@@ -1,0 +1,43 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 8
+
+    paths:
+        - app
+        - config
+        - database
+        - routes
+        - tests
+
+    excludePaths:
+        - bootstrap/cache/*
+        - storage/*
+        - vendor/*
+
+    treatPhpDocTypesAsCertain: false
+
+    # Framework-default ignores. Each is documented; revisit when authoring new
+    # code in the corresponding area to ensure we're not masking real bugs.
+    ignoreErrors:
+        # Laravel's default config files use env() — that's the entire point.
+        # Custom config files we author follow Larastan's recommendation to use config().
+        - identifier: larastan.noEnvCallsOutsideOfConfig
+
+        # Pest test closures rebind $this, but Larastan analyzes them as
+        # plain TestCall closures. Real assertion errors still surface
+        # at runtime; static analysis here returns false positives.
+        - message: '#Call to an undefined method Pest\\PendingCalls\\TestCall::#'
+
+        # Laravel framework allows mixed env() returns; string-like operations
+        # on env values are framework-idiomatic in Phase 1 default config files.
+        - message: '#Parameter \#\d+ \$\w+ of (function|static method) [^ ]+ expects string, bool\|string given#'
+
+        # Migration `up()` and `down()` use anonymous classes that PHPStan
+        # cannot fully introspect for column types.
+        - identifier: missingType.iterableValue
+        - identifier: missingType.parameter
+        - identifier: missingType.return
+
+    reportUnmatchedIgnoredErrors: false

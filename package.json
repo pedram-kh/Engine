@@ -1,0 +1,58 @@
+{
+  "name": "catalyst-engine",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Catalyst Engine — enterprise-grade two-sided platform for influencer marketing",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "concurrently -n api,main,admin -c blue,green,magenta \"pnpm dev:api\" \"pnpm dev:main\" \"pnpm dev:admin\"",
+    "dev:api": "cd apps/api && php artisan serve --host=127.0.0.1 --port=8000",
+    "dev:main": "pnpm --filter @catalyst/main dev",
+    "dev:admin": "pnpm --filter @catalyst/admin dev",
+    "build": "pnpm -r --parallel build",
+    "test": "pnpm test:backend && pnpm test:frontend",
+    "test:backend": "cd apps/api && composer test",
+    "test:frontend": "pnpm -r --parallel --filter './apps/main' --filter './apps/admin' --filter './packages/*' test",
+    "test:e2e": "pnpm -r --parallel --filter './apps/main' --filter './apps/admin' test:e2e",
+    "lint": "pnpm lint:backend && pnpm lint:frontend",
+    "lint:backend": "cd apps/api && composer pint -- --test",
+    "lint:frontend": "pnpm -r --parallel --filter './apps/main' --filter './apps/admin' --filter './packages/*' lint",
+    "typecheck": "pnpm typecheck:backend && pnpm typecheck:frontend",
+    "typecheck:backend": "cd apps/api && composer stan",
+    "typecheck:frontend": "pnpm -r --parallel --filter './apps/main' --filter './apps/admin' --filter './packages/*' typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:reset": "cd apps/api && php artisan migrate:fresh --seed",
+    "db:seed": "cd apps/api && php artisan db:seed",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "concurrently": "^9.1.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0",
+    "prettier": "^3.4.2"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,vue}": [
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,css}": [
+      "prettier --write"
+    ],
+    "apps/api/**/*.php": [
+      "bash -c 'cd apps/api && ./vendor/bin/pint'"
+    ]
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "vue-demi"
+    ]
+  }
+}

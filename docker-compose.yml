@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: catalyst-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: catalyst
+      POSTGRES_PASSWORD: catalyst
+      POSTGRES_DB: catalyst
+    ports:
+      - '127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432'
+    volumes:
+      - catalyst-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U catalyst -d catalyst']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: catalyst-redis
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${REDIS_HOST_PORT:-6379}:6379'
+    volumes:
+      - catalyst-redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: catalyst-mailhog
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${MAILHOG_SMTP_HOST_PORT:-1025}:1025'
+      - '127.0.0.1:${MAILHOG_UI_HOST_PORT:-8025}:8025'
+
+volumes:
+  catalyst-postgres-data:
+    name: catalyst-postgres-data
+  catalyst-redis-data:
+    name: catalyst-redis-data

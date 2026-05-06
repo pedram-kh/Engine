@@ -1,0 +1,14 @@
+node_modules
+vendor
+dist
+build
+coverage
+.pnpm-store
+apps/api/storage
+apps/api/bootstrap/cache
+apps/api/public/build
+playwright-report
+test-results
+*.lock
+pnpm-lock.yaml
+composer.lock

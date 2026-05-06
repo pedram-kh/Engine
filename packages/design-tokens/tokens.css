@@ -1,0 +1,192 @@
+/*
+ * Catalyst Engine — design tokens, CSS variables.
+ * Source of truth: docs/01-UI-UX.md §2.
+ *
+ * Components consume the semantic variables (--color-bg-*, --color-text-*, etc.).
+ * The brand and neutral primitives are exposed for the rare case a component
+ * needs a raw value (logos, gradient surfaces).
+ */
+
+:root {
+  /* Brand primitives */
+  --brand-teal-50: #e6f8f5;
+  --brand-teal-100: #b8ede3;
+  --brand-teal-200: #8ae3d1;
+  --brand-teal-300: #5cd8c0;
+  --brand-teal-400: #2ecdae;
+  --brand-teal-500: #14b8a6;
+  --brand-teal-600: #0f9488;
+  --brand-teal-700: #0b6f66;
+  --brand-teal-800: #074a44;
+  --brand-teal-900: #042522;
+
+  --brand-violet-50: #f2ebfe;
+  --brand-violet-100: #ddc9fc;
+  --brand-violet-200: #c8a7fa;
+  --brand-violet-300: #b385f8;
+  --brand-violet-400: #9e63f6;
+  --brand-violet-500: #8b5cf6;
+  --brand-violet-600: #7039d6;
+  --brand-violet-700: #5828a8;
+  --brand-violet-800: #401c7a;
+  --brand-violet-900: #28104c;
+
+  --brand-cream: #f5f1ea;
+  --brand-ink: #0a0a0b;
+  --brand-gradient: linear-gradient(135deg, #14b8a6 0%, #8b5cf6 100%);
+
+  /* Neutrals (warm gray) */
+  --neutral-0: #ffffff;
+  --neutral-50: #fafaf9;
+  --neutral-100: #f4f4f2;
+  --neutral-200: #e8e8e5;
+  --neutral-300: #d4d4d0;
+  --neutral-400: #a8a8a2;
+  --neutral-500: #76766f;
+  --neutral-600: #525250;
+  --neutral-700: #3a3a38;
+  --neutral-800: #1f1f1e;
+  --neutral-900: #121211;
+  --neutral-950: #0a0a0b;
+
+  /* Status palette */
+  --success-100: #dcfce7;
+  --success-500: #16a34a;
+  --warning-100: #fef3c7;
+  --warning-500: #f59e0b;
+  --danger-100: #fee2e2;
+  --danger-500: #dc2626;
+  --info-100: #e0f2fe;
+  --info-500: #0284c7;
+
+  /* Spacing */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Light theme (default) */
+:root,
+:root[data-theme='light'] {
+  --color-bg-app: var(--neutral-50);
+  --color-bg-surface: var(--neutral-0);
+  --color-bg-surface-raised: var(--neutral-0);
+  --color-bg-surface-sunken: var(--neutral-100);
+  --color-bg-overlay: rgba(10, 10, 11, 0.4);
+
+  --color-border-subtle: var(--neutral-200);
+  --color-border-default: var(--neutral-300);
+  --color-border-strong: var(--neutral-400);
+
+  --color-text-primary: var(--neutral-900);
+  --color-text-secondary: var(--neutral-600);
+  --color-text-tertiary: var(--neutral-500);
+  --color-text-disabled: var(--neutral-400);
+  --color-text-inverse: var(--neutral-0);
+
+  --color-action-primary: var(--brand-teal-500);
+  --color-action-primary-hover: var(--brand-teal-600);
+  --color-action-primary-active: var(--brand-teal-700);
+  --color-action-primary-fg: var(--neutral-0);
+
+  --color-action-secondary: var(--neutral-100);
+  --color-action-secondary-hover: var(--neutral-200);
+  --color-action-secondary-fg: var(--neutral-900);
+
+  --color-action-danger: var(--danger-500);
+  --color-action-danger-hover: #b91c1c;
+  --color-action-danger-fg: var(--neutral-0);
+
+  --color-focus-ring: var(--brand-teal-500);
+}
+
+/* Dark theme */
+:root[data-theme='dark'] {
+  --color-bg-app: var(--brand-ink);
+  --color-bg-surface: var(--neutral-900);
+  --color-bg-surface-raised: var(--neutral-800);
+  --color-bg-surface-sunken: var(--brand-ink);
+  --color-bg-overlay: rgba(0, 0, 0, 0.6);
+
+  --color-border-subtle: var(--neutral-800);
+  --color-border-default: var(--neutral-700);
+  --color-border-strong: var(--neutral-600);
+
+  --color-text-primary: var(--brand-cream);
+  --color-text-secondary: var(--neutral-300);
+  --color-text-tertiary: var(--neutral-400);
+  --color-text-disabled: var(--neutral-600);
+  --color-text-inverse: var(--neutral-900);
+
+  --color-action-primary: var(--brand-teal-400);
+  --color-action-primary-hover: var(--brand-teal-300);
+  --color-action-primary-active: var(--brand-teal-500);
+  --color-action-primary-fg: var(--neutral-950);
+
+  --color-action-secondary: var(--neutral-800);
+  --color-action-secondary-hover: var(--neutral-700);
+  --color-action-secondary-fg: var(--brand-cream);
+
+  --color-action-danger: #ef4444;
+  --color-action-danger-hover: var(--danger-500);
+  --color-action-danger-fg: var(--neutral-0);
+
+  --color-focus-ring: var(--brand-teal-400);
+}
+
+/* System preference fallback when no explicit data-theme is set */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg-app: var(--brand-ink);
+    --color-bg-surface: var(--neutral-900);
+    --color-bg-surface-raised: var(--neutral-800);
+    --color-bg-surface-sunken: var(--brand-ink);
+    --color-bg-overlay: rgba(0, 0, 0, 0.6);
+
+    --color-border-subtle: var(--neutral-800);
+    --color-border-default: var(--neutral-700);
+    --color-border-strong: var(--neutral-600);
+
+    --color-text-primary: var(--brand-cream);
+    --color-text-secondary: var(--neutral-300);
+    --color-text-tertiary: var(--neutral-400);
+    --color-text-disabled: var(--neutral-600);
+    --color-text-inverse: var(--neutral-900);
+
+    --color-action-primary: var(--brand-teal-400);
+    --color-action-primary-hover: var(--brand-teal-300);
+    --color-action-primary-active: var(--brand-teal-500);
+    --color-action-primary-fg: var(--neutral-950);
+
+    --color-action-secondary: var(--neutral-800);
+    --color-action-secondary-hover: var(--neutral-700);
+    --color-action-secondary-fg: var(--brand-cream);
+
+    --color-action-danger: #ef4444;
+    --color-action-danger-hover: var(--danger-500);
+    --color-action-danger-fg: var(--neutral-0);
+
+    --color-focus-ring: var(--brand-teal-400);
+  }
+}
