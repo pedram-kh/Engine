@@ -69,6 +69,11 @@ jobs:
       - name: Install composer deps
         run: composer install --no-interaction --no-progress --prefer-dist
 
+      - name: Prepare .env and generate a fresh APP_KEY
+        run: |
+          cp .env.example .env
+          php artisan key:generate --ansi --force
+
       - name: Pint (lint)
         run: composer pint:test
 
