@@ -59,12 +59,12 @@ pnpm dev                    # api on :8000, main on :5173, admin on :5174
 
 Started by `docker compose up -d`. All ports bind to `127.0.0.1` only.
 
-| Service  | Ports                             | URL / credentials                                      |
-| -------- | --------------------------------- | ------------------------------------------------------ |
-| Postgres | `5432`                            | `postgres://catalyst:catalyst@localhost:5432/catalyst` |
-| Redis    | `6379`                            | `redis://localhost:6379`                               |
-| Mailhog  | `1025` (SMTP), `8025` (UI)        | http://localhost:8025                                  |
-| MinIO    | `9000` (S3 API), `9011` (console) | http://localhost:9011 — `minioadmin` / `minioadmin`    |
+| Service  | Ports                             | URL / credentials                                                                                 |
+| -------- | --------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Postgres | `5432`                            | `postgres://catalyst:catalyst@localhost:5432/catalyst`                                            |
+| Redis    | `6379`                            | `redis://localhost:6379`                                                                          |
+| Mailhog  | `1025` (SMTP), `8025` (UI)        | http://localhost:8025                                                                             |
+| MinIO    | `9100` (S3 API), `9011` (console) | S3 endpoint: http://localhost:9100 — console: http://localhost:9011 (`minioadmin` / `minioadmin`) |
 
 The `minio-init` one-shot container creates the four buckets the platform expects (`catalyst-engine-media`, `catalyst-engine-contracts`, `catalyst-engine-exports`, `catalyst-engine-public`) and exits. Re-run it any time with `docker compose up minio-init`.
 
