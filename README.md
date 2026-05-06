@@ -51,9 +51,22 @@ First-time setup:
 Daily dev:
 
 ```bash
-docker compose up -d        # Postgres, Redis, Mailhog
+docker compose up -d        # Postgres, Redis, Mailhog, MinIO
 pnpm dev                    # api on :8000, main on :5173, admin on :5174
 ```
+
+### Local services
+
+Started by `docker compose up -d`. All ports bind to `127.0.0.1` only.
+
+| Service  | Ports                             | URL / credentials                                      |
+| -------- | --------------------------------- | ------------------------------------------------------ |
+| Postgres | `5432`                            | `postgres://catalyst:catalyst@localhost:5432/catalyst` |
+| Redis    | `6379`                            | `redis://localhost:6379`                               |
+| Mailhog  | `1025` (SMTP), `8025` (UI)        | http://localhost:8025                                  |
+| MinIO    | `9000` (S3 API), `9001` (console) | http://localhost:9001 — `minioadmin` / `minioadmin`    |
+
+The `minio-init` one-shot container creates the four buckets the platform expects (`catalyst-engine-media`, `catalyst-engine-contracts`, `catalyst-engine-exports`, `catalyst-engine-public`) and exits. Re-run it any time with `docker compose up minio-init`.
 
 Run all tests:
 
