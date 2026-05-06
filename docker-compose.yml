@@ -49,7 +49,7 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
     ports:
       - '127.0.0.1:${MINIO_S3_HOST_PORT:-9000}:9000'
-      - '127.0.0.1:${MINIO_CONSOLE_HOST_PORT:-9001}:9001'
+      - '127.0.0.1:${MINIO_CONSOLE_HOST_PORT:-9011}:9001'
     volumes:
       - catalyst-minio-data:/data
     healthcheck:
