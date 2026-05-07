@@ -68,6 +68,42 @@ Started by `docker compose up -d`. All ports bind to `127.0.0.1` only.
 
 The `minio-init` one-shot container creates the four buckets the platform expects (`catalyst-engine-media`, `catalyst-engine-contracts`, `catalyst-engine-exports`, `catalyst-engine-public`) and exits. Re-run it any time with `docker compose up minio-init`.
 
+### Port conflicts on your machine
+
+> The defaults committed to `.env.example` work for clean development environments without port conflicts.
+
+Some machines already have services bound to `5432` (Postgres) or `6379` (Redis) — typically a system-installed Postgres/Redis, or another Docker project. If `docker compose up` fails with **`address already in use`**, override the host ports as follows. The override is per-machine and stays out of git.
+
+1. Copy the root-level docker-compose env template and pick any free ports on your machine:
+
+   ```bash
+   cp .env.example .env
+   # then edit .env, for example:
+   #   POSTGRES_HOST_PORT=5435
+   #   REDIS_HOST_PORT=6380
+   ```
+
+   `.env` is gitignored at the repo root, so the override stays local to you.
+
+2. Bring the stack up and **verify the actual host port mappings** Docker chose:
+
+   ```bash
+   docker compose up -d
+   docker port catalyst-postgres
+   docker port catalyst-redis
+   ```
+
+   The right-hand side of each line is the host port. Expect output like `5432/tcp -> 127.0.0.1:5435`.
+
+3. Update `apps/api/.env` (your local copy of `apps/api/.env.example`) to match the host ports Docker actually bound:
+
+   ```bash
+   DB_PORT=5435
+   REDIS_PORT=6380
+   ```
+
+   The API runs on the host, so it has to dial the **host-side** port, not the container-internal port. Same logic applies for any other host-port override (Mailhog, MinIO).
+
 Run all tests:
 
 ```bash
