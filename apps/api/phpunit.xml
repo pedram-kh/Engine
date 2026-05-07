@@ -19,8 +19,19 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <!-- Deterministic test-only encryption key. NOT a secret — committed
+             intentionally so the test suite is hermetic and runs identically
+             on a fresh clone, on CI, and on every developer's machine without
+             depending on apps/api/.env. Production / staging keys come from
+             AWS Secrets Manager (see docs/SPRINT-0-MANUAL-STEPS.md). -->
+        <env name="APP_KEY" value="base64:SjJQVMrPc7nfaVPS4fIL71NxMj8lpAKwOl+o0YKwHgw="/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
-        <env name="BCRYPT_ROUNDS" value="4"/>
+        <!-- Argon2id with the lowest safe cost so the test suite runs fast.
+             Production parameters are tuned in config/hashing.php. -->
+        <env name="HASH_DRIVER" value="argon2id"/>
+        <env name="HASH_ARGON_MEMORY" value="8192"/>
+        <env name="HASH_ARGON_TIME" value="1"/>
+        <env name="HASH_ARGON_THREADS" value="1"/>
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>

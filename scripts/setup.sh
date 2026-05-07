@@ -47,11 +47,24 @@ for _ in {1..30}; do
 done
 
 bold "4/5 Configuring apps/api"
+# Bootstrap apps/api/.env idempotently. Steps:
+#   a. If apps/api/.env is missing, copy it from .env.example.
+#   b. Read APP_KEY= out of the file (works whether .env was just copied or
+#      pre-existed). If it's empty, generate one. Never overwrite a real key.
 if [[ ! -f apps/api/.env ]]; then
   cp apps/api/.env.example apps/api/.env
   info "Created apps/api/.env from .env.example"
 fi
-( cd apps/api && php artisan key:generate --ansi --force )
+
+# Match `APP_KEY=…` exactly (no leading spaces, allowing trailing CR for safety).
+existing_app_key="$(grep -E '^APP_KEY=' apps/api/.env | head -n1 | cut -d= -f2- | tr -d '\r')"
+if [[ -z "$existing_app_key" ]]; then
+  info "APP_KEY is empty in apps/api/.env — generating a new one"
+  ( cd apps/api && php artisan key:generate --ansi --force )
+else
+  info "APP_KEY already set in apps/api/.env — keeping it"
+fi
+
 ( cd apps/api && php artisan migrate --no-interaction )
 
 bold "5/5 Installing Playwright browsers (Chromium only)"

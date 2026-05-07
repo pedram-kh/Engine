@@ -4,22 +4,19 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+/**
+ * Top-level seeder. Composes per-sprint seeders so that running
+ * `php artisan db:seed` reliably gives a developer a usable local
+ * environment.
+ */
+final class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            Sprint1IdentitySeeder::class,
         ]);
     }
 }

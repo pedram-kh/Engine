@@ -48,6 +48,13 @@ First-time setup:
 ./scripts/setup.sh
 ```
 
+`./scripts/setup.sh` is the canonical first-run command. On a fresh clone it
+creates `apps/api/.env` from `.env.example`, generates `APP_KEY` if (and only
+if) it is empty, brings up the docker services (Postgres, Redis, Mailhog),
+runs migrations, and installs Playwright browsers. It is idempotent — re-run
+it safely after pulling `main`. When it finishes, `pnpm test` runs green
+without any further manual steps.
+
 Daily dev:
 
 ```bash
