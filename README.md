@@ -70,22 +70,24 @@ The `minio-init` one-shot container creates the four buckets the platform expect
 
 ### Port conflicts on your machine
 
-> The defaults committed to `.env.example` work for clean development environments without port conflicts.
+The defaults committed to `.env.example` work for clean development environments without port conflicts.
 
-Some machines already have services bound to `5432` (Postgres) or `6379` (Redis) — typically a system-installed Postgres/Redis, or another Docker project. If `docker compose up` fails with **`address already in use`**, override the host ports as follows. The override is per-machine and stays out of git.
+Some machines already have other services bound to `5432` (Postgres) or `6379` (Redis) — a system Postgres install, another local Docker project, etc. If `docker compose up` fails with `address already in use`, override the host ports.
 
-1. Copy the root-level docker-compose env template and pick any free ports on your machine:
+1. **Override the Compose host ports.** At the repo root:
 
    ```bash
    cp .env.example .env
-   # then edit .env, for example:
-   #   POSTGRES_HOST_PORT=5435
-   #   REDIS_HOST_PORT=6380
    ```
 
-   `.env` is gitignored at the repo root, so the override stays local to you.
+   `.env` is gitignored, so this stays local. Edit it to use ports that are free on your machine, e.g.:
 
-2. Bring the stack up and **verify the actual host port mappings** Docker chose:
+   ```bash
+   POSTGRES_HOST_PORT=5435
+   REDIS_HOST_PORT=6380
+   ```
+
+2. **Bring the stack up and verify the actual host-side bindings:**
 
    ```bash
    docker compose up -d
@@ -93,16 +95,15 @@ Some machines already have services bound to `5432` (Postgres) or `6379` (Redis)
    docker port catalyst-redis
    ```
 
-   The right-hand side of each line is the host port. Expect output like `5432/tcp -> 127.0.0.1:5435`.
-
-3. Update `apps/api/.env` (your local copy of `apps/api/.env.example`) to match the host ports Docker actually bound:
+3. **Match `apps/api/.env` to the host ports** so Laravel connects to the right place:
 
    ```bash
+   # apps/api/.env
    DB_PORT=5435
    REDIS_PORT=6380
    ```
 
-   The API runs on the host, so it has to dial the **host-side** port, not the container-internal port. Same logic applies for any other host-port override (Mailhog, MinIO).
+   `apps/api/.env` is also gitignored — your local overrides stay on your machine.
 
 Run all tests:
 
