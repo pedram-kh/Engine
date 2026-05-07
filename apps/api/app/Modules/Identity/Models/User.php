@@ -8,6 +8,8 @@ use App\Core\Concerns\HasUlid;
 use App\Modules\Admin\Models\AdminProfile;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyMembership;
+use App\Modules\Audit\Concerns\Audited;
+use App\Modules\Audit\Contracts\Auditable;
 use App\Modules\Identity\Database\Factories\UserFactory;
 use App\Modules\Identity\Enums\ThemePreference;
 use App\Modules\Identity\Enums\UserType;
@@ -45,8 +47,10 @@ use Illuminate\Support\Carbon;
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
  */
-final class User extends Authenticatable implements MustVerifyEmail
+final class User extends Authenticatable implements Auditable, MustVerifyEmail
 {
+    use Audited;
+
     /** @use HasFactory<UserFactory> */
     use HasFactory;
 
@@ -87,6 +91,42 @@ final class User extends Authenticatable implements MustVerifyEmail
         'two_factor_secret',
         'two_factor_recovery_codes',
     ];
+
+    /**
+     * Explicit allowlist of attributes that may appear in audit `before` /
+     * `after` snapshots. Required by {@see Auditable}.
+     *
+     * Sensitive fields are excluded by absence:
+     *   - password                  (never in audits)
+     *   - two_factor_secret         (never in audits)
+     *   - two_factor_recovery_codes (never in audits)
+     *   - two_factor_confirmed_at   (never in audits)
+     *   - remember_token            (never in audits)
+     *
+     * Asserted by tests/Feature/Modules/Audit/AuditedTraitTest.php.
+     *
+     * @return list<string>
+     */
+    public function auditableAllowlist(): array
+    {
+        return [
+            'email',
+            'email_verified_at',
+            'type',
+            'name',
+            'preferred_language',
+            'preferred_currency',
+            'timezone',
+            'theme_preference',
+            'last_login_at',
+            'last_login_ip',
+            'mfa_required',
+            'is_suspended',
+            'suspended_reason',
+            'suspended_at',
+            'deleted_at',
+        ];
+    }
 
     /**
      * Memberships in agencies. A creator-typed user has zero memberships;

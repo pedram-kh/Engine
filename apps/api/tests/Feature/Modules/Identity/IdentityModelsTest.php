@@ -170,7 +170,11 @@ it('agency_users unique constraint rejects duplicate memberships per user/agency
 it('User soft-delete preserves the row', function (): void {
     $user = User::factory()->create();
 
-    $user->delete();
+    // user.deleted is a reason-mandatory action (docs/05-SECURITY-COMPLIANCE.md §3.3),
+    // enforced at the service layer by AuditLogger. Real admin destructive
+    // endpoints get the reason from the X-Action-Reason header via the
+    // `action.reason` middleware (docs/04-API-DESIGN.md §26).
+    $user->withAuditReason('test cleanup')->delete();
 
     expect(User::query()->find($user->id))->toBeNull()
         ->and(User::query()->withTrashed()->find($user->id))->not->toBeNull();
