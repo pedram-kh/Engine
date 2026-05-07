@@ -77,13 +77,33 @@ it('accepts a non-empty reason for reason-mandatory actions and trims it', funct
     expect($row->reason)->toBe('support ticket #4711');
 });
 
-it('auto-derives actor_type=system when no actor and no auth user', function (): void {
+it('auto-derives actor_type=system and actor_role=system when no actor and no auth user', function (): void {
     /** @var AuditLogger $logger */
     $logger = app(AuditLogger::class);
     $row = $logger->log(action: AuditAction::AuthLoginFailed);
 
-    expect($row->actor_type)->toBe('system');
-    expect($row->actor_id)->toBeNull();
+    expect($row->actor_type)->toBe('system')
+        ->and($row->actor_role)->toBe('system')
+        ->and($row->actor_id)->toBeNull();
+});
+
+it('runs cleanly with no HTTP request and no overrides', function (): void {
+    // Seeders, artisan commands, and queued jobs may invoke AuditLogger
+    // outside an HTTP request lifecycle. We simulate that by binding an
+    // empty Request (no REMOTE_ADDR, no User-Agent) — the same shape Laravel
+    // hands a queue worker that has not had an HTTP context restored.
+    app()->instance('request', new Request);
+
+    /** @var AuditLogger $logger */
+    $logger = app(AuditLogger::class);
+    $row = $logger->log(action: AuditAction::AuthLoginFailed);
+
+    expect($row->exists)->toBeTrue('the row must persist even with no HTTP context')
+        ->and($row->actor_id)->toBeNull()
+        ->and($row->actor_type)->toBe('system')
+        ->and($row->actor_role)->toBe('system')
+        ->and($row->ip)->toBeNull()
+        ->and($row->user_agent)->toBeNull();
 });
 
 it('auto-derives actor from auth()->user() when no explicit actor passed', function (): void {

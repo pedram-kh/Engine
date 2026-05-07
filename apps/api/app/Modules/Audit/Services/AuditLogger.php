@@ -21,10 +21,26 @@ use Illuminate\Database\Eloquent\Model;
  * either path produce equivalent rows. See AuditServiceProvider.
  *
  * Auto-derived defaults (when not explicitly passed):
- *   - actor / actor_id / actor_role : derived from auth()->user() if any.
- *   - actor_type                    : 'user' if actor present, else 'system'.
- *   - agency_id                     : derived from {@see TenancyContext}.
- *   - ip / user_agent               : derived from the current Request, if any.
+ *   - actor / actor_id : derived from auth()->user() if any, else null.
+ *   - actor_type       : 'user' when an actor is resolved; otherwise the
+ *                        sentinel 'system'.
+ *   - actor_role       : null when actor_type='user' (callers pass the
+ *                        snapshot); the sentinel 'system' when
+ *                        actor_type='system' (so admin queries can
+ *                        filter system-initiated rows on either column).
+ *   - agency_id        : derived from {@see TenancyContext}.
+ *   - ip / user_agent  : derived from the current Request via the
+ *                        framework helper. Always returns null in
+ *                        non-HTTP contexts (artisan, queued jobs, the
+ *                        Sprint1IdentitySeeder, anywhere request() is
+ *                        bound to an empty/synthetic Request without
+ *                        REMOTE_ADDR or User-Agent headers).
+ *
+ * Non-HTTP contract (verified by AuditLoggerTest):
+ *   When called from a seeder, artisan command, or queued job with no
+ *   real HTTP request and no overrides, the row is still written and
+ *   contains: actor_id=null, actor_type='system', actor_role='system',
+ *   ip=null, user_agent=null.
  */
 final class AuditLogger
 {
@@ -67,12 +83,14 @@ final class AuditLogger
         }
 
         $resolvedActor = $actor ?? $this->resolveCurrentActor();
+        $resolvedActorType = $actorType ?? ($resolvedActor !== null ? 'user' : 'system');
+        $resolvedActorRole = $actorRole ?? ($resolvedActorType === 'system' ? 'system' : null);
 
         return AuditLog::query()->create([
             'agency_id' => $agencyId ?? $this->resolveAgencyId(),
-            'actor_type' => $actorType ?? ($resolvedActor !== null ? 'user' : 'system'),
+            'actor_type' => $resolvedActorType,
             'actor_id' => $this->extractActorId($resolvedActor),
-            'actor_role' => $actorRole,
+            'actor_role' => $resolvedActorRole,
             'action' => $action,
             'subject_type' => $subject?->getMorphClass(),
             'subject_id' => $subject?->getKey(),
