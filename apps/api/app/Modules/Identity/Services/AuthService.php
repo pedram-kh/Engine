@@ -13,6 +13,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use SensitiveParameter;
 
 /**
  * Owns the login + logout decision graph.
@@ -61,10 +62,17 @@ final class AuthService
         private readonly Dispatcher $events,
         private readonly FailedLoginTracker $failedLogins,
         private readonly AccountLockoutService $lockout,
+        private readonly TwoFactorChallengeService $twoFactorChallenge,
+        private readonly TwoFactorVerificationThrottle $twoFactorThrottle,
     ) {}
 
-    public function login(string $email, string $password, Request $request, string $guard): LoginResult
-    {
+    public function login(
+        string $email,
+        #[SensitiveParameter] string $password,
+        Request $request,
+        string $guard,
+        #[SensitiveParameter] ?string $mfaCode = null,
+    ): LoginResult {
         $email = strtolower(trim($email));
         $ip = $request->ip();
         $userAgent = $request->userAgent();
@@ -114,10 +122,62 @@ final class AuthService
             $user->forceFill(['password' => Hash::make($password)])->saveQuietly();
         }
 
-        if ($user->hasTwoFactorEnabled()) {
-            $this->events->dispatch(new LoginFailed($email, $user, $ip, $userAgent, 'mfa_required'));
+        $usedMfa = false;
 
-            return LoginResult::mfaRequired($user);
+        if ($user->hasTwoFactorEnabled()) {
+            // 2FA enrollment can be administratively suspended after the
+            // 10-invalid-attempts-in-15-minutes hard threshold trips. A
+            // suspended user cannot complete the MFA gate even with a
+            // valid code; admin must clear the timestamp.
+            if ($user->hasTwoFactorEnrollmentSuspended()) {
+                $this->events->dispatch(new LoginFailed($email, $user, $ip, $userAgent, 'mfa_enrollment_suspended'));
+
+                return LoginResult::mfaEnrollmentSuspended($user);
+            }
+
+            if ($mfaCode === null || trim($mfaCode) === '') {
+                $this->events->dispatch(new LoginFailed($email, $user, $ip, $userAgent, 'mfa_required'));
+
+                return LoginResult::mfaRequired($user);
+            }
+
+            // When the soft-window cap is already reached we refuse to
+            // run the verifier (no oracle for an attacker hammering codes)
+            // BUT we still increment the counter for this attempt — the
+            // hard threshold for full enrollment suspension must remain
+            // reachable even by an attacker who paces themselves below
+            // the soft-rate cap.
+            if ($this->twoFactorThrottle->isSoftLocked($user)) {
+                $this->twoFactorThrottle->recordFailure($user, $ip, $userAgent);
+                $this->events->dispatch(new LoginFailed($email, $user, $ip, $userAgent, 'mfa_rate_limited'));
+
+                if ($user->refresh()->hasTwoFactorEnrollmentSuspended()) {
+                    return LoginResult::mfaEnrollmentSuspended($user);
+                }
+
+                return LoginResult::mfaRateLimited(
+                    $user,
+                    $this->twoFactorThrottle->retryAfterSeconds($user),
+                );
+            }
+
+            $challenge = $this->twoFactorChallenge->verify($user, $mfaCode, $request);
+
+            if (! $challenge->passed) {
+                $this->twoFactorThrottle->recordFailure($user, $ip, $userAgent);
+                $this->events->dispatch(new LoginFailed($email, $user, $ip, $userAgent, 'mfa_invalid_code'));
+
+                // No "did the failure I just recorded push me past the hard
+                // threshold?" check here. Under current thresholds (soft=5,
+                // hard=10) that path is unreachable from this branch — the
+                // user would have been soft-locked above before the challenge
+                // ever ran. The soft-locked branch above does the suspension
+                // check transactionally for any future threshold tuning.
+                return LoginResult::mfaInvalidCode($user);
+            }
+
+            $this->twoFactorThrottle->recordSuccess($user);
+            $usedMfa = true;
         }
 
         $this->failedLogins->clear($email);
@@ -131,7 +191,13 @@ final class AuthService
             'last_login_ip' => $ip,
         ])->saveQuietly();
 
-        $this->events->dispatch(new UserLoggedIn($user, $ip, $userAgent, $guard));
+        $this->events->dispatch(new UserLoggedIn(
+            user: $user,
+            ip: $ip,
+            userAgent: $userAgent,
+            guard: $guard,
+            mfa: $usedMfa,
+        ));
 
         return LoginResult::success($user);
     }

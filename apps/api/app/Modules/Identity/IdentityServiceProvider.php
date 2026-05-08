@@ -10,6 +10,11 @@ use App\Modules\Identity\Events\EmailVerified;
 use App\Modules\Identity\Events\LoginFailed;
 use App\Modules\Identity\Events\PasswordResetCompleted;
 use App\Modules\Identity\Events\PasswordResetRequested;
+use App\Modules\Identity\Events\TwoFactorConfirmed;
+use App\Modules\Identity\Events\TwoFactorDisabled;
+use App\Modules\Identity\Events\TwoFactorEnabled;
+use App\Modules\Identity\Events\TwoFactorRecoveryCodeConsumed;
+use App\Modules\Identity\Events\TwoFactorRecoveryCodesRegenerated;
 use App\Modules\Identity\Events\UserLoggedIn;
 use App\Modules\Identity\Events\UserLoggedOut;
 use App\Modules\Identity\Events\UserSignedUp;
@@ -118,6 +123,16 @@ final class IdentityServiceProvider extends ServiceProvider
         Event::listen(UserSignedUp::class, [WriteAuthAuditLog::class, 'handleUserSignedUp']);
         Event::listen(EmailVerificationSent::class, [WriteAuthAuditLog::class, 'handleEmailVerificationSent']);
         Event::listen(EmailVerified::class, [WriteAuthAuditLog::class, 'handleEmailVerified']);
+        Event::listen(TwoFactorEnabled::class, [WriteAuthAuditLog::class, 'handleTwoFactorEnabled']);
+        Event::listen(TwoFactorConfirmed::class, [WriteAuthAuditLog::class, 'handleTwoFactorConfirmed']);
+        Event::listen(TwoFactorDisabled::class, [WriteAuthAuditLog::class, 'handleTwoFactorDisabled']);
+        Event::listen(TwoFactorRecoveryCodesRegenerated::class, [WriteAuthAuditLog::class, 'handleTwoFactorRecoveryCodesRegenerated']);
+        Event::listen(TwoFactorRecoveryCodeConsumed::class, [WriteAuthAuditLog::class, 'handleTwoFactorRecoveryCodeConsumed']);
+        // Note: TwoFactorEnrollmentSuspended is intentionally NOT
+        // listened to here. Its `mfa.enrollment_suspended` audit row is
+        // written transactionally by TwoFactorVerificationThrottle so
+        // the suspension state and audit log can never disagree (same
+        // pattern as AccountLocked).
     }
 
     private function registerRoutes(): void

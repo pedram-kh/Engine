@@ -12,6 +12,11 @@ use App\Modules\Identity\Events\EmailVerified;
 use App\Modules\Identity\Events\LoginFailed;
 use App\Modules\Identity\Events\PasswordResetCompleted;
 use App\Modules\Identity\Events\PasswordResetRequested;
+use App\Modules\Identity\Events\TwoFactorConfirmed;
+use App\Modules\Identity\Events\TwoFactorDisabled;
+use App\Modules\Identity\Events\TwoFactorEnabled;
+use App\Modules\Identity\Events\TwoFactorRecoveryCodeConsumed;
+use App\Modules\Identity\Events\TwoFactorRecoveryCodesRegenerated;
 use App\Modules\Identity\Events\UserLoggedIn;
 use App\Modules\Identity\Events\UserLoggedOut;
 use App\Modules\Identity\Events\UserSignedUp;
@@ -28,10 +33,14 @@ use App\Modules\Identity\Services\AuthService;
  *   - Future side effects (Slack pings, Sentry breadcrumbs) hang off the
  *     same events without touching the service.
  *
- * The {@see AccountLocked} event is NOT
- * handled here — its audit row must be written transactionally with the
- * suspension, so {@see AccountLockoutService}
- * writes the row directly and emits the event for downstream fan-out only.
+ * The {@see AccountLocked} event is NOT handled here — its audit row
+ * must be written transactionally with the suspension, so
+ * {@see AccountLockoutService} writes the row directly and emits the
+ * event for downstream fan-out only. The same pattern applies to the
+ * `TwoFactorEnrollmentSuspended` event from chunk 5: the throttle
+ * writes the `mfa.enrollment_suspended` row inside the transaction
+ * that stamps `users.two_factor_enrollment_suspended_at`, and the
+ * event itself is purely a fan-out signal.
  */
 final class WriteAuthAuditLog
 {
@@ -43,7 +52,10 @@ final class WriteAuthAuditLog
             action: AuditAction::AuthLoginSucceeded,
             actor: $event->user,
             subject: $event->user,
-            metadata: ['guard' => $event->guard],
+            metadata: [
+                'guard' => $event->guard,
+                'mfa' => $event->mfa,
+            ],
             ip: $event->ip,
             userAgent: $event->userAgent,
         );
@@ -126,6 +138,73 @@ final class WriteAuthAuditLog
             action: AuditAction::AuthEmailVerified,
             actor: $event->user,
             subject: $event->user,
+            ip: $event->ip,
+            userAgent: $event->userAgent,
+        );
+    }
+
+    public function handleTwoFactorEnabled(TwoFactorEnabled $event): void
+    {
+        $this->audit->log(
+            action: AuditAction::MfaEnabled,
+            actor: $event->user,
+            subject: $event->user,
+            ip: $event->ip,
+            userAgent: $event->userAgent,
+        );
+    }
+
+    public function handleTwoFactorConfirmed(TwoFactorConfirmed $event): void
+    {
+        $this->audit->log(
+            action: AuditAction::MfaConfirmed,
+            actor: $event->user,
+            subject: $event->user,
+            ip: $event->ip,
+            userAgent: $event->userAgent,
+        );
+    }
+
+    public function handleTwoFactorDisabled(TwoFactorDisabled $event): void
+    {
+        $this->audit->log(
+            action: AuditAction::MfaDisabled,
+            actor: $event->user,
+            subject: $event->user,
+            ip: $event->ip,
+            userAgent: $event->userAgent,
+        );
+    }
+
+    /**
+     * The audit row records the COUNT of codes that were generated, not
+     * any of the plaintext code values. The plaintext is shown to the
+     * user once at the controller layer and never reaches this listener.
+     */
+    public function handleTwoFactorRecoveryCodesRegenerated(TwoFactorRecoveryCodesRegenerated $event): void
+    {
+        $this->audit->log(
+            action: AuditAction::MfaRecoveryCodesRegenerated,
+            actor: $event->user,
+            subject: $event->user,
+            metadata: ['code_count' => $event->codeCount],
+            ip: $event->ip,
+            userAgent: $event->userAgent,
+        );
+    }
+
+    /**
+     * The audit row records the REMAINING code count after consumption,
+     * not which code was consumed. Operations can spot a recovery-code
+     * burn pattern without ever seeing the bearer token.
+     */
+    public function handleTwoFactorRecoveryCodeConsumed(TwoFactorRecoveryCodeConsumed $event): void
+    {
+        $this->audit->log(
+            action: AuditAction::MfaRecoveryCodeConsumed,
+            actor: $event->user,
+            subject: $event->user,
+            metadata: ['remaining_count' => $event->remainingCount],
             ip: $event->ip,
             userAgent: $event->userAgent,
         );

@@ -34,12 +34,20 @@ enum AuditAction: string
     case AuthPasswordChanged = 'auth.password.changed';
     case AuthEmailVerificationSent = 'auth.email.verification_sent';
     case AuthEmailVerified = 'auth.email.verified';
-    case AuthTwoFactorEnabled = 'auth.two_factor.enabled';
-    case AuthTwoFactorDisabled = 'auth.two_factor.disabled';
-    case AuthTwoFactorChallengeSucceeded = 'auth.two_factor.challenge_succeeded';
-    case AuthTwoFactorChallengeFailed = 'auth.two_factor.challenge_failed';
     case AuthAccountLocked = 'auth.account_locked';
     case AuthAccountUnlocked = 'auth.account_unlocked';
+
+    // MFA verbs (chunk 5). Per-attempt TOTP verification is intentionally
+    // NOT audited — the LoginSucceeded row carries `mfa: true` metadata
+    // when 2FA was used, and only the more interesting state changes
+    // (enable/confirm/disable/regenerate/consume/enrollment-suspend) emit
+    // their own audit rows.
+    case MfaEnabled = 'mfa.enabled';
+    case MfaConfirmed = 'mfa.confirmed';
+    case MfaDisabled = 'mfa.disabled';
+    case MfaRecoveryCodesRegenerated = 'mfa.recovery_codes_regenerated';
+    case MfaRecoveryCodeConsumed = 'mfa.recovery_code_consumed';
+    case MfaEnrollmentSuspended = 'mfa.enrollment_suspended';
 
     case UserCreated = 'user.created';
     case UserUpdated = 'user.updated';
@@ -61,6 +69,26 @@ enum AuditAction: string
             self::UserSuspended,
             self::UserUnsuspended,
             self::UserDeleted => true,
+            default => false,
+        };
+    }
+
+    /**
+     * True when the action describes a sensitive credential mutation whose
+     * before/after snapshot must NEVER contain the underlying secret/code
+     * material in plaintext. Asserted by chunk 5's TwoFactorAuditTest in
+     * addition to the {@see User::auditableAllowlist()} exclusion.
+     */
+    public function isSensitiveCredentialAction(): bool
+    {
+        return match ($this) {
+            self::MfaEnabled,
+            self::MfaConfirmed,
+            self::MfaDisabled,
+            self::MfaRecoveryCodesRegenerated,
+            self::MfaRecoveryCodeConsumed,
+            self::AuthPasswordChanged,
+            self::AuthPasswordResetCompleted => true,
             default => false,
         };
     }

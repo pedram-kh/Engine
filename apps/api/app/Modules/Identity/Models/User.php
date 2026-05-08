@@ -37,8 +37,9 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $last_login_at
  * @property string|null $last_login_ip
  * @property string|null $two_factor_secret
- * @property string|null $two_factor_recovery_codes
+ * @property array<int, string>|null $two_factor_recovery_codes
  * @property Carbon|null $two_factor_confirmed_at
+ * @property Carbon|null $two_factor_enrollment_suspended_at
  * @property bool $mfa_required
  * @property bool $is_suspended
  * @property string|null $suspended_reason
@@ -75,6 +76,7 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
         'two_factor_secret',
         'two_factor_recovery_codes',
         'two_factor_confirmed_at',
+        'two_factor_enrollment_suspended_at',
         'mfa_required',
         'is_suspended',
         'suspended_reason',
@@ -97,13 +99,15 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
      * `after` snapshots. Required by {@see Auditable}.
      *
      * Sensitive fields are excluded by absence:
-     *   - password                  (never in audits)
-     *   - two_factor_secret         (never in audits)
-     *   - two_factor_recovery_codes (never in audits)
-     *   - two_factor_confirmed_at   (never in audits)
-     *   - remember_token            (never in audits)
+     *   - password                              (never in audits)
+     *   - two_factor_secret                     (never in audits)
+     *   - two_factor_recovery_codes             (never in audits)
+     *   - two_factor_confirmed_at               (never in audits)
+     *   - two_factor_enrollment_suspended_at    (never in audits)
+     *   - remember_token                        (never in audits)
      *
-     * Asserted by tests/Feature/Modules/Audit/AuditedTraitTest.php.
+     * Asserted by tests/Feature/Modules/Audit/AuditedTraitTest.php and
+     * tests/Feature/Modules/Identity/TwoFactorAuditTest.php.
      *
      * @return list<string>
      */
@@ -177,6 +181,11 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
         return $this->two_factor_confirmed_at !== null;
     }
 
+    public function hasTwoFactorEnrollmentSuspended(): bool
+    {
+        return $this->two_factor_enrollment_suspended_at !== null;
+    }
+
     /**
      * @return array<string, string>
      */
@@ -189,8 +198,13 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
             'theme_preference' => ThemePreference::class,
             'last_login_at' => 'datetime',
             'two_factor_secret' => 'encrypted',
-            'two_factor_recovery_codes' => 'encrypted',
+            // Stored as JSON array of bcrypt hashes (one per recovery code),
+            // then encrypted at rest as defense-in-depth. Plaintext codes are
+            // shown to the user once at confirmation/regeneration and never
+            // retrievable from the database. See chunk 5 priority #3.
+            'two_factor_recovery_codes' => 'encrypted:array',
             'two_factor_confirmed_at' => 'datetime',
+            'two_factor_enrollment_suspended_at' => 'datetime',
             'mfa_required' => 'boolean',
             'is_suspended' => 'boolean',
             'suspended_at' => 'datetime',

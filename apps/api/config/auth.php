@@ -129,4 +129,25 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Mandatory MFA enforcement on the admin guard
+    |--------------------------------------------------------------------------
+    |
+    | When true, every route mounted behind the EnsureMfaForAdmins
+    | middleware (i.e. all admin routes other than the 2FA enrollment
+    | endpoints themselves) refuses to serve admins who have not yet
+    | confirmed 2FA. The default is `true` and SHOULD remain so in
+    | every staging / production environment — chunk 5 priority #11.
+    |
+    | The flag MAY be flipped to false in the local environment via
+    | the env var below to unblock UI development against a fresh
+    | unenrolled admin account. EnsureMfaForAdmins refuses to honour
+    | the override outside `local`, so a misconfigured staging env
+    | cannot silently disable MFA.
+    |
+    */
+
+    'admin_mfa_enforced' => (bool) env('ADMIN_MFA_ENFORCED', true),
+
 ];

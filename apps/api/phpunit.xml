@@ -32,6 +32,12 @@
         <env name="HASH_ARGON_MEMORY" value="8192"/>
         <env name="HASH_ARGON_TIME" value="1"/>
         <env name="HASH_ARGON_THREADS" value="1"/>
+        <!-- Bcrypt cost only kicks in for chunk 5's recovery-code hashing
+             (TwoFactorService uses the bcrypt driver explicitly). 4 is
+             the lowest cost the library accepts and gives test runs a
+             ~10x speedup vs the default 10. Production stays on the
+             config default. -->
+        <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>

@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 uses(TestCase::class);
 
-it('AuditAction catalogue lists every Sprint 1 auth + user verb', function (): void {
+it('AuditAction catalogue lists every Sprint 1 auth + user + mfa verb', function (): void {
     $expected = [
         'auth.signup',
         'auth.login.succeeded',
@@ -18,12 +18,14 @@ it('AuditAction catalogue lists every Sprint 1 auth + user verb', function (): v
         'auth.password.changed',
         'auth.email.verification_sent',
         'auth.email.verified',
-        'auth.two_factor.enabled',
-        'auth.two_factor.disabled',
-        'auth.two_factor.challenge_succeeded',
-        'auth.two_factor.challenge_failed',
         'auth.account_locked',
         'auth.account_unlocked',
+        'mfa.enabled',
+        'mfa.confirmed',
+        'mfa.disabled',
+        'mfa.recovery_codes_regenerated',
+        'mfa.recovery_code_consumed',
+        'mfa.enrollment_suspended',
         'user.created',
         'user.updated',
         'user.deleted',
@@ -36,7 +38,7 @@ it('AuditAction catalogue lists every Sprint 1 auth + user verb', function (): v
     sort($expected);
     sort($actual);
 
-    expect($actual)->toBe($expected, 'AuditAction enum drifted from chunk 2 catalogue.');
+    expect($actual)->toBe($expected, 'AuditAction enum drifted from Sprint 1 catalogue.');
 });
 
 it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', function (): void {
@@ -60,5 +62,34 @@ it('non-destructive actions do not require a reason', function (): void {
         ->and(AuditAction::AuthLoginFailed->requiresReason())->toBeFalse()
         ->and(AuditAction::UserCreated->requiresReason())->toBeFalse()
         ->and(AuditAction::UserUpdated->requiresReason())->toBeFalse()
-        ->and(AuditAction::AuthAccountLocked->requiresReason())->toBeFalse();
+        ->and(AuditAction::AuthAccountLocked->requiresReason())->toBeFalse()
+        ->and(AuditAction::MfaEnabled->requiresReason())->toBeFalse()
+        ->and(AuditAction::MfaConfirmed->requiresReason())->toBeFalse()
+        ->and(AuditAction::MfaDisabled->requiresReason())->toBeFalse();
+});
+
+it('flags mfa state-mutating verbs as sensitive credential actions', function (): void {
+    $sensitive = array_values(array_filter(
+        AuditAction::cases(),
+        fn (AuditAction $case): bool => $case->isSensitiveCredentialAction(),
+    ));
+
+    $sensitiveValues = array_map(fn (AuditAction $a): string => $a->value, $sensitive);
+
+    expect($sensitiveValues)->toEqualCanonicalizing([
+        'mfa.enabled',
+        'mfa.confirmed',
+        'mfa.disabled',
+        'mfa.recovery_codes_regenerated',
+        'mfa.recovery_code_consumed',
+        'auth.password.changed',
+        'auth.password.reset_completed',
+    ]);
+});
+
+it('non-credential actions are not flagged sensitive', function (): void {
+    expect(AuditAction::AuthLoginSucceeded->isSensitiveCredentialAction())->toBeFalse()
+        ->and(AuditAction::AuthLogout->isSensitiveCredentialAction())->toBeFalse()
+        ->and(AuditAction::UserCreated->isSensitiveCredentialAction())->toBeFalse()
+        ->and(AuditAction::MfaEnrollmentSuspended->isSensitiveCredentialAction())->toBeFalse();
 });

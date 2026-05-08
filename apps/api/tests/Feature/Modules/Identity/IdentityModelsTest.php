@@ -55,10 +55,12 @@ it('User factory withTwoFactor state populates the 2FA columns', function (): vo
     $user = User::factory()->withTwoFactor()->create();
     $user->refresh();
 
-    expect($user->two_factor_secret)->toBe('TESTSECRETXXXXXX')
+    expect($user->two_factor_secret)->toBe('JBSWY3DPEHPK3PXP')
         ->and($user->two_factor_recovery_codes)->not->toBeNull()
+        ->and($user->two_factor_recovery_codes)->toBeArray()
         ->and($user->two_factor_confirmed_at)->not->toBeNull()
-        ->and($user->hasTwoFactorEnabled())->toBeTrue();
+        ->and($user->hasTwoFactorEnabled())->toBeTrue()
+        ->and($user->hasTwoFactorEnrollmentSuspended())->toBeFalse();
 });
 
 it('User factory agencyAdmin state attaches the user to a fresh agency as admin', function (): void {

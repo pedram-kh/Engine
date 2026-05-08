@@ -42,4 +42,14 @@ return [
     'signup' => [
         'email_taken' => 'Já existe uma conta com este endereço de e-mail.',
     ],
+
+    'mfa' => [
+        'invalid_code' => 'O código de dois fatores é inválido. Tente novamente.',
+        'rate_limited' => 'Demasiadas tentativas inválidas de dois fatores. Tente novamente em :minutes minutos.',
+        'enrollment_suspended' => 'A autenticação de dois fatores foi suspensa nesta conta. Contacte o suporte para restaurar o acesso.',
+        'enrollment_required' => 'A autenticação de dois fatores deve ser ativada antes de poder continuar.',
+        'already_enabled' => 'A autenticação de dois fatores já está ativada nesta conta.',
+        'not_enabled' => 'A autenticação de dois fatores não está ativada nesta conta.',
+        'provisional_expired' => 'A sessão de inscrição em dois fatores expirou. Comece novamente.',
+    ],
 ];

@@ -2,12 +2,17 @@
 
 declare(strict_types=1);
 
+use App\Modules\Identity\Http\Controllers\ConfirmTwoFactorController;
+use App\Modules\Identity\Http\Controllers\DisableTwoFactorController;
+use App\Modules\Identity\Http\Controllers\EnableTwoFactorController;
 use App\Modules\Identity\Http\Controllers\LoginController;
 use App\Modules\Identity\Http\Controllers\LogoutController;
 use App\Modules\Identity\Http\Controllers\PasswordResetController;
+use App\Modules\Identity\Http\Controllers\RegenerateRecoveryCodesController;
 use App\Modules\Identity\Http\Controllers\ResendVerificationController;
 use App\Modules\Identity\Http\Controllers\SignUpController;
 use App\Modules\Identity\Http\Controllers\VerifyEmailController;
+use App\Modules\Identity\Http\Middleware\EnsureMfaForAdmins;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -61,6 +66,28 @@ Route::prefix('auth')
         Route::post('resend-verification', ResendVerificationController::class)
             ->middleware('throttle:auth-resend-verification')
             ->name('email.resend');
+
+        // 2FA enrollment + management. All endpoints require an
+        // authenticated session on the main guard. The `confirm`
+        // endpoint can be reached repeatedly until it succeeds, hence
+        // the dedicated per-user verification throttle inside the
+        // service rather than a route-level limiter (an honest user
+        // who fat-fingers four codes still gets a fifth try).
+        Route::post('2fa/enable', EnableTwoFactorController::class)
+            ->middleware('auth:web')
+            ->name('2fa.enable');
+
+        Route::post('2fa/confirm', ConfirmTwoFactorController::class)
+            ->middleware('auth:web')
+            ->name('2fa.confirm');
+
+        Route::post('2fa/disable', DisableTwoFactorController::class)
+            ->middleware('auth:web')
+            ->name('2fa.disable');
+
+        Route::post('2fa/recovery-codes', RegenerateRecoveryCodesController::class)
+            ->middleware('auth:web')
+            ->name('2fa.recovery_codes');
     });
 
 // ---------------------------------------------------------------------------
@@ -80,4 +107,26 @@ Route::prefix('admin/auth')
         Route::post('logout', LogoutController::class)
             ->middleware('auth:web_admin')
             ->name('logout');
+
+        // 2FA enrollment endpoints on the admin guard. These are NOT
+        // protected by EnsureMfaForAdmins because they ARE the
+        // enrollment path — gating them behind MFA would be a
+        // chicken-and-egg lockout. Every other admin route registered
+        // by other modules MUST mount EnsureMfaForAdmins after the
+        // auth guard (chunk 5 priority #7).
+        Route::post('2fa/enable', EnableTwoFactorController::class)
+            ->middleware('auth:web_admin')
+            ->name('2fa.enable');
+
+        Route::post('2fa/confirm', ConfirmTwoFactorController::class)
+            ->middleware('auth:web_admin')
+            ->name('2fa.confirm');
+
+        Route::post('2fa/disable', DisableTwoFactorController::class)
+            ->middleware(['auth:web_admin', EnsureMfaForAdmins::class])
+            ->name('2fa.disable');
+
+        Route::post('2fa/recovery-codes', RegenerateRecoveryCodesController::class)
+            ->middleware(['auth:web_admin', EnsureMfaForAdmins::class])
+            ->name('2fa.recovery_codes');
     });

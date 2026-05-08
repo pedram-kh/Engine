@@ -11,6 +11,7 @@ use App\Modules\Identity\Services\AuthService;
 use App\Modules\Identity\Services\FailedLoginTracker;
 use App\Modules\Identity\Services\LoginResult;
 use App\Modules\Identity\Services\LoginResultStatus;
+use App\Modules\Identity\Services\TwoFactorVerificationThrottle;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -33,6 +34,7 @@ final class LoginController
             password: $request->passwordInput(),
             request: $request,
             guard: $guard,
+            mfaCode: $request->mfaCodeInput(),
         );
 
         return self::respond($request, $result);
@@ -70,6 +72,31 @@ final class LoginController
                 code: 'auth.mfa_required',
                 title: trans('auth.login.mfa_required'),
                 meta: ['mfa_required' => true],
+            ),
+
+            LoginResultStatus::MfaInvalidCode => ErrorResponse::single(
+                request: $request,
+                status: 401,
+                code: 'auth.mfa.invalid_code',
+                title: trans('auth.mfa.invalid_code'),
+                meta: ['mfa_required' => true],
+            ),
+
+            LoginResultStatus::MfaRateLimited => ErrorResponse::single(
+                request: $request,
+                status: 423,
+                code: 'auth.mfa.rate_limited',
+                title: trans('auth.mfa.rate_limited', [
+                    'minutes' => TwoFactorVerificationThrottle::WINDOW_MINUTES,
+                ]),
+                headers: ['Retry-After' => (string) ($result->retryAfterSeconds ?? 0)],
+            ),
+
+            LoginResultStatus::MfaEnrollmentSuspended => ErrorResponse::single(
+                request: $request,
+                status: 423,
+                code: 'auth.mfa.enrollment_suspended',
+                title: trans('auth.mfa.enrollment_suspended'),
             ),
 
             LoginResultStatus::AccountSuspended => ErrorResponse::single(

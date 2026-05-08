@@ -10,11 +10,13 @@
   "license": "proprietary",
   "require": {
     "php": "^8.4",
+    "bacon/bacon-qr-code": "^3.1",
     "laravel/framework": "^11.31",
     "laravel/horizon": "^5.0",
     "laravel/pennant": "^1.0",
     "laravel/sanctum": "^4.3",
     "laravel/tinker": "^2.9",
+    "pragmarx/google2fa": "^9.0",
     "predis/predis": "^3.4"
   },
   "require-dev": {

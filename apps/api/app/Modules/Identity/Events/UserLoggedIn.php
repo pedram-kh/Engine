@@ -29,5 +29,6 @@ final readonly class UserLoggedIn
         public ?string $ip,
         public ?string $userAgent,
         public string $guard,
+        public bool $mfa = false,
     ) {}
 }

@@ -73,13 +73,23 @@ final class UserFactory extends Factory
     }
 
     /**
-     * 2FA-confirmed state.
+     * 2FA-confirmed state. Note: the two_factor_recovery_codes column
+     * is cast to `encrypted:array` and stores bcrypt hashes (chunk 5
+     * priority #3); the placeholder values below are valid bcrypt-shaped
+     * strings so the cast round-trips cleanly. Tests that need to log
+     * in with a recovery code must hash a known plaintext via
+     * TwoFactorService::hashRecoveryCode() and stamp the array
+     * themselves rather than relying on this state.
      */
     public function withTwoFactor(): static
     {
         return $this->state(fn (array $attributes): array => [
-            'two_factor_secret' => 'TESTSECRETXXXXXX',
-            'two_factor_recovery_codes' => json_encode(array_fill(0, 8, str_repeat('A', 10))),
+            'two_factor_secret' => 'JBSWY3DPEHPK3PXP', // RFC 6238 example secret
+            'two_factor_recovery_codes' => array_fill(
+                0,
+                10,
+                '$2y$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012345',
+            ),
             'two_factor_confirmed_at' => now(),
         ]);
     }

@@ -59,4 +59,14 @@ return [
     'signup' => [
         'email_taken' => 'An account with this email address already exists.',
     ],
+
+    'mfa' => [
+        'invalid_code' => 'The two-factor code is invalid. Please try again.',
+        'rate_limited' => 'Too many invalid two-factor attempts. Please try again in :minutes minutes.',
+        'enrollment_suspended' => 'Two-factor authentication has been suspended for this account. Please contact support to restore access.',
+        'enrollment_required' => 'Two-factor authentication must be enabled before you can continue.',
+        'already_enabled' => 'Two-factor authentication is already enabled for this account.',
+        'not_enabled' => 'Two-factor authentication is not enabled for this account.',
+        'provisional_expired' => 'The two-factor enrollment session has expired. Please start again.',
+    ],
 ];

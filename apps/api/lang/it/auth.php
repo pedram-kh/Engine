@@ -42,4 +42,14 @@ return [
     'signup' => [
         'email_taken' => 'Esiste già un account con questo indirizzo email.',
     ],
+
+    'mfa' => [
+        'invalid_code' => 'Il codice a due fattori non è valido. Riprova.',
+        'rate_limited' => 'Troppi tentativi non validi del codice a due fattori. Riprova tra :minutes minuti.',
+        'enrollment_suspended' => "L'autenticazione a due fattori è stata sospesa per questo account. Contatta l'assistenza per ripristinare l'accesso.",
+        'enrollment_required' => "L'autenticazione a due fattori deve essere abilitata prima di poter continuare.",
+        'already_enabled' => "L'autenticazione a due fattori è già abilitata per questo account.",
+        'not_enabled' => "L'autenticazione a due fattori non è abilitata per questo account.",
+        'provisional_expired' => 'La sessione di registrazione a due fattori è scaduta. Riprova.',
+    ],
 ];
