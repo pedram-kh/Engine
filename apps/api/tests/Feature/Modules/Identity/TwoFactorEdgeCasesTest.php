@@ -133,3 +133,41 @@ it('checkRecoveryCode returns false rather than throwing on non-bcrypt input', f
 
     expect($service->checkRecoveryCode('aaaa-bbbb-cccc-dddd', 'not-a-bcrypt-hash'))->toBeFalse();
 });
+
+// ---------------------------------------------------------------------------
+// Constant-verification-count invariant (no timing oracle)
+// ---------------------------------------------------------------------------
+//
+// The recovery-code loop in TwoFactorChallengeService::consumeRecoveryCode()
+// MUST run checkRecoveryCode() on every stored hash slot, even after a match
+// is found. Short-circuiting on first match would make the bcrypt-verify
+// count a function of the matched slot's position and leak it via response
+// timing (~bcrypt-cost-10 ms per slot, ~80–90 ms differential between slot 0
+// and slot 9 in production).
+//
+// This test guards the invariant by source inspection (same pattern as
+// TwoFactorIsolationTest). A future engineer adding a `! $matched` short-
+// circuit would have to actively edit this assertion to land their change.
+
+it('TwoFactorChallengeService runs checkRecoveryCode on every slot (no `! $matched` short-circuit)', function (): void {
+    $source = (string) file_get_contents(
+        base_path('app/Modules/Identity/Services/TwoFactorChallengeService.php'),
+    );
+
+    // Match actual code patterns only, not the warning comment in the
+    // source that explicitly references `! $matched` to discourage it.
+    expect(preg_match('/if\s*\(\s*!\s*\$matched/', $source))->toBe(0,
+        'Reintroducing `if (! $matched ...)` would restore the per-slot timing oracle.',
+    );
+    expect(preg_match('/&&\s*!\s*\$matched/', $source))->toBe(0,
+        'Reintroducing `&& ! $matched` would restore the per-slot timing oracle.',
+    );
+
+    // Positive assertion: exactly one call site to checkRecoveryCode in the
+    // file, and it lives inside the foreach (not gated by any guard).
+    $callSites = (int) preg_match_all(
+        '/\$this->twoFactor->checkRecoveryCode\(/',
+        $source,
+    );
+    expect($callSites)->toBe(1);
+});

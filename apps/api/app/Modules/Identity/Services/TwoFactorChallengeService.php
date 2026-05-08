@@ -31,9 +31,11 @@ use SensitiveParameter;
  * transaction with `SELECT ... FOR UPDATE` on the user row so two
  * simultaneous requests with the same code can never both succeed.
  * The {@see consumeRecoveryCode()} method re-reads the user inside
- * the lock, walks the hash list with constant-time {@see hash_equals()}-
- * style comparison via {@see TwoFactorService::checkRecoveryCode()},
- * removes the matching hash, and rewrites the column.
+ * the lock, then runs {@see TwoFactorService::checkRecoveryCode()}
+ * (bcrypt verify) on EVERY stored hash slot — the verification count
+ * is constant in the slot count, not in the matched slot's position,
+ * so response time does not leak which slot matched. The matching
+ * hash is then removed and the column rewritten.
  */
 final class TwoFactorChallengeService
 {
@@ -114,13 +116,21 @@ final class TwoFactorChallengeService
 
             $matchedIndex = null;
 
-            // Walk every hash even after we find a match so the
-            // verification cost is constant in the hash count and
-            // doesn't leak which slot matched via a timing channel.
-            $matched = false;
+            // Run checkRecoveryCode() on EVERY slot, even after we find
+            // a match, so the bcrypt-verify count is constant in the
+            // hash count and the response time doesn't leak which slot
+            // matched via a timing channel. Cost: ~N × bcrypt-verify on
+            // every recovery-code login (~100ms in production with cost
+            // 10). Acceptable because recovery-code logins are rare and
+            // already rate-limited by the chunk-3 per-IP / per-email
+            // throttles plus the chunk-5 per-user throttle.
+            //
+            // Do NOT add a `! $matched` short-circuit here — that would
+            // turn the bcrypt-verify count into a function of the slot
+            // position and reintroduce the side channel.
             foreach ($hashes as $index => $hash) {
-                if (! $matched && $this->twoFactor->checkRecoveryCode($candidate, $hash)) {
-                    $matched = true;
+                $isMatch = $this->twoFactor->checkRecoveryCode($candidate, $hash);
+                if ($isMatch && $matchedIndex === null) {
                     $matchedIndex = $index;
                 }
             }
