@@ -32,11 +32,22 @@
         <env name="HASH_ARGON_MEMORY" value="8192"/>
         <env name="HASH_ARGON_TIME" value="1"/>
         <env name="HASH_ARGON_THREADS" value="1"/>
-        <!-- Bcrypt cost only kicks in for chunk 5's recovery-code hashing
-             (TwoFactorService uses the bcrypt driver explicitly). 4 is
-             the lowest cost the library accepts and gives test runs a
-             ~10x speedup vs the default 10. Production stays on the
-             config default. -->
+        <!-- ============================================================
+             TEST-PERFORMANCE-ONLY BCRYPT COST. DO NOT CARGO-CULT.
+             ============================================================
+             Bcrypt cost 4 is the absolute MINIMUM the library accepts.
+             It is set here ONLY so the chunk-5 recovery-code hashing
+             tests do not dominate the suite (~60s -> ~10s end-to-end).
+
+             Production / staging / any non-test environment uses
+             config('hashing.bcrypt.rounds'), which defaults to 12 per
+             Laravel's framework default. Cost 4 must NEVER appear in
+             .env.example, config/hashing.php, deployment manifests, or
+             any other phpunit.xml-style override file.
+
+             If you need to add a new bcrypt-related env var, leave it
+             at the framework default and only override here for the
+             same test-performance reason. -->
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="sqlite"/>
