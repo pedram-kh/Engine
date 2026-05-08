@@ -58,6 +58,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Frontend URLs
+    |--------------------------------------------------------------------------
+    |
+    | The two SPA origins consumed by the API. Used by Mailables to construct
+    | reset / verify links and by config/cors.php to seed allowed origins.
+    | In local dev these point at the Vite dev servers; staging / production
+    | override via AWS Secrets Manager.
+    |
+    */
+
+    'frontend_main_url' => (string) env('FRONTEND_MAIN_URL', 'http://127.0.0.1:5173'),
+    'frontend_admin_url' => (string) env('FRONTEND_ADMIN_URL', 'http://127.0.0.1:5174'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

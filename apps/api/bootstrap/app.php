@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\Core\Tenancy\EnsureTenancyContext;
+use App\Core\Tenancy\SetTenancyContext;
+use App\Modules\Audit\Http\Middleware\RequireActionReason;
+use App\Modules\Identity\Http\Middleware\UseAdminSessionCookie;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,12 +19,31 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Tenant-scoped HTTP routes must declare ->middleware('tenancy').
-        // The guard 500s with MissingTenancyContextException if the populator
-        // (SetTenancyContext, added in chunk 3) failed to set the context —
-        // see docs/security/tenancy.md for the full contract.
+        // Sanctum SPA cookie auth. EnsureFrontendRequestsAreStateful is
+        // prepended into the api group; on requests from any
+        // SANCTUM_STATEFUL_DOMAINS origin it dynamically applies session +
+        // CSRF middleware so the api routes can issue/consume session cookies.
+        $middleware->statefulApi();
+
+        // Two-SPA cookie isolation. Runs as a global middleware so it lands
+        // BEFORE Sanctum's stateful injection (and therefore before
+        // StartSession reads config('session.cookie')). The middleware is
+        // path-aware and only rewrites the cookie name on `api/v1/admin/*`
+        // requests — see UseAdminSessionCookie + docs/runbooks/local-dev.md.
+        $middleware->prepend(UseAdminSessionCookie::class);
+
+        // Tenant-scoped HTTP routes declare ->middleware('tenancy.set') to
+        // populate the context from the authenticated user's primary
+        // AgencyMembership (Sprint 2+ routes), then ->middleware('tenancy')
+        // fails closed if the populator yielded nothing. The chunk-3 routes
+        // use neither alias yet — auth endpoints are not tenant-scoped —
+        // but the aliases are registered here so Sprint 2 routes pick them
+        // up without ceremony. See docs/security/tenancy.md.
         $middleware->alias([
             'tenancy' => EnsureTenancyContext::class,
+            'tenancy.set' => SetTenancyContext::class,
+            'action.reason' => RequireActionReason::class,
+            'admin.session' => UseAdminSessionCookie::class,
         ]);
 
         // Module-specific middleware is registered by each module's ServiceProvider.

@@ -37,4 +37,9 @@ return [
         ],
     ],
 
+    'hibp' => [
+        'url' => env('HIBP_API_URL', 'https://api.pwnedpasswords.com'),
+        'timeout' => (int) env('HIBP_TIMEOUT', 3),
+    ],
+
 ];

@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Str;
-
 return [
 
     /*
@@ -129,10 +127,16 @@ return [
     |
     */
 
-    'cookie' => env(
-        'SESSION_COOKIE',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_session',
-    ),
+    /*
+    | The default cookie name is 'catalyst_main_session' (used by the main
+    | SPA). The admin SPA receives 'catalyst_admin_session' instead — set
+    | per-request by the UseAdminSessionCookie middleware before StartSession.
+    | Distinct names prevent the two SPAs from clobbering each other when
+    | both run on 127.0.0.1 in local dev (browsers do not isolate cookies
+    | by port). See docs/runbooks/local-dev.md for full background.
+    */
+
+    'cookie' => (string) env('SESSION_COOKIE', 'catalyst_main_session'),
 
     /*
     |--------------------------------------------------------------------------

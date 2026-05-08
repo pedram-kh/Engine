@@ -96,6 +96,39 @@ it('User factory platformAdmin state creates the admin_profile row and forces mf
     $profile = AdminProfile::query()->where('user_id', $user->id)->firstOrFail();
 
     expect($profile->admin_role)->toBe(AdminRole::SuperAdmin);
+
+    $reloaded = $user->refresh();
+    /** @var AdminProfile $linked */
+    $linked = $reloaded->adminProfile()->firstOrFail();
+    expect($linked->id)->toBe($profile->id);
+});
+
+it('User factory agencyStaff state attaches the user with the agency_staff role', function (): void {
+    $agency = Agency::factory()->create();
+
+    $user = User::factory()->agencyStaff($agency)->create();
+    $agency->refresh();
+
+    /** @var AgencyMembership $membership */
+    $membership = $agency->memberships()->firstOrFail();
+
+    expect($user->type)->toBe(UserType::AgencyUser)
+        ->and($membership->role)->toBe(AgencyRole::AgencyStaff)
+        ->and($membership->user_id)->toBe($user->id);
+});
+
+it('User->isCreator() returns true for creators and false otherwise', function (): void {
+    $creator = User::factory()->create(['type' => UserType::Creator]);
+    $admin = User::factory()->platformAdmin()->create();
+
+    expect($creator->isCreator())->toBeTrue()
+        ->and($admin->isCreator())->toBeFalse();
+});
+
+it('User factory creator() state sets type=creator', function (): void {
+    $user = User::factory()->creator()->create();
+
+    expect($user->type)->toBe(UserType::Creator);
 });
 
 it('Agency factory catalyst state seeds the pilot tenant correctly', function (): void {

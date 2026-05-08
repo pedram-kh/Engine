@@ -40,7 +40,20 @@ return [
     */
 
     'guards' => [
+        // Main SPA guard. Issues a session cookie named per
+        // config('session.cookie') — see SetTenancyContext middleware
+        // and docs/runbooks/local-dev.md for cookie isolation in local dev.
         'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        // Admin SPA guard. Same Sanctum-cookie pattern as 'web' but isolated
+        // by a distinct cookie name in local dev (set by the
+        // UseAdminSessionCookie middleware before StartSession), and by a
+        // separate subdomain in staging/production. Per
+        // docs/00-MASTER-ARCHITECTURE.md §7 and docs/05-SECURITY-COMPLIANCE.md §4.
+        'web_admin' => [
             'driver' => 'session',
             'provider' => 'users',
         ],
