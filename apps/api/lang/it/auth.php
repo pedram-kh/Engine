@@ -27,4 +27,19 @@ return [
         'invalid_token' => 'Questo link di reimpostazione della password non è valido o è scaduto. Richiedine uno nuovo.',
         'completed' => 'La tua password è stata reimpostata. Tutte le altre sessioni attive sono state terminate.',
     ],
+
+    'email_verification' => [
+        'subject' => 'Verifica il tuo indirizzo email :app',
+        'greeting' => 'Benvenuto su :app, :name!',
+        'body' => 'Conferma il tuo indirizzo email per completare la configurazione del tuo account :app. Il link qui sotto è valido per :hours ore.',
+        'cta' => 'Verifica indirizzo email',
+        'ignore' => 'Se non hai creato un account :app, puoi ignorare questa email.',
+        'verification_invalid' => 'Questo link di verifica non è valido. Richiedine uno nuovo.',
+        'verification_expired' => 'Questo link di verifica è scaduto. Richiedine uno nuovo.',
+        'already_verified' => 'Questo indirizzo email è già stato verificato.',
+    ],
+
+    'signup' => [
+        'email_taken' => 'Esiste già un account con questo indirizzo email.',
+    ],
 ];

@@ -27,4 +27,19 @@ return [
         'invalid_token' => 'Esta ligação de redefinição de palavra-passe é inválida ou expirou. Solicite uma nova.',
         'completed' => 'A sua palavra-passe foi redefinida. Todas as outras sessões ativas foram terminadas.',
     ],
+
+    'email_verification' => [
+        'subject' => 'Confirme o seu endereço de e-mail :app',
+        'greeting' => 'Bem-vindo ao :app, :name!',
+        'body' => 'Por favor, confirme o seu endereço de e-mail para concluir a configuração da sua conta :app. A ligação abaixo é válida durante :hours horas.',
+        'cta' => 'Confirmar endereço de e-mail',
+        'ignore' => 'Se não criou uma conta :app, pode ignorar este e-mail.',
+        'verification_invalid' => 'Esta ligação de verificação é inválida. Solicite uma nova.',
+        'verification_expired' => 'Esta ligação de verificação expirou. Solicite uma nova.',
+        'already_verified' => 'Este endereço de e-mail já foi confirmado.',
+    ],
+
+    'signup' => [
+        'email_taken' => 'Já existe uma conta com este endereço de e-mail.',
+    ],
 ];

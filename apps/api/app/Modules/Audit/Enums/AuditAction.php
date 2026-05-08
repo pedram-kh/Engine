@@ -25,13 +25,14 @@ use App\Modules\Identity\Models\User;
  */
 enum AuditAction: string
 {
+    case AuthSignedUp = 'auth.signup';
     case AuthLoginSucceeded = 'auth.login.succeeded';
     case AuthLoginFailed = 'auth.login.failed';
     case AuthLogout = 'auth.logout';
     case AuthPasswordResetRequested = 'auth.password.reset_requested';
     case AuthPasswordResetCompleted = 'auth.password.reset_completed';
     case AuthPasswordChanged = 'auth.password.changed';
-    case AuthEmailVerificationRequested = 'auth.email.verification_requested';
+    case AuthEmailVerificationSent = 'auth.email.verification_sent';
     case AuthEmailVerified = 'auth.email.verified';
     case AuthTwoFactorEnabled = 'auth.two_factor.enabled';
     case AuthTwoFactorDisabled = 'auth.two_factor.disabled';

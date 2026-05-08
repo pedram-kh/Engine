@@ -9,13 +9,14 @@ uses(TestCase::class);
 
 it('AuditAction catalogue lists every Sprint 1 auth + user verb', function (): void {
     $expected = [
+        'auth.signup',
         'auth.login.succeeded',
         'auth.login.failed',
         'auth.logout',
         'auth.password.reset_requested',
         'auth.password.reset_completed',
         'auth.password.changed',
-        'auth.email.verification_requested',
+        'auth.email.verification_sent',
         'auth.email.verified',
         'auth.two_factor.enabled',
         'auth.two_factor.disabled',

@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Modules\Identity;
 
 use App\Modules\Identity\Contracts\PwnedPasswordsClientContract;
+use App\Modules\Identity\Events\EmailVerificationSent;
+use App\Modules\Identity\Events\EmailVerified;
 use App\Modules\Identity\Events\LoginFailed;
 use App\Modules\Identity\Events\PasswordResetCompleted;
 use App\Modules\Identity\Events\PasswordResetRequested;
 use App\Modules\Identity\Events\UserLoggedIn;
 use App\Modules\Identity\Events\UserLoggedOut;
+use App\Modules\Identity\Events\UserSignedUp;
 use App\Modules\Identity\Listeners\WriteAuthAuditLog;
 use App\Modules\Identity\Services\PwnedPasswordsClient;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -83,6 +86,26 @@ final class IdentityServiceProvider extends ServiceProvider
                     ]),
                 ]],
             ], 429, $headers)));
+
+        // Resend-verification: at most ONE request per minute per email,
+        // applied on top of the per-IP cap. The strict ceiling keeps a
+        // single attacker from mailbombing a known address even if they
+        // rotate IPs through a residential proxy pool.
+        RateLimiter::for('auth-resend-verification', static function (Request $request): Limit {
+            $email = strtolower(trim((string) $request->input('email', '')));
+
+            return Limit::perMinute(1)
+                ->by('verify:'.$email)
+                ->response(static fn (Request $req, array $headers) => response()->json([
+                    'errors' => [[
+                        'status' => '429',
+                        'code' => 'rate_limit.exceeded',
+                        'title' => trans('auth.login.rate_limited', [
+                            'seconds' => (int) ($headers['Retry-After'] ?? 60),
+                        ]),
+                    ]],
+                ], 429, $headers));
+        });
     }
 
     private function registerEventListeners(): void
@@ -92,6 +115,9 @@ final class IdentityServiceProvider extends ServiceProvider
         Event::listen(LoginFailed::class, [WriteAuthAuditLog::class, 'handleLoginFailed']);
         Event::listen(PasswordResetRequested::class, [WriteAuthAuditLog::class, 'handlePasswordResetRequested']);
         Event::listen(PasswordResetCompleted::class, [WriteAuthAuditLog::class, 'handlePasswordResetCompleted']);
+        Event::listen(UserSignedUp::class, [WriteAuthAuditLog::class, 'handleUserSignedUp']);
+        Event::listen(EmailVerificationSent::class, [WriteAuthAuditLog::class, 'handleEmailVerificationSent']);
+        Event::listen(EmailVerified::class, [WriteAuthAuditLog::class, 'handleEmailVerified']);
     }
 
     private function registerRoutes(): void

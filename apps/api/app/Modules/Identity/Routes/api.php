@@ -5,6 +5,9 @@ declare(strict_types=1);
 use App\Modules\Identity\Http\Controllers\LoginController;
 use App\Modules\Identity\Http\Controllers\LogoutController;
 use App\Modules\Identity\Http\Controllers\PasswordResetController;
+use App\Modules\Identity\Http\Controllers\ResendVerificationController;
+use App\Modules\Identity\Http\Controllers\SignUpController;
+use App\Modules\Identity\Http\Controllers\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,6 +51,16 @@ Route::prefix('auth')
         Route::post('reset-password', [PasswordResetController::class, 'reset'])
             ->middleware('throttle:auth-password')
             ->name('password.reset');
+
+        Route::post('sign-up', SignUpController::class)
+            ->name('signup');
+
+        Route::post('verify-email', VerifyEmailController::class)
+            ->name('email.verify');
+
+        Route::post('resend-verification', ResendVerificationController::class)
+            ->middleware('throttle:auth-resend-verification')
+            ->name('email.resend');
     });
 
 // ---------------------------------------------------------------------------

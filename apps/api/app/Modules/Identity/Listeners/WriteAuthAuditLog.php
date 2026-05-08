@@ -7,11 +7,14 @@ namespace App\Modules\Identity\Listeners;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Services\AuditLogger;
 use App\Modules\Identity\Events\AccountLocked;
+use App\Modules\Identity\Events\EmailVerificationSent;
+use App\Modules\Identity\Events\EmailVerified;
 use App\Modules\Identity\Events\LoginFailed;
 use App\Modules\Identity\Events\PasswordResetCompleted;
 use App\Modules\Identity\Events\PasswordResetRequested;
 use App\Modules\Identity\Events\UserLoggedIn;
 use App\Modules\Identity\Events\UserLoggedOut;
+use App\Modules\Identity\Events\UserSignedUp;
 use App\Modules\Identity\Services\AccountLockoutService;
 use App\Modules\Identity\Services\AuthService;
 
@@ -88,6 +91,39 @@ final class WriteAuthAuditLog
     {
         $this->audit->log(
             action: AuditAction::AuthPasswordResetCompleted,
+            actor: $event->user,
+            subject: $event->user,
+            ip: $event->ip,
+            userAgent: $event->userAgent,
+        );
+    }
+
+    public function handleUserSignedUp(UserSignedUp $event): void
+    {
+        $this->audit->log(
+            action: AuditAction::AuthSignedUp,
+            actor: $event->user,
+            subject: $event->user,
+            ip: $event->ip,
+            userAgent: $event->userAgent,
+        );
+    }
+
+    public function handleEmailVerificationSent(EmailVerificationSent $event): void
+    {
+        $this->audit->log(
+            action: AuditAction::AuthEmailVerificationSent,
+            actor: $event->user,
+            subject: $event->user,
+            ip: $event->ip,
+            userAgent: $event->userAgent,
+        );
+    }
+
+    public function handleEmailVerified(EmailVerified $event): void
+    {
+        $this->audit->log(
+            action: AuditAction::AuthEmailVerified,
             actor: $event->user,
             subject: $event->user,
             ip: $event->ip,

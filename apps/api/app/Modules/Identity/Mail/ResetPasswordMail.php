@@ -47,7 +47,7 @@ final class ResetPasswordMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'mail.identity.reset-password',
+            markdown: 'mail.identity.reset-password',
             with: [
                 'user' => $this->user,
                 'resetUrl' => $this->resetUrl,

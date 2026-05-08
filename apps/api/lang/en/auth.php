@@ -44,4 +44,19 @@ return [
         'invalid_token' => 'This password-reset link is invalid or has expired. Request a new one.',
         'completed' => 'Your password has been reset. All other active sessions have been signed out.',
     ],
+
+    'email_verification' => [
+        'subject' => 'Verify your :app email address',
+        'greeting' => 'Welcome to :app, :name!',
+        'body' => 'Please confirm your email address to finish setting up your :app account. The link below is valid for :hours hours.',
+        'cta' => 'Verify email address',
+        'ignore' => 'If you did not create a :app account, you can safely ignore this email.',
+        'verification_invalid' => 'This verification link is invalid. Request a new one.',
+        'verification_expired' => 'This verification link has expired. Request a new one.',
+        'already_verified' => 'This email address has already been verified.',
+    ],
+
+    'signup' => [
+        'email_taken' => 'An account with this email address already exists.',
+    ],
 ];
