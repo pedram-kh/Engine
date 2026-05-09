@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use App\TestHelpers\Http\Middleware\ApplyTestClock;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Carbon;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -21,5 +23,24 @@ abstract class TestCase extends BaseTestCase
         // header here mirrors what every browser sends in real life and
         // matches the entries in config/sanctum.php → stateful.
         $this->withHeader('Origin', 'http://localhost');
+    }
+
+    protected function tearDown(): void
+    {
+        // Carbon::setTestNow is process-global static state. Pest reuses a
+        // single PHP process for the whole suite, so a test that pins Carbon
+        // and forgets to reset would leak that pin into the next test. Reset
+        // unconditionally — tests that need a pinned clock re-pin in their
+        // own setup.
+        Carbon::setTestNow();
+
+        // Likewise reset the App\TestHelpers\Http\Middleware\ApplyTestClock
+        // pinning tracker so the per-process flag does not bleed across
+        // tests in either direction. See ApplyTestClock's class docblock
+        // for why we track pinning ourselves rather than calling
+        // setTestNow() unconditionally inside the middleware.
+        ApplyTestClock::resetPinningTracker();
+
+        parent::tearDown();
     }
 }

@@ -114,6 +114,33 @@ final class TwoFactorService
     }
 
     /**
+     * Generate the 6-digit TOTP that is current at "now" for the given
+     * secret. Test-helper-only path: the production login flow always
+     * verifies a user-supplied code via {@see verifyTotp()}, so calling
+     * this method from any non-test path is a chunk-5 isolation
+     * violation.
+     *
+     * The method exists exclusively to keep the
+     * {@see App\TestHelpers\Http\Controllers\IssueTotpController}
+     * inside the chunk-5 isolation invariant: every call into
+     * `PragmaRX\Google2FA\` continues to live in this file. The
+     * `tests/Unit/Modules/Identity/Services/TwoFactorIsolationTest`
+     * source-inspection test enforces that.
+     *
+     * WARNING: `Google2FA::getCurrentOtp()` reads PHP's `time()`
+     * directly and does NOT honor `Carbon::setTestNow()`. If a future
+     * spec needs to combine clock-skip with TOTP issuance, give this
+     * method an optional `?Carbon $at = null` parameter and route it
+     * through `Google2FA::getCurrentOtpAt(...)` (and read the test
+     * clock from the cache to fill the timestamp). Tracked as an
+     * accepted limitation in `docs/tech-debt.md`.
+     */
+    public function currentCodeFor(#[SensitiveParameter] string $secret): string
+    {
+        return $this->google2fa->getCurrentOtp($secret);
+    }
+
+    /**
      * @return list<string> plaintext recovery codes formatted as
      *                      `xxxx-xxxx-xxxx-xxxx` (16 lowercase hex chars
      *                      + 3 dashes). The caller is responsible for

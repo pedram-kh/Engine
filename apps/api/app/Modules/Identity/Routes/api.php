@@ -7,6 +7,7 @@ use App\Modules\Identity\Http\Controllers\DisableTwoFactorController;
 use App\Modules\Identity\Http\Controllers\EnableTwoFactorController;
 use App\Modules\Identity\Http\Controllers\LoginController;
 use App\Modules\Identity\Http\Controllers\LogoutController;
+use App\Modules\Identity\Http\Controllers\MeController;
 use App\Modules\Identity\Http\Controllers\PasswordResetController;
 use App\Modules\Identity\Http\Controllers\RegenerateRecoveryCodesController;
 use App\Modules\Identity\Http\Controllers\ResendVerificationController;
@@ -32,6 +33,30 @@ use Illuminate\Support\Facades\Route;
 |     middleware below.
 |
 */
+
+// ---------------------------------------------------------------------------
+// Cross-cutting authenticated endpoints — main SPA
+// ---------------------------------------------------------------------------
+//
+// `/me` is mounted at the v1 root rather than under `auth/` because it
+// is a "who am I?" lookup the SPA fires on every cold load, not part of
+// the credential-exchange surface. The route stays inside the API
+// stateful group (so cookie + CSRF resolution apply identically to the
+// auth endpoints) and additionally mounts `tenancy.set` to populate the
+// TenancyContext from the user's primary AgencyMembership. For
+// creators / platform admins the populator is a no-op; this is the
+// documented behaviour from docs/security/tenancy.md.
+//
+// The fail-closed `tenancy` alias is intentionally NOT applied — creators
+// and platform-admin users have no agency context, and `tenancy` would
+// 500 every /me request for those user types. The standard three-
+// middleware stack from docs/security/tenancy.md § 3 (`auth:web` +
+// `tenancy.set` + `tenancy`) applies only when the route both reads
+// tenant-scoped data AND is reachable only by agency users.
+
+Route::get('me', MeController::class)
+    ->middleware(['auth:web', 'tenancy.set'])
+    ->name('me');
 
 // ---------------------------------------------------------------------------
 // Main SPA — guard 'web', cookie 'catalyst_main_session'
@@ -89,6 +114,21 @@ Route::prefix('auth')
             ->middleware('auth:web')
             ->name('2fa.recovery_codes');
     });
+
+// ---------------------------------------------------------------------------
+// Cross-cutting authenticated endpoints — admin SPA
+// ---------------------------------------------------------------------------
+//
+// `/admin/me` mirrors the main SPA's `/me` but lives under `admin/` so
+// the path-aware UseAdminSessionCookie middleware swaps the session
+// cookie name before StartSession runs. EnsureMfaForAdmins is mounted
+// per chunk 5 priority #7: an admin who has not enrolled 2FA gets a
+// 403 envelope with `auth.mfa.enrollment_required` here, which the
+// admin SPA uses as the signal to redirect to /auth/2fa/enable.
+
+Route::get('admin/me', MeController::class)
+    ->middleware(['auth:web_admin', EnsureMfaForAdmins::class, 'tenancy.set'])
+    ->name('admin.me');
 
 // ---------------------------------------------------------------------------
 // Admin SPA — guard 'web_admin', cookie 'catalyst_admin_session'

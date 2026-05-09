@@ -14,6 +14,7 @@ use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\Messaging\MessagingServiceProvider;
 use App\Modules\Payments\PaymentsServiceProvider;
 use App\Providers\AppServiceProvider;
+use App\TestHelpers\TestHelpersServiceProvider;
 
 return [
     AppServiceProvider::class,
@@ -31,4 +32,9 @@ return [
     IdentityServiceProvider::class,
     MessagingServiceProvider::class,
     PaymentsServiceProvider::class,
+
+    // E2E / Playwright support. The provider is itself a no-op outside
+    // of `local` and `testing` environments and when `TEST_HELPERS_TOKEN`
+    // is unset — see app/TestHelpers/README.md for the gating contract.
+    TestHelpersServiceProvider::class,
 ];

@@ -57,5 +57,11 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <!-- Test-helpers gate. Phase-1 Pest tests cover the App\TestHelpers
+             module under both gate-open and gate-closed states; the latter
+             flips this via config()->set() at runtime so the env value
+             stays open for the rest of the suite. See
+             app/TestHelpers/README.md for the operator runbook. -->
+        <env name="TEST_HELPERS_TOKEN" value="phpunit-test-helpers-token"/>
     </php>
 </phpunit>

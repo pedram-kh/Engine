@@ -36,7 +36,8 @@ This document defines _how_ code is written, organized, named, tested, and shipp
 │   │   │   │   └── Kernel.php
 │   │   │   ├── Console/
 │   │   │   ├── Exceptions/
-│   │   │   └── Providers/
+│   │   │   ├── Providers/
+│   │   │   └── TestHelpers/          # Test-only, gated (see § 2.1)
 │   │   ├── bootstrap/
 │   │   ├── config/
 │   │   ├── database/
@@ -155,6 +156,16 @@ Catalyst Engine's backend is a **modular monolith**. The Laravel app is one depl
   - Service contracts (interfaces in the module's `Contracts/` folder)
   - Events (in the module's `Events/` folder)
 - A module's private internals (models, internal services) **must not be referenced from other modules**.
+
+**Top-level folders under `apps/api/app/`** (seven, in this order):
+
+1. **`Modules/`** — domain modules per the rules above.
+2. **`Core/`** — cross-cutting infrastructure (tenancy, pagination, error envelope, storage, mail wiring). Production-critical, used by every module.
+3. **`Http/`** — global HTTP plumbing (kernel, global middleware). Thin; per-route logic lives in module controllers.
+4. **`Console/`** — Artisan commands.
+5. **`Exceptions/`** — global exception handler. Module-specific rendering is registered in each module's service provider.
+6. **`Providers/`** — application-level service providers (e.g., `AppServiceProvider`). Module providers live inside the module folder.
+7. **`TestHelpers/`** — **test-only, gated**. Houses HTTP endpoints and middleware that exist solely to support the Playwright E2E suite (mint a verification token, issue a TOTP, fast-forward `Carbon::now()` via Redis). Gated three ways: (a) `app()->environment(['local', 'testing'])` — no routes registered in staging or production; (b) `config('test_helpers.token')` non-empty — empty token closes the surface; (c) per-request `X-Test-Helper-Token` header check via `hash_equals`. Never reachable in production. See [`apps/api/app/TestHelpers/README.md`](../apps/api/app/TestHelpers/README.md) for the gating contract and the local-dev-vs-CI token-rotation runbook. Adding a new top-level folder under `app/` requires an entry here; adding a new helper inside `TestHelpers/` requires extending the README's "Adding a new helper endpoint" section.
 
 ### 2.2 Module folder structure
 
