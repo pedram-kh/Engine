@@ -39,7 +39,7 @@ use SensitiveParameter;
  *      escalate to suspension.
  *
  *   4. Suspension check — reads `users.is_suspended`. Suspended users get
- *      a 423 with `auth.account_locked` even if the password is correct.
+ *      a 423 with `auth.account_locked.suspended` even if the password is correct.
  *
  *   5. Hash rehash check via {@see Hash::needsRehash()} so cost-parameter
  *      changes propagate transparently on the user's next login. This is

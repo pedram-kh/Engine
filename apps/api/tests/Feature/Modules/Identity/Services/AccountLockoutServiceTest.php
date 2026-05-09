@@ -56,7 +56,7 @@ it('escalate() suspends the user with the documented reason and audits', functio
         ->and($user->suspended_reason)->toBe(AccountLockoutService::ESCALATION_REASON)
         ->and($user->suspended_at)->not->toBeNull();
 
-    $audit = AuditLog::query()->where('action', AuditAction::AuthAccountLocked->value)->latest('id')->firstOrFail();
+    $audit = AuditLog::query()->where('action', AuditAction::AuthAccountLockedSuspended->value)->latest('id')->firstOrFail();
     expect($audit->reason)->toBe(AccountLockoutService::ESCALATION_REASON)
         ->and($audit->subject_id)->toBe($user->id);
 
@@ -70,11 +70,11 @@ it('escalate() is idempotent — re-running on a suspended user does nothing', f
     $service = app(AccountLockoutService::class);
     $service->escalate($user);
 
-    $rowsAfterFirst = AuditLog::query()->where('action', AuditAction::AuthAccountLocked->value)->count();
+    $rowsAfterFirst = AuditLog::query()->where('action', AuditAction::AuthAccountLockedSuspended->value)->count();
 
     $service->escalate($user);
 
-    $rowsAfterSecond = AuditLog::query()->where('action', AuditAction::AuthAccountLocked->value)->count();
+    $rowsAfterSecond = AuditLog::query()->where('action', AuditAction::AuthAccountLockedSuspended->value)->count();
 
     expect($rowsAfterSecond)->toBe($rowsAfterFirst);
     Event::assertDispatchedTimes(AccountLocked::class, 1);

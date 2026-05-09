@@ -102,7 +102,7 @@ final class LoginController
             LoginResultStatus::AccountSuspended => ErrorResponse::single(
                 request: $request,
                 status: 423,
-                code: 'auth.account_locked',
+                code: 'auth.account_locked.suspended',
                 title: trans('auth.login.account_locked'),
             ),
 

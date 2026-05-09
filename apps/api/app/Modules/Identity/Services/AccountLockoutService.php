@@ -80,7 +80,7 @@ final class AccountLockoutService
         ])->saveQuietly();
 
         $this->audit->log(
-            action: AuditAction::AuthAccountLocked,
+            action: AuditAction::AuthAccountLockedSuspended,
             subject: $user,
             reason: self::ESCALATION_REASON,
             metadata: [

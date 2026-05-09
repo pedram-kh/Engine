@@ -18,7 +18,7 @@ it('AuditAction catalogue lists every Sprint 1 auth + user + mfa verb', function
         'auth.password.changed',
         'auth.email.verification_sent',
         'auth.email.verified',
-        'auth.account_locked',
+        'auth.account_locked.suspended',
         'auth.account_unlocked',
         'mfa.enabled',
         'mfa.confirmed',
@@ -62,7 +62,7 @@ it('non-destructive actions do not require a reason', function (): void {
         ->and(AuditAction::AuthLoginFailed->requiresReason())->toBeFalse()
         ->and(AuditAction::UserCreated->requiresReason())->toBeFalse()
         ->and(AuditAction::UserUpdated->requiresReason())->toBeFalse()
-        ->and(AuditAction::AuthAccountLocked->requiresReason())->toBeFalse()
+        ->and(AuditAction::AuthAccountLockedSuspended->requiresReason())->toBeFalse()
         ->and(AuditAction::MfaEnabled->requiresReason())->toBeFalse()
         ->and(AuditAction::MfaConfirmed->requiresReason())->toBeFalse()
         ->and(AuditAction::MfaDisabled->requiresReason())->toBeFalse();

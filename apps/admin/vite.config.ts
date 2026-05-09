@@ -16,7 +16,14 @@ export default defineConfig({
     port: 5174,
     strictPort: true,
     proxy: {
+      // Both prefixes route to the Laravel backend; `/sanctum/csrf-cookie`
+      // sets the XSRF-TOKEN cookie that the api-client forwards on
+      // state-changing requests (`docs/04-API-DESIGN.md § 4`).
       '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+      '/sanctum': {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
       },

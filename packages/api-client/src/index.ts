@@ -1,55 +1,24 @@
-import axios, { type AxiosInstance } from 'axios'
-
-export interface ApiClientOptions {
-  baseURL: string
-  withCredentials?: boolean
-  csrfHeader?: string
-}
-
-export interface ApiError {
-  status: number
-  code: string
-  message: string
-  details?: unknown
-  traceId?: string
-}
-
 /**
- * Builds an axios instance configured for Catalyst Engine's JSON:API conventions.
+ * Public surface of `@catalyst/api-client`.
  *
- * Sprint 0 ships the contract; Sprint 1 layers on Sanctum CSRF handling and
- * authenticated request flows. Subsequent sprints add per-module typed methods.
+ * Consumers import:
+ *   - `createHttpClient` — the only place axios lives in the monorepo.
+ *     Configures Sanctum SPA cookie auth, CSRF preflight, and error
+ *     normalization (`docs/04-API-DESIGN.md § 4`).
+ *   - `createAuthApi` — typed wrapper functions for every auth endpoint
+ *     shipped through Sprint-1 chunks 3 → 5.
+ *   - `ApiError` — single error class thrown by every typed function.
+ *     Preserves backend error codes verbatim per chunk-4 / chunk-5
+ *     standard 5.4 (`docs/PROJECT-WORKFLOW.md § 5`).
+ *   - All wire DTO types under `./types`.
  */
-export function createApiClient(options: ApiClientOptions): AxiosInstance {
-  const instance = axios.create({
-    baseURL: options.baseURL,
-    withCredentials: options.withCredentials ?? true,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-    },
-  })
 
-  instance.interceptors.response.use(
-    (response) => response,
-    (error: unknown) => {
-      if (axios.isAxiosError(error) && error.response) {
-        const data = error.response.data as Partial<ApiError> | undefined
-        const apiError: ApiError = {
-          status: error.response.status,
-          code: data?.code ?? `HTTP_${error.response.status}`,
-          message: data?.message ?? error.message,
-          ...(data?.details !== undefined ? { details: data.details } : {}),
-          ...(data?.traceId !== undefined ? { traceId: data.traceId } : {}),
-        }
-        return Promise.reject(apiError)
-      }
-      return Promise.reject(error)
-    },
-  )
-
-  return instance
-}
-
-export type { AxiosInstance } from 'axios'
+export { createAuthApi, type AuthApi, type AuthVariant, type CreateAuthApiOptions } from './auth'
+export { ApiError, type ApiErrorDetail, type ApiErrorOptions } from './errors'
+export {
+  createHttpClient,
+  type CreateHttpClientOptions,
+  type HttpClient,
+  type HttpRequestOptions,
+} from './http'
+export * from './types'

@@ -302,11 +302,11 @@ it('escalates to permanent lockout after 11 failed attempts spanning 24 hours', 
         ->and($user->suspended_reason)->toBe('Excessive failed login attempts')
         ->and($user->suspended_at)->not->toBeNull();
 
-    expect(AuditLog::query()->where('action', AuditAction::AuthAccountLocked->value)->count())->toBeGreaterThanOrEqual(1);
+    expect(AuditLog::query()->where('action', AuditAction::AuthAccountLockedSuspended->value)->count())->toBeGreaterThanOrEqual(1);
     Event::assertDispatched(AccountLocked::class);
 });
 
-it('rejects subsequent logins on a hard-locked account with auth.account_locked', function (): void {
+it('rejects subsequent logins on a hard-locked account with auth.account_locked.suspended', function (): void {
     Carbon::setTestNow('2026-05-08T12:00:00Z');
     $user = User::factory()->suspended('Excessive failed login attempts')->createOne(['email' => 'banned@example.com']);
 
@@ -314,7 +314,7 @@ it('rejects subsequent logins on a hard-locked account with auth.account_locked'
         'email' => 'banned@example.com',
         'password' => FACTORY_PASSWORD,
     ])->assertStatus(423)
-        ->assertJsonPath('errors.0.code', 'auth.account_locked');
+        ->assertJsonPath('errors.0.code', 'auth.account_locked.suspended');
 
     expect($user->refresh()->is_suspended)->toBeTrue();
 });

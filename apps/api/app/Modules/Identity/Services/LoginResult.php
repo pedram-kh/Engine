@@ -35,7 +35,7 @@ use App\Modules\Identity\Models\User;
  *                              `users.two_factor_enrollment_suspended_at`.
  *                              423 with `auth.mfa.enrollment_suspended`.
  *   - AccountSuspended   → user is hard-suspended (is_suspended=true).
- *                          `auth.account_locked`. 423.
+ *                          `auth.account_locked.suspended`. 423.
  *   - TemporarilyLocked  → too many failures in the 15-minute window.
  *                          `auth.account_locked.temporary`. 423.
  */

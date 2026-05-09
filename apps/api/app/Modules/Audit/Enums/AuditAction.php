@@ -34,7 +34,7 @@ enum AuditAction: string
     case AuthPasswordChanged = 'auth.password.changed';
     case AuthEmailVerificationSent = 'auth.email.verification_sent';
     case AuthEmailVerified = 'auth.email.verified';
-    case AuthAccountLocked = 'auth.account_locked';
+    case AuthAccountLockedSuspended = 'auth.account_locked.suspended';
     case AuthAccountUnlocked = 'auth.account_unlocked';
 
     // MFA verbs (chunk 5). Per-attempt TOTP verification is intentionally
