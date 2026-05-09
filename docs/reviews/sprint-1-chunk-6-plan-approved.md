@@ -1,7 +1,7 @@
 # Sprint 1 — Chunk 6 Plan Approved (Checkpoint)
 
 **Status:** In progress.
-**Sub-chunks closed:** 6.1 (commit f8f4940), 6.2–6.4 (commit 7544c8e).
+**Sub-chunks closed:** 6.1 (commit f8f4940), 6.2–6.4 (commit 2e4bb7f).
 **Sub-chunks ahead:** 6.5–6.7 (router + auth pages + 2FA UI), 6.8 (Playwright specs), 6.9 (module README + final self-review).
 **Approved at:** Start of Sprint 1 Chunk 6 (Main SPA auth UI)
 
