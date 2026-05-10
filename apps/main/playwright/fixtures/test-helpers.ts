@@ -1,0 +1,173 @@
+import type { APIRequestContext } from '@playwright/test'
+
+/**
+ * Typed wrappers around the chunk 6.1 `App\TestHelpers` HTTP surface.
+ *
+ * Specs use Playwright's `request` fixture (NOT the SPA's HTTP path)
+ * to call these helpers. `request` shares cookies with the page when
+ * accessed via `page.context().request`, so a helper-driven sign-up
+ * lands the user in the same session the page sees.
+ *
+ * The `X-Test-Helper-Token` header is forwarded automatically by the
+ * `extraHTTPHeaders` block in `playwright.config.ts` — these wrappers
+ * never spell it.
+ *
+ * Returned values are typed; specs read named fields rather than raw
+ * `Response` objects. A non-2xx response from any helper throws a
+ * descriptive error so a misconfigured spec fails loudly instead of
+ * silently asserting against undefined.
+ */
+
+export interface SignUpUserResult {
+  email: string
+  password: string
+}
+
+/**
+ * Sign up a new user via the production sign-up endpoint (NOT a
+ * test-helper). The user is created with `email_verified_at = NULL`,
+ * which is fine for chunk 6.8 because the LoginController does not
+ * gate on email verification. Specs that need a verified email call
+ * `mintVerificationToken` and navigate the SPA to the
+ * `/verify-email/confirm?token=…` route.
+ */
+export async function signUpUser(
+  request: APIRequestContext,
+  email: string,
+  password: string,
+  name: string = 'Test User',
+): Promise<SignUpUserResult> {
+  const response = await request.post('http://127.0.0.1:8000/api/v1/auth/sign-up', {
+    data: {
+      name,
+      email,
+      password,
+      password_confirmation: password,
+    },
+  })
+
+  if (response.status() !== 201 && response.status() !== 200) {
+    throw new Error(`signUpUser failed with status ${response.status()}: ${await response.text()}`)
+  }
+
+  return { email, password }
+}
+
+export interface MintTotpResult {
+  code: string
+}
+
+/**
+ * Mint the current 6-digit TOTP code for the user with the given
+ * email. Calls the chunk-6.8 email branch of `IssueTotpController` —
+ * specs use email because the SPA never exposes the user's numeric
+ * primary key.
+ */
+export async function mintTotpCodeForEmail(
+  request: APIRequestContext,
+  email: string,
+): Promise<MintTotpResult> {
+  const response = await request.post('http://127.0.0.1:8000/api/v1/_test/totp', {
+    data: { email },
+  })
+
+  if (response.status() !== 200) {
+    throw new Error(
+      `mintTotpCodeForEmail failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  const body = (await response.json()) as { data: { code: string } }
+  return { code: body.data.code }
+}
+
+export interface MintVerificationTokenResult {
+  token: string
+  verificationUrl: string
+}
+
+/**
+ * Mint a fresh email-verification token for the user with the given
+ * email. The returned `token` is the value the SPA's
+ * `/verify-email/confirm?token=…` route consumes.
+ *
+ * The helper's `verification_url` field is included for completeness
+ * but specs MUST NOT rely on its path matching the SPA route — the
+ * helper's URL targets `/auth/verify-email`, while the SPA route is
+ * `/verify-email/confirm` (chunk 6.6). Specs construct the SPA URL
+ * themselves using the returned `token`.
+ */
+export async function mintVerificationToken(
+  request: APIRequestContext,
+  email: string,
+): Promise<MintVerificationTokenResult> {
+  const response = await request.get(
+    `http://127.0.0.1:8000/api/v1/_test/verification-token?email=${encodeURIComponent(email)}`,
+  )
+
+  if (response.status() !== 200) {
+    throw new Error(
+      `mintVerificationToken failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  const body = (await response.json()) as {
+    data: { token: string; verification_url: string }
+  }
+  return { token: body.data.token, verificationUrl: body.data.verification_url }
+}
+
+/**
+ * Pin the application clock to the given ISO 8601 instant via the
+ * chunk-6.1 test-clock surface. Subsequent backend requests will see
+ * `Carbon::now()` return the pinned instant until the next call to
+ * `setClock()` or `resetClock()`.
+ *
+ * Specs SHOULD always pair `setClock()` calls with an `afterEach`
+ * `resetClock()` so a stray test does not bleed pinned time into the
+ * next.
+ */
+export async function setClock(request: APIRequestContext, isoInstant: string): Promise<void> {
+  const response = await request.post('http://127.0.0.1:8000/api/v1/_test/clock', {
+    data: { at: isoInstant },
+  })
+
+  if (response.status() !== 200) {
+    throw new Error(
+      `setClock(${isoInstant}) failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+}
+
+/**
+ * Release the pinned application clock so backend requests see real
+ * wall-clock time again.
+ */
+export async function resetClock(request: APIRequestContext): Promise<void> {
+  const response = await request.post('http://127.0.0.1:8000/api/v1/_test/clock/reset')
+
+  if (response.status() !== 200) {
+    throw new Error(`resetClock failed with status ${response.status()}: ${await response.text()}`)
+  }
+}
+
+/**
+ * Sign out via the production logout endpoint. The chunk 7 nav
+ * surface will provide a UI sign-out button; until then specs use
+ * this fixture so the chunk-6.8 specs do not need a UI placeholder
+ * just for the sign-out interaction.
+ *
+ * Cookie is shared with the page via `page.context().request`, so a
+ * subsequent `page.goto()` lands on a cold session.
+ */
+export async function signOutViaApi(request: APIRequestContext): Promise<void> {
+  const response = await request.post('http://127.0.0.1:8000/api/v1/auth/logout')
+
+  // 204 (signed-in path) or 401 (already signed out — race with
+  // expiry) are both acceptable; anything else is a regression.
+  if (response.status() !== 204 && response.status() !== 401) {
+    throw new Error(
+      `signOutViaApi failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+}

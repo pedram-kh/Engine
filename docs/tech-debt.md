@@ -45,3 +45,16 @@ anyone reviewing it later.
 - **Resolution:** add a new architecture test that walks `useErrorMessage`'s mapping table, walks the harvested backend codes from the chunks 6.3 source-inspection, and asserts every UI-renderable code has an explicit mapping (or a documented fall-through). The set of "UI-renderable" codes is the subset of backend codes that any auth page consumes.
 - **Owner:** the sprint that introduces the new auth error code.
 - **Status:** open.
+
+---
+
+## `auth.account_locked.temporary` i18n bundle has no `{minutes}` interpolation
+
+- **Where:** [`apps/main/src/core/i18n/locales/{en,pt,it}/auth.json`](../apps/main/src/core/i18n/locales/) — the `auth.account_locked.temporary` bundle entry.
+- **What we accepted in Sprint 1 chunks 6.8–6.9:** The bundle entry is `"Too many failed sign-in attempts. Please try again in a few minutes."` — generic phrasing, no `{minutes}` placeholder. The backend response carries `meta.retry_after_minutes` on the `AuthErrorResource`, and `useErrorMessage` already forwards `details[0].meta` as the interpolation bag, so the data path is open — only the bundle entry needs a placeholder to consume the value.
+- **Risk:** Users see "in a few minutes" instead of the actual minutes remaining. Materially less helpful when the lockout has 14 minutes remaining vs 30 seconds remaining; both render the same string.
+- **Mitigation today:** None. The generic phrasing is correct, just imprecise.
+- **Triggered by:** A UX-focused chunk that improves auth error messages, OR a user complaint about not knowing how long to wait.
+- **Resolution:** Add `{minutes}` placeholder to all three locale bundle entries. Update spec `failed-login-lockout-and-reset.spec.ts`'s substring assertion to accommodate the new shape (still matches `'failed sign-in'` as a substring; no full-string assertion needed).
+- **Owner:** The sprint that introduces the UX improvement.
+- **Status:** open.

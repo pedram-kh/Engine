@@ -36,7 +36,7 @@ it('returns a 6-digit TOTP code that verifies against the user secret', function
     expect($twoFactor->verifyTotp($secret, $code))->toBeTrue();
 });
 
-it('returns 422 when user_id is missing', function (): void {
+it('returns 422 when neither user_id nor email is supplied', function (): void {
     $this->postJson('/api/v1/_test/totp', [])->assertStatus(422);
 });
 
@@ -46,6 +46,41 @@ it('returns 422 when user_id is non-numeric', function (): void {
 
 it('returns 404 when no user matches the given id', function (): void {
     $this->postJson('/api/v1/_test/totp', ['user_id' => 999_999])->assertStatus(404);
+});
+
+it('returns a TOTP code when looked up by email (chunk-6.8 spec #19 path)', function (): void {
+    /** @var User $user */
+    $user = User::factory()->withTwoFactor()->createOne([
+        'email' => 'jane@example.com',
+    ]);
+
+    $response = $this->postJson('/api/v1/_test/totp', ['email' => 'jane@example.com']);
+
+    $response->assertOk();
+    $code = $response->json('data.code');
+    expect($code)->toBeString();
+    /** @var string $code */
+    expect(preg_match('/^\d{6}$/', $code))->toBe(1);
+
+    /** @var TwoFactorService $twoFactor */
+    $twoFactor = app(TwoFactorService::class);
+    /** @var string $secret */
+    $secret = $user->two_factor_secret;
+    expect($twoFactor->verifyTotp($secret, $code))->toBeTrue();
+});
+
+it('lower-cases + trims the email before lookup', function (): void {
+    User::factory()->withTwoFactor()->createOne([
+        'email' => 'jane@example.com',
+    ]);
+
+    $this->postJson('/api/v1/_test/totp', ['email' => '  JANE@example.com  '])
+        ->assertOk();
+});
+
+it('returns 404 when no user matches the given email', function (): void {
+    $this->postJson('/api/v1/_test/totp', ['email' => 'noone@example.com'])
+        ->assertStatus(404);
 });
 
 it('returns 422 when the user has no two_factor_secret yet', function (): void {

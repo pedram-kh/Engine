@@ -10,12 +10,20 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * POST /api/v1/_test/totp  { "user_id": 123 }
+ * POST /api/v1/_test/totp  { "user_id": 123 }   — or — { "email": "jane@example.com" }
  *
  * Returns the 6-digit TOTP code that is current at "now" for the
  * given user's stored 2FA secret. Used by the Playwright "2FA
  * enrollment + sign-in with code" spec (chunk 6 priority #19) so
  * the spec can drive the SPA without a real authenticator app.
+ *
+ * Either `user_id` (numeric primary key) or `email` (looked up via
+ * the same lower-case+trim normalisation as `SignUpService`) may be
+ * supplied. The Playwright runner only ever sees the user's `ulid`
+ * via the `/me` envelope, so the email branch is what spec #19 uses
+ * end-to-end. The `user_id` branch is preserved for tests + manual
+ * use — both branches share the same controller body once the user
+ * row is resolved.
  *
  * Hard isolation invariant (chunk 5 priority #1): the controller
  * routes the request through {@see TwoFactorService::currentCodeFor()},
@@ -25,8 +33,10 @@ use Illuminate\Http\Request;
  * `tests/Unit/Modules/Identity/Services/TwoFactorIsolationTest`.
  *
  * Failure modes:
- *   - Missing/invalid user_id → 422.
- *   - User row not found → 404 (matches the gate's bare-404 stance).
+ *   - Missing both user_id and email → 422.
+ *   - Invalid user_id (non-numeric) → 422.
+ *   - User row not found (by id OR email) → 404 (matches the gate's
+ *     bare-404 stance).
  *   - User has no two_factor_secret → 422; the spec should generate
  *     it via the standard `/2fa/enable` flow before requesting a
  *     code.
@@ -40,20 +50,10 @@ final class IssueTotpController
 {
     public function __invoke(Request $request, TwoFactorService $twoFactor): JsonResponse
     {
-        $userId = $request->input('user_id');
+        $user = $this->resolveUser($request);
 
-        if (! is_numeric($userId)) {
-            return new JsonResponse([
-                'error' => 'user_id is required and must be numeric',
-            ], 422);
-        }
-
-        $user = User::query()->find((int) $userId);
-
-        if (! $user instanceof User) {
-            return new JsonResponse([
-                'error' => 'no user matched',
-            ], 404);
+        if ($user instanceof JsonResponse) {
+            return $user;
         }
 
         $secret = $user->two_factor_secret;
@@ -69,5 +69,48 @@ final class IssueTotpController
                 'code' => $twoFactor->currentCodeFor($secret),
             ],
         ]);
+    }
+
+    /**
+     * Resolve the target user from either `user_id` or `email`. Returns
+     * the `User` row on success, or a `JsonResponse` carrying the
+     * appropriate 4xx for the failure mode.
+     *
+     * The two branches share the validation envelope shape (`{error: …}`)
+     * with the rest of the test-helpers surface so spec failures surface
+     * a debuggable body.
+     */
+    private function resolveUser(Request $request): User|JsonResponse
+    {
+        $userId = $request->input('user_id');
+        $email = $request->input('email');
+
+        if ($userId !== null && $userId !== '') {
+            if (! is_numeric($userId)) {
+                return new JsonResponse([
+                    'error' => 'user_id must be numeric',
+                ], 422);
+            }
+            $user = User::query()->find((int) $userId);
+            if (! $user instanceof User) {
+                return new JsonResponse(['error' => 'no user matched'], 404);
+            }
+
+            return $user;
+        }
+
+        if (is_string($email) && trim($email) !== '') {
+            $normalised = strtolower(trim($email));
+            $user = User::query()->where('email', $normalised)->first();
+            if (! $user instanceof User) {
+                return new JsonResponse(['error' => 'no user matched'], 404);
+            }
+
+            return $user;
+        }
+
+        return new JsonResponse([
+            'error' => 'either user_id (numeric) or email (string) is required',
+        ], 422);
     }
 }

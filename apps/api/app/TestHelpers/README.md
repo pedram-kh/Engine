@@ -29,12 +29,17 @@ The endpoints address two specific E2E pain points:
 All routes live under `/api/v1/_test/*` and require the
 `X-Test-Helper-Token` header.
 
-| Method | Path                               | Body / Query                       | Returns                                 |
-| ------ | ---------------------------------- | ---------------------------------- | --------------------------------------- |
-| GET    | `/api/v1/_test/verification-token` | `?email=jane@example.com`          | `{ data: { token, verification_url } }` |
-| POST   | `/api/v1/_test/totp`               | `{ "user_id": 123 }`               | `{ data: { code: "123456" } }`          |
-| POST   | `/api/v1/_test/clock`              | `{ "at": "2026-05-09T00:00:00Z" }` | `{ data: { at: "..." } }`               |
-| POST   | `/api/v1/_test/clock/reset`        | (none)                             | `{ data: { reset: true } }`             |
+| Method | Path                               | Body / Query                                                  | Returns                                 |
+| ------ | ---------------------------------- | ------------------------------------------------------------- | --------------------------------------- |
+| GET    | `/api/v1/_test/verification-token` | `?email=jane@example.com`                                     | `{ data: { token, verification_url } }` |
+| POST   | `/api/v1/_test/totp`               | `{ "user_id": 123 }` **or** `{ "email": "jane@example.com" }` | `{ data: { code: "123456" } }`          |
+| POST   | `/api/v1/_test/clock`              | `{ "at": "2026-05-09T00:00:00Z" }`                            | `{ data: { at: "..." } }`               |
+| POST   | `/api/v1/_test/clock/reset`        | (none)                                                        | `{ data: { reset: true } }`             |
+
+The Playwright spec for 2FA enrollment (chunk 6 priority #19) calls
+`/_test/totp` with `email` because the SPA never sees the user's
+numeric primary key — only the public `ulid`. The `user_id` branch is
+preserved for direct-database tests + manual debugging.
 
 A request that fails the gate receives a bare `404` — indistinguishable
 from any other unknown route. This is deliberate: the surface should

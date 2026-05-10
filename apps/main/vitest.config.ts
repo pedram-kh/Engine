@@ -8,7 +8,10 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       include: ['tests/unit/**/*.{spec,test}.ts', 'src/**/*.{spec,test}.ts'],
-      exclude: ['tests/e2e/**', 'node_modules/**'],
+      // The Playwright suite lives under `playwright/**` (chunk 6.8);
+      // its specs use the @playwright/test runner, not Vitest, so they
+      // must be excluded from the Vitest scan.
+      exclude: ['tests/e2e/**', 'playwright/**', 'node_modules/**'],
       globals: true,
       root: fileURLToPath(new URL('./', import.meta.url)),
       setupFiles: ['./tests/unit/setup.ts'],
