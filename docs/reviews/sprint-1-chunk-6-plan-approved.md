@@ -1,8 +1,8 @@
 # Sprint 1 — Chunk 6 Plan Approved (Checkpoint)
 
 **Status:** In progress.
-**Sub-chunks closed:** 6.1 (commit f8f4940), 6.2–6.4 (commit 2e4bb7f).
-**Sub-chunks ahead:** 6.5–6.7 (router + auth pages + 2FA UI), 6.8 (Playwright specs), 6.9 (module README + final self-review).
+**Sub-chunks closed:** 6.1 (commit f8f4940), 6.2–6.4 (commit 2e4bb7f, hash-drift correction cda780e), 6.5–6.7 (commit bbf0ca2).
+**Sub-chunks ahead:** 6.8 + 6.9 (Playwright specs + module README + final self-review, bundled per Pedram's two-more-round-trips compression).
 **Approved at:** Start of Sprint 1 Chunk 6 (Main SPA auth UI)
 
 This is a checkpoint file for chat-session resumption. Sprint 1 Chunk 6 is unusually large (9 sub-chunks) so the approved plan and the Q-and-A answers are recorded here durably.
