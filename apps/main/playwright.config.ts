@@ -11,12 +11,13 @@ import { defineConfig, devices } from '@playwright/test'
  *
  * Two `webServer` entries are started: the Laravel API (so the SPA
  * has a real backend to call) and the Vite dev server (the SPA the
- * specs drive). The API is started with `CACHE_STORE=array` because
- * the chunk 6.1 test-helpers clock pins `Carbon::setTestNow()`,
- * which the application cache must honor for the 15-minute lockout
- * cache key (chunk 6.8 spec #20). Redis EXPIRE uses real wall-clock
- * time and would not honor a `Carbon::setTestNow()` fast-forward; the
- * array driver computes TTL from `Carbon::now()` on read, which does.
+ * specs drive). The API is started with `CACHE_STORE=database` —
+ * the database cache driver persists across `php artisan serve`'s
+ * per-request PHP processes (so the FailedLoginTracker counter for
+ * spec #20 actually accumulates across attempts) AND its TTL
+ * evaluation routes through `Carbon::now()` (so the chunk-6.1
+ * simulated test clock is honored). See the chunks 6.8-6.9 review's
+ * post-merge addendum #3 for the discovery context.
  *
  * The `TEST_HELPERS_TOKEN` env variable MUST be set when running the
  * suite. The global setup validates it and fails loudly if missing.
@@ -76,9 +77,9 @@ export default defineConfig({
     {
       // Laravel API. `php artisan serve` is the dev-grade server; the
       // chunk 6.1 test-helpers gate is honored because APP_ENV is
-      // `local` in development and `testing` in CI's hermetic env.
-      // CACHE_STORE=array is the chunk-6.8 hermeticity contract for
-      // spec #20 (see config docblock at the top of this file).
+      // `local` in development and CI sets the same value on the job
+      // env. CACHE_STORE=database is the chunk-6.8 hermeticity
+      // contract (see config docblock above).
       command: 'php artisan serve --host=127.0.0.1 --port=8000',
       cwd: '../api',
       // `/up` is Laravel 11's built-in health route, enabled in
@@ -94,7 +95,7 @@ export default defineConfig({
       timeout: 60_000,
       env: {
         APP_ENV: 'local',
-        CACHE_STORE: 'array',
+        CACHE_STORE: 'database',
         TEST_HELPERS_TOKEN,
       },
       ignoreHTTPSErrors: true,

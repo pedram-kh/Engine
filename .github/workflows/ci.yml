@@ -130,11 +130,11 @@ jobs:
   #      API + Vite; both inherit `TEST_HELPERS_TOKEN` from env.
   #
   # The lockout cache MUST honor the simulated test clock for spec
-  # #20 to work hermetically — see the `CACHE_STORE=array` env var
+  # #20 AND persist across the per-request PHP processes spawned by
+  # `php artisan serve` — see the `CACHE_STORE=database` env var
   # passed to both the API webServer (in `playwright.config.ts`) and
-  # this job's env block. With Redis the lockout key would have a
-  # real-wall-clock TTL that the chunk-6.1 Carbon test clock cannot
-  # influence.
+  # this job's env block, and the chunks 6.8-6.9 review's post-merge
+  # addendum #3 for the discovery context.
   e2e-main:
     name: E2E — main SPA (Playwright)
     runs-on: ubuntu-latest
@@ -163,10 +163,10 @@ jobs:
           --health-timeout 3s
           --health-retries 10
     env:
-      # Laravel runtime configuration. CACHE_STORE=array is the
-      # chunk-6.8 hermeticity contract for spec #20 (the Redis driver
-      # would not honor `Carbon::setTestNow()` for the lockout cache
-      # TTL).
+      # Laravel runtime configuration. CACHE_STORE=database is the
+      # chunk-6.8 hermeticity contract — see playwright.config.ts
+      # docblock for the full reasoning (cross-request persistence
+      # under `php artisan serve` + `Carbon::setTestNow()` honor).
       APP_ENV: local
       APP_DEBUG: 'true'
       APP_URL: 'http://127.0.0.1:8000'
@@ -176,7 +176,7 @@ jobs:
       DB_DATABASE: catalyst
       DB_USERNAME: catalyst
       DB_PASSWORD: catalyst
-      CACHE_STORE: array
+      CACHE_STORE: database
       SESSION_DRIVER: database
       SESSION_COOKIE: catalyst_main_session
       SANCTUM_STATEFUL_DOMAINS: '127.0.0.1:5173,localhost:5173'

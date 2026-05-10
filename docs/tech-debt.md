@@ -58,3 +58,16 @@ anyone reviewing it later.
 - **Resolution:** Add `{minutes}` placeholder to all three locale bundle entries. Update spec `failed-login-lockout-and-reset.spec.ts`'s substring assertion to accommodate the new shape (still matches `'failed sign-in'` as a substring; no full-string assertion needed).
 - **Owner:** The sprint that introduces the UX improvement.
 - **Status:** open.
+
+---
+
+## Spec #19 (2FA enrollment) skipped pending in-flight TOTP enrollment helper
+
+- **Where:** [`apps/main/playwright/specs/2fa-enrollment-and-sign-in.spec.ts`](../apps/main/playwright/specs/2fa-enrollment-and-sign-in.spec.ts) — `test.skip(...)` on the sole `full enrollment + re-sign-in flow` test, marked with the `TODO(spec-19-skip)` anchor.
+- **What we accepted in Sprint 1 chunk 6 hotfix #3:** Spec #19 is muted in CI. The spec drives the SPA's two-step 2FA enrollment (`TwoFactorEnrollmentService::start()` → `confirm()`) and needs a TOTP code minted from the in-flight enrollment secret — the secret that lives in the cache (key prefix `identity:2fa:enroll:`) during enrollment, NOT the persisted `users.two_factor_secret` column (which is NULL until `confirm()` lands successfully). The chunk-6.8 `mintTotpCodeForEmail` fixture only services the post-enrollment case, so the spec 422s at the helper step. The chunk-6.8 spec design assumed a helper that didn't yet exist.
+- **Risk:** The only end-to-end test for the 2FA enrollment flow is muted. Regressions in `EnableTotpPage`, `TwoFactorEnrollmentService::confirm()`, the recovery-codes UI countdown, or the `requireMfaEnrolled` router guard's enrollment-rebound behaviour can land without surfacing in CI until the spec is restored. Spec #20 (failed-login lockout) remains active and exercises a different slice of the auth surface.
+- **Mitigation today:** Vitest unit specs + Pest feature specs cover the underlying behaviour at the component + service + controller level (`EnableTotpPage.spec.ts`, `RecoveryCodesDisplay.spec.ts`, `TwoFactorEnrollmentService` Pest tests, `IssueTotpController` Pest tests, `requireMfaEnrolled` guard architecture test). The 2FA path is exercised; what's missing is the cross-layer integration check that Playwright provides.
+- **Triggered by:** the next chunk that touches `EnableTotpPage`, `TwoFactorEnrollmentService`, `IssueTotpController`, the recovery-codes UI, or the `requireMfaEnrolled` guard in a way that could break the cross-layer enrollment flow. Also triggered by the Sprint 2 kickoff if the spec is still skipped at that point — restoring it should be sequenced into Sprint 2 planning rather than carried indefinitely.
+- **Resolution:** Follow-up review round designs an in-flight TOTP enrollment helper. The chunks 6.8–6.9 review's post-merge addendum #3 captures the discovery context. The same review round should also reconsider chunk-6.8 OQ-3 (whether `CACHE_STORE=array` was technically a correct choice given `php artisan serve`'s per-request PHP process model — separate technical question, related context). Once the helper lands, flip `test.skip` → `test` and remove the `TODO(spec-19-skip)` anchor.
+- **Owner:** the sprint that introduces a chunk hitting one of the trigger conditions, OR an explicit "restore spec #19" sub-chunk in Sprint 2 if no triggering chunk has landed by then.
+- **Status:** open.
