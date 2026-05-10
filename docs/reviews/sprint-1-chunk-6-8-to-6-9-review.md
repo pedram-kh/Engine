@@ -512,3 +512,11 @@ in `docs/tech-debt.md` → "Spec #19 (2FA enrollment) skipped pending
 in-flight TOTP enrollment helper". Spec #19 is `test.skip`'d in this
 commit; spec #20 stays active and is expected to pass with the
 cache-driver fix.
+
+**Update (2026-05-11, second CI run after the cache-driver fix):**
+spec #20 then surfaced a deeper layered issue (route throttle
+preempts application lockout at the same threshold; SPA resolver
+rejects `rate_limit.*` codes). Spec #20 joined spec #19 as
+`test.skip`'d in hotfix #4; both items + the resolver-taxonomy
+production UX bug are tracked in `docs/tech-debt.md` under their
+dedicated entries.
