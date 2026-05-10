@@ -1,7 +1,6 @@
 # Sprint 1 — Chunks 6.8 → 6.9 Review (Playwright E2E + auth module README + final chunk-6 self-review)
 
-**Status:** Approved with two small change-requests — flips to **Closed** when the two bookkeeping items in §"Change-requests landing in this commit" land in the working tree.
-
+**Status:** Closed.
 **Reviewer:** Claude (independent review) — incorporating Cursor's self-review draft.
 
 **Reviewed against:** `PROJECT-WORKFLOW.md` § 5 (all 11 team standards), `02-CONVENTIONS.md` § 1 + § 3 + § 4 (note: § 4.3 coverage thresholds explicitly do NOT apply to Playwright E2E per kickoff Q4), `01-UI-UX.md` (the surface Playwright drives), `04-API-DESIGN.md` § 4 + § 7 + § 8 (envelope shapes E2E asserts against), `05-SECURITY-COMPLIANCE.md` § 6 (lockout thresholds, 2FA enrollment requirements), `07-TESTING.md` § 4 + § 4.4 (Playwright config patterns, hermetic-test discipline, fixture conventions), `20-PHASE-1-SPEC.md` § 7 (E2E priorities #19 + #20), `security/tenancy.md`, `feature-flags.md`, `tech-debt.md`, `reviews/sprint-1-chunk-6-plan-approved.md`, `reviews/sprint-1-chunk-6-1-review.md` (test-helpers contract — directly exercised by 6.8), `reviews/sprint-1-chunk-6-2-to-6-4-review.md` (data layer — invariants preserved), `reviews/sprint-1-chunk-6-5-to-6-7-review.md` (most-direct precedent).
@@ -332,3 +331,87 @@ The compressed pattern continues to work as intended:
 ---
 
 _Provenance: drafted by Cursor on Sprint 1 chunks 6.8 + 6.9 group completion (compressed-pattern process — single chat completion summary + single structured draft per `PROJECT-WORKFLOW.md` § 3 step 6, modified). Independently reviewed by Claude with four targeted spot-checks. Five honest-deviation flags surfaced (OQ-1 through OQ-6, with OQ-1, OQ-2, OQ-3 load-bearing); the pattern of "every chunk-6 group catches at least one hidden assumption in the kickoff" is now four-for-four and recorded as a permanent feature of the workflow. This is the closing review for the entire chunk 6. Two small bookkeeping change-requests issued (typo fix in the OQ-section intro; `tech-debt.md` entry for the `auth.account_locked.temporary` `{minutes}` interpolation gap). Status flips to "Closed" when both land in the working tree, in the same commit as this review file. After commit, chunk 6 is closed and Sprint 1 moves to chunk 7 (admin SPA + nav surface)._
+
+---
+
+## Post-merge addendum — Playwright API health-probe fix (2026-05-10)
+
+This addendum is appended after chunks 6.8–6.9 closed (commit 7341340) and
+the chunk-6 plan-approved checkpoint flipped to Closed (commit 1cc3fd7).
+The work itself is shipped as a follow-up commit, not a re-open of chunk 6.
+
+### (a) What surfaced in CI
+
+The first push of the closed chunk (CI run #30, commit 1cc3fd7) failed
+on the new `e2e-main` job with `Error: Timed out waiting 60000ms from
+config.webServer.` after 1m 1s. Backend, frontend, and `e2e-admin` were
+all green on the same run. The 60000ms in the error matches the API
+webServer's `timeout` (60_000) — the Vite entry's timeout is 120_000 —
+so the failure was localized to the Laravel API health probe.
+
+### (b) The one-file fix
+
+`apps/main/playwright.config.ts` — switched the API webServer's
+health-probe URL from `/api/v1/_test/clock/reset` (POST-only, returns
+405 to GET) to `/up` (Laravel 11's built-in GET-200 health route,
+already enabled in `apps/api/bootstrap/app.php`).
+
+Root cause: Playwright's `isURLAvailable`
+(`playwright-core/lib/server/utils/network.js`) accepts
+`statusCode >= 200 && statusCode < 404` — 404, 405, 5xx are all
+treated as "not yet available" and the prober keeps polling until the
+deadline fires. The original config's docblock incorrectly claimed
+Playwright treats a 405 as "server is up". It does not. The probe
+was sitting on Laravel returning 405 to every GET while the 60s
+deadline ticked down.
+
+The original "two assertions in one probe" cleverness (boot + gate-open
+in a single GET) was structurally impossible under Playwright's actual
+contract. Gate-open is already validated independently by
+`playwright/global-setup.ts` (fails loudly if `TEST_HELPERS_TOKEN` is
+unset) and by every spec's first `/_test/*` call (would 404 cleanly if
+the gate were closed), so no validation coverage is lost by switching
+to `/up`.
+
+The docblock was rewritten to capture (i) Playwright's `< 404` rule
+explicitly, (ii) the rationale for `/up` as the new probe, and (iii)
+where gate-open is now validated, so the next reader of the file sees
+the contract instead of re-deriving it.
+
+### (c) What this validates about the honest-deviation-flagging pattern
+
+The chunks 6.8–6.9 review file's Verification section explicitly flagged
+"Playwright runtime — Not executed in this self-review" as a known blind
+spot, with the reasoning recorded honestly: no headed runner attached to
+the session, time-traveling specs need a real Postgres/Redis ladder. CI
+was nominated as the runtime ground truth.
+
+CI did exactly that — it caught a Playwright-runtime bug that the
+unit-test + Pint + Larastan + Pnpm-lint ladder structurally could not
+have caught (none of those execute the webServer health probe), and it
+caught it on the very first push. The blind-spot disclosure was the
+right call: pretending the runtime was covered would have shipped a
+silent timeout into the chunk-6 closing artifact; flagging it as
+deferred-to-CI made the failure expected rather than surprising.
+
+This is the fifth instance in chunk 6 of the honest-deviation pattern
+catching a real hidden assumption (after OQ-1 App.vue routing, OQ-2
+TOTP user lookup, OQ-3 Redis TTL vs Carbon, OQ-4 dashboard route name).
+Three of those five were caught pre-runtime in the kickoff-vs-code
+phase; this one was caught at the deferred-to-CI boundary the review
+explicitly named. The pattern is doing what it's meant to.
+
+No back-edit of the chunks 6.8–6.9 review file's body is needed —
+the blind-spot disclosure stands as written. This addendum is the
+honest record of what surfaced in the deferred runtime check and how
+it was resolved.
+
+### (d) Status
+
+- Fix shipped as a single follow-up commit
+  (`fix(e2e): correct Playwright API health-probe URL [post-chunk-6 hotfix]`).
+- No change to chunk-6 sub-chunk closure status; this is a hotfix on
+  closed work, not a re-open.
+- Next CI push expected to clear `e2e-main`. Any further Playwright-
+  runtime-only failures will surface from there and be iterated in
+  the same commit-per-fix cadence (no need to re-open chunk 6).

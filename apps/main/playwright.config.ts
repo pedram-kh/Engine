@@ -25,6 +25,16 @@ import { defineConfig, devices } from '@playwright/test'
  * value per run via `openssl rand -hex 32` and exports it into both
  * the API process and the Playwright runner — see
  * `.github/workflows/ci.yml` and `apps/api/app/TestHelpers/README.md`.
+ *
+ * Health-probe URL contract: Playwright's `webServer.url` probe is
+ * implemented in `playwright-core/lib/server/utils/network.js` as
+ * `statusCode >= 200 && statusCode < 404` — i.e. 404, 405, and 5xx
+ * are all treated as "not yet available" and the probe keeps polling
+ * until the deadline fires. This rules out POST-only routes (which
+ * 405 to GET) and routes behind closed gates (which can 404). The
+ * API entry below uses Laravel 11's built-in `/up` health route
+ * (enabled in `apps/api/bootstrap/app.php` via `health: '/up'`),
+ * which is a GET-200 endpoint with no auth or gate dependencies.
  */
 
 const TEST_HELPERS_TOKEN =
@@ -71,10 +81,15 @@ export default defineConfig({
       // spec #20 (see config docblock at the top of this file).
       command: 'php artisan serve --host=127.0.0.1 --port=8000',
       cwd: '../api',
-      url: 'http://127.0.0.1:8000/api/v1/_test/clock/reset',
-      // The reset endpoint is the cheapest gate-checked route — a
-      // 200 response means the API is up AND the test-helpers gate
-      // is open, both of which the spec suite needs.
+      // `/up` is Laravel 11's built-in health route, enabled in
+      // `apps/api/bootstrap/app.php` (`health: '/up'`). GET-200,
+      // no auth, no gate dependency. Probe-safe per Playwright's
+      // `< 404` rule (see top-of-file docblock). The test-helpers
+      // gate is validated separately by `playwright/global-setup.ts`
+      // (which fails loudly if `TEST_HELPERS_TOKEN` is unset) and
+      // by every spec's first `/_test/*` call (which would 404 if
+      // the gate were closed).
+      url: 'http://127.0.0.1:8000/up',
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,
       env: {
@@ -82,11 +97,6 @@ export default defineConfig({
         CACHE_STORE: 'array',
         TEST_HELPERS_TOKEN,
       },
-      // The reset endpoint is a POST; the standard `url` health probe
-      // issues a GET that 405s here (which Playwright treats as
-      // "server is up"). The 405 is exactly the signal we want — it
-      // proves Laravel is routing requests AND the gate is open
-      // (a closed gate would return a bare 404).
       ignoreHTTPSErrors: true,
     },
     {
