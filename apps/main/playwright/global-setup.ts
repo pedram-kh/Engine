@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process'
-import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 /**
  * Global setup for the chunk-6.8 Playwright suite.
@@ -40,7 +40,17 @@ export default async function globalSetup(): Promise<void> {
     )
   }
 
-  const apiDir = path.resolve(__dirname, '../../api')
+  // ESM-safe equivalent of `path.resolve(__dirname, '../../api')`.
+  // `apps/main/package.json` declares `"type": "module"`, so this
+  // file is loaded as ESM and the CommonJS `__dirname` global is
+  // undefined here. The `fileURLToPath(new URL(rel, import.meta.url))`
+  // idiom matches `apps/main/vite.config.ts` and the vitest configs.
+  // Vitest polyfills `__dirname` for transformed test modules (which
+  // is why the architecture tests under `tests/unit/architecture/`
+  // can keep using it) but Playwright's TS loader does not — see the
+  // chunks 6.8-6.9 review's post-merge addendum #2 for the
+  // CI-discovery context.
+  const apiDir = fileURLToPath(new URL('../../api', import.meta.url))
   // `--force` skips the production-environment confirmation prompt;
   // the gate above already asserts we're in a test-friendly env.
   // `migrate:fresh` drops + recreates the schema, then seeds nothing

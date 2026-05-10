@@ -334,7 +334,7 @@ _Provenance: drafted by Cursor on Sprint 1 chunks 6.8 + 6.9 group completion (co
 
 ---
 
-## Post-merge addendum — Playwright API health-probe fix (2026-05-10)
+## Post-merge addendum #1 — Playwright API health-probe fix (2026-05-10)
 
 This addendum is appended after chunks 6.8–6.9 closed (commit 7341340) and
 the chunk-6 plan-approved checkpoint flipped to Closed (commit 1cc3fd7).
@@ -409,9 +409,92 @@ it was resolved.
 ### (d) Status
 
 - Fix shipped as a single follow-up commit
-  (`fix(e2e): correct Playwright API health-probe URL [post-chunk-6 hotfix]`).
+  (`fix(spa-auth): correct Playwright API health-probe URL [post-chunk-6 hotfix]`,
+  commit `5f3b935`).
 - No change to chunk-6 sub-chunk closure status; this is a hotfix on
   closed work, not a re-open.
 - Next CI push expected to clear `e2e-main`. Any further Playwright-
   runtime-only failures will surface from there and be iterated in
   the same commit-per-fix cadence (no need to re-open chunk 6).
+
+---
+
+## Post-merge addendum #2 — global-setup ESM safety (2026-05-10)
+
+This addendum is appended after the API health-probe fix shipped
+(commit `5f3b935`). Same chunk-6 closure status applies — no re-open.
+
+### (a) What surfaced in CI
+
+CI run #31 (commit `5f3b935`, the addendum #1 health-probe fix)
+advanced past the webServer probe stage but failed `e2e-main` at the
+very next step with `ReferenceError: __dirname is not defined` at
+`apps/main/playwright/global-setup.ts:43`, in 1m 13s. Backend,
+frontend, and `e2e-admin` all green. The probe fix worked exactly as
+intended — `e2e-main` now reaches the "Run Playwright tests" step —
+but the global setup throws before any spec runs.
+
+### (b) The one-file fix
+
+`apps/main/playwright/global-setup.ts` — replaced
+`path.resolve(__dirname, '../../api')` with
+`fileURLToPath(new URL('../../api', import.meta.url))`, dropped the
+unused `node:path` import, added `fileURLToPath` from `node:url`.
+
+Root cause: `apps/main/package.json` declares `"type": "module"`,
+so every `.ts` in the package is loaded as ESM. The CommonJS globals
+`__dirname` and `__filename` are undefined under ESM — accessing
+either throws a `ReferenceError` at the top of the function. The
+idiom for "directory of the current file in ESM" already established
+in this repo is `fileURLToPath(new URL('./relative', import.meta.url))`
+(see `apps/main/vite.config.ts` line 11 and both `vitest.config.ts`
+files); the fix matches that house style.
+
+Why the architecture tests under `apps/main/tests/unit/architecture/`
+keep working with `__dirname`: Vitest provides a per-module polyfill
+for `__dirname` and `__filename` in transformed test modules even
+when the package is ESM. Playwright's TypeScript loader does NOT
+polyfill, so the same idiom that works in six existing Vitest files
+breaks in this one Playwright file. Scope is deliberately narrow —
+the architecture tests don't need to change because they're never
+loaded by Playwright.
+
+A multi-line comment was added above the new resolution call so the
+next reader (or AI) doesn't "fix" it back to `__dirname`, with a
+back-reference to this addendum for the post-mortem.
+
+### (c) What this validates about the CI-as-runtime-arbiter pattern
+
+Second consecutive Playwright-runtime-only bug, caught on the second
+consecutive push. The pattern is working as designed: the chunks
+6.8–6.9 review explicitly nominated CI as the runtime ground truth
+for Playwright (because no headed runner was attached to the build
+session), and CI is iterating through the runtime-only bugs one push
+at a time, in the order they surface.
+
+This is the sixth chunk-6 honest-deviation catch — addendum #1 was
+the fifth. Three caught pre-runtime in kickoff-vs-code review (OQ-1
+App.vue routing, OQ-2 TOTP user lookup, OQ-3 Redis TTL vs Carbon);
+two caught in CI now (probe URL, ESM `__dirname`). The pattern
+continues to converge on the actual reachable surface.
+
+The cadence (one runtime bug per push, fix per push) is structurally
+healthy as long as each fix stays genuinely scoped to a single
+discovery and ships under the same hotfix-on-closed-work convention.
+If a CI push surfaced a cluster of related issues at once, the right
+move would be to bundle the fix; so far the bugs are surfacing
+independently, one per push.
+
+### (d) Status
+
+- Fix shipped as a single follow-up commit
+  (`fix(spa-auth): make Playwright global-setup ESM-safe [post-chunk-6 hotfix]`).
+- No change to chunk-6 sub-chunk closure status; same hotfix-on-
+  closed-work convention as addendum #1.
+- Next CI push expected to advance past `globalSetup` and either run
+  the spec suite to completion OR surface the next runtime-only bug,
+  whichever comes first. The `2fa-enrollment-and-sign-in.spec.ts` and
+  `failed-login-lockout-and-reset.spec.ts` files have not yet been
+  exercised against a real backend in any environment; further
+  discoveries are entirely possible and will be iterated under the
+  same convention.
