@@ -32,3 +32,16 @@ anyone reviewing it later.
 - **Resolution:** extend `TwoFactorService::currentCodeFor()` with an optional `?Carbon $at = null` parameter and route through `Google2FA::getCurrentOtpAt($timestamp)` when provided. The test-clock cache value (`config('test_helpers.clock_cache_key')`, default `test:clock:current`) is the canonical source for `$at` in the test-helper controller — `IssueTotpController` would read it via `TestClock::current()` and pass it through, so the same Redis-backed clock that drives `Carbon::setTestNow()` also drives `Google2FA`.
 - **Owner:** the sprint that introduces a spec needing combined clock-skip + TOTP. Likely Sprint 9 (session-management UI) or Sprint 13+ (security pipeline) but not earlier.
 - **Status:** open.
+
+---
+
+## `useErrorMessage` mapping table is not coverage-checked against the backend code registry
+
+- **Where:** [`apps/main/src/modules/auth/composables/useErrorMessage.ts`](../apps/main/src/modules/auth/composables/useErrorMessage.ts) — the mapping table from `ApiError.code` → i18n key + interpolation values.
+- **What we accepted in Sprint 1 chunks 6.5–6.7:** `useErrorMessage` maintains a finite explicit map covering the auth error codes the UI currently renders. New backend `auth.*` codes added in future chunks need a manual line in the map to render with their intended interpolation values; without a line, they fall through to `auth.ui.errors.unknown`.
+- **Risk:** a future backend error code lands with an i18n entry (the chunks 6.3 architecture test ensures that), but renders as "An unexpected error occurred" because `useErrorMessage` doesn't know about it. The user-facing impact is a less-helpful error message; not a security or data risk.
+- **Mitigation today:** the chunks 6.3 architecture test [`i18n-auth-codes.spec.ts`](../apps/main/tests/unit/architecture/i18n-auth-codes.spec.ts) ensures every backend code has an i18n entry, so the missing case is "code exists in bundle, code missing from `useErrorMessage` map" — a degraded UX, not a crash.
+- **Triggered by:** the next chunk that adds a new `auth.*` error code AND surfaces it through the UI.
+- **Resolution:** add a new architecture test that walks `useErrorMessage`'s mapping table, walks the harvested backend codes from the chunks 6.3 source-inspection, and asserts every UI-renderable code has an explicit mapping (or a documented fall-through). The set of "UI-renderable" codes is the subset of backend codes that any auth page consumes.
+- **Owner:** the sprint that introduces the new auth error code.
+- **Status:** open.

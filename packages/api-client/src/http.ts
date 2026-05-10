@@ -69,6 +69,27 @@ export interface CreateHttpClientOptions {
    * adapter is mocked. Production code never sets this.
    */
   axiosInstance?: AxiosInstance
+  /**
+   * Optional policy hook fired exactly once per response that
+   * normalizes to a `401 Unauthorized`, after {@link ApiError} is
+   * built but before it is thrown. The wiring layer
+   * (`apps/main/src/core/api/index.ts`) plugs in
+   * "clear user + redirect to /sign-in" here; the api-client itself
+   * stays transport-only and never knows about routing.
+   *
+   * The callback receives the request path verbatim (the `path`
+   * argument the caller passed to `get()` / `post()` / etc., not the
+   * absolutised URL) so the consumer can exempt specific endpoints.
+   * Chunk 6.5 review priority #2 + #8 require exempting
+   * `/auth/login` (legitimate wrong-password path) and `/me`,
+   * `/admin/me` (cold-load 401 is normal).
+   *
+   * The thrown {@link ApiError} is unaffected — exceptions from the
+   * callback itself are caught and silently swallowed so a misbehaving
+   * policy hook can never replace the original 401 surface with a
+   * different exception type the caller would not be prepared for.
+   */
+  onUnauthorized?: (path: string) => void
 }
 
 const DEFAULT_CSRF_COOKIE_URL = '/sanctum/csrf-cookie'
@@ -140,7 +161,17 @@ export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
       })
       return response.data
     } catch (error) {
-      throw normalizeError(error)
+      const normalized = normalizeError(error)
+      if (normalized.status === 401 && options.onUnauthorized !== undefined) {
+        try {
+          options.onUnauthorized(path)
+        } catch {
+          // Swallow callback failures: the original 401 remains the
+          // surface the caller sees. A misbehaving policy hook must
+          // never replace the typed ApiError with a different error.
+        }
+      }
+      throw normalized
     }
   }
 

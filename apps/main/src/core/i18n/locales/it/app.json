@@ -2,6 +2,13 @@
   "app": {
     "title": "Catalyst Engine",
     "subtitle": "Influencer marketing, gestito come un vero business.",
-    "sprint0Notice": "Sprint 0 — scheletro iniziale della piattaforma principale"
+    "sprint0Notice": "Sprint 0 — scheletro iniziale della piattaforma principale",
+    "dashboardPlaceholder": "Segnaposto della dashboard — superficie completa nel chunk 7.",
+    "locale": {
+      "switcher": "Lingua",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    }
   }
 }

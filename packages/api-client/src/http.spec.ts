@@ -402,6 +402,110 @@ describe('createHttpClient', () => {
     })
   })
 
+  describe('onUnauthorized callback', () => {
+    it('fires on a 401 response with the original request path', async () => {
+      const seen: string[] = []
+      const instance = axios.create({ withCredentials: true })
+      const mock = new MockAdapter(instance)
+      const http = createHttpClient({
+        baseUrl: BASE_URL,
+        axiosInstance: instance,
+        onUnauthorized: (p) => seen.push(p),
+      })
+      mock.onGet(`${BASE_URL}/me`).reply(401, {
+        errors: [{ status: '401', code: 'auth.unauthenticated', title: 'no.' }],
+      })
+
+      await expect(http.get('/me')).rejects.toBeInstanceOf(ApiError)
+      expect(seen).toEqual(['/me'])
+
+      mock.restore()
+    })
+
+    it('fires once per call even when the same caller retries', async () => {
+      const seen: string[] = []
+      const instance = axios.create({ withCredentials: true })
+      const mock = new MockAdapter(instance)
+      const http = createHttpClient({
+        baseUrl: BASE_URL,
+        axiosInstance: instance,
+        onUnauthorized: (p) => seen.push(p),
+      })
+      mock.onGet(`${BASE_URL}/users/1`).reply(401, {
+        errors: [{ status: '401', code: 'auth.unauthenticated' }],
+      })
+
+      await expect(http.get('/users/1')).rejects.toBeInstanceOf(ApiError)
+      await expect(http.get('/users/1')).rejects.toBeInstanceOf(ApiError)
+      expect(seen).toEqual(['/users/1', '/users/1'])
+
+      mock.restore()
+    })
+
+    it('does not fire on non-401 errors', async () => {
+      const seen: string[] = []
+      const instance = axios.create({ withCredentials: true })
+      const mock = new MockAdapter(instance)
+      const http = createHttpClient({
+        baseUrl: BASE_URL,
+        axiosInstance: instance,
+        onUnauthorized: (p) => seen.push(p),
+      })
+      mock.onGet(`${BASE_URL}/me`).reply(403, {
+        errors: [{ status: '403', code: 'auth.mfa.required' }],
+      })
+
+      await expect(http.get('/me')).rejects.toBeInstanceOf(ApiError)
+      expect(seen).toHaveLength(0)
+
+      mock.restore()
+    })
+
+    it('does not fire on a network error (status 0)', async () => {
+      const seen: string[] = []
+      const instance = axios.create({ withCredentials: true })
+      const mock = new MockAdapter(instance)
+      const http = createHttpClient({
+        baseUrl: BASE_URL,
+        axiosInstance: instance,
+        onUnauthorized: (p) => seen.push(p),
+      })
+      mock.onGet(`${BASE_URL}/me`).networkError()
+
+      await expect(http.get('/me')).rejects.toMatchObject({ status: 0 })
+      expect(seen).toHaveLength(0)
+
+      mock.restore()
+    })
+
+    it('still throws the ApiError when the callback itself throws', async () => {
+      const instance = axios.create({ withCredentials: true })
+      const mock = new MockAdapter(instance)
+      const http = createHttpClient({
+        baseUrl: BASE_URL,
+        axiosInstance: instance,
+        onUnauthorized: () => {
+          throw new Error('policy hook exploded')
+        },
+      })
+      mock.onGet(`${BASE_URL}/me`).reply(401, {
+        errors: [{ status: '401', code: 'auth.unauthenticated' }],
+      })
+
+      await expect(http.get('/me')).rejects.toBeInstanceOf(ApiError)
+
+      mock.restore()
+    })
+
+    it('is a no-op when no callback is provided', async () => {
+      h.mock.onGet(`${BASE_URL}/me`).reply(401, {
+        errors: [{ status: '401', code: 'auth.unauthenticated' }],
+      })
+
+      await expect(h.http.get('/me')).rejects.toBeInstanceOf(ApiError)
+    })
+  })
+
   describe('default request bodies', () => {
     it('defaults POST body to {} when omitted', async () => {
       h.mock.onGet(CSRF_URL).reply(204)

@@ -2,6 +2,13 @@
   "app": {
     "title": "Catalyst Engine",
     "subtitle": "Marketing de influenciadores, gerido como um negócio a sério.",
-    "sprint0Notice": "Sprint 0 — estrutura inicial da plataforma principal"
+    "sprint0Notice": "Sprint 0 — estrutura inicial da plataforma principal",
+    "dashboardPlaceholder": "Marcador do painel — superfície completa no chunk 7.",
+    "locale": {
+      "switcher": "Idioma",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    }
   }
 }
