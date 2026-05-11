@@ -146,3 +146,21 @@ anyone reviewing it later.
      Land any subset; option 1 is the highest-leverage one because it produces a clear runtime error when authoring future specs.
 - **Owner:** The next sprint that touches the Playwright fixture surface, the test-clock backend, OR a "test infrastructure" hardening sub-chunk. Likely Sprint 2 if no triggering chunk lands earlier.
 - **Status:** open.
+
+## Idle-timeout enforcement unwired on both admin and main SPAs
+
+**Where:** `apps/main/src/core/auth/useIdleTimeout.ts` (composable exists but is not invoked from `apps/main/src/App.vue`); `apps/admin/src/App.vue` (does not invoke any idle-timeout composable).
+
+**What we accepted:** Both SPAs ship without active idle-timeout enforcement despite `useIdleTimeout` existing on main. Per `05-SECURITY-COMPLIANCE.md` § 6.3, admin SPA should enforce a 30-minute idle timeout (stricter than main's looser policy); neither SPA currently does so.
+
+**Risk:** An admin user leaves their session open indefinitely without re-authenticating. An attacker with physical access to the unlocked machine gains admin-level access without re-prompting. The window is bounded only by the session cookie's absolute lifetime, not by inactivity.
+
+**Mitigation today:** Session cookie has a 2-hour absolute lifetime per Laravel's default `session.lifetime`; user must re-authenticate after that regardless of activity. This is significantly weaker than active idle-timeout enforcement but caps the exposure window.
+
+**Triggered by:** A future security-hardening sprint OR a security review flagging idle-timeout as a gap OR a CI test that asserts idle-timeout behavior (none exist today).
+
+**Resolution:** Wire `useIdleTimeout` from each SPA's `App.vue` with the configured timeout values from `05-SECURITY-COMPLIANCE.md` § 6.3 (admin 30 min, main per main's policy). Ensure both invocations use the correct per-SPA configuration. Add Vitest coverage for the wiring.
+
+**Owner:** Future security-hardening sprint.
+
+**Status:** Open. Surfaced as deviation D6 in sub-chunk 7.4 (Group 2 of chunk 7).

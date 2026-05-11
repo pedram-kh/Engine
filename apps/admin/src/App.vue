@@ -1,19 +1,30 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-
-const { t } = useI18n()
+/**
+ * Top-level admin application shell.
+ *
+ * Sub-chunk 7.4 ships the router infrastructure but not the auth pages
+ * or the `AuthLayout`. This shell is therefore a minimal
+ * `<v-app><v-main><router-view /></v-main></v-app>` frame: it lets the
+ * router resolve and render the placeholder pages without the
+ * route-meta layout switching main's `App.vue` performs (chunk 6.8).
+ *
+ * Sub-chunk 7.5 will:
+ *   - Introduce `apps/admin/src/modules/auth/layouts/AuthLayout.vue`.
+ *   - Expand this shell into a `meta.layout`-driven switcher that
+ *     mounts `AuthLayout` for `'auth'` / `'error'` routes and the bare
+ *     `<v-app>` for `'app'` routes — exact mirror of main's chunk-6.8
+ *     `App.vue`.
+ *
+ * The route `meta.layout` field is already declared in
+ * `apps/admin/src/modules/auth/routes.ts` so 7.5's expansion is a
+ * template change only, not a route-table change.
+ */
 </script>
 
 <template>
   <v-app>
     <v-main>
-      <v-container class="d-flex flex-column align-center justify-center" style="min-height: 100vh">
-        <h1 class="text-h4 mb-2">{{ t('app.title') }}</h1>
-        <p class="text-body-1 text-medium-emphasis">{{ t('app.subtitle') }}</p>
-        <p class="text-caption mt-8 text-disabled">
-          {{ t('app.sprint0Notice') }}
-        </p>
-      </v-container>
+      <router-view />
     </v-main>
   </v-app>
 </template>

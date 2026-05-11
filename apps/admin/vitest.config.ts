@@ -19,17 +19,25 @@ export default mergeConfig(
       },
       // Auth-flow coverage gate per docs/02-CONVENTIONS.md § 4.3 +
       // docs/07-TESTING.md § 4.3: 100% line coverage on the admin
-      // SPA's auth module (sub-chunk 7.2). Mirrors
-      // `apps/main/vitest.config.ts` chunk-6.4 gate scope.
-      // Router, guards, and page components added in sub-chunks
-      // 7.4/7.5 will extend this include set.
+      // SPA's auth module (sub-chunk 7.2), the router infrastructure
+      // (sub-chunk 7.4: `src/core/router/**`), and the 401 policy
+      // (sub-chunk 7.4: `src/core/api/**`). Mirrors
+      // `apps/main/vitest.config.ts` chunk-6.5 gate scope.
+      // Page components added in sub-chunk 7.5 will extend this
+      // include set further.
       coverage: {
         provider: 'v8',
         reporter: ['text', 'lcov'],
-        include: ['src/modules/auth/**/*.{ts,vue}'],
+        include: [
+          'src/modules/auth/**/*.{ts,vue}',
+          'src/core/router/**/*.ts',
+          'src/core/api/**/*.ts',
+        ],
         exclude: [
           'src/modules/auth/**/*.spec.ts',
           'src/modules/auth/**/*.test.ts',
+          'src/core/router/**/*.spec.ts',
+          'src/core/api/**/*.spec.ts',
           // `admin-auth.api.ts` is a thin re-export of the singleton
           // from `core/api`. The store tests mock the module entirely
           // (so `core/api` is never loaded under jsdom — that file
@@ -39,6 +47,20 @@ export default mergeConfig(
           // the file-size + import/export-only guard lives in
           // `tests/unit/architecture/auth-api-reexport-shape.spec.ts`.
           'src/modules/auth/api/admin-auth.api.ts',
+          // `routes.ts` is a declarative route table — every route's
+          // `component` field is a `() => import(...)` arrow that v8
+          // never invokes under the unit-test runner (no
+          // `<router-view>` renders the actual component during the
+          // dispatcher/guard tests). The routing behaviour itself is
+          // covered by the dispatcher tests in
+          // `tests/unit/core/router/index.spec.ts` and by the guard
+          // branch tests; the lazy-loader bodies are pure data and
+          // deliberately untested at the unit level. Architecture-level
+          // protection on imports lives in
+          // `tests/unit/architecture/no-direct-router-imports.spec.ts`
+          // (chunk-6.4 exclusion + guard pattern, mirror of main's
+          // chunk-6.5 decision).
+          'src/modules/auth/routes.ts',
         ],
         thresholds: {
           lines: 100,
