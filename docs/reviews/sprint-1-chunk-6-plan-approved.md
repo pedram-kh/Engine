@@ -6,6 +6,7 @@
 
 **Final closure:** Sprint 1 sub-chunk 7.1 (commit e04bf75) closes the chunk-6 hotfix saga (throttle-vs-lockout overlap, `useErrorMessage` resolver taxonomy gap, Playwright specs #19 + #20 active) and meets Sprint 1's E2E acceptance criterion for the auth surface — see `sprint-1-chunk-7-1-review.md`.
 **Hotfix saga closure:** Commit `b715cfa` (auth-ip neutralisation in specs #19/#20) is the terminal hotfix in the chunk-7.1 post-merge series; CI run [25689460184](https://github.com/pedram-kh/Engine/actions/runs/25689460184) is the durable green-CI proof. See the post-merge addendum in `sprint-1-chunk-7-1-review.md` for the full nine-hotfix lineage and root-cause breakdown.
+**Chunk 7 progress:** Group 1 (sub-chunks 7.2 + 7.3 — admin SPA Pinia auth store + admin SPA i18n bundle) closed in commit `d2ec623`. See `sprint-1-chunk-7-2-to-7-3-review.md`; Group 2 (sub-chunk 7.4 — admin router + guards + mandatory-MFA flow) is the next session.
 
 This is a checkpoint file for chat-session resumption. Sprint 1 Chunk 6 is unusually large (9 sub-chunks) so the approved plan and the Q-and-A answers are recorded here durably.
 
