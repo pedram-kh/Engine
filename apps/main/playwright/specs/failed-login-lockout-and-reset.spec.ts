@@ -104,11 +104,35 @@ function uniqueEmail(): string {
 /**
  * The test clock is set in absolute terms (the helper accepts an
  * ISO 8601 instant, not a relative offset). We anchor the spec at a
- * deterministic baseline so step 6's "+24 hours from T0" is easy to
- * reason about. Any instant that is not the unix epoch works; we
- * pick one in the chunk-6 timeframe so a stray log is recognisable.
+ * single baseline so step 6's "+24 hours from T0" is easy to reason
+ * about — within a single test run T0 is constant and every offset
+ * (T0+0, T0+16m, T0+24h+1m) lands at a deterministic instant.
+ *
+ * Why T0 must be in the FUTURE relative to wall-clock time
+ * --------------------------------------------------------
+ * Laravel's session middleware computes session-cookie expiry as
+ * `Carbon::now()->addMinutes(config('session.lifetime'))`, with
+ * `Carbon::now()` honoring `Carbon::setTestNow()` (the test clock).
+ * Symfony then serialises the cookie's `Max-Age` attribute as
+ * `$expiresTimestamp - time()`, where `time()` reads REAL wall-clock
+ * time — NOT Carbon. If T0 + session.lifetime lands in the past
+ * relative to wall-clock now, `Max-Age` clamps to 0 and the browser
+ * discards both `XSRF-TOKEN` and `catalyst_main_session` cookies the
+ * instant they arrive. Every subsequent CSRF-protected POST then
+ * lands without a token and 419s.
+ *
+ * Setting T0 to wall-clock-now + a comfortable buffer guarantees
+ * `Carbon::now() + session.lifetime > time()` at every point in the
+ * spec, regardless of how far Sprint 2+ pushes the wall clock past
+ * the original chunk-7.1 authoring date. The buffer covers
+ * session.lifetime + the spec's own +24h fast-forward + slack for
+ * unrelated time pinning by future steps.
+ *
+ * See "Test-clock pinning interacts with Laravel cookie expiry to
+ * invalidate session/XSRF cookies" in `docs/tech-debt.md` for the
+ * full discovery context (chunk-7.1 post-merge hotfix).
  */
-const T0 = new Date('2026-05-10T09:00:00.000Z')
+const T0 = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
 
 function clockAtMinutes(minutes: number): string {
   return new Date(T0.getTime() + minutes * 60_000).toISOString()
