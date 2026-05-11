@@ -12,11 +12,51 @@ import type { APIRequestContext } from '@playwright/test'
  * `extraHTTPHeaders` block in `playwright.config.ts` — these wrappers
  * never spell it.
  *
+ * `defaultHeaders` (below) is forwarded by every wrapper so the call
+ * self-identifies as a JSON API request — see the constant's docblock
+ * for the chunk-7.1 post-merge hotfix discovery context.
+ *
  * Returned values are typed; specs read named fields rather than raw
  * `Response` objects. A non-2xx response from any helper throws a
  * descriptive error so a misconfigured spec fails loudly instead of
  * silently asserting against undefined.
  */
+
+/**
+ * Headers every fixture forwards on its outbound request.
+ *
+ * Why both headers
+ * ----------------
+ * - `Accept: application/json` flips Laravel's exception-handler
+ *   branch from "redirect to named login route" (HTML response) to
+ *   "return 401 JSON envelope". Without it, an unauthenticated
+ *   request to a protected endpoint hits Laravel's default
+ *   `redirectTo()` path which calls `route('login')` — and this
+ *   API-only Laravel app has no named `login` route, so the
+ *   exception cascades to a `RouteNotFoundException` 500 with an
+ *   HTML error page. Spec #19's `signOutViaApi` step surfaced this
+ *   in CI (chunk-7.1 post-merge hotfix); see the tech-debt entry
+ *   "Laravel exception handler returns HTML/redirect for
+ *   unauthenticated /api/v1/* requests without Accept: application/json"
+ *   for the long-form context and the deferred backend resolution.
+ * - `X-Requested-With: XMLHttpRequest` is the conventional XHR
+ *   sentinel honored by Laravel's `Request::expectsJson()` and by
+ *   most middleware-driven content-negotiation paths. Belt-and-
+ *   suspenders alongside the `Accept` header.
+ *
+ * Mirrors the chunk-5 SPA `apiClient` convention: every state-
+ * changing request that originates from the SPA sets the same pair.
+ * Fixtures follow suit so a future fixture author who copy-pastes
+ * an existing wrapper inherits the contract for free.
+ *
+ * Forwarded by every wrapper below. New fixtures should spread this
+ * into their `request.*` options' `headers` field rather than re-
+ * declaring the literal — reduces drift if the convention extends.
+ */
+const defaultHeaders = {
+  Accept: 'application/json',
+  'X-Requested-With': 'XMLHttpRequest',
+} as const
 
 export interface SignUpUserResult {
   email: string
@@ -38,6 +78,7 @@ export async function signUpUser(
   name: string = 'Test User',
 ): Promise<SignUpUserResult> {
   const response = await request.post('http://127.0.0.1:8000/api/v1/auth/sign-up', {
+    headers: defaultHeaders,
     data: {
       name,
       email,
@@ -74,6 +115,7 @@ export async function mintTotpCodeForEmail(
   email: string,
 ): Promise<MintTotpResult> {
   const response = await request.post('http://127.0.0.1:8000/api/v1/_test/totp', {
+    headers: defaultHeaders,
     data: { email },
   })
 
@@ -112,6 +154,7 @@ export async function mintTotpFromSecret(
   secret: string,
 ): Promise<MintTotpResult> {
   const response = await request.post('http://127.0.0.1:8000/api/v1/_test/totp/secret', {
+    headers: defaultHeaders,
     data: { secret },
   })
 
@@ -147,6 +190,7 @@ export async function mintVerificationToken(
 ): Promise<MintVerificationTokenResult> {
   const response = await request.get(
     `http://127.0.0.1:8000/api/v1/_test/verification-token?email=${encodeURIComponent(email)}`,
+    { headers: defaultHeaders },
   )
 
   if (response.status() !== 200) {
@@ -173,6 +217,7 @@ export async function mintVerificationToken(
  */
 export async function setClock(request: APIRequestContext, isoInstant: string): Promise<void> {
   const response = await request.post('http://127.0.0.1:8000/api/v1/_test/clock', {
+    headers: defaultHeaders,
     data: { at: isoInstant },
   })
 
@@ -188,7 +233,9 @@ export async function setClock(request: APIRequestContext, isoInstant: string): 
  * wall-clock time again.
  */
 export async function resetClock(request: APIRequestContext): Promise<void> {
-  const response = await request.post('http://127.0.0.1:8000/api/v1/_test/clock/reset')
+  const response = await request.post('http://127.0.0.1:8000/api/v1/_test/clock/reset', {
+    headers: defaultHeaders,
+  })
 
   if (response.status() !== 200) {
     throw new Error(`resetClock failed with status ${response.status()}: ${await response.text()}`)
@@ -234,6 +281,7 @@ export async function neutralizeThrottle(
 ): Promise<void> {
   const response = await request.post(
     `http://127.0.0.1:8000/api/v1/_test/rate-limiter/${encodeURIComponent(name)}`,
+    { headers: defaultHeaders },
   )
 
   if (response.status() !== 200) {
@@ -258,6 +306,7 @@ export async function restoreThrottle(
 ): Promise<void> {
   const response = await request.delete(
     `http://127.0.0.1:8000/api/v1/_test/rate-limiter/${encodeURIComponent(name)}`,
+    { headers: defaultHeaders },
   )
 
   if (response.status() !== 200) {
@@ -277,7 +326,9 @@ export async function restoreThrottle(
  * subsequent `page.goto()` lands on a cold session.
  */
 export async function signOutViaApi(request: APIRequestContext): Promise<void> {
-  const response = await request.post('http://127.0.0.1:8000/api/v1/auth/logout')
+  const response = await request.post('http://127.0.0.1:8000/api/v1/auth/logout', {
+    headers: defaultHeaders,
+  })
 
   // 204 (signed-in path) or 401 (already signed out — race with
   // expiry) are both acceptable; anything else is a regression.
