@@ -7,7 +7,6 @@ import {
   restoreThrottle,
   setClock,
   signUpUser,
-  warmCsrfCookie,
 } from '../fixtures/test-helpers'
 
 /**
@@ -120,16 +119,6 @@ async function attemptFailedSignIn(
   email: string,
 ): Promise<void> {
   await page.goto('/sign-in')
-  // Warm the browser's session + XSRF cookies before driving the SPA's
-  // CSRF-protected POST. See `warmCsrfCookie`'s docblock and the
-  // tech-debt entry "SPA apiClient CSRF preflight 419s on cold browser
-  // context (Playwright workaround in `warmCsrfCookie`)" for context.
-  // Without this, the very first POST after a fresh browser context
-  // 419s because the SPA's apiClient preflight does not reliably leave
-  // a usable XSRF-TOKEN cookie behind for the immediately-following
-  // form submission. Cheap to call repeatedly — subsequent invocations
-  // just refresh already-set cookies.
-  await warmCsrfCookie(page)
   await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
   await page.locator(dt(testIds.signInPassword)).locator('input').fill(WRONG_PASSWORD)
   await page.locator(dt(testIds.signInSubmit)).click()
@@ -190,9 +179,6 @@ test.describe('spec #20 — failed-login lockout + reset / escalation', () => {
     await setClock(request, clockAtMinutes(16))
 
     await page.goto('/sign-in')
-    // Warm cookies before the (correct-password) submit too — same
-    // mechanism as in `attemptFailedSignIn`.
-    await warmCsrfCookie(page)
     await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(CORRECT_PASSWORD)
     await page.locator(dt(testIds.signInSubmit)).click()

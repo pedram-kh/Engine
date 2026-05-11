@@ -1,4 +1,4 @@
-import type { APIRequestContext, Page } from '@playwright/test'
+import type { APIRequestContext } from '@playwright/test'
 
 /**
  * Typed wrappers around the chunk 6.1 `App\TestHelpers` HTTP surface.
@@ -337,76 +337,4 @@ export async function signOutViaApi(request: APIRequestContext): Promise<void> {
       `signOutViaApi failed with status ${response.status()}: ${await response.text()}`,
     )
   }
-}
-
-/**
- * Pre-populate the browser's session + XSRF-TOKEN cookies so the SPA's
- * first page-driven POST does not 419 on the CSRF preflight.
- *
- * Why this helper exists
- * ----------------------
- * The chunk-3 SPA `apiClient` does a `GET /sanctum/csrf-cookie`
- * preflight before every state-changing request and forwards the
- * resulting `XSRF-TOKEN` cookie back as the `X-XSRF-TOKEN` header
- * (`packages/api-client/src/http.ts`). On paper this is the canonical
- * Sanctum SPA flow and SHOULD work cold.
- *
- * In practice, when a Playwright spec hits the SPA's first state-
- * changing call from a totally cold browser context (no prior page
- * activity, no prior fixture call that shared cookies via
- * `page.context().request`), the preflight does not reliably leave a
- * usable XSRF-TOKEN cookie behind for the immediately-following POST.
- * The POST lands without a matching `X-XSRF-TOKEN` and Laravel's
- * `VerifyCsrfToken` returns HTTP 419 ("CSRF token mismatch."). The
- * resulting page renders the SPA's generic `auth.errors.unknown`
- * fallback because `auth.csrf_mismatch` is not in the i18n bundle and
- * the response shape (Laravel debug-mode HtmlException, not the
- * standard `errors[]` envelope) carries no resolvable code anyway.
- *
- * Spec #19 never trips this because every page-driven login is
- * preceded by browser activity that already established session +
- * XSRF cookies (page-driven sign-up at step 1, OR steps 2-5's full
- * auth + 2FA flow before step 7's re-sign-in). Spec #20 is the only
- * suite member whose first page-driven login lands on a fully cold
- * browser context — and the only one that 419s.
- *
- * What this helper does
- * ---------------------
- * Issues a browser-side `fetch('/sanctum/csrf-cookie')` so the cookies
- * are set in the page context BEFORE the SPA's apiClient preflight
- * runs. The SPA's own preflight on the immediately-following form
- * submit then refreshes (rather than initialises) the cookies, and the
- * POST sees a matching token.
- *
- * Caller contract
- * ---------------
- * The page must already be on the SPA origin (`http://127.0.0.1:5173`)
- * — typically via a prior `await page.goto('/sign-in')`. The helper
- * does NOT navigate; it only runs the in-page fetch. This keeps the
- * caller in control of which navigation the warm-up follows.
- *
- * Tech-debt linkage
- * -----------------
- * This is a spec-level workaround. The root-cause investigation
- * (browser cookie state on first preflight, possible Vite-proxy
- * Set-Cookie quirk, possible apiClient race) is captured in
- * `docs/tech-debt.md` under "SPA apiClient CSRF preflight 419s on
- * cold browser context (Playwright workaround in `warmCsrfCookie`)".
- * Future specs that drive page-level form submissions from cold
- * cookie state should reuse this helper rather than re-implementing
- * the workaround inline.
- */
-export async function warmCsrfCookie(page: Page): Promise<void> {
-  await page.evaluate(async () => {
-    const response = await fetch('/sanctum/csrf-cookie', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-    })
-    if (!response.ok) {
-      throw new Error(`warmCsrfCookie: GET /sanctum/csrf-cookie returned ${response.status}`)
-    }
-  })
 }
