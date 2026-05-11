@@ -182,11 +182,17 @@ async function onCodesConfirmed(): Promise<void> {
       </div>
     </template>
 
-    <RecoveryCodesDisplay
-      v-else
-      :codes="recoveryCodes"
-      data-test="enable-totp-recovery"
-      @confirmed="onCodesConfirmed"
-    />
+    <!--
+      No `data-test` here — the child component's own root carries
+      `data-test="recovery-codes-display"` and Vue 3 attribute
+      fall-through would otherwise REPLACE the child's value with a
+      parent-supplied one (single-root child, non-class/style attr,
+      parent wins). That replacement broke spec #19's `recovery-codes-display`
+      selector against the real browser; see chunk-7.1 post-merge hotfix.
+      Future contributors: if a parent test ID is genuinely needed for
+      this slot, wrap the child in a `<div data-test="…">` rather than
+      passing the attribute through the component.
+    -->
+    <RecoveryCodesDisplay v-else :codes="recoveryCodes" @confirmed="onCodesConfirmed" />
   </section>
 </template>

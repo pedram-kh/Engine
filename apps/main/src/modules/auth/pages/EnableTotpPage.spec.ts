@@ -93,7 +93,16 @@ describe('EnableTotpPage', () => {
       provisional_token: 'tok',
       code: '123456',
     })
-    expect(h.wrapper.find('[data-test="enable-totp-recovery"]').exists()).toBe(true)
+    // Assert on the child's own root selector (`recovery-codes-display`)
+    // rather than a parent-supplied data-test. Vue 3 single-root
+    // attribute fall-through makes the parent's `data-test` REPLACE
+    // the child's `data-test` on the rendered root, so reaching into
+    // the child via the parent's wrapper-name was always a mirage —
+    // the rendered DOM only carried whichever `data-test` the parent
+    // last assigned. Spec #19 surfaced this by asserting on the
+    // child's selector against a real browser. See the chunk-7.1
+    // post-merge hotfix for the full diagnosis.
+    expect(h.wrapper.find('[data-test="recovery-codes-display"]').exists()).toBe(true)
     // Recovery codes appear in the rendered display.
     expect(h.wrapper.find('[data-test="recovery-codes-list"]').text()).toBe('rc-1\nrc-2\nrc-3')
   })
