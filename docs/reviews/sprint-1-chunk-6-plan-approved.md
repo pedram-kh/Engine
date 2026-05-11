@@ -4,6 +4,8 @@
 **Sub-chunks closed:** 6.1 (commit f8f4940), 6.2–6.4 (commit 2e4bb7f, hash-drift correction cda780e), 6.5–6.7 (commit bbf0ca2), 6.8–6.9 (commit 7341340).
 **Approved at:** Start of Sprint 1 Chunk 6 (Main SPA auth UI)
 
+**Final closure:** Sprint 1 sub-chunk 7.1 (commit e04bf75) closes the chunk-6 hotfix saga (throttle-vs-lockout overlap, `useErrorMessage` resolver taxonomy gap, Playwright specs #19 + #20 active) and meets Sprint 1's E2E acceptance criterion for the auth surface — see `sprint-1-chunk-7-1-review.md`.
+
 This is a checkpoint file for chat-session resumption. Sprint 1 Chunk 6 is unusually large (9 sub-chunks) so the approved plan and the Q-and-A answers are recorded here durably.
 
 ---
