@@ -4,7 +4,9 @@ import { dt, testIds } from '../helpers/selectors'
 import {
   mintTotpCodeForEmail,
   mintTotpFromSecret,
+  neutralizeThrottle,
   resetClock,
+  restoreThrottle,
   signOutViaApi,
 } from '../fixtures/test-helpers'
 
@@ -61,7 +63,26 @@ function uniqueEmail(): string {
 }
 
 test.describe('spec #19 — 2FA enrollment + sign-in', () => {
+  test.beforeEach(async ({ request }) => {
+    // Neutralise the per-IP auth limiter (`auth-ip`, 10/min/IP from
+    // `IdentityServiceProvider::registerRateLimits()`). The full
+    // enrollment + re-sign-in flow consumes ~7 auth-ip hits per
+    // attempt (sign-up + 2 sign-ins + 4 enrollment-related calls),
+    // and Playwright retries on failure — three retries can
+    // accumulate >20 hits inside a single Carbon-pinned bucket and
+    // saturate the limiter. Spec #20 traffic landing on the same
+    // shared CI runner IP also contributes. Pair with
+    // `restoreThrottle` in `afterEach` so we don't leak the override
+    // across specs (mandatory pair the controller docblock
+    // enforces — same convention as `setClock`/`resetClock`).
+    await neutralizeThrottle(request, 'auth-ip')
+  })
+
   test.afterEach(async ({ request }) => {
+    // Restore in inverse order. Both calls are idempotent — even if
+    // the test bailed before either side-effect ran, the cleanup
+    // still runs cleanly.
+    await restoreThrottle(request, 'auth-ip')
     // Belt-and-suspenders: this spec doesn't touch the test clock,
     // but spec #20 does — running the reset here guarantees that a
     // run order that interleaves the two cannot cross-contaminate.

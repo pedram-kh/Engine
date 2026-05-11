@@ -158,16 +158,39 @@ async function attemptFailedSignIn(
 
 test.describe('spec #20 — failed-login lockout + reset / escalation', () => {
   test.beforeEach(async ({ request }) => {
-    // Neutralise the named limiter so the application-level lockout
-    // layer is what the request graph reaches at the 6th attempt.
-    // Mirrors chunk-5 `LoginTest::beforeEach`.
+    // Neutralise BOTH the per-email limiter (`auth-login-email`,
+    // 5/min/email + IP) AND the per-IP limiter (`auth-ip`, 10/min/IP)
+    // from `IdentityServiceProvider::registerRateLimits()`.
+    //
+    // - `auth-login-email`: needed so the application-level lockout
+    //   layer (FailedLoginTracker + AccountLockoutService) is what
+    //   the request graph reaches at the 6th attempt — mirrors
+    //   chunk-5 `LoginTest::beforeEach`. Without this, the 6th
+    //   failed login would 429 from the throttle BEFORE reaching
+    //   the lockout layer.
+    //
+    // - `auth-ip`: needed because this spec issues ~13 failed
+    //   logins + 1 successful login + 1 sign-up = ~15 auth-ip hits
+    //   per attempt, distributed across multiple Carbon-pinned
+    //   buckets. Even within a single bucket, three Playwright
+    //   retries on failure can accumulate >20 cumulative hits in
+    //   the cache between attempts (RateLimiter cache TTL is set
+    //   in Carbon time → entries from a prior attempt's pinned
+    //   future T0 outlive `afterEach` cleanup, since `resetClock`
+    //   only restores Carbon, not the limiter cache). Without
+    //   neutralising auth-ip, retry #1 of a flaked spec lands
+    //   pre-saturated and surfaces the chunk-7.1 hotfix-discovery
+    //   "Too many requests. Please try again in 85483 seconds."
+    //   error. Pair with `restoreThrottle` in `afterEach`.
     await neutralizeThrottle(request, 'auth-login-email')
+    await neutralizeThrottle(request, 'auth-ip')
   })
 
   test.afterEach(async ({ request }) => {
     // Restore in inverse order. Both calls are idempotent — even if
     // the test bailed before either side-effect ran, the cleanup
     // still runs cleanly.
+    await restoreThrottle(request, 'auth-ip')
     await restoreThrottle(request, 'auth-login-email')
     await resetClock(request)
   })
