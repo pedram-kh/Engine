@@ -74,14 +74,16 @@ import {
  *      Login succeeds.
  *   5. Submit 5 more failed attempts; assert the 6th hits the
  *      temporary lockout again.
- *   6. Fast-forward 24 hours past T0. Submit 4 more failed attempts;
- *      the 4th brings the 24h long-window count to 10 (= 6 from
- *      step 5 + 4 here — step 4's success cleared the original 6
- *      from steps 2/3, so they don't contribute). The backend
- *      escalates per `AccountLockoutService::escalate()` and the
- *      response carries `auth.account_locked.suspended` (the
- *      renamed code from chunks 6.2–6.4). The SPA renders the
- *      suspended i18n key.
+ *   6. Fast-forward 24 hours past T0. Submit 5 more failed attempts;
+ *      the 5th brings the 24h long-window count to 10 (= 5 from
+ *      step 5 + 5 here — step 4's success cleared the steps 2/3
+ *      register, AND the 6th attempt of each of steps 2/3 + 5
+ *      returned 423 from the temp-lock precheck which skips the
+ *      record path entirely, so each of those steps contributes 5
+ *      recorded failures, not 6). The backend escalates per
+ *      `AccountLockoutService::escalate()` and the response carries
+ *      `auth.account_locked.suspended` (the renamed code from
+ *      chunks 6.2–6.4). The SPA renders the suspended i18n key.
  *   7. `afterEach` resets the clock AND restores the throttle so a
  *      stray failure does not bleed pinned time or a neutralised
  *      limiter into the next spec.
@@ -232,24 +234,38 @@ test.describe('spec #20 — failed-login lockout + reset / escalation', () => {
 
     // -----------------------------------------------------------------
     // Step 6 — fast-forward 24h past T0 (NOT 24h + 1 minute). Submit
-    // 4 more failed attempts; the 4th brings the 24h long-window
+    // 5 more failed attempts; the 5th brings the 24h long-window
     // count to 10 and the user is escalated to `is_suspended = true`.
     //
-    // Why 4 attempts (not 1)
-    // ----------------------
-    // Step 4's successful sign-in calls
-    // `AuthService::clear($email) → FailedLoginTracker::clear()`,
-    // which wipes the 6 failures recorded at T0 by steps 2 + 3. The
-    // 24h long-window register going into step 6 therefore only
-    // contains step 5's 6 failures (at T0 + 16m); a single 7th
-    // failure at T0 + 24h leaves the count at 7, well short of the
-    // LONG_WINDOW_THRESHOLD (10). The 4 attempts here bring the
-    // count to 6 + 4 = 10 exactly, and
+    // Why 5 attempts (not 1, not 4)
+    // -----------------------------
+    // Two compounding effects shape the 24h-window count entering
+    // step 6:
+    //
+    // 1. Step 4's successful sign-in calls
+    //    `AuthService::clear($email) → FailedLoginTracker::clear()`,
+    //    which wipes the failures recorded by steps 2/3. So nothing
+    //    from before step 4 contributes.
+    //
+    // 2. Steps 2/3 and step 5 each LOOK like 6 failed attempts
+    //    (5 in the loop + 1 explicit), but the 6th attempt of each
+    //    block hits `AuthService::login()`'s `isTemporarilyLocked`
+    //    precheck and returns 423 IMMEDIATELY — the lockout
+    //    short-circuit returns BEFORE the password verifier and
+    //    BEFORE `recordFailureAndMaybeLock()`, so the 6th attempt
+    //    does NOT add a row to the failure ledger. (The 5th
+    //    attempt's `record()` call sets the temp-lock IN-LINE with
+    //    its own response, so the 5th IS recorded but the response
+    //    is also already 423 — see CI run 25688305242 trace.) Each
+    //    block therefore contributes 5 recorded failures, not 6.
+    //
+    // Result: the 24h ledger entering step 6 has 5 failures (from
+    // step 5, at T0 + 16m). Five attempts here bring the cumulative
+    // count to 5 + 5 = 10 exactly, and the 5th attempt's
     // `recordFailureAndMaybeLock()` short-circuits the escalation
     // check (`if ($counts['long_window_count'] >= 10) { escalate;
-    // return; }`) on the 4th attempt — no further temp-lock check
-    // runs, so the spec doesn't need to worry about the 5th attempt
-    // re-arming the short-window lockout instead of escalating.
+    // return; }`) — the temp-lock branch never runs because of the
+    // early return.
     //
     // Why exactly 24h, not 24h + N minutes
     // ------------------------------------
@@ -262,12 +278,10 @@ test.describe('spec #20 — failed-login lockout + reset / escalation', () => {
     // the cleared T0 failures, so the count math is unaffected, but
     // we keep the cleaner cutoff for clarity.
     //
-    // Failure ledger at the moment the 4th attempt records:
-    //   - 6 at T0 + 16m     (step 5, all 6 attempts including the
-    //                        temp-lock-triggering 6th — the temp-lock
-    //                        layer records BEFORE checking, so all 6
-    //                        land in the table)
-    //   - 4 at T0 + 24h     (this loop)
+    // Failure ledger at the moment the 5th attempt records:
+    //   - 5 at T0 + 16m     (step 5 attempts 1-5; attempt 6 was
+    //                        the 423 short-circuit, no record)
+    //   - 5 at T0 + 24h     (this loop attempts 1-5)
     //   = 10 total in the (T0, T0 + 24h] window
     //
     // 10 >= LONG_WINDOW_THRESHOLD (10), so escalate() runs, sets
@@ -283,7 +297,7 @@ test.describe('spec #20 — failed-login lockout + reset / escalation', () => {
     // -----------------------------------------------------------------
     await setClock(request, clockAtMinutes(24 * 60))
 
-    for (let i = 0; i < 3; i += 1) {
+    for (let i = 0; i < 4; i += 1) {
       await attemptFailedSignIn(page, email)
     }
     await attemptFailedSignIn(page, email)
