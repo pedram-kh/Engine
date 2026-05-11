@@ -164,3 +164,27 @@ anyone reviewing it later.
 **Owner:** Future security-hardening sprint.
 
 **Status:** Open. Surfaced as deviation D6 in sub-chunk 7.4 (Group 2 of chunk 7).
+
+## Admin SPA Playwright job runs without a Laravel backend
+
+**Where:** `.github/workflows/ci.yml` § "E2E — admin SPA (placeholder until chunk 7)" (job `e2e-admin`, lines 268–313). The job runs Playwright against `pnpm dev` only — no Postgres, no Redis, no PHP, no `php artisan serve`. `apps/admin/playwright.config.ts` `webServer.command: 'pnpm dev'` starts only the Vite dev server at `:5174`; the Vite proxy forwards `/api` + `/sanctum` to a non-existent backend at `:8000`.
+
+**What we accepted:** Pre-7.4 the admin `App.vue` rendered an i18n title statically — no backend dependency. The single `smoke.spec.ts` asserted that h1. Post-7.4 the SPA's home route (`/` → `app.dashboard`) is gated by `requireAuth` which calls `store.bootstrap()` → `/admin/me`; without a backend that request hangs / fails and the SPA never gets past the loading shell. The fix landed in the Group 2 CI follow-up commit was to target `/sign-in` (a `requireGuest` route, no bootstrap call) so the smoke spec stays backend-independent while the infra deferral resolves. The kickoff for 7.4 explicitly scoped Playwright work as 7.6's surface: "No new Playwright work (that's 7.6's surface)." Adding Postgres + Redis service containers + PHP setup + `migrate:fresh` + a shared `TEST_HELPERS_TOKEN` to the e2e-admin job is meaningful CI infra work and was deliberately deferred.
+
+**Risk:** As soon as chunk 7.6 introduces real admin E2E specs (sign-in happy path, sign-in error paths, mandatory-MFA enrollment journey, deep-linking with intended-destination preservation across the MFA redirect — the D7 admin-specific adaptation), the job MUST be extended to include a real backend OR the specs need to drive the SPA against a mocked api-client (which would compromise their E2E character). Until then, the smoke spec is the only signal that the admin Playwright config + Vite dev server boot correctly; it cannot exercise anything that touches the auth-store contract.
+
+**Mitigation today:** The smoke spec uses `/sign-in` which mounts `requireGuest` and does not call `bootstrap()`, so no `/admin/me` request fires. The spec verifies the SPA mounts + i18n resolves + the route renders. Coverage gaps until 7.6: any route gated by `requireAuth` or `requireMfaEnrolled` is unreachable in the admin E2E surface — those branches are covered at the Vitest unit + dispatcher level (`apps/admin/tests/unit/core/router/index.spec.ts`, including the chained-D7-flow case) instead.
+
+**Triggered by:** Chunk 7.6 (Group 3 of chunk 7) — the chunk that ships the substantive admin E2E specs. That chunk's natural surface is exactly this CI infra change.
+
+**Resolution:** Extend `.github/workflows/ci.yml` job `e2e-admin` to mirror `e2e-main`'s shape:
+
+1. Add `services: { postgres, redis }` blocks with the same image tags + healthchecks.
+2. Add `env:` block with the same Laravel runtime config (`APP_ENV`, `DB_*`, `CACHE_STORE: database`, `SESSION_DRIVER: database`, `SANCTUM_STATEFUL_DOMAINS`, `VITE_API_BASE_URL`). Override `SESSION_COOKIE` to `catalyst_admin_session` to match admin's cookie name.
+3. Add the `Setup PHP` + composer steps + `Generate fresh TEST_HELPERS_TOKEN` + `Generate Laravel APP_KEY` + `migrate:fresh` + Playwright cache + install browsers steps from `e2e-main`.
+4. Extend `apps/admin/playwright.config.ts`'s `webServer` block to spin both the API (`php artisan serve --port=8000`) AND the Vite dev server, the same way `apps/main/playwright.config.ts` does. The Vite proxy already forwards `/api` + `/sanctum` to `:8000`.
+5. Revert `apps/admin/tests/e2e/smoke.spec.ts` to target `/` (or extend it to exercise the full D7 chained flow against the real backend), so the smoke gains its full pre-7.4 contract back.
+
+**Owner:** Chunk 7.6 (sub-chunk 7.6 within Group 3 of chunk 7).
+
+**Status:** Open. Surfaced in the Group 2 CI follow-up after the chunk-7.4 work commit landed.
