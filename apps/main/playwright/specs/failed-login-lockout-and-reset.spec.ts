@@ -228,22 +228,41 @@ test.describe('spec #20 — failed-login lockout + reset / escalation', () => {
     await expect(page.locator(dt(testIds.signInError))).toContainText('failed sign-in')
 
     // -----------------------------------------------------------------
-    // Step 6 — fast-forward 24h + 1m past T0. Submit one more
-    // failed attempt; the long-window threshold (10 failures in 24h)
-    // trips and the user is escalated to `is_suspended = true`.
+    // Step 6 — fast-forward 24h past T0 (NOT 24h + 1 minute). Submit
+    // one more failed attempt; the long-window threshold
+    // (10 failures in 24h) trips and the user is escalated to
+    // `is_suspended = true`.
     //
-    // We've already recorded 6 + 5 + 1 = 12 failures within the
-    // pruned 24-hour window (the prune cutoff is `Carbon::now()->subHours(24)`,
-    // which under the new clock is exactly T0 — the original 6
-    // failures land on T0 itself, so they survive the prune by the
-    // `>=` boundary). The 13th attempt below is the one that
-    // triggers escalate() inside recordFailureAndMaybeLock.
+    // Why exactly 24h, not 24h + N minutes
+    // ------------------------------------
+    // `FailedLoginTracker::prune()` filters timestamps by
+    // `ts >= Carbon::now()->subHours(24)->getTimestamp()` — boundary
+    // INCLUSIVE. With the clock pinned at exactly T0 + 24h, the prune
+    // cutoff is exactly T0, so failures recorded at T0 itself
+    // (`ts = T0`) survive (`T0 >= T0`). With ANY positive offset
+    // (e.g. T0 + 24h + 1min), the cutoff becomes T0 + 1min and the
+    // original 6 failures recorded at T0 are pruned. The chunk-7.1
+    // post-merge hotfix narrowed this from "+1min" to exactly 24h
+    // after the spec failed in CI with "Invalid email or password"
+    // (long-window count == 7 — short of the 10 threshold) instead
+    // of "account has been locked" (long-window count == 13 once the
+    // original 6 survive).
     //
-    // Even if a few of the original 6 fall just outside the
-    // boundary, the freshly-armed 6 from step 5 still leave us at
-    // ≥ 10 failures inside the long window when this attempt lands.
+    // Failure ledger at the moment this attempt is recorded:
+    //   - 6 at T0           (steps 2 + 3, all 6 attempts including
+    //                        the temp-lock-triggering 6th — the
+    //                        temp-lock layer records BEFORE checking
+    //                        the lockout, so all 6 land in the table)
+    //   - 6 at T0 + 16m     (step 5, same shape — 5 + 1)
+    //   - 1 at T0 + 24h     (this attempt)
+    //   = 13 total in the [T0, T0 + 24h] window
+    //
+    // 13 >= LONG_WINDOW_THRESHOLD (10), so
+    // `recordFailureAndMaybeLock()` calls `lockout->escalate($user)`
+    // which sets `is_suspended = true` and the response carries
+    // `auth.account_locked.suspended`.
     // -----------------------------------------------------------------
-    await setClock(request, clockAtMinutes(24 * 60 + 1))
+    await setClock(request, clockAtMinutes(24 * 60))
 
     await attemptFailedSignIn(page, email)
 
