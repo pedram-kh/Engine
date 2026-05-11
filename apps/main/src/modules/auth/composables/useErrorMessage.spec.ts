@@ -102,6 +102,49 @@ describe('resolveErrorMessage', () => {
     expect(resolveErrorMessage(err)).toEqual({ key: UNKNOWN_ERROR_KEY, values: {} })
   })
 
+  it('returns the rate_limit.* code (chunk 7.1 prefix widening)', () => {
+    const err = new ApiError({
+      status: 429,
+      code: 'rate_limit.exceeded',
+      message: 'no.',
+      details: [{ code: 'rate_limit.exceeded', meta: { seconds: 42 } }],
+    })
+    expect(resolveErrorMessage(err)).toEqual({
+      key: 'rate_limit.exceeded',
+      values: { seconds: 42 },
+    })
+  })
+
+  it('returns the rate_limit.* code with empty values when meta is absent', () => {
+    const err = new ApiError({
+      status: 429,
+      code: 'rate_limit.exceeded',
+      message: 'no.',
+    })
+    expect(resolveErrorMessage(err)).toEqual({
+      key: 'rate_limit.exceeded',
+      values: {},
+    })
+  })
+
+  it('does NOT widen to error.* codes (review priority #3 — no accidental over-match)', () => {
+    const err = new ApiError({ status: 500, code: 'error.500', message: 'no.' })
+    expect(resolveErrorMessage(err)).toEqual({ key: UNKNOWN_ERROR_KEY, values: {} })
+  })
+
+  it('does NOT widen to http.* codes (review priority #3 — no accidental over-match)', () => {
+    const err = new ApiError({ status: 502, code: 'http.foo', message: 'no.' })
+    expect(resolveErrorMessage(err)).toEqual({ key: UNKNOWN_ERROR_KEY, values: {} })
+  })
+
+  it('does NOT widen to bare prefixes (auth, validation, rate_limit) without a dot', () => {
+    // "auth" alone is NOT "auth.*"; the predicate uses startsWith
+    // which would happily accept it without the dot guard. Guard against
+    // a regression that drops the dot.
+    const err = new ApiError({ status: 500, code: 'authentication_failure', message: 'no.' })
+    expect(resolveErrorMessage(err)).toEqual({ key: UNKNOWN_ERROR_KEY, values: {} })
+  })
+
   it('falls back to UNKNOWN_ERROR_KEY for plain Error objects', () => {
     expect(resolveErrorMessage(new Error('something else'))).toEqual({
       key: UNKNOWN_ERROR_KEY,

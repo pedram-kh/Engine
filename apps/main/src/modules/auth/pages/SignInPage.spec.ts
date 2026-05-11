@@ -120,6 +120,26 @@ describe('SignInPage', () => {
     expect(h.wrapper.find('[data-test="sign-in-error"]').text()).toBe('Invalid email or password.')
   })
 
+  it('on rate_limit.exceeded, renders the localized message with {seconds} from meta (chunk 7.1)', async () => {
+    vi.mocked(authApi.login).mockRejectedValue(
+      new ApiError({
+        status: 429,
+        code: 'rate_limit.exceeded',
+        message: 'no.',
+        details: [{ code: 'rate_limit.exceeded', meta: { seconds: 42 } }],
+      }),
+    )
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('whatever')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(h.wrapper.find('[data-test="sign-in-error"]').text()).toBe(
+      'Too many requests. Please try again in 42 seconds.',
+    )
+  })
+
   it('on auth.login.account_locked_temporary, interpolates {minutes}', async () => {
     vi.mocked(authApi.login).mockRejectedValue(
       new ApiError({

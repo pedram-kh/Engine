@@ -22,6 +22,7 @@ use App\Modules\Identity\Listeners\WriteAuthAuditLog;
 use App\Modules\Identity\Services\PwnedPasswordsClient;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Foundation\CachesRoutes;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
@@ -44,72 +45,62 @@ final class IdentityServiceProvider extends ServiceProvider
 
     private function registerRateLimits(): void
     {
+        // Single source of truth for the rate-limit response envelope.
+        // Every limiter below shares the same shape: code +
+        // localised title + `meta.seconds`. The SPA's `useErrorMessage`
+        // resolver pulls interpolation values from `details[0].meta`
+        // (chunk-6.5–6.7 contract), so omitting `meta.seconds` would
+        // leave the bundled "Too many requests. Please try again in
+        // {seconds} seconds." string with an unfilled placeholder.
+        // Discovered as deviation #2 during chunk 7.1 — see the
+        // chunk-7.1 review file's "Open questions" section.
+        $rateLimitResponse = static fn (array $headers): JsonResponse => response()->json([
+            'errors' => [[
+                'status' => '429',
+                'code' => 'rate_limit.exceeded',
+                'title' => trans('auth.login.rate_limited', [
+                    'seconds' => (int) ($headers['Retry-After'] ?? 60),
+                ]),
+                'meta' => [
+                    'seconds' => (int) ($headers['Retry-After'] ?? 60),
+                ],
+            ]],
+        ], 429, $headers);
+
         // Unauthenticated auth endpoints: 10 requests / minute / IP
         // (docs/04-API-DESIGN.md §13).
         RateLimiter::for('auth-ip', static fn (Request $request): Limit => Limit::perMinute(10)
             ->by((string) $request->ip())
-            ->response(static fn (Request $req, array $headers) => response()->json([
-                'errors' => [[
-                    'status' => '429',
-                    'code' => 'rate_limit.exceeded',
-                    'title' => trans('auth.login.rate_limited', [
-                        'seconds' => (int) ($headers['Retry-After'] ?? 60),
-                    ]),
-                ]],
-            ], 429, $headers)));
+            ->response(static fn (Request $req, array $headers) => $rateLimitResponse($headers)));
 
         // Login endpoint: an additional 5 requests / minute / email
         // (docs/05-SECURITY-COMPLIANCE.md §6.2). Keyed on the lower-cased
         // email + IP so attempts against many accounts from one IP can't
         // share the email bucket and silently exceed the documented cap.
-        RateLimiter::for('auth-login-email', static function (Request $request): Limit {
+        RateLimiter::for('auth-login-email', static function (Request $request) use ($rateLimitResponse): Limit {
             $email = strtolower(trim((string) $request->input('email', '')));
 
             return Limit::perMinute(5)
                 ->by('login:'.$email.':'.$request->ip())
-                ->response(static fn (Request $req, array $headers) => response()->json([
-                    'errors' => [[
-                        'status' => '429',
-                        'code' => 'rate_limit.exceeded',
-                        'title' => trans('auth.login.rate_limited', [
-                            'seconds' => (int) ($headers['Retry-After'] ?? 60),
-                        ]),
-                    ]],
-                ], 429, $headers));
+                ->response(static fn (Request $req, array $headers) => $rateLimitResponse($headers));
         });
 
         // Password-reset request endpoint reuses the per-IP cap with a
         // tighter ceiling so a single attacker cannot mailbomb a victim.
         RateLimiter::for('auth-password', static fn (Request $request): Limit => Limit::perMinute(5)
             ->by('pw:'.$request->ip())
-            ->response(static fn (Request $req, array $headers) => response()->json([
-                'errors' => [[
-                    'status' => '429',
-                    'code' => 'rate_limit.exceeded',
-                    'title' => trans('auth.login.rate_limited', [
-                        'seconds' => (int) ($headers['Retry-After'] ?? 60),
-                    ]),
-                ]],
-            ], 429, $headers)));
+            ->response(static fn (Request $req, array $headers) => $rateLimitResponse($headers)));
 
         // Resend-verification: at most ONE request per minute per email,
         // applied on top of the per-IP cap. The strict ceiling keeps a
         // single attacker from mailbombing a known address even if they
         // rotate IPs through a residential proxy pool.
-        RateLimiter::for('auth-resend-verification', static function (Request $request): Limit {
+        RateLimiter::for('auth-resend-verification', static function (Request $request) use ($rateLimitResponse): Limit {
             $email = strtolower(trim((string) $request->input('email', '')));
 
             return Limit::perMinute(1)
                 ->by('verify:'.$email)
-                ->response(static fn (Request $req, array $headers) => response()->json([
-                    'errors' => [[
-                        'status' => '429',
-                        'code' => 'rate_limit.exceeded',
-                        'title' => trans('auth.login.rate_limited', [
-                            'seconds' => (int) ($headers['Retry-After'] ?? 60),
-                        ]),
-                    ]],
-                ], 429, $headers));
+                ->response(static fn (Request $req, array $headers) => $rateLimitResponse($headers));
         });
     }
 

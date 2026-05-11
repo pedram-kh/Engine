@@ -49,19 +49,44 @@ export const UNKNOWN_ERROR_KEY = 'auth.ui.errors.unknown'
 export const NETWORK_ERROR_KEY = 'auth.ui.errors.network'
 
 /**
- * Backend codes we explicitly know exist in the i18n bundle. Anything
- * outside this list still gets `t(error.code)`-resolved on the page,
- * but we conservatively guard against a fallback to `auth.ui.errors.unknown`
- * by giving `t()` a chance to find the key first.
+ * Backend code prefixes we accept for the bundle lookup. A code that
+ * starts with one of these is forwarded to `t(error.code)` — anything
+ * outside this list short-circuits to the unknown fallback.
+ *
+ * Adding a new prefix here is a deliberate decision: it widens the set
+ * of backend codes the SPA will attempt to render via i18n. Each
+ * prefix corresponds to a known emit-site on the backend whose codes
+ * have parallel entries in the i18n bundle:
+ *
+ *   - `auth.`        — Identity-module errors (sign-in, MFA, lockout, …).
+ *   - `validation.`  — Laravel validation rule names normalised by the
+ *                      ValidationException → ApiError shaper.
+ *   - `rate_limit.`  — Rate-limiter responses from the four named
+ *                      limiters in
+ *                      `App\Modules\Identity\IdentityServiceProvider::registerRateLimits()`
+ *                      (chunk 7.1; closes the production UX bug where
+ *                      throttle errors rendered with the unknown
+ *                      fallback). The `rate_limit.exceeded` bundle
+ *                      entries live as a top-level sibling of `auth`
+ *                      in the en/pt/it `auth.json` files.
  *
  * The architecture test in `tests/unit/architecture/i18n-auth-codes.spec.ts`
- * is the source of truth — every backend code MUST resolve in every
- * locale. This list is purely for the resolver's "do I know this key
- * in the bundle?" check; it does NOT short-circuit code → message
- * mapping.
+ * walks the backend source for both `auth.*` and `rate_limit.*`
+ * literals and asserts each one resolves to a leaf string in every
+ * locale, so a new code emitted on the backend without a matching
+ * bundle entry trips CI before merge.
+ *
+ * Codes outside these prefixes — e.g. `http.invalid_response_body`,
+ * `network.error` (handled separately above), or anything synthesised
+ * from the api-client transport layer — fall through to
+ * `auth.ui.errors.unknown`. That conservative posture is intentional:
+ * widening the predicate to "anything with a dot" would mask backend
+ * regressions where a typo'd code lands and renders verbatim.
  */
 function isLikelyBundledCode(code: string): boolean {
-  return code.startsWith('auth.') || code.startsWith('validation.')
+  return (
+    code.startsWith('auth.') || code.startsWith('validation.') || code.startsWith('rate_limit.')
+  )
 }
 
 /**

@@ -4,7 +4,9 @@
  *
  *   1. Walk every `*.php` file under
  *      `apps/api/app/Modules/Identity/`.
- *   2. Harvest every string literal matching `auth.<dotted.path>`.
+ *   2. Harvest every string literal matching either:
+ *        - `auth.<dotted.path>`        — Identity-module error codes.
+ *        - `rate_limit.<dotted.path>`  — chunk-7.1 named-limiter codes.
  *   3. For each harvested literal, assert it resolves to a string in
  *      the SPA's `en/auth.json`, `pt/auth.json`, AND `it/auth.json`
  *      bundles.
@@ -26,6 +28,14 @@
  * happen to live under the `auth.` namespace (config()->get(...) calls)
  * — they are NOT translation strings and the SPA is not expected to
  * carry them.
+ *
+ * Why `rate_limit.*` lives in `auth.json` (chunk 7.1 deviation note):
+ * the only emit-sites today are inside `IdentityServiceProvider::registerRateLimits()`,
+ * so the codes are conceptually part of the auth surface. If a future
+ * non-auth limiter adopts the `rate_limit.*` prefix, the bundle entries
+ * should split into a dedicated `errors.json` namespace at that point.
+ * Until then a single bundle file keeps the locale-pair-edit story
+ * (en + pt + it always edited together) tight.
  */
 
 import { promises as fs } from 'node:fs'
@@ -50,18 +60,18 @@ const CONFIG_KEY_ALLOWLIST: ReadonlySet<string> = new Set([
 ])
 
 /**
- * Regex-walks the file contents and returns the set of `auth.*`
- * dotted-path string literals it finds, minus the
- * {@link CONFIG_KEY_ALLOWLIST} entries.
+ * Regex-walks the file contents and returns the set of dotted-path
+ * string literals it finds for each tracked top-level prefix
+ * (`auth.*`, `rate_limit.*`), minus the {@link CONFIG_KEY_ALLOWLIST}
+ * entries.
  */
 function harvestAuthCodes(contents: string): Set<string> {
   const codes = new Set<string>()
-  // String literals beginning with `auth.` followed by an
-  // identifier path. Matches both single and double quoted
-  // PHP strings. Does NOT match `auth_*` (no dot) or
-  // `auth/login` (slash) or array-access syntax like
+  // Combined alternation. Matches both single and double quoted PHP
+  // strings. Does NOT match `auth_*` / `rate_limit_*` (no dot),
+  // `auth/login` (slash), or array-access syntax like
   // `$config['auth']['foo']`.
-  const pattern = /['"]auth\.[a-z_][a-zA-Z0-9_.]*['"]/g
+  const pattern = /['"](auth|rate_limit)\.[a-z_][a-zA-Z0-9_.]*['"]/g
   for (const match of contents.matchAll(pattern)) {
     const literal = match[0].slice(1, -1)
     if (!CONFIG_KEY_ALLOWLIST.has(literal)) {
@@ -135,7 +145,7 @@ async function loadBundle(locale: 'en' | 'pt' | 'it'): Promise<unknown> {
   return JSON.parse(raw)
 }
 
-describe('i18n auth bundle covers every backend auth.* code', () => {
+describe('i18n auth bundle covers every backend auth.* and rate_limit.* code', () => {
   it('harvests at least one code from the backend Identity module (sanity check)', async () => {
     const codes = await harvestAllAuthCodes()
     // If this fires, the regex-walk broke or the Identity tree moved —
@@ -153,6 +163,11 @@ describe('i18n auth bundle covers every backend auth.* code', () => {
     // here BEFORE the per-locale resolution checks fire.
     expect(codes.has('auth.account_locked.suspended')).toBe(true)
     expect(codes.has('auth.account_locked')).toBe(false)
+    // Chunk 7.1: the `rate_limit.exceeded` emit-site is the four
+    // named limiters in IdentityServiceProvider. Pin the harvest so
+    // a future rename of the code on the backend trips here before
+    // the per-locale resolution checks fire.
+    expect(codes.has('rate_limit.exceeded')).toBe(true)
   })
 
   for (const locale of ['en', 'pt', 'it'] as const) {

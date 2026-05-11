@@ -520,3 +520,29 @@ rejects `rate_limit.*` codes). Spec #20 joined spec #19 as
 `test.skip`'d in hotfix #4; both items + the resolver-taxonomy
 production UX bug are tracked in `docs/tech-debt.md` under their
 dedicated entries.
+
+**Final update (2026-05-11, sub-chunk 7.1 closes the chunk-6 hotfix
+saga):** the three deferred items above are resolved by Sprint 1
+sub-chunk 7.1 — the dedicated review file is
+[`sprint-1-chunk-7-1-review.md`](sprint-1-chunk-7-1-review.md).
+Specs #19 and #20 are both `test`'d (no `test.skip`'s remain on auth
+flows), the `useErrorMessage` resolver renders rate-limit errors
+with the localised `{seconds}` value, and the `docs/tech-debt.md`
+entries for "Spec #19 skipped", "Spec #20 skipped", and "SPA renders
+generic fallback for rate-limit errors on auth endpoints" are all
+marked closed. The chunk-6.5 mapping-coverage entry is also closed
+on the same commit because the prefix-allowlist resolver shipped in
+chunks 6.5–6.7 plus the chunk-7.1 architecture-test extension cover
+the same drift-detection guarantee the original concern asked for.
+
+Two honest deviations surfaced during the chunk-7.1 build (continuing
+the chunk-6 precedent): the in-flight TOTP helper takes `secret`
+rather than `email` as input (cleanest path given the cache-vs-row
+state model for in-flight enrollment), and the backend's rate-limit
+response shape needed `meta: { seconds }` added per error entry (the
+chunk-7.1 kickoff assumed it was already there; it was not). Both
+are documented in detail in the chunk-7.1 review's "Honest
+deviations" section.
+
+This addendum is the closing artifact for the chunk-6 hotfix saga.
+No further follow-ups expected against this review file.

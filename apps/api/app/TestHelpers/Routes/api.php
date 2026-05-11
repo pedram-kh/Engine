@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use App\TestHelpers\Http\Controllers\IssueTotpController;
+use App\TestHelpers\Http\Controllers\IssueTotpFromSecretController;
 use App\TestHelpers\Http\Controllers\MintVerificationTokenController;
+use App\TestHelpers\Http\Controllers\NeutralizeRateLimiterController;
 use App\TestHelpers\Http\Controllers\ResetClockController;
 use App\TestHelpers\Http\Controllers\SetClockController;
 use App\TestHelpers\Http\Middleware\VerifyTestHelperToken;
@@ -38,9 +40,28 @@ Route::prefix('_test')
         Route::post('totp', IssueTotpController::class)
             ->name('totp');
 
+        // Chunk 7.1 spec #19: the "in-flight enrollment" branch of TOTP
+        // minting. The post-confirm controller above reads the secret
+        // from `users.two_factor_secret`; this one accepts the secret
+        // directly so the spec can mint a code from the secret the SPA
+        // is showing the user before /2fa/confirm has landed (during
+        // enrollment the secret lives in cache, not on the row).
+        Route::post('totp/secret', IssueTotpFromSecretController::class)
+            ->name('totp.secret');
+
         Route::post('clock', SetClockController::class)
             ->name('clock.set');
 
         Route::post('clock/reset', ResetClockController::class)
             ->name('clock.reset');
+
+        // Chunk 7.1 spec #20: neutralise / restore named rate limiters.
+        // POST mutates global throttle state across requests; specs
+        // MUST pair with DELETE in afterEach (see controller docblock
+        // and the matching `neutralizeThrottle` / `restoreThrottle`
+        // Playwright fixtures).
+        Route::post('rate-limiter/{name}', [NeutralizeRateLimiterController::class, 'store'])
+            ->name('rate_limiter.neutralize');
+        Route::delete('rate-limiter/{name}', [NeutralizeRateLimiterController::class, 'destroy'])
+            ->name('rate_limiter.restore');
     });

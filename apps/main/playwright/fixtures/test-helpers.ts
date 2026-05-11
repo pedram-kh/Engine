@@ -62,6 +62,12 @@ export interface MintTotpResult {
  * email. Calls the chunk-6.8 email branch of `IssueTotpController` —
  * specs use email because the SPA never exposes the user's numeric
  * primary key.
+ *
+ * REQUIRES the user to have already completed `/2fa/confirm` so the
+ * secret is persisted on `users.two_factor_secret`. For the in-flight
+ * case (after `/2fa/enable` but before `/2fa/confirm`), use
+ * {@link mintTotpFromSecret} instead — that path takes the secret
+ * directly because the in-flight secret lives in cache, not on the row.
  */
 export async function mintTotpCodeForEmail(
   request: APIRequestContext,
@@ -74,6 +80,44 @@ export async function mintTotpCodeForEmail(
   if (response.status() !== 200) {
     throw new Error(
       `mintTotpCodeForEmail failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  const body = (await response.json()) as { data: { code: string } }
+  return { code: body.data.code }
+}
+
+/**
+ * Mint the current 6-digit TOTP code for the supplied base32 secret.
+ *
+ * Used by the chunk-7.1 spec #19 redesign: during in-flight 2FA
+ * enrollment, the secret lives in cache (key prefix
+ * `identity:2fa:enroll:`) until `/2fa/confirm` lands. The persisted
+ * `users.two_factor_secret` column is NULL until then, so
+ * {@link mintTotpCodeForEmail} 422s. The SPA renders the secret as
+ * plain text inside the `enable-totp-manual-key` `data-test`
+ * element (so the user can type it into an authenticator app); the
+ * spec reads the same DOM text and forwards it here.
+ *
+ * Cookie context: this fixture does not depend on a session — the
+ * helper is gated by the chunk-6.1 `X-Test-Helper-Token` header
+ * (forwarded automatically by `extraHTTPHeaders` in
+ * `playwright.config.ts`), and the secret it receives is the
+ * authoritative input. The user-by-email branch is intentionally
+ * absent: see the `IssueTotpFromSecretController` class docblock for
+ * the cache-vs-row reasoning.
+ */
+export async function mintTotpFromSecret(
+  request: APIRequestContext,
+  secret: string,
+): Promise<MintTotpResult> {
+  const response = await request.post('http://127.0.0.1:8000/api/v1/_test/totp/secret', {
+    data: { secret },
+  })
+
+  if (response.status() !== 200) {
+    throw new Error(
+      `mintTotpFromSecret failed with status ${response.status()}: ${await response.text()}`,
     )
   }
 
@@ -148,6 +192,78 @@ export async function resetClock(request: APIRequestContext): Promise<void> {
 
   if (response.status() !== 200) {
     throw new Error(`resetClock failed with status ${response.status()}: ${await response.text()}`)
+  }
+}
+
+/**
+ * Names of the four production rate limiters a spec is allowed to
+ * neutralise. Mirrors the backend's
+ * `App\TestHelpers\Services\RateLimiterNeutralizer::ALLOWED_NAMES`.
+ * Adding a name here without a matching backend allowlist entry will
+ * 422 at the helper call.
+ */
+export type ThrottleName =
+  | 'auth-ip'
+  | 'auth-login-email'
+  | 'auth-password'
+  | 'auth-resend-verification'
+
+/**
+ * Override the named Laravel rate limiter to `Limit::none()` so the
+ * application-level lockout layer can be exercised in isolation
+ * (chunk-7.1 spec #20 design choice — option (i), mirroring the
+ * chunk-5 `LoginTest::beforeEach` Pest pattern).
+ *
+ * REQUIRES afterEach restoreThrottle
+ * ----------------------------------
+ * The neutralised state lives in shared cache and survives across
+ * tests — that's the whole point: `php artisan serve` spawns a fresh
+ * PHP process per request and the override has to persist. Every
+ * spec that calls this MUST pair with {@link restoreThrottle} in
+ * `afterEach`. An un-restored neutraliser bleeds into every
+ * subsequent spec on the same suite run; the production-shape
+ * assertions of unrelated specs become meaningless.
+ *
+ * The convention is identical to {@link setClock} / {@link resetClock}
+ * for the chunk-6.1 test clock — pair the mutation with its inverse,
+ * and pin the inverse on `afterEach`.
+ */
+export async function neutralizeThrottle(
+  request: APIRequestContext,
+  name: ThrottleName,
+): Promise<void> {
+  const response = await request.post(
+    `http://127.0.0.1:8000/api/v1/_test/rate-limiter/${encodeURIComponent(name)}`,
+  )
+
+  if (response.status() !== 200) {
+    throw new Error(
+      `neutralizeThrottle(${name}) failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+}
+
+/**
+ * Restore the named Laravel rate limiter to its production callback.
+ *
+ * Idempotent — calling restore on a name that was never neutralised
+ * is a no-op (200 with an empty `neutralized` list). Specs SHOULD
+ * call this in `afterEach` even when they think they cleaned up
+ * inline; the cache-state-bleed is exactly the failure mode this
+ * pair guards against.
+ */
+export async function restoreThrottle(
+  request: APIRequestContext,
+  name: ThrottleName,
+): Promise<void> {
+  const response = await request.delete(
+    `http://127.0.0.1:8000/api/v1/_test/rate-limiter/${encodeURIComponent(name)}`,
+  )
+
+  if (response.status() !== 200) {
+    throw new Error(
+      `restoreThrottle(${name}) failed with status ${response.status()}: ${await response.text()}`,
+    )
   }
 }
 

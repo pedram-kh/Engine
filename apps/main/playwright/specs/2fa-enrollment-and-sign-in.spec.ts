@@ -1,7 +1,12 @@
 import { expect, test } from '@playwright/test'
 
 import { dt, testIds } from '../helpers/selectors'
-import { mintTotpCodeForEmail, resetClock, signOutViaApi } from '../fixtures/test-helpers'
+import {
+  mintTotpCodeForEmail,
+  mintTotpFromSecret,
+  resetClock,
+  signOutViaApi,
+} from '../fixtures/test-helpers'
 
 /**
  * 20-PHASE-1-SPEC.md § 7 priority #19 — 2FA enrollment + sign-in.
@@ -12,8 +17,12 @@ import { mintTotpCodeForEmail, resetClock, signOutViaApi } from '../fixtures/tes
  *      (the requireMfaEnrolled router guard rebounds the dashboard
  *      navigation because `two_factor_enabled = false`).
  *   3. The enable-totp page calls `/auth/2fa/enable` on mount and
- *      renders the QR + manual key. We do NOT parse the QR — we ask
- *      the chunk-6.1 test-helper for the current code by email.
+ *      renders the QR + manual key. Read the manual key from the
+ *      DOM and forward it to the chunk-7.1 in-flight TOTP helper
+ *      (`mintTotpFromSecret`). The post-confirm helper
+ *      (`mintTotpCodeForEmail`) cannot be used here because
+ *      `users.two_factor_secret` is still NULL — the secret lives
+ *      in cache (`identity:2fa:enroll:`) until step 4 lands.
  *   4. Submit the code. The recovery codes panel appears. The 5-
  *      second countdown has to elapse before the "I have saved them"
  *      button is enabled — Playwright `expect(...).toBeEnabled()`
@@ -24,7 +33,17 @@ import { mintTotpCodeForEmail, resetClock, signOutViaApi } from '../fixtures/tes
  *   6. Sign out (via the chunk 7-defer fixture; no UI button yet).
  *   7. Sign in again. The backend now answers `auth.mfa_required`
  *      because the user has 2FA enrolled; the SignInPage reveals the
- *      TOTP field inline. Mint a fresh code, submit, land on `/`.
+ *      TOTP field inline. Mint a fresh code via the post-confirm
+ *      helper (the secret is now persisted on the user row), submit,
+ *      land on `/`.
+ *
+ * Two minting paths, intentional split:
+ *   - Step 3 (in-flight): `mintTotpFromSecret(request, secret)`. The
+ *     secret is read from the DOM via the `enable-totp-manual-key`
+ *     element. The helper is gated by the chunk-6.1 token header.
+ *   - Step 7 (post-confirm): `mintTotpCodeForEmail(request, email)`.
+ *     Same email-keyed lookup the chunk-6.8 helper has always
+ *     supported, now reaching a confirmed `users.two_factor_secret`.
  *
  * Assertions are anchored on `data-test` attributes and i18n keys
  * (no English-string matches), so a future locale change will not
@@ -49,15 +68,7 @@ test.describe('spec #19 — 2FA enrollment + sign-in', () => {
     await resetClock(request)
   })
 
-  // TODO(spec-19-skip): restore once the in-flight TOTP enrollment
-  // helper lands. The current `mintTotpCodeForEmail` fixture reads
-  // `users.two_factor_secret`, which is NULL during enrollment-in-
-  // progress (the secret only lands in the column after `confirm()`
-  // succeeds). The follow-up review round designs the helper. See
-  // `docs/tech-debt.md` → "Spec #19 (2FA enrollment) skipped pending
-  // in-flight TOTP enrollment helper" for the full trigger
-  // conditions + resolution plan.
-  test.skip('full enrollment + re-sign-in flow', async ({ page }) => {
+  test('full enrollment + re-sign-in flow', async ({ page }) => {
     const email = uniqueEmail()
 
     // -----------------------------------------------------------------
@@ -89,13 +100,16 @@ test.describe('spec #19 — 2FA enrollment + sign-in', () => {
     await expect(page.locator(dt(testIds.enableTotpPage))).toBeVisible()
 
     // -----------------------------------------------------------------
-    // Step 3 — wait for the QR + manual key to render. The page
-    // calls `/auth/2fa/enable` in onMounted; once the manual key is
-    // visible, the user has a `two_factor_secret` row and the
-    // helper can mint a code.
+    // Step 3 — wait for the manual key to render, read it from the
+    // DOM, and mint the current code via the chunk-7.1 in-flight
+    // helper. The post-confirm `mintTotpCodeForEmail` helper would
+    // 422 here because the secret isn't on `users.two_factor_secret`
+    // yet (it lives in cache during enrollment-in-progress).
     // -----------------------------------------------------------------
     await expect(page.locator(dt(testIds.enableTotpManualKey))).toBeVisible()
-    const code = await mintTotpCodeForEmail(page.context().request, email)
+    const manualKey = (await page.locator(dt(testIds.enableTotpManualKey)).innerText()).trim()
+    expect(manualKey.length).toBeGreaterThan(0)
+    const code = await mintTotpFromSecret(page.context().request, manualKey)
 
     // -----------------------------------------------------------------
     // Step 4 — submit the code. Recovery codes appear with the
@@ -133,7 +147,10 @@ test.describe('spec #19 — 2FA enrollment + sign-in', () => {
 
     // -----------------------------------------------------------------
     // Step 7 — sign in again. The backend answers `auth.mfa_required`
-    // and the SignInPage reveals the TOTP field inline.
+    // and the SignInPage reveals the TOTP field inline. The user now
+    // has `users.two_factor_secret` populated (step 4 confirmed the
+    // enrollment), so the post-confirm `mintTotpCodeForEmail`
+    // fixture works.
     // -----------------------------------------------------------------
     await page.goto('/sign-in')
     await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)

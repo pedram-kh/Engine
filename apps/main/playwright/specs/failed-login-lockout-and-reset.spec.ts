@@ -1,11 +1,63 @@
 import { expect, test } from '@playwright/test'
 
 import { dt, testIds } from '../helpers/selectors'
-import { resetClock, setClock, signUpUser } from '../fixtures/test-helpers'
+import {
+  neutralizeThrottle,
+  resetClock,
+  restoreThrottle,
+  setClock,
+  signUpUser,
+} from '../fixtures/test-helpers'
 
 /**
  * 20-PHASE-1-SPEC.md § 7 priority #20 — failed-login lockout +
  * reset / escalation flow.
+ *
+ * Layer-design choice (chunk 7.1, option (i) from the kickoff)
+ * ------------------------------------------------------------
+ * Production stacks two layers on the login endpoint at the same
+ * 5-attempts-per-minute threshold:
+ *
+ *   - Route-level throttle `auth-login-email` (chunk-3, defined in
+ *     `IdentityServiceProvider::registerRateLimits()`).
+ *   - Application-level lockout (`FailedLoginTracker` +
+ *     `AccountLockoutService`, chunks 3 + 5).
+ *
+ * The route-level throttle preempts the application-level lockout, so
+ * the SPA only ever sees `rate_limit.exceeded` from the throttle. The
+ * chunk-5 Pest suite hides this overlap by registering the named
+ * limiters as `Limit::none()` in `LoginTest::beforeEach` so the
+ * lockout layer can be exercised in isolation. This spec mirrors that
+ * shape via the chunk-7.1 `_test/rate-limiter/{name}` test-helper:
+ * the throttle is neutralised in `beforeEach` and restored in
+ * `afterEach`, so the request graph the spec drives lands on the
+ * application-level lockout in the same way it does in the Pest
+ * `LoginTest` suite.
+ *
+ * Why option (i), not (ii)
+ * ------------------------
+ * Option (ii) — assert the throttle-then-lockout chain that
+ * production actually exhibits — would require either a 60-second
+ * sleep between the 6th and 7th attempts (to let the throttle reset)
+ * or a second test-helper that ALSO bumps the throttle's bucket. Both
+ * make the spec slow or further entangled with backend internals. The
+ * Pest `AuthRateLimitTest` already exercises the throttle in
+ * isolation (with the lockout layer dormant because no row escalates
+ * inside the test's tight loop), and the chunk-5 `LoginTest`
+ * exercises the lockout in isolation. Spec #20's job is to be the
+ * cross-layer integration check that the SPA actually renders the
+ * lockout's i18n key when the application path is reached — so
+ * option (i) is the right shape.
+ *
+ * Throttle-neutraliser convention (chunk-7.1 standard)
+ * ----------------------------------------------------
+ * The `_test/rate-limiter/{name}` endpoint mutates global state that
+ * survives across `php artisan serve`'s per-request PHP processes
+ * (that's the whole point — the override has to persist). Specs MUST
+ * pair `neutralizeThrottle` with `restoreThrottle` in `afterEach`,
+ * otherwise the next spec runs against a silently-neutralised limiter
+ * and unrelated production-shape assertions become meaningless. The
+ * convention is identical to `setClock` / `resetClock`.
  *
  * Flow under test (mirrors `AccountLockoutService` /
  * `FailedLoginTracker` thresholds from
@@ -22,25 +74,24 @@ import { resetClock, setClock, signUpUser } from '../fixtures/test-helpers'
  *      Login succeeds.
  *   5. Submit 5 more failed attempts; assert the 6th hits the
  *      temporary lockout again.
- *   6. Fast-forward 24 hours past the FIRST failed attempt (we set
- *      the clock to T0 + 24h + 1m so any timestamp in the original
- *      window is dropped from the prune step's view). Submit one
- *      more failed attempt. The backend escalates per
+ *   6. Fast-forward 24 hours past the FIRST failed attempt. Submit
+ *      one more failed attempt. The backend escalates per
  *      `AccountLockoutService::escalate()` and the response carries
  *      `auth.account_locked.suspended` (the renamed code from chunks
  *      6.2–6.4). The SPA renders the suspended i18n key.
- *   7. `afterEach` resets the clock so a stray failure does not
- *      bleed pinned time into the next spec.
+ *   7. `afterEach` resets the clock AND restores the throttle so a
+ *      stray failure does not bleed pinned time or a neutralised
+ *      limiter into the next spec.
  *
- * Hermeticity contract:
- *   - The Laravel API runs with `CACHE_STORE=array` (see
- *     `playwright.config.ts`) so the lockout cache TTL is computed
- *     against `Carbon::now()` on read instead of Redis EXPIRE
- *     against real wall-clock. Without that, the fast-forward in
- *     step 4 would leave the lock active because Redis would still
- *     be inside its real 15-minute TTL. The chunk-6.8 review file
- *     records this as a flagged deviation from the kickoff's
- *     hidden assumption that the test clock alone unlocks.
+ * Hermeticity contract (carried forward from chunk-6.8 hotfix #3):
+ *   - The Laravel API runs with `CACHE_STORE=database` (see
+ *     `playwright.config.ts`) so the lockout cache survives across
+ *     `php artisan serve`'s per-request PHP processes. The chunk-6.8
+ *     review's post-merge addendum #3 records the discovery context.
+ *   - The throttle-neutraliser cache flag also persists across those
+ *     same per-request processes via the same database cache, so
+ *     `TestHelpersServiceProvider::boot()` re-applies `Limit::none()`
+ *     on every fresh request the spec issues.
  */
 
 const WRONG_PASSWORD = 'WrongPassword42!'
@@ -77,19 +128,22 @@ async function attemptFailedSignIn(
 }
 
 test.describe('spec #20 — failed-login lockout + reset / escalation', () => {
+  test.beforeEach(async ({ request }) => {
+    // Neutralise the named limiter so the application-level lockout
+    // layer is what the request graph reaches at the 6th attempt.
+    // Mirrors chunk-5 `LoginTest::beforeEach`.
+    await neutralizeThrottle(request, 'auth-login-email')
+  })
+
   test.afterEach(async ({ request }) => {
+    // Restore in inverse order. Both calls are idempotent — even if
+    // the test bailed before either side-effect ran, the cleanup
+    // still runs cleanly.
+    await restoreThrottle(request, 'auth-login-email')
     await resetClock(request)
   })
 
-  // TODO(spec-20-skip): see docs/tech-debt.md "Spec #20 (failed-login
-  // lockout + reset) skipped pending throttle-vs-lockout-vs-resolver
-  // follow-up" — follow-up review covers throttle-vs-lockout layering
-  // (the route-level `auth-login-email` 5/min/email throttle preempts
-  // `FailedLoginTracker`'s 5/15min lockout at the same threshold, so
-  // the 6th rapid attempt returns `rate_limit.exceeded` instead of
-  // `auth.account_locked.temporary` and the SPA's error resolver
-  // rejects the `rate_limit.*` prefix → renders the unknown fallback).
-  test.skip('short-window lockout, fast-forward unlock, long-window escalation', async ({
+  test('short-window lockout, fast-forward unlock, long-window escalation', async ({
     page,
     request,
   }) => {
@@ -107,14 +161,14 @@ test.describe('spec #20 — failed-login lockout + reset / escalation', () => {
     for (let i = 0; i < 5; i += 1) {
       await attemptFailedSignIn(page, email)
     }
-    // The 6th attempt — temporary lockout returns the i18n key. We
-    // assert on the resolved English substring (the `auth.account_locked.temporary`
-    // value in `apps/main/src/core/i18n/locales/en/auth.json` is
-    // "Too many failed sign-in attempts. Please try again in a few minutes.").
-    // The kickoff's "in N minutes" phrasing does not match the
-    // bundle (the {minutes} interpolation lives on the backend
-    // `title` field, which the SPA does not render); flagged in
-    // the chunk-6.8 review.
+    // The 6th attempt — temporary lockout returns the i18n key. The
+    // bundle entry for `auth.account_locked.temporary` is "Too many
+    // failed sign-in attempts. Please try again in a few minutes."
+    // (the {minutes} interpolation is tracked as a separate
+    // tech-debt entry — see "auth.account_locked.temporary i18n
+    // bundle has no {minutes} interpolation" in `docs/tech-debt.md`).
+    // We assert on a stable substring so a future copy update that
+    // adds the {minutes} placeholder doesn't flake the spec.
     await attemptFailedSignIn(page, email)
     await expect(page.locator(dt(testIds.signInError))).toContainText('failed sign-in')
 

@@ -6,9 +6,13 @@ namespace App\TestHelpers;
 
 use App\TestHelpers\Http\Middleware\ApplyTestClock;
 use App\TestHelpers\Http\Middleware\VerifyTestHelperToken;
+use App\TestHelpers\Services\RateLimiterNeutralizer;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -53,6 +57,7 @@ final class TestHelpersServiceProvider extends ServiceProvider
 
         $this->registerRoutes();
         $this->registerGlobalClockMiddleware();
+        $this->applyNeutralizedRateLimiters();
     }
 
     /**
@@ -75,6 +80,32 @@ final class TestHelpersServiceProvider extends ServiceProvider
         }
 
         return (string) config('test_helpers.token', '') !== '';
+    }
+
+    /**
+     * Re-register any cache-flagged named limiters with `Limit::none()`.
+     *
+     * `bootstrap/providers.php` lists this provider AFTER
+     * `IdentityServiceProvider`, so by the time this method runs the
+     * production `auth-ip` / `auth-login-email` / `auth-password` /
+     * `auth-resend-verification` registrations are in place. Calling
+     * `RateLimiter::for($name, …)` again overwrites the registration —
+     * that's the same primitive `LoginTest::beforeEach` uses for
+     * the chunk-5 in-isolation pattern.
+     *
+     * Static call to `app()` instead of injection: providers cannot
+     * type-hint container-built dependencies in `boot()` at the same
+     * lifecycle point; `app()` resolves the singleton from the
+     * already-bootstrapped container without an extra binding.
+     */
+    private function applyNeutralizedRateLimiters(): void
+    {
+        /** @var RateLimiterNeutralizer $neutralizer */
+        $neutralizer = $this->app->make(RateLimiterNeutralizer::class);
+
+        foreach ($neutralizer->list() as $name) {
+            RateLimiter::for($name, static fn (Request $request): Limit => Limit::none());
+        }
     }
 
     private function registerRoutes(): void
