@@ -6,6 +6,8 @@ use App\Modules\Identity\Models\User;
 use App\TestHelpers\Http\Middleware\VerifyTestHelperToken;
 use App\TestHelpers\Services\RateLimiterNeutralizer;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -220,4 +222,99 @@ it('list() drops corrupted cache entries (non-string and unknown names)', functi
 
     expect(app(RateLimiterNeutralizer::class)->list())
         ->toBe(['auth-login-email', 'auth-password']);
+});
+
+// -----------------------------------------------------------------------------
+// Cache-backend defence (unit) — post-chunk-7.1 hotfix
+// -----------------------------------------------------------------------------
+//
+// This section uses Mockery on the CacheRepository contract because the
+// contract under test is about CACHE-BACKEND BEHAVIOUR (the backend
+// throws), not cache CONTENTS (what's stored at a key). Constructing
+// RateLimiterNeutralizer directly with the mock keeps these tests at
+// the unit layer — no Laravel app boot, no RefreshDatabase, no
+// container — which mirrors the bug being defended against: the
+// failure mode triggers BEFORE migrations run, so it's wrong to
+// require the test framework to be in a fully-booted post-migration
+// state.
+//
+// Future contributors adding cases that interact with the cache
+// CONTENTS should use the integration-style construction above
+// (`app(RateLimiterNeutralizer::class)` + `app('cache')` + an array
+// driver via `RefreshDatabase`). New cases that test how the service
+// handles cache BACKEND failures (exceptions, connection errors,
+// driver-specific edge cases) belong here.
+//
+// Trigger context: composer install's post-install hook runs
+// `php artisan key:generate --ansi` BEFORE `php artisan migrate:fresh`,
+// so under a `database` cache driver the `cache` table doesn't exist
+// the first time `TestHelpersServiceProvider::boot()` calls
+// `applyNeutralizedRateLimiters()` → `list()` → `$cache->get(…)`.
+// CI failure surfaced at commit e04bf75 (sub-chunk 7.1 work commit);
+// the fix wraps `$cache->get(…)` in a Throwable-catching guard so the
+// boot path returns to the "no overrides" steady state instead of
+// propagating QueryException up through Laravel's bootstrap.
+
+describe('cache-backend defence (unit)', function (): void {
+    afterEach(function (): void {
+        Mockery::close();
+    });
+
+    it('list() returns [] when the cache backend throws QueryException (pre-migration boot path)', function (): void {
+        $cache = Mockery::mock(CacheRepository::class);
+        $cache->expects('get')
+            ->with(RateLimiterNeutralizer::CACHE_KEY, [])
+            ->andThrow(new QueryException(
+                'pgsql',
+                'select * from "cache" where "key" = ?',
+                [RateLimiterNeutralizer::CACHE_KEY],
+                new RuntimeException('SQLSTATE[42P01]: Undefined table: relation "cache" does not exist'),
+            ));
+
+        $neutralizer = new RateLimiterNeutralizer($cache);
+
+        expect($neutralizer->list())->toBe([]);
+    });
+
+    it('list() returns [] for any Throwable from the cache backend (Redis down, file driver missing, etc.)', function (): void {
+        $cache = Mockery::mock(CacheRepository::class);
+        $cache->expects('get')
+            ->with(RateLimiterNeutralizer::CACHE_KEY, [])
+            ->andThrow(new RuntimeException('connection refused'));
+
+        $neutralizer = new RateLimiterNeutralizer($cache);
+
+        expect($neutralizer->list())->toBe([]);
+    });
+
+    it('isNeutralized() inherits the defence transitively (calls list() under the hood)', function (): void {
+        $cache = Mockery::mock(CacheRepository::class);
+        $cache->expects('get')
+            ->with(RateLimiterNeutralizer::CACHE_KEY, [])
+            ->andThrow(new RuntimeException('cache backend unreachable'));
+
+        $neutralizer = new RateLimiterNeutralizer($cache);
+
+        expect($neutralizer->isNeutralized('auth-login-email'))->toBeFalse();
+    });
+
+    it('list() does NOT swallow exceptions from neutralize() / restore() / clear() (those are controller-only and should fail loudly)', function (): void {
+        // Sibling assertion: confirms the surgical scope of the defence
+        // — only `list()` (the boot-path read) is wrapped. The write
+        // operations are deliberately undefended so a test author who
+        // hits a broken cache via the controller endpoints sees the
+        // failure immediately, instead of the change silently going
+        // nowhere.
+        $cache = Mockery::mock(CacheRepository::class);
+        $cache->expects('get')
+            ->with(RateLimiterNeutralizer::CACHE_KEY, [])
+            ->andReturn([]);
+        $cache->expects('forever')
+            ->andThrow(new RuntimeException('cache write failed'));
+
+        $neutralizer = new RateLimiterNeutralizer($cache);
+
+        expect(static fn () => $neutralizer->neutralize('auth-login-email'))
+            ->toThrow(RuntimeException::class, 'cache write failed');
+    });
 });

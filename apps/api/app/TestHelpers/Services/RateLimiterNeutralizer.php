@@ -126,11 +126,36 @@ final class RateLimiterNeutralizer
      * named-limiter overrides survive `php artisan serve`'s per-request
      * PHP-process model.
      *
+     * Cache-backend defence
+     * ---------------------
+     * `list()` is the cache-touching method on the boot path, and
+     * `boot()` runs before any artisan command — including
+     * `key:generate` and `migrate`. Composer's post-install hook
+     * triggers `key:generate` before `migrate:fresh` runs, so under a
+     * `database` cache driver the `cache` table does not exist yet
+     * the first time this method is reached. Cache backends can also
+     * be unreachable for other reasons (Redis down, file path missing,
+     * etc.). We catch `\Throwable` and return `[]` rather than
+     * propagate, on the principle that "no overrides apply this
+     * request" is the safe default — production throttle behaviour
+     * stays in place, and a spec that expected neutralisation will
+     * fail at the assertion layer (its 429 won't downgrade to 423),
+     * surfacing the cache problem there rather than in the boot path.
+     *
+     * No logging deliberately: the apply-loop runs on every request
+     * under `php artisan serve`'s per-request PHP-process model, so a
+     * log line per request when cache is down would be noise. The
+     * test-layer failure is the right diagnostic surface.
+     *
      * @return list<string>
      */
     public function list(): array
     {
-        $value = $this->cache->get(self::CACHE_KEY, []);
+        try {
+            $value = $this->cache->get(self::CACHE_KEY, []);
+        } catch (\Throwable) {
+            return [];
+        }
 
         if (! is_array($value)) {
             return [];
