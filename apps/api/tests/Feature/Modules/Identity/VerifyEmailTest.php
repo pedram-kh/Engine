@@ -109,7 +109,11 @@ it('returns 400 with auth.email.verification_invalid for a tampered signature', 
     $token = app(EmailVerificationToken::class)->mint($user);
 
     [$payload, $signature] = explode('.', $token);
-    $tampered = $payload.'.'.($signature === 'a' ? 'b' : 'a'.substr($signature, 1));
+    // Deterministic first-char swap: the prior `($signature === 'a' ? 'b' : 'a'.substr(...))`
+    // shape compared the whole signature to the literal 'a' (never true) and then prepended
+    // 'a', which silently no-op'd whenever the signature's first byte already was 'a' (~1/64
+    // base64 flake → 204 instead of 400). Check the FIRST CHARACTER and flip it.
+    $tampered = $payload.'.'.($signature[0] === 'a' ? 'b' : 'a').substr($signature, 1);
 
     $this->postJson('/api/v1/auth/verify-email', ['token' => $tampered])
         ->assertStatus(400)
