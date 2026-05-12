@@ -191,3 +191,20 @@ Endorsing Cursor's (f) observations; adding the reviewer-side perspective.
 ---
 
 _Provenance: drafted by Cursor as the closing artifact for chunk 7 (Group 3's compressed-pattern process — single chat completion summary + two structured drafts per `PROJECT-WORKFLOW.md` § 3 step 6, modified). Claude-side observations added on independent review pass. The self-review is the closing artifact for the entire chunk 7; the merged Group 3 review file (`sprint-1-chunk-7-5-to-7-7-review.md`) is the final review for Group 3's specific work. **Status: Closed. Chunk 7 is done. Sprint 1 proceeds to chunk 8.**_
+
+---
+
+## Post-merge addendum — Group 3 hotfix tally
+
+Two post-merge hotfixes landed after Group 3's work + closure commits, both driven Cursor-solo to green CI per the no-bundling convention:
+
+- `2e31a19` — `fix(admin-auth)`: D7 deep-link URL regex assumed percent-encoded `%2F`, but Vue Router emits literal `/` per RFC 3986 § 3.4 (slashes are reserved-but-permitted in the query component, and Vue Router does not encode them). Two regex updates + docblock paragraph capturing the finding. Spec-side encoding assumption, not a guard or router bug.
+- `4ff9bb6` — `test(identity)`: pre-existing `VerifyEmailTest` tampering-logic flake (~1/64 over base64 alphabet). Prior `($signature === 'a' ? 'b' : 'a'.substr($signature, 1))` compared the whole signature to literal `'a'` and unconditionally prepended `'a'`, no-op'ing whenever the signature's first byte already was `'a'`. Fixed to check the FIRST CHARACTER deterministically. 30× local stress-test confirmed zero remaining probability surface. Unrelated to chunk-7 work; just surfaced on the docs-only closure-commit CI run because the random seed happened to land on a first-byte-`'a'` signature.
+
+**Total chunk-7 post-merge hotfixes: 9 (sub-chunk 7.1) + 0 (Group 1) + 1 (Group 2) + 2 (Group 3) = 12.** Distribution skewed heavily toward 7.1 (the inaugural Playwright + admin-context saga). The remaining three hotfix surfaces (Group 2's smoke-spec, Group 3's spec regex, Group 3's pre-existing flake) were single-commit fixes with no follow-on hotfix chains — the chunk-7.1 saga's lessons stuck. No replay; each hotfix was scoped, fixed, and merged in a single cycle.
+
+**Process pattern recorded:** when CI fails on a commit that touched zero production code, "look for a flake in the unchanged tests" is the right first hypothesis. Hotfix #2 above is the canonical example — the closure commit modified only `docs/reviews/sprint-1-chunk-6-plan-approved.md`, yet a backend Pest test failed; root-cause was a pre-existing probabilistic bug in the test's tampering logic, not anything chunk-7 introduced. Worth carrying forward into Sprint 2+ as a debugging heuristic.
+
+**Commitlint discovery:** the project's commitlint config rejects conventional-commit scopes containing digits (the default kebab-case rule is `[a-z]+(-[a-z]+)*`, no digits). Future hotfix scopes should use letter-only forms (`admin-auth`, `spa-auth`, `admin-playwright`, etc.) rather than scopes like `admin-e2e`. No config change needed.
+
+**Chunk 7 fully closed.** Final state: 12 commits on `main` covering the full chunk-7 surface (admin Pinia store + i18n + router + guards + auth pages + layouts + E2E specs + CI extension + module docs + self-review + 12 hotfixes). Sprint 1 admin-side scope complete.

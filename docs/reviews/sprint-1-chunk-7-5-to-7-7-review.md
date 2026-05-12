@@ -201,3 +201,61 @@ Specific observations:
 ---
 
 _Provenance: drafted by Cursor on Group 3 completion (compressed-pattern process across three sub-chunks per `PROJECT-WORKFLOW.md` § 3 step 6, modified). Independently reviewed by Claude with one targeted spot-check covering all six chunk-7.1 saga conventions (load-bearing review priority #1). Three honest deviations surfaced and categorized (1 structurally-correct minimal extension, 2 structurally-correct admin adaptations), all resolved with structurally-correct alternatives. The "file:line citations to main" discipline upgrade introduced in Group 2's review dropped paraphrase-vs-actual deviations to zero in Group 3. The pattern of "every chunk-6 + 7.1 + 7.2-7.3 + 7.4 + 7.5-7.7 group catches at least one hidden assumption" is now nine-for-nine. Status: Closed. No change-requests; Group 3 lands as-is. **Closes chunk 7 — Sprint 1 admin-side scope complete.**_
+
+---
+
+## Post-merge addendum — Group 3 hotfixes (commits `2e31a19` + `4ff9bb6`)
+
+Appended after the merged review's main body. This addendum is the durable record of what surfaced AFTER Group 3's work commit (`d457cb1`) and chunk-7 closure commit (`2706632`) landed on `main` and CI ran for the first time against the new admin E2E job + the chunk-7-closure docs.
+
+### Final commit lineage on `main`
+
+- `4ff9bb6` — `test(identity): deterministic signature tampering in VerifyEmailTest [flake fix]` (hotfix #2)
+- `2e31a19` — `fix(admin-auth): match literal '/' in D7 redirect URL regex [post-chunk-7 hotfix]` (hotfix #1)
+- `2706632` — `docs(reviews): close chunk 7 — sprint 1 admin-side scope complete` (closure)
+- `d457cb1` — `feat(admin-auth): admin auth pages + E2E + CI extension (sprint 1, chunk 7 group 3 closes chunk 7)` (work)
+
+CI run after hotfix #2: all four jobs green. Frontend lint+typecheck+Vitest, Backend Pint+Larastan+Pest, E2E admin SPA, E2E main SPA.
+
+### Two hotfixes surfaced after the closure push
+
+**Hotfix #1 — D7 deep-link URL regex mismatch in admin mandatory-MFA enrollment spec.**
+
+- **Surface:** `apps/admin/playwright/specs/admin-mandatory-mfa-enrollment.spec.ts` (the chunk-7.6 load-bearing D7 spec).
+- **Symptom:** the spec failed all three Playwright retries on the assertion `await expect(page).toHaveURL(/\/sign-in\?redirect=%2Fsettings$/)` — expected pattern wanted percent-encoded `%2F`, received string had literal `/settings`. A second assertion against `/auth/2fa/enable\?redirect=%2Fsettings` had the same shape.
+- **Root cause:** Vue Router serialises `query: { redirect: '/settings' }` with a **literal `/`**, not percent-encoded `%2F`. Slashes are reserved-but-permitted in the query component per RFC 3986 § 3.4, and Vue Router does not encode them. The spec assertions were paraphrasing a percent-encoding assumption that doesn't hold against real router output.
+- **Not a guard bug:** `apps/admin/src/core/router/guards.ts:92-99` was correctly redirecting on every retry; the spec was just asserting against the wrong encoding. Trace evidence: the call log showed the page reaching `/sign-in?redirect=/settings` (literal `/`) on every attempt — the assertion never matched because the regex was wrong, not because the redirect was wrong.
+- **Fix:** two regex updates (`%2F` → `\/`) plus a docblock paragraph capturing the RFC 3986 § 3.4 finding so the next reviewer doesn't repeat the encoding assumption. Lint + typecheck green pre-push.
+- **Category:** spec-side assumption error, surface-localised. Production code untouched. The chunk-7.4 guard logic + the chunk-7.5 EnableTotpPage's `?redirect=` honor logic both remain unchanged and were validated as correct by the trace.
+
+**Hotfix #2 — Pre-existing `VerifyEmailTest` tampering-logic flake.**
+
+- **Surface:** `apps/api/tests/Feature/Modules/Identity/VerifyEmailTest.php:111-117`.
+- **Symptom:** the test `it returns 400 with auth.email.verification_invalid for a tampered signature` failed on the chunk-7 closure CI run (which only modified `docs/reviews/sprint-1-chunk-6-plan-approved.md` — zero backend code changes between work-commit green run and closure-commit failing run).
+- **Root cause:** the tampering line was `$tampered = $payload.'.'.($signature === 'a' ? 'b' : 'a'.substr($signature, 1));`. It compared the **whole** signature against the literal single-character string `'a'` (never true for a real signature) and then unconditionally prepended `'a'` to `substr($signature, 1)`. When the random signature's first byte already was `'a'`, the "tampered" token was **byte-identical to the original** → backend correctly returned 204 success → assertion of 400 failed. Probabilistic flake at ~1/64 over the base64 signature alphabet.
+- **Pre-existing, NOT chunk-7 caused:** the test was unchanged by chunk-7's work; the work-commit run happened to land on a signature whose first byte was NOT `'a'`, the closure-commit run happened to land on one whose first byte WAS `'a'`. Same code path, different random seed.
+- **Fix:** check the FIRST CHARACTER, not the whole signature: `($signature[0] === 'a' ? 'b' : 'a').substr($signature, 1)`. Now if the first byte is `'a'`, swap to `'b'`; else swap to `'a'`. Deterministic, zero remaining probability surface. Plus an inline comment explaining the prior bug so the next contributor doesn't reintroduce it.
+- **Verified deterministic:** 30 sequential local runs all pass. Under the prior logic, the expected flake count over 30 runs would be ~0.47 (probabilistically ~1/64); under the fix it's exactly zero.
+- **Category:** pre-existing test-fixture flake, surface-localised. Production code untouched, no other tests affected.
+
+### What this validates
+
+- **The no-bundling-under-hotfix-pressure convention held cleanly.** Two distinct root causes → two distinct commits with distinct conventional-commit scopes (`fix(admin-auth)` for the chunk-7 hotfix, `test(identity)` for the pre-existing flake). The chunk-7 hotfix's scope and the unrelated flake fix were kept in separate commits per the kickoff's modification #8. Same discipline as the chunk-6 hotfix saga + the Group 2 hotfix.
+- **The chunk-6 hotfix saga's "scope-discipline-under-pressure" pattern continues to operate cleanly without Claude in the loop.** Cursor identified both root causes, scoped them as separate hotfixes (refusing to bundle), verified each fix locally (30× stress-test for the determinism claim), and pushed both to green CI autonomously.
+- **Commitlint discovered a kebab-case-with-digits gap.** Cursor's initial commit message `fix(admin-e2e): ...` was rejected by commitlint's default kebab-case rule (digits aren't allowed inside kebab-case scopes). Cursor pivoted to `fix(admin-auth): ...` to match the work-commit's scope and preserve lineage clarity. Worth recording: the project's commitlint config rejects scopes containing digits — future hotfix scopes should use letter-only kebab forms (`admin-auth`, `spa-auth`, `admin-playwright`, etc.). No config change needed; just a convention to keep in mind.
+- **The "diagnostic uncertainty about flake-vs-not" was resolved correctly.** When CI failed on a docs-only commit, the working hypothesis was either (a) a pre-existing flake or (b) a real backend bug introduced by something unrelated. The trace pointed unambiguously at (a) once the tampering logic was read carefully. Worth recording as a process pattern: when CI fails on a commit that touched zero production code, "look for a flake in the unchanged tests" is the right first hypothesis, not "look for an environmental issue."
+
+### Open tech-debt items after this hotfix
+
+- No new tech-debt entries opened by either hotfix. Hotfix #1 was a spec-side encoding assumption fix; hotfix #2 was a pre-existing tampering-logic fix. Both are surface-localised and require no follow-up.
+- All pre-existing tech-debt entries from chunks 6 + 7 remain unchanged by these hotfixes.
+
+### Final state for Group 3 + chunk 7
+
+- ✅ Group 3 work merged on `d457cb1`.
+- ✅ Chunk 7 closure docs merged on `2706632`.
+- ✅ D7 deep-link spec hotfix merged on `2e31a19`.
+- ✅ VerifyEmailTest determinism fix merged on `4ff9bb6`. CI green.
+- ✅ Sub-chunks 7.5 + 7.6 + 7.7 fully closed. Chunk 7 fully closed. No further follow-ups expected against this review file.
+
+**Sprint 1 admin-side scope complete. Sprint 1 proceeds to chunk 8 (theme system + remaining sprint cleanup).**
