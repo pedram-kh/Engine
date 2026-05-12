@@ -23,7 +23,23 @@ import { describe, expect, it } from 'vitest'
 
 const LAYOUT_PATH = path.resolve(__dirname, '../../../src/modules/auth/layouts/AuthLayout.vue')
 
-const MAX_LINES = 80
+/**
+ * Chunk 8.2 raised the ceiling from 80 → 96 to absorb the
+ * `<ThemeToggle />` import + the wrapper `<div>` that pairs it with
+ * the existing locale switcher in the layout's header. The toggle
+ * itself is a sibling component (`@/components/ThemeToggle.vue`) with
+ * its own 100% Vitest spec — the layout remains a structural shell
+ * (no business logic in the `<script setup>` block; mounting the
+ * toggle is a single-import + single-tag-invocation change).
+ *
+ * The chunk-6.6 "structural shell" intent still holds: substantive
+ * logic must live in sibling `*.ts` helpers OR in sibling components
+ * with their own coverage. The expanded docblock comment explaining
+ * the toggle integration accounts for most of the additional lines.
+ *
+ * Future raises require a new chunk-scoped code-review note here.
+ */
+const MAX_LINES = 96
 
 describe('AuthLayout.vue (admin) stays a pure structural shell', () => {
   it('is at most MAX_LINES lines (size guard)', async () => {

@@ -14,8 +14,38 @@
  *      (persistence, system-default detection, telemetry) by editing a
  *      single file.
  *
- * The composable file itself is allowlisted — it's the SOT and
- * legitimately needs both the import and the mutation.
+ * Chunk 8.2 extension (Group 2 of chunk 8): `useThemePreference` at
+ * `src/composables/useThemePreference.ts` is the SINGLE source of
+ * truth for the user-preference layer that wraps `useTheme`.
+ * Components MUST consume the preference through `useThemePreference()`
+ * and MUST NOT:
+ *
+ *   3. Call `localStorage.{get,set,remove}Item('catalyst.admin.theme', …)`
+ *      (or any literal of that storage key) outside the composable.
+ *      The persistence layer IS the composable; bypassing it means
+ *      a future refactor that flips persistence (cookie, server-side
+ *      preference, IndexedDB) cannot land by editing a single file.
+ *
+ *   4. Reference the literal storage key string `'catalyst.admin.theme'`
+ *      anywhere outside the composable, even without a `localStorage`
+ *      call. Defence-in-depth: prevents a contributor from defining
+ *      `const KEY = 'catalyst.admin.theme'` and then doing storage
+ *      ops through it (which the regex in (3) would miss).
+ *
+ *   5. Call `window.matchMedia('(prefers-color-scheme: …)')` outside
+ *      the composable. The system-detection layer IS the composable;
+ *      bypassing it means two listeners would race for "what does the
+ *      OS prefer?" — exactly the hazard the chunk-8.2 dormant
+ *      `tokens.css` `@media` removal closed.
+ *
+ * Audit-first per chunk 7.2 D5 standing standard: a chunk-8.2 grep
+ * across `apps/admin/src/**` for `localStorage`, `matchMedia`, and the
+ * literal `'catalyst.admin.theme'` returned zero non-composable
+ * matches at the time the patterns landed; the allowlist starts
+ * empty modulo the composable file itself.
+ *
+ * Both composable files are allowlisted — each IS the SOT for its
+ * layer and legitimately needs the otherwise-forbidden primitives.
  *
  * Mirror discipline (chunk 7.2 D2): this spec mirrors
  * `apps/main/tests/unit/architecture/use-theme-is-sot.spec.ts`.
@@ -37,6 +67,11 @@ const ALLOWLISTED_RELATIVE_PATHS: ReadonlySet<string> = new Set([
   // The composable IS the SOT: it MUST mutate theme.global.name.value
   // and it MUST import useTheme from vuetify.
   'composables/useTheme.ts',
+  // The preference composable IS the SOT for persistence + system
+  // detection: it MUST call localStorage.{get,set,remove}Item with
+  // the storage key, MUST reference the literal key string, and
+  // MUST register a `prefers-color-scheme` matchMedia listener.
+  'composables/useThemePreference.ts',
 ])
 
 const FORBIDDEN_PATTERNS: ReadonlyArray<{ pattern: RegExp; description: string }> = [
@@ -47,6 +82,21 @@ const FORBIDDEN_PATTERNS: ReadonlyArray<{ pattern: RegExp; description: string }
   {
     pattern: /\bimport\s*\{[^}]*\buseTheme\b[^}]*\}\s*from\s*['"]vuetify['"]/,
     description: 'direct import of useTheme from "vuetify" (use @/composables/useTheme instead)',
+  },
+  {
+    pattern: /\blocalStorage\s*\.\s*(?:get|set|remove)Item\s*\(/,
+    description:
+      'direct localStorage.{get,set,remove}Item call (use @/composables/useThemePreference for theme persistence; for non-theme persistence open a tech-debt note + extend this allowlist)',
+  },
+  {
+    pattern: /['"`]catalyst\.(?:main|admin)\.theme['"`]/,
+    description:
+      'direct reference to the theme storage key literal (use STORAGE_KEY exported by @/composables/useThemePreference)',
+  },
+  {
+    pattern: /\bmatchMedia\s*\(\s*['"`][^'"`]*prefers-color-scheme/,
+    description:
+      "direct window.matchMedia('(prefers-color-scheme: …)') call (use @/composables/useThemePreference for system-default detection)",
   },
 ]
 

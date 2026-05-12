@@ -21,7 +21,11 @@
  *                 the same centred-card frame).
  *   - `'app'`   → bare `<v-app><v-main>` shell hosting the routed
  *                 page. The dashboard / settings placeholders provide
- *                 their own surface inside the slot.
+ *                 their own surface inside the slot. A thin top-right
+ *                 chrome line carries the chunk-8.2 `<ThemeToggle />`
+ *                 so authenticated users have a visible toggle until
+ *                 Sprint 2's user-menu surface lands and consumes the
+ *                 same component.
  *
  * `AuthLayout.vue` owns its own `<v-app>` (chunk 6.6), so this file
  * MUST NOT wrap auth/error routes in another `<v-app>` — Vuetify
@@ -34,12 +38,20 @@
  * Vue Router exposes before the first navigation, and the bare shell
  * is the safe default (an unmatched route under HTML5 history mode
  * resolves to a missing match, not to an auth route).
+ *
+ * Theme bootstrap (chunk 8.2): App.vue is the lifecycle hook that
+ * runs in EVERY route's setup() — auth, app, error. Mounting
+ * `<ThemeToggle />` here in the app-layout branch is enough for the
+ * authenticated surface; on auth routes the toggle's wrapping
+ * AuthLayout.vue mounts its own copy. The composable singleton
+ * means both mountings share the same reactive state.
  */
 
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 import AuthLayout from '@/modules/auth/layouts/AuthLayout.vue'
+import ThemeToggle from '@/components/ThemeToggle.vue'
 
 const route = useRoute()
 
@@ -52,6 +64,9 @@ const layout = computed<'auth' | 'app' | 'error'>(() => route.meta.layout ?? 'ap
   </AuthLayout>
   <v-app v-else>
     <v-main>
+      <div class="d-flex justify-end pa-2" data-test="app-chrome">
+        <ThemeToggle />
+      </div>
       <router-view />
     </v-main>
   </v-app>

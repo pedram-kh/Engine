@@ -9,6 +9,14 @@
       "en": "English",
       "pt": "Português",
       "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Tema",
+        "light": "Chiaro",
+        "dark": "Scuro",
+        "system": "Segui il sistema"
+      }
     }
   }
 }

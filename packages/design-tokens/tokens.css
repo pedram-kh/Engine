@@ -158,39 +158,23 @@
   --color-focus-ring: var(--brand-teal-400);
 }
 
-/* System preference fallback when no explicit data-theme is set */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --color-bg-app: var(--brand-ink);
-    --color-bg-surface: var(--neutral-900);
-    --color-bg-surface-raised: var(--neutral-800);
-    --color-bg-surface-sunken: var(--brand-ink);
-    --color-bg-overlay: rgba(0, 0, 0, 0.6);
-
-    --color-border-subtle: var(--neutral-800);
-    --color-border-default: var(--neutral-700);
-    --color-border-strong: var(--neutral-600);
-
-    --color-text-primary: var(--brand-cream);
-    --color-text-secondary: var(--neutral-300);
-    --color-text-tertiary: var(--neutral-400);
-    --color-text-disabled: var(--neutral-600);
-    --color-text-inverse: var(--neutral-900);
-
-    --color-action-primary: var(--brand-teal-400);
-    --color-action-primary-hover: var(--brand-teal-300);
-    --color-action-primary-active: var(--brand-teal-500);
-    --color-action-primary-fg: var(--neutral-950);
-
-    --color-action-secondary: var(--neutral-800);
-    --color-action-secondary-hover: var(--neutral-700);
-    --color-action-secondary-fg: var(--brand-cream);
-
-    /* Mirrors the explicit dark theme above (chunk 8.1 WCAG AA fix). */
-    --color-action-danger: var(--danger-500);
-    --color-action-danger-hover: #b91c1c;
-    --color-action-danger-fg: var(--neutral-0);
-
-    --color-focus-ring: var(--brand-teal-400);
-  }
-}
+/*
+ * Note (chunk 8.2): the previous `@media (prefers-color-scheme: dark)`
+ * block was removed in Group 2 of chunk 8.
+ *
+ * Why: with Group 2's `useThemePreference` composable now reactively
+ * consulting `window.matchMedia('(prefers-color-scheme: dark)')` and
+ * driving the active Vuetify theme through `useTheme().setTheme()`, an
+ * independent CSS-media-query layer would create two competing sources
+ * of truth for "what theme should be active right now." `useTheme` is
+ * the Single Source of Truth (architecture-test-enforced); the dormant
+ * `@media` block was a hazard rather than a feature.
+ *
+ * The `:root[data-theme='dark']` block above is left in place so that
+ * any future opt-in consumer of the dormant `--color-*` semantic
+ * variables still has a way to flip palettes via a `data-theme`
+ * attribute on `<html>`. None exist today (a chunk-8.2 grep across
+ * `apps/main/src/**` and `apps/admin/src/**` for `var(--color-`
+ * returned zero matches), so the broader `tokens.css` removal-or-keep
+ * decision is tracked in `docs/tech-debt.md` for a future chunk.
+ */

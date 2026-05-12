@@ -71,6 +71,23 @@ function createI18nForApp() {
         app: {
           title: 'Catalyst Engine — Admin',
           locale: { switcher: 'Language', en: 'English' },
+          // The chunk-8.2 ThemeToggle is mounted inside AuthLayout
+          // (and inside the bare app-layout branch of App.vue), so
+          // its i18n keys MUST be present in this minimal bundle —
+          // otherwise the toggle's `<v-btn-toggle>` rendering paths
+          // emit `[intlify] Not found …` warnings even when the
+          // assertions still pass. Keeping the strings inline (as
+          // opposed to importing the locale JSON) preserves this
+          // file's chunk-7.5 design intent of being a layout-switch
+          // contract test, not a full-stack i18n test.
+          theme: {
+            toggle: {
+              label: 'Theme',
+              light: 'Light',
+              dark: 'Dark',
+              system: 'Match system',
+            },
+          },
         },
       },
     },
