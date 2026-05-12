@@ -7,6 +7,7 @@
 **Final closure:** Sprint 1 sub-chunk 7.1 (commit e04bf75) closes the chunk-6 hotfix saga (throttle-vs-lockout overlap, `useErrorMessage` resolver taxonomy gap, Playwright specs #19 + #20 active) and meets Sprint 1's E2E acceptance criterion for the auth surface — see `sprint-1-chunk-7-1-review.md`.
 **Hotfix saga closure:** Commit `b715cfa` (auth-ip neutralisation in specs #19/#20) is the terminal hotfix in the chunk-7.1 post-merge series; CI run [25689460184](https://github.com/pedram-kh/Engine/actions/runs/25689460184) is the durable green-CI proof. See the post-merge addendum in `sprint-1-chunk-7-1-review.md` for the full nine-hotfix lineage and root-cause breakdown.
 **Chunk 7 progress:** Group 1 (sub-chunks 7.2 + 7.3 — admin SPA Pinia auth store + admin SPA i18n bundle) closed in commit `d2ec623`. See `sprint-1-chunk-7-2-to-7-3-review.md`. Group 2 (sub-chunk 7.4 — admin SPA router + guards + mandatory-MFA enforcement) closed in commit `5bf881a`. See `sprint-1-chunk-7-4-review.md`; Group 3 (sub-chunks 7.5 + 7.6 + 7.7 — admin auth pages + admin E2E + admin module README + chunk 7 self-review) is the next session.
+**Chunk 8 progress:** Group 1 (theme foundations — light + dark Vuetify themes with WCAG-AA dark palette, `useTheme` composable mirrored per-SPA, architecture tests for token-usage discipline) closed in commit `29c0726`. See `sprint-1-chunk-8-group-1-review.md`. Group 2 (theme consumers + user preferences + Sprint 1 cleanup) is the next session.
 
 ## Chunk 7 closure
 
