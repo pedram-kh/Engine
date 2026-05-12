@@ -23,12 +23,16 @@ import {
  *      (chunk 5 priority #7's EnsureMfaForAdmins middleware).
  *   2. Deep-link to `/settings`. The router's `requireAuth` guard
  *      sees no session, redirects to
- *      `/sign-in?redirect=%2Fsettings` (chunks 6.5 + 7.4 redirect
- *      contract).
+ *      `/sign-in?redirect=/settings` (chunks 6.5 + 7.4 redirect
+ *      contract). Vue Router serialises `query: { redirect: '/settings' }`
+ *      with a literal `/` (slashes are reserved-but-permitted in the
+ *      query component per RFC 3986 §3.4, and Vue Router does not
+ *      percent-encode them), so the URL assertion below matches a
+ *      literal `/`, not `%2F` — chunk-7.6 hotfix #1 finding.
  *   3. Sign in. The `requireAuth` guard's `bootstrap()` call sees the
  *      403 envelope and flips the auth store's `mfaEnrollmentRequired`
  *      flag. The same guard's `mfaEnrollmentRequired` branch redirects
- *      to `/auth/2fa/enable?redirect=%2Fsettings` (D7: the intended
+ *      to `/auth/2fa/enable?redirect=/settings` (D7: the intended
  *      destination is preserved across the MFA redirect — see
  *      `apps/admin/src/core/router/guards.ts:92-99`).
  *   4. Complete the 2FA enrollment: read the manual key from the DOM,
@@ -92,7 +96,7 @@ test.describe('admin mandatory-MFA enrollment journey', () => {
     // /sign-in with `?redirect=/settings`.
     // -----------------------------------------------------------------
     await page.goto('/settings')
-    await expect(page).toHaveURL(/\/sign-in\?redirect=%2Fsettings$/)
+    await expect(page).toHaveURL(/\/sign-in\?redirect=\/settings$/)
     await expect(page.locator(dt(testIds.signInPage))).toBeVisible()
 
     // -----------------------------------------------------------------
@@ -104,7 +108,7 @@ test.describe('admin mandatory-MFA enrollment journey', () => {
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(PASSWORD)
     await page.locator(dt(testIds.signInSubmit)).click()
 
-    await expect(page).toHaveURL(/\/auth\/2fa\/enable\?redirect=%2Fsettings$/)
+    await expect(page).toHaveURL(/\/auth\/2fa\/enable\?redirect=\/settings$/)
     await expect(page.locator(dt(testIds.enableTotpPage))).toBeVisible()
 
     // -----------------------------------------------------------------
