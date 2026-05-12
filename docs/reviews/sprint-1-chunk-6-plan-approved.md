@@ -16,6 +16,14 @@
 **Sprint 1 admin-side scope:** Complete. Admin SPA is feature-complete for Sprint 1's acceptance criteria (auth pages, mandatory-MFA enforcement with D7 deep-link preservation, E2E coverage of the critical auth flows, full e2e-admin CI stack mirroring e2e-main).
 **Next:** Sprint 1 proceeds to chunk 8 (theme system + preferences).
 
+## Sprint 1 closure
+
+**Status:** Sprint 1 fully closed — all 8 chunks shipped.
+**Final chunk:** Chunk 8 closed across two groups — Group 1 (theme foundations) in commit `29c0726`; Group 2 (theme consumers + user preferences + `<ThemeToggle />` + system-default detection + Sprint 1 cleanup) in commit `637cc1b`. Closing artifacts: `sprint-1-chunk-8-group-2-review.md` (Group 2 merged review), `sprint-1-chunk-8-self-review.md` (chunk 8 retrospective), `sprint-1-self-review.md` (Sprint 1 retrospective).
+**Sprint 1 acceptance per `20-PHASE-1-SPEC.md` § 5:** All criteria met (creator can sign up; agency admin can sign in; admin can sign in to admin SPA; 2FA works for admin; cross-tenant access tests pass; audit log captures auth events; all tests green across 367 Pest + 286 main Vitest + 232 admin Vitest + 18 design-tokens specs; lint + typecheck clean repo-wide).
+**Tech-debt register at close:** 6 entries open with named trigger conditions and owner sprints; 8 entries closed across Sprint 1.
+**Next:** Sprint 2 — brands + agency UI + nav shell per `20-PHASE-1-SPEC.md` § 5 Sprint 2.
+
 This is a checkpoint file for chat-session resumption. Sprint 1 Chunk 6 is unusually large (9 sub-chunks) so the approved plan and the Q-and-A answers are recorded here durably.
 
 ---
