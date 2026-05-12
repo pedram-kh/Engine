@@ -2,6 +2,13 @@
   "app": {
     "title": "Catalyst Engine — Admin",
     "subtitle": "Super-admin console.",
-    "sprint0Notice": "Sprint 0 scaffolding — admin SPA"
+    "sprint0Notice": "Sprint 0 scaffolding — admin SPA",
+    "dashboardPlaceholder": "Admin dashboard placeholder — full surface lands in a later sprint.",
+    "locale": {
+      "switcher": "Language",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    }
   }
 }

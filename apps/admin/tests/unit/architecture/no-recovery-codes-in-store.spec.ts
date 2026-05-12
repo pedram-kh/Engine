@@ -21,14 +21,13 @@
  *   loading flag is explicitly allowlisted — it is a boolean toggle
  *   for the action, not the codes themselves.
  *
- * The second-layer assertion in main's mirror file ("the future
- * RecoveryCodesDisplay.vue must not import the store") is deliberately
- * NOT replicated here yet: the admin SPA does not have a recovery-codes
- * display component until sub-chunk 7.5. When 7.5 lands, this test
- * MUST be extended with the equivalent guard against the admin
- * component's path, OR the future admin RecoveryCodesDisplay must
- * share an architecturally-equivalent component from `@catalyst/ui`
- * (in which case the existing guard on main is sufficient).
+ * The second-layer assertion (chunk 6.7) is now active for admin too:
+ * `apps/admin/src/modules/auth/components/RecoveryCodesDisplay.vue`
+ * (added in sub-chunk 7.5 as a structural mirror of main's component
+ * rather than a shared `@catalyst/ui` extract — Group 3 deviation #D2,
+ * documented in the Group 3 review) must NOT import the admin auth
+ * store, even at the import statement level. The component receives
+ * its codes through a prop and emits when the admin has saved them.
  *
  * If a future store legitimately needs to reference recovery codes
  * for some non-display reason (audit, telemetry, etc.) — extend this
@@ -104,5 +103,19 @@ describe('apps/admin/src/modules/**/stores — no recovery codes in Pinia state'
         ].join('\n'),
       )
     }
+  })
+
+  it('RecoveryCodesDisplay.vue does NOT import useAdminAuthStore (chunk 7.5 extension)', async () => {
+    const componentPath = path.resolve(
+      __dirname,
+      '../../../src/modules/auth/components/RecoveryCodesDisplay.vue',
+    )
+    const raw = await fs.readFile(componentPath, 'utf8')
+    // Strip line + block comments before matching so the docblock
+    // explaining the rule does not itself trip the rule.
+    const stripped = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
+    expect(stripped).not.toMatch(/\bimport\b[\s\S]*?\buseAdminAuthStore\b/)
+    expect(stripped).not.toMatch(/\buseAdminAuthStore\s*\(/)
+    expect(stripped).not.toMatch(/from\s+['"][^'"]*\/stores\/useAdminAuthStore['"]/)
   })
 })

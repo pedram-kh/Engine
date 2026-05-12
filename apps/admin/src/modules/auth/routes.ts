@@ -73,7 +73,7 @@ export const authRoutes: RouteRecordRaw[] = [
   {
     path: '/sign-in',
     name: 'auth.sign-in',
-    component: () => import('@/core/pages/PlaceholderPage.vue'),
+    component: () => import('@/modules/auth/pages/SignInPage.vue'),
     meta: { layout: 'auth', guards: ['requireGuest'] },
   },
 
@@ -85,7 +85,7 @@ export const authRoutes: RouteRecordRaw[] = [
   {
     path: '/auth/2fa/enable',
     name: 'auth.2fa.enable',
-    component: () => import('@/core/pages/PlaceholderPage.vue'),
+    component: () => import('@/modules/auth/pages/EnableTotpPage.vue'),
     meta: { layout: 'auth', guards: ['requireAuth'] },
   },
   // 2FA verification challenge — used during the sign-in flow when the
@@ -94,7 +94,7 @@ export const authRoutes: RouteRecordRaw[] = [
   {
     path: '/auth/2fa/verify',
     name: 'auth.2fa.verify',
-    component: () => import('@/core/pages/PlaceholderPage.vue'),
+    component: () => import('@/modules/auth/pages/VerifyTotpPage.vue'),
     meta: { layout: 'auth' },
   },
   // 2FA disable — requires a full authenticated MFA-enrolled session.
@@ -104,7 +104,7 @@ export const authRoutes: RouteRecordRaw[] = [
   {
     path: '/auth/2fa/disable',
     name: 'auth.2fa.disable',
-    component: () => import('@/core/pages/PlaceholderPage.vue'),
+    component: () => import('@/modules/auth/pages/DisableTotpPage.vue'),
     meta: { layout: 'auth', guards: ['requireAuth', 'requireMfaEnrolled'] },
   },
 ]

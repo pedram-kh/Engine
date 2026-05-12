@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\TestHelpers\Http\Controllers\CreateAdminUserController;
 use App\TestHelpers\Http\Controllers\IssueTotpController;
 use App\TestHelpers\Http\Controllers\IssueTotpFromSecretController;
 use App\TestHelpers\Http\Controllers\MintVerificationTokenController;
@@ -64,4 +65,13 @@ Route::prefix('_test')
             ->name('rate_limiter.neutralize');
         Route::delete('rate-limiter/{name}', [NeutralizeRateLimiterController::class, 'destroy'])
             ->name('rate_limiter.restore');
+
+        // Chunk 7.6 spec subject provisioning. Production sign-up
+        // rejects `platform_admin` (admin onboarding is out-of-band
+        // per `docs/20-PHASE-1-SPEC.md` § 5) so the admin SPA's E2E
+        // suite cannot seed its own subject through production paths.
+        // This route fills exactly that gap. See the controller
+        // docblock for the design discussion + Group 3 deviation #D1.
+        Route::post('users/admin', CreateAdminUserController::class)
+            ->name('users.admin.create');
     });

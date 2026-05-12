@@ -1,28 +1,46 @@
 <script setup lang="ts">
 /**
- * Top-level admin application shell.
+ * Top-level admin application shell — a layout switcher.
  *
- * Sub-chunk 7.4 ships the router infrastructure but not the auth pages
- * or the `AuthLayout`. This shell is therefore a minimal
- * `<v-app><v-main><router-view /></v-main></v-app>` frame: it lets the
- * router resolve and render the placeholder pages without the
- * route-meta layout switching main's `App.vue` performs (chunk 6.8).
+ * Mirror of `apps/main/src/App.vue` (chunk 6.8). The three
+ * `meta.layout` values declared in
+ * `apps/admin/src/modules/auth/routes.ts` map as follows:
  *
- * Sub-chunk 7.5 will:
- *   - Introduce `apps/admin/src/modules/auth/layouts/AuthLayout.vue`.
- *   - Expand this shell into a `meta.layout`-driven switcher that
- *     mounts `AuthLayout` for `'auth'` / `'error'` routes and the bare
- *     `<v-app>` for `'app'` routes — exact mirror of main's chunk-6.8
- *     `App.vue`.
+ *   - `'auth'`  → centred-card layout via `AuthLayout.vue` (sign-in
+ *                 + 2FA enrol/verify/disable routes).
+ *   - `'error'` → reuses `AuthLayout.vue` (bootstrap-error route is a
+ *                 single message, well-suited to the same frame).
+ *   - `'app'`   → bare `<v-app><v-main>` shell hosting the routed
+ *                 page. Dashboard / settings placeholders provide
+ *                 their own surface inside the slot.
  *
- * The route `meta.layout` field is already declared in
- * `apps/admin/src/modules/auth/routes.ts` so 7.5's expansion is a
- * template change only, not a route-table change.
+ * `AuthLayout.vue` owns its own `<v-app>` (chunk 7.5), so this file
+ * MUST NOT wrap auth/error routes in another `<v-app>` — Vuetify
+ * warns and the second app's theme tokens never resolve. The
+ * conditional `v-if` / `v-else` ensures only one `<v-app>` is mounted
+ * per route.
+ *
+ * Initial render before route resolution falls through to the `'app'`
+ * branch: `meta.layout` is `undefined` for the `currentRoute` placeholder
+ * Vue Router exposes before the first navigation, and the bare shell
+ * is the safe default.
  */
+
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+import AuthLayout from '@/modules/auth/layouts/AuthLayout.vue'
+
+const route = useRoute()
+
+const layout = computed<'auth' | 'app' | 'error'>(() => route.meta.layout ?? 'app')
 </script>
 
 <template>
-  <v-app>
+  <AuthLayout v-if="layout === 'auth' || layout === 'error'">
+    <router-view />
+  </AuthLayout>
+  <v-app v-else>
     <v-main>
       <router-view />
     </v-main>

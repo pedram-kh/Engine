@@ -2,6 +2,13 @@
   "app": {
     "title": "Catalyst Engine — Admin",
     "subtitle": "Consola de super-administrador.",
-    "sprint0Notice": "Sprint 0 — estrutura inicial da SPA admin"
+    "sprint0Notice": "Sprint 0 — estrutura inicial da SPA admin",
+    "dashboardPlaceholder": "Painel de administração temporário — a versão completa chega num sprint posterior.",
+    "locale": {
+      "switcher": "Idioma",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    }
   }
 }
