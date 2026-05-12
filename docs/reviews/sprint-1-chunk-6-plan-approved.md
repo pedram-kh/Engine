@@ -8,6 +8,13 @@
 **Hotfix saga closure:** Commit `b715cfa` (auth-ip neutralisation in specs #19/#20) is the terminal hotfix in the chunk-7.1 post-merge series; CI run [25689460184](https://github.com/pedram-kh/Engine/actions/runs/25689460184) is the durable green-CI proof. See the post-merge addendum in `sprint-1-chunk-7-1-review.md` for the full nine-hotfix lineage and root-cause breakdown.
 **Chunk 7 progress:** Group 1 (sub-chunks 7.2 + 7.3 — admin SPA Pinia auth store + admin SPA i18n bundle) closed in commit `d2ec623`. See `sprint-1-chunk-7-2-to-7-3-review.md`. Group 2 (sub-chunk 7.4 — admin SPA router + guards + mandatory-MFA enforcement) closed in commit `5bf881a`. See `sprint-1-chunk-7-4-review.md`; Group 3 (sub-chunks 7.5 + 7.6 + 7.7 — admin auth pages + admin E2E + admin module README + chunk 7 self-review) is the next session.
 
+## Chunk 7 closure
+
+**Status:** Closed — all 7 sub-chunks shipped (7.1 + 7.2-7.3 + 7.4 + 7.5-7.7), see review files for details.
+**Final group:** Group 3 (sub-chunks 7.5 + 7.6 + 7.7 — admin auth pages + admin E2E specs + e2e-admin CI extension + admin auth module README + chunk-7 self-review) closed in commit `d457cb1`. See `sprint-1-chunk-7-5-to-7-7-review.md` (merged Group 3 review) and `sprint-1-chunk-7-self-review.md` (chunk-7 closing retrospective).
+**Sprint 1 admin-side scope:** Complete. Admin SPA is feature-complete for Sprint 1's acceptance criteria (auth pages, mandatory-MFA enforcement with D7 deep-link preservation, E2E coverage of the critical auth flows, full e2e-admin CI stack mirroring e2e-main).
+**Next:** Sprint 1 proceeds to chunk 8 (theme system + preferences).
+
 This is a checkpoint file for chat-session resumption. Sprint 1 Chunk 6 is unusually large (9 sub-chunks) so the approved plan and the Q-and-A answers are recorded here durably.
 
 ---
