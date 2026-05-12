@@ -70,8 +70,13 @@ export const semanticDark = {
     secondary: neutral[800],
     secondaryHover: neutral[700],
     secondaryFg: brand.cream,
-    danger: '#EF4444',
-    dangerHover: palette.danger[500],
+    // Aligned with the light palette (palette.danger[500] = #DC2626)
+    // by chunk 8.1. The previous lighter shade (#EF4444) measured
+    // 3.69:1 against white text, below WCAG AA-normal (4.5:1).
+    // #DC2626 measures 4.83:1 against white. The hover state moves
+    // darker for tactile feedback on a dark backdrop.
+    danger: palette.danger[500],
+    dangerHover: '#B91C1C',
     dangerFg: neutral[0],
   },
   focusRing: brand.teal[400],

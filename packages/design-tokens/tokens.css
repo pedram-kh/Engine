@@ -148,8 +148,11 @@
   --color-action-secondary-hover: var(--neutral-700);
   --color-action-secondary-fg: var(--brand-cream);
 
-  --color-action-danger: #ef4444;
-  --color-action-danger-hover: var(--danger-500);
+  /* Aligned with the light palette by chunk 8.1; the previous
+   * #ef4444 measured 3.69:1 against white text, below WCAG AA-normal
+   * (4.5:1). #dc2626 measures 4.83:1 against white. */
+  --color-action-danger: var(--danger-500);
+  --color-action-danger-hover: #b91c1c;
   --color-action-danger-fg: var(--neutral-0);
 
   --color-focus-ring: var(--brand-teal-400);
@@ -183,8 +186,9 @@
     --color-action-secondary-hover: var(--neutral-700);
     --color-action-secondary-fg: var(--brand-cream);
 
-    --color-action-danger: #ef4444;
-    --color-action-danger-hover: var(--danger-500);
+    /* Mirrors the explicit dark theme above (chunk 8.1 WCAG AA fix). */
+    --color-action-danger: var(--danger-500);
+    --color-action-danger-hover: #b91c1c;
     --color-action-danger-fg: var(--neutral-0);
 
     --color-focus-ring: var(--brand-teal-400);

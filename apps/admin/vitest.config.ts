@@ -30,12 +30,18 @@ export default mergeConfig(
           'src/modules/auth/**/*.{ts,vue}',
           'src/core/router/**/*.ts',
           'src/core/api/**/*.ts',
+          // Chunk-8.1: theme-management composable (`useTheme`) is the
+          // single source of truth for theme state in the admin SPA.
+          // The kickoff demands 100% Vitest coverage on the composable;
+          // include the directory so the gate enforces it.
+          'src/composables/**/*.ts',
         ],
         exclude: [
           'src/modules/auth/**/*.spec.ts',
           'src/modules/auth/**/*.test.ts',
           'src/core/router/**/*.spec.ts',
           'src/core/api/**/*.spec.ts',
+          'src/composables/**/*.spec.ts',
           // `admin-auth.api.ts` is a thin re-export of the singleton
           // from `core/api`. The store tests mock the module entirely
           // (so `core/api` is never loaded under jsdom — that file

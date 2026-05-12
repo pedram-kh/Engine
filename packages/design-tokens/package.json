@@ -23,11 +23,16 @@
     "README.md"
   ],
   "scripts": {
-    "test": "echo 'no tests yet' && exit 0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "lint": "echo 'no lint yet' && exit 0",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "typescript": "~5.6.3"
+    "@vitest/coverage-v8": "^2.1.9",
+    "colord": "^2.9.3",
+    "typescript": "~5.6.3",
+    "vitest": "^2.1.8"
   }
 }
