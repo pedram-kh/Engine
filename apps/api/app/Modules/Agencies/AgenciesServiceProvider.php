@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Agencies;
 
+use App\Modules\Agencies\Services\AgencyInvitationService;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -12,7 +13,7 @@ final class AgenciesServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // Module contract bindings are added by the sprint that builds this module.
+        $this->app->singleton(AgencyInvitationService::class);
     }
 
     public function boot(): void

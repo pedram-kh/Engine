@@ -55,6 +55,20 @@ enum AuditAction: string
     case UserSuspended = 'user.suspended';
     case UserUnsuspended = 'user.unsuspended';
 
+    // Brand verbs (Sprint 2 Chunk 1).
+    case BrandCreated = 'brand.created';
+    case BrandUpdated = 'brand.updated';
+    case BrandArchived = 'brand.archived';
+    case BrandRestored = 'brand.restored';
+
+    // Agency user invitation verbs (Sprint 2 Chunk 1).
+    case InvitationCreated = 'invitation.created';
+    case InvitationAccepted = 'invitation.accepted';
+    case InvitationExpiredOnAttempt = 'invitation.expired_on_attempt';
+
+    // Agency settings verbs (Sprint 2 Chunk 1).
+    case AgencySettingsUpdated = 'agency_settings.updated';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *

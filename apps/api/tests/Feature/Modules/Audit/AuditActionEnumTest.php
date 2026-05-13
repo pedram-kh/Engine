@@ -7,8 +7,9 @@ use Tests\TestCase;
 
 uses(TestCase::class);
 
-it('AuditAction catalogue lists every Sprint 1 auth + user + mfa verb', function (): void {
+it('AuditAction catalogue lists every Sprint 1+2 auth + user + mfa + brand + invitation + settings verb', function (): void {
     $expected = [
+        // Sprint 1 — auth
         'auth.signup',
         'auth.login.succeeded',
         'auth.login.failed',
@@ -20,17 +21,30 @@ it('AuditAction catalogue lists every Sprint 1 auth + user + mfa verb', function
         'auth.email.verified',
         'auth.account_locked.suspended',
         'auth.account_unlocked',
+        // Sprint 1 — MFA
         'mfa.enabled',
         'mfa.confirmed',
         'mfa.disabled',
         'mfa.recovery_codes_regenerated',
         'mfa.recovery_code_consumed',
         'mfa.enrollment_suspended',
+        // Sprint 1 — user
         'user.created',
         'user.updated',
         'user.deleted',
         'user.suspended',
         'user.unsuspended',
+        // Sprint 2 — brands
+        'brand.created',
+        'brand.updated',
+        'brand.archived',
+        'brand.restored',
+        // Sprint 2 — invitations
+        'invitation.created',
+        'invitation.accepted',
+        'invitation.expired_on_attempt',
+        // Sprint 2 — agency settings
+        'agency_settings.updated',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());
@@ -38,7 +52,7 @@ it('AuditAction catalogue lists every Sprint 1 auth + user + mfa verb', function
     sort($expected);
     sort($actual);
 
-    expect($actual)->toBe($expected, 'AuditAction enum drifted from Sprint 1 catalogue.');
+    expect($actual)->toBe($expected, 'AuditAction enum drifted from Sprint 1+2 catalogue.');
 });
 
 it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', function (): void {

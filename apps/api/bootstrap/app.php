@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Core\Tenancy\EnsureTenancyContext;
 use App\Core\Tenancy\SetTenancyContext;
+use App\Core\Tenancy\SetTenancyFromAgencyRoute;
 use App\Modules\Audit\Http\Middleware\RequireActionReason;
 use App\Modules\Identity\Http\Middleware\UseAdminSessionCookie;
 use Illuminate\Foundation\Application;
@@ -42,6 +43,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'tenancy' => EnsureTenancyContext::class,
             'tenancy.set' => SetTenancyContext::class,
+            // Sprint 2 agency-scoped routes: reads {agency} route binding,
+            // verifies user membership, sets context, returns 404 on mismatch.
+            // See docs/security/tenancy.md §3 and SetTenancyFromAgencyRoute.
+            'tenancy.agency' => SetTenancyFromAgencyRoute::class,
             'action.reason' => RequireActionReason::class,
             'admin.session' => UseAdminSessionCookie::class,
         ]);

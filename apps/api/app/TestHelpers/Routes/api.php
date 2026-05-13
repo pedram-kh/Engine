@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\TestHelpers\Http\Controllers\CreateAdminUserController;
+use App\TestHelpers\Http\Controllers\CreateAgencyInvitationController;
 use App\TestHelpers\Http\Controllers\IssueTotpController;
 use App\TestHelpers\Http\Controllers\IssueTotpFromSecretController;
 use App\TestHelpers\Http\Controllers\MintVerificationTokenController;
@@ -74,4 +75,11 @@ Route::prefix('_test')
         // docblock for the design discussion + Group 3 deviation #D1.
         Route::post('users/admin', CreateAdminUserController::class)
             ->name('users.admin.create');
+
+        // Sprint 2 Chunk 1 — invitation provisioning for Chunk 2's E2E
+        // accept-invitation spec. Returns the unhashed token so the spec
+        // can click the magic-link without intercepting an email.
+        // Mirrors CreateAdminUserController shape (chunk 7.6 pattern).
+        Route::post('agencies/{agency}/invitations', CreateAgencyInvitationController::class)
+            ->name('agencies.invitations.create');
     });
