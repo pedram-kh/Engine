@@ -34,6 +34,7 @@ final class AgencyUserInvitation extends Model
 
     /** @use HasFactory<AgencyUserInvitationFactory> */
     use HasFactory;
+
     use HasUlid;
 
     protected $table = 'agency_user_invitations';

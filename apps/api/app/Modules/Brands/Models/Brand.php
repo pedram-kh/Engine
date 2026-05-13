@@ -41,6 +41,7 @@ final class Brand extends Model
 
     /** @use HasFactory<BrandFactory> */
     use HasFactory;
+
     use HasUlid;
     use SoftDeletes;
 
