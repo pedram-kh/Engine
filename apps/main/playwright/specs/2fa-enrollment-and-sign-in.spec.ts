@@ -52,7 +52,7 @@ import {
  * flake the spec.
  */
 
-const PASSWORD = 'CorrectHorseBatteryStaple1!'
+const PASSWORD = 'Cata1yst-E2E-2FA-Spec!'
 
 function uniqueEmail(): string {
   // Per-test email keeps the suite hermetic across re-runs even if

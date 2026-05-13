@@ -146,9 +146,9 @@ test.describe('Invitation happy path', () => {
     // Should show pending state with accept button.
     await expect(page.locator(dt(testIds.acceptInvitationPending))).toBeVisible({ timeout: 8000 })
     await expect(page.locator(dt(testIds.acceptInvitationBtn))).toBeVisible()
-    await expect(page.locator(dt(testIds.acceptInvitationDescription))).toContainText(
-      'agency_manager',
-    )
+    // Description is i18n-translated, so role renders as the user-facing label
+    // ("Manager") not the raw enum value ("agency_manager").
+    await expect(page.locator(dt(testIds.acceptInvitationDescription))).toContainText('Manager')
 
     // Accept the invitation.
     await page.locator(dt(testIds.acceptInvitationBtn)).click()

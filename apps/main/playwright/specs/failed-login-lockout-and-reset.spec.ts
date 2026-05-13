@@ -99,8 +99,8 @@ import {
  *     on every fresh request the spec issues.
  */
 
-const WRONG_PASSWORD = 'WrongPassword42!'
-const CORRECT_PASSWORD = 'CorrectHorseBatteryStaple1!'
+const WRONG_PASSWORD = 'Cata1yst-E2E-Wrong-Pwd!'
+const CORRECT_PASSWORD = 'Cata1yst-E2E-Lockout-Spec!'
 
 function uniqueEmail(): string {
   return `spec20-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`
