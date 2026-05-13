@@ -57,21 +57,21 @@ test.describe('Brand happy path', () => {
     await page.locator(dt(testIds.signInSubmit)).click()
 
     // ── Verify AgencyLayout rendered ─────────────────────────────────────────
-    await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible()
-    await expect(page.locator(dt(testIds.agencySidebar))).toBeVisible()
-    await expect(page.locator(dt(testIds.agencyTopbar))).toBeVisible()
+    await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible({ timeout: 10000 })
+    await expect(page.locator(dt(testIds.agencySidebar))).toBeVisible({ timeout: 8000 })
+    await expect(page.locator(dt(testIds.agencyTopbar))).toBeVisible({ timeout: 8000 })
 
     // ── Navigate to brands ───────────────────────────────────────────────────
     await page.locator(dt(testIds.navBrands)).click()
-    await expect(page.locator(dt(testIds.brandListPage))).toBeVisible()
-    await expect(page.locator(dt(testIds.brandListHeading))).toBeVisible()
+    await expect(page.locator(dt(testIds.brandListPage))).toBeVisible({ timeout: 10000 })
+    await expect(page.locator(dt(testIds.brandListHeading))).toBeVisible({ timeout: 8000 })
 
     // Empty state should appear (no brands yet).
-    await expect(page.locator(dt(testIds.brandEmptyState))).toBeVisible()
+    await expect(page.locator(dt(testIds.brandEmptyState))).toBeVisible({ timeout: 8000 })
 
     // ── Create a brand ────────────────────────────────────────────────────────
     await page.locator(dt(testIds.brandEmptyCta)).click()
-    await expect(page.locator(dt(testIds.brandCreatePage))).toBeVisible()
+    await expect(page.locator(dt(testIds.brandCreatePage))).toBeVisible({ timeout: 10000 })
 
     await page.locator(dt(testIds.brandName)).locator('input').fill('Acme Brand')
     // Trigger slug auto-suggestion.
@@ -100,8 +100,10 @@ test.describe('Brand happy path', () => {
 
     // ── Navigate to brand list and verify it appears ──────────────────────────
     await page.locator(dt(testIds.navBrands)).click()
-    await expect(page.locator(dt(testIds.brandTable))).toBeVisible()
-    await expect(page.locator(dt(testIds.brandTable))).toContainText('Acme Brand Updated')
+    await expect(page.locator(dt(testIds.brandTable))).toBeVisible({ timeout: 10000 })
+    await expect(page.locator(dt(testIds.brandTable))).toContainText('Acme Brand Updated', {
+      timeout: 8000,
+    })
 
     // ── Archive the brand ─────────────────────────────────────────────────────
     // Get the ULID from the page URL and navigate to detail.

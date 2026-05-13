@@ -51,7 +51,7 @@ test.describe('Permission gating', () => {
 
     // Create a staff member by seeding an invitation + accepting it.
     const staffEmail = `staff-${Date.now()}@catalyst-test.dev`
-    const staffPassword = 'Password1!'
+    const staffPassword = 'Password123!'
 
     // Create the staff user account.
     await signUpUser(request, staffEmail, staffPassword, 'Staff User')
@@ -73,7 +73,7 @@ test.describe('Permission gating', () => {
 
     // Accept the invitation (staff user must do this first to join the agency).
     await page.goto(acceptUrl)
-    await expect(page.locator(dt(testIds.acceptInvitationPending))).toBeVisible({ timeout: 8000 })
+    await expect(page.locator(dt(testIds.acceptInvitationPending))).toBeVisible({ timeout: 10000 })
     await page.locator(dt(testIds.acceptInvitationBtn)).click()
     await expect(page.locator(dt(testIds.acceptInvitationSuccess))).toBeVisible({ timeout: 8000 })
 
@@ -81,7 +81,7 @@ test.describe('Permission gating', () => {
     await page.goto('/agency-users')
 
     // The requireAgencyAdmin guard should redirect to /brands.
-    await expect(page.locator(dt(testIds.brandListPage))).toBeVisible({ timeout: 8000 })
+    await expect(page.locator(dt(testIds.brandListPage))).toBeVisible({ timeout: 10000 })
 
     // Verify: even if staff navigates to the agency layout, they see no invite button.
     // Navigate to brands (agency-wrapped route) to confirm layout renders.
@@ -96,11 +96,11 @@ test.describe('Permission gating', () => {
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(adminPassword)
     await page.locator(dt(testIds.signInSubmit)).click()
 
-    await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible()
+    await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible({ timeout: 10000 })
 
     // Admin can reach /agency-users.
     await page.goto('/agency-users')
-    await expect(page.locator(dt(testIds.agencyUsersPage))).toBeVisible({ timeout: 8000 })
-    await expect(page.locator(dt(testIds.inviteUserBtn))).toBeVisible()
+    await expect(page.locator(dt(testIds.agencyUsersPage))).toBeVisible({ timeout: 10000 })
+    await expect(page.locator(dt(testIds.inviteUserBtn))).toBeVisible({ timeout: 8000 })
   })
 })

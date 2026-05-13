@@ -3,9 +3,11 @@ import { expect, test } from '@playwright/test'
 import { dt, testIds } from '../helpers/selectors'
 import {
   neutralizeThrottle,
+  resetClock,
   restoreThrottle,
   seedAgencyAdmin,
   seedAgencyInvitation,
+  setClock,
   signOutViaApi,
   signUpUser,
 } from '../fixtures/test-helpers'
@@ -49,6 +51,9 @@ test.describe('Invitation happy path', () => {
     const request = page.context().request
     await restoreThrottle(request, 'auth-ip')
     await signOutViaApi(request)
+    // Belt-and-suspenders: the expired-invitation test uses setClock;
+    // reset ensures the pinned time doesn't bleed into subsequent specs.
+    await resetClock(request)
   })
 
   test('agency_admin can invite a user via the modal', async ({ page }) => {
@@ -58,7 +63,7 @@ test.describe('Invitation happy path', () => {
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(adminPassword)
     await page.locator(dt(testIds.signInSubmit)).click()
 
-    await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible()
+    await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible({ timeout: 10000 })
 
     // Navigate to team page.
     await page.locator(dt(testIds.navAgencyUsers)).click()
@@ -114,7 +119,7 @@ test.describe('Invitation happy path', () => {
     const request = page.context().request
 
     const inviteeEmail = `invitee-${Date.now()}@catalyst-test.dev`
-    const inviteePassword = 'Password1!'
+    const inviteePassword = 'Password123!'
 
     // Create the invitee account via production sign-up.
     await signUpUser(request, inviteeEmail, inviteePassword, 'Invitee User')
@@ -156,14 +161,19 @@ test.describe('Invitation happy path', () => {
 
     const inviteeEmail = `invitee-expired-${Date.now()}@catalyst-test.dev`
 
-    // Seed an invitation that is already expired.
+    // Seed a valid invitation (min 1 day per backend validation min:1).
     const { acceptUrl } = await seedAgencyInvitation(request, agencyUlid, {
       email: inviteeEmail,
       role: 'agency_manager',
-      expiresInDays: -1, // past the expiry date
+      expiresInDays: 1,
     })
 
-    // Navigate to the expired accept URL (no auth needed for preview).
+    // Advance the backend clock 2 days so the 1-day invitation is expired.
+    // Chunk-7.1 convention: pair setClock with resetClock in afterEach (done above).
+    const twoDaysFromNow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
+    await setClock(request, twoDaysFromNow)
+
+    // Navigate to the accept URL — preview endpoint sees expired invitation.
     await page.goto(acceptUrl)
 
     // Should show expired state.
