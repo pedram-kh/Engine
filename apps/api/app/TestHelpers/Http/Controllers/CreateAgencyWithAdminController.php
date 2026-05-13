@@ -8,11 +8,11 @@ use App\Modules\Agencies\Database\Factories\AgencyFactory;
 use App\Modules\Agencies\Enums\AgencyRole;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyMembership;
-use App\Modules\Identity\Database\Factories\UserFactory;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -85,15 +85,22 @@ final class CreateAgencyWithAdminController
             : fake()->unique()->company();
 
         // Create an agency_user-typed, email-verified user with a known password.
+        // Use User::query()->create() directly (mirrors CreateAdminUserController)
+        // rather than UserFactory so we control the password without triggering
+        // the model's `hashed` cast on a pre-hashed value (RuntimeException in CI).
         /** @var User $user */
-        $user = UserFactory::new()
-            ->state([
-                'type' => UserType::AgencyUser,
-                'email' => $email,
-                'name' => $name,
-                'email_verified_at' => now(),
-            ])
-            ->create(['password' => bcrypt($password)]);
+        $user = User::query()->create([
+            'type' => UserType::AgencyUser,
+            'email' => $email,
+            'name' => $name,
+            'email_verified_at' => now(),
+            'password' => Hash::make($password),
+            'preferred_language' => 'en',
+            'preferred_currency' => 'EUR',
+            'timezone' => 'UTC',
+            'mfa_required' => false,
+            'is_suspended' => false,
+        ]);
 
         // Create the agency.
         /** @var Agency $agency */
