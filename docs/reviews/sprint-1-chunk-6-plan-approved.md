@@ -116,3 +116,12 @@ Chunk 2 (frontend) is next.
 **Closing artifacts:** `docs/reviews/sprint-2-chunk-2-review.md` (Chunk 2 merged review), `docs/reviews/sprint-2-self-review.md` (Sprint 2 retrospective). Both closed by Claude — no change requests.
 **Test counts at close:** 992 tests green (462 Pest + 298 main Vitest + 232 admin Vitest). Lint, typecheck, Pint all clean.
 **Next:** Sprint 3 — dashboard, creators, campaigns per `20-PHASE-1-SPEC.md` § 5 Sprint 3.
+
+---
+
+## Sprint 3 progress
+
+Sprint 3 Chunk 1 (creator-domain backend foundation: 8 new tables + tracked_jobs, 9 Eloquent models with Audited/Encrypted casts, CreatorPolicy, CreatorBootstrapService called from SignUpService transaction, 8 wizard step endpoints + GET /me bootstrap, CompletenessScoreCalculator, AvatarUploadService + PortfolioUploadService, 3 provider contracts with Deferred stubs, 4 MinIO disks, reusable TrackedJob infrastructure with GET /api/v1/jobs/{job}, bulk-invite pipeline with CSV parser + queued job + ProspectCreatorInviteMail, InvitationPreviewController with no-email response shape per #42, in-controller authorizeAdmin pattern per D-pause-9, 15+ new audit-action enum cases, tenancy.md allowlist extension, 6 doc fix-ups, 5 tech-debt entries) closed 2026-05-13.
+Commit: `2376488` — `feat(creators): backend foundation — wizard/bulk-invite/providers/tracked-jobs (sprint 3 chunk 1)`
+597 Pest tests passing (1816 assertions; 462 Sprint 2 baseline + ~135 new). PHPStan level 8 clean. Pint clean (sandbox; CI authoritative per #41). Review: `docs/reviews/sprint-3-chunk-1-review.md` (Status: Ready for review).
+Chunk 2 (provider mocks + complete wizard side-effects + accept-invite flow) is next.
