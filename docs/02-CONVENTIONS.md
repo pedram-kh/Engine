@@ -703,7 +703,7 @@ Every PR:
 
 ### 6.3 Local dev setup
 
-- **Docker Compose** for local services: Postgres, Redis, Mailhog.
+- **Docker Compose** for local services: Postgres, Redis, Mailhog, **MinIO** (S3-compatible storage; backs the `media`, `contracts`, `exports`, and `media-public` Laravel disks introduced in Sprint 3 Chunk 1 — see [`docs/runbooks/local-dev.md`](./runbooks/local-dev.md) for bucket bootstrap).
 - **Makefile or `pnpm` scripts** for common tasks: `pnpm db:reset`, `pnpm db:seed`, `pnpm test`.
 - **Laravel Sail** is acceptable but the project uses a custom docker-compose.yml because we need Vue SPAs alongside.
 

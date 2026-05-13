@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Services;
 
+use App\Modules\Creators\Services\CreatorBootstrapService;
 use App\Modules\Identity\Enums\ThemePreference;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Events\EmailVerificationSent;
@@ -25,10 +26,12 @@ use Illuminate\Support\Facades\DB;
  *
  * Strict invariants:
  *
- *   - Exactly ONE row written to `users`. No satellite profile rows
- *     (admin_profiles, agency_users, creators) are touched here. The
- *     creators table doesn't exist yet (Sprint 3); when it does, the
- *     row is created by the wizard in Sprint 3, not by sign-up.
+ *   - Creates the User row; delegates Creator-row bootstrap to
+ *     {@see CreatorBootstrapService} (see
+ *     app/Modules/Creators/Services/CreatorBootstrapService.php). Single
+ *     transaction guarantees no User-without-Creator state. No other
+ *     satellite profile rows (admin_profiles, agency_users) are touched
+ *     here — those are owned by their respective modules.
  *
  *   - NO authentication side effects: no session cookie, no
  *     `Auth::login()`, no `last_login_*` stamping. The user must
@@ -56,6 +59,7 @@ final class SignUpService
         private readonly MailFactory $mail,
         private readonly Repository $config,
         private readonly EmailVerificationToken $tokens,
+        private readonly CreatorBootstrapService $creatorBootstrap,
     ) {}
 
     /**
@@ -70,7 +74,7 @@ final class SignUpService
 
         /** @var User $user */
         $user = DB::transaction(function () use ($email, $name, $password, $preferredLanguage): User {
-            return User::query()->create([
+            $user = User::query()->create([
                 'email' => $email,
                 'name' => $name,
                 'password' => $password,
@@ -83,6 +87,14 @@ final class SignUpService
                 'is_suspended' => false,
                 'email_verified_at' => null,
             ]);
+
+            // Bootstrap the Creator satellite row in the same transaction.
+            // Failure to create the Creator row aborts the User insert too,
+            // so the database never holds a creator-typed User without
+            // a corresponding Creator row.
+            $this->creatorBootstrap->bootstrapForUser($user);
+
+            return $user;
         });
 
         $this->events->dispatch(new UserSignedUp(

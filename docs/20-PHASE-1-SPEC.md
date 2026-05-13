@@ -158,7 +158,7 @@ This is the recommended sequence. Each sprint is roughly 1–2 weeks for a solo 
 
 This is one of the bigger sprints because the creator side is rich.
 
-- `creators`, `creator_social_accounts`, `creator_portfolio_items`, `creator_availability_blocks`, `creator_tax_profiles`, `creator_payout_methods`, `creator_kyc_verifications` tables
+- `creators`, `creator_social_accounts`, `creator_portfolio_items`, `creator_availability_blocks`, `creator_tax_profiles`, `creator_payout_methods`, `creator_kyc_verifications`, `agency_creator_relations` tables (the last is added in Sprint 3 Chunk 1 — Sprint 1's self-review §a inaccurately listed it as already shipped; see [`docs/tech-debt.md`](./tech-debt.md))
 - Creator self-signup flow (multi-step wizard)
   - Step 1: account creation (email, password, 2FA encouraged)
   - Step 2: profile basics (name, bio, country, language, region, categories)

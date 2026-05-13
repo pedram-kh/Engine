@@ -69,6 +69,43 @@ enum AuditAction: string
     // Agency settings verbs (Sprint 2 Chunk 1).
     case AgencySettingsUpdated = 'agency_settings.updated';
 
+    // Creator domain (Sprint 3 Chunk 1).
+    // Bootstrap on sign-up — emitted by CreatorBootstrapService.
+    case CreatorCreated = 'creator.created';
+    case CreatorUpdated = 'creator.updated';
+    case CreatorDeleted = 'creator.deleted';
+
+    // Wizard step completions — emitted on first-successful state transition
+    // (#6 idempotency: re-submitting a completed step does NOT re-emit).
+    case CreatorWizardProfileCompleted = 'creator.wizard.profile_completed';
+    case CreatorWizardSocialCompleted = 'creator.wizard.social_completed';
+    case CreatorWizardPortfolioCompleted = 'creator.wizard.portfolio_completed';
+    case CreatorWizardKycInitiated = 'creator.wizard.kyc_initiated';
+    case CreatorWizardTaxCompleted = 'creator.wizard.tax_completed';
+    case CreatorWizardPayoutInitiated = 'creator.wizard.payout_initiated';
+    case CreatorWizardContractInitiated = 'creator.wizard.contract_initiated';
+    case CreatorSubmitted = 'creator.submitted';
+
+    // Bulk roster invitation (Sprint 3 Chunk 1, agency-side).
+    case CreatorInvited = 'creator.invited';
+    case BulkInviteStarted = 'bulk_invite.started';
+    case BulkInviteCompleted = 'bulk_invite.completed';
+    case BulkInviteFailed = 'bulk_invite.failed';
+
+    // Auto-emitted by Audited trait on related models. Each model
+    // overrides auditAction() to produce snake_case subject naming
+    // (the trait's default class_basename lowercase produces
+    // unreadable names like 'creatortaxprofile.created').
+    case CreatorTaxProfileCreated = 'creator_tax_profile.created';
+    case CreatorTaxProfileUpdated = 'creator_tax_profile.updated';
+    case CreatorTaxProfileDeleted = 'creator_tax_profile.deleted';
+    case CreatorPayoutMethodCreated = 'creator_payout_method.created';
+    case CreatorPayoutMethodUpdated = 'creator_payout_method.updated';
+    case CreatorPayoutMethodDeleted = 'creator_payout_method.deleted';
+    case AgencyCreatorRelationCreated = 'agency_creator_relation.created';
+    case AgencyCreatorRelationUpdated = 'agency_creator_relation.updated';
+    case AgencyCreatorRelationDeleted = 'agency_creator_relation.deleted';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *

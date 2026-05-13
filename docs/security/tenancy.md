@@ -112,11 +112,26 @@ to the allowlist requires:
 
 ### Cross-tenant route allowlist
 
-| Route          | Method | Justification                                  | Added in  |
-| -------------- | ------ | ---------------------------------------------- | --------- |
-| `/up`          | `GET`  | Liveness check; no DB queries.                 | Sprint 0. |
-| `/health`      | `GET`  | Liveness check; reports service identity only. | Sprint 0. |
-| `/api/v1/ping` | `GET`  | Smoke test; returns timestamp only.            | Sprint 0. |
+| Route                                           | Method   | Justification                                                                                           | Added in       |
+| ----------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------- | -------------- |
+| `/up`                                           | `GET`    | Liveness check; no DB queries.                                                                          | Sprint 0.      |
+| `/health`                                       | `GET`    | Liveness check; reports service identity only.                                                          | Sprint 0.      |
+| `/api/v1/ping`                                  | `GET`    | Smoke test; returns timestamp only.                                                                     | Sprint 0.      |
+| `/api/v1/creators/me`                           | `GET`    | Creator is a global entity (data-model § 5); the bootstrap response keys off `auth()->user()->creator`. | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/wizard/profile`            | `PATCH`  | Same — creator-owned wizard step.                                                                       | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/wizard/social`             | `POST`   | Same — creator-owned wizard step.                                                                       | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/wizard/kyc`                | `POST`   | Same — creator-owned wizard step.                                                                       | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/wizard/tax`                | `PATCH`  | Same — creator-owned wizard step.                                                                       | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/wizard/payout`             | `POST`   | Same — creator-owned wizard step.                                                                       | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/wizard/contract`           | `POST`   | Same — creator-owned wizard step.                                                                       | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/wizard/submit`             | `POST`   | Same — creator submits their own application.                                                           | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/avatar`                    | `POST`   | Same — creator uploads their own avatar.                                                                | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/avatar`                    | `DELETE` | Same — creator removes their own avatar.                                                                | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/portfolio/images`          | `POST`   | Same — creator uploads to their own portfolio.                                                          | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/portfolio/videos/init`     | `POST`   | Same — initiates a presigned-S3 upload scoped to the creator's path prefix.                             | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/portfolio/videos/complete` | `POST`   | Same — completes the presigned upload after the client has PUT to S3.                                   | Sprint 3 Ch 1. |
+| `/api/v1/creators/me/portfolio/{item}`          | `DELETE` | Same — creator removes their own portfolio item.                                                        | Sprint 3 Ch 1. |
+| `/api/v1/jobs/{job}`                            | `GET`    | Polled by background-job initiators (e.g. bulk invite); job ownership is verified at the controller.    | Sprint 3 Ch 1. |
 
 (Auth endpoints will be added to this table in Sprint 1 chunk 3 when the
 endpoints themselves land. Admin agency-listing routes will be added in

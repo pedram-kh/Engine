@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 uses(TestCase::class);
 
-it('AuditAction catalogue lists every Sprint 1+2 auth + user + mfa + brand + invitation + settings verb', function (): void {
+it('AuditAction catalogue lists every Sprint 1-3 auth + user + mfa + brand + invitation + settings + creator + bulk_invite verb', function (): void {
     $expected = [
         // Sprint 1 — auth
         'auth.signup',
@@ -45,6 +45,32 @@ it('AuditAction catalogue lists every Sprint 1+2 auth + user + mfa + brand + inv
         'invitation.expired_on_attempt',
         // Sprint 2 — agency settings
         'agency_settings.updated',
+        // Sprint 3 — creator domain
+        'creator.created',
+        'creator.updated',
+        'creator.deleted',
+        'creator.wizard.profile_completed',
+        'creator.wizard.social_completed',
+        'creator.wizard.portfolio_completed',
+        'creator.wizard.kyc_initiated',
+        'creator.wizard.tax_completed',
+        'creator.wizard.payout_initiated',
+        'creator.wizard.contract_initiated',
+        'creator.submitted',
+        'creator.invited',
+        'bulk_invite.started',
+        'bulk_invite.completed',
+        'bulk_invite.failed',
+        // Sprint 3 — auto-emitted by Audited trait on related models
+        'creator_tax_profile.created',
+        'creator_tax_profile.updated',
+        'creator_tax_profile.deleted',
+        'creator_payout_method.created',
+        'creator_payout_method.updated',
+        'creator_payout_method.deleted',
+        'agency_creator_relation.created',
+        'agency_creator_relation.updated',
+        'agency_creator_relation.deleted',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());
@@ -52,7 +78,7 @@ it('AuditAction catalogue lists every Sprint 1+2 auth + user + mfa + brand + inv
     sort($expected);
     sort($actual);
 
-    expect($actual)->toBe($expected, 'AuditAction enum drifted from Sprint 1+2 catalogue.');
+    expect($actual)->toBe($expected, 'AuditAction enum drifted from Sprint 1-3 catalogue.');
 });
 
 it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', function (): void {

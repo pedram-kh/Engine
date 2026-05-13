@@ -93,7 +93,81 @@ If you change ports (e.g., add a Storybook server on 6006), update **both** list
 
 ---
 
-## 6. Where this is enforced
+## 6. MinIO (S3-compatible storage) — Sprint 3 Chunk 1
+
+The Creators module uses four named Laravel disks backed by MinIO in
+local dev:
+
+| Disk           | Bucket               | Visibility | Purpose                                                  |
+| -------------- | -------------------- | ---------- | -------------------------------------------------------- |
+| `media`        | `catalyst-media`     | private    | Avatars, portfolio uploads, anything served via API auth |
+| `media-public` | `catalyst-public`    | public     | Public assets (avatars served via CDN; future use)       |
+| `contracts`    | `catalyst-contracts` | private    | Signed master contracts (Sprint 4+)                      |
+| `exports`      | `catalyst-exports`   | private    | GDPR exports + per-agency archives (Sprint 14)           |
+
+The new MinIO disk is named `media-public` (NOT `public`) to avoid
+colliding with Laravel's default `public` disk. The collision would
+silently re-route any `Storage::disk('public')` consumer to S3 — which
+breaks Sprint 1 features that legitimately use the local-filesystem
+`public` disk. See [`docs/reviews/sprint-3-chunk-1-review.md`](../reviews/sprint-3-chunk-1-review.md)
+"D-pause-5" for the rationale.
+
+### 6.1 Bootstrap (one-time)
+
+Local-dev uses the `minio/mc` CLI in a sidecar container to create the
+four buckets once on first `docker compose up`:
+
+```bash
+docker compose run --rm mc \
+  mb \
+  catalyst/catalyst-media \
+  catalyst/catalyst-public \
+  catalyst/catalyst-contracts \
+  catalyst/catalyst-exports
+```
+
+The `media-public` bucket is then made publicly readable:
+
+```bash
+docker compose run --rm mc anonymous set download catalyst/catalyst-public
+```
+
+### 6.2 Connection settings
+
+The Laravel disks read from these env vars (defaults wired in
+`apps/api/.env.example`):
+
+```env
+AWS_ACCESS_KEY_ID=catalyst-local
+AWS_SECRET_ACCESS_KEY=catalyst-local-secret
+AWS_DEFAULT_REGION=us-east-1
+AWS_ENDPOINT_URL=http://minio:9000
+AWS_USE_PATH_STYLE_ENDPOINT=true
+AWS_BUCKET_MEDIA=catalyst-media
+AWS_BUCKET_PUBLIC=catalyst-public
+AWS_BUCKET_CONTRACTS=catalyst-contracts
+AWS_BUCKET_EXPORTS=catalyst-exports
+```
+
+If the API runs OUTSIDE docker (e.g. via `php artisan serve` against a
+dockerised MinIO), set `AWS_ENDPOINT_URL=http://127.0.0.1:9000` instead.
+
+### 6.3 Troubleshooting
+
+- **`PutObject failed: SignatureDoesNotMatch`**: clock skew between
+  the API container and MinIO. `docker compose restart` fixes it
+  (re-syncs container clocks).
+- **`The specified bucket does not exist`**: run the bootstrap step
+  above; check the bucket actually exists with
+  `docker compose run --rm mc ls catalyst/`.
+- **Avatar uploads succeed but the SPA can't load them**: the SPA
+  fetches via authenticated API proxy, NOT via direct MinIO URL.
+  Avatars live on the `media` (private) disk by design — see
+  `app/Modules/Creators/Services/AvatarUploadService.php`.
+
+---
+
+## 7. Where this is enforced
 
 | Concern                     | Component                                                                 |
 | --------------------------- | ------------------------------------------------------------------------- |

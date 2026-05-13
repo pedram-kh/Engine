@@ -235,3 +235,60 @@ anyone reviewing it later.
 - **Resolution:** extract a `useAgencyPreference` composable mirroring `useThemePreference`, and have `useAgencyStore` delegate to it. The composable becomes the new allowlist entry; the store no longer needs one.
 - **Owner:** Sprint 3 (when workspace-switching becomes a real multi-agency feature).
 - **Status:** open.
+
+---
+
+## Sprint 1 self-review §a inaccuracy — `agency_creator_relations` reconciliation
+
+- **Where:** [`docs/reviews/sprint-1-self-review.md`](./reviews/sprint-1-self-review.md) §a, vs. the Sprint 3 Chunk 1 read pass.
+- **What we accepted in Sprint 3 Chunk 1:** Sprint 1's self-review §a claimed `agency_creator_relations` shipped as part of the multi-tenancy primitives chunk. The Chunk 1 read pass (per standing standard #34, cross-chunk handoff verification) found NO migration, NO model, NO code references outside docs. Chunk 1 created the table from scratch in a single migration with the full P1 column set per spec §6 plus the Sprint-3 invitation columns. Without #34 the chunk would have built against a non-existent table and surfaced as a runtime migration error mid-build.
+- **Risk:** the historical-record drift is benign now that the table exists, but the unreconciled review document misleads any future contributor doing Sprint 1 archaeology (e.g., debugging a multi-tenancy regression, writing a Sprint 1 retrospective, recreating the schema from review-history alone).
+- **Resolution:** in a dedicated doc-cleanup pass, edit `docs/reviews/sprint-1-self-review.md` §a to note the actual handoff state (table NOT shipped; introduced in Sprint 3 Chunk 1 migration #14) and add a forward-pointer to the Sprint 3 Chunk 1 review file.
+- **Owner:** any future doc-cleanup chunk OR the Sprint 4 kickoff read pass (if it surfaces this drift again).
+- **Status:** open.
+
+---
+
+## Standards migration backlog — PROJECT-WORKFLOW.md §5 not yet authoritative
+
+- **Where:** [`docs/PROJECT-WORKFLOW.md`](./PROJECT-WORKFLOW.md) §5 — "Standing standards" list.
+- **What we accepted in Sprint 3 Chunk 1:** §5 today documents standards #5.1–#5.20. The Sprint-1 chunk-7.1 saga added several review-file standards (#5.21+) and the Sprint-2 self-review §b appended ~7 more (cross-chunk handoff verification = #34, defense-in-depth coverage = #40, sandbox Pint not authoritative = #41, no enumerable identifiers = #42, etc.). These standards are de facto applied (Chunk 1 of Sprint 3 explicitly enumerated them as the binding baseline) but have not yet been migrated into PROJECT-WORKFLOW.md §5.
+- **Risk:** a future contributor doing a fresh read of PROJECT-WORKFLOW.md will only see #5.1–#5.20 and may unintentionally regress against the unwritten ~7 additional standards.
+- **Resolution:** in a dedicated housekeeping commit (NOT a feature chunk — process-doc work), append the Sprint 1 chunk-7.1 + Sprint 2 self-review §b standards into PROJECT-WORKFLOW.md §5 with stable numbering. Per Pedram's guidance: drives the migration before Sprint 4 kickoff.
+- **Owner:** dedicated housekeeping commit; Pedram drives.
+- **Status:** open.
+
+---
+
+## Integration driver env-var convention — INTEGRATIONS_DRIVER vs per-provider names
+
+- **Where:** [`docs/06-INTEGRATIONS.md`](./06-INTEGRATIONS.md) §13.1 + [`apps/api/.env.example`](../apps/api/.env.example).
+- **What we accepted in Sprint 3 Chunk 1:** Spec §13.1 names a single `INTEGRATIONS_DRIVER=mock` env var to control which family of provider adapters is bound. The actual `.env.example` uses per-provider variables (e.g. `KYC_PROVIDER=mock`, `ESIGN_PROVIDER=mock`, `STRIPE_PROVIDER=mock`). Sprint 3 Chunk 1 did not reconcile this divergence — Chunk 2 (when it binds Mock implementations behind a driver flag) is the natural decision point.
+- **Risk:** Sprint 4+ ops automation that sets the integration driver may reach for `INTEGRATIONS_DRIVER` first and silently fall back to the deferred stubs because nothing reads it.
+- **Resolution:** Chunk 2 picks one of the two conventions and standardises across spec + `.env.example` + AppServiceProvider binding. Worth landing in 06-INTEGRATIONS.md §13.1 after Chunk 2's decision.
+- **Owner:** Sprint 3 Chunk 2 read pass.
+- **Status:** open.
+
+---
+
+## Resume UX bootstrap shape — admin/creator endpoint symmetry pending
+
+- **Where:** [`apps/api/app/Modules/Creators/Http/Resources/CreatorResource.php`](../apps/api/app/Modules/Creators/Http/Resources/CreatorResource.php) + (future) admin endpoint at `GET /api/v1/admin/creators/{creator}`.
+- **What we accepted in Sprint 3 Chunk 1:** Q2 (resume UX) demands a stable bootstrap response shape between `GET /api/v1/creators/me` and `GET /api/v1/admin/creators/{creator}` (both consumed by Chunk 3's admin pending-approval pane). Chunk 1 ships only the creator-facing endpoint; the admin endpoint is Chunk 3 scope. The shared `CreatorResource` is structured to satisfy both call sites — but no admin-route consumer has yet validated the assumption that the admin view needs zero additional fields beyond what `CreatorResource` exposes today (admin view DOES need `rejection_reason` + `kyc_verifications` history per spec §6.2).
+- **Risk:** Chunk 3 may discover that admin needs additional fields, requiring either (a) a `withAdmin()` factory method that conditionally appends fields, or (b) a dedicated `AdminCreatorResource` that breaks the symmetry promise.
+- **Mitigation today:** `CreatorResource` is a single class with a single `toArray()` shape. Adding admin-only fields via a factory method is a one-file change.
+- **Resolution:** Chunk 3 implements the admin endpoint and either extends `CreatorResource` with a factory method (preferred for shape symmetry) or creates an `AdminCreatorResource` (acceptable but incurs a one-time review cost on the symmetry rationale).
+- **Owner:** Sprint 3 Chunk 3.
+- **Status:** open.
+
+---
+
+## CreatorBootstrapService random throwaway password on bulk-invite
+
+- **Where:** [`apps/api/app/Modules/Creators/Services/BulkInviteService.php::findOrCreateInviteeUser()`](../apps/api/app/Modules/Creators/Services/BulkInviteService.php).
+- **What we accepted in Sprint 3 Chunk 1:** When a bulk-invite row references an email that has no existing User row, the service pre-creates a User with a 64-character random hex string as the password. The invitee sets a real password via the `/auth/accept-invite` flow (Chunk 2 surface). The throwaway password is hashed by Laravel's normal hashing pipeline.
+- **Risk:** The throwaway password is mathematically un-guessable but is technically a valid password. If a future change accidentally exposes the bulk-invited User row to the normal `/auth/login` endpoint before the invitee sets a real password, an attacker who somehow learned the throwaway hex would be able to log in.
+- **Mitigation today:** The bulk-invited User row carries `email_verified_at = null`. The login endpoint already refuses unverified users (Sprint 1 chunk 5).
+- **Resolution:** Chunk 2's accept-invite flow MUST verify (a) the User has `email_verified_at = null`, (b) the relation's invitation_token_hash matches, and (c) re-set the password via the normal `Hash::make()` call before stamping `email_verified_at = now()`. A regression test should pin: a bulk-invited User with the throwaway password in plaintext (somehow leaked) cannot log in via `/auth/login` until they accept-invite.
+- **Owner:** Sprint 3 Chunk 2 (accept-invite flow).
+- **Status:** open.

@@ -10,6 +10,7 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Audit\Concerns\Audited;
 use App\Modules\Audit\Contracts\Auditable;
+use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Database\Factories\UserFactory;
 use App\Modules\Identity\Enums\ThemePreference;
 use App\Modules\Identity\Enums\UserType;
@@ -159,6 +160,19 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
     public function adminProfile(): HasOne
     {
         return $this->hasOne(AdminProfile::class);
+    }
+
+    /**
+     * Creator satellite. Present iff users.type == 'creator' AND
+     * CreatorBootstrapService has run (post-Sprint-3 sign-up always
+     * creates the row in the same transaction). Returns null for
+     * agency_user / platform_admin types.
+     *
+     * @return HasOne<Creator, $this>
+     */
+    public function creator(): HasOne
+    {
+        return $this->hasOne(Creator::class);
     }
 
     public function isPlatformAdmin(): bool
