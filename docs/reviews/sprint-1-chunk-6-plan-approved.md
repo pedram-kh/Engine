@@ -98,3 +98,12 @@ At each review checkpoint, Cursor produces a chat completion summary AND a draft
 ---
 
 _This checkpoint file exists because Sprint 1 chunk 6 spans multiple chat sessions (the Sprint 0 + Sprint 1 chunks 1-5 chat is being closed and a new chat will pick up at chunk 6.1 review). The new chat needs to know what plan was approved and what the open questions' answers were. Without this checkpoint, the resumption would have to recover the answers from chat history that may no longer be available._
+
+---
+
+## Sprint 2 progress
+
+Sprint 2 Chunk 1 (backend: brands CRUD + agency user invitations + agency settings + test-helper) closed 2026-05-13.
+Commit: `b37557a` — `feat(brands): backend — CRUD + invitations + agency settings (sprint 2 chunk 1)`
+452 Pest tests (367 Sprint 1 baseline + 85 new). PHPStan level 8 clean. Review: `docs/reviews/sprint-2-chunk-1-review.md`.
+Chunk 2 (frontend) is next.
