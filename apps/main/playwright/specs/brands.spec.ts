@@ -52,8 +52,8 @@ test.describe('Brand happy path', () => {
   test('agency_admin can navigate brands list, create, detail, edit, archive', async ({ page }) => {
     // ── Sign in ──────────────────────────────────────────────────────────────
     await page.goto('/sign-in')
-    await page.locator(dt(testIds.signInEmail)).fill(adminEmail)
-    await page.locator(dt(testIds.signInPassword)).fill(adminPassword)
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(adminEmail)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(adminPassword)
     await page.locator(dt(testIds.signInSubmit)).click()
 
     // ── Verify AgencyLayout rendered ─────────────────────────────────────────
@@ -73,9 +73,9 @@ test.describe('Brand happy path', () => {
     await page.locator(dt(testIds.brandEmptyCta)).click()
     await expect(page.locator(dt(testIds.brandCreatePage))).toBeVisible()
 
-    await page.locator(dt(testIds.brandName)).fill('Acme Brand')
+    await page.locator(dt(testIds.brandName)).locator('input').fill('Acme Brand')
     // Trigger slug auto-suggestion.
-    await page.locator(dt(testIds.brandName)).blur()
+    await page.locator(dt(testIds.brandName)).locator('input').blur()
 
     await page.locator(dt(testIds.brandFormSubmit)).click()
 
@@ -91,7 +91,7 @@ test.describe('Brand happy path', () => {
     await expect(page.locator(dt(testIds.brandEditPage))).toBeVisible()
 
     // Update the brand name.
-    await page.locator(dt(testIds.brandName)).fill('Acme Brand Updated')
+    await page.locator(dt(testIds.brandName)).locator('input').fill('Acme Brand Updated')
     await page.locator(dt(testIds.brandFormSubmit)).click()
 
     // Should redirect back to detail page.

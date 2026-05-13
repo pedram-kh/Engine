@@ -54,8 +54,8 @@ test.describe('Invitation happy path', () => {
   test('agency_admin can invite a user via the modal', async ({ page }) => {
     // Sign in as admin.
     await page.goto('/sign-in')
-    await page.locator(dt(testIds.signInEmail)).fill(adminEmail)
-    await page.locator(dt(testIds.signInPassword)).fill(adminPassword)
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(adminEmail)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(adminPassword)
     await page.locator(dt(testIds.signInSubmit)).click()
 
     await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible()
@@ -73,7 +73,7 @@ test.describe('Invitation happy path', () => {
 
     // Fill in the invitation form.
     const inviteeEmail = `invitee-${Date.now()}@catalyst-test.dev`
-    await page.locator(dt(testIds.inviteEmail)).fill(inviteeEmail)
+    await page.locator(dt(testIds.inviteEmail)).locator('input').fill(inviteeEmail)
     // Role defaults to manager — keep it.
 
     await page.locator(dt(testIds.inviteSubmit)).click()
@@ -127,8 +127,8 @@ test.describe('Invitation happy path', () => {
 
     // Sign in as invitee first.
     await page.goto('/sign-in')
-    await page.locator(dt(testIds.signInEmail)).fill(inviteeEmail)
-    await page.locator(dt(testIds.signInPassword)).fill(inviteePassword)
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(inviteeEmail)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(inviteePassword)
     await page.locator(dt(testIds.signInSubmit)).click()
 
     // Wait for auth to settle (lands on dashboard or brands list).

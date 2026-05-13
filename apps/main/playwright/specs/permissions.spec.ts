@@ -64,8 +64,8 @@ test.describe('Permission gating', () => {
 
     // Sign in as staff user.
     await page.goto('/sign-in')
-    await page.locator(dt(testIds.signInEmail)).fill(staffEmail)
-    await page.locator(dt(testIds.signInPassword)).fill(staffPassword)
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(staffEmail)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(staffPassword)
     await page.locator(dt(testIds.signInSubmit)).click()
 
     // Wait for auth to settle.
@@ -92,8 +92,8 @@ test.describe('Permission gating', () => {
   test('agency_admin sees Invite user button on /agency-users', async ({ page }) => {
     // Sign in as admin.
     await page.goto('/sign-in')
-    await page.locator(dt(testIds.signInEmail)).fill(adminEmail)
-    await page.locator(dt(testIds.signInPassword)).fill(adminPassword)
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(adminEmail)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(adminPassword)
     await page.locator(dt(testIds.signInSubmit)).click()
 
     await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible()
