@@ -102,6 +102,17 @@ it('returns archived brands when ?status=archived is passed', function (): void 
         ->assertJsonPath('data.0.attributes.name', 'Archived');
 });
 
+it('returns both active and archived brands when ?status=all is passed', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeAdmin();
+    Brand::factory()->forAgency($agency->id)->create(['name' => 'Active Brand']);
+    Brand::factory()->archived()->forAgency($agency->id)->create(['name' => 'Archived Brand']);
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/brands?status=all")
+        ->assertOk()
+        ->assertJsonCount(2, 'data');
+});
+
 it('unauthenticated request returns 401', function (): void {
     $agency = Agency::factory()->createOne();
 

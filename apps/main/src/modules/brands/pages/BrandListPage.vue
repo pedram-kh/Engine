@@ -58,11 +58,13 @@ async function loadBrands(): Promise<void> {
   error.value = null
 
   try {
-    const statusParam = statusFilter.value === 'all' ? undefined : statusFilter.value
+    // Send the filter value verbatim: the backend handles 'active' | 'archived' | 'all'.
+    // 'all' returns both active and archived (soft-deleted) brands so the unified
+    // view can render archived rows alongside active ones.
     const res = await brandsApi.list(agencyId, {
       page: tableOptions.value.page,
       per_page: tableOptions.value.itemsPerPage,
-      status: statusParam,
+      status: statusFilter.value,
     })
     items.value = res.data
     totalItems.value = res.meta.total

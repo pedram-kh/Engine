@@ -19,7 +19,8 @@ import { http } from '@/core/api'
 export interface BrandListParams {
   page?: number
   per_page?: number
-  status?: 'active' | 'archived'
+  /** 'active' (default) | 'archived' | 'all' (active + archived). */
+  status?: 'active' | 'archived' | 'all'
 }
 
 export interface SingleBrandEnvelope {

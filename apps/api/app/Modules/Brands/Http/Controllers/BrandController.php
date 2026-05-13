@@ -23,7 +23,10 @@ final class BrandController
      * GET /api/v1/agencies/{agency}/brands
      *
      * Lists brands for the agency. Default returns active brands only.
-     * Pass `?status=archived` to list archived brands.
+     * Supported `?status` values:
+     *   - 'active'   (default) — only active brands
+     *   - 'archived'           — only archived (soft-deleted) brands
+     *   - 'all'                — both active and archived brands
      * Only one role — any membership — can view.
      */
     public function index(Request $request, Agency $agency): AnonymousResourceCollection
@@ -36,6 +39,10 @@ final class BrandController
 
         if ($status === 'archived') {
             $query->withTrashed()->where('status', BrandStatus::Archived->value);
+        } elseif ($status === 'all') {
+            // Include soft-deleted rows so archived brands surface in the
+            // unified view; the SPA's status chip discriminates client-side.
+            $query->withTrashed();
         } else {
             $query->where('status', BrandStatus::Active->value);
         }
