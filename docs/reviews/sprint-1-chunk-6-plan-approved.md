@@ -107,3 +107,12 @@ Sprint 2 Chunk 1 (backend: brands CRUD + agency user invitations + agency settin
 Commit: `b37557a` — `feat(brands): backend — CRUD + invitations + agency settings (sprint 2 chunk 1)`
 452 Pest tests (367 Sprint 1 baseline + 85 new). PHPStan level 8 clean. Review: `docs/reviews/sprint-2-chunk-1-review.md`.
 Chunk 2 (frontend) is next.
+
+## Sprint 2 closure
+
+**Status:** Sprint 2 fully closed — both chunks shipped and reviewed.
+**Chunk 1 commit:** `b37557a` — backend (brands CRUD + invitations + agency settings + test-helper infrastructure).
+**Chunk 2 commit:** `85494f7` — frontend close-out (agency layout shell, brand CRUD UI, invitation UI, settings UI, E2E specs, useAgencyStore, requireAgencyAdmin guard, PROJECT-WORKFLOW.md § 5 standards 5.11–5.20).
+**Closing artifacts:** `docs/reviews/sprint-2-chunk-2-review.md` (Chunk 2 merged review), `docs/reviews/sprint-2-self-review.md` (Sprint 2 retrospective). Both closed by Claude — no change requests.
+**Test counts at close:** 992 tests green (462 Pest + 298 main Vitest + 232 admin Vitest). Lint, typecheck, Pint all clean.
+**Next:** Sprint 3 — dashboard, creators, campaigns per `20-PHASE-1-SPEC.md` § 5 Sprint 3.
