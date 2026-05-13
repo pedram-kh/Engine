@@ -6,9 +6,11 @@ namespace App\TestHelpers\Http\Controllers;
 
 use App\Modules\Agencies\Database\Factories\AgencyFactory;
 use App\Modules\Agencies\Enums\AgencyRole;
+use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Identity\Database\Factories\UserFactory;
 use App\Modules\Identity\Enums\UserType;
+use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -83,6 +85,7 @@ final class CreateAgencyWithAdminController
             : fake()->unique()->company();
 
         // Create an agency_user-typed, email-verified user with a known password.
+        /** @var User $user */
         $user = UserFactory::new()
             ->state([
                 'type' => UserType::AgencyUser,
@@ -93,6 +96,7 @@ final class CreateAgencyWithAdminController
             ->create(['password' => bcrypt($password)]);
 
         // Create the agency.
+        /** @var Agency $agency */
         $agency = AgencyFactory::new()->create(['name' => $agencyName]);
 
         // Create an accepted agency_admin membership.

@@ -64,18 +64,29 @@ final class UserResource extends JsonResource
      */
     private function agencyMembershipsData(User $user): array
     {
-        return AgencyMembership::query()
+        $rows = AgencyMembership::query()
             ->where('user_id', $user->id)
             ->whereNotNull('accepted_at')
             ->whereNull('deleted_at')
             ->with('agency')
-            ->get()
-            ->map(static fn (AgencyMembership $m): array => [
-                'agency_id' => $m->agency->ulid,
-                'agency_name' => $m->agency->name,
+            ->get();
+
+        $result = [];
+
+        foreach ($rows as $m) {
+            $agency = $m->agency;
+
+            if ($agency === null) {
+                continue;
+            }
+
+            $result[] = [
+                'agency_id' => $agency->ulid,
+                'agency_name' => $agency->name,
                 'role' => $m->role->value,
-            ])
-            ->values()
-            ->all();
+            ];
+        }
+
+        return $result;
     }
 }
