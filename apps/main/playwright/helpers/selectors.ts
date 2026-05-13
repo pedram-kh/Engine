@@ -85,6 +85,127 @@ export const testIds = {
   // routed page underneath.
   // ---------------------------------------------------------------
   authBrand: 'auth-brand',
+
+  // ---------------------------------------------------------------
+  // Agency layout shell (AgencyLayout.vue) — Sprint 2 Chunk 2
+  // ---------------------------------------------------------------
+  agencyLayout: 'agency-layout',
+  agencySidebar: 'agency-sidebar',
+  agencyTopbar: 'agency-topbar',
+  agencyMain: 'agency-main',
+  sidebarWorkspaceName: 'sidebar-workspace-name',
+  navDashboard: 'nav-dashboard',
+  navBrands: 'nav-brands',
+  navAgencyUsers: 'nav-agencyUsers',
+  navSettings: 'nav-settings',
+  workspaceSwitcher: 'workspace-switcher',
+  userMenuBtn: 'user-menu-btn',
+  userMenuName: 'user-menu-name',
+  userMenu: 'user-menu',
+  userMenuLocaleSwitcher: 'user-menu-locale-switcher',
+  signOutBtn: 'sign-out-btn',
+
+  // ---------------------------------------------------------------
+  // Brand pages — Sprint 2 Chunk 2
+  // ---------------------------------------------------------------
+  brandListPage: 'brand-list-page',
+  brandListHeading: 'brand-list-heading',
+  brandCreateBtn: 'brand-create-btn',
+  brandStatusFilter: 'brand-status-filter',
+  brandTable: 'brand-table',
+  brandEmptyState: 'brand-empty-state',
+  brandEmptyCta: 'brand-empty-cta',
+  brandEmptyFiltered: 'brand-empty-filtered',
+  brandListError: 'brand-list-error',
+  brandListSkeleton: 'brand-list-skeleton',
+
+  brandCreatePage: 'brand-create-page',
+  brandCreateHeading: 'brand-create-heading',
+
+  brandDetailPage: 'brand-detail-page',
+  brandDetailHeading: 'brand-detail-heading',
+  brandDetailCard: 'brand-detail-card',
+  brandDetailSkeleton: 'brand-detail-skeleton',
+  brandDetailStatus: 'brand-detail-status',
+  brandEditBtn: 'brand-edit-btn',
+  brandArchiveBtn: 'brand-archive-btn',
+  brandDetailArchiveDialog: 'brand-detail-archive-dialog',
+  brandDetailArchiveConfirm: 'brand-detail-archive-confirm',
+  brandDetailArchiveCancel: 'brand-detail-archive-cancel',
+
+  brandEditPage: 'brand-edit-page',
+  brandEditHeading: 'brand-edit-heading',
+  brandEditSkeleton: 'brand-edit-skeleton',
+
+  // Brand form (shared)
+  brandForm: 'brand-form',
+  brandName: 'brand-name',
+  brandSlug: 'brand-slug',
+  brandDescription: 'brand-description',
+  brandIndustry: 'brand-industry',
+  brandWebsiteUrl: 'brand-website-url',
+  brandDefaultCurrency: 'brand-default-currency',
+  brandDefaultLanguage: 'brand-default-language',
+  brandFormSubmit: 'brand-form-submit',
+  brandFormError: 'brand-form-error',
+
+  // Archive dialog (in list page)
+  archiveDialog: 'archive-dialog',
+  archiveDialogTitle: 'archive-dialog-title',
+  archiveDialogMessage: 'archive-dialog-message',
+  archiveDialogConfirm: 'archive-dialog-confirm',
+  archiveDialogCancel: 'archive-dialog-cancel',
+
+  // ---------------------------------------------------------------
+  // Agency users / invitations — Sprint 2 Chunk 2
+  // ---------------------------------------------------------------
+  agencyUsersPage: 'agency-users-page',
+  agencyUsersHeading: 'agency-users-heading',
+  inviteUserBtn: 'invite-user-btn',
+  membersTable: 'members-table',
+  inviteSuccessAlert: 'invite-success-alert',
+
+  // Invite modal
+  inviteUserModal: 'invite-user-modal',
+  inviteModalTitle: 'invite-modal-title',
+  inviteForm: 'invite-form',
+  inviteEmail: 'invite-email',
+  inviteRole: 'invite-role',
+  inviteSubmit: 'invite-submit',
+  inviteCancel: 'invite-cancel',
+  inviteError: 'invite-error',
+
+  // Accept invitation page
+  acceptInvitationPage: 'accept-invitation-page',
+  acceptInvitationSkeleton: 'accept-invitation-skeleton',
+  acceptInvitationPending: 'accept-invitation-pending',
+  acceptInvitationDescription: 'accept-invitation-description',
+  acceptInvitationBtn: 'accept-invitation-btn',
+  acceptInvitationExpired: 'accept-invitation-expired',
+  acceptInvitationAlreadyAccepted: 'accept-invitation-already-accepted',
+  acceptInvitationUnauthenticated: 'accept-invitation-unauthenticated',
+  acceptSignInBtn: 'accept-sign-in-btn',
+  acceptSignUpLink: 'accept-sign-up-link',
+  acceptInvitationSuccess: 'accept-invitation-success',
+  acceptInvitationSuccessMsg: 'accept-invitation-success-msg',
+  acceptInvitationEmailMismatch: 'accept-invitation-email-mismatch',
+  acceptInvitationNotFound: 'accept-invitation-not-found',
+  acceptInvitationAlreadyMember: 'accept-invitation-already-member',
+  alreadyAcceptedSignIn: 'already-accepted-sign-in',
+
+  // ---------------------------------------------------------------
+  // Settings page — Sprint 2 Chunk 2
+  // ---------------------------------------------------------------
+  settingsPage: 'settings-page',
+  settingsHeading: 'settings-heading',
+  settingsSkeleton: 'settings-skeleton',
+  settingsForm: 'settings-form',
+  settingsCurrency: 'settings-currency',
+  settingsLanguage: 'settings-language',
+  settingsSaveBtn: 'settings-save-btn',
+  settingsSuccess: 'settings-success',
+  settingsSaveError: 'settings-save-error',
+  settingsReadonlyNotice: 'settings-readonly-notice',
 } as const
 
 export type TestId = (typeof testIds)[keyof typeof testIds]

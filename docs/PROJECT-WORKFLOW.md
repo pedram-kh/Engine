@@ -262,6 +262,104 @@ Every auth endpoint that takes an email must respond identically for unknown / u
 
 When Sprint N starts, Cursor's kickoff prompt includes: _"Read `docs/reviews/` for any review file that mentions this sprint as a trigger or deferral target."_
 
+### 5.11 Cross-chunk handoff contract verification
+
+**Established:** Sprint 2 Chunk 2 (caught during pre-planning read pass)
+
+When Chunk N provides an endpoint, URL, or token that Chunk N+1 consumes, the consuming chunk's read pass must explicitly verify:
+
+- The full URL shape (path params, query params)
+- The authentication requirement (unauthenticated? auth:web? auth:sanctum?)
+- Every parameter the consumer will embed (e.g. `&agency=<ulid>` in a magic link)
+
+This is not the providing chunk's responsibility alone — the consuming chunk's plan must confirm the contract before building against it. Sprint 2 caught that the magic link URL lacked the agency ULID required by the accept endpoint. Without the read-pass catch, the bug would have reached E2E testing.
+
+**Process note for Cursor kickoffs:** include an explicit "cross-chunk handoff contracts verified" section in the plan response when the chunk consumes backend endpoints from a prior chunk.
+
+### 5.12 Test-helper one-shot provisioning
+
+**Established:** Sprint 2 Chunk 2 (`CreateAgencyWithAdminController`)
+
+E2E test provisioning helpers must create a complete test subject + all dependencies in a single API call and return all identifiers needed by the spec. No multi-step provisioning chains in specs. Pattern: `POST /api/v1/_test/{subject}/setup` → `{ email, password, {subject}_ulid, ... }`.
+
+Mirror: `CreateAdminUserController` (chunk 7.6), `CreateAgencyWithAdminController` (Sprint 2 Chunk 2).
+
+### 5.13 Module-scoped API files
+
+**Established:** Sprint 2 Chunk 2 (codified from chunk 6.4 origin)
+
+Every frontend module that communicates with the API has its own `<module>.api.ts` file. No cross-module API calls. The file exports a single named object (e.g. `brandsApi`, `invitationsApi`). All HTTP interaction for that module is centralized there.
+
+### 5.14 AgencyLayout is the authenticated agency shell
+
+**Established:** Sprint 2 Chunk 2
+
+All post-auth agency-scoped routes use `meta.layout: 'agency'`. No new routes may use `meta.layout: 'app'` for authenticated agency surfaces. The layout switcher in `App.vue` dispatches via `route.meta.layout`; the three-way dispatch (`auth` / `agency` / bare catch-all) is the established pattern.
+
+### 5.15 Architecture test allowlist discipline
+
+**Established:** Sprint 2 Chunk 2 (`use-theme-is-sot.spec.ts`)
+
+Any non-theme `localStorage` usage in the main SPA requires:
+
+1. An allowlist entry in `use-theme-is-sot.spec.ts`
+2. A corresponding entry in `docs/tech-debt.md` with risk, mitigation, and resolution trigger
+
+The architecture test is doing its job when it catches the new file — the allowlist + tech-debt record is the documented resolution, not a bypass.
+
+### 5.16 Vuetify v-data-table slot modifier allowance
+
+**Established:** Sprint 2 Chunk 2
+
+ESLint must be configured with `vue/valid-v-slot: ['error', { allowModifiers: true }]` in any project using Vuetify `v-data-table` or `v-data-table-server` with dot-notation slot names (e.g. `#item.attributes.status`). Without this, ESLint incorrectly flags valid Vuetify slot syntax. Applies to both `apps/main` and `apps/admin`.
+
+### 5.17 Defense-in-depth coverage for permission guards
+
+**Established:** Sprint 2 Chunk 2 (review pass — `requireAgencyAdmin` unit test gap)
+
+Every route guard in `apps/main/src/core/router/guards.ts` must have Vitest unit test coverage covering:
+
+1. The allow path (authorized role/state → returns `null`)
+2. The deny path (unauthorized → returns the correct redirect)
+3. Registration in the `guards` registry
+
+The guards file is imported by every protected route; a broken guard is a security regression. Unit coverage at this layer allows empirical break-revert verification without the full E2E stack. The `vi.mock()` + `vi.mocked().mockReturnValue()` pattern (module-level mock, per-test override) is the established pattern for mocking Pinia stores in guard unit tests.
+
+### 5.18 CI-authoritative Pint verification
+
+**Established:** Sprint 2 Chunk 1 (hotfix); codified Sprint 2 Chunk 2
+
+Cursor sandbox Pint runs are not authoritative. The sandbox's PHP binary may differ from the project's pinned Pint version, producing false passes or false failures. Authoritative Pint checks come from:
+
+- CI (GitHub Actions)
+- `./vendor/bin/pint --test` run with `required_permissions: ["all"]` to bypass the sandbox
+
+If a Pint check is run in the sandbox and produces an unexpected result, trust CI over the sandbox result.
+
+### 5.19 User-enumeration defense for unauthenticated preview/status endpoints
+
+**Established:** Sprint 2 Chunk 2 (`InvitationPreviewController`) — extends 5.9
+
+Standard 5.9 covers auth endpoints that take an email. This extends the principle to any unauthenticated endpoint that returns data about an authenticated subject:
+
+- An unknown token → 404 with a generic message (not "token not found")
+- A valid token belonging to a different agency → 404, not "wrong agency" (avoids cross-tenant token enumeration)
+- Only after token + agency both match does the endpoint return subject data (`is_expired`, `is_accepted`, `agency_name`, `role`)
+
+The invariant: the response body must not reveal whether the token exists independently of the agency check.
+
+### 5.20 Read the prior review file before producing the merged review (Claude-side discipline)
+
+**Established:** Sprint 2 Chunk 2 (Claude-side; recorded here for Cursor context)
+
+Before Claude produces a merged review file for Chunk N, Claude must read the prior chunk's merged review (Chunk N-1) to:
+
+1. Verify that deferred items from Chunk N-1 are addressed or remain correctly deferred
+2. Confirm that standards established in Chunk N-1 are applied in Chunk N
+3. Anchor the cross-chunk arc accurately in the new review's prose
+
+This is Claude's counterpart to Cursor's mandatory read-list at session start.
+
 ---
 
 ## 6. The "Q-and-A before code" pattern

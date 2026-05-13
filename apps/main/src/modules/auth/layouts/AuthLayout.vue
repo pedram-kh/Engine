@@ -2,29 +2,16 @@
 /**
  * Centred-card layout for every auth page (sign-in, sign-up, verify
  * email, reset password, 2FA). The layout owns the brand mark, the
- * locale switcher, the theme toggle (chunk 8.2), and a slot for the
- * page content.
+ * locale switcher, and a slot for the page content.
  *
- * Brand mark is text-only (`Catalyst Engine` from `app.title`) — chunk-6
- * out-of-scope note keeps the actual logo asset for chunk 7.
- *
- * Locale switcher writes directly to `i18n.global.locale` via the
- * `useI18n` composable. The choice is purely client-side for now;
- * persisted user preference lands with the settings page in chunk 7.
- *
- * Theme toggle (chunk 8.2): the `<ThemeToggle />` component consumes
- * `useThemePreference()` and emits user intent via
- * `setPreference()`. This layout itself holds NO theme state — see
- * the toggle component's docblock for the SOT-boundary contract.
- * The same component is also mounted in `App.vue`'s app-layout
- * branch so authenticated users on the placeholder dashboard /
- * settings page can toggle too. Sprint 2's user-menu work will
- * consume the same component when the real nav shell lands.
+ * Chunk 2: ThemeToggle removed from this layout's header. It now lives
+ * exclusively in AgencyLayout's user menu for authenticated users.
+ * Unauthenticated users on auth pages can still toggle via the system
+ * default (prefers-color-scheme); the explicit toggle is an
+ * authenticated-user affordance.
  */
 
 import { useI18n } from 'vue-i18n'
-
-import ThemeToggle from '@/components/ThemeToggle.vue'
 
 import { buildLocaleOptions } from './localeOptions'
 
@@ -42,7 +29,6 @@ const localeOptions = buildLocaleOptions(availableLocales, t)
             {{ t('app.title') }}
           </h1>
           <div class="d-flex align-center ga-2">
-            <ThemeToggle />
             <v-select
               v-model="locale"
               :items="localeOptions"

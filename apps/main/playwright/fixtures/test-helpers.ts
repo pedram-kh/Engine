@@ -338,3 +338,103 @@ export async function signOutViaApi(request: APIRequestContext): Promise<void> {
     )
   }
 }
+
+// ---------------------------------------------------------------------------
+// Sprint 2 Chunk 2 — Agency, invitation, and brand provisioning
+// ---------------------------------------------------------------------------
+
+export interface SeedAgencyAdminResult {
+  email: string
+  password: string
+  agencyUlid: string
+  agencyName: string
+}
+
+/**
+ * Seed an agency admin user + agency via the Chunk 2 test-helper endpoint.
+ *
+ * POST /api/v1/_test/agencies/setup creates:
+ *   - An agency_user-typed user with a verified email.
+ *   - An agency.
+ *   - An accepted agency_admin membership.
+ *
+ * Returns the email, password, agencyUlid, and agencyName for the E2E spec.
+ * Pattern follows CreateAdminUserController (chunk 7.6 shape).
+ */
+export async function seedAgencyAdmin(
+  request: APIRequestContext,
+  overrides: { email?: string; password?: string; agencyName?: string } = {},
+): Promise<SeedAgencyAdminResult> {
+  const response = await request.post('http://127.0.0.1:8000/api/v1/_test/agencies/setup', {
+    headers: defaultHeaders,
+    data: {
+      email: overrides.email,
+      password: overrides.password ?? 'Password1!',
+      name: 'Test Admin',
+      agency_name: overrides.agencyName,
+    },
+  })
+
+  if (response.status() !== 201) {
+    throw new Error(
+      `seedAgencyAdmin failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  const body = (await response.json()) as {
+    data: { email: string; password: string; agency_ulid: string; agency_name: string }
+  }
+  return {
+    email: body.data.email,
+    password: body.data.password,
+    agencyUlid: body.data.agency_ulid,
+    agencyName: body.data.agency_name,
+  }
+}
+
+export interface SeedAgencyInvitationResult {
+  token: string
+  agencyUlid: string
+  email: string
+  role: string
+  acceptUrl: string
+}
+
+/**
+ * Seed a pending agency invitation via the Chunk 1 test-helper endpoint.
+ * Returns the unhashed token and the full SPA accept URL so the spec can
+ * navigate to the accept page directly.
+ *
+ * Pattern follows CreateAdminUserController (chunk 7.6 shape).
+ */
+export async function seedAgencyInvitation(
+  request: APIRequestContext,
+  agencyUlid: string,
+  options: { email: string; role?: string; expiresInDays?: number } = { email: '' },
+): Promise<SeedAgencyInvitationResult> {
+  const response = await request.post(
+    `http://127.0.0.1:8000/api/v1/_test/agencies/${agencyUlid}/invitations`,
+    {
+      headers: defaultHeaders,
+      data: {
+        email: options.email,
+        role: options.role ?? 'agency_manager',
+        expires_in_days: options.expiresInDays ?? 7,
+      },
+    },
+  )
+
+  if (response.status() !== 201) {
+    throw new Error(
+      `seedAgencyInvitation failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  const body = (await response.json()) as {
+    data: { token: string; agency_ulid: string; email: string; role: string }
+  }
+  const { token, agency_ulid, email, role } = body.data
+  const acceptUrl = `/accept-invitation?token=${token}&agency=${agency_ulid}`
+
+  return { token, agencyUlid: agency_ulid, email, role, acceptUrl }
+}

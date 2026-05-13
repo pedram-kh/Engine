@@ -14,10 +14,18 @@
 import type { RouteLocationNormalized } from 'vue-router'
 import { describe, expect, it, vi } from 'vitest'
 
+// Module-level mock for useAgencyStore — hoisted, safe to reference in tests via vi.mocked().
+vi.mock('@/core/stores/useAgencyStore', () => ({
+  useAgencyStore: vi.fn(() => ({ isAdmin: false })),
+}))
+
+import { useAgencyStore } from '@/core/stores/useAgencyStore'
+
 import {
   requireAuth,
   requireGuest,
   requireMfaEnrolled,
+  requireAgencyAdmin,
   guards,
   type AuthStore,
   type GuardContext,
@@ -178,10 +186,39 @@ describe('requireMfaEnrolled', () => {
   })
 })
 
+describe('requireAgencyAdmin', () => {
+  it('returns null (allow) when the user has agency_admin role', async () => {
+    vi.mocked(useAgencyStore).mockReturnValue({ isAdmin: true } as ReturnType<
+      typeof useAgencyStore
+    >)
+    const store = makeStore({ user: makeUser() })
+    const result = await requireAgencyAdmin(
+      makeCtx(store, makeRoute('agency-users', '/agency-users')),
+    )
+    expect(result).toBeNull()
+  })
+
+  it('redirects to brands.list when the user is NOT agency_admin', async () => {
+    vi.mocked(useAgencyStore).mockReturnValue({ isAdmin: false } as ReturnType<
+      typeof useAgencyStore
+    >)
+    const store = makeStore({ user: makeUser() })
+    const result = await requireAgencyAdmin(
+      makeCtx(store, makeRoute('agency-users', '/agency-users')),
+    )
+    expect(result).toEqual({ name: 'brands.list' })
+  })
+
+  it('is registered in the guards registry', () => {
+    expect(guards.requireAgencyAdmin).toBe(requireAgencyAdmin)
+  })
+})
+
 describe('guards registry', () => {
   it('maps each symbolic name to the correct function reference', () => {
     expect(guards.requireAuth).toBe(requireAuth)
     expect(guards.requireGuest).toBe(requireGuest)
     expect(guards.requireMfaEnrolled).toBe(requireMfaEnrolled)
+    expect(guards.requireAgencyAdmin).toBe(requireAgencyAdmin)
   })
 })

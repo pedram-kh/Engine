@@ -26,6 +26,7 @@
 
 import type { RouteLocationNormalized, RouteLocationRaw } from 'vue-router'
 
+import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import type { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 
 export type AuthStore = ReturnType<typeof useAuthStore>
@@ -135,11 +136,26 @@ export async function requireMfaEnrolled(ctx: GuardContext): Promise<GuardResult
  * `meta.guards: ['requireAuth', 'requireMfaEnrolled']` to these
  * function references and runs them in order.
  */
+/**
+ * Requires the current user to have agency_admin role in the active agency.
+ * Redirects to /brands (the agency home) if they don't.
+ *
+ * Note: called AFTER requireAuth, so `store.user` is non-null here.
+ */
+export async function requireAgencyAdmin(_ctx: GuardContext): Promise<GuardResult> {
+  const agencyStore = useAgencyStore()
+  if (!agencyStore.isAdmin) {
+    return { name: 'brands.list' }
+  }
+  return null
+}
+
 export const guards: Record<
-  'requireAuth' | 'requireGuest' | 'requireMfaEnrolled',
+  'requireAuth' | 'requireGuest' | 'requireMfaEnrolled' | 'requireAgencyAdmin',
   (ctx: GuardContext) => Promise<GuardResult>
 > = {
   requireAuth,
   requireGuest,
   requireMfaEnrolled,
+  requireAgencyAdmin,
 }

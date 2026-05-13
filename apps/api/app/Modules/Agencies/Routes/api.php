@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Agencies\Http\Controllers\AgencySettingsController;
 use App\Modules\Agencies\Http\Controllers\InvitationController;
+use App\Modules\Agencies\Http\Controllers\InvitationPreviewController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -47,4 +48,15 @@ Route::middleware(['auth:web'])
     ->group(function (): void {
         Route::post('invitations/accept', [InvitationController::class, 'accept'])
             ->name('agencies.invitations.accept');
+    });
+
+// ─── Invitation preview (no auth) ─────────────────────────────────────────────
+// Unauthenticated — the invitee may not have an account yet. Returns
+// invitation metadata so the SPA accept page can show "Joining X as Y"
+// before the user signs in. Token is passed as ?token=<unhashed>.
+
+Route::prefix('agencies/{agency}')
+    ->group(function (): void {
+        Route::get('invitations/preview', InvitationPreviewController::class)
+            ->name('agencies.invitations.preview');
     });

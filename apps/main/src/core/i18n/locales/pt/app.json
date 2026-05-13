@@ -17,6 +17,153 @@
         "dark": "Escuro",
         "system": "Seguir o sistema"
       }
+    },
+    "nav": {
+      "dashboard": "Painel",
+      "brands": "Marcas",
+      "agencyUsers": "Equipe",
+      "settings": "Configurações"
+    },
+    "userMenu": {
+      "signOut": "Sair",
+      "signingOut": "Saindo…"
+    },
+    "workspaceSwitcher": {
+      "label": "Mudar espaço de trabalho",
+      "placeholder": "Selecionar espaço de trabalho"
+    },
+    "brands": {
+      "title": "Marcas",
+      "actions": {
+        "create": "Nova marca",
+        "edit": "Editar",
+        "archive": "Arquivar",
+        "save": "Salvar marca",
+        "saving": "Salvando…",
+        "backToList": "Voltar às marcas",
+        "backToDetail": "Voltar à marca"
+      },
+      "fields": {
+        "name": "Nome da marca",
+        "slug": "Slug",
+        "description": "Descrição",
+        "industry": "Setor",
+        "websiteUrl": "URL do site",
+        "defaultCurrency": "Moeda padrão",
+        "defaultLanguage": "Idioma padrão",
+        "status": "Status"
+      },
+      "status": {
+        "active": "Ativo",
+        "archived": "Arquivado",
+        "all": "Todos"
+      },
+      "detail": { "title": "Detalhes da marca" },
+      "create": { "title": "Nova marca", "success": "Marca criada com sucesso." },
+      "edit": { "title": "Editar marca", "success": "Marca atualizada com sucesso." },
+      "archive": {
+        "confirmTitle": "Arquivar marca",
+        "confirmMessage": "Arquivar {name}? Ela será ocultada da lista ativa, mas pode ser restaurada.",
+        "confirm": "Arquivar",
+        "cancel": "Cancelar",
+        "success": "Marca arquivada."
+      },
+      "empty": {
+        "heading": "Nenhuma marca ainda",
+        "body": "Crie sua primeira marca para começar.",
+        "cta": "Criar marca"
+      },
+      "emptyFiltered": {
+        "heading": "Nenhuma marca corresponde ao filtro",
+        "body": "Tente alterar o filtro de status acima."
+      },
+      "loading": "Carregando marcas…",
+      "errors": {
+        "loadFailed": "Falha ao carregar marcas.",
+        "saveFailed": "Falha ao salvar marca.",
+        "archiveFailed": "Falha ao arquivar marca."
+      }
+    },
+    "agencyUsers": {
+      "title": "Equipe",
+      "columns": {
+        "name": "Nome",
+        "email": "E-mail",
+        "role": "Função",
+        "status": "Status",
+        "joinedAt": "Entrou em"
+      },
+      "roles": {
+        "agency_admin": "Admin",
+        "agency_manager": "Gerente",
+        "agency_staff": "Colaborador"
+      },
+      "status": { "active": "Ativo", "pending": "Pendente" },
+      "invite": {
+        "button": "Convidar usuário",
+        "title": "Convidar membro da equipe",
+        "fields": { "email": "Endereço de e-mail", "role": "Função" },
+        "submit": "Enviar convite",
+        "submitting": "Enviando…",
+        "success": "Convite enviado para {email}.",
+        "errors": { "failed": "Falha ao enviar convite." }
+      },
+      "empty": {
+        "heading": "Nenhum membro da equipe",
+        "body": "Convide seu primeiro membro para começar."
+      },
+      "loading": "Carregando equipe…"
+    },
+    "invitation": {
+      "accept": {
+        "title": "Você foi convidado",
+        "joining": "Você está sendo convidado para entrar em {agencyName} como {role}.",
+        "accept": "Aceitar convite",
+        "accepting": "Aceitando…",
+        "signInToContinue": "Entre para aceitar este convite",
+        "signIn": "Entrar",
+        "noAccount": "Não tem uma conta?",
+        "signUp": "Crie uma agora",
+        "success": "Bem-vindo(a) a {agencyName}! Agora você é {role}.",
+        "expired": {
+          "heading": "Este convite expirou",
+          "body": "Entre em contato com o administrador para solicitar um novo convite."
+        },
+        "alreadyAccepted": {
+          "heading": "Convite já aceito",
+          "body": "Este convite já foi usado. Entre para acessar seu espaço de trabalho.",
+          "signIn": "Entrar"
+        },
+        "alreadyMember": {
+          "heading": "Já é membro",
+          "body": "Você já é membro deste espaço de trabalho."
+        },
+        "emailMismatch": {
+          "heading": "Conta incorreta",
+          "body": "Este convite foi enviado para outro endereço de e-mail."
+        },
+        "notFound": {
+          "heading": "Convite não encontrado",
+          "body": "Este link de convite é inválido ou já foi usado."
+        },
+        "errors": { "failed": "Falha ao aceitar convite." }
+      }
+    },
+    "settings": {
+      "title": "Configurações da agência",
+      "fields": {
+        "defaultCurrency": "Moeda padrão",
+        "defaultLanguage": "Idioma padrão"
+      },
+      "save": "Salvar configurações",
+      "saving": "Salvando…",
+      "success": "Configurações salvas.",
+      "readOnly": "Apenas administradores podem editar as configurações.",
+      "loading": "Carregando configurações…",
+      "errors": {
+        "loadFailed": "Falha ao carregar configurações.",
+        "saveFailed": "Falha ao salvar configurações."
+      }
     }
   }
 }

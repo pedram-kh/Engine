@@ -17,6 +17,153 @@
         "dark": "Scuro",
         "system": "Segui il sistema"
       }
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "brands": "Brand",
+      "agencyUsers": "Team",
+      "settings": "Impostazioni"
+    },
+    "userMenu": {
+      "signOut": "Esci",
+      "signingOut": "Disconnessione…"
+    },
+    "workspaceSwitcher": {
+      "label": "Cambia area di lavoro",
+      "placeholder": "Seleziona area di lavoro"
+    },
+    "brands": {
+      "title": "Brand",
+      "actions": {
+        "create": "Nuovo brand",
+        "edit": "Modifica",
+        "archive": "Archivia",
+        "save": "Salva brand",
+        "saving": "Salvataggio…",
+        "backToList": "Torna ai brand",
+        "backToDetail": "Torna al brand"
+      },
+      "fields": {
+        "name": "Nome brand",
+        "slug": "Slug",
+        "description": "Descrizione",
+        "industry": "Settore",
+        "websiteUrl": "URL sito web",
+        "defaultCurrency": "Valuta predefinita",
+        "defaultLanguage": "Lingua predefinita",
+        "status": "Stato"
+      },
+      "status": {
+        "active": "Attivo",
+        "archived": "Archiviato",
+        "all": "Tutti"
+      },
+      "detail": { "title": "Dettagli brand" },
+      "create": { "title": "Nuovo brand", "success": "Brand creato con successo." },
+      "edit": { "title": "Modifica brand", "success": "Brand aggiornato con successo." },
+      "archive": {
+        "confirmTitle": "Archivia brand",
+        "confirmMessage": "Archiviare {name}? Sarà nascosto dall'elenco attivo ma potrà essere ripristinato.",
+        "confirm": "Archivia",
+        "cancel": "Annulla",
+        "success": "Brand archiviato."
+      },
+      "empty": {
+        "heading": "Nessun brand ancora",
+        "body": "Crea il tuo primo brand per iniziare.",
+        "cta": "Crea brand"
+      },
+      "emptyFiltered": {
+        "heading": "Nessun brand corrisponde al filtro",
+        "body": "Prova a modificare il filtro di stato sopra."
+      },
+      "loading": "Caricamento brand…",
+      "errors": {
+        "loadFailed": "Caricamento brand fallito.",
+        "saveFailed": "Salvataggio brand fallito.",
+        "archiveFailed": "Archiviazione brand fallita."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Nome",
+        "email": "Email",
+        "role": "Ruolo",
+        "status": "Stato",
+        "joinedAt": "Iscritto il"
+      },
+      "roles": {
+        "agency_admin": "Admin",
+        "agency_manager": "Manager",
+        "agency_staff": "Collaboratore"
+      },
+      "status": { "active": "Attivo", "pending": "In attesa" },
+      "invite": {
+        "button": "Invita utente",
+        "title": "Invita un membro del team",
+        "fields": { "email": "Indirizzo email", "role": "Ruolo" },
+        "submit": "Invia invito",
+        "submitting": "Invio…",
+        "success": "Invito inviato a {email}.",
+        "errors": { "failed": "Invio invito fallito." }
+      },
+      "empty": {
+        "heading": "Nessun membro del team",
+        "body": "Invita il tuo primo membro per iniziare."
+      },
+      "loading": "Caricamento team…"
+    },
+    "invitation": {
+      "accept": {
+        "title": "Sei stato invitato",
+        "joining": "Sei invitato ad unirti a {agencyName} come {role}.",
+        "accept": "Accetta invito",
+        "accepting": "Accettazione…",
+        "signInToContinue": "Accedi per accettare questo invito",
+        "signIn": "Accedi",
+        "noAccount": "Non hai un account?",
+        "signUp": "Creane uno ora",
+        "success": "Benvenuto/a in {agencyName}! Ora sei {role}.",
+        "expired": {
+          "heading": "Questo invito è scaduto",
+          "body": "Contatta l'amministratore per richiedere un nuovo invito."
+        },
+        "alreadyAccepted": {
+          "heading": "Invito già accettato",
+          "body": "Questo invito è già stato usato. Accedi per entrare nella tua area di lavoro.",
+          "signIn": "Accedi"
+        },
+        "alreadyMember": {
+          "heading": "Già membro",
+          "body": "Sei già membro di questa area di lavoro."
+        },
+        "emailMismatch": {
+          "heading": "Account errato",
+          "body": "Questo invito è stato inviato a un indirizzo email diverso."
+        },
+        "notFound": {
+          "heading": "Invito non trovato",
+          "body": "Questo link di invito non è valido o è già stato usato."
+        },
+        "errors": { "failed": "Accettazione invito fallita." }
+      }
+    },
+    "settings": {
+      "title": "Impostazioni agenzia",
+      "fields": {
+        "defaultCurrency": "Valuta predefinita",
+        "defaultLanguage": "Lingua predefinita"
+      },
+      "save": "Salva impostazioni",
+      "saving": "Salvataggio…",
+      "success": "Impostazioni salvate.",
+      "readOnly": "Solo gli amministratori possono modificare le impostazioni.",
+      "loading": "Caricamento impostazioni…",
+      "errors": {
+        "loadFailed": "Caricamento impostazioni fallito.",
+        "saveFailed": "Salvataggio impostazioni fallito."
+      }
     }
   }
 }

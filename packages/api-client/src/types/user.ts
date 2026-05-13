@@ -89,14 +89,38 @@ export interface UserAttributes {
 }
 
 /**
+ * A single accepted agency membership included in the `/me` response
+ * (Chunk 2 addition — workspace switcher contract).
+ */
+export interface AgencyMembershipData {
+  agency_id: string
+  agency_name: string
+  role: 'agency_admin' | 'agency_manager' | 'agency_staff'
+}
+
+/**
  * The wrapper the backend's `JsonResource` produces — `id` is the user's
  * ULID (the public identifier per `docs/03-DATA-MODEL.md §2`), `type` is
  * the literal string `'user'`, and `attributes` is the flat map above.
+ *
+ * `relationships.agency_memberships.data` is the list of accepted agency
+ * memberships included in Chunk 2's UserResource extension.
  */
 export interface UserResource {
   id: string
   type: 'user'
   attributes: UserAttributes
+  /**
+   * Optional in the type because Sprint 1 test objects predate Chunk 2's
+   * agency_memberships extension and don't include this field. At runtime
+   * the backend ALWAYS sends relationships; optional here prevents a large
+   * breaking change across the existing unit-test corpus.
+   */
+  relationships?: {
+    agency_memberships: {
+      data: AgencyMembershipData[]
+    }
+  }
 }
 
 /**

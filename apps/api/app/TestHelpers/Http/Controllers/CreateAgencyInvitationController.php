@@ -106,6 +106,9 @@ final class CreateAgencyInvitationController
                 'role' => $invitation->role->value,
                 'token' => $token,
                 'expires_at' => $invitation->expires_at->toIso8601String(),
+                // Included so the E2E spec can construct the SPA accept URL:
+                // /accept-invitation?token={token}&agency={agency_ulid}
+                'agency_ulid' => $agency->ulid,
             ],
         ], 201);
     }

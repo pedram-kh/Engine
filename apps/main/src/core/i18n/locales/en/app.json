@@ -17,6 +17,171 @@
         "dark": "Dark",
         "system": "Match system"
       }
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "brands": "Brands",
+      "agencyUsers": "Team",
+      "settings": "Settings"
+    },
+    "userMenu": {
+      "signOut": "Sign out",
+      "signingOut": "Signing out…"
+    },
+    "workspaceSwitcher": {
+      "label": "Switch workspace",
+      "placeholder": "Select workspace"
+    },
+    "brands": {
+      "title": "Brands",
+      "actions": {
+        "create": "New brand",
+        "edit": "Edit",
+        "archive": "Archive",
+        "save": "Save brand",
+        "saving": "Saving…",
+        "backToList": "Back to brands",
+        "backToDetail": "Back to brand"
+      },
+      "fields": {
+        "name": "Brand name",
+        "slug": "Slug",
+        "description": "Description",
+        "industry": "Industry",
+        "websiteUrl": "Website URL",
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "status": "Status"
+      },
+      "status": {
+        "active": "Active",
+        "archived": "Archived",
+        "all": "All"
+      },
+      "detail": {
+        "title": "Brand details"
+      },
+      "create": {
+        "title": "New brand",
+        "success": "Brand created successfully."
+      },
+      "edit": {
+        "title": "Edit brand",
+        "success": "Brand updated successfully."
+      },
+      "archive": {
+        "confirmTitle": "Archive brand",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later.",
+        "confirm": "Archive",
+        "cancel": "Cancel",
+        "success": "Brand archived."
+      },
+      "empty": {
+        "heading": "No brands yet",
+        "body": "Create your first brand to start managing influencer campaigns.",
+        "cta": "Create brand"
+      },
+      "emptyFiltered": {
+        "heading": "No brands match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "loading": "Loading brands…",
+      "errors": {
+        "loadFailed": "Failed to load brands.",
+        "saveFailed": "Failed to save brand.",
+        "archiveFailed": "Failed to archive brand."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "joinedAt": "Joined"
+      },
+      "roles": {
+        "agency_admin": "Admin",
+        "agency_manager": "Manager",
+        "agency_staff": "Staff"
+      },
+      "status": {
+        "active": "Active",
+        "pending": "Pending"
+      },
+      "invite": {
+        "button": "Invite user",
+        "title": "Invite a team member",
+        "fields": {
+          "email": "Email address",
+          "role": "Role"
+        },
+        "submit": "Send invitation",
+        "submitting": "Sending…",
+        "success": "Invitation sent to {email}.",
+        "errors": {
+          "failed": "Failed to send invitation."
+        }
+      },
+      "empty": {
+        "heading": "No team members",
+        "body": "Invite your first team member to get started."
+      },
+      "loading": "Loading team…"
+    },
+    "invitation": {
+      "accept": {
+        "title": "You've been invited",
+        "joining": "You're being invited to join {agencyName} as {role}.",
+        "accept": "Accept invitation",
+        "accepting": "Accepting…",
+        "signInToContinue": "Sign in to accept this invitation",
+        "signIn": "Sign in",
+        "noAccount": "Don't have an account?",
+        "signUp": "Create one now",
+        "success": "Welcome to {agencyName}! You're now a {role}.",
+        "expired": {
+          "heading": "This invitation has expired",
+          "body": "Please contact your agency administrator to request a new invitation."
+        },
+        "alreadyAccepted": {
+          "heading": "Invitation already accepted",
+          "body": "This invitation has already been used. Sign in to access your workspace.",
+          "signIn": "Sign in"
+        },
+        "alreadyMember": {
+          "heading": "Already a member",
+          "body": "You are already a member of this workspace."
+        },
+        "emailMismatch": {
+          "heading": "Wrong account",
+          "body": "This invitation was sent to a different email address. Please sign in with the correct account."
+        },
+        "notFound": {
+          "heading": "Invitation not found",
+          "body": "This invitation link is invalid or has already been used."
+        },
+        "errors": {
+          "failed": "Failed to accept invitation."
+        }
+      }
+    },
+    "settings": {
+      "title": "Agency settings",
+      "fields": {
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language"
+      },
+      "save": "Save settings",
+      "saving": "Saving…",
+      "success": "Settings saved.",
+      "readOnly": "Only administrators can edit agency settings.",
+      "loading": "Loading settings…",
+      "errors": {
+        "loadFailed": "Failed to load settings.",
+        "saveFailed": "Failed to save settings."
+      }
     }
   }
 }

@@ -68,6 +68,14 @@ const ALLOWLISTED_RELATIVE_PATHS: ReadonlySet<string> = new Set([
   // the storage key, MUST reference the literal key string, and
   // MUST register a `prefers-color-scheme` matchMedia listener.
   'composables/useThemePreference.ts',
+  // Sprint 2 Chunk 2: useAgencyStore persists the active agency ULID in
+  // localStorage under 'catalyst.agency.current'. This is non-theme
+  // persistence; per the allowlist rules, this entry carries a matching
+  // tech-debt note in docs/tech-debt.md:
+  //   "useAgencyStore direct localStorage — consider extracting a
+  //    useAgencyPreference composable (mirrors useThemePreference) when
+  //    a second localStorage-backed store appears (Sprint 3+)."
+  'core/stores/useAgencyStore.ts',
 ])
 
 const FORBIDDEN_PATTERNS: ReadonlyArray<{ pattern: RegExp; description: string }> = [

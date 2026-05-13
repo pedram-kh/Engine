@@ -59,10 +59,12 @@ final class AgencyInvitationService
             return $invitation;
         });
 
-        // Build the magic-link URL for the SPA accept page (Chunk 2 builds
-        // the page; the token is embedded in the query parameter).
+        // Build the magic-link URL for the SPA accept page. The `agency`
+        // parameter carries the agency ULID so the accept page can call
+        // POST /api/v1/agencies/{agency}/invitations/accept — the endpoint
+        // requires the agency identifier in the path.
         $acceptUrl = rtrim((string) config('app.frontend_url', config('app.url')), '/')
-            .'/accept-invitation?token='.$token;
+            .'/accept-invitation?token='.$token.'&agency='.$agency->ulid;
 
         // The invitee's name: if they already have an account, use it;
         // otherwise fall back to the email local part.

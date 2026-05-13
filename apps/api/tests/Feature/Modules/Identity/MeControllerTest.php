@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Core\Tenancy\TenancyContext;
 use App\Modules\Agencies\Database\Factories\AgencyFactory;
+use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Identity\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -146,6 +147,52 @@ it('leaves the TenancyContext empty for a platform admin on /admin/me', function
 
 // -----------------------------------------------------------------------------
 // /me is side-effect free (no last_login_* stamping, no audit row)
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// agency_memberships relationship (Chunk 2: workspace switcher contract)
+// -----------------------------------------------------------------------------
+
+it('includes accepted agency memberships in relationships on /me', function (): void {
+    $agency = AgencyFactory::new()->createOne(['name' => 'Acme Agency']);
+    /** @var User $user */
+    $user = User::factory()->agencyAdmin($agency)->createOne();
+
+    $response = $this->actingAs($user, 'web')->getJson('/api/v1/me');
+
+    $response->assertOk()
+        ->assertJsonPath('data.relationships.agency_memberships.data.0.agency_id', $agency->ulid)
+        ->assertJsonPath('data.relationships.agency_memberships.data.0.agency_name', 'Acme Agency')
+        ->assertJsonPath('data.relationships.agency_memberships.data.0.role', 'agency_admin');
+});
+
+it('returns an empty agency_memberships array for a creator on /me', function (): void {
+    /** @var User $creator */
+    $creator = User::factory()->creator()->createOne();
+
+    $response = $this->actingAs($creator, 'web')->getJson('/api/v1/me');
+
+    $response->assertOk()
+        ->assertJsonPath('data.relationships.agency_memberships.data', []);
+});
+
+it('excludes soft-deleted and pending (non-accepted) memberships from agency_memberships', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    /** @var User $user */
+    $user = User::factory()->agencyAdmin($agency)->createOne();
+
+    // Soft-delete the membership
+    AgencyMembership::query()
+        ->where('user_id', $user->id)
+        ->where('agency_id', $agency->id)
+        ->update(['deleted_at' => now()]);
+
+    $response = $this->actingAs($user, 'web')->getJson('/api/v1/me');
+
+    $response->assertOk()
+        ->assertJsonPath('data.relationships.agency_memberships.data', []);
+});
+
 // -----------------------------------------------------------------------------
 
 it('does not stamp last_login_at on /me', function (): void {

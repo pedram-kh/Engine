@@ -25,6 +25,11 @@ export default [
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'vue/multi-word-component-names': 'off',
       'vue/component-api-style': ['error', ['script-setup']],
+      // Vuetify v-data-table slot names use dot notation (e.g., `#item.role`,
+      // `#item.attributes.status`). The dot would normally be interpreted as a
+      // Vue slot modifier, which is invalid. `allowModifiers: true` tells the
+      // rule that dots in slot names are acceptable — required for Vuetify tables.
+      'vue/valid-v-slot': ['error', { allowModifiers: true }],
     },
   },
 ]

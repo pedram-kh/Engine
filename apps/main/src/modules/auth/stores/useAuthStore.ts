@@ -46,6 +46,7 @@ import type {
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
+import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { authApi } from '../api/auth.api'
 
 export type BootstrapStatus = 'idle' | 'loading' | 'ready' | 'error'
@@ -98,11 +99,13 @@ export const useAuthStore = defineStore('auth', () => {
 
   /**
    * Replace the stored user. The login() action calls this internally;
-   * tests can call it directly to seed state.
+   * tests can call it directly to seed state. Also seeds the agency store
+   * from the user's membership list.
    */
   function setUser(next: User): void {
     user.value = next
     mfaEnrollmentRequired.value = false
+    useAgencyStore().initFromUser(next.relationships?.agency_memberships?.data ?? [])
   }
 
   /**
@@ -112,6 +115,7 @@ export const useAuthStore = defineStore('auth', () => {
   function clearUser(): void {
     user.value = null
     mfaEnrollmentRequired.value = false
+    useAgencyStore().reset()
   }
 
   // ---------------------------------------------------------------

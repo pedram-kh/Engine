@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Http\Resources;
 
+use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -45,6 +46,36 @@ final class UserResource extends JsonResource
                 'last_login_at' => $user->last_login_at?->toIso8601String(),
                 'created_at' => $user->created_at->toIso8601String(),
             ],
+            'relationships' => [
+                'agency_memberships' => [
+                    'data' => $this->agencyMembershipsData($user),
+                ],
+            ],
         ];
+    }
+
+    /**
+     * Eager-loads accepted, non-deleted agency memberships for the user.
+     *
+     * Chunk 2 adds this so the SPA can populate the workspace switcher and
+     * derive the current agency context without an extra API round-trip.
+     *
+     * @return list<array{agency_id: string, agency_name: string, role: string}>
+     */
+    private function agencyMembershipsData(User $user): array
+    {
+        return AgencyMembership::query()
+            ->where('user_id', $user->id)
+            ->whereNotNull('accepted_at')
+            ->whereNull('deleted_at')
+            ->with('agency')
+            ->get()
+            ->map(static fn (AgencyMembership $m): array => [
+                'agency_id' => $m->agency->ulid,
+                'agency_name' => $m->agency->name,
+                'role' => $m->role->value,
+            ])
+            ->values()
+            ->all();
     }
 }

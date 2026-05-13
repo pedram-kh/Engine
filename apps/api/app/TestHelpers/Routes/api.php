@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\TestHelpers\Http\Controllers\CreateAdminUserController;
 use App\TestHelpers\Http\Controllers\CreateAgencyInvitationController;
+use App\TestHelpers\Http\Controllers\CreateAgencyWithAdminController;
 use App\TestHelpers\Http\Controllers\IssueTotpController;
 use App\TestHelpers\Http\Controllers\IssueTotpFromSecretController;
 use App\TestHelpers\Http\Controllers\MintVerificationTokenController;
@@ -82,4 +83,10 @@ Route::prefix('_test')
         // Mirrors CreateAdminUserController shape (chunk 7.6 pattern).
         Route::post('agencies/{agency}/invitations', CreateAgencyInvitationController::class)
             ->name('agencies.invitations.create');
+
+        // Sprint 2 Chunk 2 — one-shot agency + admin provisioning.
+        // Creates an agency_user + agency + accepted agency_admin membership
+        // in a single call so brand/invitation E2E specs can sign in immediately.
+        Route::post('agencies/setup', CreateAgencyWithAdminController::class)
+            ->name('agencies.setup');
     });

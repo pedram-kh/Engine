@@ -222,3 +222,16 @@ anyone reviewing it later.
   3. **Standardize on `tokens.css` + `data-theme` attribute** instead of Vuetify's theme system. Directly contradicts the chunk-8 kickoff's "extend Vuetify's existing theme system rather than building a parallel CSS variable layer" — would require revisiting the whole foundational decision.
 - **Owner:** the next chunk that surfaces a real `--color-*` consumer OR an explicit cleanup chunk (e.g., a Phase-1-late tooling pass).
 - **Status:** open (narrowed scope — only the broader dormant-variable question remains; the `@media` hazard sub-concern was resolved in Sprint 1 chunk 8.2).
+
+---
+
+## `useAgencyStore` direct localStorage usage
+
+- **Where:** [`apps/main/src/core/stores/useAgencyStore.ts`](../apps/main/src/core/stores/useAgencyStore.ts).
+- **What we accepted in Sprint 2 Chunk 2:** `useAgencyStore` calls `localStorage.{get,set,remove}Item` directly to persist the active agency ULID under `catalyst.agency.current`. The architecture test (`use-theme-is-sot.spec.ts`) normally forbids direct localStorage access to enforce that `useThemePreference` is the sole localStorage consumer — but explicitly allows non-theme uses via the allowlist + a tech-debt entry (per the test's own docblock).
+- **Risk:** if a second store or composable also needs localStorage, the pattern will diverge further from the single-composable principle. Two ad-hoc localStorage users are harder to migrate to `IndexedDB` or server-side storage than one composable that all stores delegate to.
+- **Mitigation today:** the storage key (`catalyst.agency.current`) is a named constant inside the store file. Migration is a single-file change.
+- **Triggered by:** any Sprint 3+ task that introduces a second non-theme localStorage use.
+- **Resolution:** extract a `useAgencyPreference` composable mirroring `useThemePreference`, and have `useAgencyStore` delegate to it. The composable becomes the new allowlist entry; the store no longer needs one.
+- **Owner:** Sprint 3 (when workspace-switching becomes a real multi-agency feature).
+- **Status:** open.

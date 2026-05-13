@@ -30,17 +30,18 @@ import type { RouteRecordRaw } from 'vue-router'
  * to test, and avoids importing the guards eagerly into every chunk that
  * touches the router).
  */
-export type GuardName = 'requireAuth' | 'requireGuest' | 'requireMfaEnrolled'
+export type GuardName = 'requireAuth' | 'requireGuest' | 'requireMfaEnrolled' | 'requireAgencyAdmin'
 
 declare module 'vue-router' {
   interface RouteMeta {
     guards?: ReadonlyArray<GuardName>
     /**
-     * `'auth'` routes use `AuthLayout.vue`; `'app'` routes are post-auth
-     * application surface (the dashboard placeholder for now).
+     * `'auth'` routes use `AuthLayout.vue`.
+     * `'agency'` routes use `AgencyLayout.vue` (sidebar + topbar + user menu).
+     * `'app'` routes use the bare v-app catch-all.
      * `'error'` is the terminal error layout.
      */
-    layout?: 'auth' | 'app' | 'error'
+    layout?: 'auth' | 'agency' | 'app' | 'error'
   }
 }
 
@@ -117,23 +118,68 @@ export const authRoutes: RouteRecordRaw[] = [
 ]
 
 export const appRoutes: RouteRecordRaw[] = [
-  // Dashboard placeholder — full implementation in chunk 7. Requires
-  // authentication AND MFA enrolment (gate enforced by requireMfaEnrolled,
-  // which redirects unenroled users to the enable-2fa page). The
-  // placeholder lives under `core/pages/` rather than the auth module so
-  // it does not pollute the auth module's 100% coverage scope.
+  // Dashboard — requires auth (full implementation in Sprint 3+).
   {
     path: '/',
     name: 'app.dashboard',
     component: () => import('@/core/pages/DashboardPlaceholderPage.vue'),
-    meta: { layout: 'app', guards: ['requireAuth', 'requireMfaEnrolled'] },
+    meta: { layout: 'agency', guards: ['requireAuth'] },
   },
-  // Settings placeholder — landing target for DisableTotp on success.
+
+  // ── Brands ───────────────────────────────────────────────────────────────
+  {
+    path: '/brands',
+    name: 'brands.list',
+    component: () => import('@/modules/brands/pages/BrandListPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth'] },
+  },
+  {
+    path: '/brands/new',
+    name: 'brands.create',
+    component: () => import('@/modules/brands/pages/BrandCreatePage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth'] },
+  },
+  {
+    path: '/brands/:ulid',
+    name: 'brands.detail',
+    component: () => import('@/modules/brands/pages/BrandDetailPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth'] },
+  },
+  {
+    path: '/brands/:ulid/edit',
+    name: 'brands.edit',
+    component: () => import('@/modules/brands/pages/BrandEditPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth'] },
+  },
+
+  // ── Agency users / invitations ────────────────────────────────────────────
+  // Visible only to agency_admin (route guard + UI gating).
+  {
+    path: '/agency-users',
+    name: 'agency-users.list',
+    component: () => import('@/modules/agency-users/pages/AgencyUsersPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyAdmin'] },
+  },
+
+  // ── Settings ──────────────────────────────────────────────────────────────
+  // Visible to all roles; editable by admin only (backend + UI enforced).
   {
     path: '/settings',
-    name: 'app.settings',
-    component: () => import('@/core/pages/DashboardPlaceholderPage.vue'),
-    meta: { layout: 'app', guards: ['requireAuth'] },
+    name: 'settings',
+    component: () => import('@/modules/settings/pages/SettingsPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth'] },
+  },
+
+  // ── Accept invitation ─────────────────────────────────────────────────────
+  // Public landing page. Auth state is detected inside the page.
+  // No layout guard — this renders inside AgencyLayout only if authenticated,
+  // and falls back to a minimal layout for unauthenticated visitors.
+  // Using AuthLayout keeps it simple for unauthenticated state.
+  {
+    path: '/accept-invitation',
+    name: 'accept-invitation',
+    component: () => import('@/modules/agency-users/pages/AcceptInvitationPage.vue'),
+    meta: { layout: 'auth' },
   },
 ]
 
