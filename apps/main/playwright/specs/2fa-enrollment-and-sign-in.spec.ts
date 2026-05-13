@@ -109,15 +109,22 @@ test.describe('spec #19 — 2FA enrollment + sign-in', () => {
     await expect(page.locator(dt(testIds.emailVerificationPendingPage))).toBeVisible()
 
     // -----------------------------------------------------------------
-    // Step 2 — sign in. The requireMfaEnrolled guard sends us to
-    // `/auth/2fa/enable` because the new user has no 2FA yet.
+    // Step 2 — sign in. Sprint 2 chunk 2 changed the post-auth contract:
+    // the dashboard route (`/`) no longer carries `requireMfaEnrolled`,
+    // so a fresh user with no 2FA lands on `/` rather than being
+    // bounced to `/auth/2fa/enable`. We assert the sign-in succeeded
+    // (we are no longer on /sign-in — the cookie landed) and then
+    // navigate explicitly to the enrollment page for the rest of the
+    // journey under test.
     // -----------------------------------------------------------------
     await page.goto('/sign-in')
     await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(PASSWORD)
     await page.locator(dt(testIds.signInSubmit)).click()
 
-    await expect(page).toHaveURL(/\/auth\/2fa\/enable/)
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
+
+    await page.goto('/auth/2fa/enable')
     await expect(page.locator(dt(testIds.enableTotpPage))).toBeVisible()
 
     // -----------------------------------------------------------------

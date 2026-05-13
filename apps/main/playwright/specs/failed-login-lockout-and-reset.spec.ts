@@ -235,12 +235,13 @@ test.describe('spec #20 — failed-login lockout + reset / escalation', () => {
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(CORRECT_PASSWORD)
     await page.locator(dt(testIds.signInSubmit)).click()
 
-    // The user has no 2FA → requireMfaEnrolled bounces the dashboard
-    // navigation to `/auth/2fa/enable`. That's the expected resting
-    // place for a successful sign-in by an unenrolled user; the
-    // sign-in itself succeeded (the redirect proves the cookie
-    // landed), which is what step 4 asserts.
-    await expect(page).toHaveURL(/\/auth\/2fa\/enable/)
+    // Sprint 2 chunk 2 changed the post-auth contract: the dashboard
+    // route (`/`) no longer carries `requireMfaEnrolled`, so the user
+    // lands on `/` directly rather than `/auth/2fa/enable`. Step 4's
+    // intent is to prove the sign-in succeeded (the cookie landed and
+    // the user is no longer on `/sign-in`); the exact destination is
+    // immaterial for the lockout flow under test.
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
 
     // -----------------------------------------------------------------
     // Step 5 — sign out (no UI button yet; clear cookies via the
