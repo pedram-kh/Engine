@@ -51,7 +51,7 @@ test.describe('Permission gating', () => {
 
     // Create a staff member by seeding an invitation + accepting it.
     const staffEmail = `staff-${Date.now()}@catalyst-test.dev`
-    const staffPassword = 'Password123!'
+    const staffPassword = 'Cata1yst-E2E-Staff!'
 
     // Create the staff user account.
     await signUpUser(request, staffEmail, staffPassword, 'Staff User')

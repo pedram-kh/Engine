@@ -63,6 +63,7 @@ test.describe('Brand happy path', () => {
 
     // ── Navigate to brands ───────────────────────────────────────────────────
     await page.locator(dt(testIds.navBrands)).click()
+    await page.waitForURL(/\/brands$/, { timeout: 10000 })
     await expect(page.locator(dt(testIds.brandListPage))).toBeVisible({ timeout: 10000 })
     await expect(page.locator(dt(testIds.brandListHeading))).toBeVisible({ timeout: 8000 })
 
@@ -71,6 +72,7 @@ test.describe('Brand happy path', () => {
 
     // ── Create a brand ────────────────────────────────────────────────────────
     await page.locator(dt(testIds.brandEmptyCta)).click()
+    await page.waitForURL(/\/brands\/new/, { timeout: 10000 })
     await expect(page.locator(dt(testIds.brandCreatePage))).toBeVisible({ timeout: 10000 })
 
     await page.locator(dt(testIds.brandName)).locator('input').fill('Acme Brand')
@@ -100,6 +102,7 @@ test.describe('Brand happy path', () => {
 
     // ── Navigate to brand list and verify it appears ──────────────────────────
     await page.locator(dt(testIds.navBrands)).click()
+    await page.waitForURL(/\/brands$/, { timeout: 10000 })
     await expect(page.locator(dt(testIds.brandTable))).toBeVisible({ timeout: 10000 })
     await expect(page.locator(dt(testIds.brandTable))).toContainText('Acme Brand Updated', {
       timeout: 8000,

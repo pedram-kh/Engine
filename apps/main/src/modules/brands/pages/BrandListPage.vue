@@ -11,7 +11,7 @@
  */
 
 import type { BrandResource } from '@catalyst/api-client'
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
@@ -72,6 +72,22 @@ async function loadBrands(): Promise<void> {
     loading.value = false
   }
 }
+
+// Load on mount. The v-data-table-server is inside a v-else that only
+// renders once items are populated, so @update:options cannot trigger the
+// initial fetch. We must call loadBrands() explicitly on mount.
+onMounted(() => {
+  void loadBrands()
+})
+
+// Re-load whenever the active agency changes (e.g. workspace switch or
+// async store init — currentAgencyId may be null on first mount).
+watch(
+  () => agencyStore.currentAgencyId,
+  (id) => {
+    if (id !== null) void loadBrands()
+  },
+)
 
 watch(statusFilter, () => {
   tableOptions.value.page = 1

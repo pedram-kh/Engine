@@ -111,10 +111,13 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * Drop the stored user back to `null` and reset MFA-required flag.
    * Called after logout, after an authoritative 401, and from tests.
+   * Resets bootstrapStatus to 'idle' so the next requireAuth guard
+   * triggers a fresh bootstrap rather than short-circuiting.
    */
   function clearUser(): void {
     user.value = null
     mfaEnrollmentRequired.value = false
+    bootstrapStatus.value = 'idle'
     useAgencyStore().reset()
   }
 
@@ -127,13 +130,21 @@ export const useAuthStore = defineStore('auth', () => {
       return inFlightBootstrap
     }
 
+    // Skip re-fetch if already bootstrapped. clearUser() resets the status
+    // to 'idle' on logout so the next auth-required navigation re-runs.
+    if (bootstrapStatus.value === 'ready') {
+      return
+    }
+
     bootstrapStatus.value = 'loading'
 
     inFlightBootstrap = (async (): Promise<void> => {
       try {
         const me = await authApi.me()
-        user.value = me
-        mfaEnrollmentRequired.value = false
+        // Use setUser() so the agency store is initialized from the membership
+        // list embedded in the /me response. Direct user.value assignment would
+        // skip agencyStore.initFromUser() and leave currentAgencyId null.
+        setUser(me)
         bootstrapStatus.value = 'ready'
       } catch (error) {
         if (error instanceof ApiError && error.status === 401) {

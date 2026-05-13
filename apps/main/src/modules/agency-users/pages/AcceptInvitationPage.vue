@@ -81,6 +81,12 @@ async function loadPreview(): Promise<void> {
     return
   }
 
+  // Bootstrap to detect session state. The accept page has no requireAuth
+  // guard (it must be reachable unauthenticated), so bootstrap is never
+  // triggered by the router. Without this call, a fresh page.goto() to the
+  // accept URL leaves authStore.user null even when a session cookie exists.
+  await authStore.bootstrap()
+
   try {
     const res = await invitationsApi.preview(a, t)
     preview.value = res.data

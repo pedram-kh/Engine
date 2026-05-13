@@ -67,7 +67,8 @@ test.describe('Invitation happy path', () => {
 
     // Navigate to team page.
     await page.locator(dt(testIds.navAgencyUsers)).click()
-    await expect(page.locator(dt(testIds.agencyUsersPage))).toBeVisible()
+    await page.waitForURL(/\/agency-users/, { timeout: 10000 })
+    await expect(page.locator(dt(testIds.agencyUsersPage))).toBeVisible({ timeout: 10000 })
 
     // Invite user button should be visible for admin.
     await expect(page.locator(dt(testIds.inviteUserBtn))).toBeVisible()
@@ -119,7 +120,7 @@ test.describe('Invitation happy path', () => {
     const request = page.context().request
 
     const inviteeEmail = `invitee-${Date.now()}@catalyst-test.dev`
-    const inviteePassword = 'Password123!'
+    const inviteePassword = 'Cata1yst-E2E-Invitee!'
 
     // Create the invitee account via production sign-up.
     await signUpUser(request, inviteeEmail, inviteePassword, 'Invitee User')

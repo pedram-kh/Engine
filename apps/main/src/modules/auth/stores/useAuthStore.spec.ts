@@ -219,15 +219,27 @@ describe('useAuthStore', () => {
       expect(mocked.me).toHaveBeenCalledTimes(1)
     })
 
-    it('reissues a fresh me() call after the first promise settles', async () => {
+    it('is a no-op once bootstrapped — subsequent sequential calls skip the me() round-trip', async () => {
+      const store = useAuthStore()
+      mocked.me.mockResolvedValueOnce(makeUser())
+
+      await store.bootstrap()
+      await store.bootstrap() // second call — status is 'ready', should be skipped
+
+      expect(mocked.me).toHaveBeenCalledTimes(1)
+    })
+
+    it('reissues a fresh me() call after clearUser() resets bootstrapStatus', async () => {
       const store = useAuthStore()
       mocked.me.mockResolvedValueOnce(makeUser())
       mocked.me.mockResolvedValueOnce(makeUser({ name: 'Changed' }))
 
       await store.bootstrap()
-      await store.bootstrap()
+      store.clearUser() // resets bootstrapStatus to 'idle'
+      await store.bootstrap() // should run again
 
       expect(mocked.me).toHaveBeenCalledTimes(2)
+      expect(store.user?.attributes.name).toBe('Changed')
     })
 
     it('clears the in-flight cache even when the call rejects, so a retry is possible', async () => {
