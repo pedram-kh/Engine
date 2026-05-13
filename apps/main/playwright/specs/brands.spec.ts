@@ -30,7 +30,6 @@ import {
 test.describe('Brand happy path', () => {
   let adminEmail: string
   let adminPassword: string
-  let agencyUlid: string
 
   test.beforeEach(async ({ page }) => {
     const request = page.context().request
@@ -42,7 +41,6 @@ test.describe('Brand happy path', () => {
     const setup = await seedAgencyAdmin(request)
     adminEmail = setup.email
     adminPassword = setup.password
-    agencyUlid = setup.agencyUlid
   })
 
   test.afterEach(async ({ page }) => {
