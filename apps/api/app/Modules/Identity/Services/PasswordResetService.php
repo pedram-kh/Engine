@@ -24,8 +24,11 @@ use Illuminate\Support\Str;
  *
  *   - {@see Request()} issues a token via Laravel's password broker, queues
  *     the localized {@see ResetPasswordMail}, audits via
- *     {@see PasswordResetRequested}. Returns silently for unknown emails to
- *     prevent user enumeration (per OWASP and docs/05 §6.6).
+ *     {@see PasswordResetRequested}. Returns silently for unknown emails AND
+ *     for users with `email_verified_at IS NULL` to prevent user
+ *     enumeration AND to close the bulk-invite throwaway-password vector
+ *     (Sprint 3 Chunk 2 P1 — see docs/reviews/sprint-3-chunk-1-review.md
+ *     "P1 blockers for Chunk 2"). Standing standard #9 + #40.
  *
  *   - {@see complete()} validates the token, sets the new password
  *     (Argon2id, the default driver), invalidates all existing sessions
@@ -51,6 +54,18 @@ final class PasswordResetService
         $user = User::query()->where('email', $email)->first();
 
         if (! $user instanceof User) {
+            return;
+        }
+
+        // #9 user-enumeration defence — silent 204 for unverified users.
+        // Closes the Sprint 3 Chunk 1 bulk-invite throwaway-password
+        // vector: BulkInviteService creates User rows with
+        // email_verified_at = null, so without this gate an attacker
+        // who guesses an invited email could trigger a reset mail that
+        // races the legitimate magic-link consumer. See chunk-1 review's
+        // "P1 blockers for Chunk 2" + docs/tech-debt.md
+        // "Forgot-password user-enumeration defense regression".
+        if ($user->email_verified_at === null) {
             return;
         }
 

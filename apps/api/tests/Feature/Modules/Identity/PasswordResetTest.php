@@ -90,6 +90,50 @@ it('returns 204 silently for an unknown email (user enumeration defence)', funct
     expect(AuditLog::query()->where('action', AuditAction::AuthPasswordResetRequested->value)->count())->toBe(0);
 });
 
+it('returns 204 silently for an unverified user (closes Sprint 3 bulk-invite throwaway-password vector)', function (): void {
+    // Sprint 3 Chunk 2 P1 fix: BulkInviteService creates User rows with
+    // email_verified_at = null. Without this gate, an attacker who
+    // guesses an invited email could trigger a forgot-password mail
+    // that races the legitimate magic-link consumer. See
+    // docs/reviews/sprint-3-chunk-1-review.md "P1 blockers for Chunk 2"
+    // and docs/tech-debt.md "Forgot-password user-enumeration defense
+    // regression". Standing standard #9 + #40.
+    Mail::fake();
+    Event::fake([PasswordResetRequested::class]);
+
+    $user = User::factory()->unverified()->createOne([
+        'email' => 'invited-but-not-verified@example.com',
+    ]);
+
+    expect($user->email_verified_at)->toBeNull();
+
+    $this->postJson('/api/v1/auth/forgot-password', ['email' => 'invited-but-not-verified@example.com'])
+        ->assertStatus(204);
+
+    Mail::assertNothingQueued();
+    Event::assertNotDispatched(PasswordResetRequested::class);
+
+    expect(AuditLog::query()->where('action', AuditAction::AuthPasswordResetRequested->value)->count())->toBe(0);
+});
+
+it('still queues the reset mail for verified users (regression guard for the unverified gate)', function (): void {
+    // Defence-in-depth: pin that the new email_verified_at gate did NOT
+    // accidentally short-circuit the verified-user happy path. Without
+    // this assertion, an over-broad `return;` in PasswordResetService
+    // would silently break the documented forgot-password flow for
+    // every legitimate user. Companion to the unverified case above.
+    Mail::fake();
+    Event::fake([PasswordResetRequested::class]);
+
+    User::factory()->createOne(['email' => 'verified@example.com']);
+
+    $this->postJson('/api/v1/auth/forgot-password', ['email' => 'verified@example.com'])
+        ->assertStatus(204);
+
+    Mail::assertQueued(ResetPasswordMail::class);
+    Event::assertDispatched(PasswordResetRequested::class);
+});
+
 it('rejects forgot-password without an email', function (): void {
     $this->postJson('/api/v1/auth/forgot-password', [])
         ->assertStatus(422);

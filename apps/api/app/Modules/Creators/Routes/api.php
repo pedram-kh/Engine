@@ -23,6 +23,12 @@ use Illuminate\Support\Facades\Route;
 | IS applied so that if a creator user happens to also belong to an agency
 | (Sprint 4+), the TenancyContext is still populated for downstream use.
 |
+| The `verified` middleware (Laravel's EnsureEmailIsVerified) was added in
+| Sprint 3 Chunk 2 sub-step 1 alongside the PasswordResetService::request()
+| email_verified_at gate as defence-in-depth (#40) against the bulk-invite
+| throwaway-password vector. See docs/reviews/sprint-3-chunk-1-review.md
+| "P1 blockers for Chunk 2" and the chunk-2 review's sub-step 1.
+|
 | Cross-tenant route allowlist (docs/security/tenancy.md § 4):
 |   GET    /api/v1/creators/me                    Sprint 3 Chunk 1
 |   PATCH  /api/v1/creators/me/wizard/profile     Sprint 3 Chunk 1
@@ -41,7 +47,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('creators/me')
     ->name('creators.me.')
-    ->middleware(['auth:web', 'tenancy.set'])
+    ->middleware(['auth:web', 'tenancy.set', 'verified'])
     ->group(function (): void {
         Route::get('/', [CreatorWizardController::class, 'show'])->name('show');
 
