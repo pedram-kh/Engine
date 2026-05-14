@@ -283,12 +283,36 @@ anyone reviewing it later.
 
 ---
 
-## CreatorBootstrapService random throwaway password on bulk-invite
+## Forgot-password user-enumeration defense regression — surfaced by Sprint 3 Chunk 1 bulk-invite
 
-- **Where:** [`apps/api/app/Modules/Creators/Services/BulkInviteService.php::findOrCreateInviteeUser()`](../apps/api/app/Modules/Creators/Services/BulkInviteService.php).
-- **What we accepted in Sprint 3 Chunk 1:** When a bulk-invite row references an email that has no existing User row, the service pre-creates a User with a 64-character random hex string as the password. The invitee sets a real password via the `/auth/accept-invite` flow (Chunk 2 surface). The throwaway password is hashed by Laravel's normal hashing pipeline.
-- **Risk:** The throwaway password is mathematically un-guessable but is technically a valid password. If a future change accidentally exposes the bulk-invited User row to the normal `/auth/login` endpoint before the invitee sets a real password, an attacker who somehow learned the throwaway hex would be able to log in.
-- **Mitigation today:** The bulk-invited User row carries `email_verified_at = null`. The login endpoint already refuses unverified users (Sprint 1 chunk 5).
-- **Resolution:** Chunk 2's accept-invite flow MUST verify (a) the User has `email_verified_at = null`, (b) the relation's invitation_token_hash matches, and (c) re-set the password via the normal `Hash::make()` call before stamping `email_verified_at = now()`. A regression test should pin: a bulk-invited User with the throwaway password in plaintext (somehow leaked) cannot log in via `/auth/login` until they accept-invite.
-- **Owner:** Sprint 3 Chunk 2 (accept-invite flow).
+- **Where:** [`apps/api/app/Modules/Identity/Services/PasswordResetService.php::request()`](../apps/api/app/Modules/Identity/Services/PasswordResetService.php) + [`apps/api/app/Modules/Creators/Routes/api.php`](../apps/api/app/Modules/Creators/Routes/api.php) (the `creators.me.*` route group's missing `verified` middleware).
+- **What we accepted in Sprint 3 Chunk 1:** `PasswordResetService::request()` does NOT check `User::email_verified_at` before issuing a reset token. Pre-Sprint-3 this was a latent gap — there was no Eloquent path to create an unverified User without going through the verify-email flow (`SignUpService` immediately queues the verification mail; `EmailVerificationService::verify()` is the only writer to `email_verified_at`). Sprint 3 Chunk 1's `BulkInviteService` is the first surface that creates User rows with `email_verified_at = null` outside the verify-email flow, exposing the gap.
+- **Risk:** An attacker who knows or guesses an invited email can trigger a forgot-password mail to that invitee's inbox before the legitimate invitee consumes the magic link. If the attacker (or the invitee racing the attacker) completes the reset, they authenticate the User row WITHOUT consuming the invitation token. The `AgencyCreatorRelation` stays `prospect` indefinitely; the agency is unaware. Wizard routes use `auth:web` not `verified`, so the unverified-via-reset User has full wizard access. Net effect: bulk-invite becomes a user-confusion / spam vector (P1) and an invitation-bypass vector (P2). Regression of standing standard #9 (user-enumeration defense across the auth surface).
+- **Mitigation today:** None — the gap exists and is exploitable as soon as the Chunk 2 frontend ships the magic-link landing page. The throwaway password itself (256-bit random hex, Argon2id-hashed) is not the weakness; the password broker is.
+- **Resolution:** Sprint 3 Chunk 2 P1 blocker (see [`docs/reviews/sprint-3-chunk-1-review.md`](./reviews/sprint-3-chunk-1-review.md) → "P1 blockers for Chunk 2"). Concretely: (a) `PasswordResetService::request()` returns silently when `User::email_verified_at IS NULL`, (b) wizard routes add the `verified` middleware alongside `auth:web`, (c) break-revert independent unit coverage per #40 for both gates, (d) `PasswordResetServiceTest` gets a `"returns silently for unverified users"` case.
+- **Sprint 4 close** to retrospective the full standing-standard #9 surface — Sprint 1 + Sprint 2 auth-surface review didn't catch this latent gap; the retrospective audits every endpoint that issues a credential / token / link to a User, against the verified-email gate.
+- **Owner:** Sprint 3 Chunk 2 (immediate fix); Sprint 4 close (#9 surface retrospective).
+- **Status:** open.
+
+---
+
+## tenancy.md § 4 categorization sloppy — three categories collapsed into one
+
+- **Where:** [`docs/security/tenancy.md`](./security/tenancy.md) § 4.
+- **What we accepted in Sprint 3 Chunk 1 (F1):** The cross-tenant route allowlist in § 4 collapses three semantically distinct categories into one ("cross-tenant"): **(a) cross-tenant** (admin tooling that legitimately spans tenants — e.g. platform-admin agency-listing), **(b) tenant-less** (no tenant data — liveness, public preview), **(c) path-scoped tenant** (tenant resolved from URL path param, not session — e.g. `POST /api/v1/agencies/{agency}/invitations`). The doc's invariant ("every cross-tenant route MUST appear in the allowlist below") is correct but the table justifications now mix three rationales. Sprint 3 Chunk 1's F1 fix added the categorization note inline but deferred the structural Category column.
+- **Risk:** A future contributor reads the table, sees a `creators/me` row justified as "Creator is a global entity" and a Sprint 2 invitation row justified as "agency resolved from path param", and may not realize they belong to different categories with different security review requirements. Auditors reading the doc see a flat list and may miss that the no-context contract MEANS something different per category.
+- **Resolution:** Dedicated housekeeping commit before Sprint 4 kickoff. (1) Add a `Category` column to the table, (2) recategorize all existing rows, (3) audit every route in the codebase against the allowlist (the F1 audit found 3 missing routes — there may be more), (4) add per-category security-review guidance to the prose around § 4.
+- **Owner:** dedicated housekeeping commit; Pedram drives.
+- **Status:** open.
+
+---
+
+## Provider contract test "exactly one Sprint-3 method" broken by design when Chunk 2 lands
+
+- **Where:** [`apps/api/tests/Feature/Modules/Creators/IntegrationProviderBindingsTest.php`](../apps/api/tests/Feature/Modules/Creators/IntegrationProviderBindingsTest.php) → `"the three contracts each define exactly one Sprint-3 method"`.
+- **What we accepted in Sprint 3 Chunk 1:** The contract test pins the Sprint-3 surface at exactly one method per contract (`initiateVerification`, `sendEnvelope`, `createConnectedAccount`). When Chunk 2 extends the contracts to add status-check methods (`getVerificationStatus`, `getEnvelopeStatus`, `getAccountStatus`) and webhook methods (`parseWebhookEvent`, `verifyWebhookSignature`), this test MUST fail. The break is intentional: it forces the Chunk 2 author to update the assertion in lockstep with the contract extension, preventing accidental contract growth.
+- **Risk:** A Chunk 2 author confused by the failure may simply remove the assertion rather than replace it with the new "Sprint-3-completion surface" enumeration, eroding the contract-shape pin entirely.
+- **Mitigation today:** The test docblock and this tech-debt entry call out the by-design break + the replacement assertion shape (`"each contract has the Sprint-3-completion surface"` with explicit method-name enumeration matching the chosen wizard-completion architecture per the Sprint 3 Chunk 1 review's "Honest deviations" → "Provider contract surface narrowed from kickoff").
+- **Resolution:** Chunk 2 close: update the assertion to enumerate the new contract methods explicitly. Pin both the Sprint-3-initiate methods AND the new completion methods.
+- **Owner:** Sprint 3 Chunk 2.
 - **Status:** open.

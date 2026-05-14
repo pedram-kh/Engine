@@ -32,10 +32,10 @@ This chunk lays the entire data-model + service-layer foundation for the creator
 - **InvitationPreviewController** — pushback-applied response shape `{agency_name, is_expired, is_accepted}` ONLY (no email).
 - **POST `/api/v1/agencies/{agency}/creators/invitations/bulk`** — admin-only via in-controller `authorizeAdmin()` (D-pause-9).
 - **GET `/api/v1/creators/invitations/preview`** — unauthenticated preview endpoint.
-- **`tenancy.md` § 4 allowlist** — extended with all 18 new cross-tenant routes added by this chunk.
+- **`tenancy.md` § 4 allowlist** — extended with **15** new cross-tenant routes added by this chunk (the 14 `creators.me.*` routes + `GET /api/v1/jobs/{job}`), plus **3 path-scoped-tenant routes** added in this same commit per F1: the Sprint 2 oversight `POST /api/v1/agencies/{agency}/invitations` + the new Sprint 3 `POST /api/v1/agencies/{agency}/creators/invitations/bulk` and `GET /api/v1/creators/invitations/preview` (see "Honest deviations" → "tenancy.md categorization audit" below).
 - **15+ new audit-action enum cases** under the `creator.*`, `creator.wizard.*`, `bulk_invite.*`, plus auto-emitter overrides for the related models (`creator_tax_profile.*`, `creator_payout_method.*`, `agency_creator_relation.*`).
 - **6 doc fix-ups:** `02-CONVENTIONS.md` § 6.3 (MinIO), `runbooks/local-dev.md` § 6 (MinIO bootstrap), `20-PHASE-1-SPEC.md` § 5 (`agency_creator_relations` shipping note), `security/tenancy.md` § 4 (allowlist additions), plus the `tech-debt.md` additions and `06-INTEGRATIONS.md` § 13.1 driver-convention deferral note (via tech-debt entry).
-- **5 new tech-debt entries** in `tech-debt.md`.
+- **7 new tech-debt entries** in `tech-debt.md` (4 carried forward from the original close-out + 3 added during the pre-merge review pass; see "Tech-debt added" below).
 
 ---
 
@@ -150,7 +150,7 @@ Each contract (`KycProvider`, `EsignProvider`, `PaymentProvider`) defines exactl
 | 14  | Preview endpoint exposes NO email (#42 + pushback)                                                                                                    | ✅ Verified by `InvitationPreviewControllerTest` (`assertExactJson` shape pin)                   |
 | 15  | Unhashed invitation token is never persisted (Q1 hardening)                                                                                           | ✅ Verified by `InvitationTokenStorageTest`                                                      |
 | 16  | All 15+ Sprint 3 audit-action enum cases land with correct names                                                                                      | ✅ Verified by `Sprint3AuditActionsTest`                                                         |
-| 17  | `tenancy.md` § 4 allowlist covers all 18 new cross-tenant routes                                                                                      | ✅ Manually verified; route-list output matches                                                  |
+| 17  | `tenancy.md` § 4 allowlist covers all 15 new cross-tenant routes + 3 path-scoped-tenant routes (Sprint 2 oversight + 2 Sprint 3 routes; see F1)       | ✅ Manually verified; route-list output matches                                                  |
 | 18  | PHPStan green; full test suite green; Pint clean                                                                                                      | ✅ 597 tests passing (1816 assertions); PHPStan 0 errors; Pint applied via `php vendor/bin/pint` |
 
 ---
@@ -166,21 +166,88 @@ Each contract (`KycProvider`, `EsignProvider`, `PaymentProvider`) defines exactl
 
 ---
 
-## Plan corrections / honest deviation flagging
+## Honest deviations
 
-None this chunk. Build matched the plan + refinements as approved. The Intervention Image v4 API surprise (no static `read()` method) was a sub-step-3-internal correction, not a plan-level deviation — fixed by switching to `decodePath()` + explicit `JpegEncoder/PngEncoder/WebpEncoder` and proceeding.
+The build matched the plan as approved on the in-build dimensions; the deviations below were either (a) discovered during the Chunk 1 read pass and shipped knowingly, or (b) surfaced during the pre-merge review pass and are flagged here so they cannot be lost on the way to the next chunk. The Intervention Image v4 API surprise (no static `read()` method) was a sub-step-3-internal correction, not a plan-level deviation — fixed by switching to `decodePath()` + explicit `JpegEncoder/PngEncoder/WebpEncoder` and proceeding.
+
+### Throwaway-password design — bulk-invited User rows exist before acceptance
+
+To satisfy `agency_creator_relations.creator_id NOT NULL`, bulk invite eagerly creates User + Creator + Relation atomically. User row has `email_verified_at = null` and a 256-bit random hex Argon2id-hashed password.
+
+**Security side-channel surfaced during Chunk 1 review (S2):** `PasswordResetService::request()` does NOT check `email_verified_at` — an attacker who knows or guesses an invited email can trigger a forgot-password email to that invitee's inbox before the legitimate invitee consumes the magic link. If the attacker (or the invitee racing the attacker) completes the reset, they authenticate the User row WITHOUT consuming the invitation token. The `AgencyCreatorRelation` stays `prospect` indefinitely; the agency is unaware. Wizard routes use `auth:web` not `verified`, so the unverified-via-reset User has full wizard access.
+
+This is a regression of standing standard #9 (user-enumeration defense across the auth surface). The forgot-password endpoint's missing `email_verified_at` check was latent through Sprint 1 + Sprint 2 — pre-Sprint-3 there was no Eloquent path to create an unverified User without going through the verify-email flow. Sprint 3 Chunk 1's bulk-invite shape exposes the latent gap.
+
+Mitigation is mandatory in Chunk 2 — see "P1 blockers for Chunk 2" below.
+
+### Provider contract surface narrowed from kickoff
+
+Kickoff specified 11 contract methods (KycProvider: 4, EsignProvider: 4, PaymentProvider Sprint-3 subset: 3). Chunk 1 shipped 3 (initiate-only per contract). The 8-method gap covers:
+
+- **Status-check methods (3):** `getVerificationStatus`, `getEnvelopeStatus`, `getAccountStatus`.
+- **Webhook handling methods (5):** `parseWebhookEvent` + `verifyWebhookSignature` for each of KYC + eSign + Payment, with the Payment one being `parseWebhookEvent` + `verifyWebhookSignature` combined to 1 per provider = 6 actually, but 4 listed in kickoff = methodological imprecision in the original kickoff acknowledged.
+
+Wizard cannot progress past Steps 5 / 7 / 8 in Chunk 1 because there is no status-check endpoint and no webhook handler. `KycStatus`, `payout_method_set`, `signed_master_contract_id` sit at initial values forever.
+
+Future-extension surface enumerated in each contract's docblock per D-pause-11; Chunk 2's read pass treats those docblocks as the binding shape.
+
+**Chunk 2's first architectural decision: pick the wizard-completion architecture.** Three options:
+
+1. Status-poll endpoint + status-check contract methods (wizard frontend polls after redirect-bounce).
+2. Webhook handlers + signature/parse contract methods (vendor calls Catalyst directly).
+3. Mock-synchronous (only viable for mocks; real adapters need 1 or 2 eventually).
+
+**Recommendation (Claude review): adopt BOTH (1) and (2).** Real production needs both — status-check for the redirect-bounce UX confirmation; webhooks for the authoritative state update. Mock implementations can complete-on-status-check (option 3's mechanics, accessed via the status-check contract method). Real adapters (Sprints 4 / 7 / 10) implement both branches. Contract grows by 5 methods (status-check × 3 + webhook signature × 2 — KYC + eSign use webhooks; Stripe Connect onboarding completes via `account.updated` webhook). Final contract surface ends at 8 methods (3 initiate + 3 status + 2 webhook for the KYC/eSign cases; Stripe Connect's onboarding-only Sprint-3 surface doesn't need webhook handling yet — that's Sprint 10).
+
+The `IntegrationProviderBindingsTest` assertion `"the three contracts each define exactly one Sprint-3 method"` is **by design** — it forces Chunk 2 to update the test in lockstep with the contract extension. The replacement assertion at Chunk 2 close: `"each contract has the Sprint-3-completion surface"` with explicit method-name enumeration.
+
+### tenancy.md § 4 categorization audit (F1)
+
+The pre-merge audit surfaced three routes that lived outside the `tenancy.set + tenancy` middleware stack but were not in the cross-tenant allowlist, in violation of the doc's "every cross-tenant route MUST appear in the allowlist below" invariant:
+
+- `POST /api/v1/agencies/{agency}/invitations` — Sprint 2 oversight; same path-param-resolved-tenant pattern as Sprint 3's bulk-invite. Mirrors the precedent that Sprint 3's D-pause-9 instructed me to follow.
+- `POST /api/v1/agencies/{agency}/creators/invitations/bulk` — Sprint 3, this chunk. Same pattern.
+- `GET /api/v1/creators/invitations/preview` — Sprint 3, this chunk; unauthenticated, returns no enumerable identifiers (#42).
+
+All three were added to the allowlist in this same commit (F1). Each has feature-test coverage that exercises the no-context contract:
+
+- `POST /api/v1/agencies/{agency}/invitations` → `tests/Feature/Modules/Agencies/InvitationTest.php` (Sprint 2).
+- `POST /api/v1/agencies/{agency}/creators/invitations/bulk` → `tests/Feature/Modules/Creators/BulkInviteEndpointTest.php`.
+- `GET /api/v1/creators/invitations/preview` → `tests/Feature/Modules/Creators/InvitationPreviewControllerTest.php`.
+
+The doc's table currently collapses three categories (cross-tenant, tenant-less, path-scoped tenant) into one. A `Category` column + recategorization of all rows is deferred to a dedicated housekeeping commit (tech-debt entry — see below).
+
+---
+
+## P1 blockers for Chunk 2
+
+The accept-invite flow is the natural Chunk 2 deliverable; before it ships, the following MUST land or the throwaway-password side-channel becomes exploitable in production:
+
+### P1 — `PasswordResetService::request()` `email_verified_at` gate
+
+(a) `PasswordResetService::request()` returns silently (no token issued, no mail sent) when `User::email_verified_at IS NULL`.
+
+(b) Wizard routes (`creators.me.*`) add the `verified` middleware alongside `auth:web`. Concretely, this changes the `Route::prefix('creators/me')->middleware(['auth:web', 'tenancy.set'])` group to `->middleware(['auth:web', 'verified', 'tenancy.set'])` and exercises Laravel's `EnsureEmailIsVerified` contract — which the `User` model already implements via `MustVerifyEmail`.
+
+(c) Break-revert independent unit coverage per #40 for both gates: temporarily remove the `email_verified_at` check, confirm a specific test fails, revert. Same for the `verified` middleware — temporarily remove the alias from the route group; confirm a feature test fails (e.g. an unverified-but-authenticated user can call `/api/v1/creators/me/wizard/profile`); revert.
+
+(d) Existing `PasswordResetServiceTest` gets a new case: `"returns silently for unverified users"`. Asserts: no token in `password_reset_tokens` table, no mail queued, no `PasswordResetRequested` event dispatched.
+
+Failure to land (a)+(b)+(c)+(d) before the accept-invite flow ships in Chunk 2 reopens the side-channel surfaced in S2 of this review.
 
 ---
 
 ## Tech-debt added
 
-5 entries appended to `docs/tech-debt.md`:
+7 entries appended to `docs/tech-debt.md` (4 from the close-out + 3 surfaced during the pre-merge review pass):
 
 1. **Sprint 1 self-review §a inaccuracy** — `agency_creator_relations` reconciliation in a future doc-cleanup pass.
 2. **Standards migration backlog** — Sprint 1 chunk-7.1 review-file standards (#5.21+) and Sprint 2 self-review § b standards (#34+) are de facto applied but not yet documented in PROJECT-WORKFLOW.md § 5. Migration deferred to a dedicated housekeeping commit before Sprint 4 kickoff.
 3. **Integration driver env-var convention** — `INTEGRATIONS_DRIVER` (spec §13.1) vs per-provider `KYC_PROVIDER=mock` etc. (.env.example). Chunk 2 picks the standard.
 4. **Resume UX bootstrap shape — admin/creator endpoint symmetry pending** — the `CreatorResource` is structured to satisfy both endpoints but Chunk 3 must validate the assumption.
-5. **CreatorBootstrapService random throwaway password on bulk-invite** — bulk-invited User rows carry a random hex password until acceptance. Chunk 2's accept-invite flow MUST reset the password and only then mark the email verified.
+5. **(NEW)** **Forgot-password user-enumeration defense regression** — Sprint 2 + Sprint 1 auth-surface review missed `PasswordResetService::request()`'s missing `email_verified_at` check. Pre-Sprint-3 the gap was latent (no path to create unverified Users); Sprint 3 Chunk 1's bulk-invite exposes it. Mitigation in Chunk 2 (see P1 blockers above). Sprint 4 close to retrospective the full standing-standard #9 surface.
+6. **(NEW)** **`tenancy.md` § 4 categorization sloppy** — three categories (cross-tenant, tenant-less, path-scoped tenant) collapsed into one. Add a `Category` column, recategorize all rows, audit all routes for allowlist coverage in a housekeeping commit before Sprint 4.
+7. **(NEW)** **Contract test "exactly one Sprint-3 method" broken by design** when Chunk 2 extends the contract surface — Chunk 2 updates the assertion in lockstep with the extension. Replacement assertion enumerates the Sprint-3-completion method names per contract.
 
 ---
 
@@ -191,7 +258,7 @@ None this chunk. Build matched the plan + refinements as approved. The Intervent
 - `02-CONVENTIONS.md` § 6.3 — MinIO added to the local-dev services list with a forward-pointer to the runbook section.
 - `runbooks/local-dev.md` § 6 (NEW) — full MinIO bootstrap recipe + connection settings + troubleshooting.
 - `20-PHASE-1-SPEC.md` § 5 (Sprint 3 line) — `agency_creator_relations` added to the table list with a forward-pointer to the tech-debt entry on Sprint 1 self-review §a inaccuracy.
-- `security/tenancy.md` § 4 — allowlist extended with the 18 new cross-tenant routes Sprint 3 Chunk 1 introduces.
+- `security/tenancy.md` § 4 — allowlist extended with 15 new cross-tenant routes Sprint 3 Chunk 1 introduces, plus 3 path-scoped-tenant routes (Sprint 2 oversight + 2 Sprint 3 routes; see F1) and a categorization note flagging the Category-column structural change deferred to a housekeeping commit.
 
 ---
 
