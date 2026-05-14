@@ -53,6 +53,12 @@
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="MAIL_MAILER" value="array"/>
+        <!-- Pennant's array driver keeps feature-flag state in-process,
+             avoiding the cross-test coupling on the `features` table
+             from the database driver and keeping non-RefreshDatabase
+             tests usable for binding assertions (Sprint 3 Chunk 2
+             sub-step 8 IntegrationProviderBindingsTest). -->
+        <env name="PENNANT_STORE" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>

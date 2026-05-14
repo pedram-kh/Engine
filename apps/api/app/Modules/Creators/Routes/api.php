@@ -7,6 +7,9 @@ use App\Modules\Creators\Http\Controllers\BulkInviteController;
 use App\Modules\Creators\Http\Controllers\CreatorWizardController;
 use App\Modules\Creators\Http\Controllers\InvitationPreviewController;
 use App\Modules\Creators\Http\Controllers\PortfolioController;
+use App\Modules\Creators\Http\Controllers\Webhooks\EsignWebhookController;
+use App\Modules\Creators\Http\Controllers\Webhooks\KycWebhookController;
+use App\Modules\Creators\Http\Controllers\WizardCompletionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -64,8 +67,31 @@ Route::prefix('creators/me')
                 ->name('payout.initiate');
             Route::post('contract', [CreatorWizardController::class, 'initiateContract'])
                 ->name('contract.initiate');
+            Route::post('contract/click-through-accept', [CreatorWizardController::class, 'clickThroughAcceptContract'])
+                ->name('contract.click-through-accept');
             Route::post('submit', [CreatorWizardController::class, 'submit'])
                 ->name('submit');
+
+            // Sprint 3 Chunk 2 sub-step 6 — status-poll + return
+            // endpoints for the three vendor-gated steps. Status
+            // is the periodic poll while the creator stays on the
+            // wizard; return is the redirect-bounce target the
+            // mock-vendor (or real vendor) lands them on after
+            // completion. Both call WizardCompletionService and
+            // emit the matching creator.wizard.*_completed audit
+            // on the success edge (idempotent on re-poll, #6).
+            Route::get('kyc/status', [WizardCompletionController::class, 'kycStatus'])
+                ->name('kyc.status');
+            Route::get('kyc/return', [WizardCompletionController::class, 'kycReturn'])
+                ->name('kyc.return');
+            Route::get('contract/status', [WizardCompletionController::class, 'contractStatus'])
+                ->name('contract.status');
+            Route::get('contract/return', [WizardCompletionController::class, 'contractReturn'])
+                ->name('contract.return');
+            Route::get('payout/status', [WizardCompletionController::class, 'payoutStatus'])
+                ->name('payout.status');
+            Route::get('payout/return', [WizardCompletionController::class, 'payoutReturn'])
+                ->name('payout.return');
         });
 
         Route::post('avatar', [AvatarController::class, 'store'])->name('avatar.store');
@@ -117,3 +143,32 @@ Route::prefix('agencies/{agency}')
 
 Route::get('creators/invitations/preview', InvitationPreviewController::class)
     ->name('creators.invitations.preview');
+
+// ---------------------------------------------------------------------------
+// Inbound vendor webhooks — tenant-less + unauthenticated
+// ---------------------------------------------------------------------------
+//
+// Sprint 3 Chunk 2 sub-step 7 + docs/06-INTEGRATIONS.md § 1.3.
+// Vendors POST signed payloads from their own infrastructure. The
+// controller verifies the signature inline and returns 401 with a
+// single `integration.webhook.signature_failed` error code on
+// failure (no granular failure-mode codes per the chunk-2 plan's
+// "Decisions documented for future chunks").
+//
+// Tenant-less by design: the request has no session / auth, and
+// the payload's contents (creator_ulid) drive the downstream
+// state update inside the Process*WebhookJob — not the route layer.
+// Allowlisted in docs/security/tenancy.md § 4 (sub-step 11).
+//
+// Rate limit: 1000 req/min per provider via the `webhooks` named
+// limiter registered in CreatorsServiceProvider::boot(). Stripe
+// Connect's webhook handler is deferred to Sprint 10 per
+// Q-stripe-no-webhook-acceptable.
+
+Route::middleware('throttle:webhooks')
+    ->prefix('webhooks')
+    ->name('webhooks.')
+    ->group(function (): void {
+        Route::post('kyc', KycWebhookController::class)->name('kyc');
+        Route::post('esign', EsignWebhookController::class)->name('esign');
+    });

@@ -7,12 +7,19 @@ use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
 use App\Modules\Creators\Database\Factories\CreatorPortfolioItemFactory;
 use App\Modules\Creators\Database\Factories\CreatorSocialAccountFactory;
+use App\Modules\Creators\Enums\EsignStatus;
 use App\Modules\Creators\Enums\KycStatus;
+use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
+use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Creators\Integrations\Contracts\EsignProvider;
 use App\Modules\Creators\Integrations\Contracts\KycProvider;
 use App\Modules\Creators\Integrations\Contracts\PaymentProvider;
+use App\Modules\Creators\Integrations\DataTransferObjects\AccountStatus;
 use App\Modules\Creators\Integrations\DataTransferObjects\EsignEnvelopeResult;
+use App\Modules\Creators\Integrations\DataTransferObjects\EsignWebhookEvent;
 use App\Modules\Creators\Integrations\DataTransferObjects\KycInitiationResult;
+use App\Modules\Creators\Integrations\DataTransferObjects\KycWebhookEvent;
 use App\Modules\Creators\Integrations\DataTransferObjects\PaymentAccountResult;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorKycVerification;
@@ -21,6 +28,7 @@ use App\Modules\Creators\Models\CreatorSocialAccount;
 use App\Modules\Creators\Models\CreatorTaxProfile;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Pennant\Feature;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -38,6 +46,21 @@ function bindFakeProviders(): void
         {
             return new KycInitiationResult('sess-fake', 'https://kyc.example/start', '2026-12-31T00:00:00Z');
         }
+
+        public function getVerificationStatus(Creator $creator): KycStatus
+        {
+            return KycStatus::Pending;
+        }
+
+        public function verifyWebhookSignature(string $payload, string $signature): bool
+        {
+            return true;
+        }
+
+        public function parseWebhookEvent(string $payload): KycWebhookEvent
+        {
+            return new KycWebhookEvent('evt_fake', 'verification.completed', null, KycStatus::Verified, []);
+        }
     });
 
     app()->bind(PaymentProvider::class, fn (): PaymentProvider => new class implements PaymentProvider
@@ -45,6 +68,11 @@ function bindFakeProviders(): void
         public function createConnectedAccount(Creator $creator): PaymentAccountResult
         {
             return new PaymentAccountResult('acct_fake', 'https://stripe.example/onboarding', '2026-12-31T00:00:00Z');
+        }
+
+        public function getAccountStatus(Creator $creator): AccountStatus
+        {
+            return new AccountStatus(false, false, false, []);
         }
     });
 
@@ -54,11 +82,34 @@ function bindFakeProviders(): void
         {
             return new EsignEnvelopeResult('env-fake', 'https://esign.example/sign', '2026-12-31T00:00:00Z');
         }
+
+        public function getEnvelopeStatus(Creator $creator): EsignStatus
+        {
+            return EsignStatus::Sent;
+        }
+
+        public function verifyWebhookSignature(string $payload, string $signature): bool
+        {
+            return true;
+        }
+
+        public function parseWebhookEvent(string $payload): EsignWebhookEvent
+        {
+            return new EsignWebhookEvent('evt_fake', 'envelope.signed', null, EsignStatus::Signed, []);
+        }
     });
 }
 
 beforeEach(function (): void {
     bindFakeProviders();
+
+    // Sprint 3 Chunk 2 sub-step 9 — these endpoints exercise the
+    // flag-ON happy path. The flag-OFF skip-path is asserted in
+    // CreatorWizardFlagOffTest. Activating here keeps the
+    // chunk-1-era tests intact under the new gating.
+    Feature::activate(KycVerificationEnabled::NAME);
+    Feature::activate(ContractSigningEnabled::NAME);
+    Feature::activate(CreatorPayoutMethodEnabled::NAME);
 });
 
 it('PATCH /wizard/profile updates fields and recomputes completeness when all profile fields land', function (): void {

@@ -71,6 +71,15 @@ it('AuditAction catalogue lists every Sprint 1-3 auth + user + mfa + brand + inv
         'agency_creator_relation.created',
         'agency_creator_relation.updated',
         'agency_creator_relation.deleted',
+        // Sprint 3 Chunk 2 — wizard completion-pairs (status-poll + webhook)
+        'creator.wizard.kyc_completed',
+        'creator.wizard.contract_completed',
+        'creator.wizard.payout_completed',
+        'creator.wizard.click_through_accepted',
+        // Sprint 3 Chunk 2 — inbound webhook lifecycle
+        'integration.webhook.received',
+        'integration.webhook.processed',
+        'integration.webhook.signature_failed',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());

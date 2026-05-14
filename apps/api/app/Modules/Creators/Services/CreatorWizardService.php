@@ -12,6 +12,9 @@ use App\Modules\Creators\Enums\KycVerificationStatus;
 use App\Modules\Creators\Enums\PayoutStatus;
 use App\Modules\Creators\Enums\SocialPlatform;
 use App\Modules\Creators\Enums\TaxFormType;
+use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
+use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Creators\Integrations\Contracts\EsignProvider;
 use App\Modules\Creators\Integrations\Contracts\KycProvider;
 use App\Modules\Creators\Integrations\Contracts\PaymentProvider;
@@ -24,6 +27,7 @@ use App\Modules\Creators\Models\CreatorPayoutMethod;
 use App\Modules\Creators\Models\CreatorSocialAccount;
 use App\Modules\Creators\Models\CreatorTaxProfile;
 use Illuminate\Support\Facades\DB;
+use Laravel\Pennant\Feature;
 use RuntimeException;
 
 /**
@@ -128,6 +132,8 @@ final class CreatorWizardService
      */
     public function initiateKyc(Creator $creator): KycInitiationResult
     {
+        $this->guardFeatureEnabled(KycVerificationEnabled::NAME);
+
         return DB::transaction(function () use ($creator): KycInitiationResult {
             $result = $this->kycProvider->initiateVerification($creator);
 
@@ -195,6 +201,8 @@ final class CreatorWizardService
      */
     public function initiatePayout(Creator $creator): PaymentAccountResult
     {
+        $this->guardFeatureEnabled(CreatorPayoutMethodEnabled::NAME);
+
         return DB::transaction(function () use ($creator): PaymentAccountResult {
             $result = $this->paymentProvider->createConnectedAccount($creator);
 
@@ -226,6 +234,8 @@ final class CreatorWizardService
      */
     public function initiateContract(Creator $creator): EsignEnvelopeResult
     {
+        $this->guardFeatureEnabled(ContractSigningEnabled::NAME);
+
         return DB::transaction(function () use ($creator): EsignEnvelopeResult {
             $result = $this->esignProvider->sendEnvelope($creator);
 
@@ -248,6 +258,24 @@ final class CreatorWizardService
     public function submit(Creator $creator): Creator
     {
         return DB::transaction(function () use ($creator): Creator {
+            // Sprint 3 Chunk 2 sub-step 9 — flag-OFF skip-path on
+            // submit. When kyc_verification_enabled is OFF and the
+            // creator's kyc_status is still the default `none`,
+            // stamp `not_required` so the row tells the forensic
+            // story "operator-bypassed at submit time"
+            // (Q-flag-off-1 = (a)). The transition is one-way: a
+            // Verified creator stays Verified even if the flag
+            // later flips off.
+            if (
+                ! Feature::active(KycVerificationEnabled::NAME)
+                && $creator->kyc_status === KycStatus::None
+            ) {
+                $creator->forceFill([
+                    'kyc_status' => KycStatus::NotRequired->value,
+                ])->save();
+                $creator->refresh();
+            }
+
             $completion = $this->calculator->stepCompletion($creator);
             foreach ($completion as $isComplete) {
                 if (! $isComplete) {
@@ -270,8 +298,59 @@ final class CreatorWizardService
         });
     }
 
+    /**
+     * Step 8 alternate path — click-through-accept fallback.
+     *
+     * Available only when `contract_signing_enabled` is OFF
+     * (Q-flag-off-2 = (a) in the chunk-2 plan). Stamps
+     * `creators.click_through_accepted_at` so the wizard's
+     * submit-validation treats the contract step as satisfied
+     * without an envelope. Idempotent: a second accept does NOT
+     * re-stamp the timestamp or re-emit the audit row.
+     */
+    public function acceptClickThroughContract(Creator $creator): Creator
+    {
+        if (Feature::active(ContractSigningEnabled::NAME)) {
+            throw new RuntimeException('creator.wizard.feature_enabled');
+        }
+
+        return DB::transaction(function () use ($creator): Creator {
+            if ($creator->click_through_accepted_at !== null) {
+                return $creator;
+            }
+
+            $creator->forceFill([
+                'click_through_accepted_at' => now(),
+            ])->save();
+
+            Audit::log(
+                action: AuditAction::CreatorWizardClickThroughAccepted,
+                actor: $creator->user,
+                subject: $creator,
+            );
+
+            return $creator;
+        });
+    }
+
     private function refreshCompleteness(Creator $creator): void
     {
         $creator->profile_completeness_score = $this->calculator->score($creator);
+    }
+
+    /**
+     * Throw the RuntimeException the controller translates to a
+     * 409 `creator.wizard.feature_disabled` response when an
+     * initiate endpoint is hit while its gating flag is OFF.
+     * Defence-in-depth alongside the Skipped*Provider binding —
+     * the provider would also throw FeatureDisabledException, but
+     * pre-checking at the service layer gives a clearer error
+     * surface and avoids the wasted provider round-trip.
+     */
+    private function guardFeatureEnabled(string $flagName): void
+    {
+        if (! Feature::active($flagName)) {
+            throw new RuntimeException("creator.wizard.feature_disabled:{$flagName}");
+        }
     }
 }

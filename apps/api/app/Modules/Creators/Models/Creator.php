@@ -52,6 +52,7 @@ use Illuminate\Support\Carbon;
  * @property int $profile_completeness_score
  * @property Carbon|null $last_active_at
  * @property int|null $signed_master_contract_id
+ * @property Carbon|null $click_through_accepted_at
  * @property KycStatus $kyc_status
  * @property Carbon|null $kyc_verified_at
  * @property bool $tax_profile_complete
@@ -110,6 +111,7 @@ final class Creator extends Model implements Auditable
         'profile_completeness_score',
         'last_active_at',
         'signed_master_contract_id',
+        'click_through_accepted_at',
         'kyc_status',
         'kyc_verified_at',
         'tax_profile_complete',
@@ -234,6 +236,7 @@ final class Creator extends Model implements Auditable
             'kyc_verified_at' => 'datetime',
             'last_active_at' => 'datetime',
             'submitted_at' => 'datetime',
+            'click_through_accepted_at' => 'datetime',
             'tax_profile_complete' => 'boolean',
             'payout_method_set' => 'boolean',
             'profile_completeness_score' => 'integer',

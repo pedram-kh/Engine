@@ -98,7 +98,15 @@ final class CreatorWizardController
     public function initiateKyc(Request $request): JsonResponse
     {
         $creator = $this->requireCreator($request);
-        $result = $this->wizardService->initiateKyc($creator);
+
+        try {
+            $result = $this->wizardService->initiateKyc($creator);
+        } catch (RuntimeException $e) {
+            if (str_starts_with($e->getMessage(), 'creator.wizard.feature_disabled')) {
+                return $this->featureDisabledResponse($request, 'kyc');
+            }
+            throw $e;
+        }
 
         return response()->json([
             'data' => [
@@ -127,7 +135,15 @@ final class CreatorWizardController
     public function initiatePayout(Request $request): JsonResponse
     {
         $creator = $this->requireCreator($request);
-        $result = $this->wizardService->initiatePayout($creator);
+
+        try {
+            $result = $this->wizardService->initiatePayout($creator);
+        } catch (RuntimeException $e) {
+            if (str_starts_with($e->getMessage(), 'creator.wizard.feature_disabled')) {
+                return $this->featureDisabledResponse($request, 'payout');
+            }
+            throw $e;
+        }
 
         return response()->json([
             'data' => [
@@ -141,7 +157,15 @@ final class CreatorWizardController
     public function initiateContract(Request $request): JsonResponse
     {
         $creator = $this->requireCreator($request);
-        $result = $this->wizardService->initiateContract($creator);
+
+        try {
+            $result = $this->wizardService->initiateContract($creator);
+        } catch (RuntimeException $e) {
+            if (str_starts_with($e->getMessage(), 'creator.wizard.feature_disabled')) {
+                return $this->featureDisabledResponse($request, 'contract');
+            }
+            throw $e;
+        }
 
         return response()->json([
             'data' => [
@@ -150,6 +174,38 @@ final class CreatorWizardController
                 'expires_at' => $result->expiresAt,
             ],
         ]);
+    }
+
+    /**
+     * POST /api/v1/creators/me/wizard/contract/click-through-accept
+     *
+     * Click-through-acceptance fallback for the master-contract
+     * step when `contract_signing_enabled` is OFF
+     * (Q-flag-off-2 = (a)). The endpoint refuses with 409 if the
+     * flag is ON — envelope mode is the canonical path in that
+     * state and the click-through is the operator-bypass route.
+     * Idempotent on re-submit.
+     */
+    public function clickThroughAcceptContract(Request $request): JsonResponse
+    {
+        $creator = $this->requireCreator($request);
+
+        try {
+            $this->wizardService->acceptClickThroughContract($creator);
+        } catch (RuntimeException $e) {
+            if ($e->getMessage() === 'creator.wizard.feature_enabled') {
+                return ErrorResponse::single(
+                    $request,
+                    409,
+                    'creator.wizard.feature_enabled',
+                    'Click-through acceptance is only available while contract signing is disabled. Use the envelope flow instead.',
+                );
+            }
+            throw $e;
+        }
+
+        return (new CreatorResource($creator->refresh(), $this->calculator))
+            ->response();
     }
 
     public function submit(Request $request): JsonResponse
@@ -173,6 +229,16 @@ final class CreatorWizardController
         return (new CreatorResource($creator->refresh(), $this->calculator))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
+    }
+
+    private function featureDisabledResponse(Request $request, string $step): JsonResponse
+    {
+        return ErrorResponse::single(
+            $request,
+            409,
+            'creator.wizard.feature_disabled',
+            "The {$step} step is currently disabled by feature flag. Route to the skip-path UI instead.",
+        );
     }
 
     private function resolveCreator(Request $request): ?Creator

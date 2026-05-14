@@ -86,6 +86,36 @@ enum AuditAction: string
     case CreatorWizardContractInitiated = 'creator.wizard.contract_initiated';
     case CreatorSubmitted = 'creator.submitted';
 
+    // Wizard step completion-pairs — emitted by status-poll / webhook
+    // processing on the FIRST successful state transition to the
+    // terminal "done" value. Idempotent (#6) — re-polling after
+    // completion does not re-emit. Sprint 3 Chunk 2 sub-step 6
+    // (status-poll) + sub-step 7 (Process*WebhookJob).
+    case CreatorWizardKycCompleted = 'creator.wizard.kyc_completed';
+    case CreatorWizardContractCompleted = 'creator.wizard.contract_completed';
+    case CreatorWizardPayoutCompleted = 'creator.wizard.payout_completed';
+
+    // Click-through contract acceptance — emitted by sub-step 9's
+    // `/wizard/contract/click-through-accept` endpoint when the
+    // `contract_signing_enabled` flag is OFF and the creator
+    // accepts terms via the fallback flow. Distinct from
+    // CreatorWizardContractCompleted (envelope-mode); the two
+    // are mutually exclusive per wizard run.
+    case CreatorWizardClickThroughAccepted = 'creator.wizard.click_through_accepted';
+
+    // Inbound webhook lifecycle — emitted by the webhook handler
+    // controllers + Process*WebhookJob. Sprint 3 Chunk 2 sub-step
+    // 7. The `signature_failed` case is a security event — admins
+    // surface these in the audit-review queue; the response body
+    // intentionally does NOT differentiate failure modes (single
+    // error code per the chunk-2 plan's "Decisions documented for
+    // future chunks" section). Distinct from IntegrationEvent
+    // rows (which are vendor-payload archaeology, not audit
+    // history) per Refinement 5.
+    case IntegrationWebhookReceived = 'integration.webhook.received';
+    case IntegrationWebhookProcessed = 'integration.webhook.processed';
+    case IntegrationWebhookSignatureFailed = 'integration.webhook.signature_failed';
+
     // Bulk roster invitation (Sprint 3 Chunk 1, agency-side).
     case CreatorInvited = 'creator.invited';
     case BulkInviteStarted = 'bulk_invite.started';

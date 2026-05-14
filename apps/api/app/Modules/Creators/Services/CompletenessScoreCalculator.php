@@ -6,7 +6,11 @@ namespace App\Modules\Creators\Services;
 
 use App\Modules\Creators\Enums\KycStatus;
 use App\Modules\Creators\Enums\WizardStep;
+use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
+use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Creators\Models\Creator;
+use Laravel\Pennant\Feature;
 
 /**
  * Computes the 0–100 profile-completeness score stored on
@@ -82,14 +86,46 @@ final class CompletenessScoreCalculator
      */
     public function stepCompletion(Creator $creator): array
     {
+        // Sprint 3 Chunk 2 sub-step 9 — flag-OFF skip-path. When a
+        // vendor-gated step's feature flag is OFF, the wizard treats
+        // the step as satisfied for submit-validation purposes:
+        //
+        //   kyc_verification_enabled OFF       → KycStatus::NotRequired
+        //                                        also satisfies the step
+        //                                        (Q-flag-off-1 = (a))
+        //   creator_payout_method_enabled OFF  → step is implicitly satisfied
+        //                                        (no column sentinel — the
+        //                                        absence of payout_method_set
+        //                                        is fine when the operator
+        //                                        has skipped payout entirely)
+        //   contract_signing_enabled OFF       → click_through_accepted_at
+        //                                        non-null also satisfies
+        //                                        (Q-flag-off-2 = (a))
+        //
+        // The flag-on path stays the strict check on the column. This
+        // matters for forensic clarity: a `kyc_status='not_required'`
+        // creator's row tells you "operator-bypassed", while a
+        // `kyc_status='verified'` creator's row tells you "vendor-cleared",
+        // even after the flag is later flipped on or off.
+        $kycSatisfied = $creator->kyc_status === KycStatus::Verified
+            || $creator->kyc_status === KycStatus::NotRequired
+            || ! Feature::active(KycVerificationEnabled::NAME);
+
+        $payoutSatisfied = $creator->payout_method_set === true
+            || ! Feature::active(CreatorPayoutMethodEnabled::NAME);
+
+        $contractSatisfied = $creator->signed_master_contract_id !== null
+            || $creator->click_through_accepted_at !== null
+            || ! Feature::active(ContractSigningEnabled::NAME);
+
         return [
             WizardStep::Profile->value => $this->isProfileComplete($creator),
             WizardStep::Social->value => $creator->socialAccounts()->exists(),
             WizardStep::Portfolio->value => $creator->portfolioItems()->exists(),
-            WizardStep::Kyc->value => $creator->kyc_status === KycStatus::Verified,
+            WizardStep::Kyc->value => $kycSatisfied,
             WizardStep::Tax->value => $creator->tax_profile_complete === true,
-            WizardStep::Payout->value => $creator->payout_method_set === true,
-            WizardStep::Contract->value => $creator->signed_master_contract_id !== null,
+            WizardStep::Payout->value => $payoutSatisfied,
+            WizardStep::Contract->value => $contractSatisfied,
         ];
     }
 

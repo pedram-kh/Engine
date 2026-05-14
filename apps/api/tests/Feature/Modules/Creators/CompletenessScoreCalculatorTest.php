@@ -7,11 +7,26 @@ use App\Modules\Creators\Database\Factories\CreatorPortfolioItemFactory;
 use App\Modules\Creators\Database\Factories\CreatorSocialAccountFactory;
 use App\Modules\Creators\Enums\KycStatus;
 use App\Modules\Creators\Enums\WizardStep;
+use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
+use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Creators\Services\CompletenessScoreCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Pennant\Feature;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
+
+beforeEach(function (): void {
+    // Sprint 3 Chunk 2 sub-step 9 — completeness now honours
+    // flag-OFF skip-paths (KYC / payout / contract steps satisfy
+    // when their gating flag is OFF). These tests pin the
+    // flag-ON weighting; flag-OFF coverage lives in
+    // CreatorWizardFlagOffTest.
+    Feature::activate(KycVerificationEnabled::NAME);
+    Feature::activate(ContractSigningEnabled::NAME);
+    Feature::activate(CreatorPayoutMethodEnabled::NAME);
+});
 
 /*
 |--------------------------------------------------------------------------
