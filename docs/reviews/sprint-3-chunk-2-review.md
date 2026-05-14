@@ -1,8 +1,8 @@
 # Sprint 3 — Chunk 2 Review
 
-**Status:** Ready for review.
+**Status:** Closed.
 
-**Reviewer:** Cursor self-review draft → Claude independent review pass.
+**Reviewer:** Cursor self-review draft → pre-merge spot-check pass (S1-S6) → corrections baked into commit `6a3c081` → closed.
 
 **Reviewed against:** `PROJECT-WORKFLOW.md` § 5 (~27 standing standards binding per the Sprint 3 Chunk 1 D-pause-3 reconciliation), `02-CONVENTIONS.md` § 1 + § 2.2 (modular monolith) + § 5 (git workflow) + § 2.8 (DTO conventions), `03-DATA-MODEL.md` § 17 (`integration_events` + `integration_credentials`) + § 23 (encryption casts), `04-API-DESIGN.md` § 12 (idempotency keys) + § 13 (rate limiting) + § 14 (webhook endpoint pattern), `05-SECURITY-COMPLIANCE.md` § 3 (audit) + § 4 (encryption) + § 13 (rate limiting), `06-INTEGRATIONS.md` § 1 (adapter pattern) + § 1.2 (credentials in Secrets Manager) + § 1.3 (inbound webhook pattern) + § 2 + § 3 + § 4 + § 13.1 (driver convention), `07-TESTING.md` § 4 (testing discipline), `20-PHASE-1-SPEC.md` § 5 (Sprint 3 acceptance) + § 6.1 (wizard step shape) + § 8.1 (mock-usage discipline) + § 8.2 (i18n), `feature-flags.md` (registry + conventions), `security/tenancy.md` § 4 (cross-tenant allowlist), `tech-debt.md` (3 entries closed + 3 entries added by this chunk), `docs/reviews/sprint-3-chunk-1-review.md` (Honest deviations + P1 blockers + decisions for future chunks).
 
