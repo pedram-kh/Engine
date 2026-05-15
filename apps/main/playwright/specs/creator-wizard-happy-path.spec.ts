@@ -239,11 +239,25 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     })
     // Pair the click with an explicit `waitForURL` so we don't poll
     // `toHaveURL` against a navigation that has not yet been
-    // initiated. This was the symptom on CI run 25896340741 attempt
-    // #1: the click fired during a re-render flush and the router
-    // push lost the race against the poll's 30s budget.
+    // initiated (CI run 25896340741 attempt #1 symptom: the click
+    // fired during a re-render flush and the navigation-to-poll race
+    // exhausted the budget).
+    //
+    // 60s budget — not 30s — because this is the only hop in the
+    // spec that crosses into a route chunk with a heavy transitive
+    // import graph (Step8ContractPage pulls `ContractStatusBadge`
+    // from @catalyst/ui + `ClickThroughAccept` + `useVendorBounce`).
+    // Under Playwright's `webServer: vite` configuration, the chunk
+    // is compiled on-demand on first navigation and the cold-compile
+    // cost stacks on top of the guard's `bootstrap()` call. CI run
+    // 25934883993 attempt #1 timed out at 30s on exactly this hop +
+    // passed on retry once Vite's chunk was warm. Other wizard hops
+    // do NOT need 60s because their target chunks are lighter (KYC
+    // and payout flag-OFF surfaces are `<v-alert>`-only) — keeping
+    // those at the standard 10s poll budget surfaces real bugs
+    // without absorbing them in a generous timeout.
     await Promise.all([
-      page.waitForURL(/\/onboarding\/contract/, { timeout: 30_000 }),
+      page.waitForURL(/\/onboarding\/contract/, { timeout: 60_000 }),
       page.locator('[data-testid="payout-advance"]').click(),
     ])
 
