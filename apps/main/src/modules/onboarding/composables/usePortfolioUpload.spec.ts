@@ -159,7 +159,7 @@ describe('usePortfolioUpload', () => {
     it('runs no more than PORTFOLIO_CONCURRENCY uploads in flight', async () => {
       // Use a deferred image-upload promise so we can inspect the
       // in-flight count mid-flight.
-      let pendingResolvers: Array<() => void> = []
+      const pendingResolvers: Array<() => void> = []
       vi.mocked(onboardingApi.uploadPortfolioImage).mockImplementation(async (file) => {
         await new Promise<void>((resolve) => pendingResolvers.push(resolve))
         return {

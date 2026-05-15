@@ -196,15 +196,20 @@ final class CreatorResource extends JsonResource
             ? $creator->socialAccounts
             : $creator->socialAccounts()->get(['platform', 'handle', 'profile_url', 'is_primary']);
 
-        return $accounts
-            ->map(fn (CreatorSocialAccount $account): array => [
-                'platform' => $account->platform->value,
-                'handle' => $account->handle,
-                'profile_url' => $account->profile_url,
-                'is_primary' => $account->is_primary,
-            ])
-            ->values()
-            ->all();
+        // array_values() pins the list shape for Larastan — Eloquent's
+        // Collection::all() returns array<TKey, TValue> regardless of
+        // a preceding ->values() reindex, so PHPStan can't infer the
+        // list invariant from the Collection chain alone.
+        return array_values(
+            $accounts
+                ->map(fn (CreatorSocialAccount $account): array => [
+                    'platform' => $account->platform->value,
+                    'handle' => $account->handle,
+                    'profile_url' => $account->profile_url,
+                    'is_primary' => $account->is_primary,
+                ])
+                ->all(),
+        );
     }
 
     /**
@@ -223,21 +228,24 @@ final class CreatorResource extends JsonResource
             ? $creator->portfolioItems
             : $creator->portfolioItems()->get();
 
-        return $items
-            ->map(fn (CreatorPortfolioItem $item): array => [
-                'id' => $item->ulid,
-                'kind' => $item->kind->value,
-                'title' => $item->title,
-                'description' => $item->description,
-                's3_path' => $item->s3_path,
-                'external_url' => $item->external_url,
-                'thumbnail_path' => $item->thumbnail_path,
-                'mime_type' => $item->mime_type,
-                'size_bytes' => $item->size_bytes,
-                'duration_seconds' => $item->duration_seconds,
-                'position' => $item->position,
-            ])
-            ->values()
-            ->all();
+        // array_values() pins the list shape for Larastan — see the
+        // note on mapSocialAccounts() above.
+        return array_values(
+            $items
+                ->map(fn (CreatorPortfolioItem $item): array => [
+                    'id' => $item->ulid,
+                    'kind' => $item->kind->value,
+                    'title' => $item->title,
+                    'description' => $item->description,
+                    's3_path' => $item->s3_path,
+                    'external_url' => $item->external_url,
+                    'thumbnail_path' => $item->thumbnail_path,
+                    'mime_type' => $item->mime_type,
+                    'size_bytes' => $item->size_bytes,
+                    'duration_seconds' => $item->duration_seconds,
+                    'position' => $item->position,
+                ])
+                ->all(),
+        );
     }
 }
