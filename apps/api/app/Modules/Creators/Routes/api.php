@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Creators\Http\Controllers\Admin\AdminCreatorController;
 use App\Modules\Creators\Http\Controllers\AvatarController;
 use App\Modules\Creators\Http\Controllers\BulkInviteController;
 use App\Modules\Creators\Http\Controllers\CreatorWizardController;
@@ -10,6 +11,7 @@ use App\Modules\Creators\Http\Controllers\PortfolioController;
 use App\Modules\Creators\Http\Controllers\Webhooks\EsignWebhookController;
 use App\Modules\Creators\Http\Controllers\Webhooks\KycWebhookController;
 use App\Modules\Creators\Http\Controllers\WizardCompletionController;
+use App\Modules\Identity\Http\Middleware\EnsureMfaForAdmins;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -67,6 +69,8 @@ Route::prefix('creators/me')
                 ->name('payout.initiate');
             Route::post('contract', [CreatorWizardController::class, 'initiateContract'])
                 ->name('contract.initiate');
+            Route::get('contract/terms', [CreatorWizardController::class, 'getContractTerms'])
+                ->name('contract.terms');
             Route::post('contract/click-through-accept', [CreatorWizardController::class, 'clickThroughAcceptContract'])
                 ->name('contract.click-through-accept');
             Route::post('submit', [CreatorWizardController::class, 'submit'])
@@ -143,6 +147,38 @@ Route::prefix('agencies/{agency}')
 
 Route::get('creators/invitations/preview', InvitationPreviewController::class)
     ->name('creators.invitations.preview');
+
+// ---------------------------------------------------------------------------
+// Admin SPA — read-only Creator drill-in (Sprint 3 Chunk 3 sub-step 9)
+// ---------------------------------------------------------------------------
+//
+// Path: GET /api/v1/admin/creators/{creator}
+//
+// Authentication: 'auth:web_admin' (admin SPA session cookie, gated by
+// the path-aware UseAdminSessionCookie middleware mounted globally).
+// EnsureMfaForAdmins gates the route per chunk 5 priority #7 — admins
+// who haven't enrolled 2FA receive auth.mfa.enrollment_required.
+//
+// Tenancy: tenant-less by category — Creator is a global entity
+// (docs/03-DATA-MODEL.md § 5) and `platform_admin` users do not have
+// agency membership. The fail-closed `tenancy` alias is NOT mounted
+// (it would 500 every admin request); `tenancy.set` is also omitted
+// because the controller does not query any agency-scoped models.
+//
+// Allowlisted in docs/security/tenancy.md § 4 (sub-step 12 fix-up):
+//   GET /api/v1/admin/creators/{creator}  — path-scoped admin tooling
+//
+// Authorization: CreatorPolicy::view (admin branch returns true for
+// platform_admin user_type). Per-field admin EDIT is deferred to
+// Chunk 4 per pause-condition-6 closure.
+
+Route::prefix('admin/creators')
+    ->name('admin.creators.')
+    ->middleware(['auth:web_admin', EnsureMfaForAdmins::class])
+    ->group(function (): void {
+        Route::get('{creator}', [AdminCreatorController::class, 'show'])
+            ->name('show');
+    });
 
 // ---------------------------------------------------------------------------
 // Inbound vendor webhooks — tenant-less + unauthenticated

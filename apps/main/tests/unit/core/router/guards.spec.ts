@@ -12,11 +12,25 @@
  */
 
 import type { RouteLocationNormalized } from 'vue-router'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Module-level mock for useAgencyStore — hoisted, safe to reference in tests via vi.mocked().
 vi.mock('@/core/stores/useAgencyStore', () => ({
   useAgencyStore: vi.fn(() => ({ isAdmin: false })),
+}))
+
+// Module-level mock for useOnboardingStore — the requireOnboardingAccess
+// guard lazy-imports the store inside its body, so we mock the import
+// path the dynamic import resolves to.
+const onboardingStoreStub: {
+  bootstrap: ReturnType<typeof vi.fn>
+  applicationStatus: 'incomplete' | 'pending' | 'approved' | 'rejected' | null
+} = {
+  bootstrap: vi.fn(async () => undefined),
+  applicationStatus: 'incomplete',
+}
+vi.mock('@/modules/onboarding/stores/useOnboardingStore', () => ({
+  useOnboardingStore: vi.fn(() => onboardingStoreStub),
 }))
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
@@ -26,6 +40,7 @@ import {
   requireGuest,
   requireMfaEnrolled,
   requireAgencyAdmin,
+  requireOnboardingAccess,
   guards,
   type AuthStore,
   type GuardContext,
@@ -63,13 +78,18 @@ function makeRoute(name: string, fullPath: string = `/${name}`): RouteLocationNo
   } as unknown as RouteLocationNormalized
 }
 
-function makeUser(overrides: Partial<{ two_factor_enabled: boolean }> = {}) {
+function makeUser(
+  overrides: Partial<{
+    two_factor_enabled: boolean
+    user_type: 'creator' | 'agency_user' | 'platform_admin' | 'brand_user'
+  }> = {},
+) {
   return {
     type: 'users',
     id: '01HQ',
     attributes: {
       email: 'a@b.c',
-      user_type: 'creator',
+      user_type: overrides.user_type ?? 'creator',
       two_factor_enabled: overrides.two_factor_enabled ?? false,
     },
   } as unknown as NonNullable<AuthStore['user']>
@@ -214,11 +234,86 @@ describe('requireAgencyAdmin', () => {
   })
 })
 
+describe('requireOnboardingAccess', () => {
+  beforeEach(() => {
+    onboardingStoreStub.bootstrap.mockClear()
+    onboardingStoreStub.applicationStatus = 'incomplete'
+  })
+
+  it('returns null (allow) for a creator with application_status=incomplete', async () => {
+    const store = makeStore({ user: makeUser({ user_type: 'creator' }) })
+    onboardingStoreStub.applicationStatus = 'incomplete'
+    const result = await requireOnboardingAccess(
+      makeCtx(store, makeRoute('onboarding.profile', '/onboarding/profile')),
+    )
+    expect(result).toBeNull()
+    expect(onboardingStoreStub.bootstrap).toHaveBeenCalledTimes(1)
+  })
+
+  it('redirects non-creator users to the agency dashboard', async () => {
+    const store = makeStore({ user: makeUser({ user_type: 'agency_user' }) })
+    const result = await requireOnboardingAccess(
+      makeCtx(store, makeRoute('onboarding.profile', '/onboarding/profile')),
+    )
+    expect(result).toEqual({ name: 'app.dashboard' })
+    expect(onboardingStoreStub.bootstrap).not.toHaveBeenCalled()
+  })
+
+  it('redirects platform_admin users to the agency dashboard', async () => {
+    const store = makeStore({ user: makeUser({ user_type: 'platform_admin' }) })
+    const result = await requireOnboardingAccess(
+      makeCtx(store, makeRoute('onboarding.profile', '/onboarding/profile')),
+    )
+    expect(result).toEqual({ name: 'app.dashboard' })
+  })
+
+  it('redirects a submitted creator to /creator/dashboard', async () => {
+    const store = makeStore({ user: makeUser({ user_type: 'creator' }) })
+    onboardingStoreStub.applicationStatus = 'pending'
+    const result = await requireOnboardingAccess(
+      makeCtx(store, makeRoute('onboarding.profile', '/onboarding/profile')),
+    )
+    expect(result).toEqual({ name: 'creator.dashboard' })
+  })
+
+  it('redirects an approved creator to /creator/dashboard', async () => {
+    const store = makeStore({ user: makeUser({ user_type: 'creator' }) })
+    onboardingStoreStub.applicationStatus = 'approved'
+    const result = await requireOnboardingAccess(
+      makeCtx(store, makeRoute('onboarding.profile', '/onboarding/profile')),
+    )
+    expect(result).toEqual({ name: 'creator.dashboard' })
+  })
+
+  it('redirects a rejected creator to /creator/dashboard', async () => {
+    const store = makeStore({ user: makeUser({ user_type: 'creator' }) })
+    onboardingStoreStub.applicationStatus = 'rejected'
+    const result = await requireOnboardingAccess(
+      makeCtx(store, makeRoute('onboarding.profile', '/onboarding/profile')),
+    )
+    expect(result).toEqual({ name: 'creator.dashboard' })
+  })
+
+  it('falls through to sign-in when no user is signed in (defensive)', async () => {
+    const store = makeStore({ user: null })
+    const result = await requireOnboardingAccess(
+      makeCtx(store, makeRoute('onboarding.profile', '/onboarding/profile')),
+    )
+    expect(result).toEqual({ name: 'auth.sign-in' })
+    expect(onboardingStoreStub.bootstrap).not.toHaveBeenCalled()
+  })
+
+  it('is registered in the guards registry', () => {
+    expect(guards.requireOnboardingAccess).toBe(requireOnboardingAccess)
+  })
+})
+
 describe('guards registry', () => {
   it('maps each symbolic name to the correct function reference', () => {
     expect(guards.requireAuth).toBe(requireAuth)
     expect(guards.requireGuest).toBe(requireGuest)
     expect(guards.requireMfaEnrolled).toBe(requireMfaEnrolled)
     expect(guards.requireAgencyAdmin).toBe(requireAgencyAdmin)
+    expect(guards.requireOnboardingAccess).toBe(requireOnboardingAccess)
   })
 })

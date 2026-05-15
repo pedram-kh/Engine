@@ -11,6 +11,7 @@ use App\TestHelpers\Http\Controllers\MintVerificationTokenController;
 use App\TestHelpers\Http\Controllers\NeutralizeRateLimiterController;
 use App\TestHelpers\Http\Controllers\ResetClockController;
 use App\TestHelpers\Http\Controllers\SetClockController;
+use App\TestHelpers\Http\Controllers\SetQueueModeController;
 use App\TestHelpers\Http\Middleware\VerifyTestHelperToken;
 use Illuminate\Support\Facades\Route;
 
@@ -89,4 +90,15 @@ Route::prefix('_test')
         // in a single call so brand/invitation E2E specs can sign in immediately.
         Route::post('agencies/setup', CreateAgencyWithAdminController::class)
             ->name('agencies.setup');
+
+        // Sprint 3 Chunk 3 — queue mode override for E2E saga specs.
+        // POST sets `config('queue.default')` for subsequent requests
+        // (cached, sticky); DELETE clears the override. The matching
+        // middleware {@see ApplyTestQueueModeMiddleware} applies the
+        // cached value on every request. Specs MUST pair POST + DELETE
+        // so a forgotten override doesn't poison the next test.
+        Route::post('queue-mode', [SetQueueModeController::class, 'store'])
+            ->name('queue_mode.set');
+        Route::delete('queue-mode', [SetQueueModeController::class, 'destroy'])
+            ->name('queue_mode.clear');
     });

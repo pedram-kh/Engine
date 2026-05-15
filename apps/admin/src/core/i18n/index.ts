@@ -2,10 +2,13 @@ import { createI18n } from 'vue-i18n'
 
 import enApp from './locales/en/app.json'
 import enAuth from './locales/en/auth.json'
+import enCreators from './locales/en/creators.json'
 import itApp from './locales/it/app.json'
 import itAuth from './locales/it/auth.json'
+import itCreators from './locales/it/creators.json'
 import ptApp from './locales/pt/app.json'
 import ptAuth from './locales/pt/auth.json'
+import ptCreators from './locales/pt/creators.json'
 
 /**
  * Vue-i18n bundle for the admin SPA. Each locale folder owns one JSON
@@ -28,12 +31,12 @@ import ptAuth from './locales/pt/auth.json'
  * architecture test, mirror of main's path).
  */
 
-type MessageSchema = typeof enApp & typeof enAuth
+type MessageSchema = typeof enApp & typeof enAuth & typeof enCreators
 
 const messages: Record<'en' | 'pt' | 'it', MessageSchema> = {
-  en: { ...enApp, ...enAuth },
-  pt: { ...ptApp, ...ptAuth },
-  it: { ...itApp, ...itAuth },
+  en: { ...enApp, ...enAuth, ...enCreators },
+  pt: { ...ptApp, ...ptAuth, ...ptCreators },
+  it: { ...itApp, ...itAuth, ...itCreators },
 }
 
 export const i18n = createI18n<[MessageSchema], 'en' | 'pt' | 'it'>({

@@ -194,6 +194,18 @@ export const testIds = {
   alreadyAcceptedSignIn: 'already-accepted-sign-in',
 
   // ---------------------------------------------------------------
+  // Onboarding wizard — Welcome Back surface (Sprint 3 Chunk 3
+  // sub-step 2). The wizard step pages themselves use `data-testid="…"`
+  // attributes; only the WelcomeBackPage shipped with the legacy
+  // `data-test="…"` attribute so it lands here. New wizard E2E selectors
+  // should use the `data-testid` attribute directly via
+  // `page.locator('[data-testid="step-foo"]')`.
+  // ---------------------------------------------------------------
+  welcomeBackPage: 'welcome-back-page',
+  welcomeBackHeading: 'welcome-back-heading',
+  welcomeBackContinueBtn: 'welcome-back-continue-btn',
+
+  // ---------------------------------------------------------------
   // Settings page — Sprint 2 Chunk 2
   // ---------------------------------------------------------------
   settingsPage: 'settings-page',

@@ -127,6 +127,48 @@ describe('resolveErrorMessage', () => {
     })
   })
 
+  it('returns the creator.* code for a creator-namespaced ApiError (chunk-3 prefix widening)', () => {
+    const err = new ApiError({
+      status: 404,
+      code: 'creator.not_found',
+      message: 'no.',
+    })
+    expect(resolveErrorMessage(err)).toEqual({
+      key: 'creator.not_found',
+      values: {},
+    })
+  })
+
+  it('returns the creator.wizard.feature_disabled code with meta forwarded', () => {
+    const err = new ApiError({
+      status: 409,
+      code: 'creator.wizard.feature_disabled',
+      message: 'no.',
+      details: [
+        {
+          code: 'creator.wizard.feature_disabled',
+          meta: { flag: 'kyc_verification_enabled' },
+        },
+      ],
+    })
+    expect(resolveErrorMessage(err)).toEqual({
+      key: 'creator.wizard.feature_disabled',
+      values: { flag: 'kyc_verification_enabled' },
+    })
+  })
+
+  it('returns the creator.wizard.incomplete code', () => {
+    const err = new ApiError({
+      status: 409,
+      code: 'creator.wizard.incomplete',
+      message: 'no.',
+    })
+    expect(resolveErrorMessage(err)).toEqual({
+      key: 'creator.wizard.incomplete',
+      values: {},
+    })
+  })
+
   it('does NOT widen to error.* codes (review priority #3 — no accidental over-match)', () => {
     const err = new ApiError({ status: 500, code: 'error.500', message: 'no.' })
     expect(resolveErrorMessage(err)).toEqual({ key: UNKNOWN_ERROR_KEY, values: {} })
@@ -137,12 +179,15 @@ describe('resolveErrorMessage', () => {
     expect(resolveErrorMessage(err)).toEqual({ key: UNKNOWN_ERROR_KEY, values: {} })
   })
 
-  it('does NOT widen to bare prefixes (auth, validation, rate_limit) without a dot', () => {
+  it('does NOT widen to bare prefixes (auth, validation, rate_limit, creator) without a dot', () => {
     // "auth" alone is NOT "auth.*"; the predicate uses startsWith
     // which would happily accept it without the dot guard. Guard against
     // a regression that drops the dot.
     const err = new ApiError({ status: 500, code: 'authentication_failure', message: 'no.' })
     expect(resolveErrorMessage(err)).toEqual({ key: UNKNOWN_ERROR_KEY, values: {} })
+
+    const creatorish = new ApiError({ status: 500, code: 'creator_studio', message: 'no.' })
+    expect(resolveErrorMessage(creatorish)).toEqual({ key: UNKNOWN_ERROR_KEY, values: {} })
   })
 
   it('falls back to UNKNOWN_ERROR_KEY for plain Error objects', () => {

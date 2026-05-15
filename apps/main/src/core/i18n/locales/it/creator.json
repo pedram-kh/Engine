@@ -1,0 +1,253 @@
+{
+  "creator": {
+    "not_found": "Nessun profilo creator è associato al tuo account. Esci e accedi di nuovo, oppure contatta l'assistenza.",
+    "wizard": {
+      "feature_disabled": "Questo passaggio non è disponibile durante una modifica di configurazione. Puoi saltarlo per continuare la candidatura.",
+      "feature_enabled": "Questa opzione non è disponibile in questo momento — utilizza il flusso standard di questo passaggio.",
+      "incomplete": "Non è possibile inviare la candidatura — uno o più passaggi della procedura guidata sono ancora incompleti."
+    },
+    "ui": {
+      "wizard": {
+        "title": "Configura il tuo profilo creator",
+        "subtitle": "Alcuni passaggi per presentarti ai brand.",
+        "progress": {
+          "step_of": "Passaggio {current} di {total}",
+          "completed": "Completato",
+          "current": "Passaggio corrente",
+          "skipped": "Saltato",
+          "pending": "Non iniziato"
+        },
+        "actions": {
+          "save": "Salva",
+          "save_and_continue": "Salva e continua",
+          "back": "Indietro",
+          "skip_for_now": "Salta per ora",
+          "save_and_exit": "Salva ed esci",
+          "submit_for_approval": "Invia per l'approvazione",
+          "continue_from_here": "Continua da qui",
+          "edit_step": "Modifica passaggio",
+          "review_and_submit": "Rivedi e invia"
+        },
+        "skipped": {
+          "label": "Saltato",
+          "explanation": "Questo passaggio non è richiesto in questo momento. Un amministratore esaminerà la candidatura senza di esso."
+        },
+        "save_status": {
+          "saving": "Salvataggio in corso…",
+          "saved": "Salvato",
+          "error": "Impossibile salvare — riprova."
+        },
+        "steps": {
+          "profile": {
+            "name": "Profilo base",
+            "title": "Parlaci di te",
+            "description": "Il tuo nome, biografia, foto e le categorie in cui crei contenuti."
+          },
+          "social": {
+            "name": "Account social",
+            "title": "Collega i tuoi account social",
+            "description": "Collega almeno una piattaforma in modo che i brand possano vedere la tua portata."
+          },
+          "portfolio": {
+            "name": "Portfolio",
+            "title": "Mostra i tuoi lavori migliori",
+            "description": "Carica fino a 10 elementi — video, immagini o link esterni — che rappresentino il tuo stile.",
+            "gallery_heading": "Il tuo portfolio",
+            "gallery_empty": "Nessun elemento del portfolio caricato finora.",
+            "gallery_remove": "Rimuovi elemento",
+            "gallery_status": "La galleria del portfolio contiene {count} elemento(i).",
+            "video_badge_label": "Video",
+            "link_badge_label": "Link esterno",
+            "untitled_item": "Elemento del portfolio senza titolo"
+          },
+          "kyc": {
+            "name": "Verifica dell'identità",
+            "title": "Verifica la tua identità",
+            "description": "Un controllo rapido con il nostro partner di verifica. Necessario per i pagamenti.",
+            "skipped_title": "Verifica saltata",
+            "skipped_explanation": "La verifica dell'identità non è richiesta in questo momento.",
+            "current_status": "Stato:",
+            "begin_button": "Inizia la verifica",
+            "status_labels": {
+              "none": "Non iniziata",
+              "pending": "In corso",
+              "verified": "Verificata",
+              "rejected": "Respinta",
+              "not_required": "Saltata"
+            }
+          },
+          "tax": {
+            "name": "Informazioni fiscali",
+            "title": "Modulo fiscale",
+            "description": "Ci serve un modulo fiscale per i pagamenti, anche prima del primo.",
+            "current_status": "Stato:",
+            "status_complete": "Inviato",
+            "status_incomplete": "Non ancora inviato"
+          },
+          "payout": {
+            "name": "Metodo di pagamento",
+            "title": "Configura i pagamenti",
+            "description": "Collega un account Stripe Express per ricevere pagamenti.",
+            "skipped_title": "Configurazione pagamenti saltata",
+            "skipped_explanation": "La configurazione dei pagamenti non è richiesta in questo momento.",
+            "current_status": "Stato:",
+            "begin_button": "Configura i pagamenti",
+            "status_set": "Collegato",
+            "status_unset": "Non collegato"
+          },
+          "contract": {
+            "name": "Contratto principale",
+            "title": "Firma il contratto principale",
+            "description": "Il nostro contratto creator standard copre le collaborazioni con i brand sulla piattaforma.",
+            "skipped_explanation": "La firma del contratto non è richiesta in questo momento — accetta i termini di seguito.",
+            "click_through_label": "Ho letto e accetto questi termini.",
+            "click_through_help": "Leggi il contratto qui sopra e seleziona la casella per continuare.",
+            "terms_version": "Contratto master del creator v{version}",
+            "current_status": "Stato:",
+            "begin_button": "Apri il contratto per firmare",
+            "status_labels": {
+              "signed": "Firmato",
+              "click_through_accepted": "Accettato",
+              "none": "Non iniziato"
+            }
+          },
+          "review": {
+            "name": "Rivedi e invia",
+            "title": "Rivedi la tua candidatura",
+            "description": "Controlla tutto prima di inviare.",
+            "completeness": "{percent}% completato",
+            "edit_step": "Modifica",
+            "submit_button": "Invia candidatura"
+          }
+        },
+        "fields": {
+          "display_name": "Nome visualizzato",
+          "display_name_help": "Come ti vedranno i brand — il tuo handle o nome d'arte.",
+          "bio": "Biografia",
+          "bio_help": "Una breve presentazione. Puoi usare **grassetto**, *corsivo* e [link](https://esempio.com).",
+          "avatar": "Foto profilo",
+          "avatar_drop": "Trascina una foto qui o clicca per sceglierla. JPG, PNG o WebP fino a 5 MB.",
+          "country": "Paese",
+          "region": "Regione o città",
+          "primary_language": "Lingua principale",
+          "secondary_languages": "Altre lingue",
+          "categories": "Categorie",
+          "categories_help": "Scegli le categorie che descrivono meglio quello che crei.",
+          "social_handle": "Nome utente",
+          "social_profile_url": "URL del profilo",
+          "portfolio_title": "Titolo",
+          "portfolio_description": "Descrizione",
+          "portfolio_external_url": "URL esterno (opzionale)",
+          "tax_form_type": "Modulo fiscale",
+          "legal_name": "Nome legale",
+          "tax_id": "Codice fiscale / P. IVA",
+          "address_country": "Paese",
+          "address_city": "Città",
+          "address_postal_code": "Codice postale",
+          "address_street": "Via"
+        },
+        "categories": {
+          "fashion": "Moda",
+          "beauty": "Bellezza",
+          "lifestyle": "Lifestyle",
+          "fitness": "Fitness",
+          "travel": "Viaggi",
+          "food": "Cibo",
+          "tech": "Tecnologia",
+          "gaming": "Gaming",
+          "music": "Musica",
+          "comedy": "Comicità",
+          "education": "Educazione",
+          "parenting": "Genitorialità",
+          "business": "Business",
+          "art": "Arte",
+          "sports": "Sport",
+          "other": "Altro"
+        },
+        "tax_form_types": {
+          "eu_self_employed": "UE — autonomo",
+          "eu_company": "UE — società",
+          "uk_self_employed": "UK — autonomo",
+          "uk_company": "UK — società"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "In arrivo"
+        },
+        "vendor_bounce": {
+          "waiting_title": "Ci siamo quasi…",
+          "waiting_description": "Stiamo aspettando una risposta dal nostro partner. Di solito richiede meno di un minuto.",
+          "timeout_title": "Ancora in attesa del nostro partner",
+          "timeout_description": "Sta richiedendo più tempo del previsto. Puoi riprovare o contattare l'assistenza.",
+          "retry": "Riprova",
+          "contact_support": "Contatta l'assistenza"
+        },
+        "welcome_back": {
+          "title": "Bentornato",
+          "subtitle": "Sei stato qui per l'ultima volta {time_ago}. Riprendi da dove avevi lasciato.",
+          "next_step_prompt": "Sei al passaggio {step}. Continua qui oppure torna indietro per modificare un passaggio precedente.",
+          "all_complete_prompt": "Sei a posto — hai completato tutti i passaggi. Pronto a inviare?",
+          "continue_button": "Continua a {step_name}",
+          "review_button": "Rivedi e invia"
+        }
+      },
+      "dashboard": {
+        "title": "La tua candidatura",
+        "greeting": "Ciao, {name}.",
+        "completeness": "{percent}% completato",
+        "submitted_at": "Inviata il {datetime}",
+        "submitted": {
+          "heading": "Candidatura inviata",
+          "description": "Il tuo profilo è in fase di revisione. Ti avviseremo entro 3 giorni lavorativi.",
+          "completeness_label": "Completezza del profilo",
+          "last_updated": "Ultimo aggiornamento {time_ago}"
+        },
+        "pending_review": {
+          "title": "Candidatura in revisione",
+          "description": "La tua candidatura è in coda. Ti avviseremo entro 3 giorni lavorativi."
+        },
+        "approved": {
+          "title": "Benvenuto su Catalyst",
+          "heading": "Sei stato approvato",
+          "description": "Sei approvato per ricevere collaborazioni con i brand. La dashboard completa arriverà presto."
+        },
+        "rejected": {
+          "title": "Candidatura non approvata",
+          "heading": "La candidatura richiede modifiche",
+          "description": "Contatta l'assistenza per i prossimi passi. Siamo qui per aiutarti.",
+          "reason_label": "Motivo:",
+          "edit_profile": "Modifica profilo"
+        },
+        "incomplete": {
+          "title": "Continua la tua candidatura",
+          "description": "Riprendi da dove avevi lasciato — i tuoi progressi sono salvati."
+        }
+      },
+      "upload": {
+        "avatar_prompt": "Trascina una foto qui o clicca per selezionare",
+        "avatar_preview_alt": "Anteprima della foto del profilo",
+        "size_hint": "{types} · fino a {max_mb} MB",
+        "portfolio_prompt": "Trascina i file qui o clicca per selezionare",
+        "portfolio_size_hint": "Immagini fino a {image_mb} MB · video fino a {video_mb} MB",
+        "portfolio_slots_remaining": "{remaining} slot rimanenti",
+        "portfolio_queue_status": "{in_flight} di {total} in caricamento (fino a {concurrency} contemporaneamente).",
+        "uploading": "Caricamento…",
+        "remove": "Rimuovi",
+        "remove_avatar": "Rimuovi foto",
+        "remove_portfolio_item_label": "Rimuovi {name}",
+        "status_pending": "In attesa…",
+        "status_uploading": "Caricamento…",
+        "status_done": "Caricato",
+        "status_error": "Errore"
+      },
+      "errors": {
+        "upload_too_large": "Questo file è troppo grande. La dimensione massima è {max_mb} MB.",
+        "upload_wrong_type": "Questo tipo di file non è supportato. Utilizza {allowed_types}.",
+        "upload_failed": "Il caricamento non è riuscito. Riprova.",
+        "portfolio_max_reached": "Puoi caricare fino a {max} elementi nel portfolio."
+      }
+    }
+  }
+}

@@ -165,5 +165,8 @@
         "saveFailed": "Salvataggio impostazioni fallito."
       }
     }
+  },
+  "validation": {
+    "field_required": "Questo campo è obbligatorio."
   }
 }

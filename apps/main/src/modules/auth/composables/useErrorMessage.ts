@@ -69,12 +69,24 @@ export const NETWORK_ERROR_KEY = 'auth.ui.errors.network'
  *                      fallback). The `rate_limit.exceeded` bundle
  *                      entries live as a top-level sibling of `auth`
  *                      in the en/pt/it `auth.json` files.
+ *   - `creator.`     — Creators-module errors (Sprint 3 Chunk 3 sub-step 1).
+ *                      Covers `creator.not_found`, `creator.wizard.*`
+ *                      (feature_disabled, feature_enabled, incomplete).
+ *                      Bundle entries live in the en/pt/it
+ *                      `creator.json` files; the dedicated architecture
+ *                      test in
+ *                      `tests/unit/architecture/i18n-creator-codes.spec.ts`
+ *                      walks the backend Creators module and asserts
+ *                      each harvested literal resolves to a leaf
+ *                      string in every locale.
  *
- * The architecture test in `tests/unit/architecture/i18n-auth-codes.spec.ts`
- * walks the backend source for both `auth.*` and `rate_limit.*`
- * literals and asserts each one resolves to a leaf string in every
- * locale, so a new code emitted on the backend without a matching
- * bundle entry trips CI before merge.
+ * Per-prefix architecture tests in
+ * `tests/unit/architecture/i18n-auth-codes.spec.ts` (auth.* +
+ * rate_limit.*) and `tests/unit/architecture/i18n-creator-codes.spec.ts`
+ * (creator.*) walk the backend source for each prefix's literals and
+ * assert each one resolves to a leaf string in every locale, so a new
+ * code emitted on the backend without a matching bundle entry trips
+ * CI before merge.
  *
  * Codes outside these prefixes — e.g. `http.invalid_response_body`,
  * `network.error` (handled separately above), or anything synthesised
@@ -82,10 +94,19 @@ export const NETWORK_ERROR_KEY = 'auth.ui.errors.network'
  * `auth.ui.errors.unknown`. That conservative posture is intentional:
  * widening the predicate to "anything with a dot" would mask backend
  * regressions where a typo'd code lands and renders verbatim.
+ *
+ * Standing contract: a new top-level prefix (e.g. `tenant.*`,
+ * `brand.*`) requires extending this predicate AND adding a parallel
+ * architecture-test file AND shipping bundle entries in all three
+ * locales in the same commit. The chunk-7.1 saga (chunk-3 widening
+ * of this list to add `creator.*`) is the reference precedent.
  */
 function isLikelyBundledCode(code: string): boolean {
   return (
-    code.startsWith('auth.') || code.startsWith('validation.') || code.startsWith('rate_limit.')
+    code.startsWith('auth.') ||
+    code.startsWith('validation.') ||
+    code.startsWith('rate_limit.') ||
+    code.startsWith('creator.')
   )
 }
 

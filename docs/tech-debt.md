@@ -279,7 +279,22 @@ anyone reviewing it later.
 - **Mitigation today:** `CreatorResource` is a single class with a single `toArray()` shape. Adding admin-only fields via a factory method is a one-file change.
 - **Resolution:** Chunk 3 implements the admin endpoint and either extends `CreatorResource` with a factory method (preferred for shape symmetry) or creates an `AdminCreatorResource` (acceptable but incurs a one-time review cost on the symmetry rationale).
 - **Owner:** Sprint 3 Chunk 3.
-- **Status:** open.
+- **Status:** **closed** in Sprint 3 Chunk 3 sub-step 1 via the symmetric-factory shape. [`CreatorResource`](../apps/api/app/Modules/Creators/Http/Resources/CreatorResource.php) exposes an instance method `withAdmin(bool $isAdmin = true): self` that flips a private `$isAdmin` flag; `toArray()` reads the flag and conditionally appends an `admin_attributes` block carrying `rejection_reason` + `kyc_verifications` history. The creator-self call site (`GET /api/v1/creators/me`) emits the base shape; the admin call site (`GET /api/v1/admin/creators/{creator}`, sub-step 9) chains `->withAdmin(true)` before `->response()`. Symmetric — same class, same `toArray()`, one extra field group conditional on the flag. No `AdminCreatorResource` subclass was needed; the symmetry promise from Chunk 1 holds. Coverage: [`AdminCreatorShowTest`](../apps/api/tests/Feature/Modules/Creators/Admin/AdminCreatorShowTest.php) asserts the admin response carries both the creator-self block AND the `admin_attributes` block; [`CreatorWizardEndpointsTest`](../apps/api/tests/Feature/Modules/Creators/CreatorWizardEndpointsTest.php) verifies the creator-self response does NOT carry `admin_attributes`. The forward-compat `kyc_verifications` shape strips PII (newest-first, status + provider + timestamps only) so Phase-2 admin pages can render the history without touching the underlying table.
+
+---
+
+## Sprint 3 Chunk 3 — `lastActivityAt` is approximated via `creator.updated_at`
+
+- **Where:** [`apps/main/src/modules/onboarding/stores/useOnboardingStore.ts`](../apps/main/src/modules/onboarding/stores/useOnboardingStore.ts) — `lastActivityAt = creator.value?.attributes.updated_at`. The Welcome Back UI surface reads this through `storeToRefs` at [`apps/main/src/modules/onboarding/pages/WelcomeBackPage.vue`](../apps/main/src/modules/onboarding/pages/WelcomeBackPage.vue) and feeds it into the `timeAgoCopy()` helper that picks the "minutes / hours / days" bucket for the orientation string.
+- **What we accepted in Sprint 3 Chunk 3 (Refinement 6):** The Welcome Back page's "you were here X ago" copy is derived from a `last_activity_at` field that maps to `Creator::updated_at`. The mapping is structurally correct for the orienting copy ("you last submitted a wizard step 2 hours ago") but does NOT capture passive engagement ("you were viewing the wizard 30 minutes ago without submitting"). For the Welcome Back UI surface itself the distinction does not matter; the copy is meant to re-orient a returning creator, not provide audit-grade activity tracking.
+- **Risk:** Two latent surfaces that would care about the distinction —
+  1. **Analytics-driven UX.** Sprint 6+ funnel analytics that want "draft saved" vs "viewed" engagement metrics on the wizard cannot use `updated_at` (the former updates only on save).
+  2. **Draft-saved messaging.** A future "you have unsaved changes from your last session" surface needs a separate signal.
+- **Mitigation today:** None — the approximation is correct for the current consumer (Welcome Back orientation copy). Documented inline in `WelcomeBackPage.vue` and `CreatorResource` so a future reader sees the trade-off.
+- **Triggered by:** the next chunk that adds a wizard-analytics surface (likely Sprint 6+) OR the chunk that adds "you have unsaved changes" messaging (likely Sprint 4+).
+- **Resolution:** Introduce a dedicated `Creator::last_seen_at` (or similar) column updated on every authenticated wizard route hit via middleware (e.g. `TouchCreatorLastSeen` on the `creators.me.*` route group). The migration is additive (nullable column, no backfill needed). Frontend reads the new field from the bootstrap response and the docblock in `WelcomeBackPage.vue` is updated to reflect the precise signal. Note: a per-request DB write is a real cost; if Sprint 6 finds it shows up in p95 latency, batch via Redis pipeline (write on every request, persist every N seconds) — same pattern as `last_login_at` deferred-touch in Sprint 1 chunk 6.
+- **Owner:** the sprint that introduces a triggering surface.
+- **Status:** open. Surfaced by Refinement 6 in the Sprint 3 Chunk 3 plan-approval.
 
 ---
 

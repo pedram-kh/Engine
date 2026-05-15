@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "creators": {
+      "detail": {
+        "fallback_title": "Creator",
+        "application_status": "Stato candidatura: {status}",
+        "completeness": "{percent}% completato",
+        "rejection_heading": "Note di rifiuto",
+        "profile_heading": "Profilo",
+        "social_heading": "Account social",
+        "portfolio_heading": "Portfolio",
+        "kyc_history_heading": "Cronologia verifiche KYC",
+        "kyc_history": {
+          "provider": "Fornitore",
+          "status": "Stato",
+          "started_at": "Iniziata il",
+          "completed_at": "Completata il"
+        },
+        "load_failed": "Impossibile caricare questo creator. Aggiorna la pagina."
+      }
+    }
+  }
+}

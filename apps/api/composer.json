@@ -17,6 +17,7 @@
     "laravel/pennant": "^1.0",
     "laravel/sanctum": "^4.3",
     "laravel/tinker": "^2.9",
+    "league/commonmark": "^2.7",
     "league/flysystem-aws-s3-v3": "^3.32",
     "pragmarx/google2fa": "^9.0",
     "predis/predis": "^3.4"

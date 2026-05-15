@@ -22,6 +22,9 @@
 
 import type { RouteRecordRaw } from 'vue-router'
 
+import { creatorsRoutes } from '@/modules/creators/routes'
+import { onboardingRoutes } from '@/modules/onboarding/routes'
+
 /**
  * Symbolic guard names. The router's `beforeEach` resolves these to the
  * actual guard composables in `apps/main/src/core/router/guards.ts`. We
@@ -30,7 +33,12 @@ import type { RouteRecordRaw } from 'vue-router'
  * to test, and avoids importing the guards eagerly into every chunk that
  * touches the router).
  */
-export type GuardName = 'requireAuth' | 'requireGuest' | 'requireMfaEnrolled' | 'requireAgencyAdmin'
+export type GuardName =
+  | 'requireAuth'
+  | 'requireGuest'
+  | 'requireMfaEnrolled'
+  | 'requireAgencyAdmin'
+  | 'requireOnboardingAccess'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -38,10 +46,15 @@ declare module 'vue-router' {
     /**
      * `'auth'` routes use `AuthLayout.vue`.
      * `'agency'` routes use `AgencyLayout.vue` (sidebar + topbar + user menu).
+     * `'onboarding'` routes use `OnboardingLayout.vue` — the wizard chrome
+     *                 (progress indicator + save-and-exit + minimal body).
+     *                 Sprint 3 Chunk 3 sub-step 2.
+     * `'creator'`  routes use `CreatorDashboardLayout.vue` — the
+     *                 post-submit creator shell. Sprint 3 Chunk 3 sub-step 8.
      * `'app'` routes use the bare v-app catch-all.
      * `'error'` is the terminal error layout.
      */
-    layout?: 'auth' | 'agency' | 'app' | 'error'
+    layout?: 'auth' | 'agency' | 'onboarding' | 'creator' | 'app' | 'error'
   }
 }
 
@@ -198,5 +211,13 @@ export const errorRoutes: RouteRecordRaw[] = [
 /**
  * The full route table the main SPA mounts. Order matters only for
  * route-name collisions, of which there are none.
+ *
+ * Sprint 3 Chunk 3 sub-step 2: onboarding + creators routes joined.
  */
-export const routes: RouteRecordRaw[] = [...authRoutes, ...appRoutes, ...errorRoutes]
+export const routes: RouteRecordRaw[] = [
+  ...authRoutes,
+  ...appRoutes,
+  ...onboardingRoutes,
+  ...creatorsRoutes,
+  ...errorRoutes,
+]

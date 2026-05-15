@@ -392,6 +392,152 @@ export async function seedAgencyAdmin(
   }
 }
 
+// ---------------------------------------------------------------------------
+// Sprint 3 Chunk 3 — Creator wizard E2E helpers
+// ---------------------------------------------------------------------------
+
+export type QueueMode = 'sync' | 'database' | 'redis'
+
+/**
+ * Override the running app's `config('queue.default')` so any saga jobs
+ * dispatched downstream fire inline (`sync`) instead of being queued
+ * (`database`/`redis`). Sprint 3 Chunk 3 sub-step 4 — the SPA happy-path
+ * wizard spec needs jobs to execute before the next bootstrap so the
+ * status flips are observable in a single navigation pass.
+ *
+ * Mandatory pair with {@link clearQueueMode} in `afterEach` — the
+ * cached override survives across requests until it's cleared, and
+ * a forgotten override poisons every subsequent spec on the same
+ * suite run. Same convention as `setClock`/`resetClock`.
+ */
+export async function setQueueMode(request: APIRequestContext, mode: QueueMode): Promise<void> {
+  const response = await request.post('http://127.0.0.1:8000/api/v1/_test/queue-mode', {
+    headers: defaultHeaders,
+    data: { mode },
+  })
+
+  if (response.status() !== 200) {
+    throw new Error(
+      `setQueueMode(${mode}) failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+}
+
+/**
+ * Clear the queue-mode override. Idempotent — DELETE on a never-set
+ * key returns 204 cleanly. Pair with {@link setQueueMode} in
+ * `afterEach`.
+ */
+export async function clearQueueMode(request: APIRequestContext): Promise<void> {
+  const response = await request.delete('http://127.0.0.1:8000/api/v1/_test/queue-mode', {
+    headers: defaultHeaders,
+  })
+
+  if (response.status() !== 204 && response.status() !== 200) {
+    throw new Error(
+      `clearQueueMode failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+}
+
+/**
+ * Mint a verification token for the email and confirm it via the
+ * production verify-email endpoint. Lands the user in
+ * `email_verified_at NOT NULL` so the creator wizard's `verified`
+ * middleware passes.
+ *
+ * Implementation note: we POST the token to the production endpoint
+ * rather than navigating the SPA's `/verify-email/confirm?token=…`
+ * page so the helper is usable from outside a `page` context (e.g.,
+ * from `test.beforeEach` setup that hasn't navigated yet).
+ */
+export async function verifyEmailViaApi(request: APIRequestContext, email: string): Promise<void> {
+  const { token } = await mintVerificationToken(request, email)
+  const response = await request.post('http://127.0.0.1:8000/api/v1/auth/verify-email', {
+    headers: defaultHeaders,
+    data: { token },
+  })
+
+  if (response.status() !== 204) {
+    throw new Error(
+      `verifyEmailViaApi failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+}
+
+export interface SignInResult {
+  ok: boolean
+}
+
+/**
+ * Sign in via the production login endpoint, sharing the resulting
+ * session cookie with the page context. Distinct from the SPA-driven
+ * sign-in (which the 2FA spec exercises) — this helper is for specs
+ * that need a signed-in cookie cheaply, without re-asserting the
+ * sign-in form itself.
+ */
+export async function signInViaApi(
+  request: APIRequestContext,
+  email: string,
+  password: string,
+): Promise<SignInResult> {
+  const response = await request.post('http://127.0.0.1:8000/api/v1/auth/login', {
+    headers: defaultHeaders,
+    data: { email, password },
+  })
+
+  if (response.status() !== 200 && response.status() !== 204) {
+    throw new Error(
+      `signInViaApi failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  return { ok: true }
+}
+
+export interface SeedPortfolioImageResult {
+  id: string
+}
+
+/**
+ * Upload a tiny in-memory PNG to the production portfolio image
+ * endpoint so the signed-in creator has at least one portfolio item.
+ * The Step-4 wizard page enforces "min 1 piece to advance"; this
+ * helper lets the happy-path spec bypass the upload-drop UI (which
+ * has its own dedicated component-test coverage) and focus on the
+ * wizard-traversal contract.
+ *
+ * Cookie context: the caller must have already signed in
+ * (`signInViaApi` or equivalent) — the route is `auth:web`.
+ */
+export async function seedPortfolioImage(
+  request: APIRequestContext,
+): Promise<SeedPortfolioImageResult> {
+  // 1×1 transparent PNG — smallest valid PNG that survives the
+  // backend's MIME sniff + GD re-encode pass.
+  const png = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkAAIAAAoAAv/lxKUAAAAASUVORK5CYII=',
+    'base64',
+  )
+
+  const response = await request.post('http://127.0.0.1:8000/api/v1/creators/me/portfolio/images', {
+    headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+    multipart: {
+      file: { name: 'seed.png', mimeType: 'image/png', buffer: png },
+      title: 'Seeded sample',
+    },
+  })
+
+  if (response.status() !== 201) {
+    throw new Error(
+      `seedPortfolioImage failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  const body = (await response.json()) as { data: { id: string } }
+  return { id: body.data.id }
+}
+
 export interface SeedAgencyInvitationResult {
   token: string
   agencyUlid: string

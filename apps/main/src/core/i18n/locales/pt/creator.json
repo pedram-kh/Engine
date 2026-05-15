@@ -1,0 +1,253 @@
+{
+  "creator": {
+    "not_found": "Nenhum perfil de criador está associado à sua conta. Saia e entre novamente, ou entre em contacto com o suporte.",
+    "wizard": {
+      "feature_disabled": "Esta etapa está temporariamente indisponível durante uma alteração de configuração. Pode saltá-la para continuar a candidatura.",
+      "feature_enabled": "Esta opção não está disponível neste momento — utilize o fluxo padrão desta etapa.",
+      "incomplete": "Não é possível submeter a candidatura — uma ou mais etapas do assistente ainda estão incompletas."
+    },
+    "ui": {
+      "wizard": {
+        "title": "Configurar o seu perfil de criador",
+        "subtitle": "Algumas etapas para se apresentar às marcas.",
+        "progress": {
+          "step_of": "Etapa {current} de {total}",
+          "completed": "Concluída",
+          "current": "Etapa atual",
+          "skipped": "Saltada",
+          "pending": "Não iniciada"
+        },
+        "actions": {
+          "save": "Guardar",
+          "save_and_continue": "Guardar e continuar",
+          "back": "Voltar",
+          "skip_for_now": "Saltar por agora",
+          "save_and_exit": "Guardar e sair",
+          "submit_for_approval": "Submeter para aprovação",
+          "continue_from_here": "Continuar daqui",
+          "edit_step": "Editar etapa",
+          "review_and_submit": "Rever e submeter"
+        },
+        "skipped": {
+          "label": "Saltada",
+          "explanation": "Esta etapa não é necessária neste momento. Um administrador irá rever a sua candidatura sem ela."
+        },
+        "save_status": {
+          "saving": "A guardar…",
+          "saved": "Guardado",
+          "error": "Não foi possível guardar — por favor tente novamente."
+        },
+        "steps": {
+          "profile": {
+            "name": "Perfil básico",
+            "title": "Conte-nos sobre si",
+            "description": "O seu nome, biografia, fotografia e as categorias em que cria conteúdo."
+          },
+          "social": {
+            "name": "Redes sociais",
+            "title": "Ligue as suas contas sociais",
+            "description": "Ligue pelo menos uma plataforma para as marcas verem o seu alcance."
+          },
+          "portfolio": {
+            "name": "Portfólio",
+            "title": "Mostre o seu melhor trabalho",
+            "description": "Carregue até 10 itens — vídeos, imagens ou links externos — que representem o seu estilo.",
+            "gallery_heading": "O seu portfólio",
+            "gallery_empty": "Ainda não foram carregados itens do portfólio.",
+            "gallery_remove": "Remover item",
+            "gallery_status": "A galeria do portfólio contém {count} item(s).",
+            "video_badge_label": "Vídeo",
+            "link_badge_label": "Link externo",
+            "untitled_item": "Item do portfólio sem título"
+          },
+          "kyc": {
+            "name": "Verificação de identidade",
+            "title": "Verifique a sua identidade",
+            "description": "Uma verificação rápida com o nosso parceiro. Necessária para pagamentos.",
+            "skipped_title": "Verificação saltada",
+            "skipped_explanation": "A verificação de identidade não é necessária neste momento.",
+            "current_status": "Estado:",
+            "begin_button": "Iniciar verificação",
+            "status_labels": {
+              "none": "Não iniciada",
+              "pending": "Em curso",
+              "verified": "Verificada",
+              "rejected": "Rejeitada",
+              "not_required": "Saltada"
+            }
+          },
+          "tax": {
+            "name": "Informação fiscal",
+            "title": "Formulário fiscal",
+            "description": "Precisamos de um formulário fiscal para pagamentos, mesmo antes do primeiro.",
+            "current_status": "Estado:",
+            "status_complete": "Enviado",
+            "status_incomplete": "Ainda não enviado"
+          },
+          "payout": {
+            "name": "Método de pagamento",
+            "title": "Configurar pagamentos",
+            "description": "Ligue uma conta Stripe Express para receber pagamentos.",
+            "skipped_title": "Configuração de pagamentos saltada",
+            "skipped_explanation": "A configuração de pagamentos não é necessária neste momento.",
+            "current_status": "Estado:",
+            "begin_button": "Configurar pagamentos",
+            "status_set": "Ligado",
+            "status_unset": "Não ligado"
+          },
+          "contract": {
+            "name": "Contrato principal",
+            "title": "Assinar o contrato principal",
+            "description": "O nosso contrato padrão para criadores cobre as colaborações com marcas na plataforma.",
+            "skipped_explanation": "A assinatura do contrato não é necessária neste momento — por favor aceite os termos abaixo.",
+            "click_through_label": "Li e aceito estes termos.",
+            "click_through_help": "Leia o contrato acima e marque a caixa para continuar.",
+            "terms_version": "Acordo-mestre do criador v{version}",
+            "current_status": "Estado:",
+            "begin_button": "Abrir o contrato para assinar",
+            "status_labels": {
+              "signed": "Assinado",
+              "click_through_accepted": "Aceite",
+              "none": "Não iniciado"
+            }
+          },
+          "review": {
+            "name": "Rever e submeter",
+            "title": "Reveja a sua candidatura",
+            "description": "Confira tudo antes de submeter.",
+            "completeness": "{percent}% completo",
+            "edit_step": "Editar",
+            "submit_button": "Submeter candidatura"
+          }
+        },
+        "fields": {
+          "display_name": "Nome a apresentar",
+          "display_name_help": "Como as marcas o vão ver — o seu identificador ou nome artístico.",
+          "bio": "Biografia",
+          "bio_help": "Uma breve apresentação. Pode usar **negrito**, *itálico* e [links](https://exemplo.com).",
+          "avatar": "Fotografia de perfil",
+          "avatar_drop": "Largue uma fotografia aqui ou clique para escolher. JPG, PNG ou WebP até 5 MB.",
+          "country": "País",
+          "region": "Região ou cidade",
+          "primary_language": "Idioma principal",
+          "secondary_languages": "Outros idiomas",
+          "categories": "Categorias",
+          "categories_help": "Selecione as categorias que melhor descrevem o que cria.",
+          "social_handle": "Nome de utilizador",
+          "social_profile_url": "URL do perfil",
+          "portfolio_title": "Título",
+          "portfolio_description": "Descrição",
+          "portfolio_external_url": "URL externo (opcional)",
+          "tax_form_type": "Formulário fiscal",
+          "legal_name": "Nome legal",
+          "tax_id": "NIF",
+          "address_country": "País",
+          "address_city": "Cidade",
+          "address_postal_code": "Código postal",
+          "address_street": "Morada"
+        },
+        "categories": {
+          "fashion": "Moda",
+          "beauty": "Beleza",
+          "lifestyle": "Lifestyle",
+          "fitness": "Fitness",
+          "travel": "Viagens",
+          "food": "Comida",
+          "tech": "Tecnologia",
+          "gaming": "Gaming",
+          "music": "Música",
+          "comedy": "Comédia",
+          "education": "Educação",
+          "parenting": "Parentalidade",
+          "business": "Negócios",
+          "art": "Arte",
+          "sports": "Desporto",
+          "other": "Outras"
+        },
+        "tax_form_types": {
+          "eu_self_employed": "UE — trabalhador independente",
+          "eu_company": "UE — empresa",
+          "uk_self_employed": "Reino Unido — trabalhador independente",
+          "uk_company": "Reino Unido — empresa"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Em breve"
+        },
+        "vendor_bounce": {
+          "waiting_title": "Quase pronto…",
+          "waiting_description": "Estamos a aguardar uma resposta do nosso parceiro. Normalmente demora menos de um minuto.",
+          "timeout_title": "Ainda à espera do nosso parceiro",
+          "timeout_description": "Está a demorar mais do que o esperado. Pode tentar novamente ou contactar o suporte.",
+          "retry": "Tentar novamente",
+          "contact_support": "Contactar suporte"
+        },
+        "welcome_back": {
+          "title": "Bem-vindo de volta",
+          "subtitle": "Esteve aqui pela última vez {time_ago}. Continue de onde parou.",
+          "next_step_prompt": "Está na Etapa {step}. Continue aqui ou volte para editar uma etapa anterior.",
+          "all_complete_prompt": "Está pronto — completou todas as etapas. Pronto para submeter?",
+          "continue_button": "Continuar para {step_name}",
+          "review_button": "Rever e submeter"
+        }
+      },
+      "dashboard": {
+        "title": "A sua candidatura",
+        "greeting": "Olá, {name}.",
+        "completeness": "{percent}% completo",
+        "submitted_at": "Submetida em {datetime}",
+        "submitted": {
+          "heading": "Candidatura submetida",
+          "description": "O seu perfil está em revisão. Iremos notificá-lo no prazo de 3 dias úteis.",
+          "completeness_label": "Completude do perfil",
+          "last_updated": "Atualizado pela última vez {time_ago}"
+        },
+        "pending_review": {
+          "title": "Candidatura em revisão",
+          "description": "A sua candidatura está em fila. Iremos notificá-lo no prazo de 3 dias úteis."
+        },
+        "approved": {
+          "title": "Bem-vindo ao Catalyst",
+          "heading": "Foi aprovado",
+          "description": "Foi aprovado para receber colaborações com marcas. O painel completo chegará em breve."
+        },
+        "rejected": {
+          "title": "Candidatura não aprovada",
+          "heading": "A candidatura precisa de alterações",
+          "description": "Contacte a equipa de apoio para os próximos passos. Estamos cá para ajudar.",
+          "reason_label": "Motivo:",
+          "edit_profile": "Editar perfil"
+        },
+        "incomplete": {
+          "title": "Continue a sua candidatura",
+          "description": "Continue de onde parou — o seu progresso está guardado."
+        }
+      },
+      "upload": {
+        "avatar_prompt": "Largue uma foto aqui ou clique para escolher",
+        "avatar_preview_alt": "Pré-visualização da foto de perfil",
+        "size_hint": "{types} · até {max_mb} MB",
+        "portfolio_prompt": "Largue ficheiros aqui ou clique para escolher",
+        "portfolio_size_hint": "Imagens até {image_mb} MB · vídeos até {video_mb} MB",
+        "portfolio_slots_remaining": "{remaining} lugares restantes",
+        "portfolio_queue_status": "{in_flight} de {total} a carregar (até {concurrency} em simultâneo).",
+        "uploading": "A carregar…",
+        "remove": "Remover",
+        "remove_avatar": "Remover foto",
+        "remove_portfolio_item_label": "Remover {name}",
+        "status_pending": "À espera…",
+        "status_uploading": "A carregar…",
+        "status_done": "Carregado",
+        "status_error": "Falhou"
+      },
+      "errors": {
+        "upload_too_large": "Este ficheiro é demasiado grande. O tamanho máximo é {max_mb} MB.",
+        "upload_wrong_type": "Este tipo de ficheiro não é suportado. Utilize {allowed_types}.",
+        "upload_failed": "O carregamento falhou. Por favor tente novamente.",
+        "portfolio_max_reached": "Pode carregar até {max} itens no portfólio."
+      }
+    }
+  }
+}

@@ -150,12 +150,77 @@ export async function requireAgencyAdmin(_ctx: GuardContext): Promise<GuardResul
   return null
 }
 
+/**
+ * Wizard-route guard (Sprint 3 Chunk 3 sub-step 2).
+ *
+ * Allows the user to enter the onboarding wizard ONLY when both
+ * conditions hold:
+ *
+ *   1. `user.user_type === 'creator'` — non-creator types (agency
+ *      users, platform admins) have no creator profile and would
+ *      bounce off the bootstrap 404. They get redirected to the
+ *      agency dashboard (their natural home) instead.
+ *
+ *   2. `application_status === 'incomplete'` — submitted / approved /
+ *      rejected creators have either finished onboarding (no wizard
+ *      to return to) or need the rejection-feedback surface
+ *      (`/creator/dashboard`). They redirect to the creator
+ *      dashboard.
+ *
+ * Composes safely AFTER `requireAuth`. By the time this runs,
+ * `bootstrap()` has resolved and `user` is populated.
+ *
+ * Defense-in-depth (#40, Sprint 2 § 5.17): Vitest unit covers:
+ *   (1) allow path (creator + incomplete),
+ *   (2) deny non-creator path,
+ *   (3) deny submitted/approved/rejected path,
+ *   (4) registration in guards registry.
+ * The break-revert: temporarily removing this guard from a wizard
+ * route fails the no-unauthorized-access spec.
+ */
+export async function requireOnboardingAccess(ctx: GuardContext): Promise<GuardResult> {
+  const { store } = ctx
+
+  if (store.user === null) {
+    // Defensive: requireAuth ahead of us should have caught this. If
+    // requireOnboardingAccess was composed without requireAuth, fall
+    // through to the sign-in redirect rather than crashing.
+    return { name: 'auth.sign-in' }
+  }
+
+  if (store.user.attributes.user_type !== 'creator') {
+    return { name: 'app.dashboard' }
+  }
+
+  // Lazy-load to avoid eager Pinia coupling — the onboarding store is
+  // only constructed when a creator user reaches this guard.
+  const { useOnboardingStore } = await import('@/modules/onboarding/stores/useOnboardingStore')
+  const onboardingStore = useOnboardingStore()
+
+  // Drive a bootstrap so we have authoritative application_status.
+  // The store dedupes concurrent calls so racing guard invocations
+  // collapse to a single backend call.
+  await onboardingStore.bootstrap()
+
+  const status = onboardingStore.applicationStatus
+  if (status !== null && status !== 'incomplete') {
+    return { name: 'creator.dashboard' }
+  }
+
+  return null
+}
+
 export const guards: Record<
-  'requireAuth' | 'requireGuest' | 'requireMfaEnrolled' | 'requireAgencyAdmin',
+  | 'requireAuth'
+  | 'requireGuest'
+  | 'requireMfaEnrolled'
+  | 'requireAgencyAdmin'
+  | 'requireOnboardingAccess',
   (ctx: GuardContext) => Promise<GuardResult>
 > = {
   requireAuth,
   requireGuest,
   requireMfaEnrolled,
   requireAgencyAdmin,
+  requireOnboardingAccess,
 }

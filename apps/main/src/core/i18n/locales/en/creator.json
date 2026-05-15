@@ -1,0 +1,253 @@
+{
+  "creator": {
+    "not_found": "No creator profile is associated with your account. Please sign out and sign in again, or contact support.",
+    "wizard": {
+      "feature_disabled": "This step is currently unavailable while a configuration change is in progress. Skip to continue your application.",
+      "feature_enabled": "This option is not available right now — please use the standard flow for this step.",
+      "incomplete": "Cannot submit your application yet — one or more wizard steps are still incomplete."
+    },
+    "ui": {
+      "wizard": {
+        "title": "Set up your creator profile",
+        "subtitle": "A few steps to introduce yourself to brands.",
+        "progress": {
+          "step_of": "Step {current} of {total}",
+          "completed": "Completed",
+          "current": "Current step",
+          "skipped": "Skipped",
+          "pending": "Not started"
+        },
+        "actions": {
+          "save": "Save",
+          "save_and_continue": "Save and continue",
+          "back": "Back",
+          "skip_for_now": "Skip for now",
+          "save_and_exit": "Save and exit",
+          "submit_for_approval": "Submit for approval",
+          "continue_from_here": "Continue from here",
+          "edit_step": "Edit step",
+          "review_and_submit": "Review and submit"
+        },
+        "skipped": {
+          "label": "Skipped",
+          "explanation": "This step is not required at this time. An admin will review your application without it."
+        },
+        "save_status": {
+          "saving": "Saving…",
+          "saved": "Saved",
+          "error": "Could not save — please try again."
+        },
+        "steps": {
+          "profile": {
+            "name": "Profile basics",
+            "title": "Tell us about yourself",
+            "description": "Your display name, bio, photo, and the categories you create in."
+          },
+          "social": {
+            "name": "Social accounts",
+            "title": "Connect your social accounts",
+            "description": "Connect at least one platform so brands can see your reach."
+          },
+          "portfolio": {
+            "name": "Portfolio",
+            "title": "Show your best work",
+            "description": "Upload up to 10 items — videos, images, or external links — that represent your style.",
+            "gallery_heading": "Your portfolio",
+            "gallery_empty": "No portfolio items uploaded yet.",
+            "gallery_remove": "Remove item",
+            "gallery_status": "Portfolio gallery contains {count} item(s).",
+            "video_badge_label": "Video",
+            "link_badge_label": "External link",
+            "untitled_item": "Untitled portfolio item"
+          },
+          "kyc": {
+            "name": "Identity verification",
+            "title": "Verify your identity",
+            "description": "A quick check with our verification partner. Required for payouts.",
+            "skipped_title": "Identity verification skipped",
+            "skipped_explanation": "Identity verification is not required at this time.",
+            "current_status": "Status:",
+            "begin_button": "Begin verification",
+            "status_labels": {
+              "none": "Not started",
+              "pending": "In progress",
+              "verified": "Verified",
+              "rejected": "Rejected",
+              "not_required": "Skipped"
+            }
+          },
+          "tax": {
+            "name": "Tax information",
+            "title": "Tax form",
+            "description": "We need a tax form for payouts, even before your first one.",
+            "current_status": "Status:",
+            "status_complete": "Submitted",
+            "status_incomplete": "Not yet submitted"
+          },
+          "payout": {
+            "name": "Payout method",
+            "title": "Set up payouts",
+            "description": "Connect a Stripe Express account to receive payments.",
+            "skipped_title": "Payout setup skipped",
+            "skipped_explanation": "Payout setup is not required at this time.",
+            "current_status": "Status:",
+            "begin_button": "Set up payouts",
+            "status_set": "Connected",
+            "status_unset": "Not connected"
+          },
+          "contract": {
+            "name": "Master agreement",
+            "title": "Sign the master agreement",
+            "description": "Our standard creator agreement covers brand collaborations on the platform.",
+            "skipped_explanation": "Contract signing is not required at this time — please accept the click-through terms below.",
+            "click_through_label": "I have read and accept these terms.",
+            "click_through_help": "Read the agreement above, then check the box to continue.",
+            "terms_version": "Master Creator Agreement v{version}",
+            "current_status": "Status:",
+            "begin_button": "Open agreement to sign",
+            "status_labels": {
+              "signed": "Signed",
+              "click_through_accepted": "Accepted",
+              "none": "Not started"
+            }
+          },
+          "review": {
+            "name": "Review and submit",
+            "title": "Review your application",
+            "description": "Take a moment to review everything before submitting.",
+            "completeness": "{percent}% complete",
+            "edit_step": "Edit",
+            "submit_button": "Submit application"
+          }
+        },
+        "fields": {
+          "display_name": "Display name",
+          "display_name_help": "How brands will see you — your handle or stage name.",
+          "bio": "Bio",
+          "bio_help": "A short introduction. You can use **bold**, *italics*, and [links](https://example.com).",
+          "avatar": "Profile photo",
+          "avatar_drop": "Drop a photo here, or click to choose. JPG, PNG, or WebP up to 5 MB.",
+          "country": "Country",
+          "region": "Region or city",
+          "primary_language": "Primary language",
+          "secondary_languages": "Other languages",
+          "categories": "Categories",
+          "categories_help": "Pick the categories that best describe what you create.",
+          "social_handle": "Username",
+          "social_profile_url": "Profile URL",
+          "portfolio_title": "Title",
+          "portfolio_description": "Description",
+          "portfolio_external_url": "External URL (optional)",
+          "tax_form_type": "Tax form",
+          "legal_name": "Legal name",
+          "tax_id": "Tax ID",
+          "address_country": "Country",
+          "address_city": "City",
+          "address_postal_code": "Postal code",
+          "address_street": "Street"
+        },
+        "categories": {
+          "fashion": "Fashion",
+          "beauty": "Beauty",
+          "lifestyle": "Lifestyle",
+          "fitness": "Fitness",
+          "travel": "Travel",
+          "food": "Food",
+          "tech": "Technology",
+          "gaming": "Gaming",
+          "music": "Music",
+          "comedy": "Comedy",
+          "education": "Education",
+          "parenting": "Parenting",
+          "business": "Business",
+          "art": "Art",
+          "sports": "Sports",
+          "other": "Other"
+        },
+        "tax_form_types": {
+          "eu_self_employed": "EU — self-employed",
+          "eu_company": "EU — company",
+          "uk_self_employed": "UK — self-employed",
+          "uk_company": "UK — company"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Coming soon"
+        },
+        "vendor_bounce": {
+          "waiting_title": "Almost there…",
+          "waiting_description": "We're waiting on a response from our partner. This usually takes under a minute.",
+          "timeout_title": "Still waiting on our partner",
+          "timeout_description": "This is taking longer than expected. You can try again or contact support.",
+          "retry": "Try again",
+          "contact_support": "Contact support"
+        },
+        "welcome_back": {
+          "title": "Welcome back",
+          "subtitle": "You were last here {time_ago}. Pick up where you left off.",
+          "next_step_prompt": "You're on Step {step}. Continue here, or jump back to edit an earlier step.",
+          "all_complete_prompt": "Looking good — you've completed every step. Ready to submit?",
+          "continue_button": "Continue to {step_name}",
+          "review_button": "Review and submit"
+        }
+      },
+      "dashboard": {
+        "title": "Your application",
+        "greeting": "Welcome, {name}.",
+        "completeness": "{percent}% complete",
+        "submitted_at": "Submitted on {datetime}",
+        "submitted": {
+          "heading": "Application submitted",
+          "description": "Your profile is under review. We'll notify you within 3 business days.",
+          "completeness_label": "Profile completeness",
+          "last_updated": "Last updated {time_ago}"
+        },
+        "pending_review": {
+          "title": "Application under review",
+          "description": "Your application is in our queue. We'll notify you within 3 business days."
+        },
+        "approved": {
+          "title": "Welcome to Catalyst",
+          "heading": "You're approved",
+          "description": "You're approved to receive brand collaborations. The full creator dashboard ships soon."
+        },
+        "rejected": {
+          "title": "Application not approved",
+          "heading": "Application needs changes",
+          "description": "Please contact support for the next steps. We're here to help.",
+          "reason_label": "Reason:",
+          "edit_profile": "Edit profile"
+        },
+        "incomplete": {
+          "title": "Continue your application",
+          "description": "Pick up where you left off — your wizard progress is saved."
+        }
+      },
+      "upload": {
+        "avatar_prompt": "Drop a photo here, or click to choose",
+        "avatar_preview_alt": "Profile photo preview",
+        "size_hint": "{types} · up to {max_mb} MB",
+        "portfolio_prompt": "Drop files here, or click to choose",
+        "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
+        "portfolio_slots_remaining": "{remaining} slots remaining",
+        "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",
+        "uploading": "Uploading…",
+        "remove": "Remove",
+        "remove_avatar": "Remove photo",
+        "remove_portfolio_item_label": "Remove {name}",
+        "status_pending": "Waiting…",
+        "status_uploading": "Uploading…",
+        "status_done": "Uploaded",
+        "status_error": "Failed"
+      },
+      "errors": {
+        "upload_too_large": "This file is too large. The maximum size is {max_mb} MB.",
+        "upload_wrong_type": "This file type is not supported. Use {allowed_types}.",
+        "upload_failed": "The upload failed. Please try again.",
+        "portfolio_max_reached": "You can upload up to {max} portfolio items."
+      }
+    }
+  }
+}

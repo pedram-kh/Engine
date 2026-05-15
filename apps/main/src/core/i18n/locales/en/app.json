@@ -183,5 +183,8 @@
         "saveFailed": "Failed to save settings."
       }
     }
+  },
+  "validation": {
+    "field_required": "This field is required."
   }
 }

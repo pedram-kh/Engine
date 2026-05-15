@@ -21,4 +21,5 @@ export {
   type HttpClient,
   type HttpRequestOptions,
 } from './http'
+export { uploadToPresignedUrl } from './presigned'
 export * from './types'

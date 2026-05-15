@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "creators": {
+      "detail": {
+        "fallback_title": "Creator",
+        "application_status": "Application status: {status}",
+        "completeness": "{percent}% complete",
+        "rejection_heading": "Rejection notes",
+        "profile_heading": "Profile",
+        "social_heading": "Social accounts",
+        "portfolio_heading": "Portfolio",
+        "kyc_history_heading": "KYC verification history",
+        "kyc_history": {
+          "provider": "Provider",
+          "status": "Status",
+          "started_at": "Started at",
+          "completed_at": "Completed at"
+        },
+        "load_failed": "We couldn't load this creator. Please refresh."
+      }
+    }
+  }
+}

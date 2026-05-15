@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\TestHelpers;
 
 use App\TestHelpers\Http\Middleware\ApplyTestClock;
+use App\TestHelpers\Http\Middleware\ApplyTestQueueModeMiddleware;
 use App\TestHelpers\Http\Middleware\VerifyTestHelperToken;
 use App\TestHelpers\Services\RateLimiterNeutralizer;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -57,6 +58,7 @@ final class TestHelpersServiceProvider extends ServiceProvider
 
         $this->registerRoutes();
         $this->registerGlobalClockMiddleware();
+        $this->registerQueueModeMiddleware();
         $this->applyNeutralizedRateLimiters();
     }
 
@@ -131,6 +133,24 @@ final class TestHelpersServiceProvider extends ServiceProvider
 
         if ($kernel instanceof HttpKernel) {
             $kernel->prependMiddleware(ApplyTestClock::class);
+        }
+    }
+
+    /**
+     * Push the queue-mode override middleware onto the `api` group.
+     *
+     * Sprint 3 Chunk 3 sub-step 4. Scoped to `api` rather than
+     * prepended globally because queue-config overrides are only
+     * meaningful for API requests that dispatch jobs — the `web`
+     * stack (mock-vendor pages, auth screens) doesn't depend on
+     * the queue driver.
+     */
+    private function registerQueueModeMiddleware(): void
+    {
+        $kernel = $this->app->make(Kernel::class);
+
+        if ($kernel instanceof HttpKernel) {
+            $kernel->appendMiddlewareToGroup('api', ApplyTestQueueModeMiddleware::class);
         }
     }
 }

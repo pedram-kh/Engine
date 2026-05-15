@@ -13,6 +13,7 @@ use App\Modules\Creators\Http\Requests\UpsertTaxProfileRequest;
 use App\Modules\Creators\Http\Resources\CreatorResource;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Services\CompletenessScoreCalculator;
+use App\Modules\Creators\Services\ContractTermsRenderer;
 use App\Modules\Creators\Services\CreatorWizardService;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -48,6 +49,7 @@ final class CreatorWizardController
     public function __construct(
         private readonly CreatorWizardService $wizardService,
         private readonly CompletenessScoreCalculator $calculator,
+        private readonly ContractTermsRenderer $contractTermsRenderer,
     ) {}
 
     /**
@@ -172,6 +174,41 @@ final class CreatorWizardController
                 'envelope_id' => $result->envelopeId,
                 'signing_url' => $result->signingUrl,
                 'expires_at' => $result->expiresAt,
+            ],
+        ]);
+    }
+
+    /**
+     * GET /api/v1/creators/me/wizard/contract/terms
+     *
+     * Server-rendered master agreement HTML — Sprint 3 Chunk 3
+     * sub-step 4. The SPA's click-through fallback uses this as the
+     * canonical source so an attacker who can poison the SPA bundle
+     * still cannot inject content into the legally-binding terms
+     * surface (#40 break-revert: try replacing the response with a
+     * raw markdown string and confirm the SPA's scrollable region
+     * fails to render the formatted document).
+     *
+     * The endpoint is creator-scoped (auth + verified) like the
+     * rest of the `creators/me/*` group. The `?locale=` query
+     * parameter is optional; the renderer falls back to `en` when
+     * the requested locale has no source file.
+     */
+    public function getContractTerms(Request $request): JsonResponse
+    {
+        // Ensure a creator exists before serving the terms — the
+        // endpoint is otherwise generic, but gating on the creator
+        // existence matches the rest of the /creators/me/* group.
+        $this->requireCreator($request);
+
+        $requested = (string) $request->query('locale', $request->getPreferredLanguage(['en', 'pt', 'it']) ?? 'en');
+        $rendered = $this->contractTermsRenderer->render($requested);
+
+        return response()->json([
+            'data' => [
+                'html' => $rendered['html'],
+                'version' => $rendered['version'],
+                'locale' => $rendered['locale'],
             ],
         ]);
     }

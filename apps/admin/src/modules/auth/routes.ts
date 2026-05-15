@@ -146,8 +146,18 @@ export const errorRoutes: RouteRecordRaw[] = [
   },
 ]
 
+import { creatorsRoutes } from '@/modules/creators/routes'
+
 /**
  * The full route table the admin SPA mounts. Order matters only for
  * route-name collisions, of which there are none.
+ *
+ * Sprint 3 Chunk 3 sub-step 9: `creatorsRoutes` adds the admin
+ * Creator drill-in surface at `/creators/:ulid`.
  */
-export const routes: RouteRecordRaw[] = [...authRoutes, ...appRoutes, ...errorRoutes]
+export const routes: RouteRecordRaw[] = [
+  ...authRoutes,
+  ...appRoutes,
+  ...creatorsRoutes,
+  ...errorRoutes,
+]

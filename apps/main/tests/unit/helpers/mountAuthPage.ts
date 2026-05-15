@@ -28,10 +28,13 @@ import { createI18n } from 'vue-i18n'
 
 import enApp from '@/core/i18n/locales/en/app.json'
 import enAuth from '@/core/i18n/locales/en/auth.json'
+import enCreator from '@/core/i18n/locales/en/creator.json'
 import ptApp from '@/core/i18n/locales/pt/app.json'
 import ptAuth from '@/core/i18n/locales/pt/auth.json'
+import ptCreator from '@/core/i18n/locales/pt/creator.json'
 import itApp from '@/core/i18n/locales/it/app.json'
 import itAuth from '@/core/i18n/locales/it/auth.json'
+import itCreator from '@/core/i18n/locales/it/creator.json'
 
 import { routes } from '@/modules/auth/routes'
 
@@ -61,6 +64,17 @@ export interface MountAuthPageOptions {
    * can assert on its `to` prop without rendering a real link.
    */
   stubs?: Record<string, Component | boolean>
+  /**
+   * Hook fired AFTER pinia + router are constructed and the initial
+   * route has resolved, but BEFORE the component mounts. Used by
+   * onboarding/creator specs to drive `bootstrap()` calls in the
+   * same chronology as the real router guards
+   * (`requireOnboardingAccess` awaits `bootstrap()` before the
+   * navigation lands and the component mounts). The router instance
+   * is passed in so specs can install spies before `onMounted` fires
+   * the navigation.
+   */
+  beforeMount?: (ctx: { router: Router; pinia: Pinia }) => Promise<void> | void
 }
 
 export interface MountAuthPageResult<T> {
@@ -94,9 +108,9 @@ export async function mountAuthPage<T = unknown>(
   })
 
   const messages = {
-    en: { ...enApp, ...enAuth },
-    pt: { ...ptApp, ...ptAuth },
-    it: { ...itApp, ...itAuth },
+    en: { ...enApp, ...enAuth, ...enCreator },
+    pt: { ...ptApp, ...ptAuth, ...ptCreator },
+    it: { ...itApp, ...itAuth, ...itCreator },
   }
 
   // We cast to a loose type so the helper plugs into mount() without
@@ -126,6 +140,10 @@ export async function mountAuthPage<T = unknown>(
     // the initial route resolves to the same path; safe to swallow.
   }
   await router.isReady()
+
+  if (options.beforeMount !== undefined) {
+    await options.beforeMount({ router, pinia })
+  }
 
   const wrapper = mount(component, {
     props: options.props ?? {},
