@@ -151,7 +151,7 @@ describe('Step6TaxPage', () => {
       legal_name: 'Acme Studio S.r.l.',
       tax_id: 'IT12345678901',
       address: {
-        country: 'IT',
+        country_code: 'IT',
         city: 'Milano',
         postal_code: '20100',
         street: 'Via Roma 1',

@@ -264,7 +264,7 @@ export interface CreatorSocialConnectPayload {
 }
 
 export interface CreatorTaxAddress {
-  country: string
+  country_code: string
   city: string
   postal_code: string
   street: string

@@ -311,7 +311,7 @@ describe('useOnboardingStore', () => {
         tax_form_type: 'eu_self_employed',
         legal_name: 'X',
         tax_id: 'X',
-        address: { country: 'IT', city: 'Rome', postal_code: '00100', street: 'A' },
+        address: { country_code: 'IT', city: 'Rome', postal_code: '00100', street: 'A' },
       })
       expect(onboardingApi.updateTax).toHaveBeenCalledOnce()
     })

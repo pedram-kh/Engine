@@ -46,7 +46,7 @@ const draft = reactive<CreatorTaxUpdatePayload>({
   legal_name: '',
   tax_id: '',
   address: {
-    country: '',
+    country_code: '',
     city: '',
     postal_code: '',
     street: '',
@@ -67,7 +67,7 @@ const isSaveDisabled = computed(
     store.isLoadingTax ||
     draft.legal_name.trim() === '' ||
     draft.tax_id.trim() === '' ||
-    draft.address.country.trim() === '' ||
+    draft.address.country_code.trim() === '' ||
     draft.address.city.trim() === '' ||
     draft.address.postal_code.trim() === '' ||
     draft.address.street.trim() === '',
@@ -88,7 +88,7 @@ async function save(): Promise<void> {
       legal_name: draft.legal_name.trim(),
       tax_id: draft.tax_id.trim(),
       address: {
-        country: draft.address.country.trim(),
+        country_code: draft.address.country_code.trim(),
         city: draft.address.city.trim(),
         postal_code: draft.address.postal_code.trim(),
         street: draft.address.street.trim(),
@@ -163,7 +163,7 @@ async function advance(): Promise<void> {
         density="comfortable"
       />
       <v-text-field
-        v-model="draft.address.country"
+        v-model="draft.address.country_code"
         :label="t('creator.ui.wizard.fields.address_country')"
         data-testid="tax-address-country"
         density="comfortable"
