@@ -1,6 +1,11 @@
 {
   "creator": {
     "not_found": "No creator profile is associated with your account. Please sign out and sign in again, or contact support.",
+    "already_approved": "This creator has already been approved.",
+    "already_rejected": "This creator has already been rejected.",
+    "admin": {
+      "field_status_immutable": "Application status cannot be changed through this form. Use the approve or reject actions instead."
+    },
     "wizard": {
       "feature_disabled": "This step is currently unavailable while a configuration change is in progress. Skip to continue your application.",
       "feature_enabled": "This option is not available right now — please use the standard flow for this step.",

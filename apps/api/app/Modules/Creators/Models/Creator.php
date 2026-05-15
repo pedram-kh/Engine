@@ -49,6 +49,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $approved_by_user_id
  * @property Carbon|null $rejected_at
  * @property string|null $rejection_reason
+ * @property string|null $welcome_message
  * @property int $profile_completeness_score
  * @property Carbon|null $last_active_at
  * @property int|null $signed_master_contract_id
@@ -108,6 +109,7 @@ final class Creator extends Model implements Auditable
         'approved_by_user_id',
         'rejected_at',
         'rejection_reason',
+        'welcome_message',
         'profile_completeness_score',
         'last_active_at',
         'signed_master_contract_id',

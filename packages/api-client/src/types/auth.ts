@@ -52,6 +52,15 @@ export interface SignUpRequest {
   password: string
   password_confirmation: string
   preferred_language?: PreferredLanguage
+  /**
+   * Magic-link invitation token (Sprint 3 Chunk 4). When present, the
+   * sign-up endpoint accepts the invitation: the bulk-invite User row
+   * is updated in place rather than a new row created, the relation
+   * flips to roster, and email_verified_at is stamped to now() (the
+   * invitee clicked a link mailed to them — the verification gate is
+   * implicit). Absent for direct-signup users.
+   */
+  invitation_token?: string
 }
 
 /**

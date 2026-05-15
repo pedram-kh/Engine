@@ -66,4 +66,18 @@ export const brandsApi = {
   archive(agencyId: string, brandId: string): Promise<SingleBrandEnvelope> {
     return http.delete<SingleBrandEnvelope>(`${brandsBase(agencyId)}/${brandId}`)
   },
+
+  /**
+   * Restore an archived brand.
+   *
+   * Sprint 3 Chunk 4 sub-step 6 — un-archives a soft-deleted brand:
+   * clears `deleted_at` + flips `status` back to `active`. Requires the
+   * agency_admin or agency_manager role; staff get a 403.
+   *
+   * Idempotent: restoring an already-active brand is a 200 OK no-op
+   * (no audit emitted). See `BrandController::restore`.
+   */
+  restore(agencyId: string, brandId: string): Promise<SingleBrandEnvelope> {
+    return http.post<SingleBrandEnvelope>(`${brandsBase(agencyId)}/${brandId}/restore`)
+  },
 }

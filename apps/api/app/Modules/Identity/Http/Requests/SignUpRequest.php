@@ -32,15 +32,25 @@ final class SignUpRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Sprint 3 Chunk 4: invitation-token path. When a creator signs up
+        // via the magic-link `/auth/accept-invite` flow, the BulkInviteService
+        // already pre-created a User row at invite time (with a random
+        // unusable password, email_verified_at=null). The sign-up POST
+        // updates that existing row rather than creating a new one — so
+        // the unique-email rule MUST be relaxed when invitation_token is
+        // present. SignUpService validates the token + email-match at the
+        // service layer.
+        $hasInvitationToken = is_string($this->input('invitation_token'))
+            && trim((string) $this->input('invitation_token')) !== '';
+
+        $emailRules = ['required', 'string', 'email:rfc', 'max:320'];
+        if (! $hasInvitationToken) {
+            $emailRules[] = Rule::unique('users', 'email');
+        }
+
         return [
             'name' => ['required', 'string', 'min:1', 'max:120'],
-            'email' => [
-                'required',
-                'string',
-                'email:rfc',
-                'max:320',
-                Rule::unique('users', 'email'),
-            ],
+            'email' => $emailRules,
             'password' => [
                 'required',
                 'string',
@@ -50,6 +60,7 @@ final class SignUpRequest extends FormRequest
             ],
             'password_confirmation' => ['required', 'string'],
             'preferred_language' => ['sometimes', 'string', 'in:en,pt,it'],
+            'invitation_token' => ['sometimes', 'nullable', 'string', 'max:128'],
         ];
     }
 

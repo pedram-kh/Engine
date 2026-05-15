@@ -22,9 +22,64 @@ use Illuminate\Http\Request;
 
 final class InvitationController
 {
+    public const int DEFAULT_PER_PAGE = 25;
+
+    public const int MAX_PER_PAGE = 100;
+
     public function __construct(
         private readonly AgencyInvitationService $invitationService,
     ) {}
+
+    /**
+     * GET /api/v1/agencies/{agency}/invitations — Sprint 3 Chunk 4 sub-step 3.
+     *
+     * Paginated invitation history (pending + accepted + expired).
+     * Admin-only — invitation history is sensitive (it reveals who has
+     * been invited and when, including failed acceptances). Non-admin
+     * agency members get 403.
+     *
+     * Filter: ?status=pending|accepted|expired.
+     * Default sort: -invited_at (== -created_at on the row).
+     */
+    public function index(Request $request, Agency $agency): JsonResponse
+    {
+        $this->authorizeAdmin($request);
+
+        $request->validate([
+            'status' => ['sometimes', 'string', 'in:pending,accepted,expired'],
+            'page' => ['sometimes', 'integer', 'min:1'],
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:'.self::MAX_PER_PAGE],
+        ]);
+
+        $perPage = (int) $request->input('per_page', self::DEFAULT_PER_PAGE);
+
+        $query = AgencyUserInvitation::query()
+            ->where('agency_id', $agency->id)
+            ->with(['agency', 'invitedBy']);
+
+        $status = $request->string('status')->value();
+        if ($status !== '') {
+            $now = now();
+            match ($status) {
+                'pending' => $query
+                    ->whereNull('accepted_at')
+                    ->where('expires_at', '>', $now),
+                'accepted' => $query->whereNotNull('accepted_at'),
+                'expired' => $query
+                    ->whereNull('accepted_at')
+                    ->where('expires_at', '<=', $now),
+                default => null,
+            };
+        }
+
+        $query->orderByDesc('created_at');
+
+        $paginator = $query->paginate($perPage)->appends($request->query());
+
+        return AgencyInvitationResource::collection($paginator)
+            ->response()
+            ->setStatusCode(200);
+    }
 
     /**
      * POST /api/v1/agencies/{agency}/invitations

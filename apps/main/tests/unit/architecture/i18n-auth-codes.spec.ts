@@ -7,6 +7,8 @@
  *   2. Harvest every string literal matching either:
  *        - `auth.<dotted.path>`        — Identity-module error codes.
  *        - `rate_limit.<dotted.path>`  — chunk-7.1 named-limiter codes.
+ *        - `invitation.<dotted.path>`  — Sprint 3 Chunk 4 magic-link
+ *                                        invitation acceptance codes.
  *   3. For each harvested literal, assert it resolves to a string in
  *      the SPA's `en/auth.json`, `pt/auth.json`, AND `it/auth.json`
  *      bundles.
@@ -71,7 +73,7 @@ function harvestAuthCodes(contents: string): Set<string> {
   // strings. Does NOT match `auth_*` / `rate_limit_*` (no dot),
   // `auth/login` (slash), or array-access syntax like
   // `$config['auth']['foo']`.
-  const pattern = /['"](auth|rate_limit)\.[a-z_][a-zA-Z0-9_.]*['"]/g
+  const pattern = /['"](auth|rate_limit|invitation)\.[a-z_][a-zA-Z0-9_.]*['"]/g
   for (const match of contents.matchAll(pattern)) {
     const literal = match[0].slice(1, -1)
     if (!CONFIG_KEY_ALLOWLIST.has(literal)) {

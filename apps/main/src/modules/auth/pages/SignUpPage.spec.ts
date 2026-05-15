@@ -147,6 +147,91 @@ describe('SignUpPage', () => {
     expect(region.attributes('aria-live')).toBe('polite')
   })
 
+  // --------------------------------------------------------------------------
+  // Sprint 3 Chunk 4 sub-step 4 — magic-link invitation forward path
+  // --------------------------------------------------------------------------
+
+  it('does NOT render the invitation banner when there is no ?token= query', async () => {
+    const h = await mountAuthPage(SignUpPage)
+    teardown = h.unmount
+    expect(h.wrapper.find('[data-test="sign-up-invitation-banner"]').exists()).toBe(false)
+  })
+
+  it('renders the invitation banner when ?token=<token> is present', async () => {
+    const h = await mountAuthPage(SignUpPage, {
+      initialRoute: { path: '/sign-up', query: { token: 'abc-token' } },
+    })
+    teardown = h.unmount
+    expect(h.wrapper.find('[data-test="sign-up-invitation-banner"]').exists()).toBe(true)
+  })
+
+  it('forwards invitation_token in the signUp() payload when the URL carries ?token=', async () => {
+    vi.mocked(authApi.signUp).mockResolvedValue(USER)
+    const h = await mountAuthPage(SignUpPage, {
+      initialRoute: { path: '/sign-up', query: { token: 'magic-token' } },
+    })
+    teardown = h.unmount
+    await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
+    await h.wrapper.find('[data-test="sign-up-email"] input').setValue('a@b.c')
+    await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
+    await h.wrapper
+      .find('[data-test="sign-up-password-confirmation"] input')
+      .setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(authApi.signUp).toHaveBeenCalledWith({
+      name: 'Alice',
+      email: 'a@b.c',
+      password: 'Pa$$w0rd!12',
+      password_confirmation: 'Pa$$w0rd!12',
+      invitation_token: 'magic-token',
+    })
+  })
+
+  it('on successful invitation signup, navigates to /sign-in?invited=1 (not the verify-email-pending page)', async () => {
+    vi.mocked(authApi.signUp).mockResolvedValue(USER)
+    const h = await mountAuthPage(SignUpPage, {
+      initialRoute: { path: '/sign-up', query: { token: 'magic-token' } },
+    })
+    teardown = h.unmount
+    const pushSpy = vi.spyOn(h.router, 'push')
+    await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
+    await h.wrapper.find('[data-test="sign-up-email"] input').setValue('a@b.c')
+    await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
+    await h.wrapper
+      .find('[data-test="sign-up-password-confirmation"] input')
+      .setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(pushSpy).toHaveBeenCalledWith({
+      name: 'auth.sign-in',
+      query: { invited: '1' },
+    })
+  })
+
+  it('on invitation.email_mismatch, renders the i18n string inline', async () => {
+    vi.mocked(authApi.signUp).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'invitation.email_mismatch',
+        message: 'Email does not match.',
+      }),
+    )
+    const h = await mountAuthPage(SignUpPage, {
+      initialRoute: { path: '/sign-up', query: { token: 'magic-token' } },
+    })
+    teardown = h.unmount
+    await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
+    await h.wrapper.find('[data-test="sign-up-email"] input').setValue('wrong@example.com')
+    await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
+    await h.wrapper
+      .find('[data-test="sign-up-password-confirmation"] input')
+      .setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(h.wrapper.find('[data-test="sign-up-error"]').text()).toContain('different email')
+  })
+
   it('submit button shows loading label while isSigningUp is true', async () => {
     let resolveSignUp: (u: typeof USER) => void = () => undefined
     vi.mocked(authApi.signUp).mockImplementation(

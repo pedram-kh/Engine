@@ -38,7 +38,8 @@ const router = useRouter()
 const agencyStore = useAgencyStore()
 const authStore = useAuthStore()
 
-const { memberships, currentAgencyId, currentAgencyName } = storeToRefs(agencyStore)
+const { memberships, currentAgencyId, currentAgencyName, isSwitchingAgency } =
+  storeToRefs(agencyStore)
 const { user, isLoggingOut } = storeToRefs(authStore)
 
 const localeOptions = buildLocaleOptions(availableLocales, t)
@@ -59,10 +60,17 @@ async function signOut(): Promise<void> {
   await router.push({ name: 'auth.sign-in' })
 }
 
-function onSwitchAgency(agencyId: string): void {
-  agencyStore.switchAgency(agencyId)
-  // Reload the current page so tenant-scoped data refreshes.
-  router.go(0)
+/**
+ * Sprint 3 Chunk 4 sub-step 5 — workspace switching full UX (Decision
+ * D2=b). The store handles the re-bootstrap; the layout only awaits
+ * the result so the loading spinner unblocks at the right moment.
+ *
+ * NO `router.go(0)` reload (that was the Sprint 2 placeholder). The
+ * current route stays put; tenant-scoped data refreshes via the
+ * auth-store bootstrap re-running.
+ */
+async function onSwitchAgency(agencyId: string): Promise<void> {
+  await agencyStore.switchAgency(agencyId)
 }
 </script>
 
@@ -109,6 +117,8 @@ function onSwitchAgency(agencyId: string): void {
         density="compact"
         variant="outlined"
         hide-details
+        :loading="isSwitchingAgency"
+        :disabled="isSwitchingAgency"
         :label="t('app.workspaceSwitcher.label')"
         class="agency-topbar__switcher mx-3"
         data-test="workspace-switcher"

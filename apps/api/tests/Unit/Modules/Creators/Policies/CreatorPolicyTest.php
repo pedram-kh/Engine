@@ -176,23 +176,30 @@ it('adminUpdate returns false for agency members', function (): void {
 });
 
 // ---------------------------------------------------------------------------
-// approve / reject — Sprint 4 stubs returning false
+// approve / reject — Sprint 3 Chunk 4 promoted these from Sprint 4 stubs to
+// real platform-admin gates. Owners and agency members remain denied; the
+// controllers wrapping these methods carry their own business-rule checks
+// (e.g. status transitions) on top of the policy.
 // ---------------------------------------------------------------------------
 
-it('approve returns false for everyone in Chunk 1 (Sprint 4 stub)', function (): void {
+it('approve returns true for platform admins and false for everyone else', function (): void {
     $admin = User::factory()->platformAdmin()->createOne();
     $owner = User::factory()->creator()->createOne();
+    $member = User::factory()->agencyAdmin()->createOne();
     $creator = Creator::factory()->createOne(['user_id' => $owner->id]);
 
-    expect(creatorPolicy()->approve($admin, $creator))->toBeFalse()
-        ->and(creatorPolicy()->approve($owner, $creator))->toBeFalse();
+    expect(creatorPolicy()->approve($admin, $creator))->toBeTrue()
+        ->and(creatorPolicy()->approve($owner, $creator))->toBeFalse()
+        ->and(creatorPolicy()->approve($member, $creator))->toBeFalse();
 });
 
-it('reject returns false for everyone in Chunk 1 (Sprint 4 stub)', function (): void {
+it('reject returns true for platform admins and false for everyone else', function (): void {
     $admin = User::factory()->platformAdmin()->createOne();
     $owner = User::factory()->creator()->createOne();
+    $member = User::factory()->agencyAdmin()->createOne();
     $creator = Creator::factory()->createOne(['user_id' => $owner->id]);
 
-    expect(creatorPolicy()->reject($admin, $creator))->toBeFalse()
-        ->and(creatorPolicy()->reject($owner, $creator))->toBeFalse();
+    expect(creatorPolicy()->reject($admin, $creator))->toBeTrue()
+        ->and(creatorPolicy()->reject($owner, $creator))->toBeFalse()
+        ->and(creatorPolicy()->reject($member, $creator))->toBeFalse();
 });

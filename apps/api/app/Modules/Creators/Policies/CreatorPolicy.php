@@ -75,21 +75,21 @@ final class CreatorPolicy
     }
 
     /**
-     * Sprint 4 admin action — kept here as a stub returning false so the
-     * authorize() contract is in place for the admin SPA's approve UI
-     * before Sprint 4 implements the workflow.
+     * Sprint 3 Chunk 4 admin action — flips application_status to
+     * `approved` via the dedicated approve endpoint per Decision E2=b.
+     * Gated on platform_admin user_type; agency users never approve.
      */
     public function approve(User $user, Creator $creator): bool
     {
-        return false;
+        return $user->type === UserType::PlatformAdmin;
     }
 
     /**
-     * Sprint 4 admin action — same rationale as approve().
+     * Sprint 3 Chunk 4 admin action — same rationale as approve().
      */
     public function reject(User $user, Creator $creator): bool
     {
-        return false;
+        return $user->type === UserType::PlatformAdmin;
     }
 
     // -------------------------------------------------------------------------

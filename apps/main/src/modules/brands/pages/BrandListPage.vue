@@ -11,7 +11,7 @@
  */
 
 import type { BrandResource } from '@catalyst/api-client'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
@@ -34,6 +34,22 @@ const archiveDialog = ref(false)
 const brandToArchive = ref<BrandResource | null>(null)
 const archiving = ref(false)
 const archiveError = ref<string | null>(null)
+
+// Restore confirmation — Sprint 3 Chunk 4 sub-step 6.
+//
+// Per-archived-row restore action, gated by agency_admin role on the
+// client (the backend policy is broader — agency_manager can also
+// restore — but the kickoff's intent is to keep the manage-the-archive
+// action to admins on the UI). A toast notification surfaces after a
+// successful restore; the dialog itself is borrowed from the archive
+// confirmation pattern above to keep the two flows visually consistent.
+const restoreDialog = ref(false)
+const brandToRestore = ref<BrandResource | null>(null)
+const restoring = ref(false)
+const restoreError = ref<string | null>(null)
+const restoreSuccessMessage = ref<string | null>(null)
+
+const canRestore = computed(() => agencyStore.isAdmin)
 
 const tableOptions = ref({ page: 1, itemsPerPage: 25 })
 
@@ -132,6 +148,45 @@ async function confirmArchive(): Promise<void> {
     archiveError.value = t('app.brands.errors.archiveFailed')
   } finally {
     archiving.value = false
+  }
+}
+
+// Sprint 3 Chunk 4 sub-step 6 — restore handlers mirror the archive
+// shape (open dialog → confirm → close + reload + toast). The toast
+// uses a transient ref + v-snackbar (timeout-driven) rather than a
+// shared notification store, which is Sprint 4+'s when a third surface
+// needs the same pattern.
+
+function openRestoreDialog(brand: BrandResource): void {
+  brandToRestore.value = brand
+  restoreDialog.value = true
+  restoreError.value = null
+}
+
+function closeRestoreDialog(): void {
+  restoreDialog.value = false
+  brandToRestore.value = null
+  restoreError.value = null
+}
+
+async function confirmRestore(): Promise<void> {
+  const agencyId = agencyStore.currentAgencyId
+  if (agencyId === null || brandToRestore.value === null) return
+
+  const brandName = brandToRestore.value.attributes.name
+
+  restoring.value = true
+  restoreError.value = null
+
+  try {
+    await brandsApi.restore(agencyId, brandToRestore.value.id)
+    closeRestoreDialog()
+    restoreSuccessMessage.value = t('app.brands.restore.success', { name: brandName })
+    void loadBrands()
+  } catch {
+    restoreError.value = t('app.brands.errors.restoreFailed')
+  } finally {
+    restoring.value = false
   }
 }
 </script>
@@ -255,9 +310,81 @@ async function confirmArchive(): Promise<void> {
             :data-test="`brand-archive-${item.id}`"
             @click="openArchiveDialog(item)"
           />
+          <v-btn
+            v-if="item.attributes.status === 'archived' && canRestore"
+            icon="mdi-restore"
+            size="small"
+            variant="text"
+            color="primary"
+            :aria-label="t('app.brands.actions.restore')"
+            :data-test="`brand-restore-${item.id}`"
+            @click="openRestoreDialog(item)"
+          />
         </div>
       </template>
     </v-data-table-server>
+
+    <!-- Restore confirmation dialog — Sprint 3 Chunk 4 sub-step 6 -->
+    <v-dialog v-model="restoreDialog" max-width="440" data-test="restore-dialog">
+      <v-card v-if="brandToRestore">
+        <v-card-title class="text-h6 pa-4" data-test="restore-dialog-title">
+          {{ t('app.brands.restore.confirmTitle') }}
+        </v-card-title>
+        <v-card-text>
+          <p data-test="restore-dialog-message">
+            {{ t('app.brands.restore.confirmMessage', { name: brandToRestore.attributes.name }) }}
+          </p>
+          <v-alert
+            v-if="restoreError"
+            type="error"
+            variant="tonal"
+            class="mt-2"
+            data-test="restore-dialog-error"
+          >
+            {{ restoreError }}
+          </v-alert>
+        </v-card-text>
+        <v-card-actions class="px-4 pb-4">
+          <v-spacer />
+          <v-btn
+            variant="text"
+            :disabled="restoring"
+            data-test="restore-dialog-cancel"
+            @click="closeRestoreDialog"
+          >
+            {{ t('app.brands.restore.cancel') }}
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="flat"
+            :loading="restoring"
+            :disabled="restoring"
+            data-test="restore-dialog-confirm"
+            @click="confirmRestore"
+          >
+            {{ t('app.brands.restore.confirm') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Restore success snackbar — auto-dismisses after 4s. Bound to the
+         transient `restoreSuccessMessage` ref via `model-value` so the
+         snackbar's own dismiss flips the ref back to null without an
+         extra handler. -->
+    <v-snackbar
+      :model-value="restoreSuccessMessage !== null"
+      :timeout="4000"
+      color="success"
+      data-test="restore-success-toast"
+      @update:model-value="
+        (v) => {
+          if (!v) restoreSuccessMessage = null
+        }
+      "
+    >
+      {{ restoreSuccessMessage }}
+    </v-snackbar>
 
     <!-- Archive confirmation dialog -->
     <v-dialog v-model="archiveDialog" max-width="440" data-test="archive-dialog">

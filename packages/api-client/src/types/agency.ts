@@ -100,6 +100,8 @@ export type UpdateBrandPayload = Partial<CreateBrandPayload>
 
 export type AgencyRole = 'agency_admin' | 'agency_manager' | 'agency_staff'
 
+export type AgencyInvitationStatus = 'pending' | 'accepted' | 'expired'
+
 export interface AgencyInvitationAttributes {
   email: string
   role: AgencyRole
@@ -108,6 +110,12 @@ export interface AgencyInvitationAttributes {
   is_pending: boolean
   is_expired: boolean
   created_at: string
+  /** Sprint 3 Chunk 4 — invitation history listing. */
+  status: AgencyInvitationStatus
+  /** Sprint 3 Chunk 4 — invitation history listing (alias of created_at). */
+  invited_at: string
+  /** Sprint 3 Chunk 4 — name of the agency_admin who created the invite. */
+  invited_by_user_name: string | null
 }
 
 export interface AgencyInvitationResource {
@@ -127,6 +135,28 @@ export interface AgencyInvitationResource {
 export interface CreateInvitationPayload {
   email: string
   role: AgencyRole
+}
+
+// ---------------------------------------------------------------------------
+// Agency memberships (Sprint 3 Chunk 4 — paginated members listing)
+// ---------------------------------------------------------------------------
+
+export type AgencyMembershipStatus = 'active' | 'pending'
+
+export interface AgencyMembershipAttributes {
+  user_id: string
+  name: string
+  email: string
+  role: AgencyRole
+  status: AgencyMembershipStatus
+  created_at: string
+  last_active_at: string | null
+}
+
+export interface AgencyMembershipResource {
+  id: string
+  type: 'agency_memberships'
+  attributes: AgencyMembershipAttributes
 }
 
 /**

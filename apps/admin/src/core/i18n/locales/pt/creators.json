@@ -16,8 +16,60 @@
           "started_at": "Iniciada em",
           "completed_at": "Concluída em"
         },
-        "load_failed": "Não foi possível carregar este criador. Atualize a página."
+        "load_failed": "Não foi possível carregar este criador. Atualize a página.",
+        "fields": {
+          "display_name": "Nome de apresentação",
+          "bio": "Biografia",
+          "country_code": "País",
+          "region": "Região",
+          "primary_language": "Idioma principal",
+          "secondary_languages": "Idiomas secundários",
+          "categories": "Categorias"
+        },
+        "edit": {
+          "title": "Editar {field}",
+          "save": "Guardar alterações",
+          "cancel": "Cancelar",
+          "reason_label": "Motivo da alteração",
+          "reason_hint": "Obrigatório para campos sensíveis. Registado no log de auditoria.",
+          "custom_code_hint": "Escolha um valor ou escreva um código ISO de 2 letras.",
+          "button_aria_label": "Editar {field}",
+          "save_failed": "Não foi possível guardar esta alteração. Tente novamente.",
+          "saved": "{field} atualizado."
+        },
+        "errors": {
+          "field_status_immutable": "As transições de estado usam as ações aprovar / rejeitar, não a edição de campo."
+        },
+        "approve": {
+          "button": "Aprovar candidatura",
+          "title": "Aprovar candidatura de {name}",
+          "description": "Isto marca o criador como aprovado e concede acesso de produção. A ação é registada no log de auditoria.",
+          "welcome_label": "Mensagem de boas-vindas (opcional)",
+          "welcome_hint": "Mostrada no painel do criador no próximo início de sessão.",
+          "confirm": "Aprovar",
+          "cancel": "Cancelar",
+          "success": "Criador aprovado.",
+          "failed": "Não foi possível aprovar este criador. Tente novamente."
+        },
+        "reject": {
+          "button": "Rejeitar candidatura",
+          "title": "Rejeitar candidatura de {name}",
+          "description": "O criador verá o motivo no painel no próximo início de sessão.",
+          "reason_label": "Motivo da rejeição",
+          "min_hint": "Obrigatório, pelo menos {count} caracteres.",
+          "confirm": "Rejeitar",
+          "cancel": "Cancelar",
+          "success": "Criador rejeitado.",
+          "failed": "Não foi possível rejeitar este criador. Tente novamente."
+        }
       }
+    }
+  },
+  "creator": {
+    "already_approved": "Este criador já foi aprovado.",
+    "already_rejected": "Este criador já foi rejeitado.",
+    "admin": {
+      "field_status_immutable": "As transições de estado usam as ações aprovar / rejeitar, não a edição de campo."
     }
   }
 }

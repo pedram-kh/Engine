@@ -122,6 +122,21 @@ enum AuditAction: string
     case BulkInviteCompleted = 'bulk_invite.completed';
     case BulkInviteFailed = 'bulk_invite.failed';
 
+    // Magic-link invitation acceptance (Sprint 3 Chunk 4). Emitted by
+    // SignUpService::acceptInvitationOnSignUp() when an invitee completes
+    // sign-up via the magic-link path: User row gains a real password +
+    // email_verified_at; AgencyCreatorRelation transitions prospect → roster.
+    case CreatorInvitationAccepted = 'creator.invitation_accepted';
+
+    // Admin per-field edit + approve / reject (Sprint 3 Chunk 4).
+    // CreatorAdminFieldUpdated is emitted by AdminCreatorUpdateService
+    // once per state-flipping field change. Same-value updates are
+    // no-ops per #6 idempotency — they neither touch updated_at nor
+    // emit this row. Metadata: {field, old_value, new_value, reason?}.
+    case CreatorAdminFieldUpdated = 'creator.admin.field_updated';
+    case CreatorApproved = 'creator.approved';
+    case CreatorRejected = 'creator.rejected';
+
     // Auto-emitted by Audited trait on related models. Each model
     // overrides auditAction() to produce snake_case subject naming
     // (the trait's default class_basename lowercase produces

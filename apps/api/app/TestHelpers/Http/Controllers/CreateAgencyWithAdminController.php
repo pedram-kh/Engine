@@ -10,6 +10,7 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
+use App\Modules\Identity\Services\TwoFactorService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -34,10 +35,24 @@ use Illuminate\Validation\ValidationException;
  *   - Validates all inputs; returns 422 on failure.
  *
  * Request body (all optional — defaults generate stable unique values):
- *   - `email`       — string, optional. Defaults to a unique fake email.
- *   - `password`    — string, optional. Defaults to 'Password1!'.
- *   - `name`        — string, optional. Defaults to 'Test Admin'.
- *   - `agency_name` — string, optional. Defaults to a unique fake company.
+ *   - `email`          — string, optional. Defaults to a unique fake email.
+ *   - `password`       — string, optional. Defaults to 'Password1!'.
+ *   - `name`           — string, optional. Defaults to 'Test Admin'.
+ *   - `agency_name`    — string, optional. Defaults to a unique fake company.
+ *   - `enroll_2fa`     — bool, optional. When `true`, seed the user with a
+ *                        confirmed 2FA secret + recovery codes so the SPA
+ *                        `requireMfaEnrolled` router guard treats the user
+ *                        as enrolled out-of-the-box. Sprint 3 Chunk 4 added
+ *                        this flag to unblock the bulk-invite critical-path
+ *                        E2E spec, whose route chain is
+ *                        `requireAuth → requireMfaEnrolled → requireAgencyAdmin`.
+ *                        Without it, the spec would have to drive the full
+ *                        enrollment flow inline (~12 SPA navigations) just
+ *                        to reach the page under test. The returned
+ *                        `two_factor_secret` lets the spec mint a fresh
+ *                        TOTP code via `mintTotpCodeForEmail`, which only
+ *                        works once `users.two_factor_secret` is persisted
+ *                        — exactly the state this branch leaves the user in.
  *
  * Response (201):
  *   {
@@ -46,13 +61,14 @@ use Illuminate\Validation\ValidationException;
  *       "password": "Password1!",
  *       "user_ulid": "...",
  *       "agency_ulid": "...",
- *       "agency_name": "..."
+ *       "agency_name": "...",
+ *       "two_factor_secret": "..." | null
  *     }
  *   }
  */
 final class CreateAgencyWithAdminController
 {
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(Request $request, TwoFactorService $twoFactor): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -60,6 +76,7 @@ final class CreateAgencyWithAdminController
                 'password' => ['nullable', 'string', 'min:8', 'max:128'],
                 'name' => ['nullable', 'string', 'max:255'],
                 'agency_name' => ['nullable', 'string', 'max:255'],
+                'enroll_2fa' => ['nullable', 'boolean'],
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([
@@ -84,12 +101,9 @@ final class CreateAgencyWithAdminController
             ? $validated['agency_name']
             : fake()->unique()->company();
 
-        // Create an agency_user-typed, email-verified user with a known password.
-        // Use User::query()->create() directly (mirrors CreateAdminUserController)
-        // rather than UserFactory so we control the password without triggering
-        // the model's `hashed` cast on a pre-hashed value (RuntimeException in CI).
-        /** @var User $user */
-        $user = User::query()->create([
+        $enroll2fa = (bool) ($validated['enroll_2fa'] ?? false);
+
+        $attributes = [
             'type' => UserType::AgencyUser,
             'email' => $email,
             'name' => $name,
@@ -100,7 +114,32 @@ final class CreateAgencyWithAdminController
             'timezone' => 'UTC',
             'mfa_required' => false,
             'is_suspended' => false,
-        ]);
+        ];
+
+        // Optional 2FA enrollment: pre-seed the model with a confirmed TOTP
+        // secret + recovery codes so the SPA's `requireMfaEnrolled` guard
+        // treats the user as enrolled on first sign-in. The secret is a
+        // 32-char base32 string in the shape `TwoFactorService` would
+        // generate; we hand it back in the response so the spec can mint a
+        // valid 6-digit code via `_test/totp`. Recovery codes are seeded
+        // with placeholder values so the column is non-null and the
+        // controller schema invariant (`two_factor_recovery_codes NOT NULL
+        // when two_factor_confirmed_at NOT NULL`) holds.
+        $secret = null;
+        if ($enroll2fa) {
+            // Use the production TwoFactorService to mint the secret so the
+            // shape is bit-identical to a real enrollment (Google2FA's
+            // generateSecretKey of length SECRET_LENGTH). `mintTotpCodeForEmail`
+            // reads the persisted column and re-derives the current code via
+            // the same service, so the shape parity matters.
+            $secret = $twoFactor->generateSecret();
+            $attributes['two_factor_secret'] = $secret;
+            $attributes['two_factor_recovery_codes'] = $this->generateRecoveryCodes();
+            $attributes['two_factor_confirmed_at'] = now();
+        }
+
+        /** @var User $user */
+        $user = User::query()->create($attributes);
 
         // Create the agency.
         /** @var Agency $agency */
@@ -122,7 +161,28 @@ final class CreateAgencyWithAdminController
                 'user_ulid' => $user->ulid,
                 'agency_ulid' => $agency->ulid,
                 'agency_name' => $agencyName,
+                'two_factor_secret' => $secret,
             ],
         ], 201);
+    }
+
+    /**
+     * Generate 8 single-use recovery codes in the shape
+     * `RecoveryCodeService::generate()` returns. The values are never
+     * consumed by the bulk-invite spec — the spec mints a TOTP code, not
+     * a recovery code — but the column is encrypted:array on the model
+     * and we want it non-null when `two_factor_confirmed_at` is also set
+     * (matches the production invariant the model assumes).
+     *
+     * @return array<int, string>
+     */
+    private function generateRecoveryCodes(): array
+    {
+        $codes = [];
+        for ($i = 0; $i < 8; $i++) {
+            $codes[] = bin2hex(random_bytes(5));
+        }
+
+        return $codes;
     }
 }

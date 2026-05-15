@@ -106,7 +106,14 @@ function isLikelyBundledCode(code: string): boolean {
     code.startsWith('auth.') ||
     code.startsWith('validation.') ||
     code.startsWith('rate_limit.') ||
-    code.startsWith('creator.')
+    code.startsWith('creator.') ||
+    // Sprint 3 Chunk 4 — magic-link invitation acceptance error codes
+    // emitted by SignUpService::acceptInvitationOnSignUp(). Codes:
+    //   invitation.not_found, invitation.expired,
+    //   invitation.already_accepted, invitation.email_mismatch.
+    // Bundle entries live in the en/pt/it `auth.json` files under
+    // `invitation.*`.
+    code.startsWith('invitation.')
   )
 }
 

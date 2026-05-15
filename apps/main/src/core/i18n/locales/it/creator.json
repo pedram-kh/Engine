@@ -1,6 +1,11 @@
 {
   "creator": {
     "not_found": "Nessun profilo creator è associato al tuo account. Esci e accedi di nuovo, oppure contatta l'assistenza.",
+    "already_approved": "Questo creator è già stato approvato.",
+    "already_rejected": "Questo creator è già stato rifiutato.",
+    "admin": {
+      "field_status_immutable": "Lo stato della candidatura non può essere modificato tramite questo modulo. Utilizza le azioni di approvazione o rifiuto."
+    },
     "wizard": {
       "feature_disabled": "Questo passaggio non è disponibile durante una modifica di configurazione. Puoi saltarlo per continuare la candidatura.",
       "feature_enabled": "Questa opzione non è disponibile in questo momento — utilizza il flusso standard di questo passaggio.",

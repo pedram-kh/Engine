@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Modules\Agencies\Http\Controllers\AgencySettingsController;
 use App\Modules\Agencies\Http\Controllers\InvitationController;
 use App\Modules\Agencies\Http\Controllers\InvitationPreviewController;
+use App\Modules\Agencies\Http\Controllers\MembershipController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,9 +34,23 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         Route::patch('settings', [AgencySettingsController::class, 'update'])
             ->name('agencies.settings.update');
 
-        // ─── Invitations (creation — admin only) ─────────────────────────────
+        // ─── Invitations ─────────────────────────────────────────────────────
+        // Creation (admin only — enforced inline in the controller).
         Route::post('invitations', [InvitationController::class, 'store'])
             ->name('agencies.invitations.store');
+
+        // Sprint 3 Chunk 4 sub-step 3 — paginated history listing.
+        // Admin-only (enforced inline). Path-scoped via the tenancy.agency
+        // middleware; no allowlist entry needed.
+        Route::get('invitations', [InvitationController::class, 'index'])
+            ->name('agencies.invitations.index');
+
+        // ─── Members (paginated listing) ─────────────────────────────────────
+        // Sprint 3 Chunk 4 sub-step 3. Any agency member may list members;
+        // the Manage actions on the agency-users page are admin-gated in
+        // the UI layer.
+        Route::get('members', [MembershipController::class, 'index'])
+            ->name('agencies.members.index');
     });
 
 // ─── Accept invitation ────────────────────────────────────────────────────────

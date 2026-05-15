@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 
 import { dt, testIds } from '../helpers/selectors'
 import {
+  mintTotpCodeForEmail,
   neutralizeThrottle,
   resetClock,
   restoreThrottle,
@@ -41,7 +42,13 @@ test.describe('Invitation happy path', () => {
     const request = page.context().request
     await neutralizeThrottle(request, 'auth-ip')
 
-    const setup = await seedAgencyAdmin(request)
+    // Sprint 3 Chunk 4 sub-step 5 added `requireMfaEnrolled` to the
+    // `agency-users.list` route chain. The "agency_admin can invite"
+    // test below drives the SPA through that route, so the seeded
+    // admin must come pre-enrolled in MFA. Other tests in this file
+    // don't traverse `/agency-users` — they exercise the magic-link
+    // accept page — so the extra enrollment is inert for them.
+    const setup = await seedAgencyAdmin(request, { enroll2fa: true })
     adminEmail = setup.email
     adminPassword = setup.password
     agencyUlid = setup.agencyUlid
@@ -57,17 +64,32 @@ test.describe('Invitation happy path', () => {
   })
 
   test('agency_admin can invite a user via the modal', async ({ page }) => {
-    // Sign in as admin.
+    const request = page.context().request
+
+    // Sign in as admin — email + password → MFA challenge → TOTP code.
+    // The MFA hop is mandatory now that `agency-users.list` is gated by
+    // `requireMfaEnrolled` (Sprint 3 Chunk 4 sub-step 5). The
+    // `seedAgencyAdmin` helper enrolled the admin in MFA above; the
+    // `mintTotpCodeForEmail` helper reads the persisted secret and
+    // returns the current 6-digit code.
     await page.goto('/sign-in')
     await page.locator(dt(testIds.signInEmail)).locator('input').fill(adminEmail)
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(adminPassword)
     await page.locator(dt(testIds.signInSubmit)).click()
 
+    await expect(page.locator(dt(testIds.signInTotp))).toBeVisible({ timeout: 10000 })
+    const { code } = await mintTotpCodeForEmail(request, adminEmail)
+    await page.locator(dt(testIds.signInTotp)).locator('input').fill(code)
+    await page.locator(dt(testIds.signInSubmit)).click()
+
     await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible({ timeout: 10000 })
 
-    // Navigate to team page.
-    await page.locator(dt(testIds.navAgencyUsers)).click()
-    await page.waitForURL(/\/agency-users/, { timeout: 10000 })
+    // Navigate to the team page. Vuetify's `v-list-item :to` click is
+    // intermittently flaky in Playwright (see commit 043355e); the
+    // project pattern is to assert the nav link is visible and then
+    // `page.goto()` for determinism.
+    await expect(page.locator(dt(testIds.navAgencyUsers))).toBeVisible()
+    await page.goto('/agency-users')
     await expect(page.locator(dt(testIds.agencyUsersPage))).toBeVisible({ timeout: 10000 })
 
     // Invite user button should be visible for admin.

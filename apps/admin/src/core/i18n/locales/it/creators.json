@@ -16,8 +16,60 @@
           "started_at": "Iniziata il",
           "completed_at": "Completata il"
         },
-        "load_failed": "Impossibile caricare questo creator. Aggiorna la pagina."
+        "load_failed": "Impossibile caricare questo creator. Aggiorna la pagina.",
+        "fields": {
+          "display_name": "Nome visualizzato",
+          "bio": "Biografia",
+          "country_code": "Paese",
+          "region": "Regione",
+          "primary_language": "Lingua principale",
+          "secondary_languages": "Lingue secondarie",
+          "categories": "Categorie"
+        },
+        "edit": {
+          "title": "Modifica {field}",
+          "save": "Salva modifiche",
+          "cancel": "Annulla",
+          "reason_label": "Motivo della modifica",
+          "reason_hint": "Obbligatorio per campi sensibili. Registrato nel log di audit.",
+          "custom_code_hint": "Scegli un valore o digita un codice ISO di 2 lettere.",
+          "button_aria_label": "Modifica {field}",
+          "save_failed": "Impossibile salvare questa modifica. Riprova.",
+          "saved": "{field} aggiornato."
+        },
+        "errors": {
+          "field_status_immutable": "Le transizioni di stato usano le azioni approva / rifiuta, non la modifica del campo."
+        },
+        "approve": {
+          "button": "Approva candidatura",
+          "title": "Approva la candidatura di {name}",
+          "description": "Questo segna il creator come approvato e concede l'accesso di produzione. L'azione è registrata nel log di audit.",
+          "welcome_label": "Messaggio di benvenuto (opzionale)",
+          "welcome_hint": "Mostrato nella dashboard del creator al prossimo accesso.",
+          "confirm": "Approva",
+          "cancel": "Annulla",
+          "success": "Creator approvato.",
+          "failed": "Impossibile approvare questo creator. Riprova."
+        },
+        "reject": {
+          "button": "Rifiuta candidatura",
+          "title": "Rifiuta la candidatura di {name}",
+          "description": "Il creator vedrà il motivo nella dashboard al prossimo accesso.",
+          "reason_label": "Motivo del rifiuto",
+          "min_hint": "Obbligatorio, almeno {count} caratteri.",
+          "confirm": "Rifiuta",
+          "cancel": "Annulla",
+          "success": "Creator rifiutato.",
+          "failed": "Impossibile rifiutare questo creator. Riprova."
+        }
       }
+    }
+  },
+  "creator": {
+    "already_approved": "Questo creator è già stato approvato.",
+    "already_rejected": "Questo creator è già stato rifiutato.",
+    "admin": {
+      "field_status_immutable": "Le transizioni di stato usano le azioni approva / rifiuta, non la modifica del campo."
     }
   }
 }

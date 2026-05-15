@@ -1,26 +1,42 @@
 <script setup lang="ts">
 /**
- * Admin Creator Detail Page — read-only view of a single Creator.
+ * Admin Creator Detail Page — Creator drill-in with per-field edit.
  *
- * Sprint 3 Chunk 3 sub-step 9. The page reuses every display-only
- * shared component from `@catalyst/ui` so the admin surface and
- * the creator-self wizard surface render the same data with
- * identical UI (Decision C1: display-shared, form-main).
+ * Initial scaffolding: Sprint 3 Chunk 3 sub-step 9 (read-only).
+ * Per-field edit affordance: Sprint 3 Chunk 4 sub-step 9.
  *
- * Per pause-condition-6 the page is intentionally READ-ONLY in
- * Sprint 3: per-field admin edit modals + PATCH endpoint + audit +
- * idempotency land in Chunk 4 alongside the approve/reject
- * workflow. The "Edit" affordance is deliberately absent here.
+ * Each of the 7 editable fields (`display_name`, `bio`, `country_code`,
+ * `region`, `primary_language`, `secondary_languages`, `categories`)
+ * is wrapped in {@link EditFieldRow}. Clicking the pencil opens
+ * {@link EditFieldModal} with the matching {@link EditFieldConfig}.
+ * The page owns the PATCH call so the modal stays decoupled from the
+ * `adminCreatorsApi` and is easier to unit-test in isolation.
+ * On save success the response envelope replaces the local `creator`
+ * ref — the backend re-renders `CreatorResource::withAdmin(true)` so
+ * the admin_attributes block (rejection_reason + kyc_verifications)
+ * stays fresh too.
  *
- * Tenancy: this page hits `GET /api/v1/admin/creators/{ulid}`
- * (path-scoped admin tooling category in docs/security/tenancy.md
- * § 4 — Refinement 3 F1-style audit allowlist entry lands with
- * sub-step 12's doc fix-ups). The backend gates via
- * `auth:web_admin` + EnsureMfaForAdmins, mirrors `CreatorPolicy::view`.
+ * Decision C1 stays honored: each row's *display* (chips, badges,
+ * country block, language list) renders via the same shared
+ * components used by the wizard's preview section
+ * (`@catalyst/ui` — CategoryChips, CountryDisplay, LanguageList).
+ * The form-side input controls live inline in
+ * `EditFieldModal.vue` (form-main; admin re-implements the input
+ * shells because the wizard's controls are not yet a shared package).
  *
- * a11y (F2=b): each section is a `<section>` with an `<h2>`
- * heading; the chips inside the per-step status blocks carry
- * accessible names via the shared components.
+ * `application_status` is intentionally NOT editable via this surface
+ * (Decision E2=b; backend `AdminUpdateCreatorRequest` rejects it with
+ * `creator.admin.field_status_immutable`). Approve / reject buttons
+ * land in sub-step 10.
+ *
+ * Tenancy: same as the read pass — `GET /api/v1/admin/creators/{ulid}`
+ * and `PATCH /api/v1/admin/creators/{ulid}` (path-scoped admin tooling
+ * category in `docs/security/tenancy.md § 4`). Backend gates via
+ * `auth:web_admin` + EnsureMfaForAdmins + `CreatorPolicy::view` /
+ * `CreatorPolicy::update`.
+ *
+ * a11y (F2=b): edit buttons carry an accessible name composed of
+ * "Edit" + the field label; section headings remain `<h2>`s.
  */
 
 import { ApiError } from '@catalyst/api-client'
@@ -45,7 +61,12 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
-import { adminCreatorsApi } from '../api/creators.api'
+import ApproveCreatorDialog from '../components/ApproveCreatorDialog.vue'
+import EditFieldModal from '../components/EditFieldModal.vue'
+import EditFieldRow from '../components/EditFieldRow.vue'
+import RejectCreatorDialog from '../components/RejectCreatorDialog.vue'
+import { FIELD_EDIT_CONFIG, type EditFieldConfig } from '../config/field-edit'
+import { adminCreatorsApi, type AdminEditableField } from '../api/creators.api'
 
 type AdminCreatorPayload = CreatorResource
 
@@ -161,21 +182,227 @@ async function load(): Promise<void> {
 onMounted(() => {
   void load()
 })
+
+const editingField = ref<AdminEditableField | null>(null)
+const editModalOpen = ref(false)
+const editErrorKey = ref<string | null>(null)
+const isSavingEdit = ref(false)
+const savedSnackbarOpen = ref(false)
+const savedSnackbarField = ref<AdminEditableField | null>(null)
+
+const editingConfig = computed<EditFieldConfig | null>(() =>
+  editingField.value === null ? null : FIELD_EDIT_CONFIG[editingField.value],
+)
+
+const editingCurrentValue = computed<unknown>(() => {
+  if (editingField.value === null || creator.value === null) return null
+  const attrs = creator.value.attributes
+  switch (editingField.value) {
+    case 'display_name':
+      return attrs.display_name ?? ''
+    case 'bio':
+      return attrs.bio ?? ''
+    case 'country_code':
+      return attrs.country_code ?? null
+    case 'region':
+      return attrs.region ?? ''
+    case 'primary_language':
+      return attrs.primary_language ?? null
+    case 'secondary_languages':
+      return [...(attrs.secondary_languages ?? [])]
+    case 'categories':
+      return [...(attrs.categories ?? [])]
+    default:
+      return null
+  }
+})
+
+const savedSnackbarText = computed(() => {
+  if (savedSnackbarField.value === null) return ''
+  const config = FIELD_EDIT_CONFIG[savedSnackbarField.value]
+  return t('admin.creators.detail.edit.saved', { field: t(config.labelKey) })
+})
+
+function openEdit(field: AdminEditableField): void {
+  editingField.value = field
+  editErrorKey.value = null
+  editModalOpen.value = true
+}
+
+function closeEdit(): void {
+  editModalOpen.value = false
+  editingField.value = null
+  editErrorKey.value = null
+}
+
+async function handleEditSave(payload: {
+  field: AdminEditableField
+  value: unknown
+  reason: string | null
+}): Promise<void> {
+  if (creator.value === null) return
+  isSavingEdit.value = true
+  editErrorKey.value = null
+  try {
+    const envelope = await adminCreatorsApi.updateField(
+      creatorUlid.value,
+      payload.field,
+      payload.value,
+      payload.reason,
+    )
+    creator.value = envelope.data as AdminCreatorPayload
+    savedSnackbarField.value = payload.field
+    savedSnackbarOpen.value = true
+    closeEdit()
+  } catch (error) {
+    editErrorKey.value =
+      error instanceof ApiError ? error.code : 'admin.creators.detail.edit.save_failed'
+  } finally {
+    isSavingEdit.value = false
+  }
+}
+
+const approveDialogOpen = ref(false)
+const rejectDialogOpen = ref(false)
+const approveErrorKey = ref<string | null>(null)
+const rejectErrorKey = ref<string | null>(null)
+const isApproving = ref(false)
+const isRejecting = ref(false)
+const decisionSnackbarOpen = ref(false)
+const decisionSnackbarKey = ref<string | null>(null)
+
+const creatorDisplayName = computed(
+  () => creator.value?.attributes.display_name ?? t('admin.creators.detail.fallback_title'),
+)
+
+const applicationStatus = computed(() => creator.value?.attributes.application_status ?? null)
+
+/**
+ * Approve / reject affordance gating (Decision E2=b).
+ *
+ *   - approved → both buttons hidden (terminal state; idempotency
+ *     would 409 anyway).
+ *   - rejected → "Approve" is allowed (admins can move rejected back
+ *     to approved via the dedicated approve workflow; the backend
+ *     resets rejected_at / rejection_reason). "Reject" hidden.
+ *   - pending / incomplete → both buttons visible.
+ *
+ * `incomplete` is technically pre-submission but admins may want to
+ * approve a creator who only partially completed the wizard during
+ * Phase-1 manual-bootstrapping flows (Sprint 1 chunk-2.4 supports
+ * this via backend); leaving the affordance visible keeps the admin
+ * unblocked. Backend retains final authority.
+ */
+const canApprove = computed(
+  () => applicationStatus.value !== null && applicationStatus.value !== 'approved',
+)
+const canReject = computed(
+  () =>
+    applicationStatus.value !== null &&
+    applicationStatus.value !== 'approved' &&
+    applicationStatus.value !== 'rejected',
+)
+
+function openApprove(): void {
+  approveErrorKey.value = null
+  approveDialogOpen.value = true
+}
+
+function closeApprove(): void {
+  approveDialogOpen.value = false
+  approveErrorKey.value = null
+}
+
+function openReject(): void {
+  rejectErrorKey.value = null
+  rejectDialogOpen.value = true
+}
+
+function closeReject(): void {
+  rejectDialogOpen.value = false
+  rejectErrorKey.value = null
+}
+
+async function handleApproveConfirm(payload: { welcomeMessage: string | null }): Promise<void> {
+  if (creator.value === null) return
+  isApproving.value = true
+  approveErrorKey.value = null
+  try {
+    const envelope = await adminCreatorsApi.approve(creatorUlid.value, payload.welcomeMessage)
+    creator.value = envelope.data as AdminCreatorPayload
+    decisionSnackbarKey.value = 'admin.creators.detail.approve.success'
+    decisionSnackbarOpen.value = true
+    closeApprove()
+  } catch (error) {
+    approveErrorKey.value =
+      error instanceof ApiError ? error.code : 'admin.creators.detail.approve.failed'
+  } finally {
+    isApproving.value = false
+  }
+}
+
+async function handleRejectConfirm(payload: { rejectionReason: string }): Promise<void> {
+  if (creator.value === null) return
+  isRejecting.value = true
+  rejectErrorKey.value = null
+  try {
+    const envelope = await adminCreatorsApi.reject(creatorUlid.value, payload.rejectionReason)
+    creator.value = envelope.data as AdminCreatorPayload
+    decisionSnackbarKey.value = 'admin.creators.detail.reject.success'
+    decisionSnackbarOpen.value = true
+    closeReject()
+  } catch (error) {
+    rejectErrorKey.value =
+      error instanceof ApiError ? error.code : 'admin.creators.detail.reject.failed'
+  } finally {
+    isRejecting.value = false
+  }
+}
+
+const decisionSnackbarText = computed(() =>
+  decisionSnackbarKey.value === null ? '' : t(decisionSnackbarKey.value),
+)
+
+const decisionSnackbarColor = computed(() =>
+  decisionSnackbarKey.value === 'admin.creators.detail.reject.success' ? 'warning' : 'success',
+)
 </script>
 
 <template>
   <section class="admin-creator-detail" data-testid="admin-creator-detail">
     <header class="admin-creator-detail__header">
-      <h1 class="text-h4">
-        {{ creator?.attributes.display_name ?? t('admin.creators.detail.fallback_title') }}
-      </h1>
-      <p v-if="creator?.attributes.application_status" class="text-body-2 text-medium-emphasis">
-        {{
-          t('admin.creators.detail.application_status', {
-            status: creator.attributes.application_status,
-          })
-        }}
-      </p>
+      <div class="admin-creator-detail__header-text">
+        <h1 class="text-h4">
+          {{ creator?.attributes.display_name ?? t('admin.creators.detail.fallback_title') }}
+        </h1>
+        <p v-if="creator?.attributes.application_status" class="text-body-2 text-medium-emphasis">
+          {{
+            t('admin.creators.detail.application_status', {
+              status: creator.attributes.application_status,
+            })
+          }}
+        </p>
+      </div>
+      <div v-if="creator !== null" class="admin-creator-detail__header-actions">
+        <v-btn
+          v-if="canApprove"
+          color="success"
+          variant="elevated"
+          data-testid="admin-creator-detail-approve"
+          @click="openApprove"
+        >
+          {{ t('admin.creators.detail.approve.button') }}
+        </v-btn>
+        <v-btn
+          v-if="canReject"
+          color="error"
+          variant="outlined"
+          data-testid="admin-creator-detail-reject"
+          @click="openReject"
+        >
+          {{ t('admin.creators.detail.reject.button') }}
+        </v-btn>
+      </div>
     </header>
 
     <div
@@ -208,23 +435,68 @@ onMounted(() => {
 
       <section class="admin-creator-detail__section">
         <h2 class="text-h6">{{ t('admin.creators.detail.profile_heading') }}</h2>
-        <p v-if="creator.attributes.bio" class="text-body-2">
-          {{ creator.attributes.bio }}
-        </p>
-        <div class="admin-creator-detail__row">
-          <span>{{ t('creator.ui.wizard.fields.country') }}:</span>
+
+        <EditFieldRow
+          label-key="admin.creators.detail.fields.display_name"
+          test-id="admin-creator-detail-row-display_name"
+          @edit="openEdit('display_name')"
+        >
+          <span data-testid="admin-creator-detail-value-display_name">
+            {{ creator.attributes.display_name }}
+          </span>
+        </EditFieldRow>
+
+        <EditFieldRow
+          label-key="admin.creators.detail.fields.bio"
+          test-id="admin-creator-detail-row-bio"
+          @edit="openEdit('bio')"
+        >
+          <span data-testid="admin-creator-detail-value-bio">
+            {{ creator.attributes.bio ?? '' }}
+          </span>
+        </EditFieldRow>
+
+        <EditFieldRow
+          label-key="admin.creators.detail.fields.country_code"
+          test-id="admin-creator-detail-row-country_code"
+          @edit="openEdit('country_code')"
+        >
           <CountryDisplay :code="creator.attributes.country_code" :label="countryLabel" />
-        </div>
-        <div class="admin-creator-detail__row">
-          <span>{{ t('creator.ui.wizard.fields.categories') }}:</span>
+        </EditFieldRow>
+
+        <EditFieldRow
+          label-key="admin.creators.detail.fields.region"
+          test-id="admin-creator-detail-row-region"
+          @edit="openEdit('region')"
+        >
+          <span data-testid="admin-creator-detail-value-region">
+            {{ creator.attributes.region ?? '' }}
+          </span>
+        </EditFieldRow>
+
+        <EditFieldRow
+          label-key="admin.creators.detail.fields.primary_language"
+          test-id="admin-creator-detail-row-primary_language"
+          @edit="openEdit('primary_language')"
+        >
+          <LanguageList :primary-label="primaryLanguageLabel" :secondary-labels="[]" />
+        </EditFieldRow>
+
+        <EditFieldRow
+          label-key="admin.creators.detail.fields.secondary_languages"
+          test-id="admin-creator-detail-row-secondary_languages"
+          @edit="openEdit('secondary_languages')"
+        >
+          <LanguageList :primary-label="null" :secondary-labels="secondaryLanguageLabels" />
+        </EditFieldRow>
+
+        <EditFieldRow
+          label-key="admin.creators.detail.fields.categories"
+          test-id="admin-creator-detail-row-categories"
+          @edit="openEdit('categories')"
+        >
           <CategoryChips :labels="categoryLabels" />
-        </div>
-        <div class="admin-creator-detail__row">
-          <LanguageList
-            :primary-label="primaryLanguageLabel"
-            :secondary-labels="secondaryLanguageLabels"
-          />
-        </div>
+        </EditFieldRow>
       </section>
 
       <section class="admin-creator-detail__section">
@@ -295,6 +567,53 @@ onMounted(() => {
         </v-table>
       </section>
     </template>
+
+    <EditFieldModal
+      v-if="editingConfig !== null"
+      v-model="editModalOpen"
+      :config="editingConfig"
+      :current-value="editingCurrentValue"
+      :error-key="editErrorKey"
+      :is-saving="isSavingEdit"
+      @save="handleEditSave"
+      @cancel="closeEdit"
+    />
+
+    <ApproveCreatorDialog
+      v-model="approveDialogOpen"
+      :is-saving="isApproving"
+      :error-key="approveErrorKey"
+      :creator-display-name="creatorDisplayName"
+      @confirm="handleApproveConfirm"
+      @cancel="closeApprove"
+    />
+
+    <RejectCreatorDialog
+      v-model="rejectDialogOpen"
+      :is-saving="isRejecting"
+      :error-key="rejectErrorKey"
+      :creator-display-name="creatorDisplayName"
+      @confirm="handleRejectConfirm"
+      @cancel="closeReject"
+    />
+
+    <v-snackbar
+      v-model="savedSnackbarOpen"
+      :timeout="3000"
+      color="success"
+      data-testid="admin-creator-detail-saved-snackbar"
+    >
+      {{ savedSnackbarText }}
+    </v-snackbar>
+
+    <v-snackbar
+      v-model="decisionSnackbarOpen"
+      :timeout="3000"
+      :color="decisionSnackbarColor"
+      data-testid="admin-creator-detail-decision-snackbar"
+    >
+      {{ decisionSnackbarText }}
+    </v-snackbar>
   </section>
 </template>
 
@@ -304,6 +623,26 @@ onMounted(() => {
   flex-direction: column;
   gap: 24px;
   max-width: 960px;
+}
+
+.admin-creator-detail__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-creator-detail__header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-creator-detail__header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .admin-creator-detail__error {

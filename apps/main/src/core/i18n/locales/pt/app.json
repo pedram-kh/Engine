@@ -38,6 +38,7 @@
         "create": "Nova marca",
         "edit": "Editar",
         "archive": "Arquivar",
+        "restore": "Restaurar",
         "save": "Salvar marca",
         "saving": "Salvando…",
         "backToList": "Voltar às marcas",
@@ -68,6 +69,13 @@
         "cancel": "Cancelar",
         "success": "Marca arquivada."
       },
+      "restore": {
+        "confirmTitle": "Restaurar marca",
+        "confirmMessage": "Restaurar {name}? Ela voltará a aparecer na lista de marcas ativas.",
+        "confirm": "Restaurar",
+        "cancel": "Cancelar",
+        "success": "{name} restaurada."
+      },
       "empty": {
         "heading": "Nenhuma marca ainda",
         "body": "Crie sua primeira marca para começar.",
@@ -81,7 +89,8 @@
       "errors": {
         "loadFailed": "Falha ao carregar marcas.",
         "saveFailed": "Falha ao salvar marca.",
-        "archiveFailed": "Falha ao arquivar marca."
+        "archiveFailed": "Falha ao arquivar marca.",
+        "restoreFailed": "Falha ao restaurar marca."
       }
     },
     "agencyUsers": {
@@ -99,6 +108,29 @@
         "agency_staff": "Colaborador"
       },
       "status": { "active": "Ativo", "pending": "Pendente" },
+      "members": { "heading": "Membros atuais" },
+      "filters": {
+        "allRoles": "Todas as funções",
+        "allStatuses": "Todos os status"
+      },
+      "search": {
+        "label": "Buscar",
+        "placeholder": "Nome ou e-mail"
+      },
+      "invitations": {
+        "heading": "Histórico de convites",
+        "columns": {
+          "email": "Convidado",
+          "invitedAt": "Convidado em",
+          "invitedBy": "Convidado por"
+        },
+        "status": {
+          "pending": "Pendente",
+          "accepted": "Aceito",
+          "expired": "Expirado"
+        },
+        "empty": "Nenhum convite ainda."
+      },
       "invite": {
         "button": "Convidar usuário",
         "title": "Convidar membro da equipe",
@@ -112,7 +144,51 @@
         "heading": "Nenhum membro da equipe",
         "body": "Convide seu primeiro membro para começar."
       },
-      "loading": "Carregando equipe…"
+      "emptyFiltered": "Nenhum membro corresponde ao filtro.",
+      "errors": {
+        "membersLoadFailed": "Falha ao carregar membros da equipe.",
+        "invitationsLoadFailed": "Falha ao carregar histórico de convites."
+      },
+      "loading": "Carregando equipe…",
+      "bulkInviteCreators": { "button": "Convidar criadores em massa" }
+    },
+    "bulkInvite": {
+      "title": "Convidar criadores em massa",
+      "description": "Carregue um CSV com uma coluna `email`. Cada linha cria um convite por link mágico. As outras colunas são aceitas mas ignoradas.",
+      "file": {
+        "label": "Ficheiro CSV",
+        "hint": "Máx. 5 MB / 1000 linhas. Apenas a coluna `email` é obrigatória."
+      },
+      "softWarning": "{count} linhas é um lote grande — o processamento pode demorar alguns minutos.",
+      "preview": {
+        "heading": "Linhas analisadas ({count})",
+        "row": "Linha",
+        "email": "E-mail",
+        "errorCount": "{count} erros de análise",
+        "errorHeading": "Estas linhas serão ignoradas:",
+        "errorItem": "Linha {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Enviar convites ({count})",
+        "reset": "Limpar",
+        "startOver": "Enviar outro lote"
+      },
+      "status": {
+        "queued": "Em fila — a aguardar início",
+        "processing": "A processar convites",
+        "complete": "Concluído",
+        "failed": "O trabalho falhou"
+      },
+      "tracking": { "progress": "{percent}% concluído" },
+      "complete": {
+        "heading": "Resultados",
+        "invited": "Convidados",
+        "alreadyInvited": "Já convidados",
+        "failed": "Falharam",
+        "failureReason": "Motivo"
+      },
+      "failed": { "heading": "O envio em massa falhou." },
+      "errors": { "submitFailed": "Não foi possível enviar o CSV. Tente novamente." }
     },
     "invitation": {
       "accept": {

@@ -147,6 +147,61 @@ final class BrandController
     }
 
     /**
+     * POST /api/v1/agencies/{agency}/brands/{brand}/restore
+     *
+     * Restores an archived brand — sets `status` back to `active` and
+     * clears `deleted_at`. Requires `agency_admin` or `agency_manager`
+     * role (staff cannot restore).
+     *
+     * Sprint 3 Chunk 4 sub-step 6 — surfaces the existing restore path
+     * to the frontend's Brand Restore UI. The `BrandRestored` audit
+     * action and `BrandPolicy::restore` policy gate were stubbed in
+     * Sprint 2 but never wired to a route. The model is looked up via
+     * an explicit query (not route-model binding) because the default
+     * Eloquent binding excludes soft-deleted rows.
+     *
+     * Returns 200 with the refreshed resource so the SPA can reflect
+     * the new state immediately.
+     *
+     * Idempotency (#6): restoring an already-active brand is a no-op
+     * (no audit emission, no DB write). This matches the per-field
+     * admin edit pattern from sub-step 1.
+     */
+    public function restore(Request $request, Agency $agency, string $brand): JsonResponse
+    {
+        // Lookup with trashed rows included; the default scope hides
+        // soft-deleted brands so we cannot use route-model binding here.
+        // The `{brand}` route segment carries the ULID — see HasUlid's
+        // `getRouteKeyName()`, which makes ULID the public identifier.
+        $brandModel = Brand::withTrashed()->where('ulid', $brand)->first();
+        if ($brandModel === null) {
+            abort(404);
+        }
+        $this->assertBelongsToAgency($brandModel, $agency);
+        Gate::authorize('restore', $brandModel);
+
+        if ($brandModel->status === BrandStatus::Active && $brandModel->deleted_at === null) {
+            return (new BrandResource($brandModel))->response()->setStatusCode(200);
+        }
+
+        $before = $brandModel->toArray();
+
+        $brandModel->restore();
+        $brandModel->update(['status' => BrandStatus::Active]);
+
+        Audit::log(
+            action: AuditAction::BrandRestored,
+            subject: $brandModel,
+            before: $before,
+            after: $brandModel->fresh()?->toArray() ?? [],
+        );
+
+        return (new BrandResource($brandModel->fresh() ?? $brandModel))
+            ->response()
+            ->setStatusCode(200);
+    }
+
+    /**
      * Belt-and-suspenders cross-tenant check.
      *
      * `SubstituteBindings` runs before `tenancy.agency` sets TenancyContext,

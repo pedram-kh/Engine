@@ -25,4 +25,11 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // CRUD — index, store, show, update, destroy (archive) are all
         // handled by BrandController via authorizeResource().
         Route::apiResource('brands', BrandController::class);
+
+        // Sprint 3 Chunk 4 sub-step 6 — Brand Restore UI.
+        // Reverses an archive (soft-delete + status flip). Surfaces the
+        // existing BrandPolicy::restore gate + BrandRestored audit action
+        // to the frontend's archive-filter restore action.
+        Route::post('brands/{brand}/restore', [BrandController::class, 'restore'])
+            ->name('brands.restore');
     });

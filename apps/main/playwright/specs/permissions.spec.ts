@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 
 import { dt, testIds } from '../helpers/selectors'
 import {
+  mintTotpCodeForEmail,
   neutralizeThrottle,
   restoreThrottle,
   seedAgencyAdmin,
@@ -32,7 +33,11 @@ test.describe('Permission gating', () => {
     const request = page.context().request
     await neutralizeThrottle(request, 'auth-ip')
 
-    const setup = await seedAgencyAdmin(request)
+    // Sprint 3 Chunk 4 sub-step 5 added `requireMfaEnrolled` to the
+    // `agency-users.list` route chain. The admin-side test below drives
+    // the SPA through that route, so the seeded admin must come
+    // pre-enrolled in MFA.
+    const setup = await seedAgencyAdmin(request, { enroll2fa: true })
     adminEmail = setup.email
     adminPassword = setup.password
     agencyUlid = setup.agencyUlid
@@ -77,23 +82,44 @@ test.describe('Permission gating', () => {
     await page.locator(dt(testIds.acceptInvitationBtn)).click()
     await expect(page.locator(dt(testIds.acceptInvitationSuccess))).toBeVisible({ timeout: 8000 })
 
-    // Now navigate to the team page — staff should be redirected (guard).
+    // Now navigate to the team page — staff should be redirected.
+    //
+    // Sprint 3 Chunk 4 sub-step 5 promoted the `agency-users.list` guard
+    // chain to `requireAuth → requireMfaEnrolled → requireAgencyAdmin`.
+    // The staff user has no MFA enrolled, so the chain fails at
+    // `requireMfaEnrolled` BEFORE reaching `requireAgencyAdmin` and the
+    // user is bounced to the 2FA-enable page rather than `/brands`. The
+    // staff-cannot-reach-/agency-users contract still holds — only the
+    // landing surface changed.
     await page.goto('/agency-users')
+    await expect(page).toHaveURL(/\/auth\/2fa\/enable/, { timeout: 10000 })
+    await expect(page.locator(dt(testIds.enableTotpPage))).toBeVisible({ timeout: 10000 })
 
-    // The requireAgencyAdmin guard should redirect to /brands.
-    await expect(page.locator(dt(testIds.brandListPage))).toBeVisible({ timeout: 10000 })
-
-    // Verify: even if staff navigates to the agency layout, they see no invite button.
-    // Navigate to brands (agency-wrapped route) to confirm layout renders.
-    await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible()
+    // Defence-in-depth: even if the staff user lands on /brands directly
+    // (the legacy redirect target), the agency layout must hide the
+    // Invite-user CTA.
+    await page.goto('/brands')
+    await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible({ timeout: 10000 })
     await expect(page.locator(dt(testIds.inviteUserBtn))).not.toBeVisible()
   })
 
   test('agency_admin sees Invite user button on /agency-users', async ({ page }) => {
-    // Sign in as admin.
+    const request = page.context().request
+
+    // Sign in as admin — email + password → MFA challenge → TOTP code.
+    // The MFA hop is mandatory now that `agency-users.list` is gated by
+    // `requireMfaEnrolled` (Sprint 3 Chunk 4 sub-step 5). The
+    // `seedAgencyAdmin` helper enrolled the admin in MFA above; the
+    // `mintTotpCodeForEmail` helper reads the persisted secret and
+    // returns the current 6-digit code.
     await page.goto('/sign-in')
     await page.locator(dt(testIds.signInEmail)).locator('input').fill(adminEmail)
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(adminPassword)
+    await page.locator(dt(testIds.signInSubmit)).click()
+
+    await expect(page.locator(dt(testIds.signInTotp))).toBeVisible({ timeout: 10000 })
+    const { code } = await mintTotpCodeForEmail(request, adminEmail)
+    await page.locator(dt(testIds.signInTotp)).locator('input').fill(code)
     await page.locator(dt(testIds.signInSubmit)).click()
 
     await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible({ timeout: 10000 })

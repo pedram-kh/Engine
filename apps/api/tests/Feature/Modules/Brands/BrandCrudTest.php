@@ -379,3 +379,117 @@ it('archived brand is excluded from default list', function (): void {
         ->assertOk()
         ->assertJsonCount(0, 'data');
 });
+
+// ---------------------------------------------------------------------------
+// Restore (POST /restore) — Sprint 3 Chunk 4 sub-step 6
+//
+// Reverses an archive. Flips `status` back to `active` and clears
+// `deleted_at`. Audit emission per Sprint 1 § 5.5. Idempotency per #6.
+// Authorisation matches archive: agency_admin + agency_manager only.
+// ---------------------------------------------------------------------------
+
+/** Archive a brand the same way BrandController::destroy does, so the
+ *  restore tests start from a real archived state (status=Archived AND
+ *  soft-deleted) and not just the factory's status-only `archived()`
+ *  state which leaves `deleted_at` null.
+ */
+function archiveBrand(Brand $brand): Brand
+{
+    $brand->update(['status' => BrandStatus::Archived]);
+    $brand->delete();
+
+    return $brand->fresh() ?? $brand;
+}
+
+it('agency_admin can restore an archived brand', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeAdmin();
+    $brand = archiveBrand(Brand::factory()->forAgency($agency->id)->createOne());
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}/restore")
+        ->assertOk()
+        ->assertJsonPath('data.attributes.status', BrandStatus::Active->value);
+
+    $this->assertDatabaseHas('brands', ['id' => $brand->id, 'deleted_at' => null]);
+});
+
+it('agency_manager can restore an archived brand', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeManager();
+    $brand = archiveBrand(Brand::factory()->forAgency($agency->id)->createOne());
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}/restore")
+        ->assertOk();
+});
+
+it('agency_staff cannot restore an archived brand', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeStaff();
+    $brand = archiveBrand(Brand::factory()->forAgency($agency->id)->createOne());
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}/restore")
+        ->assertForbidden();
+});
+
+it('restore emits brand.restored audit log with before/after metadata', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeAdmin();
+    $brand = archiveBrand(Brand::factory()->forAgency($agency->id)->createOne());
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}/restore")
+        ->assertOk();
+
+    $this->assertDatabaseHas('audit_logs', ['action' => AuditAction::BrandRestored->value]);
+});
+
+it('restore returns the brand to the active list', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeAdmin();
+    $brand = archiveBrand(Brand::factory()->forAgency($agency->id)->createOne());
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}/restore")
+        ->assertOk();
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/brands")
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.id', $brand->ulid);
+});
+
+it('restoring an already-active brand is an idempotent no-op (no audit emitted)', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeAdmin();
+    $brand = Brand::factory()->forAgency($agency->id)->createOne();
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}/restore")
+        ->assertOk();
+
+    $this->assertDatabaseMissing('audit_logs', ['action' => AuditAction::BrandRestored->value]);
+});
+
+it('restore on a missing brand returns 404', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeAdmin();
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands/01HZZZZZZZZZZZZZZZZZZZZZZZ/restore")
+        ->assertNotFound();
+});
+
+it('cross-tenant restore returns 404', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeAdmin();
+    $otherAgency = Agency::factory()->createOne();
+    $brand = archiveBrand(Brand::factory()->forAgency($otherAgency->id)->createOne());
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}/restore")
+        ->assertNotFound();
+});
+
+it('unauthenticated restore returns 401', function (): void {
+    $agency = Agency::factory()->createOne();
+    $brand = archiveBrand(Brand::factory()->forAgency($agency->id)->createOne());
+
+    $this->postJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}/restore")
+        ->assertUnauthorized();
+});

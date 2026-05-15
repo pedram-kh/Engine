@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Services;
 
+use App\Core\Tenancy\BelongsToAgencyScope;
+use App\Modules\Agencies\Models\AgencyCreatorRelation;
+use App\Modules\Audit\Enums\AuditAction;
+use App\Modules\Audit\Facades\Audit;
+use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Services\CreatorBootstrapService;
 use App\Modules\Identity\Enums\ThemePreference;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Events\EmailVerificationSent;
 use App\Modules\Identity\Events\UserSignedUp;
+use App\Modules\Identity\Exceptions\InvitationAcceptException;
 use App\Modules\Identity\Listeners\WriteAuthAuditLog;
 use App\Modules\Identity\Mail\VerifyEmailMail;
 use App\Modules\Identity\Models\User;
@@ -71,6 +77,27 @@ final class SignUpService
         $name = trim((string) $attributes['name']);
         $password = (string) $attributes['password'];
         $preferredLanguage = $this->normaliseLanguage($attributes['preferred_language'] ?? null);
+        $invitationToken = isset($attributes['invitation_token'])
+            && is_string($attributes['invitation_token'])
+            && trim($attributes['invitation_token']) !== ''
+                ? trim($attributes['invitation_token'])
+                : null;
+
+        // Sprint 3 Chunk 4 — magic-link invitation path. The BulkInviteService
+        // pre-created the User row at invite time; sign-up completes it
+        // rather than creating a fresh one. The hard-lock from Decision C2=a
+        // is enforced here as a post-submit gate: typed email must match the
+        // invited User's email (case-insensitive) or we throw email_mismatch.
+        if ($invitationToken !== null) {
+            return $this->acceptInvitationOnSignUp(
+                token: $invitationToken,
+                email: $email,
+                name: $name,
+                password: $password,
+                preferredLanguage: $preferredLanguage,
+                request: $request,
+            );
+        }
 
         /** @var User $user */
         $user = DB::transaction(function () use ($email, $name, $password, $preferredLanguage): User {
@@ -104,6 +131,114 @@ final class SignUpService
         ));
 
         $this->sendVerificationMail($user, $request);
+
+        return $user;
+    }
+
+    /**
+     * Magic-link invitation acceptance path. Looks up the
+     * AgencyCreatorRelation by token hash, validates the four failure
+     * modes (not_found, expired, already_accepted, email_mismatch),
+     * then updates the pre-created User row + transitions the relation
+     * to roster status in a single transaction.
+     *
+     * Email verification: the invitee clicked a link mailed to them, so
+     * email_verified_at is stamped to now() — they don't need to click
+     * a second verification mail to enter the wizard.
+     *
+     * @throws InvitationAcceptException When the token is invalid for
+     *                                   any of the four reasons.
+     */
+    public function acceptInvitationOnSignUp(
+        string $token,
+        string $email,
+        string $name,
+        string $password,
+        string $preferredLanguage,
+        Request $request,
+    ): User {
+        $tokenHash = hash('sha256', $token);
+
+        $relation = AgencyCreatorRelation::query()
+            ->withoutGlobalScope(BelongsToAgencyScope::class)
+            ->where('invitation_token_hash', $tokenHash)
+            ->with(['creator.user'])
+            ->first();
+
+        if ($relation === null) {
+            throw new InvitationAcceptException(
+                errorCode: 'invitation.not_found',
+                message: 'Invitation token not found.',
+            );
+        }
+
+        if ($relation->isInvitationExpired()) {
+            throw new InvitationAcceptException(
+                errorCode: 'invitation.expired',
+                message: 'Invitation has expired.',
+            );
+        }
+
+        if ($relation->relationship_status !== RelationshipStatus::Prospect) {
+            throw new InvitationAcceptException(
+                errorCode: 'invitation.already_accepted',
+                message: 'Invitation has already been accepted.',
+            );
+        }
+
+        $invitedUser = $relation->creator?->user;
+        if ($invitedUser === null) {
+            // Defensive — bulk-invite always wires both User + Creator,
+            // so we should never hit this. Treat as not_found rather than
+            // 500 to avoid leaking the partial state.
+            throw new InvitationAcceptException(
+                errorCode: 'invitation.not_found',
+                message: 'Invitation user is missing.',
+            );
+        }
+
+        if (mb_strtolower(trim($invitedUser->email)) !== $email) {
+            throw new InvitationAcceptException(
+                errorCode: 'invitation.email_mismatch',
+                message: 'Email does not match the invited user.',
+            );
+        }
+
+        /** @var User $user */
+        $user = DB::transaction(function () use ($relation, $invitedUser, $name, $password, $preferredLanguage): User {
+            // The hashing cast on User normally runs on attribute mutation,
+            // but we forceFill() here to update the placeholder password
+            // from bulk-invite without bypassing the hash. Setting the
+            // attribute through the standard setter ensures the hashed
+            // cast fires.
+            $invitedUser->name = $name;
+            $invitedUser->password = $password;
+            $invitedUser->preferred_language = $preferredLanguage;
+            $invitedUser->email_verified_at = now();
+            $invitedUser->save();
+
+            $relation->relationship_status = RelationshipStatus::Roster->value;
+            // Defense-in-depth: clear the token hash so the magic-link
+            // can never be replayed.
+            $relation->invitation_token_hash = null;
+            $relation->invitation_expires_at = null;
+            $relation->save();
+
+            Audit::log(
+                action: AuditAction::CreatorInvitationAccepted,
+                actor: $invitedUser,
+                subject: $relation,
+                agencyId: $relation->agency_id,
+            );
+
+            return $invitedUser;
+        });
+
+        $this->events->dispatch(new UserSignedUp(
+            user: $user,
+            ip: $request->ip(),
+            userAgent: $request->userAgent(),
+        ));
 
         return $user;
     }

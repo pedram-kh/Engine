@@ -52,3 +52,26 @@ if (typeof CSS === 'undefined' || typeof CSS.supports !== 'function') {
     value: { supports: () => false },
   })
 }
+
+// Sprint 3 Chunk 4 sub-step 6 — Vuetify's VOverlay (used by `v-dialog`,
+// `v-menu`, `v-snackbar`, etc.) reads `visualViewport` to drive its
+// position strategy. jsdom does not implement it. The dialog body
+// gets teleported to `document.body` via `<v-teleport>`, so the
+// surface tests need a working viewport stub to render the modal.
+if (typeof globalThis.visualViewport === 'undefined') {
+  Object.defineProperty(globalThis, 'visualViewport', {
+    writable: true,
+    value: {
+      width: 1024,
+      height: 768,
+      offsetLeft: 0,
+      offsetTop: 0,
+      pageLeft: 0,
+      pageTop: 0,
+      scale: 1,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(() => true),
+    },
+  })
+}

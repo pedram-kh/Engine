@@ -52,3 +52,38 @@ if (typeof CSS === 'undefined' || typeof CSS.supports !== 'function') {
     value: { supports: () => false },
   })
 }
+
+/**
+ * `visualViewport` polyfill — Vuetify's `VOverlay` (used by `v-dialog`
+ * and `v-snackbar`) reads `window.visualViewport.scale` / `offsetTop`
+ * etc. to position itself. JSDOM does not provide this API and Vuetify
+ * throws a `ReferenceError: visualViewport is not defined` on overlay
+ * activation without this stub. The shape mirrors the polyfill in
+ * `apps/main/tests/unit/setup.ts`.
+ */
+if (typeof (globalThis as { visualViewport?: unknown }).visualViewport === 'undefined') {
+  const stub = {
+    width: 1024,
+    height: 768,
+    offsetLeft: 0,
+    offsetTop: 0,
+    pageLeft: 0,
+    pageTop: 0,
+    scale: 1,
+    onresize: null,
+    onscroll: null,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }
+  Object.defineProperty(globalThis, 'visualViewport', {
+    writable: true,
+    configurable: true,
+    value: stub,
+  })
+  Object.defineProperty(globalThis.window ?? globalThis, 'visualViewport', {
+    writable: true,
+    configurable: true,
+    value: stub,
+  })
+}

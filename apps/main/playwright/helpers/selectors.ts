@@ -206,6 +206,21 @@ export const testIds = {
   welcomeBackContinueBtn: 'welcome-back-continue-btn',
 
   // ---------------------------------------------------------------
+  // Bulk-invite page — Sprint 3 Chunk 4 sub-step 11
+  // (apps/main/src/modules/creator-invitations/pages/BulkInvitePage.vue)
+  // ---------------------------------------------------------------
+  bulkInvitePage: 'bulk-invite-page',
+  bulkInviteFileInput: 'bulk-invite-file-input',
+  bulkInvitePreviewHeading: 'bulk-invite-preview-heading',
+  bulkInviteSubmit: 'bulk-invite-submit',
+  bulkInviteTracking: 'bulk-invite-tracking',
+  bulkInviteComplete: 'bulk-invite-complete',
+  bulkInviteStatInvited: 'bulk-invite-stat-invited',
+  bulkInviteStatAlreadyInvited: 'bulk-invite-stat-already-invited',
+  bulkInviteStatFailed: 'bulk-invite-stat-failed',
+  bulkInviteCreatorsBtn: 'bulk-invite-creators-btn',
+
+  // ---------------------------------------------------------------
   // Settings page — Sprint 2 Chunk 2
   // ---------------------------------------------------------------
   settingsPage: 'settings-page',

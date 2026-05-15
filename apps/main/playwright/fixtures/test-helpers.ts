@@ -348,6 +348,13 @@ export interface SeedAgencyAdminResult {
   password: string
   agencyUlid: string
   agencyName: string
+  /**
+   * Populated only when `seedAgencyAdmin` is called with
+   * `{ enroll2fa: true }`. The persisted base-32 TOTP secret the
+   * spec forwards to {@link mintTotpCodeForEmail} (or the
+   * secret-keyed equivalent) to log the user in.
+   */
+  twoFactorSecret: string | null
 }
 
 /**
@@ -358,12 +365,24 @@ export interface SeedAgencyAdminResult {
  *   - An agency.
  *   - An accepted agency_admin membership.
  *
- * Returns the email, password, agencyUlid, and agencyName for the E2E spec.
- * Pattern follows CreateAdminUserController (chunk 7.6 shape).
+ * Pass `{ enroll2fa: true }` to also seed `users.two_factor_secret`,
+ * `two_factor_recovery_codes`, and `two_factor_confirmed_at` so the SPA
+ * `requireMfaEnrolled` router guard treats the user as enrolled on first
+ * sign-in. The seeded secret is returned so the spec can mint a fresh
+ * TOTP code via `mintTotpCodeForEmail` (works once the secret is on the
+ * row — which is exactly the state this branch leaves the user in).
+ *
+ * Returns the email, password, agencyUlid, agencyName, and twoFactorSecret
+ * for the E2E spec. Pattern follows CreateAdminUserController (chunk 7.6 shape).
  */
 export async function seedAgencyAdmin(
   request: APIRequestContext,
-  overrides: { email?: string; password?: string; agencyName?: string } = {},
+  overrides: {
+    email?: string
+    password?: string
+    agencyName?: string
+    enroll2fa?: boolean
+  } = {},
 ): Promise<SeedAgencyAdminResult> {
   const response = await request.post('http://127.0.0.1:8000/api/v1/_test/agencies/setup', {
     headers: defaultHeaders,
@@ -372,6 +391,7 @@ export async function seedAgencyAdmin(
       password: overrides.password ?? 'Password1!',
       name: 'Test Admin',
       agency_name: overrides.agencyName,
+      enroll_2fa: overrides.enroll2fa ?? false,
     },
   })
 
@@ -382,13 +402,20 @@ export async function seedAgencyAdmin(
   }
 
   const body = (await response.json()) as {
-    data: { email: string; password: string; agency_ulid: string; agency_name: string }
+    data: {
+      email: string
+      password: string
+      agency_ulid: string
+      agency_name: string
+      two_factor_secret: string | null
+    }
   }
   return {
     email: body.data.email,
     password: body.data.password,
     agencyUlid: body.data.agency_ulid,
     agencyName: body.data.agency_name,
+    twoFactorSecret: body.data.two_factor_secret,
   }
 }
 

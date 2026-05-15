@@ -12,9 +12,9 @@
  * `confirmed` rule is the authoritative gate.
  */
 
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
@@ -22,6 +22,7 @@ import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
 
 const { t, te } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const store = useAuthStore()
 const { isSigningUp } = storeToRefs(store)
 
@@ -33,6 +34,24 @@ const passwordConfirmation = ref('')
 const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
 
+/**
+ * Sprint 3 Chunk 4 sub-step 4 — magic-link invitation forward path.
+ *
+ * When the creator arrived from `/auth/accept-invite`, the token is
+ * passed through as `?token=<token>` in the query string. We surface
+ * an inline banner explaining that they're completing an invitation
+ * and forward the token to the backend as `invitation_token`. The
+ * backend's SignUpService runs the post-submit hard-lock (email match)
+ * and emits the structured `invitation.*` error codes which surface
+ * through `resolveErrorMessage` → the `errors.invitation_*` keys.
+ */
+const invitationToken = computed(() => {
+  const raw = route.query.token
+  return typeof raw === 'string' && raw.trim() !== '' ? raw.trim() : null
+})
+
+const isInvitationFlow = computed(() => invitationToken.value !== null)
+
 async function onSubmit(): Promise<void> {
   errorKey.value = null
   errorValues.value = {}
@@ -42,7 +61,20 @@ async function onSubmit(): Promise<void> {
       email: email.value,
       password: password.value,
       password_confirmation: passwordConfirmation.value,
+      ...(invitationToken.value !== null ? { invitation_token: invitationToken.value } : {}),
     })
+    if (isInvitationFlow.value) {
+      // Invitation acceptance auto-verifies the email (the user clicked
+      // a link mailed to them) and is now ready to enter the wizard.
+      // The /me/wizard route is gated behind requireAuth; the user
+      // still needs to sign in once to mint a session. Route them to
+      // the verified-email-confirmed page which shows a "Sign in" CTA.
+      await router.push({
+        name: 'auth.sign-in',
+        query: { invited: '1' },
+      })
+      return
+    }
     await router.push({
       name: 'auth.verify-email.pending',
       query: { email: email.value },
@@ -60,6 +92,16 @@ async function onSubmit(): Promise<void> {
     <h2 class="text-h5 mb-4" data-test="sign-up-heading">
       {{ t('auth.ui.headings.sign_up') }}
     </h2>
+
+    <v-alert
+      v-if="isInvitationFlow"
+      type="info"
+      variant="tonal"
+      class="mb-4"
+      data-test="sign-up-invitation-banner"
+    >
+      {{ t('auth.creator_invitation.banners.completing_invitation') }}
+    </v-alert>
 
     <form novalidate @submit.prevent="onSubmit">
       <v-text-field

@@ -38,6 +38,7 @@
         "create": "New brand",
         "edit": "Edit",
         "archive": "Archive",
+        "restore": "Restore",
         "save": "Save brand",
         "saving": "Saving…",
         "backToList": "Back to brands",
@@ -76,6 +77,13 @@
         "cancel": "Cancel",
         "success": "Brand archived."
       },
+      "restore": {
+        "confirmTitle": "Restore brand",
+        "confirmMessage": "Restore {name}? It will appear in the active brand list again.",
+        "confirm": "Restore",
+        "cancel": "Cancel",
+        "success": "{name} restored."
+      },
       "empty": {
         "heading": "No brands yet",
         "body": "Create your first brand to start managing influencer campaigns.",
@@ -89,7 +97,8 @@
       "errors": {
         "loadFailed": "Failed to load brands.",
         "saveFailed": "Failed to save brand.",
-        "archiveFailed": "Failed to archive brand."
+        "archiveFailed": "Failed to archive brand.",
+        "restoreFailed": "Failed to restore brand."
       }
     },
     "agencyUsers": {
@@ -110,6 +119,31 @@
         "active": "Active",
         "pending": "Pending"
       },
+      "members": {
+        "heading": "Current members"
+      },
+      "filters": {
+        "allRoles": "All roles",
+        "allStatuses": "All statuses"
+      },
+      "search": {
+        "label": "Search",
+        "placeholder": "Name or email"
+      },
+      "invitations": {
+        "heading": "Invitation history",
+        "columns": {
+          "email": "Invitee",
+          "invitedAt": "Invited",
+          "invitedBy": "Invited by"
+        },
+        "status": {
+          "pending": "Pending",
+          "accepted": "Accepted",
+          "expired": "Expired"
+        },
+        "empty": "No invitations yet."
+      },
       "invite": {
         "button": "Invite user",
         "title": "Invite a team member",
@@ -128,7 +162,59 @@
         "heading": "No team members",
         "body": "Invite your first team member to get started."
       },
-      "loading": "Loading team…"
+      "emptyFiltered": "No team members match your filter.",
+      "errors": {
+        "membersLoadFailed": "Failed to load team members.",
+        "invitationsLoadFailed": "Failed to load invitation history."
+      },
+      "loading": "Loading team…",
+      "bulkInviteCreators": {
+        "button": "Bulk-invite creators"
+      }
+    },
+    "bulkInvite": {
+      "title": "Bulk-invite creators",
+      "description": "Upload a CSV with an `email` column. Each row becomes a magic-link invitation. Other columns are accepted but ignored.",
+      "file": {
+        "label": "CSV file",
+        "hint": "5 MB / 1000 rows max. The only required column is `email`."
+      },
+      "softWarning": "{count} rows is a large batch — processing may take a few minutes.",
+      "preview": {
+        "heading": "Parsed rows ({count})",
+        "row": "Row",
+        "email": "Email",
+        "errorCount": "{count} parse errors",
+        "errorHeading": "These rows will be skipped:",
+        "errorItem": "Row {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Send invitations ({count})",
+        "reset": "Clear",
+        "startOver": "Send another batch"
+      },
+      "status": {
+        "queued": "Queued — waiting to start",
+        "processing": "Processing invitations",
+        "complete": "All done",
+        "failed": "Job failed"
+      },
+      "tracking": {
+        "progress": "{percent}% complete"
+      },
+      "complete": {
+        "heading": "Results",
+        "invited": "Invited",
+        "alreadyInvited": "Already invited",
+        "failed": "Failed",
+        "failureReason": "Reason"
+      },
+      "failed": {
+        "heading": "The bulk invitation job failed."
+      },
+      "errors": {
+        "submitFailed": "We couldn't submit the CSV. Please try again."
+      }
     },
     "invitation": {
       "accept": {

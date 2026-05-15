@@ -1,6 +1,11 @@
 {
   "creator": {
     "not_found": "Nenhum perfil de criador está associado à sua conta. Saia e entre novamente, ou entre em contacto com o suporte.",
+    "already_approved": "Este criador já foi aprovado.",
+    "already_rejected": "Este criador já foi rejeitado.",
+    "admin": {
+      "field_status_immutable": "O estado da candidatura não pode ser alterado através deste formulário. Utilize as ações de aprovação ou rejeição."
+    },
     "wizard": {
       "feature_disabled": "Esta etapa está temporariamente indisponível durante uma alteração de configuração. Pode saltá-la para continuar a candidatura.",
       "feature_enabled": "Esta opção não está disponível neste momento — utilize o fluxo padrão desta etapa.",

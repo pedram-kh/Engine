@@ -149,14 +149,18 @@ Route::get('creators/invitations/preview', InvitationPreviewController::class)
     ->name('creators.invitations.preview');
 
 // ---------------------------------------------------------------------------
-// Admin SPA — read-only Creator drill-in (Sprint 3 Chunk 3 sub-step 9)
+// Admin SPA — Creator drill-in (Sprint 3 Chunk 3 + Chunk 4)
 // ---------------------------------------------------------------------------
 //
-// Path: GET /api/v1/admin/creators/{creator}
+// Paths:
+//   GET    /api/v1/admin/creators/{creator}          — Sprint 3 Chunk 3
+//   PATCH  /api/v1/admin/creators/{creator}          — Sprint 3 Chunk 4
+//   POST   /api/v1/admin/creators/{creator}/approve  — Sprint 3 Chunk 4
+//   POST   /api/v1/admin/creators/{creator}/reject   — Sprint 3 Chunk 4
 //
 // Authentication: 'auth:web_admin' (admin SPA session cookie, gated by
 // the path-aware UseAdminSessionCookie middleware mounted globally).
-// EnsureMfaForAdmins gates the route per chunk 5 priority #7 — admins
+// EnsureMfaForAdmins gates every route per chunk 5 priority #7 — admins
 // who haven't enrolled 2FA receive auth.mfa.enrollment_required.
 //
 // Tenancy: tenant-less by category — Creator is a global entity
@@ -166,11 +170,16 @@ Route::get('creators/invitations/preview', InvitationPreviewController::class)
 // because the controller does not query any agency-scoped models.
 //
 // Allowlisted in docs/security/tenancy.md § 4 (sub-step 12 fix-up):
-//   GET /api/v1/admin/creators/{creator}  — path-scoped admin tooling
+//   GET    /api/v1/admin/creators/{creator}          — path-scoped admin tooling
+//   PATCH  /api/v1/admin/creators/{creator}          — path-scoped admin tooling
+//   POST   /api/v1/admin/creators/{creator}/approve  — path-scoped admin tooling
+//   POST   /api/v1/admin/creators/{creator}/reject   — path-scoped admin tooling
 //
-// Authorization: CreatorPolicy::view (admin branch returns true for
-// platform_admin user_type). Per-field admin EDIT is deferred to
-// Chunk 4 per pause-condition-6 closure.
+// Authorization:
+//   GET    → CreatorPolicy::view       (Chunk 1; platform_admin branch).
+//   PATCH  → CreatorPolicy::adminUpdate (Chunk 1; platform_admin branch).
+//   approve → CreatorPolicy::approve   (Chunk 4; replaces Chunk 1 stub).
+//   reject  → CreatorPolicy::reject    (Chunk 4; replaces Chunk 1 stub).
 
 Route::prefix('admin/creators')
     ->name('admin.creators.')
@@ -178,6 +187,12 @@ Route::prefix('admin/creators')
     ->group(function (): void {
         Route::get('{creator}', [AdminCreatorController::class, 'show'])
             ->name('show');
+        Route::patch('{creator}', [AdminCreatorController::class, 'update'])
+            ->name('update');
+        Route::post('{creator}/approve', [AdminCreatorController::class, 'approve'])
+            ->name('approve');
+        Route::post('{creator}/reject', [AdminCreatorController::class, 'reject'])
+            ->name('reject');
     });
 
 // ---------------------------------------------------------------------------

@@ -16,8 +16,60 @@
           "started_at": "Started at",
           "completed_at": "Completed at"
         },
-        "load_failed": "We couldn't load this creator. Please refresh."
+        "load_failed": "We couldn't load this creator. Please refresh.",
+        "fields": {
+          "display_name": "Display name",
+          "bio": "Bio",
+          "country_code": "Country",
+          "region": "Region",
+          "primary_language": "Primary language",
+          "secondary_languages": "Secondary languages",
+          "categories": "Categories"
+        },
+        "edit": {
+          "title": "Edit {field}",
+          "save": "Save changes",
+          "cancel": "Cancel",
+          "reason_label": "Reason for change",
+          "reason_hint": "Required for sensitive fields. Recorded in the audit log.",
+          "custom_code_hint": "Pick a value or type a 2-letter ISO code.",
+          "button_aria_label": "Edit {field}",
+          "save_failed": "We couldn't save this change. Please try again.",
+          "saved": "{field} updated."
+        },
+        "errors": {
+          "field_status_immutable": "Status transitions use the approve / reject actions, not the field edit."
+        },
+        "approve": {
+          "button": "Approve application",
+          "title": "Approve {name}'s application",
+          "description": "This will mark the creator as approved and grant production access. The action is recorded in the audit log.",
+          "welcome_label": "Welcome message (optional)",
+          "welcome_hint": "Surfaced on the creator's dashboard the next time they sign in.",
+          "confirm": "Approve",
+          "cancel": "Cancel",
+          "success": "Creator approved.",
+          "failed": "We couldn't approve this creator. Please try again."
+        },
+        "reject": {
+          "button": "Reject application",
+          "title": "Reject {name}'s application",
+          "description": "The creator will see the reason on their dashboard the next time they sign in.",
+          "reason_label": "Rejection reason",
+          "min_hint": "Required, at least {count} characters.",
+          "confirm": "Reject",
+          "cancel": "Cancel",
+          "success": "Creator rejected.",
+          "failed": "We couldn't reject this creator. Please try again."
+        }
       }
+    }
+  },
+  "creator": {
+    "already_approved": "This creator has already been approved.",
+    "already_rejected": "This creator has already been rejected.",
+    "admin": {
+      "field_status_immutable": "Status transitions use the approve / reject actions, not the field edit."
     }
   }
 }

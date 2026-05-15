@@ -46,7 +46,7 @@ import type {
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
-import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import { setAuthRebootstrap, useAgencyStore } from '@/core/stores/useAgencyStore'
 import { authApi } from '../api/auth.api'
 
 export type BootstrapStatus = 'idle' | 'loading' | 'ready' | 'error'
@@ -345,6 +345,22 @@ export const useAuthStore = defineStore('auth', () => {
       isRegeneratingRecoveryCodes.value = false
     }
   }
+
+  // Sprint 3 Chunk 4 sub-step 5 — wire the workspace-switch re-bootstrap
+  // hook into the agency store. Using a setter-injection seam avoids a
+  // top-level circular import (the agency store imports nothing from
+  // auth at module level; this factory closure pushes the contract in).
+  setAuthRebootstrap({
+    resetBootstrapStatus(): void {
+      bootstrapStatus.value = 'idle'
+    },
+    async bootstrap(): Promise<void> {
+      await bootstrap()
+    },
+    isBootstrapping(): boolean {
+      return bootstrapStatus.value === 'loading'
+    },
+  })
 
   return {
     // state

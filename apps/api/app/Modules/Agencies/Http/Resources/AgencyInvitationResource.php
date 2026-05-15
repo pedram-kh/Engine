@@ -25,6 +25,10 @@ final class AgencyInvitationResource extends JsonResource
         $invitation = $this->resource;
         assert($invitation instanceof AgencyUserInvitation);
 
+        $status = $invitation->isAccepted()
+            ? 'accepted'
+            : ($invitation->isExpired() ? 'expired' : 'pending');
+
         return [
             'id' => $invitation->ulid,
             'type' => 'agency_invitations',
@@ -36,6 +40,16 @@ final class AgencyInvitationResource extends JsonResource
                 'is_pending' => $invitation->isPending(),
                 'is_expired' => $invitation->isExpired(),
                 'created_at' => $invitation->created_at->toIso8601String(),
+                // Sprint 3 Chunk 4 sub-step 3 — invitation history listing.
+                // `status` collapses {is_pending, is_expired, accepted_at}
+                // to a single enum for the v-data-table-server status
+                // filter chip group. `invited_at` is the row's created_at
+                // surfaced under a domain-specific name. `invited_by_user_name`
+                // resolves the related inviter (eagerly loaded by the
+                // controller via with('invitedBy')).
+                'status' => $status,
+                'invited_at' => $invitation->created_at->toIso8601String(),
+                'invited_by_user_name' => $invitation->invitedBy?->name,
             ],
             'relationships' => [
                 'agency' => [

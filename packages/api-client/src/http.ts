@@ -106,11 +106,13 @@ export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
     options.axiosInstance ??
     axios.create({
       withCredentials: true,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
+      // Per-request `request<T>()` is the single source of truth for
+      // headers (see Content-Type / FormData contract below). We
+      // intentionally do NOT set instance-level header defaults so the
+      // per-request logic can drop `Content-Type` for multipart bodies
+      // without fighting an axios merge step that would re-add the
+      // default. See Sprint 3 Chunk 4 critical-path E2E #9 for the
+      // original discovery.
       // Disable axios' built-in xsrf handling: it only fires inside a
       // browser AND when the request URL matches the cookie origin
       // exactly. We do the read+attach ourselves below so the same
@@ -140,9 +142,24 @@ export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
         })
       }
 
-      const headers: Record<string, string> = {
+      // Multipart contract: when the body is `FormData`, the browser MUST
+      // be the one to set `Content-Type: multipart/form-data; boundary=…`.
+      // Axios 1.x's `transformRequest` reads the header BEFORE serializing
+      // the body — if it sees `application/json`, it calls
+      // `formDataToJSON(data)` and ships a JSON object instead, and
+      // Laravel's `$request->file(…)` then sees no upload.
+      //
+      // The per-request `headers` object is merged with the axios-instance
+      // defaults, so simply omitting `Content-Type` here is not enough —
+      // the default `application/json` would stick. Setting it to `null`
+      // tells axios 1.x to drop the header so the browser writes its own
+      // (with boundary). See Sprint 3 Chunk 4 critical-path E2E #9 for the
+      // original discovery context.
+      const isFormDataBody = typeof FormData !== 'undefined' && config.data instanceof FormData
+
+      const headers: Record<string, string | null> = {
         Accept: 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': isFormDataBody ? null : 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
         ...(config.headers as Record<string, string> | undefined),
       }
@@ -154,10 +171,18 @@ export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
         }
       }
 
+      // Axios 1.x interprets a null header value as "drop this header from
+      // the request entirely", which is exactly what we need for the
+      // FormData case (so the instance-default `Content-Type:
+      // application/json` does NOT survive into the request). The
+      // axios-mock-adapter records the final headers post-merge, so this
+      // is also what the unit test asserts on.
+      const resolvedHeaders: Record<string, string | null> = headers
+
       const response = await instance.request<T>({
         ...config,
         url: absolutize(path, options.baseUrl),
-        headers,
+        headers: resolvedHeaders as Record<string, string>,
       })
       return response.data
     } catch (error) {

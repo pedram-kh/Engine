@@ -38,6 +38,7 @@
         "create": "Nuovo brand",
         "edit": "Modifica",
         "archive": "Archivia",
+        "restore": "Ripristina",
         "save": "Salva brand",
         "saving": "Salvataggio…",
         "backToList": "Torna ai brand",
@@ -68,6 +69,13 @@
         "cancel": "Annulla",
         "success": "Brand archiviato."
       },
+      "restore": {
+        "confirmTitle": "Ripristina brand",
+        "confirmMessage": "Ripristinare {name}? Tornerà a comparire nell'elenco dei brand attivi.",
+        "confirm": "Ripristina",
+        "cancel": "Annulla",
+        "success": "{name} ripristinato."
+      },
       "empty": {
         "heading": "Nessun brand ancora",
         "body": "Crea il tuo primo brand per iniziare.",
@@ -81,7 +89,8 @@
       "errors": {
         "loadFailed": "Caricamento brand fallito.",
         "saveFailed": "Salvataggio brand fallito.",
-        "archiveFailed": "Archiviazione brand fallita."
+        "archiveFailed": "Archiviazione brand fallita.",
+        "restoreFailed": "Ripristino brand fallito."
       }
     },
     "agencyUsers": {
@@ -99,6 +108,29 @@
         "agency_staff": "Collaboratore"
       },
       "status": { "active": "Attivo", "pending": "In attesa" },
+      "members": { "heading": "Membri attuali" },
+      "filters": {
+        "allRoles": "Tutti i ruoli",
+        "allStatuses": "Tutti gli stati"
+      },
+      "search": {
+        "label": "Cerca",
+        "placeholder": "Nome o email"
+      },
+      "invitations": {
+        "heading": "Cronologia degli inviti",
+        "columns": {
+          "email": "Invitato",
+          "invitedAt": "Invitato il",
+          "invitedBy": "Invitato da"
+        },
+        "status": {
+          "pending": "In attesa",
+          "accepted": "Accettato",
+          "expired": "Scaduto"
+        },
+        "empty": "Nessun invito al momento."
+      },
       "invite": {
         "button": "Invita utente",
         "title": "Invita un membro del team",
@@ -112,7 +144,51 @@
         "heading": "Nessun membro del team",
         "body": "Invita il tuo primo membro per iniziare."
       },
-      "loading": "Caricamento team…"
+      "emptyFiltered": "Nessun membro corrisponde al filtro.",
+      "errors": {
+        "membersLoadFailed": "Caricamento membri fallito.",
+        "invitationsLoadFailed": "Caricamento cronologia inviti fallito."
+      },
+      "loading": "Caricamento team…",
+      "bulkInviteCreators": { "button": "Invita creator in massa" }
+    },
+    "bulkInvite": {
+      "title": "Invita creator in massa",
+      "description": "Carica un CSV con una colonna `email`. Ogni riga genera un invito tramite magic link. Le altre colonne sono accettate ma ignorate.",
+      "file": {
+        "label": "File CSV",
+        "hint": "Max 5 MB / 1000 righe. È obbligatoria solo la colonna `email`."
+      },
+      "softWarning": "{count} righe è un lotto grande — l'elaborazione può richiedere qualche minuto.",
+      "preview": {
+        "heading": "Righe analizzate ({count})",
+        "row": "Riga",
+        "email": "Email",
+        "errorCount": "{count} errori di analisi",
+        "errorHeading": "Queste righe saranno ignorate:",
+        "errorItem": "Riga {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Invia inviti ({count})",
+        "reset": "Cancella",
+        "startOver": "Invia un altro lotto"
+      },
+      "status": {
+        "queued": "In coda — in attesa di avvio",
+        "processing": "Elaborazione inviti",
+        "complete": "Completato",
+        "failed": "Il job è fallito"
+      },
+      "tracking": { "progress": "{percent}% completato" },
+      "complete": {
+        "heading": "Risultati",
+        "invited": "Invitati",
+        "alreadyInvited": "Già invitati",
+        "failed": "Falliti",
+        "failureReason": "Motivo"
+      },
+      "failed": { "heading": "Il job di invio in massa è fallito." },
+      "errors": { "submitFailed": "Impossibile inviare il CSV. Riprova." }
     },
     "invitation": {
       "accept": {

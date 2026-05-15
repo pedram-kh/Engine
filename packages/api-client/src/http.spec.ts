@@ -567,5 +567,50 @@ describe('createHttpClient', () => {
       expect(patchHeaders?.['X-A']).toBe('1')
       expect(deleteHeaders?.['X-B']).toBe('2')
     })
+
+    // -----------------------------------------------------------------
+    // FormData / multipart contract (Sprint 3 Chunk 4 sub-step 11)
+    //
+    // The avatar / portfolio / bulk-invite endpoints pass a `FormData`
+    // instance as the body. The browser-set boundary lives inside the
+    // `Content-Type: multipart/form-data; boundary=…` header — if we
+    // ship the default `application/json` instead, axios 1.x's
+    // `transformRequest` JSON-stringifies the FormData via
+    // `formDataToJSON`, and Laravel's `$request->file(…)` sees no upload.
+    // The client deletes the explicit Content-Type for FormData bodies so
+    // axios + the browser cooperate on the multipart header.
+    // -----------------------------------------------------------------
+    it('drops the JSON Content-Type when the body is FormData (multipart)', async () => {
+      h.mock.onGet(CSRF_URL).reply(204)
+      h.mock.onPost(`${BASE_URL}/avatar`).reply(200, {})
+
+      const form = new FormData()
+      form.append('avatar', new Blob(['x'], { type: 'image/png' }), 'avatar.png')
+
+      await h.http.post('/avatar', form)
+
+      const headers = h.mock.history.post[0]?.headers as Record<string, string> | undefined
+      const contentType = headers?.['Content-Type'] ?? headers?.['content-type']
+      // Acceptable outcomes: header dropped entirely OR axios filled it
+      // with `multipart/form-data; boundary=…`. The forbidden outcome
+      // is `application/json` (which would re-trigger formDataToJSON).
+      const dropped = contentType === undefined || contentType === ''
+      const multipart = typeof contentType === 'string' && /multipart\/form-data/i.test(contentType)
+      expect(dropped || multipart).toBe(true)
+    })
+
+    it('keeps the JSON Content-Type for plain-object bodies on the same instance', async () => {
+      h.mock.onGet(CSRF_URL).reply(204)
+      h.mock.onPost(`${BASE_URL}/avatar`).reply(200, {})
+      h.mock.onPost(`${BASE_URL}/sessions`).reply(204)
+
+      const form = new FormData()
+      form.append('avatar', new Blob(['x'], { type: 'image/png' }), 'avatar.png')
+      await h.http.post('/avatar', form)
+      await h.http.post('/sessions', { email: 'x@y.z' })
+
+      const jsonHeaders = h.mock.history.post[1]?.headers as Record<string, string>
+      expect(jsonHeaders?.['Content-Type']).toBe('application/json')
+    })
   })
 })

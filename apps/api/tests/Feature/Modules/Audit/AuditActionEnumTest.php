@@ -61,6 +61,12 @@ it('AuditAction catalogue lists every Sprint 1-3 auth + user + mfa + brand + inv
         'bulk_invite.started',
         'bulk_invite.completed',
         'bulk_invite.failed',
+        // Sprint 3 Chunk 4 — magic-link invitation acceptance
+        'creator.invitation_accepted',
+        // Sprint 3 Chunk 4 — admin per-field edit + approve / reject
+        'creator.admin.field_updated',
+        'creator.approved',
+        'creator.rejected',
         // Sprint 3 — auto-emitted by Audited trait on related models
         'creator_tax_profile.created',
         'creator_tax_profile.updated',

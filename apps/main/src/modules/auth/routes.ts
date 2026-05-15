@@ -89,6 +89,18 @@ export const authRoutes: RouteRecordRaw[] = [
     meta: { layout: 'auth' },
   },
 
+  // Creator-side magic-link invitation landing — public, no guards.
+  // Sprint 3 Chunk 4 sub-step 4. The page previews the invitation via
+  // the unauthenticated `/creators/invitations/preview` endpoint and
+  // renders one of 5 states; the valid-pending state chains forward
+  // to /sign-up?token=<token>.
+  {
+    path: '/auth/accept-invite',
+    name: 'auth.accept-creator-invite',
+    component: () => import('./pages/AcceptCreatorInvitePage.vue'),
+    meta: { layout: 'auth' },
+  },
+
   // Password recovery — public landing pages. Same rationale as
   // verify-email above.
   {
@@ -167,11 +179,39 @@ export const appRoutes: RouteRecordRaw[] = [
 
   // ── Agency users / invitations ────────────────────────────────────────────
   // Visible only to agency_admin (route guard + UI gating).
+  //
+  // Sprint 3 Chunk 4 sub-step 5 — `requireMfaEnrolled` lands on
+  // admin-gated agency routes per Sprint 2 § e carry-forward. Order
+  // mirrors the chunk-7.1 admin SPA chain: requireAuth → requireMfaEnrolled
+  // → requireAgencyAdmin. An admin user who hasn't enrolled 2FA is
+  // bounced to /auth/2fa/enable before the route renders. Non-admin
+  // routes (app.dashboard, brands.*, settings) are NOT MFA-gated in
+  // Phase 1 — Sprint 4+ may broaden this if any of them grows a
+  // state-flipping admin surface.
   {
     path: '/agency-users',
     name: 'agency-users.list',
     component: () => import('@/modules/agency-users/pages/AgencyUsersPage.vue'),
-    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyAdmin'] },
+    meta: {
+      layout: 'agency',
+      guards: ['requireAuth', 'requireMfaEnrolled', 'requireAgencyAdmin'],
+    },
+  },
+
+  // ── Bulk creator invitations ─────────────────────────────────────────────
+  // Sprint 3 Chunk 4 sub-step 11 — CSV-driven prospect creator bulk-invite.
+  // Admin-only (matches the backend's BulkInviteController::authorizeAdmin
+  // role check). The guard chain mirrors agency-users.list — requireAuth →
+  // requireMfaEnrolled → requireAgencyAdmin — so 2FA is enforced before
+  // an admin can ship invitations.
+  {
+    path: '/creator-invitations/bulk',
+    name: 'creator-invitations.bulk',
+    component: () => import('@/modules/creator-invitations/pages/BulkInvitePage.vue'),
+    meta: {
+      layout: 'agency',
+      guards: ['requireAuth', 'requireMfaEnrolled', 'requireAgencyAdmin'],
+    },
   },
 
   // ── Settings ──────────────────────────────────────────────────────────────
