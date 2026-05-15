@@ -181,6 +181,15 @@ jobs:
       SESSION_COOKIE: catalyst_main_session
       SANCTUM_STATEFUL_DOMAINS: '127.0.0.1:5173,localhost:5173'
       VITE_API_BASE_URL: '/api/v1'
+      # No SMTP server is available in the runner (Mailpit ships locally
+      # via `make dev` but isn't part of the CI service-container set).
+      # `MAIL_MAILER=array` makes `Mail::send()` push to an in-memory
+      # collection instead of opening a socket to 127.0.0.1:1025 — so
+      # specs that flip the queue to `sync` (e.g. the chunk-3 wizard
+      # happy-path) don't trip a 500 when the verification-email job
+      # fires inline. Local dev keeps the Mailpit path because `.env`
+      # there sets `MAIL_MAILER=smtp` and Mailpit is running.
+      MAIL_MAILER: array
     steps:
       - uses: actions/checkout@v4
 
@@ -335,6 +344,8 @@ jobs:
       SESSION_COOKIE: catalyst_admin_session
       SANCTUM_STATEFUL_DOMAINS: '127.0.0.1:5174,localhost:5174'
       VITE_API_BASE_URL: '/api/v1'
+      # See the e2e-main env block above for the rationale.
+      MAIL_MAILER: array
     steps:
       - uses: actions/checkout@v4
 

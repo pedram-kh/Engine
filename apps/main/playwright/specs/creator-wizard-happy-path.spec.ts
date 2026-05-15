@@ -7,7 +7,6 @@ import {
   restoreThrottle,
   seedPortfolioImage,
   setQueueMode,
-  signInViaApi,
   signOutViaApi,
   signUpUser,
   verifyEmailViaApi,
@@ -89,8 +88,23 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     // -----------------------------------------------------------------
     await signUpUser(request, email, PASSWORD, 'Wizard E2E')
     await verifyEmailViaApi(request, email)
-    await signInViaApi(request, email, PASSWORD)
-    await seedPortfolioImage(request)
+
+    // Sign in via the SPA UI (not a `request.post`) so the browser
+    // engages Sanctum's stateful pipeline — the SPA's apiClient
+    // handles the `/sanctum/csrf-cookie` handshake + `X-XSRF-TOKEN`
+    // header forwarding automatically. See the matching block in
+    // `creator-dashboard.spec.ts` for the full reasoning.
+    await page.goto('/sign-in')
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(PASSWORD)
+    await page.locator(dt(testIds.signInSubmit)).click()
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
+
+    // Seed via the page-bound helper so the helper inherits the
+    // post-sign-in cookies AND can read the `XSRF-TOKEN` value to
+    // forward as `X-XSRF-TOKEN` — required for the `auth:web`
+    // portfolio-upload route to clear Sanctum's CSRF check.
+    await seedPortfolioImage(page)
 
     // -----------------------------------------------------------------
     // /onboarding — Welcome Back page renders on first mount in this

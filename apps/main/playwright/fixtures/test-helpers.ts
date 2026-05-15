@@ -1,4 +1,4 @@
-import type { APIRequestContext } from '@playwright/test'
+import type { APIRequestContext, Page } from '@playwright/test'
 
 /**
  * Typed wrappers around the chunk 6.1 `App\TestHelpers` HTTP surface.
@@ -465,36 +465,6 @@ export async function verifyEmailViaApi(request: APIRequestContext, email: strin
   }
 }
 
-export interface SignInResult {
-  ok: boolean
-}
-
-/**
- * Sign in via the production login endpoint, sharing the resulting
- * session cookie with the page context. Distinct from the SPA-driven
- * sign-in (which the 2FA spec exercises) — this helper is for specs
- * that need a signed-in cookie cheaply, without re-asserting the
- * sign-in form itself.
- */
-export async function signInViaApi(
-  request: APIRequestContext,
-  email: string,
-  password: string,
-): Promise<SignInResult> {
-  const response = await request.post('http://127.0.0.1:8000/api/v1/auth/login', {
-    headers: defaultHeaders,
-    data: { email, password },
-  })
-
-  if (response.status() !== 200 && response.status() !== 204) {
-    throw new Error(
-      `signInViaApi failed with status ${response.status()}: ${await response.text()}`,
-    )
-  }
-
-  return { ok: true }
-}
-
 export interface SeedPortfolioImageResult {
   id: string
 }
@@ -507,12 +477,38 @@ export interface SeedPortfolioImageResult {
  * has its own dedicated component-test coverage) and focus on the
  * wizard-traversal contract.
  *
- * Cookie context: the caller must have already signed in
- * (`signInViaApi` or equivalent) — the route is `auth:web`.
+ * Why this takes a `Page` (not a raw `APIRequestContext`)
+ * --------------------------------------------------------
+ * The portfolio route is `auth:web`, which means three Sanctum-stack
+ * preconditions must all hold for the upload to succeed:
+ *
+ *   1. The session cookie (`catalyst_main_session`) must be present.
+ *      Cookies are shared automatically between the page and
+ *      `page.context().request`, so this is "free" after a UI
+ *      sign-in.
+ *
+ *   2. The request must include a `Referer` that matches one of the
+ *      `SANCTUM_STATEFUL_DOMAINS`. Without it,
+ *      `EnsureFrontendRequestsAreStateful` skips the stateful
+ *      pipeline and `StartSession` never runs — `auth:web` then
+ *      returns 401 even though the cookie is there. Playwright's
+ *      `request.post` does NOT auto-set `Referer` for absolute URLs.
+ *
+ *   3. With the stateful pipeline engaged, Sanctum's
+ *      `ValidateCsrfToken` ALSO runs and demands the `X-XSRF-TOKEN`
+ *      header. The SPA's apiClient sets it automatically from the
+ *      `XSRF-TOKEN` cookie; Playwright's `request.post` does not.
+ *
+ * This helper reads `XSRF-TOKEN` from the page's cookie jar (set by
+ * the UI sign-in earlier in the spec), URL-decodes it, and forwards
+ * both `Referer` and `X-XSRF-TOKEN` so the upload clears all three
+ * preconditions.
+ *
+ * Cookie context: the caller MUST have already signed in via the SPA
+ * UI before invoking this helper — otherwise the `XSRF-TOKEN` cookie
+ * does not exist yet and the upload 419s.
  */
-export async function seedPortfolioImage(
-  request: APIRequestContext,
-): Promise<SeedPortfolioImageResult> {
+export async function seedPortfolioImage(page: Page): Promise<SeedPortfolioImageResult> {
   // 1×1 transparent PNG — smallest valid PNG that survives the
   // backend's MIME sniff + GD re-encode pass.
   const png = Buffer.from(
@@ -520,13 +516,24 @@ export async function seedPortfolioImage(
     'base64',
   )
 
-  const response = await request.post('http://127.0.0.1:8000/api/v1/creators/me/portfolio/images', {
-    headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-    multipart: {
-      file: { name: 'seed.png', mimeType: 'image/png', buffer: png },
-      title: 'Seeded sample',
-    },
-  })
+  const cookies = await page.context().cookies()
+  const xsrfCookie = cookies.find((c) => c.name === 'XSRF-TOKEN')
+  const xsrfToken = xsrfCookie ? decodeURIComponent(xsrfCookie.value) : ''
+
+  const response = await page
+    .context()
+    .request.post('http://127.0.0.1:8000/api/v1/creators/me/portfolio/images', {
+      headers: {
+        Accept: 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        Referer: 'http://127.0.0.1:5173/',
+        'X-XSRF-TOKEN': xsrfToken,
+      },
+      multipart: {
+        file: { name: 'seed.png', mimeType: 'image/png', buffer: png },
+        title: 'Seeded sample',
+      },
+    })
 
   if (response.status() !== 201) {
     throw new Error(

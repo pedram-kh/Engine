@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test'
 
+import { dt, testIds } from '../helpers/selectors'
 import {
   neutralizeThrottle,
   restoreThrottle,
-  signInViaApi,
   signOutViaApi,
   signUpUser,
   verifyEmailViaApi,
@@ -55,7 +55,21 @@ test.describe('Sprint 3 Chunk 3 — creator dashboard', () => {
 
     await signUpUser(request, email, PASSWORD, 'Dashboard E2E')
     await verifyEmailViaApi(request, email)
-    await signInViaApi(request, email, PASSWORD)
+
+    // Sign in via the SPA UI (not a `request.post`) so the browser
+    // engages Sanctum's stateful pipeline — the SPA's apiClient
+    // handles the `/sanctum/csrf-cookie` handshake + `X-XSRF-TOKEN`
+    // header forwarding automatically. An API-only signInViaApi
+    // helper would 500 with "Session store not set on request"
+    // because Sanctum's `EnsureFrontendRequestsAreStateful` only
+    // injects StartSession when the Referer matches one of the
+    // configured stateful domains, and Playwright's APIRequestContext
+    // does not set Referer for absolute-URL POSTs.
+    await page.goto('/sign-in')
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(PASSWORD)
+    await page.locator(dt(testIds.signInSubmit)).click()
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
 
     await page.goto('/creator/dashboard')
 
