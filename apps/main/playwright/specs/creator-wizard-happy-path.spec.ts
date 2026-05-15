@@ -20,8 +20,8 @@ import {
  *   2. Verify the email via the production verify-email endpoint
  *      (helper mints the token, posts it back). This unblocks the
  *      `verified` middleware on `/api/v1/creators/me/*`.
- *   3. Sign in via the production login endpoint (cookie shared
- *      with the page context).
+ *   3. Sign in via the SPA `/sign-in` UI (cookie + Sanctum CSRF
+ *      handshake shared with the page — see `creator-dashboard.spec`).
  *   4. Pre-seed one portfolio image via the production POST
  *      endpoint so Step 4's "min 1 piece" gate is satisfied without
  *      driving the file-upload UI in the spec (the upload UI has
@@ -66,6 +66,12 @@ function uniqueEmail(): string {
 }
 
 test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
+  // Twelve wizard hops + bootstrap-on-every guarded navigation + lazy
+  // route chunks reliably exceeds Playwright's default 30s per-test
+  // budget on a cold GH runner — run 25895881681 tripped TEST TIMEOUT at
+  // the payout→contract hop even though navigation was still in flight.
+  test.describe.configure({ timeout: 180_000 })
+
   test.beforeEach(async ({ request }) => {
     await neutralizeThrottle(request, 'auth-ip')
     await setQueueMode(request, 'sync')
@@ -215,6 +221,9 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     await expect(page).toHaveURL(/\/onboarding\/payout/, { timeout: 10_000 })
     await expect(page.locator('[data-testid="step-payout"]')).toBeVisible()
     await expect(page.locator('[data-testid="payout-flag-off"]')).toBeVisible()
+    await expect(page.locator('[data-testid="payout-advance"]')).toBeEnabled({
+      timeout: 10_000,
+    })
     await page.locator('[data-testid="payout-advance"]').click()
 
     // -----------------------------------------------------------------
@@ -259,7 +268,7 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     // -----------------------------------------------------------------
     await expect(page).toHaveURL(/\/onboarding\/review/, { timeout: 10_000 })
     await expect(page.locator('[data-testid="step-review"]')).toBeVisible()
-    await expect(page.locator('[data-testid="review-submit"]')).toBeEnabled({ timeout: 10_000 })
+    await expect(page.locator('[data-testid="review-submit"]')).toBeEnabled({ timeout: 30_000 })
     await page.locator('[data-testid="review-submit"]').click()
 
     // -----------------------------------------------------------------
