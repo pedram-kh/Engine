@@ -36,19 +36,27 @@ final class AgencyMembershipResource extends JsonResource
         $membership = $this->resource;
         assert($membership instanceof AgencyMembership);
 
+        // The relation is typed `BelongsTo<User, $this>` and the index
+        // query eager-loads `user`, so `$user` is non-null here. We
+        // narrow explicitly because phpstan.neon sets
+        // `treatPhpDocTypesAsCertain: false`, which would otherwise
+        // surface `property.nonObject` on plain `->` access; using
+        // `?->X ?? ''` instead trips `nullsafe.neverNull`. The assert
+        // resolves both rules and documents the invariant.
         $user = $membership->user;
+        assert($user !== null, 'AgencyMembership::user expected to be eager-loaded');
 
         return [
-            'id' => $user?->ulid ?? '',
+            'id' => $user->ulid,
             'type' => 'agency_memberships',
             'attributes' => [
-                'user_id' => $user?->ulid ?? '',
-                'name' => $user?->name ?? '',
-                'email' => $user?->email ?? '',
+                'user_id' => $user->ulid,
+                'name' => $user->name,
+                'email' => $user->email,
                 'role' => $membership->role->value,
                 'status' => $membership->isAccepted() ? 'active' : 'pending',
                 'created_at' => $membership->created_at->toIso8601String(),
-                'last_active_at' => $user?->last_login_at?->toIso8601String(),
+                'last_active_at' => $user->last_login_at?->toIso8601String(),
             ],
         ];
     }

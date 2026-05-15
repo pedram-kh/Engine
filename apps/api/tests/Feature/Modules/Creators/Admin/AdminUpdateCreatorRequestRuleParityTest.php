@@ -46,16 +46,25 @@ it('AdminUpdateCreatorRequest categories rules contain the same 16-enum check as
     // categories.* enum check — the admin request uses Rule::in() while the
     // wizard uses an inline `in:` string. Both must resolve to the same
     // 16-category set. Compare by extracting the values from each.
-    $adminEnum = collect($adminRules['categories.*'])
+    /** @var array<int, mixed> $adminStarRules */
+    $adminStarRules = $adminRules['categories.*'];
+    /** @var array<int, string> $wizardStarRules */
+    $wizardStarRules = $wizardRules['categories.*'];
+
+    $adminEnum = collect($adminStarRules)
         ->first(fn ($rule) => $rule instanceof In);
-    $wizardEnum = collect($wizardRules['categories.*'])
+    $wizardEnum = collect($wizardStarRules)
         ->first(fn (string $rule) => str_starts_with($rule, 'in:'));
 
     expect($adminEnum)->not->toBeNull();
     expect($wizardEnum)->not->toBeNull();
+    assert($adminEnum instanceof In);
+    assert(is_string($wizardEnum));
 
     // Normalise to a sorted list of category slugs for comparison.
-    $adminSet = collect((fn () => $this->values)->call($adminEnum))->sort()->values()->all();
+    /** @var array<int, string> $adminValues */
+    $adminValues = (fn () => $this->values)->call($adminEnum);
+    $adminSet = collect($adminValues)->sort()->values()->all();
     $wizardSet = collect(explode(',', substr($wizardEnum, 3)))->sort()->values()->all();
 
     expect($adminSet)->toEqual($wizardSet);

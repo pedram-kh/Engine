@@ -116,10 +116,13 @@ it('updates display_name and emits creator.admin.field_updated audit (no reason 
         ->latest('id')
         ->first();
     expect($audit)->not->toBeNull();
+    assert($audit !== null);
     expect($audit->actor_id)->toBe($admin->id);
-    expect($audit->metadata['field'])->toBe('display_name');
-    expect($audit->metadata['before'])->toBe('Original Name');
-    expect($audit->metadata['after'])->toBe('Updated Name');
+    /** @var array<string, mixed> $metadata */
+    $metadata = $audit->metadata;
+    expect($metadata['field'])->toBe('display_name');
+    expect($metadata['before'])->toBe('Original Name');
+    expect($metadata['after'])->toBe('Updated Name');
 });
 
 it('updates bio when a reason is provided', function (): void {
@@ -139,7 +142,11 @@ it('updates bio when a reason is provided', function (): void {
         ->where('action', AuditAction::CreatorAdminFieldUpdated->value)
         ->latest('id')
         ->first();
-    expect($audit->metadata['reason'])->toBe('PII redaction request from creator.');
+    expect($audit)->not->toBeNull();
+    assert($audit !== null);
+    /** @var array<string, mixed> $metadata */
+    $metadata = $audit->metadata;
+    expect($metadata['reason'])->toBe('PII redaction request from creator.');
 });
 
 it('updates categories when a reason is provided', function (): void {
@@ -169,7 +176,9 @@ it('refuses bio update without a reason — 422 with reason error', function ():
         ]);
 
     expect($response->status())->toBe(422);
-    expect($creator->fresh()->bio)->toBe('Old bio.');
+    $fresh = $creator->fresh();
+    assert($fresh !== null);
+    expect($fresh->bio)->toBe('Old bio.');
 });
 
 it('refuses categories update without a reason — 422 with reason error', function (): void {
@@ -193,7 +202,9 @@ it('refuses categories update without a reason — 422 with reason error', funct
 it('same-value updates are no-ops: no audit emitted, updated_at not bumped', function (): void {
     $admin = makePlatformAdmin();
     $creator = CreatorFactory::new()->createOne(['display_name' => 'Same']);
-    $originalUpdatedAt = $creator->fresh()->updated_at;
+    $freshBefore = $creator->fresh();
+    assert($freshBefore !== null);
+    $originalUpdatedAt = $freshBefore->updated_at;
 
     sleep(1);
 
@@ -209,7 +220,9 @@ it('same-value updates are no-ops: no audit emitted, updated_at not bumped', fun
         ->count();
     expect($auditCount)->toBe(0);
 
-    expect($creator->fresh()->updated_at->equalTo($originalUpdatedAt))->toBeTrue();
+    $freshAfter = $creator->fresh();
+    assert($freshAfter !== null);
+    expect($freshAfter->updated_at->equalTo($originalUpdatedAt))->toBeTrue();
 });
 
 it('same-value array-shaped updates are idempotent (order-insensitive)', function (): void {
@@ -250,7 +263,9 @@ it('refuses application_status in generic PATCH with creator.admin.field_status_
 
     expect($response->status())->toBe(422);
     expect($response->json('errors.0.code'))->toBe('creator.admin.field_status_immutable');
-    expect($creator->fresh()->application_status)->toBe(ApplicationStatus::Pending);
+    $fresh = $creator->fresh();
+    assert($fresh !== null);
+    expect($fresh->application_status)->toBe(ApplicationStatus::Pending);
 });
 
 it('refuses zero-field PATCH with a generic field-required error', function (): void {
@@ -350,6 +365,7 @@ it('approves a pending creator and emits creator.approved audit', function (): v
     expect($response->json('data.attributes.application_status'))->toBe('approved');
 
     $fresh = $creator->fresh();
+    assert($fresh !== null);
     expect($fresh->application_status)->toBe(ApplicationStatus::Approved);
     expect($fresh->approved_at)->not->toBeNull();
     expect($fresh->approved_by_user_id)->toBe($admin->id);
@@ -360,7 +376,10 @@ it('approves a pending creator and emits creator.approved audit', function (): v
         ->latest('id')
         ->first();
     expect($audit)->not->toBeNull();
-    expect($audit->metadata['welcome_message'])->toBe('Welcome to the platform!');
+    assert($audit !== null);
+    /** @var array<string, mixed> $metadata */
+    $metadata = $audit->metadata;
+    expect($metadata['welcome_message'])->toBe('Welcome to the platform!');
 });
 
 it('approves without a welcome message (optional field)', function (): void {
@@ -373,7 +392,9 @@ it('approves without a welcome message (optional field)', function (): void {
         ->postJson("/api/v1/admin/creators/{$creator->ulid}/approve", []);
 
     expect($response->status())->toBe(200);
-    expect($creator->fresh()->welcome_message)->toBeNull();
+    $fresh = $creator->fresh();
+    assert($fresh !== null);
+    expect($fresh->welcome_message)->toBeNull();
 });
 
 it('returns 409 + creator.already_approved when approving an already-approved creator (idempotent)', function (): void {
@@ -382,14 +403,20 @@ it('returns 409 + creator.already_approved when approving an already-approved cr
         'application_status' => ApplicationStatus::Approved->value,
         'approved_at' => now()->subDay(),
     ]);
-    $originalApprovedAt = $creator->fresh()->approved_at;
+    $freshBefore = $creator->fresh();
+    assert($freshBefore !== null);
+    $originalApprovedAt = $freshBefore->approved_at;
+    assert($originalApprovedAt !== null);
 
     $response = $this->actingAs($admin, 'web_admin')
         ->postJson("/api/v1/admin/creators/{$creator->ulid}/approve");
 
     expect($response->status())->toBe(409);
     expect($response->json('errors.0.code'))->toBe('creator.already_approved');
-    expect($creator->fresh()->approved_at->equalTo($originalApprovedAt))->toBeTrue();
+    $freshAfter = $creator->fresh();
+    assert($freshAfter !== null);
+    assert($freshAfter->approved_at !== null);
+    expect($freshAfter->approved_at->equalTo($originalApprovedAt))->toBeTrue();
 });
 
 it('rejects a pending creator with a rejection_reason and emits creator.rejected audit', function (): void {
@@ -407,6 +434,7 @@ it('rejects a pending creator with a rejection_reason and emits creator.rejected
     expect($response->json('data.attributes.application_status'))->toBe('rejected');
 
     $fresh = $creator->fresh();
+    assert($fresh !== null);
     expect($fresh->application_status)->toBe(ApplicationStatus::Rejected);
     expect($fresh->rejected_at)->not->toBeNull();
     expect($fresh->rejection_reason)->toBe('Portfolio insufficient for Tier 1 review.');
@@ -416,7 +444,10 @@ it('rejects a pending creator with a rejection_reason and emits creator.rejected
         ->latest('id')
         ->first();
     expect($audit)->not->toBeNull();
-    expect($audit->metadata['rejection_reason'])->toBe('Portfolio insufficient for Tier 1 review.');
+    assert($audit !== null);
+    /** @var array<string, mixed> $metadata */
+    $metadata = $audit->metadata;
+    expect($metadata['rejection_reason'])->toBe('Portfolio insufficient for Tier 1 review.');
 });
 
 it('rejects without rejection_reason returns 422', function (): void {

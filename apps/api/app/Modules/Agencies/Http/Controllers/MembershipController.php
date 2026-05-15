@@ -9,6 +9,7 @@ use App\Modules\Agencies\Http\Resources\AgencyMembershipResource;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Identity\Models\User;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -70,7 +71,14 @@ final class MembershipController
                 // time so both production (Postgres) and the unit-test path
                 // (SQLite) execute the same intent — case-insensitive
                 // substring match across the related User's email + name.
-                $driver = $query->getConnection()->getDriverName();
+                // `getConnection()` on an Eloquent builder returns a
+                // `ConnectionInterface`, which does not declare
+                // `getDriverName()`. The concrete value is always a
+                // `\Illuminate\Database\Connection` subclass (Postgres or
+                // SQLite under test), so we narrow inline for Larastan.
+                $connection = $query->getConnection();
+                /** @var Connection $connection */
+                $driver = $connection->getDriverName();
                 $isPostgres = $driver === 'pgsql';
                 $needle = mb_strtolower($search);
                 $like = '%'.str_replace('%', '\%', $needle).'%';

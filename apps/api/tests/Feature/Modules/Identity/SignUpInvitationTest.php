@@ -101,12 +101,14 @@ it('accepts a valid invitation: updates the User, flips the relation to roster, 
     expect($response->status())->toBe(201);
 
     $fresh = $invitee->fresh();
+    assert($fresh !== null);
     expect($fresh->name)->toBe('Real Name');
     expect($fresh->email_verified_at)->not->toBeNull();
     expect(Hash::check(STRONG_PASSWORD, $fresh->password))->toBeTrue();
     expect($fresh->preferred_language)->toBe('pt');
 
     $freshRelation = $relation->fresh();
+    assert($freshRelation !== null);
     expect($freshRelation->relationship_status)->toBe(RelationshipStatus::Roster);
     expect($freshRelation->invitation_token_hash)->toBeNull();
 
@@ -170,7 +172,9 @@ it('returns 422 + invitation.expired when the invitation expires_at is past', fu
 
     expect($response->status())->toBe(422);
     expect($response->json('errors.0.code'))->toBe('invitation.expired');
-    expect($invitee->fresh()->email_verified_at)->toBeNull();
+    $fresh = $invitee->fresh();
+    assert($fresh !== null);
+    expect($fresh->email_verified_at)->toBeNull();
 });
 
 // ---------------------------------------------------------------------------
@@ -217,6 +221,7 @@ it('returns 422 + invitation.email_mismatch when the typed email differs from th
 
     // No state changes occurred.
     $fresh = $invitee->fresh();
+    assert($fresh !== null);
     expect($fresh->email_verified_at)->toBeNull();
 });
 

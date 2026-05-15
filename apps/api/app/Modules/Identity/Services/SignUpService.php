@@ -217,7 +217,7 @@ final class SignUpService
             $invitedUser->email_verified_at = now();
             $invitedUser->save();
 
-            $relation->relationship_status = RelationshipStatus::Roster->value;
+            $relation->relationship_status = RelationshipStatus::Roster;
             // Defense-in-depth: clear the token hash so the magic-link
             // can never be replayed.
             $relation->invitation_token_hash = null;
