@@ -267,11 +267,21 @@ jobs:
         run: pnpm --filter @catalyst/main test:e2e
 
       - name: Upload Playwright report
-        if: failure()
+        # `always()` (instead of `failure()`) so traces from
+        # flaky-but-retry-passed attempts are still uploaded — the
+        # `retain-on-failure` trace mode keeps `trace.zip` on disk
+        # for the failed attempt even when the overall test outcome
+        # is "flaky → passed", and we need that trace to diagnose
+        # the creator-wizard-happy-path payout→contract flake noted
+        # in docs/tech-debt.md.
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report-main
-          path: apps/main/playwright-report
+          path: |
+            apps/main/playwright-report
+            apps/main/test-results
+          if-no-files-found: ignore
           retention-days: 14
 
   # ---------------------------------------------------------------------------
@@ -421,9 +431,16 @@ jobs:
         run: pnpm --filter @catalyst/admin test:e2e
 
       - name: Upload Playwright report
-        if: failure()
+        # See the parallel `playwright-report-main` step above for
+        # the `always()` rationale (retains trace.zip on flaky-but-
+        # retry-passed attempts so the next flake is diagnosable
+        # without a follow-up CI re-push).
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report-admin
-          path: apps/admin/playwright-report
+          path: |
+            apps/admin/playwright-report
+            apps/admin/test-results
+          if-no-files-found: ignore
           retention-days: 14
