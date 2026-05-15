@@ -222,8 +222,15 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     // the server-rendered terms to load, tick the checkbox, submit.
     // The ClickThroughAccept component emits 'accepted' on success,
     // which the page handler translates into a router.push to review.
+    //
+    // Generous toHaveURL timeout: this is the FIRST cold-cache hit
+    // for the contract step's lazy-loaded route chunk in the spec
+    // run (the wizard pages are dynamic-import'd by the router) and
+    // CI's first-fetch on a fresh runner is materially slower than
+    // the warm-cache hops between Steps 2-7. 30s lines up with the
+    // step-1 `welcomeBackPage`/Step 2 first-hit timeouts.
     // -----------------------------------------------------------------
-    await expect(page).toHaveURL(/\/onboarding\/contract/, { timeout: 10_000 })
+    await expect(page).toHaveURL(/\/onboarding\/contract/, { timeout: 30_000 })
     await expect(page.locator('[data-testid="step-contract"]')).toBeVisible()
     await expect(page.locator('[data-testid="contract-flag-off"]')).toBeVisible()
     await expect(page.locator('[data-testid="click-through-terms"]')).toBeVisible({
@@ -231,9 +238,16 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     })
     await expect(page.locator('[data-testid="click-through-version"]')).toBeVisible()
 
-    // Vuetify v-checkbox wraps a native input; clicking the label
-    // toggles the model so we click the rendered checkbox container.
-    await page.locator('[data-testid="click-through-checkbox"]').click()
+    // Drill into the nested `<input type="checkbox">` — Vuetify's
+    // v-checkbox renders a Vuetify-styled wrapper around the native
+    // input, and clicks on the OUTER wrapper element don't reliably
+    // dispatch a 'change' on the input element bound to v-model
+    // (the click landing target is the styled selection-control
+    // wrapper, which propagates a click but not the toggle when
+    // hit on dead space). `check()` on the input itself drives the
+    // 'change' event directly so `accepted` flips and the submit
+    // button enables.
+    await page.locator('[data-testid="click-through-checkbox"] input[type="checkbox"]').check()
     await expect(page.locator('[data-testid="click-through-submit"]')).toBeEnabled({
       timeout: 5_000,
     })
