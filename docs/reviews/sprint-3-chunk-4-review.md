@@ -8,6 +8,8 @@
 
 - `eeb7d2b` — work commit (~85 files; sub-steps 1-12 + the two pre-merge spot-check PMC test pins folded into their respective test files; the three CI-pass bug fixes B1/B2/B3 surfaced during the chunk-close E2E pass and fixed inline).
 - `8a5cc6a` — plan-approved follow-up commit (sprint-3 chunk-4 hash + Ready-for-review draft + Sprint 3 self-review draft).
+- `09dc221` — close commit (sprint-3 chunk-4 review final merged version + sprint-3 self-review final merged version).
+- `a924e55` — **post-merge CI fix commit** (`fix(api): resolve 48 Larastan level-8 errors from chunk-4 work commit`). The chunk-4 work commit's pre-commit verification ran Pest + Vitest + vue-tsc but missed `composer stan`; CI run 25931807066 caught 48 PHPStan level-8 errors across 6 files (3 production, 3 test). See "Post-merge CI finding (B4)" below.
 
 **Reviewed against:** `PROJECT-WORKFLOW.md` § 3 (build-pass discipline) + § 5 (standing standards #9, #34, #40–#42), `02-CONVENTIONS.md` § 1 + § 2.2 (modular monolith), `01-UI-UX.md` (design tokens, Vuetify, WCAG 2.1 AA), `03-DATA-MODEL.md` § 5 (Creator is a global entity), `04-API-DESIGN.md` § 1.4 (resource shape) + § 1.5 (error envelope) + § 17 (bulk operations) + § 18 (long-running operations), `05-SECURITY-COMPLIANCE.md` § 3 (audit on state-flipping operations) + § 6.5 (verified-email gate) + § 10 (PII gating), `06-INTEGRATIONS.md`, `07-TESTING.md` § 4-5, `09-ADMIN-PANEL.md` § 6.4 (admin creator management), `20-PHASE-1-SPEC.md` § 5 (Sprint 3 acceptance) + § 7 (critical-path E2E #9), `feature-flags.md`, `security/tenancy.md` § 4 (cross-tenant allowlist), `tech-debt.md` (3 new entries by this chunk; 1 Sprint-2-§-e bundle closed), `docs/reviews/sprint-3-chunk-3-review.md` (pause-condition-6 closure path), `docs/reviews/sprint-2-self-review.md` § e (5-item carry-forward bundle).
 
@@ -304,6 +306,20 @@ Sub-step 5's `requireMfaEnrolled` guard on `/agency-users` broke two pre-existin
 - `playwright/specs/invitations.spec.ts` — the first test (`agency_admin can invite a user via the modal`) drives the TOTP step inline after the password submit.
 - `playwright/specs/permissions.spec.ts` — admin test does the same; the staff-side test was updated to assert the new redirect destination (`/auth/2fa/enable`, not `/brands`), since the chain now fails at `requireMfaEnrolled` before reaching `requireAgencyAdmin`. The staff-cannot-see-Invite-user-button assertion is preserved as a defense-in-depth check on `/brands`.
 
+### B4 — Post-merge CI finding: 48 Larastan level-8 errors caught only by CI
+
+- **Where:** Six files introduced by the chunk-4 work commit (`eeb7d2b`): 3 production (`MembershipController`, `AgencyMembershipResource`, `SignUpService`), 3 test (`AdminCreatorUpdateTest`, `AdminUpdateCreatorRequestRuleParityTest`, `SignUpInvitationTest`).
+- **Discovery:** The chunk-close pushes (`eeb7d2b` → `8a5cc6a` → `09dc221`) all triggered CI; the third (close commit) failed CI run 25931807066's `Backend (Pint + Larastan + Pest)` job at the `Larastan (typecheck, level 8)` step with `Found 48 errors`. Pint, Pest, and Vitest all passed.
+- **Root cause:** The local pre-commit verification loop ran `composer pint:test`, `composer test`, `pnpm test`, `pnpm typecheck` (vue-tsc), and `pnpm test:frontend` — but did NOT run `composer stan`. The work commit's 6 new files carried 48 level-8 strictness errors:
+  - **`MembershipController:73`** — `Illuminate\Database\ConnectionInterface::getDriverName()` is undefined on the interface (the concrete value is always a `Connection` subclass). Fixed by narrowing inline with `/** @var Connection $connection */`.
+  - **`AgencyMembershipResource` (4 sites)** — `$user?->X ?? ''` tripped `nullsafe.neverNull`; plain `->X` tripped `property.nonObject` because `phpstan.neon` sets `treatPhpDocTypesAsCertain: false`. Resolved both by `assert($user !== null, ...)` + `->X`, which also documents the eager-load invariant.
+  - **`SignUpService:220`** — assigned `RelationshipStatus::Roster->value` (a string) to a property cast as `RelationshipStatus` (an enum). Fixed by assigning the enum.
+  - **Test files (~38 sites)** — most are `->first()` / `->fresh()` results being accessed without narrowing the `AuditLog|null` / `Creator|null` / `User|null` return type. Pest's `expect($x)->not->toBeNull()` does NOT narrow types for PHPStan; resolved with explicit `assert($x !== null)` after every such call.
+  - **`AdminUpdateCreatorRequestRuleParityTest`** — three `collect($mixed)` calls couldn't resolve TKey/TValue; resolved with `@var array<int, ...>` annotations on the inputs.
+- **Fix:** Single commit `a924e55` — 6 files modified, 85 insertions, 24 deletions. Pint clean, PHPStan 0 errors (was 48), Pest 810 passing.
+- **CI confirmation:** Run 25932951116 on `a924e55` — all 4 jobs green (Backend, Frontend, E2E main, E2E admin).
+- **Pattern:** This is the **first chunk-4 finding caught only by CI's static-analysis layer** (B1/B2/B3 were unit / E2E findings). Documented as new tech-debt entry ("`composer stan` is not in the local pre-commit verification loop") with three resolution options. The lesson aligns with the Sprint 3 cross-chunk note's broader pattern: **layers running locally that don't catch CI-only steps create a CI-loop-latency cost**. Sprint 4 kickoff is the natural place to add `composer stan` to the standing chunk-close checklist + (optionally) lint-staged.
+
 ---
 
 ## Tech-debt added + closed by this chunk
@@ -316,11 +332,12 @@ Sub-step 5's `requireMfaEnrolled` guard on `/agency-users` broke two pre-existin
 4. **Agency users list pagination + invitation history** → shipped (sub-step 7).
 5. **AcceptInvitationPage email-mismatch + already-member coverage** → Playwright spec shipped (sub-step 8).
 
-### Added (3 entries)
+### Added (4 entries)
 
 1. **`BulkInvitePage exposes onFileSelected` for unit-test access.** Vuetify file-input testability gap. Three resolution options. Trigger: next chunk substantively touching `BulkInvitePage`.
 2. **`seedAgencyAdmin` test-helper hand-rolls recovery codes** instead of calling `RecoveryCodeService::generate()`. Format mismatch invisible at runtime (recovery codes never consumed). Trigger: next spec that consumes a recovery code from a seeded admin.
 3. **Country-code list curations not enforced by architecture test** (added via PMC-7). Backend has no SOT enum to mirror; admin-vs-wizard TS curations are docstring-aligned. Two resolution options (introduce backend `COUNTRY_CODES` enum + pin all three layers; OR frontend-only architecture test diffing the two TS lists).
+4. **`composer stan` (PHPStan / Larastan level 8) is not in the local pre-commit verification loop** (added via the B4 post-merge CI finding). Surfaced because the chunk-4 work commit's 48 PHPStan level-8 errors reached `main` before the static-analysis CI step caught them. Three resolution options (lint-staged hook on staged PHP files; pre-push hook running the full `composer stan` + `composer test`; OR a `composer verify` script wired into the standing chunk-close checklist).
 
 ### Open from prior chunks (carry-forward; not addressed in Chunk 4)
 
@@ -347,17 +364,18 @@ The Cursor draft surfaced three open questions for the independent reviewer. Ans
 
 ## Verification results
 
-| Check                                     | Result            | Notes                                                                                              |
-| ----------------------------------------- | ----------------- | -------------------------------------------------------------------------------------------------- |
-| `php vendor/bin/pest`                     | ✅ 810 passing    | 2,410 assertions                                                                                   |
-| `pnpm --filter @catalyst/main test`       | ✅ 497 passing    | includes PMC-1 + PMC-2 (was 495 before pre-merge corrections)                                      |
-| `pnpm --filter @catalyst/admin test`      | ✅ 270 passing    |                                                                                                    |
-| `pnpm --filter @catalyst/api-client test` | ✅ 94 passing     | includes 2 new FormData / multipart tests                                                          |
-| Architecture tests (main + admin)         | ✅ all passing    | `agency-routes-mfa-guard` 4 invariants + `field-edit-config-parity` 3 invariants                   |
-| Playwright (main)                         | ✅ all passing    | E2E #9 (`bulk-invite-creators`) + new error-paths spec + updated invitations + updated permissions |
-| `vue-tsc` (both SPAs)                     | ✅ clean          |                                                                                                    |
-| `tsc` (api-client)                        | ✅ clean          |                                                                                                    |
-| Pint                                      | ✅ via CI per #41 |                                                                                                    |
+| Check                                     | Result                                  | Notes                                                                                                                                                                                                                                                                                  |
+| ----------------------------------------- | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `php vendor/bin/pest`                     | ✅ 810 passing                          | 2,411 assertions (count includes the B4 post-merge `assert(...)` narrowings that subsumed prior `expect(...)->not->toBeNull()` assertions one-for-one)                                                                                                                                 |
+| `pnpm --filter @catalyst/main test`       | ✅ 497 passing                          | includes PMC-1 + PMC-2 (was 495 before pre-merge corrections)                                                                                                                                                                                                                          |
+| `pnpm --filter @catalyst/admin test`      | ✅ 270 passing                          |                                                                                                                                                                                                                                                                                        |
+| `pnpm --filter @catalyst/api-client test` | ✅ 94 passing                           | includes 2 new FormData / multipart tests                                                                                                                                                                                                                                              |
+| Architecture tests (main + admin)         | ✅ all passing                          | `agency-routes-mfa-guard` 4 invariants + `field-edit-config-parity` 3 invariants                                                                                                                                                                                                       |
+| Playwright (main)                         | ✅ all passing                          | E2E #9 (`bulk-invite-creators`) + new error-paths spec + updated invitations + updated permissions                                                                                                                                                                                     |
+| `vue-tsc` (both SPAs)                     | ✅ clean                                |                                                                                                                                                                                                                                                                                        |
+| `tsc` (api-client)                        | ✅ clean                                |                                                                                                                                                                                                                                                                                        |
+| Pint                                      | ✅ via CI per #41                       |                                                                                                                                                                                                                                                                                        |
+| `composer stan` (Larastan level 8)        | ⚠️ missed pre-merge → ✅ post-`a924e55` | Self-review oversight. The pre-merge verification table did NOT include this row; CI run 25931807066 caught 48 errors on the close commit. Fix landed in `a924e55`; CI run 25932951116 green. New tech-debt entry: "`composer stan` is not in the local pre-commit verification loop". |
 
 **Test count delta** (Chunk 4 close): ~138 net new (~34 backend Pest + ~65 main Vitest + ~35 admin Vitest + 2 architecture-test files + 2 Playwright specs). Inside the kickoff's revised G estimate of ~130-160.
 
@@ -387,6 +405,7 @@ The B1 finding has the largest blast radius of any Sprint 3 bug: avatar + portfo
 - Full #9 user-enumeration defense surface (carried forward from Sprint 3 Chunk 1).
 - Cross-layer contract-gap audit on completeness calculators / submit validations (carried forward from Sprint 3 Chunk 3).
 - Multipart-endpoint E2E coverage audit (NEW from Sprint 3 Chunk 4) — verify every endpoint family with FormData payloads has at least one Playwright spec driving the real DOM path.
+- **Local pre-commit verification loop hardening** (NEW from Sprint 3 Chunk 4 B4 post-merge finding) — add `composer stan` to the standing chunk-close checklist; consider wiring lint-staged or a pre-push hook so static-analysis errors cannot reach `main` ahead of CI catching them.
 
 ---
 
@@ -443,4 +462,4 @@ Chunk 4 = one Cursor session, one plan-approval round-trip with 4 refinements + 
 
 ---
 
-_Provenance: Cursor self-review draft (sub-step 12) → Claude independent review with 6-item spot-check pass (S1-S6) → 7 pre-merge corrections (PMC-1 through PMC-7) landed inline (2 test additions + 5 prose corrections + 1 new tech-debt entry) → 3 E2E-pass bugs fixed inline (B1 multipart Content-Type + B2 stub assertions + B3 missing audit verbs) → Claude merged final review file. Three real product-correctness findings surfaced across Sprint 3 (#9 regression + avatar-completeness + B1 multipart); all captured as durable patterns or tech-debt. **Status: Closed. Sprint 3 Chunk 4 is done. Sprint 3 is closed.**_
+_Provenance: Cursor self-review draft (sub-step 12) → Claude independent review with 6-item spot-check pass (S1-S6) → 7 pre-merge corrections (PMC-1 through PMC-7) landed inline (2 test additions + 5 prose corrections + 1 new tech-debt entry) → 3 E2E-pass bugs fixed inline (B1 multipart Content-Type + B2 stub assertions + B3 missing audit verbs) → Claude merged final review file → **B4 post-merge CI finding** (48 Larastan level-8 errors caught by CI run 25931807066, resolved in `a924e55`; CI run 25932951116 green; 4th tech-debt entry added for the local pre-commit verification gap). Three real product-correctness findings surfaced across Sprint 3 (#9 regression + avatar-completeness + B1 multipart); one tooling-loop finding (B4 static-analysis pre-commit gap); all captured as durable patterns or tech-debt. **Status: Closed. Sprint 3 Chunk 4 is done. Sprint 3 is closed.**_
