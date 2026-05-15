@@ -5,6 +5,7 @@ import {
   clearQueueMode,
   neutralizeThrottle,
   restoreThrottle,
+  seedAvatar,
   seedPortfolioImage,
   setQueueMode,
   signOutViaApi,
@@ -106,11 +107,23 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     await page.locator(dt(testIds.signInSubmit)).click()
     await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
 
-    // Seed via the page-bound helper so the helper inherits the
-    // post-sign-in cookies AND can read the `XSRF-TOKEN` value to
-    // forward as `X-XSRF-TOKEN` — required for the `auth:web`
-    // portfolio-upload route to clear Sanctum's CSRF check.
+    // Seed via page-bound helpers so they inherit the post-sign-in
+    // cookies AND can read the `XSRF-TOKEN` value to forward as
+    // `X-XSRF-TOKEN` — required for the `auth:web` upload routes to
+    // clear Sanctum's CSRF check.
+    //
+    // We seed BOTH the portfolio image AND the avatar because the
+    // backend's `CompletenessScoreCalculator::isProfileComplete`
+    // (apps/api/.../CompletenessScoreCalculator.php) requires
+    // `avatar_path !== null` for the profile step's `is_complete`
+    // to flip to true. Without the avatar seed the SPA happily
+    // advances client-side, but on Step 9 the review-submit button
+    // stays disabled because `incompleteSteps` keeps `profile` in
+    // the list. Driving the AvatarUploadDrop UI from the spec is
+    // unnecessary noise — that surface has its own Vitest coverage
+    // (`useAvatarUpload.spec.ts` + `AvatarUploadDrop.spec.ts`).
     await seedPortfolioImage(page)
+    await seedAvatar(page)
 
     // -----------------------------------------------------------------
     // /onboarding — Welcome Back page renders on first mount in this
@@ -224,7 +237,15 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     await expect(page.locator('[data-testid="payout-advance"]')).toBeEnabled({
       timeout: 10_000,
     })
-    await page.locator('[data-testid="payout-advance"]').click()
+    // Pair the click with an explicit `waitForURL` so we don't poll
+    // `toHaveURL` against a navigation that has not yet been
+    // initiated. This was the symptom on CI run 25896340741 attempt
+    // #1: the click fired during a re-render flush and the router
+    // push lost the race against the poll's 30s budget.
+    await Promise.all([
+      page.waitForURL(/\/onboarding\/contract/, { timeout: 30_000 }),
+      page.locator('[data-testid="payout-advance"]').click(),
+    ])
 
     // -----------------------------------------------------------------
     // Step 8 — Contract. Flag OFF; click-through fallback. Wait for
@@ -232,15 +253,10 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     // The ClickThroughAccept component emits 'accepted' on success,
     // which the page handler translates into a router.push to review.
     //
-    // Generous toHaveURL timeout: this is the FIRST cold-cache hit
-    // for the contract step's lazy-loaded route chunk in the spec
-    // run (the wizard pages are dynamic-import'd by the router) and
-    // CI's first-fetch on a fresh runner is materially slower than
-    // the warm-cache hops between Steps 2-7. 30s lines up with the
-    // step-1 `welcomeBackPage`/Step 2 first-hit timeouts.
+    // The waitForURL above already pinned us to /onboarding/contract;
+    // assert step-contract is rendered before driving the click-through.
     // -----------------------------------------------------------------
-    await expect(page).toHaveURL(/\/onboarding\/contract/, { timeout: 30_000 })
-    await expect(page.locator('[data-testid="step-contract"]')).toBeVisible()
+    await expect(page.locator('[data-testid="step-contract"]')).toBeVisible({ timeout: 10_000 })
     await expect(page.locator('[data-testid="contract-flag-off"]')).toBeVisible()
     await expect(page.locator('[data-testid="click-through-terms"]')).toBeVisible({
       timeout: 10_000,

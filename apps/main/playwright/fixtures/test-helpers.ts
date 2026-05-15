@@ -465,6 +465,53 @@ export async function verifyEmailViaApi(request: APIRequestContext, email: strin
   }
 }
 
+/**
+ * Upload a tiny in-memory PNG to the production avatar endpoint so
+ * the signed-in creator has `avatar_path` set. The Step-2 backend
+ * completeness check (`CompletenessScoreCalculator::isProfileComplete`)
+ * requires `avatar_path !== null` — without it, the profile step's
+ * `is_complete` stays `false` server-side regardless of the SPA's
+ * client-side advance, and `review-submit` on Step 9 stays disabled
+ * because `incompleteSteps` keeps profile in the list.
+ *
+ * Same shape as {@link seedPortfolioImage}: takes a `Page`, reads
+ * `XSRF-TOKEN` from the page's cookie jar, and forwards Referer +
+ * `X-XSRF-TOKEN` so Sanctum's stateful + CSRF gates clear on the
+ * `auth:web`-gated upload route. See the long comment on
+ * {@link seedPortfolioImage} for the Sanctum stateful reasoning.
+ */
+export async function seedAvatar(page: Page): Promise<{ avatarPath: string }> {
+  const png = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkAAIAAAoAAv/lxKUAAAAASUVORK5CYII=',
+    'base64',
+  )
+
+  const cookies = await page.context().cookies()
+  const xsrfCookie = cookies.find((c) => c.name === 'XSRF-TOKEN')
+  const xsrfToken = xsrfCookie ? decodeURIComponent(xsrfCookie.value) : ''
+
+  const response = await page
+    .context()
+    .request.post('http://127.0.0.1:8000/api/v1/creators/me/avatar', {
+      headers: {
+        Accept: 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        Referer: 'http://127.0.0.1:5173/',
+        'X-XSRF-TOKEN': xsrfToken,
+      },
+      multipart: {
+        file: { name: 'seed-avatar.png', mimeType: 'image/png', buffer: png },
+      },
+    })
+
+  if (response.status() !== 200) {
+    throw new Error(`seedAvatar failed with status ${response.status()}: ${await response.text()}`)
+  }
+
+  const body = (await response.json()) as { data: { avatar_path: string } }
+  return { avatarPath: body.data.avatar_path }
+}
+
 export interface SeedPortfolioImageResult {
   id: string
 }
