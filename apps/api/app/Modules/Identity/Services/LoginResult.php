@@ -38,6 +38,14 @@ use App\Modules\Identity\Models\User;
  *                          `auth.account_locked.suspended`. 423.
  *   - TemporarilyLocked  → too many failures in the 15-minute window.
  *                          `auth.account_locked.temporary`. 423.
+ *   - WrongSpa           → credentials are valid but the user's type is
+ *                          not allowed for the SPA the request hit. 403
+ *                          with `auth.wrong_spa`. The session is NOT
+ *                          attached, no failed-login counter increment
+ *                          (the credentials were correct), and the
+ *                          response carries the correct SPA URL in
+ *                          `meta.correct_spa_url` so the wrong-side SPA
+ *                          can offer a one-click redirect.
  */
 final readonly class LoginResult
 {
@@ -85,5 +93,10 @@ final readonly class LoginResult
     public static function temporarilyLocked(int $retryAfterSeconds): self
     {
         return new self(LoginResultStatus::TemporarilyLocked, retryAfterSeconds: $retryAfterSeconds);
+    }
+
+    public static function wrongSpa(User $user): self
+    {
+        return new self(LoginResultStatus::WrongSpa, user: $user);
     }
 }

@@ -16,6 +16,7 @@ return [
         'account_locked_temporary' => 'Demasiadas tentativas falhadas. Tente novamente em :minutes minutos.',
         'account_locked' => 'Esta conta foi bloqueada. Redefina a palavra-passe ou contacte o suporte para recuperar o acesso.',
         'rate_limited' => 'Demasiados pedidos. Tente novamente em :seconds segundos.',
+        'wrong_spa' => 'Esta conta não está registada para este site. Inicie sessão no site correto.',
     ],
 
     'reset' => [

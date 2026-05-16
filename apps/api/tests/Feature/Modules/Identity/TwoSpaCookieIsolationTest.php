@@ -72,3 +72,71 @@ it('overwrites config(session.cookie) on admin paths only', function (): void {
     $middleware->handle(Request::create('/api/v1/admin/auth/login', 'POST'), $next);
     expect(config('session.cookie'))->toBe(UseAdminSessionCookie::COOKIE);
 });
+
+it('shouldApply fires on /sanctum/csrf-cookie when Origin matches the admin SPA URL', function (): void {
+    // Reproduces the chunk-6 admin-login fix. Before the widening,
+    // `/sanctum/csrf-cookie` always ran under the main session, so the
+    // CSRF token issued for an admin-SPA preflight ended up in the wrong
+    // session and the follow-up `/api/v1/admin/auth/login` POST 419'd.
+    config()->set('app.frontend_admin_url', 'http://127.0.0.1:5174');
+
+    $request = Request::create('/sanctum/csrf-cookie', 'GET');
+    $request->headers->set('Origin', 'http://127.0.0.1:5174');
+
+    expect(UseAdminSessionCookie::shouldApply($request))->toBeTrue();
+});
+
+it('shouldApply does NOT fire on /sanctum/csrf-cookie from the main SPA Origin', function (): void {
+    config()->set('app.frontend_admin_url', 'http://127.0.0.1:5174');
+
+    $request = Request::create('/sanctum/csrf-cookie', 'GET');
+    $request->headers->set('Origin', 'http://127.0.0.1:5173');
+
+    expect(UseAdminSessionCookie::shouldApply($request))->toBeFalse();
+});
+
+it('shouldApply does NOT fire on /sanctum/csrf-cookie with no Origin and no Referer', function (): void {
+    // A bare same-origin preflight without any browser-issued Origin
+    // header (e.g. server-side health probes, curl without -e) must
+    // continue to use the main session so we don't accidentally flip
+    // unrelated traffic onto the admin cookie.
+    config()->set('app.frontend_admin_url', 'http://127.0.0.1:5174');
+
+    $request = Request::create('/sanctum/csrf-cookie', 'GET');
+
+    expect(UseAdminSessionCookie::shouldApply($request))->toBeFalse();
+});
+
+it('shouldApply falls back to Referer when Origin is absent on the CSRF preflight', function (): void {
+    // Some browsers omit Origin on simple GETs but still send Referer.
+    // The middleware must accept that fallback so the admin SPA's
+    // preflight is still detected.
+    config()->set('app.frontend_admin_url', 'http://127.0.0.1:5174');
+
+    $request = Request::create('/sanctum/csrf-cookie', 'GET');
+    $request->headers->set('Referer', 'http://127.0.0.1:5174/login');
+
+    expect(UseAdminSessionCookie::shouldApply($request))->toBeTrue();
+});
+
+it('shouldApply ignores trailing slash differences between Origin and configured admin URL', function (): void {
+    config()->set('app.frontend_admin_url', 'http://127.0.0.1:5174/');
+
+    $request = Request::create('/sanctum/csrf-cookie', 'GET');
+    $request->headers->set('Origin', 'http://127.0.0.1:5174');
+
+    expect(UseAdminSessionCookie::shouldApply($request))->toBeTrue();
+});
+
+it('shouldApply only widens for the csrf-cookie path, not arbitrary top-level paths from the admin origin', function (): void {
+    // The widening is keyed on the specific Sanctum preflight path so we
+    // don't accidentally treat unrelated top-level traffic (e.g. health
+    // checks, OAuth callbacks) as admin-session-bound just because the
+    // browser happens to be on the admin SPA.
+    config()->set('app.frontend_admin_url', 'http://127.0.0.1:5174');
+
+    $request = Request::create('/api/v1/health', 'GET');
+    $request->headers->set('Origin', 'http://127.0.0.1:5174');
+
+    expect(UseAdminSessionCookie::shouldApply($request))->toBeFalse();
+});

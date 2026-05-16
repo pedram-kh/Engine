@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Services;
 
+use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Events\LoginFailed;
 use App\Modules\Identity\Events\UserLoggedIn;
 use App\Modules\Identity\Events\UserLoggedOut;
@@ -45,18 +46,57 @@ use SensitiveParameter;
  *      changes propagate transparently on the user's next login. This is
  *      called in plaintext-still-in-memory window only.
  *
- *   6. MFA gate — if `users.two_factor_confirmed_at IS NOT NULL` we stop
+ *   6. SPA-mismatch gate — the (guard, user.type) pair must appear in
+ *      {@see SPA_USER_TYPE_ALLOW_LIST}. A PlatformAdmin who supplies
+ *      valid credentials on the agency SPA's `web` guard (or, mirrored,
+ *      an AgencyUser / Creator on `web_admin`) is rejected with
+ *      `auth.wrong_spa` 403 — no session attached, no rehash, no MFA
+ *      challenge. The response carries the correct SPA URL in
+ *      `meta.correct_spa_url` so the SPA can offer a one-click hop.
+ *      This gate sits AFTER credential verification on purpose: we
+ *      never reveal SPA-eligibility for an unknown email or a wrong
+ *      password (which would be a soft enumeration oracle for the
+ *      population of platform admins).
+ *
+ *   7. MFA gate — if `users.two_factor_confirmed_at IS NOT NULL` we stop
  *      here with `auth.mfa_required`. The session is NOT attached. The
  *      MFA challenge endpoint (Sprint 1 chunk 5) will complete the login
  *      after a valid TOTP code. The branch is wired honestly today even
  *      though no users have 2FA in chunk 3.
  *
- *   7. Session attached via the configured guard. last_login_at /
+ *   8. Session attached via the configured guard. last_login_at /
  *      last_login_ip stamped. Failed-login counter cleared.
  *      {@see UserLoggedIn} emitted, listener writes audit row.
  */
 final class AuthService
 {
+    /**
+     * Allow-list of user types per SPA guard. The agency SPA (`web`)
+     * serves Creators (onboarding wizard + welcome-back flow) and
+     * AgencyUsers (the role-stratified team UI). The admin SPA
+     * (`web_admin`) serves PlatformAdmins exclusively. Any user type
+     * not enumerated here for a given guard is treated as a SPA
+     * mismatch and short-circuits with WrongSpa.
+     *
+     * `BrandUser` is reserved for Phase 2 (see
+     * docs/20-PHASE-1-SPEC.md §3) and intentionally absent everywhere
+     * — the schema knows about it, but no SPA serves it today, so a
+     * brand-user attempting either side falls through to WrongSpa.
+     *
+     * Guards outside the SPA axis (e.g. `api`, `sanctum` token auth)
+     * do not flow through this code path because the SPA login
+     * controller hard-codes `web` / `web_admin` based on the matched
+     * route name. If a future caller passes an unknown guard string,
+     * we fail open (no gate) — that is the conservative posture for a
+     * defensive check whose contract is "wrong SPA, not wrong auth".
+     *
+     * @var array<string, list<UserType>>
+     */
+    private const SPA_USER_TYPE_ALLOW_LIST = [
+        'web' => [UserType::Creator, UserType::AgencyUser],
+        'web_admin' => [UserType::PlatformAdmin],
+    ];
+
     public function __construct(
         private readonly AuthFactory $auth,
         private readonly Dispatcher $events,
@@ -116,6 +156,19 @@ final class AuthService
             $this->events->dispatch(new LoginFailed($email, $user, $ip, $userAgent, 'account_suspended'));
 
             return LoginResult::accountSuspended($user);
+        }
+
+        // SPA-mismatch gate. Placed after credential + suspension
+        // verification so a probe with a wrong password or against a
+        // suspended account never leaks "this email belongs to a
+        // platform admin" (a soft enumeration oracle). The session
+        // attachment + rehash + MFA challenge below are all skipped on
+        // a mismatch so the wrong-side flow has no side effects on the
+        // user's account.
+        if (! self::guardAcceptsUserType($guard, $user->type)) {
+            $this->events->dispatch(new LoginFailed($email, $user, $ip, $userAgent, 'wrong_spa'));
+
+            return LoginResult::wrongSpa($user);
         }
 
         if (Hash::needsRehash($user->password)) {
@@ -246,5 +299,22 @@ final class AuthService
         if ($counts['short_window_count'] >= FailedLoginTracker::SHORT_WINDOW_THRESHOLD) {
             $this->lockout->temporaryLock($email);
         }
+    }
+
+    /**
+     * Returns true if the SPA reachable via `$guard` is expected to
+     * serve a user of `$type`. Unknown guards (anything outside the
+     * `web` / `web_admin` SPA pair) fail open — the WrongSpa gate is
+     * specifically about the two-SPA topology and should not interfere
+     * with API-token flows that may land here in the future.
+     */
+    private static function guardAcceptsUserType(string $guard, UserType $type): bool
+    {
+        $allowed = self::SPA_USER_TYPE_ALLOW_LIST[$guard] ?? null;
+        if ($allowed === null) {
+            return true;
+        }
+
+        return in_array($type, $allowed, true);
     }
 }

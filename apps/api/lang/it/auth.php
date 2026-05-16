@@ -16,6 +16,7 @@ return [
         'account_locked_temporary' => 'Troppi tentativi di accesso falliti. Riprova tra :minutes minuti.',
         'account_locked' => "Questo account è stato bloccato. Reimposta la password o contatta l'assistenza per ripristinare l'accesso.",
         'rate_limited' => 'Troppe richieste. Riprova tra :seconds secondi.',
+        'wrong_spa' => 'Questo account non è registrato per questo sito. Accedi sul sito corretto.',
     ],
 
     'reset' => [

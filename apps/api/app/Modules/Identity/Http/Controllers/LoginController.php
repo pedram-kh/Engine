@@ -59,6 +59,19 @@ final class LoginController
         return match ($result->status) {
             LoginResultStatus::Success => UserResource::make($result->user)->response(),
 
+            LoginResultStatus::WrongSpa => ErrorResponse::single(
+                request: $request,
+                status: 403,
+                code: 'auth.wrong_spa',
+                title: trans('auth.login.wrong_spa'),
+                // The receiving SPA uses `meta.correct_spa_url` to render
+                // a "Go to the right login page" link. We always return
+                // the OTHER SPA's URL (relative to the guard that just
+                // rejected the user) so the wrong-side flow has a single,
+                // unambiguous next step.
+                meta: ['correct_spa_url' => self::correctSpaUrlForUser($request)],
+            ),
+
             LoginResultStatus::InvalidCredentials => ErrorResponse::single(
                 request: $request,
                 status: 401,
@@ -116,5 +129,20 @@ final class LoginController
                 headers: ['Retry-After' => (string) ($result->retryAfterSeconds ?? 0)],
             ),
         };
+    }
+
+    /**
+     * Resolves the "other-side" SPA URL for the guard that just
+     * rejected the user. The wrong-SPA envelope carries this on
+     * `meta.correct_spa_url` so the SPA can render a one-click hop.
+     *
+     * Routing-by-name lets us mirror {@see resolveGuard()} exactly —
+     * any future admin login route still flows through this branch.
+     */
+    private static function correctSpaUrlForUser(LoginRequest $request): string
+    {
+        return self::resolveGuard($request) === 'web_admin'
+            ? (string) config('app.frontend_main_url', '')
+            : (string) config('app.frontend_admin_url', '');
     }
 }

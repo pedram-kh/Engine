@@ -33,6 +33,7 @@ return [
         'account_locked_temporary' => 'Too many failed sign-in attempts. Please try again in :minutes minutes.',
         'account_locked' => 'This account has been locked. Reset your password or contact support to regain access.',
         'rate_limited' => 'Too many requests. Please try again in :seconds seconds.',
+        'wrong_spa' => 'This account is not registered for this site. Please sign in on the correct site.',
     ],
 
     'reset' => [
