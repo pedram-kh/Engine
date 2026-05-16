@@ -232,6 +232,28 @@ class under `apps/api/app/Modules/*/Jobs/`, restart the worker (Ctrl-C
 → re-run). For the `pnpm dev` workflow, stopping and restarting
 `pnpm dev` restarts the worker along with the rest of the stack.
 
+### 7.5 Stale jobs after `db:reset`
+
+Mail jobs and any job that uses `SerializesModels` (the Laravel
+default) pass Eloquent models by ID through the queue. Redis survives
+`db:reset` / `migrate:fresh --seed`, so jobs queued before a reset
+reference user IDs that no longer exist after it. When the worker
+eventually processes them, they fail with:
+
+> `ModelNotFoundException: No query results for model [App\Modules\Identity\Models\User]`
+
+This is not a code bug — it's a queue-vs-database lifecycle mismatch
+specific to local dev. Clear the wreckage with:
+
+```bash
+cd apps/api && php artisan queue:clear redis --queue=default  # drop pending jobs
+cd apps/api && php artisan queue:flush                          # drop failed-job entries
+```
+
+Production isn't affected: users aren't deleted between mail dispatch
+and the worker picking the job up within seconds, and production never
+runs `db:reset`.
+
 ---
 
 ## 8. Where this is enforced
