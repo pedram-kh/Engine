@@ -194,8 +194,7 @@ it('brand creation validates required fields', function (): void {
 
     $this->actingAs($user)
         ->postJson("/api/v1/agencies/{$agency->ulid}/brands", [])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['name', 'slug']);
+        ->assertEnvelopeValidationErrors(['name', 'slug']);
 });
 
 it('brand slug must be unique within agency', function (): void {

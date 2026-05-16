@@ -123,6 +123,5 @@ it('limits per email — different addresses are independently allowed', functio
 
 it('rejects requests missing the email field with 422', function (): void {
     $this->postJson('/api/v1/auth/resend-verification', [])
-        ->assertStatus(422)
-        ->assertJsonValidationErrors(['email']);
+        ->assertEnvelopeValidationErrors(['email']);
 });

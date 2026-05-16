@@ -135,8 +135,7 @@ it('rejects a breached password (HIBP) — same rule as password reset', functio
     });
 
     $this->postJson('/api/v1/auth/sign-up', VALID_PAYLOAD)
-        ->assertStatus(422)
-        ->assertJsonValidationErrors(['password']);
+        ->assertEnvelopeValidationErrors(['password']);
 
     expect(User::query()->where('email', 'pedro@example.com')->exists())->toBeFalse();
 });
@@ -148,8 +147,7 @@ it('rejects a too-short password — same StrongPassword rule as reset', functio
         ...VALID_PAYLOAD,
         'password' => 'shortpw',
         'password_confirmation' => 'shortpw',
-    ])->assertStatus(422)
-        ->assertJsonValidationErrors(['password']);
+    ])->assertEnvelopeValidationErrors(['password']);
 });
 
 it('rejects unconfirmed password', function (): void {
@@ -158,8 +156,7 @@ it('rejects unconfirmed password', function (): void {
     $this->postJson('/api/v1/auth/sign-up', [
         ...VALID_PAYLOAD,
         'password_confirmation' => 'different-passphrase-12',
-    ])->assertStatus(422)
-        ->assertJsonValidationErrors(['password']);
+    ])->assertEnvelopeValidationErrors(['password']);
 });
 
 it('rejects an already-registered email', function (): void {
@@ -168,8 +165,7 @@ it('rejects an already-registered email', function (): void {
     User::factory()->createOne(['email' => 'pedro@example.com']);
 
     $this->postJson('/api/v1/auth/sign-up', VALID_PAYLOAD)
-        ->assertStatus(422)
-        ->assertJsonValidationErrors(['email']);
+        ->assertEnvelopeValidationErrors(['email']);
 });
 
 it('rejects a duplicate email regardless of case (Form Request normalises)', function (): void {
@@ -180,8 +176,7 @@ it('rejects a duplicate email regardless of case (Form Request normalises)', fun
     $this->postJson('/api/v1/auth/sign-up', [
         ...VALID_PAYLOAD,
         'email' => 'PEDRO@example.com',
-    ])->assertStatus(422)
-        ->assertJsonValidationErrors(['email']);
+    ])->assertEnvelopeValidationErrors(['email']);
 });
 
 it('rejects a malformed email', function (): void {
@@ -190,8 +185,7 @@ it('rejects a malformed email', function (): void {
     $this->postJson('/api/v1/auth/sign-up', [
         ...VALID_PAYLOAD,
         'email' => 'not-an-email',
-    ])->assertStatus(422)
-        ->assertJsonValidationErrors(['email']);
+    ])->assertEnvelopeValidationErrors(['email']);
 });
 
 it('rejects an unsupported preferred_language', function (): void {
@@ -200,8 +194,7 @@ it('rejects an unsupported preferred_language', function (): void {
     $this->postJson('/api/v1/auth/sign-up', [
         ...VALID_PAYLOAD,
         'preferred_language' => 'fr',
-    ])->assertStatus(422)
-        ->assertJsonValidationErrors(['preferred_language']);
+    ])->assertEnvelopeValidationErrors(['preferred_language']);
 });
 
 // -----------------------------------------------------------------------------

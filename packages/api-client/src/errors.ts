@@ -182,6 +182,65 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Group a validation {@link ApiError}'s `details` array into a map keyed
+ * by backend field name, with each value being the ordered list of
+ * error messages for that field. Mirrors the JSON:API envelope from
+ * `docs/04-API-DESIGN.md §8` — each entry's `source.pointer` of shape
+ * `/data/attributes/<field>` is the source of truth; `meta.field` is
+ * the same identifier denormalised for convenience and acts as a
+ * fallback when an upstream proxy or future server version omits the
+ * pointer.
+ *
+ * Designed for form pages that bind per-field error banners (e.g.
+ * Vuetify `error-messages`). Returns an empty object for non-422 / no-
+ * field errors so the caller can pass the result through unconditionally.
+ *
+ * Use the generic parameter to narrow the returned key type to a known
+ * union of field names if you have one (e.g. `keyof CreateBrandPayload`).
+ *
+ * @example
+ *   const fieldErrors = extractFieldErrors<keyof CreateBrandPayload>(err)
+ *   // → { slug: ['The slug field is required.'] }
+ */
+export function extractFieldErrors<TField extends string = string>(
+  error: ApiError,
+): Partial<Record<TField, readonly string[]>> {
+  const out: Record<string, string[]> = {}
+
+  for (const detail of error.details) {
+    const field = fieldFromDetail(detail)
+    if (field === null) continue
+
+    const message = detail.detail ?? detail.title
+    if (typeof message !== 'string' || message.length === 0) continue
+
+    const bucket = out[field] ?? []
+    bucket.push(message)
+    out[field] = bucket
+  }
+
+  return out as unknown as Partial<Record<TField, readonly string[]>>
+}
+
+function fieldFromDetail(detail: ApiErrorDetail): string | null {
+  const pointer = detail.source?.pointer
+  if (typeof pointer === 'string') {
+    const prefix = '/data/attributes/'
+    if (pointer.startsWith(prefix)) {
+      const tail = pointer.slice(prefix.length)
+      if (tail.length > 0) return tail
+    }
+  }
+
+  const meta = detail.meta
+  if (meta !== undefined && typeof meta['field'] === 'string') {
+    return meta['field']
+  }
+
+  return null
+}
+
 function isObjectRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }

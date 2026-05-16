@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CreateBrandPayload } from '@catalyst/api-client'
+import { ApiError, extractFieldErrors, type CreateBrandPayload } from '@catalyst/api-client'
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -20,6 +20,7 @@ const loading = ref(true)
 const submitting = ref(false)
 const loadError = ref<string | null>(null)
 const saveError = ref<string | null>(null)
+const fieldErrors = ref<Partial<Record<keyof CreateBrandPayload, readonly string[]>>>({})
 
 async function loadBrand(): Promise<void> {
   const agencyId = agencyStore.currentAgencyId
@@ -52,12 +53,30 @@ async function onSubmit(): Promise<void> {
 
   submitting.value = true
   saveError.value = null
+  fieldErrors.value = {}
 
   try {
     await brandsApi.update(agencyId, ulid, form.value)
     await router.push({ name: 'brands.detail', params: { ulid } })
-  } catch {
-    saveError.value = t('app.brands.errors.saveFailed')
+  } catch (err) {
+    if (err instanceof ApiError) {
+      const grouped = extractFieldErrors<keyof CreateBrandPayload>(err)
+      fieldErrors.value = grouped
+
+      if (Object.keys(grouped).length === 0) {
+        saveError.value = `[${err.code}] ${err.message}`
+      }
+
+      console.error('[BrandEditPage] save failed', {
+        status: err.status,
+        code: err.code,
+        details: err.details,
+        requestId: err.requestId,
+      })
+    } else {
+      saveError.value = t('app.brands.errors.saveFailed')
+      console.error('[BrandEditPage] save failed (non-ApiError)', err)
+    }
   } finally {
     submitting.value = false
   }
@@ -94,6 +113,7 @@ onMounted(loadBrand)
         :submitting="submitting"
         :submit-label="t('app.brands.actions.save')"
         :error="saveError"
+        :field-errors="fieldErrors"
         @submit="onSubmit"
       />
     </v-card>

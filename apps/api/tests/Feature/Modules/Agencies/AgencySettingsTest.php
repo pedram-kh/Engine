@@ -142,8 +142,7 @@ it('validates default_language against supported locales', function (): void {
         ->patchJson("/api/v1/agencies/{$agency->ulid}/settings", [
             'default_language' => 'fr',
         ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['default_language']);
+        ->assertEnvelopeValidationErrors(['default_language']);
 });
 
 it('validates default_currency must be 3 characters', function (): void {
@@ -154,6 +153,5 @@ it('validates default_currency must be 3 characters', function (): void {
         ->patchJson("/api/v1/agencies/{$agency->ulid}/settings", [
             'default_currency' => 'EU', // too short
         ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['default_currency']);
+        ->assertEnvelopeValidationErrors(['default_currency']);
 });

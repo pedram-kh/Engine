@@ -206,8 +206,7 @@ it('rejects a too-short password with auth.password.too_short', function (): voi
         'token' => $token,
         'password' => 'shortpw',
         'password_confirmation' => 'shortpw',
-    ])->assertStatus(422)
-        ->assertJsonValidationErrors(['password']);
+    ])->assertEnvelopeValidationErrors(['password']);
 });
 
 it('rejects a breached password (HIBP) with auth.password.breached', function (): void {
@@ -229,8 +228,7 @@ it('rejects a breached password (HIBP) with auth.password.breached', function ()
         'password_confirmation' => 'a-very-strong-passphrase-1234',
     ]);
 
-    $response->assertStatus(422)
-        ->assertJsonValidationErrors(['password']);
+    $response->assertEnvelopeValidationErrors(['password']);
 });
 
 it('rejects a non-confirmed password', function (): void {
@@ -242,6 +240,5 @@ it('rejects a non-confirmed password', function (): void {
         'token' => $token,
         'password' => 'a-brand-new-passphrase-1234',
         'password_confirmation' => 'something-else',
-    ])->assertStatus(422)
-        ->assertJsonValidationErrors(['password']);
+    ])->assertEnvelopeValidationErrors(['password']);
 });

@@ -98,8 +98,7 @@ it('invitation creation validates role field', function (): void {
             'email' => 'test@example.com',
             'role' => 'invalid_role',
         ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['role']);
+        ->assertEnvelopeValidationErrors(['role']);
 });
 
 it('invitation creation succeeds for existing-user email (user-enumeration defence)', function (): void {

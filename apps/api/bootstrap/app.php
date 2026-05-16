@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Core\Errors\ValidationExceptionRenderer;
 use App\Core\Tenancy\EnsureTenancyContext;
 use App\Core\Tenancy\SetTenancyContext;
 use App\Core\Tenancy\SetTenancyFromAgencyRoute;
@@ -10,6 +11,8 @@ use App\Modules\Identity\Http\Middleware\UseAdminSessionCookie;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -54,5 +57,23 @@ return Application::configure(basePath: dirname(__DIR__))
         // Module-specific middleware is registered by each module's ServiceProvider.
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Normalize FormRequest validation failures to the canonical JSON:API
+        // error envelope (docs/04-API-DESIGN.md §8). Without this, Laravel's
+        // default validation renderer returns `{message, errors:{field:[]}}`,
+        // which the SPA's `ApiError.fromEnvelope` parser rejects as malformed
+        // — surfacing every 422 as `[http.invalid_response_body]` in the UI.
+        // See `App\Core\Errors\ValidationExceptionRenderer` for the contract.
+        //
+        // Scope-guarded to JSON requests so we don't disturb any future
+        // server-rendered web form (the api/ apps emit JSON only today,
+        // but the gate is cheap and forward-compatible).
+        //
         // Module-specific exception rendering is registered by each module's ServiceProvider.
+        $exceptions->render(function (ValidationException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return ValidationExceptionRenderer::render($e, $request);
+            }
+
+            return null;
+        });
     })->create();

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { ApiError } from './errors'
+import { ApiError, extractFieldErrors } from './errors'
 
 describe('ApiError', () => {
   it('preserves status, code, message, details, raw, requestId from a well-formed envelope', () => {
@@ -142,5 +142,99 @@ describe('ApiError', () => {
 
     await expect(probe()).rejects.toBeInstanceOf(ApiError)
     await expect(probe()).rejects.toMatchObject({ code: 'auth.invalid_credentials' })
+  })
+})
+
+describe('extractFieldErrors', () => {
+  it('groups envelope details by /data/attributes/<field> pointer', () => {
+    const err = ApiError.fromEnvelope(422, {
+      errors: [
+        {
+          code: 'validation.failed',
+          title: 'The slug field is required.',
+          detail: 'The slug field is required.',
+          source: { pointer: '/data/attributes/slug' },
+          meta: { field: 'slug' },
+        },
+        {
+          code: 'validation.failed',
+          title: 'The name field is required.',
+          detail: 'The name field is required.',
+          source: { pointer: '/data/attributes/name' },
+          meta: { field: 'name' },
+        },
+      ],
+      meta: { request_id: 'req-1' },
+    })
+
+    expect(extractFieldErrors(err)).toEqual({
+      slug: ['The slug field is required.'],
+      name: ['The name field is required.'],
+    })
+  })
+
+  it('collects multiple messages for the same field in order', () => {
+    const err = ApiError.fromEnvelope(422, {
+      errors: [
+        {
+          code: 'validation.failed',
+          title: 'slug must be kebab-case',
+          source: { pointer: '/data/attributes/slug' },
+        },
+        {
+          code: 'validation.failed',
+          title: 'slug is already taken',
+          detail: 'slug is already taken',
+          source: { pointer: '/data/attributes/slug' },
+        },
+      ],
+    })
+
+    expect(extractFieldErrors(err)).toEqual({
+      slug: ['slug must be kebab-case', 'slug is already taken'],
+    })
+  })
+
+  it('falls back to meta.field when source.pointer is absent', () => {
+    const err = ApiError.fromEnvelope(422, {
+      errors: [
+        {
+          code: 'validation.failed',
+          title: 'industry is required',
+          meta: { field: 'industry' },
+        },
+      ],
+    })
+
+    expect(extractFieldErrors(err)).toEqual({ industry: ['industry is required'] })
+  })
+
+  it('ignores entries with neither pointer nor meta.field', () => {
+    const err = ApiError.fromEnvelope(500, {
+      errors: [{ code: 'http.unknown_error', title: 'Something broke.' }],
+    })
+
+    expect(extractFieldErrors(err)).toEqual({})
+  })
+
+  it('prefers detail over title when both are present', () => {
+    const err = ApiError.fromEnvelope(422, {
+      errors: [
+        {
+          code: 'validation.failed',
+          title: 'short header',
+          detail: 'long human-readable explanation',
+          source: { pointer: '/data/attributes/website_url' },
+        },
+      ],
+    })
+
+    expect(extractFieldErrors(err)).toEqual({
+      website_url: ['long human-readable explanation'],
+    })
+  })
+
+  it('returns an empty object for an error with no details (e.g. transport failure)', () => {
+    expect(extractFieldErrors(ApiError.fromNetworkError(new Error('boom')))).toEqual({})
   })
 })

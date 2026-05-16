@@ -150,6 +150,5 @@ it('returns 400 with auth.email.verification_invalid when the email changed afte
 
 it('rejects requests missing the token field with 422', function (): void {
     $this->postJson('/api/v1/auth/verify-email', [])
-        ->assertStatus(422)
-        ->assertJsonValidationErrors(['token']);
+        ->assertEnvelopeValidationErrors(['token']);
 });
