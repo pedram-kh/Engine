@@ -173,7 +173,68 @@ dockerised MinIO), set `AWS_ENDPOINT_URL=http://127.0.0.1:9000` instead.
 
 ---
 
-## 7. Where this is enforced
+## 7. Queue worker
+
+Several async features dispatch jobs to a queue rather than running
+inline. Bulk creator-invitation (`/creator-invitations/bulk`) is the
+most visible example; the hybrid-completion saga that powers the
+creator wizard's vendor-gated steps (KYC / payout / contract) also
+dispatches saga jobs. **Local dev must run a worker** or these flows
+appear to hang on the initial `queued` status with 0% progress.
+
+### 7.1 Default driver
+
+`apps/api/.env.example` sets `QUEUE_CONNECTION=redis`. The fallback in
+`config/queue.php` is `database`. Both require a worker process —
+neither runs jobs inline.
+
+Two surfaces bypass this for automated tests:
+
+- `apps/api/phpunit.xml` overrides `QUEUE_CONNECTION=sync` → Pest
+  dispatches synchronously.
+- Playwright specs that exercise async flows call
+  `setQueueMode(request, 'sync')` via the chunk-6.1 helper-token
+  middleware → E2E bypass too.
+
+This is why the test suites stay green even when no worker is running
+locally. The runtime gap only shows up when a human drives the SPA
+against a real (non-sync) queue.
+
+### 7.2 Running the worker
+
+`pnpm dev` from the repo root spawns a worker alongside the API + SPAs
+via `concurrently` (process labelled `queue` in the multiplexed output).
+To run a worker standalone (e.g. when iterating on the API without the
+SPAs):
+
+```bash
+cd apps/api && php artisan queue:work
+```
+
+### 7.3 Symptom of a missing worker
+
+Any tracked-job-driven flow stays on the initial `queued` status
+indefinitely. The bulk-invite UI surfaces this as a "Queued — waiting
+to start / 0% complete" card that never advances.
+
+If you see this:
+
+1. Confirm the `queue` line is present in your `pnpm dev` output.
+2. If you started the API standalone, open a second terminal and run
+   `php artisan queue:work` from `apps/api`.
+3. The pending `TrackedJob` row drains within seconds and the SPA's
+   next 3-second poll cycle picks up the terminal status.
+
+### 7.4 Restart on Job-class changes
+
+Workers resolve Job classes at boot and cache them. After editing any
+class under `apps/api/app/Modules/*/Jobs/`, restart the worker (Ctrl-C
+→ re-run). For the `pnpm dev` workflow, stopping and restarting
+`pnpm dev` restarts the worker along with the rest of the stack.
+
+---
+
+## 8. Where this is enforced
 
 | Concern                     | Component                                                                 |
 | --------------------------- | ------------------------------------------------------------------------- |

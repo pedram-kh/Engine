@@ -9,10 +9,11 @@
   },
   "packageManager": "pnpm@10.28.0",
   "scripts": {
-    "dev": "concurrently -n api,main,admin -c blue,green,magenta \"pnpm dev:api\" \"pnpm dev:main\" \"pnpm dev:admin\"",
+    "dev": "concurrently -n api,main,admin,queue -c blue,green,magenta,yellow \"pnpm dev:api\" \"pnpm dev:main\" \"pnpm dev:admin\" \"pnpm dev:queue\"",
     "dev:api": "cd apps/api && php artisan serve --host=127.0.0.1 --port=8000",
     "dev:main": "pnpm --filter @catalyst/main dev",
     "dev:admin": "pnpm --filter @catalyst/admin dev",
+    "dev:queue": "cd apps/api && php artisan queue:work",
     "build": "pnpm -r --parallel build",
     "test": "pnpm test:backend && pnpm test:frontend",
     "test:backend": "cd apps/api && composer test",

@@ -73,8 +73,11 @@ pnpm --filter @catalyst/main test:e2e:install || info "Playwright install skippe
 bold "Setup complete. Next steps:"
 cat <<'EOF'
 
-  Start the dev stack:
+  Start the dev stack (api + main + admin + queue worker):
     pnpm dev
+
+  Or run the queue worker on its own (e.g. headless API iteration):
+    cd apps/api && php artisan queue:work
 
   Run all tests:
     pnpm test
