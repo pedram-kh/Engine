@@ -9,6 +9,32 @@ anyone reviewing it later.
 
 ---
 
+## SignIn pages render `meta.correct_spa_url` as plain text only (no clickable hop)
+
+- **Where:** [`apps/main/src/modules/auth/pages/SignInPage.vue`](../apps/main/src/modules/auth/pages/SignInPage.vue) + [`apps/admin/src/modules/auth/pages/SignInPage.vue`](../apps/admin/src/modules/auth/pages/SignInPage.vue) + the `auth.wrong_spa` bundle entries in both SPAs' `core/i18n/locales/{en,pt,it}/auth.json`. The backend's [`LoginController`](../apps/api/app/Modules/Identity/Http/Controllers/LoginController.php) maps `LoginResultStatus::WrongSpa` to a 403 envelope carrying `meta.correct_spa_url` (the other SPA's URL — resolved at backend response time), and the SPA's [`useErrorMessage`](../apps/main/src/modules/auth/composables/useErrorMessage.ts) resolver already forwards `error.details[0].meta` as a values bag into `t()`. The forwarding works; the bundle templates just don't interpolate it.
+- **What we accepted in Sprint 3 chunk 6:** the bundle entry is plain text ("This account is registered for the admin console. Please sign in there instead." on main / mirror copy on admin). The user reads the message, types the right URL by hand, retries. Sprint 3 chunk 6's goal was unblocking the admin login (Bug A) and closing the user-type × guard mismatch hole (Bug B); rendering a clickable link is UX polish that doesn't change correctness.
+- **Risk:** a one-extra-click cost on the wrong-SPA path. Users who mistype the URL bounce again. Not a fingerprinting / security concern — the `correct_spa_url` is the same value `config('app.frontend_main_url')` / `config('app.frontend_admin_url')` carries, which is already public via CORS.
+- **Mitigation today:** the i18n message names the destination SPA explicitly ("admin console" / "agency console") so the user knows what to type even without the link.
+- **Triggered by:** the next chunk that touches the SignIn page UX, or a UX-quality sprint that surveys auth-page polish across both SPAs.
+- **Resolution:** parametrise the `auth.wrong_spa` bundle entry with `{correct_spa_url}` and render the SignIn page's error banner with a vue-i18n `<i18n-t>` slot so the URL becomes an `<a href>` while the rest stays static. The values-bag forwarding from `useErrorMessage` already populates the placeholder — the bundle template just needs to reference it. Estimated effort: 30 minutes per SPA + a unit test pinning that the banner renders a link element.
+- **Owner:** next UX-polish-touching chunk.
+- **Status:** open.
+
+---
+
+## Admin-origin CSRF preflight rule supports exactly one admin SPA URL
+
+- **Where:** [`apps/api/app/Modules/Identity/Http/Middleware/UseAdminSessionCookie::originIsAdminSpa()`](../apps/api/app/Modules/Identity/Http/Middleware/UseAdminSessionCookie.php) reads `config('app.frontend_admin_url')` as a single string. The CSRF-preflight session-cookie widening from Sprint 3 chunk 6 (see [`docs/reviews/sprint-3-chunk-6-review.md`](reviews/sprint-3-chunk-6-review.md) — Bug A) only matches a request `Origin` / `Referer` against that one URL.
+- **What we accepted in Sprint 3 chunk 6:** one admin URL per environment is the production topology (`admin.catalystengine.com` in prod, `admin.staging.*` in staging, `127.0.0.1:5174` in local dev), so a single-string config suffices today. Generalising to an array would mean a config-shape change (string → list<string>) that ripples to `cors.php` (which reads the same key) and to any operator runbooks.
+- **Risk:** a deployment that needs the admin SPA reachable on >1 origin (e.g. a vanity domain rollout, a regional partition served from two hostnames, a preview-deployment scheme for PRs) cannot configure the widening rule without code changes. The CSRF preflight will land on the main session and admin login will 419 on the un-listed origin — the exact failure mode chunk 6 fixed for the canonical URL.
+- **Mitigation today:** none. Single-origin is the documented topology.
+- **Triggered by:** any sprint that introduces a multi-origin admin deployment shape — vanity domains, preview deploys with their own hostname, or a partner-tenant SPA mounted at a separate hostname.
+- **Resolution:** widen `config('app.frontend_admin_url')` to accept either a single string or a list, and have `originIsAdminSpa` iterate. Pair with the same change in `config/cors.php` (which already reads from the same key for CORS allow-list). Estimated effort: half-day including tests and one runbook touch-up.
+- **Owner:** the sprint that introduces multi-origin admin.
+- **Status:** open.
+
+---
+
 ## Laravel default exception shapes outside `ValidationException` still bypass the canonical envelope
 
 - **Where:** [`apps/api/bootstrap/app.php`](../apps/api/bootstrap/app.php) `withExceptions()` — only `Illuminate\Validation\ValidationException` is currently normalized to the JSON:API error envelope from [`docs/04-API-DESIGN.md`](04-API-DESIGN.md) § 8. Other Laravel-default exception types (`Illuminate\Auth\AuthenticationException`, `Symfony\Component\HttpKernel\Exception\NotFoundHttpException`, `Illuminate\Auth\Access\AuthorizationException`, `Illuminate\Http\Exceptions\HttpResponseException`, the generic 5xx path, etc.) still emit Laravel's stock JSON shape when no controller has hand-built an `ErrorResponse::single` for the failure path.

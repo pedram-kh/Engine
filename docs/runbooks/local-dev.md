@@ -32,9 +32,14 @@ To stop the two SPAs from clobbering each other's session cookies, the API uses 
 
 The `catalyst_main_session` name is the default — set in `config/session.php` and reachable via `SESSION_COOKIE`. The admin override is applied at runtime by [`UseAdminSessionCookie`](../../apps/api/app/Modules/Identity/Http/Middleware/UseAdminSessionCookie.php), which is **registered globally** in `bootstrap/app.php` so it executes before Sanctum's stateful injection (the thing that triggers `StartSession`).
 
-The middleware is path-aware: it only flips the cookie name on requests whose path starts with `api/v1/admin/`. Everything else flows through with `catalyst_main_session`.
+The middleware fires under **two** conditions:
 
-> **Note about XSRF-TOKEN**: Sanctum issues a single `XSRF-TOKEN` cookie regardless of guard. In local dev that cookie is shared between the two SPAs because they share an origin — that's tolerable because CSRF tokens are not authenticators. In production each subdomain gets its own `XSRF-TOKEN` cookie naturally.
+1. **Path-based** — any request whose path starts with `api/v1/admin/`. Every admin-side controller lives under that prefix by convention.
+2. **Origin-based for the Sanctum CSRF preflight** — `GET /sanctum/csrf-cookie` is a top-level Sanctum route, _not_ under the admin prefix. When the request's `Origin` (or `Referer`, as a fallback) matches `FRONTEND_ADMIN_URL`, the middleware still flips to the admin session cookie. Without this widening, an admin-SPA preflight would store the CSRF token in the _main_ session, and the follow-up `POST /api/v1/admin/auth/login` (which runs under the _admin_ session) would 419 every time. The Sprint 3 Chunk 6 review has the full root-cause writeup.
+
+Everything else flows through with `catalyst_main_session`.
+
+> **Note about XSRF-TOKEN cookie sharing**: Sanctum uses a single `XSRF-TOKEN` cookie name regardless of guard. The _value_ is bound to the session that created it (Laravel CSRF tokens are stored _in the session_), so the per-guard session-cookie split also means a per-guard CSRF-token split — even though the cookie _name_ is shared. The CSRF preflight must therefore land on the right session for the SPA making the call, which is exactly what the origin-based middleware rule above ensures. In production each subdomain gets its own `XSRF-TOKEN` cookie naturally and the rule becomes a no-op.
 
 ---
 
@@ -82,6 +87,7 @@ If you change ports (e.g., add a Storybook server on 6006), update **both** list
    - Confirm the SPA fetches `GET /sanctum/csrf-cookie` before the POST.
    - Confirm the SPA sends the `X-XSRF-TOKEN` header on the POST.
    - In Vite, `axios.defaults.withCredentials = true`.
+   - For the **admin SPA specifically**, confirm `FRONTEND_ADMIN_URL` matches the actual admin Vite origin. The CSRF preflight is origin-detected: if `Origin: http://127.0.0.1:5174` doesn't match the configured admin URL, the preflight lands on the main session and the admin login POST 419s every time. See §2.
 
 4. **If the SPA receives a 401 unexpectedly after login**:
    - Confirm `SANCTUM_STATEFUL_DOMAINS` includes the SPA's exact `host:port`.
