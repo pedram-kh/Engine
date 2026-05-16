@@ -14,6 +14,11 @@
  *   - tracking        — polling /jobs/{id} (status: queued | processing).
  *   - complete        — terminal: result.stats + per-row failures.
  *   - failed          — terminal: failure_reason rendered.
+ *   - timeout         — recovery: MAX_POLLS reached without a terminal
+ *                       status; surfaces a "still working on this" UI
+ *                       with a Try-again button (mirrors the wizard
+ *                       saga's `useVendorBounce` 'timeout' state,
+ *                       Sprint 3 Chunk 3 Q-vendor-bounce-1 (a)).
  *
  * Access control: gated by `requireAuth` → `requireMfaEnrolled` →
  * `requireAgencyAdmin` (the backend enforces agency_admin role
@@ -47,7 +52,15 @@ import {
 const { t } = useI18n()
 const agencyStore = useAgencyStore()
 
-type Phase = 'idle' | 'parsing' | 'preview' | 'submitting' | 'tracking' | 'complete' | 'failed'
+type Phase =
+  | 'idle'
+  | 'parsing'
+  | 'preview'
+  | 'submitting'
+  | 'tracking'
+  | 'complete'
+  | 'failed'
+  | 'timeout'
 
 const phase = ref<Phase>('idle')
 const selectedFile = ref<File | null>(null)
@@ -59,10 +72,19 @@ const jobProgress = ref(0)
 const jobResult = ref<BulkInviteResult | null>(null)
 const jobFailureReason = ref<string | null>(null)
 const submitMetaErrors = ref<Array<{ row: number; code: string; detail: string }>>([])
+const pollCount = ref(0)
 
 let pollTimer: ReturnType<typeof setTimeout> | null = null
 
 const POLL_INTERVAL_MS = 3000
+
+// Maximum number of successful poll responses without a terminal status
+// before we surface the "still working on this" recovery UI. 20 polls at
+// the 3 s cadence = ~60 s wall-clock, matching `useVendorBounce`'s
+// MAX_POLLS=12-with-backoff wall-clock budget (Sprint 3 Chunk 3,
+// Q-vendor-bounce-1 (a)). Transient API errors do not burn the budget —
+// only successful poll responses count, mirroring `useVendorBounce`.
+const MAX_POLLS = 20
 
 const previewRows = computed<BulkInviteCsvRow[]>(() => parseResult.value?.rows ?? [])
 const previewErrors = computed(() => parseResult.value?.errors ?? [])
@@ -116,6 +138,7 @@ function resetForNewFile(): void {
   jobFailureReason.value = null
   submitMetaErrors.value = []
   selectedFile.value = null
+  pollCount.value = 0
   phase.value = 'idle'
 }
 
@@ -148,6 +171,7 @@ async function pollJob(): Promise<void> {
     const res = await bulkInviteApi.getJob(jobUlid.value)
     jobStatus.value = res.data.status
     jobProgress.value = res.data.progress
+    pollCount.value += 1
     if (res.data.status === 'complete') {
       jobResult.value = res.data.result
       phase.value = 'complete'
@@ -159,16 +183,19 @@ async function pollJob(): Promise<void> {
       phase.value = 'failed'
       return
     }
-    pollTimer = setTimeout(() => {
-      void pollJob()
-    }, POLL_INTERVAL_MS)
+    if (pollCount.value >= MAX_POLLS) {
+      phase.value = 'timeout'
+      return
+    }
   } catch {
-    // Transient errors: keep polling. A permanent failure surfaces
-    // via the terminal 'failed' status on the server side.
-    pollTimer = setTimeout(() => {
-      void pollJob()
-    }, POLL_INTERVAL_MS)
+    // Transient errors: keep polling without burning the poll budget.
+    // Mirrors `useVendorBounce` line 141-144 — network glitches
+    // shouldn't terminate the saga, only successful responses count
+    // toward MAX_POLLS.
   }
+  pollTimer = setTimeout(() => {
+    void pollJob()
+  }, POLL_INTERVAL_MS)
 }
 
 function startOver(): void {
@@ -409,6 +436,24 @@ defineExpose({ onFileSelected })
       </v-alert>
       <v-btn color="primary" data-test="bulk-invite-start-over" @click="startOver">
         {{ t('app.bulkInvite.actions.startOver') }}
+      </v-btn>
+    </template>
+
+    <!-- ── Timeout (MAX_POLLS reached without terminal status) ───── -->
+    <template v-if="phase === 'timeout'">
+      <v-alert
+        type="warning"
+        variant="tonal"
+        class="mb-4"
+        role="status"
+        aria-live="polite"
+        data-test="bulk-invite-timeout"
+      >
+        <p class="font-weight-medium mb-2">{{ t('app.bulkInvite.timeout.heading') }}</p>
+        <p class="ma-0">{{ t('app.bulkInvite.timeout.description') }}</p>
+      </v-alert>
+      <v-btn color="primary" data-test="bulk-invite-start-over" @click="startOver">
+        {{ t('app.bulkInvite.timeout.retry') }}
       </v-btn>
     </template>
   </div>

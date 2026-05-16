@@ -202,6 +202,11 @@
       "tracking": {
         "progress": "{percent}% complete"
       },
+      "timeout": {
+        "heading": "Still working on this",
+        "description": "Your invitations are taking longer than expected to process. You can try again or check back later.",
+        "retry": "Try again"
+      },
       "complete": {
         "heading": "Results",
         "invited": "Invited",

@@ -180,6 +180,11 @@
         "failed": "O trabalho falhou"
       },
       "tracking": { "progress": "{percent}% concluído" },
+      "timeout": {
+        "heading": "Ainda em processamento",
+        "description": "Os seus convites estão a demorar mais do que o esperado a processar. Pode tentar novamente ou voltar mais tarde.",
+        "retry": "Tentar novamente"
+      },
       "complete": {
         "heading": "Resultados",
         "invited": "Convidados",

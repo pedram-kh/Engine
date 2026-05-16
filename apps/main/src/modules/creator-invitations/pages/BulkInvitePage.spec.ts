@@ -5,6 +5,7 @@
  *
  *   file-select → parse → preview → submit (202) → poll → complete (success)
  *   file-select → parse → preview → submit (202) → poll → failed (terminal error)
+ *   file-select → parse → preview → submit (202) → poll × MAX_POLLS → timeout
  *
  * Plus pre-upload error states (csv.header_missing, invalid email rows
  * filtered out of the submit count, soft-warning banner).
@@ -345,6 +346,78 @@ describe('BulkInvitePage', () => {
     await flushPromises()
 
     expect(vi.mocked(bulkInviteApi.getJob).mock.calls.length).toBe(callsBeforeUnmount)
+  })
+
+  // ------------------------------------------------------------------
+  // Stuck-tracking recovery — mirrors the wizard saga's
+  // `useVendorBounce` 'timeout' state for the bulk-invite poll loop.
+  // After MAX_POLLS (20) successful poll responses without a terminal
+  // status, the page transitions from 'tracking' to 'timeout' and
+  // surfaces a Try-again CTA. The CTA wires to `startOver()`, which
+  // resets the page back to idle (file picker visible, all job state
+  // cleared). The 60 s wall-clock budget (20 × 3000 ms) matches the
+  // wizard saga's ~60 s budget set in `useVendorBounce` (Sprint 3
+  // Chunk 3 Q-vendor-bounce-1 (a)).
+  // ------------------------------------------------------------------
+  it('transitions to timeout phase after MAX_POLLS without a terminal status', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const h = await mountPage()
+    teardown = (): void => {
+      vi.useRealTimers()
+      h.cleanup()
+    }
+
+    vi.mocked(bulkInviteApi.submit).mockResolvedValue({
+      data: { id: 'job-ulid', type: 'bulk_creator_invitation' },
+      meta: { row_count: 1, exceeds_soft_warning: false, errors: [] },
+      links: { self: '/api/v1/jobs/job-ulid' },
+    })
+    // Every poll returns the same non-terminal `queued/0%` snapshot so
+    // the timeout gate is the only thing that can exit the tracking
+    // phase. mockResolvedValue (not mockResolvedValueOnce) covers all
+    // calls.
+    vi.mocked(bulkInviteApi.getJob).mockResolvedValue({
+      data: {
+        id: 'job-ulid',
+        type: 'bulk_creator_invitation',
+        status: 'queued',
+        progress: 0,
+        started_at: null,
+        completed_at: null,
+        estimated_completion_at: null,
+        result: null,
+        failure_reason: null,
+      },
+    })
+
+    const file = makeFile('email\nalice@example.com\n')
+    await selectFile(h.wrapper, file)
+    await h.wrapper.find('[data-test="bulk-invite-submit"]').trigger('click')
+    await flushPromises()
+    await flushPromises()
+    expect(h.wrapper.find('[data-test="bulk-invite-tracking"]').exists()).toBe(true)
+
+    // Advance through MAX_POLLS (= 20) poll cycles. The first poll
+    // fires synchronously inside `onSubmit` → `pollJob()`; each
+    // subsequent poll is scheduled by the 3 s setTimeout. After 19
+    // additional advances, pollCount reaches 20 and the gate trips.
+    for (let i = 0; i < 20; i++) {
+      await vi.advanceTimersByTimeAsync(3000)
+      await flushPromises()
+    }
+
+    expect(h.wrapper.find('[data-test="bulk-invite-timeout"]').exists()).toBe(true)
+    expect(h.wrapper.find('[data-test="bulk-invite-tracking"]').exists()).toBe(false)
+    expect(h.wrapper.find('[data-test="bulk-invite-timeout"]').text()).toContain(
+      'Still working on this',
+    )
+
+    // Try-again wires to startOver — verify the page returns to idle
+    // with the file picker visible and prior job state cleared.
+    await h.wrapper.find('[data-test="bulk-invite-start-over"]').trigger('click')
+    await flushPromises()
+    expect(h.wrapper.find('[data-test="bulk-invite-timeout"]').exists()).toBe(false)
+    expect(h.wrapper.find('[data-test="bulk-invite-file-input"]').exists()).toBe(true)
   })
 
   it('start-over from complete state resets the page to idle', async () => {

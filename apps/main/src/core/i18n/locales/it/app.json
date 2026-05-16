@@ -180,6 +180,11 @@
         "failed": "Il job è fallito"
       },
       "tracking": { "progress": "{percent}% completato" },
+      "timeout": {
+        "heading": "Ancora in elaborazione",
+        "description": "I tuoi inviti stanno richiedendo più tempo del previsto. Puoi riprovare o controllare più tardi.",
+        "retry": "Riprova"
+      },
       "complete": {
         "heading": "Risultati",
         "invited": "Invitati",
