@@ -125,6 +125,142 @@ describe('SignUpPage', () => {
     expect(h.wrapper.find('[data-test="sign-up-error"]').text()).toContain('12 characters')
   })
 
+  // ---------------------------------------------------------------------
+  // Stabilization (post-Sprint 3) — per-field rendering for the real
+  // `validation.failed` envelope shape emitted by
+  // App\Core\Errors\ValidationExceptionRenderer. Without this binding
+  // the password-too-short message stays trapped in details[] and the
+  // user sees the generic "Something went wrong" banner instead of the
+  // specific reason. The earlier tests in this file stub the top-level
+  // `code` directly (e.g. `auth.password.too_short`) which is NOT what
+  // the real backend ships; this test pins the real shape so the
+  // contract drift can't recur.
+  // ---------------------------------------------------------------------
+
+  it('binds per-field validation messages (real `validation.failed` envelope, password too short)', async () => {
+    vi.mocked(authApi.signUp).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'validation.failed',
+        message: 'The password field must be at least 12 characters.',
+        details: [
+          {
+            code: 'validation.failed',
+            title: 'The password field must be at least 12 characters.',
+            detail: 'The password field must be at least 12 characters.',
+            source: { pointer: '/data/attributes/password' },
+            meta: { field: 'password', rule: 'App\\Modules\\Identity\\Rules\\StrongPassword' },
+          },
+        ],
+      }),
+    )
+    const h = await mountAuthPage(SignUpPage)
+    teardown = h.unmount
+    await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
+    await h.wrapper.find('[data-test="sign-up-email"] input').setValue('a@b.c')
+    await h.wrapper.find('[data-test="sign-up-password"] input').setValue('short')
+    await h.wrapper.find('[data-test="sign-up-password-confirmation"] input').setValue('short')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    // The message must render under the password field, not in the
+    // top-level banner — that's the whole point of this fix.
+    const passwordField = h.wrapper.find('[data-test="sign-up-password"]')
+    expect(passwordField.text()).toContain('at least 12 characters')
+
+    // The top-level banner stays empty when per-field rendering owns
+    // the surface (single signal source per error class).
+    expect(h.wrapper.find('[data-test="sign-up-error"]').text()).toBe('')
+  })
+
+  it('binds multiple per-field errors simultaneously (name + email + password)', async () => {
+    vi.mocked(authApi.signUp).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'validation.failed',
+        message: 'The name field is required.',
+        details: [
+          {
+            code: 'validation.failed',
+            title: 'The name field is required.',
+            detail: 'The name field is required.',
+            source: { pointer: '/data/attributes/name' },
+            meta: { field: 'name' },
+          },
+          {
+            code: 'validation.failed',
+            title: 'The email field must be a valid email address.',
+            detail: 'The email field must be a valid email address.',
+            source: { pointer: '/data/attributes/email' },
+            meta: { field: 'email' },
+          },
+          {
+            code: 'validation.failed',
+            title: 'The password field is required.',
+            detail: 'The password field is required.',
+            source: { pointer: '/data/attributes/password' },
+            meta: { field: 'password' },
+          },
+        ],
+      }),
+    )
+    const h = await mountAuthPage(SignUpPage)
+    teardown = h.unmount
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-test="sign-up-name"]').text()).toContain('name field is required')
+    expect(h.wrapper.find('[data-test="sign-up-email"]').text()).toContain('valid email address')
+    expect(h.wrapper.find('[data-test="sign-up-password"]').text()).toContain(
+      'password field is required',
+    )
+    expect(h.wrapper.find('[data-test="sign-up-error"]').text()).toBe('')
+  })
+
+  it('clears per-field errors on the next submit', async () => {
+    vi.mocked(authApi.signUp).mockRejectedValueOnce(
+      new ApiError({
+        status: 422,
+        code: 'validation.failed',
+        message: 'fail',
+        details: [
+          {
+            code: 'validation.failed',
+            title: 'The password field is required.',
+            detail: 'The password field is required.',
+            source: { pointer: '/data/attributes/password' },
+            meta: { field: 'password' },
+          },
+        ],
+      }),
+    )
+    vi.mocked(authApi.signUp).mockResolvedValueOnce(USER)
+
+    const h = await mountAuthPage(SignUpPage)
+    teardown = h.unmount
+
+    await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
+    await h.wrapper.find('[data-test="sign-up-email"] input').setValue('a@b.c')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(h.wrapper.find('[data-test="sign-up-password"]').text()).toContain(
+      'password field is required',
+    )
+
+    await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
+    await h.wrapper
+      .find('[data-test="sign-up-password-confirmation"] input')
+      .setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    // After the successful retry, the previous per-field error must
+    // have been cleared from the DOM (resetForNewSubmit semantics).
+    expect(h.wrapper.find('[data-test="sign-up-password"]').text()).not.toContain(
+      'password field is required',
+    )
+  })
+
   it('on a non-ApiError, falls back to auth.ui.errors.unknown', async () => {
     vi.mocked(authApi.signUp).mockRejectedValue(new Error('boom'))
     const h = await mountAuthPage(SignUpPage)

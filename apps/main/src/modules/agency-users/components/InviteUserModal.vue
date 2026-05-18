@@ -5,7 +5,7 @@
  * On success: emits 'invited' event so the parent can update the pending list.
  */
 
-import type { AgencyRole } from '@catalyst/api-client'
+import { ApiError, extractFieldErrors, type AgencyRole } from '@catalyst/api-client'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -29,6 +29,20 @@ const role = ref<AgencyRole>('agency_manager')
 const submitting = ref(false)
 const error = ref<string | null>(null)
 
+/**
+ * Per-field validation errors extracted from a 422 envelope. The
+ * invitation create endpoint validates `email` (rfc + unique-per-
+ * agency + not-a-current-member) and `role`. Pre-stabilization the
+ * dialog rendered a generic "Failed to send invitation." string for
+ * every failure mode — including obvious user-fixable ones like
+ * "this user is already invited" — which hid the real reason. Same
+ * `extractFieldErrors` pattern as SignUpPage / ResetPasswordPage /
+ * BrandCreatePage. The generic banner stays as the fallback for
+ * non-field errors (tenancy, 5xx, network).
+ */
+type InvitationField = 'email' | 'role'
+const fieldErrors = ref<Partial<Record<InvitationField, readonly string[]>>>({})
+
 const roleOptions: { title: string; value: AgencyRole }[] = [
   { title: t('app.agencyUsers.roles.agency_admin'), value: 'agency_admin' },
   { title: t('app.agencyUsers.roles.agency_manager'), value: 'agency_manager' },
@@ -40,6 +54,7 @@ function close(): void {
   email.value = ''
   role.value = 'agency_manager'
   error.value = null
+  fieldErrors.value = {}
 }
 
 async function onSubmit(): Promise<void> {
@@ -48,14 +63,20 @@ async function onSubmit(): Promise<void> {
 
   submitting.value = true
   error.value = null
+  fieldErrors.value = {}
 
   try {
     await invitationsApi.create(agencyId, { email: email.value, role: role.value })
     const invitedEmail = email.value
     close()
     emit('invited', invitedEmail)
-  } catch {
-    error.value = t('app.agencyUsers.invite.errors.failed')
+  } catch (err) {
+    if (err instanceof ApiError) {
+      fieldErrors.value = extractFieldErrors<InvitationField>(err)
+    }
+    if (Object.keys(fieldErrors.value).length === 0) {
+      error.value = t('app.agencyUsers.invite.errors.failed')
+    }
   } finally {
     submitting.value = false
   }
@@ -79,6 +100,7 @@ async function onSubmit(): Promise<void> {
           <v-text-field
             v-model="email"
             :label="t('app.agencyUsers.invite.fields.email')"
+            :error-messages="fieldErrors.email"
             type="email"
             autocomplete="email"
             required
@@ -89,6 +111,7 @@ async function onSubmit(): Promise<void> {
             v-model="role"
             :label="t('app.agencyUsers.invite.fields.role')"
             :items="roleOptions"
+            :error-messages="fieldErrors.role"
             item-title="title"
             item-value="value"
             required

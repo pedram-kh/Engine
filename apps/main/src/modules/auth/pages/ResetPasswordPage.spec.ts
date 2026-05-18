@@ -139,6 +139,51 @@ describe('ResetPasswordPage', () => {
     )
   })
 
+  // ---------------------------------------------------------------------
+  // Stabilization (post-Sprint 3) — per-field rendering for the real
+  // `validation.failed` envelope shape (mirrors SignUpPage). The
+  // earlier tests in this file all stub semantic top-level codes
+  // (`auth.password.invalid_token`, …) which exercise the resolver
+  // path; this test exercises the per-field path on the
+  // StrongPassword rule, which is the surface the user actually hits
+  // when they pick a short new password from a reset email.
+  // ---------------------------------------------------------------------
+
+  it('binds per-field validation messages (real `validation.failed` envelope, password too short)', async () => {
+    vi.mocked(authApi.resetPassword).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'validation.failed',
+        message: 'The password field must be at least 12 characters.',
+        details: [
+          {
+            code: 'validation.failed',
+            title: 'The password field must be at least 12 characters.',
+            detail: 'The password field must be at least 12 characters.',
+            source: { pointer: '/data/attributes/password' },
+            meta: { field: 'password', rule: 'App\\Modules\\Identity\\Rules\\StrongPassword' },
+          },
+        ],
+      }),
+    )
+    const h = await mountAuthPage(ResetPasswordPage, {
+      initialRoute: { path: '/reset-password', query: { token: 't', email: 'a@b.c' } },
+    })
+    teardown = h.unmount
+    await flushPromises()
+    await h.wrapper.find('[data-test="reset-password-password"] input').setValue('short')
+    await h.wrapper
+      .find('[data-test="reset-password-password-confirmation"] input')
+      .setValue('short')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-test="reset-password-password"]').text()).toContain(
+      'at least 12 characters',
+    )
+    expect(h.wrapper.find('[data-test="reset-password-error"]').text()).toBe('')
+  })
+
   it('error region uses aria-live="polite"', async () => {
     const h = await mountAuthPage(ResetPasswordPage)
     teardown = h.unmount

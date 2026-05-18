@@ -12,6 +12,7 @@
  * `confirmed` rule is the authoritative gate.
  */
 
+import { ApiError, extractFieldErrors } from '@catalyst/api-client'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -35,6 +36,30 @@ const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
 
 /**
+ * Per-field validation errors extracted from a 422 envelope.
+ *
+ * The backend's {@link ValidationExceptionRenderer} ships every
+ * `FormRequest` failure as `code: validation.failed` with the actual
+ * translated message in `details[i].detail` and the field name in
+ * `source.pointer = /data/attributes/<field>`. Rendering that as a
+ * single top-level banner via `resolveErrorMessage` produces the
+ * generic "Something went wrong" surface (because `validation.failed`
+ * has no bundle entry by design — per-rule disambiguation is
+ * intentionally non-fingerprinting). The fix is to pull the
+ * per-field messages out via `extractFieldErrors` and bind them to
+ * each input's `error-messages` prop — same shape as the Chunk-5
+ * `BrandCreatePage` reference.
+ *
+ * The banner stays as the fallback surface for semantic backend codes
+ * that DO have bundle entries (`auth.signup.email_taken`,
+ * `invitation.email_mismatch`, `auth.password.compromised`, …) — for
+ * those, `extractFieldErrors` returns `{}` (no pointer in details)
+ * and the resolver path takes over.
+ */
+type SignUpField = 'name' | 'email' | 'password' | 'password_confirmation'
+const fieldErrors = ref<Partial<Record<SignUpField, readonly string[]>>>({})
+
+/**
  * Sprint 3 Chunk 4 sub-step 4 — magic-link invitation forward path.
  *
  * When the creator arrived from `/auth/accept-invite`, the token is
@@ -55,6 +80,7 @@ const isInvitationFlow = computed(() => invitationToken.value !== null)
 async function onSubmit(): Promise<void> {
   errorKey.value = null
   errorValues.value = {}
+  fieldErrors.value = {}
   try {
     await store.signUp({
       name: name.value,
@@ -80,9 +106,14 @@ async function onSubmit(): Promise<void> {
       query: { email: email.value },
     })
   } catch (err) {
-    const resolved = resolveErrorMessage(err, (k) => te(k))
-    errorKey.value = resolved.key
-    errorValues.value = resolved.values
+    if (err instanceof ApiError) {
+      fieldErrors.value = extractFieldErrors<SignUpField>(err)
+    }
+    if (Object.keys(fieldErrors.value).length === 0) {
+      const resolved = resolveErrorMessage(err, (k) => te(k))
+      errorKey.value = resolved.key
+      errorValues.value = resolved.values
+    }
   }
 }
 </script>
@@ -108,6 +139,7 @@ async function onSubmit(): Promise<void> {
         id="sign-up-name"
         v-model="name"
         :label="t('auth.ui.labels.name')"
+        :error-messages="fieldErrors.name"
         autocomplete="name"
         required
         data-test="sign-up-name"
@@ -116,6 +148,7 @@ async function onSubmit(): Promise<void> {
         id="sign-up-email"
         v-model="email"
         :label="t('auth.ui.labels.email')"
+        :error-messages="fieldErrors.email"
         type="email"
         autocomplete="email"
         required
@@ -125,6 +158,7 @@ async function onSubmit(): Promise<void> {
         id="sign-up-password"
         v-model="password"
         :label="t('auth.ui.labels.password')"
+        :error-messages="fieldErrors.password"
         type="password"
         autocomplete="new-password"
         required
@@ -134,6 +168,7 @@ async function onSubmit(): Promise<void> {
         id="sign-up-password-confirmation"
         v-model="passwordConfirmation"
         :label="t('auth.ui.labels.password_confirmation')"
+        :error-messages="fieldErrors.password_confirmation"
         type="password"
         autocomplete="new-password"
         required
