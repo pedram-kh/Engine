@@ -9,6 +9,19 @@ anyone reviewing it later.
 
 ---
 
+## Unified server-authoritative stall detection across TrackedJob + wizard saga endpoints
+
+- **Where:** [`apps/api/app/Modules/TrackedJobs/Models/TrackedJob.php`](../apps/api/app/Modules/TrackedJobs/Models/TrackedJob.php) + the three wizard saga status controllers (KYC / payout / contract) under [`apps/api/app/Modules/Creators/Http/Controllers/`](../apps/api/app/Modules/Creators/Http/Controllers/). SPA consumers: [`apps/main/src/modules/creator-invitations/pages/BulkInvitePage.vue`](../apps/main/src/modules/creator-invitations/pages/BulkInvitePage.vue) + [`apps/main/src/modules/onboarding/composables/useVendorBounce.ts`](../apps/main/src/modules/onboarding/composables/useVendorBounce.ts).
+- **What we accepted in Sprint 3 stabilization (May 16, 2026):** Bulk-invite gained a client-side timeout (MAX_POLLS=20, ~60 s wall-clock) mirroring `useVendorBounce`'s existing client-side detection (Sprint 3 Chunk 3 Q-vendor-bounce-1 = (a) — see [`sprint-3-chunk-3-review.md`](reviews/sprint-3-chunk-3-review.md)). Both surfaces detect stall purely client-side; the backend has no notion of "this job has been pending too long."
+- **Risk:** a truly-hung backend job (worker crash, DB lock, vendor saga frozen mid-status, etc.) is invisible to ops — no alerting, no audit trail of stuck workloads. The SPA's "Try again" affordance starts a new job rather than surfacing the actual operational issue. The stall pattern can recur indefinitely against the same broken backend with no observability signal.
+- **Mitigation today:** none at the backend. Client-side detection bounds the poll loop budget (~60 s on both surfaces); transient errors don't burn budget (mirrored convention in both `useVendorBounce` and `BulkInvitePage`).
+- **Triggered by:** Sprint 4 ops-readiness work, OR a production incident where stuck jobs go unnoticed because no signal reached observability.
+- **Resolution:** add `stalled` to [`TrackedJobStatus`](../apps/api/app/Modules/TrackedJobs/Enums/TrackedJobStatus.php) enum + lazy TTL check on `GET /api/v1/jobs/{job}` ([`GetJobController`](../apps/api/app/Modules/TrackedJobs/Http/Controllers/GetJobController.php)) and on the three wizard saga `*Status` endpoints + deprecate the client-side timeout in `useVendorBounce` in favour of reading the server status + add `stalled`-branch handling to both `BulkInvitePage` and the wizard step pages + corresponding cross-layer tests (Pest TTL transition + Vitest stalled-state render + architecture-test parity if the existing status enum has one). Estimated effort: 5-8 hours.
+- **Owner:** Sprint 4 chunk candidate.
+- **Status:** open. Surfaced by Sprint 3 stabilization pass, May 16, 2026.
+
+---
+
 ## SignIn pages render `meta.correct_spa_url` as plain text only (no clickable hop)
 
 - **Where:** [`apps/main/src/modules/auth/pages/SignInPage.vue`](../apps/main/src/modules/auth/pages/SignInPage.vue) + [`apps/admin/src/modules/auth/pages/SignInPage.vue`](../apps/admin/src/modules/auth/pages/SignInPage.vue) + the `auth.wrong_spa` bundle entries in both SPAs' `core/i18n/locales/{en,pt,it}/auth.json`. The backend's [`LoginController`](../apps/api/app/Modules/Identity/Http/Controllers/LoginController.php) maps `LoginResultStatus::WrongSpa` to a 403 envelope carrying `meta.correct_spa_url` (the other SPA's URL — resolved at backend response time), and the SPA's [`useErrorMessage`](../apps/main/src/modules/auth/composables/useErrorMessage.ts) resolver already forwards `error.details[0].meta` as a values bag into `t()`. The forwarding works; the bundle templates just don't interpolate it.
