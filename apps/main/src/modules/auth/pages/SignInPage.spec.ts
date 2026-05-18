@@ -24,6 +24,11 @@ vi.mock('@/modules/auth/api/auth.api', () => ({
 
 import { authApi } from '@/modules/auth/api/auth.api'
 
+// Default fixture for tests that don't care about post-login dispatch.
+// The stabilization fix routes by `user_type`: creators land on
+// `/onboarding`, every other user_type lands on `/`. Tests that
+// specifically pin the dispatch rule use the AGENCY_USER / CREATOR
+// fixtures below.
 const USER = {
   type: 'user' as const,
   id: '01HQ',
@@ -31,7 +36,7 @@ const USER = {
     email: 'a@b.c',
     email_verified_at: '2026-01-01T00:00:00Z',
     name: 'A',
-    user_type: 'creator' as const,
+    user_type: 'agency_user' as const,
     preferred_language: 'en' as const,
     preferred_currency: 'USD',
     timezone: 'Europe/Lisbon',
@@ -41,6 +46,11 @@ const USER = {
     last_login_at: null,
     created_at: '2026-01-01T00:00:00Z',
   },
+}
+
+const CREATOR_USER = {
+  ...USER,
+  attributes: { ...USER.attributes, user_type: 'creator' as const },
 }
 
 describe('SignInPage', () => {
@@ -79,7 +89,7 @@ describe('SignInPage', () => {
     )
   })
 
-  it('happy path: calls login() and pushes to / on 2xx', async () => {
+  it('happy path: agency_user — calls login() and pushes to / on 2xx', async () => {
     vi.mocked(authApi.login).mockResolvedValue(USER)
     const h = await mountAuthPage(SignInPage)
     teardown = h.unmount
@@ -92,7 +102,44 @@ describe('SignInPage', () => {
     expect(pushSpy).toHaveBeenCalledWith('/')
   })
 
-  it('happy path: pushes to ?redirect=/foo when query param is set', async () => {
+  // ---------------------------------------------------------------------
+  // Stabilization (post-Sprint 3) — post-login dispatch by user_type.
+  // Pre-fix, every user (including creators) was pushed to `/`, which
+  // is `app.dashboard` → DashboardPlaceholderPage wrapped in the agency
+  // shell (sidebar: Dashboard / Brands / Team / Settings). A creator
+  // who arrived via bulk-invite → magic-link → sign-up → sign-in
+  // therefore landed on the wrong layout entirely. The fix dispatches
+  // by `user_type` when no meaningful `?redirect=` is set.
+  // ---------------------------------------------------------------------
+
+  it('happy path: creator — pushes to onboarding.welcome-back on 2xx (post-Sprint-3 stabilization)', async () => {
+    vi.mocked(authApi.login).mockResolvedValue(CREATOR_USER)
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    const pushSpy = vi.spyOn(h.router, 'push')
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'onboarding.welcome-back' })
+  })
+
+  it('happy path: creator — ignores ?redirect=/ (default agency home) and dispatches to wizard', async () => {
+    vi.mocked(authApi.login).mockResolvedValue(CREATOR_USER)
+    const h = await mountAuthPage(SignInPage, {
+      initialRoute: { path: '/sign-in', query: { redirect: '/' } },
+    })
+    teardown = h.unmount
+    await flushPromises()
+    const pushSpy = vi.spyOn(h.router, 'push')
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'onboarding.welcome-back' })
+  })
+
+  it('happy path: pushes to ?redirect=/foo when query param is set (session-expired flow, both user_types)', async () => {
     vi.mocked(authApi.login).mockResolvedValue(USER)
     const h = await mountAuthPage(SignInPage, {
       initialRoute: { path: '/sign-in', query: { redirect: '/dashboard?x=1' } },
@@ -105,6 +152,21 @@ describe('SignInPage', () => {
     await h.wrapper.find('form').trigger('submit')
     await flushPromises()
     expect(pushSpy).toHaveBeenCalledWith('/dashboard?x=1')
+  })
+
+  it('happy path: creator with a wizard ?redirect= honors the redirect (session-expired flow)', async () => {
+    vi.mocked(authApi.login).mockResolvedValue(CREATOR_USER)
+    const h = await mountAuthPage(SignInPage, {
+      initialRoute: { path: '/sign-in', query: { redirect: '/onboarding/profile' } },
+    })
+    teardown = h.unmount
+    await flushPromises()
+    const pushSpy = vi.spyOn(h.router, 'push')
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(pushSpy).toHaveBeenCalledWith('/onboarding/profile')
   })
 
   it('on auth.invalid_credentials, renders t(error.code) inline', async () => {

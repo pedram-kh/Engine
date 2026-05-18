@@ -19,7 +19,7 @@
 import { ApiError } from '@catalyst/api-client'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
@@ -29,7 +29,7 @@ const { t, te } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const store = useAuthStore()
-const { isLoggingIn } = storeToRefs(store)
+const { isLoggingIn, userType } = storeToRefs(store)
 
 const email = ref('')
 const password = ref('')
@@ -52,13 +52,56 @@ const submitLabel = computed(() =>
   isLoggingIn.value ? t('auth.ui.loading.logging_in') : t('auth.ui.actions.sign_in'),
 )
 
+/**
+ * Resolve the post-login navigation target.
+ *
+ * Stabilization (post-Sprint 3): pre-fix this page sent every user to
+ * `/` after a successful login, which is `app.dashboard` →
+ * `DashboardPlaceholderPage` wrapped in `AgencyLayout` (sidebar:
+ * Dashboard / Brands / Team / Settings). For a creator who arrived
+ * via the bulk-invite magic link → sign-up → sign-in path, that's the
+ * wrong shell entirely — they should land on the onboarding wizard's
+ * Welcome-Back surface (`/onboarding`), which auto-advances to the
+ * next incomplete step (or to `/creator/dashboard` if their
+ * `application_status !== 'incomplete'`).
+ *
+ * Rule:
+ *   1. If `?redirect=<path>` is set AND it's not the default agency
+ *      home (`/`), honor it. This preserves the session-expired flow
+ *      where `requireAuth` captured `to.fullPath` (e.g.
+ *      `/onboarding/profile`) before bouncing through sign-in —
+ *      `requireOnboardingAccess` on the destination still validates
+ *      the user_type + status, so a stale wizard redirect against an
+ *      agency user (or vice-versa) is still safely bounced.
+ *   2. Otherwise dispatch by `user_type`: creators land on the wizard's
+ *      Welcome-Back page (which itself routes onward to the right
+ *      step or to the creator dashboard); every other user_type lands
+ *      on the agency dashboard (the existing behaviour).
+ *
+ * The shape mirrors the symmetry already present in
+ * `requireOnboardingAccess`: non-creators bouncing OFF wizard routes
+ * land on `app.dashboard`, so creators bouncing TO their home should
+ * land on `onboarding.welcome-back`. The defensive case — a creator
+ * manually typing an agency URL — is tracked in `docs/tech-debt.md`
+ * under "Defensive requireAgencyUser guard for agency routes".
+ */
+function postLoginTarget(): RouteLocationRaw {
+  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+  if (redirect.length > 0 && redirect !== '/') {
+    return redirect
+  }
+  if (userType.value === 'creator') {
+    return { name: 'onboarding.welcome-back' }
+  }
+  return '/'
+}
+
 async function onSubmit(): Promise<void> {
   errorKey.value = null
   errorValues.value = {}
   try {
     await store.login(email.value, password.value, showTotpField.value ? totpCode.value : undefined)
-    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
-    await router.push(redirect)
+    await router.push(postLoginTarget())
   } catch (err) {
     if (err instanceof ApiError && err.code === 'auth.mfa_required') {
       // Reveal the TOTP field and keep the rest of the form intact.

@@ -24,6 +24,9 @@ vi.mock('@/modules/auth/api/auth.api', () => ({
 
 import { authApi } from '@/modules/auth/api/auth.api'
 
+// Default fixture for tests that don't pin post-login dispatch
+// behaviour. The stabilization fix dispatches creators to the
+// onboarding wizard; tests that pin that path use CREATOR_USER below.
 const USER = {
   type: 'user' as const,
   id: '01HQ',
@@ -31,7 +34,7 @@ const USER = {
     email: 'a@b.c',
     email_verified_at: '2026-01-01T00:00:00Z',
     name: 'A',
-    user_type: 'creator' as const,
+    user_type: 'agency_user' as const,
     preferred_language: 'en' as const,
     preferred_currency: 'USD',
     timezone: 'Europe/Lisbon',
@@ -41,6 +44,11 @@ const USER = {
     last_login_at: null,
     created_at: '2026-01-01T00:00:00Z',
   },
+}
+
+const CREATOR_USER = {
+  ...USER,
+  attributes: { ...USER.attributes, user_type: 'creator' as const },
 }
 
 describe('VerifyTotpPage', () => {
@@ -63,7 +71,7 @@ describe('VerifyTotpPage', () => {
     )
   })
 
-  it('happy path: re-submits login with email + password + mfa_code, navigates to /', async () => {
+  it('happy path: agency_user — re-submits login with email + password + mfa_code, navigates to /', async () => {
     vi.mocked(authApi.login).mockResolvedValue(USER)
     const h = await mountAuthPage(VerifyTotpPage, {
       initialRoute: {
@@ -85,7 +93,32 @@ describe('VerifyTotpPage', () => {
     expect(pushSpy).toHaveBeenCalledWith('/')
   })
 
-  it('happy path: navigates to ?redirect when present', async () => {
+  // ---------------------------------------------------------------------
+  // Stabilization (post-Sprint 3) — post-login dispatch by user_type
+  // (mirror of SignInPage). VerifyTotpPage handles the same login
+  // completion event one step further along the 2FA flow; if it
+  // diverged from SignInPage's dispatch logic, the same misroute would
+  // strike creators with 2FA enabled.
+  // ---------------------------------------------------------------------
+
+  it('happy path: creator — navigates to onboarding.welcome-back after MFA verification', async () => {
+    vi.mocked(authApi.login).mockResolvedValue(CREATOR_USER)
+    const h = await mountAuthPage(VerifyTotpPage, {
+      initialRoute: {
+        path: '/auth/2fa/verify',
+        query: { email: 'a@b.c', password: 'Pa$$w0rd!12' },
+      },
+    })
+    teardown = h.unmount
+    await flushPromises()
+    const pushSpy = vi.spyOn(h.router, 'push')
+    await h.wrapper.find('[data-test="verify-totp-code"] input').setValue('123456')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'onboarding.welcome-back' })
+  })
+
+  it('happy path: navigates to ?redirect when present (any user_type)', async () => {
     vi.mocked(authApi.login).mockResolvedValue(USER)
     const h = await mountAuthPage(VerifyTotpPage, {
       initialRoute: {

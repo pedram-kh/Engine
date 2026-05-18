@@ -13,7 +13,7 @@
 import { ApiError } from '@catalyst/api-client'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
@@ -23,11 +23,29 @@ const { t, te } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const store = useAuthStore()
-const { isLoggingIn } = storeToRefs(store)
+const { isLoggingIn, userType } = storeToRefs(store)
 
 const code = ref('')
 const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
+
+/**
+ * Post-login navigation target — mirrors `SignInPage.postLoginTarget`.
+ * See that file for the full rationale; the short version is that a
+ * creator finishing 2FA on the verify-totp route lands here too, and
+ * pre-stabilization this page also blindly pushed to `/`. Keeping the
+ * two surfaces' dispatch logic identical avoids a path-specific drift.
+ */
+function postLoginTarget(): RouteLocationRaw {
+  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+  if (redirect.length > 0 && redirect !== '/') {
+    return redirect
+  }
+  if (userType.value === 'creator') {
+    return { name: 'onboarding.welcome-back' }
+  }
+  return '/'
+}
 
 async function onSubmit(): Promise<void> {
   errorKey.value = null
@@ -40,8 +58,7 @@ async function onSubmit(): Promise<void> {
   }
   try {
     await store.login(email, password, code.value)
-    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
-    await router.push(redirect)
+    await router.push(postLoginTarget())
   } catch (err) {
     if (err instanceof ApiError) {
       const resolved = resolveErrorMessage(err, (k) => te(k))
