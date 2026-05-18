@@ -9,6 +9,21 @@ anyone reviewing it later.
 
 ---
 
+## Agency-side prospect/invited creators list
+
+- **Where:** new surface needed at `apps/main/src/modules/creator-invitations/` (or extension of the [`apps/main/src/modules/agency-users/`](../apps/main/src/modules/agency-users/) `InvitationHistoryTable` pattern). Backend: query surface over [`agency_creator_relations`](../apps/api/database/migrations/) filtered to current agency. Sprint 6 owns the full version per [`docs/20-PHASE-1-SPEC.md`](20-PHASE-1-SPEC.md) Sprint 6 "Agency SPA: creator roster view."
+- **What we accepted in Sprint 3 stabilization (May 16, 2026):** Bulk-invite UI ships at `/creator-invitations/bulk` ([Sprint 3 Chunk 4](reviews/sprint-3-chunk-4-review.md)). The post-upload Results card is the only signal of who was invited. No persistent list view surfaces invited-but-not-yet-accepted, accepted-but-incomplete, or approved/rejected creators back to the agency admin.
+- **Risk:** agency admins lose visibility on outstanding invitations once they close the Results card. They have no in-platform way to chase non-responders, see who's mid-wizard, or audit the long tail of their bulk-invite history. In production this either drives users to external tracking (defeating the platform's intent) or to repeated re-invitations.
+- **Mitigation today:** none. Audit log captures invitation events but isn't surfaced in the agency SPA. The agency-users "Invitation history" tab covers agency-user invitations only, not creator invitations.
+- **Triggered by:** Sprint 6 roster view per the spec, OR a Sprint 4 decision to land a minimal prospect-creators list as agency-side stabilization (see Sprint 4 scope discussion).
+- **Resolution:** two-tier framing.
+  - **Full version (Sprint 6 per spec):** roster view with filtering (country, language, categories, follower range, engagement rate, availability), FTS search, saved talent pools, per-creator detail with ratings + notes + blacklist status.
+  - **Minimal version (Sprint 4 chunk candidate):** prospect-creators list at `/creator-invitations` showing email + status (pending invitation / accepted / incomplete / submitted / approved / rejected) + `invited_at` + `invitation_link_status`. Backend: paginated query against `agency_creator_relations` filtered to current agency. Estimated ~1 chunk of work.
+- **Owner:** Sprint 4 chunk candidate (minimal) OR Sprint 6 (full version).
+- **Status:** open. Surfaced by Sprint 3 stabilization pass, May 16, 2026.
+
+---
+
 ## Unified server-authoritative stall detection across TrackedJob + wizard saga endpoints
 
 - **Where:** [`apps/api/app/Modules/TrackedJobs/Models/TrackedJob.php`](../apps/api/app/Modules/TrackedJobs/Models/TrackedJob.php) + the three wizard saga status controllers (KYC / payout / contract) under [`apps/api/app/Modules/Creators/Http/Controllers/`](../apps/api/app/Modules/Creators/Http/Controllers/). SPA consumers: [`apps/main/src/modules/creator-invitations/pages/BulkInvitePage.vue`](../apps/main/src/modules/creator-invitations/pages/BulkInvitePage.vue) + [`apps/main/src/modules/onboarding/composables/useVendorBounce.ts`](../apps/main/src/modules/onboarding/composables/useVendorBounce.ts).
