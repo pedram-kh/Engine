@@ -79,6 +79,11 @@ function splitCsvLine(line: string): string[] {
 }
 
 export function parseCsvText(text: string, sizeBytes: number): BulkInviteCsvParseResult {
+  // Strip UTF-8 BOM (Excel "CSV UTF-8" saves with EF BB BF). Without this,
+  // the first header cell reads as "\uFEFFemail" and the `email` column is
+  // not detected (fatal csv.header_missing), matching backend parity after
+  // BulkInviteCsvParser normalises headers the same way.
+  const normalisedText = text.replace(/^\uFEFF/, '')
   if (sizeBytes > MAX_BYTES) {
     return {
       rows: [],
@@ -93,7 +98,7 @@ export function parseCsvText(text: string, sizeBytes: number): BulkInviteCsvPars
     }
   }
 
-  const lines = text
+  const lines = normalisedText
     .replace(/\r\n/g, '\n')
     .replace(/\r/g, '\n')
     .split('\n')

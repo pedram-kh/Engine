@@ -119,7 +119,9 @@ final class BulkInviteCsvParser
     private function resolveEmailColumnIndex(array $header): int
     {
         foreach ($header as $i => $name) {
-            if (mb_strtolower(trim((string) $name)) === 'email') {
+            $normalised = mb_strtolower(trim((string) $name));
+            $normalised = preg_replace('/^\x{FEFF}/u', '', $normalised) ?? $normalised;
+            if ($normalised === 'email') {
                 return $i;
             }
         }

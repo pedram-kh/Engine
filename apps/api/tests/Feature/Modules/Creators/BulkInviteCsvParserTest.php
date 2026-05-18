@@ -29,6 +29,17 @@ it('parses a valid CSV with a single email column', function (): void {
         ->and($result['errors'])->toBeEmpty();
 });
 
+it('accepts CSV UTF-8 with leading BOM before the header (Excel)', function (): void {
+    $csv = "\xEF\xBB\xBF".'email'.PHP_EOL.'user@example.com'.PHP_EOL;
+    $parser = new BulkInviteCsvParser;
+
+    $result = $parser->parse(uploadedCsv($csv));
+
+    expect($result['row_count'])->toBe(1)
+        ->and($result['errors'])->toBeEmpty()
+        ->and($result['rows'][0]['email'])->toBe('user@example.com');
+});
+
 it('records per-row errors for invalid emails without aborting (Q3)', function (): void {
     $csv = "email\nvalid@example.com\nnot-an-email\n\nanother@example.com\n";
     $parser = new BulkInviteCsvParser;

@@ -12,6 +12,14 @@ import { describe, expect, it } from 'vitest'
 import { parseCsvText, BULK_INVITE_CSV_LIMITS } from './useBulkInviteCsv'
 
 describe('parseCsvText (bulk-invite)', () => {
+  it('strips UTF-8 BOM before parsing (Excel "CSV UTF-8" export)', () => {
+    const csv = '\uFEFFemail\nalice@example.com\n'
+    const result = parseCsvText(csv, csv.length)
+    expect(result.fatal).toBeNull()
+    expect(result.rowCount).toBe(1)
+    expect(result.rows[0]?.email).toBe('alice@example.com')
+  })
+
   it('parses a happy-path 3-row CSV with only the email column', () => {
     const csv = 'email\nalice@example.com\nbob@example.com\ncarol@example.com\n'
     const result = parseCsvText(csv, csv.length)
