@@ -128,7 +128,14 @@ final class AuthService
         // grep rather than via a 50-frame trace. Mirrors the equivalent
         // `hasSession()` guard already in `logout()`.
         if (! $request->hasSession()) {
-            Log::error('auth.login.no_session_bound_on_request', [
+            // Log event uses the subsystem prefix (`identity.*`) — parallel
+            // to PwnedPasswordsClient's `hibp.*` — so the SPA's i18n
+            // architecture test (tests/unit/architecture/i18n-auth-codes.spec.ts)
+            // does NOT harvest it as a user-facing translation key. This is
+            // a server-config diagnostic that never reaches a creator's
+            // banner; the throw below 500s the request with Laravel's
+            // generic exception envelope.
+            Log::error('identity.login.no_session_bound_on_request', [
                 'host' => $request->getHttpHost(),
                 'referer' => $request->headers->get('referer'),
                 'origin' => $request->headers->get('origin'),
