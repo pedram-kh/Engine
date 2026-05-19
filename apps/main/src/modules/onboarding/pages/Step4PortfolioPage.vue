@@ -55,12 +55,12 @@ const galleryItems = computed(() => {
     kind: item.kind,
     title: item.title,
     description: item.description,
-    // Phase 1: backend returns the storage path verbatim and the
-    // SPA hands it to the gallery as the thumbnail URL. When private
-    // storage + signed URLs land (tech-debt: Sprint 4+ asset disk
-    // hardening), this will move to a `view_url` field on the
-    // resource — gallery component already accepts a nullable string.
-    thumbnailUrl: item.thumbnail_path ?? item.s3_path,
+    // Backend mints presigned GET URLs against the private `media`
+    // disk on every bootstrap; prefer the dedicated thumbnail URL,
+    // fall back to the full-size view URL when no thumbnail exists.
+    // The raw `*_path` fields are storage keys and are NOT directly
+    // browser-fetchable.
+    thumbnailUrl: item.thumbnail_view_url ?? item.view_url,
     externalUrl: item.external_url,
     altText: item.title ?? t('creator.ui.wizard.steps.portfolio.untitled_item'),
   }))

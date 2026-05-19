@@ -13,8 +13,11 @@ use App\Modules\Creators\Models\CreatorKycVerification;
 use App\Modules\Creators\Models\CreatorPortfolioItem;
 use App\Modules\Creators\Models\CreatorSocialAccount;
 use App\Modules\Creators\Services\CompletenessScoreCalculator;
+use App\Modules\Creators\Services\PortfolioUploadService;
+use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Pennant\Feature;
 
 /**
@@ -49,6 +52,17 @@ use Laravel\Pennant\Feature;
  */
 final class CreatorResource extends JsonResource
 {
+    /**
+     * TTL for the signed view URLs we mint on every bootstrap. 60 minutes
+     * is comfortably longer than a typical wizard sitting (median ~12 min
+     * across Sprint 3 telemetry) and short enough that a leaked URL stops
+     * working before it can travel. The SPA refetches `/creators/me` on
+     * every wizard hydrate / dashboard mount, so the URLs are renewed on
+     * each navigation — clients never hold a single URL past its expiry
+     * in normal flows.
+     */
+    private const int SIGNED_URL_TTL_MINUTES = 60;
+
     /**
      * Toggled by {@see self::withAdmin()}. When true, {@see self::toArray()}
      * appends the `admin_attributes` block. When false (default), the
@@ -107,6 +121,16 @@ final class CreatorResource extends JsonResource
                 'categories' => $creator->categories,
                 'avatar_path' => $creator->avatar_path,
                 'cover_path' => $creator->cover_path,
+                // Signed view URLs for the private `media` disk. Phase 1
+                // (Sprint 3 stabilization): backend mints a presigned GET
+                // URL on every bootstrap so the SPA's <img src> can fetch
+                // the asset directly. The `_path` fields are kept for one
+                // sprint as the old contract; the SPA reads `_url` only.
+                // Null when the underlying path is null OR when the disk
+                // is non-S3 (test fakes via `Storage::fake('media')` use
+                // the local driver, which doesn't support temporaryUrl).
+                'avatar_url' => $this->signedViewUrl($creator->avatar_path),
+                'cover_url' => $this->signedViewUrl($creator->cover_path),
                 'verification_level' => $creator->verification_level->value,
                 'application_status' => $creator->application_status->value,
                 'tier' => $creator->tier,
@@ -123,11 +147,11 @@ final class CreatorResource extends JsonResource
                 // fields (encrypted via casts) never leave the backend.
                 'social_accounts' => $this->mapSocialAccounts($creator),
                 // Sprint 3 Chunk 3 sub-step 6: persisted portfolio items.
-                // Storage paths are kept opaque — the SPA must request
-                // signed view URLs via a future drill-in endpoint, not
-                // construct them directly. Phase 1 ships the path
-                // verbatim for the SPA to feed into a `<v-img>` via
-                // the Filesystem disk's `url()` derivation.
+                // Each entry carries both the raw storage path (`s3_path`,
+                // `thumbnail_path`) and a freshly-minted signed view URL
+                // (`view_url`, `thumbnail_view_url`) so the SPA can render
+                // <img> directly against the private `media` disk without
+                // a second drill-in round trip. See {@see self::mapPortfolio()}.
                 'portfolio' => $this->mapPortfolio($creator),
                 'profile_completeness_score' => $creator->profile_completeness_score,
                 'submitted_at' => $creator->submitted_at?->toIso8601String(),
@@ -215,10 +239,9 @@ final class CreatorResource extends JsonResource
     /**
      * Map persisted portfolio items to the SPA-consumable summary shape.
      *
-     * The `s3_path` and `thumbnail_path` fields are surfaced verbatim;
-     * the SPA's `<PortfolioGallery>` component is expected to read them
-     * via the Filesystem disk's `url()` helper (or a future signed-URL
-     * drill-in endpoint when the assets move to private storage).
+     * Each entry exposes both the raw storage path and a freshly-minted
+     * signed view URL. Link items (kind=link) have no S3 path; their URL
+     * fields stay null and the SPA renders `external_url` instead.
      *
      * @return list<array<string, mixed>>
      */
@@ -238,8 +261,10 @@ final class CreatorResource extends JsonResource
                     'title' => $item->title,
                     'description' => $item->description,
                     's3_path' => $item->s3_path,
+                    'view_url' => $this->signedViewUrl($item->s3_path),
                     'external_url' => $item->external_url,
                     'thumbnail_path' => $item->thumbnail_path,
+                    'thumbnail_view_url' => $this->signedViewUrl($item->thumbnail_path),
                     'mime_type' => $item->mime_type,
                     'size_bytes' => $item->size_bytes,
                     'duration_seconds' => $item->duration_seconds,
@@ -247,5 +272,30 @@ final class CreatorResource extends JsonResource
                 ])
                 ->all(),
         );
+    }
+
+    /**
+     * Mint a presigned GET URL against the private `media` disk.
+     *
+     * Returns null when:
+     *   - the path is null (no asset persisted yet), OR
+     *   - the disk's underlying adapter is not S3-compatible. This
+     *     happens in tests that call `Storage::fake('media')` — the
+     *     fake uses the local-filesystem driver, which throws on
+     *     `temporaryUrl()`. Mirrors the guard pattern already used in
+     *     {@see PortfolioUploadService::initiatePresignedUpload()}.
+     */
+    private function signedViewUrl(?string $path): ?string
+    {
+        if ($path === null) {
+            return null;
+        }
+
+        $disk = Storage::disk('media');
+        if (! $disk instanceof AwsS3V3Adapter) {
+            return null;
+        }
+
+        return $disk->temporaryUrl($path, now()->addMinutes(self::SIGNED_URL_TTL_MINUTES));
     }
 }

@@ -80,7 +80,7 @@ Sprint 3 acceptance criteria from `20-PHASE-1-SPEC.md` § 5 are now ~75% met acr
 
 - **`PortfolioGallery` shared component.** Responsive grid for image/video/link items. Editable variant exposes per-item remove affordance. Vuetify-themed; design-token discipline maintained (no hardcoded rgba).
 - **`Step4PortfolioPage`.** Integrates `PortfolioUploadGrid` (in-flight, sub-step 3) + `PortfolioGallery` (persisted, sub-step 6). Advance button disabled until at least one persisted item exists.
-- **`portfolio` in `CreatorResource`.** Bootstrap response gains `attributes.portfolio`. Storage paths emitted opaquely; signed view URLs deferred to Sprint 4+ asset-disk hardening.
+- **`portfolio` in `CreatorResource`.** Bootstrap response gains `attributes.portfolio`. Storage paths emitted opaquely; signed view URLs landed in Sprint 3 stabilization (May 19, 2026) via `Storage::disk('media')->temporaryUrl()` minting parallel `view_url` + `thumbnail_view_url` fields — see this review's "Sprint 4+ asset disk hardening" follow-up below for the closure note.
 - **`removePortfolioItem`** Pinia action — calls `DELETE /api/v1/creators/me/portfolio/{ulid}` then re-bootstraps.
 - **Coverage delta**: 4 Step4 tests.
 
@@ -413,7 +413,7 @@ These decisions (Q-driver-convention + Phase 1 flag invocation pattern) hold unc
 
 ### Sprint 4+ (asset disk hardening)
 
-- Signed view URLs for portfolio + KYC verification storage paths.
+- ~~Signed view URLs for portfolio + KYC verification storage paths.~~ **Closed by Sprint 3 stabilization pass (May 19, 2026)** — `CreatorResource` now mints presigned `avatar_url`/`cover_url`/`view_url`/`thumbnail_view_url` via `Storage::disk('media')->temporaryUrl()`, both SPAs consume the `*_url` fields, architecture test pins the path↔url parity contract. KYC document previews (Sprint 4) inherit the same `signedViewUrl()` helper.
 
 ### Sprint 10 (payments)
 

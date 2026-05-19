@@ -198,7 +198,7 @@ All three shapes are valid; the failure-mode shape (Chunk 3) is the well-trodden
 
 ### Sprint 4+ (asset disk hardening)
 
-- Signed view URLs for portfolio + KYC verification storage paths.
+- ~~Signed view URLs for portfolio + KYC verification storage paths.~~ **Closed by Sprint 3 stabilization pass (May 19, 2026)** — `CreatorResource` now mints presigned `avatar_url`/`cover_url`/`view_url`/`thumbnail_view_url` via `Storage::disk('media')->temporaryUrl()`, both SPAs consume the `*_url` fields, architecture test pins the path↔url parity contract. KYC document previews (Sprint 4) inherit the same `signedViewUrl()` helper.
 
 ### Sprint 10 (payments)
 

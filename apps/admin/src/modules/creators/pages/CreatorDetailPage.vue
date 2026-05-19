@@ -119,7 +119,11 @@ const portfolioItems = computed(() => {
     kind: item.kind,
     title: item.title,
     description: item.description,
-    thumbnailUrl: item.thumbnail_path ?? item.s3_path,
+    // The `media` disk is private; we MUST read the backend-minted
+    // signed URLs rather than constructing one from `*_path`. Fall
+    // back to the full-size `view_url` when no dedicated thumbnail
+    // exists (e.g. images with no thumbnail variant generated).
+    thumbnailUrl: item.thumbnail_view_url ?? item.view_url,
     externalUrl: item.external_url,
     altText: item.title ?? t('creator.ui.wizard.steps.portfolio.untitled_item'),
   }))

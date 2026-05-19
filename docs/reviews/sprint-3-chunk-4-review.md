@@ -453,7 +453,7 @@ The B1 finding has the largest blast radius of any Sprint 3 bug: avatar + portfo
 
 ### Sprint 4+ (asset disk hardening)
 
-- Signed view URLs for portfolio + KYC verification storage paths.
+- ~~Signed view URLs for portfolio + KYC verification storage paths.~~ **Closed by Sprint 3 stabilization pass (May 19, 2026)** — `CreatorResource` now mints presigned `avatar_url`/`cover_url`/`view_url`/`thumbnail_view_url` via `Storage::disk('media')->temporaryUrl()`, both SPAs consume the `*_url` fields, architecture test pins the path↔url parity contract. KYC document previews (Sprint 4) inherit the same `signedViewUrl()` helper.
 - **Multipart endpoint E2E coverage audit** — verify every endpoint family with FormData payloads has at least one Playwright spec driving the real DOM path. New from Sprint 3 Chunk 4 B1 finding.
 
 ---

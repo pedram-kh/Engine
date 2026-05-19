@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Creators\Database\Factories\CreatorFactory;
 use App\Modules\Creators\Database\Factories\CreatorKycVerificationFactory;
+use App\Modules\Creators\Database\Factories\CreatorPortfolioItemFactory;
 use App\Modules\Creators\Enums\KycStatus;
 use App\Modules\Creators\Enums\KycVerificationStatus;
 use App\Modules\Creators\Features\ContractSigningEnabled;
@@ -13,8 +14,11 @@ use App\Modules\Creators\Http\Resources\CreatorResource;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Services\CompletenessScoreCalculator;
 use App\Modules\Identity\Models\User;
+use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Pennant\Feature;
 use Tests\TestCase;
 
@@ -251,4 +255,163 @@ it('flag-OFF + kyc_status=NotRequired both render — forensic distinction is pr
 
     expect($payload['attributes']['kyc_status'])->toBe('not_required');
     expect($payload['wizard']['flags'][KycVerificationEnabled::NAME])->toBe(false);
+});
+
+// ---------------------------------------------------------------------------
+// Asset-disk hardening (Sprint 3 stabilization).
+//
+// The `media` disk is private — raw `*_path` fields are storage keys and
+// are NOT directly browser-fetchable. The resource MUST surface a parallel
+// `*_url` field for every path, populated with a presigned GET URL on the
+// real disk (and gracefully null when the disk is faked with the local
+// driver, which doesn't support `temporaryUrl()`).
+// ---------------------------------------------------------------------------
+
+it('exposes null avatar_url + cover_url when the underlying paths are null', function (): void {
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne([
+        'user_id' => $user->id,
+        'avatar_path' => null,
+        'cover_path' => null,
+    ]);
+
+    $payload = makeResource($creator)->toArray(Request::create('/'));
+
+    expect($payload['attributes'])->toHaveKeys(['avatar_url', 'cover_url']);
+    expect($payload['attributes']['avatar_url'])->toBeNull();
+    expect($payload['attributes']['cover_url'])->toBeNull();
+});
+
+it('exposes null *_url fields when the `media` disk is faked with a non-S3 adapter', function (): void {
+    // Storage::fake() swaps in the local-filesystem driver, which
+    // throws on temporaryUrl(). The resource's adapter check should
+    // catch this and return null instead of bubbling the exception.
+    Storage::fake('media');
+
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne([
+        'user_id' => $user->id,
+        'avatar_path' => 'creators/test/avatar/x.jpg',
+        'cover_path' => 'creators/test/cover/y.jpg',
+    ]);
+
+    $payload = makeResource($creator)->toArray(Request::create('/'));
+
+    expect($payload['attributes']['avatar_path'])->toBe('creators/test/avatar/x.jpg');
+    expect($payload['attributes']['cover_path'])->toBe('creators/test/cover/y.jpg');
+    expect($payload['attributes']['avatar_url'])->toBeNull();
+    expect($payload['attributes']['cover_url'])->toBeNull();
+});
+
+it('mints presigned avatar_url + cover_url when the disk is S3-backed', function (): void {
+    // Mock the S3 adapter so we don't depend on a live MinIO connection
+    // — the contract under test is "resource calls temporaryUrl() and
+    // surfaces the result", not the wire-level signature mechanics.
+    $adapter = Mockery::mock(AwsS3V3Adapter::class);
+    $adapter->shouldReceive('temporaryUrl')
+        ->with('creators/test/avatar/x.jpg', Mockery::type(Carbon::class))
+        ->andReturn('https://signed.example/avatar?sig=abc');
+    $adapter->shouldReceive('temporaryUrl')
+        ->with('creators/test/cover/y.jpg', Mockery::type(Carbon::class))
+        ->andReturn('https://signed.example/cover?sig=def');
+    Storage::shouldReceive('disk')->with('media')->andReturn($adapter);
+
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne([
+        'user_id' => $user->id,
+        'avatar_path' => 'creators/test/avatar/x.jpg',
+        'cover_path' => 'creators/test/cover/y.jpg',
+    ]);
+
+    $payload = makeResource($creator)->toArray(Request::create('/'));
+
+    expect($payload['attributes']['avatar_url'])->toBe('https://signed.example/avatar?sig=abc');
+    expect($payload['attributes']['cover_url'])->toBe('https://signed.example/cover?sig=def');
+});
+
+it('exposes view_url + thumbnail_view_url on every portfolio item', function (): void {
+    $adapter = Mockery::mock(AwsS3V3Adapter::class);
+    $adapter->shouldReceive('temporaryUrl')
+        ->andReturnUsing(fn (string $path): string => "https://signed.example/{$path}?sig=test");
+    Storage::shouldReceive('disk')->with('media')->andReturn($adapter);
+
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+    CreatorPortfolioItemFactory::new()->createOne([
+        'creator_id' => $creator->id,
+        's3_path' => 'creators/01/portfolio/img.jpg',
+        'thumbnail_path' => null,
+    ]);
+    CreatorPortfolioItemFactory::new()->video()->createOne([
+        'creator_id' => $creator->id,
+        's3_path' => 'creators/01/portfolio/clip.mp4',
+        'thumbnail_path' => 'creators/01/portfolio/thumbs/clip.jpg',
+    ]);
+
+    $creator->load('portfolioItems');
+    $payload = makeResource($creator)->toArray(Request::create('/'));
+    $items = $payload['attributes']['portfolio'];
+
+    expect($items)->toHaveCount(2);
+    foreach ($items as $item) {
+        expect($item)->toHaveKeys(['view_url', 'thumbnail_view_url']);
+        expect($item['view_url'])->toContain('https://signed.example/');
+        expect($item['view_url'])->toContain('?sig=test');
+    }
+    // The image (no thumbnail) gets null; the video (with thumb) gets a URL.
+    $image = collect($items)->firstWhere('s3_path', 'creators/01/portfolio/img.jpg');
+    $video = collect($items)->firstWhere('s3_path', 'creators/01/portfolio/clip.mp4');
+    expect($image['thumbnail_view_url'])->toBeNull();
+    expect($video['thumbnail_view_url'])->toBe('https://signed.example/creators/01/portfolio/thumbs/clip.jpg?sig=test');
+});
+
+it('link portfolio items have null view_url + thumbnail_view_url (no S3 asset)', function (): void {
+    Storage::fake('media');
+
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+    CreatorPortfolioItemFactory::new()->link()->createOne([
+        'creator_id' => $creator->id,
+    ]);
+
+    $creator->load('portfolioItems');
+    $payload = makeResource($creator)->toArray(Request::create('/'));
+    $item = $payload['attributes']['portfolio'][0];
+
+    expect($item['kind'])->toBe('link');
+    expect($item['s3_path'])->toBeNull();
+    expect($item['view_url'])->toBeNull();
+    expect($item['thumbnail_view_url'])->toBeNull();
+    expect($item['external_url'])->not->toBeNull();
+});
+
+it('every attribute carrying a *_path field also carries a parallel *_url field (architecture contract)', function (): void {
+    // Pins the resource-shape invariant so adding a future `*_path`
+    // without its `*_url` sibling fails fast. The signed-URL contract
+    // is documented in CreatorResource::signedViewUrl() — any new
+    // private-disk path field MUST be minted into a signed URL by the
+    // same helper.
+    Storage::fake('media');
+
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+    CreatorPortfolioItemFactory::new()->video()->createOne(['creator_id' => $creator->id]);
+    $creator->load('portfolioItems');
+
+    $payload = makeResource($creator)->toArray(Request::create('/'));
+    $attributes = $payload['attributes'];
+
+    // Top-level paths
+    foreach (['avatar', 'cover'] as $prefix) {
+        expect($attributes)->toHaveKey("{$prefix}_path");
+        expect($attributes)->toHaveKey("{$prefix}_url");
+    }
+
+    // Per-portfolio-item paths
+    foreach ($attributes['portfolio'] as $item) {
+        expect($item)->toHaveKey('s3_path');
+        expect($item)->toHaveKey('view_url');
+        expect($item)->toHaveKey('thumbnail_path');
+        expect($item)->toHaveKey('thumbnail_view_url');
+    }
 });

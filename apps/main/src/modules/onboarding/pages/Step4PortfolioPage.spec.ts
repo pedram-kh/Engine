@@ -36,6 +36,8 @@ function makeBootstrapWith(
         categories: null,
         avatar_path: null,
         cover_path: null,
+        avatar_url: null,
+        cover_url: null,
         verification_level: 'unverified',
         application_status: 'incomplete',
         tier: null,
@@ -52,8 +54,10 @@ function makeBootstrapWith(
           title: p.title ?? null,
           description: null,
           s3_path: `creators/01/portfolio/${p.id}.jpg`,
+          view_url: `https://signed.example/creators/01/portfolio/${p.id}.jpg?sig=test`,
           external_url: null,
           thumbnail_path: null,
+          thumbnail_view_url: null,
           mime_type: p.kind === 'image' ? 'image/jpeg' : 'video/mp4',
           size_bytes: 1024,
           duration_seconds: null,
@@ -141,6 +145,35 @@ describe('Step4PortfolioPage', () => {
     expect(wrapper.find('[data-testid="portfolio-gallery-item-01HQA"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="portfolio-gallery-item-01HQB"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="portfolio-advance"]').attributes('disabled')).toBeUndefined()
+  })
+
+  // Asset-disk hardening (Sprint 3 stabilization). The `media` disk is
+  // private; the gallery MUST bind to the backend-minted signed view URL
+  // (`view_url`) and NOT the raw `s3_path`. This pins the binding so a
+  // regression to the path-based shortcut reintroduces broken thumbnails.
+  it('binds <img src> to the signed view_url, never the raw s3_path', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
+      makeBootstrapWith([{ id: '01HQA', kind: 'image', title: 'Beach shoot' }]),
+    )
+
+    const { wrapper, unmount } = await mountAuthPage(Step4PortfolioPage, {
+      initialRoute: { path: '/onboarding/portfolio' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    const img = wrapper.find('[data-testid="portfolio-gallery-item-01HQA"] img')
+    expect(img.exists()).toBe(true)
+    const src = img.attributes('src') ?? ''
+    // Signed URL host + signature query — exact echo of the fixture's
+    // `view_url`. The raw `s3_path` alone (without the signed host /
+    // signature) would NOT satisfy this assertion.
+    expect(src).toBe('https://signed.example/creators/01/portfolio/01HQA.jpg?sig=test')
+    expect(src).toMatch(/^https:\/\/signed\.example\//)
+    expect(src).toContain('?sig=')
   })
 
   it('calls deletePortfolioItem and re-bootstraps when remove is emitted', async () => {

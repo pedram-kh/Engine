@@ -37,6 +37,8 @@ function makeBootstrap(opts: {
         categories: null,
         avatar_path: null,
         cover_path: null,
+        avatar_url: null,
+        cover_url: null,
         verification_level: 'unverified',
         application_status: opts.isSubmitted ? 'pending' : 'incomplete',
         tier: null,

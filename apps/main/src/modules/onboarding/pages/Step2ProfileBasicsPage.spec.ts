@@ -28,6 +28,8 @@ const baseAttributes = {
   categories: ['lifestyle'] as string[],
   avatar_path: null,
   cover_path: null,
+  avatar_url: null,
+  cover_url: null,
   verification_level: 'unverified' as const,
   application_status: 'incomplete' as const,
   tier: null,

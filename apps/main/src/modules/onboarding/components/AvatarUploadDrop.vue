@@ -42,9 +42,15 @@ const sizeHint = computed(() =>
   t('creator.ui.upload.size_hint', { max_mb: AVATAR_MAX_MB, types: AVATAR_ALLOWED_DESCRIPTORS }),
 )
 
+// `avatar_url` is the presigned GET URL minted by the backend on
+// each bootstrap (`media` disk is private; raw `avatar_path` is not
+// browser-fetchable). `hasPersisted` keys off the path because that's
+// the authoritative "is something stored" signal — the URL can be
+// null transiently in test environments that don't mock the S3 disk.
 const persistedAvatarPath = computed(() => store.creator?.attributes.avatar_path ?? null)
+const persistedAvatarUrl = computed(() => store.creator?.attributes.avatar_url ?? null)
 const hasPersisted = computed(() => persistedAvatarPath.value !== null)
-const displayUrl = computed(() => previewUrl.value ?? persistedAvatarPath.value)
+const displayUrl = computed(() => previewUrl.value ?? persistedAvatarUrl.value)
 
 const errorMessage = computed(() => {
   if (error.value === null) return null

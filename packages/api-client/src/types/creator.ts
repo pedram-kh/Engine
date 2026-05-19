@@ -124,6 +124,19 @@ export interface CreatorAttributes {
   categories: string[] | null
   avatar_path: string | null
   cover_path: string | null
+  /**
+   * Presigned GET URL minted by the backend on every bootstrap.
+   * The `media` disk is private; the SPA MUST consume `*_url` for
+   * `<img src>` bindings rather than constructing a URL from
+   * `*_path`. Null when the underlying path is null.
+   *
+   * TTL is 60 minutes (see `CreatorResource::SIGNED_URL_TTL_MINUTES`).
+   * The SPA refetches `/creators/me` on every wizard hydrate /
+   * dashboard mount, so URLs are renewed on each navigation — no
+   * client-side refresh logic is required for normal flows.
+   */
+  avatar_url: string | null
+  cover_url: string | null
   verification_level: CreatorVerificationLevel
   application_status: CreatorApplicationStatus
   tier: string | null
@@ -337,6 +350,11 @@ export interface CreatorSocialAccountSummary {
  * For uploaded media, `s3_path` is populated; for link items,
  * `external_url` is populated and `s3_path` is null. The kind enum
  * disambiguates which is canonical.
+ *
+ * `view_url` / `thumbnail_view_url` are presigned GET URLs minted
+ * by the backend on every bootstrap (60-min TTL). The SPA MUST
+ * read these for `<img src>` bindings — the `*_path` fields refer
+ * to keys on the private `media` disk and are NOT browser-fetchable.
  */
 export interface CreatorPortfolioItemSummary {
   id: string
@@ -344,8 +362,10 @@ export interface CreatorPortfolioItemSummary {
   title: string | null
   description: string | null
   s3_path: string | null
+  view_url: string | null
   external_url: string | null
   thumbnail_path: string | null
+  thumbnail_view_url: string | null
   mime_type: string | null
   size_bytes: number | null
   duration_seconds: number | null

@@ -4,8 +4,11 @@
  * Direct-multipart upload to `POST /api/v1/creators/me/avatar`. The
  * backend processes the image via Intervention/Image — resizes,
  * strips EXIF, re-encodes to a small set of allowed formats — and
- * returns the refreshed `CreatorResource` with `avatar_path`
- * populated on a 2xx.
+ * returns the refreshed `CreatorResource` with `avatar_path` (the
+ * raw storage key on the private `media` disk) AND `avatar_url`
+ * (a 60-min presigned GET URL) populated on a 2xx. Display code
+ * MUST consume `avatar_url`, not `avatar_path` — the path is not
+ * directly browser-fetchable.
  *
  * Pre-flight validation (mirrors the backend rules so the SPA
  * surfaces a friendly error without round-tripping):
