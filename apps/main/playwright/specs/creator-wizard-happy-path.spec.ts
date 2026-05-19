@@ -222,7 +222,17 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     await page.locator('[data-testid="tax-address-street"]').locator('input').fill('1 Test Lane')
     await page.locator('[data-testid="tax-address-city"]').locator('input').fill('Dublin')
     await page.locator('[data-testid="tax-address-postal"]').locator('input').fill('D01XYZ')
-    await page.locator('[data-testid="tax-address-country"]').locator('input').fill('IE')
+
+    // Step 6's address country flipped from <v-text-field> to <v-select>
+    // in commit 2dd649c (per-field 422 rendering + ISO country picker)
+    // so the backend's `address.country_code` rule (`size:2`) no longer
+    // bounces creators who type "Spain". The previous `.fill('IE')` on
+    // the inner readonly input does not propagate to v-model on a
+    // v-select; drive it the same way the Step 2 profile country
+    // picker is driven (click → role=option) so the v-model
+    // actually updates and the save button enables.
+    await page.locator('[data-testid="tax-address-country"]').click()
+    await page.getByRole('option', { name: 'Ireland' }).click()
 
     await page.locator('[data-testid="tax-save"]').click()
     await expect(page.locator('[data-testid="tax-advance"]')).toBeEnabled({ timeout: 10_000 })

@@ -535,8 +535,15 @@ export async function seedAvatar(page: Page): Promise<{ avatarPath: string }> {
     throw new Error(`seedAvatar failed with status ${response.status()}: ${await response.text()}`)
   }
 
-  const body = (await response.json()) as { data: { avatar_path: string } }
-  return { avatarPath: body.data.avatar_path }
+  // AvatarController returns a canonical CreatorResource envelope
+  // since e8584ec (matching every other wizard endpoint, so the SPA
+  // store reactively refreshes on upload/delete). The previous shape
+  // `{ data: { avatar_path } }` is gone; the path now lives at
+  // `data.attributes.avatar_path`. The wizard happy-path spec
+  // discards this return value, but a future caller would silently
+  // get `undefined` under the old cast — keep the contract honest.
+  const body = (await response.json()) as { data: { attributes: { avatar_path: string } } }
+  return { avatarPath: body.data.attributes.avatar_path }
 }
 
 export interface SeedPortfolioImageResult {
