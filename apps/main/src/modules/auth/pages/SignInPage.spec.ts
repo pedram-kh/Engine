@@ -53,6 +53,19 @@ const CREATOR_USER = {
   attributes: { ...USER.attributes, user_type: 'creator' as const },
 }
 
+// Unverified creator fixture. Caught by playwright/specs/
+// 2fa-enrollment-and-sign-in.spec.ts:125 and failed-login-lockout-
+// and-reset.spec.ts:244 in CI when c479189's `postLoginTarget()`
+// dispatched these users to /onboarding without first checking
+// `email_verified_at` — the resulting requireOnboardingAccess
+// bootstrap() 403s and the SPA shows the generic banner with no
+// URL change. The post-stabilization rule: unverified creators go
+// to /verify-email/pending instead.
+const CREATOR_USER_UNVERIFIED = {
+  ...CREATOR_USER,
+  attributes: { ...CREATOR_USER.attributes, email_verified_at: null },
+}
+
 describe('SignInPage', () => {
   let teardown: (() => void) | null = null
 
@@ -137,6 +150,33 @@ describe('SignInPage', () => {
     await h.wrapper.find('form').trigger('submit')
     await flushPromises()
     expect(pushSpy).toHaveBeenCalledWith({ name: 'onboarding.welcome-back' })
+  })
+
+  it('happy path: unverified creator — pushes to auth.verify-email.pending (NOT onboarding) so the bootstrap 403 is avoided', async () => {
+    vi.mocked(authApi.login).mockResolvedValue(CREATOR_USER_UNVERIFIED)
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    const pushSpy = vi.spyOn(h.router, 'push')
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'auth.verify-email.pending' })
+  })
+
+  it('happy path: unverified creator with ?redirect=/ still bounces to verify-email-pending (the /-default redirect is ignored on this branch too)', async () => {
+    vi.mocked(authApi.login).mockResolvedValue(CREATOR_USER_UNVERIFIED)
+    const h = await mountAuthPage(SignInPage, {
+      initialRoute: { path: '/sign-in', query: { redirect: '/' } },
+    })
+    teardown = h.unmount
+    await flushPromises()
+    const pushSpy = vi.spyOn(h.router, 'push')
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'auth.verify-email.pending' })
   })
 
   it('happy path: pushes to ?redirect=/foo when query param is set (session-expired flow, both user_types)', async () => {

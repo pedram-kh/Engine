@@ -42,6 +42,15 @@ function postLoginTarget(): RouteLocationRaw {
     return redirect
   }
   if (userType.value === 'creator') {
+    // Mirrors SignInPage.postLoginTarget — see the long comment there
+    // for the discovery context. A creator who reaches the TOTP page
+    // has already completed 2FA enrollment (which itself requires a
+    // verified email), so this branch is largely defensive symmetry,
+    // but keeping the two dispatch surfaces identical prevents
+    // path-specific drift.
+    if (store.user?.attributes.email_verified_at == null) {
+      return { name: 'auth.verify-email.pending' }
+    }
     return { name: 'onboarding.welcome-back' }
   }
   return '/'

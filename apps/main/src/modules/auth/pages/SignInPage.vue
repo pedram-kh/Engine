@@ -91,6 +91,21 @@ function postLoginTarget(): RouteLocationRaw {
     return redirect
   }
   if (userType.value === 'creator') {
+    // Unverified creators cannot bootstrap any verified-gated wizard
+    // surface — `/api/v1/creators/me` responds 403, so
+    // `requireOnboardingAccess`'s bootstrap() throws, router.push
+    // rejects, and the SPA shows the generic "Something went wrong"
+    // banner with the URL stuck on /sign-in. Caught in CI by
+    // playwright/specs/2fa-enrollment-and-sign-in.spec.ts:125 and
+    // playwright/specs/failed-login-lockout-and-reset.spec.ts:244 —
+    // both sign up a creator and immediately sign in WITHOUT clicking
+    // the verification email link. Production users hit the same
+    // edge case when they sign up, close the browser, then return
+    // and sign in directly. Bounce to `/verify-email/pending` so the
+    // precondition is fixed before the wizard guard chain runs.
+    if (store.user?.attributes.email_verified_at == null) {
+      return { name: 'auth.verify-email.pending' }
+    }
     return { name: 'onboarding.welcome-back' }
   }
   return '/'
