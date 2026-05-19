@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Modules\Creators\Http\Controllers;
 
 use App\Core\Errors\ErrorResponse;
+use App\Modules\Creators\Http\Resources\CreatorResource;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Services\AvatarUploadService;
+use App\Modules\Creators\Services\CompletenessScoreCalculator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,11 +22,19 @@ use RuntimeException;
  * Direct-multipart avatar upload. The service applies size + MIME
  * validation and re-encodes the image to strip EXIF (defense-in-depth
  * against accidental geo-PII leakage).
+ *
+ * Both endpoints return the canonical {@see CreatorResource} envelope
+ * (matching every other wizard endpoint in CreatorWizardController),
+ * so the SPA's `onboardingApi.uploadAvatar` / `deleteAvatar` typed as
+ * `Promise<CreatorResourceEnvelope>` can refresh the full creator
+ * state — including the freshly-minted presigned `avatar_url` — in
+ * the same round-trip.
  */
 final class AvatarController
 {
     public function __construct(
         private readonly AvatarUploadService $service,
+        private readonly CompletenessScoreCalculator $calculator,
     ) {}
 
     public function store(Request $request): JsonResponse
@@ -45,19 +55,16 @@ final class AvatarController
         }
 
         try {
-            $path = DB::transaction(function () use ($creator, $file): string {
+            DB::transaction(function () use ($creator, $file): void {
                 $path = $this->service->upload($creator, $file);
                 $creator->forceFill(['avatar_path' => $path])->save();
-
-                return $path;
             });
         } catch (RuntimeException $e) {
             return ErrorResponse::single($request, 422, 'avatar.upload_failed', $e->getMessage());
         }
 
-        return response()->json([
-            'data' => ['avatar_path' => $path],
-        ]);
+        return (new CreatorResource($creator->refresh(), $this->calculator))
+            ->response();
     }
 
     public function destroy(Request $request): JsonResponse
@@ -72,9 +79,8 @@ final class AvatarController
             $creator->forceFill(['avatar_path' => null])->save();
         });
 
-        return response()->json([
-            'data' => ['avatar_path' => null],
-        ]);
+        return (new CreatorResource($creator->refresh(), $this->calculator))
+            ->response();
     }
 
     private function resolveCreator(Request $request): Creator
