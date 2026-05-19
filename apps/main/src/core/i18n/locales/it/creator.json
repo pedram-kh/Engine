@@ -116,13 +116,17 @@
               "none": "Non iniziato"
             }
           },
+          "account_created": {
+            "name": "Account creato"
+          },
           "review": {
             "name": "Rivedi e invia",
             "title": "Rivedi la tua candidatura",
             "description": "Controlla tutto prima di inviare.",
             "completeness": "{percent}% completato",
             "edit_step": "Modifica",
-            "submit_button": "Invia candidatura"
+            "submit_button": "Invia candidatura",
+            "incomplete_blocker": "Hai 1 passaggio incompleto: {names}. Clicca Modifica per completarlo prima di inviare. | Hai {count} passaggi incompleti: {names}. Clicca Modifica su ciascuno per completarli prima di inviare."
           }
         },
         "fields": {

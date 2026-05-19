@@ -31,6 +31,7 @@ import type { CreatorWizardStepId } from '@catalyst/api-client'
 import { CompletenessBar } from '@catalyst/ui'
 import { computed, ref } from 'vue'
 
+import { resolveStepStatus, type WizardStepStatus } from '../composables/useFeatureFlags'
 import { resolveSubmitErrorKey } from '../composables/useSubmitErrorKey'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -60,17 +61,53 @@ const completenessLabel = computed(() =>
 )
 const completenessColor = computed(() => (score.value >= 100 ? 'success' : 'primary'))
 
-const stepRows = computed(() =>
-  REVIEWABLE_STEPS.map((step) => ({
-    id: step,
-    name: t(`creator.ui.wizard.steps.${step}.name`),
-    isComplete: store.stepCompletion[step] ?? false,
-    routeName: WIZARD_STEP_ROUTE_NAMES[step],
-  })),
+/**
+ * Sprint 3 stabilization (May 19, 2026): rows now carry their visible
+ * status (Completed / Skipped / Not started) AND the page surfaces an
+ * inline list of incomplete step names when Submit is disabled. The
+ * previous version showed a status ICON per row but no text + a
+ * disabled button with no explanation, leaving creators stuck staring
+ * at a greyed-out CTA wondering which step needed attention.
+ */
+const STATUS_I18N_KEY: Record<WizardStepStatus, string> = {
+  completed: 'creator.ui.wizard.progress.completed',
+  skipped: 'creator.ui.wizard.progress.skipped',
+  'not-started': 'creator.ui.wizard.progress.pending',
+}
+
+interface StepRow {
+  id: CreatorWizardStepId
+  name: string
+  isComplete: boolean
+  status: WizardStepStatus
+  statusLabel: string
+  routeName: string
+}
+
+const stepRows = computed<StepRow[]>(() =>
+  REVIEWABLE_STEPS.map((step) => {
+    const isComplete = store.stepCompletion[step] ?? false
+    const status = resolveStepStatus(step, isComplete, store.flags)
+    return {
+      id: step,
+      name: t(`creator.ui.wizard.steps.${step}.name`),
+      isComplete,
+      status,
+      statusLabel: t(STATUS_I18N_KEY[status]),
+      routeName: WIZARD_STEP_ROUTE_NAMES[step],
+    }
+  }),
 )
 
 const incompleteSteps = computed(() => stepRows.value.filter((row) => !row.isComplete))
 const canSubmit = computed(() => incompleteSteps.value.length === 0 && !store.isSubmitted)
+
+/**
+ * Joined human-readable names of every incomplete step, in display
+ * order. Localised so pt-BR / it-IT see "Profile basics, Tax
+ * information" with the same step names the side rail uses.
+ */
+const incompleteStepNames = computed(() => incompleteSteps.value.map((row) => row.name).join(', '))
 
 async function submit(): Promise<void> {
   submitErrorKey.value = null
@@ -103,16 +140,33 @@ async function goToStep(step: CreatorWizardStepId): Promise<void> {
         v-for="row in stepRows"
         :key="row.id"
         class="review-step__row"
+        :class="{
+          'review-step__row--incomplete': row.status === 'not-started',
+          'review-step__row--skipped': row.status === 'skipped',
+        }"
         :data-testid="`review-row-${row.id}`"
         :data-complete="row.isComplete"
+        :data-status="row.status"
       >
         <v-icon
-          :icon="row.isComplete ? 'mdi-check-circle' : 'mdi-circle-outline'"
-          :color="row.isComplete ? 'success' : 'on-surface-variant'"
+          :icon="row.isComplete ? 'mdi-check-circle' : 'mdi-alert-circle-outline'"
+          :color="
+            row.status === 'completed'
+              ? 'success'
+              : row.status === 'skipped'
+                ? 'on-surface-variant'
+                : 'warning'
+          "
           size="20"
           aria-hidden="true"
         />
         <span class="review-step__row-name">{{ row.name }}</span>
+        <span
+          class="review-step__row-status text-caption"
+          :data-testid="`review-row-status-${row.id}`"
+        >
+          {{ row.statusLabel }}
+        </span>
         <v-btn
           variant="text"
           size="small"
@@ -123,6 +177,24 @@ async function goToStep(step: CreatorWizardStepId): Promise<void> {
         </v-btn>
       </li>
     </ul>
+
+    <div
+      v-if="!canSubmit && incompleteSteps.length > 0"
+      role="status"
+      class="review-step__blocker"
+      data-testid="review-incomplete-blocker"
+    >
+      <v-icon icon="mdi-alert-circle-outline" color="warning" size="20" aria-hidden="true" />
+      <span>
+        {{
+          t(
+            'creator.ui.wizard.steps.review.incomplete_blocker',
+            { count: incompleteSteps.length, names: incompleteStepNames },
+            incompleteSteps.length,
+          )
+        }}
+      </span>
+    </div>
 
     <div
       v-if="submitErrorKey"
@@ -166,7 +238,7 @@ async function goToStep(step: CreatorWizardStepId): Promise<void> {
 
 .review-step__row {
   display: grid;
-  grid-template-columns: 24px 1fr auto;
+  grid-template-columns: 24px 1fr auto auto;
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
@@ -174,8 +246,39 @@ async function goToStep(step: CreatorWizardStepId): Promise<void> {
   border-radius: 6px;
 }
 
+/* Visible "this is why submit is disabled" cue on the offending row. */
+.review-step__row--incomplete {
+  border-color: rgb(var(--v-theme-warning));
+  background-color: rgb(var(--v-theme-warning) / 0.06);
+}
+
+.review-step__row--skipped {
+  background-color: rgb(var(--v-theme-surface-variant) / 0.4);
+}
+
 .review-step__row-name {
   font-weight: 500;
+}
+
+.review-step__row-status {
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+.review-step__row--incomplete .review-step__row-status {
+  color: rgb(var(--v-theme-warning));
+  font-weight: 500;
+}
+
+.review-step__blocker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgb(var(--v-theme-warning));
+  background-color: rgb(var(--v-theme-warning) / 0.06);
+  border-radius: 6px;
+  color: rgb(var(--v-theme-on-surface));
+  font-size: 0.875rem;
 }
 
 .review-step__error {

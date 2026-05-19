@@ -116,13 +116,17 @@
               "none": "Not started"
             }
           },
+          "account_created": {
+            "name": "Account created"
+          },
           "review": {
             "name": "Review and submit",
             "title": "Review your application",
             "description": "Take a moment to review everything before submitting.",
             "completeness": "{percent}% complete",
             "edit_step": "Edit",
-            "submit_button": "Submit application"
+            "submit_button": "Submit application",
+            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Edit to finish it before submitting. | You have {count} incomplete steps: {names}. Click Edit on each to finish them before submitting."
           }
         },
         "fields": {

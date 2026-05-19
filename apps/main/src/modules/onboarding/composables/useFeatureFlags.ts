@@ -22,6 +22,8 @@
 
 import { computed, type ComputedRef } from 'vue'
 
+import type { CreatorWizardFlags, CreatorWizardStepId } from '@catalyst/api-client'
+
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 export interface FlagState {
@@ -35,6 +37,56 @@ export interface FeatureFlagsHandle {
   kyc: ComputedRef<FlagState>
   payout: ComputedRef<FlagState>
   contract: ComputedRef<FlagState>
+}
+
+/**
+ * The three statuses a wizard row can be in on the review surface.
+ *
+ *   - `completed`   — server marked `is_complete: true` AND the step
+ *                     was vendor-cleared (creator actually did the
+ *                     work). The forensic distinction in the
+ *                     `CompletenessScoreCalculator` docblock.
+ *   - `skipped`     — server marked `is_complete: true` BUT the
+ *                     feature flag is OFF. The step is satisfied for
+ *                     submit-validation but no work was performed.
+ *   - `not-started` — server marked `is_complete: false`. Blocks submit.
+ */
+export type WizardStepStatus = 'completed' | 'skipped' | 'not-started'
+
+/**
+ * Map a wizard step to the feature flag whose OFF state turns the
+ * step's `is_complete` into a "skipped" pseudo-completion. Kept in
+ * lockstep with the backend's
+ * `CompletenessScoreCalculator::stepCompletion()` flag-OFF branches
+ * and with the {@link OnboardingProgress} component's `FLAG_BY_STEP`
+ * map. Adding a new flag-gated step requires touching all three.
+ */
+const FLAG_BY_STEP: Partial<Record<CreatorWizardStepId, keyof CreatorWizardFlags>> = {
+  kyc: 'kyc_verification_enabled',
+  payout: 'creator_payout_method_enabled',
+  contract: 'contract_signing_enabled',
+}
+
+/**
+ * Resolve the visible status of a wizard row from the backend-supplied
+ * `is_complete` boolean + the feature-flag state from the same
+ * bootstrap response. Pure function — no reactivity, easy to test.
+ *
+ * @param stepId       Wizard step identifier.
+ * @param isComplete   `creator.wizard.steps[i].is_complete`.
+ * @param flags        `creator.wizard.flags`, or null on a fresh
+ *                     boot before bootstrap has resolved.
+ */
+export function resolveStepStatus(
+  stepId: CreatorWizardStepId,
+  isComplete: boolean,
+  flags: CreatorWizardFlags | null,
+): WizardStepStatus {
+  const flagKey = FLAG_BY_STEP[stepId]
+  const isFlagOff = flagKey !== undefined && flags !== null && flags[flagKey] === false
+  if (isFlagOff && isComplete) return 'skipped'
+  if (isComplete) return 'completed'
+  return 'not-started'
 }
 
 export function useFeatureFlags(): FeatureFlagsHandle {

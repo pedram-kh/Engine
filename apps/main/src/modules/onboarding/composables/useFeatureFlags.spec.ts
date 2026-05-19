@@ -6,7 +6,7 @@ vi.mock('../api/onboarding.api', () => ({
 }))
 
 import { useOnboardingStore } from '../stores/useOnboardingStore'
-import { useFeatureFlags } from './useFeatureFlags'
+import { resolveStepStatus, useFeatureFlags } from './useFeatureFlags'
 
 beforeEach(() => {
   setActivePinia(createPinia())
@@ -70,5 +70,59 @@ describe('useFeatureFlags', () => {
     expect(kyc.value.enabled).toBe(false)
     setFlags({ kyc_verification_enabled: true })
     expect(kyc.value.enabled).toBe(true)
+  })
+})
+
+// Sprint 3 stabilization (May 19, 2026): pure helper extracted from
+// the OnboardingProgress component so the Review surface can apply
+// the same status semantics (Completed / Skipped / Not started). The
+// "skipped" branch is the subtle one — it requires BOTH `is_complete`
+// AND the relevant feature flag being OFF; flipping the flag on but
+// leaving is_complete unchanged should fall back to "completed".
+describe('resolveStepStatus', () => {
+  const flagsOn = {
+    kyc_verification_enabled: true,
+    creator_payout_method_enabled: true,
+    contract_signing_enabled: true,
+  }
+  const flagsOff = {
+    kyc_verification_enabled: false,
+    creator_payout_method_enabled: false,
+    contract_signing_enabled: false,
+  }
+
+  it('returns `not-started` when the step is incomplete regardless of flag state', () => {
+    expect(resolveStepStatus('profile', false, flagsOn)).toBe('not-started')
+    expect(resolveStepStatus('kyc', false, flagsOff)).toBe('not-started')
+    expect(resolveStepStatus('tax', false, null)).toBe('not-started')
+  })
+
+  it('returns `completed` for non-flag-gated steps that are complete', () => {
+    expect(resolveStepStatus('profile', true, flagsOn)).toBe('completed')
+    expect(resolveStepStatus('social', true, flagsOff)).toBe('completed')
+    expect(resolveStepStatus('portfolio', true, null)).toBe('completed')
+    expect(resolveStepStatus('tax', true, flagsOn)).toBe('completed')
+  })
+
+  it('returns `skipped` for a flag-gated step when its flag is OFF and is_complete is true', () => {
+    expect(resolveStepStatus('kyc', true, flagsOff)).toBe('skipped')
+    expect(resolveStepStatus('payout', true, flagsOff)).toBe('skipped')
+    expect(resolveStepStatus('contract', true, flagsOff)).toBe('skipped')
+  })
+
+  it('returns `completed` for a flag-gated step when the flag is ON (vendor-cleared)', () => {
+    // This is the chunk-2 forensic distinction: when the flag is on,
+    // is_complete only flips true via real vendor clearance.
+    expect(resolveStepStatus('kyc', true, flagsOn)).toBe('completed')
+    expect(resolveStepStatus('payout', true, flagsOn)).toBe('completed')
+    expect(resolveStepStatus('contract', true, flagsOn)).toBe('completed')
+  })
+
+  it('treats null flags as on-by-default (the fresh-boot case)', () => {
+    // Until bootstrap resolves, the SPA has no flag info; assume the
+    // strict path so flag-gated steps render "completed" rather than
+    // mis-labelling them "skipped" before the truth lands.
+    expect(resolveStepStatus('kyc', true, null)).toBe('completed')
+    expect(resolveStepStatus('payout', true, null)).toBe('completed')
   })
 })

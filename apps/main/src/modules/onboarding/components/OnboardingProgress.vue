@@ -31,6 +31,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
+import { resolveStepStatus } from '../composables/useFeatureFlags'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 import { WIZARD_STEP_ROUTE_NAMES } from '../routes'
 import type { CreatorWizardStepId } from '@catalyst/api-client'
@@ -42,6 +43,17 @@ const onboardingStore = useOnboardingStore()
 
 const { creator, stepCompletion, flags } = storeToRefs(onboardingStore)
 
+/**
+ * Total step count visible in the rail. `9` = the 8 backend wizard
+ * steps + the implicit Step 1 (account creation / sign-up). Step 1
+ * is rendered as a non-navigable static row at the top so the
+ * "Step X of 9" labels on the other rows are self-consistent rather
+ * than visually skipping a number. Caught during the May 19, 2026
+ * stabilization audit — a creator landing on Review saw "Step 2 of
+ * 9" with no Step 1 anywhere and was confused.
+ */
+const TOTAL_STEPS = 9
+
 interface StepView {
   id: CreatorWizardStepId
   routeName: string
@@ -49,12 +61,6 @@ interface StepView {
   isCurrent: boolean
   isSkipped: boolean
   position: number
-}
-
-const FLAG_BY_STEP: Partial<Record<CreatorWizardStepId, keyof NonNullable<typeof flags.value>>> = {
-  kyc: 'kyc_verification_enabled',
-  payout: 'creator_payout_method_enabled',
-  contract: 'contract_signing_enabled',
 }
 
 const steps = computed<StepView[]>(() => {
@@ -74,9 +80,7 @@ const steps = computed<StepView[]>(() => {
 
   return baseList.map((id, index) => {
     const isComplete = stepCompletion.value[id] ?? false
-    const flagKey = FLAG_BY_STEP[id]
-    const isFlagOff =
-      flagKey !== undefined && flags.value !== null && flags.value[flagKey] === false
+    const status = resolveStepStatus(id, isComplete, flags.value)
     return {
       id,
       routeName: WIZARD_STEP_ROUTE_NAMES[id],
@@ -86,7 +90,7 @@ const steps = computed<StepView[]>(() => {
       // creator has not vendor-completed it (e.g. NotRequired stamp).
       // Vendor-completed steps render "Completed" regardless of flag
       // state — the chunk-2 forensic distinction.
-      isSkipped: isFlagOff && isComplete,
+      isSkipped: status === 'skipped',
       position: index + 2, // Step 1 (account creation) is implicit
     }
   })
@@ -144,6 +148,39 @@ function statusLabel(step: StepView): string {
     data-test="onboarding-progress-list"
   >
     <ol class="onboarding-progress__list">
+      <!--
+        Static Step 1 row — account creation is "implicit" (handled
+        by the Identity module's sign-up endpoint and complete by the
+        time the creator can authenticate). We surface it visually so
+        the "Step X of 9" numbering on the other rows isn't off by
+        one from the user's perspective. Non-navigable: there's no
+        in-wizard route to return to sign-up.
+      -->
+      <li
+        class="onboarding-progress__item is-complete is-static"
+        data-test="progress-step-account-created"
+      >
+        <div class="onboarding-progress__button onboarding-progress__button--static">
+          <v-icon
+            icon="mdi-check-circle"
+            color="success"
+            size="small"
+            aria-hidden="true"
+            class="onboarding-progress__icon"
+          />
+          <span class="onboarding-progress__text">
+            <span class="onboarding-progress__index text-caption text-medium-emphasis">
+              {{ t('creator.ui.wizard.progress.step_of', { current: 1, total: TOTAL_STEPS }) }}
+            </span>
+            <span class="onboarding-progress__name text-body-2">
+              {{ t('creator.ui.wizard.steps.account_created.name') }}
+            </span>
+            <span class="onboarding-progress__status text-caption">
+              {{ t('creator.ui.wizard.progress.completed') }}
+            </span>
+          </span>
+        </div>
+      </li>
       <li
         v-for="step in steps"
         :key="step.id"
@@ -170,7 +207,12 @@ function statusLabel(step: StepView): string {
           />
           <span class="onboarding-progress__text">
             <span class="onboarding-progress__index text-caption text-medium-emphasis">
-              {{ t('creator.ui.wizard.progress.step_of', { current: step.position, total: 9 }) }}
+              {{
+                t('creator.ui.wizard.progress.step_of', {
+                  current: step.position,
+                  total: TOTAL_STEPS,
+                })
+              }}
             </span>
             <span class="onboarding-progress__name text-body-2">
               {{ t(`creator.ui.wizard.steps.${step.id}.name`) }}
@@ -227,6 +269,15 @@ function statusLabel(step: StepView): string {
 
 .onboarding-progress__button:hover {
   background-color: rgb(var(--v-theme-on-surface) / 0.04);
+}
+
+/* Static Step 1 row — no hover state, not navigable. */
+.onboarding-progress__button--static {
+  cursor: default;
+}
+
+.onboarding-progress__button--static:hover {
+  background-color: transparent;
 }
 
 .onboarding-progress__button:focus-visible {

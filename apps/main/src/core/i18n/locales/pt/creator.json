@@ -116,13 +116,17 @@
               "none": "Não iniciado"
             }
           },
+          "account_created": {
+            "name": "Conta criada"
+          },
           "review": {
             "name": "Rever e submeter",
             "title": "Reveja a sua candidatura",
             "description": "Confira tudo antes de submeter.",
             "completeness": "{percent}% completo",
             "edit_step": "Editar",
-            "submit_button": "Submeter candidatura"
+            "submit_button": "Submeter candidatura",
+            "incomplete_blocker": "Tem 1 etapa por concluir: {names}. Clique em Editar para a terminar antes de submeter. | Tem {count} etapas por concluir: {names}. Clique em Editar em cada uma para as terminar antes de submeter."
           }
         },
         "fields": {
