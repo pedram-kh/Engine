@@ -1,5 +1,7 @@
-import { flushPromises } from '@vue/test-utils'
+import { flushPromises, type VueWrapper } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { ApiError } from '@catalyst/api-client'
 
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
 
@@ -13,6 +15,28 @@ vi.mock('../api/onboarding.api', () => ({
 import { onboardingApi } from '../api/onboarding.api'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 import Step6TaxPage from './Step6TaxPage.vue'
+
+/**
+ * Drive a Vuetify <v-select> programmatically by emitting its
+ * `update:modelValue` event. Vuetify's combobox-style inner input
+ * is JSDOM-hostile (see BulkInvitePage.spec.ts for the same
+ * friction): selecting an option through the DOM requires a
+ * fully-rendered overlay we can't realistically drive here.
+ *
+ * `findComponent(selector)` is typed as `WrapperLike` (selector
+ * MIGHT not match a component); the cast to `VueWrapper` reflects
+ * that v-select IS a component — the existence guard below catches
+ * any misuse.
+ */
+function findVSelectByTestId(wrapper: VueWrapper, testid: string): VueWrapper {
+  const select = wrapper.findComponent(`[data-testid="${testid}"]`) as VueWrapper
+  if (!select.exists()) throw new Error(`v-select with data-testid="${testid}" not found`)
+  return select
+}
+
+function setSelectValue(wrapper: VueWrapper, testid: string, value: unknown): void {
+  findVSelectByTestId(wrapper, testid).vm.$emit('update:modelValue', value)
+}
 
 let teardown: (() => void) | null = null
 
@@ -143,7 +167,12 @@ describe('Step6TaxPage', () => {
     await wrapper.find('[data-testid="tax-address-street"] input').setValue('Via Roma 1')
     await wrapper.find('[data-testid="tax-address-city"] input').setValue('Milano')
     await wrapper.find('[data-testid="tax-address-postal"] input').setValue('20100')
-    await wrapper.find('[data-testid="tax-address-country"] input').setValue('IT')
+    // Country is now a <v-select> — drive it via update:modelValue.
+    // Sprint 3 stabilization (May 19, 2026): swapped from a free-text
+    // input to prevent users typing the country name ("Spain") and
+    // bouncing off the backend's `size:2` ISO-code rule.
+    setSelectValue(wrapper, 'tax-address-country', 'IT')
+    await flushPromises()
 
     await wrapper.find('form').trigger('submit.prevent')
     await flushPromises()
@@ -159,5 +188,149 @@ describe('Step6TaxPage', () => {
         street: 'Via Roma 1',
       },
     })
+  })
+
+  // -------------------------------------------------------------------------
+  // Sprint 3 stabilization (May 19, 2026): the `validation.failed` envelope
+  // emitted by `ValidationExceptionRenderer` has no top-level bundle entry.
+  // The old shortcut `submitErrorKey.value = error.code` rendered the
+  // literal string "validation.failed" in red text. These specs pin the
+  // per-field rendering pattern (mirrors SignUpPage + BrandCreatePage)
+  // including the nested `address.*` dot-notation paths.
+  // -------------------------------------------------------------------------
+  it('binds per-field 422 messages to the matching input (legal_name, tax_id, address.country_code)', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap(false))
+    vi.mocked(onboardingApi.updateTax).mockRejectedValue(
+      ApiError.fromEnvelope(422, {
+        errors: [
+          {
+            id: 'err-1',
+            status: '422',
+            code: 'validation.failed',
+            title: 'The legal name field is required.',
+            detail: 'The legal name field is required.',
+            source: { pointer: '/data/attributes/legal_name' },
+            meta: { field: 'legal_name', rule: 'Required' },
+          },
+          {
+            id: 'err-2',
+            status: '422',
+            code: 'validation.failed',
+            title: 'The tax id field is required.',
+            detail: 'The tax id field is required.',
+            source: { pointer: '/data/attributes/tax_id' },
+            meta: { field: 'tax_id', rule: 'Required' },
+          },
+          {
+            id: 'err-3',
+            status: '422',
+            code: 'validation.failed',
+            title: 'The address.country code must be 2 characters.',
+            detail: 'The address.country code must be 2 characters.',
+            source: { pointer: '/data/attributes/address.country_code' },
+            meta: { field: 'address.country_code', rule: 'Size' },
+          },
+        ],
+        meta: { request_id: 'req-1' },
+      }),
+    )
+
+    const { wrapper, unmount } = await mountAuthPage(Step6TaxPage, {
+      initialRoute: { path: '/onboarding/tax' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    // Fill enough to make the submit button enabled — the actual values
+    // don't matter because we're rejecting at the API mock level.
+    await wrapper.find('[data-testid="tax-legal-name"] input').setValue('x')
+    await wrapper.find('[data-testid="tax-id"] input').setValue('x')
+    await wrapper.find('[data-testid="tax-address-street"] input').setValue('x')
+    await wrapper.find('[data-testid="tax-address-city"] input').setValue('x')
+    await wrapper.find('[data-testid="tax-address-postal"] input').setValue('x')
+    setSelectValue(wrapper, 'tax-address-country', 'XX')
+    await flushPromises()
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    const html = wrapper.html()
+    expect(html).toContain('The legal name field is required.')
+    expect(html).toContain('The tax id field is required.')
+    expect(html).toContain('The address.country code must be 2 characters.')
+    // The literal "validation.failed" key MUST NOT leak through into
+    // the DOM as a translation key — that was the visible bug.
+    expect(html).not.toContain('validation.failed')
+    // Top-level banner should stay hidden when per-field errors fill the role.
+    expect(wrapper.find('[data-testid="tax-submit-error"]').exists()).toBe(false)
+  })
+
+  it('falls back to the generic banner when the API rejects with no field details', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap(false))
+    vi.mocked(onboardingApi.updateTax).mockRejectedValue(
+      ApiError.fromEnvelope(500, {
+        errors: [
+          {
+            id: 'err-1',
+            status: '500',
+            code: 'server.error',
+            title: 'Something went wrong',
+            detail: 'Something went wrong',
+          },
+        ],
+        meta: { request_id: 'req-2' },
+      }),
+    )
+
+    const { wrapper, unmount } = await mountAuthPage(Step6TaxPage, {
+      initialRoute: { path: '/onboarding/tax' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('[data-testid="tax-legal-name"] input').setValue('x')
+    await wrapper.find('[data-testid="tax-id"] input').setValue('x')
+    await wrapper.find('[data-testid="tax-address-street"] input').setValue('x')
+    await wrapper.find('[data-testid="tax-address-city"] input').setValue('x')
+    await wrapper.find('[data-testid="tax-address-postal"] input').setValue('x')
+    setSelectValue(wrapper, 'tax-address-country', 'IT')
+    await flushPromises()
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="tax-submit-error"]').exists()).toBe(true)
+  })
+
+  it('country picker exposes the shared ISO-code option list (no free-text fallback)', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap(false))
+
+    const { wrapper, unmount } = await mountAuthPage(Step6TaxPage, {
+      initialRoute: { path: '/onboarding/tax' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    const country = findVSelectByTestId(wrapper, 'tax-address-country')
+    // Vuetify VSelect; a VTextField would have no `items` prop. `props()`
+    // is untyped here because the component generic isn't carried through
+    // the selector-based findComponent — index into the record directly.
+    const items = (country.props() as Record<string, unknown>)['items'] as Array<{
+      code: string
+      label: string
+    }>
+    expect(items).toBeDefined()
+    expect(items.length).toBeGreaterThan(0)
+    expect(items.find((i) => i.code === 'ES' && i.label === 'Spain')).toBeDefined()
+    expect(items.find((i) => i.code === 'IT' && i.label === 'Italy')).toBeDefined()
   })
 })

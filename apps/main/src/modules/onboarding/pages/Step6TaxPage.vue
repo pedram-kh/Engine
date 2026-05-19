@@ -17,21 +17,52 @@
  * every input and inline error messages bound via
  * `:error-messages`. The submit button is disabled while the
  * store action is in-flight.
+ *
+ * Sprint 3 stabilization (May 19, 2026):
+ *   - Per-field 422 rendering. The `validation.failed` envelope
+ *     emitted by `ValidationExceptionRenderer` has no top-level
+ *     bundle entry — feeding `error.code` straight to `t()`
+ *     produced the literal "validation.failed" red banner. Now
+ *     uses `extractFieldErrors` for per-input binding (same shape
+ *     as SignUpPage / BrandCreatePage). The nested address fields
+ *     come back as dot-notation keys (`address.country_code`, …)
+ *     matching Laravel's `$validator->errors()` output.
+ *   - Country picker swapped from `<v-text-field>` to `<v-select>`
+ *     using the shared `COUNTRY_OPTIONS`. The backend's rule is
+ *     `size:2` (ISO-3166-1 alpha-2), so a free-text input invited
+ *     users to type "Spain" and bounce off the validator.
  */
 
-import { ApiError } from '@catalyst/api-client'
+import { ApiError, extractFieldErrors } from '@catalyst/api-client'
 import type { CreatorTaxFormType, CreatorTaxUpdatePayload } from '@catalyst/api-client'
 import { TaxProfileDisplay } from '@catalyst/ui'
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+import { COUNTRY_OPTIONS } from '../data/countries'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 const { t } = useI18n()
 const router = useRouter()
 const store = useOnboardingStore()
 
+/**
+ * Backend field-key union (matches `UpsertTaxProfileRequest::rules()`
+ * keys after the `ValidationExceptionRenderer` flattens the pointer).
+ * Nested address rules surface as dot-notation — Laravel's validator
+ * reports them that way and `extractFieldErrors` preserves it.
+ */
+type TaxField =
+  | 'tax_form_type'
+  | 'legal_name'
+  | 'tax_id'
+  | 'address.country_code'
+  | 'address.city'
+  | 'address.postal_code'
+  | 'address.street'
+
+const fieldErrors = ref<Partial<Record<TaxField, readonly string[]>>>({})
 const submitErrorKey = ref<string | null>(null)
 
 const TAX_FORM_TYPES: CreatorTaxFormType[] = [
@@ -82,6 +113,7 @@ const formTypeOptions = computed(() =>
 
 async function save(): Promise<void> {
   submitErrorKey.value = null
+  fieldErrors.value = {}
   try {
     await store.updateTax({
       tax_form_type: draft.tax_form_type,
@@ -95,8 +127,15 @@ async function save(): Promise<void> {
       },
     })
   } catch (error) {
-    submitErrorKey.value =
-      error instanceof ApiError ? error.code : 'creator.ui.errors.upload_failed'
+    if (error instanceof ApiError) {
+      fieldErrors.value = extractFieldErrors<TaxField>(error)
+    }
+    // Banner is the fallback ONLY when no field errors were extracted
+    // — otherwise the per-input messages tell the user exactly what
+    // to fix, and a duplicate banner would be noise.
+    if (Object.keys(fieldErrors.value).length === 0) {
+      submitErrorKey.value = 'creator.ui.errors.upload_failed'
+    }
   }
 }
 
@@ -129,48 +168,58 @@ async function advance(): Promise<void> {
         item-title="title"
         item-value="value"
         :label="t('creator.ui.wizard.fields.tax_form_type')"
+        :error-messages="fieldErrors.tax_form_type"
         data-testid="tax-form-type"
         density="comfortable"
       />
       <v-text-field
         v-model="draft.legal_name"
         :label="t('creator.ui.wizard.fields.legal_name')"
+        :error-messages="fieldErrors.legal_name"
         data-testid="tax-legal-name"
         density="comfortable"
       />
       <v-text-field
         v-model="draft.tax_id"
         :label="t('creator.ui.wizard.fields.tax_id')"
+        :error-messages="fieldErrors.tax_id"
         data-testid="tax-id"
         density="comfortable"
       />
       <v-text-field
         v-model="draft.address.street"
         :label="t('creator.ui.wizard.fields.address_street')"
+        :error-messages="fieldErrors['address.street']"
         data-testid="tax-address-street"
         density="comfortable"
       />
       <v-text-field
         v-model="draft.address.city"
         :label="t('creator.ui.wizard.fields.address_city')"
+        :error-messages="fieldErrors['address.city']"
         data-testid="tax-address-city"
         density="comfortable"
       />
       <v-text-field
         v-model="draft.address.postal_code"
         :label="t('creator.ui.wizard.fields.address_postal_code')"
+        :error-messages="fieldErrors['address.postal_code']"
         data-testid="tax-address-postal"
         density="comfortable"
       />
-      <v-text-field
+      <v-select
         v-model="draft.address.country_code"
+        :items="COUNTRY_OPTIONS"
+        item-title="label"
+        item-value="code"
         :label="t('creator.ui.wizard.fields.address_country')"
+        :error-messages="fieldErrors['address.country_code']"
         data-testid="tax-address-country"
         density="comfortable"
       />
 
       <div
-        v-if="submitErrorKey"
+        v-if="submitErrorKey !== null"
         role="alert"
         class="tax-step__error"
         data-testid="tax-submit-error"

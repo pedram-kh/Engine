@@ -1,6 +1,8 @@
 import { flushPromises } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { ApiError } from '@catalyst/api-client'
+
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
 
 vi.mock('../api/onboarding.api', () => ({
@@ -128,5 +130,44 @@ describe('Step2ProfileBasicsPage', () => {
     await flushPromises()
 
     expect(wrapper.find('[data-testid="category-chips"]').exists()).toBe(true)
+  })
+
+  // Sprint 3 stabilization (May 19, 2026): per-field 422 rendering.
+  // Same pattern as SignUpPage / Step 6 Tax — `validation.failed`
+  // MUST NOT reach `t()` as a literal i18n key.
+  it('binds per-field 422 messages to the matching input and hides the generic banner', async () => {
+    vi.mocked(onboardingApi.updateProfile).mockRejectedValue(
+      ApiError.fromEnvelope(422, {
+        errors: [
+          {
+            id: 'err-1',
+            status: '422',
+            code: 'validation.failed',
+            title: 'The display name field is required.',
+            detail: 'The display name field is required.',
+            source: { pointer: '/data/attributes/display_name' },
+            meta: { field: 'display_name', rule: 'Required' },
+          },
+        ],
+        meta: { request_id: 'req-1' },
+      }),
+    )
+
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    const html = wrapper.html()
+    expect(html).toContain('The display name field is required.')
+    expect(html).not.toContain('validation.failed')
+    expect(wrapper.find('[data-testid="profile-submit-error"]').exists()).toBe(false)
   })
 })

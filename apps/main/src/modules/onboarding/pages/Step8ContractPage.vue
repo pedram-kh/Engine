@@ -24,10 +24,11 @@
  * until either signal is present.
  */
 
-import { ApiError } from '@catalyst/api-client'
 import { ContractStatusBadge } from '@catalyst/ui'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { resolveSubmitErrorKey } from '../composables/useSubmitErrorKey'
 import { useRouter } from 'vue-router'
 
 import ClickThroughAccept from '../components/ClickThroughAccept.vue'
@@ -78,8 +79,7 @@ async function beginSign(): Promise<void> {
     const response = await store.initiateContract()
     window.location.href = response.data.signing_url
   } catch (error) {
-    initiateErrorKey.value =
-      error instanceof ApiError ? error.code : 'creator.ui.errors.upload_failed'
+    initiateErrorKey.value = resolveSubmitErrorKey(error, 'creator.ui.errors.upload_failed')
   }
 }
 

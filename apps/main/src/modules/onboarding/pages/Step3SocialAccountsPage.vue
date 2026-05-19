@@ -22,7 +22,7 @@
 
 import { SocialAccountList } from '@catalyst/ui'
 import type { CreatorSocialPlatform } from '@catalyst/api-client'
-import { ApiError } from '@catalyst/api-client'
+import { ApiError, extractFieldErrors } from '@catalyst/api-client'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -33,15 +33,30 @@ const { t } = useI18n()
 const router = useRouter()
 const store = useOnboardingStore()
 
+/**
+ * Backend field-key union (matches `ConnectSocialRequest::rules()`).
+ * The `platform` key is set programmatically per-row, so a backend
+ * `platform` violation is exceptional — we still surface it to the
+ * row that triggered it, attached to the handle input (no separate
+ * UI surface). `profile_url` is also derived programmatically from
+ * `handle`, so any error there folds back onto the handle input.
+ */
+type SocialField = 'platform' | 'handle' | 'profile_url'
+
 interface PlatformDraft {
   handle: string
+  fieldErrors: Partial<Record<SocialField, readonly string[]>>
   errorKey: string | null
 }
 
+function emptyDraft(): PlatformDraft {
+  return { handle: '', fieldErrors: {}, errorKey: null }
+}
+
 const drafts = ref<Record<CreatorSocialPlatform, PlatformDraft>>({
-  instagram: { handle: '', errorKey: null },
-  tiktok: { handle: '', errorKey: null },
-  youtube: { handle: '', errorKey: null },
+  instagram: emptyDraft(),
+  tiktok: emptyDraft(),
+  youtube: emptyDraft(),
 })
 
 const PROFILE_URL_BUILDERS: Record<CreatorSocialPlatform, (handle: string) => string> = {
@@ -67,6 +82,7 @@ async function connectPlatform(platform: CreatorSocialPlatform): Promise<void> {
   if (draft.handle.trim() === '') return
 
   draft.errorKey = null
+  draft.fieldErrors = {}
   try {
     await store.connectSocial({
       platform,
@@ -75,7 +91,24 @@ async function connectPlatform(platform: CreatorSocialPlatform): Promise<void> {
     })
     draft.handle = ''
   } catch (error) {
-    draft.errorKey = error instanceof ApiError ? error.code : 'creator.ui.errors.upload_failed'
+    if (error instanceof ApiError) {
+      draft.fieldErrors = extractFieldErrors<SocialField>(error)
+    }
+    // Fold any `platform` or `profile_url` violations into the handle
+    // surface — those fields are derived/programmatic, the creator
+    // can only act on the handle. We collapse to a single line in
+    // priority order to keep the per-row UI compact.
+    const collapsed = [
+      ...(drafts.value[platform].fieldErrors.handle ?? []),
+      ...(drafts.value[platform].fieldErrors.profile_url ?? []),
+      ...(drafts.value[platform].fieldErrors.platform ?? []),
+    ]
+    if (collapsed.length > 0) {
+      drafts.value[platform].fieldErrors = { handle: collapsed }
+    } else {
+      // No per-field violations — fall back to the generic banner.
+      draft.errorKey = 'creator.ui.errors.upload_failed'
+    }
   }
 }
 
@@ -114,7 +147,10 @@ async function advance(): Promise<void> {
           :data-testid="`social-handle-${platform}`"
           density="compact"
           hide-details="auto"
-          :error-messages="drafts[platform].errorKey === null ? '' : t(drafts[platform].errorKey!)"
+          :error-messages="
+            drafts[platform].fieldErrors.handle ??
+            (drafts[platform].errorKey === null ? undefined : t(drafts[platform].errorKey!))
+          "
         />
         <v-btn
           variant="tonal"

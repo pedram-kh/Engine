@@ -14,10 +14,11 @@
  *     complete at submit time (Q-flag-off-1).
  */
 
-import { ApiError } from '@catalyst/api-client'
 import { PayoutMethodStatus } from '@catalyst/ui'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { resolveSubmitErrorKey } from '../composables/useSubmitErrorKey'
 import { useRouter } from 'vue-router'
 
 import { useFeatureFlags } from '../composables/useFeatureFlags'
@@ -57,8 +58,7 @@ async function beginSetup(): Promise<void> {
     const response = await store.initiatePayout()
     window.location.href = response.data.onboarding_url
   } catch (error) {
-    initiateErrorKey.value =
-      error instanceof ApiError ? error.code : 'creator.ui.errors.upload_failed'
+    initiateErrorKey.value = resolveSubmitErrorKey(error, 'creator.ui.errors.upload_failed')
   }
 }
 

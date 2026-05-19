@@ -27,10 +27,11 @@
  * layout's status region.
  */
 
-import { ApiError } from '@catalyst/api-client'
 import type { CreatorWizardStepId } from '@catalyst/api-client'
 import { CompletenessBar } from '@catalyst/ui'
 import { computed, ref } from 'vue'
+
+import { resolveSubmitErrorKey } from '../composables/useSubmitErrorKey'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
@@ -77,7 +78,7 @@ async function submit(): Promise<void> {
     await store.submit()
     await router.push('/creator/dashboard')
   } catch (error) {
-    submitErrorKey.value = error instanceof ApiError ? error.code : 'creator.wizard.incomplete'
+    submitErrorKey.value = resolveSubmitErrorKey(error, 'creator.wizard.incomplete')
   }
 }
 

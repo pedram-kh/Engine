@@ -32,13 +32,14 @@
  * users.
  */
 
-import { ApiError, type CreatorPortfolioItemSummary } from '@catalyst/api-client'
+import type { CreatorPortfolioItemSummary } from '@catalyst/api-client'
 import { PortfolioGallery } from '@catalyst/ui'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import PortfolioUploadGrid from '../components/PortfolioUploadGrid.vue'
+import { resolveSubmitErrorKey } from '../composables/useSubmitErrorKey'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 const { t } = useI18n()
@@ -79,8 +80,7 @@ async function onRemove(itemId: string): Promise<void> {
   try {
     await store.removePortfolioItem(itemId)
   } catch (error) {
-    removeErrorKey.value =
-      error instanceof ApiError ? error.code : 'creator.ui.errors.upload_failed'
+    removeErrorKey.value = resolveSubmitErrorKey(error, 'creator.ui.errors.upload_failed')
   }
 }
 

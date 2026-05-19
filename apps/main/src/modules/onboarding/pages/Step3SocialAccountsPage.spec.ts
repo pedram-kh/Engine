@@ -1,6 +1,8 @@
 import { flushPromises } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { ApiError } from '@catalyst/api-client'
+
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
 
 vi.mock('../api/onboarding.api', () => ({
@@ -148,5 +150,55 @@ describe('Step3SocialAccountsPage', () => {
     expect(wrapper.find('[data-testid="social-account-list"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="social-account-row-instagram"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="social-account-row-tiktok"]').exists()).toBe(true)
+  })
+
+  // Sprint 3 stabilization (May 19, 2026): per-platform per-field 422
+  // rendering. The previous shortcut `draft.errorKey = error.code`
+  // rendered "validation.failed" as a literal string when the backend
+  // rejected an invalid handle. Now per-platform extractFieldErrors,
+  // with `platform` / `profile_url` violations folded onto the handle
+  // input (the creator can only act on the handle).
+  it('binds per-platform per-field 422 messages to the offending row only', async () => {
+    vi.mocked(onboardingApi.connectSocial).mockRejectedValue(
+      ApiError.fromEnvelope(422, {
+        errors: [
+          {
+            id: 'err-1',
+            status: '422',
+            code: 'validation.failed',
+            title: 'The handle field is required.',
+            detail: 'The handle field is required.',
+            source: { pointer: '/data/attributes/handle' },
+            meta: { field: 'handle', rule: 'Required' },
+          },
+        ],
+        meta: { request_id: 'req-1' },
+      }),
+    )
+
+    const { wrapper, unmount } = await mountAuthPage(Step3SocialAccountsPage, {
+      initialRoute: { path: '/onboarding/social' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    // Type something into TikTok so the Connect button is enabled, then click it.
+    await wrapper.find('[data-testid="social-handle-tiktok"] input').setValue('badhandle')
+    await wrapper.find('[data-testid="social-connect-tiktok"]').trigger('click')
+    await flushPromises()
+
+    const html = wrapper.html()
+    expect(html).toContain('The handle field is required.')
+    // Critically: the literal envelope code must NOT leak as a key.
+    expect(html).not.toContain('validation.failed')
+
+    // The error appears on the TikTok row only, not on Instagram / YouTube.
+    const tiktokRow = wrapper.find('[data-testid="social-form-tiktok"]').html()
+    const instagramRow = wrapper.find('[data-testid="social-form-instagram"]').html()
+    expect(tiktokRow).toContain('The handle field is required.')
+    expect(instagramRow).not.toContain('The handle field is required.')
   })
 })

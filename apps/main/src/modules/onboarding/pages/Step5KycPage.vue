@@ -30,13 +30,13 @@
  * `:disabled` while loading.
  */
 
-import { ApiError } from '@catalyst/api-client'
 import { KycStatusBadge } from '@catalyst/ui'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import { useFeatureFlags } from '../composables/useFeatureFlags'
+import { resolveSubmitErrorKey } from '../composables/useSubmitErrorKey'
 import { useVendorBounce } from '../composables/useVendorBounce'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
@@ -74,8 +74,7 @@ async function beginVerification(): Promise<void> {
     const response = await store.initiateKyc()
     window.location.href = response.data.hosted_flow_url
   } catch (error) {
-    initiateErrorKey.value =
-      error instanceof ApiError ? error.code : 'creator.ui.errors.upload_failed'
+    initiateErrorKey.value = resolveSubmitErrorKey(error, 'creator.ui.errors.upload_failed')
   }
 }
 

@@ -33,18 +33,36 @@
  */
 
 import { CategoryChips, CountryDisplay, LanguageList } from '@catalyst/ui'
-import { ApiError } from '@catalyst/api-client'
+import { ApiError, extractFieldErrors } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import AvatarUploadDrop from '../components/AvatarUploadDrop.vue'
 import { renderBio } from '../composables/useBioRenderer'
+import { COUNTRY_OPTIONS, labelForCountryCode } from '../data/countries'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 const { t } = useI18n()
 const router = useRouter()
 const store = useOnboardingStore()
+
+/**
+ * Backend field-key union (matches `UpdateProfileRequest::rules()`).
+ * The array-of-strings rules (`secondary_languages.*`, `categories.*`)
+ * surface from Laravel's validator as keys like `secondary_languages.0`
+ * — those collapse to the parent field for UI purposes (the input is
+ * a multi-select chip group, no per-item slot to bind to). We add the
+ * parent keys here so per-input binding works on the canonical shape.
+ */
+type ProfileField =
+  | 'display_name'
+  | 'bio'
+  | 'country_code'
+  | 'region'
+  | 'primary_language'
+  | 'secondary_languages'
+  | 'categories'
 
 const displayName = ref('')
 const bio = ref('')
@@ -54,6 +72,7 @@ const primaryLanguage = ref<string | null>(null)
 const secondaryLanguages = ref<string[]>([])
 const categories = ref<string[]>([])
 const submitErrorKey = ref<string | null>(null)
+const fieldErrors = ref<Partial<Record<ProfileField, readonly string[]>>>({})
 
 const CATEGORY_KEYS = [
   'fashion',
@@ -83,18 +102,6 @@ const LANGUAGE_OPTIONS = [
   { code: 'de', label: 'Deutsch' },
 ] as const
 
-const COUNTRY_OPTIONS = [
-  { code: 'IE', label: 'Ireland' },
-  { code: 'GB', label: 'United Kingdom' },
-  { code: 'PT', label: 'Portugal' },
-  { code: 'IT', label: 'Italy' },
-  { code: 'ES', label: 'Spain' },
-  { code: 'FR', label: 'France' },
-  { code: 'DE', label: 'Germany' },
-  { code: 'US', label: 'United States' },
-  { code: 'CA', label: 'Canada' },
-] as const
-
 const categoryItems = computed(() =>
   CATEGORY_KEYS.map((key) => ({
     value: key,
@@ -104,10 +111,7 @@ const categoryItems = computed(() =>
 
 const renderedBio = computed(() => renderBio(bio.value))
 
-const countryLabel = computed(() => {
-  if (countryCode.value === null) return ''
-  return COUNTRY_OPTIONS.find((c) => c.code === countryCode.value)?.label ?? countryCode.value
-})
+const countryLabel = computed(() => labelForCountryCode(countryCode.value))
 
 const primaryLanguageLabel = computed(() => {
   if (primaryLanguage.value === null) return null
@@ -145,6 +149,7 @@ function hydrateFromCreator(): void {
 
 async function save(): Promise<boolean> {
   submitErrorKey.value = null
+  fieldErrors.value = {}
   try {
     await store.updateProfile({
       display_name: displayName.value,
@@ -158,8 +163,9 @@ async function save(): Promise<boolean> {
     return true
   } catch (error) {
     if (error instanceof ApiError) {
-      submitErrorKey.value = error.code
-    } else {
+      fieldErrors.value = extractFieldErrors<ProfileField>(error)
+    }
+    if (Object.keys(fieldErrors.value).length === 0) {
       submitErrorKey.value = 'creator.ui.errors.upload_failed'
     }
     return false
@@ -206,6 +212,7 @@ onMounted(() => {
         persistent-hint
         :counter="60"
         :rules="[(v: string) => !!v || t('validation.field_required')]"
+        :error-messages="fieldErrors.display_name"
         data-testid="profile-display-name"
         required
       />
@@ -218,6 +225,7 @@ onMounted(() => {
         rows="4"
         auto-grow
         :counter="500"
+        :error-messages="fieldErrors.bio"
         data-testid="profile-bio"
       />
 
@@ -234,12 +242,14 @@ onMounted(() => {
         item-title="label"
         item-value="code"
         :label="t('creator.ui.wizard.fields.country')"
+        :error-messages="fieldErrors.country_code"
         data-testid="profile-country"
       />
 
       <v-text-field
         v-model="region"
         :label="t('creator.ui.wizard.fields.region')"
+        :error-messages="fieldErrors.region"
         data-testid="profile-region"
       />
 
@@ -249,6 +259,7 @@ onMounted(() => {
         item-title="label"
         item-value="code"
         :label="t('creator.ui.wizard.fields.primary_language')"
+        :error-messages="fieldErrors.primary_language"
         data-testid="profile-primary-language"
       />
 
@@ -260,6 +271,7 @@ onMounted(() => {
         :label="t('creator.ui.wizard.fields.secondary_languages')"
         multiple
         chips
+        :error-messages="fieldErrors.secondary_languages"
         data-testid="profile-secondary-languages"
       />
 
@@ -271,6 +283,7 @@ onMounted(() => {
         persistent-hint
         multiple
         chips
+        :error-messages="fieldErrors.categories"
         data-testid="profile-categories"
       />
 
