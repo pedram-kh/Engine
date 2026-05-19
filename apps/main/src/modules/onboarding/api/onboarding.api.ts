@@ -122,7 +122,12 @@ export const onboardingApi = {
    */
   uploadAvatar(file: File): Promise<CreatorResourceEnvelope> {
     const form = new FormData()
-    form.append('avatar', file)
+    // Field name MUST be `file` to match AvatarController's validator
+    // (`$request->validate(['file' => …])`). The project's canonical
+    // multipart field across all upload endpoints — avatar, portfolio,
+    // bulk-invite — is `file`. Sending `avatar` here returns 422 and
+    // the SPA surfaces the generic `upload_failed` banner.
+    form.append('file', file)
     return http.post<CreatorResourceEnvelope>(`${BASE}/avatar`, form)
   },
 
