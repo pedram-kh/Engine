@@ -14,6 +14,8 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use SensitiveParameter;
 
 /**
@@ -113,6 +115,33 @@ final class AuthService
         string $guard,
         #[SensitiveParameter] ?string $mfaCode = null,
     ): LoginResult {
+        // Defensive guard: login needs a session to attach the
+        // authenticated user to (see step 8 below — `auth->login($user)`
+        // + `$request->session()->regenerate()`). Sanctum's
+        // EnsureFrontendRequestsAreStateful normally appends StartSession
+        // on requests from a configured SANCTUM_STATEFUL_DOMAINS origin;
+        // when the browser host is not in the stateful list (e.g.
+        // `localhost:5173` against a 127.0.0.1-only list), no session is
+        // bound and `regenerate()` blows up with an inscrutable
+        // RuntimeException at the call site. Convert that into a clearly-
+        // named log line + exception so the diagnostic surfaces in one
+        // grep rather than via a 50-frame trace. Mirrors the equivalent
+        // `hasSession()` guard already in `logout()`.
+        if (! $request->hasSession()) {
+            Log::error('auth.login.no_session_bound_on_request', [
+                'host' => $request->getHttpHost(),
+                'referer' => $request->headers->get('referer'),
+                'origin' => $request->headers->get('origin'),
+                'session_cookie' => config('session.cookie'),
+            ]);
+
+            throw new RuntimeException(
+                'Login attempted on a request with no session bound. Likely a '
+                .'Sanctum stateful-domain misconfiguration: verify the browser '
+                .'host is in SANCTUM_STATEFUL_DOMAINS (see docs/runbooks/local-dev.md).',
+            );
+        }
+
         $email = strtolower(trim($email));
         $ip = $request->ip();
         $userAgent = $request->userAgent();

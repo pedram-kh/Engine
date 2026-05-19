@@ -19,6 +19,15 @@ return [
     | isolation is enforced separately — see config/session.php and the
     | UseAdminSessionCookie middleware (and docs/runbooks/local-dev.md).
     |
+    | `localhost:5173` is included as a convenience alias for the main SPA so
+    | a browser tab opened at http://localhost:5173 also gets stateful session
+    | cookies; the canonical local-dev URL remains http://127.0.0.1:5173 per
+    | the runbook. The admin SPA is intentionally NOT mirrored to
+    | `localhost:5174` because UseAdminSessionCookie::originIsAdminSpa() only
+    | accepts the canonical 127.0.0.1 admin URL — adding a localhost mirror
+    | here without the matching middleware update would re-introduce the
+    | d9f29eb admin-CSRF-419 bug under the `localhost` host.
+    |
     | Production / staging stateful domains come from environment variables;
     | see docs/SPRINT-0-MANUAL-STEPS.md for AWS Secrets Manager wiring.
     |
@@ -26,7 +35,7 @@ return [
 
     'stateful' => explode(',', (string) env(
         'SANCTUM_STATEFUL_DOMAINS',
-        'localhost,127.0.0.1,127.0.0.1:5173,127.0.0.1:5174',
+        'localhost,localhost:5173,127.0.0.1,127.0.0.1:5173,127.0.0.1:5174',
     )),
 
     /*
