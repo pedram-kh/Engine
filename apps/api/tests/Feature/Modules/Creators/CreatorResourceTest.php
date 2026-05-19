@@ -350,6 +350,7 @@ it('exposes view_url + thumbnail_view_url on every portfolio item', function ():
 
     $creator->load('portfolioItems');
     $payload = makeResource($creator)->toArray(Request::create('/'));
+    /** @var array<int, array{s3_path: string|null, view_url: string|null, thumbnail_view_url: string|null}> $items */
     $items = $payload['attributes']['portfolio'];
 
     expect($items)->toHaveCount(2);
@@ -361,6 +362,8 @@ it('exposes view_url + thumbnail_view_url on every portfolio item', function ():
     // The image (no thumbnail) gets null; the video (with thumb) gets a URL.
     $image = collect($items)->firstWhere('s3_path', 'creators/01/portfolio/img.jpg');
     $video = collect($items)->firstWhere('s3_path', 'creators/01/portfolio/clip.mp4');
+    assert($image !== null);
+    assert($video !== null);
     expect($image['thumbnail_view_url'])->toBeNull();
     expect($video['thumbnail_view_url'])->toBe('https://signed.example/creators/01/portfolio/thumbs/clip.jpg?sig=test');
 });
