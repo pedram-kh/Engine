@@ -8,6 +8,7 @@ import {
   resetClock,
   restoreThrottle,
   signOutViaApi,
+  verifyEmailViaApi,
 } from '../fixtures/test-helpers'
 
 /**
@@ -89,7 +90,7 @@ test.describe('spec #19 — 2FA enrollment + sign-in', () => {
     await resetClock(request)
   })
 
-  test('full enrollment + re-sign-in flow', async ({ page }) => {
+  test('full enrollment + re-sign-in flow', async ({ page, request }) => {
     const email = uniqueEmail()
 
     // -----------------------------------------------------------------
@@ -107,6 +108,20 @@ test.describe('spec #19 — 2FA enrollment + sign-in', () => {
     // SPA redirects to the email-verification-pending page on success.
     await expect(page).toHaveURL(/\/verify-email\/pending/)
     await expect(page.locator(dt(testIds.emailVerificationPendingPage))).toBeVisible()
+
+    // -----------------------------------------------------------------
+    // Verify the email out-of-band before continuing. Post-c479189
+    // stabilization, `SignInPage.postLoginTarget()` bounces unverified
+    // creators to `/verify-email/pending` (the `/api/v1/creators/me`
+    // verified middleware would otherwise 403 inside
+    // `requireOnboardingAccess.bootstrap()` and the SPA would render
+    // the generic "Something went wrong" banner with the URL stuck on
+    // `/sign-in` — see ecda60c). This spec tests the 2FA enrollment +
+    // re-sign-in flow, not the unverified-user edge case, so we
+    // verify upfront to mirror real-user behaviour (same pattern as
+    // creator-wizard-happy-path.spec.ts).
+    // -----------------------------------------------------------------
+    await verifyEmailViaApi(request, email)
 
     // -----------------------------------------------------------------
     // Step 2 — sign in. Sprint 2 chunk 2 changed the post-auth contract:
@@ -194,8 +209,15 @@ test.describe('spec #19 — 2FA enrollment + sign-in', () => {
     await page.locator(dt(testIds.signInTotp)).locator('input').fill(second.code)
     await page.locator(dt(testIds.signInSubmit)).click()
 
-    // Land on `/` — chunk 6.5 dashboard route, MFA enrolled this
-    // time so the requireMfaEnrolled guard passes.
-    await expect(page).toHaveURL('http://127.0.0.1:5173/')
+    // Assert the cookie landed. Pre-c479189 this spec pinned the
+    // destination to '/' (every user went to `app.dashboard`).
+    // Post-c479189 + ecda60c stabilization, `postLoginTarget()`
+    // dispatches by user_type: a verified creator lands on
+    // `/onboarding/welcome-back`, not '/'. The spec's intent at
+    // this step is "the post-2FA sign-in succeeded — the cookie
+    // landed", not which specific shell renders; use the same
+    // loose URL assertion as Step 2 to avoid pinning to whatever
+    // the dispatch returns this sprint.
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
   })
 })
