@@ -69,7 +69,7 @@ export interface SignUpUserResult {
  * which is fine for chunk 6.8 because the LoginController does not
  * gate on email verification. Specs that need a verified email call
  * `mintVerificationToken` and navigate the SPA to the
- * `/verify-email/confirm?token=…` route.
+ * `/auth/verify-email?token=…` route.
  */
 export async function signUpUser(
   request: APIRequestContext,
@@ -176,13 +176,13 @@ export interface MintVerificationTokenResult {
 /**
  * Mint a fresh email-verification token for the user with the given
  * email. The returned `token` is the value the SPA's
- * `/verify-email/confirm?token=…` route consumes.
+ * `/auth/verify-email?token=…` route consumes.
  *
- * The helper's `verification_url` field is included for completeness
- * but specs MUST NOT rely on its path matching the SPA route — the
- * helper's URL targets `/auth/verify-email`, while the SPA route is
- * `/verify-email/confirm` (chunk 6.6). Specs construct the SPA URL
- * themselves using the returned `token`.
+ * The helper's `verification_url` field targets `/auth/verify-email`,
+ * which now matches the SPA route 1:1 (the earlier `/verify-email/confirm`
+ * mismatch was fixed — see `apps/main/src/modules/auth/routes.ts`). Specs
+ * may either follow `verification_url` directly or construct the SPA URL
+ * from the returned `token`.
  */
 export async function mintVerificationToken(
   request: APIRequestContext,
@@ -474,7 +474,7 @@ export async function clearQueueMode(request: APIRequestContext): Promise<void> 
  * middleware passes.
  *
  * Implementation note: we POST the token to the production endpoint
- * rather than navigating the SPA's `/verify-email/confirm?token=…`
+ * rather than navigating the SPA's `/auth/verify-email?token=…`
  * page so the helper is usable from outside a `page` context (e.g.,
  * from `test.beforeEach` setup that hasn't navigated yet).
  */

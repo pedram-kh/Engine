@@ -82,8 +82,15 @@ export const authRoutes: RouteRecordRaw[] = [
     component: () => import('./pages/EmailVerificationPendingPage.vue'),
     meta: { layout: 'auth' },
   },
+  // Path is `/auth/verify-email` to match the link the backend mints in
+  // `SignUpService::buildVerificationUrl()` (and the `_test` token-mint
+  // helper). The route NAME stays `auth.verify-email.confirm` for
+  // name-based navigation. A prior mismatch (SPA on `/verify-email/confirm`,
+  // emails pointing at `/auth/verify-email`) landed real users on a blank
+  // unmatched route — the e2e suite had papered over it by constructing
+  // its own SPA URL.
   {
-    path: '/verify-email/confirm',
+    path: '/auth/verify-email',
     name: 'auth.verify-email.confirm',
     component: () => import('./pages/EmailVerificationConfirmPage.vue'),
     meta: { layout: 'auth' },

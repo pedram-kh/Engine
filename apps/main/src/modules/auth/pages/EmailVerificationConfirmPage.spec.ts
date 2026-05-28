@@ -39,7 +39,7 @@ describe('EmailVerificationConfirmPage', () => {
   it('on mount, calls verifyEmail with the token from the route query', async () => {
     vi.mocked(authApi.verifyEmail).mockResolvedValue(undefined)
     const h = await mountAuthPage(EmailVerificationConfirmPage, {
-      initialRoute: { path: '/verify-email/confirm', query: { token: 'tok' } },
+      initialRoute: { path: '/auth/verify-email', query: { token: 'tok' } },
     })
     teardown = h.unmount
     await flushPromises()
@@ -66,7 +66,7 @@ describe('EmailVerificationConfirmPage', () => {
       }),
     )
     const h = await mountAuthPage(EmailVerificationConfirmPage, {
-      initialRoute: { path: '/verify-email/confirm', query: { token: 'tok' } },
+      initialRoute: { path: '/auth/verify-email', query: { token: 'tok' } },
     })
     teardown = h.unmount
     await flushPromises()
@@ -84,7 +84,7 @@ describe('EmailVerificationConfirmPage', () => {
       }),
     )
     const h = await mountAuthPage(EmailVerificationConfirmPage, {
-      initialRoute: { path: '/verify-email/confirm', query: { token: 'tok' } },
+      initialRoute: { path: '/auth/verify-email', query: { token: 'tok' } },
     })
     teardown = h.unmount
     await flushPromises()
@@ -102,7 +102,7 @@ describe('EmailVerificationConfirmPage', () => {
         }),
     )
     const h = await mountAuthPage(EmailVerificationConfirmPage, {
-      initialRoute: { path: '/verify-email/confirm', query: { token: 'tok' } },
+      initialRoute: { path: '/auth/verify-email', query: { token: 'tok' } },
     })
     teardown = h.unmount
     // Pump pending microtasks then wait for Vue to flush its reactive
