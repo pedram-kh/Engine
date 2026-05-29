@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Creators\Database\Factories\CreatorFactory;
+use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -32,7 +33,8 @@ it('stores a valid avatar and returns the refreshed creator', function (): void 
         ->assertOk()
         ->assertJsonPath('data.type', 'creators');
 
-    expect($user->creator->refresh()->avatar_path)->not->toBeNull();
+    $avatarPath = Creator::query()->where('user_id', $user->id)->value('avatar_path');
+    expect($avatarPath)->not->toBeNull();
 });
 
 it('returns a precise 413 avatar.too_large when PHP dropped the file via upload_max_filesize', function (): void {
