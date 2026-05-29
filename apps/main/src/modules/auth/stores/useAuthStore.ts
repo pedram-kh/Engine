@@ -47,6 +47,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 import { setAuthRebootstrap, useAgencyStore } from '@/core/stores/useAgencyStore'
+import { resetWelcomeBackFlag } from '@/modules/onboarding/internal/welcomeBackFlag'
 import { authApi } from '../api/auth.api'
 
 export type BootstrapStatus = 'idle' | 'loading' | 'ready' | 'error'
@@ -119,6 +120,10 @@ export const useAuthStore = defineStore('auth', () => {
     mfaEnrollmentRequired.value = false
     bootstrapStatus.value = 'idle'
     useAgencyStore().reset()
+    // Tear down the tab-scoped "already showed the onboarding landing"
+    // flag so a sign-out → sign-in cycle in the same tab re-shows the
+    // Welcome / Let's-get-started screen for the next session.
+    resetWelcomeBackFlag()
   }
 
   // ---------------------------------------------------------------

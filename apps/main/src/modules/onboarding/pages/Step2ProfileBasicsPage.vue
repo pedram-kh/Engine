@@ -135,6 +135,18 @@ const submitErrorMessage = computed(() =>
   submitErrorKey.value === null ? null : t(submitErrorKey.value),
 )
 
+// The backend's `isProfileComplete` gate requires an avatar AND at
+// least one category (CompletenessScoreCalculator). Both were
+// previously presented as optional in this form, so a creator could
+// "Save and continue" with the step still incomplete — leaving them
+// stuck at next_step=profile and 0 score credit for the step. Mirror
+// the backend rule on the client: avatar is persisted via its own
+// immediate upload mutation, so we read it from the store; categories
+// is local form state.
+const hasAvatar = computed(() => store.creator?.attributes.avatar_path != null)
+const hasCategory = computed(() => categories.value.length > 0)
+const canContinue = computed(() => hasAvatar.value && hasCategory.value)
+
 function hydrateFromCreator(): void {
   const attrs = store.creator?.attributes
   if (attrs === undefined) return
@@ -173,6 +185,9 @@ async function save(): Promise<boolean> {
 }
 
 async function onSubmit(): Promise<void> {
+  // Guard the keyboard-submit path (Enter inside a field) too — the
+  // button is disabled, but the form's submit event can still fire.
+  if (!canContinue.value) return
   const ok = await save()
   if (ok) {
     await router.push({ name: 'onboarding.social' })
@@ -204,6 +219,13 @@ onMounted(() => {
 
     <v-form class="profile-basics__form" @submit.prevent="onSubmit">
       <AvatarUploadDrop />
+      <p
+        class="profile-basics__avatar-note text-caption"
+        :class="{ 'profile-basics__avatar-note--missing': !hasAvatar }"
+        data-testid="profile-avatar-required"
+      >
+        {{ t('creator.ui.wizard.fields.avatar_required') }}
+      </p>
 
       <v-text-field
         v-model="displayName"
@@ -283,6 +305,9 @@ onMounted(() => {
         persistent-hint
         multiple
         chips
+        :rules="[
+          (v: string[]) => (Array.isArray(v) && v.length > 0) || t('validation.field_required'),
+        ]"
         :error-messages="fieldErrors.categories"
         data-testid="profile-categories"
       />
@@ -309,7 +334,20 @@ onMounted(() => {
       </div>
 
       <div class="profile-basics__actions">
-        <v-btn type="submit" color="primary" :loading="isSaving" data-testid="profile-submit">
+        <p
+          v-if="!canContinue"
+          class="profile-basics__requirements text-body-2"
+          data-testid="profile-requirements-hint"
+        >
+          {{ t('creator.ui.wizard.fields.step_requirements_hint') }}
+        </p>
+        <v-btn
+          type="submit"
+          color="primary"
+          :loading="isSaving"
+          :disabled="!canContinue"
+          data-testid="profile-submit"
+        >
           {{ t('creator.ui.wizard.actions.save_and_continue') }}
         </v-btn>
       </div>
@@ -355,8 +393,24 @@ onMounted(() => {
   font-size: 0.875rem;
 }
 
+.profile-basics__avatar-note {
+  text-align: center;
+  margin-top: -4px;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+.profile-basics__avatar-note--missing {
+  color: rgb(var(--v-theme-error));
+}
+
 .profile-basics__actions {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.profile-basics__requirements {
+  color: rgb(var(--v-theme-on-surface-variant));
 }
 </style>

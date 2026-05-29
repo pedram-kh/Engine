@@ -142,6 +142,8 @@
           "secondary_languages": "Altre lingue",
           "categories": "Categorie",
           "categories_help": "Scegli le categorie che descrivono meglio quello che crei.",
+          "avatar_required": "È necessaria una foto profilo per completare questo passaggio.",
+          "step_requirements_hint": "Aggiungi una foto profilo e almeno una categoria per continuare.",
           "social_handle": "Nome utente",
           "social_profile_url": "URL del profilo",
           "portfolio_title": "Titolo",
@@ -196,6 +198,9 @@
         "welcome_back": {
           "title": "Bentornato",
           "subtitle": "Sei stato qui per l'ultima volta {time_ago}. Riprendi da dove avevi lasciato.",
+          "first_time_title": "Iniziamo",
+          "first_time_subtitle": "Benvenuto in Catalyst. Configuriamo il tuo profilo creator — bastano pochi minuti.",
+          "first_time_prompt": "Inizia da {step} per presentarti ai brand.",
           "next_step_prompt": "Sei al passaggio {step}. Continua qui oppure torna indietro per modificare un passaggio precedente.",
           "all_complete_prompt": "Sei a posto — hai completato tutti i passaggi. Pronto a inviare?",
           "continue_button": "Continua a {step_name}",

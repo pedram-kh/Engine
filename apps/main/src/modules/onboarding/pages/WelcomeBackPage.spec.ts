@@ -5,7 +5,7 @@ import { flushPromises } from '@vue/test-utils'
 import type { Router } from 'vue-router'
 
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
-import { __resetWelcomeBackFlag } from '../internal/welcomeBackFlag'
+import { resetWelcomeBackFlag } from '../internal/welcomeBackFlag'
 
 vi.mock('../api/onboarding.api', () => ({
   onboardingApi: {
@@ -91,7 +91,7 @@ let teardown: (() => void) | null = null
 
 beforeEach(() => {
   vi.clearAllMocks()
-  __resetWelcomeBackFlag()
+  resetWelcomeBackFlag()
 })
 
 afterEach(() => {
@@ -113,6 +113,39 @@ describe('WelcomeBackPage — Decision B (session-vs-fresh hybrid)', () => {
 
     expect(h.wrapper.find('[data-test="welcome-back-page"]').exists()).toBe(true)
     expect(h.wrapper.find('[data-test="welcome-back-heading"]').text()).toBe('Welcome back')
+  })
+
+  it('shows the first-time "Let\'s get started" copy (no time-ago) when nextStep is still "profile"', async () => {
+    // A brand-new creator who has not completed the first wizard step
+    // must NOT be told "Welcome back / you were last here X ago" — the
+    // time-ago is derived from updated_at and reads as a falsehood on a
+    // genuine first visit (the reported "last here 16 min ago" bug).
+    const recentISO = new Date(Date.now() - 16 * 60 * 1000).toISOString()
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue({
+      data: makeCreator(
+        { updated_at: recentISO, profile_completeness_score: 0 },
+        { next_step: 'profile', steps: [{ id: 'profile', is_complete: false }] },
+      ),
+    })
+    const h = await mountAuthPage(WelcomeBackPage, {
+      initialRoute: { path: '/onboarding' },
+    })
+    teardown = h.unmount
+
+    await useOnboardingStore().bootstrap()
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-test="welcome-back-heading"]').text()).toBe("Let's get started")
+
+    const subtitle = h.wrapper.find('[data-test="welcome-back-subtitle"]').text()
+    expect(subtitle).toContain('set up your creator profile')
+    // The returning-user time-ago framing must be absent.
+    expect(subtitle).not.toContain('16 min')
+    expect(subtitle).not.toContain('last here')
+
+    expect(h.wrapper.find('[data-test="welcome-back-next-step-prompt"]').text()).toContain(
+      'Start with',
+    )
   })
 
   it('renders the creator completeness score (35%)', async () => {
@@ -277,7 +310,7 @@ describe('WelcomeBackPage — Decision B (session-vs-fresh hybrid)', () => {
     await flushPromises()
     first.unmount()
 
-    // DO NOT call __resetWelcomeBackFlag() — simulate the bug
+    // DO NOT call resetWelcomeBackFlag() — simulate the bug
     // condition where the flag drifts to always-true.
     const second = await mountAuthPage(WelcomeBackPage, {
       initialRoute: { path: '/onboarding' },

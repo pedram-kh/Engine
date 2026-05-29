@@ -87,7 +87,7 @@
  *   exists to catch.
  */
 
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
@@ -104,6 +104,17 @@ const { creator, nextStep, isSubmitted, completenessScore, lastActivityAt } =
   storeToRefs(onboardingStore)
 
 const shouldRender = ref(false)
+
+// A creator whose first incomplete step is still `profile` has not
+// finished a single wizard step yet, so there is no genuine prior
+// session to welcome them "back" to. The existing copy ("Welcome
+// back / you were last here X ago") plus the `updated_at`-derived
+// time-ago would read as a falsehood for a brand-new account (e.g.
+// "last here 16 min ago" on a first visit). Branch them onto the
+// "Let's get started" copy with no time-ago. Returners who have
+// completed at least one step (nextStep beyond profile, or null when
+// fully complete) keep the welcome-back copy.
+const isFirstTime = computed(() => nextStep.value === 'profile')
 
 function timeAgoCopy(timestamp: string | null): string {
   if (timestamp === null) {
@@ -162,14 +173,25 @@ function continueFromHere(): void {
 <template>
   <div v-if="shouldRender && creator" class="welcome-back" data-test="welcome-back-page">
     <h1 class="text-h4 mb-2" data-test="welcome-back-heading">
-      {{ t('creator.ui.wizard.welcome_back.title') }}
+      {{
+        t(
+          isFirstTime
+            ? 'creator.ui.wizard.welcome_back.first_time_title'
+            : 'creator.ui.wizard.welcome_back.title',
+        )
+      }}
     </h1>
     <p class="text-body-1 text-medium-emphasis mb-6" data-test="welcome-back-subtitle">
-      {{
-        t('creator.ui.wizard.welcome_back.subtitle', {
-          time_ago: timeAgoCopy(lastActivityAt),
-        })
-      }}
+      <template v-if="isFirstTime">
+        {{ t('creator.ui.wizard.welcome_back.first_time_subtitle') }}
+      </template>
+      <template v-else>
+        {{
+          t('creator.ui.wizard.welcome_back.subtitle', {
+            time_ago: timeAgoCopy(lastActivityAt),
+          })
+        }}
+      </template>
     </p>
 
     <v-card class="mb-6 pa-6" elevation="1" data-test="welcome-back-status">
@@ -193,11 +215,20 @@ function continueFromHere(): void {
         class="text-body-2 mb-4"
         data-test="welcome-back-next-step-prompt"
       >
-        {{
-          t('creator.ui.wizard.welcome_back.next_step_prompt', {
-            step: t(`creator.ui.wizard.steps.${nextStep}.name`),
-          })
-        }}
+        <template v-if="isFirstTime">
+          {{
+            t('creator.ui.wizard.welcome_back.first_time_prompt', {
+              step: t(`creator.ui.wizard.steps.${nextStep}.name`),
+            })
+          }}
+        </template>
+        <template v-else>
+          {{
+            t('creator.ui.wizard.welcome_back.next_step_prompt', {
+              step: t(`creator.ui.wizard.steps.${nextStep}.name`),
+            })
+          }}
+        </template>
       </p>
       <p v-else class="text-body-2 mb-4" data-test="welcome-back-all-complete-prompt">
         {{ t('creator.ui.wizard.welcome_back.all_complete_prompt') }}

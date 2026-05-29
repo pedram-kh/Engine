@@ -11,6 +11,11 @@ import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useAuthStore } from './useAuthStore'
+import {
+  hasMountedBefore,
+  markMounted,
+  resetWelcomeBackFlag,
+} from '@/modules/onboarding/internal/welcomeBackFlag'
 
 // The store imports `authApi` from `../api/auth.api`. Mock that module
 // so each test can drive the doubles directly.
@@ -121,6 +126,21 @@ describe('useAuthStore', () => {
       expect(store.user).toBeNull()
       expect(store.isAuthenticated).toBe(false)
       expect(store.mfaEnrollmentRequired).toBe(false)
+    })
+
+    it('clearUser() resets the tab-scoped welcome-back flag (sign-out → sign-in re-shows the landing)', () => {
+      // Regression: the SPA logout does an in-tab navigation rather
+      // than a hard reload, so the module-scoped welcome-back flag
+      // stayed `true` and the next sign-in auto-advanced straight past
+      // the onboarding landing. clearUser() must tear it down.
+      resetWelcomeBackFlag()
+      markMounted()
+      expect(hasMountedBefore()).toBe(true)
+
+      const store = useAuthStore()
+      store.clearUser()
+
+      expect(hasMountedBefore()).toBe(false)
     })
   })
 

@@ -50,13 +50,12 @@ const baseAttributes = {
   updated_at: '2026-05-14T00:00:00+00:00',
 }
 
-beforeEach(() => {
-  vi.clearAllMocks()
+function mockBootstrap(attrOverrides: Record<string, unknown> = {}): void {
   vi.mocked(onboardingApi.bootstrap).mockResolvedValue({
     data: {
       id: '01',
       type: 'creators',
-      attributes: baseAttributes,
+      attributes: { ...baseAttributes, ...attrOverrides },
       wizard: {
         next_step: 'profile',
         is_submitted: false,
@@ -70,6 +69,14 @@ beforeEach(() => {
       },
     } as never,
   })
+}
+
+beforeEach(() => {
+  vi.clearAllMocks()
+  // Default fixture has a category but NO avatar — Step 2's completion
+  // gate (avatar + ≥1 category) therefore starts unmet. Tests that need
+  // to exercise the submit path opt in via mockBootstrap({ avatar_path }).
+  mockBootstrap()
 })
 
 afterEach(() => {
@@ -136,6 +143,9 @@ describe('Step2ProfileBasicsPage', () => {
   // Same pattern as SignUpPage / Step 6 Tax — `validation.failed`
   // MUST NOT reach `t()` as a literal i18n key.
   it('binds per-field 422 messages to the matching input and hides the generic banner', async () => {
+    // Completion gate must be satisfied (avatar + category) so the
+    // submit actually reaches the server and surfaces the 422.
+    mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg' })
     vi.mocked(onboardingApi.updateProfile).mockRejectedValue(
       ApiError.fromEnvelope(422, {
         errors: [
@@ -169,5 +179,57 @@ describe('Step2ProfileBasicsPage', () => {
     expect(html).toContain('The display name field is required.')
     expect(html).not.toContain('validation.failed')
     expect(wrapper.find('[data-testid="profile-submit-error"]').exists()).toBe(false)
+  })
+
+  // Stabilization (May 29, 2026): the backend's isProfileComplete gate
+  // requires an avatar AND ≥1 category, but the form let creators "Save
+  // and continue" without them — leaving the step silently incomplete.
+  // The client now mirrors the gate.
+  it('disables Save and continue and shows the requirements hint when the avatar is missing', async () => {
+    // Default fixture: category present, avatar absent → gate unmet.
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="profile-submit"]').classes()).toContain('v-btn--disabled')
+    expect(wrapper.find('[data-testid="profile-requirements-hint"]').exists()).toBe(true)
+  })
+
+  it('does not call updateProfile when submitted with the avatar still missing', async () => {
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(onboardingApi.updateProfile).not.toHaveBeenCalled()
+  })
+
+  it('enables Save and continue and hides the hint once avatar + category are present', async () => {
+    mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg', categories: ['lifestyle'] })
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="profile-submit"]').classes()).not.toContain(
+      'v-btn--disabled',
+    )
+    expect(wrapper.find('[data-testid="profile-requirements-hint"]').exists()).toBe(false)
   })
 })

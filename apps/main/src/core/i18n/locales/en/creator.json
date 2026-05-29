@@ -142,6 +142,8 @@
           "secondary_languages": "Other languages",
           "categories": "Categories",
           "categories_help": "Pick the categories that best describe what you create.",
+          "avatar_required": "A profile photo is required to finish this step.",
+          "step_requirements_hint": "Add a profile photo and at least one category to continue.",
           "social_handle": "Username",
           "social_profile_url": "Profile URL",
           "portfolio_title": "Title",
@@ -196,6 +198,9 @@
         "welcome_back": {
           "title": "Welcome back",
           "subtitle": "You were last here {time_ago}. Pick up where you left off.",
+          "first_time_title": "Let's get started",
+          "first_time_subtitle": "Welcome to Catalyst. Let's set up your creator profile — it only takes a few minutes.",
+          "first_time_prompt": "Start with {step} to introduce yourself to brands.",
           "next_step_prompt": "You're on Step {step}. Continue here, or jump back to edit an earlier step.",
           "all_complete_prompt": "Looking good — you've completed every step. Ready to submit?",
           "continue_button": "Continue to {step_name}",

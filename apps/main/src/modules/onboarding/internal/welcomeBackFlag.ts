@@ -35,10 +35,22 @@ export function markMounted(): void {
 }
 
 /**
- * Test-only reset for the module-scoped flag. The Vitest harness
- * imports + calls this in `beforeEach` so each spec gets a clean
- * "fresh page load" starting state. Production code never calls it.
+ * Reset the module-scoped flag back to its "fresh page load" state.
+ *
+ * Called in production from `useAuthStore.clearUser()` so that a
+ * sign-out → sign-in cycle within the SAME tab re-shows the landing
+ * page for the next session. Without this, the flag stayed `true`
+ * for the tab's whole lifetime and the second login auto-advanced
+ * straight past the Welcome / Let's-get-started screen (the SPA does
+ * an in-tab `router.push` on logout, not a hard reload, so the module
+ * never re-evaluated). Tab-scoped persistence is still the right
+ * behaviour WITHIN a single authenticated session (navigating back
+ * to `/onboarding` mid-session auto-advances) — this reset only fires
+ * when the session itself is torn down.
+ *
+ * Also used by the Vitest harness in `beforeEach` to give each spec a
+ * clean starting state.
  */
-export function __resetWelcomeBackFlag(): void {
+export function resetWelcomeBackFlag(): void {
   priorBootstrap = false
 }
