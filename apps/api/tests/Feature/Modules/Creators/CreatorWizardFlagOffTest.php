@@ -259,3 +259,59 @@ it('completeness score = 100 for a creator with profile/social/portfolio/tax fil
 
     expect($score)->toBe(100);
 });
+
+// Stabilization (May 29, 2026): the flag-OFF skip-path no longer
+// CREDITS the disabled steps up front — it EXCLUDES them from the
+// score's denominator (renormalisation). The end-state (all applicable
+// steps done = 100, pinned above) is unchanged, but partial progress
+// now reflects only the work the creator can actually do, starting at
+// 0 instead of the old phantom 40 (kyc 15 + payout 10 + contract 15).
+it('completeness score = 0 for a fresh creator with all three vendor flags OFF (no phantom credit)', function (): void {
+    [, $creator] = makeFlagOffCreator();
+
+    // Bootstrap state: avatar seeded by the helper, but no profile
+    // fields, no social/portfolio, tax incomplete. The three flag-OFF
+    // steps must NOT pre-credit their weight.
+    $score = app(CompletenessScoreCalculator::class)
+        ->score($creator->fresh());
+
+    expect($score)->toBe(0);
+});
+
+it('completeness score renormalises to 42 when only profile is complete and the vendor flags are OFF', function (): void {
+    [, $creator] = makeFlagOffCreator();
+
+    $creator->forceFill([
+        'display_name' => 'Catalyst',
+        'country_code' => 'IT',
+        'primary_language' => 'en',
+        'categories' => ['lifestyle'],
+    ])->save();
+
+    // Applicable denominator with all three vendor flags OFF is
+    // profile(25) + social(15) + portfolio(10) + tax(10) = 60.
+    // Profile alone => round(25 / 60 * 100) = 42.
+    $score = app(CompletenessScoreCalculator::class)
+        ->score($creator->fresh());
+
+    expect($score)->toBe(42);
+});
+
+it('completeness score renormalises to 67 when profile + social are complete and the vendor flags are OFF', function (): void {
+    [, $creator] = makeFlagOffCreator();
+
+    $creator->forceFill([
+        'display_name' => 'Catalyst',
+        'country_code' => 'IT',
+        'primary_language' => 'en',
+        'categories' => ['lifestyle'],
+    ])->save();
+
+    CreatorSocialAccountFactory::new()->createOne(['creator_id' => $creator->id]);
+
+    // (25 + 15) / 60 * 100 = round(66.67) = 67.
+    $score = app(CompletenessScoreCalculator::class)
+        ->score($creator->fresh());
+
+    expect($score)->toBe(67);
+});

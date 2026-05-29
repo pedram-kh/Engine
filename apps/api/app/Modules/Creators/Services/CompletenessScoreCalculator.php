@@ -61,22 +61,48 @@ final class CompletenessScoreCalculator
     /**
      * Compute the score for the given creator. Triggers no extra
      * queries beyond the relationships the caller has eager-loaded.
+     *
+     * The score is renormalised over the steps that actually apply in
+     * the current environment. A vendor-gated step whose feature flag
+     * is OFF is "skipped" (Decision E1=a) — it requires no creator
+     * action — so it is excluded from BOTH the numerator AND the
+     * denominator. Previously such steps were credited their full
+     * weight up front, which inflated the score for a creator who had
+     * done nothing (e.g. a fresh creator reading 40% with KYC/payout/
+     * contract all flag-OFF). Now the percentage reflects only the work
+     * the creator can actually do, starts at 0, and still reaches 100
+     * once every applicable step is complete (the all-flags-OFF
+     * "score = 100 when the four enabled steps are done" contract in
+     * CreatorWizardFlagOffTest is preserved: 60/60 = 100).
      */
     public function score(Creator $creator): int
     {
         $weights = $this->weights();
-        $score = 0;
+        $applicable = $this->applicableSteps();
+
+        $earned = 0;
+        $total = 0;
 
         foreach ($this->stepCompletion($creator) as $step => $isComplete) {
-            if ($isComplete && isset($weights[$step])) {
-                $score += $weights[$step];
+            if (! isset($weights[$step]) || ! in_array($step, $applicable, true)) {
+                continue;
+            }
+
+            $total += $weights[$step];
+
+            if ($isComplete) {
+                $earned += $weights[$step];
             }
         }
 
-        // Cap at 100 defensively — sum-to-100 invariant is asserted by
-        // the regression test, but a future weight change without a
-        // matching test update should never produce > 100 user-facing.
-        return min($score, 100);
+        if ($total === 0) {
+            return 0;
+        }
+
+        // Cap at 100 defensively — earned can never exceed total, but a
+        // future weight change without a matching test update should
+        // never produce > 100 user-facing.
+        return min((int) round($earned / $total * 100), 100);
     }
 
     /**
@@ -149,6 +175,41 @@ final class CompletenessScoreCalculator
         }
 
         return WizardStep::Review;
+    }
+
+    /**
+     * The subset of weighted steps that count toward the score in the
+     * current environment. Vendor-gated steps drop out when their
+     * feature flag is OFF (see {@see score()} for the renormalisation
+     * rationale). Non-gated steps (profile / social / portfolio / tax)
+     * always apply.
+     *
+     * Kept in lockstep with {@see stepCompletion()}'s flag-OFF branches
+     * and the SPA's `resolveStepStatus` / `FLAG_BY_STEP` maps.
+     *
+     * @return list<string>
+     */
+    private function applicableSteps(): array
+    {
+        $gatedFlagByStep = [
+            WizardStep::Kyc->value => KycVerificationEnabled::NAME,
+            WizardStep::Payout->value => CreatorPayoutMethodEnabled::NAME,
+            WizardStep::Contract->value => ContractSigningEnabled::NAME,
+        ];
+
+        $applicable = [];
+
+        foreach (array_keys($this->weights()) as $step) {
+            $flag = $gatedFlagByStep[$step] ?? null;
+
+            if ($flag !== null && ! Feature::active($flag)) {
+                continue;
+            }
+
+            $applicable[] = $step;
+        }
+
+        return $applicable;
     }
 
     private function isProfileComplete(Creator $creator): bool
