@@ -27,12 +27,18 @@ it('uploads an avatar to creators/{ulid}/avatar/ on the media disk', function ()
     Storage::disk('media')->assertExists($path);
 });
 
-it('rejects an avatar exceeding 5MB', function (): void {
+it('rejects an avatar exceeding the configured cap', function (): void {
     $creator = Creator::factory()->createOne();
     $file = UploadedFile::fake()->image('huge.jpg', 4000, 4000)->size(6 * 1024); // 6MB
 
     expect(fn () => app(AvatarUploadService::class)->upload($creator, $file))
-        ->toThrow(RuntimeException::class, 'Avatar exceeds 5MB');
+        ->toThrow(RuntimeException::class, 'Avatar exceeds the configured size limit');
+});
+
+it('maxBytes() reflects the configured single source of truth', function (): void {
+    config(['uploads.avatar_max_bytes' => 7 * 1024 * 1024]);
+
+    expect(app(AvatarUploadService::class)->maxBytes())->toBe(7 * 1024 * 1024);
 });
 
 it('rejects unsupported MIME types', function (): void {

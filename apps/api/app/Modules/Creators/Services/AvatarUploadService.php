@@ -32,8 +32,6 @@ use RuntimeException;
  */
 final class AvatarUploadService
 {
-    public const int MAX_BYTES = 5 * 1024 * 1024;
-
     /**
      * MIME types accepted on the avatar surface. Mapped to canonical
      * file extensions for the saved object.
@@ -107,10 +105,20 @@ final class AvatarUploadService
         return self::ACCEPTED_MIME_TYPES[$mime];
     }
 
+    /**
+     * The configured maximum avatar size in bytes (single source of truth
+     * — see config/uploads.php). The controller's `max:` validation rule
+     * derives from the same value.
+     */
+    public function maxBytes(): int
+    {
+        return (int) config('uploads.avatar_max_bytes');
+    }
+
     private function assertWithinSize(UploadedFile $file): void
     {
-        if ($file->getSize() > self::MAX_BYTES) {
-            throw new RuntimeException('Avatar exceeds 5MB size limit.');
+        if ($file->getSize() > $this->maxBytes()) {
+            throw new RuntimeException('Avatar exceeds the configured size limit.');
         }
     }
 

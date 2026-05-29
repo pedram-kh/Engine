@@ -12,6 +12,7 @@ use App\Modules\Creators\Services\CompletenessScoreCalculator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -39,8 +40,29 @@ final class AvatarController
 
     public function store(Request $request): JsonResponse
     {
+        // Distinguish "the server's PHP limits silently dropped the upload"
+        // from an ordinary oversized-file rejection. When `upload_max_filesize`
+        // or `post_max_size` is exceeded, PHP discards the payload BEFORE
+        // validation runs, so a naive `required` rule would mislead the
+        // client with a generic "file is required" message. Surface a clear,
+        // specific 413 instead (and the /health upload check + the
+        // `uploads:check-limits` command exist to catch the misconfiguration
+        // at deploy time so this path is never hit in a correct environment).
+        if ($this->uploadDroppedByServerLimit($request)) {
+            return ErrorResponse::single(
+                $request,
+                413,
+                'avatar.too_large',
+                'The uploaded file exceeds the server upload limit.',
+                'The image was rejected by the server before it could be processed. '
+                    .'Choose a smaller image, or ask an administrator to raise the upload limit.',
+            );
+        }
+
+        $maxKilobytes = (int) ceil($this->service->maxBytes() / 1024);
+
         $request->validate([
-            'file' => ['required', 'file', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
+            'file' => ['required', 'file', 'max:'.$maxKilobytes, 'mimes:jpg,jpeg,png,webp'],
         ]);
 
         $creator = $this->resolveCreator($request);
@@ -81,6 +103,36 @@ final class AvatarController
 
         return (new CreatorResource($creator->refresh(), $this->calculator))
             ->response();
+    }
+
+    /**
+     * Detect an upload that PHP discarded because it exceeded the runtime
+     * limits, so the controller can return a precise 413 rather than a
+     * misleading "file is required" 422.
+     *
+     * Two distinct failure shapes:
+     *   - `upload_max_filesize` exceeded: the file still arrives in $_FILES
+     *     but with the UPLOAD_ERR_INI_SIZE error code (no usable tmp file).
+     *   - `post_max_size` exceeded: PHP throws away the ENTIRE request body,
+     *     so a POST that declared a non-zero Content-Length arrives with no
+     *     parsed files AND no parsed form fields.
+     */
+    private function uploadDroppedByServerLimit(Request $request): bool
+    {
+        $file = $request->file('file');
+        if ($file instanceof UploadedFile && $file->getError() === UPLOAD_ERR_INI_SIZE) {
+            return true;
+        }
+
+        if (! $request->isMethod('POST')) {
+            return false;
+        }
+
+        $declaredLength = (int) $request->server('CONTENT_LENGTH', 0);
+
+        return $declaredLength > 0
+            && $request->allFiles() === []
+            && $request->post() === [];
     }
 
     private function resolveCreator(Request $request): Creator
