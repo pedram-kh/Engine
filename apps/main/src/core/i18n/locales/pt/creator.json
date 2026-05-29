@@ -6,6 +6,9 @@
     "admin": {
       "field_status_immutable": "O estado da candidatura não pode ser alterado através deste formulário. Utilize as ações de aprovação ou rejeição."
     },
+    "social": {
+      "invalid_platform": "Essa plataforma social não é suportada."
+    },
     "wizard": {
       "feature_disabled": "Esta etapa está temporariamente indisponível durante uma alteração de configuração. Pode saltá-la para continuar a candidatura.",
       "feature_enabled": "Esta opção não está disponível neste momento — utilize o fluxo padrão desta etapa.",
@@ -31,7 +34,10 @@
           "submit_for_approval": "Submeter para aprovação",
           "continue_from_here": "Continuar daqui",
           "edit_step": "Editar etapa",
-          "review_and_submit": "Rever e submeter"
+          "review_and_submit": "Rever e submeter",
+          "connect": "Ligar",
+          "update": "Atualizar",
+          "remove": "Remover"
         },
         "skipped": {
           "label": "Saltada",
@@ -145,6 +151,8 @@
           "avatar_required": "É necessária uma foto de perfil para concluir este passo.",
           "step_requirements_hint": "Adicione uma foto de perfil e pelo menos uma categoria para continuar.",
           "social_handle": "Nome de utilizador",
+          "social_handle_hint": "Indique apenas o nome de utilizador — sem o símbolo {'@'} nem o URL completo do perfil.",
+          "social_handle_invalid": "Indique um nome de utilizador válido: 2 a 30 letras, números, pontos, sublinhados ou hífenes (sem espaços, {'@'} ou URLs).",
           "social_profile_url": "URL do perfil",
           "portfolio_title": "Título",
           "portfolio_description": "Descrição",

@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\Route;
 |   GET    /api/v1/creators/me                    Sprint 3 Chunk 1
 |   PATCH  /api/v1/creators/me/wizard/profile     Sprint 3 Chunk 1
 |   POST   /api/v1/creators/me/wizard/social      Sprint 3 Chunk 1
+|   DELETE /api/v1/creators/me/wizard/social/{p}  Stabilization (May 2026)
 |   POST   /api/v1/creators/me/wizard/kyc         Sprint 3 Chunk 1
 |   PATCH  /api/v1/creators/me/wizard/tax         Sprint 3 Chunk 1
 |   POST   /api/v1/creators/me/wizard/payout      Sprint 3 Chunk 1
@@ -61,6 +62,8 @@ Route::prefix('creators/me')
                 ->name('profile.update');
             Route::post('social', [CreatorWizardController::class, 'connectSocial'])
                 ->name('social.connect');
+            Route::delete('social/{platform}', [CreatorWizardController::class, 'disconnectSocial'])
+                ->name('social.disconnect');
             Route::post('kyc', [CreatorWizardController::class, 'initiateKyc'])
                 ->name('kyc.initiate');
             Route::patch('tax', [CreatorWizardController::class, 'upsertTaxProfile'])

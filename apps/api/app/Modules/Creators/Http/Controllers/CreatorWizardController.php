@@ -97,6 +97,33 @@ final class CreatorWizardController
             ->response();
     }
 
+    /**
+     * DELETE /api/v1/creators/me/wizard/social/{platform}
+     *
+     * Disconnect a previously connected social account. Idempotent — a
+     * 422 only when the {platform} segment is not a known platform.
+     */
+    public function disconnectSocial(Request $request, string $platform): JsonResponse
+    {
+        $creator = $this->requireCreator($request);
+
+        $platformEnum = SocialPlatform::tryFrom($platform);
+
+        if ($platformEnum === null) {
+            return ErrorResponse::single(
+                $request,
+                422,
+                'creator.social.invalid_platform',
+                "Unknown social platform '{$platform}'.",
+            );
+        }
+
+        $this->wizardService->disconnectSocial($creator, $platformEnum);
+
+        return (new CreatorResource($creator->refresh(), $this->calculator))
+            ->response();
+    }
+
     public function initiateKyc(Request $request): JsonResponse
     {
         $creator = $this->requireCreator($request);

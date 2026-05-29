@@ -127,6 +127,46 @@ final class CreatorWizardService
     }
 
     /**
+     * Step 3 — Disconnect a social account by platform. Idempotent: a
+     * no-op when the platform is not connected. When the removed row was
+     * the primary, promotes the oldest remaining account so the creator
+     * never ends up with connected accounts and no primary. Recomputes
+     * completeness because dropping the last account un-completes the
+     * "≥1 social account" step.
+     */
+    public function disconnectSocial(Creator $creator, SocialPlatform $platform): void
+    {
+        DB::transaction(function () use ($creator, $platform): void {
+            $account = $creator->socialAccounts()
+                ->where('platform', $platform->value)
+                ->first();
+
+            if ($account === null) {
+                return;
+            }
+
+            $wasPrimary = $account->is_primary;
+
+            // Hard delete on purpose: the unique (creator_id, platform)
+            // index does NOT include deleted_at, so a soft delete would
+            // leave the row in place and block reconnecting the same
+            // platform (updateOrCreate would collide on the unique index).
+            // Sprint-3 social rows carry no history value yet — OAuth
+            // tokens / metrics land in Chunk 4 — so removing them outright
+            // is correct here.
+            $account->forceDelete();
+
+            if ($wasPrimary) {
+                $next = $creator->socialAccounts()->orderBy('id')->first();
+                $next?->forceFill(['is_primary' => true])->save();
+            }
+
+            $this->refreshCompleteness($creator);
+            $creator->save();
+        });
+    }
+
+    /**
      * Step 5 — Initiate hosted KYC flow. Persists the session +
      * provider identifier so we can correlate the eventual webhook.
      */

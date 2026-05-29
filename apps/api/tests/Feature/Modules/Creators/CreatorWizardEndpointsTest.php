@@ -9,6 +9,7 @@ use App\Modules\Creators\Database\Factories\CreatorPortfolioItemFactory;
 use App\Modules\Creators\Database\Factories\CreatorSocialAccountFactory;
 use App\Modules\Creators\Enums\EsignStatus;
 use App\Modules\Creators\Enums\KycStatus;
+use App\Modules\Creators\Enums\SocialPlatform;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
@@ -188,6 +189,106 @@ it('POST /wizard/social creates a social account and emits the audit row', funct
         ->where('action', AuditAction::CreatorWizardSocialCompleted->value)
         ->where('subject_id', $creator->id)
         ->count())->toBe(1);
+});
+
+it('POST /wizard/social strips a leading @ and stores the bare handle', function (): void {
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/wizard/social', [
+            'platform' => 'instagram',
+            'handle' => '@Catalyst_99',
+            'profile_url' => 'https://instagram.com/Catalyst_99',
+        ])
+        ->assertOk();
+
+    expect(CreatorSocialAccount::where('creator_id', $creator->id)->value('handle'))
+        ->toBe('Catalyst_99');
+});
+
+it('POST /wizard/social rejects a handle that is a URL or has spaces (per-field 422)', function (string $handle): void {
+    $user = User::factory()->create();
+    CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/wizard/social', [
+            'platform' => 'youtube',
+            'handle' => $handle,
+            'profile_url' => 'https://youtube.com/@x',
+        ])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.0.source.pointer', '/data/attributes/handle');
+})->with([
+    'pasted URL' => ['https://youtube.com/@ThePrimeTimeagen'],
+    'has spaces' => ['my handle'],
+    'too short' => ['a'],
+]);
+
+it('DELETE /wizard/social/{platform} disconnects the account and is idempotent', function (): void {
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+    CreatorSocialAccountFactory::new()->for($creator)->platform(SocialPlatform::Instagram)->create();
+
+    $this->actingAs($user)
+        ->deleteJson('/api/v1/creators/me/wizard/social/instagram')
+        ->assertOk();
+
+    expect(CreatorSocialAccount::where('creator_id', $creator->id)->count())->toBe(0);
+
+    // Idempotent: deleting an already-removed platform is still 200.
+    $this->actingAs($user)
+        ->deleteJson('/api/v1/creators/me/wizard/social/instagram')
+        ->assertOk();
+});
+
+it('DELETE /wizard/social hard-deletes so the same platform can be reconnected', function (): void {
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+    CreatorSocialAccountFactory::new()->for($creator)->platform(SocialPlatform::Instagram)->create();
+
+    $this->actingAs($user)
+        ->deleteJson('/api/v1/creators/me/wizard/social/instagram')
+        ->assertOk();
+
+    // Reconnect the SAME platform — must not collide on the unique
+    // (creator_id, platform) index (regression guard for the soft-delete trap).
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/wizard/social', [
+            'platform' => 'instagram',
+            'handle' => 'fresh_handle',
+            'profile_url' => 'https://instagram.com/fresh_handle',
+        ])
+        ->assertOk();
+
+    expect(CreatorSocialAccount::where('creator_id', $creator->id)->count())->toBe(1);
+});
+
+it('DELETE /wizard/social promotes a new primary when the removed account was primary', function (): void {
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+    CreatorSocialAccountFactory::new()->for($creator)->platform(SocialPlatform::Instagram)->primary()->create();
+    CreatorSocialAccountFactory::new()->for($creator)->platform(SocialPlatform::TikTok)->create();
+
+    $this->actingAs($user)
+        ->deleteJson('/api/v1/creators/me/wizard/social/instagram')
+        ->assertOk();
+
+    expect(CreatorSocialAccount::where('creator_id', $creator->id)->count())->toBe(1);
+
+    $promoted = CreatorSocialAccount::where('creator_id', $creator->id)->sole();
+    expect($promoted->platform)->toBe(SocialPlatform::TikTok)
+        ->and($promoted->is_primary)->toBeTrue();
+});
+
+it('DELETE /wizard/social/{platform} returns 422 for an unknown platform', function (): void {
+    $user = User::factory()->create();
+    CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->deleteJson('/api/v1/creators/me/wizard/social/myspace')
+        ->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'creator.social.invalid_platform');
 });
 
 it('POST /wizard/kyc returns the hosted-flow URL and persists a KYC row', function (): void {

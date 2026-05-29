@@ -9,6 +9,7 @@ vi.mock('../api/onboarding.api', () => ({
   onboardingApi: {
     bootstrap: vi.fn(),
     connectSocial: vi.fn(),
+    disconnectSocial: vi.fn(),
   },
 }))
 
@@ -77,6 +78,8 @@ function makeBootstrapWith(
 beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrapWith([]))
+  vi.mocked(onboardingApi.connectSocial).mockResolvedValue(makeBootstrapWith([]))
+  vi.mocked(onboardingApi.disconnectSocial).mockResolvedValue(makeBootstrapWith([]))
 })
 
 afterEach(() => {
@@ -200,5 +203,90 @@ describe('Step3SocialAccountsPage', () => {
     const instagramRow = wrapper.find('[data-testid="social-form-instagram"]').html()
     expect(tiktokRow).toContain('The handle field is required.')
     expect(instagramRow).not.toContain('The handle field is required.')
+  })
+
+  it('prefills the input and shows an Edit/Update + Remove control for a connected platform', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
+      makeBootstrapWith([{ platform: 'instagram', handle: 'creator_x' }]),
+    )
+    const { wrapper, unmount } = await mountAuthPage(Step3SocialAccountsPage, {
+      initialRoute: { path: '/onboarding/social' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    const input = wrapper.find('[data-testid="social-handle-instagram"] input')
+      .element as HTMLInputElement
+    expect(input.value).toBe('creator_x')
+    // The connected row exposes a Remove control; an unconnected one does not.
+    expect(wrapper.find('[data-testid="social-remove-instagram"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="social-remove-tiktok"]').exists()).toBe(false)
+  })
+
+  it('disables Connect when the handle is invalid (e.g. a pasted URL)', async () => {
+    const { wrapper, unmount } = await mountAuthPage(Step3SocialAccountsPage, {
+      initialRoute: { path: '/onboarding/social' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper
+      .find('[data-testid="social-handle-youtube"] input')
+      .setValue('https://youtube.com/@ThePrimeTimeagen')
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="social-connect-youtube"]').attributes('disabled'),
+    ).toBeDefined()
+    expect(onboardingApi.connectSocial).not.toHaveBeenCalled()
+  })
+
+  it('strips a leading @ before sending the handle to connect', async () => {
+    vi.mocked(onboardingApi.connectSocial).mockResolvedValue(
+      makeBootstrapWith([{ platform: 'instagram', handle: 'Creator_X' }]),
+    )
+    const { wrapper, unmount } = await mountAuthPage(Step3SocialAccountsPage, {
+      initialRoute: { path: '/onboarding/social' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('[data-testid="social-handle-instagram"] input').setValue('@Creator_X')
+    await wrapper.find('[data-testid="social-connect-instagram"]').trigger('click')
+    await flushPromises()
+
+    expect(onboardingApi.connectSocial).toHaveBeenCalledWith({
+      platform: 'instagram',
+      handle: 'Creator_X',
+      profile_url: 'https://instagram.com/Creator_X',
+    })
+  })
+
+  it('removes a connected account via disconnectSocial', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
+      makeBootstrapWith([{ platform: 'instagram', handle: 'creator_x' }]),
+    )
+    const { wrapper, unmount } = await mountAuthPage(Step3SocialAccountsPage, {
+      initialRoute: { path: '/onboarding/social' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('[data-testid="social-remove-instagram"]').trigger('click')
+    await flushPromises()
+
+    expect(onboardingApi.disconnectSocial).toHaveBeenCalledWith('instagram')
   })
 })

@@ -6,6 +6,9 @@
     "admin": {
       "field_status_immutable": "Application status cannot be changed through this form. Use the approve or reject actions instead."
     },
+    "social": {
+      "invalid_platform": "That social platform is not supported."
+    },
     "wizard": {
       "feature_disabled": "This step is currently unavailable while a configuration change is in progress. Skip to continue your application.",
       "feature_enabled": "This option is not available right now — please use the standard flow for this step.",
@@ -31,7 +34,10 @@
           "submit_for_approval": "Submit for approval",
           "continue_from_here": "Continue from here",
           "edit_step": "Edit step",
-          "review_and_submit": "Review and submit"
+          "review_and_submit": "Review and submit",
+          "connect": "Connect",
+          "update": "Update",
+          "remove": "Remove"
         },
         "skipped": {
           "label": "Skipped",
@@ -145,6 +151,8 @@
           "avatar_required": "A profile photo is required to finish this step.",
           "step_requirements_hint": "Add a profile photo and at least one category to continue.",
           "social_handle": "Username",
+          "social_handle_hint": "Enter your username only — no {'@'} symbol or full profile URL.",
+          "social_handle_invalid": "Enter a valid username: 2–30 letters, numbers, dots, underscores or hyphens (no spaces, {'@'}, or URLs).",
           "social_profile_url": "Profile URL",
           "portfolio_title": "Title",
           "portfolio_description": "Description",

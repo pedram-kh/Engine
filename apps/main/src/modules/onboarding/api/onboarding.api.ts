@@ -34,6 +34,7 @@ import type {
   CreatorProfileUpdatePayload,
   CreatorResourceEnvelope,
   CreatorSocialConnectPayload,
+  CreatorSocialPlatform,
   CreatorTaxUpdatePayload,
   KycInitiateResponse,
   PayoutInitiateResponse,
@@ -62,6 +63,10 @@ export const onboardingApi = {
   // ── Social accounts (Step 3) ─────────────────────────────────────
   connectSocial(payload: CreatorSocialConnectPayload): Promise<CreatorResourceEnvelope> {
     return http.post<CreatorResourceEnvelope>(`${BASE}/wizard/social`, payload)
+  },
+
+  disconnectSocial(platform: CreatorSocialPlatform): Promise<CreatorResourceEnvelope> {
+    return http.delete<CreatorResourceEnvelope>(`${BASE}/wizard/social/${platform}`)
   },
 
   // ── KYC (Step 5) ─────────────────────────────────────────────────

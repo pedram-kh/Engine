@@ -46,6 +46,7 @@ import type {
   CreatorProfileUpdatePayload,
   CreatorResource,
   CreatorSocialConnectPayload,
+  CreatorSocialPlatform,
   CreatorTaxUpdatePayload,
   CreatorWizardStepId,
   KycInitiateResponse,
@@ -190,6 +191,21 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     isLoadingSocial.value = true
     try {
       const envelope = await onboardingApi.connectSocial(payload)
+      creator.value = envelope.data
+    } finally {
+      isLoadingSocial.value = false
+    }
+  }
+
+  /**
+   * Disconnect a connected social account by platform. The backend is
+   * idempotent (no-op when the platform is not connected) and returns
+   * the refreshed creator, so we adopt its authoritative state directly.
+   */
+  async function disconnectSocial(platform: CreatorSocialPlatform): Promise<void> {
+    isLoadingSocial.value = true
+    try {
+      const envelope = await onboardingApi.disconnectSocial(platform)
       creator.value = envelope.data
     } finally {
       isLoadingSocial.value = false
@@ -387,6 +403,7 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     reset,
     updateProfile,
     connectSocial,
+    disconnectSocial,
     updateTax,
     initiateKyc,
     initiatePayout,

@@ -21,9 +21,9 @@
  */
 
 import { SocialAccountList } from '@catalyst/ui'
-import type { CreatorSocialPlatform } from '@catalyst/api-client'
+import type { CreatorSocialAccountSummary, CreatorSocialPlatform } from '@catalyst/api-client'
 import { ApiError, extractFieldErrors } from '@catalyst/api-client'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
@@ -32,6 +32,20 @@ import { useOnboardingStore } from '../stores/useOnboardingStore'
 const { t } = useI18n()
 const router = useRouter()
 const store = useOnboardingStore()
+
+const PLATFORMS: readonly CreatorSocialPlatform[] = ['instagram', 'tiktok', 'youtube']
+
+/**
+ * Allowed handle characters, mirrored from the backend
+ * `ConnectSocialRequest::HANDLE_PATTERN`: 2–30 letters, digits, dot,
+ * underscore or hyphen. Rejects spaces / slashes / `@` so a pasted
+ * profile URL is caught client-side with a clear message.
+ */
+const HANDLE_RE = /^[A-Za-z0-9._-]{2,30}$/
+
+function normalizeHandle(raw: string): string {
+  return raw.trim().replace(/^@/, '')
+}
 
 /**
  * Backend field-key union (matches `ConnectSocialRequest::rules()`).
@@ -65,6 +79,16 @@ const PROFILE_URL_BUILDERS: Record<CreatorSocialPlatform, (handle: string) => st
   youtube: (h) => `https://youtube.com/@${h.replace(/^@/, '')}`,
 }
 
+const connectedByPlatform = computed<
+  Partial<Record<CreatorSocialPlatform, CreatorSocialAccountSummary>>
+>(() => {
+  const out: Partial<Record<CreatorSocialPlatform, CreatorSocialAccountSummary>> = {}
+  for (const account of store.creator?.attributes.social_accounts ?? []) {
+    out[account.platform] = account
+  }
+  return out
+})
+
 const connectedAccounts = computed(() => {
   const raw = store.creator?.attributes.social_accounts ?? []
   return raw.map((account) => ({
@@ -77,19 +101,46 @@ const connectedAccounts = computed(() => {
 
 const canAdvance = computed(() => connectedAccounts.value.length > 0)
 
+function isConnected(platform: CreatorSocialPlatform): boolean {
+  return connectedByPlatform.value[platform] !== undefined
+}
+
+/** Client-side validity for a row's handle (empty is "not yet valid"). */
+function isHandleValid(platform: CreatorSocialPlatform): boolean {
+  return HANDLE_RE.test(normalizeHandle(drafts.value[platform].handle))
+}
+
+/**
+ * Pre-fill each row with its connected handle (edit affordance) and clear
+ * transient error state. Called on mount and after every successful
+ * connect/update/remove so the inputs always reflect server truth.
+ */
+function syncDraftsFromServer(): void {
+  for (const platform of PLATFORMS) {
+    drafts.value[platform].handle = connectedByPlatform.value[platform]?.handle ?? ''
+    drafts.value[platform].fieldErrors = {}
+    drafts.value[platform].errorKey = null
+  }
+}
+
+onMounted(syncDraftsFromServer)
+
 async function connectPlatform(platform: CreatorSocialPlatform): Promise<void> {
   const draft = drafts.value[platform]
-  if (draft.handle.trim() === '') return
+  const handle = normalizeHandle(draft.handle)
+  if (handle === '' || !HANDLE_RE.test(handle)) return
 
   draft.errorKey = null
   draft.fieldErrors = {}
   try {
     await store.connectSocial({
       platform,
-      handle: draft.handle.trim(),
-      profile_url: PROFILE_URL_BUILDERS[platform](draft.handle.trim()),
+      handle,
+      profile_url: PROFILE_URL_BUILDERS[platform](handle),
     })
-    draft.handle = ''
+    // Re-sync so the row now shows the persisted (possibly normalized)
+    // handle instead of clearing — reinforces that it is editable.
+    syncDraftsFromServer()
   } catch (error) {
     if (error instanceof ApiError) {
       draft.fieldErrors = extractFieldErrors<SocialField>(error)
@@ -107,6 +158,23 @@ async function connectPlatform(platform: CreatorSocialPlatform): Promise<void> {
       drafts.value[platform].fieldErrors = { handle: collapsed }
     } else {
       // No per-field violations — fall back to the generic banner.
+      draft.errorKey = 'creator.ui.errors.upload_failed'
+    }
+  }
+}
+
+async function removePlatform(platform: CreatorSocialPlatform): Promise<void> {
+  const draft = drafts.value[platform]
+  draft.errorKey = null
+  draft.fieldErrors = {}
+  try {
+    await store.disconnectSocial(platform)
+    syncDraftsFromServer()
+  } catch (error) {
+    if (error instanceof ApiError) {
+      draft.fieldErrors = extractFieldErrors<SocialField>(error)
+    }
+    if ((draft.fieldErrors.handle ?? []).length === 0) {
       draft.errorKey = 'creator.ui.errors.upload_failed'
     }
   }
@@ -131,9 +199,13 @@ async function advance(): Promise<void> {
       <SocialAccountList :accounts="connectedAccounts" />
     </div>
 
+    <p class="text-caption text-medium-emphasis social-accounts__hint">
+      {{ t('creator.ui.wizard.fields.social_handle_hint') }}
+    </p>
+
     <div class="social-accounts__forms">
       <div
-        v-for="platform in ['instagram', 'tiktok', 'youtube'] as CreatorSocialPlatform[]"
+        v-for="platform in PLATFORMS"
         :key="platform"
         class="social-accounts__form-row"
         :data-testid="`social-form-${platform}`"
@@ -147,6 +219,12 @@ async function advance(): Promise<void> {
           :data-testid="`social-handle-${platform}`"
           density="compact"
           hide-details="auto"
+          :rules="[
+            (v: string) =>
+              normalizeHandle(v) === '' ||
+              HANDLE_RE.test(normalizeHandle(v)) ||
+              t('creator.ui.wizard.fields.social_handle_invalid'),
+          ]"
           :error-messages="
             drafts[platform].fieldErrors.handle ??
             (drafts[platform].errorKey === null ? undefined : t(drafts[platform].errorKey!))
@@ -155,11 +233,25 @@ async function advance(): Promise<void> {
         <v-btn
           variant="tonal"
           :loading="store.isLoadingSocial"
-          :disabled="drafts[platform].handle.trim() === ''"
+          :disabled="drafts[platform].handle.trim() === '' || !isHandleValid(platform)"
           :data-testid="`social-connect-${platform}`"
           @click="connectPlatform(platform)"
         >
-          {{ t('creator.ui.wizard.actions.save_and_continue') }}
+          {{
+            isConnected(platform)
+              ? t('creator.ui.wizard.actions.update')
+              : t('creator.ui.wizard.actions.connect')
+          }}
+        </v-btn>
+        <v-btn
+          v-if="isConnected(platform)"
+          variant="text"
+          color="error"
+          :loading="store.isLoadingSocial"
+          :data-testid="`social-remove-${platform}`"
+          @click="removePlatform(platform)"
+        >
+          {{ t('creator.ui.wizard.actions.remove') }}
         </v-btn>
       </div>
     </div>
@@ -195,9 +287,13 @@ async function advance(): Promise<void> {
 
 .social-accounts__form-row {
   display: grid;
-  grid-template-columns: 110px 1fr auto;
-  align-items: center;
+  grid-template-columns: 110px 1fr auto auto;
+  align-items: start;
   gap: 12px;
+}
+
+.social-accounts__hint {
+  margin-top: -8px;
 }
 
 .social-accounts__platform-label {
