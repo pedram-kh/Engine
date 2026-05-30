@@ -35,7 +35,6 @@
 
 import { ApiError, extractFieldErrors } from '@catalyst/api-client'
 import type { CreatorTaxFormType, CreatorTaxUpdatePayload } from '@catalyst/api-client'
-import { TaxProfileDisplay } from '@catalyst/ui'
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -84,15 +83,6 @@ const draft = reactive<CreatorTaxUpdatePayload>({
   },
 })
 
-const isComplete = computed(() => store.creator?.attributes.tax_profile_complete ?? false)
-const statusLabel = computed(() =>
-  t(
-    isComplete.value
-      ? 'creator.ui.wizard.steps.tax.status_complete'
-      : 'creator.ui.wizard.steps.tax.status_incomplete',
-  ),
-)
-
 const isSaveDisabled = computed(
   () =>
     store.isLoadingTax ||
@@ -111,7 +101,7 @@ const formTypeOptions = computed(() =>
   })),
 )
 
-async function save(): Promise<void> {
+async function save(): Promise<boolean> {
   submitErrorKey.value = null
   fieldErrors.value = {}
   try {
@@ -126,6 +116,7 @@ async function save(): Promise<void> {
         street: draft.address.street.trim(),
       },
     })
+    return true
   } catch (error) {
     if (error instanceof ApiError) {
       fieldErrors.value = extractFieldErrors<TaxField>(error)
@@ -136,12 +127,26 @@ async function save(): Promise<void> {
     if (Object.keys(fieldErrors.value).length === 0) {
       submitErrorKey.value = 'creator.ui.errors.upload_failed'
     }
+    return false
   }
 }
 
-async function advance(): Promise<void> {
-  if (!isComplete.value) return
-  await router.push({ name: 'onboarding.payout' })
+/**
+ * Single "Save and continue" action — mirrors every other wizard step
+ * (Profile, Social, Portfolio). Saves the tax profile and, only on
+ * success, advances to the payout step. Replaces the old split
+ * Save / Save-and-continue + status-badge layout, which was unique to
+ * this step and read "Submitted" (misleading: nothing is filed with a
+ * tax authority — the data is just stored for payouts).
+ */
+async function onSubmit(): Promise<void> {
+  // Guard the keyboard-submit path (Enter inside a field) too — the
+  // button is disabled, but the form's submit event can still fire.
+  if (isSaveDisabled.value) return
+  const ok = await save()
+  if (ok) {
+    await router.push({ name: 'onboarding.payout' })
+  }
 }
 </script>
 
@@ -154,14 +159,7 @@ async function advance(): Promise<void> {
       </p>
     </header>
 
-    <div class="tax-step__status-line">
-      <span class="tax-step__status-label">
-        {{ t('creator.ui.wizard.steps.tax.current_status') }}
-      </span>
-      <TaxProfileDisplay :is-complete="isComplete" :label="statusLabel" />
-    </div>
-
-    <form class="tax-step__form" data-testid="tax-form" @submit.prevent="save">
+    <form class="tax-step__form" data-testid="tax-form" @submit.prevent="onSubmit">
       <v-select
         v-model="draft.tax_form_type"
         :items="formTypeOptions"
@@ -231,21 +229,14 @@ async function advance(): Promise<void> {
         <v-btn
           type="submit"
           color="primary"
-          variant="tonal"
           :loading="store.isLoadingTax"
           :disabled="isSaveDisabled"
-          data-testid="tax-save"
+          data-testid="tax-submit"
         >
-          {{ t('creator.ui.wizard.actions.save') }}
+          {{ t('creator.ui.wizard.actions.save_and_continue') }}
         </v-btn>
       </div>
     </form>
-
-    <div class="tax-step__actions">
-      <v-btn color="primary" :disabled="!isComplete" data-testid="tax-advance" @click="advance">
-        {{ t('creator.ui.wizard.actions.save_and_continue') }}
-      </v-btn>
-    </div>
   </section>
 </template>
 
@@ -255,16 +246,6 @@ async function advance(): Promise<void> {
   flex-direction: column;
   gap: 20px;
   max-width: 720px;
-}
-
-.tax-step__status-line {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.tax-step__status-label {
-  font-weight: 500;
 }
 
 .tax-step__form {
@@ -281,10 +262,5 @@ async function advance(): Promise<void> {
 .tax-step__error {
   color: rgb(var(--v-theme-error));
   font-size: 0.875rem;
-}
-
-.tax-step__actions {
-  display: flex;
-  justify-content: flex-end;
 }
 </style>

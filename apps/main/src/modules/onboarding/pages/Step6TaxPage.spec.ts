@@ -1,5 +1,6 @@
 import { flushPromises, type VueWrapper } from '@vue/test-utils'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest'
+import type { Router } from 'vue-router'
 
 import { ApiError } from '@catalyst/api-client'
 
@@ -99,7 +100,7 @@ afterEach(() => {
 })
 
 describe('Step6TaxPage', () => {
-  it('renders the form and the incomplete status badge', async () => {
+  it('renders the form with a single save-and-continue button (no status badge / separate advance)', async () => {
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap(false))
 
     const { wrapper, unmount } = await mountAuthPage(Step6TaxPage, {
@@ -113,27 +114,16 @@ describe('Step6TaxPage', () => {
 
     expect(wrapper.find('[data-testid="step-tax"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="tax-form"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="tax-profile-display-incomplete"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="tax-advance"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.find('[data-testid="tax-submit"]').exists()).toBe(true)
+    // Option A: the misleading "Submitted" status badge and the separate
+    // Save / advance buttons were removed in favour of one save+advance.
+    expect(wrapper.find('[data-testid="tax-profile-display-incomplete"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="tax-profile-display-complete"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="tax-advance"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="tax-save"]').exists()).toBe(false)
   })
 
-  it('renders the complete status badge and enables advance when tax_profile_complete=true', async () => {
-    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap(true))
-
-    const { wrapper, unmount } = await mountAuthPage(Step6TaxPage, {
-      initialRoute: { path: '/onboarding/tax' },
-      beforeMount: async () => {
-        await useOnboardingStore().bootstrap()
-      },
-    })
-    teardown = unmount
-    await flushPromises()
-
-    expect(wrapper.find('[data-testid="tax-profile-display-complete"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="tax-advance"]').attributes('disabled')).toBeUndefined()
-  })
-
-  it('save is disabled until all required fields are filled', async () => {
+  it('the submit button is disabled until all required fields are filled', async () => {
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap(false))
 
     const { wrapper, unmount } = await mountAuthPage(Step6TaxPage, {
@@ -145,8 +135,73 @@ describe('Step6TaxPage', () => {
     teardown = unmount
     await flushPromises()
 
-    const saveBtn = wrapper.find('[data-testid="tax-save"]')
-    expect(saveBtn.attributes('disabled')).toBeDefined()
+    expect(wrapper.find('[data-testid="tax-submit"]').attributes('disabled')).toBeDefined()
+  })
+
+  it('saves then advances to the payout step on success', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap(false))
+    vi.mocked(onboardingApi.updateTax).mockResolvedValue(makeBootstrap(true))
+
+    let pushSpy: MockInstance<Router['push']> | null = null
+    const { wrapper, unmount } = await mountAuthPage(Step6TaxPage, {
+      initialRoute: { path: '/onboarding/tax' },
+      beforeMount: async ({ router }) => {
+        await useOnboardingStore().bootstrap()
+        pushSpy = vi.spyOn(router, 'push')
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('[data-testid="tax-legal-name"] input').setValue('Acme')
+    await wrapper.find('[data-testid="tax-id"] input').setValue('IT123')
+    await wrapper.find('[data-testid="tax-address-street"] input').setValue('Via Roma 1')
+    await wrapper.find('[data-testid="tax-address-city"] input').setValue('Milano')
+    await wrapper.find('[data-testid="tax-address-postal"] input').setValue('20100')
+    setSelectValue(wrapper, 'tax-address-country', 'IT')
+    await flushPromises()
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(onboardingApi.updateTax).toHaveBeenCalledTimes(1)
+    expect(pushSpy).not.toBeNull()
+    expect(pushSpy!).toHaveBeenCalledWith({ name: 'onboarding.payout' })
+  })
+
+  it('does not advance when the save fails', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap(false))
+    vi.mocked(onboardingApi.updateTax).mockRejectedValue(
+      ApiError.fromEnvelope(500, {
+        errors: [{ id: 'e', status: '500', code: 'server.error', title: 'x', detail: 'x' }],
+        meta: { request_id: 'req-x' },
+      }),
+    )
+
+    let pushSpy: MockInstance<Router['push']> | null = null
+    const { wrapper, unmount } = await mountAuthPage(Step6TaxPage, {
+      initialRoute: { path: '/onboarding/tax' },
+      beforeMount: async ({ router }) => {
+        await useOnboardingStore().bootstrap()
+        pushSpy = vi.spyOn(router, 'push')
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('[data-testid="tax-legal-name"] input').setValue('Acme')
+    await wrapper.find('[data-testid="tax-id"] input').setValue('IT123')
+    await wrapper.find('[data-testid="tax-address-street"] input').setValue('Via Roma 1')
+    await wrapper.find('[data-testid="tax-address-city"] input').setValue('Milano')
+    await wrapper.find('[data-testid="tax-address-postal"] input').setValue('20100')
+    setSelectValue(wrapper, 'tax-address-country', 'IT')
+    await flushPromises()
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(pushSpy).not.toBeNull()
+    expect(pushSpy!).not.toHaveBeenCalled()
   })
 
   it('calls updateTax with trimmed values on submit', async () => {
