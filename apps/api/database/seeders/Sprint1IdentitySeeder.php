@@ -84,7 +84,7 @@ final class Sprint1IdentitySeeder extends Seeder
         $superAdmin = User::query()->updateOrCreate(
             ['email' => 'super@catalyst-engine.local'],
             [
-                'name' => 'Catalyst Engine Super Admin',
+                'name' => 'Engine C Super Admin',
                 'type' => UserType::PlatformAdmin,
                 'password' => Hash::make('password-12chars'),
                 'email_verified_at' => now(),

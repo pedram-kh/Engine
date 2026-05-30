@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', static fn (): JsonResponse => response()->json([
-    'name' => 'Catalyst Engine API',
+    'name' => 'Engine C API',
     'status' => 'ok',
 ]));
 

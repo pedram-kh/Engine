@@ -69,7 +69,7 @@ function createI18nForApp() {
     messages: {
       en: {
         app: {
-          title: 'Catalyst Engine — Admin',
+          title: 'Engine C — Admin',
           locale: { switcher: 'Language', en: 'English' },
           // The chunk-8.2 ThemeToggle is mounted inside AuthLayout
           // (and inside the bare app-layout branch of App.vue), so

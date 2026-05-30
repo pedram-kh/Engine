@@ -35,7 +35,7 @@ it('returns the rendered HTML, version, and locale for the authenticated creator
 
     $html = $response->json('data.html');
     expect($html)->toBeString();
-    expect($html)->toContain('<h1>Catalyst Engine');
+    expect($html)->toContain('<h1>Engine C');
     expect($html)->toContain('<h2>1. Definitions</h2>');
 });
 

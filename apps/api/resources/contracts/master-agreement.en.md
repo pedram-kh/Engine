@@ -1,8 +1,8 @@
-# Catalyst Engine — Master Creator Agreement
+# Engine C — Master Creator Agreement
 
 **Version:** 1.0 — Effective 2026-05-14
 
-This Master Creator Agreement ("Agreement") is between Catalyst Engine, a
+This Master Creator Agreement ("Agreement") is between Engine C, a
 limited company registered in the Republic of Ireland ("Platform"), and the
 individual creator who accepts it ("Creator"). By accepting this Agreement
 the Creator agrees to be bound by its terms in connection with any campaign,

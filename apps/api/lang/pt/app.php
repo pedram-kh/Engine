@@ -3,6 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'name' => 'Catalyst Engine',
+    'name' => 'Engine C',
     'tagline' => 'Marketing de influenciadores, gerido como um negócio a sério.',
 ];
