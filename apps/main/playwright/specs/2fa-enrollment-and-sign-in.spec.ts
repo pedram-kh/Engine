@@ -126,11 +126,12 @@ test.describe('spec #19 — 2FA enrollment + sign-in', () => {
     // -----------------------------------------------------------------
     // Step 2 — sign in. Sprint 2 chunk 2 changed the post-auth contract:
     // the dashboard route (`/`) no longer carries `requireMfaEnrolled`,
-    // so a fresh user with no 2FA lands on `/` rather than being
-    // bounced to `/auth/2fa/enable`. We assert the sign-in succeeded
-    // (we are no longer on /sign-in — the cookie landed) and then
-    // navigate explicitly to the enrollment page for the rest of the
-    // journey under test.
+    // so a fresh user with no 2FA is not bounced to `/auth/2fa/enable`.
+    // For a freshly signed-up + verified creator the post-login target
+    // is the onboarding wizard, so the SPA redirects to `/onboarding`.
+    // We assert the sign-in succeeded (we are no longer on /sign-in —
+    // the cookie landed), let that redirect settle, then navigate
+    // explicitly to the enrollment page for the rest of the journey.
     // -----------------------------------------------------------------
     await page.goto('/sign-in')
     await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
@@ -138,6 +139,16 @@ test.describe('spec #19 — 2FA enrollment + sign-in', () => {
     await page.locator(dt(testIds.signInSubmit)).click()
 
     await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
+
+    // A freshly signed-up + verified creator is bounced through the
+    // post-login target into the onboarding wizard. That redirect chain
+    // can still be in flight at this point, so navigating immediately
+    // races it — Playwright aborts the goto with "Navigation … is
+    // interrupted by another navigation to …/onboarding" (CI run
+    // 26693615546 flake). Wait for the wizard landing to settle (and the
+    // bootstrap fetch to finish) before driving to the 2FA enrolment page.
+    await page.waitForURL(/\/onboarding/, { timeout: 10_000 })
+    await page.waitForLoadState('networkidle')
 
     await page.goto('/auth/2fa/enable')
     await expect(page.locator(dt(testIds.enableTotpPage))).toBeVisible()
