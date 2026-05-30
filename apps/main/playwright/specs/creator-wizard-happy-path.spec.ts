@@ -234,9 +234,11 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     await page.locator('[data-testid="tax-address-country"]').click()
     await page.getByRole('option', { name: 'Ireland' }).click()
 
-    await page.locator('[data-testid="tax-save"]').click()
-    await expect(page.locator('[data-testid="tax-advance"]')).toBeEnabled({ timeout: 10_000 })
-    await page.locator('[data-testid="tax-advance"]').click()
+    // Step 6 now uses a single "Save and continue" button (the old split
+    // Save / advance + "Submitted" status badge was removed) — it saves
+    // the tax profile and navigates to payout in one action.
+    await expect(page.locator('[data-testid="tax-submit"]')).toBeEnabled({ timeout: 10_000 })
+    await page.locator('[data-testid="tax-submit"]').click()
 
     // -----------------------------------------------------------------
     // Step 7 — Payout. Flag OFF; skipped surface; advance.
