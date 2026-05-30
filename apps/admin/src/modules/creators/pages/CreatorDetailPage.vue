@@ -121,9 +121,12 @@ const portfolioItems = computed(() => {
     description: item.description,
     // The `media` disk is private; we MUST read the backend-minted
     // signed URLs rather than constructing one from `*_path`. Fall
-    // back to the full-size `view_url` when no dedicated thumbnail
-    // exists (e.g. images with no thumbnail variant generated).
-    thumbnailUrl: item.thumbnail_view_url ?? item.view_url,
+    // back to the full-size `view_url` only for images — a video's
+    // `view_url` is the raw media file and is NOT a valid `<img src>`
+    // (it would render a broken tile), so leave it null and let the
+    // gallery show its play-badge placeholder.
+    thumbnailUrl: item.thumbnail_view_url ?? (item.kind === 'image' ? item.view_url : null),
+    viewUrl: item.view_url,
     externalUrl: item.external_url,
     altText: item.title ?? t('creator.ui.wizard.steps.portfolio.untitled_item'),
   }))

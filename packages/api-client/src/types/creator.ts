@@ -435,6 +435,13 @@ export interface PortfolioVideoCompletePayload {
   mime_type: string
   size_bytes: number
   duration_seconds?: number
+  /**
+   * Optional client-captured poster frame (JPEG). When present, the
+   * request is sent as multipart/form-data and the backend persists it
+   * as the item's thumbnail so the gallery can render a real preview
+   * instead of a play-badge placeholder. Absent → JSON body as before.
+   */
+  thumbnail?: Blob | null
 }
 
 export interface PortfolioItemSummary {

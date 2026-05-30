@@ -21,6 +21,7 @@
     "@catalyst/api-client": "workspace:*",
     "@catalyst/design-tokens": "workspace:*",
     "@catalyst/ui": "workspace:*",
+    "@mdi/font": "^7.4.47",
     "dompurify": "^3.4.3",
     "markdown-it": "^14.1.1",
     "pinia": "^2.3.0",

@@ -16,11 +16,20 @@
  * `link` renders a placeholder card with the title + external
  * URL. Videos overlay a play-icon affordance.
  *
+ * Preview: clicking a tile opens a lightbox dialog — `image`
+ * items show the full-size `viewUrl`, `video` items play it in a
+ * `<video controls>`. `link` items open `externalUrl` in a new
+ * tab (no dialog). Tiles with neither a `viewUrl` nor an
+ * `externalUrl` are non-interactive.
+ *
  * a11y (F2=b): the grid is a `<ul>` with each item a `<li>`, the
  * thumbnail `<img>` carries the `alt` text composed by the
- * caller (item title or fallback), and the delete affordance is
- * a button (NOT an anchor) with an accessible name.
+ * caller (item title or fallback), the open affordance is a
+ * `<button>`/`<a>` with an accessible name, and the delete
+ * affordance is a button (NOT an anchor) with an accessible name.
  */
+
+import { ref } from 'vue'
 
 interface PortfolioGalleryItem {
   id: string
@@ -28,6 +37,12 @@ interface PortfolioGalleryItem {
   title: string | null
   description: string | null
   thumbnailUrl: string | null
+  /**
+   * Full-size signed media URL. For `image` this is the full image,
+   * for `video` it's the playable media file. Drives the lightbox;
+   * `null` for items with no previewable media (e.g. links).
+   */
+  viewUrl?: string | null
   externalUrl: string | null
   altText: string
 }
@@ -44,6 +59,10 @@ interface Props {
   videoLabel?: string
   /** Localized accessible label for the external-link overlay on links. */
   linkLabel?: string
+  /** Localized accessible label for the open-preview affordance. */
+  previewLabel?: string
+  /** Localized accessible label for the lightbox close button. */
+  closeLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -52,11 +71,31 @@ const props = withDefaults(defineProps<Props>(), {
   removeLabel: 'Remove item',
   videoLabel: 'Video',
   linkLabel: 'External link',
+  previewLabel: 'Open preview',
+  closeLabel: 'Close',
 })
 
 const emit = defineEmits<{
   (event: 'remove', itemId: string): void
 }>()
+
+/** The item currently shown in the lightbox, or null when closed. */
+const active = ref<PortfolioGalleryItem | null>(null)
+
+/** Media (image/video) with a resolvable full-size URL is previewable. */
+function canPreview(item: PortfolioGalleryItem): boolean {
+  return (item.kind === 'image' || item.kind === 'video') && Boolean(item.viewUrl)
+}
+
+function openPreview(item: PortfolioGalleryItem): void {
+  if (canPreview(item)) {
+    active.value = item
+  }
+}
+
+function closePreview(): void {
+  active.value = null
+}
 
 function onRemove(itemId: string): void {
   emit('remove', itemId)
@@ -101,6 +140,27 @@ function onRemove(itemId: string): void {
         >
           <v-icon icon="mdi-open-in-new" size="24" aria-hidden="true" />
         </span>
+
+        <!-- Click target. Links open externally; previewable media open
+             the lightbox. Sits above the thumbnail but below the (later,
+             absolutely-positioned) remove button so removal still wins. -->
+        <a
+          v-if="item.kind === 'link' && item.externalUrl"
+          class="portfolio-gallery__open"
+          :href="item.externalUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          :aria-label="`${props.linkLabel}${item.title ? ': ' + item.title : ''}`"
+          :data-testid="`portfolio-gallery-open-${item.id}`"
+        />
+        <button
+          v-else-if="canPreview(item)"
+          type="button"
+          class="portfolio-gallery__open"
+          :aria-label="`${props.previewLabel}${item.title ? ': ' + item.title : ''}`"
+          :data-testid="`portfolio-gallery-open-${item.id}`"
+          @click="openPreview(item)"
+        />
       </div>
 
       <div v-if="item.title" class="portfolio-gallery__title">
@@ -122,6 +182,48 @@ function onRemove(itemId: string): void {
   <span v-else class="portfolio-gallery--empty" data-testid="portfolio-gallery-empty">
     {{ props.emptyLabel }}
   </span>
+
+  <v-dialog
+    :model-value="active !== null"
+    max-width="960"
+    @update:model-value="
+      (value: boolean) => {
+        if (!value) closePreview()
+      }
+    "
+  >
+    <div v-if="active" class="portfolio-gallery__preview" data-testid="portfolio-gallery-preview">
+      <button
+        type="button"
+        class="portfolio-gallery__preview-close"
+        :aria-label="props.closeLabel"
+        data-testid="portfolio-gallery-preview-close"
+        @click="closePreview"
+      >
+        <v-icon icon="mdi-close" size="24" aria-hidden="true" />
+      </button>
+
+      <img
+        v-if="active.kind === 'image'"
+        class="portfolio-gallery__preview-media"
+        :src="active.viewUrl ?? undefined"
+        :alt="active.altText"
+        data-testid="portfolio-gallery-preview-image"
+      />
+      <!-- eslint-disable-next-line vuejs-accessibility/media-has-caption -->
+      <video
+        v-else-if="active.kind === 'video'"
+        class="portfolio-gallery__preview-media"
+        :src="active.viewUrl ?? undefined"
+        controls
+        autoplay
+        playsinline
+        data-testid="portfolio-gallery-preview-video"
+      />
+
+      <p v-if="active.title" class="portfolio-gallery__preview-title">{{ active.title }}</p>
+    </div>
+  </v-dialog>
 </template>
 
 <style scoped>
@@ -176,6 +278,24 @@ function onRemove(itemId: string): void {
   background: rgba(var(--v-theme-surface), 0.35);
 }
 
+.portfolio-gallery__open {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: block;
+}
+
+.portfolio-gallery__open:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: -2px;
+}
+
 .portfolio-gallery__title {
   font-size: 0.875rem;
   font-weight: 500;
@@ -208,5 +328,56 @@ function onRemove(itemId: string): void {
 
 .portfolio-gallery--empty {
   color: rgb(var(--v-theme-on-surface-variant));
+}
+
+.portfolio-gallery__preview {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgb(var(--v-theme-surface));
+  border-radius: 8px;
+}
+
+.portfolio-gallery__preview-media {
+  max-width: 100%;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+}
+
+.portfolio-gallery__preview-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  word-break: break-word;
+}
+
+.portfolio-gallery__preview-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--v-theme-outline-variant));
+  background: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-on-surface));
+  cursor: pointer;
+  z-index: 1;
+}
+
+.portfolio-gallery__preview-close:hover,
+.portfolio-gallery__preview-close:focus-visible {
+  background: rgb(var(--v-theme-surface-variant));
+  outline: none;
 }
 </style>

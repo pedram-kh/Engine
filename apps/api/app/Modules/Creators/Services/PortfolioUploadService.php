@@ -83,7 +83,12 @@ final class PortfolioUploadService
      * planned object path; the client PUTs to the URL and then calls
      * complete() with the upload-id (which is the planned path).
      *
-     * @return array{url: string, upload_id: string, expires_at: string, max_bytes: int}
+     * Key names mirror the published `PortfolioVideoInitResponse` type in
+     *
+     * @catalyst/api-client (the SPA reads `upload_url`) — see the
+     * contract-guard test in CreatorWizardEndpointsTest.
+     *
+     * @return array{upload_url: string, upload_id: string, storage_path: string, expires_at: string, max_bytes: int}
      */
     public function initiatePresignedUpload(
         Creator $creator,
@@ -113,8 +118,9 @@ final class PortfolioUploadService
             // but the upload_id remains a valid path the complete()
             // endpoint can write to.
             return [
-                'url' => '/_test/presigned-upload/'.urlencode($path),
+                'upload_url' => '/_test/presigned-upload/'.urlencode($path),
                 'upload_id' => $path,
+                'storage_path' => $path,
                 'expires_at' => now()->addMinutes(15)->toIso8601String(),
                 'max_bytes' => self::MAX_PRESIGNED_BYTES,
             ];
@@ -132,8 +138,9 @@ final class PortfolioUploadService
         $request = $client->createPresignedRequest($command, '+15 minutes');
 
         return [
-            'url' => (string) $request->getUri(),
+            'upload_url' => (string) $request->getUri(),
             'upload_id' => $path,
+            'storage_path' => $path,
             'expires_at' => now()->addMinutes(15)->toIso8601String(),
             'max_bytes' => self::MAX_PRESIGNED_BYTES,
         ];

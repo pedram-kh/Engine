@@ -12,6 +12,7 @@ use App\Modules\Creators\Services\PortfolioUploadService;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -113,17 +114,29 @@ final class PortfolioController
             'mime_type' => ['required', 'string'],
             'size_bytes' => ['required', 'integer', 'min:1'],
             'duration_seconds' => ['nullable', 'integer', 'min:1'],
+            // Optional client-captured poster frame. The SPA grabs a frame
+            // from the video at upload time (browsers can't render an .mp4
+            // into an <img>), so this gives the gallery a real thumbnail.
+            // Re-encoded server-side via uploadImage() (EXIF-stripped).
+            'thumbnail' => ['nullable', 'file', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
         ]);
 
         $creator = $this->resolveCreator($request);
         $this->assertHasCapacity($creator);
 
+        $thumbnail = $request->file('thumbnail');
+        $thumbnailFile = $thumbnail instanceof UploadedFile ? $thumbnail : null;
+
         try {
-            $item = DB::transaction(function () use ($creator, $request): CreatorPortfolioItem {
+            $item = DB::transaction(function () use ($creator, $request, $thumbnailFile): CreatorPortfolioItem {
                 $path = $this->service->completePresignedUpload(
                     $creator,
                     (string) $request->string('upload_id'),
                 );
+
+                $thumbnailPath = $thumbnailFile !== null
+                    ? $this->service->uploadImage($creator, $thumbnailFile)
+                    : null;
 
                 return CreatorPortfolioItem::create([
                     'creator_id' => $creator->id,
@@ -131,6 +144,7 @@ final class PortfolioController
                     'title' => $request->string('title')->value() ?: null,
                     'description' => $request->string('description')->value() ?: null,
                     's3_path' => $path,
+                    'thumbnail_path' => $thumbnailPath,
                     'mime_type' => (string) $request->string('mime_type'),
                     'size_bytes' => (int) $request->integer('size_bytes'),
                     'duration_seconds' => $request->filled('duration_seconds')

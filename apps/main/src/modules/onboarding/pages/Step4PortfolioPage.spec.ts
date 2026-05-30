@@ -176,6 +176,81 @@ describe('Step4PortfolioPage', () => {
     expect(src).toContain('?sig=')
   })
 
+  // Video items have no server-generated thumbnail (thumbnail_view_url is
+  // null) and their `view_url` points at the raw .mp4 — which is NOT a
+  // valid <img src>. Binding it produced a broken-image tile. The gallery
+  // must instead render its placeholder (with a play badge) for videos.
+  it('renders a placeholder (not a broken <img>) for video items with no thumbnail', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
+      makeBootstrapWith([{ id: '01HQV', kind: 'video', title: 'Reel cut' }]),
+    )
+
+    const { wrapper, unmount } = await mountAuthPage(Step4PortfolioPage, {
+      initialRoute: { path: '/onboarding/portfolio' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    const item = wrapper.find('[data-testid="portfolio-gallery-item-01HQV"]')
+    expect(item.exists()).toBe(true)
+    // No <img> at all — the raw video URL must never reach an <img src>.
+    expect(item.find('img').exists()).toBe(false)
+    expect(item.find('.portfolio-gallery__placeholder').exists()).toBe(true)
+  })
+
+  it('opens an image lightbox when an image tile is clicked', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
+      makeBootstrapWith([{ id: '01HQA', kind: 'image', title: 'Beach shoot' }]),
+    )
+
+    const { wrapper, unmount } = await mountAuthPage(Step4PortfolioPage, {
+      initialRoute: { path: '/onboarding/portfolio' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    expect(document.body.querySelector('[data-testid="portfolio-gallery-preview"]')).toBeNull()
+
+    await wrapper.find('[data-testid="portfolio-gallery-open-01HQA"]').trigger('click')
+    await flushPromises()
+
+    const image = document.body.querySelector('[data-testid="portfolio-gallery-preview-image"]')
+    expect(image).not.toBeNull()
+    // The lightbox binds the full-size signed view_url, never the raw path.
+    expect(image?.getAttribute('src')).toContain('?sig=test')
+  })
+
+  it('opens a <video> lightbox (not an <img>) when a video tile is clicked', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
+      makeBootstrapWith([{ id: '01HQV', kind: 'video', title: 'Reel cut' }]),
+    )
+
+    const { wrapper, unmount } = await mountAuthPage(Step4PortfolioPage, {
+      initialRoute: { path: '/onboarding/portfolio' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('[data-testid="portfolio-gallery-open-01HQV"]').trigger('click')
+    await flushPromises()
+
+    expect(
+      document.body.querySelector('[data-testid="portfolio-gallery-preview-video"]'),
+    ).not.toBeNull()
+    expect(
+      document.body.querySelector('[data-testid="portfolio-gallery-preview-image"]'),
+    ).toBeNull()
+  })
+
   it('calls deletePortfolioItem and re-bootstraps when remove is emitted', async () => {
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
       makeBootstrapWith([{ id: '01HQA', kind: 'image', title: 'Beach shoot' }]),

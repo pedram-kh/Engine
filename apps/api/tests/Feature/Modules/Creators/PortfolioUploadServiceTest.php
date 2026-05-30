@@ -47,9 +47,13 @@ it('initiatePresignedUpload returns a synthetic URL on the local fake disk', fun
     $result = app(PortfolioUploadService::class)
         ->initiatePresignedUpload($creator, 'video/mp4', 50 * 1024 * 1024);
 
-    expect($result)->toHaveKeys(['url', 'upload_id', 'expires_at', 'max_bytes'])
+    // Key names mirror the published PortfolioVideoInitResponse type the
+    // SPA consumes (`upload_url`, `storage_path`) — a mismatch here silently
+    // broke browser video uploads (init.data.upload_url was undefined).
+    expect($result)->toHaveKeys(['upload_url', 'upload_id', 'storage_path', 'expires_at', 'max_bytes'])
         ->and($result['upload_id'])->toStartWith("creators/{$creator->ulid}/portfolio/")
         ->and($result['upload_id'])->toEndWith('.mp4')
+        ->and($result['storage_path'])->toBe($result['upload_id'])
         ->and($result['max_bytes'])->toBe(500 * 1024 * 1024);
 });
 

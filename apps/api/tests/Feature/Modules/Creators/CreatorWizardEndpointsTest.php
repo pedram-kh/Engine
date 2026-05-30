@@ -25,10 +25,13 @@ use App\Modules\Creators\Integrations\DataTransferObjects\PaymentAccountResult;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorKycVerification;
 use App\Modules\Creators\Models\CreatorPayoutMethod;
+use App\Modules\Creators\Models\CreatorPortfolioItem;
 use App\Modules\Creators\Models\CreatorSocialAccount;
 use App\Modules\Creators\Models\CreatorTaxProfile;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Pennant\Feature;
 use Tests\TestCase;
 
@@ -289,6 +292,70 @@ it('DELETE /wizard/social/{platform} returns 422 for an unknown platform', funct
         ->deleteJson('/api/v1/creators/me/wizard/social/myspace')
         ->assertStatus(422)
         ->assertJsonPath('errors.0.code', 'creator.social.invalid_platform');
+});
+
+it('POST /portfolio/videos/init returns the exact keys the SPA reads (contract guard)', function (): void {
+    // Regression guard: the SPA reads `init.data.upload_url`. A backend
+    // that returns `url` instead leaves upload_url undefined and silently
+    // breaks browser video uploads. The frontend mock and the backend
+    // test previously validated divergent shapes; this pins the real
+    // endpoint response to the published PortfolioVideoInitResponse type.
+    $user = User::factory()->create();
+    CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/portfolio/videos/init', [
+            'mime_type' => 'video/mp4',
+            'declared_bytes' => 50 * 1024 * 1024,
+        ])
+        ->assertOk()
+        ->assertJsonStructure([
+            'data' => ['upload_url', 'upload_id', 'storage_path', 'expires_at'],
+        ]);
+});
+
+it('POST /portfolio/videos/complete persists a client-captured poster as the thumbnail', function (): void {
+    Storage::fake('media');
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    // Simulate the presigned PUT having already landed the video object.
+    $uploadId = "creators/{$creator->ulid}/portfolio/01POSTERVID0000000000000.mp4";
+    Storage::disk('media')->put($uploadId, 'fake video bytes');
+
+    $this->actingAs($user)
+        ->post('/api/v1/creators/me/portfolio/videos/complete', [
+            'upload_id' => $uploadId,
+            'mime_type' => 'video/mp4',
+            'size_bytes' => 5_000_000,
+            'thumbnail' => UploadedFile::fake()->image('poster.jpg', 640, 360),
+        ], ['Accept' => 'application/json'])
+        ->assertCreated()
+        ->assertJsonPath('data.kind', 'video');
+
+    $item = CreatorPortfolioItem::query()->where('creator_id', $creator->id)->sole();
+    expect($item->thumbnail_path)->not->toBeNull()
+        ->and($item->s3_path)->toBe($uploadId);
+});
+
+it('POST /portfolio/videos/complete works without a poster (thumbnail stays null)', function (): void {
+    Storage::fake('media');
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    $uploadId = "creators/{$creator->ulid}/portfolio/01NOPOSTERVID000000000000.mp4";
+    Storage::disk('media')->put($uploadId, 'fake video bytes');
+
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/portfolio/videos/complete', [
+            'upload_id' => $uploadId,
+            'mime_type' => 'video/mp4',
+            'size_bytes' => 5_000_000,
+        ])
+        ->assertCreated();
+
+    $item = CreatorPortfolioItem::query()->where('creator_id', $creator->id)->sole();
+    expect($item->thumbnail_path)->toBeNull();
 });
 
 it('POST /wizard/kyc returns the hosted-flow URL and persists a KYC row', function (): void {

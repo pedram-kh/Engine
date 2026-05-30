@@ -57,11 +57,18 @@ const galleryItems = computed(() => {
     title: item.title,
     description: item.description,
     // Backend mints presigned GET URLs against the private `media`
-    // disk on every bootstrap; prefer the dedicated thumbnail URL,
-    // fall back to the full-size view URL when no thumbnail exists.
+    // disk on every bootstrap; prefer the dedicated thumbnail URL.
+    // For images we fall back to the full-size view URL when no
+    // thumbnail exists. For videos `view_url` points at the raw media
+    // (e.g. an .mp4) which is NOT a valid `<img src>` — feeding it to
+    // the gallery yields a broken-image tile, so we leave it null and
+    // let the gallery render its placeholder + play badge instead.
     // The raw `*_path` fields are storage keys and are NOT directly
     // browser-fetchable.
-    thumbnailUrl: item.thumbnail_view_url ?? item.view_url,
+    thumbnailUrl: item.thumbnail_view_url ?? (item.kind === 'image' ? item.view_url : null),
+    // Full-size signed media for the click-to-preview lightbox: the full
+    // image for `image`, the playable file for `video`.
+    viewUrl: item.view_url,
     externalUrl: item.external_url,
     altText: item.title ?? t('creator.ui.wizard.steps.portfolio.untitled_item'),
   }))
@@ -114,6 +121,8 @@ async function advance(): Promise<void> {
         :remove-label="t('creator.ui.wizard.steps.portfolio.gallery_remove')"
         :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
         :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
+        :preview-label="t('creator.ui.wizard.steps.portfolio.preview_label')"
+        :close-label="t('creator.ui.wizard.steps.portfolio.preview_close')"
         @remove="onRemove"
       />
       <div

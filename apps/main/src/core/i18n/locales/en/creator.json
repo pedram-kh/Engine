@@ -69,7 +69,9 @@
             "gallery_status": "Portfolio gallery contains {count} item(s).",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
-            "untitled_item": "Untitled portfolio item"
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Open preview",
+            "preview_close": "Close preview"
           },
           "kyc": {
             "name": "Identity verification",

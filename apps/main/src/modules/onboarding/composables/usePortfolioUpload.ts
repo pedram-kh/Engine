@@ -52,6 +52,7 @@ import { uploadToPresignedUrl } from '@catalyst/api-client'
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
 
 import { onboardingApi } from '../api/onboarding.api'
+import { captureVideoPoster } from '../internal/captureVideoPoster'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 export const PORTFOLIO_MAX_ITEMS = 10
@@ -147,23 +148,35 @@ export function usePortfolioUpload(): PortfolioUploadHandle {
   const inFlightCount = computed(() => items.value.filter((it) => it.status === 'uploading').length)
 
   /**
-   * Items that count against the per-creator cap of 10 — anything
-   * in `pending`, `uploading`, or `done`. Items in `error` are
-   * excluded because they never made it to the server.
+   * Already-persisted portfolio items, sourced from the canonical
+   * bootstrap state. A `done` upload is folded into this list once
+   * its post-upload `store.bootstrap()` resolves, so it must NOT also
+   * be counted from the local queue (see `inFlightSlotCount`) or the
+   * item would be double-charged against the cap.
    */
-  const consumingCount = computed(() => items.value.filter((it) => it.status !== 'error').length)
+  const persistedCount = computed(() => store.creator?.attributes.portfolio?.length ?? 0)
 
   /**
-   * Slots remaining BEFORE the per-creator cap of 10 items kicks in.
-   * Calculated as `cap - (server-known existing portfolio count) -
-   * (anything in the local queue that's not yet failed)`. The
-   * backend is the canonical source for "what's persisted"; this
-   * number is a client-side heuristic that prevents enqueueing past
-   * the cap. CreatorResource currently exposes per-step `is_complete`
-   * (not a count); the local-queue heuristic is conservative and
-   * 409s from the server are still surfaced per-file as upload_failed.
+   * Local-queue items still occupying a slot but NOT yet reflected in
+   * the persisted list: `pending` + `uploading`. `error` items never
+   * reached the server; `done` items are already counted via
+   * `persistedCount` after their bootstrap refresh.
    */
-  const remainingSlots = computed(() => PORTFOLIO_MAX_ITEMS - consumingCount.value)
+  const inFlightSlotCount = computed(
+    () => items.value.filter((it) => it.status === 'pending' || it.status === 'uploading').length,
+  )
+
+  /**
+   * Slots remaining before the per-creator cap of 10 items kicks in:
+   * `cap - (persisted items) - (in-flight local uploads)`. The backend
+   * is the canonical source for what's persisted; bootstrap state
+   * exposes the full `portfolio` array, so we count it directly rather
+   * than guessing. Server-side 409s remain the final backstop and are
+   * surfaced per-file as `upload_failed`.
+   */
+  const remainingSlots = computed(
+    () => PORTFOLIO_MAX_ITEMS - persistedCount.value - inFlightSlotCount.value,
+  )
 
   const hasError = computed(() => items.value.some((it) => it.status === 'error'))
 
@@ -268,10 +281,14 @@ export function usePortfolioUpload(): PortfolioUploadHandle {
           declared_bytes: item.file.size,
         })
         await uploadToPresignedUrl(init.data.upload_url, item.file)
+        // Best-effort poster frame so the gallery shows a real preview.
+        // Returns null on any failure — the upload proceeds regardless.
+        const poster = await captureVideoPoster(item.file)
         const complete = await onboardingApi.completePortfolioVideoUpload({
           upload_id: init.data.upload_id,
           mime_type: item.file.type,
           size_bytes: item.file.size,
+          thumbnail: poster,
         })
         item.portfolioId = complete.data.id
       }

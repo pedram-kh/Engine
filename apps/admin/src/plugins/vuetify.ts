@@ -17,6 +17,11 @@
  */
 
 import 'vuetify/styles'
+// Material Design Icons webfont. Vuetify 3 defaults to the `mdi` icon set
+// but ships NO glyphs of its own — without this stylesheet every
+// `<v-icon icon="mdi-…">` (and Vuetify's own `$`-aliased control icons)
+// renders as an empty box. Required app-wide; do not remove.
+import '@mdi/font/css/materialdesignicons.css'
 import { createVuetify, type ThemeDefinition } from 'vuetify'
 import { lightTheme, darkTheme } from '@catalyst/design-tokens/vuetify'
 

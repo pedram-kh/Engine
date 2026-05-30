@@ -167,7 +167,24 @@ export const onboardingApi = {
   completePortfolioVideoUpload(
     payload: PortfolioVideoCompletePayload,
   ): Promise<PortfolioItemEnvelope> {
-    return http.post<PortfolioItemEnvelope>(`${BASE}/portfolio/videos/complete`, payload)
+    const { thumbnail, ...rest } = payload
+    // No poster captured → keep the lightweight JSON body (unchanged
+    // contract). A poster requires multipart so the file rides along.
+    if (thumbnail === undefined || thumbnail === null) {
+      return http.post<PortfolioItemEnvelope>(`${BASE}/portfolio/videos/complete`, rest)
+    }
+
+    const form = new FormData()
+    form.append('upload_id', rest.upload_id)
+    if (rest.title !== undefined) form.append('title', rest.title)
+    if (rest.description !== undefined) form.append('description', rest.description)
+    form.append('mime_type', rest.mime_type)
+    form.append('size_bytes', String(rest.size_bytes))
+    if (rest.duration_seconds !== undefined) {
+      form.append('duration_seconds', String(rest.duration_seconds))
+    }
+    form.append('thumbnail', thumbnail, 'poster.jpg')
+    return http.post<PortfolioItemEnvelope>(`${BASE}/portfolio/videos/complete`, form)
   },
 
   deletePortfolioItem(itemUlid: string): Promise<void> {

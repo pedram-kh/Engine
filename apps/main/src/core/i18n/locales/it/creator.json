@@ -69,7 +69,9 @@
             "gallery_status": "La galleria del portfolio contiene {count} elemento(i).",
             "video_badge_label": "Video",
             "link_badge_label": "Link esterno",
-            "untitled_item": "Elemento del portfolio senza titolo"
+            "untitled_item": "Elemento del portfolio senza titolo",
+            "preview_label": "Apri anteprima",
+            "preview_close": "Chiudi anteprima"
           },
           "kyc": {
             "name": "Verifica dell'identità",

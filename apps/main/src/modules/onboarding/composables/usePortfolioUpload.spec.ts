@@ -12,6 +12,10 @@ vi.mock('../api/onboarding.api', () => ({
   },
 }))
 
+vi.mock('../internal/captureVideoPoster', () => ({
+  captureVideoPoster: vi.fn(async () => null),
+}))
+
 vi.mock('@catalyst/api-client', async () => {
   const actual =
     await vi.importActual<typeof import('@catalyst/api-client')>('@catalyst/api-client')
@@ -23,6 +27,7 @@ vi.mock('@catalyst/api-client', async () => {
 
 import { uploadToPresignedUrl } from '@catalyst/api-client'
 import { onboardingApi } from '../api/onboarding.api'
+import { captureVideoPoster } from '../internal/captureVideoPoster'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 import {
   PORTFOLIO_CONCURRENCY,
@@ -261,6 +266,35 @@ describe('usePortfolioUpload', () => {
       expect(items.value[0]?.portfolioId).toBe('vid-1')
     })
 
+    it('captures a poster frame and forwards it to the complete call', async () => {
+      const poster = new Blob(['jpeg-bytes'], { type: 'image/jpeg' })
+      vi.mocked(captureVideoPoster).mockResolvedValueOnce(poster)
+      vi.mocked(uploadToPresignedUrl).mockResolvedValue(undefined)
+      vi.mocked(onboardingApi.initiatePortfolioVideoUpload).mockResolvedValue({
+        data: {
+          upload_id: 'u-3',
+          upload_url: 'https://s3/u-3',
+          storage_path: 'media/u-3',
+          expires_at: '2026-05-14T12:00:00+00:00',
+        },
+      })
+      vi.mocked(onboardingApi.completePortfolioVideoUpload).mockResolvedValue({
+        data: { id: 'vid-3', kind: 'video', s3_path: 'media/u-3', position: 1 },
+      })
+
+      const file = makeFile({ name: 'clip.mp4', type: 'video/mp4', size: 5_000_000 })
+      const { enqueue } = usePortfolioUpload()
+      enqueue(file)
+      await flushPromises()
+      await flushPromises()
+      await flushPromises()
+
+      expect(captureVideoPoster).toHaveBeenCalledWith(file)
+      expect(onboardingApi.completePortfolioVideoUpload).toHaveBeenCalledWith(
+        expect.objectContaining({ upload_id: 'u-3', thumbnail: poster }),
+      )
+    })
+
     it('marks status=error if the presigned PUT fails', async () => {
       vi.mocked(uploadToPresignedUrl).mockRejectedValue(new Error('presigned 500'))
       vi.mocked(onboardingApi.initiatePortfolioVideoUpload).mockResolvedValue({
@@ -336,6 +370,54 @@ describe('usePortfolioUpload', () => {
       await remove(id)
       expect(onboardingApi.deletePortfolioItem).toHaveBeenCalledWith('pid-a.jpg')
       expect(items.value).toHaveLength(0)
+    })
+  })
+
+  describe('slot accounting', () => {
+    function seedPersistedPortfolio(count: number): void {
+      const store = useOnboardingStore()
+      store.creator = {
+        id: '01H',
+        type: 'creators',
+        attributes: {
+          portfolio: Array.from({ length: count }, (_, i) => ({ id: `seed-${i}`, kind: 'image' })),
+        } as never,
+        wizard: {} as never,
+      } as never
+    }
+
+    it('counts already-persisted portfolio items against the cap', () => {
+      seedPersistedPortfolio(3)
+      const { remainingSlots } = usePortfolioUpload()
+      // 10 cap − 3 persisted − 0 in-flight = 7 (not 9/10).
+      expect(remainingSlots.value).toBe(PORTFOLIO_MAX_ITEMS - 3)
+    })
+
+    it('subtracts in-flight uploads on top of persisted items', async () => {
+      seedPersistedPortfolio(8)
+      const heldResolvers: Array<() => void> = []
+      vi.mocked(onboardingApi.uploadPortfolioImage).mockImplementation(async (file) => {
+        await new Promise<void>((r) => heldResolvers.push(r))
+        return { data: { id: `pid-${file.name}`, kind: 'image', s3_path: 'x', position: 1 } }
+      })
+
+      const { enqueue, remainingSlots } = usePortfolioUpload()
+      enqueue(makeFile({ name: 'a.jpg' }))
+      await flushPromises()
+      // 10 − 8 persisted − 1 uploading = 1 slot left.
+      expect(remainingSlots.value).toBe(1)
+
+      enqueue(makeFile({ name: 'b.jpg' }))
+      await flushPromises()
+      // Now full: 10 − 8 − 2 = 0.
+      expect(remainingSlots.value).toBe(0)
+
+      const overflow = enqueue(makeFile({ name: 'c.jpg' }))
+      expect(overflow.status).toBe('error')
+      expect(overflow.errorKey).toBe('creator.ui.errors.portfolio_max_reached')
+
+      while (heldResolvers.length > 0) heldResolvers.shift()?.()
+      await flushPromises()
     })
   })
 
