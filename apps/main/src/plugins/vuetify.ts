@@ -41,7 +41,12 @@ export const vuetify = createVuetify({
     VBtn: {
       variant: 'flat',
       rounded: 0,
-      style: 'border-radius: 6px; text-transform: none;',
+      // Sprint 3.5 Chunk 2 (D-fork-a + R1): the button radius is the single
+      // styling SOT here — CButton no longer re-applies it inline. The
+      // literal `6px` was tokenised to `var(--radius-md)` (the existing
+      // dormant radius scale in @catalyst/design-tokens/tokens.css, now
+      // consumed rather than re-authored).
+      style: 'border-radius: var(--radius-md); text-transform: none;',
     },
     VTextField: {
       variant: 'outlined',

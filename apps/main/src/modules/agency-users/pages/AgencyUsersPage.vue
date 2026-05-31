@@ -40,6 +40,8 @@ import type {
 import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { CEmptyState } from '@catalyst/ui'
+
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { invitationsApi } from '../api/invitations.api'
 import { membersApi } from '../api/members.api'
@@ -309,20 +311,24 @@ function formatDate(iso: string | null): string {
       <v-skeleton-loader type="table" data-test="members-skeleton" />
     </template>
     <template v-else-if="!memberLoading && memberItems.length === 0 && !memberError">
-      <div
+      <CEmptyState
         v-if="memberRoleFilter === 'all' && memberSearch.trim() === ''"
-        class="d-flex flex-column align-center pa-8"
         data-test="members-empty-state"
+        :body="t('app.agencyUsers.empty.body')"
       >
-        <v-icon icon="mdi-account-group-outline" size="48" color="medium-emphasis" class="mb-3" />
-        <p class="text-body-2 text-medium-emphasis">{{ t('app.agencyUsers.empty.body') }}</p>
-      </div>
-      <div v-else class="d-flex flex-column align-center pa-8" data-test="members-empty-filtered">
-        <v-icon icon="mdi-filter-remove-outline" size="48" color="medium-emphasis" class="mb-3" />
-        <p class="text-body-2 text-medium-emphasis">
-          {{ t('app.agencyUsers.emptyFiltered') }}
-        </p>
-      </div>
+        <template #icon>
+          <v-icon icon="mdi-account-group-outline" size="48" color="medium-emphasis" />
+        </template>
+      </CEmptyState>
+      <CEmptyState
+        v-else
+        data-test="members-empty-filtered"
+        :body="t('app.agencyUsers.emptyFiltered')"
+      >
+        <template #icon>
+          <v-icon icon="mdi-filter-remove-outline" size="48" color="medium-emphasis" />
+        </template>
+      </CEmptyState>
     </template>
 
     <v-data-table-server
@@ -394,12 +400,14 @@ function formatDate(iso: string | null): string {
         <v-skeleton-loader type="table" data-test="invitations-skeleton" />
       </template>
       <template v-else-if="!invitationLoading && invitationItems.length === 0 && !invitationError">
-        <div class="d-flex flex-column align-center pa-8" data-test="invitations-empty-state">
-          <v-icon icon="mdi-email-outline" size="48" color="medium-emphasis" class="mb-3" />
-          <p class="text-body-2 text-medium-emphasis">
-            {{ t('app.agencyUsers.invitations.empty') }}
-          </p>
-        </div>
+        <CEmptyState
+          data-test="invitations-empty-state"
+          :body="t('app.agencyUsers.invitations.empty')"
+        >
+          <template #icon>
+            <v-icon icon="mdi-email-outline" size="48" color="medium-emphasis" />
+          </template>
+        </CEmptyState>
       </template>
 
       <v-data-table-server

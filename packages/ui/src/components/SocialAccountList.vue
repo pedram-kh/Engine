@@ -90,7 +90,7 @@ function iconFor(platform: string): string {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.9375rem;
+  font-size: var(--catalyst-typography-body-size);
 }
 
 .social-account-list__platform {

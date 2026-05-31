@@ -83,7 +83,15 @@
   --space-20: 80px;
   --space-24: 96px;
 
-  /* Radius */
+  /* Radius (Sprint 3.5 Chunk 2 — Decision R1: consume the existing scale,
+   * don't re-author. `--radius-none` added so every `radius` TS key in
+   * tokens.ts has a matching CSS declaration; the color-system-parity
+   * architecture test pins this TS↔CSS parity. Vuetify `defaults.VBtn`
+   * consumes `var(--radius-md)` for the 6px control radius. No
+   * `--brand-radius-*` namespace is introduced — the kickoff's D-radii
+   * was reinterpreted against the verified codebase scale: lg stays 8px,
+   * xl stays 12px. */
+  --radius-none: 0px;
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;

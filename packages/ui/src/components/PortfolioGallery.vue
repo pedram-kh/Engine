@@ -297,7 +297,7 @@ function onRemove(itemId: string): void {
 }
 
 .portfolio-gallery__title {
-  font-size: 0.875rem;
+  font-size: var(--catalyst-typography-body-size);
   font-weight: 500;
   line-height: 1.3;
   word-break: break-word;
@@ -352,7 +352,7 @@ function onRemove(itemId: string): void {
 
 .portfolio-gallery__preview-title {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: var(--catalyst-typography-body-size);
   font-weight: 500;
   text-align: center;
   word-break: break-word;

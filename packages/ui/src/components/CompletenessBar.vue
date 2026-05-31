@@ -70,7 +70,7 @@ const props = withDefaults(defineProps<Props>(), {
 }
 
 .completeness-bar__label {
-  font-size: 0.875rem;
+  font-size: var(--catalyst-typography-body-size);
   color: rgb(var(--v-theme-on-surface-variant));
 }
 </style>

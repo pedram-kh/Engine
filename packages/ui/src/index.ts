@@ -1,5 +1,6 @@
 export { default as CButton } from './components/CButton.vue'
 export { default as CategoryChips } from './components/CategoryChips.vue'
+export { default as CEmptyState } from './components/CEmptyState.vue'
 export { default as CompletenessBar } from './components/CompletenessBar.vue'
 export { default as ContractStatusBadge } from './components/ContractStatusBadge.vue'
 export { default as CountryDisplay } from './components/CountryDisplay.vue'

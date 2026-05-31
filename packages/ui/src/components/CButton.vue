@@ -5,6 +5,15 @@
  * Sprint 0 placeholder: thin wrapper over Vuetify's <v-btn>. Subsequent sprints
  * tighten the API (variants, density, loading state, icon-only) per
  * docs/01-UI-UX.md §5 Buttons.
+ *
+ * Styling source-of-truth (Sprint 3.5 Chunk 2, Decision D-fork-a):
+ *   CButton encodes VARIANT SEMANTICS only (primary / secondary / ghost /
+ *   danger → Vuetify variant + color). It does NOT re-apply primitive
+ *   styling. The border-radius (var(--radius-md)) + text-transform:none
+ *   live once in the Vuetify `defaults.VBtn` block (both SPAs' plugins),
+ *   which this <v-btn> inherits automatically. The previous inline
+ *   `style="border-radius:6px;text-transform:none"` here was a second
+ *   source for the same decision and was removed to close the drift.
  */
 
 import { computed } from 'vue'
@@ -65,7 +74,6 @@ const vuetifyColor = computed(() => {
     :loading="loading"
     :disabled="disabled"
     :type="type"
-    style="border-radius: 6px; text-transform: none"
     @click="(event: MouseEvent) => $emit('click', event)"
   >
     <slot />

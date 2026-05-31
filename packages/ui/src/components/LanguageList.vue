@@ -59,7 +59,7 @@ const hasAny = computed(() => hasPrimary.value || hasSecondary.value)
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.9375rem;
+  font-size: var(--catalyst-typography-body-size);
 }
 
 .language-list__primary {

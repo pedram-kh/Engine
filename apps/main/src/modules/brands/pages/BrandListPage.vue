@@ -14,6 +14,8 @@ import type { BrandResource } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { CEmptyState } from '@catalyst/ui'
+
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { brandsApi } from '../api/brands.api'
 
@@ -231,27 +233,31 @@ async function confirmRestore(): Promise<void> {
 
     <!-- Empty state -->
     <template v-else-if="!loading && items.length === 0 && !error">
-      <div
+      <CEmptyState
         v-if="statusFilter === 'active'"
-        class="d-flex flex-column align-center justify-center pa-12"
         data-test="brand-empty-state"
+        :title="t('app.brands.empty.heading')"
+        :body="t('app.brands.empty.body')"
       >
-        <v-icon icon="mdi-tag-outline" size="64" color="medium-emphasis" class="mb-4" />
-        <h2 class="text-h6 mb-2">{{ t('app.brands.empty.heading') }}</h2>
-        <p class="text-body-2 text-medium-emphasis mb-6">{{ t('app.brands.empty.body') }}</p>
-        <v-btn color="primary" :to="{ name: 'brands.create' }" data-test="brand-empty-cta">
-          {{ t('app.brands.empty.cta') }}
-        </v-btn>
-      </div>
-      <div
+        <template #icon>
+          <v-icon icon="mdi-tag-outline" size="64" color="medium-emphasis" />
+        </template>
+        <template #action>
+          <v-btn color="primary" :to="{ name: 'brands.create' }" data-test="brand-empty-cta">
+            {{ t('app.brands.empty.cta') }}
+          </v-btn>
+        </template>
+      </CEmptyState>
+      <CEmptyState
         v-else
-        class="d-flex flex-column align-center justify-center pa-12"
         data-test="brand-empty-filtered"
+        :title="t('app.brands.emptyFiltered.heading')"
+        :body="t('app.brands.emptyFiltered.body')"
       >
-        <v-icon icon="mdi-filter-remove-outline" size="48" color="medium-emphasis" class="mb-3" />
-        <h2 class="text-h6 mb-2">{{ t('app.brands.emptyFiltered.heading') }}</h2>
-        <p class="text-body-2 text-medium-emphasis">{{ t('app.brands.emptyFiltered.body') }}</p>
-      </div>
+        <template #icon>
+          <v-icon icon="mdi-filter-remove-outline" size="48" color="medium-emphasis" />
+        </template>
+      </CEmptyState>
     </template>
 
     <!-- Data table -->

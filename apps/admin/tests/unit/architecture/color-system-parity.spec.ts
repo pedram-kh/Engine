@@ -30,6 +30,15 @@
  *      (Decision D6 reinterpreted: expose the existing 12-step scale as
  *      CSS-consumable.)
  *
+ *   6. RADIUS PARITY (Sprint 3.5 Chunk 2 — Decision R1) — every key of
+ *      the TS `radius` scale has a matching `--radius-{key}` CSS
+ *      declaration in `tokens.css`. Same shape as #5: the kickoff's
+ *      D-radii was reinterpreted to "consume the existing dormant radius
+ *      scale, don't re-author / don't introduce a parallel
+ *      --brand-radius-* namespace." Vuetify `defaults.VBtn` consumes
+ *      `var(--radius-md)`; this invariant keeps the TS and CSS layers in
+ *      lockstep so a typo (or a half-migration) fails CI.
+ *
  * The WCAG-AA contrast invariant (kickoff § 1.5 item 4) is asserted
  * separately by `packages/design-tokens/src/vuetify.spec.ts` against the
  * same `lightTheme` / `darkTheme` objects — re-run during Chunk 1
@@ -52,7 +61,7 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { brand, lightTheme, darkTheme, typography } from '@catalyst/design-tokens'
+import { brand, lightTheme, darkTheme, typography, radius } from '@catalyst/design-tokens'
 
 const TOKENS_CSS = readFileSync(
   path.resolve(__dirname, '../../../../../packages/design-tokens/tokens.css'),
@@ -124,5 +133,20 @@ describe('color-system parity — typography scale exposed as CSS vars (D6)', ()
     const match = TOKENS_CSS.match(/--brand-font-primary:\s*([^;]+);/)
     expect(match).not.toBeNull()
     expect(match?.[1]).toContain('Inter')
+  })
+})
+
+describe('color-system parity — radius scale TS↔CSS parity (R1)', () => {
+  const radiusKeys = Object.keys(radius)
+
+  it('covers the full none→full radius scale (6 keys)', () => {
+    expect(radiusKeys).toEqual(['none', 'sm', 'md', 'lg', 'xl', 'full'])
+  })
+
+  it.each(radiusKeys)('exposes a --radius-%s CSS declaration', (key) => {
+    // Assert the DECLARATION form (trailing colon) so a bare mention in a
+    // doc comment can't falsely satisfy the check — same hardening the
+    // aurora-authored invariant uses.
+    expect(TOKENS_CSS).toContain(`--radius-${key}:`)
   })
 })

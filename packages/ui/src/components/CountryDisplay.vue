@@ -57,12 +57,15 @@ const hasContent = computed(() => props.label.length > 0 || flagEmoji.value.leng
 }
 
 .country-display__flag {
+  /* Allowlisted literal (Sprint 3.5 Chunk 2 — typography-consumption test):
+   * flag glyph; sized for visual weight, not a typographic role, so it does
+   * not map to a step in the type scale. Tracked in the spec's allowlist. */
   font-size: 1.125rem;
   line-height: 1;
 }
 
 .country-display__label {
-  font-size: 0.9375rem;
+  font-size: var(--catalyst-typography-body-size);
 }
 
 .country-display--empty {
