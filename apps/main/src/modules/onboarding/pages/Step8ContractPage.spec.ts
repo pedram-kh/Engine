@@ -179,6 +179,47 @@ describe('Step8ContractPage', () => {
     expect(pushSpy!).toHaveBeenCalledWith({ name: 'onboarding.review' })
   })
 
+  it('flag OFF + fresh: accepting the click-through advances to review (does not strand on contract)', async () => {
+    // Regression (CI E2E strand): the completed-state panel must key off the
+    // ENTRY snapshot, not live `isComplete`. Accepting sets
+    // `click_through_accepted_at`, which would flip a live `v-if` true and
+    // unmount <ClickThroughAccept> before its `accepted` emit could advance
+    // the wizard — leaving the creator stuck on /onboarding/contract.
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap({ contractEnabled: false }))
+    vi.mocked(onboardingApi.clickThroughAccept).mockResolvedValue(
+      makeBootstrap({
+        contractEnabled: false,
+        clickThroughAcceptedAt: '2026-05-14T00:30:00+00:00',
+      }),
+    )
+
+    let pushSpy: MockInstance<Router['push']> | null = null
+    const { wrapper, unmount } = await mountAuthPage(Step8ContractPage, {
+      initialRoute: { path: '/onboarding/contract' },
+      beforeMount: async ({ router }) => {
+        await useOnboardingStore().bootstrap()
+        // Stub the navigation itself — this test asserts the step *advances*
+        // (push is invoked), not that the review route renders in this
+        // single-page mount harness.
+        pushSpy = vi.spyOn(router, 'push').mockResolvedValue(undefined)
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    // Fresh entry → the click-through surface is shown, not the panel.
+    expect(wrapper.find('[data-testid="click-through-accept"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="contract-click-through-complete"]').exists()).toBe(false)
+
+    await wrapper.find('[data-testid="click-through-checkbox"] input').setValue(true)
+    await wrapper.find('[data-testid="click-through-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(onboardingApi.clickThroughAccept).toHaveBeenCalledTimes(1)
+    expect(pushSpy).not.toBeNull()
+    expect(pushSpy!).toHaveBeenCalledWith({ name: 'onboarding.review' })
+  })
+
   it('flag ON + click_through_accepted_at set still treats the step as complete', async () => {
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
       makeBootstrap({

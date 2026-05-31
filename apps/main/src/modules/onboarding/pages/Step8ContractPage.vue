@@ -25,7 +25,7 @@
  */
 
 import { ContractStatusBadge } from '@catalyst/ui'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { resolveSubmitErrorKey } from '../composables/useSubmitErrorKey'
@@ -62,6 +62,26 @@ const statusLabel = computed(() =>
 )
 
 const isComplete = computed(() => hasSigned.value || clickThroughAccepted.value)
+
+// Whether this step was ALREADY complete when the creator entered it.
+// We snapshot it once (rather than gating the click-through surface on the
+// live `isComplete`) because accepting *now* mutates the store and flips
+// `isComplete` true — gating <ClickThroughAccept> on the live value would
+// unmount it the instant acceptance resolves, racing (and often losing to)
+// its own `accepted` emit and stranding the creator on this step. The
+// completed-on-re-entry panel only cares about the entry state.
+const completedOnEntry = ref(false)
+const entryCaptured = ref(false)
+watch(
+  () => store.creator,
+  (creator) => {
+    if (creator && !entryCaptured.value) {
+      entryCaptured.value = true
+      completedOnEntry.value = hasSigned.value || clickThroughAccepted.value
+    }
+  },
+  { immediate: true },
+)
 
 const pollAnnounce = computed(() => {
   if (bounce.status.value === 'waiting') {
@@ -151,9 +171,11 @@ async function onClickThroughAccepted(): Promise<void> {
         which already guards its CTA on `isComplete`, and the
         Tax/Payout/KYC steps' completed states. The PII boundary is
         irrelevant here — there's nothing sensitive to re-show — but the
-        "already done, just continue" affordance is the same.
+        "already done, just continue" affordance is the same. Keyed off
+        `completedOnEntry` (snapshot) so accepting now doesn't unmount the
+        click-through surface before its `accepted` emit advances the step.
       -->
-      <template v-if="isComplete">
+      <template v-if="completedOnEntry">
         <v-alert
           type="success"
           variant="tonal"
