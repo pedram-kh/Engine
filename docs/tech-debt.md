@@ -611,3 +611,29 @@ anyone reviewing it later.
 - **Resolution:** rewrite `docs/01-UI-UX.md` §2 (colour) + §3 (typography) to describe the zinc neutral scale, the aurora utility accent + co-brand relationship to teal/violet, the self-hosted Inter typeface, and the binary dark-default theme model. Cross-link the parity architecture test as the enforcement artifact. Estimated effort: bundled into Chunk 5's scope.
 - **Owner:** Sprint 3.5 Chunk 5.
 - **Status:** open (scheduled). Surfaced by Sprint 3.5 Chunk 1, May 31, 2026.
+
+---
+
+## Shared status-badge / display chips not consolidated into a single `CStatusBadge`
+
+- **Where:** [`packages/ui/src/components/`](../packages/ui/src/components/) — the five near-identical v-chip shells: `ContractStatusBadge.vue`, `KycStatusBadge.vue`, `PayoutMethodStatus.vue`, `TaxProfileDisplay.vue`, and the chip portion of related displays.
+- **What we accepted in Sprint 3.5 Chunk 2 (May 31, 2026):** the five status chips were left purpose-specific (Decision § 1.7). A generic `CStatusBadge` is technically possible but was deliberately not built this chunk. Each chip encodes its own domain semantics (KYC status enum → label + colour, payout boolean → label + colour, contract status enum → label + colour, etc.). A generic badge would push that enum→label→colour mapping into every call site, making the call sites noisier without a real maintainability gain at the current count of five.
+- **Risk:** low. Five small, stable components with overlapping structure (v-chip + size + variant). The only cost is mild duplication of the chip shell; there is no behavioural or theming risk (all consume Vuetify `color` props, so they re-theme automatically with the zinc swap).
+- **Mitigation today:** none needed — the duplication is shallow and the components are individually tiny.
+- **Triggered by:** the call-site count growing (a sixth/seventh status chip appearing), OR a shared-component-library consolidation pass.
+- **Resolution:** introduce `CStatusBadge` taking `{ label, color, size?, variant? }` and migrate the five chips' templates to it, keeping the domain enum→label→colour mapping in each consuming module (or a shared map). Estimated effort: ~2-3 hours including the co-located specs.
+- **Owner:** open.
+- **Status:** open (deferred by design). Surfaced by Sprint 3.5 Chunk 2 read pass, May 31, 2026.
+
+---
+
+## packages/ui has no test harness
+
+- **Where:** [`packages/ui`](../packages/ui) (no Vitest/jsdom/@vue/test-utils config; `package.json` test script is a placeholder `echo 'no tests yet'`).
+- **What we accepted in Sprint 3.5 Chunk 2:** `CEmptyState` + `CButton` specs were co-located in [`apps/main/tests/unit/`](../apps/main/tests/unit/) rather than standing up a package-level test harness this chunk. The "tests live in the consuming SPA" convention is documented in each spec's header comment, and the cross-package architecture tests (`typography-consumption.spec.ts`) inspect `packages/ui/src` via `fs` from the SPA suites.
+- **Risk:** shared components without package-level coverage rely on the consuming SPAs' tests for verification. Coverage gaps emerge if multiple SPAs consume a component differently, OR if a shared component's behaviour isn't exercised by any consuming SPA test.
+- **Mitigation today:** `CButton` + `CEmptyState` are covered by co-located specs in `apps/main/tests/unit/`. The convention is recorded in the spec header comments.
+- **Resolution:** set up Vitest + jsdom + `@vue/test-utils` in `packages/ui` per the shared-package extraction pattern from `02-CONVENTIONS.md §1`. Migrate the co-located SPA specs back into the package. Estimated effort: ~4-6 hours of infrastructure work.
+- **Triggered by:** the next chunk that adds 2+ shared components, OR an explicit decision to invest in package-level testing.
+- **Owner:** open.
+- **Status:** open. Surfaced by Sprint 3.5 Chunk 2 read pass, 2026-05-31.
