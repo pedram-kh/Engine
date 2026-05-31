@@ -667,3 +667,30 @@ anyone reviewing it later.
 - **Triggered by:** the next chunk that meaningfully restructures the main-SPA route table, OR the dashboard module growing its own multi-route surface.
 - **Owner:** open (low priority).
 - **Status:** open (deferred by design). Surfaced by Sprint 4 Chunk 1 read pass, 2026-05-31.
+
+---
+
+## Dashboard KPI counts exclude `is_blacklisted` via the boolean only (scope-aware counting deferred to Sprint 7)
+
+- **Where:** the agency dashboard summary endpoint (`GET /api/v1/agencies/{agency}/dashboard/summary`, Agencies module) — the `creators_in_roster` and `pending_creator_applications` counts.
+- **What we accepted in Sprint 4 Chunk 1:** both KPI counts apply a plain `agency_creator_relations.is_blacklisted = false` clause. The relation row already carries richer blacklist columns (`blacklist_scope`, `blacklist_type`, `blacklisted_at`, …) whose real semantics (agency vs platform vs campaign scope) are NOT yet designed — full blacklisting is Sprint 7. The boolean is the conservative, obviously-correct interim interpretation of "active roster / this agency's pending applications": a creator the agency has blacklisted should not inflate either workspace-home KPI. This is a deliberate deviation from the chunk-1 kickoff's "no blacklist filter" prose (D-c1-7), taken because the field already ships and Sprint 7 could be months out — surfaced at plan-pause and approved.
+- **Risk:** low. If Sprint 7 introduces scope-aware blacklisting where a _campaign-scoped_ or _platform-scoped_ block should NOT exclude a creator from an agency's roster KPI, the plain-boolean filter would be too aggressive (or not aggressive enough) and the counts would need revisiting.
+- **Resolution:** when Sprint 7 designs blacklisting scope semantics, revisit the dashboard KPI denominators to honor scope (e.g. only agency-scoped blacklists exclude from the agency roster count) rather than the flat boolean.
+- **Triggered by:** Sprint 7 blacklisting.
+- **Owner:** Sprint 7 (blacklisting).
+- **Status:** open (deferred by design). Surfaced + accepted by Sprint 4 Chunk 1, 2026-05-31.
+
+---
+
+## Dashboard activity feed enrichment is deferred (subject-relevance via stamping + allowlist only) — D-c1-8
+
+- **Where:** the agency dashboard activity feed (`GET /api/v1/agencies/{agency}/dashboard/activity`, Agencies module) + `App\Modules\Agencies\Support\DashboardActivityFeed`.
+- **What we accepted in Sprint 4 Chunk 1 (1c):** the feed's subject-relevance scoping v1 is "agency-stamped `audit_logs` rows (`agency_id = {agency}`) whose action is in a curated `ACTION_ALLOWLIST`", newest-first, capped at 15. This establishes the _mechanism_ (stamped rows + curated allowlist + per-action metadata whitelist) from day one, but it is deliberately NOT enriched:
+  - **Tenant-less events are excluded by construction.** Creator wizard events (`creator.wizard.*`, `creator.submitted`, …) stamp `agency_id = null`, so they never reach an agency's feed even when that agency rosters the creator. Surfacing "your rostered creator completed KYC" would require either back-filling `agency_id` on those emissions or a creator→agency join at read time — out of scope for this chunk.
+  - **Row copy is template-only.** Rows render a localized per-action template + the whitelisted metadata; there is no deep-link to the subject, no subject display-name resolution beyond the actor label, and no grouping/"X and 3 others" collapsing.
+  - **The allowlist favours signal over churn** (lifecycle events, not field-level updates) — see `DashboardActivityFeed`'s curation rationale. Re-including churn actions (e.g. `agency_creator_relation.updated`) would need a noise-control strategy (debounce / group) first.
+- **Risk:** low. The feed is correct + PII-safe for what it shows; the debt is _coverage/richness_, not correctness. An agency won't see creator-side lifecycle moments in v1.
+- **Resolution:** a later chunk can (a) decide which tenant-less creator events should appear in a rostering agency's feed and back-fill `agency_id` (or add a read-time join), (b) add subject deep-links + name resolution, and (c) expand the allowlist with a churn-control strategy. Each allowlist/whitelist change is already guarded by `DashboardActivityAllowlistTest`.
+- **Triggered by:** the chunk that invests in workspace-home activity richness, OR a product decision that agencies must see creator-side lifecycle events.
+- **Owner:** open.
+- **Status:** open (deferred by design). Surfaced + accepted by Sprint 4 Chunk 1, 2026-05-31.
