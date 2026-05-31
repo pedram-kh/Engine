@@ -637,3 +637,16 @@ anyone reviewing it later.
 - **Triggered by:** the next chunk that adds 2+ shared components, OR an explicit decision to invest in package-level testing.
 - **Owner:** open.
 - **Status:** open. Surfaced by Sprint 3.5 Chunk 2 read pass, 2026-05-31.
+
+---
+
+## Component-test harness renders under Vuetify's stock theme, not the Catalyst zinc themes
+
+- **Where:** [`apps/main/tests/unit/helpers/mountAuthPage.ts`](../apps/main/tests/unit/helpers/mountAuthPage.ts) (and the admin SPA's equivalent harness). The harness calls `createVuetify({ components, directives })` with **no `theme` option**, so every mounted component renders under Vuetify's built-in default `light` theme — never the Catalyst `lightTheme` / `darkTheme` exports (zinc neutrals, registered container/variant tokens, etc.).
+- **What we accepted in Sprint 3.5 Chunk 3 (May 31, 2026):** the visual-regression sweep across both SPAs in light AND dark mode was done **eyes-on** because there is no automated coverage of dark-mode rendering. Component unit tests assert structure/behaviour/string output, all under the stock light theme. The Chunk 1 `color-system-parity` architecture tests pin the theme token VALUES (so a wrong hex is caught), but nothing renders a component against the dark theme and asserts the result — so a regression that only manifests when the dark theme is applied (e.g. a hardcoded color that happens to look fine on stock-light but wrong on zinc-dark, or a missing `on-*` foreground) would pass CI and only surface in a manual sweep.
+- **Risk:** medium. Dark mode is the product default (binary dark-first since Chunk 1), so the un-covered theme is the one most users see. The mitigations below keep the risk bounded, but each visual chunk currently costs a manual eyes-on pass.
+- **Mitigation today:** (1) `color-system-parity` pins every theme slot's per-mode value (incl. the Chunk 3 container/variant tokens), so the token layer itself is regression-locked; (2) `no-hard-coded-colors` + `no-inline-color-styles` architecture tests forbid the most common drift source; (3) the per-chunk eyes-on sweep (Chunk 3) is the human backstop.
+- **Resolution:** register the Catalyst themes in the harness (`createVuetify({ ..., theme: { defaultTheme, themes: { light: lightTheme, dark: darkTheme } } })`) and add an option to mount a component under a chosen theme, enabling targeted dark-mode rendering assertions (e.g. snapshot or computed-style probes on the highest-CSS surfaces — onboarding cluster, PortfolioGallery, dialogs). Estimated effort: ~3-4 hours including a first batch of dark-mode rendering specs.
+- **Triggered by:** the next visual/theming chunk, OR a dark-mode rendering regression slipping past CI into a manual sweep.
+- **Owner:** open.
+- **Status:** open. Surfaced by Sprint 3.5 Chunk 3 visual-regression sweep, 2026-05-31.
