@@ -26,9 +26,8 @@
  * and zinc neutrals via the Vuetify theme (`rgb(var(--v-theme-on-surface*))`),
  * so it re-themes automatically across light/dark.
  *
- * Tests are co-located in `apps/main/tests/unit/` — `packages/ui` has no
- * Vitest harness of its own (see docs/tech-debt.md, "packages/ui has no
- * test harness").
+ * Tested by `tests/components/CEmptyState.spec.ts` under the package's own
+ * theme-aware Vitest harness (Sprint 4 Chunk 1 sub-step 1a).
  */
 
 interface Props {
