@@ -39,12 +39,12 @@ export const brand = {
    *
    * The aurora gradient is the partner-agency-aligned brand accent. Per
    * Sprint 3.5 Decision D7 it is a UTILITY value, NOT a Vuetify theme
-   * color: it is consumed directly via `var(--brand-aurora-gradient)` on
-   * specific surfaces (auth hero strip, dashboard welcome bar, email
-   * header bars — all landing in Sprint 3.5 Chunk 4) and is intentionally
-   * never registered in any Vuetify `theme.colors` slot. The
-   * `color-system-parity` architecture test pins the not-in-theme-colors
-   * invariant.
+   * color: it is consumed directly via `var(--brand-aurora-gradient)` as
+   * thin chrome accents on the surfaces it shipped to in Chunk 4 — the
+   * auth card (both SPAs), the onboarding app-bar, and the creator
+   * dashboard header — and is intentionally never registered in any
+   * Vuetify `theme.colors` slot. The `color-system-parity` architecture
+   * test pins the not-in-theme-colors invariant.
    *
    * The midpoint stop sits at 50% — the natural reading of three stops.
    */
@@ -56,33 +56,17 @@ export const brand = {
   },
 } as const
 
-export const neutral = {
-  0: '#FFFFFF',
-  50: '#FAFAF9',
-  100: '#F4F4F2',
-  200: '#E8E8E5',
-  300: '#D4D4D0',
-  400: '#A8A8A2',
-  500: '#76766F',
-  600: '#525250',
-  700: '#3A3A38',
-  800: '#1F1F1E',
-  900: '#121211',
-  950: '#0A0A0B',
-} as const
-
 /**
  * Zinc neutral scale (Sprint 3.5 Chunk 1 — Engine C v2 brand layer).
  *
  * Per Sprint 3.5 Decisions D4 (dark) + D5 (light), the v2 neutral surface
- * uses Tailwind's zinc family — a true-neutral grey, replacing the warm
- * grey `neutral` scale above as the canonical surface/text palette for the
- * Vuetify themes. The warm `neutral` scale is preserved as an importable
- * primitive (the `brand.cream` / `brand.ink` logo colours still reference
- * its tonal world) but is no longer wired into `semanticLight` /
- * `semanticDark` — see the deprecation note in `docs/tech-debt.md`
- * ("Warm-gray neutral primitives deprecated"). Chunk 4 consolidation
- * decides removal once consumers are audited.
+ * uses Tailwind's zinc family — a true-neutral grey. It is the canonical
+ * surface/border/text palette for the Vuetify themes. The v1 warm-grey
+ * `neutral` scale that zinc replaced was the last dead-code holdover from
+ * the original palette; its runtime consumers were severed in Chunk 4 and
+ * the primitive was deleted in Chunk 5. `brand.cream` (#F5F1EA) and
+ * `brand.ink` (#0A0A0B) are standalone logo-derived hex literals — they do
+ * NOT reference the old `neutral` scale.
  */
 export const zinc = {
   50: '#FAFAFA',
@@ -174,7 +158,6 @@ export const typography = {
 } as const
 
 export type BrandTokens = typeof brand
-export type NeutralTokens = typeof neutral
 export type ZincTokens = typeof zinc
 export type SemanticTokens = typeof semantic
 export type BoardStatus = typeof boardStatus

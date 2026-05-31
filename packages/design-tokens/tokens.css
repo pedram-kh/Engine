@@ -2,9 +2,14 @@
  * Catalyst Engine — design tokens, CSS variables.
  * Source of truth: docs/01-UI-UX.md §2.
  *
- * Components consume the semantic variables (--color-bg-*, --color-text-*, etc.).
- * The brand and neutral primitives are exposed for the rare case a component
- * needs a raw value (logos, gradient surfaces).
+ * Color is consumed through the Vuetify theme layer (color props +
+ * var(--v-theme-*)) — see 01-UI-UX.md §2.7. This file carries only the
+ * non-color-system tokens the theme layer doesn't own: the brand
+ * primitives (incl. the aurora accent, consumed via
+ * var(--brand-aurora-gradient)), the radius / space scales, the brand
+ * font, and the typography scale. The dormant `--neutral-*` / `--color-*`
+ * semantic-variable layer (zero consumers) was deleted in Sprint 3.5
+ * Chunk 5.
  */
 
 :root {
@@ -43,20 +48,6 @@
   --brand-aurora-mid: #7fc3ff;
   --brand-aurora-end: #00fff2;
   --brand-aurora-gradient: linear-gradient(135deg, #cd69ff 0%, #7fc3ff 50%, #00fff2 100%);
-
-  /* Neutrals (warm gray) */
-  --neutral-0: #ffffff;
-  --neutral-50: #fafaf9;
-  --neutral-100: #f4f4f2;
-  --neutral-200: #e8e8e5;
-  --neutral-300: #d4d4d0;
-  --neutral-400: #a8a8a2;
-  --neutral-500: #76766f;
-  --neutral-600: #525250;
-  --neutral-700: #3a3a38;
-  --neutral-800: #1f1f1e;
-  --neutral-900: #121211;
-  --neutral-950: #0a0a0b;
 
   /* Status palette */
   --success-100: #dcfce7;
@@ -150,96 +141,3 @@
   --catalyst-typography-mono-weight: 500;
   --catalyst-typography-mono-line-height: 20px;
 }
-
-/* Light theme (default) */
-:root,
-:root[data-theme='light'] {
-  --color-bg-app: var(--neutral-50);
-  --color-bg-surface: var(--neutral-0);
-  --color-bg-surface-raised: var(--neutral-0);
-  --color-bg-surface-sunken: var(--neutral-100);
-  --color-bg-overlay: rgba(10, 10, 11, 0.4);
-
-  --color-border-subtle: var(--neutral-200);
-  --color-border-default: var(--neutral-300);
-  --color-border-strong: var(--neutral-400);
-
-  --color-text-primary: var(--neutral-900);
-  --color-text-secondary: var(--neutral-600);
-  --color-text-tertiary: var(--neutral-500);
-  --color-text-disabled: var(--neutral-400);
-  --color-text-inverse: var(--neutral-0);
-
-  --color-action-primary: var(--brand-teal-500);
-  --color-action-primary-hover: var(--brand-teal-600);
-  --color-action-primary-active: var(--brand-teal-700);
-  --color-action-primary-fg: var(--neutral-0);
-
-  --color-action-secondary: var(--neutral-100);
-  --color-action-secondary-hover: var(--neutral-200);
-  --color-action-secondary-fg: var(--neutral-900);
-
-  --color-action-danger: var(--danger-500);
-  --color-action-danger-hover: #b91c1c;
-  --color-action-danger-fg: var(--neutral-0);
-
-  --color-focus-ring: var(--brand-teal-500);
-}
-
-/* Dark theme */
-:root[data-theme='dark'] {
-  --color-bg-app: var(--brand-ink);
-  --color-bg-surface: var(--neutral-900);
-  --color-bg-surface-raised: var(--neutral-800);
-  --color-bg-surface-sunken: var(--brand-ink);
-  --color-bg-overlay: rgba(0, 0, 0, 0.6);
-
-  --color-border-subtle: var(--neutral-800);
-  --color-border-default: var(--neutral-700);
-  --color-border-strong: var(--neutral-600);
-
-  --color-text-primary: var(--brand-cream);
-  --color-text-secondary: var(--neutral-300);
-  --color-text-tertiary: var(--neutral-400);
-  --color-text-disabled: var(--neutral-600);
-  --color-text-inverse: var(--neutral-900);
-
-  --color-action-primary: var(--brand-teal-400);
-  --color-action-primary-hover: var(--brand-teal-300);
-  --color-action-primary-active: var(--brand-teal-500);
-  --color-action-primary-fg: var(--neutral-950);
-
-  --color-action-secondary: var(--neutral-800);
-  --color-action-secondary-hover: var(--neutral-700);
-  --color-action-secondary-fg: var(--brand-cream);
-
-  /* Aligned with the light palette by chunk 8.1; the previous
-   * #ef4444 measured 3.69:1 against white text, below WCAG AA-normal
-   * (4.5:1). #dc2626 measures 4.83:1 against white. */
-  --color-action-danger: var(--danger-500);
-  --color-action-danger-hover: #b91c1c;
-  --color-action-danger-fg: var(--neutral-0);
-
-  --color-focus-ring: var(--brand-teal-400);
-}
-
-/*
- * Note (chunk 8.2): the previous `@media (prefers-color-scheme: dark)`
- * block was removed in Group 2 of chunk 8.
- *
- * Why: with Group 2's `useThemePreference` composable now reactively
- * consulting `window.matchMedia('(prefers-color-scheme: dark)')` and
- * driving the active Vuetify theme through `useTheme().setTheme()`, an
- * independent CSS-media-query layer would create two competing sources
- * of truth for "what theme should be active right now." `useTheme` is
- * the Single Source of Truth (architecture-test-enforced); the dormant
- * `@media` block was a hazard rather than a feature.
- *
- * The `:root[data-theme='dark']` block above is left in place so that
- * any future opt-in consumer of the dormant `--color-*` semantic
- * variables still has a way to flip palettes via a `data-theme`
- * attribute on `<html>`. None exist today (a chunk-8.2 grep across
- * `apps/main/src/**` and `apps/admin/src/**` for `var(--color-`
- * returned zero matches), so the broader `tokens.css` removal-or-keep
- * decision is tracked in `docs/tech-debt.md` for a future chunk.
- */

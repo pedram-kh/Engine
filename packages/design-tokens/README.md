@@ -4,13 +4,13 @@ Design tokens for Catalyst Engine — extracted from [`docs/01-UI-UX.md`](../../
 
 ## What's exported
 
-- `import {...} from '@catalyst/design-tokens'` — TypeScript constants for brand colors, neutrals, status palettes, spacing, radius, and typography scales.
+- `import {...} from '@catalyst/design-tokens'` — TypeScript constants for brand colors (incl. the zinc neutral scale), status palettes, spacing, radius, and typography scales.
 - `import { lightTheme, darkTheme } from '@catalyst/design-tokens/vuetify'` — both palettes as Vuetify `ThemeDefinition` objects. Plug into `createVuetify({ theme: { themes: { light, dark } } })`. The exports were renamed from `catalystLightTheme` / `catalystDarkTheme` in chunk 8.1 to align with Vuetify's standard `light` / `dark` theme keys.
-- `import '@catalyst/design-tokens/tokens.css'` — global CSS custom properties for `--color-*`, `--space-*`, `--radius-*`. Components reference these, never the raw hex values.
+- `import '@catalyst/design-tokens/tokens.css'` — global CSS custom properties for `--brand-*` (incl. the aurora accent), `--space-*`, `--radius-*`, `--font-*`, and `--catalyst-typography-*`. The dormant `--color-*` / `--neutral-*` semantic-variable layer was deleted in Sprint 3.5 Chunk 5 (zero consumers).
 
 ## Conventions
 
-- Components must reference **semantic** tokens (`--color-text-primary`, `--color-action-primary`) — never raw brand or neutral values.
+- Color is consumed through the **Vuetify theme layer** — Vuetify `color="…"` props and `var(--v-theme-*)` in component `<style>` — never raw hex and never the old `--color-*` / `--neutral-*` vars. See [`docs/01-UI-UX.md`](../../docs/01-UI-UX.md) §2.7. The aurora accent is the one exception: `var(--brand-aurora-gradient)`.
 - The brand gradient is reserved for logos, marketing surfaces, and onboarding splashes (not routine UI).
 - Spacing follows the 4-pixel scale exclusively. If a component "needs" 28px, choose 24 or 32.
 
