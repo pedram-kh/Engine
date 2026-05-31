@@ -3,12 +3,15 @@ import { createI18n } from 'vue-i18n'
 import enApp from './locales/en/app.json'
 import enAuth from './locales/en/auth.json'
 import enCreator from './locales/en/creator.json'
+import enDashboard from './locales/en/dashboard.json'
 import itApp from './locales/it/app.json'
 import itAuth from './locales/it/auth.json'
 import itCreator from './locales/it/creator.json'
+import itDashboard from './locales/it/dashboard.json'
 import ptApp from './locales/pt/app.json'
 import ptAuth from './locales/pt/auth.json'
 import ptCreator from './locales/pt/creator.json'
+import ptDashboard from './locales/pt/dashboard.json'
 
 /**
  * Vue-i18n bundle. Each locale folder owns one JSON file per top-level
@@ -25,6 +28,11 @@ import ptCreator from './locales/pt/creator.json'
  *                       `tests/unit/architecture/i18n-creator-codes.spec.ts`.
  *   - `app.json`      — shared app chrome strings (header, footer,
  *                       common form labels).
+ *   - `dashboard.json` — agency workspace-home strings (welcome bar, KPI
+ *                       labels, activity feed). Sprint 4 Chunk 1. UI-only;
+ *                       no backend error codes map under `dashboard.*`, so
+ *                       (unlike auth/creator) it has no i18n-codes
+ *                       architecture test.
  *
  * The architecture tests walk the backend source at Vitest time and
  * fail CI if a backend error code lands without a matching translation
@@ -35,12 +43,12 @@ import ptCreator from './locales/pt/creator.json'
  * locales in the same commit.
  */
 
-type MessageSchema = typeof enApp & typeof enAuth & typeof enCreator
+type MessageSchema = typeof enApp & typeof enAuth & typeof enCreator & typeof enDashboard
 
 const messages: Record<'en' | 'pt' | 'it', MessageSchema> = {
-  en: { ...enApp, ...enAuth, ...enCreator },
-  pt: { ...ptApp, ...ptAuth, ...ptCreator },
-  it: { ...itApp, ...itAuth, ...itCreator },
+  en: { ...enApp, ...enAuth, ...enCreator, ...enDashboard },
+  pt: { ...ptApp, ...ptAuth, ...ptCreator, ...ptDashboard },
+  it: { ...itApp, ...itAuth, ...itCreator, ...itDashboard },
 }
 
 export const i18n = createI18n<[MessageSchema], 'en' | 'pt' | 'it'>({

@@ -14,7 +14,8 @@
  * Layout assignment:
  *   - All `auth.*` routes render inside `AuthLayout.vue` (centred card,
  *     brand mark, locale switcher).
- *   - `app.dashboard` is a placeholder until chunk 7.
+ *   - `app.dashboard` renders the real agency workspace home
+ *     (`@/modules/dashboard`) since Sprint 4 Chunk 1.
  *   - `error.auth-bootstrap` is the dedicated terminal error route — see
  *     chunk-6.5 pre-answered Q1, which prefers a deep-linkable route over
  *     a global app-level error boundary.
@@ -150,11 +151,13 @@ export const authRoutes: RouteRecordRaw[] = [
 ]
 
 export const appRoutes: RouteRecordRaw[] = [
-  // Dashboard — requires auth (full implementation in Sprint 3+).
+  // Dashboard — the real agency workspace home (Sprint 4 Chunk 1; replaced
+  // the chunk-6.5 DashboardPlaceholderPage). Requires auth; NOT MFA-gated
+  // (see the selective-gating test in agency-routes-mfa-guard.spec.ts).
   {
     path: '/',
     name: 'app.dashboard',
-    component: () => import('@/core/pages/DashboardPlaceholderPage.vue'),
+    component: () => import('@/modules/dashboard/pages/DashboardPage.vue'),
     meta: { layout: 'agency', guards: ['requireAuth'] },
   },
 

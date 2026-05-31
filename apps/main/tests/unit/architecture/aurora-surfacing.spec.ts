@@ -33,12 +33,14 @@ const RAW_AURORA_HEXES = ['#cd69ff', '#7fc3ff', '#00fff2']
 
 /**
  * The persistent brand surfaces that carry an aurora thin-accent in this
- * SPA (main). Auth card + onboarding app-bar + creator dashboard header.
+ * SPA (main). Auth card + onboarding app-bar + creator dashboard header +
+ * the agency workspace-home welcome bar (Sprint 4 Chunk 1, D-c1-9).
  */
 const AURORA_SURFACES: ReadonlyArray<string> = [
   'modules/auth/layouts/AuthLayout.vue',
   'modules/onboarding/layouts/OnboardingLayout.vue',
   'modules/creators/pages/CreatorDashboardPage.vue',
+  'modules/dashboard/components/WelcomeBar.vue',
 ]
 
 describe('aurora surfacing — brand accent consumes the utility var (Chunk 4)', () => {

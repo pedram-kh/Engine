@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "welcome": {
+      "greeting": "Bentornato",
+      "greetingNamed": "Bentornato, {name}"
+    },
+    "kpi": {
+      "activeCampaigns": "Campagne attive",
+      "creatorsInRoster": "Creator in roster",
+      "pendingApplications": "Candidature creator in sospeso",
+      "paymentsDue": "Pagamenti dovuti"
+    },
+    "activity": {
+      "title": "Attività recente",
+      "empty": "Nessuna attività recente per ora.",
+      "loadFailed": "Impossibile caricare l'attività recente.",
+      "system": "Il sistema",
+      "actions": {
+        "creatorInvited": "{actor} ha invitato un creator",
+        "bulkInviteCompleted": "{actor} ha eseguito un invito di massa ({invited} invitati, {failed} falliti)",
+        "agencyCreatorRelationCreated": "{actor} ha aggiunto un creator al roster",
+        "brandCreated": "{actor} ha creato un brand",
+        "brandArchived": "{actor} ha archiviato un brand",
+        "brandRestored": "{actor} ha ripristinato un brand",
+        "invitationCreated": "{actor} ha invitato un membro del team",
+        "invitationAccepted": "{actor} si è unito al team",
+        "agencySettingsUpdated": "{actor} ha aggiornato le impostazioni dell'agenzia",
+        "fallback": "{actor} ha eseguito un'azione"
+      }
+    },
+    "errors": {
+      "loadFailed": "Impossibile caricare la dashboard. Riprova."
+    }
+  }
+}

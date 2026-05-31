@@ -56,8 +56,8 @@ const submitLabel = computed(() =>
  * Resolve the post-login navigation target.
  *
  * Stabilization (post-Sprint 3): pre-fix this page sent every user to
- * `/` after a successful login, which is `app.dashboard` →
- * `DashboardPlaceholderPage` wrapped in `AgencyLayout` (sidebar:
+ * `/` after a successful login, which is `app.dashboard` → the agency
+ * dashboard page wrapped in `AgencyLayout` (sidebar:
  * Dashboard / Brands / Team / Settings). For a creator who arrived
  * via the bulk-invite magic link → sign-up → sign-in path, that's the
  * wrong shell entirely — they should land on the onboarding wizard's

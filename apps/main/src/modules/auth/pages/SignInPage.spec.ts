@@ -118,7 +118,7 @@ describe('SignInPage', () => {
   // ---------------------------------------------------------------------
   // Stabilization (post-Sprint 3) — post-login dispatch by user_type.
   // Pre-fix, every user (including creators) was pushed to `/`, which
-  // is `app.dashboard` → DashboardPlaceholderPage wrapped in the agency
+  // is `app.dashboard` → the agency dashboard page wrapped in the agency
   // shell (sidebar: Dashboard / Brands / Team / Settings). A creator
   // who arrived via bulk-invite → magic-link → sign-up → sign-in
   // therefore landed on the wrong layout entirely. The fix dispatches

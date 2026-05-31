@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "welcome": {
+      "greeting": "Bem-vindo de volta",
+      "greetingNamed": "Bem-vindo de volta, {name}"
+    },
+    "kpi": {
+      "activeCampaigns": "Campanhas ativas",
+      "creatorsInRoster": "Criadores no plantel",
+      "pendingApplications": "Candidaturas de criadores pendentes",
+      "paymentsDue": "Pagamentos devidos"
+    },
+    "activity": {
+      "title": "Atividade recente",
+      "empty": "Ainda não há atividade recente.",
+      "loadFailed": "Não foi possível carregar a atividade recente.",
+      "system": "O sistema",
+      "actions": {
+        "creatorInvited": "{actor} convidou um criador",
+        "bulkInviteCompleted": "{actor} executou um convite em massa ({invited} convidados, {failed} falharam)",
+        "agencyCreatorRelationCreated": "{actor} adicionou um criador ao plantel",
+        "brandCreated": "{actor} criou uma marca",
+        "brandArchived": "{actor} arquivou uma marca",
+        "brandRestored": "{actor} restaurou uma marca",
+        "invitationCreated": "{actor} convidou um membro da equipa",
+        "invitationAccepted": "{actor} juntou-se à equipa",
+        "agencySettingsUpdated": "{actor} atualizou as definições da agência",
+        "fallback": "{actor} realizou uma ação"
+      }
+    },
+    "errors": {
+      "loadFailed": "Não foi possível carregar o seu painel. Tente novamente."
+    }
+  }
+}

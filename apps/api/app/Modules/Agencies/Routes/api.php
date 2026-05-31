@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Modules\Agencies\Http\Controllers\AgencySettingsController;
+use App\Modules\Agencies\Http\Controllers\DashboardActivityController;
+use App\Modules\Agencies\Http\Controllers\DashboardSummaryController;
 use App\Modules\Agencies\Http\Controllers\InvitationController;
 use App\Modules\Agencies\Http\Controllers\InvitationPreviewController;
 use App\Modules\Agencies\Http\Controllers\MembershipController;
@@ -51,6 +53,16 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // the UI layer.
         Route::get('members', [MembershipController::class, 'index'])
             ->name('agencies.members.index');
+
+        // ─── Dashboard (workspace home) ──────────────────────────────────────
+        // Sprint 4 Chunk 1. Any agency member may read the dashboard; no MFA
+        // gate (matches the `/` route). `summary` returns the four KPI values
+        // in one payload (1b); `activity` returns the agency-scoped audit feed
+        // (1c).
+        Route::get('dashboard/summary', DashboardSummaryController::class)
+            ->name('agencies.dashboard.summary');
+        Route::get('dashboard/activity', DashboardActivityController::class)
+            ->name('agencies.dashboard.activity');
     });
 
 // ─── Accept invitation ────────────────────────────────────────────────────────
