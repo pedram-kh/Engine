@@ -1,0 +1,331 @@
+/*
+ * Catalyst Engine — brand mail theme (Sprint 3.5 Chunk 4, Workstream C).
+ *
+ * A rebrand of Laravel's stock `default.css` markdown-mail theme to the
+ * Engine C v2 brand palette. Pointed at by `config/mail.php`
+ * (`markdown.theme => 'catalyst'`); Laravel inlines this CSS into the
+ * `style=""` attributes of the rendered email via css-to-inline-styles.
+ *
+ * HEX-NOT-VARS (the one Sprint 3.5 exception): email clients do NOT resolve
+ * CSS custom properties, so this theme uses brand HEX LITERALS, not
+ * `var(--brand-*)`. This is the deliberate inverse of the SPA token
+ * discipline — here "tokenize" means "apply the brand hex values."
+ *
+ * LIGHT SURFACE: email dark-mode is unreliable across clients, so the theme
+ * mirrors the SPA's LIGHT mode (zinc-50 page, white panel, zinc text), never
+ * the dark default. Hex values are drawn from @catalyst/design-tokens:
+ *   - teal-700  #0B6F66  brand action (button + links). NOTE: this is a
+ *       DARKER teal than the SPA primary (teal-500 #14B8A6) ON PURPOSE — the
+ *       mail theme is always a light surface, the marginal-contrast regime,
+ *       where white-on-teal-500 measures only ~2.49:1 (fails AA). teal-700
+ *       gives white text ~5.5:1 (AA-normal). Do NOT "fix" this to match the
+ *       SPA primary; that would reintroduce the contrast failure. The SPA
+ *       keeps teal-500 because its default surface is DARK (good contrast)
+ *       and the light-mode primary is the documented contrast it.todo.
+ *   - zinc-900  #18181B  headings / wordmark
+ *   - zinc-800  #27272A  body text
+ *   - zinc-600  #52525B  table text
+ *   - zinc-500  #71717A  muted / footer text
+ *   - zinc-200  #E4E4E7  borders
+ *   - zinc-100  #F4F4F5  panel fill
+ *   - zinc-50   #FAFAFA  page background
+ *   - success   #16A34A / danger #DC2626  secondary semantic buttons
+ */
+
+/* Base */
+
+body,
+body *:not(html):not(style):not(br):not(tr):not(code) {
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+    position: relative;
+}
+
+body {
+    -webkit-text-size-adjust: none;
+    background-color: #ffffff;
+    color: #27272a;
+    height: 100%;
+    line-height: 1.4;
+    margin: 0;
+    padding: 0;
+    width: 100% !important;
+}
+
+p,
+ul,
+ol,
+blockquote {
+    line-height: 1.4;
+    text-align: left;
+}
+
+a {
+    color: #0b6f66;
+}
+
+a img {
+    border: none;
+}
+
+/* Typography */
+
+h1 {
+    color: #18181b;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: left;
+}
+
+h2 {
+    color: #18181b;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: left;
+}
+
+h3 {
+    color: #18181b;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: left;
+}
+
+p {
+    font-size: 16px;
+    line-height: 1.5em;
+    margin-top: 0;
+    text-align: left;
+}
+
+p.sub {
+    font-size: 12px;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Layout */
+
+.wrapper {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #fafafa;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.content {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Header */
+
+.header {
+    padding: 25px 0;
+    text-align: center;
+}
+
+.header a {
+    color: #18181b;
+    font-size: 19px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* Logo */
+
+.logo {
+    height: 75px;
+    max-height: 75px;
+    width: 75px;
+}
+
+/* Body */
+
+.body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #fafafa;
+    border-bottom: 1px solid #fafafa;
+    border-top: 1px solid #fafafa;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.inner-body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    background-color: #ffffff;
+    border-color: #e4e4e7;
+    border-radius: 8px;
+    border-width: 1px;
+    box-shadow: 0 2px 0 rgba(9, 9, 11, 0.04), 2px 4px 0 rgba(9, 9, 11, 0.03);
+    margin: 0 auto;
+    padding: 0;
+    width: 570px;
+}
+
+.inner-body a {
+    word-break: break-all;
+}
+
+/* Subcopy */
+
+.subcopy {
+    border-top: 1px solid #e4e4e7;
+    margin-top: 25px;
+    padding-top: 25px;
+}
+
+.subcopy p {
+    font-size: 14px;
+}
+
+/* Footer */
+
+.footer {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    margin: 0 auto;
+    padding: 0;
+    text-align: center;
+    width: 570px;
+}
+
+.footer p {
+    color: #71717a;
+    font-size: 12px;
+    text-align: center;
+}
+
+.footer a {
+    color: #71717a;
+    text-decoration: underline;
+}
+
+/* Tables */
+
+.table table {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 30px auto;
+    width: 100%;
+}
+
+.table th {
+    border-bottom: 1px solid #e4e4e7;
+    margin: 0;
+    padding-bottom: 8px;
+}
+
+.table td {
+    color: #52525b;
+    font-size: 15px;
+    line-height: 18px;
+    margin: 0;
+    padding: 10px 0;
+}
+
+.content-cell {
+    max-width: 100vw;
+    padding: 32px;
+}
+
+/* Buttons */
+
+.action {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 30px auto;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+    float: unset;
+}
+
+.button {
+    -webkit-text-size-adjust: none;
+    border-radius: 6px;
+    color: #fff;
+    display: inline-block;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.button-blue,
+.button-primary {
+    background-color: #0b6f66;
+    border-bottom: 8px solid #0b6f66;
+    border-left: 18px solid #0b6f66;
+    border-right: 18px solid #0b6f66;
+    border-top: 8px solid #0b6f66;
+}
+
+.button-green,
+.button-success {
+    background-color: #16a34a;
+    border-bottom: 8px solid #16a34a;
+    border-left: 18px solid #16a34a;
+    border-right: 18px solid #16a34a;
+    border-top: 8px solid #16a34a;
+}
+
+.button-red,
+.button-error {
+    background-color: #dc2626;
+    border-bottom: 8px solid #dc2626;
+    border-left: 18px solid #dc2626;
+    border-right: 18px solid #dc2626;
+    border-top: 8px solid #dc2626;
+}
+
+/* Panels */
+
+.panel {
+    border-left: #0b6f66 solid 4px;
+    margin: 21px 0;
+}
+
+.panel-content {
+    background-color: #f4f4f5;
+    color: #3f3f46;
+    padding: 16px;
+}
+
+.panel-content p {
+    color: #3f3f46;
+}
+
+.panel-item {
+    padding: 0;
+}
+
+.panel-item p:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* Utilities */
+
+.break-all {
+    word-break: break-all;
+}

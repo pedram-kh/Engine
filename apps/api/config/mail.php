@@ -115,4 +115,26 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Markdown Mail Settings
+    |--------------------------------------------------------------------------
+    |
+    | The Engine C v2 brand mail theme (Sprint 3.5 Chunk 4, Workstream C).
+    | Markdown mailables render through the published vendor views under
+    | resources/views/vendor/mail and inline the 'catalyst' theme CSS as hex
+    | literals (email clients do not resolve CSS custom properties). The theme
+    | is a LIGHT surface mirroring the SPA's light mode — see
+    | resources/views/vendor/mail/html/themes/catalyst.css.
+    |
+    */
+
+    'markdown' => [
+        'theme' => 'catalyst',
+
+        'paths' => [
+            resource_path('views/vendor/mail'),
+        ],
+    ],
+
 ];
