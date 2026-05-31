@@ -360,6 +360,102 @@ Before Claude produces a merged review file for Chunk N, Claude must read the pr
 
 This is Claude's counterpart to Cursor's mandatory read-list at session start.
 
+### 5.21 Cross-tenant allowlist categorisation
+
+**Established:** Sprint 3 Chunk 1 (F1 audit)
+
+The tenancy allowlist conflates three semantically distinct categories (cross-tenant admin tooling / tenant-less / path-scoped tenant). When adding routes that bypass the standard tenancy stack, name the category explicitly in the row justification. The categorisation note lives in `security/tenancy.md` § 4; the structural `Category` column is open tech-debt.
+
+### 5.22 `withAdmin()` factory for symmetric resources
+
+**Established:** Sprint 3 Chunk 3
+
+When a resource serves both creator-self + admin audiences, keep ONE `toArray()` shape with an `admin_attributes` block conditionally appended via a factory toggle (`->withAdmin(true)`). No parallel `AdminXResource` subclass. Applies to all admin-bearing resources.
+
+### 5.23 Module-scoped boolean for "did this surface render once this tab?"
+
+**Established:** Sprint 3 Chunk 3 (`internal/welcomeBackFlag.ts`)
+
+The three-signals-three-timing-windows analysis (auth-store flag vs onboarding-store flag vs module-scoped flag) is the reusable framing for any future "first-mount-in-tab" detection. The module-scoped in-memory boolean is reset by the relevant store action on logout and has zero coupling to persisted state.
+
+### 5.24 Per-route MFA-enrolment gating, not blanket gating
+
+**Established:** Sprint 3 Chunk 4
+
+Admin-sensitive surfaces (`/agency-users`, `/creator-invitations/bulk`) carry `requireMfaEnrolled` in their guard chain; non-sensitive surfaces (dashboard, brands, settings) do not. Selective gating must be pinned with a negative-case assertion (see 5.34) verified via break-revert (see 5.35).
+
+### 5.25 Backend / frontend constant parity via architecture tests
+
+**Established:** Sprint 3 Chunk 4 (`field-edit-config-parity.spec.ts`)
+
+When a backend Laravel `Request` class pins enums / field lists as a SOT, an architecture test source-inspects both layers (extends 5.1). Where backend validation is permissive (e.g. `size:2` strings), parity is docstring-only with a tech-debt entry — and the review prose must NOT claim the test enforces what it cannot (see 5.35).
+
+### 5.26 Test-helper seam for "skip multi-step setup"
+
+**Established:** Sprint 3 Chunk 4 (`enroll_2fa` flag on `agencies/setup`); precursor Chunk 3 `setQueueMode`
+
+When an E2E spec needs a subject in a state that would require 10+ SPA navigations to reach via production paths, extend the existing test-helper with an optional flag for the target state, gated by the chunk-6.1 helper-token middleware. The double-gating discipline (provider gate at boot + token middleware per-request) keeps production traffic out.
+
+### 5.27 Cross-layer contract-gap diagnostic pattern
+
+**Established:** Sprint 3 Chunk 3 (avatar-completeness gap); reinforced Chunk 4 (B1 multipart Content-Type gap)
+
+CI failures on cross-layer specs are first-class diagnostic surfaces. Trace the disabled-state condition (which field is missing? which calculator returns false?) rather than retrying. Cross-layer contract gaps surface as CI timeouts ("Submit never enables"), not explicit assertion failures — the seam between two structurally-correct layers is the highest-leverage bug class.
+
+### 5.28 `Promise.all([page.waitForURL, click])` for cross-step navigation
+
+**Established:** Sprint 3 Chunk 3 (CI race)
+
+Pin the navigation expectation BEFORE the click dispatches. Applies to all future Playwright specs with cross-step navigation. **Companion pattern (Chunk 4):** prefer `page.goto()` for Vuetify `:to`-bound widget navigation in Playwright specs (verify-visible-then-goto).
+
+### 5.29 Single async path for long-running operations
+
+**Established:** Sprint 3 Chunk 4 (bulk-invite)
+
+Submit + 202 + poll → terminal status. No "inline preview + edit + submit" hybrid UX. Applies to all future long-running operations (campaign launch, payout disbursement, etc.).
+
+### 5.30 One row per field for admin edit, not multi-field forms
+
+**Established:** Sprint 3 Chunk 4
+
+Each editable field is its own transaction with its own audit row. Avoids partial-state ambiguity. Applies to all future admin edit surfaces.
+
+### 5.31 Server-side markdown rendering with strict CommonMark config
+
+**Established:** Sprint 3 Chunk 3 (`ContractTermsRenderer`)
+
+`league/commonmark` with `allow_unsafe_links: false` + `html_input: 'escape'` for any platform-controlled markdown source rendered via `v-html` in the SPA. Applies to any future contract/terms/markdown-source rendering.
+
+### 5.32 Decision reinterpretation at plan-pause-time
+
+**Established:** Sprint 3 Chunk 4 (B=c, C2=a); load-tested across all of Sprint 3.5
+
+Locked decisions can survive read-pass divergences via reinterpretation provided the **structural intent** is preserved while the **mechanism** adapts to verified reality. The cost saving is meaningful: a re-decision round-trip costs at minimum one review pass; reinterpretation costs zero extra round-trips when the intent is preserved. The trick is knowing which intent the decision was actually serving — so every locked decision should have its structural intent explicitly named in the kickoff, so future read passes know what is reinterpretable vs load-bearing. (Sprint 3.5 exercised this every chunk; Chunk 4's "auth hero / welcome bar" → "thin accents on persistent surfaces that exist today" is the clearest case of the pattern changing _what_ gets built.)
+
+### 5.33 Setter-injection breaks Pinia circular dependencies
+
+**Established:** Sprint 3 Chunk 4 (`useAgencyStore.setAuthRebootstrap(fn)`)
+
+When store A needs to invoke store B's actions but B already imports A, the dependency-aware store imports a `setHook(fn)` setter from the dependency-free store and calls it from inside the factory function body. Reusable for any future cross-store action coupling.
+
+### 5.34 Negative-case assertions in architecture tests
+
+**Established:** Sprint 3 Chunk 4 (PMC-1)
+
+Tests that pin a positive case (X has property P) often miss the negative case (only X has property P). Pinning both is what defends a decision against silent broadening. Pairs with 5.17 (selective gating) and is verified via break-revert (5.35).
+
+### 5.35 Architecture-test claim verification via break-revert
+
+**Established:** Sprint 3 Chunk 4 (spot-check pass surfacing two overclaims); reaffirmed throughout Sprint 3.5
+
+Every "the architecture test enforces X" claim in a chunk review must pair with a break-revert verification — temporarily mutate the source to violate the invariant, confirm the test fails, revert. The only mechanism that surfaces the "claim more rigor than the test enforces" failure mode. Sprint 3.5 added the corollary (Chunk 4): **after any break-revert, verify the restore via `git status` / `git diff`** — a `git checkout` restore can silently fail to take, leaving an uncommitted mutation.
+
+### 5.36 Asymmetric test coverage acknowledgement
+
+**Established:** Sprint 3 Chunk 4 (B1 multipart fix)
+
+Multi-part fixes may have one leg pinned in unit tests and another leg covered only by E2E. Document the asymmetry explicitly in the review prose rather than implying uniform coverage. A generalisation of 5.35: some defense-in-depth coverage is structurally untestable at the unit level and relies on integration paths.
+
 ---
 
 ## 6. The "Q-and-A before code" pattern

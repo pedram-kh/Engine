@@ -313,8 +313,8 @@ anyone reviewing it later.
   1. **Remove `tokens.css` entirely** and remove the import from both SPAs' `main.ts`. The brand/neutral CSS variables ARE technically useful for the rare case a component needs a raw value (logos, gradients), but the chunks 6/7/8 compliance shows that case has not arisen.
   2. **Keep `tokens.css` as a documented escape hatch** (logo gradients, marketing pages) and add an architecture test that allowlists known consumers. Today: zero allowlist entries.
   3. **Standardize on `tokens.css` + `data-theme` attribute** instead of Vuetify's theme system. Directly contradicts the chunk-8 kickoff's "extend Vuetify's existing theme system rather than building a parallel CSS variable layer" — would require revisiting the whole foundational decision.
-- **Owner:** the next chunk that surfaces a real `--color-*` consumer OR an explicit cleanup chunk (e.g., a Phase-1-late tooling pass).
-- **Status:** open (narrowed scope — only the broader dormant-variable question remains; the `@media` hazard sub-concern was resolved in Sprint 1 chunk 8.2).
+- **Owner:** ~~the next chunk that surfaces a real `--color-*` consumer OR an explicit cleanup chunk.~~
+- **Status:** **closed** in Sprint 3.5 Chunk 5 (W1) via resolution option 1 (remove the dormant `--color-*` layer). `tokens.css` was NOT deleted wholesale — it is kept as the carrier for the non-color-system tokens that the Vuetify theme layer doesn't own: `--brand-*` (incl. `--brand-aurora-*`, a live 4-surface consumer), `--radius-*`, `--space-*`, `--font-*`, and `--catalyst-typography-*`. The `main.ts` imports stay. Only the dormant, zero-consumer `--color-*` / `--neutral-*` semantic-variable layer was removed, so there is no longer a parallel-CSS-variable-system question. (The `@media` hazard sub-concern was resolved earlier in Sprint 1 chunk 8.2.)
 
 ---
 
@@ -345,11 +345,15 @@ anyone reviewing it later.
 ## Standards migration backlog — PROJECT-WORKFLOW.md §5 not yet authoritative
 
 - **Where:** [`docs/PROJECT-WORKFLOW.md`](./PROJECT-WORKFLOW.md) §5 — "Standing standards" list.
-- **What we accepted in Sprint 3 Chunk 1:** §5 today documents standards #5.1–#5.20. The Sprint-1 chunk-7.1 saga added several review-file standards (#5.21+) and the Sprint-2 self-review §b appended ~7 more (cross-chunk handoff verification = #34, defense-in-depth coverage = #40, sandbox Pint not authoritative = #41, no enumerable identifiers = #42, etc.). These standards are de facto applied (Chunk 1 of Sprint 3 explicitly enumerated them as the binding baseline) but have not yet been migrated into PROJECT-WORKFLOW.md §5.
-- **Risk:** a future contributor doing a fresh read of PROJECT-WORKFLOW.md will only see #5.1–#5.20 and may unintentionally regress against the unwritten ~7 additional standards.
-- **Resolution:** in a dedicated housekeeping commit (NOT a feature chunk — process-doc work), append the Sprint 1 chunk-7.1 + Sprint 2 self-review §b standards into PROJECT-WORKFLOW.md §5 with stable numbering. Per Pedram's guidance: drives the migration before Sprint 4 kickoff.
-- **Owner:** dedicated housekeeping commit; Pedram drives.
-- **Status:** open.
+- **What we accepted in Sprint 3 Chunk 1:** §5 at the time documented standards #5.1–#5.20, and this entry asserted the Sprint-2 self-review §b standards were not yet migrated. **That claim was already stale when written:** Sprint 2 §b's 7 patterns were in fact already present as **#5.11–#5.17**. (#5.18–#5.20 — CI-authoritative Pint, user-enumeration for preview/status endpoints, read-prior-review-before-merge — originated from the Sprint 1 chunk-7.1/8 reviews + the §g observations, not Sprint 2 §b.) The confusing parallel "#34 / #40 / #41 / #42" numbering used in the Sprint 3 chunk reviews was a legacy review-file scheme that maps cleanly onto the §5.x scheme:
+  - **#34** (cross-chunk handoff verification) = **§5.11**
+  - **#40** (defense-in-depth coverage) = **§5.17** — its "break-revert" connotation in the chunk reviews is captured separately as **§5.35** (architecture-test claim verification via break-revert)
+  - **#41** (sandbox Pint not authoritative) = **§5.18**
+  - **#42** (no enumerable identifiers) = **§5.19**
+  - The legacy `#34/#40/#41/#42` labels are deprecated; cite the `§5.x` numbers going forward.
+- **Resolution:** ~~Sprint 2 §b → §5.11–5.17 (already done before this entry).~~ Sprint 3 self-review §b's 16 patterns migrated to **§5.21–§5.36** in Sprint 3.5 Chunk 5 (W4.1). The §5 list is now authoritative through Sprint 3; the parallel numbering is normalized to `§5.x`.
+- **Owner:** ~~dedicated housekeeping commit; Pedram drives.~~
+- **Status:** **closed** in Sprint 3.5 Chunk 5 (W4.2). Sprint 2 §b confirmed already migrated (#5.11–5.17 — the original "un-migrated" claim was stale; #5.18–5.20 are Sprint 1 chunk-7.1/8 origin, not Sprint 2 §b); Sprint 3 §b migrated as #5.21–5.36; legacy `#34/#40/#41/#42` numbering normalized to `§5.x`.
 
 ---
 
@@ -569,9 +573,9 @@ anyone reviewing it later.
 - **Risk:** two neutral scales coexist in the token package. A future contributor could reach for `neutral.*` (warm) when they meant `zinc.*` (true-neutral), producing a subtly-off surface. Low blast radius today — `semantic.ts` is the only theme-facing consumer and it is fully on zinc.
 - **Mitigation today:** the migration is complete at the theme layer; `neutral` survives only for the brand-color + semantic-chip-foreground cases that legitimately want its warmth. Comments in `tokens.ts` + `semantic.ts` mark `neutral` as deprecated.
 - **Triggered by:** Sprint 3.5 Chunk 4 (component-override / visual-regression sweep) once warm-gray consumers are audited, OR any chunk that touches the brand-surface tokens.
-- **Resolution:** audit every `neutral.*` / `--neutral-*` consumer; migrate brand surfaces + semantic-chip foregrounds onto explicit literals or `zinc.*` as appropriate; delete the `neutral` scale + `--neutral-*` vars. Estimated effort: ~1-2 hours including a grep-driven consumer hunt and the parity test extension.
-- **Owner:** Sprint 3.5 Chunk 4 OR the brand-surface consolidation chunk.
-- **Status:** open. Surfaced by Sprint 3.5 Chunk 1, May 31, 2026.
+- **Resolution:** ~~audit every `neutral.*` / `--neutral-*` consumer; migrate brand surfaces + semantic-chip foregrounds onto explicit literals or `zinc.*` as appropriate; delete the `neutral` scale + `--neutral-*` vars.~~ Done across Chunks 4–5: Chunk 4 severed the last runtime consumer (`vuetify.ts` semantic-chip foregrounds → `#FFFFFF` / `zinc[950]` literals, regression-locked by the `vuetify.spec.ts` severance test); Chunk 5 (W1) deleted the `neutral` const + `NeutralTokens` type from `tokens.ts` and the `--neutral-*` block from `tokens.css`. `brand.cream` / `brand.ink` confirmed to be standalone hex literals (they never referenced the `neutral` scale — the prior docblock prose was corrected).
+- **Owner:** ~~Sprint 3.5 Chunk 4 OR the brand-surface consolidation chunk.~~
+- **Status:** **closed** in Sprint 3.5 Chunk 5 (W1). Severed Chunk 4; primitive + CSS deleted Chunk 5. Surfaced by Sprint 3.5 Chunk 1, May 31, 2026.
 
 ---
 
@@ -595,9 +599,9 @@ anyone reviewing it later.
 - **Risk:** if a future component starts consuming `var(--color-bg-app)` etc., it would render the OLD warm-gray surface, diverging visibly from the Vuetify-driven zinc surface the rest of the app uses. Zero risk while consumer count stays at 0.
 - **Mitigation today:** none needed — dormant. The `data-theme='dark'` block is also referenced by the new `<html data-theme="dark">` attribute (decorative; the SPAs aren't PWA-configured and nothing reads `--color-*`).
 - **Triggered by:** the broader `tokens.css` `--color-*` removal-or-migrate decision (already tracked from chunk 8.2), OR the first component that consumes a `--color-*` variable.
-- **Resolution:** either (a) delete the dormant `--color-*` blocks entirely (they duplicate the Vuetify theme layer), or (b) migrate their neutral references to `--zinc-*` (requires also adding `--zinc-*` primitives to `tokens.css`) if a CSS-variable consumption path is ever desired. Decide at the same time as the warm-gray `neutral` deprecation above. Estimated effort: ~30 minutes (deletion) or ~1 hour (migration).
-- **Owner:** Sprint 3.5 Chunk 4 / brand-surface consolidation chunk.
-- **Status:** open. Surfaced (re-confirmed) by Sprint 3.5 Chunk 1, May 31, 2026.
+- **Resolution:** ~~either (a) delete the dormant `--color-*` blocks entirely (they duplicate the Vuetify theme layer), or (b) migrate their neutral references to `--zinc-*`.~~ Resolved via option (a): Chunk 5 (W1) deleted both `:root[data-theme='light']` / `:root[data-theme='dark']` `--color-*` blocks (and the chunk-8.2 `@media`-removal note that only documented them) from `tokens.css`. The deletion audit re-confirmed zero `var(--color-*)` consumers across both SPAs' source. The Vuetify `theme.colors` layer (zinc) is the sole color path; `tokens.css` now carries only `--brand-*` / `--radius-*` / `--space-*` / `--font-*` / `--catalyst-typography-*`.
+- **Owner:** ~~Sprint 3.5 Chunk 4 / brand-surface consolidation chunk.~~
+- **Status:** **closed** in Sprint 3.5 Chunk 5 (W1). Surfaced (re-confirmed) by Sprint 3.5 Chunk 1, May 31, 2026.
 
 ---
 
@@ -608,9 +612,9 @@ anyone reviewing it later.
 - **Risk:** a reader treating `01-UI-UX.md` as current would mis-describe the neutral scale, the brand accent, and the theme model. Bounded — the code + the Sprint 3.5 chunk reviews are the accurate record in the interim.
 - **Mitigation today:** the Sprint 3.5 Chunk 1 review ([`reviews/sprint-3-5-chunk-1-review.md`](reviews/sprint-3-5-chunk-1-review.md)) documents the as-built v2 decisions (D1–D7, R1, the five reinterpretations); the design-tokens source + the `color-system-parity` architecture test are self-describing.
 - **Triggered by:** Sprint 3.5 Chunk 5 (documentation chunk) per the kickoff plan.
-- **Resolution:** rewrite `docs/01-UI-UX.md` §2 (colour) + §3 (typography) to describe the zinc neutral scale, the aurora utility accent + co-brand relationship to teal/violet, the self-hosted Inter typeface, and the binary dark-default theme model. Cross-link the parity architecture test as the enforcement artifact. Estimated effort: bundled into Chunk 5's scope.
-- **Owner:** Sprint 3.5 Chunk 5.
-- **Status:** open (scheduled). Surfaced by Sprint 3.5 Chunk 1, May 31, 2026.
+- **Resolution:** ~~rewrite `docs/01-UI-UX.md` §2 (colour) + §3 (typography).~~ Done in Chunk 5 (W2): §2 rewritten wholesale (§2.1–2.7 — zinc neutrals, teal co-brand, aurora utility/D7, single-value semantics, container/variant tokens, binary dark-default theme model, and the correct Vuetify-theme-layer consumption path); §3 corrected (self-host path → `packages/ui/assets/fonts/`, static weights); the theme-model framing fixed in §1/§10/§14; the stale `var(--color-*)` consumption guidance reconciled in §2.7 + §12 + `02-CONVENTIONS.md` §3.8. The `color-system-parity` test is cross-linked as the enforcement artifact.
+- **Owner:** ~~Sprint 3.5 Chunk 5.~~
+- **Status:** **closed** in Sprint 3.5 Chunk 5 (W2). Surfaced by Sprint 3.5 Chunk 1, May 31, 2026.
 
 ---
 
@@ -636,7 +640,7 @@ anyone reviewing it later.
 - **Resolution:** set up Vitest + jsdom + `@vue/test-utils` in `packages/ui` per the shared-package extraction pattern from `02-CONVENTIONS.md §1`. Migrate the co-located SPA specs back into the package. Estimated effort: ~4-6 hours of infrastructure work.
 - **Triggered by:** the next chunk that adds 2+ shared components, OR an explicit decision to invest in package-level testing.
 - **Owner:** open.
-- **Status:** open. Surfaced by Sprint 3.5 Chunk 2 read pass, 2026-05-31.
+- **Status:** **open** — re-affirmed open at Sprint 3.5 Chunk 5 (W4.3). Standing up a package-level harness is infrastructure work Sprint 3.5 deliberately deferred (a docs/deletion chunk is the wrong place for it); the Chunk 5 self-review documents this as the correct deferral. Surfaced by Sprint 3.5 Chunk 2 read pass, 2026-05-31.
 
 ---
 
@@ -649,4 +653,4 @@ anyone reviewing it later.
 - **Resolution:** register the Catalyst themes in the harness (`createVuetify({ ..., theme: { defaultTheme, themes: { light: lightTheme, dark: darkTheme } } })`) and add an option to mount a component under a chosen theme, enabling targeted dark-mode rendering assertions (e.g. snapshot or computed-style probes on the highest-CSS surfaces — onboarding cluster, PortfolioGallery, dialogs). Estimated effort: ~3-4 hours including a first batch of dark-mode rendering specs.
 - **Triggered by:** the next visual/theming chunk, OR a dark-mode rendering regression slipping past CI into a manual sweep.
 - **Owner:** open.
-- **Status:** open. Surfaced by Sprint 3.5 Chunk 3 visual-regression sweep, 2026-05-31.
+- **Status:** **open** — re-affirmed open at Sprint 3.5 Chunk 5 (W4.3). Registering the Catalyst themes in the harness is infrastructure work Sprint 3.5 deferred; the **eyes-on sweep** (Chunks 3–4) remains the documented continuing mitigation, alongside the `color-system-parity` value-locks and the `no-hard-coded-colors` / `no-inline-color-styles` guards. The Chunk 5 self-review (§4) names this the mini-sprint's largest standing risk and flags the first Sprint 4 rendered-surface chunk to weigh closing it. Surfaced by Sprint 3.5 Chunk 3 visual-regression sweep, 2026-05-31.
