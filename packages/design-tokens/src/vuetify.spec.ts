@@ -25,13 +25,19 @@
  * the runtime bundle of either SPA.
  */
 
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 import { colord, extend } from 'colord'
 import a11yPlugin from 'colord/plugins/a11y'
 
+import { zinc } from './tokens'
 import { lightTheme, darkTheme, type CatalystThemeDefinition } from './vuetify'
 
 extend([a11yPlugin])
+
+const VUETIFY_SRC = readFileSync(path.resolve(__dirname, 'vuetify.ts'), 'utf8')
 
 /**
  * Vuetify-standard semantic token set the kickoff requires. Both
@@ -223,4 +229,42 @@ describe('Vuetify theme definitions — WCAG AA-Large contrast on accent pairs (
       })
     }
   }
+})
+
+/**
+ * Warm-`neutral` dependency severance (Sprint 3.5 Chunk 4, Workstream B).
+ *
+ * `vuetify.ts` was the LAST runtime consumer of the warm `neutral`
+ * primitive (`on-info`/`on-success` = `neutral[0]`, `on-warning` =
+ * `neutral[900]`). Chunk 4 severs that dependency so the warm scale can be
+ * deleted in Chunk 5. This source-inspection invariant regression-locks the
+ * severance: re-importing `neutral` here would re-create the dead-code
+ * dependency the Chunk-5 cleanup is waiting to remove. Break-revert: add
+ * `neutral` back to the import → the first assertion fails.
+ */
+describe('Vuetify theme definitions — warm-neutral severance (Chunk 4 Workstream B)', () => {
+  it('does not import the warm `neutral` primitive', () => {
+    const importLine = VUETIFY_SRC.match(/import\s*\{([^}]*)\}\s*from\s*['"]\.\/tokens['"]/)
+    expect(importLine).not.toBeNull()
+    const imported = importLine?.[1] ?? ''
+    // Word-boundary check so `neutral` is matched as a named import, not as
+    // a substring of another identifier.
+    expect(imported).not.toMatch(/\bneutral\b/)
+  })
+
+  it('keeps on-info / on-success pure white in both themes (not zinc[50])', () => {
+    for (const theme of [lightTheme, darkTheme]) {
+      expect(theme.colors['on-info']?.toLowerCase()).toBe('#ffffff')
+      expect(theme.colors['on-success']?.toLowerCase()).toBe('#ffffff')
+      // Guard against the worsening-contrast map the plan explicitly rejected.
+      expect(theme.colors['on-info']?.toLowerCase()).not.toBe(zinc[50].toLowerCase())
+      expect(theme.colors['on-success']?.toLowerCase()).not.toBe(zinc[50].toLowerCase())
+    }
+  })
+
+  it('migrates on-warning to zinc[950] in both themes', () => {
+    for (const theme of [lightTheme, darkTheme]) {
+      expect(theme.colors['on-warning']?.toLowerCase()).toBe(zinc[950].toLowerCase())
+    }
+  })
 })

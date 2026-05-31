@@ -66,12 +66,34 @@
  *             refinement in view.
  *
  *   Semantic feedback foregrounds (success/warning/info) are single-value
- *   across both themes and unchanged from chunk 8.1 (Decisions D1/D2
- *   reinterpreted at plan-pause-time — "semantic colours that work in both
- *   modes", already satisfied). Their `on-*` foregrounds intentionally
- *   still reference the warm `neutral` primitive (white / near-black) —
- *   the migration to zinc applies to the surface/border/text neutral
- *   surface, not to these locked semantic chips.
+ *   across both themes and unchanged in VALUE from chunk 8.1 (Decisions
+ *   D1/D2 reinterpreted at plan-pause-time — "semantic colours that work
+ *   in both modes", already satisfied).
+ *
+ *   Warm-`neutral` dependency severance (Sprint 3.5 Chunk 4, Workstream B):
+ *   these `on-*` foregrounds previously referenced the warm `neutral`
+ *   primitive (`neutral[0]` white / `neutral[900]` near-black). Chunk 4
+ *   severs that dependency so the warm scale's last runtime consumer is
+ *   gone (teeing up its Chunk-5 deletion):
+ *     - `on-info`    — white on info (#0284C7) measures ~4.07:1 (BELOW
+ *         AA-normal). A naive `neutral[0] → zinc[50]` map would LOWER the
+ *         contrast further, so the value is KEPT as pure white, now a
+ *         `'#FFFFFF'` literal (dependency severed, value unchanged → zero
+ *         visible shift, zero contrast regression). The sub-AA contrast is
+ *         a legacy semantic-palette decision predating the brand pivot,
+ *         left as-is per Q-chunk-4-B1 (out of severance scope) and covered
+ *         by the AA-Large accent-pair assertion in `vuetify.spec.ts`
+ *         (white on info = ~4.07:1 ≥ 3.0 AA-Large) — there is no dedicated
+ *         `on-info` `it.todo`.
+ *     - `on-success` — white on success (#16A34A) ~3.13:1 (AA-Large only).
+ *         Same treatment: KEPT pure white (`'#FFFFFF'` literal), value
+ *         unchanged.
+ *     - `on-warning` — black on warning (#F59E0B). MIGRATED in value from
+ *         `neutral[900]` (#121211, ~10.4:1) to `zinc[950]` (#09090B, the
+ *         darker true-neutral near-black, ~10.6:1). Imperceptible shift;
+ *         contrast nudges up. This is the only on-* whose value changes.
+ *   After this, `vuetify.ts` no longer imports `neutral` (regression-locked
+ *   by a source-inspection test in both SPAs).
  *
  * Container / variant Material tokens (Sprint 3.5 Chunk 3 — finding (b)):
  *   `outline`, `outline-variant`, `primary-container`, `error-container`
@@ -105,7 +127,7 @@
  *   The `color-system-parity` test pins all eight values.
  */
 
-import { brand, neutral, zinc, semantic as palette } from './tokens'
+import { brand, zinc, semantic as palette } from './tokens'
 import { semanticLight, semanticDark } from './semantic'
 
 export type CatalystThemeDefinition = {
@@ -133,21 +155,22 @@ export const lightTheme: CatalystThemeDefinition = {
     'on-error': semanticLight.action.dangerFg,
     info: palette.info[500],
     // White on info (#0284C7) measures ~4.07:1 — just below AA-normal
-    // (4.5:1). Vuetify's auto-derivation would also pick white. Use
-    // neutral[0] explicitly so the value is locked at the type level
-    // and the contrast spec records the measurement; the `it.todo`
-    // keeps a future tighten-info refinement visible.
-    'on-info': neutral[0],
+    // (4.5:1), passes AA-Large. Kept pure white as a '#FFFFFF' literal
+    // (Chunk 4 Workstream B severed the warm-neutral[0] dependency;
+    // mapping to zinc[50] would WORSEN this marginal pair). The sub-AA
+    // contrast is a legacy decision left per Q-chunk-4-B1.
+    'on-info': '#FFFFFF',
     success: palette.success[500],
     // White on success (#16A34A) measures ~3.13:1 — passes AA-Large
-    // (3.0:1) but fails AA-normal. Vuetify auto-derivation also picks
-    // white. Locked explicitly for the same reason as `on-info`.
-    'on-success': neutral[0],
+    // (3.0:1) but fails AA-normal. Kept pure white ('#FFFFFF' literal),
+    // dependency severed, value unchanged (Chunk 4 Workstream B).
+    'on-success': '#FFFFFF',
     warning: palette.warning[500],
-    // Black on warning (#F59E0B) measures ~10.4:1; white measures
-    // ~1.99:1. Vuetify auto-derivation would pick black; this lock
-    // makes the choice explicit and contrast-spec-verifiable.
-    'on-warning': neutral[900],
+    // Black on warning (#F59E0B). Migrated from the warm neutral[900]
+    // (#121211, ~10.4:1) to zinc[950] (#09090B, ~10.6:1) in Chunk 4
+    // Workstream B — imperceptible shift, contrast nudges up. The only
+    // on-* whose VALUE changes during the severance.
+    'on-warning': zinc[950],
     'border-color': semanticLight.border.default,
     accent: brand.violet[500],
     // Container / variant tokens (Chunk 3 finding (b)) — explicit
@@ -178,11 +201,14 @@ export const darkTheme: CatalystThemeDefinition = {
     error: semanticDark.action.danger,
     'on-error': semanticDark.action.dangerFg,
     info: palette.info[500],
-    'on-info': neutral[0],
+    // Single-value with the light theme (white); '#FFFFFF' literal after
+    // the Chunk 4 Workstream B warm-neutral[0] severance.
+    'on-info': '#FFFFFF',
     success: palette.success[500],
-    'on-success': neutral[0],
+    'on-success': '#FFFFFF',
     warning: palette.warning[500],
-    'on-warning': neutral[900],
+    // Migrated neutral[900] → zinc[950] (Chunk 4 Workstream B).
+    'on-warning': zinc[950],
     'border-color': semanticDark.border.default,
     accent: brand.violet[400],
     // Container / variant tokens (Chunk 3 finding (b)). `error-container`
