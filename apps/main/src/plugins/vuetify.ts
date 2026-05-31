@@ -1,17 +1,20 @@
 /**
  * Vuetify plugin instance for the main SPA.
  *
- * Theme registration (chunk 8.1):
+ * Theme registration (chunk 8.1; dark default since Sprint 3.5 Chunk 1):
  *   Both `light` and `dark` palettes are registered. The main SPA defaults
- *   to `light`. Theme switching is owned by the `useTheme` composable
- *   (`@/composables/useTheme`) — components MUST NOT mutate
+ *   to `dark` as of Sprint 3.5 Chunk 1 — the Engine C v2 brand is
+ *   dark-first, matching admin. Theme switching is owned by the `useTheme`
+ *   composable (`@/composables/useTheme`) — components MUST NOT mutate
  *   `theme.global.name.value` directly. Enforcement lives in
  *   `tests/unit/architecture/use-theme-is-sot.spec.ts`.
  *
  *   The theme keys (`light`, `dark`) and definitions (`lightTheme`,
- *   `darkTheme`) come from `@catalyst/design-tokens/vuetify`. The exports
- *   were renamed from `catalystLightTheme` / `catalystDarkTheme` in
- *   chunk 8.1 to honor Vuetify's standard naming.
+ *   `darkTheme`) come from `@catalyst/design-tokens/vuetify`. Sprint 3.5
+ *   Chunk 1 Refinement R1 preserved these Vuetify-standard keys (the
+ *   kickoff's proposed `engineCLight` / `engineCDark` rename was
+ *   reinterpreted back to `light` / `dark` — the brand identity lives in
+ *   the theme values, not the key names).
  */
 
 import 'vuetify/styles'
@@ -28,7 +31,7 @@ const dark: ThemeDefinition = darkTheme
 
 export const vuetify = createVuetify({
   theme: {
-    defaultTheme: 'light',
+    defaultTheme: 'dark',
     themes: {
       light,
       dark,

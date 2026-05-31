@@ -35,6 +35,15 @@
   --brand-ink: #0a0a0b;
   --brand-gradient: linear-gradient(135deg, #14b8a6 0%, #8b5cf6 100%);
 
+  /* Aurora accent (Engine C v2 — Sprint 3.5 Chunk 1, Decision D7).
+   * Utility-only: consumed directly via var(--brand-aurora-gradient) on
+   * specific surfaces. NOT a Vuetify theme color (the color-system-parity
+   * architecture test pins the not-in-theme-colors invariant). */
+  --brand-aurora-start: #cd69ff;
+  --brand-aurora-mid: #7fc3ff;
+  --brand-aurora-end: #00fff2;
+  --brand-aurora-gradient: linear-gradient(135deg, #cd69ff 0%, #7fc3ff 50%, #00fff2 100%);
+
   /* Neutrals (warm gray) */
   --neutral-0: #ffffff;
   --neutral-50: #fafaf9;
@@ -84,6 +93,54 @@
   /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Engine C v2 brand font (Sprint 3.5 Chunk 1, Decision D6 reinterpreted).
+   * Single source of the family stack consumed by the self-hosted Inter
+   * @font-face cascade override in @catalyst/ui/assets/fonts/inter.css
+   * (`.v-application { font-family: var(--brand-font-primary) }`). */
+  --brand-font-primary: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Type scale exposed as CSS variables (Decision D6 reinterpreted:
+   * "expose the existing 12-step TS scale as CSS-consumable"). Generated
+   * 1:1 from packages/design-tokens/src/tokens.ts `typography.scale`;
+   * the color-system-parity architecture test asserts every TS step has
+   * matching --catalyst-typography-{step}-{size,weight,line-height} vars. */
+  --catalyst-typography-display-xl-size: 48px;
+  --catalyst-typography-display-xl-weight: 700;
+  --catalyst-typography-display-xl-line-height: 56px;
+  --catalyst-typography-display-size: 36px;
+  --catalyst-typography-display-weight: 700;
+  --catalyst-typography-display-line-height: 44px;
+  --catalyst-typography-heading-1-size: 28px;
+  --catalyst-typography-heading-1-weight: 600;
+  --catalyst-typography-heading-1-line-height: 36px;
+  --catalyst-typography-heading-2-size: 22px;
+  --catalyst-typography-heading-2-weight: 600;
+  --catalyst-typography-heading-2-line-height: 30px;
+  --catalyst-typography-heading-3-size: 18px;
+  --catalyst-typography-heading-3-weight: 600;
+  --catalyst-typography-heading-3-line-height: 26px;
+  --catalyst-typography-heading-4-size: 16px;
+  --catalyst-typography-heading-4-weight: 600;
+  --catalyst-typography-heading-4-line-height: 24px;
+  --catalyst-typography-body-lg-size: 16px;
+  --catalyst-typography-body-lg-weight: 400;
+  --catalyst-typography-body-lg-line-height: 24px;
+  --catalyst-typography-body-size: 14px;
+  --catalyst-typography-body-weight: 400;
+  --catalyst-typography-body-line-height: 22px;
+  --catalyst-typography-body-sm-size: 13px;
+  --catalyst-typography-body-sm-weight: 400;
+  --catalyst-typography-body-sm-line-height: 20px;
+  --catalyst-typography-caption-size: 12px;
+  --catalyst-typography-caption-weight: 500;
+  --catalyst-typography-caption-line-height: 18px;
+  --catalyst-typography-overline-size: 11px;
+  --catalyst-typography-overline-weight: 600;
+  --catalyst-typography-overline-line-height: 16px;
+  --catalyst-typography-mono-size: 13px;
+  --catalyst-typography-mono-weight: 500;
+  --catalyst-typography-mono-line-height: 20px;
 }
 
 /* Light theme (default) */

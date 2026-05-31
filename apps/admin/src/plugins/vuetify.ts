@@ -11,9 +11,11 @@
  *   `tests/unit/architecture/use-theme-is-sot.spec.ts`.
  *
  *   The theme keys (`light`, `dark`) and definitions (`lightTheme`,
- *   `darkTheme`) come from `@catalyst/design-tokens/vuetify`. The exports
- *   were renamed from `catalystLightTheme` / `catalystDarkTheme` in
- *   chunk 8.1 to honor Vuetify's standard naming.
+ *   `darkTheme`) come from `@catalyst/design-tokens/vuetify`. Sprint 3.5
+ *   Chunk 1 Refinement R1 preserved these Vuetify-standard keys (the
+ *   kickoff's proposed `engineCLight` / `engineCDark` rename was
+ *   reinterpreted back to `light` / `dark` — the brand identity lives in
+ *   the theme values, not the key names).
  */
 
 import 'vuetify/styles'

@@ -5,13 +5,19 @@
  * The Vuetify ThemeDefinition shape is replicated as a structural type so
  * this package does not pull in vuetify as a runtime dependency.
  *
- * Theme keys (chunk 8.1):
+ * Theme keys (chunk 8.1; preserved through Sprint 3.5 Chunk 1 — R1):
  *   - `light` and `dark` align with Vuetify's standard theme names. The
  *     previous `catalystLight` / `catalystDark` keys were renamed in
  *     chunk 8.1 to honor the framework convention (review priority #1
  *     of the chunk-8 kickoff: "Tokens use Vuetify's semantic names
  *     (primary, surface, error, etc.), not custom invented names" —
  *     extending the same logic to *theme* keys).
+ *   - Sprint 3.5 Chunk 1 Refinement R1: the kickoff's proposed
+ *     `engineCDark` / `engineCLight` key rename was reinterpreted back to
+ *     these `dark` / `light` keys. The Engine C v2 brand identity lives in
+ *     the theme VALUES (zinc neutrals, aurora utility, Inter font), not
+ *     the key names — so chunk 8.1's Vuetify-standard-naming decision is
+ *     preserved unchanged.
  *
  * Token coverage (chunk 8.1):
  *   The Vuetify-standard semantic tokens enumerated below cover the
@@ -28,38 +34,44 @@
  *   `surface-*` and `*-darken-1` are Vuetify variants, `border-color` is a
  *   Vuetify CSS-variable name, and `accent` is a documented Vuetify slot.
  *
- * WCAG AA contrast on the dark palette (chunk 8.1 audit):
+ * WCAG AA contrast on the dark palette (Sprint 3.5 Chunk 1 — zinc D4 audit;
+ * chunk-8.1 baseline re-measured after the warm-grey → zinc migration):
  *   Critical pairs measured with the WCAG 2.1 relative-luminance formula
  *   (asserted at runtime by `vuetify.spec.ts`):
- *     - background (#0A0A0B brand.ink) / on-background (#F5F1EA brand.cream)
- *         → 17.7:1   ✅ AA-normal (≥ 4.5:1)
- *     - surface (#121211 neutral[900]) / on-surface (#F5F1EA brand.cream)
- *         → 16.6:1   ✅ AA-normal
- *     - primary (#2ECDAE brand.teal[400]) / on-primary (#0A0A0B neutral[950])
- *         → 10.0:1   ✅ AA-normal
- *     - error (#DC2626 palette.danger[500]) / on-error (#FFFFFF neutral[0])
+ *     - background (#09090B zinc[950]) / on-background (#D4D4D8 zinc[300])
+ *         → ~15:1    ✅ AA-normal (≥ 4.5:1)
+ *     - surface (#18181B zinc[900]) / on-surface (#D4D4D8 zinc[300])
+ *         → ~13:1    ✅ AA-normal
+ *     - primary (#2ECDAE brand.teal[400]) / on-primary (#09090B zinc[950])
+ *         → ~10:1    ✅ AA-normal  (primary stays teal — co-brand path)
+ *     - error (#DC2626 palette.danger[500]) / on-error (#FFFFFF)
  *         → 4.83:1   ✅ AA-normal (refined from #EF4444 in chunk 8.1
  *                    which measured 3.69:1 — failed AA-normal)
  *
- *   Light-palette contrast notes (the kickoff's "don't redesign light
- *   palette" directive limits chunk-8.1 to additive changes; the
- *   contrast spec asserts the additive on-* tokens we just defined):
- *     - background (#FAFAF9 neutral[50]) / on-background (#121211 neutral[900])
- *         → ~17:1    ✅ AA-normal
- *     - surface (#FFFFFF neutral[0]) / on-surface (#121211 neutral[900])
- *         → ~18:1    ✅ AA-normal
- *     - error (#DC2626 palette.danger[500]) / on-error (#FFFFFF neutral[0])
+ *   Light-palette contrast notes (Decision D5 zinc light surface):
+ *     - background (#FAFAFA zinc[50]) / on-background (#27272A zinc[800])
+ *         → ~13:1    ✅ AA-normal
+ *     - surface (#FFFFFF) / on-surface (#27272A zinc[800])
+ *         → ~14:1    ✅ AA-normal
+ *     - error (#DC2626 palette.danger[500]) / on-error (#FFFFFF)
  *         → 4.83:1   ✅ AA-normal
- *     - primary (#14B8A6 brand.teal[500]) / on-primary (#FFFFFF neutral[0])
+ *     - primary (#14B8A6 brand.teal[500]) / on-primary (#FFFFFF)
  *         → 2.49:1   ❌ FAILS AA-normal AND AA-Large
  *           — Pre-existing as of chunk 3 (design-tokens package
- *             creation). Not in chunk-8.1 scope per the kickoff
- *             ("Light theme: preserve current Vuetify light palette
- *             as the baseline (don't redesign)"). Logged in
+ *             creation); carried forward through the co-brand refresh
+ *             (the teal primary is deliberately preserved). Logged in
  *             docs/tech-debt.md as a Phase-1-late refinement target.
  *             The contrast spec excludes this pair from the light-theme
  *             assertions to keep CI green; an `it.todo` keeps the
  *             refinement in view.
+ *
+ *   Semantic feedback foregrounds (success/warning/info) are single-value
+ *   across both themes and unchanged from chunk 8.1 (Decisions D1/D2
+ *   reinterpreted at plan-pause-time — "semantic colours that work in both
+ *   modes", already satisfied). Their `on-*` foregrounds intentionally
+ *   still reference the warm `neutral` primitive (white / near-black) —
+ *   the migration to zinc applies to the surface/border/text neutral
+ *   surface, not to these locked semantic chips.
  */
 
 import { brand, neutral, semantic as palette } from './tokens'

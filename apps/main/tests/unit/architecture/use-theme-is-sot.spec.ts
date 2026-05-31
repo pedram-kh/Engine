@@ -32,20 +32,25 @@
  *      `const KEY = 'catalyst.main.theme'` and then doing storage
  *      ops through it (which the regex in (3) would miss).
  *
- *   5. Call `window.matchMedia('(prefers-color-scheme: …)')` outside
- *      the composable. The system-detection layer IS the composable;
- *      bypassing it means two listeners would race for "what does the
- *      OS prefer?" — exactly the hazard the chunk-8.2 dormant
- *      `tokens.css` `@media` removal closed.
+ *   5. Call `window.matchMedia('(prefers-color-scheme: …)')` ANYWHERE
+ *      in `src/`. Sprint 3.5 Chunk 1 dropped the `'system'` preference,
+ *      so NO file legitimately reads the OS colour scheme any more. The
+ *      ratchet is kept as a ONE-WAY design decision: re-introducing
+ *      `prefers-color-scheme` (and the two-listeners-racing hazard the
+ *      chunk-8.2 dormant `tokens.css` `@media` removal closed) requires
+ *      a deliberate edit to THIS test, not a silent component change.
+ *      Unlike (1)–(4), this pattern is NOT allowlisted for the
+ *      preference composable: the composable no longer uses matchMedia.
  *
- * Audit-first per chunk 7.2 D5 standing standard: a chunk-8.2 grep
- * across `apps/main/src/**` for `localStorage`, `matchMedia`, and the
- * literal `'catalyst.main.theme'` returned zero non-composable
- * matches at the time the patterns landed; the allowlist starts
- * empty modulo the composable file itself.
+ * Audit-first per chunk 7.2 D5 standing standard: a Sprint 3.5 Chunk 1
+ * grep across `apps/main/src/**` for `localStorage`, `matchMedia`, and
+ * the literal `'catalyst.main.theme'` returned zero non-composable
+ * matches; the allowlist holds only the composable files (for the
+ * storage primitives) modulo `useAgencyStore` (non-theme persistence).
  *
- * Both composable files are allowlisted — each IS the SOT for its
- * layer and legitimately needs the otherwise-forbidden primitives.
+ * Both composable files are allowlisted for the STORAGE primitives —
+ * each IS the SOT for its layer and legitimately needs localStorage +
+ * the key literal. Neither needs matchMedia post-Sprint-3.5.
  */
 
 import { promises as fs } from 'node:fs'
@@ -63,10 +68,11 @@ const ALLOWLISTED_RELATIVE_PATHS: ReadonlySet<string> = new Set([
   // The composable IS the SOT: it MUST mutate theme.global.name.value
   // and it MUST import useTheme from vuetify.
   'composables/useTheme.ts',
-  // The preference composable IS the SOT for persistence + system
-  // detection: it MUST call localStorage.{get,set,remove}Item with
-  // the storage key, MUST reference the literal key string, and
-  // MUST register a `prefers-color-scheme` matchMedia listener.
+  // The preference composable IS the SOT for persistence: it MUST call
+  // localStorage.{get,set,remove}Item with the storage key and MUST
+  // reference the literal key string. As of Sprint 3.5 Chunk 1 it no
+  // longer touches matchMedia (the `'system'` preference was dropped) —
+  // the matchMedia ratchet now allowlists no file at all.
   'composables/useThemePreference.ts',
   // Sprint 2 Chunk 2: useAgencyStore persists the active agency ULID in
   // localStorage under 'catalyst.agency.current'. This is non-theme

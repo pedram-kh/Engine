@@ -6,6 +6,10 @@ import { router } from './core/router'
 import { i18n } from './core/i18n'
 import { vuetify } from './plugins/vuetify'
 
+// Self-hosted Inter typeface (Engine C v2). Imported before the design
+// tokens so the @font-face + .v-application family override are
+// registered alongside the token CSS variables they consume.
+import '@catalyst/ui/assets/fonts/inter.css'
 import '@catalyst/design-tokens/tokens.css'
 
 const app = createApp(App)

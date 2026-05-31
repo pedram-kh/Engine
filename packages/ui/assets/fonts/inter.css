@@ -1,0 +1,112 @@
+/**
+ * Self-hosted Inter (static weights) — Engine C v2 brand typeface.
+ *
+ * Sprint 3.5 Chunk 1 (Q `inter_self_hosting_path` = "shared_package_ui",
+ * Q-chunk-1-3 = (b) static weights):
+ *   The woff2 files live alongside this stylesheet in
+ *   `packages/ui/assets/fonts/` and are shipped via the `@catalyst/ui`
+ *   package `exports` map. Both SPAs import this stylesheet from their
+ *   `main.ts` so a single source self-hosts the typeface for the whole
+ *   monorepo. No Google Fonts / CDN runtime dependency — fonts are
+ *   bundled and served same-origin.
+ *
+ * Static weights (Q-chunk-1-3 locked decision):
+ *   Four discrete weights — 400 / 500 / 600 / 700 — each as its own
+ *   woff2 (latin subset), normal + italic. This matches the locked
+ *   plan-pause-time decision. (An earlier build pass shipped the
+ *   variable font; that was an unintentional drift from the lock and
+ *   was reverted before commit — see the chunk-1 review's "Honest
+ *   deviations" PMC note. Variable Inter is technically fine, but the
+ *   lock stands until explicitly revisited at plan-pause-time.)
+ *
+ *   Italic is shipped because the creator-bio renderer
+ *   (`apps/main/src/modules/onboarding/composables/useBioRenderer.ts`)
+ *   emits `<em>` / `<strong><em>` from the bio Markdown subset, so
+ *   italic Inter (at body + bold weights) is a real rendered surface.
+ *
+ * `font-display: swap`:
+ *   Text renders immediately in the fallback stack and swaps to Inter
+ *   once loaded — no invisible-text flash on first paint.
+ *
+ * License: SIL Open Font License 1.1 — see `LICENSE-INTER.txt` in this
+ * directory. Copyright (c) 2016 The Inter Project Authors.
+ */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('./inter-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('./inter-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('./inter-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('./inter-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 400;
+  src: url('./inter-400-italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 500;
+  src: url('./inter-500-italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 600;
+  src: url('./inter-600-italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 700;
+  src: url('./inter-700-italic.woff2') format('woff2');
+}
+
+/**
+ * CSS-cascade font-family override (Sprint 3.5 Chunk 1 plan — preferred
+ * over Vuetify `defaults.global.style`):
+ *   Vuetify scopes its application styles under `.v-application`, which
+ *   sets its own `font-family`. Overriding it here (rather than via the
+ *   plugin's `defaults`) keeps the typeface decision in the design-layer
+ *   CSS next to the `@font-face` rules, and applies app-wide without
+ *   touching every component's `defaults`. The `--brand-font-primary`
+ *   variable (defined in `@catalyst/design-tokens/tokens.css`) is the
+ *   single source of the family stack; this rule consumes it.
+ */
+.v-application {
+  font-family: var(--brand-font-primary);
+}

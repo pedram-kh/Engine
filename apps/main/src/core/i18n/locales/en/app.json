@@ -14,8 +14,7 @@
       "toggle": {
         "label": "Theme",
         "light": "Light",
-        "dark": "Dark",
-        "system": "Match system"
+        "dark": "Dark"
       }
     },
     "nav": {

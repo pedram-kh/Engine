@@ -1,28 +1,26 @@
 /**
  * Unit tests for the admin SPA's `ThemeToggle` component.
  *
- * Surface verified (chunk 8.2 review priority #3 — "no leakage of
- * theme logic outside the composables"):
- *   - Three buttons rendered (light / dark / system) with the
- *     correct `data-test` selectors (no parent fall-through risk
- *     per the chunk-7.1 hotfix #3 lesson).
+ * Binary toggle (Sprint 3.5 Chunk 1 — `'system'` dropped):
+ *   - Two buttons rendered (light / dark) with the correct `data-test`
+ *     selectors (no parent fall-through risk per the chunk-7.1 hotfix
+ *     #3 lesson). The `system` button is GONE.
  *   - The currently-selected button reflects
  *     `useThemePreference().preference.value`.
- *   - Clicking a button calls `setPreference` with the matching
- *     value and the persistence layer flips Vuetify accordingly.
- *   - The component holds NO theme state of its own — every
- *     rendered value goes through the composable. Verified by
- *     mutating storage out-of-band and confirming the toggle
- *     re-renders to match.
+ *   - Clicking a button calls `setPreference` with the matching value
+ *     and the persistence layer flips Vuetify accordingly.
+ *   - The component holds NO theme state of its own — every rendered
+ *     value goes through the composable (verified by mutating the
+ *     preference out-of-band and confirming the toggle re-renders).
  *   - i18n: every visible string resolves through the
  *     `app.theme.toggle.*` keys (no hard-coded English).
  *
  * Mirror discipline (chunk 7.2 D2 standing standard):
  *   This spec mirrors `apps/main/tests/unit/components/
- *   ThemeToggle.spec.ts`. Both files MUST stay in structural
- *   lockstep. Differences are limited to the SPA's `STORAGE_KEY`,
- *   `SPA_DEFAULT`, and the import alias resolving to the
- *   SPA-local component + composable.
+ *   ThemeToggle.spec.ts`. Both files MUST stay in structural lockstep.
+ *   Differences are limited to the SPA's `STORAGE_KEY`, `SPA_DEFAULT`,
+ *   and the import alias resolving to the SPA-local component +
+ *   composable. Both SPAs default to `dark` as of Sprint 3.5 Chunk 1.
  */
 
 import { defineComponent, h } from 'vue'
@@ -30,7 +28,7 @@ import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
 import { createVuetify } from 'vuetify'
 import * as vuetifyComponents from 'vuetify/components'
-import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { lightTheme, darkTheme } from '@catalyst/design-tokens/vuetify'
 
@@ -55,21 +53,6 @@ function createStorageStub(initial: Record<string, string> = {}) {
       delete store[key]
     }),
   }
-}
-
-function createMatchMediaStub(initialMatches: boolean) {
-  const listeners = new Set<(event: MediaQueryListEvent) => void>()
-  const mediaQuery = {
-    matches: initialMatches,
-    media: '(prefers-color-scheme: dark)',
-    addEventListener: vi.fn((_: 'change', listener: (event: MediaQueryListEvent) => void) => {
-      listeners.add(listener)
-    }),
-    removeEventListener: vi.fn((_: 'change', listener: (event: MediaQueryListEvent) => void) => {
-      listeners.delete(listener)
-    }),
-  }
-  return { mediaQuery }
 }
 
 interface Harness {
@@ -118,24 +101,15 @@ function mountToggle(): Harness {
 
 describe('ThemeToggle — admin SPA', () => {
   let storage: ReturnType<typeof createStorageStub>
-  let media: ReturnType<typeof createMatchMediaStub>
   let originalLocalStorage: PropertyDescriptor | undefined
-  let originalMatchMedia: PropertyDescriptor | undefined
-  let matchMediaSpy: MockInstance<(query: string) => MediaQueryList> | null
 
   beforeEach(() => {
     storage = createStorageStub()
-    media = createMatchMediaStub(false)
-    matchMediaSpy = null
     originalLocalStorage = Object.getOwnPropertyDescriptor(window, 'localStorage')
-    originalMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia')
     Object.defineProperty(window, 'localStorage', {
       configurable: true,
       get: () => storage,
     })
-    matchMediaSpy = vi
-      .spyOn(window, 'matchMedia')
-      .mockImplementation(() => media.mediaQuery as unknown as MediaQueryList)
   })
 
   afterEach(() => {
@@ -143,10 +117,6 @@ describe('ThemeToggle — admin SPA', () => {
     if (originalLocalStorage !== undefined) {
       Object.defineProperty(window, 'localStorage', originalLocalStorage)
     }
-    if (originalMatchMedia !== undefined) {
-      Object.defineProperty(window, 'matchMedia', originalMatchMedia)
-    }
-    matchMediaSpy?.mockRestore()
   })
 
   describe('rendering', () => {
@@ -159,12 +129,13 @@ describe('ThemeToggle — admin SPA', () => {
       }
     })
 
-    it('renders three buttons — light, dark, and system — each with its own data-test selector', () => {
+    it('renders exactly two buttons — light and dark — each with its own data-test selector', () => {
       const h = mountToggle()
       try {
         expect(h.wrapper.find('[data-test="theme-toggle-light"]').exists()).toBe(true)
         expect(h.wrapper.find('[data-test="theme-toggle-dark"]').exists()).toBe(true)
-        expect(h.wrapper.find('[data-test="theme-toggle-system"]').exists()).toBe(true)
+        // The tri-state `system` button was removed in Sprint 3.5 Chunk 1.
+        expect(h.wrapper.find('[data-test="theme-toggle-system"]').exists()).toBe(false)
       } finally {
         h.unmount()
       }
@@ -175,10 +146,8 @@ describe('ThemeToggle — admin SPA', () => {
       try {
         const lightBtn = h.wrapper.find('[data-test="theme-toggle-light"]')
         const darkBtn = h.wrapper.find('[data-test="theme-toggle-dark"]')
-        const systemBtn = h.wrapper.find('[data-test="theme-toggle-system"]')
         expect(lightBtn.attributes('aria-label')).toBe('Light')
         expect(darkBtn.attributes('aria-label')).toBe('Dark')
-        expect(systemBtn.attributes('aria-label')).toBe('Match system')
       } finally {
         h.unmount()
       }
@@ -196,10 +165,11 @@ describe('ThemeToggle — admin SPA', () => {
   })
 
   describe('initial selection', () => {
-    it('renders with the SPA default (admin = dark) selected when storage is empty', () => {
+    it('renders with the SPA default (dark) selected when storage is empty', () => {
       const h = mountToggle()
       try {
         const darkBtn = h.wrapper.find('[data-test="theme-toggle-dark"]')
+        // Vuetify marks active toggle buttons with the v-btn--active class.
         expect(darkBtn.classes()).toContain('v-btn--active')
       } finally {
         h.unmount()
@@ -212,17 +182,6 @@ describe('ThemeToggle — admin SPA', () => {
       try {
         const lightBtn = h.wrapper.find('[data-test="theme-toggle-light"]')
         expect(lightBtn.classes()).toContain('v-btn--active')
-      } finally {
-        h.unmount()
-      }
-    })
-
-    it('renders with `system` selected when storage holds `system`', () => {
-      storage.store[STORAGE_KEY] = 'system'
-      const h = mountToggle()
-      try {
-        const systemBtn = h.wrapper.find('[data-test="theme-toggle-system"]')
-        expect(systemBtn.classes()).toContain('v-btn--active')
       } finally {
         h.unmount()
       }
@@ -255,23 +214,6 @@ describe('ThemeToggle — admin SPA', () => {
         h.unmount()
       }
     })
-
-    it('clicking system mounts the matchMedia listener and resolves through it', async () => {
-      media.mediaQuery.matches = true
-      const h = mountToggle()
-      try {
-        await h.wrapper.find('[data-test="theme-toggle-system"]').trigger('click')
-        await h.wrapper.vm.$nextTick()
-        expect(storage.setItem).toHaveBeenLastCalledWith(STORAGE_KEY, 'system')
-        expect(media.mediaQuery.addEventListener).toHaveBeenCalledWith(
-          'change',
-          expect.any(Function),
-        )
-        expect(h.vuetify.theme.global.name.value).toBe('dark')
-      } finally {
-        h.unmount()
-      }
-    })
   })
 
   describe('composable boundary', () => {
@@ -283,19 +225,18 @@ describe('ThemeToggle — admin SPA', () => {
         await h.wrapper.vm.$nextTick()
         const lightBtn = h.wrapper.find('[data-test="theme-toggle-light"]')
         expect(lightBtn.classes()).toContain('v-btn--active')
-        manager.setPreference('system')
+        manager.setPreference('dark')
         await h.wrapper.vm.$nextTick()
-        const systemBtn = h.wrapper.find('[data-test="theme-toggle-system"]')
-        expect(systemBtn.classes()).toContain('v-btn--active')
+        const darkBtn = h.wrapper.find('[data-test="theme-toggle-dark"]')
+        expect(darkBtn.classes()).toContain('v-btn--active')
       } finally {
         h.unmount()
       }
     })
 
-    it('uses the composable as SOT for SPA default (no hard-coded fallback)', () => {
+    it('uses the composable as SOT for the SPA default (no hard-coded fallback)', () => {
       // Sanity: the imported SPA_DEFAULT is the value the toggle
-      // visually selects when storage is empty. Admin's pre-existing
-      // asymmetry ('dark') is preserved per chunk-8.2 Q1 Option C.
+      // visually selects when storage is empty (asserted above).
       expect(SPA_DEFAULT).toBe('dark')
     })
   })

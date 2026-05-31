@@ -4,64 +4,60 @@
  * of the `useTheme` composable (which owns the "what is the theme
  * right now?" question).
  *
- * The preference layer is a tri-state value:
+ * The preference layer is a BINARY value (Sprint 3.5 Chunk 1):
  *
  *   - `'light'`   → user explicitly picked the light palette.
  *   - `'dark'`    → user explicitly picked the dark palette.
- *   - `'system'`  → user opted into "follow my OS" — `prefers-color-scheme`
- *                   is consulted reactively for the effective theme.
  *
  * When the user has never set a preference (storage empty), the
- * effective theme falls back to the SPA default (admin = `dark`,
- * the operator-preferred default per Sprint 0). `prefers-color-scheme`
- * is **not** consulted in that case — Group 2 of chunk 8 picked
- * Option C (asymmetric defaults with layered fallback) per Q1's
- * design answer:
+ * effective theme falls back to the SPA default (admin = `dark`, the
+ * operator-preferred default since Sprint 0 and the Engine C v2
+ * dark-first identity).
  *
- *     User preference > SPA default > prefers-color-scheme
+ * Sprint 3.5 Chunk 1 — dropped `'system'`:
+ *   Chunk 8.2 shipped a tri-state preference (`light` / `dark` /
+ *   `system`) where `system` consulted `prefers-color-scheme`. Sprint
+ *   3.5 Decision (Q `tri_state_disposition` = "drop_system") removes the
+ *   `system` mode entirely: the v2 brand is dark-first and the toggle is
+ *   a deliberate binary choice. The `prefers-color-scheme` machinery
+ *   (matchMedia listener) is gone. The forbidden-pattern ratchet in
+ *   `tests/unit/architecture/use-theme-is-sot.spec.ts` STAYS in place
+ *   (no component may newly reach for `matchMedia(prefers-color-scheme)`)
+ *   — a one-way design decision — but this composable no longer needs
+ *   the allowlist row for it.
  *
- * The OS preference is consulted **only** when the user explicitly
- * picks `'system'`. This honours Sprint-0's deliberate `defaultTheme:
- * 'dark'` choice for admin (operators-in-low-light-contexts) AND
- * gives users full control via the toggle UI.
+ * Passive storage migration:
+ *   A legacy persisted `'system'` value (written by chunk 8.2) is read
+ *   as "unset" → the user falls back to the SPA default. The migration
+ *   is passive-on-read: we do NOT rewrite storage on read (no write side
+ *   effect during a getter). The stale `'system'` row is overwritten the
+ *   next time the user explicitly toggles, or simply lingers harmlessly.
  *
  * Storage:
  *   `localStorage` keyed by `STORAGE_KEY` (`catalyst.admin.theme`).
  *   Per-origin storage means the main and admin SPAs (different
  *   subdomains in production, different ports in dev) get independent
- *   preferences naturally — see chunk-8 kickoff for the rejected
- *   alternatives (cookies bring session-cookie boundary concerns;
- *   server-stored preference is out of Sprint 1 scope).
+ *   preferences naturally.
  *
  * Module-scoped singleton state:
- *   The preference, system-detection ref, listener, and cached
- *   `useTheme` manager are all module-scoped so multiple consumers
- *   (App.vue, the toggle, future settings page) share the same
- *   reactive state. The first call performs idempotent
+ *   The preference and cached `useTheme` manager are module-scoped so
+ *   multiple consumers (App.vue, the toggle, future settings page) share
+ *   the same reactive state. The first call performs idempotent
  *   initialisation; subsequent calls are no-ops modulo the
  *   "current === target" theme-sync guard.
  *
  * Bootstrapping:
  *   `useThemePreference()` runs from `App.vue`'s setup() so the
  *   persisted preference is applied to Vuetify SYNCHRONOUSLY before
- *   the first render — no flash-of-default-theme. The composable
- *   call boundary is the bootstrap; there is no separate
- *   `bootstrapThemePreference()` helper.
- *
- * Architecture enforcement (chunk 8.2 extension):
- *   `tests/unit/architecture/use-theme-is-sot.spec.ts` is extended
- *   to also forbid (a) any `localStorage.{get,set,remove}Item(...)`
- *   call referencing a `catalyst.*.theme` key outside this file,
- *   and (b) any `window.matchMedia('(prefers-color-scheme: ...)')`
- *   call outside this file. The composable file itself is the SOT
- *   and legitimately needs both.
+ *   the first render — no flash-of-default-theme.
  *
  * Per-SPA mirror (chunk 7.2 D2 standing standard):
  *   The main SPA mirrors this composable verbatim at
  *   `apps/main/src/composables/useThemePreference.ts`. Differences
  *   are limited to (a) `STORAGE_KEY` (`catalyst.main.theme`),
- *   (b) `SPA_DEFAULT` (`'light'`), and (c) module-comment SPA-name
- *   swaps. Both files MUST stay in structural lockstep.
+ *   (b) `SPA_DEFAULT` (both SPAs are `'dark'` as of Sprint 3.5 Chunk 1),
+ *   and (c) module-comment SPA-name swaps. Both files MUST stay in
+ *   structural lockstep.
  */
 
 import { computed, ref, type ComputedRef } from 'vue'
@@ -72,7 +68,7 @@ export const STORAGE_KEY = 'catalyst.admin.theme'
 
 export const SPA_DEFAULT: ThemeName = 'dark'
 
-export const themePreferences = ['light', 'dark', 'system'] as const
+export const themePreferences = ['light', 'dark'] as const
 
 export type ThemePreference = (typeof themePreferences)[number]
 
@@ -85,9 +81,8 @@ export interface ThemePreferenceManager {
    */
   preference: ComputedRef<ThemePreference>
   /**
-   * The actually-applied theme — `'light'` or `'dark'`. For
-   * `preference === 'system'` this resolves through
-   * `prefers-color-scheme` reactively.
+   * The actually-applied theme — `'light'` or `'dark'`. In the binary
+   * model this equals `preference` (or the SPA default when unset).
    */
   effectiveTheme: ComputedRef<ThemeName>
   /**
@@ -96,14 +91,11 @@ export interface ThemePreferenceManager {
    */
   isExplicit: ComputedRef<boolean>
   /**
-   * Persist a new preference and apply it to Vuetify. Selecting
-   * `'system'` also mounts the `prefers-color-scheme` listener;
-   * selecting `'light'` or `'dark'` tears it down.
+   * Persist a new preference and apply it to Vuetify.
    */
   setPreference: (next: ThemePreference) => void
   /**
-   * Clear the stored preference, returning to the SPA-default
-   * fallback. Tears down the `prefers-color-scheme` listener.
+   * Clear the stored preference, returning to the SPA-default fallback.
    */
   clearPreference: () => void
   /**
@@ -113,9 +105,6 @@ export interface ThemePreferenceManager {
 }
 
 const preference = ref<ThemePreference | null>(null)
-const systemPrefersDark = ref<boolean>(false)
-let mediaQuery: MediaQueryList | null = null
-let mediaListener: ((event: MediaQueryListEvent) => void) | null = null
 let cachedThemeManager: ThemeManager | null = null
 let initialized = false
 
@@ -125,7 +114,10 @@ function readStoredPreference(): ThemePreference | null {
   }
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY)
-    if (raw === 'light' || raw === 'dark' || raw === 'system') {
+    // Binary model only. A legacy `'system'` value (chunk 8.2) — or any
+    // other unrecognised string — is treated as unset, falling back to
+    // the SPA default. Migration is passive-on-read: no rewrite here.
+    if (raw === 'light' || raw === 'dark') {
       return raw
     }
     return null
@@ -149,35 +141,8 @@ function writeStoredPreference(value: ThemePreference | null): void {
   } catch {
     // Storage write rejected (quota, security policy). The in-memory
     // preference still flips correctly; the persistence is what we
-    // lose. Acceptable degradation per the chunk-8 kickoff.
+    // lose. Acceptable degradation.
   }
-}
-
-function ensureSystemListener(): void {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    systemPrefersDark.value = false
-    return
-  }
-  if (mediaQuery !== null) {
-    return
-  }
-  mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-  systemPrefersDark.value = mediaQuery.matches
-  mediaListener = (event: MediaQueryListEvent): void => {
-    systemPrefersDark.value = event.matches
-    if (preference.value === 'system') {
-      applyToVuetify(event.matches ? 'dark' : 'light')
-    }
-  }
-  mediaQuery.addEventListener('change', mediaListener)
-}
-
-function teardownSystemListener(): void {
-  if (mediaQuery !== null && mediaListener !== null) {
-    mediaQuery.removeEventListener('change', mediaListener)
-  }
-  mediaQuery = null
-  mediaListener = null
 }
 
 function applyToVuetify(name: ThemeName): void {
@@ -196,9 +161,6 @@ function ensureInitialized(): void {
   }
   initialized = true
   preference.value = readStoredPreference()
-  if (preference.value === 'system') {
-    ensureSystemListener()
-  }
 }
 
 export function useThemePreference(): ThemePreferenceManager {
@@ -209,34 +171,17 @@ export function useThemePreference(): ThemePreferenceManager {
 
   const preferenceComputed = computed<ThemePreference>(() => preference.value ?? SPA_DEFAULT)
   const isExplicit = computed<boolean>(() => preference.value !== null)
-  const effectiveTheme = computed<ThemeName>(() => {
-    if (preference.value === 'light') {
-      return 'light'
-    }
-    if (preference.value === 'dark') {
-      return 'dark'
-    }
-    if (preference.value === 'system') {
-      return systemPrefersDark.value ? 'dark' : 'light'
-    }
-    return SPA_DEFAULT
-  })
+  const effectiveTheme = computed<ThemeName>(() => preference.value ?? SPA_DEFAULT)
 
   applyToVuetify(effectiveTheme.value)
 
   function setPreference(next: ThemePreference): void {
-    if (next === 'system') {
-      ensureSystemListener()
-    } else {
-      teardownSystemListener()
-    }
     preference.value = next
     writeStoredPreference(next)
     applyToVuetify(effectiveTheme.value)
   }
 
   function clearPreference(): void {
-    teardownSystemListener()
     preference.value = null
     writeStoredPreference(null)
     applyToVuetify(effectiveTheme.value)
@@ -260,9 +205,7 @@ export function useThemePreference(): ThemePreferenceManager {
  * is consumed).
  */
 export function __resetThemePreferenceForTests(): void {
-  teardownSystemListener()
   preference.value = null
-  systemPrefersDark.value = false
   cachedThemeManager = null
   initialized = false
 }

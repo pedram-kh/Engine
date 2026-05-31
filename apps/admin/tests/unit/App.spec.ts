@@ -85,7 +85,6 @@ function createI18nForApp() {
               label: 'Theme',
               light: 'Light',
               dark: 'Dark',
-              system: 'Match system',
             },
           },
         },

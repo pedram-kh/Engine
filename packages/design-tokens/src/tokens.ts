@@ -34,6 +34,26 @@ export const brand = {
   cream: '#F5F1EA',
   ink: '#0A0A0B',
   gradient: 'linear-gradient(135deg, #14B8A6 0%, #8B5CF6 100%)',
+  /**
+   * Aurora accent (Sprint 3.5 Chunk 1 — Engine C v2 brand layer).
+   *
+   * The aurora gradient is the partner-agency-aligned brand accent. Per
+   * Sprint 3.5 Decision D7 it is a UTILITY value, NOT a Vuetify theme
+   * color: it is consumed directly via `var(--brand-aurora-gradient)` on
+   * specific surfaces (auth hero strip, dashboard welcome bar, email
+   * header bars — all landing in Sprint 3.5 Chunk 4) and is intentionally
+   * never registered in any Vuetify `theme.colors` slot. The
+   * `color-system-parity` architecture test pins the not-in-theme-colors
+   * invariant.
+   *
+   * The midpoint stop sits at 50% — the natural reading of three stops.
+   */
+  aurora: {
+    start: '#CD69FF',
+    mid: '#7FC3FF',
+    end: '#00FFF2',
+    gradient: 'linear-gradient(135deg, #CD69FF 0%, #7FC3FF 50%, #00FFF2 100%)',
+  },
 } as const
 
 export const neutral = {
@@ -49,6 +69,33 @@ export const neutral = {
   800: '#1F1F1E',
   900: '#121211',
   950: '#0A0A0B',
+} as const
+
+/**
+ * Zinc neutral scale (Sprint 3.5 Chunk 1 — Engine C v2 brand layer).
+ *
+ * Per Sprint 3.5 Decisions D4 (dark) + D5 (light), the v2 neutral surface
+ * uses Tailwind's zinc family — a true-neutral grey, replacing the warm
+ * grey `neutral` scale above as the canonical surface/text palette for the
+ * Vuetify themes. The warm `neutral` scale is preserved as an importable
+ * primitive (the `brand.cream` / `brand.ink` logo colours still reference
+ * its tonal world) but is no longer wired into `semanticLight` /
+ * `semanticDark` — see the deprecation note in `docs/tech-debt.md`
+ * ("Warm-gray neutral primitives deprecated"). Chunk 4 consolidation
+ * decides removal once consumers are audited.
+ */
+export const zinc = {
+  50: '#FAFAFA',
+  100: '#F4F4F5',
+  200: '#E4E4E7',
+  300: '#D4D4D8',
+  400: '#A1A1AA',
+  500: '#71717A',
+  600: '#52525B',
+  700: '#3F3F46',
+  800: '#27272A',
+  900: '#18181B',
+  950: '#09090B',
 } as const
 
 export const semantic = {
@@ -128,6 +175,7 @@ export const typography = {
 
 export type BrandTokens = typeof brand
 export type NeutralTokens = typeof neutral
+export type ZincTokens = typeof zinc
 export type SemanticTokens = typeof semantic
 export type BoardStatus = typeof boardStatus
 export type SpaceTokens = typeof space
