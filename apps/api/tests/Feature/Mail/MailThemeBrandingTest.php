@@ -39,11 +39,10 @@ it('inlines the brand teal mail theme into VerifyEmailMail', function (): void {
         expiresInHours: 24,
     );
 
-    $html = (string) $mail->render();
+    $html = strtolower((string) $mail->render());
 
-    expect(strtolower($html))
-        ->toContain(BRAND_TEAL_700)
-        ->not->toContain(STOCK_DEFAULT_BUTTON);
+    expect($html)->toContain(BRAND_TEAL_700);
+    expect($html)->not->toContain(STOCK_DEFAULT_BUTTON);
 });
 
 it('inlines the brand teal mail theme into ResetPasswordMail', function (): void {
@@ -54,9 +53,10 @@ it('inlines the brand teal mail theme into ResetPasswordMail', function (): void
         expiresInMinutes: 60,
     );
 
-    expect(strtolower((string) $mail->render()))
-        ->toContain(BRAND_TEAL_700)
-        ->not->toContain(STOCK_DEFAULT_BUTTON);
+    $html = strtolower((string) $mail->render());
+
+    expect($html)->toContain(BRAND_TEAL_700);
+    expect($html)->not->toContain(STOCK_DEFAULT_BUTTON);
 });
 
 it('inlines the brand teal mail theme into InviteAgencyUserMail', function (): void {
@@ -71,9 +71,10 @@ it('inlines the brand teal mail theme into InviteAgencyUserMail', function (): v
         expiresInDays: 7,
     );
 
-    expect(strtolower((string) $mail->render()))
-        ->toContain(BRAND_TEAL_700)
-        ->not->toContain(STOCK_DEFAULT_BUTTON);
+    $html = strtolower((string) $mail->render());
+
+    expect($html)->toContain(BRAND_TEAL_700);
+    expect($html)->not->toContain(STOCK_DEFAULT_BUTTON);
 });
 
 it('inlines the brand teal mail theme into ProspectCreatorInviteMail', function (): void {
@@ -83,7 +84,8 @@ it('inlines the brand teal mail theme into ProspectCreatorInviteMail', function 
         expiresAt: '2026-12-31',
     );
 
-    expect(strtolower((string) $mail->render()))
-        ->toContain(BRAND_TEAL_700)
-        ->not->toContain(STOCK_DEFAULT_BUTTON);
+    $html = strtolower((string) $mail->render());
+
+    expect($html)->toContain(BRAND_TEAL_700);
+    expect($html)->not->toContain(STOCK_DEFAULT_BUTTON);
 });
