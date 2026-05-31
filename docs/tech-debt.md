@@ -559,3 +559,55 @@ anyone reviewing it later.
   3. **Add a `composer verify` Composer script** that runs `pint:test` + `stan` + `test` in sequence, and include it in the standing chunk-close verification checklist in `PROJECT-WORKFLOW.md § 3`. Lowest tooling investment, highest discipline reliance.
 - **Owner:** Sprint 4 kickoff sub-step-0 (tooling hardening) OR the next chunk that surfaces a similar CI-loop-latency cost.
 - **Status:** open. Surfaced by the Sprint 3 Chunk 4 post-merge CI failure (run 25931807066) — fix landed in [`a924e55`](https://github.com/pedram-kh/Engine/commit/a924e55); this entry documents the tooling gap that allowed the regression to reach `main`.
+
+---
+
+## Warm-gray `neutral` primitives deprecated in favour of `zinc` (Engine C v2)
+
+- **Where:** [`packages/design-tokens/src/tokens.ts`](../packages/design-tokens/src/tokens.ts) (`neutral` scale) + its CSS mirror in [`packages/design-tokens/tokens.css`](../packages/design-tokens/tokens.css) (`--neutral-*`).
+- **What we accepted in Sprint 3.5 Chunk 1 (May 31, 2026):** the Engine C v2 brand layer migrated the canonical surface/border/text neutral palette from the warm-gray `neutral` scale to the true-neutral `zinc` scale (Decisions D4 dark + D5 light). [`semantic.ts`](../packages/design-tokens/src/semantic.ts) now references `zinc.*` exclusively for `bg` / `border` / `text` roles. The old `neutral` scale is left exported-but-deprecated: `brand.cream` / `brand.ink` still live in its tonal world (logo + brand surfaces, Sprint 3.5 Chunk 5), and the Vuetify semantic-chip foregrounds (`on-info` / `on-success` / `on-warning`) still reference `neutral[0]` / `neutral[900]` (white / near-black) under the D1/D2 "preserve single-value semantics" reinterpretation.
+- **Risk:** two neutral scales coexist in the token package. A future contributor could reach for `neutral.*` (warm) when they meant `zinc.*` (true-neutral), producing a subtly-off surface. Low blast radius today — `semantic.ts` is the only theme-facing consumer and it is fully on zinc.
+- **Mitigation today:** the migration is complete at the theme layer; `neutral` survives only for the brand-color + semantic-chip-foreground cases that legitimately want its warmth. Comments in `tokens.ts` + `semantic.ts` mark `neutral` as deprecated.
+- **Triggered by:** Sprint 3.5 Chunk 4 (component-override / visual-regression sweep) once warm-gray consumers are audited, OR any chunk that touches the brand-surface tokens.
+- **Resolution:** audit every `neutral.*` / `--neutral-*` consumer; migrate brand surfaces + semantic-chip foregrounds onto explicit literals or `zinc.*` as appropriate; delete the `neutral` scale + `--neutral-*` vars. Estimated effort: ~1-2 hours including a grep-driven consumer hunt and the parity test extension.
+- **Owner:** Sprint 3.5 Chunk 4 OR the brand-surface consolidation chunk.
+- **Status:** open. Surfaced by Sprint 3.5 Chunk 1, May 31, 2026.
+
+---
+
+## Tri-state `'system'` theme preference dropped — stale localStorage values linger
+
+- **Where:** [`apps/main/src/composables/useThemePreference.ts`](../apps/main/src/composables/useThemePreference.ts) + [`apps/admin/src/composables/useThemePreference.ts`](../apps/admin/src/composables/useThemePreference.ts) (`readStoredPreference`), keyed by `catalyst.main.theme` / `catalyst.admin.theme`.
+- **What we accepted in Sprint 3.5 Chunk 1 (May 31, 2026):** chunk 8.2 shipped a tri-state preference (`light` / `dark` / `system`) where `system` consulted `prefers-color-scheme`. Sprint 3.5 dropped `'system'` entirely (Q `tri_state_disposition` = "drop_system") — the v2 brand is dark-first and the toggle is binary. A user who previously selected `system` has the literal string `'system'` persisted in `localStorage`. The new composable treats any unrecognised stored value (including `'system'`) as **unset**, falling back to the SPA default (`dark`), via a passive-on-read migration: storage is read but NOT rewritten during initialisation (no write side effect in a getter). The stale row is overwritten the next time the user explicitly toggles, or lingers harmlessly.
+- **Risk:** cosmetic + storage hygiene only. The stale `'system'` row occupies one `localStorage` key until the user next toggles; it is never read as a valid preference (the binary guard rejects it). No correctness impact — the fallback-to-default behaviour is the intended one.
+- **Mitigation today:** passive-on-read coercion (`raw === 'light' || raw === 'dark'` guard) is the migration; it is unit-tested in both SPAs' `useThemePreference.spec.ts` ("legacy 'system' value (passive-on-read migration)" describe block) — including the assertion that storage is NOT rewritten on read.
+- **Triggered by:** a future preference-schema change that wants active migration, OR a storage-hygiene sweep.
+- **Resolution:** optionally add a one-shot active migration (on read, if the value is the legacy `'system'`, `removeItem` it) — deliberately NOT done now to avoid a write side effect during composable initialisation (anti-pattern). If ever desired, gate it behind an explicit `migrate()` call from `App.vue` bootstrap. Estimated effort: ~20 minutes including the test flip.
+- **Owner:** optional — only if a storage-hygiene or preference-schema chunk lands.
+- **Status:** open (low priority). Surfaced by Sprint 3.5 Chunk 1, May 31, 2026.
+
+---
+
+## Dormant `--color-*` semantic CSS variables still on warm-gray (not migrated to zinc)
+
+- **Where:** [`packages/design-tokens/tokens.css`](../packages/design-tokens/tokens.css) — the `:root[data-theme='light']` / `:root[data-theme='dark']` blocks defining `--color-bg-*`, `--color-text-*`, `--color-border-*`, `--color-action-*`.
+- **What we accepted in Sprint 3.5 Chunk 1 (May 31, 2026):** the authored `--color-*` semantic variables map to the warm-gray `--neutral-*` primitives (and `--brand-ink` / `--brand-cream`). They were NOT migrated to zinc in Chunk 1. Reason: a chunk-8.2 grep confirmed **zero** consumers of `var(--color-*)` across both SPAs — the variables are dormant. The live theme path is the Vuetify `theme.colors` layer (now on zinc); the `--color-*` CSS layer is a parallel, unused authored surface inherited from the original `docs/01-UI-UX.md` token extraction.
+- **Risk:** if a future component starts consuming `var(--color-bg-app)` etc., it would render the OLD warm-gray surface, diverging visibly from the Vuetify-driven zinc surface the rest of the app uses. Zero risk while consumer count stays at 0.
+- **Mitigation today:** none needed — dormant. The `data-theme='dark'` block is also referenced by the new `<html data-theme="dark">` attribute (decorative; the SPAs aren't PWA-configured and nothing reads `--color-*`).
+- **Triggered by:** the broader `tokens.css` `--color-*` removal-or-migrate decision (already tracked from chunk 8.2), OR the first component that consumes a `--color-*` variable.
+- **Resolution:** either (a) delete the dormant `--color-*` blocks entirely (they duplicate the Vuetify theme layer), or (b) migrate their neutral references to `--zinc-*` (requires also adding `--zinc-*` primitives to `tokens.css`) if a CSS-variable consumption path is ever desired. Decide at the same time as the warm-gray `neutral` deprecation above. Estimated effort: ~30 minutes (deletion) or ~1 hour (migration).
+- **Owner:** Sprint 3.5 Chunk 4 / brand-surface consolidation chunk.
+- **Status:** open. Surfaced (re-confirmed) by Sprint 3.5 Chunk 1, May 31, 2026.
+
+---
+
+## `docs/01-UI-UX.md` is stale vs the Engine C v2 brand layer
+
+- **Where:** [`docs/01-UI-UX.md`](01-UI-UX.md) — the design-system source-of-truth doc.
+- **What we accepted in Sprint 3.5 Chunk 1 (May 31, 2026):** Chunk 1 landed the v2 brand layer (aurora accent, zinc neutrals, Inter self-hosting, binary dark-first theme toggle) in code, but `docs/01-UI-UX.md` still documents the v1 system (warm-gray neutrals, teal→violet-only brand, tri-state theme intent). Per the Sprint 3.5 kickoff, documentation updates are explicitly **deferred to Chunk 5**. Chunk 1 is a code-first landing; the doc refresh is its own chunk so the prose can describe the _settled_ v2 system rather than chasing in-flight chunks.
+- **Risk:** a reader treating `01-UI-UX.md` as current would mis-describe the neutral scale, the brand accent, and the theme model. Bounded — the code + the Sprint 3.5 chunk reviews are the accurate record in the interim.
+- **Mitigation today:** the Sprint 3.5 Chunk 1 review ([`reviews/sprint-3-5-chunk-1-review.md`](reviews/sprint-3-5-chunk-1-review.md)) documents the as-built v2 decisions (D1–D7, R1, the five reinterpretations); the design-tokens source + the `color-system-parity` architecture test are self-describing.
+- **Triggered by:** Sprint 3.5 Chunk 5 (documentation chunk) per the kickoff plan.
+- **Resolution:** rewrite `docs/01-UI-UX.md` §2 (colour) + §3 (typography) to describe the zinc neutral scale, the aurora utility accent + co-brand relationship to teal/violet, the self-hosted Inter typeface, and the binary dark-default theme model. Cross-link the parity architecture test as the enforcement artifact. Estimated effort: bundled into Chunk 5's scope.
+- **Owner:** Sprint 3.5 Chunk 5.
+- **Status:** open (scheduled). Surfaced by Sprint 3.5 Chunk 1, May 31, 2026.
