@@ -64,6 +64,22 @@ const localeOptions = buildLocaleOptions(availableLocales, t)
 
 .auth-layout__card {
   max-width: 480px;
+  /* Aurora brand accent (Sprint 3.5 Chunk 4 — Decision D7, thin-accent-only):
+   * a 3px aurora gradient line along the card's top edge. The primary brand
+   * moment for unauthenticated users. v-card's default overflow:hidden clips
+   * it to the rounded top corners. Consumes the authored utility var, never a
+   * Vuetify theme.color (parity invariant 3 stays green). */
+  position: relative;
+}
+
+.auth-layout__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--brand-aurora-gradient);
 }
 
 .auth-layout__locale {

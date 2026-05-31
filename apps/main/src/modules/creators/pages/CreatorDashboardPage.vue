@@ -129,4 +129,16 @@ onMounted(async () => {
   flex-direction: column;
   gap: 20px;
 }
+
+/* Aurora brand accent (Sprint 3.5 Chunk 4 — Decision D7, thin-accent-only):
+ * a full-width 2px aurora rule along the header's bottom edge — the
+ * creator-journey brand moment, reading as a deliberate header divider that
+ * matches the auth card top-border + onboarding app-bar bottom-line (all
+ * full-width aurora edge-lines). Consumes the authored utility var, never a
+ * Vuetify theme.color (parity invariant 3 stays green). */
+.creator-dashboard__header {
+  padding-bottom: 16px;
+  border-bottom: 2px solid transparent;
+  border-image: var(--brand-aurora-gradient) 1;
+}
 </style>

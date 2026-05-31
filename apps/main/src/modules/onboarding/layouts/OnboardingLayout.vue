@@ -70,7 +70,7 @@ async function saveAndExit(): Promise<void> {
 
 <template>
   <v-app data-test="onboarding-layout">
-    <v-app-bar elevation="1" data-test="onboarding-topbar">
+    <v-app-bar elevation="1" class="onboarding-topbar" data-test="onboarding-topbar">
       <div class="d-flex align-center px-4">
         <v-icon icon="mdi-lightning-bolt" color="primary" size="small" class="mr-2" />
         <span class="text-subtitle-1 font-weight-bold" data-test="onboarding-brand">
@@ -124,6 +124,26 @@ async function saveAndExit(): Promise<void> {
 <style scoped>
 .onboarding-container {
   max-width: 1200px;
+}
+
+/* Aurora brand accent (Sprint 3.5 Chunk 4 — Decision D7, thin-accent-only):
+ * a 2px aurora gradient line along the app-bar's bottom edge — the brand
+ * moment at the start of the creator journey. Sits UNDER the bar (does not
+ * fill it), so it never clashes with the teal mdi-lightning-bolt wordmark
+ * icon. Consumes the authored utility var, never a Vuetify theme.color
+ * (parity invariant 3 stays green). */
+.onboarding-topbar {
+  position: relative;
+}
+
+.onboarding-topbar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--brand-aurora-gradient);
 }
 
 .onboarding-topbar__locale {

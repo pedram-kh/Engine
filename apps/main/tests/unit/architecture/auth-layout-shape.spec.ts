@@ -43,9 +43,17 @@ const LAYOUT_PATH = path.resolve(__dirname, '../../../src/modules/auth/layouts/A
  * with their own coverage. The expanded docblock comment explaining
  * the toggle integration accounts for most of the additional lines.
  *
+ * Sprint 3.5 Chunk 4 (Workstream A) raised the ceiling 96 -> 115 to
+ * absorb the aurora brand accent: a 3px clipped `::before` gradient bar
+ * on `.auth-layout__card` (`background: var(--brand-aurora-gradient)`)
+ * plus its explanatory comment. This is decorative CHROME, not logic —
+ * exactly what a layout shell is for; the cap exists to catch logic
+ * creep, not a brand accent. No `<script setup>` logic was added (the
+ * no-function / no-multi-statement-arrow guards below still hold).
+ *
  * Future raises require a new chunk-scoped code-review note here.
  */
-const MAX_LINES = 96
+const MAX_LINES = 115
 
 describe('AuthLayout.vue stays a pure structural shell', () => {
   it('is at most MAX_LINES lines (size guard)', async () => {
