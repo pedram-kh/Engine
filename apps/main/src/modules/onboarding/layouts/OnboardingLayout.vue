@@ -144,7 +144,9 @@ async function saveAndExit(): Promise<void> {
 
 .onboarding-layout__body {
   background-color: rgb(var(--v-theme-surface));
-  border-radius: 8px;
+  /* Sprint 3.5 Chunk 3 §5d — tokenized: 8px is an exact match for the
+   * --radius-lg scale step (tokens.css). Surgical, exact-match-only. */
+  border-radius: var(--radius-lg);
   padding: 2rem;
   /* Elevation sourced via the Vuetify `elevation-1` utility class on
    * the consumer site — the architecture invariant disallows raw

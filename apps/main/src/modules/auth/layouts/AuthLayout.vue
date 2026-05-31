@@ -6,9 +6,10 @@
  *
  * Chunk 2: ThemeToggle removed from this layout's header. It now lives
  * exclusively in AgencyLayout's user menu for authenticated users.
- * Unauthenticated users on auth pages can still toggle via the system
- * default (prefers-color-scheme); the explicit toggle is an
- * authenticated-user affordance.
+ * Sprint 3.5 Chunk 1 dropped the `prefers-color-scheme` system default
+ * (binary light/dark, dark-first), so unauthenticated auth pages render
+ * the default theme (dark) with no in-page toggle; the explicit toggle
+ * is an authenticated-user affordance reached after sign-in.
  */
 
 import { useI18n } from 'vue-i18n'

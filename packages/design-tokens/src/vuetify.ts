@@ -72,9 +72,40 @@
  *   still reference the warm `neutral` primitive (white / near-black) —
  *   the migration to zinc applies to the surface/border/text neutral
  *   surface, not to these locked semantic chips.
+ *
+ * Container / variant Material tokens (Sprint 3.5 Chunk 3 — finding (b)):
+ *   `outline`, `outline-variant`, `primary-container`, `error-container`
+ *   are now registered EXPLICITLY in both themes with deliberate
+ *   zinc/teal/danger-derived values. They were previously referenced by
+ *   high-CSS surfaces (onboarding upload/preview tiles, PortfolioGallery,
+ *   admin EditFieldRow). The sweep found a latent bug: `outline` /
+ *   `outline-variant` exist in neither our themes NOR Vuetify's default
+ *   theme (verified against vuetify@3.12.5 genDefaults), so no
+ *   `--v-theme-outline*` CSS var was emitted. An undefined var inside
+ *   `rgb()` invalidates the `border` shorthand at computed-value time →
+ *   every longhand resets to initial → `border-style: none`. So the
+ *   dropzone dashed borders + the click-through terms border rendered as
+ *   NO BORDER AT ALL (not merely "wrong colour") — and the fallback-chained
+ *   `var(--v-theme-outline-variant, var(--v-theme-outline))` surfaces broke
+ *   too, since the fallback target was itself undefined. Eyes-on confirmed
+ *   the before (no border) / after (border renders) in headless Chromium.
+ *   Registering the tokens is the fix. Values:
+ *     - outline           zinc-300 (#D4D4D8) light / zinc-700 (#3F3F46) dark
+ *         — matches border.default, the real border weight the dropzones want.
+ *     - outline-variant   zinc-200 (#E4E4E7) light / zinc-800 (#27272A) dark
+ *         — a subtler border one step lighter than `outline`.
+ *     - primary-container teal-50 (#E6F8F5) light / teal-800 (#074A44) dark
+ *         — perceptible teal drag-over fill (teal-900 was an invisible wash
+ *           on zinc-900; spot-check downgraded it to teal-800, eyes-on).
+ *     - error-container   danger-100 (#FEE2E2) light / #3B1A1A dark
+ *         — the danger palette has no clean dark step (only 100/500), so the
+ *         dark value is a hand-picked muted error surface. on-surface text
+ *         (zinc-300 #D4D4D8) on #3B1A1A measures ~13:1 (comfortably AA).
+ *   The CSS fallbacks in the consumer files are KEPT as defense-in-depth.
+ *   The `color-system-parity` test pins all eight values.
  */
 
-import { brand, neutral, semantic as palette } from './tokens'
+import { brand, neutral, zinc, semantic as palette } from './tokens'
 import { semanticLight, semanticDark } from './semantic'
 
 export type CatalystThemeDefinition = {
@@ -119,6 +150,12 @@ export const lightTheme: CatalystThemeDefinition = {
     'on-warning': neutral[900],
     'border-color': semanticLight.border.default,
     accent: brand.violet[500],
+    // Container / variant tokens (Chunk 3 finding (b)) — explicit
+    // registration so high-CSS surfaces stop relying on auto-derivation.
+    outline: zinc[300],
+    'outline-variant': zinc[200],
+    'primary-container': brand.teal[50],
+    'error-container': palette.danger[100],
   },
 }
 
@@ -148,5 +185,17 @@ export const darkTheme: CatalystThemeDefinition = {
     'on-warning': neutral[900],
     'border-color': semanticDark.border.default,
     accent: brand.violet[400],
+    // Container / variant tokens (Chunk 3 finding (b)). `error-container`
+    // dark is a hand-picked muted error surface — the danger palette has
+    // no clean dark step. on-surface text (zinc-300) on it measures ~13:1.
+    // `primary-container` dark is teal-800 (NOT teal-900): teal-900 measured
+    // ~1.09:1 against the zinc-900 surface — an invisible wash, so pinning it
+    // would have regression-locked a non-functional fill. teal-800 (~1.75:1)
+    // reads as a distinct drag-over fill while staying subordinate to the
+    // bright teal-400 `primary` border. Eyes-on verified (Chunk 3 spot-check).
+    outline: zinc[700],
+    'outline-variant': zinc[800],
+    'primary-container': brand.teal[800],
+    'error-container': '#3B1A1A',
   },
 }

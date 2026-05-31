@@ -39,6 +39,17 @@
  *      `var(--radius-md)`; this invariant keeps the TS and CSS layers in
  *      lockstep so a typo (or a half-migration) fails CI.
  *
+ *   7. CONTAINER / VARIANT TOKENS (Sprint 3.5 Chunk 3 — finding (b)) —
+ *      the four Material container/variant tokens consumed by high-CSS
+ *      surfaces (`outline`, `outline-variant`, `primary-container`,
+ *      `error-container`) are registered EXPLICITLY in BOTH themes (no
+ *      reliance on Vuetify auto-derivation), and their per-mode values
+ *      are pinned. The raw `rgb(var(--v-theme-outline))` references had
+ *      no fallback and Vuetify never auto-generates `--v-theme-outline`,
+ *      so they resolved to an invalid colour — registering the token is
+ *      the fix. Pinning the values keeps a future edit from silently
+ *      regressing the dark-mode surfaces.
+ *
  * The WCAG-AA contrast invariant (kickoff § 1.5 item 4) is asserted
  * separately by `packages/design-tokens/src/vuetify.spec.ts` against the
  * same `lightTheme` / `darkTheme` objects — re-run during Chunk 1
@@ -148,5 +159,31 @@ describe('color-system parity — radius scale TS↔CSS parity (R1)', () => {
     // doc comment can't falsely satisfy the check — same hardening the
     // aurora-authored invariant uses.
     expect(TOKENS_CSS).toContain(`--radius-${key}:`)
+  })
+})
+
+describe('color-system parity — container/variant tokens registered (Chunk 3)', () => {
+  // Per-mode values are pinned (not just presence) so a silent edit to the
+  // dark muted-error surface or the teal drag-over fill fails CI. Lower-cased
+  // for case-insensitive comparison against the theme objects.
+  const CONTAINER_TOKENS: ReadonlyArray<{
+    slot: string
+    light: string
+    dark: string
+  }> = [
+    { slot: 'outline', light: '#d4d4d8', dark: '#3f3f46' },
+    { slot: 'outline-variant', light: '#e4e4e7', dark: '#27272a' },
+    { slot: 'primary-container', light: '#e6f8f5', dark: '#074a44' },
+    { slot: 'error-container', light: '#fee2e2', dark: '#3b1a1a' },
+  ]
+
+  it.each(CONTAINER_TOKENS)('registers "$slot" in both themes', ({ slot }) => {
+    expect(lightTheme.colors[slot]).toBeDefined()
+    expect(darkTheme.colors[slot]).toBeDefined()
+  })
+
+  it.each(CONTAINER_TOKENS)('pins the per-mode "$slot" value', ({ slot, light, dark }) => {
+    expect(lightTheme.colors[slot]?.toLowerCase()).toBe(light)
+    expect(darkTheme.colors[slot]?.toLowerCase()).toBe(dark)
   })
 })

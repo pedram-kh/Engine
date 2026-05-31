@@ -10,6 +10,13 @@
  * API (Decision D-empty-state + Q-chunk-2-3 = slot-only icon):
  *   - `title` / `body` — props (the common case). Pass already-localized
  *     strings; this package stays i18n-free (the consumer calls `t(...)`).
+ *   - `titleTag`       — heading level for the title (`h2` | `h3` | `h4`),
+ *     default `h3`. Lets the caller fit the empty-state into the page's
+ *     document outline without a heading-level skip (Sprint 3.5 Chunk 3
+ *     finding (a): BrandListPage's page `<h1>` followed by a default
+ *     `<h3>` empty-state title skipped `<h2>`; the page now passes
+ *     `titleTag="h2"`). The default `h3` preserves the Chunk 2 behaviour
+ *     for body-only / unspecified usages.
  *   - `icon` slot      — optional; caller supplies a <v-icon> / custom SVG.
  *   - `action` slot    — optional; caller supplies a CTA button.
  *   - `dataTest`       — applied to the root for spec/Playwright anchoring.
@@ -27,13 +34,17 @@
 interface Props {
   /** Pre-localized title. Omit for icon-only / body-only variants. */
   title?: string
+  /** Heading element for the title. Default `h3` (Chunk 2 behaviour). */
+  titleTag?: 'h2' | 'h3' | 'h4'
   /** Pre-localized body copy. */
   body?: string
   /** Root `data-test` anchor (preserved from the migrated call site). */
   dataTest?: string
 }
 
-defineProps<Props>()
+withDefaults(defineProps<Props>(), {
+  titleTag: 'h3',
+})
 </script>
 
 <template>
@@ -41,7 +52,7 @@ defineProps<Props>()
     <div v-if="$slots.icon" class="c-empty-state__icon">
       <slot name="icon" />
     </div>
-    <h3 v-if="title" class="c-empty-state__title">{{ title }}</h3>
+    <component :is="titleTag" v-if="title" class="c-empty-state__title">{{ title }}</component>
     <p v-if="body" class="c-empty-state__body">{{ body }}</p>
     <div v-if="$slots.action" class="c-empty-state__action">
       <slot name="action" />

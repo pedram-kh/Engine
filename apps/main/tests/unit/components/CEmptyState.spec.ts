@@ -32,12 +32,25 @@ describe('CEmptyState — anchoring', () => {
 })
 
 describe('CEmptyState — title/body props', () => {
-  it('renders the title in an <h3> when provided', () => {
+  it('renders the title in an <h3> by default when provided', () => {
     const wrapper = mount(CEmptyState, { props: { title: 'No brands yet' } })
     const title = wrapper.find('.c-empty-state__title')
     expect(title.exists()).toBe(true)
     expect(title.element.tagName).toBe('H3')
     expect(title.text()).toBe('No brands yet')
+  })
+
+  it('renders the title with the titleTag override (h2 for BrandListPage)', () => {
+    const wrapper = mount(CEmptyState, { props: { title: 'No brands yet', titleTag: 'h2' } })
+    const title = wrapper.find('.c-empty-state__title')
+    expect(title.exists()).toBe(true)
+    expect(title.element.tagName).toBe('H2')
+    expect(title.text()).toBe('No brands yet')
+  })
+
+  it('honours an h4 titleTag override', () => {
+    const wrapper = mount(CEmptyState, { props: { title: 'Nested', titleTag: 'h4' } })
+    expect(wrapper.find('.c-empty-state__title').element.tagName).toBe('H4')
   })
 
   it('omits the title node entirely when no title prop is given', () => {

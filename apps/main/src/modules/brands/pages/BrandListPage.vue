@@ -236,6 +236,7 @@ async function confirmRestore(): Promise<void> {
       <CEmptyState
         v-if="statusFilter === 'active'"
         data-test="brand-empty-state"
+        title-tag="h2"
         :title="t('app.brands.empty.heading')"
         :body="t('app.brands.empty.body')"
       >
@@ -251,6 +252,7 @@ async function confirmRestore(): Promise<void> {
       <CEmptyState
         v-else
         data-test="brand-empty-filtered"
+        title-tag="h2"
         :title="t('app.brands.emptyFiltered.heading')"
         :body="t('app.brands.emptyFiltered.body')"
       >
