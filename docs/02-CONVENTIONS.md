@@ -523,11 +523,11 @@ const isOverdue = computed(() => {
 <style scoped>
 .campaign-card {
   padding: var(--space-4);
-  border-radius: 8px;
-  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgb(var(--v-theme-outline-variant));
 }
 .campaign-card.is-overdue {
-  border-color: var(--color-action-danger);
+  border-color: rgb(var(--v-theme-error));
 }
 </style>
 ```

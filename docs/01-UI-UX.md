@@ -4,7 +4,7 @@
 
 This is the design system for Catalyst Engine. It exists so that every screen — main app, admin SPA, marketing surfaces, emails — feels like one product. It exists so that you (Cursor) don't have to make taste decisions; you apply this system.
 
-The visual language is **ClickUp-inspired** (clean, dense, productive, slightly playful) adapted to **Catalyst Engine's** brand identity (warm dark surfaces, cream foreground, teal-to-violet brand gradient).
+The visual language is **ClickUp-inspired** (clean, dense, productive, slightly playful) adapted to **Catalyst Engine's** Engine C v2 brand identity: zinc true-neutral surfaces (dark by default), a teal/violet co-brand, and the aurora gradient as a thin accent. See §2 for the settled v2 color system.
 
 ---
 
@@ -15,7 +15,7 @@ The visual language is **ClickUp-inspired** (clean, dense, productive, slightly 
 - **Confident, not loud.** The product runs serious money and serious campaigns. The UI conveys quiet competence.
 - **Modern, not trendy.** No glassmorphism, no overly rounded "Big Sur" surfaces, no gradient-on-everything. Clean, crisp, geometric.
 - **Productive, not decorative.** Density is high. Whitespace is intentional but not generous. Information per pixel matters.
-- **Warm, not corporate.** The cream foreground and warm dark surfaces give the product a human warmth that pure black-on-white SaaS lacks.
+- **Considered, not corporate.** The zinc dark-default surfaces with a restrained aurora accent give the product a distinct, human feel that pure black-on-white SaaS lacks — without leaning on decoration.
 
 ### Logo
 
@@ -33,159 +33,63 @@ The full product is "Catalyst Engine" but the wordmark is just "Catalyst." When 
 
 ## 2. Color system
 
-The color system has **two layers**:
+Engine C v2 is a **co-brand**: the aurora accent layers _alongside_ the existing teal/violet brand identity, not replacing it. The neutral foundation is the zinc true-neutral scale; the brand primary stays teal; aurora is a thin accent only. The app is **dark-default**.
 
-1. **Brand tokens** — the source of truth. Do not use raw hex values anywhere except in this file and the design tokens package.
-2. **Semantic tokens** — what components reference (e.g., `--color-surface-default`, `--color-text-primary`). Switch values per theme (light/dark) automatically.
+### 2.1 The neutral foundation — zinc
 
-All colors are defined in `packages/design-tokens/` and re-exported as Vuetify theme config.
+The surface, border, and text neutrals come from the **zinc** true-neutral scale (Tailwind zinc, 50→950). Zinc replaced the v1 warm-gray neutrals across both SPAs. The scale is defined in `packages/design-tokens/src/tokens.ts` (`zinc`) and consumed through the Vuetify theme layer — never referenced directly as hex in component code.
 
-### Brand tokens (raw values)
+Dark mode (the default) maps surfaces to the dark end of the scale (background ≈ zinc-950, surface ≈ zinc-900, elevated ≈ zinc-800) and text to the light end (emphasis ≈ zinc-50, default ≈ zinc-300, muted ≈ zinc-400). Light mode inverts this. The per-mode neutral split is pinned by the `color-system-parity` architecture test (the "split neutrals" invariant: background/surface/on-surface/border differ between themes).
 
-```
-Brand
-  brand-teal-50    #E6F8F5
-  brand-teal-100   #B8EDE3
-  brand-teal-200   #8AE3D1
-  brand-teal-300   #5CD8C0
-  brand-teal-400   #2ECDAE
-  brand-teal-500   #14B8A6   ← primary brand teal
-  brand-teal-600   #0F9488
-  brand-teal-700   #0B6F66
-  brand-teal-800   #074A44
-  brand-teal-900   #042522
+### 2.2 Brand primary — teal (co-brand, preserved)
 
-  brand-violet-50  #F2EBFE
-  brand-violet-100 #DDC9FC
-  brand-violet-200 #C8A7FA
-  brand-violet-300 #B385F8
-  brand-violet-400 #9E63F6
-  brand-violet-500 #8B5CF6   ← primary brand violet
-  brand-violet-600 #7039D6
-  brand-violet-700 #5828A8
-  brand-violet-800 #401C7A
-  brand-violet-900 #28104C
+The brand primary stays **teal** (`brand.teal`), unchanged from v1. The teal→violet brand gradient survives as the logo/favicon mark. Aurora does **not** replace teal as the primary; the two co-exist. Primary CTAs, links, and brand-primary surfaces use teal via the Vuetify `primary` color.
 
-  brand-cream      #F5F1EA   ← off-white from logo wordmark
-  brand-ink        #0A0A0B   ← warm near-black from logo background
-  brand-gradient   linear-gradient(135deg, #14B8A6 0%, #8B5CF6 100%)
+> Contrast note: teal-500 on white is ~2.49:1 (below AA-normal) — a documented characteristic of the light-mode primary (tracked as an `it.todo` in `vuetify.spec.ts`). The app's dark default avoids this regime. Light surfaces that need an AA-passing teal (e.g. the email mail theme) use a darker step (teal-700, ~5.5:1 on white). This is not an inconsistency — each surface picks the teal step that hits AA for its background.
 
-Neutrals (warm gray, not pure)
-  neutral-0        #FFFFFF
-  neutral-50       #FAFAF9
-  neutral-100      #F4F4F2
-  neutral-200      #E8E8E5
-  neutral-300      #D4D4D0
-  neutral-400      #A8A8A2
-  neutral-500      #76766F
-  neutral-600      #525250
-  neutral-700      #3A3A38
-  neutral-800      #1F1F1E
-  neutral-900      #121211
-  neutral-950      #0A0A0B
+### 2.3 The aurora accent — utility-only, thin, D7
 
-Semantic palette (status, feedback)
-  success-500      #16A34A
-  success-100      #DCFCE7
-  warning-500      #F59E0B
-  warning-100      #FEF3C7
-  danger-500       #DC2626
-  danger-100       #FEE2E2
-  info-500         #0284C7
-  info-100         #E0F2FE
+Aurora is the v2 brand accent: the gradient `#CD69FF → #7FC3FF → #00FFF2` (magenta → sky → cyan), defined as `--brand-aurora-gradient` in `tokens.css`.
 
-Board status palette (ClickUp-inspired, mapped to defaults)
-  status-todefine  #A8A8A2   ← gray, dashed border in UI
-  status-progress  #8B5CF6   ← brand violet
-  status-review    #F59E0B   ← amber
-  status-aligned   #14B8A6   ← brand teal (treated as "complete/aligned" in board context)
-  status-posted    #06B6D4   ← cyan
-  status-paid      #16A34A   ← success green
-  status-blocked   #DC2626   ← danger red
-```
+**D7 — aurora is accent-only.** It is never a primary color, never a status/semantic color, never a form field color, and **never registered in any Vuetify `theme.colors` slot**. It appears only in component CSS, consumed via `var(--brand-aurora-gradient)`. The `color-system-parity` test enforces this (the "aurora utility-only" invariant: no aurora hex — solid or gradient-string — appears in any theme's `colors`).
 
-### Semantic tokens (light theme)
+**Thin accents only.** Aurora is applied as a 2-3px edge-line/border, never a full-bleed fill. The gradient is high-chroma; anything larger than an accent dominates the zinc dark surface and reads as a marketing splash. The surfaced locations (as of v2):
 
-```
---color-bg-app             neutral-50
---color-bg-surface         neutral-0
---color-bg-surface-raised  neutral-0          (with border + shadow)
---color-bg-surface-sunken  neutral-100
---color-bg-overlay         rgba(10,10,11,0.4)
+- **Auth card** (both SPAs) — a 3px aurora top-border on the centered card. The brand moment for unauthenticated users.
+- **Onboarding app-bar** — a 2px aurora line on the app-bar's bottom edge.
+- **Creator dashboard** — a full-width 2px aurora header rule.
 
---color-border-subtle      neutral-200
---color-border-default     neutral-300
---color-border-strong      neutral-400
+All three read as one brand language (shared gradient, 2-3px weight, full-width edge-lines). New aurora placements must hold the thin-accent + utility-only discipline; aesthetic surfaces require eyes-on verification in both modes.
 
---color-text-primary       neutral-900
---color-text-secondary     neutral-600
---color-text-tertiary      neutral-500
---color-text-disabled      neutral-400
---color-text-inverse       neutral-0
+### 2.4 Semantic colors — single-value, both modes
 
---color-action-primary           brand-teal-500
---color-action-primary-hover     brand-teal-600
---color-action-primary-active    brand-teal-700
---color-action-primary-fg        neutral-0
+The semantic palette (success / warning / danger / info) is **single-value across both themes** (preserved from chunk 8.1, not split per-mode). The semantic-chip foregrounds use pure white (`on-info`, `on-success`) or zinc-950 (`on-warning`) — anchored to literals, not the (now-deleted) warm-neutral primitive.
 
---color-action-secondary         neutral-100
---color-action-secondary-hover   neutral-200
---color-action-secondary-fg      neutral-900
+> `on-info` (white on info) is ~4.07:1 — marginal, below AA-normal — a pre-existing semantic-palette characteristic, covered by the AA-Large accent-pair assertion, not a dedicated fix. It predates the brand pivot and is out of v2's scope.
 
---color-action-danger            danger-500
---color-action-danger-hover      #B91C1C
---color-action-danger-fg         neutral-0
+### 2.5 Container / variant tokens
 
---color-focus-ring               brand-teal-500
-```
+Four Material container/variant tokens are explicitly registered in both themes (rather than relying on Vuetify auto-derivation or undefined-token fallbacks): `outline` (zinc-300/700), `outline-variant` (zinc-200/800), `primary-container` (teal-50 / teal-800), `error-container` (danger-100 / #3B1A1A). Registering them explicitly fixed a latent bug where the unregistered `outline` token left dropzone borders not rendering. Pinned by the `color-system-parity` test (the container-token invariant).
 
-### Semantic tokens (dark theme)
+### 2.6 The theme model — binary, dark-default
 
-```
---color-bg-app             brand-ink              (#0A0A0B)
---color-bg-surface         neutral-900            (#121211)
---color-bg-surface-raised  neutral-800            (#1F1F1E)
---color-bg-surface-sunken  brand-ink
---color-bg-overlay         rgba(0,0,0,0.6)
+Engine C v2 is **binary dark-first**:
 
---color-border-subtle      neutral-800
---color-border-default     neutral-700
---color-border-strong      neutral-600
+- Two themes only: `dark` (default) and `light`. There is no `'system'` / OS-preference option — it was removed, and `matchMedia(prefers-color-scheme)` detection is ratcheted shut (a `use-theme-is-sot` architecture test forbids reintroducing it).
+- First visit renders **dark** regardless of OS preference.
+- The Vuetify theme keys are `light` / `dark` (Vuetify-standard naming, per chunk 8.1). The brand identity lives in the theme _values_, not the key names.
+- The theme toggle is binary (two states); preference persists in `localStorage`.
 
---color-text-primary       brand-cream            (#F5F1EA)
---color-text-secondary     neutral-300
---color-text-tertiary      neutral-400
---color-text-disabled      neutral-600
---color-text-inverse       neutral-900
+### 2.7 How to consume color — the correct path
 
---color-action-primary           brand-teal-400   (slightly brighter for dark)
---color-action-primary-hover     brand-teal-300
---color-action-primary-active    brand-teal-500
---color-action-primary-fg        neutral-950
+**Use the Vuetify theme layer, not raw hex and not the (deleted) `--color-*` vars.**
 
---color-action-secondary         neutral-800
---color-action-secondary-hover   neutral-700
---color-action-secondary-fg      brand-cream
+- In Vue components, prefer Vuetify color props: `color="primary"`, `color="surface"`, `color="error"`, etc. These resolve through the registered theme.
+- In component `<style>`, use the Vuetify-generated CSS vars: `rgb(var(--v-theme-surface))`, `rgb(var(--v-theme-on-surface))`, `rgb(var(--v-theme-primary))`, `rgb(var(--v-theme-outline))`, etc.
+- For the aurora accent only: `var(--brand-aurora-gradient)`.
+- **Never** raw hex in component CSS (the `no-hard-coded-colors` test forbids it). **Never** the old `--color-*` / `--neutral-*` vars — they were dormant and are now deleted; the real path is the Vuetify theme layer above.
 
---color-action-danger            #EF4444
---color-action-danger-hover      #DC2626
---color-action-danger-fg         neutral-0
-
---color-focus-ring               brand-teal-400
-```
-
-### How to use these in code
-
-- **Vue components** reference semantic tokens via CSS variables: `color: var(--color-text-primary)`.
-- **Vuetify theme** is configured in `apps/main/src/plugins/vuetify.ts` (and identically in admin) using these tokens.
-- **Never** hardcode hex values inside components. Always go through the token system.
-- The brand gradient is used **sparingly**: logos, the active state of the primary CTA on the marketing landing page (Phase 2), and onboarding splash screens. Not for routine UI elements.
-
-### Mode switching
-
-- Both light and dark themes are first-class. Default for newly registered users: respect system preference (`prefers-color-scheme`).
-- Theme is stored on the user record and applied across sessions.
-- Theme toggle is in user menu, top-right.
+The Vuetify theme is the single source of truth for color. The design-tokens TS layer feeds the theme; `tokens.css` carries only `--brand-*` (incl. aurora), `--radius-*`, `--space-*`, and `--catalyst-typography-*` — not a parallel color system.
 
 ---
 
@@ -193,10 +97,10 @@ Board status palette (ClickUp-inspired, mapped to defaults)
 
 ### Typeface
 
-- **Primary UI font:** **Inter** (variable font, weights 400, 500, 600, 700).
+- **Primary UI font:** **Inter** — self-hosted as **static weights 400 / 500 / 600 / 700, normal + italic** (latin subset). Italic ships because the creator-bio renderer emits `<em>` / `<strong><em>`. (An interim build shipped the variable font; it was reverted to static weights before commit per the Chunk 1 locked decision. Variable Inter is a deliberate future cleanup if ever revisited, not a silent swap.)
 - **Monospace:** **JetBrains Mono** (for codes, IDs, technical values).
-- **Self-host both fonts** in `apps/main/public/fonts/` and `apps/admin/public/fonts/`. Do not load from Google Fonts at runtime (GDPR-friendliness, performance).
-- **`font-feature-settings`** enabled: `"cv02", "cv03", "cv04", "cv11"` for Inter to get the more humane variants of certain glyphs (curved-tail `l`, single-storey `a`).
+- **Self-host location:** the fonts + `inter.css` live in the shared **`packages/ui/assets/fonts/`** package and are imported once from each SPA's `main.ts` (not per-SPA `public/fonts/`). The `.v-application { font-family: var(--brand-font-primary) }` cascade override in `inter.css` applies the typeface app-wide. No Google Fonts / CDN runtime dependency (GDPR-friendliness, performance).
+- **`font-feature-settings`:** not currently applied. The v1 spec called for `"cv02", "cv03", "cv04", "cv11"` (humane glyph variants); the as-shipped self-hosted static weights do not enable the stylistic sets. Enabling them is an optional future typography refinement, not a shipped characteristic — documented here so the doc matches the code.
 
 ### Type scale
 
@@ -299,7 +203,7 @@ Icon-only buttons are 32x32, square, 6px border-radius. Tooltip on hover is mand
 
 ### Inputs
 
-- **Text inputs:** 36px tall, 1px border (`--color-border-default`), 6px radius. On focus: 2px ring in `--color-focus-ring`, no border color change. Subtle label above the input, never floating-label inside the input.
+- **Text inputs:** 36px tall, 1px border (`rgb(var(--v-theme-outline))`), 6px radius. On focus: 2px ring in the `primary` color, no border color change. Subtle label above the input, never floating-label inside the input.
 - **Select / dropdowns:** Same shape as text inputs. Open downward by default. Search-as-you-type for any list with more than 8 items.
 - **Date pickers:** Calendar in a popover. Keyboard navigable. Defaults to today's date highlighted. Start of week respects locale (Monday for EU).
 - **Checkboxes:** 16x16, 4px radius. Teal when checked.
@@ -309,10 +213,10 @@ Icon-only buttons are 32x32, square, 6px border-radius. Tooltip on hover is mand
 
 The most important component in the agency-side experience. Tables are how agencies see their world.
 
-- **Header row:** sticky, `--color-bg-surface-sunken` background, 12px caption-style text in `--color-text-secondary`.
-- **Body rows:** 40px tall, alternating row backgrounds NOT used (it adds visual noise). Bottom border 1px in `--color-border-subtle`.
-- **Row hover:** background shifts to `--color-bg-surface-sunken`. Cursor changes to pointer if the row is clickable.
-- **Selected row:** subtle teal-tinted background (`brand-teal-50` light / `brand-teal-900` at 30% dark).
+- **Header row:** sticky, sunken-surface background (`rgb(var(--v-theme-surface))` family), 12px caption-style text in the secondary tone (`rgb(var(--v-theme-on-surface-variant))`).
+- **Body rows:** 40px tall, alternating row backgrounds NOT used (it adds visual noise). Bottom border 1px in `rgb(var(--v-theme-outline-variant))`.
+- **Row hover:** background shifts to the sunken surface tone. Cursor changes to pointer if the row is clickable.
+- **Selected row:** subtle teal-tinted background via the registered `primary-container` token (`rgb(var(--v-theme-primary-container))` — teal-50 light / teal-800 dark).
 - **Checkbox column:** 40px wide, leftmost. For bulk operations.
 - **Column resize:** enabled by default. Persisted per user.
 - **Column reorder:** enabled.
@@ -328,7 +232,7 @@ The table component is `<CTable>` in `packages/ui/`. Cursor uses this component,
 A card is a contained piece of information with a colored top accent (often a status color).
 
 - **Padding:** 16px.
-- **Border:** 1px `--color-border-subtle`.
+- **Border:** 1px `rgb(var(--v-theme-outline-variant))`.
 - **Radius:** 8px.
 - **Shadow:** none by default. On hover, subtle shadow.
 - **Status accent:** an optional 3px tall colored bar at the very top of the card (matching board status colors).
@@ -353,7 +257,7 @@ Board cards represent CampaignAssignments (one creator on one campaign). They lo
 
 - **Top section:** Catalyst Engine logo (mark + wordmark on `lg+`, just mark on collapsed).
 - **Workspace switcher:** below logo, shows current agency (and brand context if selected). Dropdown to switch. Pattern matches ClickUp's workspace switcher.
-- **Primary nav items:** icon + label. Active item has a teal left-border accent and `--color-bg-surface-sunken` background.
+- **Primary nav items:** icon + label. Active item has a teal left-border accent and a sunken-surface background (`rgb(var(--v-theme-surface))` family).
 - **Sections:** "Workspace", "Brands" (lists each brand), "Reports", "Admin".
 - **Bottom section:** user avatar, settings, theme toggle.
 
@@ -387,7 +291,7 @@ Badge color uses the appropriate `status-*` token. Background is the badge color
 
 Every list, every table, every board column should have a designed empty state. Not just "No data."
 
-Pattern: a centered icon (or simple illustration), a one-line headline (`heading-3`), a one-sentence helper (`body` in `--color-text-secondary`), and a primary action button.
+Pattern: a centered icon (or simple illustration), a one-line headline (`heading-3`), a one-sentence helper (`body` in the secondary tone, `rgb(var(--v-theme-on-surface-variant))`), and a primary action button.
 
 Examples:
 
@@ -444,7 +348,7 @@ Motion is functional, not decorative. Bouncing icons, animated shimmers, and her
 
 ## 8. Imagery & illustration
 
-Phase 1 has no custom illustrations. Empty states use Tabler icons at large size with a soft background circle (`--color-bg-surface-sunken`) for visual weight.
+Phase 1 has no custom illustrations. Empty states use Tabler icons at large size with a soft background circle (the sunken surface tone, `rgb(var(--v-theme-surface))` family) for visual weight.
 
 Phase 2+ may introduce custom illustrations matching the geometric, slightly hand-cut feel of the logo. When that happens, this section will be updated.
 
@@ -472,7 +376,7 @@ Vuetify 3 is the underlying component library, but it is heavily themed and sele
 ### Theming
 
 - Vuetify theme config lives in `apps/main/src/plugins/vuetify.ts` (and identically in admin) and reads from `packages/design-tokens/`.
-- Both `light` and `dark` themes are defined. The theme is set based on user preference, with system fallback.
+- Both `light` and `dark` themes are defined. The app is **dark by default** (binary toggle, no OS-preference/system option — see §2.6); the user's explicit choice persists in `localStorage`.
 - Vuetify's default color names (`primary`, `secondary`, `success`, etc.) are aliased to Catalyst Engine's semantic tokens.
 
 ### Components used directly
@@ -562,7 +466,7 @@ Admins live in this UI all day. It's optimized for power, not warmth.
 
 ### Do
 
-- Use semantic tokens (`var(--color-text-primary)`), never raw hex.
+- Consume color through the Vuetify theme layer (§2.7): `color="primary"` / `color="surface"` props, and `rgb(var(--v-theme-*))` in `<style>`. The aurora accent only via `var(--brand-aurora-gradient)`. Never raw hex, and never the deleted `--color-*` / `--neutral-*` vars.
 - Use the spacing scale, never arbitrary pixel values.
 - Use the type scale, never arbitrary font sizes.
 - Use `<CTable>`, `<CButton>`, etc. when wrappers exist.
@@ -630,8 +534,11 @@ Storybook is **not in scope for Phase 1**. It comes in Phase 2 if useful.
 ## 14. Quick reference card (post this above your desk)
 
 ```
-Brand colors:    teal #14B8A6   violet #8B5CF6   ink #0A0A0B   cream #F5F1EA
-Default font:    Inter, body 14px / 22px, 400
+Neutrals:        zinc scale (true-neutral, 50→950) — dark-default surfaces
+Brand primary:   teal #14B8A6 (co-brand; violet #8B5CF6 in the logo gradient)
+Aurora accent:   #CD69FF→#7FC3FF→#00FFF2 — utility-only, thin (2-3px), never a theme color
+Consume color:   Vuetify color props + var(--v-theme-*); aurora via var(--brand-aurora-gradient)
+Default font:    Inter (self-hosted static 400/500/600/700 +italic), body 14px / 22px, 400
 Spacing unit:    4px (use only the scale)
 Border radius:   6px buttons, 8px cards, 4px badges
 Row height:      40px main app, 32px admin, 36px form inputs
@@ -643,7 +550,7 @@ Modals vs drawers: modals for decisions, drawers for editing
 Toasts:          bottom-right, max 3 stacked
 Icons:           Tabler, 16px / 20px / 24px, currentColor
 Motion:          150ms hover, 200ms drawer, no page transitions
-Themes:          light + dark, system-default, user-overrideable
+Themes:          light + dark, dark-default (binary, no OS-preference), user-overrideable
 Languages:       en, pt, it from day one
 A11y:            WCAG 2.1 AA, keyboard nav, focus rings, ARIA labels
 ```
