@@ -388,4 +388,70 @@ describe('Step6TaxPage', () => {
     expect(items.find((i) => i.code === 'ES' && i.label === 'Spain')).toBeDefined()
     expect(items.find((i) => i.code === 'IT' && i.label === 'Italy')).toBeDefined()
   })
+
+  // ---------------------------------------------------------------------------
+  // Completed-step re-entry. Tax PII is never returned to the creator's own
+  // browser (only `tax_profile_complete`), so a revisited-but-complete step
+  // cannot rehydrate the form. Render an "on file" panel instead of a blank
+  // form (which read as "my data is gone"); `Update` reveals the form for a
+  // deliberate overwrite.
+  // ---------------------------------------------------------------------------
+  it('shows the "on file" panel (not the form) when the tax profile is already complete', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap(true))
+
+    const { wrapper, unmount } = await mountAuthPage(Step6TaxPage, {
+      initialRoute: { path: '/onboarding/tax' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="tax-complete"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="tax-form"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="tax-continue"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="tax-edit"]').exists()).toBe(true)
+  })
+
+  it('Continue from the complete panel advances to payout without re-submitting', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap(true))
+
+    let pushSpy: MockInstance<Router['push']> | null = null
+    const { wrapper, unmount } = await mountAuthPage(Step6TaxPage, {
+      initialRoute: { path: '/onboarding/tax' },
+      beforeMount: async ({ router }) => {
+        await useOnboardingStore().bootstrap()
+        pushSpy = vi.spyOn(router, 'push')
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('[data-testid="tax-continue"]').trigger('click')
+    await flushPromises()
+
+    expect(onboardingApi.updateTax).not.toHaveBeenCalled()
+    expect(pushSpy).not.toBeNull()
+    expect(pushSpy!).toHaveBeenCalledWith({ name: 'onboarding.payout' })
+  })
+
+  it('Update reveals the form so the creator can overwrite their tax details', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap(true))
+
+    const { wrapper, unmount } = await mountAuthPage(Step6TaxPage, {
+      initialRoute: { path: '/onboarding/tax' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('[data-testid="tax-edit"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="tax-complete"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="tax-form"]').exists()).toBe(true)
+  })
 })

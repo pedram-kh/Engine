@@ -95,7 +95,10 @@
             "description": "We need a tax form for payouts, even before your first one.",
             "current_status": "Status:",
             "status_complete": "Submitted",
-            "status_incomplete": "Not yet submitted"
+            "status_incomplete": "Not yet submitted",
+            "on_file_title": "Tax information on file",
+            "on_file_body": "Your tax details are saved securely. For your privacy we don't display them again — choose Update to re-enter them.",
+            "update_button": "Update tax information"
           },
           "payout": {
             "name": "Payout method",
@@ -122,7 +125,9 @@
               "signed": "Signed",
               "click_through_accepted": "Accepted",
               "none": "Not started"
-            }
+            },
+            "accepted_title": "Agreement accepted",
+            "accepted_body": "You've accepted the master agreement. Continue to the next step."
           },
           "account_created": {
             "name": "Account created"

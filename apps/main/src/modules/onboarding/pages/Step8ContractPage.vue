@@ -143,7 +143,37 @@ async function onClickThroughAccepted(): Promise<void> {
     </div>
 
     <div v-else class="contract-step__body" data-testid="contract-flag-off">
-      <ClickThroughAccept @accepted="onClickThroughAccepted" />
+      <!--
+        Completed-step re-entry: once the click-through is accepted
+        (`click_through_accepted_at` set), revisiting this step from the
+        progress rail must NOT re-render the full terms + an unchecked
+        box (reads as "my acceptance was lost"). Mirror the flag-ON path,
+        which already guards its CTA on `isComplete`, and the
+        Tax/Payout/KYC steps' completed states. The PII boundary is
+        irrelevant here — there's nothing sensitive to re-show — but the
+        "already done, just continue" affordance is the same.
+      -->
+      <template v-if="isComplete">
+        <v-alert
+          type="success"
+          variant="tonal"
+          :title="t('creator.ui.wizard.steps.contract.accepted_title')"
+          data-testid="contract-click-through-complete"
+        >
+          {{ t('creator.ui.wizard.steps.contract.accepted_body') }}
+        </v-alert>
+        <div class="contract-step__actions">
+          <v-btn
+            color="primary"
+            variant="tonal"
+            data-testid="contract-click-through-advance"
+            @click="advance"
+          >
+            {{ t('creator.ui.wizard.actions.save_and_continue') }}
+          </v-btn>
+        </div>
+      </template>
+      <ClickThroughAccept v-else @accepted="onClickThroughAccepted" />
     </div>
 
     <div class="contract-step__sr-status" role="status" aria-live="polite" aria-atomic="true">

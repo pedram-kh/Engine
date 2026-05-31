@@ -1,5 +1,6 @@
 import { flushPromises } from '@vue/test-utils'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest'
+import type { Router } from 'vue-router'
 
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
 
@@ -143,6 +144,39 @@ describe('Step8ContractPage', () => {
     expect(wrapper.find('[data-testid="contract-flag-off"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="click-through-accept"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="contract-begin"]').exists()).toBe(false)
+  })
+
+  it('flag OFF + already accepted shows the accepted panel (not the click-through box again)', async () => {
+    // Completed-step re-entry: revisiting an accepted click-through step
+    // must not re-render the full terms + an unchecked box (reads as "my
+    // acceptance was lost"). Show the accepted panel + Continue instead.
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
+      makeBootstrap({
+        contractEnabled: false,
+        clickThroughAcceptedAt: '2026-05-14T00:30:00+00:00',
+      }),
+    )
+
+    let pushSpy: MockInstance<Router['push']> | null = null
+    const { wrapper, unmount } = await mountAuthPage(Step8ContractPage, {
+      initialRoute: { path: '/onboarding/contract' },
+      beforeMount: async ({ router }) => {
+        await useOnboardingStore().bootstrap()
+        pushSpy = vi.spyOn(router, 'push')
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="contract-flag-off"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="contract-click-through-complete"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="click-through-accept"]').exists()).toBe(false)
+
+    await wrapper.find('[data-testid="contract-click-through-advance"]').trigger('click')
+    await flushPromises()
+
+    expect(pushSpy).not.toBeNull()
+    expect(pushSpy!).toHaveBeenCalledWith({ name: 'onboarding.review' })
   })
 
   it('flag ON + click_through_accepted_at set still treats the step as complete', async () => {

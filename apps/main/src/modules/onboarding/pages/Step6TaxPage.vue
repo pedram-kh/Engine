@@ -46,6 +46,16 @@ const { t } = useI18n()
 const router = useRouter()
 const store = useOnboardingStore()
 
+// Completed-step re-entry: the backend deliberately does NOT return the
+// tax PII (tax_id / legal_name / address) to the creator's own browser —
+// only the `tax_profile_complete` boolean (CreatorResource: "encrypted
+// PII; admin drill-in only"). So a revisited-but-complete tax step can't
+// rehydrate the form, and rendering a raw blank form reads as data loss.
+// When complete, show an "on file ✓" panel instead; `isEditing` lets the
+// creator deliberately re-enter the form to overwrite their details.
+const isComplete = computed(() => store.creator?.attributes.tax_profile_complete ?? false)
+const isEditing = ref(false)
+
 /**
  * Backend field-key union (matches `UpsertTaxProfileRequest::rules()`
  * keys after the `ValidationExceptionRenderer` flattens the pointer).
@@ -148,6 +158,12 @@ async function onSubmit(): Promise<void> {
     await router.push({ name: 'onboarding.payout' })
   }
 }
+
+// Continue without re-submitting — used by the completed-state panel
+// when the creator revisits an already-complete tax step.
+async function advance(): Promise<void> {
+  await router.push({ name: 'onboarding.payout' })
+}
 </script>
 
 <template>
@@ -159,7 +175,25 @@ async function onSubmit(): Promise<void> {
       </p>
     </header>
 
-    <form class="tax-step__form" data-testid="tax-form" @submit.prevent="onSubmit">
+    <div v-if="isComplete && !isEditing" class="tax-step__complete" data-testid="tax-complete">
+      <v-alert
+        type="success"
+        variant="tonal"
+        :title="t('creator.ui.wizard.steps.tax.on_file_title')"
+      >
+        {{ t('creator.ui.wizard.steps.tax.on_file_body') }}
+      </v-alert>
+      <div class="tax-step__form-actions">
+        <v-btn variant="text" data-testid="tax-edit" @click="isEditing = true">
+          {{ t('creator.ui.wizard.steps.tax.update_button') }}
+        </v-btn>
+        <v-btn color="primary" data-testid="tax-continue" @click="advance">
+          {{ t('creator.ui.wizard.actions.save_and_continue') }}
+        </v-btn>
+      </div>
+    </div>
+
+    <form v-else class="tax-step__form" data-testid="tax-form" @submit.prevent="onSubmit">
       <v-select
         v-model="draft.tax_form_type"
         :items="formTypeOptions"
@@ -252,6 +286,12 @@ async function onSubmit(): Promise<void> {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.tax-step__complete {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .tax-step__form-actions {

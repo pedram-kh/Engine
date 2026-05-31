@@ -95,7 +95,10 @@
             "description": "Precisamos de um formulário fiscal para pagamentos, mesmo antes do primeiro.",
             "current_status": "Estado:",
             "status_complete": "Enviado",
-            "status_incomplete": "Ainda não enviado"
+            "status_incomplete": "Ainda não enviado",
+            "on_file_title": "Informação fiscal registada",
+            "on_file_body": "Os seus dados fiscais estão guardados em segurança. Por privacidade não os voltamos a mostrar — escolha Atualizar para os introduzir novamente.",
+            "update_button": "Atualizar informação fiscal"
           },
           "payout": {
             "name": "Método de pagamento",
@@ -122,7 +125,9 @@
               "signed": "Assinado",
               "click_through_accepted": "Aceite",
               "none": "Não iniciado"
-            }
+            },
+            "accepted_title": "Contrato aceite",
+            "accepted_body": "Aceitou o contrato principal. Continue para o passo seguinte."
           },
           "account_created": {
             "name": "Conta criada"

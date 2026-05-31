@@ -95,7 +95,10 @@
             "description": "Ci serve un modulo fiscale per i pagamenti, anche prima del primo.",
             "current_status": "Stato:",
             "status_complete": "Inviato",
-            "status_incomplete": "Non ancora inviato"
+            "status_incomplete": "Non ancora inviato",
+            "on_file_title": "Informazioni fiscali salvate",
+            "on_file_body": "I tuoi dati fiscali sono salvati in modo sicuro. Per la tua privacy non li mostriamo di nuovo — scegli Aggiorna per reinserirli.",
+            "update_button": "Aggiorna informazioni fiscali"
           },
           "payout": {
             "name": "Metodo di pagamento",
@@ -122,7 +125,9 @@
               "signed": "Firmato",
               "click_through_accepted": "Accettato",
               "none": "Non iniziato"
-            }
+            },
+            "accepted_title": "Contratto accettato",
+            "accepted_body": "Hai accettato il contratto principale. Continua al passaggio successivo."
           },
           "account_created": {
             "name": "Account creato"
