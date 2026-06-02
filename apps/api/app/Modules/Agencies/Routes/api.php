@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Agencies\Http\Controllers\AgencyCreatorController;
 use App\Modules\Agencies\Http\Controllers\AgencySettingsController;
 use App\Modules\Agencies\Http\Controllers\DashboardActivityController;
 use App\Modules\Agencies\Http\Controllers\DashboardSummaryController;
@@ -63,6 +64,16 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
             ->name('agencies.dashboard.summary');
         Route::get('dashboard/activity', DashboardActivityController::class)
             ->name('agencies.dashboard.activity');
+
+        // ─── Creator roster ("my creators") ──────────────────────────────────
+        // Sprint 4 Chunk 5 (D-c5-1). Any agency member may view the roster
+        // (gated by AgencyCreatorRelationPolicy::viewAny inside the
+        // controller). Lists the agency's relations across ALL
+        // relationship_status values, joined to their creators, with the
+        // status / country / language / category filters that have backing
+        // data today. Read-only: no write surface this chunk (D-c5-3).
+        Route::get('creators', [AgencyCreatorController::class, 'index'])
+            ->name('agencies.creators.index');
     });
 
 // ─── Accept invitation ────────────────────────────────────────────────────────

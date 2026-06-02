@@ -95,6 +95,66 @@ export interface CreateBrandPayload {
 export type UpdateBrandPayload = Partial<CreateBrandPayload>
 
 // ---------------------------------------------------------------------------
+// Agency creator roster ("my creators") — Sprint 4 Chunk 5
+// ---------------------------------------------------------------------------
+
+/**
+ * Mirrors `App\Modules\Creators\Enums\RelationshipStatus` — the per-agency
+ * view of a creator's status. All three values appear in the roster list.
+ */
+export type RosterRelationshipStatus = 'roster' | 'prospect' | 'external'
+
+/**
+ * A single row in the agency roster list
+ * (GET /api/v1/agencies/{agency}/creators). Slim hand-rolled shape
+ * (D-c5-5) — NOT the heavy `CreatorResource`. Carries `internal_rating`
+ * read-only; deliberately omits `internal_notes` (GDPR-sensitive) and any
+ * signed media URLs.
+ */
+export interface RosterCreatorListItem {
+  id: string
+  type: 'agency_creator_relations'
+  attributes: {
+    relationship_status: RosterRelationshipStatus
+    is_blacklisted: boolean
+    /** 1–5 stars from the agency's POV; null when unset. Read-only this chunk. */
+    internal_rating: number | null
+    total_campaigns_completed: number
+    total_paid_minor_units: number
+    last_engaged_at: string | null
+    /** Creator ULID — reserved for Sprint 6 click-through; rows do NOT navigate yet. */
+    creator_id: string | null
+    display_name: string | null
+    country_code: string | null
+    primary_language: string | null
+    categories: string[] | null
+  }
+}
+
+/**
+ * Hand-rolled `{data, meta}` envelope returned by the roster index. Mirrors
+ * the admin review-queue shape (not the standard `PaginatedCollection`).
+ */
+export interface RosterListResponse {
+  data: RosterCreatorListItem[]
+  meta: {
+    total: number
+    page: number
+    per_page: number
+    last_page: number
+  }
+}
+
+export interface RosterListParams {
+  status?: RosterRelationshipStatus
+  country?: string
+  language?: string
+  category?: string
+  page?: number
+  per_page?: number
+}
+
+// ---------------------------------------------------------------------------
 // Agency invitations
 // ---------------------------------------------------------------------------
 

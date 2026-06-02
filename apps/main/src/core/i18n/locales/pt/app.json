@@ -18,9 +18,59 @@
     },
     "nav": {
       "dashboard": "Painel",
+      "roster": "Meus criadores",
       "brands": "Marcas",
       "agencyUsers": "Equipe",
       "settings": "Configurações"
+    },
+    "roster": {
+      "title": "Meus criadores",
+      "unnamed": "Criador sem nome",
+      "blacklisted": "Na lista negra",
+      "fields": {
+        "name": "Nome",
+        "status": "Estado",
+        "country": "País",
+        "language": "Idioma",
+        "categories": "Categorias",
+        "rating": "Avaliação",
+        "campaigns": "Campanhas"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Potencial",
+        "external": "Externo"
+      },
+      "filters": {
+        "status": {
+          "all": "Todos",
+          "roster": "Roster",
+          "prospect": "Potencial",
+          "external": "Externo"
+        },
+        "country": "País",
+        "language": "Idioma",
+        "category": "Categoria"
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Ainda não há criadores",
+        "body": "Os criadores que você convidar ou contratar aparecerão aqui — roster, potenciais e colaboradores externos."
+      },
+      "emptyFiltered": {
+        "heading": "Nenhum criador corresponde a estes filtros",
+        "body": "Tente limpar ou alterar um filtro para ver mais dos seus criadores."
+      },
+      "errors": {
+        "loadFailed": "Falha ao carregar os seus criadores. Tente novamente."
+      }
     },
     "userMenu": {
       "signOut": "Sair",

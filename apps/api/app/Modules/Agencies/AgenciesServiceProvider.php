@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modules\Agencies;
 
+use App\Modules\Agencies\Models\AgencyCreatorRelation;
+use App\Modules\Agencies\Policies\AgencyCreatorRelationPolicy;
 use App\Modules\Agencies\Services\AgencyInvitationService;
 use Illuminate\Contracts\Foundation\CachesRoutes;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -18,7 +21,13 @@ final class AgenciesServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->registerPolicies();
         $this->registerRoutes();
+    }
+
+    private function registerPolicies(): void
+    {
+        Gate::policy(AgencyCreatorRelation::class, AgencyCreatorRelationPolicy::class);
     }
 
     private function registerRoutes(): void

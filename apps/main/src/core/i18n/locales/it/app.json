@@ -18,9 +18,59 @@
     },
     "nav": {
       "dashboard": "Dashboard",
+      "roster": "I miei creator",
       "brands": "Brand",
       "agencyUsers": "Team",
       "settings": "Impostazioni"
+    },
+    "roster": {
+      "title": "I miei creator",
+      "unnamed": "Creator senza nome",
+      "blacklisted": "In blacklist",
+      "fields": {
+        "name": "Nome",
+        "status": "Stato",
+        "country": "Paese",
+        "language": "Lingua",
+        "categories": "Categorie",
+        "rating": "Valutazione",
+        "campaigns": "Campagne"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Potenziale",
+        "external": "Esterno"
+      },
+      "filters": {
+        "status": {
+          "all": "Tutti",
+          "roster": "Roster",
+          "prospect": "Potenziale",
+          "external": "Esterno"
+        },
+        "country": "Paese",
+        "language": "Lingua",
+        "category": "Categoria"
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Ancora nessun creator",
+        "body": "I creator che inviti o ingaggi appariranno qui: roster, potenziali e collaboratori esterni."
+      },
+      "emptyFiltered": {
+        "heading": "Nessun creator corrisponde a questi filtri",
+        "body": "Prova a rimuovere o cambiare un filtro per vedere più creator."
+      },
+      "errors": {
+        "loadFailed": "Caricamento dei creator non riuscito. Riprova."
+      }
     },
     "userMenu": {
       "signOut": "Esci",

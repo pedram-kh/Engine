@@ -161,6 +161,17 @@ export const appRoutes: RouteRecordRaw[] = [
     meta: { layout: 'agency', guards: ['requireAuth'] },
   },
 
+  // ── Creator roster ("my creators") ─────────────────────────────────────────
+  // Sprint 4 Chunk 5. Any agency member may view; not MFA-gated (matches
+  // the dashboard + brands list). Read-only this chunk — no row navigation
+  // (no agency-side creator detail exists yet, D-c5-4).
+  {
+    path: '/roster',
+    name: 'roster.list',
+    component: () => import('@/modules/roster/pages/CreatorRosterPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth'] },
+  },
+
   // ── Brands ───────────────────────────────────────────────────────────────
   {
     path: '/brands',

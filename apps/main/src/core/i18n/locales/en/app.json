@@ -18,9 +18,59 @@
     },
     "nav": {
       "dashboard": "Dashboard",
+      "roster": "My creators",
       "brands": "Brands",
       "agencyUsers": "Team",
       "settings": "Settings"
+    },
+    "roster": {
+      "title": "My creators",
+      "unnamed": "Unnamed creator",
+      "blacklisted": "Blacklisted",
+      "fields": {
+        "name": "Name",
+        "status": "Status",
+        "country": "Country",
+        "language": "Language",
+        "categories": "Categories",
+        "rating": "Rating",
+        "campaigns": "Campaigns"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Prospect",
+        "external": "External"
+      },
+      "filters": {
+        "status": {
+          "all": "All",
+          "roster": "Roster",
+          "prospect": "Prospect",
+          "external": "External"
+        },
+        "country": "Country",
+        "language": "Language",
+        "category": "Category"
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "No creators yet",
+        "body": "Creators you invite or engage will appear here across your roster, prospects, and external collaborators."
+      },
+      "emptyFiltered": {
+        "heading": "No creators match these filters",
+        "body": "Try clearing or changing a filter to see more of your creators."
+      },
+      "errors": {
+        "loadFailed": "Failed to load your creators. Please try again."
+      }
     },
     "userMenu": {
       "signOut": "Sign out",
