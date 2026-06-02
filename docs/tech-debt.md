@@ -9,6 +9,63 @@ anyone reviewing it later.
 
 ---
 
+## ⚠️ Deferred `creators.signed_master_contract_id` → `contracts.id` FK (column is temporarily MULTI-MEANING)
+
+- **Where:** [`apps/api/database/migrations/2026_05_14_100000_create_creators_table.php`](../apps/api/database/migrations/2026_05_14_100000_create_creators_table.php) (the FK-less column) + the three writers of `creators.signed_master_contract_id`:
+  - [`apps/api/app/Modules/Creators/Services/CreatorWizardService.php`](../apps/api/app/Modules/Creators/Services/CreatorWizardService.php) `acceptClickThroughContract()` — writes a **real `contracts.id`** (Sprint 4 Chunk 4, the correct semantic).
+  - [`apps/api/app/Modules/Creators/Jobs/ProcessEsignWebhookJob.php:111`](../apps/api/app/Modules/Creators/Jobs/ProcessEsignWebhookJob.php) — writes an **`integration_events.id` sentinel** (NOT a contracts.id).
+  - [`apps/api/app/Modules/Creators/Services/WizardCompletionService.php:133`](../apps/api/app/Modules/Creators/Services/WizardCompletionService.php) — writes a **`now()->timestamp` unix-timestamp sentinel** (NOT a contracts.id).
+- **What we accepted in Sprint 4 Chunk 4 (June 2, 2026):** D-c4-1 called for adding the spec'd `creators.signed_master_contract_id` → `contracts.id` FK constraint now that the `contracts` table exists. We **deferred the DB-level constraint** because the column is currently **multi-meaning** — it holds three structurally incompatible kinds of value depending on which path wrote it (a real `contracts.id`, an `integration_events.id`, and a unix timestamp). Adding a hard FK today would immediately violate on the two vendor sentinel paths and break their tests. The click-through path (this chunk) is correct: it writes a genuine `contracts.id` and the Eloquent `Creator::masterContract()` relation resolves it.
+- **Risk:** a latent data-integrity landmine. Until unified, `signed_master_contract_id` cannot be trusted as a real FK — `Creator::masterContract()` resolves to `null` for the two sentinel paths (the sentinel value is not a real `contracts.id`), and any future code that JOINs on this column will silently mis-resolve. No FK protects against orphaned/garbage values today.
+- **Mitigation today:** step-8 satisfaction (`CompletenessScoreCalculator`) only checks `signed_master_contract_id IS NOT NULL` (presence, not validity), which all three writers satisfy, so the wizard behaves correctly. The multi-meaning is invisible to the wizard but real at the data layer.
+- **Triggered by:** the **e-sign vendor adapter chunk** (the next Sprint-4 e-sign workstream). It MUST NOT be missed there.
+- **Resolution (the vendor chunk owns this, in order):**
+  1. Convert `ProcessEsignWebhookJob` to create a real `contracts` row (vendor envelope: `signature_provider=docusign|dropboxsign`, `signature_envelope_id`, `sent_at`, `status=signed`) and set `signed_master_contract_id` to that row's id — replacing the `integration_events.id` sentinel.
+  2. Convert `WizardCompletionService::contractReturn()` likewise — replacing the `now()->timestamp` sentinel with a real `contracts.id`.
+  3. Backfill any pre-existing sentinel rows to real `contracts` rows.
+  4. **Only then** add the DB-level FK constraint (`signed_master_contract_id` → `contracts.id`, `nullOnDelete`) in a migration. Add a `Sprint4MigrationTest`-style assertion that the constraint exists.
+- **Owner:** the e-sign vendor adapter chunk (Sprint 4 e-sign workstream / spec-native S9).
+- **Status:** open. Surfaced + deliberately deferred by Sprint 4 Chunk 4, June 2, 2026 ([review](reviews/sprint-4-chunk-4-review.md)).
+
+---
+
+## Read-receipts ("which sections were viewed") for contract acceptance
+
+- **Where:** the contract step — [`apps/api/app/Modules/Creators/Services/ContractTermsRenderer.php`](../apps/api/app/Modules/Creators/Services/ContractTermsRenderer.php) (terms render) + the click-through accept path. Spec reference: [`docs/20-PHASE-1-SPEC.md`](20-PHASE-1-SPEC.md) Step 8 (`:420` — "which sections were viewed").
+- **What we accepted in Sprint 4 Chunk 4 (June 2, 2026):** D-c4-7 scoped read-receipts OUT. The spec's "which sections were viewed" is **viewing telemetry**, not acceptance evidence — it is not part of the `contracts` shape (`03-DATA-MODEL.md §8`), and conflating it with the acceptance record would muddy what `signed_signature_data` means (binding-signature evidence: method + IP/UA + timestamp). The structured acceptance record (this chunk) is complete without it.
+- **Risk:** low. Read-receipts are a nice-to-have evidentiary enhancement (proof the creator scrolled through each clause), not a correctness or compliance blocker for the click-through binding signature, which the master agreement §10 already establishes as legally effective.
+- **Triggered by:** the e-sign vendor adapter chunk (the natural home — vendors capture per-section view events), OR a compliance-hardening pass.
+- **Resolution:** capture per-section view telemetry (likely a separate `contract_view_events` table or a vendor-supplied field), kept distinct from `signed_signature_data`. Defer to the vendor chunk.
+- **Owner:** e-sign vendor adapter chunk.
+- **Status:** open. Surfaced + deferred by Sprint 4 Chunk 4, June 2, 2026.
+
+---
+
+## `creators.click_through_accepted_at` is now denormalized (eventual removal)
+
+- **Where:** [`apps/api/database/migrations/2026_05_15_100002_add_click_through_accepted_at_to_creators_table.php`](../apps/api/database/migrations/2026_05_15_100002_add_click_through_accepted_at_to_creators_table.php) (the column) + readers: [`CreatorResource`](../apps/api/app/Modules/Creators/Http/Resources/CreatorResource.php) (surfaces it), [`CreatorWizardService::acceptClickThroughContract()`](../apps/api/app/Modules/Creators/Services/CreatorWizardService.php) (idempotency guard keys off it).
+- **What we accepted in Sprint 4 Chunk 4 (June 2, 2026):** D-c4-3 made the `contracts` row the source of truth for "contract step satisfied" (step-8 now keys off `signed_master_contract_id`, no longer off `click_through_accepted_at`). We **kept `click_through_accepted_at` set** as a denormalized convenience rather than deprecating it — low-risk, avoids touching unrelated reads (`CreatorResource` still exposes it; the accept idempotency guard still uses it). The acceptance timestamp is now redundant with `contracts.signed_at`.
+- **Risk:** minor denormalization drift potential — two sources for the same timestamp (`creators.click_through_accepted_at` and `contracts.signed_at`). They are written in the same transaction so cannot diverge today, but a future writer that updates one without the other would.
+- **Triggered by:** a schema-cleanup pass once the deferred FK lands and `masterContract()` is a reliable join (then `click_through_accepted_at` can be derived from `masterContract.signed_at`).
+- **Resolution:** repoint `CreatorResource` + the accept idempotency guard at `masterContract()->signed_at` / `signed_master_contract_id`, then drop the column in a migration. Estimated ~30 minutes.
+- **Owner:** the schema-cleanup pass following the deferred-FK resolution (above).
+- **Status:** open. Surfaced by Sprint 4 Chunk 4, June 2, 2026.
+
+---
+
+## Full API test suite needs `memory_limit=2G` (unrelated big-CSV test OOMs at 128M)
+
+- **Where:** [`apps/api/tests/Feature/Modules/Creators/BulkInviteCsvParserTest.php`](../apps/api/tests/Feature/Modules/Creators/BulkInviteCsvParserTest.php) ("rejects a CSV exceeding the 5MB hard cap" builds a 300k-row CSV in memory).
+- **What we accepted (June 2, 2026, noted during Sprint 4 Chunk 4):** running the **entire** suite via `php artisan test` at PHP's default 128M `memory_limit` OOMs partway through (cumulative across the run, surfacing at the big-CSV test). The suite is green only at a raised limit: `php -d memory_limit=2G vendor/bin/pest`. Separately, `php artisan test --parallel` trips a pre-existing `use RuntimeException` non-compound-name warning in `Sprint3Chunk2InvariantsTest.php`. Neither is related to any feature code — they're test-harness ergonomics.
+- **Risk:** low, but a footgun: "all green" silently depends on remembering the memory flag. A contributor running the documented default command sees a scary FatalException unrelated to their change.
+- **Mitigation today:** scoped runs (per-module/per-dir) stay under 128M; the raised-limit full run is documented in chunk reviews.
+- **Triggered by:** a CI/test-harness tidy-up, OR the next chunk that touches the bulk-invite CSV test.
+- **Resolution:** either set `memory_limit=2G` in the test bootstrap / `phpunit.xml` (`<ini>`), or rewrite the big-CSV assertion to stream/stub the size check instead of materialising 300k rows; and fix the `Sprint3Chunk2InvariantsTest` import so `--parallel` is clean. Estimated ~20 minutes.
+- **Owner:** test-harness tidy-up / next bulk-invite-touching chunk.
+- **Status:** open. Surfaced by Sprint 4 Chunk 4, June 2, 2026.
+
+---
+
 ## Defensive `requireAgencyUser` guard for agency-shell routes
 
 - **Where:** [`apps/main/src/core/router/guards.ts`](../apps/main/src/core/router/guards.ts) (new guard, symmetric to the existing `requireOnboardingAccess`) + the `meta.guards` arrays on every `appRoutes` entry in [`apps/main/src/modules/auth/routes.ts`](../apps/main/src/modules/auth/routes.ts) (`app.dashboard`, `brands.*`, `agency-users.list`, `creator-invitations.bulk`, `settings`).

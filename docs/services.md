@@ -84,7 +84,7 @@ signup is usually fast (instant→days) — the decision is the gating step.
 ### E-signature
 
 - **Capability:** templated master contract, mobile signing, completion webhook, audit-grade signed PDF, multi-lang (en/pt/it).
-- **Code state:** `ESignatureProviderContract` + mock ✅ (4-method surface; contract step graceful-degrades to click-through accept when flag OFF). Real adapter ❌.
+- **Code state:** `ESignatureProviderContract` + mock ✅ (4-method surface; contract step graceful-degrades to click-through accept when flag OFF). Real adapter ❌. **Acceptance-record foundation now exists (S4 Ch4):** the spec'd `contracts` table (`03-DATA-MODEL.md §8`) is built and the click-through accept routes through it — every acceptance is a versioned + timestamped + attributed `contracts` row (`status=signed`, `signature_provider=internal`), unified with the future vendor path. **The vendor adapter EXTENDS this table — it does not rebuild it:** it fills the envelope columns (`signature_envelope_id`, `sent_at`, `expires_at`, `signature_provider=docusign|dropboxsign`) that ship now and stay null for click-through. ⚠️ Before the adapter lands it must convert the two `signed_master_contract_id` sentinel writers to real `contracts` rows so the deferred DB-level FK can be added — see `tech-debt.md` "Deferred `contracts` FK".
 - **Vendor:** **open — lean Dropbox Sign** (solid API, fair pricing, multi-lang; DocuSign is overkill for P1 volumes).
 - **Your action:** **select the vendor**, open a sandbox/dev account, add API key + webhook secret to Secrets Manager, prepare the master-contract template.
 - **Lands in:** S4 wk2 (adapter) — spec-native home is S9 (drafts/contracts), pulled forward by the full-Sprint-4 scope.
