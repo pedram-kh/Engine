@@ -9,6 +9,43 @@ anyone reviewing it later.
 
 ---
 
+## Postgres FTS name/bio search on the creator roster (spec'd `tsvector`, not built)
+
+- **Where:** spec at [`docs/03-DATA-MODEL.md:219`](03-DATA-MODEL.md) ("Postgres full-text index on `display_name`, `bio` — combined `tsvector` column"). No migration builds it; confirmed by the Sprint 4 Chunk 5 pre-kickoff inventory. The roster list that would consume it is [`apps/api/app/Modules/Agencies/Http/Controllers/AgencyCreatorController.php`](../apps/api/app/Modules/Agencies/Http/Controllers/AgencyCreatorController.php).
+- **What we accepted in Sprint 4 Chunk 5 (June 3, 2026):** D-c5-2 deferred FTS name/bio search to Sprint 6 (Internal creator matching). The roster ships with the four filters that have real backing today (status / country / language / category); name/bio search needs net-new infrastructure — a generated `tsvector` column + GIN index, **a SQLite-divergence guard** (the GIN/`to_tsvector` path is Postgres-only; the local + CI test DB is SQLite `:memory:`, which has no `tsvector`), and a query helper — that belongs with Sprint 6's matching engine, not bolted onto a list chunk.
+- **Risk:** low. The list is useful and complete without free-text search at Phase-1 roster volumes; the four structured filters narrow effectively. The cost is purely a missing convenience until Sprint 6.
+- **SQLite-divergence note:** unlike the `categories` filter — which uses `whereJsonContains`, and degrades gracefully (Postgres `@>`/GIN vs SQLite `json_each`, both supported by the query grammar) — there is **no portable `tsvector` equivalent on SQLite**. Sprint 6 must either guard the FTS path by driver (Postgres-only, with a `LIKE`/`ILIKE` fallback on SQLite) or accept that the FTS branch is exercised only in Postgres CI.
+- **Triggered by:** Sprint 6 (Internal creator matching) — the natural home for search + the talent-pool/metrics/availability filters deferred alongside it.
+- **Resolution:** in Sprint 6, add the generated `tsvector` column + GIN index (pgsql-guarded migration), a driver-aware query helper (FTS on Postgres, `ILIKE` fallback on SQLite), and wire a `?q=` param into the roster/matching endpoint.
+- **Owner:** Sprint 6 matching workstream.
+- **Status:** open. Surfaced + deliberately deferred by Sprint 4 Chunk 5, June 3, 2026 ([review](reviews/sprint-4-chunk-5-review.md)).
+
+---
+
+## Unindexed roster filters: `agency_creator_relations.relationship_status` + `creators.primary_language`
+
+- **Where:** [`apps/api/app/Modules/Agencies/Http/Controllers/AgencyCreatorController.php`](../apps/api/app/Modules/Agencies/Http/Controllers/AgencyCreatorController.php) — the `?status=` and `?language=` filters. Schema: [`2026_05_14_100007_create_agency_creator_relations_table.php`](../apps/api/database/migrations/2026_05_14_100007_create_agency_creator_relations_table.php) (no index on `relationship_status`) and [`2026_05_14_100000_create_creators_table.php`](../apps/api/database/migrations/2026_05_14_100000_create_creators_table.php) (no index on `primary_language`; `country_code` and `categories` ARE indexed — `idx_creators_country_code`, GIN `idx_creators_categories_gin`).
+- **What we accepted in Sprint 4 Chunk 5 (June 3, 2026):** D-c5-1 shipped these two filters without adding indexes. Both run **behind the agency-scoped relation set** — the query is already constrained to one agency's `agency_creator_relations` rows (tenancy scope + the belt-and-suspenders `where('agency_id', …)`), so the filtered cardinality is the agency's roster size, not the global table. At Phase-1 volumes a sequential scan over one agency's relations is negligible.
+- **Risk:** low at Phase-1 volume; grows only if a single agency's roster becomes very large (thousands+).
+- **Triggered by:** Sprint 6's matching engine (which will profile roster queries under realistic volume) OR the first agency whose roster query shows up in slow-query logs.
+- **Resolution:** add a B-tree index on `agency_creator_relations(agency_id, relationship_status)` and, if `primary_language` filtering proves hot, `creators(primary_language)`. Defer until a measured need exists.
+- **Owner:** Sprint 6 matching workstream / performance pass.
+- **Status:** open. Surfaced + deliberately deferred by Sprint 4 Chunk 5, June 3, 2026 ([review](reviews/sprint-4-chunk-5-review.md)).
+
+---
+
+## Heavy Vuetify components (`VSelect` / `VDataTableServer`) leak across jsdom mounts — component-spec stub pattern
+
+- **Where:** [`apps/main/src/modules/roster/pages/CreatorRosterPage.spec.ts`](../apps/main/src/modules/roster/pages/CreatorRosterPage.spec.ts) (the pattern's first use), against [`CreatorRosterPage.vue`](../apps/main/src/modules/roster/pages/CreatorRosterPage.vue). Contrast: [`BrandListPage.spec.ts`](../apps/main/src/modules/brands/pages/BrandListPage.spec.ts) survives 7 full mounts only because it has **no** `v-select`.
+- **What we accepted in Sprint 4 Chunk 5 (June 3, 2026):** Vuetify's `VSelect` (its `VOverlay`/`VMenu` internals teleport to `<body>` and are not reclaimed on unmount) and `VDataTableServer` (retains a large tree) **leak across jsdom mounts** and OOM the Vitest worker at ~3–4 full renders. So `CreatorRosterPage.spec` renders the **real** data-table in **exactly one** row-DOM test (the load-bearing D-c5-4 non-navigating-row assertion hits real DOM there) and **stubs** `VDataTableServer` in the other four cases, which drive the filter refs directly + assert against the mocked API. `VSelect` is always stubbed; the read-only rating is rendered as static star `v-icon`s rather than `v-rating` (another jsdom memory hog).
+- **Risk:** **none today** — coverage for the roster surface is intact (logic, filters, empty/error states via refs + mock; row DOM + no-navigation via the one real mount). The cost is a test-ergonomics constraint, not a coverage gap.
+- **Triggered by:** the **next rich agency-SPA list** — **Sprint 6's matching / roster-management view**, which will carry _more_ selects + filters (talent pools, metrics/availability, FTS search box) and so hits the same wall harder. The stub-the-heavy-components pattern scales poorly as a single page accrues many heavy controls.
+- **Resolution (Sprint 6 decides deliberately):** either (a) keep + formalize the "render one real table, stub the rest" pattern (cheap, fast, but table-DOM coverage stays thin), or (b) stand up **Playwright** table-DOM coverage for the matching view and let component specs stub freely. Pick one consciously rather than discovering the OOM mid-build.
+- **Owner:** Sprint 6 matching workstream.
+- **Status:** open (accepted — not a coverage gap today). Surfaced by Sprint 4 Chunk 5, June 3, 2026 ([review](reviews/sprint-4-chunk-5-review.md)).
+
+---
+
 ## ⚠️ Deferred `creators.signed_master_contract_id` → `contracts.id` FK (column is temporarily MULTI-MEANING)
 
 - **Where:** [`apps/api/database/migrations/2026_05_14_100000_create_creators_table.php`](../apps/api/database/migrations/2026_05_14_100000_create_creators_table.php) (the FK-less column) + the three writers of `creators.signed_master_contract_id`:
