@@ -182,7 +182,7 @@ async function loadRoster(): Promise<void> {
 
 // Explicit load on mount — the v-data-table-server sits inside a v-else
 // that only renders once items are populated, so @update:options cannot
-// drive the initial fetch (mirrors BrandListPage).
+// drive the initial load. Mirrors BrandListPage.
 onMounted(() => {
   void loadRoster()
 })

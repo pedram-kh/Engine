@@ -93,7 +93,7 @@ it('lists relations across all relationship statuses (roster, prospect, external
     expect($response->status())->toBe(200);
     expect($response->json('meta.total'))->toBe(3);
 
-    $statuses = collect($response->json('data'))->pluck('attributes.relationship_status')->all();
+    $statuses = $response->json('data.*.attributes.relationship_status');
     expect($statuses)->toEqualCanonicalizing(['roster', 'prospect', 'external']);
 });
 
@@ -286,7 +286,7 @@ it('INCLUDES blacklisted relations with the flag visible (unlike the dashboard K
     $response = $this->actingAs($admin)->getJson(rosterUrl($agency));
 
     expect($response->json('meta.total'))->toBe(2);
-    $flags = collect($response->json('data'))->pluck('attributes.is_blacklisted')->all();
+    $flags = $response->json('data.*.attributes.is_blacklisted');
     expect($flags)->toContain(true)->toContain(false);
 });
 
@@ -296,7 +296,7 @@ it('excludes soft-deleted creators from the roster list', function (): void {
 
     makeRosterRelation($agency);
     $relation = makeRosterRelation($agency);
-    $relation->creator->delete();
+    $relation->creator()->firstOrFail()->delete();
 
     $response = $this->actingAs($admin)->getJson(rosterUrl($agency));
 
@@ -317,7 +317,7 @@ it('sorts by creator display_name ascending by default', function (): void {
 
     $response = $this->actingAs($admin)->getJson(rosterUrl($agency));
 
-    $names = collect($response->json('data'))->pluck('attributes.display_name')->all();
+    $names = $response->json('data.*.attributes.display_name');
     expect($names)->toBe(['Alice', 'Bob', 'Charlie']);
 });
 
