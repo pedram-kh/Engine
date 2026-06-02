@@ -67,6 +67,9 @@ it('AuditAction catalogue lists every Sprint 1-3 auth + user + mfa + brand + inv
         'creator.admin.field_updated',
         'creator.approved',
         'creator.rejected',
+        // Sprint 4 Chunk 3 — manual KYC verify (D-c3-3) + resubmit reopen (D-c3-9)
+        'creator.kyc.manually_verified',
+        'creator.application.reopened',
         // Sprint 3 — auto-emitted by Audited trait on related models
         'creator_tax_profile.created',
         'creator_tax_profile.updated',

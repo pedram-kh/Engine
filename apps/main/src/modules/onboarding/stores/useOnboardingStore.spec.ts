@@ -358,9 +358,9 @@ describe('useOnboardingStore', () => {
     // store with the reopened (incomplete) creator.
     it('reopen refreshes creator from response', async () => {
       const store = useOnboardingStore()
-      vi.mocked(onboardingApi.reopen).mockResolvedValue({
-        data: makeCreator({ attributes: { application_status: 'incomplete' } }),
-      })
+      // makeCreator() defaults application_status to 'incomplete' — the
+      // post-reopen state we assert below.
+      vi.mocked(onboardingApi.reopen).mockResolvedValue({ data: makeCreator() })
       await store.reopen()
       expect(onboardingApi.reopen).toHaveBeenCalledTimes(1)
       expect(store.applicationStatus).toBe('incomplete')
