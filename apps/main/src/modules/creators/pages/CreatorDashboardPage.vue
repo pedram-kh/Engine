@@ -32,12 +32,15 @@
  */
 
 import { CompletenessBar } from '@catalyst/ui'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
+import { resolveSubmitErrorKey } from '../../onboarding/composables/useSubmitErrorKey'
 import { useOnboardingStore } from '../../onboarding/stores/useOnboardingStore'
 
 const { t } = useI18n()
+const router = useRouter()
 const store = useOnboardingStore()
 
 const status = computed(() => store.applicationStatus ?? 'incomplete')
@@ -48,12 +51,30 @@ const completenessLabel = computed(() =>
 
 const displayName = computed(() => store.creator?.attributes.display_name ?? '')
 const submittedAt = computed(() => store.creator?.attributes.submitted_at)
-const rejectionReason = computed(() => {
-  const admin = (
-    store.creator as unknown as { admin_attributes?: { rejection_reason?: string | null } }
-  )?.admin_attributes
-  return admin?.rejection_reason ?? null
-})
+// Sprint 4 Chunk 3 (Cluster 5 / D-c3-1): the reason is now surfaced on
+// the creator-facing attributes (it used to be admin-only and thus null
+// here). Read it directly from `attributes`.
+const rejectionReason = computed(() => store.creator?.attributes.rejection_reason ?? null)
+
+// Sprint 4 Chunk 3 (Cluster 6 / D-c3-9): creator-driven resubmit.
+const isReopening = ref(false)
+const reopenErrorKey = ref<string | null>(null)
+
+async function resubmit(): Promise<void> {
+  isReopening.value = true
+  reopenErrorKey.value = null
+  try {
+    await store.reopen()
+    await router.push({ name: 'onboarding.welcome-back' })
+  } catch (error) {
+    reopenErrorKey.value = resolveSubmitErrorKey(
+      error,
+      'creator.ui.dashboard.rejected.resubmit_failed',
+    )
+  } finally {
+    isReopening.value = false
+  }
+}
 
 onMounted(async () => {
   if (!store.isBootstrapped) {
@@ -107,6 +128,25 @@ onMounted(async () => {
       <p v-if="rejectionReason" class="mt-2" data-testid="dashboard-rejection-reason">
         <strong>{{ t('creator.ui.dashboard.rejected.reason_label') }}</strong>
         {{ rejectionReason }}
+      </p>
+      <div class="mt-3">
+        <v-btn
+          color="primary"
+          variant="flat"
+          :loading="isReopening"
+          data-testid="dashboard-resubmit"
+          @click="resubmit"
+        >
+          {{ t('creator.ui.dashboard.rejected.resubmit') }}
+        </v-btn>
+      </div>
+      <p
+        v-if="reopenErrorKey"
+        role="alert"
+        class="mt-2 text-error"
+        data-testid="dashboard-resubmit-error"
+      >
+        {{ t(reopenErrorKey) }}
       </p>
     </v-alert>
 

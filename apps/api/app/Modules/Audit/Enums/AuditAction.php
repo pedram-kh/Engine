@@ -137,6 +137,17 @@ enum AuditAction: string
     case CreatorApproved = 'creator.approved';
     case CreatorRejected = 'creator.rejected';
 
+    // Manual KYC clearance + creator-driven resubmit (Sprint 4 Chunk 3).
+    // CreatorKycManuallyVerified is emitted by the admin verify-identity
+    // endpoint (D-c3-3) — a permanent compliance-sensitive identity
+    // override. Metadata: {note?} and the actor is the acting admin;
+    // the verified_by_user_id column carries the same attribution on the
+    // row itself. CreatorApplicationReopened is emitted when a creator
+    // reopens their own rejected application (D-c3-9), flipping
+    // rejected → incomplete to re-enter the wizard.
+    case CreatorKycManuallyVerified = 'creator.kyc.manually_verified';
+    case CreatorApplicationReopened = 'creator.application.reopened';
+
     // Auto-emitted by Audited trait on related models. Each model
     // overrides auditAction() to produce snake_case subject naming
     // (the trait's default class_basename lowercase produces

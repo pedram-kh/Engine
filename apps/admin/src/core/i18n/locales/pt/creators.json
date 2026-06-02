@@ -1,6 +1,32 @@
 {
   "admin": {
     "creators": {
+      "list": {
+        "title": "Fila de revisão de criadores",
+        "unnamed": "Criador sem nome",
+        "view": "Ver criador",
+        "load_failed": "Não foi possível carregar a fila de revisão. Atualize a página.",
+        "fields": {
+          "name": "Criador",
+          "status": "Estado",
+          "kyc": "KYC",
+          "completeness": "Conclusão",
+          "submitted_at": "Submetido"
+        },
+        "filters": {
+          "pending": "Pendente",
+          "approved": "Aprovado",
+          "rejected": "Rejeitado",
+          "incomplete": "Incompleto",
+          "all": "Todos"
+        },
+        "status_labels": {
+          "incomplete": "Incompleto",
+          "pending": "Pendente",
+          "approved": "Aprovado",
+          "rejected": "Rejeitado"
+        }
+      },
       "detail": {
         "fallback_title": "Criador",
         "application_status": "Estado da candidatura: {status}",
@@ -61,6 +87,27 @@
           "cancel": "Cancelar",
           "success": "Criador rejeitado.",
           "failed": "Não foi possível rejeitar este criador. Tente novamente."
+        },
+        "identity": {
+          "heading": "Verificação de identidade",
+          "status": "Estado: {status}",
+          "verify_manual": "Verificar manualmente",
+          "verify_vendor": "Solicitar verificação por fornecedor",
+          "vendor_disabled_tooltip": "Nenhum fornecedor de KYC configurado",
+          "method_labels": {
+            "vendor": "Verificado pelo fornecedor",
+            "manual": "Verificado manualmente por um administrador"
+          }
+        },
+        "verify": {
+          "title": "Verificar manualmente a identidade de {name}",
+          "description": "Isto marca permanentemente a identidade do criador como verificada e fica registado na sua conta no log de auditoria. Use apenas quando tiver confirmado a identidade por outros meios.",
+          "note_label": "Nota (opcional)",
+          "note_hint": "Registada no log de auditoria juntamente com o seu nome.",
+          "confirm": "Verificar identidade",
+          "cancel": "Cancelar",
+          "success": "Identidade verificada.",
+          "failed": "Não foi possível verificar a identidade deste criador. Tente novamente."
         }
       }
     }
@@ -68,6 +115,8 @@
   "creator": {
     "already_approved": "Este criador já foi aprovado.",
     "already_rejected": "Este criador já foi rejeitado.",
+    "kyc_not_verified": "A aprovação está bloqueada até que a identidade do criador seja verificada.",
+    "kyc_already_verified": "A identidade deste criador já foi verificada.",
     "admin": {
       "field_status_immutable": "As transições de estado usam as ações aprovar / rejeitar, não a edição de campo."
     }

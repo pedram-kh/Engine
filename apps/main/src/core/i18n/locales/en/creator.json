@@ -3,6 +3,8 @@
     "not_found": "No creator profile is associated with your account. Please sign out and sign in again, or contact support.",
     "already_approved": "This creator has already been approved.",
     "already_rejected": "This creator has already been rejected.",
+    "kyc_not_verified": "This creator's identity must be verified before the application can be approved.",
+    "kyc_already_verified": "This creator's identity has already been verified.",
     "admin": {
       "field_status_immutable": "Application status cannot be changed through this form. Use the approve or reject actions instead."
     },
@@ -13,6 +15,9 @@
       "feature_disabled": "This step is currently unavailable while a configuration change is in progress. Skip to continue your application.",
       "feature_enabled": "This option is not available right now — please use the standard flow for this step.",
       "incomplete": "Cannot submit your application yet — one or more wizard steps are still incomplete."
+    },
+    "reopen": {
+      "invalid_state": "Only a rejected application can be reopened."
     },
     "ui": {
       "wizard": {
@@ -245,9 +250,11 @@
         "rejected": {
           "title": "Application not approved",
           "heading": "Application needs changes",
-          "description": "Please contact support for the next steps. We're here to help.",
+          "description": "Review the notes below, update your application, and resubmit it for another review.",
           "reason_label": "Reason:",
-          "edit_profile": "Edit profile"
+          "edit_profile": "Edit profile",
+          "resubmit": "Update & resubmit",
+          "resubmit_failed": "We couldn't reopen your application. Please try again."
         },
         "incomplete": {
           "title": "Continue your application",

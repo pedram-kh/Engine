@@ -14,6 +14,7 @@ vi.mock('../api/onboarding.api', () => ({
     pollPayoutStatus: vi.fn(),
     pollContractStatus: vi.fn(),
     submit: vi.fn(),
+    reopen: vi.fn(),
     uploadAvatar: vi.fn(),
     deleteAvatar: vi.fn(),
   },
@@ -49,6 +50,8 @@ function makeCreator(overrides: Partial<CreatorResource> = {}): CreatorResource 
     profile_completeness_score: 0,
     submitted_at: null,
     approved_at: null,
+    rejection_reason: null,
+    rejected_at: null,
     created_at: '2026-05-14T00:00:00+00:00',
     updated_at: '2026-05-14T00:00:00+00:00',
   }
@@ -348,6 +351,19 @@ describe('useOnboardingStore', () => {
       const store = useOnboardingStore()
       vi.mocked(onboardingApi.submit).mockResolvedValue({ data: makeCreator() })
       await store.submit()
+      expect(store.isSubmitting).toBe(false)
+    })
+
+    // Cluster 6 (D-c3-9): reopen calls the endpoint and refreshes the
+    // store with the reopened (incomplete) creator.
+    it('reopen refreshes creator from response', async () => {
+      const store = useOnboardingStore()
+      vi.mocked(onboardingApi.reopen).mockResolvedValue({
+        data: makeCreator({ attributes: { application_status: 'incomplete' } }),
+      })
+      await store.reopen()
+      expect(onboardingApi.reopen).toHaveBeenCalledTimes(1)
+      expect(store.applicationStatus).toBe('incomplete')
       expect(store.isSubmitting).toBe(false)
     })
 

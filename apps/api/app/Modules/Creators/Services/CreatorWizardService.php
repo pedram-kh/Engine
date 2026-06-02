@@ -330,13 +330,56 @@ final class CreatorWizardService
                 }
             }
 
+            // D-c3-10: a (re)submission supersedes any prior rejection.
+            // Clear the rejection fields on incomplete → pending so the
+            // dashboard's rejected-banner doesn't resurface after a
+            // resubmit; the audit log preserves the rejection history.
             $creator->forceFill([
                 'application_status' => ApplicationStatus::Pending->value,
                 'submitted_at' => now(),
+                'rejected_at' => null,
+                'rejection_reason' => null,
             ])->save();
 
             Audit::log(
                 action: AuditAction::CreatorSubmitted,
+                actor: $creator->user,
+                subject: $creator,
+            );
+
+            return $creator;
+        });
+    }
+
+    /**
+     * Sprint 4 Chunk 3 (D-c3-9) — creator-driven resubmit reopen.
+     *
+     * Source-state-guarded: only a `rejected` creator may reopen. Flips
+     * application_status rejected → incomplete so the existing wizard
+     * (whose requireOnboardingAccess guard already admits `incomplete`)
+     * re-opens for editing. D-c3-10: the rejected_at / rejection_reason
+     * fields are PRESERVED here (the wizard can surface the reason as
+     * editing guidance); they're cleared only on the subsequent submit().
+     * submitted_at is cleared so the reopened application reads as not
+     * yet (re)submitted.
+     *
+     * Throws creator.reopen.invalid_state when called on a non-rejected
+     * creator — the controller translates to a 409.
+     */
+    public function reopen(Creator $creator): Creator
+    {
+        return DB::transaction(function () use ($creator): Creator {
+            if ($creator->application_status !== ApplicationStatus::Rejected) {
+                throw new RuntimeException('creator.reopen.invalid_state');
+            }
+
+            $creator->forceFill([
+                'application_status' => ApplicationStatus::Incomplete->value,
+                'submitted_at' => null,
+            ])->save();
+
+            Audit::log(
+                action: AuditAction::CreatorApplicationReopened,
                 actor: $creator->user,
                 subject: $creator,
             );

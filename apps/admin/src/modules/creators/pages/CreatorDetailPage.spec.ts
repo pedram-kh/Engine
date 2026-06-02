@@ -23,6 +23,8 @@ vi.mock('@/modules/creators/api/creators.api', async () => {
       updateField: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
+      verifyIdentity: vi.fn(),
+      list: vi.fn(),
     },
   }
 })
@@ -51,8 +53,10 @@ function buildCreator(overrides: Partial<CreatorResource['attributes']> = {}): C
       verification_level: 'unverified',
       application_status: 'pending',
       tier: null,
-      kyc_status: 'none',
-      kyc_verified_at: null,
+      // Default to verified KYC so the existing approve-path tests
+      // satisfy the new gate (D-c3-7). Gate-specific tests override this.
+      kyc_status: 'verified',
+      kyc_verified_at: '2026-01-02T00:00:00Z',
       tax_profile_complete: false,
       payout_method_set: false,
       has_signed_master_contract: false,
@@ -62,6 +66,8 @@ function buildCreator(overrides: Partial<CreatorResource['attributes']> = {}): C
       profile_completeness_score: 60,
       submitted_at: null,
       approved_at: null,
+      rejection_reason: null,
+      rejected_at: null,
       created_at: '2026-01-01T00:00:00Z',
       updated_at: '2026-01-01T00:00:00Z',
       ...overrides,
@@ -82,7 +88,20 @@ function buildCreator(overrides: Partial<CreatorResource['attributes']> = {}): C
       rejected_at: null,
       last_active_at: null,
       kyc_verifications: [],
+      kyc_method: 'manual',
+      verified_by_user_id: null,
+      kyc_vendor_available: false,
     },
+  }
+}
+
+function withAdmin(
+  creator: CreatorResource,
+  admin: Partial<NonNullable<CreatorResource['admin_attributes']>>,
+): CreatorResource {
+  return {
+    ...creator,
+    admin_attributes: { ...creator.admin_attributes!, ...admin },
   }
 }
 
@@ -406,5 +425,97 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
       'new bio',
       'cleanup outdated copy',
     )
+  })
+
+  // ── Cluster 2 — approve gate (D-c3-7) ────────────────────────────
+  it('hides Approve when KYC is not verified (gate)', async () => {
+    vi.mocked(adminCreatorsApi.show).mockResolvedValue(
+      envelope(buildCreator({ kyc_status: 'none', kyc_verified_at: null })),
+    )
+    const h = await mountCreatorPage(CreatorDetailPage)
+    teardown = h.unmount
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-testid="admin-creator-detail-approve"]').exists()).toBe(false)
+    // Reject stays available — only the approve gate depends on KYC.
+    expect(h.wrapper.find('[data-testid="admin-creator-detail-reject"]').exists()).toBe(true)
+  })
+
+  it('shows Approve when KYC is not_required (flag-OFF terminal, D-NEW-1)', async () => {
+    vi.mocked(adminCreatorsApi.show).mockResolvedValue(
+      envelope(buildCreator({ kyc_status: 'not_required', kyc_verified_at: null })),
+    )
+    const h = await mountCreatorPage(CreatorDetailPage)
+    teardown = h.unmount
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-testid="admin-creator-detail-approve"]').exists()).toBe(true)
+  })
+
+  // ── Cluster 4 — verify-identity UI (D-c3-3 / D-c3-6) ─────────────
+  it('manual verify: opens the dialog, calls verifyIdentity, and refreshes', async () => {
+    vi.mocked(adminCreatorsApi.show).mockResolvedValue(
+      envelope(buildCreator({ kyc_status: 'pending', kyc_verified_at: null })),
+    )
+    vi.mocked(adminCreatorsApi.verifyIdentity).mockResolvedValue(
+      envelope(buildCreator({ kyc_status: 'verified' })),
+    )
+    const h = await mountCreatorPage(CreatorDetailPage)
+    teardown = h.unmount
+    await flushPromises()
+
+    await h.wrapper.find('[data-testid="admin-creator-detail-verify-manual"]').trigger('click')
+    await flushPromises()
+
+    const note = document.body.querySelector<HTMLTextAreaElement>(
+      '[data-testid="admin-creator-verify-dialog-note"] textarea',
+    )!
+    note.value = 'Reviewed passport + selfie.'
+    note.dispatchEvent(new Event('input'))
+    await flushPromises()
+
+    document
+      .querySelector<HTMLButtonElement>('[data-testid="admin-creator-verify-dialog-confirm"]')!
+      .click()
+    await flushPromises()
+
+    expect(adminCreatorsApi.verifyIdentity).toHaveBeenCalledWith(
+      '01HQABCD',
+      'Reviewed passport + selfie.',
+    )
+    // Once verified the manual affordance disappears (re-verify → 409).
+    expect(h.wrapper.find('[data-testid="admin-creator-detail-verify-manual"]').exists()).toBe(
+      false,
+    )
+  })
+
+  it('hides the manual-verify control once KYC is verified', async () => {
+    vi.mocked(adminCreatorsApi.show).mockResolvedValue(
+      envelope(buildCreator({ kyc_status: 'verified' })),
+    )
+    const h = await mountCreatorPage(CreatorDetailPage)
+    teardown = h.unmount
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-testid="admin-creator-detail-verify-manual"]').exists()).toBe(
+      false,
+    )
+  })
+
+  it('keeps the vendor-verify control disabled when no vendor is available', async () => {
+    vi.mocked(adminCreatorsApi.show).mockResolvedValue(
+      envelope(
+        withAdmin(buildCreator({ kyc_status: 'pending', kyc_verified_at: null }), {
+          kyc_vendor_available: false,
+        }),
+      ),
+    )
+    const h = await mountCreatorPage(CreatorDetailPage)
+    teardown = h.unmount
+    await flushPromises()
+
+    const vendor = h.wrapper.find('[data-testid="admin-creator-detail-verify-vendor"]')
+    expect(vendor.exists()).toBe(true)
+    expect(vendor.attributes('disabled')).toBeDefined()
   })
 })

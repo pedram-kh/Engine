@@ -6,6 +6,7 @@ use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
 use App\Modules\Creators\Enums\ApplicationStatus;
+use App\Modules\Creators\Enums\KycStatus;
 use App\Modules\Creators\Policies\CreatorPolicy;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
@@ -352,7 +353,8 @@ it('rejects bio longer than 5000 chars (matches wizard cap)', function (): void 
 
 it('approves a pending creator and emits creator.approved audit', function (): void {
     $admin = makePlatformAdmin();
-    $creator = CreatorFactory::new()->createOne([
+    // Sprint 4 Chunk 3 (D-c3-7): approve now requires identity cleared.
+    $creator = CreatorFactory::new()->kycVerified()->createOne([
         'application_status' => ApplicationStatus::Pending->value,
     ]);
 
@@ -384,7 +386,7 @@ it('approves a pending creator and emits creator.approved audit', function (): v
 
 it('approves without a welcome message (optional field)', function (): void {
     $admin = makePlatformAdmin();
-    $creator = CreatorFactory::new()->createOne([
+    $creator = CreatorFactory::new()->kycVerified()->createOne([
         'application_status' => ApplicationStatus::Pending->value,
     ]);
 
@@ -396,6 +398,102 @@ it('approves without a welcome message (optional field)', function (): void {
     assert($fresh !== null);
     expect($fresh->welcome_message)->toBeNull();
 });
+
+it('refuses approve when kyc_status is not verified — 422 creator.kyc_not_verified (gate break-revert)', function (): void {
+    $admin = makePlatformAdmin();
+    // Pending application but identity NOT cleared (default kyc_status=none).
+    $creator = CreatorFactory::new()->createOne([
+        'application_status' => ApplicationStatus::Pending->value,
+        'kyc_status' => KycStatus::None->value,
+    ]);
+
+    $response = $this->actingAs($admin, 'web_admin')
+        ->postJson("/api/v1/admin/creators/{$creator->ulid}/approve", []);
+
+    expect($response->status())->toBe(422);
+    expect($response->json('errors.0.code'))->toBe('creator.kyc_not_verified');
+
+    // The gate must not flip status — break-revert: removing the gate
+    // makes this assertion fail (the creator would become approved).
+    $fresh = $creator->fresh();
+    assert($fresh !== null);
+    expect($fresh->application_status)->toBe(ApplicationStatus::Pending);
+});
+
+it('refuses approve when kyc_status is pending (mid-vendor-flow) — 422', function (): void {
+    $admin = makePlatformAdmin();
+    $creator = CreatorFactory::new()->createOne([
+        'application_status' => ApplicationStatus::Pending->value,
+        'kyc_status' => KycStatus::Pending->value,
+    ]);
+
+    $response = $this->actingAs($admin, 'web_admin')
+        ->postJson("/api/v1/admin/creators/{$creator->ulid}/approve", []);
+
+    expect($response->status())->toBe(422);
+    expect($response->json('errors.0.code'))->toBe('creator.kyc_not_verified');
+});
+
+it('approves a creator whose kyc_status is not_required (flag-OFF path, D-NEW-1)', function (): void {
+    $admin = makePlatformAdmin();
+    $creator = CreatorFactory::new()->createOne([
+        'application_status' => ApplicationStatus::Pending->value,
+        'kyc_status' => KycStatus::NotRequired->value,
+    ]);
+
+    $response = $this->actingAs($admin, 'web_admin')
+        ->postJson("/api/v1/admin/creators/{$creator->ulid}/approve", []);
+
+    expect($response->status())->toBe(200);
+    $fresh = $creator->fresh();
+    assert($fresh !== null);
+    expect($fresh->application_status)->toBe(ApplicationStatus::Approved);
+});
+
+/**
+ * Fail-closed exhaustiveness pin (D-c3-7 / D-NEW-1 — same fail-closed
+ * principle as the Chunk-2 feed-metadata whitelist).
+ *
+ * The dataset is derived from `KycStatus::cases()`, so a NEW enum case
+ * auto-enrolls here the moment it's added. The approvable set is pinned
+ * INDEPENDENTLY of the controller to exactly {Verified, NotRequired} —
+ * so if a future case is ever made silently approvable (added to the
+ * controller's whitelist, or the gate is flipped to a blacklist), the
+ * new case lands in the "must 422" branch here and this test fails.
+ * The gate admits ONLY the two listed states; everything else (today:
+ * none / pending / rejected; tomorrow: any new case) fails closed.
+ */
+it('approve gate is fail-closed: only verified + not_required clear identity (all KycStatus cases)', function (KycStatus $status): void {
+    // The pinned allow-list — NOT sourced from the controller. This is
+    // the contract the gate must honor; drifting the controller away
+    // from it (in either direction) breaks this test.
+    $approvable = [KycStatus::Verified, KycStatus::NotRequired];
+
+    $admin = makePlatformAdmin();
+    $creator = CreatorFactory::new()->createOne([
+        'application_status' => ApplicationStatus::Pending->value,
+        'kyc_status' => $status->value,
+    ]);
+
+    $response = $this->actingAs($admin, 'web_admin')
+        ->postJson("/api/v1/admin/creators/{$creator->ulid}/approve", []);
+
+    $fresh = $creator->fresh();
+    assert($fresh !== null);
+
+    if (in_array($status, $approvable, true)) {
+        expect($response->status())->toBe(200);
+        expect($fresh->application_status)->toBe(ApplicationStatus::Approved);
+    } else {
+        expect($response->status())->toBe(422);
+        expect($response->json('errors.0.code'))->toBe('creator.kyc_not_verified');
+        // Gate must not flip status on a blocked case.
+        expect($fresh->application_status)->toBe(ApplicationStatus::Pending);
+    }
+})->with(fn (): array => array_map(
+    static fn (KycStatus $status): array => [$status],
+    KycStatus::cases(),
+));
 
 it('returns 409 + creator.already_approved when approving an already-approved creator (idempotent)', function (): void {
     $admin = makePlatformAdmin();

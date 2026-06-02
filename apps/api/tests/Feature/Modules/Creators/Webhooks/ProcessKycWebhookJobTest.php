@@ -7,6 +7,7 @@ use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Audit\Models\IntegrationEvent;
 use App\Modules\Audit\Services\AuditLogger;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
+use App\Modules\Creators\Enums\KycMethod;
 use App\Modules\Creators\Enums\KycStatus;
 use App\Modules\Creators\Integrations\Contracts\KycProvider;
 use App\Modules\Creators\Integrations\Mock\MockKycProvider;
@@ -56,12 +57,26 @@ it('flips kyc_status to verified + emits CreatorWizardKycCompleted on first tran
     $creator->refresh();
     expect($creator->kyc_status)->toBe(KycStatus::Verified);
     expect($creator->kyc_verified_at)->not->toBeNull();
+    // D-c3-5 break-revert: the vendor path stamps kyc_method=vendor when
+    // it writes kyc_status. Dropping the stamp fails this assertion.
+    expect($creator->kyc_method)->toBe(KycMethod::Vendor);
 
     $completionAudit = AuditLog::query()->where('action', AuditAction::CreatorWizardKycCompleted)->count();
     expect($completionAudit)->toBe(1);
 
     $event->refresh();
     expect($event->processed_at)->not->toBeNull();
+});
+
+it('stamps kyc_method=vendor even when the webhook reports rejection (discriminator always populated)', function (): void {
+    $creator = makeProcessKycCreator();
+    $event = makeKycEventForCreator($creator, 'rejected', 'evt_reject_method');
+
+    (new ProcessKycWebhookJob($event->id))->handle(app(KycProvider::class), app(AuditLogger::class));
+
+    $creator->refresh();
+    expect($creator->kyc_status)->toBe(KycStatus::Rejected);
+    expect($creator->kyc_method)->toBe(KycMethod::Vendor);
 });
 
 it('does NOT re-emit completion audit on re-run for an already-verified creator (#6 idempotency)', function (): void {

@@ -120,6 +120,16 @@ export const onboardingApi = {
     return http.post<CreatorResourceEnvelope>(`${BASE}/wizard/submit`)
   },
 
+  /**
+   * Reopen a rejected application (Sprint 4 Chunk 3, D-c3-9). Flips the
+   * creator's own `rejected → incomplete` so the wizard re-opens. The
+   * rejection fields are preserved (cleared on the subsequent submit).
+   * 409 + `creator.reopen.invalid_state` if not in the rejected state.
+   */
+  reopen(): Promise<CreatorResourceEnvelope> {
+    return http.post<CreatorResourceEnvelope>(`${BASE}/reopen`)
+  },
+
   // ── Avatar (Step 2 sub-element) ──────────────────────────────────
   /**
    * Direct-multipart upload — 5 MB cap enforced backend-side; the

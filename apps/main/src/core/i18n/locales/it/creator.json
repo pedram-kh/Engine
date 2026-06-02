@@ -3,6 +3,8 @@
     "not_found": "Nessun profilo creator è associato al tuo account. Esci e accedi di nuovo, oppure contatta l'assistenza.",
     "already_approved": "Questo creator è già stato approvato.",
     "already_rejected": "Questo creator è già stato rifiutato.",
+    "kyc_not_verified": "L'identità di questo creator deve essere verificata prima che la candidatura possa essere approvata.",
+    "kyc_already_verified": "L'identità di questo creator è già stata verificata.",
     "admin": {
       "field_status_immutable": "Lo stato della candidatura non può essere modificato tramite questo modulo. Utilizza le azioni di approvazione o rifiuto."
     },
@@ -13,6 +15,9 @@
       "feature_disabled": "Questo passaggio non è disponibile durante una modifica di configurazione. Puoi saltarlo per continuare la candidatura.",
       "feature_enabled": "Questa opzione non è disponibile in questo momento — utilizza il flusso standard di questo passaggio.",
       "incomplete": "Non è possibile inviare la candidatura — uno o più passaggi della procedura guidata sono ancora incompleti."
+    },
+    "reopen": {
+      "invalid_state": "Solo una candidatura rifiutata può essere riaperta."
     },
     "ui": {
       "wizard": {
@@ -245,9 +250,11 @@
         "rejected": {
           "title": "Candidatura non approvata",
           "heading": "La candidatura richiede modifiche",
-          "description": "Contatta l'assistenza per i prossimi passi. Siamo qui per aiutarti.",
+          "description": "Esamina le note qui sotto, aggiorna la tua candidatura e inviala di nuovo per una nuova revisione.",
           "reason_label": "Motivo:",
-          "edit_profile": "Modifica profilo"
+          "edit_profile": "Modifica profilo",
+          "resubmit": "Aggiorna e reinvia",
+          "resubmit_failed": "Non è stato possibile riaprire la tua candidatura. Riprova."
         },
         "incomplete": {
           "title": "Continua la tua candidatura",

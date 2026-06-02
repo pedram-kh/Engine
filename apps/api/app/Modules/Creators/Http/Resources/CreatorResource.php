@@ -136,6 +136,13 @@ final class CreatorResource extends JsonResource
                 'tier' => $creator->tier,
                 'kyc_status' => $creator->kyc_status->value,
                 'kyc_verified_at' => $creator->kyc_verified_at?->toIso8601String(),
+                // Sprint 4 Chunk 3 (D-c3-1, Cluster 5): the rejection
+                // feedback is surfaced on the creator-facing payload (not
+                // just admin_attributes) so CreatorDashboardPage's rejected
+                // banner can render the reason as editing guidance. Null
+                // unless the application has been rejected.
+                'rejection_reason' => $creator->rejection_reason,
+                'rejected_at' => $creator->rejected_at?->toIso8601String(),
                 'tax_profile_complete' => $creator->tax_profile_complete,
                 'payout_method_set' => $creator->payout_method_set,
                 'has_signed_master_contract' => $creator->signed_master_contract_id !== null,
@@ -186,6 +193,17 @@ final class CreatorResource extends JsonResource
                 'rejection_reason' => $creator->rejection_reason,
                 'rejected_at' => $creator->rejected_at?->toIso8601String(),
                 'last_active_at' => $creator->last_active_at?->toIso8601String(),
+                // Sprint 4 Chunk 3 (Cluster 1/4): the KYC-method
+                // discriminator + manual-verify attribution + whether a
+                // real vendor adapter is wired. kyc_vendor_available drives
+                // the admin SPA's "Request vendor verification" disabled
+                // affordance (D-c3-6/D-NEW-2): true only when the KYC flag
+                // is ON AND a real (non-mock) vendor driver is configured —
+                // false today (kyc_verification_enabled OFF, realDrivers []).
+                'kyc_method' => $creator->kyc_method?->value,
+                'verified_by_user_id' => $creator->verified_by_user_id,
+                'kyc_vendor_available' => Feature::active(KycVerificationEnabled::NAME)
+                    && ! in_array((string) config('integrations.kyc.driver'), ['', 'mock'], true),
                 // Eager-loaded by the admin controller via with('kycVerifications')
                 // — defensive ?? [] so a non-eager-loaded call doesn't blow up.
                 // PII (decision_data, failure_reason) is NEVER surfaced here;

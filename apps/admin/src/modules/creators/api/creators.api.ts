@@ -15,9 +15,46 @@
  * additionally gates this route with EnsureMfaForAdmins.
  */
 
-import type { CreatorResourceEnvelope } from '@catalyst/api-client'
+import type {
+  CreatorApplicationStatus,
+  CreatorKycStatus,
+  CreatorResourceEnvelope,
+} from '@catalyst/api-client'
 
 import { http } from '@/core/api'
+
+/**
+ * A single row in the admin review queue (GET /admin/creators). Slim
+ * list-card shape — the full drill-in lives at the show route.
+ */
+export interface AdminCreatorListItem {
+  id: string
+  type: 'creators'
+  attributes: {
+    display_name: string | null
+    application_status: CreatorApplicationStatus
+    kyc_status: CreatorKycStatus
+    profile_completeness_score: number
+    submitted_at: string | null
+    created_at: string
+  }
+}
+
+export interface AdminCreatorListResponse {
+  data: AdminCreatorListItem[]
+  meta: {
+    total: number
+    page: number
+    per_page: number
+    last_page: number
+  }
+}
+
+export interface AdminCreatorListParams {
+  status?: CreatorApplicationStatus
+  page?: number
+  per_page?: number
+}
 
 /**
  * Editable fields exposed by the admin per-field PATCH endpoint
@@ -45,6 +82,20 @@ export type AdminEditableField =
 export const ADMIN_REASON_REQUIRED_FIELDS: ReadonlyArray<AdminEditableField> = ['bio', 'categories']
 
 export const adminCreatorsApi = {
+  /**
+   * Fetch the review queue — Sprint 4 Chunk 3 (Cluster 3) backend
+   * GET /api/v1/admin/creators. platform_admin-gated, filterable by
+   * application_status, paginated. Returns the list-card shape.
+   */
+  list(params: AdminCreatorListParams = {}): Promise<AdminCreatorListResponse> {
+    const query = new URLSearchParams()
+    if (params.status !== undefined) query.set('status', params.status)
+    if (params.page !== undefined) query.set('page', String(params.page))
+    if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
+    const qs = query.toString()
+    return http.get<AdminCreatorListResponse>(`/admin/creators${qs === '' ? '' : `?${qs}`}`)
+  },
+
   /**
    * Fetch a single Creator by its ULID. Surfaces the
    * `admin_attributes` block on the response (via the backend's
@@ -118,5 +169,29 @@ export const adminCreatorsApi = {
     return http.post<CreatorResourceEnvelope>(`/admin/creators/${creatorUlid}/reject`, {
       rejection_reason: rejectionReason,
     })
+  },
+
+  /**
+   * Manually clear a creator's identity verification — Sprint 4 Chunk 3
+   * (D-c3-3) backend POST /api/v1/admin/creators/{ulid}/verify-identity.
+   *
+   * The live identity-clearing action: sets kyc_status=verified +
+   * kyc_method=manual + verified_by_user_id + an audit row. Optional
+   * `note` captured in the audit metadata. Returns a fresh
+   * `CreatorResource` envelope on 200 OK. Already-verified → 409 +
+   * `creator.kyc_already_verified`.
+   */
+  verifyIdentity(
+    creatorUlid: string,
+    note: string | null = null,
+  ): Promise<CreatorResourceEnvelope> {
+    const payload: Record<string, unknown> = {}
+    if (note !== null && note.trim() !== '') {
+      payload.note = note.trim()
+    }
+    return http.post<CreatorResourceEnvelope>(
+      `/admin/creators/${creatorUlid}/verify-identity`,
+      payload,
+    )
   },
 }

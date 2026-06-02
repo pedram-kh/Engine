@@ -60,6 +60,8 @@ function makeCreator(
       profile_completeness_score: 35,
       submitted_at: null,
       approved_at: null,
+      rejection_reason: null,
+      rejected_at: null,
       created_at: '2026-05-14T00:00:00+00:00',
       updated_at: '2026-05-14T15:00:00+00:00',
       ...overrides,

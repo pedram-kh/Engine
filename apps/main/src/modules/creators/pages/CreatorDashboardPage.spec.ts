@@ -6,6 +6,7 @@ import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
 vi.mock('../../onboarding/api/onboarding.api', () => ({
   onboardingApi: {
     bootstrap: vi.fn(),
+    reopen: vi.fn(),
   },
 }))
 
@@ -48,6 +49,9 @@ function makeBootstrap(
         profile_completeness_score: applicationStatus === 'incomplete' ? 60 : 100,
         submitted_at: applicationStatus === 'incomplete' ? null : '2026-05-14T00:00:00+00:00',
         approved_at: applicationStatus === 'approved' ? '2026-05-15T00:00:00+00:00' : null,
+        rejection_reason:
+          applicationStatus === 'rejected' ? 'Portfolio links were unreachable.' : null,
+        rejected_at: applicationStatus === 'rejected' ? '2026-05-15T00:00:00+00:00' : null,
         created_at: '2026-05-14T00:00:00+00:00',
         updated_at: '2026-05-14T00:00:00+00:00',
       },
@@ -120,6 +124,51 @@ describe('CreatorDashboardPage', () => {
     await flushPromises()
 
     expect(wrapper.find('[data-testid="dashboard-banner-rejected"]').exists()).toBe(true)
+  })
+
+  // Cluster 5 (D-c3-1): the rejection reason now reaches the creator via
+  // the creator-facing `attributes` block, so the banner renders it.
+  it('renders the rejection reason from creator attributes when rejected', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap('rejected'))
+
+    const { wrapper, unmount } = await mountAuthPage(CreatorDashboardPage, {
+      initialRoute: { path: '/creator/dashboard' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    const reason = wrapper.find('[data-testid="dashboard-rejection-reason"]')
+    expect(reason.exists()).toBe(true)
+    expect(reason.text()).toContain('Portfolio links were unreachable.')
+  })
+
+  // Cluster 6 (D-c3-9): the "Update & resubmit" control calls reopen and
+  // routes the creator back into the wizard's welcome-back entry.
+  it('reopens the application and navigates into the wizard on resubmit', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap('rejected'))
+    vi.mocked(onboardingApi.reopen).mockResolvedValue(makeBootstrap('incomplete'))
+
+    const { wrapper, router, unmount } = await mountAuthPage(CreatorDashboardPage, {
+      initialRoute: { path: '/creator/dashboard' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    const push = vi.spyOn(router, 'push').mockResolvedValue(undefined)
+
+    const button = wrapper.find('[data-testid="dashboard-resubmit"]')
+    expect(button.exists()).toBe(true)
+    await button.trigger('click')
+    await flushPromises()
+
+    expect(onboardingApi.reopen).toHaveBeenCalledTimes(1)
+    expect(push).toHaveBeenCalledWith({ name: 'onboarding.welcome-back' })
   })
 
   it('renders the incomplete banner when application_status=incomplete', async () => {

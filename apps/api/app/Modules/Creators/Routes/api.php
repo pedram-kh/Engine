@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\Route;
 |
 | Cross-tenant route allowlist (docs/security/tenancy.md § 4):
 |   GET    /api/v1/creators/me                    Sprint 3 Chunk 1
+|   POST   /api/v1/creators/me/reopen             Sprint 4 Chunk 3
 |   PATCH  /api/v1/creators/me/wizard/profile     Sprint 3 Chunk 1
 |   POST   /api/v1/creators/me/wizard/social      Sprint 3 Chunk 1
 |   DELETE /api/v1/creators/me/wizard/social/{p}  Stabilization (May 2026)
@@ -57,6 +58,14 @@ Route::prefix('creators/me')
     ->middleware(['auth:web', 'tenancy.set', 'verified'])
     ->group(function (): void {
         Route::get('/', [CreatorWizardController::class, 'show'])->name('show');
+
+        // Sprint 4 Chunk 3 (D-c3-9) — creator-driven resubmit reopen.
+        // Source-state-guarded flip rejected → incomplete so the rejected
+        // creator can re-enter the existing wizard (the requireOnboarding
+        // guard already admits `incomplete`). The existing submit() then
+        // flips incomplete → pending and clears the rejection fields.
+        Route::post('reopen', [CreatorWizardController::class, 'reopen'])
+            ->name('reopen');
 
         Route::prefix('wizard')->name('wizard.')->group(function (): void {
             Route::patch('profile', [CreatorWizardController::class, 'updateProfile'])
@@ -157,10 +166,12 @@ Route::get('creators/invitations/preview', InvitationPreviewController::class)
 // ---------------------------------------------------------------------------
 //
 // Paths:
-//   GET    /api/v1/admin/creators/{creator}          — Sprint 3 Chunk 3
-//   PATCH  /api/v1/admin/creators/{creator}          — Sprint 3 Chunk 4
-//   POST   /api/v1/admin/creators/{creator}/approve  — Sprint 3 Chunk 4
-//   POST   /api/v1/admin/creators/{creator}/reject   — Sprint 3 Chunk 4
+//   GET    /api/v1/admin/creators                          — Sprint 4 Chunk 3 (review queue)
+//   GET    /api/v1/admin/creators/{creator}                — Sprint 3 Chunk 3
+//   PATCH  /api/v1/admin/creators/{creator}                — Sprint 3 Chunk 4
+//   POST   /api/v1/admin/creators/{creator}/approve        — Sprint 3 Chunk 4
+//   POST   /api/v1/admin/creators/{creator}/reject         — Sprint 3 Chunk 4
+//   POST   /api/v1/admin/creators/{creator}/verify-identity — Sprint 4 Chunk 3 (manual KYC)
 //
 // Authentication: 'auth:web_admin' (admin SPA session cookie, gated by
 // the path-aware UseAdminSessionCookie middleware mounted globally).
@@ -174,21 +185,27 @@ Route::get('creators/invitations/preview', InvitationPreviewController::class)
 // because the controller does not query any agency-scoped models.
 //
 // Allowlisted in docs/security/tenancy.md § 4 (sub-step 12 fix-up):
-//   GET    /api/v1/admin/creators/{creator}          — path-scoped admin tooling
-//   PATCH  /api/v1/admin/creators/{creator}          — path-scoped admin tooling
-//   POST   /api/v1/admin/creators/{creator}/approve  — path-scoped admin tooling
-//   POST   /api/v1/admin/creators/{creator}/reject   — path-scoped admin tooling
+//   GET    /api/v1/admin/creators                          — path-scoped admin tooling
+//   GET    /api/v1/admin/creators/{creator}                — path-scoped admin tooling
+//   PATCH  /api/v1/admin/creators/{creator}                — path-scoped admin tooling
+//   POST   /api/v1/admin/creators/{creator}/approve        — path-scoped admin tooling
+//   POST   /api/v1/admin/creators/{creator}/reject         — path-scoped admin tooling
+//   POST   /api/v1/admin/creators/{creator}/verify-identity — path-scoped admin tooling
 //
 // Authorization:
-//   GET    → CreatorPolicy::view       (Chunk 1; platform_admin branch).
-//   PATCH  → CreatorPolicy::adminUpdate (Chunk 1; platform_admin branch).
-//   approve → CreatorPolicy::approve   (Chunk 4; replaces Chunk 1 stub).
-//   reject  → CreatorPolicy::reject    (Chunk 4; replaces Chunk 1 stub).
+//   index   → CreatorPolicy::viewAny       (Chunk 3 / Sprint 4; platform_admin).
+//   GET     → CreatorPolicy::view          (Chunk 1; platform_admin branch).
+//   PATCH   → CreatorPolicy::adminUpdate    (Chunk 1; platform_admin branch).
+//   approve → CreatorPolicy::approve        (Chunk 4; + KYC-verified gate, Sprint 4 Chunk 3).
+//   reject  → CreatorPolicy::reject         (Chunk 4; replaces Chunk 1 stub).
+//   verify  → CreatorPolicy::verifyIdentity (Sprint 4 Chunk 3; platform_admin).
 
 Route::prefix('admin/creators')
     ->name('admin.creators.')
     ->middleware(['auth:web_admin', EnsureMfaForAdmins::class])
     ->group(function (): void {
+        Route::get('/', [AdminCreatorController::class, 'index'])
+            ->name('index');
         Route::get('{creator}', [AdminCreatorController::class, 'show'])
             ->name('show');
         Route::patch('{creator}', [AdminCreatorController::class, 'update'])
@@ -197,6 +214,8 @@ Route::prefix('admin/creators')
             ->name('approve');
         Route::post('{creator}/reject', [AdminCreatorController::class, 'reject'])
             ->name('reject');
+        Route::post('{creator}/verify-identity', [AdminCreatorController::class, 'verifyIdentity'])
+            ->name('verify-identity');
     });
 
 // ---------------------------------------------------------------------------

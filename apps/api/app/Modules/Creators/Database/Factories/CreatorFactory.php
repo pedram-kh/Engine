@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Creators\Database\Factories;
 
 use App\Modules\Creators\Enums\ApplicationStatus;
+use App\Modules\Creators\Enums\KycMethod;
 use App\Modules\Creators\Enums\KycStatus;
 use App\Modules\Creators\Enums\VerificationLevel;
 use App\Modules\Creators\Models\Creator;
@@ -82,6 +83,20 @@ final class CreatorFactory extends Factory
             'application_status' => ApplicationStatus::Approved,
             'submitted_at' => now()->subDays(2),
             'approved_at' => now(),
+        ]);
+    }
+
+    /**
+     * Identity-cleared state (Sprint 4 Chunk 3, Cluster 2). The approve
+     * endpoint gates on kyc_status ∈ {verified, not_required}; tests that
+     * exercise the happy-path approve compose this with submitted().
+     */
+    public function kycVerified(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'kyc_status' => KycStatus::Verified,
+            'kyc_verified_at' => now(),
+            'kyc_method' => KycMethod::Vendor,
         ]);
     }
 }

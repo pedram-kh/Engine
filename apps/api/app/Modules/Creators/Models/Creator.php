@@ -9,6 +9,7 @@ use App\Modules\Audit\Concerns\Audited;
 use App\Modules\Audit\Contracts\Auditable;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
 use App\Modules\Creators\Enums\ApplicationStatus;
+use App\Modules\Creators\Enums\KycMethod;
 use App\Modules\Creators\Enums\KycStatus;
 use App\Modules\Creators\Enums\VerificationLevel;
 use App\Modules\Identity\Models\User;
@@ -56,6 +57,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $click_through_accepted_at
  * @property KycStatus $kyc_status
  * @property Carbon|null $kyc_verified_at
+ * @property KycMethod|null $kyc_method
+ * @property int|null $verified_by_user_id
  * @property bool $tax_profile_complete
  * @property bool $payout_method_set
  * @property Carbon|null $submitted_at
@@ -116,6 +119,8 @@ final class Creator extends Model implements Auditable
         'click_through_accepted_at',
         'kyc_status',
         'kyc_verified_at',
+        'kyc_method',
+        'verified_by_user_id',
         'tax_profile_complete',
         'payout_method_set',
         'submitted_at',
@@ -186,6 +191,17 @@ final class Creator extends Model implements Auditable
     }
 
     /**
+     * The platform_admin who manually cleared identity (D-c3-3). Null
+     * when KYC was cleared by the vendor path or not yet cleared.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function verifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by_user_id');
+    }
+
+    /**
      * Allowlist of attributes that may appear in audit before/after
      * snapshots. Excludes:
      *   - bio                  (free-text; GDPR-sensitive)
@@ -214,6 +230,8 @@ final class Creator extends Model implements Auditable
             'profile_completeness_score',
             'kyc_status',
             'kyc_verified_at',
+            'kyc_method',
+            'verified_by_user_id',
             'tax_profile_complete',
             'payout_method_set',
             'submitted_at',
@@ -233,6 +251,7 @@ final class Creator extends Model implements Auditable
             'verification_level' => VerificationLevel::class,
             'application_status' => ApplicationStatus::class,
             'kyc_status' => KycStatus::class,
+            'kyc_method' => KycMethod::class,
             'approved_at' => 'datetime',
             'rejected_at' => 'datetime',
             'kyc_verified_at' => 'datetime',

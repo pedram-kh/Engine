@@ -295,6 +295,39 @@ final class CreatorWizardController
             ->setStatusCode(Response::HTTP_OK);
     }
 
+    /**
+     * POST /api/v1/creators/me/reopen — Sprint 4 Chunk 3 (D-c3-9).
+     *
+     * Creator-driven resubmit reopen: flips the authenticated creator's
+     * own rejected application back to `incomplete` so the wizard
+     * re-opens. The Creator row is resolved from the authenticated user
+     * ($user->creator), so a creator can only ever reopen their OWN
+     * application — non-owner reopen is structurally impossible. Returns
+     * 409 + `creator.reopen.invalid_state` when the application isn't in
+     * the `rejected` source state.
+     */
+    public function reopen(Request $request): JsonResponse
+    {
+        $creator = $this->requireCreator($request);
+
+        try {
+            $this->wizardService->reopen($creator);
+        } catch (RuntimeException $e) {
+            if ($e->getMessage() === 'creator.reopen.invalid_state') {
+                return ErrorResponse::single(
+                    $request,
+                    409,
+                    'creator.reopen.invalid_state',
+                    'Only a rejected application can be reopened.',
+                );
+            }
+            throw $e;
+        }
+
+        return (new CreatorResource($creator->refresh(), $this->calculator))
+            ->response();
+    }
+
     private function featureDisabledResponse(Request $request, string $step): JsonResponse
     {
         return ErrorResponse::single(

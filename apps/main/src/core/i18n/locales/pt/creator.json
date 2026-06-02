@@ -3,6 +3,8 @@
     "not_found": "Nenhum perfil de criador está associado à sua conta. Saia e entre novamente, ou entre em contacto com o suporte.",
     "already_approved": "Este criador já foi aprovado.",
     "already_rejected": "Este criador já foi rejeitado.",
+    "kyc_not_verified": "A identidade deste criador tem de ser verificada antes de a candidatura poder ser aprovada.",
+    "kyc_already_verified": "A identidade deste criador já foi verificada.",
     "admin": {
       "field_status_immutable": "O estado da candidatura não pode ser alterado através deste formulário. Utilize as ações de aprovação ou rejeição."
     },
@@ -13,6 +15,9 @@
       "feature_disabled": "Esta etapa está temporariamente indisponível durante uma alteração de configuração. Pode saltá-la para continuar a candidatura.",
       "feature_enabled": "Esta opção não está disponível neste momento — utilize o fluxo padrão desta etapa.",
       "incomplete": "Não é possível submeter a candidatura — uma ou mais etapas do assistente ainda estão incompletas."
+    },
+    "reopen": {
+      "invalid_state": "Apenas uma candidatura rejeitada pode ser reaberta."
     },
     "ui": {
       "wizard": {
@@ -245,9 +250,11 @@
         "rejected": {
           "title": "Candidatura não aprovada",
           "heading": "A candidatura precisa de alterações",
-          "description": "Contacte a equipa de apoio para os próximos passos. Estamos cá para ajudar.",
+          "description": "Reveja as notas abaixo, atualize a sua candidatura e submeta-a novamente para nova revisão.",
           "reason_label": "Motivo:",
-          "edit_profile": "Editar perfil"
+          "edit_profile": "Editar perfil",
+          "resubmit": "Atualizar e reenviar",
+          "resubmit_failed": "Não foi possível reabrir a sua candidatura. Tente novamente."
         },
         "incomplete": {
           "title": "Continue a sua candidatura",

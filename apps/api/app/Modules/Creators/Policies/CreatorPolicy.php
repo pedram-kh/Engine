@@ -92,6 +92,17 @@ final class CreatorPolicy
         return $user->type === UserType::PlatformAdmin;
     }
 
+    /**
+     * Sprint 4 Chunk 3 admin action (D-c3-3) — manually clears identity
+     * verification (kyc_status → verified, kyc_method = manual). A
+     * permanent compliance-sensitive override; platform_admin only, same
+     * gate as approve / reject. No new sub-role (D-c3-8).
+     */
+    public function verifyIdentity(User $user, Creator $creator): bool
+    {
+        return $user->type === UserType::PlatformAdmin;
+    }
+
     // -------------------------------------------------------------------------
 
     private function isOwner(User $user, Creator $creator): bool

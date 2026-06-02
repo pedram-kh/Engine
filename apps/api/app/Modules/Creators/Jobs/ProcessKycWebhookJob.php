@@ -7,6 +7,7 @@ namespace App\Modules\Creators\Jobs;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Models\IntegrationEvent;
 use App\Modules\Audit\Services\AuditLogger;
+use App\Modules\Creators\Enums\KycMethod;
 use App\Modules\Creators\Enums\KycStatus;
 use App\Modules\Creators\Integrations\Contracts\KycProvider;
 use App\Modules\Creators\Models\Creator;
@@ -95,9 +96,14 @@ final class ProcessKycWebhookJob implements ShouldQueue
                     return;
                 }
 
+                // D-c3-5: stamp kyc_method=vendor whenever the vendor path
+                // writes kyc_status, so the discriminator is always
+                // populated from whichever path clears identity. Mirrors
+                // the manual-verify endpoint's kyc_method=manual stamp.
                 $creator->forceFill([
                     'kyc_status' => $newStatus,
                     'kyc_verified_at' => $newStatus === KycStatus::Verified ? now() : null,
+                    'kyc_method' => KycMethod::Vendor->value,
                 ])->save();
 
                 if ($newStatus === KycStatus::Verified) {

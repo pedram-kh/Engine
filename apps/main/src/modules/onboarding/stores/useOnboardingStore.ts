@@ -334,6 +334,22 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     }
   }
 
+  /**
+   * Reopen a rejected application (Sprint 4 Chunk 3, D-c3-9). On success
+   * the creator transitions to `incomplete` and the wizard re-opens; the
+   * caller (dashboard) navigates into the wizard. Errors propagate so the
+   * UI can surface `creator.reopen.invalid_state`.
+   */
+  async function reopen(): Promise<void> {
+    isSubmitting.value = true
+    try {
+      const envelope = await onboardingApi.reopen()
+      creator.value = envelope.data
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
   async function uploadAvatar(file: File): Promise<void> {
     isUploadingAvatar.value = true
     try {
@@ -413,6 +429,7 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     pollPayoutStatus,
     pollContractStatus,
     submit,
+    reopen,
     uploadAvatar,
     deleteAvatar,
     removePortfolioItem,

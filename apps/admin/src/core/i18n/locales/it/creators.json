@@ -1,6 +1,32 @@
 {
   "admin": {
     "creators": {
+      "list": {
+        "title": "Coda di revisione creator",
+        "unnamed": "Creator senza nome",
+        "view": "Vedi creator",
+        "load_failed": "Impossibile caricare la coda di revisione. Aggiorna la pagina.",
+        "fields": {
+          "name": "Creator",
+          "status": "Stato",
+          "kyc": "KYC",
+          "completeness": "Completamento",
+          "submitted_at": "Inviato"
+        },
+        "filters": {
+          "pending": "In attesa",
+          "approved": "Approvato",
+          "rejected": "Rifiutato",
+          "incomplete": "Incompleto",
+          "all": "Tutti"
+        },
+        "status_labels": {
+          "incomplete": "Incompleto",
+          "pending": "In attesa",
+          "approved": "Approvato",
+          "rejected": "Rifiutato"
+        }
+      },
       "detail": {
         "fallback_title": "Creator",
         "application_status": "Stato candidatura: {status}",
@@ -61,6 +87,27 @@
           "cancel": "Annulla",
           "success": "Creator rifiutato.",
           "failed": "Impossibile rifiutare questo creator. Riprova."
+        },
+        "identity": {
+          "heading": "Verifica dell'identità",
+          "status": "Stato: {status}",
+          "verify_manual": "Verifica manualmente",
+          "verify_vendor": "Richiedi verifica dal fornitore",
+          "vendor_disabled_tooltip": "Nessun fornitore KYC configurato",
+          "method_labels": {
+            "vendor": "Verificato dal fornitore",
+            "manual": "Verificato manualmente da un amministratore"
+          }
+        },
+        "verify": {
+          "title": "Verifica manualmente l'identità di {name}",
+          "description": "Questo segna in modo permanente l'identità del creator come verificata e viene registrato sul tuo account nel log di audit. Usa solo quando hai confermato l'identità tramite altri mezzi.",
+          "note_label": "Nota (opzionale)",
+          "note_hint": "Registrata nel log di audit insieme al tuo nome.",
+          "confirm": "Verifica identità",
+          "cancel": "Annulla",
+          "success": "Identità verificata.",
+          "failed": "Impossibile verificare l'identità di questo creator. Riprova."
         }
       }
     }
@@ -68,6 +115,8 @@
   "creator": {
     "already_approved": "Questo creator è già stato approvato.",
     "already_rejected": "Questo creator è già stato rifiutato.",
+    "kyc_not_verified": "L'approvazione è bloccata finché l'identità del creator non è verificata.",
+    "kyc_already_verified": "L'identità di questo creator è già stata verificata.",
     "admin": {
       "field_status_immutable": "Le transizioni di stato usano le azioni approva / rifiuta, non la modifica del campo."
     }

@@ -65,6 +65,7 @@ import ApproveCreatorDialog from '../components/ApproveCreatorDialog.vue'
 import EditFieldModal from '../components/EditFieldModal.vue'
 import EditFieldRow from '../components/EditFieldRow.vue'
 import RejectCreatorDialog from '../components/RejectCreatorDialog.vue'
+import VerifyIdentityDialog from '../components/VerifyIdentityDialog.vue'
 import { FIELD_EDIT_CONFIG, type EditFieldConfig } from '../config/field-edit'
 import { adminCreatorsApi, type AdminEditableField } from '../api/creators.api'
 
@@ -285,23 +286,52 @@ const creatorDisplayName = computed(
 const applicationStatus = computed(() => creator.value?.attributes.application_status ?? null)
 
 /**
- * Approve / reject affordance gating (Decision E2=b).
+ * Approve / reject affordance gating (Decision E2=b + Sprint 4 Chunk 3
+ * KYC gate).
  *
  *   - approved → both buttons hidden (terminal state; idempotency
  *     would 409 anyway).
- *   - rejected → "Approve" is allowed (admins can move rejected back
- *     to approved via the dedicated approve workflow; the backend
- *     resets rejected_at / rejection_reason). "Reject" hidden.
- *   - pending / incomplete → both buttons visible.
+ *   - rejected → "Approve" allowed (the backend resets rejected_at /
+ *     rejection_reason). "Reject" hidden.
+ *   - pending / incomplete → "Reject" visible; "Approve" only when KYC
+ *     is cleared (see isKycCleared below — D-c3-7 / D-NEW-1).
  *
- * `incomplete` is technically pre-submission but admins may want to
- * approve a creator who only partially completed the wizard during
- * Phase-1 manual-bootstrapping flows (Sprint 1 chunk-2.4 supports
- * this via backend); leaving the affordance visible keeps the admin
- * unblocked. Backend retains final authority.
+ * Backend retains final authority (422 `creator.kyc_not_verified` on an
+ * un-cleared approve attempt).
+ */
+/**
+ * Identity / KYC gate state (Sprint 4 Chunk 3).
+ *
+ *   - isKycCleared: kyc_status is `verified` (vendor/manual) OR
+ *     `not_required` (flag-OFF terminal). This is the approve
+ *     precondition (D-c3-7 / D-NEW-1) — mirrors the backend gate 1:1.
+ *   - isKycVerified: specifically `verified`; once true the manual-verify
+ *     affordance is hidden (re-verify would 409).
+ *   - kycVendorAvailable: backend-driven (admin_attributes) — false when
+ *     no real KYC vendor adapter is wired; drives the disabled vendor
+ *     affordance (D-c3-6).
+ */
+const kycStatus = computed(() => creator.value?.attributes.kyc_status ?? 'none')
+const isKycCleared = computed(
+  () => kycStatus.value === 'verified' || kycStatus.value === 'not_required',
+)
+const isKycVerified = computed(() => kycStatus.value === 'verified')
+const kycVendorAvailable = computed(
+  () => creator.value?.admin_attributes?.kyc_vendor_available ?? false,
+)
+const kycMethod = computed(() => creator.value?.admin_attributes?.kyc_method ?? null)
+
+/**
+ * Approve requires KYC cleared (D-c3-7) on top of the existing
+ * not-already-approved check. The backend re-validates as SOT (422
+ * `creator.kyc_not_verified`); gating the affordance keeps the admin
+ * from a guaranteed-fail click.
  */
 const canApprove = computed(
-  () => applicationStatus.value !== null && applicationStatus.value !== 'approved',
+  () =>
+    applicationStatus.value !== null &&
+    applicationStatus.value !== 'approved' &&
+    isKycCleared.value,
 )
 const canReject = computed(
   () =>
@@ -363,6 +393,38 @@ async function handleRejectConfirm(payload: { rejectionReason: string }): Promis
       error instanceof ApiError ? error.code : 'admin.creators.detail.reject.failed'
   } finally {
     isRejecting.value = false
+  }
+}
+
+const verifyDialogOpen = ref(false)
+const verifyErrorKey = ref<string | null>(null)
+const isVerifying = ref(false)
+
+function openVerify(): void {
+  verifyErrorKey.value = null
+  verifyDialogOpen.value = true
+}
+
+function closeVerify(): void {
+  verifyDialogOpen.value = false
+  verifyErrorKey.value = null
+}
+
+async function handleVerifyConfirm(payload: { note: string | null }): Promise<void> {
+  if (creator.value === null) return
+  isVerifying.value = true
+  verifyErrorKey.value = null
+  try {
+    const envelope = await adminCreatorsApi.verifyIdentity(creatorUlid.value, payload.note)
+    creator.value = envelope.data as AdminCreatorPayload
+    decisionSnackbarKey.value = 'admin.creators.detail.verify.success'
+    decisionSnackbarOpen.value = true
+    closeVerify()
+  } catch (error) {
+    verifyErrorKey.value =
+      error instanceof ApiError ? error.code : 'admin.creators.detail.verify.failed'
+  } finally {
+    isVerifying.value = false
   }
 }
 
@@ -544,6 +606,51 @@ const decisionSnackbarColor = computed(() =>
         </div>
       </section>
 
+      <section class="admin-creator-detail__section" data-testid="admin-creator-detail-identity">
+        <h2 class="text-h6">{{ t('admin.creators.detail.identity.heading') }}</h2>
+        <p class="text-body-2 text-medium-emphasis">
+          {{ t('admin.creators.detail.identity.status', { status: kycStatusLabel }) }}
+          <span v-if="kycMethod !== null" data-testid="admin-creator-detail-identity-method">
+            ·
+            {{ t(`admin.creators.detail.identity.method_labels.${kycMethod}`) }}
+          </span>
+        </p>
+        <div class="admin-creator-detail__identity-actions">
+          <v-btn
+            v-if="!isKycVerified"
+            color="primary"
+            variant="elevated"
+            data-testid="admin-creator-detail-verify-manual"
+            @click="openVerify"
+          >
+            {{ t('admin.creators.detail.identity.verify_manual') }}
+          </v-btn>
+          <v-tooltip
+            v-if="!kycVendorAvailable"
+            location="top"
+            :text="t('admin.creators.detail.identity.vendor_disabled_tooltip')"
+          >
+            <template #activator="{ props: tooltipProps }">
+              <!-- Disabled affordance, not dead code (D-c3-6): no backend
+                   wiring — activates when a vendor adapter lands. -->
+              <span v-bind="tooltipProps">
+                <v-btn variant="outlined" disabled data-testid="admin-creator-detail-verify-vendor">
+                  {{ t('admin.creators.detail.identity.verify_vendor') }}
+                </v-btn>
+              </span>
+            </template>
+          </v-tooltip>
+          <v-btn
+            v-else
+            variant="outlined"
+            disabled
+            data-testid="admin-creator-detail-verify-vendor"
+          >
+            {{ t('admin.creators.detail.identity.verify_vendor') }}
+          </v-btn>
+        </div>
+      </section>
+
       <section
         v-if="kycVerifications.length > 0"
         class="admin-creator-detail__section"
@@ -602,6 +709,15 @@ const decisionSnackbarColor = computed(() =>
       :creator-display-name="creatorDisplayName"
       @confirm="handleRejectConfirm"
       @cancel="closeReject"
+    />
+
+    <VerifyIdentityDialog
+      v-model="verifyDialogOpen"
+      :is-saving="isVerifying"
+      :error-key="verifyErrorKey"
+      :creator-display-name="creatorDisplayName"
+      @confirm="handleVerifyConfirm"
+      @cancel="closeVerify"
     />
 
     <v-snackbar
@@ -679,5 +795,12 @@ const decisionSnackbarColor = computed(() =>
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
+}
+
+.admin-creator-detail__identity-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 </style>

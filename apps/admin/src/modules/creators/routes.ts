@@ -14,6 +14,12 @@ import type { RouteRecordRaw } from 'vue-router'
 
 export const creatorsRoutes: RouteRecordRaw[] = [
   {
+    path: '/creators',
+    name: 'app.creators.list',
+    component: () => import('@/modules/creators/pages/CreatorListPage.vue'),
+    meta: { layout: 'app', guards: ['requireAuth', 'requireMfaEnrolled'] },
+  },
+  {
     path: '/creators/:ulid',
     name: 'app.creators.detail',
     component: () => import('@/modules/creators/pages/CreatorDetailPage.vue'),

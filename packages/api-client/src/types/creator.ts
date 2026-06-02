@@ -161,6 +161,14 @@ export interface CreatorAttributes {
   profile_completeness_score: number
   submitted_at: string | null
   approved_at: string | null
+  /**
+   * Rejection feedback surfaced to the creator (Sprint 4 Chunk 3,
+   * Cluster 5 / D-c3-1). Null unless the application has been rejected.
+   * The creator dashboard's rejected-banner renders `rejection_reason`
+   * as editing guidance before a resubmit.
+   */
+  rejection_reason: string | null
+  rejected_at: string | null
   created_at: string
   updated_at: string
 }
@@ -230,11 +238,28 @@ export interface CreatorKycVerificationSummary {
  * admin-read bootstrap surface (Chunk 3 sub-step 9). Closes Chunk 1
  * tech-debt entry 4.
  */
+/**
+ * Which path cleared a creator's identity verification (Sprint 4 Chunk 3,
+ * Cluster 1). Mirrors the backend `KycMethod` enum. Null until identity
+ * is cleared.
+ */
+export type CreatorKycMethod = 'vendor' | 'manual'
+
 export interface CreatorAdminAttributes {
   rejection_reason: string | null
   rejected_at: string | null
   last_active_at: string | null
   kyc_verifications: CreatorKycVerificationSummary[]
+  /**
+   * Sprint 4 Chunk 3 (Cluster 1/4). The KYC-method discriminator + the
+   * manual-verify attribution + whether a real vendor adapter is wired.
+   * `kyc_vendor_available` drives the admin detail page's "Request vendor
+   * verification" disabled affordance (D-c3-6) — false today (no KYC
+   * vendor configured).
+   */
+  kyc_method: CreatorKycMethod | null
+  verified_by_user_id: number | null
+  kyc_vendor_available: boolean
 }
 
 /**
