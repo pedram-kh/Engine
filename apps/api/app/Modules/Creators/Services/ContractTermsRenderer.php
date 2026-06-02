@@ -40,7 +40,64 @@ final class ContractTermsRenderer
 {
     public const CURRENT_VERSION = '1.0';
 
+    /**
+     * Fallback title when the markdown source has no leading `# ` heading.
+     */
+    private const DEFAULT_TITLE = 'Master Creator Agreement';
+
     private const RESOURCES_PATH = 'contracts';
+
+    /**
+     * Map a human-facing semantic version string (e.g. `'1.0'`) to the
+     * integer the `contracts.version` column stores (docs/03-DATA-MODEL.md
+     * §8, `:583`). The precise string is preserved separately in
+     * `signed_signature_data.version`, so this lossy major-version mapping
+     * is for the queryable integer column only.
+     *
+     * Centralised here — the single owner of {@see self::CURRENT_VERSION} —
+     * so a future `'2.0'` bump doesn't have to hunt down a parallel constant.
+     */
+    public static function versionToInteger(string $version): int
+    {
+        return (int) $version;
+    }
+
+    /**
+     * The integer form of the version currently in force.
+     */
+    public static function currentVersionNumber(): int
+    {
+        return self::versionToInteger(self::CURRENT_VERSION);
+    }
+
+    /**
+     * The raw (un-rendered) markdown source + its title and version, for
+     * callers that need to SNAPSHOT what was agreed — the click-through
+     * accept persists `contracts.body_markdown` / `title` from this
+     * (Sprint 4 Chunk 4, D-c4-2).
+     *
+     * Deliberately a SEPARATE method from {@see self::render()}: exposing
+     * the raw source must not perturb the rendered-HTML output the SPA
+     * consumes (its sanitisation contract is pinned by
+     * ContractTermsEndpointTest). This method shares the locale-resolution
+     * and file-loading helpers but renders nothing.
+     *
+     * @return array{markdown: string, title: string, version: string, locale: string}
+     *
+     * @throws RuntimeException when no markdown source exists (see render()).
+     */
+    public function source(string $locale = 'en'): array
+    {
+        $resolvedLocale = $this->resolveLocale($locale);
+        $markdown = $this->loadMarkdown($resolvedLocale);
+
+        return [
+            'markdown' => $markdown,
+            'title' => $this->extractTitle($markdown),
+            'version' => self::CURRENT_VERSION,
+            'locale' => $resolvedLocale,
+        ];
+    }
 
     /**
      * Render the master agreement to safe HTML.
@@ -112,6 +169,23 @@ final class ContractTermsRenderer
         }
 
         return $contents;
+    }
+
+    /**
+     * Pull the document title from the markdown's first `# ` heading,
+     * falling back to a constant. Used to populate `contracts.title` at
+     * accept time — purely a read over the loaded source, no rendering.
+     */
+    private function extractTitle(string $markdown): string
+    {
+        $lines = preg_split('/\r\n|\r|\n/', $markdown) ?: [];
+        foreach ($lines as $line) {
+            if (str_starts_with($line, '# ')) {
+                return mb_substr(trim($line), 2);
+            }
+        }
+
+        return self::DEFAULT_TITLE;
     }
 
     private function renderHtml(string $markdown): string

@@ -80,6 +80,35 @@ it('escapes raw HTML in the rendered markdown source (sanitisation contract)', f
     expect($rendered)->not->toContain('<script>');
 });
 
+it('source() exposes the RAW markdown + title + version without altering render() output', function (): void {
+    $renderer = app(ContractTermsRenderer::class);
+
+    $source = $renderer->source('en');
+
+    // Raw markdown — NOT rendered HTML.
+    expect($source['markdown'])->toContain('# Engine C — Master Creator Agreement');
+    expect($source['markdown'])->not->toContain('<h1>');
+    expect($source['title'])->toBe('Engine C — Master Creator Agreement');
+    expect($source['version'])->toBe(ContractTermsRenderer::CURRENT_VERSION);
+    expect($source['locale'])->toBe('en');
+
+    // Break-revert (§5.35): exposing the raw source must not perturb the
+    // rendered HTML the SPA consumes. render() still escapes + wraps as
+    // before — alter the render path and this (plus the HTML-shape test
+    // above) fails.
+    $rendered = $renderer->render('en');
+    expect($rendered['html'])->toContain('<h1>Engine C');
+    expect($rendered['html'])->toContain('<h2>1. Definitions</h2>');
+    expect($rendered['version'])->toBe(ContractTermsRenderer::CURRENT_VERSION);
+});
+
+it('maps the version string to the integer the contracts.version column stores', function (): void {
+    expect(ContractTermsRenderer::versionToInteger('1.0'))->toBe(1);
+    expect(ContractTermsRenderer::versionToInteger('2.0'))->toBe(2);
+    expect(ContractTermsRenderer::currentVersionNumber())
+        ->toBe(ContractTermsRenderer::versionToInteger(ContractTermsRenderer::CURRENT_VERSION));
+});
+
 it('memoises the rendered HTML per locale per version', function (): void {
     $user = User::factory()->create();
     CreatorFactory::new()->createOne(['user_id' => $user->id]);

@@ -191,6 +191,25 @@ final class Creator extends Model implements Auditable
     }
 
     /**
+     * The accepted master agreement (Sprint 4 Chunk 4, D-c4-1/2). For the
+     * flag-OFF click-through path this points at a real `contracts` row.
+     *
+     * NOTE — there is intentionally NO database-level FK constraint behind
+     * this column yet (D-c4-1 divergence A): `signed_master_contract_id` is
+     * temporarily multi-meaning (the two vendor sentinel writers stuff an
+     * integration_events.id / a unix timestamp into it). The relation is
+     * still safe for the click-through path, which writes a genuine
+     * contracts.id; for the sentinel paths it simply resolves to null.
+     * See docs/internal/tech-debt.md "Deferred contracts FK".
+     *
+     * @return BelongsTo<Contract, $this>
+     */
+    public function masterContract(): BelongsTo
+    {
+        return $this->belongsTo(Contract::class, 'signed_master_contract_id');
+    }
+
+    /**
      * The platform_admin who manually cleared identity (D-c3-3). Null
      * when KYC was cleared by the vendor path or not yet cleared.
      *

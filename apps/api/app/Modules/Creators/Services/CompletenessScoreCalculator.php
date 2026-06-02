@@ -124,7 +124,7 @@ final class CompletenessScoreCalculator
         //                                        absence of payout_method_set
         //                                        is fine when the operator
         //                                        has skipped payout entirely)
-        //   contract_signing_enabled OFF       → click_through_accepted_at
+        //   contract_signing_enabled OFF       → signed_master_contract_id
         //                                        non-null also satisfies
         //                                        (Q-flag-off-2 = (a))
         //
@@ -140,8 +140,14 @@ final class CompletenessScoreCalculator
         $payoutSatisfied = $creator->payout_method_set === true
             || ! Feature::active(CreatorPayoutMethodEnabled::NAME);
 
+        // Sprint 4 Chunk 4 (D-c4-3): the `contracts` row is the source of
+        // truth for "contract step satisfied" — satisfaction keys off
+        // `signed_master_contract_id` only. The click-through path now sets
+        // that FK (to a real contracts.id) alongside the denormalised
+        // `click_through_accepted_at`, so the legacy timestamp clause is no
+        // longer load-bearing and has been removed: a creator with the FK
+        // set but no timestamp passes; one with neither fails.
         $contractSatisfied = $creator->signed_master_contract_id !== null
-            || $creator->click_through_accepted_at !== null
             || ! Feature::active(ContractSigningEnabled::NAME);
 
         return [

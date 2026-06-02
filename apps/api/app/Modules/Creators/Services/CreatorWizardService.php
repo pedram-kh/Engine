@@ -7,6 +7,8 @@ namespace App\Modules\Creators\Services;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
 use App\Modules\Creators\Enums\ApplicationStatus;
+use App\Modules\Creators\Enums\ContractKind;
+use App\Modules\Creators\Enums\ContractStatus;
 use App\Modules\Creators\Enums\KycStatus;
 use App\Modules\Creators\Enums\KycVerificationStatus;
 use App\Modules\Creators\Enums\PayoutStatus;
@@ -21,6 +23,7 @@ use App\Modules\Creators\Integrations\Contracts\PaymentProvider;
 use App\Modules\Creators\Integrations\DataTransferObjects\EsignEnvelopeResult;
 use App\Modules\Creators\Integrations\DataTransferObjects\KycInitiationResult;
 use App\Modules\Creators\Integrations\DataTransferObjects\PaymentAccountResult;
+use App\Modules\Creators\Models\Contract;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorKycVerification;
 use App\Modules\Creators\Models\CreatorPayoutMethod;
@@ -51,6 +54,7 @@ final class CreatorWizardService
         private readonly KycProvider $kycProvider,
         private readonly PaymentProvider $paymentProvider,
         private readonly EsignProvider $esignProvider,
+        private readonly ContractTermsRenderer $contractTermsRenderer,
     ) {}
 
     /**
@@ -392,25 +396,81 @@ final class CreatorWizardService
      * Step 8 alternate path — click-through-accept fallback.
      *
      * Available only when `contract_signing_enabled` is OFF
-     * (Q-flag-off-2 = (a) in the chunk-2 plan). Stamps
-     * `creators.click_through_accepted_at` so the wizard's
-     * submit-validation treats the contract step as satisfied
-     * without an envelope. Idempotent: a second accept does NOT
-     * re-stamp the timestamp or re-emit the audit row.
+     * (Q-flag-off-2 = (a) in the chunk-2 plan).
+     *
+     * Sprint 4 Chunk 4 (D-c4-2/3): the acceptance is now a STRUCTURED,
+     * VERSIONED record. We create a `contracts` row — the spec'd entity
+     * the e-sign vendor path also writes to — and point
+     * `creators.signed_master_contract_id` at it, so acceptance is
+     * versioned + timestamped + attributed + unified with the future
+     * vendor record (closes the inventory's continuity gap). The row is:
+     *
+     *   kind               master_universal (global Engine C T&Cs)
+     *   subject            creator → this creator
+     *   version            ContractTermsRenderer::currentVersionNumber()
+     *                      (server-side — the client never sends a version)
+     *   title/body_markdown snapshot of the agreed source at accept time
+     *   status / provider  signed / internal (the master agreement §10
+     *                      makes the click-through a binding signature)
+     *   signed_signature_data { method, version, ip, user_agent, accepted_at }
+     *                      — encrypted at rest, NEVER creator-facing
+     *
+     * `creators.click_through_accepted_at` is kept set as a denormalised
+     * convenience (D-c4-3) — submit-validation keys off
+     * `signed_master_contract_id` now, but leaving the timestamp avoids
+     * touching unrelated reads (CreatorResource still surfaces it). Its
+     * eventual removal is logged as tech-debt.
+     *
+     * Idempotent: a second accept does NOT create a duplicate `contracts`
+     * row, re-stamp the timestamp, or re-emit the audit row — the existing
+     * acceptance already satisfies the step.
      */
-    public function acceptClickThroughContract(Creator $creator): Creator
-    {
+    public function acceptClickThroughContract(
+        Creator $creator,
+        ?string $ipAddress = null,
+        ?string $userAgent = null,
+    ): Creator {
         if (Feature::active(ContractSigningEnabled::NAME)) {
             throw new RuntimeException('creator.wizard.feature_enabled');
         }
 
-        return DB::transaction(function () use ($creator): Creator {
+        return DB::transaction(function () use ($creator, $ipAddress, $userAgent): Creator {
+            // Idempotency guard (#6): an already-accepted creator short
+            // circuits before any write. Keyed off the denormalised
+            // timestamp, which both this path and the backfill keep in
+            // lockstep with the contracts row.
             if ($creator->click_through_accepted_at !== null) {
                 return $creator;
             }
 
+            $acceptedAt = now();
+            $source = $this->contractTermsRenderer->source();
+            $version = ContractTermsRenderer::CURRENT_VERSION;
+
+            $contract = Contract::create([
+                'kind' => ContractKind::MasterUniversal,
+                'subject_type' => Contract::SUBJECT_CREATOR,
+                'subject_id' => $creator->id,
+                'version' => ContractTermsRenderer::versionToInteger($version),
+                'title' => $source['title'],
+                'body_markdown' => $source['markdown'],
+                'signature_provider' => Contract::PROVIDER_INTERNAL,
+                'status' => ContractStatus::Signed,
+                'signed_at' => $acceptedAt,
+                'signed_by_creator_id' => $creator->id,
+                'signed_signature_data' => [
+                    'method' => Contract::METHOD_CLICK_THROUGH,
+                    'version' => $version,
+                    'ip' => $ipAddress,
+                    'user_agent' => $userAgent,
+                    'accepted_at' => $acceptedAt->toIso8601String(),
+                ],
+                'created_by_user_id' => $creator->user_id,
+            ]);
+
             $creator->forceFill([
-                'click_through_accepted_at' => now(),
+                'signed_master_contract_id' => $contract->id,
+                'click_through_accepted_at' => $acceptedAt,
             ])->save();
 
             Audit::log(

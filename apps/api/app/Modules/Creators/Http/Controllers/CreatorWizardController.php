@@ -255,7 +255,14 @@ final class CreatorWizardController
         $creator = $this->requireCreator($request);
 
         try {
-            $this->wizardService->acceptClickThroughContract($creator);
+            // IP/UA are captured server-side as e-sign evidentiary data
+            // (D-c4-5) — the client sends nothing; they land in the
+            // contracts row's encrypted signed_signature_data.
+            $this->wizardService->acceptClickThroughContract(
+                $creator,
+                $request->ip(),
+                $request->userAgent(),
+            );
         } catch (RuntimeException $e) {
             if ($e->getMessage() === 'creator.wizard.feature_enabled') {
                 return ErrorResponse::single(
