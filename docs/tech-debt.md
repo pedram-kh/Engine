@@ -712,3 +712,29 @@ anyone reviewing it later.
 - **Triggered by:** Sprint 10 (payments / money movement).
 - **Owner:** Sprint 10.
 - **Status:** open (deferred by design). Surfaced + accepted by Sprint 4 Chunk 2, 2026-06-02.
+
+---
+
+## Real in-app notification subsystem (D-c3-1 deferral)
+
+- **Where:** there is no notifications surface anywhere today — no `notifications` table, no channel, no unread badge/inbox, no per-event push. The creator-facing signals that exist are the four dashboard status banners on [`apps/main/src/modules/creators/pages/CreatorDashboardPage.vue`](../apps/main/src/modules/creators/pages/CreatorDashboardPage.vue) (pending / approved / rejected / incomplete) plus the two lifecycle emails ([`CreatorApprovedMail`](../apps/api/app/Modules/Creators/Mail/CreatorApprovedMail.php) + [`CreatorRejectedMail`](../apps/api/app/Modules/Creators/Mail/CreatorRejectedMail.php)).
+- **What we accepted in Sprint 4 Chunk 3 (D-c3-1):** `20-PHASE-1-SPEC.md:186` reads the approval/rejection outcome as "in-app + email." We satisfied the "in-app" half with the **existing** rejected dashboard banner — Chunk 3 (Cluster 5) just wired `rejection_reason` through to the creator-facing `/creators/me` resource so the banner can render the reason, and (Cluster 6) added the "Update & resubmit" affordance on that same banner. This is a **deliberate divergence** from a literal reading of "in-app notification": there is no notification record, no read/unread state, and no notification for any event other than the application outcome the creator sees when they next open the dashboard. The email half is the active push (deferred to the log mailer — see the email-posture note in [`services.md`](services.md)).
+- **Risk:** low for Phase 1. The creator learns their outcome via email (push) and sees it reflected on the dashboard (pull). The gap is that there is no general-purpose notification primitive: future events (a brand message, a campaign invite, an agency action) have nowhere to land in-app, and the creator has no notification history. Building one ad-hoc per event would fragment the surface.
+- **Mitigation today:** none beyond the banner + email. The audit log records the lifecycle transitions for compliance, but it is admin-only and is not a user-facing notification feed.
+- **Resolution:** when a real notification subsystem is needed, design it as a first-class primitive — a `notifications` table (polymorphic subject + actor + read_at + type), a backend dispatch seam that the approve/reject/verify actions (and future emitters) write to, a SPA inbox/badge surface, and the i18n + architecture-test parity the other surfaces carry. Migrate the dashboard banner to read from it rather than from `application_status` directly.
+- **Triggered by:** the first product requirement for an in-app notification beyond the application-outcome banner (e.g. brand messaging, campaign invites), OR a deliberate notifications-subsystem chunk.
+- **Owner:** open (post-Phase-1 / notifications chunk).
+- **Status:** open (deferred by design). Surfaced + accepted by Sprint 4 Chunk 3, 2026-06-02.
+
+---
+
+## Admin PII drill-in for encrypted KYC / tax-profile decision data (D-c3-2 deferral, vendor-era)
+
+- **Where:** the admin creator drill-in — [`apps/admin/src/modules/creators/pages/CreatorDetailPage.vue`](../apps/admin/src/modules/creators/pages/CreatorDetailPage.vue) + [`CreatorResource::withAdmin()`](../apps/api/app/Modules/Creators/Http/Resources/CreatorResource.php) (the `admin_attributes` block). The encrypted-at-rest fields live on the KYC verification rows + `creator_tax_profiles` (`decision_data`, `failure_reason`, encrypted tax identifiers per `05-SECURITY-COMPLIANCE.md` §4 / `03-DATA-MODEL.md` §23).
+- **What we accepted in Sprint 4 Chunk 3 (D-c3-2):** the admin review pane shows the already-visible profile / social / portfolio fields + the KYC verification **history summary** (`{id, provider, status, started_at, completed_at, expires_at}` — PII stripped, established Sprint 3 Chunk 3) + (Chunk 3, Cluster 4) the manual identity-verify affordance. It does **not** surface the encrypted `decision_data` / `failure_reason` drill-in that `20-PHASE-1-SPEC.md:439–440` anticipates. With manual + mock KYC there is no rich `decision_data` to show — the manual-verify judgment is made against the visible profile fields — so the drill-in has nothing meaningful to render yet. The `CreatorResource` comment already scopes this to "Sprint 4+ when the approval queue ships": Chunk 3 ships the queue (Cluster 3) and defers the PII drill-in to the vendor era.
+- **Risk:** low today. The admin can make + audit a manual identity decision without the drill-in (the four fields + the audit trail are load-bearing and present). The gap only bites once a **real** KYC vendor lands and produces structured `decision_data` (document-match scores, liveness results, failure reasons) that a reviewer would want to inspect before overriding or escalating.
+- **Mitigation today:** none needed — there is no rich decision data to drill into under manual + mock KYC.
+- **Resolution:** ship alongside the real vendor adapter — add a decrypt-on-read, audit-logged admin drill-in for `decision_data` / `failure_reason` (access itself is a compliance-sensitive read and must emit an audit row), gated behind `platform_admin` + surfaced in the detail-page identity section. Pair with the vendor-verify affordance that ships disabled today (D-c3-6).
+- **Triggered by:** the real KYC vendor adapter landing (the same trigger that activates the disabled "Request vendor verification" affordance).
+- **Owner:** vendor-KYC chunk (Sprint 4+).
+- **Status:** open (deferred by design). Surfaced + accepted by Sprint 4 Chunk 3, 2026-06-02.
