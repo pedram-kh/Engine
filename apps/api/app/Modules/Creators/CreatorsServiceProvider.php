@@ -13,6 +13,7 @@ use App\Modules\Creators\Integrations\Contracts\PaymentProvider;
 use App\Modules\Creators\Integrations\Mock\MockEsignProvider;
 use App\Modules\Creators\Integrations\Mock\MockKycProvider;
 use App\Modules\Creators\Integrations\Mock\MockPaymentProvider;
+use App\Modules\Creators\Integrations\Stripe\StripePaymentProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredEsignProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredKycProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredPaymentProvider;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Pennant\Feature;
+use Stripe\StripeClient;
 
 final class CreatorsServiceProvider extends ServiceProvider
 {
@@ -42,11 +44,13 @@ final class CreatorsServiceProvider extends ServiceProvider
         //   2. Flag ON + driver = 'mock' (Sprint 3 default) →
         //      Mock*Provider. Backed by Cache for session state.
         //
-        //   3. Flag ON + driver matches a real-vendor case (none
-        //      ship in Sprint 3) → real adapter binding. Falls
-        //      through to the Deferred stub today so a misconfigured
-        //      driver in production fails loudly via
-        //      ProviderNotBoundException at call time, not silently.
+        //   3. Flag ON + driver matches a real-vendor case (Sprint 4
+        //      Chunk 2 ships the payment `stripe` driver →
+        //      StripePaymentProvider, D-c2-9) → real adapter binding.
+        //      An unrecognised driver falls through to the Deferred
+        //      stub so a misconfigured driver in production fails
+        //      loudly via ProviderNotBoundException at call time, not
+        //      silently.
         //
         // The bindings live here (not in AppServiceProvider) so the
         // Creators module owns its integration seams — Identity and
@@ -74,6 +78,30 @@ final class CreatorsServiceProvider extends ServiceProvider
             ),
         );
 
+        // Sprint 4 Chunk 2 — the real Stripe Connect adapter. Built
+        // with a StripeClient (test-mode key in test/staging; secret
+        // material from AWS Secrets Manager per config/integrations.php)
+        // + the non-secret return/refresh URLs + webhook signing
+        // secret. Tests override the StripeClient binding with a fake
+        // so no live calls hit Stripe in CI.
+        $this->app->bind(StripeClient::class, static function ($app): StripeClient {
+            return new StripeClient(
+                (string) $app['config']->get('integrations.payment.stripe.secret_key', ''),
+            );
+        });
+
+        $this->app->bind(StripePaymentProvider::class, static function ($app): StripePaymentProvider {
+            $config = $app['config'];
+
+            return new StripePaymentProvider(
+                client: $app->make(StripeClient::class),
+                webhookSecret: (string) $config->get('integrations.payment.stripe.webhook_secret', ''),
+                returnUrl: (string) $config->get('integrations.payment.stripe.return_url', ''),
+                refreshUrl: (string) $config->get('integrations.payment.stripe.refresh_url', ''),
+                webhookTolerance: (int) $config->get('integrations.payment.stripe.webhook_tolerance', 300),
+            );
+        });
+
         $this->app->bind(
             PaymentProvider::class,
             $this->makeProviderResolver(
@@ -82,6 +110,7 @@ final class CreatorsServiceProvider extends ServiceProvider
                 mockClass: MockPaymentProvider::class,
                 deferredClass: DeferredPaymentProvider::class,
                 skippedClass: SkippedPaymentProvider::class,
+                realDrivers: ['stripe' => StripePaymentProvider::class],
             ),
         );
     }
@@ -127,6 +156,10 @@ final class CreatorsServiceProvider extends ServiceProvider
      * @param  class-string  $mockClass
      * @param  class-string  $deferredClass
      * @param  class-string  $skippedClass
+     * @param  array<string, class-string>  $realDrivers  driver-string → real-adapter class.
+     *                                                    Generic so each provider registers its own real vendors
+     *                                                    (payment: `['stripe' => StripePaymentProvider::class]`;
+     *                                                    Kyc/Esign add theirs the same way when they land).
      */
     private function makeProviderResolver(
         string $flagName,
@@ -134,31 +167,38 @@ final class CreatorsServiceProvider extends ServiceProvider
         string $mockClass,
         string $deferredClass,
         string $skippedClass,
+        array $realDrivers = [],
     ): \Closure {
-        return function ($app) use ($flagName, $configKey, $mockClass, $deferredClass, $skippedClass): object {
+        return function ($app) use ($flagName, $configKey, $mockClass, $deferredClass, $skippedClass, $realDrivers): object {
             if (! Feature::active($flagName)) {
                 return $app->make($skippedClass);
             }
 
             $driver = $app['config']->get($configKey, 'mock');
 
-            return match ($driver) {
-                'mock' => $app->make($mockClass),
-                default => $app->make($deferredClass),
-            };
+            if ($driver === 'mock') {
+                return $app->make($mockClass);
+            }
+
+            if (is_string($driver) && isset($realDrivers[$driver])) {
+                return $app->make($realDrivers[$driver]);
+            }
+
+            return $app->make($deferredClass);
         };
     }
 
     /**
      * Register the `webhooks` named rate limiter the inbound vendor
-     * webhook endpoints use (POST /api/v1/webhooks/{kyc,esign}).
+     * webhook endpoints use (POST /api/v1/webhooks/{kyc,esign,stripe}).
      *
      * 1000 req/min per provider per docs/04-API-DESIGN.md § 13.
-     * Keyed on the provider segment of the URL so a noisy KYC
-     * vendor cannot starve the eSign quota (and vice versa). The
-     * `kyc` and `esign` segments come from the route prefix +
-     * controller path; `$request->path()` is `api/v1/webhooks/kyc`
-     * etc. so we slice off the trailing segment.
+     * Keyed on the provider segment of the URL so a noisy vendor
+     * cannot starve another's quota. The `kyc` / `esign` / `stripe`
+     * segments come from the route prefix + controller path;
+     * `$request->path()` is `api/v1/webhooks/stripe` etc. so we slice
+     * off the trailing segment (the new `stripe` route is covered
+     * automatically — no limiter change needed).
      */
     private function registerRateLimiters(): void
     {

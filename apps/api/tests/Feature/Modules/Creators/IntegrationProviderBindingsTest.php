@@ -12,6 +12,7 @@ use App\Modules\Creators\Integrations\Exceptions\ProviderNotBoundException;
 use App\Modules\Creators\Integrations\Mock\MockEsignProvider;
 use App\Modules\Creators\Integrations\Mock\MockKycProvider;
 use App\Modules\Creators\Integrations\Mock\MockPaymentProvider;
+use App\Modules\Creators\Integrations\Stripe\StripePaymentProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredEsignProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredKycProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredPaymentProvider;
@@ -92,6 +93,19 @@ it('with flag ON + driver=mock, PaymentProvider resolves to MockPaymentProvider'
     expect(app(PaymentProvider::class))->toBeInstanceOf(MockPaymentProvider::class);
 });
 
+it('with flag ON + driver=stripe, PaymentProvider resolves to the real StripePaymentProvider (Sprint 4 Chunk 2, D-c2-9)', function (): void {
+    Feature::activate(CreatorPayoutMethodEnabled::NAME);
+    config([
+        'integrations.payment.driver' => 'stripe',
+        // Dummy test key so the StripeClient binding constructs without
+        // a real secret (no network call on construction). In test/
+        // staging this is a real sk_test_* from Secrets Manager.
+        'integrations.payment.stripe.secret_key' => 'sk_test_dummy_resolver',
+    ]);
+
+    expect(app(PaymentProvider::class))->toBeInstanceOf(StripePaymentProvider::class);
+});
+
 it('with flag ON + unknown driver, KycProvider falls through to DeferredKycProvider (no silent vendor)', function (): void {
     Feature::activate(KycVerificationEnabled::NAME);
     config(['integrations.kyc.driver' => 'unknown_real_vendor']);
@@ -164,10 +178,14 @@ it('DeferredPaymentProvider throws ProviderNotBoundException on every method', f
     $stub = new DeferredPaymentProvider;
     $creator = new Creator;
 
-    foreach (['createConnectedAccount', 'getAccountStatus'] as $method) {
+    foreach (['createConnectedAccount', 'getAccountStatus', 'verifyWebhookSignature', 'parseWebhookEvent'] as $method) {
         $threw = false;
         try {
-            $stub->{$method}($creator);
+            match ($method) {
+                'createConnectedAccount', 'getAccountStatus' => $stub->{$method}($creator),
+                'verifyWebhookSignature' => $stub->verifyWebhookSignature('payload', 'sig'),
+                'parseWebhookEvent' => $stub->parseWebhookEvent('payload'),
+            };
         } catch (ProviderNotBoundException $e) {
             $threw = true;
             expect($e->getMessage())
@@ -178,12 +196,13 @@ it('DeferredPaymentProvider throws ProviderNotBoundException on every method', f
     }
 });
 
-it('the three contracts each define exactly the Sprint-3-completion surface (KYC: 4, eSign: 4, Payment: 2)', function (): void {
-    // Sprint 3 Chunk 2 planned reset of the chunk-1 "exactly one
-    // method" pin — the hybrid completion architecture (Decision
-    // A = (c) in the chunk-2 plan) lands all status-poll +
-    // webhook methods in lockstep with the wizard endpoints that
-    // call them. Source-inspection regression (#1).
+it('the three contracts each define exactly their built surface (KYC: 4, eSign: 4, Payment: 4)', function (): void {
+    // Sprint 3 Chunk 2 landed KYC + eSign at 4 methods and Payment at
+    // its 2-method onboarding surface. Sprint 4 Chunk 2 extends Payment
+    // with the inbound-webhook pair (verifyWebhookSignature +
+    // parseWebhookEvent) for the real Stripe `account.updated` adapter
+    // (D-c2-3) — bringing it to 4 like its siblings. Source-inspection
+    // regression (#1).
     //
     // If a future sprint extends a contract, this assertion MUST
     // be updated in lockstep with the contract change so the
@@ -207,6 +226,8 @@ it('the three contracts each define exactly the Sprint-3-completion surface (KYC
         PaymentProvider::class => [
             'createConnectedAccount',
             'getAccountStatus',
+            'parseWebhookEvent',
+            'verifyWebhookSignature',
         ],
     ];
 
@@ -220,20 +241,23 @@ it('the three contracts each define exactly the Sprint-3-completion surface (KYC
 
         sort($expected);
 
-        expect($actual)->toBe($expected, "{$contract} should expose exactly the Sprint-3-completion surface.");
+        expect($actual)->toBe($expected, "{$contract} should expose exactly its built surface.");
     }
 });
 
-it('each contract docblock cites the Sprint-3 completion surface for #34 cross-chunk handoff verification', function (): void {
-    $contracts = [
-        KycProvider::class,
-        EsignProvider::class,
-        PaymentProvider::class,
+it('each contract docblock documents its built surface for #34 cross-chunk handoff verification', function (): void {
+    // KYC + eSign pin the Sprint-3 phrasing; Payment was extended in
+    // Sprint 4 Chunk 2 so its docblock documents both the Sprint-3
+    // onboarding surface and the Sprint-4 inbound-webhook surface.
+    $expectedPhrases = [
+        KycProvider::class => 'Sprint 3 completion surface',
+        EsignProvider::class => 'Sprint 3 completion surface',
+        PaymentProvider::class => 'Inbound-webhook surface (Sprint 4 Chunk 2',
     ];
 
-    foreach ($contracts as $contract) {
+    foreach ($expectedPhrases as $contract => $phrase) {
         $doc = (new ReflectionClass($contract))->getDocComment();
         expect($doc)->toBeString()
-            ->and($doc)->toContain('Sprint 3 completion surface');
+            ->and($doc)->toContain($phrase);
     }
 });

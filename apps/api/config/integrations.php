@@ -15,10 +15,13 @@ declare(strict_types=1);
 | mixed-vendor staging environments tractable: KYC can flip to a real
 | vendor while eSign and payment stay on `mock` independently.
 |
-| Sprint 3 ships only the `mock` driver per provider. Real-vendor
+| Sprint 3 shipped only the `mock` driver per provider. Real-vendor
 | drivers register additional cases in {@see CreatorsServiceProvider}'s
-| binding map as they land in Sprint 4 (KYC), Sprint 7 (Stripe), and
-| Sprint 9 (eSign).
+| binding map as they land. Sprint 4 Chunk 2 adds the `stripe` payment
+| driver (real Stripe Connect onboarding adapter, test-mode); it is
+| bound-but-unreachable in production because `creator_payout_method_enabled`
+| stays OFF (D-c2-9) — reached only in test/staging where the flag is ON
+| and PAYMENT_PROVIDER=stripe.
 |
 | All real-vendor secrets live in AWS Secrets Manager per
 | docs/06-INTEGRATIONS.md § 1.2; this file holds **non-secret**
@@ -57,13 +60,47 @@ return [
 
     'payment' => [
         /*
-         * Stripe Connect onboarding-completion uses status-poll only
-         * in Sprint 3 (Q-stripe-no-webhook-acceptable in the chunk-2
-         * plan). The webhook handling — and a corresponding
-         * `mock_webhook_secret` — lands in Sprint 10 alongside the
-         * `account.updated` handler.
+         * Driver selection. 'mock' (default) resolves to
+         * MockPaymentProvider when creator_payout_method_enabled is ON;
+         * 'stripe' resolves to the real StripePaymentProvider (Sprint 4
+         * Chunk 2). Otherwise the Skipped stub binds (flag OFF).
          */
         'driver' => env('PAYMENT_PROVIDER', 'mock'),
+
+        /*
+         * HMAC-SHA256 secret for the mock payment webhook path — used
+         * by MockPaymentProvider::verifyWebhookSignature() and by
+         * feature tests that recompute the signature. Non-production;
+         * never validates real Stripe traffic, never written to AWS
+         * Secrets Manager. Mirrors the kyc/esign mock secrets.
+         */
+        'mock_webhook_secret' => env('PAYMENT_MOCK_WEBHOOK_SECRET', 'mock-payment-webhook-secret-do-not-use-in-production'),
+
+        /*
+         * Real Stripe Connect adapter configuration (Sprint 4 Chunk 2).
+         *
+         * `secret_key`, `webhook_secret` and `connect_client_id` are
+         * SECRET material: in non-local environments they are hydrated
+         * into these env vars from AWS Secrets Manager
+         * (`catalyst/${env}/api/stripe`) per docs/06-INTEGRATIONS.md
+         * § 1.2 — never committed to env files or code. In test-mode
+         * they are Stripe test keys (`sk_test_*`) and the dashboard /
+         * Stripe-CLI webhook endpoint signing secret (`whsec_*`).
+         *
+         * `return_url` / `refresh_url` are NON-secret — the SPA wizard
+         * payout-return URLs the hosted Express onboarding flow bounces
+         * the creator back to (useVendorBounce('payout') picks up from
+         * there). `webhook_tolerance` is the Stripe signature timestamp
+         * tolerance in seconds (replay-window guard).
+         */
+        'stripe' => [
+            'secret_key' => env('STRIPE_SECRET_KEY'),
+            'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+            'connect_client_id' => env('STRIPE_CONNECT_CLIENT_ID'),
+            'return_url' => env('STRIPE_CONNECT_RETURN_URL', env('APP_FRONTEND_URL', 'http://localhost:5173').'/onboarding/payout/return'),
+            'refresh_url' => env('STRIPE_CONNECT_REFRESH_URL', env('APP_FRONTEND_URL', 'http://localhost:5173').'/onboarding/payout/refresh'),
+            'webhook_tolerance' => (int) env('STRIPE_WEBHOOK_TOLERANCE', 300),
+        ],
     ],
 
 ];

@@ -10,6 +10,7 @@ use App\Modules\Creators\Http\Controllers\InvitationPreviewController;
 use App\Modules\Creators\Http\Controllers\PortfolioController;
 use App\Modules\Creators\Http\Controllers\Webhooks\EsignWebhookController;
 use App\Modules\Creators\Http\Controllers\Webhooks\KycWebhookController;
+use App\Modules\Creators\Http\Controllers\Webhooks\StripeWebhookController;
 use App\Modules\Creators\Http\Controllers\WizardCompletionController;
 use App\Modules\Identity\Http\Middleware\EnsureMfaForAdmins;
 use Illuminate\Support\Facades\Route;
@@ -215,9 +216,10 @@ Route::prefix('admin/creators')
 // Allowlisted in docs/security/tenancy.md § 4 (sub-step 11).
 //
 // Rate limit: 1000 req/min per provider via the `webhooks` named
-// limiter registered in CreatorsServiceProvider::boot(). Stripe
-// Connect's webhook handler is deferred to Sprint 10 per
-// Q-stripe-no-webhook-acceptable.
+// limiter registered in CreatorsServiceProvider::boot(). The Stripe
+// Connect `account.updated` handler lands in Sprint 4 Chunk 2 (the
+// real onboarding adapter); the remaining 8 money-movement webhooks
+// (charge.*, transfer.*, payout.*) are deferred to Sprint 10.
 
 Route::middleware('throttle:webhooks')
     ->prefix('webhooks')
@@ -225,4 +227,5 @@ Route::middleware('throttle:webhooks')
     ->group(function (): void {
         Route::post('kyc', KycWebhookController::class)->name('kyc');
         Route::post('esign', EsignWebhookController::class)->name('esign');
+        Route::post('stripe', StripeWebhookController::class)->name('stripe');
     });

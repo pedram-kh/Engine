@@ -243,13 +243,20 @@ final class CreatorWizardService
     {
         $this->guardFeatureEnabled(CreatorPayoutMethodEnabled::NAME);
 
-        return DB::transaction(function () use ($creator): PaymentAccountResult {
+        // Stamp the actual configured driver (`stripe` for the real
+        // adapter, `mock` for dev) so the row's provenance is honest —
+        // the inbound `account.updated` webhook + audit trail rely on
+        // an accurate provider label (Sprint 4 Chunk 2; previously
+        // hardcoded 'mock' regardless of driver).
+        $provider = (string) (config('integrations.payment.driver') ?: 'mock');
+
+        return DB::transaction(function () use ($creator, $provider): PaymentAccountResult {
             $result = $this->paymentProvider->createConnectedAccount($creator);
 
             CreatorPayoutMethod::updateOrCreate(
                 ['creator_id' => $creator->id, 'is_default' => true],
                 [
-                    'provider' => 'mock',
+                    'provider' => $provider,
                     'provider_account_id' => $result->accountId,
                     'currency' => 'EUR',
                     'status' => PayoutStatus::Pending,

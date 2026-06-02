@@ -8,10 +8,18 @@
  * `creator_payout_method_enabled` flag and the
  * `useVendorBounce('payout')` saga.
  *
- *   - flag ON: Stripe Connect onboarding via the hosted flow.
- *     `payout_method_set` flips to true once the webhook lands.
+ *   - flag ON: Stripe Connect onboarding via the hosted Express flow.
+ *     On return from Stripe, `payout_method_set` flips to true via the
+ *     payout status-poll (`useVendorBounce('payout')` →
+ *     `GET /wizard/payout/status`, Sprint 3 reality). The authoritative
+ *     async update is Stripe's `account.updated` webhook (Sprint 4
+ *     Chunk 2 real adapter), which drives `creator_payout_methods.status`
+ *     and flips `payout_method_set` server-side independent of the poll.
  *   - flag OFF: skipped-with-explanation; backend stamps the step
- *     complete at submit time (Q-flag-off-1).
+ *     complete at submit time (Q-flag-off-1). Note: the
+ *     "profile shows payout setup pending" surface in
+ *     docs/feature-flags.md describes a future profile screen that is
+ *     not built — out of scope here.
  */
 
 import { PayoutMethodStatus } from '@catalyst/ui'

@@ -20,7 +20,8 @@
     "league/commonmark": "^2.7",
     "league/flysystem-aws-s3-v3": "^3.32",
     "pragmarx/google2fa": "^9.0",
-    "predis/predis": "^3.4"
+    "predis/predis": "^3.4",
+    "stripe/stripe-php": "^20.2"
   },
   "require-dev": {
     "fakerphp/faker": "^1.23",

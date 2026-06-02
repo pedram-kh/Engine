@@ -7,6 +7,7 @@ namespace App\Modules\Creators\Integrations\Stubs;
 use App\Modules\Creators\Integrations\Contracts\PaymentProvider;
 use App\Modules\Creators\Integrations\DataTransferObjects\AccountStatus;
 use App\Modules\Creators\Integrations\DataTransferObjects\PaymentAccountResult;
+use App\Modules\Creators\Integrations\DataTransferObjects\PaymentsWebhookEvent;
 use App\Modules\Creators\Integrations\Exceptions\ProviderNotBoundException;
 use App\Modules\Creators\Integrations\Mock\MockPaymentProvider;
 use App\Modules\Creators\Models\Creator;
@@ -28,5 +29,15 @@ final class DeferredPaymentProvider implements PaymentProvider
     public function getAccountStatus(Creator $creator): AccountStatus
     {
         throw ProviderNotBoundException::for('PaymentProvider', 'getAccountStatus');
+    }
+
+    public function verifyWebhookSignature(string $payload, string $signature): bool
+    {
+        throw ProviderNotBoundException::for('PaymentProvider', 'verifyWebhookSignature');
+    }
+
+    public function parseWebhookEvent(string $payload): PaymentsWebhookEvent
+    {
+        throw ProviderNotBoundException::for('PaymentProvider', 'parseWebhookEvent');
     }
 }

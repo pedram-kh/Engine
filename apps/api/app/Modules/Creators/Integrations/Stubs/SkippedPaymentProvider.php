@@ -8,6 +8,7 @@ use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Integrations\Contracts\PaymentProvider;
 use App\Modules\Creators\Integrations\DataTransferObjects\AccountStatus;
 use App\Modules\Creators\Integrations\DataTransferObjects\PaymentAccountResult;
+use App\Modules\Creators\Integrations\DataTransferObjects\PaymentsWebhookEvent;
 use App\Modules\Creators\Integrations\Exceptions\FeatureDisabledException;
 use App\Modules\Creators\Models\Creator;
 
@@ -40,6 +41,24 @@ final class SkippedPaymentProvider implements PaymentProvider
             'PaymentProvider',
             CreatorPayoutMethodEnabled::NAME,
             'getAccountStatus',
+        );
+    }
+
+    public function verifyWebhookSignature(string $payload, string $signature): bool
+    {
+        throw FeatureDisabledException::for(
+            'PaymentProvider',
+            CreatorPayoutMethodEnabled::NAME,
+            'verifyWebhookSignature',
+        );
+    }
+
+    public function parseWebhookEvent(string $payload): PaymentsWebhookEvent
+    {
+        throw FeatureDisabledException::for(
+            'PaymentProvider',
+            CreatorPayoutMethodEnabled::NAME,
+            'parseWebhookEvent',
         );
     }
 }

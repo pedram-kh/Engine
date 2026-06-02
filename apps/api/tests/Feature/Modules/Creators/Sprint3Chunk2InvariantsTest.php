@@ -8,6 +8,7 @@ use App\Modules\Audit\Models\IntegrationEvent;
 use App\Modules\Creators\Http\Controllers\MockVendorController;
 use App\Modules\Creators\Http\Controllers\Webhooks\EsignWebhookController;
 use App\Modules\Creators\Http\Controllers\Webhooks\KycWebhookController;
+use App\Modules\Creators\Http\Controllers\Webhooks\StripeWebhookController;
 use App\Modules\Creators\Http\Controllers\WizardCompletionController;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -153,6 +154,8 @@ it('webhook + mock-vendor controllers are wired to the registered routes', funct
     $expected = [
         'api/v1/webhooks/kyc' => KycWebhookController::class,
         'api/v1/webhooks/esign' => EsignWebhookController::class,
+        // Sprint 4 Chunk 2 — real Stripe Connect account.updated webhook.
+        'api/v1/webhooks/stripe' => StripeWebhookController::class,
     ];
 
     foreach ($expected as $uri => $controller) {

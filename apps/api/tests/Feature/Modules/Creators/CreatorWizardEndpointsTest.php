@@ -9,6 +9,7 @@ use App\Modules\Creators\Database\Factories\CreatorPortfolioItemFactory;
 use App\Modules\Creators\Database\Factories\CreatorSocialAccountFactory;
 use App\Modules\Creators\Enums\EsignStatus;
 use App\Modules\Creators\Enums\KycStatus;
+use App\Modules\Creators\Enums\PayoutStatus;
 use App\Modules\Creators\Enums\SocialPlatform;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
@@ -22,6 +23,7 @@ use App\Modules\Creators\Integrations\DataTransferObjects\EsignWebhookEvent;
 use App\Modules\Creators\Integrations\DataTransferObjects\KycInitiationResult;
 use App\Modules\Creators\Integrations\DataTransferObjects\KycWebhookEvent;
 use App\Modules\Creators\Integrations\DataTransferObjects\PaymentAccountResult;
+use App\Modules\Creators\Integrations\DataTransferObjects\PaymentsWebhookEvent;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorKycVerification;
 use App\Modules\Creators\Models\CreatorPayoutMethod;
@@ -77,6 +79,16 @@ function bindFakeProviders(): void
         public function getAccountStatus(Creator $creator): AccountStatus
         {
             return new AccountStatus(false, false, false, []);
+        }
+
+        public function verifyWebhookSignature(string $payload, string $signature): bool
+        {
+            return true;
+        }
+
+        public function parseWebhookEvent(string $payload): PaymentsWebhookEvent
+        {
+            return new PaymentsWebhookEvent('evt_fake', 'account.updated', 'acct_fake', PayoutStatus::Verified, true, true, []);
         }
     });
 

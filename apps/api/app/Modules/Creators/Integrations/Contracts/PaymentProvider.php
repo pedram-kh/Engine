@@ -6,44 +6,49 @@ namespace App\Modules\Creators\Integrations\Contracts;
 
 use App\Modules\Creators\Integrations\DataTransferObjects\AccountStatus;
 use App\Modules\Creators\Integrations\DataTransferObjects\PaymentAccountResult;
+use App\Modules\Creators\Integrations\DataTransferObjects\PaymentsWebhookEvent;
+use App\Modules\Creators\Integrations\Stripe\StripePaymentProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredPaymentProvider;
 use App\Modules\Creators\Models\Creator;
 
 /**
  * Payment-provider contract (Stripe-Connect-style).
  *
- * Sprint 3 Chunk 2 completes the wizard's payout-method integration
- * surface (hybrid completion architecture, Decision A = (c) in the
- * chunk-2 plan — but status-poll only for Stripe Connect; webhook
- * handling deferred to Sprint 10 per Q-stripe-no-webhook-acceptable).
- * Two methods, no inbound-webhook surface.
+ * Sprint 3 Chunk 2 completed the wizard's payout-method onboarding
+ * surface (createConnectedAccount + getAccountStatus, status-poll
+ * completion). Sprint 4 Chunk 2 adds the inbound-webhook pair
+ * (verifyWebhookSignature + parseWebhookEvent) so the real Stripe
+ * adapter's `account.updated` event can drive
+ * `creator_payout_methods.status` authoritatively — the first real
+ * adapter behind this seam.
  *
- * Lives under `Modules/Creators/Integrations/` for Sprint 3 (not
- * under `Modules/Payments/`) because the wizard owns the connected-
- * account onboarding lifecycle. When Sprint 10 builds out
- * escrow / release / refund flows, the Payments module will define a
- * broader `PaymentProviderContract` (per 06-INTEGRATIONS.md § 2.2);
- * the wizard will continue depending on this narrower contract.
+ * Lives under `Modules/Creators/Integrations/` because the wizard owns
+ * the connected-account onboarding lifecycle (D-c2-1). The real
+ * adapter ({@see StripePaymentProvider})
+ * implements THIS contract — it deliberately does NOT stand up the
+ * spec's broad escrow-bearing `Modules\Payments\Contracts\PaymentProviderContract`
+ * (06-INTEGRATIONS.md § 2.2), which is deferred to Sprint 10. When
+ * Sprint 10 builds escrow / release / refund, the Payments module
+ * defines the broader contract and the adapter migrates with it
+ * (see docs/tech-debt.md).
  *
- * ## Sprint 3 completion surface (this contract — 2 methods)
+ * ## Onboarding surface (Sprint 3 — 2 methods)
  *   - {@see self::createConnectedAccount()}: creates account; returns onboarding URL.
  *   - {@see self::getAccountStatus()}: status-poll for post-redirect UX.
  *
+ * ## Inbound-webhook surface (Sprint 4 Chunk 2 — 2 methods)
+ *   - {@see self::verifyWebhookSignature()}: inbound-webhook signature check.
+ *   - {@see self::parseWebhookEvent()}: parse vendor payload to internal DTO.
+ *
  * ## Future-extension methods (Sprint 10 in Modules/Payments/)
- *   - `verifyWebhookSignature(string $payload, string $signature): bool`
- *   - `parseWebhookEvent(string $payload): PaymentsWebhookEvent`
  *   - `fundEscrow(Payment $payment, FundingRequest $r): EscrowResult`
  *   - `releaseEscrow(Payment $payment, ReleaseRequest $r): ReleaseResult`
  *   - `refundEscrow(Payment $payment, RefundRequest $r): RefundResult`
- *
- * Sprint 3's status-poll-only choice is documented as accepted risk
- * in docs/tech-debt.md (Sprint 7 / Sprint 10 follow-up): the
- * `account.updated` webhook is the production-grade source of truth
- * for Connect account state, but Sprint 3's wizard only needs
- * onboarding-completion confirmation, which status-poll satisfies.
+ *   - the remaining 8 money-movement webhooks (charge.*, transfer.*, payout.*).
  *
  * @see DeferredPaymentProvider
  * @see AccountStatus
+ * @see PaymentsWebhookEvent
  */
 interface PaymentProvider
 {
@@ -65,4 +70,25 @@ interface PaymentProvider
      * advance the wizard.
      */
     public function getAccountStatus(Creator $creator): AccountStatus;
+
+    /**
+     * Verify the signature on an inbound webhook payload.
+     *
+     * Returns true iff the signature is valid for the given payload.
+     * The webhook handler returns 401 Unauthorized on false. Single
+     * boolean return on purpose — the security envelope MUST NOT
+     * differentiate between failure modes (mirrors the binding
+     * decision in {@see KycProvider::verifyWebhookSignature()}).
+     */
+    public function verifyWebhookSignature(string $payload, string $signature): bool;
+
+    /**
+     * Parse an inbound webhook payload into the internal
+     * {@see PaymentsWebhookEvent} DTO. Called only after
+     * {@see self::verifyWebhookSignature()} returns true.
+     *
+     * Throws on malformed payloads (the handler converts to
+     * `processing_error` on the integration_events row).
+     */
+    public function parseWebhookEvent(string $payload): PaymentsWebhookEvent;
 }

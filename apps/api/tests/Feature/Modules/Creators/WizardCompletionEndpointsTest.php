@@ -19,6 +19,7 @@ use App\Modules\Creators\Integrations\DataTransferObjects\EsignWebhookEvent;
 use App\Modules\Creators\Integrations\DataTransferObjects\KycInitiationResult;
 use App\Modules\Creators\Integrations\DataTransferObjects\KycWebhookEvent;
 use App\Modules\Creators\Integrations\DataTransferObjects\PaymentAccountResult;
+use App\Modules\Creators\Integrations\DataTransferObjects\PaymentsWebhookEvent;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -112,6 +113,16 @@ function bindAccountStatus(AccountStatus $status): void
         public function getAccountStatus(Creator $creator): AccountStatus
         {
             return $this->status;
+        }
+
+        public function verifyWebhookSignature(string $payload, string $signature): bool
+        {
+            return true;
+        }
+
+        public function parseWebhookEvent(string $payload): PaymentsWebhookEvent
+        {
+            return new PaymentsWebhookEvent('evt', 'account.updated', 'acct', null, false, false, []);
         }
     });
 }
