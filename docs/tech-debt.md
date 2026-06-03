@@ -46,7 +46,37 @@ anyone reviewing it later.
 - **Triggered by:** Sprint 6 (Internal creator matching) — the natural home for search + the talent-pool/metrics/availability filters deferred alongside it.
 - **Resolution:** in Sprint 6, add the generated `tsvector` column + GIN index (pgsql-guarded migration), a driver-aware query helper (FTS on Postgres, `ILIKE` fallback on SQLite), and wire a `?q=` param into the roster/matching endpoint.
 - **Owner:** Sprint 6 matching workstream.
-- **Status:** open. Surfaced + deliberately deferred by Sprint 4 Chunk 5, June 3, 2026 ([review](reviews/sprint-4-chunk-5-review.md)).
+- **Status:** **CLOSED** — Sprint 6 Chunk 1 (2026-06-03, D-1/D-3, [review](reviews/sprint-6-chunk-1-review.md)). Built exactly as the resolution sketched, scoped to **name/bio** (handle search is a separate deferred entry below):
+  - Migration `2026_06_03_100001_add_search_vector_to_creators_table.php` adds a **pgsql-guarded** STORED generated column `search_vector = to_tsvector('simple', display_name || bio)` + `idx_creators_search_gin` GIN index. The entire `ALTER`/index lives behind `getDriverName() === 'pgsql'`, mirroring the `idx_creators_categories_gin` block — so the column **does not exist on SQLite** and the test schema is untouched.
+  - `AgencyCreatorController::applySearchFilter` is **driver-aware** (the one filter that needs an explicit branch — FTS has no portable grammar degrade): Postgres `search_vector @@ plainto_tsquery('simple', ?)`; SQLite `LOWER(display_name|bio) LIKE ? ESCAPE '\'`. `?q=` is threaded controller → `roster.api.ts` (`RosterListParams.q`) → the page's debounced search box.
+  - **Untestable-seam discipline (D-3):** the SQLite `ILIKE` fallback is the CI-exercised path and is fully tested (narrows by name + bio; unmatched→0 break-revert; blank no-op; wildcard escaping). The Postgres FTS branch ships with a dormant `markTestSkipped()` counterpart (live the day Postgres CI lands) **and** was manually verified against the live local Postgres 16 (port 5435) on a throwaway `catalyst_test` DB — all 24 roster tests green incl. the otherwise-skipped FTS assertion (recorded in the chunk review). The `'simple'` config minimizes the FTS-lexeme vs ILIKE-substring divergence; the residual difference is documented, not papered over.
+
+---
+
+## A real availability filter on the agency roster (the cheap-signal design problem)
+
+- **Where:** [`apps/main/src/modules/roster/pages/CreatorRosterPage.vue`](../apps/main/src/modules/roster/pages/CreatorRosterPage.vue) ships availability as a **disabled affordance** (D-4); [`apps/api/app/Modules/Agencies/Http/Controllers/AgencyCreatorController.php`](../apps/api/app/Modules/Agencies/Http/Controllers/AgencyCreatorController.php) has no availability filter. Availability data lives in `creator_availability_blocks` as **per-creator RRULE recurrence**, not a stored status.
+- **What we accepted in Sprint 6 Chunk 1 (June 3, 2026):** D-5 — a _real_ availability filter is **deferred as a design problem, not just effort.** The Chunk-1 inventory reframed the scope: availability was assumed to be a stored field that a filter could read, but there is **no stored availability status**. Answering "is this creator free in window X?" for a roster page means expanding each creator's RRULE set (N expansions per page) — a second spine of query weight, not an extension of the FTS chunk. So availability ships as an inert affordance (faded, span-wrapped tooltip "Availability filtering is coming soon", **issues no query** — a 0-results from an empty-data query reads as broken), exactly like the metrics affordance.
+- **Risk:** none today (the affordance is honest about being unbuilt). The cost is a missing filter until the design decision is made.
+- **Triggered by:** an agency workflow that needs to filter the roster by who's free — likely the campaign-matching work that consumes availability.
+- **Resolution (two options, to be chosen deliberately — this is the whole point of deferring):**
+  - **(a) Denormalized roster-wide signal:** maintain a cheap per-creator column (e.g. `next_free_date` / a coarse availability bucket) updated when availability blocks change, so the roster filter is a plain indexed `WHERE`. Cheap to query, but adds a denormalization to keep in sync (write-time cost + a backfill).
+  - **(b) Accept N RRULE expansions per page:** expand each rostered creator's recurrence at query time for the requested window. No denormalization, but O(roster-size) expansion per page load — needs a bound (page size cap) and likely a cache.
+  - Pick one consciously after measuring expected roster sizes + the query window's shape; do not bolt either onto a list/search chunk.
+- **Owner:** the chunk that first needs availability-based roster filtering.
+- **Status:** open. Surfaced + deliberately deferred by Sprint 6 Chunk 1, June 3, 2026 ([review](reviews/sprint-6-chunk-1-review.md)).
+
+---
+
+## Handle search on the agency roster (`creator_social_accounts.handle`)
+
+- **Where:** the roster `?q=` FTS (Sprint 6 Chunk 1) searches **name/bio only** — the spec'd `tsvector` is over `creators(display_name, bio)`. The handle lives on a different table, [`creator_social_accounts.handle`](../docs/03-DATA-MODEL.md), one row per (creator, platform).
+- **What we accepted in Sprint 6 Chunk 1 (June 3, 2026):** D-2 — handle search is **deferred**. It's outside the spec'd name/bio `tsvector` and needs a join to `creator_social_accounts` + a second search path (a creator has multiple handles across platforms) — a scope multiplier on a chunk whose one real spine was FTS. Name/bio is the spec'd surface; handles become rich (verified, metric-bearing) only when the social adapters land, which is the natural home for searching them.
+- **Risk:** low — agencies search their roster by name far more than by raw handle at Phase-1 volume; the four structured filters + name/bio FTS cover the common cases.
+- **Triggered by:** the social-adapter work (when handles become first-class, synced, metric-bearing) OR an explicit agency need to find a creator by @handle.
+- **Resolution:** extend the roster search to also match `creator_social_accounts.handle` — either via a `whereHas('socialAccounts', …)` `ILIKE`/FTS branch joined into the existing `?q=` path, or a dedicated handle index once handles are normalized + deduped by the adapters. Mind the driver-aware seam already established for the name/bio FTS.
+- **Owner:** social-adapter workstream.
+- **Status:** open. Surfaced + deliberately deferred by Sprint 6 Chunk 1, June 3, 2026 ([review](reviews/sprint-6-chunk-1-review.md)).
 
 ---
 
@@ -70,7 +100,7 @@ anyone reviewing it later.
 - **Triggered by:** the **next rich agency-SPA list** — **Sprint 6's matching / roster-management view**, which will carry _more_ selects + filters (talent pools, metrics/availability, FTS search box) and so hits the same wall harder. The stub-the-heavy-components pattern scales poorly as a single page accrues many heavy controls.
 - **Resolution (Sprint 6 decides deliberately):** either (a) keep + formalize the "render one real table, stub the rest" pattern (cheap, fast, but table-DOM coverage stays thin), or (b) stand up **Playwright** table-DOM coverage for the matching view and let component specs stub freely. Pick one consciously rather than discovering the OOM mid-build.
 - **Owner:** Sprint 6 matching workstream.
-- **Status:** open (accepted — not a coverage gap today). Surfaced by Sprint 4 Chunk 5, June 3, 2026 ([review](reviews/sprint-4-chunk-5-review.md)).
+- **Status:** **CLOSED** — Sprint 6 Chunk 1 (2026-06-03, D-6, [review](reviews/sprint-6-chunk-1-review.md)) chose **option (b)** deliberately. The inventory corrected the assumption that Playwright was greenfield — it's already stood up + running in the `e2e-main` CI job (10 specs), so adding a roster spec is cheap. `playwright/specs/roster-search-and-affordances.spec.ts` covers the **real** `v-data-table-server` DOM + the search-narrows-the-table flow + the disabled-affordance tooltips against actual seeded rows (via a new `_test/agencies/{agency}/roster-creators` helper). The `CreatorRosterPage.spec.ts` now stubs the heavy components freely (`VSelect`, `VDataTableServer`, `VTextField`) and drives refs directly — the OOM-prone "render one real table" mount is retained for the existing row-DOM test but the chunk did **not** push the workaround further as this entry feared. The pattern is now: heavy table/search/filter DOM → Playwright; logic/filter/empty/error → stubbed component specs.
 
 ---
 
@@ -140,7 +170,7 @@ anyone reviewing it later.
 - **Triggered by:** the next router-touching chunk OR a deliberate UX-polish sweep across both SPAs.
 - **Resolution:** add `requireAgencyUser` guard (symmetric to `requireOnboardingAccess`) that redirects `user_type === 'creator'` → `{ name: 'onboarding.welcome-back' }` and falls through for every other user_type. Apply to every `appRoutes` entry. Add the architecture-test counterpart that walks `appRoutes` and asserts every entry carries the guard. Estimated effort: ~30 minutes including tests + the parity architecture-test.
 - **Owner:** next router-touching chunk OR Sprint 4 polish.
-- **Status:** open. Surfaced by Sprint 3 stabilization pass, May 18, 2026.
+- **Status:** **CLOSED** — Sprint 6 Chunk 1 (2026-06-03, D-7, [review](reviews/sprint-6-chunk-1-review.md)). `requireAgencyUser` added to `guards.ts` (+ `GuardName` union + registry), redirecting `user_type === 'creator'` → `onboarding.welcome-back` and falling through for every other type. Wired **second** in the chain (`requireAuth → requireAgencyUser → [requireMfaEnrolled → requireAgencyAdmin]`) so a creator is bounced before the MFA/admin checks. **Scope refinement vs the original "every `appRoutes` entry"**: applied to every **agency-shell** route (`layout: 'agency'` — the 9 entries: dashboard, roster, brands.{list,create,detail,edit}, agency-users, creator-invitations.bulk, settings). The one `appRoutes` exception is `accept-invitation` — a public pre-auth landing (`layout: 'auth'`, no `requireAuth`) where the guard cannot run; it's documented inline + asserted excluded. The route-walking arch-test `agency-routes-agency-user-guard.spec.ts` pins (1) the full agency-shell set, (2) every such route carries the guard after `requireAuth`, (3) `accept-invitation` does NOT. Guard unit tests cover the creator redirect + each non-creator fall-through + defensive no-user + registry. The pre-existing MFA arch-test's exact-order assertion was updated for the inserted guard.
 
 ---
 
