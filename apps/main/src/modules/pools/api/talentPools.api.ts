@@ -113,8 +113,8 @@ export const talentPoolsApi = {
   },
 
   /**
-   * The add-to-pool picker fetch (D-2b-9): the agency's pools each flagged
-   * `is_member` for this creator. One query server-side (no N+1).
+   * The add-to-pool picker's data load (D-2b-9): the agency's pools each
+   * flagged `is_member` for this creator. One query server-side (no N+1).
    */
   poolsForCreator(agencyId: string, creatorUlid: string): Promise<TalentPoolPickerResponse> {
     return http.get<TalentPoolPickerResponse>(
