@@ -81,7 +81,11 @@ async function mountRoster(
     reject?: boolean
     realTable?: boolean
   } = {},
-): Promise<{ wrapper: ReturnType<typeof mount>; cleanup: () => void }> {
+): Promise<{
+  wrapper: ReturnType<typeof mount>
+  router: ReturnType<typeof createRouter>
+  cleanup: () => void
+}> {
   const pinia = createPinia()
   setActivePinia(pinia)
 
@@ -111,6 +115,7 @@ async function mountRoster(
     routes: [
       { path: '/', name: 'app.dashboard', component: { template: '<div />' } },
       { path: '/roster', name: 'roster.list', component: { template: '<div />' } },
+      { path: '/roster/:ulid', name: 'roster.detail', component: { template: '<div />' } },
     ],
   })
   await router.push('/roster')
@@ -159,6 +164,7 @@ async function mountRoster(
 
   return {
     wrapper,
+    router,
     cleanup: () => {
       wrapper.unmount()
       Object.keys(localStorageStore).forEach((k) => delete localStorageStore[k])
@@ -209,11 +215,29 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     expect(appStatusChip.element).not.toBe(relationshipChip.element)
     expect(appStatusChip.text()).not.toContain('Prospect')
 
-    // D-c5-4: the name is a plain span, not a link/button — rows do NOT
-    // navigate to a creator detail and no per-row view affordance exists.
+    // The name is still a plain span (Sprint 6 Chunk 2a navigates via a ROW
+    // click, not a per-cell link/button — so no `roster-view` affordance).
     const nameEl = harness.wrapper.find(`[data-test="roster-name-${row.id}"]`)
     expect(nameEl.element.tagName).toBe('SPAN')
     expect(harness.wrapper.find(`[data-test="roster-view-${row.id}"]`).exists()).toBe(false)
+  })
+
+  it('navigates to the creator detail on a row click (Sprint 6 Chunk 2a, D-2a-6)', async () => {
+    const row = makeRow({ creator_id: '01CREATORULIDXXXXXXXXXXXXXX' })
+    const harness = await mountRoster({ rows: [row], realTable: true })
+    cleanup = harness.cleanup
+
+    const pushSpy = vi.spyOn(harness.router, 'push')
+
+    // Click the row (the name cell bubbles to the <tr>, which Vuetify turns
+    // into a `click:row` event). Navigation keys off the CREATOR ulid.
+    await harness.wrapper.find(`[data-test="roster-name-${row.id}"]`).trigger('click')
+    await flushPromises()
+
+    expect(pushSpy).toHaveBeenCalledWith({
+      name: 'roster.detail',
+      params: { ulid: '01CREATORULIDXXXXXXXXXXXXXX' },
+    })
   })
 
   it('does NOT call the API when there is no current agency', async () => {

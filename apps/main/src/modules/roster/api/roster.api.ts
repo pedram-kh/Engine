@@ -8,7 +8,12 @@
  * Endpoint: GET /api/v1/agencies/{agency}/creators
  */
 
-import type { RosterListParams, RosterListResponse } from '@catalyst/api-client'
+import type {
+  AgencyCreatorDetailEnvelope,
+  RosterListParams,
+  RosterListResponse,
+  UpdateAgencyCreatorRelationPayload,
+} from '@catalyst/api-client'
 
 import { http } from '@/core/api'
 
@@ -36,5 +41,29 @@ export const rosterApi = {
     if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
     const qs = query.toString()
     return http.get<RosterListResponse>(`${rosterBase(agencyId)}${qs === '' ? '' : `?${qs}`}`)
+  },
+
+  /**
+   * The per-creator detail view (Sprint 6 Chunk 2a). `creatorUlid` is the
+   * creator's ULID (the slim roster row carries it as `creator_id`). 404 when
+   * the creator has no relation with this agency (relation-exists tenancy).
+   */
+  show(agencyId: string, creatorUlid: string): Promise<AgencyCreatorDetailEnvelope> {
+    return http.get<AgencyCreatorDetailEnvelope>(`${rosterBase(agencyId)}/${creatorUlid}`)
+  },
+
+  /**
+   * Edit the relation's rating + notes ONLY (D-2a-3). Admin/manager (a staff
+   * member 403s). Returns the re-rendered detail envelope.
+   */
+  updateRelation(
+    agencyId: string,
+    creatorUlid: string,
+    payload: UpdateAgencyCreatorRelationPayload,
+  ): Promise<AgencyCreatorDetailEnvelope> {
+    return http.patch<AgencyCreatorDetailEnvelope>(
+      `${rosterBase(agencyId)}/${creatorUlid}`,
+      payload,
+    )
   },
 }

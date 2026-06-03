@@ -181,6 +181,17 @@ export const appRoutes: RouteRecordRaw[] = [
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
+  // Per-creator detail view (Sprint 6 Chunk 2a, D-2a-6 — the D-c5-4 reversal:
+  // roster rows now navigate). `:ulid` is the CREATOR ULID (the slim roster
+  // row carries it as `creator_id`). Same guard chain as the roster list;
+  // pinned into the requireAgencyUser arch-test's expected set.
+  {
+    path: '/roster/:ulid',
+    name: 'roster.detail',
+    component: () => import('@/modules/roster/pages/CreatorDetailPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+
   // ── Brands ───────────────────────────────────────────────────────────────
   {
     path: '/brands',

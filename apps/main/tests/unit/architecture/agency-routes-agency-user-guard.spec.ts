@@ -81,6 +81,7 @@ describe('agency-shell routes — requireAgencyUser guard registration (Sprint 6
       'brands.edit',
       'brands.list',
       'creator-invitations.bulk',
+      'roster.detail',
       'roster.list',
       'settings',
     ])

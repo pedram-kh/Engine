@@ -1,0 +1,488 @@
+<script setup lang="ts">
+/**
+ * Agency-side per-creator DETAIL view (Sprint 6 Chunk 2a, F1).
+ *
+ * Reached by clicking a roster row (the D-c5-4 reversal). Re-composes the same
+ * SPA-agnostic `@catalyst/ui` primitives the admin `CreatorDetailPage` uses
+ * (CategoryChips / CountryDisplay / LanguageList / SocialAccountList /
+ * PortfolioGallery) — but it is a DIFFERENT page (D-2a-7): NO admin actions
+ * (approve/reject/verify), NO per-field edit, NO completeness bar, NO
+ * admin_attributes. It adds the agency-private rating/notes EDITOR the roster
+ * shipped read-only, and consumes the Sprint-5 agency availability endpoint.
+ *
+ * Editing is gated to admin/manager (D-2a-4) in the UI; the backend is the SOT
+ * (a staff PATCH 403s regardless). Two sections are data-blocked and render
+ * honest empty states (D-2a-10): social METRICS (followers/engagement — null
+ * until adapters land) and campaign HISTORY (Sprint 8). Social ACCOUNTS DO
+ * render — it's the metrics that are empty.
+ *
+ * The creator's contact email is surfaced (D-2a-8): the agency holds a
+ * verified relation with this creator, so the contact email belongs here.
+ */
+
+import type {
+  AgencyCreatorDetailResource,
+  CreatorPortfolioItemSummary,
+  CreatorSocialAccountSummary,
+} from '@catalyst/api-client'
+import { ApiError } from '@catalyst/api-client'
+import {
+  CategoryChips,
+  CEmptyState,
+  CountryDisplay,
+  LanguageList,
+  PortfolioGallery,
+  SocialAccountList,
+} from '@catalyst/ui'
+import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
+
+import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
+
+import { rosterApi } from '../api/roster.api'
+import AgencyAvailabilityCalendar from '../components/AgencyAvailabilityCalendar.vue'
+import StarRatingInput from '../components/StarRatingInput.vue'
+
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const agencyStore = useAgencyStore()
+
+const LANGUAGE_CODES = ['en', 'pt', 'it', 'es', 'fr', 'de'] as const
+
+const detail = ref<AgencyCreatorDetailResource | null>(null)
+const loading = ref(false)
+const errorMessage = ref<string | null>(null)
+
+const creatorUlid = computed(() => String(route.params.ulid ?? ''))
+
+// Editing is admin/manager (D-2a-4). Staff sees rating/notes read-only.
+const canEdit = computed(
+  () => agencyStore.currentRole === 'agency_admin' || agencyStore.currentRole === 'agency_manager',
+)
+
+const attrs = computed(() => detail.value?.attributes ?? null)
+const creator = computed(() => detail.value?.attributes.creator ?? null)
+
+const displayName = computed(() => creator.value?.display_name ?? t('app.roster.detail.unnamed'))
+const email = computed(() => creator.value?.email ?? null)
+
+const countryLabel = computed(() => {
+  const code = creator.value?.country_code ?? null
+  if (code === null) return ''
+  return COUNTRY_OPTIONS.find((c) => c.code === code)?.label ?? code
+})
+
+function languageLabel(code: string | null): string | null {
+  if (code === null) return null
+  return (LANGUAGE_CODES as readonly string[]).includes(code)
+    ? t(`app.roster.languages.${code}`)
+    : code
+}
+
+const primaryLanguageLabel = computed(() => languageLabel(creator.value?.primary_language ?? null))
+const secondaryLanguageLabels = computed(() =>
+  (creator.value?.secondary_languages ?? [])
+    .map((c) => languageLabel(c))
+    .filter((l): l is string => l !== null),
+)
+
+const categoryLabels = computed(() =>
+  (creator.value?.categories ?? []).map((cat) => t(`creator.ui.wizard.categories.${cat}`, cat)),
+)
+
+const socialAccountRows = computed(() => {
+  const raw: ReadonlyArray<CreatorSocialAccountSummary> = creator.value?.social_accounts ?? []
+  return raw.map((account) => ({
+    platform: account.platform,
+    handle: account.handle,
+    profileUrl: account.profile_url,
+    platformLabel: t(`creator.ui.wizard.social_platforms.${account.platform}`, account.platform),
+  }))
+})
+
+const portfolioItems = computed(() => {
+  const items: ReadonlyArray<CreatorPortfolioItemSummary> = creator.value?.portfolio ?? []
+  return items.map((item) => ({
+    id: item.id,
+    kind: item.kind,
+    title: item.title,
+    description: item.description,
+    thumbnailUrl: item.thumbnail_view_url ?? (item.kind === 'image' ? item.view_url : null),
+    viewUrl: item.view_url,
+    externalUrl: item.external_url,
+    altText: item.title ?? t('app.roster.detail.portfolio.untitled'),
+  }))
+})
+
+// ── Rating/notes editor state ────────────────────────────────────────────────
+const ratingDraft = ref<number | null>(null)
+const notesDraft = ref<string>('')
+const saving = ref(false)
+const saveError = ref<string | null>(null)
+const savedSnackbar = ref(false)
+
+const isDirty = computed(() => {
+  if (attrs.value === null) return false
+  const currentNotes = attrs.value.internal_notes ?? ''
+  return ratingDraft.value !== attrs.value.internal_rating || notesDraft.value !== currentNotes
+})
+
+function seedDrafts(): void {
+  if (attrs.value === null) return
+  ratingDraft.value = attrs.value.internal_rating
+  notesDraft.value = attrs.value.internal_notes ?? ''
+}
+
+async function load(): Promise<void> {
+  const agencyId = agencyStore.currentAgencyId
+  if (agencyId === null || creatorUlid.value === '') return
+
+  loading.value = true
+  errorMessage.value = null
+  try {
+    const envelope = await rosterApi.show(agencyId, creatorUlid.value)
+    detail.value = envelope.data
+    seedDrafts()
+  } catch (error) {
+    errorMessage.value =
+      error instanceof ApiError && error.status === 404
+        ? t('app.roster.detail.notFound')
+        : t('app.roster.detail.loadFailed')
+  } finally {
+    loading.value = false
+  }
+}
+
+async function save(): Promise<void> {
+  const agencyId = agencyStore.currentAgencyId
+  if (agencyId === null || detail.value === null) return
+
+  saving.value = true
+  saveError.value = null
+  try {
+    const envelope = await rosterApi.updateRelation(agencyId, creatorUlid.value, {
+      internal_rating: ratingDraft.value,
+      internal_notes: notesDraft.value === '' ? null : notesDraft.value,
+    })
+    detail.value = envelope.data
+    seedDrafts()
+    savedSnackbar.value = true
+  } catch {
+    saveError.value = t('app.roster.detail.editor.saveFailed')
+  } finally {
+    saving.value = false
+  }
+}
+
+function goBack(): void {
+  void router.push({ name: 'roster.list' })
+}
+
+onMounted(() => {
+  void load()
+})
+</script>
+
+<template>
+  <div class="creator-detail" data-test="creator-detail-page">
+    <v-btn
+      variant="text"
+      density="comfortable"
+      prepend-icon="mdi-arrow-left"
+      class="mb-2 px-0"
+      data-test="creator-detail-back"
+      @click="goBack"
+    >
+      {{ t('app.roster.detail.back') }}
+    </v-btn>
+
+    <v-alert
+      v-if="errorMessage"
+      type="error"
+      variant="tonal"
+      class="mb-4"
+      data-test="creator-detail-error"
+    >
+      {{ errorMessage }}
+    </v-alert>
+
+    <v-skeleton-loader
+      v-if="loading && detail === null"
+      type="article, list-item-two-line, image"
+      data-test="creator-detail-skeleton"
+    />
+
+    <template v-else-if="detail !== null && attrs !== null && creator !== null">
+      <!-- Header: name + contact email + status chips (D-2a-8) -->
+      <header class="creator-detail__header">
+        <div class="creator-detail__header-text">
+          <h1 class="text-h5 ma-0" data-test="creator-detail-name">{{ displayName }}</h1>
+          <a
+            v-if="email"
+            :href="`mailto:${email}`"
+            class="creator-detail__email"
+            data-test="creator-detail-email"
+          >
+            {{ email }}
+          </a>
+          <div class="d-flex flex-wrap ga-2 mt-1">
+            <v-chip size="small" variant="tonal" data-test="creator-detail-relationship-status">
+              {{ t(`app.roster.status.${attrs.relationship_status}`) }}
+            </v-chip>
+            <v-chip size="small" variant="flat" data-test="creator-detail-application-status">
+              {{ t(`app.roster.applicationStatus.${creator.application_status}`) }}
+            </v-chip>
+            <v-chip
+              v-if="attrs.is_blacklisted"
+              size="small"
+              color="error"
+              variant="tonal"
+              data-test="creator-detail-blacklist"
+            >
+              {{ t('app.roster.blacklisted') }}
+            </v-chip>
+          </div>
+        </div>
+      </header>
+
+      <!-- Profile -->
+      <section class="creator-detail__section" data-test="creator-detail-profile">
+        <h2 class="text-h6">{{ t('app.roster.detail.sections.profile') }}</h2>
+        <p v-if="creator.bio" class="text-body-2" data-test="creator-detail-bio">
+          {{ creator.bio }}
+        </p>
+        <div class="creator-detail__profile-grid">
+          <div>
+            <span class="creator-detail__label">{{ t('app.roster.fields.country') }}</span>
+            <CountryDisplay :code="creator.country_code" :label="countryLabel" />
+          </div>
+          <div>
+            <span class="creator-detail__label">{{ t('app.roster.fields.language') }}</span>
+            <LanguageList
+              :primary-label="primaryLanguageLabel"
+              :secondary-labels="secondaryLanguageLabels"
+            />
+          </div>
+          <div class="creator-detail__profile-categories">
+            <span class="creator-detail__label">{{ t('app.roster.fields.categories') }}</span>
+            <CategoryChips :labels="categoryLabels" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Rating + notes editor (admin/manager) / read-only (staff) -->
+      <section class="creator-detail__section" data-test="creator-detail-rating-notes">
+        <h2 class="text-h6">{{ t('app.roster.detail.sections.rating') }}</h2>
+
+        <div class="creator-detail__rating-row">
+          <span class="creator-detail__label">{{ t('app.roster.fields.rating') }}</span>
+          <StarRatingInput
+            v-model="ratingDraft"
+            :readonly="!canEdit"
+            :aria-label="t('app.roster.fields.rating')"
+            :star-label="(n) => t('app.roster.detail.editor.starLabel', { n })"
+            data-test="creator-detail-rating"
+          />
+          <span
+            v-if="ratingDraft === null"
+            class="text-caption text-medium-emphasis"
+            data-test="creator-detail-rating-unset"
+          >
+            {{ t('app.roster.detail.editor.ratingUnset') }}
+          </span>
+        </div>
+
+        <!-- Editable notes (admin/manager) -->
+        <template v-if="canEdit">
+          <v-textarea
+            v-model="notesDraft"
+            :label="t('app.roster.detail.editor.notesLabel')"
+            :placeholder="t('app.roster.detail.editor.notesPlaceholder')"
+            variant="outlined"
+            rows="4"
+            auto-grow
+            counter="5000"
+            maxlength="5000"
+            hide-details="auto"
+            class="mt-3"
+            data-test="creator-detail-notes"
+          />
+          <v-alert
+            v-if="saveError"
+            type="error"
+            variant="tonal"
+            class="mt-2"
+            data-test="creator-detail-save-error"
+          >
+            {{ saveError }}
+          </v-alert>
+          <div class="d-flex justify-end mt-2">
+            <v-btn
+              color="primary"
+              variant="flat"
+              :loading="saving"
+              :disabled="!isDirty || saving"
+              data-test="creator-detail-save"
+              @click="save"
+            >
+              {{ t('app.roster.detail.editor.save') }}
+            </v-btn>
+          </div>
+        </template>
+
+        <!-- Read-only notes (staff) -->
+        <template v-else>
+          <div class="mt-3">
+            <span class="creator-detail__label">{{
+              t('app.roster.detail.editor.notesLabel')
+            }}</span>
+            <p
+              v-if="attrs.internal_notes"
+              class="text-body-2"
+              data-test="creator-detail-notes-readonly"
+            >
+              {{ attrs.internal_notes }}
+            </p>
+            <span
+              v-else
+              class="text-body-2 text-medium-emphasis"
+              data-test="creator-detail-notes-readonly"
+            >
+              {{ t('app.roster.detail.editor.notesEmpty') }}
+            </span>
+          </div>
+        </template>
+      </section>
+
+      <!-- Social accounts (accounts render; metrics are blocked → empty state) -->
+      <section class="creator-detail__section" data-test="creator-detail-social">
+        <h2 class="text-h6">{{ t('app.roster.detail.sections.social') }}</h2>
+        <SocialAccountList
+          :accounts="socialAccountRows"
+          :empty-label="t('app.roster.detail.social.empty')"
+        />
+      </section>
+
+      <!-- Social metrics — data-blocked empty state (D-2a-10) -->
+      <section class="creator-detail__section" data-test="creator-detail-metrics">
+        <h2 class="text-h6">{{ t('app.roster.detail.sections.metrics') }}</h2>
+        <CEmptyState
+          title-tag="h3"
+          data-test="creator-detail-metrics-empty"
+          :title="t('app.roster.detail.metrics.empty.heading')"
+          :body="t('app.roster.detail.metrics.empty.body')"
+        >
+          <template #icon>
+            <v-icon icon="mdi-chart-line" size="48" color="medium-emphasis" />
+          </template>
+        </CEmptyState>
+      </section>
+
+      <!-- Portfolio -->
+      <section class="creator-detail__section" data-test="creator-detail-portfolio">
+        <h2 class="text-h6">{{ t('app.roster.detail.sections.portfolio') }}</h2>
+        <PortfolioGallery
+          :items="portfolioItems"
+          :editable="false"
+          :empty-label="t('app.roster.detail.portfolio.empty')"
+          :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
+          :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
+        />
+      </section>
+
+      <!-- Availability (read-only, consumes the Sprint-5 agency endpoint) -->
+      <section class="creator-detail__section" data-test="creator-detail-availability">
+        <h2 class="text-h6">{{ t('app.roster.detail.sections.availability') }}</h2>
+        <AgencyAvailabilityCalendar
+          v-if="agencyStore.currentAgencyId"
+          :agency-id="agencyStore.currentAgencyId"
+          :creator-ulid="creatorUlid"
+        />
+      </section>
+
+      <!-- Campaign history — Sprint-8-blocked empty state (D-2a-10) -->
+      <section class="creator-detail__section" data-test="creator-detail-campaigns">
+        <h2 class="text-h6">{{ t('app.roster.detail.sections.campaigns') }}</h2>
+        <CEmptyState
+          title-tag="h3"
+          data-test="creator-detail-campaigns-empty"
+          :title="t('app.roster.detail.campaigns.empty.heading')"
+          :body="t('app.roster.detail.campaigns.empty.body')"
+        >
+          <template #icon>
+            <v-icon icon="mdi-history" size="48" color="medium-emphasis" />
+          </template>
+        </CEmptyState>
+      </section>
+    </template>
+
+    <v-snackbar
+      v-model="savedSnackbar"
+      :timeout="3000"
+      color="success"
+      data-test="creator-detail-saved"
+    >
+      {{ t('app.roster.detail.editor.saved') }}
+    </v-snackbar>
+  </div>
+</template>
+
+<style scoped>
+.creator-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 960px;
+}
+
+.creator-detail__header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.creator-detail__email {
+  font-size: 0.875rem;
+  color: rgb(var(--v-theme-primary));
+  text-decoration: none;
+  width: fit-content;
+}
+.creator-detail__email:hover {
+  text-decoration: underline;
+}
+
+.creator-detail__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.creator-detail__profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.creator-detail__profile-categories {
+  grid-column: 1 / -1;
+}
+
+.creator-detail__label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgb(var(--v-theme-on-surface-variant));
+  margin-bottom: 4px;
+}
+
+.creator-detail__rating-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+</style>

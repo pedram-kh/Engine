@@ -96,6 +96,56 @@
       },
       "errors": {
         "loadFailed": "Caricamento dei creator non riuscito. Riprova."
+      },
+      "detail": {
+        "back": "Torna ai miei creator",
+        "unnamed": "Creator senza nome",
+        "loadFailed": "Impossibile caricare questo creator. Riprova.",
+        "notFound": "Questo creator non è nel tuo elenco.",
+        "sections": {
+          "profile": "Profilo",
+          "rating": "Valutazione e note",
+          "social": "Account social",
+          "metrics": "Metriche social",
+          "portfolio": "Portfolio",
+          "availability": "Disponibilità",
+          "campaigns": "Storico campagne"
+        },
+        "editor": {
+          "starLabel": "Valuta {n} su 5",
+          "ratingUnset": "Senza valutazione",
+          "notesLabel": "Note interne",
+          "notesPlaceholder": "Note private sul lavoro con questo creator (visibili solo alla tua agenzia).",
+          "notesEmpty": "Ancora nessuna nota.",
+          "save": "Salva",
+          "saved": "Modifiche salvate.",
+          "saveFailed": "Impossibile salvare le modifiche. Riprova."
+        },
+        "social": {
+          "empty": "Nessun account social collegato."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Le metriche social appariranno una volta collegati gli account",
+            "body": "Il numero di follower e i tassi di coinvolgimento non sono ancora disponibili — appariranno qui quando arriveranno le integrazioni social."
+          }
+        },
+        "portfolio": {
+          "empty": "Ancora nessun elemento nel portfolio.",
+          "untitled": "Elemento del portfolio senza titolo"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Nessun blocco di disponibilità in questo periodo",
+            "body": "Questo creator non ha indicato periodi di indisponibilità per le date mostrate."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Ancora nessuno storico campagne",
+            "body": "Le campagne che realizzerai con questo creator appariranno qui."
+          }
+        }
       }
     },
     "userMenu": {

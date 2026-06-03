@@ -96,6 +96,56 @@
       },
       "errors": {
         "loadFailed": "Falha ao carregar os seus criadores. Tente novamente."
+      },
+      "detail": {
+        "back": "Voltar aos meus criadores",
+        "unnamed": "Criador sem nome",
+        "loadFailed": "Não foi possível carregar este criador. Tente novamente.",
+        "notFound": "Este criador não está no seu portfólio.",
+        "sections": {
+          "profile": "Perfil",
+          "rating": "Avaliação e notas",
+          "social": "Contas sociais",
+          "metrics": "Métricas sociais",
+          "portfolio": "Portefólio",
+          "availability": "Disponibilidade",
+          "campaigns": "Histórico de campanhas"
+        },
+        "editor": {
+          "starLabel": "Avaliar {n} de 5",
+          "ratingUnset": "Sem avaliação",
+          "notesLabel": "Notas internas",
+          "notesPlaceholder": "Notas privadas sobre o trabalho com este criador (visíveis apenas para a sua agência).",
+          "notesEmpty": "Ainda sem notas.",
+          "save": "Guardar",
+          "saved": "Alterações guardadas.",
+          "saveFailed": "Não foi possível guardar as alterações. Tente novamente."
+        },
+        "social": {
+          "empty": "Nenhuma conta social ligada."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "As métricas sociais aparecerão quando as contas estiverem ligadas",
+            "body": "Os números de seguidores e as taxas de envolvimento ainda não estão disponíveis — serão mostrados aqui quando as integrações sociais chegarem."
+          }
+        },
+        "portfolio": {
+          "empty": "Ainda sem itens de portefólio.",
+          "untitled": "Item de portefólio sem título"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Sem blocos de disponibilidade neste período",
+            "body": "Este criador não marcou tempo indisponível nas datas mostradas."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Ainda sem histórico de campanhas",
+            "body": "As campanhas que realizar com este criador aparecerão aqui."
+          }
+        }
       }
     },
     "userMenu": {

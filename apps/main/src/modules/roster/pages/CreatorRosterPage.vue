@@ -30,6 +30,7 @@ import type {
 } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 import { CEmptyState } from '@catalyst/ui'
 
@@ -38,6 +39,7 @@ import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 import { rosterApi } from '../api/roster.api'
 
 const { t } = useI18n()
+const router = useRouter()
 
 const agencyStore = useAgencyStore()
 
@@ -269,6 +271,15 @@ function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
   tableOptions.value = opts
   void loadRoster()
 }
+
+// Row navigation (Sprint 6 Chunk 2a, D-2a-6 — the D-c5-4 reversal). The slim
+// row carries the CREATOR ULID as `creator_id`; the detail route keys off it.
+// A row without a creator_id (defensive — shouldn't happen) is non-navigable.
+function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void {
+  const creatorUlid = ctx.item.attributes.creator_id
+  if (creatorUlid === null) return
+  void router.push({ name: 'roster.detail', params: { ulid: creatorUlid } })
+}
 </script>
 
 <template>
@@ -462,8 +473,10 @@ function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
       :items-per-page="tableOptions.itemsPerPage"
       :page="tableOptions.page"
       item-value="id"
+      hover
       data-test="roster-table"
       @update:options="onTableUpdate"
+      @click:row="onRowClick"
     >
       <template #item.attributes.display_name="{ item }">
         <span :data-test="`roster-name-${item.id}`">

@@ -964,3 +964,13 @@ anyone reviewing it later.
 - **Triggered by:** the next API error-envelope hardening pass, or the first user-facing report of a confusing delete-in-another-tab error.
 - **Owner:** backend platform / unowned.
 - **Status:** open (accepted — cosmetic edge case). Surfaced by Sprint 5 Chunk B, 2026-06-03 ([review](reviews/sprint-5-chunk-b-review.md)).
+
+---
+
+## Agency availability read endpoint — consumer loop CLOSED (Sprint 5 Chunk A → Sprint 6 Chunk 2a)
+
+- **Where:** [`AgencyCreatorAvailabilityController`](../apps/api/app/Modules/Agencies/Http/Controllers/AgencyCreatorAvailabilityController.php) + [`AgencyAvailabilityResource`](../apps/api/app/Modules/Agencies/Http/Resources/AgencyAvailabilityResource.php) (`GET /agencies/{agency}/creators/{creator}/availability`). Built standalone in Sprint 5 Chunk A (D-a6) **ahead of any SPA consumer** — the Chunk-A review noted "Sprint 6's creator-detail page will consume it."
+- **What closed in Sprint 6 Chunk 2a (June 3, 2026):** the per-creator detail view (D-2a-9) now consumes the endpoint via a **read-only** agency calendar — [`AgencyAvailabilityCalendar.vue`](../apps/main/src/modules/roster/components/AgencyAvailabilityCalendar.vue) reusing the `CMonthGrid` primitive + the pure `datetime.ts` bucketing helpers (NOT the creator-coupled `AvailabilityCalendar.vue`, which carries the creator-self API + edit dialog), behind a new agency-scoped wrapper [`agencyAvailability.api.ts`](../apps/main/src/modules/roster/api/agencyAvailability.api.ts). The Sprint-5 deferral's loop is closed: the endpoint built-ahead-of-consumer now has its consumer.
+- **The `reason` omission, kept type-clean WITHOUT a "reason-optional" change (divergence 1):** the kickoff floated loosening `AvailabilityOccurrenceAttributes.reason` to optional so the agency path (which omits `reason`) would type-check. **Rejected in favour of a dedicated FE type** — [`AgencyAvailabilityOccurrenceAttributes`](../packages/api-client/src/types/agency.ts) where `reason` is structurally **absent** (not optional). This **mirrors the backend's existing dedicated `AgencyAvailabilityResource` discipline** (separate shape so `reason` cannot leak through a shared type) rather than weakening the creator-self path's `reason` guarantee. The creator-self `AvailabilityOccurrenceAttributes` is untouched — its `reason` stays non-optional.
+- **Risk:** none — this is a closure note, not an accepted gap. Recorded so the cross-sprint handoff (build-ahead-of-consumer → consumer) is auditable.
+- **Status:** **CLOSED** — Sprint 6 Chunk 2a, 2026-06-03 ([review](reviews/sprint-6-chunk-2a-review.md)).

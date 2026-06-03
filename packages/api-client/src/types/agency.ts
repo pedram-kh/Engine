@@ -9,7 +9,12 @@
  *   - Timestamps are `string` (ISO 8601 from Carbon).
  */
 
-import type { CreatorApplicationStatus } from './creator'
+import type { AvailabilityBlockType, AvailabilityKind } from './availability'
+import type {
+  CreatorApplicationStatus,
+  CreatorPortfolioItemSummary,
+  CreatorSocialAccountSummary,
+} from './creator'
 
 // ---------------------------------------------------------------------------
 // Shared
@@ -166,6 +171,136 @@ export interface RosterListParams {
   q?: string
   page?: number
   per_page?: number
+}
+
+// ---------------------------------------------------------------------------
+// Agency creator DETAIL view — Sprint 6 Chunk 2a
+// ---------------------------------------------------------------------------
+
+/**
+ * The nested creator-profile block on the detail resource. Composes the same
+ * SPA-agnostic display fields the wizard/admin surfaces use (display_name,
+ * bio, country, languages, categories, signed avatar/cover URLs, social
+ * ACCOUNTS, portfolio) PLUS the contact `email` — surfaced here as a
+ * deliberate privacy decision (D-2a-8): the agency holds a verified relation
+ * with this creator, so the contact email belongs on the single-creator
+ * detail view (the slim roster LIST omitted it for N+1 reasons).
+ *
+ * Social follower/engagement METRICS are NOT here (blocked-on-data — the page
+ * renders an empty state, D-2a-10). Admin-only KYC PII is never present.
+ */
+export interface AgencyCreatorDetailProfile {
+  id: string
+  display_name: string | null
+  bio: string | null
+  /** Contact email (D-2a-8). Null only if the related user has none. */
+  email: string | null
+  country_code: string | null
+  region: string | null
+  primary_language: string | null
+  secondary_languages: string[] | null
+  categories: string[] | null
+  /** Signed view URL for the private `media` disk; null when unset / non-S3. */
+  avatar_url: string | null
+  cover_url: string | null
+  application_status: CreatorApplicationStatus
+  social_accounts: CreatorSocialAccountSummary[]
+  portfolio: CreatorPortfolioItemSummary[]
+}
+
+/**
+ * `GET /api/v1/agencies/{agency}/creators/{creator}` (D-2a-2). A dedicated
+ * shape composing the RELATION block (the agency's private view — rating,
+ * notes, read-only blacklist STATUS, counters) + the nested creator profile.
+ *
+ * `blacklist_reason` is deliberately absent (free-text GDPR-sensitive, the
+ * same data class as `internal_notes` which the backend redacts from the
+ * audit log). Only the structured blacklist facts ship. Blacklist EDITING is
+ * Sprint 7 — the flag/scope/type/date are display-only here.
+ */
+export interface AgencyCreatorDetailResource {
+  id: string
+  type: 'agency_creator_details'
+  attributes: {
+    relationship_status: RosterRelationshipStatus
+    /** 1–5 from the agency's POV; null when unset. Editable (admin/manager). */
+    internal_rating: number | null
+    /** Free-text private notes. Editable (admin/manager); audit-redacted. */
+    internal_notes: string | null
+    total_campaigns_completed: number
+    total_paid_minor_units: number
+    last_engaged_at: string | null
+    is_blacklisted: boolean
+    blacklist_scope: string | null
+    blacklist_type: string | null
+    blacklisted_at: string | null
+    creator: AgencyCreatorDetailProfile | null
+  }
+}
+
+export interface AgencyCreatorDetailEnvelope {
+  data: AgencyCreatorDetailResource
+}
+
+/**
+ * PATCH payload for the rating/notes edit (D-2a-3). ONLY these two fields are
+ * editable; the backend ignores anything else. Both optional so a partial
+ * edit (rating only / notes only) is valid. `internal_rating: null` clears.
+ */
+export interface UpdateAgencyCreatorRelationPayload {
+  internal_rating?: number | null
+  internal_notes?: string | null
+}
+
+// ---------------------------------------------------------------------------
+// Agency creator AVAILABILITY read-view — Sprint 5 Chunk A backend,
+// Sprint 6 Chunk 2a consumer
+// ---------------------------------------------------------------------------
+
+/**
+ * One expanded availability occurrence as seen by an AGENCY. A DEDICATED type
+ * mirroring the backend's dedicated `AgencyAvailabilityResource` — which omits
+ * `reason` precisely so the creator-only note can never leak through a shared
+ * shape. This is the FE counterpart of that discipline: we do NOT loosen the
+ * creator-self `AvailabilityOccurrenceAttributes.reason` to optional (which
+ * would weaken the creator path's guarantee), we mirror the backend's
+ * separate-shape approach instead.
+ *
+ * `reason` is structurally ABSENT here — not optional, ABSENT.
+ */
+export interface AgencyAvailabilityOccurrenceAttributes {
+  /** ISO 8601 with UTC offset. */
+  starts_at: string
+  /** ISO 8601 with UTC offset. */
+  ends_at: string
+  is_all_day: boolean
+  block_type: AvailabilityBlockType
+  kind: AvailabilityKind
+  is_recurring: boolean
+  /** RRULE body (weekly ceiling), or null for a one-off. */
+  recurrence_rule: string | null
+}
+
+export interface AgencyAvailabilityOccurrenceResource {
+  /** SOURCE BLOCK ULID — shared across every occurrence of a recurring block. */
+  id: string
+  type: 'availability_blocks'
+  attributes: AgencyAvailabilityOccurrenceAttributes
+}
+
+/**
+ * `GET /api/v1/agencies/{agency}/creators/{creator}/availability`. Mirrors the
+ * creator-self list envelope (data + the effective `meta.window` after the
+ * silent 366-day clamp), minus `reason` on each occurrence.
+ */
+export interface AgencyAvailabilityListResponse {
+  data: AgencyAvailabilityOccurrenceResource[]
+  meta: {
+    window: {
+      from: string
+      to: string
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
