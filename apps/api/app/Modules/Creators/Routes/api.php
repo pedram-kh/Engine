@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Modules\Creators\Http\Controllers\Admin\AdminCreatorController;
 use App\Modules\Creators\Http\Controllers\AvatarController;
 use App\Modules\Creators\Http\Controllers\BulkInviteController;
+use App\Modules\Creators\Http\Controllers\CreatorAvailabilityController;
 use App\Modules\Creators\Http\Controllers\CreatorWizardController;
 use App\Modules\Creators\Http\Controllers\InvitationPreviewController;
 use App\Modules\Creators\Http\Controllers\PortfolioController;
@@ -50,6 +51,10 @@ use Illuminate\Support\Facades\Route;
 |   DELETE /api/v1/creators/me/avatar             Sprint 3 Chunk 1
 |   POST   /api/v1/creators/me/portfolio/...      Sprint 3 Chunk 1
 |   DELETE /api/v1/creators/me/portfolio/{item}   Sprint 3 Chunk 1
+|   GET    /api/v1/creators/me/availability       Sprint 5 Chunk A
+|   POST   /api/v1/creators/me/availability       Sprint 5 Chunk A
+|   PATCH  /api/v1/creators/me/availability/{b}   Sprint 5 Chunk A
+|   DELETE /api/v1/creators/me/availability/{b}   Sprint 5 Chunk A
 |
 */
 
@@ -123,6 +128,20 @@ Route::prefix('creators/me')
                 ->name('video.complete');
             Route::delete('{portfolioItem}', [PortfolioController::class, 'destroy'])
                 ->name('destroy');
+        });
+
+        // ─── Availability blocks (calendar CRUD) ─────────────────────────────
+        // Sprint 5 Chunk A (D-a1). Manual availability-block CRUD, creator-self
+        // owned: every row is resolved from $request->user()->creator, never a
+        // path id, so cross-creator access is structurally impossible. The list
+        // endpoint expands occurrences for a window via the single
+        // AvailabilityExpansionService (D-a4). Allowlisted in
+        // docs/security/tenancy.md § 4 alongside the rest of creators/me/*.
+        Route::prefix('availability')->name('availability.')->group(function (): void {
+            Route::get('/', [CreatorAvailabilityController::class, 'index'])->name('index');
+            Route::post('/', [CreatorAvailabilityController::class, 'store'])->name('store');
+            Route::patch('{block}', [CreatorAvailabilityController::class, 'update'])->name('update');
+            Route::delete('{block}', [CreatorAvailabilityController::class, 'destroy'])->name('destroy');
         });
     });
 

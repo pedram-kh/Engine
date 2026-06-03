@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Agencies\Http\Controllers\AgencyCreatorAvailabilityController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorController;
 use App\Modules\Agencies\Http\Controllers\AgencySettingsController;
 use App\Modules\Agencies\Http\Controllers\DashboardActivityController;
@@ -74,6 +75,17 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // data today. Read-only: no write surface this chunk (D-c5-3).
         Route::get('creators', [AgencyCreatorController::class, 'index'])
             ->name('agencies.creators.index');
+
+        // ─── Creator availability read-view ──────────────────────────────────
+        // Sprint 5 Chunk A (D-a6). Agency-side read of a ROSTER creator's
+        // expanded availability — `reason` omitted (creator-only, B4) via the
+        // dedicated AgencyAvailabilityResource. Built standalone now (plan-pause
+        // B6); Sprint 6's creator-detail page consumes it. Scope: the creator
+        // must have an AgencyCreatorRelation with this agency (any status),
+        // else 404. Path-scoped under tenancy.agency + tenancy — no §4
+        // allowlist entry needed (it is inside the tenancy stack).
+        Route::get('creators/{creator}/availability', [AgencyCreatorAvailabilityController::class, 'show'])
+            ->name('agencies.creators.availability.show');
     });
 
 // ─── Accept invitation ────────────────────────────────────────────────────────
