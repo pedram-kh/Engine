@@ -185,12 +185,18 @@ test.describe('spec #19 — 2FA enrollment + sign-in', () => {
     await page.locator(dt(testIds.recoveryCodesConfirm)).click()
 
     // -----------------------------------------------------------------
-    // Step 5 — land on `/`. The route name is `app.dashboard`; the
-    // path is the empty `/`. The kickoff text says "/dashboard"
-    // but the chunk 6.5 route table uses `/`. The deviation is
-    // flagged in the chunk-6.8 review file.
+    // Step 5 — land in the onboarding shell. `EnableTotpPage` pushes
+    // `app.dashboard` (`/`) after enrolment, but this user is a fresh
+    // CREATOR with no agency membership. Sprint 6 Chunk 1's
+    // `requireAgencyUser` guard bounces a membership-less creator off the
+    // agency shell to `onboarding.welcome-back` (`/onboarding`) — their
+    // natural home. (Pre-guard this spec pinned `/`, i.e. a creator
+    // leaking onto the agency dashboard; the guard corrects that, matching
+    // the same dispatch step 2 and step 7 already document.) Assert the
+    // onboarding shell (welcome-back may auto-advance to a wizard step, so
+    // match the `/onboarding` prefix rather than the exact path).
     // -----------------------------------------------------------------
-    await expect(page).toHaveURL('http://127.0.0.1:5173/')
+    await expect(page).toHaveURL(/\/onboarding/, { timeout: 10_000 })
 
     // -----------------------------------------------------------------
     // Step 6 — sign out. Chunk 7 owns the nav-surface UI; until

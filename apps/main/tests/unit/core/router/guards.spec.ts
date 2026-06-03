@@ -15,8 +15,10 @@ import type { RouteLocationNormalized } from 'vue-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Module-level mock for useAgencyStore — hoisted, safe to reference in tests via vi.mocked().
+// Default: no agency memberships (a pure creator). requireAgencyUser reads
+// `memberships`; requireAgencyAdmin reads `isAdmin`.
 vi.mock('@/core/stores/useAgencyStore', () => ({
-  useAgencyStore: vi.fn(() => ({ isAdmin: false })),
+  useAgencyStore: vi.fn(() => ({ isAdmin: false, memberships: [] })),
 }))
 
 // Module-level mock for useOnboardingStore — the requireOnboardingAccess
@@ -310,10 +312,31 @@ describe('requireOnboardingAccess', () => {
 })
 
 describe('requireAgencyUser', () => {
-  it('redirects a creator-type user to onboarding.welcome-back', async () => {
+  beforeEach(() => {
+    // Reset the shared agency-store mock the requireAgencyAdmin block mutates
+    // via mockReturnValue, back to the "pure creator" default (no memberships).
+    vi.mocked(useAgencyStore).mockReturnValue({
+      isAdmin: false,
+      memberships: [],
+    } as unknown as ReturnType<typeof useAgencyStore>)
+  })
+
+  it('redirects a membership-less creator to onboarding.welcome-back', async () => {
     const store = makeStore({ user: makeUser({ user_type: 'creator' }) })
     const result = await requireAgencyUser(makeCtx(store, makeRoute('roster.list', '/roster')))
     expect(result).toEqual({ name: 'onboarding.welcome-back' })
+  })
+
+  it('allows a creator WITH an agency membership through (agency teammate)', async () => {
+    // A teammate who signed up via the public form (user_type stays "creator")
+    // and then accepted an agency invitation holds ≥1 membership.
+    vi.mocked(useAgencyStore).mockReturnValue({
+      isAdmin: false,
+      memberships: [{ agency_id: '01HQ', agency_name: 'Acme', role: 'agency_staff' }],
+    } as unknown as ReturnType<typeof useAgencyStore>)
+    const store = makeStore({ user: makeUser({ user_type: 'creator' }) })
+    const result = await requireAgencyUser(makeCtx(store, makeRoute('roster.list', '/roster')))
+    expect(result).toBeNull()
   })
 
   it('allows an agency_user through (returns null)', async () => {

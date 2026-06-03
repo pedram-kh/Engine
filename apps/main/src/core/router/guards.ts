@@ -223,18 +223,32 @@ export async function requireOnboardingAccess(ctx: GuardContext): Promise<GuardR
  * this is a UX/mental-model polish, not a security fix — but a creator should
  * never see the agency chrome they don't belong in.
  *
- * Redirects `user_type === 'creator'` to `onboarding.welcome-back` (their
- * natural home, which itself re-dispatches via `requireOnboardingAccess` to
- * the right wizard step or the creator dashboard). Every other user_type
- * (agency_user, platform_admin, brand_user) falls through.
+ * The bounce signal is "a `creator`-type user who holds NO agency membership".
+ * `user_type` alone is NOT sufficient: an agency teammate signs up through the
+ * public form (which stamps `user_type = 'creator'`) and then accepts an agency
+ * invitation, which adds an `AgencyMembership` WITHOUT flipping `user_type`
+ * (see `AgencyInvitationService::accept` + `SignUpService`). Such a user is a
+ * legitimate agency member and must reach the shell — so we additionally
+ * require an empty membership list before bouncing. The authoritative
+ * membership list lives on `useAgencyStore` (seeded from the `/me` payload
+ * during `requireAuth`'s bootstrap, the same store `requireAgencyAdmin` reads).
  *
- * Composes AFTER `requireAuth` (it assumes a resolved user) and BEFORE any
- * `requireMfaEnrolled` / `requireAgencyAdmin` — a creator is bounced before
- * those checks can leak anything about the page.
+ * Bounced users go to `onboarding.welcome-back` (their natural home, which
+ * itself re-dispatches via `requireOnboardingAccess` to the right wizard step
+ * or the creator dashboard). Every NON-creator user_type (agency_user,
+ * platform_admin, brand_user) falls through unconditionally — bouncing a
+ * non-creator into `onboarding.welcome-back` would ping-pong against
+ * `requireOnboardingAccess` (which bounces non-creators back to the dashboard).
  *
- * Defense-in-depth (#40, Sprint 2 § 5.17): the unit suite covers the creator
- * redirect, each non-creator fall-through, the defensive no-user case, and
- * registry registration; the route-walking arch-test
+ * Composes AFTER `requireAuth` (it assumes a resolved user + a bootstrapped
+ * agency store) and BEFORE any `requireMfaEnrolled` / `requireAgencyAdmin` — a
+ * membership-less creator is bounced before those checks can leak anything
+ * about the page.
+ *
+ * Defense-in-depth (#40, Sprint 2 § 5.17): the unit suite covers the
+ * creator-without-membership redirect, the creator-WITH-membership pass-through,
+ * each non-creator fall-through, the defensive no-user case, and registry
+ * registration; the route-walking arch-test
  * (`agency-routes-agency-user-guard.spec.ts`) asserts every agency-shell route
  * actually carries the guard.
  */
@@ -247,11 +261,18 @@ export async function requireAgencyUser(ctx: GuardContext): Promise<GuardResult>
     return { name: 'auth.sign-in' }
   }
 
-  if (store.user.attributes.user_type === 'creator') {
-    return { name: 'onboarding.welcome-back' }
+  if (store.user.attributes.user_type !== 'creator') {
+    return null
   }
 
-  return null
+  // A creator who belongs to at least one agency (e.g. signed up via the public
+  // form, then accepted an agency invitation) is a real teammate — let them in.
+  const agencyStore = useAgencyStore()
+  if (agencyStore.memberships.length > 0) {
+    return null
+  }
+
+  return { name: 'onboarding.welcome-back' }
 }
 
 export const guards: Record<
