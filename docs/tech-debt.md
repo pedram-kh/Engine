@@ -832,3 +832,51 @@ anyone reviewing it later.
 - **Triggered by:** the real KYC vendor adapter landing (the same trigger that activates the disabled "Request vendor verification" affordance).
 - **Owner:** vendor-KYC chunk (Sprint 4+).
 - **Status:** open (deferred by design). Surfaced + accepted by Sprint 4 Chunk 3, 2026-06-02.
+
+---
+
+## Auto-blocks on assignment acceptance (Sprint 5 spec `:197`/`:204` acceptance criterion — deferred to Sprint 8)
+
+- **Where:** the spec's Sprint 5 line items include "Auto-blocks created when creator accepts an assignment (linked to assignment_id)" ([`docs/20-PHASE-1-SPEC.md:197`](20-PHASE-1-SPEC.md)) and the matching acceptance criterion "Auto-blocks happen on assignment acceptance" ([`docs/20-PHASE-1-SPEC.md:204`](20-PHASE-1-SPEC.md)). The schema is ready: [`creator_availability_blocks.assignment_id`](../apps/api/database/migrations/2026_05_14_100003_create_creator_availability_blocks_table.php) (nullable, FK deferred until the target table exists) + the [`Kind::AssignmentAuto`](../apps/api/app/Modules/Creators/Enums/Kind.php) case (reserved, NOT creator-settable).
+- **What we accepted in Sprint 5 Chunk A (2026-06-03):** the auto-block-on-acceptance behaviour is **forward-blocked** and explicitly deferred to **Sprint 8**. `campaign_assignments` is `NOT FOUND` (Sprint 5 read-only inventory B3) — there is no assignment entity and no acceptance event to fire the auto-block from. Chunk A ships everything buildable on today's schema (manual CRUD + the weekly-recurrence engine + conflict-detection + the agency read-view) and names this criterion as deferred rather than silently dropping it. `Kind::AssignmentAuto` is reserved system-side now (a creator cannot manually mint an "assignment auto" block — D-a2) so the kind is ready the moment the emitter exists.
+- **Risk:** low. No creator-facing capability is missing in Phase-1 availability terms — creators still block time manually. The gap is purely the _automatic_ block on acceptance, which has no trigger to attach to yet.
+- **Resolution:** in Sprint 8, when `campaign_assignments` + an acceptance event exist, add the FK constraint on `assignment_id`, and emit an `assignment_auto` hard block (linked via `assignment_id`) from the acceptance handler. The conflict-detection service built in Chunk A already treats hard blocks (including future auto-blocks) as conflicts, so no detection rework is needed.
+- **Triggered by:** Sprint 8 (`campaign_assignments` + the assignment-acceptance flow).
+- **Owner:** Sprint 8 assignments workstream.
+- **Status:** open (deferred by design). Surfaced + accepted by Sprint 5 Chunk A, 2026-06-03 ([review](reviews/sprint-5-chunk-a-review.md)).
+
+---
+
+## Conflict-warning modal trigger (Sprint 5 spec `:202` — detection ships now, trigger deferred to Sprint 8)
+
+- **Where:** spec line "Conflict warnings: agency tries to invite creator during a hard block → warning modal" ([`docs/20-PHASE-1-SPEC.md:202`](20-PHASE-1-SPEC.md)). The detection half ships in Sprint 5 Chunk A as a standalone, unit-tested service: [`AvailabilityConflictService`](../apps/api/app/Modules/Creators/Services/Availability/AvailabilityConflictService.php) (given a creator + a date range, does any HARD block — one-off or expanded-recurring — overlap?).
+- **What we accepted in Sprint 5 Chunk A (2026-06-03):** the **detection logic** is complete and tested now (D-a5). The **modal trigger** — the agency invite-to-assignment surface that would call the service and render the warning — is deferred to **Sprint 8** because that surface does not exist (inventory B7: roster is list-only, no agency-side invite-to-assignment flow until the assignments work). Building detection standalone now means Sprint 8 only wires the trigger; the overlap logic, the hard-vs-soft distinction, and the single-expansion-source guarantee are already proven.
+- **Risk:** low. Nothing regresses — there is no invite flow to warn within yet. The service is dead-code-adjacent until Sprint 8 wires it, but it is fully covered so it cannot rot silently.
+- **Resolution:** in Sprint 8, call `AvailabilityConflictService::detect()` from the agency invite/assignment surface and render the warning modal on `hasConflict === true` (the result already carries the overlapping hard occurrences for display).
+- **Triggered by:** Sprint 8 (the agency invite-to-assignment surface).
+- **Owner:** Sprint 8 assignments workstream.
+- **Status:** open (deferred by design). Surfaced + accepted by Sprint 5 Chunk A, 2026-06-03 ([review](reviews/sprint-5-chunk-a-review.md)).
+
+---
+
+## Availability recurrence: spec-vs-data-model contradiction (resolved by keeping weekly; ceiling = weekly)
+
+- **Where:** the Sprint 5 spec lists "Recurring blocks (basic — once per week)" as in-scope ([`docs/20-PHASE-1-SPEC.md:199`](20-PHASE-1-SPEC.md)), while the `creator_availability_blocks` data-model marks `is_recurring` + `recurrence_rule` as **P2 (column from P1)** ([`docs/03-DATA-MODEL.md:288-289`](03-DATA-MODEL.md)). Those two readings contradict: one says build recurrence in Phase 1, the other says the columns are Phase-2 activation.
+- **How Sprint 5 Chunk A resolved it (2026-06-03):** **kept** weekly recurrence in scope, per the weekly-recurring market signal (creators predominantly have weekly-recurring availability; biweekly "every other week" is common too — see the INTERVAL decision below). Built a server-side expansion engine ([`AvailabilityExpansionService`](../apps/api/app/Modules/Creators/Services/Availability/AvailabilityExpansionService.php)) on [`rlanvin/php-rrule`](../apps/api/composer.json) with a hard **weekly ceiling** enforced at validation ([`WeeklyRecurrenceRule`](../apps/api/app/Modules/Creators/Rules/WeeklyRecurrenceRule.php)): `FREQ=WEEKLY` + optional `INTERVAL` (every N weeks) + optional `BYDAY` (plain weekday codes) + optional `UNTIL`. Everything else — daily/monthly/yearly, `BYMONTHDAY`, `BYMONTH`, `BYSETPOS`, `COUNT`, numeric-prefixed `BYDAY` (`2MO`), embedded `DTSTART` — is rejected. The library can parse full RFC 5545 RRULE; _we_ only accept/emit weekly.
+- **Risk:** low. The ceiling is enforced at validation (a `FREQ=DAILY` cannot reach storage or expansion — break-revert tested), so the P2 columns now carry only weekly rules. Lifting the ceiling later (daily/monthly/custom) is additive: widen `WeeklyRecurrenceRule`'s allowlist + the validation, no schema change (`recurrence_rule` already stores any RRULE string).
+- **Resolution:** none required for Phase 1 — the contradiction is resolved in favour of the spec's in-scope reading, bounded to weekly. If a future product need wants daily/monthly/custom recurrence, widen the rule allowlist; the engine + storage already support arbitrary RRULE.
+- **Triggered by:** a product requirement for non-weekly recurrence (no current trigger).
+- **Owner:** Sprint 5 Chunk A (resolved); future-recurrence work unowned.
+- **Status:** resolved (documented). Recorded by Sprint 5 Chunk A, 2026-06-03 ([review](reviews/sprint-5-chunk-a-review.md)).
+
+---
+
+## External calendar sync for availability blocks (`external_calendar_id` / `external_event_id`) — still P2
+
+- **Where:** [`creator_availability_blocks.external_calendar_id` / `external_event_id`](../apps/api/database/migrations/2026_05_14_100003_create_creator_availability_blocks_table.php), marked **P2 (column from P1)** in [`docs/03-DATA-MODEL.md:290-291`](03-DATA-MODEL.md) ("If synced from Google Calendar").
+- **What we accepted in Sprint 5 Chunk A (2026-06-03):** untouched — Google Calendar (and similar) two-way sync remains a P2 feature. Chunk A neither reads, writes, nor validates these columns; availability blocks are created/edited entirely in-app. The columns stay nullable + dormant, exactly as shipped in Sprint 3 Chunk 1.
+- **Risk:** none today. The columns are inert.
+- **Resolution:** a dedicated P2 external-calendar-sync chunk (OAuth into the provider, a sync job, conflict reconciliation between synced events and in-app blocks, and the `external_*` columns as the idempotency key).
+- **Triggered by:** the P2 external-calendar-sync feature being scheduled.
+- **Owner:** P2 / unscheduled.
+- **Status:** open (P2, untouched). Re-confirmed by Sprint 5 Chunk A, 2026-06-03.
