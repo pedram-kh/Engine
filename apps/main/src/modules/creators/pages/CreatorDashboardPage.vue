@@ -31,15 +31,17 @@
  * never the only signal — icon + text are also distinct.
  */
 
-import { CompletenessBar } from '@catalyst/ui'
+import type { ConnectionRequestListItem } from '@catalyst/api-client'
+import { CompletenessBar, CEmptyState } from '@catalyst/ui'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import { resolveSubmitErrorKey } from '../../onboarding/composables/useSubmitErrorKey'
 import { useOnboardingStore } from '../../onboarding/stores/useOnboardingStore'
+import { connectionRequestsApi } from '../connectionRequests.api'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
 const store = useOnboardingStore()
 
@@ -76,9 +78,100 @@ async function resubmit(): Promise<void> {
   }
 }
 
+// ── Connection requests inbox (Sprint 6.6c, D-d1) ──────────────────────────
+// The incoming agency-request section, rendered ONLY in the approved branch
+// (pending/rejected/incomplete creators have no agency relations). Component-
+// local refs, no global store — re-fetch after a mutation so the actioned row
+// drops from the pending set (the AvailabilityCalendar `onMutated → load()`
+// precedent, D-d7).
+const requests = ref<ConnectionRequestListItem[]>([])
+const requestsLoading = ref(false)
+const requestsLoadedOnce = ref(false)
+/** The row currently being accepted/declined — drives its buttons' loading state. */
+const actioningId = ref<string | null>(null)
+const snackbar = ref<{ color: string; text: string } | null>(null)
+
+const requestsEmpty = computed(() => requestsLoadedOnce.value && requests.value.length === 0)
+
+/** "Sent {date}" for the row, localized; falls back when the timestamp is null. */
+function sentLabel(iso: string | null): string {
+  if (iso === null) return t('creator.ui.dashboard.requests.sent_unknown')
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return t('creator.ui.dashboard.requests.sent_unknown')
+  return t('creator.ui.dashboard.requests.sent', {
+    date: new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(date),
+  })
+}
+
+async function loadRequests(): Promise<void> {
+  requestsLoading.value = true
+  try {
+    const res = await connectionRequestsApi.list()
+    requests.value = res.data
+  } catch {
+    requests.value = []
+  } finally {
+    requestsLoading.value = false
+    requestsLoadedOnce.value = true
+  }
+}
+
+/**
+ * Snackbar keyed on the backend's `meta.code` (D-d6), mirroring the
+ * DiscoverProfilePage pattern. Accept names the agency; decline does not (there
+ * is no creator-side connections surface to click through to).
+ */
+function snackbarFor(code: string, agencyName: string): { color: string; text: string } {
+  switch (code) {
+    case 'connection.accepted':
+      return {
+        color: 'success',
+        text: t('creator.ui.dashboard.requests.toast.accepted', { agency: agencyName }),
+      }
+    case 'connection.declined':
+    default:
+      return { color: 'info', text: t('creator.ui.dashboard.requests.toast.declined') }
+  }
+}
+
+async function acceptRequest(item: ConnectionRequestListItem): Promise<void> {
+  if (actioningId.value !== null) return
+  actioningId.value = item.id
+  try {
+    // POST the ROW's `id` (the relation ULID — D-d3), never the agency id.
+    const res = await connectionRequestsApi.accept(item.id)
+    snackbar.value = snackbarFor(res.meta.code, item.attributes.agency_name)
+    await loadRequests()
+  } catch {
+    snackbar.value = { color: 'error', text: t('creator.ui.dashboard.requests.toast.error') }
+  } finally {
+    actioningId.value = null
+  }
+}
+
+async function declineRequest(item: ConnectionRequestListItem): Promise<void> {
+  if (actioningId.value !== null) return
+  actioningId.value = item.id
+  try {
+    // Direct decline (no confirm — reversible via an agency re-request, D-d3).
+    const res = await connectionRequestsApi.decline(item.id)
+    snackbar.value = snackbarFor(res.meta.code, item.attributes.agency_name)
+    await loadRequests()
+  } catch {
+    snackbar.value = { color: 'error', text: t('creator.ui.dashboard.requests.toast.error') }
+  } finally {
+    actioningId.value = null
+  }
+}
+
 onMounted(async () => {
   if (!store.isBootstrapped) {
     await store.bootstrap()
+  }
+  // The inbox is approved-only — no fetch fires for any other branch (the
+  // first creator-side fetch stays scoped to the surface that needs it).
+  if (status.value === 'approved') {
+    await loadRequests()
   }
 })
 </script>
@@ -160,6 +253,87 @@ onMounted(async () => {
       :label="completenessLabel"
       :color="score >= 100 ? 'success' : 'primary'"
     />
+
+    <!-- Connection requests inbox (Sprint 6.6c, D-d1). Approved-only: the
+         section never renders for pending/rejected/incomplete creators, who
+         have no agency relations. A simple inserted block — the page's vertical
+         flex accepts it without restructuring the banner logic. -->
+    <section
+      v-if="status === 'approved'"
+      class="creator-dashboard__requests"
+      data-testid="dashboard-requests"
+    >
+      <h2 class="text-h6">{{ t('creator.ui.dashboard.requests.title') }}</h2>
+
+      <v-skeleton-loader
+        v-if="requestsLoading && !requestsLoadedOnce"
+        type="list-item-two-line, list-item-two-line"
+        data-testid="dashboard-requests-skeleton"
+      />
+
+      <template v-else>
+        <v-list v-if="!requestsEmpty" lines="two" data-testid="dashboard-requests-list">
+          <v-list-item
+            v-for="item in requests"
+            :key="item.id"
+            :title="item.attributes.agency_name"
+            :subtitle="sentLabel(item.attributes.invitation_sent_at)"
+            :data-testid="`dashboard-request-${item.id}`"
+          >
+            <template #append>
+              <div class="d-flex ga-2">
+                <v-btn
+                  color="primary"
+                  variant="flat"
+                  size="small"
+                  :loading="actioningId === item.id"
+                  :disabled="actioningId !== null && actioningId !== item.id"
+                  :data-testid="`dashboard-request-accept-${item.id}`"
+                  @click="acceptRequest(item)"
+                >
+                  {{ t('creator.ui.dashboard.requests.accept') }}
+                </v-btn>
+                <v-btn
+                  variant="tonal"
+                  size="small"
+                  :loading="actioningId === item.id"
+                  :disabled="actioningId !== null && actioningId !== item.id"
+                  :data-testid="`dashboard-request-decline-${item.id}`"
+                  @click="declineRequest(item)"
+                >
+                  {{ t('creator.ui.dashboard.requests.decline') }}
+                </v-btn>
+              </div>
+            </template>
+          </v-list-item>
+        </v-list>
+
+        <CEmptyState
+          v-else
+          data-test="dashboard-requests-empty"
+          :title="t('creator.ui.dashboard.requests.empty.title')"
+          :body="t('creator.ui.dashboard.requests.empty.body')"
+        >
+          <template #icon>
+            <v-icon icon="mdi-account-multiple-outline" size="64" color="medium-emphasis" />
+          </template>
+        </CEmptyState>
+      </template>
+    </section>
+
+    <v-snackbar
+      :model-value="snackbar !== null"
+      :timeout="3000"
+      :color="snackbar?.color"
+      data-testid="dashboard-requests-snackbar"
+      @update:model-value="
+        (v) => {
+          if (!v) snackbar = null
+        }
+      "
+    >
+      {{ snackbar?.text }}
+    </v-snackbar>
   </section>
 </template>
 

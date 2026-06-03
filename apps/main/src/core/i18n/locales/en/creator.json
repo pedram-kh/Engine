@@ -259,6 +259,22 @@
         "incomplete": {
           "title": "Continue your application",
           "description": "Pick up where you left off — your wizard progress is saved."
+        },
+        "requests": {
+          "title": "Connection requests",
+          "sent": "Sent {date}",
+          "sent_unknown": "Sent recently",
+          "accept": "Accept",
+          "decline": "Decline",
+          "empty": {
+            "title": "No connection requests",
+            "body": "When an agency invites you to connect, it'll appear here."
+          },
+          "toast": {
+            "accepted": "You're now connected with {agency}.",
+            "declined": "Request declined.",
+            "error": "Something went wrong. Please try again."
+          }
         }
       },
       "upload": {

@@ -259,6 +259,22 @@
         "incomplete": {
           "title": "Continua la tua candidatura",
           "description": "Riprendi da dove avevi lasciato — i tuoi progressi sono salvati."
+        },
+        "requests": {
+          "title": "Richieste di collegamento",
+          "sent": "Inviata il {date}",
+          "sent_unknown": "Inviata di recente",
+          "accept": "Accetta",
+          "decline": "Rifiuta",
+          "empty": {
+            "title": "Nessuna richiesta di collegamento",
+            "body": "Quando un'agenzia ti invita a collegarti, apparirà qui."
+          },
+          "toast": {
+            "accepted": "Ora sei collegato con {agency}.",
+            "declined": "Richiesta rifiutata.",
+            "error": "Qualcosa è andato storto. Riprova."
+          }
         }
       },
       "upload": {

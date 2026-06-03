@@ -511,6 +511,70 @@ export interface ConnectionRequestResponse {
 }
 
 // ---------------------------------------------------------------------------
+// Creator-side connection requests (the inbox) — Sprint 6.6c
+// ---------------------------------------------------------------------------
+
+/**
+ * One row in the creator's incoming-request inbox
+ * (GET /api/v1/creators/me/connection-requests, Sprint 6.6c / D-d2). The
+ * CREATOR side of the lifecycle — distinct from the agency send-side
+ * `ConnectionRequestResponse` (`type: 'agency_connection_request'`), which it
+ * MUST NOT be confused with (D-d5).
+ *
+ * ⚠ `id` is the RELATION ULID — the value POSTed back to accept/decline
+ *   (`POST …/{relation}/accept|decline`), NOT the agency's id.
+ * ⚠ `agency_id` is the agency's ULID despite the `_id` suffix — bind it as the
+ *   agency identifier, never as a numeric key (D-d2 quirk). `agency_name` is
+ *   the only human-readable label on the row.
+ *
+ * `relationship_status` is always `'pending_request'` here (the list filters
+ * to pending), reusing the shared `DiscoveryRelationshipStatus` (D-d5).
+ */
+export interface ConnectionRequestListItem {
+  id: string
+  type: 'connection_request'
+  attributes: {
+    relationship_status: DiscoveryRelationshipStatus
+    /** ISO 8601 instant the agency sent the request; nullable. */
+    invitation_sent_at: string | null
+    /** The agency's ULID (NOT a numeric id, despite the `_id` suffix — D-d2). */
+    agency_id: string
+    agency_name: string
+  }
+}
+
+/**
+ * The creator inbox list envelope (D-d2). A FLAT `data: [...]` — there is NO
+ * `meta`/pagination here (the 6.6b list is un-paginated by design; do NOT
+ * expect an availability-style `meta.window`).
+ */
+export interface ConnectionRequestListResponse {
+  data: ConnectionRequestListItem[]
+}
+
+/**
+ * Response from the creator accept/decline endpoints (D-d3):
+ *   POST /api/v1/creators/me/connection-requests/{relation}/accept|decline
+ *
+ * Carries the resulting `relationship_status` (`roster` on accept, `declined`
+ * on decline) + a `meta.code` the UI keys its snackbar on (D-d6). The code
+ * union is the CREATOR side (`accepted`/`declined`) — NOT the agency send-side
+ * union on `ConnectionRequestResponse` (D-d5).
+ */
+export interface ConnectionRequestActionResponse {
+  data: {
+    id: string
+    type: 'connection_request'
+    attributes: {
+      relationship_status: DiscoveryRelationshipStatus
+    }
+  }
+  meta: {
+    code: 'connection.accepted' | 'connection.declined'
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Agency creator AVAILABILITY read-view — Sprint 5 Chunk A backend,
 // Sprint 6 Chunk 2a consumer
 // ---------------------------------------------------------------------------

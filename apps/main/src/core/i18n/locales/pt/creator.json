@@ -259,6 +259,22 @@
         "incomplete": {
           "title": "Continue a sua candidatura",
           "description": "Continue de onde parou — o seu progresso está guardado."
+        },
+        "requests": {
+          "title": "Pedidos de ligação",
+          "sent": "Enviado a {date}",
+          "sent_unknown": "Enviado recentemente",
+          "accept": "Aceitar",
+          "decline": "Recusar",
+          "empty": {
+            "title": "Sem pedidos de ligação",
+            "body": "Quando uma agência o convidar para ligar-se, aparecerá aqui."
+          },
+          "toast": {
+            "accepted": "Está agora ligado à {agency}.",
+            "declined": "Pedido recusado.",
+            "error": "Algo correu mal. Tente novamente."
+          }
         }
       },
       "upload": {
