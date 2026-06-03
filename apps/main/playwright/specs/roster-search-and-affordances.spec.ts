@@ -92,10 +92,13 @@ test.describe('Creator roster — search + disabled affordances', () => {
 
     // The span-wrap idiom delivers a hover tooltip on the disabled metrics
     // control (a disabled control emits no hover — the wrapping <span> does).
+    // Both metrics affordances (followers + engagement) share this tooltip
+    // text, so intersect with `:visible` to target the one the hover opened
+    // (avoids the strict-mode violation of two matching text nodes in the DOM).
     await page.locator(dt(testIds.rosterFollowersAffordance)).hover()
-    await expect(page.getByText("Social metrics aren't connected yet.")).toBeVisible({
-      timeout: 5000,
-    })
+    await expect(
+      page.getByText("Social metrics aren't connected yet.").and(page.locator(':visible')),
+    ).toBeVisible({ timeout: 5000 })
 
     // Availability range filter (Sprint 6.5, D-6): the real control is two
     // ENABLED native date inputs — NOT the old disabled affordance.
