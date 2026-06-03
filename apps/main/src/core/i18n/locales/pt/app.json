@@ -62,7 +62,11 @@
         },
         "country": "País",
         "language": "Idioma",
-        "category": "Categoria"
+        "category": "Categoria",
+        "availability": {
+          "from": "Disponível a partir de",
+          "to": "Disponível até"
+        }
       },
       "affordances": {
         "followers": {
@@ -70,10 +74,6 @@
         },
         "engagement": {
           "label": "Taxa de interação"
-        },
-        "availability": {
-          "label": "Disponibilidade",
-          "tooltip": "O filtro de disponibilidade está a chegar em breve."
         },
         "metrics": {
           "tooltip": "As métricas sociais ainda não estão ligadas."

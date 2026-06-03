@@ -8,19 +8,22 @@
  * (chip-group) + country / language / category (selects). Tenancy via
  * `useAgencyStore().currentAgencyId`, mirroring BrandListPage.
  *
- * Sprint 6 Chunk 1 adds: a debounced name/bio search box (→ `?q=` FTS, D-1)
- * and two DISABLED filter affordances — metrics (follower range + engagement)
- * and availability (D-4). The affordances are present-but-inert: faded,
- * disabled, span-wrapped so their tooltip still fires on hover (a disabled
- * control emits no hover events), and they issue NO query — a "0 results"
- * from an empty-data query would read as broken. They're blocked by missing
- * infrastructure (social metrics are null until adapters land; a real
- * availability filter needs a cheap roster-wide signal — its own chunk, D-5),
+ * Sprint 6 Chunk 1 adds: a debounced name/bio search box (→ `?q=` FTS, D-1).
+ *
+ * Sprint 6.5 (D-6) makes the availability filter REAL: a from/to date range
+ * (two native date inputs) threaded to the backend as
+ * `?available_from=&available_to=`. A creator is excluded when they have an
+ * overlapping HARD availability block in the window (soft never excludes).
+ * Both bounds are required — a one-sided range issues no availability param.
+ *
+ * The METRICS affordance (follower range + engagement) stays a DISABLED,
+ * present-but-inert control (D-4): faded, span-wrapped so its tooltip still
+ * fires on hover (a disabled control emits no hover events), issuing NO query
+ * — blocked by missing DATA (social metrics are null until the adapters land),
  * not dead code.
  *
- * Still deferred: handle search (D-2), real metrics/availability filters,
- * talent pools, internal_rating editing (read-only stars here), and — rows do
- * NOT navigate to a creator detail (no agency-side detail surface yet → Chunk 2).
+ * Still deferred: handle search (D-2), real follower/engagement filters,
+ * talent pools, internal_rating editing (read-only stars here).
  */
 
 import type {
@@ -51,17 +54,20 @@ const languageFilter = ref<string | null>(null)
 const categoryFilter = ref<string | null>(null)
 const searchQuery = ref('')
 
-// Disabled-affordance drivers (D-4). Both are static FE constants this chunk —
-// there is no backend signal to drive them yet (no `kyc_vendor_available`
-// equivalent). When the blocking infrastructure lands, flip these to a
-// backend-driven flag and wire the real control behind the `v-else`:
-//   - metrics (follower range + engagement): blocked by missing DATA —
-//     `creator_social_accounts.metrics` is null until the social adapters land.
-//   - availability: blocked by missing cheap-query INFRASTRUCTURE — there is no
-//     stored availability status; a real filter needs a denormalized
-//     roster-wide signal or N RRULE expansions per page (a design problem, D-5).
+// Availability range filter (Sprint 6.5, D-6). Two `'YYYY-MM-DD'` bounds;
+// the filter is sent only when BOTH are set (a one-sided range is ignored).
+// `clearable` sets the model to null on clear, so the refs are string | null
+// and all reads use truthiness (empty string OR null = "unset").
+const availableFrom = ref<string | null>('')
+const availableTo = ref<string | null>('')
+
+// Affordance driver (D-4). A static FE constant — there is no backend signal
+// to drive it yet (no `kyc_vendor_available` equivalent). The METRICS filters
+// (follower range + engagement) stay disabled: blocked by missing DATA
+// (`creator_social_accounts.metrics` is null until the social adapters land).
+// When the data lands, flip this to a backend-driven flag + wire the real
+// control. (Availability is no longer here — Sprint 6.5 made it real.)
 const METRICS_FILTERS_CONNECTED = false
-const AVAILABILITY_FILTER_CONNECTED = false
 
 const items = ref<RosterCreatorListItem[]>([])
 const totalItems = ref(0)
@@ -162,13 +168,20 @@ const headers = [
   },
 ]
 
+// Both bounds present → a usable availability window (the only shape the
+// backend acts on). Mirrors the api-client's both-required threading.
+const hasAvailabilityWindow = computed(
+  () => Boolean(availableFrom.value) && Boolean(availableTo.value),
+)
+
 const hasActiveFilters = computed(
   () =>
     statusFilter.value !== 'all' ||
     countryFilter.value !== null ||
     languageFilter.value !== null ||
     categoryFilter.value !== null ||
-    searchQuery.value.trim() !== '',
+    searchQuery.value.trim() !== '' ||
+    hasAvailabilityWindow.value,
 )
 
 function countryLabel(code: string | null): string {
@@ -222,6 +235,14 @@ async function loadRoster(): Promise<void> {
     if (categoryFilter.value !== null) params.category = categoryFilter.value
     const trimmedQuery = searchQuery.value.trim()
     if (trimmedQuery !== '') params.q = trimmedQuery
+    // Availability window — both-or-neither (the backend ignores a one-sided
+    // range, so we only thread it when complete).
+    const from = availableFrom.value
+    const to = availableTo.value
+    if (from !== null && from !== '' && to !== null && to !== '') {
+      params.available_from = from
+      params.available_to = to
+    }
 
     const res = await rosterApi.list(agencyId, params)
     items.value = res.data
@@ -250,10 +271,16 @@ watch(
 )
 
 // Any structured-filter change resets to page 1 and re-queries immediately.
-watch([statusFilter, countryFilter, languageFilter, categoryFilter], () => {
-  tableOptions.value.page = 1
-  void loadRoster()
-})
+// The availability bounds are included: setting one side reloads without the
+// param (it's incomplete), completing the range reloads with it, clearing a
+// side drops it — all page-1 resets (mirrors the other filters).
+watch(
+  [statusFilter, countryFilter, languageFilter, categoryFilter, availableFrom, availableTo],
+  () => {
+    tableOptions.value.page = 1
+    void loadRoster()
+  },
+)
 
 // Free-text search is debounced — fires 300ms after the user stops typing
 // (mirrors AgencyUsersPage). No existing list-search idiom to mirror beyond
@@ -356,13 +383,44 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
       </v-col>
     </v-row>
 
-    <!-- Disabled filter affordances (D-4). Present-but-inert: faded, disabled,
-         and span-wrapped so the tooltip still fires (a disabled control emits
-         no hover events — the Chunk-3 KYC idiom). They have NO v-model and NO
-         watcher, so they CANNOT issue a query. They flip live when the blocking
-         infrastructure lands (METRICS_FILTERS_CONNECTED / AVAILABILITY_FILTER_CONNECTED). -->
+    <!-- Availability range filter (Sprint 6.5, D-6) + the still-disabled
+         metrics affordances (D-4). The availability control is now REAL: two
+         native date inputs (from/to). Native date fields thread + test cleanly
+         and are honestly better UX than a heavy picker for a range filter (the
+         same jsdom discipline as the read-only star icons). The window is sent
+         only when BOTH bounds are set (a one-sided range issues no param). The
+         METRICS controls stay present-but-inert: faded, disabled, span-wrapped
+         so the tooltip still fires (a disabled control emits no hover events —
+         the Chunk-3 KYC idiom), with NO v-model + NO watcher, so they CANNOT
+         query. They flip live when the social-metrics data lands. -->
     <v-row dense class="mb-2">
-      <v-col cols="12" sm="4">
+      <v-col cols="12" sm="3">
+        <v-text-field
+          v-model="availableFrom"
+          type="date"
+          :label="t('app.roster.filters.availability.from')"
+          :max="availableTo || undefined"
+          density="compact"
+          variant="outlined"
+          hide-details
+          clearable
+          data-test="roster-available-from"
+        />
+      </v-col>
+      <v-col cols="12" sm="3">
+        <v-text-field
+          v-model="availableTo"
+          type="date"
+          :label="t('app.roster.filters.availability.to')"
+          :min="availableFrom || undefined"
+          density="compact"
+          variant="outlined"
+          hide-details
+          clearable
+          data-test="roster-available-to"
+        />
+      </v-col>
+      <v-col cols="12" sm="3">
         <v-tooltip
           v-if="!METRICS_FILTERS_CONNECTED"
           location="top"
@@ -383,7 +441,7 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
           </template>
         </v-tooltip>
       </v-col>
-      <v-col cols="12" sm="4">
+      <v-col cols="12" sm="3">
         <v-tooltip
           v-if="!METRICS_FILTERS_CONNECTED"
           location="top"
@@ -399,27 +457,6 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
                 hide-details
                 disabled
                 data-test="roster-engagement-filter"
-              />
-            </span>
-          </template>
-        </v-tooltip>
-      </v-col>
-      <v-col cols="12" sm="4">
-        <v-tooltip
-          v-if="!AVAILABILITY_FILTER_CONNECTED"
-          location="top"
-          :text="t('app.roster.affordances.availability.tooltip')"
-        >
-          <template #activator="{ props: tooltipProps }">
-            <span v-bind="tooltipProps" data-test="roster-availability-affordance">
-              <v-select
-                :label="t('app.roster.affordances.availability.label')"
-                :items="[]"
-                density="compact"
-                variant="outlined"
-                hide-details
-                disabled
-                data-test="roster-availability-filter"
               />
             </span>
           </template>

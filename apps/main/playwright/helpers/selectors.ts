@@ -222,7 +222,8 @@ export const testIds = {
 
   // ---------------------------------------------------------------
   // Creator roster — Sprint 4 Chunk 5 + Sprint 6 Chunk 1 (search +
-  // disabled affordances). (apps/main/src/modules/roster/pages/CreatorRosterPage.vue)
+  // disabled affordances) + Sprint 6.5 (real availability range filter).
+  // (apps/main/src/modules/roster/pages/CreatorRosterPage.vue)
   // ---------------------------------------------------------------
   rosterPage: 'roster-page',
   rosterHeading: 'roster-heading',
@@ -231,10 +232,12 @@ export const testIds = {
   rosterEmptyFiltered: 'roster-empty-filtered',
   rosterFollowersAffordance: 'roster-followers-affordance',
   rosterEngagementAffordance: 'roster-engagement-affordance',
-  rosterAvailabilityAffordance: 'roster-availability-affordance',
   rosterFollowersFilter: 'roster-followers-filter',
   rosterEngagementFilter: 'roster-engagement-filter',
-  rosterAvailabilityFilter: 'roster-availability-filter',
+  // Sprint 6.5 (D-6): the real availability range control (two native date
+  // inputs) — replaces the old disabled availability affordance.
+  rosterAvailableFrom: 'roster-available-from',
+  rosterAvailableTo: 'roster-available-to',
 
   // ---------------------------------------------------------------
   // Settings page — Sprint 2 Chunk 2

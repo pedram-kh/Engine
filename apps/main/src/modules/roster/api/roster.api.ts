@@ -24,9 +24,11 @@ function rosterBase(agencyId: string): string {
 export const rosterApi = {
   /**
    * List the agency's creators across all relationship statuses, with the
-   * status / country / language / category filters plus name/bio full-text
-   * search (`?q=`, Sprint 6 Chunk 1). Follower/availability filters and talent
-   * pools remain deferred (inert affordances on the page, D-4/D-5).
+   * status / country / language / category filters, name/bio full-text
+   * search (`?q=`, Sprint 6 Chunk 1), and the availability range filter
+   * (`?available_from=&available_to=`, Sprint 6.5 D-6 — both bounds required).
+   * Follower/engagement filters and talent pools remain deferred (inert
+   * affordances on the page, D-4).
    */
   list(agencyId: string, params: RosterListParams = {}): Promise<RosterListResponse> {
     const query = new URLSearchParams()
@@ -37,6 +39,17 @@ export const rosterApi = {
     if (params.category !== undefined && params.category !== '')
       query.set('category', params.category)
     if (params.q !== undefined && params.q !== '') query.set('q', params.q)
+    // Availability window: thread BOTH bounds only when BOTH are set — the
+    // backend ignores a one-sided range, so sending a half window is wasted.
+    if (
+      params.available_from !== undefined &&
+      params.available_from !== '' &&
+      params.available_to !== undefined &&
+      params.available_to !== ''
+    ) {
+      query.set('available_from', params.available_from)
+      query.set('available_to', params.available_to)
+    }
     if (params.page !== undefined) query.set('page', String(params.page))
     if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
     const qs = query.toString()

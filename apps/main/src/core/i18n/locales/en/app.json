@@ -62,7 +62,11 @@
         },
         "country": "Country",
         "language": "Language",
-        "category": "Category"
+        "category": "Category",
+        "availability": {
+          "from": "Available from",
+          "to": "Available to"
+        }
       },
       "affordances": {
         "followers": {
@@ -70,10 +74,6 @@
         },
         "engagement": {
           "label": "Engagement rate"
-        },
-        "availability": {
-          "label": "Availability",
-          "tooltip": "Availability filtering is coming soon."
         },
         "metrics": {
           "tooltip": "Social metrics aren't connected yet."

@@ -62,7 +62,11 @@
         },
         "country": "Paese",
         "language": "Lingua",
-        "category": "Categoria"
+        "category": "Categoria",
+        "availability": {
+          "from": "Disponibile dal",
+          "to": "Disponibile al"
+        }
       },
       "affordances": {
         "followers": {
@@ -70,10 +74,6 @@
         },
         "engagement": {
           "label": "Tasso di engagement"
-        },
-        "availability": {
-          "label": "Disponibilità",
-          "tooltip": "Il filtro per disponibilità sarà presto disponibile."
         },
         "metrics": {
           "tooltip": "Le metriche social non sono ancora collegate."

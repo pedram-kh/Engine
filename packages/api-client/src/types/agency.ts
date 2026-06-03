@@ -240,6 +240,16 @@ export interface RosterListParams {
    * `?q=` FTS filter (Postgres `tsvector`; SQLite `LIKE` fallback).
    */
   q?: string
+  /**
+   * Availability range filter (Sprint 6.5, D-6). A `'YYYY-MM-DD'` window;
+   * creators with an overlapping HARD availability block in [from, to] are
+   * excluded (soft blocks never exclude). Both bounds are required to
+   * activate the filter — a one-sided range is ignored by the backend. The
+   * window is day-granular + inclusive of the `to` day (normalized
+   * server-side).
+   */
+  available_from?: string
+  available_to?: string
   page?: number
   per_page?: number
 }

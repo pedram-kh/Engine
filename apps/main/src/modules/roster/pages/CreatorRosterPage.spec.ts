@@ -324,13 +324,15 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     }
   })
 
-  it('renders availability + metrics as DISABLED affordances that issue no query (D-4)', async () => {
+  it('renders metrics as DISABLED affordances that issue no query (D-4)', async () => {
     const harness = await mountRoster({ rows: [makeRow()] })
     cleanup = harness.cleanup
     const wrapper = harness.wrapper
 
-    // Each affordance control renders and is disabled (faded, inert).
-    for (const id of ['roster-followers', 'roster-engagement', 'roster-availability']) {
+    // The METRICS affordances stay disabled (faded, inert) — blocked on data.
+    // Availability is NO LONGER here (Sprint 6.5 made it a real control), so
+    // it is deliberately absent from this disabled loop.
+    for (const id of ['roster-followers', 'roster-engagement']) {
       const control = wrapper.find(`[data-test="${id}-filter"]`)
       expect(control.exists(), `${id}-filter should render`).toBe(true)
       expect(control.attributes('disabled'), `${id}-filter should be disabled`).toBeDefined()
@@ -340,11 +342,50 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     // tooltip attaches to a wrapping <span> activator.
     expect(wrapper.find('[data-test="roster-followers-affordance"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="roster-engagement-affordance"]').exists()).toBe(true)
-    expect(wrapper.find('[data-test="roster-availability-affordance"]').exists()).toBe(true)
+
+    // The old disabled availability affordance is gone (replaced by the real
+    // range control below).
+    expect(wrapper.find('[data-test="roster-availability-affordance"]').exists()).toBe(false)
 
     // They have NO v-model and NO watcher → they CANNOT query. Only the
     // initial mount load happened (break-revert: wiring one to a query would
     // bump this past 1).
     expect(rosterApi.list).toHaveBeenCalledTimes(1)
+  })
+
+  it('threads BOTH availability bounds into the query, but only when complete (Sprint 6.5, D-6)', async () => {
+    const harness = await mountRoster({ rows: [makeRow()] })
+    cleanup = harness.cleanup
+    const vm = harness.wrapper.vm as unknown as {
+      availableFrom: string | null
+      availableTo: string | null
+    }
+
+    // One-sided range → NO availability params (the backend ignores it, so we
+    // don't even send it). The query reloads (page-1 reset) but without the
+    // window.
+    vi.mocked(rosterApi.list).mockClear()
+    vm.availableFrom = '2026-06-08'
+    await flushPromises()
+    const oneSided = vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1] ?? {}
+    expect(oneSided).not.toHaveProperty('available_from')
+    expect(oneSided).not.toHaveProperty('available_to')
+
+    // Completing the range → both bounds thread through together.
+    vi.mocked(rosterApi.list).mockClear()
+    vm.availableTo = '2026-06-12'
+    await flushPromises()
+    expect(vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1]).toMatchObject({
+      available_from: '2026-06-08',
+      available_to: '2026-06-12',
+    })
+
+    // Clearing one side (clearable → null) drops the window again.
+    vi.mocked(rosterApi.list).mockClear()
+    vm.availableFrom = null
+    await flushPromises()
+    const cleared = vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1] ?? {}
+    expect(cleared).not.toHaveProperty('available_from')
+    expect(cleared).not.toHaveProperty('available_to')
   })
 })

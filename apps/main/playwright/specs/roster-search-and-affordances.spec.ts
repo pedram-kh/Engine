@@ -19,8 +19,11 @@ import {
  *     API runs against Postgres, this is also a LIVE exercise of the FTS
  *     `to_tsvector @@ plainto_tsquery` path (the one the unit suite can only
  *     cover via a dormant markTestSkipped under SQLite),
- *   - the availability + metrics filters render DISABLED, with a hover tooltip
- *     delivered through the span-wrap idiom, and do NOT filter (D-4).
+ *   - the METRICS filters render DISABLED, with a hover tooltip delivered
+ *     through the span-wrap idiom, and do NOT filter (D-4),
+ *   - the availability range filter (Sprint 6.5, D-6) renders as TWO ENABLED
+ *     native date inputs (no longer the old disabled affordance) and threads
+ *     a window through the live stack without error.
  *
  * The `/roster` route is `requireAuth → requireAgencyUser` (NOT MFA-gated), so
  * a plain agency admin (no 2FA) can reach it directly — no TOTP hop needed.
@@ -82,23 +85,32 @@ test.describe('Creator roster — search + disabled affordances', () => {
     await expect(table).toContainText('Ada Lovelace')
     await expect(table).toContainText('Grace Hopper')
 
-    // Disabled affordances: each renders disabled and does NOT filter.
-    for (const id of [
-      testIds.rosterFollowersFilter,
-      testIds.rosterEngagementFilter,
-      testIds.rosterAvailabilityFilter,
-    ]) {
+    // Metrics affordances: each renders disabled and does NOT filter (D-4).
+    for (const id of [testIds.rosterFollowersFilter, testIds.rosterEngagementFilter]) {
       await expect(page.locator(dt(id))).toHaveClass(/v-input--disabled/)
     }
 
-    // The span-wrap idiom delivers a hover tooltip on the disabled availability
+    // The span-wrap idiom delivers a hover tooltip on the disabled metrics
     // control (a disabled control emits no hover — the wrapping <span> does).
-    await page.locator(dt(testIds.rosterAvailabilityAffordance)).hover()
-    await expect(page.getByText('Availability filtering is coming soon.')).toBeVisible({
+    await page.locator(dt(testIds.rosterFollowersAffordance)).hover()
+    await expect(page.getByText("Social metrics aren't connected yet.")).toBeVisible({
       timeout: 5000,
     })
 
-    // The availability affordance does not narrow the table — both rows remain.
+    // Availability range filter (Sprint 6.5, D-6): the real control is two
+    // ENABLED native date inputs — NOT the old disabled affordance.
+    const fromInput = page.locator(dt(testIds.rosterAvailableFrom)).locator('input')
+    const toInput = page.locator(dt(testIds.rosterAvailableTo)).locator('input')
+    await expect(fromInput).toBeEnabled()
+    await expect(toInput).toBeEnabled()
+
+    // Threading a window through the live stack: neither seeded creator has a
+    // hard block, so both remain available (the filter is accepted end-to-end
+    // — no 422/500, the table reloads with both rows). The filtering CORRECTNESS
+    // (hard excludes / soft includes / recurrence / counts) is pinned by the
+    // backend feature suite (AgencyCreatorRosterTest).
+    await fromInput.fill('2026-06-08')
+    await toInput.fill('2026-06-12')
     await expect(table).toContainText('Ada Lovelace')
     await expect(table).toContainText('Grace Hopper')
   })
