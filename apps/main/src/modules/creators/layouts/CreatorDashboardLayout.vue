@@ -8,8 +8,11 @@
  *   v-app-bar with brand + locale switcher + user menu (sign-out).
  *   v-main with slot.
  *
- * Distinct from `AgencyLayout`: no sidebar (creator has no
- * brand/team/settings nav in Phase 1), no workspace switcher.
+ * Distinct from `AgencyLayout`: TOPBAR nav (not a sidebar). The creator
+ * surface is thin (2 items), so primary nav rides the existing app bar as
+ * router-linked buttons (Sprint 5 Chunk B, D-b13) — a sidebar would read
+ * heavy/empty here, and extending the topbar is lower-risk than adding a
+ * new structural region. No workspace switcher (creator is global).
  */
 
 import { ref } from 'vue'
@@ -28,6 +31,16 @@ const { user, isLoggingOut } = storeToRefs(authStore)
 const localeOptions = buildLocaleOptions(availableLocales, t)
 const userMenuOpen = ref(false)
 
+/**
+ * Creator topbar nav (D-b13). Two router-linked items; active-state is
+ * driven by vue-router's link matching on the current route (no manual
+ * `route.name` checks). Localized via the `availability` bundle.
+ */
+const navItems = [
+  { key: 'dashboard', icon: 'mdi-view-dashboard-outline', routeName: 'creator.dashboard' },
+  { key: 'availability', icon: 'mdi-calendar-month-outline', routeName: 'creator.availability' },
+] as const
+
 async function signOut(): Promise<void> {
   userMenuOpen.value = false
   await authStore.logout()
@@ -44,6 +57,20 @@ async function signOut(): Promise<void> {
           {{ t('app.title') }}
         </span>
       </div>
+
+      <nav class="d-flex align-center ml-2 ml-sm-6" data-test="creator-nav" aria-label="Primary">
+        <v-btn
+          v-for="item in navItems"
+          :key="item.key"
+          :to="{ name: item.routeName }"
+          :prepend-icon="item.icon"
+          variant="text"
+          class="text-none"
+          :data-test="`creator-nav-${item.key}`"
+        >
+          {{ t(`availability.creatorNav.${item.key}`) }}
+        </v-btn>
+      </nav>
 
       <v-spacer />
 

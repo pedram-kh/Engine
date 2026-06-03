@@ -53,6 +53,7 @@ const CANONICAL_422_FILES: readonly string[] = [
   'modules/onboarding/pages/Step2ProfileBasicsPage.vue',
   'modules/onboarding/pages/Step3SocialAccountsPage.vue',
   'modules/onboarding/pages/Step6TaxPage.vue',
+  'modules/creators/availability/components/AvailabilityBlockDialog.vue',
 ]
 
 const IMPORTS_EXTRACT_FIELD_ERRORS =

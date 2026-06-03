@@ -1,0 +1,79 @@
+{
+  "availability": {
+    "title": "Disponibilidade",
+    "subtitle": "Bloqueie os horários em que está indisponível para que as agências vejam o seu calendário real.",
+    "allDay": "Dia inteiro",
+    "moreCount": "+{count} mais",
+    "creatorNav": {
+      "dashboard": "Painel",
+      "availability": "Disponibilidade"
+    },
+    "nav": {
+      "prevMonth": "Mês anterior",
+      "nextMonth": "Mês seguinte"
+    },
+    "actions": {
+      "add": "Adicionar bloco"
+    },
+    "empty": {
+      "heading": "Ainda não há blocos de disponibilidade",
+      "body": "Adicione um bloco para marcar quando está ausente ou indisponível."
+    },
+    "errors": {
+      "loadFailed": "Não foi possível carregar a sua disponibilidade. Tente novamente."
+    },
+    "blockType": {
+      "hard": "Indisponível (rígido)",
+      "soft": "Preferência (flexível)"
+    },
+    "kind": {
+      "vacation": "Férias",
+      "personal": "Pessoal",
+      "exclusive_contract": "Contrato exclusivo",
+      "assignment_auto": "Atribuição (automática)",
+      "other": "Outro"
+    },
+    "weekday": {
+      "MO": "Seg",
+      "TU": "Ter",
+      "WE": "Qua",
+      "TH": "Qui",
+      "FR": "Sex",
+      "SA": "Sáb",
+      "SU": "Dom"
+    },
+    "dialog": {
+      "createTitle": "Adicionar bloco de disponibilidade",
+      "editTitle": "Editar bloco de disponibilidade",
+      "seriesNotice": "Este é um bloco recorrente — as alterações aplicam-se a todas as suas ocorrências, não apenas a este dia.",
+      "blockTypeHint": "Blocos rígidos excluem-no por completo; blocos flexíveis são apenas uma preferência.",
+      "fields": {
+        "allDay": "Dia inteiro",
+        "startDate": "Data de início",
+        "startTime": "Hora de início",
+        "endDate": "Data de fim",
+        "endTime": "Hora de fim",
+        "blockType": "Tipo",
+        "kind": "Motivo",
+        "reason": "Nota (opcional)",
+        "recurring": "Repete semanalmente"
+      },
+      "recurrence": {
+        "interval": "Repetir a cada (semanas)",
+        "weekdays": "Nestes dias",
+        "hasEnd": "Definir uma data de fim",
+        "endsOn": "Termina em"
+      },
+      "actions": {
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "confirmDelete": "Confirmar eliminação"
+      },
+      "errors": {
+        "saveFailed": "Não foi possível guardar o bloco. Tente novamente.",
+        "deleteFailed": "Não foi possível eliminar o bloco. Tente novamente."
+      }
+    }
+  }
+}

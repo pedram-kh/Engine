@@ -1,4 +1,5 @@
 export * from './agency'
 export * from './auth'
+export * from './availability'
 export * from './creator'
 export * from './user'

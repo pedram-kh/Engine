@@ -1,0 +1,79 @@
+{
+  "availability": {
+    "title": "Disponibilità",
+    "subtitle": "Blocca gli orari in cui non sei disponibile così le agenzie vedono il tuo calendario reale.",
+    "allDay": "Tutto il giorno",
+    "moreCount": "+{count} altri",
+    "creatorNav": {
+      "dashboard": "Dashboard",
+      "availability": "Disponibilità"
+    },
+    "nav": {
+      "prevMonth": "Mese precedente",
+      "nextMonth": "Mese successivo"
+    },
+    "actions": {
+      "add": "Aggiungi blocco"
+    },
+    "empty": {
+      "heading": "Nessun blocco di disponibilità",
+      "body": "Aggiungi un blocco per indicare quando sei assente o non disponibile."
+    },
+    "errors": {
+      "loadFailed": "Impossibile caricare la tua disponibilità. Riprova."
+    },
+    "blockType": {
+      "hard": "Non disponibile (rigido)",
+      "soft": "Preferenza (flessibile)"
+    },
+    "kind": {
+      "vacation": "Ferie",
+      "personal": "Personale",
+      "exclusive_contract": "Contratto esclusivo",
+      "assignment_auto": "Incarico (automatico)",
+      "other": "Altro"
+    },
+    "weekday": {
+      "MO": "Lun",
+      "TU": "Mar",
+      "WE": "Mer",
+      "TH": "Gio",
+      "FR": "Ven",
+      "SA": "Sab",
+      "SU": "Dom"
+    },
+    "dialog": {
+      "createTitle": "Aggiungi blocco di disponibilità",
+      "editTitle": "Modifica blocco di disponibilità",
+      "seriesNotice": "Questo è un blocco ricorrente — le modifiche si applicano a tutte le sue occorrenze, non solo a questo giorno.",
+      "blockTypeHint": "I blocchi rigidi ti escludono completamente; i blocchi flessibili sono solo una preferenza.",
+      "fields": {
+        "allDay": "Tutto il giorno",
+        "startDate": "Data di inizio",
+        "startTime": "Ora di inizio",
+        "endDate": "Data di fine",
+        "endTime": "Ora di fine",
+        "blockType": "Tipo",
+        "kind": "Motivo",
+        "reason": "Nota (facoltativa)",
+        "recurring": "Si ripete settimanalmente"
+      },
+      "recurrence": {
+        "interval": "Ripeti ogni (settimane)",
+        "weekdays": "In questi giorni",
+        "hasEnd": "Imposta una data di fine",
+        "endsOn": "Termina il"
+      },
+      "actions": {
+        "save": "Salva",
+        "cancel": "Annulla",
+        "delete": "Elimina",
+        "confirmDelete": "Conferma eliminazione"
+      },
+      "errors": {
+        "saveFailed": "Impossibile salvare il blocco. Riprova.",
+        "deleteFailed": "Impossibile eliminare il blocco. Riprova."
+      }
+    }
+  }
+}

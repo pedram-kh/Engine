@@ -25,4 +25,14 @@ export const creatorsRoutes: RouteRecordRaw[] = [
       guards: ['requireAuth'],
     },
   },
+  {
+    // Sprint 5 Chunk B — creator availability calendar (month view).
+    path: '/creator/availability',
+    name: 'creator.availability',
+    component: () => import('./availability/pages/AvailabilityPage.vue'),
+    meta: {
+      layout: 'creator',
+      guards: ['requireAuth'],
+    },
+  },
 ]
