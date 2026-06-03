@@ -226,6 +226,39 @@ describe('AvailabilityCalendar (Sprint 5 Chunk B)', () => {
     expect(mounted.wrapper.find('[data-test="availability-fill-2026-06-11"]').exists()).toBe(false)
   })
 
+  it('clicking anywhere on an all-day block cell opens the editor (not create), so Delete is reachable', async () => {
+    // Regression: previously only the thin label opened the editor; clicking
+    // the rest of the washed cell fell through to "create" (no Delete button),
+    // so all-day / multi-day blocks felt undeletable. The full-cell overlay
+    // now routes the whole block area to edit.
+    const occ = makeOccurrence('BLOCK_AD', '2026-06-09T00:00:00Z', '2026-06-10T00:00:00Z', {
+      is_all_day: true,
+    })
+    const mounted = await mountCalendar({ occurrences: [occ], timezone: 'UTC' })
+    cleanup = mounted.cleanup
+
+    const overlay = mounted.wrapper.find('[data-test="availability-fill-click-2026-06-09"]')
+    expect(overlay.exists()).toBe(true)
+    await overlay.trigger('click')
+
+    const dialog = mounted.wrapper.findComponent(DialogStub)
+    expect(dialog.props('modelValue')).toBe(true)
+    // Edit mode — the occurrence is passed (so the dialog renders Delete),
+    // and it is NOT the create path (occurrence !== null).
+    expect(dialog.props('occurrence')).toMatchObject({ id: 'BLOCK_AD' })
+    expect(dialog.props('initialDate')).toBeNull()
+  })
+
+  it('does not add a full-cell edit overlay on a timed-only day (empty space still creates)', async () => {
+    const occ = makeOccurrence('BLOCK_T', '2026-06-15T13:30:00Z', '2026-06-15T14:30:00Z')
+    const mounted = await mountCalendar({ occurrences: [occ], timezone: 'UTC' })
+    cleanup = mounted.cleanup
+
+    expect(mounted.wrapper.find('[data-test="availability-fill-click-2026-06-15"]').exists()).toBe(
+      false,
+    )
+  })
+
   it('uses the soft wash for a soft all-day block', async () => {
     const occ = makeOccurrence('BLOCK_S', '2026-06-09T00:00:00Z', '2026-06-10T00:00:00Z', {
       is_all_day: true,

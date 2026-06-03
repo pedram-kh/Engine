@@ -210,6 +210,22 @@ function openEdit(occurrence: AvailabilityOccurrenceResource): void {
   dialogOpen.value = true
 }
 
+/**
+ * Edit the all-day block covering a cell when the creator clicks anywhere
+ * on the colour wash (not just the thin label). The wash itself is a
+ * full-cell click target on all-day days so a creator can always reach the
+ * editor — and therefore Delete — for an all-day / multi-day block, instead
+ * of accidentally hitting the empty-cell "create" handler. Targets the first
+ * all-day entry; individual labels/chips (raised above the overlay) still
+ * select a specific block when a day stacks several.
+ */
+function openEditAllDay(date: string): void {
+  const occurrence = allDayEntries(date)[0]?.occurrence
+  if (occurrence !== undefined) {
+    openEdit(occurrence)
+  }
+}
+
 function onMutated(): void {
   void load()
 }
@@ -272,6 +288,20 @@ defineExpose({ loadedWindow, year, month })
             :class="dayFillClass(cell.date)"
             :data-test="`availability-fill-${cell.date}`"
             aria-hidden="true"
+          />
+
+          <!-- Full-cell click target for an all-day block: the whole washed
+               area opens the editor (so Delete is always reachable), instead
+               of the empty space triggering "create". Sits above the wash but
+               below the labels/chips (z-index), so a specific block can still
+               be selected when a day stacks several. -->
+          <button
+            v-if="allDayEntries(cell.date).length > 0"
+            type="button"
+            class="availability-fill-click"
+            :data-test="`availability-fill-click-${cell.date}`"
+            :aria-label="t('availability.dialog.editTitle')"
+            @click.stop="openEditAllDay(cell.date)"
           />
 
           <!-- All-day blocks: a clickable label riding on the wash. -->
@@ -384,8 +414,25 @@ defineExpose({ loadedWindow, year, month })
   background: rgb(var(--v-theme-warning));
 }
 
+/* Transparent full-cell click target on all-day days. Sits above the wash
+   (z-index:0 vs the wash's -1) so clicking anywhere on the block opens the
+   editor; transparent, so the day number painted in normal flow shows
+   through. The labels/chips below are raised to z-index:1 so they stay
+   individually clickable on top of this overlay. */
+.availability-fill-click {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
 /* All-day label riding on the wash — fills the width, reads on the colour. */
 .availability-allday {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   text-align: left;
@@ -402,6 +449,8 @@ defineExpose({ loadedWindow, year, month })
 }
 
 .availability-bar {
+  position: relative;
+  z-index: 1;
   width: 100%;
   justify-content: flex-start;
   cursor: pointer;
@@ -416,6 +465,8 @@ defineExpose({ loadedWindow, year, month })
 /* Clickable "+N more" — left-aligned, looks like inline text but is a real
    button so it opens the day popover (and stays keyboard-focusable). */
 .availability-more {
+  position: relative;
+  z-index: 1;
   align-self: flex-start;
   padding: 0 var(--space-1, 4px);
   background: transparent;
