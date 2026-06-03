@@ -309,17 +309,17 @@ it('escapes LIKE wildcards so a literal % in q is not a wildcard', function (): 
     expect($response->json('meta.total'))->toBe(0);
 });
 
-it('[postgres-only] matches name/bio via to_tsvector @@ plainto_tsquery', function (): void {
-    // The Postgres FTS branch (search_vector @@ plainto_tsquery('simple', ?))
+it('[postgres-only] matches name/bio via to_tsquery prefix lexemes', function (): void {
+    // The Postgres FTS branch (search_vector @@ to_tsquery('simple', 'word:*'))
     // cannot run under the SQLite :memory: test DB — there is no tsvector type
     // or generated `search_vector` column there (the migration is pgsql-guarded,
     // D-1). This assertion is dormant: it skips under SQLite and becomes live
     // the day a Postgres CI job lands (docs/tech-debt.md — SQLite-in-tests).
     // Until then the FTS path is covered by manual local-Postgres verification
-    // (recorded in the chunk review) — the one place "green CI" is not full
-    // proof, stated honestly (D-3).
+    // (recorded in the review) — the one place "green CI" is not full proof,
+    // stated honestly (D-3).
     if (DB::connection()->getDriverName() !== 'pgsql') {
-        $this->markTestSkipped('FTS tsvector path requires Postgres; SQLite uses the ILIKE fallback.');
+        $this->markTestSkipped('FTS tsquery path requires Postgres; SQLite uses the ILIKE fallback.');
     }
 
     $agency = Agency::factory()->createOne();
@@ -328,11 +328,28 @@ it('[postgres-only] matches name/bio via to_tsvector @@ plainto_tsquery', functi
     $match = makeRosterRelation($agency, [], ['display_name' => 'Ada Lovelace', 'bio' => 'Mathematician']);
     makeRosterRelation($agency, [], ['display_name' => 'Grace Hopper', 'bio' => 'Computer scientist']);
 
-    // FTS matches whole-word lexemes (not substrings): a full token narrows.
-    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'q=lovelace'));
+    // A full token narrows.
+    $full = $this->actingAs($admin)->getJson(rosterUrl($agency, 'q=lovelace'));
+    expect($full->json('meta.total'))->toBe(1);
+    expect($full->json('data.0.id'))->toBe($match->ulid);
 
-    expect($response->json('meta.total'))->toBe(1);
-    expect($response->json('data.0.id'))->toBe($match->ulid);
+    // PREFIX (type-ahead): a left-anchored partial matches via `word:*`. `lov`
+    // matches "Lovelace" under the prefix tsquery (it would NOT under the old
+    // plainto_tsquery whole-word path — the behavior this change adds).
+    $prefix = $this->actingAs($admin)->getJson(rosterUrl($agency, 'q=lov'));
+    expect($prefix->json('meta.total'))->toBe(1);
+    expect($prefix->json('data.0.id'))->toBe($match->ulid);
+
+    // A mid-word substring (NOT a prefix) does NOT match under Postgres — this
+    // is the residual divergence from the SQLite substring fallback (D-3).
+    $midword = $this->actingAs($admin)->getJson(rosterUrl($agency, 'q=ovela'));
+    expect($midword->json('meta.total'))->toBe(0);
+
+    // Multi-word: each word's prefix must match some token (AND). `ada math`
+    // → "Ada" + "Mathematician" both prefix-match the one creator.
+    $multi = $this->actingAs($admin)->getJson(rosterUrl($agency, 'q=ada+math'));
+    expect($multi->json('meta.total'))->toBe(1);
+    expect($multi->json('data.0.id'))->toBe($match->ulid);
 });
 
 it('ANDs combined filters together', function (): void {

@@ -300,10 +300,13 @@ final class AgencyCreatorController
      * Driver-aware because FTS has no portable grammar-level degrade (unlike
      * `whereJsonContains`):
      *
-     *   - Postgres: `search_vector @@ plainto_tsquery('simple', ?)` against the
+     *   - Postgres: `search_vector @@ to_tsquery('simple', ?)` against the
      *     generated `tsvector` column + GIN index from the pgsql-guarded
-     *     migration. `plainto_tsquery` ANDs the query's lexemes, so a
-     *     multi-word `q` narrows (all words must match some token).
+     *     migration. Each whitespace-separated word becomes a PREFIX lexeme
+     *     `word:*`, ANDed together — so `dis` matches `disply` (type-ahead) and
+     *     a multi-word `q` narrows (every word's prefix must match some token).
+     *     Tokens are stripped to letters/digits before being handed to
+     *     to_tsquery so user input can never break its operator grammar.
      *   - SQLite (test + local dev): `LOWER(...) LIKE` substring match over
      *     `display_name` + `bio`. There is no `tsvector`/`search_vector` column
      *     on SQLite (the migration skips it), so the fallback queries the raw
@@ -311,13 +314,14 @@ final class AgencyCreatorController
      *     as literals, not wildcards.
      *
      * Result-semantics divergence (D-3, honest-deviation trigger #2): the
-     * Postgres path matches whole-word lexemes (token boundaries) while the
-     * SQLite path matches substrings — e.g. `q=lov` matches "Lovelace" under
-     * SQLite but NOT under Postgres. The `'simple'` tsvector config keeps the
-     * two as close as practical (no stemming). The SQLite fallback is the path
-     * the CI suite actually exercises and is fully tested; the Postgres branch
-     * is verified by a manual local-Postgres pass + a dormant `markTestSkipped`
-     * counterpart until Postgres CI lands (~Sprint 8).
+     * Postgres path now matches by PREFIX (left-anchored within each token)
+     * while the SQLite path matches substrings ANYWHERE — e.g. `q=isp` matches
+     * "disply" under SQLite (mid-word substring) but NOT under Postgres (prefix
+     * only); `q=dis` matches under both. The `'simple'` tsvector config keeps
+     * the two as close as practical (no stemming). The SQLite fallback is the
+     * path the CI suite actually exercises and is fully tested; the Postgres
+     * prefix branch is verified by a manual local-Postgres pass + a dormant
+     * `markTestSkipped` counterpart until Postgres CI lands (~Sprint 8).
      *
      * @param  Builder<Model>  $creatorQuery
      */
@@ -332,9 +336,32 @@ final class AgencyCreatorController
         $isPostgres = $connection->getDriverName() === 'pgsql';
 
         if ($isPostgres) {
+            // PREFIX (type-ahead) match: turn each whitespace-separated word
+            // into a prefix lexeme `word:*` and AND them, so `dis` matches
+            // `disply` and a multi-word query narrows (every word's prefix must
+            // match some token). We build the tsquery by hand rather than use
+            // plainto_tsquery (which has no prefix support); each token is
+            // stripped to letters/digits so raw user input can never reach
+            // to_tsquery's operator grammar (`& | ! ( ) : *`). Tokens that
+            // reduce to empty are dropped; if nothing usable survives, match
+            // nothing (a query of only punctuation is not "match everything").
+            $lexemes = [];
+            foreach (preg_split('/\s+/', $search, -1, PREG_SPLIT_NO_EMPTY) ?: [] as $token) {
+                $clean = preg_replace('/[^\p{L}\p{N}]+/u', '', $token);
+                if (is_string($clean) && $clean !== '') {
+                    $lexemes[] = $clean.':*';
+                }
+            }
+
+            if ($lexemes === []) {
+                $creatorQuery->whereRaw('1 = 0');
+
+                return;
+            }
+
             $creatorQuery->whereRaw(
-                "search_vector @@ plainto_tsquery('simple', ?)",
-                [$search],
+                "search_vector @@ to_tsquery('simple', ?)",
+                [implode(' & ', $lexemes)],
             );
 
             return;
