@@ -31,4 +31,13 @@ return [
             'cta' => 'Review your application',
         ],
     ],
+    'connection_request' => [
+        'email' => [
+            'subject' => ':agency wants to connect with you on Catalyst',
+            'greeting' => 'Hi :name,',
+            'body' => ':agency would like to add you to their roster on Catalyst. Open your dashboard to accept or decline the request.',
+            'cta' => 'View the request',
+            'ignore' => 'If you don\'t recognise this agency, you can simply decline — nothing changes until you accept.',
+        ],
+    ],
 ];

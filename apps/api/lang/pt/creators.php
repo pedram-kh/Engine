@@ -31,4 +31,13 @@ return [
             'cta' => 'Rever a sua candidatura',
         ],
     ],
+    'connection_request' => [
+        'email' => [
+            'subject' => ':agency quer conectar-se consigo no Catalyst',
+            'greeting' => 'Olá :name,',
+            'body' => ':agency gostaria de adicioná-lo ao plantel deles no Catalyst. Abra o seu painel para aceitar ou recusar o pedido.',
+            'cta' => 'Ver o pedido',
+            'ignore' => 'Se não reconhece esta agência, pode simplesmente recusar — nada muda até que aceite.',
+        ],
+    ],
 ];

@@ -168,7 +168,7 @@ it('exposes the slim card shape and carries NONE of the relation block', functio
     $attrs = $response->json('data.0.attributes');
     expect(array_keys($attrs))->toEqualCanonicalizing([
         'display_name', 'country_code', 'primary_language', 'categories',
-        'avatar_url', 'is_connected', 'relationship_status',
+        'avatar_url', 'relationship_status',
     ]);
 
     // The per-agency relation block is absent (only the caller's own status
@@ -196,7 +196,6 @@ it('does NOT 404 the public detail for an agency with NO relation (D-6 break-rev
 
     $response->assertOk()
         ->assertJsonPath('data.attributes.display_name', 'Solo Sal')
-        ->assertJsonPath('data.attributes.is_connected', false)
         ->assertJsonPath('data.attributes.relationship_status', null);
 });
 
@@ -292,13 +291,11 @@ it('annotates the calling agency\'s OWN relation status (list + detail)', functi
     ]);
 
     $list = $this->actingAs($admin)->getJson(discoverUrl($agency));
-    expect($list->json('data.0.attributes.is_connected'))->toBeTrue();
     expect($list->json('data.0.attributes.relationship_status'))->toBe($status);
 
     $detail = $this->actingAs($admin)->getJson(publicProfileUrl($agency, $creator));
-    expect($detail->json('data.attributes.is_connected'))->toBeTrue();
     expect($detail->json('data.attributes.relationship_status'))->toBe($status);
-})->with(['roster', 'prospect', 'external']);
+})->with(['roster', 'prospect', 'external', 'pending_request', 'declined']);
 
 it('shows not-connected for a creator the calling agency has no relation with', function (): void {
     $agency = Agency::factory()->createOne();
@@ -307,7 +304,6 @@ it('shows not-connected for a creator the calling agency has no relation with', 
 
     $response = $this->actingAs($admin)->getJson(discoverUrl($agency));
 
-    expect($response->json('data.0.attributes.is_connected'))->toBeFalse();
     expect($response->json('data.0.attributes.relationship_status'))->toBeNull();
 });
 

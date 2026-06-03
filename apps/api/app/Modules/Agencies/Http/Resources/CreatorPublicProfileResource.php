@@ -74,8 +74,11 @@ final class CreatorPublicProfileResource extends JsonResource
                 'profile_completeness_score' => $creator->profile_completeness_score,
                 'social_accounts' => $this->mapSocialAccounts($creator),
                 'portfolio' => $this->mapPortfolio($creator),
-                // "Already-connected" annotation (calling agency only, D-4/D-9).
-                'is_connected' => $connectedStatus !== null,
+                // The calling-agency-only relation status (D-4/D-9), emitted
+                // RAW (Sprint 6.6b, D-5). The boolean `is_connected` was REMOVED
+                // — it conflated `roster` with `pending_request`/`declined`. The
+                // FE derives the status-driven send-request button + the three
+                // annotation states from this alone. null ⟹ no relation.
                 'relationship_status' => $connectedStatus,
             ],
         ];

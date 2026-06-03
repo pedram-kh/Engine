@@ -95,6 +95,14 @@ final class AgencyCreatorRelation extends Model implements Auditable
     ];
 
     /**
+     * @return BelongsTo<Agency, $this>
+     */
+    public function agency(): BelongsTo
+    {
+        return $this->belongsTo(Agency::class);
+    }
+
+    /**
      * @return BelongsTo<Creator, $this>
      */
     public function creator(): BelongsTo
@@ -121,6 +129,17 @@ final class AgencyCreatorRelation extends Model implements Auditable
     public function isProspect(): bool
     {
         return $this->relationship_status === RelationshipStatus::Prospect;
+    }
+
+    /**
+     * True when this relation is an agency-sent discovery connection request
+     * the creator has NOT yet accepted (Sprint 6.6b, D-1/D-2). Mirrors
+     * {@see self::isProspect()}; the accept/decline write paths fail-closed
+     * against this so they can only act on a `pending_request` row.
+     */
+    public function isPendingRequest(): bool
+    {
+        return $this->relationship_status === RelationshipStatus::PendingRequest;
     }
 
     public function isInvitationExpired(): bool

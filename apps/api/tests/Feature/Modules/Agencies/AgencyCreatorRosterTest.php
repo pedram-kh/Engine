@@ -101,6 +101,57 @@ it('lists relations across all relationship statuses (roster, prospect, external
 });
 
 // ---------------------------------------------------------------------------
+// Sprint 6.6b D-6 — default-exclude pending_request/declined, BUT filterable
+// ---------------------------------------------------------------------------
+
+it('EXCLUDES pending_request + declined from the DEFAULT (unfiltered) index (D-6)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::Roster]);
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::Prospect]);
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::External]);
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::PendingRequest]);
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::Declined]);
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency));
+
+    // Default = real-relationship set only; the two lifecycle-in-flight
+    // statuses are hidden (the roster is not a request inbox).
+    expect($response->json('meta.total'))->toBe(3);
+    expect($response->json('data.*.attributes.relationship_status'))
+        ->toEqualCanonicalizing(['roster', 'prospect', 'external']);
+});
+
+it('filters BY pending_request — the chip returns exactly those (D-6 break-revert: an unconditional whereNotIn breaks this)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::Roster]);
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::PendingRequest]);
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::PendingRequest]);
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'status=pending_request'));
+
+    expect($response->json('meta.total'))->toBe(2);
+    expect($response->json('data.*.attributes.relationship_status'))
+        ->toEqualCanonicalizing(['pending_request', 'pending_request']);
+});
+
+it('filters BY declined — the chip returns exactly those (D-6)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::Roster]);
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::Declined]);
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'status=declined'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.attributes.relationship_status'))->toBe('declined');
+});
+
+// ---------------------------------------------------------------------------
 // Slim resource shape (D-c5-5)
 // ---------------------------------------------------------------------------
 

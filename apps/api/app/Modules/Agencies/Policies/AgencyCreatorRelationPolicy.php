@@ -69,6 +69,18 @@ final class AgencyCreatorRelationPolicy
         return $this->hasAnyRole($user, [AgencyRole::AgencyAdmin, AgencyRole::AgencyManager]);
     }
 
+    /**
+     * Send (or re-send) a discovery connection request to a creator
+     * (Sprint 6.6b, D-7). Same admin/manager floor as {@see self::update} —
+     * a stateful write that creates/transitions the relation, so staff is
+     * 403. A class-level ability (no relation instance exists yet on a
+     * net-new send), mirroring the role matrix of `update`.
+     */
+    public function sendRequest(User $user): bool
+    {
+        return $this->hasAnyRole($user, [AgencyRole::AgencyAdmin, AgencyRole::AgencyManager]);
+    }
+
     /** @param list<AgencyRole> $roles */
     private function hasAnyRole(User $user, array $roles): bool
     {

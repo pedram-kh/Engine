@@ -48,6 +48,39 @@ final class AgencyCreatorRelationFactory extends Factory
         ]);
     }
 
+    /**
+     * Agency-sent connection request awaiting the creator's accept/decline
+     * (Sprint 6.6b, D-1/D-3). Distinguished from {@see self::prospect()} by
+     * carrying NO magic-link token/expiry — the creator already has an
+     * account and accepts/declines in-app. Stamps the invite attribution +
+     * the notification timestamp the send-request write sets.
+     */
+    public function pendingRequest(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'relationship_status' => RelationshipStatus::PendingRequest,
+            'invitation_token_hash' => null,
+            'invitation_expires_at' => null,
+            'invitation_sent_at' => now(),
+            'invited_by_user_id' => UserFactory::new()->agencyAdmin(),
+            'notification_sent_at' => now(),
+        ]);
+    }
+
+    /**
+     * Terminal "creator declined" state (Sprint 6.6b, D-1/D-3). The row is
+     * retained to occupy the unique (agency_id, creator_id) pair; the agency
+     * can deliberately re-request from here (declined → pending_request, D-4).
+     */
+    public function declined(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'relationship_status' => RelationshipStatus::Declined,
+            'invitation_token_hash' => null,
+            'invitation_expires_at' => null,
+        ]);
+    }
+
     public function blacklisted(string $reason = 'Test blacklist'): static
     {
         return $this->state(fn (array $attributes): array => [

@@ -6,6 +6,7 @@ use App\Modules\Creators\Http\Controllers\Admin\AdminCreatorController;
 use App\Modules\Creators\Http\Controllers\AvatarController;
 use App\Modules\Creators\Http\Controllers\BulkInviteController;
 use App\Modules\Creators\Http\Controllers\CreatorAvailabilityController;
+use App\Modules\Creators\Http\Controllers\CreatorConnectionRequestController;
 use App\Modules\Creators\Http\Controllers\CreatorWizardController;
 use App\Modules\Creators\Http\Controllers\InvitationPreviewController;
 use App\Modules\Creators\Http\Controllers\PortfolioController;
@@ -55,6 +56,9 @@ use Illuminate\Support\Facades\Route;
 |   POST   /api/v1/creators/me/availability       Sprint 5 Chunk A
 |   PATCH  /api/v1/creators/me/availability/{b}   Sprint 5 Chunk A
 |   DELETE /api/v1/creators/me/availability/{b}   Sprint 5 Chunk A
+|   GET    /api/v1/creators/me/connection-requests              Sprint 6.6b
+|   POST   /api/v1/creators/me/connection-requests/{r}/accept   Sprint 6.6b
+|   POST   /api/v1/creators/me/connection-requests/{r}/decline  Sprint 6.6b
 |
 */
 
@@ -142,6 +146,22 @@ Route::prefix('creators/me')
             Route::post('/', [CreatorAvailabilityController::class, 'store'])->name('store');
             Route::patch('{block}', [CreatorAvailabilityController::class, 'update'])->name('update');
             Route::delete('{block}', [CreatorAvailabilityController::class, 'destroy'])->name('destroy');
+        });
+
+        // ─── Connection requests (the CREATOR half of the lifecycle) ─────────
+        // Sprint 6.6b (D-8). The creator's own agency-sent discovery requests:
+        // list the pending ones, accept (→ roster) or decline (→ declined).
+        // Cross-module read/write of an Agencies model (AgencyCreatorRelation),
+        // resolved STRUCTURALLY from $request->user()->creator — never a path
+        // agency id — so cross-creator access is impossible. Accept/decline are
+        // fail-closed: only a `pending_request` may transition (D-2).
+        // Allowlisted in docs/security/tenancy.md § 4 alongside creators/me/*.
+        Route::prefix('connection-requests')->name('connection-requests.')->group(function (): void {
+            Route::get('/', [CreatorConnectionRequestController::class, 'index'])->name('index');
+            Route::post('{relation}/accept', [CreatorConnectionRequestController::class, 'accept'])
+                ->name('accept');
+            Route::post('{relation}/decline', [CreatorConnectionRequestController::class, 'decline'])
+                ->name('decline');
         });
     });
 

@@ -31,4 +31,13 @@ return [
             'cta' => 'Rivedi la tua candidatura',
         ],
     ],
+    'connection_request' => [
+        'email' => [
+            'subject' => ':agency vuole connettersi con te su Catalyst',
+            'greeting' => 'Ciao :name,',
+            'body' => ':agency vorrebbe aggiungerti al loro roster su Catalyst. Apri la tua dashboard per accettare o rifiutare la richiesta.',
+            'cta' => 'Vedi la richiesta',
+            'ignore' => 'Se non riconosci questa agenzia, puoi semplicemente rifiutare — nulla cambia finché non accetti.',
+        ],
+    ],
 ];

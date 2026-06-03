@@ -100,6 +100,19 @@ final class AgencyCreatorController
      */
     private const int MAX_WINDOW_DAYS = 366;
 
+    /**
+     * The relationship statuses EXCLUDED from the default (unfiltered) roster
+     * index (Sprint 6.6b, D-6). The roster is "my working relationships," not a
+     * request inbox — so the two lifecycle-in-flight statuses are hidden unless
+     * the agency explicitly filters to them via a chip.
+     *
+     * @var list<RelationshipStatus>
+     */
+    private const array DEFAULT_EXCLUDED_STATUSES = [
+        RelationshipStatus::PendingRequest,
+        RelationshipStatus::Declined,
+    ];
+
     public function __construct(
         private readonly AvailabilityExpansionService $expansion,
     ) {}
@@ -161,16 +174,39 @@ final class AgencyCreatorController
     }
 
     /**
-     * Status filter on the relation itself. Unknown value → empty page
-     * (the SPA only ever sends valid chips), mirroring the admin index's
-     * `tryFrom` → `whereRaw('1 = 0')` precedent.
+     * Status filter on the relation itself (Sprint 6.6b, D-6) — a
+     * default-when-unfiltered, explicit-when-filtered rule that MUST satisfy
+     * both halves:
+     *
+     *   - NO `?status=`  → the default real-relationship set: exclude
+     *     `pending_request` + `declined` (the roster is not a request inbox).
+     *   - `?status=X`    → return EXACTLY that status, INCLUDING
+     *     `pending_request` / `declined` (the "show my pending requests" /
+     *     "who declined me" chips).
+     *
+     * ⚠ The default-exclude is NOT an unconditional `whereNotIn` — that would
+     * break the chip (filtering BY pending_request would return nothing).
+     * Break-revert: making the exclusion unconditional fails the "filtering by
+     * pending_request returns them" test.
+     *
+     * Unknown value → empty page (the SPA only sends valid chips), mirroring
+     * the admin index's `tryFrom` → `whereRaw('1 = 0')` precedent.
      *
      * @param  Builder<AgencyCreatorRelation>  $query
      */
     private function applyStatusFilter(Builder $query, Request $request): void
     {
         $statusInput = $request->query('status');
+
+        // Unfiltered: default real-relationship set — exclude the two
+        // lifecycle-in-flight statuses (but NOT unconditionally; this branch
+        // only runs when no explicit status was requested).
         if (! is_string($statusInput) || $statusInput === '') {
+            $query->whereNotIn(
+                'agency_creator_relations.relationship_status',
+                array_map(static fn (RelationshipStatus $s): string => $s->value, self::DEFAULT_EXCLUDED_STATUSES),
+            );
+
             return;
         }
 
@@ -181,6 +217,8 @@ final class AgencyCreatorController
             return;
         }
 
+        // Explicit filter → exactly that status, including pending_request /
+        // declined when those chips are selected.
         $query->where('agency_creator_relations.relationship_status', $status->value);
     }
 

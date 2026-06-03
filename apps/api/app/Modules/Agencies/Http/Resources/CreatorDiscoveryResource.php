@@ -62,8 +62,12 @@ final class CreatorDiscoveryResource extends JsonResource
                 'primary_language' => $creator->primary_language,
                 'categories' => $creator->categories,
                 'avatar_url' => $this->signedViewUrl($creator->avatar_path),
-                // "Already-connected" annotation (calling agency only, D-4).
-                'is_connected' => $connectedStatus !== null,
+                // The calling-agency-only relation status (D-4), emitted RAW
+                // (Sprint 6.6b, D-5). The boolean `is_connected` was REMOVED:
+                // it conflated `roster` with `pending_request`/`declined` (a
+                // declined creator would have rendered "connected"). The FE now
+                // derives the three states (connected / pending / declined /
+                // none) from this status alone. null ⟹ no relation.
                 'relationship_status' => $connectedStatus,
             ],
         ];

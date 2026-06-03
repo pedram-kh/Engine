@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Agencies\Http\Controllers\AgencyConnectionRequestController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorAvailabilityController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorDetailController;
@@ -95,6 +96,18 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
             ->name('agencies.creators.discover.index');
         Route::get('creators/discover/{creator}', [AgencyCreatorDiscoveryController::class, 'show'])
             ->name('agencies.creators.discover.show');
+
+        // ─── Send connection request (the AGENCY half of the lifecycle) ───────
+        // Sprint 6.6b (D-7). A STATEFUL WRITE off the discovery surface, in its
+        // own controller (NOT the read-only discovery controller): admin/manager
+        // only (sendRequest ability — staff 403), same fail-closed discoverable
+        // gate as the reads, and it fires ConnectionRequestMail (D-9). Creates
+        // the relation in `pending_request` (no magic-link token/expiry) from
+        // `(none)`, re-requests from `declined` (D-4), and no-ops surfacing the
+        // existing state for any other status. Path-scoped under tenancy.agency
+        // + tenancy — no §4 allowlist entry needed.
+        Route::post('creators/discover/{creator}/connection-request', [AgencyConnectionRequestController::class, 'store'])
+            ->name('agencies.creators.discover.connection-request');
 
         // ─── Creator detail (per-creator drill-in) ───────────────────────────
         // Sprint 6 Chunk 2a (D-2a-1). The roster row-click (D-c5-4 reversal)
