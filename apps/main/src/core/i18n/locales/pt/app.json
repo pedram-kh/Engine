@@ -19,10 +19,55 @@
     "nav": {
       "dashboard": "Painel",
       "roster": "Meus criadores",
+      "discover": "Descobrir",
       "pools": "Grupos de talentos",
       "brands": "Marcas",
       "agencyUsers": "Equipe",
       "settings": "Configurações"
+    },
+    "discover": {
+      "title": "Descobrir criadores",
+      "subtitle": "Navegue e pesquise no conjunto global de criadores.",
+      "unnamed": "Criador sem nome",
+      "notConnected": "Sem ligação",
+      "search": {
+        "label": "Pesquisar criadores",
+        "placeholder": "Pesquisar por nome ou biografia"
+      },
+      "filters": {
+        "country": "País",
+        "language": "Idioma",
+        "category": "Categoria"
+      },
+      "empty": {
+        "heading": "Ainda não há criadores",
+        "body": "Os criadores aprovados aparecerão aqui à medida que o conjunto crescer."
+      },
+      "emptyFiltered": {
+        "heading": "Sem resultados",
+        "body": "Nenhum criador corresponde aos seus filtros. Tente alargar a pesquisa."
+      },
+      "errors": {
+        "loadFailed": "Não foi possível carregar os criadores. Tente novamente."
+      },
+      "detail": {
+        "back": "Voltar a Descobrir",
+        "notFound": "Este criador não está disponível.",
+        "loadFailed": "Não foi possível carregar este perfil. Tente novamente.",
+        "viewInRoster": "Ver na lista",
+        "sections": {
+          "profile": "Perfil",
+          "social": "Contas sociais",
+          "portfolio": "Portefólio"
+        },
+        "social": {
+          "empty": "Nenhuma conta social associada."
+        },
+        "portfolio": {
+          "empty": "Ainda não há itens no portefólio.",
+          "untitled": "Item sem título"
+        }
+      }
     },
     "roster": {
       "title": "Meus criadores",

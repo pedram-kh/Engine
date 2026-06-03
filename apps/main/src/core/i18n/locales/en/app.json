@@ -19,10 +19,55 @@
     "nav": {
       "dashboard": "Dashboard",
       "roster": "My creators",
+      "discover": "Discover",
       "pools": "Talent pools",
       "brands": "Brands",
       "agencyUsers": "Team",
       "settings": "Settings"
+    },
+    "discover": {
+      "title": "Discover creators",
+      "subtitle": "Browse and search the global creator pool.",
+      "unnamed": "Unnamed creator",
+      "notConnected": "Not connected",
+      "search": {
+        "label": "Search creators",
+        "placeholder": "Search by name or bio"
+      },
+      "filters": {
+        "country": "Country",
+        "language": "Language",
+        "category": "Category"
+      },
+      "empty": {
+        "heading": "No creators yet",
+        "body": "Approved creators will appear here as the pool grows."
+      },
+      "emptyFiltered": {
+        "heading": "No matches",
+        "body": "No creators match your filters. Try broadening your search."
+      },
+      "errors": {
+        "loadFailed": "Couldn't load creators. Please try again."
+      },
+      "detail": {
+        "back": "Back to Discover",
+        "notFound": "This creator isn't available.",
+        "loadFailed": "Couldn't load this profile. Please try again.",
+        "viewInRoster": "View in roster",
+        "sections": {
+          "profile": "Profile",
+          "social": "Social accounts",
+          "portfolio": "Portfolio"
+        },
+        "social": {
+          "empty": "No social accounts linked."
+        },
+        "portfolio": {
+          "empty": "No portfolio items yet.",
+          "untitled": "Untitled item"
+        }
+      }
     },
     "roster": {
       "title": "My creators",

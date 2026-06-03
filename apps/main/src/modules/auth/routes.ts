@@ -192,6 +192,26 @@ export const appRoutes: RouteRecordRaw[] = [
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
+  // ── Creator discovery (the global pool) ────────────────────────────────────
+  // Sprint 6.6a (D-8). A SEPARATE surface from the roster (NOT a tab): the
+  // roster is "creators I have a relationship with"; Discover is "the global
+  // pool" (the public resource). Same agency-shell guard chain; not MFA-gated
+  // (read-only browse). Both routes are pinned into the requireAgencyUser
+  // arch-test's expected set. Read-only this chunk — no send-request (D-9).
+  {
+    path: '/discover',
+    name: 'discover.list',
+    component: () => import('@/modules/discover/pages/DiscoverPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+  // `:ulid` is the CREATOR ULID (a discovery card carries it as its `id`).
+  {
+    path: '/discover/:ulid',
+    name: 'discover.detail',
+    component: () => import('@/modules/discover/pages/DiscoverProfilePage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+
   // ── Brands ───────────────────────────────────────────────────────────────
   {
     path: '/brands',

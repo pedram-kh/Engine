@@ -334,6 +334,102 @@ export interface UpdateAgencyCreatorRelationPayload {
 }
 
 // ---------------------------------------------------------------------------
+// Creator DISCOVERY (the global pool) — Sprint 6.6a
+// ---------------------------------------------------------------------------
+
+/**
+ * The "already-connected" annotation surfaced on every discovery shape (D-4).
+ * It is the CALLING agency's OWN relationship status with the creator, or
+ * `null` when there is no relation. ⚠ It is NEVER any OTHER agency's status —
+ * the cross-agency isolation invariant (D-7) the backend enforces by scoping
+ * the annotation subquery to the calling agency.
+ */
+export type DiscoveryRelationshipStatus = RosterRelationshipStatus
+
+/**
+ * One CARD in the discovery grid
+ * (GET /api/v1/agencies/{agency}/creators/discover, D-5/D-8). The PUBLIC
+ * creator facts + a single signed avatar (D-10: bounded per page) + the
+ * calling-agency-only connection annotation. It carries NONE of the per-agency
+ * relation block (no internal_notes/rating, no blacklist, no counters, no
+ * email) — that is the privacy delta this shape exists to enforce (D-5/D-7).
+ */
+export interface DiscoveryCreatorListItem {
+  id: string
+  type: 'creator_discovery'
+  attributes: {
+    display_name: string | null
+    country_code: string | null
+    primary_language: string | null
+    categories: string[] | null
+    /** Single signed avatar URL; null when unset / non-S3. */
+    avatar_url: string | null
+    /** True when the CALLING agency already has a relation with this creator. */
+    is_connected: boolean
+    /** The CALLING agency's own status (never another agency's), or null. */
+    relationship_status: DiscoveryRelationshipStatus | null
+  }
+}
+
+/**
+ * Hand-rolled `{data, meta}` envelope from the discovery index — mirrors the
+ * roster list shape (not the standard `PaginatedCollection`).
+ */
+export interface DiscoveryListResponse {
+  data: DiscoveryCreatorListItem[]
+  meta: {
+    total: number
+    page: number
+    per_page: number
+    last_page: number
+  }
+}
+
+export interface DiscoveryListParams {
+  country?: string
+  language?: string
+  category?: string
+  /** Free-text name/bio search — the shared `?q=` FTS (Postgres tsvector; SQLite LIKE). */
+  q?: string
+  page?: number
+  per_page?: number
+}
+
+/**
+ * `GET /api/v1/agencies/{agency}/creators/discover/{creator}` (D-5/D-6). The
+ * PUBLIC creator profile — a THIRD creator shape, distinct from the slim
+ * roster row and the relation-gated 2a detail. It does NOT 404 on no-relation
+ * (D-6). It carries the public profile (bio, region, languages, categories,
+ * signed avatar/cover, social ACCOUNTS, portfolio, completeness) + the
+ * calling-agency-only connection annotation, and WITHHOLDS the entire relation
+ * block, the contact email, and admin KYC PII (D-5/D-7).
+ */
+export interface CreatorPublicProfile {
+  id: string
+  type: 'creator_public_profiles'
+  attributes: {
+    display_name: string | null
+    bio: string | null
+    country_code: string | null
+    region: string | null
+    primary_language: string | null
+    secondary_languages: string[] | null
+    categories: string[] | null
+    avatar_url: string | null
+    cover_url: string | null
+    profile_completeness_score: number
+    social_accounts: CreatorSocialAccountSummary[]
+    portfolio: CreatorPortfolioItemSummary[]
+    is_connected: boolean
+    relationship_status: DiscoveryRelationshipStatus | null
+  }
+}
+
+export interface CreatorPublicProfileEnvelope {
+  data: CreatorPublicProfile
+}
+
+// ---------------------------------------------------------------------------
 // Agency creator AVAILABILITY read-view — Sprint 5 Chunk A backend,
 // Sprint 6 Chunk 2a consumer
 // ---------------------------------------------------------------------------

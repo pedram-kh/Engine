@@ -19,10 +19,55 @@
     "nav": {
       "dashboard": "Dashboard",
       "roster": "I miei creator",
+      "discover": "Scopri",
       "pools": "Pool di talenti",
       "brands": "Brand",
       "agencyUsers": "Team",
       "settings": "Impostazioni"
+    },
+    "discover": {
+      "title": "Scopri creator",
+      "subtitle": "Esplora e cerca nel pool globale di creator.",
+      "unnamed": "Creator senza nome",
+      "notConnected": "Non collegato",
+      "search": {
+        "label": "Cerca creator",
+        "placeholder": "Cerca per nome o biografia"
+      },
+      "filters": {
+        "country": "Paese",
+        "language": "Lingua",
+        "category": "Categoria"
+      },
+      "empty": {
+        "heading": "Ancora nessun creator",
+        "body": "I creator approvati appariranno qui man mano che il pool cresce."
+      },
+      "emptyFiltered": {
+        "heading": "Nessun risultato",
+        "body": "Nessun creator corrisponde ai filtri. Prova ad ampliare la ricerca."
+      },
+      "errors": {
+        "loadFailed": "Impossibile caricare i creator. Riprova."
+      },
+      "detail": {
+        "back": "Torna a Scopri",
+        "notFound": "Questo creator non è disponibile.",
+        "loadFailed": "Impossibile caricare questo profilo. Riprova.",
+        "viewInRoster": "Vedi nella lista",
+        "sections": {
+          "profile": "Profilo",
+          "social": "Account social",
+          "portfolio": "Portfolio"
+        },
+        "social": {
+          "empty": "Nessun account social collegato."
+        },
+        "portfolio": {
+          "empty": "Ancora nessun elemento nel portfolio.",
+          "untitled": "Elemento senza titolo"
+        }
+      }
     },
     "roster": {
       "title": "I miei creator",
