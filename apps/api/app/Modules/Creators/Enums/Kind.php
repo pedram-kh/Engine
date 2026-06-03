@@ -18,9 +18,11 @@ namespace App\Modules\Creators\Enums;
  *                         auto" block (D-a2). See {@see self::creatorSettable()}.
  *   other               → catch-all.
  *
- * Stored as varchar(16) on creator_availability_blocks.kind (required,
+ * Stored as varchar(32) on creator_availability_blocks.kind (required,
  * non-null column). Was a bare unvalidated string before Sprint 5 Chunk A
- * (inventory B4).
+ * (inventory B4). The column was widened from varchar(16) to varchar(32) on
+ * 2026-06-03 — the longest value `exclusive_contract` (18 chars) overflowed
+ * the original 16, which Postgres rejected but SQLite (test driver) did not.
  */
 enum Kind: string
 {
