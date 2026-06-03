@@ -120,6 +120,71 @@ it('defaults preferred_language to en when omitted', function (): void {
 });
 
 // -----------------------------------------------------------------------------
+// Sprint 5 Chunk C — browser timezone auto-detect (D-c2 / D-c3).
+// -----------------------------------------------------------------------------
+
+it('stores the browser-captured IANA timezone instead of UTC (break-revert anchor)', function (): void {
+    Mail::fake();
+
+    // Break-revert: revert register() to read config('app.timezone','UTC')
+    // and this assertion fails — the stored zone would be UTC, not Asia/Tokyo.
+    $this->postJson('/api/v1/auth/sign-up', [
+        ...VALID_PAYLOAD,
+        'timezone' => 'Asia/Tokyo',
+    ])->assertStatus(201);
+
+    expect(User::query()->where('email', 'pedro@example.com')->value('timezone'))
+        ->toBe('Asia/Tokyo');
+});
+
+it('accepts other real IANA zones (Europe/Madrid)', function (): void {
+    Mail::fake();
+
+    $this->postJson('/api/v1/auth/sign-up', [
+        ...VALID_PAYLOAD,
+        'timezone' => 'Europe/Madrid',
+    ])->assertStatus(201);
+
+    expect(User::query()->where('email', 'pedro@example.com')->value('timezone'))
+        ->toBe('Europe/Madrid');
+});
+
+it('falls back to UTC for an invalid timezone — sign-up still succeeds (never rejects)', function (): void {
+    Mail::fake();
+
+    // D-c2: a junk zone must NOT 422 the registration; it degrades to UTC.
+    $this->postJson('/api/v1/auth/sign-up', [
+        ...VALID_PAYLOAD,
+        'timezone' => 'Not/AZone',
+    ])->assertStatus(201);
+
+    expect(User::query()->where('email', 'pedro@example.com')->value('timezone'))
+        ->toBe('UTC');
+});
+
+it('falls back to UTC when the timezone field is omitted (back-compat)', function (): void {
+    Mail::fake();
+
+    // VALID_PAYLOAD carries no timezone — the existing back-compat path.
+    $this->postJson('/api/v1/auth/sign-up', VALID_PAYLOAD)->assertStatus(201);
+
+    expect(User::query()->where('email', 'pedro@example.com')->value('timezone'))
+        ->toBe('UTC');
+});
+
+it('falls back to UTC for a null or empty timezone — still succeeds', function (): void {
+    Mail::fake();
+
+    $this->postJson('/api/v1/auth/sign-up', [
+        ...VALID_PAYLOAD,
+        'timezone' => '',
+    ])->assertStatus(201);
+
+    expect(User::query()->where('email', 'pedro@example.com')->value('timezone'))
+        ->toBe('UTC');
+});
+
+// -----------------------------------------------------------------------------
 // Validation: HIBP, length, dup email, weak format.
 // -----------------------------------------------------------------------------
 

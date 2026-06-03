@@ -77,6 +77,9 @@ final class SignUpService
         $name = trim((string) $attributes['name']);
         $password = (string) $attributes['password'];
         $preferredLanguage = $this->normaliseLanguage($attributes['preferred_language'] ?? null);
+        // Sprint 5 Chunk C (D-c3): read the browser-captured tz, IANA-validated
+        // with a UTC fallback (D-c2). Replaces the always-UTC config default.
+        $timezone = $this->normaliseTimezone($attributes['timezone'] ?? null);
         $invitationToken = isset($attributes['invitation_token'])
             && is_string($attributes['invitation_token'])
             && trim($attributes['invitation_token']) !== ''
@@ -95,12 +98,13 @@ final class SignUpService
                 name: $name,
                 password: $password,
                 preferredLanguage: $preferredLanguage,
+                timezone: $timezone,
                 request: $request,
             );
         }
 
         /** @var User $user */
-        $user = DB::transaction(function () use ($email, $name, $password, $preferredLanguage): User {
+        $user = DB::transaction(function () use ($email, $name, $password, $preferredLanguage, $timezone): User {
             $user = User::query()->create([
                 'email' => $email,
                 'name' => $name,
@@ -108,7 +112,7 @@ final class SignUpService
                 'type' => UserType::Creator,
                 'preferred_language' => $preferredLanguage,
                 'preferred_currency' => $this->config->get('app.default_currency', 'EUR'),
-                'timezone' => $this->config->get('app.timezone', 'UTC'),
+                'timezone' => $timezone,
                 'theme_preference' => ThemePreference::System,
                 'mfa_required' => false,
                 'is_suspended' => false,
@@ -146,6 +150,12 @@ final class SignUpService
      * email_verified_at is stamped to now() — they don't need to click
      * a second verification mail to enter the wizard.
      *
+     * Sprint 5 Chunk C (D-c3): the bulk-invite pre-created the row with
+     * `timezone = 'UTC'` (no browser existed at invite time — D-c4). The
+     * invitee now has a browser, so acceptance writes the captured,
+     * IANA-validated `$timezone` over the UTC seed. Without this write an
+     * accepted invitee would stay UTC forever (the S4 finding).
+     *
      * @throws InvitationAcceptException When the token is invalid for
      *                                   any of the four reasons.
      */
@@ -155,6 +165,7 @@ final class SignUpService
         string $name,
         string $password,
         string $preferredLanguage,
+        string $timezone,
         Request $request,
     ): User {
         $tokenHash = hash('sha256', $token);
@@ -205,7 +216,7 @@ final class SignUpService
         }
 
         /** @var User $user */
-        $user = DB::transaction(function () use ($relation, $invitedUser, $name, $password, $preferredLanguage): User {
+        $user = DB::transaction(function () use ($relation, $invitedUser, $name, $password, $preferredLanguage, $timezone): User {
             // The hashing cast on User normally runs on attribute mutation,
             // but we forceFill() here to update the placeholder password
             // from bulk-invite without bypassing the hash. Setting the
@@ -214,6 +225,9 @@ final class SignUpService
             $invitedUser->name = $name;
             $invitedUser->password = $password;
             $invitedUser->preferred_language = $preferredLanguage;
+            // D-c3: overwrite the UTC seed from bulk-invite with the real,
+            // browser-captured zone now that the invitee has accepted.
+            $invitedUser->timezone = $timezone;
             $invitedUser->email_verified_at = now();
             $invitedUser->save();
 
@@ -270,6 +284,30 @@ final class SignUpService
         $value = is_string($candidate) ? strtolower(trim($candidate)) : '';
 
         return in_array($value, $allowed, true) ? $value : 'en';
+    }
+
+    /**
+     * Server-side IANA-timezone gate (Sprint 5 Chunk C, D-c2). The client
+     * is not trusted: the browser-sent value is validated against PHP's
+     * canonical zone list ({@see \DateTimeZone::listIdentifiers()}) and any
+     * invalid, empty, or absent value degrades to `'UTC'`.
+     *
+     * Critically NON-rejecting: a bad/missing tz must never block sign-up,
+     * so this normalises rather than throws — it just falls back to today's
+     * always-UTC behaviour. Mirrors {@see self::normaliseLanguage()}.
+     */
+    private function normaliseTimezone(mixed $candidate): string
+    {
+        if (! is_string($candidate)) {
+            return 'UTC';
+        }
+
+        $value = trim($candidate);
+        if ($value === '') {
+            return 'UTC';
+        }
+
+        return in_array($value, \DateTimeZone::listIdentifiers(), true) ? $value : 'UTC';
     }
 
     private function buildVerifyUrl(string $token): string

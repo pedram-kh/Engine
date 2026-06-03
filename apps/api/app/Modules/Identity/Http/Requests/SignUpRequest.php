@@ -60,6 +60,13 @@ final class SignUpRequest extends FormRequest
             ],
             'password_confirmation' => ['required', 'string'],
             'preferred_language' => ['sometimes', 'string', 'in:en,pt,it'],
+            // Sprint 5 Chunk C: browser-captured IANA timezone (auto-detected
+            // at sign-up, no user-facing input). Deliberately permissive here —
+            // a bad/absent tz must NEVER 422 the registration. The authoritative
+            // IANA check + UTC fallback lives in SignUpService::normaliseTimezone()
+            // (non-rejecting by design — D-c2). This rule exists so the value
+            // survives validated() and reaches the service.
+            'timezone' => ['sometimes', 'nullable', 'string', 'max:64'],
             'invitation_token' => ['sometimes', 'nullable', 'string', 'max:128'],
         ];
     }

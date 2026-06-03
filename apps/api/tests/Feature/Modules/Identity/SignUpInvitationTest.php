@@ -119,6 +119,49 @@ it('accepts a valid invitation: updates the User, flips the relation to roster, 
     expect($audit)->not->toBeNull();
 });
 
+it('updates the pre-created (UTC) invitee row to the captured browser timezone on acceptance (break-revert anchor, D-c3)', function (): void {
+    // The bulk-invite seeds the pre-created row at UTC (no browser exists at
+    // invite time — D-c4). Pin that starting state, then accept with a real
+    // browser zone and assert the row was corrected.
+    //
+    // Break-revert: remove the `$invitedUser->timezone = $timezone` write in
+    // acceptInvitationOnSignUp() and this assertion fails — the accepted
+    // invitee would stay UTC forever (the S4 finding, the easy path to miss).
+    ['token' => $token, 'user' => $invitee] = provisionInvitation();
+    $invitee->forceFill(['timezone' => 'UTC'])->save();
+
+    $this->postJson('/api/v1/auth/sign-up', [
+        'name' => 'Real Name',
+        'email' => 'invitee@example.com',
+        'password' => STRONG_PASSWORD,
+        'password_confirmation' => STRONG_PASSWORD,
+        'invitation_token' => $token,
+        'timezone' => 'Europe/Madrid',
+    ])->assertStatus(201);
+
+    $fresh = $invitee->fresh();
+    assert($fresh !== null);
+    expect($fresh->timezone)->toBe('Europe/Madrid');
+});
+
+it('falls back to UTC on an invalid timezone during invitation acceptance — still succeeds', function (): void {
+    ['token' => $token, 'user' => $invitee] = provisionInvitation();
+    $invitee->forceFill(['timezone' => 'UTC'])->save();
+
+    $this->postJson('/api/v1/auth/sign-up', [
+        'name' => 'Real Name',
+        'email' => 'invitee@example.com',
+        'password' => STRONG_PASSWORD,
+        'password_confirmation' => STRONG_PASSWORD,
+        'invitation_token' => $token,
+        'timezone' => 'Not/AZone',
+    ])->assertStatus(201);
+
+    $fresh = $invitee->fresh();
+    assert($fresh !== null);
+    expect($fresh->timezone)->toBe('UTC');
+});
+
 it('does not create a new User row when the invitation path is used (the bulk-invite User is reused)', function (): void {
     ['token' => $token] = provisionInvitation();
     $before = User::query()->count();
