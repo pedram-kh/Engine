@@ -50,6 +50,7 @@ const userMenuOpen = ref(false)
 const navItems = [
   { key: 'dashboard', icon: 'mdi-view-dashboard-outline', routeName: 'app.dashboard' },
   { key: 'roster', icon: 'mdi-account-multiple-outline', routeName: 'roster.list' },
+  { key: 'pools', icon: 'mdi-account-multiple-plus-outline', routeName: 'pools.list' },
   { key: 'brands', icon: 'mdi-tag-outline', routeName: 'brands.list' },
   { key: 'agencyUsers', icon: 'mdi-account-group-outline', routeName: 'agency-users.list' },
   { key: 'settings', icon: 'mdi-cog-outline', routeName: 'settings' },

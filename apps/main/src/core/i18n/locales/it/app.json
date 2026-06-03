@@ -19,6 +19,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "roster": "I miei creator",
+      "pools": "Pool di talenti",
       "brands": "Brand",
       "agencyUsers": "Team",
       "settings": "Impostazioni"
@@ -215,6 +216,87 @@
         "saveFailed": "Salvataggio brand fallito.",
         "archiveFailed": "Archiviazione brand fallita.",
         "restoreFailed": "Ripristino brand fallito."
+      }
+    },
+    "pools": {
+      "title": "Pool di talenti",
+      "agencyWide": "Tutta l'agenzia",
+      "actions": {
+        "create": "Nuovo pool",
+        "edit": "Modifica",
+        "archive": "Archivia",
+        "restore": "Ripristina",
+        "save": "Salva pool",
+        "backToList": "Torna ai pool di talenti",
+        "backToDetail": "Torna al pool"
+      },
+      "fields": {
+        "name": "Nome del pool",
+        "description": "Descrizione",
+        "brand": "Brand",
+        "brandHint": "Facoltativo — etichetta il pool per il lavoro di un brand. Lascia vuoto per un pool valido per tutta l'agenzia.",
+        "members": "Membri"
+      },
+      "status": {
+        "active": "Attivi",
+        "archived": "Archiviati",
+        "all": "Tutti"
+      },
+      "create": {
+        "title": "Nuovo pool di talenti"
+      },
+      "edit": {
+        "title": "Modifica pool di talenti"
+      },
+      "detail": {
+        "title": "Dettagli del pool",
+        "notFound": "Questo pool non esiste più.",
+        "membersHeading": "Membri",
+        "membersEmpty": "Ancora nessun creator in questo pool. Aggiungi creator dalla pagina di dettaglio di un creator.",
+        "memberCount": "{count} creator",
+        "unnamed": "Creator senza nome",
+        "remove": "Rimuovi dal pool",
+        "removed": "{name} rimosso dal pool."
+      },
+      "archive": {
+        "confirmTitle": "Archivia pool",
+        "confirmMessage": "Archiviare {name}? Verrà nascosto dall'elenco attivo ma potrà essere ripristinato in seguito con i membri intatti.",
+        "confirm": "Archivia",
+        "cancel": "Annulla"
+      },
+      "restore": {
+        "confirmTitle": "Ripristina pool",
+        "confirmMessage": "Ripristinare {name}? Tornerà a comparire nell'elenco dei pool attivi.",
+        "confirm": "Ripristina",
+        "cancel": "Annulla",
+        "success": "{name} ripristinato."
+      },
+      "empty": {
+        "heading": "Ancora nessun pool di talenti",
+        "body": "Crea un pool per raggruppare i creator per un brand o un brief di campagna.",
+        "cta": "Crea pool"
+      },
+      "emptyFiltered": {
+        "heading": "Nessun pool corrisponde al filtro",
+        "body": "Prova a cambiare il filtro di stato qui sopra."
+      },
+      "picker": {
+        "openLabel": "Aggiungi al pool",
+        "title": "Aggiungi ai pool di talenti",
+        "empty": "Ancora nessun pool di talenti. Creane uno dalla pagina Pool di talenti.",
+        "done": "Fatto",
+        "added": "Aggiunto a {name}.",
+        "removed": "Rimosso da {name}.",
+        "loadFailed": "Impossibile caricare i pool di talenti.",
+        "toggleFailed": "Impossibile aggiornare l'appartenenza al pool."
+      },
+      "errors": {
+        "loadFailed": "Impossibile caricare i pool di talenti.",
+        "membersLoadFailed": "Impossibile caricare i membri del pool.",
+        "saveFailed": "Impossibile salvare il pool di talenti.",
+        "archiveFailed": "Impossibile archiviare il pool.",
+        "restoreFailed": "Impossibile ripristinare il pool.",
+        "removeFailed": "Impossibile rimuovere il creator dal pool."
       }
     },
     "agencyUsers": {

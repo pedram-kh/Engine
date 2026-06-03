@@ -19,6 +19,7 @@
     "nav": {
       "dashboard": "Painel",
       "roster": "Meus criadores",
+      "pools": "Grupos de talentos",
       "brands": "Marcas",
       "agencyUsers": "Equipe",
       "settings": "Configurações"
@@ -215,6 +216,87 @@
         "saveFailed": "Falha ao salvar marca.",
         "archiveFailed": "Falha ao arquivar marca.",
         "restoreFailed": "Falha ao restaurar marca."
+      }
+    },
+    "pools": {
+      "title": "Grupos de talentos",
+      "agencyWide": "Toda a agência",
+      "actions": {
+        "create": "Novo grupo",
+        "edit": "Editar",
+        "archive": "Arquivar",
+        "restore": "Restaurar",
+        "save": "Salvar grupo",
+        "backToList": "Voltar aos grupos de talentos",
+        "backToDetail": "Voltar ao grupo"
+      },
+      "fields": {
+        "name": "Nome do grupo",
+        "description": "Descrição",
+        "brand": "Marca",
+        "brandHint": "Opcional — rotula o grupo para o trabalho de uma marca. Deixe em branco para um grupo de toda a agência.",
+        "members": "Membros"
+      },
+      "status": {
+        "active": "Ativos",
+        "archived": "Arquivados",
+        "all": "Todos"
+      },
+      "create": {
+        "title": "Novo grupo de talentos"
+      },
+      "edit": {
+        "title": "Editar grupo de talentos"
+      },
+      "detail": {
+        "title": "Detalhes do grupo",
+        "notFound": "Este grupo não existe mais.",
+        "membersHeading": "Membros",
+        "membersEmpty": "Nenhum criador neste grupo ainda. Adicione criadores na página de detalhes de um criador.",
+        "memberCount": "{count} criadores",
+        "unnamed": "Criador sem nome",
+        "remove": "Remover do grupo",
+        "removed": "{name} removido do grupo."
+      },
+      "archive": {
+        "confirmTitle": "Arquivar grupo",
+        "confirmMessage": "Arquivar {name}? Ele ficará oculto da lista ativa, mas pode ser restaurado depois com os membros intactos.",
+        "confirm": "Arquivar",
+        "cancel": "Cancelar"
+      },
+      "restore": {
+        "confirmTitle": "Restaurar grupo",
+        "confirmMessage": "Restaurar {name}? Ele voltará a aparecer na lista de grupos ativos.",
+        "confirm": "Restaurar",
+        "cancel": "Cancelar",
+        "success": "{name} restaurado."
+      },
+      "empty": {
+        "heading": "Nenhum grupo de talentos ainda",
+        "body": "Crie um grupo para agrupar criadores para uma marca ou briefing de campanha.",
+        "cta": "Criar grupo"
+      },
+      "emptyFiltered": {
+        "heading": "Nenhum grupo corresponde ao filtro",
+        "body": "Tente alterar o filtro de status acima."
+      },
+      "picker": {
+        "openLabel": "Adicionar ao grupo",
+        "title": "Adicionar aos grupos de talentos",
+        "empty": "Nenhum grupo de talentos ainda. Crie um na página Grupos de talentos.",
+        "done": "Concluído",
+        "added": "Adicionado a {name}.",
+        "removed": "Removido de {name}.",
+        "loadFailed": "Falha ao carregar os grupos de talentos.",
+        "toggleFailed": "Falha ao atualizar a participação no grupo."
+      },
+      "errors": {
+        "loadFailed": "Falha ao carregar os grupos de talentos.",
+        "membersLoadFailed": "Falha ao carregar os membros do grupo.",
+        "saveFailed": "Falha ao salvar o grupo de talentos.",
+        "archiveFailed": "Falha ao arquivar o grupo.",
+        "restoreFailed": "Falha ao restaurar o grupo.",
+        "removeFailed": "Falha ao remover o criador do grupo."
       }
     },
     "agencyUsers": {

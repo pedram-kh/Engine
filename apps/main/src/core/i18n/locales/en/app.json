@@ -19,6 +19,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "roster": "My creators",
+      "pools": "Talent pools",
       "brands": "Brands",
       "agencyUsers": "Team",
       "settings": "Settings"
@@ -223,6 +224,87 @@
         "saveFailed": "Failed to save brand.",
         "archiveFailed": "Failed to archive brand.",
         "restoreFailed": "Failed to restore brand."
+      }
+    },
+    "pools": {
+      "title": "Talent pools",
+      "agencyWide": "Agency-wide",
+      "actions": {
+        "create": "New pool",
+        "edit": "Edit",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Save pool",
+        "backToList": "Back to talent pools",
+        "backToDetail": "Back to pool"
+      },
+      "fields": {
+        "name": "Pool name",
+        "description": "Description",
+        "brand": "Brand",
+        "brandHint": "Optional — labels the pool for a brand's work. Leave blank for an agency-wide pool.",
+        "members": "Members"
+      },
+      "status": {
+        "active": "Active",
+        "archived": "Archived",
+        "all": "All"
+      },
+      "create": {
+        "title": "New talent pool"
+      },
+      "edit": {
+        "title": "Edit talent pool"
+      },
+      "detail": {
+        "title": "Pool details",
+        "notFound": "This pool no longer exists.",
+        "membersHeading": "Members",
+        "membersEmpty": "No creators in this pool yet. Add creators from a creator's detail page.",
+        "memberCount": "{count} creators",
+        "unnamed": "Unnamed creator",
+        "remove": "Remove from pool",
+        "removed": "{name} removed from the pool."
+      },
+      "archive": {
+        "confirmTitle": "Archive pool",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later with its members intact.",
+        "confirm": "Archive",
+        "cancel": "Cancel"
+      },
+      "restore": {
+        "confirmTitle": "Restore pool",
+        "confirmMessage": "Restore {name}? It will appear in the active pool list again.",
+        "confirm": "Restore",
+        "cancel": "Cancel",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "No talent pools yet",
+        "body": "Create a pool to group creators for a brand or a campaign brief.",
+        "cta": "Create pool"
+      },
+      "emptyFiltered": {
+        "heading": "No pools match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "picker": {
+        "openLabel": "Add to pool",
+        "title": "Add to talent pools",
+        "empty": "No talent pools yet. Create one from the Talent pools page.",
+        "done": "Done",
+        "added": "Added to {name}.",
+        "removed": "Removed from {name}.",
+        "loadFailed": "Failed to load talent pools.",
+        "toggleFailed": "Failed to update pool membership."
+      },
+      "errors": {
+        "loadFailed": "Failed to load talent pools.",
+        "membersLoadFailed": "Failed to load pool members.",
+        "saveFailed": "Failed to save talent pool.",
+        "archiveFailed": "Failed to archive pool.",
+        "restoreFailed": "Failed to restore pool.",
+        "removeFailed": "Failed to remove creator from the pool."
       }
     },
     "agencyUsers": {

@@ -102,6 +102,77 @@ export interface CreateBrandPayload {
 export type UpdateBrandPayload = Partial<CreateBrandPayload>
 
 // ---------------------------------------------------------------------------
+// Talent pools — Sprint 6 Chunk 2b
+// ---------------------------------------------------------------------------
+
+export interface TalentPoolAttributes {
+  name: string
+  description: string | null
+  /** Brand-scope LABEL (D-2b-4) — the brand's ULID + name, or null (agency-wide). */
+  brand_id: string | null
+  brand_name: string | null
+  /** Derived from deleted_at — pools have no status column (D-2b-1). */
+  is_archived: boolean
+  /** withCount('creators') — the list shows COUNTS, not member previews (D-2b-7). */
+  creators_count: number
+  created_at: string
+  updated_at: string
+}
+
+export interface TalentPoolResource {
+  id: string
+  type: 'talent_pools'
+  attributes: TalentPoolAttributes
+}
+
+export interface CreateTalentPoolPayload {
+  name: string
+  description?: string | null
+  /** Optional brand ULID to label the pool (D-2b-4). */
+  brand_id?: string | null
+}
+
+export type UpdateTalentPoolPayload = Partial<CreateTalentPoolPayload>
+
+/**
+ * One row in the add-to-pool picker dialog (D-2b-9): the pool + an `is_member`
+ * flag for the creator the dialog was opened for. Computed server-side in one
+ * query (no N+1 across pools).
+ */
+export interface TalentPoolPickerItem {
+  id: string
+  type: 'talent_pools'
+  attributes: {
+    name: string
+    brand_name: string | null
+    is_member: boolean
+  }
+}
+
+export interface TalentPoolPickerResponse {
+  data: TalentPoolPickerItem[]
+}
+
+/**
+ * One member row on the pool DETAIL page. A slim creator shape + the signed
+ * avatar URL + the `added_at` pivot timestamp. Paginated server-side so the
+ * signed-avatar minting is bounded (the D-2b-7 list/detail boundary).
+ */
+export interface TalentPoolMemberResource {
+  id: string
+  type: 'talent_pool_members'
+  attributes: {
+    display_name: string | null
+    country_code: string | null
+    primary_language: string | null
+    categories: string[] | null
+    avatar_url: string | null
+    application_status: CreatorApplicationStatus
+    added_at: string | null
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Agency creator roster ("my creators") — Sprint 4 Chunk 5
 // ---------------------------------------------------------------------------
 

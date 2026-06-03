@@ -41,6 +41,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 
+import AddToPoolDialog from '@/modules/pools/components/AddToPoolDialog.vue'
+
 import { rosterApi } from '../api/roster.api'
 import AgencyAvailabilityCalendar from '../components/AgencyAvailabilityCalendar.vue'
 import StarRatingInput from '../components/StarRatingInput.vue'
@@ -123,6 +125,16 @@ const notesDraft = ref<string>('')
 const saving = ref(false)
 const saveError = ref<string | null>(null)
 const savedSnackbar = ref(false)
+
+// Add-to-pool picker (Sprint 6 Chunk 2b, D-2b-9). Gated by the same canEdit
+// (admin/manager) computed; the dialog reflects + toggles this creator's pool
+// membership.
+const poolDialog = ref(false)
+const poolSnackbar = ref<string | null>(null)
+
+function onPoolChanged(message: string): void {
+  poolSnackbar.value = message
+}
 
 const isDirty = computed(() => {
   if (attrs.value === null) return false
@@ -217,7 +229,7 @@ onMounted(() => {
 
     <template v-else-if="detail !== null && attrs !== null && creator !== null">
       <!-- Header: name + contact email + status chips (D-2a-8) -->
-      <header class="creator-detail__header">
+      <header class="creator-detail__header d-flex align-start justify-space-between ga-3">
         <div class="creator-detail__header-text">
           <h1 class="text-h5 ma-0" data-test="creator-detail-name">{{ displayName }}</h1>
           <a
@@ -246,6 +258,19 @@ onMounted(() => {
             </v-chip>
           </div>
         </div>
+
+        <!-- Add-to-pool action (D-2b-9). Net-new chrome on the 2a header;
+             admin/manager only (canEdit). -->
+        <v-btn
+          v-if="canEdit"
+          color="primary"
+          variant="tonal"
+          prepend-icon="mdi-account-multiple-plus-outline"
+          data-test="creator-detail-add-to-pool"
+          @click="poolDialog = true"
+        >
+          {{ t('app.pools.picker.openLabel') }}
+        </v-btn>
       </header>
 
       <!-- Profile -->
@@ -426,6 +451,29 @@ onMounted(() => {
       data-test="creator-detail-saved"
     >
       {{ t('app.roster.detail.editor.saved') }}
+    </v-snackbar>
+
+    <!-- Add-to-pool picker dialog (D-2b-9) -->
+    <AddToPoolDialog
+      v-if="agencyStore.currentAgencyId && canEdit"
+      v-model="poolDialog"
+      :agency-id="agencyStore.currentAgencyId"
+      :creator-ulid="creatorUlid"
+      @changed="onPoolChanged"
+    />
+
+    <v-snackbar
+      :model-value="poolSnackbar !== null"
+      :timeout="3000"
+      color="success"
+      data-test="creator-detail-pool-snackbar"
+      @update:model-value="
+        (v) => {
+          if (!v) poolSnackbar = null
+        }
+      "
+    >
+      {{ poolSnackbar }}
     </v-snackbar>
   </div>
 </template>

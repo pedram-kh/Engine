@@ -198,7 +198,12 @@ anyone reviewing it later.
   - **Full version (Sprint 6 per spec):** roster view with filtering (country, language, categories, follower range, engagement rate, availability), FTS search, saved talent pools, per-creator detail with ratings + notes + blacklist status.
   - **Minimal version (Sprint 4 chunk candidate):** prospect-creators list at `/creator-invitations` showing email + status (pending invitation / accepted / incomplete / submitted / approved / rejected) + `invited_at` + `invitation_link_status`. Backend: paginated query against `agency_creator_relations` filtered to current agency. Estimated ~1 chunk of work.
 - **Owner:** Sprint 4 chunk candidate (minimal) OR Sprint 6 (full version).
-- **Status:** open. Surfaced by Sprint 3 stabilization pass, May 16, 2026.
+- **Status:** **CLOSED** — the **full version (Sprint 6 per spec)** shipped across Sprint 6's three chunks; the minimal Sprint-4 list was leapfrogged (never built — the full roster supersedes it). Each spec'd bullet now has a home:
+  - **Roster view + filtering (country / language / categories) + FTS name/bio search** — Sprint 6 Chunk 1 (2026-06-03, [review](reviews/sprint-6-chunk-1-review.md)). The follower-range / engagement-rate / availability filters ship as **honest inert affordances** (no real backing data yet) and are tracked by their own open entries above (handle search, availability-as-a-design-problem) — those are deferred _within_ Sprint 6, not part of this entry's "lose visibility on invitations" risk.
+  - **Per-creator detail with ratings + notes + blacklist status** — Sprint 6 Chunk 2a (2026-06-03, [review](reviews/sprint-6-chunk-2a-review.md)).
+  - **Saved talent pools** — Sprint 6 Chunk 2b (2026-06-03, [review](reviews/sprint-6-chunk-2b-review.md)). Per-agency, per-brand-label pools with CRUD (Brand-mirrored, soft-delete + restore), creator membership (a net-new pivot-write surface gated on the relation-exists check), and an "add to pool" picker on the 2a detail page.
+
+  The original visibility risk (agency admins lose track of outstanding invitations after closing the bulk-invite Results card) is now answered by the roster view itself: the roster surfaces every `agency_creator_relation` (roster / prospect / external) with status, and the detail view shows per-creator state. **What remains open** (separate entries, not this one): handle search, a real availability filter, and follower/engagement filters — each blocked on net-new infrastructure (social adapters / RRULE expansion), not on this surface.
 
 ---
 

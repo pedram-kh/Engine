@@ -218,6 +218,35 @@ export const appRoutes: RouteRecordRaw[] = [
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
+  // ── Talent pools ───────────────────────────────────────────────────────────
+  // Sprint 6 Chunk 2b. Mirrors the brands block: any agency member may view;
+  // create/edit gated by role in the UI + backend. NOT MFA-gated (pools are
+  // non-admin — pinned out of the MFA arch-test's gated set).
+  {
+    path: '/talent-pools',
+    name: 'pools.list',
+    component: () => import('@/modules/pools/pages/PoolListPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+  {
+    path: '/talent-pools/new',
+    name: 'pools.create',
+    component: () => import('@/modules/pools/pages/PoolCreatePage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+  {
+    path: '/talent-pools/:ulid',
+    name: 'pools.detail',
+    component: () => import('@/modules/pools/pages/PoolDetailPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+  {
+    path: '/talent-pools/:ulid/edit',
+    name: 'pools.edit',
+    component: () => import('@/modules/pools/pages/PoolEditPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+
   // ── Agency users / invitations ────────────────────────────────────────────
   // Visible only to agency_admin (route guard + UI gating).
   //
