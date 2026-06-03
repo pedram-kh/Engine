@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\TestHelpers\Http\Controllers\CreateAdminUserController;
 use App\TestHelpers\Http\Controllers\CreateAgencyInvitationController;
 use App\TestHelpers\Http\Controllers\CreateAgencyWithAdminController;
+use App\TestHelpers\Http\Controllers\CreatePendingConnectionRequestController;
 use App\TestHelpers\Http\Controllers\CreateRosterCreatorsController;
 use App\TestHelpers\Http\Controllers\IssueTotpController;
 use App\TestHelpers\Http\Controllers\IssueTotpFromSecretController;
@@ -98,6 +99,13 @@ Route::prefix('_test')
         // actual rows. No production path provisions a roster in one call.
         Route::post('agencies/{agency}/roster-creators', CreateRosterCreatorsController::class)
             ->name('agencies.roster_creators.create');
+
+        // Sprint 6.6c — approve the signed-in creator + seed a pending_request
+        // relation (on a fresh agency) so the creator-inbox Playwright round-
+        // trip can render the approved-branch requests section and accept a
+        // real request. No production path approves a self-signed-up creator.
+        Route::post('creators/pending-connection-request', CreatePendingConnectionRequestController::class)
+            ->name('creators.pending_connection_request.create');
 
         // Sprint 3 Chunk 3 — queue mode override for E2E saga specs.
         // POST sets `config('queue.default')` for subsequent requests

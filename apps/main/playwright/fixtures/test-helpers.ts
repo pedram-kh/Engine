@@ -738,3 +738,61 @@ export async function seedRosterCreators(
     })),
   }
 }
+
+// ---------------------------------------------------------------------------
+// Sprint 6.6c — creator connection-request inbox provisioning
+// ---------------------------------------------------------------------------
+
+export interface SeedPendingConnectionRequestResult {
+  relationUlid: string
+  agencyUlid: string
+  agencyName: string
+  creatorUlid: string
+}
+
+/**
+ * Approve the creator with the given email + seed a `pending_request` relation
+ * (on a fresh agency) so the Sprint 6.6c creator-inbox round-trip can render
+ * the approved-branch requests section and accept a real request.
+ *
+ * Identifies the creator by EMAIL (not session) — the helper is gated by the
+ * `X-Test-Helper-Token` header (forwarded automatically by `extraHTTPHeaders`),
+ * so it can be called any time after the creator exists (the production sign-up
+ * bootstraps the Creator row in the same transaction). No production path
+ * approves a self-signed-up creator or sends a request from an agency the spec
+ * doesn't control; hence this test-helper.
+ */
+export async function seedPendingConnectionRequest(
+  request: APIRequestContext,
+  email: string,
+  agencyName?: string,
+): Promise<SeedPendingConnectionRequestResult> {
+  const response = await request.post(
+    'http://127.0.0.1:8000/api/v1/_test/creators/pending-connection-request',
+    {
+      headers: defaultHeaders,
+      data: { email, agency_name: agencyName },
+    },
+  )
+
+  if (response.status() !== 201) {
+    throw new Error(
+      `seedPendingConnectionRequest failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  const body = (await response.json()) as {
+    data: {
+      relation_ulid: string
+      agency_ulid: string
+      agency_name: string
+      creator_ulid: string
+    }
+  }
+  return {
+    relationUlid: body.data.relation_ulid,
+    agencyUlid: body.data.agency_ulid,
+    agencyName: body.data.agency_name,
+    creatorUlid: body.data.creator_ulid,
+  }
+}

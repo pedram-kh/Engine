@@ -1009,3 +1009,27 @@ anyone reviewing it later.
 - **The `reason` omission, kept type-clean WITHOUT a "reason-optional" change (divergence 1):** the kickoff floated loosening `AvailabilityOccurrenceAttributes.reason` to optional so the agency path (which omits `reason`) would type-check. **Rejected in favour of a dedicated FE type** — [`AgencyAvailabilityOccurrenceAttributes`](../packages/api-client/src/types/agency.ts) where `reason` is structurally **absent** (not optional). This **mirrors the backend's existing dedicated `AgencyAvailabilityResource` discipline** (separate shape so `reason` cannot leak through a shared type) rather than weakening the creator-self path's `reason` guarantee. The creator-self `AvailabilityOccurrenceAttributes` is untouched — its `reason` stays non-optional.
 - **Risk:** none — this is a closure note, not an accepted gap. Recorded so the cross-sprint handoff (build-ahead-of-consumer → consumer) is auditable.
 - **Status:** **CLOSED** — Sprint 6 Chunk 2a, 2026-06-03 ([review](reviews/sprint-6-chunk-2a-review.md)).
+
+---
+
+## Creator-side connection-requests: no pending-count badge on the nav (deferred nicety)
+
+- **Where:** the creator surface nav/topbar. The Sprint 6.6c inbox ([`CreatorDashboardPage.vue`](../apps/main/src/modules/creators/pages/CreatorDashboardPage.vue) approved branch) renders incoming agency requests inline, but there is **no count badge** anywhere (e.g. a `<v-badge>` on a nav item showing "3 pending").
+- **What we accepted in Sprint 6.6c (2026-06-03, D-d):** deferred deliberately. There is **no reusable creator-side badge primitive** (no `CStatusBadge`/creator-bell to hang it on — it would be hand-rolled), and a count badge would introduce the **first always-on creator-side fetch** (the requests would have to be counted on every navigation, not just on the dashboard landing). The requests are already visible on the dashboard — the creator's natural landing — so the "know without hunting" value is marginal at v1.
+- **Risk:** none. The inbox is fully functional; the badge is purely an at-a-glance affordance.
+- **Resolution:** when a creator-side nav/notification surface exists (or the creator surface grows past its deliberately-thin 2 items), add a `<v-badge>` + a lightweight count source (a `?count_only=1` on the list endpoint, or reuse of the list call). Pairs naturally with the creator-side connections page below.
+- **Triggered by:** the creator surface gaining a notification/nav affordance, or product wanting the at-a-glance pending count.
+- **Owner:** future creator-surface chunk / unscheduled.
+- **Status:** open (deferred nicety). Surfaced + accepted by Sprint 6.6c, 2026-06-03 ([review](reviews/sprint-6-6c-review.md)).
+
+---
+
+## Creator-side connections/roster page (post-accept has no click-through destination)
+
+- **Where:** the creator surface. After a creator **accepts** a request in the Sprint 6.6c inbox, the relation becomes `roster` — but there is **no creator-side page that lists the agencies they're connected with**. The accept UX is "the row disappears + a toast naming the agency" ([`CreatorDashboardPage.vue`](../apps/main/src/modules/creators/pages/CreatorDashboardPage.vue), D-d6), with **no click-through** to a connections list because no such destination exists.
+- **What we accepted in Sprint 6.6c (2026-06-03, D-d6):** the creator surface is deliberately thin (dashboard + availability only). A post-accept click-through would have no honest destination, so "row disappears + toast" is the complete, honest v1. Building a connections page was explicitly out of scope for this chunk.
+- **Risk:** low. The accept succeeds and is persisted (the agency sees the creator on its roster); the creator simply has no in-app view of _their_ side of the relationship yet. The data already exists (the `roster` relations are queryable creator-side, the same way the inbox queries `pending_request`).
+- **Resolution:** a future creator-surface chunk adds a connections/roster list (the creator's `roster` relations, agency name + connected-since), at which point the 6.6c accept toast can gain a "View connections" click-through and the pending-count badge above gets its home.
+- **Triggered by:** the creator-side connections page being scheduled.
+- **Owner:** future creator-surface chunk / unscheduled.
+- **Status:** open (deferred — future surface). Surfaced + accepted by Sprint 6.6c, 2026-06-03 ([review](reviews/sprint-6-6c-review.md)).
