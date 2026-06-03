@@ -40,9 +40,92 @@ final class AvailabilityExpansionService
         $start = CarbonImmutable::instance($windowStart);
         $end = CarbonImmutable::instance($windowEnd);
 
+        return $this->assemble(
+            $this->oneOffBlocks($creator, $start, $end),
+            $this->recurringBlocks($creator),
+            $start,
+            $end,
+        );
+    }
+
+    /**
+     * Batch counterpart to {@see self::expand()} for a SET of creators
+     * (D-6-4). The roster availability filter needs every creator in the
+     * filtered set expanded to decide who is free — calling expand() in a
+     * loop is a 2N query fan-out. This loads ALL creators' one-off + recurring
+     * blocks in exactly TWO queries (a `creator_id IN (...)` each), groups them
+     * in PHP, then runs the SAME per-creator {@see self::assemble()} the single
+     * expand() uses.
+     *
+     * CRITICAL: this produces IDENTICAL per-creator results to calling
+     * expand() per creator — it is the same logic batched at the query layer,
+     * not a reimplementation (the assemble()/expandRecurring() code path is
+     * shared). The §5.17 batch == loop test pins this.
+     *
+     * @param  list<int>  $creatorIds
+     * @return array<int, list<AvailabilityOccurrence>> keyed by creator id
+     */
+    public function expandMany(array $creatorIds, CarbonInterface $windowStart, CarbonInterface $windowEnd): array
+    {
+        $ids = array_values(array_unique($creatorIds));
+        if ($ids === []) {
+            return [];
+        }
+
+        $start = CarbonImmutable::instance($windowStart);
+        $end = CarbonImmutable::instance($windowEnd);
+
+        // Query 1: one-off blocks overlapping the window for every creator.
+        // Same overlap predicate as the single-creator oneOffBlocks().
+        $oneOffByCreator = CreatorAvailabilityBlock::query()
+            ->whereIn('creator_id', $ids)
+            ->where('is_recurring', false)
+            ->where('starts_at', '<', $end)
+            ->where('ends_at', '>', $start)
+            ->get()
+            ->groupBy('creator_id');
+
+        // Query 2: all recurring blocks for every creator (no date predicate
+        // safely bounds a rule — the RRULE engine bounds by the window).
+        $recurringByCreator = CreatorAvailabilityBlock::query()
+            ->whereIn('creator_id', $ids)
+            ->where('is_recurring', true)
+            ->whereNotNull('recurrence_rule')
+            ->get()
+            ->groupBy('creator_id');
+
+        $result = [];
+        foreach ($ids as $id) {
+            $result[$id] = $this->assemble(
+                $oneOffByCreator->get($id) ?? [],
+                $recurringByCreator->get($id) ?? [],
+                $start,
+                $end,
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Assemble the sorted occurrence list for ONE creator from its one-off +
+     * recurring blocks. The single source of per-creator expansion logic,
+     * shared by expand() (per-creator queries) and expandMany() (batched
+     * queries) so the two can never drift (D-6-4).
+     *
+     * @param  iterable<CreatorAvailabilityBlock>  $oneOffBlocks
+     * @param  iterable<CreatorAvailabilityBlock>  $recurringBlocks
+     * @return list<AvailabilityOccurrence>
+     */
+    private function assemble(
+        iterable $oneOffBlocks,
+        iterable $recurringBlocks,
+        CarbonImmutable $windowStart,
+        CarbonImmutable $windowEnd,
+    ): array {
         $occurrences = [];
 
-        foreach ($this->oneOffBlocks($creator, $start, $end) as $block) {
+        foreach ($oneOffBlocks as $block) {
             $occurrences[] = new AvailabilityOccurrence(
                 $block,
                 CarbonImmutable::instance($block->starts_at),
@@ -50,8 +133,8 @@ final class AvailabilityExpansionService
             );
         }
 
-        foreach ($this->recurringBlocks($creator) as $block) {
-            foreach ($this->expandRecurring($block, $start, $end) as $occurrence) {
+        foreach ($recurringBlocks as $block) {
+            foreach ($this->expandRecurring($block, $windowStart, $windowEnd) as $occurrence) {
                 $occurrences[] = $occurrence;
             }
         }

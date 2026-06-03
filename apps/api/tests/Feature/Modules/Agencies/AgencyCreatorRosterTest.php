@@ -7,6 +7,7 @@ use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Creators\Enums\ApplicationStatus;
 use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
+use App\Modules\Creators\Models\CreatorAvailabilityBlock;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -374,6 +375,204 @@ it('returns an empty page for an unknown status value', function (): void {
 
     expect($response->status())->toBe(200);
     expect($response->json('meta.total'))->toBe(0);
+});
+
+// ---------------------------------------------------------------------------
+// Availability range filter (?available_from=&available_to=) — Sprint 6.5 (D-6)
+//
+// A creator is "available within [from, to]" iff they have NO overlapping HARD
+// block in that window (soft never excludes — D-2, mirroring
+// AvailabilityConflictService). The window is day-granular + inclusive of the
+// `to` day, normalized server-side. The filter expands the FILTERED relation
+// set, drops busy creators, and paginates the survivors with CORRECT counts
+// (D-3 — busy-set → whereNotIn → paginate, no filter-within-page).
+// ---------------------------------------------------------------------------
+
+/**
+ * Attach a hard one-off block to a roster relation's creator.
+ */
+function hardBlock(AgencyCreatorRelation $relation, string $start, string $end): void
+{
+    CreatorAvailabilityBlock::factory()->for($relation->creator()->firstOrFail())->hard()->create([
+        'starts_at' => $start,
+        'ends_at' => $end,
+        'is_recurring' => false,
+    ]);
+}
+
+it('excludes a creator with an overlapping HARD block in the window', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $busy = makeRosterRelation($agency, [], ['display_name' => 'Busy Bea']);
+    hardBlock($busy, '2026-06-10T09:00:00+00:00', '2026-06-10T17:00:00+00:00');
+
+    $free = makeRosterRelation($agency, [], ['display_name' => 'Free Fred']);
+
+    $response = $this->actingAs($admin)
+        ->getJson(rosterUrl($agency, 'available_from=2026-06-08&available_to=2026-06-12'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.attributes.display_name'))->toBe('Free Fred');
+});
+
+it('INCLUDES a creator with only a SOFT block in the window (break-revert: soft must not exclude)', function (): void {
+    // Break-revert (§5.35): if the filter excluded on soft blocks too, this
+    // creator would drop out and meta.total would be 0 — failing this.
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $softOnly = makeRosterRelation($agency, [], ['display_name' => 'Soft Sue']);
+    CreatorAvailabilityBlock::factory()->for($softOnly->creator()->firstOrFail())->soft()->create([
+        'starts_at' => '2026-06-10T09:00:00+00:00',
+        'ends_at' => '2026-06-10T17:00:00+00:00',
+        'is_recurring' => false,
+    ]);
+
+    $response = $this->actingAs($admin)
+        ->getJson(rosterUrl($agency, 'available_from=2026-06-08&available_to=2026-06-12'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.attributes.display_name'))->toBe('Soft Sue');
+});
+
+it('INCLUDES a creator whose HARD block is OUTSIDE the window', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $relation = makeRosterRelation($agency, [], ['display_name' => 'Later Lou']);
+    hardBlock($relation, '2026-07-01T09:00:00+00:00', '2026-07-01T17:00:00+00:00');
+
+    $response = $this->actingAs($admin)
+        ->getJson(rosterUrl($agency, 'available_from=2026-06-08&available_to=2026-06-12'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.attributes.display_name'))->toBe('Later Lou');
+});
+
+it('INCLUDES a creator with no availability blocks at all', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterRelation($agency, [], ['display_name' => 'Empty Eve']);
+
+    $response = $this->actingAs($admin)
+        ->getJson(rosterUrl($agency, 'available_from=2026-06-08&available_to=2026-06-12'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.attributes.display_name'))->toBe('Empty Eve');
+});
+
+it('excludes a creator whose RECURRING HARD block expands into the window', function (): void {
+    // The RRULE path, not just one-off blocks: a weekly Thursday block.
+    // 2026-06-11 is a Thursday inside [2026-06-08, 2026-06-12].
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $recurringBusy = makeRosterRelation($agency, [], ['display_name' => 'Weekly Wendy']);
+    CreatorAvailabilityBlock::factory()->for($recurringBusy->creator()->firstOrFail())->hard()
+        ->weeklyRecurring('FREQ=WEEKLY;BYDAY=TH')->create([
+            'starts_at' => '2026-06-04T09:00:00+00:00',
+            'ends_at' => '2026-06-04T17:00:00+00:00',
+        ]);
+
+    makeRosterRelation($agency, [], ['display_name' => 'Free Fran']);
+
+    $response = $this->actingAs($admin)
+        ->getJson(rosterUrl($agency, 'available_from=2026-06-08&available_to=2026-06-12'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.attributes.display_name'))->toBe('Free Fran');
+});
+
+it('includes the to-day inclusively (day-granular window normalization)', function (): void {
+    // available_to=2026-06-12 means the WHOLE of June 12 — a block that day
+    // must still exclude the creator (server normalizes to [from 00:00,
+    // to+1day 00:00)). Break-revert: a half-open raw window that stopped at
+    // 2026-06-12 00:00 would NOT catch this block, wrongly including the row.
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $busyOnLastDay = makeRosterRelation($agency, [], ['display_name' => 'Edge Ed']);
+    hardBlock($busyOnLastDay, '2026-06-12T09:00:00+00:00', '2026-06-12T17:00:00+00:00');
+
+    $response = $this->actingAs($admin)
+        ->getJson(rosterUrl($agency, 'available_from=2026-06-10&available_to=2026-06-12'));
+
+    expect($response->json('meta.total'))->toBe(0);
+});
+
+it('reports availability-FILTERED pagination counts, not the pre-filter total (D-3 break-revert)', function (): void {
+    // Five creators; two are busy in-window. With per_page=2 the pager must
+    // reflect the 3 AVAILABLE survivors: total=3, last_page=2 — NOT the
+    // pre-filter 5. Break-revert: a filter-within-page (expand only the
+    // returned rows) would leave meta.total counting all 5 and last_page=3.
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $busy1 = makeRosterRelation($agency, [], ['display_name' => 'AAA Busy']);
+    hardBlock($busy1, '2026-06-10T09:00:00+00:00', '2026-06-10T17:00:00+00:00');
+    $busy2 = makeRosterRelation($agency, [], ['display_name' => 'BBB Busy']);
+    hardBlock($busy2, '2026-06-11T09:00:00+00:00', '2026-06-11T17:00:00+00:00');
+
+    makeRosterRelation($agency, [], ['display_name' => 'CCC Free']);
+    makeRosterRelation($agency, [], ['display_name' => 'DDD Free']);
+    makeRosterRelation($agency, [], ['display_name' => 'EEE Free']);
+
+    $response = $this->actingAs($admin)->getJson(
+        rosterUrl($agency, 'available_from=2026-06-08&available_to=2026-06-12&per_page=2&page=1'),
+    );
+
+    expect($response->json('meta.total'))->toBe(3);
+    expect($response->json('meta.last_page'))->toBe(2);
+    expect($response->json('meta.per_page'))->toBe(2);
+    expect($response->json('data'))->toHaveCount(2);
+
+    // The page rows are the available survivors, sorted by display_name — the
+    // busy creators never appear on any page.
+    expect($response->json('data.*.attributes.display_name'))->toBe(['CCC Free', 'DDD Free']);
+});
+
+it('does NOT filter on availability when the range is empty (roster unchanged)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $busy = makeRosterRelation($agency, [], ['display_name' => 'Busy Bea']);
+    hardBlock($busy, '2026-06-10T09:00:00+00:00', '2026-06-10T17:00:00+00:00');
+    makeRosterRelation($agency, [], ['display_name' => 'Free Fred']);
+
+    // No availability params at all → the busy creator is NOT excluded.
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency));
+
+    expect($response->json('meta.total'))->toBe(2);
+});
+
+it('ignores a one-sided range (only available_from, no available_to)', function (): void {
+    // Both-required (divergence #3): a half range issues no availability
+    // filtering — the busy creator is still listed.
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $busy = makeRosterRelation($agency, [], ['display_name' => 'Busy Bea']);
+    hardBlock($busy, '2026-06-10T09:00:00+00:00', '2026-06-10T17:00:00+00:00');
+    makeRosterRelation($agency, [], ['display_name' => 'Free Fred']);
+
+    $response = $this->actingAs($admin)
+        ->getJson(rosterUrl($agency, 'available_from=2026-06-08'));
+
+    expect($response->json('meta.total'))->toBe(2);
+});
+
+it('422s when available_to precedes available_from', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterRelation($agency);
+
+    $response = $this->actingAs($admin)
+        ->getJson(rosterUrl($agency, 'available_from=2026-06-12&available_to=2026-06-08'));
+
+    expect($response->status())->toBe(422);
 });
 
 // ---------------------------------------------------------------------------

@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace App\Modules\Agencies\Http\Controllers;
 
+use App\Modules\Agencies\Http\Requests\ListAgencyRosterRequest;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Brands\Http\Controllers\BrandController;
+use App\Modules\Creators\Enums\BlockType;
 use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Http\Controllers\Admin\AdminCreatorController;
+use App\Modules\Creators\Http\Controllers\CreatorAvailabilityController;
 use App\Modules\Creators\Models\Creator;
+use App\Modules\Creators\Services\Availability\AvailabilityConflictService;
+use App\Modules\Creators\Services\Availability\AvailabilityExpansionService;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -37,13 +43,24 @@ use Illuminate\Support\Facades\Gate;
  *              `LOWER(...) LIKE` substring fallback over display_name/bio. The
  *              two paths diverge in result semantics (FTS = whole-word lexemes;
  *              ILIKE = substring) — documented, not papered over (D-3).
+ *   ?available_from=&?available_to=
+ *              availability range filter (Sprint 6.5, D-6). A creator is
+ *              "available within [from, to]" iff they have NO overlapping HARD
+ *              block in that window (soft blocks never exclude — mirrors
+ *              {@see AvailabilityConflictService}).
+ *              Availability is NOT a SQL predicate (it's per-creator RRULE
+ *              intervals, no stored status), so it can't join the paginated
+ *              whereHas. Instead we expand the FILTERED relation set in PHP
+ *              (batched — {@see AvailabilityExpansionService::expandMany()}),
+ *              find the busy creator ids, and apply them as a `whereNotIn`
+ *              BEFORE paginating — so meta.total / last_page / page contents
+ *              stay correct (D-3, no filter-within-page). Activates only when
+ *              BOTH bounds are present; a one-sided range is ignored.
  *
  * Deliberately deferred (later Sprint 6 chunks):
  *   - handle search (creator_social_accounts) → follow-on, social-adapter era (D-2).
  *   - follower / engagement filters → social metrics are null today (disabled
  *     affordance on the FE, D-4).
- *   - a REAL availability filter → no stored status; needs a cheap roster-wide
- *     signal — its own chunk (D-5; disabled affordance on the FE, D-4).
  *   - saved talent pools   → no schema (Sprint 6).
  *   - internal_rating editing + internal_notes → Sprint 6 roster mgmt.
  *   - row → creator-detail navigation → no agency-side detail exists (Chunk 2).
@@ -67,7 +84,21 @@ use Illuminate\Support\Facades\Gate;
  */
 final class AgencyCreatorController
 {
-    public function index(Request $request, Agency $agency): JsonResponse
+    /**
+     * Hard ceiling on the availability window span (D-6). Mirrors
+     * {@see CreatorAvailabilityController}'s
+     * MAX_WINDOW_DAYS — bounds recurrence expansion so a pathological
+     * `?available_from=...&available_to=...` can't generate an unbounded
+     * occurrence set per creator. Combined with the per-agency bound on the
+     * filtered relation set, neither expansion vector is unbounded.
+     */
+    private const int MAX_WINDOW_DAYS = 366;
+
+    public function __construct(
+        private readonly AvailabilityExpansionService $expansion,
+    ) {}
+
+    public function index(ListAgencyRosterRequest $request, Agency $agency): JsonResponse
     {
         Gate::authorize('viewAny', AgencyCreatorRelation::class);
 
@@ -103,6 +134,7 @@ final class AgencyCreatorController
             ->orderBy('agency_creator_relations.id');
 
         $this->applyStatusFilter($query, $request);
+        $this->applyAvailabilityFilter($query, $request);
 
         $paginator = $query->paginate($perPage)->withQueryString();
 
@@ -144,6 +176,85 @@ final class AgencyCreatorController
         }
 
         $query->where('agency_creator_relations.relationship_status', $status->value);
+    }
+
+    /**
+     * Availability range filter (D-6). Excludes creators with an overlapping
+     * HARD block in [available_from, available_to] (soft never excludes — D-2,
+     * mirroring AvailabilityConflictService).
+     *
+     * Availability can't be a SQL predicate (per-creator RRULE intervals, no
+     * stored status), so it can't join the paginated whereHas. Instead we
+     * filter-before-pagination with CORRECT counts (D-3):
+     *
+     *   1. pluck the creator ids of the ALREADY-filtered relation set (one
+     *      light query, bounded by the agency's roster size);
+     *   2. batch-expand them ({@see AvailabilityExpansionService::expandMany()},
+     *      2 queries total) over the window;
+     *   3. collect the BUSY ids (any hard occurrence in-window);
+     *   4. apply `whereNotIn(creator_id, busy)` to the live query.
+     *
+     * Step 4 turns the availability exclusion into a real SQL predicate once
+     * PHP knows the busy set, so the subsequent ->paginate() reports a correct
+     * meta.total / last_page and returns the right page rows — no
+     * filter-within-page (which would leave meta.total counting the pre-filter
+     * set and desync the pager).
+     *
+     * The window is day-granular + inclusive of the `to` day (D-6, divergence
+     * #1): an agency picking "June 8–12" means the whole of those days. The
+     * span is clamped to MAX_WINDOW_DAYS to bound recurrence expansion.
+     *
+     * Activates only when BOTH bounds are present (divergence #3) — a one-sided
+     * range is ignored, never defaulted-forward.
+     *
+     * @param  Builder<AgencyCreatorRelation>  $query
+     */
+    private function applyAvailabilityFilter(Builder $query, ListAgencyRosterRequest $request): void
+    {
+        if (! $request->filled('available_from') || ! $request->filled('available_to')) {
+            return;
+        }
+
+        // Day-granular, inclusive of the `to` day, normalized server-side so
+        // the client never constructs the boundary and the window math lives
+        // in one place (divergence #1). Half-open: [from 00:00, to+1d 00:00).
+        $windowStart = CarbonImmutable::parse((string) $request->input('available_from'))->startOfDay();
+        $windowEnd = CarbonImmutable::parse((string) $request->input('available_to'))->startOfDay()->addDay();
+
+        // Clamp the span so recurrence expansion stays bounded (mirrors the
+        // availability list's MAX_WINDOW_DAYS).
+        $maxEnd = $windowStart->addDays(self::MAX_WINDOW_DAYS);
+        if ($windowEnd->greaterThan($maxEnd)) {
+            $windowEnd = $maxEnd;
+        }
+
+        // The filtered relation set's creator ids (clone so the pluck doesn't
+        // consume the live builder). Bounded by the agency's roster size.
+        /** @var list<int> $creatorIds */
+        $creatorIds = (clone $query)
+            ->pluck('agency_creator_relations.creator_id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+
+        if ($creatorIds === []) {
+            return;
+        }
+
+        $expanded = $this->expansion->expandMany($creatorIds, $windowStart, $windowEnd);
+
+        $busyIds = [];
+        foreach ($expanded as $creatorId => $occurrences) {
+            foreach ($occurrences as $occurrence) {
+                if ($occurrence->block->block_type === BlockType::Hard) {
+                    $busyIds[] = $creatorId;
+                    break;
+                }
+            }
+        }
+
+        if ($busyIds !== []) {
+            $query->whereNotIn('agency_creator_relations.creator_id', $busyIds);
+        }
     }
 
     /**
