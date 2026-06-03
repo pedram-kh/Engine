@@ -162,6 +162,18 @@ enum AuditAction: string
     case AgencyCreatorRelationUpdated = 'agency_creator_relation.updated';
     case AgencyCreatorRelationDeleted = 'agency_creator_relation.deleted';
 
+    // Redacted notes-edit event (Sprint 6 Chunk 2a, D-2a-5). `internal_notes`
+    // is deliberately EXCLUDED from AgencyCreatorRelation::auditableAllowlist()
+    // (free-text, GDPR-sensitive), so the trait's auto `*.updated` row never
+    // carries it. This event records the FACT of a notes change (actor +
+    // timestamp via the subject + the acting guard) with NO before/after
+    // content — accountability for edits to a sensitive field without copying
+    // that content into the audit store. Emitted manually by
+    // AgencyCreatorDetailController::update ONLY when the notes actually
+    // changed (never on a rating-only edit). `internal_rating` edits keep the
+    // trait's normal allowlisted before/after diff (AgencyCreatorRelationUpdated).
+    case AgencyCreatorRelationNotesUpdated = 'agency_creator_relation.notes_updated';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *

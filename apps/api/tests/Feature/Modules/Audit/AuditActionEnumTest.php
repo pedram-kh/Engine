@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 uses(TestCase::class);
 
-it('AuditAction catalogue lists every Sprint 1-3 auth + user + mfa + brand + invitation + settings + creator + bulk_invite verb', function (): void {
+it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + invitation + settings + creator + bulk_invite verb', function (): void {
     $expected = [
         // Sprint 1 — auth
         'auth.signup',
@@ -80,6 +80,8 @@ it('AuditAction catalogue lists every Sprint 1-3 auth + user + mfa + brand + inv
         'agency_creator_relation.created',
         'agency_creator_relation.updated',
         'agency_creator_relation.deleted',
+        // Sprint 6 Chunk 2a — redacted notes-edit event (D-2a-5)
+        'agency_creator_relation.notes_updated',
         // Sprint 3 Chunk 2 — wizard completion-pairs (status-poll + webhook)
         'creator.wizard.kyc_completed',
         'creator.wizard.contract_completed',

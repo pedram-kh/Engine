@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorAvailabilityController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorController;
+use App\Modules\Agencies\Http\Controllers\AgencyCreatorDetailController;
 use App\Modules\Agencies\Http\Controllers\AgencySettingsController;
 use App\Modules\Agencies\Http\Controllers\DashboardActivityController;
 use App\Modules\Agencies\Http\Controllers\DashboardSummaryController;
@@ -75,6 +76,20 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // data today. Read-only: no write surface this chunk (D-c5-3).
         Route::get('creators', [AgencyCreatorController::class, 'index'])
             ->name('agencies.creators.index');
+
+        // ─── Creator detail (per-creator drill-in) ───────────────────────────
+        // Sprint 6 Chunk 2a (D-2a-1). The roster row-click (D-c5-4 reversal)
+        // lands on `show`. READ is any agency member (viewAny); PATCH edits
+        // the relation's rating + notes ONLY and is admin/manager-gated
+        // (AgencyCreatorRelationPolicy::update, D-2a-3/4). Tenancy mirrors the
+        // roster + availability controllers: a relation (any status) must
+        // exist between this agency and creator, else 404. Path-scoped under
+        // tenancy.agency + tenancy. The platform_admin admin detail endpoint
+        // is untouched (D-2a-1 does not relax it).
+        Route::get('creators/{creator}', [AgencyCreatorDetailController::class, 'show'])
+            ->name('agencies.creators.show');
+        Route::patch('creators/{creator}', [AgencyCreatorDetailController::class, 'update'])
+            ->name('agencies.creators.update');
 
         // ─── Creator availability read-view ──────────────────────────────────
         // Sprint 5 Chunk A (D-a6). Agency-side read of a ROSTER creator's
