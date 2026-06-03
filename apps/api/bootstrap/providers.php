@@ -13,6 +13,7 @@ use App\Modules\Creators\CreatorsServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\Messaging\MessagingServiceProvider;
 use App\Modules\Payments\PaymentsServiceProvider;
+use App\Modules\TalentPools\TalentPoolsServiceProvider;
 use App\Modules\TrackedJobs\TrackedJobsServiceProvider;
 use App\Providers\AppServiceProvider;
 use App\TestHelpers\TestHelpersServiceProvider;
@@ -33,6 +34,7 @@ return [
     IdentityServiceProvider::class,
     MessagingServiceProvider::class,
     PaymentsServiceProvider::class,
+    TalentPoolsServiceProvider::class,
     TrackedJobsServiceProvider::class,
 
     // E2E / Playwright support. The provider is itself a no-op outside

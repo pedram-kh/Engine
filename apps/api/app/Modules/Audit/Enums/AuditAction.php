@@ -174,6 +174,17 @@ enum AuditAction: string
     // trait's normal allowlisted before/after diff (AgencyCreatorRelationUpdated).
     case AgencyCreatorRelationNotesUpdated = 'agency_creator_relation.notes_updated';
 
+    // Talent pools (Sprint 6 Chunk 2b). CRUD mirrors the brand.* verbs;
+    // membership add/remove are net-new (the pivot-write surface has no
+    // controller precedent — MembershipController is read-only and agency
+    // adds go through invitations, not a direct pivot write).
+    case TalentPoolCreated = 'talent_pool.created';
+    case TalentPoolUpdated = 'talent_pool.updated';
+    case TalentPoolArchived = 'talent_pool.archived';
+    case TalentPoolRestored = 'talent_pool.restored';
+    case TalentPoolCreatorAdded = 'talent_pool.creator_added';
+    case TalentPoolCreatorRemoved = 'talent_pool.creator_removed';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *

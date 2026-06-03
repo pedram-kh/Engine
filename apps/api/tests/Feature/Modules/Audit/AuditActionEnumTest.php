@@ -82,6 +82,13 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'agency_creator_relation.deleted',
         // Sprint 6 Chunk 2a — redacted notes-edit event (D-2a-5)
         'agency_creator_relation.notes_updated',
+        // Sprint 6 Chunk 2b — talent pools CRUD + membership
+        'talent_pool.created',
+        'talent_pool.updated',
+        'talent_pool.archived',
+        'talent_pool.restored',
+        'talent_pool.creator_added',
+        'talent_pool.creator_removed',
         // Sprint 3 Chunk 2 — wizard completion-pairs (status-poll + webhook)
         'creator.wizard.kyc_completed',
         'creator.wizard.contract_completed',
