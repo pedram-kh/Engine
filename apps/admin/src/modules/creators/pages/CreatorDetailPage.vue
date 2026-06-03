@@ -168,6 +168,7 @@ const taxLabel = computed(() =>
   ),
 )
 
+const creatorEmail = computed(() => creator.value?.admin_attributes?.email ?? null)
 const rejectionReason = computed(() => creator.value?.admin_attributes?.rejection_reason ?? null)
 const kycVerifications = computed<ReadonlyArray<CreatorKycVerificationSummary>>(
   () => creator.value?.admin_attributes?.kyc_verifications ?? [],
@@ -444,6 +445,14 @@ const decisionSnackbarColor = computed(() =>
         <h1 class="text-h4">
           {{ creator?.attributes.display_name ?? t('admin.creators.detail.fallback_title') }}
         </h1>
+        <a
+          v-if="creatorEmail"
+          :href="`mailto:${creatorEmail}`"
+          class="admin-creator-detail__email"
+          data-testid="admin-creator-detail-email"
+        >
+          {{ creatorEmail }}
+        </a>
         <p v-if="creator?.attributes.application_status" class="text-body-2 text-medium-emphasis">
           {{
             t('admin.creators.detail.application_status', {
@@ -584,25 +593,42 @@ const decisionSnackbarColor = computed(() =>
         />
       </section>
 
-      <section class="admin-creator-detail__section admin-creator-detail__status-grid">
-        <div data-testid="admin-creator-detail-kyc">
-          <h2 class="text-h6">{{ t('creator.ui.wizard.steps.kyc.name') }}</h2>
-          <KycStatusBadge :status="creator.attributes.kyc_status" :label="kycStatusLabel" />
-        </div>
-        <div data-testid="admin-creator-detail-tax">
-          <h2 class="text-h6">{{ t('creator.ui.wizard.steps.tax.name') }}</h2>
-          <TaxProfileDisplay
-            :is-complete="creator.attributes.tax_profile_complete"
-            :label="taxLabel"
-          />
-        </div>
-        <div data-testid="admin-creator-detail-payout">
-          <h2 class="text-h6">{{ t('creator.ui.wizard.steps.payout.name') }}</h2>
-          <PayoutMethodStatus :is-set="creator.attributes.payout_method_set" :label="payoutLabel" />
-        </div>
-        <div data-testid="admin-creator-detail-contract">
-          <h2 class="text-h6">{{ t('creator.ui.wizard.steps.contract.name') }}</h2>
-          <ContractStatusBadge :status="contractStatus" :label="contractLabel" />
+      <section class="admin-creator-detail__section">
+        <h2 class="text-h6">{{ t('admin.creators.detail.onboarding_heading') }}</h2>
+        <div class="admin-creator-detail__status-grid">
+          <div class="admin-creator-detail__status-card" data-testid="admin-creator-detail-kyc">
+            <span class="admin-creator-detail__status-label">
+              {{ t('creator.ui.wizard.steps.kyc.name') }}
+            </span>
+            <KycStatusBadge :status="creator.attributes.kyc_status" :label="kycStatusLabel" />
+          </div>
+          <div class="admin-creator-detail__status-card" data-testid="admin-creator-detail-tax">
+            <span class="admin-creator-detail__status-label">
+              {{ t('creator.ui.wizard.steps.tax.name') }}
+            </span>
+            <TaxProfileDisplay
+              :is-complete="creator.attributes.tax_profile_complete"
+              :label="taxLabel"
+            />
+          </div>
+          <div class="admin-creator-detail__status-card" data-testid="admin-creator-detail-payout">
+            <span class="admin-creator-detail__status-label">
+              {{ t('creator.ui.wizard.steps.payout.name') }}
+            </span>
+            <PayoutMethodStatus
+              :is-set="creator.attributes.payout_method_set"
+              :label="payoutLabel"
+            />
+          </div>
+          <div
+            class="admin-creator-detail__status-card"
+            data-testid="admin-creator-detail-contract"
+          >
+            <span class="admin-creator-detail__status-label">
+              {{ t('creator.ui.wizard.steps.contract.name') }}
+            </span>
+            <ContractStatusBadge :status="contractStatus" :label="contractLabel" />
+          </div>
         </div>
       </section>
 
@@ -762,6 +788,17 @@ const decisionSnackbarColor = computed(() =>
   gap: 4px;
 }
 
+.admin-creator-detail__email {
+  font-size: 0.875rem;
+  color: rgb(var(--v-theme-primary));
+  text-decoration: none;
+  width: fit-content;
+}
+
+.admin-creator-detail__email:hover {
+  text-decoration: underline;
+}
+
 .admin-creator-detail__header-actions {
   display: flex;
   gap: 8px;
@@ -793,8 +830,28 @@ const decisionSnackbarColor = computed(() =>
 
 .admin-creator-detail__status-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.admin-creator-detail__status-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px 16px;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 8px;
+  background: rgb(var(--v-theme-surface));
+}
+
+.admin-creator-detail__status-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+  overflow-wrap: anywhere;
 }
 
 .admin-creator-detail__identity-actions {

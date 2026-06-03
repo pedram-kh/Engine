@@ -8,6 +8,7 @@
         "load_failed": "Impossibile caricare la coda di revisione. Aggiorna la pagina.",
         "fields": {
           "name": "Creator",
+          "email": "Email",
           "status": "Stato",
           "kyc": "KYC",
           "completeness": "Completamento",
@@ -35,6 +36,7 @@
         "profile_heading": "Profilo",
         "social_heading": "Account social",
         "portfolio_heading": "Portfolio",
+        "onboarding_heading": "Stato dell'onboarding",
         "kyc_history_heading": "Cronologia verifiche KYC",
         "kyc_history": {
           "provider": "Fornitore",
@@ -119,6 +121,70 @@
     "kyc_already_verified": "L'identità di questo creator è già stata verificata.",
     "admin": {
       "field_status_immutable": "Le transizioni di stato usano le azioni approva / rifiuta, non la modifica del campo."
+    },
+    "ui": {
+      "wizard": {
+        "steps": {
+          "kyc": {
+            "name": "Verifica dell'identità",
+            "status_labels": {
+              "none": "Non iniziata",
+              "pending": "In corso",
+              "verified": "Verificata",
+              "rejected": "Respinta",
+              "not_required": "Non richiesta"
+            }
+          },
+          "tax": {
+            "name": "Informazioni fiscali",
+            "status_complete": "Inviato",
+            "status_incomplete": "Non ancora inviato"
+          },
+          "payout": {
+            "name": "Metodo di pagamento",
+            "status_set": "Collegato",
+            "status_unset": "Non collegato"
+          },
+          "contract": {
+            "name": "Contratto principale",
+            "status_labels": {
+              "signed": "Firmato",
+              "click_through_accepted": "Accettato",
+              "none": "Non iniziato"
+            }
+          },
+          "portfolio": {
+            "gallery_empty": "Nessun elemento del portfolio caricato finora.",
+            "video_badge_label": "Video",
+            "link_badge_label": "Link esterno",
+            "untitled_item": "Elemento del portfolio senza titolo"
+          }
+        },
+        "categories": {
+          "fashion": "Moda",
+          "beauty": "Bellezza",
+          "lifestyle": "Lifestyle",
+          "fitness": "Fitness",
+          "travel": "Viaggi",
+          "food": "Cibo",
+          "tech": "Tecnologia",
+          "gaming": "Gaming",
+          "music": "Musica",
+          "comedy": "Comicità",
+          "education": "Educazione",
+          "parenting": "Genitorialità",
+          "business": "Business",
+          "art": "Arte",
+          "sports": "Sport",
+          "other": "Altro"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "In arrivo"
+        }
+      }
     }
   }
 }

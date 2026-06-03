@@ -8,6 +8,7 @@
         "load_failed": "Não foi possível carregar a fila de revisão. Atualize a página.",
         "fields": {
           "name": "Criador",
+          "email": "Email",
           "status": "Estado",
           "kyc": "KYC",
           "completeness": "Conclusão",
@@ -35,6 +36,7 @@
         "profile_heading": "Perfil",
         "social_heading": "Contas sociais",
         "portfolio_heading": "Portfólio",
+        "onboarding_heading": "Estado do onboarding",
         "kyc_history_heading": "Histórico de verificações KYC",
         "kyc_history": {
           "provider": "Fornecedor",
@@ -119,6 +121,70 @@
     "kyc_already_verified": "A identidade deste criador já foi verificada.",
     "admin": {
       "field_status_immutable": "As transições de estado usam as ações aprovar / rejeitar, não a edição de campo."
+    },
+    "ui": {
+      "wizard": {
+        "steps": {
+          "kyc": {
+            "name": "Verificação de identidade",
+            "status_labels": {
+              "none": "Não iniciada",
+              "pending": "Em curso",
+              "verified": "Verificada",
+              "rejected": "Rejeitada",
+              "not_required": "Não necessária"
+            }
+          },
+          "tax": {
+            "name": "Informação fiscal",
+            "status_complete": "Enviado",
+            "status_incomplete": "Ainda não enviado"
+          },
+          "payout": {
+            "name": "Método de pagamento",
+            "status_set": "Ligado",
+            "status_unset": "Não ligado"
+          },
+          "contract": {
+            "name": "Contrato principal",
+            "status_labels": {
+              "signed": "Assinado",
+              "click_through_accepted": "Aceite",
+              "none": "Não iniciado"
+            }
+          },
+          "portfolio": {
+            "gallery_empty": "Ainda não foram carregados itens do portfólio.",
+            "video_badge_label": "Vídeo",
+            "link_badge_label": "Link externo",
+            "untitled_item": "Item do portfólio sem título"
+          }
+        },
+        "categories": {
+          "fashion": "Moda",
+          "beauty": "Beleza",
+          "lifestyle": "Lifestyle",
+          "fitness": "Fitness",
+          "travel": "Viagens",
+          "food": "Comida",
+          "tech": "Tecnologia",
+          "gaming": "Gaming",
+          "music": "Música",
+          "comedy": "Comédia",
+          "education": "Educação",
+          "parenting": "Parentalidade",
+          "business": "Negócios",
+          "art": "Arte",
+          "sports": "Desporto",
+          "other": "Outras"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Em breve"
+        }
+      }
     }
   }
 }

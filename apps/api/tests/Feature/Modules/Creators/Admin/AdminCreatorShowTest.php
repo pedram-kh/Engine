@@ -83,6 +83,8 @@ it('returns the creator-self view + admin_attributes block to an authenticated p
     expect($payload['data'])->toHaveKey('admin_attributes');
     expect($payload['data']['admin_attributes']['rejection_reason'])
         ->toBe('Insufficient portfolio at submit time.');
+    // The creator's account email is surfaced (admin-only) for reviewer identification.
+    expect($payload['data']['admin_attributes']['email'])->toBe($creator->user->email);
 });
 
 it('surfaces the kyc_verifications history (newest first, PII stripped)', function (): void {

@@ -246,6 +246,8 @@ export interface CreatorKycVerificationSummary {
 export type CreatorKycMethod = 'vendor' | 'manual'
 
 export interface CreatorAdminAttributes {
+  /** The creator's account email — admin-only PII for reviewer identification. */
+  email: string | null
   rejection_reason: string | null
   rejected_at: string | null
   last_active_at: string | null

@@ -72,7 +72,10 @@ final class AdminCreatorController
         $perPage = (int) $request->integer('per_page', 25);
         $perPage = max(1, min($perPage, 100));
 
-        $query = Creator::query()->orderByDesc('submitted_at')->orderByDesc('id');
+        $query = Creator::query()
+            ->with('user:id,email')
+            ->orderByDesc('submitted_at')
+            ->orderByDesc('id');
 
         $statusInput = $request->query('status');
         if (is_string($statusInput) && $statusInput !== '') {
@@ -92,6 +95,7 @@ final class AdminCreatorController
             'type' => 'creators',
             'attributes' => [
                 'display_name' => $creator->display_name,
+                'email' => $creator->user?->email,
                 'application_status' => $creator->application_status->value,
                 'kyc_status' => $creator->kyc_status->value,
                 'profile_completeness_score' => $creator->profile_completeness_score,
@@ -115,7 +119,7 @@ final class AdminCreatorController
     {
         $this->authorize($request, 'view', $creator);
 
-        $creator->loadMissing(['socialAccounts', 'portfolioItems', 'kycVerifications']);
+        $creator->loadMissing(['user', 'socialAccounts', 'portfolioItems', 'kycVerifications']);
 
         return (new CreatorResource($creator, $this->calculator))
             ->withAdmin(true)
@@ -150,7 +154,7 @@ final class AdminCreatorController
             reason: $reasonString,
         );
 
-        $creator->refresh()->loadMissing(['socialAccounts', 'portfolioItems', 'kycVerifications']);
+        $creator->refresh()->loadMissing(['user', 'socialAccounts', 'portfolioItems', 'kycVerifications']);
 
         return (new CreatorResource($creator, $this->calculator))
             ->withAdmin(true)
@@ -226,7 +230,7 @@ final class AdminCreatorController
             );
         });
 
-        $creator->refresh()->loadMissing(['socialAccounts', 'portfolioItems', 'kycVerifications']);
+        $creator->refresh()->loadMissing(['user', 'socialAccounts', 'portfolioItems', 'kycVerifications']);
 
         $this->dispatchCreatorMail($creator, new CreatorApprovedMail(
             creatorDisplayName: $creator->display_name ?? '',
@@ -286,7 +290,7 @@ final class AdminCreatorController
             );
         });
 
-        $creator->refresh()->loadMissing(['socialAccounts', 'portfolioItems', 'kycVerifications']);
+        $creator->refresh()->loadMissing(['user', 'socialAccounts', 'portfolioItems', 'kycVerifications']);
 
         $this->dispatchCreatorMail($creator, new CreatorRejectedMail(
             creatorDisplayName: $creator->display_name ?? '',
@@ -351,7 +355,7 @@ final class AdminCreatorController
             );
         });
 
-        $creator->refresh()->loadMissing(['socialAccounts', 'portfolioItems', 'kycVerifications']);
+        $creator->refresh()->loadMissing(['user', 'socialAccounts', 'portfolioItems', 'kycVerifications']);
 
         return (new CreatorResource($creator, $this->calculator))
             ->withAdmin(true)

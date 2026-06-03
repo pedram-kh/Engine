@@ -37,6 +37,7 @@ const tableOptions = ref({ page: 1, itemsPerPage: 25 })
 
 const headers = [
   { title: t('admin.creators.list.fields.name'), key: 'attributes.display_name', sortable: false },
+  { title: t('admin.creators.list.fields.email'), key: 'attributes.email', sortable: false },
   {
     title: t('admin.creators.list.fields.status'),
     key: 'attributes.application_status',
@@ -167,6 +168,12 @@ function formatDate(iso: string | null): string {
         >
           {{ item.attributes.display_name ?? t('admin.creators.list.unnamed') }}
         </button>
+      </template>
+
+      <template #item.attributes.email="{ item }">
+        <span :data-testid="`admin-creator-list-email-${item.id}`">
+          {{ item.attributes.email ?? '—' }}
+        </span>
       </template>
 
       <template #item.attributes.application_status="{ item }">

@@ -32,6 +32,7 @@ export interface AdminCreatorListItem {
   type: 'creators'
   attributes: {
     display_name: string | null
+    email: string | null
     application_status: CreatorApplicationStatus
     kyc_status: CreatorKycStatus
     profile_completeness_score: number

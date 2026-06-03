@@ -8,6 +8,7 @@
         "load_failed": "We couldn't load the review queue. Please refresh.",
         "fields": {
           "name": "Creator",
+          "email": "Email",
           "status": "Status",
           "kyc": "KYC",
           "completeness": "Completeness",
@@ -35,6 +36,7 @@
         "profile_heading": "Profile",
         "social_heading": "Social accounts",
         "portfolio_heading": "Portfolio",
+        "onboarding_heading": "Onboarding status",
         "kyc_history_heading": "KYC verification history",
         "kyc_history": {
           "provider": "Provider",
@@ -119,6 +121,70 @@
     "kyc_already_verified": "This creator's identity has already been verified.",
     "admin": {
       "field_status_immutable": "Status transitions use the approve / reject actions, not the field edit."
+    },
+    "ui": {
+      "wizard": {
+        "steps": {
+          "kyc": {
+            "name": "Identity verification",
+            "status_labels": {
+              "none": "Not started",
+              "pending": "In progress",
+              "verified": "Verified",
+              "rejected": "Rejected",
+              "not_required": "Not required"
+            }
+          },
+          "tax": {
+            "name": "Tax information",
+            "status_complete": "Submitted",
+            "status_incomplete": "Not yet submitted"
+          },
+          "payout": {
+            "name": "Payout method",
+            "status_set": "Connected",
+            "status_unset": "Not connected"
+          },
+          "contract": {
+            "name": "Master agreement",
+            "status_labels": {
+              "signed": "Signed",
+              "click_through_accepted": "Accepted",
+              "none": "Not started"
+            }
+          },
+          "portfolio": {
+            "gallery_empty": "No portfolio items uploaded yet.",
+            "video_badge_label": "Video",
+            "link_badge_label": "External link",
+            "untitled_item": "Untitled portfolio item"
+          }
+        },
+        "categories": {
+          "fashion": "Fashion",
+          "beauty": "Beauty",
+          "lifestyle": "Lifestyle",
+          "fitness": "Fitness",
+          "travel": "Travel",
+          "food": "Food",
+          "tech": "Technology",
+          "gaming": "Gaming",
+          "music": "Music",
+          "comedy": "Comedy",
+          "education": "Education",
+          "parenting": "Parenting",
+          "business": "Business",
+          "art": "Art",
+          "sports": "Sports",
+          "other": "Other"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Coming soon"
+        }
+      }
     }
   }
 }

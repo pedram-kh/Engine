@@ -43,6 +43,7 @@ function listResponse(
         type: 'creators',
         attributes: {
           display_name: 'Jane Doe',
+          email: 'jane@example.com',
           application_status: 'pending',
           kyc_status: 'verified',
           profile_completeness_score: 100,

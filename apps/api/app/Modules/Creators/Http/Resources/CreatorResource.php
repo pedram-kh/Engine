@@ -190,6 +190,10 @@ final class CreatorResource extends JsonResource
 
         if ($this->isAdminView) {
             $payload['admin_attributes'] = [
+                // The creator's account email — admin-only PII surfaced so
+                // reviewers can identify / contact the applicant. Lives on
+                // the related User; eager-loaded by the admin controller.
+                'email' => $creator->user?->email,
                 'rejection_reason' => $creator->rejection_reason,
                 'rejected_at' => $creator->rejected_at?->toIso8601String(),
                 'last_active_at' => $creator->last_active_at?->toIso8601String(),

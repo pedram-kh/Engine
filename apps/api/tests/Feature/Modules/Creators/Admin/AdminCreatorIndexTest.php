@@ -42,8 +42,10 @@ it('returns only creators matching the status filter', function (): void {
     expect($response->json('data.0.attributes.application_status'))->toBe('pending');
     // List-card fields present; no admin drill-in payload.
     expect($response->json('data.0.attributes'))->toHaveKeys([
-        'display_name', 'application_status', 'kyc_status', 'profile_completeness_score', 'submitted_at',
+        'display_name', 'email', 'application_status', 'kyc_status', 'profile_completeness_score', 'submitted_at',
     ]);
+    // Email is surfaced from the related user so admins can identify creators.
+    expect($response->json('data.0.attributes.email'))->toBe($pending->user->email);
 });
 
 it('returns all creators when no status filter is supplied', function (): void {
