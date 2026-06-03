@@ -19,8 +19,10 @@
  * The consumer fills each day cell via the scoped `#day` slot, which
  * receives a single `cell` object `{ date, day, inMonth, isToday }` (a
  * single object avoids the template slot-prop camelCase gotcha) — e.g. the
- * availability calendar buckets occurrences by `cell.date` and renders
- * day-level bars there.
+ * availability calendar tints the cell for all-day blocks and stacks timed
+ * blocks as chips on top. The cell is a stacking context (`isolation`), so
+ * a slotted full-cell background layer (`z-index: -1`) paints behind the
+ * day number and chips.
  *
  * Styling consumes the Vuetify theme layer (`rgb(var(--v-theme-*))`) so it
  * re-themes automatically across light/dark with no extra work.
@@ -239,6 +241,9 @@ function onCellActivate(date: string): void {
 
 .cmg__cell {
   position: relative;
+  /* Own stacking context so a slotted full-cell background layer
+     (z-index: -1) paints behind the day number + chips, not the page. */
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   gap: var(--space-1, 4px);

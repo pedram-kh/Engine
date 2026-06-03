@@ -4,6 +4,10 @@
     "subtitle": "Blocca gli orari in cui non sei disponibile così le agenzie vedono il tuo calendario reale.",
     "allDay": "Tutto il giorno",
     "moreCount": "+{count} altri",
+    "dayPopover": {
+      "title": "Blocchi del giorno",
+      "viewAll": "Mostra tutti i blocchi del giorno"
+    },
     "creatorNav": {
       "dashboard": "Dashboard",
       "availability": "Disponibilità"

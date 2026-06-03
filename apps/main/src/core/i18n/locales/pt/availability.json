@@ -4,6 +4,10 @@
     "subtitle": "Bloqueie os horários em que está indisponível para que as agências vejam o seu calendário real.",
     "allDay": "Dia inteiro",
     "moreCount": "+{count} mais",
+    "dayPopover": {
+      "title": "Blocos deste dia",
+      "viewAll": "Mostrar todos os blocos deste dia"
+    },
     "creatorNav": {
       "dashboard": "Painel",
       "availability": "Disponibilidade"

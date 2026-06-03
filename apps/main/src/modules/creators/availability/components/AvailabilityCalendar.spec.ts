@@ -160,7 +160,7 @@ describe('AvailabilityCalendar (Sprint 5 Chunk B)', () => {
     }
   })
 
-  it('renders an occurrence in the correct day cell for the creator tz', async () => {
+  it('renders a timed occurrence as a chip in the correct day cell (creator tz)', async () => {
     // 13:30 UTC = 09:30 in New York on 2026-06-15.
     const occ = makeOccurrence('BLOCK_A', '2026-06-15T13:30:00Z', '2026-06-15T14:30:00Z')
     const mounted = await mountCalendar({ occurrences: [occ] })
@@ -171,6 +171,8 @@ describe('AvailabilityCalendar (Sprint 5 Chunk B)', () => {
     expect(cell.find('[data-test="availability-bar-BLOCK_A|2026-06-15T13:30:00Z"]').exists()).toBe(
       true,
     )
+    // A timed block does NOT wash the whole day.
+    expect(cell.find('[data-test="availability-fill-2026-06-15"]').exists()).toBe(false)
   })
 
   it('renders EACH occurrence of a recurring block without key collision (D-b5)', async () => {
@@ -186,17 +188,80 @@ describe('AvailabilityCalendar (Sprint 5 Chunk B)', () => {
     const mounted = await mountCalendar({ occurrences: [week1, week2] })
     cleanup = mounted.cleanup
 
-    const bar1 = mounted.wrapper.find('[data-test="availability-bar-BLOCK_R|2026-06-08T13:00:00Z"]')
-    const bar2 = mounted.wrapper.find('[data-test="availability-bar-BLOCK_R|2026-06-15T13:00:00Z"]')
-    expect(bar1.exists()).toBe(true)
-    expect(bar2.exists()).toBe(true)
-    // Each lands in its own week's cell.
-    expect(mounted.wrapper.find('[data-date="2026-06-08"]').html()).toContain(
-      'availability-bar-BLOCK_R|2026-06-08T13:00:00Z',
-    )
-    expect(mounted.wrapper.find('[data-date="2026-06-15"]').html()).toContain(
-      'availability-bar-BLOCK_R|2026-06-15T13:00:00Z',
-    )
+    expect(
+      mounted.wrapper
+        .find('[data-date="2026-06-08"]')
+        .find('[data-test="availability-bar-BLOCK_R|2026-06-08T13:00:00Z"]')
+        .exists(),
+    ).toBe(true)
+    expect(
+      mounted.wrapper
+        .find('[data-date="2026-06-15"]')
+        .find('[data-test="availability-bar-BLOCK_R|2026-06-15T13:00:00Z"]')
+        .exists(),
+    ).toBe(true)
+  })
+
+  it('fills every covered day cell for a multi-day all-day block', async () => {
+    // 2026-06-08 → 06-11 (end-exclusive) covers the 8th/9th/10th. Pinned to
+    // UTC so all-day midnight boundaries do not shift the covered days.
+    const occ = makeOccurrence('BLOCK_M', '2026-06-08T00:00:00Z', '2026-06-11T00:00:00Z', {
+      is_all_day: true,
+    })
+    const mounted = await mountCalendar({ occurrences: [occ], timezone: 'UTC' })
+    cleanup = mounted.cleanup
+
+    for (const date of ['2026-06-08', '2026-06-09', '2026-06-10']) {
+      const cell = mounted.wrapper.find(`[data-date="${date}"]`)
+      const fill = cell.find(`[data-test="availability-fill-${date}"]`)
+      expect(fill.exists()).toBe(true)
+      // Default block_type is 'hard' → the hard wash.
+      expect(fill.classes()).toContain('availability-fill--hard')
+      // The clickable all-day label rides on the wash in each covered cell.
+      expect(
+        cell.find('[data-test="availability-bar-BLOCK_M|2026-06-08T00:00:00Z"]').exists(),
+      ).toBe(true)
+    }
+    // End-exclusive: the 11th is NOT washed.
+    expect(mounted.wrapper.find('[data-test="availability-fill-2026-06-11"]').exists()).toBe(false)
+  })
+
+  it('uses the soft wash for a soft all-day block', async () => {
+    const occ = makeOccurrence('BLOCK_S', '2026-06-09T00:00:00Z', '2026-06-10T00:00:00Z', {
+      is_all_day: true,
+      block_type: 'soft',
+    })
+    const mounted = await mountCalendar({ occurrences: [occ], timezone: 'UTC' })
+    cleanup = mounted.cleanup
+
+    const fill = mounted.wrapper.find('[data-test="availability-fill-2026-06-09"]')
+    expect(fill.exists()).toBe(true)
+    expect(fill.classes()).toContain('availability-fill--soft')
+  })
+
+  it('opens a clickable popover listing EVERY block on a day past the chip cap', async () => {
+    // Four timed blocks on one day → 3 chips + a "+1 more" control.
+    const occs = [
+      makeOccurrence('T1', '2026-06-15T09:00:00Z', '2026-06-15T10:00:00Z'),
+      makeOccurrence('T2', '2026-06-15T11:00:00Z', '2026-06-15T12:00:00Z'),
+      makeOccurrence('T3', '2026-06-15T13:00:00Z', '2026-06-15T14:00:00Z'),
+      makeOccurrence('T4', '2026-06-15T15:00:00Z', '2026-06-15T16:00:00Z'),
+    ]
+    const mounted = await mountCalendar({ occurrences: occs, timezone: 'UTC' })
+    cleanup = mounted.cleanup
+
+    const more = mounted.wrapper.find('[data-test="availability-overflow-2026-06-15"]')
+    expect(more.exists()).toBe(true)
+    // It is a real <button> (focusable + clickable), not inert text.
+    expect(more.element.tagName).toBe('BUTTON')
+    expect(more.text()).toContain('+1 more')
+
+    await more.trigger('click')
+    await flushPromises()
+
+    // The menu content teleports to the document body; it lists ALL four.
+    const items = document.body.querySelectorAll('[data-test^="availability-day-item-T"]')
+    expect(items).toHaveLength(4)
   })
 
   it('reads the effective range from meta.window (D-b6)', async () => {

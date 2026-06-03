@@ -4,6 +4,10 @@
     "subtitle": "Block out the times you're unavailable so agencies see your real calendar.",
     "allDay": "All day",
     "moreCount": "+{count} more",
+    "dayPopover": {
+      "title": "Blocks this day",
+      "viewAll": "Show all blocks for this day"
+    },
     "creatorNav": {
       "dashboard": "Dashboard",
       "availability": "Availability"
