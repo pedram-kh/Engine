@@ -880,3 +880,29 @@ anyone reviewing it later.
 - **Triggered by:** the P2 external-calendar-sync feature being scheduled.
 - **Owner:** P2 / unscheduled.
 - **Status:** open (P2, untouched). Re-confirmed by Sprint 5 Chunk A, 2026-06-03.
+
+---
+
+## Availability calendar WEEK view deferred to a follow-on chunk (month view shipped)
+
+- **Where:** the creator availability calendar UI. Month view ships in Sprint 5 Chunk B: [`AvailabilityCalendar.vue`](../apps/main/src/modules/creators/availability/components/AvailabilityCalendar.vue) over the shared [`CMonthGrid`](../packages/ui/src/components/CMonthGrid.vue) primitive. There is **no week view**.
+- **What we accepted in Sprint 5 Chunk B (2026-06-03):** D-b1 phased the calendar deliberately. **Effort read (inventory B2):** the **6×7 month grid is tractable hand-rolled work** — a flat calendar matrix with day-level entries, no intra-day geometry. The **week view is a different order of complexity**: it needs timed-lane layout + **overlap-packing math** (computing how many concurrent blocks share a time slot and how to lay them out side-by-side without collision). That overlap geometry is disproportionately heavy relative to the rest of the calendar and deserves its own build + eyes-on pass rather than being rushed into this chunk. The month view is a complete, useful product on its own (it shows every block as a day-level bar, multi-day blocks span their covered days); the week view is a power-user zoom.
+- **Risk:** low. Month view covers the core need — a creator can see, create, edit, and delete blocks across the month, with recurrence. The week view is an enhancement, not a gap in the core flow. No data model or API work is deferred (the backend already returns the occurrence shape a week view would consume).
+- **Honest-deviation guard held:** the month-grid rendering was kept strictly day-level — multi-day blocks paint each covered day (end-exclusive at midnight), never intra-day lanes. The moment all-day-vs-timed rendering would have pulled in week-view-grade overlap math, that was the deferred view leaking in; it was kept out.
+- **Resolution:** a focused follow-on chunk builds the week view — the timed-lane layout + overlap-packing algorithm (and, if a headless layout helper is wanted purely for the packing geometry, that dependency decision belongs to _that_ chunk, not this one — D-b2). It can reuse this chunk's `availability.api.ts`, tz helpers (`datetime.ts`), recurrence helpers (`recurrence.ts`), and the create/edit dialog as-is.
+- **Triggered by:** the follow-on week-view chunk being scheduled.
+- **Owner:** Sprint 5 week-view follow-on / unscheduled.
+- **Status:** open (deferred by design). Surfaced + accepted by Sprint 5 Chunk B, 2026-06-03 ([review](reviews/sprint-5-chunk-b-review.md)).
+
+---
+
+## Availability block-not-found 404 is Laravel's default `{message}`, not the canonical error envelope
+
+- **Where:** [`CreatorAvailabilityController::resolveBlock()`](../apps/api/app/Modules/Creators/Http/Controllers/CreatorAvailabilityController.php) — `firstOrFail()` on `update`/`destroy` of a non-existent (or non-owned) block ULID. `ModelNotFoundException` → Laravel's stock `{ "message": "..." }` 404, **not** the `{ errors: [{ code, detail, source }] }` envelope the SPA's `ApiError`/`extractFieldErrors` parse. The SPA renders it as a generic unknown-error.
+- **What we accepted in Sprint 5 Chunk B (2026-06-03):** flagged but **not fixed** — out of scope for a calendar UI chunk. It is an **edge case** (the block was deleted in another tab between load and the edit/delete call) and the structural owner-only 404 it produces is correct behaviour; only the envelope shape is off. The SPA already shows a sane generic error for it.
+- **Risk:** low. Cosmetic at the error-copy level on a rare race; no security or data issue (the 404 itself is the correct owner-only guard, Chunk A).
+- **Why not fixed here:** the right fix is an **API-wide `ModelNotFoundException` → canonical-envelope renderer** (in the global exception handler), so every `firstOrFail()` across the monolith emits the standard envelope — not a calendar-local catch that would diverge from the platform pattern. That is a backend cross-cutting concern, not a Chunk-B (frontend) deliverable.
+- **Resolution:** register a `ModelNotFoundException` handler in the API exception renderer that emits `{ errors: [{ status: '404', code: '<resource>.not_found', detail }] }`, then drop any per-controller workarounds.
+- **Triggered by:** the next API error-envelope hardening pass, or the first user-facing report of a confusing delete-in-another-tab error.
+- **Owner:** backend platform / unowned.
+- **Status:** open (accepted — cosmetic edge case). Surfaced by Sprint 5 Chunk B, 2026-06-03 ([review](reviews/sprint-5-chunk-b-review.md)).
