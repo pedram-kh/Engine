@@ -9,6 +9,34 @@ anyone reviewing it later.
 
 ---
 
+## Deferred creator settings page (timezone correction + `preferred_language` / `theme_preference` persistence)
+
+- **Where:** there is no creator settings surface today. The fields that would live there: [`apps/api/app/Modules/Identity/Models/User.php`](../apps/api/app/Modules/Identity/Models/User.php) (`timezone`, `preferred_language`, `theme_preference`), set once at row-creation by [`apps/api/app/Modules/Identity/Services/SignUpService.php`](../apps/api/app/Modules/Identity/Services/SignUpService.php) and never updated afterward. The SPA reads them via `useAuthStore`/[`packages/api-client/src/types/user.ts`](../packages/api-client/src/types/user.ts) but has no surface to write them back.
+- **What we accepted in Sprint 5 Chunk C (June 3, 2026):** Chunk C was re-scoped from "auto-detect + settings page" down to **auto-detect only** (capture the browser IANA tz at both sign-up entry points — D-c1/D-c3). The **settings page was deferred** because the Chunk-C inventory (S5/S7) found it is net-new/medium — the _first_ creator settings surface, with **no** creator settings route/page/nav item and **no** User self-update endpoint existing today — AND that `preferred_language` + `theme_preference` are _also_ client-only / never persisted after row creation (S7). A one-field tz settings page would just be torn out and rebuilt when language + theme need the same surface, so they should land together.
+- **Risk:** low. Auto-detect (Chunk C) already makes the calendar correct-by-default for essentially every real creator; the missing settings page only blocks _manual correction_ of the three fields. Until it ships, a creator cannot change their timezone, UI language, or theme after sign-up.
+- **Triggered by:** the first creator request to change language/theme/timezone in-app, or a future "creator account settings" chunk.
+- **Resolution (the deferred chunk owns, as one surface):**
+  1. The first creator settings **route + page + nav item**.
+  2. A **net-new User self-update endpoint** (`users/me`-style, **own-record-only** authorization — a creator may only edit their own row).
+  3. A **lean IANA timezone picker** — `v-autocomplete` over the _full_ `Intl.supportedValuesOf('timeZone')` (not a curated subset; a creator could be anywhere).
+  4. **Persist `preferred_language` and `theme_preference`** through the same endpoint (today both are dropped after row creation).
+- **Owner:** future creator-settings workstream.
+- **Status:** open. Surfaced + deliberately deferred by Sprint 5 Chunk C, June 3, 2026 ([review](reviews/sprint-5-chunk-c-review.md)).
+
+---
+
+## Auto-detected timezone can capture a travel zone and cannot be corrected in-app (until the settings page ships)
+
+- **Where:** [`apps/main/src/modules/auth/pages/SignUpPage.vue`](../apps/main/src/modules/auth/pages/SignUpPage.vue) (captures `Intl.DateTimeFormat().resolvedOptions().timeZone` at sign-up) → [`apps/api/app/Modules/Identity/Services/SignUpService.php`](../apps/api/app/Modules/Identity/Services/SignUpService.php) (`normaliseTimezone()`, persisted to `users.timezone`).
+- **What we accepted in Sprint 5 Chunk C (June 3, 2026):** Chunk C captures the _browser's_ zone at registration. A creator who signs up (or accepts an invite) **while traveling** captures the travel zone, not their home zone. Because the creator settings page is deferred (entry above), there is currently **no in-app way to correct a wrong auto-detected zone**.
+- **Risk:** low and rare. This is strictly better than the prior always-`'UTC'` behaviour (the calendar now renders in a real zone for the overwhelming majority who sign up at home), and the failure mode is "wrong-but-real zone for a traveling minority," not a broken calendar.
+- **Triggered by:** the deferred creator settings page — its IANA picker is exactly the correction mechanism this limitation needs.
+- **Resolution:** ship the creator settings page (entry above); manual tz correction resolves this automatically.
+- **Owner:** future creator-settings workstream.
+- **Status:** open (accepted limit, named honestly). Surfaced by Sprint 5 Chunk C, June 3, 2026 ([review](reviews/sprint-5-chunk-c-review.md)).
+
+---
+
 ## Postgres FTS name/bio search on the creator roster (spec'd `tsvector`, not built)
 
 - **Where:** spec at [`docs/03-DATA-MODEL.md:219`](03-DATA-MODEL.md) ("Postgres full-text index on `display_name`, `bio` — combined `tsvector` column"). No migration builds it; confirmed by the Sprint 4 Chunk 5 pre-kickoff inventory. The roster list that would consume it is [`apps/api/app/Modules/Agencies/Http/Controllers/AgencyCreatorController.php`](../apps/api/app/Modules/Agencies/Http/Controllers/AgencyCreatorController.php).

@@ -77,6 +77,17 @@ const invitationToken = computed(() => {
 
 const isInvitationFlow = computed(() => invitationToken.value !== null)
 
+/**
+ * Sprint 5 Chunk C — auto-detected browser timezone (D-c1). Captured as a
+ * hidden/auto field (no user-facing input) so the calendar's tz round-trip
+ * renders in the creator's real zone instead of UTC-for-all. The backend
+ * re-validates as a real IANA zone and falls back to UTC on anything
+ * invalid/absent — the client value is never trusted. Read once at mount
+ * (the zone does not change mid-form). Omitted only if the browser exposes
+ * no zone, in which case the backend's UTC fallback applies.
+ */
+const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || null
+
 async function onSubmit(): Promise<void> {
   errorKey.value = null
   errorValues.value = {}
@@ -87,6 +98,7 @@ async function onSubmit(): Promise<void> {
       email: email.value,
       password: password.value,
       password_confirmation: passwordConfirmation.value,
+      ...(browserTimezone !== null ? { timezone: browserTimezone } : {}),
       ...(invitationToken.value !== null ? { invitation_token: invitationToken.value } : {}),
     })
     if (isInvitationFlow.value) {

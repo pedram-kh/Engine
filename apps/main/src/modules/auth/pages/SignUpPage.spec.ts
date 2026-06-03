@@ -81,11 +81,34 @@ describe('SignUpPage', () => {
       email: 'a@b.c',
       password: 'Pa$$w0rd!12',
       password_confirmation: 'Pa$$w0rd!12',
+      // Sprint 5 Chunk C — the auto-detected browser zone always rides the
+      // payload. Its value is environment-dependent (the test runner's tz),
+      // so we assert presence + type rather than a fixed zone here; the
+      // dedicated test below pins it to the exact resolved value.
+      timezone: expect.any(String),
     })
     expect(pushSpy).toHaveBeenCalledWith({
       name: 'auth.verify-email.pending',
       query: { email: 'a@b.c' },
     })
+  })
+
+  it('forwards the auto-detected browser timezone in the signUp() payload (Sprint 5 Chunk C)', async () => {
+    vi.mocked(authApi.signUp).mockResolvedValue(USER)
+    // Read the same source the component reads so the assertion is
+    // deterministic regardless of which tz the CI runner sits in.
+    const expectedTz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const h = await mountAuthPage(SignUpPage)
+    teardown = h.unmount
+    await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
+    await h.wrapper.find('[data-test="sign-up-email"] input').setValue('a@b.c')
+    await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
+    await h.wrapper
+      .find('[data-test="sign-up-password-confirmation"] input')
+      .setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(authApi.signUp).toHaveBeenCalledWith(expect.objectContaining({ timezone: expectedTz }))
   })
 
   it('on auth.signup.email_taken, renders the i18n string inline', async () => {
@@ -320,6 +343,9 @@ describe('SignUpPage', () => {
       email: 'a@b.c',
       password: 'Pa$$w0rd!12',
       password_confirmation: 'Pa$$w0rd!12',
+      // Sprint 5 Chunk C — the browser tz rides the invite-acceptance path
+      // too (same SignUpPage handles both entry points — D-c1).
+      timezone: expect.any(String),
       invitation_token: 'magic-token',
     })
   })

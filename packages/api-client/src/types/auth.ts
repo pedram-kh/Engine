@@ -20,7 +20,7 @@
  *     test (PROJECT-WORKFLOW.md § 5.1).
  */
 
-import type { PreferredLanguage } from './user'
+import type { PreferredLanguage, TimezoneIdentifier } from './user'
 
 /**
  * `POST /api/v1/auth/login` request body.
@@ -52,6 +52,16 @@ export interface SignUpRequest {
   password: string
   password_confirmation: string
   preferred_language?: PreferredLanguage
+  /**
+   * Browser-detected IANA timezone (Sprint 5 Chunk C). Auto-captured at
+   * sign-up via `Intl.DateTimeFormat().resolvedOptions().timeZone` — there
+   * is no user-facing input. Rides BOTH the direct-signup and the
+   * invite-acceptance paths (same `SignUpPage`). The backend treats the
+   * client as untrusted: it re-validates against the canonical IANA list
+   * and silently falls back to `'UTC'` on an invalid/absent value (never
+   * rejects the registration). Absent only if the browser exposes no zone.
+   */
+  timezone?: TimezoneIdentifier
   /**
    * Magic-link invitation token (Sprint 3 Chunk 4). When present, the
    * sign-up endpoint accepts the invitation: the bulk-invite User row
