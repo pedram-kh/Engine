@@ -221,6 +221,22 @@ export const testIds = {
   bulkInviteCreatorsBtn: 'bulk-invite-creators-btn',
 
   // ---------------------------------------------------------------
+  // Creator roster — Sprint 4 Chunk 5 + Sprint 6 Chunk 1 (search +
+  // disabled affordances). (apps/main/src/modules/roster/pages/CreatorRosterPage.vue)
+  // ---------------------------------------------------------------
+  rosterPage: 'roster-page',
+  rosterHeading: 'roster-heading',
+  rosterTable: 'roster-table',
+  rosterSearch: 'roster-search',
+  rosterEmptyFiltered: 'roster-empty-filtered',
+  rosterFollowersAffordance: 'roster-followers-affordance',
+  rosterEngagementAffordance: 'roster-engagement-affordance',
+  rosterAvailabilityAffordance: 'roster-availability-affordance',
+  rosterFollowersFilter: 'roster-followers-filter',
+  rosterEngagementFilter: 'roster-engagement-filter',
+  rosterAvailabilityFilter: 'roster-availability-filter',
+
+  // ---------------------------------------------------------------
   // Settings page — Sprint 2 Chunk 2
   // ---------------------------------------------------------------
   settingsPage: 'settings-page',

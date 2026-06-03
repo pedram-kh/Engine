@@ -12,13 +12,14 @@
  * This test inspects `apps/main/src/modules/auth/routes.ts` and asserts
  * that the `agency-users.list` route declares its guards in the order:
  *
- *   requireAuth → requireMfaEnrolled → requireAgencyAdmin
+ *   requireAuth → requireAgencyUser → requireMfaEnrolled → requireAgencyAdmin
  *
- * The order matters: auth check must come first (we need a user), then
- * MFA enforcement (so non-enrolled users are bounced to
- * `/auth/2fa/enable` before the role check leaks any information about
- * the page), then the role check. This mirrors the admin SPA's chain
- * pinned in `chunk 7.1`.
+ * The order matters: auth check must come first (we need a user), then the
+ * agency-shell check (Sprint 6 Chunk 1, D-7 — bounce a creator before any
+ * further checks), then MFA enforcement (so non-enrolled users are bounced to
+ * `/auth/2fa/enable` before the role check leaks any information about the
+ * page), then the role check. The MFA → admin tail mirrors the admin SPA's
+ * chain pinned in `chunk 7.1`.
  *
  * Tests that come along for the ride (cheap structural invariants):
  *   - The chain is a tuple of strings, not the actual guard function
@@ -85,10 +86,18 @@ describe('agency routes — MFA guard registration (Sprint 3 Chunk 4 sub-step 5)
     expect(target, 'agency-users.list route record not found in routes.ts').toBeDefined()
   })
 
-  it('chains requireAuth → requireMfaEnrolled → requireAgencyAdmin in that exact order', async () => {
+  it('chains requireAuth → requireAgencyUser → requireMfaEnrolled → requireAgencyAdmin in that exact order', async () => {
     const routes = await parseRoutes()
     const target = routes.find((r) => r.name === 'agency-users.list')
-    expect(target?.guards).toEqual(['requireAuth', 'requireMfaEnrolled', 'requireAgencyAdmin'])
+    // Sprint 6 Chunk 1 (D-7) inserted `requireAgencyUser` second — after auth
+    // resolves a user, a creator is bounced before the MFA/admin checks can
+    // leak anything about the page. The MFA → admin tail order is unchanged.
+    expect(target?.guards).toEqual([
+      'requireAuth',
+      'requireAgencyUser',
+      'requireMfaEnrolled',
+      'requireAgencyAdmin',
+    ])
   })
 })
 

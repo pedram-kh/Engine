@@ -48,6 +48,10 @@
         "approved": "Approved",
         "rejected": "Rejected"
       },
+      "search": {
+        "label": "Search creators",
+        "placeholder": "Search by name or bio"
+      },
       "filters": {
         "status": {
           "all": "All",
@@ -58,6 +62,21 @@
         "country": "Country",
         "language": "Language",
         "category": "Category"
+      },
+      "affordances": {
+        "followers": {
+          "label": "Followers"
+        },
+        "engagement": {
+          "label": "Engagement rate"
+        },
+        "availability": {
+          "label": "Availability",
+          "tooltip": "Availability filtering is coming soon."
+        },
+        "metrics": {
+          "tooltip": "Social metrics aren't connected yet."
+        }
       },
       "languages": {
         "en": "English",

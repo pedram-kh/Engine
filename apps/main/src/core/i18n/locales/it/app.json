@@ -48,6 +48,10 @@
         "approved": "Approvata",
         "rejected": "Rifiutata"
       },
+      "search": {
+        "label": "Cerca creator",
+        "placeholder": "Cerca per nome o biografia"
+      },
       "filters": {
         "status": {
           "all": "Tutti",
@@ -58,6 +62,21 @@
         "country": "Paese",
         "language": "Lingua",
         "category": "Categoria"
+      },
+      "affordances": {
+        "followers": {
+          "label": "Follower"
+        },
+        "engagement": {
+          "label": "Tasso di engagement"
+        },
+        "availability": {
+          "label": "Disponibilità",
+          "tooltip": "Il filtro per disponibilità sarà presto disponibile."
+        },
+        "metrics": {
+          "tooltip": "Le metriche social non sono ancora collegate."
+        }
       },
       "languages": {
         "en": "English",

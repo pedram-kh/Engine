@@ -159,6 +159,11 @@ export interface RosterListParams {
   country?: string
   language?: string
   category?: string
+  /**
+   * Free-text name/bio search (Sprint 6 Chunk 1). Threaded to the backend's
+   * `?q=` FTS filter (Postgres `tsvector`; SQLite `LIKE` fallback).
+   */
+  q?: string
   page?: number
   per_page?: number
 }

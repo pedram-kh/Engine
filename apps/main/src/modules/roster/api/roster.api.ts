@@ -19,9 +19,9 @@ function rosterBase(agencyId: string): string {
 export const rosterApi = {
   /**
    * List the agency's creators across all relationship statuses, with the
-   * status / country / language / category filters that have backing data
-   * today (D-c5-1). FTS search, follower/availability filters and talent
-   * pools are deferred (Sprint 5/6).
+   * status / country / language / category filters plus name/bio full-text
+   * search (`?q=`, Sprint 6 Chunk 1). Follower/availability filters and talent
+   * pools remain deferred (inert affordances on the page, D-4/D-5).
    */
   list(agencyId: string, params: RosterListParams = {}): Promise<RosterListResponse> {
     const query = new URLSearchParams()
@@ -31,6 +31,7 @@ export const rosterApi = {
       query.set('language', params.language)
     if (params.category !== undefined && params.category !== '')
       query.set('category', params.category)
+    if (params.q !== undefined && params.q !== '') query.set('q', params.q)
     if (params.page !== undefined) query.set('page', String(params.page))
     if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
     const qs = query.toString()

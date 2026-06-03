@@ -48,6 +48,10 @@
         "approved": "Aprovada",
         "rejected": "Rejeitada"
       },
+      "search": {
+        "label": "Pesquisar criadores",
+        "placeholder": "Pesquisar por nome ou biografia"
+      },
       "filters": {
         "status": {
           "all": "Todos",
@@ -58,6 +62,21 @@
         "country": "País",
         "language": "Idioma",
         "category": "Categoria"
+      },
+      "affordances": {
+        "followers": {
+          "label": "Seguidores"
+        },
+        "engagement": {
+          "label": "Taxa de interação"
+        },
+        "availability": {
+          "label": "Disponibilidade",
+          "tooltip": "O filtro de disponibilidade está a chegar em breve."
+        },
+        "metrics": {
+          "tooltip": "As métricas sociais ainda não estão ligadas."
+        }
       },
       "languages": {
         "en": "English",

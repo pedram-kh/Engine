@@ -131,12 +131,18 @@ async function mountRoster(
 
   // Vuetify's heavy components leak across jsdom mounts: VSelect's
   // VOverlay/VMenu teleport to <body> and VDataTableServer retains a large
-  // tree — running 5 full renders in one worker blows the heap. We render
-  // the REAL data-table in exactly one test (row-DOM assertions) and stub
-  // it elsewhere; the filter selects are always stubbed (the specs drive
-  // the filter refs directly, not via select clicks, so no coverage is
-  // lost). This mirrors the lean footprint of BrandListPage.spec.
-  const stubs: Record<string, boolean> = { VSelect: true }
+  // tree — running several full renders in one worker blows the heap. We
+  // render the REAL data-table in exactly one test (row-DOM assertions) and
+  // stub it elsewhere; the filter selects + the search field are always
+  // stubbed (the specs drive the refs directly, not via input events, so no
+  // coverage is lost — the real table + search + affordance DOM is covered by
+  // the Playwright roster spec, Sprint 6 Chunk 1 D-6). Lean footprint mirrors
+  // BrandListPage.spec.
+  //
+  // Note: VTooltip is intentionally NOT stubbed — the disabled-affordance
+  // tests assert the span-wrapped activator + the disabled control render
+  // (the Chunk-3 KYC idiom), which lives inside the tooltip's activator slot.
+  const stubs: Record<string, boolean> = { VSelect: true, VTextField: true }
   if (options.realTable !== true) {
     stubs.VDataTableServer = true
   }
@@ -266,5 +272,55 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     cleanup = harness.cleanup
 
     expect(harness.wrapper.find('[data-test="roster-error"]').text()).toContain('Failed to load')
+  })
+
+  it('debounces the search box and threads the trimmed q to the API (Sprint 6 Chunk 1, D-1)', async () => {
+    const harness = await mountRoster({ rows: [makeRow()] })
+    cleanup = harness.cleanup
+    const vm = harness.wrapper.vm as unknown as { searchQuery: string }
+
+    // Switch to fake timers AFTER mount (the initial onMounted load already ran
+    // under real timers) so we can drive the 300ms debounce deterministically.
+    vi.useFakeTimers()
+    try {
+      vi.mocked(rosterApi.list).mockClear()
+      vm.searchQuery = '  ada  '
+      await harness.wrapper.vm.$nextTick()
+
+      // Still inside the debounce window → no query yet.
+      await vi.advanceTimersByTimeAsync(299)
+      expect(rosterApi.list).not.toHaveBeenCalled()
+
+      // Debounce elapses → exactly one query, with the TRIMMED q.
+      await vi.advanceTimersByTimeAsync(1)
+      expect(rosterApi.list).toHaveBeenCalledTimes(1)
+      expect(vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1]).toMatchObject({ q: 'ada' })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('renders availability + metrics as DISABLED affordances that issue no query (D-4)', async () => {
+    const harness = await mountRoster({ rows: [makeRow()] })
+    cleanup = harness.cleanup
+    const wrapper = harness.wrapper
+
+    // Each affordance control renders and is disabled (faded, inert).
+    for (const id of ['roster-followers', 'roster-engagement', 'roster-availability']) {
+      const control = wrapper.find(`[data-test="${id}-filter"]`)
+      expect(control.exists(), `${id}-filter should render`).toBe(true)
+      expect(control.attributes('disabled'), `${id}-filter should be disabled`).toBeDefined()
+    }
+
+    // The KYC span-wrap idiom: a disabled control emits no hover, so the
+    // tooltip attaches to a wrapping <span> activator.
+    expect(wrapper.find('[data-test="roster-followers-affordance"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="roster-engagement-affordance"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="roster-availability-affordance"]').exists()).toBe(true)
+
+    // They have NO v-model and NO watcher → they CANNOT query. Only the
+    // initial mount load happened (break-revert: wiring one to a query would
+    // bump this past 1).
+    expect(rosterApi.list).toHaveBeenCalledTimes(1)
   })
 })

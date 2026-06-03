@@ -210,12 +210,57 @@ export async function requireOnboardingAccess(ctx: GuardContext): Promise<GuardR
   return null
 }
 
+/**
+ * Agency-shell guard (Sprint 6 Chunk 1, D-7). The inverse of
+ * `requireOnboardingAccess`: that guard bounces non-creators OUT of the
+ * wizard; this one bounces creators OUT of the agency shell.
+ *
+ * Closes the standing gap (tech-debt: "Defensive requireAgencyUser guard"):
+ * `requireAuth` alone does not inspect `user_type`, so a creator who knows the
+ * URLs (or whose browser autocompletes `/brands` from history) could render
+ * `BrandListPage` / `CreatorRosterPage` / etc. behind `requireAuth`. The
+ * backend is the SOT for authorization (every mutation 403s for a creator), so
+ * this is a UX/mental-model polish, not a security fix — but a creator should
+ * never see the agency chrome they don't belong in.
+ *
+ * Redirects `user_type === 'creator'` to `onboarding.welcome-back` (their
+ * natural home, which itself re-dispatches via `requireOnboardingAccess` to
+ * the right wizard step or the creator dashboard). Every other user_type
+ * (agency_user, platform_admin, brand_user) falls through.
+ *
+ * Composes AFTER `requireAuth` (it assumes a resolved user) and BEFORE any
+ * `requireMfaEnrolled` / `requireAgencyAdmin` — a creator is bounced before
+ * those checks can leak anything about the page.
+ *
+ * Defense-in-depth (#40, Sprint 2 § 5.17): the unit suite covers the creator
+ * redirect, each non-creator fall-through, the defensive no-user case, and
+ * registry registration; the route-walking arch-test
+ * (`agency-routes-agency-user-guard.spec.ts`) asserts every agency-shell route
+ * actually carries the guard.
+ */
+export async function requireAgencyUser(ctx: GuardContext): Promise<GuardResult> {
+  const { store } = ctx
+
+  if (store.user === null) {
+    // Defensive: requireAuth ahead of us should have caught this. Fall through
+    // to sign-in rather than crashing if composed without requireAuth.
+    return { name: 'auth.sign-in' }
+  }
+
+  if (store.user.attributes.user_type === 'creator') {
+    return { name: 'onboarding.welcome-back' }
+  }
+
+  return null
+}
+
 export const guards: Record<
   | 'requireAuth'
   | 'requireGuest'
   | 'requireMfaEnrolled'
   | 'requireAgencyAdmin'
-  | 'requireOnboardingAccess',
+  | 'requireOnboardingAccess'
+  | 'requireAgencyUser',
   (ctx: GuardContext) => Promise<GuardResult>
 > = {
   requireAuth,
@@ -223,4 +268,5 @@ export const guards: Record<
   requireMfaEnrolled,
   requireAgencyAdmin,
   requireOnboardingAccess,
+  requireAgencyUser,
 }

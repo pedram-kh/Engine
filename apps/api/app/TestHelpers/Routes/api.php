@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\TestHelpers\Http\Controllers\CreateAdminUserController;
 use App\TestHelpers\Http\Controllers\CreateAgencyInvitationController;
 use App\TestHelpers\Http\Controllers\CreateAgencyWithAdminController;
+use App\TestHelpers\Http\Controllers\CreateRosterCreatorsController;
 use App\TestHelpers\Http\Controllers\IssueTotpController;
 use App\TestHelpers\Http\Controllers\IssueTotpFromSecretController;
 use App\TestHelpers\Http\Controllers\MintVerificationTokenController;
@@ -90,6 +91,13 @@ Route::prefix('_test')
         // in a single call so brand/invitation E2E specs can sign in immediately.
         Route::post('agencies/setup', CreateAgencyWithAdminController::class)
             ->name('agencies.setup');
+
+        // Sprint 6 Chunk 1 — seed roster creators + accepted relations on an
+        // agency so the Playwright roster spec can drive a real table + the
+        // name/bio search (?q=) + the disabled filter affordances against
+        // actual rows. No production path provisions a roster in one call.
+        Route::post('agencies/{agency}/roster-creators', CreateRosterCreatorsController::class)
+            ->name('agencies.roster_creators.create');
 
         // Sprint 3 Chunk 3 — queue mode override for E2E saga specs.
         // POST sets `config('queue.default')` for subsequent requests

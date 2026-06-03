@@ -672,3 +672,69 @@ export async function seedAgencyInvitation(
 
   return { token, agencyUlid: agency_ulid, email, role, acceptUrl }
 }
+
+// ---------------------------------------------------------------------------
+// Sprint 6 Chunk 1 — roster creator provisioning
+// ---------------------------------------------------------------------------
+
+export interface SeedRosterCreatorInput {
+  displayName: string
+  bio?: string
+  countryCode?: string
+  primaryLanguage?: string
+  relationshipStatus?: 'roster' | 'prospect' | 'external'
+}
+
+export interface SeedRosterCreatorsResult {
+  agencyUlid: string
+  relations: { relationUlid: string; creatorUlid: string; displayName: string }[]
+}
+
+/**
+ * Seed approved creators + accepted agency_creator_relations on the given
+ * agency via the Sprint 6 Chunk 1 test-helper endpoint, so the roster spec can
+ * drive a REAL table + the name/bio search (?q=) + the disabled affordances
+ * against actual rows. No production path provisions a roster in one call.
+ */
+export async function seedRosterCreators(
+  request: APIRequestContext,
+  agencyUlid: string,
+  creators: SeedRosterCreatorInput[],
+): Promise<SeedRosterCreatorsResult> {
+  const response = await request.post(
+    `http://127.0.0.1:8000/api/v1/_test/agencies/${agencyUlid}/roster-creators`,
+    {
+      headers: defaultHeaders,
+      data: {
+        creators: creators.map((c) => ({
+          display_name: c.displayName,
+          bio: c.bio ?? null,
+          country_code: c.countryCode ?? null,
+          primary_language: c.primaryLanguage ?? null,
+          relationship_status: c.relationshipStatus ?? null,
+        })),
+      },
+    },
+  )
+
+  if (response.status() !== 201) {
+    throw new Error(
+      `seedRosterCreators failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  const body = (await response.json()) as {
+    data: {
+      agency_ulid: string
+      relations: { relation_ulid: string; creator_ulid: string; display_name: string }[]
+    }
+  }
+  return {
+    agencyUlid: body.data.agency_ulid,
+    relations: body.data.relations.map((r) => ({
+      relationUlid: r.relation_ulid,
+      creatorUlid: r.creator_ulid,
+      displayName: r.display_name,
+    })),
+  }
+}

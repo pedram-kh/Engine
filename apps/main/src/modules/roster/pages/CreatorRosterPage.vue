@@ -8,11 +8,19 @@
  * (chip-group) + country / language / category (selects). Tenancy via
  * `useAgencyStore().currentAgencyId`, mirroring BrandListPage.
  *
- * Scope line (deferred to Sprint 5/6): no FTS name/bio search, no
- * follower/availability filters, no talent pools, no internal_rating
- * editing (read-only stars here), and — critically — rows do NOT navigate
- * to a creator detail (D-c5-4): there is no agency-side creator detail
- * surface yet, and relaxing the admin drill-in's gate is out of scope.
+ * Sprint 6 Chunk 1 adds: a debounced name/bio search box (→ `?q=` FTS, D-1)
+ * and two DISABLED filter affordances — metrics (follower range + engagement)
+ * and availability (D-4). The affordances are present-but-inert: faded,
+ * disabled, span-wrapped so their tooltip still fires on hover (a disabled
+ * control emits no hover events), and they issue NO query — a "0 results"
+ * from an empty-data query would read as broken. They're blocked by missing
+ * infrastructure (social metrics are null until adapters land; a real
+ * availability filter needs a cheap roster-wide signal — its own chunk, D-5),
+ * not dead code.
+ *
+ * Still deferred: handle search (D-2), real metrics/availability filters,
+ * talent pools, internal_rating editing (read-only stars here), and — rows do
+ * NOT navigate to a creator detail (no agency-side detail surface yet → Chunk 2).
  */
 
 import type {
@@ -39,6 +47,19 @@ const statusFilter = ref<StatusFilter>('all')
 const countryFilter = ref<string | null>(null)
 const languageFilter = ref<string | null>(null)
 const categoryFilter = ref<string | null>(null)
+const searchQuery = ref('')
+
+// Disabled-affordance drivers (D-4). Both are static FE constants this chunk —
+// there is no backend signal to drive them yet (no `kyc_vendor_available`
+// equivalent). When the blocking infrastructure lands, flip these to a
+// backend-driven flag and wire the real control behind the `v-else`:
+//   - metrics (follower range + engagement): blocked by missing DATA —
+//     `creator_social_accounts.metrics` is null until the social adapters land.
+//   - availability: blocked by missing cheap-query INFRASTRUCTURE — there is no
+//     stored availability status; a real filter needs a denormalized
+//     roster-wide signal or N RRULE expansions per page (a design problem, D-5).
+const METRICS_FILTERS_CONNECTED = false
+const AVAILABILITY_FILTER_CONNECTED = false
 
 const items = ref<RosterCreatorListItem[]>([])
 const totalItems = ref(0)
@@ -144,7 +165,8 @@ const hasActiveFilters = computed(
     statusFilter.value !== 'all' ||
     countryFilter.value !== null ||
     languageFilter.value !== null ||
-    categoryFilter.value !== null,
+    categoryFilter.value !== null ||
+    searchQuery.value.trim() !== '',
 )
 
 function countryLabel(code: string | null): string {
@@ -196,6 +218,8 @@ async function loadRoster(): Promise<void> {
     if (countryFilter.value !== null) params.country = countryFilter.value
     if (languageFilter.value !== null) params.language = languageFilter.value
     if (categoryFilter.value !== null) params.category = categoryFilter.value
+    const trimmedQuery = searchQuery.value.trim()
+    if (trimmedQuery !== '') params.q = trimmedQuery
 
     const res = await rosterApi.list(agencyId, params)
     items.value = res.data
@@ -223,10 +247,22 @@ watch(
   },
 )
 
-// Any filter change resets to page 1 and re-queries.
+// Any structured-filter change resets to page 1 and re-queries immediately.
 watch([statusFilter, countryFilter, languageFilter, categoryFilter], () => {
   tableOptions.value.page = 1
   void loadRoster()
+})
+
+// Free-text search is debounced — fires 300ms after the user stops typing
+// (mirrors AgencyUsersPage). No existing list-search idiom to mirror beyond
+// the debounce shape itself, so this is the page's first search box.
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+watch(searchQuery, () => {
+  if (searchTimer !== null) clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    tableOptions.value.page = 1
+    void loadRoster()
+  }, 300)
 })
 
 function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
@@ -240,6 +276,20 @@ function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
     <div class="d-flex align-center justify-space-between mb-4">
       <h1 class="text-h5 ma-0" data-test="roster-heading">{{ t('app.roster.title') }}</h1>
     </div>
+
+    <!-- Name/bio full-text search (D-1). Debounced → ?q=. -->
+    <v-text-field
+      v-model="searchQuery"
+      :label="t('app.roster.search.label')"
+      :placeholder="t('app.roster.search.placeholder')"
+      prepend-inner-icon="mdi-magnify"
+      density="compact"
+      variant="outlined"
+      hide-details
+      clearable
+      class="mb-3"
+      data-test="roster-search"
+    />
 
     <!-- Status filter chips -->
     <v-chip-group v-model="statusFilter" mandatory class="mb-2" data-test="roster-status-filter">
@@ -292,6 +342,77 @@ function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
           clearable
           data-test="roster-category-filter"
         />
+      </v-col>
+    </v-row>
+
+    <!-- Disabled filter affordances (D-4). Present-but-inert: faded, disabled,
+         and span-wrapped so the tooltip still fires (a disabled control emits
+         no hover events — the Chunk-3 KYC idiom). They have NO v-model and NO
+         watcher, so they CANNOT issue a query. They flip live when the blocking
+         infrastructure lands (METRICS_FILTERS_CONNECTED / AVAILABILITY_FILTER_CONNECTED). -->
+    <v-row dense class="mb-2">
+      <v-col cols="12" sm="4">
+        <v-tooltip
+          v-if="!METRICS_FILTERS_CONNECTED"
+          location="top"
+          :text="t('app.roster.affordances.metrics.tooltip')"
+        >
+          <template #activator="{ props: tooltipProps }">
+            <span v-bind="tooltipProps" data-test="roster-followers-affordance">
+              <v-select
+                :label="t('app.roster.affordances.followers.label')"
+                :items="[]"
+                density="compact"
+                variant="outlined"
+                hide-details
+                disabled
+                data-test="roster-followers-filter"
+              />
+            </span>
+          </template>
+        </v-tooltip>
+      </v-col>
+      <v-col cols="12" sm="4">
+        <v-tooltip
+          v-if="!METRICS_FILTERS_CONNECTED"
+          location="top"
+          :text="t('app.roster.affordances.metrics.tooltip')"
+        >
+          <template #activator="{ props: tooltipProps }">
+            <span v-bind="tooltipProps" data-test="roster-engagement-affordance">
+              <v-select
+                :label="t('app.roster.affordances.engagement.label')"
+                :items="[]"
+                density="compact"
+                variant="outlined"
+                hide-details
+                disabled
+                data-test="roster-engagement-filter"
+              />
+            </span>
+          </template>
+        </v-tooltip>
+      </v-col>
+      <v-col cols="12" sm="4">
+        <v-tooltip
+          v-if="!AVAILABILITY_FILTER_CONNECTED"
+          location="top"
+          :text="t('app.roster.affordances.availability.tooltip')"
+        >
+          <template #activator="{ props: tooltipProps }">
+            <span v-bind="tooltipProps" data-test="roster-availability-affordance">
+              <v-select
+                :label="t('app.roster.affordances.availability.label')"
+                :items="[]"
+                density="compact"
+                variant="outlined"
+                hide-details
+                disabled
+                data-test="roster-availability-filter"
+              />
+            </span>
+          </template>
+        </v-tooltip>
       </v-col>
     </v-row>
 

@@ -40,6 +40,7 @@ export type GuardName =
   | 'requireMfaEnrolled'
   | 'requireAgencyAdmin'
   | 'requireOnboardingAccess'
+  | 'requireAgencyUser'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -151,6 +152,14 @@ export const authRoutes: RouteRecordRaw[] = [
 ]
 
 export const appRoutes: RouteRecordRaw[] = [
+  // Every agency-SHELL route (layout: 'agency') chains
+  // `requireAuth → requireAgencyUser` (Sprint 6 Chunk 1, D-7): auth resolves a
+  // user, then requireAgencyUser bounces a `creator`-type user (who belongs in
+  // the onboarding/creator shell, not here) to `onboarding.welcome-back`. The
+  // ONE appRoutes exception is `accept-invitation` below — a public pre-auth
+  // landing (layout: 'auth', no requireAuth) where the guard cannot run. The
+  // arch-test `agency-routes-agency-user-guard.spec.ts` pins this invariant.
+
   // Dashboard — the real agency workspace home (Sprint 4 Chunk 1; replaced
   // the chunk-6.5 DashboardPlaceholderPage). Requires auth; NOT MFA-gated
   // (see the selective-gating test in agency-routes-mfa-guard.spec.ts).
@@ -158,7 +167,7 @@ export const appRoutes: RouteRecordRaw[] = [
     path: '/',
     name: 'app.dashboard',
     component: () => import('@/modules/dashboard/pages/DashboardPage.vue'),
-    meta: { layout: 'agency', guards: ['requireAuth'] },
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
   // ── Creator roster ("my creators") ─────────────────────────────────────────
@@ -169,7 +178,7 @@ export const appRoutes: RouteRecordRaw[] = [
     path: '/roster',
     name: 'roster.list',
     component: () => import('@/modules/roster/pages/CreatorRosterPage.vue'),
-    meta: { layout: 'agency', guards: ['requireAuth'] },
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
   // ── Brands ───────────────────────────────────────────────────────────────
@@ -177,25 +186,25 @@ export const appRoutes: RouteRecordRaw[] = [
     path: '/brands',
     name: 'brands.list',
     component: () => import('@/modules/brands/pages/BrandListPage.vue'),
-    meta: { layout: 'agency', guards: ['requireAuth'] },
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
   {
     path: '/brands/new',
     name: 'brands.create',
     component: () => import('@/modules/brands/pages/BrandCreatePage.vue'),
-    meta: { layout: 'agency', guards: ['requireAuth'] },
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
   {
     path: '/brands/:ulid',
     name: 'brands.detail',
     component: () => import('@/modules/brands/pages/BrandDetailPage.vue'),
-    meta: { layout: 'agency', guards: ['requireAuth'] },
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
   {
     path: '/brands/:ulid/edit',
     name: 'brands.edit',
     component: () => import('@/modules/brands/pages/BrandEditPage.vue'),
-    meta: { layout: 'agency', guards: ['requireAuth'] },
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
   // ── Agency users / invitations ────────────────────────────────────────────
@@ -215,7 +224,7 @@ export const appRoutes: RouteRecordRaw[] = [
     component: () => import('@/modules/agency-users/pages/AgencyUsersPage.vue'),
     meta: {
       layout: 'agency',
-      guards: ['requireAuth', 'requireMfaEnrolled', 'requireAgencyAdmin'],
+      guards: ['requireAuth', 'requireAgencyUser', 'requireMfaEnrolled', 'requireAgencyAdmin'],
     },
   },
 
@@ -231,7 +240,7 @@ export const appRoutes: RouteRecordRaw[] = [
     component: () => import('@/modules/creator-invitations/pages/BulkInvitePage.vue'),
     meta: {
       layout: 'agency',
-      guards: ['requireAuth', 'requireMfaEnrolled', 'requireAgencyAdmin'],
+      guards: ['requireAuth', 'requireAgencyUser', 'requireMfaEnrolled', 'requireAgencyAdmin'],
     },
   },
 
@@ -241,7 +250,7 @@ export const appRoutes: RouteRecordRaw[] = [
     path: '/settings',
     name: 'settings',
     component: () => import('@/modules/settings/pages/SettingsPage.vue'),
-    meta: { layout: 'agency', guards: ['requireAuth'] },
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
   // ── Accept invitation ─────────────────────────────────────────────────────
@@ -249,6 +258,11 @@ export const appRoutes: RouteRecordRaw[] = [
   // No layout guard — this renders inside AgencyLayout only if authenticated,
   // and falls back to a minimal layout for unauthenticated visitors.
   // Using AuthLayout keeps it simple for unauthenticated state.
+  //
+  // D-7 exception: this is the ONE appRoutes entry that does NOT carry
+  // `requireAgencyUser`. It's a public pre-auth landing (layout: 'auth', no
+  // requireAuth), so the agency-shell guard cannot run here — the page resolves
+  // auth itself. The arch-test excludes it explicitly.
   {
     path: '/accept-invitation',
     name: 'accept-invitation',

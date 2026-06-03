@@ -41,6 +41,7 @@ import {
   requireMfaEnrolled,
   requireAgencyAdmin,
   requireOnboardingAccess,
+  requireAgencyUser,
   guards,
   type AuthStore,
   type GuardContext,
@@ -308,6 +309,42 @@ describe('requireOnboardingAccess', () => {
   })
 })
 
+describe('requireAgencyUser', () => {
+  it('redirects a creator-type user to onboarding.welcome-back', async () => {
+    const store = makeStore({ user: makeUser({ user_type: 'creator' }) })
+    const result = await requireAgencyUser(makeCtx(store, makeRoute('roster.list', '/roster')))
+    expect(result).toEqual({ name: 'onboarding.welcome-back' })
+  })
+
+  it('allows an agency_user through (returns null)', async () => {
+    const store = makeStore({ user: makeUser({ user_type: 'agency_user' }) })
+    const result = await requireAgencyUser(makeCtx(store, makeRoute('roster.list', '/roster')))
+    expect(result).toBeNull()
+  })
+
+  it('allows a platform_admin through (returns null)', async () => {
+    const store = makeStore({ user: makeUser({ user_type: 'platform_admin' }) })
+    const result = await requireAgencyUser(makeCtx(store, makeRoute('app.dashboard', '/')))
+    expect(result).toBeNull()
+  })
+
+  it('allows a brand_user through (returns null)', async () => {
+    const store = makeStore({ user: makeUser({ user_type: 'brand_user' }) })
+    const result = await requireAgencyUser(makeCtx(store, makeRoute('app.dashboard', '/')))
+    expect(result).toBeNull()
+  })
+
+  it('falls through to sign-in when no user is signed in (defensive)', async () => {
+    const store = makeStore({ user: null })
+    const result = await requireAgencyUser(makeCtx(store, makeRoute('roster.list', '/roster')))
+    expect(result).toEqual({ name: 'auth.sign-in' })
+  })
+
+  it('is registered in the guards registry', () => {
+    expect(guards.requireAgencyUser).toBe(requireAgencyUser)
+  })
+})
+
 describe('guards registry', () => {
   it('maps each symbolic name to the correct function reference', () => {
     expect(guards.requireAuth).toBe(requireAuth)
@@ -315,5 +352,6 @@ describe('guards registry', () => {
     expect(guards.requireMfaEnrolled).toBe(requireMfaEnrolled)
     expect(guards.requireAgencyAdmin).toBe(requireAgencyAdmin)
     expect(guards.requireOnboardingAccess).toBe(requireOnboardingAccess)
+    expect(guards.requireAgencyUser).toBe(requireAgencyUser)
   })
 })

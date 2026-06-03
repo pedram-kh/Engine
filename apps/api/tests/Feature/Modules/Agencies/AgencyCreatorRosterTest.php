@@ -9,6 +9,7 @@ use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -223,6 +224,114 @@ it('filters by category via jsonb containment', function (): void {
 
     expect($response->json('meta.total'))->toBe(1);
     expect($response->json('data.0.attributes.categories'))->toContain('travel');
+});
+
+// ---------------------------------------------------------------------------
+// Name/bio full-text search (?q=) — Sprint 6 Chunk 1 (D-1)
+//
+// The CI suite runs on SQLite, so these exercise the `LOWER(...) LIKE`
+// substring FALLBACK (D-3) — the path the test suite actually runs in dev +
+// CI. The Postgres `to_tsvector @@ plainto_tsquery` branch is un-unit-testable
+// under SQLite (no tsvector); it ships with a dormant markTestSkipped
+// counterpart below + a manual local-Postgres verification noted in the review.
+// ---------------------------------------------------------------------------
+
+it('narrows by display_name via the q search (SQLite ILIKE fallback)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $match = makeRosterRelation($agency, [], ['display_name' => 'Ada Lovelace', 'bio' => 'Mathematician']);
+    makeRosterRelation($agency, [], ['display_name' => 'Grace Hopper', 'bio' => 'Computer scientist']);
+
+    // Case-insensitive substring match on the name.
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'q=lovelace'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.id'))->toBe($match->ulid);
+    expect($response->json('data.0.attributes.display_name'))->toBe('Ada Lovelace');
+});
+
+it('narrows by bio via the q search (SQLite ILIKE fallback)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $match = makeRosterRelation($agency, [], ['display_name' => 'Ada Lovelace', 'bio' => 'Pioneering mathematician']);
+    makeRosterRelation($agency, [], ['display_name' => 'Grace Hopper', 'bio' => 'Computer scientist']);
+
+    // The needle only appears in the bio, not the name.
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'q=mathematician'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.id'))->toBe($match->ulid);
+});
+
+it('returns zero rows for an unmatched q (break-revert anchor)', function (): void {
+    // Break-revert (§5.35): if the `q` filter is dropped from the controller,
+    // this query would ignore `q` and return BOTH rows — failing this
+    // expect(0). It pins that an unmatched search actually narrows rather than
+    // silently returning all.
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterRelation($agency, [], ['display_name' => 'Ada Lovelace', 'bio' => 'Mathematician']);
+    makeRosterRelation($agency, [], ['display_name' => 'Grace Hopper', 'bio' => 'Computer scientist']);
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'q=nonexistentneedle'));
+
+    expect($response->status())->toBe(200);
+    expect($response->json('meta.total'))->toBe(0);
+});
+
+it('treats a blank/whitespace q as a no-op (returns all)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterRelation($agency, [], ['display_name' => 'Ada Lovelace']);
+    makeRosterRelation($agency, [], ['display_name' => 'Grace Hopper']);
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'q=%20%20'));
+
+    expect($response->json('meta.total'))->toBe(2);
+});
+
+it('escapes LIKE wildcards so a literal % in q is not a wildcard', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    // A bare `%` would match every row if wildcards weren't escaped; with
+    // escaping it matches only a literal percent, of which there are none.
+    makeRosterRelation($agency, [], ['display_name' => 'Ada Lovelace']);
+    makeRosterRelation($agency, [], ['display_name' => 'Grace Hopper']);
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'q=%25'));
+
+    expect($response->json('meta.total'))->toBe(0);
+});
+
+it('[postgres-only] matches name/bio via to_tsvector @@ plainto_tsquery', function (): void {
+    // The Postgres FTS branch (search_vector @@ plainto_tsquery('simple', ?))
+    // cannot run under the SQLite :memory: test DB — there is no tsvector type
+    // or generated `search_vector` column there (the migration is pgsql-guarded,
+    // D-1). This assertion is dormant: it skips under SQLite and becomes live
+    // the day a Postgres CI job lands (docs/tech-debt.md — SQLite-in-tests).
+    // Until then the FTS path is covered by manual local-Postgres verification
+    // (recorded in the chunk review) — the one place "green CI" is not full
+    // proof, stated honestly (D-3).
+    if (DB::connection()->getDriverName() !== 'pgsql') {
+        $this->markTestSkipped('FTS tsvector path requires Postgres; SQLite uses the ILIKE fallback.');
+    }
+
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $match = makeRosterRelation($agency, [], ['display_name' => 'Ada Lovelace', 'bio' => 'Mathematician']);
+    makeRosterRelation($agency, [], ['display_name' => 'Grace Hopper', 'bio' => 'Computer scientist']);
+
+    // FTS matches whole-word lexemes (not substrings): a full token narrows.
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'q=lovelace'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.id'))->toBe($match->ulid);
 });
 
 it('ANDs combined filters together', function (): void {
