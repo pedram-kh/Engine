@@ -13,12 +13,18 @@ use App\Modules\Identity\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
- * Authorises reads of an agency's creator roster (Sprint 4 Chunk 5) and the
- * per-creator detail surface (Sprint 6 Chunk 2a).
+ * Authorises reads of an agency's creator roster (Sprint 4 Chunk 5), the
+ * per-creator detail surface (Sprint 6 Chunk 2a), and the global discovery
+ * surface (Sprint 6.6a).
  *
  * READ (`viewAny`) mirrors {@see BrandPolicy::viewAny} — any agency member
  * (admin / manager / staff) may view the roster list AND the per-creator
  * detail view (D-2a-4: read stays any-member).
+ *
+ * DISCOVER (`discover`, Sprint 6.6a D-1) is a distinct any-member ability for
+ * the global-pool browse + public profile — kept separate from `viewAny`
+ * because that ability is conceptually "view relations," a stretch for "browse
+ * the pool." Same authz floor, clearer intent.
  *
  * WRITE (`update`) mirrors {@see BrandPolicy::update}'s role matrix — only
  * admin + manager may edit the relation's rating / notes; staff is view-only
@@ -37,6 +43,19 @@ final class AgencyCreatorRelationPolicy
     use HandlesAuthorization;
 
     public function viewAny(User $user): bool
+    {
+        return $this->membership($user) !== null;
+    }
+
+    /**
+     * Browse the GLOBAL creator pool + view a public profile (Sprint 6.6a,
+     * D-1). A DISTINCT ability from `viewAny` on purpose: `viewAny` means "view
+     * the agency's relations" (relation-scoped), whereas discovery queries the
+     * global `creators` pool — semantically a different read, so a separate
+     * ability documents the intent (the reviewer lean). Authz is the same
+     * floor: any agency member may discover.
+     */
+    public function discover(User $user): bool
     {
         return $this->membership($user) !== null;
     }

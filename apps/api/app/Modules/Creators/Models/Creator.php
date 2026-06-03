@@ -45,6 +45,7 @@ use Illuminate\Support\Carbon;
  * @property array<int, string>|null $categories
  * @property VerificationLevel $verification_level
  * @property string|null $tier
+ * @property bool $is_discoverable
  * @property ApplicationStatus $application_status
  * @property Carbon|null $approved_at
  * @property int|null $approved_by_user_id
@@ -85,6 +86,7 @@ final class Creator extends Model implements Auditable
     protected $attributes = [
         'verification_level' => 'unverified',
         'application_status' => 'incomplete',
+        'is_discoverable' => true,
         'kyc_status' => 'none',
         'profile_completeness_score' => 0,
         'tax_profile_complete' => false,
@@ -107,6 +109,7 @@ final class Creator extends Model implements Auditable
         'categories',
         'verification_level',
         'tier',
+        'is_discoverable',
         'application_status',
         'approved_at',
         'approved_by_user_id',
@@ -279,6 +282,7 @@ final class Creator extends Model implements Auditable
             'click_through_accepted_at' => 'datetime',
             'tax_profile_complete' => 'boolean',
             'payout_method_set' => 'boolean',
+            'is_discoverable' => 'boolean',
             'profile_completeness_score' => 'integer',
         ];
     }

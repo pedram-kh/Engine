@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Agencies\Http\Controllers;
 
+use App\Modules\Agencies\Concerns\FiltersCreatorColumns;
 use App\Modules\Agencies\Http\Requests\ListAgencyRosterRequest;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
@@ -16,9 +17,7 @@ use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Services\Availability\AvailabilityConflictService;
 use App\Modules\Creators\Services\Availability\AvailabilityExpansionService;
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -84,6 +83,13 @@ use Illuminate\Support\Facades\Gate;
  */
 final class AgencyCreatorController
 {
+    // The creator-column filters + `?q=` FTS were extracted to a shared trait
+    // (Sprint 6.6a, D-3) so the discovery surface reuses the SAME logic — the
+    // driver-aware FTS branch in particular stays single-source. The roster's
+    // call-sites (applyCreatorFilters / applySearchFilter) are unchanged; the
+    // relation-coupled filters (status, availability) stay private below.
+    use FiltersCreatorColumns;
+
     /**
      * Hard ceiling on the availability window span (D-6). Mirrors
      * {@see CreatorAvailabilityController}'s
@@ -255,128 +261,6 @@ final class AgencyCreatorController
         if ($busyIds !== []) {
             $query->whereNotIn('agency_creator_relations.creator_id', $busyIds);
         }
-    }
-
-    /**
-     * Apply the creator-column filters inside the `whereHas('creator')`
-     * subquery. Each is optional and composable (they AND together).
-     *
-     * `?category=` uses whereJsonContains: on Postgres this compiles to the
-     * `@>` containment operator served by idx_creators_categories_gin; on
-     * the SQLite test DB it compiles to a `json_each(...)` EXISTS — so the
-     * query degrades gracefully across both drivers with no branching.
-     *
-     * `?q=` (FTS) is the exception that DOES need a driver branch — see
-     * {@see self::applySearchFilter}.
-     *
-     * @param  Builder<Model>  $creatorQuery
-     */
-    private function applyCreatorFilters(Builder $creatorQuery, Request $request): void
-    {
-        $country = $request->query('country');
-        if (is_string($country) && $country !== '') {
-            $creatorQuery->where('country_code', $country);
-        }
-
-        $language = $request->query('language');
-        if (is_string($language) && $language !== '') {
-            $creatorQuery->where('primary_language', $language);
-        }
-
-        $category = $request->query('category');
-        if (is_string($category) && $category !== '') {
-            $creatorQuery->whereJsonContains('categories', $category);
-        }
-
-        $search = $request->query('q');
-        if (is_string($search) && trim($search) !== '') {
-            $this->applySearchFilter($creatorQuery, trim($search));
-        }
-    }
-
-    /**
-     * Name/bio full-text search (Sprint 6 Chunk 1, D-1).
-     *
-     * Driver-aware because FTS has no portable grammar-level degrade (unlike
-     * `whereJsonContains`):
-     *
-     *   - Postgres: `search_vector @@ to_tsquery('simple', ?)` against the
-     *     generated `tsvector` column + GIN index from the pgsql-guarded
-     *     migration. Each whitespace-separated word becomes a PREFIX lexeme
-     *     `word:*`, ANDed together — so `dis` matches `disply` (type-ahead) and
-     *     a multi-word `q` narrows (every word's prefix must match some token).
-     *     Tokens are stripped to letters/digits before being handed to
-     *     to_tsquery so user input can never break its operator grammar.
-     *   - SQLite (test + local dev): `LOWER(...) LIKE` substring match over
-     *     `display_name` + `bio`. There is no `tsvector`/`search_vector` column
-     *     on SQLite (the migration skips it), so the fallback queries the raw
-     *     columns directly. `%`/`_` in the needle are escaped so they're treated
-     *     as literals, not wildcards.
-     *
-     * Result-semantics divergence (D-3, honest-deviation trigger #2): the
-     * Postgres path now matches by PREFIX (left-anchored within each token)
-     * while the SQLite path matches substrings ANYWHERE — e.g. `q=isp` matches
-     * "disply" under SQLite (mid-word substring) but NOT under Postgres (prefix
-     * only); `q=dis` matches under both. The `'simple'` tsvector config keeps
-     * the two as close as practical (no stemming). The SQLite fallback is the
-     * path the CI suite actually exercises and is fully tested; the Postgres
-     * prefix branch is verified by a manual local-Postgres pass + a dormant
-     * `markTestSkipped` counterpart until Postgres CI lands (~Sprint 8).
-     *
-     * @param  Builder<Model>  $creatorQuery
-     */
-    private function applySearchFilter(Builder $creatorQuery, string $search): void
-    {
-        // `getConnection()` on an Eloquent builder returns a ConnectionInterface,
-        // which does not declare getDriverName(). The concrete value is always a
-        // \Illuminate\Database\Connection subclass (Postgres in prod, SQLite under
-        // test), so we narrow inline for Larastan — mirrors MembershipController.
-        $connection = $creatorQuery->getConnection();
-        /** @var Connection $connection */
-        $isPostgres = $connection->getDriverName() === 'pgsql';
-
-        if ($isPostgres) {
-            // PREFIX (type-ahead) match: turn each whitespace-separated word
-            // into a prefix lexeme `word:*` and AND them, so `dis` matches
-            // `disply` and a multi-word query narrows (every word's prefix must
-            // match some token). We build the tsquery by hand rather than use
-            // plainto_tsquery (which has no prefix support); each token is
-            // stripped to letters/digits so raw user input can never reach
-            // to_tsquery's operator grammar (`& | ! ( ) : *`). Tokens that
-            // reduce to empty are dropped; if nothing usable survives, match
-            // nothing (a query of only punctuation is not "match everything").
-            $lexemes = [];
-            foreach (preg_split('/\s+/', $search, -1, PREG_SPLIT_NO_EMPTY) ?: [] as $token) {
-                $clean = preg_replace('/[^\p{L}\p{N}]+/u', '', $token);
-                if (is_string($clean) && $clean !== '') {
-                    $lexemes[] = $clean.':*';
-                }
-            }
-
-            if ($lexemes === []) {
-                $creatorQuery->whereRaw('1 = 0');
-
-                return;
-            }
-
-            $creatorQuery->whereRaw(
-                "search_vector @@ to_tsquery('simple', ?)",
-                [implode(' & ', $lexemes)],
-            );
-
-            return;
-        }
-
-        // Escape LIKE wildcards so a literal `%`/`_`/`\` in the search term is
-        // matched as itself; the ESCAPE clause makes `\` the escape char (SQLite
-        // does not treat `\` as an escape by default).
-        $needle = mb_strtolower($search);
-        $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $needle).'%';
-
-        $creatorQuery->where(function (Builder $inner) use ($like): void {
-            $inner->whereRaw("LOWER(display_name) LIKE ? ESCAPE '\\'", [$like])
-                ->orWhereRaw("LOWER(bio) LIKE ? ESCAPE '\\'", [$like]);
-        });
     }
 
     /**

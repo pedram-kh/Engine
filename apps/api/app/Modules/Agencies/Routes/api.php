@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorAvailabilityController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorDetailController;
+use App\Modules\Agencies\Http\Controllers\AgencyCreatorDiscoveryController;
 use App\Modules\Agencies\Http\Controllers\AgencySettingsController;
 use App\Modules\Agencies\Http\Controllers\DashboardActivityController;
 use App\Modules\Agencies\Http\Controllers\DashboardSummaryController;
@@ -76,6 +77,24 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // data today. Read-only: no write surface this chunk (D-c5-3).
         Route::get('creators', [AgencyCreatorController::class, 'index'])
             ->name('agencies.creators.index');
+
+        // ─── Creator discovery (the global pool) ──────────────────────────────
+        // Sprint 6.6a (D-1). The FIRST agency-facing creator query that is NOT
+        // relation-scoped: it browses/searches the GLOBAL `creators` pool with
+        // the fail-closed discoverable gate (approved + is_discoverable), the
+        // shared FTS/filter logic (D-3), and the calling-agency-scoped
+        // "already-connected" annotation (D-4/D-7). `discover` ability, any
+        // member. Read-only — no send-request action (D-9, that's 6.6b).
+        //
+        // ⚠ Registration order: these LITERAL `creators/discover*` routes MUST
+        // precede the `creators/{creator}` param route below, or `discover`
+        // would be captured as a {creator} ULID. `index` (creators/discover)
+        // collides with creators/{creator} on segment count; the show route
+        // (creators/discover/{creator}) does not, but is kept here for clarity.
+        Route::get('creators/discover', [AgencyCreatorDiscoveryController::class, 'index'])
+            ->name('agencies.creators.discover.index');
+        Route::get('creators/discover/{creator}', [AgencyCreatorDiscoveryController::class, 'show'])
+            ->name('agencies.creators.discover.show');
 
         // ─── Creator detail (per-creator drill-in) ───────────────────────────
         // Sprint 6 Chunk 2a (D-2a-1). The roster row-click (D-c5-4 reversal)

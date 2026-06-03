@@ -87,6 +87,19 @@ final class CreatorFactory extends Factory
     }
 
     /**
+     * GDPR opt-out state (Sprint 6.6a, D-2): the creator has set
+     * `is_discoverable = false`, so the discovery gate excludes them even when
+     * approved. No write path exists yet — this state exists for the gate's
+     * fail-closed coverage.
+     */
+    public function notDiscoverable(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'is_discoverable' => false,
+        ]);
+    }
+
+    /**
      * Identity-cleared state (Sprint 4 Chunk 3, Cluster 2). The approve
      * endpoint gates on kyc_status ∈ {verified, not_required}; tests that
      * exercise the happy-path approve compose this with submitted().
