@@ -106,6 +106,12 @@ const headers = [
     width: 130,
   },
   {
+    title: t('app.roster.fields.applicationStatus'),
+    key: 'attributes.application_status',
+    sortable: false,
+    width: 140,
+  },
+  {
     title: t('app.roster.fields.country'),
     key: 'attributes.country_code',
     sortable: false,
@@ -151,6 +157,27 @@ function languageLabel(code: string | null): string {
   return (LANGUAGE_FILTER_CODES as readonly string[]).includes(code)
     ? t(`app.roster.languages.${code}`)
     : code
+}
+
+// Semantic colour per application state — deliberately a different visual
+// register from the neutral tonal relationship-status chip (Chunk 5b: the
+// two status axes must not read as interchangeable). approved=usable (green),
+// pending=awaiting review (amber), rejected=declined (red), incomplete=
+// not-yet-submitted (neutral grey).
+type RosterApplicationStatus = RosterCreatorListItem['attributes']['application_status']
+
+function applicationStatusColor(status: RosterApplicationStatus): string {
+  switch (status) {
+    case 'approved':
+      return 'success'
+    case 'pending':
+      return 'warning'
+    case 'rejected':
+      return 'error'
+    case 'incomplete':
+    default:
+      return 'grey'
+  }
 }
 
 async function loadRoster(): Promise<void> {
@@ -336,6 +363,20 @@ function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
       <template #item.attributes.relationship_status="{ item }">
         <v-chip size="small" variant="tonal" :data-test="`roster-status-${item.id}`">
           {{ t(`app.roster.status.${item.attributes.relationship_status}`) }}
+        </v-chip>
+      </template>
+
+      <!-- Application status (Chunk 5b): display-only, NOT filterable. Solid
+           colour-coded chip — visually distinct from the neutral tonal
+           relationship chip above so the two axes don't read as the same. -->
+      <template #item.attributes.application_status="{ item }">
+        <v-chip
+          size="small"
+          variant="flat"
+          :color="applicationStatusColor(item.attributes.application_status)"
+          :data-test="`roster-app-status-${item.id}`"
+        >
+          {{ t(`app.roster.applicationStatus.${item.attributes.application_status}`) }}
         </v-chip>
       </template>
 

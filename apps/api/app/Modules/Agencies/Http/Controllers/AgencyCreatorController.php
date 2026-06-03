@@ -79,7 +79,9 @@ final class AgencyCreatorController
             })
             // Eager-load only the slim display columns — no social /
             // portfolio / kyc relations, no signed-URL minting.
-            ->with('creator:id,ulid,display_name,country_code,primary_language,categories')
+            // application_status (Chunk 5b): already on the joined creators
+            // table — added to the select only, no new join/query shape.
+            ->with('creator:id,ulid,display_name,country_code,primary_language,categories,application_status')
             // Default sort: creator display_name ASC via a correlated
             // subquery (avoids a join + hydration clobber), with a stable
             // id tiebreaker. NULL display_names (prospects mid-wizard) sort
@@ -189,6 +191,11 @@ final class AgencyCreatorController
                 // click-through; this chunk's rows do NOT navigate (D-c5-4).
                 'creator_id' => $creator?->ulid,
                 'display_name' => $creator?->display_name,
+                // Application lifecycle state (Chunk 5b): display-only, NOT
+                // filterable — lets the agency tell an approved/usable creator
+                // from one still pending/incomplete/rejected. Distinct axis
+                // from relationship_status above.
+                'application_status' => $creator?->application_status->value,
                 'country_code' => $creator?->country_code,
                 'primary_language' => $creator?->primary_language,
                 'categories' => $creator?->categories,

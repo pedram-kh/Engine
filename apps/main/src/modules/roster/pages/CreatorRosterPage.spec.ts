@@ -58,6 +58,7 @@ function makeRow(
     type: 'agency_creator_relations',
     attributes: {
       relationship_status: 'roster',
+      application_status: 'pending',
       is_blacklisted: false,
       internal_rating: null,
       total_campaigns_completed: 0,
@@ -176,6 +177,7 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
       internal_rating: 4,
       is_blacklisted: true,
       relationship_status: 'prospect',
+      application_status: 'approved',
     })
     const harness = await mountRoster({ rows: [row], agencyId: 'agency-xyz', realTable: true })
     cleanup = harness.cleanup
@@ -190,6 +192,16 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     )
     expect(harness.wrapper.find(`[data-test="roster-rating-${row.id}"]`).exists()).toBe(true)
     expect(harness.wrapper.find(`[data-test="roster-blacklist-${row.id}"]`).exists()).toBe(true)
+
+    // Chunk 5b: the application-status chip is a SEPARATE axis from the
+    // relationship chip — its own data-test + its own label ("Approved" vs
+    // the relationship "Prospect"), so the two never read as the same thing.
+    const appStatusChip = harness.wrapper.find(`[data-test="roster-app-status-${row.id}"]`)
+    expect(appStatusChip.exists()).toBe(true)
+    expect(appStatusChip.text()).toContain('Approved')
+    const relationshipChip = harness.wrapper.find(`[data-test="roster-status-${row.id}"]`)
+    expect(appStatusChip.element).not.toBe(relationshipChip.element)
+    expect(appStatusChip.text()).not.toContain('Prospect')
 
     // D-c5-4: the name is a plain span, not a link/button — rows do NOT
     // navigate to a creator detail and no per-row view affordance exists.

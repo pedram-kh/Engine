@@ -30,6 +30,7 @@
       "fields": {
         "name": "Nome",
         "status": "Estado",
+        "applicationStatus": "Candidatura",
         "country": "País",
         "language": "Idioma",
         "categories": "Categorias",
@@ -40,6 +41,12 @@
         "roster": "Roster",
         "prospect": "Potencial",
         "external": "Externo"
+      },
+      "applicationStatus": {
+        "incomplete": "Incompleta",
+        "pending": "Pendente",
+        "approved": "Aprovada",
+        "rejected": "Rejeitada"
       },
       "filters": {
         "status": {

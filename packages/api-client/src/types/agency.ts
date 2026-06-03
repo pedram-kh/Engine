@@ -9,6 +9,8 @@
  *   - Timestamps are `string` (ISO 8601 from Carbon).
  */
 
+import type { CreatorApplicationStatus } from './creator'
+
 // ---------------------------------------------------------------------------
 // Shared
 // ---------------------------------------------------------------------------
@@ -125,6 +127,13 @@ export interface RosterCreatorListItem {
     /** Creator ULID — reserved for Sprint 6 click-through; rows do NOT navigate yet. */
     creator_id: string | null
     display_name: string | null
+    /**
+     * Creator application lifecycle state (Chunk 5b). Display-only — a
+     * distinct axis from `relationship_status` so the agency can tell an
+     * approved/usable creator from one still pending/incomplete/rejected.
+     * Not filterable this chunk.
+     */
+    application_status: CreatorApplicationStatus
     country_code: string | null
     primary_language: string | null
     categories: string[] | null

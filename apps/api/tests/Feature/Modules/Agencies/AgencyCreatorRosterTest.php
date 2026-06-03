@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
+use App\Modules\Creators\Enums\ApplicationStatus;
 use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
@@ -124,6 +125,7 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes and n
         'last_engaged_at',
         'creator_id',
         'display_name',
+        'application_status',
         'country_code',
         'primary_language',
         'categories',
@@ -139,6 +141,32 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes and n
     // No signed media URLs (the slim resource is not CreatorResource).
     expect($attributes)->not->toHaveKey('avatar_url');
     expect($attributes)->not->toHaveKey('cover_url');
+});
+
+it('surfaces each creator application_status on the slim row, reflecting actual state (Chunk 5b)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    // Four creators in distinct application states — all roster relations of
+    // this agency. Names chosen so the default display_name ASC sort gives a
+    // deterministic order; application_status is read per-creator, NOT a
+    // constant, so this pins it to the real column value (break-revert: a
+    // hardcoded literal in toRow would fail the per-name pairing below).
+    makeRosterRelation($agency, [], ['display_name' => 'Amy Approved', 'application_status' => ApplicationStatus::Approved]);
+    makeRosterRelation($agency, [], ['display_name' => 'Ivy Incomplete', 'application_status' => ApplicationStatus::Incomplete]);
+    makeRosterRelation($agency, [], ['display_name' => 'Pat Pending', 'application_status' => ApplicationStatus::Pending]);
+    makeRosterRelation($agency, [], ['display_name' => 'Rae Rejected', 'application_status' => ApplicationStatus::Rejected]);
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency));
+
+    expect($response->status())->toBe(200);
+
+    // Parallel wildcard arrays under the default display_name ASC sort — the
+    // status at index i belongs to the creator named at index i.
+    expect($response->json('data.*.attributes.display_name'))
+        ->toBe(['Amy Approved', 'Ivy Incomplete', 'Pat Pending', 'Rae Rejected']);
+    expect($response->json('data.*.attributes.application_status'))
+        ->toBe(['approved', 'incomplete', 'pending', 'rejected']);
 });
 
 // ---------------------------------------------------------------------------
