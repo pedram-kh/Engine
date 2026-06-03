@@ -15,7 +15,12 @@
  * Read-only this chunk (D-9): NO send-request action — that's Sprint 6.6b.
  */
 
-import type { DiscoveryCreatorListItem, DiscoveryListParams } from '@catalyst/api-client'
+import type {
+  DiscoveryConnectionState,
+  DiscoveryCreatorListItem,
+  DiscoveryListParams,
+} from '@catalyst/api-client'
+import { deriveConnectionState } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -100,6 +105,41 @@ function languageLabel(code: string | null): string | null {
 
 function avatarInitial(name: string | null): string {
   return (name ?? '?').trim().charAt(0).toUpperCase() || '?'
+}
+
+// The three annotation states (Sprint 6.6b, D-5/D-11), derived from the
+// calling-agency-only relationship_status alone (the boolean is_connected was
+// removed). `connected` keys on `roster` specifically — NOT "has any relation".
+const CONNECTION_CHIP: Record<
+  Exclude<DiscoveryConnectionState, 'none'>,
+  { color: string; icon: string; key: string }
+> = {
+  connected: {
+    color: 'primary',
+    icon: 'mdi-link-variant',
+    key: 'app.discover.connection.connected',
+  },
+  pending: { color: 'info', icon: 'mdi-clock-outline', key: 'app.discover.connection.pending' },
+  declined: {
+    color: 'default',
+    icon: 'mdi-close-circle-outline',
+    key: 'app.discover.connection.declined',
+  },
+}
+
+function connectionState(item: DiscoveryCreatorListItem): DiscoveryConnectionState {
+  return deriveConnectionState(item.attributes.relationship_status)
+}
+
+// The chip descriptor for the item's state, or null for `none` (no chip). Kept
+// in the script (not an inline template cast) so the `Exclude<…, 'none'>`
+// generic never lands in a `{{ }}` expression — Prettier's HTML parser reads the
+// `<` as an opening tag and chokes.
+function connectionChip(
+  item: DiscoveryCreatorListItem,
+): { color: string; icon: string; key: string } | null {
+  const state = connectionState(item)
+  return state === 'none' ? null : CONNECTION_CHIP[state]
 }
 
 async function loadDiscovery(): Promise<void> {
@@ -311,24 +351,25 @@ function openProfile(item: DiscoveryCreatorListItem): void {
                 </v-chip>
               </div>
 
-              <!-- Calling-agency-only connection status (D-4). -->
+              <!-- Calling-agency-only connection annotation, three states
+                   (D-5/D-11): connected / pending / declined / not connected. -->
               <v-chip
-                v-if="item.attributes.is_connected && item.attributes.relationship_status"
+                v-if="connectionChip(item)"
                 size="small"
-                color="primary"
+                :color="connectionChip(item)!.color"
                 variant="tonal"
                 class="mt-3"
-                prepend-icon="mdi-link-variant"
-                :data-test="`discover-connected-${item.id}`"
+                :prepend-icon="connectionChip(item)!.icon"
+                :data-test="`discover-connection-${connectionState(item)}-${item.id}`"
               >
-                {{ t(`app.roster.status.${item.attributes.relationship_status}`) }}
+                {{ t(connectionChip(item)!.key) }}
               </v-chip>
               <span
                 v-else
                 class="text-caption text-disabled mt-3"
                 :data-test="`discover-notconnected-${item.id}`"
               >
-                {{ t('app.discover.notConnected') }}
+                {{ t('app.discover.connection.notConnected') }}
               </span>
             </v-card-text>
           </v-card>

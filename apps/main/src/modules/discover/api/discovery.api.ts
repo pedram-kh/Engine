@@ -1,18 +1,18 @@
 /**
- * Typed wrapper for the creator discovery API (Sprint 6.6a — the read path).
+ * Typed wrapper for the creator discovery API.
  *
  * Tenant-scoped to the current agency via the `agencyId` (ULID) path segment,
  * mirroring `roster.api.ts`. The HTTP client handles CSRF preflight + Sanctum
  * cookie auth transparently.
  *
- *   GET /api/v1/agencies/{agency}/creators/discover            — browse the pool
- *   GET /api/v1/agencies/{agency}/creators/discover/{creator}  — public profile
- *
- * Read-only this chunk (D-9): there is NO send-request action — that, and the
- * `pending_request`/`declined` statuses, is Sprint 6.6b.
+ *   GET  /api/v1/agencies/{agency}/creators/discover            — browse the pool
+ *   GET  /api/v1/agencies/{agency}/creators/discover/{creator}  — public profile
+ *   POST /api/v1/agencies/{agency}/creators/discover/{creator}/connection-request
+ *        — send (or re-send) a connection request (Sprint 6.6b, D-7/D-10).
  */
 
 import type {
+  ConnectionRequestResponse,
   CreatorPublicProfileEnvelope,
   DiscoveryListParams,
   DiscoveryListResponse,
@@ -53,5 +53,19 @@ export const discoveryApi = {
    */
   show(agencyId: string, creatorUlid: string): Promise<CreatorPublicProfileEnvelope> {
     return http.get<CreatorPublicProfileEnvelope>(`${discoverBase(agencyId)}/${creatorUlid}`)
+  },
+
+  /**
+   * Send (or re-send) a connection request to a discovered creator
+   * (Sprint 6.6b, D-7/D-10). Admin/manager only (the backend 403s staff).
+   * Creates the relation in `pending_request` from no-relation, re-requests
+   * from `declined` (D-4), and is an idempotent no-op surfacing the existing
+   * state for `pending_request`/`roster`. The response carries the resulting
+   * `relationship_status` so the caller can re-derive the button state.
+   */
+  sendConnectionRequest(agencyId: string, creatorUlid: string): Promise<ConnectionRequestResponse> {
+    return http.post<ConnectionRequestResponse>(
+      `${discoverBase(agencyId)}/${creatorUlid}/connection-request`,
+    )
   },
 }

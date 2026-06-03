@@ -39,6 +39,19 @@
         "language": "Language",
         "category": "Category"
       },
+      "connection": {
+        "connected": "Connected",
+        "pending": "Request pending",
+        "declined": "Declined",
+        "notConnected": "Not connected",
+        "sendRequest": "Send request",
+        "requestAgain": "Request again",
+        "sent": "Request sent",
+        "reRequested": "Request sent again",
+        "alreadyPending": "A request is already pending",
+        "alreadyConnected": "This creator is already on your roster",
+        "error": "Couldn't send the request. Please try again."
+      },
       "empty": {
         "heading": "No creators yet",
         "body": "Approved creators will appear here as the pool grows."
@@ -86,7 +99,9 @@
       "status": {
         "roster": "Roster",
         "prospect": "Prospect",
-        "external": "External"
+        "external": "External",
+        "pending_request": "Pending request",
+        "declined": "Declined"
       },
       "applicationStatus": {
         "incomplete": "Incomplete",
@@ -103,7 +118,9 @@
           "all": "All",
           "roster": "Roster",
           "prospect": "Prospect",
-          "external": "External"
+          "external": "External",
+          "pending_request": "Pending requests",
+          "declined": "Declined"
         },
         "country": "Country",
         "language": "Language",

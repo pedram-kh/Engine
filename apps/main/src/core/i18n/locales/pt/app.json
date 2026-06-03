@@ -39,6 +39,19 @@
         "language": "Idioma",
         "category": "Categoria"
       },
+      "connection": {
+        "connected": "Ligado",
+        "pending": "Pedido pendente",
+        "declined": "Recusado",
+        "notConnected": "Sem ligação",
+        "sendRequest": "Enviar pedido",
+        "requestAgain": "Pedir novamente",
+        "sent": "Pedido enviado",
+        "reRequested": "Pedido enviado novamente",
+        "alreadyPending": "Já existe um pedido pendente",
+        "alreadyConnected": "Este criador já está na sua lista",
+        "error": "Não foi possível enviar o pedido. Tente novamente."
+      },
       "empty": {
         "heading": "Ainda não há criadores",
         "body": "Os criadores aprovados aparecerão aqui à medida que o conjunto crescer."
@@ -86,7 +99,9 @@
       "status": {
         "roster": "Roster",
         "prospect": "Potencial",
-        "external": "Externo"
+        "external": "Externo",
+        "pending_request": "Pedido pendente",
+        "declined": "Recusado"
       },
       "applicationStatus": {
         "incomplete": "Incompleta",
@@ -103,7 +118,9 @@
           "all": "Todos",
           "roster": "Roster",
           "prospect": "Potencial",
-          "external": "Externo"
+          "external": "Externo",
+          "pending_request": "Pedidos pendentes",
+          "declined": "Recusados"
         },
         "country": "País",
         "language": "Idioma",

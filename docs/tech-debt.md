@@ -9,6 +9,18 @@ anyone reviewing it later.
 
 ---
 
+## Agency-notified-on-accept/decline + a real notification subsystem (only the send-request email ships)
+
+- **Where:** the two-sided connection lifecycle in the Agencies + Creators modules. The agency→creator **send** path notifies via [`apps/api/app/Modules/Agencies/Mail/ConnectionRequestMail.php`](../apps/api/app/Modules/Agencies/Mail/ConnectionRequestMail.php) (queued, localized). The reverse direction — the creator's **accept/decline** in [`apps/api/app/Modules/Creators/Http/Controllers/CreatorConnectionRequestController.php`](../apps/api/app/Modules/Creators/Http/Controllers/CreatorConnectionRequestController.php) — does **not** notify the requesting agency.
+- **What we accepted in Sprint 6.6b (June 3, 2026):** D-9 shipped the send-request email only. **Agency-notified-on-response is deliberately deferred.** When a creator accepts (`pending_request → roster`) or declines (`pending_request → declined`), the agency is **not** pushed a notification; it learns the outcome **pull-style** via the discovery annotation — the creator's `relationship_status` flips, so the discovery card/profile re-renders "Connected" / "Declined" on next view (the D-5 three-state annotation is the feedback channel). No mailable, no in-app toast, no notification row is written on the response.
+- **Risk:** low. The outcome is never lost (it's durable in `relationship_status` and visible on the discovery surface); the gap is purely **push immediacy** — an agency that doesn't revisit the discovery surface won't be actively told "creator X accepted." Acceptable at Phase-1 volumes where an agency checks discovery deliberately.
+- **Triggered by:** the chunk that builds a **real notification subsystem** (in-app notification center + a `notifications` table + the push/email fan-out) — agency-notified-on-response is one of its first consumers. Until that lands, adding a one-off accept/decline mailable would be a second bespoke email path that the subsystem would immediately subsume.
+- **Resolution:** when the notification subsystem ships, emit an agency-facing notification on `accept`/`decline` (and migrate the send-request email onto the same fan-out so there is one notification spine, not a scatter of bespoke mailables).
+- **Owner:** the future notification-subsystem workstream.
+- **Status:** open. Surfaced + deliberately deferred by Sprint 6.6b, June 3, 2026 ([review](reviews/sprint-6-6b-review.md)).
+
+---
+
 ## Deferred creator settings page (timezone correction + `preferred_language` / `theme_preference` persistence)
 
 - **Where:** there is no creator settings surface today. The fields that would live there: [`apps/api/app/Modules/Identity/Models/User.php`](../apps/api/app/Modules/Identity/Models/User.php) (`timezone`, `preferred_language`, `theme_preference`), set once at row-creation by [`apps/api/app/Modules/Identity/Services/SignUpService.php`](../apps/api/app/Modules/Identity/Services/SignUpService.php) and never updated afterward. The SPA reads them via `useAuthStore`/[`packages/api-client/src/types/user.ts`](../packages/api-client/src/types/user.ts) but has no surface to write them back.

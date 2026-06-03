@@ -39,6 +39,19 @@
         "language": "Lingua",
         "category": "Categoria"
       },
+      "connection": {
+        "connected": "Collegato",
+        "pending": "Richiesta in attesa",
+        "declined": "Rifiutata",
+        "notConnected": "Non collegato",
+        "sendRequest": "Invia richiesta",
+        "requestAgain": "Richiedi di nuovo",
+        "sent": "Richiesta inviata",
+        "reRequested": "Richiesta inviata di nuovo",
+        "alreadyPending": "Una richiesta è già in attesa",
+        "alreadyConnected": "Questo creator è già nella tua lista",
+        "error": "Impossibile inviare la richiesta. Riprova."
+      },
       "empty": {
         "heading": "Ancora nessun creator",
         "body": "I creator approvati appariranno qui man mano che il pool cresce."
@@ -86,7 +99,9 @@
       "status": {
         "roster": "Roster",
         "prospect": "Potenziale",
-        "external": "Esterno"
+        "external": "Esterno",
+        "pending_request": "Richiesta in attesa",
+        "declined": "Rifiutata"
       },
       "applicationStatus": {
         "incomplete": "Incompleta",
@@ -103,7 +118,9 @@
           "all": "Tutti",
           "roster": "Roster",
           "prospect": "Potenziale",
-          "external": "Esterno"
+          "external": "Esterno",
+          "pending_request": "Richieste in attesa",
+          "declined": "Rifiutate"
         },
         "country": "Paese",
         "language": "Lingua",

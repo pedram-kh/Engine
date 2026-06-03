@@ -1,15 +1,19 @@
 <script setup lang="ts">
 /**
- * Public creator profile (Sprint 6.6a, D-5/D-6/D-9) — reached from a discovery
+ * Public creator profile (Sprint 6.6a, D-5/D-6) — reached from a discovery
  * card. The PUBLIC shape: it carries the creator's public profile (bio,
  * country, languages, categories, social ACCOUNTS, portfolio) and the
  * calling-agency-only connection status, and it does NOT 404 when this agency
  * has no relation (D-6).
  *
- * Read-only this chunk (D-9): there is NO "Send connection request" button —
- * that, and the pending/connected action states, is Sprint 6.6b. The ONE
- * connection affordance here is a READ: when the creator is already on this
- * agency's roster, a "View in roster" link to the 2a detail.
+ * Sprint 6.6b (D-10/D-11): the header carries the status-driven send-request
+ * affordance (admin/manager only, mirroring the roster detail's canEdit role
+ * pattern) + the three annotation states. The button's presence is derived
+ * from the calling-agency-only relationship_status:
+ *   - none      → "Send request" (W1)
+ *   - pending   → "Request pending" (disabled/info)
+ *   - connected → "View in roster" (the existing 2a link — keys on `roster`)
+ *   - declined  → "Declined" + an explicit "Request again" (the D-4 re-request)
  *
  * It deliberately carries no rating/notes editor, no contact email, no
  * availability, no admin actions — those are relation-gated surfaces (the
@@ -20,8 +24,9 @@ import type {
   CreatorPublicProfile,
   CreatorSocialAccountSummary,
   CreatorPortfolioItemSummary,
+  DiscoveryConnectionState,
 } from '@catalyst/api-client'
-import { ApiError } from '@catalyst/api-client'
+import { ApiError, deriveConnectionState } from '@catalyst/api-client'
 import {
   CategoryChips,
   CountryDisplay,
@@ -49,8 +54,22 @@ const profile = ref<CreatorPublicProfile | null>(null)
 const loading = ref(false)
 const errorMessage = ref<string | null>(null)
 
+// Send-request state (D-10). Admin/manager only — the SAME role pattern as the
+// roster detail's canEdit (copied verbatim per the kickoff).
+const canSend = computed(
+  () => agencyStore.currentRole === 'agency_admin' || agencyStore.currentRole === 'agency_manager',
+)
+const sending = ref(false)
+const snackbar = ref<{ color: string; text: string } | null>(null)
+
 const creatorUlid = computed(() => String(route.params.ulid ?? ''))
 const attrs = computed(() => profile.value?.attributes ?? null)
+
+// The three annotation states (D-5/D-11), derived from the calling-agency-only
+// relationship_status alone. `connected` keys on `roster` specifically.
+const connectionState = computed<DiscoveryConnectionState>(() =>
+  deriveConnectionState(attrs.value?.relationship_status ?? null),
+)
 
 const displayName = computed(() => attrs.value?.display_name ?? t('app.discover.unnamed'))
 
@@ -129,6 +148,44 @@ function viewInRoster(): void {
   void router.push({ name: 'roster.detail', params: { ulid: creatorUlid.value } })
 }
 
+/**
+ * Send (or re-send, when declined — D-4) a connection request. Updates the
+ * local relationship_status from the response so the button re-derives its
+ * state without a refetch, and surfaces the outcome via a snackbar keyed on
+ * the backend's meta.code.
+ */
+async function sendConnectionRequest(): Promise<void> {
+  const agencyId = agencyStore.currentAgencyId
+  if (agencyId === null || creatorUlid.value === '' || sending.value || !canSend.value) return
+
+  sending.value = true
+  try {
+    const res = await discoveryApi.sendConnectionRequest(agencyId, creatorUlid.value)
+    if (attrs.value !== null) {
+      attrs.value.relationship_status = res.data.attributes.relationship_status
+    }
+    snackbar.value = snackbarFor(res.meta.code)
+  } catch {
+    snackbar.value = { color: 'error', text: t('app.discover.connection.error') }
+  } finally {
+    sending.value = false
+  }
+}
+
+function snackbarFor(code: string): { color: string; text: string } {
+  switch (code) {
+    case 'connection.requested':
+      return { color: 'success', text: t('app.discover.connection.sent') }
+    case 'connection.re_requested':
+      return { color: 'success', text: t('app.discover.connection.reRequested') }
+    case 'connection.already_connected':
+      return { color: 'info', text: t('app.discover.connection.alreadyConnected') }
+    case 'connection.already_requested':
+    default:
+      return { color: 'info', text: t('app.discover.connection.alreadyPending') }
+  }
+}
+
 onMounted(() => {
   void load()
 })
@@ -164,44 +221,104 @@ onMounted(() => {
     />
 
     <template v-else-if="profile !== null && attrs !== null">
-      <!-- Header: name + connection status. NO send-request action (D-9). -->
+      <!-- Header: name + the three connection annotation states + the
+           status-driven send-request affordance (D-10/D-11). -->
       <header class="discover-profile__header d-flex align-start justify-space-between ga-3">
         <div class="discover-profile__header-text">
           <h1 class="text-h5 ma-0" data-test="discover-profile-name">{{ displayName }}</h1>
           <div class="d-flex flex-wrap align-center ga-2 mt-1">
             <v-chip
-              v-if="attrs.is_connected && attrs.relationship_status"
+              v-if="connectionState === 'connected'"
               size="small"
               color="primary"
               variant="tonal"
               prepend-icon="mdi-link-variant"
-              data-test="discover-profile-connected"
+              data-test="discover-profile-connection-connected"
             >
-              {{ t(`app.roster.status.${attrs.relationship_status}`) }}
+              {{ t('app.discover.connection.connected') }}
+            </v-chip>
+            <v-chip
+              v-else-if="connectionState === 'pending'"
+              size="small"
+              color="info"
+              variant="tonal"
+              prepend-icon="mdi-clock-outline"
+              data-test="discover-profile-connection-pending"
+            >
+              {{ t('app.discover.connection.pending') }}
+            </v-chip>
+            <v-chip
+              v-else-if="connectionState === 'declined'"
+              size="small"
+              variant="tonal"
+              prepend-icon="mdi-close-circle-outline"
+              data-test="discover-profile-connection-declined"
+            >
+              {{ t('app.discover.connection.declined') }}
             </v-chip>
             <span
               v-else
               class="text-caption text-medium-emphasis"
               data-test="discover-profile-notconnected"
             >
-              {{ t('app.discover.notConnected') }}
+              {{ t('app.discover.connection.notConnected') }}
             </span>
           </div>
         </div>
 
-        <!-- The ONLY connection affordance this chunk: a READ link to the
-             relation-gated roster detail, shown only when already connected
-             (D-9). The send-request action lives in 6.6b. -->
-        <v-btn
-          v-if="attrs.is_connected"
-          variant="tonal"
-          color="primary"
-          prepend-icon="mdi-account-arrow-right-outline"
-          data-test="discover-profile-view-in-roster"
-          @click="viewInRoster"
-        >
-          {{ t('app.discover.detail.viewInRoster') }}
-        </v-btn>
+        <!-- Status-driven action (D-10). Admin/manager only (canSend). -->
+        <div class="d-flex align-center ga-2">
+          <!-- connected → the existing READ link to the relation-gated roster
+               detail (keys on `roster` specifically, D-5). -->
+          <v-btn
+            v-if="connectionState === 'connected'"
+            variant="tonal"
+            color="primary"
+            prepend-icon="mdi-account-arrow-right-outline"
+            data-test="discover-profile-view-in-roster"
+            @click="viewInRoster"
+          >
+            {{ t('app.discover.detail.viewInRoster') }}
+          </v-btn>
+
+          <!-- pending → informational, disabled. -->
+          <v-btn
+            v-else-if="connectionState === 'pending'"
+            variant="tonal"
+            color="info"
+            prepend-icon="mdi-clock-outline"
+            disabled
+            data-test="discover-profile-request-pending"
+          >
+            {{ t('app.discover.connection.pending') }}
+          </v-btn>
+
+          <!-- declined → an explicit "Request again" (D-4); admin/manager only. -->
+          <v-btn
+            v-else-if="connectionState === 'declined' && canSend"
+            variant="flat"
+            color="primary"
+            prepend-icon="mdi-refresh"
+            :loading="sending"
+            data-test="discover-profile-request-again"
+            @click="sendConnectionRequest"
+          >
+            {{ t('app.discover.connection.requestAgain') }}
+          </v-btn>
+
+          <!-- none → "Send request" (W1); admin/manager only. -->
+          <v-btn
+            v-else-if="connectionState === 'none' && canSend"
+            variant="flat"
+            color="primary"
+            prepend-icon="mdi-account-plus-outline"
+            :loading="sending"
+            data-test="discover-profile-send-request"
+            @click="sendConnectionRequest"
+          >
+            {{ t('app.discover.connection.sendRequest') }}
+          </v-btn>
+        </div>
       </header>
 
       <!-- Profile -->
@@ -248,6 +365,20 @@ onMounted(() => {
         />
       </section>
     </template>
+
+    <v-snackbar
+      :model-value="snackbar !== null"
+      :timeout="3000"
+      :color="snackbar?.color"
+      data-test="discover-profile-snackbar"
+      @update:model-value="
+        (v) => {
+          if (!v) snackbar = null
+        }
+      "
+    >
+      {{ snackbar?.text }}
+    </v-snackbar>
   </div>
 </template>
 

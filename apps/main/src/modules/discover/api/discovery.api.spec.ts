@@ -83,3 +83,24 @@ describe('discoveryApi.show', () => {
     )
   })
 })
+
+describe('discoveryApi.sendConnectionRequest (Sprint 6.6b)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockHttp.post.mockResolvedValue({
+      data: {
+        id: 'rel',
+        type: 'agency_connection_request',
+        attributes: { relationship_status: 'pending_request' },
+      },
+      meta: { code: 'connection.requested' },
+    })
+  })
+
+  it('POSTs to the connection-request URL with the creator ULID', () => {
+    void discoveryApi.sendConnectionRequest('agency-ulid', 'creator-ulid')
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/creators/discover/creator-ulid/connection-request',
+    )
+  })
+})

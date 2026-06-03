@@ -101,11 +101,16 @@ const CATEGORY_FILTER_KEYS = [
   'other',
 ] as const
 
+// The two lifecycle-in-flight statuses (Sprint 6.6b, D-6) are EXCLUDED from
+// the default index but get their own chips here, so the agency can
+// deliberately filter to "my pending requests" / "who declined me".
 const statusFilterItems: { label: string; value: StatusFilter }[] = [
   { label: t('app.roster.filters.status.all'), value: 'all' },
   { label: t('app.roster.filters.status.roster'), value: 'roster' },
   { label: t('app.roster.filters.status.prospect'), value: 'prospect' },
   { label: t('app.roster.filters.status.external'), value: 'external' },
+  { label: t('app.roster.filters.status.pending_request'), value: 'pending_request' },
+  { label: t('app.roster.filters.status.declined'), value: 'declined' },
 ]
 
 const countryFilterItems = computed(() =>

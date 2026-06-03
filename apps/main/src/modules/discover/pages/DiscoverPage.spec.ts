@@ -59,7 +59,6 @@ function makeCard(
       primary_language: 'en',
       categories: ['tech'],
       avatar_url: null,
-      is_connected: false,
       relationship_status: null,
       ...overrides,
     },
@@ -158,28 +157,46 @@ describe('DiscoverPage (Sprint 6.6a)', () => {
     cleanup = null
   })
 
-  it('loads scoped to the current agency and renders cards with the connection annotation', async () => {
+  it('loads scoped to the current agency and renders cards with the three-state connection annotation', async () => {
     const connected = makeCard(
-      { display_name: 'Connected Cara', is_connected: true, relationship_status: 'roster' },
+      { display_name: 'Connected Cara', relationship_status: 'roster' },
       '01CONNECTEDXXXXXXXXXXXXXXXX',
     )
+    const pending = makeCard(
+      { display_name: 'Pending Pat', relationship_status: 'pending_request' },
+      '01PENDINGXXXXXXXXXXXXXXXXXX',
+    )
+    const declined = makeCard(
+      { display_name: 'Declined Dan', relationship_status: 'declined' },
+      '01DECLINEDXXXXXXXXXXXXXXXXX',
+    )
     const stranger = makeCard(
-      { display_name: 'Stranger Sam', is_connected: false, relationship_status: null },
+      { display_name: 'Stranger Sam', relationship_status: null },
       '01STRANGERXXXXXXXXXXXXXXXXX',
     )
-    const harness = await mountDiscover({ cards: [connected, stranger], agencyId: 'agency-xyz' })
+    const harness = await mountDiscover({
+      cards: [connected, pending, declined, stranger],
+      agencyId: 'agency-xyz',
+    })
     cleanup = harness.cleanup
 
     expect(vi.mocked(discoveryApi.list).mock.calls[0]?.[0]).toBe('agency-xyz')
 
-    // The connected card shows its (calling-agency-only) status chip.
+    // roster → "Connected"; pending_request → "Request pending"; declined →
+    // "Declined" (D-5/D-11: keyed on the status, not a boolean).
     expect(
-      harness.wrapper.find(`[data-test="discover-connected-${connected.id}"]`).text(),
-    ).toContain('Roster')
-    // The stranger card shows the not-connected affordance, not a status chip.
-    expect(harness.wrapper.find(`[data-test="discover-connected-${stranger.id}"]`).exists()).toBe(
-      false,
-    )
+      harness.wrapper.find(`[data-test="discover-connection-connected-${connected.id}"]`).text(),
+    ).toContain('Connected')
+    expect(
+      harness.wrapper.find(`[data-test="discover-connection-pending-${pending.id}"]`).text(),
+    ).toContain('Request pending')
+    expect(
+      harness.wrapper.find(`[data-test="discover-connection-declined-${declined.id}"]`).text(),
+    ).toContain('Declined')
+    // The stranger card shows the not-connected affordance, no status chip.
+    expect(
+      harness.wrapper.find(`[data-test="discover-connection-connected-${stranger.id}"]`).exists(),
+    ).toBe(false)
     expect(
       harness.wrapper.find(`[data-test="discover-notconnected-${stranger.id}"]`).exists(),
     ).toBe(true)

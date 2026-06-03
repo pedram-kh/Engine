@@ -178,9 +178,23 @@ export interface TalentPoolMemberResource {
 
 /**
  * Mirrors `App\Modules\Creators\Enums\RelationshipStatus` — the per-agency
- * view of a creator's status. All three values appear in the roster list.
+ * view of a creator's status. This is the LOAD-BEARING FE consumer of the
+ * enum: every status chip + the discovery annotation derives from it, so a
+ * missing value silently mistypes a status (the 21-consumer ripple, D-3).
+ *
+ * Sprint 6.6b adds the two-sided lifecycle values:
+ *   - `pending_request` — agency sent a discovery request, creator not yet
+ *     accepted (no magic-link token; excluded from the default roster index
+ *     but filterable by chip, D-6).
+ *   - `declined`        — creator declined; row retained so the agency can
+ *     re-request (D-1/D-4).
  */
-export type RosterRelationshipStatus = 'roster' | 'prospect' | 'external'
+export type RosterRelationshipStatus =
+  | 'roster'
+  | 'prospect'
+  | 'external'
+  | 'pending_request'
+  | 'declined'
 
 /**
  * A single row in the agency roster list
@@ -364,9 +378,13 @@ export interface DiscoveryCreatorListItem {
     categories: string[] | null
     /** Single signed avatar URL; null when unset / non-S3. */
     avatar_url: string | null
-    /** True when the CALLING agency already has a relation with this creator. */
-    is_connected: boolean
-    /** The CALLING agency's own status (never another agency's), or null. */
+    /**
+     * The CALLING agency's own status (never another agency's), or null when
+     * no relation exists. Sprint 6.6b (D-5): the boolean `is_connected` was
+     * REMOVED — it conflated `roster` with `pending_request`/`declined`. The FE
+     * derives the three annotation states (connected / pending / declined /
+     * none) from this status alone via `deriveConnectionState`.
+     */
     relationship_status: DiscoveryRelationshipStatus | null
   }
 }
@@ -420,13 +438,76 @@ export interface CreatorPublicProfile {
     profile_completeness_score: number
     social_accounts: CreatorSocialAccountSummary[]
     portfolio: CreatorPortfolioItemSummary[]
-    is_connected: boolean
+    /**
+     * The CALLING agency's own status (never another agency's), or null. The
+     * boolean `is_connected` was removed in Sprint 6.6b (D-5); the FE derives
+     * the status-driven send-request button + the three annotation states from
+     * this alone.
+     */
     relationship_status: DiscoveryRelationshipStatus | null
   }
 }
 
 export interface CreatorPublicProfileEnvelope {
   data: CreatorPublicProfile
+}
+
+/**
+ * The three-state connection distinction the discovery surfaces render
+ * (Sprint 6.6b, D-5/D-10/D-11), derived from `relationship_status`:
+ *
+ *   - `connected`  → `roster` (the "View in roster" affordance keys on THIS,
+ *                    not "has any relation").
+ *   - `pending`    → `pending_request` (request sent, awaiting the creator).
+ *   - `declined`   → `declined` (creator declined; offer an explicit
+ *                    "Request again", D-4).
+ *   - `none`       → no relation / prospect / external — "Send request".
+ *
+ * ⚠ `prospect`/`external` fall through to `none` for the discovery SEND
+ * affordance: discovery is the cold-outreach surface, and those statuses have
+ * no send/accept semantics here.
+ */
+export type DiscoveryConnectionState = 'connected' | 'pending' | 'declined' | 'none'
+
+export function deriveConnectionState(
+  status: DiscoveryRelationshipStatus | null,
+): DiscoveryConnectionState {
+  switch (status) {
+    case 'roster':
+      return 'connected'
+    case 'pending_request':
+      return 'pending'
+    case 'declined':
+      return 'declined'
+    default:
+      return 'none'
+  }
+}
+
+/**
+ * Response envelope from the agency send-connection-request endpoint
+ * (Sprint 6.6b, D-7):
+ *   POST /agencies/{agency}/creators/discover/{creator}/connection-request
+ *
+ * Carries the resulting relationship_status (so the FE re-derives the button
+ * state) + a `meta.code` describing the outcome (requested / re_requested /
+ * already_requested / already_connected).
+ */
+export interface ConnectionRequestResponse {
+  data: {
+    id: string
+    type: 'agency_connection_request'
+    attributes: {
+      relationship_status: DiscoveryRelationshipStatus
+    }
+  }
+  meta: {
+    code:
+      | 'connection.requested'
+      | 'connection.re_requested'
+      | 'connection.already_requested'
+      | 'connection.already_connected'
+  }
 }
 
 // ---------------------------------------------------------------------------

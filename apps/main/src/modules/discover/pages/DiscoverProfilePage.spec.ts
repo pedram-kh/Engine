@@ -1,16 +1,20 @@
 /**
- * Sprint 6.6a — Vitest coverage for the public creator profile page.
+ * Sprint 6.6a + 6.6b — Vitest coverage for the public creator profile page.
  *
- * Covers: agency-scoped load, the read-only render (NO send-request action,
- * D-9), the "View in roster" link shown ONLY when already connected (D-9), the
- * not-connected state, and the 404 → not-found message (the public detail
- * 404s only for a non-discoverable creator, never for no-relation — D-6).
+ * 6.6a: agency-scoped load, the public render, the 404 → not-found message.
+ * 6.6b (D-10/D-11): the status-driven send-request affordance + the three
+ * annotation states. The button presence is derived from the calling-agency-
+ * only relationship_status, admin/manager-gated (the canEdit role pattern):
+ *   - none      → "Send request" (W1)
+ *   - pending   → "Request pending" (disabled)
+ *   - connected → "View in roster" (keys on `roster`)
+ *   - declined  → "Declined" + "Request again" (D-4)
  *
  * The @catalyst/ui leaf components are stubbed to keep the mount lean; the
- * page chrome (header, connection chip, view-in-roster) renders for real.
+ * page chrome (header, connection chip, action button) renders for real.
  */
 
-import type { CreatorPublicProfile } from '@catalyst/api-client'
+import type { ConnectionRequestResponse, CreatorPublicProfile } from '@catalyst/api-client'
 import { ApiError } from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
@@ -28,10 +32,12 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import DiscoverProfilePage from './DiscoverProfilePage.vue'
 
 vi.mock('../api/discovery.api', () => ({
-  discoveryApi: { show: vi.fn() },
+  discoveryApi: { show: vi.fn(), sendConnectionRequest: vi.fn() },
 }))
 
 import { discoveryApi } from '../api/discovery.api'
+
+type AgencyRole = 'agency_admin' | 'agency_manager' | 'agency_staff'
 
 const localStorageStore: Record<string, string> = {}
 Object.defineProperty(globalThis, 'localStorage', {
@@ -66,15 +72,28 @@ function makeProfile(
       profile_completeness_score: 90,
       social_accounts: [],
       portfolio: [],
-      is_connected: false,
       relationship_status: null,
       ...overrides,
     },
   }
 }
 
+function sendResponse(
+  status: ConnectionRequestResponse['data']['attributes']['relationship_status'],
+  code: ConnectionRequestResponse['meta']['code'],
+): ConnectionRequestResponse {
+  return {
+    data: {
+      id: '01CREATORULIDXXXXXXXXXXXXXX',
+      type: 'agency_connection_request',
+      attributes: { relationship_status: status },
+    },
+    meta: { code },
+  }
+}
+
 async function mountProfile(
-  options: { profile?: CreatorPublicProfile; reject?: ApiError | Error } = {},
+  options: { profile?: CreatorPublicProfile; reject?: ApiError | Error; role?: AgencyRole } = {},
 ): Promise<{
   wrapper: ReturnType<typeof mount>
   router: ReturnType<typeof createRouter>
@@ -91,7 +110,7 @@ async function mountProfile(
 
   const agency = useAgencyStore()
   agency.initFromUser([
-    { agency_id: 'agency-ulid', agency_name: 'Test Agency', role: 'agency_admin' },
+    { agency_id: 'agency-ulid', agency_name: 'Test Agency', role: options.role ?? 'agency_admin' },
   ])
 
   const router = createRouter({
@@ -142,7 +161,7 @@ async function mountProfile(
   }
 }
 
-describe('DiscoverProfilePage (Sprint 6.6a)', () => {
+describe('DiscoverProfilePage', () => {
   let cleanup: (() => void) | null = null
 
   beforeEach(() => {
@@ -154,7 +173,7 @@ describe('DiscoverProfilePage (Sprint 6.6a)', () => {
     cleanup = null
   })
 
-  it('loads the public profile scoped to the agency + creator ULID and renders read-only', async () => {
+  it('loads the public profile scoped to the agency + creator ULID', async () => {
     const harness = await mountProfile({ profile: makeProfile({ display_name: 'Ada Lovelace' }) })
     cleanup = harness.cleanup
 
@@ -168,24 +187,21 @@ describe('DiscoverProfilePage (Sprint 6.6a)', () => {
     expect(harness.wrapper.find('[data-test="discover-profile-bio"]').text()).toContain(
       'Pioneering mathematician',
     )
-
-    // Read-only (D-9): there is NO send-request action anywhere on the page,
-    // and no rating/notes editor. The connect lifecycle is Sprint 6.6b.
-    expect(harness.wrapper.find('[data-test="discover-profile-send-request"]').exists()).toBe(false)
+    // No relation-gated editor (rating/notes live on the 2a roster detail).
     expect(harness.wrapper.find('[data-test="creator-detail-save"]').exists()).toBe(false)
     expect(harness.wrapper.find('[data-test="creator-detail-rating"]').exists()).toBe(false)
   })
 
-  it('shows the View-in-roster link ONLY when already connected, and navigates to the 2a detail', async () => {
-    const harness = await mountProfile({
-      profile: makeProfile({ is_connected: true, relationship_status: 'roster' }),
-    })
+  it('connected (roster) → "Connected" chip + the View-in-roster link, navigating to the 2a detail', async () => {
+    const harness = await mountProfile({ profile: makeProfile({ relationship_status: 'roster' }) })
     cleanup = harness.cleanup
     const pushSpy = vi.spyOn(harness.router, 'push')
 
-    expect(harness.wrapper.find('[data-test="discover-profile-connected"]').text()).toContain(
-      'Roster',
-    )
+    expect(
+      harness.wrapper.find('[data-test="discover-profile-connection-connected"]').text(),
+    ).toContain('Connected')
+    // The send-request button is NOT shown when already connected.
+    expect(harness.wrapper.find('[data-test="discover-profile-send-request"]').exists()).toBe(false)
 
     const link = harness.wrapper.find('[data-test="discover-profile-view-in-roster"]')
     expect(link.exists()).toBe(true)
@@ -197,14 +213,80 @@ describe('DiscoverProfilePage (Sprint 6.6a)', () => {
     })
   })
 
-  it('shows the not-connected state and NO view-in-roster link for an unrelated creator', async () => {
-    const harness = await mountProfile({ profile: makeProfile({ is_connected: false }) })
+  it('not-connected (admin) → shows "Send request"; clicking it sends and flips to pending', async () => {
+    vi.mocked(discoveryApi.sendConnectionRequest).mockResolvedValue(
+      sendResponse('pending_request', 'connection.requested'),
+    )
+    const harness = await mountProfile({ profile: makeProfile({ relationship_status: null }) })
     cleanup = harness.cleanup
 
     expect(harness.wrapper.find('[data-test="discover-profile-notconnected"]').exists()).toBe(true)
-    expect(harness.wrapper.find('[data-test="discover-profile-view-in-roster"]').exists()).toBe(
-      false,
+    const btn = harness.wrapper.find('[data-test="discover-profile-send-request"]')
+    expect(btn.exists()).toBe(true)
+
+    await btn.trigger('click')
+    await flushPromises()
+
+    expect(vi.mocked(discoveryApi.sendConnectionRequest).mock.calls[0]).toEqual([
+      'agency-ulid',
+      '01CREATORULIDXXXXXXXXXXXXXX',
+    ])
+    // The button re-derives to the disabled "Request pending" state.
+    expect(harness.wrapper.find('[data-test="discover-profile-request-pending"]').exists()).toBe(
+      true,
     )
+    expect(harness.wrapper.find('[data-test="discover-profile-send-request"]').exists()).toBe(false)
+  })
+
+  it('pending → "Request pending" chip + disabled pending button, no send action', async () => {
+    const harness = await mountProfile({
+      profile: makeProfile({ relationship_status: 'pending_request' }),
+    })
+    cleanup = harness.cleanup
+
+    expect(
+      harness.wrapper.find('[data-test="discover-profile-connection-pending"]').text(),
+    ).toContain('Request pending')
+    expect(harness.wrapper.find('[data-test="discover-profile-request-pending"]').exists()).toBe(
+      true,
+    )
+    expect(harness.wrapper.find('[data-test="discover-profile-send-request"]').exists()).toBe(false)
+  })
+
+  it('declined → "Declined" chip + an explicit "Request again" that re-requests (D-4)', async () => {
+    vi.mocked(discoveryApi.sendConnectionRequest).mockResolvedValue(
+      sendResponse('pending_request', 'connection.re_requested'),
+    )
+    const harness = await mountProfile({
+      profile: makeProfile({ relationship_status: 'declined' }),
+    })
+    cleanup = harness.cleanup
+
+    expect(
+      harness.wrapper.find('[data-test="discover-profile-connection-declined"]').text(),
+    ).toContain('Declined')
+
+    const again = harness.wrapper.find('[data-test="discover-profile-request-again"]')
+    expect(again.exists()).toBe(true)
+    await again.trigger('click')
+    await flushPromises()
+
+    expect(discoveryApi.sendConnectionRequest).toHaveBeenCalledTimes(1)
+    // Re-derives to pending after the re-request.
+    expect(harness.wrapper.find('[data-test="discover-profile-request-pending"]').exists()).toBe(
+      true,
+    )
+  })
+
+  it('staff sees NO send-request action on a not-connected profile (admin/manager-gated, D-10)', async () => {
+    const harness = await mountProfile({
+      profile: makeProfile({ relationship_status: null }),
+      role: 'agency_staff',
+    })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="discover-profile-notconnected"]').exists()).toBe(true)
+    expect(harness.wrapper.find('[data-test="discover-profile-send-request"]').exists()).toBe(false)
   })
 
   it('shows the not-found message on a 404 (non-discoverable creator)', async () => {
