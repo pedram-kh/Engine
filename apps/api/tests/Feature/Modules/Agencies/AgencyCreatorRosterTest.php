@@ -712,7 +712,7 @@ it('exposes blacklist_type (hard/soft/null) so the list can tell them apart', fu
 
     $response = $this->actingAs($admin)->getJson(rosterUrl($agency));
 
-    $byName = collect($response->json('data'))
+    $byName = collect((array) $response->json('data'))
         ->keyBy('attributes.display_name')
         ->map(fn (array $row): mixed => $row['attributes']['blacklist_type']);
 
