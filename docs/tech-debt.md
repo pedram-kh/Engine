@@ -1079,3 +1079,16 @@ anyone reviewing it later.
 - **Resolution:** the respective promote-trigger chunk owns each enhancement; until then the FE-only version is the complete, honest v1.
 - **Owner:** future talent-pools workstream / unscheduled.
 - **Status:** open (deferred by design — FE-only v1). Surfaced + accepted by the pool-add chunk, 2026-06-04 ([review](reviews/pool-add-creators-review.md)).
+
+---
+
+## Blacklist visibility in talent pools (a blacklisted creator could sit in a staffing pool with no indication)
+
+- **Where:** the pool member list [`PoolDetailPage.vue`](../apps/main/src/modules/pools/pages/PoolDetailPage.vue) + the add-creators picker [`AddCreatorsToPoolDialog.vue`](../apps/main/src/modules/pools/components/AddCreatorsToPoolDialog.vue); the member resource [`TalentPoolMemberResource`](../apps/api/app/Modules/TalentPools/Http/Resources/TalentPoolMemberResource.php) + its query in [`TalentPoolMembershipController::index`](../apps/api/app/Modules/TalentPools/Http/Controllers/TalentPoolMembershipController.php).
+- **The footgun (surfaced by the blacklist-in-pools read-pass inventory):** the pool member list rendered creators with **no blacklist indication**, and the picker let you add a blacklisted creator with no warning — so a blacklisted creator could be staffed onto a pool silently. Engagement enforcement still bites at the connection-request layer (a hard-blacklisted creator can't be sent a request), but the **pool surface gave no visibility** where you'd actually act on it.
+- **✅ RESOLVED — blacklist-in-pools chunk (2026-06-05, [review](reviews/blacklist-in-pools-review.md)). Decision: WARN, don't remove.** A blacklisted creator **stays** a pool member (no silent removal, no hard block — enforcement stays at the connection-request layer); the blacklist is made **visible**:
+  - **Member-list badge** (the scoped backend extension): `TalentPoolMemberResource` gained `is_blacklisted` + `blacklist_type` (status + hard/soft, **NOT the reason** — 2a parity), fed by two `addSelect` subqueries on `agency_creator_relations` **scoped to `agency_id = pool.agency_id`** (D-4 — the per-agency privacy invariant: agency A's blacklist is invisible in agency B's pool, pinned by `TalentPoolMembershipTest`).
+  - **Picker per-row flag + hard-only confirm-on-add** (pure FE): every picker row shows the blacklist flag (hard + soft) before selecting; `addSelected` fires a confirm **only for HARD**-blacklisted creators (soft shows the flag but no confirm — friction only where the mistake is costly).
+  - **Shared `BlacklistBadge`** ([`packages/ui`](../packages/ui/src/components/BlacklistBadge.vue)) was extracted (the 4th use — roster list + 2a detail migrated behavior-preservingly, + pool member list + picker rows) — i18n-free, hard=`error`/soft=`warning` tonal map.
+- **Out of scope (logged):** silent removal / hard block of blacklisted pool members (the decision is warn-don't-remove); a "remove all blacklisted from this pool" bulk action (a future nicety — log if it comes up); the brand-scoped blacklist's effect on pools (brand-scoped is recorded-now / enforced-at-Sprint-8 and never touches the relation flag, so a brand-scoped-only blacklist does NOT set `is_blacklisted` → no pool badge, consistent — revisit if a reviewer wants brand-scoped to surface in the agency pool).
+- **Owner:** resolved (blacklist-in-pools chunk).

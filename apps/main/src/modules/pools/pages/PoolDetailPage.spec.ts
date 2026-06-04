@@ -74,7 +74,10 @@ function makePool(): TalentPoolResource {
   }
 }
 
-function makeMember(id = '01MEMBERULIDXXXXXXXXXXXXXX'): TalentPoolMemberResource {
+function makeMember(
+  id = '01MEMBERULIDXXXXXXXXXXXXXX',
+  overrides: Partial<TalentPoolMemberResource['attributes']> = {},
+): TalentPoolMemberResource {
   return {
     id,
     type: 'talent_pool_members',
@@ -85,7 +88,10 @@ function makeMember(id = '01MEMBERULIDXXXXXXXXXXXXXX'): TalentPoolMemberResource
       categories: ['tech'],
       avatar_url: null,
       application_status: 'approved',
+      is_blacklisted: false,
+      blacklist_type: null,
       added_at: '2026-06-02T10:00:00.000000Z',
+      ...overrides,
     },
   }
 }
@@ -185,6 +191,30 @@ describe('PoolDetailPage (Sprint 6 Chunk 2b)', () => {
     const harness = await mountDetail({ members: [member] })
     cleanup = harness.cleanup
     expect(harness.wrapper.find(`[data-test="pool-member-${member.id}"]`).exists()).toBe(true)
+  })
+
+  it('shows a blacklist badge for a blacklisted member (D-5) — hard + soft, none for a clean one', async () => {
+    const hard = makeMember('01HARDMEMBERXXXXXXXXXXXXXX', {
+      is_blacklisted: true,
+      blacklist_type: 'hard',
+    })
+    const soft = makeMember('01SOFTMEMBERXXXXXXXXXXXXXX', {
+      is_blacklisted: true,
+      blacklist_type: 'soft',
+    })
+    const clean = makeMember('01CLEANMEMBERXXXXXXXXXXXXX')
+    const harness = await mountDetail({ members: [hard, soft, clean] })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find(`[data-test="pool-member-blacklist-${hard.id}"]`).text()).toBe(
+      'Blacklisted',
+    )
+    expect(harness.wrapper.find(`[data-test="pool-member-blacklist-${soft.id}"]`).text()).toBe(
+      'Blacklist warning',
+    )
+    expect(harness.wrapper.find(`[data-test="pool-member-blacklist-${clean.id}"]`).exists()).toBe(
+      false,
+    )
   })
 
   it('shows the inline remove button for admin/manager', async () => {

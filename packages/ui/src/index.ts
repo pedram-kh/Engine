@@ -1,3 +1,4 @@
+export { default as BlacklistBadge } from './components/BlacklistBadge.vue'
 export { default as CButton } from './components/CButton.vue'
 export { default as CategoryChips } from './components/CategoryChips.vue'
 export { default as CEmptyState } from './components/CEmptyState.vue'

@@ -9,6 +9,7 @@
 
 import type { TalentPoolMemberResource, TalentPoolResource } from '@catalyst/api-client'
 import { ApiError } from '@catalyst/api-client'
+import { BlacklistBadge } from '@catalyst/ui'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -229,6 +230,17 @@ onMounted(() => {
           </template>
           <v-list-item-title>
             {{ member.attributes.display_name ?? t('app.pools.detail.unnamed') }}
+            <!-- Blacklist badge (D-5): shows for BOTH hard + soft (informational
+                 — warn-don't-remove). The status reflects THIS agency's own
+                 blacklist of the member (the backend join is agency-scoped). -->
+            <BlacklistBadge
+              v-if="member.attributes.is_blacklisted"
+              :type="member.attributes.blacklist_type ?? 'hard'"
+              :label="t(`app.roster.blacklist.badge.${member.attributes.blacklist_type ?? 'hard'}`)"
+              size="x-small"
+              class="ml-2"
+              :data-test="`pool-member-blacklist-${member.id}`"
+            />
           </v-list-item-title>
           <v-list-item-subtitle>
             {{ member.attributes.country_code ?? '' }}

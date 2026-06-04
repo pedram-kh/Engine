@@ -27,6 +27,7 @@ import type {
 } from '@catalyst/api-client'
 import { ApiError } from '@catalyst/api-client'
 import {
+  BlacklistBadge,
   CategoryChips,
   CEmptyState,
   CountryDisplay,
@@ -289,15 +290,13 @@ onMounted(() => {
             <v-chip size="small" variant="flat" data-test="creator-detail-application-status">
               {{ t(`app.roster.applicationStatus.${creator.application_status}`) }}
             </v-chip>
-            <v-chip
+            <BlacklistBadge
               v-if="attrs.is_blacklisted"
+              :type="blacklistType"
+              :label="t(`app.roster.blacklist.badge.${blacklistType}`)"
               size="small"
-              :color="blacklistType === 'soft' ? 'warning' : 'error'"
-              variant="tonal"
               data-test="creator-detail-blacklist"
-            >
-              {{ t(`app.roster.blacklist.badge.${blacklistType}`) }}
-            </v-chip>
+            />
           </div>
         </div>
 

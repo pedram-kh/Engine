@@ -411,7 +411,11 @@
         "add": "Add {count}",
         "added": "{count} creators added to the pool.",
         "loadFailed": "Failed to load your roster.",
-        "addFailed": "Failed to add creators to the pool."
+        "addFailed": "Failed to add creators to the pool.",
+        "confirmHard": {
+          "one": "{name} is blacklisted by your agency. Add them to this pool anyway?",
+          "many": "{count} selected creators are blacklisted by your agency ({names}). Add them anyway?"
+        }
       },
       "errors": {
         "loadFailed": "Failed to load talent pools.",

@@ -403,7 +403,11 @@
         "add": "Adicionar {count}",
         "added": "{count} criadores adicionados ao grupo.",
         "loadFailed": "Falha ao carregar seu elenco.",
-        "addFailed": "Falha ao adicionar criadores ao grupo."
+        "addFailed": "Falha ao adicionar criadores ao grupo.",
+        "confirmHard": {
+          "one": "{name} está na lista negra da sua agência. Adicionar a este grupo mesmo assim?",
+          "many": "{count} criadores selecionados estão na lista negra da sua agência ({names}). Adicioná-los mesmo assim?"
+        }
       },
       "errors": {
         "loadFailed": "Falha ao carregar os grupos de talentos.",

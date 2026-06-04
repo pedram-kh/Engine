@@ -168,6 +168,13 @@ export interface TalentPoolMemberResource {
     categories: string[] | null
     avatar_url: string | null
     application_status: CreatorApplicationStatus
+    /** This (pool-owning) agency's own blacklist of the member, scoped to the
+     * pool's agency (D-3/D-4). Surfaces the warn-don't-remove footgun: a
+     * blacklisted creator stays a member but is flagged. */
+    is_blacklisted: boolean
+    /** `hard` | `soft` when blacklisted; null otherwise — the roster-list
+     * subset (status + type, NOT the reason). */
+    blacklist_type: BlacklistType | null
     added_at: string | null
   }
 }
@@ -330,7 +337,7 @@ export interface AgencyCreatorDetailResource {
     last_engaged_at: string | null
     is_blacklisted: boolean
     blacklist_scope: string | null
-    blacklist_type: string | null
+    blacklist_type: BlacklistType | null
     blacklisted_at: string | null
     creator: AgencyCreatorDetailProfile | null
   }

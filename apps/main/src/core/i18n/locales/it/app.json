@@ -403,7 +403,11 @@
         "add": "Aggiungi {count}",
         "added": "{count} creator aggiunti al pool.",
         "loadFailed": "Impossibile caricare il tuo roster.",
-        "addFailed": "Impossibile aggiungere creator al pool."
+        "addFailed": "Impossibile aggiungere creator al pool.",
+        "confirmHard": {
+          "one": "{name} è in blacklist per la tua agenzia. Aggiungerlo comunque a questo pool?",
+          "many": "{count} creator selezionati sono in blacklist per la tua agenzia ({names}). Aggiungerli comunque?"
+        }
       },
       "errors": {
         "loadFailed": "Impossibile caricare i pool di talenti.",

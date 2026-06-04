@@ -23,6 +23,7 @@
  */
 
 import type { RosterCreatorListItem } from '@catalyst/api-client'
+import { BlacklistBadge } from '@catalyst/ui'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -69,6 +70,17 @@ const filtered = computed<RosterCreatorListItem[]>(() => {
   return available.value.filter((row) =>
     (row.attributes.display_name ?? '').toLowerCase().includes(q),
   )
+})
+
+/** Roster rows keyed by creator ULID — lets `addSelected` resolve a selected
+ * id back to its blacklist status for the hard-only confirm (D-6/D-7). */
+const rosterById = computed<Map<string, RosterCreatorListItem>>(() => {
+  const map = new Map<string, RosterCreatorListItem>()
+  for (const row of roster.value) {
+    const id = row.attributes.creator_id
+    if (id !== null && id !== '') map.set(id, row)
+  }
+  return map
 })
 
 const rosterEmpty = computed(() => roster.value.length === 0)
@@ -122,9 +134,35 @@ function toggleSelect(creatorId: string): void {
 async function addSelected(): Promise<void> {
   if (selected.value.size === 0 || adding.value) return
 
+  const ids = [...selected.value]
+
+  // Hard-only confirm-on-add (D-6/D-7): visibility is everywhere (the per-row
+  // badge shows hard + soft), but friction fires ONLY where the mistake is
+  // costly — a HARD blacklist. SOFT is a mild caution; the badge alone is
+  // enough (a confirm-about-a-warning is redundant friction). Warn-don't-
+  // remove: the user can still proceed; nothing is blocked or auto-removed.
+  const hardSelected = ids
+    .map((id) => rosterById.value.get(id))
+    .filter(
+      (row): row is RosterCreatorListItem =>
+        row !== undefined &&
+        row.attributes.is_blacklisted === true &&
+        (row.attributes.blacklist_type ?? 'hard') === 'hard',
+    )
+
+  if (hardSelected.length > 0) {
+    const names = hardSelected
+      .map((row) => row.attributes.display_name ?? t('app.pools.detail.unnamed'))
+      .join(', ')
+    const message =
+      hardSelected.length === 1
+        ? t('app.pools.addCreators.confirmHard.one', { name: names })
+        : t('app.pools.addCreators.confirmHard.many', { count: hardSelected.length, names })
+    if (!window.confirm(message)) return
+  }
+
   adding.value = true
   error.value = null
-  const ids = [...selected.value]
   try {
     for (const creatorId of ids) {
       await talentPoolsApi.addCreator(props.agencyId, props.poolId, creatorId)
@@ -228,6 +266,17 @@ async function addSelected(): Promise<void> {
             </template>
             <v-list-item-title>
               {{ row.attributes.display_name ?? t('app.pools.detail.unnamed') }}
+              <!-- Per-row blacklist flag (D-6): shows for BOTH hard + soft so
+                   status is visible BEFORE selecting. The HARD-only confirm in
+                   addSelected is the friction gate; this badge is the visibility. -->
+              <BlacklistBadge
+                v-if="row.attributes.is_blacklisted"
+                :type="row.attributes.blacklist_type ?? 'hard'"
+                :label="t(`app.roster.blacklist.badge.${row.attributes.blacklist_type ?? 'hard'}`)"
+                size="x-small"
+                class="ml-2"
+                :data-test="`add-creators-blacklist-${row.attributes.creator_id}`"
+              />
             </v-list-item-title>
             <v-list-item-subtitle>
               {{ row.attributes.country_code ?? '' }}

@@ -74,6 +74,8 @@ function member(id: string, name = 'Member'): TalentPoolMemberResource {
       categories: [],
       avatar_url: null,
       application_status: 'approved',
+      is_blacklisted: false,
+      blacklist_type: null,
       added_at: '2026-06-02T10:00:00.000000Z',
     },
   } as TalentPoolMemberResource
@@ -194,6 +196,115 @@ describe('AddCreatorsToPoolDialog (pool-side add)', () => {
 
     expect(document.querySelector('[data-test="add-creators-row-01A"]')).not.toBeNull()
     expect(document.querySelector('[data-test="add-creators-row-01B"]')).toBeNull()
+  })
+
+  it('shows a per-row blacklist flag for hard + soft, none for a clean creator (D-6)', async () => {
+    const hard = rosterRow({
+      id: 'rel-hard',
+      creator_id: '01HARD',
+      display_name: 'Hard',
+      is_blacklisted: true,
+      blacklist_type: 'hard',
+    })
+    const soft = rosterRow({
+      id: 'rel-soft',
+      creator_id: '01SOFT',
+      display_name: 'Soft',
+      is_blacklisted: true,
+      blacklist_type: 'soft',
+    })
+    const clean = rosterRow({ id: 'rel-clean', creator_id: '01CLEAN', display_name: 'Clean' })
+    wrapper = mountDialog([hard, soft, clean], [])
+    await flushPromises()
+
+    expect(document.querySelector('[data-test="add-creators-blacklist-01HARD"]')?.textContent).toBe(
+      'Blacklisted',
+    )
+    expect(document.querySelector('[data-test="add-creators-blacklist-01SOFT"]')?.textContent).toBe(
+      'Blacklist warning',
+    )
+    expect(document.querySelector('[data-test="add-creators-blacklist-01CLEAN"]')).toBeNull()
+  })
+
+  it('a HARD-blacklisted creator triggers a confirm on add — proceed adds, cancel aborts (D-6/D-7)', async () => {
+    const hard = rosterRow({
+      id: 'rel-hard',
+      creator_id: '01HARD',
+      display_name: 'Hard',
+      is_blacklisted: true,
+      blacklist_type: 'hard',
+    })
+    wrapper = mountDialog([hard], [])
+    await flushPromises()
+
+    vi.mocked(talentPoolsApi.addCreator).mockResolvedValue({
+      data: {} as unknown as Awaited<ReturnType<typeof talentPoolsApi.addCreator>>['data'],
+    })
+
+    const vm = wrapper.vm as unknown as DialogVm
+    vm.toggleSelect('01HARD')
+
+    // Cancel → aborts, no add.
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
+    await vm.addSelected()
+    await flushPromises()
+    expect(confirmSpy).toHaveBeenCalledTimes(1)
+    expect(talentPoolsApi.addCreator).not.toHaveBeenCalled()
+
+    // Proceed → adds.
+    confirmSpy.mockReturnValue(true)
+    await vm.addSelected()
+    await flushPromises()
+    expect(confirmSpy).toHaveBeenCalledTimes(2)
+    expect(talentPoolsApi.addCreator).toHaveBeenCalledWith('agency-ulid', POOL, '01HARD')
+
+    confirmSpy.mockRestore()
+  })
+
+  it('a SOFT-blacklisted creator shows the flag but does NOT trigger the confirm (D-7)', async () => {
+    const soft = rosterRow({
+      id: 'rel-soft',
+      creator_id: '01SOFT',
+      display_name: 'Soft',
+      is_blacklisted: true,
+      blacklist_type: 'soft',
+    })
+    wrapper = mountDialog([soft], [])
+    await flushPromises()
+
+    vi.mocked(talentPoolsApi.addCreator).mockResolvedValue({
+      data: {} as unknown as Awaited<ReturnType<typeof talentPoolsApi.addCreator>>['data'],
+    })
+
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const vm = wrapper.vm as unknown as DialogVm
+    vm.toggleSelect('01SOFT')
+    await vm.addSelected()
+    await flushPromises()
+
+    expect(confirmSpy).not.toHaveBeenCalled()
+    expect(talentPoolsApi.addCreator).toHaveBeenCalledWith('agency-ulid', POOL, '01SOFT')
+    confirmSpy.mockRestore()
+  })
+
+  it('a clean creator adds with no confirm (D-7)', async () => {
+    const clean = rosterRow({ id: 'rel-clean', creator_id: '01CLEAN', display_name: 'Clean' })
+    wrapper = mountDialog([clean], [])
+    await flushPromises()
+
+    vi.mocked(talentPoolsApi.addCreator).mockResolvedValue({
+      data: {} as unknown as Awaited<ReturnType<typeof talentPoolsApi.addCreator>>['data'],
+    })
+
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const vm = wrapper.vm as unknown as DialogVm
+    vm.toggleSelect('01CLEAN')
+    await vm.addSelected()
+    await flushPromises()
+
+    expect(confirmSpy).not.toHaveBeenCalled()
+    expect(talentPoolsApi.addCreator).toHaveBeenCalledWith('agency-ulid', POOL, '01CLEAN')
+    confirmSpy.mockRestore()
   })
 
   it('adding a creator the partial exclusion still showed is a harmless no-op (D-3 idempotency)', async () => {

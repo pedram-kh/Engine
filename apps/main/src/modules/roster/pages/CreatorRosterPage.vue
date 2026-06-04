@@ -35,7 +35,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-import { CEmptyState } from '@catalyst/ui'
+import { BlacklistBadge, CEmptyState } from '@catalyst/ui'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
@@ -524,16 +524,14 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
         <span :data-test="`roster-name-${item.id}`">
           {{ item.attributes.display_name ?? t('app.roster.unnamed') }}
         </span>
-        <v-chip
+        <BlacklistBadge
           v-if="item.attributes.is_blacklisted"
+          :type="item.attributes.blacklist_type ?? 'hard'"
+          :label="t(`app.roster.blacklist.badge.${item.attributes.blacklist_type ?? 'hard'}`)"
           size="x-small"
-          :color="item.attributes.blacklist_type === 'soft' ? 'warning' : 'error'"
-          variant="tonal"
           class="ml-2"
           :data-test="`roster-blacklist-${item.id}`"
-        >
-          {{ t(`app.roster.blacklist.badge.${item.attributes.blacklist_type ?? 'hard'}`) }}
-        </v-chip>
+        />
       </template>
 
       <template #item.attributes.relationship_status="{ item }">
