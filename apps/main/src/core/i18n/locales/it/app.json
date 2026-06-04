@@ -392,6 +392,19 @@
         "loadFailed": "Impossibile caricare i pool di talenti.",
         "toggleFailed": "Impossibile aggiornare l'appartenenza al pool."
       },
+      "addCreators": {
+        "open": "Aggiungi creator",
+        "title": "Aggiungi creator a questo pool",
+        "search": "Cerca nel tuo roster",
+        "noRoster": "Il tuo roster è vuoto. Aggiungi prima dei creator al tuo roster.",
+        "allInPool": "Tutti i creator del tuo roster sono già in questo pool.",
+        "noSearchMatch": "Nessun creator del roster corrisponde alla ricerca.",
+        "cancel": "Annulla",
+        "add": "Aggiungi {count}",
+        "added": "{count} creator aggiunti al pool.",
+        "loadFailed": "Impossibile caricare il tuo roster.",
+        "addFailed": "Impossibile aggiungere creator al pool."
+      },
       "errors": {
         "loadFailed": "Impossibile caricare i pool di talenti.",
         "membersLoadFailed": "Impossibile caricare i membri del pool.",

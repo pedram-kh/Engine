@@ -400,6 +400,19 @@
         "loadFailed": "Failed to load talent pools.",
         "toggleFailed": "Failed to update pool membership."
       },
+      "addCreators": {
+        "open": "Add creators",
+        "title": "Add creators to this pool",
+        "search": "Search your roster",
+        "noRoster": "Your roster is empty. Add creators to your roster first.",
+        "allInPool": "All your roster creators are already in this pool.",
+        "noSearchMatch": "No roster creators match your search.",
+        "cancel": "Cancel",
+        "add": "Add {count}",
+        "added": "{count} creators added to the pool.",
+        "loadFailed": "Failed to load your roster.",
+        "addFailed": "Failed to add creators to the pool."
+      },
       "errors": {
         "loadFailed": "Failed to load talent pools.",
         "membersLoadFailed": "Failed to load pool members.",

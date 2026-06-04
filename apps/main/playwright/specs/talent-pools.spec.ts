@@ -115,4 +115,32 @@ test.describe('Talent pools', () => {
     await expect(table).toBeVisible({ timeout: 10000 })
     await expect(table.getByText('Spring Campaign')).toBeVisible()
   })
+
+  test('adds a roster creator to a pool from the POOL page and the roster + count reflect it', async ({
+    page,
+  }) => {
+    // Create an empty pool and stay on its detail page.
+    await page.goto('/talent-pools/new')
+    await page.locator('[data-test="pool-name"]').locator('input').fill('Summer Push')
+    await page.locator('[data-test="pool-form-submit"]').click()
+    await expect(page.locator('[data-test="pool-detail-name"]')).toHaveText('Summer Push', {
+      timeout: 10000,
+    })
+    await expect(page.locator('[data-test="pool-members-empty"]')).toBeVisible()
+
+    // Open the pool-side picker, pick the rostered creator not yet in the pool.
+    await page.locator('[data-test="pool-detail-add-creators"]').click()
+    await expect(page.locator('[data-test="add-creators-dialog"]')).toBeVisible()
+    await expect(page.locator(`[data-test="add-creators-row-${creatorUlid}"]`)).toBeVisible({
+      timeout: 10000,
+    })
+
+    await page.locator(`[data-test="add-creators-checkbox-${creatorUlid}"]`).click()
+    await page.locator('[data-test="add-creators-submit"]').click()
+
+    // Success snackbar, then the member roster + the count reflect the add.
+    await expect(page.locator('[data-test="pool-detail-snackbar"]')).toBeVisible({ timeout: 10000 })
+    await expect(page.locator('[data-test="pool-members-list"]')).toContainText('Ada Lovelace')
+    await expect(page.locator('[data-test="pool-detail-count"]')).toContainText('1')
+  })
 })

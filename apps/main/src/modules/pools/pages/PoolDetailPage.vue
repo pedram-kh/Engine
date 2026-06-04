@@ -14,6 +14,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import AddCreatorsToPoolDialog from '../components/AddCreatorsToPoolDialog.vue'
 import { talentPoolsApi } from '../api/talentPools.api'
 
 const { t } = useI18n()
@@ -31,6 +32,7 @@ const membersLoading = ref(false)
 const errorMessage = ref<string | null>(null)
 const removingUlid = ref<string | null>(null)
 const snackbar = ref<string | null>(null)
+const addDialogOpen = ref(false)
 
 const page = ref(1)
 const perPage = 25
@@ -102,6 +104,15 @@ async function removeMember(member: TalentPoolMemberResource): Promise<void> {
   }
 }
 
+async function onCreatorsAdded(message: string): Promise<void> {
+  snackbar.value = message
+  // Reload the pool (refreshes `creators_count`) + the member roster. The
+  // single-add `store` returns the refreshed count, but a multi-add loop +
+  // client-side exclusion is simplest to reconcile with a fresh fetch.
+  page.value = 1
+  await Promise.all([loadPool(), loadMembers()])
+}
+
 function goBack(): void {
   void router.push({ name: 'pools.list' })
 }
@@ -157,15 +168,25 @@ onMounted(() => {
             </span>
           </div>
         </div>
-        <v-btn
-          v-if="canWrite"
-          variant="text"
-          prepend-icon="mdi-pencil-outline"
-          :to="{ name: 'pools.edit', params: { ulid } }"
-          data-test="pool-detail-edit"
-        >
-          {{ t('app.pools.actions.edit') }}
-        </v-btn>
+        <div v-if="canWrite" class="d-flex ga-2">
+          <v-btn
+            variant="tonal"
+            color="primary"
+            prepend-icon="mdi-account-plus-outline"
+            data-test="pool-detail-add-creators"
+            @click="addDialogOpen = true"
+          >
+            {{ t('app.pools.addCreators.open') }}
+          </v-btn>
+          <v-btn
+            variant="text"
+            prepend-icon="mdi-pencil-outline"
+            :to="{ name: 'pools.edit', params: { ulid } }"
+            data-test="pool-detail-edit"
+          >
+            {{ t('app.pools.actions.edit') }}
+          </v-btn>
+        </div>
       </header>
 
       <p
@@ -237,6 +258,14 @@ onMounted(() => {
         @update:model-value="onPageChange"
       />
     </template>
+
+    <AddCreatorsToPoolDialog
+      v-if="canWrite && agencyStore.currentAgencyId !== null"
+      v-model="addDialogOpen"
+      :agency-id="agencyStore.currentAgencyId"
+      :pool-id="ulid"
+      @added="onCreatorsAdded"
+    />
 
     <v-snackbar
       :model-value="snackbar !== null"

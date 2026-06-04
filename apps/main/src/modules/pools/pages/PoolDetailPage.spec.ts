@@ -24,6 +24,18 @@ vi.mock('../api/talentPools.api', () => ({
     show: vi.fn(),
     members: vi.fn(),
     removeCreator: vi.fn(),
+    addCreator: vi.fn(),
+  },
+}))
+
+// The pool-side "Add creators" dialog (rendered for admin/manager) loads the
+// roster on open; stub the roster API so mounting the page never hits transport.
+vi.mock('@/modules/roster/api/roster.api', () => ({
+  rosterApi: {
+    list: vi.fn().mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 100, last_page: 1 },
+    }),
   },
 }))
 
@@ -191,6 +203,37 @@ describe('PoolDetailPage (Sprint 6 Chunk 2b)', () => {
     expect(harness.wrapper.find(`[data-test="pool-member-remove-${member.id}"]`).exists()).toBe(
       false,
     )
+  })
+
+  it('shows the "Add creators" button for admin/manager (mirrors the remove gate)', async () => {
+    const harness = await mountDetail({ role: 'agency_manager' })
+    cleanup = harness.cleanup
+    expect(harness.wrapper.find('[data-test="pool-detail-add-creators"]').exists()).toBe(true)
+  })
+
+  it('hides the "Add creators" button for staff', async () => {
+    const harness = await mountDetail({ role: 'agency_staff' })
+    cleanup = harness.cleanup
+    expect(harness.wrapper.find('[data-test="pool-detail-add-creators"]').exists()).toBe(false)
+  })
+
+  it('reloads the pool + member list when the add dialog reports creators added', async () => {
+    const harness = await mountDetail({ role: 'agency_admin' })
+    cleanup = harness.cleanup
+
+    const showCallsBefore = vi.mocked(talentPoolsApi.show).mock.calls.length
+    const membersCallsBefore = vi.mocked(talentPoolsApi.members).mock.calls.length
+
+    const vm = harness.wrapper.vm as unknown as {
+      onCreatorsAdded: (m: string) => Promise<void>
+      snackbar: string | null
+    }
+    await vm.onCreatorsAdded('2 creators added to the pool.')
+    await flushPromises()
+
+    expect(vi.mocked(talentPoolsApi.show).mock.calls.length).toBe(showCallsBefore + 1)
+    expect(vi.mocked(talentPoolsApi.members).mock.calls.length).toBe(membersCallsBefore + 1)
+    expect(vm.snackbar).toBe('2 creators added to the pool.')
   })
 
   it('clicking remove calls removeCreator and refreshes the member list', async () => {

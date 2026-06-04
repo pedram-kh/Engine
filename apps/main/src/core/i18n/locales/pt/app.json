@@ -392,6 +392,19 @@
         "loadFailed": "Falha ao carregar os grupos de talentos.",
         "toggleFailed": "Falha ao atualizar a participação no grupo."
       },
+      "addCreators": {
+        "open": "Adicionar criadores",
+        "title": "Adicionar criadores a este grupo",
+        "search": "Pesquisar no seu elenco",
+        "noRoster": "Seu elenco está vazio. Adicione criadores ao seu elenco primeiro.",
+        "allInPool": "Todos os criadores do seu elenco já estão neste grupo.",
+        "noSearchMatch": "Nenhum criador do elenco corresponde à sua pesquisa.",
+        "cancel": "Cancelar",
+        "add": "Adicionar {count}",
+        "added": "{count} criadores adicionados ao grupo.",
+        "loadFailed": "Falha ao carregar seu elenco.",
+        "addFailed": "Falha ao adicionar criadores ao grupo."
+      },
       "errors": {
         "loadFailed": "Falha ao carregar os grupos de talentos.",
         "membersLoadFailed": "Falha ao carregar os membros do grupo.",

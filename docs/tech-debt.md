@@ -1061,3 +1061,21 @@ anyone reviewing it later.
 - **Triggered by:** Sprint 8 brand-level campaign matching.
 - **Owner:** Sprint 8 (campaign matching).
 - **Status:** open (deferred by design). Surfaced + accepted by Sprint 7, 2026-06-04 ([review](reviews/sprint-7-review.md)).
+
+---
+
+## Pool-side "Add creators" is FE-only (no server exclusion, no batch add, no server-side picker search)
+
+- **Where:** the pool detail page picker [`AddCreatorsToPoolDialog.vue`](../apps/main/src/modules/pools/components/AddCreatorsToPoolDialog.vue), wired into [`PoolDetailPage.vue`](../apps/main/src/modules/pools/pages/PoolDetailPage.vue). It reuses the existing idempotent, relation-gated `store` (`TalentPoolMembershipController::store`) via `talentPoolsApi.addCreator`, sourced from the roster (`rosterApi.list`), with **zero backend changes**.
+- **What we accepted in the pool-add chunk (2026-06-04, D-1..D-5):** the discoverability gap (the pool page could list/remove members but had no add entry point) was closed **frontend-only** by taking the small version of every call. Three server-side enhancements were deliberately deferred:
+  1. **Per-pool `is_member` roster annotation (server-side exact exclusion).** Today current-member exclusion is **client-side and page-local** (D-3): the picker fetches the pool's members (`talentPoolsApi.members`, paginated at 25) and subtracts them from the roster in the FE. On a large pool (>25 members) the exclusion is **partial** — an already-member creator beyond the first members page may still be offered. Re-adding them hits the idempotent `firstOrCreate` `store`, so it is a **harmless no-op** (no duplicate, no error), making the partial filter only ever _cosmetic_.
+  2. **A batch add endpoint.** Multi-add **loops the single `store`** (D-4) — N requests for N selected creators. No batch route exists; one would be net-new backend (out of scope).
+  3. **Server-side picker search (`?q=` FTS).** Search is **client-side** over a single wide roster page (D-5, `per_page: 100`). The server `?q=` full-text filter is fully plumbed through `rosterApi.list` but unused here; creators beyond the fetched page are not searchable.
+- **Risk:** low. The add path is correct-by-construction (every roster creator has an `AgencyCreatorRelation`, so the `requireRosterRelation()` gate can never reject a roster-sourced add) and idempotency makes the partial exclusion safe. The gaps are cosmetic / scale-of-volume, not correctness.
+- **Triggered by:**
+  1. **Annotation** — the client-side partial exclusion on large pools becomes **visibly confusing** (already-members repeatedly shown). Promote to a pool-aware `is_member` flag on the roster query for exact, page-independent exclusion.
+  2. **Batch add** — agencies routinely add **many** creators at once and the per-creator request loop is slow/janky. Promote to a single batch-add endpoint.
+  3. **Server-side search** — rosters grow large enough that **client-local search misses creators beyond the fetched page**. Promote by threading the existing `rosterApi.list` `?q=` FTS into the picker.
+- **Resolution:** the respective promote-trigger chunk owns each enhancement; until then the FE-only version is the complete, honest v1.
+- **Owner:** future talent-pools workstream / unscheduled.
+- **Status:** open (deferred by design — FE-only v1). Surfaced + accepted by the pool-add chunk, 2026-06-04 ([review](reviews/pool-add-creators-review.md)).
