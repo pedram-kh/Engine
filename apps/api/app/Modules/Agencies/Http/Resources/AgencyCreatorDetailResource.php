@@ -75,8 +75,8 @@ final class AgencyCreatorDetailResource extends JsonResource
                 // Blacklist STATUS, read-only (D-2a-3). Structured facts only —
                 // blacklist_reason is withheld (free-text GDPR-sensitive).
                 'is_blacklisted' => $relation->is_blacklisted,
-                'blacklist_scope' => $relation->blacklist_scope,
-                'blacklist_type' => $relation->blacklist_type,
+                'blacklist_scope' => $relation->blacklist_scope?->value,
+                'blacklist_type' => $relation->blacklist_type?->value,
                 'blacklisted_at' => $relation->blacklisted_at?->toIso8601String(),
                 // ── Creator profile (nested) ────────────────────────────────
                 'creator' => $creator instanceof Creator ? $this->mapCreator($creator) : null,

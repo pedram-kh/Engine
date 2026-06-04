@@ -7,6 +7,8 @@ namespace App\Modules\Agencies\Models;
 use App\Core\Concerns\HasUlid;
 use App\Core\Tenancy\BelongsToAgency;
 use App\Modules\Agencies\Database\Factories\AgencyCreatorRelationFactory;
+use App\Modules\Agencies\Enums\BlacklistScope;
+use App\Modules\Agencies\Enums\BlacklistType;
 use App\Modules\Audit\Concerns\Audited;
 use App\Modules\Audit\Contracts\Auditable;
 use App\Modules\Audit\Enums\AuditAction;
@@ -37,9 +39,9 @@ use Illuminate\Support\Carbon;
  * @property int $creator_id
  * @property RelationshipStatus $relationship_status
  * @property bool $is_blacklisted
- * @property string|null $blacklist_scope
+ * @property BlacklistScope|null $blacklist_scope
  * @property string|null $blacklist_reason
- * @property string|null $blacklist_type
+ * @property BlacklistType|null $blacklist_type
  * @property Carbon|null $blacklisted_at
  * @property int|null $blacklisted_by_user_id
  * @property Carbon|null $notification_sent_at
@@ -187,6 +189,8 @@ final class AgencyCreatorRelation extends Model implements Auditable
         return [
             'relationship_status' => RelationshipStatus::class,
             'is_blacklisted' => 'boolean',
+            'blacklist_scope' => BlacklistScope::class,
+            'blacklist_type' => BlacklistType::class,
             'blacklisted_at' => 'datetime',
             'notification_sent_at' => 'datetime',
             'appeal_submitted_at' => 'datetime',

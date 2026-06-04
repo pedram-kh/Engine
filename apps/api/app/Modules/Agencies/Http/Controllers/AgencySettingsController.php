@@ -37,22 +37,49 @@ final class AgencySettingsController
     {
         $this->authorizeAdmin($request, $agency);
 
-        $before = [
-            'default_currency' => $agency->default_currency,
-            'default_language' => $agency->default_language,
-        ];
+        $validated = $request->validated();
 
-        $agency->update($request->validated());
+        $before = $this->settingsSnapshot($agency);
+
+        // default_currency / default_language are top-level columns;
+        // blacklist_notification_policy (Sprint 7) lives INSIDE the settings
+        // jsonb, so it is merged rather than mass-assigned as a column.
+        $columnUpdates = array_intersect_key($validated, array_flip(['default_currency', 'default_language']));
+        if ($columnUpdates !== []) {
+            $agency->fill($columnUpdates);
+        }
+
+        if (array_key_exists('blacklist_notification_policy', $validated)) {
+            $settings = $agency->settings ?? [];
+            $settings['blacklist_notification_policy'] = (bool) $validated['blacklist_notification_policy'];
+            $agency->settings = $settings;
+        }
+
+        $agency->save();
+
+        $after = $this->settingsSnapshot($agency);
 
         Audit::log(
             action: AuditAction::AgencySettingsUpdated,
             subject: $agency,
             before: $before,
-            after: $request->validated(),
+            after: $after,
             agencyId: $agency->id,
         );
 
         return new AgencySettingsResource($agency->fresh() ?? $agency);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function settingsSnapshot(Agency $agency): array
+    {
+        return [
+            'default_currency' => $agency->default_currency,
+            'default_language' => $agency->default_language,
+            'blacklist_notification_policy' => (bool) ($agency->settings['blacklist_notification_policy'] ?? false),
+        ];
     }
 
     private function authorizeAdmin(Request $request, Agency $agency): void

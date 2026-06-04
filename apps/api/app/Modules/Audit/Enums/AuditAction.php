@@ -174,6 +174,24 @@ enum AuditAction: string
     // trait's normal allowlisted before/after diff (AgencyCreatorRelationUpdated).
     case AgencyCreatorRelationNotesUpdated = 'agency_creator_relation.notes_updated';
 
+    // Creator blacklisting (Sprint 7, D-5). `creator.blacklisted` is the
+    // dedicated semantic verb emitted MANUALLY by CreatorBlacklistController
+    // on every blacklist write (agency-wide OR brand-scoped). It records the
+    // FACT + actor + scope/type in metadata, with the `reason` content
+    // REDACTED (never in before/after/metadata) — mirroring the
+    // AgencyCreatorRelationNotesUpdated redaction pattern. `blacklist_reason`
+    // is already absent from AgencyCreatorRelation::auditableAllowlist(), so
+    // the trait's auto agency_creator_relation.updated row is redacted by
+    // construction; this verb adds the named, queryable event on top.
+    case CreatorBlacklisted = 'creator.blacklisted';
+
+    // Auto-emitted by the Audited trait on BrandCreatorBlacklist (the brand-
+    // scoped write path). `.created` on blacklist, `.deleted` on un-blacklist
+    // (soft-delete, D-3). `reason` is excluded from the model's allowlist, so
+    // neither row carries the free-text justification.
+    case BrandCreatorBlacklistCreated = 'brand_creator_blacklist.created';
+    case BrandCreatorBlacklistDeleted = 'brand_creator_blacklist.deleted';
+
     // Talent pools (Sprint 6 Chunk 2b). CRUD mirrors the brand.* verbs;
     // membership add/remove are net-new (the pivot-write surface has no
     // controller precedent — MembershipController is read-only and agency

@@ -82,6 +82,10 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'agency_creator_relation.deleted',
         // Sprint 6 Chunk 2a — redacted notes-edit event (D-2a-5)
         'agency_creator_relation.notes_updated',
+        // Sprint 7 — creator blacklisting (D-5)
+        'creator.blacklisted',
+        'brand_creator_blacklist.created',
+        'brand_creator_blacklist.deleted',
         // Sprint 6 Chunk 2b — talent pools CRUD + membership
         'talent_pool.created',
         'talent_pool.updated',

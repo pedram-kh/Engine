@@ -8,6 +8,7 @@ use App\Modules\Agencies\Http\Controllers\AgencyCreatorController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorDetailController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorDiscoveryController;
 use App\Modules\Agencies\Http\Controllers\AgencySettingsController;
+use App\Modules\Agencies\Http\Controllers\CreatorBlacklistController;
 use App\Modules\Agencies\Http\Controllers\DashboardActivityController;
 use App\Modules\Agencies\Http\Controllers\DashboardSummaryController;
 use App\Modules\Agencies\Http\Controllers\InvitationController;
@@ -122,6 +123,18 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
             ->name('agencies.creators.show');
         Route::patch('creators/{creator}', [AgencyCreatorDetailController::class, 'update'])
             ->name('agencies.creators.update');
+
+        // ─── Creator blacklist (Sprint 7, Part A) ─────────────────────────────
+        // A DEDICATED write surface (NOT the rating/notes PATCH — D-2 forbids a
+        // dual-write). Admin/manager only (`blacklist` ability — staff 403).
+        // `scope` in the body chooses the path: agency-wide (columns ON the
+        // relation, requires an existing relation) or brand-scoped (a
+        // brand_creator_blacklists row, no relation touch). Path-scoped under
+        // tenancy.agency + tenancy — no §4 allowlist entry needed.
+        Route::post('creators/{creator}/blacklist', [CreatorBlacklistController::class, 'store'])
+            ->name('agencies.creators.blacklist.store');
+        Route::delete('creators/{creator}/blacklist', [CreatorBlacklistController::class, 'destroy'])
+            ->name('agencies.creators.blacklist.destroy');
 
         // ─── Creator availability read-view ──────────────────────────────────
         // Sprint 5 Chunk A (D-a6). Agency-side read of a ROSTER creator's

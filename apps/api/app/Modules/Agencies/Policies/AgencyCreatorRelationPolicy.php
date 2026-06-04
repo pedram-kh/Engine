@@ -81,6 +81,19 @@ final class AgencyCreatorRelationPolicy
         return $this->hasAnyRole($user, [AgencyRole::AgencyAdmin, AgencyRole::AgencyManager]);
     }
 
+    /**
+     * Blacklist (or un-blacklist) a creator — agency-wide OR brand-scoped
+     * (Sprint 7, D-7). Same admin/manager floor as {@see self::update} (the
+     * rating/notes precedent) and {@see self::sendRequest}; staff is view-only
+     * (403). A CLASS-LEVEL ability: a brand-scoped blacklist has no relation
+     * instance, and the role matrix is identical for both scopes, so the gate
+     * keys off role alone (mirrors the sendRequest precedent).
+     */
+    public function blacklist(User $user): bool
+    {
+        return $this->hasAnyRole($user, [AgencyRole::AgencyAdmin, AgencyRole::AgencyManager]);
+    }
+
     /** @param list<AgencyRole> $roles */
     private function hasAnyRole(User $user, array $roles): bool
     {

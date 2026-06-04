@@ -11,8 +11,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * JSON representation of an Agency's configurable settings.
  *
- * Sprint 2 scope: default_currency + default_language only.
- * Nothing more per the kickoff's pre-answered settings scope.
+ * Sprint 2: default_currency + default_language (top-level columns).
+ * Sprint 7 (D-4): blacklist_notification_policy — the first key surfaced from
+ * the `settings` jsonb. Default OFF (creators are not emailed unless opted in).
  *
  * @mixin Agency
  */
@@ -32,6 +33,8 @@ final class AgencySettingsResource extends JsonResource
             'attributes' => [
                 'default_currency' => $agency->default_currency,
                 'default_language' => $agency->default_language,
+                // Sprint 7 (D-4) — read from the settings jsonb; default OFF.
+                'blacklist_notification_policy' => (bool) ($agency->settings['blacklist_notification_policy'] ?? false),
             ],
         ];
     }

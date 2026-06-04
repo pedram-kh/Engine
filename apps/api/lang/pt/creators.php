@@ -40,4 +40,12 @@ return [
             'ignore' => 'Se não reconhece esta agência, pode simplesmente recusar — nada muda até que aceite.',
         ],
     ],
+    'blacklisted' => [
+        'email' => [
+            'subject' => ':agency atualizou o seu estado de colaboração no Catalyst',
+            'greeting' => 'Olá :name,',
+            'body' => ':agency atualizou o seu estado de colaboração no Catalyst. Se tiver alguma dúvida, contacte-os diretamente.',
+            'closing' => 'Obrigado por fazer parte do Catalyst.',
+        ],
+    ],
 ];

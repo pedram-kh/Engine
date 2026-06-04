@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Agencies\Http\Controllers;
 
+use App\Modules\Agencies\Enums\BlacklistType;
 use App\Modules\Agencies\Mail\ConnectionRequestMail;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
@@ -78,6 +79,23 @@ final class AgencyConnectionRequestController
             ->where('agency_id', $agency->id)
             ->where('creator_id', $creator->id)
             ->first();
+
+        // Sprint 7 (B2) — the hard-blacklist send gate, BEFORE the state
+        // machine. A HARD agency-wide blacklist on this relation BLOCKS the
+        // send (a typed 422 failure), regardless of the current
+        // relationship_status. soft does NOT block (warn-only, D-1) and falls
+        // through to the normal flow. This is orthogonal to the state machine:
+        // it neither creates nor transitions a relation. Break-revert: drop
+        // this guard → a hard-blacklisted creator can be re-requested.
+        if ($relation !== null
+            && $relation->is_blacklisted
+            && $relation->blacklist_type === BlacklistType::Hard) {
+            return response()->json([
+                'message' => 'This creator is hard-blacklisted and cannot be sent a connection request.',
+                'errors' => ['blacklist' => ['This creator is hard-blacklisted and cannot be sent a connection request.']],
+                'meta' => ['code' => 'connection.blacklisted'],
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
         // No-op surfacing the existing state for any status that is NOT a legal
         // entry point. The only existing-row transition is `declined → pending`

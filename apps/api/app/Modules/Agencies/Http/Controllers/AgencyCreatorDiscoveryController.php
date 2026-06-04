@@ -6,6 +6,7 @@ namespace App\Modules\Agencies\Http\Controllers;
 
 use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Agencies\Concerns\FiltersCreatorColumns;
+use App\Modules\Agencies\Enums\BlacklistType;
 use App\Modules\Agencies\Http\Resources\CreatorDiscoveryResource;
 use App\Modules\Agencies\Http\Resources\CreatorPublicProfileResource;
 use App\Modules\Agencies\Models\Agency;
@@ -63,7 +64,13 @@ final class AgencyCreatorDiscoveryController
         $perPage = (int) $request->integer('per_page', 25);
         $perPage = max(1, min($perPage, 100));
 
-        $query = $this->discoverableCreators()
+        $query = $this->discoverableCreators();
+
+        // Sprint 7 (B1) — drop the calling agency's HARD agency-wide-blacklisted
+        // creators from ITS discovery. Calling-agency-scoped + hard-only.
+        $this->excludeHardBlacklisted($query, $agency);
+
+        $query
             // Slim card columns only (D-10) — no heavy/leaky columns, no
             // tsvector. The FTS WHERE references search_vector directly, not the
             // SELECT, so it works regardless of the projection.
@@ -176,5 +183,37 @@ final class AgencyCreatorDiscoveryController
             ->whereColumn('agency_creator_relations.creator_id', 'creators.id')
             ->where('agency_creator_relations.agency_id', $agency->id)
             ->limit(1);
+    }
+
+    /**
+     * Sprint 7 (B1) — the discovery exclusion. Removes from the result set any
+     * creator the CALLING agency has HARD agency-wide-blacklisted.
+     *
+     * ⚠ Privacy / per-agency isolation (B4 — the load-bearing pin): the
+     * `whereNotExists` predicate is scoped to `agency_id = {calling agency}`,
+     * so the pool is global but the exclusion bites only the blacklisting
+     * agency — agency B still discovers a creator agency A hard-blacklisted.
+     * This is the same per-agency isolation the connection annotation subquery
+     * embodies. BREAK-REVERT: drop the agency_id leg → the creator vanishes
+     * from EVERY agency's discovery (a P0 cross-agency violation), not just A's.
+     *
+     * Hard-only (D-1): `blacklist_type = 'hard'` — soft is warn-only and does
+     * NOT exclude. Brand-scoped blacklists are intentionally absent here —
+     * discovery is agency-level (no brand context), so brand scope never lives
+     * on the relation (D-2) and never touches discovery; its exclusion bites at
+     * campaign-matching time (Sprint 8). The global tenancy scope is dropped so
+     * the explicit agency_id filter is the single, auditable scope source.
+     *
+     * @param  Builder<Creator>  $query
+     */
+    private function excludeHardBlacklisted(Builder $query, Agency $agency): void
+    {
+        $query->whereNotExists(function ($sub) use ($agency): void {
+            $sub->from('agency_creator_relations')
+                ->whereColumn('agency_creator_relations.creator_id', 'creators.id')
+                ->where('agency_creator_relations.agency_id', $agency->id)
+                ->where('agency_creator_relations.is_blacklisted', true)
+                ->where('agency_creator_relations.blacklist_type', BlacklistType::Hard->value);
+        });
     }
 }

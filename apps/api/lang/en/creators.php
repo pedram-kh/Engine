@@ -40,4 +40,13 @@ return [
             'ignore' => 'If you don\'t recognise this agency, you can simply decline — nothing changes until you accept.',
         ],
     ],
+    // Sprint 7 (D-4). Generic by design — no reason, no scope/type detail.
+    'blacklisted' => [
+        'email' => [
+            'subject' => ':agency has updated your collaboration status on Catalyst',
+            'greeting' => 'Hi :name,',
+            'body' => ':agency has updated your collaboration status on Catalyst. If you have any questions, please reach out to them directly.',
+            'closing' => 'Thank you for being part of Catalyst.',
+        ],
+    ],
 ];
