@@ -209,6 +209,9 @@ export interface RosterCreatorListItem {
   attributes: {
     relationship_status: RosterRelationshipStatus
     is_blacklisted: boolean
+    /** `hard` | `soft` when blacklisted; null otherwise — lets the list show a
+     * hard exclusion distinctly from a soft warning (same axis as the detail). */
+    blacklist_type: BlacklistType | null
     /** 1–5 stars from the agency's POV; null when unset. Read-only this chunk. */
     internal_rating: number | null
     total_campaigns_completed: number

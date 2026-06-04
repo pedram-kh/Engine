@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Agencies\Enums\BlacklistType;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Creators\Enums\ApplicationStatus;
@@ -172,6 +173,7 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes and n
     expect($attributes)->toHaveKeys([
         'relationship_status',
         'is_blacklisted',
+        'blacklist_type',
         'internal_rating',
         'total_campaigns_completed',
         'total_paid_minor_units',
@@ -692,6 +694,31 @@ it('INCLUDES blacklisted relations with the flag visible (unlike the dashboard K
     expect($response->json('meta.total'))->toBe(2);
     $flags = $response->json('data.*.attributes.is_blacklisted');
     expect($flags)->toContain(true)->toContain(false);
+});
+
+it('exposes blacklist_type (hard/soft/null) so the list can tell them apart', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterRelation($agency, [
+        'is_blacklisted' => true,
+        'blacklist_type' => BlacklistType::Hard,
+    ], ['display_name' => 'Hard Hank']);
+    makeRosterRelation($agency, [
+        'is_blacklisted' => true,
+        'blacklist_type' => BlacklistType::Soft,
+    ], ['display_name' => 'Soft Sue']);
+    makeRosterRelation($agency, ['is_blacklisted' => false], ['display_name' => 'Clean Cleo']);
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency));
+
+    $byName = collect($response->json('data'))
+        ->keyBy('attributes.display_name')
+        ->map(fn (array $row): mixed => $row['attributes']['blacklist_type']);
+
+    expect($byName['Hard Hank'])->toBe('hard');
+    expect($byName['Soft Sue'])->toBe('soft');
+    expect($byName['Clean Cleo'])->toBeNull();
 });
 
 it('excludes soft-deleted creators from the roster list', function (): void {

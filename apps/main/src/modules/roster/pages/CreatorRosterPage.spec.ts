@@ -60,6 +60,7 @@ function makeRow(
       relationship_status: 'roster',
       application_status: 'pending',
       is_blacklisted: false,
+      blacklist_type: null,
       internal_rating: null,
       total_campaigns_completed: 0,
       total_paid_minor_units: 0,
@@ -220,6 +221,23 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     const nameEl = harness.wrapper.find(`[data-test="roster-name-${row.id}"]`)
     expect(nameEl.element.tagName).toBe('SPAN')
     expect(harness.wrapper.find(`[data-test="roster-view-${row.id}"]`).exists()).toBe(false)
+  })
+
+  it('distinguishes a hard blacklist from a soft one in the list chip', async () => {
+    const hard = makeRow({ is_blacklisted: true, blacklist_type: 'hard' })
+    const soft = {
+      ...makeRow({ is_blacklisted: true, blacklist_type: 'soft' }),
+      id: '01HZA1B2C3D4E5F6G7H8J9K0M2',
+    }
+    const harness = await mountRoster({ rows: [hard, soft], realTable: true })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find(`[data-test="roster-blacklist-${hard.id}"]`).text()).toBe(
+      'Blacklisted',
+    )
+    expect(harness.wrapper.find(`[data-test="roster-blacklist-${soft.id}"]`).text()).toBe(
+      'Blacklist warning',
+    )
   })
 
   it('navigates to the creator detail on a row click (Sprint 6 Chunk 2a, D-2a-6)', async () => {

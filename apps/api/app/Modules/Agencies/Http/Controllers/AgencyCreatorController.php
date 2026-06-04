@@ -318,6 +318,10 @@ final class AgencyCreatorController
             'attributes' => [
                 'relationship_status' => $relation->relationship_status->value,
                 'is_blacklisted' => $relation->is_blacklisted,
+                // hard | soft (null when not blacklisted) — lets the roster
+                // list distinguish a hard exclusion from a soft warning, the
+                // same hard/soft axis the detail page renders.
+                'blacklist_type' => $relation->blacklist_type?->value,
                 'internal_rating' => $relation->internal_rating,
                 'total_campaigns_completed' => $relation->total_campaigns_completed,
                 'total_paid_minor_units' => $relation->total_paid_minor_units,

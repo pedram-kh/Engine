@@ -527,12 +527,12 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
         <v-chip
           v-if="item.attributes.is_blacklisted"
           size="x-small"
-          color="error"
+          :color="item.attributes.blacklist_type === 'soft' ? 'warning' : 'error'"
           variant="tonal"
           class="ml-2"
           :data-test="`roster-blacklist-${item.id}`"
         >
-          {{ t('app.roster.blacklisted') }}
+          {{ t(`app.roster.blacklist.badge.${item.attributes.blacklist_type ?? 'hard'}`) }}
         </v-chip>
       </template>
 
