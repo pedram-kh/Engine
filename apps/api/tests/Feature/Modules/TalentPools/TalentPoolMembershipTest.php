@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Creators\Models\Creator;
@@ -201,6 +202,108 @@ it('lists pool members (paginated) for any agency member', function (): void {
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.id', $creator->ulid)
         ->assertJsonPath('data.0.type', 'talent_pool_members');
+});
+
+// ---------------------------------------------------------------------------
+// Member-list blacklist badge (D-3/D-4) — status + type ON the member resource,
+// scoped to the pool-owning agency. Warn-don't-remove: a blacklisted creator
+// STAYS a member; the badge is the visibility, not a removal.
+// ---------------------------------------------------------------------------
+
+it('emits is_blacklisted + blacklist_type for a blacklisted member (D-3)', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+
+    $creator = Creator::factory()->createOne();
+    AgencyCreatorRelation::factory()->blacklisted()->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+    ]);
+    $pool->creators()->attach($creator->id);
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/talent-pools/{$pool->ulid}/creators")
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.is_blacklisted', true)
+        ->assertJsonPath('data.0.attributes.blacklist_type', 'hard');
+});
+
+it('emits a soft blacklist type distinctly from hard', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+
+    $creator = Creator::factory()->createOne();
+    AgencyCreatorRelation::factory()->blacklisted()->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'blacklist_type' => 'soft',
+    ]);
+    $pool->creators()->attach($creator->id);
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/talent-pools/{$pool->ulid}/creators")
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.is_blacklisted', true)
+        ->assertJsonPath('data.0.attributes.blacklist_type', 'soft');
+});
+
+it('emits is_blacklisted=false + null type for a clean member', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    ['creator' => $creator] = makePooledRelation($agency);
+    $pool->creators()->attach($creator->id);
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/talent-pools/{$pool->ulid}/creators")
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.is_blacklisted', false)
+        ->assertJsonPath('data.0.attributes.blacklist_type', null);
+});
+
+it('does NOT emit the blacklist_reason (2a parity, D-3)', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+
+    $creator = Creator::factory()->createOne();
+    AgencyCreatorRelation::factory()->blacklisted('Secret private reason')->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+    ]);
+    $pool->creators()->attach($creator->id);
+
+    $response = $this->actingAs($user)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/talent-pools/{$pool->ulid}/creators")
+        ->assertOk()
+        ->json('data.0.attributes');
+
+    expect($response)->not->toHaveKey('blacklist_reason')
+        ->and($response)->not->toHaveKey('blacklist_scope');
+});
+
+it('the blacklist join is SCOPED to the pool-owning agency — agency A blacklist is INVISIBLE in agency B pool (D-4, break-revert: the privacy pin)', function (): void {
+    // Agency B owns the pool + the user listing it.
+    ['agency' => $agencyB, 'user' => $userB] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agencyB->id)->createOne();
+
+    // A creator HARD-blacklisted by a DIFFERENT agency A. The creator is a
+    // member of B's pool but has no blacklist (and here no relation) with B.
+    $agencyA = Agency::factory()->createOne();
+    $creator = Creator::factory()->createOne();
+    AgencyCreatorRelation::factory()->blacklisted()->create([
+        'agency_id' => $agencyA->id,
+        'creator_id' => $creator->id,
+    ]);
+    $pool->creators()->attach($creator->id);
+
+    // B's member list must show NO blacklist — the subqueries are scoped to
+    // agency_id = pool.agency_id (= B), so A's blacklist never surfaces here.
+    // Break-revert: un-scope the join → A's hard blacklist leaks → is_blacklisted true.
+    $this->actingAs($userB)
+        ->getJson("/api/v1/agencies/{$agencyB->ulid}/talent-pools/{$pool->ulid}/creators")
+        ->assertOk()
+        ->assertJsonPath('data.0.id', $creator->ulid)
+        ->assertJsonPath('data.0.attributes.is_blacklisted', false)
+        ->assertJsonPath('data.0.attributes.blacklist_type', null);
 });
 
 // ---------------------------------------------------------------------------

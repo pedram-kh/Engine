@@ -56,6 +56,27 @@ final class TalentPoolMembershipController
         Gate::authorize('view', $talentPool);
 
         $members = $talentPool->creators()
+            ->addSelect([
+                // The pool member's blacklist STATUS, scoped to the POOL-OWNING
+                // agency (D-4 — the privacy pin). Two correlated subqueries on
+                // agency_creator_relations, each filtered to BOTH the creator
+                // AND `agency_id = pool.agency_id`, so the badge can only ever
+                // reflect THIS agency's own blacklist of the creator — never
+                // another agency's (mirrors requireRosterRelation's scoped
+                // (agency_id, creator_id) lookup + the discovery EXISTS scope).
+                // Break-revert: drop the agency_id clause → agency A's blacklist
+                // surfaces in agency B's pool → the cross-agency violation.
+                'acr_is_blacklisted' => AgencyCreatorRelation::query()
+                    ->select('is_blacklisted')
+                    ->whereColumn('agency_creator_relations.creator_id', 'creators.id')
+                    ->where('agency_creator_relations.agency_id', $talentPool->agency_id)
+                    ->limit(1),
+                'acr_blacklist_type' => AgencyCreatorRelation::query()
+                    ->select('blacklist_type')
+                    ->whereColumn('agency_creator_relations.creator_id', 'creators.id')
+                    ->where('agency_creator_relations.agency_id', $talentPool->agency_id)
+                    ->limit(1),
+            ])
             ->orderByPivot('created_at', 'desc')
             ->paginate(25);
 

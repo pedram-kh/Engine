@@ -43,6 +43,14 @@ final class TalentPoolMemberResource extends JsonResource
             ? $pivot->created_at->toIso8601String()
             : null;
 
+        // Blacklist STATUS, scoped to the POOL-OWNING agency (D-3/D-4). The two
+        // columns ride in as raw `acr_*` attributes off the controller's scoped
+        // addSelect subqueries (agency_id = pool.agency_id) — never a join to
+        // another agency's relation. The roster-list subset: status + hard/soft
+        // ONLY, NOT the reason (free-text GDPR-sensitive — the 2a withhold, D-3).
+        $rawBlacklisted = $creator->getAttribute('acr_is_blacklisted');
+        $blacklistType = $creator->getAttribute('acr_blacklist_type');
+
         return [
             'id' => $creator->ulid,
             'type' => 'talent_pool_members',
@@ -53,6 +61,10 @@ final class TalentPoolMemberResource extends JsonResource
                 'categories' => $creator->categories,
                 'avatar_url' => $this->signedViewUrl($creator->avatar_path),
                 'application_status' => $creator->application_status->value,
+                'is_blacklisted' => (bool) $rawBlacklisted,
+                // hard | soft (null when not blacklisted) — same hard/soft axis
+                // the roster list + 2a detail render. Reason withheld (above).
+                'blacklist_type' => $blacklistType === null ? null : (string) $blacklistType,
                 // The pivot timestamp — when this creator was added to the pool.
                 'added_at' => $addedAt,
             ],
