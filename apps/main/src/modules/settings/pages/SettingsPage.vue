@@ -19,6 +19,8 @@ const { isAdmin, currentAgencyId } = storeToRefs(agencyStore)
 
 const defaultCurrency = ref<string>('')
 const defaultLanguage = ref<string>('')
+// Sprint 7 (D-4) — whether creators are emailed when blacklisted. Default off.
+const blacklistNotificationPolicy = ref<boolean>(false)
 const loading = ref(true)
 const saving = ref(false)
 const loadError = ref<string | null>(null)
@@ -51,6 +53,7 @@ async function loadSettings(): Promise<void> {
     const res = await settingsApi.show(agencyId)
     defaultCurrency.value = res.data.attributes.default_currency
     defaultLanguage.value = res.data.attributes.default_language
+    blacklistNotificationPolicy.value = res.data.attributes.blacklist_notification_policy
   } catch {
     loadError.value = t('app.settings.errors.loadFailed')
   } finally {
@@ -69,6 +72,7 @@ async function onSave(): Promise<void> {
     await settingsApi.update(agencyId, {
       default_currency: defaultCurrency.value,
       default_language: defaultLanguage.value,
+      blacklist_notification_policy: blacklistNotificationPolicy.value,
     })
     saveSuccess.value = true
     setTimeout(() => {
@@ -144,6 +148,21 @@ onMounted(loadSettings)
           :disabled="!isAdmin"
           data-test="settings-language"
         />
+
+        <!-- Blacklist notification policy (Sprint 7, D-4) -->
+        <v-switch
+          v-model="blacklistNotificationPolicy"
+          :label="t('app.settings.fields.blacklistNotificationPolicy')"
+          color="primary"
+          :readonly="!isAdmin"
+          :disabled="!isAdmin"
+          hide-details
+          class="mb-2"
+          data-test="settings-blacklist-notification"
+        />
+        <p class="text-caption text-medium-emphasis mb-4" data-test="settings-blacklist-hint">
+          {{ t('app.settings.fields.blacklistNotificationPolicyHint') }}
+        </p>
 
         <div
           v-if="saveError"

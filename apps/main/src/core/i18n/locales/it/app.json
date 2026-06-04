@@ -86,6 +86,46 @@
       "title": "I miei creator",
       "unnamed": "Creator senza nome",
       "blacklisted": "In blacklist",
+      "blacklist": {
+        "badge": {
+          "hard": "In blacklist",
+          "soft": "Avviso blacklist"
+        },
+        "openAction": "Aggiungi alla blacklist",
+        "liftAction": "Rimuovi dalla blacklist",
+        "lifted": "Rimosso dalla blacklist.",
+        "liftFailed": "Impossibile rimuovere dalla blacklist.",
+        "section": {
+          "title": "Blacklist",
+          "none": "Questo creator non è in blacklist per la tua agenzia."
+        },
+        "status": {
+          "hard": "Blacklist rigida — escluso dalla tua ricerca e bloccato per le richieste di connessione.",
+          "soft": "Blacklist leggera — solo un avviso; il creator resta disponibile."
+        },
+        "dialog": {
+          "title": "Aggiungi creator alla blacklist",
+          "scopeLabel": "Ambito",
+          "scope": {
+            "agency": "Intera agenzia",
+            "brand": "Un brand specifico"
+          },
+          "noRelationHint": "La blacklist a livello di agenzia richiede un creator collegato.",
+          "brandLabel": "Brand",
+          "typeLabel": "Tipo",
+          "type": {
+            "hard": "Rigida — escludi dalla ricerca e blocca le richieste",
+            "soft": "Leggera — solo avviso, mantieni disponibile"
+          },
+          "reasonLabel": "Motivo",
+          "reasonPlaceholder": "Perché questo creator viene aggiunto alla blacklist? (privato per la tua agenzia)",
+          "cancel": "Annulla",
+          "confirm": "Aggiungi alla blacklist",
+          "success": "Creator aggiunto alla blacklist.",
+          "invalid": "Compila i campi obbligatori.",
+          "failed": "Impossibile aggiungere il creator alla blacklist."
+        }
+      },
       "fields": {
         "name": "Nome",
         "status": "Stato",
@@ -502,7 +542,9 @@
       "title": "Impostazioni agenzia",
       "fields": {
         "defaultCurrency": "Valuta predefinita",
-        "defaultLanguage": "Lingua predefinita"
+        "defaultLanguage": "Lingua predefinita",
+        "blacklistNotificationPolicy": "Avvisa i creator quando aggiunti alla blacklist",
+        "blacklistNotificationPolicyHint": "Se attivo, il creator riceve un'email se la tua agenzia lo aggiunge alla blacklist. Il motivo non viene mai condiviso."
       },
       "save": "Salva impostazioni",
       "saving": "Salvataggio…",

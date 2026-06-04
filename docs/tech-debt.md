@@ -878,7 +878,7 @@ anyone reviewing it later.
 - **Resolution:** when Sprint 7 designs blacklisting scope semantics, revisit the dashboard KPI denominators to honor scope (e.g. only agency-scoped blacklists exclude from the agency roster count) rather than the flat boolean.
 - **Triggered by:** Sprint 7 blacklisting.
 - **Owner:** Sprint 7 (blacklisting).
-- **Status:** open (deferred by design). Surfaced + accepted by Sprint 4 Chunk 1, 2026-05-31.
+- **Status:** ✅ **RESOLVED — Sprint 7 (2026-06-04, [review](reviews/sprint-7-review.md)).** Both KPI counts (`creators_in_roster`, `pending_creator_applications` in `DashboardSummaryController`) now apply the scope-aware predicate `NOT (is_blacklisted = true AND blacklist_scope = 'agency')` instead of the flat `is_blacklisted = false`. Only an **agency-wide** blacklist drops a creator from the count; a **brand-scoped** blacklist (which lives in `brand_creator_blacklists`, never on the relation — D-2) does NOT, since it is not an agency-wide exclusion. Pinned by `BlacklistEnforcementTest` (B3): an agency-wide blacklist reduces the count, a brand-scoped one leaves it unchanged (break-revert: the old boolean would wrongly drop brand-scoped too). Originally surfaced + accepted by Sprint 4 Chunk 1, 2026-05-31.
 
 ---
 
@@ -1045,3 +1045,19 @@ anyone reviewing it later.
 - **Triggered by:** the creator-side connections page being scheduled.
 - **Owner:** future creator-surface chunk / unscheduled.
 - **Status:** open (deferred — future surface). Surfaced + accepted by Sprint 6.6c, 2026-06-03 ([review](reviews/sprint-6-6c-review.md)).
+
+---
+
+## Brand-scoped blacklist is recorded-now, enforced-at-campaign-matching-later (Sprint 8)
+
+- **Where:** [`brand_creator_blacklists`](../apps/api/database/migrations/2026_06_04_100000_create_brand_creator_blacklists_table.php) + [`CreatorBlacklistController`](../apps/api/app/Modules/Agencies/Http/Controllers/CreatorBlacklistController.php) (the brand-scoped write path, D-2/A3).
+- **What we accepted in Sprint 7 (2026-06-04, B1):** Sprint 7 ships the **full brand-scoped write surface** — the table, model (audited, soft-deleted), the blacklist/un-blacklist endpoints, and the dialog's brand picker. But a brand-scoped blacklist **does NOT yet bite on any read surface**:
+  - **Discovery is agency-level (no brand context)** — the discovery exclusion (B1) is deliberately scoped to **agency-wide hard** blacklists on the relation only; a brand-scoped row never affects whether a creator appears in an agency's discovery. Confirmed by `BlacklistEnforcementTest` ("a brand-scoped blacklist does NOT affect discovery").
+  - **The KPI counts are agency-level** — brand-scoped rows never touch the roster/pending counts (B3, same test file).
+  - The brand-scoped blacklist's **only effect today is "recorded"** (an audited row, surfaced nowhere as a filter). Its **matching effect bites at campaign-matching time**, which does not exist until Sprint 8.
+- **Why deferred:** there is **no brand-level campaign matching yet** to enforce against. Building a brand-scoped exclusion read path now would have no consumer (and would tempt building Sprint 8's matching early — explicitly out of scope per the kickoff). The table + write path ship now so the data + audit trail accrue from day one; the enforcement lands when brand-level matching exists.
+- **Risk:** low-to-moderate. The data is captured correctly and isolated (cross-agency via `brands.agency_id`); the gap is purely "recorded but not yet enforced." If Sprint 8 ships campaign matching without wiring the brand-scoped exclusion, a brand-scoped blacklist would be silently inert — the matching chunk MUST consume `brand_creator_blacklists` (hard = exclude from that brand's campaign matches; soft = warn).
+- **Resolution:** Sprint 8 (brand-level campaign matching) consumes `brand_creator_blacklists` at match time — `blacklist_type='hard'` excludes the creator from that brand's matchable pool, `soft` surfaces a warning. The agency→brand derivation is `brands.agency_id` (no `agency_id` on the blacklist table by design — D-2).
+- **Triggered by:** Sprint 8 brand-level campaign matching.
+- **Owner:** Sprint 8 (campaign matching).
+- **Status:** open (deferred by design). Surfaced + accepted by Sprint 7, 2026-06-04 ([review](reviews/sprint-7-review.md)).

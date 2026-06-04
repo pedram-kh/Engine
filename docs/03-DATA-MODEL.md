@@ -382,22 +382,29 @@ The per-agency view of a creator. Stores agency-specific data.
 
 ### `brand_creator_blacklists`
 
-Brand-scoped blacklists (when a creator is blocked from a specific brand but ok for others in the agency).
+Brand-scoped blacklists (when a creator is blocked from a specific brand but ok for others in the agency). This is the **sole source of truth for brand-scoped blacklists** — a brand-scoped block is a row here, NOT a flag on `agency_creator_relations` (no dual-write; the brand→agency link derives through `brands.agency_id`). Un-blacklisting **soft-deletes** the row (history preserved); re-blacklisting inserts a fresh row.
 
-| Column                     | Type             | Notes                  | Phase |
-| -------------------------- | ---------------- | ---------------------- | ----- |
-| `id`                       | bigint PK        |                        | P1    |
-| `brand_id`                 | bigint FK        | `brands.id`, CASCADE   | P1    |
-| `creator_id`               | bigint FK        | `creators.id`, CASCADE | P1    |
-| `reason`                   | text             |                        | P1    |
-| `block_type`               | varchar(8)       | `hard`, `soft`         | P1    |
-| `created_by_user_id`       | bigint FK        | `users.id`, SET NULL   | P1    |
-| `notification_sent_at`     | timestamptz null |                        | P1    |
-| `created_at`, `updated_at` | timestamptz      |                        | P1    |
+| Column                     | Type             | Notes                                            | Phase |
+| -------------------------- | ---------------- | ------------------------------------------------ | ----- |
+| `id`                       | bigint PK        |                                                  | P1    |
+| `ulid`                     | char(26) unique  |                                                  | P1    |
+| `brand_id`                 | bigint FK        | `brands.id`, CASCADE                             | P1    |
+| `creator_id`               | bigint FK        | `creators.id`, CASCADE                           | P1    |
+| `blacklist_type`           | varchar(8)       | `hard`, `soft` (the shared `BlacklistType` enum) | P1    |
+| `reason`                   | text NOT NULL    | mandatory; GDPR-sensitive (redacted from audit)  | P1    |
+| `blacklisted_at`           | timestamptz      |                                                  | P1    |
+| `blacklisted_by_user_id`   | bigint FK null   | `users.id`, SET NULL                             | P1    |
+| `notification_sent_at`     | timestamptz null |                                                  | P1    |
+| `created_at`, `updated_at` | timestamptz      |                                                  | P1    |
+| `deleted_at`               | timestamptz null | soft-deletes (un-blacklist = soft-delete)        | P1    |
 
 **Indexes:**
 
-- `unique_brand_creator_blacklist` on (`brand_id`, `creator_id`)
+- `unique_brand_creator_blacklist` partial unique on (`brand_id`, `creator_id`) `WHERE deleted_at IS NULL` (allows re-blacklist as a fresh row after a soft-deleted history row)
+- `idx_brand_creator_blacklists_brand_id` on (`brand_id`)
+- `idx_brand_creator_blacklists_creator_id` on (`creator_id`)
+
+> **As-built reconcile (Sprint 7, 2026-06-04 — see [review](reviews/sprint-7-review.md)).** This table was implemented per the Sprint-7 kickoff A1 schema, which diverged from the original spec draft (`block_type` / `created_by_user_id`, no `ulid`, no soft-deletes): the column is `blacklist_type` (sharing the one `BlacklistType` hard/soft enum with the relation), the actor is `blacklisted_by_user_id`, `reason` is `NOT NULL`, and the row carries `ulid` + `blacklisted_at` + soft-deletes + the partial unique index. The table above reflects the shipped migration.
 
 ---
 

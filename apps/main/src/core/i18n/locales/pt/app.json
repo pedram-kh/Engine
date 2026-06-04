@@ -86,6 +86,46 @@
       "title": "Meus criadores",
       "unnamed": "Criador sem nome",
       "blacklisted": "Na lista negra",
+      "blacklist": {
+        "badge": {
+          "hard": "Na lista negra",
+          "soft": "Aviso de lista negra"
+        },
+        "openAction": "Adicionar à lista negra",
+        "liftAction": "Remover da lista negra",
+        "lifted": "Removido da lista negra.",
+        "liftFailed": "Falha ao remover da lista negra.",
+        "section": {
+          "title": "Lista negra",
+          "none": "Este criador não está na lista negra da sua agência."
+        },
+        "status": {
+          "hard": "Lista negra rígida — excluído da sua descoberta e bloqueado para pedidos de ligação.",
+          "soft": "Lista negra leve — apenas um aviso; o criador continua disponível."
+        },
+        "dialog": {
+          "title": "Adicionar criador à lista negra",
+          "scopeLabel": "Âmbito",
+          "scope": {
+            "agency": "Toda a agência",
+            "brand": "Uma marca específica"
+          },
+          "noRelationHint": "A lista negra de toda a agência requer um criador ligado.",
+          "brandLabel": "Marca",
+          "typeLabel": "Tipo",
+          "type": {
+            "hard": "Rígida — excluir da descoberta e bloquear pedidos",
+            "soft": "Leve — apenas avisar, manter disponível"
+          },
+          "reasonLabel": "Motivo",
+          "reasonPlaceholder": "Porque é que este criador está a ser colocado na lista negra? (privado da sua agência)",
+          "cancel": "Cancelar",
+          "confirm": "Adicionar à lista negra",
+          "success": "Criador adicionado à lista negra.",
+          "invalid": "Preencha os campos obrigatórios.",
+          "failed": "Falha ao adicionar o criador à lista negra."
+        }
+      },
       "fields": {
         "name": "Nome",
         "status": "Estado",
@@ -502,7 +542,9 @@
       "title": "Configurações da agência",
       "fields": {
         "defaultCurrency": "Moeda padrão",
-        "defaultLanguage": "Idioma padrão"
+        "defaultLanguage": "Idioma padrão",
+        "blacklistNotificationPolicy": "Notificar criadores quando colocados na lista negra",
+        "blacklistNotificationPolicyHint": "Quando ativo, o criador é notificado por email se a sua agência o colocar na lista negra. O motivo nunca é partilhado."
       },
       "save": "Salvar configurações",
       "saving": "Salvando…",

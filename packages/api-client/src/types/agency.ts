@@ -348,6 +348,52 @@ export interface UpdateAgencyCreatorRelationPayload {
 }
 
 // ---------------------------------------------------------------------------
+// Creator blacklisting — Sprint 7
+// ---------------------------------------------------------------------------
+
+/** agency-wide (columns on the relation) | brand-scoped (its own table). */
+export type BlacklistScope = 'agency' | 'brand'
+
+/** hard = exclude (discovery + send gate) | soft = warn only. */
+export type BlacklistType = 'hard' | 'soft'
+
+/**
+ * POST /api/v1/agencies/{agency}/creators/{creator}/blacklist.
+ *
+ * `reason` is mandatory (you only ever blacklist WITH a reason). `brand_id`
+ * (the brand ULID) is required when `scope === 'brand'` and must be omitted
+ * for `scope === 'agency'`.
+ */
+export interface BlacklistCreatorPayload {
+  scope: BlacklistScope
+  type: BlacklistType
+  reason: string
+  brand_id?: string
+}
+
+/** DELETE …/blacklist — lift an agency-wide or brand-scoped blacklist. */
+export interface UnblacklistCreatorPayload {
+  scope: BlacklistScope
+  brand_id?: string
+}
+
+export interface CreatorBlacklistResource {
+  type: 'creator_blacklist'
+  attributes: {
+    scope?: BlacklistScope
+    type?: BlacklistType
+    is_blacklisted?: boolean
+    brand_id?: string
+    id?: string
+  }
+}
+
+export interface CreatorBlacklistEnvelope {
+  data: CreatorBlacklistResource
+  meta: { code: string }
+}
+
+// ---------------------------------------------------------------------------
 // Creator DISCOVERY (the global pool) — Sprint 6.6a
 // ---------------------------------------------------------------------------
 
@@ -713,6 +759,11 @@ export interface InvitationPreviewEnvelope {
 export interface AgencySettingsAttributes {
   default_currency: string
   default_language: string
+  /**
+   * Whether creators are emailed when blacklisted (Sprint 7, D-4). The first
+   * key surfaced from the `settings` jsonb. Default `false`.
+   */
+  blacklist_notification_policy: boolean
 }
 
 export interface AgencySettingsResource {
@@ -728,6 +779,7 @@ export interface AgencySettingsEnvelope {
 export interface UpdateAgencySettingsPayload {
   default_currency?: string
   default_language?: string
+  blacklist_notification_policy?: boolean
 }
 
 // ---------------------------------------------------------------------------

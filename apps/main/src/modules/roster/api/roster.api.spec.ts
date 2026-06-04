@@ -67,3 +67,54 @@ describe('rosterApi.list', () => {
     expect(mockHttp.get).toHaveBeenCalledWith('/agencies/agency-ulid/creators')
   })
 })
+
+describe('rosterApi.blacklist / unblacklist (Sprint 7)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockHttp.post.mockResolvedValue({ data: {} })
+    mockHttp.delete.mockResolvedValue({ data: {} })
+  })
+
+  it('POSTs to the dedicated /blacklist endpoint (NOT the rating/notes PATCH)', () => {
+    void rosterApi.blacklist('agency-ulid', 'creator-ulid', {
+      scope: 'agency',
+      type: 'hard',
+      reason: 'spammy',
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/creators/creator-ulid/blacklist',
+      {
+        scope: 'agency',
+        type: 'hard',
+        reason: 'spammy',
+      },
+    )
+    expect(mockHttp.patch).not.toHaveBeenCalled()
+  })
+
+  it('threads brand_id for a brand-scoped blacklist', () => {
+    void rosterApi.blacklist('agency-ulid', 'creator-ulid', {
+      scope: 'brand',
+      type: 'soft',
+      reason: 'off-brand',
+      brand_id: 'brand-ulid',
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/creators/creator-ulid/blacklist',
+      {
+        scope: 'brand',
+        type: 'soft',
+        reason: 'off-brand',
+        brand_id: 'brand-ulid',
+      },
+    )
+  })
+
+  it('DELETEs with the scope body to lift a blacklist', () => {
+    void rosterApi.unblacklist('agency-ulid', 'creator-ulid', { scope: 'agency' })
+    expect(mockHttp.delete).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/creators/creator-ulid/blacklist',
+      { scope: 'agency' },
+    )
+  })
+})

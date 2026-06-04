@@ -34,6 +34,14 @@ vi.mock('../api/roster.api', () => ({
   rosterApi: {
     show: vi.fn(),
     updateRelation: vi.fn(),
+    blacklist: vi.fn(),
+    unblacklist: vi.fn(),
+  },
+}))
+
+vi.mock('@/modules/brands/api/brands.api', () => ({
+  brandsApi: {
+    list: vi.fn().mockResolvedValue({ data: [] }),
   },
 }))
 
@@ -280,6 +288,85 @@ describe('CreatorDetailPage (Sprint 6 Chunk 2a)', () => {
     expect(vi.mocked(rosterApi.updateRelation).mock.calls.at(-1)?.[2]).toMatchObject({
       internal_notes: null,
     })
+  })
+
+  it('shows the blacklist section + open action for an admin on a non-blacklisted creator', async () => {
+    const harness = await mountDetail({ role: 'agency_admin' })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="creator-detail-blacklist-section"]').exists()).toBe(
+      true,
+    )
+    expect(harness.wrapper.find('[data-test="creator-detail-blacklist-open"]').exists()).toBe(true)
+    expect(harness.wrapper.find('[data-test="creator-detail-unblacklist"]').exists()).toBe(false)
+  })
+
+  it('hides the blacklist management section from staff (admin/manager gate)', async () => {
+    const harness = await mountDetail({ role: 'agency_staff' })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="creator-detail-blacklist-section"]').exists()).toBe(
+      false,
+    )
+  })
+
+  it('shows the un-blacklist action + status when the creator is blacklisted', async () => {
+    const harness = await mountDetail({
+      role: 'agency_admin',
+      detail: makeDetail({
+        is_blacklisted: true,
+        blacklist_scope: 'agency',
+        blacklist_type: 'hard',
+        blacklisted_at: '2026-06-01T00:00:00+00:00',
+      }),
+    })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="creator-detail-unblacklist"]').exists()).toBe(true)
+    expect(harness.wrapper.find('[data-test="creator-detail-blacklist-open"]').exists()).toBe(false)
+    expect(harness.wrapper.find('[data-test="creator-detail-blacklist-status"]').text()).not.toBe(
+      '',
+    )
+  })
+
+  it('lifts an agency-wide blacklist via the un-blacklist action', async () => {
+    const harness = await mountDetail({
+      role: 'agency_admin',
+      detail: makeDetail({
+        is_blacklisted: true,
+        blacklist_scope: 'agency',
+        blacklist_type: 'hard',
+      }),
+    })
+    cleanup = harness.cleanup
+
+    vi.mocked(rosterApi.unblacklist).mockResolvedValue({
+      data: { type: 'creator_blacklist', attributes: { is_blacklisted: false } },
+      meta: { code: 'creator.unblacklisted' },
+    })
+
+    await harness.wrapper.find('[data-test="creator-detail-unblacklist"]').trigger('click')
+    await flushPromises()
+
+    expect(vi.mocked(rosterApi.unblacklist)).toHaveBeenCalledWith('agency-ulid', CREATOR_ULID, {
+      scope: 'agency',
+    })
+  })
+
+  it('renders a warning (not error) badge for a SOFT blacklist', async () => {
+    const harness = await mountDetail({
+      role: 'agency_admin',
+      detail: makeDetail({
+        is_blacklisted: true,
+        blacklist_scope: 'agency',
+        blacklist_type: 'soft',
+      }),
+    })
+    cleanup = harness.cleanup
+
+    const badge = harness.wrapper.find('[data-test="creator-detail-blacklist"]')
+    expect(badge.exists()).toBe(true)
+    expect(badge.text()).toBe('Blacklist warning')
   })
 
   it('shows a not-in-roster message on a 404', async () => {

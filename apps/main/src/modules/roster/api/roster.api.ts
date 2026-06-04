@@ -10,8 +10,11 @@
 
 import type {
   AgencyCreatorDetailEnvelope,
+  BlacklistCreatorPayload,
+  CreatorBlacklistEnvelope,
   RosterListParams,
   RosterListResponse,
+  UnblacklistCreatorPayload,
   UpdateAgencyCreatorRelationPayload,
 } from '@catalyst/api-client'
 
@@ -76,6 +79,36 @@ export const rosterApi = {
   ): Promise<AgencyCreatorDetailEnvelope> {
     return http.patch<AgencyCreatorDetailEnvelope>(
       `${rosterBase(agencyId)}/${creatorUlid}`,
+      payload,
+    )
+  },
+
+  /**
+   * Blacklist a creator (Sprint 7). Dedicated endpoint, NOT the rating/notes
+   * PATCH (D-2 — no dual-write). `scope` chooses agency-wide (columns on the
+   * relation; requires a relation) or brand-scoped (its own table row).
+   * Admin/manager only (staff 403).
+   */
+  blacklist(
+    agencyId: string,
+    creatorUlid: string,
+    payload: BlacklistCreatorPayload,
+  ): Promise<CreatorBlacklistEnvelope> {
+    return http.post<CreatorBlacklistEnvelope>(
+      `${rosterBase(agencyId)}/${creatorUlid}/blacklist`,
+      payload,
+    )
+  },
+
+  /** Lift a blacklist (Sprint 7) — clears the relation columns (agency) or
+   * soft-deletes the brand row (brand). */
+  unblacklist(
+    agencyId: string,
+    creatorUlid: string,
+    payload: UnblacklistCreatorPayload,
+  ): Promise<CreatorBlacklistEnvelope> {
+    return http.delete<CreatorBlacklistEnvelope>(
+      `${rosterBase(agencyId)}/${creatorUlid}/blacklist`,
       payload,
     )
   },

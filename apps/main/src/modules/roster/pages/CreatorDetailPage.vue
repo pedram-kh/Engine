@@ -45,6 +45,7 @@ import AddToPoolDialog from '@/modules/pools/components/AddToPoolDialog.vue'
 
 import { rosterApi } from '../api/roster.api'
 import AgencyAvailabilityCalendar from '../components/AgencyAvailabilityCalendar.vue'
+import BlacklistCreatorDialog from '../components/BlacklistCreatorDialog.vue'
 import StarRatingInput from '../components/StarRatingInput.vue'
 
 const { t } = useI18n()
@@ -134,6 +135,47 @@ const poolSnackbar = ref<string | null>(null)
 
 function onPoolChanged(message: string): void {
   poolSnackbar.value = message
+}
+
+// ── Blacklist state (Sprint 7, A7) ───────────────────────────────────────────
+// The 2a detail surfaces AGENCY-WIDE blacklist status only (the relation's
+// columns — D-2). Brand-scoped blacklists live in their own table and never
+// touch the relation, so they are NOT reflected here; the dialog can still
+// CREATE one. The detail always has a relation (the page 404s otherwise).
+const blacklistDialog = ref(false)
+const unblacklisting = ref(false)
+const blacklistSnackbar = ref<string | null>(null)
+const blacklistError = ref<string | null>(null)
+
+const isBlacklisted = computed(() => attrs.value?.is_blacklisted ?? false)
+const blacklistType = computed(() => attrs.value?.blacklist_type ?? 'hard')
+
+function blacklistedDateLabel(): string | null {
+  const at = attrs.value?.blacklisted_at ?? null
+  return at === null ? null : new Date(at).toLocaleDateString()
+}
+
+function onBlacklisted(message: string): void {
+  blacklistSnackbar.value = message
+  void load()
+}
+
+async function unblacklist(): Promise<void> {
+  const agencyId = agencyStore.currentAgencyId
+  if (agencyId === null) return
+
+  unblacklisting.value = true
+  blacklistError.value = null
+  try {
+    // The relation only ever carries an AGENCY-WIDE blacklist (D-2).
+    await rosterApi.unblacklist(agencyId, creatorUlid.value, { scope: 'agency' })
+    blacklistSnackbar.value = t('app.roster.blacklist.lifted')
+    await load()
+  } catch {
+    blacklistError.value = t('app.roster.blacklist.liftFailed')
+  } finally {
+    unblacklisting.value = false
+  }
 }
 
 const isDirty = computed(() => {
@@ -250,11 +292,11 @@ onMounted(() => {
             <v-chip
               v-if="attrs.is_blacklisted"
               size="small"
-              color="error"
+              :color="blacklistType === 'soft' ? 'warning' : 'error'"
               variant="tonal"
               data-test="creator-detail-blacklist"
             >
-              {{ t('app.roster.blacklisted') }}
+              {{ t(`app.roster.blacklist.badge.${blacklistType}`) }}
             </v-chip>
           </div>
         </div>
@@ -382,6 +424,63 @@ onMounted(() => {
         </template>
       </section>
 
+      <!-- Blacklist management (Sprint 7, A7) — admin/manager only. Shows the
+           AGENCY-WIDE status (D-2) + the blacklist / un-blacklist actions. -->
+      <section
+        v-if="canEdit"
+        class="creator-detail__section"
+        data-test="creator-detail-blacklist-section"
+      >
+        <h2 class="text-h6">{{ t('app.roster.blacklist.section.title') }}</h2>
+
+        <v-alert
+          v-if="blacklistError"
+          type="error"
+          variant="tonal"
+          data-test="creator-detail-blacklist-error"
+        >
+          {{ blacklistError }}
+        </v-alert>
+
+        <template v-if="isBlacklisted">
+          <p class="text-body-2" data-test="creator-detail-blacklist-status">
+            {{ t(`app.roster.blacklist.status.${blacklistType}`) }}
+            <template v-if="blacklistedDateLabel() !== null">
+              · {{ blacklistedDateLabel() }}</template
+            >
+          </p>
+          <div class="d-flex justify-start">
+            <v-btn
+              color="primary"
+              variant="tonal"
+              prepend-icon="mdi-account-check-outline"
+              :loading="unblacklisting"
+              data-test="creator-detail-unblacklist"
+              @click="unblacklist"
+            >
+              {{ t('app.roster.blacklist.liftAction') }}
+            </v-btn>
+          </div>
+        </template>
+
+        <template v-else>
+          <p class="text-body-2 text-medium-emphasis" data-test="creator-detail-blacklist-none">
+            {{ t('app.roster.blacklist.section.none') }}
+          </p>
+          <div class="d-flex justify-start">
+            <v-btn
+              color="error"
+              variant="tonal"
+              prepend-icon="mdi-cancel"
+              data-test="creator-detail-blacklist-open"
+              @click="blacklistDialog = true"
+            >
+              {{ t('app.roster.blacklist.openAction') }}
+            </v-btn>
+          </div>
+        </template>
+      </section>
+
       <!-- Social accounts (accounts render; metrics are blocked → empty state) -->
       <section class="creator-detail__section" data-test="creator-detail-social">
         <h2 class="text-h6">{{ t('app.roster.detail.sections.social') }}</h2>
@@ -461,6 +560,30 @@ onMounted(() => {
       :creator-ulid="creatorUlid"
       @changed="onPoolChanged"
     />
+
+    <!-- Blacklist dialog (Sprint 7, A7) -->
+    <BlacklistCreatorDialog
+      v-if="agencyStore.currentAgencyId && canEdit"
+      v-model="blacklistDialog"
+      :agency-id="agencyStore.currentAgencyId"
+      :creator-ulid="creatorUlid"
+      :has-relation="true"
+      @blacklisted="onBlacklisted"
+    />
+
+    <v-snackbar
+      :model-value="blacklistSnackbar !== null"
+      :timeout="3000"
+      color="success"
+      data-test="creator-detail-blacklist-snackbar"
+      @update:model-value="
+        (v) => {
+          if (!v) blacklistSnackbar = null
+        }
+      "
+    >
+      {{ blacklistSnackbar }}
+    </v-snackbar>
 
     <v-snackbar
       :model-value="poolSnackbar !== null"
