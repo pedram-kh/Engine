@@ -406,6 +406,45 @@ Brand-scoped blacklists (when a creator is blocked from a specific brand but ok 
 
 > **As-built reconcile (Sprint 7, 2026-06-04 — see [review](reviews/sprint-7-review.md)).** This table was implemented per the Sprint-7 kickoff A1 schema, which diverged from the original spec draft (`block_type` / `created_by_user_id`, no `ulid`, no soft-deletes): the column is `blacklist_type` (sharing the one `BlacklistType` hard/soft enum with the relation), the actor is `blacklisted_by_user_id`, `reason` is `NOT NULL`, and the row carries `ulid` + `blacklisted_at` + soft-deletes + the partial unique index. The table above reflects the shipped migration.
 
+### `talent_pools`
+
+A saved, per-agency (optionally per-brand) collection of creators (Sprint 6 Chunk 2b). Brand-scope is a **label, not an eligibility gate** — a creator with no link to the pool's brand can still be a member. Archive is pure soft-delete (no status column); CRUD mirrors the Brand entity (soft-delete + restore). Routes resolve by `ulid` (no slug — pools have no public URL).
+
+| Column                     | Type             | Notes                                                                                                    | Phase |
+| -------------------------- | ---------------- | -------------------------------------------------------------------------------------------------------- | ----- |
+| `id`                       | bigint PK        |                                                                                                          | P1    |
+| `ulid`                     | char(26) unique  |                                                                                                          | P1    |
+| `agency_id`                | bigint FK        | `agencies.id`, RESTRICT — a pool belongs to exactly one agency                                           | P1    |
+| `brand_id`                 | bigint FK null   | `brands.id`, SET NULL — brand-scope is a LABEL; if the brand is deleted the pool survives as agency-wide | P1    |
+| `name`                     | varchar(160)     |                                                                                                          | P1    |
+| `description`              | text null        |                                                                                                          | P1    |
+| `created_by_user_id`       | bigint FK null   | `users.id`, SET NULL (house attribution pattern)                                                         | P1    |
+| `created_at`, `updated_at` | timestamptz      |                                                                                                          | P1    |
+| `deleted_at`               | timestamptz null | soft-deletes — a pool holds members, so an accidental delete must be recoverable                         | P1    |
+
+**Indexes:**
+
+- `unique_talent_pools_agency_name` unique on (`agency_id`, `name`) — an agency can't have two pools with the same name (a soft-deleted pool still occupies the slot until restored, same as brands' slug)
+- `idx_talent_pools_agency_id` on (`agency_id`)
+- `idx_talent_pools_brand_id` on (`brand_id`)
+
+### `talent_pool_creators`
+
+Pool membership (Sprint 6 Chunk 2b). A first-class pivot model (`App\Modules\TalentPools\Models\TalentPoolMembership`) because it carries `added_by_user_id` — same rationale that makes `AgencyMembership` first-class. House pivot style (mirrors `agency_users`): a surrogate `id` PK **plus** a named composite unique, **not** a composite PK. The unique constraint is what makes the add endpoint idempotent (`firstOrCreate` → one row per (pool, creator), never a duplicate / 500). No soft-deletes on the pivot.
+
+| Column                     | Type           | Notes                                                                                                                         | Phase |
+| -------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `id`                       | bigint PK      | surrogate (not a composite PK)                                                                                                | P1    |
+| `talent_pool_id`           | bigint FK      | `talent_pools.id`, CASCADE — a hard-deleted pool drops its memberships; a **soft**-delete does NOT (rows survive for restore) | P1    |
+| `creator_id`               | bigint FK      | `creators.id`, CASCADE                                                                                                        | P1    |
+| `added_by_user_id`         | bigint FK null | `users.id`, SET NULL (house attribution pattern)                                                                              | P1    |
+| `created_at`, `updated_at` | timestamptz    | the pivot's `created_at` is "when added to the pool" (surfaced as `added_at`)                                                 | P1    |
+
+**Indexes:**
+
+- `unique_talent_pool_creator` unique on (`talent_pool_id`, `creator_id`) — one row per (pool, creator); the basis of idempotent add
+- `idx_talent_pool_creators_creator_id` on (`creator_id`)
+
 ---
 
 ## 7. Campaigns
@@ -1093,30 +1132,32 @@ Phase 1 migrations are applied in this dependency order:
 13. `creator_kyc_verifications`
 14. `agency_creator_relations`
 15. `brand_creator_blacklists`
-16. `contract_templates`
-17. `contracts`
-18. `campaigns`
-19. `campaign_assignments`
-20. `campaign_drafts`
-21. `campaign_posted_content`
-22. `payments`
-23. `payment_events`
-24. `boards`
-25. `board_columns`
-26. `board_automations`
-27. `board_cards`
-28. `board_card_movements`
-29. `message_threads`
-30. `messages`
-31. `message_read_receipts`
-32. `notification_preferences`
-33. `audit_logs`
-34. `admin_impersonation_sessions`
-35. `files`
-36. `integration_events`
-37. `integration_credentials`
-38. `data_export_requests`
-39. `data_erasure_requests`
+16. `talent_pools`
+17. `talent_pool_creators`
+18. `contract_templates`
+19. `contracts`
+20. `campaigns`
+21. `campaign_assignments`
+22. `campaign_drafts`
+23. `campaign_posted_content`
+24. `payments`
+25. `payment_events`
+26. `boards`
+27. `board_columns`
+28. `board_automations`
+29. `board_cards`
+30. `board_card_movements`
+31. `message_threads`
+32. `messages`
+33. `message_read_receipts`
+34. `notification_preferences`
+35. `audit_logs`
+36. `admin_impersonation_sessions`
+37. `files`
+38. `integration_events`
+39. `integration_credentials`
+40. `data_export_requests`
+41. `data_erasure_requests`
 
 Each migration is a separate timestamped file. Forward and reverse tested.
 
