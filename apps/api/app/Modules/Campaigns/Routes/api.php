@@ -18,7 +18,8 @@ use Illuminate\Support\Facades\Route;
 |
 | See docs/security/tenancy.md §3. Campaign create + Settings edit are
 | admin/manager-gated inside the controller (Gate::authorize); any member may
-| view (D-10). Inviting creators + assignment mutations land in Chunk 2.
+| view (D-10). Inviting (D-3) + re-inviting (D-7) are gated on the broader
+| `invite` execute ability (admin + manager + staff, D-6).
 |
 */
 
@@ -37,4 +38,12 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // Read-only assignment listing for the Creators tab (Chunk 1).
         Route::get('campaigns/{campaign}/assignments', [CampaignAssignmentController::class, 'index'])
             ->name('campaigns.assignments.index');
+
+        // Invite a creator (Chunk 2, D-3) — the two-tier gate + execute ability.
+        Route::post('campaigns/{campaign}/assignments', [CampaignAssignmentController::class, 'store'])
+            ->name('campaigns.assignments.store');
+
+        // Re-invite after a counter (Chunk 2, D-7) — the guarded machine edge.
+        Route::post('campaigns/{campaign}/assignments/{assignment}/reinvite', [CampaignAssignmentController::class, 'reinvite'])
+            ->name('campaigns.assignments.reinvite');
     });

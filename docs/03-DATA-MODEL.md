@@ -296,6 +296,8 @@ Blocks of time when the creator is unavailable.
 - `idx_availability_creator_dates` on (`creator_id`, `starts_at`, `ends_at`)
 - `idx_availability_creator_kind` on (`creator_id`, `kind`)
 
+> **`assignment_id` FK — wired in Sprint 8 Chunk 2 (2026-06-05, D-12).** The column shipped in Sprint 5 Chunk A as a **bare nullable bigint with no FK** (there was no `campaign_assignments` table to point at yet — Sprint 5 inventory B3). Sprint 8 Chunk 2 adds the actual constraint `assignment_id → campaign_assignments.id ON DELETE SET NULL` ([migration](../apps/api/database/migrations/2026_06_05_100002_add_assignment_fk_to_creator_availability_blocks_table.php)): deleting an assignment **nulls** the auto-block's link rather than cascade-deleting the block (the column's original documented intent — the block is the creator's calendar fact, the assignment is merely its cause). The blocks themselves are created by the [`CreateAssignmentAvailabilityBlock`](../apps/api/app/Modules/Campaigns/Listeners/CreateAssignmentAvailabilityBlock.php) listener on `assignment.accepted` (D-11): a `hard`/`assignment_auto` block spanning the campaign's posting window (falling back to the campaign dates; skipped + logged if both are null).
+
 ### `creator_tax_profiles`
 
 | Column                     | Type             | Notes                                                      | Phase |
@@ -530,7 +532,7 @@ invited
   ↓
 responded (split into):
   → declined  (terminal)
-  → countered (negotiation)
+  → countered (negotiation) ──(agency re-invite)──→ invited   (re-opens cleanly)
   → accepted
        ↓
    contracted   (master signed; addendum signed if required)
@@ -556,6 +558,8 @@ Cancellation can happen from any non-terminal state → cancelled (terminal)
 State transitions are managed by `CampaignAssignmentStateMachine` service. Every transition is logged in `audit_logs` and may trigger card movement on the board.
 
 > **`countered_fee_*` — Sprint-8 addition (Chunk 1, D-7).** The state machine's `counter()` transition (`invited → countered`) records the creator's counter-offer in `countered_fee_minor_units`/`countered_fee_currency` **without overwriting `agreed_fee_*`** — the agency's original offer is preserved alongside the counter so the negotiation delta is inspectable. As-built `status` is `varchar(32)`. The negotiation **loop** (multiple back-and-forth rounds) is **not** built — a single counter is recorded, then the next move is accept/decline; see `tech-debt.md` (counter-minimal).
+
+> **`reinvite()` edge — Sprint-8 addition (Chunk 2, D-7).** The agency's response to a counter is a **guarded `countered → invited` machine edge** ([`CampaignAssignmentStateMachine::reinvite()`](../apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php)): it sets a new `agreed_fee_*`, **clears `countered_fee_*` and `responded_at`** (re-opening the invitation cleanly), and audits the distinct verb `assignment.re_invited` (a re-offer is legible in the trail, not folded into `assignment.invited`). No raw back-write — the machine stays the sole status authority. The re-invite reopens to `invited`, from which the creator can accept/decline/counter again; single-shot remains the shape (no unbounded loop, per the counter-minimal debt). The **first-contact invite is NOT a machine transition** — the machine has no `invite()`. The `invited` row is **created directly** by the agency invite endpoint (`POST agencies/{agency}/campaigns/{campaign}/assignments`), which hand-writes its own `assignment.invited` audit row + dispatches the `AssignmentTransitioned` event (the deliberate create-exception, hand-audited like CRUD); only subsequent edges go through the machine.
 
 **Indexes:**
 

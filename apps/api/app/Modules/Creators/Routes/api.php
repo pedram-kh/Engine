@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Modules\Creators\Http\Controllers\Admin\AdminCreatorController;
 use App\Modules\Creators\Http\Controllers\AvatarController;
 use App\Modules\Creators\Http\Controllers\BulkInviteController;
+use App\Modules\Creators\Http\Controllers\CreatorAssignmentController;
 use App\Modules\Creators\Http\Controllers\CreatorAvailabilityController;
 use App\Modules\Creators\Http\Controllers\CreatorConnectionRequestController;
 use App\Modules\Creators\Http\Controllers\CreatorWizardController;
@@ -59,6 +60,10 @@ use Illuminate\Support\Facades\Route;
 |   GET    /api/v1/creators/me/connection-requests              Sprint 6.6b
 |   POST   /api/v1/creators/me/connection-requests/{r}/accept   Sprint 6.6b
 |   POST   /api/v1/creators/me/connection-requests/{r}/decline  Sprint 6.6b
+|   GET    /api/v1/creators/me/assignments                      Sprint 8 Chunk 2
+|   POST   /api/v1/creators/me/assignments/{a}/accept           Sprint 8 Chunk 2
+|   POST   /api/v1/creators/me/assignments/{a}/decline          Sprint 8 Chunk 2
+|   POST   /api/v1/creators/me/assignments/{a}/counter          Sprint 8 Chunk 2
 |
 */
 
@@ -162,6 +167,26 @@ Route::prefix('creators/me')
                 ->name('accept');
             Route::post('{relation}/decline', [CreatorConnectionRequestController::class, 'decline'])
                 ->name('decline');
+        });
+
+        // ─── Campaign assignments (the CREATOR half of the lifecycle) ────────
+        // Sprint 8 Chunk 2 (D-9). The creator's own campaign invitations: list
+        // them, accept (→ accepted), decline (→ declined) or counter (→
+        // countered with a proposed fee). Cross-module read/write of a Campaigns
+        // model (CampaignAssignment), resolved STRUCTURALLY from
+        // $request->user()->creator — never a path agency id — so cross-creator
+        // access is impossible. Accept/decline/counter are fail-closed: only an
+        // `invited` assignment may transition, and the flip goes through the
+        // CampaignAssignmentStateMachine (the sole status authority). Allowlisted
+        // in docs/security/tenancy.md § 4 alongside creators/me/*.
+        Route::prefix('assignments')->name('assignments.')->group(function (): void {
+            Route::get('/', [CreatorAssignmentController::class, 'index'])->name('index');
+            Route::post('{assignment}/accept', [CreatorAssignmentController::class, 'accept'])
+                ->name('accept');
+            Route::post('{assignment}/decline', [CreatorAssignmentController::class, 'decline'])
+                ->name('decline');
+            Route::post('{assignment}/counter', [CreatorAssignmentController::class, 'counter'])
+                ->name('counter');
         });
     });
 

@@ -221,6 +221,11 @@ enum AuditAction: string
     // draft_submitted). Logged at transition time by
     // CampaignAssignmentStateMachine; `assignment.cancelled` requires a reason.
     case AssignmentInvited = 'assignment.invited';
+    // Sprint 8 Chunk 2 (D-7) — the agency re-offers after a creator counter.
+    // A distinct verb (not a re-used `assignment.invited`) so the re-offer is
+    // legible in the trail, carrying the new agreed-fee in metadata. Logged by
+    // CampaignAssignmentStateMachine::reinvite() (`countered → invited`).
+    case AssignmentReInvited = 'assignment.re_invited';
     case AssignmentDeclined = 'assignment.declined';
     case AssignmentCountered = 'assignment.countered';
     case AssignmentAccepted = 'assignment.accepted';

@@ -21,8 +21,11 @@ use Illuminate\Auth\Access\HandlesAuthorization;
  *   - agency_manager → "campaigns and creators" — create / update + view
  *   - agency_staff   → "execute campaigns; no creating" — view only
  *
- * Staff's "execute" (invite/manage assignments) is Chunk 2 — its gate is
- * scoped there. Cross-tenant access is prevented at the middleware layer.
+ * Staff's "execute" (invite/manage assignments) lands in Chunk 2 as the
+ * {@see invite()} ability — broader than `create`, because inviting creators
+ * IS executing a campaign (spec §4.2: staff "execute campaigns"), as distinct
+ * from CREATING one (admin/manager). Cross-tenant access is prevented at the
+ * middleware layer.
  */
 final class CampaignPolicy
 {
@@ -46,6 +49,21 @@ final class CampaignPolicy
     public function update(User $user, Campaign $campaign): bool
     {
         return $this->hasAnyRole($user, [AgencyRole::AgencyAdmin, AgencyRole::AgencyManager]);
+    }
+
+    /**
+     * The "execute" ability (Sprint 8 Chunk 2, D-6) — inviting / re-inviting
+     * creators to a campaign. Broader than {@see create()}: admin + manager +
+     * STAFF (staff "execute campaigns" per spec §4.2 — if staff couldn't
+     * invite, "execute" would be hollow).
+     */
+    public function invite(User $user, Campaign $campaign): bool
+    {
+        return $this->hasAnyRole($user, [
+            AgencyRole::AgencyAdmin,
+            AgencyRole::AgencyManager,
+            AgencyRole::AgencyStaff,
+        ]);
     }
 
     private function membership(User $user): ?AgencyMembership

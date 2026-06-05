@@ -33,6 +33,7 @@ use Laravel\Pennant\Feature;
  *
  * The graph (docs/03-DATA-MODEL.md §7):
  *   invited → {declined, countered, accepted}
+ *   countered → invited (re-invite, D-7 — the agency re-offers)
  *   accepted → contracted (flag-gated) → producing → draft_submitted
  *   draft_submitted → {revision_requested → producing(loop), approved}
  *   approved → posted → live_verified → payment_held → payment_released
@@ -45,9 +46,9 @@ use Laravel\Pennant\Feature;
  * gated on the `contract_signing_enabled` flag (the e-sign mock exists).
  *
  * Note: the `invited` ENTRY state is set by the invite flow (Chunk 2), not by
- * a transition here. `countered` re-offer = the agency re-inviting (Chunk 2's
- * invite flow), so `countered` has no outgoing edge here except cancel (D-7,
- * no multi-round negotiation loop).
+ * a transition here. The agency re-offer after a counter IS a machine edge now
+ * ({@see reinvite()}, `countered → invited`, D-7) — single-shot, not an
+ * unbounded negotiation loop.
  */
 final class CampaignAssignmentStateMachine
 {
@@ -94,6 +95,41 @@ final class CampaignAssignmentStateMachine
             context: [
                 'countered_fee_minor_units' => $counteredFeeMinorUnits,
                 'countered_fee_currency' => $counteredFeeCurrency,
+            ],
+        );
+    }
+
+    /**
+     * countered → invited (D-7). The agency's response to a creator counter:
+     * re-open the invitation with a fresh agreed fee. A GUARDED machine edge —
+     * the machine stays the sole status authority (no raw back-write). The new
+     * offer OVERWRITES `agreed_fee_*`; the prior `countered_fee_*` and the
+     * `responded_at` stamp are cleared so the re-opened invite reads cleanly
+     * (single-shot: counter → re-invite → accept/decline, no unbounded loop).
+     */
+    public function reinvite(
+        CampaignAssignment $assignment,
+        int $agreedFeeMinorUnits,
+        string $agreedFeeCurrency,
+        ?User $actor = null,
+    ): CampaignAssignment {
+        $this->assertSource($assignment, [AssignmentStatus::Countered], AssignmentStatus::Invited);
+
+        return $this->commit(
+            $assignment,
+            AssignmentStatus::Invited,
+            AuditAction::AssignmentReInvited,
+            $actor,
+            mutate: function (CampaignAssignment $a) use ($agreedFeeMinorUnits, $agreedFeeCurrency): void {
+                $a->agreed_fee_minor_units = $agreedFeeMinorUnits;
+                $a->agreed_fee_currency = $agreedFeeCurrency;
+                $a->countered_fee_minor_units = null;
+                $a->countered_fee_currency = null;
+                $a->responded_at = null;
+            },
+            context: [
+                'agreed_fee_minor_units' => $agreedFeeMinorUnits,
+                'agreed_fee_currency' => $agreedFeeCurrency,
             ],
         );
     }

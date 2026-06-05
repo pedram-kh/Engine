@@ -1060,7 +1060,7 @@ anyone reviewing it later.
 - **Resolution:** Sprint 8 (brand-level campaign matching) consumes `brand_creator_blacklists` at match time — `blacklist_type='hard'` excludes the creator from that brand's matchable pool, `soft` surfaces a warning. The agency→brand derivation is `brands.agency_id` (no `agency_id` on the blacklist table by design — D-2).
 - **Triggered by:** Sprint 8 brand-level campaign matching.
 - **Owner:** Sprint 8 (campaign matching).
-- **Status:** open (deferred by design). Surfaced + accepted by Sprint 7, 2026-06-04 ([review](reviews/sprint-7-review.md)).
+- **Status:** ✅ **RESOLVED — Sprint 8 Chunk 2 (2026-06-05, [review](reviews/sprint-8-chunk-2-review.md)).** The agency invite create-path (`POST agencies/{agency}/campaigns/{campaign}/assignments`) now runs the two-tier gate's **hard-blacklist predicate** ([`AssignmentInviteGate::isHardBlacklisted`](../apps/api/app/Modules/Campaigns/Services/AssignmentInviteGate.php)), which composes BOTH scopes — agency-wide hard on `agency_creator_relations` **and** a hard `brand_creator_blacklists` row for `(campaign.brand_id, creator_id)`. A hard brand-scoped row for THIS campaign's brand now returns `422 assignment.blacklisted`; a row for a DIFFERENT brand does not block (per-brand scope, `brands.agency_id` derivation). Pinned by `CampaignAssignmentInviteTest` (the deferred-promise break-revert: dropping the brand predicate makes the invite wrongly succeed). Soft (either scope) does not block.
 
 ---
 
@@ -1149,3 +1149,27 @@ anyone reviewing it later.
 - **Resolution:** Sprint 9 owns both migrations + their models/flows; the `draft_submitted`/`posted` states they hang off already exist in the enum + state machine.
 - **Owner:** Sprint 9 (drafts + posted content).
 - **Status:** open (deferred by design → S9). Surfaced + accepted by Sprint 8 Chunk 1, 2026-06-05 ([review](reviews/sprint-8-chunk-1-review.md)).
+
+---
+
+## Assignment fee is NOT validated against the campaign budget (Sprint 8 Chunk 2)
+
+- **Where:** [`InviteAssignmentRequest`](../apps/api/app/Modules/Campaigns/Http/Requests/InviteAssignmentRequest.php), [`ReinviteAssignmentRequest`](../apps/api/app/Modules/Campaigns/Http/Requests/ReinviteAssignmentRequest.php), [`CounterAssignmentRequest`](../apps/api/app/Modules/Creators/Http/Requests/CounterAssignmentRequest.php) (the three fee-bearing FormRequests).
+- **What we accepted in Sprint 8 Chunk 2 (2026-06-05, D-8):** the `agreed_fee_*` (invite/re-invite) and `countered_fee_*` (creator counter) validation enforces only **shape** — a positive integer in minor units + an ISO-3 currency matching the campaign's `budget_currency` when set. It is deliberately **NOT** constrained against `campaign.budget_minor_units`: neither the per-assignment fee nor the sum of all assignment fees is checked against the campaign budget. Per-assignment-vs-budget (and aggregate-spend-vs-budget) is a **business-tracking** concern, not a per-field validation rule, so it is out of scope this chunk.
+- **Risk:** low. Over-committing a campaign's budget is an agency-internal financial concern, not a tenancy/security boundary; the fees are recorded faithfully (in minor units, currency-checked) so a future budget-tracking surface has clean data to aggregate. Nothing silently breaks — an agency can simply invite past the budget today.
+- **Resolution:** a future budget-tracking chunk surfaces committed-vs-budget (sum of `agreed_fee_minor_units` across non-terminal assignments vs `campaign.budget_minor_units`), as a soft warning or a hard cap per product call — TBD.
+- **Triggered by:** the budget-tracking / campaign-spend workstream (unscheduled).
+- **Owner:** Sprint 8+ (campaign finance).
+- **Status:** open (deferred by design). Surfaced + accepted by Sprint 8 Chunk 2, 2026-06-05 ([review](reviews/sprint-8-chunk-2-review.md)).
+
+---
+
+## Nullable `campaign.budget_currency` weakens the assignment-fee currency check (Sprint 8 Chunk 2)
+
+- **Where:** the same three fee FormRequests above; the campaign currency source is `campaigns.budget_currency`, which is **nullable**.
+- **What we accepted in Sprint 8 Chunk 2 (2026-06-05, divergence #2):** D-8 says the fee currency must equal the campaign's single currency. But `budget_currency` is nullable (a campaign can exist with no budget set). The rule therefore validates `fee_currency === campaign.budget_currency` **only when `budget_currency` is set**; when it is `null`, any valid ISO-3 code is accepted (there is no campaign currency to match against). This keeps invite/counter buildable on budget-less campaigns rather than hard-blocking them.
+- **Risk:** low. The window is narrow (a budget-less campaign) and the fee currency is still shape-valid (ISO-3); the only gap is that two assignments on the same budget-less campaign could in principle carry different currencies. No security/tenancy impact.
+- **Resolution:** if/when `budget_currency` becomes required at campaign creation (or a campaign-level currency is split out from the budget), tighten the rule to always match. Until then the conditional match is the correct behaviour for the nullable column.
+- **Triggered by:** a future change making campaign currency mandatory.
+- **Owner:** Sprint 8+ (campaigns).
+- **Status:** open (deferred by design — conditional on a nullable column). Surfaced + accepted by Sprint 8 Chunk 2, 2026-06-05 ([review](reviews/sprint-8-chunk-2-review.md)).
