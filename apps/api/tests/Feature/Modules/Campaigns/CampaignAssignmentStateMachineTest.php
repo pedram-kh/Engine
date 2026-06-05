@@ -45,6 +45,12 @@ function lastAuditFor(CampaignAssignment $assignment, AuditAction $action): ?Aud
         ->first();
 }
 
+/** Reload from the DB, narrowed non-null (the row always exists in these tests). */
+function reload(CampaignAssignment $assignment): CampaignAssignment
+{
+    return $assignment->fresh() ?? $assignment;
+}
+
 // ---------------------------------------------------------------------------
 // LEGAL transitions — each fires + logs the right verb + stamps the timestamp.
 // ---------------------------------------------------------------------------
@@ -55,8 +61,8 @@ it('decline: invited → declined logs assignment.declined + stamps responded_at
 
     sm()->decline($assignment);
 
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Declined)
-        ->and($assignment->fresh()->responded_at)->not->toBeNull();
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::Declined)
+        ->and(reload($assignment)->responded_at)->not->toBeNull();
 
     expect(lastAuditFor($assignment, AuditAction::AssignmentDeclined))->not->toBeNull();
 
@@ -73,7 +79,7 @@ it('accept: invited → accepted logs assignment.accepted + stamps responded_at 
 
     sm()->accept($assignment);
 
-    $fresh = $assignment->fresh();
+    $fresh = reload($assignment);
     expect($fresh->status)->toBe(AssignmentStatus::Accepted)
         ->and($fresh->responded_at)->not->toBeNull()
         ->and($fresh->accepted_at)->not->toBeNull();
@@ -88,7 +94,7 @@ it('counter: invited → countered records countered_fee and NOT agreed_fee (D-7
 
     sm()->counter($assignment, 750_000, 'EUR');
 
-    $fresh = $assignment->fresh();
+    $fresh = reload($assignment);
     expect($fresh->status)->toBe(AssignmentStatus::Countered)
         ->and($fresh->countered_fee_minor_units)->toBe(750_000)
         ->and($fresh->countered_fee_currency)->toBe('EUR')
@@ -97,8 +103,8 @@ it('counter: invited → countered records countered_fee and NOT agreed_fee (D-7
         ->and($fresh->responded_at)->not->toBeNull();
 
     $audit = lastAuditFor($assignment, AuditAction::AssignmentCountered);
-    expect($audit)->not->toBeNull()
-        ->and($audit->metadata['countered_fee_minor_units'])->toBe(750_000);
+    expect($audit)->not->toBeNull();
+    expect(($audit->metadata ?? [])['countered_fee_minor_units'] ?? null)->toBe(750_000);
 });
 
 it('contract: accepted → contracted is reachable when contract_signing_enabled is ON', function (): void {
@@ -107,7 +113,7 @@ it('contract: accepted → contracted is reachable when contract_signing_enabled
 
     sm()->contract($assignment);
 
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Contracted);
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::Contracted);
     expect(lastAuditFor($assignment, AuditAction::AssignmentContracted))->not->toBeNull();
 });
 
@@ -116,7 +122,7 @@ it('startProducing: contracted → producing logs assignment.producing', functio
 
     sm()->startProducing($assignment);
 
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Producing);
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::Producing);
     expect(lastAuditFor($assignment, AuditAction::AssignmentProducing))->not->toBeNull();
 });
 
@@ -125,7 +131,7 @@ it('submitDraft: producing → draft_submitted stamps submitted_draft_at', funct
 
     sm()->submitDraft($assignment);
 
-    $fresh = $assignment->fresh();
+    $fresh = reload($assignment);
     expect($fresh->status)->toBe(AssignmentStatus::DraftSubmitted)
         ->and($fresh->submitted_draft_at)->not->toBeNull();
     expect(lastAuditFor($assignment, AuditAction::AssignmentDraftSubmitted))->not->toBeNull();
@@ -135,12 +141,12 @@ it('requestRevision: draft_submitted → revision_requested, then the loop back 
     $assignment = assignmentInStatus(AssignmentStatus::DraftSubmitted);
 
     sm()->requestRevision($assignment);
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::RevisionRequested);
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::RevisionRequested);
     expect(lastAuditFor($assignment, AuditAction::AssignmentRevisionRequested))->not->toBeNull();
 
     // The review loop: revision_requested → producing.
     sm()->startProducing($assignment);
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Producing);
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::Producing);
 });
 
 it('approve: draft_submitted → approved fires the board verb assignment.draft_approved + stamps approved_at', function (): void {
@@ -148,7 +154,7 @@ it('approve: draft_submitted → approved fires the board verb assignment.draft_
 
     sm()->approve($assignment);
 
-    $fresh = $assignment->fresh();
+    $fresh = reload($assignment);
     expect($fresh->status)->toBe(AssignmentStatus::Approved)
         ->and($fresh->approved_at)->not->toBeNull();
     // Verb != landing-state name — it is the board event-key.
@@ -160,7 +166,7 @@ it('markPosted: approved → posted fires the board verb assignment.posted_by_cr
 
     sm()->markPosted($assignment);
 
-    $fresh = $assignment->fresh();
+    $fresh = reload($assignment);
     expect($fresh->status)->toBe(AssignmentStatus::Posted)
         ->and($fresh->posted_at)->not->toBeNull();
     expect(lastAuditFor($assignment, AuditAction::AssignmentPostedByCreator))->not->toBeNull();
@@ -184,7 +190,7 @@ it('rejects invited → contracted (skipping accept) with a typed invalid_transi
     }
 
     // Fail-closed: status unchanged, no audit, no event.
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Invited);
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::Invited);
 });
 
 it('rejects every illegal source → target pair fail-closed', function (string $method, string $from): void {
@@ -195,7 +201,7 @@ it('rejects every illegal source → target pair fail-closed', function (string 
         ->toThrow(AssignmentTransitionException::class);
 
     // No write happened — the source state is preserved.
-    expect($assignment->fresh()->status->value)->toBe($from);
+    expect(reload($assignment)->status->value)->toBe($from);
 })->with([
     // accept only legal from invited
     'accept from accepted' => ['accept', 'accepted'],
@@ -244,14 +250,14 @@ it('cancels from every non-terminal state → cancelled (stamps reason + actor +
 
     sm()->cancel($assignment, 'Brand pulled the budget');
 
-    $fresh = $assignment->fresh();
+    $fresh = reload($assignment);
     expect($fresh->status)->toBe(AssignmentStatus::Cancelled)
         ->and($fresh->cancelled_at)->not->toBeNull()
         ->and($fresh->cancelled_reason)->toBe('Brand pulled the budget');
 
     $audit = lastAuditFor($assignment, AuditAction::AssignmentCancelled);
     expect($audit)->not->toBeNull()
-        ->and($audit->reason)->toBe('Brand pulled the budget');
+        ->and($audit?->reason)->toBe('Brand pulled the budget');
 })->with([
     'invited' => ['invited'],
     'countered' => ['countered'],
@@ -276,7 +282,7 @@ it('rejects cancelling a terminal assignment', function (string $from): void {
         expect($e->errorCode)->toBe('assignment.terminal');
     }
 
-    expect($assignment->fresh()->status->value)->toBe($from);
+    expect(reload($assignment)->status->value)->toBe($from);
 })->with([
     'declined' => ['declined'],
     'payment_released' => ['payment_released'],
@@ -293,7 +299,7 @@ it('rejects cancel without a reason', function (): void {
         expect($e->errorCode)->toBe('assignment.reason_required');
     }
 
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Invited);
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::Invited);
 });
 
 // ---------------------------------------------------------------------------
@@ -312,7 +318,7 @@ it('verifyLive is vendor-gated (social adapter) — source guard passes but the 
     }
 
     // No state change, no audit, no event — truly unreachable.
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Posted);
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::Posted);
     expect(lastAuditFor($assignment, AuditAction::AssignmentLiveVerified))->toBeNull();
     Event::assertNotDispatched(AssignmentTransitioned::class);
 });
@@ -338,7 +344,7 @@ it('holdPayment + releasePayment are escrow-gated (Sprint 10) — no manual path
     } catch (AssignmentTransitionGatedException $e) {
         expect($e->errorCode)->toBe('assignment.escrow_unavailable');
     }
-    expect($held->fresh()->status)->toBe(AssignmentStatus::LiveVerified);
+    expect(reload($held)->status)->toBe(AssignmentStatus::LiveVerified);
 
     $released = assignmentInStatus(AssignmentStatus::PaymentHeld);
     try {
@@ -347,7 +353,7 @@ it('holdPayment + releasePayment are escrow-gated (Sprint 10) — no manual path
     } catch (AssignmentTransitionGatedException $e) {
         expect($e->errorCode)->toBe('assignment.escrow_unavailable');
     }
-    expect($released->fresh()->status)->toBe(AssignmentStatus::PaymentHeld);
+    expect(reload($released)->status)->toBe(AssignmentStatus::PaymentHeld);
 });
 
 it('contract is gated when contract_signing_enabled is OFF (no transition)', function (): void {
@@ -361,5 +367,5 @@ it('contract is gated when contract_signing_enabled is OFF (no transition)', fun
         expect($e->errorCode)->toBe('assignment.contract_signing_disabled');
     }
 
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Accepted);
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::Accepted);
 });

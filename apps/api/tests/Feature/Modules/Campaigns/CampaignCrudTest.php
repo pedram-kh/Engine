@@ -18,6 +18,12 @@ function campaignsUrl(Agency $agency, string $query = ''): string
     return "/api/v1/agencies/{$agency->ulid}/campaigns".($query === '' ? '' : "?{$query}");
 }
 
+/** Reload from the DB, narrowed non-null (the row always exists in these tests). */
+function reloadCampaign(Campaign $campaign): Campaign
+{
+    return $campaign->fresh() ?? $campaign;
+}
+
 /**
  * @return array<string, mixed>
  */
@@ -56,7 +62,7 @@ it('lets an admin create a campaign — brief lands in the jsonb, money is minor
         ->assertJsonPath('data.relationships.brand.data.id', $brand->ulid);
 
     $campaign = Campaign::query()->where('agency_id', $agency->id)->firstOrFail();
-    expect($campaign->brief['hashtags'])->toBe(['#summer'])
+    expect($campaign->brief['hashtags'] ?? null)->toBe(['#summer'])
         ->and($campaign->budget_minor_units)->toBe(2_500_000)
         ->and($campaign->budget_minor_units)->toBeInt()
         ->and($campaign->created_by_user_id)->toBe($admin->id);
@@ -191,8 +197,8 @@ it('lets an admin edit campaign settings (status) + logs campaign.updated', func
         'budget_minor_units' => 9_999_999,
     ])->assertOk()->assertJsonPath('data.attributes.status', 'active');
 
-    expect($campaign->fresh()->status)->toBe(CampaignStatus::Active)
-        ->and($campaign->fresh()->budget_minor_units)->toBe(9_999_999);
+    expect(reloadCampaign($campaign)->status)->toBe(CampaignStatus::Active)
+        ->and(reloadCampaign($campaign)->budget_minor_units)->toBe(9_999_999);
     expect(AuditLog::query()->where('action', 'campaign.updated')->where('subject_id', $campaign->id)->exists())->toBeTrue();
 });
 
@@ -205,7 +211,7 @@ it('forbids a staff member from editing campaign settings (403)', function (): v
         'status' => 'active',
     ])->assertForbidden();
 
-    expect($campaign->fresh()->status)->toBe(CampaignStatus::Draft);
+    expect(reloadCampaign($campaign)->status)->toBe(CampaignStatus::Draft);
 });
 
 // ── Creators tab assignment list (read-only, Chunk 1) ─────────────────────────
