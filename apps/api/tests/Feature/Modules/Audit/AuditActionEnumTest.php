@@ -102,6 +102,25 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'integration.webhook.received',
         'integration.webhook.processed',
         'integration.webhook.signature_failed',
+        // Sprint 8 Chunk 1 — campaign CRUD
+        'campaign.created',
+        'campaign.updated',
+        // Sprint 8 Chunk 1 — campaign-assignment state-machine transitions
+        // (the board's future event vocabulary — matches 10-BOARD-AUTOMATION §2).
+        'assignment.invited',
+        'assignment.declined',
+        'assignment.countered',
+        'assignment.accepted',
+        'assignment.contracted',
+        'assignment.producing',
+        'assignment.draft_submitted',
+        'assignment.revision_requested',
+        'assignment.draft_approved',
+        'assignment.posted_by_creator',
+        'assignment.live_verified',
+        'assignment.payment_funded',
+        'assignment.payment_released',
+        'assignment.cancelled',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());
@@ -125,6 +144,7 @@ it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', functi
         'user.deleted',
         'user.suspended',
         'user.unsuspended',
+        'assignment.cancelled',
     ]);
 });
 

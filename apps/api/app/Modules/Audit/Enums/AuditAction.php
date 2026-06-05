@@ -203,6 +203,38 @@ enum AuditAction: string
     case TalentPoolCreatorAdded = 'talent_pool.creator_added';
     case TalentPoolCreatorRemoved = 'talent_pool.creator_removed';
 
+    // Campaign CRUD (Sprint 8 Chunk 1, D-9). Logged MANUALLY by
+    // CampaignController (the Brand precedent) — the free-text `brief` blob
+    // is never snapshotted.
+    case CampaignCreated = 'campaign.created';
+    case CampaignUpdated = 'campaign.updated';
+
+    // CampaignAssignment state-machine transitions (Sprint 8 Chunk 1, D-9).
+    // These verbs ARE the board's future event vocabulary (the deferral
+    // discipline) — they match the docs/10-BOARD-AUTOMATION.md §2 event-key
+    // catalogue EXACTLY, so the board sprint stays purely additive. Note the
+    // verb is NOT always the landing-state name: the transition INTO `approved`
+    // fires `assignment.draft_approved`, INTO `posted` fires
+    // `assignment.posted_by_creator`, INTO `payment_held` fires
+    // `assignment.payment_funded`. `assignment.producing` is a campaign-module
+    // transition verb (no board automation maps to it — the card waits for
+    // draft_submitted). Logged at transition time by
+    // CampaignAssignmentStateMachine; `assignment.cancelled` requires a reason.
+    case AssignmentInvited = 'assignment.invited';
+    case AssignmentDeclined = 'assignment.declined';
+    case AssignmentCountered = 'assignment.countered';
+    case AssignmentAccepted = 'assignment.accepted';
+    case AssignmentContracted = 'assignment.contracted';
+    case AssignmentProducing = 'assignment.producing';
+    case AssignmentDraftSubmitted = 'assignment.draft_submitted';
+    case AssignmentRevisionRequested = 'assignment.revision_requested';
+    case AssignmentDraftApproved = 'assignment.draft_approved';
+    case AssignmentPostedByCreator = 'assignment.posted_by_creator';
+    case AssignmentLiveVerified = 'assignment.live_verified';
+    case AssignmentPaymentFunded = 'assignment.payment_funded';
+    case AssignmentPaymentReleased = 'assignment.payment_released';
+    case AssignmentCancelled = 'assignment.cancelled';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *
@@ -216,7 +248,10 @@ enum AuditAction: string
             self::AuthAccountUnlocked,
             self::UserSuspended,
             self::UserUnsuspended,
-            self::UserDeleted => true,
+            self::UserDeleted,
+            // Cancel always carries a mandatory reason (D-9 — the
+            // `cancelled_reason` column + this gate enforce it).
+            self::AssignmentCancelled => true,
             default => false,
         };
     }

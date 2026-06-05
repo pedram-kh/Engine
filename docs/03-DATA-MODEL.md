@@ -489,37 +489,39 @@ Pool membership (Sprint 6 Chunk 2b). A first-class pivot model (`App\Modules\Tal
 
 The heart of the system. One assignment = one creator engaged on one campaign.
 
-| Column                               | Type             | Notes                                              | Phase |
-| ------------------------------------ | ---------------- | -------------------------------------------------- | ----- |
-| `id`                                 | bigint PK        |                                                    | P1    |
-| `ulid`                               | char(26) unique  |                                                    | P1    |
-| `agency_id`                          | bigint FK        | `agencies.id`, RESTRICT (denormalized for tenancy) | P1    |
-| `campaign_id`                        | bigint FK        | `campaigns.id`, CASCADE                            | P1    |
-| `brand_id`                           | bigint FK        | `brands.id`, RESTRICT (denormalized)               | P1    |
-| `creator_id`                         | bigint FK        | `creators.id`, RESTRICT                            | P1    |
-| `status`                             | varchar(32)      | See state machine below                            | P1    |
-| `invited_at`                         | timestamptz null |                                                    | P1    |
-| `invited_by_user_id`                 | bigint FK null   |                                                    | P1    |
-| `responded_at`                       | timestamptz null | When creator accepted/declined/countered           | P1    |
-| `accepted_at`                        | timestamptz null |                                                    | P1    |
-| `contract_id`                        | bigint FK null   | `contracts.id` if a per-campaign addendum          | P1    |
-| `agreed_fee_minor_units`             | bigint null      | Final agreed fee                                   | P1    |
-| `agreed_fee_currency`                | char(3) null     |                                                    | P1    |
-| `markup_minor_units`                 | bigint null      | Hidden from brand (margin agency adds)             | P1    |
-| `total_charged_to_brand_minor_units` | bigint null      | What the brand sees / pays                         | P1    |
-| `deliverables`                       | jsonb            | Specific list (overrides campaign brief if set)    | P1    |
-| `posting_due_at`                     | timestamptz null |                                                    | P1    |
-| `submitted_draft_at`                 | timestamptz null |                                                    | P1    |
-| `approved_at`                        | timestamptz null |                                                    | P1    |
-| `posted_at`                          | timestamptz null |                                                    | P1    |
-| `verified_live_at`                   | timestamptz null | When social API confirmed post is live             | P1    |
-| `payment_id`                         | bigint FK null   | `payments.id`                                      | P1    |
-| `cancelled_at`                       | timestamptz null |                                                    | P1    |
-| `cancelled_reason`                   | text null        |                                                    | P1    |
-| `cancelled_by_user_id`               | bigint FK null   |                                                    | P1    |
-| `notes`                              | text null        | Internal agency notes                              | P1    |
-| `created_at`, `updated_at`           | timestamptz      |                                                    | P1    |
-| `deleted_at`                         | timestamptz null |                                                    | P1    |
+| Column                               | Type             | Notes                                                             | Phase |
+| ------------------------------------ | ---------------- | ----------------------------------------------------------------- | ----- |
+| `id`                                 | bigint PK        |                                                                   | P1    |
+| `ulid`                               | char(26) unique  |                                                                   | P1    |
+| `agency_id`                          | bigint FK        | `agencies.id`, RESTRICT (denormalized for tenancy)                | P1    |
+| `campaign_id`                        | bigint FK        | `campaigns.id`, CASCADE                                           | P1    |
+| `brand_id`                           | bigint FK        | `brands.id`, RESTRICT (denormalized)                              | P1    |
+| `creator_id`                         | bigint FK        | `creators.id`, RESTRICT                                           | P1    |
+| `status`                             | varchar(32)      | See state machine below                                           | P1    |
+| `invited_at`                         | timestamptz null |                                                                   | P1    |
+| `invited_by_user_id`                 | bigint FK null   |                                                                   | P1    |
+| `responded_at`                       | timestamptz null | When creator accepted/declined/countered                          | P1    |
+| `accepted_at`                        | timestamptz null |                                                                   | P1    |
+| `contract_id`                        | bigint FK null   | `contracts.id` if a per-campaign addendum                         | P1    |
+| `agreed_fee_minor_units`             | bigint null      | Final agreed fee                                                  | P1    |
+| `agreed_fee_currency`                | char(3) null     |                                                                   | P1    |
+| `countered_fee_minor_units`          | bigint null      | Creator's counter-offer (Sprint-8 addition, D-7) — see note below | P1    |
+| `countered_fee_currency`             | char(3) null     | Sprint-8 addition (D-7)                                           | P1    |
+| `markup_minor_units`                 | bigint null      | Hidden from brand (margin agency adds)                            | P1    |
+| `total_charged_to_brand_minor_units` | bigint null      | What the brand sees / pays                                        | P1    |
+| `deliverables`                       | jsonb            | Specific list (overrides campaign brief if set)                   | P1    |
+| `posting_due_at`                     | timestamptz null |                                                                   | P1    |
+| `submitted_draft_at`                 | timestamptz null |                                                                   | P1    |
+| `approved_at`                        | timestamptz null |                                                                   | P1    |
+| `posted_at`                          | timestamptz null |                                                                   | P1    |
+| `verified_live_at`                   | timestamptz null | When social API confirmed post is live                            | P1    |
+| `payment_id`                         | bigint FK null   | `payments.id`                                                     | P1    |
+| `cancelled_at`                       | timestamptz null |                                                                   | P1    |
+| `cancelled_reason`                   | text null        |                                                                   | P1    |
+| `cancelled_by_user_id`               | bigint FK null   |                                                                   | P1    |
+| `notes`                              | text null        | Internal agency notes                                             | P1    |
+| `created_at`, `updated_at`           | timestamptz      |                                                                   | P1    |
+| `deleted_at`                         | timestamptz null |                                                                   | P1    |
 
 **State machine for `status`:**
 
@@ -553,6 +555,8 @@ Cancellation can happen from any non-terminal state → cancelled (terminal)
 
 State transitions are managed by `CampaignAssignmentStateMachine` service. Every transition is logged in `audit_logs` and may trigger card movement on the board.
 
+> **`countered_fee_*` — Sprint-8 addition (Chunk 1, D-7).** The state machine's `counter()` transition (`invited → countered`) records the creator's counter-offer in `countered_fee_minor_units`/`countered_fee_currency` **without overwriting `agreed_fee_*`** — the agency's original offer is preserved alongside the counter so the negotiation delta is inspectable. As-built `status` is `varchar(32)`. The negotiation **loop** (multiple back-and-forth rounds) is **not** built — a single counter is recorded, then the next move is accept/decline; see `tech-debt.md` (counter-minimal).
+
 **Indexes:**
 
 - `unique_assignment_campaign_creator` on (`campaign_id`, `creator_id`) — one assignment per pair
@@ -562,6 +566,8 @@ State transitions are managed by `CampaignAssignmentStateMachine` service. Every
 - `idx_assignments_dates` on `posting_due_at`
 
 ### `campaign_drafts`
+
+> **⏳ Deferred to Sprint 9 (logged in `tech-debt.md`).** Spec'd here but **not migrated** in Sprint 8 Chunk 1. `campaign_assignments` carries **no FK** to this table (drafts are children of the assignment, pointing _up_ via `assignment_id`), and `draft_submitted` is only an `AssignmentStatus` enum value — nothing in Chunk 1 reads or writes a draft row, so the table is safely deferred to the chunk that builds the draft-submission/review flow.
 
 Draft submissions for review.
 
@@ -590,6 +596,8 @@ Draft submissions for review.
 | `created_at`, `updated_at`   | timestamptz      |                                                                       | P1                  |
 
 ### `campaign_posted_content`
+
+> **⏳ Deferred to Sprint 9 (logged in `tech-debt.md`).** Spec'd here but **not migrated** in Sprint 8 Chunk 1 — same reasoning as `campaign_drafts`: it is a child of the assignment (`assignment_id` points up), the `posted`/`live_verified` states are vendor-gated and unreachable by any manual path this chunk, and nothing in Chunk 1 references it. Deferred to the chunk that builds posted-content verification.
 
 Tracks the actual published post on social.
 

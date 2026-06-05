@@ -1101,3 +1101,51 @@ anyone reviewing it later.
 - **What it was:** `composer stan` (Larastan, level 8) reported **2 errors** on the one line — `Unable to resolve the template type TKey in call to function collect` + `… TValue …` (identifier `argument.templateType`). The test passed `collect($response->json('data'))` a `mixed` (`TestResponse::json()` returns `mixed`), so Larastan couldn't infer `collect()`'s `TKey`/`TValue`. Backend CI runs Larastan **before** Pest, so this gated the whole backend job (Pest never ran) — the working-tree/CI red on `1e26f39` (and surfaced again on the blacklist-in-pools push) was **this**, not the feature chunks. Pre-existing, untouched by the recent chunks.
 - **✅ RESOLVED — 2026-06-05, commit `774168d`.** Cast the `mixed` to `array` — `collect((array) $response->json('data'))` — mirroring the `(array)` idiom the membership tests already use, so `collect()` resolves concrete template types. Verified: full `composer stan` is **0 errors** (526 files) and CI on `774168d` is green (all four jobs). No production code touched — a one-line test-only fix.
 - **Note:** the original intent was to _log_ this as open red with a "tidy whenever something next touches the file" trigger; by the time the housekeeping pass ran it had already been fixed in the CI-unblock commit above, so it is recorded here as **resolved** rather than open. The unrelated `block_type` column on `creator_availability_blocks` (data-model §6/availability) is a legitimate as-built name, not part of this red.
+
+---
+
+## Assignment board is event-emitting but listener-less (the board sprint is purely additive)
+
+- **Where:** the state machine [`CampaignAssignmentStateMachine`](../apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php) dispatches `AssignmentTransitioned` (implementing [`AssignmentEventContract`](../apps/api/app/Modules/Campaigns/Events/AssignmentEventContract.php)) on **every** legal transition, carrying `{from, to}`, the board-key `eventKey()` (an [`AuditAction`](../apps/api/app/Modules/Audit/Enums/AuditAction.php)), and `triggeredByUserId`. There is **no listener** registered for it anywhere.
+- **What we accepted in Sprint 8 Chunk 1 (2026-06-05, D-9):** the machine **double-writes** — it logs to `audit_logs` directly **AND** dispatches a Laravel domain event — but ships **no consumer**. The event is the **board's future vocabulary, declared early**: the audit-verb catalogue and the event-key catalogue were deliberately aligned (D-9), so the board sprint can subscribe a listener without the machine changing at all. Three verbs intentionally differ from their landing-state because they match the **board event-key catalogue** ([`10-BOARD-AUTOMATION.md`](10-BOARD-AUTOMATION.md)) not the status enum: `assignment.draft_approved` (→`approved`), `assignment.posted_by_creator` (→`posted`), `assignment.payment_funded` (→`payment_held`).
+- **Risk:** very low. A dispatched event with no listener is a no-op; nothing depends on it yet. The only cost is that the event class set must stay in step with the verb catalogue (pinned by the state-machine tests + `AuditActionEnumTest`).
+- **Triggered by:** the board-automation sprint — it registers the listener that turns these events into card movements.
+- **Resolution:** the board sprint owns the listener; the emitter + vocabulary are already in place (purely additive).
+- **Owner:** future board-automation workstream.
+- **Status:** open (deferred by design — emitter shipped, consumer deferred). Surfaced + accepted by Sprint 8 Chunk 1, 2026-06-05 ([review](reviews/sprint-8-chunk-1-review.md)).
+
+---
+
+## Counter-offer is single-shot, not a negotiation loop
+
+- **Where:** [`CampaignAssignmentStateMachine::counter()`](../apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php) (`invited → countered`) + the `countered_fee_minor_units`/`countered_fee_currency` columns on `campaign_assignments` ([`03-DATA-MODEL.md §7`](03-DATA-MODEL.md)).
+- **What we accepted in Sprint 8 Chunk 1 (2026-06-05, D-7):** `counter()` records **one** creator counter-offer in the net-new `countered_fee_*` columns (preserving the agency's original `agreed_fee_*` so the delta is inspectable). There is **no multi-round back-and-forth** — `countered` is a single landing state from which the next legal move is accept/decline; the machine has no `countered → countered` re-counter edge and no per-round history table.
+- **Risk:** low. The single-counter model captures the common case (one number comes back); a richer negotiation is a Phase-2+ concern. The columns + the `assignment.countered` board verb are in place, so promoting to a loop is additive.
+- **Triggered by:** product demand for true multi-round negotiation (re-counter / counter-the-counter), or a negotiation-history requirement.
+- **Resolution:** add a `countered → countered` edge (or a `assignment_fee_offers` history table) when the loop is needed; until then single-shot is the honest v1.
+- **Owner:** future campaigns/negotiation workstream.
+- **Status:** open (deferred by design — single counter, no loop). Surfaced + accepted by Sprint 8 Chunk 1, 2026-06-05 ([review](reviews/sprint-8-chunk-1-review.md)).
+
+---
+
+## Vendor-gated assignment transitions are built + guarded but unreachable (social verification + escrow parked)
+
+- **Where:** [`CampaignAssignmentStateMachine`](../apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php) — the `verifyLive()` (`posted → live_verified`), `holdPayment()` (`live_verified → payment_held`), and `releasePayment()` (`payment_held → payment_released`) transitions, each fronted by an `assertVendorAvailable()` gate that throws [`AssignmentTransitionGatedException`](../apps/api/app/Modules/Campaigns/Exceptions/AssignmentTransitionGatedException.php). `accepted → contracted` is separately gated on the `ContractSigningEnabled` Pennant flag.
+- **What we accepted in Sprint 8 Chunk 1 (2026-06-05, D-6):** these transitions have full source-guards + audit + event wiring, but the vendor gate **refuses every call** — social verification is parked (the social adapter is not integrated) and escrow funding/payout is Sprint 10. So `live_verified`, `payment_held`, and `payment_released` are **states no manual path can reach** this chunk; the contract step is reachable only when the `ContractSigningEnabled` mock flag is on. This is verified by the state-machine tests (the gated transitions throw `AssignmentTransitionGatedException`; no legal path lands on the gated states with the gate closed).
+- **Risk:** low and fail-closed — the gate is a hard refusal, not a silent skip, so a premature call surfaces as a typed error rather than a half-finished state. The cost is that the post→verify→pay tail of the lifecycle is inert until its vendors land.
+- **Triggered by:** (1) the social-integration chunk wires real post verification → flip the `verifyLive` gate open; (2) Sprint 10 escrow wires funding/payout → flip the `holdPayment`/`releasePayment` gates open; (3) contract e-sign goes live → default `ContractSigningEnabled` on.
+- **Resolution:** each vendor chunk owns flipping its own gate; the transitions + guards + board verbs are already in place (additive).
+- **Owner:** future social-integration + Sprint-10 payments workstreams.
+- **Status:** open (deferred by design — gated unreachable). Surfaced + accepted by Sprint 8 Chunk 1, 2026-06-05 ([review](reviews/sprint-8-chunk-1-review.md)).
+
+---
+
+## `campaign_drafts` + `campaign_posted_content` tables deferred to Sprint 9
+
+- **Where:** spec'd at [`03-DATA-MODEL.md §7`](03-DATA-MODEL.md) (`campaign_drafts`, `campaign_posted_content`); **no migration** builds them in Sprint 8 Chunk 1.
+- **What we accepted in Sprint 8 Chunk 1 (2026-06-05, D-4):** both tables are deferred. The finding that made this safe: `campaign_assignments` carries **no FK** to either table — they are **children** of the assignment (each points _up_ via `assignment_id`), and `draft_submitted` is only an `AssignmentStatus` enum value. Nothing in Chunk 1 reads or writes a draft or posted-content row, so deferring them is a pure no-op for everything shipped this chunk.
+- **Risk:** low. The dependency direction (children → assignment) means the parent table is complete without them; building them later is additive and touches no Chunk-1 code.
+- **Triggered by:** the Sprint 9 chunk that builds the draft-submission/review flow (`campaign_drafts`) and posted-content verification (`campaign_posted_content`).
+- **Resolution:** Sprint 9 owns both migrations + their models/flows; the `draft_submitted`/`posted` states they hang off already exist in the enum + state machine.
+- **Owner:** Sprint 9 (drafts + posted content).
+- **Status:** open (deferred by design → S9). Surfaced + accepted by Sprint 8 Chunk 1, 2026-06-05 ([review](reviews/sprint-8-chunk-1-review.md)).

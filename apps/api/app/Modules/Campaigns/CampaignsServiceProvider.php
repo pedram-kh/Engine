@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Modules\Campaigns;
 
+use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Campaigns\Policies\CampaignPolicy;
 use Illuminate\Contracts\Foundation\CachesRoutes;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,7 +20,13 @@ final class CampaignsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->registerPolicies();
         $this->registerRoutes();
+    }
+
+    private function registerPolicies(): void
+    {
+        Gate::policy(Campaign::class, CampaignPolicy::class);
     }
 
     private function registerRoutes(): void
