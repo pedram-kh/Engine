@@ -133,6 +133,7 @@ const categoryFilterItems = computed(() =>
 
 const headers = [
   { title: t('app.roster.fields.name'), key: 'attributes.display_name', sortable: false },
+  { title: t('app.roster.fields.email'), key: 'attributes.email', sortable: false },
   {
     title: t('app.roster.fields.status'),
     key: 'attributes.relationship_status',
@@ -532,6 +533,12 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
           class="ml-2"
           :data-test="`roster-blacklist-${item.id}`"
         />
+      </template>
+
+      <template #item.attributes.email="{ item }">
+        <span :data-test="`roster-email-${item.id}`">
+          {{ item.attributes.email ?? '—' }}
+        </span>
       </template>
 
       <template #item.attributes.relationship_status="{ item }">

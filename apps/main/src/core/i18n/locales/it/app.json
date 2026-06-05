@@ -129,6 +129,7 @@
       },
       "fields": {
         "name": "Nome",
+        "email": "Email",
         "status": "Stato",
         "applicationStatus": "Candidatura",
         "country": "Paese",

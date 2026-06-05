@@ -140,7 +140,14 @@ final class AgencyCreatorController
             // portfolio / kyc relations, no signed-URL minting.
             // application_status (Chunk 5b): already on the joined creators
             // table — added to the select only, no new join/query shape.
-            ->with('creator:id,ulid,display_name,country_code,primary_language,categories,application_status')
+            // The contact email lives on the related User; it is eager-loaded
+            // here (one extra query for the whole page, NOT per-row) so the
+            // roster list can surface it without an N+1 — `user_id` is added to
+            // the creator select so the belongsTo can hydrate.
+            ->with([
+                'creator:id,ulid,user_id,display_name,country_code,primary_language,categories,application_status',
+                'creator.user:id,email',
+            ])
             // Default sort: creator display_name ASC via a correlated
             // subquery (avoids a join + hydration clobber), with a stable
             // id tiebreaker. NULL display_names (prospects mid-wizard) sort
@@ -330,6 +337,10 @@ final class AgencyCreatorController
                 // click-through; this chunk's rows do NOT navigate (D-c5-4).
                 'creator_id' => $creator?->ulid,
                 'display_name' => $creator?->display_name,
+                // Contact email (lives on the related User, eager-loaded). The
+                // agency-holds-a-relation invariant makes this appropriate on
+                // the roster list — the same privacy basis as the detail view.
+                'email' => $creator?->user?->email,
                 // Application lifecycle state (Chunk 5b): display-only, NOT
                 // filterable — lets the agency tell an approved/usable creator
                 // from one still pending/incomplete/rejected. Distinct axis

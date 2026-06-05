@@ -67,6 +67,7 @@ function makeRow(
       last_engaged_at: null,
       creator_id: '01CREATORULIDXXXXXXXXXXXXXX',
       display_name: 'Ada Lovelace',
+      email: 'ada@example.test',
       country_code: 'GB',
       primary_language: 'en',
       categories: ['tech'],
@@ -205,6 +206,11 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     )
     expect(harness.wrapper.find(`[data-test="roster-rating-${row.id}"]`).exists()).toBe(true)
     expect(harness.wrapper.find(`[data-test="roster-blacklist-${row.id}"]`).exists()).toBe(true)
+
+    // Contact email surfaces in its own column.
+    expect(harness.wrapper.find(`[data-test="roster-email-${row.id}"]`).text()).toBe(
+      'ada@example.test',
+    )
 
     // Chunk 5b: the application-status chip is a SEPARATE axis from the
     // relationship chip — its own data-test + its own label ("Approved" vs

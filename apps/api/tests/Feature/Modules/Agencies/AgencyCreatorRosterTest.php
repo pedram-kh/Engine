@@ -180,6 +180,7 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes and n
         'last_engaged_at',
         'creator_id',
         'display_name',
+        'email',
         'application_status',
         'country_code',
         'primary_language',
@@ -196,6 +197,23 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes and n
     // No signed media URLs (the slim resource is not CreatorResource).
     expect($attributes)->not->toHaveKey('avatar_url');
     expect($attributes)->not->toHaveKey('cover_url');
+});
+
+it('surfaces the contact email of the related creator account (eager-loaded)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $creatorUser = User::factory()->createOne(['email' => 'roster.creator@example.test']);
+    $creator = Creator::factory()->create(['user_id' => $creatorUser->id]);
+    AgencyCreatorRelation::factory()->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::Roster,
+    ]);
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency));
+
+    expect($response->json('data.0.attributes.email'))->toBe('roster.creator@example.test');
 });
 
 it('surfaces each creator application_status on the slim row, reflecting actual state (Chunk 5b)', function (): void {

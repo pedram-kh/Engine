@@ -228,6 +228,13 @@ export interface RosterCreatorListItem {
     creator_id: string | null
     display_name: string | null
     /**
+     * Contact email of the related creator account. Surfaced on the roster
+     * list (eager-loaded server-side, not N+1) — appropriate on the same
+     * agency-holds-a-relation basis as the detail view. Null only if the
+     * related user has none.
+     */
+    email: string | null
+    /**
      * Creator application lifecycle state (Chunk 5b). Display-only — a
      * distinct axis from `relationship_status` so the agency can tell an
      * approved/usable creator from one still pending/incomplete/rejected.

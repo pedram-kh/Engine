@@ -27,8 +27,9 @@ use Illuminate\Support\Facades\Storage;
  *   - the nested creator PROFILE: display fields + signed avatar/cover URLs,
  *     the contact email (D-2a-8 — a deliberate privacy decision: the agency
  *     holds a verified relation with this creator, so the contact email is
- *     appropriate on the single-creator detail view, unlike the slim roster
- *     LIST which omitted it for N+1 reasons), social accounts, and portfolio.
+ *     appropriate here; the slim roster LIST now also surfaces it, eager-loaded
+ *     to avoid the N+1 that originally kept it off the list), social accounts,
+ *     and portfolio.
  *
  * What this resource DELIBERATELY DOES NOT carry:
  *   - admin-only KYC PII (kyc_method, verified_by_user_id, kyc_verifications)

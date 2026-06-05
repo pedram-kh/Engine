@@ -129,6 +129,7 @@
       },
       "fields": {
         "name": "Name",
+        "email": "Email",
         "status": "Status",
         "applicationStatus": "Application",
         "country": "Country",
