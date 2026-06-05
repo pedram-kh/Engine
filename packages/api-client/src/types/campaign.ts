@@ -17,10 +17,10 @@ export type CampaignStatus = 'draft' | 'active' | 'paused' | 'completed' | 'canc
 export type CampaignObjective = 'awareness' | 'engagement' | 'conversion' | 'ugc' | 'launch'
 
 /**
- * Mirror of `AssignmentStatus` — the 14-state campaign-assignment graph driven
+ * Mirror of `AssignmentStatus` — the 15-state campaign-assignment graph driven
  * by the backend `CampaignAssignmentStateMachine`. Terminal: declined,
- * payment_released, cancelled. The agency-side Creators tab is read-only this
- * chunk (inviting + transitions land in Chunk 2).
+ * rejected, payment_released, cancelled. Sprint 9 Chunk 2 adds the dedicated
+ * `rejected` terminal (the agency rejects a submitted draft).
  */
 export type AssignmentStatus =
   | 'invited'
@@ -32,6 +32,7 @@ export type AssignmentStatus =
   | 'draft_submitted'
   | 'revision_requested'
   | 'approved'
+  | 'rejected'
   | 'posted'
   | 'live_verified'
   | 'payment_held'
@@ -365,6 +366,62 @@ export interface CreatorAssignmentDetailResource {
 
 export interface CreatorAssignmentDetailResponse {
   data: CreatorAssignmentDetailResource
+}
+
+// ---------------------------------------------------------------------------
+// Agency review surface (Sprint 9 Chunk 2) — the review drawer + 3 actions
+// ---------------------------------------------------------------------------
+
+/** The agency-side per-assignment detail the review drawer consumes (D-7). */
+export interface AgencyAssignmentDetailResource {
+  id: string
+  type: 'campaign_assignment'
+  attributes: {
+    status: AssignmentStatus
+    agreed_fee_minor_units: number | null
+    agreed_fee_currency: string | null
+    posting_due_at: string | null
+    submitted_draft_at: string | null
+    approved_at: string | null
+    posted_at: string | null
+    verified_live_at: string | null
+    creator: {
+      id: string
+      display_name: string | null
+    } | null
+    campaign: {
+      id: string
+      name: string
+      brand_name: string | null
+    } | null
+  }
+  relationships: {
+    drafts: CampaignDraftResource[]
+    posted_content: CampaignPostedContentResource[]
+  }
+}
+
+export interface AgencyAssignmentDetailResponse {
+  data: AgencyAssignmentDetailResource
+}
+
+/** POST `…/approve` — no body (the approval carries no feedback, D-5). */
+export type ApproveDraftPayload = Record<string, never>
+
+/** POST `…/request-revision` — feedback REQUIRED (D-5). */
+export interface RequestRevisionPayload {
+  review_feedback: string
+}
+
+/** POST `…/reject` — the rejection reason REQUIRED (D-5); terminal (D-1). */
+export interface RejectDraftPayload {
+  review_feedback: string
+}
+
+/** The `{data, meta:{code}}` envelope returned by the three review actions. */
+export interface ReviewActionResponse {
+  data: CampaignDraftResource
+  meta: { code: string }
 }
 
 /** One media item submitted with a draft (the SPA builds this post-upload). */

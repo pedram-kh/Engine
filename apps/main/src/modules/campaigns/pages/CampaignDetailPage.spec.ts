@@ -22,7 +22,16 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import CampaignDetailPage from './CampaignDetailPage.vue'
 
 vi.mock('../api/campaigns.api', () => ({
-  campaignsApi: { show: vi.fn(), assignments: vi.fn(), update: vi.fn(), reinvite: vi.fn() },
+  campaignsApi: {
+    show: vi.fn(),
+    assignments: vi.fn(),
+    update: vi.fn(),
+    reinvite: vi.fn(),
+    showAssignment: vi.fn(),
+    approveDraft: vi.fn(),
+    requestRevision: vi.fn(),
+    rejectDraft: vi.fn(),
+  },
 }))
 
 import { campaignsApi } from '../api/campaigns.api'
@@ -254,5 +263,16 @@ describe('CampaignDetailPage — Creators tab re-invite (re-invite UI chunk)', (
   it('gates the re-invite action on canInvite (staff sees it)', async () => {
     const wrapper = await openCreatorsTab('agency_staff', [makeAssignment('C', 'countered')])
     expect(wrapper.find('[data-test="creators-reinvite-C"]').exists()).toBe(true)
+  })
+
+  // Sprint 9 Chunk 2 (D-8) — the Review action.
+  it('shows the Review action on a draft_submitted row (staff can review)', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [makeAssignment('D', 'draft_submitted')])
+    expect(wrapper.find('[data-test="creators-review-D"]').exists()).toBe(true)
+  })
+
+  it('does NOT show the Review action on a non-draft_submitted row', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [makeAssignment('I', 'invited')])
+    expect(wrapper.find('[data-test="creators-review-I"]').exists()).toBe(false)
   })
 })

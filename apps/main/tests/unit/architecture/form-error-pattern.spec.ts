@@ -65,6 +65,9 @@ const CANONICAL_422_FILES: readonly string[] = [
   // Re-invite UI chunk (D-4): the agency re-offer fee-form binds 422s onto the
   // amount field (counter-dialog shape, not the invite dialog's unbound field).
   'modules/campaigns/components/ReinviteDialog.vue',
+  // Sprint 9 Chunk 2 (D-8): the agency review drawer binds the feedback-required
+  // 422 onto the review_feedback textarea (request-revision / reject).
+  'modules/campaigns/components/ReviewDraftDrawer.vue',
 ]
 
 const IMPORTS_EXTRACT_FIELD_ERRORS =

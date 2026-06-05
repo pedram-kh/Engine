@@ -453,11 +453,55 @@
         "draft_submitted": "Rascunho enviado",
         "revision_requested": "Revisão solicitada",
         "approved": "Aprovado",
+        "rejected": "Rejeitado",
         "posted": "Publicado",
         "live_verified": "Verificado ao vivo",
         "payment_held": "Pagamento retido",
         "payment_released": "Pagamento liberado",
         "cancelled": "Cancelado"
+      },
+      "review": {
+        "action": "Rever",
+        "title": "Rever rascunho",
+        "loadFailed": "Não foi possível carregar este rascunho. Tente novamente.",
+        "draftVersion": "Rascunho v{n}",
+        "noCaption": "Nenhuma legenda fornecida.",
+        "hashtags": "Hashtags",
+        "mentions": "Menções",
+        "noMedia": "Nenhuma mídia anexada.",
+        "feedbackLabel": "Feedback para o criador",
+        "feedbackHint": "Obrigatório ao solicitar alterações ou rejeitar.",
+        "approve": "Aprovar",
+        "requestRevision": "Solicitar alterações",
+        "reject": "Rejeitar",
+        "close": "Fechar",
+        "history": "Histórico de versões",
+        "postedContent": "Conteúdo publicado",
+        "draftStatus": {
+          "pending": "Aguardando revisão",
+          "approved": "Aprovado",
+          "rejected": "Rejeitado",
+          "revision_requested": "Revisão solicitada"
+        },
+        "verification": {
+          "pending": "Aguardando verificação",
+          "verified": "Verificado",
+          "not_found": "Não encontrado",
+          "mismatch": "Incompatível"
+        },
+        "simulated": "Verificação simulada (provedor fictício)",
+        "toast": {
+          "approved": "Rascunho aprovado.",
+          "revisionRequested": "Alterações solicitadas.",
+          "rejected": "Rascunho rejeitado.",
+          "error": "Algo correu mal. Tente novamente."
+        },
+        "media": {
+          "video": "Vídeo",
+          "preview": "Abrir pré-visualização",
+          "close": "Fechar",
+          "empty": "Nenhuma mídia anexada."
+        }
       },
       "empty": {
         "heading": "Nenhuma campanha ainda",

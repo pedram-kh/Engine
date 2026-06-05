@@ -461,11 +461,55 @@
         "draft_submitted": "Draft submitted",
         "revision_requested": "Revision requested",
         "approved": "Approved",
+        "rejected": "Rejected",
         "posted": "Posted",
         "live_verified": "Live verified",
         "payment_held": "Payment held",
         "payment_released": "Payment released",
         "cancelled": "Cancelled"
+      },
+      "review": {
+        "action": "Review",
+        "title": "Review draft",
+        "loadFailed": "We couldn't load this draft. Please try again.",
+        "draftVersion": "Draft v{n}",
+        "noCaption": "No caption provided.",
+        "hashtags": "Hashtags",
+        "mentions": "Mentions",
+        "noMedia": "No media attached.",
+        "feedbackLabel": "Feedback to the creator",
+        "feedbackHint": "Required when requesting changes or rejecting.",
+        "approve": "Approve",
+        "requestRevision": "Request changes",
+        "reject": "Reject",
+        "close": "Close",
+        "history": "Version history",
+        "postedContent": "Posted content",
+        "draftStatus": {
+          "pending": "Pending review",
+          "approved": "Approved",
+          "rejected": "Rejected",
+          "revision_requested": "Revision requested"
+        },
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Not found",
+          "mismatch": "Mismatch"
+        },
+        "simulated": "Simulated verification (mock provider)",
+        "toast": {
+          "approved": "Draft approved.",
+          "revisionRequested": "Revision requested.",
+          "rejected": "Draft rejected.",
+          "error": "Something went wrong. Please try again."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Open preview",
+          "close": "Close",
+          "empty": "No media attached."
+        }
       },
       "empty": {
         "heading": "No campaigns yet",

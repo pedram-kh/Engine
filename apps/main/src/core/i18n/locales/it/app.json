@@ -453,11 +453,55 @@
         "draft_submitted": "Bozza inviata",
         "revision_requested": "Revisione richiesta",
         "approved": "Approvato",
+        "rejected": "Rifiutato",
         "posted": "Pubblicato",
         "live_verified": "Verificato live",
         "payment_held": "Pagamento trattenuto",
         "payment_released": "Pagamento rilasciato",
         "cancelled": "Annullato"
+      },
+      "review": {
+        "action": "Rivedi",
+        "title": "Rivedi bozza",
+        "loadFailed": "Impossibile caricare questa bozza. Riprova.",
+        "draftVersion": "Bozza v{n}",
+        "noCaption": "Nessuna didascalia fornita.",
+        "hashtags": "Hashtag",
+        "mentions": "Menzioni",
+        "noMedia": "Nessun media allegato.",
+        "feedbackLabel": "Feedback per il creator",
+        "feedbackHint": "Obbligatorio quando si richiedono modifiche o si rifiuta.",
+        "approve": "Approva",
+        "requestRevision": "Richiedi modifiche",
+        "reject": "Rifiuta",
+        "close": "Chiudi",
+        "history": "Cronologia versioni",
+        "postedContent": "Contenuto pubblicato",
+        "draftStatus": {
+          "pending": "In attesa di revisione",
+          "approved": "Approvato",
+          "rejected": "Rifiutato",
+          "revision_requested": "Revisione richiesta"
+        },
+        "verification": {
+          "pending": "In attesa di verifica",
+          "verified": "Verificato",
+          "not_found": "Non trovato",
+          "mismatch": "Non corrispondente"
+        },
+        "simulated": "Verifica simulata (provider fittizio)",
+        "toast": {
+          "approved": "Bozza approvata.",
+          "revisionRequested": "Modifiche richieste.",
+          "rejected": "Bozza rifiutata.",
+          "error": "Qualcosa è andato storto. Riprova."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Apri anteprima",
+          "close": "Chiudi",
+          "empty": "Nessun media allegato."
+        }
       },
       "empty": {
         "heading": "Ancora nessuna campagna",

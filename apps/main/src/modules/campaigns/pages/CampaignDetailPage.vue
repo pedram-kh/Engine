@@ -32,6 +32,7 @@ import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
 import InviteCreatorsDialog from '../components/InviteCreatorsDialog.vue'
 import ReinviteDialog from '../components/ReinviteDialog.vue'
+import ReviewDraftDrawer from '../components/ReviewDraftDrawer.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -70,6 +71,23 @@ function openReinvite(assignment: CampaignAssignmentResource): void {
 
 function onReinvited(): void {
   reinviteSnackbar.value = t('app.campaigns.reinvite.success')
+  void loadAssignments()
+}
+
+// The draft-review surface (Sprint 9 Chunk 2, D-8) — the `review` ability is
+// the execute ability: admin + manager + staff (mirrors canInvite).
+const canReview = canInvite
+const reviewDialog = ref(false)
+const reviewTarget = ref<CampaignAssignmentResource | null>(null)
+const reviewSnackbar = ref<string | null>(null)
+
+function openReview(assignment: CampaignAssignmentResource): void {
+  reviewTarget.value = assignment
+  reviewDialog.value = true
+}
+
+function onReviewed(message: string): void {
+  reviewSnackbar.value = message
   void loadAssignments()
 }
 
@@ -366,6 +384,16 @@ function formatMoney(minor: number | null, currency: string | null): string {
                 >
                   {{ t('app.campaigns.reinvite.action') }}
                 </v-btn>
+                <v-btn
+                  v-if="a.attributes.status === 'draft_submitted' && canReview"
+                  color="primary"
+                  variant="flat"
+                  size="small"
+                  :data-test="`creators-review-${a.id}`"
+                  @click="openReview(a)"
+                >
+                  {{ t('app.campaigns.review.action') }}
+                </v-btn>
               </template>
             </v-list-item>
           </v-list>
@@ -387,6 +415,15 @@ function formatMoney(minor: number | null, currency: string | null): string {
             :assignment="reinviteTarget"
             :campaign-currency="campaign?.attributes.budget_currency ?? null"
             @success="onReinvited"
+          />
+
+          <ReviewDraftDrawer
+            v-if="canReview && agencyStore.currentAgencyId"
+            v-model="reviewDialog"
+            :agency-id="agencyStore.currentAgencyId"
+            :campaign-id="ulid"
+            :assignment="reviewTarget"
+            @reviewed="onReviewed"
           />
 
           <v-snackbar
@@ -415,6 +452,20 @@ function formatMoney(minor: number | null, currency: string | null): string {
             "
           >
             {{ reinviteSnackbar }}
+          </v-snackbar>
+
+          <v-snackbar
+            :model-value="reviewSnackbar !== null"
+            :timeout="4000"
+            color="success"
+            data-test="review-snackbar"
+            @update:model-value="
+              (v) => {
+                if (!v) reviewSnackbar = null
+              }
+            "
+          >
+            {{ reviewSnackbar }}
           </v-snackbar>
         </v-window-item>
 

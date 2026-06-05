@@ -1,0 +1,227 @@
+/**
+ * Sprint 9 Chunk 2 (D-8) — Vitest coverage for the agency review drawer.
+ * Pins: loads the agency-side detail on open, renders the draft preview, the
+ * three actions call the right endpoints + emit `reviewed`, and a
+ * feedback-required 422 binds onto the review_feedback textarea.
+ */
+
+import {
+  ApiError,
+  type AgencyAssignmentDetailResource,
+  type CampaignAssignmentResource,
+  type CampaignDraftResource,
+} from '@catalyst/api-client'
+import { flushPromises, mount } from '@vue/test-utils'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createI18n } from 'vue-i18n'
+import { createVuetify } from 'vuetify'
+import * as vuetifyComponents from 'vuetify/components'
+import * as vuetifyDirectives from 'vuetify/directives'
+
+import enApp from '@/core/i18n/locales/en/app.json'
+
+vi.mock('../api/campaigns.api', () => ({
+  campaignsApi: {
+    showAssignment: vi.fn(),
+    approveDraft: vi.fn(),
+    requestRevision: vi.fn(),
+    rejectDraft: vi.fn(),
+  },
+}))
+
+import { campaignsApi } from '../api/campaigns.api'
+import ReviewDraftDrawer from './ReviewDraftDrawer.vue'
+
+const ASSIGNMENT_ID = '01ASSIGNULIDXXXXXXXXXXXXXX'
+
+function makeAssignment(): CampaignAssignmentResource {
+  return {
+    id: ASSIGNMENT_ID,
+    type: 'campaign_assignments',
+    attributes: {
+      status: 'draft_submitted',
+      agreed_fee_minor_units: 100000,
+      agreed_fee_currency: 'EUR',
+      countered_fee_minor_units: null,
+      countered_fee_currency: null,
+      invited_at: null,
+      responded_at: null,
+      posting_due_at: null,
+      creator: { id: 'creator-ulid', display_name: 'Alex Creator' },
+    },
+  }
+}
+
+function makeDraft(): CampaignDraftResource {
+  return {
+    id: 'draft-1',
+    type: 'campaign_draft',
+    attributes: {
+      version: 1,
+      submitted_at: '2026-06-01T10:00:00.000000Z',
+      caption: 'A shiny new caption',
+      hashtags: ['#ad'],
+      mentions: ['@brand'],
+      media: [],
+      review_status: 'pending',
+      reviewed_at: null,
+      review_feedback: null,
+    },
+  }
+}
+
+function makeDetail(): AgencyAssignmentDetailResource {
+  return {
+    id: ASSIGNMENT_ID,
+    type: 'campaign_assignment',
+    attributes: {
+      status: 'draft_submitted',
+      agreed_fee_minor_units: 100000,
+      agreed_fee_currency: 'EUR',
+      posting_due_at: null,
+      submitted_draft_at: '2026-06-01T10:00:00.000000Z',
+      approved_at: null,
+      posted_at: null,
+      verified_live_at: null,
+      creator: { id: 'creator-ulid', display_name: 'Alex Creator' },
+      campaign: { id: 'campaign-ulid', name: 'Summer launch', brand_name: 'Acme' },
+    },
+    relationships: {
+      drafts: [makeDraft()],
+      posted_content: [],
+    },
+  }
+}
+
+const VDialogStub = {
+  name: 'VDialog',
+  props: ['modelValue'],
+  template: '<div class="vdialog-stub"><slot /></div>',
+}
+
+const PortfolioGalleryStub = {
+  name: 'PortfolioGallery',
+  props: ['items'],
+  template: '<div class="portfolio-stub" />',
+}
+
+async function mountOpen() {
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'en',
+    fallbackLocale: 'en',
+    availableLocales: ['en'],
+    messages: { en: enApp } as never,
+  }) as unknown as ReturnType<typeof createI18n>
+
+  const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
+
+  const wrapper = mount(ReviewDraftDrawer, {
+    props: {
+      modelValue: false,
+      agencyId: 'agency-ulid',
+      campaignId: 'campaign-ulid',
+      assignment: makeAssignment(),
+    },
+    global: {
+      plugins: [i18n, vuetify],
+      stubs: { VDialog: VDialogStub, PortfolioGallery: PortfolioGalleryStub },
+    },
+    attachTo: document.createElement('div'),
+  })
+
+  // The drawer loads on the false→true transition (the real open path).
+  await wrapper.setProps({ modelValue: true })
+  await flushPromises()
+  return wrapper
+}
+
+describe('ReviewDraftDrawer (Sprint 9 Chunk 2)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(campaignsApi.showAssignment).mockResolvedValue({ data: makeDetail() })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('loads the agency detail on open and renders the latest draft caption', async () => {
+    const wrapper = await mountOpen()
+    expect(campaignsApi.showAssignment).toHaveBeenCalledWith(
+      'agency-ulid',
+      'campaign-ulid',
+      ASSIGNMENT_ID,
+    )
+    expect(wrapper.find('[data-test="review-caption"]').text()).toContain('A shiny new caption')
+    wrapper.unmount()
+  })
+
+  it('approve calls approveDraft + emits reviewed + closes', async () => {
+    vi.mocked(campaignsApi.approveDraft).mockResolvedValue({
+      data: makeDraft(),
+      meta: { code: 'assignment.draft_approved' },
+    })
+    const wrapper = await mountOpen()
+
+    await wrapper.find('[data-test="review-approve"]').trigger('click')
+    await flushPromises()
+
+    expect(campaignsApi.approveDraft).toHaveBeenCalledWith(
+      'agency-ulid',
+      'campaign-ulid',
+      ASSIGNMENT_ID,
+    )
+    expect(wrapper.emitted('reviewed')).toHaveLength(1)
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([false])
+    wrapper.unmount()
+  })
+
+  it('reject calls rejectDraft with the feedback as the reason', async () => {
+    vi.mocked(campaignsApi.rejectDraft).mockResolvedValue({
+      data: makeDraft(),
+      meta: { code: 'assignment.draft_rejected' },
+    })
+    const wrapper = await mountOpen()
+
+    await wrapper.find('[data-test="review-feedback"] textarea').setValue('Off brief.')
+    await wrapper.find('[data-test="review-reject"]').trigger('click')
+    await flushPromises()
+
+    expect(campaignsApi.rejectDraft).toHaveBeenCalledWith(
+      'agency-ulid',
+      'campaign-ulid',
+      ASSIGNMENT_ID,
+      {
+        review_feedback: 'Off brief.',
+      },
+    )
+    wrapper.unmount()
+  })
+
+  it('binds a feedback-required 422 onto the review_feedback textarea', async () => {
+    vi.mocked(campaignsApi.requestRevision).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'validation.failed',
+        message: 'Validation failed.',
+        details: [
+          {
+            code: 'validation.required',
+            detail: 'The review feedback field is required.',
+            source: { pointer: '/data/attributes/review_feedback' },
+          },
+        ],
+      }),
+    )
+    const wrapper = await mountOpen()
+
+    await wrapper.find('[data-test="review-request-revision"]').trigger('click')
+    await flushPromises()
+
+    const textarea = wrapper.findComponent({ name: 'VTextarea' })
+    expect(textarea.props('errorMessages')).toContain('The review feedback field is required.')
+    expect(wrapper.emitted('reviewed')).toBeUndefined()
+    wrapper.unmount()
+  })
+})

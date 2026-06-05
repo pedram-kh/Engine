@@ -9,6 +9,7 @@
  */
 
 import type {
+  AgencyAssignmentDetailResponse,
   CampaignAssignmentListResponse,
   CampaignAssignmentResource,
   CampaignEnvelope,
@@ -16,7 +17,10 @@ import type {
   CampaignListResponse,
   CreateCampaignPayload,
   InviteAssignmentPayload,
+  RejectDraftPayload,
   ReinviteAssignmentPayload,
+  RequestRevisionPayload,
+  ReviewActionResponse,
   UpdateCampaignPayload,
 } from '@catalyst/api-client'
 
@@ -94,6 +98,59 @@ export const campaignsApi = {
   ): Promise<{ data: CampaignAssignmentResource }> {
     return http.post<{ data: CampaignAssignmentResource }>(
       `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/reinvite`,
+      payload,
+    )
+  },
+
+  /**
+   * The agency-side review detail (Sprint 9 Chunk 2, D-7) — the assignment +
+   * its draft version history + posted content (with signed media URLs). Feeds
+   * the review drawer.
+   */
+  showAssignment(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+  ): Promise<AgencyAssignmentDetailResponse> {
+    return http.get<AgencyAssignmentDetailResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}`,
+    )
+  },
+
+  /** Approve a submitted draft (D-4/D-5) — draft_submitted → approved. */
+  approveDraft(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+  ): Promise<ReviewActionResponse> {
+    return http.post<ReviewActionResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/approve`,
+      {},
+    )
+  },
+
+  /** Request changes (D-4/D-5) — draft_submitted → revision_requested. Feedback required. */
+  requestRevision(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+    payload: RequestRevisionPayload,
+  ): Promise<ReviewActionResponse> {
+    return http.post<ReviewActionResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/request-revision`,
+      payload,
+    )
+  },
+
+  /** Reject a submitted draft (D-1/D-4/D-5) — draft_submitted → rejected (terminal). Reason required. */
+  rejectDraft(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+    payload: RejectDraftPayload,
+  ): Promise<ReviewActionResponse> {
+    return http.post<ReviewActionResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/reject`,
       payload,
     )
   },
