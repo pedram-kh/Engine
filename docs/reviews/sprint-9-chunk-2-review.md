@@ -1,8 +1,8 @@
 # Sprint 9 — Chunk 2 Review
 
-**Status:** Ready for review.
+**Status:** Closed.
 
-**Reviewer:** drafted by Cursor (implementation pass). Awaiting the independent spot-check.
+**Reviewer:** drafted by Cursor (implementation pass); independent spot-check **passed — no PMC** (the `Rejected` ripple complete across every consumer; `rejectDraft` fail-closed + reason-in-the-dedicated-field; the verification flow holds all three safety properties — flag-OFF keeps the break-revert gate green with both arms asserted, the arc auto-flows on the mock but the surface says "simulated," and not_found/mismatch stay `posted` with no machine call; no payment creep, the S10 escrow boundary held; the lean "Social: 1" contract, the listener-dispatched idempotent + flag-gated job, the three Mailables + the tech-debt note, and the Larastan narrowing all sound).
 
 **Reviewed against:** the Chunk 2 kickoff + the plan-approval message (the five confirmed divergences); `PROJECT-WORKFLOW.md` § 3 (chunk lifecycle) + § 5 standards (5.1 backend/frontend constant parity, source-inspection, the build-to-surface precedent, the catalogue-tripwire discipline, the break-revert claim-verification corollary, asymmetric-coverage acknowledgement); the Sprint 8 Chunk 1 state-machine contract (`CampaignAssignmentStateMachine` — sole status authority, fail-closed, audited, flag-gated vendor edges); the Sprint 9 Chunk 1 submission surface (`CampaignDraft` / `CampaignPostedContent` + their resources, the context-thread audit mechanism); the integration-provider precedent (`Kyc`/`Esign`/`Payment` contracts + Mock/Deferred/Skipped stubs + `IntegrationProviderBindingsTest`); the notification precedent (`ConnectionRequestMail`, queued + localized).
 
@@ -141,13 +141,17 @@ Per the catalogue-tripwire discipline, the enum-add was not assumed complete —
 
 ---
 
-## Proposed commit shape (for the merge step)
+## Commit shape (as merged)
 
-The confirmed two-commit pair (backend / FE), not yet committed — draft stage pending spot-check:
+The two-commit pair, spot-check-passed and pushed:
 
-1. `feat(campaigns): agency draft review + mock social verification (Sprint 9 Chunk 2)` — all backend (enum/machine/audit, the review endpoints + policy, the social provider + bindings, the job + listeners, the flag, the notification set + lang) + their tests + the tech-debt note.
-2. `feat(main): agency review drawer + verification surface (Sprint 9 Chunk 2)` — the api-client types, the api wrappers, `ReviewDraftDrawer.vue` + spec, the detail-page wiring, the i18n, the `CANONICAL_422_FILES` entry.
+1. **`fc438a2`** — `feat(campaigns): agency draft review + mock social verification (Sprint 9 Chunk 2)` — all backend (enum/machine/audit, the review endpoints + policy, the social provider + bindings, the job + listeners, the flag, the notification set + lang) + their tests + the tech-debt note + this review.
+2. **`d5d93eb`** — `feat(main): agency review drawer + verification surface (Sprint 9 Chunk 2)` — the api-client types, the api wrappers, `ReviewDraftDrawer.vue` + spec, the detail-page wiring, the i18n, the `CANONICAL_422_FILES` entry.
+
+A trailing `docs(reviews)` commit flips this file's status to Closed.
+
+**Sprint-9-close follow-up (not a chunk-2 blocker):** run the full backend Pest suite end-to-end at the Sprint 9 close to confirm no cross-module regression — this chunk verified the 117-test chunk surface but did not re-run the full suite.
 
 ---
 
-_Provenance: drafted by Cursor (Sprint 9 Chunk 2 build pass, 2026-06-05) — backend lifecycle arc (the `rejected` terminal + mock social verification) + the agency review drawer, against the kickoff's five confirmed divergences. Awaiting the independent spot-check; merged version to follow per `PROJECT-WORKFLOW.md` § 3 steps 8–9._
+_Provenance: drafted by Cursor (Sprint 9 Chunk 2 build pass, 2026-06-05) — backend lifecycle arc (the `rejected` terminal + mock social verification) + the agency review drawer, against the kickoff's five confirmed divergences. Spot-check passed (no PMC); pair `fc438a2` / `d5d93eb` pushed and this review closed per `PROJECT-WORKFLOW.md` § 3 steps 8–9._
