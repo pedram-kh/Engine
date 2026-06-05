@@ -426,6 +426,12 @@
           "cancel": "Cancel",
           "submit": "Issue contract",
           "success": "Contract issued. The creator has been notified."
+        },
+        "proceedWithout": {
+          "action": "Proceed without contract",
+          "success": "Assignment advanced without a contract.",
+          "requiredError": "This campaign requires a per-campaign contract; issue one for the creator to accept.",
+          "error": "We couldn't advance this assignment. Please try again."
         }
       },
       "invite": {

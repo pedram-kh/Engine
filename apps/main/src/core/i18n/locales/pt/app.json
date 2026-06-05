@@ -418,6 +418,12 @@
           "cancel": "Cancelar",
           "submit": "Emitir contrato",
           "success": "Contrato emitido. O criador foi notificado."
+        },
+        "proceedWithout": {
+          "action": "Prosseguir sem contrato",
+          "success": "Atribuição avançada sem contrato.",
+          "requiredError": "Esta campanha exige um contrato por campanha; emita um para o criador aceitar.",
+          "error": "Não foi possível avançar esta atribuição. Tente novamente."
         }
       },
       "invite": {

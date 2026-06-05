@@ -23,6 +23,7 @@ import type {
   ContractMediaInitResponse,
   CreateCampaignPayload,
   InviteAssignmentPayload,
+  ProceedWithoutContractResponse,
   RejectDraftPayload,
   ReinviteAssignmentPayload,
   RequestRevisionPayload,
@@ -196,6 +197,23 @@ export const campaignsApi = {
     return http.post<AttachContractResponse>(
       `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/contract/attach`,
       payload,
+    )
+  },
+
+  /**
+   * Advance an accepted assignment to `contracted` WITHOUT a per-campaign
+   * contract (D-7) — agency discretion, available only when the campaign does
+   * not require a contract. Throws an `ApiError` with code
+   * `assignment.per_campaign_contract_required` when the campaign requires one.
+   */
+  proceedWithoutContract(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+  ): Promise<ProceedWithoutContractResponse> {
+    return http.post<ProceedWithoutContractResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/contract/proceed-without-contract`,
+      {},
     )
   },
 }

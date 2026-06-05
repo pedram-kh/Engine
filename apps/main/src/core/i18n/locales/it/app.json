@@ -418,6 +418,12 @@
           "cancel": "Annulla",
           "submit": "Emetti contratto",
           "success": "Contratto emesso. Il creator è stato notificato."
+        },
+        "proceedWithout": {
+          "action": "Procedi senza contratto",
+          "success": "Incarico avanzato senza contratto.",
+          "requiredError": "Questa campagna richiede un contratto per campagna; emettine uno che il creator possa accettare.",
+          "error": "Impossibile far avanzare questo incarico. Riprova."
         }
       },
       "invite": {

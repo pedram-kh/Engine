@@ -31,6 +31,7 @@ vi.mock('../api/campaigns.api', () => ({
     approveDraft: vi.fn(),
     requestRevision: vi.fn(),
     rejectDraft: vi.fn(),
+    proceedWithoutContract: vi.fn(),
   },
 }))
 
@@ -52,7 +53,7 @@ Object.defineProperty(globalThis, 'localStorage', {
 
 const CAMPAIGN_ULID = '01HZA1B2C3D4E5F6G7H8J9K0M1'
 
-function makeCampaign(): CampaignResource {
+function makeCampaign(requiresContract = false): CampaignResource {
   return {
     id: CAMPAIGN_ULID,
     type: 'campaigns',
@@ -69,7 +70,7 @@ function makeCampaign(): CampaignResource {
       posting_window_ends_at: null,
       brief: null,
       target_creator_count: null,
-      requires_per_campaign_contract: false,
+      requires_per_campaign_contract: requiresContract,
       is_marketplace_visible: false,
       published_at: null,
       completed_at: null,
@@ -108,14 +109,23 @@ function makeAssignment(
 async function mountDetail(
   role: 'agency_admin' | 'agency_manager' | 'agency_staff' = 'agency_admin',
   assignments: CampaignAssignmentResource[] = [],
+  opts: { perCampaignContractEnabled?: boolean; requiresContract?: boolean } = {},
 ): Promise<{ wrapper: ReturnType<typeof mount>; cleanup: () => void }> {
   const pinia = createPinia()
   setActivePinia(pinia)
 
-  vi.mocked(campaignsApi.show).mockResolvedValue({ data: makeCampaign() })
+  vi.mocked(campaignsApi.show).mockResolvedValue({
+    data: makeCampaign(opts.requiresContract ?? false),
+  })
   vi.mocked(campaignsApi.assignments).mockResolvedValue({
     data: assignments,
-    meta: { total: assignments.length, page: 1, per_page: 25, last_page: 1 },
+    meta: {
+      total: assignments.length,
+      page: 1,
+      per_page: 25,
+      last_page: 1,
+      per_campaign_contract_enabled: opts.perCampaignContractEnabled ?? false,
+    },
   })
 
   const agency = useAgencyStore()
@@ -274,5 +284,75 @@ describe('CampaignDetailPage — Creators tab re-invite (re-invite UI chunk)', (
   it('does NOT show the Review action on a non-draft_submitted row', async () => {
     const wrapper = await openCreatorsTab('agency_staff', [makeAssignment('I', 'invited')])
     expect(wrapper.find('[data-test="creators-review-I"]').exists()).toBe(false)
+  })
+})
+
+// contract-gate-decouple chunk (D-7) — the agency "proceed without a contract"
+// action on an accepted row, visible only when requires=false AND the flag is ON.
+describe('CampaignDetailPage — proceed without per-campaign contract (D-7)', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+  })
+
+  async function openCreatorsTab(
+    assignments: CampaignAssignmentResource[],
+    opts: { perCampaignContractEnabled?: boolean; requiresContract?: boolean },
+  ) {
+    const harness = await mountDetail('agency_staff', assignments, opts)
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'creators'
+    await flushPromises()
+    return harness.wrapper
+  }
+
+  it('shows the action on an accepted row when requires=false and the flag is ON', async () => {
+    const wrapper = await openCreatorsTab([makeAssignment('A', 'accepted')], {
+      perCampaignContractEnabled: true,
+      requiresContract: false,
+    })
+    expect(wrapper.find('[data-test="creators-proceed-without-contract-A"]').exists()).toBe(true)
+  })
+
+  it('hides the action when the per-campaign flag is OFF', async () => {
+    const wrapper = await openCreatorsTab([makeAssignment('A', 'accepted')], {
+      perCampaignContractEnabled: false,
+      requiresContract: false,
+    })
+    expect(wrapper.find('[data-test="creators-proceed-without-contract-A"]').exists()).toBe(false)
+  })
+
+  it('hides the action when the campaign requires a per-campaign contract', async () => {
+    const wrapper = await openCreatorsTab([makeAssignment('A', 'accepted')], {
+      perCampaignContractEnabled: true,
+      requiresContract: true,
+    })
+    expect(wrapper.find('[data-test="creators-proceed-without-contract-A"]').exists()).toBe(false)
+  })
+
+  it('calls the API and shows the success snackbar', async () => {
+    vi.mocked(campaignsApi.proceedWithoutContract).mockResolvedValue({
+      data: { type: 'campaign_assignment', id: 'A', attributes: { status: 'contracted' } },
+      meta: { code: 'assignment.contracted' },
+    })
+    const wrapper = await openCreatorsTab([makeAssignment('A', 'accepted')], {
+      perCampaignContractEnabled: true,
+      requiresContract: false,
+    })
+
+    await wrapper.find('[data-test="creators-proceed-without-contract-A"]').trigger('click')
+    await flushPromises()
+
+    expect(campaignsApi.proceedWithoutContract).toHaveBeenCalledWith(
+      'agency-ulid',
+      CAMPAIGN_ULID,
+      'A',
+    )
   })
 })

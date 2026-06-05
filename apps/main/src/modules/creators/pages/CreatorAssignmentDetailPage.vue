@@ -62,7 +62,8 @@ const loadedOnce = ref(false)
 // from any other failure (5xx, network) so a server error never masquerades
 // as "not found" — the bare-catch trap that hid the missing-migration 500.
 const loadError = ref<'not_found' | 'generic' | null>(null)
-const contractSigningEnabled = ref(false)
+// The per-campaign manual-contract flag (NOT the e-sign vendor flag), D-5.
+const perCampaignContractEnabled = ref(false)
 const snackbar = ref<{ color: string; text: string } | null>(null)
 
 // Draft form state.
@@ -91,11 +92,11 @@ const canAcceptContract = computed(
 const isAwaitingContract = computed(
   () =>
     status.value === 'accepted' &&
-    contractSigningEnabled.value &&
+    perCampaignContractEnabled.value &&
     pendingContract.value?.attributes.status !== 'sent',
 )
 const isContractSigningDisabled = computed(
-  () => status.value === 'accepted' && !contractSigningEnabled.value,
+  () => status.value === 'accepted' && !perCampaignContractEnabled.value,
 )
 
 const canSubmitDraft = computed(
@@ -146,7 +147,7 @@ async function load(): Promise<void> {
   try {
     const res = await creatorAssignmentsApi.show(ulid.value)
     assignment.value = res.data
-    contractSigningEnabled.value = res.meta?.contract_signing_enabled ?? false
+    perCampaignContractEnabled.value = res.meta?.per_campaign_contract_enabled ?? false
   } catch (err) {
     assignment.value = null
     loadError.value = err instanceof ApiError && err.status === 404 ? 'not_found' : 'generic'

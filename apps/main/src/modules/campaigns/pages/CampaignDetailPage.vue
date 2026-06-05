@@ -91,6 +91,37 @@ function onContractAttached(): void {
   void loadAssignments()
 }
 
+// The per-campaign manual-contract flag (D-7), read from the assignments
+// list meta. Gates the agency "proceed without a contract" action together
+// with the campaign's `requires_per_campaign_contract` (false → optional).
+const perCampaignContractEnabled = ref(false)
+const proceedSnackbar = ref<string | null>(null)
+const proceedError = ref<string | null>(null)
+
+function canProceedWithoutContract(assignment: CampaignAssignmentResource): boolean {
+  return (
+    assignment.attributes.status === 'accepted' &&
+    canAttachContract.value &&
+    perCampaignContractEnabled.value &&
+    campaign.value?.attributes.requires_per_campaign_contract === false
+  )
+}
+
+async function proceedWithoutContract(assignment: CampaignAssignmentResource): Promise<void> {
+  const agencyId = agencyStore.currentAgencyId
+  if (agencyId === null) return
+  try {
+    await campaignsApi.proceedWithoutContract(agencyId, ulid.value, assignment.id)
+    proceedSnackbar.value = t('app.campaigns.contract.proceedWithout.success')
+    void loadAssignments()
+  } catch (err) {
+    proceedError.value =
+      err instanceof ApiError && err.code === 'assignment.per_campaign_contract_required'
+        ? t('app.campaigns.contract.proceedWithout.requiredError')
+        : t('app.campaigns.contract.proceedWithout.error')
+  }
+}
+
 // The draft-review surface (Sprint 9 Chunk 2, D-8) — the `review` ability is
 // the execute ability: admin + manager + staff (mirrors canInvite).
 const canReview = canInvite
@@ -181,6 +212,7 @@ async function loadAssignments(): Promise<void> {
   try {
     const res = await campaignsApi.assignments(agencyId, ulid.value)
     assignments.value = res.data
+    perCampaignContractEnabled.value = res.meta?.per_campaign_contract_enabled ?? false
   } catch {
     assignments.value = []
   } finally {
@@ -412,6 +444,16 @@ function formatMoney(minor: number | null, currency: string | null): string {
                   {{ t('app.campaigns.contract.attach.action') }}
                 </v-btn>
                 <v-btn
+                  v-if="canProceedWithoutContract(a)"
+                  color="secondary"
+                  variant="outlined"
+                  size="small"
+                  :data-test="`creators-proceed-without-contract-${a.id}`"
+                  @click="proceedWithoutContract(a)"
+                >
+                  {{ t('app.campaigns.contract.proceedWithout.action') }}
+                </v-btn>
+                <v-btn
                   v-if="a.attributes.status === 'draft_submitted' && canReview"
                   color="primary"
                   variant="flat"
@@ -502,6 +544,34 @@ function formatMoney(minor: number | null, currency: string | null): string {
             "
           >
             {{ attachContractSnackbar }}
+          </v-snackbar>
+
+          <v-snackbar
+            :model-value="proceedSnackbar !== null"
+            :timeout="4000"
+            color="success"
+            data-test="proceed-without-contract-snackbar"
+            @update:model-value="
+              (v) => {
+                if (!v) proceedSnackbar = null
+              }
+            "
+          >
+            {{ proceedSnackbar }}
+          </v-snackbar>
+
+          <v-snackbar
+            :model-value="proceedError !== null"
+            :timeout="5000"
+            color="error"
+            data-test="proceed-without-contract-error"
+            @update:model-value="
+              (v) => {
+                if (!v) proceedError = null
+              }
+            "
+          >
+            {{ proceedError }}
           </v-snackbar>
 
           <v-snackbar

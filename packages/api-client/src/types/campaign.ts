@@ -185,6 +185,12 @@ export interface CampaignAssignmentListResponse {
     page: number
     per_page: number
     last_page: number
+    /**
+     * The per-campaign manual-contract flag (`per_campaign_contract_enabled`) —
+     * gates the agency "proceed without a contract" action on the Creators tab
+     * (contract-gate-decouple chunk, D-7). Optional for back-compat.
+     */
+    per_campaign_contract_enabled?: boolean
   }
 }
 
@@ -383,7 +389,12 @@ export interface ContractResource {
 export interface CreatorAssignmentDetailResponse {
   data: CreatorAssignmentDetailResource
   meta?: {
-    contract_signing_enabled: boolean
+    /**
+     * The per-campaign manual-contract flag (`per_campaign_contract_enabled`) —
+     * NOT the e-sign vendor flag. Reflects whether the per-campaign contract
+     * flow (attach / accept) is available on this instance (D-5 key rename).
+     */
+    per_campaign_contract_enabled: boolean
   }
 }
 
@@ -541,6 +552,20 @@ export interface CreatorContractAcceptResponse {
     id: string
     attributes: { status: AssignmentStatus }
     relationships: { contract: ContractResource }
+  }
+  meta: { code: string }
+}
+
+/**
+ * The `{data, meta:{code}}` envelope returned by the agency "proceed without a
+ * per-campaign contract" action (contract-gate-decouple chunk, D-7) —
+ * `accepted → contracted` with no Contract row (`contract_id` stays null).
+ */
+export interface ProceedWithoutContractResponse {
+  data: {
+    type: 'campaign_assignment'
+    id: string
+    attributes: { status: AssignmentStatus }
   }
   meta: { code: string }
 }
