@@ -262,6 +262,9 @@ The heart of the platform.
 
 ### Sprint 10 — Payments (1.5 weeks)
 
+> **Build order:** deferred — built after Sprint 11 (Messaging). Gating item to resume: Stripe
+> account + test-mode keys. See `tech-debt.md` ("Sprint 10 deferred").
+
 - `payments`, `payment_events` tables
 - Stripe Connect integration (real, not mock — but in test mode for staging)
 - Stripe Connect Express account creation for creators (during onboarding)

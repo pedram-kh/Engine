@@ -67,6 +67,12 @@ signup is usually fast (instant→days) — the decision is the gating step.
 
 ### Payments — Stripe Connect (Express)
 
+> **⏸ Sprint 10 status (deferred).** The payments build is resequenced to after Sprint 11
+> (Messaging). The Stripe Connect application + test-mode keys + webhook signing secret are now the
+> **gating item to resume Sprint 10** — finish the application now so the approval clock overlaps
+> Sprint 11 rather than stalling the resume. Rationale + constraints in `tech-debt.md`
+> ("Sprint 10 deferred").
+
 - **Capability:** escrow funding/release, creator payout KYC, multi-currency, payout speeds, refunds/disputes.
 - **Code state:** the built interface is `App\Modules\Creators\Integrations\Contracts\PaymentProvider` (the 2-method onboarding contract under the **Creators** module — _not_ a `PaymentProviderContract`; that name was a doc mislabel, corrected Sprint 4 Ch2) + `MockPaymentProvider` ✅. Sprint 4 Ch2 added the inbound-webhook pair (`verifyWebhookSignature` + `parseWebhookEvent`) and shipped the **real `StripePaymentProvider`** ✅ (test-mode: real Connect Express account + onboarding link + `account.updated` → `creator_payout_methods.status`), at `app/Modules/Creators/Integrations/Stripe/` (deliberately _not_ the spec's `Modules/Payments/` path — see the deferral note below). **Deferred to Sprint 10:** escrow methods (`fundEscrow`/`releaseEscrow`/`refundEscrow`), the 8 money-movement webhooks (`charge.*`/`transfer.*`/`payout.*`), the `payments`/`payment_events` model, and migrating the adapter + contract into a broad `Modules\Payments\Contracts\PaymentProviderContract`.
 - **Vendor:** **decided — Stripe** (no real EU marketplace alternative).

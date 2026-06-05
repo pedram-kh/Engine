@@ -1268,3 +1268,41 @@ anyone reviewing it later.
 - **Triggered by:** UX request for inline preview without leaving the app.
 - **Owner:** future creators FE workstream.
 - **Status:** open.
+
+---
+
+## Sprint 10 (Payments & escrow) deferred — build resequenced to after Sprint 11
+
+- **What:** Sprint 10 (Payments & escrow) is deferred. Build order resequenced — Sprint 11
+  (Messaging) is built next; Sprint 10 slots back in after it.
+- **Why:** S10 is the platform's money sprint and the highest-risk surface (operation
+  idempotency, the honest payment mock, escrow correctness). It is mock-buildable today
+  (flag-OFF, `MockPaymentProvider`) — **no Stripe account is needed to BUILD it** — but building
+  it now leaves the money path validated only against the mock for an extended period before real
+  Stripe test-mode keys exist. We prefer to build payments close to when we can exercise the full
+  round-trip against real Stripe test mode, so latent vendor-contract bugs surface at build time
+  rather than months later. Sprint 11 has no vendor dependency it doesn't already have
+  (assignments ✓, pre-signed S3 ✓, email = Postmark), so it is fully buildable and validatable now.
+- **Not a blocker, a sequencing choice.** The earlier decision was "build S10 now against the
+  mock; the Stripe account is a go-live concern, not a build blocker." That remains true — this
+  deferral is build-when-validatable, not an admission the mock build was blocked.
+- **Stripe is now the gating item to RESUME S10.** Finish the Stripe Connect platform application;
+  land test-mode keys + the webhook signing secret in AWS Secrets Manager; configure
+  `/api/v1/webhooks/stripe` in the Stripe dashboard (see `services.md`). Start now so the approval
+  clock overlaps Sprint 11.
+- **How far S10 can slip:** must land **before Sprint 13** (Admin Panel Core — its
+  payment-investigation / refund / dispute-resolution surface, `09-ADMIN-PANEL §6.6`, has nothing
+  to operate on without S10) and **before go-live**. Sprint 12 (Boards) is unaffected — the
+  `assignment.payment_released → Paid` board verb/column can be catalogued without S10; the column
+  simply won't auto-populate until payments ship.
+- **Already prepared, reusable on resume:** the S10 pre-kickoff inventory is written and run; the
+  chunk-count call (2 chunks, fund-IN / release-OUT, contract-migration as Chunk A's foundation
+  slice) and the write-real-mock-bound provider call are made; the Chunk A kickoff is drafted
+  (pending the D-8 auto-fund-grain + D-9 off-state confirms). No re-inventory needed on resume
+  unless the codebase moves materially under it (e.g., Sprint 11 touches the assignment surface).
+- **Related deferral:** the `isPaymentEligible()` release-gate consumption note (verification-
+  resolution chunk) is pushed out with S10 — its consumer no longer lands imminently.
+- **Triggered by:** Stripe account + test-mode keys available, OR reaching Sprint 13 / go-live prep
+  (whichever first).
+- **Owner:** the Sprint 10 payments workstream (when resumed).
+- **Status:** open (deferred).
