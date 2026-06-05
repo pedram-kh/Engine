@@ -49,6 +49,8 @@ const CANONICAL_422_FILES: readonly string[] = [
   'modules/auth/pages/ResetPasswordPage.vue',
   'modules/brands/pages/BrandCreatePage.vue',
   'modules/brands/pages/BrandEditPage.vue',
+  'modules/campaigns/pages/CampaignCreatePage.vue',
+  'modules/campaigns/pages/CampaignDetailPage.vue',
   'modules/agency-users/components/InviteUserModal.vue',
   'modules/onboarding/pages/Step2ProfileBasicsPage.vue',
   'modules/onboarding/pages/Step3SocialAccountsPage.vue',

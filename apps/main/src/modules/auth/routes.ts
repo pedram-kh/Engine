@@ -238,6 +238,30 @@ export const appRoutes: RouteRecordRaw[] = [
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
+  // ── Campaigns ──────────────────────────────────────────────────────────────
+  // Sprint 8 Chunk 1. Any agency member may view (list/detail); create + the
+  // detail Settings tab are admin/manager-gated (backend + UI). Same agency-
+  // shell guard chain; not MFA-gated. All three names are pinned into the
+  // requireAgencyUser arch-test's expected set.
+  {
+    path: '/campaigns',
+    name: 'campaigns.list',
+    component: () => import('@/modules/campaigns/pages/CampaignListPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+  {
+    path: '/campaigns/new',
+    name: 'campaigns.create',
+    component: () => import('@/modules/campaigns/pages/CampaignCreatePage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+  {
+    path: '/campaigns/:ulid',
+    name: 'campaigns.detail',
+    component: () => import('@/modules/campaigns/pages/CampaignDetailPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+
   // ── Talent pools ───────────────────────────────────────────────────────────
   // Sprint 6 Chunk 2b. Mirrors the brands block: any agency member may view;
   // create/edit gated by role in the UI + backend. NOT MFA-gated (pools are

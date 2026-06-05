@@ -53,6 +53,7 @@ const navItems = [
   { key: 'discover', icon: 'mdi-account-search-outline', routeName: 'discover.list' },
   { key: 'pools', icon: 'mdi-account-multiple-plus-outline', routeName: 'pools.list' },
   { key: 'brands', icon: 'mdi-tag-outline', routeName: 'brands.list' },
+  { key: 'campaigns', icon: 'mdi-bullhorn-outline', routeName: 'campaigns.list' },
   { key: 'agencyUsers', icon: 'mdi-account-group-outline', routeName: 'agency-users.list' },
   { key: 'settings', icon: 'mdi-cog-outline', routeName: 'settings' },
 ]

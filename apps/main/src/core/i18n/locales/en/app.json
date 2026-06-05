@@ -22,6 +22,7 @@
       "discover": "Discover",
       "pools": "Talent pools",
       "brands": "Brands",
+      "campaigns": "Campaigns",
       "agencyUsers": "Team",
       "settings": "Settings"
     },
@@ -326,6 +327,120 @@
         "saveFailed": "Failed to save brand.",
         "archiveFailed": "Failed to archive brand.",
         "restoreFailed": "Failed to restore brand."
+      }
+    },
+    "campaigns": {
+      "title": "Campaigns",
+      "actions": {
+        "create": "New campaign",
+        "save": "Create campaign",
+        "saveSettings": "Save settings",
+        "backToList": "Back to campaigns"
+      },
+      "fields": {
+        "name": "Campaign name",
+        "brand": "Brand",
+        "objective": "Objective",
+        "description": "Description",
+        "budget": "Budget",
+        "currency": "Currency",
+        "startsAt": "Start date",
+        "endsAt": "End date",
+        "targetCreatorCount": "Target creator count",
+        "deliverables": "Deliverables",
+        "deliverablesHint": "One deliverable per line (e.g. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Space or comma separated.",
+        "usageRights": "Usage rights",
+        "requiresContract": "Require a per-campaign contract",
+        "status": "Status"
+      },
+      "objective": {
+        "awareness": "Awareness",
+        "engagement": "Engagement",
+        "conversion": "Conversion",
+        "ugc": "UGC",
+        "launch": "Launch"
+      },
+      "status": {
+        "all": "All",
+        "draft": "Draft",
+        "active": "Active",
+        "paused": "Paused",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "filters": {
+        "brand": "Brand",
+        "startsFrom": "Starts from",
+        "startsTo": "Starts to"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "creators": "Creators",
+        "board": "Board",
+        "drafts": "Drafts",
+        "payments": "Payments",
+        "messages": "Messages",
+        "settings": "Settings"
+      },
+      "create": {
+        "title": "New campaign"
+      },
+      "detail": {
+        "title": "Campaign details"
+      },
+      "settings": {
+        "saved": "Campaign settings saved."
+      },
+      "creators": {
+        "empty": {
+          "heading": "No creators yet",
+          "body": "Invite creators to this campaign — coming in the next chunk."
+        }
+      },
+      "comingSoon": {
+        "board": {
+          "heading": "Board coming soon",
+          "body": "The campaign Kanban board will live here."
+        },
+        "drafts": {
+          "heading": "Drafts coming soon",
+          "body": "Creator draft submissions and reviews will appear here."
+        },
+        "payments": {
+          "heading": "Payments coming soon",
+          "body": "Escrow funding and payouts will be managed here."
+        },
+        "messages": {
+          "heading": "Messages coming soon",
+          "body": "Campaign messaging will appear here."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Invited",
+        "declined": "Declined",
+        "countered": "Countered",
+        "accepted": "Accepted",
+        "contracted": "Contracted",
+        "producing": "Producing",
+        "draft_submitted": "Draft submitted",
+        "revision_requested": "Revision requested",
+        "approved": "Approved",
+        "posted": "Posted",
+        "live_verified": "Live verified",
+        "payment_held": "Payment held",
+        "payment_released": "Payment released",
+        "cancelled": "Cancelled"
+      },
+      "empty": {
+        "heading": "No campaigns yet",
+        "body": "Create your first campaign to start engaging creators.",
+        "cta": "Create campaign"
+      },
+      "errors": {
+        "loadFailed": "Failed to load campaigns.",
+        "saveFailed": "Failed to save campaign."
       }
     },
     "pools": {

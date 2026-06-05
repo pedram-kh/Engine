@@ -22,6 +22,7 @@
       "discover": "Descobrir",
       "pools": "Grupos de talentos",
       "brands": "Marcas",
+      "campaigns": "Campanhas",
       "agencyUsers": "Equipe",
       "settings": "Configurações"
     },
@@ -318,6 +319,120 @@
         "saveFailed": "Falha ao salvar marca.",
         "archiveFailed": "Falha ao arquivar marca.",
         "restoreFailed": "Falha ao restaurar marca."
+      }
+    },
+    "campaigns": {
+      "title": "Campanhas",
+      "actions": {
+        "create": "Nova campanha",
+        "save": "Criar campanha",
+        "saveSettings": "Salvar configurações",
+        "backToList": "Voltar para campanhas"
+      },
+      "fields": {
+        "name": "Nome da campanha",
+        "brand": "Marca",
+        "objective": "Objetivo",
+        "description": "Descrição",
+        "budget": "Orçamento",
+        "currency": "Moeda",
+        "startsAt": "Data de início",
+        "endsAt": "Data de término",
+        "targetCreatorCount": "Número-alvo de criadores",
+        "deliverables": "Entregáveis",
+        "deliverablesHint": "Um entregável por linha (ex.: 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Separados por espaço ou vírgula.",
+        "usageRights": "Direitos de uso",
+        "requiresContract": "Exigir contrato por campanha",
+        "status": "Status"
+      },
+      "objective": {
+        "awareness": "Reconhecimento",
+        "engagement": "Engajamento",
+        "conversion": "Conversão",
+        "ugc": "UGC",
+        "launch": "Lançamento"
+      },
+      "status": {
+        "all": "Todas",
+        "draft": "Rascunho",
+        "active": "Ativa",
+        "paused": "Pausada",
+        "completed": "Concluída",
+        "cancelled": "Cancelada"
+      },
+      "filters": {
+        "brand": "Marca",
+        "startsFrom": "Inicia a partir de",
+        "startsTo": "Inicia até"
+      },
+      "tabs": {
+        "overview": "Visão geral",
+        "creators": "Criadores",
+        "board": "Quadro",
+        "drafts": "Rascunhos",
+        "payments": "Pagamentos",
+        "messages": "Mensagens",
+        "settings": "Configurações"
+      },
+      "create": {
+        "title": "Nova campanha"
+      },
+      "detail": {
+        "title": "Detalhes da campanha"
+      },
+      "settings": {
+        "saved": "Configurações da campanha salvas."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Nenhum criador ainda",
+          "body": "Convide criadores para esta campanha — em breve no próximo bloco."
+        }
+      },
+      "comingSoon": {
+        "board": {
+          "heading": "Quadro em breve",
+          "body": "O quadro Kanban da campanha ficará aqui."
+        },
+        "drafts": {
+          "heading": "Rascunhos em breve",
+          "body": "Os envios e revisões de rascunhos dos criadores aparecerão aqui."
+        },
+        "payments": {
+          "heading": "Pagamentos em breve",
+          "body": "O financiamento em garantia e os pagamentos serão gerenciados aqui."
+        },
+        "messages": {
+          "heading": "Mensagens em breve",
+          "body": "As mensagens da campanha aparecerão aqui."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Convidado",
+        "declined": "Recusado",
+        "countered": "Contraproposta",
+        "accepted": "Aceito",
+        "contracted": "Contratado",
+        "producing": "Produzindo",
+        "draft_submitted": "Rascunho enviado",
+        "revision_requested": "Revisão solicitada",
+        "approved": "Aprovado",
+        "posted": "Publicado",
+        "live_verified": "Verificado ao vivo",
+        "payment_held": "Pagamento retido",
+        "payment_released": "Pagamento liberado",
+        "cancelled": "Cancelado"
+      },
+      "empty": {
+        "heading": "Nenhuma campanha ainda",
+        "body": "Crie sua primeira campanha para começar a engajar criadores.",
+        "cta": "Criar campanha"
+      },
+      "errors": {
+        "loadFailed": "Falha ao carregar campanhas.",
+        "saveFailed": "Falha ao salvar campanha."
       }
     },
     "pools": {

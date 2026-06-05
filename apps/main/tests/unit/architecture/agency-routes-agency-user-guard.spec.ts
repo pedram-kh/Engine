@@ -80,6 +80,10 @@ describe('agency-shell routes — requireAgencyUser guard registration (Sprint 6
       'brands.detail',
       'brands.edit',
       'brands.list',
+      // Sprint 8 Chunk 1 — campaigns (list / create / detail with tabs).
+      'campaigns.create',
+      'campaigns.detail',
+      'campaigns.list',
       'creator-invitations.bulk',
       // Sprint 6.6a — the discovery read path (browse the global pool + the
       // public profile). New agency-shell routes; both carry requireAgencyUser.
