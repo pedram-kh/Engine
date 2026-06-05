@@ -4,17 +4,26 @@ declare(strict_types=1);
 
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
+use App\Modules\Campaigns\Enums\PostedContentVerificationStatus;
 use App\Modules\Campaigns\Events\AssignmentTransitioned;
+use App\Modules\Campaigns\Jobs\VerifyPostedContentJob;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
 use App\Modules\Campaigns\Models\CampaignPostedContent;
+use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
+use App\Modules\Creators\Enums\SocialPlatform;
+use App\Modules\Creators\Features\SocialVerificationEnabled;
+use App\Modules\Creators\Integrations\Contracts\SocialPlatformProvider;
 use App\Modules\Creators\Models\Creator;
+use App\Modules\Creators\Models\CreatorSocialAccount;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Pennant\Feature;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -30,7 +39,9 @@ uses(TestCase::class, RefreshDatabase::class);
  *   - creator-self scoping (non-owned ULID 404) + fail-closed (non-producible 422);
  *   - presigned media init/complete under the `drafts` namespace + ownership.
  *
- * Arc STOPS at posted / verification_status=pending (no verifyLive, no review).
+ * Arc STOPS at posted / verification_status=pending when social verification is
+ * gated OFF (the posting-mechanics test pins the flag OFF explicitly; the
+ * flag-ON arc lives in VerifyPostedContentJobTest + the in-place edit tests).
  */
 if (! function_exists('draftCreatorUser')) {
     /**
@@ -245,6 +256,11 @@ it('rejects draft media that does not belong to the creator (422 draft.media_inv
 // ── Posted content (approved → posted) ────────────────────────────────────────
 
 it('submits posted content, transitions approved → posted, leaving verification pending', function (): void {
+    // This pins the Chunk-1 posting mechanics with verification GATED OFF — the
+    // arc deliberately stops at posted/pending. (Social verification now
+    // defaults ON under the mock driver; the flag-ON arc is covered by
+    // VerifyPostedContentJobTest + the in-place edit tests below.)
+    Feature::define(SocialVerificationEnabled::NAME, false);
     [$user, $creator] = draftCreatorUser();
     $assignment = assignmentForCreatorInStatus($creator, AssignmentStatus::Approved);
 
@@ -354,4 +370,107 @@ it('rejects a complete whose upload_id belongs to another creator', function ():
         ])
         ->assertStatus(422)
         ->assertJsonPath('errors.0.code', 'draft.complete_failed');
+});
+
+// ── In-place posted-content edit (verification-resolution, ACT3) ─────────────
+
+if (! function_exists('postedFailedForCreator')) {
+    /**
+     * A `posted` assignment for the creator whose latest posted-content row
+     * FAILED verification, with a connected Instagram handle.
+     *
+     * @return array{0: User, 1: Creator, 2: CampaignAssignment, 3: CampaignPostedContent}
+     */
+    function postedFailedForCreator(string $handle = 'creatorhandle'): array
+    {
+        [$user, $creator] = draftCreatorUser();
+        CreatorSocialAccount::factory()->createOne([
+            'creator_id' => $creator->id,
+            'platform' => SocialPlatform::Instagram,
+            'handle' => $handle,
+        ]);
+
+        $assignment = assignmentForCreatorInStatus($creator, AssignmentStatus::Posted);
+        $posted = CampaignPostedContent::factory()->createOne([
+            'assignment_id' => $assignment->id,
+            'platform' => SocialPlatform::Instagram->value,
+            'post_url' => 'https://instagram.com/someoneelse/p/abc',
+            'verification_status' => PostedContentVerificationStatus::Mismatch,
+        ]);
+
+        return [$user, $creator, $assignment, $posted];
+    }
+}
+
+it('the creator edits a failed post URL in place → resets verification to pending, audits its own mutation, re-dispatches the verify job (no state change)', function (): void {
+    Feature::define(SocialVerificationEnabled::NAME, true);
+    Queue::fake();
+    [$user, , $assignment, $posted] = postedFailedForCreator();
+
+    $this->actingAs($user)
+        ->patchJson("/api/v1/creators/me/assignments/{$assignment->ulid}/posted-content", [
+            'post_url' => 'https://instagram.com/creatorhandle/p/xyz',
+        ])
+        ->assertOk()
+        ->assertJsonPath('meta.code', 'assignment.posted_content_updated')
+        ->assertJsonPath('data.attributes.verification_status', 'pending');
+
+    $posted->refresh();
+    expect($posted->verification_status)->toBe(PostedContentVerificationStatus::Pending)
+        ->and($posted->verified_at)->toBeNull()
+        ->and($posted->post_url)->toBe('https://instagram.com/creatorhandle/p/xyz');
+
+    // No state transition — the assignment never left posted.
+    expect(reloadAssignment($assignment)->status)->toBe(AssignmentStatus::Posted);
+
+    // The creator's mutation audits distinctly; the re-verify job is re-armed.
+    expect(AuditLog::query()->where('action', 'assignment.posted_content_updated')->where('subject_id', $assignment->id)->exists())->toBeTrue();
+    Queue::assertPushed(VerifyPostedContentJob::class, fn (VerifyPostedContentJob $j): bool => $j->postedContentUlid === $posted->ulid);
+});
+
+it('after the in-place edit, the re-armed verify job re-runs and a matching handle now → live_verified', function (): void {
+    Feature::define(SocialVerificationEnabled::NAME, true);
+    [$user, , $assignment, $posted] = postedFailedForCreator();
+
+    $this->actingAs($user)
+        ->patchJson("/api/v1/creators/me/assignments/{$assignment->ulid}/posted-content", [
+            'post_url' => 'https://instagram.com/creatorhandle/p/xyz',
+        ])
+        ->assertOk();
+
+    // Run the re-dispatched job (idempotency guard re-armed on pending).
+    (new VerifyPostedContentJob($posted->refresh()->ulid))->handle(
+        app(SocialPlatformProvider::class),
+        app(CampaignAssignmentStateMachine::class),
+    );
+
+    expect($posted->fresh()?->verification_status)->toBe(PostedContentVerificationStatus::Verified)
+        ->and(reloadAssignment($assignment)->status)->toBe(AssignmentStatus::LiveVerified);
+});
+
+it('fails closed (422 not_resolvable) on an in-place edit when the post has not failed', function (): void {
+    [$user, $creator] = draftCreatorUser();
+    $assignment = assignmentForCreatorInStatus($creator, AssignmentStatus::Posted);
+    CampaignPostedContent::factory()->createOne([
+        'assignment_id' => $assignment->id,
+        'verification_status' => PostedContentVerificationStatus::Pending,
+    ]);
+
+    $this->actingAs($user)
+        ->patchJson("/api/v1/creators/me/assignments/{$assignment->ulid}/posted-content", [
+            'post_url' => 'https://instagram.com/creatorhandle/p/xyz',
+        ])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'assignment.not_resolvable');
+});
+
+it('a non-owned assignment 404s on the in-place edit', function (): void {
+    [$user] = draftCreatorUser();
+    [, , $foreign] = postedFailedForCreator('otherhandle');
+
+    $this->actingAs($user)
+        ->patchJson("/api/v1/creators/me/assignments/{$foreign->ulid}/posted-content", [
+            'post_url' => 'https://instagram.com/creatorhandle/p/xyz',
+        ])
+        ->assertNotFound();
 });

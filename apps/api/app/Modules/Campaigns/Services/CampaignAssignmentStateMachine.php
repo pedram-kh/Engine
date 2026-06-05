@@ -44,6 +44,14 @@ use Laravel\Pennant\Feature;
  * dedicated terminal, D-1/D-3) + `verifyLive` un-gated behind the
  * `social_verification_enabled` flag (D-11).
  *
+ * Verification-resolution chunk: the agency's resolution of a FAILED
+ * auto-verification (`posted` + `not_found`/`mismatch`) — `manuallyVerify`
+ * (`posted → manually_verified`, ACT1/D-4, mandatory reason, the human override)
+ * + `returnForResubmit` (`posted → approved`, ACT2/D-5, the fresh-resubmit edge).
+ * The in-place nudge (ACT3) is NOT a machine edge (no transition — the agency
+ * endpoint only notifies/audits; the creator's in-place URL PATCH re-arms
+ * verification).
+ *
  * VENDOR/FLAG-GATED — the methods + their source guards exist + are tested.
  * `holdPayment` / `releasePayment` refuse because Stripe escrow (Sprint 10)
  * does not exist yet; there is NO manual path to those states (the footgun
@@ -378,6 +386,78 @@ final class CampaignAssignmentStateMachine
             mutate: function (CampaignAssignment $a): void {
                 $a->verified_live_at = now();
             },
+            context: $context,
+        );
+    }
+
+    /**
+     * posted → manually_verified (verification-resolution chunk, ACT1, D-4). The
+     * agency's MANUAL OVERRIDE of a FAILED auto-verification: the assignment
+     * stayed `posted` after the job set `not_found`/`mismatch`, and the agency
+     * judges the post acceptable anyway. Fail-closed: only `posted` is a legal
+     * source. Fires the net-new board verb `assignment.manually_verified` —
+     * EXPLICITLY distinct from `assignment.live_verified` ("a real pass"): the
+     * audit row is the human-override trail (who/when/why).
+     *
+     * The `$reason` is MANDATORY (D-4 — the override must answer "why was this
+     * paid despite failing verification") — carried in the dedicated audit
+     * `reason` field (the cancel/reject precedent), NOT the metadata snapshot.
+     *
+     * `manually_verified` is NON-terminal and PAYMENT-ELIGIBLE alongside
+     * `live_verified` ({@see AssignmentStatus::isPaymentEligible()}): S10's
+     * release-gate (docs/20-PHASE-1-SPEC.md §6.8) + auto-release listener MUST
+     * consume that predicate, NOT the literal `live_verified` string, so this
+     * override does not dead-end at payment. Stamps `verified_live_at` (the
+     * verification-complete timestamp; the override distinction lives in the
+     * status + the distinct verb, not a separate column — no migration, D-1).
+     *
+     * @param  array<string, mixed>  $context
+     */
+    public function manuallyVerify(CampaignAssignment $assignment, string $reason, ?User $actor = null, array $context = []): CampaignAssignment
+    {
+        $this->assertSource($assignment, [AssignmentStatus::Posted], AssignmentStatus::ManuallyVerified);
+
+        $trimmed = trim($reason);
+        if ($trimmed === '') {
+            throw AssignmentTransitionException::reasonRequired();
+        }
+
+        return $this->commit(
+            $assignment,
+            AssignmentStatus::ManuallyVerified,
+            AuditAction::AssignmentManuallyVerified,
+            $actor,
+            reason: $trimmed,
+            mutate: function (CampaignAssignment $a): void {
+                $a->verified_live_at = now();
+            },
+            context: $context,
+        );
+    }
+
+    /**
+     * posted → approved (verification-resolution chunk, ACT2, D-5). The agency
+     * sends a FAILED-verification assignment BACK so the creator submits a FRESH
+     * post (re-using the existing `approved → submit-post-URL` creator surface
+     * verbatim). The existing `campaign_posted_content` row is KEPT as history —
+     * the failed post is part of the story; the verification job orders by id so
+     * the new row becomes active. Fail-closed: only `posted` is a legal source.
+     * Fires the net-new board verb `assignment.resubmit_requested` (a card moving
+     * back to "approved" — distinct from the in-place nudge, ACT3, which has no
+     * edge). Optional `$feedback` rides the notification (not the audit snapshot,
+     * the free-text discipline, D-3).
+     *
+     * @param  array<string, mixed>  $context
+     */
+    public function returnForResubmit(CampaignAssignment $assignment, ?User $actor = null, array $context = []): CampaignAssignment
+    {
+        $this->assertSource($assignment, [AssignmentStatus::Posted], AssignmentStatus::Approved);
+
+        return $this->commit(
+            $assignment,
+            AssignmentStatus::Approved,
+            AuditAction::AssignmentResubmitRequested,
+            $actor,
             context: $context,
         );
     }

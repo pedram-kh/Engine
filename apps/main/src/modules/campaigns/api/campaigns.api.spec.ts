@@ -130,4 +130,34 @@ describe('campaignsApi create / update / assignments', () => {
       { agreed_fee_minor_units: 650000, agreed_fee_currency: 'EUR' },
     )
   })
+
+  it('POSTs the manual-verify override with its reason (verification-resolution, ACT1)', () => {
+    void campaignsApi.manuallyVerify('agency-ulid', 'campaign-ulid', 'assignment-ulid', {
+      reason: 'Checked by hand — live and on-brief.',
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/assignments/assignment-ulid/manually-verify',
+      { reason: 'Checked by hand — live and on-brief.' },
+    )
+  })
+
+  it('POSTs the fresh-resubmit request with optional feedback (ACT2)', () => {
+    void campaignsApi.requestResubmitFresh('agency-ulid', 'campaign-ulid', 'assignment-ulid', {
+      feedback: 'Post a fresh link.',
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/assignments/assignment-ulid/request-resubmit-fresh',
+      { feedback: 'Post a fresh link.' },
+    )
+  })
+
+  it('POSTs the in-place resubmit request (ACT3 — the nudge, no transition)', () => {
+    void campaignsApi.requestResubmitInPlace('agency-ulid', 'campaign-ulid', 'assignment-ulid', {
+      feedback: 'The link 404s.',
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/assignments/assignment-ulid/request-resubmit-in-place',
+      { feedback: 'The link 404s.' },
+    )
+  })
 })

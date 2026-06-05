@@ -36,6 +36,24 @@ return [
                 'cta' => 'Rever a tarefa',
             ],
         ],
+        'manually_verified' => [
+            'email' => [
+                'subject' => 'A sua publicação para :campaign foi aceite',
+                'greeting' => 'Olá :name,',
+                'body' => 'Boas notícias — a agência reviu e aceitou a sua publicação para ":campaign". Não é necessária nenhuma ação adicional.',
+                'cta' => 'Ver a tarefa',
+            ],
+        ],
+        'resubmit_requested' => [
+            'email' => [
+                'subject' => 'Ação necessária na sua publicação de :campaign',
+                'greeting' => 'Olá :name,',
+                'body_fresh' => 'A agência não conseguiu verificar a sua publicação para ":campaign" e pediu que envie um novo link de publicação. Abra a tarefa para reenviar.',
+                'body_in_place' => 'A agência não conseguiu verificar a sua publicação para ":campaign" e pediu que corrija o link enviado. Abra a tarefa para atualizá-lo.',
+                'feedback_label' => 'Nota da agência',
+                'cta' => 'Abrir a tarefa',
+            ],
+        ],
         'contract_attached' => [
             'email' => [
                 'subject' => 'Contrato pronto para :campaign',

@@ -417,8 +417,11 @@
           "pdfReady": "PDF pronto: {name}",
           "cancel": "Cancelar",
           "submit": "Emitir contrato",
-          "success": "Contrato emitido. O criador foi notificado."
+          "success": "Contrato emitido. O criador foi notificado.",
+          "alreadyAttached": "Já existe um contrato a aguardar a aceitação deste criador.",
+          "error": "Não foi possível emitir o contrato. Tente novamente."
         },
+        "pending": "Contrato enviado — a aguardar o criador",
         "proceedWithout": {
           "action": "Prosseguir sem contrato",
           "success": "Atribuição avançada sem contrato.",
@@ -477,6 +480,7 @@
         "rejected": "Rejeitado",
         "posted": "Publicado",
         "live_verified": "Verificado ao vivo",
+        "manually_verified": "Verificado manualmente",
         "payment_held": "Pagamento retido",
         "payment_released": "Pagamento liberado",
         "cancelled": "Cancelado"
@@ -522,6 +526,50 @@
           "preview": "Abrir pré-visualização",
           "close": "Fechar",
           "empty": "Nenhuma mídia anexada."
+        }
+      },
+      "resolution": {
+        "action": "Resolver",
+        "title": "Resolver verificação",
+        "loadFailed": "Não foi possível carregar esta tarefa. Tente novamente.",
+        "postedContent": "Publicação enviada",
+        "simulated": "Verificação simulada (provedor fictício)",
+        "intro": "A verificação automática desta publicação falhou. Aceite-a manualmente, devolva-a para uma nova publicação ou peça ao criador para corrigir o link.",
+        "verification": {
+          "pending": "A aguardar verificação",
+          "verified": "Verificado",
+          "not_found": "Não encontrado",
+          "mismatch": "Não corresponde"
+        },
+        "noteLabel": "Motivo / nota para o criador",
+        "noteHint": "Obrigatório na verificação manual; opcional nos pedidos de reenvio.",
+        "manuallyVerify": "Verificar manualmente",
+        "requestFresh": "Pedir nova publicação",
+        "requestInPlace": "Pedir para corrigir o link",
+        "close": "Fechar",
+        "notActionable": "Esta tarefa já não aguarda resolução.",
+        "toast": {
+          "verified": "Publicação verificada manualmente.",
+          "resubmitFresh": "Devolvida para uma nova publicação.",
+          "resubmitInPlace": "Pediu ao criador para corrigir o link.",
+          "error": "Algo correu mal. Tente novamente."
+        }
+      },
+      "viewPost": {
+        "action": "Ver publicação",
+        "title": "Conteúdo publicado",
+        "loadFailed": "Não foi possível carregar esta publicação. Tente novamente.",
+        "empty": "O criador ainda não publicou nenhum conteúdo.",
+        "current": "Atual",
+        "postedAt": "Publicado",
+        "verifiedAt": "Verificado",
+        "simulated": "Neste ambiente a verificação corre contra um fornecedor simulado.",
+        "close": "Fechar",
+        "verification": {
+          "pending": "A aguardar verificação",
+          "verified": "Verificado",
+          "not_found": "Não encontrado",
+          "mismatch": "Divergência"
         }
       },
       "empty": {

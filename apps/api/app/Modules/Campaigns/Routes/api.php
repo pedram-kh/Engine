@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentContractController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentController;
+use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentResolutionController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentReviewController;
 use App\Modules\Campaigns\Http\Controllers\CampaignController;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,18 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
             ->name('campaigns.assignments.request-revision');
         Route::post('campaigns/{campaign}/assignments/{assignment}/reject', [CampaignAssignmentReviewController::class, 'reject'])
             ->name('campaigns.assignments.reject');
+
+        // Verification-resolution chunk — the agency resolves a FAILED
+        // auto-verification (a `posted` assignment whose latest posted-content
+        // verification is `not_found`/`mismatch`). The three resolution actions
+        // (D-4/D-5/D-6), gated on the `review` ability (admin + manager + staff)
+        // + fail-closed on the resolvable precondition inside the controller.
+        Route::post('campaigns/{campaign}/assignments/{assignment}/manually-verify', [CampaignAssignmentResolutionController::class, 'manuallyVerify'])
+            ->name('campaigns.assignments.manually-verify');
+        Route::post('campaigns/{campaign}/assignments/{assignment}/request-resubmit-fresh', [CampaignAssignmentResolutionController::class, 'requestResubmitFresh'])
+            ->name('campaigns.assignments.request-resubmit-fresh');
+        Route::post('campaigns/{campaign}/assignments/{assignment}/request-resubmit-in-place', [CampaignAssignmentResolutionController::class, 'requestResubmitInPlace'])
+            ->name('campaigns.assignments.request-resubmit-in-place');
 
         // Per-campaign contract attach (contract-bridge chunk, D-6/D-9). Agency
         // issues a contract to an accepted assignment; creator accept is on

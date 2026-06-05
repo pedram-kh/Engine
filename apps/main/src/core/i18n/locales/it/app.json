@@ -417,8 +417,11 @@
           "pdfReady": "PDF pronto: {name}",
           "cancel": "Annulla",
           "submit": "Emetti contratto",
-          "success": "Contratto emesso. Il creator è stato notificato."
+          "success": "Contratto emesso. Il creator è stato notificato.",
+          "alreadyAttached": "Un contratto è già in attesa di accettazione da parte di questo creator.",
+          "error": "Impossibile emettere il contratto. Riprova."
         },
+        "pending": "Contratto inviato — in attesa del creator",
         "proceedWithout": {
           "action": "Procedi senza contratto",
           "success": "Incarico avanzato senza contratto.",
@@ -477,6 +480,7 @@
         "rejected": "Rifiutato",
         "posted": "Pubblicato",
         "live_verified": "Verificato live",
+        "manually_verified": "Verificato manualmente",
         "payment_held": "Pagamento trattenuto",
         "payment_released": "Pagamento rilasciato",
         "cancelled": "Annullato"
@@ -522,6 +526,50 @@
           "preview": "Apri anteprima",
           "close": "Chiudi",
           "empty": "Nessun media allegato."
+        }
+      },
+      "resolution": {
+        "action": "Risolvi",
+        "title": "Risolvi la verifica",
+        "loadFailed": "Impossibile caricare questo incarico. Riprova.",
+        "postedContent": "Post inviato",
+        "simulated": "Verifica simulata (provider mock)",
+        "intro": "La verifica automatica di questo post non è riuscita. Accettalo manualmente, rimandalo per un nuovo post o chiedi al creator di correggere il link.",
+        "verification": {
+          "pending": "In attesa di verifica",
+          "verified": "Verificato",
+          "not_found": "Non trovato",
+          "mismatch": "Non corrispondente"
+        },
+        "noteLabel": "Motivo / nota per il creator",
+        "noteHint": "Obbligatorio per la verifica manuale; facoltativo per le richieste di reinvio.",
+        "manuallyVerify": "Verifica manualmente",
+        "requestFresh": "Richiedi nuovo post",
+        "requestInPlace": "Chiedi di correggere il link",
+        "close": "Chiudi",
+        "notActionable": "Questo incarico non è più in attesa di risoluzione.",
+        "toast": {
+          "verified": "Post verificato manualmente.",
+          "resubmitFresh": "Rimandato per un nuovo post.",
+          "resubmitInPlace": "Hai chiesto al creator di correggere il link.",
+          "error": "Qualcosa è andato storto. Riprova."
+        }
+      },
+      "viewPost": {
+        "action": "Vedi post",
+        "title": "Contenuto pubblicato",
+        "loadFailed": "Impossibile caricare questo post. Riprova.",
+        "empty": "Il creator non ha ancora pubblicato alcun contenuto.",
+        "current": "Attuale",
+        "postedAt": "Pubblicato",
+        "verifiedAt": "Verificato",
+        "simulated": "In questo ambiente la verifica usa un provider simulato.",
+        "close": "Chiudi",
+        "verification": {
+          "pending": "In attesa di verifica",
+          "verified": "Verificato",
+          "not_found": "Non trovato",
+          "mismatch": "Discordanza"
         }
       },
       "empty": {

@@ -6,11 +6,14 @@ namespace App\Modules\Creators\Http\Controllers;
 
 use App\Core\Errors\ErrorResponse;
 use App\Core\Tenancy\BelongsToAgencyScope;
+use App\Modules\Audit\Enums\AuditAction;
+use App\Modules\Audit\Facades\Audit;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Enums\DraftReviewStatus;
 use App\Modules\Campaigns\Enums\PostedContentVerificationStatus;
 use App\Modules\Campaigns\Http\Resources\CampaignDraftResource;
 use App\Modules\Campaigns\Http\Resources\CampaignPostedContentResource;
+use App\Modules\Campaigns\Jobs\VerifyPostedContentJob;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
 use App\Modules\Campaigns\Models\CampaignPostedContent;
@@ -365,6 +368,90 @@ final class CreatorAssignmentDraftController
             'data' => (new CampaignPostedContentResource($posted))->resolve($request),
             'meta' => ['code' => 'assignment.posted_by_creator'],
         ], 201);
+    }
+
+    /**
+     * Edit the self-reported post URL IN PLACE after a failed auto-verification
+     * (verification-resolution chunk, ACT3/D-6). The creator fixes the URL on
+     * the existing posted-content row; this resets `verification_status` to
+     * `pending` (clearing any prior `verified_at`/`platform_post_id`) and
+     * re-dispatches {@see VerifyPostedContentJob} — and BECAUSE the job is
+     * idempotent (it bails unless `pending`), the reset-to-`pending` is exactly
+     * what re-arms it. NO state transition — the assignment stays `posted`.
+     *
+     * Fail-closed: allowed ONLY when the assignment is `posted` AND the latest
+     * posted-content row's verification FAILED (`not_found`/`mismatch`). The
+     * agency's in-place resubmit request is a nudge, NOT a precondition — the
+     * creator may fix a failed post whenever it is in that state.
+     *
+     * Audits the creator's mutation distinctly (`assignment.posted_content_updated`);
+     * the free-text URL is NOT snapshotted (the hand-written-audit discipline, D-3).
+     */
+    public function updatePostedContent(Request $request, string $assignment): JsonResponse
+    {
+        $validated = $request->validate([
+            'platform' => ['sometimes', 'string', Rule::in(array_map(static fn (SocialPlatform $p): string => $p->value, SocialPlatform::cases()))],
+            'post_url' => ['required', 'string', 'url', 'max:2048'],
+        ]);
+
+        $creator = $this->requireCreator($request);
+        $model = $this->resolveOwnedAssignment($creator, $assignment);
+
+        // Fail-closed: only a `posted` assignment whose latest post failed
+        // verification may be edited in place.
+        if ($model->status !== AssignmentStatus::Posted) {
+            return ErrorResponse::single(
+                $request,
+                422,
+                'assignment.not_resolvable',
+                'This assignment has no failed post to resubmit in place.',
+            );
+        }
+
+        $posted = CampaignPostedContent::query()
+            ->where('assignment_id', $model->id)
+            ->orderByDesc('id')
+            ->first();
+
+        $failed = [PostedContentVerificationStatus::NotFound, PostedContentVerificationStatus::Mismatch];
+        if ($posted === null || ! in_array($posted->verification_status, $failed, true)) {
+            return ErrorResponse::single(
+                $request,
+                422,
+                'assignment.not_resolvable',
+                'This post has no failed verification to resubmit in place.',
+            );
+        }
+
+        DB::transaction(function () use ($posted, $model, $validated): void {
+            if (isset($validated['platform'])) {
+                $posted->platform = (string) $validated['platform'];
+            }
+            $posted->post_url = (string) $validated['post_url'];
+            // The reset re-arms the idempotent verification job.
+            $posted->verification_status = PostedContentVerificationStatus::Pending;
+            $posted->verified_at = null;
+            $posted->platform_post_id = null;
+            $posted->save();
+
+            // The creator's mutation audits distinctly from the agency request
+            // (ACT3's `assignment.resubmit_requested_in_place`). The free-text
+            // post_url is excluded (D-3); the posted-content id + platform ride it.
+            Audit::log(
+                action: AuditAction::AssignmentPostedContentUpdated,
+                subject: $model,
+                metadata: ['posted_content_id' => $posted->ulid, 'platform' => $posted->platform],
+            );
+        });
+
+        // Standalone re-verify dispatch (today the job only fires on
+        // posted_by_creator). The job re-checks the social flag itself.
+        VerifyPostedContentJob::dispatch($posted->ulid);
+
+        return response()->json([
+            'data' => (new CampaignPostedContentResource($posted->refresh()))->resolve($request),
+            'meta' => ['code' => 'assignment.posted_content_updated'],
+        ]);
     }
 
     /**

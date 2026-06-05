@@ -55,7 +55,7 @@ final class CampaignAssignmentController
 
         $paginator = $campaign->assignments()
             ->where('campaign_assignments.agency_id', $agency->id)
-            ->with('creator:id,ulid,display_name')
+            ->with(['creator:id,ulid,display_name', 'latestPostedContent', 'sentContract'])
             ->orderByDesc('campaign_assignments.id')
             ->paginate($perPage)
             ->withQueryString();

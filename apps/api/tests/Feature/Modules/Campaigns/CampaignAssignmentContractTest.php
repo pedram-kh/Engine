@@ -413,3 +413,33 @@ it('proceed-without-contract rejects non-members with 404', function (): void {
         ->postJson(agencyContractUrl($agency, $campaign, $assignment, 'proceed-without-contract'))
         ->assertNotFound();
 });
+
+it('the Creators listing exposes has_pending_contract once a contract is sent (issue-visibility fix)', function (): void {
+    [$agency, $campaign, $assignment] = contractSetup();
+    $staff = User::factory()->agencyStaff($agency)->createOne();
+    $indexUrl = "/api/v1/agencies/{$agency->ulid}/campaigns/{$campaign->ulid}/assignments";
+
+    // Before issuing: an accepted row reports no pending contract (relation
+    // loaded → false, not null).
+    $this->actingAs($staff)
+        ->getJson($indexUrl)
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.status', 'accepted')
+        ->assertJsonPath('data.0.attributes.has_pending_contract', false);
+
+    $this->actingAs($staff)
+        ->postJson(agencyContractUrl($agency, $campaign, $assignment, 'attach'), [
+            'title' => 'Addendum',
+            'body_markdown' => 'Terms.',
+        ])
+        ->assertCreated();
+
+    // After issuing: the assignment is STILL accepted (the creator must accept),
+    // but the row now flags a pending contract so the FE shows "Contract sent —
+    // awaiting creator" instead of re-offering "Issue contract".
+    $this->actingAs($staff)
+        ->getJson($indexUrl)
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.status', 'accepted')
+        ->assertJsonPath('data.0.attributes.has_pending_contract', true);
+});

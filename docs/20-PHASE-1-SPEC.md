@@ -578,13 +578,13 @@ From campaign board → click card in "In Review" column → drawer opens:
 - Job calls the social API for the post
 - Verifies: post belongs to creator's connected account, post URL matches submitted, content matches brief deliverable kind (e.g., is it actually a Reel?)
 - If verified: status → `live_verified`, board card moves
-- If failed: agency notified, manual review
+- If failed: agency notified, manual review — the **resolution** half (verification-resolution chunk) gives the agency three actions on a `posted`+failed assignment: **manually verify** (override → `manually_verified`, payment-eligible), **request a fresh resubmit** (`posted → approved`), or **request an in-place fix** (creator re-edits the URL, re-arming verification). See docs/03-DATA-MODEL.md §7.
 
 ### 6.8 Payment release flow
 
 Agency-initiated:
 
-- From assignment drawer → "Release payment" button (only enabled when status is `live_verified`)
+- From assignment drawer → "Release payment" button (only enabled when the status is **payment-eligible** — `live_verified` OR `manually_verified`). The S10 gate MUST consume [`AssignmentStatus::isPaymentEligible()`](../apps/api/app/Modules/Campaigns/Enums/AssignmentStatus.php), NOT the literal `live_verified` string, so an agency's manual override of a failed auto-verification can still be paid (the dead-end-preventer).
 - Confirmation modal showing: amount, fee, recipient
 - Idempotent submission
 - Triggers Stripe transfer
@@ -594,7 +594,7 @@ Agency-initiated:
 Or via automation:
 
 - Agency settings can enable "auto-release on verification"
-- When `assignment.live_verified` event fires AND auto-release is on, payment automatically released
+- When `assignment.live_verified` **OR `assignment.manually_verified`** fires AND auto-release is on, payment automatically released (the auto-release listener keys on the payment-eligible predicate, not a single verb)
 
 ---
 

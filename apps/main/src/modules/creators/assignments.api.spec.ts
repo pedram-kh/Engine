@@ -109,4 +109,18 @@ describe('creatorAssignmentsApi', () => {
       },
     )
   })
+
+  it('PATCHes the in-place posted-content edit (verification-resolution, ACT3)', () => {
+    mockHttp.patch.mockResolvedValue({
+      data: {},
+      meta: { code: 'assignment.posted_content_updated' },
+    })
+    void creatorAssignmentsApi.updatePostedContent('01ASSIGNMENT', {
+      post_url: 'https://instagram.com/creatorhandle/p/xyz',
+    })
+    expect(mockHttp.patch).toHaveBeenCalledWith(
+      '/creators/me/assignments/01ASSIGNMENT/posted-content',
+      { post_url: 'https://instagram.com/creatorhandle/p/xyz' },
+    )
+  })
 })

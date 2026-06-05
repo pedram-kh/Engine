@@ -17,10 +17,13 @@ export type CampaignStatus = 'draft' | 'active' | 'paused' | 'completed' | 'canc
 export type CampaignObjective = 'awareness' | 'engagement' | 'conversion' | 'ugc' | 'launch'
 
 /**
- * Mirror of `AssignmentStatus` — the 15-state campaign-assignment graph driven
+ * Mirror of `AssignmentStatus` — the 16-state campaign-assignment graph driven
  * by the backend `CampaignAssignmentStateMachine`. Terminal: declined,
  * rejected, payment_released, cancelled. Sprint 9 Chunk 2 adds the dedicated
- * `rejected` terminal (the agency rejects a submitted draft).
+ * `rejected` terminal (the agency rejects a submitted draft). The
+ * verification-resolution chunk adds the non-terminal `manually_verified` —
+ * the agency's manual override of a FAILED auto-verification (`posted →
+ * manually_verified`), payment-eligible alongside `live_verified`.
  */
 export type AssignmentStatus =
   | 'invited'
@@ -35,6 +38,7 @@ export type AssignmentStatus =
   | 'rejected'
   | 'posted'
   | 'live_verified'
+  | 'manually_verified'
   | 'payment_held'
   | 'payment_released'
   | 'cancelled'
@@ -171,6 +175,20 @@ export interface CampaignAssignmentResource {
     invited_at: string | null
     responded_at: string | null
     posting_due_at: string | null
+    /**
+     * The latest posted-content row's verification status (verification-
+     * resolution chunk, D-7) — drives the `posted`+failed row action. Null when
+     * the assignment has no posted content (or the relation was not loaded).
+     */
+    verification_status: PostedContentVerificationStatus | null
+    /**
+     * True when a per-campaign contract is awaiting the creator's acceptance
+     * (contract-issue visibility fix). Lets the Creators tab show "Contract
+     * sent — awaiting creator" instead of re-offering "Issue contract" while
+     * the assignment is still `accepted`. Null when the `sentContract` relation
+     * was not loaded.
+     */
+    has_pending_contract: boolean | null
     creator: {
       id: string
       display_name: string | null
@@ -454,6 +472,34 @@ export interface ReviewActionResponse {
   meta: { code: string }
 }
 
+// ---------------------------------------------------------------------------
+// Agency verification-failure resolution — the 3 actions on a posted+failed
+// assignment (verification-resolution chunk, D-4/D-5/D-6).
+// ---------------------------------------------------------------------------
+
+/** POST `…/manually-verify` — the override reason is REQUIRED (D-4). */
+export interface ManuallyVerifyPayload {
+  reason: string
+}
+
+/** POST `…/request-resubmit-fresh` — `posted → approved`; feedback optional (D-5). */
+export interface RequestResubmitFreshPayload {
+  feedback?: string | null
+}
+
+/** POST `…/request-resubmit-in-place` — a nudge, no transition; feedback optional (D-6). */
+export interface RequestResubmitInPlacePayload {
+  feedback?: string | null
+}
+
+/**
+ * The `{data}` envelope returned by the three resolution actions — the updated
+ * agency-side assignment row (mirrors the Creators-tab resource shape).
+ */
+export interface ResolutionActionResponse {
+  data: CampaignAssignmentResource
+}
+
 /** One media item submitted with a draft (the SPA builds this post-upload). */
 export interface DraftMediaInput {
   s3_path: string
@@ -478,6 +524,16 @@ export interface CreatorDraftSubmitResponse {
 export interface SubmitPostedContentPayload {
   platform: string
   post_url: string
+}
+
+/**
+ * PATCH `…/posted-content` — the creator edits the post URL IN PLACE after a
+ * failed auto-verification (verification-resolution chunk, ACT3/D-6). Resets
+ * verification to `pending` + re-arms the verify job; no state transition.
+ */
+export interface UpdatePostedContentPayload {
+  post_url: string
+  platform?: string
 }
 
 export interface CreatorPostedContentResponse {

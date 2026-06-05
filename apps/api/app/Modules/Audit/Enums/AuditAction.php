@@ -243,6 +243,28 @@ enum AuditAction: string
     case AssignmentDraftRejected = 'assignment.draft_rejected';
     case AssignmentPostedByCreator = 'assignment.posted_by_creator';
     case AssignmentLiveVerified = 'assignment.live_verified';
+    // Verification-resolution chunk — the agency's resolution of a FAILED
+    // auto-verification (a `posted`/`not_found`|`mismatch` assignment).
+    //   - ManuallyVerified (ACT1): the human OVERRIDE — `posted → manually_verified`
+    //     (mandatory reason). EXPLICITLY distinct from `assignment.live_verified`
+    //     ("a real pass"): this verb is the audit trail answering "why was this
+    //     paid despite failing verification". Logged by the machine's manuallyVerify().
+    //   - ResubmitRequested (ACT2): the agency sends the assignment BACK for a
+    //     FRESH post — the `posted → approved` machine edge (the creator re-uses
+    //     the existing approved→submit-post-URL surface). Logged by the machine.
+    //   - ResubmitRequestedInPlace (ACT3): the agency NUDGES the creator to fix
+    //     the post URL in place — NO state transition (the card stays in
+    //     posted/failed). A self-describing verb distinct from the fresh-resubmit
+    //     edge (different board movement). Hand-written by the resolution endpoint;
+    //     the creator's actual in-place URL edit audits separately
+    //     (PostedContentUpdated) as its own mutation.
+    //   - PostedContentUpdated: the creator's in-place posted-content edit — the
+    //     free-text post_url is NOT snapshotted (the hand-written-audit discipline);
+    //     the row records the FACT + the posted-content id. Re-arms verification.
+    case AssignmentManuallyVerified = 'assignment.manually_verified';
+    case AssignmentResubmitRequested = 'assignment.resubmit_requested';
+    case AssignmentResubmitRequestedInPlace = 'assignment.resubmit_requested_in_place';
+    case AssignmentPostedContentUpdated = 'assignment.posted_content_updated';
     case AssignmentPaymentFunded = 'assignment.payment_funded';
     case AssignmentPaymentReleased = 'assignment.payment_released';
     case AssignmentCancelled = 'assignment.cancelled';
@@ -267,7 +289,11 @@ enum AuditAction: string
             // Reject always carries a mandatory reason (Sprint 9 Chunk 2, D-3 —
             // the review feedback is the rejection rationale; the controller
             // also persists it on the draft's `review_feedback`).
-            self::AssignmentDraftRejected => true,
+            self::AssignmentDraftRejected,
+            // Manual-verify always carries a mandatory reason (verification-
+            // resolution chunk, D-4 — the override must answer "why was this paid
+            // despite failing verification"). Carried in the audit `reason` field.
+            self::AssignmentManuallyVerified => true,
             default => false,
         };
     }

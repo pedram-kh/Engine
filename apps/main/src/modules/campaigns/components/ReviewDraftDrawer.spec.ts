@@ -47,6 +47,8 @@ function makeAssignment(): CampaignAssignmentResource {
       invited_at: null,
       responded_at: null,
       posting_due_at: null,
+      verification_status: null,
+      has_pending_contract: null,
       creator: { id: 'creator-ulid', display_name: 'Alex Creator' },
     },
   }

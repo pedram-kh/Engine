@@ -220,6 +220,16 @@ Route::prefix('creators/me')
                 ->name('drafts.media.complete');
             Route::post('{assignment}/posted-content', [CreatorAssignmentDraftController::class, 'submitPostedContent'])
                 ->name('posted-content.submit');
+
+            // Verification-resolution chunk (ACT3, D-6) — the creator edits the
+            // self-reported post URL IN PLACE after a failed auto-verification.
+            // Resets verification_status → pending + re-dispatches the verify job
+            // (which re-arms because it is idempotent on pending). NO state
+            // transition; fail-closed on posted + failed verification. Same
+            // structural creator-ownership + scope-bypass as the rest of the
+            // submission surface. Allowlisted in docs/security/tenancy.md § 4.
+            Route::patch('{assignment}/posted-content', [CreatorAssignmentDraftController::class, 'updatePostedContent'])
+                ->name('posted-content.update');
         });
     });
 

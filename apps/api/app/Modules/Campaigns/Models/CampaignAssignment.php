@@ -11,12 +11,15 @@ use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Database\Factories\CampaignAssignmentFactory;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
+use App\Modules\Creators\Enums\ContractStatus;
 use App\Modules\Creators\Models\Contract;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -161,6 +164,44 @@ final class CampaignAssignment extends Model
     public function contract(): BelongsTo
     {
         return $this->belongsTo(Contract::class);
+    }
+
+    /**
+     * @return HasMany<CampaignPostedContent, $this>
+     */
+    public function postedContent(): HasMany
+    {
+        return $this->hasMany(CampaignPostedContent::class, 'assignment_id');
+    }
+
+    /**
+     * The active posted-content row (verification-resolution chunk). The
+     * verification job + the resolution surfaces order by id, so the
+     * highest-id row is the current one (a fresh ACT2 resubmit supersedes the
+     * failed post, which is kept as history).
+     *
+     * @return HasOne<CampaignPostedContent, $this>
+     */
+    public function latestPostedContent(): HasOne
+    {
+        return $this->hasOne(CampaignPostedContent::class, 'assignment_id')->latestOfMany();
+    }
+
+    /**
+     * The per-campaign contract awaiting the creator's acceptance
+     * (contract-issue visibility fix). The Contract subject is polymorphic
+     * (`subject_type = campaign_assignment`, `subject_id = id`); the attach
+     * endpoint refuses a second `sent` row, so at most one exists at a time.
+     * Drives the agency Creators-tab "Contract sent — awaiting creator"
+     * state. Emitted on the resource only when eager-loaded.
+     *
+     * @return HasOne<Contract, $this>
+     */
+    public function sentContract(): HasOne
+    {
+        return $this->hasOne(Contract::class, 'subject_id')
+            ->where('subject_type', Contract::SUBJECT_CAMPAIGN_ASSIGNMENT)
+            ->where('status', ContractStatus::Sent);
     }
 
     public function isTerminal(): bool

@@ -28,6 +28,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
   success: []
+  error: [message: string]
 }>()
 
 const { t } = useI18n()
@@ -116,7 +117,18 @@ async function submit(): Promise<void> {
     if (err instanceof ApiError) {
       fieldErrors.value = extractFieldErrors<AttachField>(err)
     }
+    // Per-field 422s keep the dialog open (the user fixes the inputs). Any
+    // other failure — a top-level 422 like `contract.already_attached`, a 5xx,
+    // or a network error — would otherwise close the dialog silently, so
+    // surface it to the parent as an error toast instead.
     if (Object.keys(fieldErrors.value).length === 0) {
+      const code = err instanceof ApiError ? err.code : null
+      emit(
+        'error',
+        code === 'contract.already_attached'
+          ? t('app.campaigns.contract.attach.alreadyAttached')
+          : t('app.campaigns.contract.attach.error'),
+      )
       emit('update:modelValue', false)
     }
   } finally {

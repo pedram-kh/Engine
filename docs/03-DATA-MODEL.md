@@ -546,8 +546,11 @@ responded (split into):
             ↓
         posted          (creator says posted; awaiting verification)
             ↓
-        live_verified   (system verified via API)
-            ↓
+       ┌────┴───────────────────────────────────────┐
+       ↓                                             ↓
+        live_verified   (system verified via API)   manually_verified  (agency override of a failed check)
+       └────┬───────────────────────────────────────┘
+            ↓ (both are payment-eligible — AssignmentStatus::isPaymentEligible())
         payment_held    (escrow holds — auto)
             ↓
         payment_released (funds out — terminal success)
@@ -558,6 +561,8 @@ Cancellation can happen from any non-terminal state → cancelled (terminal)
 State transitions are managed by `CampaignAssignmentStateMachine` service. Every transition is logged in `audit_logs` and may trigger card movement on the board.
 
 > **`countered_fee_*` — Sprint-8 addition (Chunk 1, D-7).** The state machine's `counter()` transition (`invited → countered`) records the creator's counter-offer in `countered_fee_minor_units`/`countered_fee_currency` **without overwriting `agreed_fee_*`** — the agency's original offer is preserved alongside the counter so the negotiation delta is inspectable. As-built `status` is `varchar(32)`. The negotiation **loop** (multiple back-and-forth rounds) is **not** built — a single counter is recorded, then the next move is accept/decline; see `tech-debt.md` (counter-minimal).
+
+> **`manually_verified` + verification-failure resolution — verification-resolution chunk (D-1/D-4/D-5/D-6).** Sprint 9 detected failed auto-verification (`VerifyPostedContentJob` sets `verification_status` to `not_found`/`mismatch`, the assignment stays `posted`, the agency is notified) but gave the agency no way to resolve it. This chunk adds the resolution half. **`manually_verified`** is a NEW non-terminal status — the agency's MANUAL OVERRIDE of a failed check (`posted → manually_verified`, mandatory reason, audited `assignment.manually_verified`, **distinct from `live_verified`** so the override is legible in the trail). Crucially it is **payment-eligible alongside `live_verified`** via the new [`AssignmentStatus::isPaymentEligible()`](../apps/api/app/Modules/Campaigns/Enums/AssignmentStatus.php) predicate (the dead-end-preventer — a manual override that could never be paid would just relocate the failure; the S10 release-gate MUST consume that predicate, not the literal `live_verified` string). 17 chars, fits the `status` `varchar(32)` — no migration. The other two agency actions take **no new state**: **fresh resubmit** (`posted → approved`, audited `assignment.resubmit_requested` — the creator re-posts via the existing approved→post-URL surface, the failed post row kept as history) and **in-place resubmit request** (NO transition — a nudge audited `assignment.resubmit_requested_in_place`; the creator fixes the URL via a creator-self `PATCH …/posted-content`, which resets `verification_status → pending` + re-dispatches the idempotent verify job, audited `assignment.posted_content_updated`).
 
 > **`reinvite()` edge — Sprint-8 addition (Chunk 2, D-7).** The agency's response to a counter is a **guarded `countered → invited` machine edge** ([`CampaignAssignmentStateMachine::reinvite()`](../apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php)): it sets a new `agreed_fee_*`, **clears `countered_fee_*` and `responded_at`** (re-opening the invitation cleanly), and audits the distinct verb `assignment.re_invited` (a re-offer is legible in the trail, not folded into `assignment.invited`). No raw back-write — the machine stays the sole status authority. The re-invite reopens to `invited`, from which the creator can accept/decline/counter again; single-shot remains the shape (no unbounded loop, per the counter-minimal debt). The **first-contact invite is NOT a machine transition** — the machine has no `invite()`. The `invited` row is **created directly** by the agency invite endpoint (`POST agencies/{agency}/campaigns/{campaign}/assignments`), which hand-writes its own `assignment.invited` audit row + dispatches the `AssignmentTransitioned` event (the deliberate create-exception, hand-audited like CRUD); only subsequent edges go through the machine.
 

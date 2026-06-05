@@ -299,6 +299,13 @@
           "retry": "Tentar novamente",
           "awaitingReview": "O seu rascunho foi enviado e aguarda revisão da agência.",
           "awaitingVerification": "A sua publicação foi registada e aguarda verificação.",
+          "resubmitInPlace": {
+            "title": "Não foi possível verificar a sua publicação",
+            "intro": "A verificação automática da sua publicação falhou. Confirme que o link está correto e aponta para a sua publicação, depois reenvie-o abaixo.",
+            "url": "URL da publicação",
+            "submit": "Reenviar link",
+            "toast": "Link reenviado — vamos verificá-lo novamente em breve."
+          },
           "contract": {
             "title": "Contrato da campanha",
             "viewPdf": "Ver contrato (PDF)",

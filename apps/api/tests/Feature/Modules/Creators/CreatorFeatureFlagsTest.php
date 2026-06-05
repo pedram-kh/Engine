@@ -74,9 +74,33 @@ it('registers contract_signing_enabled with default OFF', function (): void {
     expect(Feature::active(ContractSigningEnabled::NAME))->toBeFalse();
 });
 
-it('registers social_verification_enabled with default OFF (Sprint 9 Chunk 2, D-11)', function (): void {
+it('registers social_verification_enabled with a DRIVER-BASED default — ON under the mock driver (Sprint 9 Chunk 2, D-11)', function (): void {
+    // Driver-based default (see SocialVerificationEnabled docblock): the mock
+    // provider makes NO vendor calls, so the "no silent vendor calls" rationale
+    // does not apply while driver=mock — the flag defaults ON so the
+    // verification arc (incl. failure → manual resolution) runs out of the box.
+    config(['integrations.social.driver' => 'mock']);
     expect(SocialVerificationEnabled::NAME)->toBe('social_verification_enabled');
+    expect(Feature::active(SocialVerificationEnabled::NAME))->toBeTrue();
+});
+
+it('social_verification_enabled defaults OFF once a real social adapter is configured (no silent vendor calls)', function (): void {
+    // The moment a real adapter is wired, the default flips back to OFF: an
+    // un-provisioned real-driver instance must never reach the vendor. The
+    // operator explicitly activates it once secrets are in place.
+    config(['integrations.social.driver' => 'meta']);
     expect(Feature::active(SocialVerificationEnabled::NAME))->toBeFalse();
+});
+
+it('round-trips deactivate / activate for social_verification_enabled (default-ON under the mock driver)', function (): void {
+    config(['integrations.social.driver' => 'mock']);
+    expect(Feature::active(SocialVerificationEnabled::NAME))->toBeTrue('default-ON under mock');
+
+    Feature::deactivate(SocialVerificationEnabled::NAME);
+    expect(Feature::active(SocialVerificationEnabled::NAME))->toBeFalse('deactivate flips it OFF globally');
+
+    Feature::activate(SocialVerificationEnabled::NAME);
+    expect(Feature::active(SocialVerificationEnabled::NAME))->toBeTrue('activate flips it back ON globally');
 });
 
 it('registers per_campaign_contract_enabled with default ON (contract-gate-decouple chunk, D-1/D-2)', function (): void {
@@ -115,7 +139,10 @@ it('round-trips activate / deactivate for each Phase-1 flag (no scope arg per Ph
             KycVerificationEnabled::NAME,
             CreatorPayoutMethodEnabled::NAME,
             ContractSigningEnabled::NAME,
-            SocialVerificationEnabled::NAME,
+            // social_verification_enabled is intentionally excluded — it has a
+            // driver-based default (ON under the mock driver, the test env),
+            // so it does not start from the default-OFF state. Its own default
+            // + round-trip pins live above.
         ] as $name
     ) {
         expect(Feature::active($name))->toBeFalse("default-OFF for {$name}");

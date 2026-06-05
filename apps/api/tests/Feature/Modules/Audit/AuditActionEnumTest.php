@@ -125,6 +125,13 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'assignment.cancelled',
         // Sprint 8 Chunk 2 — the agency re-offer after a creator counter (D-7).
         'assignment.re_invited',
+        // Verification-resolution chunk — the agency's resolution of a FAILED
+        // auto-verification (manual override + the two resubmit movements) +
+        // the creator's in-place posted-content edit.
+        'assignment.manually_verified',
+        'assignment.resubmit_requested',
+        'assignment.resubmit_requested_in_place',
+        'assignment.posted_content_updated',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());
@@ -151,6 +158,9 @@ it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', functi
         'assignment.cancelled',
         // Sprint 9 Chunk 2 — reject carries a mandatory reason (the review feedback).
         'assignment.draft_rejected',
+        // Verification-resolution chunk — the manual override must answer "why
+        // was this paid despite failing verification" (D-4).
+        'assignment.manually_verified',
     ]);
 });
 

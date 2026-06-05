@@ -33,7 +33,18 @@ use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
  * assignment" outcome, and the board catalogue routes its
  * `assignment.draft_rejected` verb to a distinct "stalled" column.
  *
+ * Verification-resolution chunk (D-1): `manually_verified` is a NEW
+ * NON-terminal state — the agency manually overrides a FAILED auto-verification
+ * (`posted → manually_verified`, mandatory reason). It is a DISTINCT status (the
+ * audit trail shows a human override, NOT a real `live_verified` pass) that is
+ * nonetheless PAYMENT-ELIGIBLE alongside `live_verified` — see
+ * {@see isPaymentEligible()} (the dead-end-preventer: a manual override that
+ * could never be paid would just relocate the failure). 17 chars, fits the
+ * `campaign_assignments.status` varchar(32) — no migration (a sub-status marker
+ * on `campaign_posted_content.verification_status` varchar(16) WOULD overflow).
+ *
  * Terminal states: declined, rejected, payment_released, cancelled.
+ * Payment-eligible states: live_verified, manually_verified ({@see isPaymentEligible()}).
  */
 enum AssignmentStatus: string
 {
@@ -49,6 +60,7 @@ enum AssignmentStatus: string
     case Rejected = 'rejected';
     case Posted = 'posted';
     case LiveVerified = 'live_verified';
+    case ManuallyVerified = 'manually_verified';
     case PaymentHeld = 'payment_held';
     case PaymentReleased = 'payment_released';
     case Cancelled = 'cancelled';
@@ -64,6 +76,25 @@ enum AssignmentStatus: string
             self::Rejected,
             self::PaymentReleased,
             self::Cancelled => true,
+            default => false,
+        };
+    }
+
+    /**
+     * True when a payment may be released for an assignment in this state
+     * (verification-resolution chunk, D-3). The S10 release-gate
+     * (docs/20-PHASE-1-SPEC.md §6.8 "Release payment" + the auto-release
+     * listener) MUST consume THIS predicate, never the literal `live_verified`
+     * string — so a manual override (`manually_verified`, D-1) is payment-eligible
+     * alongside a real auto-verification (`live_verified`) WITHOUT collapsing the
+     * two (the audit distinction survives). Proven now (a test asserts both
+     * states satisfy it) even though no payment is built this chunk.
+     */
+    public function isPaymentEligible(): bool
+    {
+        return match ($this) {
+            self::LiveVerified,
+            self::ManuallyVerified => true,
             default => false,
         };
     }

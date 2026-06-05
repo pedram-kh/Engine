@@ -33,6 +33,7 @@ import type {
   DraftMediaInitResponse,
   SubmitDraftPayload,
   SubmitPostedContentPayload,
+  UpdatePostedContentPayload,
 } from '@catalyst/api-client'
 import { http } from '@/core/api'
 
@@ -99,6 +100,22 @@ export const creatorAssignmentsApi = {
     payload: SubmitPostedContentPayload,
   ): Promise<CreatorPostedContentResponse> {
     return http.post<CreatorPostedContentResponse>(
+      `${BASE}/${assignmentUlid}/posted-content`,
+      payload,
+    )
+  },
+
+  /**
+   * Edit the post URL IN PLACE after a failed auto-verification (verification-
+   * resolution chunk, ACT3/D-6). Resets verification → pending + re-arms the
+   * verify job; no state transition (stays posted). Fail-closed server-side: a
+   * non-posted/non-failed row 422s (`assignment.not_resolvable`).
+   */
+  updatePostedContent(
+    assignmentUlid: string,
+    payload: UpdatePostedContentPayload,
+  ): Promise<CreatorPostedContentResponse> {
+    return http.patch<CreatorPostedContentResponse>(
       `${BASE}/${assignmentUlid}/posted-content`,
       payload,
     )

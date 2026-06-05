@@ -15,6 +15,18 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * is emitted as raw minor-units integers. Internal `notes` / `cancelled_reason`
  * are deliberately omitted (free-text, GDPR-sensitive).
  *
+ * `verification_status` (verification-resolution chunk, D-7) is the LATEST
+ * posted-content row's status — it drives the `posted`+failed row action that
+ * opens the resolution drawer. Emitted only when `latestPostedContent` is
+ * eager-loaded (null otherwise); the FE treats null/absent as "no action".
+ *
+ * `has_pending_contract` (contract-issue visibility fix) is true when a
+ * per-campaign contract is awaiting the creator's acceptance. It lets the
+ * Creators tab show "Contract sent — awaiting creator" instead of re-offering
+ * "Issue contract" on an accepted assignment (the status stays `accepted`
+ * until the creator accepts). Emitted only when `sentContract` is eager-loaded
+ * (null otherwise); the FE treats null/absent as "unknown".
+ *
  * @mixin CampaignAssignment
  */
 final class CampaignAssignmentResource extends JsonResource
@@ -29,6 +41,16 @@ final class CampaignAssignmentResource extends JsonResource
 
         $creator = $assignment->relationLoaded('creator') ? $assignment->creator : null;
 
+        $verificationStatus = null;
+        if ($assignment->relationLoaded('latestPostedContent')) {
+            $verificationStatus = $assignment->latestPostedContent?->verification_status->value;
+        }
+
+        $hasPendingContract = null;
+        if ($assignment->relationLoaded('sentContract')) {
+            $hasPendingContract = $assignment->sentContract !== null;
+        }
+
         return [
             'id' => $assignment->ulid,
             'type' => 'campaign_assignments',
@@ -41,6 +63,8 @@ final class CampaignAssignmentResource extends JsonResource
                 'invited_at' => $assignment->invited_at?->toIso8601String(),
                 'responded_at' => $assignment->responded_at?->toIso8601String(),
                 'posting_due_at' => $assignment->posting_due_at?->toIso8601String(),
+                'verification_status' => $verificationStatus,
+                'has_pending_contract' => $hasPendingContract,
                 'creator' => $creator instanceof Creator ? [
                     'id' => $creator->ulid,
                     'display_name' => $creator->display_name,

@@ -36,6 +36,24 @@ return [
                 'cta' => 'Rivedi l\'incarico',
             ],
         ],
+        'manually_verified' => [
+            'email' => [
+                'subject' => 'Il tuo post per :campaign è stato accettato',
+                'greeting' => 'Ciao :name,',
+                'body' => 'Buone notizie — l\'agenzia ha rivisto e accettato il tuo post per ":campaign". Non è necessaria alcuna ulteriore azione.',
+                'cta' => 'Vedi l\'incarico',
+            ],
+        ],
+        'resubmit_requested' => [
+            'email' => [
+                'subject' => 'Azione richiesta sul tuo post per :campaign',
+                'greeting' => 'Ciao :name,',
+                'body_fresh' => 'L\'agenzia non è riuscita a verificare il tuo post per ":campaign" e ti ha chiesto di inviare un nuovo link al post. Apri l\'incarico per reinviare.',
+                'body_in_place' => 'L\'agenzia non è riuscita a verificare il tuo post per ":campaign" e ti ha chiesto di correggere il link inviato. Apri l\'incarico per aggiornarlo.',
+                'feedback_label' => 'Nota dall\'agenzia',
+                'cta' => 'Apri l\'incarico',
+            ],
+        ],
         'contract_attached' => [
             'email' => [
                 'subject' => 'Contratto pronto per :campaign',

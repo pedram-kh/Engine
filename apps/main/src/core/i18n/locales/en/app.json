@@ -425,8 +425,11 @@
           "pdfReady": "PDF ready: {name}",
           "cancel": "Cancel",
           "submit": "Issue contract",
-          "success": "Contract issued. The creator has been notified."
+          "success": "Contract issued. The creator has been notified.",
+          "alreadyAttached": "A contract is already awaiting this creator's acceptance.",
+          "error": "We couldn't issue the contract. Please try again."
         },
+        "pending": "Contract sent — awaiting creator",
         "proceedWithout": {
           "action": "Proceed without contract",
           "success": "Assignment advanced without a contract.",
@@ -485,6 +488,7 @@
         "rejected": "Rejected",
         "posted": "Posted",
         "live_verified": "Live verified",
+        "manually_verified": "Manually verified",
         "payment_held": "Payment held",
         "payment_released": "Payment released",
         "cancelled": "Cancelled"
@@ -530,6 +534,50 @@
           "preview": "Open preview",
           "close": "Close",
           "empty": "No media attached."
+        }
+      },
+      "resolution": {
+        "action": "Resolve",
+        "title": "Resolve verification",
+        "loadFailed": "We couldn't load this assignment. Please try again.",
+        "postedContent": "Submitted post",
+        "simulated": "Simulated verification (mock provider)",
+        "intro": "Automatic verification of this post failed. Accept it manually, send it back for a fresh post, or ask the creator to fix the link in place.",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Not found",
+          "mismatch": "Mismatch"
+        },
+        "noteLabel": "Reason / note to the creator",
+        "noteHint": "Required when verifying manually; optional for resubmit requests.",
+        "manuallyVerify": "Verify manually",
+        "requestFresh": "Request fresh post",
+        "requestInPlace": "Ask to fix link",
+        "close": "Close",
+        "notActionable": "This assignment is no longer awaiting resolution.",
+        "toast": {
+          "verified": "Post manually verified.",
+          "resubmitFresh": "Sent back for a fresh post.",
+          "resubmitInPlace": "Asked the creator to fix the link.",
+          "error": "Something went wrong. Please try again."
+        }
+      },
+      "viewPost": {
+        "action": "View post",
+        "title": "Posted content",
+        "loadFailed": "We couldn't load this post. Please try again.",
+        "empty": "The creator hasn't posted any content yet.",
+        "current": "Current",
+        "postedAt": "Posted",
+        "verifiedAt": "Verified",
+        "simulated": "Verification runs against a simulated provider in this environment.",
+        "close": "Close",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Not found",
+          "mismatch": "Mismatch"
         }
       },
       "empty": {

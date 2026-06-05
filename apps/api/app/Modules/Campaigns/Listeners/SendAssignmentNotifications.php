@@ -11,6 +11,7 @@ use App\Modules\Campaigns\Jobs\VerifyPostedContentJob;
 use App\Modules\Campaigns\Mail\ContractAcceptedMail;
 use App\Modules\Campaigns\Mail\DraftReviewedMail;
 use App\Modules\Campaigns\Mail\DraftSubmittedForReviewMail;
+use App\Modules\Campaigns\Mail\PostManuallyVerifiedMail;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
 use App\Modules\Identity\Models\User;
@@ -24,11 +25,15 @@ use Illuminate\Support\Facades\Mail;
  *   - `assignment.draft_approved`      → notify the CREATOR (approved)
  *   - `assignment.revision_requested`  → notify the CREATOR (changes requested)
  *   - `assignment.draft_rejected`      → notify the CREATOR (rejected)
+ *   - `assignment.manually_verified`   → notify the CREATOR (post accepted, D-8)
  *
  * Queued mailables, localized at queue time to the recipient's preferred
  * language (the {@see ConnectionRequestMail} pattern).
  * The verification-failed agency notification (D-13/D-14) is NOT a transition —
- * it is sent directly by {@see VerifyPostedContentJob}.
+ * it is sent directly by {@see VerifyPostedContentJob}. The resubmit-requested
+ * creator notifications (ACT2/ACT3) are likewise sent directly by the
+ * resolution endpoint (the free-text feedback must not ride the audit
+ * snapshot), so only the manual-verify acceptance is wired here.
  *
  * Draft-submitted notification lives here (not in Chunk 1's creator submit
  * endpoint) so Chunk 1 stays untouched — it is review-adjacent and belongs to
@@ -46,8 +51,32 @@ final class SendAssignmentNotifications
             AuditAction::AssignmentRevisionRequested => $this->notifyCreatorOfReview($assignment, 'revision_requested'),
             AuditAction::AssignmentDraftRejected => $this->notifyCreatorOfReview($assignment, 'rejected'),
             AuditAction::AssignmentContracted => $this->notifyAgencyOfContractAcceptance($assignment),
+            AuditAction::AssignmentManuallyVerified => $this->notifyCreatorOfManualVerification($assignment),
             default => null,
         };
+    }
+
+    private function notifyCreatorOfManualVerification(CampaignAssignment $assignment): void
+    {
+        $creator = $assignment->creator;
+        $campaign = $assignment->campaign;
+
+        if ($creator === null || $campaign === null) {
+            return;
+        }
+
+        $recipient = $creator->user;
+        if (! $recipient instanceof User || $recipient->email === '') {
+            return;
+        }
+
+        Mail::to($recipient->email)
+            ->locale($recipient->preferred_language ?: 'en')
+            ->queue(new PostManuallyVerifiedMail(
+                creatorName: $creator->display_name ?? $recipient->name,
+                campaignName: $campaign->name,
+                assignmentUlid: $assignment->ulid,
+            ));
     }
 
     private function notifyAgencyOfSubmission(CampaignAssignment $assignment): void

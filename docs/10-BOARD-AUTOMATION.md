@@ -42,25 +42,29 @@ These limitations are intentional. They keep Phase 1 shippable while supporting 
 
 These are the events the system emits that can drive card movement. Each event corresponds to a meaningful state change in a CampaignAssignment.
 
-| Event key                       | Emitted when                                                      | Phase |
-| ------------------------------- | ----------------------------------------------------------------- | ----- |
-| `assignment.invited`            | Agency invites a creator to a campaign                            | P1    |
-| `assignment.declined`           | Creator declines the invitation                                   | P1    |
-| `assignment.countered`          | Creator submits a counter-offer                                   | P1    |
-| `assignment.accepted`           | Creator accepts the invitation                                    | P1    |
-| `assignment.contracted`         | All required contracts are signed                                 | P1    |
-| `assignment.draft_submitted`    | Creator submits a draft for review                                | P1    |
-| `assignment.draft_approved`     | Agency approves the draft                                         | P1    |
-| `assignment.draft_rejected`     | Agency rejects the draft (terminal — moves to a "stalled" column) | P1    |
-| `assignment.revision_requested` | Agency requests changes; back to producing                        | P1    |
-| `assignment.client_approved`    | Brand client approves draft (P2; designed but unused in P1)       | P2    |
-| `assignment.posted_by_creator`  | Creator marks content as posted                                   | P1    |
-| `assignment.live_verified`      | System confirms post is live via social API                       | P1    |
-| `assignment.payment_funded`     | Brand/agency funds escrow                                         | P1    |
-| `assignment.payment_released`   | Funds released to creator                                         | P1    |
-| `assignment.cancelled`          | Assignment is cancelled at any stage                              | P1    |
-| `assignment.posting_overdue`    | Posting deadline passed without action (time-triggered)           | P1    |
-| `assignment.draft_overdue`      | Draft deadline passed without submission (time-triggered)         | P1    |
+| Event key                                | Emitted when                                                                    | Phase |
+| ---------------------------------------- | ------------------------------------------------------------------------------- | ----- |
+| `assignment.invited`                     | Agency invites a creator to a campaign                                          | P1    |
+| `assignment.declined`                    | Creator declines the invitation                                                 | P1    |
+| `assignment.countered`                   | Creator submits a counter-offer                                                 | P1    |
+| `assignment.accepted`                    | Creator accepts the invitation                                                  | P1    |
+| `assignment.contracted`                  | All required contracts are signed                                               | P1    |
+| `assignment.draft_submitted`             | Creator submits a draft for review                                              | P1    |
+| `assignment.draft_approved`              | Agency approves the draft                                                       | P1    |
+| `assignment.draft_rejected`              | Agency rejects the draft (terminal — moves to a "stalled" column)               | P1    |
+| `assignment.revision_requested`          | Agency requests changes; back to producing                                      | P1    |
+| `assignment.client_approved`             | Brand client approves draft (P2; designed but unused in P1)                     | P2    |
+| `assignment.posted_by_creator`           | Creator marks content as posted                                                 | P1    |
+| `assignment.live_verified`               | System confirms post is live via social API                                     | P1    |
+| `assignment.manually_verified`           | Agency manually overrides a failed auto-verification (payment-eligible)         | P1    |
+| `assignment.resubmit_requested`          | Agency sends a failed post back for a fresh resubmit (`posted → approved`)      | P1    |
+| `assignment.resubmit_requested_in_place` | Agency nudges the creator to fix the post URL in place (no state change)        | P1    |
+| `assignment.posted_content_updated`      | Creator edits the post URL in place after a failed check (re-arms verification) | P1    |
+| `assignment.payment_funded`              | Brand/agency funds escrow                                                       | P1    |
+| `assignment.payment_released`            | Funds released to creator                                                       | P1    |
+| `assignment.cancelled`                   | Assignment is cancelled at any stage                                            | P1    |
+| `assignment.posting_overdue`             | Posting deadline passed without action (time-triggered)                         | P1    |
+| `assignment.draft_overdue`               | Draft deadline passed without submission (time-triggered)                       | P1    |
 
 Each event carries a payload with at minimum:
 
@@ -123,15 +127,17 @@ When a campaign is created, its board is provisioned with default columns and au
 
 ### 3.2 Default automations
 
-| Event                          | Target column                   |
-| ------------------------------ | ------------------------------- |
-| `assignment.invited`           | Invited                         |
-| `assignment.draft_submitted`   | In Review                       |
-| `assignment.draft_approved`    | Approved                        |
-| `assignment.posted_by_creator` | Posted                          |
-| `assignment.live_verified`     | Posted (no-op if already there) |
-| `assignment.payment_released`  | Paid                            |
-| `assignment.cancelled`         | Cancelled                       |
+| Event                           | Target column                   |
+| ------------------------------- | ------------------------------- |
+| `assignment.invited`            | Invited                         |
+| `assignment.draft_submitted`    | In Review                       |
+| `assignment.draft_approved`     | Approved                        |
+| `assignment.posted_by_creator`  | Posted                          |
+| `assignment.live_verified`      | Posted (no-op if already there) |
+| `assignment.manually_verified`  | Posted (no-op if already there) |
+| `assignment.resubmit_requested` | Approved                        |
+| `assignment.payment_released`   | Paid                            |
+| `assignment.cancelled`          | Cancelled                       |
 
 ### 3.3 Why these defaults
 

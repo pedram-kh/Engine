@@ -403,10 +403,96 @@ it('verifyLive: posted → live_verified when social_verification_enabled is ON 
 });
 
 // ---------------------------------------------------------------------------
+// VERIFICATION-RESOLUTION — manual override + the fresh-resubmit edge.
+// ---------------------------------------------------------------------------
+
+it('manuallyVerify: posted → manually_verified fires assignment.manually_verified (a DISTINCT override verb) with the reason + stamps verified_live_at', function (): void {
+    Event::fake([AssignmentTransitioned::class]);
+    $assignment = assignmentInStatus(AssignmentStatus::Posted);
+
+    sm()->manuallyVerify($assignment, 'Reviewed the link manually — the post is live and on-brief');
+
+    $fresh = reload($assignment);
+    expect($fresh->status)->toBe(AssignmentStatus::ManuallyVerified)
+        ->and($fresh->status->isTerminal())->toBeFalse()
+        ->and($fresh->status->isPaymentEligible())->toBeTrue()
+        ->and($fresh->verified_live_at)->not->toBeNull();
+
+    // The override verb is DISTINCT from live_verified ("a real pass") — no
+    // live_verified row was written.
+    $audit = lastAuditFor($assignment, AuditAction::AssignmentManuallyVerified);
+    expect($audit)->not->toBeNull()
+        ->and($audit?->reason)->toBe('Reviewed the link manually — the post is live and on-brief');
+    expect(lastAuditFor($assignment, AuditAction::AssignmentLiveVerified))->toBeNull();
+
+    Event::assertDispatched(
+        AssignmentTransitioned::class,
+        fn (AssignmentTransitioned $e): bool => $e->eventKey() === 'assignment.manually_verified'
+            && $e->metadata()['from'] === 'posted'
+            && $e->metadata()['to'] === 'manually_verified',
+    );
+});
+
+it('manuallyVerify rejects an empty reason (reason required)', function (): void {
+    $assignment = assignmentInStatus(AssignmentStatus::Posted);
+
+    try {
+        sm()->manuallyVerify($assignment, '   ');
+        $this->fail('Expected a reason-required rejection.');
+    } catch (AssignmentTransitionException $e) {
+        expect($e->errorCode)->toBe('assignment.reason_required');
+    }
+
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::Posted);
+});
+
+it('returnForResubmit: posted → approved fires assignment.resubmit_requested (the fresh-resubmit edge)', function (): void {
+    Event::fake([AssignmentTransitioned::class]);
+    $assignment = assignmentInStatus(AssignmentStatus::Posted);
+
+    sm()->returnForResubmit($assignment);
+
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::Approved);
+    expect(lastAuditFor($assignment, AuditAction::AssignmentResubmitRequested))->not->toBeNull();
+
+    Event::assertDispatched(
+        AssignmentTransitioned::class,
+        fn (AssignmentTransitioned $e): bool => $e->eventKey() === 'assignment.resubmit_requested'
+            && $e->metadata()['from'] === 'posted'
+            && $e->metadata()['to'] === 'approved',
+    );
+});
+
+it('manuallyVerify + returnForResubmit fail closed from a non-posted source', function (string $method, string $from): void {
+    $assignment = assignmentInStatus(AssignmentStatus::from($from));
+
+    try {
+        $method === 'manuallyVerify'
+            ? sm()->manuallyVerify($assignment, 'reason')
+            : sm()->returnForResubmit($assignment);
+        $this->fail('Expected an invalid-transition rejection.');
+    } catch (AssignmentTransitionException $e) {
+        expect($e->errorCode)->toBe('assignment.invalid_transition');
+    }
+
+    expect(reload($assignment)->status->value)->toBe($from);
+})->with([
+    'manuallyVerify from approved' => ['manuallyVerify', 'approved'],
+    'manuallyVerify from draft_submitted' => ['manuallyVerify', 'draft_submitted'],
+    'manuallyVerify from live_verified' => ['manuallyVerify', 'live_verified'],
+    'returnForResubmit from approved' => ['returnForResubmit', 'approved'],
+    'returnForResubmit from producing' => ['returnForResubmit', 'producing'],
+]);
+
+// ---------------------------------------------------------------------------
 // VENDOR / FLAG-GATED — unreachable under own power; no manual path.
 // ---------------------------------------------------------------------------
 
 it('verifyLive is vendor-gated (social adapter) — source guard passes but the gate refuses', function (): void {
+    // The gate is the flag: pin it OFF to exercise the refusal path. (The flag
+    // now defaults ON under the mock driver, so the default no longer gates —
+    // the gate itself is what's under test here.)
+    Feature::define(SocialVerificationEnabled::NAME, false);
     Event::fake([AssignmentTransitioned::class]);
     $assignment = assignmentInStatus(AssignmentStatus::Posted);
 

@@ -88,6 +88,8 @@ function makeCampaign(requiresContract = false): CampaignResource {
 function makeAssignment(
   id: string,
   status: CampaignAssignmentResource['attributes']['status'],
+  verificationStatus: CampaignAssignmentResource['attributes']['verification_status'] = null,
+  hasPendingContract: CampaignAssignmentResource['attributes']['has_pending_contract'] = null,
 ): CampaignAssignmentResource {
   return {
     id,
@@ -101,6 +103,8 @@ function makeAssignment(
       invited_at: '2026-06-01T10:00:00.000000Z',
       responded_at: status === 'countered' ? '2026-06-02T10:00:00.000000Z' : null,
       posting_due_at: null,
+      verification_status: verificationStatus,
+      has_pending_contract: hasPendingContract,
       creator: { id: `creator-${id}`, display_name: `Creator ${id}` },
     },
   }
@@ -285,6 +289,49 @@ describe('CampaignDetailPage — Creators tab re-invite (re-invite UI chunk)', (
     const wrapper = await openCreatorsTab('agency_staff', [makeAssignment('I', 'invited')])
     expect(wrapper.find('[data-test="creators-review-I"]').exists()).toBe(false)
   })
+
+  // Verification-resolution chunk (D-7) — the Resolve action on a posted+failed row.
+  it('shows the Resolve action on a posted row whose verification FAILED', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [
+      makeAssignment('F', 'posted', 'mismatch'),
+    ])
+    expect(wrapper.find('[data-test="creators-resolve-F"]').exists()).toBe(true)
+  })
+
+  it('does NOT show the Resolve action on a posted row still pending verification', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [
+      makeAssignment('P', 'posted', 'pending'),
+    ])
+    expect(wrapper.find('[data-test="creators-resolve-P"]').exists()).toBe(false)
+  })
+
+  it('shows "View post" on a pending posted row (read-only), not Resolve', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [
+      makeAssignment('P', 'posted', 'pending'),
+    ])
+    expect(wrapper.find('[data-test="creators-view-post-P"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="creators-resolve-P"]').exists()).toBe(false)
+  })
+
+  it('shows "View post" on a live_verified row', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [
+      makeAssignment('V', 'live_verified', 'verified'),
+    ])
+    expect(wrapper.find('[data-test="creators-view-post-V"]').exists()).toBe(true)
+  })
+
+  it('on a failed posted row shows Resolve but NOT the read-only View post', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [
+      makeAssignment('F', 'posted', 'mismatch'),
+    ])
+    expect(wrapper.find('[data-test="creators-resolve-F"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="creators-view-post-F"]').exists()).toBe(false)
+  })
+
+  it('does NOT show "View post" on a row with no posted content', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [makeAssignment('A', 'accepted')])
+    expect(wrapper.find('[data-test="creators-view-post-A"]').exists()).toBe(false)
+  })
 })
 
 // contract-gate-decouple chunk (D-7) — the agency "proceed without a contract"
@@ -354,5 +401,41 @@ describe('CampaignDetailPage — proceed without per-campaign contract (D-7)', (
       CAMPAIGN_ULID,
       'A',
     )
+  })
+})
+
+// contract-issue visibility fix — issuing a contract leaves the assignment
+// `accepted` (the creator must accept), so the Creators row must reflect a
+// pending contract instead of re-offering "Issue contract".
+describe('CampaignDetailPage — pending-contract row state', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+  })
+
+  async function openCreatorsTab(assignments: CampaignAssignmentResource[]) {
+    const harness = await mountDetail('agency_admin', assignments)
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'creators'
+    await flushPromises()
+    return harness.wrapper
+  }
+
+  it('offers "Issue contract" on an accepted row with no pending contract', async () => {
+    const wrapper = await openCreatorsTab([makeAssignment('A', 'accepted', null, false)])
+    expect(wrapper.find('[data-test="creators-attach-contract-A"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="creators-contract-pending-A"]').exists()).toBe(false)
+  })
+
+  it('hides "Issue contract" and shows the pending chip once a contract is sent', async () => {
+    const wrapper = await openCreatorsTab([makeAssignment('A', 'accepted', null, true)])
+    expect(wrapper.find('[data-test="creators-attach-contract-A"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="creators-contract-pending-A"]').exists()).toBe(true)
   })
 })

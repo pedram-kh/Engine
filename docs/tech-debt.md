@@ -1165,6 +1165,18 @@ anyone reviewing it later.
 
 ---
 
+## S10 payment-release gate must consume `isPaymentEligible()`, not the literal `live_verified`
+
+- **Where:** [`AssignmentStatus::isPaymentEligible()`](../apps/api/app/Modules/Campaigns/Enums/AssignmentStatus.php) — returns true for **both** `live_verified` and `manually_verified`. Added by the verification-resolution chunk so the agency's manual override of a failed auto-verification (`manually_verified`) is payment-eligible alongside a real auto-verification.
+- **What we accepted (verification-resolution chunk, D-3):** `manually_verified` is a payment-eligible state **today**, but no payment is built this chunk (escrow is Sprint 10, still vendor-gated). The predicate is **proven now** — a tripwire test asserts both `live_verified` and `manually_verified` satisfy `isPaymentEligible()` and `posted` does not — so the contract is locked before the consumer exists. The risk is purely forward: when S10 wires the "Release payment" button + the auto-release listener, it MUST gate on `isPaymentEligible()` (or `holdPayment()`'s source guard must accept both states), NOT on a literal `status === 'live_verified'` check — otherwise a manually-verified assignment dead-ends at payment (the exact failure-relocation this chunk exists to prevent). `holdPayment()`'s source guard currently accepts only `live_verified` (it is vendor-gated + unreachable, so harmless today); S10 must widen it to the payment-eligible set when it flips the escrow gate open.
+- **Risk:** low now (no consumer), medium at S10 if missed — a silent dead-end rather than a hard error. Mitigated by the predicate + tripwire being in place and this note.
+- **Triggered by:** Sprint 10 escrow wiring the release flow.
+- **Resolution:** S10 consumes `isPaymentEligible()` in the release-gate + widens `holdPayment()`'s source set to `{live_verified, manually_verified}`.
+- **Owner:** Sprint-10 payments workstream.
+- **Status:** open (deferred by design — predicate proven, consumer is S10). Surfaced + accepted by the verification-resolution chunk, 2026-06-05.
+
+---
+
 ## `campaign_drafts` + `campaign_posted_content` tables deferred to Sprint 9
 
 - **Where:** spec'd at [`03-DATA-MODEL.md §7`](03-DATA-MODEL.md) (`campaign_drafts`, `campaign_posted_content`); **no migration** builds them in Sprint 8 Chunk 1.

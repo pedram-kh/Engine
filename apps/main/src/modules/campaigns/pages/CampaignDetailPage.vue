@@ -34,6 +34,8 @@ import InviteCreatorsDialog from '../components/InviteCreatorsDialog.vue'
 import AttachContractDialog from '../components/AttachContractDialog.vue'
 import ReinviteDialog from '../components/ReinviteDialog.vue'
 import ReviewDraftDrawer from '../components/ReviewDraftDrawer.vue'
+import ResolveVerificationDrawer from '../components/ResolveVerificationDrawer.vue'
+import ViewPostedContentDrawer from '../components/ViewPostedContentDrawer.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -80,6 +82,7 @@ function onReinvited(): void {
 const attachContractDialog = ref(false)
 const attachContractTarget = ref<CampaignAssignmentResource | null>(null)
 const attachContractSnackbar = ref<string | null>(null)
+const attachContractError = ref<string | null>(null)
 
 function openAttachContract(assignment: CampaignAssignmentResource): void {
   attachContractTarget.value = assignment
@@ -89,6 +92,10 @@ function openAttachContract(assignment: CampaignAssignmentResource): void {
 function onContractAttached(): void {
   attachContractSnackbar.value = t('app.campaigns.contract.attach.success')
   void loadAssignments()
+}
+
+function onContractAttachError(message: string): void {
+  attachContractError.value = message
 }
 
 // The per-campaign manual-contract flag (D-7), read from the assignments
@@ -101,6 +108,7 @@ const proceedError = ref<string | null>(null)
 function canProceedWithoutContract(assignment: CampaignAssignmentResource): boolean {
   return (
     assignment.attributes.status === 'accepted' &&
+    assignment.attributes.has_pending_contract !== true &&
     canAttachContract.value &&
     perCampaignContractEnabled.value &&
     campaign.value?.attributes.requires_per_campaign_contract === false
@@ -135,6 +143,46 @@ function openReview(assignment: CampaignAssignmentResource): void {
 }
 
 function onReviewed(message: string): void {
+  reviewSnackbar.value = message
+  void loadAssignments()
+}
+
+// The verification-failure resolution surface (verification-resolution chunk,
+// D-7). Same `review` ability as the draft review. The row action shows only
+// when the assignment is `posted` AND its latest verification FAILED.
+const resolveDialog = ref(false)
+const resolveTarget = ref<CampaignAssignmentResource | null>(null)
+
+function canResolveVerification(a: CampaignAssignmentResource): boolean {
+  return (
+    canReview.value &&
+    a.attributes.status === 'posted' &&
+    (a.attributes.verification_status === 'not_found' ||
+      a.attributes.verification_status === 'mismatch')
+  )
+}
+
+function openResolve(assignment: CampaignAssignmentResource): void {
+  resolveTarget.value = assignment
+  resolveDialog.value = true
+}
+
+const viewPostDialog = ref(false)
+const viewPostTarget = ref<CampaignAssignmentResource | null>(null)
+
+// Read-only "view posted content" — offered on any row that already has a
+// post (`verification_status !== null`), EXCEPT when the failure-resolution
+// action is offered instead (that drawer shows the post + the actions).
+function canViewPost(a: CampaignAssignmentResource): boolean {
+  return canReview.value && a.attributes.verification_status !== null && !canResolveVerification(a)
+}
+
+function openViewPost(assignment: CampaignAssignmentResource): void {
+  viewPostTarget.value = assignment
+  viewPostDialog.value = true
+}
+
+function onResolved(message: string): void {
   reviewSnackbar.value = message
   void loadAssignments()
 }
@@ -434,7 +482,11 @@ function formatMoney(minor: number | null, currency: string | null): string {
                   {{ t('app.campaigns.reinvite.action') }}
                 </v-btn>
                 <v-btn
-                  v-if="a.attributes.status === 'accepted' && canAttachContract"
+                  v-if="
+                    a.attributes.status === 'accepted' &&
+                    canAttachContract &&
+                    a.attributes.has_pending_contract !== true
+                  "
                   color="primary"
                   variant="flat"
                   size="small"
@@ -443,6 +495,17 @@ function formatMoney(minor: number | null, currency: string | null): string {
                 >
                   {{ t('app.campaigns.contract.attach.action') }}
                 </v-btn>
+                <v-chip
+                  v-if="
+                    a.attributes.status === 'accepted' && a.attributes.has_pending_contract === true
+                  "
+                  size="small"
+                  color="info"
+                  variant="tonal"
+                  :data-test="`creators-contract-pending-${a.id}`"
+                >
+                  {{ t('app.campaigns.contract.pending') }}
+                </v-chip>
                 <v-btn
                   v-if="canProceedWithoutContract(a)"
                   color="secondary"
@@ -462,6 +525,26 @@ function formatMoney(minor: number | null, currency: string | null): string {
                   @click="openReview(a)"
                 >
                   {{ t('app.campaigns.review.action') }}
+                </v-btn>
+                <v-btn
+                  v-if="canResolveVerification(a)"
+                  color="warning"
+                  variant="flat"
+                  size="small"
+                  :data-test="`creators-resolve-${a.id}`"
+                  @click="openResolve(a)"
+                >
+                  {{ t('app.campaigns.resolution.action') }}
+                </v-btn>
+                <v-btn
+                  v-if="canViewPost(a)"
+                  color="secondary"
+                  variant="outlined"
+                  size="small"
+                  :data-test="`creators-view-post-${a.id}`"
+                  @click="openViewPost(a)"
+                >
+                  {{ t('app.campaigns.viewPost.action') }}
                 </v-btn>
               </template>
             </v-list-item>
@@ -493,6 +576,7 @@ function formatMoney(minor: number | null, currency: string | null): string {
             :campaign-id="ulid"
             :assignment="attachContractTarget"
             @success="onContractAttached"
+            @error="onContractAttachError"
           />
 
           <ReviewDraftDrawer
@@ -502,6 +586,23 @@ function formatMoney(minor: number | null, currency: string | null): string {
             :campaign-id="ulid"
             :assignment="reviewTarget"
             @reviewed="onReviewed"
+          />
+
+          <ResolveVerificationDrawer
+            v-if="canReview && agencyStore.currentAgencyId"
+            v-model="resolveDialog"
+            :agency-id="agencyStore.currentAgencyId"
+            :campaign-id="ulid"
+            :assignment="resolveTarget"
+            @resolved="onResolved"
+          />
+
+          <ViewPostedContentDrawer
+            v-if="canReview && agencyStore.currentAgencyId"
+            v-model="viewPostDialog"
+            :agency-id="agencyStore.currentAgencyId"
+            :campaign-id="ulid"
+            :assignment="viewPostTarget"
           />
 
           <v-snackbar
@@ -544,6 +645,20 @@ function formatMoney(minor: number | null, currency: string | null): string {
             "
           >
             {{ attachContractSnackbar }}
+          </v-snackbar>
+
+          <v-snackbar
+            :model-value="attachContractError !== null"
+            :timeout="5000"
+            color="error"
+            data-test="attach-contract-error-snackbar"
+            @update:model-value="
+              (v) => {
+                if (!v) attachContractError = null
+              }
+            "
+          >
+            {{ attachContractError }}
           </v-snackbar>
 
           <v-snackbar

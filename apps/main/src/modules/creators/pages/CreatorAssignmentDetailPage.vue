@@ -81,6 +81,12 @@ const postedFieldErrors = ref<Partial<Record<PostedField, readonly string[]>>>({
 const submittingPosted = ref(false)
 const acceptingContract = ref(false)
 
+// In-place resubmit state (verification-resolution chunk, ACT3) — the creator
+// edits the failed post URL in place, re-arming verification.
+const inPlaceUrl = ref('')
+const inPlaceFieldErrors = ref<Partial<Record<PostedField, readonly string[]>>>({})
+const submittingInPlace = ref(false)
+
 const status = computed(() => assignment.value?.attributes.status ?? null)
 const drafts = computed(() => assignment.value?.relationships.drafts ?? [])
 const postedContent = computed(() => assignment.value?.relationships.posted_content ?? [])
@@ -108,7 +114,24 @@ const canSubmitDraft = computed(
 const isResubmit = computed(() => status.value === 'revision_requested')
 const isAwaitingReview = computed(() => status.value === 'draft_submitted')
 const canSubmitPosted = computed(() => status.value === 'approved')
-const isAwaitingVerification = computed(() => status.value === 'posted')
+
+/** The active (latest) posted-content row carries the live verification state. */
+const latestPosted = computed(() => postedContent.value[postedContent.value.length - 1] ?? null)
+/**
+ * The failed-verification state (verification-resolution chunk, ACT3) — the
+ * assignment is `posted` but the latest post failed (`not_found`/`mismatch`).
+ * The creator may fix the URL in place whenever it is in this state (the
+ * agency's nudge is not a precondition).
+ */
+const verificationFailed = computed(
+  () =>
+    status.value === 'posted' &&
+    (latestPosted.value?.attributes.verification_status === 'not_found' ||
+      latestPosted.value?.attributes.verification_status === 'mismatch'),
+)
+const isAwaitingVerification = computed(
+  () => status.value === 'posted' && !verificationFailed.value,
+)
 
 /** The most recent agency feedback (Chunk 2 populates `review_feedback`). */
 const revisionFeedback = computed<string | null>(() => {
@@ -148,6 +171,10 @@ async function load(): Promise<void> {
     const res = await creatorAssignmentsApi.show(ulid.value)
     assignment.value = res.data
     perCampaignContractEnabled.value = res.meta?.per_campaign_contract_enabled ?? false
+    // Prefill the in-place edit with the failed URL so the creator edits, not retypes.
+    inPlaceUrl.value = verificationFailed.value
+      ? (latestPosted.value?.attributes.post_url ?? '')
+      : ''
   } catch (err) {
     assignment.value = null
     loadError.value = err instanceof ApiError && err.status === 404 ? 'not_found' : 'generic'
@@ -291,6 +318,36 @@ async function submitPostedContent(): Promise<void> {
     }
   } finally {
     submittingPosted.value = false
+  }
+}
+
+/**
+ * Edit the failed post URL in place (verification-resolution chunk, ACT3). The
+ * backend resets verification → pending + re-dispatches the verify job; the
+ * assignment stays `posted`. Reloading reflects the re-armed pending state.
+ */
+async function resubmitInPlace(): Promise<void> {
+  if (submittingInPlace.value || inPlaceUrl.value.trim() === '') return
+  submittingInPlace.value = true
+  inPlaceFieldErrors.value = {}
+  try {
+    await creatorAssignmentsApi.updatePostedContent(ulid.value, {
+      post_url: inPlaceUrl.value.trim(),
+    })
+    snackbar.value = {
+      color: 'success',
+      text: t('creator.ui.assignments.detail.resubmitInPlace.toast'),
+    }
+    await load()
+  } catch (err) {
+    if (err instanceof ApiError) {
+      inPlaceFieldErrors.value = extractFieldErrors<PostedField>(err)
+    }
+    if (Object.keys(inPlaceFieldErrors.value).length === 0) {
+      snackbar.value = { color: 'error', text: t('creator.ui.assignments.detail.toast.error') }
+    }
+  } finally {
+    submittingInPlace.value = false
   }
 }
 
@@ -547,6 +604,43 @@ onMounted(() => {
             @click="submitPostedContent"
           >
             {{ t('creator.ui.assignments.detail.posted.submit') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+
+      <!-- Failed verification (posted + not_found/mismatch) — fix the URL in place -->
+      <v-card
+        v-else-if="verificationFailed"
+        variant="outlined"
+        data-testid="assignment-resubmit-in-place-form"
+      >
+        <v-card-title class="text-h6">
+          {{ t('creator.ui.assignments.detail.resubmitInPlace.title') }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column ga-3">
+          <v-alert type="warning" variant="tonal" density="compact">
+            {{ t('creator.ui.assignments.detail.resubmitInPlace.intro') }}
+          </v-alert>
+          <v-text-field
+            v-model="inPlaceUrl"
+            :label="t('creator.ui.assignments.detail.resubmitInPlace.url')"
+            variant="outlined"
+            density="compact"
+            :error-messages="inPlaceFieldErrors.post_url as string[]"
+            data-testid="assignment-resubmit-in-place-url"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            color="primary"
+            variant="flat"
+            :loading="submittingInPlace"
+            :disabled="inPlaceUrl.trim() === ''"
+            data-testid="assignment-resubmit-in-place-submit"
+            @click="resubmitInPlace"
+          >
+            {{ t('creator.ui.assignments.detail.resubmitInPlace.submit') }}
           </v-btn>
         </v-card-actions>
       </v-card>

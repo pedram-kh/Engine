@@ -16,6 +16,7 @@ vi.mock('../assignments.api', () => ({
     show: vi.fn(),
     submitDraft: vi.fn(),
     submitPostedContent: vi.fn(),
+    updatePostedContent: vi.fn(),
     initDraftMedia: vi.fn(),
     completeDraftMedia: vi.fn(),
     acceptContract: vi.fn(),
@@ -88,6 +89,23 @@ function makeDraft(
   }
 }
 
+function makePost(
+  verification: 'pending' | 'verified' | 'not_found' | 'mismatch',
+): CreatorAssignmentDetailResource['relationships']['posted_content'][number] {
+  return {
+    id: '01POST',
+    type: 'campaign_posted_content',
+    attributes: {
+      platform: 'instagram',
+      post_url: 'https://instagram.com/someoneelse/p/abc',
+      platform_post_id: null,
+      posted_at: '2026-06-03T10:00:00+00:00',
+      verified_at: null,
+      verification_status: verification,
+    },
+  }
+}
+
 let teardown: (() => void) | null = null
 
 afterEach(() => {
@@ -138,12 +156,51 @@ describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', 
     expect(wrapper.find('[data-testid="assignment-draft-form"]').exists()).toBe(false)
   })
 
-  it('renders awaiting-verification for a posted assignment (the arc stops here)', async () => {
-    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('posted') })
+  it('renders awaiting-verification for a posted assignment still pending', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('posted', [], [makePost('pending')]),
+    })
     const { wrapper } = await mountDetail()
 
     expect(wrapper.find('[data-testid="assignment-awaiting-verification"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="assignment-posted-form"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-resubmit-in-place-form"]').exists()).toBe(false)
+  })
+
+  // Verification-resolution chunk (ACT3) — the in-place fix form on a failed post.
+  it('renders the in-place resubmit form for a posted assignment whose verification FAILED', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('posted', [], [makePost('mismatch')]),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-resubmit-in-place-form"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="assignment-awaiting-verification"]').exists()).toBe(false)
+    // Prefilled with the failed URL (edit, not retype).
+    const input = wrapper.find('[data-testid="assignment-resubmit-in-place-url"] input')
+      .element as HTMLInputElement
+    expect(input.value).toContain('someoneelse')
+  })
+
+  it('submits the in-place fix → calls updatePostedContent + reloads', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('posted', [], [makePost('not_found')]),
+    })
+    vi.mocked(creatorAssignmentsApi.updatePostedContent).mockResolvedValue({
+      data: makePost('pending'),
+      meta: { code: 'assignment.posted_content_updated' },
+    })
+    const { wrapper } = await mountDetail()
+
+    await wrapper
+      .find('[data-testid="assignment-resubmit-in-place-url"] input')
+      .setValue('https://instagram.com/creatorhandle/p/xyz')
+    await wrapper.find('[data-testid="assignment-resubmit-in-place-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(creatorAssignmentsApi.updatePostedContent).toHaveBeenCalledWith(ULID, {
+      post_url: 'https://instagram.com/creatorhandle/p/xyz',
+    })
   })
 
   it('shows the revision feedback + resubmit form + version history for revision_requested', async () => {

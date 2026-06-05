@@ -41,11 +41,12 @@ it('CampaignObjective catalogue pins the exact case set', function (): void {
     expect($actual)->toBe($expected, 'CampaignObjective enum drifted from the locked catalogue.');
 });
 
-it('AssignmentStatus catalogue pins the exact 15-case set (the full state graph)', function (): void {
-    // Sprint 9 Chunk 2 (D-1) adds the dedicated `rejected` terminal — the
-    // agency's review-time draft rejection (`draft_submitted → rejected`),
-    // distinct from `cancelled`. Bumping this catalogue from 14 → 15 is the
-    // deliberate, reviewed enum-add it is meant to force.
+it('AssignmentStatus catalogue pins the exact 16-case set (the full state graph)', function (): void {
+    // Sprint 9 Chunk 2 (D-1) added the dedicated `rejected` terminal. The
+    // verification-resolution chunk (D-1) adds the non-terminal
+    // `manually_verified` — the agency's manual override of a FAILED
+    // auto-verification (`posted → manually_verified`). Bumping this catalogue
+    // from 15 → 16 is the deliberate, reviewed enum-add it is meant to force.
     $expected = [
         'invited',
         'declined',
@@ -59,6 +60,7 @@ it('AssignmentStatus catalogue pins the exact 15-case set (the full state graph)
         'rejected',
         'posted',
         'live_verified',
+        'manually_verified',
         'payment_held',
         'payment_released',
         'cancelled',
@@ -81,6 +83,30 @@ it('AssignmentStatus terminal states are exactly declined / rejected / payment_r
     $terminalValues = array_map(fn (AssignmentStatus $case): string => $case->value, $terminal);
 
     expect($terminalValues)->toEqualCanonicalizing(['declined', 'rejected', 'payment_released', 'cancelled']);
+});
+
+it('manually_verified is NON-terminal (payment follows, like live_verified)', function (): void {
+    expect(AssignmentStatus::ManuallyVerified->isTerminal())->toBeFalse();
+});
+
+it('AssignmentStatus payment-eligible states are exactly live_verified + manually_verified (D-3)', function (): void {
+    // The dead-end-preventer: a manual override must be payment-eligible like a
+    // real auto-verification. Proven NOW — both states satisfy the same
+    // predicate the S10 release-gate will consume — without payment being built.
+    $eligible = array_values(array_filter(
+        AssignmentStatus::cases(),
+        fn (AssignmentStatus $case): bool => $case->isPaymentEligible(),
+    ));
+
+    $eligibleValues = array_map(fn (AssignmentStatus $case): string => $case->value, $eligible);
+
+    expect($eligibleValues)->toEqualCanonicalizing(['live_verified', 'manually_verified']);
+
+    // The equivalence, asserted directly: both satisfy the predicate; `posted`
+    // (the failed-verification state) does not.
+    expect(AssignmentStatus::LiveVerified->isPaymentEligible())->toBeTrue()
+        ->and(AssignmentStatus::ManuallyVerified->isPaymentEligible())->toBeTrue()
+        ->and(AssignmentStatus::Posted->isPaymentEligible())->toBeFalse();
 });
 
 it('CampaignStatus values fit the varchar(16) status column', function (): void {

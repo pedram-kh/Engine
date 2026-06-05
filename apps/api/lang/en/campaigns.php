@@ -39,6 +39,25 @@ return [
                 'cta' => 'Review the assignment',
             ],
         ],
+        // Verification-resolution chunk (D-8) — the creator-facing resolution mails.
+        'manually_verified' => [
+            'email' => [
+                'subject' => 'Your post for :campaign was accepted',
+                'greeting' => 'Hi :name,',
+                'body' => 'Good news — the agency has reviewed and accepted your post for ":campaign". No further action is needed.',
+                'cta' => 'View the assignment',
+            ],
+        ],
+        'resubmit_requested' => [
+            'email' => [
+                'subject' => 'Action needed on your :campaign post',
+                'greeting' => 'Hi :name,',
+                'body_fresh' => 'The agency could not verify your post for ":campaign" and has asked you to submit a new post link. Open the assignment to resubmit.',
+                'body_in_place' => 'The agency could not verify your post for ":campaign" and has asked you to fix the submitted link. Open the assignment to update it.',
+                'feedback_label' => 'Note from the agency',
+                'cta' => 'Open the assignment',
+            ],
+        ],
         'contract_attached' => [
             'email' => [
                 'subject' => 'Contract ready for :campaign',

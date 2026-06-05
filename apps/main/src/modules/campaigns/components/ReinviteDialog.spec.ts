@@ -36,6 +36,8 @@ function makeAssignment(): CampaignAssignmentResource {
       invited_at: '2026-06-01T10:00:00.000000Z',
       responded_at: '2026-06-02T10:00:00.000000Z',
       posting_due_at: null,
+      verification_status: null,
+      has_pending_contract: null,
       creator: { id: 'creator-ulid', display_name: 'Alex Creator' },
     },
   }

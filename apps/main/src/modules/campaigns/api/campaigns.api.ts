@@ -23,10 +23,14 @@ import type {
   ContractMediaInitResponse,
   CreateCampaignPayload,
   InviteAssignmentPayload,
+  ManuallyVerifyPayload,
   ProceedWithoutContractResponse,
   RejectDraftPayload,
   ReinviteAssignmentPayload,
+  RequestResubmitFreshPayload,
+  RequestResubmitInPlacePayload,
   RequestRevisionPayload,
+  ResolutionActionResponse,
   ReviewActionResponse,
   UpdateCampaignPayload,
 } from '@catalyst/api-client'
@@ -158,6 +162,57 @@ export const campaignsApi = {
   ): Promise<ReviewActionResponse> {
     return http.post<ReviewActionResponse>(
       `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/reject`,
+      payload,
+    )
+  },
+
+  /**
+   * Manually verify a failed-verification post (verification-resolution chunk,
+   * ACT1/D-4) — posted → manually_verified. The override reason is required.
+   * Payment-eligible alongside live_verified.
+   */
+  manuallyVerify(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+    payload: ManuallyVerifyPayload,
+  ): Promise<ResolutionActionResponse> {
+    return http.post<ResolutionActionResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/manually-verify`,
+      payload,
+    )
+  },
+
+  /**
+   * Send a failed-verification assignment back for a FRESH post (ACT2/D-5) —
+   * posted → approved. The creator re-posts via the existing posted-content
+   * surface; the failed post is kept as history. Optional feedback to the creator.
+   */
+  requestResubmitFresh(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+    payload: RequestResubmitFreshPayload = {},
+  ): Promise<ResolutionActionResponse> {
+    return http.post<ResolutionActionResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/request-resubmit-fresh`,
+      payload,
+    )
+  },
+
+  /**
+   * Nudge the creator to fix the post URL IN PLACE (ACT3/D-6) — NO state
+   * transition (stays posted). Notifies + audits only; the creator's own
+   * in-place edit re-arms verification. Optional feedback to the creator.
+   */
+  requestResubmitInPlace(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+    payload: RequestResubmitInPlacePayload = {},
+  ): Promise<ResolutionActionResponse> {
+    return http.post<ResolutionActionResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/request-resubmit-in-place`,
       payload,
     )
   },
