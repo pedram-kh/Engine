@@ -233,7 +233,7 @@ it('presigned contract upload completes under agency assignment prefix', functio
 });
 
 it('after accept the existing draft submit flow works from contracted', function (): void {
-    [$agency, $campaign, $assignment, , $creatorUser] = contractSetup();
+    [$agency, $campaign, $assignment, $creator, $creatorUser] = contractSetup();
     $staff = User::factory()->agencyStaff($agency)->createOne();
 
     $this->actingAs($staff)
@@ -249,7 +249,6 @@ it('after accept the existing draft submit flow works from contracted', function
 
     expect($assignment->fresh()?->status)->toBe(AssignmentStatus::Contracted);
 
-    $creator = $assignment->creator;
     $mediaPath = "creators/{$creator->ulid}/drafts/test.mp4";
     Storage::disk('media')->put($mediaPath, 'video');
 
