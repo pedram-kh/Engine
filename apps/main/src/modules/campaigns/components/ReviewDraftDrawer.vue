@@ -60,6 +60,7 @@ const loading = ref(false)
 const loadError = ref<string | null>(null)
 const feedback = ref('')
 const fieldErrors = ref<Partial<Record<ReviewField, readonly string[]>>>({})
+const actionError = ref<string | null>(null)
 const submitting = ref<ActionKind | null>(null)
 
 const latestDraft = computed(() => detail.value?.relationships.drafts[0] ?? null)
@@ -70,16 +71,23 @@ const canAct = computed(() => detail.value?.attributes.status === 'draft_submitt
 const galleryItems = computed<GalleryItem[]>(() => {
   const draft = latestDraft.value
   if (draft === null) return []
-  return draft.attributes.media.map((m, index) => ({
-    id: `${draft.id}-${index}`,
-    kind: m.kind === 'video' ? 'video' : 'image',
-    title: null,
-    description: null,
-    thumbnailUrl: m.thumbnail_view_url ?? m.view_url,
-    viewUrl: m.view_url,
-    externalUrl: null,
-    altText: draft.attributes.caption ?? `media-${index}`,
-  }))
+  return draft.attributes.media.map((m, index) => {
+    const isVideo = m.kind === 'video'
+    return {
+      id: `${draft.id}-${index}`,
+      kind: isVideo ? 'video' : 'image',
+      title: null,
+      description: null,
+      // A video's `view_url` is the playable file, NOT an image — never feed it
+      // to the gallery's <img> thumbnail (it renders broken). Only use a real
+      // poster (`thumbnail_view_url`); when there is none, leave it null so the
+      // gallery shows a clean play-tile. Images keep falling back to view_url.
+      thumbnailUrl: m.thumbnail_view_url ?? (isVideo ? null : m.view_url),
+      viewUrl: m.view_url,
+      externalUrl: null,
+      altText: draft.attributes.caption ?? `media-${index}`,
+    }
+  })
 })
 
 async function load(): Promise<void> {
@@ -104,6 +112,7 @@ watch(
     if (open) {
       feedback.value = ''
       fieldErrors.value = {}
+      actionError.value = null
       void load()
     }
   },
@@ -119,6 +128,7 @@ async function runAction(kind: ActionKind): Promise<void> {
 
   submitting.value = kind
   fieldErrors.value = {}
+  actionError.value = null
   try {
     if (kind === 'approve') {
       await campaignsApi.approveDraft(props.agencyId, props.campaignId, assignment.id)
@@ -140,7 +150,10 @@ async function runAction(kind: ActionKind): Promise<void> {
       fieldErrors.value = extractFieldErrors<ReviewField>(err)
     }
     if (Object.keys(fieldErrors.value).length === 0) {
-      emit('update:modelValue', false)
+      // No field-level (422) error to bind inline — surface the failure rather
+      // than silently closing the drawer (e.g. an unexpected 5xx). Keep it open
+      // so the reviewer can see what happened and retry.
+      actionError.value = t('app.campaigns.review.toast.error')
     }
   } finally {
     submitting.value = null
@@ -243,6 +256,15 @@ async function runAction(kind: ActionKind): Promise<void> {
 
           <!-- Review actions (only when a draft awaits review) -->
           <template v-if="canAct">
+            <v-alert
+              v-if="actionError"
+              type="error"
+              variant="tonal"
+              class="mb-3"
+              data-test="review-action-error"
+            >
+              {{ actionError }}
+            </v-alert>
             <v-textarea
               v-model="feedback"
               :label="t('app.campaigns.review.feedbackLabel')"

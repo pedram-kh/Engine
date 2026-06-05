@@ -571,7 +571,7 @@ State transitions are managed by `CampaignAssignmentStateMachine` service. Every
 
 ### `campaign_drafts`
 
-> **✅ Built in Sprint 9 Chunk 1.** Migrated as spec'd (`2026_06_05_110000_create_campaign_drafts_table.php`) + `CampaignDraft` model/factory + `DraftReviewStatus` enum. Chunk 1 WRITES only the submission side (`version`, `submitted_*`, `caption`, `hashtags`, `mentions`, `media_attachments`, `review_status` default `pending`) via the creator-self `POST creators/me/assignments/{a}/drafts` endpoint; `version` increments per resubmission (one row per attempt, history preserved). The review-trail columns (`reviewed_*`, `review_feedback`) + P2/P3 (`client_review_*`, `ai_qc_*`) ship as column-only — Chunk 2 (agency review) populates the review trail. The model intentionally does **not** use the Audited trait (free-text `caption`/`review_feedback` kept out of any snapshot); the draft-submitted fact rides the `assignment.draft_submitted` machine-transition audit (carrying `{draft_id, version, media_count}`).
+> **✅ Built in Sprint 9 Chunk 1.** Migrated as spec'd (`2026_06_05_110000_create_campaign_drafts_table.php`) + `CampaignDraft` model/factory + `DraftReviewStatus` enum. Chunk 1 WRITES only the submission side (`version`, `submitted_*`, `caption`, `hashtags`, `mentions`, `media_attachments`, `review_status` default `pending`) via the creator-self `POST creators/me/assignments/{a}/drafts` endpoint; `version` increments per resubmission (one row per attempt, history preserved). The review-trail columns (`reviewed_*`, `review_feedback`) + P2/P3 (`client_review_*`, `ai_qc_*`) ship as column-only — Chunk 2 (agency review) populates the review trail. The model intentionally does **not** use the Audited trait (free-text `caption`/`review_feedback` kept out of any snapshot); the draft-submitted fact rides the `assignment.draft_submitted` machine-transition audit (carrying `{draft_id, version, media_count}`). **Bugfix (migration `2026_06_05_120000`):** `review_status` / `client_review_status` were widened varchar(16) → varchar(32) — the original 16 could not hold `revision_requested` (18 chars), so Chunk 2's "request changes" failed on Postgres (SQLite tests don't enforce length, so it slipped through).
 
 Draft submissions for review.
 
@@ -587,11 +587,11 @@ Draft submissions for review.
 | `hashtags`                   | jsonb null       | Array                                                                 | P1                  |
 | `mentions`                   | jsonb null       |                                                                       | P1                  |
 | `media_attachments`          | jsonb            | Array of {s3_path, mime_type, kind, thumbnail_path, duration_seconds} | P1                  |
-| `review_status`              | varchar(16)      | `pending`, `approved`, `rejected`, `revision_requested`               | P1                  |
+| `review_status`              | varchar(32)      | `pending`, `approved`, `rejected`, `revision_requested`               | P1                  |
 | `reviewed_at`                | timestamptz null |                                                                       | P1                  |
 | `reviewed_by_user_id`        | bigint FK null   |                                                                       | P1                  |
 | `review_feedback`            | text null        |                                                                       | P1                  |
-| `client_review_status`       | varchar(16) null | `pending`, `approved`, `rejected` (P2 brand portal)                   | P2 (column from P1) |
+| `client_review_status`       | varchar(32) null | `pending`, `approved`, `rejected` (P2 brand portal)                   | P2 (column from P1) |
 | `client_reviewed_at`         | timestamptz null |                                                                       | P2 (column from P1) |
 | `client_reviewed_by_user_id` | bigint FK null   |                                                                       | P2 (column from P1) |
 | `client_review_feedback`     | text null        |                                                                       | P2 (column from P1) |

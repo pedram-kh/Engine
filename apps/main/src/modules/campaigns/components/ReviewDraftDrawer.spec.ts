@@ -199,6 +199,70 @@ describe('ReviewDraftDrawer (Sprint 9 Chunk 2)', () => {
     wrapper.unmount()
   })
 
+  it('never feeds a video file URL to the gallery thumbnail (broken-img bug)', async () => {
+    const detail = makeDetail()
+    detail.relationships.drafts[0]!.attributes.media = [
+      {
+        s3_path: 'v.mp4',
+        mime_type: 'video/mp4',
+        kind: 'video',
+        thumbnail_path: null,
+        duration_seconds: 12,
+        view_url: 'https://signed/v.mp4',
+        thumbnail_view_url: null,
+      },
+      {
+        s3_path: 'i.jpg',
+        mime_type: 'image/jpeg',
+        kind: 'image',
+        thumbnail_path: null,
+        duration_seconds: null,
+        view_url: 'https://signed/i.jpg',
+        thumbnail_view_url: null,
+      },
+    ]
+    vi.mocked(campaignsApi.showAssignment).mockResolvedValue({ data: detail })
+    const wrapper = await mountOpen()
+
+    const gallery = wrapper.findComponent({ name: 'PortfolioGallery' })
+    const items = gallery.props('items') as Array<{
+      kind: string
+      thumbnailUrl: string | null
+      viewUrl: string | null
+    }>
+
+    // Video with no poster → thumbnailUrl null (so the <img> is not rendered),
+    // but the playable file is still on viewUrl for the lightbox.
+    expect(items[0]?.kind).toBe('video')
+    expect(items[0]?.thumbnailUrl).toBeNull()
+    expect(items[0]?.viewUrl).toBe('https://signed/v.mp4')
+    // Image without a dedicated thumbnail still falls back to its own view_url.
+    expect(items[1]?.thumbnailUrl).toBe('https://signed/i.jpg')
+    wrapper.unmount()
+  })
+
+  it('surfaces an unexpected 5xx as an inline error and keeps the drawer open', async () => {
+    vi.mocked(campaignsApi.requestRevision).mockRejectedValue(
+      new ApiError({
+        status: 500,
+        code: 'server.error',
+        message: 'Server error.',
+        details: [],
+      }),
+    )
+    const wrapper = await mountOpen()
+
+    await wrapper.find('[data-test="review-feedback"] textarea').setValue('Please redo the hook.')
+    await wrapper.find('[data-test="review-request-revision"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="review-action-error"]').exists()).toBe(true)
+    expect(wrapper.emitted('reviewed')).toBeUndefined()
+    // The drawer must NOT silently close on an unexpected error.
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+
   it('binds a feedback-required 422 onto the review_feedback textarea', async () => {
     vi.mocked(campaignsApi.requestRevision).mockRejectedValue(
       new ApiError({
