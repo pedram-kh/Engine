@@ -295,6 +295,8 @@
         "detail": {
           "back": "Back to invitations",
           "notFound": "This assignment could not be found.",
+          "loadFailed": "We couldn't load this assignment. Please try again.",
+          "retry": "Retry",
           "awaitingReview": "Your draft has been submitted and is awaiting agency review.",
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
           "revision": {

@@ -295,6 +295,8 @@
         "detail": {
           "back": "Voltar aos convites",
           "notFound": "Não foi possível encontrar esta atribuição.",
+          "loadFailed": "Não foi possível carregar esta atribuição. Tente novamente.",
+          "retry": "Tentar novamente",
           "awaitingReview": "O seu rascunho foi enviado e aguarda revisão da agência.",
           "awaitingVerification": "A sua publicação foi registada e aguarda verificação.",
           "revision": {

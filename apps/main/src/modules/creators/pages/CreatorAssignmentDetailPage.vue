@@ -56,6 +56,10 @@ const ulid = computed(() => String(route.params.ulid ?? ''))
 const assignment = ref<CreatorAssignmentDetailResource | null>(null)
 const loading = ref(false)
 const loadedOnce = ref(false)
+// Distinguish a true 404 (the assignment really isn't ours / doesn't exist)
+// from any other failure (5xx, network) so a server error never masquerades
+// as "not found" — the bare-catch trap that hid the missing-migration 500.
+const loadError = ref<'not_found' | 'generic' | null>(null)
 const snackbar = ref<{ color: string; text: string } | null>(null)
 
 // Draft form state.
@@ -120,11 +124,13 @@ function formatMoney(minor: number | null, currency: string | null): string {
 
 async function load(): Promise<void> {
   loading.value = true
+  loadError.value = null
   try {
     const res = await creatorAssignmentsApi.show(ulid.value)
     assignment.value = res.data
-  } catch {
+  } catch (err) {
     assignment.value = null
+    loadError.value = err instanceof ApiError && err.status === 404 ? 'not_found' : 'generic'
   } finally {
     loading.value = false
     loadedOnce.value = true
@@ -514,8 +520,28 @@ onMounted(() => {
       </v-card>
     </template>
 
-    <v-alert v-else type="error" variant="tonal" data-testid="assignment-detail-not-found">
+    <v-alert
+      v-else-if="loadError === 'not_found'"
+      type="error"
+      variant="tonal"
+      data-testid="assignment-detail-not-found"
+    >
       {{ t('creator.ui.assignments.detail.notFound') }}
+    </v-alert>
+
+    <v-alert v-else type="error" variant="tonal" data-testid="assignment-detail-load-error">
+      <div class="d-flex align-center ga-3 flex-wrap">
+        <span>{{ t('creator.ui.assignments.detail.loadFailed') }}</span>
+        <v-btn
+          size="small"
+          variant="tonal"
+          :loading="loading"
+          data-testid="assignment-detail-retry"
+          @click="load"
+        >
+          {{ t('creator.ui.assignments.detail.retry') }}
+        </v-btn>
+      </div>
     </v-alert>
 
     <v-snackbar

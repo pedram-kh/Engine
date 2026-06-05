@@ -158,6 +158,46 @@ describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', 
   })
 })
 
+describe('CreatorAssignmentDetailPage — load failures', () => {
+  it('shows the not-found alert only on a true 404', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockRejectedValue(
+      new ApiError({ status: 404, code: 'assignment.not_found', message: 'No assignment found.' }),
+    )
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-detail-not-found"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="assignment-detail-load-error"]').exists()).toBe(false)
+  })
+
+  it('shows a retry-able error (not "not found") on a 500, then recovers on retry', async () => {
+    vi.mocked(creatorAssignmentsApi.show)
+      .mockRejectedValueOnce(
+        new ApiError({ status: 500, code: 'server.error', message: 'Server error.' }),
+      )
+      .mockResolvedValueOnce({ data: makeDetail('producing') })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-detail-load-error"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="assignment-detail-not-found"]').exists()).toBe(false)
+
+    await wrapper.find('[data-testid="assignment-detail-retry"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="assignment-detail-load-error"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-draft-form"]').exists()).toBe(true)
+  })
+
+  it('treats a network error (status 0) as retry-able, not "not found"', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockRejectedValue(
+      new ApiError({ status: 0, code: 'network.error', message: 'Network error.' }),
+    )
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-detail-load-error"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="assignment-detail-not-found"]').exists()).toBe(false)
+  })
+})
+
 describe('CreatorAssignmentDetailPage — draft submit form', () => {
   it('uploads media then binds a 422 onto the caption field', async () => {
     vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('producing') })

@@ -295,6 +295,8 @@
         "detail": {
           "back": "Torna agli inviti",
           "notFound": "Impossibile trovare questo incarico.",
+          "loadFailed": "Impossibile caricare questo incarico. Riprova.",
+          "retry": "Riprova",
           "awaitingReview": "La tua bozza è stata inviata ed è in attesa di revisione dell'agenzia.",
           "awaitingVerification": "Il tuo post è stato registrato ed è in attesa di verifica.",
           "revision": {
