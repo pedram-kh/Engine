@@ -250,15 +250,20 @@ interface ESignatureProviderContract
 
 **Dropbox Sign as default candidate.** Solid API, fair pricing, multi-language support. DocuSign is overkill for Phase 1 volumes. Re-evaluate at Phase 3 when volume justifies enterprise pricing negotiations.
 
-### 4.5 Per-campaign contract manual flow (Phase 1 — contract-bridge chunk)
+### 4.5 Per-campaign contract manual flow (Phase 1 — contract-bridge + contract-gate-decouple chunks)
 
-Phase 1 ships a **manual two-party flow** for assignment addenda when `contract_signing_enabled` is ON:
+Phase 1 ships a **manual two-party flow** for assignment addenda, gated by its OWN flag `per_campaign_contract_enabled` (NOT the e-sign vendor flag — decoupled by the contract-gate-decouple chunk, D-3; defaults **ON** because it gates no vendor — see `feature-flags.md`):
 
 1. Agency issues a `per_campaign` contract (`POST …/assignments/{assignment}/contract/attach`) — PDF via agency-scoped presigned upload and/or inline markdown terms.
 2. Creator reviews on the assignment detail page and click-accepts (`POST /api/v1/creators/me/assignments/{assignment}/contract/accept`).
 3. Accept stamps `contracts.signed_at` and drives `CampaignAssignmentStateMachine::contract()` (`accepted → contracted`, sets `assignment.contract_id`). **Stops at `contracted`** — the existing draft-submit endpoint auto-chains `startProducing` + `submitDraft`.
 
-Master-contract wizard e-sign (`EsignProvider`, wizard routes) is a **separate** surface; this chunk does not reuse it for assignments.
+**The two axes (contract-gate-decouple chunk, D-10):**
+
+- `per_campaign_contract_enabled` (the **flag**) — is the manual contract feature available on this instance. OFF → attach / accept / `contract()` / proceed-without all 422 `assignment.per_campaign_contract_disabled`.
+- `campaigns.requires_per_campaign_contract` (the **column**) — does THIS campaign require a contract. `true` → mandatory: the only exit from `accepted` is creator-accepts-a-contract. `false` → optional: the agency may attach + have the creator accept, OR call `POST …/assignments/{assignment}/contract/proceed-without-contract` to advance `accepted → contracted` with **no** Contract row (`contract_id` null). "Not required" ≠ "not allowed." A `requires=true` campaign refuses proceed-without-contract with 422 `assignment.per_campaign_contract_required`.
+
+Master-contract wizard e-sign (`EsignProvider`, wizard routes, gated by `contract_signing_enabled`) is a **separate** surface; this flow does not reuse it for assignments.
 
 ### 4.6 E-sign vendor swap checklist (when real e-sign replaces manual click-through)
 
@@ -274,10 +279,10 @@ Use this checklist when binding a production e-sign vendor for **both** master c
 
 #### Flag
 
-| Step | Detail                                                                                                                                                                                           |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 4    | `contract_signing_enabled` already gates `CampaignAssignmentStateMachine::contract()`. With the real vendor ON, envelope creation replaces manual click-through for flows wired to the provider. |
-| 5    | **Do not** add a flag-OFF bypass for assignment `accepted → contracted` — that would require loosening the machine gate. Wizard master click-through (flag OFF) remains a separate path.         |
+| Step | Detail                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 4    | **Two separate flags now.** `contract_signing_enabled` gates the e-sign **vendor** (envelope creation + the master-contract wizard). `per_campaign_contract_enabled` gates the per-campaign **manual** flow + `CampaignAssignmentStateMachine::contract()` (decoupled by the contract-gate-decouple chunk, D-3). To wire real e-sign for **assignments**, leave `per_campaign_contract_enabled` ON and add the vendor envelope behind `contract_signing_enabled` in the webhook handler (step 6); do not re-couple the manual gate to the vendor flag. |
+| 5    | **Do not** add a `contract_signing_enabled`-OFF bypass for assignment `accepted → contracted` — the manual per-campaign flow rides `per_campaign_contract_enabled` (default ON, gates no vendor), so the manual path already works in production without the vendor. Wizard master click-through (`contract_signing_enabled` OFF) remains a separate path.                                                                                                                                                                                             |
 
 #### Manual-fallback UI to replace
 

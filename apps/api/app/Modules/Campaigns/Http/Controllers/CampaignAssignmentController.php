@@ -19,12 +19,14 @@ use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\AssignmentInviteGate;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Creators\Enums\ApplicationStatus;
+use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Laravel\Pennant\Feature;
 
 /**
  * Agency-side campaign assignments (Sprint 8 Chunk 1 read-only + Chunk 2 invite
@@ -65,6 +67,11 @@ final class CampaignAssignmentController
                 'page' => $paginator->currentPage(),
                 'per_page' => $paginator->perPage(),
                 'last_page' => $paginator->lastPage(),
+                // The per-campaign manual-contract flag, so the Creators tab can
+                // gate the agency "proceed without a contract" action (visible
+                // only when the campaign does not require a contract AND the flag
+                // is ON). Contract-gate-decouple chunk, D-7.
+                'per_campaign_contract_enabled' => Feature::active(PerCampaignContractEnabled::NAME),
             ],
         ]);
     }

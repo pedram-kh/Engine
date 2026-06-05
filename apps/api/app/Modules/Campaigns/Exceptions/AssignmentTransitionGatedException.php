@@ -21,9 +21,9 @@ use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
  * test can assert that the SOURCE guard passed but the VENDOR gate refused.
  *
  * Allowed codes:
- *   assignment.social_adapter_unavailable    — live_verified (social, parked).
- *   assignment.escrow_unavailable            — payment_* (Stripe escrow, S10).
- *   assignment.contract_signing_disabled     — contracted (flag off).
+ *   assignment.social_adapter_unavailable      — live_verified (social, parked).
+ *   assignment.escrow_unavailable              — payment_* (Stripe escrow, S10).
+ *   assignment.per_campaign_contract_disabled  — contracted (per-campaign flag off).
  */
 final class AssignmentTransitionGatedException extends AssignmentTransitionException
 {
@@ -43,11 +43,11 @@ final class AssignmentTransitionGatedException extends AssignmentTransitionExcep
         );
     }
 
-    public static function contractSigningDisabled(): self
+    public static function perCampaignContractDisabled(): self
     {
         return new self(
-            'assignment.contract_signing_disabled',
-            'contracted requires the contract_signing_enabled flag (the e-sign flow).',
+            'assignment.per_campaign_contract_disabled',
+            'contracted requires the per_campaign_contract_enabled flag (the per-campaign manual contract flow).',
         );
     }
 }

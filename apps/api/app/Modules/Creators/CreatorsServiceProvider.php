@@ -7,6 +7,7 @@ namespace App\Modules\Creators;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
+use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Creators\Integrations\Contracts\EsignProvider;
 use App\Modules\Creators\Integrations\Contracts\KycProvider;
@@ -232,13 +233,19 @@ final class CreatorsServiceProvider extends ServiceProvider
     /**
      * Register the Phase-1 vendor-gating flags (docs/feature-flags.md): the
      * three wizard flags (kyc / payout / contract) + `social_verification_enabled`
-     * (Sprint 9 Chunk 2, D-11 — gates `posted → live_verified`). Phase 1 flags are
-     * operator-controlled and scope-less — call sites use
-     * `Feature::active(<Class>::NAME)` (no scope arg). Each flag
+     * (Sprint 9 Chunk 2, D-11 — gates `posted → live_verified`) +
+     * `per_campaign_contract_enabled` (the contract-gate-decouple chunk, D-1 —
+     * gates the per-campaign MANUAL contract flow, decoupled from the e-sign
+     * vendor flag). Phase 1 flags are operator-controlled and scope-less — call
+     * sites use `Feature::active(<Class>::NAME)` (no scope arg). Each flag
      * class exposes a static `default()` returning a Closure so the
      * resolver runs on every check (Pennant treats non-Closure
      * arguments to `define()` as the literal stored value — see
      * Drivers/Decorator.php:153).
+     *
+     * ⚠ `per_campaign_contract_enabled` defaults ON — the documented exception
+     * to the default-OFF convention (it gates no vendor; see the class docblock
+     * + docs/feature-flags.md's Default-OFF convention note).
      */
     private function registerFeatureFlags(): void
     {
@@ -246,6 +253,7 @@ final class CreatorsServiceProvider extends ServiceProvider
         Feature::define(CreatorPayoutMethodEnabled::NAME, CreatorPayoutMethodEnabled::default());
         Feature::define(ContractSigningEnabled::NAME, ContractSigningEnabled::default());
         Feature::define(SocialVerificationEnabled::NAME, SocialVerificationEnabled::default());
+        Feature::define(PerCampaignContractEnabled::NAME, PerCampaignContractEnabled::default());
     }
 
     private function registerRoutes(): void

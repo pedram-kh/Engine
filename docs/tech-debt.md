@@ -215,6 +215,19 @@ anyone reviewing it later.
 
 ---
 
+## Creators feature dir OOMs at 128M in one process (unrelated Stripe-mock test)
+
+- **Where:** running the whole [`apps/api/tests/Feature/Modules/Creators`](../apps/api/tests/Feature/Modules/Creators) directory in a single process hits PHP's default 128M `memory_limit` with a fatal inside an unrelated Stripe-mock test; it passes with `php -d memory_limit=512M`.
+- **What we accepted (June 5, 2026, noted during the contract-gate-decouple chunk):** this is a _narrower_ scope than the full-suite 2G entry above — it shows the existing entry's "scoped runs (per-module/per-dir) stay under 128M" mitigation is **no longer true for the Creators dir specifically**. The whole-dir run now needs `-d memory_limit=512M`. Unrelated to any feature code in this chunk — surfaced only because this chunk's verification ran the whole Creators dir at once.
+- **Risk:** low, but a latent CI hazard: a job that runs `tests/Feature/Modules/Creators` as one process at the default limit will see a FatalException unrelated to the change under test. Combined with the 2G full-suite entry, "all green" silently depends on remembering a memory flag at multiple granularities.
+- **Mitigation today:** run the Creators dir with `php -d memory_limit=512M` (or finer-grained per-file runs).
+- **Triggered by:** the same test-harness tidy-up as the 2G entry — ideally fixed together by setting `memory_limit` in `phpunit.xml` `<ini>` and/or making the offending Stripe-mock test release memory between cases.
+- **Resolution:** fold into the test-harness `memory_limit` fix (set the limit in bootstrap/`phpunit.xml`), or identify and tighten the leaking Stripe-mock test so the Creators dir runs clean at 128M. Estimated ~15 minutes (on top of the 2G entry's fix).
+- **Owner:** test-harness tidy-up.
+- **Status:** open. Surfaced by the contract-gate-decouple chunk, June 5, 2026.
+
+---
+
 ## Defensive `requireAgencyUser` guard for agency-shell routes
 
 - **Where:** [`apps/main/src/core/router/guards.ts`](../apps/main/src/core/router/guards.ts) (new guard, symmetric to the existing `requireOnboardingAccess`) + the `meta.guards` arrays on every `appRoutes` entry in [`apps/main/src/modules/auth/routes.ts`](../apps/main/src/modules/auth/routes.ts) (`app.dashboard`, `brands.*`, `agency-users.list`, `creator-invitations.bulk`, `settings`).
@@ -1232,7 +1245,7 @@ anyone reviewing it later.
 - **What we accepted in contract-bridge chunk (2026-06-05, D-8):** informational only — agency may attach regardless; no gate on attach/accept.
 - **Triggered by:** product rule that attach is mandatory when flag is set.
 - **Owner:** future campaigns workstream.
-- **Status:** open.
+- **Status:** **closed** in the contract-gate-decouple chunk (2026-06-05, D-8/D-9). The column is now a **runtime switch**: `CampaignAssignmentContractController::proceedWithoutContract()` reads `$campaign->requires_per_campaign_contract` and refuses the contract-less advance (422 `assignment.per_campaign_contract_required`) when it is `true`, so a required-contract campaign genuinely cannot reach `contracted`/`producing` without an accepted contract. `false` campaigns may advance via the proceed-without-contract endpoint OR attach + accept (D-10: "not required" ≠ "not allowed"). The full agency UI polish (a dedicated requires-toggle redesign) remains P2; this chunk wired the **gating**, not a redesign.
 
 ---
 

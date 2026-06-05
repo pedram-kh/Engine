@@ -17,7 +17,7 @@ use App\Modules\Campaigns\Models\CampaignPostedContent;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Creators\Enums\ContractStatus;
 use App\Modules\Creators\Enums\SocialPlatform;
-use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Http\Resources\ContractResource;
 use App\Modules\Creators\Models\Contract;
 use App\Modules\Creators\Models\Creator;
@@ -131,7 +131,10 @@ final class CreatorAssignmentDraftController
                 ],
             ],
             'meta' => [
-                'contract_signing_enabled' => Feature::active(ContractSigningEnabled::NAME),
+                // The per-campaign manual-contract flag (NOT the e-sign vendor
+                // flag) — the assignment-detail surface reflects whether the
+                // per-campaign flow is available (D-5 key rename).
+                'per_campaign_contract_enabled' => Feature::active(PerCampaignContractEnabled::NAME),
             ],
         ]);
     }

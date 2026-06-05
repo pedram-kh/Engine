@@ -15,6 +15,7 @@ use App\Modules\Creators\Database\Factories\CreatorFactory;
 use App\Modules\Creators\Enums\ContractKind;
 use App\Modules\Creators\Enums\ContractStatus;
 use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Models\Contract;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
@@ -65,7 +66,12 @@ function creatorAcceptUrl(CampaignAssignment $assignment): string
 }
 
 beforeEach(function (): void {
-    Feature::define(ContractSigningEnabled::NAME, true);
+    // The per-campaign manual flow now rides its OWN flag (default ON,
+    // contract-gate-decouple chunk D-3) — NOT the e-sign vendor flag. Set it
+    // explicitly for clarity; the vendor flag stays OFF to prove the decoupling
+    // (the manual flow does not need it).
+    Feature::define(PerCampaignContractEnabled::NAME, true);
+    Feature::define(ContractSigningEnabled::NAME, false);
     Storage::fake('media');
 });
 
@@ -153,8 +159,8 @@ it('accept on another creators assignment returns 404', function (): void {
         ->assertNotFound();
 });
 
-it('attach is unavailable when contract_signing_enabled is OFF', function (): void {
-    Feature::define(ContractSigningEnabled::NAME, false);
+it('attach is unavailable when per_campaign_contract_enabled is OFF (the re-pointed break-revert)', function (): void {
+    Feature::define(PerCampaignContractEnabled::NAME, false);
     [$agency, $campaign, $assignment] = contractSetup();
     $staff = User::factory()->agencyStaff($agency)->createOne();
 
@@ -164,10 +170,10 @@ it('attach is unavailable when contract_signing_enabled is OFF', function (): vo
             'body_markdown' => 'Terms.',
         ])
         ->assertUnprocessable()
-        ->assertJsonPath('errors.0.code', 'assignment.contract_signing_disabled');
+        ->assertJsonPath('errors.0.code', 'assignment.per_campaign_contract_disabled');
 });
 
-it('accept is unavailable when contract_signing_enabled is OFF', function (): void {
+it('accept is unavailable when per_campaign_contract_enabled is OFF (the re-pointed break-revert)', function (): void {
     [$agency, $campaign, $assignment, , $creatorUser] = contractSetup();
 
     $this->actingAs(User::factory()->agencyStaff($agency)->createOne())
@@ -177,12 +183,34 @@ it('accept is unavailable when contract_signing_enabled is OFF', function (): vo
         ])
         ->assertCreated();
 
-    Feature::define(ContractSigningEnabled::NAME, false);
+    Feature::define(PerCampaignContractEnabled::NAME, false);
 
     $this->actingAs($creatorUser)
         ->postJson(creatorAcceptUrl($assignment))
         ->assertUnprocessable()
-        ->assertJsonPath('errors.0.code', 'assignment.contract_signing_disabled');
+        ->assertJsonPath('errors.0.code', 'assignment.per_campaign_contract_disabled');
+});
+
+it('the master wizard e-sign flag stays OFF throughout the per-campaign flow (the decoupling proof, X3)', function (): void {
+    // The shippable production state: contract_signing_enabled OFF (no vendor
+    // calls, wizard click-through), per_campaign_contract_enabled ON. The
+    // per-campaign attach + accept work end-to-end without the vendor flag.
+    expect(Feature::active(ContractSigningEnabled::NAME))->toBeFalse()
+        ->and(Feature::active(PerCampaignContractEnabled::NAME))->toBeTrue();
+
+    [$agency, $campaign, $assignment, , $creatorUser] = contractSetup();
+
+    $this->actingAs(User::factory()->agencyStaff($agency)->createOne())
+        ->postJson(agencyContractUrl($agency, $campaign, $assignment, 'attach'), [
+            'title' => 'Addendum',
+            'body_markdown' => 'Terms.',
+        ])
+        ->assertCreated();
+
+    $this->actingAs($creatorUser)
+        ->postJson(creatorAcceptUrl($assignment))
+        ->assertOk()
+        ->assertJsonPath('data.attributes.status', 'contracted');
 });
 
 it('attach authz allows admin manager staff and rejects non-members with 404', function (): void {
@@ -282,5 +310,106 @@ it('creator show includes pending contract relationship when accepted', function
         ->assertOk()
         ->assertJsonPath('data.relationships.contract.attributes.status', 'sent')
         ->assertJsonPath('data.relationships.contract.attributes.body_markdown', 'Review these terms.')
-        ->assertJsonPath('meta.contract_signing_enabled', true);
+        ->assertJsonPath('meta.per_campaign_contract_enabled', true);
+});
+
+// ---------------------------------------------------------------------------
+// Agency "proceed without a per-campaign contract" (D-7/D-8) — the no-contract
+// advance path that prevents the `accepted` dead-end for requires=false.
+// ---------------------------------------------------------------------------
+
+it('proceed-without-contract advances accepted → contracted with no contract row when requires=false', function (): void {
+    [$agency, $campaign, $assignment] = contractSetup();
+    // requires_per_campaign_contract defaults false on the factory.
+    $staff = User::factory()->agencyStaff($agency)->createOne();
+
+    $this->actingAs($staff)
+        ->postJson(agencyContractUrl($agency, $campaign, $assignment, 'proceed-without-contract'))
+        ->assertOk()
+        ->assertJsonPath('meta.code', 'assignment.contracted')
+        ->assertJsonPath('data.attributes.status', 'contracted');
+
+    $fresh = $assignment->fresh();
+    expect($fresh?->status)->toBe(AssignmentStatus::Contracted)
+        ->and($fresh?->contract_id)->toBeNull()
+        ->and(Contract::query()->count())->toBe(0);
+});
+
+it('after proceed-without-contract the existing draft submit flow continues (NOT a dead-end, the L1 fix)', function (): void {
+    [$agency, $campaign, $assignment, $creator, $creatorUser] = contractSetup();
+    $staff = User::factory()->agencyStaff($agency)->createOne();
+
+    $this->actingAs($staff)
+        ->postJson(agencyContractUrl($agency, $campaign, $assignment, 'proceed-without-contract'))
+        ->assertOk();
+
+    $mediaPath = "creators/{$creator->ulid}/drafts/test.mp4";
+    Storage::disk('media')->put($mediaPath, 'video');
+
+    $this->actingAs($creatorUser)
+        ->postJson("/api/v1/creators/me/assignments/{$assignment->ulid}/drafts", [
+            'caption' => 'Draft v1',
+            'media' => [[
+                's3_path' => $mediaPath,
+                'mime_type' => 'video/mp4',
+                'kind' => 'video',
+            ]],
+        ])
+        ->assertCreated()
+        ->assertJsonPath('meta.code', 'assignment.draft_submitted');
+
+    expect($assignment->fresh()?->status)->toBe(AssignmentStatus::DraftSubmitted);
+});
+
+it('proceed-without-contract is refused when requires_per_campaign_contract = true (mandatory enforced, D-8)', function (): void {
+    [$agency, $campaign, $assignment] = contractSetup();
+    $campaign->forceFill(['requires_per_campaign_contract' => true])->save();
+    $staff = User::factory()->agencyStaff($agency)->createOne();
+
+    $this->actingAs($staff)
+        ->postJson(agencyContractUrl($agency, $campaign, $assignment, 'proceed-without-contract'))
+        ->assertUnprocessable()
+        ->assertJsonPath('errors.0.code', 'assignment.per_campaign_contract_required');
+
+    // The only exit from `accepted` for a requires=true campaign stays the
+    // creator-accepts-a-contract path: the assignment is still `accepted`.
+    expect($assignment->fresh()?->status)->toBe(AssignmentStatus::Accepted);
+});
+
+it('a requires=true assignment can still reach contracted via creator-accepts-a-contract', function (): void {
+    [$agency, $campaign, $assignment, , $creatorUser] = contractSetup();
+    $campaign->forceFill(['requires_per_campaign_contract' => true])->save();
+
+    $this->actingAs(User::factory()->agencyStaff($agency)->createOne())
+        ->postJson(agencyContractUrl($agency, $campaign, $assignment, 'attach'), [
+            'title' => 'Addendum',
+            'body_markdown' => 'Terms.',
+        ])
+        ->assertCreated();
+
+    $this->actingAs($creatorUser)
+        ->postJson(creatorAcceptUrl($assignment))
+        ->assertOk()
+        ->assertJsonPath('data.attributes.status', 'contracted');
+
+    expect($assignment->fresh()?->status)->toBe(AssignmentStatus::Contracted);
+});
+
+it('proceed-without-contract is unavailable when per_campaign_contract_enabled is OFF', function (): void {
+    Feature::define(PerCampaignContractEnabled::NAME, false);
+    [$agency, $campaign, $assignment] = contractSetup();
+
+    $this->actingAs(User::factory()->agencyStaff($agency)->createOne())
+        ->postJson(agencyContractUrl($agency, $campaign, $assignment, 'proceed-without-contract'))
+        ->assertUnprocessable()
+        ->assertJsonPath('errors.0.code', 'assignment.per_campaign_contract_disabled');
+});
+
+it('proceed-without-contract rejects non-members with 404', function (): void {
+    [$agency, $campaign, $assignment] = contractSetup();
+    $outsider = User::factory()->createOne();
+
+    $this->actingAs($outsider)
+        ->postJson(agencyContractUrl($agency, $campaign, $assignment, 'proceed-without-contract'))
+        ->assertNotFound();
 });

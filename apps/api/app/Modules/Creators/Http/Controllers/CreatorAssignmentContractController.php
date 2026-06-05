@@ -11,7 +11,7 @@ use App\Modules\Campaigns\Exceptions\AssignmentTransitionException;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Creators\Enums\ContractStatus;
-use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Http\Resources\ContractResource;
 use App\Modules\Creators\Models\Contract;
 use App\Modules\Creators\Models\Creator;
@@ -35,12 +35,12 @@ final class CreatorAssignmentContractController
 {
     public function accept(Request $request, string $assignment, CampaignAssignmentStateMachine $machine): JsonResponse
     {
-        if (! Feature::active(ContractSigningEnabled::NAME)) {
+        if (! Feature::active(PerCampaignContractEnabled::NAME)) {
             return ErrorResponse::single(
                 $request,
                 Response::HTTP_UNPROCESSABLE_ENTITY,
-                'assignment.contract_signing_disabled',
-                'Contract signing is not enabled.',
+                'assignment.per_campaign_contract_disabled',
+                'The per-campaign contract flow is not enabled.',
             );
         }
 

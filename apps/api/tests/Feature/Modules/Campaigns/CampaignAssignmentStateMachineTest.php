@@ -11,6 +11,7 @@ use App\Modules\Campaigns\Exceptions\AssignmentTransitionGatedException;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -108,13 +109,25 @@ it('counter: invited → countered records countered_fee and NOT agreed_fee (D-7
     expect(($audit->metadata ?? [])['countered_fee_minor_units'] ?? null)->toBe(750_000);
 });
 
-it('contract: accepted → contracted is reachable when contract_signing_enabled is ON', function (): void {
-    Feature::define(ContractSigningEnabled::NAME, true);
+it('contract: accepted → contracted is reachable when per_campaign_contract_enabled is ON', function (): void {
+    Feature::define(PerCampaignContractEnabled::NAME, true);
     $assignment = assignmentInStatus(AssignmentStatus::Accepted);
 
     sm()->contract($assignment);
 
     expect(reload($assignment)->status)->toBe(AssignmentStatus::Contracted);
+    expect(lastAuditFor($assignment, AuditAction::AssignmentContracted))->not->toBeNull();
+});
+
+it('contract: accepted → contracted with a null contract leaves contract_id null (the proceed-without path, D-7)', function (): void {
+    Feature::define(PerCampaignContractEnabled::NAME, true);
+    $assignment = assignmentInStatus(AssignmentStatus::Accepted);
+
+    sm()->contract($assignment, null);
+
+    $fresh = reload($assignment);
+    expect($fresh->status)->toBe(AssignmentStatus::Contracted)
+        ->and($fresh->contract_id)->toBeNull();
     expect(lastAuditFor($assignment, AuditAction::AssignmentContracted))->not->toBeNull();
 });
 
@@ -443,15 +456,15 @@ it('holdPayment + releasePayment are escrow-gated (Sprint 10) — no manual path
     expect(reload($released)->status)->toBe(AssignmentStatus::PaymentHeld);
 });
 
-it('contract is gated when contract_signing_enabled is OFF (no transition)', function (): void {
-    Feature::define(ContractSigningEnabled::NAME, false);
+it('contract is gated when per_campaign_contract_enabled is OFF (no transition)', function (): void {
+    Feature::define(PerCampaignContractEnabled::NAME, false);
     $assignment = assignmentInStatus(AssignmentStatus::Accepted);
 
     try {
         sm()->contract($assignment);
-        $this->fail('Expected a contract-signing gate.');
+        $this->fail('Expected a per-campaign-contract gate.');
     } catch (AssignmentTransitionGatedException $e) {
-        expect($e->errorCode)->toBe('assignment.contract_signing_disabled');
+        expect($e->errorCode)->toBe('assignment.per_campaign_contract_disabled');
     }
 
     expect(reload($assignment)->status)->toBe(AssignmentStatus::Accepted);

@@ -7,13 +7,15 @@ namespace App\Modules\Campaigns\Http\Controllers;
 use App\Core\Errors\ErrorResponse;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
+use App\Modules\Campaigns\Exceptions\AssignmentTransitionException;
 use App\Modules\Campaigns\Mail\ContractAttachedMail;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\AssignmentContractUploadService;
+use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Creators\Enums\ContractKind;
 use App\Modules\Creators\Enums\ContractStatus;
-use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Http\Resources\ContractResource;
 use App\Modules\Creators\Models\Contract;
 use App\Modules\Identity\Models\User;
@@ -184,6 +186,86 @@ final class CampaignAssignmentContractController
         ], 201);
     }
 
+    /**
+     * Agency "proceed without a per-campaign contract" (D-7) — advance an
+     * accepted assignment to `contracted` WITHOUT a Contract row, by calling
+     * `contract($assignment, null, $actor)`. Reuses the single existing machine
+     * edge (NO second edge, D-7): `contract_id` stays null, the graph stays
+     * single-edged (`accepted → contracted` always), and the existing
+     * draft-submit flow continues downstream (the L1 dead-end fix).
+     *
+     * Agency discretion, not the creator's call — gated on the `attachContract`
+     * ability (admin + manager + staff, the execute precedent) and the
+     * `per_campaign_contract_enabled` flag.
+     *
+     * D-8 — the MANDATORY-contract enforcement co-locates here: when the
+     * campaign's `requires_per_campaign_contract = true`, this path REFUSES
+     * (422 `assignment.per_campaign_contract_required`). So a `requires=true`
+     * assignment cannot reach `contracted` without an accepted contract — the
+     * contract-less path is closed to it. "Not required" ≠ "not allowed"
+     * (D-10): only `requires=false` campaigns may advance this way.
+     */
+    public function proceedWithoutContract(
+        Request $request,
+        Agency $agency,
+        Campaign $campaign,
+        CampaignAssignment $assignment,
+        CampaignAssignmentStateMachine $machine,
+    ): JsonResponse {
+        $this->assertContext($campaign, $agency, $assignment);
+        Gate::authorize('attachContract', $campaign);
+        if ($gate = $this->flagGate($request)) {
+            return $gate;
+        }
+
+        // D-8 — the single mandatory-enforcement gate. A required-contract
+        // campaign refuses the contract-less advance regardless of state.
+        if ($campaign->requires_per_campaign_contract) {
+            return ErrorResponse::single(
+                $request,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                'assignment.per_campaign_contract_required',
+                'This campaign requires a per-campaign contract; the creator must accept one before the assignment can proceed.',
+            );
+        }
+
+        if ($assignment->status !== AssignmentStatus::Accepted) {
+            return ErrorResponse::single(
+                $request,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                'assignment.not_accepted',
+                'Only an accepted assignment can be advanced without a contract.',
+            );
+        }
+
+        /** @var User $actor */
+        $actor = $request->user();
+
+        try {
+            $machine->contract($assignment, null, $actor);
+        } catch (AssignmentTransitionException $e) {
+            return ErrorResponse::single(
+                $request,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                $e->errorCode,
+                $e->getMessage(),
+            );
+        }
+
+        $fresh = $assignment->fresh();
+
+        return response()->json([
+            'data' => [
+                'type' => 'campaign_assignment',
+                'id' => $assignment->ulid,
+                'attributes' => [
+                    'status' => ($fresh ?? $assignment)->status->value,
+                ],
+            ],
+            'meta' => ['code' => 'assignment.contracted'],
+        ]);
+    }
+
     private function notifyCreator(CampaignAssignment $assignment, Contract $contract): void
     {
         $creator = $assignment->creator;
@@ -214,15 +296,15 @@ final class CampaignAssignmentContractController
 
     private function flagGate(Request $request): ?JsonResponse
     {
-        if (Feature::active(ContractSigningEnabled::NAME)) {
+        if (Feature::active(PerCampaignContractEnabled::NAME)) {
             return null;
         }
 
         return ErrorResponse::single(
             $request,
             Response::HTTP_UNPROCESSABLE_ENTITY,
-            'assignment.contract_signing_disabled',
-            'Contract signing is not enabled.',
+            'assignment.per_campaign_contract_disabled',
+            'The per-campaign contract flow is not enabled.',
         );
     }
 

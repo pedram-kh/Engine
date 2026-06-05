@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
+use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Creators\Integrations\Contracts\EsignProvider;
 use App\Modules\Creators\Integrations\Contracts\KycProvider;
@@ -76,6 +77,29 @@ it('registers contract_signing_enabled with default OFF', function (): void {
 it('registers social_verification_enabled with default OFF (Sprint 9 Chunk 2, D-11)', function (): void {
     expect(SocialVerificationEnabled::NAME)->toBe('social_verification_enabled');
     expect(Feature::active(SocialVerificationEnabled::NAME))->toBeFalse();
+});
+
+it('registers per_campaign_contract_enabled with default ON (contract-gate-decouple chunk, D-1/D-2)', function (): void {
+    // ⚠ The documented default-ON exception (D-2). This flag gates NO vendor —
+    // the per-campaign manual flow is internal — so the "default OFF / no
+    // silent vendor calls" rationale does not apply. It MUST register ON so the
+    // manual flow ships to production without flipping the e-sign vendor flag.
+    // Deliberately NOT added to the default-OFF expectation set below.
+    expect(PerCampaignContractEnabled::NAME)->toBe('per_campaign_contract_enabled');
+    expect(Feature::active(PerCampaignContractEnabled::NAME))->toBeTrue();
+});
+
+it('round-trips deactivate / activate for the default-ON per_campaign_contract_enabled flag', function (): void {
+    // The mirror of the default-OFF round-trip below, but starting from the
+    // default-ON state: the operator can flip the per-campaign flow OFF
+    // globally (the break-revert) and back ON.
+    expect(Feature::active(PerCampaignContractEnabled::NAME))->toBeTrue('default-ON');
+
+    Feature::deactivate(PerCampaignContractEnabled::NAME);
+    expect(Feature::active(PerCampaignContractEnabled::NAME))->toBeFalse('deactivate flips it OFF globally');
+
+    Feature::activate(PerCampaignContractEnabled::NAME);
+    expect(Feature::active(PerCampaignContractEnabled::NAME))->toBeTrue('activate flips it back ON globally');
 });
 
 it('round-trips activate / deactivate for each Phase-1 flag (no scope arg per Phase 1 convention)', function (): void {

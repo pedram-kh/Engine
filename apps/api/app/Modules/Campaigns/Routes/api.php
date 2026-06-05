@@ -70,4 +70,14 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
             ->name('campaigns.assignments.contract.media.complete');
         Route::post('campaigns/{campaign}/assignments/{assignment}/contract/attach', [CampaignAssignmentContractController::class, 'attach'])
             ->name('campaigns.assignments.contract.attach');
+
+        // Agency "proceed without a per-campaign contract" (contract-gate-decouple
+        // chunk, D-7/D-8). Advances an accepted assignment to `contracted` with NO
+        // Contract row (reuses contract(null) — no second machine edge), allowed
+        // ONLY when the campaign does NOT require a contract; refuses 422
+        // `assignment.per_campaign_contract_required` when it does. The execute
+        // ability (admin + manager + staff) + the `per_campaign_contract_enabled`
+        // flag gate apply (inside the controller).
+        Route::post('campaigns/{campaign}/assignments/{assignment}/contract/proceed-without-contract', [CampaignAssignmentContractController::class, 'proceedWithoutContract'])
+            ->name('campaigns.assignments.contract.proceed-without-contract');
     });

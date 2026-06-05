@@ -11,7 +11,7 @@ use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Exceptions\AssignmentTransitionException;
 use App\Modules\Campaigns\Exceptions\AssignmentTransitionGatedException;
 use App\Modules\Campaigns\Models\CampaignAssignment;
-use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Creators\Models\Contract;
 use App\Modules\Identity\Models\User;
@@ -47,8 +47,9 @@ use Laravel\Pennant\Feature;
  * VENDOR/FLAG-GATED — the methods + their source guards exist + are tested.
  * `holdPayment` / `releasePayment` refuse because Stripe escrow (Sprint 10)
  * does not exist yet; there is NO manual path to those states (the footgun
- * guard). `contract` is gated on `contract_signing_enabled` (the e-sign mock
- * exists); `verifyLive` is gated on `social_verification_enabled` (the social
+ * guard). `contract` is gated on `per_campaign_contract_enabled` (the
+ * per-campaign manual flow — NOT the e-sign vendor flag, decoupled by the
+ * contract-gate-decouple chunk); `verifyLive` is gated on `social_verification_enabled` (the social
  * mock exists — flag-ON + the verification job is the path; flag-OFF stays
  * gated, production-without-adapter safe).
  *
@@ -159,9 +160,13 @@ final class CampaignAssignmentStateMachine
     }
 
     /**
-     * accepted → contracted. Flag-gated on `contract_signing_enabled` (the
-     * e-sign mock exists). The optional signed addendum is recorded on
-     * `contract_id`.
+     * accepted → contracted. Flag-gated on `per_campaign_contract_enabled` (the
+     * per-campaign MANUAL contract flow — decoupled from the e-sign vendor flag
+     * by the contract-gate-decouple chunk, D-3). The optional signed addendum is
+     * recorded on `contract_id`. A `null` $contract is legal (D-7): the agency
+     * "proceed without a per-campaign contract" caller passes null when the
+     * campaign does not require a contract — `contract_id` simply stays null,
+     * keeping the graph single-edged (`accepted → contracted` always).
      */
     public function contract(
         CampaignAssignment $assignment,
@@ -170,8 +175,8 @@ final class CampaignAssignmentStateMachine
     ): CampaignAssignment {
         $this->assertSource($assignment, [AssignmentStatus::Accepted], AssignmentStatus::Contracted);
 
-        if (! Feature::active(ContractSigningEnabled::NAME)) {
-            throw AssignmentTransitionGatedException::contractSigningDisabled();
+        if (! Feature::active(PerCampaignContractEnabled::NAME)) {
+            throw AssignmentTransitionGatedException::perCampaignContractDisabled();
         }
 
         return $this->commit(
