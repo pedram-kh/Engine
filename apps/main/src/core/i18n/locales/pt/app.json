@@ -391,6 +391,19 @@
           "body": "Convide criadores para esta campanha para começar."
         }
       },
+      "fees": {
+        "offered": "Oferecido",
+        "countered": "Contraproposta"
+      },
+      "reinvite": {
+        "action": "Reconvidar",
+        "title": "Reconvidar criador",
+        "body": "Eles contrapropuseram {fee}. Refaça a oferta em:",
+        "feeLabel": "Novo cachê acordado ({currency})",
+        "cancel": "Cancelar",
+        "submit": "Reconvidar",
+        "success": "Reconvite enviado."
+      },
       "invite": {
         "open": "Convidar criadores",
         "title": "Convidar criadores",

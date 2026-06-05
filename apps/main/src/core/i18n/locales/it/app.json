@@ -391,6 +391,19 @@
           "body": "Invita creator a questa campagna per iniziare."
         }
       },
+      "fees": {
+        "offered": "Offerto",
+        "countered": "Controproposta"
+      },
+      "reinvite": {
+        "action": "Reinvita",
+        "title": "Reinvita creator",
+        "body": "Hanno controproposto {fee}. Rifai l'offerta a:",
+        "feeLabel": "Nuovo compenso concordato ({currency})",
+        "cancel": "Annulla",
+        "submit": "Reinvita",
+        "success": "Reinvito inviato."
+      },
       "invite": {
         "open": "Invita creator",
         "title": "Invita creator",

@@ -59,6 +59,9 @@ const CANONICAL_422_FILES: readonly string[] = [
   // Sprint 8 Chunk 2 (D-8): the creator counter fee-form binds the 422 from a
   // non-positive / wrong-currency fee onto the amount field.
   'modules/creators/pages/CreatorAssignmentsPage.vue',
+  // Re-invite UI chunk (D-4): the agency re-offer fee-form binds 422s onto the
+  // amount field (counter-dialog shape, not the invite dialog's unbound field).
+  'modules/campaigns/components/ReinviteDialog.vue',
 ]
 
 const IMPORTS_EXTRACT_FIELD_ERRORS =

@@ -399,6 +399,19 @@
           "body": "Invite creators to this campaign to get started."
         }
       },
+      "fees": {
+        "offered": "Offered",
+        "countered": "Countered"
+      },
+      "reinvite": {
+        "action": "Re-invite",
+        "title": "Re-invite creator",
+        "body": "They countered with {fee}. Re-offer at:",
+        "feeLabel": "New agreed fee ({currency})",
+        "cancel": "Cancel",
+        "submit": "Re-invite",
+        "success": "Re-invitation sent."
+      },
       "invite": {
         "open": "Invite creators",
         "title": "Invite creators",

@@ -31,6 +31,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
 import InviteCreatorsDialog from '../components/InviteCreatorsDialog.vue'
+import ReinviteDialog from '../components/ReinviteDialog.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -55,6 +56,20 @@ const inviteSnackbar = ref<string | null>(null)
 
 function onInvited(message: string): void {
   inviteSnackbar.value = message
+  void loadAssignments()
+}
+
+const reinviteDialog = ref(false)
+const reinviteTarget = ref<CampaignAssignmentResource | null>(null)
+const reinviteSnackbar = ref<string | null>(null)
+
+function openReinvite(assignment: CampaignAssignmentResource): void {
+  reinviteTarget.value = assignment
+  reinviteDialog.value = true
+}
+
+function onReinvited(): void {
+  reinviteSnackbar.value = t('app.campaigns.reinvite.success')
   void loadAssignments()
 }
 
@@ -307,12 +322,52 @@ function formatMoney(minor: number | null, currency: string | null): string {
             </template>
           </CEmptyState>
           <v-list v-else data-test="creators-list">
-            <v-list-item
-              v-for="a in assignments"
-              :key="a.id"
-              :title="a.attributes.creator?.display_name ?? '—'"
-              :subtitle="t(`app.campaigns.assignmentStatus.${a.attributes.status}`)"
-            />
+            <v-list-item v-for="a in assignments" :key="a.id" :data-test="`creators-row-${a.id}`">
+              <v-list-item-title class="d-flex align-center ga-2">
+                {{ a.attributes.creator?.display_name ?? '—' }}
+                <v-chip size="x-small" variant="tonal" :data-test="`creators-status-${a.id}`">
+                  {{ t(`app.campaigns.assignmentStatus.${a.attributes.status}`) }}
+                </v-chip>
+              </v-list-item-title>
+              <v-list-item-subtitle :data-test="`creators-fees-${a.id}`">
+                <template v-if="a.attributes.status === 'countered'">
+                  {{ t('app.campaigns.fees.offered') }}:
+                  {{
+                    formatMoney(
+                      a.attributes.agreed_fee_minor_units,
+                      a.attributes.agreed_fee_currency,
+                    )
+                  }}
+                  · {{ t('app.campaigns.fees.countered') }}:
+                  {{
+                    formatMoney(
+                      a.attributes.countered_fee_minor_units,
+                      a.attributes.countered_fee_currency,
+                    )
+                  }}
+                </template>
+                <template v-else>
+                  {{
+                    formatMoney(
+                      a.attributes.agreed_fee_minor_units,
+                      a.attributes.agreed_fee_currency,
+                    )
+                  }}
+                </template>
+              </v-list-item-subtitle>
+              <template #append>
+                <v-btn
+                  v-if="a.attributes.status === 'countered' && canInvite"
+                  color="primary"
+                  variant="flat"
+                  size="small"
+                  :data-test="`creators-reinvite-${a.id}`"
+                  @click="openReinvite(a)"
+                >
+                  {{ t('app.campaigns.reinvite.action') }}
+                </v-btn>
+              </template>
+            </v-list-item>
           </v-list>
 
           <InviteCreatorsDialog
@@ -322,6 +377,16 @@ function formatMoney(minor: number | null, currency: string | null): string {
             :campaign-id="ulid"
             :campaign-currency="campaign?.attributes.budget_currency ?? null"
             @invited="onInvited"
+          />
+
+          <ReinviteDialog
+            v-if="canInvite && agencyStore.currentAgencyId"
+            v-model="reinviteDialog"
+            :agency-id="agencyStore.currentAgencyId"
+            :campaign-id="ulid"
+            :assignment="reinviteTarget"
+            :campaign-currency="campaign?.attributes.budget_currency ?? null"
+            @success="onReinvited"
           />
 
           <v-snackbar
@@ -336,6 +401,20 @@ function formatMoney(minor: number | null, currency: string | null): string {
             "
           >
             {{ inviteSnackbar }}
+          </v-snackbar>
+
+          <v-snackbar
+            :model-value="reinviteSnackbar !== null"
+            :timeout="4000"
+            color="success"
+            data-test="reinvite-snackbar"
+            @update:model-value="
+              (v) => {
+                if (!v) reinviteSnackbar = null
+              }
+            "
+          >
+            {{ reinviteSnackbar }}
           </v-snackbar>
         </v-window-item>
 

@@ -6,7 +6,7 @@
  * its empty state when there are no assignments.
  */
 
-import type { CampaignResource } from '@catalyst/api-client'
+import type { CampaignAssignmentResource, CampaignResource } from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -22,7 +22,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import CampaignDetailPage from './CampaignDetailPage.vue'
 
 vi.mock('../api/campaigns.api', () => ({
-  campaignsApi: { show: vi.fn(), assignments: vi.fn(), update: vi.fn() },
+  campaignsApi: { show: vi.fn(), assignments: vi.fn(), update: vi.fn(), reinvite: vi.fn() },
 }))
 
 import { campaignsApi } from '../api/campaigns.api'
@@ -75,16 +75,38 @@ function makeCampaign(): CampaignResource {
   }
 }
 
+function makeAssignment(
+  id: string,
+  status: CampaignAssignmentResource['attributes']['status'],
+): CampaignAssignmentResource {
+  return {
+    id,
+    type: 'campaign_assignments',
+    attributes: {
+      status,
+      agreed_fee_minor_units: 100000,
+      agreed_fee_currency: 'EUR',
+      countered_fee_minor_units: status === 'countered' ? 150000 : null,
+      countered_fee_currency: status === 'countered' ? 'EUR' : null,
+      invited_at: '2026-06-01T10:00:00.000000Z',
+      responded_at: status === 'countered' ? '2026-06-02T10:00:00.000000Z' : null,
+      posting_due_at: null,
+      creator: { id: `creator-${id}`, display_name: `Creator ${id}` },
+    },
+  }
+}
+
 async function mountDetail(
   role: 'agency_admin' | 'agency_manager' | 'agency_staff' = 'agency_admin',
+  assignments: CampaignAssignmentResource[] = [],
 ): Promise<{ wrapper: ReturnType<typeof mount>; cleanup: () => void }> {
   const pinia = createPinia()
   setActivePinia(pinia)
 
   vi.mocked(campaignsApi.show).mockResolvedValue({ data: makeCampaign() })
   vi.mocked(campaignsApi.assignments).mockResolvedValue({
-    data: [],
-    meta: { total: 0, page: 1, per_page: 25, last_page: 1 },
+    data: assignments,
+    meta: { total: assignments.length, page: 1, per_page: 25, last_page: 1 },
   })
 
   const agency = useAgencyStore()
@@ -176,5 +198,61 @@ describe('CampaignDetailPage (Sprint 8 Chunk 1)', () => {
     await flushPromises()
     expect(campaignsApi.assignments).toHaveBeenCalledWith('agency-ulid', CAMPAIGN_ULID)
     expect(harness.wrapper.find('[data-test="creators-empty-state"]').exists()).toBe(true)
+  })
+})
+
+describe('CampaignDetailPage — Creators tab re-invite (re-invite UI chunk)', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+  })
+
+  async function openCreatorsTab(
+    role: 'agency_admin' | 'agency_manager' | 'agency_staff' = 'agency_staff',
+    assignments: CampaignAssignmentResource[] = [],
+  ) {
+    const harness = await mountDetail(role, assignments)
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'creators'
+    await flushPromises()
+    return harness.wrapper
+  }
+
+  it('renders assignment status as a chip', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [
+      makeAssignment('A', 'invited'),
+      makeAssignment('B', 'countered'),
+    ])
+    expect(wrapper.find('[data-test="creators-status-A"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="creators-status-B"]').exists()).toBe(true)
+  })
+
+  it('shows both fees + the re-invite action on a countered row', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [makeAssignment('C', 'countered')])
+    const fees = wrapper.find('[data-test="creators-fees-C"]')
+    expect(fees.text()).toContain('Offered')
+    expect(fees.text()).toContain('Countered')
+    expect(fees.text()).toContain('1,000.00 EUR')
+    expect(fees.text()).toContain('1,500.00 EUR')
+    expect(wrapper.find('[data-test="creators-reinvite-C"]').exists()).toBe(true)
+  })
+
+  it('shows agreed fee only and NO re-invite action on a non-countered row', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [makeAssignment('I', 'invited')])
+    const fees = wrapper.find('[data-test="creators-fees-I"]')
+    expect(fees.text()).toContain('1,000.00 EUR')
+    expect(fees.text()).not.toContain('Countered')
+    expect(wrapper.find('[data-test="creators-reinvite-I"]').exists()).toBe(false)
+  })
+
+  it('gates the re-invite action on canInvite (staff sees it)', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [makeAssignment('C', 'countered')])
+    expect(wrapper.find('[data-test="creators-reinvite-C"]').exists()).toBe(true)
   })
 })

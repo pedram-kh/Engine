@@ -1173,3 +1173,23 @@ anyone reviewing it later.
 - **Triggered by:** a future change making campaign currency mandatory.
 - **Owner:** Sprint 8+ (campaigns).
 - **Status:** open (deferred by design — conditional on a nullable column). Surfaced + accepted by Sprint 8 Chunk 2, 2026-06-05 ([review](reviews/sprint-8-chunk-2-review.md)).
+
+---
+
+## Agency re-invite UI was backend-ready but UI-pending (Sprint 8 Chunk 2 → re-invite UI chunk)
+
+- **Where:** [`CampaignDetailPage.vue`](../apps/main/src/modules/campaigns/pages/CampaignDetailPage.vue) Creators tab — the assignment list shipped read-only in Chunk 1 and gained invite in Chunk 2, but no row surfaced `countered_fee_*` or triggered `campaignsApi.reinvite()` even though the endpoint, api-client types, wrapper, and backend tests all shipped in Chunk 2.
+- **What it was:** the counter→re-invite loop was whole at the backend (`countered → invited` via `reinvite()`) but broken at the agency UI — a creator could counter into a dead end. Surfaced by the Sprint-8 eyes-on walk.
+- **✅ RESOLVED — 2026-06-05, re-invite UI chunk.** [`ReinviteDialog.vue`](../apps/main/src/modules/campaigns/components/ReinviteDialog.vue) + Creators-tab row enrichment (both fees on countered rows, status chip, fail-closed `countered && canInvite` re-invite action, post-success `loadAssignments()` + snackbar). Frontend-only — zero backend change. See [review](reviews/reinvite-ui-review.md).
+
+---
+
+## No agency-side campaign-detail Playwright E2E (re-invite UI chunk)
+
+- **Where:** [`CampaignDetailPage.vue`](../apps/main/src/modules/campaigns/pages/CampaignDetailPage.vue) — Vitest component coverage exists (`CampaignDetailPage.spec.ts`, `ReinviteDialog.spec.ts`); no Playwright harness exercises the campaign-detail Creators tab end-to-end.
+- **What we accepted in the re-invite UI chunk (2026-06-05):** the counter→re-invite round-trip is pinned by Vitest only (mocked API). A browser E2E would need a seeded countered assignment + agency staff session — heavier than this chunk's scope.
+- **Risk:** low. Vitest pins the fail-closed gates, fee display, dialog wiring, and 422 binding; the backend reinvite path is already feature-tested in [`CampaignAssignmentInviteTest`](../apps/api/tests/Feature/Modules/Campaigns/CampaignAssignmentInviteTest.php).
+- **Triggered by:** the next chunk that materially extends the campaign-detail frontend (e.g. per-row cancel, expanded assignment detail, or a dedicated campaign-detail Playwright harness).
+- **Resolution:** add a counter→re-invite round-trip Playwright E2E when the campaign-detail surface grows enough to warrant its own browser harness.
+- **Owner:** Sprint 8+ (campaigns FE).
+- **Status:** open (deferred by design — Vitest-only this chunk). Surfaced + accepted by re-invite UI chunk, 2026-06-05 ([review](reviews/reinvite-ui-review.md)).
