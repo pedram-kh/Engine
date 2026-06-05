@@ -53,6 +53,16 @@ function invitableCreator(): Creator
     return CreatorFactory::new()->approved()->createOne();
 }
 
+// The repo's `fresh() ?? $self` reload idiom — fresh() is typed ?static, so the
+// non-null reload keeps Larastan level-8 happy on property reads (guarded
+// because Pest loads every test file into one shared function scope).
+if (! function_exists('reloadAssignment')) {
+    function reloadAssignment(CampaignAssignment $assignment): CampaignAssignment
+    {
+        return $assignment->fresh() ?? $assignment;
+    }
+}
+
 /**
  * @return array<string, mixed>
  */
@@ -334,7 +344,7 @@ it('re-invites a countered assignment (countered → invited) recording a NEW ag
         ->assertOk()
         ->assertJsonPath('data.attributes.status', 'invited');
 
-    $fresh = $assignment->fresh();
+    $fresh = reloadAssignment($assignment);
     expect($fresh->status)->toBe(AssignmentStatus::Invited)
         ->and($fresh->agreed_fee_minor_units)->toBe(650_000)
         ->and($fresh->countered_fee_minor_units)->toBeNull();
@@ -357,5 +367,5 @@ it('fails closed on an illegal re-invite source (e.g. accepted → invited) — 
         ->assertStatus(422)
         ->assertJsonPath('errors.0.code', 'assignment.invalid_transition');
 
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Accepted);
+    expect(reloadAssignment($assignment)->status)->toBe(AssignmentStatus::Accepted);
 });

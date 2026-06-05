@@ -56,6 +56,16 @@ function assignmentUrl(CampaignAssignment $assignment, string $verb): string
     return "/api/v1/creators/me/assignments/{$assignment->ulid}/{$verb}";
 }
 
+// The repo's `fresh() ?? $self` reload idiom — fresh() is typed ?static, so the
+// non-null reload keeps Larastan level-8 happy on property reads (guarded
+// because Pest loads every test file into one shared function scope).
+if (! function_exists('reloadAssignment')) {
+    function reloadAssignment(CampaignAssignment $assignment): CampaignAssignment
+    {
+        return $assignment->fresh() ?? $assignment;
+    }
+}
+
 // ── List ─────────────────────────────────────────────────────────────────────
 
 it('returns 401 when unauthenticated', function (): void {
@@ -89,7 +99,7 @@ it('accepts an invited assignment (invited → accepted) via the state machine',
         ->assertJsonPath('meta.code', 'assignment.accepted')
         ->assertJsonPath('data.attributes.status', 'accepted');
 
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Accepted);
+    expect(reloadAssignment($assignment)->status)->toBe(AssignmentStatus::Accepted);
     expect(AuditLog::query()->where('action', 'assignment.accepted')->where('subject_id', $assignment->id)->exists())->toBeTrue();
 });
 
@@ -102,7 +112,7 @@ it('declines an invited assignment (invited → declined)', function (): void {
         ->assertOk()
         ->assertJsonPath('meta.code', 'assignment.declined');
 
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Declined);
+    expect(reloadAssignment($assignment)->status)->toBe(AssignmentStatus::Declined);
 });
 
 // ── Counter (records countered_fee, NOT agreed_fee — D-7/D-8) ────────────────
@@ -120,7 +130,7 @@ it('counters an invited assignment recording countered_fee WITHOUT touching agre
         ->assertJsonPath('meta.code', 'assignment.countered')
         ->assertJsonPath('data.attributes.status', 'countered');
 
-    $fresh = $assignment->fresh();
+    $fresh = reloadAssignment($assignment);
     expect($fresh->status)->toBe(AssignmentStatus::Countered)
         ->and($fresh->countered_fee_minor_units)->toBe(750_000)
         ->and($fresh->agreed_fee_minor_units)->toBe(500_000); // untouched
@@ -151,7 +161,7 @@ it('404s when acting on another creator\'s assignment (structural owner-only gua
         ->assertNotFound();
 
     // The foreign row is untouched.
-    expect($foreign->fresh()->status)->toBe(AssignmentStatus::Invited);
+    expect(reloadAssignment($foreign)->status)->toBe(AssignmentStatus::Invited);
 });
 
 // ── Fail-closed unless invited ───────────────────────────────────────────────
@@ -171,5 +181,5 @@ it('fails closed — a non-invited assignment cannot be accepted/declined/counte
             ->assertJsonPath('errors.0.code', 'assignment.not_invited');
     }
 
-    expect($accepted->fresh()->status)->toBe(AssignmentStatus::Accepted);
+    expect(reloadAssignment($accepted)->status)->toBe(AssignmentStatus::Accepted);
 });

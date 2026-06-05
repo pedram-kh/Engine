@@ -30,9 +30,11 @@ function machine(): CampaignAssignmentStateMachine
 it('auto-creates a Hard/AssignmentAuto block linked to assignment_id over the posting window on accept (D-11)', function (): void {
     // Break-revert: remove the listener registration and NO block is created —
     // the next agency's conflict check would not fire.
+    $windowStart = now()->addDays(5);
+    $windowEnd = now()->addDays(12);
     $campaign = Campaign::factory()->create([
-        'posting_window_starts_at' => now()->addDays(5),
-        'posting_window_ends_at' => now()->addDays(12),
+        'posting_window_starts_at' => $windowStart,
+        'posting_window_ends_at' => $windowEnd,
     ]);
     $assignment = CampaignAssignment::factory()->status(AssignmentStatus::Invited)->create([
         'campaign_id' => $campaign->id,
@@ -47,16 +49,18 @@ it('auto-creates a Hard/AssignmentAuto block linked to assignment_id over the po
     expect($block->creator_id)->toBe($assignment->creator_id)
         ->and($block->block_type)->toBe(BlockType::Hard)
         ->and($block->kind)->toBe(Kind::AssignmentAuto)
-        ->and($block->starts_at->toDateString())->toBe($campaign->posting_window_starts_at->toDateString())
-        ->and($block->ends_at->toDateString())->toBe($campaign->posting_window_ends_at->toDateString());
+        ->and($block->starts_at->toDateString())->toBe($windowStart->toDateString())
+        ->and($block->ends_at->toDateString())->toBe($windowEnd->toDateString());
 });
 
 it('falls back to the campaign run dates when the posting window is null', function (): void {
+    $runStart = now()->addDays(3);
+    $runEnd = now()->addDays(9);
     $campaign = Campaign::factory()->create([
         'posting_window_starts_at' => null,
         'posting_window_ends_at' => null,
-        'starts_at' => now()->addDays(3),
-        'ends_at' => now()->addDays(9),
+        'starts_at' => $runStart,
+        'ends_at' => $runEnd,
     ]);
     $assignment = CampaignAssignment::factory()->status(AssignmentStatus::Invited)->create([
         'campaign_id' => $campaign->id,
@@ -65,8 +69,8 @@ it('falls back to the campaign run dates when the posting window is null', funct
     machine()->accept($assignment);
 
     $block = CreatorAvailabilityBlock::query()->where('assignment_id', $assignment->id)->firstOrFail();
-    expect($block->starts_at->toDateString())->toBe($campaign->starts_at->toDateString())
-        ->and($block->ends_at->toDateString())->toBe($campaign->ends_at->toDateString());
+    expect($block->starts_at->toDateString())->toBe($runStart->toDateString())
+        ->and($block->ends_at->toDateString())->toBe($runEnd->toDateString());
 });
 
 it('skips the auto-block when the campaign has no dateable window (the flagged edge)', function (): void {
