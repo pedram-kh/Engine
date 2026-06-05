@@ -11,6 +11,7 @@ use App\Modules\Campaigns\Exceptions\AssignmentTransitionGatedException;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\SocialVerificationEnabled;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Laravel\Pennant\Feature;
@@ -229,7 +230,7 @@ it('rejects every illegal source → target pair fail-closed', function (string 
     'markPosted from draft_submitted' => ['markPosted', 'draft_submitted'],
 ]);
 
-it('rejects any transition out of a terminal state (declined / payment_released)', function (string $from): void {
+it('rejects any transition out of a terminal state (declined / rejected / payment_released)', function (string $from): void {
     Feature::define(ContractSigningEnabled::NAME, true);
 
     expect(fn () => sm()->accept(assignmentInStatus(AssignmentStatus::from($from))))
@@ -238,6 +239,8 @@ it('rejects any transition out of a terminal state (declined / payment_released)
         ->toThrow(AssignmentTransitionException::class);
 })->with([
     'declined' => ['declined'],
+    // Sprint 9 Chunk 2 (D-1) — the new dedicated terminal has no edge out.
+    'rejected' => ['rejected'],
     'payment_released' => ['payment_released'],
 ]);
 
@@ -285,6 +288,7 @@ it('rejects cancelling a terminal assignment', function (string $from): void {
     expect(reload($assignment)->status->value)->toBe($from);
 })->with([
     'declined' => ['declined'],
+    'rejected' => ['rejected'],
     'payment_released' => ['payment_released'],
     'cancelled' => ['cancelled'],
 ]);
@@ -303,7 +307,90 @@ it('rejects cancel without a reason', function (): void {
 });
 
 // ---------------------------------------------------------------------------
-// VENDOR-GATED (D-6) — unreachable under own power; no manual path.
+// REJECT (Sprint 9 Chunk 2, D-1/D-3) — the new dedicated terminal edge.
+// ---------------------------------------------------------------------------
+
+it('rejectDraft: draft_submitted → rejected (terminal) fires assignment.draft_rejected with the reason', function (): void {
+    Event::fake([AssignmentTransitioned::class]);
+    $assignment = assignmentInStatus(AssignmentStatus::DraftSubmitted);
+
+    sm()->rejectDraft($assignment, 'Off-brief and low quality', context: ['draft_id' => 'd_123', 'version' => 1]);
+
+    $fresh = reload($assignment);
+    expect($fresh->status)->toBe(AssignmentStatus::Rejected)
+        ->and($fresh->status->isTerminal())->toBeTrue();
+
+    $audit = lastAuditFor($assignment, AuditAction::AssignmentDraftRejected);
+    expect($audit)->not->toBeNull()
+        ->and($audit?->reason)->toBe('Off-brief and low quality')
+        // The reason rides the dedicated reason field, NOT the metadata snapshot.
+        ->and($audit?->metadata['draft_id'] ?? null)->toBe('d_123')
+        ->and($audit?->metadata)->not->toHaveKey('review_feedback');
+
+    Event::assertDispatched(
+        AssignmentTransitioned::class,
+        fn (AssignmentTransitioned $e): bool => $e->eventKey() === 'assignment.draft_rejected'
+            && $e->metadata()['from'] === 'draft_submitted'
+            && $e->metadata()['to'] === 'rejected',
+    );
+});
+
+it('rejectDraft rejects an empty reason (reason required)', function (): void {
+    $assignment = assignmentInStatus(AssignmentStatus::DraftSubmitted);
+
+    try {
+        sm()->rejectDraft($assignment, '   ');
+        $this->fail('Expected a reason-required rejection.');
+    } catch (AssignmentTransitionException $e) {
+        expect($e->errorCode)->toBe('assignment.reason_required');
+    }
+
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::DraftSubmitted);
+});
+
+it('rejectDraft fails closed from a non-draft_submitted source', function (string $from): void {
+    $assignment = assignmentInStatus(AssignmentStatus::from($from));
+
+    try {
+        sm()->rejectDraft($assignment, 'nope');
+        $this->fail('Expected an invalid-transition rejection.');
+    } catch (AssignmentTransitionException $e) {
+        expect($e->errorCode)->toBe('assignment.invalid_transition');
+    }
+
+    expect(reload($assignment)->status->value)->toBe($from);
+})->with([
+    'producing' => ['producing'],
+    'approved' => ['approved'],
+    'revision_requested' => ['revision_requested'],
+    'posted' => ['posted'],
+]);
+
+// ---------------------------------------------------------------------------
+// VERIFY LIVE (Sprint 9 Chunk 2, D-11) — flag-gated; ON commits, OFF refuses.
+// ---------------------------------------------------------------------------
+
+it('verifyLive: posted → live_verified when social_verification_enabled is ON (stamps verified_live_at + fires the verb)', function (): void {
+    Feature::define(SocialVerificationEnabled::NAME, true);
+    Event::fake([AssignmentTransitioned::class]);
+    $assignment = assignmentInStatus(AssignmentStatus::Posted);
+
+    sm()->verifyLive($assignment, context: ['posted_content_id' => 'pc_1', 'platform_post_id' => 'mock_post_abc']);
+
+    $fresh = reload($assignment);
+    expect($fresh->status)->toBe(AssignmentStatus::LiveVerified)
+        ->and($fresh->verified_live_at)->not->toBeNull();
+    expect(lastAuditFor($assignment, AuditAction::AssignmentLiveVerified))->not->toBeNull();
+
+    Event::assertDispatched(
+        AssignmentTransitioned::class,
+        fn (AssignmentTransitioned $e): bool => $e->eventKey() === 'assignment.live_verified'
+            && ($e->metadata()['posted_content_id'] ?? null) === 'pc_1',
+    );
+});
+
+// ---------------------------------------------------------------------------
+// VENDOR / FLAG-GATED — unreachable under own power; no manual path.
 // ---------------------------------------------------------------------------
 
 it('verifyLive is vendor-gated (social adapter) — source guard passes but the gate refuses', function (): void {

@@ -7,19 +7,24 @@ namespace App\Modules\Creators;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
+use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Creators\Integrations\Contracts\EsignProvider;
 use App\Modules\Creators\Integrations\Contracts\KycProvider;
 use App\Modules\Creators\Integrations\Contracts\PaymentProvider;
+use App\Modules\Creators\Integrations\Contracts\SocialPlatformProvider;
 use App\Modules\Creators\Integrations\Mock\MockEsignProvider;
 use App\Modules\Creators\Integrations\Mock\MockKycProvider;
 use App\Modules\Creators\Integrations\Mock\MockPaymentProvider;
+use App\Modules\Creators\Integrations\Mock\MockSocialProvider;
 use App\Modules\Creators\Integrations\Stripe\StripePaymentProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredEsignProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredKycProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredPaymentProvider;
+use App\Modules\Creators\Integrations\Stubs\DeferredSocialProvider;
 use App\Modules\Creators\Integrations\Stubs\SkippedEsignProvider;
 use App\Modules\Creators\Integrations\Stubs\SkippedKycProvider;
 use App\Modules\Creators\Integrations\Stubs\SkippedPaymentProvider;
+use App\Modules\Creators\Integrations\Stubs\SkippedSocialProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Http\Request;
@@ -111,6 +116,21 @@ final class CreatorsServiceProvider extends ServiceProvider
                 deferredClass: DeferredPaymentProvider::class,
                 skippedClass: SkippedPaymentProvider::class,
                 realDrivers: ['stripe' => StripePaymentProvider::class],
+            ),
+        );
+
+        // Sprint 9 Chunk 2 (D-9) — the 4th provider seam. Flag-OFF →
+        // SkippedSocialProvider; flag-ON + driver=mock → MockSocialProvider
+        // (the only meaningful method is verifyPostUrl). Real per-platform
+        // adapters register their driver cases here when they land.
+        $this->app->bind(
+            SocialPlatformProvider::class,
+            $this->makeProviderResolver(
+                flagName: SocialVerificationEnabled::NAME,
+                configKey: 'integrations.social.driver',
+                mockClass: MockSocialProvider::class,
+                deferredClass: DeferredSocialProvider::class,
+                skippedClass: SkippedSocialProvider::class,
             ),
         );
     }
@@ -210,8 +230,9 @@ final class CreatorsServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the three Phase-1 vendor-gating flags that the wizard
-     * depends on (docs/feature-flags.md). Phase 1 flags are
+     * Register the Phase-1 vendor-gating flags (docs/feature-flags.md): the
+     * three wizard flags (kyc / payout / contract) + `social_verification_enabled`
+     * (Sprint 9 Chunk 2, D-11 — gates `posted → live_verified`). Phase 1 flags are
      * operator-controlled and scope-less — call sites use
      * `Feature::active(<Class>::NAME)` (no scope arg). Each flag
      * class exposes a static `default()` returning a Closure so the
@@ -224,6 +245,7 @@ final class CreatorsServiceProvider extends ServiceProvider
         Feature::define(KycVerificationEnabled::NAME, KycVerificationEnabled::default());
         Feature::define(CreatorPayoutMethodEnabled::NAME, CreatorPayoutMethodEnabled::default());
         Feature::define(ContractSigningEnabled::NAME, ContractSigningEnabled::default());
+        Feature::define(SocialVerificationEnabled::NAME, SocialVerificationEnabled::default());
     }
 
     private function registerRoutes(): void

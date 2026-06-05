@@ -58,6 +58,18 @@ return [
         'mock_webhook_secret' => env('ESIGN_MOCK_WEBHOOK_SECRET', 'mock-esign-webhook-secret-do-not-use-in-production'),
     ],
 
+    'social' => [
+        /*
+         * Driver selection (Sprint 9 Chunk 2, D-9). 'mock' (default)
+         * resolves to MockSocialProvider when social_verification_enabled
+         * is ON; otherwise the Skipped stub binds (flag OFF). Real
+         * per-platform adapters (Meta / TikTok / YouTube) register
+         * additional driver cases in CreatorsServiceProvider's binding map
+         * as they land (logged in docs/tech-debt.md).
+         */
+        'driver' => env('SOCIAL_PROVIDER', 'mock'),
+    ],
+
     'payment' => [
         /*
          * Driver selection. 'mock' (default) resolves to

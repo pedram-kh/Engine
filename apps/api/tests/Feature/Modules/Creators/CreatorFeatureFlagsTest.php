@@ -5,13 +5,16 @@ declare(strict_types=1);
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
+use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Creators\Integrations\Contracts\EsignProvider;
 use App\Modules\Creators\Integrations\Contracts\KycProvider;
 use App\Modules\Creators\Integrations\Contracts\PaymentProvider;
+use App\Modules\Creators\Integrations\Contracts\SocialPlatformProvider;
 use App\Modules\Creators\Integrations\Exceptions\FeatureDisabledException;
 use App\Modules\Creators\Integrations\Stubs\SkippedEsignProvider;
 use App\Modules\Creators\Integrations\Stubs\SkippedKycProvider;
 use App\Modules\Creators\Integrations\Stubs\SkippedPaymentProvider;
+use App\Modules\Creators\Integrations\Stubs\SkippedSocialProvider;
 use App\Modules\Creators\Models\Creator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Pennant\Feature;
@@ -70,6 +73,11 @@ it('registers contract_signing_enabled with default OFF', function (): void {
     expect(Feature::active(ContractSigningEnabled::NAME))->toBeFalse();
 });
 
+it('registers social_verification_enabled with default OFF (Sprint 9 Chunk 2, D-11)', function (): void {
+    expect(SocialVerificationEnabled::NAME)->toBe('social_verification_enabled');
+    expect(Feature::active(SocialVerificationEnabled::NAME))->toBeFalse();
+});
+
 it('round-trips activate / deactivate for each Phase-1 flag (no scope arg per Phase 1 convention)', function (): void {
     // Phase 1 invocation pattern: scope-less / global. The default
     // store is the array driver in the test env (config/pennant.php),
@@ -83,6 +91,7 @@ it('round-trips activate / deactivate for each Phase-1 flag (no scope arg per Ph
             KycVerificationEnabled::NAME,
             CreatorPayoutMethodEnabled::NAME,
             ContractSigningEnabled::NAME,
+            SocialVerificationEnabled::NAME,
         ] as $name
     ) {
         expect(Feature::active($name))->toBeFalse("default-OFF for {$name}");
@@ -119,6 +128,14 @@ it('SkippedPaymentProvider throws FeatureDisabledException naming the OFF flag +
     "Integration provider 'PaymentProvider' is bound to a Skipped stub because feature flag 'creator_payout_method_enabled' is OFF. Method called: createConnectedAccount.",
 );
 
+it('SkippedSocialProvider throws FeatureDisabledException naming the OFF flag + method', function (): void {
+    $stub = new SkippedSocialProvider;
+    $stub->verifyPostUrl('@creator', 'https://instagram.com/p/abc');
+})->throws(
+    FeatureDisabledException::class,
+    "Integration provider 'SocialPlatformProvider' is bound to a Skipped stub because feature flag 'social_verification_enabled' is OFF. Method called: verifyPostUrl.",
+);
+
 it('source-inspection: each Skipped*Provider implements every method on its contract (#1)', function (): void {
     // Lockstep regression. Sprint 3 Chunk 2 sub-step 3 extends the
     // three contracts (KYC: 1 → 4 methods, eSign: 1 → 4, Payment:
@@ -135,6 +152,7 @@ it('source-inspection: each Skipped*Provider implements every method on its cont
         [KycProvider::class, SkippedKycProvider::class, KycVerificationEnabled::NAME],
         [EsignProvider::class, SkippedEsignProvider::class, ContractSigningEnabled::NAME],
         [PaymentProvider::class, SkippedPaymentProvider::class, CreatorPayoutMethodEnabled::NAME],
+        [SocialPlatformProvider::class, SkippedSocialProvider::class, SocialVerificationEnabled::NAME],
     ];
 
     foreach ($pairs as [$contract, $stub, $flag]) {

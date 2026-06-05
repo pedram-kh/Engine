@@ -66,6 +66,22 @@ final class CampaignPolicy
         ]);
     }
 
+    /**
+     * The draft-review ability (Sprint 9 Chunk 2, D-6) — approve / request
+     * revision / reject a submitted draft, and read the agency-side review
+     * detail. Mirrors {@see invite()}: admin + manager + STAFF, because
+     * reviewing a draft IS executing a campaign (spec §4.2 — staff "execute
+     * campaigns"), as distinct from CREATING one (admin/manager only).
+     */
+    public function review(User $user, Campaign $campaign): bool
+    {
+        return $this->hasAnyRole($user, [
+            AgencyRole::AgencyAdmin,
+            AgencyRole::AgencyManager,
+            AgencyRole::AgencyStaff,
+        ]);
+    }
+
     private function membership(User $user): ?AgencyMembership
     {
         return AgencyMembership::withoutGlobalScope(BelongsToAgencyScope::class)

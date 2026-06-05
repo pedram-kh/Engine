@@ -234,6 +234,13 @@ enum AuditAction: string
     case AssignmentDraftSubmitted = 'assignment.draft_submitted';
     case AssignmentRevisionRequested = 'assignment.revision_requested';
     case AssignmentDraftApproved = 'assignment.draft_approved';
+    // Sprint 9 Chunk 2 (D-3) — the agency REJECTS a submitted draft, a new
+    // dedicated terminal edge (`draft_submitted → rejected`, mandatory reason).
+    // Distinct from `assignment.cancelled`: rejection is the review-time
+    // outcome, routed by the board catalogue to a distinct "stalled" column
+    // (docs/10-BOARD-AUTOMATION.md). The board sprint consumes this verb (the
+    // deferral discipline). Logged by CampaignAssignmentStateMachine::rejectDraft().
+    case AssignmentDraftRejected = 'assignment.draft_rejected';
     case AssignmentPostedByCreator = 'assignment.posted_by_creator';
     case AssignmentLiveVerified = 'assignment.live_verified';
     case AssignmentPaymentFunded = 'assignment.payment_funded';
@@ -256,7 +263,11 @@ enum AuditAction: string
             self::UserDeleted,
             // Cancel always carries a mandatory reason (D-9 — the
             // `cancelled_reason` column + this gate enforce it).
-            self::AssignmentCancelled => true,
+            self::AssignmentCancelled,
+            // Reject always carries a mandatory reason (Sprint 9 Chunk 2, D-3 —
+            // the review feedback is the rejection rationale; the controller
+            // also persists it on the draft's `review_feedback`).
+            self::AssignmentDraftRejected => true,
             default => false,
         };
     }

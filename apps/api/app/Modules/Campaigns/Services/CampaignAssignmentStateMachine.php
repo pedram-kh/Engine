@@ -12,6 +12,7 @@ use App\Modules\Campaigns\Exceptions\AssignmentTransitionException;
 use App\Modules\Campaigns\Exceptions\AssignmentTransitionGatedException;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Creators\Models\Contract;
 use App\Modules\Identity\Models\User;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -35,15 +36,21 @@ use Laravel\Pennant\Feature;
  *   invited → {declined, countered, accepted}
  *   countered → invited (re-invite, D-7 — the agency re-offers)
  *   accepted → contracted (flag-gated) → producing → draft_submitted
- *   draft_submitted → {revision_requested → producing(loop), approved}
+ *   draft_submitted → {revision_requested → producing(loop), approved, rejected}
  *   approved → posted → live_verified → payment_held → payment_released
  *   any non-terminal → cancelled
  *
- * VENDOR-GATED (D-6) — the methods + their source guards exist + are tested,
- * but `verifyLive` / `holdPayment` / `releasePayment` refuse because the
- * social adapter (parked) and Stripe escrow (Sprint 10) do not exist yet.
- * There is NO manual path to those states (the footgun guard). `contract` is
- * gated on the `contract_signing_enabled` flag (the e-sign mock exists).
+ * Sprint 9 Chunk 2: `rejectDraft` (`draft_submitted → rejected`, the new
+ * dedicated terminal, D-1/D-3) + `verifyLive` un-gated behind the
+ * `social_verification_enabled` flag (D-11).
+ *
+ * VENDOR/FLAG-GATED — the methods + their source guards exist + are tested.
+ * `holdPayment` / `releasePayment` refuse because Stripe escrow (Sprint 10)
+ * does not exist yet; there is NO manual path to those states (the footgun
+ * guard). `contract` is gated on `contract_signing_enabled` (the e-sign mock
+ * exists); `verifyLive` is gated on `social_verification_enabled` (the social
+ * mock exists — flag-ON + the verification job is the path; flag-OFF stays
+ * gated, production-without-adapter safe).
  *
  * Note: the `invited` ENTRY state is set by the invite flow (Chunk 2), not by
  * a transition here. The agency re-offer after a counter IS a machine edge now
@@ -226,7 +233,18 @@ final class CampaignAssignmentStateMachine
         );
     }
 
-    public function requestRevision(CampaignAssignment $assignment, ?User $actor = null): CampaignAssignment
+    /**
+     * draft_submitted → revision_requested (the review loop, D-5). The
+     * `$context` carries the reviewed draft's `{draft_id, version}` so the
+     * single transition audit row LINKS back to the draft (the Chunk 1
+     * context-thread mechanism). The free-text reviewer feedback itself is
+     * persisted on the draft's `review_feedback` column by the controller (in
+     * the same transaction), NOT snapshotted into the audit metadata (the
+     * hand-written-audit / free-text-redaction discipline, D-3).
+     *
+     * @param  array<string, mixed>  $context
+     */
+    public function requestRevision(CampaignAssignment $assignment, ?User $actor = null, array $context = []): CampaignAssignment
     {
         $this->assertSource($assignment, [AssignmentStatus::DraftSubmitted], AssignmentStatus::RevisionRequested);
 
@@ -235,13 +253,17 @@ final class CampaignAssignmentStateMachine
             AssignmentStatus::RevisionRequested,
             AuditAction::AssignmentRevisionRequested,
             $actor,
+            context: $context,
         );
     }
 
     /**
      * draft_submitted → approved. Fires the board verb `assignment.draft_approved`.
+     * `$context` links the approved draft (`{draft_id, version}`).
+     *
+     * @param  array<string, mixed>  $context
      */
-    public function approve(CampaignAssignment $assignment, ?User $actor = null): CampaignAssignment
+    public function approve(CampaignAssignment $assignment, ?User $actor = null, array $context = []): CampaignAssignment
     {
         $this->assertSource($assignment, [AssignmentStatus::DraftSubmitted], AssignmentStatus::Approved);
 
@@ -253,6 +275,43 @@ final class CampaignAssignmentStateMachine
             mutate: function (CampaignAssignment $a): void {
                 $a->approved_at = now();
             },
+            context: $context,
+        );
+    }
+
+    /**
+     * draft_submitted → rejected (terminal, Sprint 9 Chunk 2, D-1/D-3). The
+     * agency's review-time "this draft is not acceptable, end the assignment"
+     * outcome — a DEDICATED terminal, distinct from `cancel()` (which fires
+     * from any non-terminal). Fail-closed: only `draft_submitted` is a legal
+     * source. Fires the net-new board verb `assignment.draft_rejected`.
+     *
+     * The `$reason` is MANDATORY (the review feedback IS the rejection
+     * rationale) — carried in the dedicated audit `reason` field (the cancel
+     * precedent), NOT the before/after metadata snapshot. The `$context` links
+     * the rejected draft (`{draft_id, version}`); the controller stamps the
+     * draft's `review_status = Rejected` + `reviewed_at` + `review_feedback` in
+     * the same transaction (no `rejected_at` column on the assignment — the
+     * draft trail + the audit row carry the timing).
+     *
+     * @param  array<string, mixed>  $context
+     */
+    public function rejectDraft(CampaignAssignment $assignment, string $reason, ?User $actor = null, array $context = []): CampaignAssignment
+    {
+        $this->assertSource($assignment, [AssignmentStatus::DraftSubmitted], AssignmentStatus::Rejected);
+
+        $trimmed = trim($reason);
+        if ($trimmed === '') {
+            throw AssignmentTransitionException::reasonRequired();
+        }
+
+        return $this->commit(
+            $assignment,
+            AssignmentStatus::Rejected,
+            AuditAction::AssignmentDraftRejected,
+            $actor,
+            reason: $trimmed,
+            context: $context,
         );
     }
 
@@ -282,15 +341,40 @@ final class CampaignAssignmentStateMachine
     }
 
     /**
-     * posted → live_verified. VENDOR-GATED (D-6) — the social-verification
-     * adapter is parked. The source guard passes; the vendor gate refuses.
-     * No manual path is permitted.
+     * posted → live_verified (Sprint 9 Chunk 2, D-11). FLAG-GATED on
+     * `social_verification_enabled` (mirrors `contract()` on
+     * `contract_signing_enabled`): when the flag is OFF the transition throws
+     * the vendor-gated exception — production without a real social adapter
+     * stays gated, and there is NO manual path (the footgun guard, the
+     * break-revert anchor). When the flag is ON the transition commits; the
+     * caller is the `VerifyPostedContentJob` (D-10), which only reaches here
+     * after the verification provider confirms the post (mock today, a real
+     * Meta/TikTok/YouTube adapter later). Stamps `verified_live_at` + fires the
+     * board verb `assignment.live_verified` (Sprint 10's payment trigger).
+     *
+     * The `$context` links the verified posted-content row
+     * (`{posted_content_id, platform_post_id}`).
+     *
+     * @param  array<string, mixed>  $context
      */
-    public function verifyLive(CampaignAssignment $assignment, ?User $actor = null): CampaignAssignment
+    public function verifyLive(CampaignAssignment $assignment, ?User $actor = null, array $context = []): CampaignAssignment
     {
         $this->assertSource($assignment, [AssignmentStatus::Posted], AssignmentStatus::LiveVerified);
 
-        throw AssignmentTransitionGatedException::socialAdapterUnavailable();
+        if (! Feature::active(SocialVerificationEnabled::NAME)) {
+            throw AssignmentTransitionGatedException::socialAdapterUnavailable();
+        }
+
+        return $this->commit(
+            $assignment,
+            AssignmentStatus::LiveVerified,
+            AuditAction::AssignmentLiveVerified,
+            $actor,
+            mutate: function (CampaignAssignment $a): void {
+                $a->verified_live_at = now();
+            },
+            context: $context,
+        );
     }
 
     /**

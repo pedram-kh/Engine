@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentController;
+use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentReviewController;
 use App\Modules\Campaigns\Http\Controllers\CampaignController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,4 +47,16 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // Re-invite after a counter (Chunk 2, D-7) — the guarded machine edge.
         Route::post('campaigns/{campaign}/assignments/{assignment}/reinvite', [CampaignAssignmentController::class, 'reinvite'])
             ->name('campaigns.assignments.reinvite');
+
+        // Agency-side draft review (Sprint 9 Chunk 2). The drawer read (D-7) +
+        // the three per-action review endpoints (D-4), gated on the `review`
+        // ability (admin + manager + staff, D-6).
+        Route::get('campaigns/{campaign}/assignments/{assignment}', [CampaignAssignmentReviewController::class, 'show'])
+            ->name('campaigns.assignments.show');
+        Route::post('campaigns/{campaign}/assignments/{assignment}/approve', [CampaignAssignmentReviewController::class, 'approve'])
+            ->name('campaigns.assignments.approve');
+        Route::post('campaigns/{campaign}/assignments/{assignment}/request-revision', [CampaignAssignmentReviewController::class, 'requestRevision'])
+            ->name('campaigns.assignments.request-revision');
+        Route::post('campaigns/{campaign}/assignments/{assignment}/reject', [CampaignAssignmentReviewController::class, 'reject'])
+            ->name('campaigns.assignments.reject');
     });

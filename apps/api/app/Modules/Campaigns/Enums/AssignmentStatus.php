@@ -17,7 +17,7 @@ use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
  * The graph:
  *   invited → {declined(terminal), countered, accepted}
  *   accepted → contracted → producing → draft_submitted
- *   draft_submitted → {revision_requested → producing(loop), approved}
+ *   draft_submitted → {revision_requested → producing(loop), approved, rejected(terminal)}
  *   approved → posted → live_verified → payment_held → payment_released(terminal)
  *   any non-terminal → cancelled(terminal)
  *
@@ -26,7 +26,14 @@ use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
  * until their sprint: `posted`/`live_verified` (social adapter — parked),
  * `payment_held`/`payment_released` (Stripe escrow — Sprint 10).
  *
- * Terminal states: declined, payment_released, cancelled.
+ * Sprint 9 Chunk 2 (D-1): `rejected` is a NEW dedicated terminal — the agency
+ * rejects a submitted draft (`draft_submitted → rejected`, mandatory reason).
+ * Distinct from `cancelled` (which can fire from any non-terminal): rejection
+ * is specifically the review-time "this draft is not acceptable, end the
+ * assignment" outcome, and the board catalogue routes its
+ * `assignment.draft_rejected` verb to a distinct "stalled" column.
+ *
+ * Terminal states: declined, rejected, payment_released, cancelled.
  */
 enum AssignmentStatus: string
 {
@@ -39,6 +46,7 @@ enum AssignmentStatus: string
     case DraftSubmitted = 'draft_submitted';
     case RevisionRequested = 'revision_requested';
     case Approved = 'approved';
+    case Rejected = 'rejected';
     case Posted = 'posted';
     case LiveVerified = 'live_verified';
     case PaymentHeld = 'payment_held';
@@ -53,6 +61,7 @@ enum AssignmentStatus: string
     {
         return match ($this) {
             self::Declined,
+            self::Rejected,
             self::PaymentReleased,
             self::Cancelled => true,
             default => false,

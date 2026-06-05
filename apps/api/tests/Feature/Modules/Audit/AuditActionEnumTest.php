@@ -116,6 +116,8 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'assignment.draft_submitted',
         'assignment.revision_requested',
         'assignment.draft_approved',
+        // Sprint 9 Chunk 2 — the agency's dedicated draft-rejection terminal.
+        'assignment.draft_rejected',
         'assignment.posted_by_creator',
         'assignment.live_verified',
         'assignment.payment_funded',
@@ -147,6 +149,8 @@ it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', functi
         'user.suspended',
         'user.unsuspended',
         'assignment.cancelled',
+        // Sprint 9 Chunk 2 — reject carries a mandatory reason (the review feedback).
+        'assignment.draft_rejected',
     ]);
 });
 

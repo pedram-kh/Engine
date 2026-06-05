@@ -41,7 +41,11 @@ it('CampaignObjective catalogue pins the exact case set', function (): void {
     expect($actual)->toBe($expected, 'CampaignObjective enum drifted from the locked catalogue.');
 });
 
-it('AssignmentStatus catalogue pins the exact 14-case set (the full state graph)', function (): void {
+it('AssignmentStatus catalogue pins the exact 15-case set (the full state graph)', function (): void {
+    // Sprint 9 Chunk 2 (D-1) adds the dedicated `rejected` terminal — the
+    // agency's review-time draft rejection (`draft_submitted → rejected`),
+    // distinct from `cancelled`. Bumping this catalogue from 14 → 15 is the
+    // deliberate, reviewed enum-add it is meant to force.
     $expected = [
         'invited',
         'declined',
@@ -52,6 +56,7 @@ it('AssignmentStatus catalogue pins the exact 14-case set (the full state graph)
         'draft_submitted',
         'revision_requested',
         'approved',
+        'rejected',
         'posted',
         'live_verified',
         'payment_held',
@@ -67,7 +72,7 @@ it('AssignmentStatus catalogue pins the exact 14-case set (the full state graph)
     expect($actual)->toBe($expected, 'AssignmentStatus enum drifted from the locked state-machine catalogue.');
 });
 
-it('AssignmentStatus terminal states are exactly declined / payment_released / cancelled', function (): void {
+it('AssignmentStatus terminal states are exactly declined / rejected / payment_released / cancelled', function (): void {
     $terminal = array_values(array_filter(
         AssignmentStatus::cases(),
         fn (AssignmentStatus $case): bool => $case->isTerminal(),
@@ -75,7 +80,7 @@ it('AssignmentStatus terminal states are exactly declined / payment_released / c
 
     $terminalValues = array_map(fn (AssignmentStatus $case): string => $case->value, $terminal);
 
-    expect($terminalValues)->toEqualCanonicalizing(['declined', 'payment_released', 'cancelled']);
+    expect($terminalValues)->toEqualCanonicalizing(['declined', 'rejected', 'payment_released', 'cancelled']);
 });
 
 it('CampaignStatus values fit the varchar(16) status column', function (): void {

@@ -21,6 +21,18 @@ anyone reviewing it later.
 
 ---
 
+## Agency-side assignment notifications target the inviting user, not an agency-wide inbox/role
+
+- **Where:** the Sprint 9 Chunk 2 notification set — [`SendAssignmentNotifications`](../apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php) (`DraftSubmittedForReviewMail`) and [`VerifyPostedContentJob`](../apps/api/app/Modules/Campaigns/Jobs/VerifyPostedContentJob.php) (`PostVerificationFailedMail`).
+- **What we accepted in Sprint 9 Chunk 2 (June 5, 2026):** agency-facing notifications (draft-submitted-for-review, verification-failed) are addressed to the assignment's `invited_by_user_id` — the single user who sent the invite — mirroring the `ConnectionRequestMail` precedent. There is no agency-wide inbox, shared mailbox, or role fan-out, so only the inviting user is notified; another manager on the same agency sees nothing.
+- **Risk:** low at Phase-1 volumes (one operator per assignment is the norm). The gap is shared visibility, not lost data — the assignment status is durable and visible on the campaign detail surface.
+- **Triggered by:** the real notification subsystem (same trigger as the entry above) or the first agency that needs multiple operators to see review/verification events.
+- **Resolution:** fan agency-facing notifications out to an agency-wide inbox/role when the notification subsystem lands (migrate these mailables onto the same spine).
+- **Owner:** the future notification-subsystem workstream.
+- **Status:** open. Surfaced + deliberately deferred by Sprint 9 Chunk 2, June 5, 2026 ([review](reviews/sprint-9-chunk-2-review.md)).
+
+---
+
 ## Deferred creator settings page (timezone correction + `preferred_language` / `theme_preference` persistence)
 
 - **Where:** there is no creator settings surface today. The fields that would live there: [`apps/api/app/Modules/Identity/Models/User.php`](../apps/api/app/Modules/Identity/Models/User.php) (`timezone`, `preferred_language`, `theme_preference`), set once at row-creation by [`apps/api/app/Modules/Identity/Services/SignUpService.php`](../apps/api/app/Modules/Identity/Services/SignUpService.php) and never updated afterward. The SPA reads them via `useAuthStore`/[`packages/api-client/src/types/user.ts`](../packages/api-client/src/types/user.ts) but has no surface to write them back.

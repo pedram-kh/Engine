@@ -5,20 +5,25 @@ declare(strict_types=1);
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
+use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Creators\Integrations\Contracts\EsignProvider;
 use App\Modules\Creators\Integrations\Contracts\KycProvider;
 use App\Modules\Creators\Integrations\Contracts\PaymentProvider;
+use App\Modules\Creators\Integrations\Contracts\SocialPlatformProvider;
 use App\Modules\Creators\Integrations\Exceptions\ProviderNotBoundException;
 use App\Modules\Creators\Integrations\Mock\MockEsignProvider;
 use App\Modules\Creators\Integrations\Mock\MockKycProvider;
 use App\Modules\Creators\Integrations\Mock\MockPaymentProvider;
+use App\Modules\Creators\Integrations\Mock\MockSocialProvider;
 use App\Modules\Creators\Integrations\Stripe\StripePaymentProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredEsignProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredKycProvider;
 use App\Modules\Creators\Integrations\Stubs\DeferredPaymentProvider;
+use App\Modules\Creators\Integrations\Stubs\DeferredSocialProvider;
 use App\Modules\Creators\Integrations\Stubs\SkippedEsignProvider;
 use App\Modules\Creators\Integrations\Stubs\SkippedKycProvider;
 use App\Modules\Creators\Integrations\Stubs\SkippedPaymentProvider;
+use App\Modules\Creators\Integrations\Stubs\SkippedSocialProvider;
 use App\Modules\Creators\Models\Creator;
 use Laravel\Pennant\Feature;
 use Tests\TestCase;
@@ -91,6 +96,19 @@ it('with flag ON + driver=mock, PaymentProvider resolves to MockPaymentProvider'
     config(['integrations.payment.driver' => 'mock']);
 
     expect(app(PaymentProvider::class))->toBeInstanceOf(MockPaymentProvider::class);
+});
+
+it('with flag OFF, SocialPlatformProvider resolves to SkippedSocialProvider (Sprint 9 Chunk 2, D-9)', function (): void {
+    Feature::deactivate(SocialVerificationEnabled::NAME);
+
+    expect(app(SocialPlatformProvider::class))->toBeInstanceOf(SkippedSocialProvider::class);
+});
+
+it('with flag ON + driver=mock, SocialPlatformProvider resolves to MockSocialProvider', function (): void {
+    Feature::activate(SocialVerificationEnabled::NAME);
+    config(['integrations.social.driver' => 'mock']);
+
+    expect(app(SocialPlatformProvider::class))->toBeInstanceOf(MockSocialProvider::class);
 });
 
 it('with flag ON + driver=stripe, PaymentProvider resolves to the real StripePaymentProvider (Sprint 4 Chunk 2, D-c2-9)', function (): void {
@@ -196,7 +214,22 @@ it('DeferredPaymentProvider throws ProviderNotBoundException on every method', f
     }
 });
 
-it('the three contracts each define exactly their built surface (KYC: 4, eSign: 4, Payment: 4)', function (): void {
+it('DeferredSocialProvider throws ProviderNotBoundException on verifyPostUrl', function (): void {
+    $stub = new DeferredSocialProvider;
+
+    $threw = false;
+    try {
+        $stub->verifyPostUrl('@creator', 'https://instagram.com/p/abc');
+    } catch (ProviderNotBoundException $e) {
+        $threw = true;
+        expect($e->getMessage())
+            ->toContain("'SocialPlatformProvider'")
+            ->and($e->getMessage())->toContain('Method called: verifyPostUrl');
+    }
+    expect($threw)->toBeTrue('DeferredSocialProvider::verifyPostUrl() did not throw');
+});
+
+it('the four contracts each define exactly their built surface (KYC: 4, eSign: 4, Payment: 4, Social: 1)', function (): void {
     // Sprint 3 Chunk 2 landed KYC + eSign at 4 methods and Payment at
     // its 2-method onboarding surface. Sprint 4 Chunk 2 extends Payment
     // with the inbound-webhook pair (verifyWebhookSignature +
@@ -229,6 +262,14 @@ it('the three contracts each define exactly their built surface (KYC: 4, eSign: 
             'parseWebhookEvent',
             'verifyWebhookSignature',
         ],
+        // Sprint 9 Chunk 2 (D-9) — the social contract ships ONLY its
+        // load-bearing verification method this sprint (the precedent: build
+        // the sprint's surface, not the full vendor interface). The remaining
+        // OAuth/profile/metrics/media/revoke surface lands with the real
+        // adapters — this assertion must be bumped in lockstep then.
+        SocialPlatformProvider::class => [
+            'verifyPostUrl',
+        ],
     ];
 
     foreach ($expectedMethods as $contract => $expected) {
@@ -253,6 +294,7 @@ it('each contract docblock documents its built surface for #34 cross-chunk hando
         KycProvider::class => 'Sprint 3 completion surface',
         EsignProvider::class => 'Sprint 3 completion surface',
         PaymentProvider::class => 'Inbound-webhook surface (Sprint 4 Chunk 2',
+        SocialPlatformProvider::class => 'Sprint 9 Chunk 2 completion surface',
     ];
 
     foreach ($expectedPhrases as $contract => $phrase) {
