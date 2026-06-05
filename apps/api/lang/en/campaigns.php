@@ -39,5 +39,21 @@ return [
                 'cta' => 'Review the assignment',
             ],
         ],
+        'contract_attached' => [
+            'email' => [
+                'subject' => 'Contract ready for :campaign',
+                'greeting' => 'Hi :name,',
+                'body' => 'A contract for ":campaign" is ready for your review. Open the assignment to read the terms and accept.',
+                'cta' => 'Review the contract',
+            ],
+        ],
+        'contract_accepted' => [
+            'email' => [
+                'subject' => ':creator accepted the contract',
+                'greeting' => 'Hi :name,',
+                'body' => ':creator has accepted the contract for ":campaign". They can now begin work on their draft.',
+                'cta' => 'View the campaign',
+            ],
+        ],
     ],
 ];

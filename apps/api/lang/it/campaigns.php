@@ -36,5 +36,21 @@ return [
                 'cta' => 'Rivedi l\'incarico',
             ],
         ],
+        'contract_attached' => [
+            'email' => [
+                'subject' => 'Contratto pronto per :campaign',
+                'greeting' => 'Ciao :name,',
+                'body' => 'Un contratto per ":campaign" è pronto per la revisione. Apri l\'incarico per leggere i condizioni e accettare.',
+                'cta' => 'Rivedi il contrato',
+            ],
+        ],
+        'contract_accepted' => [
+            'email' => [
+                'subject' => ':creator ha accettato il contrato',
+                'greeting' => 'Ciao :name,',
+                'body' => ':creator ha accettato il contrato per ":campaign". Ora può iniziare a lavorare sulla bozza.',
+                'cta' => 'Vedi la campagna',
+            ],
+        ],
     ],
 ];

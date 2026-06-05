@@ -8,6 +8,7 @@ use App\Modules\Agencies\Mail\ConnectionRequestMail;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Jobs\VerifyPostedContentJob;
+use App\Modules\Campaigns\Mail\ContractAcceptedMail;
 use App\Modules\Campaigns\Mail\DraftReviewedMail;
 use App\Modules\Campaigns\Mail\DraftSubmittedForReviewMail;
 use App\Modules\Campaigns\Models\CampaignAssignment;
@@ -44,6 +45,7 @@ final class SendAssignmentNotifications
             AuditAction::AssignmentDraftApproved => $this->notifyCreatorOfReview($assignment, 'approved'),
             AuditAction::AssignmentRevisionRequested => $this->notifyCreatorOfReview($assignment, 'revision_requested'),
             AuditAction::AssignmentDraftRejected => $this->notifyCreatorOfReview($assignment, 'rejected'),
+            AuditAction::AssignmentContracted => $this->notifyAgencyOfContractAcceptance($assignment),
             default => null,
         };
     }
@@ -105,6 +107,26 @@ final class SendAssignmentNotifications
                 outcome: $outcome,
                 feedback: is_string($feedback) && $feedback !== '' ? $feedback : null,
                 assignmentUlid: $assignment->ulid,
+            ));
+    }
+
+    private function notifyAgencyOfContractAcceptance(CampaignAssignment $assignment): void
+    {
+        $recipient = $assignment->invitedBy;
+        $campaign = $assignment->campaign;
+        $creator = $assignment->creator;
+
+        if (! $recipient instanceof User || $recipient->email === '' || $campaign === null || $creator === null) {
+            return;
+        }
+
+        Mail::to($recipient->email)
+            ->locale($recipient->preferred_language ?: 'en')
+            ->queue(new ContractAcceptedMail(
+                recipientName: $recipient->name,
+                creatorName: $creator->display_name ?? '',
+                campaignName: $campaign->name,
+                campaignUlid: $campaign->ulid,
             ));
     }
 }

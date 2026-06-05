@@ -250,6 +250,59 @@ interface ESignatureProviderContract
 
 **Dropbox Sign as default candidate.** Solid API, fair pricing, multi-language support. DocuSign is overkill for Phase 1 volumes. Re-evaluate at Phase 3 when volume justifies enterprise pricing negotiations.
 
+### 4.5 Per-campaign contract manual flow (Phase 1 — contract-bridge chunk)
+
+Phase 1 ships a **manual two-party flow** for assignment addenda when `contract_signing_enabled` is ON:
+
+1. Agency issues a `per_campaign` contract (`POST …/assignments/{assignment}/contract/attach`) — PDF via agency-scoped presigned upload and/or inline markdown terms.
+2. Creator reviews on the assignment detail page and click-accepts (`POST /api/v1/creators/me/assignments/{assignment}/contract/accept`).
+3. Accept stamps `contracts.signed_at` and drives `CampaignAssignmentStateMachine::contract()` (`accepted → contracted`, sets `assignment.contract_id`). **Stops at `contracted`** — the existing draft-submit endpoint auto-chains `startProducing` + `submitDraft`.
+
+Master-contract wizard e-sign (`EsignProvider`, wizard routes) is a **separate** surface; this chunk does not reuse it for assignments.
+
+### 4.6 E-sign vendor swap checklist (when real e-sign replaces manual click-through)
+
+Use this checklist when binding a production e-sign vendor for **both** master contracts and per-campaign addenda. The state machine and `contracts` table stay unchanged — only the provider binding, flag behaviour, manual UI, and webhook handler change.
+
+#### Provider binding
+
+| Step | Location                                                           | Action                                                                                                                                                                          |
+| ---- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | `apps/api/app/Modules/Creators/CreatorsServiceProvider.php`        | Replace `MockEsignProvider` resolution with the real `EsignProvider` implementation when `contract_signing_enabled` is ON and `integrations.esign.driver` points at the vendor. |
+| 2    | `config/integrations.php` + AWS secret `catalyst/${env}/api/esign` | Populate vendor API keys; set production driver (e.g. `dropboxsign`).                                                                                                           |
+| 3    | `apps/api/app/Modules/Creators/Integrations/`                      | Add `{Vendor}EsignProvider` implementing `EsignProvider` (`sendEnvelope`, `getEnvelopeStatus`, `verifyWebhookSignature`, `parseWebhookEvent`).                                  |
+
+#### Flag
+
+| Step | Detail                                                                                                                                                                                           |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 4    | `contract_signing_enabled` already gates `CampaignAssignmentStateMachine::contract()`. With the real vendor ON, envelope creation replaces manual click-through for flows wired to the provider. |
+| 5    | **Do not** add a flag-OFF bypass for assignment `accepted → contracted` — that would require loosening the machine gate. Wizard master click-through (flag OFF) remains a separate path.         |
+
+#### Manual-fallback UI to replace
+
+| Surface                                                                                                      | Phase 1 (manual)                                                      | Real e-sign replacement                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Agency **Issue contract** dialog (`AttachContractDialog.vue`) + `POST …/contract/attach` + agency PDF upload | Agency uploads PDF / enters markdown; creates `internal` contract row | Likely template-driven envelope generation from campaign/assignment data; agency upload endpoint retired or repurposed as envelope preview |
+| Creator **Accept contract** card (`CreatorAssignmentDetailPage.vue`) + `POST …/contract/accept`              | Click-through accept; stamps `signed_at`, calls `contract()`          | Redirect to vendor signing URL; completion via webhook (or poll), not a manual accept button                                               |
+| `ContractResource.view_url`                                                                                  | Presigned PDF download link (D-5)                                     | Vendor-hosted signing session + signed PDF download from provider                                                                          |
+
+#### Webhook — assignment gotcha
+
+| Step | Location                                            | Action                                                                                                                                                                                                                                                                                                                     |
+| ---- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 6    | `EsignWebhookController` + `ProcessEsignWebhookJob` | Today the job only sets `creators.signed_master_contract_id` (wizard master contract). **Enabling real e-sign for assignments requires extending the webhook handler** to resolve the envelope → `Contract` row (`subject_type=campaign_assignment`) and call `$machine->contract($assignment, $contract, …)` on `Signed`. |
+| 7    | Idempotency                                         | Mirror existing webhook idempotency (`integration_events` dedupe) for assignment envelopes.                                                                                                                                                                                                                                |
+
+#### What stays UNCHANGED (abstraction check)
+
+- `CampaignAssignmentStateMachine::contract()` — source `accepted`, target `contracted`, optional `Contract` → `contract_id`.
+- `contracts` table schema — `kind`, `subject_type`/`subject_id`, `body_pdf_path`, `body_markdown`, envelope columns.
+- Post-`contracted` lifecycle — draft submit from `contracted` auto-runs `startProducing` then `submitDraft` (existing Sprint 9 Chunk 1 path).
+- Audit verb `assignment.contracted` and `AssignmentTransitioned` event.
+
+If this checklist touches the state machine or adds new assignment statuses, the abstraction has leaked — stop and refactor at the provider/webhook layer instead.
+
 ---
 
 ## 5. Social media APIs

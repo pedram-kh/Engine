@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Modules\Creators\Http\Controllers\Admin\AdminCreatorController;
 use App\Modules\Creators\Http\Controllers\AvatarController;
 use App\Modules\Creators\Http\Controllers\BulkInviteController;
+use App\Modules\Creators\Http\Controllers\CreatorAssignmentContractController;
 use App\Modules\Creators\Http\Controllers\CreatorAssignmentController;
 use App\Modules\Creators\Http\Controllers\CreatorAssignmentDraftController;
 use App\Modules\Creators\Http\Controllers\CreatorAvailabilityController;
@@ -193,6 +194,8 @@ Route::prefix('creators/me')
                 ->name('decline');
             Route::post('{assignment}/counter', [CreatorAssignmentController::class, 'counter'])
                 ->name('counter');
+            Route::post('{assignment}/contract/accept', [CreatorAssignmentContractController::class, 'accept'])
+                ->name('contract.accept');
 
             // ─── Submission surface (the CREATOR draft/posted flow) ──────────
             // Sprint 9 Chunk 1. The submission half of the submission→review

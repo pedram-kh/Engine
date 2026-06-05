@@ -15,7 +15,10 @@ use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
 use App\Modules\Campaigns\Models\CampaignPostedContent;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
+use App\Modules\Creators\Enums\ContractStatus;
 use App\Modules\Creators\Enums\SocialPlatform;
+use App\Modules\Creators\Http\Resources\ContractResource;
+use App\Modules\Creators\Models\Contract;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Services\PortfolioUploadService;
 use App\Modules\Identity\Models\User;
@@ -83,6 +86,13 @@ final class CreatorAssignmentDraftController
             ->orderByDesc('id')
             ->get();
 
+        $contract = Contract::query()
+            ->where('subject_type', Contract::SUBJECT_CAMPAIGN_ASSIGNMENT)
+            ->where('subject_id', $model->id)
+            ->whereIn('status', [ContractStatus::Sent, ContractStatus::Signed])
+            ->orderByDesc('id')
+            ->first();
+
         $campaign = $model->campaign;
         $brand = $campaign?->brand;
 
@@ -113,6 +123,9 @@ final class CreatorAssignmentDraftController
                 'relationships' => [
                     'drafts' => CampaignDraftResource::collection($drafts)->resolve($request),
                     'posted_content' => CampaignPostedContentResource::collection($posted)->resolve($request),
+                    'contract' => $contract !== null
+                        ? (new ContractResource($contract))->resolve($request)
+                        : null,
                 ],
             ],
         ]);

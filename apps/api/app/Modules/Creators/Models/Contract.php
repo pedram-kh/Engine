@@ -73,6 +73,12 @@ final class Contract extends Model
     public const SUBJECT_CREATOR = 'creator';
 
     /**
+     * Subject-type discriminator for a per-campaign addendum attached to a
+     * CampaignAssignment (docs/03-DATA-MODEL.md §8).
+     */
+    public const SUBJECT_CAMPAIGN_ASSIGNMENT = 'campaign_assignment';
+
+    /**
      * `signature_provider` value for the flag-OFF click-through acceptance
      * (docs/03-DATA-MODEL.md §8, `:587`). Distinguishes the click-through
      * record from a vendor-signed envelope (`docusign`/`dropboxsign`).

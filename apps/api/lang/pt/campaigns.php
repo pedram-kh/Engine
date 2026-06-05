@@ -36,5 +36,21 @@ return [
                 'cta' => 'Rever a tarefa',
             ],
         ],
+        'contract_attached' => [
+            'email' => [
+                'subject' => 'Contrato pronto para :campaign',
+                'greeting' => 'Olá :name,',
+                'body' => 'Um contrato para ":campaign" está pronto para revisão. Abra a tarefa para ler os termos e aceitar.',
+                'cta' => 'Rever o contrato',
+            ],
+        ],
+        'contract_accepted' => [
+            'email' => [
+                'subject' => ':creator aceitou o contrato',
+                'greeting' => 'Olá :name,',
+                'body' => ':creator aceitou o contrato para ":campaign". Já pode começar a trabalhar no rascunho.',
+                'cta' => 'Ver a campanha',
+            ],
+        ],
     ],
 ];

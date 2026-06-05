@@ -629,6 +629,8 @@ Tracks the actual published post on social.
 
 Polymorphic — attaches to a Creator (master) or a CampaignAssignment (addendum).
 
+**Wiring (contract-bridge chunk):** per-campaign addenda are exercised via `subject_type=campaign_assignment`, `kind=per_campaign`. Agency attach creates a `sent` row; creator accept stamps `signed_at` and links `campaign_assignments.contract_id`. Document at `body_pdf_path` (agency-scoped S3 upload) and/or `body_markdown`.
+
 | Column                     | Type              | Notes                                                          | Phase |
 | -------------------------- | ----------------- | -------------------------------------------------------------- | ----- |
 | `id`                       | bigint PK         |                                                                | P1    |

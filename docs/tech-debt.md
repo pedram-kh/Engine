@@ -1205,3 +1205,41 @@ anyone reviewing it later.
 - **Resolution:** add a counter→re-invite round-trip Playwright E2E when the campaign-detail surface grows enough to warrant its own browser harness.
 - **Owner:** Sprint 8+ (campaigns FE).
 - **Status:** open (deferred by design — Vitest-only this chunk). Surfaced + accepted by re-invite UI chunk, 2026-06-05 ([review](reviews/reinvite-ui-review.md)).
+
+---
+
+## Accepted → contracted gap (eyes-on finding — CLOSED)
+
+- **Where:** Sprint 9 eyes-on walk found `accepted` was a dead-end: `CampaignAssignmentStateMachine::contract()` existed but no HTTP/UI called it.
+- **What we shipped in the contract-bridge chunk (2026-06-05):** agency attach (`POST …/contract/attach`) + creator accept (`POST …/contract/accept`) + manual two-party UI. Accept drives `contract()` and stops at `contracted`; existing draft submit handles the rest.
+- **Status:** CLOSED — 2026-06-05 ([review](reviews/contract-bridge-review.md)).
+
+---
+
+## Brand-side contract acceptance (P2)
+
+- **Where:** two-party contract design in Phase 1 spec; `brand_users` table has no P1 actor.
+- **What we accepted in contract-bridge chunk (2026-06-05, D-1):** P1 = agency attaches + creator accepts only. Brand click-accept deferred.
+- **Triggered by:** P2 brand portal / `brand_users` actor exists.
+- **Owner:** future brand workstream.
+- **Status:** open.
+
+---
+
+## `requires_per_campaign_contract` gating (P2)
+
+- **Where:** `campaigns.requires_per_campaign_contract` column + Settings toggle; no runtime wiring.
+- **What we accepted in contract-bridge chunk (2026-06-05, D-8):** informational only — agency may attach regardless; no gate on attach/accept.
+- **Triggered by:** product rule that attach is mandatory when flag is set.
+- **Owner:** future campaigns workstream.
+- **Status:** open.
+
+---
+
+## Embedded PDF contract viewer (nice-to-have)
+
+- **Where:** creator assignment detail — `ContractResource.view_url` is a presigned download link (D-5).
+- **What we accepted in contract-bridge chunk (2026-06-05):** no in-app PDF viewer; open/download via signed URL.
+- **Triggered by:** UX request for inline preview without leaving the app.
+- **Owner:** future creators FE workstream.
+- **Status:** open.

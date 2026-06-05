@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentContractController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentReviewController;
 use App\Modules\Campaigns\Http\Controllers\CampaignController;
@@ -59,4 +60,14 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
             ->name('campaigns.assignments.request-revision');
         Route::post('campaigns/{campaign}/assignments/{assignment}/reject', [CampaignAssignmentReviewController::class, 'reject'])
             ->name('campaigns.assignments.reject');
+
+        // Per-campaign contract attach (contract-bridge chunk, D-6/D-9). Agency
+        // issues a contract to an accepted assignment; creator accept is on
+        // creators/me/assignments/{assignment}/contract/accept.
+        Route::post('campaigns/{campaign}/assignments/{assignment}/contract/media/init', [CampaignAssignmentContractController::class, 'initMedia'])
+            ->name('campaigns.assignments.contract.media.init');
+        Route::post('campaigns/{campaign}/assignments/{assignment}/contract/media/complete', [CampaignAssignmentContractController::class, 'completeMedia'])
+            ->name('campaigns.assignments.contract.media.complete');
+        Route::post('campaigns/{campaign}/assignments/{assignment}/contract/attach', [CampaignAssignmentContractController::class, 'attach'])
+            ->name('campaigns.assignments.contract.attach');
     });

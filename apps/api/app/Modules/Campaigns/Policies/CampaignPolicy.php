@@ -82,6 +82,20 @@ final class CampaignPolicy
         ]);
     }
 
+    /**
+     * Issue a per-campaign contract to an accepted assignment (contract-bridge
+     * chunk, D-6). Mirrors {@see invite()}: admin + manager + STAFF — issuing
+     * a contract IS executing a campaign.
+     */
+    public function attachContract(User $user, Campaign $campaign): bool
+    {
+        return $this->hasAnyRole($user, [
+            AgencyRole::AgencyAdmin,
+            AgencyRole::AgencyManager,
+            AgencyRole::AgencyStaff,
+        ]);
+    }
+
     private function membership(User $user): ?AgencyMembership
     {
         return AgencyMembership::withoutGlobalScope(BelongsToAgencyScope::class)
