@@ -12,6 +12,8 @@
  *   - approved                 → submit the post URL (approved → posted, D-7).
  *   - posted                   → awaiting verification (read-only — verifyLive is
  *     Chunk 2; the arc STOPS here at verification_status=pending).
+ *   - accepted                 → review + accept the per-campaign contract (when
+ *     attached); otherwise read-only until the agency issues one.
  *   - anything else            → read-only (the list owns invited actions).
  *
  * Only the ONE legal action for the current status is shown (fail-closed UI; the
@@ -75,10 +77,16 @@ const platform = ref<(typeof PLATFORMS)[number]>('instagram')
 const postUrl = ref('')
 const postedFieldErrors = ref<Partial<Record<PostedField, readonly string[]>>>({})
 const submittingPosted = ref(false)
+const acceptingContract = ref(false)
 
 const status = computed(() => assignment.value?.attributes.status ?? null)
 const drafts = computed(() => assignment.value?.relationships.drafts ?? [])
 const postedContent = computed(() => assignment.value?.relationships.posted_content ?? [])
+const pendingContract = computed(() => assignment.value?.relationships.contract ?? null)
+
+const canAcceptContract = computed(
+  () => status.value === 'accepted' && pendingContract.value?.attributes.status === 'sent',
+)
 
 const canSubmitDraft = computed(
   () =>
@@ -233,6 +241,23 @@ async function submitDraft(): Promise<void> {
   }
 }
 
+async function acceptContract(): Promise<void> {
+  if (acceptingContract.value) return
+  acceptingContract.value = true
+  try {
+    await creatorAssignmentsApi.acceptContract(ulid.value)
+    snackbar.value = {
+      color: 'success',
+      text: t('creator.ui.assignments.detail.contract.toast.accepted'),
+    }
+    await load()
+  } catch {
+    snackbar.value = { color: 'error', text: t('creator.ui.assignments.detail.toast.error') }
+  } finally {
+    acceptingContract.value = false
+  }
+}
+
 async function submitPostedContent(): Promise<void> {
   if (submittingPosted.value || postUrl.value.trim() === '') return
   submittingPosted.value = true
@@ -313,6 +338,43 @@ onMounted(() => {
           {{ t('creator.ui.assignments.detail.revision.noFeedback') }}
         </div>
       </v-alert>
+
+      <!-- Per-campaign contract review (accepted + contract sent) -->
+      <v-card v-if="canAcceptContract" data-testid="assignment-contract-form">
+        <v-card-title class="text-h6">
+          {{
+            pendingContract?.attributes.title ?? t('creator.ui.assignments.detail.contract.title')
+          }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column ga-3">
+          <p v-if="pendingContract?.attributes.body_markdown" class="text-body-2">
+            {{ pendingContract.attributes.body_markdown }}
+          </p>
+          <v-btn
+            v-if="pendingContract?.attributes.view_url"
+            variant="outlined"
+            prepend-icon="mdi-file-pdf-box"
+            :href="pendingContract.attributes.view_url"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="assignment-contract-view"
+          >
+            {{ t('creator.ui.assignments.detail.contract.viewPdf') }}
+          </v-btn>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            color="primary"
+            variant="flat"
+            :loading="acceptingContract"
+            data-testid="assignment-contract-accept"
+            @click="acceptContract"
+          >
+            {{ t('creator.ui.assignments.detail.contract.accept') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
 
       <!-- Draft submit / resubmit form (producing / contracted / revision_requested) -->
       <v-card v-if="canSubmitDraft" data-testid="assignment-draft-form">

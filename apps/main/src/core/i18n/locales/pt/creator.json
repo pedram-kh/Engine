@@ -299,6 +299,14 @@
           "retry": "Tentar novamente",
           "awaitingReview": "O seu rascunho foi enviado e aguarda revisão da agência.",
           "awaitingVerification": "A sua publicação foi registada e aguarda verificação.",
+          "contract": {
+            "title": "Contrato da campanha",
+            "viewPdf": "Ver contrato (PDF)",
+            "accept": "Aceitar contrato",
+            "toast": {
+              "accepted": "Contrato aceite. Já pode enviar o rascunho."
+            }
+          },
           "revision": {
             "title": "Revisão solicitada",
             "noFeedback": "A agência solicitou alterações. Reenvie um rascunho atualizado."

@@ -10,11 +10,17 @@
 
 import type {
   AgencyAssignmentDetailResponse,
+  AttachContractPayload,
+  AttachContractResponse,
   CampaignAssignmentListResponse,
   CampaignAssignmentResource,
   CampaignEnvelope,
   CampaignListParams,
   CampaignListResponse,
+  ContractMediaCompletePayload,
+  ContractMediaCompleteResponse,
+  ContractMediaInitPayload,
+  ContractMediaInitResponse,
   CreateCampaignPayload,
   InviteAssignmentPayload,
   RejectDraftPayload,
@@ -151,6 +157,44 @@ export const campaignsApi = {
   ): Promise<ReviewActionResponse> {
     return http.post<ReviewActionResponse>(
       `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/reject`,
+      payload,
+    )
+  },
+
+  /** Initiate a presigned contract PDF upload for an accepted assignment. */
+  initContractMedia(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+    payload: ContractMediaInitPayload,
+  ): Promise<ContractMediaInitResponse> {
+    return http.post<ContractMediaInitResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/contract/media/init`,
+      payload,
+    )
+  },
+
+  completeContractMedia(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+    payload: ContractMediaCompletePayload,
+  ): Promise<ContractMediaCompleteResponse> {
+    return http.post<ContractMediaCompleteResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/contract/media/complete`,
+      payload,
+    )
+  },
+
+  /** Issue a per-campaign contract to an accepted assignment. */
+  attachContract(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+    payload: AttachContractPayload,
+  ): Promise<AttachContractResponse> {
+    return http.post<AttachContractResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/contract/attach`,
       payload,
     )
   },

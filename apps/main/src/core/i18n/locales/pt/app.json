@@ -405,6 +405,21 @@
         "submit": "Reconvidar",
         "success": "Reconvite enviado."
       },
+      "contract": {
+        "attach": {
+          "action": "Emitir contrato",
+          "title": "Emitir contrato",
+          "body": "Anexe os termos do contrato para o criador rever e aceitar antes de enviar um rascunho.",
+          "titleLabel": "Título do contrato",
+          "termsLabel": "Termos (markdown)",
+          "termsHint": "Forneça termos inline e/ou carregue um PDF abaixo.",
+          "pdfLabel": "PDF do contrato (opcional)",
+          "pdfReady": "PDF pronto: {name}",
+          "cancel": "Cancelar",
+          "submit": "Emitir contrato",
+          "success": "Contrato emitido. O criador foi notificado."
+        }
+      },
       "invite": {
         "open": "Convidar criadores",
         "title": "Convidar criadores",

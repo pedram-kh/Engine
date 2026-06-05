@@ -413,6 +413,21 @@
         "submit": "Re-invite",
         "success": "Re-invitation sent."
       },
+      "contract": {
+        "attach": {
+          "action": "Issue contract",
+          "title": "Issue contract",
+          "body": "Attach contract terms for the creator to review and accept before they can submit a draft.",
+          "titleLabel": "Contract title",
+          "termsLabel": "Terms (markdown)",
+          "termsHint": "Provide inline terms and/or upload a PDF below.",
+          "pdfLabel": "Contract PDF (optional)",
+          "pdfReady": "PDF ready: {name}",
+          "cancel": "Cancel",
+          "submit": "Issue contract",
+          "success": "Contract issued. The creator has been notified."
+        }
+      },
       "invite": {
         "open": "Invite creators",
         "title": "Invite creators",

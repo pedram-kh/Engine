@@ -18,6 +18,7 @@ vi.mock('../assignments.api', () => ({
     submitPostedContent: vi.fn(),
     initDraftMedia: vi.fn(),
     completeDraftMedia: vi.fn(),
+    acceptContract: vi.fn(),
   },
 }))
 
@@ -38,6 +39,7 @@ function makeDetail(
   status: CreatorAssignmentDetailResource['attributes']['status'],
   drafts: CreatorAssignmentDetailResource['relationships']['drafts'] = [],
   posted: CreatorAssignmentDetailResource['relationships']['posted_content'] = [],
+  contract: CreatorAssignmentDetailResource['relationships']['contract'] = null,
 ): CreatorAssignmentDetailResource {
   return {
     id: ULID,
@@ -62,7 +64,7 @@ function makeDetail(
         brand_name: 'Acme',
       },
     },
-    relationships: { drafts, posted_content: posted },
+    relationships: { drafts, posted_content: posted, contract },
   }
 }
 
@@ -155,6 +157,53 @@ describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', 
     // Version history preserved — both versions render.
     expect(wrapper.find('[data-testid="assignment-draft-version-1"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="assignment-draft-version-2"]').exists()).toBe(true)
+  })
+
+  it('renders contract accept for accepted + sent contract only', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('accepted', [], [], {
+        id: '01CONTRACT',
+        type: 'contract',
+        attributes: {
+          kind: 'per_campaign',
+          title: 'Campaign addendum',
+          body_markdown: 'Deliver one Reel by the due date.',
+          status: 'sent',
+          sent_at: '2026-06-01T10:00:00+00:00',
+          signed_at: null,
+          view_url: 'https://example.com/contract.pdf',
+        },
+      }),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-contract-form"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="assignment-draft-form"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-contract-view"]').attributes('href')).toBe(
+      'https://example.com/contract.pdf',
+    )
+  })
+
+  it('renders the draft form after contracted (not contract accept)', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('contracted', [], [], {
+        id: '01CONTRACT',
+        type: 'contract',
+        attributes: {
+          kind: 'per_campaign',
+          title: 'Campaign addendum',
+          body_markdown: null,
+          status: 'signed',
+          sent_at: '2026-06-01T10:00:00+00:00',
+          signed_at: '2026-06-01T11:00:00+00:00',
+          view_url: null,
+        },
+      }),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-contract-form"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-draft-form"]').exists()).toBe(true)
   })
 })
 

@@ -299,6 +299,14 @@
           "retry": "Riprova",
           "awaitingReview": "La tua bozza è stata inviata ed è in attesa di revisione dell'agenzia.",
           "awaitingVerification": "Il tuo post è stato registrato ed è in attesa di verifica.",
+          "contract": {
+            "title": "Contratto campagna",
+            "viewPdf": "Visualizza contratto (PDF)",
+            "accept": "Accetta contratto",
+            "toast": {
+              "accepted": "Contratto accettato. Ora puoi inviare la bozza."
+            }
+          },
           "revision": {
             "title": "Revisione richiesta",
             "noFeedback": "L'agenzia ha richiesto modifiche. Reinvia una bozza aggiornata."

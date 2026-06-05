@@ -405,6 +405,21 @@
         "submit": "Reinvita",
         "success": "Reinvito inviato."
       },
+      "contract": {
+        "attach": {
+          "action": "Emetti contratto",
+          "title": "Emetti contratto",
+          "body": "Allega i termini del contratto per la revisione e l'accettazione del creator prima dell'invio della bozza.",
+          "titleLabel": "Titolo del contratto",
+          "termsLabel": "Termini (markdown)",
+          "termsHint": "Fornisci termini inline e/o carica un PDF sotto.",
+          "pdfLabel": "PDF del contratto (opzionale)",
+          "pdfReady": "PDF pronto: {name}",
+          "cancel": "Annulla",
+          "submit": "Emetti contratto",
+          "success": "Contratto emesso. Il creator è stato notificato."
+        }
+      },
       "invite": {
         "open": "Invita creator",
         "title": "Invita creator",

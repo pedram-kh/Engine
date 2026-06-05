@@ -299,6 +299,14 @@
           "retry": "Retry",
           "awaitingReview": "Your draft has been submitted and is awaiting agency review.",
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
+          "contract": {
+            "title": "Campaign contract",
+            "viewPdf": "View contract (PDF)",
+            "accept": "Accept contract",
+            "toast": {
+              "accepted": "Contract accepted. You can now submit your draft."
+            }
+          },
           "revision": {
             "title": "Revision requested",
             "noFeedback": "The agency has requested changes. Please resubmit an updated draft."

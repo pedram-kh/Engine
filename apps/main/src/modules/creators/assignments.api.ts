@@ -24,6 +24,7 @@ import type {
   CreatorAssignmentActionResponse,
   CreatorAssignmentDetailResponse,
   CreatorAssignmentListResponse,
+  CreatorContractAcceptResponse,
   CreatorDraftSubmitResponse,
   CreatorPostedContentResponse,
   DraftMediaCompletePayload,
@@ -101,5 +102,10 @@ export const creatorAssignmentsApi = {
       `${BASE}/${assignmentUlid}/posted-content`,
       payload,
     )
+  },
+
+  /** Accept the per-campaign contract (accepted → contracted). */
+  acceptContract(assignmentUlid: string): Promise<CreatorContractAcceptResponse> {
+    return http.post<CreatorContractAcceptResponse>(`${BASE}/${assignmentUlid}/contract/accept`)
   },
 }

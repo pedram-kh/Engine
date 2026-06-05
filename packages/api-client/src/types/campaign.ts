@@ -361,6 +361,22 @@ export interface CreatorAssignmentDetailResource {
   relationships: {
     drafts: CampaignDraftResource[]
     posted_content: CampaignPostedContentResource[]
+    contract: ContractResource | null
+  }
+}
+
+/** A per-campaign contract row (contract-bridge chunk). */
+export interface ContractResource {
+  id: string
+  type: 'contract'
+  attributes: {
+    kind: string
+    title: string
+    body_markdown: string | null
+    status: string
+    sent_at: string | null
+    signed_at: string | null
+    view_url: string | null
   }
 }
 
@@ -476,4 +492,52 @@ export interface DraftMediaCompletePayload {
 
 export interface DraftMediaCompleteResponse {
   data: { storage_path: string }
+}
+
+// ---------------------------------------------------------------------------
+// Contract bridge — per-campaign attach + accept
+// ---------------------------------------------------------------------------
+
+export interface AttachContractPayload {
+  title: string
+  body_markdown?: string | null
+  body_pdf_path?: string | null
+}
+
+export interface AttachContractResponse {
+  data: ContractResource
+  meta: { code: string }
+}
+
+export interface ContractMediaInitPayload {
+  mime_type: string
+  declared_bytes: number
+}
+
+export interface ContractMediaInitResponse {
+  data: {
+    upload_url: string
+    upload_id: string
+    storage_path: string
+    expires_at: string
+    max_bytes: number
+  }
+}
+
+export interface ContractMediaCompletePayload {
+  upload_id: string
+}
+
+export interface ContractMediaCompleteResponse {
+  data: { storage_path: string }
+}
+
+export interface CreatorContractAcceptResponse {
+  data: {
+    type: 'campaign_assignment'
+    id: string
+    attributes: { status: AssignmentStatus }
+    relationships: { contract: ContractResource }
+  }
+  meta: { code: string }
 }

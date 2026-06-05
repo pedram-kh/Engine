@@ -31,6 +31,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
 import InviteCreatorsDialog from '../components/InviteCreatorsDialog.vue'
+import AttachContractDialog from '../components/AttachContractDialog.vue'
 import ReinviteDialog from '../components/ReinviteDialog.vue'
 import ReviewDraftDrawer from '../components/ReviewDraftDrawer.vue'
 
@@ -52,6 +53,8 @@ const canInvite = computed(
     currentRole.value === 'agency_staff',
 )
 
+const canAttachContract = canInvite
+
 const inviteDialog = ref(false)
 const inviteSnackbar = ref<string | null>(null)
 
@@ -71,6 +74,20 @@ function openReinvite(assignment: CampaignAssignmentResource): void {
 
 function onReinvited(): void {
   reinviteSnackbar.value = t('app.campaigns.reinvite.success')
+  void loadAssignments()
+}
+
+const attachContractDialog = ref(false)
+const attachContractTarget = ref<CampaignAssignmentResource | null>(null)
+const attachContractSnackbar = ref<string | null>(null)
+
+function openAttachContract(assignment: CampaignAssignmentResource): void {
+  attachContractTarget.value = assignment
+  attachContractDialog.value = true
+}
+
+function onContractAttached(): void {
+  attachContractSnackbar.value = t('app.campaigns.contract.attach.success')
   void loadAssignments()
 }
 
@@ -385,6 +402,16 @@ function formatMoney(minor: number | null, currency: string | null): string {
                   {{ t('app.campaigns.reinvite.action') }}
                 </v-btn>
                 <v-btn
+                  v-if="a.attributes.status === 'accepted' && canAttachContract"
+                  color="primary"
+                  variant="flat"
+                  size="small"
+                  :data-test="`creators-attach-contract-${a.id}`"
+                  @click="openAttachContract(a)"
+                >
+                  {{ t('app.campaigns.contract.attach.action') }}
+                </v-btn>
+                <v-btn
                   v-if="a.attributes.status === 'draft_submitted' && canReview"
                   color="primary"
                   variant="flat"
@@ -415,6 +442,15 @@ function formatMoney(minor: number | null, currency: string | null): string {
             :assignment="reinviteTarget"
             :campaign-currency="campaign?.attributes.budget_currency ?? null"
             @success="onReinvited"
+          />
+
+          <AttachContractDialog
+            v-if="canAttachContract && agencyStore.currentAgencyId"
+            v-model="attachContractDialog"
+            :agency-id="agencyStore.currentAgencyId"
+            :campaign-id="ulid"
+            :assignment="attachContractTarget"
+            @success="onContractAttached"
           />
 
           <ReviewDraftDrawer
@@ -452,6 +488,20 @@ function formatMoney(minor: number | null, currency: string | null): string {
             "
           >
             {{ reinviteSnackbar }}
+          </v-snackbar>
+
+          <v-snackbar
+            :model-value="attachContractSnackbar !== null"
+            :timeout="4000"
+            color="success"
+            data-test="attach-contract-snackbar"
+            @update:model-value="
+              (v) => {
+                if (!v) attachContractSnackbar = null
+              }
+            "
+          >
+            {{ attachContractSnackbar }}
           </v-snackbar>
 
           <v-snackbar
