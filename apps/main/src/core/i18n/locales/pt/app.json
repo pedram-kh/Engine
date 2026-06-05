@@ -388,7 +388,27 @@
       "creators": {
         "empty": {
           "heading": "Nenhum criador ainda",
-          "body": "Convide criadores para esta campanha — em breve no próximo bloco."
+          "body": "Convide criadores para esta campanha para começar."
+        }
+      },
+      "invite": {
+        "open": "Convidar criadores",
+        "title": "Convidar criadores",
+        "loadFailed": "Não foi possível carregar sua lista. Tente novamente.",
+        "feeLabel": "Cachê acordado ({currency})",
+        "search": "Buscar criadores",
+        "noRoster": "Nenhum criador na lista para convidar ainda.",
+        "noSearchMatch": "Nenhum criador corresponde à sua busca.",
+        "unnamed": "Criador sem nome",
+        "blockedHint": "Na lista negra — não pode ser convidado.",
+        "cancel": "Cancelar",
+        "submit": "Convidar ({count})",
+        "summary": "Convidados {ok}. Ignorados {blacklisted} (lista negra), {conflicts} com conflitos.",
+        "conflict": {
+          "title": "Conflito de disponibilidade",
+          "body": "{count} criador(es) selecionado(s) estão indisponíveis durante o período da campanha. Convidar mesmo assim?",
+          "cancel": "Ignorá-los",
+          "proceed": "Convidar mesmo assim"
         }
       },
       "comingSoon": {

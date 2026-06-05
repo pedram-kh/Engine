@@ -38,6 +38,7 @@ const userMenuOpen = ref(false)
  */
 const navItems = [
   { key: 'dashboard', icon: 'mdi-view-dashboard-outline', routeName: 'creator.dashboard' },
+  { key: 'assignments', icon: 'mdi-clipboard-text-outline', routeName: 'creator.assignments' },
   { key: 'availability', icon: 'mdi-calendar-month-outline', routeName: 'creator.availability' },
 ] as const
 

@@ -396,7 +396,27 @@
       "creators": {
         "empty": {
           "heading": "No creators yet",
-          "body": "Invite creators to this campaign — coming in the next chunk."
+          "body": "Invite creators to this campaign to get started."
+        }
+      },
+      "invite": {
+        "open": "Invite creators",
+        "title": "Invite creators",
+        "loadFailed": "We couldn't load your roster. Please try again.",
+        "feeLabel": "Agreed fee ({currency})",
+        "search": "Search creators",
+        "noRoster": "No roster creators to invite yet.",
+        "noSearchMatch": "No creators match your search.",
+        "unnamed": "Unnamed creator",
+        "blockedHint": "Blacklisted — can't be invited.",
+        "cancel": "Cancel",
+        "submit": "Invite ({count})",
+        "summary": "Invited {ok}. Skipped {blacklisted} (blacklisted), {conflicts} with conflicts.",
+        "conflict": {
+          "title": "Availability conflict",
+          "body": "{count} selected creator(s) are unavailable during the campaign window. Invite them anyway?",
+          "cancel": "Skip them",
+          "proceed": "Invite anyway"
         }
       },
       "comingSoon": {

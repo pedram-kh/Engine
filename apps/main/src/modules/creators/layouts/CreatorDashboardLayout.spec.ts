@@ -57,6 +57,11 @@ async function mountLayout(
         name: 'creator.availability',
         component: { template: '<div />' },
       },
+      {
+        path: '/creator/assignments',
+        name: 'creator.assignments',
+        component: { template: '<div />' },
+      },
       { path: '/sign-in', name: 'auth.sign-in', component: { template: '<div />' } },
     ],
   })
@@ -113,6 +118,22 @@ describe('CreatorDashboardLayout — topbar nav (D-b13)', () => {
     expect(mounted.wrapper.find('[data-test="creator-nav-availability"]').text()).toBe(
       'Availability',
     )
+  })
+
+  // Sprint 8 Chunk 2 (D-10): the campaign-invitation surface gets its own
+  // topbar entry between Dashboard and Availability.
+  it('renders the Invitations nav item (and localizes it)', async () => {
+    const en = await mountLayout()
+    expect(en.wrapper.find('[data-test="creator-nav-assignments"]').text()).toBe('Invitations')
+    en.cleanup()
+
+    const pt = await mountLayout({ locale: 'pt' })
+    expect(pt.wrapper.find('[data-test="creator-nav-assignments"]').text()).toBe('Convites')
+    pt.cleanup()
+
+    const it = await mountLayout({ locale: 'it' })
+    cleanup = it.cleanup
+    expect(it.wrapper.find('[data-test="creator-nav-assignments"]').text()).toBe('Inviti')
   })
 
   it('marks the Availability item active on its route (and Dashboard inactive)', async () => {

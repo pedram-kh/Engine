@@ -30,6 +30,7 @@ import { CEmptyState } from '@catalyst/ui'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
+import InviteCreatorsDialog from '../components/InviteCreatorsDialog.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -39,6 +40,23 @@ const { currentRole } = storeToRefs(agencyStore)
 const canEdit = computed(
   () => currentRole.value === 'agency_admin' || currentRole.value === 'agency_manager',
 )
+
+// The execute ability (D-6) — inviting is broader than editing: admin +
+// manager + STAFF can invite creators to a campaign.
+const canInvite = computed(
+  () =>
+    currentRole.value === 'agency_admin' ||
+    currentRole.value === 'agency_manager' ||
+    currentRole.value === 'agency_staff',
+)
+
+const inviteDialog = ref(false)
+const inviteSnackbar = ref<string | null>(null)
+
+function onInvited(message: string): void {
+  inviteSnackbar.value = message
+  void loadAssignments()
+}
 
 const ulid = computed(() => String(route.params.ulid))
 const tab = ref<string>('overview')
@@ -261,8 +279,21 @@ function formatMoney(minor: number | null, currency: string | null): string {
           </v-card>
         </v-window-item>
 
-        <!-- Creators (read-only assignment list) -->
+        <!-- Creators (assignment list + invite picker) -->
         <v-window-item value="creators" data-test="panel-creators">
+          <div class="d-flex justify-end mb-3">
+            <v-btn
+              v-if="canInvite"
+              color="primary"
+              variant="flat"
+              prepend-icon="mdi-account-plus-outline"
+              data-test="invite-creators-open"
+              @click="inviteDialog = true"
+            >
+              {{ t('app.campaigns.invite.open') }}
+            </v-btn>
+          </div>
+
           <v-skeleton-loader v-if="assignmentsLoading" type="list-item-two-line@3" />
           <CEmptyState
             v-else-if="assignments.length === 0"
@@ -283,6 +314,29 @@ function formatMoney(minor: number | null, currency: string | null): string {
               :subtitle="t(`app.campaigns.assignmentStatus.${a.attributes.status}`)"
             />
           </v-list>
+
+          <InviteCreatorsDialog
+            v-if="canInvite && agencyStore.currentAgencyId"
+            v-model="inviteDialog"
+            :agency-id="agencyStore.currentAgencyId"
+            :campaign-id="ulid"
+            :campaign-currency="campaign?.attributes.budget_currency ?? null"
+            @invited="onInvited"
+          />
+
+          <v-snackbar
+            :model-value="inviteSnackbar !== null"
+            :timeout="4000"
+            color="success"
+            data-test="invite-creators-snackbar"
+            @update:model-value="
+              (v) => {
+                if (!v) inviteSnackbar = null
+              }
+            "
+          >
+            {{ inviteSnackbar }}
+          </v-snackbar>
         </v-window-item>
 
         <!-- Coming-soon tabs -->

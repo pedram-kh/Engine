@@ -275,6 +275,42 @@
             "declined": "Request declined.",
             "error": "Something went wrong. Please try again."
           }
+        },
+        "assignments": {
+          "title": "Campaign invitations",
+          "pending": "You have {count} invitation(s) awaiting your response.",
+          "none": "No invitations awaiting your response.",
+          "cta": "View invitations"
+        }
+      },
+      "assignments": {
+        "title": "Campaign invitations",
+        "subtitle": "Accept, decline, or counter the fee on campaigns you've been invited to.",
+        "fee": "Fee",
+        "youCountered": "you countered",
+        "accept": "Accept",
+        "counter": "Counter",
+        "decline": "Decline",
+        "window": {
+          "range": "{start} – {end}",
+          "unset": "Dates TBC"
+        },
+        "empty": {
+          "title": "No campaign invitations",
+          "body": "When an agency invites you to a campaign, it'll appear here."
+        },
+        "toast": {
+          "accepted": "Invitation accepted.",
+          "countered": "Counter-offer sent.",
+          "declined": "Invitation declined.",
+          "error": "Something went wrong. Please try again."
+        },
+        "counterDialog": {
+          "title": "Counter the fee",
+          "body": "Propose a different fee for this campaign. The agency can re-offer or withdraw.",
+          "feeLabel": "Your fee ({currency})",
+          "cancel": "Cancel",
+          "submit": "Send counter"
         }
       },
       "upload": {

@@ -186,3 +186,96 @@ export interface CampaignAssignmentListResponse {
     last_page: number
   }
 }
+
+// ---------------------------------------------------------------------------
+// Agency invite (Chunk 2) — the two-tier gate
+// ---------------------------------------------------------------------------
+
+/** POST a single invite under a campaign (D-3). */
+export interface InviteAssignmentPayload {
+  /** The creator's PUBLIC ULID. */
+  creator_id: string
+  /** Positive integer in minor units (D-8). */
+  agreed_fee_minor_units: number
+  /** ISO-4217; must match the campaign currency when set (D-8). */
+  agreed_fee_currency: string
+  deliverables?: string[] | null
+  posting_due_at?: string | null
+  /**
+   * The soft-warn protocol flag (D-2): re-submit with `true` to proceed past a
+   * hard AVAILABILITY conflict (a 409). No bearing on the blacklist 422.
+   */
+  acknowledged?: boolean
+}
+
+/** POST the agency re-offer after a counter (D-7) — verb on an existing row. */
+export interface ReinviteAssignmentPayload {
+  agreed_fee_minor_units: number
+  agreed_fee_currency: string
+}
+
+/** One overlapping hard-availability occurrence in a 409 conflict payload. */
+export interface AssignmentAvailabilityConflict {
+  starts_at: string
+  ends_at: string
+  reason: string | null
+}
+
+/**
+ * The 409 body returned when a hard availability conflict is detected (D-2 —
+ * the SOFT WARN tier). Distinct from the blacklist 422 (the HARD BLOCK tier):
+ * `meta.code === 'assignment.availability_conflict'`.
+ */
+export interface AssignmentAvailabilityConflictResponse {
+  message: string
+  meta: { code: 'assignment.availability_conflict' }
+  conflict: {
+    creator_id: string
+    conflicts: AssignmentAvailabilityConflict[]
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Creator-self assignments (Chunk 2, D-9) — creators/me/assignments
+// ---------------------------------------------------------------------------
+
+export interface CreatorAssignmentResource {
+  id: string
+  type: 'campaign_assignment'
+  attributes: {
+    status: AssignmentStatus
+    agreed_fee_minor_units: number | null
+    agreed_fee_currency: string | null
+    countered_fee_minor_units: number | null
+    countered_fee_currency: string | null
+    deliverables: string[] | null
+    posting_due_at: string | null
+    invited_at: string | null
+    campaign: {
+      id: string
+      name: string
+      posting_window_starts_at: string | null
+      posting_window_ends_at: string | null
+      brand_name: string | null
+    } | null
+  }
+}
+
+export interface CreatorAssignmentListResponse {
+  data: CreatorAssignmentResource[]
+}
+
+/** The `{data, meta:{code}}` envelope returned by accept/decline/counter. */
+export interface CreatorAssignmentActionResponse {
+  data: {
+    type: 'campaign_assignment'
+    id: string
+    attributes: { status: AssignmentStatus }
+  }
+  meta: { code: string }
+}
+
+export interface CounterAssignmentPayload {
+  countered_fee_minor_units: number
+  countered_fee_currency: string
+}

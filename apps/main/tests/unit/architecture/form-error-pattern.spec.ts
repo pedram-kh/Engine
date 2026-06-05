@@ -56,6 +56,9 @@ const CANONICAL_422_FILES: readonly string[] = [
   'modules/onboarding/pages/Step3SocialAccountsPage.vue',
   'modules/onboarding/pages/Step6TaxPage.vue',
   'modules/creators/availability/components/AvailabilityBlockDialog.vue',
+  // Sprint 8 Chunk 2 (D-8): the creator counter fee-form binds the 422 from a
+  // non-positive / wrong-currency fee onto the amount field.
+  'modules/creators/pages/CreatorAssignmentsPage.vue',
 ]
 
 const IMPORTS_EXTRACT_FIELD_ERRORS =

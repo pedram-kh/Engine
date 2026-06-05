@@ -18,11 +18,21 @@ vi.mock('../connectionRequests.api', () => ({
   },
 }))
 
+vi.mock('../assignments.api', () => ({
+  creatorAssignmentsApi: {
+    list: vi.fn(),
+    accept: vi.fn(),
+    decline: vi.fn(),
+    counter: vi.fn(),
+  },
+}))
+
 import type { ConnectionRequestListItem } from '@catalyst/api-client'
 
 import { onboardingApi } from '../../onboarding/api/onboarding.api'
 import { useOnboardingStore } from '../../onboarding/stores/useOnboardingStore'
 import { connectionRequestsApi } from '../connectionRequests.api'
+import { creatorAssignmentsApi } from '../assignments.api'
 import CreatorDashboardPage from './CreatorDashboardPage.vue'
 
 function makeRequest(
@@ -104,6 +114,8 @@ beforeEach(() => {
   // requests don't trip on an unmocked list() (the catch would swallow it,
   // but a clean default keeps the other assertions honest).
   vi.mocked(connectionRequestsApi.list).mockResolvedValue({ data: [] })
+  // The approved-branch campaign-invitation teaser (D-10) fetches assignments.
+  vi.mocked(creatorAssignmentsApi.list).mockResolvedValue({ data: [] })
 })
 
 afterEach(() => {

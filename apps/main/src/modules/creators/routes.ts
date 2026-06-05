@@ -35,4 +35,15 @@ export const creatorsRoutes: RouteRecordRaw[] = [
       guards: ['requireAuth'],
     },
   },
+  {
+    // Sprint 8 Chunk 2 (D-10) — the creator's campaign-invitation surface
+    // (accept / decline / counter). Consumes GET creators/me/assignments.
+    path: '/creator/assignments',
+    name: 'creator.assignments',
+    component: () => import('./pages/CreatorAssignmentsPage.vue'),
+    meta: {
+      layout: 'creator',
+      guards: ['requireAuth'],
+    },
+  },
 ]

@@ -40,6 +40,7 @@ import { useRouter } from 'vue-router'
 import { resolveSubmitErrorKey } from '../../onboarding/composables/useSubmitErrorKey'
 import { useOnboardingStore } from '../../onboarding/stores/useOnboardingStore'
 import { connectionRequestsApi } from '../connectionRequests.api'
+import { creatorAssignmentsApi } from '../assignments.api'
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -116,6 +117,20 @@ async function loadRequests(): Promise<void> {
   }
 }
 
+// ── Campaign-invitation teaser (Sprint 8 Chunk 2, D-10) ────────────────────
+// A lightweight count of assignments awaiting the creator's response, linking
+// to the dedicated /creator/assignments surface. Approved-only, like the inbox.
+const invitedCount = ref(0)
+
+async function loadInvitedCount(): Promise<void> {
+  try {
+    const res = await creatorAssignmentsApi.list()
+    invitedCount.value = res.data.filter((a) => a.attributes.status === 'invited').length
+  } catch {
+    invitedCount.value = 0
+  }
+}
+
 /**
  * Snackbar keyed on the backend's `meta.code` (D-d6), mirroring the
  * DiscoverProfilePage pattern. Accept names the agency; decline does not (there
@@ -172,6 +187,7 @@ onMounted(async () => {
   // first creator-side fetch stays scoped to the surface that needs it).
   if (status.value === 'approved') {
     await loadRequests()
+    await loadInvitedCount()
   }
 })
 </script>
@@ -253,6 +269,39 @@ onMounted(async () => {
       :label="completenessLabel"
       :color="score >= 100 ? 'success' : 'primary'"
     />
+
+    <!-- Campaign-invitation teaser (Sprint 8 Chunk 2, D-10). Approved-only;
+         links to the dedicated assignments surface. Shows a count badge when
+         invitations await a response. -->
+    <v-alert
+      v-if="status === 'approved'"
+      type="info"
+      variant="tonal"
+      border="start"
+      data-testid="dashboard-assignments-teaser"
+    >
+      <div class="d-flex align-center justify-space-between flex-wrap ga-2">
+        <div>
+          <strong>{{ t('creator.ui.dashboard.assignments.title') }}</strong>
+          <p class="text-body-2 mb-0">
+            {{
+              invitedCount > 0
+                ? t('creator.ui.dashboard.assignments.pending', { count: invitedCount })
+                : t('creator.ui.dashboard.assignments.none')
+            }}
+          </p>
+        </div>
+        <v-btn
+          color="primary"
+          variant="flat"
+          size="small"
+          :to="{ name: 'creator.assignments' }"
+          data-testid="dashboard-assignments-cta"
+        >
+          {{ t('creator.ui.dashboard.assignments.cta') }}
+        </v-btn>
+      </div>
+    </v-alert>
 
     <!-- Connection requests inbox (Sprint 6.6c, D-d1). Approved-only: the
          section never renders for pending/rejected/incomplete creators, who

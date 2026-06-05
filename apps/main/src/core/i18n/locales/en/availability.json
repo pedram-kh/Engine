@@ -10,6 +10,7 @@
     },
     "creatorNav": {
       "dashboard": "Dashboard",
+      "assignments": "Invitations",
       "availability": "Availability"
     },
     "nav": {
@@ -34,7 +35,7 @@
       "vacation": "Vacation",
       "personal": "Personal",
       "exclusive_contract": "Exclusive contract",
-      "assignment_auto": "Assignment (auto)",
+      "assignment_auto": "From campaign",
       "other": "Other"
     },
     "weekday": {

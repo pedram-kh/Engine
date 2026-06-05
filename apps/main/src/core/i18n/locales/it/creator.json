@@ -275,6 +275,42 @@
             "declined": "Richiesta rifiutata.",
             "error": "Qualcosa è andato storto. Riprova."
           }
+        },
+        "assignments": {
+          "title": "Inviti alle campagne",
+          "pending": "Hai {count} invito/i in attesa di risposta.",
+          "none": "Nessun invito in attesa di risposta.",
+          "cta": "Vedi inviti"
+        }
+      },
+      "assignments": {
+        "title": "Inviti alle campagne",
+        "subtitle": "Accetta, rifiuta o controproponi il compenso delle campagne a cui sei stato invitato.",
+        "fee": "Compenso",
+        "youCountered": "controproposta",
+        "accept": "Accetta",
+        "counter": "Controproponi",
+        "decline": "Rifiuta",
+        "window": {
+          "range": "{start} – {end}",
+          "unset": "Date da confermare"
+        },
+        "empty": {
+          "title": "Nessun invito alle campagne",
+          "body": "Quando un'agenzia ti invita a una campagna, apparirà qui."
+        },
+        "toast": {
+          "accepted": "Invito accettato.",
+          "countered": "Controproposta inviata.",
+          "declined": "Invito rifiutato.",
+          "error": "Qualcosa è andato storto. Riprova."
+        },
+        "counterDialog": {
+          "title": "Controproponi il compenso",
+          "body": "Proponi un compenso diverso per questa campagna. L'agenzia può rilanciare o ritirare.",
+          "feeLabel": "Il tuo compenso ({currency})",
+          "cancel": "Annulla",
+          "submit": "Invia controproposta"
         }
       },
       "upload": {

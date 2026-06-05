@@ -10,6 +10,7 @@
     },
     "creatorNav": {
       "dashboard": "Painel",
+      "assignments": "Convites",
       "availability": "Disponibilidade"
     },
     "nav": {
@@ -34,7 +35,7 @@
       "vacation": "Férias",
       "personal": "Pessoal",
       "exclusive_contract": "Contrato exclusivo",
-      "assignment_auto": "Atribuição (automática)",
+      "assignment_auto": "De campanha",
       "other": "Outro"
     },
     "weekday": {

@@ -275,6 +275,42 @@
             "declined": "Pedido recusado.",
             "error": "Algo correu mal. Tente novamente."
           }
+        },
+        "assignments": {
+          "title": "Convites de campanha",
+          "pending": "Tem {count} convite(s) a aguardar a sua resposta.",
+          "none": "Nenhum convite a aguardar a sua resposta.",
+          "cta": "Ver convites"
+        }
+      },
+      "assignments": {
+        "title": "Convites de campanha",
+        "subtitle": "Aceite, recuse ou contraproponha o cachê das campanhas para as quais foi convidado.",
+        "fee": "Cachê",
+        "youCountered": "contraproposta",
+        "accept": "Aceitar",
+        "counter": "Contrapropor",
+        "decline": "Recusar",
+        "window": {
+          "range": "{start} – {end}",
+          "unset": "Datas a confirmar"
+        },
+        "empty": {
+          "title": "Nenhum convite de campanha",
+          "body": "Quando uma agência o convidar para uma campanha, aparecerá aqui."
+        },
+        "toast": {
+          "accepted": "Convite aceite.",
+          "countered": "Contraproposta enviada.",
+          "declined": "Convite recusado.",
+          "error": "Algo correu mal. Tente novamente."
+        },
+        "counterDialog": {
+          "title": "Contrapropor o cachê",
+          "body": "Proponha um cachê diferente para esta campanha. A agência pode reofertar ou retirar.",
+          "feeLabel": "O seu cachê ({currency})",
+          "cancel": "Cancelar",
+          "submit": "Enviar contraproposta"
         }
       },
       "upload": {

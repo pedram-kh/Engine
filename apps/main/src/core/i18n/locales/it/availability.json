@@ -10,6 +10,7 @@
     },
     "creatorNav": {
       "dashboard": "Dashboard",
+      "assignments": "Inviti",
       "availability": "Disponibilità"
     },
     "nav": {
@@ -34,7 +35,7 @@
       "vacation": "Ferie",
       "personal": "Personale",
       "exclusive_contract": "Contratto esclusivo",
-      "assignment_auto": "Incarico (automatico)",
+      "assignment_auto": "Da campagna",
       "other": "Altro"
     },
     "weekday": {

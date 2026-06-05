@@ -388,7 +388,27 @@
       "creators": {
         "empty": {
           "heading": "Ancora nessun creator",
-          "body": "Invita creator a questa campagna — in arrivo nel prossimo blocco."
+          "body": "Invita creator a questa campagna per iniziare."
+        }
+      },
+      "invite": {
+        "open": "Invita creator",
+        "title": "Invita creator",
+        "loadFailed": "Impossibile caricare il tuo elenco. Riprova.",
+        "feeLabel": "Compenso concordato ({currency})",
+        "search": "Cerca creator",
+        "noRoster": "Ancora nessun creator nell'elenco da invitare.",
+        "noSearchMatch": "Nessun creator corrisponde alla ricerca.",
+        "unnamed": "Creator senza nome",
+        "blockedHint": "In blacklist — non può essere invitato.",
+        "cancel": "Annulla",
+        "submit": "Invita ({count})",
+        "summary": "Invitati {ok}. Saltati {blacklisted} (blacklist), {conflicts} con conflitti.",
+        "conflict": {
+          "title": "Conflitto di disponibilità",
+          "body": "{count} creator selezionato/i non sono disponibili durante il periodo della campagna. Invitarli comunque?",
+          "cancel": "Saltali",
+          "proceed": "Invita comunque"
         }
       },
       "comingSoon": {

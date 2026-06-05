@@ -10,10 +10,13 @@
 
 import type {
   CampaignAssignmentListResponse,
+  CampaignAssignmentResource,
   CampaignEnvelope,
   CampaignListParams,
   CampaignListResponse,
   CreateCampaignPayload,
+  InviteAssignmentPayload,
+  ReinviteAssignmentPayload,
   UpdateCampaignPayload,
 } from '@catalyst/api-client'
 
@@ -57,10 +60,41 @@ export const campaignsApi = {
     return http.patch<CampaignEnvelope>(`${campaignsBase(agencyId)}/${campaignId}`, payload)
   },
 
-  /** Read-only assignment listing for the Creators tab (Chunk 1). */
+  /** Assignment listing for the Creators tab. */
   assignments(agencyId: string, campaignId: string): Promise<CampaignAssignmentListResponse> {
     return http.get<CampaignAssignmentListResponse>(
       `${campaignsBase(agencyId)}/${campaignId}/assignments`,
+    )
+  },
+
+  /**
+   * Invite a single creator (Chunk 2, D-3). The execute ability (admin +
+   * manager + staff). Resolves to the created assignment (201) or the existing
+   * one (200, idempotent). Throws an `ApiError` for the two gate tiers: a 422
+   * `assignment.blacklisted` (hard block) or a 409 `assignment.availability_conflict`
+   * (soft warn — re-call with `acknowledged: true` to proceed).
+   */
+  invite(
+    agencyId: string,
+    campaignId: string,
+    payload: InviteAssignmentPayload,
+  ): Promise<{ data: CampaignAssignmentResource }> {
+    return http.post<{ data: CampaignAssignmentResource }>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments`,
+      payload,
+    )
+  },
+
+  /** The agency re-offer after a counter (Chunk 2, D-7) — the guarded edge. */
+  reinvite(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+    payload: ReinviteAssignmentPayload,
+  ): Promise<{ data: CampaignAssignmentResource }> {
+    return http.post<{ data: CampaignAssignmentResource }>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/reinvite`,
+      payload,
     )
   },
 }

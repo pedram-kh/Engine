@@ -101,4 +101,33 @@ describe('campaignsApi create / update / assignments', () => {
       '/agencies/agency-ulid/campaigns/campaign-ulid/assignments',
     )
   })
+
+  it('POSTs an invite to the campaign assignments collection (Chunk 2, D-3)', () => {
+    void campaignsApi.invite('agency-ulid', 'campaign-ulid', {
+      creator_id: 'creator-ulid',
+      agreed_fee_minor_units: 500000,
+      agreed_fee_currency: 'EUR',
+      acknowledged: true,
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/assignments',
+      {
+        creator_id: 'creator-ulid',
+        agreed_fee_minor_units: 500000,
+        agreed_fee_currency: 'EUR',
+        acknowledged: true,
+      },
+    )
+  })
+
+  it('POSTs a re-invite to the verb-on-existing path (Chunk 2, D-7)', () => {
+    void campaignsApi.reinvite('agency-ulid', 'campaign-ulid', 'assignment-ulid', {
+      agreed_fee_minor_units: 650000,
+      agreed_fee_currency: 'EUR',
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/assignments/assignment-ulid/reinvite',
+      { agreed_fee_minor_units: 650000, agreed_fee_currency: 'EUR' },
+    )
+  })
 })
