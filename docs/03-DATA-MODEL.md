@@ -571,7 +571,7 @@ State transitions are managed by `CampaignAssignmentStateMachine` service. Every
 
 ### `campaign_drafts`
 
-> **⏳ Deferred to Sprint 9 (logged in `tech-debt.md`).** Spec'd here but **not migrated** in Sprint 8 Chunk 1. `campaign_assignments` carries **no FK** to this table (drafts are children of the assignment, pointing _up_ via `assignment_id`), and `draft_submitted` is only an `AssignmentStatus` enum value — nothing in Chunk 1 reads or writes a draft row, so the table is safely deferred to the chunk that builds the draft-submission/review flow.
+> **✅ Built in Sprint 9 Chunk 1.** Migrated as spec'd (`2026_06_05_110000_create_campaign_drafts_table.php`) + `CampaignDraft` model/factory + `DraftReviewStatus` enum. Chunk 1 WRITES only the submission side (`version`, `submitted_*`, `caption`, `hashtags`, `mentions`, `media_attachments`, `review_status` default `pending`) via the creator-self `POST creators/me/assignments/{a}/drafts` endpoint; `version` increments per resubmission (one row per attempt, history preserved). The review-trail columns (`reviewed_*`, `review_feedback`) + P2/P3 (`client_review_*`, `ai_qc_*`) ship as column-only — Chunk 2 (agency review) populates the review trail. The model intentionally does **not** use the Audited trait (free-text `caption`/`review_feedback` kept out of any snapshot); the draft-submitted fact rides the `assignment.draft_submitted` machine-transition audit (carrying `{draft_id, version, media_count}`).
 
 Draft submissions for review.
 
@@ -601,7 +601,7 @@ Draft submissions for review.
 
 ### `campaign_posted_content`
 
-> **⏳ Deferred to Sprint 9 (logged in `tech-debt.md`).** Spec'd here but **not migrated** in Sprint 8 Chunk 1 — same reasoning as `campaign_drafts`: it is a child of the assignment (`assignment_id` points up), the `posted`/`live_verified` states are vendor-gated and unreachable by any manual path this chunk, and nothing in Chunk 1 references it. Deferred to the chunk that builds posted-content verification.
+> **✅ Built in Sprint 9 Chunk 1.** Migrated as spec'd (`2026_06_05_110001_create_campaign_posted_content_table.php`) + `CampaignPostedContent` model/factory + `PostedContentVerificationStatus` enum. Chunk 1 WRITES only the creator-reported side (`platform`, `post_url`, `posted_at`, `verification_status` default `pending`) via `POST creators/me/assignments/{a}/posted-content` (drives `approved → posted` through `markPosted()`). The verification columns (`verified_at`, `platform_post_id`) + metrics (`last_metrics_synced_at`, `metrics`, `metrics_history`) ship now but are advanced by Chunk 2's `VerifyPostedContentJob` / later metrics sync — the arc **stops** at `verification_status=pending` this chunk (`verifyLive` remains vendor-gated).
 
 Tracks the actual published post on social.
 

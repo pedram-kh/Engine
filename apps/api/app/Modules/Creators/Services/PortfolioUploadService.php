@@ -88,25 +88,40 @@ final class PortfolioUploadService
      * @catalyst/api-client (the SPA reads `upload_url`) — see the
      * contract-guard test in CreatorWizardEndpointsTest.
      *
+     * The `$namespace` partitions the per-creator key prefix
+     * (`creators/{ulid}/{namespace}/…`). It defaults to `portfolio` (the
+     * original caller — no behaviour change); the Sprint 9 draft-media flow
+     * passes `drafts` so submission media lands under its own prefix and the
+     * accepted-MIME set widens to include images (a draft post may be an
+     * image, not just video — D-8). This is the reuse-not-duplicate path for
+     * the presigned S3 mechanics.
+     *
      * @return array{upload_url: string, upload_id: string, storage_path: string, expires_at: string, max_bytes: int}
      */
     public function initiatePresignedUpload(
         Creator $creator,
         string $mimeType,
         int $declaredBytes,
+        string $namespace = 'portfolio',
     ): array {
-        if (! array_key_exists($mimeType, self::ACCEPTED_VIDEO_MIME_TYPES)) {
-            throw new RuntimeException("Unsupported video MIME type: {$mimeType}.");
+        $accepted = $this->acceptedMimeTypesFor($namespace);
+        if (! array_key_exists($mimeType, $accepted)) {
+            // Preserve the original 'video' wording for the portfolio
+            // namespace (its contract test pins the message) — drafts use a
+            // namespace-accurate label since they also accept images.
+            $label = $namespace === 'drafts' ? 'draft' : 'video';
+            throw new RuntimeException("Unsupported {$label} MIME type: {$mimeType}.");
         }
 
         if ($declaredBytes > self::MAX_PRESIGNED_BYTES) {
             throw new RuntimeException('Declared file size exceeds 500MB.');
         }
 
-        $extension = self::ACCEPTED_VIDEO_MIME_TYPES[$mimeType];
+        $extension = $accepted[$mimeType];
         $path = sprintf(
-            'creators/%s/portfolio/%s.%s',
+            'creators/%s/%s/%s.%s',
             $creator->ulid,
+            $namespace,
             (string) Str::ulid(),
             $extension,
         );
@@ -150,13 +165,18 @@ final class PortfolioUploadService
      * Verify the presigned upload landed (object exists at the planned
      * path) and return the path. Caller is responsible for creating
      * the creator_portfolio_items row referencing this path.
+     *
+     * `$namespace` must match the value passed to
+     * {@see initiatePresignedUpload()} — the prefix check rejects a path that
+     * is not scoped under `creators/{ulid}/{namespace}/`, so a creator can
+     * neither inject another creator's path nor cross namespaces.
      */
-    public function completePresignedUpload(Creator $creator, string $uploadId): string
+    public function completePresignedUpload(Creator $creator, string $uploadId, string $namespace = 'portfolio'): string
     {
         // upload_id is the planned path; sanity-check that it's scoped
         // under the creator's prefix to prevent cross-creator path
         // injection.
-        $expectedPrefix = sprintf('creators/%s/portfolio/', $creator->ulid);
+        $expectedPrefix = sprintf('creators/%s/%s/', $creator->ulid, $namespace);
         if (! str_starts_with($uploadId, $expectedPrefix)) {
             throw new RuntimeException('Upload ID does not belong to this creator.');
         }
@@ -167,5 +187,19 @@ final class PortfolioUploadService
         }
 
         return $uploadId;
+    }
+
+    /**
+     * The accepted MIME → extension map for a given upload namespace. The
+     * `drafts` namespace accepts both images and videos (a draft post may be
+     * an image); every other namespace (portfolio) stays video-only.
+     *
+     * @return array<string, string>
+     */
+    private function acceptedMimeTypesFor(string $namespace): array
+    {
+        return $namespace === 'drafts'
+            ? array_merge(self::ACCEPTED_IMAGE_MIME_TYPES, self::ACCEPTED_VIDEO_MIME_TYPES)
+            : self::ACCEPTED_VIDEO_MIME_TYPES;
     }
 }

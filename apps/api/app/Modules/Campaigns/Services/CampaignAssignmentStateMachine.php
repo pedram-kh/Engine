@@ -200,7 +200,17 @@ final class CampaignAssignmentStateMachine
         );
     }
 
-    public function submitDraft(CampaignAssignment $assignment, ?User $actor = null): CampaignAssignment
+    /**
+     * producing → draft_submitted. The `$context` is merged into the
+     * `assignment.draft_submitted` audit metadata so the single
+     * machine-written transition row also records the just-created draft's
+     * identity (Sprint 9 Chunk 1, D-5): `{draft_id, version, media_count}`.
+     * Free text (`caption`) is deliberately NOT threaded — the
+     * hand-written-audit discipline (D-3).
+     *
+     * @param  array<string, mixed>  $context
+     */
+    public function submitDraft(CampaignAssignment $assignment, ?User $actor = null, array $context = []): CampaignAssignment
     {
         $this->assertSource($assignment, [AssignmentStatus::Producing], AssignmentStatus::DraftSubmitted);
 
@@ -212,6 +222,7 @@ final class CampaignAssignmentStateMachine
             mutate: function (CampaignAssignment $a): void {
                 $a->submitted_draft_at = now();
             },
+            context: $context,
         );
     }
 
@@ -247,10 +258,14 @@ final class CampaignAssignmentStateMachine
 
     /**
      * approved → posted. The creator self-reports the post (no vendor) —
-     * fires the board verb `assignment.posted_by_creator`. The creator-side
-     * endpoint lands in a later sprint; the transition exists here now.
+     * fires the board verb `assignment.posted_by_creator`. The `$context` is
+     * merged into the audit metadata so the transition row records the
+     * just-created posted-content row: `{posted_content_id, platform}`
+     * (Sprint 9 Chunk 1, D-7). The free-text `post_url` is NOT threaded (D-3).
+     *
+     * @param  array<string, mixed>  $context
      */
-    public function markPosted(CampaignAssignment $assignment, ?User $actor = null): CampaignAssignment
+    public function markPosted(CampaignAssignment $assignment, ?User $actor = null, array $context = []): CampaignAssignment
     {
         $this->assertSource($assignment, [AssignmentStatus::Approved], AssignmentStatus::Posted);
 
@@ -262,6 +277,7 @@ final class CampaignAssignmentStateMachine
             mutate: function (CampaignAssignment $a): void {
                 $a->posted_at = now();
             },
+            context: $context,
         );
     }
 

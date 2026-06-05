@@ -1148,7 +1148,7 @@ anyone reviewing it later.
 - **Triggered by:** the Sprint 9 chunk that builds the draft-submission/review flow (`campaign_drafts`) and posted-content verification (`campaign_posted_content`).
 - **Resolution:** Sprint 9 owns both migrations + their models/flows; the `draft_submitted`/`posted` states they hang off already exist in the enum + state machine.
 - **Owner:** Sprint 9 (drafts + posted content).
-- **Status:** open (deferred by design → S9). Surfaced + accepted by Sprint 8 Chunk 1, 2026-06-05 ([review](reviews/sprint-8-chunk-1-review.md)).
+- **Status:** ✅ **CLOSED — built by Sprint 9 Chunk 1, 2026-06-05** ([review](reviews/sprint-9-chunk-1-review.md)). Both tables migrated (`campaign_drafts`, `campaign_posted_content`) with the assignment-CASCADE FKs + their `CampaignDraft`/`CampaignPostedContent` models, factories, enums, the creator-self submission endpoints, and `Sprint9MigrationTest` pinning the full column set. Chunk 1 wires the submission side (drafts submit/resubmit, posted-content) through `posted`/`verification_status=pending`; the review trail + verification job are Chunk 2.
 
 ---
 

@@ -6,6 +6,7 @@ use App\Modules\Creators\Http\Controllers\Admin\AdminCreatorController;
 use App\Modules\Creators\Http\Controllers\AvatarController;
 use App\Modules\Creators\Http\Controllers\BulkInviteController;
 use App\Modules\Creators\Http\Controllers\CreatorAssignmentController;
+use App\Modules\Creators\Http\Controllers\CreatorAssignmentDraftController;
 use App\Modules\Creators\Http\Controllers\CreatorAvailabilityController;
 use App\Modules\Creators\Http\Controllers\CreatorConnectionRequestController;
 use App\Modules\Creators\Http\Controllers\CreatorWizardController;
@@ -64,6 +65,11 @@ use Illuminate\Support\Facades\Route;
 |   POST   /api/v1/creators/me/assignments/{a}/accept           Sprint 8 Chunk 2
 |   POST   /api/v1/creators/me/assignments/{a}/decline          Sprint 8 Chunk 2
 |   POST   /api/v1/creators/me/assignments/{a}/counter          Sprint 8 Chunk 2
+|   GET    /api/v1/creators/me/assignments/{a}                  Sprint 9 Chunk 1
+|   POST   /api/v1/creators/me/assignments/{a}/drafts           Sprint 9 Chunk 1
+|   POST   /api/v1/creators/me/assignments/{a}/drafts/media/init      Sprint 9 Chunk 1
+|   POST   /api/v1/creators/me/assignments/{a}/drafts/media/complete  Sprint 9 Chunk 1
+|   POST   /api/v1/creators/me/assignments/{a}/posted-content   Sprint 9 Chunk 1
 |
 */
 
@@ -187,6 +193,30 @@ Route::prefix('creators/me')
                 ->name('decline');
             Route::post('{assignment}/counter', [CreatorAssignmentController::class, 'counter'])
                 ->name('counter');
+
+            // ─── Submission surface (the CREATOR draft/posted flow) ──────────
+            // Sprint 9 Chunk 1. The submission half of the submission→review
+            // seam: read the assignment + its draft history (show), submit /
+            // resubmit a versioned draft (producing → draft_submitted, or the
+            // two-step startProducing path from contracted/revision_requested,
+            // D-4/5/6), the presigned draft-media pipeline (init/complete, D-8,
+            // reusing PortfolioUploadService under the `drafts` namespace), and
+            // self-report the post (approved → posted, D-7). Same structural
+            // creator-ownership + scope-bypass as the accept/decline rows;
+            // fail-closed on the legal source states; status flips only via
+            // the CampaignAssignmentStateMachine. STOPS at posted/pending —
+            // review + verifyLive are Chunk 2. Allowlisted in
+            // docs/security/tenancy.md § 4.
+            Route::get('{assignment}', [CreatorAssignmentDraftController::class, 'show'])
+                ->name('show');
+            Route::post('{assignment}/drafts', [CreatorAssignmentDraftController::class, 'submitDraft'])
+                ->name('drafts.submit');
+            Route::post('{assignment}/drafts/media/init', [CreatorAssignmentDraftController::class, 'initMedia'])
+                ->name('drafts.media.init');
+            Route::post('{assignment}/drafts/media/complete', [CreatorAssignmentDraftController::class, 'completeMedia'])
+                ->name('drafts.media.complete');
+            Route::post('{assignment}/posted-content', [CreatorAssignmentDraftController::class, 'submitPostedContent'])
+                ->name('posted-content.submit');
         });
     });
 
