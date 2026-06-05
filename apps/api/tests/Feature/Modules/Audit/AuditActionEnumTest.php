@@ -121,6 +121,8 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'assignment.payment_funded',
         'assignment.payment_released',
         'assignment.cancelled',
+        // Sprint 8 Chunk 2 — the agency re-offer after a creator counter (D-7).
+        'assignment.re_invited',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());
