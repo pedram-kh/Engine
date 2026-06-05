@@ -281,5 +281,6 @@ it('creator show includes pending contract relationship when accepted', function
         ->getJson("/api/v1/creators/me/assignments/{$assignment->ulid}")
         ->assertOk()
         ->assertJsonPath('data.relationships.contract.attributes.status', 'sent')
-        ->assertJsonPath('data.relationships.contract.attributes.body_markdown', 'Review these terms.');
+        ->assertJsonPath('data.relationships.contract.attributes.body_markdown', 'Review these terms.')
+        ->assertJsonPath('meta.contract_signing_enabled', true);
 });

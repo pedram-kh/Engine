@@ -303,6 +303,8 @@
             "title": "Campaign contract",
             "viewPdf": "View contract (PDF)",
             "accept": "Accept contract",
+            "awaitingAgency": "The agency will send a contract for you to review and accept. You'll be notified when it's ready — check back here then.",
+            "signingDisabled": "Contract signing is not enabled yet. The agency will contact you when it's time to proceed.",
             "toast": {
               "accepted": "Contract accepted. You can now submit your draft."
             }

@@ -303,6 +303,8 @@
             "title": "Contrato da campanha",
             "viewPdf": "Ver contrato (PDF)",
             "accept": "Aceitar contrato",
+            "awaitingAgency": "A agência enviará um contrato para rever e aceitar. Será notificado quando estiver pronto — volte aqui então.",
+            "signingDisabled": "A assinatura de contratos ainda não está ativa. A agência entrará em contacto quando for altura de avançar.",
             "toast": {
               "accepted": "Contrato aceite. Já pode enviar o rascunho."
             }

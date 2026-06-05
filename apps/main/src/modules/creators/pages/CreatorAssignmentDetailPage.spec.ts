@@ -174,6 +174,7 @@ describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', 
           view_url: 'https://example.com/contract.pdf',
         },
       }),
+      meta: { contract_signing_enabled: true },
     })
     const { wrapper } = await mountDetail()
 
@@ -199,11 +200,34 @@ describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', 
           view_url: null,
         },
       }),
+      meta: { contract_signing_enabled: true },
     })
     const { wrapper } = await mountDetail()
 
     expect(wrapper.find('[data-testid="assignment-contract-form"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="assignment-draft-form"]').exists()).toBe(true)
+  })
+
+  it('shows awaiting-contract when accepted without a sent contract', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('accepted'),
+      meta: { contract_signing_enabled: true },
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-awaiting-contract"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="assignment-contract-form"]').exists()).toBe(false)
+  })
+
+  it('shows signing-disabled when accepted and contract_signing_enabled is OFF', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('accepted'),
+      meta: { contract_signing_enabled: false },
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-contract-signing-disabled"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="assignment-awaiting-contract"]').exists()).toBe(false)
   })
 })
 

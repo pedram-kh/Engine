@@ -303,6 +303,8 @@
             "title": "Contratto campagna",
             "viewPdf": "Visualizza contratto (PDF)",
             "accept": "Accetta contratto",
+            "awaitingAgency": "L'agenzia invierà un contratto da rivedere e accettare. Riceverai una notifica quando sarà pronto — torna qui.",
+            "signingDisabled": "La firma dei contratti non è ancora attiva. L'agenzia ti contatterà quando sarà il momento di procedere.",
             "toast": {
               "accepted": "Contratto accettato. Ora puoi inviare la bozza."
             }

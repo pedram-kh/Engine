@@ -62,6 +62,7 @@ const loadedOnce = ref(false)
 // from any other failure (5xx, network) so a server error never masquerades
 // as "not found" — the bare-catch trap that hid the missing-migration 500.
 const loadError = ref<'not_found' | 'generic' | null>(null)
+const contractSigningEnabled = ref(false)
 const snackbar = ref<{ color: string; text: string } | null>(null)
 
 // Draft form state.
@@ -86,6 +87,15 @@ const pendingContract = computed(() => assignment.value?.relationships.contract 
 
 const canAcceptContract = computed(
   () => status.value === 'accepted' && pendingContract.value?.attributes.status === 'sent',
+)
+const isAwaitingContract = computed(
+  () =>
+    status.value === 'accepted' &&
+    contractSigningEnabled.value &&
+    pendingContract.value?.attributes.status !== 'sent',
+)
+const isContractSigningDisabled = computed(
+  () => status.value === 'accepted' && !contractSigningEnabled.value,
 )
 
 const canSubmitDraft = computed(
@@ -136,6 +146,7 @@ async function load(): Promise<void> {
   try {
     const res = await creatorAssignmentsApi.show(ulid.value)
     assignment.value = res.data
+    contractSigningEnabled.value = res.meta?.contract_signing_enabled ?? false
   } catch (err) {
     assignment.value = null
     loadError.value = err instanceof ApiError && err.status === 404 ? 'not_found' : 'generic'
@@ -375,6 +386,26 @@ onMounted(() => {
           </v-btn>
         </v-card-actions>
       </v-card>
+
+      <!-- Accepted, contract signing disabled (flag OFF — nothing to do yet) -->
+      <v-alert
+        v-else-if="isContractSigningDisabled"
+        type="info"
+        variant="tonal"
+        data-testid="assignment-contract-signing-disabled"
+      >
+        {{ t('creator.ui.assignments.detail.contract.signingDisabled') }}
+      </v-alert>
+
+      <!-- Accepted, waiting for agency to issue the contract -->
+      <v-alert
+        v-else-if="isAwaitingContract"
+        type="info"
+        variant="tonal"
+        data-testid="assignment-awaiting-contract"
+      >
+        {{ t('creator.ui.assignments.detail.contract.awaitingAgency') }}
+      </v-alert>
 
       <!-- Draft submit / resubmit form (producing / contracted / revision_requested) -->
       <v-card v-if="canSubmitDraft" data-testid="assignment-draft-form">

@@ -17,6 +17,7 @@ use App\Modules\Campaigns\Models\CampaignPostedContent;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Creators\Enums\ContractStatus;
 use App\Modules\Creators\Enums\SocialPlatform;
+use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Http\Resources\ContractResource;
 use App\Modules\Creators\Models\Contract;
 use App\Modules\Creators\Models\Creator;
@@ -26,6 +27,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Laravel\Pennant\Feature;
 use RuntimeException;
 
 /**
@@ -127,6 +129,9 @@ final class CreatorAssignmentDraftController
                         ? (new ContractResource($contract))->resolve($request)
                         : null,
                 ],
+            ],
+            'meta' => [
+                'contract_signing_enabled' => Feature::active(ContractSigningEnabled::NAME),
             ],
         ]);
     }

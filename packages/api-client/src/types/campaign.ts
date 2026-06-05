@@ -382,6 +382,9 @@ export interface ContractResource {
 
 export interface CreatorAssignmentDetailResponse {
   data: CreatorAssignmentDetailResource
+  meta?: {
+    contract_signing_enabled: boolean
+  }
 }
 
 // ---------------------------------------------------------------------------
