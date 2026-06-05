@@ -45,15 +45,43 @@ it('seeds the Catalyst pilot agency, an agency_admin, and a super_admin', functi
     expect($profile->admin_role)->toBe(AdminRole::SuperAdmin);
 });
 
+it('seeds a second agency (Northwind) + its agency_admin for cross-tenant testing', function (): void {
+    $this->seed(Sprint1IdentitySeeder::class);
+
+    $northwind = Agency::query()->where('slug', 'northwind')->firstOrFail();
+    expect($northwind->name)->toBe('Northwind')
+        ->and($northwind->country_code)->toBe('GB');
+
+    $northwindAdmin = User::query()->where('email', 'admin@northwind.local')->firstOrFail();
+    expect($northwindAdmin->type->value)->toBe('agency_user')
+        ->and(Hash::check('password-12chars', $northwindAdmin->password))->toBeTrue()
+        ->and($northwindAdmin->email_verified_at)->not->toBeNull();
+
+    $membership = AgencyMembership::query()
+        ->where('agency_id', $northwind->id)
+        ->where('user_id', $northwindAdmin->id)
+        ->firstOrFail();
+    expect($membership->role)->toBe(AgencyRole::AgencyAdmin)
+        ->and($membership->isAccepted())->toBeTrue();
+
+    // The two tenants are distinct — the cross-tenant isolation the seed exists to exercise.
+    $catalyst = Agency::query()->where('slug', 'catalyst')->firstOrFail();
+    expect($northwind->id)->not->toBe($catalyst->id);
+});
+
 it('seeder is idempotent (safe to run twice)', function (): void {
     $this->seed(Sprint1IdentitySeeder::class);
     $this->seed(Sprint1IdentitySeeder::class);
 
+    // Two agencies (Catalyst + Northwind), each with one agency_admin membership.
     expect(Agency::query()->where('slug', 'catalyst')->count())->toBe(1)
+        ->and(Agency::query()->where('slug', 'northwind')->count())->toBe(1)
+        ->and(Agency::query()->count())->toBe(2)
         ->and(User::query()->where('email', 'admin@catalyst.local')->count())->toBe(1)
+        ->and(User::query()->where('email', 'admin@northwind.local')->count())->toBe(1)
         ->and(User::query()->where('email', 'super@catalyst-engine.local')->count())->toBe(1)
         ->and(AdminProfile::query()->count())->toBe(1)
-        ->and(AgencyMembership::query()->count())->toBe(1);
+        ->and(AgencyMembership::query()->count())->toBe(2);
 });
 
 it('seeder refuses to run outside local/testing', function (): void {

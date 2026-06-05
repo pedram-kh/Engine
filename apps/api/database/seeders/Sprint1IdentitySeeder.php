@@ -19,7 +19,10 @@ use RuntimeException;
  * Seeds the Phase 1 identity baseline:
  *
  *   - The Catalyst pilot agency (docs/20-PHASE-1-SPEC.md §1).
- *   - One agency_admin user attached to Catalyst.
+ *   - A second agency (Northwind) so cross-tenant isolation can be
+ *     exercised in local dev (agency A vs agency B — e.g. the Sprint 7
+ *     blacklist privacy invariant: A's blacklist is invisible to B).
+ *   - One agency_admin user attached to EACH agency.
  *   - One platform super_admin user.
  *
  * GUARDED to local + testing only. Refuses to run in any other
@@ -39,46 +42,25 @@ final class Sprint1IdentitySeeder extends Seeder
             );
         }
 
-        $catalyst = Agency::query()->updateOrCreate(
-            ['slug' => 'catalyst'],
-            [
-                'name' => 'Catalyst',
-                'country_code' => 'PT',
-                'default_currency' => 'EUR',
-                'default_language' => 'en',
-                'subscription_tier' => 'pilot',
-                'subscription_status' => 'active',
-                'settings' => [
-                    'blacklist_notification_default' => false,
-                    'escrow_funding_moment' => 'on_contract_sign',
-                ],
-                'is_active' => true,
-            ],
+        $this->seedAgencyWithAdmin(
+            slug: 'catalyst',
+            name: 'Catalyst',
+            countryCode: 'PT',
+            timezone: 'Europe/Lisbon',
+            adminEmail: 'admin@catalyst.local',
+            adminName: 'Catalyst Admin',
         );
 
-        $agencyAdmin = User::query()->updateOrCreate(
-            ['email' => 'admin@catalyst.local'],
-            [
-                'name' => 'Catalyst Admin',
-                'type' => UserType::AgencyUser,
-                'password' => Hash::make('password-12chars'),
-                'email_verified_at' => now(),
-                'preferred_language' => 'en',
-                'preferred_currency' => 'EUR',
-                'timezone' => 'Europe/Lisbon',
-                'mfa_required' => false,
-            ],
-        );
-
-        AgencyMembership::query()->updateOrCreate(
-            [
-                'agency_id' => $catalyst->id,
-                'user_id' => $agencyAdmin->id,
-            ],
-            [
-                'role' => AgencyRole::AgencyAdmin,
-                'accepted_at' => now(),
-            ],
+        // Second agency for cross-tenant testing (a distinct tenant from
+        // Catalyst — share a creator between the two to exercise the
+        // per-agency blacklist / discovery isolation invariants).
+        $this->seedAgencyWithAdmin(
+            slug: 'northwind',
+            name: 'Northwind',
+            countryCode: 'GB',
+            timezone: 'Europe/London',
+            adminEmail: 'admin@northwind.local',
+            adminName: 'Northwind Admin',
         );
 
         $superAdmin = User::query()->updateOrCreate(
@@ -98,6 +80,60 @@ final class Sprint1IdentitySeeder extends Seeder
         AdminProfile::query()->updateOrCreate(
             ['user_id' => $superAdmin->id],
             ['admin_role' => AdminRole::SuperAdmin],
+        );
+    }
+
+    /**
+     * Idempotently seed an agency + an agency_admin member attached to it.
+     */
+    private function seedAgencyWithAdmin(
+        string $slug,
+        string $name,
+        string $countryCode,
+        string $timezone,
+        string $adminEmail,
+        string $adminName,
+    ): void {
+        $agency = Agency::query()->updateOrCreate(
+            ['slug' => $slug],
+            [
+                'name' => $name,
+                'country_code' => $countryCode,
+                'default_currency' => 'EUR',
+                'default_language' => 'en',
+                'subscription_tier' => 'pilot',
+                'subscription_status' => 'active',
+                'settings' => [
+                    'blacklist_notification_default' => false,
+                    'escrow_funding_moment' => 'on_contract_sign',
+                ],
+                'is_active' => true,
+            ],
+        );
+
+        $admin = User::query()->updateOrCreate(
+            ['email' => $adminEmail],
+            [
+                'name' => $adminName,
+                'type' => UserType::AgencyUser,
+                'password' => Hash::make('password-12chars'),
+                'email_verified_at' => now(),
+                'preferred_language' => 'en',
+                'preferred_currency' => 'EUR',
+                'timezone' => $timezone,
+                'mfa_required' => false,
+            ],
+        );
+
+        AgencyMembership::query()->updateOrCreate(
+            [
+                'agency_id' => $agency->id,
+                'user_id' => $admin->id,
+            ],
+            [
+                'role' => AgencyRole::AgencyAdmin,
+                'accepted_at' => now(),
+            ],
         );
     }
 }
