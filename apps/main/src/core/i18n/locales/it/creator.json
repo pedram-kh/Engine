@@ -291,6 +291,62 @@
         "accept": "Accetta",
         "counter": "Controproponi",
         "decline": "Rifiuta",
+        "view": "Vedi",
+        "detail": {
+          "back": "Torna agli inviti",
+          "notFound": "Impossibile trovare questo incarico.",
+          "awaitingReview": "La tua bozza è stata inviata ed è in attesa di revisione dell'agenzia.",
+          "awaitingVerification": "Il tuo post è stato registrato ed è in attesa di verifica.",
+          "revision": {
+            "title": "Revisione richiesta",
+            "noFeedback": "L'agenzia ha richiesto modifiche. Reinvia una bozza aggiornata."
+          },
+          "draft": {
+            "submitTitle": "Invia la tua bozza",
+            "resubmitTitle": "Reinvia la tua bozza",
+            "caption": "Didascalia",
+            "hashtags": "Hashtag",
+            "hashtagsHint": "Separa con spazi o virgole",
+            "mentions": "Menzioni",
+            "mentionsHint": "Separa con spazi o virgole",
+            "media": "Media",
+            "submit": "Invia bozza",
+            "resubmit": "Reinvia bozza",
+            "mediaStatus": {
+              "uploading": "Caricamento…",
+              "done": "Caricato",
+              "error": "Caricamento non riuscito"
+            }
+          },
+          "posted": {
+            "title": "Segna come pubblicato",
+            "platform": "Piattaforma",
+            "url": "URL del post",
+            "submit": "Invia post",
+            "summaryTitle": "Contenuto pubblicato"
+          },
+          "history": {
+            "title": "Cronologia bozze",
+            "version": "Versione {n}"
+          },
+          "reviewStatus": {
+            "pending": "In attesa di revisione",
+            "approved": "Approvata",
+            "rejected": "Rifiutata",
+            "revision_requested": "Revisione richiesta"
+          },
+          "verificationStatus": {
+            "pending": "Verifica in attesa",
+            "verified": "Verificato",
+            "not_found": "Non trovato",
+            "mismatch": "Discrepanza"
+          },
+          "toast": {
+            "draftSubmitted": "Bozza inviata.",
+            "posted": "Post registrato.",
+            "error": "Qualcosa è andato storto. Riprova."
+          }
+        },
         "window": {
           "range": "{start} – {end}",
           "unset": "Date da confermare"

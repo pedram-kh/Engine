@@ -55,4 +55,58 @@ describe('creatorAssignmentsApi', () => {
       countered_fee_currency: 'EUR',
     })
   })
+
+  // ── Sprint 9 Chunk 1 — submission surface ──────────────────────────────────
+
+  it('GETs the assignment detail path (show)', () => {
+    void creatorAssignmentsApi.show('01ASSIGNMENT')
+    expect(mockHttp.get).toHaveBeenCalledWith('/creators/me/assignments/01ASSIGNMENT')
+  })
+
+  it('POSTs a draft to the drafts path', () => {
+    const payload = { caption: 'hi', hashtags: ['#ad'], mentions: null, media: [] }
+    void creatorAssignmentsApi.submitDraft('01ASSIGNMENT', payload)
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/creators/me/assignments/01ASSIGNMENT/drafts',
+      payload,
+    )
+  })
+
+  it('POSTs to the draft media init + complete paths', () => {
+    void creatorAssignmentsApi.initDraftMedia('01ASSIGNMENT', {
+      mime_type: 'video/mp4',
+      declared_bytes: 100,
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/creators/me/assignments/01ASSIGNMENT/drafts/media/init',
+      {
+        mime_type: 'video/mp4',
+        declared_bytes: 100,
+      },
+    )
+
+    void creatorAssignmentsApi.completeDraftMedia('01ASSIGNMENT', {
+      upload_id: 'creators/x/drafts/y.mp4',
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/creators/me/assignments/01ASSIGNMENT/drafts/media/complete',
+      {
+        upload_id: 'creators/x/drafts/y.mp4',
+      },
+    )
+  })
+
+  it('POSTs posted content to the posted-content path', () => {
+    void creatorAssignmentsApi.submitPostedContent('01ASSIGNMENT', {
+      platform: 'instagram',
+      post_url: 'https://instagram.com/p/x',
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/creators/me/assignments/01ASSIGNMENT/posted-content',
+      {
+        platform: 'instagram',
+        post_url: 'https://instagram.com/p/x',
+      },
+    )
+  })
 })

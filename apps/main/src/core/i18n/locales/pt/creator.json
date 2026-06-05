@@ -291,6 +291,62 @@
         "accept": "Aceitar",
         "counter": "Contrapropor",
         "decline": "Recusar",
+        "view": "Ver",
+        "detail": {
+          "back": "Voltar aos convites",
+          "notFound": "Não foi possível encontrar esta atribuição.",
+          "awaitingReview": "O seu rascunho foi enviado e aguarda revisão da agência.",
+          "awaitingVerification": "A sua publicação foi registada e aguarda verificação.",
+          "revision": {
+            "title": "Revisão solicitada",
+            "noFeedback": "A agência solicitou alterações. Reenvie um rascunho atualizado."
+          },
+          "draft": {
+            "submitTitle": "Enviar o seu rascunho",
+            "resubmitTitle": "Reenviar o seu rascunho",
+            "caption": "Legenda",
+            "hashtags": "Hashtags",
+            "hashtagsHint": "Separe com espaços ou vírgulas",
+            "mentions": "Menções",
+            "mentionsHint": "Separe com espaços ou vírgulas",
+            "media": "Multimédia",
+            "submit": "Enviar rascunho",
+            "resubmit": "Reenviar rascunho",
+            "mediaStatus": {
+              "uploading": "A carregar…",
+              "done": "Carregado",
+              "error": "Falha no carregamento"
+            }
+          },
+          "posted": {
+            "title": "Marcar como publicado",
+            "platform": "Plataforma",
+            "url": "URL da publicação",
+            "submit": "Enviar publicação",
+            "summaryTitle": "Conteúdo publicado"
+          },
+          "history": {
+            "title": "Histórico de rascunhos",
+            "version": "Versão {n}"
+          },
+          "reviewStatus": {
+            "pending": "Revisão pendente",
+            "approved": "Aprovado",
+            "rejected": "Rejeitado",
+            "revision_requested": "Revisão solicitada"
+          },
+          "verificationStatus": {
+            "pending": "Verificação pendente",
+            "verified": "Verificado",
+            "not_found": "Não encontrado",
+            "mismatch": "Incompatível"
+          },
+          "toast": {
+            "draftSubmitted": "Rascunho enviado.",
+            "posted": "Publicação registada.",
+            "error": "Algo correu mal. Tente novamente."
+          }
+        },
         "window": {
           "range": "{start} – {end}",
           "unset": "Datas a confirmar"

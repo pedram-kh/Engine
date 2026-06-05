@@ -279,3 +279,144 @@ export interface CounterAssignmentPayload {
   countered_fee_minor_units: number
   countered_fee_currency: string
 }
+
+// ---------------------------------------------------------------------------
+// Creator submission surface (Sprint 9 Chunk 1) — drafts + media + posted
+// ---------------------------------------------------------------------------
+
+/** Mirror of `DraftReviewStatus`. Chunk 1 only ever reads `pending`. */
+export type DraftReviewStatus = 'pending' | 'approved' | 'rejected' | 'revision_requested'
+
+/** Mirror of `PostedContentVerificationStatus`. Chunk 1 only reads `pending`. */
+export type PostedContentVerificationStatus = 'pending' | 'verified' | 'not_found' | 'mismatch'
+
+/** One media attachment on a draft, as returned by `CampaignDraftResource`. */
+export interface DraftMediaAttachment {
+  s3_path: string | null
+  mime_type: string | null
+  kind: string | null
+  thumbnail_path: string | null
+  duration_seconds: number | null
+  /** Presigned GET URL (null in tests / non-S3 disks). */
+  view_url: string | null
+  thumbnail_view_url: string | null
+}
+
+/** One `campaign_drafts` row (a single submission version). */
+export interface CampaignDraftResource {
+  id: string
+  type: 'campaign_draft'
+  attributes: {
+    version: number
+    submitted_at: string | null
+    caption: string | null
+    hashtags: string[] | null
+    mentions: string[] | null
+    media: DraftMediaAttachment[]
+    review_status: DraftReviewStatus
+    reviewed_at: string | null
+    review_feedback: string | null
+  }
+}
+
+/** One `campaign_posted_content` row (the self-reported post). */
+export interface CampaignPostedContentResource {
+  id: string
+  type: 'campaign_posted_content'
+  attributes: {
+    platform: string
+    post_url: string
+    platform_post_id: string | null
+    posted_at: string | null
+    verified_at: string | null
+    verification_status: PostedContentVerificationStatus
+  }
+}
+
+/** The per-assignment detail payload the creator detail route consumes (D-9). */
+export interface CreatorAssignmentDetailResource {
+  id: string
+  type: 'campaign_assignment'
+  attributes: {
+    status: AssignmentStatus
+    agreed_fee_minor_units: number | null
+    agreed_fee_currency: string | null
+    countered_fee_minor_units: number | null
+    countered_fee_currency: string | null
+    deliverables: string[] | null
+    posting_due_at: string | null
+    invited_at: string | null
+    submitted_draft_at: string | null
+    approved_at: string | null
+    posted_at: string | null
+    campaign: {
+      id: string
+      name: string
+      posting_window_starts_at: string | null
+      posting_window_ends_at: string | null
+      brand_name: string | null
+    } | null
+  }
+  relationships: {
+    drafts: CampaignDraftResource[]
+    posted_content: CampaignPostedContentResource[]
+  }
+}
+
+export interface CreatorAssignmentDetailResponse {
+  data: CreatorAssignmentDetailResource
+}
+
+/** One media item submitted with a draft (the SPA builds this post-upload). */
+export interface DraftMediaInput {
+  s3_path: string
+  mime_type: string
+  kind: 'image' | 'video'
+  thumbnail_path?: string | null
+  duration_seconds?: number | null
+}
+
+export interface SubmitDraftPayload {
+  caption?: string | null
+  hashtags?: string[] | null
+  mentions?: string[] | null
+  media: DraftMediaInput[]
+}
+
+export interface CreatorDraftSubmitResponse {
+  data: CampaignDraftResource
+  meta: { code: string }
+}
+
+export interface SubmitPostedContentPayload {
+  platform: string
+  post_url: string
+}
+
+export interface CreatorPostedContentResponse {
+  data: CampaignPostedContentResource
+  meta: { code: string }
+}
+
+export interface DraftMediaInitPayload {
+  mime_type: string
+  declared_bytes: number
+}
+
+export interface DraftMediaInitResponse {
+  data: {
+    upload_url: string
+    upload_id: string
+    storage_path: string
+    expires_at: string
+    max_bytes: number
+  }
+}
+
+export interface DraftMediaCompletePayload {
+  upload_id: string
+}
+
+export interface DraftMediaCompleteResponse {
+  data: { storage_path: string }
+}

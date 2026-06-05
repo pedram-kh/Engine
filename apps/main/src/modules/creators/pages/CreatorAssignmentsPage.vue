@@ -213,38 +213,48 @@ onMounted(() => {
           </v-list-item-subtitle>
 
           <template #append>
-            <div v-if="item.attributes.status === 'invited'" class="d-flex ga-2">
-              <v-btn
-                color="primary"
-                variant="flat"
-                size="small"
-                :loading="actioningId === item.id"
-                :disabled="actioningId !== null && actioningId !== item.id"
-                :data-testid="`creator-assignment-accept-${item.id}`"
-                @click="accept(item)"
-              >
-                {{ t('creator.ui.assignments.accept') }}
-              </v-btn>
-              <v-btn
-                variant="tonal"
-                size="small"
-                :loading="actioningId === item.id"
-                :disabled="actioningId !== null && actioningId !== item.id"
-                :data-testid="`creator-assignment-counter-${item.id}`"
-                @click="openCounter(item)"
-              >
-                {{ t('creator.ui.assignments.counter') }}
-              </v-btn>
+            <div class="d-flex ga-2 align-center">
               <v-btn
                 variant="text"
                 size="small"
-                :loading="actioningId === item.id"
-                :disabled="actioningId !== null && actioningId !== item.id"
-                :data-testid="`creator-assignment-decline-${item.id}`"
-                @click="decline(item)"
+                :to="{ name: 'creator.assignment.detail', params: { ulid: item.id } }"
+                :data-testid="`creator-assignment-view-${item.id}`"
               >
-                {{ t('creator.ui.assignments.decline') }}
+                {{ t('creator.ui.assignments.view') }}
               </v-btn>
+              <div v-if="item.attributes.status === 'invited'" class="d-flex ga-2">
+                <v-btn
+                  color="primary"
+                  variant="flat"
+                  size="small"
+                  :loading="actioningId === item.id"
+                  :disabled="actioningId !== null && actioningId !== item.id"
+                  :data-testid="`creator-assignment-accept-${item.id}`"
+                  @click="accept(item)"
+                >
+                  {{ t('creator.ui.assignments.accept') }}
+                </v-btn>
+                <v-btn
+                  variant="tonal"
+                  size="small"
+                  :loading="actioningId === item.id"
+                  :disabled="actioningId !== null && actioningId !== item.id"
+                  :data-testid="`creator-assignment-counter-${item.id}`"
+                  @click="openCounter(item)"
+                >
+                  {{ t('creator.ui.assignments.counter') }}
+                </v-btn>
+                <v-btn
+                  variant="text"
+                  size="small"
+                  :loading="actioningId === item.id"
+                  :disabled="actioningId !== null && actioningId !== item.id"
+                  :data-testid="`creator-assignment-decline-${item.id}`"
+                  @click="decline(item)"
+                >
+                  {{ t('creator.ui.assignments.decline') }}
+                </v-btn>
+              </div>
             </div>
           </template>
         </v-list-item>

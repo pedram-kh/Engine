@@ -291,6 +291,62 @@
         "accept": "Accept",
         "counter": "Counter",
         "decline": "Decline",
+        "view": "View",
+        "detail": {
+          "back": "Back to invitations",
+          "notFound": "This assignment could not be found.",
+          "awaitingReview": "Your draft has been submitted and is awaiting agency review.",
+          "awaitingVerification": "Your post has been recorded and is awaiting verification.",
+          "revision": {
+            "title": "Revision requested",
+            "noFeedback": "The agency has requested changes. Please resubmit an updated draft."
+          },
+          "draft": {
+            "submitTitle": "Submit your draft",
+            "resubmitTitle": "Resubmit your draft",
+            "caption": "Caption",
+            "hashtags": "Hashtags",
+            "hashtagsHint": "Separate with spaces or commas",
+            "mentions": "Mentions",
+            "mentionsHint": "Separate with spaces or commas",
+            "media": "Media",
+            "submit": "Submit draft",
+            "resubmit": "Resubmit draft",
+            "mediaStatus": {
+              "uploading": "Uploading…",
+              "done": "Uploaded",
+              "error": "Upload failed"
+            }
+          },
+          "posted": {
+            "title": "Mark as posted",
+            "platform": "Platform",
+            "url": "Post URL",
+            "submit": "Submit post",
+            "summaryTitle": "Posted content"
+          },
+          "history": {
+            "title": "Draft history",
+            "version": "Version {n}"
+          },
+          "reviewStatus": {
+            "pending": "Pending review",
+            "approved": "Approved",
+            "rejected": "Rejected",
+            "revision_requested": "Revision requested"
+          },
+          "verificationStatus": {
+            "pending": "Verification pending",
+            "verified": "Verified",
+            "not_found": "Not found",
+            "mismatch": "Mismatch"
+          },
+          "toast": {
+            "draftSubmitted": "Draft submitted.",
+            "posted": "Post recorded.",
+            "error": "Something went wrong. Please try again."
+          }
+        },
         "window": {
           "range": "{start} – {end}",
           "unset": "Dates TBC"

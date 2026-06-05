@@ -46,4 +46,16 @@ export const creatorsRoutes: RouteRecordRaw[] = [
       guards: ['requireAuth'],
     },
   },
+  {
+    // Sprint 9 Chunk 1 (D-9) — the per-assignment detail + submission surface
+    // (draft submit/resubmit + posted content). The flat list links here; this
+    // is the home for draft history + state-dependent (fail-closed) actions.
+    path: '/creator/assignments/:ulid',
+    name: 'creator.assignment.detail',
+    component: () => import('./pages/CreatorAssignmentDetailPage.vue'),
+    meta: {
+      layout: 'creator',
+      guards: ['requireAuth'],
+    },
+  },
 ]
