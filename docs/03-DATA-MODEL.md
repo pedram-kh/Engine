@@ -947,30 +947,62 @@ When an admin impersonates a user for support.
 
 ## 14. Notifications
 
-### `notifications` (Laravel default + extended)
+> **Implemented in S11.0 (notification subsystem mini-sprint), Chunk 1.** This
+> is a tech-debt-resolution mini-sprint — not a numbered spec sprint — that
+> closes the three deferred notification entries in
+> [`tech-debt.md`](tech-debt.md). The subsystem is a **custom** pair of
+> tables (NOT Laravel's stock `database` notification channel): the stock channel
+> stores `type` as a class FQCN and everything else in an opaque blob — no actor
+> column, no indexable type, no clean per-type query. The shapes below are the
+> built schema (`App\Modules\Notifications`). Laravel's `Notifiable` trait was
+> removed from `User` (it was scaffold dead code; this subsystem supersedes it).
 
-Standard Laravel notifications table extended for in-app notification center.
+### `notifications`
 
-| Column                     | Type             | Notes                    | Phase |
-| -------------------------- | ---------------- | ------------------------ | ----- |
-| `id`                       | char(36) PK      | UUID per Laravel default | P1    |
-| `type`                     | varchar(255)     | Notification class name  | P1    |
-| `notifiable_type`          | varchar(255)     |                          | P1    |
-| `notifiable_id`            | bigint           |                          | P1    |
-| `data`                     | jsonb            |                          | P1    |
-| `read_at`                  | timestamptz null |                          | P1    |
-| `created_at`, `updated_at` | timestamptz      |                          | P1    |
+In-app notification addressed to a single User. User-level, **above tenancy**
+(no `agency_id`; isolation is `recipient_user_id = auth user`). Append-then-
+mark-read: `created_at` only, no `updated_at` (mirrors `audit_logs`).
 
-### `notification_preferences`
+| Column              | Type             | Notes                                                                        | Phase |
+| ------------------- | ---------------- | ---------------------------------------------------------------------------- | ----- |
+| `id`                | bigint PK        |                                                                              | P1    |
+| `ulid`              | char(26) unique  | Public identifier exposed in the API                                         | P1    |
+| `recipient_user_id` | bigint FK        | `users.id`, RESTRICT (anchors the recipient; erasure is an explicit concern) | P1    |
+| `actor_user_id`     | bigint FK null   | `users.id`, nullOnDelete. NULL for system notifications (audit precedent)    | P1    |
+| `subject_type`      | varchar(64) null | Polymorphic subject (manual pair, no FK) — the assignment/creator/message    | P1    |
+| `subject_id`        | bigint null      |                                                                              | P1    |
+| `type`              | varchar(64)      | The `NotificationType` enum value (shares the `AuditAction` vocabulary)      | P1    |
+| `data`              | jsonb null       | Render params only (e.g. `{campaign_name, ...}`) — NEVER localized text      | P1    |
+| `read_at`           | timestamptz null | The sole post-insert mutation                                                | P1    |
+| `created_at`        | timestamptz      |                                                                              | P1    |
 
-| Column                     | Type                 | Notes                          | Phase |
-| -------------------------- | -------------------- | ------------------------------ | ----- |
-| `id`                       | bigint PK            |                                | P1    |
-| `user_id`                  | bigint FK            | `users.id`, CASCADE            | P1    |
-| `channel`                  | varchar(16)          | `email`, `in_app`, `push` (P2) | P1    |
-| `event_key`                | varchar(64)          |                                | P1    |
-| `is_enabled`               | boolean default true |                                | P1    |
-| `created_at`, `updated_at` | timestamptz          |                                | P1    |
+**Indexes:**
+
+- `idx_notifications_recipient_unread` on `(recipient_user_id, read_at)` — unread-count
+- `idx_notifications_recipient_feed` on `(recipient_user_id, created_at)` — feed
+- `idx_notifications_subject` on `(subject_type, subject_id)`
+
+### `user_notification_preferences`
+
+Per-user × per-type × per-channel opt-out toggle. User-global (no `agency_id`).
+Default resolution is **computed, not seeded** (preserve-current): a missing row
+resolves to `in_app=on, email=on, digest=off`, so the retrofit can never silently
+disable an existing email. The `digest` channel is present-but-unconsumed (the
+Messaging sprint is its first consumer). The model name is
+`NotificationPreference`; the `type` column is the spec's `event_key`.
+
+| Column                     | Type                 | Notes                                             | Phase |
+| -------------------------- | -------------------- | ------------------------------------------------- | ----- |
+| `id`                       | bigint PK            |                                                   | P1    |
+| `user_id`                  | bigint FK            | `users.id`, CASCADE                               | P1    |
+| `type`                     | varchar(64)          | The `NotificationType` value (a.k.a. `event_key`) | P1    |
+| `channel`                  | varchar(16)          | `in_app`, `email`, `digest`                       | P1    |
+| `is_enabled`               | boolean default true | DB default true; per-channel default is app-layer | P1    |
+| `created_at`, `updated_at` | timestamptz          |                                                   | P1    |
+
+**Indexes:**
+
+- `unique_user_notification_pref` unique on `(user_id, type, channel)` — the upsert key
 
 ---
 

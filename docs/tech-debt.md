@@ -17,7 +17,7 @@ anyone reviewing it later.
 - **Triggered by:** the chunk that builds a **real notification subsystem** (in-app notification center + a `notifications` table + the push/email fan-out) — agency-notified-on-response is one of its first consumers. Until that lands, adding a one-off accept/decline mailable would be a second bespoke email path that the subsystem would immediately subsume.
 - **Resolution:** when the notification subsystem ships, emit an agency-facing notification on `accept`/`decline` (and migrate the send-request email onto the same fan-out so there is one notification spine, not a scatter of bespoke mailables).
 - **Owner:** the future notification-subsystem workstream.
-- **Status:** open. Surfaced + deliberately deferred by Sprint 6.6b, June 3, 2026 ([review](reviews/sprint-6-6b-review.md)).
+- **Status:** in-progress (S11.0 — notification subsystem mini-sprint). Chunk 1 (June 6, 2026) built the spine the resolution depends on: the custom `notifications` table, `NotificationType` vocabulary, per-user preferences, and the `NotificationService` emit seam. The accept/decline emitter + migrating the send-request email onto this spine land in **Chunk 2** (the retrofit + fan-out chunk); full closure is Chunk 2. Surfaced + deliberately deferred by Sprint 6.6b, June 3, 2026 ([review](reviews/sprint-6-6b-review.md)).
 
 ---
 
@@ -29,7 +29,7 @@ anyone reviewing it later.
 - **Triggered by:** the real notification subsystem (same trigger as the entry above) or the first agency that needs multiple operators to see review/verification events.
 - **Resolution:** fan agency-facing notifications out to an agency-wide inbox/role when the notification subsystem lands (migrate these mailables onto the same spine).
 - **Owner:** the future notification-subsystem workstream.
-- **Status:** open. Surfaced + deliberately deferred by Sprint 9 Chunk 2, June 5, 2026 ([review](reviews/sprint-9-chunk-2-review.md)).
+- **Status:** in-progress (S11.0 — notification subsystem mini-sprint). Chunk 1 (June 6, 2026) built the subsystem core (custom `notifications` table + `NotificationService` emit seam) and wired the draft-reviewed → creator path as the single proof consumer. The agency-role **fan-out** query (admins + managers, replacing `invited_by_user_id`) is applied in **Chunk 2** (the retrofit + fan-out chunk); full closure is Chunk 2. Surfaced + deliberately deferred by Sprint 9 Chunk 2, June 5, 2026 ([review](reviews/sprint-9-chunk-2-review.md)).
 
 ---
 
@@ -948,7 +948,7 @@ anyone reviewing it later.
 - **Resolution:** when a real notification subsystem is needed, design it as a first-class primitive — a `notifications` table (polymorphic subject + actor + read_at + type), a backend dispatch seam that the approve/reject/verify actions (and future emitters) write to, a SPA inbox/badge surface, and the i18n + architecture-test parity the other surfaces carry. Migrate the dashboard banner to read from it rather than from `application_status` directly.
 - **Triggered by:** the first product requirement for an in-app notification beyond the application-outcome banner (e.g. brand messaging, campaign invites), OR a deliberate notifications-subsystem chunk.
 - **Owner:** open (post-Phase-1 / notifications chunk).
-- **Status:** open (deferred by design). Surfaced + accepted by Sprint 4 Chunk 3, 2026-06-02.
+- **Status:** in-progress (S11.0 — notification subsystem mini-sprint). Chunk 1 (June 6, 2026) built the first-class primitive this resolution called for: the `notifications` table (polymorphic subject + nullable actor + `read_at` + indexable `type`), the `NotificationService` dispatch seam, the per-user `/me/notifications` feed + unread-count + mark-read endpoints, and per-user preferences — see [`03-DATA-MODEL.md`](03-DATA-MODEL.md) §14. The remaining emitters (the funnel events + controller/job sites), the approve/reject **dashboard-banner migration** to read notifications, and the SPA inbox/badge + i18n land in **Chunks 2–3**; full closure is Chunk 3. Surfaced + accepted by Sprint 4 Chunk 3, 2026-06-02.
 
 ---
 

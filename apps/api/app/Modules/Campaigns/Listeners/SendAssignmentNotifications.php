@@ -15,6 +15,8 @@ use App\Modules\Campaigns\Mail\PostManuallyVerifiedMail;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
 use App\Modules\Identity\Models\User;
+use App\Modules\Notifications\Enums\NotificationType;
+use App\Modules\Notifications\Services\NotificationService;
 use Illuminate\Support\Facades\Mail;
 
 /**
@@ -38,9 +40,17 @@ use Illuminate\Support\Facades\Mail;
  * Draft-submitted notification lives here (not in Chunk 1's creator submit
  * endpoint) so Chunk 1 stays untouched — it is review-adjacent and belongs to
  * the review chunk (D-14).
+ *
+ * S11.0 Chunk 1 (D-10): this listener is the notification subsystem's PROOF
+ * consumer. The draft-reviewed → creator path additionally emits an IN-APP
+ * notification via {@see NotificationService::notify()} — ALONGSIDE the
+ * untouched email, never instead of it. This is the only emit site wired this
+ * chunk; the remaining funnel events + fan-out are Ch2.
  */
 final class SendAssignmentNotifications
 {
+    public function __construct(private readonly NotificationService $notifications) {}
+
     public function handle(AssignmentTransitioned $event): void
     {
         $assignment = $event->assignment;
@@ -119,14 +129,15 @@ final class SendAssignmentNotifications
         // The reviewer feedback (revision / reject) is persisted on the draft's
         // review trail by the controller in the same transaction (before the
         // machine drove the transition), so the latest draft already carries it
-        // here. Approvals carry none.
-        $feedback = null;
-        if ($outcome !== 'approved') {
-            $feedback = CampaignDraft::query()
-                ->where('assignment_id', $assignment->id)
-                ->orderByDesc('version')
-                ->value('review_feedback');
-        }
+        // here. Approvals carry none. The same row records the reviewer
+        // (reviewed_by_user_id) — the in-app notification's actor.
+        $latestDraft = CampaignDraft::query()
+            ->where('assignment_id', $assignment->id)
+            ->orderByDesc('version')
+            ->first(['review_feedback', 'reviewed_by_user_id']);
+
+        $rawFeedback = $outcome === 'approved' ? null : $latestDraft?->review_feedback;
+        $feedback = is_string($rawFeedback) && $rawFeedback !== '' ? $rawFeedback : null;
 
         Mail::to($recipient->email)
             ->locale($recipient->preferred_language ?: 'en')
@@ -134,9 +145,43 @@ final class SendAssignmentNotifications
                 creatorName: $creator->display_name ?? $recipient->name,
                 campaignName: $campaign->name,
                 outcome: $outcome,
-                feedback: is_string($feedback) && $feedback !== '' ? $feedback : null,
+                feedback: $feedback,
                 assignmentUlid: $assignment->ulid,
             ));
+
+        // S11.0 Chunk 1 (D-10) — the proof consumer. In-app emission rides
+        // alongside the email above; NotificationService reads the recipient's
+        // in_app preference and writes a row only when enabled. `data` carries
+        // render params only (the body renders client-side in Ch3).
+        $reviewer = $latestDraft?->reviewed_by_user_id !== null
+            ? User::find($latestDraft->reviewed_by_user_id)
+            : null;
+
+        $this->notifications->notify(
+            recipient: $recipient,
+            type: $this->reviewNotificationType($outcome),
+            subject: $assignment,
+            actor: $reviewer,
+            data: [
+                'campaign_name' => $campaign->name,
+                'creator_name' => $creator->display_name ?? $recipient->name,
+                'outcome' => $outcome,
+                'feedback' => $feedback,
+                'assignment_ulid' => $assignment->ulid,
+            ],
+        );
+    }
+
+    /**
+     * @param  'approved'|'revision_requested'|'rejected'  $outcome
+     */
+    private function reviewNotificationType(string $outcome): NotificationType
+    {
+        return match ($outcome) {
+            'approved' => NotificationType::AssignmentDraftApproved,
+            'revision_requested' => NotificationType::AssignmentRevisionRequested,
+            'rejected' => NotificationType::AssignmentDraftRejected,
+        };
     }
 
     private function notifyAgencyOfContractAcceptance(CampaignAssignment $assignment): void

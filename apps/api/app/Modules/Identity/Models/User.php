@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 
 /**
@@ -57,8 +56,15 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
     use HasFactory;
 
     use HasUlid;
-    use Notifiable;
     use SoftDeletes;
+
+    // Laravel's Notifiable trait was removed in S11.0 Chunk 1 (D-11) under the
+    // reasoned-removal discipline (PROJECT-WORKFLOW.md §5.8). It was scaffold
+    // dead code — the app has never used Laravel's notification channels (no
+    // app/Notifications, zero ->notify() calls). The custom notification
+    // subsystem (App\Modules\Notifications) supersedes it: emit via
+    // NotificationService, store in the `notifications` table. Re-adding
+    // Notifiable would be an intentional decision to adopt Laravel channels.
 
     /**
      * @var list<string>
