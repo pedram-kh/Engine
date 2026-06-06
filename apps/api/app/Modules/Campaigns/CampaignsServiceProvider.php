@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Campaigns;
 
+use App\Modules\Boards\Listeners\BoardAutomationListener;
 use App\Modules\Boards\Listeners\CreateBoardCard;
 use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Listeners\CreateAssignmentAvailabilityBlock;
@@ -63,14 +64,15 @@ final class CampaignsServiceProvider extends ServiceProvider
         // messages write even on terminal events (D-13).
         Event::listen(AssignmentTransitioned::class, [WriteSystemMessage::class, 'handle']);
 
-        // Sprint 12 Chunk 1 (D-5): the 6th consumer provisions the board card on
-        // invite. Idempotent (firstOrCreate on the board_cards.assignment_id
-        // UNIQUE); the lazy board GET heals any pre-existing card-less assignment,
-        // so no backfill migration is needed. ORDER IS LOCKED (D-7) — this
-        // registers BEFORE BoardAutomationListener (added next) so the card
-        // exists before the `invited → Invited` automation runs off the same
-        // event.
+        // Sprint 12 Chunk 1 (D-5/D-6): the board consumers. ORDER IS LOCKED
+        // (D-7) — CreateBoardCard (6th) provisions the card on invite BEFORE
+        // BoardAutomationListener (7th) runs the `invited → Invited` automation
+        // off the same event. The automation is ALSO a no-op on a missing card
+        // (belt + suspenders), so the move can never be dropped by a slip here.
+        // BoardAutomationListener binds to the AssignmentEventContract and
+        // switches on eventKey() — no dedicated per-event classes (D-6).
         Event::listen(AssignmentTransitioned::class, [CreateBoardCard::class, 'handle']);
+        Event::listen(AssignmentTransitioned::class, [BoardAutomationListener::class, 'handle']);
     }
 
     private function registerRoutes(): void
