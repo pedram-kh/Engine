@@ -24,10 +24,15 @@ use App\Modules\Audit\Enums\AuditAction;
  * Deliberately EXCLUDED as internal / non-notification transitions:
  * `assignment.re_invited`, `assignment.producing`, `assignment.posted_by_creator`,
  * `assignment.live_verified`, `assignment.resubmit_requested(_in_place)`,
- * `assignment.posted_content_updated`. Connection / creator-lifecycle verbs
- * (`creator.invited` / `.approved` / `.rejected`, connection accept/decline)
- * are added by Ch2 when it wires those emitters — the tripwire makes each a
- * one-line decision.
+ * `assignment.posted_content_updated`.
+ *
+ * Ch2 (S11.0) un-curates the two creator-lifecycle verbs whose AuditAction
+ * value already exists (`creator.approved` / `creator.rejected`) so the admin
+ * approve/reject sites emit in-app. The remaining lifecycle / connection verbs
+ * (`creator.invited`, `creator.blacklisted`, connection accept/decline) stay
+ * deferred: each needs a NET-NEW AuditAction verb (or, for blacklist, is
+ * deliberately email-only — an unsolicited in-app notice of one's own
+ * blacklisting is counterproductive), tracked in docs/tech-debt.md.
  *
  * The body text is NEVER stored here or on the row — it renders client-side
  * (Ch3) from `type` + the notification's `data` payload.
@@ -51,6 +56,12 @@ enum NotificationType: string
     // Forward payment verbs (deferred-S10 escrow alerts — drop-in, D-5).
     case AssignmentPaymentFunded = 'assignment.payment_funded';
     case AssignmentPaymentReleased = 'assignment.payment_released';
+
+    // Creator lifecycle (S11.0 Chunk 2, D-4). The admin approve/reject sites
+    // emit in-app alongside their untouched mailables. Both values already exist
+    // in AuditAction — clean enum-adds, no new vocabulary.
+    case CreatorApproved = 'creator.approved';
+    case CreatorRejected = 'creator.rejected';
 
     /**
      * The AuditAction this notification type mirrors. Proves the one-vocabulary

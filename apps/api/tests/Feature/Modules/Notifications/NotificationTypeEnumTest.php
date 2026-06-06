@@ -14,7 +14,7 @@ uses(TestCase::class);
  * AuditAction vocabulary; adding or removing a case must be a deliberate edit
  * that updates this hardcoded list, never an accidental drift.
  */
-it('NotificationType catalogue lists exactly the curated S11.0 Chunk 1 membership', function (): void {
+it('NotificationType catalogue lists exactly the curated membership', function (): void {
     $expected = [
         // Assignment lifecycle (creator + agency facing).
         'assignment.invited',
@@ -31,6 +31,9 @@ it('NotificationType catalogue lists exactly the curated S11.0 Chunk 1 membershi
         // Forward payment verbs — deferred-S10 escrow alerts drop-in.
         'assignment.payment_funded',
         'assignment.payment_released',
+        // Creator lifecycle (S11.0 Chunk 2) — admin approve/reject in-app.
+        'creator.approved',
+        'creator.rejected',
     ];
 
     $actual = array_map(fn (NotificationType $case): string => $case->value, NotificationType::cases());
@@ -38,7 +41,7 @@ it('NotificationType catalogue lists exactly the curated S11.0 Chunk 1 membershi
     sort($expected);
     sort($actual);
 
-    expect($actual)->toBe($expected, 'NotificationType enum drifted from the S11.0 Chunk 1 catalogue.');
+    expect($actual)->toBe($expected, 'NotificationType enum drifted from the curated catalogue.');
 });
 
 it('every NotificationType value is a live AuditAction value (one-vocabulary discipline)', function (): void {

@@ -6,13 +6,16 @@ namespace App\Modules\Agencies\Models;
 
 use App\Core\Concerns\HasUlid;
 use App\Modules\Agencies\Database\Factories\AgencyFactory;
+use App\Modules\Agencies\Enums\AgencyRole;
 use App\Modules\Identity\Models\User;
+use App\Modules\Notifications\Services\NotificationService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 /**
  * @property int $id
@@ -87,6 +90,36 @@ final class Agency extends Model
     public function memberships(): HasMany
     {
         return $this->hasMany(AgencyMembership::class);
+    }
+
+    /**
+     * The agency users who should receive agency-facing notifications
+     * (S11.0 Chunk 2, D-5) — the admins + managers fan-out target that
+     * replaces the single `invited_by_user_id` recipient. Staff are
+     * EXCLUDED (the load-bearing exclusion); the inviter is one recipient
+     * among the others, not specially flagged.
+     *
+     * Resolved through {@see self::memberships()} (a soft-delete-aware
+     * `agency_users` Pivot, NOT BelongsToAgency — no tenant scope, so this
+     * is safe to call from a queued listener without `runAs`, D-9). Deduped
+     * by user id and returns hydrated {@see User} models ready for
+     * {@see NotificationService::notify()}.
+     *
+     * @return Collection<int, User>
+     */
+    public function notifiableMembers(): Collection
+    {
+        return $this->memberships()
+            ->whereIn('role', [
+                AgencyRole::AgencyAdmin->value,
+                AgencyRole::AgencyManager->value,
+            ])
+            ->with('user')
+            ->get()
+            ->map(static fn (AgencyMembership $membership): ?User => $membership->user)
+            ->filter()
+            ->unique(static fn (User $user): int => $user->getKey())
+            ->values();
     }
 
     /**
