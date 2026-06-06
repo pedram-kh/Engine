@@ -10,11 +10,14 @@
  * in one locale can't silently ship a render that falls back to English — or,
  * worse, throws a missing-key warning — in another.
  *
- * It additionally pins the "only the 8 live types are templated + one generic
- * fallback" invariant (D-6): `notifications.types` must contain EXACTLY the 8
+ * It additionally pins the "only the live types are templated + one generic
+ * fallback" invariant (D-6): `notifications.types` must contain EXACTLY the
  * live-emit-site templates plus `fallback`, and the FE template-key map
- * (`notificationTemplateKey`) must agree. The 7 emit-less / forward-declared
+ * (`notificationTemplateKey`) must agree. The emit-less / forward-declared
  * types get NO bespoke template by design — they ride the fallback.
+ *
+ * Sprint 11 (D-7): the two dual-recipient messaging types each gained a live
+ * emit site (SendMessageNotifications), so the live-set grew 8 → 10.
  */
 
 import { promises as fs } from 'node:fs'
@@ -31,7 +34,7 @@ import {
 const LOCALE_ROOT = path.resolve(__dirname, '../../../src/core/i18n/locales')
 const LOCALES = ['en', 'pt', 'it'] as const
 
-/** The 8 notification types with a live emit site (Ch1/Ch2 reviews). */
+/** The 10 notification types with a live emit site (Ch1/Ch2 + Sprint 11 messaging). */
 const LIVE_TYPES = [
   'assignment.draft_approved',
   'assignment.revision_requested',
@@ -41,6 +44,8 @@ const LIVE_TYPES = [
   'assignment.contracted',
   'creator.approved',
   'creator.rejected',
+  'message.received_by_creator',
+  'message.received_by_agency',
 ] as const
 
 /** Emit-less / forward-declared types that MUST route to the fallback. */
@@ -95,7 +100,7 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
     expect(itKeys).toEqual(enKeys)
   })
 
-  it('notifications.types holds EXACTLY the 8 live templates + fallback', async () => {
+  it('notifications.types holds EXACTLY the 10 live templates + fallback', async () => {
     const en = await loadBundle('en')
     const typeKeys = Object.keys(en.notifications.types).sort()
 
@@ -109,6 +114,8 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
       'creator_approved',
       'creator_rejected',
       'fallback',
+      'message_received_by_agency',
+      'message_received_by_creator',
     ]
     expect(typeKeys).toEqual(expected)
   })
@@ -151,14 +158,14 @@ describe('notifications prefs role-partition — single live-set source of truth
   const creatorTypes = preferenceGroupsForRole('creator').flatMap((g) => g.types)
   const agencyTypes = preferenceGroupsForRole('agency').flatMap((g) => g.types)
 
-  it('creator + agency prefs types partition the 8 live types exactly (disjoint, complete)', () => {
+  it('creator + agency prefs types partition the 10 live types exactly (disjoint, complete)', () => {
     // Disjoint — no type is offered to both roles.
     expect(creatorTypes.filter((t) => agencyTypes.includes(t))).toEqual([])
     // Complete — together they are exactly the LIVE_TYPES set.
     expect([...creatorTypes, ...agencyTypes].sort()).toEqual([...LIVE_TYPES].sort())
   })
 
-  it('the known role split is honest (creator = 6 review/lifecycle, agency = 2 fan-out)', () => {
+  it('the known role split is honest (creator = 7 review/lifecycle/messaging, agency = 3 fan-out/messaging)', () => {
     expect([...creatorTypes].sort()).toEqual(
       [
         'assignment.draft_approved',
@@ -167,9 +174,12 @@ describe('notifications prefs role-partition — single live-set source of truth
         'assignment.revision_requested',
         'creator.approved',
         'creator.rejected',
+        'message.received_by_creator',
       ].sort(),
     )
-    expect([...agencyTypes].sort()).toEqual(['assignment.contracted', 'assignment.draft_submitted'])
+    expect([...agencyTypes].sort()).toEqual(
+      ['assignment.contracted', 'assignment.draft_submitted', 'message.received_by_agency'].sort(),
+    )
   })
 
   it('every prefs-exposed type has a bespoke (non-fallback) template — no drift from Ch3a', () => {

@@ -89,39 +89,52 @@ describe('NotificationPreferencesPage', () => {
     wrapper.unmount()
   })
 
-  it('role filter — a CREATOR sees only the 6 creator-facing types (2 groups)', async () => {
+  it('role filter — a CREATOR sees only the 7 creator-facing types (3 groups)', async () => {
     vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
     const wrapper = mountPage('creator')
     await flushPromises()
 
     const toggles = wrapper.findAll('[data-test^="prefs-toggle-"]')
-    expect(toggles).toHaveLength(6)
-    // Both groups present (4 assignment + 2 creator).
+    expect(toggles).toHaveLength(7)
+    // All three groups present (4 assignment + 2 creator + 1 messaging).
     expect(wrapper.find('[data-test="prefs-group-assignment"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="prefs-group-creator"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="prefs-group-messaging"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="prefs-toggle-message.received_by_creator"]').exists()).toBe(
+      true,
+    )
     // The agency-only types are NOT offered to a creator (no dead control).
     expect(wrapper.find('[data-test="prefs-toggle-assignment.draft_submitted"]').exists()).toBe(
       false,
     )
     expect(wrapper.find('[data-test="prefs-toggle-assignment.contracted"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="prefs-toggle-message.received_by_agency"]').exists()).toBe(
+      false,
+    )
     expect(wrapper.find('[data-test="prefs-toggle-creator.approved"]').exists()).toBe(true)
     wrapper.unmount()
   })
 
-  it('role filter — an AGENCY user sees only the 2 agency-facing types (assignment group)', async () => {
+  it('role filter — an AGENCY user sees only the 3 agency-facing types (assignment + messaging)', async () => {
     vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
     const wrapper = mountPage('agency_user')
     await flushPromises()
 
     const toggles = wrapper.findAll('[data-test^="prefs-toggle-"]')
-    expect(toggles).toHaveLength(2)
+    expect(toggles).toHaveLength(3)
     expect(wrapper.find('[data-test="prefs-toggle-assignment.draft_submitted"]').exists()).toBe(
       true,
     )
     expect(wrapper.find('[data-test="prefs-toggle-assignment.contracted"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="prefs-toggle-message.received_by_agency"]').exists()).toBe(
+      true,
+    )
     // No creator-facing toggles, and the creator group header is absent.
     expect(wrapper.find('[data-test="prefs-toggle-creator.approved"]').exists()).toBe(false)
     expect(wrapper.find('[data-test="prefs-group-creator"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="prefs-toggle-message.received_by_creator"]').exists()).toBe(
+      false,
+    )
     wrapper.unmount()
   })
 
@@ -143,8 +156,8 @@ describe('NotificationPreferencesPage', () => {
 
     expect(notificationsApi.updatePreferences).toHaveBeenCalledTimes(1)
     const payload = vi.mocked(notificationsApi.updatePreferences).mock.calls[0]?.[0]
-    // A creator submits exactly their 6 role-filtered toggles (not the full 8).
-    expect(payload?.preferences).toHaveLength(6)
+    // A creator submits exactly their 7 role-filtered toggles (not the full 10).
+    expect(payload?.preferences).toHaveLength(7)
     // Every row is in_app (the only exposed channel).
     expect(payload?.preferences.every((p) => p.channel === 'in_app')).toBe(true)
     // The flipped toggle rides as false; an untouched one stays true.

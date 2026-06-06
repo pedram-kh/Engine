@@ -3,8 +3,9 @@
  * property that depends on a type having a live emit site (S11.0 Ch3a + Ch3b).
  *
  * The body text is never on the wire — it renders client-side from
- * `notification_type` + the row's `data` bag. Only the 8 notification types with
- * a LIVE emit site (Ch1/Ch2) are defined here; everything else — the
+ * `notification_type` + the row's `data` bag. Only the notification types with
+ * a LIVE emit site (Ch1/Ch2 + Sprint 11 messaging) are defined here; everything
+ * else — the
  * forward-declared deferred-S10 payment verbs, the lifecycle verbs still
  * awaiting an emitter, AND any string the backend might send that the FE union
  * doesn't even know about — resolves to the generic `fallback` template and is
@@ -37,7 +38,7 @@ const FALLBACK_KEY = 'notifications.types.fallback'
 export type NotificationRecipientRole = 'creator' | 'agency'
 
 /** The Ch3b prefs-UI category a live type is grouped under. */
-export type NotificationPreferenceGroup = 'assignment' | 'creator'
+export type NotificationPreferenceGroup = 'assignment' | 'creator' | 'messaging'
 
 interface LiveNotificationType {
   /** Flat i18n key under `notifications.types.*` (the Ch3a body template). */
@@ -96,6 +97,20 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
     recipient: 'creator',
     group: 'creator',
   },
+  // Messaging (Sprint 11, D-7) — dual-recipient new-message notifications. Each
+  // direction targets exactly one role, so each gets its own toggle (no dead
+  // control). by_creator → the creator receives (agency sent); by_agency → the
+  // agency receives (creator sent).
+  'message.received_by_creator': {
+    templateKey: 'notifications.types.message_received_by_creator',
+    recipient: 'creator',
+    group: 'messaging',
+  },
+  'message.received_by_agency': {
+    templateKey: 'notifications.types.message_received_by_agency',
+    recipient: 'agency',
+    group: 'messaging',
+  },
 }
 
 /**
@@ -126,7 +141,11 @@ export interface NotificationPreferenceGroupView {
 }
 
 /** Stable display order of the prefs groups. */
-const PREFERENCE_GROUP_ORDER: readonly NotificationPreferenceGroup[] = ['assignment', 'creator']
+const PREFERENCE_GROUP_ORDER: readonly NotificationPreferenceGroup[] = [
+  'assignment',
+  'creator',
+  'messaging',
+]
 
 /**
  * The prefs toggles a given recipient role can meaningfully set — only the live

@@ -24,6 +24,8 @@
       "assignment_contracted": "{creator_name} aceitou o contrato para {campaign_name}.",
       "creator_approved": "A sua conta de criador foi aprovada.",
       "creator_rejected": "A sua candidatura de criador não foi aprovada.",
+      "message_received_by_creator": "{sender_name} enviou-lhe uma mensagem sobre {campaign_name}.",
+      "message_received_by_agency": "{sender_name} enviou uma mensagem sobre {campaign_name}.",
       "fallback": "Tem uma nova notificação."
     },
     "preferences": {
@@ -37,7 +39,8 @@
       "saveError": "Não foi possível guardar as suas definições de notificações. Tente novamente.",
       "groups": {
         "assignment": "Atribuições",
-        "creator": "Conta de criador"
+        "creator": "Conta de criador",
+        "messaging": "Mensagens"
       },
       "typeLabels": {
         "assignment_draft_submitted": "Um rascunho é enviado para revisão",
@@ -47,7 +50,9 @@
         "assignment_draft_rejected": "Um rascunho é rejeitado",
         "assignment_manually_verified": "Uma publicação é verificada",
         "creator_approved": "Uma conta de criador é aprovada",
-        "creator_rejected": "Uma candidatura de criador é recusada"
+        "creator_rejected": "Uma candidatura de criador é recusada",
+        "message_received_by_creator": "Uma nova mensagem da agência",
+        "message_received_by_agency": "Uma nova mensagem do criador"
       }
     }
   }

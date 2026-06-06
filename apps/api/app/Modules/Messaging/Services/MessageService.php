@@ -32,6 +32,8 @@ final class MessageService
 {
     public const int DEFAULT_PAGE_SIZE = 50;
 
+    public function __construct(private readonly SendMessageNotifications $messageNotifications) {}
+
     /**
      * Send a human message (text or attachment-only). Terminal-guarded: a send
      * on a declined/rejected/cancelled assignment throws
@@ -66,6 +68,10 @@ final class MessageService
         $message->save();
 
         $thread->forceFill(['last_message_at' => $message->created_at])->save();
+
+        // Emit the counterparty in-app notification THROUGH NotificationService
+        // (D-7) — both surfaces notify identically because the emit lives here.
+        $this->messageNotifications->dispatch($thread, $message, $sender);
 
         return $message;
     }

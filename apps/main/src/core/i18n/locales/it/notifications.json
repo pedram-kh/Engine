@@ -24,6 +24,8 @@
       "assignment_contracted": "{creator_name} ha accettato il contratto per {campaign_name}.",
       "creator_approved": "Il tuo account creator è stato approvato.",
       "creator_rejected": "La tua candidatura come creator non è stata approvata.",
+      "message_received_by_creator": "{sender_name} ti ha inviato un messaggio su {campaign_name}.",
+      "message_received_by_agency": "{sender_name} ha inviato un messaggio su {campaign_name}.",
       "fallback": "Hai una nuova notifica."
     },
     "preferences": {
@@ -37,7 +39,8 @@
       "saveError": "Impossibile salvare le tue impostazioni delle notifiche. Riprova.",
       "groups": {
         "assignment": "Incarichi",
-        "creator": "Account creator"
+        "creator": "Account creator",
+        "messaging": "Messaggi"
       },
       "typeLabels": {
         "assignment_draft_submitted": "Viene inviata una bozza per la revisione",
@@ -47,7 +50,9 @@
         "assignment_draft_rejected": "Una bozza viene rifiutata",
         "assignment_manually_verified": "Un post viene verificato",
         "creator_approved": "Un account creator viene approvato",
-        "creator_rejected": "Una candidatura creator viene rifiutata"
+        "creator_rejected": "Una candidatura creator viene rifiutata",
+        "message_received_by_creator": "Un nuovo messaggio dall'agenzia",
+        "message_received_by_agency": "Un nuovo messaggio dal creator"
       }
     }
   }

@@ -269,6 +269,15 @@ enum AuditAction: string
     case AssignmentPaymentReleased = 'assignment.payment_released';
     case AssignmentCancelled = 'assignment.cancelled';
 
+    // Sprint 11 (D-7) — the two dual-recipient message-notification verbs. They
+    // exist ONLY to satisfy NotificationType's one-vocabulary tie (a notification
+    // type's value must be a live AuditAction value); NO audit row is ever
+    // written on message-send (D-17 — messages are their own append-only log).
+    // Two verbs (not one) so each recipient direction carries its own type +
+    // its own prefs toggle (no "receive-but-can't-toggle" dead control).
+    case MessageReceivedByCreator = 'message.received_by_creator';
+    case MessageReceivedByAgency = 'message.received_by_agency';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *

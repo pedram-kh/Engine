@@ -24,6 +24,8 @@
       "assignment_contracted": "{creator_name} accepted the contract for {campaign_name}.",
       "creator_approved": "Your creator account has been approved.",
       "creator_rejected": "Your creator application was not approved.",
+      "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",
+      "message_received_by_agency": "{sender_name} sent a message about {campaign_name}.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -37,7 +39,8 @@
       "saveError": "Couldn't save your notification settings. Please try again.",
       "groups": {
         "assignment": "Assignments",
-        "creator": "Creator account"
+        "creator": "Creator account",
+        "messaging": "Messages"
       },
       "typeLabels": {
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -47,7 +50,9 @@
         "assignment_draft_rejected": "A draft is rejected",
         "assignment_manually_verified": "A post is verified",
         "creator_approved": "A creator account is approved",
-        "creator_rejected": "A creator application is declined"
+        "creator_rejected": "A creator application is declined",
+        "message_received_by_creator": "A new message from the agency",
+        "message_received_by_agency": "A new message from the creator"
       }
     }
   }

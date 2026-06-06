@@ -132,6 +132,10 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'assignment.resubmit_requested',
         'assignment.resubmit_requested_in_place',
         'assignment.posted_content_updated',
+        // Sprint 11 (D-7) — the dual-recipient message-notification verbs (no
+        // audit row written; they exist for the NotificationType vocabulary tie).
+        'message.received_by_creator',
+        'message.received_by_agency',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());

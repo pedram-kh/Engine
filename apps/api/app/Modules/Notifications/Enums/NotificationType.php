@@ -63,6 +63,14 @@ enum NotificationType: string
     case CreatorApproved = 'creator.approved';
     case CreatorRejected = 'creator.rejected';
 
+    // Messaging (Sprint 11, D-7). Dual-recipient: a new message notifies the
+    // COUNTERPARTY. Two types (not one) so each direction has its own recipient
+    // in the FE LIVE_TYPES registry and its own prefs toggle — a single
+    // message.received type would force one static recipient, leaving the other
+    // party with a row but no toggle (the dead-control trap Ch3b prevents).
+    case MessageReceivedByCreator = 'message.received_by_creator';
+    case MessageReceivedByAgency = 'message.received_by_agency';
+
     /**
      * The AuditAction this notification type mirrors. Proves the one-vocabulary
      * tie — every NotificationType value MUST be a live AuditAction value.

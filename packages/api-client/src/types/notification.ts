@@ -41,6 +41,8 @@ export type NotificationType =
   | 'assignment.payment_released'
   | 'creator.approved'
   | 'creator.rejected'
+  | 'message.received_by_creator'
+  | 'message.received_by_agency'
 
 /** The acting user who drove the event, when one exists (null for system-driven). */
 export interface NotificationActor {

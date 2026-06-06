@@ -34,6 +34,9 @@ it('NotificationType catalogue lists exactly the curated membership', function (
         // Creator lifecycle (S11.0 Chunk 2) — admin approve/reject in-app.
         'creator.approved',
         'creator.rejected',
+        // Messaging (Sprint 11, D-7) — the dual-recipient new-message types.
+        'message.received_by_creator',
+        'message.received_by_agency',
     ];
 
     $actual = array_map(fn (NotificationType $case): string => $case->value, NotificationType::cases());
