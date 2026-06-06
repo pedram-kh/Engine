@@ -758,17 +758,18 @@ One board per campaign.
 
 ### `board_columns`
 
-| Column                     | Type                  | Notes                           | Phase |
-| -------------------------- | --------------------- | ------------------------------- | ----- |
-| `id`                       | bigint PK             |                                 | P1    |
-| `ulid`                     | char(26) unique       |                                 | P1    |
-| `board_id`                 | bigint FK             | `boards.id`, CASCADE            | P1    |
-| `name`                     | varchar(64)           |                                 | P1    |
-| `position`                 | integer               | Order on the board              | P1    |
-| `color_token`              | varchar(32)           | Status color from design system | P1    |
-| `is_terminal_success`      | boolean default false | E.g., "Paid"                    | P1    |
-| `is_terminal_failure`      | boolean default false | E.g., "Cancelled"               | P1    |
-| `created_at`, `updated_at` | timestamptz           |                                 | P1    |
+| Column                     | Type                  | Notes                                        | Phase |
+| -------------------------- | --------------------- | -------------------------------------------- | ----- |
+| `id`                       | bigint PK             |                                              | P1    |
+| `ulid`                     | char(26) unique       |                                              | P1    |
+| `board_id`                 | bigint FK             | `boards.id`, CASCADE                         | P1    |
+| `agency_id`                | bigint FK             | RESTRICT (denormalized, D-2)                 | P1    |
+| `name`                     | varchar(64)           |                                              | P1    |
+| `position`                 | integer               | Order on the board                           | P1    |
+| `color_token`              | varchar(32)           | Status token (`status-*`) from design system | P1    |
+| `is_terminal_success`      | boolean default false | E.g., "Paid"                                 | P1    |
+| `is_terminal_failure`      | boolean default false | E.g., "Cancelled"                            | P1    |
+| `created_at`, `updated_at` | timestamptz           |                                              | P1    |
 
 ### `board_automations`
 
@@ -792,31 +793,57 @@ Maps system events to column moves.
 
 ### `board_cards`
 
-| Column                     | Type             | Notes                              | Phase |
-| -------------------------- | ---------------- | ---------------------------------- | ----- |
-| `id`                       | bigint PK        |                                    | P1    |
-| `ulid`                     | char(26) unique  |                                    | P1    |
-| `board_id`                 | bigint FK        | `boards.id`, CASCADE               | P1    |
-| `column_id`                | bigint FK        | `board_columns.id`, RESTRICT       | P1    |
-| `assignment_id`            | bigint FK unique | `campaign_assignments.id`, CASCADE | P1    |
-| `position`                 | integer          | Order within column                | P1    |
-| `created_at`, `updated_at` | timestamptz      |                                    | P1    |
+| Column                     | Type             | Notes                                                               | Phase |
+| -------------------------- | ---------------- | ------------------------------------------------------------------- | ----- |
+| `id`                       | bigint PK        |                                                                     | P1    |
+| `ulid`                     | char(26) unique  |                                                                     | P1    |
+| `board_id`                 | bigint FK        | `boards.id`, CASCADE                                                | P1    |
+| `column_id`                | bigint FK        | `board_columns.id`, RESTRICT                                        | P1    |
+| `agency_id`                | bigint FK        | RESTRICT (denormalized, D-2)                                        | P1    |
+| `assignment_id`            | bigint FK unique | `campaign_assignments.id`, CASCADE                                  | P1    |
+| `position`                 | integer          | Order within column — **inert in P1** (intra-column ordering is P2) | P1    |
+| `created_at`, `updated_at` | timestamptz      |                                                                     | P1    |
 
 ### `board_card_movements`
 
 Append-only log of card movements.
 
-| Column                 | Type             | Notes                     | Phase |
-| ---------------------- | ---------------- | ------------------------- | ----- |
-| `id`                   | bigint PK        |                           | P1    |
-| `card_id`              | bigint FK        | `board_cards.id`, CASCADE | P1    |
-| `from_column_id`       | bigint FK null   |                           | P1    |
-| `to_column_id`         | bigint FK        |                           | P1    |
-| `triggered_by`         | varchar(16)      | `event` or `user`         | P1    |
-| `triggered_event_key`  | varchar(64) null | If event-triggered        | P1    |
-| `triggered_by_user_id` | bigint FK null   | If user-triggered         | P1    |
-| `reason`               | text null        |                           | P1    |
-| `created_at`           | timestamptz      |                           | P1    |
+| Column                 | Type             | Notes                                         | Phase |
+| ---------------------- | ---------------- | --------------------------------------------- | ----- |
+| `id`                   | bigint PK        |                                               | P1    |
+| `card_id`              | bigint FK        | `board_cards.id`, CASCADE                     | P1    |
+| `from_column_id`       | bigint FK null   | SET NULL (history survives column delete)     | P1    |
+| `to_column_id`         | bigint FK null   | SET NULL — nullable as-built (see note)       | P1    |
+| `triggered_by`         | varchar(16)      | `event` (automation) or `user` (manual)       | P1    |
+| `triggered_event_key`  | varchar(64) null | If event-triggered                            | P1    |
+| `triggered_by_user_id` | bigint FK null   | If user-triggered                             | P1    |
+| `reason`               | text null        | Optional on manual moves (NOT requiresReason) | P1    |
+| `created_at`           | timestamptz      | Append-only (no `updated_at`)                 | P1    |
+
+> **✅ Built in Sprint 12 Chunk 1 (Board engine).** All five tables migrated as
+> spec'd (`2026_06_06_120000`–`120004`) + `Board` / `BoardColumn` /
+> `BoardAutomation` / `BoardCard` / `BoardCardMovement` models + factories +
+> the `BoardAutomationActionType` / `MovementTrigger` enums.
+>
+> **D-2 tenancy denormalization (additive to the §10 lists above):**
+> `board_columns` and `board_cards` carry a denormalized `agency_id` + the
+> `BelongsToAgency` trait (they are directly route-model-bound, so they need the
+> global scope), mirroring `message_threads`. `board_automations` +
+> `board_card_movements` scope transitively through `board_id` / `card_id` (no
+> own `agency_id`).
+>
+> **As-built reconciliations (build notes):**
+>
+> - `board_card_movements.to_column_id` is **nullable + SET NULL** (the §10 draft
+>   had it non-null). The in-scope column-delete-with-history flow (10-BOARD-AUTOMATION
+>   §14.3) can leave historical movements pointing at a now-deleted column;
+>   nulling the column ref preserves the append-only movement row instead of
+>   blocking the delete. The durable history anchor is `card_id`.
+> - `board_cards.position` exists but is **inert in P1** — intra-column ordering
+>   is P2 (column present, unused). Logged in `tech-debt.md`.
+> - The `payment_released → Paid` default automation is **wired but inert** until
+>   Sprint 10 (escrow is gated); a default automation may reference an overdue
+>   event key that doesn't emit until Chunk 3. Both logged in `tech-debt.md`.
 
 ---
 

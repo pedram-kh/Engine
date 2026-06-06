@@ -9,6 +9,26 @@ anyone reviewing it later.
 
 ---
 
+## Sprint 12 Chunk 1 (Board engine) — three inert-by-design seams + one schema reconciliation
+
+- **Where:** the Boards module ([`apps/api/app/Modules/Boards`](../apps/api/app/Modules/Boards)) + the §10 board tables ([migrations `2026_06_06_120000`–`120004`](../apps/api/database/migrations)).
+- **What we accepted in Sprint 12 Chunk 1 (June 6, 2026):** the board ENGINE shipped (5 tables, lazy provisioning + card-heal, the `CreateBoardCard` + `BoardAutomationListener` consumers, the manual-move dual-trail, the column/automation/move API). Four conscious deferrals/shortcuts ride it:
+  1. **Intra-column card ordering (P2).** `board_cards.position` exists in the schema (§10) but is **inert in P1** — the move path never reads or writes it, cards render in a stable id order within a column. **Triggered by** the P2 chunk that adds drag-to-reorder-within-column UX. **Resolution:** honor `position` on move + add a reorder-within-column endpoint.
+  2. **Inert payment-verb automation (Sprint-10-gated).** The §3.2 default `assignment.payment_released → Paid` automation is **wired but never fires** — the `CampaignAssignmentStateMachine`'s `releasePayment()` throws `escrowUnavailable()` (Stripe escrow is Sprint 10, deferred). It no-ops in practice today (D-11). **Triggered by** Sprint 10 (escrow). **Resolution:** none needed in Boards — the automation activates automatically the day the `assignment.payment_released` event begins to dispatch. Do NOT build payment here.
+  3. **Time-triggered overdue events are OUT (Chunk 3).** `assignment.posting_overdue` / `assignment.draft_overdue` need a scheduler sweep + a net-new draft-deadline field + 2 net-new audit verbs — a separate vertical (D-12). A default automation MAY reference an overdue event key that doesn't emit yet; that is fine (it simply never fires until Ch3) — the same inert-wiring posture as the payment verb. **Triggered by** Sprint 12 Chunk 3. **Resolution:** build the scheduler + draft-deadline field + the two `AuditAction` verbs, then seed the overdue automations.
+  4. **`board_card_movements.to_column_id` nullable reconciliation (as-built).** §10 drafted `to_column_id` non-null; it shipped **nullable + SET NULL** so the in-scope column-delete-with-history flow (10-BOARD-AUTOMATION §14.3) preserves the append-only movement row instead of blocking the delete. The durable history anchor is `card_id`. **Triggered by** never (intentional). **Resolution:** none — documented in `03-DATA-MODEL.md` §10.
+- **Risk:** low. (1)+(3) are missing features behind an empty-state/coming-soon surface; (2) is a no-op until escrow exists; (4) is a deliberate schema choice that strictly preserves history. No data is lost in any case.
+- **Owner:** Sprint 12 Chunk 3 (overdue), Sprint 10 (payment), and the future P2 ordering chunk.
+- **Status:** open (by design). Surfaced + deliberately deferred by Sprint 12 Chunk 1, June 6, 2026 ([review](reviews/sprint-12-chunk-1-review.md)).
+
+---
+
+## Local `php` `memory_limit` (128M) exhausts a full `vendor/bin/pest` run
+
+- **Where:** the dev/CI PHP `memory_limit` (`128M`). A whole-suite `vendor/bin/pest` OOMs mid-run; targeted module suites pass clean with `php -d memory_limit=1G`. **Resolution:** raise `memory_limit` (e.g. `512M`/`1G`) in the test PHP config or pin `-d memory_limit=1G` in the CI test step. Surfaced Sprint 12 Chunk 1, June 6, 2026. **Status:** open (low — env-only, not a code defect).
+
+---
+
 ## Agency-notified-on-accept/decline + a real notification subsystem (only the send-request email ships)
 
 - **Where:** the two-sided connection lifecycle in the Agencies + Creators modules. The agency→creator **send** path notifies via [`apps/api/app/Modules/Agencies/Mail/ConnectionRequestMail.php`](../apps/api/app/Modules/Agencies/Mail/ConnectionRequestMail.php) (queued, localized). The reverse direction — the creator's **accept/decline** in [`apps/api/app/Modules/Creators/Http/Controllers/CreatorConnectionRequestController.php`](../apps/api/app/Modules/Creators/Http/Controllers/CreatorConnectionRequestController.php) — does **not** notify the requesting agency.

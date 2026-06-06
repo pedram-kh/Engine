@@ -188,6 +188,31 @@ to the allowlist requires:
 endpoints themselves land. Admin agency-listing routes will be added in
 Sprint 1 chunk 7.)
 
+**Sprint 12 (Boards & Automation) — NOT allowlisted (standard agency-scoped).**
+The board surface routes are deliberately **absent** from the allowlist above
+because they are ordinary tenant-scoped routes, not bypasses. All ride the
+standard `agencies/{agency}` stack (`auth:web` + `tenancy.agency` + `tenancy`),
+so a tenant context is always set and the `BelongsToAgencyScope` global scope is
+active:
+
+- `GET    /api/v1/agencies/{agency}/campaigns/{campaign}/board`
+- `POST   …/board/columns` · `PATCH …/board/columns/reorder` · `PATCH/DELETE …/board/columns/{column}`
+- `GET    …/board/automations` · `PATCH …/board/automations/{automation}`
+- `POST   …/board/cards/{card}/move` · `GET …/board/cards/{card}/movements`
+
+`Board`, `BoardColumn`, and `BoardCard` carry `agency_id` + `BelongsToAgency`
+(D-2), so a cross-agency `{column}`/`{card}` ULID is already filtered to a 404 at
+route-model binding. `BoardAutomation` + `BoardCardMovement` are not scoped
+(they reach tenancy through `board_id`/`card_id`); their controllers add an
+explicit parent-of-board check. **Every** cross-tenant / cross-campaign mismatch
+returns **404 (absence, not 403)** — the `assertBelongsToAgency` precedent (no
+ULID-validity leak). The lazy board-provisioning + card-heal that runs inside the
+board `GET` (and the invite listener) bypasses the scope via the named
+`withoutGlobalScope(BelongsToAgencyScope::class)` construct (§5) with an explicit
+`agency_id` derived from the already-resolved campaign — idempotent
+infrastructure keyed on the `boards.campaign_id` / `board_cards.assignment_id`
+UNIQUEs, never a cross-tenant read.
+
 **Categorization note:** the rows above span three distinct categories that
 the table currently collapses into one: **(a) cross-tenant** (admin tooling
 that legitimately spans tenants), **(b) tenant-less** (no tenant data —
