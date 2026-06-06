@@ -278,6 +278,17 @@ enum AuditAction: string
     case MessageReceivedByCreator = 'message.received_by_creator';
     case MessageReceivedByAgency = 'message.received_by_agency';
 
+    // Sprint 12 Chunk 1 (D-9) — a human dragged a card to another column on the
+    // campaign board. The one net-new board verb (the messaging-verb precedent +
+    // its tripwire ripple). Board state is a VISUALIZATION layer (§4.4): a manual
+    // move records the FACT (this row) + a board_card_movements row
+    // (triggered_by=user), but drives NO business logic — moving a card to "Paid"
+    // does NOT release payment. Audit-only: it is NOT a NotificationType (no
+    // notification fires on a manual move), so it does not join the one-vocabulary
+    // tie. `reason` is OPTIONAL (NOT requiresReason()). Automation moves are
+    // system-driven and record ONLY the movement row (no audit row).
+    case BoardCardMovedManually = 'board.card_moved_manually';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *

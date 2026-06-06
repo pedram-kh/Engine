@@ -7,6 +7,7 @@ namespace App\Modules\Campaigns\Models;
 use App\Core\Concerns\HasUlid;
 use App\Core\Tenancy\BelongsToAgency;
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Boards\Models\Board;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Database\Factories\CampaignFactory;
 use App\Modules\Campaigns\Enums\CampaignObjective;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -127,6 +129,17 @@ final class Campaign extends Model
     public function assignments(): HasMany
     {
         return $this->hasMany(CampaignAssignment::class);
+    }
+
+    /**
+     * The campaign's Kanban board (Sprint 12 Chunk 1, D-1). 1:1, lazily
+     * provisioned on first GET (D-4) — null until then.
+     *
+     * @return HasOne<Board, $this>
+     */
+    public function board(): HasOne
+    {
+        return $this->hasOne(Board::class);
     }
 
     /**

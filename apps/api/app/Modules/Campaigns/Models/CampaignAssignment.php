@@ -7,6 +7,7 @@ namespace App\Modules\Campaigns\Models;
 use App\Core\Concerns\HasUlid;
 use App\Core\Tenancy\BelongsToAgency;
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Boards\Models\BoardCard;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Database\Factories\CampaignAssignmentFactory;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
@@ -202,6 +203,18 @@ final class CampaignAssignment extends Model
         return $this->hasOne(Contract::class, 'subject_id')
             ->where('subject_type', Contract::SUBJECT_CAMPAIGN_ASSIGNMENT)
             ->where('status', ContractStatus::Sent);
+    }
+
+    /**
+     * The board card representing this assignment (Sprint 12 Chunk 1, D-5). 1:1
+     * via the `board_cards.assignment_id` UNIQUE; null until the card is
+     * provisioned (the CreateBoardCard invite listener or the lazy GET heal).
+     *
+     * @return HasOne<BoardCard, $this>
+     */
+    public function boardCard(): HasOne
+    {
+        return $this->hasOne(BoardCard::class, 'assignment_id');
     }
 
     public function isTerminal(): bool

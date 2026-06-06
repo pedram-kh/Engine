@@ -136,6 +136,9 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         // audit row written; they exist for the NotificationType vocabulary tie).
         'message.received_by_creator',
         'message.received_by_agency',
+        // Sprint 12 Chunk 1 (D-9) — the manual board-card move verb (audit-only;
+        // NOT a NotificationType, so it does not join the one-vocabulary tie).
+        'board.card_moved_manually',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());
