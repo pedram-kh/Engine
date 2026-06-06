@@ -837,19 +837,19 @@ One thread per CampaignAssignment.
 
 ### `messages`
 
-| Column                     | Type             | Notes                                                     | Phase |
-| -------------------------- | ---------------- | --------------------------------------------------------- | ----- |
-| `id`                       | bigint PK        |                                                           | P1    |
-| `ulid`                     | char(26) unique  |                                                           | P1    |
-| `thread_id`                | bigint FK        | `message_threads.id`, CASCADE                             | P1    |
-| `sender_user_id`           | bigint FK        | `users.id`, RESTRICT                                      | P1    |
-| `sender_role`              | varchar(16)      | `creator`, `agency_user`, `brand_user`, `system`, `admin` | P1    |
-| `kind`                     | varchar(16)      | `text`, `system`, `attachment_only`                       | P1    |
-| `body`                     | text null        |                                                           | P1    |
-| `attachments`              | jsonb null       | Array of {s3_path, mime_type, name, size_bytes}           | P1    |
-| `system_event_key`         | varchar(64) null | For system messages                                       | P1    |
-| `created_at`, `updated_at` | timestamptz      |                                                           | P1    |
-| `deleted_at`               | timestamptz null |                                                           | P1    |
+| Column                     | Type               | Notes                                                                                                                                                                                                                                                  | Phase |
+| -------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- |
+| `id`                       | bigint PK          |                                                                                                                                                                                                                                                        | P1    |
+| `ulid`                     | char(26) unique    |                                                                                                                                                                                                                                                        | P1    |
+| `thread_id`                | bigint FK          | `message_threads.id`, CASCADE                                                                                                                                                                                                                          | P1    |
+| `sender_user_id`           | bigint FK **null** | `users.id`, RESTRICT. **Nullable (D-2 correction):** system messages (`sender_role`/`kind` = `system`) have no human sender — they are `sender_user_id = null`, mirroring the `notifications.actor_user_id`-nullable precedent. No fictional bot user. | P1    |
+| `sender_role`              | varchar(16)        | `creator`, `agency_user`, `brand_user`, `system`, `admin`                                                                                                                                                                                              | P1    |
+| `kind`                     | varchar(16)        | `text`, `system`, `attachment_only`                                                                                                                                                                                                                    | P1    |
+| `body`                     | text null          |                                                                                                                                                                                                                                                        | P1    |
+| `attachments`              | jsonb null         | Array of {s3_path, mime_type, name, size_bytes}                                                                                                                                                                                                        | P1    |
+| `system_event_key`         | varchar(64) null   | For system messages                                                                                                                                                                                                                                    | P1    |
+| `created_at`, `updated_at` | timestamptz        |                                                                                                                                                                                                                                                        | P1    |
+| `deleted_at`               | timestamptz null   |                                                                                                                                                                                                                                                        | P1    |
 
 **Indexes:**
 
@@ -867,6 +867,19 @@ One thread per CampaignAssignment.
 **Indexes:**
 
 - `unique_read_receipts_message_user` on (`message_id`, `user_id`)
+
+> **✅ Built in Sprint 11 (Messaging).** All three tables migrated as spec'd
+> (`2026_06_06_110000/110001/110002`) + `MessageThread` / `Message` /
+> `MessageReadReceipt` models + factories + the string-backed `MessageSenderRole`
+> / `MessageKind` enums (varchar(16), catalogue-tripwire test). **D-2 spec-drift
+> correction:** `messages.sender_user_id` is **nullable** (system messages have
+> no human sender) — amended above. One thread per assignment, provisioned
+> idempotently (`assignment_id` UNIQUE) across three sites: the invite listener,
+> a defensive create before each system-message write, and the lazy GET (heals
+> thread-less assignments — no backfill migration). `attachments` jsonb gains a
+> `view_url` only at render time (presigned, never stored). `deleted_at` ships
+> column-only — no delete endpoint this sprint (D-14, tech-debt). See
+> docs/reviews/sprint-11-chunk-1-review.md.
 
 ---
 

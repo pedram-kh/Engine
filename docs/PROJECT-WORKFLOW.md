@@ -456,6 +456,12 @@ Every "the architecture test enforces X" claim in a chunk review must pair with 
 
 Multi-part fixes may have one leg pinned in unit tests and another leg covered only by E2E. Document the asymmetry explicitly in the review prose rather than implying uniform coverage. A generalisation of 5.35: some defense-in-depth coverage is structurally untestable at the unit level and relies on integration paths.
 
+### 5.37 Dual-recipient notifications use TWO types, not one (per-direction)
+
+**Established:** Sprint 11 — Messaging (D-7)
+
+When a single event can notify EITHER party depending on who triggered it (e.g. a new chat message: the creator's send notifies the agency, the agency's send notifies the creator), model it as **two notification types**, one per recipient direction — `<event>_by_creator` (recipient = creator) + `<event>_by_agency` (recipient = agency) — NOT a single `<event>` type. A single type forces one static `recipient` in the `LIVE_TYPES` registry, so the OTHER party would receive the row but get no preference toggle — the exact "receive-but-can't-toggle" dead control the Ch3b role-filter exists to prevent. The full ripple per type: one `AuditAction` verb (the `NotificationType` one-vocabulary tie, even when no audit row is written on the event), one `NotificationType` case, one `LIVE_TYPES` entry (templateKey + recipient + group). The two types keep the prefs role-partition disjoint-and-complete (the parity spec covers both, verified via 5.35 break-revert). Reusable for any future either-party notification.
+
 ---
 
 ## 6. The "Q-and-A before code" pattern

@@ -161,6 +161,15 @@ test('approving a creator emits an audit entry', function () {
 - Every queued job has tests for: success, retryable failure, permanent failure.
 - `Queue::fake()` for assertions.
 
+#### Scheduled-command tests
+
+_Established Sprint 11 — Messaging (the app's first scheduled command, `messages:send-digest`)._
+
+Every scheduled command (`->command(...)` in the `withSchedule()` callback in [`bootstrap/app.php`](../apps/api/bootstrap/app.php)) has tests for **both** halves:
+
+- **The effect** — drive the command via `$this->artisan('<signature>')->assertExitCode(0)` against real data, and assert its side effects (`Mail::fake()` + `Mail::assertQueued(...)`, DB rows, etc.). Cover the positive path AND the negative boundaries (e.g. opted-out / no-work recipients get nothing). For aggregate jobs that fan out per tenant, an **absence test** is mandatory: assert tenant A's output never reflects tenant B's data (the cross-tenant isolation anchor applied to the job — a scheduled command runs with NO ambient tenancy context, so its queries must scope explicitly, never rely on a global scope).
+- **The registration** — assert the command is actually on the schedule. Use `$this->artisan('schedule:list')->expectsOutputToContain('<signature>')`, which bootstraps the console kernel's schedule (the `withSchedule` callback) for real, rather than inspecting a freshly-resolved (empty) `Schedule` instance.
+
 #### Webhook tests
 
 - Every webhook handler has tests for: valid signature, invalid signature, idempotency (duplicate event), unknown event type, malformed payload.
