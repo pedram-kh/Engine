@@ -8,6 +8,7 @@ use App\Modules\Boards\Models\Board;
 use App\Modules\Boards\Models\BoardCard;
 use App\Modules\Boards\Models\BoardCardMovement;
 use App\Modules\Boards\Models\BoardColumn;
+use App\Modules\Boards\Services\BoardService;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
@@ -25,8 +26,8 @@ function boardForDelete(): array
     $agency = Agency::factory()->createOne();
     $admin = User::factory()->agencyAdmin($agency)->createOne();
     $campaign = Campaign::factory()->create(['agency_id' => $agency->id]);
-    test()->actingAs($admin)->getJson("/api/v1/agencies/{$agency->ulid}/campaigns/{$campaign->ulid}/board")->assertOk();
-    $board = Board::query()->where('campaign_id', $campaign->id)->firstOrFail();
+    // Lazily provision the board (the board-GET path, D-4).
+    $board = app(BoardService::class)->forCampaign($campaign);
 
     return [$agency, $admin, $campaign, $board];
 }
@@ -40,7 +41,7 @@ it('deletes an empty column directly', function (): void {
     [$agency, $admin, $campaign, $board] = boardForDelete();
     $column = $board->columns()->where('name', 'In Review')->firstOrFail();
 
-    test()->actingAs($admin)->deleteJson(columnUrl($agency, $campaign, $column))->assertNoContent();
+    $this->actingAs($admin)->deleteJson(columnUrl($agency, $campaign, $column))->assertNoContent();
 
     expect(BoardColumn::query()->whereKey($column->id)->exists())->toBeFalse()
         ->and($board->columns()->count())->toBe(6);
@@ -52,7 +53,7 @@ it('rejects deleting a non-empty column without a destination (422)', function (
     $assignment = CampaignAssignment::factory()->create(['campaign_id' => $campaign->id]);
     BoardCard::factory()->forBoard($board)->inColumn($invited)->forAssignment($assignment)->create();
 
-    test()->actingAs($admin)->deleteJson(columnUrl($agency, $campaign, $invited))->assertStatus(422);
+    $this->actingAs($admin)->deleteJson(columnUrl($agency, $campaign, $invited))->assertStatus(422);
 
     expect(BoardColumn::query()->whereKey($invited->id)->exists())->toBeTrue();
 });
@@ -64,12 +65,12 @@ it('re-homes cards as manual movements then deletes the column', function (): vo
     $assignment = CampaignAssignment::factory()->create(['campaign_id' => $campaign->id, 'status' => AssignmentStatus::Producing]);
     $card = BoardCard::factory()->forBoard($board)->inColumn($invited)->forAssignment($assignment)->create();
 
-    test()->actingAs($admin)->deleteJson(columnUrl($agency, $campaign, $invited), [
+    $this->actingAs($admin)->deleteJson(columnUrl($agency, $campaign, $invited), [
         'destination_column_id' => $posted->ulid,
     ])->assertNoContent();
 
     expect(BoardColumn::query()->whereKey($invited->id)->exists())->toBeFalse()
-        ->and($card->fresh()->column_id)->toBe($posted->id);
+        ->and($card->fresh()?->column_id)->toBe($posted->id);
 
     $movement = BoardCardMovement::query()->where('card_id', $card->id)->firstOrFail();
     expect($movement->triggered_by)->toBe(MovementTrigger::User)
@@ -80,7 +81,7 @@ it('re-homes cards as manual movements then deletes the column', function (): vo
     // The load-bearing invariant (§4.4 / D-8): re-home goes THROUGH the manual-
     // move path, which never touches the state machine — the assignment status
     // is unchanged by a column delete.
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Producing);
+    expect($assignment->fresh()?->status)->toBe(AssignmentStatus::Producing);
 });
 
 it('refuses to delete the last remaining column (422)', function (): void {
@@ -88,10 +89,10 @@ it('refuses to delete the last remaining column (422)', function (): void {
 
     // Delete down to one column.
     $board->columns()->where('name', '!=', 'To Define')->get()
-        ->each(fn (BoardColumn $c) => test()->actingAs($admin)->deleteJson(columnUrl($agency, $campaign, $c))->assertNoContent());
+        ->each(fn (BoardColumn $c) => $this->actingAs($admin)->deleteJson(columnUrl($agency, $campaign, $c))->assertNoContent());
 
     $last = $board->columns()->firstOrFail();
-    test()->actingAs($admin)->deleteJson(columnUrl($agency, $campaign, $last))->assertStatus(422);
+    $this->actingAs($admin)->deleteJson(columnUrl($agency, $campaign, $last))->assertStatus(422);
 
     expect($board->columns()->count())->toBe(1);
 });

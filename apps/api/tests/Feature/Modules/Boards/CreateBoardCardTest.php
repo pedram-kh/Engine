@@ -9,6 +9,7 @@ use App\Modules\Boards\Services\BoardCardService;
 use App\Modules\Boards\Services\BoardService;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Events\AssignmentTransitioned;
+use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -55,8 +56,9 @@ it('does not provision a card on a non-invite transition', function (): void {
 });
 
 it('card provisioning is idempotent — repeated calls return the one canonical row', function (): void {
-    $assignment = CampaignAssignment::factory()->create();
-    $board = app(BoardService::class)->ensureBoard($assignment->campaign);
+    $campaign = Campaign::factory()->create();
+    $assignment = CampaignAssignment::factory()->create(['campaign_id' => $campaign->id]);
+    $board = app(BoardService::class)->ensureBoard($campaign);
     $service = app(BoardCardService::class);
 
     $first = $service->forAssignment($board, $assignment);

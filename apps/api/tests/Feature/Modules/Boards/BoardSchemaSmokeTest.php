@@ -25,10 +25,10 @@ it('builds the full board graph via factories with relations intact', function (
     expect($board->columns()->count())->toBe(1)
         ->and($board->automations()->count())->toBe(1)
         ->and($board->cards()->count())->toBe(1)
-        ->and($automation->targetColumn->id)->toBe($column->id)
-        ->and($card->column->id)->toBe($column->id)
+        ->and($automation->targetColumn?->id)->toBe($column->id)
+        ->and($card->column?->id)->toBe($column->id)
         ->and($card->movements()->count())->toBe(1)
-        ->and($movement->toColumn->id)->toBe($column->id);
+        ->and($movement->toColumn?->id)->toBe($column->id);
 });
 
 it('links a board to its campaign and a card to its assignment (1:1 relations)', function (): void {
@@ -38,9 +38,9 @@ it('links a board to its campaign and a card to its assignment (1:1 relations)',
     $card = BoardCard::factory()->forBoard($board)->forAssignment($assignment)->create();
 
     expect($campaign->board?->id)->toBe($board->id)
-        ->and($board->campaign->id)->toBe($campaign->id)
+        ->and($board->campaign?->id)->toBe($campaign->id)
         ->and($assignment->boardCard?->id)->toBe($card->id)
-        ->and($card->assignment->id)->toBe($assignment->id);
+        ->and($card->assignment?->id)->toBe($assignment->id);
 });
 
 it('enforces the assignment_id UNIQUE on board_cards', function (): void {

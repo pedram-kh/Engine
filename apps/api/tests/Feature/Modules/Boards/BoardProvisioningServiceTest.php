@@ -31,10 +31,10 @@ it('seeds the 7 default columns in order with the §3.1 tokens + terminals', fun
 
     $paid = $columns->firstWhere('name', 'Paid');
     $cancelled = $columns->firstWhere('name', 'Cancelled');
-    expect($paid->is_terminal_success)->toBeTrue()
-        ->and($paid->is_terminal_failure)->toBeFalse()
-        ->and($cancelled->is_terminal_failure)->toBeTrue()
-        ->and($cancelled->is_terminal_success)->toBeFalse();
+    expect($paid?->is_terminal_success)->toBeTrue()
+        ->and($paid?->is_terminal_failure)->toBeFalse()
+        ->and($cancelled?->is_terminal_failure)->toBeTrue()
+        ->and($cancelled?->is_terminal_success)->toBeFalse();
 
     // Every seeded column carries the board's denormalized agency_id (D-2).
     expect($columns->pluck('agency_id')->unique()->all())->toBe([$board->agency_id]);
@@ -63,10 +63,11 @@ it('seeds the 9 default automations mapped to the right columns (§3.2)', functi
     ];
 
     foreach ($expected as $eventKey => $columnName) {
+        $automation = $byKey->get($eventKey);
         expect($byKey->has($eventKey))->toBeTrue("missing automation {$eventKey}")
-            ->and($byKey[$eventKey]->action_type)->toBe(BoardAutomationActionType::MoveToColumn)
-            ->and($byKey[$eventKey]->is_enabled)->toBeTrue()
-            ->and($byKey[$eventKey]->targetColumn->name)->toBe($columnName);
+            ->and($automation?->action_type)->toBe(BoardAutomationActionType::MoveToColumn)
+            ->and($automation?->is_enabled)->toBeTrue()
+            ->and($automation?->targetColumn?->name)->toBe($columnName);
     }
 });
 

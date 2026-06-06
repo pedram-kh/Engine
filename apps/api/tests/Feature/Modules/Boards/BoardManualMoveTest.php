@@ -8,6 +8,7 @@ use App\Modules\Boards\Enums\MovementTrigger;
 use App\Modules\Boards\Models\Board;
 use App\Modules\Boards\Models\BoardCard;
 use App\Modules\Boards\Models\BoardCardMovement;
+use App\Modules\Boards\Services\BoardService;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Models\Campaign;
@@ -29,8 +30,8 @@ function boardWithCard(AssignmentStatus $status = AssignmentStatus::Invited): ar
     $campaign = Campaign::factory()->create(['agency_id' => $agency->id]);
     $assignment = CampaignAssignment::factory()->create(['campaign_id' => $campaign->id, 'status' => $status]);
 
-    // GET the board to lazily heal the card.
-    test()->actingAs($admin)->getJson("/api/v1/agencies/{$agency->ulid}/campaigns/{$campaign->ulid}/board")->assertOk();
+    // Lazily provision the board + heal the card (the board-GET path, D-4).
+    app(BoardService::class)->forCampaign($campaign);
     $card = BoardCard::query()->where('assignment_id', $assignment->id)->firstOrFail();
 
     return [$agency, $admin, $campaign, $assignment, $card];
@@ -83,9 +84,9 @@ it('manual move has NO side effect on assignment state (the critical safety inva
     ])->assertOk();
 
     // The card moved (visualization)…
-    expect($card->fresh()->column_id)->toBe($paid->id);
+    expect($card->fresh()?->column_id)->toBe($paid->id);
     // …but reality did NOT: status unchanged, no transition event, no payment verbs.
-    expect($assignment->fresh()->status)->toBe(AssignmentStatus::Invited);
+    expect($assignment->fresh()?->status)->toBe(AssignmentStatus::Invited);
     Event::assertNotDispatched(AssignmentTransitioned::class);
     expect(AuditLog::query()->where('subject_id', $assignment->id)->whereIn('action', [
         'assignment.payment_released', 'assignment.payment_funded',

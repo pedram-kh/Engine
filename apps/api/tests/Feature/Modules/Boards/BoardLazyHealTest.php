@@ -41,8 +41,8 @@ it('heals a card for every card-less assignment (no backfill migration)', functi
     $invitedCard = BoardCard::query()->where('assignment_id', $invited->id)->firstOrFail()->load('column');
     $postedCard = BoardCard::query()->where('assignment_id', $posted->id)->firstOrFail()->load('column');
 
-    expect($invitedCard->column->name)->toBe('Invited')
-        ->and($postedCard->column->name)->toBe('Posted');
+    expect($invitedCard->column?->name)->toBe('Invited')
+        ->and($postedCard->column?->name)->toBe('Posted');
 });
 
 it('is idempotent — a second forCampaign creates no new rows', function (): void {
