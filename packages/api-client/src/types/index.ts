@@ -1,6 +1,7 @@
 export * from './agency'
 export * from './auth'
 export * from './availability'
+export * from './board'
 export * from './campaign'
 export * from './creator'
 export * from './messaging'
