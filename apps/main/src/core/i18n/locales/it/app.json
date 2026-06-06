@@ -483,11 +483,80 @@
           "proceed": "Invita comunque"
         }
       },
-      "comingSoon": {
-        "board": {
-          "heading": "Bacheca in arrivo",
-          "body": "La bacheca Kanban della campagna sarà qui."
+      "board": {
+        "loadError": "Impossibile caricare la bacheca. Riprova.",
+        "empty": "Questa bacheca non ha ancora colonne.",
+        "moveFailed": "Impossibile spostare la scheda — è tornata al punto di partenza.",
+        "reorderFailed": "Impossibile riordinare le colonne — l'ordine è stato ripristinato.",
+        "automationsButton": "Automazioni",
+        "card": {
+          "unnamed": "Creator senza nome",
+          "removed": "Assegnazione rimossa",
+          "daysLeft": "{n}g rimanenti",
+          "dueToday": "Scade oggi",
+          "overdue": "In ritardo"
         },
+        "column": {
+          "add": "Aggiungi colonna",
+          "edit": "Rinomina / ricolora",
+          "delete": "Elimina colonna",
+          "addTitle": "Aggiungi colonna",
+          "editTitle": "Modifica colonna",
+          "name": "Nome colonna",
+          "color": "Colore",
+          "terminalSuccess": "Segna come successo (terminale)",
+          "terminalFailure": "Segna come fallimento (terminale)",
+          "save": "Salva",
+          "cancel": "Annulla",
+          "saveFailed": "Impossibile salvare la colonna. Riprova.",
+          "deleteTitle": "Elimina colonna",
+          "deleteBody": "Eliminare \"{name}\"? L'operazione non può essere annullata.",
+          "deleteBodyNonEmpty": "\"{name}\" ha {count} scheda/e. Scegli dove spostarle prima di eliminare.",
+          "deleteDestination": "Sposta le schede in",
+          "deleteConfirm": "Elimina",
+          "errorLastColumn": "Una bacheca deve mantenere almeno una colonna.",
+          "errorDestinationRequired": "Questa colonna contiene schede — scegli una colonna di destinazione per spostarle prima di eliminare.",
+          "errorGeneric": "Impossibile eliminare la colonna. Riprova."
+        },
+        "automation": {
+          "title": "Automazioni",
+          "subtitle": "Ogni evento può spostare automaticamente una scheda in una colonna. I trascinamenti manuali non le attivano mai.",
+          "event": "Evento",
+          "target": "Sposta la scheda in",
+          "none": "Nessuna automazione",
+          "enabled": "Attivata",
+          "broken": "La colonna di destinazione è stata eliminata — selezionane una nuova",
+          "updateFailed": "Impossibile aggiornare l'automazione. Riprova.",
+          "close": "Chiudi"
+        },
+        "drawer": {
+          "title": "Assegnazione",
+          "close": "Chiudi",
+          "loadError": "Impossibile caricare questa assegnazione. Riprova.",
+          "tabs": {
+            "detail": "Dettaglio",
+            "history": "Cronologia spostamenti"
+          },
+          "detail": {
+            "status": "Stato",
+            "creator": "Creator",
+            "postingDue": "Scadenza pubblicazione",
+            "deliverables": "Deliverable",
+            "latestDraft": "Ultima bozza",
+            "postedContent": "Contenuto pubblicato",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Nessuno spostamento registrato finora.",
+            "removed": "(rimossa)",
+            "manual": "Spostamento manuale",
+            "auto": "Automazione",
+            "from": "da",
+            "to": "a"
+          }
+        }
+      },
+      "comingSoon": {
         "drafts": {
           "heading": "Bozze in arrivo",
           "body": "Gli invii e le revisioni delle bozze dei creator appariranno qui."

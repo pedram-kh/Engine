@@ -37,6 +37,7 @@ import ReviewDraftDrawer from '../components/ReviewDraftDrawer.vue'
 import ResolveVerificationDrawer from '../components/ResolveVerificationDrawer.vue'
 import ViewPostedContentDrawer from '../components/ViewPostedContentDrawer.vue'
 import CampaignMessagesPanel from '@/modules/messaging/components/CampaignMessagesPanel.vue'
+import BoardView from '@/modules/boards/components/BoardView.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -214,7 +215,7 @@ const statusOptions: { title: string; value: CampaignStatus }[] = [
   { title: t('app.campaigns.status.cancelled'), value: 'cancelled' },
 ]
 
-const comingSoonTabs = ['board', 'drafts', 'payments'] as const
+const comingSoonTabs = ['drafts', 'payments'] as const
 
 function toDateInput(iso: string | null): string | undefined {
   return iso ? iso.slice(0, 10) : undefined
@@ -703,6 +704,18 @@ function formatMoney(minor: number | null, currency: string | null): string {
           >
             {{ reviewSnackbar }}
           </v-snackbar>
+        </v-window-item>
+
+        <!-- Board (Sprint 12) — the Kanban. Mounted with v-if so the 30s poll
+             stops when the operator leaves the tab (§10.2 / Q3 — no background
+             polling on an unviewed tab). -->
+        <v-window-item value="board" data-test="panel-board">
+          <BoardView
+            v-if="tab === 'board' && agencyStore.currentAgencyId"
+            :agency-id="agencyStore.currentAgencyId"
+            :campaign-id="ulid"
+            :can-configure="canEdit"
+          />
         </v-window-item>
 
         <!-- Messages (Sprint 11) — the agency roll-up of the campaign's threads -->

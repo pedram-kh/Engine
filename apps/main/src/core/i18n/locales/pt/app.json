@@ -483,11 +483,80 @@
           "proceed": "Convidar mesmo assim"
         }
       },
-      "comingSoon": {
-        "board": {
-          "heading": "Quadro em breve",
-          "body": "O quadro Kanban da campanha ficará aqui."
+      "board": {
+        "loadError": "Não foi possível carregar o quadro. Tente novamente.",
+        "empty": "Este quadro ainda não tem colunas.",
+        "moveFailed": "Não foi possível mover o cartão — ele voltou ao lugar de origem.",
+        "reorderFailed": "Não foi possível reordenar as colunas — a ordem foi restaurada.",
+        "automationsButton": "Automações",
+        "card": {
+          "unnamed": "Criador sem nome",
+          "removed": "Atribuição removida",
+          "daysLeft": "{n}d restantes",
+          "dueToday": "Vence hoje",
+          "overdue": "Atrasado"
         },
+        "column": {
+          "add": "Adicionar coluna",
+          "edit": "Renomear / recolorir",
+          "delete": "Excluir coluna",
+          "addTitle": "Adicionar coluna",
+          "editTitle": "Editar coluna",
+          "name": "Nome da coluna",
+          "color": "Cor",
+          "terminalSuccess": "Marcar como sucesso (terminal)",
+          "terminalFailure": "Marcar como falha (terminal)",
+          "save": "Salvar",
+          "cancel": "Cancelar",
+          "saveFailed": "Não foi possível salvar a coluna. Tente novamente.",
+          "deleteTitle": "Excluir coluna",
+          "deleteBody": "Excluir \"{name}\"? Isso não pode ser desfeito.",
+          "deleteBodyNonEmpty": "\"{name}\" tem {count} cartão(ões). Escolha para onde movê-los antes de excluir.",
+          "deleteDestination": "Mover cartões para",
+          "deleteConfirm": "Excluir",
+          "errorLastColumn": "Um quadro deve manter pelo menos uma coluna.",
+          "errorDestinationRequired": "Esta coluna tem cartões — escolha uma coluna de destino para movê-los antes de excluir.",
+          "errorGeneric": "Não foi possível excluir a coluna. Tente novamente."
+        },
+        "automation": {
+          "title": "Automações",
+          "subtitle": "Cada evento pode mover um cartão para uma coluna automaticamente. Arrastos manuais nunca acionam isso.",
+          "event": "Evento",
+          "target": "Move o cartão para",
+          "none": "Sem automação",
+          "enabled": "Ativado",
+          "broken": "A coluna de destino foi excluída — escolha uma nova",
+          "updateFailed": "Não foi possível atualizar a automação. Tente novamente.",
+          "close": "Fechar"
+        },
+        "drawer": {
+          "title": "Atribuição",
+          "close": "Fechar",
+          "loadError": "Não foi possível carregar esta atribuição. Tente novamente.",
+          "tabs": {
+            "detail": "Detalhe",
+            "history": "Histórico de movimentações"
+          },
+          "detail": {
+            "status": "Status",
+            "creator": "Criador",
+            "postingDue": "Prazo de publicação",
+            "deliverables": "Entregáveis",
+            "latestDraft": "Último rascunho",
+            "postedContent": "Conteúdo publicado",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Nenhuma movimentação registrada ainda.",
+            "removed": "(removida)",
+            "manual": "Movimentação manual",
+            "auto": "Automação",
+            "from": "de",
+            "to": "para"
+          }
+        }
+      },
+      "comingSoon": {
         "drafts": {
           "heading": "Rascunhos em breve",
           "body": "Os envios e revisões de rascunhos dos criadores aparecerão aqui."

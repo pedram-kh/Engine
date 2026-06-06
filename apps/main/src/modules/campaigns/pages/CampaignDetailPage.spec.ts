@@ -37,6 +37,31 @@ vi.mock('../api/campaigns.api', () => ({
 
 import { campaignsApi } from '../api/campaigns.api'
 
+// Sprint 12 Chunk 2: the Board tab now mounts the live BoardView (no longer
+// coming-soon). Mock the board API so no transport runs when the tab opens.
+vi.mock('@/modules/boards/api/board.api', () => ({
+  boardApi: {
+    show: vi.fn().mockResolvedValue({
+      data: {
+        id: 'board-1',
+        type: 'boards',
+        attributes: { created_at: 'x', updated_at: 'x' },
+        relationships: { campaign: { data: { id: 'campaign-ulid', type: 'campaigns' } } },
+        columns: [],
+        automations: [],
+        cards: [],
+      },
+    }),
+    moveCard: vi.fn(),
+    movements: vi.fn(),
+    createColumn: vi.fn(),
+    updateColumn: vi.fn(),
+    deleteColumn: vi.fn(),
+    reorderColumns: vi.fn(),
+    updateAutomation: vi.fn(),
+  },
+}))
+
 const localStorageStore: Record<string, string> = {}
 Object.defineProperty(globalThis, 'localStorage', {
   value: {
@@ -206,12 +231,13 @@ describe('CampaignDetailPage (Sprint 8 Chunk 1)', () => {
     expect(harness.wrapper.find('[data-test="tab-settings"]').exists()).toBe(false)
   })
 
-  it('renders an empty-state "coming soon" for the Board tab (nothing half-built)', async () => {
+  it('mounts the live BoardView when the Board tab opens (Sprint 12 Chunk 2)', async () => {
     const harness = await mountDetail()
     cleanup = harness.cleanup
     ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'board'
     await flushPromises()
-    expect(harness.wrapper.find('[data-test="board-coming-soon"]').exists()).toBe(true)
+    expect(harness.wrapper.find('[data-test="board-view"]').exists()).toBe(true)
+    expect(harness.wrapper.find('[data-test="board-coming-soon"]').exists()).toBe(false)
   })
 
   it('shows the Creators empty state and loads assignments when the tab opens', async () => {
