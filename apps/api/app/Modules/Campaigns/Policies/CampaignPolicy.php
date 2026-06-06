@@ -83,6 +83,21 @@ final class CampaignPolicy
     }
 
     /**
+     * Send a message to a campaign's creator (Sprint 11, D-7/D-11). Mirrors
+     * {@see invite()}: admin + manager + STAFF — talking to the creator IS
+     * executing a campaign. READING the thread only needs {@see view()} (any
+     * member), so the roll-up + thread reads gate on `view`; sends gate on this.
+     */
+    public function message(User $user, Campaign $campaign): bool
+    {
+        return $this->hasAnyRole($user, [
+            AgencyRole::AgencyAdmin,
+            AgencyRole::AgencyManager,
+            AgencyRole::AgencyStaff,
+        ]);
+    }
+
+    /**
      * Issue a per-campaign contract to an accepted assignment (contract-bridge
      * chunk, D-6). Mirrors {@see invite()}: admin + manager + STAFF — issuing
      * a contract IS executing a campaign.
