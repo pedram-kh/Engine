@@ -60,6 +60,46 @@ final class NotificationService
     }
 
     /**
+     * Apply a single preference toggle, SPARSELY (S11.0 Chunk 3b, D-1).
+     *
+     * The table holds ONLY divergences from {@see NotificationChannel::defaultEnabled()}
+     * so the "missing row → default" read in {@see self::isChannelEnabled()} stays
+     * the single source of truth:
+     *   - toggle DIVERGES from the default → updateOrCreate the row;
+     *   - toggle RETURNS to the default → DELETE the row.
+     *
+     * The delete (not a stored `is_enabled = default`) is the contract: a user
+     * back at the default holds no row, so a future default flip (or the Ch2
+     * retrofit) can never be silently overridden by a stale stored value.
+     *
+     * The (user_id, type, channel) unique constraint backs updateOrCreate
+     * against a double-write race — a concurrent second write collides on the
+     * unique and updates rather than duplicating.
+     */
+    public function setPreference(User $user, NotificationType $type, NotificationChannel $channel, bool $isEnabled): void
+    {
+        $query = NotificationPreference::query()
+            ->where('user_id', $user->getKey())
+            ->where('type', $type->value)
+            ->where('channel', $channel->value);
+
+        if ($isEnabled === $channel->defaultEnabled()) {
+            $query->delete();
+
+            return;
+        }
+
+        NotificationPreference::query()->updateOrCreate(
+            [
+                'user_id' => $user->getKey(),
+                'type' => $type->value,
+                'channel' => $channel->value,
+            ],
+            ['is_enabled' => $isEnabled],
+        );
+    }
+
+    /**
      * Resolve whether a channel is enabled for a (user, type) pair.
      *
      * Preserve-current default (D-7): when no preference row exists, fall back

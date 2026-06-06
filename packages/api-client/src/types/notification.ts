@@ -136,3 +136,45 @@ export interface NotificationReadAllEnvelope {
     code: 'notification.read_all'
   }
 }
+
+/**
+ * The delivery channels a preference can toggle (S11.0 Ch3b). Mirrors
+ * `App\Modules\Notifications\Enums\NotificationChannel`. The Ch3b UI surfaces
+ * `in_app` only (`email` rides independently of prefs; `digest` has no consumer
+ * until Messaging) — but the wire contract carries all three so the channels
+ * light up with no type change when a consumer ships.
+ */
+export type NotificationChannel = 'in_app' | 'email' | 'digest'
+
+/**
+ * A single SPARSE preference row — present ONLY when it diverges from the
+ * channel default. The full display state is composed against the `defaults`
+ * block: `row?.is_enabled ?? defaults[channel]` (the channel default contract
+ * is never hardcoded client-side).
+ */
+export interface NotificationPreferenceRow {
+  notification_type: NotificationType
+  channel: NotificationChannel
+  is_enabled: boolean
+}
+
+/**
+ * `GET` / `PATCH /me/notification-preferences`. The read returns the caller's
+ * sparse rows AND the server-authoritative channel `defaults`; the write
+ * (sparse upsert/delete) returns the recomputed state in the same shape.
+ */
+export interface NotificationPreferencesEnvelope {
+  data: {
+    type: 'notification_preferences'
+    attributes: {
+      preferences: NotificationPreferenceRow[]
+      /** Channel value → its preserve-current default (`in_app`/`email` on, `digest` off). */
+      defaults: Record<NotificationChannel, boolean>
+    }
+  }
+}
+
+/** `PATCH /me/notification-preferences` body — a batch of per-row toggles. */
+export interface UpdateNotificationPreferencesPayload {
+  preferences: NotificationPreferenceRow[]
+}

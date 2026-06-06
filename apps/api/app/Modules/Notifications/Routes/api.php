@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Notifications\Http\Controllers\NotificationController;
+use App\Modules\Notifications\Http\Controllers\NotificationPreferenceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,4 +36,16 @@ Route::prefix('me/notifications')
         Route::get('unread-count', [NotificationController::class, 'unreadCount'])->name('unread-count');
         Route::post('read-all', [NotificationController::class, 'readAll'])->name('read-all');
         Route::patch('{notification}/read', [NotificationController::class, 'markRead'])->name('read');
+    });
+
+// Per-user notification preferences (S11.0 Chunk 3b). The product's first user
+// self-WRITE surface — same `auth:web` + `tenancy.set` stack as the feed, owner
+// resolved from $request->user() (no path id, no policy). On the cross-tenant
+// allowlist in docs/security/tenancy.md §4: prefs are user-global.
+Route::prefix('me/notification-preferences')
+    ->middleware(['auth:web', 'tenancy.set'])
+    ->name('me.notification-preferences.')
+    ->group(function (): void {
+        Route::get('', [NotificationPreferenceController::class, 'index'])->name('index');
+        Route::patch('', [NotificationPreferenceController::class, 'update'])->name('update');
     });
