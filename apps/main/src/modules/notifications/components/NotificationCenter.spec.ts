@@ -74,7 +74,13 @@ function makePoll(): NotificationPollHandle {
   }
 }
 
-function mountCenter(props: Record<string, unknown>) {
+interface CenterProps {
+  variant: 'dropdown' | 'page'
+  poll?: NotificationPollHandle | null
+  viewAllRoute?: string | null
+}
+
+function mountCenter(props: CenterProps) {
   const i18n = createI18n({
     legacy: false,
     locale: 'en',
