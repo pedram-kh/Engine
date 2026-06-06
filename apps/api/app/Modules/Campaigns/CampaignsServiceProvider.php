@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Campaigns;
 
+use App\Modules\Boards\Listeners\CreateBoardCard;
 use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Listeners\CreateAssignmentAvailabilityBlock;
 use App\Modules\Campaigns\Listeners\CreateMessageThread;
@@ -61,6 +62,15 @@ final class CampaignsServiceProvider extends ServiceProvider
         // allowlist). The thread is provisioned defensively first; system
         // messages write even on terminal events (D-13).
         Event::listen(AssignmentTransitioned::class, [WriteSystemMessage::class, 'handle']);
+
+        // Sprint 12 Chunk 1 (D-5): the 6th consumer provisions the board card on
+        // invite. Idempotent (firstOrCreate on the board_cards.assignment_id
+        // UNIQUE); the lazy board GET heals any pre-existing card-less assignment,
+        // so no backfill migration is needed. ORDER IS LOCKED (D-7) — this
+        // registers BEFORE BoardAutomationListener (added next) so the card
+        // exists before the `invited → Invited` automation runs off the same
+        // event.
+        Event::listen(AssignmentTransitioned::class, [CreateBoardCard::class, 'handle']);
     }
 
     private function registerRoutes(): void
