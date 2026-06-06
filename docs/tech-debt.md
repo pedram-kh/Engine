@@ -23,6 +23,19 @@ anyone reviewing it later.
 
 ---
 
+## Sprint 12 Chunk 2 (Board Kanban UI) — three deferred UX affordances
+
+- **Where:** the Boards FE module ([`apps/main/src/modules/boards`](../apps/main/src/modules/boards)).
+- **What we accepted in Sprint 12 Chunk 2 (June 7, 2026):** the Kanban UI shipped (the store + 30s poll, the two DnD surfaces, column CRUD + delete-safeguard, automation config, the card drawer + movement history). Three conscious deferrals ride it:
+  1. **Manual-move reason not promptable via drag (Q2).** A drag-drop sends `{ target_column_id }` only — no `reason`. The optional `reason` field on the move endpoint stays unused from the SPA so the optimistic drag flow is never interrupted by a mid-gesture prompt; the movement still records `triggered_by: user`, so the audit trail is intact. **Triggered by** a product need to capture a manual-move note. **Resolution:** add a reason affordance via a drawer control (not the drag) if ever needed.
+  2. **Reduced card face (D-10).** The card tile renders only what the closed Chunk 1 `BoardCardResource` exposes (creator name, status badge, days-remaining, colour strip). §4.2's richer wants — creator avatar, platform icon, unread-message count — are **not** on the wire and the Chunk 1 Resource was **not** reopened for them. **Triggered by** a product call to enrich the tile. **Resolution:** extend `BoardCardResource` (avatar URL, platform, unread count) in a backend chunk, then render them on the face.
+  3. **Intra-column ordering still inert (P2).** The card DnD only moves cards BETWEEN columns; an intra-column `moved` change is ignored (the backend `position` is inert in P1 — see the Chunk 1 entry). **Triggered by** the P2 drag-to-reorder-within-column chunk. **Resolution:** wire the `moved` event to a reorder-within-column endpoint once the backend honours `position`.
+- **Risk:** low. All three are missing UX niceties over a fully-functional board; no data is lost and the trails are intact.
+- **Owner:** future board UX chunks (+ Chunk 3 for the overdue events the automation config already lists inertly).
+- **Status:** open (by design). Surfaced + deliberately deferred by Sprint 12 Chunk 2, June 7, 2026 ([review](reviews/sprint-12-chunk-2-review.md)).
+
+---
+
 ## Local `php` `memory_limit` (128M) exhausts a full `vendor/bin/pest` run
 
 - **Where:** the dev/CI PHP `memory_limit` (`128M`). A whole-suite `vendor/bin/pest` OOMs mid-run; targeted module suites pass clean with `php -d memory_limit=1G`. **Resolution:** raise `memory_limit` (e.g. `512M`/`1G`) in the test PHP config or pin `-d memory_limit=1G` in the CI test step. Surfaced Sprint 12 Chunk 1, June 6, 2026. **Status:** open (low — env-only, not a code defect).
