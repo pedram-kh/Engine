@@ -25,6 +25,30 @@
       "creator_approved": "A sua conta de criador foi aprovada.",
       "creator_rejected": "A sua candidatura de criador não foi aprovada.",
       "fallback": "Tem uma nova notificação."
+    },
+    "preferences": {
+      "title": "Definições de notificações",
+      "description": "Escolha que notificações na aplicação pretende receber.",
+      "menuItem": "Definições de notificações",
+      "save": "Guardar alterações",
+      "saving": "A guardar…",
+      "success": "As suas definições de notificações foram guardadas.",
+      "loadError": "Não foi possível carregar as suas definições de notificações.",
+      "saveError": "Não foi possível guardar as suas definições de notificações. Tente novamente.",
+      "groups": {
+        "assignment": "Atribuições",
+        "creator": "Conta de criador"
+      },
+      "typeLabels": {
+        "assignment_draft_submitted": "Um rascunho é enviado para revisão",
+        "assignment_contracted": "Um contrato é aceite",
+        "assignment_revision_requested": "São pedidas alterações a um rascunho",
+        "assignment_draft_approved": "Um rascunho é aprovado",
+        "assignment_draft_rejected": "Um rascunho é rejeitado",
+        "assignment_manually_verified": "Uma publicação é verificada",
+        "creator_approved": "Uma conta de criador é aprovada",
+        "creator_rejected": "Uma candidatura de criador é recusada"
+      }
     }
   }
 }

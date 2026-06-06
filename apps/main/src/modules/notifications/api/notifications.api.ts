@@ -11,8 +11,10 @@
 import type {
   NotificationFeedEnvelope,
   NotificationMarkReadEnvelope,
+  NotificationPreferencesEnvelope,
   NotificationReadAllEnvelope,
   NotificationUnreadCountEnvelope,
+  UpdateNotificationPreferencesPayload,
 } from '@catalyst/api-client'
 
 import { http } from '@/core/api'
@@ -51,5 +53,27 @@ export const notificationsApi = {
   /** POST /api/v1/me/notifications/read-all — idempotent server-side. */
   readAll(): Promise<NotificationReadAllEnvelope> {
     return http.post<NotificationReadAllEnvelope>('/me/notifications/read-all')
+  },
+
+  /**
+   * GET /api/v1/me/notification-preferences — the caller's SPARSE rows (only
+   * divergences from the channel default) plus the server-authoritative
+   * `defaults` block. The page composes display state as
+   * `row?.is_enabled ?? defaults[channel]` (S11.0 Ch3b, D-3).
+   */
+  getPreferences(): Promise<NotificationPreferencesEnvelope> {
+    return http.get<NotificationPreferencesEnvelope>('/me/notification-preferences')
+  },
+
+  /**
+   * PATCH /api/v1/me/notification-preferences — the product's first user
+   * self-write. The backend stores sparsely (diverge → upsert, return-to-default
+   * → delete) and returns the recomputed state; safe to send the full visible
+   * set every save (D-1).
+   */
+  updatePreferences(
+    payload: UpdateNotificationPreferencesPayload,
+  ): Promise<NotificationPreferencesEnvelope> {
+    return http.patch<NotificationPreferencesEnvelope>('/me/notification-preferences', payload)
   },
 }

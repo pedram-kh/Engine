@@ -25,6 +25,30 @@
       "creator_approved": "Your creator account has been approved.",
       "creator_rejected": "Your creator application was not approved.",
       "fallback": "You have a new notification."
+    },
+    "preferences": {
+      "title": "Notification settings",
+      "description": "Choose which in-app notifications you'd like to receive.",
+      "menuItem": "Notification settings",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "success": "Your notification settings were saved.",
+      "loadError": "Couldn't load your notification settings.",
+      "saveError": "Couldn't save your notification settings. Please try again.",
+      "groups": {
+        "assignment": "Assignments",
+        "creator": "Creator account"
+      },
+      "typeLabels": {
+        "assignment_draft_submitted": "A draft is submitted for review",
+        "assignment_contracted": "A contract is accepted",
+        "assignment_revision_requested": "Revisions are requested on a draft",
+        "assignment_draft_approved": "A draft is approved",
+        "assignment_draft_rejected": "A draft is rejected",
+        "assignment_manually_verified": "A post is verified",
+        "creator_approved": "A creator account is approved",
+        "creator_rejected": "A creator application is declined"
+      }
     }
   }
 }

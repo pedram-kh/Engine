@@ -187,6 +187,13 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
 
           <v-list density="compact">
             <v-list-item
+              :to="{ name: 'notifications.preferences' }"
+              :title="t('notifications.preferences.menuItem')"
+              prepend-icon="mdi-bell-cog-outline"
+              data-test="notification-settings-link"
+              @click="userMenuOpen = false"
+            />
+            <v-list-item
               :disabled="isLoggingOut"
               :title="isLoggingOut ? t('app.userMenu.signingOut') : t('app.userMenu.signOut')"
               prepend-icon="mdi-logout"

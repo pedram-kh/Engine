@@ -22,7 +22,11 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { hasLiveTemplate, notificationTemplateKey } from '@/modules/notifications/templates'
+import {
+  hasLiveTemplate,
+  notificationTemplateKey,
+  preferenceGroupsForRole,
+} from '@/modules/notifications/templates'
 
 const LOCALE_ROOT = path.resolve(__dirname, '../../../src/core/i18n/locales')
 const LOCALES = ['en', 'pt', 'it'] as const
@@ -132,5 +136,46 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
   it('a genuinely unknown string (not in the union) also routes to the fallback', () => {
     expect(notificationTemplateKey('totally.made.up.verb')).toBe('notifications.types.fallback')
     expect(hasLiveTemplate('totally.made.up.verb')).toBe(false)
+  })
+})
+
+/**
+ * S11.0 Ch3b — the prefs role-partition and the Ch3a template map are ONE source
+ * of truth (the `LIVE_TYPES` registry). These pin that they can't drift: the
+ * union of the two recipient roles' prefs types is EXACTLY the 8 live-template
+ * types, the two roles are disjoint, and every prefs-exposed type has a bespoke
+ * (non-fallback) template. A type added to / dropped from the registry, or given
+ * a recipient that doesn't match its template, fails here.
+ */
+describe('notifications prefs role-partition — single live-set source of truth', () => {
+  const creatorTypes = preferenceGroupsForRole('creator').flatMap((g) => g.types)
+  const agencyTypes = preferenceGroupsForRole('agency').flatMap((g) => g.types)
+
+  it('creator + agency prefs types partition the 8 live types exactly (disjoint, complete)', () => {
+    // Disjoint — no type is offered to both roles.
+    expect(creatorTypes.filter((t) => agencyTypes.includes(t))).toEqual([])
+    // Complete — together they are exactly the LIVE_TYPES set.
+    expect([...creatorTypes, ...agencyTypes].sort()).toEqual([...LIVE_TYPES].sort())
+  })
+
+  it('the known role split is honest (creator = 6 review/lifecycle, agency = 2 fan-out)', () => {
+    expect([...creatorTypes].sort()).toEqual(
+      [
+        'assignment.draft_approved',
+        'assignment.draft_rejected',
+        'assignment.manually_verified',
+        'assignment.revision_requested',
+        'creator.approved',
+        'creator.rejected',
+      ].sort(),
+    )
+    expect([...agencyTypes].sort()).toEqual(['assignment.contracted', 'assignment.draft_submitted'])
+  })
+
+  it('every prefs-exposed type has a bespoke (non-fallback) template — no drift from Ch3a', () => {
+    for (const type of [...creatorTypes, ...agencyTypes]) {
+      expect(hasLiveTemplate(type)).toBe(true)
+      expect(notificationTemplateKey(type)).not.toBe('notifications.types.fallback')
+    }
   })
 })

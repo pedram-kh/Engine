@@ -351,6 +351,18 @@ export const appRoutes: RouteRecordRaw[] = [
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
+  // ── Notification preferences (S11.0 Ch3b) ───────────────────────────────────
+  // The first user self-write surface. Owner-scoped to the auth user (no agency
+  // id), reached from the user-menu "Notification settings" item. The creator
+  // shell has a parallel `/creator/notifications/preferences` route rendering the
+  // SAME shell-agnostic page. Added to the requireAgencyUser arch-test set.
+  {
+    path: '/notifications/preferences',
+    name: 'notifications.preferences',
+    component: () => import('@/modules/notifications/pages/NotificationPreferencesPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+
   // ── Accept invitation ─────────────────────────────────────────────────────
   // Public landing page. Auth state is detected inside the page.
   // No layout guard — this renders inside AgencyLayout only if authenticated,

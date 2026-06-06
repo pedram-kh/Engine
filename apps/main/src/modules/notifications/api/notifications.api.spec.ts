@@ -9,6 +9,8 @@ vi.mock('@/core/api', () => ({
   },
 }))
 
+import type { UpdateNotificationPreferencesPayload } from '@catalyst/api-client'
+
 import { http } from '@/core/api'
 
 import { notificationsApi } from './notifications.api'
@@ -46,6 +48,23 @@ describe('notificationsApi', () => {
     vi.mocked(http.post).mockResolvedValue({} as never)
     void notificationsApi.readAll()
     expect(http.post).toHaveBeenCalledWith('/me/notifications/read-all')
+  })
+
+  it('getPreferences() hits the bare preferences path (no query, no agency)', () => {
+    vi.mocked(http.get).mockResolvedValue({} as never)
+    void notificationsApi.getPreferences()
+    expect(http.get).toHaveBeenCalledWith('/me/notification-preferences')
+  })
+
+  it('updatePreferences() PATCHes the preferences path with the batch body', () => {
+    vi.mocked(http.patch).mockResolvedValue({} as never)
+    const payload: UpdateNotificationPreferencesPayload = {
+      preferences: [
+        { notification_type: 'assignment.draft_approved', channel: 'in_app', is_enabled: false },
+      ],
+    }
+    void notificationsApi.updatePreferences(payload)
+    expect(http.patch).toHaveBeenCalledWith('/me/notification-preferences', payload)
   })
 
   it('takes no agency argument — the API is user-agnostic (no currentAgencyId)', () => {

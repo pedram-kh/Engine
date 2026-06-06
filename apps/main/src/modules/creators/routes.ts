@@ -73,4 +73,17 @@ export const creatorsRoutes: RouteRecordRaw[] = [
       guards: ['requireAuth'],
     },
   },
+  {
+    // S11.0 Ch3b — the creator-shell notification-preferences page. Parallel to
+    // the agency `/notifications/preferences` route; renders the SAME
+    // shell-agnostic NotificationPreferencesPage (the API is user-scoped).
+    // Reached from the user-menu "Notification settings" item.
+    path: '/creator/notifications/preferences',
+    name: 'creator.notifications.preferences',
+    component: () => import('@/modules/notifications/pages/NotificationPreferencesPage.vue'),
+    meta: {
+      layout: 'creator',
+      guards: ['requireAuth'],
+    },
+  },
 ]

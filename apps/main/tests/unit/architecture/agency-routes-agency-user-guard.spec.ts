@@ -91,6 +91,8 @@ describe('agency-shell routes — requireAgencyUser guard registration (Sprint 6
       'discover.list',
       // S11.0 Ch3a — the agency-shell notification archive (full paginated feed).
       'notifications',
+      // S11.0 Ch3b — the agency-shell notification-preferences page.
+      'notifications.preferences',
       'pools.create',
       'pools.detail',
       'pools.edit',

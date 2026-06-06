@@ -25,6 +25,30 @@
       "creator_approved": "Il tuo account creator è stato approvato.",
       "creator_rejected": "La tua candidatura come creator non è stata approvata.",
       "fallback": "Hai una nuova notifica."
+    },
+    "preferences": {
+      "title": "Impostazioni notifiche",
+      "description": "Scegli quali notifiche nell'app vuoi ricevere.",
+      "menuItem": "Impostazioni notifiche",
+      "save": "Salva modifiche",
+      "saving": "Salvataggio…",
+      "success": "Le tue impostazioni delle notifiche sono state salvate.",
+      "loadError": "Impossibile caricare le tue impostazioni delle notifiche.",
+      "saveError": "Impossibile salvare le tue impostazioni delle notifiche. Riprova.",
+      "groups": {
+        "assignment": "Incarichi",
+        "creator": "Account creator"
+      },
+      "typeLabels": {
+        "assignment_draft_submitted": "Viene inviata una bozza per la revisione",
+        "assignment_contracted": "Un contratto viene accettato",
+        "assignment_revision_requested": "Vengono richieste modifiche a una bozza",
+        "assignment_draft_approved": "Una bozza viene approvata",
+        "assignment_draft_rejected": "Una bozza viene rifiutata",
+        "assignment_manually_verified": "Un post viene verificato",
+        "creator_approved": "Un account creator viene approvato",
+        "creator_rejected": "Una candidatura creator viene rifiutata"
+      }
     }
   }
 }
