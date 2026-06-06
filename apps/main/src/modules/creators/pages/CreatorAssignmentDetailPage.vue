@@ -32,6 +32,8 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import { creatorAssignmentsApi } from '../assignments.api'
+import { creatorChatTransport } from '@/modules/messaging/api/messaging.api'
+import ChatPanel from '@/modules/messaging/components/ChatPanel.vue'
 
 type DraftField = 'caption' | 'hashtags' | 'mentions' | 'media'
 type PostedField = 'platform' | 'post_url'
@@ -54,6 +56,9 @@ const { t, locale } = useI18n()
 const route = useRoute()
 
 const ulid = computed(() => String(route.params.ulid ?? ''))
+
+// The creator's inline chat thread for this assignment (Sprint 11, D-11).
+const chatTransport = computed(() => (ulid.value !== '' ? creatorChatTransport(ulid.value) : null))
 
 const assignment = ref<CreatorAssignmentDetailResource | null>(null)
 const loading = ref(false)
@@ -391,6 +396,16 @@ onMounted(() => {
           )
         }}
       </p>
+
+      <!-- Inline chat thread with the agency (Sprint 11, D-11) -->
+      <v-card variant="outlined" data-testid="assignment-chat">
+        <v-card-title class="text-h6">
+          {{ t('app.messaging.title') }}
+        </v-card-title>
+        <v-card-text>
+          <ChatPanel :transport="chatTransport" />
+        </v-card-text>
+      </v-card>
 
       <!-- revision_requested feedback (Chunk 2 writes the feedback text) -->
       <v-alert

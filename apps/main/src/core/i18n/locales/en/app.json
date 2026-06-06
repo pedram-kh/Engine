@@ -16,6 +16,40 @@
         "dark": "Dark"
       }
     },
+    "messaging": {
+      "title": "Messages",
+      "you": "You",
+      "participant": "Participant",
+      "composePlaceholder": "Write a message…",
+      "send": "Send",
+      "attachment": "Attachment",
+      "empty": "No messages yet. Start the conversation.",
+      "loadEarlier": "Load earlier messages",
+      "loadError": "We couldn't load this conversation. It will retry shortly.",
+      "sendError": "Your message couldn't be sent. Please try again.",
+      "attachmentUploadError": "An attachment failed to upload. Please try again.",
+      "closed": "This conversation is closed — the assignment is no longer active.",
+      "systemFallback": "The assignment was updated.",
+      "system": {
+        "assignment": {
+          "contracted": "The contract was signed — production can begin.",
+          "draft_submitted": "A draft was submitted for review.",
+          "draft_approved": "The draft was approved.",
+          "revision_requested": "Revisions were requested on the draft.",
+          "draft_rejected": "The draft was rejected.",
+          "posted_by_creator": "The creator marked the content as posted.",
+          "live_verified": "The live post was verified.",
+          "manually_verified": "The post was manually verified.",
+          "resubmit_requested": "A resubmission was requested.",
+          "payment_released": "Payment was released."
+        }
+      },
+      "rollup": {
+        "empty": "No message threads yet for this campaign.",
+        "noMessages": "No messages yet.",
+        "loadError": "We couldn't load the message threads."
+      }
+    },
     "nav": {
       "dashboard": "Dashboard",
       "roster": "My creators",

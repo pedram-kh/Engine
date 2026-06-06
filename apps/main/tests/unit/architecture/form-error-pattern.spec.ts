@@ -68,6 +68,10 @@ const CANONICAL_422_FILES: readonly string[] = [
   // Sprint 9 Chunk 2 (D-8): the agency review drawer binds the feedback-required
   // 422 onto the review_feedback textarea (request-revision / reject).
   'modules/campaigns/components/ReviewDraftDrawer.vue',
+  // Sprint 11 (D-11): the shared chat compose form binds the send 422 (body /
+  // attachments) onto its fields. Consumed by both the agency Messages tab and
+  // the creator's inline thread.
+  'modules/messaging/components/ChatPanel.vue',
 ]
 
 const IMPORTS_EXTRACT_FIELD_ERRORS =

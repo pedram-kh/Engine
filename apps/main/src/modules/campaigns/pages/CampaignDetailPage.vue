@@ -36,6 +36,7 @@ import ReinviteDialog from '../components/ReinviteDialog.vue'
 import ReviewDraftDrawer from '../components/ReviewDraftDrawer.vue'
 import ResolveVerificationDrawer from '../components/ResolveVerificationDrawer.vue'
 import ViewPostedContentDrawer from '../components/ViewPostedContentDrawer.vue'
+import CampaignMessagesPanel from '@/modules/messaging/components/CampaignMessagesPanel.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -213,7 +214,7 @@ const statusOptions: { title: string; value: CampaignStatus }[] = [
   { title: t('app.campaigns.status.cancelled'), value: 'cancelled' },
 ]
 
-const comingSoonTabs = ['board', 'drafts', 'payments', 'messages'] as const
+const comingSoonTabs = ['board', 'drafts', 'payments'] as const
 
 function toDateInput(iso: string | null): string | undefined {
   return iso ? iso.slice(0, 10) : undefined
@@ -702,6 +703,15 @@ function formatMoney(minor: number | null, currency: string | null): string {
           >
             {{ reviewSnackbar }}
           </v-snackbar>
+        </v-window-item>
+
+        <!-- Messages (Sprint 11) — the agency roll-up of the campaign's threads -->
+        <v-window-item value="messages" data-test="panel-messages">
+          <CampaignMessagesPanel
+            v-if="agencyStore.currentAgencyId"
+            :agency-id="agencyStore.currentAgencyId"
+            :campaign-ulid="ulid"
+          />
         </v-window-item>
 
         <!-- Coming-soon tabs -->

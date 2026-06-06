@@ -16,6 +16,40 @@
         "dark": "Scuro"
       }
     },
+    "messaging": {
+      "title": "Messaggi",
+      "you": "Tu",
+      "participant": "Partecipante",
+      "composePlaceholder": "Scrivi un messaggio…",
+      "send": "Invia",
+      "attachment": "Allegato",
+      "empty": "Ancora nessun messaggio. Inizia la conversazione.",
+      "loadEarlier": "Carica messaggi precedenti",
+      "loadError": "Impossibile caricare questa conversazione. Verrà riprovato a breve.",
+      "sendError": "Impossibile inviare il messaggio. Riprova.",
+      "attachmentUploadError": "Caricamento di un allegato non riuscito. Riprova.",
+      "closed": "Questa conversazione è chiusa — l'incarico non è più attivo.",
+      "systemFallback": "L'incarico è stato aggiornato.",
+      "system": {
+        "assignment": {
+          "contracted": "Il contratto è stato firmato — la produzione può iniziare.",
+          "draft_submitted": "Una bozza è stata inviata per la revisione.",
+          "draft_approved": "La bozza è stata approvata.",
+          "revision_requested": "Sono state richieste revisioni sulla bozza.",
+          "draft_rejected": "La bozza è stata rifiutata.",
+          "posted_by_creator": "Il creator ha contrassegnato il contenuto come pubblicato.",
+          "live_verified": "Il post dal vivo è stato verificato.",
+          "manually_verified": "Il post è stato verificato manualmente.",
+          "resubmit_requested": "È stato richiesto un nuovo invio.",
+          "payment_released": "Il pagamento è stato rilasciato."
+        }
+      },
+      "rollup": {
+        "empty": "Ancora nessuna conversazione per questa campagna.",
+        "noMessages": "Ancora nessun messaggio.",
+        "loadError": "Impossibile caricare le conversazioni."
+      }
+    },
     "nav": {
       "dashboard": "Dashboard",
       "roster": "I miei creator",

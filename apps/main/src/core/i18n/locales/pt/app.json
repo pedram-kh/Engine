@@ -16,6 +16,40 @@
         "dark": "Escuro"
       }
     },
+    "messaging": {
+      "title": "Mensagens",
+      "you": "Você",
+      "participant": "Participante",
+      "composePlaceholder": "Escreva uma mensagem…",
+      "send": "Enviar",
+      "attachment": "Anexo",
+      "empty": "Ainda não há mensagens. Inicie a conversa.",
+      "loadEarlier": "Carregar mensagens anteriores",
+      "loadError": "Não foi possível carregar esta conversa. Tentaremos novamente em breve.",
+      "sendError": "Não foi possível enviar a sua mensagem. Tente novamente.",
+      "attachmentUploadError": "Falha ao enviar um anexo. Tente novamente.",
+      "closed": "Esta conversa está encerrada — a atribuição já não está ativa.",
+      "systemFallback": "A atribuição foi atualizada.",
+      "system": {
+        "assignment": {
+          "contracted": "O contrato foi assinado — a produção pode começar.",
+          "draft_submitted": "Um rascunho foi enviado para revisão.",
+          "draft_approved": "O rascunho foi aprovado.",
+          "revision_requested": "Foram solicitadas revisões no rascunho.",
+          "draft_rejected": "O rascunho foi rejeitado.",
+          "posted_by_creator": "O criador marcou o conteúdo como publicado.",
+          "live_verified": "A publicação ao vivo foi verificada.",
+          "manually_verified": "A publicação foi verificada manualmente.",
+          "resubmit_requested": "Foi solicitado um reenvio.",
+          "payment_released": "O pagamento foi liberado."
+        }
+      },
+      "rollup": {
+        "empty": "Ainda não há conversas para esta campanha.",
+        "noMessages": "Ainda não há mensagens.",
+        "loadError": "Não foi possível carregar as conversas."
+      }
+    },
     "nav": {
       "dashboard": "Painel",
       "roster": "Meus criadores",
