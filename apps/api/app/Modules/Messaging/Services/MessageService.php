@@ -71,6 +71,31 @@ final class MessageService
     }
 
     /**
+     * Write a system message (D-4). No human sender (sender_user_id null,
+     * sender_role/kind = system); the `$eventKey` is the AuditAction verb string
+     * (the FE + digest render the localized line from it — never stored text,
+     * D-5). NOT terminal-guarded: system messages write on terminal events too
+     * (the closing event IS a system message). Stamps `last_message_at`.
+     */
+    public function writeSystemMessage(MessageThread $thread, string $eventKey): Message
+    {
+        $message = new Message([
+            'thread_id' => $thread->id,
+            'sender_user_id' => null,
+            'sender_role' => MessageSenderRole::System,
+            'kind' => MessageKind::System,
+            'body' => null,
+            'attachments' => null,
+            'system_event_key' => $eventKey,
+        ]);
+        $message->save();
+
+        $thread->forceFill(['last_message_at' => $message->created_at])->save();
+
+        return $message;
+    }
+
+    /**
      * A chronological page of a thread's messages (oldest → newest within the
      * page). Without a cursor, returns the most-recent page. With `$beforeId`
      * (an internal message id), returns the page immediately older than it — the

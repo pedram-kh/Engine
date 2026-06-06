@@ -9,6 +9,7 @@ use App\Modules\Campaigns\Listeners\CreateAssignmentAvailabilityBlock;
 use App\Modules\Campaigns\Listeners\CreateMessageThread;
 use App\Modules\Campaigns\Listeners\DispatchPostedContentVerification;
 use App\Modules\Campaigns\Listeners\SendAssignmentNotifications;
+use App\Modules\Campaigns\Listeners\WriteSystemMessage;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Policies\CampaignPolicy;
 use Illuminate\Contracts\Foundation\CachesRoutes;
@@ -54,6 +55,12 @@ final class CampaignsServiceProvider extends ServiceProvider
         // UNIQUE); the lazy GET create heals any pre-existing thread-less
         // assignment, so no backfill migration is needed.
         Event::listen(AssignmentTransitioned::class, [CreateMessageThread::class, 'handle']);
+
+        // Sprint 11 (D-4): the 5th consumer writes a system message into the
+        // thread on curated lifecycle transitions (the WriteSystemMessage
+        // allowlist). The thread is provisioned defensively first; system
+        // messages write even on terminal events (D-13).
+        Event::listen(AssignmentTransitioned::class, [WriteSystemMessage::class, 'handle']);
     }
 
     private function registerRoutes(): void
