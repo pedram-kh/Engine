@@ -20,6 +20,8 @@ use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Services\AdminCreatorUpdateService;
 use App\Modules\Creators\Services\CompletenessScoreCalculator;
 use App\Modules\Identity\Models\User;
+use App\Modules\Notifications\Enums\NotificationType;
+use App\Modules\Notifications\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -51,6 +53,7 @@ final class AdminCreatorController
     public function __construct(
         private readonly CompletenessScoreCalculator $calculator,
         private readonly AdminCreatorUpdateService $updateService,
+        private readonly NotificationService $notifications,
     ) {}
 
     /**
@@ -237,6 +240,15 @@ final class AdminCreatorController
             welcomeMessage: $welcomeString,
         ));
 
+        // S11.0 Chunk 2 (D-2 #10) — in-app rides alongside the untouched email.
+        // Actor is the acting admin (D-3); the creator's User is the recipient.
+        $this->notifyCreatorOfLifecycle(
+            $creator,
+            NotificationType::CreatorApproved,
+            $admin,
+            array_filter(['welcome_message' => $welcomeString], static fn ($v): bool => $v !== null),
+        );
+
         return (new CreatorResource($creator, $this->calculator))
             ->withAdmin(true)
             ->response($request);
@@ -296,6 +308,16 @@ final class AdminCreatorController
             creatorDisplayName: $creator->display_name ?? '',
             rejectionReason: $rejectionReason,
         ));
+
+        // S11.0 Chunk 2 (D-2 #11) — in-app rides alongside the untouched email.
+        // The free-text rejection reason is carried as a render param (the body
+        // renders client-side in Ch3); actor is the acting admin (D-3).
+        $this->notifyCreatorOfLifecycle(
+            $creator,
+            NotificationType::CreatorRejected,
+            $admin,
+            ['rejection_reason' => $rejectionReason],
+        );
 
         return (new CreatorResource($creator, $this->calculator))
             ->withAdmin(true)
@@ -378,6 +400,31 @@ final class AdminCreatorController
         Mail::to($user->email)
             ->locale($user->preferred_language ?: 'en')
             ->queue($mailable);
+    }
+
+    /**
+     * Emit a creator-lifecycle in-app notification (S11.0 Chunk 2, D-2) beside
+     * the lifecycle mail above — never instead of it. The creator's User is the
+     * recipient, the Creator the subject. {@see NotificationService} honours the
+     * recipient's per-type `in_app` preference; a missing User is a no-op
+     * (defensive, mirroring {@see self::dispatchCreatorMail()}).
+     *
+     * @param  array<string, mixed>  $data  Render params only (Ch3 renders the body).
+     */
+    private function notifyCreatorOfLifecycle(Creator $creator, NotificationType $type, User $admin, array $data): void
+    {
+        $user = $creator->user;
+        if ($user === null) {
+            return;
+        }
+
+        $this->notifications->notify(
+            recipient: $user,
+            type: $type,
+            subject: $creator,
+            actor: $admin,
+            data: $data,
+        );
     }
 
     private function authorize(Request $request, string $ability, Creator $creator): void

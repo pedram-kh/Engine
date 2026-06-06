@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Campaigns\Listeners;
 
 use App\Modules\Agencies\Mail\ConnectionRequestMail;
+use App\Modules\Agencies\Models\Agency;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Jobs\VerifyPostedContentJob;
@@ -41,11 +42,16 @@ use Illuminate\Support\Facades\Mail;
  * endpoint) so Chunk 1 stays untouched — it is review-adjacent and belongs to
  * the review chunk (D-14).
  *
- * S11.0 Chunk 1 (D-10): this listener is the notification subsystem's PROOF
- * consumer. The draft-reviewed → creator path additionally emits an IN-APP
+ * S11.0 Chunk 1 (D-10): the draft-reviewed → creator path emits an IN-APP
  * notification via {@see NotificationService::notify()} — ALONGSIDE the
- * untouched email, never instead of it. This is the only emit site wired this
- * chunk; the remaining funnel events + fan-out are Ch2.
+ * untouched email, never instead of it.
+ *
+ * S11.0 Chunk 2 (D-2/D-5/D-6): the retrofit + agency fan-out. The manual-verify
+ * → creator path (#2) now also emits in-app; the two agency-facing paths —
+ * draft-submitted (#3) and contracted (#4) — FAN OUT in-app to the agency's
+ * admins+managers via {@see self::notifyAgencyMembers()} (staff excluded),
+ * while their emails stay single-inviter (the intentional D-6 asymmetry). Every
+ * emit rides ALONGSIDE its untouched Mail::queue, never instead of it.
  */
 final class SendAssignmentNotifications
 {
@@ -55,18 +61,26 @@ final class SendAssignmentNotifications
     {
         $assignment = $event->assignment;
 
+        // The user who drove the transition (D-3) — the in-app notification's
+        // actor. Resolved once from the event: the submitting creator for
+        // draft-submitted, the accepting party for contracted, the acting
+        // agency user for manual-verify. Null when system-triggered.
+        $actor = $event->triggeredByUserId !== null
+            ? User::find($event->triggeredByUserId)
+            : null;
+
         match ($event->action) {
-            AuditAction::AssignmentDraftSubmitted => $this->notifyAgencyOfSubmission($assignment),
+            AuditAction::AssignmentDraftSubmitted => $this->notifyAgencyOfSubmission($assignment, $actor),
             AuditAction::AssignmentDraftApproved => $this->notifyCreatorOfReview($assignment, 'approved'),
             AuditAction::AssignmentRevisionRequested => $this->notifyCreatorOfReview($assignment, 'revision_requested'),
             AuditAction::AssignmentDraftRejected => $this->notifyCreatorOfReview($assignment, 'rejected'),
-            AuditAction::AssignmentContracted => $this->notifyAgencyOfContractAcceptance($assignment),
-            AuditAction::AssignmentManuallyVerified => $this->notifyCreatorOfManualVerification($assignment),
+            AuditAction::AssignmentContracted => $this->notifyAgencyOfContractAcceptance($assignment, $actor),
+            AuditAction::AssignmentManuallyVerified => $this->notifyCreatorOfManualVerification($assignment, $actor),
             default => null,
         };
     }
 
-    private function notifyCreatorOfManualVerification(CampaignAssignment $assignment): void
+    private function notifyCreatorOfManualVerification(CampaignAssignment $assignment, ?User $actor): void
     {
         $creator = $assignment->creator;
         $campaign = $assignment->campaign;
@@ -87,26 +101,59 @@ final class SendAssignmentNotifications
                 campaignName: $campaign->name,
                 assignmentUlid: $assignment->ulid,
             ));
+
+        // S11.0 Chunk 2 (D-2 #2) — in-app rides alongside the untouched email.
+        // Actor is the agency user who manually verified (D-3).
+        $this->notifications->notify(
+            recipient: $recipient,
+            type: NotificationType::AssignmentManuallyVerified,
+            subject: $assignment,
+            actor: $actor,
+            data: [
+                'campaign_name' => $campaign->name,
+                'creator_name' => $creator->display_name ?? $recipient->name,
+                'assignment_ulid' => $assignment->ulid,
+            ],
+        );
     }
 
-    private function notifyAgencyOfSubmission(CampaignAssignment $assignment): void
+    private function notifyAgencyOfSubmission(CampaignAssignment $assignment, ?User $actor): void
     {
-        $recipient = $assignment->invitedBy;
         $campaign = $assignment->campaign;
         $creator = $assignment->creator;
 
-        if (! $recipient instanceof User || $recipient->email === '' || $campaign === null || $creator === null) {
+        if ($campaign === null || $creator === null) {
             return;
         }
 
-        Mail::to($recipient->email)
-            ->locale($recipient->preferred_language ?: 'en')
-            ->queue(new DraftSubmittedForReviewMail(
-                recipientName: $recipient->name,
-                creatorName: $creator->display_name ?? '',
-                campaignName: $campaign->name,
-                campaignUlid: $campaign->ulid,
-            ));
+        // Email — UNCHANGED, single-inviter (D-6). Guarded independently so a
+        // missing/empty inviter never blocks the in-app fan-out below.
+        $inviter = $assignment->invitedBy;
+        if ($inviter instanceof User && $inviter->email !== '') {
+            Mail::to($inviter->email)
+                ->locale($inviter->preferred_language ?: 'en')
+                ->queue(new DraftSubmittedForReviewMail(
+                    recipientName: $inviter->name,
+                    creatorName: $creator->display_name ?? '',
+                    campaignName: $campaign->name,
+                    campaignUlid: $campaign->ulid,
+                ));
+        }
+
+        // S11.0 Chunk 2 (D-2 #3, D-5/D-6) — in-app FANS OUT to admins+managers
+        // (staff excluded; the inviter is one recipient among them), so the
+        // agency gets N in-app rows beside the 1 inviter email above. Actor is
+        // the submitting creator (D-3). The asymmetry is intentional.
+        $this->notifyAgencyMembers(
+            $assignment,
+            NotificationType::AssignmentDraftSubmitted,
+            $actor,
+            [
+                'creator_name' => $creator->display_name ?? '',
+                'campaign_name' => $campaign->name,
+                'campaign_ulid' => $campaign->ulid,
+            ],
+        );
     }
 
     /**
@@ -184,23 +231,73 @@ final class SendAssignmentNotifications
         };
     }
 
-    private function notifyAgencyOfContractAcceptance(CampaignAssignment $assignment): void
+    private function notifyAgencyOfContractAcceptance(CampaignAssignment $assignment, ?User $actor): void
     {
-        $recipient = $assignment->invitedBy;
         $campaign = $assignment->campaign;
         $creator = $assignment->creator;
 
-        if (! $recipient instanceof User || $recipient->email === '' || $campaign === null || $creator === null) {
+        if ($campaign === null || $creator === null) {
             return;
         }
 
-        Mail::to($recipient->email)
-            ->locale($recipient->preferred_language ?: 'en')
-            ->queue(new ContractAcceptedMail(
-                recipientName: $recipient->name,
-                creatorName: $creator->display_name ?? '',
-                campaignName: $campaign->name,
-                campaignUlid: $campaign->ulid,
-            ));
+        // Email — UNCHANGED, single-inviter (D-6). Guarded independently from
+        // the fan-out so a missing inviter never blocks the in-app rows.
+        $inviter = $assignment->invitedBy;
+        if ($inviter instanceof User && $inviter->email !== '') {
+            Mail::to($inviter->email)
+                ->locale($inviter->preferred_language ?: 'en')
+                ->queue(new ContractAcceptedMail(
+                    recipientName: $inviter->name,
+                    creatorName: $creator->display_name ?? '',
+                    campaignName: $campaign->name,
+                    campaignUlid: $campaign->ulid,
+                ));
+        }
+
+        // S11.0 Chunk 2 (D-2 #4, D-5/D-6) — in-app fans out to admins+managers;
+        // 1 inviter email vs N in-app rows (intentional asymmetry). Actor is the
+        // party who drove the contracted transition (D-3).
+        $this->notifyAgencyMembers(
+            $assignment,
+            NotificationType::AssignmentContracted,
+            $actor,
+            [
+                'creator_name' => $creator->display_name ?? '',
+                'campaign_name' => $campaign->name,
+                'campaign_ulid' => $campaign->ulid,
+            ],
+        );
+    }
+
+    /**
+     * The agency fan-out seam (S11.0 Chunk 2, D-5/D-6/D-9). Emits ONE in-app
+     * notification per agency admin/manager (staff excluded by
+     * {@see Agency::notifiableMembers()}). The membership query hits the
+     * non-BelongsToAgency `agency_users` Pivot, so it is safe to run here in the
+     * (potentially queued) listener with no `runAs` (D-9). NotificationService
+     * still honours each recipient's per-type `in_app` preference.
+     *
+     * @param  array<string, mixed>  $data  Render params only (Ch3 renders the body).
+     */
+    private function notifyAgencyMembers(
+        CampaignAssignment $assignment,
+        NotificationType $type,
+        ?User $actor,
+        array $data,
+    ): void {
+        $agency = $assignment->agency;
+        if ($agency === null) {
+            return;
+        }
+
+        foreach ($agency->notifiableMembers() as $member) {
+            $this->notifications->notify(
+                recipient: $member,
+                type: $type,
+                subject: $assignment,
+                actor: $actor,
+                data: $data,
+            );
+        }
     }
 }
