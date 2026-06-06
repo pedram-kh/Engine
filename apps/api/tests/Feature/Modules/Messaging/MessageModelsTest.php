@@ -17,7 +17,7 @@ it('thread factory derives agency_id from its assignment and auto-fills a ulid',
     $thread = MessageThread::factory()->create();
 
     expect($thread->ulid)->not->toBeEmpty()
-        ->and($thread->agency_id)->toBe($thread->assignment->agency_id);
+        ->and($thread->agency_id)->toBe($thread->assignment?->agency_id);
 });
 
 it('message casts sender_role + kind to enums and decodes attachments json', function (): void {
@@ -28,7 +28,7 @@ it('message casts sender_role + kind to enums and decodes attachments json', fun
     expect($message->kind)->toBe(MessageKind::AttachmentOnly)
         ->and($message->sender_role)->toBe(MessageSenderRole::AgencyUser)
         ->and($message->attachments)->toBeArray()
-        ->and($message->attachments[0]['mime_type'])->toBe('application/pdf');
+        ->and($message->attachments[0]['mime_type'] ?? null)->toBe('application/pdf');
 });
 
 it('a system message has a null sender (D-2) and a system_event_key', function (): void {
@@ -56,7 +56,7 @@ it('thread → messages → receipts relations resolve', function (): void {
     MessageReadReceipt::factory()->create(['message_id' => $message->id]);
 
     expect($thread->messages)->toHaveCount(1)
-        ->and($thread->latestMessage->id)->toBe($message->id)
-        ->and($message->thread->id)->toBe($thread->id)
+        ->and($thread->latestMessage?->id)->toBe($message->id)
+        ->and($message->thread?->id)->toBe($thread->id)
         ->and($message->readReceipts)->toHaveCount(1);
 });

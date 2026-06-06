@@ -77,11 +77,11 @@ it('writes a system message on an allowlisted lifecycle transition + provisions 
 
     $message = latestSystemMessage($assignment);
     expect($message)->not->toBeNull()
-        ->and($message->kind)->toBe(MessageKind::System)
-        ->and($message->sender_role)->toBe(MessageSenderRole::System)
-        ->and($message->sender_user_id)->toBeNull()
-        ->and($message->body)->toBeNull()
-        ->and($message->system_event_key)->toBe('assignment.contracted');
+        ->and($message?->kind)->toBe(MessageKind::System)
+        ->and($message?->sender_role)->toBe(MessageSenderRole::System)
+        ->and($message?->sender_user_id)->toBeNull()
+        ->and($message?->body)->toBeNull()
+        ->and($message?->system_event_key)->toBe('assignment.contracted');
 
     $thread = MessageThread::withoutGlobalScopes()->where('assignment_id', $assignment->id)->firstOrFail();
     expect($thread->last_message_at)->not->toBeNull();
@@ -102,7 +102,7 @@ it('STILL writes a system message on the terminal payment_released event (D-13)'
 
     $message = latestSystemMessage($assignment);
     expect($message)->not->toBeNull()
-        ->and($message->system_event_key)->toBe('assignment.payment_released');
+        ->and($message?->system_event_key)->toBe('assignment.payment_released');
 });
 
 it('covers every allowlisted verb (catalogue tripwire)', function (): void {

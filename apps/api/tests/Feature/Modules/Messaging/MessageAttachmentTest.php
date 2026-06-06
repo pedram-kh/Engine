@@ -114,7 +114,7 @@ it('sends an attachment-only message after the upload lands (kind=attachment_onl
         ->assertJsonPath('data.attributes.attachments.0.name', 'brief.pdf');
 
     $message = Message::query()->where('kind', MessageKind::AttachmentOnly->value)->firstOrFail();
-    expect($message->attachments[0]['s3_path'])->toBe($storagePath)
+    expect($message->attachments[0]['s3_path'] ?? null)->toBe($storagePath)
         ->and($message->body)->toBeNull();
 });
 

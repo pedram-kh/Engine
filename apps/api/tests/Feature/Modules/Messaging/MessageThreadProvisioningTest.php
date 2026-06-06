@@ -35,7 +35,7 @@ it('provisions a thread when an assignment is invited (real listener fires)', fu
     $thread = MessageThread::withoutGlobalScopes()->where('assignment_id', $assignment->id)->first();
 
     expect($thread)->not->toBeNull()
-        ->and($thread->agency_id)->toBe($assignment->agency_id);
+        ->and($thread?->agency_id)->toBe($assignment->agency_id);
 });
 
 it('does not provision a thread on a non-invite transition', function (): void {
