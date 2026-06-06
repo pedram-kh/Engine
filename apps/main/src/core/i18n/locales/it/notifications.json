@@ -1,0 +1,30 @@
+{
+  "notifications": {
+    "center": {
+      "title": "Notifiche",
+      "empty": "Sei in pari.",
+      "markAll": "Segna tutte come lette",
+      "viewAll": "Vedi tutte le notifiche",
+      "loading": "Caricamento…",
+      "error": "Impossibile caricare le notifiche.",
+      "unreadBadgeLabel": "{count} notifiche non lette",
+      "feedbackLabel": "Feedback",
+      "reasonLabel": "Motivo"
+    },
+    "page": {
+      "title": "Notifiche",
+      "empty": "Non hai ancora notifiche."
+    },
+    "types": {
+      "assignment_draft_approved": "La tua bozza per {campaign_name} è stata approvata.",
+      "assignment_revision_requested": "Sono state richieste modifiche alla tua bozza per {campaign_name}.",
+      "assignment_draft_rejected": "La tua bozza per {campaign_name} è stata rifiutata.",
+      "assignment_manually_verified": "Il tuo post per {campaign_name} è stato verificato.",
+      "assignment_draft_submitted": "{creator_name} ha inviato una bozza per {campaign_name}.",
+      "assignment_contracted": "{creator_name} ha accettato il contratto per {campaign_name}.",
+      "creator_approved": "Il tuo account creator è stato approvato.",
+      "creator_rejected": "La tua candidatura come creator non è stata approvata.",
+      "fallback": "Hai una nuova notifica."
+    }
+  }
+}

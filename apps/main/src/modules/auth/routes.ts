@@ -337,6 +337,20 @@ export const appRoutes: RouteRecordRaw[] = [
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
+  // ── Notifications archive ───────────────────────────────────────────────────
+  // S11.0 Ch3a (D-2) — the agency-shell full paginated notification feed. The
+  // app-bar bell's dropdown is the recent slice; this is the archive. Any agency
+  // member may view (the API is owner-scoped to the auth user); not MFA-gated.
+  // The creator shell has a parallel `/creator/notifications` route rendering
+  // the SAME shell-agnostic NotificationsPage. Pinned into the requireAgencyUser
+  // arch-test's expected set.
+  {
+    path: '/notifications',
+    name: 'notifications',
+    component: () => import('@/modules/notifications/pages/NotificationsPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+
   // ── Accept invitation ─────────────────────────────────────────────────────
   // Public landing page. Auth state is detected inside the page.
   // No layout guard — this renders inside AgencyLayout only if authenticated,

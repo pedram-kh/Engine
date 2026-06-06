@@ -1,0 +1,30 @@
+{
+  "notifications": {
+    "center": {
+      "title": "Notifications",
+      "empty": "You're all caught up.",
+      "markAll": "Mark all read",
+      "viewAll": "View all notifications",
+      "loading": "Loading…",
+      "error": "Couldn't load notifications.",
+      "unreadBadgeLabel": "{count} unread notifications",
+      "feedbackLabel": "Feedback",
+      "reasonLabel": "Reason"
+    },
+    "page": {
+      "title": "Notifications",
+      "empty": "You have no notifications yet."
+    },
+    "types": {
+      "assignment_draft_approved": "Your draft for {campaign_name} was approved.",
+      "assignment_revision_requested": "Revisions were requested on your draft for {campaign_name}.",
+      "assignment_draft_rejected": "Your draft for {campaign_name} was rejected.",
+      "assignment_manually_verified": "Your post for {campaign_name} was verified.",
+      "assignment_draft_submitted": "{creator_name} submitted a draft for {campaign_name}.",
+      "assignment_contracted": "{creator_name} accepted the contract for {campaign_name}.",
+      "creator_approved": "Your creator account has been approved.",
+      "creator_rejected": "Your creator application was not approved.",
+      "fallback": "You have a new notification."
+    }
+  }
+}

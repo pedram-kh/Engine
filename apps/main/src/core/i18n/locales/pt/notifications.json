@@ -1,0 +1,30 @@
+{
+  "notifications": {
+    "center": {
+      "title": "Notificações",
+      "empty": "Está tudo em dia.",
+      "markAll": "Marcar todas como lidas",
+      "viewAll": "Ver todas as notificações",
+      "loading": "A carregar…",
+      "error": "Não foi possível carregar as notificações.",
+      "unreadBadgeLabel": "{count} notificações não lidas",
+      "feedbackLabel": "Comentário",
+      "reasonLabel": "Motivo"
+    },
+    "page": {
+      "title": "Notificações",
+      "empty": "Ainda não tem notificações."
+    },
+    "types": {
+      "assignment_draft_approved": "O seu rascunho para {campaign_name} foi aprovado.",
+      "assignment_revision_requested": "Foram pedidas alterações ao seu rascunho para {campaign_name}.",
+      "assignment_draft_rejected": "O seu rascunho para {campaign_name} foi rejeitado.",
+      "assignment_manually_verified": "A sua publicação para {campaign_name} foi verificada.",
+      "assignment_draft_submitted": "{creator_name} enviou um rascunho para {campaign_name}.",
+      "assignment_contracted": "{creator_name} aceitou o contrato para {campaign_name}.",
+      "creator_approved": "A sua conta de criador foi aprovada.",
+      "creator_rejected": "A sua candidatura de criador não foi aprovada.",
+      "fallback": "Tem uma nova notificação."
+    }
+  }
+}

@@ -89,6 +89,8 @@ describe('agency-shell routes — requireAgencyUser guard registration (Sprint 6
       // public profile). New agency-shell routes; both carry requireAgencyUser.
       'discover.detail',
       'discover.list',
+      // S11.0 Ch3a — the agency-shell notification archive (full paginated feed).
+      'notifications',
       'pools.create',
       'pools.detail',
       'pools.edit',

@@ -21,6 +21,7 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import ThemeToggle from '@/components/ThemeToggle.vue'
+import NotificationBell from '@/modules/notifications/components/NotificationBell.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 
@@ -74,6 +75,9 @@ async function signOut(): Promise<void> {
       </nav>
 
       <v-spacer />
+
+      <!-- Notification bell + unread badge + recent-slice dropdown (S11.0 Ch3a) -->
+      <NotificationBell view-all-route="creator.notifications" class="mr-1" />
 
       <v-menu
         v-model="userMenuOpen"

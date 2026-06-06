@@ -5,16 +5,19 @@ import enAuth from './locales/en/auth.json'
 import enAvailability from './locales/en/availability.json'
 import enCreator from './locales/en/creator.json'
 import enDashboard from './locales/en/dashboard.json'
+import enNotifications from './locales/en/notifications.json'
 import itApp from './locales/it/app.json'
 import itAuth from './locales/it/auth.json'
 import itAvailability from './locales/it/availability.json'
 import itCreator from './locales/it/creator.json'
 import itDashboard from './locales/it/dashboard.json'
+import itNotifications from './locales/it/notifications.json'
 import ptApp from './locales/pt/app.json'
 import ptAuth from './locales/pt/auth.json'
 import ptAvailability from './locales/pt/availability.json'
 import ptCreator from './locales/pt/creator.json'
 import ptDashboard from './locales/pt/dashboard.json'
+import ptNotifications from './locales/pt/notifications.json'
 
 /**
  * Vue-i18n bundle. Each locale folder owns one JSON file per top-level
@@ -44,6 +47,14 @@ import ptDashboard from './locales/pt/dashboard.json'
  *                       `availability.*` (codes stay `validation.`/
  *                       `creator.`), so — like dashboard — no i18n-codes
  *                       architecture test.
+ *   - `notifications.json` — notification-center chrome + the per-type body
+ *                       templates rendered client-side from
+ *                       `notification_type` + `data` (S11.0 Ch3a). UI-only
+ *                       (no backend error codes map under `notifications.*`);
+ *                       the en/pt/it key-set PARITY is pinned by
+ *                       `tests/unit/architecture/i18n-notifications-parity.spec.ts`
+ *                       and the "only the 8 live types are templated" rule is
+ *                       a structural fact of `notificationTemplateKey`.
  *
  * The architecture tests walk the backend source at Vitest time and
  * fail CI if a backend error code lands without a matching translation
@@ -58,12 +69,13 @@ type MessageSchema = typeof enApp &
   typeof enAuth &
   typeof enCreator &
   typeof enDashboard &
-  typeof enAvailability
+  typeof enAvailability &
+  typeof enNotifications
 
 const messages: Record<'en' | 'pt' | 'it', MessageSchema> = {
-  en: { ...enApp, ...enAuth, ...enCreator, ...enDashboard, ...enAvailability },
-  pt: { ...ptApp, ...ptAuth, ...ptCreator, ...ptDashboard, ...ptAvailability },
-  it: { ...itApp, ...itAuth, ...itCreator, ...itDashboard, ...itAvailability },
+  en: { ...enApp, ...enAuth, ...enCreator, ...enDashboard, ...enAvailability, ...enNotifications },
+  pt: { ...ptApp, ...ptAuth, ...ptCreator, ...ptDashboard, ...ptAvailability, ...ptNotifications },
+  it: { ...itApp, ...itAuth, ...itCreator, ...itDashboard, ...itAvailability, ...itNotifications },
 }
 
 export const i18n = createI18n<[MessageSchema], 'en' | 'pt' | 'it'>({

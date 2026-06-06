@@ -29,6 +29,7 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import ThemeToggle from '@/components/ThemeToggle.vue'
+import NotificationBell from '@/modules/notifications/components/NotificationBell.vue'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
@@ -130,6 +131,9 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
       />
 
       <v-spacer />
+
+      <!-- Notification bell + unread badge + recent-slice dropdown (S11.0 Ch3a) -->
+      <NotificationBell view-all-route="notifications" class="mr-1" />
 
       <!-- User menu -->
       <v-menu

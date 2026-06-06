@@ -21,9 +21,32 @@ import * as vuetifyDirectives from 'vuetify/directives'
 import { lightTheme, darkTheme } from '@catalyst/design-tokens/vuetify'
 import enApp from '@/core/i18n/locales/en/app.json'
 import enAvailability from '@/core/i18n/locales/en/availability.json'
+import enNotifications from '@/core/i18n/locales/en/notifications.json'
 import itAvailability from '@/core/i18n/locales/it/availability.json'
 import ptAvailability from '@/core/i18n/locales/pt/availability.json'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
+
+// The app-bar NotificationBell (S11.0 Ch3a) mounts a live unread-count poll.
+// Stub the API it calls so the poll is INERT under this spec — these layout
+// tests assert the topbar nav, not the bell, and must not carry an un-asserted
+// network side effect (§5.2-adjacent: a spec shouldn't have a live side effect
+// it doesn't assert). Mirrors how every other API-touching child is mocked in
+// its host spec.
+vi.mock('@/modules/notifications/api/notifications.api', () => ({
+  notificationsApi: {
+    list: vi.fn().mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 8, last_page: 1, unread_count: 0 },
+    }),
+    unreadCount: vi
+      .fn()
+      .mockResolvedValue({
+        data: { type: 'notification_unread_count', attributes: { unread_count: 0 } },
+      }),
+    markRead: vi.fn().mockResolvedValue({}),
+    readAll: vi.fn().mockResolvedValue({}),
+  },
+}))
 
 import CreatorDashboardLayout from './CreatorDashboardLayout.vue'
 
@@ -74,9 +97,9 @@ async function mountLayout(
     fallbackLocale: 'en',
     availableLocales: ['en', 'pt', 'it'],
     messages: {
-      en: { ...enApp, ...enAvailability },
-      pt: { ...enApp, ...ptAvailability },
-      it: { ...enApp, ...itAvailability },
+      en: { ...enApp, ...enAvailability, ...enNotifications },
+      pt: { ...enApp, ...ptAvailability, ...enNotifications },
+      it: { ...enApp, ...itAvailability, ...enNotifications },
     } as never,
   }) as unknown as ReturnType<typeof createI18n>
 
