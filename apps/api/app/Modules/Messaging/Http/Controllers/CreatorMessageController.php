@@ -9,18 +9,20 @@ use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
-use App\Modules\Messaging\Enums\MessageKind;
 use App\Modules\Messaging\Enums\MessageSenderRole;
 use App\Modules\Messaging\Exceptions\MessageThreadClosedException;
+use App\Modules\Messaging\Http\Controllers\Concerns\HandlesMessageAttachments;
 use App\Modules\Messaging\Http\Requests\SendMessageRequest;
 use App\Modules\Messaging\Http\Resources\MessageResource;
 use App\Modules\Messaging\Models\Message;
 use App\Modules\Messaging\Models\MessageThread;
+use App\Modules\Messaging\Services\MessageAttachmentUploadService;
 use App\Modules\Messaging\Services\MessageService;
 use App\Modules\Messaging\Services\MessageThreadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use RuntimeException;
 
 /**
  * The CREATOR messaging surface (Sprint 11, D-11/D-16) — the creator's single
@@ -40,9 +42,12 @@ use Illuminate\Http\Response;
  */
 final class CreatorMessageController
 {
+    use HandlesMessageAttachments;
+
     public function __construct(
         private readonly MessageThreadService $threads,
         private readonly MessageService $messages,
+        private readonly MessageAttachmentUploadService $attachmentUploads,
     ) {}
 
     public function index(Request $request, string $assignment): JsonResponse
@@ -66,20 +71,39 @@ final class CreatorMessageController
         [$viewer, $thread] = $this->resolve($request, $assignment);
 
         try {
+            [$kind, $body, $attachments] = $this->resolveSendPayload($request, $thread);
+
             $message = $this->messages->sendHumanMessage(
                 $thread,
                 $viewer,
                 MessageSenderRole::Creator,
-                MessageKind::Text,
-                (string) $request->validated('body'),
+                $kind,
+                $body,
+                $attachments,
             );
         } catch (MessageThreadClosedException $e) {
             return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $e->errorCode, $e->getMessage());
+        } catch (RuntimeException $e) {
+            return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, 'message.attachment_invalid', $e->getMessage());
         }
 
         return (new MessageResource($message->load('sender:id,name')))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
+    }
+
+    public function attachmentInit(Request $request, string $assignment): JsonResponse
+    {
+        [, $thread] = $this->resolve($request, $assignment);
+
+        return $this->attachmentInitResponse($request, $thread);
+    }
+
+    public function attachmentComplete(Request $request, string $assignment): JsonResponse
+    {
+        [, $thread] = $this->resolve($request, $assignment);
+
+        return $this->attachmentCompleteResponse($request, $thread);
     }
 
     public function markRead(Request $request, string $assignment): JsonResponse

@@ -39,6 +39,10 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
             ->name('messages.store');
         Route::post('campaigns/{campaign}/assignments/{assignment}/messages/read', [AgencyMessageController::class, 'markRead'])
             ->name('messages.read');
+        Route::post('campaigns/{campaign}/assignments/{assignment}/messages/attachments/init', [AgencyMessageController::class, 'attachmentInit'])
+            ->name('messages.attachments.init');
+        Route::post('campaigns/{campaign}/assignments/{assignment}/messages/attachments/complete', [AgencyMessageController::class, 'attachmentComplete'])
+            ->name('messages.attachments.complete');
     });
 
 Route::prefix('creators/me/assignments/{assignment}')
@@ -48,4 +52,6 @@ Route::prefix('creators/me/assignments/{assignment}')
         Route::get('messages', [CreatorMessageController::class, 'index'])->name('index');
         Route::post('messages', [CreatorMessageController::class, 'store'])->name('store');
         Route::post('messages/read', [CreatorMessageController::class, 'markRead'])->name('read');
+        Route::post('messages/attachments/init', [CreatorMessageController::class, 'attachmentInit'])->name('attachments.init');
+        Route::post('messages/attachments/complete', [CreatorMessageController::class, 'attachmentComplete'])->name('attachments.complete');
     });

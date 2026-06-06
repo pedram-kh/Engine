@@ -12,16 +12,19 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Messaging\Enums\MessageKind;
 use App\Modules\Messaging\Enums\MessageSenderRole;
 use App\Modules\Messaging\Exceptions\MessageThreadClosedException;
+use App\Modules\Messaging\Http\Controllers\Concerns\HandlesMessageAttachments;
 use App\Modules\Messaging\Http\Requests\SendMessageRequest;
 use App\Modules\Messaging\Http\Resources\MessageResource;
 use App\Modules\Messaging\Models\Message;
 use App\Modules\Messaging\Models\MessageThread;
+use App\Modules\Messaging\Services\MessageAttachmentUploadService;
 use App\Modules\Messaging\Services\MessageService;
 use App\Modules\Messaging\Services\MessageThreadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use RuntimeException;
 
 /**
  * The AGENCY messaging surface (Sprint 11, D-11/D-16). Tenant-scoped under the
@@ -41,9 +44,12 @@ use Illuminate\Support\Facades\Gate;
  */
 final class AgencyMessageController
 {
+    use HandlesMessageAttachments;
+
     public function __construct(
         private readonly MessageThreadService $threads,
         private readonly MessageService $messages,
+        private readonly MessageAttachmentUploadService $attachmentUploads,
     ) {}
 
     /**
@@ -116,20 +122,43 @@ final class AgencyMessageController
         $thread = $this->threads->forAssignment($assignment);
 
         try {
+            [$kind, $body, $attachments] = $this->resolveSendPayload($request, $thread);
+
             $message = $this->messages->sendHumanMessage(
                 $thread,
                 $sender,
                 MessageSenderRole::AgencyUser,
-                MessageKind::Text,
-                (string) $request->validated('body'),
+                $kind,
+                $body,
+                $attachments,
             );
         } catch (MessageThreadClosedException $e) {
             return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $e->errorCode, $e->getMessage());
+        } catch (RuntimeException $e) {
+            return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, 'message.attachment_invalid', $e->getMessage());
         }
 
         return (new MessageResource($message->load('sender:id,name')))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
+    }
+
+    public function attachmentInit(Request $request, Agency $agency, Campaign $campaign, CampaignAssignment $assignment): JsonResponse
+    {
+        $this->assertCampaignBelongsToAgency($campaign, $agency);
+        $this->assertAssignmentBelongsToCampaign($assignment, $campaign);
+        Gate::authorize('message', $campaign);
+
+        return $this->attachmentInitResponse($request, $this->threads->forAssignment($assignment));
+    }
+
+    public function attachmentComplete(Request $request, Agency $agency, Campaign $campaign, CampaignAssignment $assignment): JsonResponse
+    {
+        $this->assertCampaignBelongsToAgency($campaign, $agency);
+        $this->assertAssignmentBelongsToCampaign($assignment, $campaign);
+        Gate::authorize('message', $campaign);
+
+        return $this->attachmentCompleteResponse($request, $this->threads->forAssignment($assignment));
     }
 
     public function markRead(Request $request, Agency $agency, Campaign $campaign, CampaignAssignment $assignment): JsonResponse
