@@ -79,9 +79,10 @@ describe('NotificationPreferencesPage', () => {
     const wrapper = mountPage()
     await flushPromises()
 
-    const divergent = wrapper.find('[data-test="prefs-toggle-assignment.draft_approved"] input')
-      .element as HTMLInputElement
-    const defaulted = wrapper.find('[data-test="prefs-toggle-creator.approved"] input')
+    const divergent = wrapper.find(
+      '[data-test="prefs-toggle-assignment.draft_approved-in_app"] input',
+    ).element as HTMLInputElement
+    const defaulted = wrapper.find('[data-test="prefs-toggle-creator.approved-in_app"] input')
       .element as HTMLInputElement
 
     expect(divergent.checked).toBe(false)
@@ -89,56 +90,79 @@ describe('NotificationPreferencesPage', () => {
     wrapper.unmount()
   })
 
-  it('role filter — a CREATOR sees only the 7 creator-facing types (3 groups)', async () => {
+  it('role filter — a CREATOR sees 7 types / 8 toggles across 3 groups (messaging has the digest)', async () => {
     vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
     const wrapper = mountPage('creator')
     await flushPromises()
 
-    const toggles = wrapper.findAll('[data-test^="prefs-toggle-"]')
-    expect(toggles).toHaveLength(7)
-    // All three groups present (4 assignment + 2 creator + 1 messaging).
+    // 7 types, 8 toggles: 6 in_app-only types + the messaging type's
+    // in_app + digest pair (D-10).
+    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(7)
+    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(8)
+    // All three groups present (assignment + creator + messaging).
     expect(wrapper.find('[data-test="prefs-group-assignment"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="prefs-group-creator"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="prefs-group-messaging"]').exists()).toBe(true)
-    expect(wrapper.find('[data-test="prefs-toggle-message.received_by_creator"]').exists()).toBe(
-      true,
-    )
+    // The messaging type exposes BOTH channels (digest co-delivered, D-10).
+    expect(
+      wrapper.find('[data-test="prefs-toggle-message.received_by_creator-in_app"]').exists(),
+    ).toBe(true)
+    expect(
+      wrapper.find('[data-test="prefs-toggle-message.received_by_creator-digest"]').exists(),
+    ).toBe(true)
     // The agency-only types are NOT offered to a creator (no dead control).
-    expect(wrapper.find('[data-test="prefs-toggle-assignment.draft_submitted"]').exists()).toBe(
-      false,
-    )
-    expect(wrapper.find('[data-test="prefs-toggle-assignment.contracted"]').exists()).toBe(false)
-    expect(wrapper.find('[data-test="prefs-toggle-message.received_by_agency"]').exists()).toBe(
-      false,
-    )
-    expect(wrapper.find('[data-test="prefs-toggle-creator.approved"]').exists()).toBe(true)
+    expect(
+      wrapper.find('[data-test="prefs-toggle-assignment.draft_submitted-in_app"]').exists(),
+    ).toBe(false)
+    expect(
+      wrapper.find('[data-test="prefs-toggle-message.received_by_agency-in_app"]').exists(),
+    ).toBe(false)
     wrapper.unmount()
   })
 
-  it('role filter — an AGENCY user sees only the 3 agency-facing types (assignment + messaging)', async () => {
+  it('role filter — an AGENCY user sees 3 types / 4 toggles (assignment + messaging w/ digest)', async () => {
     vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
     const wrapper = mountPage('agency_user')
     await flushPromises()
 
-    const toggles = wrapper.findAll('[data-test^="prefs-toggle-"]')
-    expect(toggles).toHaveLength(3)
-    expect(wrapper.find('[data-test="prefs-toggle-assignment.draft_submitted"]').exists()).toBe(
-      true,
-    )
-    expect(wrapper.find('[data-test="prefs-toggle-assignment.contracted"]').exists()).toBe(true)
-    expect(wrapper.find('[data-test="prefs-toggle-message.received_by_agency"]').exists()).toBe(
-      true,
-    )
-    // No creator-facing toggles, and the creator group header is absent.
-    expect(wrapper.find('[data-test="prefs-toggle-creator.approved"]').exists()).toBe(false)
+    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(3)
+    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(4)
+    expect(
+      wrapper.find('[data-test="prefs-toggle-assignment.draft_submitted-in_app"]').exists(),
+    ).toBe(true)
+    expect(
+      wrapper.find('[data-test="prefs-toggle-message.received_by_agency-digest"]').exists(),
+    ).toBe(true)
+    // No creator-facing types, and the creator group header is absent.
     expect(wrapper.find('[data-test="prefs-group-creator"]').exists()).toBe(false)
-    expect(wrapper.find('[data-test="prefs-toggle-message.received_by_creator"]').exists()).toBe(
-      false,
-    )
+    expect(
+      wrapper.find('[data-test="prefs-toggle-message.received_by_creator-in_app"]').exists(),
+    ).toBe(false)
     wrapper.unmount()
   })
 
-  it('toggles a switch and submits the full visible set with the flipped value', async () => {
+  it('the digest channel is opt-in (default OFF) while in_app defaults ON (D-10)', async () => {
+    vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
+    const wrapper = mountPage('creator')
+    await flushPromises()
+
+    const inApp = wrapper.find(
+      '[data-test="prefs-toggle-message.received_by_creator-in_app"] input',
+    ).element as HTMLInputElement
+    const digest = wrapper.find(
+      '[data-test="prefs-toggle-message.received_by_creator-digest"] input',
+    ).element as HTMLInputElement
+
+    expect(inApp.checked).toBe(true)
+    expect(digest.checked).toBe(false)
+    // No non-messaging type exposes a digest toggle (honest channel lift).
+    expect(
+      wrapper.find('[data-test="prefs-toggle-assignment.draft_approved-digest"]').exists(),
+    ).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('toggles a switch and submits the full visible (type, channel) set with the flipped value', async () => {
     vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
     vi.mocked(notificationsApi.updatePreferences).mockResolvedValue(
       envelope([
@@ -148,25 +172,33 @@ describe('NotificationPreferencesPage', () => {
     const wrapper = mountPage()
     await flushPromises()
 
-    // Flip draft_approved OFF (it starts ON via the default).
-    await wrapper.find('[data-test="prefs-toggle-assignment.draft_approved"] input').setValue(false)
+    // Flip draft_approved's in_app OFF (it starts ON via the default).
+    await wrapper
+      .find('[data-test="prefs-toggle-assignment.draft_approved-in_app"] input')
+      .setValue(false)
+    // Opt INTO the messaging digest (it starts OFF).
+    await wrapper
+      .find('[data-test="prefs-toggle-message.received_by_creator-digest"] input')
+      .setValue(true)
 
     await wrapper.find('[data-test="prefs-form"]').trigger('submit')
     await flushPromises()
 
     expect(notificationsApi.updatePreferences).toHaveBeenCalledTimes(1)
     const payload = vi.mocked(notificationsApi.updatePreferences).mock.calls[0]?.[0]
-    // A creator submits exactly their 7 role-filtered toggles (not the full 10).
-    expect(payload?.preferences).toHaveLength(7)
-    // Every row is in_app (the only exposed channel).
-    expect(payload?.preferences.every((p) => p.channel === 'in_app')).toBe(true)
-    // The flipped toggle rides as false; an untouched one stays true.
+    // A creator submits all 8 (type, channel) toggles — 7 in_app + 1 digest.
+    expect(payload?.preferences).toHaveLength(8)
+    expect(payload?.preferences.filter((p) => p.channel === 'digest')).toHaveLength(1)
+    // The flipped in_app rides false; the opted-in digest rides true.
     expect(
-      payload?.preferences.find((p) => p.notification_type === 'assignment.draft_approved')
-        ?.is_enabled,
+      payload?.preferences.find(
+        (p) => p.notification_type === 'assignment.draft_approved' && p.channel === 'in_app',
+      )?.is_enabled,
     ).toBe(false)
     expect(
-      payload?.preferences.find((p) => p.notification_type === 'creator.approved')?.is_enabled,
+      payload?.preferences.find(
+        (p) => p.notification_type === 'message.received_by_creator' && p.channel === 'digest',
+      )?.is_enabled,
     ).toBe(true)
     wrapper.unmount()
   })

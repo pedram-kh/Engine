@@ -21,7 +21,11 @@
  * contract is never hardcoded here.
  */
 
-import type { NotificationChannel, NotificationPreferencesEnvelope } from '@catalyst/api-client'
+import type {
+  NotificationChannel,
+  NotificationPreferencesEnvelope,
+  NotificationType,
+} from '@catalyst/api-client'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -38,27 +42,48 @@ import {
 const { t } = useI18n()
 const { user } = storeToRefs(useAuthStore())
 
-/** The single channel this page exposes (D-2). */
-const CHANNEL: NotificationChannel = 'in_app'
-
 /**
  * The grouped, ROLE-FILTERED live types this user can set (D-4 + the review's
  * role filter). Derived from the shared `LIVE_TYPES` registry off the user's
  * `user_type` — a creator sees the creator-facing types, an agency user the
  * agency-facing ones; neither sees a toggle for a notification it can't receive.
+ * Each type carries the CHANNELS it supports (Sprint 11, D-10): `in_app` for
+ * all, plus `digest` for the messaging types whose daily-digest consumer ships.
  */
 const preferenceGroups = computed(() =>
   preferenceGroupsForRole(recipientRoleForUserType(user.value?.attributes.user_type ?? 'creator')),
 )
 
-const allTypes = computed(() => preferenceGroups.value.flatMap((group) => group.types))
+/** Every (type, channel) toggle this user can set — the flat save/compose set. */
+const allRows = computed(() =>
+  preferenceGroups.value.flatMap((group) =>
+    group.types.flatMap((typeView) =>
+      typeView.channels.map((channel) => ({ type: typeView.type, channel })),
+    ),
+  ),
+)
 
 /** The flat i18n label key for a prefs group. */
 function groupLabelKey(group: NotificationPreferenceGroup): string {
   return `notifications.preferences.groups.${group}`
 }
 
-/** The composed display state: type → whether its in-app notification is on. */
+/** The flat i18n label key for a type (mirrors the dotted→underscore precedent). */
+function typeLabelKey(type: string): string {
+  return `notifications.preferences.typeLabels.${type.replace(/\./g, '_')}`
+}
+
+/** The i18n label key for a channel toggle. */
+function channelLabelKey(channel: NotificationChannel): string {
+  return `notifications.preferences.channels.${channel}`
+}
+
+/** The composed display-state key for a (type, channel) pair. */
+function stateKey(type: NotificationType, channel: NotificationChannel): string {
+  return `${type}::${channel}`
+}
+
+/** The composed display state: `${type}::${channel}` → whether it's on. */
 const enabled = reactive<Record<string, boolean>>({})
 
 const loading = ref(true)
@@ -67,25 +92,18 @@ const loadError = ref(false)
 const saveError = ref(false)
 const saveSuccess = ref(false)
 
-/** The flat i18n label key for a type (mirrors the dotted→underscore precedent). */
-function typeLabelKey(type: string): string {
-  return `notifications.preferences.typeLabels.${type.replace(/\./g, '_')}`
-}
-
 /** Compose display state from the sparse rows + the defaults block (D-3). */
 function applyState(envelope: NotificationPreferencesEnvelope): void {
   const { preferences, defaults } = envelope.data.attributes
-  const fallback = defaults[CHANNEL]
 
   const overrides = new Map<string, boolean>()
   for (const row of preferences) {
-    if (row.channel === CHANNEL) {
-      overrides.set(row.notification_type, row.is_enabled)
-    }
+    overrides.set(stateKey(row.notification_type, row.channel), row.is_enabled)
   }
 
-  for (const type of allTypes.value) {
-    enabled[type] = overrides.get(type) ?? fallback
+  for (const { type, channel } of allRows.value) {
+    const key = stateKey(type, channel)
+    enabled[key] = overrides.get(key) ?? defaults[channel]
   }
 }
 
@@ -108,10 +126,10 @@ async function onSave(): Promise<void> {
   try {
     // Send the full visible set; the backend reconciles to sparse rows (D-1).
     const result = await notificationsApi.updatePreferences({
-      preferences: allTypes.value.map((type) => ({
+      preferences: allRows.value.map(({ type, channel }) => ({
         notification_type: type,
-        channel: CHANNEL,
-        is_enabled: enabled[type] ?? true,
+        channel,
+        is_enabled: enabled[stateKey(type, channel)] ?? true,
       })),
     })
     applyState(result)
@@ -166,16 +184,26 @@ onMounted(loadPreferences)
             {{ t(groupLabelKey(group.group)) }}
           </h2>
 
-          <v-switch
-            v-for="type in group.types"
-            :key="type"
-            v-model="enabled[type]"
-            :label="t(typeLabelKey(type))"
-            color="primary"
-            density="compact"
-            hide-details
-            :data-test="`prefs-toggle-${type}`"
-          />
+          <div
+            v-for="typeView in group.types"
+            :key="typeView.type"
+            class="mb-3"
+            :data-test="`prefs-type-${typeView.type}`"
+          >
+            <div class="text-body-2 mb-1">{{ t(typeLabelKey(typeView.type)) }}</div>
+
+            <v-switch
+              v-for="channel in typeView.channels"
+              :key="channel"
+              v-model="enabled[stateKey(typeView.type, channel)]"
+              :label="t(channelLabelKey(channel))"
+              color="primary"
+              density="compact"
+              hide-details
+              class="ms-2"
+              :data-test="`prefs-toggle-${typeView.type}-${channel}`"
+            />
+          </div>
         </div>
 
         <div

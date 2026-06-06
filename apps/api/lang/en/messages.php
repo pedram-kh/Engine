@@ -30,5 +30,7 @@ return [
         'intro' => 'You have :count unread message(s) across :threads conversation(s).',
         'cta' => 'Open your messages',
         'thread_line' => ':campaign with :counterparty — :count unread',
+        'unknown_campaign' => 'a campaign',
+        'unknown_counterparty' => 'someone',
     ],
 ];

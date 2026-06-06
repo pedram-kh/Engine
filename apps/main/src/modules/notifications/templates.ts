@@ -30,7 +30,7 @@
  * null actor and only its own keys present.
  */
 
-import type { NotificationType, UserType } from '@catalyst/api-client'
+import type { NotificationChannel, NotificationType, UserType } from '@catalyst/api-client'
 
 const FALLBACK_KEY = 'notifications.types.fallback'
 
@@ -47,7 +47,19 @@ interface LiveNotificationType {
   recipient: NotificationRecipientRole
   /** The prefs-UI grouping. */
   group: NotificationPreferenceGroup
+  /**
+   * The channels this type supports a toggle for (Sprint 11, D-10). A channel
+   * appears here ONLY when a consumer actually delivers it — never ship a
+   * toggle for a channel that gates nothing (dead control). All live types
+   * support `in_app` (the Ch3a feed). Messaging additionally supports `digest`
+   * (the daily email job, opt-in / default OFF) the moment that job consumes
+   * it.
+   */
+  channels: NotificationChannel[]
 }
+
+/** Every live type supports the in-app feed; this is the common case. */
+const IN_APP_ONLY: NotificationChannel[] = ['in_app']
 
 /**
  * The live-set. The dotted enum values can't be `t()`-pathed directly (vue-i18n
@@ -60,56 +72,68 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
     templateKey: 'notifications.types.assignment_draft_submitted',
     recipient: 'agency',
     group: 'assignment',
+    channels: IN_APP_ONLY,
   },
   'assignment.contracted': {
     templateKey: 'notifications.types.assignment_contracted',
     recipient: 'agency',
     group: 'assignment',
+    channels: IN_APP_ONLY,
   },
   // Creator review/lifecycle rows — only creators receive these.
   'assignment.revision_requested': {
     templateKey: 'notifications.types.assignment_revision_requested',
     recipient: 'creator',
     group: 'assignment',
+    channels: IN_APP_ONLY,
   },
   'assignment.draft_approved': {
     templateKey: 'notifications.types.assignment_draft_approved',
     recipient: 'creator',
     group: 'assignment',
+    channels: IN_APP_ONLY,
   },
   'assignment.draft_rejected': {
     templateKey: 'notifications.types.assignment_draft_rejected',
     recipient: 'creator',
     group: 'assignment',
+    channels: IN_APP_ONLY,
   },
   'assignment.manually_verified': {
     templateKey: 'notifications.types.assignment_manually_verified',
     recipient: 'creator',
     group: 'assignment',
+    channels: IN_APP_ONLY,
   },
   'creator.approved': {
     templateKey: 'notifications.types.creator_approved',
     recipient: 'creator',
     group: 'creator',
+    channels: IN_APP_ONLY,
   },
   'creator.rejected': {
     templateKey: 'notifications.types.creator_rejected',
     recipient: 'creator',
     group: 'creator',
+    channels: IN_APP_ONLY,
   },
   // Messaging (Sprint 11, D-7) — dual-recipient new-message notifications. Each
   // direction targets exactly one role, so each gets its own toggle (no dead
   // control). by_creator → the creator receives (agency sent); by_agency → the
-  // agency receives (creator sent).
+  // agency receives (creator sent). Messaging is the first type to expose the
+  // `digest` channel (D-10): the daily-digest job consumes it, so the toggle
+  // ships WITH its consumer (no dead control, no un-opt-out-able digest).
   'message.received_by_creator': {
     templateKey: 'notifications.types.message_received_by_creator',
     recipient: 'creator',
     group: 'messaging',
+    channels: ['in_app', 'digest'],
   },
   'message.received_by_agency': {
     templateKey: 'notifications.types.message_received_by_agency',
     recipient: 'agency',
     group: 'messaging',
+    channels: ['in_app', 'digest'],
   },
 }
 
@@ -134,10 +158,16 @@ export function recipientRoleForUserType(userType: UserType): NotificationRecipi
   return userType === 'creator' ? 'creator' : 'agency'
 }
 
+/** A single live type's prefs row: the type + the channels it can toggle. */
+export interface NotificationPreferenceTypeView {
+  type: NotificationType
+  channels: NotificationChannel[]
+}
+
 /** A prefs-UI group with the live types (for one recipient role) it contains. */
 export interface NotificationPreferenceGroupView {
   group: NotificationPreferenceGroup
-  types: NotificationType[]
+  types: NotificationPreferenceTypeView[]
 }
 
 /** Stable display order of the prefs groups. */
@@ -156,7 +186,7 @@ const PREFERENCE_GROUP_ORDER: readonly NotificationPreferenceGroup[] = [
 export function preferenceGroupsForRole(
   role: NotificationRecipientRole,
 ): NotificationPreferenceGroupView[] {
-  const byGroup = new Map<NotificationPreferenceGroup, NotificationType[]>()
+  const byGroup = new Map<NotificationPreferenceGroup, NotificationPreferenceTypeView[]>()
 
   for (const [type, definition] of Object.entries(LIVE_TYPES) as Array<
     [NotificationType, LiveNotificationType]
@@ -165,7 +195,7 @@ export function preferenceGroupsForRole(
       continue
     }
     const existing = byGroup.get(definition.group) ?? []
-    existing.push(type)
+    existing.push({ type, channels: definition.channels })
     byGroup.set(definition.group, existing)
   }
 

@@ -24,5 +24,7 @@ return [
         'intro' => 'Hai :count messaggio/i non letto/i in :threads conversazione/i.',
         'cta' => 'Apri i tuoi messaggi',
         'thread_line' => ':campaign con :counterparty — :count non letti',
+        'unknown_campaign' => 'una campagna',
+        'unknown_counterparty' => 'qualcuno',
     ],
 ];

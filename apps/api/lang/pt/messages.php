@@ -24,5 +24,7 @@ return [
         'intro' => 'Você tem :count mensagem(ns) não lida(s) em :threads conversa(s).',
         'cta' => 'Abrir as suas mensagens',
         'thread_line' => ':campaign com :counterparty — :count não lidas',
+        'unknown_campaign' => 'uma campanha',
+        'unknown_counterparty' => 'alguém',
     ],
 ];

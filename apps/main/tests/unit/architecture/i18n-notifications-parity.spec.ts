@@ -147,16 +147,20 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
 })
 
 /**
- * S11.0 Ch3b — the prefs role-partition and the Ch3a template map are ONE source
- * of truth (the `LIVE_TYPES` registry). These pin that they can't drift: the
- * union of the two recipient roles' prefs types is EXACTLY the 8 live-template
- * types, the two roles are disjoint, and every prefs-exposed type has a bespoke
- * (non-fallback) template. A type added to / dropped from the registry, or given
- * a recipient that doesn't match its template, fails here.
+ * S11.0 Ch3b + Sprint 11 — the prefs role-partition and the Ch3a template map
+ * are ONE source of truth (the `LIVE_TYPES` registry). These pin that they can't
+ * drift: the union of the two recipient roles' prefs types is EXACTLY the 10
+ * live-template types, the two roles are disjoint, and every prefs-exposed type
+ * has a bespoke (non-fallback) template. A type added to / dropped from the
+ * registry, or given a recipient that doesn't match its template, fails here.
+ *
+ * Sprint 11 (D-10) also pins the CHANNEL partition: the `digest` channel is
+ * exposed ONLY for the messaging types (the only ones whose digest consumer
+ * ships) — never a dead digest toggle on a type the digest job ignores.
  */
 describe('notifications prefs role-partition — single live-set source of truth', () => {
-  const creatorTypes = preferenceGroupsForRole('creator').flatMap((g) => g.types)
-  const agencyTypes = preferenceGroupsForRole('agency').flatMap((g) => g.types)
+  const creatorTypes = preferenceGroupsForRole('creator').flatMap((g) => g.types.map((t) => t.type))
+  const agencyTypes = preferenceGroupsForRole('agency').flatMap((g) => g.types.map((t) => t.type))
 
   it('creator + agency prefs types partition the 10 live types exactly (disjoint, complete)', () => {
     // Disjoint — no type is offered to both roles.
@@ -187,5 +191,19 @@ describe('notifications prefs role-partition — single live-set source of truth
       expect(hasLiveTemplate(type)).toBe(true)
       expect(notificationTemplateKey(type)).not.toBe('notifications.types.fallback')
     }
+  })
+
+  it('the digest channel is exposed ONLY for the messaging types (D-10 honest channel lift)', () => {
+    const rows = [
+      ...preferenceGroupsForRole('creator'),
+      ...preferenceGroupsForRole('agency'),
+    ].flatMap((g) => g.types)
+
+    const withDigest = rows.filter((r) => r.channels.includes('digest')).map((r) => r.type)
+    expect(withDigest.sort()).toEqual(
+      ['message.received_by_agency', 'message.received_by_creator'].sort(),
+    )
+    // Every live type still supports the in-app feed.
+    expect(rows.every((r) => r.channels.includes('in_app'))).toBe(true)
   })
 })

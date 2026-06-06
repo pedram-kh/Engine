@@ -42,6 +42,10 @@
         "creator": "Creator account",
         "messaging": "Messages"
       },
+      "channels": {
+        "in_app": "In-app",
+        "digest": "Daily email digest"
+      },
       "typeLabels": {
         "assignment_draft_submitted": "A draft is submitted for review",
         "assignment_contracted": "A contract is accepted",

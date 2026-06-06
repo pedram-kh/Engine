@@ -42,6 +42,10 @@
         "creator": "Account creator",
         "messaging": "Messaggi"
       },
+      "channels": {
+        "in_app": "Nell'app",
+        "digest": "Riepilogo giornaliero via email"
+      },
       "typeLabels": {
         "assignment_draft_submitted": "Viene inviata una bozza per la revisione",
         "assignment_contracted": "Un contratto viene accettato",

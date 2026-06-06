@@ -42,6 +42,10 @@
         "creator": "Conta de criador",
         "messaging": "Mensagens"
       },
+      "channels": {
+        "in_app": "Na aplicação",
+        "digest": "Resumo diário por email"
+      },
       "typeLabels": {
         "assignment_draft_submitted": "Um rascunho é enviado para revisão",
         "assignment_contracted": "Um contrato é aceite",

@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Console\Commands\SendMessageDigests;
 use App\Core\Errors\ValidationExceptionRenderer;
 use App\Core\Tenancy\EnsureTenancyContext;
 use App\Core\Tenancy\SetTenancyContext;
 use App\Core\Tenancy\SetTenancyFromAgencyRoute;
 use App\Modules\Audit\Http\Middleware\RequireActionReason;
 use App\Modules\Identity\Http\Middleware\UseAdminSessionCookie;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -22,6 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
         health: '/up',
     )
+    ->withSchedule(function (Schedule $schedule): void {
+        // Sprint 11 (D-9): the app's first scheduled command — the daily
+        // unread-messages digest (the messaging email channel, opt-in).
+        $schedule->command(SendMessageDigests::class)->daily();
+    })
     ->withMiddleware(function (Middleware $middleware): void {
         // Sanctum SPA cookie auth. EnsureFrontendRequestsAreStateful is
         // prepended into the api group; on requests from any
