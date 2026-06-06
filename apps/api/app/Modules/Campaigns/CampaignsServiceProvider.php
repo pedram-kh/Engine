@@ -6,6 +6,7 @@ namespace App\Modules\Campaigns;
 
 use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Listeners\CreateAssignmentAvailabilityBlock;
+use App\Modules\Campaigns\Listeners\CreateMessageThread;
 use App\Modules\Campaigns\Listeners\DispatchPostedContentVerification;
 use App\Modules\Campaigns\Listeners\SendAssignmentNotifications;
 use App\Modules\Campaigns\Models\Campaign;
@@ -47,6 +48,12 @@ final class CampaignsServiceProvider extends ServiceProvider
         // sends the review notification set (D-14).
         Event::listen(AssignmentTransitioned::class, [DispatchPostedContentVerification::class, 'handle']);
         Event::listen(AssignmentTransitioned::class, [SendAssignmentNotifications::class, 'handle']);
+
+        // Sprint 11 (D-3): the 4th consumer provisions the assignment's message
+        // thread on invite. Idempotent (firstOrCreate on the assignment_id
+        // UNIQUE); the lazy GET create heals any pre-existing thread-less
+        // assignment, so no backfill migration is needed.
+        Event::listen(AssignmentTransitioned::class, [CreateMessageThread::class, 'handle']);
     }
 
     private function registerRoutes(): void

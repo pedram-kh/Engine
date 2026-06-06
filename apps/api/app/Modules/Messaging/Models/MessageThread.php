@@ -7,6 +7,7 @@ namespace App\Modules\Messaging\Models;
 use App\Core\Concerns\HasUlid;
 use App\Core\Tenancy\BelongsToAgency;
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Messaging\Database\Factories\MessageThreadFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -48,6 +49,24 @@ final class MessageThread extends Model
     use HasUlid;
 
     /**
+     * Assignment statuses that block a HUMAN send (Sprint 11, D-13 + Q2). The
+     * thread is ALWAYS readable, and SYSTEM messages still write on terminal
+     * events regardless — only human sends are gated.
+     *
+     * Deliberately NARROWER than {@see AssignmentStatus::isTerminal()}: that set
+     * includes `payment_released`, but per Q2 a paid-out assignment stays OPEN
+     * for post-delivery wrap-up (asset handoff, final notes). The gate is the
+     * three "engagement ended badly / was called off" terminals only.
+     *
+     * @var list<AssignmentStatus>
+     */
+    public const array HUMAN_SEND_BLOCKED_STATUSES = [
+        AssignmentStatus::Declined,
+        AssignmentStatus::Rejected,
+        AssignmentStatus::Cancelled,
+    ];
+
+    /**
      * @var list<string>
      */
     protected $fillable = [
@@ -86,6 +105,18 @@ final class MessageThread extends Model
     public function latestMessage(): HasOne
     {
         return $this->hasOne(Message::class, 'thread_id')->latestOfMany();
+    }
+
+    /**
+     * Whether a human send is currently blocked (D-13 + Q2). Reads the parent
+     * assignment's status; system writes ignore this.
+     */
+    public function humanSendBlocked(): bool
+    {
+        $assignment = $this->assignment;
+
+        return $assignment !== null
+            && in_array($assignment->status, self::HUMAN_SEND_BLOCKED_STATUSES, true);
     }
 
     /**
