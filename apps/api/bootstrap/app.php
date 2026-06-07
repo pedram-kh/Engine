@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Console\Commands\ScanOverdueAssignments;
 use App\Console\Commands\SendMessageDigests;
 use App\Core\Errors\ValidationExceptionRenderer;
 use App\Core\Tenancy\EnsureTenancyContext;
@@ -28,6 +29,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // Sprint 11 (D-9): the app's first scheduled command — the daily
         // unread-messages digest (the messaging email channel, opt-in).
         $schedule->command(SendMessageDigests::class)->daily();
+
+        // Sprint 12 Chunk 3 (D-5): the daily overdue sweep — fires the two
+        // time-triggered board events for assignments past their posting/draft
+        // deadline (a cross-agency sweep with per-card tenant self-resolution).
+        $schedule->command(ScanOverdueAssignments::class)->daily();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         // Sanctum SPA cookie auth. EnsureFrontendRequestsAreStateful is
