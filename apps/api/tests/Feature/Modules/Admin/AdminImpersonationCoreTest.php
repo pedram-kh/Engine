@@ -79,6 +79,24 @@ it('starts impersonation: writes the row, audits with reason, returns a hand-off
     expect($log->subject_id)->toBe($target->id);
 });
 
+it('returns the MAIN SPA origin as the hand-off URL (not the framework default)', function (): void {
+    config(['app.frontend_main_url' => 'http://127.0.0.1:5173']);
+
+    $admin = makeImpersonationAdmin();
+    $target = makeImpersonationTarget();
+
+    $response = $this->actingAs($admin, 'web_admin')->postJson('/api/v1/admin/impersonate', [
+        'user_ulid' => $target->ulid,
+        'reason' => 'Investigating a reported checkout bug.',
+    ]);
+
+    $response->assertCreated();
+    // The hand-off must point at the configured main SPA origin — a
+    // regression here (the Laravel framework default http://localhost:3000)
+    // sends the admin to a dead port and the claim never lands.
+    expect($response->json('data.attributes.main_spa_url'))->toBe('http://127.0.0.1:5173');
+});
+
 it('refuses to impersonate a platform admin (no escalation)', function (): void {
     $admin = makeImpersonationAdmin();
     $otherAdmin = makeImpersonationAdmin();

@@ -102,7 +102,7 @@ final class AdminImpersonationController
                 'type' => 'impersonation_sessions',
                 'attributes' => [
                     'handoff_token' => $result['token'],
-                    'main_spa_url' => (string) config('app.frontend_url'),
+                    'main_spa_url' => (string) config('app.frontend_main_url'),
                     'impersonated_user_ulid' => $target->ulid,
                     'impersonated_user_name' => $target->name,
                     'expires_at' => $result['session']->expires_at->toIso8601String(),

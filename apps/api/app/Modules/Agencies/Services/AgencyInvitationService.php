@@ -63,7 +63,7 @@ final class AgencyInvitationService
         // parameter carries the agency ULID so the accept page can call
         // POST /api/v1/agencies/{agency}/invitations/accept — the endpoint
         // requires the agency identifier in the path.
-        $acceptUrl = rtrim((string) config('app.frontend_url', config('app.url')), '/')
+        $acceptUrl = rtrim((string) config('app.frontend_main_url', config('app.url')), '/')
             .'/accept-invitation?token='.$token.'&agency='.$agency->ulid;
 
         // The invitee's name: if they already have an account, use it;
