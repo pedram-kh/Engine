@@ -14,6 +14,7 @@
 
 import { useI18n } from 'vue-i18n'
 
+import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
 import { buildLocaleOptions } from './localeOptions'
 
 const { t, locale, availableLocales } = useI18n()
@@ -23,6 +24,8 @@ const localeOptions = buildLocaleOptions(availableLocales, t)
 
 <template>
   <v-app>
+    <ImpersonationBanner />
+
     <v-main>
       <div class="auth-layout d-flex flex-column align-center justify-center pa-6">
         <header class="auth-layout__header d-flex align-center justify-space-between mb-6 w-100">

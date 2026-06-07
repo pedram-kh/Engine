@@ -21,6 +21,7 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import ThemeToggle from '@/components/ThemeToggle.vue'
+import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
 import NotificationBell from '@/modules/notifications/components/NotificationBell.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
@@ -52,6 +53,8 @@ async function signOut(): Promise<void> {
 
 <template>
   <v-app data-test="creator-layout">
+    <ImpersonationBanner />
+
     <v-app-bar elevation="1" data-test="creator-topbar">
       <div class="d-flex align-center px-4">
         <v-icon icon="mdi-lightning-bolt" color="primary" size="small" class="mr-2" />

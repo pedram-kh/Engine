@@ -29,6 +29,7 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import ThemeToggle from '@/components/ThemeToggle.vue'
+import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
 import NotificationBell from '@/modules/notifications/components/NotificationBell.vue'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
@@ -81,6 +82,9 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
 
 <template>
   <v-app data-test="agency-layout">
+    <!-- ─── Impersonation banner (first child → layout reserves its height) ── -->
+    <ImpersonationBanner />
+
     <!-- ─── Navigation drawer ─────────────────────────────────── -->
     <v-navigation-drawer v-model="drawer" permanent width="260" data-test="agency-sidebar">
       <!-- Workspace name -->

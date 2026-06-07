@@ -36,6 +36,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
+import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
@@ -70,6 +71,8 @@ async function saveAndExit(): Promise<void> {
 
 <template>
   <v-app data-test="onboarding-layout">
+    <ImpersonationBanner />
+
     <v-app-bar elevation="1" class="onboarding-topbar" data-test="onboarding-topbar">
       <div class="d-flex align-center px-4">
         <v-icon icon="mdi-lightning-bolt" color="primary" size="small" class="mr-2" />

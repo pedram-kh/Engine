@@ -50,11 +50,10 @@ const layout = computed<'auth' | 'agency' | 'onboarding' | 'creator' | 'error' |
 </script>
 
 <template>
-  <!-- Pinned ABOVE the per-layout v-app so it persists across every shell
-       while impersonating; a plain element so the single-v-app invariant
-       (each layout owns its own <v-app>) is untouched. -->
-  <ImpersonationBanner />
-
+  <!-- The impersonation banner is mounted as the first child INSIDE each
+       layout's own <v-app> (see the layout components), so the Vuetify
+       layout engine offsets the navbar/drawer/content below it instead of
+       the banner masking them. The bare fallback shell mounts it too. -->
   <AuthLayout v-if="layout === 'auth' || layout === 'error'">
     <router-view />
   </AuthLayout>
@@ -68,6 +67,7 @@ const layout = computed<'auth' | 'agency' | 'onboarding' | 'creator' | 'error' |
     <router-view />
   </CreatorDashboardLayout>
   <v-app v-else>
+    <ImpersonationBanner />
     <v-main>
       <router-view />
     </v-main>

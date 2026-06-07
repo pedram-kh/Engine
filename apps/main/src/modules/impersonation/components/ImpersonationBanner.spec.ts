@@ -10,6 +10,7 @@ import { flushPromises } from '@vue/test-utils'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { defineComponent, h } from 'vue'
 import { createI18n } from 'vue-i18n'
 import { createVuetify } from 'vuetify'
 import * as vuetifyComponents from 'vuetify/components'
@@ -31,7 +32,19 @@ function buildHarness() {
     components: vuetifyComponents,
     directives: vuetifyDirectives,
   })
-  return mount(ImpersonationBanner, {
+
+  // The banner is now a <v-system-bar>, which requires a Vuetify layout
+  // (<v-app>) ancestor for its layout-item injection — mirror the real
+  // mount site by wrapping it in a bare <v-app>.
+  const Harness = defineComponent({
+    name: 'ImpersonationBannerHarness',
+    components: { VApp: vuetifyComponents.VApp, ImpersonationBanner },
+    setup() {
+      return () => h(vuetifyComponents.VApp, () => h(ImpersonationBanner))
+    },
+  })
+
+  return mount(Harness, {
     global: { plugins: [i18n, vuetify] },
     attachTo: document.createElement('div'),
   })

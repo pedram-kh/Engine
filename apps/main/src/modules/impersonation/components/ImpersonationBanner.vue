@@ -2,10 +2,13 @@
 /**
  * Persistent impersonation banner (Sprint 13, D-10).
  *
- * A fixed, high-contrast bar pinned to the top of the viewport whenever
- * the admin is impersonating a user. Rendered at the App.vue root —
- * OUTSIDE the per-layout `<v-app>` — so it is a plain styled element (not
- * a Vuetify component) and never violates the single-`<v-app>` invariant.
+ * A high-contrast bar pinned to the top of the shell whenever the admin is
+ * impersonating a user. Rendered as a Vuetify `<v-system-bar>` as the FIRST
+ * child INSIDE each layout's `<v-app>` (mirrors the admin SPA's env banner).
+ * Living inside the layout means the Vuetify layout engine reserves space
+ * for it and pushes the app-bar / navigation-drawer / main content down —
+ * so the banner can never mask the navbar (the bug this replaced the old
+ * `position: fixed` root-level element to fix).
  *
  * It shows WHO the session is acting as is implicit (the SPA is rendering
  * as them); the bar's job is the standing reminder + the advisory
@@ -56,71 +59,42 @@ async function onEnd(): Promise<void> {
 </script>
 
 <template>
-  <div
+  <v-system-bar
     v-if="store.active"
-    class="impersonation-banner"
+    color="error"
+    window
+    :height="40"
+    class="impersonation-banner justify-center text-white"
     role="alert"
     data-testid="impersonation-banner"
   >
-    <span class="impersonation-banner__label">
+    <span class="impersonation-banner__label font-weight-bold">
       {{ t('impersonation.banner.message') }}
     </span>
-    <span class="impersonation-banner__timer" data-testid="impersonation-banner-countdown">
+    <span class="impersonation-banner__timer mx-4" data-testid="impersonation-banner-countdown">
       {{ t('impersonation.banner.expires_in', { time: countdown }) }}
     </span>
-    <button
-      type="button"
-      class="impersonation-banner__end"
+    <v-btn
+      size="x-small"
+      variant="flat"
+      color="white"
+      class="impersonation-banner__end text-error text-none"
+      :loading="store.isEnding"
       :disabled="store.isEnding"
       data-testid="impersonation-banner-end"
       @click="onEnd"
     >
       {{ t('impersonation.banner.end') }}
-    </button>
-  </div>
+    </v-btn>
+  </v-system-bar>
 </template>
 
 <style scoped>
-/* Pinned at the App.vue root, OUTSIDE any <v-app>, so the Vuetify
-   --v-theme-* variables are out of scope here. Consume the global
-   :root design tokens (@catalyst/design-tokens) instead, which is why
-   this is the danger primitive rather than the Vuetify error theme color. */
-.impersonation-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 3000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 8px 16px;
-  background: var(--danger-500);
-  color: var(--brand-cream);
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-bottom: 2px solid var(--danger-100);
-}
-
+/* The banner now lives INSIDE the layout's <v-app>, so Vuetify theme
+   tokens resolve here — `color="error"` paints the danger background and
+   the layout engine reserves the bar's height (no manual offset needed). */
 .impersonation-banner__timer {
   font-variant-numeric: tabular-nums;
   opacity: 0.9;
-}
-
-.impersonation-banner__end {
-  background: var(--brand-cream);
-  color: var(--danger-500);
-  border: none;
-  border-radius: var(--radius-sm, 4px);
-  padding: 4px 12px;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.impersonation-banner__end:disabled {
-  opacity: 0.6;
-  cursor: default;
 }
 </style>
