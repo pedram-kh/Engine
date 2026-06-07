@@ -9,6 +9,7 @@ use App\Modules\Boards\Models\Board;
 use App\Modules\Boards\Models\BoardAutomation;
 use App\Modules\Boards\Models\BoardCard;
 use App\Modules\Boards\Models\BoardCardMovement;
+use App\Modules\Boards\Models\BoardColumn;
 use App\Modules\Boards\Services\BoardService;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Models\Campaign;
@@ -28,7 +29,7 @@ uses(TestCase::class, RefreshDatabase::class);
  * Defaults seed NO overdue automation (an overdue key is inert until an agency
  * maps it), so each fixture wires one explicitly — the agency-config scenario.
  *
- * @return array{agency: Agency, campaign: Campaign, assignment: CampaignAssignment, board: Board, card: BoardCard, target: ?BoardCard}
+ * @return array{agency: Agency, campaign: Campaign, assignment: CampaignAssignment, board: Board, card: BoardCard, target: ?BoardColumn}
  */
 function overdueFixture(array $assignmentAttrs, ?string $eventKey = null, AssignmentStatus $status = AssignmentStatus::Invited): array
 {
@@ -74,6 +75,7 @@ it('fires posting_overdue for an overdue assignment with a mapped automation (ca
         ['posting_due_at' => now()->subDay()],
         'assignment.posting_overdue',
     );
+    assert($target !== null);
 
     $this->artisan('boards:scan-overdue')->assertExitCode(0);
 
@@ -123,6 +125,7 @@ it('does NOT re-fire after the card is dragged OUT of the overdue column (the fl
         ['posting_due_at' => now()->subDay()],
         'assignment.posting_overdue',
     );
+    assert($target !== null);
 
     // First scan fires: card → target, marker stamped.
     $this->artisan('boards:scan-overdue')->assertExitCode(0);
@@ -163,6 +166,7 @@ it('fires draft_overdue when draft_due_at is set and passed (the net-new field e
         ['draft_due_at' => now()->subDay()],
         'assignment.draft_overdue',
     );
+    assert($target !== null);
 
     $this->artisan('boards:scan-overdue')->assertExitCode(0);
 
@@ -200,6 +204,7 @@ it("does NOT let agency A's overdue automation fire on agency B's card (cross-ag
         ['posting_due_at' => now()->subDay()],
         'assignment.posting_overdue',
     );
+    assert($targetA !== null);
 
     // B has an overdue assignment + card but NO overdue automation of its own.
     ['assignment' => $assignmentB, 'card' => $cardB] = overdueFixture(
