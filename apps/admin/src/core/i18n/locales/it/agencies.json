@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Agenzie",
+        "search_label": "Cerca agenzie",
+        "load_failed": "Impossibile caricare le agenzie. Aggiorna la pagina.",
+        "empty": "Nessuna agenzia corrisponde a questo filtro.",
+        "filters": {
+          "all": "Tutte",
+          "active": "Attive",
+          "suspended": "Sospese"
+        },
+        "fields": {
+          "name": "Agenzia",
+          "status": "Stato",
+          "members": "Membri",
+          "tier": "Piano",
+          "created_at": "Creata"
+        },
+        "status_labels": {
+          "active": "Attiva",
+          "suspended": "Sospesa"
+        },
+        "view": "Vedi agenzia"
+      },
+      "detail": {
+        "fallback_title": "Agenzia",
+        "load_failed": "Impossibile caricare questa agenzia. Aggiorna la pagina.",
+        "overview_heading": "Panoramica",
+        "suspension_heading": "Sospensione",
+        "fields": {
+          "slug": "Slug",
+          "country": "Paese",
+          "tier": "Piano di abbonamento",
+          "subscription_status": "Stato dell'abbonamento",
+          "members": "Membri",
+          "created_at": "Creata",
+          "suspended_at": "Sospesa il",
+          "suspended_reason": "Motivo"
+        },
+        "active_state": "Questa agenzia è attiva. I suoi utenti possono accedere normalmente.",
+        "suspended_state": "Questa agenzia è sospesa. Tutti i suoi utenti non possono accedere."
+      },
+      "suspend": {
+        "button": "Sospendi agenzia",
+        "title": "Sospendi {name}",
+        "description": "La sospensione di questa agenzia impedisce a TUTTI i suoi utenti di accedere. Viene registrata nel registro di audit.",
+        "reason_label": "Motivo della sospensione",
+        "reason_hint": "Obbligatorio, almeno {count} caratteri. Registrato nel registro di audit.",
+        "confirm": "Sospendi",
+        "cancel": "Annulla",
+        "success": "Agenzia sospesa.",
+        "failed": "Impossibile sospendere questa agenzia. Riprova."
+      },
+      "reactivate": {
+        "button": "Riattiva agenzia",
+        "title": "Riattiva {name}",
+        "description": "La riattivazione di questa agenzia ripristina l'accesso per tutti i suoi utenti. Viene registrata nel registro di audit.",
+        "confirm": "Riattiva",
+        "cancel": "Annulla",
+        "success": "Agenzia riattivata.",
+        "failed": "Impossibile riattivare questa agenzia. Riprova."
+      }
+    }
+  }
+}

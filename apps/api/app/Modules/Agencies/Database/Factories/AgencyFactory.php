@@ -36,6 +36,20 @@ final class AgencyFactory extends Factory
     }
 
     /**
+     * A suspended agency (Sprint 13, D-3). `suspended_at` is the SOT
+     * marker the auth-layer login block reads; `is_active=false` is kept
+     * in lock-step.
+     */
+    public function suspended(string $reason = 'Suspended for testing purposes.'): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'is_active' => false,
+            'suspended_at' => now(),
+            'suspended_reason' => $reason,
+        ]);
+    }
+
+    /**
      * The Catalyst pilot tenant (docs/20-PHASE-1-SPEC.md §1).
      */
     public function catalyst(): static

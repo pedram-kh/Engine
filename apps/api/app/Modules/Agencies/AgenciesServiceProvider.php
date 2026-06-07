@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Modules\Agencies;
 
+use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Agencies\Policies\AgencyCreatorRelationPolicy;
+use App\Modules\Agencies\Policies\AgencyPolicy;
 use App\Modules\Agencies\Services\AgencyInvitationService;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Gate;
@@ -28,6 +30,7 @@ final class AgenciesServiceProvider extends ServiceProvider
     private function registerPolicies(): void
     {
         Gate::policy(AgencyCreatorRelation::class, AgencyCreatorRelationPolicy::class);
+        Gate::policy(Agency::class, AgencyPolicy::class);
     }
 
     private function registerRoutes(): void

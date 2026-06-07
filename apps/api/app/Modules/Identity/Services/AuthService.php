@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Services;
 
+use App\Core\Tenancy\SetTenancyContext;
+use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Events\LoginFailed;
 use App\Modules\Identity\Events\UserLoggedIn;
@@ -194,6 +196,30 @@ final class AuthService
             return LoginResult::accountSuspended($user);
         }
 
+        // Agency-suspension gate (Sprint 13, D-3). Reuses the same
+        // security-ordered login graph rather than a separate middleware:
+        // a second place where account-locking logic lives would be a
+        // drift risk (Q1). Placed right after the per-user suspension
+        // check, on the same "credentials already verified" footing.
+        //
+        // We block ONLY on the user's PRIMARY (acting) agency — the first
+        // accepted membership by id, mirroring SetTenancyContext's
+        // primary-membership convention. A user who belongs to multiple
+        // agencies is NOT locked out because some OTHER, unrelated agency
+        // is suspended; only a suspension of the agency they actually act
+        // under denies the session (Q1, the deliberate multi-agency case).
+        //
+        // The login graph is reused so the result is the same no-session,
+        // suspended-style envelope the per-user path returns; the distinct
+        // LoginFailed reason `agency_suspended` keeps the trail legible.
+        // platform_admins / creators have no agency membership, so this is
+        // a structural no-op for them.
+        if ($this->primaryAgencyIsSuspended($user)) {
+            $this->events->dispatch(new LoginFailed($email, $user, $ip, $userAgent, 'agency_suspended'));
+
+            return LoginResult::accountSuspended($user);
+        }
+
         // SPA-mismatch gate. Placed after credential + suspension
         // verification so a probe with a wrong password or against a
         // suspended account never leaks "this email belongs to a
@@ -335,6 +361,35 @@ final class AuthService
         if ($counts['short_window_count'] >= FailedLoginTracker::SHORT_WINDOW_THRESHOLD) {
             $this->lockout->temporaryLock($email);
         }
+    }
+
+    /**
+     * True when the user's PRIMARY (acting) agency is suspended (D-3).
+     *
+     * "Primary" mirrors {@see SetTenancyContext}: the
+     * first accepted membership ordered by id — the agency the user would
+     * act under once tenancy resolves. We require `accepted_at` so a
+     * dangling pending invitation to a suspended agency never blocks a
+     * login (an invite is not an acting relationship).
+     *
+     * Only this primary agency gates the login. A user with a second,
+     * healthy membership is NOT denied because some unrelated agency they
+     * also belong to is suspended (the deliberate multi-agency case, Q1).
+     *
+     * The `agency` relation is eager-loaded so the suspension read is a
+     * single extra query; `withTrashed` is NOT used — a soft-deleted
+     * agency has no live users to log in.
+     */
+    private function primaryAgencyIsSuspended(User $user): bool
+    {
+        $membership = AgencyMembership::query()
+            ->where('user_id', $user->getKey())
+            ->whereNotNull('accepted_at')
+            ->orderBy('id')
+            ->with('agency')
+            ->first();
+
+        return $membership?->agency?->isSuspended() ?? false;
     }
 
     /**

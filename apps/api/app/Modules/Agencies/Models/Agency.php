@@ -35,6 +35,8 @@ use Illuminate\Support\Collection;
  * @property array<string, mixed>|null $address
  * @property array<string, mixed> $settings
  * @property bool $is_active
+ * @property Carbon|null $suspended_at
+ * @property string|null $suspended_reason
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -66,6 +68,8 @@ final class Agency extends Model
         'address',
         'settings',
         'is_active',
+        'suspended_at',
+        'suspended_reason',
     ];
 
     /**
@@ -123,6 +127,17 @@ final class Agency extends Model
     }
 
     /**
+     * Sprint 13 (D-3) — suspension is ENFORCED at the auth layer: a
+     * suspended agency's users cannot log in (AuthService::login). The
+     * `suspended_at` timestamp is the canonical marker; `is_active` is
+     * kept in lock-step for backward-compat but `suspended_at` is the SOT.
+     */
+    public function isSuspended(): bool
+    {
+        return $this->suspended_at !== null;
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
@@ -131,6 +146,7 @@ final class Agency extends Model
             'address' => 'array',
             'settings' => 'array',
             'is_active' => 'boolean',
+            'suspended_at' => 'datetime',
         ];
     }
 

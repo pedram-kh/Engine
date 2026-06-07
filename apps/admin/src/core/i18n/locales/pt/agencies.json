@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Agências",
+        "search_label": "Procurar agências",
+        "load_failed": "Não foi possível carregar as agências. Atualize a página.",
+        "empty": "Nenhuma agência corresponde a este filtro.",
+        "filters": {
+          "all": "Todas",
+          "active": "Ativas",
+          "suspended": "Suspensas"
+        },
+        "fields": {
+          "name": "Agência",
+          "status": "Estado",
+          "members": "Membros",
+          "tier": "Plano",
+          "created_at": "Criada"
+        },
+        "status_labels": {
+          "active": "Ativa",
+          "suspended": "Suspensa"
+        },
+        "view": "Ver agência"
+      },
+      "detail": {
+        "fallback_title": "Agência",
+        "load_failed": "Não foi possível carregar esta agência. Atualize a página.",
+        "overview_heading": "Resumo",
+        "suspension_heading": "Suspensão",
+        "fields": {
+          "slug": "Slug",
+          "country": "País",
+          "tier": "Plano de subscrição",
+          "subscription_status": "Estado da subscrição",
+          "members": "Membros",
+          "created_at": "Criada",
+          "suspended_at": "Suspensa em",
+          "suspended_reason": "Motivo"
+        },
+        "active_state": "Esta agência está ativa. Os seus utilizadores podem iniciar sessão normalmente.",
+        "suspended_state": "Esta agência está suspensa. Todos os seus utilizadores estão impedidos de iniciar sessão."
+      },
+      "suspend": {
+        "button": "Suspender agência",
+        "title": "Suspender {name}",
+        "description": "Suspender esta agência impede TODOS os seus utilizadores de iniciar sessão. Fica registado no registo de auditoria.",
+        "reason_label": "Motivo da suspensão",
+        "reason_hint": "Obrigatório, pelo menos {count} caracteres. Registado no registo de auditoria.",
+        "confirm": "Suspender",
+        "cancel": "Cancelar",
+        "success": "Agência suspensa.",
+        "failed": "Não foi possível suspender esta agência. Tente novamente."
+      },
+      "reactivate": {
+        "button": "Reativar agência",
+        "title": "Reativar {name}",
+        "description": "Reativar esta agência restaura o início de sessão de todos os seus utilizadores. Fica registado no registo de auditoria.",
+        "confirm": "Reativar",
+        "cancel": "Cancelar",
+        "success": "Agência reativada.",
+        "failed": "Não foi possível reativar esta agência. Tente novamente."
+      }
+    }
+  }
+}
