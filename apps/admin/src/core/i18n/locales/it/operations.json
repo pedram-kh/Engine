@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "operations": {
+      "health": {
+        "title": "Stato del sistema",
+        "heading": "Stato dei servizi",
+        "load_failed": "Impossibile caricare la verifica dello stato. Aggiorna la pagina.",
+        "status": {
+          "ok": "Integro",
+          "degraded": "Degradato"
+        },
+        "checks": {
+          "database": "Database",
+          "cache": "Cache"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "featureFlags": {
+      "title": "Funzionalità",
+      "subtitle": "Interruttori a livello di piattaforma. Ogni modifica è tracciata e ha effetto immediato.",
+      "load_failed": "Impossibile caricare le funzionalità. Aggiorna la pagina.",
+      "toggle": {
+        "enable_title": "Attivare {label}?",
+        "disable_title": "Disattivare {label}?",
+        "description": "Questo modifica la funzionalità per l'intera piattaforma e ha effetto immediato. È obbligatorio un motivo, registrato nel registro di audit.",
+        "reason_label": "Motivo",
+        "reason_hint": "Almeno {count} caratteri — registrato per questa modifica.",
+        "cancel": "Annulla",
+        "confirm": "Conferma",
+        "success": "Funzionalità aggiornata.",
+        "failed": "Impossibile aggiornare la funzionalità. Riprova."
+      }
+    }
+  }
+}

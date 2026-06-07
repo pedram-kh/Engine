@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "load_failed": "Impossibile caricare la dashboard. Aggiorna la pagina.",
+      "kpi": {
+        "agencies_total": "Agenzie",
+        "agencies_suspended": "Agenzie sospese",
+        "creators_pending_approval": "Approvazioni in sospeso",
+        "creators_pending_kyc": "Coda KYC",
+        "queue_pending": "Lavori in coda",
+        "queue_failed": "Lavori falliti",
+        "open_disputes": "Controversie aperte",
+        "failed_payments_today": "Pagamenti falliti oggi"
+      },
+      "activity": {
+        "heading": "Attività recente",
+        "empty": "Nessuna attività recente."
+      }
+    }
+  }
+}

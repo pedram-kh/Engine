@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "featureFlags": {
+      "title": "Funcionalidades",
+      "subtitle": "Interruptores ao nível da plataforma. Cada alteração é auditada e entra em vigor imediatamente.",
+      "load_failed": "Não foi possível carregar as funcionalidades. Atualize a página.",
+      "toggle": {
+        "enable_title": "Ativar {label}?",
+        "disable_title": "Desativar {label}?",
+        "description": "Isto altera a funcionalidade em toda a plataforma e entra em vigor imediatamente. É obrigatório um motivo, registado no registo de auditoria.",
+        "reason_label": "Motivo",
+        "reason_hint": "Pelo menos {count} caracteres — registado nesta alteração.",
+        "cancel": "Cancelar",
+        "confirm": "Confirmar",
+        "success": "Funcionalidade atualizada.",
+        "failed": "Não foi possível atualizar a funcionalidade. Tente novamente."
+      }
+    }
+  }
+}

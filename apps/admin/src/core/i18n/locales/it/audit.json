@@ -1,0 +1,27 @@
+{
+  "admin": {
+    "audit": {
+      "title": "Registro di audit",
+      "empty": "Nessuna voce di audit corrisponde a questi filtri.",
+      "load_failed": "Impossibile caricare il registro di audit. Aggiorna la pagina.",
+      "filters": {
+        "action": "Azione",
+        "subject": "ULID del soggetto",
+        "date_from": "Da",
+        "date_to": "A",
+        "apply": "Applica"
+      },
+      "fields": {
+        "action": "Azione",
+        "actor": "Autore",
+        "subject": "Soggetto",
+        "reason": "Motivo",
+        "created_at": "Quando"
+      },
+      "pagination": {
+        "prev": "Precedente",
+        "next": "Successivo"
+      }
+    }
+  }
+}

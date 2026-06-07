@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Painel",
+      "load_failed": "Não foi possível carregar o painel. Atualize a página.",
+      "kpi": {
+        "agencies_total": "Agências",
+        "agencies_suspended": "Agências suspensas",
+        "creators_pending_approval": "Aprovações pendentes",
+        "creators_pending_kyc": "Fila de KYC",
+        "queue_pending": "Tarefas em fila",
+        "queue_failed": "Tarefas falhadas",
+        "open_disputes": "Disputas abertas",
+        "failed_payments_today": "Pagamentos falhados hoje"
+      },
+      "activity": {
+        "heading": "Atividade recente",
+        "empty": "Sem atividade recente."
+      }
+    }
+  }
+}

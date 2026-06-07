@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "featureFlags": {
+      "title": "Feature flags",
+      "subtitle": "Platform-level on/off toggles. Every flip is audited and takes effect immediately.",
+      "load_failed": "We couldn't load the feature flags. Please refresh.",
+      "toggle": {
+        "enable_title": "Enable {label}?",
+        "disable_title": "Disable {label}?",
+        "description": "This flips the flag platform-wide and takes effect immediately. A reason is required and recorded in the audit log.",
+        "reason_label": "Reason",
+        "reason_hint": "At least {count} characters — recorded against this flip.",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "success": "Feature flag updated.",
+        "failed": "We couldn't update the flag. Please try again."
+      }
+    }
+  }
+}

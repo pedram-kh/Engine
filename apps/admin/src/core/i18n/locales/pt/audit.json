@@ -1,0 +1,27 @@
+{
+  "admin": {
+    "audit": {
+      "title": "Registo de auditoria",
+      "empty": "Nenhuma entrada de auditoria corresponde a estes filtros.",
+      "load_failed": "Não foi possível carregar o registo de auditoria. Atualize a página.",
+      "filters": {
+        "action": "Ação",
+        "subject": "ULID do alvo",
+        "date_from": "De",
+        "date_to": "Até",
+        "apply": "Aplicar"
+      },
+      "fields": {
+        "action": "Ação",
+        "actor": "Autor",
+        "subject": "Alvo",
+        "reason": "Motivo",
+        "created_at": "Quando"
+      },
+      "pagination": {
+        "prev": "Anterior",
+        "next": "Seguinte"
+      }
+    }
+  }
+}

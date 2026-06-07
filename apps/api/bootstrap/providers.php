@@ -17,10 +17,12 @@ use App\Modules\Payments\PaymentsServiceProvider;
 use App\Modules\TalentPools\TalentPoolsServiceProvider;
 use App\Modules\TrackedJobs\TrackedJobsServiceProvider;
 use App\Providers\AppServiceProvider;
+use App\Providers\HorizonServiceProvider;
 use App\TestHelpers\TestHelpersServiceProvider;
 
 return [
     AppServiceProvider::class,
+    HorizonServiceProvider::class,
 
     // Domain modules — see docs/02-CONVENTIONS.md §1, §2.2.
     // Order: alphabetical. Modules communicate via events, not service-provider order.

@@ -53,6 +53,15 @@ final class UseAdminSessionCookie
 
     public const PATH_PREFIX = 'api/v1/admin';
 
+    /**
+     * The embedded Horizon dashboard (Sprint 13, D-8) is an admin-only
+     * surface served outside the `api/v1/admin/*` prefix, on the `web`
+     * middleware group. It must read the ADMIN session so its gate can
+     * resolve the platform_admin on the `web_admin` guard — so the cookie
+     * swap applies here too.
+     */
+    public const HORIZON_PATH_PREFIX = 'horizon';
+
     public const CSRF_PREFLIGHT_PATH = 'sanctum/csrf-cookie';
 
     public function __construct(private readonly Repository $config) {}
@@ -71,6 +80,10 @@ final class UseAdminSessionCookie
         $path = ltrim($request->path(), '/');
 
         if (str_starts_with($path, self::PATH_PREFIX)) {
+            return true;
+        }
+
+        if ($path === self::HORIZON_PATH_PREFIX || str_starts_with($path, self::HORIZON_PATH_PREFIX.'/')) {
             return true;
         }
 
