@@ -7,7 +7,8 @@
  * structure (the shell precedent) with admin-specific density + chrome:
  *
  *   v-system-bar  → persistent env banner (LOCAL/STAGING/PRODUCTION, D-2)
- *   v-navigation-drawer (left, permanent, 220px — never collapses, § 5.1)
+ *   v-navigation-drawer (left, permanent, 280px — never collapses, § 5.1;
+ *     widened from 220px so expanded group sub-items don't truncate)
  *     - Catalyst Admin wordmark
  *     - Declarative nav (NAV_ENTRIES) with groups + badge counts
  *   v-app-bar (top, 48px — denser than main's 56px, § 5.1)
@@ -86,7 +87,7 @@ async function signOut(): Promise<void> {
     <v-navigation-drawer
       v-model="drawer"
       permanent
-      width="220"
+      width="280"
       data-test="admin-sidebar"
       data-testid="admin-sidebar"
     >
