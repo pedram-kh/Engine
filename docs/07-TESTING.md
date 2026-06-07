@@ -163,7 +163,7 @@ test('approving a creator emits an audit entry', function () {
 
 #### Scheduled-command tests
 
-_Established Sprint 11 — Messaging (the app's first scheduled command, `messages:send-digest`)._
+_Established Sprint 11 — Messaging (the app's first scheduled command, `messages:send-digest`). Second consumer: Sprint 12 Chunk 3 — Boards (`boards:scan-overdue`, the daily overdue sweep). With two consumers the cross-agency-ABSENCE requirement below is now a confirmed standard for any scheduled fan-out / sweep job: `boards:scan-overdue` is a deliberate GLOBAL sweep (`withoutGlobalScope`) whose per-card isolation is structural (each card self-resolves its own agency's automation config), pinned by the ABSENCE test exactly as `messages:send-digest` is._
 
 Every scheduled command (`->command(...)` in the `withSchedule()` callback in [`bootstrap/app.php`](../apps/api/bootstrap/app.php)) has tests for **both** halves:
 

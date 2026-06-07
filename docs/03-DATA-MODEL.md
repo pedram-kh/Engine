@@ -513,10 +513,13 @@ The heart of the system. One assignment = one creator engaged on one campaign.
 | `total_charged_to_brand_minor_units` | bigint null      | What the brand sees / pays                                        | P1    |
 | `deliverables`                       | jsonb            | Specific list (overrides campaign brief if set)                   | P1    |
 | `posting_due_at`                     | timestamptz null |                                                                   | P1    |
+| `draft_due_at`                       | timestamptz null | Draft deadline (Sprint 12 Ch3, D-2) — mirror of `posting_due_at`  | P1    |
 | `submitted_draft_at`                 | timestamptz null |                                                                   | P1    |
 | `approved_at`                        | timestamptz null |                                                                   | P1    |
 | `posted_at`                          | timestamptz null |                                                                   | P1    |
 | `verified_live_at`                   | timestamptz null | When social API confirmed post is live                            | P1    |
+| `posting_overdue_flagged_at`         | timestamptz null | One-shot marker (Sprint 12 Ch3, D-4) — see note                   | P1    |
+| `draft_overdue_flagged_at`           | timestamptz null | One-shot marker (Sprint 12 Ch3, D-4) — see note                   | P1    |
 | `payment_id`                         | bigint FK null   | `payments.id`                                                     | P1    |
 | `cancelled_at`                       | timestamptz null |                                                                   | P1    |
 | `cancelled_reason`                   | text null        |                                                                   | P1    |
@@ -573,6 +576,9 @@ State transitions are managed by `CampaignAssignmentStateMachine` service. Every
 - `idx_assignments_creator_status` on (`creator_id`, `status`)
 - `idx_assignments_brand_id` on `brand_id`
 - `idx_assignments_dates` on `posting_due_at`
+- `idx_assignments_draft_due_at` on `draft_due_at` (Sprint 12 Ch3 — the draft-deadline mirror of `idx_assignments_dates`)
+
+> **`draft_due_at` + the two `*_overdue_flagged_at` markers — Sprint 12 Chunk 3 addition (D-2/D-4, migration `2026_06_07_120000`).** `draft_due_at` is an exact mirror of `posting_due_at` (nullable timestamp, indexed, set on invite via `InviteAssignmentRequest` + the controller). Backend-only this chunk — the FE invite-form control to set it is deferred to tech-debt; nullable means `assignment.draft_overdue` is capable at ship and inert until a deadline is set (the daily scan skips nulls). The two `*_overdue_flagged_at` markers are the **one-shot guarantee** for the time-triggered overdue events: `boards:scan-overdue` stamps the marker the first time it fires the matching overdue event and gates on `… IS NULL` before firing, so an overdue fires **at most once** per assignment per overdue type — even if a human drags the card out of the overdue column while still overdue (the board engine's already-in-target no-op alone would re-fire on the next daily scan, fabricating activity). P1 posture: the marker is **permanent** — it does NOT reset if the deadline is later cleared/extended (the reset-on-un-overdue refinement is logged to tech-debt).
 
 ### `campaign_drafts`
 

@@ -199,6 +199,7 @@ active:
 - `POST   …/board/columns` · `PATCH …/board/columns/reorder` · `PATCH/DELETE …/board/columns/{column}`
 - `GET    …/board/automations` · `PATCH …/board/automations/{automation}`
 - `POST   …/board/cards/{card}/move` · `GET …/board/cards/{card}/movements`
+- `POST   …/board/reset-to-defaults` (Sprint 12 Ch3 — `update`-gated; the destructive re-seed)
 
 `Board`, `BoardColumn`, and `BoardCard` carry `agency_id` + `BelongsToAgency`
 (D-2), so a cross-agency `{column}`/`{card}` ULID is already filtered to a 404 at
@@ -212,6 +213,19 @@ board `GET` (and the invite listener) bypasses the scope via the named
 `agency_id` derived from the already-resolved campaign — idempotent
 infrastructure keyed on the `boards.campaign_id` / `board_cards.assignment_id`
 UNIQUEs, never a cross-tenant read.
+
+**Sprint 12 Chunk 3 — the `boards:scan-overdue` console sweep (cross-agency).**
+The daily overdue command ([`OverdueScanService`](../../apps/api/app/Modules/Boards/Services/OverdueScanService.php))
+runs in a console with **no ambient agency context** (so `BelongsToAgencyScope`
+is a no-op — the MessageDigestService lesson, §5.2 below). It is a **deliberate
+global sweep** across ALL agencies via `withoutGlobalScope(BelongsToAgencyScope::class)`,
+then hands each overdue assignment to `BoardAutomationService::processEvent()`,
+which **self-resolves the card's board (hence agency) from the assignment** — so
+agency A's automation config can never move agency B's card. Per-card isolation
+is structural (the engine), not query-scoped. Pinned by the cross-agency ABSENCE
+test (the MessageDigestTest mirror). This is the second consumer of the
+"scheduled fan-out/sweep must scope explicitly or globally-sweep + self-resolve"
+console-tenancy pattern.
 
 **Categorization note:** the rows above span three distinct categories that
 the table currently collapses into one: **(a) cross-tenant** (admin tooling
