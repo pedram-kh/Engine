@@ -24,6 +24,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 
 import { creatorsRoutes } from '@/modules/creators/routes'
+import { impersonationRoutes } from '@/modules/impersonation/routes'
 import { onboardingRoutes } from '@/modules/onboarding/routes'
 
 /**
@@ -404,5 +405,6 @@ export const routes: RouteRecordRaw[] = [
   ...appRoutes,
   ...onboardingRoutes,
   ...creatorsRoutes,
+  ...impersonationRoutes,
   ...errorRoutes,
 ]

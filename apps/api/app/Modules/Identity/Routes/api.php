@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Modules\Identity\Http\Controllers\ConfirmTwoFactorController;
 use App\Modules\Identity\Http\Controllers\DisableTwoFactorController;
 use App\Modules\Identity\Http\Controllers\EnableTwoFactorController;
+use App\Modules\Identity\Http\Controllers\ImpersonationController;
 use App\Modules\Identity\Http\Controllers\LoginController;
 use App\Modules\Identity\Http\Controllers\LogoutController;
 use App\Modules\Identity\Http\Controllers\MeController;
@@ -113,6 +114,21 @@ Route::prefix('auth')
         Route::post('2fa/recovery-codes', RegenerateRecoveryCodesController::class)
             ->middleware('auth:web')
             ->name('2fa.recovery_codes');
+
+        // Impersonation hand-off (Sprint 13, D-9). On the MAIN origin so the
+        // cookie stays `catalyst_main_session`. `claim` is UNAUTHENTICATED —
+        // the one-time token is the bearer; it logs the impersonated user
+        // into the `web` guard. `end` tears the impersonated session down.
+        Route::post('impersonation/claim', [ImpersonationController::class, 'claim'])
+            ->name('impersonation.claim');
+
+        Route::get('impersonation/status', [ImpersonationController::class, 'status'])
+            ->middleware('auth:web')
+            ->name('impersonation.status');
+
+        Route::post('impersonation/end', [ImpersonationController::class, 'end'])
+            ->middleware('auth:web')
+            ->name('impersonation.end');
     });
 
 // ---------------------------------------------------------------------------

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Audit\Services;
 
+use App\Core\Impersonation\ImpersonationContext;
 use App\Core\Tenancy\TenancyContext;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Exceptions\MissingAuditReasonException;
@@ -47,6 +48,7 @@ final class AuditLogger
     public function __construct(
         private readonly AuthFactory $auth,
         private readonly TenancyContext $tenancyContext,
+        private readonly ImpersonationContext $impersonationContext,
     ) {}
 
     /**
@@ -91,6 +93,11 @@ final class AuditLogger
             'actor_type' => $resolvedActorType,
             'actor_id' => $this->extractActorId($resolvedActor),
             'actor_role' => $resolvedActorRole,
+            // Dual-audit (Q3): when impersonation is in play, the actor is
+            // the impersonated user and THIS is the admin behind it. Read
+            // automatically from the per-request context so no call site has
+            // to know — null on the vast majority of rows.
+            'impersonator_user_id' => $this->impersonationContext->impersonatorUserId(),
             'action' => $action,
             'subject_type' => $subject?->getMorphClass(),
             'subject_id' => $subject?->getKey(),

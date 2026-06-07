@@ -1,0 +1,30 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "User search",
+        "subtitle": "Find a user to view or impersonate. Platform admins cannot be impersonated.",
+        "label": "Search by name, email, or ULID",
+        "empty": "No users match this search.",
+        "load_failed": "We couldn't search users. Please try again."
+      },
+      "impersonate": {
+        "button": "Impersonate",
+        "title": "Impersonate {name}",
+        "warning": "You will open a new tab signed in AS this user. Your admin session stays active here. Every action you take is recorded against this user with you logged as the impersonator, and the session expires automatically.",
+        "reason_label": "Reason for impersonation",
+        "reason_hint": "Required, at least {count} characters. Recorded in the audit log.",
+        "confirm": "Start impersonation",
+        "cancel": "Cancel",
+        "success": "Impersonation of {name} started in a new tab.",
+        "failed": "We couldn't start impersonation. Please try again."
+      }
+    },
+    "impersonation": {
+      "target_admin": "Platform admins cannot be impersonated.",
+      "target_self": "You cannot impersonate yourself.",
+      "already_active": "You already have an active impersonation. End it before starting another.",
+      "invalid_handoff": "This impersonation hand-off is invalid, already used, or expired."
+    }
+  }
+}

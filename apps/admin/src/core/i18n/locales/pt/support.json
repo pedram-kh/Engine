@@ -1,0 +1,30 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "Buscar utilizador",
+        "subtitle": "Encontre um utilizador para ver ou personificar. Administradores da plataforma não podem ser personificados.",
+        "label": "Pesquisar por nome, email ou ULID",
+        "empty": "Nenhum utilizador corresponde a esta pesquisa.",
+        "load_failed": "Não foi possível pesquisar utilizadores. Tente novamente."
+      },
+      "impersonate": {
+        "button": "Personificar",
+        "title": "Personificar {name}",
+        "warning": "Abrirá um novo separador autenticado COMO este utilizador. A sua sessão de administrador permanece ativa aqui. Todas as ações que realizar são registadas contra este utilizador, com o seu registo como personificador, e a sessão expira automaticamente.",
+        "reason_label": "Motivo da personificação",
+        "reason_hint": "Obrigatório, pelo menos {count} caracteres. Registado no registo de auditoria.",
+        "confirm": "Iniciar personificação",
+        "cancel": "Cancelar",
+        "success": "Personificação de {name} iniciada num novo separador.",
+        "failed": "Não foi possível iniciar a personificação. Tente novamente."
+      }
+    },
+    "impersonation": {
+      "target_admin": "Administradores da plataforma não podem ser personificados.",
+      "target_self": "Não pode personificar-se a si próprio.",
+      "already_active": "Já tem uma personificação ativa. Termine-a antes de iniciar outra.",
+      "invalid_handoff": "Esta transferência de personificação é inválida, já foi usada ou expirou."
+    }
+  }
+}

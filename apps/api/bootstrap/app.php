@@ -9,6 +9,7 @@ use App\Core\Tenancy\EnsureTenancyContext;
 use App\Core\Tenancy\SetTenancyContext;
 use App\Core\Tenancy\SetTenancyFromAgencyRoute;
 use App\Modules\Audit\Http\Middleware\RequireActionReason;
+use App\Modules\Identity\Http\Middleware\EnforceImpersonation;
 use App\Modules\Identity\Http\Middleware\UseAdminSessionCookie;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -48,6 +49,16 @@ return Application::configure(basePath: dirname(__DIR__))
         // path-aware and only rewrites the cookie name on `api/v1/admin/*`
         // requests — see UseAdminSessionCookie + docs/runbooks/local-dev.md.
         $middleware->prepend(UseAdminSessionCookie::class);
+
+        // Impersonation enforcement (Sprint 13, D-10). Appended to the api
+        // group so it runs on EVERY main-origin request AFTER the session is
+        // started by statefulApi. Pure pass-through unless the main session
+        // carries an impersonation ulid, in which case it is the single
+        // server-authoritative gate: TTL enforcement (the break-revert seam),
+        // dual-audit context population, and the four hard-blocks. Admin-SPA
+        // requests use the separate `web_admin` cookie and never carry the
+        // main session key, so this never fires for them.
+        $middleware->appendToGroup('api', EnforceImpersonation::class);
 
         // Tenant-scoped HTTP routes declare ->middleware('tenancy.set') to
         // populate the context from the authenticated user's primary

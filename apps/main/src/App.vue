@@ -24,15 +24,25 @@
  * exactly one is active (single-`<v-app>` invariant from chunk 6.8).
  */
 
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 import AgencyLayout from '@/modules/agency/layouts/AgencyLayout.vue'
 import AuthLayout from '@/modules/auth/layouts/AuthLayout.vue'
 import CreatorDashboardLayout from '@/modules/creators/layouts/CreatorDashboardLayout.vue'
+import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
 import OnboardingLayout from '@/modules/onboarding/layouts/OnboardingLayout.vue'
+import { useImpersonationStore } from '@/modules/impersonation/stores/useImpersonationStore'
 
 const route = useRoute()
+
+// Cold-load hydration of the impersonation banner: a refresh / fresh tab
+// while impersonating must re-paint the banner. The status probe swallows
+// the anonymous-session 401, so this is a safe no-op for normal visitors.
+const impersonationStore = useImpersonationStore()
+onMounted(() => {
+  void impersonationStore.hydrate()
+})
 
 const layout = computed<'auth' | 'agency' | 'onboarding' | 'creator' | 'error' | 'app'>(
   () => route.meta.layout ?? 'app',
@@ -40,6 +50,11 @@ const layout = computed<'auth' | 'agency' | 'onboarding' | 'creator' | 'error' |
 </script>
 
 <template>
+  <!-- Pinned ABOVE the per-layout v-app so it persists across every shell
+       while impersonating; a plain element so the single-v-app invariant
+       (each layout owns its own <v-app>) is untouched. -->
+  <ImpersonationBanner />
+
   <AuthLayout v-if="layout === 'auth' || layout === 'error'">
     <router-view />
   </AuthLayout>

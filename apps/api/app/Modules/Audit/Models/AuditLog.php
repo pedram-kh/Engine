@@ -24,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property string $actor_type
  * @property int|null $actor_id
  * @property string|null $actor_role
+ * @property int|null $impersonator_user_id
  * @property AuditAction $action
  * @property string|null $subject_type
  * @property int|null $subject_id
@@ -61,6 +62,7 @@ final class AuditLog extends Model
         'actor_type',
         'actor_id',
         'actor_role',
+        'impersonator_user_id',
         'action',
         'subject_type',
         'subject_id',
@@ -83,6 +85,17 @@ final class AuditLog extends Model
     public function actor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'actor_id');
+    }
+
+    /**
+     * The platform_admin behind an impersonated action (Sprint 13, D-9 / Q3).
+     * NULL on every non-impersonated row.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function impersonator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'impersonator_user_id');
     }
 
     /**

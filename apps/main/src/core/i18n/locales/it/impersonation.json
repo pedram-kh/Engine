@@ -1,0 +1,15 @@
+{
+  "impersonation": {
+    "claim": {
+      "in_progress": "Avvio della sessione di impersonificazione\u2026",
+      "missing_token": "Nessun token di trasferimento fornito. Avvia di nuovo l'impersonificazione dal pannello di amministrazione.",
+      "invalid": "Questo trasferimento di impersonificazione non \u00e8 valido, \u00e8 gi\u00e0 stato usato o \u00e8 scaduto. Avvialo di nuovo dal pannello di amministrazione.",
+      "failed": "Non \u00e8 stato possibile avviare la sessione di impersonificazione. Riprova dal pannello di amministrazione."
+    },
+    "banner": {
+      "message": "Sessione di supporto amministratore \u2014 stai visualizzando questo account come l'utente.",
+      "expires_in": "Scade tra {time}",
+      "end": "Termina sessione"
+    }
+  }
+}

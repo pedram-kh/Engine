@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Core\Impersonation\ImpersonationContext;
 use App\Core\Storage\BracketSafeFilesystem;
 use App\Core\Tenancy\TenancyContext;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +28,13 @@ class AppServiceProvider extends ServiceProvider
         // ship). Singleton means same instance for the lifetime of one
         // request / job / artisan invocation.
         $this->app->singleton(TenancyContext::class);
+
+        // Per-request impersonation context (Sprint 13, D-9). Mirror of
+        // TenancyContext: written by the impersonation enforcement
+        // middleware, read by AuditLogger to stamp the dual-audit
+        // impersonator_user_id column. Same single-instance-per-request
+        // lifetime so the write and the reads see the same object.
+        $this->app->singleton(ImpersonationContext::class);
     }
 
     /**

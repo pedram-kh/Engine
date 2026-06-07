@@ -1,0 +1,30 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "Ricerca utenti",
+        "subtitle": "Trova un utente da visualizzare o impersonare. Gli amministratori della piattaforma non possono essere impersonati.",
+        "label": "Cerca per nome, email o ULID",
+        "empty": "Nessun utente corrisponde a questa ricerca.",
+        "load_failed": "Non è stato possibile cercare gli utenti. Riprova."
+      },
+      "impersonate": {
+        "button": "Impersona",
+        "title": "Impersona {name}",
+        "warning": "Aprirai una nuova scheda autenticato COME questo utente. La tua sessione di amministratore rimane attiva qui. Ogni azione che esegui viene registrata a carico di questo utente, con te registrato come impersonatore, e la sessione scade automaticamente.",
+        "reason_label": "Motivo dell'impersonificazione",
+        "reason_hint": "Obbligatorio, almeno {count} caratteri. Registrato nel log di audit.",
+        "confirm": "Avvia impersonificazione",
+        "cancel": "Annulla",
+        "success": "Impersonificazione di {name} avviata in una nuova scheda.",
+        "failed": "Non è stato possibile avviare l'impersonificazione. Riprova."
+      }
+    },
+    "impersonation": {
+      "target_admin": "Gli amministratori della piattaforma non possono essere impersonati.",
+      "target_self": "Non puoi impersonare te stesso.",
+      "already_active": "Hai già un'impersonificazione attiva. Terminala prima di avviarne un'altra.",
+      "invalid_handoff": "Questo trasferimento di impersonificazione non è valido, è già stato usato o è scaduto."
+    }
+  }
+}

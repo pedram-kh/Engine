@@ -5,18 +5,21 @@ import enAuth from './locales/en/auth.json'
 import enAvailability from './locales/en/availability.json'
 import enCreator from './locales/en/creator.json'
 import enDashboard from './locales/en/dashboard.json'
+import enImpersonation from './locales/en/impersonation.json'
 import enNotifications from './locales/en/notifications.json'
 import itApp from './locales/it/app.json'
 import itAuth from './locales/it/auth.json'
 import itAvailability from './locales/it/availability.json'
 import itCreator from './locales/it/creator.json'
 import itDashboard from './locales/it/dashboard.json'
+import itImpersonation from './locales/it/impersonation.json'
 import itNotifications from './locales/it/notifications.json'
 import ptApp from './locales/pt/app.json'
 import ptAuth from './locales/pt/auth.json'
 import ptAvailability from './locales/pt/availability.json'
 import ptCreator from './locales/pt/creator.json'
 import ptDashboard from './locales/pt/dashboard.json'
+import ptImpersonation from './locales/pt/impersonation.json'
 import ptNotifications from './locales/pt/notifications.json'
 
 /**
@@ -70,12 +73,37 @@ type MessageSchema = typeof enApp &
   typeof enCreator &
   typeof enDashboard &
   typeof enAvailability &
-  typeof enNotifications
+  typeof enNotifications &
+  typeof enImpersonation
 
 const messages: Record<'en' | 'pt' | 'it', MessageSchema> = {
-  en: { ...enApp, ...enAuth, ...enCreator, ...enDashboard, ...enAvailability, ...enNotifications },
-  pt: { ...ptApp, ...ptAuth, ...ptCreator, ...ptDashboard, ...ptAvailability, ...ptNotifications },
-  it: { ...itApp, ...itAuth, ...itCreator, ...itDashboard, ...itAvailability, ...itNotifications },
+  en: {
+    ...enApp,
+    ...enAuth,
+    ...enCreator,
+    ...enDashboard,
+    ...enAvailability,
+    ...enNotifications,
+    ...enImpersonation,
+  },
+  pt: {
+    ...ptApp,
+    ...ptAuth,
+    ...ptCreator,
+    ...ptDashboard,
+    ...ptAvailability,
+    ...ptNotifications,
+    ...ptImpersonation,
+  },
+  it: {
+    ...itApp,
+    ...itAuth,
+    ...itCreator,
+    ...itDashboard,
+    ...itAvailability,
+    ...itNotifications,
+    ...itImpersonation,
+  },
 }
 
 export const i18n = createI18n<[MessageSchema], 'en' | 'pt' | 'it'>({
