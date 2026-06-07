@@ -238,7 +238,7 @@ it('writes dual-audit (actor = impersonated, impersonator = admin) and is querya
         ->where('impersonator_user_id', $admin->id)
         ->get();
     expect($byImpersonator)->toHaveCount(1);
-    expect($byImpersonator->first()->actor_id)->toBe($target->id);
+    expect($byImpersonator->first()?->actor_id)->toBe($target->id);
 });
 
 // ─── No-escalation, three ways ───────────────────────────────────────────────

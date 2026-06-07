@@ -89,7 +89,7 @@ it('holds back payment-event alerts from the feed (coming-soon, not shown)', fun
     $response = $this->actingAs($admin, 'web_admin')->getJson('/api/v1/admin/alerts');
 
     expect($response->json('meta.total'))->toBe(1);
-    $types = collect($response->json('data'))->pluck('attributes.notification_type')->all();
+    $types = collect((array) $response->json('data'))->pluck('attributes.notification_type')->all();
     expect($types)->toBe(['creator.rejected']);
 });
 
