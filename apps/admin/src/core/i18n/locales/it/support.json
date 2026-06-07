@@ -18,6 +18,42 @@
         "cancel": "Annulla",
         "success": "Impersonificazione di {name} avviata in una nuova scheda.",
         "failed": "Non è stato possibile avviare l'impersonificazione. Riprova."
+      },
+      "impersonation_log": {
+        "title": "Registro di impersonazione",
+        "subtitle": "Tutte le sessioni di impersonazione admin mai avviate, dalle più recenti.",
+        "empty": "Nessuna sessione di impersonazione corrisponde a questi filtri.",
+        "load_failed": "Non è stato possibile caricare il registro di impersonazione. Aggiorna la pagina.",
+        "filters": {
+          "status": "Stato",
+          "search": "Admin o utente (nome, email, ULID)",
+          "date_from": "Da",
+          "date_to": "A",
+          "apply": "Applica"
+        },
+        "status_filter": {
+          "all": "Tutti",
+          "active": "Attiva",
+          "ended": "Terminata",
+          "expired": "Scaduta"
+        },
+        "statuses": {
+          "active": "Attiva",
+          "ended": "Terminata",
+          "expired": "Scaduta"
+        },
+        "fields": {
+          "admin": "Admin",
+          "impersonated_user": "Utente impersonato",
+          "reason": "Motivo",
+          "status": "Stato",
+          "started_at": "Avviata",
+          "ended_at": "Terminata"
+        },
+        "pagination": {
+          "prev": "Precedente",
+          "next": "Successiva"
+        }
       }
     },
     "impersonation": {

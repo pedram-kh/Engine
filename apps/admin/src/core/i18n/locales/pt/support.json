@@ -18,6 +18,42 @@
         "cancel": "Cancelar",
         "success": "Personificação de {name} iniciada num novo separador.",
         "failed": "Não foi possível iniciar a personificação. Tente novamente."
+      },
+      "impersonation_log": {
+        "title": "Registo de personificação",
+        "subtitle": "Todas as sessões de personificação de administrador alguma vez iniciadas, mais recentes primeiro.",
+        "empty": "Nenhuma sessão de personificação corresponde a estes filtros.",
+        "load_failed": "Não foi possível carregar o registo de personificação. Atualize a página.",
+        "filters": {
+          "status": "Estado",
+          "search": "Administrador ou utilizador (nome, email, ULID)",
+          "date_from": "De",
+          "date_to": "Até",
+          "apply": "Aplicar"
+        },
+        "status_filter": {
+          "all": "Todos",
+          "active": "Ativa",
+          "ended": "Terminada",
+          "expired": "Expirada"
+        },
+        "statuses": {
+          "active": "Ativa",
+          "ended": "Terminada",
+          "expired": "Expirada"
+        },
+        "fields": {
+          "admin": "Administrador",
+          "impersonated_user": "Utilizador personificado",
+          "reason": "Motivo",
+          "status": "Estado",
+          "started_at": "Iniciada",
+          "ended_at": "Terminada"
+        },
+        "pagination": {
+          "prev": "Anterior",
+          "next": "Seguinte"
+        }
       }
     },
     "impersonation": {

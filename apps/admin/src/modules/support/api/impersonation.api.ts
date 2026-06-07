@@ -52,6 +52,48 @@ export interface ImpersonationEndResult {
   }
 }
 
+export type ImpersonationSessionStatus = 'active' | 'ended' | 'expired'
+
+export interface ImpersonationLogEntry {
+  id: string
+  type: 'impersonation_sessions'
+  attributes: {
+    admin_name: string | null
+    admin_email: string | null
+    impersonated_user_name: string | null
+    impersonated_user_email: string | null
+    impersonated_user_ulid: string | null
+    reason: string
+    status: ImpersonationSessionStatus
+    started_at: string
+    claimed_at: string | null
+    ended_at: string | null
+    expires_at: string
+    ip: string | null
+  }
+}
+
+export interface ImpersonationLogResponse {
+  data: ImpersonationLogEntry[]
+  meta: {
+    per_page: number
+    next_cursor: string | null
+    prev_cursor: string | null
+    has_more: boolean
+  }
+}
+
+export type ImpersonationLogStatusFilter = 'all' | ImpersonationSessionStatus
+
+export interface ImpersonationLogParams {
+  status?: ImpersonationLogStatusFilter
+  q?: string
+  date_from?: string
+  date_to?: string
+  per_page?: number
+  cursor?: string
+}
+
 export const impersonationApi = {
   searchUsers(q: string): Promise<ImpersonationCandidateResponse> {
     const query = new URLSearchParams()
@@ -71,6 +113,21 @@ export const impersonationApi = {
 
   end(): Promise<ImpersonationEndResult> {
     return http.post<ImpersonationEndResult>('/admin/impersonate/end', {})
+  },
+
+  sessions(params: ImpersonationLogParams = {}): Promise<ImpersonationLogResponse> {
+    const query = new URLSearchParams()
+    if (params.status !== undefined && params.status !== 'all') query.set('status', params.status)
+    if (params.q !== undefined && params.q !== '') query.set('q', params.q)
+    if (params.date_from !== undefined && params.date_from !== '')
+      query.set('date_from', params.date_from)
+    if (params.date_to !== undefined && params.date_to !== '') query.set('date_to', params.date_to)
+    if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
+    if (params.cursor !== undefined && params.cursor !== '') query.set('cursor', params.cursor)
+    const qs = query.toString()
+    return http.get<ImpersonationLogResponse>(
+      `/admin/impersonate/sessions${qs === '' ? '' : `?${qs}`}`,
+    )
   },
 }
 

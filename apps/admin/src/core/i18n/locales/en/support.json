@@ -18,6 +18,42 @@
         "cancel": "Cancel",
         "success": "Impersonation of {name} started in a new tab.",
         "failed": "We couldn't start impersonation. Please try again."
+      },
+      "impersonation_log": {
+        "title": "Impersonation log",
+        "subtitle": "Every admin impersonation session ever started, newest first.",
+        "empty": "No impersonation sessions match these filters.",
+        "load_failed": "We couldn't load the impersonation log. Please refresh.",
+        "filters": {
+          "status": "Status",
+          "search": "Admin or user (name, email, ULID)",
+          "date_from": "From",
+          "date_to": "To",
+          "apply": "Apply"
+        },
+        "status_filter": {
+          "all": "All",
+          "active": "Active",
+          "ended": "Ended",
+          "expired": "Expired"
+        },
+        "statuses": {
+          "active": "Active",
+          "ended": "Ended",
+          "expired": "Expired"
+        },
+        "fields": {
+          "admin": "Admin",
+          "impersonated_user": "Impersonated user",
+          "reason": "Reason",
+          "status": "Status",
+          "started_at": "Started",
+          "ended_at": "Ended"
+        },
+        "pagination": {
+          "prev": "Previous",
+          "next": "Next"
+        }
       }
     },
     "impersonation": {

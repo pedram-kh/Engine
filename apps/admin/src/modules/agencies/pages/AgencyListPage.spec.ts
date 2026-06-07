@@ -149,7 +149,9 @@ describe('AgencyListPage (Sprint 13, D-3)', () => {
     // Vuetify's `clearable` v-text-field emits `null` (not '') when the
     // clear (X) button is pressed. The load() must coerce it instead of
     // calling `null.trim()`, which previously threw and blanked the table.
-    const searchField = h.wrapper.findComponent('[data-testid="admin-agency-list-search"]')
+    const searchField = h.wrapper.findComponent<typeof import('vuetify/components').VTextField>(
+      '[data-testid="admin-agency-list-search"]',
+    )
     searchField.vm.$emit('update:modelValue', null)
     await flushPromises()
     vi.advanceTimersByTime(300)

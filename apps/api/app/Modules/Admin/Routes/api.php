@@ -94,6 +94,7 @@ Route::prefix('admin')
         // never destroyed. Every start carries a mandatory reason.
         Route::prefix('impersonate')->name('impersonate.')->group(function (): void {
             Route::get('users', [AdminImpersonationController::class, 'searchUsers'])->name('users');
+            Route::get('sessions', [AdminImpersonationController::class, 'sessions'])->name('sessions');
             Route::post('/', [AdminImpersonationController::class, 'start'])->name('start');
             Route::post('end', [AdminImpersonationController::class, 'end'])->name('end');
         });
