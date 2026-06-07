@@ -134,6 +134,38 @@ describe('AgencyListPage (Sprint 13, D-3)', () => {
     })
   })
 
+  it('reloads with no search term (not a crash) when the clearable search is cleared to null', async () => {
+    vi.useFakeTimers()
+    vi.mocked(adminAgenciesApi.list).mockResolvedValue(listResponse())
+
+    const h = await mountAgencyPage(AgencyListPage, {
+      initialRoute: { name: 'app.agencies.list' },
+    })
+    teardown = h.unmount
+    await flushPromises()
+
+    vi.mocked(adminAgenciesApi.list).mockClear()
+
+    // Vuetify's `clearable` v-text-field emits `null` (not '') when the
+    // clear (X) button is pressed. The load() must coerce it instead of
+    // calling `null.trim()`, which previously threw and blanked the table.
+    const searchField = h.wrapper.findComponent('[data-testid="admin-agency-list-search"]')
+    searchField.vm.$emit('update:modelValue', null)
+    await flushPromises()
+    vi.advanceTimersByTime(300)
+    await flushPromises()
+
+    expect(adminAgenciesApi.list).toHaveBeenCalledWith({
+      status: undefined,
+      search: undefined,
+      page: 1,
+      per_page: 25,
+    })
+    expect(h.wrapper.find('[data-testid="admin-agency-list-error"]').exists()).toBe(false)
+
+    vi.useRealTimers()
+  })
+
   it('surfaces the API error code when the list load fails', async () => {
     vi.mocked(adminAgenciesApi.list).mockRejectedValue(
       new ApiError({ status: 403, code: 'auth.forbidden', message: 'no' }),

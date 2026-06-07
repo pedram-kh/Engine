@@ -70,9 +70,12 @@ async function load(): Promise<void> {
   loading.value = true
   errorKey.value = null
   try {
+    // Vuetify's `clearable` text field sets the model to `null` (not '')
+    // when the clear button is pressed, so coerce before trimming.
+    const trimmedSearch = (search.value ?? '').trim()
     const res = await adminAgenciesApi.list({
       status: statusFilter.value === 'all' ? undefined : statusFilter.value,
-      search: search.value.trim() === '' ? undefined : search.value.trim(),
+      search: trimmedSearch === '' ? undefined : trimmedSearch,
       page: tableOptions.value.page,
       per_page: tableOptions.value.itemsPerPage,
     })
