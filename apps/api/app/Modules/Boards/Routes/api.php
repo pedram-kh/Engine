@@ -35,6 +35,11 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         Route::get('campaigns/{campaign}/board', [BoardController::class, 'show'])
             ->name('campaigns.board.show');
 
+        // Reset-to-defaults — the destructive re-seed (Sprint 12 Chunk 3, D-7;
+        // update-gated, the column-CRUD precedent).
+        Route::post('campaigns/{campaign}/board/reset-to-defaults', [BoardController::class, 'reset'])
+            ->name('campaigns.board.reset');
+
         // Column CRUD + reorder (§7).
         Route::post('campaigns/{campaign}/board/columns', [BoardColumnController::class, 'store'])
             ->name('campaigns.board.columns.store');

@@ -9,10 +9,13 @@ use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Boards\Enums\BoardAutomationActionType;
 use App\Modules\Boards\Listeners\CreateBoardCard;
 use App\Modules\Boards\Models\Board;
+use App\Modules\Boards\Models\BoardAutomation;
 use App\Modules\Boards\Models\BoardCard;
+use App\Modules\Boards\Models\BoardColumn;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Collection;
 
 /**
  * Provisions the one-per-assignment board card (Sprint 12 Chunk 1, D-5).
@@ -59,33 +62,39 @@ final class BoardCardService
     }
 
     /**
-     * Resolve the column a freshly-provisioned card lands in (§6.1). The card is
-     * placed in the target column of the automation whose event REPRESENTS the
-     * assignment's current state (so a lazy heal of an advanced assignment lands
-     * sensibly), honoring the board's own automation config; falling back to the
-     * `assignment.invited` target, then the first column by position.
+     * The §6.1 placement primitive, parameterized on EXPLICIT column +
+     * automation collections (Sprint 12 Chunk 3, D-7/Q2). Extracted from
+     * {@see self::resolveInitialColumnId()} so the destructive reset
+     * ({@see BoardResetService}) can resolve placement against the FRESH default
+     * set mid-transaction, when the board's live `columns()`/`automations()`
+     * still hold the about-to-be-deleted custom set (passing the live relations
+     * would resolve cards onto columns that the reset is about to delete →
+     * RESTRICT violation + orphans). The Ch1 heal path delegates here unchanged.
      *
-     * This is purely a VISUALIZATION placement (§4.4 — board state never drives
+     * Resolves to the target column of the automation whose event REPRESENTS the
+     * assignment's current state, honoring the supplied automation config;
+     * falling back to the `assignment.invited` target, then the first column by
+     * position. Purely a VISUALIZATION placement (§4.4 — board state never drives
      * reality). Statuses with no representative automation (declined / rejected /
-     * the accepted→producing middle, §3.3) fall through to the first column,
-     * where the agency can drag them or the next event re-places them.
+     * the accepted→producing middle, §3.3) fall through to the first column.
+     *
+     * @param  Collection<int, BoardColumn>  $columns
+     * @param  Collection<int, BoardAutomation>  $automations
      */
-    private function resolveInitialColumnId(Board $board, AssignmentStatus $status): int
+    public function resolveColumnForState(Collection $columns, Collection $automations, AssignmentStatus $status): int
     {
-        $columns = $board->columns()->get(['id', 'position']);
-
         $candidateKeys = array_values(array_filter([
             $this->representativeEventKey($status),
             AuditAction::AssignmentInvited->value,
         ]));
 
         foreach ($candidateKeys as $eventKey) {
-            $automation = $board->automations()
-                ->where('event_key', $eventKey)
-                ->where('is_enabled', true)
-                ->where('action_type', BoardAutomationActionType::MoveToColumn->value)
-                ->whereNotNull('target_column_id')
-                ->first();
+            $automation = $automations->first(
+                fn (BoardAutomation $automation): bool => $automation->event_key === $eventKey
+                    && $automation->is_enabled === true
+                    && $automation->action_type === BoardAutomationActionType::MoveToColumn
+                    && $automation->target_column_id !== null,
+            );
 
             if ($automation !== null && $columns->contains('id', $automation->target_column_id)) {
                 return (int) $automation->target_column_id;
@@ -94,12 +103,26 @@ final class BoardCardService
 
         $first = $columns->sortBy('position')->first();
         if ($first === null) {
-            // A board always has columns by the time a card is provisioned
-            // (provisioning seeds them first); this guard satisfies the type.
-            throw new \RuntimeException("Board {$board->id} has no columns to place a card in.");
+            // A board always has columns by the time a card is placed
+            // (provisioning + reset seed them first); this guard satisfies the type.
+            throw new \RuntimeException('Cannot place a card: the board has no columns.');
         }
 
         return (int) $first->id;
+    }
+
+    /**
+     * Resolve the column a freshly-provisioned card lands in (§6.1), reading the
+     * board's LIVE columns + automations. The Ch1 heal path — behavior unchanged
+     * by the Chunk 3 extraction (it delegates to {@see self::resolveColumnForState()}).
+     */
+    private function resolveInitialColumnId(Board $board, AssignmentStatus $status): int
+    {
+        return $this->resolveColumnForState(
+            $board->columns()->get(),
+            $board->automations()->get(),
+            $status,
+        );
     }
 
     /**
