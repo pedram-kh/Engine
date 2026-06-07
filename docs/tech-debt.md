@@ -9,6 +9,21 @@ anyone reviewing it later.
 
 ---
 
+## Sprint 13 (Admin Panel Core) — the coming-soon / shell seams (each a discrete swappable block)
+
+- **Where:** the admin SPA ([`apps/admin/src`](../apps/admin/src)) + the admin/notifications/compliance backend modules.
+- **What we accepted in Sprint 13 (June 7, 2026):** the admin panel shell + every NON-payment Phase-1 surface shipped green (agency mgmt + suspend-at-auth, creator KYC/detail, audit-log viewer, feature-flag toggles, dashboard, Horizon embed + health, impersonation core + enforcement + dual-audit, tightened admin session timeout). Five conscious deferrals ride it, each built as a discrete block S10/S14 SWAPS rather than unpicks:
+  1. **Payment surfaces are coming-soon (D-13, Sprint-10-gated).** The payments nav (disputes / recent), the dashboard payment + dispute cards, the creator-detail payment section, and the payment-event admin alerts ALL ship as the proven coming-soon/placeholder pattern. Each is a discrete swappable block: S10 replaces the `ComingSoonPage` reference / flips `meta.payment_alerts.coming_soon` false / drops the placeholder card — no payment assumptions are woven elsewhere to unpick. **Triggered by** Sprint 10 (escrow). **Resolution:** swap placeholder → real surface.
+  2. **GDPR compliance queues are SHELLS (D-11, Sprint-14-gated).** `GET /admin/compliance/export-requests` + `/erasure-queue` return `data: []` + `meta.shell: true` (200, not 404) and the SPA renders the shell-state copy. The `data_export_requests` / `data_erasure_requests` tables + the export/erasure machinery (and the actioning verbs) are Sprint 14. **Triggered by** Sprint 14. **Resolution:** land the tables + machinery; the surface + load path already exist.
+  3. **The admin operational-alerts feed has no emit sites yet (D-12).** `GET /admin/alerts` is a genuine consumer (reads the admin's own `Notification` rows, user-level-above-tenancy), but the operational/admin notification EMIT sites land alongside their features, so the feed ships empty-by-default. The payment-event alert TYPES exist (drop-in) but are held back under `meta.payment_alerts` (see (1)). **Triggered by** the features that emit admin operational notifications. **Resolution:** add the emit sites; the surface lights up automatically.
+  4. **Admin absolute-session cap is enforced CLIENT-side this sprint (D-11).** `useIdleTimeout` enforces the 30-min idle + 8-h absolute cap in the admin SPA; the authoritative server-side bound remains the standard session lifetime (`config('session.lifetime')`). A server-side absolute-cap (a session-stamped `started_at` checked per request) is not built. **Triggered by** a hardening pass that wants the absolute cap server-authoritative. **Resolution:** stamp + check an admin-session start time middleware-side. **Risk:** low — defence-in-depth; the idle/absolute logout is a UX + reduced-window control, not the auth boundary (impersonation TTL, by contrast, IS server-authoritative — see the review).
+  5. **Per-tenant feature-flag overrides are out (D-6).** The toggle UI flips platform-level Pennant flags on/off only; per-agency scoping is not exposed. **Triggered by** a need for per-tenant rollout. **Resolution:** add a scoped-toggle surface over Pennant's scope mechanism.
+- **Acceptance-bar honesty:** this sprint meets the acceptance bar for **every NON-payment admin task**. Full Sprint-13 acceptance (the payment-investigation / dispute / refund surfaces, `09-ADMIN-PANEL §6.6`) lands when S10 lights the payment panels — at which point items (1) + the payment half of (3) close by swap.
+- **Owner:** Sprint 10 (payment surfaces), Sprint 14 (GDPR machinery), and a future admin-hardening pass (server-side absolute cap, per-tenant flags).
+- **Status:** open (by design). Surfaced + deliberately deferred by Sprint 13, June 7, 2026 ([review](reviews/sprint-13-review.md)).
+
+---
+
 ## Sprint 12 Chunk 1 (Board engine) — three inert-by-design seams + one schema reconciliation
 
 - **Where:** the Boards module ([`apps/api/app/Modules/Boards`](../apps/api/app/Modules/Boards)) + the §10 board tables ([migrations `2026_06_06_120000`–`120004`](../apps/api/database/migrations)).
