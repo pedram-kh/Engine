@@ -41,17 +41,25 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 import AuthLayout from '@/modules/auth/layouts/AuthLayout.vue'
+import AdminLayout from '@/core/layouts/AdminLayout.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 
 const route = useRoute()
 
-const layout = computed<'auth' | 'app' | 'error'>(() => route.meta.layout ?? 'app')
+const layout = computed<'auth' | 'admin' | 'app' | 'error'>(() => route.meta.layout ?? 'app')
 </script>
 
 <template>
   <AuthLayout v-if="layout === 'auth' || layout === 'error'">
     <router-view />
   </AuthLayout>
+  <!-- Sprint 13 (D-1): the authenticated admin-console shell. Owns its
+       own <v-app>; MUST NOT be nested in another. -->
+  <AdminLayout v-else-if="layout === 'admin'">
+    <router-view />
+  </AdminLayout>
+  <!-- Transient bare shell: only the pre-first-navigation default
+       (meta.layout undefined) falls through here. -->
   <v-app v-else>
     <v-main>
       <div class="d-flex justify-end pa-2" data-test="app-chrome">

@@ -50,6 +50,9 @@ const vuetifyComponents = [
   'VTable',
   'VSnackbar',
   'VTooltip',
+  'VList',
+  'VSwitch',
+  'VSkeletonLoader',
 ].map((name) => `vuetify/components/${name}`)
 
 export default defineConfig({
@@ -75,6 +78,14 @@ export default defineConfig({
         changeOrigin: true,
       },
       '/sanctum': {
+        target: proxyTarget,
+        changeOrigin: true,
+      },
+      // The embedded Horizon dashboard (Sprint 13, D-8) is served by the
+      // Laravel backend, gated behind the platform_admin `web_admin`
+      // session. The Operations nav links out to `/horizon`; proxy it so
+      // the admin session cookie travels and the gate resolves in local dev.
+      '/horizon': {
         target: proxyTarget,
         changeOrigin: true,
       },

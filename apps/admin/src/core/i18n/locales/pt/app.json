@@ -4,6 +4,48 @@
     "subtitle": "Consola de super-administrador.",
     "sprint0Notice": "Sprint 0 — estrutura inicial da SPA admin",
     "dashboardPlaceholder": "Painel de administração temporário — a versão completa chega num sprint posterior.",
+    "env": {
+      "local": "Local",
+      "staging": "Staging",
+      "production": "Produção — todas as ações são registadas"
+    },
+    "nav": {
+      "comingSoon": "Em breve",
+      "dashboard": "Painel",
+      "agencies": "Agências",
+      "creators": "Criadores",
+      "creatorApprovals": "Aprovações pendentes",
+      "kycQueue": "Fila de KYC",
+      "allCreators": "Todos os criadores",
+      "payments": "Pagamentos",
+      "disputes": "Disputas",
+      "recentPayments": "Recentes",
+      "audit": "Registo de auditoria",
+      "alerts": "Alertas operacionais",
+      "support": "Suporte",
+      "userSearch": "Procurar utilizadores",
+      "impersonationLog": "Registo de personificação",
+      "operations": "Operações",
+      "systemHealth": "Estado do sistema",
+      "horizon": "Tarefas em segundo plano (Horizon)",
+      "compliance": "Conformidade",
+      "exportRequests": "Pedidos de exportação",
+      "erasureQueue": "Fila de apagamento",
+      "featureFlags": "Feature flags"
+    },
+    "userMenu": {
+      "signOut": "Terminar sessão",
+      "signingOut": "A terminar sessão…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Em breve",
+      "body": "Esta área é ativada quando o processamento de pagamentos for lançado (Sprint 10).",
+      "disputes": "Disputas",
+      "recentPayments": "Pagamentos recentes"
+    },
+    "sectionStub": {
+      "body": "Esta área de administração está a ser construída neste sprint."
+    },
     "locale": {
       "switcher": "Idioma",
       "en": "English",

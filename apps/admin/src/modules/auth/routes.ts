@@ -56,13 +56,17 @@ declare module 'vue-router' {
     guards?: ReadonlyArray<GuardName>
     /**
      * `'auth'` routes use an admin auth layout (sub-chunk 7.5);
-     * `'app'` routes are post-auth admin-console surface;
-     * `'error'` is the terminal error layout. Sub-chunk 7.4 ships a
-     * single bare `<v-app><v-main><router-view /></v-main></v-app>`
-     * shell regardless of layout — 7.5 expands `App.vue` into a
-     * layout switcher matching main's chunk-6.8 pattern.
+     * `'admin'` routes are the post-auth admin-console surface, mounted
+     * in `AdminLayout` (Sprint 13, D-1 — the shell);
+     * `'app'` is the legacy bare `<v-app><v-main>` shell, retained only
+     * as the transient default before the first navigation resolves;
+     * `'error'` is the terminal error layout.
+     *
+     * Sprint 13 migrated every authenticated route from `'app'` to
+     * `'admin'` (surfaced as a divergence: main's standard 5.14 mounts
+     * authenticated shells under a named layout, not the bare `'app'`).
      */
-    layout?: 'auth' | 'app' | 'error'
+    layout?: 'auth' | 'admin' | 'app' | 'error'
   }
 }
 
@@ -110,15 +114,6 @@ export const authRoutes: RouteRecordRaw[] = [
 ]
 
 export const appRoutes: RouteRecordRaw[] = [
-  // Dashboard placeholder — substantive admin console UI ships in a
-  // later sprint. Requires authentication AND MFA enrolment per the
-  // mandatory-MFA spec (`docs/05-SECURITY-COMPLIANCE.md` § 6.3).
-  {
-    path: '/',
-    name: 'app.dashboard',
-    component: () => import('@/core/pages/PlaceholderPage.vue'),
-    meta: { layout: 'app', guards: ['requireAuth', 'requireMfaEnrolled'] },
-  },
   // Settings placeholder — landing target for DisableTotp on success.
   // Stricter than main's analog: main's `app.settings` only requires
   // auth (so a user landing back from DisableTotp can see the
@@ -126,11 +121,15 @@ export const appRoutes: RouteRecordRaw[] = [
   // mandatory-MFA spec NEVER have a legitimate window where they are
   // signed in but not enrolled (every authenticated admin route assumes
   // enrolment).
+  //
+  // Sprint 13: `app.dashboard` moved to its own dashboard module
+  // (`dashboardRoutes`) when the substantive surface landed; settings
+  // migrated to `layout: 'admin'` (the shell).
   {
     path: '/settings',
     name: 'app.settings',
     component: () => import('@/core/pages/PlaceholderPage.vue'),
-    meta: { layout: 'app', guards: ['requireAuth', 'requireMfaEnrolled'] },
+    meta: { layout: 'admin', guards: ['requireAuth', 'requireMfaEnrolled'] },
   },
 ]
 
@@ -146,18 +145,42 @@ export const errorRoutes: RouteRecordRaw[] = [
   },
 ]
 
+import { agenciesRoutes } from '@/modules/agencies/routes'
+import { alertsRoutes } from '@/modules/alerts/routes'
+import { auditRoutes } from '@/modules/audit/routes'
+import { complianceRoutes } from '@/modules/compliance/routes'
 import { creatorsRoutes } from '@/modules/creators/routes'
+import { dashboardRoutes } from '@/modules/dashboard/routes'
+import { featureFlagsRoutes } from '@/modules/feature-flags/routes'
+import { operationsRoutes } from '@/modules/operations/routes'
+import { paymentsRoutes } from '@/modules/payments/routes'
+import { supportRoutes } from '@/modules/support/routes'
 
 /**
  * The full route table the admin SPA mounts. Order matters only for
- * route-name collisions, of which there are none.
+ * route-name collisions (none) and path-prefix shadowing — the
+ * creators module declares `/creators/kyc` + `/creators/all` BEFORE
+ * `/creators/:ulid` internally so the literals are not captured by the
+ * param route.
  *
- * Sprint 3 Chunk 3 sub-step 9: `creatorsRoutes` adds the admin
- * Creator drill-in surface at `/creators/:ulid`.
+ * Sprint 13 (D-1): the full S13 module route table — dashboard,
+ * agencies, creators (+KYC +all), payments (coming-soon), audit,
+ * support/impersonation, operations, compliance, feature-flags — all
+ * mounted in the `AdminLayout` shell. Everything in the sprint reaches
+ * the user through one of these routes.
  */
 export const routes: RouteRecordRaw[] = [
   ...authRoutes,
   ...appRoutes,
+  ...dashboardRoutes,
+  ...agenciesRoutes,
   ...creatorsRoutes,
+  ...paymentsRoutes,
+  ...auditRoutes,
+  ...alertsRoutes,
+  ...supportRoutes,
+  ...operationsRoutes,
+  ...complianceRoutes,
+  ...featureFlagsRoutes,
   ...errorRoutes,
 ]
