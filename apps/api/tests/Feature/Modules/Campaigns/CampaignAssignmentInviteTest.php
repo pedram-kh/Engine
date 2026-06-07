@@ -102,6 +102,36 @@ it('lets an admin invite a discoverable creator — creates an invited assignmen
         ->exists())->toBeTrue();
 });
 
+it('persists draft_due_at + posting_due_at on invite (Sprint 12 Chunk 3, D-2 — the deadline set-path)', function (): void {
+    [$agency, , $campaign] = campaignWithBrand();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = invitableCreator();
+
+    $postingDue = now()->addDays(14)->startOfSecond();
+    $draftDue = now()->addDays(7)->startOfSecond();
+
+    $this->actingAs($admin)->postJson(inviteUrl($agency, $campaign), invitePayload($creator, [
+        'posting_due_at' => $postingDue->toIso8601String(),
+        'draft_due_at' => $draftDue->toIso8601String(),
+    ]))->assertCreated();
+
+    $assignment = CampaignAssignment::query()->where('campaign_id', $campaign->id)->firstOrFail();
+    expect($assignment->posting_due_at?->equalTo($postingDue))->toBeTrue()
+        ->and($assignment->draft_due_at?->equalTo($draftDue))->toBeTrue();
+});
+
+it('leaves draft_due_at NULL when not supplied (nullable — draft_overdue inert until set)', function (): void {
+    [$agency, , $campaign] = campaignWithBrand();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $this->actingAs($admin)
+        ->postJson(inviteUrl($agency, $campaign), invitePayload(invitableCreator()))
+        ->assertCreated();
+
+    $assignment = CampaignAssignment::query()->where('campaign_id', $campaign->id)->firstOrFail();
+    expect($assignment->draft_due_at)->toBeNull();
+});
+
 it('lets a manager invite', function (): void {
     [$agency, , $campaign] = campaignWithBrand();
     $manager = User::factory()->agencyManager($agency)->createOne();

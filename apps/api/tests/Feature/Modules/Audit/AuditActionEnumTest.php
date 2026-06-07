@@ -139,6 +139,13 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         // Sprint 12 Chunk 1 (D-9) — the manual board-card move verb (audit-only;
         // NOT a NotificationType, so it does not join the one-vocabulary tie).
         'board.card_moved_manually',
+        // Sprint 12 Chunk 3 (D-1) — the two time-triggered overdue event keys
+        // (no audit row — they ride processEvent, movement-only) + the
+        // destructive reset-to-defaults verb (the only one that writes a row).
+        // All audit-only — NONE join the NotificationType one-vocabulary tie.
+        'assignment.posting_overdue',
+        'assignment.draft_overdue',
+        'board.reset',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());

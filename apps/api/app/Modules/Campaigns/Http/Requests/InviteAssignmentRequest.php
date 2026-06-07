@@ -39,6 +39,11 @@ final class InviteAssignmentRequest extends FormRequest
 
             'deliverables' => ['nullable', 'array'],
             'posting_due_at' => ['nullable', 'date'],
+            // Sprint 12 Chunk 3 (D-2) — the draft deadline, an exact mirror of
+            // posting_due_at. Backend-only this chunk (the FE invite-form control
+            // is deferred to tech-debt); nullable, so draft_overdue is inert
+            // until a deadline is set.
+            'draft_due_at' => ['nullable', 'date'],
 
             'acknowledged' => ['sometimes', 'boolean'],
         ];

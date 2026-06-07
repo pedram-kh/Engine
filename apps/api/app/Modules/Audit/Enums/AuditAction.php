@@ -289,6 +289,19 @@ enum AuditAction: string
     // system-driven and record ONLY the movement row (no audit row).
     case BoardCardMovedManually = 'board.card_moved_manually';
 
+    // Sprint 12 Chunk 3 — the two time-triggered overdue event keys + the
+    // reset-to-defaults verb. ⚠ The two overdue verbs write NO audit row: they
+    // ride BoardAutomationService::processEvent (movement-only — the Ch1
+    // dual-trail invariant that automation moves never write an audit row). They
+    // exist as the board event-key vocabulary (to seed/reference an automation +
+    // satisfy the one-vocabulary tie). Like board.card_moved_manually, all three
+    // are audit-only — NOT NotificationType cases (no NotificationTypeEnumTest
+    // ripple). Only board.reset writes an audit row: a deliberate destructive
+    // config action (D-7), not an automation move.
+    case AssignmentPostingOverdue = 'assignment.posting_overdue';
+    case AssignmentDraftOverdue = 'assignment.draft_overdue';
+    case BoardReset = 'board.reset';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *

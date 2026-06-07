@@ -163,6 +163,8 @@ final class CampaignAssignmentController
             'agreed_fee_currency' => strtoupper((string) $validated['agreed_fee_currency']),
             'deliverables' => $validated['deliverables'] ?? null,
             'posting_due_at' => $validated['posting_due_at'] ?? null,
+            // Sprint 12 Chunk 3 (D-2) — mirror of posting_due_at; nullable.
+            'draft_due_at' => $validated['draft_due_at'] ?? null,
         ]);
 
         // Correction #1 — invite is a CREATE, not a machine transition, so the

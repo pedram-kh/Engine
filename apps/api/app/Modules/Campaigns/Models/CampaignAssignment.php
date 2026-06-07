@@ -55,10 +55,13 @@ use Illuminate\Support\Carbon;
  * @property int|null $total_charged_to_brand_minor_units
  * @property array<string, mixed>|null $deliverables
  * @property Carbon|null $posting_due_at
+ * @property Carbon|null $draft_due_at
  * @property Carbon|null $submitted_draft_at
  * @property Carbon|null $approved_at
  * @property Carbon|null $posted_at
  * @property Carbon|null $verified_live_at
+ * @property Carbon|null $posting_overdue_flagged_at
+ * @property Carbon|null $draft_overdue_flagged_at
  * @property int|null $payment_id
  * @property Carbon|null $cancelled_at
  * @property string|null $cancelled_reason
@@ -100,10 +103,13 @@ final class CampaignAssignment extends Model
         'total_charged_to_brand_minor_units',
         'deliverables',
         'posting_due_at',
+        'draft_due_at',
         'submitted_draft_at',
         'approved_at',
         'posted_at',
         'verified_live_at',
+        'posting_overdue_flagged_at',
+        'draft_overdue_flagged_at',
         'payment_id',
         'cancelled_at',
         'cancelled_reason',
@@ -238,10 +244,13 @@ final class CampaignAssignment extends Model
             'total_charged_to_brand_minor_units' => 'integer',
             'deliverables' => 'array',
             'posting_due_at' => 'datetime',
+            'draft_due_at' => 'datetime',
             'submitted_draft_at' => 'datetime',
             'approved_at' => 'datetime',
             'posted_at' => 'datetime',
             'verified_live_at' => 'datetime',
+            'posting_overdue_flagged_at' => 'datetime',
+            'draft_overdue_flagged_at' => 'datetime',
             'cancelled_at' => 'datetime',
         ];
     }
