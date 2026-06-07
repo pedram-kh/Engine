@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "compliance": {
+      "shellNotice": "Esta fila está pronta, mas ainda não ligada aos dados — o processamento de exportação e eliminação chega num sprint posterior.",
+      "load_failed": "Não foi possível carregar esta fila. Atualize a página.",
+      "fields": {
+        "subject": "Titular dos dados",
+        "status": "Estado",
+        "requested": "Solicitado"
+      },
+      "exports": {
+        "title": "Pedidos de exportação",
+        "subtitle": "Pedidos de acesso e portabilidade do titular dos dados (RGPD art. 15.º/20.º).",
+        "empty": "Sem pedidos de exportação."
+      },
+      "erasures": {
+        "title": "Fila de eliminação",
+        "subtitle": "Pedidos de direito ao esquecimento a aguardar revisão (RGPD art. 17.º).",
+        "empty": "Sem pedidos de eliminação."
+      }
+    }
+  }
+}

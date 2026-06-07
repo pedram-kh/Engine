@@ -79,4 +79,27 @@ enum NotificationType: string
     {
         return AuditAction::from($this->value);
     }
+
+    /**
+     * The payment-event alert types — the deferred-S10 escrow alerts. These
+     * are held back from the admin operational-alerts surface this sprint
+     * (Sprint 13, D-12/D-13): the types exist (so the consumer is drop-in)
+     * but their emit sites + the payment admin UI are S10. The admin alerts
+     * shell reads this partition from one source so the held-back set and
+     * its test never drift.
+     *
+     * @return array<int, self>
+     */
+    public static function paymentAlerts(): array
+    {
+        return [self::AssignmentPaymentFunded, self::AssignmentPaymentReleased];
+    }
+
+    /**
+     * Whether this type is a deferred payment-event alert (coming-soon).
+     */
+    public function isPaymentAlert(): bool
+    {
+        return in_array($this, self::paymentAlerts(), true);
+    }
 }

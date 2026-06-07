@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Alertas operacionais",
+      "subtitle": "Atividade de auditoria e notificações operacionais dirigidas a si.",
+      "empty": "Sem alertas operacionais.",
+      "load_failed": "Não foi possível carregar os alertas operacionais. Atualize a página.",
+      "paymentAlerts": {
+        "title": "Alertas de pagamento",
+        "body": "Os alertas de financiamento e libertação de garantia ficam ativos quando o processamento de pagamentos chegar (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Criador aprovado",
+          "rejected": "Criador rejeitado"
+        }
+      }
+    }
+  }
+}

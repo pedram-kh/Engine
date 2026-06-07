@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Avvisi operativi",
+      "subtitle": "Attività di audit e notifiche operative indirizzate a te.",
+      "empty": "Nessun avviso operativo.",
+      "load_failed": "Impossibile caricare gli avvisi operativi. Aggiorna la pagina.",
+      "paymentAlerts": {
+        "title": "Avvisi di pagamento",
+        "body": "Gli avvisi di finanziamento e rilascio dell'escrow si attivano quando arriva l'elaborazione dei pagamenti (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Creator approvato",
+          "rejected": "Creator rifiutato"
+        }
+      }
+    }
+  }
+}

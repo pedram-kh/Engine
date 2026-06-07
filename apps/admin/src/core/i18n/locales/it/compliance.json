@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "compliance": {
+      "shellNotice": "Questa coda è pronta ma non ancora collegata ai dati — l'elaborazione di esportazione e cancellazione arriva in uno sprint successivo.",
+      "load_failed": "Impossibile caricare questa coda. Aggiorna la pagina.",
+      "fields": {
+        "subject": "Interessato",
+        "status": "Stato",
+        "requested": "Richiesto"
+      },
+      "exports": {
+        "title": "Richieste di esportazione",
+        "subtitle": "Richieste di accesso e portabilità dell'interessato (GDPR art. 15/20).",
+        "empty": "Nessuna richiesta di esportazione."
+      },
+      "erasures": {
+        "title": "Coda di cancellazione",
+        "subtitle": "Richieste di diritto all'oblio in attesa di revisione (GDPR art. 17).",
+        "empty": "Nessuna richiesta di cancellazione."
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Operational alerts",
+      "subtitle": "Audit-activity and operational notifications addressed to you.",
+      "empty": "No operational alerts.",
+      "load_failed": "We couldn't load operational alerts. Please refresh.",
+      "paymentAlerts": {
+        "title": "Payment alerts",
+        "body": "Escrow funding and release alerts light up when payment processing ships (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Creator approved",
+          "rejected": "Creator rejected"
+        }
+      }
+    }
+  }
+}
