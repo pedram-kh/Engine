@@ -40,6 +40,11 @@ export const SESSION_EXPIRED_QUERY_REASON = 'session_expired'
  * expired":
  *   - `/me`, `/admin/me` — cold-load identity probes; the store
  *     resolves them to the anonymous-ready state.
+ *   - `/auth/impersonation/status` — the cold-load impersonation-banner
+ *     probe (App.vue, every route incl. public ones). For an anonymous
+ *     visitor it 401s by design; the store swallows it to "not
+ *     impersonating". Treating it as session-expired would redirect
+ *     anonymous visitors off public pages (sign-up, invitation accept).
  *   - `/auth/login`, `/admin/auth/login` — wrong-password is signalled
  *     here; the sign-in page renders the i18n error inline.
  *
@@ -49,6 +54,7 @@ export const SESSION_EXPIRED_QUERY_REASON = 'session_expired'
 const UNAUTHORIZED_EXEMPT_PATHS: ReadonlyArray<string> = [
   '/me',
   '/admin/me',
+  '/auth/impersonation/status',
   '/auth/login',
   '/admin/auth/login',
 ]

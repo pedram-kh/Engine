@@ -22,6 +22,7 @@ describe('shouldHandleUnauthorized', () => {
   it.each([
     ['/me', false],
     ['/admin/me', false],
+    ['/auth/impersonation/status', false],
     ['/auth/login', false],
     ['/admin/auth/login', false],
   ])('exempts %s', (path, expected) => {
@@ -90,6 +91,18 @@ describe('createUnauthorizedPolicy', () => {
 
     expect(clearUser).not.toHaveBeenCalled()
     expect(push).not.toHaveBeenCalled()
+  })
+
+  it('is a no-op on the cold-load impersonation-banner probe (anonymous visitors on public pages)', async () => {
+    const { clearUser, push, deps } = makeDeps()
+    const policy = createUnauthorizedPolicy(deps)
+
+    await policy('/auth/impersonation/status')
+
+    expect(clearUser).not.toHaveBeenCalled()
+    expect(push).not.toHaveBeenCalled()
+    expect(deps.getStore).not.toHaveBeenCalled()
+    expect(deps.getRouter).not.toHaveBeenCalled()
   })
 
   it('resolves both lazy loaders concurrently', async () => {
