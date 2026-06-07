@@ -302,6 +302,28 @@ enum AuditAction: string
     case AssignmentDraftOverdue = 'assignment.draft_overdue';
     case BoardReset = 'board.reset';
 
+    // Sprint 13 — Admin panel core. Platform-admin-only verbs (NOT
+    // NotificationType cases — admin actions notify through the admin
+    // consumer shell, not the creator/agency notification vocabulary).
+    //   - agency.suspended / agency.reactivated: the net-new agency
+    //     lifecycle controls (D-3). Suspend carries a MANDATORY reason;
+    //     reactivate clears the suspension (reason optional).
+    //   - admin.impersonation_started / admin.impersonation_ended: the
+    //     dual-session support tool (D-9). Start carries a MANDATORY
+    //     reason (no reason → no impersonation); the persistent
+    //     admin_impersonation_sessions row is the §6.8 log of record.
+    //     Every action taken WHILE impersonating is dual-audited via the
+    //     audit_logs.impersonator_user_id column, NOT via these two
+    //     start/end verbs.
+    //   - feature_flag.toggled: the DB-backed Pennant toggle UI (D-6).
+    //     Carries a MANDATORY reason on every flip (activate OR
+    //     deactivate); metadata records {flag, enabled}.
+    case AgencySuspended = 'agency.suspended';
+    case AgencyReactivated = 'agency.reactivated';
+    case AdminImpersonationStarted = 'admin.impersonation_started';
+    case AdminImpersonationEnded = 'admin.impersonation_ended';
+    case FeatureFlagToggled = 'feature_flag.toggled';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *
@@ -326,7 +348,18 @@ enum AuditAction: string
             // Manual-verify always carries a mandatory reason (verification-
             // resolution chunk, D-4 — the override must answer "why was this paid
             // despite failing verification"). Carried in the audit `reason` field.
-            self::AssignmentManuallyVerified => true,
+            self::AssignmentManuallyVerified,
+            // Sprint 13 — admin panel. Suspending an agency, starting an
+            // impersonation, and toggling a feature flag are each
+            // accountability-critical actions that must answer "why":
+            //   - agency.suspended cuts off every agency user's login (D-3),
+            //   - admin.impersonation_started opens a privileged dual session (D-9),
+            //   - feature_flag.toggled flips platform behaviour at runtime (D-6).
+            // Reactivate / impersonation-end do NOT require a reason (they
+            // restore the default/safe state).
+            self::AgencySuspended,
+            self::AdminImpersonationStarted,
+            self::FeatureFlagToggled => true,
             default => false,
         };
     }

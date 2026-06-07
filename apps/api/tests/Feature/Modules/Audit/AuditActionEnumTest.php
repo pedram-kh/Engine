@@ -146,6 +146,12 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'assignment.posting_overdue',
         'assignment.draft_overdue',
         'board.reset',
+        // Sprint 13 — Admin panel core. Net-new platform-admin verbs.
+        'agency.suspended',
+        'agency.reactivated',
+        'admin.impersonation_started',
+        'admin.impersonation_ended',
+        'feature_flag.toggled',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());
@@ -175,6 +181,11 @@ it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', functi
         // Verification-resolution chunk — the manual override must answer "why
         // was this paid despite failing verification" (D-4).
         'assignment.manually_verified',
+        // Sprint 13 — admin panel. Suspend / impersonation-start / flag-toggle
+        // each carry a mandatory reason (reactivate + impersonation-end do not).
+        'agency.suspended',
+        'admin.impersonation_started',
+        'feature_flag.toggled',
     ]);
 });
 
