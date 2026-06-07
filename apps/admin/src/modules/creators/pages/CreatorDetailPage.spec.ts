@@ -25,6 +25,8 @@ vi.mock('@/modules/creators/api/creators.api', async () => {
       reject: vi.fn(),
       verifyIdentity: vi.fn(),
       list: vi.fn(),
+      assignments: vi.fn(),
+      auditLogs: vi.fn(),
     },
   }
 })
@@ -115,6 +117,12 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // Sprint 13 (D-4): the detail page loads assignment + audit history
+    // on mount; default both to empty so the edit-focused specs are
+    // unaffected by the new reads.
+    const empty = { data: [], meta: { total: 0, page: 1, per_page: 25, last_page: 1 } }
+    vi.mocked(adminCreatorsApi.assignments).mockResolvedValue(empty)
+    vi.mocked(adminCreatorsApi.auditLogs).mockResolvedValue(empty)
   })
 
   afterEach(() => {

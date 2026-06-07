@@ -28,6 +28,23 @@
           "rejected": "Rejected"
         }
       },
+      "kyc": {
+        "title": "KYC review queue",
+        "empty": "No creators match this KYC filter.",
+        "load_failed": "We couldn't load the KYC queue. Please refresh.",
+        "filters": {
+          "pending": "Pending",
+          "verified": "Verified",
+          "rejected": "Rejected",
+          "none": "Not started",
+          "all": "All"
+        }
+      },
+      "all": {
+        "title": "All creators",
+        "empty": "No creators yet.",
+        "load_failed": "We couldn't load creators. Please refresh."
+      },
       "detail": {
         "fallback_title": "Creator",
         "application_status": "Application status: {status}",
@@ -44,6 +61,27 @@
           "started_at": "Started at",
           "completed_at": "Completed at"
         },
+        "assignments_heading": "Campaign history",
+        "assignments": {
+          "empty": "This creator has no campaign assignments yet.",
+          "load_failed": "We couldn't load the campaign history.",
+          "campaign": "Campaign",
+          "brand": "Brand",
+          "agency": "Agency",
+          "status": "Status",
+          "created_at": "Started"
+        },
+        "audit_heading": "Audit history",
+        "audit": {
+          "empty": "No audit entries for this creator yet.",
+          "load_failed": "We couldn't load the audit history.",
+          "action": "Action",
+          "actor": "Actor",
+          "reason": "Reason",
+          "created_at": "When"
+        },
+        "payments_heading": "Payment history",
+        "payments_coming_soon": "Payment history lights up when payment processing ships (Sprint 10).",
         "load_failed": "We couldn't load this creator. Please refresh.",
         "fields": {
           "display_name": "Display name",

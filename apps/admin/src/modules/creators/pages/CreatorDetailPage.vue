@@ -62,12 +62,18 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import ApproveCreatorDialog from '../components/ApproveCreatorDialog.vue'
+import CreatorPaymentSection from '../components/CreatorPaymentSection.vue'
 import EditFieldModal from '../components/EditFieldModal.vue'
 import EditFieldRow from '../components/EditFieldRow.vue'
 import RejectCreatorDialog from '../components/RejectCreatorDialog.vue'
 import VerifyIdentityDialog from '../components/VerifyIdentityDialog.vue'
 import { FIELD_EDIT_CONFIG, type EditFieldConfig } from '../config/field-edit'
-import { adminCreatorsApi, type AdminEditableField } from '../api/creators.api'
+import {
+  adminCreatorsApi,
+  type AdminCreatorAssignment,
+  type AdminCreatorAuditLog,
+  type AdminEditableField,
+} from '../api/creators.api'
 
 type AdminCreatorPayload = CreatorResource
 
@@ -188,8 +194,37 @@ async function load(): Promise<void> {
   }
 }
 
+// ─── Read-only history (Sprint 13, D-4) ────────────────────────────────
+const assignments = ref<AdminCreatorAssignment[]>([])
+const assignmentsError = ref<string | null>(null)
+const auditLogs = ref<AdminCreatorAuditLog[]>([])
+const auditError = ref<string | null>(null)
+
+async function loadHistory(): Promise<void> {
+  if (creatorUlid.value === '') return
+  try {
+    const res = await adminCreatorsApi.assignments(creatorUlid.value)
+    assignments.value = res.data
+  } catch (error) {
+    assignmentsError.value =
+      error instanceof ApiError ? error.code : 'admin.creators.detail.assignments.load_failed'
+  }
+  try {
+    const res = await adminCreatorsApi.auditLogs(creatorUlid.value)
+    auditLogs.value = res.data
+  } catch (error) {
+    auditError.value =
+      error instanceof ApiError ? error.code : 'admin.creators.detail.audit.load_failed'
+  }
+}
+
+function formatHistoryDate(iso: string | null): string {
+  return iso === null ? '—' : new Date(iso).toLocaleString()
+}
+
 onMounted(() => {
   void load()
+  void loadHistory()
 })
 
 const editingField = ref<AdminEditableField | null>(null)
@@ -706,6 +741,95 @@ const decisionSnackbarColor = computed(() =>
           </tbody>
         </v-table>
       </section>
+
+      <section class="admin-creator-detail__section" data-testid="admin-creator-detail-assignments">
+        <h2 class="text-h6">{{ t('admin.creators.detail.assignments_heading') }}</h2>
+        <div
+          v-if="assignmentsError"
+          role="alert"
+          class="admin-creator-detail__error"
+          data-testid="admin-creator-detail-assignments-error"
+        >
+          {{ t(assignmentsError) }}
+        </div>
+        <p
+          v-else-if="assignments.length === 0"
+          class="text-body-2 text-medium-emphasis"
+          data-testid="admin-creator-detail-assignments-empty"
+        >
+          {{ t('admin.creators.detail.assignments.empty') }}
+        </p>
+        <v-table v-else density="compact">
+          <thead>
+            <tr>
+              <th>{{ t('admin.creators.detail.assignments.campaign') }}</th>
+              <th>{{ t('admin.creators.detail.assignments.brand') }}</th>
+              <th>{{ t('admin.creators.detail.assignments.agency') }}</th>
+              <th>{{ t('admin.creators.detail.assignments.status') }}</th>
+              <th>{{ t('admin.creators.detail.assignments.created_at') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="row in assignments"
+              :key="row.id"
+              :data-testid="`admin-creator-detail-assignment-row-${row.id}`"
+            >
+              <td>{{ row.attributes.campaign_name ?? '—' }}</td>
+              <td>{{ row.attributes.brand_name ?? '—' }}</td>
+              <td>{{ row.attributes.agency_name ?? '—' }}</td>
+              <td>
+                <v-chip size="x-small" variant="tonal">{{ row.attributes.status }}</v-chip>
+              </td>
+              <td>{{ formatHistoryDate(row.attributes.created_at) }}</td>
+            </tr>
+          </tbody>
+        </v-table>
+      </section>
+
+      <section class="admin-creator-detail__section" data-testid="admin-creator-detail-audit">
+        <h2 class="text-h6">{{ t('admin.creators.detail.audit_heading') }}</h2>
+        <div
+          v-if="auditError"
+          role="alert"
+          class="admin-creator-detail__error"
+          data-testid="admin-creator-detail-audit-error"
+        >
+          {{ t(auditError) }}
+        </div>
+        <p
+          v-else-if="auditLogs.length === 0"
+          class="text-body-2 text-medium-emphasis"
+          data-testid="admin-creator-detail-audit-empty"
+        >
+          {{ t('admin.creators.detail.audit.empty') }}
+        </p>
+        <v-table v-else density="compact">
+          <thead>
+            <tr>
+              <th>{{ t('admin.creators.detail.audit.action') }}</th>
+              <th>{{ t('admin.creators.detail.audit.actor') }}</th>
+              <th>{{ t('admin.creators.detail.audit.reason') }}</th>
+              <th>{{ t('admin.creators.detail.audit.created_at') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="row in auditLogs"
+              :key="row.id"
+              :data-testid="`admin-creator-detail-audit-row-${row.id}`"
+            >
+              <td>{{ row.attributes.action }}</td>
+              <td>{{ row.attributes.actor_name ?? row.attributes.actor_email ?? '—' }}</td>
+              <td>{{ row.attributes.reason ?? '—' }}</td>
+              <td>{{ formatHistoryDate(row.attributes.created_at) }}</td>
+            </tr>
+          </tbody>
+        </v-table>
+      </section>
+
+      <!-- Sprint 13 D-13: discrete swappable payment block (coming-soon). -->
+      <CreatorPaymentSection />
     </template>
 
     <EditFieldModal

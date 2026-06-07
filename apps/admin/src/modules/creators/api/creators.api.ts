@@ -53,6 +53,55 @@ export interface AdminCreatorListResponse {
 
 export interface AdminCreatorListParams {
   status?: CreatorApplicationStatus
+  kyc_status?: CreatorKycStatus
+  page?: number
+  per_page?: number
+}
+
+/**
+ * A single read-only assignment-history row (Sprint 13, D-4). Payment
+ * columns are deliberately absent — the creator-detail payment section is
+ * a discrete coming-soon block (D-13) lit up in S10.
+ */
+export interface AdminCreatorAssignment {
+  id: string
+  type: 'campaign_assignments'
+  attributes: {
+    status: string
+    campaign_name: string | null
+    brand_name: string | null
+    agency_name: string | null
+    invited_at: string | null
+    accepted_at: string | null
+    posted_at: string | null
+    created_at: string
+  }
+}
+
+/** A single per-creator audit-trail row (Sprint 13, D-4). */
+export interface AdminCreatorAuditLog {
+  id: string
+  type: 'audit_logs'
+  attributes: {
+    action: string
+    actor_name: string | null
+    actor_email: string | null
+    reason: string | null
+    created_at: string
+  }
+}
+
+export interface AdminCreatorAssignmentResponse {
+  data: AdminCreatorAssignment[]
+  meta: { total: number; page: number; per_page: number; last_page: number }
+}
+
+export interface AdminCreatorAuditLogResponse {
+  data: AdminCreatorAuditLog[]
+  meta: { total: number; page: number; per_page: number; last_page: number }
+}
+
+export interface AdminCreatorHistoryParams {
   page?: number
   per_page?: number
 }
@@ -91,10 +140,46 @@ export const adminCreatorsApi = {
   list(params: AdminCreatorListParams = {}): Promise<AdminCreatorListResponse> {
     const query = new URLSearchParams()
     if (params.status !== undefined) query.set('status', params.status)
+    if (params.kyc_status !== undefined) query.set('kyc_status', params.kyc_status)
     if (params.page !== undefined) query.set('page', String(params.page))
     if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
     const qs = query.toString()
     return http.get<AdminCreatorListResponse>(`/admin/creators${qs === '' ? '' : `?${qs}`}`)
+  },
+
+  /**
+   * Read-only assignment history for a creator (Sprint 13, D-4),
+   * GET /admin/creators/{ulid}/assignments. Cross-agency; payment-free.
+   */
+  assignments(
+    creatorUlid: string,
+    params: AdminCreatorHistoryParams = {},
+  ): Promise<AdminCreatorAssignmentResponse> {
+    const query = new URLSearchParams()
+    if (params.page !== undefined) query.set('page', String(params.page))
+    if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
+    const qs = query.toString()
+    return http.get<AdminCreatorAssignmentResponse>(
+      `/admin/creators/${creatorUlid}/assignments${qs === '' ? '' : `?${qs}`}`,
+    )
+  },
+
+  /**
+   * Per-creator audit trail (Sprint 13, D-4),
+   * GET /admin/creators/{ulid}/audit-logs. Reads the append-only
+   * `audit_logs` rows whose subject is this creator.
+   */
+  auditLogs(
+    creatorUlid: string,
+    params: AdminCreatorHistoryParams = {},
+  ): Promise<AdminCreatorAuditLogResponse> {
+    const query = new URLSearchParams()
+    if (params.page !== undefined) query.set('page', String(params.page))
+    if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
+    const qs = query.toString()
+    return http.get<AdminCreatorAuditLogResponse>(
+      `/admin/creators/${creatorUlid}/audit-logs${qs === '' ? '' : `?${qs}`}`,
+    )
   },
 
   /**

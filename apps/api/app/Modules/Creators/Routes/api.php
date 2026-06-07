@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Creators\Http\Controllers\Admin\AdminCreatorController;
+use App\Modules\Creators\Http\Controllers\Admin\AdminCreatorHistoryController;
 use App\Modules\Creators\Http\Controllers\AvatarController;
 use App\Modules\Creators\Http\Controllers\BulkInviteController;
 use App\Modules\Creators\Http\Controllers\CreatorAssignmentContractController;
@@ -323,6 +324,12 @@ Route::prefix('admin/creators')
             ->name('reject');
         Route::post('{creator}/verify-identity', [AdminCreatorController::class, 'verifyIdentity'])
             ->name('verify-identity');
+
+        // Sprint 13 (D-4) — read-only creator-detail history surfaces.
+        Route::get('{creator}/assignments', [AdminCreatorHistoryController::class, 'assignments'])
+            ->name('assignments');
+        Route::get('{creator}/audit-logs', [AdminCreatorHistoryController::class, 'auditLogs'])
+            ->name('audit-logs');
     });
 
 // ---------------------------------------------------------------------------

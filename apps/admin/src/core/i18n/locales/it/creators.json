@@ -28,6 +28,23 @@
           "rejected": "Rifiutato"
         }
       },
+      "kyc": {
+        "title": "Coda di revisione KYC",
+        "empty": "Nessun creator corrisponde a questo filtro KYC.",
+        "load_failed": "Impossibile caricare la coda KYC. Aggiorna la pagina.",
+        "filters": {
+          "pending": "In attesa",
+          "verified": "Verificato",
+          "rejected": "Rifiutato",
+          "none": "Non iniziato",
+          "all": "Tutti"
+        }
+      },
+      "all": {
+        "title": "Tutti i creator",
+        "empty": "Ancora nessun creator.",
+        "load_failed": "Impossibile caricare i creator. Aggiorna la pagina."
+      },
       "detail": {
         "fallback_title": "Creator",
         "application_status": "Stato candidatura: {status}",
@@ -44,6 +61,27 @@
           "started_at": "Iniziata il",
           "completed_at": "Completata il"
         },
+        "assignments_heading": "Cronologia campagne",
+        "assignments": {
+          "empty": "Questo creator non ha ancora assegnazioni di campagna.",
+          "load_failed": "Impossibile caricare la cronologia delle campagne.",
+          "campaign": "Campagna",
+          "brand": "Brand",
+          "agency": "Agenzia",
+          "status": "Stato",
+          "created_at": "Iniziata"
+        },
+        "audit_heading": "Cronologia di audit",
+        "audit": {
+          "empty": "Ancora nessuna voce di audit per questo creator.",
+          "load_failed": "Impossibile caricare la cronologia di audit.",
+          "action": "Azione",
+          "actor": "Autore",
+          "reason": "Motivo",
+          "created_at": "Quando"
+        },
+        "payments_heading": "Cronologia pagamenti",
+        "payments_coming_soon": "La cronologia dei pagamenti sarà attivata al lancio dell'elaborazione dei pagamenti (Sprint 10).",
         "load_failed": "Impossibile caricare questo creator. Aggiorna la pagina.",
         "fields": {
           "display_name": "Nome visualizzato",

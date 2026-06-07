@@ -28,6 +28,23 @@
           "rejected": "Rejeitado"
         }
       },
+      "kyc": {
+        "title": "Fila de revisão KYC",
+        "empty": "Nenhum criador corresponde a este filtro de KYC.",
+        "load_failed": "Não foi possível carregar a fila de KYC. Atualize a página.",
+        "filters": {
+          "pending": "Pendente",
+          "verified": "Verificado",
+          "rejected": "Rejeitado",
+          "none": "Não iniciado",
+          "all": "Todos"
+        }
+      },
+      "all": {
+        "title": "Todos os criadores",
+        "empty": "Ainda não há criadores.",
+        "load_failed": "Não foi possível carregar os criadores. Atualize a página."
+      },
       "detail": {
         "fallback_title": "Criador",
         "application_status": "Estado da candidatura: {status}",
@@ -38,6 +55,27 @@
         "portfolio_heading": "Portfólio",
         "onboarding_heading": "Estado do onboarding",
         "kyc_history_heading": "Histórico de verificações KYC",
+        "assignments_heading": "Histórico de campanhas",
+        "assignments": {
+          "empty": "Este criador ainda não tem atribuições de campanha.",
+          "load_failed": "Não foi possível carregar o histórico de campanhas.",
+          "campaign": "Campanha",
+          "brand": "Marca",
+          "agency": "Agência",
+          "status": "Estado",
+          "created_at": "Iniciada"
+        },
+        "audit_heading": "Histórico de auditoria",
+        "audit": {
+          "empty": "Ainda não há registos de auditoria para este criador.",
+          "load_failed": "Não foi possível carregar o histórico de auditoria.",
+          "action": "Ação",
+          "actor": "Autor",
+          "reason": "Motivo",
+          "created_at": "Quando"
+        },
+        "payments_heading": "Histórico de pagamentos",
+        "payments_coming_soon": "O histórico de pagamentos será ativado quando o processamento de pagamentos for lançado (Sprint 10).",
         "kyc_history": {
           "provider": "Fornecedor",
           "status": "Estado",

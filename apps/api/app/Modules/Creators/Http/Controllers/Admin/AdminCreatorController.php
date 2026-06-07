@@ -91,6 +91,20 @@ final class AdminCreatorController
             }
         }
 
+        // Sprint 13 (D-4) — the KYC review queue is the SAME endpoint with a
+        // distinct, orthogonal `?kyc_status=` filter (the SPA's KYC queue
+        // sends `kyc_status=pending`, the approvals queue sends `status=`).
+        // Unknown value → empty page, mirroring the application-status leg.
+        $kycInput = $request->query('kyc_status');
+        if (is_string($kycInput) && $kycInput !== '') {
+            $kyc = KycStatus::tryFrom($kycInput);
+            if ($kyc === null) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->where('kyc_status', $kyc->value);
+            }
+        }
+
         $paginator = $query->paginate($perPage)->withQueryString();
 
         $data = array_map(static fn (Creator $creator): array => [
