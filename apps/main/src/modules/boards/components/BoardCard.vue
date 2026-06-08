@@ -116,6 +116,16 @@ const dueInfo = computed<DueInfo | null>(() => {
 .board-card {
   cursor: pointer;
   overflow: hidden;
+  background: rgb(var(--v-theme-surface));
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.05s ease;
+}
+.board-card:hover {
+  box-shadow: 0 2px 8px rgba(var(--v-theme-on-surface), 0.16);
+}
+.board-card:active {
+  transform: scale(0.997);
 }
 .board-card__strip {
   width: 4px;

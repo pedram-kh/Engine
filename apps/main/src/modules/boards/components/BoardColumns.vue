@@ -57,14 +57,14 @@ defineExpose({ onColumnChange, localColumns })
 </script>
 
 <template>
-  <div class="d-flex align-start ga-4">
+  <div class="board-columns-root">
     <draggable
       v-model="localColumns"
       item-key="id"
       group="board-columns"
       handle=".board-column__drag"
       :disabled="!canEditColumns"
-      class="d-flex align-start ga-4 board-columns"
+      class="d-flex align-stretch ga-4 board-columns"
       data-test="board-columns"
       @change="onColumnChange"
     >
@@ -81,22 +81,51 @@ defineExpose({ onColumnChange, localColumns })
       </template>
     </draggable>
 
-    <div v-if="canEditColumns" class="board-columns__add">
-      <v-btn
-        variant="outlined"
-        size="small"
-        prepend-icon="mdi-plus"
-        data-test="board-add-column"
-        @click="emit('add-column')"
-      >
-        {{ t('app.campaigns.board.column.add') }}
-      </v-btn>
-    </div>
+    <button
+      v-if="canEditColumns"
+      type="button"
+      class="board-columns__add"
+      data-test="board-add-column"
+      @click="emit('add-column')"
+    >
+      <v-icon icon="mdi-plus" size="small" />
+      <span class="text-body-2">{{ t('app.campaigns.board.column.add') }}</span>
+    </button>
   </div>
 </template>
 
 <style scoped>
-.board-columns {
+.board-columns-root {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-x: auto;
+  overflow-y: hidden;
+  /* keep the horizontal scrollbar clear of the last row of cards */
+  padding-bottom: 8px;
+}
+.board-columns {
+  align-items: stretch;
+}
+.board-columns__add {
+  flex: 0 0 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 12px;
+  border: 1px dashed rgba(var(--v-theme-on-surface), 0.16);
+  color: rgba(var(--v-theme-on-surface), 0.7);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+.board-columns__add:hover {
+  background: rgba(var(--v-theme-on-surface), 0.04);
+  border-color: rgba(var(--v-theme-on-surface), 0.28);
 }
 </style>

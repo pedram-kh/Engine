@@ -120,6 +120,7 @@ defineExpose({ onCardChange })
       item-key="id"
       group="board-cards"
       class="board-column__list d-flex flex-column ga-2"
+      :class="{ 'board-column__list--empty': cards.length === 0 }"
       :data-test="`board-column-list-${column.id}`"
       @change="onCardChange"
     >
@@ -134,8 +135,19 @@ defineExpose({ onCardChange })
 
 <style scoped>
 .board-column {
-  width: 280px;
-  flex: 0 0 280px;
+  width: 300px;
+  flex: 0 0 300px;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(var(--v-theme-on-surface), 0.04);
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+}
+.board-column__header {
+  flex: 0 0 auto;
+  padding: 2px 2px 0;
 }
 .board-column__dot {
   width: 10px;
@@ -147,6 +159,18 @@ defineExpose({ onCardChange })
   cursor: grab;
 }
 .board-column__list {
-  min-height: 40px;
+  /* fill the column so the whole body is a drop target; scroll when the card
+     stack exceeds the column height */
+  flex: 1 1 auto;
+  min-height: 64px;
+  overflow-y: auto;
+  padding: 2px;
+  /* room so the last card's hover shadow isn't clipped */
+  margin: 0 -2px;
+  border-radius: 8px;
+}
+/* an empty column still reads as a column + droppable zone */
+.board-column__list--empty {
+  border: 1px dashed rgba(var(--v-theme-on-surface), 0.12);
 }
 </style>

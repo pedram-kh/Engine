@@ -92,8 +92,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div data-test="board-view">
-    <div class="d-flex align-center mb-4">
+  <div class="board-view" data-test="board-view">
+    <div class="board-view__toolbar d-flex align-center mb-4">
       <v-spacer />
       <v-btn
         v-if="canConfigure"
@@ -120,6 +120,7 @@ onBeforeUnmount(() => {
 
     <BoardColumns
       v-else
+      class="board-view__columns"
       :columns="store.sortedColumns"
       :cards-by-column="store.cardsByColumn"
       :can-edit-columns="canConfigure"
@@ -156,3 +157,20 @@ onBeforeUnmount(() => {
     </v-snackbar>
   </div>
 </template>
+
+<style scoped>
+.board-view {
+  display: flex;
+  flex-direction: column;
+  /* fill to the viewport bottom: app bar + page heading + tabs ≈ 210px above. */
+  height: calc(100vh - 210px);
+  min-height: 360px;
+}
+.board-view__toolbar {
+  flex: 0 0 auto;
+}
+.board-view__columns {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+</style>
