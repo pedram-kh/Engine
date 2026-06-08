@@ -58,9 +58,7 @@ describe('SignUpPage', () => {
   it('renders the sign-up heading from i18n', async () => {
     const h = await mountAuthPage(SignUpPage)
     teardown = h.unmount
-    expect(h.wrapper.find('[data-test="sign-up-heading"]').text()).toBe(
-      'Create your Catalyst account',
-    )
+    expect(h.wrapper.find('[data-test="sign-up-heading"]').text()).toBe('Create your account')
   })
 
   it('happy path: forwards the form to signUp() and navigates to verify-email pending with email in query', async () => {

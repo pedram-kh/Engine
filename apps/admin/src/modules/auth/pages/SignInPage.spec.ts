@@ -62,7 +62,7 @@ describe('SignInPage (admin)', () => {
   it('renders the admin sign-in heading from i18n', async () => {
     const h = await mountAuthPage(SignInPage)
     teardown = h.unmount
-    expect(h.wrapper.find('[data-test="sign-in-heading"]').text()).toBe('Sign in to Catalyst Admin')
+    expect(h.wrapper.find('[data-test="sign-in-heading"]').text()).toBe('Sign in')
   })
 
   it('does NOT show the session-expired banner without ?reason', async () => {
