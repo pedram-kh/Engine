@@ -272,274 +272,314 @@ onMounted(() => {
 
     <template v-else-if="detail !== null && attrs !== null && creator !== null">
       <!-- Header: name + contact email + status chips (D-2a-8) -->
-      <header class="creator-detail__header d-flex align-start justify-space-between ga-3">
-        <div class="creator-detail__header-text">
-          <h1 class="text-h5 ma-0" data-test="creator-detail-name">{{ displayName }}</h1>
-          <a
-            v-if="email"
-            :href="`mailto:${email}`"
-            class="creator-detail__email"
-            data-test="creator-detail-email"
-          >
-            {{ email }}
-          </a>
-          <div class="d-flex flex-wrap ga-2 mt-1">
-            <v-chip size="small" variant="tonal" data-test="creator-detail-relationship-status">
-              {{ t(`app.roster.status.${attrs.relationship_status}`) }}
-            </v-chip>
-            <v-chip size="small" variant="flat" data-test="creator-detail-application-status">
-              {{ t(`app.roster.applicationStatus.${creator.application_status}`) }}
-            </v-chip>
-            <BlacklistBadge
-              v-if="attrs.is_blacklisted"
-              :type="blacklistType"
-              :label="t(`app.roster.blacklist.badge.${blacklistType}`)"
-              size="small"
-              data-test="creator-detail-blacklist"
-            />
+      <v-card variant="outlined" class="creator-detail__header-card">
+        <v-card-text class="creator-detail__header d-flex align-start justify-space-between ga-3">
+          <div class="creator-detail__header-text">
+            <h1 class="text-h5 ma-0" data-test="creator-detail-name">{{ displayName }}</h1>
+            <a
+              v-if="email"
+              :href="`mailto:${email}`"
+              class="creator-detail__email"
+              data-test="creator-detail-email"
+            >
+              {{ email }}
+            </a>
+            <div class="d-flex flex-wrap ga-2 mt-1">
+              <v-chip size="small" variant="tonal" data-test="creator-detail-relationship-status">
+                {{ t(`app.roster.status.${attrs.relationship_status}`) }}
+              </v-chip>
+              <v-chip size="small" variant="flat" data-test="creator-detail-application-status">
+                {{ t(`app.roster.applicationStatus.${creator.application_status}`) }}
+              </v-chip>
+              <BlacklistBadge
+                v-if="attrs.is_blacklisted"
+                :type="blacklistType"
+                :label="t(`app.roster.blacklist.badge.${blacklistType}`)"
+                size="small"
+                data-test="creator-detail-blacklist"
+              />
+            </div>
           </div>
-        </div>
 
-        <!-- Add-to-pool action (D-2b-9). Net-new chrome on the 2a header;
-             admin/manager only (canEdit). -->
-        <v-btn
-          v-if="canEdit"
-          color="primary"
-          variant="tonal"
-          prepend-icon="mdi-account-multiple-plus-outline"
-          data-test="creator-detail-add-to-pool"
-          @click="poolDialog = true"
-        >
-          {{ t('app.pools.picker.openLabel') }}
-        </v-btn>
-      </header>
-
-      <!-- Profile -->
-      <section class="creator-detail__section" data-test="creator-detail-profile">
-        <h2 class="text-h6">{{ t('app.roster.detail.sections.profile') }}</h2>
-        <p v-if="creator.bio" class="text-body-2" data-test="creator-detail-bio">
-          {{ creator.bio }}
-        </p>
-        <div class="creator-detail__profile-grid">
-          <div>
-            <span class="creator-detail__label">{{ t('app.roster.fields.country') }}</span>
-            <CountryDisplay :code="creator.country_code" :label="countryLabel" />
-          </div>
-          <div>
-            <span class="creator-detail__label">{{ t('app.roster.fields.language') }}</span>
-            <LanguageList
-              :primary-label="primaryLanguageLabel"
-              :secondary-labels="secondaryLanguageLabels"
-            />
-          </div>
-          <div class="creator-detail__profile-categories">
-            <span class="creator-detail__label">{{ t('app.roster.fields.categories') }}</span>
-            <CategoryChips :labels="categoryLabels" />
-          </div>
-        </div>
-      </section>
-
-      <!-- Rating + notes editor (admin/manager) / read-only (staff) -->
-      <section class="creator-detail__section" data-test="creator-detail-rating-notes">
-        <h2 class="text-h6">{{ t('app.roster.detail.sections.rating') }}</h2>
-
-        <div class="creator-detail__rating-row">
-          <span class="creator-detail__label">{{ t('app.roster.fields.rating') }}</span>
-          <StarRatingInput
-            v-model="ratingDraft"
-            :readonly="!canEdit"
-            :aria-label="t('app.roster.fields.rating')"
-            :star-label="(n) => t('app.roster.detail.editor.starLabel', { n })"
-            data-test="creator-detail-rating"
-          />
-          <span
-            v-if="ratingDraft === null"
-            class="text-caption text-medium-emphasis"
-            data-test="creator-detail-rating-unset"
-          >
-            {{ t('app.roster.detail.editor.ratingUnset') }}
-          </span>
-        </div>
-
-        <!-- Editable notes (admin/manager) -->
-        <template v-if="canEdit">
-          <v-textarea
-            v-model="notesDraft"
-            :label="t('app.roster.detail.editor.notesLabel')"
-            :placeholder="t('app.roster.detail.editor.notesPlaceholder')"
-            variant="outlined"
-            rows="4"
-            auto-grow
-            counter="5000"
-            maxlength="5000"
-            hide-details="auto"
-            class="mt-3"
-            data-test="creator-detail-notes"
-          />
-          <v-alert
-            v-if="saveError"
-            type="error"
+          <!-- Add-to-pool action (D-2b-9). Net-new chrome on the 2a header;
+               admin/manager only (canEdit). -->
+          <v-btn
+            v-if="canEdit"
+            color="primary"
             variant="tonal"
-            class="mt-2"
-            data-test="creator-detail-save-error"
+            prepend-icon="mdi-account-multiple-plus-outline"
+            data-test="creator-detail-add-to-pool"
+            @click="poolDialog = true"
           >
-            {{ saveError }}
-          </v-alert>
-          <div class="d-flex justify-end mt-2">
-            <v-btn
-              color="primary"
-              variant="flat"
-              :loading="saving"
-              :disabled="!isDirty || saving"
-              data-test="creator-detail-save"
-              @click="save"
-            >
-              {{ t('app.roster.detail.editor.save') }}
-            </v-btn>
-          </div>
-        </template>
+            {{ t('app.pools.picker.openLabel') }}
+          </v-btn>
+        </v-card-text>
+      </v-card>
 
-        <!-- Read-only notes (staff) -->
-        <template v-else>
-          <div class="mt-3">
-            <span class="creator-detail__label">{{
-              t('app.roster.detail.editor.notesLabel')
-            }}</span>
-            <p
-              v-if="attrs.internal_notes"
-              class="text-body-2"
-              data-test="creator-detail-notes-readonly"
-            >
-              {{ attrs.internal_notes }}
-            </p>
-            <span
-              v-else
-              class="text-body-2 text-medium-emphasis"
-              data-test="creator-detail-notes-readonly"
-            >
-              {{ t('app.roster.detail.editor.notesEmpty') }}
-            </span>
-          </div>
-        </template>
-      </section>
+      <div class="creator-detail__body">
+        <!-- Main column: the creator's public-facing profile content. -->
+        <div class="creator-detail__main">
+          <!-- Profile -->
+          <v-card variant="outlined" data-test="creator-detail-profile">
+            <v-card-title class="text-h6">
+              {{ t('app.roster.detail.sections.profile') }}
+            </v-card-title>
+            <v-card-text class="d-flex flex-column ga-3">
+              <p v-if="creator.bio" class="text-body-2 mb-0" data-test="creator-detail-bio">
+                {{ creator.bio }}
+              </p>
+              <div class="creator-detail__profile-grid">
+                <div>
+                  <span class="creator-detail__label">{{ t('app.roster.fields.country') }}</span>
+                  <CountryDisplay :code="creator.country_code" :label="countryLabel" />
+                </div>
+                <div>
+                  <span class="creator-detail__label">{{ t('app.roster.fields.language') }}</span>
+                  <LanguageList
+                    :primary-label="primaryLanguageLabel"
+                    :secondary-labels="secondaryLanguageLabels"
+                  />
+                </div>
+                <div class="creator-detail__profile-categories">
+                  <span class="creator-detail__label">{{ t('app.roster.fields.categories') }}</span>
+                  <CategoryChips :labels="categoryLabels" />
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
 
-      <!-- Blacklist management (Sprint 7, A7) — admin/manager only. Shows the
-           AGENCY-WIDE status (D-2) + the blacklist / un-blacklist actions. -->
-      <section
-        v-if="canEdit"
-        class="creator-detail__section"
-        data-test="creator-detail-blacklist-section"
-      >
-        <h2 class="text-h6">{{ t('app.roster.blacklist.section.title') }}</h2>
+          <!-- Social accounts (accounts render; metrics are blocked → empty state) -->
+          <v-card variant="outlined" data-test="creator-detail-social">
+            <v-card-title class="text-h6">
+              {{ t('app.roster.detail.sections.social') }}
+            </v-card-title>
+            <v-card-text>
+              <SocialAccountList
+                :accounts="socialAccountRows"
+                :empty-label="t('app.roster.detail.social.empty')"
+              />
+            </v-card-text>
+          </v-card>
 
-        <v-alert
-          v-if="blacklistError"
-          type="error"
-          variant="tonal"
-          data-test="creator-detail-blacklist-error"
-        >
-          {{ blacklistError }}
-        </v-alert>
+          <!-- Social metrics — data-blocked empty state (D-2a-10) -->
+          <v-card variant="outlined" data-test="creator-detail-metrics">
+            <v-card-title class="text-h6">
+              {{ t('app.roster.detail.sections.metrics') }}
+            </v-card-title>
+            <v-card-text>
+              <CEmptyState
+                title-tag="h3"
+                data-test="creator-detail-metrics-empty"
+                :title="t('app.roster.detail.metrics.empty.heading')"
+                :body="t('app.roster.detail.metrics.empty.body')"
+              >
+                <template #icon>
+                  <v-icon icon="mdi-chart-line" size="48" color="medium-emphasis" />
+                </template>
+              </CEmptyState>
+            </v-card-text>
+          </v-card>
 
-        <template v-if="isBlacklisted">
-          <p class="text-body-2" data-test="creator-detail-blacklist-status">
-            {{ t(`app.roster.blacklist.status.${blacklistType}`) }}
-            <template v-if="blacklistedDateLabel() !== null">
-              · {{ blacklistedDateLabel() }}</template
-            >
-          </p>
-          <div class="d-flex justify-start">
-            <v-btn
-              color="primary"
-              variant="tonal"
-              prepend-icon="mdi-account-check-outline"
-              :loading="unblacklisting"
-              data-test="creator-detail-unblacklist"
-              @click="unblacklist"
-            >
-              {{ t('app.roster.blacklist.liftAction') }}
-            </v-btn>
-          </div>
-        </template>
+          <!-- Portfolio -->
+          <v-card variant="outlined" data-test="creator-detail-portfolio">
+            <v-card-title class="text-h6">
+              {{ t('app.roster.detail.sections.portfolio') }}
+            </v-card-title>
+            <v-card-text>
+              <PortfolioGallery
+                :items="portfolioItems"
+                :editable="false"
+                :empty-label="t('app.roster.detail.portfolio.empty')"
+                :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
+                :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
+              />
+            </v-card-text>
+          </v-card>
 
-        <template v-else>
-          <p class="text-body-2 text-medium-emphasis" data-test="creator-detail-blacklist-none">
-            {{ t('app.roster.blacklist.section.none') }}
-          </p>
-          <div class="d-flex justify-start">
-            <v-btn
-              color="error"
-              variant="tonal"
-              prepend-icon="mdi-cancel"
-              data-test="creator-detail-blacklist-open"
-              @click="blacklistDialog = true"
-            >
-              {{ t('app.roster.blacklist.openAction') }}
-            </v-btn>
-          </div>
-        </template>
-      </section>
+          <!-- Availability (read-only, consumes the Sprint-5 agency endpoint) -->
+          <v-card variant="outlined" data-test="creator-detail-availability">
+            <v-card-title class="text-h6">
+              {{ t('app.roster.detail.sections.availability') }}
+            </v-card-title>
+            <v-card-text>
+              <AgencyAvailabilityCalendar
+                v-if="agencyStore.currentAgencyId"
+                :agency-id="agencyStore.currentAgencyId"
+                :creator-ulid="creatorUlid"
+              />
+            </v-card-text>
+          </v-card>
 
-      <!-- Social accounts (accounts render; metrics are blocked → empty state) -->
-      <section class="creator-detail__section" data-test="creator-detail-social">
-        <h2 class="text-h6">{{ t('app.roster.detail.sections.social') }}</h2>
-        <SocialAccountList
-          :accounts="socialAccountRows"
-          :empty-label="t('app.roster.detail.social.empty')"
-        />
-      </section>
+          <!-- Campaign history — Sprint-8-blocked empty state (D-2a-10) -->
+          <v-card variant="outlined" data-test="creator-detail-campaigns">
+            <v-card-title class="text-h6">
+              {{ t('app.roster.detail.sections.campaigns') }}
+            </v-card-title>
+            <v-card-text>
+              <CEmptyState
+                title-tag="h3"
+                data-test="creator-detail-campaigns-empty"
+                :title="t('app.roster.detail.campaigns.empty.heading')"
+                :body="t('app.roster.detail.campaigns.empty.body')"
+              >
+                <template #icon>
+                  <v-icon icon="mdi-history" size="48" color="medium-emphasis" />
+                </template>
+              </CEmptyState>
+            </v-card-text>
+          </v-card>
+        </div>
 
-      <!-- Social metrics — data-blocked empty state (D-2a-10) -->
-      <section class="creator-detail__section" data-test="creator-detail-metrics">
-        <h2 class="text-h6">{{ t('app.roster.detail.sections.metrics') }}</h2>
-        <CEmptyState
-          title-tag="h3"
-          data-test="creator-detail-metrics-empty"
-          :title="t('app.roster.detail.metrics.empty.heading')"
-          :body="t('app.roster.detail.metrics.empty.body')"
-        >
-          <template #icon>
-            <v-icon icon="mdi-chart-line" size="48" color="medium-emphasis" />
-          </template>
-        </CEmptyState>
-      </section>
+        <!-- Right rail: the agency's private management tools. Sticky on wide
+             screens so rating/notes + blacklist stay in view while scrolling. -->
+        <aside class="creator-detail__rail">
+          <!-- Rating + notes editor (admin/manager) / read-only (staff) -->
+          <v-card variant="outlined" data-test="creator-detail-rating-notes">
+            <v-card-title class="text-h6">
+              {{ t('app.roster.detail.sections.rating') }}
+            </v-card-title>
+            <v-card-text>
+              <div class="creator-detail__rating-row">
+                <span class="creator-detail__label">{{ t('app.roster.fields.rating') }}</span>
+                <StarRatingInput
+                  v-model="ratingDraft"
+                  :readonly="!canEdit"
+                  :aria-label="t('app.roster.fields.rating')"
+                  :star-label="(n) => t('app.roster.detail.editor.starLabel', { n })"
+                  data-test="creator-detail-rating"
+                />
+                <span
+                  v-if="ratingDraft === null"
+                  class="text-caption text-medium-emphasis"
+                  data-test="creator-detail-rating-unset"
+                >
+                  {{ t('app.roster.detail.editor.ratingUnset') }}
+                </span>
+              </div>
 
-      <!-- Portfolio -->
-      <section class="creator-detail__section" data-test="creator-detail-portfolio">
-        <h2 class="text-h6">{{ t('app.roster.detail.sections.portfolio') }}</h2>
-        <PortfolioGallery
-          :items="portfolioItems"
-          :editable="false"
-          :empty-label="t('app.roster.detail.portfolio.empty')"
-          :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
-          :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
-        />
-      </section>
+              <!-- Editable notes (admin/manager) -->
+              <template v-if="canEdit">
+                <v-textarea
+                  v-model="notesDraft"
+                  :label="t('app.roster.detail.editor.notesLabel')"
+                  :placeholder="t('app.roster.detail.editor.notesPlaceholder')"
+                  variant="outlined"
+                  rows="4"
+                  auto-grow
+                  counter="5000"
+                  maxlength="5000"
+                  hide-details="auto"
+                  class="mt-3"
+                  data-test="creator-detail-notes"
+                />
+                <v-alert
+                  v-if="saveError"
+                  type="error"
+                  variant="tonal"
+                  class="mt-2"
+                  data-test="creator-detail-save-error"
+                >
+                  {{ saveError }}
+                </v-alert>
+                <div class="d-flex justify-end mt-2">
+                  <v-btn
+                    color="primary"
+                    variant="flat"
+                    :loading="saving"
+                    :disabled="!isDirty || saving"
+                    data-test="creator-detail-save"
+                    @click="save"
+                  >
+                    {{ t('app.roster.detail.editor.save') }}
+                  </v-btn>
+                </div>
+              </template>
 
-      <!-- Availability (read-only, consumes the Sprint-5 agency endpoint) -->
-      <section class="creator-detail__section" data-test="creator-detail-availability">
-        <h2 class="text-h6">{{ t('app.roster.detail.sections.availability') }}</h2>
-        <AgencyAvailabilityCalendar
-          v-if="agencyStore.currentAgencyId"
-          :agency-id="agencyStore.currentAgencyId"
-          :creator-ulid="creatorUlid"
-        />
-      </section>
+              <!-- Read-only notes (staff) -->
+              <template v-else>
+                <div class="mt-3">
+                  <span class="creator-detail__label">{{
+                    t('app.roster.detail.editor.notesLabel')
+                  }}</span>
+                  <p
+                    v-if="attrs.internal_notes"
+                    class="text-body-2 mb-0"
+                    data-test="creator-detail-notes-readonly"
+                  >
+                    {{ attrs.internal_notes }}
+                  </p>
+                  <span
+                    v-else
+                    class="text-body-2 text-medium-emphasis"
+                    data-test="creator-detail-notes-readonly"
+                  >
+                    {{ t('app.roster.detail.editor.notesEmpty') }}
+                  </span>
+                </div>
+              </template>
+            </v-card-text>
+          </v-card>
 
-      <!-- Campaign history — Sprint-8-blocked empty state (D-2a-10) -->
-      <section class="creator-detail__section" data-test="creator-detail-campaigns">
-        <h2 class="text-h6">{{ t('app.roster.detail.sections.campaigns') }}</h2>
-        <CEmptyState
-          title-tag="h3"
-          data-test="creator-detail-campaigns-empty"
-          :title="t('app.roster.detail.campaigns.empty.heading')"
-          :body="t('app.roster.detail.campaigns.empty.body')"
-        >
-          <template #icon>
-            <v-icon icon="mdi-history" size="48" color="medium-emphasis" />
-          </template>
-        </CEmptyState>
-      </section>
+          <!-- Blacklist management (Sprint 7, A7) — admin/manager only. Shows the
+               AGENCY-WIDE status (D-2) + the blacklist / un-blacklist actions. -->
+          <v-card v-if="canEdit" variant="outlined" data-test="creator-detail-blacklist-section">
+            <v-card-title class="text-h6">
+              {{ t('app.roster.blacklist.section.title') }}
+            </v-card-title>
+            <v-card-text class="d-flex flex-column ga-3">
+              <v-alert
+                v-if="blacklistError"
+                type="error"
+                variant="tonal"
+                data-test="creator-detail-blacklist-error"
+              >
+                {{ blacklistError }}
+              </v-alert>
+
+              <template v-if="isBlacklisted">
+                <p class="text-body-2 mb-0" data-test="creator-detail-blacklist-status">
+                  {{ t(`app.roster.blacklist.status.${blacklistType}`) }}
+                  <template v-if="blacklistedDateLabel() !== null">
+                    · {{ blacklistedDateLabel() }}</template
+                  >
+                </p>
+                <div class="d-flex justify-start">
+                  <v-btn
+                    color="primary"
+                    variant="tonal"
+                    prepend-icon="mdi-account-check-outline"
+                    :loading="unblacklisting"
+                    data-test="creator-detail-unblacklist"
+                    @click="unblacklist"
+                  >
+                    {{ t('app.roster.blacklist.liftAction') }}
+                  </v-btn>
+                </div>
+              </template>
+
+              <template v-else>
+                <p
+                  class="text-body-2 text-medium-emphasis mb-0"
+                  data-test="creator-detail-blacklist-none"
+                >
+                  {{ t('app.roster.blacklist.section.none') }}
+                </p>
+                <div class="d-flex justify-start">
+                  <v-btn
+                    color="error"
+                    variant="tonal"
+                    prepend-icon="mdi-cancel"
+                    data-test="creator-detail-blacklist-open"
+                    @click="blacklistDialog = true"
+                  >
+                    {{ t('app.roster.blacklist.openAction') }}
+                  </v-btn>
+                </div>
+              </template>
+            </v-card-text>
+          </v-card>
+        </aside>
+      </div>
     </template>
 
     <v-snackbar
@@ -604,8 +644,40 @@ onMounted(() => {
 .creator-detail {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  max-width: 960px;
+  gap: 16px;
+  max-width: 1200px;
+}
+
+/* Two-column body: a flexible main column + a fixed-width management rail.
+   Stacks to a single column below the md breakpoint. */
+.creator-detail__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.creator-detail__main,
+.creator-detail__rail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 960px) {
+  .creator-detail__body {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .creator-detail__main {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .creator-detail__rail {
+    flex: 0 0 340px;
+    /* keep the agency's rating/notes + blacklist in view while the profile
+       column scrolls */
+    position: sticky;
+    top: 16px;
+  }
 }
 
 .creator-detail__header-text {
@@ -622,12 +694,6 @@ onMounted(() => {
 }
 .creator-detail__email:hover {
   text-decoration: underline;
-}
-
-.creator-detail__section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
 .creator-detail__profile-grid {

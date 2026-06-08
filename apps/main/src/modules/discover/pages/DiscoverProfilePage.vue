@@ -223,147 +223,163 @@ onMounted(() => {
     <template v-else-if="profile !== null && attrs !== null">
       <!-- Header: name + the three connection annotation states + the
            status-driven send-request affordance (D-10/D-11). -->
-      <header class="discover-profile__header d-flex align-start justify-space-between ga-3">
-        <div class="discover-profile__header-text">
-          <h1 class="text-h5 ma-0" data-test="discover-profile-name">{{ displayName }}</h1>
-          <div class="d-flex flex-wrap align-center ga-2 mt-1">
-            <v-chip
+      <v-card variant="outlined" class="discover-profile__header-card">
+        <v-card-text class="discover-profile__header d-flex align-start justify-space-between ga-3">
+          <div class="discover-profile__header-text">
+            <h1 class="text-h5 ma-0" data-test="discover-profile-name">{{ displayName }}</h1>
+            <div class="d-flex flex-wrap align-center ga-2 mt-1">
+              <v-chip
+                v-if="connectionState === 'connected'"
+                size="small"
+                color="primary"
+                variant="tonal"
+                prepend-icon="mdi-link-variant"
+                data-test="discover-profile-connection-connected"
+              >
+                {{ t('app.discover.connection.connected') }}
+              </v-chip>
+              <v-chip
+                v-else-if="connectionState === 'pending'"
+                size="small"
+                color="info"
+                variant="tonal"
+                prepend-icon="mdi-clock-outline"
+                data-test="discover-profile-connection-pending"
+              >
+                {{ t('app.discover.connection.pending') }}
+              </v-chip>
+              <v-chip
+                v-else-if="connectionState === 'declined'"
+                size="small"
+                variant="tonal"
+                prepend-icon="mdi-close-circle-outline"
+                data-test="discover-profile-connection-declined"
+              >
+                {{ t('app.discover.connection.declined') }}
+              </v-chip>
+              <span
+                v-else
+                class="text-caption text-medium-emphasis"
+                data-test="discover-profile-notconnected"
+              >
+                {{ t('app.discover.connection.notConnected') }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Status-driven action (D-10). Admin/manager only (canSend). -->
+          <div class="d-flex align-center ga-2">
+            <!-- connected → the existing READ link to the relation-gated roster
+               detail (keys on `roster` specifically, D-5). -->
+            <v-btn
               v-if="connectionState === 'connected'"
-              size="small"
+              variant="tonal"
               color="primary"
-              variant="tonal"
-              prepend-icon="mdi-link-variant"
-              data-test="discover-profile-connection-connected"
+              prepend-icon="mdi-account-arrow-right-outline"
+              data-test="discover-profile-view-in-roster"
+              @click="viewInRoster"
             >
-              {{ t('app.discover.connection.connected') }}
-            </v-chip>
-            <v-chip
+              {{ t('app.discover.detail.viewInRoster') }}
+            </v-btn>
+
+            <!-- pending → informational, disabled. -->
+            <v-btn
               v-else-if="connectionState === 'pending'"
-              size="small"
-              color="info"
               variant="tonal"
+              color="info"
               prepend-icon="mdi-clock-outline"
-              data-test="discover-profile-connection-pending"
+              disabled
+              data-test="discover-profile-request-pending"
             >
               {{ t('app.discover.connection.pending') }}
-            </v-chip>
-            <v-chip
-              v-else-if="connectionState === 'declined'"
-              size="small"
-              variant="tonal"
-              prepend-icon="mdi-close-circle-outline"
-              data-test="discover-profile-connection-declined"
+            </v-btn>
+
+            <!-- declined → an explicit "Request again" (D-4); admin/manager only. -->
+            <v-btn
+              v-else-if="connectionState === 'declined' && canSend"
+              variant="flat"
+              color="primary"
+              prepend-icon="mdi-refresh"
+              :loading="sending"
+              data-test="discover-profile-request-again"
+              @click="sendConnectionRequest"
             >
-              {{ t('app.discover.connection.declined') }}
-            </v-chip>
-            <span
-              v-else
-              class="text-caption text-medium-emphasis"
-              data-test="discover-profile-notconnected"
+              {{ t('app.discover.connection.requestAgain') }}
+            </v-btn>
+
+            <!-- none → "Send request" (W1); admin/manager only. -->
+            <v-btn
+              v-else-if="connectionState === 'none' && canSend"
+              variant="flat"
+              color="primary"
+              prepend-icon="mdi-account-plus-outline"
+              :loading="sending"
+              data-test="discover-profile-send-request"
+              @click="sendConnectionRequest"
             >
-              {{ t('app.discover.connection.notConnected') }}
-            </span>
+              {{ t('app.discover.connection.sendRequest') }}
+            </v-btn>
           </div>
-        </div>
-
-        <!-- Status-driven action (D-10). Admin/manager only (canSend). -->
-        <div class="d-flex align-center ga-2">
-          <!-- connected → the existing READ link to the relation-gated roster
-               detail (keys on `roster` specifically, D-5). -->
-          <v-btn
-            v-if="connectionState === 'connected'"
-            variant="tonal"
-            color="primary"
-            prepend-icon="mdi-account-arrow-right-outline"
-            data-test="discover-profile-view-in-roster"
-            @click="viewInRoster"
-          >
-            {{ t('app.discover.detail.viewInRoster') }}
-          </v-btn>
-
-          <!-- pending → informational, disabled. -->
-          <v-btn
-            v-else-if="connectionState === 'pending'"
-            variant="tonal"
-            color="info"
-            prepend-icon="mdi-clock-outline"
-            disabled
-            data-test="discover-profile-request-pending"
-          >
-            {{ t('app.discover.connection.pending') }}
-          </v-btn>
-
-          <!-- declined → an explicit "Request again" (D-4); admin/manager only. -->
-          <v-btn
-            v-else-if="connectionState === 'declined' && canSend"
-            variant="flat"
-            color="primary"
-            prepend-icon="mdi-refresh"
-            :loading="sending"
-            data-test="discover-profile-request-again"
-            @click="sendConnectionRequest"
-          >
-            {{ t('app.discover.connection.requestAgain') }}
-          </v-btn>
-
-          <!-- none → "Send request" (W1); admin/manager only. -->
-          <v-btn
-            v-else-if="connectionState === 'none' && canSend"
-            variant="flat"
-            color="primary"
-            prepend-icon="mdi-account-plus-outline"
-            :loading="sending"
-            data-test="discover-profile-send-request"
-            @click="sendConnectionRequest"
-          >
-            {{ t('app.discover.connection.sendRequest') }}
-          </v-btn>
-        </div>
-      </header>
+        </v-card-text>
+      </v-card>
 
       <!-- Profile -->
-      <section class="discover-profile__section" data-test="discover-profile-profile">
-        <h2 class="text-h6">{{ t('app.discover.detail.sections.profile') }}</h2>
-        <p v-if="attrs.bio" class="text-body-2" data-test="discover-profile-bio">{{ attrs.bio }}</p>
-        <div class="discover-profile__grid">
-          <div>
-            <span class="discover-profile__label">{{ t('app.roster.fields.country') }}</span>
-            <CountryDisplay :code="attrs.country_code" :label="countryLabel" />
+      <v-card variant="outlined" data-test="discover-profile-profile">
+        <v-card-title class="text-h6">
+          {{ t('app.discover.detail.sections.profile') }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column ga-3">
+          <p v-if="attrs.bio" class="text-body-2 mb-0" data-test="discover-profile-bio">
+            {{ attrs.bio }}
+          </p>
+          <div class="discover-profile__grid">
+            <div>
+              <span class="discover-profile__label">{{ t('app.roster.fields.country') }}</span>
+              <CountryDisplay :code="attrs.country_code" :label="countryLabel" />
+            </div>
+            <div>
+              <span class="discover-profile__label">{{ t('app.roster.fields.language') }}</span>
+              <LanguageList
+                :primary-label="primaryLanguageLabel"
+                :secondary-labels="secondaryLanguageLabels"
+              />
+            </div>
+            <div class="discover-profile__categories">
+              <span class="discover-profile__label">{{ t('app.roster.fields.categories') }}</span>
+              <CategoryChips :labels="categoryLabels" />
+            </div>
           </div>
-          <div>
-            <span class="discover-profile__label">{{ t('app.roster.fields.language') }}</span>
-            <LanguageList
-              :primary-label="primaryLanguageLabel"
-              :secondary-labels="secondaryLanguageLabels"
-            />
-          </div>
-          <div class="discover-profile__categories">
-            <span class="discover-profile__label">{{ t('app.roster.fields.categories') }}</span>
-            <CategoryChips :labels="categoryLabels" />
-          </div>
-        </div>
-      </section>
+        </v-card-text>
+      </v-card>
 
       <!-- Social accounts (accounts render; metrics blocked-on-data) -->
-      <section class="discover-profile__section" data-test="discover-profile-social">
-        <h2 class="text-h6">{{ t('app.discover.detail.sections.social') }}</h2>
-        <SocialAccountList
-          :accounts="socialAccountRows"
-          :empty-label="t('app.discover.detail.social.empty')"
-        />
-      </section>
+      <v-card variant="outlined" data-test="discover-profile-social">
+        <v-card-title class="text-h6">
+          {{ t('app.discover.detail.sections.social') }}
+        </v-card-title>
+        <v-card-text>
+          <SocialAccountList
+            :accounts="socialAccountRows"
+            :empty-label="t('app.discover.detail.social.empty')"
+          />
+        </v-card-text>
+      </v-card>
 
       <!-- Portfolio -->
-      <section class="discover-profile__section" data-test="discover-profile-portfolio">
-        <h2 class="text-h6">{{ t('app.discover.detail.sections.portfolio') }}</h2>
-        <PortfolioGallery
-          :items="portfolioItems"
-          :editable="false"
-          :empty-label="t('app.discover.detail.portfolio.empty')"
-          :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
-          :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
-        />
-      </section>
+      <v-card variant="outlined" data-test="discover-profile-portfolio">
+        <v-card-title class="text-h6">
+          {{ t('app.discover.detail.sections.portfolio') }}
+        </v-card-title>
+        <v-card-text>
+          <PortfolioGallery
+            :items="portfolioItems"
+            :editable="false"
+            :empty-label="t('app.discover.detail.portfolio.empty')"
+            :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
+            :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
+          />
+        </v-card-text>
+      </v-card>
     </template>
 
     <v-snackbar
@@ -386,7 +402,7 @@ onMounted(() => {
 .discover-profile {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   max-width: 960px;
 }
 
@@ -394,12 +410,6 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 4px;
-}
-
-.discover-profile__section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
 .discover-profile__grid {
