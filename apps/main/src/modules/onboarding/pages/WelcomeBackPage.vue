@@ -154,10 +154,23 @@ onMounted(async () => {
     return
   }
 
-  // First mount in this tab — render the Welcome Back UI. Flip the
-  // flag now so any subsequent mount within the same tab (router
-  // navigation back to this route from another wizard step)
-  // auto-advances.
+  // Brand-new creators (no wizard step finished yet — next_step is
+  // still `profile`) skip the Welcome Back interstitial entirely and
+  // land DIRECTLY on Step 1 inside the animated wizard. Showing them a
+  // separate "Let's get started" screen in a different layout, then
+  // switching to the wizard chrome on the next click, was a jarring
+  // double-design. The interstitial only earns its place as a *resume*
+  // affordance for returners who have completed at least one step.
+  if (isFirstTime.value) {
+    markMounted()
+    await router.replace({ name: 'onboarding.profile' })
+    return
+  }
+
+  // First mount in this tab for a RETURNING creator — render the
+  // resume UI (inside the same animated chrome). Flip the flag now so
+  // any subsequent mount within the same tab (router navigation back
+  // to this route from another wizard step) auto-advances.
   markMounted()
   shouldRender.value = true
 })

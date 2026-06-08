@@ -117,11 +117,12 @@ describe('WelcomeBackPage — Decision B (session-vs-fresh hybrid)', () => {
     expect(h.wrapper.find('[data-test="welcome-back-heading"]').text()).toBe('Welcome back')
   })
 
-  it('shows the first-time "Let\'s get started" copy (no time-ago) when nextStep is still "profile"', async () => {
-    // A brand-new creator who has not completed the first wizard step
-    // must NOT be told "Welcome back / you were last here X ago" — the
-    // time-ago is derived from updated_at and reads as a falsehood on a
-    // genuine first visit (the reported "last here 16 min ago" bug).
+  it('redirects a brand-new creator (nextStep still "profile") straight to Step 1, skipping the interstitial', async () => {
+    // Option-1 entry consistency: a creator who has not completed a
+    // single wizard step should NOT see a separate "Let's get started"
+    // screen in a different layout and then jump into the animated
+    // wizard on the next click — that double-design was jarring. They
+    // land directly on `onboarding.profile` (Step 1) inside the wizard.
     const recentISO = new Date(Date.now() - 16 * 60 * 1000).toISOString()
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue({
       data: makeCreator(
@@ -129,25 +130,20 @@ describe('WelcomeBackPage — Decision B (session-vs-fresh hybrid)', () => {
         { next_step: 'profile', steps: [{ id: 'profile', is_complete: false }] },
       ),
     })
+    let replaceSpy: MockInstance<Router['replace']> | null = null
     const h = await mountAuthPage(WelcomeBackPage, {
       initialRoute: { path: '/onboarding' },
+      beforeMount: async ({ router }) => {
+        await useOnboardingStore().bootstrap()
+        replaceSpy = vi.spyOn(router, 'replace')
+      },
     })
     teardown = h.unmount
-
-    await useOnboardingStore().bootstrap()
     await flushPromises()
 
-    expect(h.wrapper.find('[data-test="welcome-back-heading"]').text()).toBe("Let's get started")
-
-    const subtitle = h.wrapper.find('[data-test="welcome-back-subtitle"]').text()
-    expect(subtitle).toContain('set up your creator profile')
-    // The returning-user time-ago framing must be absent.
-    expect(subtitle).not.toContain('16 min')
-    expect(subtitle).not.toContain('last here')
-
-    expect(h.wrapper.find('[data-test="welcome-back-next-step-prompt"]').text()).toContain(
-      'Start with',
-    )
+    expect(h.wrapper.find('[data-test="welcome-back-page"]').exists()).toBe(false)
+    expect(replaceSpy).not.toBeNull()
+    expect(replaceSpy!).toHaveBeenCalledWith({ name: 'onboarding.profile' })
   })
 
   it('renders the creator completeness score (35%)', async () => {

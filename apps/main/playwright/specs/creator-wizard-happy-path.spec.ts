@@ -126,15 +126,14 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     await seedAvatar(page)
 
     // -----------------------------------------------------------------
-    // /onboarding — Welcome Back page renders on first mount in this
-    // tab. Module-scoped `priorBootstrap` flag in WelcomeBackPage.vue
-    // starts false, so we see the Welcome Back UI rather than the
-    // auto-advance branch.
+    // /onboarding — a brand-new creator (no wizard step finished;
+    // next_step is still `profile`) skips the Welcome Back interstitial
+    // entirely and is redirected straight to Step 1 inside the animated
+    // wizard (Option-1 entry consistency). The Welcome Back resume
+    // screen only renders for returners who have completed >=1 step,
+    // covered by WelcomeBackPage.spec.ts.
     // -----------------------------------------------------------------
     await page.goto('/onboarding')
-    await expect(page.locator(dt(testIds.welcomeBackPage))).toBeVisible({ timeout: 10_000 })
-    await expect(page.locator(dt(testIds.welcomeBackContinueBtn))).toBeVisible()
-    await page.locator(dt(testIds.welcomeBackContinueBtn)).click()
 
     // -----------------------------------------------------------------
     // Step 2 — Profile basics. Fill the required fields and submit.
