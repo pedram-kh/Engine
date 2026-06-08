@@ -14,6 +14,8 @@ import type {
   AttachContractResponse,
   CampaignAssignmentListResponse,
   CampaignAssignmentResource,
+  CampaignDraftListParams,
+  CampaignDraftListResponse,
   CampaignEnvelope,
   CampaignListParams,
   CampaignListResponse,
@@ -79,6 +81,22 @@ export const campaignsApi = {
   assignments(agencyId: string, campaignId: string): Promise<CampaignAssignmentListResponse> {
     return http.get<CampaignAssignmentListResponse>(
       `${campaignsBase(agencyId)}/${campaignId}/assignments`,
+    )
+  },
+
+  /** Campaign-wide draft listing for the Drafts tab (all versions, filterable). */
+  listDrafts(
+    agencyId: string,
+    campaignId: string,
+    params: CampaignDraftListParams = {},
+  ): Promise<CampaignDraftListResponse> {
+    const query = new URLSearchParams()
+    if (params.review_status !== undefined) query.set('review_status', params.review_status)
+    if (params.page !== undefined) query.set('page', String(params.page))
+    if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
+    const qs = query.toString()
+    return http.get<CampaignDraftListResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/drafts${qs === '' ? '' : `?${qs}`}`,
     )
   },
 

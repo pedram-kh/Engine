@@ -426,6 +426,17 @@
           "body": "Invita creator a questa campagna per iniziare."
         }
       },
+      "drafts": {
+        "filters": {
+          "all": "Tutte le bozze"
+        },
+        "empty": {
+          "heading": "Ancora nessuna bozza",
+          "body": "Gli invii delle bozze dei creator appariranno qui dopo l'invio."
+        },
+        "loadFailed": "Impossibile caricare le bozze. Riprova.",
+        "submittedAt": "Inviato il {date}"
+      },
       "fees": {
         "offered": "Offerto",
         "countered": "Controproposta"
@@ -557,10 +568,6 @@
         }
       },
       "comingSoon": {
-        "drafts": {
-          "heading": "Bozze in arrivo",
-          "body": "Gli invii e le revisioni delle bozze dei creator appariranno qui."
-        },
         "payments": {
           "heading": "Pagamenti in arrivo",
           "body": "Il finanziamento in deposito a garanzia e i pagamenti saranno gestiti qui."

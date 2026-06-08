@@ -6,7 +6,11 @@
  * its empty state when there are no assignments.
  */
 
-import type { CampaignAssignmentResource, CampaignResource } from '@catalyst/api-client'
+import type {
+  CampaignAssignmentResource,
+  CampaignDraftListItemResource,
+  CampaignResource,
+} from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -25,6 +29,7 @@ vi.mock('../api/campaigns.api', () => ({
   campaignsApi: {
     show: vi.fn(),
     assignments: vi.fn(),
+    listDrafts: vi.fn(),
     update: vi.fn(),
     reinvite: vi.fn(),
     showAssignment: vi.fn(),
@@ -77,6 +82,28 @@ Object.defineProperty(globalThis, 'localStorage', {
 })
 
 const CAMPAIGN_ULID = '01HZA1B2C3D4E5F6G7H8J9K0M1'
+const DRAFT_ROW_ID = '01DRAFTULIDXXXXXXXXXXXXXXX'
+const DRAFT_ASSIGNMENT_ID = '01ASSIGNULIDXXXXXXXXXXXXXX'
+
+function makeDraftRow(
+  reviewStatus: CampaignDraftListItemResource['attributes']['review_status'] = 'pending',
+): CampaignDraftListItemResource {
+  return {
+    id: DRAFT_ROW_ID,
+    type: 'campaign_draft_list_item',
+    attributes: {
+      version: 1,
+      review_status: reviewStatus,
+      submitted_at: '2026-06-01T10:00:00.000000Z',
+      review_feedback: null,
+      assignment: {
+        id: DRAFT_ASSIGNMENT_ID,
+        status: 'draft_submitted',
+        creator: { id: 'creator-ulid', display_name: 'Alex Creator' },
+      },
+    },
+  }
+}
 
 function makeCampaign(requiresContract = false): CampaignResource {
   return {
@@ -156,6 +183,10 @@ async function mountDetail(
       per_campaign_contract_enabled: opts.perCampaignContractEnabled ?? false,
     },
   })
+  vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+    data: [],
+    meta: { total: 0, page: 1, per_page: 25, last_page: 1 },
+  })
 
   const agency = useAgencyStore()
   agency.initFromUser([{ agency_id: 'agency-ulid', agency_name: 'Test Agency', role }])
@@ -203,6 +234,10 @@ describe('CampaignDetailPage (Sprint 8 Chunk 1)', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 25, last_page: 1 },
+    })
   })
 
   afterEach(() => {
@@ -216,6 +251,7 @@ describe('CampaignDetailPage (Sprint 8 Chunk 1)', () => {
     expect(harness.wrapper.find('[data-test="tab-overview"]').exists()).toBe(true)
     expect(harness.wrapper.find('[data-test="tab-creators"]').exists()).toBe(true)
     expect(harness.wrapper.find('[data-test="tab-board"]').exists()).toBe(true)
+    expect(harness.wrapper.find('[data-test="tab-drafts"]').exists()).toBe(true)
     expect(harness.wrapper.find('[data-test="tab-payments"]').exists()).toBe(true)
   })
 
@@ -238,6 +274,23 @@ describe('CampaignDetailPage (Sprint 8 Chunk 1)', () => {
     await flushPromises()
     expect(harness.wrapper.find('[data-test="board-view"]').exists()).toBe(true)
     expect(harness.wrapper.find('[data-test="board-coming-soon"]').exists()).toBe(false)
+  })
+
+  it('mounts the live DraftsTab when the Drafts tab opens (not coming-soon)', async () => {
+    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+      data: [makeDraftRow()],
+      meta: { total: 1, page: 1, per_page: 25, last_page: 1 },
+    })
+    const harness = await mountDetail()
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'drafts'
+    await flushPromises()
+    expect(campaignsApi.listDrafts).toHaveBeenCalledWith('agency-ulid', CAMPAIGN_ULID, {
+      page: 1,
+      per_page: 25,
+    })
+    expect(harness.wrapper.find('[data-test="drafts-tab"]').exists()).toBe(true)
+    expect(harness.wrapper.find('[data-test="drafts-coming-soon"]').exists()).toBe(false)
   })
 
   it('shows the Creators empty state and loads assignments when the tab opens', async () => {
@@ -463,5 +516,105 @@ describe('CampaignDetailPage — pending-contract row state', () => {
     const wrapper = await openCreatorsTab([makeAssignment('A', 'accepted', null, true)])
     expect(wrapper.find('[data-test="creators-attach-contract-A"]').exists()).toBe(false)
     expect(wrapper.find('[data-test="creators-contract-pending-A"]').exists()).toBe(true)
+  })
+})
+
+const ReviewDraftDrawerApproveStub = {
+  name: 'ReviewDraftDrawer',
+  props: ['modelValue'],
+  emits: ['update:modelValue', 'reviewed'],
+  template: `
+    <button
+      v-if="modelValue"
+      data-test="review-stub-approve"
+      @click="$emit('reviewed', 'Draft approved.'); $emit('update:modelValue', false)"
+    />
+  `,
+}
+
+describe('CampaignDetailPage — Drafts tab review (drafts tab chunk)', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+  })
+
+  async function openDraftsTab() {
+    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+      data: [makeDraftRow()],
+      meta: { total: 1, page: 1, per_page: 25, last_page: 1 },
+    })
+
+    const pinia = createPinia()
+    setActivePinia(pinia)
+    vi.mocked(campaignsApi.show).mockResolvedValue({ data: makeCampaign() })
+    vi.mocked(campaignsApi.assignments).mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 25, last_page: 1 },
+    })
+
+    const agency = useAgencyStore()
+    agency.initFromUser([
+      { agency_id: 'agency-ulid', agency_name: 'Test Agency', role: 'agency_staff' },
+    ])
+
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/campaigns', name: 'campaigns.list', component: { template: '<div />' } },
+        { path: '/campaigns/:ulid', name: 'campaigns.detail', component: { template: '<div />' } },
+      ],
+    })
+    await router.push(`/campaigns/${CAMPAIGN_ULID}`)
+    await router.isReady()
+
+    const i18n = createI18n({
+      legacy: false,
+      locale: 'en',
+      fallbackLocale: 'en',
+      availableLocales: ['en'],
+      messages: { en: enApp } as never,
+    }) as unknown as ReturnType<typeof createI18n>
+
+    const vuetify = createVuetify({
+      components: vuetifyComponents,
+      directives: vuetifyDirectives,
+    })
+
+    const wrapper = mount(CampaignDetailPage, {
+      global: {
+        plugins: [pinia, router, i18n, vuetify],
+        stubs: { ReviewDraftDrawer: ReviewDraftDrawerApproveStub },
+      },
+      attachTo: document.createElement('div'),
+    })
+    await flushPromises()
+    ;(wrapper.vm as unknown as { tab: string }).tab = 'drafts'
+    await flushPromises()
+
+    cleanup = () => {
+      wrapper.unmount()
+      Object.keys(localStorageStore).forEach((k) => delete localStorageStore[k])
+    }
+
+    return wrapper
+  }
+
+  it('reloads the drafts list after approving from the Drafts tab', async () => {
+    const wrapper = await openDraftsTab()
+    expect(campaignsApi.listDrafts).toHaveBeenCalledTimes(1)
+
+    await wrapper.find('[data-test="drafts-review-01DRAFTULIDXXXXXXXXXXXXXXX"]').trigger('click')
+    await flushPromises()
+
+    await wrapper.find('[data-test="review-stub-approve"]').trigger('click')
+    await flushPromises()
+
+    expect(campaignsApi.listDrafts).toHaveBeenCalledTimes(2)
   })
 })

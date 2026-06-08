@@ -55,6 +55,7 @@ GET    /api/v1/agencies/{agency}/brands/{brand}/campaigns
 POST   /api/v1/agencies/{agency}/campaigns
 GET    /api/v1/agencies/{agency}/campaigns/{campaign}/assignments
 POST   /api/v1/agencies/{agency}/campaigns/{campaign}/assignments
+GET    /api/v1/agencies/{agency}/campaigns/{campaign}/drafts
 ```
 
 ### Global resources (creator's own data)
@@ -110,6 +111,24 @@ POST /api/v1/agencies/{agency}/payments/{payment}/release
 ```
 
 Action endpoints are `POST` (they cause state changes). They take the action's parameters in the body.
+
+### Campaign-wide draft list (Drafts tab)
+
+```
+GET /api/v1/agencies/{agency}/campaigns/{campaign}/drafts
+```
+
+Read-only, **view-gated** (`Gate::authorize('view', $campaign)`). Returns every `campaign_drafts` row for the campaign (all versions, flat — not latest-per-assignment). Scoped via a two-hop join through `campaign_assignments` (`campaign_id` + `agency_id` defense-in-depth) + `assertBelongsToAgency` (cross-tenant → 404).
+
+Query parameters:
+
+| Param           | Type                                                          | Default | Notes                                                                           |
+| --------------- | ------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------- |
+| `review_status` | `pending` \| `approved` \| `rejected` \| `revision_requested` | (all)   | Invalid value → empty page (200), mirroring the campaigns index `status` filter |
+| `page`          | integer                                                       | 1       | Offset pagination                                                               |
+| `per_page`      | integer                                                       | 25      | Max 100                                                                         |
+
+Response: paginated `campaign_draft_list_item` resources — a **summary shape** (version, review trail fields, nested `assignment.{id,status,creator}`). **No media, no presigned URLs** — those load lazily via `GET …/assignments/{assignment}` when the review drawer opens.
 
 ---
 

@@ -1323,6 +1323,26 @@ anyone reviewing it later.
 
 ---
 
+## Campaign-detail Drafts tab orphaned (Phase 1 spec §Sprint 8)
+
+- **Where:** [`20-PHASE-1-SPEC.md`](20-PHASE-1-SPEC.md) lists Drafts as a campaign-detail tab; S9 shipped the review machinery (drawer + three endpoints) but the tab stayed a coming-soon empty state.
+- **What we accepted:** the Creators-tab review path covered the operational workflow; a campaign-wide draft queue was specced but not wired.
+- **✅ RESOLVED — campaign-detail Drafts tab chunk.** `GET …/campaigns/{campaign}/drafts` + `CampaignDraftListItemResource` (summary, no signed media) + `DraftsTab` on campaign detail (lazy-mounted, filterable, paginated). Reuses `ReviewDraftDrawer` + existing review endpoints unchanged.
+
+---
+
+## Denormalize `campaign_id` onto `campaign_drafts` if the campaign-drafts query is slow at volume
+
+- **Where:** [`CampaignDraftController::index`](../apps/api/app/Modules/Campaigns/Http/Controllers/CampaignDraftController.php) — the campaign-wide list uses a two-hop join (`campaign_drafts → campaign_assignments` filtered by `campaign_id` + `agency_id`). Indexes today: `unique_assignment_campaign_creator` (left-prefix on `campaign_id`) + `idx_drafts_assignment_review_status`.
+- **What we accepted:** at Phase-1 volume (tens to low-hundreds of drafts per campaign) the join is fine; no preemptive denormalization.
+- **Risk:** low now; grows if campaigns routinely carry thousands of draft versions.
+- **Triggered by:** the campaign-drafts list query becomes a measurable slow path (p95 latency or explain-plan regression at realistic volume).
+- **Resolution:** add nullable `campaign_id` to `campaign_drafts`, backfill from `assignment_id`, index `(campaign_id, review_status)`, simplify the list query to a single-table filter.
+- **Owner:** campaigns (when triggered).
+- **Status:** open (deferred by design — logged at ship time).
+
+---
+
 ## No agency-side campaign-detail Playwright E2E (re-invite UI chunk)
 
 - **Where:** [`CampaignDetailPage.vue`](../apps/main/src/modules/campaigns/pages/CampaignDetailPage.vue) — Vitest component coverage exists (`CampaignDetailPage.spec.ts`, `ReinviteDialog.spec.ts`); no Playwright harness exercises the campaign-detail Creators tab end-to-end.

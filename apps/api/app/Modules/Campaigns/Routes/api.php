@@ -7,6 +7,7 @@ use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentResolutionController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentReviewController;
 use App\Modules\Campaigns\Http\Controllers\CampaignController;
+use App\Modules\Campaigns\Http\Controllers\CampaignDraftController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -41,6 +42,10 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // Read-only assignment listing for the Creators tab (Chunk 1).
         Route::get('campaigns/{campaign}/assignments', [CampaignAssignmentController::class, 'index'])
             ->name('campaigns.assignments.index');
+
+        // Campaign-wide draft listing for the Drafts tab (view-gated, all versions).
+        Route::get('campaigns/{campaign}/drafts', [CampaignDraftController::class, 'index'])
+            ->name('campaigns.drafts.index');
 
         // Invite a creator (Chunk 2, D-3) — the two-tier gate + execute ability.
         Route::post('campaigns/{campaign}/assignments', [CampaignAssignmentController::class, 'store'])

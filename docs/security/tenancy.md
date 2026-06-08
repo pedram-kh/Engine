@@ -213,6 +213,7 @@ so a tenant context is always set and the `BelongsToAgencyScope` global scope is
 active:
 
 - `GET    /api/v1/agencies/{agency}/campaigns/{campaign}/board`
+- `GET    /api/v1/agencies/{agency}/campaigns/{campaign}/drafts`
 - `POST   …/board/columns` · `PATCH …/board/columns/reorder` · `PATCH/DELETE …/board/columns/{column}`
 - `GET    …/board/automations` · `PATCH …/board/automations/{automation}`
 - `POST   …/board/cards/{card}/move` · `GET …/board/cards/{card}/movements`
@@ -230,6 +231,8 @@ board `GET` (and the invite listener) bypasses the scope via the named
 `agency_id` derived from the already-resolved campaign — idempotent
 infrastructure keyed on the `boards.campaign_id` / `board_cards.assignment_id`
 UNIQUEs, never a cross-tenant read.
+
+**Campaign-wide draft list (Drafts tab) — same category.** `GET …/campaigns/{campaign}/drafts` is standard agency-scoped (NOT in the bypass allowlist above). `campaign_drafts` has no `BelongsToAgency` trait — isolation rides the two-hop join (`campaign_drafts → campaign_assignments` filtered by `campaign_id` + `agency_id`) plus `assertBelongsToAgency($campaign, $agency)` in the controller (404 on mismatch, not 403). The list is view-gated; the review drawer continues to use the existing review-gated `GET …/assignments/{assignment}`.
 
 **Sprint 12 Chunk 3 — the `boards:scan-overdue` console sweep (cross-agency).**
 The daily overdue command ([`OverdueScanService`](../../apps/api/app/Modules/Boards/Services/OverdueScanService.php))

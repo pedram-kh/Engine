@@ -7,8 +7,8 @@
  *   - Creators  — the assignment list (live, read-only; empty until Chunk 2
  *                 wires inviting).
  *   - Settings  — config edit (live; admin/manager only — `canEdit`).
- *   - Board / Drafts / Payments / Messages — empty-state "coming soon" tabs
- *     (their sprints are deferred; nothing is half-built).
+ *   - Board / Drafts / Messages — live tabs (lazy-mounted where noted).
+ *   - Payments — empty-state "coming soon".
  */
 
 import {
@@ -38,6 +38,7 @@ import ResolveVerificationDrawer from '../components/ResolveVerificationDrawer.v
 import ViewPostedContentDrawer from '../components/ViewPostedContentDrawer.vue'
 import CampaignMessagesPanel from '@/modules/messaging/components/CampaignMessagesPanel.vue'
 import BoardView from '@/modules/boards/components/BoardView.vue'
+import DraftsTab from '../components/DraftsTab.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -147,7 +148,12 @@ function openReview(assignment: CampaignAssignmentResource): void {
 function onReviewed(message: string): void {
   reviewSnackbar.value = message
   void loadAssignments()
+  if (tab.value === 'drafts') {
+    void draftsTabRef.value?.reload()
+  }
 }
+
+const draftsTabRef = ref<InstanceType<typeof DraftsTab> | null>(null)
 
 // The verification-failure resolution surface (verification-resolution chunk,
 // D-7). Same `review` ability as the draft review. The row action shows only
@@ -215,7 +221,7 @@ const statusOptions: { title: string; value: CampaignStatus }[] = [
   { title: t('app.campaigns.status.cancelled'), value: 'cancelled' },
 ]
 
-const comingSoonTabs = ['drafts', 'payments'] as const
+const comingSoonTabs = ['payments'] as const
 
 function toDateInput(iso: string | null): string | undefined {
   return iso ? iso.slice(0, 10) : undefined
@@ -581,32 +587,6 @@ function formatMoney(minor: number | null, currency: string | null): string {
             @error="onContractAttachError"
           />
 
-          <ReviewDraftDrawer
-            v-if="canReview && agencyStore.currentAgencyId"
-            v-model="reviewDialog"
-            :agency-id="agencyStore.currentAgencyId"
-            :campaign-id="ulid"
-            :assignment="reviewTarget"
-            @reviewed="onReviewed"
-          />
-
-          <ResolveVerificationDrawer
-            v-if="canReview && agencyStore.currentAgencyId"
-            v-model="resolveDialog"
-            :agency-id="agencyStore.currentAgencyId"
-            :campaign-id="ulid"
-            :assignment="resolveTarget"
-            @resolved="onResolved"
-          />
-
-          <ViewPostedContentDrawer
-            v-if="canReview && agencyStore.currentAgencyId"
-            v-model="viewPostDialog"
-            :agency-id="agencyStore.currentAgencyId"
-            :campaign-id="ulid"
-            :assignment="viewPostTarget"
-          />
-
           <v-snackbar
             :model-value="inviteSnackbar !== null"
             :timeout="4000"
@@ -690,20 +670,6 @@ function formatMoney(minor: number | null, currency: string | null): string {
           >
             {{ proceedError }}
           </v-snackbar>
-
-          <v-snackbar
-            :model-value="reviewSnackbar !== null"
-            :timeout="4000"
-            color="success"
-            data-test="review-snackbar"
-            @update:model-value="
-              (v) => {
-                if (!v) reviewSnackbar = null
-              }
-            "
-          >
-            {{ reviewSnackbar }}
-          </v-snackbar>
         </v-window-item>
 
         <!-- Board (Sprint 12) — the Kanban. Mounted with v-if so the 30s poll
@@ -715,6 +681,18 @@ function formatMoney(minor: number | null, currency: string | null): string {
             :agency-id="agencyStore.currentAgencyId"
             :campaign-id="ulid"
             :can-configure="canEdit"
+          />
+        </v-window-item>
+
+        <!-- Drafts — campaign-wide version list; fetch-on-open (Board precedent). -->
+        <v-window-item value="drafts" data-test="panel-drafts">
+          <DraftsTab
+            v-if="tab === 'drafts' && agencyStore.currentAgencyId"
+            ref="draftsTabRef"
+            :agency-id="agencyStore.currentAgencyId"
+            :campaign-id="ulid"
+            :can-review="canReview"
+            @open-review="openReview"
           />
         </v-window-item>
 
@@ -784,6 +762,46 @@ function formatMoney(minor: number | null, currency: string | null): string {
           </v-card>
         </v-window-item>
       </v-window>
+
+      <ReviewDraftDrawer
+        v-if="canReview && agencyStore.currentAgencyId"
+        v-model="reviewDialog"
+        :agency-id="agencyStore.currentAgencyId"
+        :campaign-id="ulid"
+        :assignment="reviewTarget"
+        @reviewed="onReviewed"
+      />
+
+      <ResolveVerificationDrawer
+        v-if="canReview && agencyStore.currentAgencyId"
+        v-model="resolveDialog"
+        :agency-id="agencyStore.currentAgencyId"
+        :campaign-id="ulid"
+        :assignment="resolveTarget"
+        @resolved="onResolved"
+      />
+
+      <ViewPostedContentDrawer
+        v-if="canReview && agencyStore.currentAgencyId"
+        v-model="viewPostDialog"
+        :agency-id="agencyStore.currentAgencyId"
+        :campaign-id="ulid"
+        :assignment="viewPostTarget"
+      />
+
+      <v-snackbar
+        :model-value="reviewSnackbar !== null"
+        :timeout="4000"
+        color="success"
+        data-test="review-snackbar"
+        @update:model-value="
+          (v) => {
+            if (!v) reviewSnackbar = null
+          }
+        "
+      >
+        {{ reviewSnackbar }}
+      </v-snackbar>
     </template>
   </div>
 </template>

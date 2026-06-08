@@ -434,6 +434,17 @@
           "body": "Invite creators to this campaign to get started."
         }
       },
+      "drafts": {
+        "filters": {
+          "all": "All drafts"
+        },
+        "empty": {
+          "heading": "No drafts yet",
+          "body": "Creator draft submissions will appear here once submitted."
+        },
+        "loadFailed": "We couldn't load drafts. Please try again.",
+        "submittedAt": "Submitted {date}"
+      },
       "fees": {
         "offered": "Offered",
         "countered": "Countered"
@@ -565,10 +576,6 @@
         }
       },
       "comingSoon": {
-        "drafts": {
-          "heading": "Drafts coming soon",
-          "body": "Creator draft submissions and reviews will appear here."
-        },
         "payments": {
           "heading": "Payments coming soon",
           "body": "Escrow funding and payouts will be managed here."

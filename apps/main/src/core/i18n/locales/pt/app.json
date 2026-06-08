@@ -426,6 +426,17 @@
           "body": "Convide criadores para esta campanha para começar."
         }
       },
+      "drafts": {
+        "filters": {
+          "all": "Todos os rascunhos"
+        },
+        "empty": {
+          "heading": "Nenhum rascunho ainda",
+          "body": "Os envios de rascunhos dos criadores aparecerão aqui após o envio."
+        },
+        "loadFailed": "Não foi possível carregar os rascunhos. Tente novamente.",
+        "submittedAt": "Enviado em {date}"
+      },
       "fees": {
         "offered": "Oferecido",
         "countered": "Contraproposta"
@@ -557,10 +568,6 @@
         }
       },
       "comingSoon": {
-        "drafts": {
-          "heading": "Rascunhos em breve",
-          "body": "Os envios e revisões de rascunhos dos criadores aparecerão aqui."
-        },
         "payments": {
           "heading": "Pagamentos em breve",
           "body": "O financiamento em garantia e os pagamentos serão gerenciados aqui."

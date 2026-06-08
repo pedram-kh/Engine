@@ -473,6 +473,46 @@ export interface ReviewActionResponse {
 }
 
 // ---------------------------------------------------------------------------
+// Agency campaign-wide draft list (Drafts tab) — summary rows, no signed media
+// ---------------------------------------------------------------------------
+
+/** One flat draft version row for the campaign-wide Drafts tab list. */
+export interface CampaignDraftListItemResource {
+  id: string
+  type: 'campaign_draft_list_item'
+  attributes: {
+    version: number
+    review_status: DraftReviewStatus
+    submitted_at: string | null
+    review_feedback: string | null
+    assignment: {
+      id: string
+      status: AssignmentStatus
+      creator: {
+        id: string
+        display_name: string | null
+      } | null
+    } | null
+  }
+}
+
+export interface CampaignDraftListParams {
+  review_status?: DraftReviewStatus
+  page?: number
+  per_page?: number
+}
+
+export interface CampaignDraftListResponse {
+  data: CampaignDraftListItemResource[]
+  meta: {
+    total: number
+    page: number
+    per_page: number
+    last_page: number
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Agency verification-failure resolution — the 3 actions on a posted+failed
 // assignment (verification-resolution chunk, D-4/D-5/D-6).
 // ---------------------------------------------------------------------------
