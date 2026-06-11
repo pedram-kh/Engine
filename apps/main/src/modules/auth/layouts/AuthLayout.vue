@@ -1,25 +1,33 @@
 <script setup lang="ts">
 /**
- * Centred-card layout for every auth page (sign-in, sign-up, verify
- * email, reset password, 2FA). The layout owns the brand mark, the
- * locale switcher, and a slot for the page content.
+ * Auth shell for every auth page — rebranded to the Figma "Rebrand"
+ * landing (node 359-1253): full-viewport dark surface with vertical
+ * grid lines, an aurora glow band, and the Catalyst logo mark.
  *
- * Chunk 2: ThemeToggle removed from this layout's header. It now lives
- * exclusively in AgencyLayout's user menu for authenticated users.
- * Sprint 3.5 Chunk 1 dropped the `prefers-color-scheme` system default
- * (binary light/dark, dark-first), so unauthenticated auth pages render
- * the default theme (dark) with no in-page toggle; the explicit toggle
- * is an authenticated-user affordance reached after sign-in.
+ * Two arrangements, both inside the same chrome:
+ *   - hero (sign-in only): headline/copy left, card right, partner
+ *     brand wall below (AuthHeroPanel + BrandLogoWall siblings own
+ *     the substance — this file stays a structural shell, see
+ *     tests/unit/architecture/auth-layout-shape.spec.ts).
+ *   - centred card: every other auth page (sign-up, verify email,
+ *     reset password, 2FA), unchanged behaviourally.
  */
 
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
+import AuthHeroPanel from '@/modules/auth/components/AuthHeroPanel.vue'
+import BrandLogoWall from '@/modules/auth/components/BrandLogoWall.vue'
+import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 import { buildLocaleOptions } from './localeOptions'
 
 const { t, locale, availableLocales } = useI18n()
+const route = useRoute()
 
 const localeOptions = buildLocaleOptions(availableLocales, t)
+const isHero = computed(() => route.name === 'auth.sign-in')
 </script>
 
 <template>
@@ -27,10 +35,11 @@ const localeOptions = buildLocaleOptions(availableLocales, t)
     <ImpersonationBanner />
 
     <v-main>
-      <div class="auth-layout d-flex flex-column align-center justify-center pa-6">
+      <div class="auth-layout" :class="{ 'auth-layout--hero': isHero }">
         <header class="auth-layout__header d-flex align-center justify-space-between mb-6 w-100">
-          <h1 class="text-h6 ma-0" data-test="auth-brand">
-            {{ t('app.title') }}
+          <h1 class="auth-layout__brand ma-0" data-test="auth-brand">
+            <img :src="catalystLogo" alt="" class="auth-layout__logo" />
+            <span class="d-sr-only">{{ t('app.title') }}</span>
           </h1>
           <div class="d-flex align-center ga-2">
             <v-select
@@ -47,9 +56,15 @@ const localeOptions = buildLocaleOptions(availableLocales, t)
             />
           </div>
         </header>
-        <v-card class="auth-layout__card pa-6 w-100" elevation="2" data-test="auth-card">
-          <slot />
-        </v-card>
+
+        <div class="auth-layout__content">
+          <AuthHeroPanel v-if="isHero" />
+          <v-card class="auth-layout__card pa-6 w-100" elevation="2" data-test="auth-card">
+            <slot />
+          </v-card>
+        </div>
+
+        <BrandLogoWall v-if="isHero" class="auth-layout__wall" />
       </div>
     </v-main>
   </v-app>
@@ -57,21 +72,89 @@ const localeOptions = buildLocaleOptions(availableLocales, t)
 
 <style scoped>
 .auth-layout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  background-color: rgb(var(--v-theme-background));
+  padding: 24px;
+  background-color: var(--auth-page-bg);
 }
 
-.auth-layout__header {
+/* Aurora glow band along the top edge (Figma: aurora gradient under
+ * 70% black, fading out downward). Tokens only — never raw hexes. */
+.auth-layout::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 450px;
+  background: var(--auth-glow-gradient);
+  mask-image: linear-gradient(to bottom, black, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+  pointer-events: none;
+}
+
+/* Five-column vertical grid lines, inset by the 24px page padding. */
+.auth-layout::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 24px;
+  right: 24px;
+  background-image: linear-gradient(to right, var(--auth-grid-line) 1px, transparent 1px);
+  background-size: calc(100% / 5) 100%;
+  border-right: 1px solid var(--auth-grid-line);
+  pointer-events: none;
+}
+
+.auth-layout > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Centred-card mode (every page except sign-in). */
+.auth-layout:not(.auth-layout--hero) {
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-layout:not(.auth-layout--hero) .auth-layout__header,
+.auth-layout:not(.auth-layout--hero) .auth-layout__content {
+  width: 100%;
   max-width: 480px;
+}
+
+.auth-layout__logo {
+  display: block;
+  height: 28px;
+}
+
+.auth-layout__content {
+  display: flex;
+  justify-content: center;
+}
+
+.auth-layout--hero .auth-layout__content {
+  margin-top: var(--space-20);
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+/* The Figma card spans the last two grid columns (747px on the
+ * 1920px frame); 38.9vw keeps that alignment as the viewport scales. */
+.auth-layout--hero .auth-layout__card {
+  flex: 0 0 clamp(480px, 38.9vw, 747px);
+  max-width: 747px;
 }
 
 .auth-layout__card {
   max-width: 480px;
-  /* Aurora brand accent (Sprint 3.5 Chunk 4 — Decision D7, thin-accent-only):
-   * a 3px aurora gradient line along the card's top edge. The primary brand
-   * moment for unauthenticated users. v-card's default overflow:hidden clips
-   * it to the rounded top corners. Consumes the authored utility var, never a
-   * Vuetify theme.color (parity invariant 3 stays green). */
+  /* Aurora brand accent (Decision D7, thin-accent-only): 3px gradient
+   * line along the card's top edge, consumed via the authored utility
+   * var — never a Vuetify theme color (parity invariant 3). */
   position: relative;
 }
 
@@ -85,7 +168,23 @@ const localeOptions = buildLocaleOptions(availableLocales, t)
   background: var(--brand-aurora-gradient);
 }
 
+.auth-layout__wall {
+  margin-top: var(--space-16);
+}
+
 .auth-layout__locale {
   max-width: 160px;
+}
+
+@media (max-width: 1100px) {
+  .auth-layout--hero .auth-layout__content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .auth-layout--hero .auth-layout__card {
+    flex: initial;
+    align-self: center;
+  }
 }
 </style>

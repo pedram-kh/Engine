@@ -46,9 +46,19 @@ const LAYOUT_PATH = path.resolve(__dirname, '../../../src/modules/auth/layouts/A
  * no-function / no-multi-statement-arrow guards below still hold).
  * Mirror of the main SPA spec (cross-SPA parity).
  *
+ * Rebrand (Figma "Rebrand" node 359-1253) raised the ceiling 115 -> 200
+ * to absorb the auth-landing chrome: the dark grid-line backdrop, the
+ * aurora glow band, the Catalyst logo mark, and the hero/centred-card
+ * split for the sign-in page (mirror of the main SPA raise). ALL of
+ * that is decorative CHROME (CSS + structural template); the
+ * substantive hero copy lives in the sibling AuthHeroPanel.vue with
+ * its own coverage. The `<script setup>` block gained exactly one
+ * single-expression computed (`isHero`) — the no-function /
+ * no-multi-statement-arrow guards below still hold.
+ *
  * Future raises require a new chunk-scoped code-review note here.
  */
-const MAX_LINES = 115
+const MAX_LINES = 200
 
 describe('AuthLayout.vue (admin) stays a pure structural shell', () => {
   it('is at most MAX_LINES lines (size guard)', async () => {

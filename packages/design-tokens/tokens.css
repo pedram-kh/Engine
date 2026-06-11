@@ -49,6 +49,34 @@
   --brand-aurora-end: #00fff2;
   --brand-aurora-gradient: linear-gradient(135deg, #cd69ff 0%, #7fc3ff 50%, #00fff2 100%);
 
+  /* Rebrand auth landing (Figma "Rebrand" node 359-1253).
+   * Utility-only vars consumed by the auth layouts + hero components in
+   * both SPAs. Like the aurora accent, these are NOT Vuetify theme
+   * colors: the auth landing is a fixed dark marketing surface that does
+   * not flip with the active theme. The glow band reuses the aurora
+   * hues at 30% strength (the Figma source overlays the same gradient
+   * with 70% black); the cell-hover pair comes from the Figma hover
+   * cell (radial #7B4099→transparent fill at 40%, gradient stroke). */
+  --auth-page-bg: #000000;
+  --auth-page-fg: #ffffff;
+  --auth-page-fg-muted: rgba(255, 255, 255, 0.7);
+  --auth-grid-line: rgba(255, 255, 255, 0.1);
+  --auth-cell-border: #303030;
+  --auth-glow-gradient: linear-gradient(
+    90deg,
+    rgba(205, 105, 255, 0.2) 0%,
+    rgba(127, 195, 255, 0.2) 50%,
+    rgba(0, 255, 242, 0.2) 100%
+  );
+  --auth-cell-hover-bg: radial-gradient(
+    140% 140% at 0% 0%,
+    rgba(123, 64, 153, 0.4) 0%,
+    rgba(0, 153, 146, 0) 100%
+  );
+  --auth-cell-hover-border: linear-gradient(90deg, #7b4099 0%, #5481a9 50%, #009992 100%);
+  --auth-display-font:
+    'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, var(--brand-font-primary);
+
   /* Status palette */
   --success-100: #dcfce7;
   --success-500: #16a34a;
