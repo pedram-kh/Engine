@@ -2,15 +2,12 @@
 /**
  * Auth shell for every auth page — rebranded to the Figma "Rebrand"
  * landing (node 359-1253): full-viewport dark surface with vertical
- * grid lines, an aurora glow band, and the Catalyst logo mark.
- *
- * Two arrangements, both inside the same chrome:
- *   - hero (sign-in only): headline/copy left, card right, partner
- *     brand wall below (AuthHeroPanel + BrandLogoWall siblings own
- *     the substance — this file stays a structural shell, see
- *     tests/unit/architecture/auth-layout-shape.spec.ts).
- *   - centred card: every other auth page (sign-up, verify email,
- *     reset password, 2FA), unchanged behaviourally.
+ * grid lines, an aurora glow band, and the Catalyst logo mark. Two
+ * arrangements inside the same chrome: hero (sign-in only — copy left,
+ * card right, brand wall below; AuthHeroPanel + BrandLogoWall siblings
+ * own the substance) and the centred card for every other auth page.
+ * This file stays a structural shell — see
+ * tests/unit/architecture/auth-layout-shape.spec.ts.
  */
 
 import { computed } from 'vue'
@@ -80,8 +77,7 @@ const isHero = computed(() => route.name === 'auth.sign-in')
   background-color: var(--auth-page-bg);
 }
 
-/* Aurora glow band along the top edge (Figma: aurora gradient under
- * 70% black, fading out downward). Tokens only — never raw hexes. */
+/* Aurora glow band along the top edge, fading out downward. */
 .auth-layout::before {
   content: '';
   position: absolute;
@@ -95,7 +91,9 @@ const isHero = computed(() => route.name === 'auth.sign-in')
   pointer-events: none;
 }
 
-/* Five-column vertical grid lines, inset by the 24px page padding. */
+/* Five-column grid lines, inset 24px: four 1px no-repeat layers +
+ * edge borders (a repeating fractional-width tile gets its 1px stripe
+ * inconsistently dropped by Chromium's rasterizer). */
 .auth-layout::after {
   content: '';
   position: absolute;
@@ -103,9 +101,20 @@ const isHero = computed(() => route.name === 'auth.sign-in')
   bottom: 0;
   left: 24px;
   right: 24px;
-  background-image: linear-gradient(to right, var(--auth-grid-line) 1px, transparent 1px);
-  background-size: calc(100% / 5) 100%;
+  background-image:
+    linear-gradient(var(--auth-grid-line), var(--auth-grid-line)),
+    linear-gradient(var(--auth-grid-line), var(--auth-grid-line)),
+    linear-gradient(var(--auth-grid-line), var(--auth-grid-line)),
+    linear-gradient(var(--auth-grid-line), var(--auth-grid-line));
+  background-size: 1px 100%;
+  background-repeat: no-repeat;
+  background-position:
+    20% 0,
+    40% 0,
+    60% 0,
+    80% 0;
   border-right: 1px solid var(--auth-grid-line);
+  border-left: 1px solid var(--auth-grid-line);
   pointer-events: none;
 }
 
