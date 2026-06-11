@@ -185,15 +185,24 @@ const isHero = computed(() => route.name === 'auth.sign-in')
   max-width: 160px;
 }
 
+/* Mobile: no background columns; the case-studies footnote moves
+ * below the card (flex order — the hero unwraps via display:contents
+ * in AuthHeroPanel, making its children and the card siblings). */
 @media (max-width: 1100px) {
+  .auth-layout::after {
+    content: none;
+  }
+
   .auth-layout--hero .auth-layout__content {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--space-6);
   }
 
   .auth-layout--hero .auth-layout__card {
     flex: initial;
     align-self: center;
+    order: 1;
   }
 }
 </style>

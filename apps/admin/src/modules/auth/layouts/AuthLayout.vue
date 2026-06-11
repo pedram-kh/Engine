@@ -181,10 +181,16 @@ const isHero = computed(() => route.name === 'auth.sign-in')
   max-width: 160px;
 }
 
+/* Mobile: no background columns (mirror of the main SPA layout). */
 @media (max-width: 1100px) {
+  .auth-layout::after {
+    content: none;
+  }
+
   .auth-layout--hero .auth-layout__content {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--space-6);
   }
 
   .auth-layout--hero .auth-layout__card {

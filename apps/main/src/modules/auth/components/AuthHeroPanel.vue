@@ -46,4 +46,17 @@ const { t } = useI18n()
 .auth-hero__body--last {
   margin-bottom: 0;
 }
+
+/* Mobile: unwrap so headline / body / footnote become flex items of
+ * the layout's content column — the footnote is ordered after the
+ * sign-in card (which AuthLayout sets to order: 1). */
+@media (max-width: 1100px) {
+  .auth-hero {
+    display: contents;
+  }
+
+  .auth-hero__body--last {
+    order: 2;
+  }
+}
 </style>
