@@ -25,6 +25,8 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { UI_LOCALES } from '@catalyst/api-client'
+
 import {
   hasLiveTemplate,
   notificationTemplateKey,
@@ -32,7 +34,9 @@ import {
 } from '@/modules/notifications/templates'
 
 const LOCALE_ROOT = path.resolve(__dirname, '../../../src/core/i18n/locales')
-const LOCALES = ['en', 'pt', 'it'] as const
+// The rendered set is the shared registry (en/pt/it today), so the S8 flip to
+// 24 locales extends this parity gate with no edit here.
+const LOCALES = UI_LOCALES
 
 /** The 10 notification types with a live emit site (Ch1/Ch2 + Sprint 11 messaging). */
 const LIVE_TYPES = [
@@ -66,7 +70,7 @@ interface NotificationsBundle {
   }
 }
 
-async function loadBundle(locale: (typeof LOCALES)[number]): Promise<NotificationsBundle> {
+async function loadBundle(locale: string): Promise<NotificationsBundle> {
   const file = path.join(LOCALE_ROOT, locale, 'notifications.json')
   return JSON.parse(await fs.readFile(file, 'utf8')) as NotificationsBundle
 }
@@ -89,15 +93,17 @@ function collectLeafKeys(node: unknown, prefix = ''): string[] {
 }
 
 describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant', () => {
-  it('all three locales expose an identical key-set', async () => {
-    const [en, pt, it] = await Promise.all(LOCALES.map(loadBundle))
-    const enKeys = collectLeafKeys(en)
-    const ptKeys = collectLeafKeys(pt)
-    const itKeys = collectLeafKeys(it)
-
+  it('all rendered locales expose an identical key-set', async () => {
+    const enKeys = collectLeafKeys(await loadBundle('en'))
     expect(enKeys.length).toBeGreaterThan(0)
-    expect(ptKeys).toEqual(enKeys)
-    expect(itKeys).toEqual(enKeys)
+
+    for (const locale of LOCALES) {
+      if (locale === 'en') {
+        continue
+      }
+      const keys = collectLeafKeys(await loadBundle(locale))
+      expect(keys, `${locale}/notifications.json key-set differs from en`).toEqual(enKeys)
+    }
   })
 
   it('notifications.types holds EXACTLY the 10 live templates + fallback', async () => {

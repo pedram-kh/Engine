@@ -45,6 +45,8 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { UI_LOCALES } from '@catalyst/api-client'
+
 const REPO_ROOT = path.resolve(__dirname, '../../../../..')
 const CREATORS_ROOT = path.resolve(REPO_ROOT, 'apps/api/app/Modules/Creators')
 const LOCALE_ROOT = path.resolve(__dirname, '../../../src/core/i18n/locales')
@@ -151,7 +153,7 @@ function resolveDottedKey(messages: unknown, dottedKey: string): ResolutionResul
   return { found: false }
 }
 
-async function loadBundle(locale: 'en' | 'pt' | 'it'): Promise<unknown> {
+async function loadBundle(locale: string): Promise<unknown> {
   const file = path.join(LOCALE_ROOT, locale, 'creator.json')
   const raw = await fs.readFile(file, 'utf8')
   return JSON.parse(raw)
@@ -186,7 +188,7 @@ describe('i18n creator bundle covers every backend creator.* error code', () => 
     }
   })
 
-  for (const locale of ['en', 'pt', 'it'] as const) {
+  for (const locale of UI_LOCALES) {
     it(`every harvested code resolves to a string in ${locale}/creator.json`, async () => {
       const codes = await harvestAllCreatorCodes()
       const bundle = await loadBundle(locale)
