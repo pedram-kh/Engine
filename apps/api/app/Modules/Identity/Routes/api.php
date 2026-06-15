@@ -13,6 +13,7 @@ use App\Modules\Identity\Http\Controllers\PasswordResetController;
 use App\Modules\Identity\Http\Controllers\RegenerateRecoveryCodesController;
 use App\Modules\Identity\Http\Controllers\ResendVerificationController;
 use App\Modules\Identity\Http\Controllers\SignUpController;
+use App\Modules\Identity\Http\Controllers\UpdateMeController;
 use App\Modules\Identity\Http\Controllers\VerifyEmailController;
 use App\Modules\Identity\Http\Middleware\EnsureMfaForAdmins;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +59,15 @@ use Illuminate\Support\Facades\Route;
 Route::get('me', MeController::class)
     ->middleware(['auth:web', 'tenancy.set'])
     ->name('me');
+
+// Locale-only self-update (persistence half of the locale chunk). Same
+// middleware posture as GET /me: `preferred_language` lives on the global
+// users row, so the route is reachable without an agency context (the
+// fail-closed `tenancy` alias is intentionally NOT applied). Allowlisted in
+// docs/security/tenancy.md §4.
+Route::patch('me', UpdateMeController::class)
+    ->middleware(['auth:web', 'tenancy.set'])
+    ->name('me.update');
 
 // ---------------------------------------------------------------------------
 // Main SPA — guard 'web', cookie 'catalyst_main_session'
@@ -145,6 +155,13 @@ Route::prefix('auth')
 Route::get('admin/me', MeController::class)
     ->middleware(['auth:web_admin', EnsureMfaForAdmins::class, 'tenancy.set'])
     ->name('admin.me');
+
+// Admin locale-only self-update — mirrors PATCH /me on the admin guard
+// (EnsureMfaForAdmins applies, same as GET /admin/me). Allowlisted in
+// docs/security/tenancy.md §4.
+Route::patch('admin/me', UpdateMeController::class)
+    ->middleware(['auth:web_admin', EnsureMfaForAdmins::class, 'tenancy.set'])
+    ->name('admin.me.update');
 
 // ---------------------------------------------------------------------------
 // Admin SPA — guard 'web_admin', cookie 'catalyst_admin_session'
