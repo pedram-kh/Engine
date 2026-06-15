@@ -44,7 +44,7 @@ This document defines _how_ code is written, organized, named, tested, and shipp
 │   │   │   ├── migrations/
 │   │   │   ├── factories/
 │   │   │   └── seeders/
-│   │   ├── lang/                     # i18n translation files (en, pt, it)
+│   │   ├── lang/                     # i18n files, central; one folder per EU locale, one file per domain
 │   │   ├── routes/
 │   │   │   ├── api.php               # Mounts module routes
 │   │   │   ├── web.php               # Health checks, redirects
@@ -565,8 +565,10 @@ const isOverdue = computed(() => {
 ### 3.7 i18n
 
 - All user-facing strings go through `$t()` or `useI18n().t()`.
-- Translation files live in `src/core/i18n/locales/{en,pt,it}/{module}.json`.
-- Pluralization uses ICU MessageFormat (vue-i18n supports this).
+- Translation files live in `src/core/i18n/locales/{locale}/{module}.json`, one folder per locale across all 24 EU languages. The supported-locale list is never hardcoded per file — it derives from the `EU_LANGUAGES` registry in `packages/api-client`.
+- Author new strings in `en` only (the source of truth); the 21 non-en UI locales are generated, `pt`/`it` follow the translation flow. Key-set parity (including backend `lang/`), placeholder integrity, and plural form-counts are enforced by architecture tests.
+- `en` is statically bundled; every other locale loads lazily via dynamic import on first activation. Resolve the target locale and await its messages before mount (no English/missing-key flash).
+- Pluralization uses vue-i18n with CLDR-correct `pluralizationRules` per locale (derived from a vetted CLDR source, not hand-typed).
 - Date and number formatting via `Intl.DateTimeFormat` and `Intl.NumberFormat`, locale-aware.
 - Currency formatting via a shared utility, never raw `toFixed(2)`.
 
@@ -772,7 +774,7 @@ A feature is shippable only when:
 5. ✅ TypeScript strict passes
 6. ✅ Pint and Prettier produce no diffs
 7. ✅ ESLint passes with no warnings
-8. ✅ All user-facing strings in i18n files (en, pt, it)
+8. ✅ All new user-facing strings authored in `en` (source of truth); cross-locale key-set parity (UI locales + backend `lang/`), placeholder integrity, and plural form-counts pass the i18n architecture tests; non-en baseline filled by the generation pass, never hand-authored per chunk; legal `resources/contracts/**` stays English
 9. ✅ Audit logging in place for privileged actions
 10. ✅ Migrations follow expand/migrate/contract if touching live tables
 11. ✅ Authorization policy in place and tested

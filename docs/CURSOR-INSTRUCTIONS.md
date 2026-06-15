@@ -232,13 +232,16 @@ When you push back:
 
 ## 10. Internationalization (Phase 1)
 
-The platform supports **English, Portuguese, and Italian** from Phase 1.
+The platform's UI supports **all 24 official EU languages**. `en`, `pt`, and `it` are **authored by hand**; the other 21 are a **machine-translation baseline** (generated, then refined). The canonical locale list is a single registry (`EU_LANGUAGES` in `packages/api-client` + parallel PHP `Locale` enum in `app/Core`); never hardcode the locale set anywhere else.
 
 - All user-facing strings live in i18n files. Hardcoded English strings are not acceptable.
-- Backend: use Laravel's localization (`__()` and `lang/` files).
-- Frontend: use `vue-i18n` with separate JSON files per locale.
+- **Done-gate (see §12 item 7):** for any chunk, author the new strings in **`en` only** — `en` is the source of truth. The 21 non-en UI locales are produced by the generation pass, not authored per chunk; `pt`/`it` follow the project's translation flow. Key-set parity across all locales (including backend `lang/`) is enforced by architecture tests, so a new `en` key with no counterpart elsewhere fails CI.
+- **Legal / binding carve-out:** legally-binding content (master contract body, other `resources/contracts/**`) is **never** machine-translated and stays English. It lives outside the i18n string files; the generation pass must never touch it.
+- Backend: use Laravel's localization (`__()` / `trans_choice()` and central `lang/{locale}/{domain}.php` files).
+- Frontend: use `vue-i18n` (Composition API) with separate JSON files per locale; `en` is statically bundled, all other locales load lazily on demand.
+- Pluralization: register CLDR-correct `pluralizationRules` (derived from a vetted CLDR source, not hand-typed) for morphologically-rich locales.
 - Database content (creator-supplied content) is stored as written; do not auto-translate.
-- Currency: GBP and EUR primary in Phase 1. Display logic is locale-aware.
+- Currency: GBP and EUR primary in Phase 1. Display logic is locale-aware via the shared formatter.
 - Dates: locale-aware formatting throughout. Store UTC, display local.
 
 ---
@@ -263,7 +266,7 @@ A feature is done when:
 4. ✅ Larastan level 8 passes
 5. ✅ TypeScript strict passes
 6. ✅ Pint and Prettier produce no diffs
-7. ✅ All user-facing strings are in i18n files for en, pt, it
+7. ✅ All new user-facing strings authored in `en` (the source of truth); key-set parity across every UI locale and backend `lang/` is enforced by architecture tests, and the non-en baseline is filled by the generation pass — never hand-author 24 locales per chunk
 8. ✅ Audit logging is in place for privileged actions
 9. ✅ Migration follows expand/migrate/contract if it touches existing tables
 10. ✅ Documentation updated if the feature changes API or data model

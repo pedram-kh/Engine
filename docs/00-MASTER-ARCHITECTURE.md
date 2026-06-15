@@ -10,7 +10,7 @@ This document describes the **target architecture** for Catalyst Engine across a
 
 Catalyst Engine is a two-sided platform for influencer marketing. Agencies use it to manage campaigns for their brand clients with a roster of creators. In later phases, brands self-serve directly, creators discover and apply to campaigns, and AI agents handle execution at scale.
 
-The product is built in Europe (English, Portuguese, Italian) under GDPR-first defaults. The first customer is **Catalyst** (an agency partner whose roster of hundreds of creators bootstraps the platform).
+The product is built in Europe under GDPR-first defaults, with a UI localized into all 24 official EU languages (English, Portuguese, and Italian authored by hand; the rest a machine-translation baseline). The first customer is **Catalyst** (an agency partner whose roster of hundreds of creators bootstraps the platform).
 
 ---
 
@@ -350,16 +350,18 @@ Detailed in `10-BOARD-AUTOMATION.md`. Architectural placement:
 
 ## 13. Internationalization architecture
 
-- **Locales supported in Phase 1:** `en`, `pt`, `it`. English is default fallback.
-- **Backend i18n:** Laravel `lang/` directory, separate file per module.
-- **Frontend i18n:** `vue-i18n`, JSON files per locale per app, lazy-loaded by route.
-- **Locale resolution order:**
-  1. Explicit user setting (stored on user record)
-  2. `Accept-Language` header
-  3. Default `en`
+- **Supported UI locales:** all 24 official EU languages — `bg, hr, cs, da, nl, en, et, fi, fr, de, el, hu, ga, it, lv, lt, mt, pl, pt, ro, sk, sl, es, sv` (ISO 639-1, each fits `char(2)`). English is the default fallback. `en`, `pt`, `it` are authored by hand; the other 21 are a machine-translation baseline. The canonical list is a single registry (`EU_LANGUAGES` in `packages/api-client`, with a parallel PHP `Locale` enum in `app/Core` held in lockstep by a constant-parity test); no file hardcodes the locale set.
+  - **`UI_LOCALES` vs `EU_LANGUAGES`:** `UI_LOCALES` is the set we actually render (drives the language switcher and validates `preferred_language`); `EU_LANGUAGES` is the full 24 and validates content-language metadata (`creator.primary_language`, `secondary_languages`, agency/brand `default_language`). Selecting a UI language we cannot render is rejected, so a stored `preferred_language` is never a silent `en` fallback.
+- **Legal / binding carve-out:** legally-binding content (master contract body and other `resources/contracts/**` source) is **never** machine-translated and stays English; it lives outside the i18n string files so the carve-out is enforceable.
+- **Backend i18n:** Laravel `lang/` — a single central directory with one PHP file per domain (`auth`, `app`, `creators`, `campaigns`, `messages`, `invitations`, …), one subfolder per locale. It is **not** nested per module under `app/Modules/`.
+- **Frontend i18n:** `vue-i18n` v10 (Composition API, `legacy: false`), JSON files per locale per app, organized one file per top-level namespace. Locales load **lazily, by active locale**: `en` is statically bundled (always-needed fallback); every other locale's messages load via dynamic import (`setLocaleMessage`) only when it becomes the active locale. Boot resolves the target locale first and awaits its messages before mounting, so there is neither an English flash nor a missing-key flash.
+- **Locale resolution order (as built):**
+  - **Frontend boot:** localStorage preference (written immediately on switch) → authenticated user's `preferred_language` (server-wins on login/hydration) → default `en`.
+  - **Backend (`SetLocale` middleware, runs after `EnforceImpersonation` so it reads the acting user under impersonation):** authenticated user's `preferred_language` → `Accept-Language` header → default `en`.
+- **Persistence:** `preferred_language` is a `char(2)` column on `users`; the SPA writes it back via `PATCH /api/v1/me` (and `PATCH /api/v1/admin/me`) and reads it on boot, so a chosen language survives reload and login.
 - **Database content:** stored as written; no auto-translation. Some fields (e.g., agency-defined campaign categories) may have translation tables (Phase 2+).
 - **Currency:** GBP, EUR primary in Phase 1. Stored as integer minor units (pence/cents). Currency is a property of the campaign, not the user.
-- **Dates and numbers:** locale-aware formatting on frontend, UTC storage on backend.
+- **Dates and numbers:** locale-aware formatting on frontend via a shared `Intl`-backed utility, UTC storage on backend.
 
 ---
 
@@ -446,7 +448,7 @@ The architectural intent is summarized here. Use this as a quick reference when 
 | AI features   | None                                                 | API hooks and event stream ready for ML consumers   |
 | Mobile        | Responsive web                                       | API contract is mobile-ready                        |
 | Public API    | None                                                 | Versioning (`/api/v1/...`) and abstraction in place |
-| Languages     | en, pt, it                                           | Translation table pattern ready for content i18n    |
+| Languages     | 24 EU UI locales (en/pt/it authored, 21 MT baseline) | Translation table pattern ready for content i18n    |
 | Regions       | EU only                                              | Architecture is region-pluggable, not US-baked      |
 
 ---
