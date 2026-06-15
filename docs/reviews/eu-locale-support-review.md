@@ -15,7 +15,7 @@
 | Sub-step       | Title                                                                           | Status  |
 | -------------- | ------------------------------------------------------------------------------- | ------- |
 | S1             | Docs-first SOT updates + glossary                                               | Done    |
-| S2             | EU_LANGUAGES registry + UI_LOCALES + PHP enum + validation split + 5.25 parity  | Pending |
+| S2             | EU_LANGUAGES registry + UI_LOCALES + PHP enum + validation split + 5.25 parity  | Done    |
 | S2b            | Lazy on-demand locale loading (both SPAs)                                       | Pending |
 | S3             | CLDR pluralizationRules (vetted source) + category SOT + rules-correctness spec | Pending |
 | S4             | PATCH /me + /admin/me (locale-only, reject-unknown-422) + tenancy allowlist     | Pending |
@@ -48,3 +48,41 @@ Docs were updated **before** any code, so the source of truth describes the as-b
 - `Engine C` is the live `app.title` string and is byte-identical across en/pt/it today, so the do-not-translate rule matches current state.
 
 **Done-gate (S1):** Prettier `--check` green on all five docs. No tests/typecheck/Larastan/Pint applicable (markdown only).
+
+---
+
+## S2 — Registry, PHP enum, validation split, parity
+
+The single source of truth for the locale sets, with the validation split (Q2) wired across both stacks. `availableLocales` stays at 3 (the rendered set) — the registry is in place but the dropdown-lighting flip is deferred to S8.
+
+### The registry (frontend SOT)
+
+New [packages/api-client/src/locales.ts](../../packages/api-client/src/locales.ts), exported from the package barrel:
+
+- `EU_LANGUAGES` — all 24 EU codes (ISO 639-1), the **content-language** set.
+- `UI_LOCALES` — the rendered subset (`['en','pt','it']` today; one-line flip to the full 24 at S8).
+- `PreferredLanguage` (in `types/user.ts`) now **derives** from `UiLocale` instead of a hand-written `'en'|'pt'|'it'`, so it widens automatically at the flip. `EuLanguage` is the distinct content-language type.
+- `LANGUAGE_ENDONYMS` + `euLanguageOptions()` + `languageEndonym()` — endonym (autonym) labels, locale-neutral, so content-language pickers and read-only displays render all 24 consistently **without** a 24x24 translated-label matrix. Options are ordered English-first, then by endonym (`Intl.Collator`).
+
+### The PHP enum (backend SOT mirror)
+
+New [apps/api/app/Core/Enums/Locale.php](../../apps/api/app/Core/Enums/Locale.php) — 24 backed cases mirroring `EU_LANGUAGES`, a typed `UI_LOCALES` constant mirroring the TS one, and `values()` / `uiValues()` helpers. (First enum in `app/Core/Enums`.)
+
+### The validation split (Q2)
+
+- **`preferred_language` -> UI_LOCALES (rendered subset).** `SignUpRequest` (`in:en,pt,it` -> `Rule::in(Locale::UI_LOCALES)`) and `SignUpService::normaliseLanguage()`. A UI locale we cannot render is rejected, so a stored value is never a silent `en` lie. `SignUpTest`'s `'fr' -> 422` assertion stays green (fr is EU but not rendered).
+- **content-language -> EU_LANGUAGES (all 24).** `UpdateProfileRequest` + `AdminUpdateCreatorRequest` (`primary_language`, `secondary_languages.*`: `size:2` -> `Rule::enum(Locale::class)`, keeping the cross-layer rule-parity contract intact — `AdminUpdateCreatorRequestRuleParityTest` green); agency/brand `default_language` in `UpdateAgencySettingsRequest`, `CreateBrandRequest`, `UpdateBrandRequest` (`Rule::in(['en','pt','it'])` -> `Rule::enum(Locale::class)`). The agency/brand 422 tests were repointed: a **non-EU** code (`ja`) is the new negative case, plus an added positive that a non-UI EU code (`fr`) is now accepted — giving the widening real teeth.
+- **Carve-out left untouched:** `CreatorWizardController::getContractTerms` keeps `['en','pt','it']` — that is contract-locale negotiation for legally-binding content (only `master-agreement.en.md` exists; the carve-out keeps it English), not the UI registry.
+
+### The 4 content-language dropdowns (+ the display surfaces they feed)
+
+All content-language INPUT pickers now derive from `euLanguageOptions()` (24, endonym-labelled): `BrandForm.vue`, agency `SettingsPage.vue`, wizard `Step2ProfileBasicsPage.vue`, admin `field-edit.ts`. Because the pickers can now store any of 24, the read-only **display** surfaces and **filter** dropdowns that previously hardcoded a 6-code list + `app.roster.languages.*` keys were unified onto the same registry (`languageEndonym` / `euLanguageOptions`) to avoid shipping raw-code labels: `CreatorRosterPage.vue`, `DiscoverPage.vue`, agency + discover `CreatorDetailPage`/`DiscoverProfilePage`, and admin `CreatorDetailPage.vue`. This is the only coherent end-state once a non-en/pt/it language is selectable; the "4 dropdowns" scope necessarily pulled in their matching displays. Admin `field-edit` language select dropped `allowCustomCode` (the 24-list is exhaustive + backend-enforced). The 6 UI **locale switchers** were not touched per-file — they derive from `availableLocales`, which now derives from `UI_LOCALES`.
+
+### Parity tests (5.25)
+
+- [packages/api-client/src/locales.spec.ts](../../packages/api-client/src/locales.spec.ts) — source-inspects `Locale.php` (no eval): enum cases == `EU_LANGUAGES`, `Locale::UI_LOCALES` == TS `UI_LOCALES`; plus registry-integrity checks (24, no dupes, subset, endonym coverage, option ordering).
+- [apps/api/tests/Unit/Core/LocaleEnumTest.php](../../apps/api/tests/Unit/Core/LocaleEnumTest.php) — PHP-side catalogue tripwire pinning the 24 cases + UI subset independently.
+
+**Break-revert (5.35):** dropped the `Swedish` case from `Locale.php` -> `locales.spec.ts` "enum cases match EU_LANGUAGES" failed as expected -> restored the case (the enum is a new untracked file, so restore was a manual re-add, confirmed by re-running the spec to green, not `git checkout`).
+
+**Done-gate (S2):** api-client 106, main 1043, admin 387 (all green); frontend typecheck + ESLint clean (2 pre-existing `v-html` warnings only); backend 105 affected feature/unit tests green; Pint + Larastan L8 clean; Prettier clean.
