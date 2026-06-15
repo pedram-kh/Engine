@@ -18,7 +18,7 @@
 | S2             | EU_LANGUAGES registry + UI_LOCALES + PHP enum + validation split + 5.25 parity  | Done    |
 | S2b            | Lazy on-demand locale loading (both SPAs)                                       | Done    |
 | S3             | CLDR pluralizationRules (vetted source) + category SOT + rules-correctness spec | Done    |
-| S4             | PATCH /me + /admin/me (locale-only, reject-unknown-422) + tenancy allowlist     | Pending |
+| S4             | PATCH /me + /admin/me (locale-only, reject-unknown-422) + tenancy allowlist     | Done    |
 | S5             | Client persistence + boot hydration (server-wins) + pre-auth locale             | Pending |
 | S6 (severable) | SetLocale middleware + 2 mailables `->locale()` + MailLocalizationTest          | Pending |
 | S7             | Parity/placeholder/plural/rules specs (incl. backend lang/), green on 3         | Pending |
@@ -148,3 +148,33 @@ New [packages/api-client/src/plural-rules.ts](../../packages/api-client/src/plur
 **Break-revert (5.35):** dropped `few` from `PLURAL_CATEGORIES.pl` -> both the SOT-vs-Intl pin ("pl matches the runtime CLDR categories") and the `rule(pl, 2) -> few` golden case failed as expected -> restored (re-add; the file is new/untracked) and re-ran to 163 green.
 
 **Done-gate (S3):** api-client 163 green (incl. the new 25-row correctness spec); frontend typecheck green (both SPAs); ESLint clean; main 1043 + admin 387 green (no plural regression). No backend surface touched.
+
+---
+
+## S4 — Locale-only self-update endpoints
+
+The persistence loop needs a write endpoint: pre-S4 only sign-up + the read-only GET /me touched `preferred_language` (confirmed in the inventory). S4 adds the narrowest possible self-write on both SPAs so a chosen UI language can be saved server-side.
+
+### The endpoint
+
+- New [UpdateMeController](../../apps/api/app/Modules/Identity/Http/Controllers/UpdateMeController.php) (invokable, mirroring the GET `MeController` style) backs both `PATCH /api/v1/me` (web) and `PATCH /api/v1/admin/me` (web_admin). It applies only the validated `preferred_language` via `$user->update([...])` and returns the existing `UserResource` (which already exposes `preferred_language`) — no new resource shape.
+- New [UpdateMeRequest](../../apps/api/app/Modules/Identity/Http/Requests/UpdateMeRequest.php) validates a **single** field, `preferred_language` `required` + `Rule::in(Locale::UI_LOCALES)`. Single-field rules make the endpoint locale-only by construction: `validated()` carries nothing else, so name/email/etc. in the body are inert (asserted).
+- `preferred_language` -> UI_LOCALES (rendered subset), consistent with `SignUpRequest` and the S2 validation split: an EU-but-not-rendered locale (`fr`) is a 422, not a stored value that silently falls back to `en`.
+
+### Middleware posture (no-context)
+
+Both routes mount the GET `/me` stack — main `auth:web` + `tenancy.set`; admin `auth:web_admin` + `EnsureMfaForAdmins` + `tenancy.set` — and deliberately NOT the fail-closed `tenancy` alias. `preferred_language` lives on the global `users` row, so the write works for creators and platform admins who carry no agency context. Tests prove the no-context path (creator with no membership updates successfully; `TenancyContext` stays empty) and the agency-user path (works without tenant scoping).
+
+### Allowlist (docs/security/tenancy.md §4)
+
+Added two rows (`PATCH /api/v1/me`, `PATCH /api/v1/admin/me`) directly below the `/me/notification-preferences` `PATCH` precedent — the existing user-self-write-above-tenancy pattern. Each row records the single-field UI_LOCALES validation, the owner-is-caller posture, and the no-context rationale. (The pre-existing gap that GET `/me` itself is not yet tabled was left as-is — out of S4 scope.)
+
+**Grounding notes for the architect:**
+
+- Auth is session/cookie (`actingAs($user, 'web'|'web_admin')` with the `Origin` header from `TestCase`), mirroring `MeControllerTest` — not Sanctum-token. CSRF is skipped under `runningUnitTests()`, so `patchJson` works.
+- No audit row: a UI-language preference is low-sensitivity, matching the notification-preferences self-write (which also does not audit). `EnforceImpersonation` does not hard-block this route (not in `HardBlockedActions`), which is correct — an impersonated session changing the _viewer's_ language is harmless and reverts with the session.
+- The frontend api-client wrapper + store wiring that CALLS this endpoint is deliberately S5, not S4 — S4 is the endpoint + its allowlist + tests only.
+
+**Break-revert (5.35):** loosened the rule to `Rule::enum(Locale::class)` (the full 24) -> the "rejects fr" test failed (200 instead of 422) -> restored to `Rule::in(Locale::UI_LOCALES)` and re-ran green.
+
+**Done-gate (S4):** new `UpdateMeControllerTest` 12 cases green; full Identity feature suite 218 green (no route-registration regressions); Pint + Larastan L8 clean on the new files; Prettier clean (the two allowlist rows fit the existing table widths — 2-line diff). No frontend surface touched.
