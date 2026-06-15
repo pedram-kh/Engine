@@ -17,7 +17,7 @@
 | S1             | Docs-first SOT updates + glossary                                               | Done    |
 | S2             | EU_LANGUAGES registry + UI_LOCALES + PHP enum + validation split + 5.25 parity  | Done    |
 | S2b            | Lazy on-demand locale loading (both SPAs)                                       | Done    |
-| S3             | CLDR pluralizationRules (vetted source) + category SOT + rules-correctness spec | Pending |
+| S3             | CLDR pluralizationRules (vetted source) + category SOT + rules-correctness spec | Done    |
 | S4             | PATCH /me + /admin/me (locale-only, reject-unknown-422) + tenancy allowlist     | Pending |
 | S5             | Client persistence + boot hydration (server-wins) + pre-auth locale             | Pending |
 | S6 (severable) | SetLocale middleware + 2 mailables `->locale()` + MailLocalizationTest          | Pending |
@@ -113,3 +113,38 @@ Both `main.ts` files now `await setLocale(i18n.global.locale.value)` before `app
 - The `legacy: false` type arg was made explicit on `createI18n<[Schema], Locales, false>` so `i18n.global` narrows to a `Composer` (giving `.locale.value` + a schema-typed `setLocaleMessage`); without it the global is the `Composer | VueI18n` union and `.value` does not type-check.
 
 **Done-gate (S2b):** frontend typecheck green (both SPAs); ESLint clean (2 pre-existing `v-html` warnings only); main 1043 + admin 387 tests green (switcher specs unchanged and passing — synchronous-flip semantics preserved); `apps/main` production build green with confirmed per-locale chunking. No backend surface touched.
+
+---
+
+## S3 — CLDR pluralization rules (all 24)
+
+vue-i18n's built-in pluralisation is English-shaped (`n === 1 ? 0 : 1`, plus a 3-form zero shortcut). That is simply wrong for the EU set: Polish/Czech/Slovak/Lithuanian need one/few/many/other, Irish/Maltese need five forms, Latvian has a `zero` category, and the Romance languages carry a `many` category for large cardinals. S3 makes all 24 correct from one code path, with no plural messages mis-rendering once the rendered set grows.
+
+### The registry (shared SOT)
+
+New [packages/api-client/src/plural-rules.ts](../../packages/api-client/src/plural-rules.ts) (co-located with the locale registry, exported from the barrel, framework-agnostic — no vue-i18n import):
+
+- `PLURAL_CATEGORIES` — the per-locale CLDR cardinal categories, canonical order (`zero,one,two,few,many,other` subsequence), `other` last. This is the SOT for plural form-counts (consumed by S7's form-count gate) and the form ORDER authors/generators must follow.
+- `buildPluralRules()` — the vue-i18n `pluralRules` map. Each rule delegates category selection to `Intl.PluralRules` (the ICU/CLDR engine — "vetted source, not hand-typed", satisfying CONVENTIONS §3.7 / CURSOR-INSTRUCTIONS), maps the category to its index via `PLURAL_CATEGORIES`, and **clamps** to the forms actually authored so an under-provided message degrades to its `other` form rather than rendering `undefined`.
+- `pluralFormCount(locale)` + `CATEGORY_ORDER` + `PluralCategory`/`PluralRule` types.
+
+### Wiring
+
+`pluralRules: buildPluralRules()` added to both `createI18n` calls. The map carries all 24 keys now; the keys for not-yet-rendered locales are inert until the S8 `availableLocales` flip, so S8 needs no plural change. For the only existing plural message (`creator.incomplete_blocker`, 2 forms in en/pt/it) behaviour is unchanged for integer counts (en/pt/it `one` -> form 0, everything else clamps to form 1 — identical to the old default).
+
+### Rules-correctness spec (the gate)
+
+[packages/api-client/src/plural-rules.spec.ts](../../packages/api-client/src/plural-rules.spec.ts):
+
+- **SOT-vs-engine pin:** probes `Intl.PluralRules` over a wide sample (0..120 + decimals + large/compact numbers) per locale and asserts the produced category set/order equals `PLURAL_CATEGORIES` exactly. A future ICU bump that changes a locale's rules fails CI and forces a deliberate SOT review.
+- **Structural invariants:** 24 entries (== `EU_LANGUAGES`), `other` present + last, no dupes, canonical order, `pluralFormCount` == list length.
+- **Golden cases (independent of SOT order):** hand-derived `[locale, count, category]` rows for the interesting locales (pl one/few/many/other, cs incl. the fractional-only `many`, ro, lv `zero`, sl two, ga five-form) assert `buildPluralRules` returns the right index; plus clamp-degradation and single-form cases.
+
+**Grounding notes for the architect:**
+
+- The SOT table was authored against a probe of the actual runtime (`node -e` over `Intl.PluralRules`), not from memory — hence `fr/it/pt/es` carry `many` and `lv` carries `zero`. Czech `many` is the fractional category (1.5), not large integers (8 -> `other`); the spec encodes this.
+- Backend is untouched: Laravel's `trans_choice` has its own CLDR selector, and no backend `lang/` string uses pluralisation today (the only `|` plural message is the frontend `creator.incomplete_blocker`). Backend plural form-count parity is S7's scope.
+
+**Break-revert (5.35):** dropped `few` from `PLURAL_CATEGORIES.pl` -> both the SOT-vs-Intl pin ("pl matches the runtime CLDR categories") and the `rule(pl, 2) -> few` golden case failed as expected -> restored (re-add; the file is new/untracked) and re-ran to 163 green.
+
+**Done-gate (S3):** api-client 163 green (incl. the new 25-row correctness spec); frontend typecheck green (both SPAs); ESLint clean; main 1043 + admin 387 green (no plural regression). No backend surface touched.

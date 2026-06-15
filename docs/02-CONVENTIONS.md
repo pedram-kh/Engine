@@ -568,7 +568,7 @@ const isOverdue = computed(() => {
 - Translation files live in `src/core/i18n/locales/{locale}/{module}.json`, one folder per locale across all 24 EU languages. The supported-locale list is never hardcoded per file — it derives from the `EU_LANGUAGES` registry in `packages/api-client`.
 - Author new strings in `en` only (the source of truth); the 21 non-en UI locales are generated, `pt`/`it` follow the translation flow. Key-set parity (including backend `lang/`), placeholder integrity, and plural form-counts are enforced by architecture tests.
 - `en` is statically bundled; every other locale loads lazily via dynamic import on first activation. Resolve the target locale and await its messages before mount (no English/missing-key flash).
-- Pluralization uses vue-i18n with CLDR-correct `pluralizationRules` per locale (derived from a vetted CLDR source, not hand-typed).
+- Pluralization uses vue-i18n with CLDR-correct `pluralizationRules` per locale, built from the `plural-rules` registry in `packages/api-client` (`buildPluralRules()` delegates category selection to `Intl.PluralRules` — the ICU/CLDR engine — so the rules are vetted, not hand-typed). The per-locale category list (`PLURAL_CATEGORIES`) is the SOT for plural form-counts and is pinned to the runtime CLDR data by `plural-rules.spec.ts`.
 - Date and number formatting via `Intl.DateTimeFormat` and `Intl.NumberFormat`, locale-aware.
 - Currency formatting via a shared utility, never raw `toFixed(2)`.
 
