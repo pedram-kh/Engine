@@ -211,3 +211,33 @@ This is the user-visible payoff: a chosen language now survives reload AND login
 2. **Server-wins behaviour:** removed `writeStoredLocale(language)` from `hydratePreferredLocale` → `setUser() hydrates the stored locale` failed → restored.
 
 **Done-gate (S5):** api-client 166 green (incl. 3 new `updateMe` cases); frontend typecheck green; ESLint clean (2 pre-existing `v-html` warnings only); main 1056 + admin 400 green (incl. new `useLocalePreference` specs ×2, store locale-persistence specs ×2, and updated SignUpPage payload assertions). No backend surface touched (S4 already shipped the endpoint).
+
+---
+
+## S6 — Request-locale middleware (server-rendered strings follow the caller)
+
+The plan framed S6 as "`SetLocale` middleware + `->locale()` on 2 mailables + `MailLocalizationTest`". The exploration found **the mail half already shipped**: `VerifyEmailMail` and `ResetPasswordMail` are sent with `->locale($user->preferred_language ?: 'en')` at their send sites ([SignUpService](../../apps/api/app/Modules/Identity/Services/SignUpService.php) `sendVerificationMail`, [PasswordResetService](../../apps/api/app/Modules/Identity/Services/PasswordResetService.php)), their copy is `trans()`-driven, and [MailLocalizationTest](../../apps/api/tests/Feature/Modules/Identity/MailLocalizationTest.php) already pins per-locale subjects/bodies + the queued `->locale` value. (In fact 14 of 16 mailables localise at the send site.) So S6 narrows to the one genuinely missing piece: the **HTTP request-locale resolver**, which had no implementation — every API request rendered `app()->getLocale() === 'en'` regardless of who was calling, so `trans('auth.*')` error strings were always English even for a `pt`/`it` user.
+
+### The middleware
+
+New [SetLocale](../../apps/api/app/Modules/Identity/Http/Middleware/SetLocale.php) (`App\Modules\Identity\Http\Middleware`). Resolution order, first match wins:
+
+1. authenticated `$request->user()->preferred_language` — but only when it is a rendered UI locale (`Locale::UI_LOCALES`);
+2. `Accept-Language`, narrowed to `UI_LOCALES` via Symfony's `getPreferredLanguage(UI_LOCALES)` (handles region tags — `pt-BR` → `pt`);
+3. `en`.
+
+Everything is clamped to `UI_LOCALES`: a value we cannot render (an EU-but-not-UI `preferred_language` like `fr`, or a non-UI `Accept-Language`) is dropped so `trans()` renders a clean `en` rather than falling back key-by-key. Because `UI_LOCALES[0] === 'en'`, the no-header `getPreferredLanguage` default IS the intended default — branch 2 and 3 collapse into one expression.
+
+### Ordering (the impersonation seam)
+
+Registered with a second `appendToGroup('api', SetLocale::class)` **immediately after `EnforceImpersonation`** in [bootstrap/app.php](../../apps/api/bootstrap/app.php). Order matters: under impersonation the _target_ user is the one logged into the `web` guard at claim time, so by the time `SetLocale` reads `$request->user()` it sees the **acting (impersonated)** user — the UI language follows the person the admin is viewing as, not the admin. Running before `EnforceImpersonation` would have been correct too here (it doesn't swap the guard user), but appending after keeps the rule robust to any future guard manipulation and mirrors the "impersonation is the authoritative gate, everything user-derived comes after it" posture.
+
+**Grounding notes for the architect:**
+
+- Route middleware (`auth:web`) runs _after_ the whole `api` group, but `StartSession` (via `statefulApi`) has already run by the time `SetLocale` fires, so `$request->user()` resolves the session user before the `Authenticate` middleware formally executes. Unauthenticated routes still hit `SetLocale` and resolve via `Accept-Language`/`en`.
+- Queued mailables are unaffected: they capture locale via the explicit `->locale(...)` at `->queue(...)`, which overrides `app()->getLocale()`. `SetLocale`'s payoff is (a) `trans()` API error strings and (b) any mail sent _synchronously inside a request_ without an explicit `->locale()`.
+- Content-language fields (the full 24 `EU_LANGUAGES`) never drive the UI locale — only `UI_LOCALES` are ever applied, consistent with the S2 UI/content split.
+
+**Break-revert (5.35):** short-circuited the branch-1 guard (`if (false && …)`) so the user's `preferred_language` was ignored → the three user-preference cases in `SetLocaleMiddlewareTest` failed (locale fell through to `Accept-Language`/`en`) → restored and re-ran green.
+
+**Done-gate (S6):** new [SetLocaleMiddlewareTest](../../apps/api/tests/Feature/Modules/Identity/SetLocaleMiddlewareTest.php) 10 cases green (preference-wins ×3, preference-over-header, header fallback, unrenderable-preference fallback, anonymous header, non-UI clamp, default, region-tag match); `MailLocalizationTest` 5 green (unchanged). Pint + Larastan L8 clean on the new files. Full backend suite re-run module-by-module under the now-global middleware with **zero regressions** — Identity 228, Agencies 217 (+1 skip), Campaigns 164, Creators 433, Admin 87, Audit 50, Boards 60, Brands 38, Messaging 45, Notifications 43, TalentPools 46, TrackedJobs 6, plus non-module Feature (Console/Core/Database/Mail/Tenancy/TestHelpers/Health) and Unit 112 all green. (The suite cannot run in a single process on this box — a pre-existing 128 MB worker memory ceiling unrelated to locale; run per-module.) No frontend surface touched.
