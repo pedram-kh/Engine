@@ -16,7 +16,7 @@
 | -------------- | ------------------------------------------------------------------------------- | ------- |
 | S1             | Docs-first SOT updates + glossary                                               | Done    |
 | S2             | EU_LANGUAGES registry + UI_LOCALES + PHP enum + validation split + 5.25 parity  | Done    |
-| S2b            | Lazy on-demand locale loading (both SPAs)                                       | Pending |
+| S2b            | Lazy on-demand locale loading (both SPAs)                                       | Done    |
 | S3             | CLDR pluralizationRules (vetted source) + category SOT + rules-correctness spec | Pending |
 | S4             | PATCH /me + /admin/me (locale-only, reject-unknown-422) + tenancy allowlist     | Pending |
 | S5             | Client persistence + boot hydration (server-wins) + pre-auth locale             | Pending |
@@ -86,3 +86,30 @@ All content-language INPUT pickers now derive from `euLanguageOptions()` (24, en
 **Break-revert (5.35):** dropped the `Swedish` case from `Locale.php` -> `locales.spec.ts` "enum cases match EU_LANGUAGES" failed as expected -> restored the case (the enum is a new untracked file, so restore was a manual re-add, confirmed by re-running the spec to green, not `git checkout`).
 
 **Done-gate (S2):** api-client 106, main 1043, admin 387 (all green); frontend typecheck + ESLint clean (2 pre-existing `v-html` warnings only); backend 105 affected feature/unit tests green; Pint + Larastan L8 clean; Prettier clean.
+
+---
+
+## S2b — Lazy on-demand locale loading (both SPAs)
+
+The blocker for scaling to 24: both bootstraps statically imported and spread **every** locale's JSON into one `messages` object (confirmed in S1 against [apps/main/src/core/i18n/index.ts](../../apps/main/src/core/i18n/index.ts)). At 24 that bundles 23 unused locales into the initial payload. S2b converts both SPAs to eager-`en` + lazy-everything-else, so the initial payload carries one locale's strings regardless of how large the rendered set grows.
+
+### The loader (per-SPA bootstrap)
+
+- `en` is the only statically-imported locale (the always-needed `fallbackLocale`; present synchronously at boot, no missing-key flash). The `createI18n` `messages` now contains just `{ en }` (cast to the all-locales schema generic; the rest are merged at runtime).
+- `loadLocaleMessages(locale)` uses `import.meta.glob('./locales/*/*.json')` so Vite emits **one async chunk per namespace JSON**; only the active locale's files are ever fetched. Main spreads the namespaces; admin reuses `deepMergeLocale` (the `admin.*`-subtree merge the eager `en` bundle already used), so lazy and eager paths build identical shapes.
+- `setLocale(locale)` is the single switch point: if the target is not yet loaded (and not `en`), it `await`s `loadLocaleMessages` and `setLocaleMessage`s it **before** flipping `i18n.global.locale`, so the UI never paints against a half-populated bundle.
+
+### The switchers (no-flash on user switch)
+
+The 6 locale `<v-select>`s (`v-model="locale"` -> `:model-value="locale"` + `@update:model-value="selectLocale"`) now route through a new `useLocaleSwitch()` composable in each SPA's `core/i18n`. Critically it operates on the instance from `useI18n()` — the bootstrap singleton in production, the **per-test** instance under Vitest — so it works in both and does not couple components to the singleton. Already-loaded locales (the common case) flip **synchronously** (no `await` taken), preserving existing v-model semantics; only a first-ever switch to an unloaded locale awaits the import. Switchers covered: main `auth/AuthLayout`, `AgencyLayout`, `OnboardingLayout`, `CreatorDashboardLayout`; admin `auth/AuthLayout`, `AdminLayout`.
+
+### The boot seam (prepares S5)
+
+Both `main.ts` files now `await setLocale(i18n.global.locale.value)` before `app.mount` — the resolve-target-then-preload-then-mount seam. The target is `en` today (a no-op preload); S5 swaps in persistence-based target resolution here, and the await-before-mount guarantee is already in place so a persisted non-`en` boot will not flash English.
+
+**Grounding notes for the architect:**
+
+- Code-splitting is real, not just typed: `pnpm --filter ./apps/main build` emits paired per-locale namespace chunks (`auth-*.js`, `app-*.js`, `creator-*.js`, …, two of each = pt + it) while `en` stays inlined in the main `index` bundle (it is also statically imported, so the glob's `en` entry is deduped into the main chunk, never fetched separately).
+- The `legacy: false` type arg was made explicit on `createI18n<[Schema], Locales, false>` so `i18n.global` narrows to a `Composer` (giving `.locale.value` + a schema-typed `setLocaleMessage`); without it the global is the `Composer | VueI18n` union and `.value` does not type-check.
+
+**Done-gate (S2b):** frontend typecheck green (both SPAs); ESLint clean (2 pre-existing `v-html` warnings only); main 1043 + admin 387 tests green (switcher specs unchanged and passing — synchronous-flip semantics preserved); `apps/main` production build green with confirmed per-locale chunking. No backend surface touched.
