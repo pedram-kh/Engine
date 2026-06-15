@@ -17,6 +17,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useAdminAuthStore } from './useAdminAuthStore'
+import { readStoredLocale } from '@/composables/useLocalePreference'
 
 // The store imports `authApi` from `../api/admin-auth.api`. Mock that
 // module so each test can drive the doubles directly. The mock shape
@@ -27,6 +28,7 @@ import { useAdminAuthStore } from './useAdminAuthStore'
 vi.mock('../api/admin-auth.api', () => ({
   authApi: {
     me: vi.fn(),
+    updateMe: vi.fn(),
     login: vi.fn(),
     logout: vi.fn(),
     enrollTotp: vi.fn(),
@@ -40,6 +42,7 @@ import { authApi } from '../api/admin-auth.api'
 
 type AdminAuthApiMock = {
   me: ReturnType<typeof vi.fn>
+  updateMe: ReturnType<typeof vi.fn>
   login: ReturnType<typeof vi.fn>
   logout: ReturnType<typeof vi.fn>
   enrollTotp: ReturnType<typeof vi.fn>
@@ -148,6 +151,36 @@ describe('useAdminAuthStore', () => {
       expect(store.user).toBeNull()
       expect(store.isAuthenticated).toBe(false)
       expect(store.mfaEnrollmentRequired).toBe(false)
+    })
+  })
+
+  describe('locale persistence (S5)', () => {
+    it('setUser() hydrates the stored locale from the server preferred_language (server-wins)', () => {
+      const store = useAdminAuthStore()
+
+      store.setUser(makeAdminUser({ preferred_language: 'pt' }))
+
+      expect(readStoredLocale()).toBe('pt')
+    })
+
+    it('bootstrap() routes through setUser so the cold-load also hydrates the locale', async () => {
+      const store = useAdminAuthStore()
+      mocked.me.mockResolvedValueOnce(makeAdminUser({ preferred_language: 'it' }))
+
+      await store.bootstrap()
+
+      expect(readStoredLocale()).toBe('it')
+    })
+
+    it('setPreferredLanguage() PATCHes the server and updates the in-memory user', async () => {
+      const store = useAdminAuthStore()
+      store.setUser(makeAdminUser({ preferred_language: 'en' }))
+      mocked.updateMe.mockResolvedValueOnce(makeAdminUser({ preferred_language: 'pt' }))
+
+      await store.setPreferredLanguage('pt')
+
+      expect(mocked.updateMe).toHaveBeenCalledWith({ preferred_language: 'pt' })
+      expect(store.user?.attributes.preferred_language).toBe('pt')
     })
   })
 

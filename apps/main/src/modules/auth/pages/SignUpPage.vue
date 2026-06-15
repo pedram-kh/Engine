@@ -12,7 +12,7 @@
  * `confirmed` rule is the authoritative gate.
  */
 
-import { ApiError, extractFieldErrors } from '@catalyst/api-client'
+import { ApiError, extractFieldErrors, type PreferredLanguage } from '@catalyst/api-client'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -21,7 +21,7 @@ import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
 
-const { t, te } = useI18n()
+const { t, te, locale } = useI18n()
 const router = useRouter()
 const route = useRoute()
 const store = useAuthStore()
@@ -98,6 +98,10 @@ async function onSubmit(): Promise<void> {
       email: email.value,
       password: password.value,
       password_confirmation: passwordConfirmation.value,
+      // Carry the locale the visitor picked on the pre-auth switcher into
+      // the account so it is their server-side preference from the first
+      // login (the active i18n locale is always a rendered UI locale).
+      preferred_language: locale.value as PreferredLanguage,
       ...(browserTimezone !== null ? { timezone: browserTimezone } : {}),
       ...(invitationToken.value !== null ? { invitation_token: invitationToken.value } : {}),
     })

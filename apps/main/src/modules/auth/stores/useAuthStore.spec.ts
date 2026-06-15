@@ -11,6 +11,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useAuthStore } from './useAuthStore'
+import { readStoredLocale, writeStoredLocale } from '@/composables/useLocalePreference'
 import {
   hasMountedBefore,
   markMounted,
@@ -22,6 +23,7 @@ import {
 vi.mock('../api/auth.api', () => ({
   authApi: {
     me: vi.fn(),
+    updateMe: vi.fn(),
     login: vi.fn(),
     logout: vi.fn(),
     signUp: vi.fn(),
@@ -141,6 +143,36 @@ describe('useAuthStore', () => {
       store.clearUser()
 
       expect(hasMountedBefore()).toBe(false)
+    })
+  })
+
+  describe('locale persistence (S5)', () => {
+    it('setUser() hydrates the stored locale from the server preferred_language (server-wins)', () => {
+      const store = useAuthStore()
+
+      store.setUser(makeUser({ preferred_language: 'pt' }))
+
+      expect(readStoredLocale()).toBe('pt')
+    })
+
+    it('setUser() leaves the stored locale untouched when preferred_language is null', () => {
+      writeStoredLocale('it')
+      const store = useAuthStore()
+
+      store.setUser(makeUser({ preferred_language: null }))
+
+      expect(readStoredLocale()).toBe('it')
+    })
+
+    it('setPreferredLanguage() PATCHes the server and updates the in-memory user', async () => {
+      const store = useAuthStore()
+      store.setUser(makeUser({ preferred_language: 'en' }))
+      mocked.updateMe.mockResolvedValueOnce(makeUser({ preferred_language: 'it' }))
+
+      await store.setPreferredLanguage('it')
+
+      expect(mocked.updateMe).toHaveBeenCalledWith({ preferred_language: 'it' })
+      expect(store.user?.attributes.preferred_language).toBe('it')
     })
   })
 

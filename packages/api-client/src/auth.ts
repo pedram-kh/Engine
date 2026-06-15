@@ -36,7 +36,7 @@ import type {
   SignUpRequest,
   VerifyEmailRequest,
 } from './types/auth'
-import type { User, UserEnvelope } from './types/user'
+import type { UpdateMeRequest, User, UserEnvelope } from './types/user'
 
 /**
  * Variant the api-client targets. The wire payloads are identical; only
@@ -67,6 +67,14 @@ export interface AuthApi {
    * the chunk-7 router guard can branch on it.
    */
   me(): Promise<User>
+
+  /**
+   * `PATCH /api/v1/me` (or `/api/v1/admin/me` for the admin variant) —
+   * the locale-only self-update. Persists `preferred_language` so a
+   * chosen UI language survives reload/login, and returns the updated
+   * user resource. Same path as {@link AuthApi.me}.
+   */
+  updateMe(body: UpdateMeRequest): Promise<User>
 
   /**
    * `POST /api/v1/auth/login` (or `/admin/auth/login` for the admin
@@ -168,6 +176,11 @@ export function createAuthApi(http: HttpClient, options: CreateAuthApiOptions = 
   return {
     async me() {
       const envelope = await http.get<UserEnvelope>(mePath)
+      return envelope.data
+    },
+
+    async updateMe(body) {
+      const envelope = await http.patch<UserEnvelope>(mePath, body)
       return envelope.data
     },
 

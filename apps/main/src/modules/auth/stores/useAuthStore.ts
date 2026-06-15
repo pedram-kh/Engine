@@ -28,12 +28,13 @@
  *     stomp on each other's UI.
  */
 
-import { ApiError } from '@catalyst/api-client'
+import { ApiError, UI_LOCALES } from '@catalyst/api-client'
 import type {
   ConfirmTotpRequest,
   DisableTotpRequest,
   EnableTotpResponse,
   ForgotPasswordRequest,
+  PreferredLanguage,
   RecoveryCodesResponse,
   RegenerateRecoveryCodesRequest,
   ResendVerificationRequest,
@@ -46,6 +47,8 @@ import type {
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
+import { writeStoredLocale } from '@/composables/useLocalePreference'
+import { setLocale } from '@/core/i18n'
 import { setAuthRebootstrap, useAgencyStore } from '@/core/stores/useAgencyStore'
 import { resetWelcomeBackFlag } from '@/modules/onboarding/internal/welcomeBackFlag'
 import { authApi } from '../api/auth.api'
@@ -107,6 +110,24 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = next
     mfaEnrollmentRequired.value = false
     useAgencyStore().initFromUser(next.relationships?.agency_memberships?.data ?? [])
+    hydratePreferredLocale(next)
+  }
+
+  /**
+   * Server-wins locale hydration. The persisted `preferred_language` is the
+   * authoritative answer to "what language?" once a user loads, so on every
+   * identity refresh (login, cold-load bootstrap, post-MFA refresh) we
+   * sync both `localStorage` and the active i18n locale to it — a reload
+   * and a fresh login then both land on the saved language. Unrenderable /
+   * absent values are ignored (the boot/default locale stays). `setLocale`
+   * lazy-loads the target bundle, so this is fire-and-forget.
+   */
+  function hydratePreferredLocale(next: User): void {
+    const language = next.attributes.preferred_language
+    if (language !== null && (UI_LOCALES as readonly string[]).includes(language)) {
+      writeStoredLocale(language)
+      void setLocale(language)
+    }
   }
 
   /**
@@ -227,6 +248,19 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       isSigningUp.value = false
     }
+  }
+
+  /**
+   * Mirror a signed-in user's locale choice to the server (`PATCH /me`).
+   * The locale switcher has already flipped i18n + localStorage; this
+   * persists the choice so it follows the user across devices/sessions.
+   * The returned resource updates the in-memory user so it stays
+   * consistent with the server (and a later `setUser`/hydrate is a no-op).
+   * Callers fire-and-forget: a failure leaves localStorage authoritative
+   * until the next server-wins hydration reconciles.
+   */
+  async function setPreferredLanguage(language: PreferredLanguage): Promise<void> {
+    user.value = await authApi.updateMe({ preferred_language: language })
   }
 
   async function verifyEmail(payload: VerifyEmailRequest): Promise<void> {
@@ -394,6 +428,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     signUp,
+    setPreferredLanguage,
     verifyEmail,
     resendVerification,
     forgotPassword,

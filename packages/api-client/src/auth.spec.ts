@@ -102,6 +102,34 @@ describe('createAuthApi', () => {
     })
   })
 
+  describe('updateMe()', () => {
+    it('PATCHes /me with the locale body and unwraps data (main variant)', async () => {
+      const envelope = userEnvelope()
+      http.patch.mockResolvedValueOnce(envelope)
+
+      const user = await api.updateMe({ preferred_language: 'pt' })
+
+      expect(http.patch).toHaveBeenCalledWith('/me', { preferred_language: 'pt' })
+      expect(user).toBe(envelope.data)
+    })
+
+    it('PATCHes /admin/me on the admin variant', async () => {
+      const adminApi = createAuthApi(http as unknown as HttpClient, { variant: 'admin' })
+      http.patch.mockResolvedValueOnce(userEnvelope())
+
+      await adminApi.updateMe({ preferred_language: 'it' })
+
+      expect(http.patch).toHaveBeenCalledWith('/admin/me', { preferred_language: 'it' })
+    })
+
+    it('rethrows a 422 ApiError verbatim (unrenderable locale rejected)', async () => {
+      const err = envelopeError(422, 'validation.failed')
+      http.patch.mockRejectedValueOnce(err)
+
+      await expect(api.updateMe({ preferred_language: 'pt' })).rejects.toBe(err)
+    })
+  })
+
   describe('login()', () => {
     it('POSTs to /auth/login with the typed body and returns the user', async () => {
       const envelope = userEnvelope()

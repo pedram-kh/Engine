@@ -55,11 +55,12 @@
  *     `me()`) cannot stomp on each other's UI states. Mirrors main.
  */
 
-import { ApiError } from '@catalyst/api-client'
+import { ApiError, UI_LOCALES } from '@catalyst/api-client'
 import type {
   ConfirmTotpRequest,
   DisableTotpRequest,
   EnableTotpResponse,
+  PreferredLanguage,
   RecoveryCodesResponse,
   RegenerateRecoveryCodesRequest,
   User,
@@ -68,6 +69,8 @@ import type {
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
+import { writeStoredLocale } from '@/composables/useLocalePreference'
+import { setLocale } from '@/core/i18n'
 import { authApi } from '../api/admin-auth.api'
 
 export type BootstrapStatus = 'idle' | 'loading' | 'ready' | 'error'
@@ -130,6 +133,22 @@ export const useAdminAuthStore = defineStore('adminAuth', () => {
   function setUser(next: User): void {
     user.value = next
     mfaEnrollmentRequired.value = false
+    hydratePreferredLocale(next)
+  }
+
+  /**
+   * Server-wins locale hydration (mirrors main). The persisted
+   * `preferred_language` is authoritative once an admin loads, so on every
+   * identity refresh we sync `localStorage` + the active i18n locale to it.
+   * Unrenderable / absent values are ignored; `setLocale` lazy-loads the
+   * target bundle, so this is fire-and-forget.
+   */
+  function hydratePreferredLocale(next: User): void {
+    const language = next.attributes.preferred_language
+    if (language !== null && (UI_LOCALES as readonly string[]).includes(language)) {
+      writeStoredLocale(language)
+      void setLocale(language)
+    }
   }
 
   /**
@@ -156,8 +175,7 @@ export const useAdminAuthStore = defineStore('adminAuth', () => {
     inFlightBootstrap = (async (): Promise<void> => {
       try {
         const me = await authApi.me()
-        user.value = me
-        mfaEnrollmentRequired.value = false
+        setUser(me)
         bootstrapStatus.value = 'ready'
       } catch (error) {
         if (error instanceof ApiError && error.status === 401) {
@@ -311,6 +329,18 @@ export const useAdminAuthStore = defineStore('adminAuth', () => {
     }
   }
 
+  /**
+   * Mirror a signed-in admin's locale choice to the server
+   * (`PATCH /admin/me`). The switcher has already flipped i18n +
+   * localStorage; this persists the choice across sessions and updates the
+   * in-memory user. Callers fire-and-forget — a failure leaves localStorage
+   * authoritative until the next server-wins hydration reconciles. Mirrors
+   * main's `setPreferredLanguage`.
+   */
+  async function setPreferredLanguage(language: PreferredLanguage): Promise<void> {
+    user.value = await authApi.updateMe({ preferred_language: language })
+  }
+
   return {
     // state
     user,
@@ -336,5 +366,6 @@ export const useAdminAuthStore = defineStore('adminAuth', () => {
     verifyTotp,
     disableTotp,
     regenerateRecoveryCodes,
+    setPreferredLanguage,
   }
 })

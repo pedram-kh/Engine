@@ -78,6 +78,11 @@ const ALLOWLISTED_RELATIVE_PATHS: ReadonlySet<string> = new Set([
   // longer touches matchMedia (the `'system'` preference was dropped) —
   // the matchMedia ratchet now allowlists no file at all.
   'composables/useThemePreference.ts',
+  // EU locale chunk (S5): useLocalePreference is the SOT for CLIENT-side
+  // locale persistence (`catalyst.admin.locale`), mirroring
+  // useThemePreference — it IS the persistence layer and legitimately
+  // owns the localStorage primitives for the locale key.
+  'composables/useLocalePreference.ts',
 ])
 
 const FORBIDDEN_PATTERNS: ReadonlyArray<{ pattern: RegExp; description: string }> = [

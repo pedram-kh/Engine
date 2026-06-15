@@ -79,6 +79,10 @@ describe('SignUpPage', () => {
       email: 'a@b.c',
       password: 'Pa$$w0rd!12',
       password_confirmation: 'Pa$$w0rd!12',
+      // EU locale chunk (S5) — the pre-auth switcher's active locale rides
+      // the payload so the new account's server-side preference is set from
+      // the first login. Defaults to `en` in the test harness.
+      preferred_language: 'en',
       // Sprint 5 Chunk C — the auto-detected browser zone always rides the
       // payload. Its value is environment-dependent (the test runner's tz),
       // so we assert presence + type rather than a fixed zone here; the
@@ -341,6 +345,8 @@ describe('SignUpPage', () => {
       email: 'a@b.c',
       password: 'Pa$$w0rd!12',
       password_confirmation: 'Pa$$w0rd!12',
+      // EU locale chunk (S5) — pre-auth locale rides the invite path too.
+      preferred_language: 'en',
       // Sprint 5 Chunk C — the browser tz rides the invite-acceptance path
       // too (same SignUpPage handles both entry points — D-c1).
       timezone: expect.any(String),

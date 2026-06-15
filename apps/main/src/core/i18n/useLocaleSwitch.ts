@@ -12,14 +12,24 @@
  * user already selected this session) there is no `await` before the
  * locale flips, so the switch stays synchronous and the existing v-model
  * semantics are preserved.
+ *
+ * Persistence (S5): every switch is written to `localStorage` so the choice
+ * survives a reload. When the user is signed in, the choice is ALSO mirrored
+ * to the server (`PATCH /me`) so it follows them across devices/sessions.
+ * The server write is best-effort — localStorage already holds the value, so
+ * a failed PATCH degrades gracefully (server-wins reconciles on next load).
  */
 
+import type { PreferredLanguage } from '@catalyst/api-client'
 import { useI18n } from 'vue-i18n'
 
+import { writeStoredLocale } from '@/composables/useLocalePreference'
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { loadLocaleMessages } from '.'
 
 export function useLocaleSwitch() {
   const { locale, getLocaleMessage, setLocaleMessage } = useI18n()
+  const auth = useAuthStore()
 
   async function selectLocale(next: string): Promise<void> {
     if (next === locale.value) return
@@ -31,6 +41,11 @@ export function useLocaleSwitch() {
     }
 
     locale.value = next
+    writeStoredLocale(next)
+
+    if (auth.isAuthenticated) {
+      void auth.setPreferredLanguage(next as PreferredLanguage)
+    }
   }
 
   return { selectLocale }

@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
 import App from './App.vue'
+import { resolveBootLocale } from './composables/useLocalePreference'
 import { router } from './core/router'
 import { i18n, setLocale } from './core/i18n'
 import { vuetify } from './plugins/vuetify'
@@ -21,7 +22,9 @@ app.use(vuetify)
 
 // Resolve and PRELOAD the target locale before the first paint so the UI
 // never renders against a half-loaded (or English-fallback) bundle. The
-// target is `en` today; S5 resolves it from persistence here instead.
-void setLocale(i18n.global.locale.value).then(() => {
+// pre-auth target comes from localStorage (the user's last choice); once
+// the authenticated user loads, the server `preferred_language` wins and
+// the auth store re-flips the locale. `en` is the default when unset.
+void setLocale(resolveBootLocale(i18n.global.locale.value)).then(() => {
   app.mount('#app')
 })

@@ -82,6 +82,11 @@ const ALLOWLISTED_RELATIVE_PATHS: ReadonlySet<string> = new Set([
   //    useAgencyPreference composable (mirrors useThemePreference) when
   //    a second localStorage-backed store appears (Sprint 3+)."
   'core/stores/useAgencyStore.ts',
+  // EU locale chunk (S5): useLocalePreference is the SOT for CLIENT-side
+  // locale persistence (`catalyst.main.locale`), mirroring
+  // useThemePreference — it IS the persistence layer and legitimately
+  // owns the localStorage primitives for the locale key.
+  'composables/useLocalePreference.ts',
 ])
 
 const FORBIDDEN_PATTERNS: ReadonlyArray<{ pattern: RegExp; description: string }> = [

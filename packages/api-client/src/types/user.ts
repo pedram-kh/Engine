@@ -52,6 +52,16 @@ import type { UiLocale } from '../locales'
 export type PreferredLanguage = UiLocale
 
 /**
+ * Body for `PATCH /api/v1/me` (and `/api/v1/admin/me`) — the locale-only
+ * self-update. Deliberately a single field: the endpoint validates and
+ * writes only `preferred_language` (a rendered UI locale), so a chosen
+ * language survives reload/login. Mirrors the backend `UpdateMeRequest`.
+ */
+export interface UpdateMeRequest {
+  preferred_language: PreferredLanguage
+}
+
+/**
  * Three-letter ISO-4217 currency code (e.g. `'USD'`, `'EUR'`, `'BRL'`).
  * The backend stores this as an opaque string; the type is intentionally
  * `string` rather than a union so adding a currency on the backend does
