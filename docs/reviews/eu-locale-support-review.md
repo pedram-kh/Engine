@@ -20,8 +20,8 @@
 | S3             | CLDR pluralizationRules (vetted source) + category SOT + rules-correctness spec | Done    |
 | S4             | PATCH /me + /admin/me (locale-only, reject-unknown-422) + tenancy allowlist     | Done    |
 | S5             | Client persistence + boot hydration (server-wins) + pre-auth locale             | Done    |
-| S6 (severable) | SetLocale middleware + 2 mailables `->locale()` + MailLocalizationTest          | Pending |
-| S7             | Parity/placeholder/plural/rules specs (incl. backend lang/), green on 3         | Pending |
+| S6 (severable) | SetLocale middleware + 2 mailables `->locale()` + MailLocalizationTest          | Done    |
+| S7             | Parity/placeholder/plural/rules specs (incl. backend lang/), green on 3         | Done    |
 | S8             | Generate 21 net-new locales x 3 roots; flip availableLocales to 24 last         | Pending |
 | S9 (severable) | Shared locale-aware currency/date util                                          | Pending |
 
@@ -241,3 +241,34 @@ Registered with a second `appendToGroup('api', SetLocale::class)` **immediately 
 **Break-revert (5.35):** short-circuited the branch-1 guard (`if (false && …)`) so the user's `preferred_language` was ignored → the three user-preference cases in `SetLocaleMiddlewareTest` failed (locale fell through to `Accept-Language`/`en`) → restored and re-ran green.
 
 **Done-gate (S6):** new [SetLocaleMiddlewareTest](../../apps/api/tests/Feature/Modules/Identity/SetLocaleMiddlewareTest.php) 10 cases green (preference-wins ×3, preference-over-header, header fallback, unrenderable-preference fallback, anonymous header, non-UI clamp, default, region-tag match); `MailLocalizationTest` 5 green (unchanged). Pint + Larastan L8 clean on the new files. Full backend suite re-run module-by-module under the now-global middleware with **zero regressions** — Identity 228, Agencies 217 (+1 skip), Campaigns 164, Creators 433, Admin 87, Audit 50, Boards 60, Brands 38, Messaging 45, Notifications 43, TalentPools 46, TrackedJobs 6, plus non-module Feature (Console/Core/Database/Mail/Tenancy/TestHelpers/Health) and Unit 112 all green. (The suite cannot run in a single process on this box — a pre-existing 128 MB worker memory ceiling unrelated to locale; run per-module.) No frontend surface touched.
+
+---
+
+## S7 — Locale parity / placeholder / plural gates (all 3 roots)
+
+S7 makes locale drift a CI failure instead of a runtime fallback. It generalises the existing locale specs and adds full-tree parity gates over **both** SPAs **and** the backend `lang/` tree, all driven by the shared `UI_LOCALES` registry so the S8 flip to 24 rendered locales extends every gate with no edit.
+
+### New comprehensive specs
+
+- **`apps/{main,admin}/tests/unit/architecture/i18n-locale-parity.spec.ts`** (new, one per SPA): for every namespace JSON, against the `en` SOT, asserts three things per rendered locale —
+  1. **keyset parity** (file-by-file: no missing key → no silent English fallback; no extra key → no dead/drifting translation), plus a file-set parity check (every locale ships exactly en's namespaces);
+  2. **placeholder integrity** — the set of `{named}` vue-i18n tokens per message equals en's (catches a dropped `{count}` or a `{minutes}`→`{minutos}` rename). Literal escapes (`{'@'}`) are deliberately not treated as tokens;
+  3. **plural form-count** — each `|`-split message has the same form count as its en source, that count is `≤` en's CLDR category count, and the en shape stays renderable in every locale (`≤` that locale's category count). Form-count comes from the shared `pluralFormCount` registry (the S3 CLDR SOT), never hand-typed.
+- **`apps/api/tests/Unit/Core/LangParityTest.php`** (new, Pest): the backend mirror — file parity + keyset parity + `:named` placeholder parity (case-insensitive: `:Name`/`:NAME` are render-time variants of `:name`) across `lang/{en,pt,it}`. No plural gate: backend strings use no `|` pluralisation today (the only plural message is the frontend `incomplete_blocker`); the comment records the porting pattern if that ever changes.
+
+### Generalised the existing 4 specs
+
+`i18n-notifications-parity` (main) and `i18n-auth-codes` (main + admin) and `i18n-creator-codes` (main) all hard-coded `['en','pt','it']`. Each now iterates `UI_LOCALES` from `@catalyst/api-client` (the same source the app renders from), and their `loadBundle` signatures widened from `'en'|'pt'|'it'` to `string` so the S8 registry flip doesn't trip the type. Behaviour on the 3 current locales is unchanged.
+
+**Grounding notes for the architect:**
+
+- The whole-tree parity gate confirmed **zero existing pt/it drift** — every main (7) and admin (11) namespace and every backend `lang/` file already matches en exactly on keys + placeholders. So S7 is green on 3 with no translation fixes needed; the gates are pure ratchets for S8.
+- On the one plural tension the inventory flagged: `incomplete_blocker` has 2 forms while pt/it have 3 CLDR categories. The form-count gate is **en-SOT parity + a renderability bound** (form count ≤ the locale's category count), NOT "must equal the locale's category count" — the latter would force a redundant third `many` form that the S3 clamp already handles. So 2 forms is correct and green for pt/it.
+- The locale-parity spec reads `locales/` directly (sorted leaf walk), independent of the per-SPA merge strategy (main `Object.assign`, admin `deepMergeLocale`), so it checks every namespace file even where admin files share the `admin.*` subtree.
+
+**Break-revert (5.35), three gates:**
+
+1. **Keyset (both layers):** added an `app.__drift__` key to `pt/app.json` and a `drift` key to `lang/pt/app.php` → the FE and BE keyset gates both reported `EXTRA` → restored.
+2. **Placeholder + plural (FE):** collapsed `pt` `incomplete_blocker` to a single form `"Tem etapas por concluir: {names}."` → the placeholder gate flagged `[names] != en [count,names]` AND the plural gate flagged `1 plural forms != en 2` → restored.
+
+**Done-gate (S7):** main architecture suite 108 green (19 files, incl. the new locale-parity ×4 cases + the 3 generalised specs); admin architecture suite 66 green (14 files); backend `tests/Unit/Core` 17 green (incl. the new `LangParityTest` 3 cases). Both SPAs typecheck clean (`vue-tsc --noEmit`); ESLint clean on all touched specs; Pint clean on `LangParityTest`. No production surface touched — S7 is tests + the registry-driven generalisation only.
