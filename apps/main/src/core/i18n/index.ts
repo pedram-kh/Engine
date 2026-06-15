@@ -8,20 +8,6 @@ import enCreator from './locales/en/creator.json'
 import enDashboard from './locales/en/dashboard.json'
 import enImpersonation from './locales/en/impersonation.json'
 import enNotifications from './locales/en/notifications.json'
-import itApp from './locales/it/app.json'
-import itAuth from './locales/it/auth.json'
-import itAvailability from './locales/it/availability.json'
-import itCreator from './locales/it/creator.json'
-import itDashboard from './locales/it/dashboard.json'
-import itImpersonation from './locales/it/impersonation.json'
-import itNotifications from './locales/it/notifications.json'
-import ptApp from './locales/pt/app.json'
-import ptAuth from './locales/pt/auth.json'
-import ptAvailability from './locales/pt/availability.json'
-import ptCreator from './locales/pt/creator.json'
-import ptDashboard from './locales/pt/dashboard.json'
-import ptImpersonation from './locales/pt/impersonation.json'
-import ptNotifications from './locales/pt/notifications.json'
 
 /**
  * Vue-i18n bundle. Each locale folder owns one JSON file per top-level
@@ -67,6 +53,13 @@ import ptNotifications from './locales/pt/notifications.json'
  * a new top-level prefix requires extending the resolver AND adding a
  * parallel architecture test AND shipping bundle entries in all three
  * locales in the same commit.
+ *
+ * Loading strategy: `en` is statically bundled (the always-needed
+ * fallback, present at boot). Every other locale is fetched on demand via
+ * `loadLocaleMessages` (a Vite glob → one async chunk per namespace JSON)
+ * and merged in by `setLocale` BEFORE the active locale flips, so the UI
+ * never renders a half-populated bundle. This keeps the initial payload
+ * to one locale's worth of strings as the rendered set grows toward 24.
  */
 
 type MessageSchema = typeof enApp &
@@ -77,37 +70,42 @@ type MessageSchema = typeof enApp &
   typeof enNotifications &
   typeof enImpersonation
 
-const messages: Record<'en' | 'pt' | 'it', MessageSchema> = {
-  en: {
-    ...enApp,
-    ...enAuth,
-    ...enCreator,
-    ...enDashboard,
-    ...enAvailability,
-    ...enNotifications,
-    ...enImpersonation,
-  },
-  pt: {
-    ...ptApp,
-    ...ptAuth,
-    ...ptCreator,
-    ...ptDashboard,
-    ...ptAvailability,
-    ...ptNotifications,
-    ...ptImpersonation,
-  },
-  it: {
-    ...itApp,
-    ...itAuth,
-    ...itCreator,
-    ...itDashboard,
-    ...itAvailability,
-    ...itNotifications,
-    ...itImpersonation,
-  },
+// `en` is statically bundled — it is the always-needed fallback, so it
+// must be present synchronously at boot (no missing-key flash). Every
+// other locale loads on demand (see `loadLocaleMessages` / `setLocale`).
+const enMessages: MessageSchema = {
+  ...enApp,
+  ...enAuth,
+  ...enCreator,
+  ...enDashboard,
+  ...enAvailability,
+  ...enNotifications,
+  ...enImpersonation,
 }
 
-export const i18n = createI18n<[MessageSchema], 'en' | 'pt' | 'it'>({
+/**
+ * Lazy per-locale namespace loaders. Vite turns this glob into one async
+ * chunk per JSON file; only the active locale's files are ever fetched.
+ * `en` is matched too but is never loaded through here (it is eager).
+ */
+const localeFileLoaders = import.meta.glob<{ default: Record<string, unknown> }>(
+  './locales/*/*.json',
+)
+
+/**
+ * Load + merge every namespace JSON for one locale into a single message
+ * object. Returns `{}` for a locale with no files on disk (the supported
+ * set is gated by `availableLocales`, so this is only a safety net). Does
+ * not touch any i18n instance — callers apply it via `setLocaleMessage`.
+ */
+export async function loadLocaleMessages(locale: string): Promise<Record<string, unknown>> {
+  const prefix = `./locales/${locale}/`
+  const loaders = Object.entries(localeFileLoaders).filter(([path]) => path.startsWith(prefix))
+  const modules = await Promise.all(loaders.map(([, load]) => load()))
+  return Object.assign({}, ...modules.map((m) => m.default)) as Record<string, unknown>
+}
+
+export const i18n = createI18n<[MessageSchema], 'en' | 'pt' | 'it', false>({
   legacy: false,
   locale: 'en',
   fallbackLocale: 'en',
@@ -115,5 +113,25 @@ export const i18n = createI18n<[MessageSchema], 'en' | 'pt' | 'it'>({
   // switcher and validation stay in lockstep and the S8 flip to 24 is a
   // single registry edit. Today UI_LOCALES === ['en', 'pt', 'it'].
   availableLocales: [...UI_LOCALES],
-  messages,
+  // Only `en` is populated at construction; pt/it (and the future 24) are
+  // merged in lazily by `setLocale`. The cast satisfies the all-locales
+  // message-schema generic without eagerly bundling the other locales.
+  messages: { en: enMessages } as Record<'en' | 'pt' | 'it', MessageSchema>,
 })
+
+/** True once a non-`en` locale's messages have been merged into `i18n`. */
+function isLoaded(locale: string): boolean {
+  return locale === 'en' || Object.keys(i18n.global.getLocaleMessage(locale)).length > 0
+}
+
+/**
+ * Switch the active locale, loading its messages first if needed so the
+ * UI never renders against a half-populated bundle (no English/missing-key
+ * flash). Used at boot (target-locale resolution) and by S5's persistence.
+ */
+export async function setLocale(locale: string): Promise<void> {
+  if (!isLoaded(locale)) {
+    i18n.global.setLocaleMessage(locale, (await loadLocaleMessages(locale)) as MessageSchema)
+  }
+  i18n.global.locale.value = locale as 'en' | 'pt' | 'it'
+}

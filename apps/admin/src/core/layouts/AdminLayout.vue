@@ -29,6 +29,7 @@ import { storeToRefs } from 'pinia'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import { useIdleTimeout } from '@/modules/auth/composables/useIdleTimeout'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
+import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import { useAdminAuthStore } from '@/modules/auth/stores/useAdminAuthStore'
 import { useDeployEnv } from '@/core/composables/useDeployEnv'
 import { useNavBadges } from '@/core/stores/useNavBadges'
@@ -47,6 +48,7 @@ const navBadges = useNavBadges()
 const { creatorApprovals, kycQueue } = storeToRefs(navBadges)
 
 const banner = useDeployEnv()
+const { selectLocale } = useLocaleSwitch()
 const localeOptions = buildLocaleOptions(availableLocales, t)
 
 const drawer = ref(true)
@@ -204,7 +206,7 @@ async function signOut(): Promise<void> {
             </div>
 
             <v-select
-              v-model="locale"
+              :model-value="locale"
               :items="localeOptions"
               :label="t('app.locale.switcher')"
               item-title="title"
@@ -214,6 +216,7 @@ async function signOut(): Promise<void> {
               hide-details
               class="mb-3"
               data-test="admin-user-menu-locale-switcher"
+              @update:model-value="selectLocale"
             />
           </v-card-text>
 

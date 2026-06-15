@@ -13,28 +13,6 @@ import enDashboard from './locales/en/dashboard.json'
 import enFeatureFlags from './locales/en/feature-flags.json'
 import enOperations from './locales/en/operations.json'
 import enSupport from './locales/en/support.json'
-import itAgencies from './locales/it/agencies.json'
-import itAlerts from './locales/it/alerts.json'
-import itApp from './locales/it/app.json'
-import itAudit from './locales/it/audit.json'
-import itAuth from './locales/it/auth.json'
-import itCompliance from './locales/it/compliance.json'
-import itCreators from './locales/it/creators.json'
-import itDashboard from './locales/it/dashboard.json'
-import itFeatureFlags from './locales/it/feature-flags.json'
-import itOperations from './locales/it/operations.json'
-import itSupport from './locales/it/support.json'
-import ptAgencies from './locales/pt/agencies.json'
-import ptAlerts from './locales/pt/alerts.json'
-import ptApp from './locales/pt/app.json'
-import ptAudit from './locales/pt/audit.json'
-import ptAuth from './locales/pt/auth.json'
-import ptCompliance from './locales/pt/compliance.json'
-import ptCreators from './locales/pt/creators.json'
-import ptDashboard from './locales/pt/dashboard.json'
-import ptFeatureFlags from './locales/pt/feature-flags.json'
-import ptOperations from './locales/pt/operations.json'
-import ptSupport from './locales/pt/support.json'
 
 /**
  * Vue-i18n bundle for the admin SPA. Each locale folder owns one JSON
@@ -73,54 +51,69 @@ type MessageSchema = typeof enApp &
 // (`creators.json`, `agencies.json`, `audit.json`, `feature-flags.json`,
 // `dashboard.json`, `operations.json`) contributes an `admin.*` subtree,
 // which a spread would clobber.
-const messages: Record<'en' | 'pt' | 'it', MessageSchema> = {
-  en: deepMergeLocale(
-    enApp,
-    enAuth,
-    enCreators,
-    enAgencies,
-    enAudit,
-    enFeatureFlags,
-    enDashboard,
-    enOperations,
-    enSupport,
-    enCompliance,
-    enAlerts,
-  ) as unknown as MessageSchema,
-  pt: deepMergeLocale(
-    ptApp,
-    ptAuth,
-    ptCreators,
-    ptAgencies,
-    ptAudit,
-    ptFeatureFlags,
-    ptDashboard,
-    ptOperations,
-    ptSupport,
-    ptCompliance,
-    ptAlerts,
-  ) as unknown as MessageSchema,
-  it: deepMergeLocale(
-    itApp,
-    itAuth,
-    itCreators,
-    itAgencies,
-    itAudit,
-    itFeatureFlags,
-    itDashboard,
-    itOperations,
-    itSupport,
-    itCompliance,
-    itAlerts,
-  ) as unknown as MessageSchema,
+//
+// `en` is statically bundled (always-needed fallback, present at boot, no
+// missing-key flash). Every other locale loads on demand.
+const enMessages = deepMergeLocale(
+  enApp,
+  enAuth,
+  enCreators,
+  enAgencies,
+  enAudit,
+  enFeatureFlags,
+  enDashboard,
+  enOperations,
+  enSupport,
+  enCompliance,
+  enAlerts,
+) as unknown as MessageSchema
+
+/**
+ * Lazy per-locale namespace loaders (one async chunk per JSON file). Only
+ * the active locale's files are fetched; `en` is matched but never loaded
+ * through here (it is eager above).
+ */
+const localeFileLoaders = import.meta.glob<{ default: Record<string, unknown> }>(
+  './locales/*/*.json',
+)
+
+/**
+ * Load every namespace JSON for one locale and deep-merge them (the same
+ * `admin.*`-subtree merge the eager `en` bundle uses). Returns `{}` for a
+ * locale with no files. Does not touch any i18n instance.
+ */
+export async function loadLocaleMessages(locale: string): Promise<Record<string, unknown>> {
+  const prefix = `./locales/${locale}/`
+  const loaders = Object.entries(localeFileLoaders).filter(([path]) => path.startsWith(prefix))
+  const modules = await Promise.all(loaders.map(([, load]) => load()))
+  return deepMergeLocale(...modules.map((m) => m.default))
 }
 
-export const i18n = createI18n<[MessageSchema], 'en' | 'pt' | 'it'>({
+export const i18n = createI18n<[MessageSchema], 'en' | 'pt' | 'it', false>({
   legacy: false,
   locale: 'en',
   fallbackLocale: 'en',
   // Rendered set derives from the shared UI_LOCALES registry (see main
   // app i18n bootstrap). Today UI_LOCALES === ['en', 'pt', 'it'].
   availableLocales: [...UI_LOCALES],
-  messages,
+  // Only `en` is populated at construction; pt/it (and the future 24) are
+  // merged in lazily by `setLocale`. The cast satisfies the all-locales
+  // message-schema generic without eagerly bundling the other locales.
+  messages: { en: enMessages } as Record<'en' | 'pt' | 'it', MessageSchema>,
 })
+
+/** True once a non-`en` locale's messages have been merged into `i18n`. */
+function isLoaded(locale: string): boolean {
+  return locale === 'en' || Object.keys(i18n.global.getLocaleMessage(locale)).length > 0
+}
+
+/**
+ * Switch the active locale, loading its messages first if needed (no
+ * English/missing-key flash). Used at boot and by S5's persistence.
+ */
+export async function setLocale(locale: string): Promise<void> {
+  if (!isLoaded(locale)) {
+    i18n.global.setLocaleMessage(locale, (await loadLocaleMessages(locale)) as MessageSchema)
+  }
+  i18n.global.locale.value = locale as 'en' | 'pt' | 'it'
+}

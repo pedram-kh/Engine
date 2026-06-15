@@ -34,6 +34,7 @@ import { useDisplay } from 'vuetify'
 import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
+import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import type { CreatorWizardStepId } from '@catalyst/api-client'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 import OnboardingProgress from '../components/OnboardingProgress.vue'
@@ -52,6 +53,7 @@ const { isBootstrapped, bootstrapStatus, creator, stepCompletion, flags, nextSte
   storeToRefs(onboardingStore)
 const { isLoggingOut } = storeToRefs(authStore)
 
+const { selectLocale } = useLocaleSwitch()
 const localeOptions = buildLocaleOptions(availableLocales, t)
 const userMenuOpen = ref(false)
 
@@ -186,7 +188,7 @@ async function saveAndExit(): Promise<void> {
       <v-spacer />
 
       <v-select
-        v-model="locale"
+        :model-value="locale"
         :items="localeOptions"
         :label="t('app.locale.switcher')"
         item-title="title"
@@ -196,6 +198,7 @@ async function saveAndExit(): Promise<void> {
         hide-details
         class="onboarding-topbar__locale mx-3"
         data-test="onboarding-locale-switcher"
+        @update:model-value="selectLocale"
       />
 
       <v-btn

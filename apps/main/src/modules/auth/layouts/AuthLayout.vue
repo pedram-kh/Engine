@@ -18,9 +18,11 @@ import ImpersonationBanner from '@/modules/impersonation/components/Impersonatio
 import AuthHeroPanel from '@/modules/auth/components/AuthHeroPanel.vue'
 import BrandLogoWall from '@/modules/auth/components/BrandLogoWall.vue'
 import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
+import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import { buildLocaleOptions } from './localeOptions'
 
 const { t, locale, availableLocales } = useI18n()
+const { selectLocale } = useLocaleSwitch()
 const route = useRoute()
 
 const localeOptions = buildLocaleOptions(availableLocales, t)
@@ -40,7 +42,7 @@ const isHero = computed(() => route.name === 'auth.sign-in')
           </h1>
           <div class="d-flex align-center ga-2">
             <v-select
-              v-model="locale"
+              :model-value="locale"
               :items="localeOptions"
               :label="t('app.locale.switcher')"
               item-title="title"
@@ -50,6 +52,7 @@ const isHero = computed(() => route.name === 'auth.sign-in')
               hide-details
               class="auth-layout__locale"
               data-test="auth-locale-switcher"
+              @update:model-value="selectLocale"
             />
           </div>
         </header>

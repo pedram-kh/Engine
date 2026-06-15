@@ -34,8 +34,10 @@ import NotificationBell from '@/modules/notifications/components/NotificationBel
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
+import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 
 const { t, locale, availableLocales } = useI18n()
+const { selectLocale } = useLocaleSwitch()
 const router = useRouter()
 const agencyStore = useAgencyStore()
 const authStore = useAuthStore()
@@ -174,7 +176,7 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
 
             <!-- Locale switcher -->
             <v-select
-              v-model="locale"
+              :model-value="locale"
               :items="localeOptions"
               :label="t('app.locale.switcher')"
               item-title="title"
@@ -184,6 +186,7 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
               hide-details
               class="mb-3"
               data-test="user-menu-locale-switcher"
+              @update:model-value="selectLocale"
             />
           </v-card-text>
 

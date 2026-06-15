@@ -25,8 +25,10 @@ import ImpersonationBanner from '@/modules/impersonation/components/Impersonatio
 import NotificationBell from '@/modules/notifications/components/NotificationBell.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
+import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 
 const { t, locale, availableLocales } = useI18n()
+const { selectLocale } = useLocaleSwitch()
 const router = useRouter()
 const authStore = useAuthStore()
 const { user, isLoggingOut } = storeToRefs(authStore)
@@ -114,7 +116,7 @@ async function signOut(): Promise<void> {
             </div>
 
             <v-select
-              v-model="locale"
+              :model-value="locale"
               :items="localeOptions"
               :label="t('app.locale.switcher')"
               item-title="title"
@@ -124,6 +126,7 @@ async function signOut(): Promise<void> {
               hide-details
               class="mb-3"
               data-test="user-menu-locale-switcher"
+              @update:model-value="selectLocale"
             />
           </v-card-text>
 
