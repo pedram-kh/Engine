@@ -19,7 +19,7 @@
 | S2b            | Lazy on-demand locale loading (both SPAs)                                       | Done    |
 | S3             | CLDR pluralizationRules (vetted source) + category SOT + rules-correctness spec | Done    |
 | S4             | PATCH /me + /admin/me (locale-only, reject-unknown-422) + tenancy allowlist     | Done    |
-| S5             | Client persistence + boot hydration (server-wins) + pre-auth locale             | Pending |
+| S5             | Client persistence + boot hydration (server-wins) + pre-auth locale             | Done    |
 | S6 (severable) | SetLocale middleware + 2 mailables `->locale()` + MailLocalizationTest          | Pending |
 | S7             | Parity/placeholder/plural/rules specs (incl. backend lang/), green on 3         | Pending |
 | S8             | Generate 21 net-new locales x 3 roots; flip availableLocales to 24 last         | Pending |
@@ -178,3 +178,36 @@ Added two rows (`PATCH /api/v1/me`, `PATCH /api/v1/admin/me`) directly below the
 **Break-revert (5.35):** loosened the rule to `Rule::enum(Locale::class)` (the full 24) -> the "rejects fr" test failed (200 instead of 422) -> restored to `Rule::in(Locale::UI_LOCALES)` and re-ran green.
 
 **Done-gate (S4):** new `UpdateMeControllerTest` 12 cases green; full Identity feature suite 218 green (no route-registration regressions); Pint + Larastan L8 clean on the new files; Prettier clean (the two allowlist rows fit the existing table widths — 2-line diff). No frontend surface touched.
+
+---
+
+## S5 — Client-side locale persistence (the bug fix)
+
+This is the user-visible payoff: a chosen language now survives reload AND login. The inventory confirmed the pre-S5 gap — nothing read `preferred_language` to hydrate i18n, and there was no client persistence at all. S5 wires the full loop in both SPAs.
+
+### Resolution order (as built, matches §13)
+
+- **Boot:** `localStorage` preference → default `en`. `main.ts` now calls `resolveBootLocale(i18n.global.locale.value)` before `setLocale(...)`/mount, so the first paint is already in the saved language (no English flash).
+- **Authenticated (server-wins):** the auth store's `setUser` (login, cold-load `bootstrap`, post-MFA refresh) hydrates `localStorage` + the active i18n locale from the user's `preferred_language`, so the server is authoritative once a user loads.
+- **On switch:** the switcher writes `localStorage` always and, when signed in, mirrors to the server via `PATCH /me` (best-effort).
+
+### Pieces
+
+- **`useLocalePreference`** (new, per SPA, in `composables/`): the localStorage SOT (`catalyst.main.locale` / `catalyst.admin.locale`), mirroring `useThemePreference`. Pure `read/write/clear/resolveBootLocale`; only rendered UI locales are read/written (a stale/unrenderable value reads as unset, passive-on-read). It is the single file allowed to touch `localStorage` for the locale key — added to the **SOT allowlist** in `use-theme-is-sot.spec.ts` in **both** SPAs.
+- **`useLocaleSwitch.selectLocale`** (both SPAs): after the existing load-then-flip, now `writeStoredLocale(next)` and, if `auth.isAuthenticated`, `void auth.setPreferredLanguage(next)`. Best-effort server write — localStorage already holds the value, so a failed PATCH degrades to server-wins on next load.
+- **Auth stores** (both SPAs): `setUser` gains `hydratePreferredLocale` (server-wins); a new `setPreferredLanguage(lang)` action calls `authApi.updateMe` and updates the in-memory user. The admin `bootstrap` was routed through `setUser` (it previously assigned `user.value` directly, which would have bypassed hydration) — a latent admin inconsistency the inventory flagged, now fixed.
+- **`SignUpPage`**: the pre-auth switcher's active locale rides the sign-up payload (`preferred_language: locale.value`), so a brand-new account's server preference is set from the first login — same capture pattern as the existing `browserTimezone` field.
+- **api-client**: new `updateMe(body)` on `AuthApi` (`PATCH` to the same `mePath` used by `me()`) + `UpdateMeRequest` type. Every `satisfies AuthApi` / typed mock updated to carry it.
+
+**Grounding notes for the architect:**
+
+- The store specs are co-located under `src/`, which the `use-theme-is-sot` walk scans — so their new assertions read/write through `useLocalePreference` (`readStoredLocale`/`writeStoredLocale`), never `localStorage` directly, to stay inside the SOT ratchet.
+- `setUser` → `setLocale` is fire-and-forget (`void`): `setLocale` lazy-loads the target bundle (S2b), so hydration never blocks the synchronous identity mutation. localStorage is written synchronously first, which is what the tests assert.
+- The 401 interceptor already exempts `/me` and `/admin/me`, so a failed best-effort `PATCH /me` from the switcher cannot trigger a spurious session-expired redirect.
+
+**Break-revert (5.35), two anchors:**
+
+1. **SOT allowlist load-bearing:** removed `composables/useLocalePreference.ts` from the main `use-theme-is-sot` allowlist → the test flagged the composable's `localStorage` calls → restored.
+2. **Server-wins behaviour:** removed `writeStoredLocale(language)` from `hydratePreferredLocale` → `setUser() hydrates the stored locale` failed → restored.
+
+**Done-gate (S5):** api-client 166 green (incl. 3 new `updateMe` cases); frontend typecheck green; ESLint clean (2 pre-existing `v-html` warnings only); main 1056 + admin 400 green (incl. new `useLocalePreference` specs ×2, store locale-persistence specs ×2, and updated SignUpPage payload assertions). No backend surface touched (S4 already shipped the endpoint).
