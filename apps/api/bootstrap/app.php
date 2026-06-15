@@ -10,6 +10,7 @@ use App\Core\Tenancy\SetTenancyContext;
 use App\Core\Tenancy\SetTenancyFromAgencyRoute;
 use App\Modules\Audit\Http\Middleware\RequireActionReason;
 use App\Modules\Identity\Http\Middleware\EnforceImpersonation;
+use App\Modules\Identity\Http\Middleware\SetLocale;
 use App\Modules\Identity\Http\Middleware\UseAdminSessionCookie;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -59,6 +60,14 @@ return Application::configure(basePath: dirname(__DIR__))
         // requests use the separate `web_admin` cookie and never carry the
         // main session key, so this never fires for them.
         $middleware->appendToGroup('api', EnforceImpersonation::class);
+
+        // Locale resolution (EU locale chunk, S6). Appended AFTER
+        // EnforceImpersonation so that under impersonation it reads the
+        // acting (impersonated) user's `preferred_language`, not the admin's.
+        // Sets the app locale from preferred_language → Accept-Language → en
+        // (clamped to UI_LOCALES) so server-rendered strings and in-request
+        // mail render in the caller's language. See docs/00-MASTER-ARCHITECTURE.md §13.
+        $middleware->appendToGroup('api', SetLocale::class);
 
         // Tenant-scoped HTTP routes declare ->middleware('tenancy.set') to
         // populate the context from the authenticated user's primary
