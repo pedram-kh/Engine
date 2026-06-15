@@ -33,7 +33,12 @@
  */
 
 import { CategoryChips, CountryDisplay, LanguageList } from '@catalyst/ui'
-import { ApiError, extractFieldErrors } from '@catalyst/api-client'
+import {
+  ApiError,
+  euLanguageOptions,
+  extractFieldErrors,
+  languageEndonym,
+} from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -93,14 +98,9 @@ const CATEGORY_KEYS = [
   'other',
 ] as const
 
-const LANGUAGE_OPTIONS = [
-  { code: 'en', label: 'English' },
-  { code: 'pt', label: 'Português' },
-  { code: 'it', label: 'Italiano' },
-  { code: 'es', label: 'Español' },
-  { code: 'fr', label: 'Français' },
-  { code: 'de', label: 'Deutsch' },
-] as const
+// Content-language options: all 24 EU languages, labelled by endonym
+// (the single registry in @catalyst/api-client).
+const languageOptions = euLanguageOptions()
 
 const categoryItems = computed(() =>
   CATEGORY_KEYS.map((key) => ({
@@ -115,15 +115,11 @@ const countryLabel = computed(() => labelForCountryCode(countryCode.value))
 
 const primaryLanguageLabel = computed(() => {
   if (primaryLanguage.value === null) return null
-  return (
-    LANGUAGE_OPTIONS.find((l) => l.code === primaryLanguage.value)?.label ?? primaryLanguage.value
-  )
+  return languageEndonym(primaryLanguage.value)
 })
 
 const secondaryLanguageLabels = computed(() =>
-  secondaryLanguages.value.map(
-    (code) => LANGUAGE_OPTIONS.find((l) => l.code === code)?.label ?? code,
-  ),
+  secondaryLanguages.value.map((code) => languageEndonym(code)),
 )
 
 const categoryLabels = computed(() =>
@@ -277,9 +273,9 @@ onMounted(() => {
 
       <v-select
         v-model="primaryLanguage"
-        :items="LANGUAGE_OPTIONS"
+        :items="languageOptions"
         item-title="label"
-        item-value="code"
+        item-value="value"
         :label="t('creator.ui.wizard.fields.primary_language')"
         :error-messages="fieldErrors.primary_language"
         data-testid="profile-primary-language"
@@ -287,9 +283,9 @@ onMounted(() => {
 
       <v-select
         v-model="secondaryLanguages"
-        :items="LANGUAGE_OPTIONS"
+        :items="languageOptions"
         item-title="label"
-        item-value="code"
+        item-value="value"
         :label="t('creator.ui.wizard.fields.secondary_languages')"
         multiple
         chips

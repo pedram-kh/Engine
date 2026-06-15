@@ -12,7 +12,7 @@
  *   - default_language (optional, en/pt/it dropdown)
  */
 
-import type { CreateBrandPayload } from '@catalyst/api-client'
+import { euLanguageOptions, type CreateBrandPayload } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -124,11 +124,9 @@ const currencyOptions = [
   { title: 'JPY — Japanese Yen', value: 'JPY' },
 ]
 
-const languageOptions = [
-  { title: t('app.locale.en'), value: 'en' },
-  { title: t('app.locale.pt'), value: 'pt' },
-  { title: t('app.locale.it'), value: 'it' },
-]
+// Content-language options: all 24 EU languages, labelled by endonym
+// (the single registry in @catalyst/api-client).
+const languageOptions = euLanguageOptions()
 </script>
 
 <template>
@@ -204,7 +202,7 @@ const languageOptions = [
       :label="t('app.brands.fields.defaultLanguage')"
       :error-messages="defaultLanguageErrors as string[]"
       :items="languageOptions"
-      item-title="title"
+      item-title="label"
       item-value="value"
       clearable
       data-test="brand-default-language"

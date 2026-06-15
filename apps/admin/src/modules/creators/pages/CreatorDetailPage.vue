@@ -39,7 +39,7 @@
  * "Edit" + the field label; section headings remain `<h2>`s.
  */
 
-import { ApiError } from '@catalyst/api-client'
+import { ApiError, languageEndonym } from '@catalyst/api-client'
 import type {
   CreatorKycVerificationSummary,
   CreatorResource,
@@ -100,12 +100,12 @@ const categoryLabels = computed(() => {
 const primaryLanguageLabel = computed(() => {
   const lang = creator.value?.attributes.primary_language
   if (!lang) return null
-  return t(`languages.${lang}`, lang)
+  return languageEndonym(lang)
 })
 
 const secondaryLanguageLabels = computed(() => {
   const langs = creator.value?.attributes.secondary_languages ?? []
-  return langs.map((code) => t(`languages.${code}`, code))
+  return langs.map((code) => languageEndonym(code))
 })
 
 const socialAccountRows = computed(() => {

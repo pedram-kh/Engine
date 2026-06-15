@@ -6,6 +6,7 @@
  * Non-admin users see read-only fields with an informational note.
  */
 
+import { euLanguageOptions } from '@catalyst/api-client'
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
@@ -37,11 +38,8 @@ const currencyOptions = [
   { title: 'JPY — Japanese Yen', value: 'JPY' },
 ]
 
-const languageOptions = [
-  { title: t('app.locale.en'), value: 'en' },
-  { title: t('app.locale.pt'), value: 'pt' },
-  { title: t('app.locale.it'), value: 'it' },
-]
+// Content-language options: all 24 EU languages, labelled by endonym.
+const languageOptions = euLanguageOptions()
 
 async function loadSettings(): Promise<void> {
   const agencyId = currentAgencyId.value
@@ -142,7 +140,7 @@ onMounted(loadSettings)
           v-model="defaultLanguage"
           :label="t('app.settings.fields.defaultLanguage')"
           :items="languageOptions"
-          item-title="title"
+          item-title="label"
           item-value="value"
           :readonly="!isAdmin"
           :disabled="!isAdmin"

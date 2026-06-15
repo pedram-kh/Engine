@@ -134,15 +134,30 @@ it('settings update emits agency_settings.updated audit log', function (): void 
     ]);
 });
 
-it('validates default_language against supported locales', function (): void {
+it('rejects a non-EU default_language', function (): void {
     $agency = Agency::factory()->createOne();
     $admin = User::factory()->agencyAdmin($agency)->createOne();
 
+    // 'ja' (Japanese) is not one of the 24 EU content languages.
+    $this->actingAs($admin)
+        ->patchJson("/api/v1/agencies/{$agency->ulid}/settings", [
+            'default_language' => 'ja',
+        ])
+        ->assertEnvelopeValidationErrors(['default_language']);
+});
+
+it('accepts any of the 24 EU content languages as default_language', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    // 'fr' (French) is an EU content language that is not in UI_LOCALES —
+    // content-language fields validate against the full 24, not the
+    // rendered UI subset.
     $this->actingAs($admin)
         ->patchJson("/api/v1/agencies/{$agency->ulid}/settings", [
             'default_language' => 'fr',
         ])
-        ->assertEnvelopeValidationErrors(['default_language']);
+        ->assertOk();
 });
 
 it('validates default_currency must be 3 characters', function (): void {

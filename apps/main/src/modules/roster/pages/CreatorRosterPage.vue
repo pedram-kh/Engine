@@ -31,6 +31,7 @@ import type {
   RosterListParams,
   RosterRelationshipStatus,
 } from '@catalyst/api-client'
+import { euLanguageOptions, languageEndonym } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -77,11 +78,9 @@ const error = ref<string | null>(null)
 const tableOptions = ref({ page: 1, itemsPerPage: 25 })
 
 // Bounded filter option sets. Country reuses the shared launch-market
-// picker; language + category mirror the wizard's bounded vocabularies
-// (category labels reuse the canonical `creator.ui.wizard.categories.*`
-// keys so they stay translated in all three locales without duplication).
-const LANGUAGE_FILTER_CODES = ['en', 'pt', 'it', 'es', 'fr', 'de'] as const
-
+// picker; language draws from the shared 24-language EU registry (endonym
+// labels); category mirrors the wizard's bounded vocabulary (labels reuse
+// the canonical `creator.ui.wizard.categories.*` keys).
 const CATEGORY_FILTER_KEYS = [
   'fashion',
   'beauty',
@@ -118,10 +117,7 @@ const countryFilterItems = computed(() =>
 )
 
 const languageFilterItems = computed(() =>
-  LANGUAGE_FILTER_CODES.map((code) => ({
-    title: t(`app.roster.languages.${code}`),
-    value: code,
-  })),
+  euLanguageOptions().map((o) => ({ title: o.label, value: o.value })),
 )
 
 const categoryFilterItems = computed(() =>
@@ -197,9 +193,7 @@ function countryLabel(code: string | null): string {
 
 function languageLabel(code: string | null): string {
   if (code === null) return '—'
-  return (LANGUAGE_FILTER_CODES as readonly string[]).includes(code)
-    ? t(`app.roster.languages.${code}`)
-    : code
+  return languageEndonym(code)
 }
 
 // Semantic colour per application state — deliberately a different visual

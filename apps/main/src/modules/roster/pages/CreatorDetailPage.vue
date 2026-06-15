@@ -25,7 +25,7 @@ import type {
   CreatorPortfolioItemSummary,
   CreatorSocialAccountSummary,
 } from '@catalyst/api-client'
-import { ApiError } from '@catalyst/api-client'
+import { ApiError, languageEndonym } from '@catalyst/api-client'
 import {
   BlacklistBadge,
   CategoryChips,
@@ -54,8 +54,6 @@ const route = useRoute()
 const router = useRouter()
 const agencyStore = useAgencyStore()
 
-const LANGUAGE_CODES = ['en', 'pt', 'it', 'es', 'fr', 'de'] as const
-
 const detail = ref<AgencyCreatorDetailResource | null>(null)
 const loading = ref(false)
 const errorMessage = ref<string | null>(null)
@@ -81,9 +79,7 @@ const countryLabel = computed(() => {
 
 function languageLabel(code: string | null): string | null {
   if (code === null) return null
-  return (LANGUAGE_CODES as readonly string[]).includes(code)
-    ? t(`app.roster.languages.${code}`)
-    : code
+  return languageEndonym(code)
 }
 
 const primaryLanguageLabel = computed(() => languageLabel(creator.value?.primary_language ?? null))

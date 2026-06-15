@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Creators\Http\Requests;
 
+use App\Core\Enums\Locale;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -92,9 +93,9 @@ final class AdminUpdateCreatorRequest extends FormRequest
             'bio' => ['sometimes', 'nullable', 'string', 'max:5000'],
             'country_code' => ['sometimes', 'string', 'size:2'],
             'region' => ['sometimes', 'nullable', 'string', 'max:120'],
-            'primary_language' => ['sometimes', 'string', 'size:2'],
+            'primary_language' => ['sometimes', 'string', Rule::enum(Locale::class)],
             'secondary_languages' => ['sometimes', 'array'],
-            'secondary_languages.*' => ['string', 'size:2'],
+            'secondary_languages.*' => ['string', Rule::enum(Locale::class)],
             'categories' => ['sometimes', 'array', 'min:1', 'max:8'],
             'categories.*' => ['string', Rule::in(self::CATEGORY_ENUM)],
 

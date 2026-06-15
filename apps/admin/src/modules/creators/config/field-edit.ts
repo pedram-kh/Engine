@@ -17,15 +17,14 @@
  * (sub-step 9) walks the backend file and fails CI if those
  * constants drift apart.
  *
- * Country / language option curations mirror the wizard Step 2
- * source-of-truth list at
- * `apps/main/src/modules/onboarding/pages/Step2ProfileBasicsPage.vue`.
- * The wizard list is a curated subset — the backend accepts any
- * `size:2` string, so admins may legitimately need to set values
- * outside this curation. We surface both the curated picklist AND a
- * free-text fallback for those two select fields (Q-chunk-4-3 = (b)
- * spirit — backend is SOT; frontend tolerates broader input).
+ * Country options are a curated subset (backend still accepts any
+ * `size:2` country string), so the country select keeps a free-text
+ * fallback. Language options now come from the shared 24-language EU
+ * registry, which the backend `Locale` enum enforces exactly — so the
+ * language list is exhaustive and needs no free-text escape hatch.
  */
+
+import { euLanguageOptions } from '@catalyst/api-client'
 
 import type { AdminEditableField } from '../api/creators.api'
 
@@ -83,15 +82,13 @@ export const COUNTRY_OPTIONS: ReadonlyArray<{ value: string; label: string }> = 
   { value: 'CA', label: 'Canada' },
 ]
 
-/** Wizard-curated language list. */
-export const LANGUAGE_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
-  { value: 'en', label: 'English' },
-  { value: 'pt', label: 'Português' },
-  { value: 'it', label: 'Italiano' },
-  { value: 'es', label: 'Español' },
-  { value: 'fr', label: 'Français' },
-  { value: 'de', label: 'Deutsch' },
-]
+/**
+ * Content-language list — all 24 EU languages, labelled by endonym, from
+ * the shared `@catalyst/api-client` registry. The backend now validates
+ * content-language fields against the same 24-language `Locale` enum, so
+ * the list is exhaustive (no free-text fallback needed for languages).
+ */
+export const LANGUAGE_OPTIONS: ReadonlyArray<{ value: string; label: string }> = euLanguageOptions()
 
 /**
  * 16-category enum — must stay in sync with
@@ -157,7 +154,8 @@ export const FIELD_EDIT_CONFIG: Readonly<Record<AdminEditableField, EditFieldCon
       maxLength: 2,
       nullable: false,
       options: LANGUAGE_OPTIONS,
-      allowCustomCode: true,
+      // The 24-language list is exhaustive and backend-enforced.
+      allowCustomCode: false,
     },
     reasonRequired: false,
   },

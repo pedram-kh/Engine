@@ -1,3 +1,4 @@
+import { UI_LOCALES } from '@catalyst/api-client'
 import { createI18n } from 'vue-i18n'
 
 import { deepMergeLocale } from './deepMerge'
@@ -118,6 +119,8 @@ export const i18n = createI18n<[MessageSchema], 'en' | 'pt' | 'it'>({
   legacy: false,
   locale: 'en',
   fallbackLocale: 'en',
-  availableLocales: ['en', 'pt', 'it'],
+  // Rendered set derives from the shared UI_LOCALES registry (see main
+  // app i18n bootstrap). Today UI_LOCALES === ['en', 'pt', 'it'].
+  availableLocales: [...UI_LOCALES],
   messages,
 })

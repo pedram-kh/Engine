@@ -20,7 +20,7 @@ import type {
   DiscoveryCreatorListItem,
   DiscoveryListParams,
 } from '@catalyst/api-client'
-import { deriveConnectionState } from '@catalyst/api-client'
+import { deriveConnectionState, euLanguageOptions, languageEndonym } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -36,8 +36,8 @@ const router = useRouter()
 const agencyStore = useAgencyStore()
 
 // Bounded filter vocabularies — shared with the roster (Chunk 1): country reuses
-// the launch-market picker; language + category mirror the wizard vocabularies.
-const LANGUAGE_FILTER_CODES = ['en', 'pt', 'it', 'es', 'fr', 'de'] as const
+// the launch-market picker; language draws from the shared 24-language EU
+// registry (endonym labels); category mirrors the wizard vocabulary.
 const CATEGORY_FILTER_KEYS = [
   'fashion',
   'beauty',
@@ -74,7 +74,7 @@ const countryFilterItems = computed(() =>
   COUNTRY_OPTIONS.map((c) => ({ title: c.label, value: c.code })),
 )
 const languageFilterItems = computed(() =>
-  LANGUAGE_FILTER_CODES.map((code) => ({ title: t(`app.roster.languages.${code}`), value: code })),
+  euLanguageOptions().map((o) => ({ title: o.label, value: o.value })),
 )
 const categoryFilterItems = computed(() =>
   CATEGORY_FILTER_KEYS.map((key) => ({
@@ -98,9 +98,7 @@ function countryLabel(code: string | null): string {
 
 function languageLabel(code: string | null): string | null {
   if (code === null) return null
-  return (LANGUAGE_FILTER_CODES as readonly string[]).includes(code)
-    ? t(`app.roster.languages.${code}`)
-    : code
+  return languageEndonym(code)
 }
 
 function avatarInitial(name: string | null): string {

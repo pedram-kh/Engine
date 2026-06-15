@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Http\Requests;
 
+use App\Core\Enums\Locale;
 use App\Modules\Identity\Rules\PasswordIsNotBreached;
 use App\Modules\Identity\Rules\StrongPassword;
 use Illuminate\Foundation\Http\FormRequest;
@@ -59,7 +60,10 @@ final class SignUpRequest extends FormRequest
                 app(PasswordIsNotBreached::class),
             ],
             'password_confirmation' => ['required', 'string'],
-            'preferred_language' => ['sometimes', 'string', 'in:en,pt,it'],
+            // preferred_language is a UI locale: it must be one we actually
+            // render (UI_LOCALES), not just any EU language — a UI locale we
+            // can't render would silently fall back to en.
+            'preferred_language' => ['sometimes', 'string', Rule::in(Locale::UI_LOCALES)],
             // Sprint 5 Chunk C: browser-captured IANA timezone (auto-detected
             // at sign-up, no user-facing input). Deliberately permissive here —
             // a bad/absent tz must NEVER 422 the registration. The authoritative

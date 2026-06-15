@@ -37,13 +37,19 @@ export type UserType = 'creator' | 'agency_user' | 'brand_user' | 'platform_admi
  */
 export type ThemePreference = 'light' | 'dark' | 'system'
 
+import type { UiLocale } from '../locales'
+
 /**
- * The two-letter language code the user picked (or `null` if they have
- * not picked one yet). The accepted set is constrained to the locales
- * the SPA i18n bundle ships (`en | pt | it`); future locales must land
- * here AND in `apps/main/src/locales/` AND on the backend list.
+ * The two-letter UI-locale code the user picked (or `null` if they have
+ * not picked one yet). Constrained to {@link UiLocale} — the subset of
+ * EU languages the SPA actually renders (`UI_LOCALES`) — because a
+ * preferred UI language we cannot render would silently fall back to
+ * `en`. Widens automatically when `UI_LOCALES` flips to the full 24.
+ *
+ * NOTE: this is the UI-locale set, distinct from `EuLanguage` (all 24),
+ * which types CONTENT-language metadata.
  */
-export type PreferredLanguage = 'en' | 'pt' | 'it'
+export type PreferredLanguage = UiLocale
 
 /**
  * Three-letter ISO-4217 currency code (e.g. `'USD'`, `'EUR'`, `'BRL'`).

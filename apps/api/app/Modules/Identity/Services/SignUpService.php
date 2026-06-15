@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Services;
 
+use App\Core\Enums\Locale;
 use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Audit\Enums\AuditAction;
@@ -280,10 +281,11 @@ final class SignUpService
 
     private function normaliseLanguage(mixed $candidate): string
     {
-        $allowed = ['en', 'pt', 'it'];
+        // preferred_language is a UI locale: only the rendered subset is
+        // acceptable (a UI locale we can't render would fall back to en).
         $value = is_string($candidate) ? strtolower(trim($candidate)) : '';
 
-        return in_array($value, $allowed, true) ? $value : 'en';
+        return in_array($value, Locale::UI_LOCALES, true) ? $value : 'en';
     }
 
     /**

@@ -1,3 +1,4 @@
+import { UI_LOCALES } from '@catalyst/api-client'
 import { createI18n } from 'vue-i18n'
 
 import enApp from './locales/en/app.json'
@@ -110,6 +111,9 @@ export const i18n = createI18n<[MessageSchema], 'en' | 'pt' | 'it'>({
   legacy: false,
   locale: 'en',
   fallbackLocale: 'en',
-  availableLocales: ['en', 'pt', 'it'],
+  // The rendered set derives from the shared UI_LOCALES registry, so the
+  // switcher and validation stay in lockstep and the S8 flip to 24 is a
+  // single registry edit. Today UI_LOCALES === ['en', 'pt', 'it'].
+  availableLocales: [...UI_LOCALES],
   messages,
 })

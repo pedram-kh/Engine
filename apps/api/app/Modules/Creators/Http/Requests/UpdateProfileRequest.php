@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Creators\Http\Requests;
 
+use App\Core\Enums\Locale;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 /**
  * Validation for PATCH /api/v1/creators/me/wizard/profile.
@@ -33,9 +35,11 @@ final class UpdateProfileRequest extends FormRequest
             'bio' => ['sometimes', 'nullable', 'string', 'max:5000'],
             'country_code' => ['sometimes', 'string', 'size:2'],
             'region' => ['sometimes', 'nullable', 'string', 'max:120'],
-            'primary_language' => ['sometimes', 'string', 'size:2'],
+            // Content-language metadata: validated against the full 24 EU
+            // languages (speaker metadata is legitimately the full set).
+            'primary_language' => ['sometimes', 'string', Rule::enum(Locale::class)],
             'secondary_languages' => ['sometimes', 'array'],
-            'secondary_languages.*' => ['string', 'size:2'],
+            'secondary_languages.*' => ['string', Rule::enum(Locale::class)],
             'categories' => ['sometimes', 'array', 'min:1', 'max:8'],
             'categories.*' => [
                 'string',

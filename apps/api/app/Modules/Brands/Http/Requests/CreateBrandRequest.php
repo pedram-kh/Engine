@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Brands\Http\Requests;
 
+use App\Core\Enums\Locale;
 use App\Modules\Agencies\Models\Agency;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -31,7 +32,7 @@ final class CreateBrandRequest extends FormRequest
             'industry' => ['nullable', 'string', 'max:64'],
             'website_url' => ['nullable', 'string', 'url', 'max:2048'],
             'default_currency' => ['sometimes', 'string', 'size:3'],
-            'default_language' => ['sometimes', 'string', Rule::in(['en', 'pt', 'it'])],
+            'default_language' => ['sometimes', 'string', Rule::enum(Locale::class)],
             'brand_safety_rules' => ['nullable', 'array'],
             'client_portal_enabled' => ['sometimes', 'boolean'],
         ];

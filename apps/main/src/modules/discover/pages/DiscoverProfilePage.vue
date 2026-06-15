@@ -26,7 +26,7 @@ import type {
   CreatorPortfolioItemSummary,
   DiscoveryConnectionState,
 } from '@catalyst/api-client'
-import { ApiError, deriveConnectionState } from '@catalyst/api-client'
+import { ApiError, deriveConnectionState, languageEndonym } from '@catalyst/api-client'
 import {
   CategoryChips,
   CountryDisplay,
@@ -47,8 +47,6 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const agencyStore = useAgencyStore()
-
-const LANGUAGE_CODES = ['en', 'pt', 'it', 'es', 'fr', 'de'] as const
 
 const profile = ref<CreatorPublicProfile | null>(null)
 const loading = ref(false)
@@ -81,9 +79,7 @@ const countryLabel = computed(() => {
 
 function languageLabel(code: string | null): string | null {
   if (code === null) return null
-  return (LANGUAGE_CODES as readonly string[]).includes(code)
-    ? t(`app.roster.languages.${code}`)
-    : code
+  return languageEndonym(code)
 }
 
 const primaryLanguageLabel = computed(() => languageLabel(attrs.value?.primary_language ?? null))

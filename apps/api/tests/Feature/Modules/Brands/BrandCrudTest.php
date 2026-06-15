@@ -308,15 +308,28 @@ it('brand update emits brand.updated audit log', function (): void {
     $this->assertDatabaseHas('audit_logs', ['action' => AuditAction::BrandUpdated->value]);
 });
 
-it('update validates default_language against supported locales', function (): void {
+it('update rejects a non-EU default_language', function (): void {
     ['agency' => $agency, 'user' => $user] = makeAdmin();
     $brand = Brand::factory()->forAgency($agency->id)->createOne();
 
+    // 'ja' (Japanese) is not one of the 24 EU content languages.
+    $this->actingAs($user)
+        ->patchJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}", [
+            'default_language' => 'ja',
+        ])
+        ->assertUnprocessable();
+});
+
+it('update accepts any of the 24 EU content languages as default_language', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeAdmin();
+    $brand = Brand::factory()->forAgency($agency->id)->createOne();
+
+    // 'fr' is an EU content language outside the rendered UI subset.
     $this->actingAs($user)
         ->patchJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}", [
             'default_language' => 'fr',
         ])
-        ->assertUnprocessable();
+        ->assertOk();
 });
 
 // ---------------------------------------------------------------------------

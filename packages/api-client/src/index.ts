@@ -22,4 +22,14 @@ export {
   type HttpRequestOptions,
 } from './http'
 export { uploadToPresignedUrl } from './presigned'
+export {
+  EU_LANGUAGES,
+  UI_LOCALES,
+  LANGUAGE_ENDONYMS,
+  euLanguageOptions,
+  languageEndonym,
+  type EuLanguage,
+  type UiLocale,
+  type LanguageOption,
+} from './locales'
 export * from './types'
