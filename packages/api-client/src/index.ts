@@ -32,4 +32,12 @@ export {
   type UiLocale,
   type LanguageOption,
 } from './locales'
+export {
+  CATEGORY_ORDER,
+  PLURAL_CATEGORIES,
+  buildPluralRules,
+  pluralFormCount,
+  type PluralCategory,
+  type PluralRule,
+} from './plural-rules'
 export * from './types'

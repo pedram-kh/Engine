@@ -1,4 +1,4 @@
-import { UI_LOCALES } from '@catalyst/api-client'
+import { UI_LOCALES, buildPluralRules } from '@catalyst/api-client'
 import { createI18n } from 'vue-i18n'
 
 import { deepMergeLocale } from './deepMerge'
@@ -100,6 +100,11 @@ export const i18n = createI18n<[MessageSchema], 'en' | 'pt' | 'it', false>({
   // merged in lazily by `setLocale`. The cast satisfies the all-locales
   // message-schema generic without eagerly bundling the other locales.
   messages: { en: enMessages } as Record<'en' | 'pt' | 'it', MessageSchema>,
+  // CLDR cardinal pluralisation for all 24 EU languages (keys for the
+  // not-yet-rendered locales are inert until the S8 flip). Replaces
+  // vue-i18n's English-shaped default, which is wrong for the Slavic/
+  // Baltic/Celtic members of the set.
+  pluralRules: buildPluralRules(),
 })
 
 /** True once a non-`en` locale's messages have been merged into `i18n`. */
