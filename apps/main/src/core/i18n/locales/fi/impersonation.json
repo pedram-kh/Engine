@@ -1,0 +1,15 @@
+{
+  "impersonation": {
+    "claim": {
+      "in_progress": "Starting impersonation session…",
+      "missing_token": "Ei hand-off token was provided. Start the impersonation again from the admin panel.",
+      "invalid": "This impersonation hand-off is invalid, already used, or expired. Start it again from the admin panel.",
+      "failed": "We couldn't start the impersonation session. Please try again from the admin panel."
+    },
+    "banner": {
+      "message": "Ylläpitäjä support session — you are viewing this account as the user.",
+      "expires_in": "Expires in {time}",
+      "end": "End session"
+    }
+  }
+}

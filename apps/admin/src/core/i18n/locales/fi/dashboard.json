@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Kojelauta",
+      "load_failed": "We couldn't load the dashboard. Please refresh.",
+      "kpi": {
+        "agencies_total": "Agencies",
+        "agencies_suspended": "Suspended agencies",
+        "creators_pending_approval": "Odottaa approvals",
+        "creators_pending_kyc": "KYC queue",
+        "queue_pending": "Queued jobs",
+        "queue_failed": "Failed jobs",
+        "open_disputes": "Open disputes",
+        "failed_payments_today": "Failed payments today"
+      },
+      "activity": {
+        "heading": "Recent activity",
+        "empty": "Ei recent activity."
+      }
+    }
+  }
+}
