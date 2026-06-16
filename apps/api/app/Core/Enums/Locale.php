@@ -55,7 +55,7 @@ enum Locale: string
      * frontend `UI_LOCALES`. Flipped to every case (all 24) as the final
      * action of the generation pass.
      */
-    public const array UI_LOCALES = ['en', 'pt', 'it'];
+    public const array UI_LOCALES = ['bg', 'hr', 'cs', 'da', 'nl', 'en', 'et', 'fi', 'fr', 'de', 'el', 'hu', 'ga', 'it', 'lv', 'lt', 'mt', 'pl', 'pt', 'ro', 'sk', 'sl', 'es', 'sv'];
 
     /**
      * Every language code (all 24) — for validating content-language

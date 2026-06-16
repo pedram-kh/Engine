@@ -64,7 +64,7 @@ export type EuLanguage = (typeof EU_LANGUAGES)[number]
  * {@link EU_LANGUAGES} set as the last action of the generation pass.
  * Kept in lockstep with the backend `Locale::UI_LOCALES` constant.
  */
-export const UI_LOCALES = ['en', 'pt', 'it'] as const
+export const UI_LOCALES = EU_LANGUAGES
 
 /** A UI locale code we currently render. */
 export type UiLocale = (typeof UI_LOCALES)[number]
