@@ -1,0 +1,84 @@
+{
+  "availability": {
+    "title": "Disponibilità",
+    "subtitle": "Block out the times you're unavailable so agencies see your real calendar.",
+    "allDay": "Kollox day",
+    "moreCount": "+{count} more",
+    "dayPopover": {
+      "title": "Blocks this day",
+      "viewAll": "Show all blocks for this day"
+    },
+    "creatorNav": {
+      "dashboard": "Dashboard",
+      "assignments": "Stedinas",
+      "availability": "Disponibilità"
+    },
+    "nav": {
+      "prevMonth": "Preċedenti month",
+      "nextMonth": "Li jmiss month"
+    },
+    "actions": {
+      "add": "Żid block"
+    },
+    "empty": {
+      "heading": "Le availability blocks yet",
+      "body": "Żid a block to mark when you're away or unavailable."
+    },
+    "errors": {
+      "loadFailed": "We couldn't load your availability. Please try again."
+    },
+    "blockType": {
+      "hard": "Unavailable (hard)",
+      "soft": "Preference (soft)"
+    },
+    "kind": {
+      "vacation": "Vacation",
+      "personal": "Personal",
+      "exclusive_contract": "Exclusive contract",
+      "assignment_auto": "From campaign",
+      "other": "Other"
+    },
+    "weekday": {
+      "MO": "Mon",
+      "TU": "Tue",
+      "WE": "Wed",
+      "TH": "Thu",
+      "FR": "Fri",
+      "SA": "Sat",
+      "SU": "Sun"
+    },
+    "dialog": {
+      "createTitle": "Żid availability block",
+      "editTitle": "Editja availability block",
+      "seriesNotice": "This is a repeating block — changes apply to all of its occurrences, not just this day.",
+      "blockTypeHint": "Hard blocks exclude you entirely; soft blocks are a preference only.",
+      "fields": {
+        "allDay": "Kollox day",
+        "startDate": "Start date",
+        "startTime": "Start time",
+        "endDate": "End date",
+        "endTime": "End time",
+        "blockType": "Type",
+        "kind": "Reason",
+        "reason": "Lete (optional)",
+        "recurring": "Repeats weekly"
+      },
+      "recurrence": {
+        "interval": "Repeat every (weeks)",
+        "weekdays": "On these days",
+        "hasEnd": "Set an end date",
+        "endsOn": "Ends on"
+      },
+      "actions": {
+        "save": "Issejvja",
+        "cancel": "Ikkanċella",
+        "delete": "Ħassar",
+        "confirmDelete": "Ikkonferma delete"
+      },
+      "errors": {
+        "saveFailed": "We couldn't save the block. Please try again.",
+        "deleteFailed": "We couldn't delete the block. Please try again."
+      }
+    }
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "admin": {
+    "creators": {
+      "list": {
+        "title": "Kreatur review queue",
+        "unnamed": "Unnamed creator",
+        "view": "Ara creator",
+        "load_failed": "We couldn't load the review queue. Please refresh.",
+        "fields": {
+          "name": "Kreatur",
+          "email": "Email",
+          "status": "Status",
+          "kyc": "KYC",
+          "completeness": "Completeness",
+          "submitted_at": "Ibgħatted"
+        },
+        "filters": {
+          "pending": "Pendenti",
+          "approved": "Approvad",
+          "rejected": "Irrifjutaed",
+          "incomplete": "Incomplete",
+          "all": "Kollox"
+        },
+        "status_labels": {
+          "incomplete": "Incomplete",
+          "pending": "Pendenti",
+          "approved": "Approvad",
+          "rejected": "Irrifjutaed"
+        }
+      },
+      "kyc": {
+        "title": "KYC review queue",
+        "empty": "Le creators match this KYC filter.",
+        "load_failed": "We couldn't load the KYC queue. Please refresh.",
+        "filters": {
+          "pending": "Pendenti",
+          "verified": "Verified",
+          "rejected": "Irrifjutaed",
+          "none": "Let started",
+          "all": "Kollox"
+        }
+      },
+      "all": {
+        "title": "Kollox creators",
+        "empty": "Le creators yet.",
+        "load_failed": "We couldn't load creators. Please refresh."
+      },
+      "detail": {
+        "fallback_title": "Kreatur",
+        "application_status": "Application status: {status}",
+        "completeness": "{percent}% complete",
+        "rejection_heading": "Irrifjutaion notes",
+        "profile_heading": "Profil",
+        "social_heading": "Social accounts",
+        "portfolio_heading": "Portfolio",
+        "onboarding_heading": "Onboarding status",
+        "kyc_history_heading": "KYC verification history",
+        "kyc_history": {
+          "provider": "Provider",
+          "status": "Status",
+          "started_at": "Started at",
+          "completed_at": "Lest at"
+        },
+        "assignments_heading": "Kampanja history",
+        "assignments": {
+          "empty": "This creator has no campaign assignments yet.",
+          "load_failed": "We couldn't load the campaign history.",
+          "campaign": "Kampanja",
+          "brand": "Brand",
+          "agency": "Aġenzija",
+          "status": "Status",
+          "created_at": "Started"
+        },
+        "audit_heading": "Awditu history",
+        "audit": {
+          "empty": "Le audit entries for this creator yet.",
+          "load_failed": "We couldn't load the audit history.",
+          "action": "Action",
+          "actor": "Actor",
+          "reason": "Reason",
+          "created_at": "When"
+        },
+        "payments_heading": "Ħlas history",
+        "payments_coming_soon": "Ħlas history lights up when payment processing ships (Sprint 10).",
+        "load_failed": "We couldn't load this creator. Please refresh.",
+        "fields": {
+          "display_name": "Display name",
+          "bio": "Bio",
+          "country_code": "Country",
+          "region": "Region",
+          "primary_language": "Primary language",
+          "secondary_languages": "Secondary languages",
+          "categories": "Categories"
+        },
+        "edit": {
+          "title": "Editja {field}",
+          "save": "Issejvja l-bidliet",
+          "cancel": "Ikkanċella",
+          "reason_label": "Reason for change",
+          "reason_hint": "Meħtieġ for sensitive fields. Recorded in the audit log.",
+          "custom_code_hint": "Pick a value or type a 2-letter ISO code.",
+          "button_aria_label": "Editja {field}",
+          "save_failed": "We couldn't save this change. Please try again.",
+          "saved": "{field} updated."
+        },
+        "errors": {
+          "field_status_immutable": "Status transitions use the approve / reject actions, not the field edit."
+        },
+        "approve": {
+          "button": "Approva application",
+          "title": "Approva {name}'s application",
+          "description": "This will mark the creator as approved and grant production access. The action is recorded in the audit log.",
+          "welcome_label": "Merħba message (optional)",
+          "welcome_hint": "Surfaced on the creator's dashboard the next time they sign in.",
+          "confirm": "Approva",
+          "cancel": "Ikkanċella",
+          "success": "Kreatur approved.",
+          "failed": "We couldn't approve this creator. Please try again."
+        },
+        "reject": {
+          "button": "Irrifjuta application",
+          "title": "Irrifjuta {name}'s application",
+          "description": "The creator will see the reason on their dashboard the next time they sign in.",
+          "reason_label": "Irrifjutaion reason",
+          "min_hint": "Meħtieġ, at least {count} characters.",
+          "confirm": "Irrifjuta",
+          "cancel": "Ikkanċella",
+          "success": "Kreatur rejected.",
+          "failed": "We couldn't reject this creator. Please try again."
+        },
+        "identity": {
+          "heading": "Identity verification",
+          "status": "Status: {status}",
+          "verify_manual": "Verify manually",
+          "verify_vendor": "Request vendor verification",
+          "vendor_disabled_tooltip": "Le KYC provider configured",
+          "method_labels": {
+            "vendor": "Verified by vendor",
+            "manual": "Verified manually by an admin"
+          }
+        },
+        "verify": {
+          "title": "Manually verify {name}'s identity",
+          "description": "This permanently marks the creator's identity as verified and is recorded against your account in the audit log. Use only when you've confirmed identity out-of-band.",
+          "note_label": "Lete (optional)",
+          "note_hint": "Recorded in the audit log alongside your name.",
+          "confirm": "Verify identity",
+          "cancel": "Ikkanċella",
+          "success": "Identity verified.",
+          "failed": "We couldn't verify this creator's identity. Please try again."
+        }
+      }
+    }
+  },
+  "creator": {
+    "already_approved": "This creator has already been approved.",
+    "already_rejected": "This creator has already been rejected.",
+    "kyc_not_verified": "Approva is blocked until the creator's identity is verified.",
+    "kyc_already_verified": "This creator's identity has already been verified.",
+    "admin": {
+      "field_status_immutable": "Status transitions use the approve / reject actions, not the field edit."
+    },
+    "ui": {
+      "wizard": {
+        "steps": {
+          "kyc": {
+            "name": "Identity verification",
+            "status_labels": {
+              "none": "Let started",
+              "pending": "In progress",
+              "verified": "Verified",
+              "rejected": "Irrifjutaed",
+              "not_required": "Let required"
+            }
+          },
+          "tax": {
+            "name": "Tax information",
+            "status_complete": "Ibgħatted",
+            "status_incomplete": "Let yet submitted"
+          },
+          "payout": {
+            "name": "Payout method",
+            "status_set": "Connected",
+            "status_unset": "Let connected"
+          },
+          "contract": {
+            "name": "Master agreement",
+            "status_labels": {
+              "signed": "Signed",
+              "click_through_accepted": "Aċċettaed",
+              "none": "Let started"
+            }
+          },
+          "portfolio": {
+            "gallery_empty": "Le portfolio oġġetti uploaded yet.",
+            "video_badge_label": "Video",
+            "link_badge_label": "External link",
+            "untitled_item": "Untitled portfolio item"
+          }
+        },
+        "categories": {
+          "fashion": "Fashion",
+          "beauty": "Beauty",
+          "lifestyle": "Lifestyle",
+          "fitness": "Fitness",
+          "travel": "Travel",
+          "food": "Food",
+          "tech": "Technology",
+          "gaming": "Gaming",
+          "music": "Music",
+          "comedy": "Comedy",
+          "education": "Education",
+          "parenting": "Parenting",
+          "business": "Business",
+          "art": "Art",
+          "sports": "Sports",
+          "other": "Other"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Coming soon"
+        }
+      }
+    }
+  }
+}

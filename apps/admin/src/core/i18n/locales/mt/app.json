@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Amministratur",
+    "subtitle": "Super-admin console.",
+    "sprint0Notice": "Sprint 0 scaffolding — admin SPA",
+    "dashboardPlaceholder": "Amministratur dashboard placeholder — full surface lands in a later sprint.",
+    "env": {
+      "local": "Local",
+      "staging": "Staging",
+      "production": "Production — all actions logged"
+    },
+    "nav": {
+      "comingSoon": "Soon",
+      "dashboard": "Dashboard",
+      "agencies": "Agencies",
+      "creators": "Kreaturs",
+      "creatorApprovals": "Pendenti approvals",
+      "kycQueue": "KYC queue",
+      "allCreators": "Kollox creators",
+      "payments": "Ħlass",
+      "disputes": "Disputes",
+      "recentPayments": "Recent",
+      "audit": "Log tal-awditu",
+      "alerts": "Operational alerts",
+      "support": "Appoġġ",
+      "userSearch": "User search",
+      "impersonationLog": "Impersonament log",
+      "operations": "Operazzjonijiet",
+      "systemHealth": "System health",
+      "horizon": "Luraground jobs …",
+      "compliance": "Konformità",
+      "exportRequests": "Export requests",
+      "erasureQueue": "Erasure queue",
+      "featureFlags": "Bnadar tal-karatteristiċi"
+    },
+    "userMenu": {
+      "signOut": "Oħroġ",
+      "signingOut": "Signing out…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Coming soon",
+      "body": "This surface lights up when payment processing ships (Sprint 10).",
+      "disputes": "Disputes",
+      "recentPayments": "Recent payments"
+    },
+    "sectionStub": {
+      "body": "This admin surface is being built this sprint."
+    },
+    "locale": {
+      "switcher": "Lingwa",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    }
+  }
+}

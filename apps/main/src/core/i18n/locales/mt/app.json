@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Influencer marketing, run like a real business.",
+    "sprint0Notice": "Sprint 0 scaffolding — main platform SPA",
+    "locale": {
+      "switcher": "Lingwa",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    },
+    "messaging": {
+      "title": "Messaġġi",
+      "you": "You",
+      "participant": "Participant",
+      "composePlaceholder": "Write a message…",
+      "send": "Ibgħat",
+      "attachment": "Attachment",
+      "empty": "Le messages yet. Start the conversation.",
+      "loadEarlier": "Load earlier messages",
+      "loadError": "We couldn't load this conversation. It will retry shortly.",
+      "sendError": "Your message couldn't be sent. Please try again.",
+      "attachmentUploadError": "An attachment failed to upload. Please try again.",
+      "closed": "This conversation is closed — the assignment is no longer active.",
+      "systemFallback": "The assignment was updated.",
+      "system": {
+        "assignment": {
+          "contracted": "The contract was signed — production can begin.",
+          "draft_submitted": "A draft was submitted for review.",
+          "draft_approved": "The draft was approved.",
+          "revision_requested": "Revisions were requested on the draft.",
+          "draft_rejected": "The draft was rejected.",
+          "posted_by_creator": "The creator marked the content as posted.",
+          "live_verified": "The live post was verified.",
+          "manually_verified": "The post was manually verified.",
+          "resubmit_requested": "A resubmission was requested.",
+          "payment_released": "Ħlas was released."
+        }
+      },
+      "rollup": {
+        "empty": "Le message threads yet for this campaign.",
+        "noMessages": "Le messages yet.",
+        "loadError": "We couldn't load the message threads."
+      }
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "roster": "My creators",
+      "discover": "Discover",
+      "pools": "Talent pools",
+      "brands": "Brands",
+      "campaigns": "Kampanjas",
+      "agencyUsers": "Team",
+      "settings": "Settings"
+    },
+    "discover": {
+      "title": "Discover creators",
+      "subtitle": "Browse and search the global creator pool.",
+      "unnamed": "Unnamed creator",
+      "notConnected": "Let connected",
+      "search": {
+        "label": "Fittex creators",
+        "placeholder": "Fittex by name or bio"
+      },
+      "filters": {
+        "country": "Country",
+        "language": "Lingwa",
+        "category": "Category"
+      },
+      "connection": {
+        "connected": "Connected",
+        "pending": "Request pending",
+        "declined": "Irrifjutad",
+        "notConnected": "Let connected",
+        "sendRequest": "Ibgħat request",
+        "requestAgain": "Request again",
+        "sent": "Request sent",
+        "reRequested": "Request sent again",
+        "alreadyPending": "A request is already pending",
+        "alreadyConnected": "This creator is already on your roster",
+        "error": "Couldn't send the request. Please try again."
+      },
+      "empty": {
+        "heading": "Le creators yet",
+        "body": "Approvad creators will appear here as the pool grows."
+      },
+      "emptyFiltered": {
+        "heading": "Le matches",
+        "body": "Le creators match your filters. Try broadening your search."
+      },
+      "errors": {
+        "loadFailed": "Couldn't load creators. Please try again."
+      },
+      "detail": {
+        "back": "Lura to Discover",
+        "notFound": "This creator isn't available.",
+        "loadFailed": "Couldn't load this profile. Please try again.",
+        "viewInRoster": "Ara in roster",
+        "sections": {
+          "profile": "Profil",
+          "social": "Social accounts",
+          "portfolio": "Portfolio"
+        },
+        "social": {
+          "empty": "Le social accounts linked."
+        },
+        "portfolio": {
+          "empty": "Le portfolio oġġetti yet.",
+          "untitled": "Untitled item"
+        }
+      }
+    },
+    "roster": {
+      "title": "My creators",
+      "unnamed": "Unnamed creator",
+      "blacklisted": "Blacklisted",
+      "blacklist": {
+        "badge": {
+          "hard": "Blacklisted",
+          "soft": "Blacklist warning"
+        },
+        "openAction": "Blacklist creator",
+        "liftAction": "Remove blacklist",
+        "lifted": "Blacklist removed.",
+        "liftFailed": "Failed to remove the blacklist.",
+        "section": {
+          "title": "Blacklist",
+          "none": "This creator is not blacklisted by your agency."
+        },
+        "status": {
+          "hard": "Hard blacklisted — excluded from your discovery and blocked from connection requests.",
+          "soft": "Soft blacklisted — a warning only; the creator stays matchable."
+        },
+        "dialog": {
+          "title": "Blacklist creator",
+          "scopeLabel": "Scope",
+          "scope": {
+            "agency": "Entire agency",
+            "brand": "A specific brand"
+          },
+          "noRelationHint": "Aġenzija-wide blacklisting requires a connected creator.",
+          "brandLabel": "Brand",
+          "typeLabel": "Type",
+          "type": {
+            "hard": "Hard — exclude from discovery and block requests",
+            "soft": "Soft — warn only, keep matchable"
+          },
+          "reasonLabel": "Reason",
+          "reasonPlaceholder": "Why is this creator being blacklisted? (kept private to your agency)",
+          "cancel": "Ikkanċella",
+          "confirm": "Blacklist",
+          "success": "Kreatur blacklisted.",
+          "invalid": "Please complete the required fields.",
+          "failed": "Failed to blacklist the creator."
+        }
+      },
+      "fields": {
+        "name": "Name",
+        "email": "Email",
+        "status": "Status",
+        "applicationStatus": "Application",
+        "country": "Country",
+        "language": "Lingwa",
+        "categories": "Categories",
+        "rating": "Rating",
+        "campaigns": "Kampanjas"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Prospect",
+        "external": "External",
+        "pending_request": "Pendenti request",
+        "declined": "Irrifjutad"
+      },
+      "applicationStatus": {
+        "incomplete": "Incomplete",
+        "pending": "Pendenti",
+        "approved": "Approvad",
+        "rejected": "Irrifjutaed"
+      },
+      "search": {
+        "label": "Fittex creators",
+        "placeholder": "Fittex by name or bio"
+      },
+      "filters": {
+        "status": {
+          "all": "Kollox",
+          "roster": "Roster",
+          "prospect": "Prospect",
+          "external": "External",
+          "pending_request": "Pendenti requests",
+          "declined": "Irrifjutad"
+        },
+        "country": "Country",
+        "language": "Lingwa",
+        "category": "Category",
+        "availability": {
+          "from": "Available from",
+          "to": "Available to"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Followers"
+        },
+        "engagement": {
+          "label": "Engagement rate"
+        },
+        "metrics": {
+          "tooltip": "Social metrics aren't connected yet."
+        }
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Le creators yet",
+        "body": "Kreaturs you invite or engage will appear here across your roster, prospects, and external collaborators."
+      },
+      "emptyFiltered": {
+        "heading": "Le creators match these filters",
+        "body": "Try clearing or changing a filter to see more of your creators."
+      },
+      "errors": {
+        "loadFailed": "Failed to load your creators. Please try again."
+      },
+      "detail": {
+        "back": "Lura to my creators",
+        "unnamed": "Unnamed creator",
+        "loadFailed": "We couldn't load this creator. Please try again.",
+        "notFound": "This creator isn't in your roster.",
+        "sections": {
+          "profile": "Profil",
+          "rating": "Rating & notes",
+          "social": "Social accounts",
+          "metrics": "Social metrics",
+          "portfolio": "Portfolio",
+          "availability": "Disponibilità",
+          "campaigns": "Kampanja history"
+        },
+        "editor": {
+          "starLabel": "Rate {n} of 5",
+          "ratingUnset": "Let rated",
+          "notesLabel": "Internal notes",
+          "notesPlaceholder": "Private notes about working with this creator (visible to your agency only).",
+          "notesEmpty": "Le notes yet.",
+          "save": "Issejvja",
+          "saved": "Changes saved.",
+          "saveFailed": "We couldn't save your changes. Please try again."
+        },
+        "social": {
+          "empty": "Le social accounts connected."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Social metrics will appear once accounts are connected",
+            "body": "Follower counts and engagement rates aren't available yet — they'll show here when the social integrations land."
+          }
+        },
+        "portfolio": {
+          "empty": "Le portfolio oġġetti yet.",
+          "untitled": "Untitled portfolio item"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Le availability blocks in this period",
+            "body": "This creator hasn't marked any unavailable time for the dates shown."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Le campaign history yet",
+            "body": "Kampanjas you run with this creator will appear here."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Oħroġ",
+      "signingOut": "Signing out…"
+    },
+    "workspaceSwitcher": {
+      "label": "Switch workspace",
+      "placeholder": "Select workspace"
+    },
+    "brands": {
+      "title": "Brands",
+      "actions": {
+        "create": "New brand",
+        "edit": "Editja",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Issejvja brand",
+        "saving": "Saving…",
+        "backToList": "Lura to brands",
+        "backToDetail": "Lura to brand"
+      },
+      "fields": {
+        "name": "Brand name",
+        "slug": "Slug",
+        "description": "Description",
+        "industry": "Industry",
+        "websiteUrl": "Website URL",
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "status": "Status"
+      },
+      "status": {
+        "active": "Attiv",
+        "archived": "Arkivjat",
+        "all": "Kollox"
+      },
+      "detail": {
+        "title": "Brand details"
+      },
+      "create": {
+        "title": "New brand",
+        "success": "Brand created successfully."
+      },
+      "edit": {
+        "title": "Editja brand",
+        "success": "Brand updated successfully."
+      },
+      "archive": {
+        "confirmTitle": "Archive brand",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later.",
+        "confirm": "Archive",
+        "cancel": "Ikkanċella",
+        "success": "Brand archived."
+      },
+      "restore": {
+        "confirmTitle": "Restore brand",
+        "confirmMessage": "Restore {name}? It will appear in the active brand list again.",
+        "confirm": "Restore",
+        "cancel": "Ikkanċella",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Le brands yet",
+        "body": "Oħloq your first brand to start managing influencer campaigns.",
+        "cta": "Oħloq brand"
+      },
+      "emptyFiltered": {
+        "heading": "Le brands match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "loading": "Qiegħed jillowdja brands…",
+      "errors": {
+        "loadFailed": "Failed to load brands.",
+        "saveFailed": "Failed to save brand.",
+        "archiveFailed": "Failed to archive brand.",
+        "restoreFailed": "Failed to restore brand."
+      }
+    },
+    "campaigns": {
+      "title": "Kampanjas",
+      "actions": {
+        "create": "New campaign",
+        "save": "Oħloq campaign",
+        "saveSettings": "Issejvja settings",
+        "backToList": "Lura to campaigns"
+      },
+      "fields": {
+        "name": "Kampanja name",
+        "brand": "Brand",
+        "objective": "Objective",
+        "description": "Description",
+        "budget": "Budget",
+        "currency": "Munita",
+        "startsAt": "Start date",
+        "endsAt": "End date",
+        "targetCreatorCount": "Target creator count",
+        "deliverables": "Deliverables",
+        "deliverablesHint": "One deliverable per line (e.g. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Space or comma separated.",
+        "usageRights": "Usage rights",
+        "requiresContract": "Require a per-campaign contract",
+        "status": "Status"
+      },
+      "objective": {
+        "awareness": "Awareness",
+        "engagement": "Engagement",
+        "conversion": "Conversion",
+        "ugc": "UGC",
+        "launch": "Launch"
+      },
+      "status": {
+        "all": "Kollox",
+        "draft": "Abbozz",
+        "active": "Attiv",
+        "paused": "Paused",
+        "completed": "Lest",
+        "cancelled": "Ikkanċellaled"
+      },
+      "filters": {
+        "brand": "Brand",
+        "startsFrom": "Starts from",
+        "startsTo": "Starts to"
+      },
+      "tabs": {
+        "overview": "Ħarsa ġenerali",
+        "creators": "Kreaturs",
+        "board": "Board",
+        "drafts": "Abbozzs",
+        "payments": "Ħlass",
+        "messages": "Messaġġi",
+        "settings": "Settings"
+      },
+      "create": {
+        "title": "New campaign"
+      },
+      "detail": {
+        "title": "Kampanja details"
+      },
+      "settings": {
+        "saved": "Kampanja settings saved."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Le creators yet",
+          "body": "Stedina creators to this campaign to get started."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Kollox drafts"
+        },
+        "empty": {
+          "heading": "Le drafts yet",
+          "body": "Kreatur draft submissions will appear here once submitted."
+        },
+        "loadFailed": "We couldn't load drafts. Please try again.",
+        "submittedAt": "Ibgħatted {date}"
+      },
+      "fees": {
+        "offered": "Offered",
+        "countered": "Countered"
+      },
+      "reinvite": {
+        "action": "Re-invite",
+        "title": "Re-invite creator",
+        "body": "They countered with {fee}. Re-offer at:",
+        "feeLabel": "New agreed fee ({currency})",
+        "cancel": "Ikkanċella",
+        "submit": "Re-invite",
+        "success": "Re-invitation sent."
+      },
+      "contract": {
+        "attach": {
+          "action": "Issue contract",
+          "title": "Issue contract",
+          "body": "Attach contract terms for the creator to review and accept before they can submit a draft.",
+          "titleLabel": "Kuntratt title",
+          "termsLabel": "Terms (markdown)",
+          "termsHint": "Provide inline terms and/or upload a PDF below.",
+          "pdfLabel": "Kuntratt PDF (optional)",
+          "pdfReady": "PDF ready: {name}",
+          "cancel": "Ikkanċella",
+          "submit": "Issue contract",
+          "success": "Kuntratt issued. The creator has been notified.",
+          "alreadyAttached": "A contract is already awaiting this creator's acceptance.",
+          "error": "We couldn't issue the contract. Please try again."
+        },
+        "pending": "Kuntratt sent — awaiting creator",
+        "proceedWithout": {
+          "action": "Proceed without contract",
+          "success": "Assenjament advanced without a contract.",
+          "requiredError": "This campaign requires a per-campaign contract; issue one for the creator to accept.",
+          "error": "We couldn't advance this assignment. Please try again."
+        }
+      },
+      "invite": {
+        "open": "Stedina creators",
+        "title": "Stedina creators",
+        "loadFailed": "We couldn't load your roster. Please try again.",
+        "feeLabel": "Agreed fee ({currency})",
+        "search": "Fittex creators",
+        "noRoster": "Le roster creators to invite yet.",
+        "noSearchMatch": "Le creators match your search.",
+        "unnamed": "Unnamed creator",
+        "blockedHint": "Blacklisted — can't be invited.",
+        "cancel": "Ikkanċella",
+        "submit": "Stedina ({count})",
+        "summary": "Stedinad {ok}. Skipped {blacklisted} (blacklisted), {conflicts} with conflicts.",
+        "conflict": {
+          "title": "Disponibilità conflict",
+          "body": "{count} selected creator(s) are unavailable during the campaign window. Stedina them anyway?",
+          "cancel": "Skip them",
+          "proceed": "Stedina anyway"
+        }
+      },
+      "board": {
+        "loadError": "We couldn't load the board. Please try again.",
+        "empty": "This board has no columns yet.",
+        "moveFailed": "Couldn't move the card — it's back where it was.",
+        "reorderFailed": "Couldn't reorder the columns — the order was restored.",
+        "automationsButton": "Automations",
+        "card": {
+          "unnamed": "Unnamed creator",
+          "removed": "Removed assignment",
+          "daysLeft": "{n}d left",
+          "dueToday": "Due today",
+          "overdue": "Overdue"
+        },
+        "column": {
+          "add": "Żid column",
+          "edit": "Rename / recolor",
+          "delete": "Ħassar column",
+          "addTitle": "Żid column",
+          "editTitle": "Editja column",
+          "name": "Column name",
+          "color": "Color",
+          "terminalSuccess": "Mark as success (terminal)",
+          "terminalFailure": "Mark as failure (terminal)",
+          "save": "Issejvja",
+          "cancel": "Ikkanċella",
+          "saveFailed": "We couldn't save the column. Please try again.",
+          "deleteTitle": "Ħassar column",
+          "deleteBody": "Ħassar \"{name}\"? This can't be undone.",
+          "deleteBodyNonEmpty": "\"{name}\" has {count} card(s). Choose where to move them before deleting.",
+          "deleteDestination": "Move cards to",
+          "deleteConfirm": "Ħassar",
+          "errorLastColumn": "A board must keep at least one column.",
+          "errorDestinationRequired": "This column has cards — choose a destination column to move them to before deleting.",
+          "errorGeneric": "We couldn't delete the column. Please try again."
+        },
+        "automation": {
+          "title": "Automations",
+          "subtitle": "Each event can move a card to a column automatically. Manual drags never trigger these.",
+          "event": "Event",
+          "target": "Moves card to",
+          "none": "Le automation",
+          "enabled": "Enabled",
+          "broken": "Target column was deleted — pick a new one",
+          "updateFailed": "We couldn't update the automation. Please try again.",
+          "close": "Agħlaq"
+        },
+        "drawer": {
+          "title": "Assenjament",
+          "close": "Agħlaq",
+          "loadError": "We couldn't load this assignment. Please try again.",
+          "tabs": {
+            "detail": "Detail",
+            "history": "Movement history"
+          },
+          "detail": {
+            "status": "Status",
+            "creator": "Kreatur",
+            "postingDue": "Posting due",
+            "deliverables": "Deliverables",
+            "latestDraft": "Latest draft",
+            "postedContent": "Posted content",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Le movements recorded yet.",
+            "removed": "(removed)",
+            "manual": "Manual move",
+            "auto": "Automation",
+            "from": "from",
+            "to": "to"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Ħlass coming soon",
+          "body": "Escrow funding and payouts will be managed here."
+        },
+        "messages": {
+          "heading": "Messaġġi coming soon",
+          "body": "Kampanja messaging will appear here."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Stedinad",
+        "declined": "Irrifjutad",
+        "countered": "Countered",
+        "accepted": "Aċċettaed",
+        "contracted": "Kuntratted",
+        "producing": "Producing",
+        "draft_submitted": "Abbozz submitted",
+        "revision_requested": "Revision requested",
+        "approved": "Approvad",
+        "rejected": "Irrifjutaed",
+        "posted": "Posted",
+        "live_verified": "Live verified",
+        "manually_verified": "Manually verified",
+        "payment_held": "Ħlas held",
+        "payment_released": "Ħlas released",
+        "cancelled": "Ikkanċellaled"
+      },
+      "review": {
+        "action": "Review",
+        "title": "Review draft",
+        "loadFailed": "We couldn't load this draft. Please try again.",
+        "draftVersion": "Abbozz v{n}",
+        "noCaption": "Le caption provided.",
+        "hashtags": "Hashtags",
+        "mentions": "Mentions",
+        "noMedia": "Le media attached.",
+        "feedbackLabel": "Feedback to the creator",
+        "feedbackHint": "Meħtieġ when requesting changes or rejecting.",
+        "approve": "Approva",
+        "requestRevision": "Request changes",
+        "reject": "Irrifjuta",
+        "close": "Agħlaq",
+        "history": "Version history",
+        "postedContent": "Posted content",
+        "draftStatus": {
+          "pending": "Pendenti review",
+          "approved": "Approvad",
+          "rejected": "Irrifjutaed",
+          "revision_requested": "Revision requested"
+        },
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Let found",
+          "mismatch": "Mismatch"
+        },
+        "simulated": "Simulated verification (mock provider)",
+        "toast": {
+          "approved": "Abbozz approved.",
+          "revisionRequested": "Revision requested.",
+          "rejected": "Abbozz rejected.",
+          "error": "Something went wrong. Please try again."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Open preview",
+          "close": "Agħlaq",
+          "empty": "Le media attached."
+        }
+      },
+      "resolution": {
+        "action": "Resolve",
+        "title": "Resolve verification",
+        "loadFailed": "We couldn't load this assignment. Please try again.",
+        "postedContent": "Ibgħatted post",
+        "simulated": "Simulated verification (mock provider)",
+        "intro": "Automatic verification of this post failed. Aċċetta it manually, send it back for a fresh post, or ask the creator to fix the link in place.",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Let found",
+          "mismatch": "Mismatch"
+        },
+        "noteLabel": "Reason / note to the creator",
+        "noteHint": "Meħtieġ when verifying manually; optional for resubmit requests.",
+        "manuallyVerify": "Verify manually",
+        "requestFresh": "Request fresh post",
+        "requestInPlace": "Ask to fix link",
+        "close": "Agħlaq",
+        "notActionable": "This assignment is no longer awaiting resolution.",
+        "toast": {
+          "verified": "Post manually verified.",
+          "resubmitFresh": "Sent back for a fresh post.",
+          "resubmitInPlace": "Asked the creator to fix the link.",
+          "error": "Something went wrong. Please try again."
+        }
+      },
+      "viewPost": {
+        "action": "Ara post",
+        "title": "Posted content",
+        "loadFailed": "We couldn't load this post. Please try again.",
+        "empty": "The creator hasn't posted any content yet.",
+        "current": "Current",
+        "postedAt": "Posted",
+        "verifiedAt": "Verified",
+        "simulated": "Verifikazzjoni runs against a simulated provider in this environment.",
+        "close": "Agħlaq",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Let found",
+          "mismatch": "Mismatch"
+        }
+      },
+      "empty": {
+        "heading": "Le campaigns yet",
+        "body": "Oħloq your first campaign to start engaging creators.",
+        "cta": "Oħloq campaign"
+      },
+      "errors": {
+        "loadFailed": "Failed to load campaigns.",
+        "saveFailed": "Failed to save campaign."
+      }
+    },
+    "pools": {
+      "title": "Talent pools",
+      "agencyWide": "Aġenzija-wide",
+      "actions": {
+        "create": "New pool",
+        "edit": "Editja",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Issejvja pool",
+        "backToList": "Lura to talent pools",
+        "backToDetail": "Lura to pool"
+      },
+      "fields": {
+        "name": "Pool name",
+        "description": "Description",
+        "brand": "Brand",
+        "brandHint": "Fakultattiv — labels the pool for a brand's work. Leave blank for an agency-wide pool.",
+        "members": "Members"
+      },
+      "status": {
+        "active": "Attiv",
+        "archived": "Arkivjat",
+        "all": "Kollox"
+      },
+      "create": {
+        "title": "New talent pool"
+      },
+      "edit": {
+        "title": "Editja talent pool"
+      },
+      "detail": {
+        "title": "Pool details",
+        "notFound": "This pool no longer exists.",
+        "membersHeading": "Members",
+        "membersEmpty": "Le creators in this pool yet. Żid creators from a creator's detail page.",
+        "memberCount": "{count} creators",
+        "unnamed": "Unnamed creator",
+        "remove": "Remove from pool",
+        "removed": "{name} removed from the pool."
+      },
+      "archive": {
+        "confirmTitle": "Archive pool",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later with its members intact.",
+        "confirm": "Archive",
+        "cancel": "Ikkanċella"
+      },
+      "restore": {
+        "confirmTitle": "Restore pool",
+        "confirmMessage": "Restore {name}? It will appear in the active pool list again.",
+        "confirm": "Restore",
+        "cancel": "Ikkanċella",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Le talent pools yet",
+        "body": "Oħloq a pool to group creators for a brand or a campaign brief.",
+        "cta": "Oħloq pool"
+      },
+      "emptyFiltered": {
+        "heading": "Le pools match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "picker": {
+        "openLabel": "Żid to pool",
+        "title": "Żid to talent pools",
+        "empty": "Le talent pools yet. Oħloq one from the Talent pools page.",
+        "done": "Done",
+        "added": "Żided to {name}.",
+        "removed": "Removed from {name}.",
+        "loadFailed": "Failed to load talent pools.",
+        "toggleFailed": "Failed to update pool membership."
+      },
+      "addCreators": {
+        "open": "Żid creators",
+        "title": "Żid creators to this pool",
+        "search": "Fittex your roster",
+        "noRoster": "Your roster is empty. Żid creators to your roster first.",
+        "allInPool": "Kollox your roster creators are already in this pool.",
+        "noSearchMatch": "Le roster creators match your search.",
+        "cancel": "Ikkanċella",
+        "add": "Żid {count}",
+        "added": "{count} creators added to the pool.",
+        "loadFailed": "Failed to load your roster.",
+        "addFailed": "Failed to add creators to the pool.",
+        "confirmHard": {
+          "one": "{name} is blacklisted by your agency. Żid them to this pool anyway?",
+          "many": "{count} selected creators are blacklisted by your agency ({names}). Żid them anyway?"
+        }
+      },
+      "errors": {
+        "loadFailed": "Failed to load talent pools.",
+        "membersLoadFailed": "Failed to load pool members.",
+        "saveFailed": "Failed to save talent pool.",
+        "archiveFailed": "Failed to archive pool.",
+        "restoreFailed": "Failed to restore pool.",
+        "removeFailed": "Failed to remove creator from the pool."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Rwol",
+        "status": "Status",
+        "joinedAt": "Joined"
+      },
+      "roles": {
+        "agency_admin": "Amministratur",
+        "agency_manager": "Maniġer",
+        "agency_staff": "Staff"
+      },
+      "status": {
+        "active": "Attiv",
+        "pending": "Pendenti"
+      },
+      "members": {
+        "heading": "Current members"
+      },
+      "filters": {
+        "allRoles": "Kollox roles",
+        "allStatuses": "Kollox statuses"
+      },
+      "search": {
+        "label": "Fittex",
+        "placeholder": "Name or email"
+      },
+      "invitations": {
+        "heading": "Stedina history",
+        "columns": {
+          "email": "Stedinae",
+          "invitedAt": "Stedinad",
+          "invitedBy": "Stedinad by"
+        },
+        "status": {
+          "pending": "Pendenti",
+          "accepted": "Aċċettaed",
+          "expired": "Expired"
+        },
+        "empty": "Le invitations yet."
+      },
+      "invite": {
+        "button": "Stedina user",
+        "title": "Stedina a team member",
+        "fields": {
+          "email": "Indirizz tal-email",
+          "role": "Rwol"
+        },
+        "submit": "Ibgħat invitation",
+        "submitting": "Ibgħating…",
+        "success": "Stedina sent to {email}.",
+        "errors": {
+          "failed": "Failed to send invitation."
+        }
+      },
+      "empty": {
+        "heading": "Le team members",
+        "body": "Stedina your first team member to get started."
+      },
+      "emptyFiltered": "Le team members match your filter.",
+      "errors": {
+        "membersLoadFailed": "Failed to load team members.",
+        "invitationsLoadFailed": "Failed to load invitation history."
+      },
+      "loading": "Qiegħed jillowdja team…",
+      "bulkInviteCreators": {
+        "button": "Bulk-invite creators"
+      }
+    },
+    "bulkInvite": {
+      "title": "Bulk-invite creators",
+      "description": "Ittella' a CSV with an `email` column. Each row becomes a magic-link invitation. Other columns are accepted but ignored.",
+      "file": {
+        "label": "CSV file",
+        "hint": "5 MB / 1000 rows max. The only required column is `email`."
+      },
+      "softWarning": "{count} rows is a large batch — processing may take a few minutes.",
+      "preview": {
+        "heading": "Parsed rows ({count})",
+        "row": "Row",
+        "email": "Email",
+        "errorCount": "{count} parse errors",
+        "errorHeading": "These rows will be skipped:",
+        "errorItem": "Row {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Ibgħat invitations ({count})",
+        "reset": "Clear",
+        "startOver": "Ibgħat another batch"
+      },
+      "status": {
+        "queued": "Queued — waiting to start",
+        "processing": "Processing invitations",
+        "complete": "Kollox done",
+        "failed": "Job failed"
+      },
+      "tracking": {
+        "progress": "{percent}% complete"
+      },
+      "timeout": {
+        "heading": "Still working on this",
+        "description": "Your invitations are taking longer than expected to process. You can try again or check back later.",
+        "retry": "Try again"
+      },
+      "complete": {
+        "heading": "Results",
+        "invited": "Stedinad",
+        "alreadyInvited": "Already invited",
+        "failed": "Failed",
+        "failureReason": "Reason"
+      },
+      "failed": {
+        "heading": "The bulk invitation job failed."
+      },
+      "errors": {
+        "submitFailed": "We couldn't submit the CSV. Please try again."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "You've been invited",
+        "joining": "You're being invited to join {agencyName} as {role}.",
+        "accept": "Aċċetta invitation",
+        "accepting": "Aċċettaing…",
+        "signInToContinue": "Idħol to accept this invitation",
+        "signIn": "Idħol",
+        "noAccount": "Don't have an account?",
+        "signUp": "Oħloq one now",
+        "success": "Merħba to {agencyName}! You're now a {role}.",
+        "expired": {
+          "heading": "This invitation has expired",
+          "body": "Please contact your agency administrator to request a new invitation."
+        },
+        "alreadyAccepted": {
+          "heading": "Stedina already accepted",
+          "body": "This invitation has already been used. Idħol to access your workspace.",
+          "signIn": "Idħol"
+        },
+        "alreadyMember": {
+          "heading": "Already a member",
+          "body": "You are already a member of this workspace."
+        },
+        "emailMismatch": {
+          "heading": "Wrong account",
+          "body": "This invitation was sent to a different email address. Please sign in with the correct account."
+        },
+        "notFound": {
+          "heading": "Stedina not found",
+          "body": "This invitation link is invalid or has already been used."
+        },
+        "errors": {
+          "failed": "Failed to accept invitation."
+        }
+      }
+    },
+    "settings": {
+      "title": "Aġenzija settings",
+      "fields": {
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "blacklistNotificationPolicy": "Letify creators when blacklisted",
+        "blacklistNotificationPolicyHint": "When on, a creator is emailed if your agency blacklists them. The reason is never shared."
+      },
+      "save": "Issejvja settings",
+      "saving": "Saving…",
+      "success": "Settings saved.",
+      "readOnly": "Only administrators can edit agency settings.",
+      "loading": "Qiegħed jillowdja settings…",
+      "errors": {
+        "loadFailed": "Failed to load settings.",
+        "saveFailed": "Failed to save settings."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "This field is required."
+  }
+}
