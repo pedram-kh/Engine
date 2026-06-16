@@ -1,0 +1,27 @@
+{
+  "admin": {
+    "audit": {
+      "title": "Protokol auditu",
+      "empty": "Žádné záznamy auditu neodpovídají těmto filtrům.",
+      "load_failed": "Nepodařilo se načíst protokol auditu. Obnovte stránku.",
+      "filters": {
+        "action": "Akce",
+        "subject": "ULID subjektu",
+        "date_from": "Od",
+        "date_to": "Do",
+        "apply": "Použít"
+      },
+      "fields": {
+        "action": "Akce",
+        "actor": "Aktér",
+        "subject": "Subjekt",
+        "reason": "Důvod",
+        "created_at": "Kdy"
+      },
+      "pagination": {
+        "prev": "Předchozí",
+        "next": "Další"
+      }
+    }
+  }
+}

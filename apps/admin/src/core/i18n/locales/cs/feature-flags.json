@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "featureFlags": {
+      "title": "Přepínače funkcí",
+      "subtitle": "Přepínače pro celou platformu. Každé přepnutí je auditováno a vstoupí v platnost okamžitě.",
+      "load_failed": "Nepodařilo se načíst přepínače funkcí. Obnovte stránku.",
+      "toggle": {
+        "enable_title": "Povolit {label}?",
+        "disable_title": "Zakázat {label}?",
+        "description": "Tím se přepínač aktivuje na celé platformě a vstoupí v platnost okamžitě. Důvod je povinný a je zaznamenán v protokolu auditu.",
+        "reason_label": "Důvod",
+        "reason_hint": "Minimálně {count} znaků — zaznamenáno při tomto přepnutí.",
+        "cancel": "Zrušit",
+        "confirm": "Potvrdit",
+        "success": "Přepínač funkce aktualizován.",
+        "failed": "Nepodařilo se aktualizovat přepínač. Zkuste to znovu."
+      }
+    }
+  }
+}

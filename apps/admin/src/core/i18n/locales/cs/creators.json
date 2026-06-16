@@ -1,0 +1,228 @@
+{
+  "admin": {
+    "creators": {
+      "list": {
+        "title": "Fronta posouzení tvůrců",
+        "unnamed": "Nepojmenovaný tvůrce",
+        "view": "Zobrazit tvůrce",
+        "load_failed": "Nepodařilo se načíst frontu posouzení. Obnovte stránku.",
+        "fields": {
+          "name": "Tvůrce",
+          "email": "E-mail",
+          "status": "Stav",
+          "kyc": "KYC",
+          "completeness": "Úplnost",
+          "submitted_at": "Odesláno"
+        },
+        "filters": {
+          "pending": "Čekající",
+          "approved": "Schválené",
+          "rejected": "Odmítnuté",
+          "incomplete": "Neúplné",
+          "all": "Vše"
+        },
+        "status_labels": {
+          "incomplete": "Neúplná",
+          "pending": "Čekající",
+          "approved": "Schválená",
+          "rejected": "Odmítnutá"
+        }
+      },
+      "kyc": {
+        "title": "Fronta posouzení KYC",
+        "empty": "Žádní tvůrci neodpovídají tomuto filtru KYC.",
+        "load_failed": "Nepodařilo se načíst frontu KYC. Obnovte stránku.",
+        "filters": {
+          "pending": "Čekající",
+          "verified": "Ověřené",
+          "rejected": "Odmítnuté",
+          "none": "Nezahájeno",
+          "all": "Vše"
+        }
+      },
+      "all": {
+        "title": "Všichni tvůrci",
+        "empty": "Žádní tvůrci.",
+        "load_failed": "Nepodařilo se načíst tvůrce. Obnovte stránku."
+      },
+      "detail": {
+        "fallback_title": "Tvůrce",
+        "application_status": "Stav přihlášky: {status}",
+        "completeness": "{percent} % dokončeno",
+        "rejection_heading": "Poznámky k odmítnutí",
+        "profile_heading": "Profil",
+        "social_heading": "Sociální sítě",
+        "portfolio_heading": "Portfolio",
+        "onboarding_heading": "Stav onboardingu",
+        "kyc_history_heading": "Historie ověření KYC",
+        "kyc_history": {
+          "provider": "Poskytovatel",
+          "status": "Stav",
+          "started_at": "Zahájeno",
+          "completed_at": "Dokončeno"
+        },
+        "assignments_heading": "Historie kampaní",
+        "assignments": {
+          "empty": "Tento tvůrce zatím nemá žádná přiřazení kampaní.",
+          "load_failed": "Nepodařilo se načíst historii kampaní.",
+          "campaign": "Kampaň",
+          "brand": "Značka",
+          "agency": "Agentura",
+          "status": "Stav",
+          "created_at": "Zahájeno"
+        },
+        "audit_heading": "Historie auditu",
+        "audit": {
+          "empty": "Žádné záznamy auditu pro tohoto tvůrce.",
+          "load_failed": "Nepodařilo se načíst historii auditu.",
+          "action": "Akce",
+          "actor": "Aktér",
+          "reason": "Důvod",
+          "created_at": "Kdy"
+        },
+        "payments_heading": "Historie plateb",
+        "payments_coming_soon": "Historie plateb se aktivuje po spuštění zpracování plateb (Sprint 10).",
+        "load_failed": "Nepodařilo se načíst tohoto tvůrce. Obnovte stránku.",
+        "fields": {
+          "display_name": "Zobrazované jméno",
+          "bio": "Bio",
+          "country_code": "Země",
+          "region": "Oblast",
+          "primary_language": "Primární jazyk",
+          "secondary_languages": "Další jazyky",
+          "categories": "Kategorie"
+        },
+        "edit": {
+          "title": "Upravit {field}",
+          "save": "Uložit změny",
+          "cancel": "Zrušit",
+          "reason_label": "Důvod změny",
+          "reason_hint": "Povinné pro citlivá pole. Zaznamenáno v protokolu auditu.",
+          "custom_code_hint": "Vyberte hodnotu nebo zadejte 2-písmenný ISO kód.",
+          "button_aria_label": "Upravit {field}",
+          "save_failed": "Nepodařilo se uložit tuto změnu. Zkuste to znovu.",
+          "saved": "{field} aktualizováno."
+        },
+        "errors": {
+          "field_status_immutable": "Přechody stavu používají akce schválit / odmítnout, nikoli editaci pole."
+        },
+        "approve": {
+          "button": "Schválit přihlášku",
+          "title": "Schválit přihlášku {name}",
+          "description": "Tím se tvůrce označí jako schválený a získá přístup do produkce. Akce je zaznamenána v protokolu auditu.",
+          "welcome_label": "Uvítací zpráva (volitelné)",
+          "welcome_hint": "Zobrazí se na řídicím panelu tvůrce při příštím přihlášení.",
+          "confirm": "Schválit",
+          "cancel": "Zrušit",
+          "success": "Tvůrce schválen.",
+          "failed": "Nepodařilo se schválit tohoto tvůrce. Zkuste to znovu."
+        },
+        "reject": {
+          "button": "Odmítnout přihlášku",
+          "title": "Odmítnout přihlášku {name}",
+          "description": "Tvůrce uvidí důvod na svém řídicím panelu při příštím přihlášení.",
+          "reason_label": "Důvod odmítnutí",
+          "min_hint": "Povinné, minimálně {count} znaků.",
+          "confirm": "Odmítnout",
+          "cancel": "Zrušit",
+          "success": "Tvůrce odmítnut.",
+          "failed": "Nepodařilo se odmítnout tohoto tvůrce. Zkuste to znovu."
+        },
+        "identity": {
+          "heading": "Ověření totožnosti",
+          "status": "Stav: {status}",
+          "verify_manual": "Ověřit ručně",
+          "verify_vendor": "Požádat o ověření poskytovatelem",
+          "vendor_disabled_tooltip": "Není nakonfigurován žádný poskytovatel KYC",
+          "method_labels": {
+            "vendor": "Ověřeno poskytovatelem",
+            "manual": "Ověřeno ručně správcem"
+          }
+        },
+        "verify": {
+          "title": "Ručně ověřit totožnost {name}",
+          "description": "Tím se trvale označí totožnost tvůrce jako ověřená a je zaznamenáno na vašem účtu v protokolu auditu. Používejte pouze tehdy, když jste totožnost potvrdili mimo systém.",
+          "note_label": "Poznámka (volitelné)",
+          "note_hint": "Zaznamenáno v protokolu auditu spolu s vaším jménem.",
+          "confirm": "Ověřit totožnost",
+          "cancel": "Zrušit",
+          "success": "Totožnost ověřena.",
+          "failed": "Nepodařilo se ověřit totožnost tohoto tvůrce. Zkuste to znovu."
+        }
+      }
+    }
+  },
+  "creator": {
+    "already_approved": "Tento tvůrce již byl schválen.",
+    "already_rejected": "Tento tvůrce již byl odmítnut.",
+    "kyc_not_verified": "Schválení je blokováno dokud nebude ověřena totožnost tvůrce.",
+    "kyc_already_verified": "Totožnost tohoto tvůrce již byla ověřena.",
+    "admin": {
+      "field_status_immutable": "Přechody stavu používají akce schválit / odmítnout, nikoli editaci pole."
+    },
+    "ui": {
+      "wizard": {
+        "steps": {
+          "kyc": {
+            "name": "Ověření totožnosti",
+            "status_labels": {
+              "none": "Nezahájeno",
+              "pending": "Probíhá",
+              "verified": "Ověřeno",
+              "rejected": "Odmítnuto",
+              "not_required": "Nevyžadováno"
+            }
+          },
+          "tax": {
+            "name": "Daňové informace",
+            "status_complete": "Odesláno",
+            "status_incomplete": "Ještě neodesláno"
+          },
+          "payout": {
+            "name": "Způsob výplaty",
+            "status_set": "Propojeno",
+            "status_unset": "Nepropojeno"
+          },
+          "contract": {
+            "name": "Rámcová smlouva",
+            "status_labels": {
+              "signed": "Podepsáno",
+              "click_through_accepted": "Přijato",
+              "none": "Nezahájeno"
+            }
+          },
+          "portfolio": {
+            "gallery_empty": "Zatím žádné nahrané položky portfolia.",
+            "video_badge_label": "Video",
+            "link_badge_label": "Externí odkaz",
+            "untitled_item": "Nepojmenovaná položka portfolia"
+          }
+        },
+        "categories": {
+          "fashion": "Móda",
+          "beauty": "Krása",
+          "lifestyle": "Životní styl",
+          "fitness": "Fitness",
+          "travel": "Cestování",
+          "food": "Jídlo",
+          "tech": "Technologie",
+          "gaming": "Gaming",
+          "music": "Hudba",
+          "comedy": "Komedie",
+          "education": "Vzdělávání",
+          "parenting": "Rodičovství",
+          "business": "Byznys",
+          "art": "Umění",
+          "sports": "Sport",
+          "other": "Jiné"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Brzy"
+        }
+      }
+    }
+  }
+}

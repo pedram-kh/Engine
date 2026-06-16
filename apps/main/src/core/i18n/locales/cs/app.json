@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Influencer marketing vedený jako skutečný byznys.",
+    "sprint0Notice": "Scaffolding Sprint 0 — hlavní SPA platformy",
+    "locale": {
+      "switcher": "Jazyk",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Motiv",
+        "light": "Světlý",
+        "dark": "Tmavý"
+      }
+    },
+    "messaging": {
+      "title": "Zprávy",
+      "you": "Vy",
+      "participant": "Účastník",
+      "composePlaceholder": "Napište zprávu…",
+      "send": "Odeslat",
+      "attachment": "Příloha",
+      "empty": "Žádné zprávy. Zahajte konverzaci.",
+      "loadEarlier": "Načíst starší zprávy",
+      "loadError": "Nepodařilo se nám načíst tuto konverzaci. Brzy to zkusíme znovu.",
+      "sendError": "Vaši zprávu se nepodařilo odeslat. Zkuste to znovu.",
+      "attachmentUploadError": "Přílohu se nepodařilo nahrát. Zkuste to znovu.",
+      "closed": "Tato konverzace je uzavřena — úkol již není aktivní.",
+      "systemFallback": "Úkol byl aktualizován.",
+      "system": {
+        "assignment": {
+          "contracted": "Smlouva byla podepsána — produkce může začít.",
+          "draft_submitted": "Byl odeslán návrh k posouzení.",
+          "draft_approved": "Návrh byl schválen.",
+          "revision_requested": "Byly požadovány revize návrhu.",
+          "draft_rejected": "Návrh byl zamítnut.",
+          "posted_by_creator": "Tvůrce označil obsah jako zveřejněný.",
+          "live_verified": "Živý příspěvek byl ověřen.",
+          "manually_verified": "Příspěvek byl ověřen ručně.",
+          "resubmit_requested": "Bylo požadováno opětovné odeslání.",
+          "payment_released": "Platba byla uvolněna."
+        }
+      },
+      "rollup": {
+        "empty": "Žádná vlákna zpráv pro tuto kampaň.",
+        "noMessages": "Žádné zprávy.",
+        "loadError": "Nepodařilo se nám načíst vlákna zpráv."
+      }
+    },
+    "nav": {
+      "dashboard": "Řídicí panel",
+      "roster": "Moji tvůrci",
+      "discover": "Objevit",
+      "pools": "Talentové skupiny",
+      "brands": "Značky",
+      "campaigns": "Kampaně",
+      "agencyUsers": "Tým",
+      "settings": "Nastavení"
+    },
+    "discover": {
+      "title": "Objevit tvůrce",
+      "subtitle": "Procházejte a prohledávejte globální skupinu tvůrců.",
+      "unnamed": "Nepojmenovaný tvůrce",
+      "notConnected": "Nepropojeno",
+      "search": {
+        "label": "Hledat tvůrce",
+        "placeholder": "Hledat podle jména nebo bio"
+      },
+      "filters": {
+        "country": "Země",
+        "language": "Jazyk",
+        "category": "Kategorie"
+      },
+      "connection": {
+        "connected": "Propojeno",
+        "pending": "Žádost čeká",
+        "declined": "Odmítnuto",
+        "notConnected": "Nepropojeno",
+        "sendRequest": "Odeslat žádost",
+        "requestAgain": "Odeslat žádost znovu",
+        "sent": "Žádost odeslána",
+        "reRequested": "Žádost odeslána znovu",
+        "alreadyPending": "Žádost již čeká",
+        "alreadyConnected": "Tento tvůrce je již ve vašem rosteru",
+        "error": "Žádost se nepodařilo odeslat. Zkuste to znovu."
+      },
+      "empty": {
+        "heading": "Žádní tvůrci",
+        "body": "Schválení tvůrci se zde zobrazí, jak skupina poroste."
+      },
+      "emptyFiltered": {
+        "heading": "Žádné shody",
+        "body": "Žádní tvůrci neodpovídají vašim filtrům. Zkuste rozšířit vyhledávání."
+      },
+      "errors": {
+        "loadFailed": "Nepodařilo se načíst tvůrce. Zkuste to znovu."
+      },
+      "detail": {
+        "back": "Zpět na Objevit",
+        "notFound": "Tento tvůrce není k dispozici.",
+        "loadFailed": "Nepodařilo se načíst tento profil. Zkuste to znovu.",
+        "viewInRoster": "Zobrazit v rosteru",
+        "sections": {
+          "profile": "Profil",
+          "social": "Sociální sítě",
+          "portfolio": "Portfolio"
+        },
+        "social": {
+          "empty": "Žádné propojené sociální sítě."
+        },
+        "portfolio": {
+          "empty": "Zatím žádné položky portfolia.",
+          "untitled": "Nepojmenovaná položka"
+        }
+      }
+    },
+    "roster": {
+      "title": "Moji tvůrci",
+      "unnamed": "Nepojmenovaný tvůrce",
+      "blacklisted": "Na černé listině",
+      "blacklist": {
+        "badge": {
+          "hard": "Na černé listině",
+          "soft": "Varování černé listiny"
+        },
+        "openAction": "Přidat na černou listinu",
+        "liftAction": "Odebrat z černé listiny",
+        "lifted": "Odebráno z černé listiny.",
+        "liftFailed": "Nepodařilo se odebrat z černé listiny.",
+        "section": {
+          "title": "Černá listina",
+          "none": "Tento tvůrce není na černé listině vaší agentury."
+        },
+        "status": {
+          "hard": "Tvrdá černá listina — vyloučen z objevování a zablokován pro žádosti o propojení.",
+          "soft": "Měkká černá listina — jen varování; tvůrce zůstává vyhledatelný."
+        },
+        "dialog": {
+          "title": "Přidat na černou listinu",
+          "scopeLabel": "Rozsah",
+          "scope": {
+            "agency": "Celá agentura",
+            "brand": "Konkrétní značka"
+          },
+          "noRelationHint": "Černá listina pro celou agenturu vyžaduje propojeného tvůrce.",
+          "brandLabel": "Značka",
+          "typeLabel": "Typ",
+          "type": {
+            "hard": "Tvrdá — vyloučit z objevování a blokovat žádosti",
+            "soft": "Měkká — jen varovat, zachovat vyhledatelnost"
+          },
+          "reasonLabel": "Důvod",
+          "reasonPlaceholder": "Proč je tento tvůrce přidáván na černou listinu? (soukromé pro vaši agenturu)",
+          "cancel": "Zrušit",
+          "confirm": "Přidat na černou listinu",
+          "success": "Tvůrce přidán na černou listinu.",
+          "invalid": "Vyplňte povinná pole.",
+          "failed": "Nepodařilo se přidat tvůrce na černou listinu."
+        }
+      },
+      "fields": {
+        "name": "Jméno",
+        "email": "E-mail",
+        "status": "Stav",
+        "applicationStatus": "Přihláška",
+        "country": "Země",
+        "language": "Jazyk",
+        "categories": "Kategorie",
+        "rating": "Hodnocení",
+        "campaigns": "Kampaně"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Prospekt",
+        "external": "Externí",
+        "pending_request": "Čekající žádost",
+        "declined": "Odmítnuto"
+      },
+      "applicationStatus": {
+        "incomplete": "Neúplná",
+        "pending": "Čekající",
+        "approved": "Schválená",
+        "rejected": "Odmítnutá"
+      },
+      "search": {
+        "label": "Hledat tvůrce",
+        "placeholder": "Hledat podle jména nebo bio"
+      },
+      "filters": {
+        "status": {
+          "all": "Všichni",
+          "roster": "Roster",
+          "prospect": "Prospekty",
+          "external": "Externí",
+          "pending_request": "Čekající žádosti",
+          "declined": "Odmítnuté"
+        },
+        "country": "Země",
+        "language": "Jazyk",
+        "category": "Kategorie",
+        "availability": {
+          "from": "Dostupný od",
+          "to": "Dostupný do"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Sledující"
+        },
+        "engagement": {
+          "label": "Míra zapojení"
+        },
+        "metrics": {
+          "tooltip": "Sociální metriky ještě nejsou propojeny."
+        }
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Žádní tvůrci",
+        "body": "Tvůrci, které zvete nebo s nimiž spolupracujete, se zobrazí zde ve vašem rosteru, prospektech a externích spolupracovnících."
+      },
+      "emptyFiltered": {
+        "heading": "Žádní tvůrci neodpovídají těmto filtrům",
+        "body": "Zkuste vymazat nebo změnit filtr, abyste viděli více tvůrců."
+      },
+      "errors": {
+        "loadFailed": "Nepodařilo se načíst vaše tvůrce. Zkuste to znovu."
+      },
+      "detail": {
+        "back": "Zpět na moje tvůrce",
+        "unnamed": "Nepojmenovaný tvůrce",
+        "loadFailed": "Nepodařilo se nám načíst tohoto tvůrce. Zkuste to znovu.",
+        "notFound": "Tento tvůrce není ve vašem rosteru.",
+        "sections": {
+          "profile": "Profil",
+          "rating": "Hodnocení a poznámky",
+          "social": "Sociální sítě",
+          "metrics": "Sociální metriky",
+          "portfolio": "Portfolio",
+          "availability": "Dostupnost",
+          "campaigns": "Historie kampaní"
+        },
+        "editor": {
+          "starLabel": "Ohodnotit {n} z 5",
+          "ratingUnset": "Neohodnoceno",
+          "notesLabel": "Interní poznámky",
+          "notesPlaceholder": "Soukromé poznámky ke spolupráci s tímto tvůrcem (viditelné pouze vaší agentuře).",
+          "notesEmpty": "Zatím žádné poznámky.",
+          "save": "Uložit",
+          "saved": "Změny uloženy.",
+          "saveFailed": "Nepodařilo se nám uložit vaše změny. Zkuste to znovu."
+        },
+        "social": {
+          "empty": "Žádné propojené sociální sítě."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Sociální metriky se zobrazí po propojení účtů",
+            "body": "Počty sledujících a míry zapojení zatím nejsou dostupné — zobrazí se zde, až sociální integrace budou spuštěny."
+          }
+        },
+        "portfolio": {
+          "empty": "Zatím žádné položky portfolia.",
+          "untitled": "Nepojmenovaná položka portfolia"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Žádné bloky dostupnosti v tomto období",
+            "body": "Tento tvůrce neoznačil žádný nedostupný čas pro zobrazená data."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Zatím žádná historie kampaní",
+            "body": "Kampaně, které s tímto tvůrcem spustíte, se zobrazí zde."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Odhlásit se",
+      "signingOut": "Odhlašování…"
+    },
+    "workspaceSwitcher": {
+      "label": "Přepnout pracovní prostor",
+      "placeholder": "Vybrat pracovní prostor"
+    },
+    "brands": {
+      "title": "Značky",
+      "actions": {
+        "create": "Nová značka",
+        "edit": "Upravit",
+        "archive": "Archivovat",
+        "restore": "Obnovit",
+        "save": "Uložit značku",
+        "saving": "Ukládání…",
+        "backToList": "Zpět na značky",
+        "backToDetail": "Zpět na značku"
+      },
+      "fields": {
+        "name": "Název značky",
+        "slug": "Slug",
+        "description": "Popis",
+        "industry": "Odvětví",
+        "websiteUrl": "URL webu",
+        "defaultCurrency": "Výchozí měna",
+        "defaultLanguage": "Výchozí jazyk",
+        "status": "Stav"
+      },
+      "status": {
+        "active": "Aktivní",
+        "archived": "Archivováno",
+        "all": "Vše"
+      },
+      "detail": {
+        "title": "Podrobnosti značky"
+      },
+      "create": {
+        "title": "Nová značka",
+        "success": "Značka vytvořena."
+      },
+      "edit": {
+        "title": "Upravit značku",
+        "success": "Značka aktualizována."
+      },
+      "archive": {
+        "confirmTitle": "Archivovat značku",
+        "confirmMessage": "Archivovat {name}? Bude skryta z aktivního seznamu, ale lze ji obnovit později.",
+        "confirm": "Archivovat",
+        "cancel": "Zrušit",
+        "success": "Značka archivována."
+      },
+      "restore": {
+        "confirmTitle": "Obnovit značku",
+        "confirmMessage": "Obnovit {name}? Znovu se zobrazí v seznamu aktivních značek.",
+        "confirm": "Obnovit",
+        "cancel": "Zrušit",
+        "success": "{name} obnovena."
+      },
+      "empty": {
+        "heading": "Zatím žádné značky",
+        "body": "Vytvořte první značku pro správu influencer marketingových kampaní.",
+        "cta": "Vytvořit značku"
+      },
+      "emptyFiltered": {
+        "heading": "Žádné značky neodpovídají vašemu filtru",
+        "body": "Zkuste změnit filtr stavu výše."
+      },
+      "loading": "Načítání značek…",
+      "errors": {
+        "loadFailed": "Nepodařilo se načíst značky.",
+        "saveFailed": "Nepodařilo se uložit značku.",
+        "archiveFailed": "Nepodařilo se archivovat značku.",
+        "restoreFailed": "Nepodařilo se obnovit značku."
+      }
+    },
+    "campaigns": {
+      "title": "Kampaně",
+      "actions": {
+        "create": "Nová kampaň",
+        "save": "Vytvořit kampaň",
+        "saveSettings": "Uložit nastavení",
+        "backToList": "Zpět na kampaně"
+      },
+      "fields": {
+        "name": "Název kampaně",
+        "brand": "Značka",
+        "objective": "Cíl",
+        "description": "Popis",
+        "budget": "Rozpočet",
+        "currency": "Měna",
+        "startsAt": "Datum začátku",
+        "endsAt": "Datum konce",
+        "targetCreatorCount": "Cílový počet tvůrců",
+        "deliverables": "Plnění",
+        "deliverablesHint": "Jedno plnění na řádek (např. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtagy",
+        "hashtagsHint": "Oddělené mezerou nebo čárkou.",
+        "usageRights": "Práva k použití",
+        "requiresContract": "Vyžadovat smlouvu pro každou kampaň",
+        "status": "Stav"
+      },
+      "objective": {
+        "awareness": "Povědomí",
+        "engagement": "Zapojení",
+        "conversion": "Konverze",
+        "ugc": "UGC",
+        "launch": "Spuštění"
+      },
+      "status": {
+        "all": "Vše",
+        "draft": "Návrh",
+        "active": "Aktivní",
+        "paused": "Pozastaveno",
+        "completed": "Dokončeno",
+        "cancelled": "Zrušeno"
+      },
+      "filters": {
+        "brand": "Značka",
+        "startsFrom": "Začíná od",
+        "startsTo": "Začíná do"
+      },
+      "tabs": {
+        "overview": "Přehled",
+        "creators": "Tvůrci",
+        "board": "Nástěnka",
+        "drafts": "Návrhy",
+        "payments": "Platby",
+        "messages": "Zprávy",
+        "settings": "Nastavení"
+      },
+      "create": {
+        "title": "Nová kampaň"
+      },
+      "detail": {
+        "title": "Podrobnosti kampaně"
+      },
+      "settings": {
+        "saved": "Nastavení kampaně uloženo."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Žádní tvůrci",
+          "body": "Pozvěte tvůrce do této kampaně a začněte."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Všechny návrhy"
+        },
+        "empty": {
+          "heading": "Žádné návrhy",
+          "body": "Návrhy odeslané tvůrci se zobrazí zde."
+        },
+        "loadFailed": "Nepodařilo se nám načíst návrhy. Zkuste to znovu.",
+        "submittedAt": "Odesláno {date}"
+      },
+      "fees": {
+        "offered": "Nabídnuto",
+        "countered": "Protinabídka"
+      },
+      "reinvite": {
+        "action": "Pozvat znovu",
+        "title": "Pozvat tvůrce znovu",
+        "body": "Poslali protinabídku na {fee}. Nabídněte znovu:",
+        "feeLabel": "Nová dohodnutá odměna ({currency})",
+        "cancel": "Zrušit",
+        "submit": "Pozvat znovu",
+        "success": "Pozvání znovu odesláno."
+      },
+      "contract": {
+        "attach": {
+          "action": "Vystavit smlouvu",
+          "title": "Vystavit smlouvu",
+          "body": "Připojte podmínky smlouvy, které tvůrce musí přečíst a přijmout před odesláním návrhu.",
+          "titleLabel": "Název smlouvy",
+          "termsLabel": "Podmínky (markdown)",
+          "termsHint": "Zadejte podmínky přímo a/nebo nahrajte PDF níže.",
+          "pdfLabel": "PDF smlouvy (volitelné)",
+          "pdfReady": "PDF připraveno: {name}",
+          "cancel": "Zrušit",
+          "submit": "Vystavit smlouvu",
+          "success": "Smlouva vystavena. Tvůrce byl upozorněn.",
+          "alreadyAttached": "Smlouva již čeká na přijetí tímto tvůrcem.",
+          "error": "Nepodařilo se nám vystavit smlouvu. Zkuste to znovu."
+        },
+        "pending": "Smlouva odeslána — čeká na tvůrce",
+        "proceedWithout": {
+          "action": "Pokračovat bez smlouvy",
+          "success": "Úkol postoupen bez smlouvy.",
+          "requiredError": "Tato kampaň vyžaduje smlouvu pro každou kampaň; vystavte ji, aby tvůrce mohl přijmout.",
+          "error": "Nepodařilo se nám postoupit tento úkol. Zkuste to znovu."
+        }
+      },
+      "invite": {
+        "open": "Pozvat tvůrce",
+        "title": "Pozvat tvůrce",
+        "loadFailed": "Nepodařilo se nám načíst váš roster. Zkuste to znovu.",
+        "feeLabel": "Dohodnutá odměna ({currency})",
+        "search": "Hledat tvůrce",
+        "noRoster": "Žádní tvůrci v rosteru k pozvání.",
+        "noSearchMatch": "Žádní tvůrci neodpovídají vašemu vyhledávání.",
+        "unnamed": "Nepojmenovaný tvůrce",
+        "blockedHint": "Na černé listině — nemůže být pozván.",
+        "cancel": "Zrušit",
+        "submit": "Pozvat ({count})",
+        "summary": "Pozváno {ok}. Přeskočeno {blacklisted} (na černé listině), {conflicts} s konflikty.",
+        "conflict": {
+          "title": "Konflikt dostupnosti",
+          "body": "{count} vybraných tvůrců není dostupných v okně kampaně. Přesto je pozvat?",
+          "cancel": "Přeskočit je",
+          "proceed": "Přesto pozvat"
+        }
+      },
+      "board": {
+        "loadError": "Nepodařilo se nám načíst nástěnku. Zkuste to znovu.",
+        "empty": "Tato nástěnka zatím nemá žádné sloupce.",
+        "moveFailed": "Kartu se nepodařilo přesunout — vrátila se na místo.",
+        "reorderFailed": "Nepodařilo se změnit pořadí sloupců — pořadí bylo obnoveno.",
+        "automationsButton": "Automatizace",
+        "card": {
+          "unnamed": "Nepojmenovaný tvůrce",
+          "removed": "Odstraněný úkol",
+          "daysLeft": "{n}d zbývá",
+          "dueToday": "Splatné dnes",
+          "overdue": "Po termínu"
+        },
+        "column": {
+          "add": "Přidat sloupec",
+          "edit": "Přejmenovat / barva",
+          "delete": "Smazat sloupec",
+          "addTitle": "Přidat sloupec",
+          "editTitle": "Upravit sloupec",
+          "name": "Název sloupce",
+          "color": "Barva",
+          "terminalSuccess": "Označit jako úspěch (terminál)",
+          "terminalFailure": "Označit jako neúspěch (terminál)",
+          "save": "Uložit",
+          "cancel": "Zrušit",
+          "saveFailed": "Nepodařilo se nám uložit sloupec. Zkuste to znovu.",
+          "deleteTitle": "Smazat sloupec",
+          "deleteBody": "Smazat \"{name}\"? To nelze vrátit zpět.",
+          "deleteBodyNonEmpty": "\"{name}\" má {count} karet. Vyberte, kam je přesunout před smazáním.",
+          "deleteDestination": "Přesunout karty do",
+          "deleteConfirm": "Smazat",
+          "errorLastColumn": "Nástěnka musí mít alespoň jeden sloupec.",
+          "errorDestinationRequired": "Tento sloupec má karty — vyberte cílový sloupec pro jejich přesunutí před smazáním.",
+          "errorGeneric": "Nepodařilo se nám smazat sloupec. Zkuste to znovu."
+        },
+        "automation": {
+          "title": "Automatizace",
+          "subtitle": "Každá událost může automaticky přesunout kartu do sloupce. Ruční přesuny je nikdy nespustí.",
+          "event": "Událost",
+          "target": "Přesune kartu do",
+          "none": "Žádná automatizace",
+          "enabled": "Povolena",
+          "broken": "Cílový sloupec byl smazán — vyberte nový",
+          "updateFailed": "Nepodařilo se nám aktualizovat automatizaci. Zkuste to znovu.",
+          "close": "Zavřít"
+        },
+        "drawer": {
+          "title": "Úkol",
+          "close": "Zavřít",
+          "loadError": "Nepodařilo se nám načíst tento úkol. Zkuste to znovu.",
+          "tabs": {
+            "detail": "Podrobnosti",
+            "history": "Historie přesunů"
+          },
+          "detail": {
+            "status": "Stav",
+            "creator": "Tvůrce",
+            "postingDue": "Termín zveřejnění",
+            "deliverables": "Plnění",
+            "latestDraft": "Poslední návrh",
+            "postedContent": "Zveřejněný obsah",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Žádné zaznamenané přesuny.",
+            "removed": "(odstraněno)",
+            "manual": "Ruční přesun",
+            "auto": "Automatizace",
+            "from": "z",
+            "to": "do"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Platby brzy",
+          "body": "Escrow financování a výplaty budou spravovány zde."
+        },
+        "messages": {
+          "heading": "Zprávy brzy",
+          "body": "Zprávy kampaně se zobrazí zde."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Pozváno",
+        "declined": "Odmítnuto",
+        "countered": "Protinabídka",
+        "accepted": "Přijato",
+        "contracted": "Uzavřena smlouva",
+        "producing": "Ve výrobě",
+        "draft_submitted": "Návrh odeslán",
+        "revision_requested": "Požadovány revize",
+        "approved": "Schváleno",
+        "rejected": "Odmítnuto",
+        "posted": "Zveřejněno",
+        "live_verified": "Ověřeno živě",
+        "manually_verified": "Ověřeno ručně",
+        "payment_held": "Platba pozastavena",
+        "payment_released": "Platba uvolněna",
+        "cancelled": "Zrušeno"
+      },
+      "review": {
+        "action": "Posouzení",
+        "title": "Posouzení návrhu",
+        "loadFailed": "Nepodařilo se nám načíst tento návrh. Zkuste to znovu.",
+        "draftVersion": "Návrh v{n}",
+        "noCaption": "Žádný popisek.",
+        "hashtags": "Hashtagy",
+        "mentions": "Zmínky",
+        "noMedia": "Žádná přiložená média.",
+        "feedbackLabel": "Poznámky pro tvůrce",
+        "feedbackHint": "Povinné při požadování změn nebo odmítnutí.",
+        "approve": "Schválit",
+        "requestRevision": "Požádat o změny",
+        "reject": "Odmítnout",
+        "close": "Zavřít",
+        "history": "Historie verzí",
+        "postedContent": "Zveřejněný obsah",
+        "draftStatus": {
+          "pending": "Čeká na posouzení",
+          "approved": "Schváleno",
+          "rejected": "Odmítnuto",
+          "revision_requested": "Požadovány revize"
+        },
+        "verification": {
+          "pending": "Čeká na ověření",
+          "verified": "Ověřeno",
+          "not_found": "Nenalezeno",
+          "mismatch": "Neshoda"
+        },
+        "simulated": "Simulované ověření (testovací poskytovatel)",
+        "toast": {
+          "approved": "Návrh schválen.",
+          "revisionRequested": "Revize požadovány.",
+          "rejected": "Návrh odmítnut.",
+          "error": "Něco se pokazilo. Zkuste to znovu."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Otevřít náhled",
+          "close": "Zavřít",
+          "empty": "Žádná přiložená média."
+        }
+      },
+      "resolution": {
+        "action": "Vyřešit",
+        "title": "Vyřešit ověření",
+        "loadFailed": "Nepodařilo se nám načíst tento úkol. Zkuste to znovu.",
+        "postedContent": "Odeslaný příspěvek",
+        "simulated": "Ověření běží v tomto prostředí oproti simulovanému poskytovateli.",
+        "intro": "Automatické ověření tohoto příspěvku selhalo. Přijměte ručně, zašlete zpět pro nový příspěvek nebo požádejte tvůrce o opravu odkazu.",
+        "verification": {
+          "pending": "Čeká na ověření",
+          "verified": "Ověřeno",
+          "not_found": "Nenalezeno",
+          "mismatch": "Neshoda"
+        },
+        "noteLabel": "Důvod / poznámka pro tvůrce",
+        "noteHint": "Povinné při ručním ověření; volitelné při žádostech o opětovné odeslání.",
+        "manuallyVerify": "Ověřit ručně",
+        "requestFresh": "Požádat o nový příspěvek",
+        "requestInPlace": "Požádat o opravu odkazu",
+        "close": "Zavřít",
+        "notActionable": "Tento úkol již nečeká na vyřešení.",
+        "toast": {
+          "verified": "Příspěvek ověřen ručně.",
+          "resubmitFresh": "Zasláno zpět pro nový příspěvek.",
+          "resubmitInPlace": "Tvůrce požádán o opravu odkazu.",
+          "error": "Něco se pokazilo. Zkuste to znovu."
+        }
+      },
+      "viewPost": {
+        "action": "Zobrazit příspěvek",
+        "title": "Zveřejněný obsah",
+        "loadFailed": "Nepodařilo se nám načíst tento příspěvek. Zkuste to znovu.",
+        "empty": "Tvůrce ještě nezveřejnil žádný obsah.",
+        "current": "Aktuální",
+        "postedAt": "Zveřejněno",
+        "verifiedAt": "Ověřeno",
+        "simulated": "Ověření funguje v tomto prostředí oproti simulovanému poskytovateli.",
+        "close": "Zavřít",
+        "verification": {
+          "pending": "Čeká na ověření",
+          "verified": "Ověřeno",
+          "not_found": "Nenalezeno",
+          "mismatch": "Neshoda"
+        }
+      },
+      "empty": {
+        "heading": "Zatím žádné kampaně",
+        "body": "Vytvořte první kampaň a začněte spolupracovat s tvůrci.",
+        "cta": "Vytvořit kampaň"
+      },
+      "errors": {
+        "loadFailed": "Nepodařilo se načíst kampaně.",
+        "saveFailed": "Nepodařilo se uložit kampaň."
+      }
+    },
+    "pools": {
+      "title": "Talentové skupiny",
+      "agencyWide": "Celá agentura",
+      "actions": {
+        "create": "Nová skupina",
+        "edit": "Upravit",
+        "archive": "Archivovat",
+        "restore": "Obnovit",
+        "save": "Uložit skupinu",
+        "backToList": "Zpět na talentové skupiny",
+        "backToDetail": "Zpět na skupinu"
+      },
+      "fields": {
+        "name": "Název skupiny",
+        "description": "Popis",
+        "brand": "Značka",
+        "brandHint": "Volitelné — označí skupinu pro práci značky. Ponechte prázdné pro skupinu celé agentury.",
+        "members": "Členové"
+      },
+      "status": {
+        "active": "Aktivní",
+        "archived": "Archivováno",
+        "all": "Vše"
+      },
+      "create": {
+        "title": "Nová talentová skupina"
+      },
+      "edit": {
+        "title": "Upravit talentovou skupinu"
+      },
+      "detail": {
+        "title": "Podrobnosti skupiny",
+        "notFound": "Tato skupina již neexistuje.",
+        "membersHeading": "Členové",
+        "membersEmpty": "V této skupině zatím žádní tvůrci. Přidejte tvůrce ze stránky s podrobnostmi tvůrce.",
+        "memberCount": "{count} tvůrců",
+        "unnamed": "Nepojmenovaný tvůrce",
+        "remove": "Odebrat ze skupiny",
+        "removed": "{name} byl/a odebrán/a ze skupiny."
+      },
+      "archive": {
+        "confirmTitle": "Archivovat skupinu",
+        "confirmMessage": "Archivovat {name}? Bude skryta z aktivního seznamu, ale lze ji obnovit později s zachovanými členy.",
+        "confirm": "Archivovat",
+        "cancel": "Zrušit"
+      },
+      "restore": {
+        "confirmTitle": "Obnovit skupinu",
+        "confirmMessage": "Obnovit {name}? Znovu se zobrazí v seznamu aktivních skupin.",
+        "confirm": "Obnovit",
+        "cancel": "Zrušit",
+        "success": "{name} obnovena."
+      },
+      "empty": {
+        "heading": "Zatím žádné talentové skupiny",
+        "body": "Vytvořte skupinu pro seskupení tvůrců pro značku nebo brief kampaně.",
+        "cta": "Vytvořit skupinu"
+      },
+      "emptyFiltered": {
+        "heading": "Žádné skupiny neodpovídají vašemu filtru",
+        "body": "Zkuste změnit filtr stavu výše."
+      },
+      "picker": {
+        "openLabel": "Přidat do skupiny",
+        "title": "Přidat do talentových skupin",
+        "empty": "Zatím žádné talentové skupiny. Vytvořte jednu na stránce Talentové skupiny.",
+        "done": "Hotovo",
+        "added": "Přidáno do {name}.",
+        "removed": "Odebráno z {name}.",
+        "loadFailed": "Nepodařilo se načíst talentové skupiny.",
+        "toggleFailed": "Nepodařilo se aktualizovat členství ve skupině."
+      },
+      "addCreators": {
+        "open": "Přidat tvůrce",
+        "title": "Přidat tvůrce do této skupiny",
+        "search": "Prohledat svůj roster",
+        "noRoster": "Váš roster je prázdný. Nejprve přidejte tvůrce do rosteru.",
+        "allInPool": "Všichni tvůrci z vašeho rosteru jsou již v této skupině.",
+        "noSearchMatch": "Žádní tvůrci z rosteru neodpovídají vašemu vyhledávání.",
+        "cancel": "Zrušit",
+        "add": "Přidat {count}",
+        "added": "Do skupiny přidáno {count} tvůrců.",
+        "loadFailed": "Nepodařilo se načíst váš roster.",
+        "addFailed": "Nepodařilo se přidat tvůrce do skupiny.",
+        "confirmHard": {
+          "one": "{name} je na černé listině vaší agentury. Přesto ho/ji přidat do této skupiny?",
+          "many": "{count} vybraných tvůrců je na černé listině vaší agentury ({names}). Přesto je přidat?"
+        }
+      },
+      "errors": {
+        "loadFailed": "Nepodařilo se načíst talentové skupiny.",
+        "membersLoadFailed": "Nepodařilo se načíst členy skupiny.",
+        "saveFailed": "Nepodařilo se uložit talentovou skupinu.",
+        "archiveFailed": "Nepodařilo se archivovat skupinu.",
+        "restoreFailed": "Nepodařilo se obnovit skupinu.",
+        "removeFailed": "Nepodařilo se odebrat tvůrce ze skupiny."
+      }
+    },
+    "agencyUsers": {
+      "title": "Tým",
+      "columns": {
+        "name": "Jméno",
+        "email": "E-mail",
+        "role": "Role",
+        "status": "Stav",
+        "joinedAt": "Připojil/a se"
+      },
+      "roles": {
+        "agency_admin": "Správce",
+        "agency_manager": "Manažer",
+        "agency_staff": "Zaměstnanec"
+      },
+      "status": {
+        "active": "Aktivní",
+        "pending": "Čekající"
+      },
+      "members": {
+        "heading": "Aktuální členové"
+      },
+      "filters": {
+        "allRoles": "Všechny role",
+        "allStatuses": "Všechny stavy"
+      },
+      "search": {
+        "label": "Hledat",
+        "placeholder": "Jméno nebo e-mail"
+      },
+      "invitations": {
+        "heading": "Historie pozvánek",
+        "columns": {
+          "email": "Pozvaný",
+          "invitedAt": "Pozváno",
+          "invitedBy": "Pozval/a"
+        },
+        "status": {
+          "pending": "Čekající",
+          "accepted": "Přijato",
+          "expired": "Vypršelo"
+        },
+        "empty": "Zatím žádné pozvánky."
+      },
+      "invite": {
+        "button": "Pozvat uživatele",
+        "title": "Pozvat člena týmu",
+        "fields": {
+          "email": "E-mailová adresa",
+          "role": "Role"
+        },
+        "submit": "Odeslat pozvánku",
+        "submitting": "Odesílání…",
+        "success": "Pozvánka odeslána na {email}.",
+        "errors": {
+          "failed": "Nepodařilo se odeslat pozvánku."
+        }
+      },
+      "empty": {
+        "heading": "Žádní členové týmu",
+        "body": "Pozvěte prvního člena týmu a začněte."
+      },
+      "emptyFiltered": "Žádní členové týmu neodpovídají vašemu filtru.",
+      "errors": {
+        "membersLoadFailed": "Nepodařilo se načíst členy týmu.",
+        "invitationsLoadFailed": "Nepodařilo se načíst historii pozvánek."
+      },
+      "loading": "Načítání týmu…",
+      "bulkInviteCreators": {
+        "button": "Hromadná pozvánka tvůrců"
+      }
+    },
+    "bulkInvite": {
+      "title": "Hromadná pozvánka tvůrců",
+      "description": "Nahrajte CSV s sloupcem `email`. Každý řádek se stane pozvánkou magic-link. Ostatní sloupce jsou přijaty, ale ignorovány.",
+      "file": {
+        "label": "CSV soubor",
+        "hint": "5 MB / max. 1000 řádků. Jediný povinný sloupec je `email`."
+      },
+      "softWarning": "{count} řádků je velká dávka — zpracování může trvat několik minut.",
+      "preview": {
+        "heading": "Zpracované řádky ({count})",
+        "row": "Řádek",
+        "email": "E-mail",
+        "errorCount": "{count} chyb parsování",
+        "errorHeading": "Tyto řádky budou přeskočeny:",
+        "errorItem": "Řádek {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Odeslat pozvánky ({count})",
+        "reset": "Vymazat",
+        "startOver": "Odeslat další dávku"
+      },
+      "status": {
+        "queued": "Ve frontě — čeká na spuštění",
+        "processing": "Zpracování pozvánek",
+        "complete": "Hotovo",
+        "failed": "Úloha selhala"
+      },
+      "tracking": {
+        "progress": "{percent} % dokončeno"
+      },
+      "timeout": {
+        "heading": "Stále probíhá",
+        "description": "Zpracování vašich pozvánek trvá déle, než se čekalo. Můžete zkusit znovu nebo se vrátit později.",
+        "retry": "Zkusit znovu"
+      },
+      "complete": {
+        "heading": "Výsledky",
+        "invited": "Pozváno",
+        "alreadyInvited": "Již pozváno",
+        "failed": "Neúspěšné",
+        "failureReason": "Důvod"
+      },
+      "failed": {
+        "heading": "Úloha hromadné pozvánky selhala."
+      },
+      "errors": {
+        "submitFailed": "Nepodařilo se nám odeslat CSV. Zkuste to znovu."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "Byli jste pozváni",
+        "joining": "Jste zváni k připojení do {agencyName} jako {role}.",
+        "accept": "Přijmout pozvánku",
+        "accepting": "Přijímání…",
+        "signInToContinue": "Přihlaste se pro přijetí této pozvánky",
+        "signIn": "Přihlásit se",
+        "noAccount": "Nemáte účet?",
+        "signUp": "Vytvořit nyní",
+        "success": "Vítejte v {agencyName}! Nyní jste {role}.",
+        "expired": {
+          "heading": "Tato pozvánka vypršela",
+          "body": "Kontaktujte správce agentury a požádejte o novou pozvánku."
+        },
+        "alreadyAccepted": {
+          "heading": "Pozvánka již přijata",
+          "body": "Tato pozvánka již byla použita. Přihlaste se pro přístup k pracovnímu prostoru.",
+          "signIn": "Přihlásit se"
+        },
+        "alreadyMember": {
+          "heading": "Již jste členem",
+          "body": "Jste již členem tohoto pracovního prostoru."
+        },
+        "emailMismatch": {
+          "heading": "Špatný účet",
+          "body": "Tato pozvánka byla odeslána na jinou e-mailovou adresu. Přihlaste se správným účtem."
+        },
+        "notFound": {
+          "heading": "Pozvánka nenalezena",
+          "body": "Tento odkaz pozvánky je neplatný nebo již byl použit."
+        },
+        "errors": {
+          "failed": "Nepodařilo se přijmout pozvánku."
+        }
+      }
+    },
+    "settings": {
+      "title": "Nastavení agentury",
+      "fields": {
+        "defaultCurrency": "Výchozí měna",
+        "defaultLanguage": "Výchozí jazyk",
+        "blacklistNotificationPolicy": "Informovat tvůrce, když jsou přidáni na černou listinu",
+        "blacklistNotificationPolicyHint": "Když je zapnuto, tvůrce dostane e-mail, pokud ho vaše agentura přidá na černou listinu. Důvod se nikdy nesděluje."
+      },
+      "save": "Uložit nastavení",
+      "saving": "Ukládání…",
+      "success": "Nastavení uloženo.",
+      "readOnly": "Nastavení agentury mohou upravovat pouze správci.",
+      "loading": "Načítání nastavení…",
+      "errors": {
+        "loadFailed": "Nepodařilo se načíst nastavení.",
+        "saveFailed": "Nepodařilo se uložit nastavení."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "Toto pole je povinné."
+  }
+}

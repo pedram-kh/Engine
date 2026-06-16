@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "operations": {
+      "health": {
+        "title": "Stav systému",
+        "heading": "Stav služeb",
+        "load_failed": "Nepodařilo se načíst kontrolu stavu. Obnovte stránku.",
+        "status": {
+          "ok": "V pořádku",
+          "degraded": "Snížený výkon"
+        },
+        "checks": {
+          "database": "Databáze",
+          "cache": "Cache"
+        }
+      }
+    }
+  }
+}

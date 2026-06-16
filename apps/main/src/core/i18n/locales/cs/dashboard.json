@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "welcome": {
+      "greeting": "Vítejte zpět",
+      "greetingNamed": "Vítejte zpět, {name}"
+    },
+    "kpi": {
+      "activeCampaigns": "Aktivní kampaně",
+      "creatorsInRoster": "Tvůrci v rosteru",
+      "pendingApplications": "Nevyřízené přihlášky tvůrců",
+      "paymentsDue": "Splatné platby"
+    },
+    "activity": {
+      "title": "Nedávná aktivita",
+      "empty": "Zatím žádná nedávná aktivita.",
+      "loadFailed": "Nepodařilo se načíst nedávnou aktivitu.",
+      "system": "Systém",
+      "actions": {
+        "creatorInvited": "{actor} pozval tvůrce",
+        "bulkInviteCompleted": "{actor} spustil hromadnou pozvánku ({invited} pozvaných, {failed} neúspěšných)",
+        "agencyCreatorRelationCreated": "{actor} přidal tvůrce do rosteru",
+        "brandCreated": "{actor} vytvořil značku",
+        "brandArchived": "{actor} archivoval značku",
+        "brandRestored": "{actor} obnovil značku",
+        "invitationCreated": "{actor} pozval člena týmu",
+        "invitationAccepted": "{actor} se připojil k týmu",
+        "agencySettingsUpdated": "{actor} aktualizoval nastavení agentury",
+        "fallback": "{actor} provedl akci"
+      }
+    },
+    "errors": {
+      "loadFailed": "Nepodařilo se načíst váš řídicí panel. Zkuste to znovu."
+    }
+  }
+}

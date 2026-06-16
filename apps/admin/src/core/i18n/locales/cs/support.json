@@ -1,0 +1,66 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "Vyhledávání uživatelů",
+        "subtitle": "Najděte uživatele pro zobrazení nebo zosobnění. Administrátoři platformy nemohou být zosobňováni.",
+        "label": "Hledat podle jména, e-mailu nebo ULID",
+        "empty": "Žádní uživatelé neodpovídají tomuto vyhledávání.",
+        "load_failed": "Nepodařilo se prohledat uživatele. Zkuste to znovu."
+      },
+      "impersonate": {
+        "button": "Zosobnit",
+        "title": "Zosobnit {name}",
+        "warning": "Otevřete novou kartu přihlášeni JAKO tento uživatel. Vaše relace správce zde zůstane aktivní. Každá provedená akce je zaznamenána u tohoto uživatele s vámi přihlášenými jako zosobňovatel a relace automaticky vyprší.",
+        "reason_label": "Důvod zosobnění",
+        "reason_hint": "Povinné, minimálně {count} znaků. Zaznamenáno v protokolu auditu.",
+        "confirm": "Zahájit zosobnění",
+        "cancel": "Zrušit",
+        "success": "Zosobnění {name} zahájeno v nové kartě.",
+        "failed": "Nepodařilo se zahájit zosobnění. Zkuste to znovu."
+      },
+      "impersonation_log": {
+        "title": "Protokol zosobnění",
+        "subtitle": "Všechny relace zosobnění správce kdy zahájené, nejnovější jako první.",
+        "empty": "Žádné relace zosobnění neodpovídají těmto filtrům.",
+        "load_failed": "Nepodařilo se načíst protokol zosobnění. Obnovte stránku.",
+        "filters": {
+          "status": "Stav",
+          "search": "Správce nebo uživatel (jméno, e-mail, ULID)",
+          "date_from": "Od",
+          "date_to": "Do",
+          "apply": "Použít"
+        },
+        "status_filter": {
+          "all": "Vše",
+          "active": "Aktivní",
+          "ended": "Ukončené",
+          "expired": "Vypršelé"
+        },
+        "statuses": {
+          "active": "Aktivní",
+          "ended": "Ukončená",
+          "expired": "Vypršelá"
+        },
+        "fields": {
+          "admin": "Správce",
+          "impersonated_user": "Zosobněný uživatel",
+          "reason": "Důvod",
+          "status": "Stav",
+          "started_at": "Zahájeno",
+          "ended_at": "Ukončeno"
+        },
+        "pagination": {
+          "prev": "Předchozí",
+          "next": "Další"
+        }
+      }
+    },
+    "impersonation": {
+      "target_admin": "Administrátoři platformy nemohou být zosobňováni.",
+      "target_self": "Nemůžete zosobnit sami sebe.",
+      "already_active": "Již máte aktivní zosobnění. Ukončete ho před zahájením nového.",
+      "invalid_handoff": "Toto předání zosobnění je neplatné, již bylo použito nebo vypršelo."
+    }
+  }
+}
