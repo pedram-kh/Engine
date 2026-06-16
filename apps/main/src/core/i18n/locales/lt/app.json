@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Influencer marketing, run like a real business.",
+    "sprint0Notice": "Sprint 0 scaffolding — main platform SPA",
+    "locale": {
+      "switcher": "Kalba",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    },
+    "messaging": {
+      "title": "Žinutės",
+      "you": "You",
+      "participant": "Participant",
+      "composePlaceholder": "Write a message…",
+      "send": "Siųsti",
+      "attachment": "Attachment",
+      "empty": "Ne messages yet. Start the conversation.",
+      "loadEarlier": "Load earlier messages",
+      "loadError": "We couldn't load this conversation. It will retry shortly.",
+      "sendError": "Your message couldn't be sent. Please try again.",
+      "attachmentUploadError": "An attachment failed to upload. Please try again.",
+      "closed": "This conversation is closed — the assignment is no longer active.",
+      "systemFallback": "The assignment was updated.",
+      "system": {
+        "assignment": {
+          "contracted": "The contract was signed — production can begin.",
+          "draft_submitted": "A draft was submitted for review.",
+          "draft_approved": "The draft was approved.",
+          "revision_requested": "Revisions were requested on the draft.",
+          "draft_rejected": "The draft was rejected.",
+          "posted_by_creator": "The creator marked the content as posted.",
+          "live_verified": "The live post was verified.",
+          "manually_verified": "The post was manually verified.",
+          "resubmit_requested": "A resubmission was requested.",
+          "payment_released": "Mokėjimas was released."
+        }
+      },
+      "rollup": {
+        "empty": "Ne message threads yet for this campaign.",
+        "noMessages": "Ne messages yet.",
+        "loadError": "We couldn't load the message threads."
+      }
+    },
+    "nav": {
+      "dashboard": "Valdymo skydelis",
+      "roster": "My creators",
+      "discover": "Discover",
+      "pools": "Talent pools",
+      "brands": "Brands",
+      "campaigns": "Kampanijas",
+      "agencyUsers": "Team",
+      "settings": "Nustatymai"
+    },
+    "discover": {
+      "title": "Discover creators",
+      "subtitle": "Browse and search the global creator pool.",
+      "unnamed": "Unnamed creator",
+      "notConnected": "Net connected",
+      "search": {
+        "label": "Ieškoti creators",
+        "placeholder": "Ieškoti by name or bio"
+      },
+      "filters": {
+        "country": "Country",
+        "language": "Kalba",
+        "category": "Category"
+      },
+      "connection": {
+        "connected": "Connected",
+        "pending": "Request pending",
+        "declined": "Atsisakytid",
+        "notConnected": "Net connected",
+        "sendRequest": "Siųsti request",
+        "requestAgain": "Request again",
+        "sent": "Request sent",
+        "reRequested": "Request sent again",
+        "alreadyPending": "A request is already pending",
+        "alreadyConnected": "This creator is already on your roster",
+        "error": "Couldn't send the request. Please try again."
+      },
+      "empty": {
+        "heading": "Ne creators yet",
+        "body": "Patvirtintid creators will appear here as the pool grows."
+      },
+      "emptyFiltered": {
+        "heading": "Ne matches",
+        "body": "Ne creators match your filters. Try broadening your search."
+      },
+      "errors": {
+        "loadFailed": "Couldn't load creators. Please try again."
+      },
+      "detail": {
+        "back": "Atgal to Discover",
+        "notFound": "This creator isn't available.",
+        "loadFailed": "Couldn't load this profile. Please try again.",
+        "viewInRoster": "Peržiūrėti in roster",
+        "sections": {
+          "profile": "Profilis",
+          "social": "Social accounts",
+          "portfolio": "Portfolio"
+        },
+        "social": {
+          "empty": "Ne social accounts linked."
+        },
+        "portfolio": {
+          "empty": "Ne portfolio elementai yet.",
+          "untitled": "Untitled item"
+        }
+      }
+    },
+    "roster": {
+      "title": "My creators",
+      "unnamed": "Unnamed creator",
+      "blacklisted": "Blacklisted",
+      "blacklist": {
+        "badge": {
+          "hard": "Blacklisted",
+          "soft": "Blacklist warning"
+        },
+        "openAction": "Blacklist creator",
+        "liftAction": "Remove blacklist",
+        "lifted": "Blacklist removed.",
+        "liftFailed": "Failed to remove the blacklist.",
+        "section": {
+          "title": "Blacklist",
+          "none": "This creator is not blacklisted by your agency."
+        },
+        "status": {
+          "hard": "Hard blacklisted — excluded from your discovery and blocked from connection requests.",
+          "soft": "Soft blacklisted — a warning only; the creator stays matchable."
+        },
+        "dialog": {
+          "title": "Blacklist creator",
+          "scopeLabel": "Scope",
+          "scope": {
+            "agency": "Entire agency",
+            "brand": "A specific brand"
+          },
+          "noRelationHint": "Agentūra-wide blacklisting requires a connected creator.",
+          "brandLabel": "Brand",
+          "typeLabel": "Type",
+          "type": {
+            "hard": "Hard — exclude from discovery and block requests",
+            "soft": "Soft — warn only, keep matchable"
+          },
+          "reasonLabel": "Reason",
+          "reasonPlaceholder": "Why is this creator being blacklisted? (kept private to your agency)",
+          "cancel": "Atšaukti",
+          "confirm": "Blacklist",
+          "success": "Kūrėjas blacklisted.",
+          "invalid": "Please complete the required fields.",
+          "failed": "Failed to blacklist the creator."
+        }
+      },
+      "fields": {
+        "name": "Name",
+        "email": "El. paštas",
+        "status": "Būsena",
+        "applicationStatus": "Application",
+        "country": "Country",
+        "language": "Kalba",
+        "categories": "Categories",
+        "rating": "Rating",
+        "campaigns": "Kampanijas"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Prospect",
+        "external": "External",
+        "pending_request": "Laukiama request",
+        "declined": "Atsisakytid"
+      },
+      "applicationStatus": {
+        "incomplete": "Incomplete",
+        "pending": "Laukiama",
+        "approved": "Patvirtintid",
+        "rejected": "Atmestied"
+      },
+      "search": {
+        "label": "Ieškoti creators",
+        "placeholder": "Ieškoti by name or bio"
+      },
+      "filters": {
+        "status": {
+          "all": "Visi",
+          "roster": "Roster",
+          "prospect": "Prospect",
+          "external": "External",
+          "pending_request": "Laukiama requests",
+          "declined": "Atsisakytid"
+        },
+        "country": "Country",
+        "language": "Kalba",
+        "category": "Category",
+        "availability": {
+          "from": "Available from",
+          "to": "Available to"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Followers"
+        },
+        "engagement": {
+          "label": "Engagement rate"
+        },
+        "metrics": {
+          "tooltip": "Social metrics aren't connected yet."
+        }
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Ne creators yet",
+        "body": "Kūrėjass you invite or engage will appear here across your roster, prospects, and external collaborators."
+      },
+      "emptyFiltered": {
+        "heading": "Ne creators match these filters",
+        "body": "Try clearing or changing a filter to see more of your creators."
+      },
+      "errors": {
+        "loadFailed": "Failed to load your creators. Please try again."
+      },
+      "detail": {
+        "back": "Atgal to my creators",
+        "unnamed": "Unnamed creator",
+        "loadFailed": "We couldn't load this creator. Please try again.",
+        "notFound": "This creator isn't in your roster.",
+        "sections": {
+          "profile": "Profilis",
+          "rating": "Rating & notes",
+          "social": "Social accounts",
+          "metrics": "Social metrics",
+          "portfolio": "Portfolio",
+          "availability": "Pasiekiamumas",
+          "campaigns": "Kampanija history"
+        },
+        "editor": {
+          "starLabel": "Rate {n} of 5",
+          "ratingUnset": "Net rated",
+          "notesLabel": "Internal notes",
+          "notesPlaceholder": "Private notes about working with this creator (visible to your agency only).",
+          "notesEmpty": "Ne notes yet.",
+          "save": "Išsaugoti",
+          "saved": "Changes saved.",
+          "saveFailed": "We couldn't save your changes. Please try again."
+        },
+        "social": {
+          "empty": "Ne social accounts connected."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Social metrics will appear once accounts are connected",
+            "body": "Follower counts and engagement rates aren't available yet — they'll show here when the social integrations land."
+          }
+        },
+        "portfolio": {
+          "empty": "Ne portfolio elementai yet.",
+          "untitled": "Untitled portfolio item"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Ne availability blocks in this period",
+            "body": "This creator hasn't marked any unavailable time for the dates shown."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Ne campaign history yet",
+            "body": "Kampanijas you run with this creator will appear here."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Atsijungti",
+      "signingOut": "Signing out…"
+    },
+    "workspaceSwitcher": {
+      "label": "Switch workspace",
+      "placeholder": "Select workspace"
+    },
+    "brands": {
+      "title": "Brands",
+      "actions": {
+        "create": "New brand",
+        "edit": "Redaguoti",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Išsaugoti brand",
+        "saving": "Saving…",
+        "backToList": "Atgal to brands",
+        "backToDetail": "Atgal to brand"
+      },
+      "fields": {
+        "name": "Brand name",
+        "slug": "Slug",
+        "description": "Description",
+        "industry": "Industry",
+        "websiteUrl": "Website URL",
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "status": "Būsena"
+      },
+      "status": {
+        "active": "Aktyvus",
+        "archived": "Suarchyvuota",
+        "all": "Visi"
+      },
+      "detail": {
+        "title": "Brand details"
+      },
+      "create": {
+        "title": "New brand",
+        "success": "Brand created successfully."
+      },
+      "edit": {
+        "title": "Redaguoti brand",
+        "success": "Brand updated successfully."
+      },
+      "archive": {
+        "confirmTitle": "Archive brand",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later.",
+        "confirm": "Archive",
+        "cancel": "Atšaukti",
+        "success": "Brand archived."
+      },
+      "restore": {
+        "confirmTitle": "Restore brand",
+        "confirmMessage": "Restore {name}? It will appear in the active brand list again.",
+        "confirm": "Restore",
+        "cancel": "Atšaukti",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Ne brands yet",
+        "body": "Sukurti your first brand to start managing influencer campaigns.",
+        "cta": "Sukurti brand"
+      },
+      "emptyFiltered": {
+        "heading": "Ne brands match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "loading": "Kraunama brands…",
+      "errors": {
+        "loadFailed": "Failed to load brands.",
+        "saveFailed": "Failed to save brand.",
+        "archiveFailed": "Failed to archive brand.",
+        "restoreFailed": "Failed to restore brand."
+      }
+    },
+    "campaigns": {
+      "title": "Kampanijas",
+      "actions": {
+        "create": "New campaign",
+        "save": "Sukurti campaign",
+        "saveSettings": "Išsaugoti settings",
+        "backToList": "Atgal to campaigns"
+      },
+      "fields": {
+        "name": "Kampanija name",
+        "brand": "Brand",
+        "objective": "Objective",
+        "description": "Description",
+        "budget": "Budget",
+        "currency": "Valiuta",
+        "startsAt": "Start date",
+        "endsAt": "End date",
+        "targetCreatorCount": "Target creator count",
+        "deliverables": "Deliverables",
+        "deliverablesHint": "One deliverable per line (e.g. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Space or comma separated.",
+        "usageRights": "Usage rights",
+        "requiresContract": "Require a per-campaign contract",
+        "status": "Būsena"
+      },
+      "objective": {
+        "awareness": "Awareness",
+        "engagement": "Engagement",
+        "conversion": "Conversion",
+        "ugc": "UGC",
+        "launch": "Launch"
+      },
+      "status": {
+        "all": "Visi",
+        "draft": "Juodraštis",
+        "active": "Aktyvus",
+        "paused": "Paused",
+        "completed": "Baigta",
+        "cancelled": "Atšauktiled"
+      },
+      "filters": {
+        "brand": "Brand",
+        "startsFrom": "Starts from",
+        "startsTo": "Starts to"
+      },
+      "tabs": {
+        "overview": "Apžvalga",
+        "creators": "Kūrėjass",
+        "board": "Board",
+        "drafts": "Juodraštiss",
+        "payments": "Mokėjimass",
+        "messages": "Žinutės",
+        "settings": "Nustatymai"
+      },
+      "create": {
+        "title": "New campaign"
+      },
+      "detail": {
+        "title": "Kampanija details"
+      },
+      "settings": {
+        "saved": "Kampanija settings saved."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Ne creators yet",
+          "body": "Pakviesti creators to this campaign to get started."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Visi drafts"
+        },
+        "empty": {
+          "heading": "Ne drafts yet",
+          "body": "Kūrėjas draft submissions will appear here once submitted."
+        },
+        "loadFailed": "We couldn't load drafts. Please try again.",
+        "submittedAt": "Pateiktited {date}"
+      },
+      "fees": {
+        "offered": "Offered",
+        "countered": "Countered"
+      },
+      "reinvite": {
+        "action": "Re-invite",
+        "title": "Re-invite creator",
+        "body": "They countered with {fee}. Re-offer at:",
+        "feeLabel": "New agreed fee ({currency})",
+        "cancel": "Atšaukti",
+        "submit": "Re-invite",
+        "success": "Re-invitation sent."
+      },
+      "contract": {
+        "attach": {
+          "action": "Issue contract",
+          "title": "Issue contract",
+          "body": "Attach contract terms for the creator to review and accept before they can submit a draft.",
+          "titleLabel": "Sutartis title",
+          "termsLabel": "Terms (markdown)",
+          "termsHint": "Provide inline terms and/or upload a PDF below.",
+          "pdfLabel": "Sutartis PDF (optional)",
+          "pdfReady": "PDF ready: {name}",
+          "cancel": "Atšaukti",
+          "submit": "Issue contract",
+          "success": "Sutartis issued. The creator has been notified.",
+          "alreadyAttached": "A contract is already awaiting this creator's acceptance.",
+          "error": "We couldn't issue the contract. Please try again."
+        },
+        "pending": "Sutartis sent — awaiting creator",
+        "proceedWithout": {
+          "action": "Proceed without contract",
+          "success": "Užduotis advanced without a contract.",
+          "requiredError": "This campaign requires a per-campaign contract; issue one for the creator to accept.",
+          "error": "We couldn't advance this assignment. Please try again."
+        }
+      },
+      "invite": {
+        "open": "Pakviesti creators",
+        "title": "Pakviesti creators",
+        "loadFailed": "We couldn't load your roster. Please try again.",
+        "feeLabel": "Agreed fee ({currency})",
+        "search": "Ieškoti creators",
+        "noRoster": "Ne roster creators to invite yet.",
+        "noSearchMatch": "Ne creators match your search.",
+        "unnamed": "Unnamed creator",
+        "blockedHint": "Blacklisted — can't be invited.",
+        "cancel": "Atšaukti",
+        "submit": "Pakviesti ({count})",
+        "summary": "Pakviestid {ok}. Skipped {blacklisted} (blacklisted), {conflicts} with conflicts.",
+        "conflict": {
+          "title": "Pasiekiamumas conflict",
+          "body": "{count} selected creator(s) are unavailable during the campaign window. Pakviesti them anyway?",
+          "cancel": "Skip them",
+          "proceed": "Pakviesti anyway"
+        }
+      },
+      "board": {
+        "loadError": "We couldn't load the board. Please try again.",
+        "empty": "This board has no columns yet.",
+        "moveFailed": "Couldn't move the card — it's back where it was.",
+        "reorderFailed": "Couldn't reorder the columns — the order was restored.",
+        "automationsButton": "Automations",
+        "card": {
+          "unnamed": "Unnamed creator",
+          "removed": "Removed assignment",
+          "daysLeft": "{n}d left",
+          "dueToday": "Due today",
+          "overdue": "Overdue"
+        },
+        "column": {
+          "add": "Pridėti column",
+          "edit": "Rename / recolor",
+          "delete": "Ištrinti column",
+          "addTitle": "Pridėti column",
+          "editTitle": "Redaguoti column",
+          "name": "Column name",
+          "color": "Color",
+          "terminalSuccess": "Mark as success (terminal)",
+          "terminalFailure": "Mark as failure (terminal)",
+          "save": "Išsaugoti",
+          "cancel": "Atšaukti",
+          "saveFailed": "We couldn't save the column. Please try again.",
+          "deleteTitle": "Ištrinti column",
+          "deleteBody": "Ištrinti \"{name}\"? This can't be undone.",
+          "deleteBodyNonEmpty": "\"{name}\" has {count} card(s). Choose where to move them before deleting.",
+          "deleteDestination": "Move cards to",
+          "deleteConfirm": "Ištrinti",
+          "errorLastColumn": "A board must keep at least one column.",
+          "errorDestinationRequired": "This column has cards — choose a destination column to move them to before deleting.",
+          "errorGeneric": "We couldn't delete the column. Please try again."
+        },
+        "automation": {
+          "title": "Automations",
+          "subtitle": "Each event can move a card to a column automatically. Manual drags never trigger these.",
+          "event": "Event",
+          "target": "Moves card to",
+          "none": "Ne automation",
+          "enabled": "Enabled",
+          "broken": "Target column was deleted — pick a new one",
+          "updateFailed": "We couldn't update the automation. Please try again.",
+          "close": "Uždaryti"
+        },
+        "drawer": {
+          "title": "Užduotis",
+          "close": "Uždaryti",
+          "loadError": "We couldn't load this assignment. Please try again.",
+          "tabs": {
+            "detail": "Detail",
+            "history": "Movement history"
+          },
+          "detail": {
+            "status": "Būsena",
+            "creator": "Kūrėjas",
+            "postingDue": "Posting due",
+            "deliverables": "Deliverables",
+            "latestDraft": "Latest draft",
+            "postedContent": "Posted content",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Ne movements recorded yet.",
+            "removed": "(removed)",
+            "manual": "Manual move",
+            "auto": "Automation",
+            "from": "from",
+            "to": "to"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Mokėjimass coming soon",
+          "body": "Escrow funding and payouts will be managed here."
+        },
+        "messages": {
+          "heading": "Žinutės coming soon",
+          "body": "Kampanija messaging will appear here."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Pakviestid",
+        "declined": "Atsisakytid",
+        "countered": "Countered",
+        "accepted": "Priimtied",
+        "contracted": "Sutartised",
+        "producing": "Producing",
+        "draft_submitted": "Juodraštis submitted",
+        "revision_requested": "Revision requested",
+        "approved": "Patvirtintid",
+        "rejected": "Atmestied",
+        "posted": "Posted",
+        "live_verified": "Live verified",
+        "manually_verified": "Manually verified",
+        "payment_held": "Mokėjimas held",
+        "payment_released": "Mokėjimas released",
+        "cancelled": "Atšauktiled"
+      },
+      "review": {
+        "action": "Review",
+        "title": "Review draft",
+        "loadFailed": "We couldn't load this draft. Please try again.",
+        "draftVersion": "Juodraštis v{n}",
+        "noCaption": "Ne caption provided.",
+        "hashtags": "Hashtags",
+        "mentions": "Mentions",
+        "noMedia": "Ne media attached.",
+        "feedbackLabel": "Feedback to the creator",
+        "feedbackHint": "Privaloma when requesting changes or rejecting.",
+        "approve": "Patvirtinti",
+        "requestRevision": "Request changes",
+        "reject": "Atmesti",
+        "close": "Uždaryti",
+        "history": "Version history",
+        "postedContent": "Posted content",
+        "draftStatus": {
+          "pending": "Laukiama review",
+          "approved": "Patvirtintid",
+          "rejected": "Atmestied",
+          "revision_requested": "Revision requested"
+        },
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Net found",
+          "mismatch": "Mismatch"
+        },
+        "simulated": "Simulated verification (mock provider)",
+        "toast": {
+          "approved": "Juodraštis approved.",
+          "revisionRequested": "Revision requested.",
+          "rejected": "Juodraštis rejected.",
+          "error": "Something went wrong. Please try again."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Open preview",
+          "close": "Uždaryti",
+          "empty": "Ne media attached."
+        }
+      },
+      "resolution": {
+        "action": "Resolve",
+        "title": "Resolve verification",
+        "loadFailed": "We couldn't load this assignment. Please try again.",
+        "postedContent": "Pateiktited post",
+        "simulated": "Simulated verification (mock provider)",
+        "intro": "Automatic verification of this post failed. Priimti it manually, send it back for a fresh post, or ask the creator to fix the link in place.",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Net found",
+          "mismatch": "Mismatch"
+        },
+        "noteLabel": "Reason / note to the creator",
+        "noteHint": "Privaloma when verifying manually; optional for resubmit requests.",
+        "manuallyVerify": "Verify manually",
+        "requestFresh": "Request fresh post",
+        "requestInPlace": "Ask to fix link",
+        "close": "Uždaryti",
+        "notActionable": "This assignment is no longer awaiting resolution.",
+        "toast": {
+          "verified": "Post manually verified.",
+          "resubmitFresh": "Sent back for a fresh post.",
+          "resubmitInPlace": "Asked the creator to fix the link.",
+          "error": "Something went wrong. Please try again."
+        }
+      },
+      "viewPost": {
+        "action": "Peržiūrėti post",
+        "title": "Posted content",
+        "loadFailed": "We couldn't load this post. Please try again.",
+        "empty": "The creator hasn't posted any content yet.",
+        "current": "Current",
+        "postedAt": "Posted",
+        "verifiedAt": "Verified",
+        "simulated": "Tikrinimas runs against a simulated provider in this environment.",
+        "close": "Uždaryti",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Net found",
+          "mismatch": "Mismatch"
+        }
+      },
+      "empty": {
+        "heading": "Ne campaigns yet",
+        "body": "Sukurti your first campaign to start engaging creators.",
+        "cta": "Sukurti campaign"
+      },
+      "errors": {
+        "loadFailed": "Failed to load campaigns.",
+        "saveFailed": "Failed to save campaign."
+      }
+    },
+    "pools": {
+      "title": "Talent pools",
+      "agencyWide": "Agentūra-wide",
+      "actions": {
+        "create": "New pool",
+        "edit": "Redaguoti",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Išsaugoti pool",
+        "backToList": "Atgal to talent pools",
+        "backToDetail": "Atgal to pool"
+      },
+      "fields": {
+        "name": "Pool name",
+        "description": "Description",
+        "brand": "Brand",
+        "brandHint": "Neprivaloma — labels the pool for a brand's work. Leave blank for an agency-wide pool.",
+        "members": "Members"
+      },
+      "status": {
+        "active": "Aktyvus",
+        "archived": "Suarchyvuota",
+        "all": "Visi"
+      },
+      "create": {
+        "title": "New talent pool"
+      },
+      "edit": {
+        "title": "Redaguoti talent pool"
+      },
+      "detail": {
+        "title": "Pool details",
+        "notFound": "This pool no longer exists.",
+        "membersHeading": "Members",
+        "membersEmpty": "Ne creators in this pool yet. Pridėti creators from a creator's detail page.",
+        "memberCount": "{count} creators",
+        "unnamed": "Unnamed creator",
+        "remove": "Remove from pool",
+        "removed": "{name} removed from the pool."
+      },
+      "archive": {
+        "confirmTitle": "Archive pool",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later with its members intact.",
+        "confirm": "Archive",
+        "cancel": "Atšaukti"
+      },
+      "restore": {
+        "confirmTitle": "Restore pool",
+        "confirmMessage": "Restore {name}? It will appear in the active pool list again.",
+        "confirm": "Restore",
+        "cancel": "Atšaukti",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Ne talent pools yet",
+        "body": "Sukurti a pool to group creators for a brand or a campaign brief.",
+        "cta": "Sukurti pool"
+      },
+      "emptyFiltered": {
+        "heading": "Ne pools match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "picker": {
+        "openLabel": "Pridėti to pool",
+        "title": "Pridėti to talent pools",
+        "empty": "Ne talent pools yet. Sukurti one from the Talent pools page.",
+        "done": "Done",
+        "added": "Pridėtied to {name}.",
+        "removed": "Removed from {name}.",
+        "loadFailed": "Failed to load talent pools.",
+        "toggleFailed": "Failed to update pool membership."
+      },
+      "addCreators": {
+        "open": "Pridėti creators",
+        "title": "Pridėti creators to this pool",
+        "search": "Ieškoti your roster",
+        "noRoster": "Your roster is empty. Pridėti creators to your roster first.",
+        "allInPool": "Visi your roster creators are already in this pool.",
+        "noSearchMatch": "Ne roster creators match your search.",
+        "cancel": "Atšaukti",
+        "add": "Pridėti {count}",
+        "added": "{count} creators added to the pool.",
+        "loadFailed": "Failed to load your roster.",
+        "addFailed": "Failed to add creators to the pool.",
+        "confirmHard": {
+          "one": "{name} is blacklisted by your agency. Pridėti them to this pool anyway?",
+          "many": "{count} selected creators are blacklisted by your agency ({names}). Pridėti them anyway?"
+        }
+      },
+      "errors": {
+        "loadFailed": "Failed to load talent pools.",
+        "membersLoadFailed": "Failed to load pool members.",
+        "saveFailed": "Failed to save talent pool.",
+        "archiveFailed": "Failed to archive pool.",
+        "restoreFailed": "Failed to restore pool.",
+        "removeFailed": "Failed to remove creator from the pool."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Name",
+        "email": "El. paštas",
+        "role": "Vaidmuo",
+        "status": "Būsena",
+        "joinedAt": "Joined"
+      },
+      "roles": {
+        "agency_admin": "Administratorius",
+        "agency_manager": "Vadybininkas",
+        "agency_staff": "Darbuotojai"
+      },
+      "status": {
+        "active": "Aktyvus",
+        "pending": "Laukiama"
+      },
+      "members": {
+        "heading": "Current members"
+      },
+      "filters": {
+        "allRoles": "Visi roles",
+        "allStatuses": "Visi statuses"
+      },
+      "search": {
+        "label": "Ieškoti",
+        "placeholder": "Name or email"
+      },
+      "invitations": {
+        "heading": "Kvietimas history",
+        "columns": {
+          "email": "Pakviestie",
+          "invitedAt": "Pakviestid",
+          "invitedBy": "Pakviestid by"
+        },
+        "status": {
+          "pending": "Laukiama",
+          "accepted": "Priimtied",
+          "expired": "Expired"
+        },
+        "empty": "Ne invitations yet."
+      },
+      "invite": {
+        "button": "Pakviesti user",
+        "title": "Pakviesti a team member",
+        "fields": {
+          "email": "El. pašto adresas",
+          "role": "Vaidmuo"
+        },
+        "submit": "Siųsti invitation",
+        "submitting": "Siųstiing…",
+        "success": "Kvietimas sent to {email}.",
+        "errors": {
+          "failed": "Failed to send invitation."
+        }
+      },
+      "empty": {
+        "heading": "Ne team members",
+        "body": "Pakviesti your first team member to get started."
+      },
+      "emptyFiltered": "Ne team members match your filter.",
+      "errors": {
+        "membersLoadFailed": "Failed to load team members.",
+        "invitationsLoadFailed": "Failed to load invitation history."
+      },
+      "loading": "Kraunama team…",
+      "bulkInviteCreators": {
+        "button": "Bulk-invite creators"
+      }
+    },
+    "bulkInvite": {
+      "title": "Bulk-invite creators",
+      "description": "Įkelti a CSV with an `email` column. Each row becomes a magic-link invitation. Other columns are accepted but ignored.",
+      "file": {
+        "label": "CSV file",
+        "hint": "5 MB / 1000 rows max. The only required column is `email`."
+      },
+      "softWarning": "{count} rows is a large batch — processing may take a few minutes.",
+      "preview": {
+        "heading": "Parsed rows ({count})",
+        "row": "Row",
+        "email": "El. paštas",
+        "errorCount": "{count} parse errors",
+        "errorHeading": "These rows will be skipped:",
+        "errorItem": "Row {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Siųsti invitations ({count})",
+        "reset": "Clear",
+        "startOver": "Siųsti another batch"
+      },
+      "status": {
+        "queued": "Queued — waiting to start",
+        "processing": "Processing invitations",
+        "complete": "Visi done",
+        "failed": "Job failed"
+      },
+      "tracking": {
+        "progress": "{percent}% complete"
+      },
+      "timeout": {
+        "heading": "Still working on this",
+        "description": "Your invitations are taking longer than expected to process. You can try again or check back later.",
+        "retry": "Try again"
+      },
+      "complete": {
+        "heading": "Results",
+        "invited": "Pakviestid",
+        "alreadyInvited": "Already invited",
+        "failed": "Failed",
+        "failureReason": "Reason"
+      },
+      "failed": {
+        "heading": "The bulk invitation job failed."
+      },
+      "errors": {
+        "submitFailed": "We couldn't submit the CSV. Please try again."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "You've been invited",
+        "joining": "You're being invited to join {agencyName} as {role}.",
+        "accept": "Priimti invitation",
+        "accepting": "Priimtiing…",
+        "signInToContinue": "Prisijungti to accept this invitation",
+        "signIn": "Prisijungti",
+        "noAccount": "Don't have an account?",
+        "signUp": "Sukurti one now",
+        "success": "Sveiki atvykę to {agencyName}! You're now a {role}.",
+        "expired": {
+          "heading": "This invitation has expired",
+          "body": "Please contact your agency administrator to request a new invitation."
+        },
+        "alreadyAccepted": {
+          "heading": "Kvietimas already accepted",
+          "body": "This invitation has already been used. Prisijungti to access your workspace.",
+          "signIn": "Prisijungti"
+        },
+        "alreadyMember": {
+          "heading": "Already a member",
+          "body": "You are already a member of this workspace."
+        },
+        "emailMismatch": {
+          "heading": "Wrong account",
+          "body": "This invitation was sent to a different email address. Please sign in with the correct account."
+        },
+        "notFound": {
+          "heading": "Kvietimas not found",
+          "body": "This invitation link is invalid or has already been used."
+        },
+        "errors": {
+          "failed": "Failed to accept invitation."
+        }
+      }
+    },
+    "settings": {
+      "title": "Agentūra settings",
+      "fields": {
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "blacklistNotificationPolicy": "Netify creators when blacklisted",
+        "blacklistNotificationPolicyHint": "When on, a creator is emailed if your agency blacklists them. The reason is never shared."
+      },
+      "save": "Išsaugoti settings",
+      "saving": "Saving…",
+      "success": "Nustatymai saved.",
+      "readOnly": "Only administrators can edit agency settings.",
+      "loading": "Kraunama settings…",
+      "errors": {
+        "loadFailed": "Failed to load settings.",
+        "saveFailed": "Failed to save settings."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "This field is required."
+  }
+}
