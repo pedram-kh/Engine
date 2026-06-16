@@ -1,0 +1,66 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "Användarsökning",
+        "subtitle": "Hitta en användare för att visa eller efterlikna. Plattformsadministratörer kan inte efterliknas.",
+        "label": "Sök efter namn, e-post eller ULID",
+        "empty": "Inga användare matchar den här sökningen.",
+        "load_failed": "Användare kunde inte sökas. Försök igen."
+      },
+      "impersonate": {
+        "button": "Efterlikna",
+        "title": "Efterlikna {name}",
+        "warning": "Du öppnar en ny flik inloggad SOM den här användaren. Din adminsession förblir aktiv här. Varje åtgärd du vidtar registreras mot den här användaren med dig loggad som efterlignare, och sessionen löper ut automatiskt.",
+        "reason_label": "Anledning till efterlikning",
+        "reason_hint": "Krävs, minst {count} tecken. Registreras i revisionsloggen.",
+        "confirm": "Starta efterlikning",
+        "cancel": "Avbryt",
+        "success": "Efterlikning av {name} startad i en ny flik.",
+        "failed": "Efterlikningen kunde inte startas. Försök igen."
+      },
+      "impersonation_log": {
+        "title": "Efterlikningslogg",
+        "subtitle": "Alla admin-efterlikningssessioner som någonsin startats, nyast först.",
+        "empty": "Inga efterlikningssessioner matchar dessa filter.",
+        "load_failed": "Efterlikningsloggen kunde inte laddas. Uppdatera sidan.",
+        "filters": {
+          "status": "Status",
+          "search": "Admin eller användare (namn, e-post, ULID)",
+          "date_from": "Från",
+          "date_to": "Till",
+          "apply": "Tillämpa"
+        },
+        "status_filter": {
+          "all": "Alla",
+          "active": "Aktiv",
+          "ended": "Avslutad",
+          "expired": "Utgången"
+        },
+        "statuses": {
+          "active": "Aktiv",
+          "ended": "Avslutad",
+          "expired": "Utgången"
+        },
+        "fields": {
+          "admin": "Administratör",
+          "impersonated_user": "Efterliknand användare",
+          "reason": "Anledning",
+          "status": "Status",
+          "started_at": "Startad",
+          "ended_at": "Avslutad"
+        },
+        "pagination": {
+          "prev": "Föregående",
+          "next": "Nästa"
+        }
+      }
+    },
+    "impersonation": {
+      "target_admin": "Plattformsadministratörer kan inte efterliknas.",
+      "target_self": "Du kan inte efterlikna dig själv.",
+      "already_active": "Du har redan en aktiv efterlikning. Avsluta den innan du startar en ny.",
+      "invalid_handoff": "Det här efterliknings-handoffet är ogiltigt, redan använt eller utgånget."
+    }
+  }
+}

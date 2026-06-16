@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Driftsaviseringar",
+      "subtitle": "Revisionsaktivitet och driftsaviseringar adresserade till dig.",
+      "empty": "Inga driftsaviseringar.",
+      "load_failed": "Driftsaviseringarna kunde inte laddas. Uppdatera sidan.",
+      "paymentAlerts": {
+        "title": "Betalningsaviseringar",
+        "body": "Escrow-finansierings- och frigivningsaviseringar aktiveras när betalningsbehandling levereras (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Creator godkänd",
+          "rejected": "Creator avvisad"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "admin": {
+    "creators": {
+      "list": {
+        "title": "Creator-granskningskö",
+        "unnamed": "Ej namngiven creator",
+        "view": "Visa creator",
+        "load_failed": "Granskningskön kunde inte laddas. Uppdatera sidan.",
+        "fields": {
+          "name": "Creator",
+          "email": "E-post",
+          "status": "Status",
+          "kyc": "KYC",
+          "completeness": "Fullständighet",
+          "submitted_at": "Inlämnad"
+        },
+        "filters": {
+          "pending": "Väntande",
+          "approved": "Godkänd",
+          "rejected": "Avvisad",
+          "incomplete": "Ofullständig",
+          "all": "Alla"
+        },
+        "status_labels": {
+          "incomplete": "Ofullständig",
+          "pending": "Väntande",
+          "approved": "Godkänd",
+          "rejected": "Avvisad"
+        }
+      },
+      "kyc": {
+        "title": "KYC-granskningskö",
+        "empty": "Inga creators matchar det här KYC-filtret.",
+        "load_failed": "KYC-kön kunde inte laddas. Uppdatera sidan.",
+        "filters": {
+          "pending": "Väntande",
+          "verified": "Verifierad",
+          "rejected": "Avvisad",
+          "none": "Inte startat",
+          "all": "Alla"
+        }
+      },
+      "all": {
+        "title": "Alla creators",
+        "empty": "Inga creators ännu.",
+        "load_failed": "Creators kunde inte laddas. Uppdatera sidan."
+      },
+      "detail": {
+        "fallback_title": "Creator",
+        "application_status": "Ansökningsstatus: {status}",
+        "completeness": "{percent}% klart",
+        "rejection_heading": "Avslagsnoteringar",
+        "profile_heading": "Profil",
+        "social_heading": "Sociala konton",
+        "portfolio_heading": "Portfolio",
+        "onboarding_heading": "Onboarding-status",
+        "kyc_history_heading": "KYC-verifieringshistorik",
+        "kyc_history": {
+          "provider": "Leverantör",
+          "status": "Status",
+          "started_at": "Startad den",
+          "completed_at": "Avslutad den"
+        },
+        "assignments_heading": "Kampanjhistorik",
+        "assignments": {
+          "empty": "Den här creatorn har inga kampanjtilldelningar ännu.",
+          "load_failed": "Kampanjhistoriken kunde inte laddas.",
+          "campaign": "Kampanj",
+          "brand": "Varumärke",
+          "agency": "Byrå",
+          "status": "Status",
+          "created_at": "Startad"
+        },
+        "audit_heading": "Revisionshistorik",
+        "audit": {
+          "empty": "Inga revisionsposter för den här creatorn ännu.",
+          "load_failed": "Revisionshistoriken kunde inte laddas.",
+          "action": "Åtgärd",
+          "actor": "Aktör",
+          "reason": "Anledning",
+          "created_at": "När"
+        },
+        "payments_heading": "Betalningshistorik",
+        "payments_coming_soon": "Betalningshistorik aktiveras när betalningsbehandling levereras (Sprint 10).",
+        "load_failed": "Den här creatorn kunde inte laddas. Uppdatera sidan.",
+        "fields": {
+          "display_name": "Visningsnamn",
+          "bio": "Bio",
+          "country_code": "Land",
+          "region": "Region",
+          "primary_language": "Primärt språk",
+          "secondary_languages": "Sekundära språk",
+          "categories": "Kategorier"
+        },
+        "edit": {
+          "title": "Redigera {field}",
+          "save": "Spara ändringar",
+          "cancel": "Avbryt",
+          "reason_label": "Anledning till ändring",
+          "reason_hint": "Krävs för känsliga fält. Registreras i revisionsloggen.",
+          "custom_code_hint": "Välj ett värde eller ange en 2-bokstavs ISO-kod.",
+          "button_aria_label": "Redigera {field}",
+          "save_failed": "Den här ändringen kunde inte sparas. Försök igen.",
+          "saved": "{field} uppdaterat."
+        },
+        "errors": {
+          "field_status_immutable": "Statusövergångar sker via godkänn / avvisa-åtgärderna, inte fältredigering."
+        },
+        "approve": {
+          "button": "Godkänn ansökan",
+          "title": "Godkänn {name}s ansökan",
+          "description": "Det här markerar creatorn som godkänd och ger produktionsåtkomst. Åtgärden registreras i revisionsloggen.",
+          "welcome_label": "Välkomstmeddelande (valfritt)",
+          "welcome_hint": "Visas på creatorns dashboard nästa gång de loggar in.",
+          "confirm": "Godkänn",
+          "cancel": "Avbryt",
+          "success": "Creator godkänd.",
+          "failed": "Den här creatorn kunde inte godkännas. Försök igen."
+        },
+        "reject": {
+          "button": "Avvisa ansökan",
+          "title": "Avvisa {name}s ansökan",
+          "description": "Creatorn ser anledningen på sitt dashboard nästa gång de loggar in.",
+          "reason_label": "Avslagsanledning",
+          "min_hint": "Krävs, minst {count} tecken.",
+          "confirm": "Avvisa",
+          "cancel": "Avbryt",
+          "success": "Creator avvisad.",
+          "failed": "Den här creatorn kunde inte avvisas. Försök igen."
+        },
+        "identity": {
+          "heading": "Identitetsverifiering",
+          "status": "Status: {status}",
+          "verify_manual": "Verifiera manuellt",
+          "verify_vendor": "Begär leverantörsverifiering",
+          "vendor_disabled_tooltip": "Ingen KYC-leverantör konfigurerad",
+          "method_labels": {
+            "vendor": "Verifierad av leverantör",
+            "manual": "Manuellt verifierad av en admin"
+          }
+        },
+        "verify": {
+          "title": "Verifiera {name}s identitet manuellt",
+          "description": "Det här markerar creatorns identitet permanent som verifierad och registreras mot ditt konto i revisionsloggen. Använd bara när du har bekräftat identiteten utanför systemet.",
+          "note_label": "Notering (valfri)",
+          "note_hint": "Registreras i revisionsloggen tillsammans med ditt namn.",
+          "confirm": "Verifiera identitet",
+          "cancel": "Avbryt",
+          "success": "Identitet verifierad.",
+          "failed": "Den här creatorns identitet kunde inte verifieras. Försök igen."
+        }
+      }
+    }
+  },
+  "creator": {
+    "already_approved": "Den här creatorn har redan godkänts.",
+    "already_rejected": "Den här creatorn har redan avvisats.",
+    "kyc_not_verified": "Godkännande är blockerat tills creatorns identitet är verifierad.",
+    "kyc_already_verified": "Den här creatorns identitet har redan verifierats.",
+    "admin": {
+      "field_status_immutable": "Statusövergångar sker via godkänn / avvisa-åtgärderna, inte fältredigering."
+    },
+    "ui": {
+      "wizard": {
+        "steps": {
+          "kyc": {
+            "name": "Identitetsverifiering",
+            "status_labels": {
+              "none": "Inte startat",
+              "pending": "Pågår",
+              "verified": "Verifierad",
+              "rejected": "Avvisad",
+              "not_required": "Inte krävs"
+            }
+          },
+          "tax": {
+            "name": "Skatteinformation",
+            "status_complete": "Inlämnad",
+            "status_incomplete": "Ännu inte inlämnad"
+          },
+          "payout": {
+            "name": "Utbetalningsmetod",
+            "status_set": "Ansluten",
+            "status_unset": "Inte ansluten"
+          },
+          "contract": {
+            "name": "Masteravtal",
+            "status_labels": {
+              "signed": "Signerat",
+              "click_through_accepted": "Accepterat",
+              "none": "Inte startat"
+            }
+          },
+          "portfolio": {
+            "gallery_empty": "Inga portfolioposter uppladdade ännu.",
+            "video_badge_label": "Video",
+            "link_badge_label": "Extern länk",
+            "untitled_item": "Ej namngiven portfoliopost"
+          }
+        },
+        "categories": {
+          "fashion": "Mode",
+          "beauty": "Skönhet",
+          "lifestyle": "Livsstil",
+          "fitness": "Fitness",
+          "travel": "Resor",
+          "food": "Mat",
+          "tech": "Teknologi",
+          "gaming": "Gaming",
+          "music": "Musik",
+          "comedy": "Komedi",
+          "education": "Utbildning",
+          "parenting": "Föräldraskap",
+          "business": "Företag",
+          "art": "Konst",
+          "sports": "Sport",
+          "other": "Övrigt"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Kommer snart"
+        }
+      }
+    }
+  }
+}

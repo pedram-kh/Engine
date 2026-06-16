@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Influencer marketing, driven som ett riktigt företag.",
+    "sprint0Notice": "Sprint 0-scaffolding — huvud-SPA för plattformen",
+    "locale": {
+      "switcher": "Språk",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Tema",
+        "light": "Ljust",
+        "dark": "Mörkt"
+      }
+    },
+    "messaging": {
+      "title": "Meddelanden",
+      "you": "Du",
+      "participant": "Deltagare",
+      "composePlaceholder": "Skriv ett meddelande…",
+      "send": "Skicka",
+      "attachment": "Bilaga",
+      "empty": "Inga meddelanden ännu. Starta konversationen.",
+      "loadEarlier": "Ladda tidigare meddelanden",
+      "loadError": "Vi kunde inte ladda den här konversationen. Den försöker igen strax.",
+      "sendError": "Ditt meddelande kunde inte skickas. Försök igen.",
+      "attachmentUploadError": "En bilaga misslyckades att ladda upp. Försök igen.",
+      "closed": "Den här konversationen är stängd — uppdraget är inte längre aktivt.",
+      "systemFallback": "Uppdraget uppdaterades.",
+      "system": {
+        "assignment": {
+          "contracted": "Kontraktet signerades — produktion kan börja.",
+          "draft_submitted": "Ett utkast skickades in för granskning.",
+          "draft_approved": "Utkastet godkändes.",
+          "revision_requested": "Revisioner begärdes för utkastet.",
+          "draft_rejected": "Utkastet avvisades.",
+          "posted_by_creator": "Creatorn markerade innehållet som publicerat.",
+          "live_verified": "Det live-publicerade inlägget verifierades.",
+          "manually_verified": "Inlägget verifierades manuellt.",
+          "resubmit_requested": "En ny inlämning begärdes.",
+          "payment_released": "Betalning släpptes."
+        }
+      },
+      "rollup": {
+        "empty": "Inga meddelandetrådar ännu för den här kampanjen.",
+        "noMessages": "Inga meddelanden ännu.",
+        "loadError": "Vi kunde inte ladda meddelandetrådarna."
+      }
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "roster": "Mina creators",
+      "discover": "Utforska",
+      "pools": "Talangpooler",
+      "brands": "Varumärken",
+      "campaigns": "Kampanjer",
+      "agencyUsers": "Team",
+      "settings": "Inställningar"
+    },
+    "discover": {
+      "title": "Utforska creators",
+      "subtitle": "Bläddra och sök i den globala creatorpoolen.",
+      "unnamed": "Ej namngiven creator",
+      "notConnected": "Inte ansluten",
+      "search": {
+        "label": "Sök creators",
+        "placeholder": "Sök på namn eller bio"
+      },
+      "filters": {
+        "country": "Land",
+        "language": "Språk",
+        "category": "Kategori"
+      },
+      "connection": {
+        "connected": "Ansluten",
+        "pending": "Förfrågan väntar",
+        "declined": "Avböjd",
+        "notConnected": "Inte ansluten",
+        "sendRequest": "Skicka förfrågan",
+        "requestAgain": "Skicka förfrågan igen",
+        "sent": "Förfrågan skickad",
+        "reRequested": "Förfrågan skickad igen",
+        "alreadyPending": "En förfrågan väntar redan",
+        "alreadyConnected": "Den här creatorn finns redan i din roster",
+        "error": "Kunde inte skicka förfrågan. Försök igen."
+      },
+      "empty": {
+        "heading": "Inga creators ännu",
+        "body": "Godkända creators visas här allt eftersom poolen växer."
+      },
+      "emptyFiltered": {
+        "heading": "Inga träffar",
+        "body": "Inga creators matchar dina filter. Prova att bredda sökningen."
+      },
+      "errors": {
+        "loadFailed": "Kunde inte ladda creators. Försök igen."
+      },
+      "detail": {
+        "back": "Tillbaka till Utforska",
+        "notFound": "Den här creatorn är inte tillgänglig.",
+        "loadFailed": "Kunde inte ladda den här profilen. Försök igen.",
+        "viewInRoster": "Visa i roster",
+        "sections": {
+          "profile": "Profil",
+          "social": "Sociala konton",
+          "portfolio": "Portfolio"
+        },
+        "social": {
+          "empty": "Inga sociala konton länkade."
+        },
+        "portfolio": {
+          "empty": "Inga portfolioposter ännu.",
+          "untitled": "Ej namngiven post"
+        }
+      }
+    },
+    "roster": {
+      "title": "Mina creators",
+      "unnamed": "Ej namngiven creator",
+      "blacklisted": "Svartlistad",
+      "blacklist": {
+        "badge": {
+          "hard": "Svartlistad",
+          "soft": "Svartlistevarning"
+        },
+        "openAction": "Svartlista creator",
+        "liftAction": "Ta bort svartlistning",
+        "lifted": "Svartlistning borttagen.",
+        "liftFailed": "Kunde inte ta bort svartlistningen.",
+        "section": {
+          "title": "Svartlista",
+          "none": "Den här creatorn är inte svartlistad av din byrå."
+        },
+        "status": {
+          "hard": "Hårt svartlistad — utesluten från din utforskning och blockerad från anslutningsförfrågningar.",
+          "soft": "Mjukt svartlistad — en varning endast; creatorn är fortfarande matchbar."
+        },
+        "dialog": {
+          "title": "Svartlista creator",
+          "scopeLabel": "Omfattning",
+          "scope": {
+            "agency": "Hela byrån",
+            "brand": "Ett specifikt varumärke"
+          },
+          "noRelationHint": "Byrånövergripande svartlistning kräver en ansluten creator.",
+          "brandLabel": "Varumärke",
+          "typeLabel": "Typ",
+          "type": {
+            "hard": "Hård — uteslut från utforskning och blockera förfrågningar",
+            "soft": "Mjuk — varna endast, håll matchbar"
+          },
+          "reasonLabel": "Anledning",
+          "reasonPlaceholder": "Varför svartlistas den här creatorn? (förblir privat för din byrå)",
+          "cancel": "Avbryt",
+          "confirm": "Svartlista",
+          "success": "Creator svartlistad.",
+          "invalid": "Fyll i de obligatoriska fälten.",
+          "failed": "Kunde inte svartlista creatorn."
+        }
+      },
+      "fields": {
+        "name": "Namn",
+        "email": "E-post",
+        "status": "Status",
+        "applicationStatus": "Ansökan",
+        "country": "Land",
+        "language": "Språk",
+        "categories": "Kategorier",
+        "rating": "Betyg",
+        "campaigns": "Kampanjer"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Prospekt",
+        "external": "Extern",
+        "pending_request": "Väntande förfrågan",
+        "declined": "Avböjd"
+      },
+      "applicationStatus": {
+        "incomplete": "Ofullständig",
+        "pending": "Väntande",
+        "approved": "Godkänd",
+        "rejected": "Avvisad"
+      },
+      "search": {
+        "label": "Sök creators",
+        "placeholder": "Sök på namn eller bio"
+      },
+      "filters": {
+        "status": {
+          "all": "Alla",
+          "roster": "Roster",
+          "prospect": "Prospekt",
+          "external": "Extern",
+          "pending_request": "Väntande förfrågningar",
+          "declined": "Avböjda"
+        },
+        "country": "Land",
+        "language": "Språk",
+        "category": "Kategori",
+        "availability": {
+          "from": "Tillgänglig från",
+          "to": "Tillgänglig till"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Följare"
+        },
+        "engagement": {
+          "label": "Engagemangsgrad"
+        },
+        "metrics": {
+          "tooltip": "Sociala mätvärden är inte anslutna ännu."
+        }
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Inga creators ännu",
+        "body": "Creators du bjuder in eller samarbetar med visas här i din roster, prospekt och externa samarbetspartners."
+      },
+      "emptyFiltered": {
+        "heading": "Inga creators matchar dessa filter",
+        "body": "Prova att rensa eller ändra ett filter för att se fler av dina creators."
+      },
+      "errors": {
+        "loadFailed": "Kunde inte ladda dina creators. Försök igen."
+      },
+      "detail": {
+        "back": "Tillbaka till mina creators",
+        "unnamed": "Ej namngiven creator",
+        "loadFailed": "Vi kunde inte ladda den här creatorn. Försök igen.",
+        "notFound": "Den här creatorn finns inte i din roster.",
+        "sections": {
+          "profile": "Profil",
+          "rating": "Betyg & anteckningar",
+          "social": "Sociala konton",
+          "metrics": "Sociala mätvärden",
+          "portfolio": "Portfolio",
+          "availability": "Tillgänglighet",
+          "campaigns": "Kampanjhistorik"
+        },
+        "editor": {
+          "starLabel": "Betygsätt {n} av 5",
+          "ratingUnset": "Inte betygsatt",
+          "notesLabel": "Interna anteckningar",
+          "notesPlaceholder": "Privata anteckningar om att arbeta med den här creatorn (synliga endast för din byrå).",
+          "notesEmpty": "Inga anteckningar ännu.",
+          "save": "Spara",
+          "saved": "Ändringar sparade.",
+          "saveFailed": "Vi kunde inte spara dina ändringar. Försök igen."
+        },
+        "social": {
+          "empty": "Inga sociala konton anslutna."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Sociala mätvärden visas när konton är anslutna",
+            "body": "Följarantal och engagemangsgrader är inte tillgängliga ännu — de visas här när de sociala integrationerna är på plats."
+          }
+        },
+        "portfolio": {
+          "empty": "Inga portfolioposter ännu.",
+          "untitled": "Ej namngiven portfoliopost"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Inga tillgänglighetsblock under den här perioden",
+            "body": "Den här creatorn har inte markerat någon otillgänglig tid för de visade datumen."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Ingen kampanjhistorik ännu",
+            "body": "Kampanjer du kör med den här creatorn visas här."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Logga ut",
+      "signingOut": "Loggar ut…"
+    },
+    "workspaceSwitcher": {
+      "label": "Byt arbetsyta",
+      "placeholder": "Välj arbetsyta"
+    },
+    "brands": {
+      "title": "Varumärken",
+      "actions": {
+        "create": "Nytt varumärke",
+        "edit": "Redigera",
+        "archive": "Arkivera",
+        "restore": "Återställ",
+        "save": "Spara varumärke",
+        "saving": "Sparar…",
+        "backToList": "Tillbaka till varumärken",
+        "backToDetail": "Tillbaka till varumärke"
+      },
+      "fields": {
+        "name": "Varumärkesnamn",
+        "slug": "Slug",
+        "description": "Beskrivning",
+        "industry": "Bransch",
+        "websiteUrl": "Webbplatsens URL",
+        "defaultCurrency": "Standardvaluta",
+        "defaultLanguage": "Standardspråk",
+        "status": "Status"
+      },
+      "status": {
+        "active": "Aktiv",
+        "archived": "Arkiverad",
+        "all": "Alla"
+      },
+      "detail": {
+        "title": "Varumärkesdetaljer"
+      },
+      "create": {
+        "title": "Nytt varumärke",
+        "success": "Varumärket skapades."
+      },
+      "edit": {
+        "title": "Redigera varumärke",
+        "success": "Varumärket uppdaterades."
+      },
+      "archive": {
+        "confirmTitle": "Arkivera varumärke",
+        "confirmMessage": "Arkivera {name}? Det döljs från den aktiva listan men kan återställas senare.",
+        "confirm": "Arkivera",
+        "cancel": "Avbryt",
+        "success": "Varumärke arkiverat."
+      },
+      "restore": {
+        "confirmTitle": "Återställ varumärke",
+        "confirmMessage": "Återställ {name}? Det visas i den aktiva varumärkeslistan igen.",
+        "confirm": "Återställ",
+        "cancel": "Avbryt",
+        "success": "{name} återställt."
+      },
+      "empty": {
+        "heading": "Inga varumärken ännu",
+        "body": "Skapa ditt första varumärke för att börja hantera influencer-kampanjer.",
+        "cta": "Skapa varumärke"
+      },
+      "emptyFiltered": {
+        "heading": "Inga varumärken matchar ditt filter",
+        "body": "Prova att ändra statusfiltret ovan."
+      },
+      "loading": "Laddar varumärken…",
+      "errors": {
+        "loadFailed": "Kunde inte ladda varumärken.",
+        "saveFailed": "Kunde inte spara varumärke.",
+        "archiveFailed": "Kunde inte arkivera varumärke.",
+        "restoreFailed": "Kunde inte återställa varumärke."
+      }
+    },
+    "campaigns": {
+      "title": "Kampanjer",
+      "actions": {
+        "create": "Ny kampanj",
+        "save": "Skapa kampanj",
+        "saveSettings": "Spara inställningar",
+        "backToList": "Tillbaka till kampanjer"
+      },
+      "fields": {
+        "name": "Kampanjnamn",
+        "brand": "Varumärke",
+        "objective": "Mål",
+        "description": "Beskrivning",
+        "budget": "Budget",
+        "currency": "Valuta",
+        "startsAt": "Startdatum",
+        "endsAt": "Slutdatum",
+        "targetCreatorCount": "Målantal creators",
+        "deliverables": "Leverabler",
+        "deliverablesHint": "En leverabel per rad (t.ex. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Mellanslag- eller kommaseparerade.",
+        "usageRights": "Användningsrättigheter",
+        "requiresContract": "Kräv ett kampanjspecifikt kontrakt",
+        "status": "Status"
+      },
+      "objective": {
+        "awareness": "Medvetenhet",
+        "engagement": "Engagemang",
+        "conversion": "Konvertering",
+        "ugc": "UGC",
+        "launch": "Lansering"
+      },
+      "status": {
+        "all": "Alla",
+        "draft": "Utkast",
+        "active": "Aktiv",
+        "paused": "Pausad",
+        "completed": "Avslutad",
+        "cancelled": "Avbruten"
+      },
+      "filters": {
+        "brand": "Varumärke",
+        "startsFrom": "Startar från",
+        "startsTo": "Startar till"
+      },
+      "tabs": {
+        "overview": "Översikt",
+        "creators": "Creators",
+        "board": "Board",
+        "drafts": "Utkast",
+        "payments": "Betalningar",
+        "messages": "Meddelanden",
+        "settings": "Inställningar"
+      },
+      "create": {
+        "title": "Ny kampanj"
+      },
+      "detail": {
+        "title": "Kampanjdetaljer"
+      },
+      "settings": {
+        "saved": "Kampanjinställningar sparade."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Inga creators ännu",
+          "body": "Bjud in creators till den här kampanjen för att komma igång."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Alla utkast"
+        },
+        "empty": {
+          "heading": "Inga utkast ännu",
+          "body": "Creators utkastinlämningar visas här när de har skickats in."
+        },
+        "loadFailed": "Vi kunde inte ladda utkast. Försök igen.",
+        "submittedAt": "Inlämnat {date}"
+      },
+      "fees": {
+        "offered": "Erbjudet",
+        "countered": "Motbud"
+      },
+      "reinvite": {
+        "action": "Bjud in igen",
+        "title": "Bjud in creator igen",
+        "body": "De lämnade motbud på {fee}. Erbjud igen till:",
+        "feeLabel": "Ny överenskommen ersättning ({currency})",
+        "cancel": "Avbryt",
+        "submit": "Bjud in igen",
+        "success": "Ny inbjudan skickad."
+      },
+      "contract": {
+        "attach": {
+          "action": "Utfärda kontrakt",
+          "title": "Utfärda kontrakt",
+          "body": "Bifoga kontraktsvillkor för creatorn att granska och acceptera innan de kan skicka in ett utkast.",
+          "titleLabel": "Kontraktstitel",
+          "termsLabel": "Villkor (markdown)",
+          "termsHint": "Ange inbäddade villkor och/eller ladda upp en PDF nedan.",
+          "pdfLabel": "Kontrakt-PDF (valfri)",
+          "pdfReady": "PDF klar: {name}",
+          "cancel": "Avbryt",
+          "submit": "Utfärda kontrakt",
+          "success": "Kontrakt utfärdat. Creatorn har meddelats.",
+          "alreadyAttached": "Ett kontrakt väntar redan på den här creatorns acceptans.",
+          "error": "Vi kunde inte utfärda kontraktet. Försök igen."
+        },
+        "pending": "Kontrakt skickat — väntar på creator",
+        "proceedWithout": {
+          "action": "Fortsätt utan kontrakt",
+          "success": "Uppdrag avancerat utan kontrakt.",
+          "requiredError": "Den här kampanjen kräver ett kampanjspecifikt kontrakt; utfärda ett för creatorn att acceptera.",
+          "error": "Vi kunde inte avancera det här uppdraget. Försök igen."
+        }
+      },
+      "invite": {
+        "open": "Bjud in creators",
+        "title": "Bjud in creators",
+        "loadFailed": "Vi kunde inte ladda din roster. Försök igen.",
+        "feeLabel": "Överenskommen ersättning ({currency})",
+        "search": "Sök creators",
+        "noRoster": "Inga roster-creators att bjuda in ännu.",
+        "noSearchMatch": "Inga creators matchar din sökning.",
+        "unnamed": "Ej namngiven creator",
+        "blockedHint": "Svartlistad — kan inte bjudas in.",
+        "cancel": "Avbryt",
+        "submit": "Bjud in ({count})",
+        "summary": "Bjöd in {ok}. Hoppade över {blacklisted} (svartlistade), {conflicts} med konflikter.",
+        "conflict": {
+          "title": "Tillgänglighetskonflikt",
+          "body": "{count} vald(a) creator(s) är otillgänglig(a) under kampanjfönstret. Bjud in dem ändå?",
+          "cancel": "Hoppa över dem",
+          "proceed": "Bjud in ändå"
+        }
+      },
+      "board": {
+        "loadError": "Vi kunde inte ladda boarden. Försök igen.",
+        "empty": "Den här boarden har inga kolumner ännu.",
+        "moveFailed": "Kunde inte flytta kortet — det är tillbaka där det var.",
+        "reorderFailed": "Kunde inte ordna om kolumnerna — ordningen återställdes.",
+        "automationsButton": "Automatiseringar",
+        "card": {
+          "unnamed": "Ej namngiven creator",
+          "removed": "Borttaget uppdrag",
+          "daysLeft": "{n}d kvar",
+          "dueToday": "Förfaller idag",
+          "overdue": "Försenad"
+        },
+        "column": {
+          "add": "Lägg till kolumn",
+          "edit": "Byt namn / färg",
+          "delete": "Ta bort kolumn",
+          "addTitle": "Lägg till kolumn",
+          "editTitle": "Redigera kolumn",
+          "name": "Kolumnnamn",
+          "color": "Färg",
+          "terminalSuccess": "Markera som framgång (terminal)",
+          "terminalFailure": "Markera som misslyckande (terminal)",
+          "save": "Spara",
+          "cancel": "Avbryt",
+          "saveFailed": "Vi kunde inte spara kolumnen. Försök igen.",
+          "deleteTitle": "Ta bort kolumn",
+          "deleteBody": "Ta bort \"{name}\"? Det går inte att ångra.",
+          "deleteBodyNonEmpty": "\"{name}\" har {count} kort. Välj var du vill flytta dem innan du tar bort.",
+          "deleteDestination": "Flytta kort till",
+          "deleteConfirm": "Ta bort",
+          "errorLastColumn": "En board måste ha minst en kolumn.",
+          "errorDestinationRequired": "Den här kolumnen har kort — välj en målkolumn att flytta dem till innan du tar bort.",
+          "errorGeneric": "Vi kunde inte ta bort kolumnen. Försök igen."
+        },
+        "automation": {
+          "title": "Automatiseringar",
+          "subtitle": "Varje händelse kan flytta ett kort till en kolumn automatiskt. Manuella drag utlöser aldrig dessa.",
+          "event": "Händelse",
+          "target": "Flyttar kort till",
+          "none": "Ingen automatisering",
+          "enabled": "Aktiverad",
+          "broken": "Målkolumnen togs bort — välj en ny",
+          "updateFailed": "Vi kunde inte uppdatera automatiseringen. Försök igen.",
+          "close": "Stäng"
+        },
+        "drawer": {
+          "title": "Uppdrag",
+          "close": "Stäng",
+          "loadError": "Vi kunde inte ladda det här uppdraget. Försök igen.",
+          "tabs": {
+            "detail": "Detalj",
+            "history": "Rörelsehistorik"
+          },
+          "detail": {
+            "status": "Status",
+            "creator": "Creator",
+            "postingDue": "Publicering förfaller",
+            "deliverables": "Leverabler",
+            "latestDraft": "Senaste utkast",
+            "postedContent": "Publicerat innehåll",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Inga rörelser registrerade ännu.",
+            "removed": "(borttaget)",
+            "manual": "Manuell flytt",
+            "auto": "Automatisering",
+            "from": "från",
+            "to": "till"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Betalningar kommer snart",
+          "body": "Escrow-finansiering och utbetalningar hanteras här."
+        },
+        "messages": {
+          "heading": "Meddelanden kommer snart",
+          "body": "Kampanjmeddelanden visas här."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Inbjuden",
+        "declined": "Avböjd",
+        "countered": "Motbud",
+        "accepted": "Accepterad",
+        "contracted": "Kontrakterad",
+        "producing": "Producerar",
+        "draft_submitted": "Utkast inlämnat",
+        "revision_requested": "Revision begärd",
+        "approved": "Godkänd",
+        "rejected": "Avvisad",
+        "posted": "Publicerad",
+        "live_verified": "Live verifierad",
+        "manually_verified": "Manuellt verifierad",
+        "payment_held": "Betalning innestående",
+        "payment_released": "Betalning frigjord",
+        "cancelled": "Avbruten"
+      },
+      "review": {
+        "action": "Granska",
+        "title": "Granska utkast",
+        "loadFailed": "Vi kunde inte ladda det här utkastet. Försök igen.",
+        "draftVersion": "Utkast v{n}",
+        "noCaption": "Ingen bildtext angiven.",
+        "hashtags": "Hashtags",
+        "mentions": "Omnämnanden",
+        "noMedia": "Inga medier bifogade.",
+        "feedbackLabel": "Feedback till creatorn",
+        "feedbackHint": "Krävs när du begär ändringar eller avvisar.",
+        "approve": "Godkänn",
+        "requestRevision": "Begär ändringar",
+        "reject": "Avvisa",
+        "close": "Stäng",
+        "history": "Versionshistorik",
+        "postedContent": "Publicerat innehåll",
+        "draftStatus": {
+          "pending": "Väntar på granskning",
+          "approved": "Godkänd",
+          "rejected": "Avvisad",
+          "revision_requested": "Revision begärd"
+        },
+        "verification": {
+          "pending": "Väntar på verifiering",
+          "verified": "Verifierad",
+          "not_found": "Hittades inte",
+          "mismatch": "Matchningsfel"
+        },
+        "simulated": "Simulerad verifiering (mock-leverantör)",
+        "toast": {
+          "approved": "Utkast godkänt.",
+          "revisionRequested": "Revision begärd.",
+          "rejected": "Utkast avvisat.",
+          "error": "Något gick fel. Försök igen."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Öppna förhandsgranskning",
+          "close": "Stäng",
+          "empty": "Inga medier bifogade."
+        }
+      },
+      "resolution": {
+        "action": "Lös",
+        "title": "Lös verifiering",
+        "loadFailed": "Vi kunde inte ladda det här uppdraget. Försök igen.",
+        "postedContent": "Inlämnat inlägg",
+        "simulated": "Simulerad verifiering (mock-leverantör)",
+        "intro": "Automatisk verifiering av det här inlägget misslyckades. Acceptera det manuellt, skicka tillbaka för ett nytt inlägg, eller be creatorn rätta länken på plats.",
+        "verification": {
+          "pending": "Väntar på verifiering",
+          "verified": "Verifierad",
+          "not_found": "Hittades inte",
+          "mismatch": "Matchningsfel"
+        },
+        "noteLabel": "Anledning / notering till creatorn",
+        "noteHint": "Krävs vid manuell verifiering; valfri för inlämningsförfrågningar.",
+        "manuallyVerify": "Verifiera manuellt",
+        "requestFresh": "Begär nytt inlägg",
+        "requestInPlace": "Be att rätta länken",
+        "close": "Stäng",
+        "notActionable": "Det här uppdraget väntar inte längre på lösning.",
+        "toast": {
+          "verified": "Inlägg manuellt verifierat.",
+          "resubmitFresh": "Skickat tillbaka för ett nytt inlägg.",
+          "resubmitInPlace": "Bett creatorn rätta länken.",
+          "error": "Något gick fel. Försök igen."
+        }
+      },
+      "viewPost": {
+        "action": "Visa inlägg",
+        "title": "Publicerat innehåll",
+        "loadFailed": "Vi kunde inte ladda det här inlägget. Försök igen.",
+        "empty": "Creatorn har inte publicerat något innehåll ännu.",
+        "current": "Aktuellt",
+        "postedAt": "Publicerat",
+        "verifiedAt": "Verifierat",
+        "simulated": "Verifiering körs mot en simulerad leverantör i den här miljön.",
+        "close": "Stäng",
+        "verification": {
+          "pending": "Väntar på verifiering",
+          "verified": "Verifierad",
+          "not_found": "Hittades inte",
+          "mismatch": "Matchningsfel"
+        }
+      },
+      "empty": {
+        "heading": "Inga kampanjer ännu",
+        "body": "Skapa din första kampanj för att börja samarbeta med creators.",
+        "cta": "Skapa kampanj"
+      },
+      "errors": {
+        "loadFailed": "Kunde inte ladda kampanjer.",
+        "saveFailed": "Kunde inte spara kampanj."
+      }
+    },
+    "pools": {
+      "title": "Talangpooler",
+      "agencyWide": "Byrånövergripande",
+      "actions": {
+        "create": "Ny pool",
+        "edit": "Redigera",
+        "archive": "Arkivera",
+        "restore": "Återställ",
+        "save": "Spara pool",
+        "backToList": "Tillbaka till talangpooler",
+        "backToDetail": "Tillbaka till pool"
+      },
+      "fields": {
+        "name": "Poolnamn",
+        "description": "Beskrivning",
+        "brand": "Varumärke",
+        "brandHint": "Valfri — märker poolen för ett varumärkes arbete. Lämna tomt för en byrånövergripande pool.",
+        "members": "Medlemmar"
+      },
+      "status": {
+        "active": "Aktiv",
+        "archived": "Arkiverad",
+        "all": "Alla"
+      },
+      "create": {
+        "title": "Ny talangpool"
+      },
+      "edit": {
+        "title": "Redigera talangpool"
+      },
+      "detail": {
+        "title": "Pooldetaljer",
+        "notFound": "Den här poolen finns inte längre.",
+        "membersHeading": "Medlemmar",
+        "membersEmpty": "Inga creators i den här poolen ännu. Lägg till creators från en creators detaljsida.",
+        "memberCount": "{count} creators",
+        "unnamed": "Ej namngiven creator",
+        "remove": "Ta bort från pool",
+        "removed": "{name} borttagen från poolen."
+      },
+      "archive": {
+        "confirmTitle": "Arkivera pool",
+        "confirmMessage": "Arkivera {name}? Den döljs från den aktiva listan men kan återställas senare med sina medlemmar intakta.",
+        "confirm": "Arkivera",
+        "cancel": "Avbryt"
+      },
+      "restore": {
+        "confirmTitle": "Återställ pool",
+        "confirmMessage": "Återställ {name}? Den visas i den aktiva poollistan igen.",
+        "confirm": "Återställ",
+        "cancel": "Avbryt",
+        "success": "{name} återställd."
+      },
+      "empty": {
+        "heading": "Inga talangpooler ännu",
+        "body": "Skapa en pool för att gruppera creators för ett varumärke eller en kampanjbrief.",
+        "cta": "Skapa pool"
+      },
+      "emptyFiltered": {
+        "heading": "Inga pooler matchar ditt filter",
+        "body": "Prova att ändra statusfiltret ovan."
+      },
+      "picker": {
+        "openLabel": "Lägg till i pool",
+        "title": "Lägg till i talangpooler",
+        "empty": "Inga talangpooler ännu. Skapa en från sidan Talangpooler.",
+        "done": "Klar",
+        "added": "Tillagd i {name}.",
+        "removed": "Borttagen från {name}.",
+        "loadFailed": "Kunde inte ladda talangpooler.",
+        "toggleFailed": "Kunde inte uppdatera poolmedlemskap."
+      },
+      "addCreators": {
+        "open": "Lägg till creators",
+        "title": "Lägg till creators i den här poolen",
+        "search": "Sök din roster",
+        "noRoster": "Din roster är tom. Lägg till creators i din roster först.",
+        "allInPool": "Alla dina roster-creators finns redan i den här poolen.",
+        "noSearchMatch": "Inga roster-creators matchar din sökning.",
+        "cancel": "Avbryt",
+        "add": "Lägg till {count}",
+        "added": "{count} creators tillagda i poolen.",
+        "loadFailed": "Kunde inte ladda din roster.",
+        "addFailed": "Kunde inte lägga till creators i poolen.",
+        "confirmHard": {
+          "one": "{name} är svartlistad av din byrå. Lägg till dem i den här poolen ändå?",
+          "many": "{count} valda creators är svartlistade av din byrå ({names}). Lägg till dem ändå?"
+        }
+      },
+      "errors": {
+        "loadFailed": "Kunde inte ladda talangpooler.",
+        "membersLoadFailed": "Kunde inte ladda poolmedlemmar.",
+        "saveFailed": "Kunde inte spara talangpool.",
+        "archiveFailed": "Kunde inte arkivera pool.",
+        "restoreFailed": "Kunde inte återställa pool.",
+        "removeFailed": "Kunde inte ta bort creator från poolen."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Namn",
+        "email": "E-post",
+        "role": "Roll",
+        "status": "Status",
+        "joinedAt": "Gick med"
+      },
+      "roles": {
+        "agency_admin": "Administratör",
+        "agency_manager": "Chef",
+        "agency_staff": "Personal"
+      },
+      "status": {
+        "active": "Aktiv",
+        "pending": "Väntande"
+      },
+      "members": {
+        "heading": "Nuvarande medlemmar"
+      },
+      "filters": {
+        "allRoles": "Alla roller",
+        "allStatuses": "Alla statusar"
+      },
+      "search": {
+        "label": "Sök",
+        "placeholder": "Namn eller e-post"
+      },
+      "invitations": {
+        "heading": "Inbjudningshistorik",
+        "columns": {
+          "email": "Inbjuden",
+          "invitedAt": "Inbjuden",
+          "invitedBy": "Inbjuden av"
+        },
+        "status": {
+          "pending": "Väntande",
+          "accepted": "Accepterad",
+          "expired": "Utgången"
+        },
+        "empty": "Inga inbjudningar ännu."
+      },
+      "invite": {
+        "button": "Bjud in användare",
+        "title": "Bjud in en teammedlem",
+        "fields": {
+          "email": "E-postadress",
+          "role": "Roll"
+        },
+        "submit": "Skicka inbjudan",
+        "submitting": "Skickar…",
+        "success": "Inbjudan skickad till {email}.",
+        "errors": {
+          "failed": "Kunde inte skicka inbjudan."
+        }
+      },
+      "empty": {
+        "heading": "Inga teammedlemmar",
+        "body": "Bjud in din första teammedlem för att komma igång."
+      },
+      "emptyFiltered": "Inga teammedlemmar matchar ditt filter.",
+      "errors": {
+        "membersLoadFailed": "Kunde inte ladda teammedlemmar.",
+        "invitationsLoadFailed": "Kunde inte ladda inbjudningshistorik."
+      },
+      "loading": "Laddar team…",
+      "bulkInviteCreators": {
+        "button": "Massinbjud creators"
+      }
+    },
+    "bulkInvite": {
+      "title": "Massinbjud creators",
+      "description": "Ladda upp en CSV med en `email`-kolumn. Varje rad blir en magic-link-inbjudan. Andra kolumner accepteras men ignoreras.",
+      "file": {
+        "label": "CSV-fil",
+        "hint": "5 MB / 1000 rader max. Den enda obligatoriska kolumnen är `email`."
+      },
+      "softWarning": "{count} rader är en stor batch — behandling kan ta några minuter.",
+      "preview": {
+        "heading": "Tolkade rader ({count})",
+        "row": "Rad",
+        "email": "E-post",
+        "errorCount": "{count} tolkningsfel",
+        "errorHeading": "Dessa rader hoppas över:",
+        "errorItem": "Rad {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Skicka inbjudningar ({count})",
+        "reset": "Rensa",
+        "startOver": "Skicka en ny batch"
+      },
+      "status": {
+        "queued": "I kö — väntar på start",
+        "processing": "Behandlar inbjudningar",
+        "complete": "Klart",
+        "failed": "Jobb misslyckades"
+      },
+      "tracking": {
+        "progress": "{percent}% klart"
+      },
+      "timeout": {
+        "heading": "Arbetar fortfarande",
+        "description": "Dina inbjudningar tar längre tid än förväntat att behandla. Du kan försöka igen eller återkomma senare.",
+        "retry": "Försök igen"
+      },
+      "complete": {
+        "heading": "Resultat",
+        "invited": "Inbjudna",
+        "alreadyInvited": "Redan inbjudna",
+        "failed": "Misslyckade",
+        "failureReason": "Anledning"
+      },
+      "failed": {
+        "heading": "Massinbjudningsjobbet misslyckades."
+      },
+      "errors": {
+        "submitFailed": "Vi kunde inte skicka CSV:n. Försök igen."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "Du har blivit inbjuden",
+        "joining": "Du bjuds in att gå med i {agencyName} som {role}.",
+        "accept": "Acceptera inbjudan",
+        "accepting": "Accepterar…",
+        "signInToContinue": "Logga in för att acceptera den här inbjudan",
+        "signIn": "Logga in",
+        "noAccount": "Har du inget konto?",
+        "signUp": "Skapa ett nu",
+        "success": "Välkommen till {agencyName}! Du är nu {role}.",
+        "expired": {
+          "heading": "Den här inbjudan har gått ut",
+          "body": "Kontakta din byråadministratör för att begära en ny inbjudan."
+        },
+        "alreadyAccepted": {
+          "heading": "Inbjudan redan accepterad",
+          "body": "Den här inbjudan har redan använts. Logga in för att få tillgång till din arbetsyta.",
+          "signIn": "Logga in"
+        },
+        "alreadyMember": {
+          "heading": "Redan en medlem",
+          "body": "Du är redan en medlem i den här arbetsytan."
+        },
+        "emailMismatch": {
+          "heading": "Fel konto",
+          "body": "Den här inbjudan skickades till en annan e-postadress. Logga in med rätt konto."
+        },
+        "notFound": {
+          "heading": "Inbjudan hittades inte",
+          "body": "Den här inbjudningslänken är ogiltig eller har redan använts."
+        },
+        "errors": {
+          "failed": "Kunde inte acceptera inbjudan."
+        }
+      }
+    },
+    "settings": {
+      "title": "Byråinställningar",
+      "fields": {
+        "defaultCurrency": "Standardvaluta",
+        "defaultLanguage": "Standardspråk",
+        "blacklistNotificationPolicy": "Meddela creators när de svartlistas",
+        "blacklistNotificationPolicyHint": "När aktiverat skickas ett e-postmeddelande till en creator om din byrå svartlistar dem. Anledningen delas aldrig."
+      },
+      "save": "Spara inställningar",
+      "saving": "Sparar…",
+      "success": "Inställningar sparade.",
+      "readOnly": "Endast administratörer kan redigera byråinställningar.",
+      "loading": "Laddar inställningar…",
+      "errors": {
+        "loadFailed": "Kunde inte ladda inställningar.",
+        "saveFailed": "Kunde inte spara inställningar."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "Det här fältet är obligatoriskt."
+  }
+}

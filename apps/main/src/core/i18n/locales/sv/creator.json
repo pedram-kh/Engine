@@ -1,0 +1,416 @@
+{
+  "creator": {
+    "not_found": "Ingen creator-profil är kopplad till ditt konto. Logga ut och logga in igen, eller kontakta support.",
+    "already_approved": "Den här creatorn har redan godkänts.",
+    "already_rejected": "Den här creatorn har redan avvisats.",
+    "kyc_not_verified": "Den här creatorns identitet måste verifieras innan ansökan kan godkännas.",
+    "kyc_already_verified": "Den här creatorns identitet har redan verifierats.",
+    "admin": {
+      "field_status_immutable": "Ansökningsstatus kan inte ändras via det här formuläret. Använd godkänn- eller avvisa-åtgärderna istället."
+    },
+    "social": {
+      "invalid_platform": "Den sociala plattformen stöds inte."
+    },
+    "wizard": {
+      "feature_disabled": "Det här steget är för tillfället otillgängligt medan en konfigurationsändring pågår. Hoppa över för att fortsätta din ansökan.",
+      "feature_enabled": "Det här alternativet är inte tillgängligt just nu — använd standardflödet för det här steget.",
+      "incomplete": "Kan inte skicka in din ansökan ännu — ett eller flera guidessteg är fortfarande ofullständiga."
+    },
+    "reopen": {
+      "invalid_state": "Endast en avvisad ansökan kan återöppnas."
+    },
+    "ui": {
+      "wizard": {
+        "title": "Konfigurera din creator-profil",
+        "subtitle": "Några steg för att presentera dig för varumärken.",
+        "progress": {
+          "step_of": "Steg {current} av {total}",
+          "completed": "Klart",
+          "current": "Aktuellt steg",
+          "skipped": "Hoppat över",
+          "pending": "Inte startat"
+        },
+        "actions": {
+          "save": "Spara",
+          "save_and_continue": "Spara och fortsätt",
+          "back": "Tillbaka",
+          "skip_for_now": "Hoppa över för nu",
+          "save_and_exit": "Spara och avsluta",
+          "submit_for_approval": "Skicka in för godkännande",
+          "continue_from_here": "Fortsätt härifrån",
+          "edit_step": "Redigera steg",
+          "review_and_submit": "Granska och skicka in",
+          "connect": "Anslut",
+          "update": "Uppdatera",
+          "remove": "Ta bort"
+        },
+        "skipped": {
+          "label": "Hoppat över",
+          "explanation": "Det här steget krävs inte för tillfället. En admin granskar din ansökan utan det."
+        },
+        "save_status": {
+          "saving": "Sparar…",
+          "saved": "Sparat",
+          "error": "Kunde inte spara — försök igen."
+        },
+        "steps": {
+          "profile": {
+            "name": "Profilgrunder",
+            "title": "Berätta om dig själv",
+            "description": "Ditt visningsnamn, bio, foto och de kategorier du skapar i."
+          },
+          "social": {
+            "name": "Sociala konton",
+            "title": "Anslut dina sociala konton",
+            "description": "Anslut minst en plattform så att varumärken kan se din räckvidd."
+          },
+          "portfolio": {
+            "name": "Portfolio",
+            "title": "Visa ditt bästa arbete",
+            "description": "Ladda upp upp till 10 poster — videor, bilder eller externa länkar — som representerar din stil.",
+            "gallery_heading": "Din portfolio",
+            "gallery_empty": "Inga portfolioposter uppladdade ännu.",
+            "gallery_remove": "Ta bort post",
+            "gallery_status": "Portfoliogalleriet innehåller {count} post(er).",
+            "video_badge_label": "Video",
+            "link_badge_label": "Extern länk",
+            "untitled_item": "Ej namngiven portfoliopost",
+            "preview_label": "Öppna förhandsgranskning",
+            "preview_close": "Stäng förhandsgranskning"
+          },
+          "kyc": {
+            "name": "Identitetsverifiering",
+            "title": "Verifiera din identitet",
+            "description": "En snabb kontroll med vår verifieringspartner. Krävs för utbetalningar.",
+            "skipped_title": "Identitetsverifiering hoppad",
+            "skipped_explanation": "Identitetsverifiering krävs inte för tillfället.",
+            "current_status": "Status:",
+            "begin_button": "Börja verifiering",
+            "status_labels": {
+              "none": "Inte startat",
+              "pending": "Pågår",
+              "verified": "Verifierad",
+              "rejected": "Avvisad",
+              "not_required": "Hoppad"
+            }
+          },
+          "tax": {
+            "name": "Skatteinformation",
+            "title": "Skatteformulär",
+            "description": "Vi behöver ett skatteformulär för utbetalningar, även innan din första.",
+            "current_status": "Status:",
+            "status_complete": "Inlämnat",
+            "status_incomplete": "Ännu inte inlämnat",
+            "on_file_title": "Skatteinformation på fil",
+            "on_file_body": "Dina skatteuppgifter är säkert sparade. Av integritetsskäl visar vi dem inte igen — välj Uppdatera för att ange dem på nytt.",
+            "update_button": "Uppdatera skatteinformation"
+          },
+          "payout": {
+            "name": "Utbetalningsmetod",
+            "title": "Konfigurera utbetalningar",
+            "description": "Anslut ett Stripe Express-konto för att ta emot betalningar.",
+            "skipped_title": "Utbetalningskonfiguration hoppades över",
+            "skipped_explanation": "Utbetalningskonfiguration krävs inte för tillfället.",
+            "current_status": "Status:",
+            "begin_button": "Konfigurera utbetalningar",
+            "status_set": "Ansluten",
+            "status_unset": "Inte ansluten"
+          },
+          "contract": {
+            "name": "Masteravtal",
+            "title": "Signera masteravtalet",
+            "description": "Vårt standardavtal för creators täcker varumärkessamarbeten på plattformen.",
+            "skipped_explanation": "Kontraktssignering krävs inte för tillfället — acceptera klick-igenom-villkoren nedan.",
+            "click_through_label": "Jag har läst och accepterat dessa villkor.",
+            "click_through_help": "Läs avtalet ovan och kryssa sedan i rutan för att fortsätta.",
+            "terms_version": "Master Creator Agreement v{version}",
+            "current_status": "Status:",
+            "begin_button": "Öppna avtal för signering",
+            "status_labels": {
+              "signed": "Signerat",
+              "click_through_accepted": "Accepterat",
+              "none": "Inte startat"
+            },
+            "accepted_title": "Avtal accepterat",
+            "accepted_body": "Du har accepterat masteravtalet. Fortsätt till nästa steg."
+          },
+          "account_created": {
+            "name": "Konto skapat"
+          },
+          "review": {
+            "name": "Granska och skicka in",
+            "title": "Granska din ansökan",
+            "description": "Ta en stund att granska allt innan du skickar in.",
+            "completeness": "{percent}% klart",
+            "edit_step": "Redigera",
+            "submit_button": "Skicka in ansökan",
+            "incomplete_blocker": "Du har 1 ofullständigt steg: {names}. Klicka på Redigera för att slutföra det innan du skickar in. | Du har {count} ofullständiga steg: {names}. Klicka på Redigera för vart och ett för att slutföra dem innan du skickar in."
+          }
+        },
+        "fields": {
+          "display_name": "Visningsnamn",
+          "display_name_help": "Hur varumärken ser dig — ditt alias eller scennamn.",
+          "bio": "Bio",
+          "bio_help": "En kort presentation. Du kan använda **fet**, *kursiv* och [länkar](https://example.com).",
+          "avatar": "Profilfoto",
+          "avatar_drop": "Släpp ett foto här, eller klicka för att välja. JPG, PNG eller WebP upp till 5 MB.",
+          "country": "Land",
+          "region": "Region eller stad",
+          "primary_language": "Primärt språk",
+          "secondary_languages": "Andra språk",
+          "categories": "Kategorier",
+          "categories_help": "Välj de kategorier som bäst beskriver vad du skapar.",
+          "avatar_required": "Ett profilfoto krävs för att slutföra det här steget.",
+          "step_requirements_hint": "Lägg till ett profilfoto och minst en kategori för att fortsätta.",
+          "social_handle": "Användarnamn",
+          "social_handle_hint": "Ange bara ditt användarnamn — inget {'@'-tecken} eller fullständig profil-URL.",
+          "social_handle_invalid": "Ange ett giltigt användarnamn: 2–30 bokstäver, siffror, punkter, understreck eller bindestreck (inga mellanslag, {'@'} eller URL:er).",
+          "social_profile_url": "Profil-URL",
+          "portfolio_title": "Titel",
+          "portfolio_description": "Beskrivning",
+          "portfolio_external_url": "Extern URL (valfri)",
+          "tax_form_type": "Skatteformulär",
+          "legal_name": "Juridiskt namn",
+          "tax_id": "Skatteidentifikationsnummer",
+          "address_country": "Land",
+          "address_city": "Stad",
+          "address_postal_code": "Postnummer",
+          "address_street": "Gata"
+        },
+        "categories": {
+          "fashion": "Mode",
+          "beauty": "Skönhet",
+          "lifestyle": "Livsstil",
+          "fitness": "Fitness",
+          "travel": "Resor",
+          "food": "Mat",
+          "tech": "Teknologi",
+          "gaming": "Gaming",
+          "music": "Musik",
+          "comedy": "Komedi",
+          "education": "Utbildning",
+          "parenting": "Föräldraskap",
+          "business": "Företag",
+          "art": "Konst",
+          "sports": "Sport",
+          "other": "Övrigt"
+        },
+        "tax_form_types": {
+          "eu_self_employed": "EU — egenföretagare",
+          "eu_company": "EU — företag",
+          "uk_self_employed": "UK — egenföretagare",
+          "uk_company": "UK — företag"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Kommer snart"
+        },
+        "vendor_bounce": {
+          "waiting_title": "Nästan klar…",
+          "waiting_description": "Vi väntar på svar från vår partner. Det brukar ta under en minut.",
+          "timeout_title": "Väntar fortfarande på vår partner",
+          "timeout_description": "Det här tar längre tid än förväntat. Du kan försöka igen eller kontakta support.",
+          "retry": "Försök igen",
+          "contact_support": "Kontakta support"
+        },
+        "welcome_back": {
+          "title": "Välkommen tillbaka",
+          "subtitle": "Du var här senast {time_ago}. Fortsätt där du slutade.",
+          "first_time_title": "Låt oss komma igång",
+          "first_time_subtitle": "Välkommen till Catalyst. Låt oss konfigurera din creator-profil — det tar bara några minuter.",
+          "first_time_prompt": "Börja med {step} för att presentera dig för varumärken.",
+          "next_step_prompt": "Du är på steg {step}. Fortsätt här, eller gå tillbaka för att redigera ett tidigare steg.",
+          "all_complete_prompt": "Ser bra ut — du har slutfört varje steg. Redo att skicka in?",
+          "continue_button": "Fortsätt till {step_name}",
+          "review_button": "Granska och skicka in"
+        }
+      },
+      "dashboard": {
+        "title": "Din ansökan",
+        "greeting": "Välkommen, {name}.",
+        "completeness": "{percent}% klart",
+        "submitted_at": "Inlämnat {datetime}",
+        "submitted": {
+          "heading": "Ansökan inlämnad",
+          "description": "Din profil granskas. Vi meddelar dig inom 3 arbetsdagar.",
+          "completeness_label": "Profilkomplettering",
+          "last_updated": "Senast uppdaterat {time_ago}"
+        },
+        "pending_review": {
+          "title": "Ansökan under granskning",
+          "description": "Din ansökan finns i vår kö. Vi meddelar dig inom 3 arbetsdagar."
+        },
+        "approved": {
+          "title": "Välkommen till Catalyst",
+          "heading": "Du är godkänd",
+          "description": "Du är godkänd att ta emot varumärkessamarbeten. Det fullständiga creator-dashboardet levereras snart."
+        },
+        "rejected": {
+          "title": "Ansökan inte godkänd",
+          "heading": "Ansökan behöver ändringar",
+          "description": "Granska anteckningarna nedan, uppdatera din ansökan och skicka in den igen för en ny granskning.",
+          "reason_label": "Anledning:",
+          "edit_profile": "Redigera profil",
+          "resubmit": "Uppdatera och skicka in igen",
+          "resubmit_failed": "Vi kunde inte återöppna din ansökan. Försök igen."
+        },
+        "incomplete": {
+          "title": "Fortsätt din ansökan",
+          "description": "Fortsätt där du slutade — din guidesframsteg är sparad."
+        },
+        "requests": {
+          "title": "Anslutningsförfrågningar",
+          "sent": "Skickad {date}",
+          "sent_unknown": "Skickad nyligen",
+          "accept": "Acceptera",
+          "decline": "Avböj",
+          "empty": {
+            "title": "Inga anslutningsförfrågningar",
+            "body": "När en byrå bjuder in dig att ansluta visas det här."
+          },
+          "toast": {
+            "accepted": "Du är nu ansluten till {agency}.",
+            "declined": "Förfrågan avböjd.",
+            "error": "Något gick fel. Försök igen."
+          }
+        },
+        "assignments": {
+          "title": "Kampanjinbjudningar",
+          "pending": "Du har {count} inbjudan/inbjudningar som väntar på ditt svar.",
+          "none": "Inga inbjudningar väntar på ditt svar.",
+          "cta": "Visa inbjudningar"
+        }
+      },
+      "assignments": {
+        "title": "Kampanjinbjudningar",
+        "subtitle": "Acceptera, avböj eller lägg motbud på ersättningen för kampanjer du bjudits in till.",
+        "fee": "Ersättning",
+        "youCountered": "du lade motbud",
+        "accept": "Acceptera",
+        "counter": "Motbud",
+        "decline": "Avböj",
+        "view": "Visa",
+        "detail": {
+          "back": "Tillbaka till inbjudningar",
+          "notFound": "Det här uppdraget hittades inte.",
+          "loadFailed": "Vi kunde inte ladda det här uppdraget. Försök igen.",
+          "retry": "Försök igen",
+          "awaitingReview": "Ditt utkast har skickats in och väntar på byråns granskning.",
+          "awaitingVerification": "Ditt inlägg har registrerats och väntar på verifiering.",
+          "resubmitInPlace": {
+            "title": "Vi kunde inte verifiera ditt inlägg",
+            "intro": "Automatisk verifiering av ditt inlägg misslyckades. Kontrollera att länken är korrekt och pekar på ditt publicerade inlägg, och skicka sedan in den igen nedan.",
+            "url": "Inläggets URL",
+            "submit": "Skicka in länk igen",
+            "toast": "Länk återinlämnad — vi kontrollerar den igen inom kort."
+          },
+          "contract": {
+            "title": "Kampanjkontrakt",
+            "viewPdf": "Visa kontrakt (PDF)",
+            "accept": "Acceptera kontrakt",
+            "awaitingAgency": "Byrån skickar ett kontrakt för dig att granska och acceptera. Du meddelas när det är klart — kom tillbaka hit då.",
+            "signingDisabled": "Kontraktssignering är inte aktiverat ännu. Byrån kontaktar dig när det är dags att gå vidare.",
+            "toast": {
+              "accepted": "Kontrakt accepterat. Du kan nu skicka in ditt utkast."
+            }
+          },
+          "revision": {
+            "title": "Revision begärd",
+            "noFeedback": "Byrån har begärt ändringar. Skicka in ett uppdaterat utkast."
+          },
+          "draft": {
+            "submitTitle": "Skicka in ditt utkast",
+            "resubmitTitle": "Skicka in ditt utkast igen",
+            "caption": "Bildtext",
+            "hashtags": "Hashtags",
+            "hashtagsHint": "Separera med mellanslag eller komman",
+            "mentions": "Omnämnanden",
+            "mentionsHint": "Separera med mellanslag eller komman",
+            "media": "Media",
+            "submit": "Skicka in utkast",
+            "resubmit": "Skicka in utkast igen",
+            "mediaStatus": {
+              "uploading": "Laddar upp…",
+              "done": "Uppladdad",
+              "error": "Uppladdning misslyckades"
+            }
+          },
+          "posted": {
+            "title": "Markera som publicerad",
+            "platform": "Plattform",
+            "url": "Inläggets URL",
+            "submit": "Skicka in inlägg",
+            "summaryTitle": "Publicerat innehåll"
+          },
+          "history": {
+            "title": "Utkastshistorik",
+            "version": "Version {n}"
+          },
+          "reviewStatus": {
+            "pending": "Väntar på granskning",
+            "approved": "Godkänd",
+            "rejected": "Avvisad",
+            "revision_requested": "Revision begärd"
+          },
+          "verificationStatus": {
+            "pending": "Verifiering pågår",
+            "verified": "Verifierad",
+            "not_found": "Hittades inte",
+            "mismatch": "Matchningsfel"
+          },
+          "toast": {
+            "draftSubmitted": "Utkast inlämnat.",
+            "posted": "Inlägg registrerat.",
+            "error": "Något gick fel. Försök igen."
+          }
+        },
+        "window": {
+          "range": "{start} – {end}",
+          "unset": "Datum TBD"
+        },
+        "empty": {
+          "title": "Inga kampanjinbjudningar",
+          "body": "När en byrå bjuder in dig till en kampanj visas det här."
+        },
+        "toast": {
+          "accepted": "Inbjudan accepterad.",
+          "countered": "Motbud skickat.",
+          "declined": "Inbjudan avböjd.",
+          "error": "Något gick fel. Försök igen."
+        },
+        "counterDialog": {
+          "title": "Lägg motbud på ersättningen",
+          "body": "Föreslå en annan ersättning för den här kampanjen. Byrån kan erbjuda igen eller dra tillbaka.",
+          "feeLabel": "Din ersättning ({currency})",
+          "cancel": "Avbryt",
+          "submit": "Skicka motbud"
+        }
+      },
+      "upload": {
+        "avatar_prompt": "Släpp ett foto här, eller klicka för att välja",
+        "avatar_preview_alt": "Förhandsgranskning av profilfoto",
+        "size_hint": "{types} · upp till {max_mb} MB",
+        "portfolio_prompt": "Släpp filer här, eller klicka för att välja",
+        "portfolio_size_hint": "Bilder upp till {image_mb} MB · videor upp till {video_mb} MB",
+        "portfolio_slots_remaining": "{remaining} platser kvar",
+        "portfolio_queue_status": "{in_flight} av {total} laddar upp (upp till {concurrency} åt gången).",
+        "uploading": "Laddar upp…",
+        "remove": "Ta bort",
+        "remove_avatar": "Ta bort foto",
+        "remove_portfolio_item_label": "Ta bort {name}",
+        "status_pending": "Väntar…",
+        "status_uploading": "Laddar upp…",
+        "status_done": "Uppladdad",
+        "status_error": "Misslyckades"
+      },
+      "errors": {
+        "upload_too_large": "Den här filen är för stor. Maxstorleken är {max_mb} MB.",
+        "upload_wrong_type": "Den här filtypen stöds inte. Använd {allowed_types}.",
+        "upload_failed": "Uppladdningen misslyckades. Försök igen.",
+        "portfolio_max_reached": "Du kan ladda upp upp till {max} portfolioposter."
+      }
+    }
+  }
+}

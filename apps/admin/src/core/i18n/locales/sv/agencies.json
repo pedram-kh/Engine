@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Byråer",
+        "search_label": "Sök byråer",
+        "load_failed": "Byråerna kunde inte laddas. Uppdatera sidan.",
+        "empty": "Inga byråer matchar det här filtret.",
+        "filters": {
+          "all": "Alla",
+          "active": "Aktiva",
+          "suspended": "Suspenderade"
+        },
+        "fields": {
+          "name": "Byrå",
+          "status": "Status",
+          "members": "Medlemmar",
+          "tier": "Nivå",
+          "created_at": "Skapad"
+        },
+        "status_labels": {
+          "active": "Aktiv",
+          "suspended": "Suspenderad"
+        },
+        "view": "Visa byrå"
+      },
+      "detail": {
+        "fallback_title": "Byrå",
+        "load_failed": "Den här byrån kunde inte laddas. Uppdatera sidan.",
+        "overview_heading": "Översikt",
+        "suspension_heading": "Suspension",
+        "fields": {
+          "slug": "Slug",
+          "country": "Land",
+          "tier": "Prenumerationsnivå",
+          "subscription_status": "Prenumerationsstatus",
+          "members": "Medlemmar",
+          "created_at": "Skapad",
+          "suspended_at": "Suspenderad den",
+          "suspended_reason": "Anledning"
+        },
+        "active_state": "Den här byrån är aktiv. Dess användare kan logga in normalt.",
+        "suspended_state": "Den här byrån är suspenderad. Alla dess användare är blockerade från att logga in."
+      },
+      "suspend": {
+        "button": "Suspendera byrå",
+        "title": "Suspendera {name}",
+        "description": "Att suspendera den här byrån blockerar ALLA dess användare från att logga in. Det registreras i revisionsloggen.",
+        "reason_label": "Anledning till suspension",
+        "reason_hint": "Krävs, minst {count} tecken. Registreras i revisionsloggen.",
+        "confirm": "Suspendera",
+        "cancel": "Avbryt",
+        "success": "Byrå suspenderad.",
+        "failed": "Den här byrån kunde inte suspenderas. Försök igen."
+      },
+      "reactivate": {
+        "button": "Återaktivera byrå",
+        "title": "Återaktivera {name}",
+        "description": "Att återaktivera den här byrån återställer inloggning för alla dess användare. Det registreras i revisionsloggen.",
+        "confirm": "Återaktivera",
+        "cancel": "Avbryt",
+        "success": "Byrå återaktiverad.",
+        "failed": "Den här byrån kunde inte återaktiveras. Försök igen."
+      }
+    }
+  }
+}

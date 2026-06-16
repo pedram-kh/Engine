@@ -1,0 +1,63 @@
+{
+  "notifications": {
+    "center": {
+      "title": "Aviseringar",
+      "empty": "Du är à jour.",
+      "markAll": "Markera alla som lästa",
+      "viewAll": "Visa alla aviseringar",
+      "loading": "Laddar…",
+      "error": "Kunde inte ladda aviseringar.",
+      "unreadBadgeLabel": "{count} olästa aviseringar",
+      "feedbackLabel": "Feedback",
+      "reasonLabel": "Anledning"
+    },
+    "page": {
+      "title": "Aviseringar",
+      "empty": "Du har inga aviseringar ännu."
+    },
+    "types": {
+      "assignment_draft_approved": "Ditt utkast för {campaign_name} godkändes.",
+      "assignment_revision_requested": "Revisioner begärdes för ditt utkast till {campaign_name}.",
+      "assignment_draft_rejected": "Ditt utkast för {campaign_name} avvisades.",
+      "assignment_manually_verified": "Ditt inlägg för {campaign_name} verifierades.",
+      "assignment_draft_submitted": "{creator_name} skickade in ett utkast för {campaign_name}.",
+      "assignment_contracted": "{creator_name} accepterade kontraktet för {campaign_name}.",
+      "creator_approved": "Ditt creator-konto har godkänts.",
+      "creator_rejected": "Din creator-ansökan godkändes inte.",
+      "message_received_by_creator": "{sender_name} skickade dig ett meddelande om {campaign_name}.",
+      "message_received_by_agency": "{sender_name} skickade ett meddelande om {campaign_name}.",
+      "fallback": "Du har en ny avisering."
+    },
+    "preferences": {
+      "title": "Aviseringsinställningar",
+      "description": "Välj vilka aviseringar i appen du vill ta emot.",
+      "menuItem": "Aviseringsinställningar",
+      "save": "Spara ändringar",
+      "saving": "Sparar…",
+      "success": "Dina aviseringsinställningar sparades.",
+      "loadError": "Kunde inte ladda dina aviseringsinställningar.",
+      "saveError": "Kunde inte spara dina aviseringsinställningar. Försök igen.",
+      "groups": {
+        "assignment": "Uppdrag",
+        "creator": "Creator-konto",
+        "messaging": "Meddelanden"
+      },
+      "channels": {
+        "in_app": "I appen",
+        "digest": "Daglig e-postdigest"
+      },
+      "typeLabels": {
+        "assignment_draft_submitted": "Ett utkast skickas in för granskning",
+        "assignment_contracted": "Ett kontrakt accepteras",
+        "assignment_revision_requested": "Revisioner begärs för ett utkast",
+        "assignment_draft_approved": "Ett utkast godkänns",
+        "assignment_draft_rejected": "Ett utkast avvisas",
+        "assignment_manually_verified": "Ett inlägg verifieras",
+        "creator_approved": "Ett creator-konto godkänns",
+        "creator_rejected": "En creator-ansökan avslås",
+        "message_received_by_creator": "Ett nytt meddelande från byrån",
+        "message_received_by_agency": "Ett nytt meddelande från creatorn"
+      }
+    }
+  }
+}

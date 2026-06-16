@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "featureFlags": {
+      "title": "Funktionsflaggor",
+      "subtitle": "Plattformsövergripande på/av-omkopplare. Varje omkoppling auditeras och träder i kraft omedelbart.",
+      "load_failed": "Funktionsflaggorna kunde inte laddas. Uppdatera sidan.",
+      "toggle": {
+        "enable_title": "Aktivera {label}?",
+        "disable_title": "Inaktivera {label}?",
+        "description": "Det här omkopplar flaggan på plattformen och träder i kraft omedelbart. En anledning krävs och registreras i revisionsloggen.",
+        "reason_label": "Anledning",
+        "reason_hint": "Minst {count} tecken — registreras mot den här omkopplingen.",
+        "cancel": "Avbryt",
+        "confirm": "Bekräfta",
+        "success": "Funktionsflagga uppdaterad.",
+        "failed": "Flaggan kunde inte uppdateras. Försök igen."
+      }
+    }
+  }
+}

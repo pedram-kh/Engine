@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "load_failed": "Dashboardet kunde inte laddas. Uppdatera sidan.",
+      "kpi": {
+        "agencies_total": "Byråer",
+        "agencies_suspended": "Suspenderade byråer",
+        "creators_pending_approval": "Väntande godkännanden",
+        "creators_pending_kyc": "KYC-kö",
+        "queue_pending": "Jobb i kö",
+        "queue_failed": "Misslyckade jobb",
+        "open_disputes": "Öppna tvister",
+        "failed_payments_today": "Misslyckade betalningar idag"
+      },
+      "activity": {
+        "heading": "Senaste aktivitet",
+        "empty": "Ingen senaste aktivitet."
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "availability": {
+    "title": "Tillgänglighet",
+    "subtitle": "Blockera de tider du inte är tillgänglig så att byråer ser din verkliga kalender.",
+    "allDay": "Hela dagen",
+    "moreCount": "+{count} fler",
+    "dayPopover": {
+      "title": "Block den här dagen",
+      "viewAll": "Visa alla block för den här dagen"
+    },
+    "creatorNav": {
+      "dashboard": "Dashboard",
+      "assignments": "Inbjudningar",
+      "availability": "Tillgänglighet"
+    },
+    "nav": {
+      "prevMonth": "Föregående månad",
+      "nextMonth": "Nästa månad"
+    },
+    "actions": {
+      "add": "Lägg till block"
+    },
+    "empty": {
+      "heading": "Inga tillgänglighetsblock ännu",
+      "body": "Lägg till ett block för att markera när du är borta eller otillgänglig."
+    },
+    "errors": {
+      "loadFailed": "Vi kunde inte ladda din tillgänglighet. Försök igen."
+    },
+    "blockType": {
+      "hard": "Otillgänglig (hård)",
+      "soft": "Preferens (mjuk)"
+    },
+    "kind": {
+      "vacation": "Semester",
+      "personal": "Personlig",
+      "exclusive_contract": "Exklusivt kontrakt",
+      "assignment_auto": "Från kampanj",
+      "other": "Övrigt"
+    },
+    "weekday": {
+      "MO": "Mån",
+      "TU": "Tis",
+      "WE": "Ons",
+      "TH": "Tor",
+      "FR": "Fre",
+      "SA": "Lör",
+      "SU": "Sön"
+    },
+    "dialog": {
+      "createTitle": "Lägg till tillgänglighetsblock",
+      "editTitle": "Redigera tillgänglighetsblock",
+      "seriesNotice": "Det här är ett återkommande block — ändringar gäller för alla dess förekomster, inte bara den här dagen.",
+      "blockTypeHint": "Hårda block utesluter dig helt; mjuka block är bara en preferens.",
+      "fields": {
+        "allDay": "Hela dagen",
+        "startDate": "Startdatum",
+        "startTime": "Starttid",
+        "endDate": "Slutdatum",
+        "endTime": "Sluttid",
+        "blockType": "Typ",
+        "kind": "Anledning",
+        "reason": "Anteckning (valfri)",
+        "recurring": "Upprepas varje vecka"
+      },
+      "recurrence": {
+        "interval": "Upprepa var (veckor)",
+        "weekdays": "Dessa dagar",
+        "hasEnd": "Ange ett slutdatum",
+        "endsOn": "Slutar den"
+      },
+      "actions": {
+        "save": "Spara",
+        "cancel": "Avbryt",
+        "delete": "Ta bort",
+        "confirmDelete": "Bekräfta borttagning"
+      },
+      "errors": {
+        "saveFailed": "Vi kunde inte spara blocket. Försök igen.",
+        "deleteFailed": "Vi kunde inte ta bort blocket. Försök igen."
+      }
+    }
+  }
+}

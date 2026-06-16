@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "operations": {
+      "health": {
+        "title": "Systemhälsa",
+        "heading": "Tjänstestatus",
+        "load_failed": "Hälsokontrollen kunde inte laddas. Uppdatera sidan.",
+        "status": {
+          "ok": "Frisk",
+          "degraded": "Nedsatt"
+        },
+        "checks": {
+          "database": "Databas",
+          "cache": "Cache"
+        }
+      }
+    }
+  }
+}

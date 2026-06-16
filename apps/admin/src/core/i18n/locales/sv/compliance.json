@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "compliance": {
+      "shellNotice": "Den här kön är redo men ännu inte kopplad till data — export- och raderingsbehandling levereras i ett senare sprint.",
+      "load_failed": "Den här kön kunde inte laddas. Uppdatera sidan.",
+      "fields": {
+        "subject": "Registrerad person",
+        "status": "Status",
+        "requested": "Begärd"
+      },
+      "exports": {
+        "title": "Exportförfrågningar",
+        "subtitle": "Åtkomst- och portabilitetsförfrågningar från registrerade personer (GDPR art. 15/20).",
+        "empty": "Inga exportförfrågningar."
+      },
+      "erasures": {
+        "title": "Raderingskö",
+        "subtitle": "Förfrågningar om att bli bortglömd, som väntar på granskning (GDPR art. 17).",
+        "empty": "Inga raderingsförfrågningar."
+      }
+    }
+  }
+}

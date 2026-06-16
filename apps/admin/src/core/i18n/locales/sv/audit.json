@@ -1,0 +1,27 @@
+{
+  "admin": {
+    "audit": {
+      "title": "Revisionslogg",
+      "empty": "Inga revisionsposter matchar dessa filter.",
+      "load_failed": "Revisionsloggen kunde inte laddas. Uppdatera sidan.",
+      "filters": {
+        "action": "Åtgärd",
+        "subject": "Ämne-ULID",
+        "date_from": "Från",
+        "date_to": "Till",
+        "apply": "Tillämpa"
+      },
+      "fields": {
+        "action": "Åtgärd",
+        "actor": "Aktör",
+        "subject": "Ämne",
+        "reason": "Anledning",
+        "created_at": "När"
+      },
+      "pagination": {
+        "prev": "Föregående",
+        "next": "Nästa"
+      }
+    }
+  }
+}

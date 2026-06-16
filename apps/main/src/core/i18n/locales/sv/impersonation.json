@@ -1,0 +1,15 @@
+{
+  "impersonation": {
+    "claim": {
+      "in_progress": "Startar efterligningssession…",
+      "missing_token": "Inget handoff-token angavs. Starta efterligningen igen från adminpanelen.",
+      "invalid": "Det här efterlignings-handoffet är ogiltigt, redan använt eller utgånget. Starta det igen från adminpanelen.",
+      "failed": "Vi kunde inte starta efterligningssessionen. Försök igen från adminpanelen."
+    },
+    "banner": {
+      "message": "Admin-supportsession — du visar det här kontot som användaren.",
+      "expires_in": "Går ut om {time}",
+      "end": "Avsluta session"
+    }
+  }
+}

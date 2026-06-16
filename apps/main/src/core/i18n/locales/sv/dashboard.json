@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "welcome": {
+      "greeting": "Välkommen tillbaka",
+      "greetingNamed": "Välkommen tillbaka, {name}"
+    },
+    "kpi": {
+      "activeCampaigns": "Aktiva kampanjer",
+      "creatorsInRoster": "Creators i roster",
+      "pendingApplications": "Väntande creator-ansökningar",
+      "paymentsDue": "Förfallande betalningar"
+    },
+    "activity": {
+      "title": "Senaste aktivitet",
+      "empty": "Ingen senaste aktivitet ännu.",
+      "loadFailed": "Vi kunde inte ladda senaste aktivitet.",
+      "system": "Systemet",
+      "actions": {
+        "creatorInvited": "{actor} bjöd in en creator",
+        "bulkInviteCompleted": "{actor} körde en massinbjudan ({invited} inbjudna, {failed} misslyckade)",
+        "agencyCreatorRelationCreated": "{actor} lade till en creator i rostern",
+        "brandCreated": "{actor} skapade ett varumärke",
+        "brandArchived": "{actor} arkiverade ett varumärke",
+        "brandRestored": "{actor} återställde ett varumärke",
+        "invitationCreated": "{actor} bjöd in en teammedlem",
+        "invitationAccepted": "{actor} gick med i teamet",
+        "agencySettingsUpdated": "{actor} uppdaterade byråinställningar",
+        "fallback": "{actor} utförde en åtgärd"
+      }
+    },
+    "errors": {
+      "loadFailed": "Vi kunde inte ladda ditt dashboard. Försök igen."
+    }
+  }
+}

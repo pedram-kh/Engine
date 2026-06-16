@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Admin",
+    "subtitle": "Superadmin-konsol.",
+    "sprint0Notice": "Sprint 0-scaffolding — admin SPA",
+    "dashboardPlaceholder": "Admin-dashboard-platshållare — full yta levereras i ett senare sprint.",
+    "env": {
+      "local": "Lokal",
+      "staging": "Staging",
+      "production": "Produktion — alla åtgärder loggas"
+    },
+    "nav": {
+      "comingSoon": "Snart",
+      "dashboard": "Dashboard",
+      "agencies": "Byråer",
+      "creators": "Creators",
+      "creatorApprovals": "Väntande godkännanden",
+      "kycQueue": "KYC-kö",
+      "allCreators": "Alla creators",
+      "payments": "Betalningar",
+      "disputes": "Tvister",
+      "recentPayments": "Senaste",
+      "audit": "Revisionslogg",
+      "alerts": "Driftsaviseringar",
+      "support": "Support",
+      "userSearch": "Användarsökning",
+      "impersonationLog": "Efterligningslogg",
+      "operations": "Drift",
+      "systemHealth": "Systemhälsa",
+      "horizon": "Bakgrundsjobb …",
+      "compliance": "Efterlevnad",
+      "exportRequests": "Exportförfrågningar",
+      "erasureQueue": "Raderingskö",
+      "featureFlags": "Funktionsflaggor"
+    },
+    "userMenu": {
+      "signOut": "Logga ut",
+      "signingOut": "Loggar ut…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Kommer snart",
+      "body": "Den här ytan aktiveras när betalningsbehandling levereras (Sprint 10).",
+      "disputes": "Tvister",
+      "recentPayments": "Senaste betalningar"
+    },
+    "sectionStub": {
+      "body": "Den här adminYtan byggs under det här sprintet."
+    },
+    "locale": {
+      "switcher": "Språk",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Tema",
+        "light": "Ljust",
+        "dark": "Mörkt"
+      }
+    }
+  }
+}
