@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Διαχειριστής",
+    "subtitle": "Super-admin console.",
+    "sprint0Notice": "Sprint 0 scaffolding — admin SPA",
+    "dashboardPlaceholder": "Διαχειριστής dashboard placeholder — full surface lands in a later sprint.",
+    "env": {
+      "local": "Local",
+      "staging": "Staging",
+      "production": "Production — all actions logged"
+    },
+    "nav": {
+      "comingSoon": "Soon",
+      "dashboard": "Πίνακας ελέγχου",
+      "agencies": "Agencies",
+      "creators": "Δημιουργόςs",
+      "creatorApprovals": "Εκκρεμές approvals",
+      "kycQueue": "KYC queue",
+      "allCreators": "Όλα creators",
+      "payments": "Πληρωμήs",
+      "disputes": "Disputes",
+      "recentPayments": "Recent",
+      "audit": "Αρχείο ελέγχου",
+      "alerts": "Operational alerts",
+      "support": "Υποστήριξη",
+      "userSearch": "User search",
+      "impersonationLog": "Πλαστοπροσωπία log",
+      "operations": "Λειτουργίες",
+      "systemHealth": "System health",
+      "horizon": "Πίσωground jobs …",
+      "compliance": "Συμμόρφωση",
+      "exportRequests": "Export requests",
+      "erasureQueue": "Erasure queue",
+      "featureFlags": "Σημαίες λειτουργιών"
+    },
+    "userMenu": {
+      "signOut": "Αποσύνδεση",
+      "signingOut": "Signing out…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Coming soon",
+      "body": "This surface lights up when payment processing ships (Sprint 10).",
+      "disputes": "Disputes",
+      "recentPayments": "Recent payments"
+    },
+    "sectionStub": {
+      "body": "This admin surface is being built this sprint."
+    },
+    "locale": {
+      "switcher": "Γλώσσα",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    }
+  }
+}
