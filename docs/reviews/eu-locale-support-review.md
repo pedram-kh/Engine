@@ -294,7 +294,7 @@ Both take one-or-more locale args, print every violation, and exit non-zero on d
 
 | Locale    | Backend `lang/` | Frontend (main+admin) | Verifier     |
 | --------- | --------------- | --------------------- | ------------ |
-| es        | done            | pending               | backend PASS |
+| es        | done            | done                  | FE + BE PASS |
 | (20 more) | pending         | pending               | —            |
 
-The `UI_LOCALES` flip and the full 24-locale parity run remain the last step (S8e).
+`es` is the first complete exemplar locale (all three roots, ~1,757 strings) and is fully parity-green on both verifiers. It validates the end-to-end method (glossary terms, placeholder/plural preservation, brand-noun + contracts carve-out) for the architect to assess before the remaining 20 locales are generated. The `UI_LOCALES` flip and the full 24-locale parity run remain the last step (S8e).
