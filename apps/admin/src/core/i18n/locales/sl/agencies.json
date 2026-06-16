@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Agencije",
+        "search_label": "Iskanje agencije",
+        "load_failed": "Ni uspelo naložiti agencije. Obnovte stránku.",
+        "empty": "Žádné agencije neodpovídají tomuto filtru.",
+        "filters": {
+          "all": "Vse",
+          "active": "Aktiven",
+          "suspended": "Pozastanjeené"
+        },
+        "fields": {
+          "name": "Agencija",
+          "status": "Stanje",
+          "members": "Členové",
+          "tier": "Úroveň",
+          "created_at": "Vytvořeno"
+        },
+        "status_labels": {
+          "active": "Aktiven",
+          "suspended": "Pozastanjeená"
+        },
+        "view": "Prikaži agenturu"
+      },
+      "detail": {
+        "fallback_title": "Agencija",
+        "load_failed": "Ni uspelo naložiti tuto agenturu. Obnovte stránku.",
+        "overview_heading": "Pregled",
+        "suspension_heading": "Pozastanjeení",
+        "fields": {
+          "slug": "Slug",
+          "country": "Země",
+          "tier": "Úroveň předplatného",
+          "subscription_status": "Stanje předplatného",
+          "members": "Členové",
+          "created_at": "Vytvořeno",
+          "suspended_at": "Začasno ustanjeljeno dne",
+          "suspended_reason": "Razlog"
+        },
+        "active_state": "Tato agentura je aktivní. Její uživatelé se mohou normálně přihlašovat.",
+        "suspended_state": "Tato agentura je pozastanjeena. Vsi její uživatelé jsou zablokováni před přihlášením."
+      },
+      "suspend": {
+        "button": "Začasno ustanjei agenturu",
+        "title": "Začasno ustanjei {name}",
+        "description": "Pozastanjeení této agencije zablokuje VŠECHNY její uživatele před přihlášením. Toto je zaznamenáno v protokolu auditu.",
+        "reason_label": "Razlog pozastanjeení",
+        "reason_hint": "Povinné, minimálně {count} znaků. Zaznamenáno v protokolu auditu.",
+        "confirm": "Začasno ustanjei",
+        "cancel": "Prekliči",
+        "success": "Agencija pozastanjeena.",
+        "failed": "Ni uspelo pozastanjeit tuto agenturu. Zkuste to znova."
+      },
+      "reactivate": {
+        "button": "Reaktivovat agenturu",
+        "title": "Reaktivovat {name}",
+        "description": "Reaktivace této agencije obnoví přihlášení pro vsechny její uživatele. Toto je zaznamenáno v protokolu auditu.",
+        "confirm": "Reaktivovat",
+        "cancel": "Prekliči",
+        "success": "Agencija reaktivována.",
+        "failed": "Ni uspelo reaktivovat tuto agenturu. Zkuste to znova."
+      }
+    }
+  }
+}

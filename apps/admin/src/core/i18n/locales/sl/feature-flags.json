@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "featureFlags": {
+      "title": "Stikaloe funkcí",
+      "subtitle": "Stikaloe pro celou platformu. Každé přepnutí je auditováno a vstoupí v platnost okamžitě.",
+      "load_failed": "Ni uspelo naložiti stikaloe funkcí. Obnovte stránku.",
+      "toggle": {
+        "enable_title": "Povolit {label}?",
+        "disable_title": "Zakázat {label}?",
+        "description": "Tím se stikalo aktivuje na celé platformě a vstoupí v platnost okamžitě. Razlog je povinný a je zaznamenán v protokolu auditu.",
+        "reason_label": "Razlog",
+        "reason_hint": "Minimálně {count} znaků — zaznamenáno při tomto přepnutí.",
+        "cancel": "Prekliči",
+        "confirm": "Potrdi",
+        "success": "Stikalo funkce aktualizován.",
+        "failed": "Ni uspelo aktualizovat stikalo. Zkuste to znova."
+      }
+    }
+  }
+}

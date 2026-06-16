@@ -1,0 +1,66 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "Iskanje uporabnikov",
+        "subtitle": "Najděte uživatele pro zobrazení nebo lažno predstanjeljanje. Administrátoři platformy nemohou být zosobňováni.",
+        "label": "Iskanje podle jména, e-mailu nebo ULID",
+        "empty": "Žádní uživatelé neodpovídají tomuto vyhledávání.",
+        "load_failed": "Ni uspelo prohledat uživatele. Zkuste to znova."
+      },
+      "impersonate": {
+        "button": "Lažno predstanjei",
+        "title": "Lažno predstanjei {name}",
+        "warning": "Otevřete novou kartu přihlášeni JAKO tento uživatel. Vaše relace skrbnik zde zůstane aktivní. Každá provedená akce je zaznamenána u tohoto uživatele s vámi přihlášenými jako zosobňovatel a relace automaticky vyprší.",
+        "reason_label": "Razlog lažno predstanjeljanje",
+        "reason_hint": "Povinné, minimálně {count} znaků. Zaznamenáno v protokolu auditu.",
+        "confirm": "Zahájit lažno predstanjeljanje",
+        "cancel": "Prekliči",
+        "success": "Lažno predstanjeljanje {name} zahájeno v nové kartě.",
+        "failed": "Ni uspelo zahájit lažno predstanjeljanje. Zkuste to znova."
+      },
+      "impersonation_log": {
+        "title": "Dnevnik lažnega predstanjeljanja",
+        "subtitle": "Vsechny relace lažno predstanjeljanje skrbnik kdy zahájené, nejnovější jako první.",
+        "empty": "Žádné relace lažno predstanjeljanje neodpovídají těmto filtrům.",
+        "load_failed": "Ni uspelo naložiti dnevnik lažnega predstanjeljanja. Obnovte stránku.",
+        "filters": {
+          "status": "Stanje",
+          "search": "Skrbnik nebo uživatel (ime, e-mail, ULID)",
+          "date_from": "Od",
+          "date_to": "Do",
+          "apply": "Použít"
+        },
+        "status_filter": {
+          "all": "Vse",
+          "active": "Aktiven",
+          "ended": "Ukončené",
+          "expired": "Potekelé"
+        },
+        "statuses": {
+          "active": "Aktiven",
+          "ended": "Ukončená",
+          "expired": "Potekelá"
+        },
+        "fields": {
+          "admin": "Skrbnik",
+          "impersonated_user": "Zosobněný uživatel",
+          "reason": "Razlog",
+          "status": "Stanje",
+          "started_at": "Zahájeno",
+          "ended_at": "Ukončeno"
+        },
+        "pagination": {
+          "prev": "Předchozí",
+          "next": "Další"
+        }
+      }
+    },
+    "impersonation": {
+      "target_admin": "Administrátoři platformy nemohou být zosobňováni.",
+      "target_self": "Nemůžete lažno predstanjei sami sebe.",
+      "already_active": "Již máte aktivní lažno predstanjeljanje. Ukončete ho před zahájením nového.",
+      "invalid_handoff": "Toto předání lažno predstanjeljanje je neplatné, již bylo použito nebo vypršelo."
+    }
+  }
+}

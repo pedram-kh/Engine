@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Nadzorna plošča",
+      "load_failed": "Ni uspelo naložiti řídicí panel. Obnovte stránku.",
+      "kpi": {
+        "agencies_total": "Agencije",
+        "agencies_suspended": "Pozastanjeené agencije",
+        "creators_pending_approval": "V čakanju schválení",
+        "creators_pending_kyc": "Čakalna vrsta KYC",
+        "queue_pending": "Úlohy ve frontě",
+        "queue_failed": "Neúspěšné úlohy",
+        "open_disputes": "Otevřené spory",
+        "failed_payments_today": "Neúspěšné plačila dnes"
+      },
+      "activity": {
+        "heading": "Nedávná aktivita",
+        "empty": "Žádná nedávná aktivita."
+      }
+    }
+  }
+}

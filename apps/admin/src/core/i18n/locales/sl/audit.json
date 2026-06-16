@@ -1,0 +1,27 @@
+{
+  "admin": {
+    "audit": {
+      "title": "Revizijski dnevnik",
+      "empty": "Žádné záznamy auditu neodpovídají těmto filtrům.",
+      "load_failed": "Ni uspelo naložiti revizijski dnevnik. Obnovte stránku.",
+      "filters": {
+        "action": "Akce",
+        "subject": "ULID subjektu",
+        "date_from": "Od",
+        "date_to": "Do",
+        "apply": "Použít"
+      },
+      "fields": {
+        "action": "Akce",
+        "actor": "Aktér",
+        "subject": "Subjekt",
+        "reason": "Razlog",
+        "created_at": "Kdy"
+      },
+      "pagination": {
+        "prev": "Předchozí",
+        "next": "Další"
+      }
+    }
+  }
+}

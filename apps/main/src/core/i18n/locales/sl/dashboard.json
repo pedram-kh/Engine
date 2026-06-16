@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "welcome": {
+      "greeting": "Vítejte zpět",
+      "greetingNamed": "Vítejte zpět, {name}"
+    },
+    "kpi": {
+      "activeCampaigns": "Aktiven kampanje",
+      "creatorsInRoster": "Ustvarjalci v zasedbau",
+      "pendingApplications": "Nevyřízené prijave tvůrců",
+      "paymentsDue": "Splatné plačila"
+    },
+    "activity": {
+      "title": "Nedávná aktivita",
+      "empty": "Zatím žádná nedávná aktivita.",
+      "loadFailed": "Ni uspelo naložiti nedávnou aktivitu.",
+      "system": "Systém",
+      "actions": {
+        "creatorInvited": "{actor} pozval ustvarjalca",
+        "bulkInviteCompleted": "{actor} spustil hromadnou pozvánku ({invited} pozvaných, {failed} neúspěšných)",
+        "agencyCreatorRelationCreated": "{actor} přidal ustvarjalca do zasedbau",
+        "brandCreated": "{actor} vytvořil značku",
+        "brandArchived": "{actor} archivoval značku",
+        "brandRestored": "{actor} obnovil značku",
+        "invitationCreated": "{actor} pozval člena ekipe",
+        "invitationAccepted": "{actor} se připojil k ekipe",
+        "agencySettingsUpdated": "{actor} aktualizoval nastanjeení agencije",
+        "fallback": "{actor} provedl akci"
+      }
+    },
+    "errors": {
+      "loadFailed": "Ni uspelo naložiti váš řídicí panel. Zkuste to znova."
+    }
+  }
+}

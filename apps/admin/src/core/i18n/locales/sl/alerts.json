@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Operacijení opozorila",
+      "subtitle": "Aktivita auditu a operacijení oznámení určená vám.",
+      "empty": "Žádná operacijení opozorila.",
+      "load_failed": "Ni uspelo naložiti operacijení opozorila. Obnovte stránku.",
+      "paymentAlerts": {
+        "title": "Platební opozorila",
+        "body": "Opozorila na financování escrow a uvolnění se aktivují po spuštění zpracování plateb (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Ustvarjalec schválen",
+          "rejected": "Ustvarjalec odmítnut"
+        }
+      }
+    }
+  }
+}

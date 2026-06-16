@@ -1,0 +1,15 @@
+{
+  "impersonation": {
+    "claim": {
+      "in_progress": "Spouštění relace lažno predstanjeljanje…",
+      "missing_token": "Nebyl poskytnut token předání. Spusťte lažno predstanjeljanje znova z administrátorského panelu.",
+      "invalid": "Toto předání lažno predstanjeljanje je neplatné, již bylo použito nebo vypršelo. Spusťte ho znova z administrátorského panelu.",
+      "failed": "Ni uspelo spustit relaci lažno predstanjeljanje. Zkuste to znova z administrátorského panelu."
+    },
+    "banner": {
+      "message": "Relace podpory skrbnik — prohlížíte tento účet jako uživatel.",
+      "expires_in": "Vyprší za {time}",
+      "end": "Ukončit relaci"
+    }
+  }
+}
