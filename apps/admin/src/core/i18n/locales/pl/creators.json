@@ -1,0 +1,228 @@
+{
+  "admin": {
+    "creators": {
+      "list": {
+        "title": "Kolejka recenzji twórców",
+        "unnamed": "Nienazwany twórca",
+        "view": "Wyświetl twórcę",
+        "load_failed": "Nie udało się załadować kolejki recenzji. Odśwież stronę.",
+        "fields": {
+          "name": "Twórca",
+          "email": "E-mail",
+          "status": "Status",
+          "kyc": "KYC",
+          "completeness": "Kompletność",
+          "submitted_at": "Przesłano"
+        },
+        "filters": {
+          "pending": "Oczekujące",
+          "approved": "Zatwierdzone",
+          "rejected": "Odrzucone",
+          "incomplete": "Niekompletne",
+          "all": "Wszystkie"
+        },
+        "status_labels": {
+          "incomplete": "Niekompletna",
+          "pending": "Oczekująca",
+          "approved": "Zatwierdzona",
+          "rejected": "Odrzucona"
+        }
+      },
+      "kyc": {
+        "title": "Kolejka recenzji KYC",
+        "empty": "Żadni twórcy nie pasują do tego filtra KYC.",
+        "load_failed": "Nie udało się załadować kolejki KYC. Odśwież stronę.",
+        "filters": {
+          "pending": "Oczekujące",
+          "verified": "Zweryfikowane",
+          "rejected": "Odrzucone",
+          "none": "Nie rozpoczęto",
+          "all": "Wszystkie"
+        }
+      },
+      "all": {
+        "title": "Wszyscy twórcy",
+        "empty": "Brak twórców.",
+        "load_failed": "Nie udało się załadować twórców. Odśwież stronę."
+      },
+      "detail": {
+        "fallback_title": "Twórca",
+        "application_status": "Status aplikacji: {status}",
+        "completeness": "{percent}% ukończono",
+        "rejection_heading": "Uwagi odrzucenia",
+        "profile_heading": "Profil",
+        "social_heading": "Konta społecznościowe",
+        "portfolio_heading": "Portfolio",
+        "onboarding_heading": "Status onboardingu",
+        "kyc_history_heading": "Historia weryfikacji KYC",
+        "kyc_history": {
+          "provider": "Dostawca",
+          "status": "Status",
+          "started_at": "Rozpoczęto",
+          "completed_at": "Ukończono"
+        },
+        "assignments_heading": "Historia kampanii",
+        "assignments": {
+          "empty": "Ten twórca nie ma jeszcze żadnych przydziałów kampanii.",
+          "load_failed": "Nie udało się załadować historii kampanii.",
+          "campaign": "Kampania",
+          "brand": "Marka",
+          "agency": "Agencja",
+          "status": "Status",
+          "created_at": "Rozpoczęto"
+        },
+        "audit_heading": "Historia audytu",
+        "audit": {
+          "empty": "Brak wpisów audytu dla tego twórcy.",
+          "load_failed": "Nie udało się załadować historii audytu.",
+          "action": "Akcja",
+          "actor": "Aktor",
+          "reason": "Powód",
+          "created_at": "Kiedy"
+        },
+        "payments_heading": "Historia płatności",
+        "payments_coming_soon": "Historia płatności zostanie aktywowana po wdrożeniu przetwarzania płatności (Sprint 10).",
+        "load_failed": "Nie udało się załadować tego twórcy. Odśwież stronę.",
+        "fields": {
+          "display_name": "Nazwa wyświetlana",
+          "bio": "Bio",
+          "country_code": "Kraj",
+          "region": "Region",
+          "primary_language": "Język główny",
+          "secondary_languages": "Języki dodatkowe",
+          "categories": "Kategorie"
+        },
+        "edit": {
+          "title": "Edytuj {field}",
+          "save": "Zapisz zmiany",
+          "cancel": "Anuluj",
+          "reason_label": "Powód zmiany",
+          "reason_hint": "Wymagane dla wrażliwych pól. Rejestrowane w dzienniku audytu.",
+          "custom_code_hint": "Wybierz wartość lub wpisz 2-literowy kod ISO.",
+          "button_aria_label": "Edytuj {field}",
+          "save_failed": "Nie udało się zapisać tej zmiany. Spróbuj ponownie.",
+          "saved": "{field} zaktualizowane."
+        },
+        "errors": {
+          "field_status_immutable": "Przejścia statusu używają akcji zatwierdź / odrzuć, a nie edycji pola."
+        },
+        "approve": {
+          "button": "Zatwierdź aplikację",
+          "title": "Zatwierdź aplikację {name}",
+          "description": "Spowoduje to oznaczenie twórcy jako zatwierdzonego i przyznanie dostępu do produkcji. Akcja jest rejestrowana w dzienniku audytu.",
+          "welcome_label": "Wiadomość powitalna (opcjonalnie)",
+          "welcome_hint": "Wyświetlana na pulpicie nawigacyjnym twórcy przy następnym logowaniu.",
+          "confirm": "Zatwierdź",
+          "cancel": "Anuluj",
+          "success": "Twórca zatwierdzony.",
+          "failed": "Nie udało się zatwierdzić tego twórcy. Spróbuj ponownie."
+        },
+        "reject": {
+          "button": "Odrzuć aplikację",
+          "title": "Odrzuć aplikację {name}",
+          "description": "Twórca zobaczy powód na swoim pulpicie nawigacyjnym przy następnym logowaniu.",
+          "reason_label": "Powód odrzucenia",
+          "min_hint": "Wymagane, co najmniej {count} znaków.",
+          "confirm": "Odrzuć",
+          "cancel": "Anuluj",
+          "success": "Twórca odrzucony.",
+          "failed": "Nie udało się odrzucić tego twórcy. Spróbuj ponownie."
+        },
+        "identity": {
+          "heading": "Weryfikacja tożsamości",
+          "status": "Status: {status}",
+          "verify_manual": "Zweryfikuj ręcznie",
+          "verify_vendor": "Zażądaj weryfikacji dostawcy",
+          "vendor_disabled_tooltip": "Brak skonfigurowanego dostawcy KYC",
+          "method_labels": {
+            "vendor": "Zweryfikowany przez dostawcę",
+            "manual": "Zweryfikowany ręcznie przez admina"
+          }
+        },
+        "verify": {
+          "title": "Ręcznie zweryfikuj tożsamość {name}",
+          "description": "To trwale oznacza tożsamość twórcy jako zweryfikowaną i jest rejestrowane na Twoim koncie w dzienniku audytu. Używaj tylko wtedy, gdy potwierdziłeś/aś tożsamość poza systemem.",
+          "note_label": "Uwaga (opcjonalnie)",
+          "note_hint": "Rejestrowane w dzienniku audytu wraz z Twoim imieniem.",
+          "confirm": "Zweryfikuj tożsamość",
+          "cancel": "Anuluj",
+          "success": "Tożsamość zweryfikowana.",
+          "failed": "Nie udało się zweryfikować tożsamości tego twórcy. Spróbuj ponownie."
+        }
+      }
+    }
+  },
+  "creator": {
+    "already_approved": "Ten twórca został już zatwierdzony.",
+    "already_rejected": "Ten twórca został już odrzucony.",
+    "kyc_not_verified": "Zatwierdzenie jest zablokowane do czasu weryfikacji tożsamości twórcy.",
+    "kyc_already_verified": "Tożsamość tego twórcy została już zweryfikowana.",
+    "admin": {
+      "field_status_immutable": "Przejścia statusu używają akcji zatwierdź / odrzuć, a nie edycji pola."
+    },
+    "ui": {
+      "wizard": {
+        "steps": {
+          "kyc": {
+            "name": "Weryfikacja tożsamości",
+            "status_labels": {
+              "none": "Nie rozpoczęto",
+              "pending": "W trakcie",
+              "verified": "Zweryfikowany",
+              "rejected": "Odrzucony",
+              "not_required": "Niewymagana"
+            }
+          },
+          "tax": {
+            "name": "Informacje podatkowe",
+            "status_complete": "Przesłane",
+            "status_incomplete": "Jeszcze nie przesłane"
+          },
+          "payout": {
+            "name": "Metoda wypłaty",
+            "status_set": "Połączony",
+            "status_unset": "Niepołączony"
+          },
+          "contract": {
+            "name": "Umowa ramowa",
+            "status_labels": {
+              "signed": "Podpisana",
+              "click_through_accepted": "Zaakceptowana",
+              "none": "Nie rozpoczęto"
+            }
+          },
+          "portfolio": {
+            "gallery_empty": "Brak przesłanych pozycji portfolio.",
+            "video_badge_label": "Wideo",
+            "link_badge_label": "Zewnętrzny link",
+            "untitled_item": "Nienazwana pozycja portfolio"
+          }
+        },
+        "categories": {
+          "fashion": "Moda",
+          "beauty": "Uroda",
+          "lifestyle": "Styl życia",
+          "fitness": "Fitness",
+          "travel": "Podróże",
+          "food": "Jedzenie",
+          "tech": "Technologia",
+          "gaming": "Gaming",
+          "music": "Muzyka",
+          "comedy": "Komedia",
+          "education": "Edukacja",
+          "parenting": "Rodzicielstwo",
+          "business": "Biznes",
+          "art": "Sztuka",
+          "sports": "Sport",
+          "other": "Inne"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Wkrótce"
+        }
+      }
+    }
+  }
+}

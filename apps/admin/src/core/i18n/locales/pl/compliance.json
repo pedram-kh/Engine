@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "compliance": {
+      "shellNotice": "Ta kolejka jest gotowa, ale jeszcze niepodłączona do danych — przetwarzanie eksportu i usunięcia zostanie dostarczone w późniejszym sprincie.",
+      "load_failed": "Nie udało się załadować tej kolejki. Odśwież stronę.",
+      "fields": {
+        "subject": "Osoba, której dane dotyczą",
+        "status": "Status",
+        "requested": "Żądane"
+      },
+      "exports": {
+        "title": "Prośby o eksport",
+        "subtitle": "Żądania dostępu i przenośności od osób, których dane dotyczą (RODO art. 15/20).",
+        "empty": "Brak próśb o eksport."
+      },
+      "erasures": {
+        "title": "Kolejka usunięcia",
+        "subtitle": "Żądania bycia zapomnianym oczekujące na weryfikację (RODO art. 17).",
+        "empty": "Brak próśb o usunięcie."
+      }
+    }
+  }
+}

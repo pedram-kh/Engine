@@ -1,0 +1,66 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "Wyszukiwanie użytkowników",
+        "subtitle": "Znajdź użytkownika, aby go wyświetlić lub spersonifikować. Administratorzy platformy nie mogą być personifikowani.",
+        "label": "Szukaj po nazwie, e-mailu lub ULID",
+        "empty": "Żadni użytkownicy nie pasują do tego wyszukiwania.",
+        "load_failed": "Nie udało się przeszukać użytkowników. Spróbuj ponownie."
+      },
+      "impersonate": {
+        "button": "Spersonifikuj",
+        "title": "Spersonifikuj {name}",
+        "warning": "Otworzysz nową kartę zalogowany/a JAKO ten użytkownik. Twoja sesja admina pozostaje aktywna tutaj. Każda wykonana akcja jest rejestrowana przy tym użytkowniku z Tobą zalogowanym/ą jako personifikator, a sesja wygasa automatycznie.",
+        "reason_label": "Powód personifikacji",
+        "reason_hint": "Wymagane, co najmniej {count} znaków. Rejestrowane w dzienniku audytu.",
+        "confirm": "Rozpocznij personifikację",
+        "cancel": "Anuluj",
+        "success": "Personifikacja {name} rozpoczęta w nowej karcie.",
+        "failed": "Nie udało się rozpocząć personifikacji. Spróbuj ponownie."
+      },
+      "impersonation_log": {
+        "title": "Dziennik personifikacji",
+        "subtitle": "Wszystkie sesje personifikacji admina kiedykolwiek rozpoczęte, najnowsze pierwsze.",
+        "empty": "Żadne sesje personifikacji nie pasują do tych filtrów.",
+        "load_failed": "Nie udało się załadować dziennika personifikacji. Odśwież stronę.",
+        "filters": {
+          "status": "Status",
+          "search": "Admin lub użytkownik (nazwa, e-mail, ULID)",
+          "date_from": "Od",
+          "date_to": "Do",
+          "apply": "Zastosuj"
+        },
+        "status_filter": {
+          "all": "Wszystkie",
+          "active": "Aktywne",
+          "ended": "Zakończone",
+          "expired": "Wygasłe"
+        },
+        "statuses": {
+          "active": "Aktywna",
+          "ended": "Zakończona",
+          "expired": "Wygasła"
+        },
+        "fields": {
+          "admin": "Administrator",
+          "impersonated_user": "Spersonifikowany użytkownik",
+          "reason": "Powód",
+          "status": "Status",
+          "started_at": "Rozpoczęto",
+          "ended_at": "Zakończono"
+        },
+        "pagination": {
+          "prev": "Poprzednia",
+          "next": "Następna"
+        }
+      }
+    },
+    "impersonation": {
+      "target_admin": "Administratorzy platformy nie mogą być personifikowani.",
+      "target_self": "Nie możesz spersonifikować siebie.",
+      "already_active": "Masz już aktywną personifikację. Zakończ ją przed rozpoczęciem nowej.",
+      "invalid_handoff": "To przekazanie personifikacji jest nieprawidłowe, już użyte lub wygasłe."
+    }
+  }
+}

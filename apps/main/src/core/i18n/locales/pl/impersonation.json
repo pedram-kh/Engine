@@ -1,0 +1,15 @@
+{
+  "impersonation": {
+    "claim": {
+      "in_progress": "Uruchamianie sesji personifikacji…",
+      "missing_token": "Nie podano tokenu przekazania. Rozpocznij personifikację ponownie z panelu administracyjnego.",
+      "invalid": "To przekazanie personifikacji jest nieprawidłowe, już użyte lub wygasłe. Rozpocznij ponownie z panelu administracyjnego.",
+      "failed": "Nie mogliśmy uruchomić sesji personifikacji. Spróbuj ponownie z panelu administracyjnego."
+    },
+    "banner": {
+      "message": "Sesja pomocy administracyjnej — przeglądasz to konto jako użytkownik.",
+      "expires_in": "Wygasa za {time}",
+      "end": "Zakończ sesję"
+    }
+  }
+}

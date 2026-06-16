@@ -1,0 +1,84 @@
+{
+  "availability": {
+    "title": "Dostępność",
+    "subtitle": "Blokuj czasy, gdy jesteś niedostępny, aby agencje widziały Twój prawdziwy kalendarz.",
+    "allDay": "Cały dzień",
+    "moreCount": "+{count} więcej",
+    "dayPopover": {
+      "title": "Bloki tego dnia",
+      "viewAll": "Pokaż wszystkie bloki tego dnia"
+    },
+    "creatorNav": {
+      "dashboard": "Pulpit nawigacyjny",
+      "assignments": "Zaproszenia",
+      "availability": "Dostępność"
+    },
+    "nav": {
+      "prevMonth": "Poprzedni miesiąc",
+      "nextMonth": "Następny miesiąc"
+    },
+    "actions": {
+      "add": "Dodaj blok"
+    },
+    "empty": {
+      "heading": "Brak bloków dostępności",
+      "body": "Dodaj blok, aby oznaczyć, kiedy jesteś nieobecny lub niedostępny."
+    },
+    "errors": {
+      "loadFailed": "Nie mogliśmy załadować Twojej dostępności. Spróbuj ponownie."
+    },
+    "blockType": {
+      "hard": "Niedostępny (twardy)",
+      "soft": "Preferencja (miękki)"
+    },
+    "kind": {
+      "vacation": "Urlop",
+      "personal": "Osobisty",
+      "exclusive_contract": "Wyłączna umowa",
+      "assignment_auto": "Z kampanii",
+      "other": "Inne"
+    },
+    "weekday": {
+      "MO": "Pon",
+      "TU": "Wt",
+      "WE": "Śr",
+      "TH": "Czw",
+      "FR": "Pt",
+      "SA": "Sob",
+      "SU": "Nd"
+    },
+    "dialog": {
+      "createTitle": "Dodaj blok dostępności",
+      "editTitle": "Edytuj blok dostępności",
+      "seriesNotice": "To jest blok cykliczny — zmiany dotyczą wszystkich jego wystąpień, nie tylko tego dnia.",
+      "blockTypeHint": "Twarde bloki całkowicie Cię wykluczają; miękkie bloki to tylko preferencja.",
+      "fields": {
+        "allDay": "Cały dzień",
+        "startDate": "Data rozpoczęcia",
+        "startTime": "Godzina rozpoczęcia",
+        "endDate": "Data zakończenia",
+        "endTime": "Godzina zakończenia",
+        "blockType": "Typ",
+        "kind": "Powód",
+        "reason": "Uwaga (opcjonalnie)",
+        "recurring": "Powtarza się co tydzień"
+      },
+      "recurrence": {
+        "interval": "Powtarzaj co (tygodnie)",
+        "weekdays": "W te dni",
+        "hasEnd": "Ustaw datę końcową",
+        "endsOn": "Kończy się"
+      },
+      "actions": {
+        "save": "Zapisz",
+        "cancel": "Anuluj",
+        "delete": "Usuń",
+        "confirmDelete": "Potwierdź usunięcie"
+      },
+      "errors": {
+        "saveFailed": "Nie mogliśmy zapisać bloku. Spróbuj ponownie.",
+        "deleteFailed": "Nie mogliśmy usunąć bloku. Spróbuj ponownie."
+      }
+    }
+  }
+}

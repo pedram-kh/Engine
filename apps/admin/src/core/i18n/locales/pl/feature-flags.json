@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "featureFlags": {
+      "title": "Flagi funkcji",
+      "subtitle": "Przełączniki obejmujące całą platformę. Każde przełączenie jest audytowane i wchodzi w życie natychmiast.",
+      "load_failed": "Nie udało się załadować flag funkcji. Odśwież stronę.",
+      "toggle": {
+        "enable_title": "Włączyć {label}?",
+        "disable_title": "Wyłączyć {label}?",
+        "description": "To przełącza flagę na całej platformie i wchodzi w życie natychmiast. Powód jest wymagany i jest rejestrowany w dzienniku audytu.",
+        "reason_label": "Powód",
+        "reason_hint": "Co najmniej {count} znaków — rejestrowane przy tym przełączeniu.",
+        "cancel": "Anuluj",
+        "confirm": "Potwierdź",
+        "success": "Flaga funkcji zaktualizowana.",
+        "failed": "Nie udało się zaktualizować flagi. Spróbuj ponownie."
+      }
+    }
+  }
+}

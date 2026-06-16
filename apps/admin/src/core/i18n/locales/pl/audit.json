@@ -1,0 +1,27 @@
+{
+  "admin": {
+    "audit": {
+      "title": "Dziennik audytu",
+      "empty": "Żadne wpisy audytu nie pasują do tych filtrów.",
+      "load_failed": "Nie udało się załadować dziennika audytu. Odśwież stronę.",
+      "filters": {
+        "action": "Akcja",
+        "subject": "Podmiot ULID",
+        "date_from": "Od",
+        "date_to": "Do",
+        "apply": "Zastosuj"
+      },
+      "fields": {
+        "action": "Akcja",
+        "actor": "Aktor",
+        "subject": "Podmiot",
+        "reason": "Powód",
+        "created_at": "Kiedy"
+      },
+      "pagination": {
+        "prev": "Poprzednia",
+        "next": "Następna"
+      }
+    }
+  }
+}

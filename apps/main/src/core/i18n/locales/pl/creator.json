@@ -1,0 +1,416 @@
+{
+  "creator": {
+    "not_found": "Z Twoim kontem nie jest powiązany żaden profil twórcy. Wyloguj się i zaloguj ponownie lub skontaktuj się z pomocą techniczną.",
+    "already_approved": "Ten twórca został już zatwierdzony.",
+    "already_rejected": "Ten twórca został już odrzucony.",
+    "kyc_not_verified": "Tożsamość tego twórcy musi być zweryfikowana przed zatwierdzeniem aplikacji.",
+    "kyc_already_verified": "Tożsamość tego twórcy została już zweryfikowana.",
+    "admin": {
+      "field_status_immutable": "Status aplikacji nie może być zmieniony przez ten formularz. Użyj zamiast tego akcji zatwierdzenia lub odrzucenia."
+    },
+    "social": {
+      "invalid_platform": "Ta platforma społecznościowa nie jest obsługiwana."
+    },
+    "wizard": {
+      "feature_disabled": "Ten krok jest obecnie niedostępny podczas trwającej zmiany konfiguracji. Pomiń, aby kontynuować aplikację.",
+      "feature_enabled": "Ta opcja nie jest teraz dostępna — użyj standardowego przepływu dla tego kroku.",
+      "incomplete": "Nie można jeszcze przesłać aplikacji — jeden lub więcej kroków kreatora jest nadal niekompletnych."
+    },
+    "reopen": {
+      "invalid_state": "Tylko odrzucona aplikacja może być ponownie otwarta."
+    },
+    "ui": {
+      "wizard": {
+        "title": "Skonfiguruj swój profil twórcy",
+        "subtitle": "Kilka kroków, aby przedstawić się markom.",
+        "progress": {
+          "step_of": "Krok {current} z {total}",
+          "completed": "Ukończono",
+          "current": "Bieżący krok",
+          "skipped": "Pominięty",
+          "pending": "Nie rozpoczęto"
+        },
+        "actions": {
+          "save": "Zapisz",
+          "save_and_continue": "Zapisz i kontynuuj",
+          "back": "Wróć",
+          "skip_for_now": "Pomiń na razie",
+          "save_and_exit": "Zapisz i wyjdź",
+          "submit_for_approval": "Prześlij do zatwierdzenia",
+          "continue_from_here": "Kontynuuj stąd",
+          "edit_step": "Edytuj krok",
+          "review_and_submit": "Przejrzyj i prześlij",
+          "connect": "Połącz",
+          "update": "Zaktualizuj",
+          "remove": "Usuń"
+        },
+        "skipped": {
+          "label": "Pominięty",
+          "explanation": "Ten krok nie jest teraz wymagany. Administrator przejrzy Twoją aplikację bez niego."
+        },
+        "save_status": {
+          "saving": "Zapisywanie…",
+          "saved": "Zapisano",
+          "error": "Nie udało się zapisać — spróbuj ponownie."
+        },
+        "steps": {
+          "profile": {
+            "name": "Podstawy profilu",
+            "title": "Opowiedz nam o sobie",
+            "description": "Twoja nazwa wyświetlana, bio, zdjęcie i kategorie, w których tworzysz."
+          },
+          "social": {
+            "name": "Konta społecznościowe",
+            "title": "Połącz swoje konta społecznościowe",
+            "description": "Połącz co najmniej jedną platformę, aby marki widziały Twój zasięg."
+          },
+          "portfolio": {
+            "name": "Portfolio",
+            "title": "Pokaż swoje najlepsze prace",
+            "description": "Prześlij do 10 pozycji — filmy, obrazy lub zewnętrzne linki — reprezentujących Twój styl.",
+            "gallery_heading": "Twoje portfolio",
+            "gallery_empty": "Brak przesłanych pozycji portfolio.",
+            "gallery_remove": "Usuń pozycję",
+            "gallery_status": "Galeria portfolio zawiera {count} pozycję/pozycji.",
+            "video_badge_label": "Wideo",
+            "link_badge_label": "Zewnętrzny link",
+            "untitled_item": "Nienazwana pozycja portfolio",
+            "preview_label": "Otwórz podgląd",
+            "preview_close": "Zamknij podgląd"
+          },
+          "kyc": {
+            "name": "Weryfikacja tożsamości",
+            "title": "Zweryfikuj swoją tożsamość",
+            "description": "Szybka weryfikacja u naszego partnera. Wymagane do wypłat.",
+            "skipped_title": "Weryfikacja tożsamości pominięta",
+            "skipped_explanation": "Weryfikacja tożsamości nie jest teraz wymagana.",
+            "current_status": "Status:",
+            "begin_button": "Rozpocznij weryfikację",
+            "status_labels": {
+              "none": "Nie rozpoczęto",
+              "pending": "W trakcie",
+              "verified": "Zweryfikowany",
+              "rejected": "Odrzucony",
+              "not_required": "Pominięty"
+            }
+          },
+          "tax": {
+            "name": "Informacje podatkowe",
+            "title": "Formularz podatkowy",
+            "description": "Potrzebujemy formularza podatkowego do wypłat, nawet przed pierwszą.",
+            "current_status": "Status:",
+            "status_complete": "Przesłany",
+            "status_incomplete": "Jeszcze nie przesłany",
+            "on_file_title": "Informacje podatkowe w archiwum",
+            "on_file_body": "Twoje dane podatkowe są bezpiecznie zapisane. Dla Twojej prywatności nie wyświetlamy ich ponownie — wybierz Zaktualizuj, aby je ponownie wprowadzić.",
+            "update_button": "Zaktualizuj informacje podatkowe"
+          },
+          "payout": {
+            "name": "Metoda wypłaty",
+            "title": "Skonfiguruj wypłaty",
+            "description": "Połącz konto Stripe Express, aby otrzymywać płatności.",
+            "skipped_title": "Konfiguracja wypłat pominięta",
+            "skipped_explanation": "Konfiguracja wypłat nie jest teraz wymagana.",
+            "current_status": "Status:",
+            "begin_button": "Skonfiguruj wypłaty",
+            "status_set": "Połączony",
+            "status_unset": "Niepołączony"
+          },
+          "contract": {
+            "name": "Umowa ramowa",
+            "title": "Podpisz umowę ramową",
+            "description": "Nasza standardowa umowa twórcy obejmuje współprace z markami na platformie.",
+            "skipped_explanation": "Podpisanie umowy nie jest teraz wymagane — zaakceptuj poniższe warunki kliknięciem.",
+            "click_through_label": "Przeczytałem/am i akceptuję te warunki.",
+            "click_through_help": "Przeczytaj powyższą umowę, a następnie zaznacz pole, aby kontynuować.",
+            "terms_version": "Umowa Ramowa Twórcy v{version}",
+            "current_status": "Status:",
+            "begin_button": "Otwórz umowę do podpisania",
+            "status_labels": {
+              "signed": "Podpisana",
+              "click_through_accepted": "Zaakceptowana",
+              "none": "Nie rozpoczęto"
+            },
+            "accepted_title": "Umowa zaakceptowana",
+            "accepted_body": "Zaakceptowałeś/aś umowę ramową. Przejdź do następnego kroku."
+          },
+          "account_created": {
+            "name": "Konto utworzone"
+          },
+          "review": {
+            "name": "Przejrzyj i prześlij",
+            "title": "Przejrzyj swoją aplikację",
+            "description": "Poświęć chwilę na przejrzenie wszystkiego przed przesłaniem.",
+            "completeness": "{percent}% ukończono",
+            "edit_step": "Edytuj",
+            "submit_button": "Prześlij aplikację",
+            "incomplete_blocker": "Masz 1 niekompletny krok: {names}. Kliknij Edytuj, aby go ukończyć przed przesłaniem. | Masz {count} niekompletnych kroków: {names}. Kliknij Edytuj na każdym, aby je ukończyć przed przesłaniem."
+          }
+        },
+        "fields": {
+          "display_name": "Nazwa wyświetlana",
+          "display_name_help": "Jak marki Cię zobaczą — Twój nick lub pseudonim sceniczny.",
+          "bio": "Bio",
+          "bio_help": "Krótkie przedstawienie. Możesz używać **pogrubienia**, *kursywy* i [linków](https://example.com).",
+          "avatar": "Zdjęcie profilowe",
+          "avatar_drop": "Upuść zdjęcie tutaj lub kliknij, aby wybrać. JPG, PNG lub WebP do 5 MB.",
+          "country": "Kraj",
+          "region": "Region lub miasto",
+          "primary_language": "Język główny",
+          "secondary_languages": "Inne języki",
+          "categories": "Kategorie",
+          "categories_help": "Wybierz kategorie, które najlepiej opisują to, co tworzysz.",
+          "avatar_required": "Zdjęcie profilowe jest wymagane do ukończenia tego kroku.",
+          "step_requirements_hint": "Dodaj zdjęcie profilowe i co najmniej jedną kategorię, aby kontynuować.",
+          "social_handle": "Nazwa użytkownika",
+          "social_handle_hint": "Podaj tylko swoją nazwę użytkownika — bez symbolu {'@'} ani pełnego adresu URL profilu.",
+          "social_handle_invalid": "Podaj prawidłową nazwę użytkownika: 2–30 liter, cyfr, kropek, podkreśleń lub myślników (bez spacji, {'@'} lub adresów URL).",
+          "social_profile_url": "Adres URL profilu",
+          "portfolio_title": "Tytuł",
+          "portfolio_description": "Opis",
+          "portfolio_external_url": "Zewnętrzny URL (opcjonalnie)",
+          "tax_form_type": "Formularz podatkowy",
+          "legal_name": "Imię i nazwisko (prawne)",
+          "tax_id": "Numer identyfikacji podatkowej",
+          "address_country": "Kraj",
+          "address_city": "Miasto",
+          "address_postal_code": "Kod pocztowy",
+          "address_street": "Ulica"
+        },
+        "categories": {
+          "fashion": "Moda",
+          "beauty": "Uroda",
+          "lifestyle": "Styl życia",
+          "fitness": "Fitness",
+          "travel": "Podróże",
+          "food": "Jedzenie",
+          "tech": "Technologia",
+          "gaming": "Gaming",
+          "music": "Muzyka",
+          "comedy": "Komedia",
+          "education": "Edukacja",
+          "parenting": "Rodzicielstwo",
+          "business": "Biznes",
+          "art": "Sztuka",
+          "sports": "Sport",
+          "other": "Inne"
+        },
+        "tax_form_types": {
+          "eu_self_employed": "UE — samozatrudniony",
+          "eu_company": "UE — firma",
+          "uk_self_employed": "UK — samozatrudniony",
+          "uk_company": "UK — firma"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Wkrótce"
+        },
+        "vendor_bounce": {
+          "waiting_title": "Prawie gotowe…",
+          "waiting_description": "Czekamy na odpowiedź od naszego partnera. Zazwyczaj trwa to poniżej minuty.",
+          "timeout_title": "Nadal czekamy na partnera",
+          "timeout_description": "To trwa dłużej niż oczekiwano. Możesz spróbować ponownie lub skontaktować się z pomocą techniczną.",
+          "retry": "Spróbuj ponownie",
+          "contact_support": "Skontaktuj się z pomocą"
+        },
+        "welcome_back": {
+          "title": "Witaj ponownie",
+          "subtitle": "Byłeś/aś tu ostatnio {time_ago}. Kontynuuj tam, gdzie skończyłeś/aś.",
+          "first_time_title": "Zacznijmy",
+          "first_time_subtitle": "Witaj w Catalyst. Skonfigurujmy Twój profil twórcy — zajmie to tylko kilka minut.",
+          "first_time_prompt": "Zacznij od {step}, aby przedstawić się markom.",
+          "next_step_prompt": "Jesteś na kroku {step}. Kontynuuj tutaj lub wróć, aby edytować wcześniejszy krok.",
+          "all_complete_prompt": "Świetnie — ukończyłeś/aś każdy krok. Gotowy/a do przesłania?",
+          "continue_button": "Kontynuuj do {step_name}",
+          "review_button": "Przejrzyj i prześlij"
+        }
+      },
+      "dashboard": {
+        "title": "Twoja aplikacja",
+        "greeting": "Witaj, {name}.",
+        "completeness": "{percent}% ukończono",
+        "submitted_at": "Przesłano {datetime}",
+        "submitted": {
+          "heading": "Aplikacja przesłana",
+          "description": "Twój profil jest w trakcie recenzji. Powiadomimy Cię w ciągu 3 dni roboczych.",
+          "completeness_label": "Kompletność profilu",
+          "last_updated": "Ostatnio zaktualizowano {time_ago}"
+        },
+        "pending_review": {
+          "title": "Aplikacja w trakcie recenzji",
+          "description": "Twoja aplikacja jest w naszej kolejce. Powiadomimy Cię w ciągu 3 dni roboczych."
+        },
+        "approved": {
+          "title": "Witaj w Catalyst",
+          "heading": "Jesteś zatwierdzony/a",
+          "description": "Jesteś zatwierdzony/a do otrzymywania współprac z markami. Pełny pulpit twórcy pojawi się wkrótce."
+        },
+        "rejected": {
+          "title": "Aplikacja niezatwierdzona",
+          "heading": "Aplikacja wymaga zmian",
+          "description": "Przejrzyj poniższe uwagi, zaktualizuj aplikację i prześlij ją ponownie do kolejnej recenzji.",
+          "reason_label": "Powód:",
+          "edit_profile": "Edytuj profil",
+          "resubmit": "Zaktualizuj i prześlij ponownie",
+          "resubmit_failed": "Nie mogliśmy ponownie otworzyć Twojej aplikacji. Spróbuj ponownie."
+        },
+        "incomplete": {
+          "title": "Kontynuuj aplikację",
+          "description": "Kontynuuj tam, gdzie skończyłeś/aś — postęp kreatora jest zapisany."
+        },
+        "requests": {
+          "title": "Prośby o połączenie",
+          "sent": "Wysłano {date}",
+          "sent_unknown": "Wysłano niedawno",
+          "accept": "Zaakceptuj",
+          "decline": "Odrzuć",
+          "empty": {
+            "title": "Brak próśb o połączenie",
+            "body": "Gdy agencja zaprosi Cię do połączenia, pojawi się tutaj."
+          },
+          "toast": {
+            "accepted": "Jesteś teraz połączony/a z {agency}.",
+            "declined": "Prośba odrzucona.",
+            "error": "Coś poszło nie tak. Spróbuj ponownie."
+          }
+        },
+        "assignments": {
+          "title": "Zaproszenia do kampanii",
+          "pending": "Masz {count} zaproszenie/a oczekujące na Twoją odpowiedź.",
+          "none": "Brak zaproszeń oczekujących na Twoją odpowiedź.",
+          "cta": "Wyświetl zaproszenia"
+        }
+      },
+      "assignments": {
+        "title": "Zaproszenia do kampanii",
+        "subtitle": "Zaakceptuj, odrzuć lub zaproponuj kontr wynagrodzenie za kampanie, do których zostałeś/aś zaproszony/a.",
+        "fee": "Wynagrodzenie",
+        "youCountered": "złożyłeś/aś kontrpropozycję",
+        "accept": "Zaakceptuj",
+        "counter": "Kontrpropozycja",
+        "decline": "Odrzuć",
+        "view": "Wyświetl",
+        "detail": {
+          "back": "Wróć do zaproszeń",
+          "notFound": "Tego zadania nie można znaleźć.",
+          "loadFailed": "Nie mogliśmy załadować tego zadania. Spróbuj ponownie.",
+          "retry": "Spróbuj ponownie",
+          "awaitingReview": "Twój szkic został przesłany i oczekuje na recenzję agencji.",
+          "awaitingVerification": "Twój post został zarejestrowany i oczekuje na weryfikację.",
+          "resubmitInPlace": {
+            "title": "Nie mogliśmy zweryfikować Twojego posta",
+            "intro": "Automatyczna weryfikacja Twojego posta nie powiodła się. Sprawdź, czy link jest poprawny i wskazuje na Twój opublikowany post, a następnie prześlij go ponownie poniżej.",
+            "url": "Adres URL posta",
+            "submit": "Prześlij link ponownie",
+            "toast": "Link przesłany ponownie — sprawdzimy go wkrótce."
+          },
+          "contract": {
+            "title": "Umowa kampanii",
+            "viewPdf": "Wyświetl umowę (PDF)",
+            "accept": "Zaakceptuj umowę",
+            "awaitingAgency": "Agencja wyśle umowę do Twojej recenzji i akceptacji. Zostaniesz powiadomiony/a, gdy będzie gotowa — sprawdź tutaj.",
+            "signingDisabled": "Podpisywanie umów nie jest jeszcze włączone. Agencja skontaktuje się z Tobą, gdy nadejdzie czas.",
+            "toast": {
+              "accepted": "Umowa zaakceptowana. Możesz teraz przesłać swój szkic."
+            }
+          },
+          "revision": {
+            "title": "Zażądano poprawek",
+            "noFeedback": "Agencja zażądała zmian. Prześlij zaktualizowany szkic."
+          },
+          "draft": {
+            "submitTitle": "Prześlij swój szkic",
+            "resubmitTitle": "Prześlij swój szkic ponownie",
+            "caption": "Podpis",
+            "hashtags": "Hashtagi",
+            "hashtagsHint": "Oddziel spacjami lub przecinkami",
+            "mentions": "Wzmianki",
+            "mentionsHint": "Oddziel spacjami lub przecinkami",
+            "media": "Media",
+            "submit": "Prześlij szkic",
+            "resubmit": "Prześlij szkic ponownie",
+            "mediaStatus": {
+              "uploading": "Przesyłanie…",
+              "done": "Przesłano",
+              "error": "Przesyłanie nie powiodło się"
+            }
+          },
+          "posted": {
+            "title": "Oznacz jako opublikowane",
+            "platform": "Platforma",
+            "url": "Adres URL posta",
+            "submit": "Prześlij post",
+            "summaryTitle": "Opublikowana treść"
+          },
+          "history": {
+            "title": "Historia szkiców",
+            "version": "Wersja {n}"
+          },
+          "reviewStatus": {
+            "pending": "Oczekuje na recenzję",
+            "approved": "Zatwierdzony",
+            "rejected": "Odrzucony",
+            "revision_requested": "Zażądano poprawek"
+          },
+          "verificationStatus": {
+            "pending": "Weryfikacja oczekuje",
+            "verified": "Zweryfikowany",
+            "not_found": "Nie znaleziono",
+            "mismatch": "Niezgodność"
+          },
+          "toast": {
+            "draftSubmitted": "Szkic przesłany.",
+            "posted": "Post zarejestrowany.",
+            "error": "Coś poszło nie tak. Spróbuj ponownie."
+          }
+        },
+        "window": {
+          "range": "{start} – {end}",
+          "unset": "Daty do ustalenia"
+        },
+        "empty": {
+          "title": "Brak zaproszeń do kampanii",
+          "body": "Gdy agencja zaprosi Cię do kampanii, pojawi się tutaj."
+        },
+        "toast": {
+          "accepted": "Zaproszenie zaakceptowane.",
+          "countered": "Kontrpropozycja wysłana.",
+          "declined": "Zaproszenie odrzucone.",
+          "error": "Coś poszło nie tak. Spróbuj ponownie."
+        },
+        "counterDialog": {
+          "title": "Zaproponuj kontrwynagrodzenienię",
+          "body": "Zaproponuj inne wynagrodzenie za tę kampanię. Agencja może zaproponować ponownie lub wycofać.",
+          "feeLabel": "Twoje wynagrodzenie ({currency})",
+          "cancel": "Anuluj",
+          "submit": "Wyślij kontrpropozycję"
+        }
+      },
+      "upload": {
+        "avatar_prompt": "Upuść zdjęcie tutaj lub kliknij, aby wybrać",
+        "avatar_preview_alt": "Podgląd zdjęcia profilowego",
+        "size_hint": "{types} · do {max_mb} MB",
+        "portfolio_prompt": "Upuść pliki tutaj lub kliknij, aby wybrać",
+        "portfolio_size_hint": "Obrazy do {image_mb} MB · filmy do {video_mb} MB",
+        "portfolio_slots_remaining": "Pozostało {remaining} miejsc",
+        "portfolio_queue_status": "{in_flight} z {total} w trakcie przesyłania (do {concurrency} jednocześnie).",
+        "uploading": "Przesyłanie…",
+        "remove": "Usuń",
+        "remove_avatar": "Usuń zdjęcie",
+        "remove_portfolio_item_label": "Usuń {name}",
+        "status_pending": "Oczekiwanie…",
+        "status_uploading": "Przesyłanie…",
+        "status_done": "Przesłano",
+        "status_error": "Nie powiodło się"
+      },
+      "errors": {
+        "upload_too_large": "Ten plik jest za duży. Maksymalny rozmiar to {max_mb} MB.",
+        "upload_wrong_type": "Ten typ pliku nie jest obsługiwany. Użyj {allowed_types}.",
+        "upload_failed": "Przesyłanie nie powiodło się. Spróbuj ponownie.",
+        "portfolio_max_reached": "Możesz przesłać do {max} pozycji portfolio."
+      }
+    }
+  }
+}

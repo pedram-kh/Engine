@@ -1,0 +1,63 @@
+{
+  "notifications": {
+    "center": {
+      "title": "Powiadomienia",
+      "empty": "Wszystko przeczytane.",
+      "markAll": "Oznacz wszystkie jako przeczytane",
+      "viewAll": "Wyświetl wszystkie powiadomienia",
+      "loading": "Ładowanie…",
+      "error": "Nie można załadować powiadomień.",
+      "unreadBadgeLabel": "{count} nieprzeczytanych powiadomień",
+      "feedbackLabel": "Uwagi",
+      "reasonLabel": "Powód"
+    },
+    "page": {
+      "title": "Powiadomienia",
+      "empty": "Nie masz jeszcze żadnych powiadomień."
+    },
+    "types": {
+      "assignment_draft_approved": "Twój szkic dla {campaign_name} został zatwierdzony.",
+      "assignment_revision_requested": "Zażądano poprawek Twojego szkicu dla {campaign_name}.",
+      "assignment_draft_rejected": "Twój szkic dla {campaign_name} został odrzucony.",
+      "assignment_manually_verified": "Twój post dla {campaign_name} został zweryfikowany.",
+      "assignment_draft_submitted": "{creator_name} przesłał szkic dla {campaign_name}.",
+      "assignment_contracted": "{creator_name} zaakceptował umowę dla {campaign_name}.",
+      "creator_approved": "Twoje konto twórcy zostało zatwierdzone.",
+      "creator_rejected": "Twoja aplikacja twórcy nie została zatwierdzona.",
+      "message_received_by_creator": "{sender_name} wysłał Ci wiadomość dotyczącą {campaign_name}.",
+      "message_received_by_agency": "{sender_name} wysłał wiadomość dotyczącą {campaign_name}.",
+      "fallback": "Masz nowe powiadomienie."
+    },
+    "preferences": {
+      "title": "Ustawienia powiadomień",
+      "description": "Wybierz, które powiadomienia w aplikacji chcesz otrzymywać.",
+      "menuItem": "Ustawienia powiadomień",
+      "save": "Zapisz zmiany",
+      "saving": "Zapisywanie…",
+      "success": "Twoje ustawienia powiadomień zostały zapisane.",
+      "loadError": "Nie można załadować ustawień powiadomień.",
+      "saveError": "Nie można zapisać ustawień powiadomień. Spróbuj ponownie.",
+      "groups": {
+        "assignment": "Zadania",
+        "creator": "Konto twórcy",
+        "messaging": "Wiadomości"
+      },
+      "channels": {
+        "in_app": "W aplikacji",
+        "digest": "Dzienny digest e-mail"
+      },
+      "typeLabels": {
+        "assignment_draft_submitted": "Szkic zostaje przesłany do recenzji",
+        "assignment_contracted": "Umowa zostaje zaakceptowana",
+        "assignment_revision_requested": "Zażądano poprawek szkicu",
+        "assignment_draft_approved": "Szkic zostaje zatwierdzony",
+        "assignment_draft_rejected": "Szkic zostaje odrzucony",
+        "assignment_manually_verified": "Post zostaje zweryfikowany",
+        "creator_approved": "Konto twórcy zostaje zatwierdzone",
+        "creator_rejected": "Aplikacja twórcy zostaje odrzucona",
+        "message_received_by_creator": "Nowa wiadomość od agencji",
+        "message_received_by_agency": "Nowa wiadomość od twórcy"
+      }
+    }
+  }
+}

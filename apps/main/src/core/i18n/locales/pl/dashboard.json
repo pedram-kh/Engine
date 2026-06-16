@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "welcome": {
+      "greeting": "Witaj ponownie",
+      "greetingNamed": "Witaj ponownie, {name}"
+    },
+    "kpi": {
+      "activeCampaigns": "Aktywne kampanie",
+      "creatorsInRoster": "Twórcy w rosterze",
+      "pendingApplications": "Oczekujące aplikacje twórców",
+      "paymentsDue": "Należne płatności"
+    },
+    "activity": {
+      "title": "Ostatnia aktywność",
+      "empty": "Brak ostatniej aktywności.",
+      "loadFailed": "Nie mogliśmy załadować ostatniej aktywności.",
+      "system": "System",
+      "actions": {
+        "creatorInvited": "{actor} zaprosił twórcę",
+        "bulkInviteCompleted": "{actor} przeprowadził masowe zaproszenie ({invited} zaproszonych, {failed} nieudanych)",
+        "agencyCreatorRelationCreated": "{actor} dodał twórcę do rosteru",
+        "brandCreated": "{actor} utworzył markę",
+        "brandArchived": "{actor} zarchiwizował markę",
+        "brandRestored": "{actor} przywrócił markę",
+        "invitationCreated": "{actor} zaprosił członka zespołu",
+        "invitationAccepted": "{actor} dołączył do zespołu",
+        "agencySettingsUpdated": "{actor} zaktualizował ustawienia agencji",
+        "fallback": "{actor} wykonał działanie"
+      }
+    },
+    "errors": {
+      "loadFailed": "Nie mogliśmy załadować Twojego pulpitu nawigacyjnego. Spróbuj ponownie."
+    }
+  }
+}

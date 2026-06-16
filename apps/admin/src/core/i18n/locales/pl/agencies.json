@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Agencje",
+        "search_label": "Szukaj agencji",
+        "load_failed": "Nie udało się załadować agencji. Odśwież stronę.",
+        "empty": "Żadne agencje nie pasują do tego filtra.",
+        "filters": {
+          "all": "Wszystkie",
+          "active": "Aktywne",
+          "suspended": "Zawieszone"
+        },
+        "fields": {
+          "name": "Agencja",
+          "status": "Status",
+          "members": "Członkowie",
+          "tier": "Poziom",
+          "created_at": "Utworzona"
+        },
+        "status_labels": {
+          "active": "Aktywna",
+          "suspended": "Zawieszona"
+        },
+        "view": "Wyświetl agencję"
+      },
+      "detail": {
+        "fallback_title": "Agencja",
+        "load_failed": "Nie udało się załadować tej agencji. Odśwież stronę.",
+        "overview_heading": "Przegląd",
+        "suspension_heading": "Zawieszenie",
+        "fields": {
+          "slug": "Slug",
+          "country": "Kraj",
+          "tier": "Poziom subskrypcji",
+          "subscription_status": "Status subskrypcji",
+          "members": "Członkowie",
+          "created_at": "Utworzona",
+          "suspended_at": "Zawieszona dnia",
+          "suspended_reason": "Powód"
+        },
+        "active_state": "Ta agencja jest aktywna. Jej użytkownicy mogą logować się normalnie.",
+        "suspended_state": "Ta agencja jest zawieszona. Wszyscy jej użytkownicy są zablokowania przed logowaniem."
+      },
+      "suspend": {
+        "button": "Zawieś agencję",
+        "title": "Zawieś {name}",
+        "description": "Zawieszenie tej agencji blokuje WSZYSTKICH jej użytkowników przed logowaniem. Jest to rejestrowane w dzienniku audytu.",
+        "reason_label": "Powód zawieszenia",
+        "reason_hint": "Wymagane, co najmniej {count} znaków. Rejestrowane w dzienniku audytu.",
+        "confirm": "Zawieś",
+        "cancel": "Anuluj",
+        "success": "Agencja zawieszona.",
+        "failed": "Nie udało się zawiesić tej agencji. Spróbuj ponownie."
+      },
+      "reactivate": {
+        "button": "Reaktywuj agencję",
+        "title": "Reaktywuj {name}",
+        "description": "Reaktywacja tej agencji przywraca logowanie dla wszystkich jej użytkowników. Jest to rejestrowane w dzienniku audytu.",
+        "confirm": "Reaktywuj",
+        "cancel": "Anuluj",
+        "success": "Agencja reaktywowana.",
+        "failed": "Nie udało się reaktywować tej agencji. Spróbuj ponownie."
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Pulpit nawigacyjny",
+      "load_failed": "Nie udało się załadować pulpitu nawigacyjnego. Odśwież stronę.",
+      "kpi": {
+        "agencies_total": "Agencje",
+        "agencies_suspended": "Zawieszone agencje",
+        "creators_pending_approval": "Oczekujące zatwierdzenia",
+        "creators_pending_kyc": "Kolejka KYC",
+        "queue_pending": "Zadania w kolejce",
+        "queue_failed": "Nieudane zadania",
+        "open_disputes": "Otwarte spory",
+        "failed_payments_today": "Nieudane płatności dzisiaj"
+      },
+      "activity": {
+        "heading": "Ostatnia aktywność",
+        "empty": "Brak ostatniej aktywności."
+      }
+    }
+  }
+}

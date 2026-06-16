@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Alerty operacyjne",
+      "subtitle": "Aktywność audytu i powiadomienia operacyjne adresowane do Ciebie.",
+      "empty": "Brak alertów operacyjnych.",
+      "load_failed": "Nie udało się załadować alertów operacyjnych. Odśwież stronę.",
+      "paymentAlerts": {
+        "title": "Alerty płatności",
+        "body": "Alerty finansowania escrow i zwolnienia zostaną aktywowane po wdrożeniu przetwarzania płatności (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Twórca zatwierdzony",
+          "rejected": "Twórca odrzucony"
+        }
+      }
+    }
+  }
+}

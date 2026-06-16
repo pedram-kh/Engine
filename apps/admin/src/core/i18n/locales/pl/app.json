@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Admin",
+    "subtitle": "Konsola superadmina.",
+    "sprint0Notice": "Scaffolding Sprint 0 — admin SPA",
+    "dashboardPlaceholder": "Placeholder pulpitu nawigacyjnego admina — pełna powierzchnia pojawi się w późniejszym sprincie.",
+    "env": {
+      "local": "Lokalne",
+      "staging": "Staging",
+      "production": "Produkcja — wszystkie akcje są logowane"
+    },
+    "nav": {
+      "comingSoon": "Wkrótce",
+      "dashboard": "Pulpit nawigacyjny",
+      "agencies": "Agencje",
+      "creators": "Twórcy",
+      "creatorApprovals": "Oczekujące zatwierdzenia",
+      "kycQueue": "Kolejka KYC",
+      "allCreators": "Wszyscy twórcy",
+      "payments": "Płatności",
+      "disputes": "Spory",
+      "recentPayments": "Ostatnie",
+      "audit": "Dziennik audytu",
+      "alerts": "Alerty operacyjne",
+      "support": "Wsparcie",
+      "userSearch": "Wyszukiwanie użytkowników",
+      "impersonationLog": "Dziennik personifikacji",
+      "operations": "Operacje",
+      "systemHealth": "Stan systemu",
+      "horizon": "Zadania w tle …",
+      "compliance": "Zgodność",
+      "exportRequests": "Prośby o eksport",
+      "erasureQueue": "Kolejka usunięcia",
+      "featureFlags": "Flagi funkcji"
+    },
+    "userMenu": {
+      "signOut": "Wyloguj się",
+      "signingOut": "Wylogowywanie…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Wkrótce",
+      "body": "Ta powierzchnia zostanie aktywowana, gdy przetwarzanie płatności zostanie wdrożone (Sprint 10).",
+      "disputes": "Spory",
+      "recentPayments": "Ostatnie płatności"
+    },
+    "sectionStub": {
+      "body": "Ta powierzchnia administracyjna jest budowana w tym sprincie."
+    },
+    "locale": {
+      "switcher": "Język",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Motyw",
+        "light": "Jasny",
+        "dark": "Ciemny"
+      }
+    }
+  }
+}

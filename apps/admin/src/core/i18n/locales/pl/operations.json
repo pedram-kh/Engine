@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "operations": {
+      "health": {
+        "title": "Stan systemu",
+        "heading": "Status usług",
+        "load_failed": "Nie udało się załadować kontroli stanu. Odśwież stronę.",
+        "status": {
+          "ok": "Zdrowy",
+          "degraded": "Obniżona wydajność"
+        },
+        "checks": {
+          "database": "Baza danych",
+          "cache": "Cache"
+        }
+      }
+    }
+  }
+}
