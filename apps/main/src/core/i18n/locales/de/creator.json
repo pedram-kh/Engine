@@ -1,0 +1,416 @@
+{
+  "creator": {
+    "not_found": "Mit deinem Konto ist kein Creator-Profil verknüpft. Bitte melde dich ab und wieder an oder wende dich an den Support.",
+    "already_approved": "Dieser Creator wurde bereits genehmigt.",
+    "already_rejected": "Dieser Creator wurde bereits abgelehnt.",
+    "kyc_not_verified": "Die Identität dieses Creators muss vor der Genehmigung der Bewerbung verifiziert werden.",
+    "kyc_already_verified": "Die Identität dieses Creators wurde bereits verifiziert.",
+    "admin": {
+      "field_status_immutable": "Der Bewerbungsstatus kann nicht über dieses Formular geändert werden. Verwende stattdessen die Genehmigungs- oder Ablehnungsaktionen."
+    },
+    "social": {
+      "invalid_platform": "Diese Social-Plattform wird nicht unterstützt."
+    },
+    "wizard": {
+      "feature_disabled": "Dieser Schritt ist derzeit nicht verfügbar, während eine Konfigurationsänderung in Bearbeitung ist. Überspringe ihn, um deine Bewerbung fortzusetzen.",
+      "feature_enabled": "Diese Option ist gerade nicht verfügbar — bitte verwende den Standardablauf für diesen Schritt.",
+      "incomplete": "Bewerbung kann noch nicht eingereicht werden — einer oder mehrere Assistenten-Schritte sind noch unvollständig."
+    },
+    "reopen": {
+      "invalid_state": "Nur eine abgelehnte Bewerbung kann erneut geöffnet werden."
+    },
+    "ui": {
+      "wizard": {
+        "title": "Creator-Profil einrichten",
+        "subtitle": "Ein paar Schritte, um dich Marken vorzustellen.",
+        "progress": {
+          "step_of": "Schritt {current} von {total}",
+          "completed": "Abgeschlossen",
+          "current": "Aktueller Schritt",
+          "skipped": "Übersprungen",
+          "pending": "Noch nicht gestartet"
+        },
+        "actions": {
+          "save": "Speichern",
+          "save_and_continue": "Speichern und weiter",
+          "back": "Zurück",
+          "skip_for_now": "Vorerst überspringen",
+          "save_and_exit": "Speichern und beenden",
+          "submit_for_approval": "Zur Genehmigung einreichen",
+          "continue_from_here": "Hier fortfahren",
+          "edit_step": "Schritt bearbeiten",
+          "review_and_submit": "Prüfen und einreichen",
+          "connect": "Verbinden",
+          "update": "Aktualisieren",
+          "remove": "Entfernen"
+        },
+        "skipped": {
+          "label": "Übersprungen",
+          "explanation": "Dieser Schritt ist derzeit nicht erforderlich. Ein Admin prüft deine Bewerbung ohne ihn."
+        },
+        "save_status": {
+          "saving": "Wird gespeichert…",
+          "saved": "Gespeichert",
+          "error": "Konnte nicht gespeichert werden — bitte versuche es erneut."
+        },
+        "steps": {
+          "profile": {
+            "name": "Profil-Grundlagen",
+            "title": "Erzähl uns von dir",
+            "description": "Dein Anzeigename, Bio, Foto und die Kategorien, in denen du erstellst."
+          },
+          "social": {
+            "name": "Social-Konten",
+            "title": "Verknüpfe deine Social-Konten",
+            "description": "Verbinde mindestens eine Plattform, damit Marken deine Reichweite sehen können."
+          },
+          "portfolio": {
+            "name": "Portfolio",
+            "title": "Zeig deine besten Arbeiten",
+            "description": "Lade bis zu 10 Einträge hoch — Videos, Bilder oder externe Links — die deinen Stil zeigen.",
+            "gallery_heading": "Dein Portfolio",
+            "gallery_empty": "Noch keine Portfolio-Einträge hochgeladen.",
+            "gallery_remove": "Eintrag entfernen",
+            "gallery_status": "Portfolio-Galerie enthält {count} Eintrag/Einträge.",
+            "video_badge_label": "Video",
+            "link_badge_label": "Externer Link",
+            "untitled_item": "Unbenannter Portfolio-Eintrag",
+            "preview_label": "Vorschau öffnen",
+            "preview_close": "Vorschau schließen"
+          },
+          "kyc": {
+            "name": "Identitätsverifizierung",
+            "title": "Identität verifizieren",
+            "description": "Eine schnelle Prüfung mit unserem Verifizierungspartner. Für Auszahlungen erforderlich.",
+            "skipped_title": "Identitätsverifizierung übersprungen",
+            "skipped_explanation": "Die Identitätsverifizierung ist derzeit nicht erforderlich.",
+            "current_status": "Status:",
+            "begin_button": "Verifizierung starten",
+            "status_labels": {
+              "none": "Nicht gestartet",
+              "pending": "In Bearbeitung",
+              "verified": "Verifiziert",
+              "rejected": "Abgelehnt",
+              "not_required": "Übersprungen"
+            }
+          },
+          "tax": {
+            "name": "Steuerinformationen",
+            "title": "Steuerformular",
+            "description": "Für Auszahlungen benötigen wir ein Steuerformular, auch vor der ersten Auszahlung.",
+            "current_status": "Status:",
+            "status_complete": "Eingereicht",
+            "status_incomplete": "Noch nicht eingereicht",
+            "on_file_title": "Steuerinformationen gespeichert",
+            "on_file_body": "Deine Steuerdaten sind sicher gespeichert. Aus Datenschutzgründen zeigen wir sie nicht erneut an — wähle Aktualisieren, um sie neu einzugeben.",
+            "update_button": "Steuerinformationen aktualisieren"
+          },
+          "payout": {
+            "name": "Auszahlungsmethode",
+            "title": "Auszahlungen einrichten",
+            "description": "Verbinde ein Stripe Express-Konto, um Zahlungen zu erhalten.",
+            "skipped_title": "Auszahlungseinrichtung übersprungen",
+            "skipped_explanation": "Die Auszahlungseinrichtung ist derzeit nicht erforderlich.",
+            "current_status": "Status:",
+            "begin_button": "Auszahlungen einrichten",
+            "status_set": "Verbunden",
+            "status_unset": "Nicht verbunden"
+          },
+          "contract": {
+            "name": "Rahmenvertrag",
+            "title": "Rahmenvertrag unterzeichnen",
+            "description": "Unser Standard-Creator-Vertrag gilt für Markenkooperationen auf der Plattform.",
+            "skipped_explanation": "Die Vertragsunterzeichnung ist derzeit nicht erforderlich — bitte akzeptiere unten die Click-Through-Bedingungen.",
+            "click_through_label": "Ich habe diese Bedingungen gelesen und akzeptiere sie.",
+            "click_through_help": "Lese die Vereinbarung oben und setze dann das Häkchen, um fortzufahren.",
+            "terms_version": "Master-Creator-Vereinbarung v{version}",
+            "current_status": "Status:",
+            "begin_button": "Vereinbarung zum Unterzeichnen öffnen",
+            "status_labels": {
+              "signed": "Unterzeichnet",
+              "click_through_accepted": "Akzeptiert",
+              "none": "Nicht gestartet"
+            },
+            "accepted_title": "Vereinbarung akzeptiert",
+            "accepted_body": "Du hast die Rahmenvereinbarung akzeptiert. Fahre mit dem nächsten Schritt fort."
+          },
+          "account_created": {
+            "name": "Konto erstellt"
+          },
+          "review": {
+            "name": "Prüfen und einreichen",
+            "title": "Bewerbung prüfen",
+            "description": "Nimm dir einen Moment, um alles zu prüfen, bevor du einreichst.",
+            "completeness": "{percent}% vollständig",
+            "edit_step": "Bearbeiten",
+            "submit_button": "Bewerbung einreichen",
+            "incomplete_blocker": "Du hast 1 unvollständigen Schritt: {names}. Klicke auf Bearbeiten, um ihn abzuschließen. | Du hast {count} unvollständige Schritte: {names}. Klicke auf jeden Schritt auf Bearbeiten, um ihn abzuschließen."
+          }
+        },
+        "fields": {
+          "display_name": "Anzeigename",
+          "display_name_help": "Wie Marken dich sehen — dein Handle oder Künstlername.",
+          "bio": "Bio",
+          "bio_help": "Eine kurze Vorstellung. Du kannst **Fettschrift**, *Kursivschrift* und [Links](https://example.com) verwenden.",
+          "avatar": "Profilfoto",
+          "avatar_drop": "Foto hier ablegen oder klicken, um eines auszuwählen. JPG, PNG oder WebP bis zu 5 MB.",
+          "country": "Land",
+          "region": "Region oder Stadt",
+          "primary_language": "Hauptsprache",
+          "secondary_languages": "Weitere Sprachen",
+          "categories": "Kategorien",
+          "categories_help": "Wähle die Kategorien aus, die am besten beschreiben, was du erstellst.",
+          "avatar_required": "Ein Profilfoto ist erforderlich, um diesen Schritt abzuschließen.",
+          "step_requirements_hint": "Füge ein Profilfoto und mindestens eine Kategorie hinzu, um fortzufahren.",
+          "social_handle": "Nutzername",
+          "social_handle_hint": "Gib nur deinen Nutzernamen ein — kein {'@'}-Symbol oder vollständige Profil-URL.",
+          "social_handle_invalid": "Gib einen gültigen Nutzernamen ein: 2–30 Buchstaben, Zahlen, Punkte, Unterstriche oder Bindestriche (keine Leerzeichen, {'@'} oder URLs).",
+          "social_profile_url": "Profil-URL",
+          "portfolio_title": "Titel",
+          "portfolio_description": "Beschreibung",
+          "portfolio_external_url": "Externe URL (optional)",
+          "tax_form_type": "Steuerformular",
+          "legal_name": "Rechtlicher Name",
+          "tax_id": "Steuer-ID",
+          "address_country": "Land",
+          "address_city": "Stadt",
+          "address_postal_code": "Postleitzahl",
+          "address_street": "Straße"
+        },
+        "categories": {
+          "fashion": "Mode",
+          "beauty": "Beauty",
+          "lifestyle": "Lifestyle",
+          "fitness": "Fitness",
+          "travel": "Reisen",
+          "food": "Essen",
+          "tech": "Technologie",
+          "gaming": "Gaming",
+          "music": "Musik",
+          "comedy": "Comedy",
+          "education": "Bildung",
+          "parenting": "Elternschaft",
+          "business": "Business",
+          "art": "Kunst",
+          "sports": "Sport",
+          "other": "Sonstiges"
+        },
+        "tax_form_types": {
+          "eu_self_employed": "EU — Selbstständige/r",
+          "eu_company": "EU — Unternehmen",
+          "uk_self_employed": "UK — Selbstständige/r",
+          "uk_company": "UK — Unternehmen"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Demnächst verfügbar"
+        },
+        "vendor_bounce": {
+          "waiting_title": "Fast fertig…",
+          "waiting_description": "Wir warten auf eine Antwort von unserem Partner. Das dauert normalerweise weniger als eine Minute.",
+          "timeout_title": "Immer noch auf unseren Partner wartend",
+          "timeout_description": "Das dauert länger als erwartet. Du kannst es erneut versuchen oder den Support kontaktieren.",
+          "retry": "Erneut versuchen",
+          "contact_support": "Support kontaktieren"
+        },
+        "welcome_back": {
+          "title": "Willkommen zurück",
+          "subtitle": "Du warst zuletzt hier vor {time_ago}. Mach dort weiter, wo du aufgehört hast.",
+          "first_time_title": "Los geht's",
+          "first_time_subtitle": "Willkommen bei Catalyst. Richten wir dein Creator-Profil ein — es dauert nur ein paar Minuten.",
+          "first_time_prompt": "Beginne mit {step}, um dich Marken vorzustellen.",
+          "next_step_prompt": "Du bist bei Schritt {step}. Fahre hier fort oder spring zurück, um einen früheren Schritt zu bearbeiten.",
+          "all_complete_prompt": "Sehr gut — du hast jeden Schritt abgeschlossen. Bereit zum Einreichen?",
+          "continue_button": "Weiter zu {step_name}",
+          "review_button": "Prüfen und einreichen"
+        }
+      },
+      "dashboard": {
+        "title": "Deine Bewerbung",
+        "greeting": "Willkommen, {name}.",
+        "completeness": "{percent}% vollständig",
+        "submitted_at": "Eingereicht am {datetime}",
+        "submitted": {
+          "heading": "Bewerbung eingereicht",
+          "description": "Dein Profil wird geprüft. Wir benachrichtigen dich innerhalb von 3 Werktagen.",
+          "completeness_label": "Profilvollständigkeit",
+          "last_updated": "Zuletzt aktualisiert vor {time_ago}"
+        },
+        "pending_review": {
+          "title": "Bewerbung in Prüfung",
+          "description": "Deine Bewerbung ist in unserer Warteschlange. Wir benachrichtigen dich innerhalb von 3 Werktagen."
+        },
+        "approved": {
+          "title": "Willkommen bei Catalyst",
+          "heading": "Du wurdest genehmigt",
+          "description": "Du bist genehmigt, Markenkooperationen zu erhalten. Das vollständige Creator-Dashboard erscheint bald."
+        },
+        "rejected": {
+          "title": "Bewerbung nicht genehmigt",
+          "heading": "Bewerbung erfordert Änderungen",
+          "description": "Überprüfe die Hinweise unten, aktualisiere deine Bewerbung und reiche sie erneut zur Prüfung ein.",
+          "reason_label": "Grund:",
+          "edit_profile": "Profil bearbeiten",
+          "resubmit": "Aktualisieren & erneut einreichen",
+          "resubmit_failed": "Deine Bewerbung konnte nicht erneut geöffnet werden. Bitte versuche es erneut."
+        },
+        "incomplete": {
+          "title": "Bewerbung fortsetzen",
+          "description": "Mach dort weiter, wo du aufgehört hast — dein Assistent-Fortschritt ist gespeichert."
+        },
+        "requests": {
+          "title": "Verbindungsanfragen",
+          "sent": "Gesendet am {date}",
+          "sent_unknown": "Kürzlich gesendet",
+          "accept": "Annehmen",
+          "decline": "Ablehnen",
+          "empty": {
+            "title": "Keine Verbindungsanfragen",
+            "body": "Wenn eine Agentur dich zur Verbindung einlädt, erscheint sie hier."
+          },
+          "toast": {
+            "accepted": "Du bist jetzt mit {agency} verbunden.",
+            "declined": "Anfrage abgelehnt.",
+            "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+          }
+        },
+        "assignments": {
+          "title": "Kampagneneinladungen",
+          "pending": "Du hast {count} Einladung(en), die auf deine Antwort wartet/warten.",
+          "none": "Keine Einladungen warten auf deine Antwort.",
+          "cta": "Einladungen ansehen"
+        }
+      },
+      "assignments": {
+        "title": "Kampagneneinladungen",
+        "subtitle": "Nimm an, lehne ab oder mache ein Gegenangebot für Kampagnen, zu denen du eingeladen wurdest.",
+        "fee": "Vergütung",
+        "youCountered": "du hast ein Gegenangebot gemacht",
+        "accept": "Annehmen",
+        "counter": "Gegenangebot",
+        "decline": "Ablehnen",
+        "view": "Ansehen",
+        "detail": {
+          "back": "Zurück zu Einladungen",
+          "notFound": "Dieser Auftrag konnte nicht gefunden werden.",
+          "loadFailed": "Dieser Auftrag konnte nicht geladen werden. Bitte versuche es erneut.",
+          "retry": "Erneut versuchen",
+          "awaitingReview": "Dein Entwurf wurde eingereicht und wartet auf die Prüfung der Agentur.",
+          "awaitingVerification": "Dein Post wurde erfasst und wartet auf Verifizierung.",
+          "resubmitInPlace": {
+            "title": "Wir konnten deinen Post nicht verifizieren",
+            "intro": "Die automatische Verifizierung deines Posts ist fehlgeschlagen. Überprüfe, ob der Link korrekt ist und auf deinen veröffentlichten Post verweist, und reiche ihn dann erneut ein.",
+            "url": "Post-URL",
+            "submit": "Link erneut einreichen",
+            "toast": "Link erneut eingereicht — wir prüfen ihn in Kürze erneut."
+          },
+          "contract": {
+            "title": "Kampagnenvertrag",
+            "viewPdf": "Vertrag ansehen (PDF)",
+            "accept": "Vertrag akzeptieren",
+            "awaitingAgency": "Die Agentur sendet dir einen Vertrag zur Prüfung und Annahme. Du wirst benachrichtigt, wenn er bereit ist — schau dann hier nach.",
+            "signingDisabled": "Die Vertragsunterzeichnung ist noch nicht aktiviert. Die Agentur wird sich melden, wenn es Zeit ist, fortzufahren.",
+            "toast": {
+              "accepted": "Vertrag akzeptiert. Du kannst jetzt deinen Entwurf einreichen."
+            }
+          },
+          "revision": {
+            "title": "Überarbeitung angefordert",
+            "noFeedback": "Die Agentur hat Änderungen angefordert. Bitte reiche einen aktualisierten Entwurf ein."
+          },
+          "draft": {
+            "submitTitle": "Deinen Entwurf einreichen",
+            "resubmitTitle": "Deinen Entwurf erneut einreichen",
+            "caption": "Beschriftung",
+            "hashtags": "Hashtags",
+            "hashtagsHint": "Mit Leerzeichen oder Kommas trennen",
+            "mentions": "Erwähnungen",
+            "mentionsHint": "Mit Leerzeichen oder Kommas trennen",
+            "media": "Medien",
+            "submit": "Entwurf einreichen",
+            "resubmit": "Entwurf erneut einreichen",
+            "mediaStatus": {
+              "uploading": "Wird hochgeladen…",
+              "done": "Hochgeladen",
+              "error": "Upload fehlgeschlagen"
+            }
+          },
+          "posted": {
+            "title": "Als veröffentlicht markieren",
+            "platform": "Plattform",
+            "url": "Post-URL",
+            "submit": "Post einreichen",
+            "summaryTitle": "Veröffentlichter Inhalt"
+          },
+          "history": {
+            "title": "Entwurfshistorie",
+            "version": "Version {n}"
+          },
+          "reviewStatus": {
+            "pending": "Ausstehende Prüfung",
+            "approved": "Genehmigt",
+            "rejected": "Abgelehnt",
+            "revision_requested": "Überarbeitung angefordert"
+          },
+          "verificationStatus": {
+            "pending": "Verifizierung ausstehend",
+            "verified": "Verifiziert",
+            "not_found": "Nicht gefunden",
+            "mismatch": "Diskrepanz"
+          },
+          "toast": {
+            "draftSubmitted": "Entwurf eingereicht.",
+            "posted": "Post erfasst.",
+            "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+          }
+        },
+        "window": {
+          "range": "{start} – {end}",
+          "unset": "Termine noch offen"
+        },
+        "empty": {
+          "title": "Keine Kampagneneinladungen",
+          "body": "Wenn eine Agentur dich zu einer Kampagne einlädt, erscheint sie hier."
+        },
+        "toast": {
+          "accepted": "Einladung angenommen.",
+          "countered": "Gegenangebot gesendet.",
+          "declined": "Einladung abgelehnt.",
+          "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+        },
+        "counterDialog": {
+          "title": "Vergütung verhandeln",
+          "body": "Schlage eine andere Vergütung für diese Kampagne vor. Die Agentur kann ein neues Angebot machen oder zurückziehen.",
+          "feeLabel": "Deine Vergütung ({currency})",
+          "cancel": "Abbrechen",
+          "submit": "Gegenangebot senden"
+        }
+      },
+      "upload": {
+        "avatar_prompt": "Foto hier ablegen oder klicken, um eines auszuwählen",
+        "avatar_preview_alt": "Profilfoto-Vorschau",
+        "size_hint": "{types} · bis zu {max_mb} MB",
+        "portfolio_prompt": "Dateien hier ablegen oder klicken, um sie auszuwählen",
+        "portfolio_size_hint": "Bilder bis zu {image_mb} MB · Videos bis zu {video_mb} MB",
+        "portfolio_slots_remaining": "{remaining} Plätze verbleibend",
+        "portfolio_queue_status": "{in_flight} von {total} wird hochgeladen (bis zu {concurrency} gleichzeitig).",
+        "uploading": "Wird hochgeladen…",
+        "remove": "Entfernen",
+        "remove_avatar": "Foto entfernen",
+        "remove_portfolio_item_label": "{name} entfernen",
+        "status_pending": "Warten…",
+        "status_uploading": "Wird hochgeladen…",
+        "status_done": "Hochgeladen",
+        "status_error": "Fehlgeschlagen"
+      },
+      "errors": {
+        "upload_too_large": "Diese Datei ist zu groß. Die maximale Größe beträgt {max_mb} MB.",
+        "upload_wrong_type": "Dieser Dateityp wird nicht unterstützt. Verwende {allowed_types}.",
+        "upload_failed": "Der Upload ist fehlgeschlagen. Bitte versuche es erneut.",
+        "portfolio_max_reached": "Du kannst bis zu {max} Portfolio-Einträge hochladen."
+      }
+    }
+  }
+}

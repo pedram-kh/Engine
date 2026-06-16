@@ -1,0 +1,66 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "Nutzersuche",
+        "subtitle": "Suche einen Nutzer, um ihn anzusehen oder seinen Identitätswechsel durchzuführen. Plattform-Admins können nicht imitiert werden.",
+        "label": "Nach Name, E-Mail oder ULID suchen",
+        "empty": "Kein Nutzer entspricht dieser Suche.",
+        "load_failed": "Nutzersuche fehlgeschlagen. Bitte versuche es erneut."
+      },
+      "impersonate": {
+        "button": "Identitätswechsel",
+        "title": "Identitätswechsel zu {name}",
+        "warning": "Du öffnest einen neuen Tab, der als dieser Nutzer angemeldet ist. Deine Admin-Sitzung bleibt hier aktiv. Jede Aktion wird gegen diesen Nutzer protokolliert, und du wirst als Imitator erfasst. Die Sitzung läuft automatisch ab.",
+        "reason_label": "Grund für den Identitätswechsel",
+        "reason_hint": "Erforderlich, mindestens {count} Zeichen. Wird im Auditprotokoll erfasst.",
+        "confirm": "Identitätswechsel starten",
+        "cancel": "Abbrechen",
+        "success": "Identitätswechsel zu {name} in einem neuen Tab gestartet.",
+        "failed": "Der Identitätswechsel konnte nicht gestartet werden. Bitte versuche es erneut."
+      },
+      "impersonation_log": {
+        "title": "Identitätswechsel-Protokoll",
+        "subtitle": "Alle je gestarteten Admin-Identitätswechsel-Sitzungen, neueste zuerst.",
+        "empty": "Keine Identitätswechsel-Sitzungen entsprechen diesen Filtern.",
+        "load_failed": "Das Identitätswechsel-Protokoll konnte nicht geladen werden. Bitte aktualisiere die Seite.",
+        "filters": {
+          "status": "Status",
+          "search": "Admin oder Nutzer (Name, E-Mail, ULID)",
+          "date_from": "Von",
+          "date_to": "Bis",
+          "apply": "Anwenden"
+        },
+        "status_filter": {
+          "all": "Alle",
+          "active": "Aktiv",
+          "ended": "Beendet",
+          "expired": "Abgelaufen"
+        },
+        "statuses": {
+          "active": "Aktiv",
+          "ended": "Beendet",
+          "expired": "Abgelaufen"
+        },
+        "fields": {
+          "admin": "Admin",
+          "impersonated_user": "Imitierter Nutzer",
+          "reason": "Grund",
+          "status": "Status",
+          "started_at": "Gestartet",
+          "ended_at": "Beendet"
+        },
+        "pagination": {
+          "prev": "Zurück",
+          "next": "Weiter"
+        }
+      }
+    },
+    "impersonation": {
+      "target_admin": "Plattform-Admins können nicht imitiert werden.",
+      "target_self": "Du kannst dich nicht selbst imitieren.",
+      "already_active": "Du hast bereits einen aktiven Identitätswechsel. Beende ihn, bevor du einen neuen startest.",
+      "invalid_handoff": "Diese Übergabe für den Identitätswechsel ist ungültig, bereits verwendet oder abgelaufen."
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Betriebliche Hinweise",
+      "subtitle": "Audit-Aktivitäten und betriebliche Benachrichtigungen, die an dich gerichtet sind.",
+      "empty": "Keine betrieblichen Hinweise.",
+      "load_failed": "Betriebliche Hinweise konnten nicht geladen werden. Bitte aktualisiere die Seite.",
+      "paymentAlerts": {
+        "title": "Zahlungshinweise",
+        "body": "Treuhand-Finanzierungs- und Freigabehinweise erscheinen, wenn die Zahlungsverarbeitung erscheint (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Creator genehmigt",
+          "rejected": "Creator abgelehnt"
+        }
+      }
+    }
+  }
+}

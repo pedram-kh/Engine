@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Agenturen",
+        "search_label": "Agenturen suchen",
+        "load_failed": "Agenturen konnten nicht geladen werden. Bitte aktualisiere die Seite.",
+        "empty": "Keine Agentur entspricht diesem Filter.",
+        "filters": {
+          "all": "Alle",
+          "active": "Aktiv",
+          "suspended": "Gesperrt"
+        },
+        "fields": {
+          "name": "Agentur",
+          "status": "Status",
+          "members": "Mitglieder",
+          "tier": "Tarif",
+          "created_at": "Erstellt"
+        },
+        "status_labels": {
+          "active": "Aktiv",
+          "suspended": "Gesperrt"
+        },
+        "view": "Agentur ansehen"
+      },
+      "detail": {
+        "fallback_title": "Agentur",
+        "load_failed": "Diese Agentur konnte nicht geladen werden. Bitte aktualisiere die Seite.",
+        "overview_heading": "Übersicht",
+        "suspension_heading": "Sperrung",
+        "fields": {
+          "slug": "Slug",
+          "country": "Land",
+          "tier": "Abonnement-Tarif",
+          "subscription_status": "Abonnementstatus",
+          "members": "Mitglieder",
+          "created_at": "Erstellt",
+          "suspended_at": "Gesperrt am",
+          "suspended_reason": "Grund"
+        },
+        "active_state": "Diese Agentur ist aktiv. Ihre Nutzer können sich normal anmelden.",
+        "suspended_state": "Diese Agentur ist gesperrt. Alle ihre Nutzer können sich nicht anmelden."
+      },
+      "suspend": {
+        "button": "Agentur sperren",
+        "title": "{name} sperren",
+        "description": "Das Sperren dieser Agentur verhindert, dass ALLE ihre Nutzer sich anmelden können. Dies wird im Auditprotokoll erfasst.",
+        "reason_label": "Grund für die Sperrung",
+        "reason_hint": "Erforderlich, mindestens {count} Zeichen. Wird im Auditprotokoll erfasst.",
+        "confirm": "Sperren",
+        "cancel": "Abbrechen",
+        "success": "Agentur gesperrt.",
+        "failed": "Die Agentur konnte nicht gesperrt werden. Bitte versuche es erneut."
+      },
+      "reactivate": {
+        "button": "Agentur reaktivieren",
+        "title": "{name} reaktivieren",
+        "description": "Das Reaktivieren dieser Agentur stellt die Anmeldemöglichkeit für alle ihre Nutzer wieder her. Dies wird im Auditprotokoll erfasst.",
+        "confirm": "Reaktivieren",
+        "cancel": "Abbrechen",
+        "success": "Agentur reaktiviert.",
+        "failed": "Die Agentur konnte nicht reaktiviert werden. Bitte versuche es erneut."
+      }
+    }
+  }
+}

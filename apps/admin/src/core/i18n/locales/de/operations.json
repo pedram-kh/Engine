@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "operations": {
+      "health": {
+        "title": "Systemzustand",
+        "heading": "Dienststatus",
+        "load_failed": "Der Gesundheitscheck konnte nicht geladen werden. Bitte aktualisiere die Seite.",
+        "status": {
+          "ok": "Gesund",
+          "degraded": "Beeinträchtigt"
+        },
+        "checks": {
+          "database": "Datenbank",
+          "cache": "Cache"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "compliance": {
+      "shellNotice": "Diese Warteschlange ist bereit, aber noch nicht mit Daten verbunden — Export- und Löschverarbeitung erscheint in einem späteren Sprint.",
+      "load_failed": "Diese Warteschlange konnte nicht geladen werden. Bitte aktualisiere die Seite.",
+      "fields": {
+        "subject": "Betroffene Person",
+        "status": "Status",
+        "requested": "Angefordert"
+      },
+      "exports": {
+        "title": "Exportanfragen",
+        "subtitle": "Auskunfts- und Portabilitätsanfragen betroffener Personen (DSGVO Art. 15/20).",
+        "empty": "Keine Exportanfragen."
+      },
+      "erasures": {
+        "title": "Lösch-Warteschlange",
+        "subtitle": "Anträge auf Vergessenwerden, die auf Überprüfung warten (DSGVO Art. 17).",
+        "empty": "Keine Löschanfragen."
+      }
+    }
+  }
+}

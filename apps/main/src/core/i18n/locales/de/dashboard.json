@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "welcome": {
+      "greeting": "Willkommen zurück",
+      "greetingNamed": "Willkommen zurück, {name}"
+    },
+    "kpi": {
+      "activeCampaigns": "Aktive Kampagnen",
+      "creatorsInRoster": "Creator im Roster",
+      "pendingApplications": "Ausstehende Creator-Bewerbungen",
+      "paymentsDue": "Fällige Zahlungen"
+    },
+    "activity": {
+      "title": "Letzte Aktivitäten",
+      "empty": "Noch keine aktuellen Aktivitäten.",
+      "loadFailed": "Aktuelle Aktivitäten konnten nicht geladen werden.",
+      "system": "Das System",
+      "actions": {
+        "creatorInvited": "{actor} hat einen Creator eingeladen",
+        "bulkInviteCompleted": "{actor} hat eine Masseneinladung durchgeführt ({invited} eingeladen, {failed} fehlgeschlagen)",
+        "agencyCreatorRelationCreated": "{actor} hat einen Creator zum Roster hinzugefügt",
+        "brandCreated": "{actor} hat eine Marke erstellt",
+        "brandArchived": "{actor} hat eine Marke archiviert",
+        "brandRestored": "{actor} hat eine Marke wiederhergestellt",
+        "invitationCreated": "{actor} hat ein Teammitglied eingeladen",
+        "invitationAccepted": "{actor} ist dem Team beigetreten",
+        "agencySettingsUpdated": "{actor} hat die Agentureinstellungen aktualisiert",
+        "fallback": "{actor} hat eine Aktion ausgeführt"
+      }
+    },
+    "errors": {
+      "loadFailed": "Dein Dashboard konnte nicht geladen werden. Bitte versuche es erneut."
+    }
+  }
+}

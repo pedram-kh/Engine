@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "load_failed": "Das Dashboard konnte nicht geladen werden. Bitte aktualisiere die Seite.",
+      "kpi": {
+        "agencies_total": "Agenturen",
+        "agencies_suspended": "Gesperrte Agenturen",
+        "creators_pending_approval": "Ausstehende Genehmigungen",
+        "creators_pending_kyc": "KYC-Warteschlange",
+        "queue_pending": "Jobs in der Warteschlange",
+        "queue_failed": "Fehlgeschlagene Jobs",
+        "open_disputes": "Offene Streitigkeiten",
+        "failed_payments_today": "Fehlgeschlagene Zahlungen heute"
+      },
+      "activity": {
+        "heading": "Letzte Aktivitäten",
+        "empty": "Noch keine aktuellen Aktivitäten."
+      }
+    }
+  }
+}

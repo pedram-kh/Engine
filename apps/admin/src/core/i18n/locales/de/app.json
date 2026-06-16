@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Admin",
+    "subtitle": "Super-Admin-Konsole.",
+    "sprint0Notice": "Sprint 0 Gerüst — Admin-SPA",
+    "dashboardPlaceholder": "Admin-Dashboard-Platzhalter — vollständige Oberfläche erscheint in einem späteren Sprint.",
+    "env": {
+      "local": "Lokal",
+      "staging": "Staging",
+      "production": "Produktion — alle Aktionen werden protokolliert"
+    },
+    "nav": {
+      "comingSoon": "Demnächst",
+      "dashboard": "Dashboard",
+      "agencies": "Agenturen",
+      "creators": "Creator",
+      "creatorApprovals": "Ausstehende Genehmigungen",
+      "kycQueue": "KYC-Warteschlange",
+      "allCreators": "Alle Creator",
+      "payments": "Zahlungen",
+      "disputes": "Streitigkeiten",
+      "recentPayments": "Letzte",
+      "audit": "Auditprotokoll",
+      "alerts": "Betriebliche Hinweise",
+      "support": "Support",
+      "userSearch": "Nutzersuche",
+      "impersonationLog": "Identitätswechsel-Protokoll",
+      "operations": "Betrieb",
+      "systemHealth": "Systemzustand",
+      "horizon": "Hintergrundjobs …",
+      "compliance": "Compliance",
+      "exportRequests": "Exportanfragen",
+      "erasureQueue": "Lösch-Warteschlange",
+      "featureFlags": "Feature-Flags"
+    },
+    "userMenu": {
+      "signOut": "Abmelden",
+      "signingOut": "Wird abgemeldet…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Demnächst verfügbar",
+      "body": "Diese Oberfläche wird aktiv, wenn die Zahlungsverarbeitung erscheint (Sprint 10).",
+      "disputes": "Streitigkeiten",
+      "recentPayments": "Letzte Zahlungen"
+    },
+    "sectionStub": {
+      "body": "Diese Admin-Oberfläche wird in diesem Sprint entwickelt."
+    },
+    "locale": {
+      "switcher": "Sprache",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Design",
+        "light": "Hell",
+        "dark": "Dunkel"
+      }
+    }
+  }
+}

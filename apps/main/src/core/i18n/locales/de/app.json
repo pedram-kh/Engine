@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Influencer-Marketing, geführt wie ein echtes Unternehmen.",
+    "sprint0Notice": "Sprint 0 Gerüst — Haupt-Plattform-SPA",
+    "locale": {
+      "switcher": "Sprache",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Design",
+        "light": "Hell",
+        "dark": "Dunkel"
+      }
+    },
+    "messaging": {
+      "title": "Nachrichten",
+      "you": "Du",
+      "participant": "Teilnehmer",
+      "composePlaceholder": "Nachricht schreiben…",
+      "send": "Senden",
+      "attachment": "Anhang",
+      "empty": "Noch keine Nachrichten. Beginne die Unterhaltung.",
+      "loadEarlier": "Frühere Nachrichten laden",
+      "loadError": "Diese Unterhaltung konnte nicht geladen werden. Sie wird in Kürze erneut versucht.",
+      "sendError": "Deine Nachricht konnte nicht gesendet werden. Bitte versuche es erneut.",
+      "attachmentUploadError": "Ein Anhang konnte nicht hochgeladen werden. Bitte versuche es erneut.",
+      "closed": "Diese Unterhaltung ist geschlossen — der Auftrag ist nicht mehr aktiv.",
+      "systemFallback": "Der Auftrag wurde aktualisiert.",
+      "system": {
+        "assignment": {
+          "contracted": "Der Vertrag wurde unterzeichnet — die Produktion kann beginnen.",
+          "draft_submitted": "Ein Entwurf wurde zur Überprüfung eingereicht.",
+          "draft_approved": "Der Entwurf wurde genehmigt.",
+          "revision_requested": "Überarbeitungen des Entwurfs wurden angefordert.",
+          "draft_rejected": "Der Entwurf wurde abgelehnt.",
+          "posted_by_creator": "Der Creator hat den Inhalt als veröffentlicht markiert.",
+          "live_verified": "Der Live-Post wurde verifiziert.",
+          "manually_verified": "Der Post wurde manuell verifiziert.",
+          "resubmit_requested": "Eine erneute Einreichung wurde angefordert.",
+          "payment_released": "Die Zahlung wurde freigegeben."
+        }
+      },
+      "rollup": {
+        "empty": "Noch keine Nachrichtenthreads für diese Kampagne.",
+        "noMessages": "Noch keine Nachrichten.",
+        "loadError": "Die Nachrichtenthreads konnten nicht geladen werden."
+      }
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "roster": "Meine Creator",
+      "discover": "Entdecken",
+      "pools": "Talent-Pools",
+      "brands": "Marken",
+      "campaigns": "Kampagnen",
+      "agencyUsers": "Team",
+      "settings": "Einstellungen"
+    },
+    "discover": {
+      "title": "Creator entdecken",
+      "subtitle": "Durchsuche und entdecke den globalen Creator-Pool.",
+      "unnamed": "Unbenannter Creator",
+      "notConnected": "Nicht verbunden",
+      "search": {
+        "label": "Creator suchen",
+        "placeholder": "Nach Name oder Bio suchen"
+      },
+      "filters": {
+        "country": "Land",
+        "language": "Sprache",
+        "category": "Kategorie"
+      },
+      "connection": {
+        "connected": "Verbunden",
+        "pending": "Anfrage ausstehend",
+        "declined": "Abgelehnt",
+        "notConnected": "Nicht verbunden",
+        "sendRequest": "Anfrage senden",
+        "requestAgain": "Erneut anfragen",
+        "sent": "Anfrage gesendet",
+        "reRequested": "Anfrage erneut gesendet",
+        "alreadyPending": "Eine Anfrage ist bereits ausstehend",
+        "alreadyConnected": "Dieser Creator ist bereits in deinem Roster",
+        "error": "Anfrage konnte nicht gesendet werden. Bitte versuche es erneut."
+      },
+      "empty": {
+        "heading": "Noch keine Creator",
+        "body": "Genehmigte Creator erscheinen hier, sobald der Pool wächst."
+      },
+      "emptyFiltered": {
+        "heading": "Keine Treffer",
+        "body": "Kein Creator entspricht deinen Filtern. Versuche deine Suche zu erweitern."
+      },
+      "errors": {
+        "loadFailed": "Creator konnten nicht geladen werden. Bitte versuche es erneut."
+      },
+      "detail": {
+        "back": "Zurück zu Entdecken",
+        "notFound": "Dieser Creator ist nicht verfügbar.",
+        "loadFailed": "Dieses Profil konnte nicht geladen werden. Bitte versuche es erneut.",
+        "viewInRoster": "Im Roster anzeigen",
+        "sections": {
+          "profile": "Profil",
+          "social": "Social-Konten",
+          "portfolio": "Portfolio"
+        },
+        "social": {
+          "empty": "Keine Social-Konten verknüpft."
+        },
+        "portfolio": {
+          "empty": "Noch keine Portfolio-Einträge.",
+          "untitled": "Unbenannter Eintrag"
+        }
+      }
+    },
+    "roster": {
+      "title": "Meine Creator",
+      "unnamed": "Unbenannter Creator",
+      "blacklisted": "Gesperrt",
+      "blacklist": {
+        "badge": {
+          "hard": "Gesperrt",
+          "soft": "Sperrwarnung"
+        },
+        "openAction": "Creator sperren",
+        "liftAction": "Sperre aufheben",
+        "lifted": "Sperre aufgehoben.",
+        "liftFailed": "Sperre konnte nicht aufgehoben werden.",
+        "section": {
+          "title": "Sperrliste",
+          "none": "Dieser Creator ist von deiner Agentur nicht gesperrt."
+        },
+        "status": {
+          "hard": "Hart gesperrt — aus deiner Entdeckung ausgeschlossen und für Verbindungsanfragen gesperrt.",
+          "soft": "Weich gesperrt — nur eine Warnung; der Creator bleibt matchbar."
+        },
+        "dialog": {
+          "title": "Creator sperren",
+          "scopeLabel": "Geltungsbereich",
+          "scope": {
+            "agency": "Gesamte Agentur",
+            "brand": "Eine bestimmte Marke"
+          },
+          "noRelationHint": "Agenturweites Sperren erfordert einen verbundenen Creator.",
+          "brandLabel": "Marke",
+          "typeLabel": "Typ",
+          "type": {
+            "hard": "Hart — aus Entdeckung ausschließen und Anfragen blockieren",
+            "soft": "Weich — nur warnen, matchbar lassen"
+          },
+          "reasonLabel": "Grund",
+          "reasonPlaceholder": "Warum wird dieser Creator gesperrt? (nur für deine Agentur sichtbar)",
+          "cancel": "Abbrechen",
+          "confirm": "Sperren",
+          "success": "Creator gesperrt.",
+          "invalid": "Bitte fülle die Pflichtfelder aus.",
+          "failed": "Creator konnte nicht gesperrt werden."
+        }
+      },
+      "fields": {
+        "name": "Name",
+        "email": "E-Mail",
+        "status": "Status",
+        "applicationStatus": "Bewerbung",
+        "country": "Land",
+        "language": "Sprache",
+        "categories": "Kategorien",
+        "rating": "Bewertung",
+        "campaigns": "Kampagnen"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Kandidat",
+        "external": "Extern",
+        "pending_request": "Anfrage ausstehend",
+        "declined": "Abgelehnt"
+      },
+      "applicationStatus": {
+        "incomplete": "Unvollständig",
+        "pending": "Ausstehend",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt"
+      },
+      "search": {
+        "label": "Creator suchen",
+        "placeholder": "Nach Name oder Bio suchen"
+      },
+      "filters": {
+        "status": {
+          "all": "Alle",
+          "roster": "Roster",
+          "prospect": "Kandidaten",
+          "external": "Extern",
+          "pending_request": "Ausstehende Anfragen",
+          "declined": "Abgelehnt"
+        },
+        "country": "Land",
+        "language": "Sprache",
+        "category": "Kategorie",
+        "availability": {
+          "from": "Verfügbar ab",
+          "to": "Verfügbar bis"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Follower"
+        },
+        "engagement": {
+          "label": "Engagement-Rate"
+        },
+        "metrics": {
+          "tooltip": "Social-Metriken sind noch nicht verknüpft."
+        }
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Noch keine Creator",
+        "body": "Creator, die du einlädst oder engagierst, erscheinen hier in deinem Roster, unter Kandidaten und externen Kooperationspartnern."
+      },
+      "emptyFiltered": {
+        "heading": "Kein Creator entspricht diesen Filtern",
+        "body": "Versuche einen Filter zu entfernen oder zu ändern, um mehr Creator zu sehen."
+      },
+      "errors": {
+        "loadFailed": "Deine Creator konnten nicht geladen werden. Bitte versuche es erneut."
+      },
+      "detail": {
+        "back": "Zurück zu meinen Creatorn",
+        "unnamed": "Unbenannter Creator",
+        "loadFailed": "Dieser Creator konnte nicht geladen werden. Bitte versuche es erneut.",
+        "notFound": "Dieser Creator ist nicht in deinem Roster.",
+        "sections": {
+          "profile": "Profil",
+          "rating": "Bewertung & Notizen",
+          "social": "Social-Konten",
+          "metrics": "Social-Metriken",
+          "portfolio": "Portfolio",
+          "availability": "Verfügbarkeit",
+          "campaigns": "Kampagnenhistorie"
+        },
+        "editor": {
+          "starLabel": "{n} von 5 Sternen",
+          "ratingUnset": "Nicht bewertet",
+          "notesLabel": "Interne Notizen",
+          "notesPlaceholder": "Private Notizen zur Zusammenarbeit mit diesem Creator (nur für deine Agentur sichtbar).",
+          "notesEmpty": "Noch keine Notizen.",
+          "save": "Speichern",
+          "saved": "Änderungen gespeichert.",
+          "saveFailed": "Deine Änderungen konnten nicht gespeichert werden. Bitte versuche es erneut."
+        },
+        "social": {
+          "empty": "Keine Social-Konten verknüpft."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Social-Metriken werden angezeigt, sobald Konten verknüpft sind",
+            "body": "Follower-Zahlen und Engagement-Raten sind noch nicht verfügbar — sie erscheinen hier, sobald die Social-Integrationen verfügbar sind."
+          }
+        },
+        "portfolio": {
+          "empty": "Noch keine Portfolio-Einträge.",
+          "untitled": "Unbenannter Portfolio-Eintrag"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Keine Verfügbarkeitsblöcke in diesem Zeitraum",
+            "body": "Dieser Creator hat für den angezeigten Zeitraum keine Abwesenheiten eingetragen."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Noch keine Kampagnenhistorie",
+            "body": "Kampagnen, die du mit diesem Creator durchführst, erscheinen hier."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Abmelden",
+      "signingOut": "Wird abgemeldet…"
+    },
+    "workspaceSwitcher": {
+      "label": "Arbeitsbereich wechseln",
+      "placeholder": "Arbeitsbereich auswählen"
+    },
+    "brands": {
+      "title": "Marken",
+      "actions": {
+        "create": "Neue Marke",
+        "edit": "Bearbeiten",
+        "archive": "Archivieren",
+        "restore": "Wiederherstellen",
+        "save": "Marke speichern",
+        "saving": "Wird gespeichert…",
+        "backToList": "Zurück zu Marken",
+        "backToDetail": "Zurück zur Marke"
+      },
+      "fields": {
+        "name": "Markenname",
+        "slug": "Slug",
+        "description": "Beschreibung",
+        "industry": "Branche",
+        "websiteUrl": "Website-URL",
+        "defaultCurrency": "Standardwährung",
+        "defaultLanguage": "Standardsprache",
+        "status": "Status"
+      },
+      "status": {
+        "active": "Aktiv",
+        "archived": "Archiviert",
+        "all": "Alle"
+      },
+      "detail": {
+        "title": "Markendetails"
+      },
+      "create": {
+        "title": "Neue Marke",
+        "success": "Marke erfolgreich erstellt."
+      },
+      "edit": {
+        "title": "Marke bearbeiten",
+        "success": "Marke erfolgreich aktualisiert."
+      },
+      "archive": {
+        "confirmTitle": "Marke archivieren",
+        "confirmMessage": "{name} archivieren? Sie wird aus der aktiven Liste ausgeblendet, kann aber später wiederhergestellt werden.",
+        "confirm": "Archivieren",
+        "cancel": "Abbrechen",
+        "success": "Marke archiviert."
+      },
+      "restore": {
+        "confirmTitle": "Marke wiederherstellen",
+        "confirmMessage": "{name} wiederherstellen? Sie erscheint wieder in der aktiven Markenliste.",
+        "confirm": "Wiederherstellen",
+        "cancel": "Abbrechen",
+        "success": "{name} wiederhergestellt."
+      },
+      "empty": {
+        "heading": "Noch keine Marken",
+        "body": "Erstelle deine erste Marke, um mit dem Management von Influencer-Kampagnen zu beginnen.",
+        "cta": "Marke erstellen"
+      },
+      "emptyFiltered": {
+        "heading": "Keine Marken entsprechen deinem Filter",
+        "body": "Versuche den Statusfilter oben zu ändern."
+      },
+      "loading": "Marken werden geladen…",
+      "errors": {
+        "loadFailed": "Marken konnten nicht geladen werden.",
+        "saveFailed": "Marke konnte nicht gespeichert werden.",
+        "archiveFailed": "Marke konnte nicht archiviert werden.",
+        "restoreFailed": "Marke konnte nicht wiederhergestellt werden."
+      }
+    },
+    "campaigns": {
+      "title": "Kampagnen",
+      "actions": {
+        "create": "Neue Kampagne",
+        "save": "Kampagne erstellen",
+        "saveSettings": "Einstellungen speichern",
+        "backToList": "Zurück zu Kampagnen"
+      },
+      "fields": {
+        "name": "Kampagnenname",
+        "brand": "Marke",
+        "objective": "Ziel",
+        "description": "Beschreibung",
+        "budget": "Budget",
+        "currency": "Währung",
+        "startsAt": "Startdatum",
+        "endsAt": "Enddatum",
+        "targetCreatorCount": "Zielanzahl Creator",
+        "deliverables": "Leistungen",
+        "deliverablesHint": "Eine Leistung pro Zeile (z.B. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Leerzeichen oder kommagetrennt.",
+        "usageRights": "Nutzungsrechte",
+        "requiresContract": "Pro-Kampagnen-Vertrag erforderlich",
+        "status": "Status"
+      },
+      "objective": {
+        "awareness": "Bekanntheit",
+        "engagement": "Interaktion",
+        "conversion": "Conversion",
+        "ugc": "UGC",
+        "launch": "Launch"
+      },
+      "status": {
+        "all": "Alle",
+        "draft": "Entwurf",
+        "active": "Aktiv",
+        "paused": "Pausiert",
+        "completed": "Abgeschlossen",
+        "cancelled": "Abgebrochen"
+      },
+      "filters": {
+        "brand": "Marke",
+        "startsFrom": "Beginnt ab",
+        "startsTo": "Beginnt bis"
+      },
+      "tabs": {
+        "overview": "Übersicht",
+        "creators": "Creator",
+        "board": "Board",
+        "drafts": "Entwürfe",
+        "payments": "Zahlungen",
+        "messages": "Nachrichten",
+        "settings": "Einstellungen"
+      },
+      "create": {
+        "title": "Neue Kampagne"
+      },
+      "detail": {
+        "title": "Kampagnendetails"
+      },
+      "settings": {
+        "saved": "Kampagneneinstellungen gespeichert."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Noch keine Creator",
+          "body": "Lade Creator zu dieser Kampagne ein, um zu beginnen."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Alle Entwürfe"
+        },
+        "empty": {
+          "heading": "Noch keine Entwürfe",
+          "body": "Entwurfseinreichungen von Creatorn erscheinen hier, sobald sie eingereicht wurden."
+        },
+        "loadFailed": "Entwürfe konnten nicht geladen werden. Bitte versuche es erneut.",
+        "submittedAt": "Eingereicht {date}"
+      },
+      "fees": {
+        "offered": "Angeboten",
+        "countered": "Gegenangebot"
+      },
+      "reinvite": {
+        "action": "Erneut einladen",
+        "title": "Creator erneut einladen",
+        "body": "Er hat mit {fee} gegengeboten. Erneutes Angebot zu:",
+        "feeLabel": "Neue vereinbarte Vergütung ({currency})",
+        "cancel": "Abbrechen",
+        "submit": "Erneut einladen",
+        "success": "Erneute Einladung gesendet."
+      },
+      "contract": {
+        "attach": {
+          "action": "Vertrag ausstellen",
+          "title": "Vertrag ausstellen",
+          "body": "Vertragsbedingungen anhängen, damit der Creator sie überprüfen und akzeptieren kann, bevor er einen Entwurf einreicht.",
+          "titleLabel": "Vertragstitel",
+          "termsLabel": "Bedingungen (Markdown)",
+          "termsHint": "Bedingungen direkt eingeben und/oder unten eine PDF hochladen.",
+          "pdfLabel": "Vertrags-PDF (optional)",
+          "pdfReady": "PDF bereit: {name}",
+          "cancel": "Abbrechen",
+          "submit": "Vertrag ausstellen",
+          "success": "Vertrag ausgestellt. Der Creator wurde benachrichtigt.",
+          "alreadyAttached": "Ein Vertrag wartet bereits auf die Annahme dieses Creators.",
+          "error": "Der Vertrag konnte nicht ausgestellt werden. Bitte versuche es erneut."
+        },
+        "pending": "Vertrag gesendet — warte auf Creator",
+        "proceedWithout": {
+          "action": "Ohne Vertrag fortfahren",
+          "success": "Auftrag ohne Vertrag vorangetrieben.",
+          "requiredError": "Diese Kampagne erfordert einen Pro-Kampagnen-Vertrag; stelle einen aus, damit der Creator ihn akzeptieren kann.",
+          "error": "Dieser Auftrag konnte nicht vorangetrieben werden. Bitte versuche es erneut."
+        }
+      },
+      "invite": {
+        "open": "Creator einladen",
+        "title": "Creator einladen",
+        "loadFailed": "Dein Roster konnte nicht geladen werden. Bitte versuche es erneut.",
+        "feeLabel": "Vereinbarte Vergütung ({currency})",
+        "search": "Creator suchen",
+        "noRoster": "Noch keine Roster-Creator zum Einladen.",
+        "noSearchMatch": "Kein Creator entspricht deiner Suche.",
+        "unnamed": "Unbenannter Creator",
+        "blockedHint": "Gesperrt — kann nicht eingeladen werden.",
+        "cancel": "Abbrechen",
+        "submit": "Einladen ({count})",
+        "summary": "{ok} eingeladen. {blacklisted} übersprungen (gesperrt), {conflicts} mit Konflikten.",
+        "conflict": {
+          "title": "Verfügbarkeitskonflikt",
+          "body": "{count} ausgewählte(r) Creator ist/sind während des Kampagnenzeitraums nicht verfügbar. Trotzdem einladen?",
+          "cancel": "Überspringen",
+          "proceed": "Trotzdem einladen"
+        }
+      },
+      "board": {
+        "loadError": "Das Board konnte nicht geladen werden. Bitte versuche es erneut.",
+        "empty": "Dieses Board hat noch keine Spalten.",
+        "moveFailed": "Karte konnte nicht verschoben werden — sie ist wieder dort, wo sie war.",
+        "reorderFailed": "Spalten konnten nicht neu angeordnet werden — die Reihenfolge wurde wiederhergestellt.",
+        "automationsButton": "Automatisierungen",
+        "card": {
+          "unnamed": "Unbenannter Creator",
+          "removed": "Entfernter Auftrag",
+          "daysLeft": "{n}T verbleibend",
+          "dueToday": "Heute fällig",
+          "overdue": "Überfällig"
+        },
+        "column": {
+          "add": "Spalte hinzufügen",
+          "edit": "Umbenennen / Farbe ändern",
+          "delete": "Spalte löschen",
+          "addTitle": "Spalte hinzufügen",
+          "editTitle": "Spalte bearbeiten",
+          "name": "Spaltenname",
+          "color": "Farbe",
+          "terminalSuccess": "Als Erfolg markieren (terminal)",
+          "terminalFailure": "Als Misserfolg markieren (terminal)",
+          "save": "Speichern",
+          "cancel": "Abbrechen",
+          "saveFailed": "Spalte konnte nicht gespeichert werden. Bitte versuche es erneut.",
+          "deleteTitle": "Spalte löschen",
+          "deleteBody": "\"{name}\" löschen? Dies kann nicht rückgängig gemacht werden.",
+          "deleteBodyNonEmpty": "\"{name}\" hat {count} Karte(n). Wähle ein Ziel für die Karten, bevor du löschst.",
+          "deleteDestination": "Karten verschieben nach",
+          "deleteConfirm": "Löschen",
+          "errorLastColumn": "Ein Board muss mindestens eine Spalte behalten.",
+          "errorDestinationRequired": "Diese Spalte hat Karten — wähle eine Zielspalte, bevor du löschst.",
+          "errorGeneric": "Spalte konnte nicht gelöscht werden. Bitte versuche es erneut."
+        },
+        "automation": {
+          "title": "Automatisierungen",
+          "subtitle": "Jedes Ereignis kann eine Karte automatisch in eine Spalte verschieben. Manuelle Verschiebungen lösen diese nie aus.",
+          "event": "Ereignis",
+          "target": "Verschiebt Karte nach",
+          "none": "Keine Automatisierung",
+          "enabled": "Aktiviert",
+          "broken": "Zielspalte wurde gelöscht — wähle eine neue",
+          "updateFailed": "Die Automatisierung konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+          "close": "Schließen"
+        },
+        "drawer": {
+          "title": "Auftrag",
+          "close": "Schließen",
+          "loadError": "Dieser Auftrag konnte nicht geladen werden. Bitte versuche es erneut.",
+          "tabs": {
+            "detail": "Details",
+            "history": "Bewegungshistorie"
+          },
+          "detail": {
+            "status": "Status",
+            "creator": "Creator",
+            "postingDue": "Veröffentlichung fällig",
+            "deliverables": "Leistungen",
+            "latestDraft": "Letzter Entwurf",
+            "postedContent": "Veröffentlichter Inhalt",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Noch keine Bewegungen aufgezeichnet.",
+            "removed": "(entfernt)",
+            "manual": "Manuell verschoben",
+            "auto": "Automatisierung",
+            "from": "von",
+            "to": "nach"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Zahlungen demnächst verfügbar",
+          "body": "Treuhand-Finanzierung und Auszahlungen werden hier verwaltet."
+        },
+        "messages": {
+          "heading": "Nachrichten demnächst verfügbar",
+          "body": "Kampagnen-Nachrichten erscheinen hier."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Eingeladen",
+        "declined": "Abgelehnt",
+        "countered": "Gegenangebot",
+        "accepted": "Angenommen",
+        "contracted": "Vertrag unterzeichnet",
+        "producing": "In Produktion",
+        "draft_submitted": "Entwurf eingereicht",
+        "revision_requested": "Überarbeitung angefordert",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt",
+        "posted": "Veröffentlicht",
+        "live_verified": "Live verifiziert",
+        "manually_verified": "Manuell verifiziert",
+        "payment_held": "Zahlung zurückgehalten",
+        "payment_released": "Zahlung freigegeben",
+        "cancelled": "Abgebrochen"
+      },
+      "review": {
+        "action": "Prüfen",
+        "title": "Entwurf prüfen",
+        "loadFailed": "Dieser Entwurf konnte nicht geladen werden. Bitte versuche es erneut.",
+        "draftVersion": "Entwurf v{n}",
+        "noCaption": "Kein Text angegeben.",
+        "hashtags": "Hashtags",
+        "mentions": "Erwähnungen",
+        "noMedia": "Kein Medieninhalt beigefügt.",
+        "feedbackLabel": "Feedback an den Creator",
+        "feedbackHint": "Erforderlich bei Änderungsanfragen oder Ablehnung.",
+        "approve": "Genehmigen",
+        "requestRevision": "Änderungen anfordern",
+        "reject": "Ablehnen",
+        "close": "Schließen",
+        "history": "Versionshistorie",
+        "postedContent": "Veröffentlichter Inhalt",
+        "draftStatus": {
+          "pending": "Ausstehende Prüfung",
+          "approved": "Genehmigt",
+          "rejected": "Abgelehnt",
+          "revision_requested": "Überarbeitung angefordert"
+        },
+        "verification": {
+          "pending": "Ausstehende Verifizierung",
+          "verified": "Verifiziert",
+          "not_found": "Nicht gefunden",
+          "mismatch": "Diskrepanz"
+        },
+        "simulated": "Simulierte Verifizierung (Mock-Anbieter)",
+        "toast": {
+          "approved": "Entwurf genehmigt.",
+          "revisionRequested": "Überarbeitung angefordert.",
+          "rejected": "Entwurf abgelehnt.",
+          "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Vorschau öffnen",
+          "close": "Schließen",
+          "empty": "Kein Medieninhalt beigefügt."
+        }
+      },
+      "resolution": {
+        "action": "Lösen",
+        "title": "Verifizierung lösen",
+        "loadFailed": "Dieser Auftrag konnte nicht geladen werden. Bitte versuche es erneut.",
+        "postedContent": "Eingereichter Post",
+        "simulated": "Simulierte Verifizierung (Mock-Anbieter)",
+        "intro": "Die automatische Verifizierung dieses Posts ist fehlgeschlagen. Akzeptiere ihn manuell, schicke ihn für einen neuen Post zurück oder bitte den Creator, den Link zu korrigieren.",
+        "verification": {
+          "pending": "Ausstehende Verifizierung",
+          "verified": "Verifiziert",
+          "not_found": "Nicht gefunden",
+          "mismatch": "Diskrepanz"
+        },
+        "noteLabel": "Grund / Hinweis an den Creator",
+        "noteHint": "Erforderlich bei manueller Verifizierung; optional bei Einreichungsanfragen.",
+        "manuallyVerify": "Manuell verifizieren",
+        "requestFresh": "Neuen Post anfordern",
+        "requestInPlace": "Bitte Link zu korrigieren",
+        "close": "Schließen",
+        "notActionable": "Dieser Auftrag wartet nicht mehr auf eine Lösung.",
+        "toast": {
+          "verified": "Post manuell verifiziert.",
+          "resubmitFresh": "Für einen neuen Post zurückgesendet.",
+          "resubmitInPlace": "Creator gebeten, den Link zu korrigieren.",
+          "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+        }
+      },
+      "viewPost": {
+        "action": "Post ansehen",
+        "title": "Veröffentlichter Inhalt",
+        "loadFailed": "Dieser Post konnte nicht geladen werden. Bitte versuche es erneut.",
+        "empty": "Der Creator hat noch keinen Inhalt veröffentlicht.",
+        "current": "Aktuell",
+        "postedAt": "Veröffentlicht",
+        "verifiedAt": "Verifiziert",
+        "simulated": "Verifizierung läuft gegen einen simulierten Anbieter in dieser Umgebung.",
+        "close": "Schließen",
+        "verification": {
+          "pending": "Ausstehende Verifizierung",
+          "verified": "Verifiziert",
+          "not_found": "Nicht gefunden",
+          "mismatch": "Diskrepanz"
+        }
+      },
+      "empty": {
+        "heading": "Noch keine Kampagnen",
+        "body": "Erstelle deine erste Kampagne, um Creator zu engagieren.",
+        "cta": "Kampagne erstellen"
+      },
+      "errors": {
+        "loadFailed": "Kampagnen konnten nicht geladen werden.",
+        "saveFailed": "Kampagne konnte nicht gespeichert werden."
+      }
+    },
+    "pools": {
+      "title": "Talent-Pools",
+      "agencyWide": "Agenturweit",
+      "actions": {
+        "create": "Neuer Pool",
+        "edit": "Bearbeiten",
+        "archive": "Archivieren",
+        "restore": "Wiederherstellen",
+        "save": "Pool speichern",
+        "backToList": "Zurück zu Talent-Pools",
+        "backToDetail": "Zurück zum Pool"
+      },
+      "fields": {
+        "name": "Poolname",
+        "description": "Beschreibung",
+        "brand": "Marke",
+        "brandHint": "Optional — verknüpft den Pool mit der Arbeit einer Marke. Leer lassen für einen agenturweiten Pool.",
+        "members": "Mitglieder"
+      },
+      "status": {
+        "active": "Aktiv",
+        "archived": "Archiviert",
+        "all": "Alle"
+      },
+      "create": {
+        "title": "Neuer Talent-Pool"
+      },
+      "edit": {
+        "title": "Talent-Pool bearbeiten"
+      },
+      "detail": {
+        "title": "Pool-Details",
+        "notFound": "Dieser Pool existiert nicht mehr.",
+        "membersHeading": "Mitglieder",
+        "membersEmpty": "Noch keine Creator in diesem Pool. Füge Creator über die Detailseite eines Creators hinzu.",
+        "memberCount": "{count} Creator",
+        "unnamed": "Unbenannter Creator",
+        "remove": "Aus Pool entfernen",
+        "removed": "{name} aus dem Pool entfernt."
+      },
+      "archive": {
+        "confirmTitle": "Pool archivieren",
+        "confirmMessage": "{name} archivieren? Er wird aus der aktiven Liste ausgeblendet, kann aber später mit seinen Mitgliedern wiederhergestellt werden.",
+        "confirm": "Archivieren",
+        "cancel": "Abbrechen"
+      },
+      "restore": {
+        "confirmTitle": "Pool wiederherstellen",
+        "confirmMessage": "{name} wiederherstellen? Er erscheint wieder in der aktiven Pool-Liste.",
+        "confirm": "Wiederherstellen",
+        "cancel": "Abbrechen",
+        "success": "{name} wiederhergestellt."
+      },
+      "empty": {
+        "heading": "Noch keine Talent-Pools",
+        "body": "Erstelle einen Pool, um Creator für eine Marke oder ein Kampagnenbriefing zu gruppieren.",
+        "cta": "Pool erstellen"
+      },
+      "emptyFiltered": {
+        "heading": "Kein Pool entspricht deinem Filter",
+        "body": "Versuche den Statusfilter oben zu ändern."
+      },
+      "picker": {
+        "openLabel": "Zum Pool hinzufügen",
+        "title": "Zu Talent-Pools hinzufügen",
+        "empty": "Noch keine Talent-Pools. Erstelle einen auf der Talent-Pools-Seite.",
+        "done": "Fertig",
+        "added": "Zu {name} hinzugefügt.",
+        "removed": "Aus {name} entfernt.",
+        "loadFailed": "Talent-Pools konnten nicht geladen werden.",
+        "toggleFailed": "Pool-Mitgliedschaft konnte nicht aktualisiert werden."
+      },
+      "addCreators": {
+        "open": "Creator hinzufügen",
+        "title": "Creator zu diesem Pool hinzufügen",
+        "search": "Roster durchsuchen",
+        "noRoster": "Dein Roster ist leer. Füge zuerst Creator zu deinem Roster hinzu.",
+        "allInPool": "Alle Roster-Creator sind bereits in diesem Pool.",
+        "noSearchMatch": "Kein Roster-Creator entspricht deiner Suche.",
+        "cancel": "Abbrechen",
+        "add": "{count} hinzufügen",
+        "added": "{count} Creator zum Pool hinzugefügt.",
+        "loadFailed": "Dein Roster konnte nicht geladen werden.",
+        "addFailed": "Creator konnten nicht zum Pool hinzugefügt werden.",
+        "confirmHard": {
+          "one": "{name} ist von deiner Agentur gesperrt. Trotzdem zu diesem Pool hinzufügen?",
+          "many": "{count} ausgewählte Creator sind von deiner Agentur gesperrt ({names}). Trotzdem hinzufügen?"
+        }
+      },
+      "errors": {
+        "loadFailed": "Talent-Pools konnten nicht geladen werden.",
+        "membersLoadFailed": "Pool-Mitglieder konnten nicht geladen werden.",
+        "saveFailed": "Talent-Pool konnte nicht gespeichert werden.",
+        "archiveFailed": "Pool konnte nicht archiviert werden.",
+        "restoreFailed": "Pool konnte nicht wiederhergestellt werden.",
+        "removeFailed": "Creator konnte nicht aus dem Pool entfernt werden."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Name",
+        "email": "E-Mail",
+        "role": "Rolle",
+        "status": "Status",
+        "joinedAt": "Beigetreten"
+      },
+      "roles": {
+        "agency_admin": "Administrator",
+        "agency_manager": "Manager",
+        "agency_staff": "Mitarbeiter"
+      },
+      "status": {
+        "active": "Aktiv",
+        "pending": "Ausstehend"
+      },
+      "members": {
+        "heading": "Aktuelle Mitglieder"
+      },
+      "filters": {
+        "allRoles": "Alle Rollen",
+        "allStatuses": "Alle Status"
+      },
+      "search": {
+        "label": "Suchen",
+        "placeholder": "Name oder E-Mail"
+      },
+      "invitations": {
+        "heading": "Einladungshistorie",
+        "columns": {
+          "email": "Eingeladene Person",
+          "invitedAt": "Eingeladen",
+          "invitedBy": "Eingeladen von"
+        },
+        "status": {
+          "pending": "Ausstehend",
+          "accepted": "Angenommen",
+          "expired": "Abgelaufen"
+        },
+        "empty": "Noch keine Einladungen."
+      },
+      "invite": {
+        "button": "Benutzer einladen",
+        "title": "Teammitglied einladen",
+        "fields": {
+          "email": "E-Mail-Adresse",
+          "role": "Rolle"
+        },
+        "submit": "Einladung senden",
+        "submitting": "Wird gesendet…",
+        "success": "Einladung an {email} gesendet.",
+        "errors": {
+          "failed": "Einladung konnte nicht gesendet werden."
+        }
+      },
+      "empty": {
+        "heading": "Keine Teammitglieder",
+        "body": "Lade dein erstes Teammitglied ein, um zu beginnen."
+      },
+      "emptyFiltered": "Kein Teammitglied entspricht deinem Filter.",
+      "errors": {
+        "membersLoadFailed": "Teammitglieder konnten nicht geladen werden.",
+        "invitationsLoadFailed": "Einladungshistorie konnte nicht geladen werden."
+      },
+      "loading": "Team wird geladen…",
+      "bulkInviteCreators": {
+        "button": "Creator masseneinladen"
+      }
+    },
+    "bulkInvite": {
+      "title": "Creator masseneinladen",
+      "description": "Lade eine CSV mit einer `email`-Spalte hoch. Jede Zeile wird zu einer Magic-Link-Einladung. Andere Spalten werden akzeptiert, aber ignoriert.",
+      "file": {
+        "label": "CSV-Datei",
+        "hint": "Max. 5 MB / 1000 Zeilen. Die einzige Pflichtpalte ist `email`."
+      },
+      "softWarning": "{count} Zeilen sind ein großes Batch — die Verarbeitung kann einige Minuten dauern.",
+      "preview": {
+        "heading": "Geparste Zeilen ({count})",
+        "row": "Zeile",
+        "email": "E-Mail",
+        "errorCount": "{count} Analysefehler",
+        "errorHeading": "Diese Zeilen werden übersprungen:",
+        "errorItem": "Zeile {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Einladungen senden ({count})",
+        "reset": "Leeren",
+        "startOver": "Weiteres Batch senden"
+      },
+      "status": {
+        "queued": "In der Warteschlange — warte auf Start",
+        "processing": "Einladungen werden verarbeitet",
+        "complete": "Alles erledigt",
+        "failed": "Job fehlgeschlagen"
+      },
+      "tracking": {
+        "progress": "{percent}% abgeschlossen"
+      },
+      "timeout": {
+        "heading": "Noch in Arbeit",
+        "description": "Die Verarbeitung deiner Einladungen dauert länger als erwartet. Du kannst es erneut versuchen oder später nachschauen.",
+        "retry": "Erneut versuchen"
+      },
+      "complete": {
+        "heading": "Ergebnisse",
+        "invited": "Eingeladen",
+        "alreadyInvited": "Bereits eingeladen",
+        "failed": "Fehlgeschlagen",
+        "failureReason": "Grund"
+      },
+      "failed": {
+        "heading": "Der Masseneinladungs-Job ist fehlgeschlagen."
+      },
+      "errors": {
+        "submitFailed": "Die CSV konnte nicht eingereicht werden. Bitte versuche es erneut."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "Du wurdest eingeladen",
+        "joining": "Du wirst eingeladen, {agencyName} als {role} beizutreten.",
+        "accept": "Einladung annehmen",
+        "accepting": "Wird angenommen…",
+        "signInToContinue": "Melde dich an, um diese Einladung anzunehmen",
+        "signIn": "Anmelden",
+        "noAccount": "Noch kein Konto?",
+        "signUp": "Jetzt erstellen",
+        "success": "Willkommen bei {agencyName}! Du bist jetzt {role}.",
+        "expired": {
+          "heading": "Diese Einladung ist abgelaufen",
+          "body": "Bitte wende dich an deinen Agentur-Administrator, um eine neue Einladung anzufordern."
+        },
+        "alreadyAccepted": {
+          "heading": "Einladung bereits angenommen",
+          "body": "Diese Einladung wurde bereits verwendet. Melde dich an, um auf deinen Arbeitsbereich zuzugreifen.",
+          "signIn": "Anmelden"
+        },
+        "alreadyMember": {
+          "heading": "Bereits Mitglied",
+          "body": "Du bist bereits Mitglied dieses Arbeitsbereichs."
+        },
+        "emailMismatch": {
+          "heading": "Falsches Konto",
+          "body": "Diese Einladung wurde an eine andere E-Mail-Adresse gesendet. Bitte melde dich mit dem richtigen Konto an."
+        },
+        "notFound": {
+          "heading": "Einladung nicht gefunden",
+          "body": "Dieser Einladungslink ist ungültig oder wurde bereits verwendet."
+        },
+        "errors": {
+          "failed": "Einladung konnte nicht angenommen werden."
+        }
+      }
+    },
+    "settings": {
+      "title": "Agentureinstellungen",
+      "fields": {
+        "defaultCurrency": "Standardwährung",
+        "defaultLanguage": "Standardsprache",
+        "blacklistNotificationPolicy": "Creator bei Sperrung benachrichtigen",
+        "blacklistNotificationPolicyHint": "Wenn aktiviert, wird ein Creator per E-Mail benachrichtigt, wenn deine Agentur ihn sperrt. Der Grund wird nie geteilt."
+      },
+      "save": "Einstellungen speichern",
+      "saving": "Wird gespeichert…",
+      "success": "Einstellungen gespeichert.",
+      "readOnly": "Nur Administratoren können Agentureinstellungen bearbeiten.",
+      "loading": "Einstellungen werden geladen…",
+      "errors": {
+        "loadFailed": "Einstellungen konnten nicht geladen werden.",
+        "saveFailed": "Einstellungen konnten nicht gespeichert werden."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "Dieses Feld ist erforderlich."
+  }
+}

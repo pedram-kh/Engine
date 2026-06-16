@@ -1,0 +1,15 @@
+{
+  "impersonation": {
+    "claim": {
+      "in_progress": "Identitätswechsel-Sitzung wird gestartet…",
+      "missing_token": "Es wurde kein Übergabe-Token angegeben. Starte den Identitätswechsel erneut über das Admin-Panel.",
+      "invalid": "Diese Übergabe für den Identitätswechsel ist ungültig, bereits verwendet oder abgelaufen. Starte ihn erneut über das Admin-Panel.",
+      "failed": "Wir konnten die Identitätswechsel-Sitzung nicht starten. Bitte versuche es erneut über das Admin-Panel."
+    },
+    "banner": {
+      "message": "Admin-Supportsitzung – du siehst dieses Konto als der Nutzer.",
+      "expires_in": "Läuft ab in {time}",
+      "end": "Sitzung beenden"
+    }
+  }
+}

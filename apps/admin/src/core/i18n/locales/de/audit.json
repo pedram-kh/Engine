@@ -1,0 +1,27 @@
+{
+  "admin": {
+    "audit": {
+      "title": "Auditprotokoll",
+      "empty": "Keine Auditeinträge entsprechen diesen Filtern.",
+      "load_failed": "Das Auditprotokoll konnte nicht geladen werden. Bitte aktualisiere die Seite.",
+      "filters": {
+        "action": "Aktion",
+        "subject": "Betreff-ULID",
+        "date_from": "Von",
+        "date_to": "Bis",
+        "apply": "Anwenden"
+      },
+      "fields": {
+        "action": "Aktion",
+        "actor": "Akteur",
+        "subject": "Betreff",
+        "reason": "Grund",
+        "created_at": "Wann"
+      },
+      "pagination": {
+        "prev": "Zurück",
+        "next": "Weiter"
+      }
+    }
+  }
+}

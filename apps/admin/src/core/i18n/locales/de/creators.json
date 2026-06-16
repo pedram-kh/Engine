@@ -1,0 +1,228 @@
+{
+  "admin": {
+    "creators": {
+      "list": {
+        "title": "Creator-Prüfwarteschlange",
+        "unnamed": "Unbenannter Creator",
+        "view": "Creator ansehen",
+        "load_failed": "Die Prüfwarteschlange konnte nicht geladen werden. Bitte aktualisiere die Seite.",
+        "fields": {
+          "name": "Creator",
+          "email": "E-Mail",
+          "status": "Status",
+          "kyc": "KYC",
+          "completeness": "Vollständigkeit",
+          "submitted_at": "Eingereicht"
+        },
+        "filters": {
+          "pending": "Ausstehend",
+          "approved": "Genehmigt",
+          "rejected": "Abgelehnt",
+          "incomplete": "Unvollständig",
+          "all": "Alle"
+        },
+        "status_labels": {
+          "incomplete": "Unvollständig",
+          "pending": "Ausstehend",
+          "approved": "Genehmigt",
+          "rejected": "Abgelehnt"
+        }
+      },
+      "kyc": {
+        "title": "KYC-Prüfwarteschlange",
+        "empty": "Kein Creator entspricht diesem KYC-Filter.",
+        "load_failed": "Die KYC-Warteschlange konnte nicht geladen werden. Bitte aktualisiere die Seite.",
+        "filters": {
+          "pending": "Ausstehend",
+          "verified": "Verifiziert",
+          "rejected": "Abgelehnt",
+          "none": "Nicht gestartet",
+          "all": "Alle"
+        }
+      },
+      "all": {
+        "title": "Alle Creator",
+        "empty": "Noch keine Creator.",
+        "load_failed": "Creator konnten nicht geladen werden. Bitte aktualisiere die Seite."
+      },
+      "detail": {
+        "fallback_title": "Creator",
+        "application_status": "Bewerbungsstatus: {status}",
+        "completeness": "{percent}% vollständig",
+        "rejection_heading": "Ablehnungshinweise",
+        "profile_heading": "Profil",
+        "social_heading": "Social-Konten",
+        "portfolio_heading": "Portfolio",
+        "onboarding_heading": "Onboarding-Status",
+        "kyc_history_heading": "KYC-Verifizierungshistorie",
+        "kyc_history": {
+          "provider": "Anbieter",
+          "status": "Status",
+          "started_at": "Gestartet am",
+          "completed_at": "Abgeschlossen am"
+        },
+        "assignments_heading": "Kampagnenhistorie",
+        "assignments": {
+          "empty": "Dieser Creator hat noch keine Kampagnenaufträge.",
+          "load_failed": "Die Kampagnenhistorie konnte nicht geladen werden.",
+          "campaign": "Kampagne",
+          "brand": "Marke",
+          "agency": "Agentur",
+          "status": "Status",
+          "created_at": "Gestartet"
+        },
+        "audit_heading": "Audithistorie",
+        "audit": {
+          "empty": "Noch keine Auditeinträge für diesen Creator.",
+          "load_failed": "Die Audithistorie konnte nicht geladen werden.",
+          "action": "Aktion",
+          "actor": "Akteur",
+          "reason": "Grund",
+          "created_at": "Wann"
+        },
+        "payments_heading": "Zahlungshistorie",
+        "payments_coming_soon": "Die Zahlungshistorie erscheint, wenn die Zahlungsverarbeitung erscheint (Sprint 10).",
+        "load_failed": "Dieser Creator konnte nicht geladen werden. Bitte aktualisiere die Seite.",
+        "fields": {
+          "display_name": "Anzeigename",
+          "bio": "Kurzbiografie",
+          "country_code": "Land",
+          "region": "Region",
+          "primary_language": "Hauptsprache",
+          "secondary_languages": "Weitere Sprachen",
+          "categories": "Kategorien"
+        },
+        "edit": {
+          "title": "{field} bearbeiten",
+          "save": "Änderungen speichern",
+          "cancel": "Abbrechen",
+          "reason_label": "Grund für die Änderung",
+          "reason_hint": "Für sensible Felder erforderlich. Wird im Auditprotokoll erfasst.",
+          "custom_code_hint": "Wähle einen Wert oder gib einen 2-buchstabigen ISO-Code ein.",
+          "button_aria_label": "{field} bearbeiten",
+          "save_failed": "Diese Änderung konnte nicht gespeichert werden. Bitte versuche es erneut.",
+          "saved": "{field} aktualisiert."
+        },
+        "errors": {
+          "field_status_immutable": "Statusübergänge verwenden die Genehmigungs-/Ablehnungsaktionen, nicht die Feldbearbeitung."
+        },
+        "approve": {
+          "button": "Bewerbung genehmigen",
+          "title": "{name}s Bewerbung genehmigen",
+          "description": "Dies markiert den Creator als genehmigt und gewährt Produktionszugang. Die Aktion wird im Auditprotokoll erfasst.",
+          "welcome_label": "Willkommensnachricht (optional)",
+          "welcome_hint": "Wird auf dem Dashboard des Creators angezeigt, wenn er sich das nächste Mal anmeldet.",
+          "confirm": "Genehmigen",
+          "cancel": "Abbrechen",
+          "success": "Creator genehmigt.",
+          "failed": "Dieser Creator konnte nicht genehmigt werden. Bitte versuche es erneut."
+        },
+        "reject": {
+          "button": "Bewerbung ablehnen",
+          "title": "{name}s Bewerbung ablehnen",
+          "description": "Der Creator sieht den Grund auf seinem Dashboard, wenn er sich das nächste Mal anmeldet.",
+          "reason_label": "Ablehnungsgrund",
+          "min_hint": "Erforderlich, mindestens {count} Zeichen.",
+          "confirm": "Ablehnen",
+          "cancel": "Abbrechen",
+          "success": "Creator abgelehnt.",
+          "failed": "Dieser Creator konnte nicht abgelehnt werden. Bitte versuche es erneut."
+        },
+        "identity": {
+          "heading": "Identitätsverifizierung",
+          "status": "Status: {status}",
+          "verify_manual": "Manuell verifizieren",
+          "verify_vendor": "Anbieterverifizierung anfordern",
+          "vendor_disabled_tooltip": "Kein KYC-Anbieter konfiguriert",
+          "method_labels": {
+            "vendor": "Vom Anbieter verifiziert",
+            "manual": "Manuell von einem Admin verifiziert"
+          }
+        },
+        "verify": {
+          "title": "{name}s Identität manuell verifizieren",
+          "description": "Dies markiert dauerhaft die Identität des Creators als verifiziert und wird gegen dein Konto im Auditprotokoll erfasst. Nur verwenden, wenn du die Identität außerhalb des Systems bestätigt hast.",
+          "note_label": "Notiz (optional)",
+          "note_hint": "Wird im Auditprotokoll zusammen mit deinem Namen erfasst.",
+          "confirm": "Identität verifizieren",
+          "cancel": "Abbrechen",
+          "success": "Identität verifiziert.",
+          "failed": "Die Identität dieses Creators konnte nicht verifiziert werden. Bitte versuche es erneut."
+        }
+      }
+    }
+  },
+  "creator": {
+    "already_approved": "Dieser Creator wurde bereits genehmigt.",
+    "already_rejected": "Dieser Creator wurde bereits abgelehnt.",
+    "kyc_not_verified": "Die Genehmigung ist gesperrt, bis die Identität des Creators verifiziert ist.",
+    "kyc_already_verified": "Die Identität dieses Creators wurde bereits verifiziert.",
+    "admin": {
+      "field_status_immutable": "Statusübergänge verwenden die Genehmigungs-/Ablehnungsaktionen, nicht die Feldbearbeitung."
+    },
+    "ui": {
+      "wizard": {
+        "steps": {
+          "kyc": {
+            "name": "Identitätsverifizierung",
+            "status_labels": {
+              "none": "Nicht gestartet",
+              "pending": "In Bearbeitung",
+              "verified": "Verifiziert",
+              "rejected": "Abgelehnt",
+              "not_required": "Nicht erforderlich"
+            }
+          },
+          "tax": {
+            "name": "Steuerinformationen",
+            "status_complete": "Eingereicht",
+            "status_incomplete": "Noch nicht eingereicht"
+          },
+          "payout": {
+            "name": "Auszahlungsmethode",
+            "status_set": "Verbunden",
+            "status_unset": "Nicht verbunden"
+          },
+          "contract": {
+            "name": "Rahmenvertrag",
+            "status_labels": {
+              "signed": "Unterzeichnet",
+              "click_through_accepted": "Akzeptiert",
+              "none": "Nicht gestartet"
+            }
+          },
+          "portfolio": {
+            "gallery_empty": "Noch keine Portfolio-Einträge hochgeladen.",
+            "video_badge_label": "Video",
+            "link_badge_label": "Externer Link",
+            "untitled_item": "Unbenannter Portfolio-Eintrag"
+          }
+        },
+        "categories": {
+          "fashion": "Mode",
+          "beauty": "Beauty",
+          "lifestyle": "Lifestyle",
+          "fitness": "Fitness",
+          "travel": "Reisen",
+          "food": "Essen",
+          "tech": "Technologie",
+          "gaming": "Gaming",
+          "music": "Musik",
+          "comedy": "Comedy",
+          "education": "Bildung",
+          "parenting": "Elternschaft",
+          "business": "Business",
+          "art": "Kunst",
+          "sports": "Sport",
+          "other": "Sonstiges"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Demnächst verfügbar"
+        }
+      }
+    }
+  }
+}

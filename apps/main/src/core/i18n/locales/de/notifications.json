@@ -1,0 +1,63 @@
+{
+  "notifications": {
+    "center": {
+      "title": "Benachrichtigungen",
+      "empty": "Du bist auf dem neuesten Stand.",
+      "markAll": "Alle als gelesen markieren",
+      "viewAll": "Alle Benachrichtigungen anzeigen",
+      "loading": "Wird geladen…",
+      "error": "Benachrichtigungen konnten nicht geladen werden.",
+      "unreadBadgeLabel": "{count} ungelesene Benachrichtigungen",
+      "feedbackLabel": "Feedback",
+      "reasonLabel": "Grund"
+    },
+    "page": {
+      "title": "Benachrichtigungen",
+      "empty": "Du hast noch keine Benachrichtigungen."
+    },
+    "types": {
+      "assignment_draft_approved": "Dein Entwurf für {campaign_name} wurde genehmigt.",
+      "assignment_revision_requested": "Überarbeitungen deines Entwurfs für {campaign_name} wurden angefordert.",
+      "assignment_draft_rejected": "Dein Entwurf für {campaign_name} wurde abgelehnt.",
+      "assignment_manually_verified": "Dein Post für {campaign_name} wurde verifiziert.",
+      "assignment_draft_submitted": "{creator_name} hat einen Entwurf für {campaign_name} eingereicht.",
+      "assignment_contracted": "{creator_name} hat den Vertrag für {campaign_name} akzeptiert.",
+      "creator_approved": "Dein Creator-Konto wurde genehmigt.",
+      "creator_rejected": "Deine Creator-Bewerbung wurde nicht genehmigt.",
+      "message_received_by_creator": "{sender_name} hat dir eine Nachricht zu {campaign_name} gesendet.",
+      "message_received_by_agency": "{sender_name} hat eine Nachricht zu {campaign_name} gesendet.",
+      "fallback": "Du hast eine neue Benachrichtigung."
+    },
+    "preferences": {
+      "title": "Benachrichtigungseinstellungen",
+      "description": "Wähle, welche In-App-Benachrichtigungen du erhalten möchtest.",
+      "menuItem": "Benachrichtigungseinstellungen",
+      "save": "Änderungen speichern",
+      "saving": "Wird gespeichert…",
+      "success": "Deine Benachrichtigungseinstellungen wurden gespeichert.",
+      "loadError": "Deine Benachrichtigungseinstellungen konnten nicht geladen werden.",
+      "saveError": "Deine Benachrichtigungseinstellungen konnten nicht gespeichert werden. Bitte versuche es erneut.",
+      "groups": {
+        "assignment": "Aufträge",
+        "creator": "Creator-Konto",
+        "messaging": "Nachrichten"
+      },
+      "channels": {
+        "in_app": "In der App",
+        "digest": "Tägliche E-Mail-Zusammenfassung"
+      },
+      "typeLabels": {
+        "assignment_draft_submitted": "Ein Entwurf wird zur Überprüfung eingereicht",
+        "assignment_contracted": "Ein Vertrag wird akzeptiert",
+        "assignment_revision_requested": "Überarbeitungen eines Entwurfs werden angefordert",
+        "assignment_draft_approved": "Ein Entwurf wird genehmigt",
+        "assignment_draft_rejected": "Ein Entwurf wird abgelehnt",
+        "assignment_manually_verified": "Ein Post wird verifiziert",
+        "creator_approved": "Ein Creator-Konto wird genehmigt",
+        "creator_rejected": "Eine Creator-Bewerbung wird abgelehnt",
+        "message_received_by_creator": "Eine neue Nachricht von der Agentur",
+        "message_received_by_agency": "Eine neue Nachricht vom Creator"
+      }
+    }
+  }
+}

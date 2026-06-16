@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "featureFlags": {
+      "title": "Feature-Flags",
+      "subtitle": "Plattformweite An/Aus-Schalter. Jede Änderung wird auditiert und tritt sofort in Kraft.",
+      "load_failed": "Die Feature-Flags konnten nicht geladen werden. Bitte aktualisiere die Seite.",
+      "toggle": {
+        "enable_title": "{label} aktivieren?",
+        "disable_title": "{label} deaktivieren?",
+        "description": "Dies ändert das Flag plattformweit und tritt sofort in Kraft. Ein Grund ist erforderlich und wird im Auditprotokoll erfasst.",
+        "reason_label": "Grund",
+        "reason_hint": "Mindestens {count} Zeichen — wird gegen diese Änderung erfasst.",
+        "cancel": "Abbrechen",
+        "confirm": "Bestätigen",
+        "success": "Feature-Flag aktualisiert.",
+        "failed": "Das Flag konnte nicht aktualisiert werden. Bitte versuche es erneut."
+      }
+    }
+  }
+}

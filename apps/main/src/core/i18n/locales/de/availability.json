@@ -1,0 +1,84 @@
+{
+  "availability": {
+    "title": "Verfügbarkeit",
+    "subtitle": "Blockiere Zeiten, zu denen du nicht verfügbar bist, damit Agenturen deinen echten Kalender sehen.",
+    "allDay": "Ganztägig",
+    "moreCount": "+{count} weitere",
+    "dayPopover": {
+      "title": "Blöcke an diesem Tag",
+      "viewAll": "Alle Blöcke für diesen Tag anzeigen"
+    },
+    "creatorNav": {
+      "dashboard": "Dashboard",
+      "assignments": "Einladungen",
+      "availability": "Verfügbarkeit"
+    },
+    "nav": {
+      "prevMonth": "Vorheriger Monat",
+      "nextMonth": "Nächster Monat"
+    },
+    "actions": {
+      "add": "Block hinzufügen"
+    },
+    "empty": {
+      "heading": "Noch keine Verfügbarkeitsblöcke",
+      "body": "Füge einen Block hinzu, um anzugeben, wann du abwesend oder nicht verfügbar bist."
+    },
+    "errors": {
+      "loadFailed": "Deine Verfügbarkeit konnte nicht geladen werden. Bitte versuche es erneut."
+    },
+    "blockType": {
+      "hard": "Nicht verfügbar (fest)",
+      "soft": "Präferenz (weich)"
+    },
+    "kind": {
+      "vacation": "Urlaub",
+      "personal": "Persönlich",
+      "exclusive_contract": "Exklusivvertrag",
+      "assignment_auto": "Aus Kampagne",
+      "other": "Sonstiges"
+    },
+    "weekday": {
+      "MO": "Mo",
+      "TU": "Di",
+      "WE": "Mi",
+      "TH": "Do",
+      "FR": "Fr",
+      "SA": "Sa",
+      "SU": "So"
+    },
+    "dialog": {
+      "createTitle": "Verfügbarkeitsblock hinzufügen",
+      "editTitle": "Verfügbarkeitsblock bearbeiten",
+      "seriesNotice": "Dies ist ein wiederkehrender Block – Änderungen gelten für alle Vorkommen, nicht nur für diesen Tag.",
+      "blockTypeHint": "Feste Blöcke schließen dich vollständig aus; weiche Blöcke sind nur eine Präferenz.",
+      "fields": {
+        "allDay": "Ganztägig",
+        "startDate": "Startdatum",
+        "startTime": "Startzeit",
+        "endDate": "Enddatum",
+        "endTime": "Endzeit",
+        "blockType": "Typ",
+        "kind": "Grund",
+        "reason": "Notiz (optional)",
+        "recurring": "Wiederholt sich wöchentlich"
+      },
+      "recurrence": {
+        "interval": "Alle (Wochen) wiederholen",
+        "weekdays": "An diesen Tagen",
+        "hasEnd": "Enddatum festlegen",
+        "endsOn": "Endet am"
+      },
+      "actions": {
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "delete": "Löschen",
+        "confirmDelete": "Löschen bestätigen"
+      },
+      "errors": {
+        "saveFailed": "Der Block konnte nicht gespeichert werden. Bitte versuche es erneut.",
+        "deleteFailed": "Der Block konnte nicht gelöscht werden. Bitte versuche es erneut."
+      }
+    }
+  }
+}
