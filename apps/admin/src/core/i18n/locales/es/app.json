@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Administración",
+    "subtitle": "Consola de superadministrador.",
+    "sprint0Notice": "Estructura de Sprint 0 — SPA de administración",
+    "dashboardPlaceholder": "Marcador de posición del panel de administración: la superficie completa llegará en un sprint posterior.",
+    "env": {
+      "local": "Local",
+      "staging": "Preproducción",
+      "production": "Producción — todas las acciones quedan registradas"
+    },
+    "nav": {
+      "comingSoon": "Pronto",
+      "dashboard": "Panel",
+      "agencies": "Agencias",
+      "creators": "Creadores",
+      "creatorApprovals": "Aprobaciones pendientes",
+      "kycQueue": "Cola de KYC",
+      "allCreators": "Todos los creadores",
+      "payments": "Pagos",
+      "disputes": "Disputas",
+      "recentPayments": "Recientes",
+      "audit": "Registro de auditoría",
+      "alerts": "Alertas operativas",
+      "support": "Soporte",
+      "userSearch": "Búsqueda de usuarios",
+      "impersonationLog": "Registro de suplantaciones",
+      "operations": "Operaciones",
+      "systemHealth": "Estado del sistema",
+      "horizon": "Trabajos en segundo plano…",
+      "compliance": "Cumplimiento",
+      "exportRequests": "Solicitudes de exportación",
+      "erasureQueue": "Cola de borrado",
+      "featureFlags": "Indicadores de funciones"
+    },
+    "userMenu": {
+      "signOut": "Cerrar sesión",
+      "signingOut": "Cerrando sesión…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Próximamente",
+      "body": "Esta superficie se activará cuando llegue el procesamiento de pagos (Sprint 10).",
+      "disputes": "Disputas",
+      "recentPayments": "Pagos recientes"
+    },
+    "sectionStub": {
+      "body": "Esta superficie de administración se está construyendo en este sprint."
+    },
+    "locale": {
+      "switcher": "Idioma",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Tema",
+        "light": "Claro",
+        "dark": "Oscuro"
+      }
+    }
+  }
+}

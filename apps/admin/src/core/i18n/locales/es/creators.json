@@ -1,0 +1,228 @@
+{
+  "admin": {
+    "creators": {
+      "list": {
+        "title": "Cola de revisión de creadores",
+        "unnamed": "Creador sin nombre",
+        "view": "Ver creador",
+        "load_failed": "No hemos podido cargar la cola de revisión. Actualiza la página.",
+        "fields": {
+          "name": "Creador",
+          "email": "Correo electrónico",
+          "status": "Estado",
+          "kyc": "KYC",
+          "completeness": "Completitud",
+          "submitted_at": "Enviada"
+        },
+        "filters": {
+          "pending": "Pendientes",
+          "approved": "Aprobados",
+          "rejected": "Rechazados",
+          "incomplete": "Incompletos",
+          "all": "Todos"
+        },
+        "status_labels": {
+          "incomplete": "Incompleta",
+          "pending": "Pendiente",
+          "approved": "Aprobada",
+          "rejected": "Rechazada"
+        }
+      },
+      "kyc": {
+        "title": "Cola de revisión de KYC",
+        "empty": "Ningún creador coincide con este filtro de KYC.",
+        "load_failed": "No hemos podido cargar la cola de KYC. Actualiza la página.",
+        "filters": {
+          "pending": "Pendientes",
+          "verified": "Verificados",
+          "rejected": "Rechazados",
+          "none": "Sin empezar",
+          "all": "Todos"
+        }
+      },
+      "all": {
+        "title": "Todos los creadores",
+        "empty": "Aún no hay creadores.",
+        "load_failed": "No hemos podido cargar los creadores. Actualiza la página."
+      },
+      "detail": {
+        "fallback_title": "Creador",
+        "application_status": "Estado de la solicitud: {status}",
+        "completeness": "{percent}% completado",
+        "rejection_heading": "Notas de rechazo",
+        "profile_heading": "Perfil",
+        "social_heading": "Cuentas sociales",
+        "portfolio_heading": "Portafolio",
+        "onboarding_heading": "Estado del onboarding",
+        "kyc_history_heading": "Historial de verificación KYC",
+        "kyc_history": {
+          "provider": "Proveedor",
+          "status": "Estado",
+          "started_at": "Iniciada el",
+          "completed_at": "Completada el"
+        },
+        "assignments_heading": "Historial de campañas",
+        "assignments": {
+          "empty": "Este creador aún no tiene asignaciones de campaña.",
+          "load_failed": "No hemos podido cargar el historial de campañas.",
+          "campaign": "Campaña",
+          "brand": "Marca",
+          "agency": "Agencia",
+          "status": "Estado",
+          "created_at": "Iniciada"
+        },
+        "audit_heading": "Historial de auditoría",
+        "audit": {
+          "empty": "Aún no hay entradas de auditoría para este creador.",
+          "load_failed": "No hemos podido cargar el historial de auditoría.",
+          "action": "Acción",
+          "actor": "Autor",
+          "reason": "Motivo",
+          "created_at": "Cuándo"
+        },
+        "payments_heading": "Historial de pagos",
+        "payments_coming_soon": "El historial de pagos se activará cuando llegue el procesamiento de pagos (Sprint 10).",
+        "load_failed": "No hemos podido cargar este creador. Actualiza la página.",
+        "fields": {
+          "display_name": "Nombre visible",
+          "bio": "Biografía",
+          "country_code": "País",
+          "region": "Región",
+          "primary_language": "Idioma principal",
+          "secondary_languages": "Idiomas secundarios",
+          "categories": "Categorías"
+        },
+        "edit": {
+          "title": "Editar {field}",
+          "save": "Guardar cambios",
+          "cancel": "Cancelar",
+          "reason_label": "Motivo del cambio",
+          "reason_hint": "Obligatorio para campos sensibles. Queda registrado en el registro de auditoría.",
+          "custom_code_hint": "Elige un valor o escribe un código ISO de 2 letras.",
+          "button_aria_label": "Editar {field}",
+          "save_failed": "No hemos podido guardar este cambio. Inténtalo de nuevo.",
+          "saved": "{field} actualizado."
+        },
+        "errors": {
+          "field_status_immutable": "Las transiciones de estado usan las acciones de aprobar/rechazar, no la edición de campos."
+        },
+        "approve": {
+          "button": "Aprobar solicitud",
+          "title": "Aprobar la solicitud de {name}",
+          "description": "Esto marcará al creador como aprobado y le concederá acceso de producción. La acción queda registrada en el registro de auditoría.",
+          "welcome_label": "Mensaje de bienvenida (opcional)",
+          "welcome_hint": "Se mostrará en el panel del creador la próxima vez que inicie sesión.",
+          "confirm": "Aprobar",
+          "cancel": "Cancelar",
+          "success": "Creador aprobado.",
+          "failed": "No hemos podido aprobar a este creador. Inténtalo de nuevo."
+        },
+        "reject": {
+          "button": "Rechazar solicitud",
+          "title": "Rechazar la solicitud de {name}",
+          "description": "El creador verá el motivo en su panel la próxima vez que inicie sesión.",
+          "reason_label": "Motivo del rechazo",
+          "min_hint": "Obligatorio, al menos {count} caracteres.",
+          "confirm": "Rechazar",
+          "cancel": "Cancelar",
+          "success": "Creador rechazado.",
+          "failed": "No hemos podido rechazar a este creador. Inténtalo de nuevo."
+        },
+        "identity": {
+          "heading": "Verificación de identidad",
+          "status": "Estado: {status}",
+          "verify_manual": "Verificar manualmente",
+          "verify_vendor": "Solicitar verificación del proveedor",
+          "vendor_disabled_tooltip": "No hay ningún proveedor de KYC configurado",
+          "method_labels": {
+            "vendor": "Verificada por el proveedor",
+            "manual": "Verificada manualmente por un administrador"
+          }
+        },
+        "verify": {
+          "title": "Verificar manualmente la identidad de {name}",
+          "description": "Esto marca de forma permanente la identidad del creador como verificada y queda registrado a nombre de tu cuenta en el registro de auditoría. Úsalo solo cuando hayas confirmado la identidad por otra vía.",
+          "note_label": "Nota (opcional)",
+          "note_hint": "Queda registrada en el registro de auditoría junto a tu nombre.",
+          "confirm": "Verificar identidad",
+          "cancel": "Cancelar",
+          "success": "Identidad verificada.",
+          "failed": "No hemos podido verificar la identidad de este creador. Inténtalo de nuevo."
+        }
+      }
+    }
+  },
+  "creator": {
+    "already_approved": "Este creador ya se ha aprobado.",
+    "already_rejected": "Este creador ya se ha rechazado.",
+    "kyc_not_verified": "La aprobación está bloqueada hasta que se verifique la identidad del creador.",
+    "kyc_already_verified": "La identidad de este creador ya se ha verificado.",
+    "admin": {
+      "field_status_immutable": "Las transiciones de estado usan las acciones de aprobar/rechazar, no la edición de campos."
+    },
+    "ui": {
+      "wizard": {
+        "steps": {
+          "kyc": {
+            "name": "Verificación de identidad",
+            "status_labels": {
+              "none": "Sin empezar",
+              "pending": "En curso",
+              "verified": "Verificada",
+              "rejected": "Rechazada",
+              "not_required": "No requerida"
+            }
+          },
+          "tax": {
+            "name": "Información fiscal",
+            "status_complete": "Enviada",
+            "status_incomplete": "Aún sin enviar"
+          },
+          "payout": {
+            "name": "Método de pago",
+            "status_set": "Conectado",
+            "status_unset": "Sin conectar"
+          },
+          "contract": {
+            "name": "Acuerdo marco",
+            "status_labels": {
+              "signed": "Firmado",
+              "click_through_accepted": "Aceptado",
+              "none": "Sin empezar"
+            }
+          },
+          "portfolio": {
+            "gallery_empty": "Aún no has subido elementos al portafolio.",
+            "video_badge_label": "Vídeo",
+            "link_badge_label": "Enlace externo",
+            "untitled_item": "Elemento del portafolio sin título"
+          }
+        },
+        "categories": {
+          "fashion": "Moda",
+          "beauty": "Belleza",
+          "lifestyle": "Estilo de vida",
+          "fitness": "Fitness",
+          "travel": "Viajes",
+          "food": "Gastronomía",
+          "tech": "Tecnología",
+          "gaming": "Videojuegos",
+          "music": "Música",
+          "comedy": "Comedia",
+          "education": "Educación",
+          "parenting": "Crianza",
+          "business": "Negocios",
+          "art": "Arte",
+          "sports": "Deportes",
+          "other": "Otra"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Próximamente"
+        }
+      }
+    }
+  }
+}

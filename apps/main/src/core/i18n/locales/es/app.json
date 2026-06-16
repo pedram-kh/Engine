@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Marketing de influencers, gestionado como un negocio de verdad.",
+    "sprint0Notice": "Estructura de Sprint 0 — SPA de la plataforma principal",
+    "locale": {
+      "switcher": "Idioma",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Tema",
+        "light": "Claro",
+        "dark": "Oscuro"
+      }
+    },
+    "messaging": {
+      "title": "Mensajes",
+      "you": "Tú",
+      "participant": "Participante",
+      "composePlaceholder": "Escribe un mensaje…",
+      "send": "Enviar",
+      "attachment": "Adjunto",
+      "empty": "Aún no hay mensajes. Inicia la conversación.",
+      "loadEarlier": "Cargar mensajes anteriores",
+      "loadError": "No hemos podido cargar esta conversación. Se reintentará en breve.",
+      "sendError": "No se ha podido enviar tu mensaje. Inténtalo de nuevo.",
+      "attachmentUploadError": "No se ha podido subir un adjunto. Inténtalo de nuevo.",
+      "closed": "Esta conversación está cerrada: la asignación ya no está activa.",
+      "systemFallback": "La asignación se ha actualizado.",
+      "system": {
+        "assignment": {
+          "contracted": "Se ha firmado el contrato: puede comenzar la producción.",
+          "draft_submitted": "Se ha enviado un borrador para revisión.",
+          "draft_approved": "El borrador se ha aprobado.",
+          "revision_requested": "Se han solicitado revisiones del borrador.",
+          "draft_rejected": "El borrador se ha rechazado.",
+          "posted_by_creator": "El creador ha marcado el contenido como publicado.",
+          "live_verified": "La publicación en directo se ha verificado.",
+          "manually_verified": "La publicación se ha verificado manualmente.",
+          "resubmit_requested": "Se ha solicitado un reenvío.",
+          "payment_released": "Se ha liberado el pago."
+        }
+      },
+      "rollup": {
+        "empty": "Aún no hay hilos de mensajes para esta campaña.",
+        "noMessages": "Aún no hay mensajes.",
+        "loadError": "No hemos podido cargar los hilos de mensajes."
+      }
+    },
+    "nav": {
+      "dashboard": "Panel",
+      "roster": "Mis creadores",
+      "discover": "Descubrir",
+      "pools": "Grupos de talento",
+      "brands": "Marcas",
+      "campaigns": "Campañas",
+      "agencyUsers": "Equipo",
+      "settings": "Configuración"
+    },
+    "discover": {
+      "title": "Descubrir creadores",
+      "subtitle": "Explora y busca en el conjunto global de creadores.",
+      "unnamed": "Creador sin nombre",
+      "notConnected": "Sin conexión",
+      "search": {
+        "label": "Buscar creadores",
+        "placeholder": "Busca por nombre o biografía"
+      },
+      "filters": {
+        "country": "País",
+        "language": "Idioma",
+        "category": "Categoría"
+      },
+      "connection": {
+        "connected": "Conectado",
+        "pending": "Solicitud pendiente",
+        "declined": "Rechazada",
+        "notConnected": "Sin conexión",
+        "sendRequest": "Enviar solicitud",
+        "requestAgain": "Volver a solicitar",
+        "sent": "Solicitud enviada",
+        "reRequested": "Solicitud enviada de nuevo",
+        "alreadyPending": "Ya hay una solicitud pendiente",
+        "alreadyConnected": "Este creador ya está en tu roster",
+        "error": "No se ha podido enviar la solicitud. Inténtalo de nuevo."
+      },
+      "empty": {
+        "heading": "Aún no hay creadores",
+        "body": "Los creadores aprobados aparecerán aquí a medida que crezca el conjunto."
+      },
+      "emptyFiltered": {
+        "heading": "Sin coincidencias",
+        "body": "Ningún creador coincide con tus filtros. Prueba a ampliar la búsqueda."
+      },
+      "errors": {
+        "loadFailed": "No se han podido cargar los creadores. Inténtalo de nuevo."
+      },
+      "detail": {
+        "back": "Volver a Descubrir",
+        "notFound": "Este creador no está disponible.",
+        "loadFailed": "No se ha podido cargar este perfil. Inténtalo de nuevo.",
+        "viewInRoster": "Ver en el roster",
+        "sections": {
+          "profile": "Perfil",
+          "social": "Cuentas sociales",
+          "portfolio": "Portafolio"
+        },
+        "social": {
+          "empty": "No hay cuentas sociales vinculadas."
+        },
+        "portfolio": {
+          "empty": "Aún no hay elementos en el portafolio.",
+          "untitled": "Elemento sin título"
+        }
+      }
+    },
+    "roster": {
+      "title": "Mis creadores",
+      "unnamed": "Creador sin nombre",
+      "blacklisted": "En la lista negra",
+      "blacklist": {
+        "badge": {
+          "hard": "En la lista negra",
+          "soft": "Aviso de lista negra"
+        },
+        "openAction": "Añadir creador a la lista negra",
+        "liftAction": "Quitar de la lista negra",
+        "lifted": "Se ha quitado de la lista negra.",
+        "liftFailed": "No se ha podido quitar de la lista negra.",
+        "section": {
+          "title": "Lista negra",
+          "none": "Tu agencia no tiene a este creador en la lista negra."
+        },
+        "status": {
+          "hard": "En lista negra estricta: excluido de tu descubrimiento y bloqueado para solicitudes de conexión.",
+          "soft": "En lista negra blanda: solo un aviso; el creador sigue siendo emparejable."
+        },
+        "dialog": {
+          "title": "Añadir creador a la lista negra",
+          "scopeLabel": "Alcance",
+          "scope": {
+            "agency": "Toda la agencia",
+            "brand": "Una marca concreta"
+          },
+          "noRelationHint": "La lista negra de toda la agencia requiere un creador conectado.",
+          "brandLabel": "Marca",
+          "typeLabel": "Tipo",
+          "type": {
+            "hard": "Estricta: excluir del descubrimiento y bloquear solicitudes",
+            "soft": "Blanda: solo avisar, mantener emparejable"
+          },
+          "reasonLabel": "Motivo",
+          "reasonPlaceholder": "¿Por qué se añade a este creador a la lista negra? (privado para tu agencia)",
+          "cancel": "Cancelar",
+          "confirm": "Añadir a la lista negra",
+          "success": "Creador añadido a la lista negra.",
+          "invalid": "Completa los campos obligatorios.",
+          "failed": "No se ha podido añadir al creador a la lista negra."
+        }
+      },
+      "fields": {
+        "name": "Nombre",
+        "email": "Correo electrónico",
+        "status": "Estado",
+        "applicationStatus": "Solicitud",
+        "country": "País",
+        "language": "Idioma",
+        "categories": "Categorías",
+        "rating": "Valoración",
+        "campaigns": "Campañas"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Posible creador",
+        "external": "Externo",
+        "pending_request": "Solicitud pendiente",
+        "declined": "Rechazada"
+      },
+      "applicationStatus": {
+        "incomplete": "Incompleta",
+        "pending": "Pendiente",
+        "approved": "Aprobada",
+        "rejected": "Rechazada"
+      },
+      "search": {
+        "label": "Buscar creadores",
+        "placeholder": "Busca por nombre o biografía"
+      },
+      "filters": {
+        "status": {
+          "all": "Todos",
+          "roster": "Roster",
+          "prospect": "Posibles creadores",
+          "external": "Externos",
+          "pending_request": "Solicitudes pendientes",
+          "declined": "Rechazadas"
+        },
+        "country": "País",
+        "language": "Idioma",
+        "category": "Categoría",
+        "availability": {
+          "from": "Disponible desde",
+          "to": "Disponible hasta"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Seguidores"
+        },
+        "engagement": {
+          "label": "Tasa de interacción"
+        },
+        "metrics": {
+          "tooltip": "Las métricas sociales aún no están conectadas."
+        }
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Aún no hay creadores",
+        "body": "Los creadores que invites o contrates aparecerán aquí en tu roster, posibles creadores y colaboradores externos."
+      },
+      "emptyFiltered": {
+        "heading": "Ningún creador coincide con estos filtros",
+        "body": "Prueba a borrar o cambiar un filtro para ver más de tus creadores."
+      },
+      "errors": {
+        "loadFailed": "No se han podido cargar tus creadores. Inténtalo de nuevo."
+      },
+      "detail": {
+        "back": "Volver a mis creadores",
+        "unnamed": "Creador sin nombre",
+        "loadFailed": "No hemos podido cargar este creador. Inténtalo de nuevo.",
+        "notFound": "Este creador no está en tu roster.",
+        "sections": {
+          "profile": "Perfil",
+          "rating": "Valoración y notas",
+          "social": "Cuentas sociales",
+          "metrics": "Métricas sociales",
+          "portfolio": "Portafolio",
+          "availability": "Disponibilidad",
+          "campaigns": "Historial de campañas"
+        },
+        "editor": {
+          "starLabel": "Valora {n} de 5",
+          "ratingUnset": "Sin valorar",
+          "notesLabel": "Notas internas",
+          "notesPlaceholder": "Notas privadas sobre trabajar con este creador (visibles solo para tu agencia).",
+          "notesEmpty": "Aún no hay notas.",
+          "save": "Guardar",
+          "saved": "Cambios guardados.",
+          "saveFailed": "No hemos podido guardar tus cambios. Inténtalo de nuevo."
+        },
+        "social": {
+          "empty": "No hay cuentas sociales conectadas."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Las métricas sociales aparecerán cuando se conecten las cuentas",
+            "body": "El número de seguidores y las tasas de interacción aún no están disponibles; se mostrarán aquí cuando lleguen las integraciones sociales."
+          }
+        },
+        "portfolio": {
+          "empty": "Aún no hay elementos en el portafolio.",
+          "untitled": "Elemento del portafolio sin título"
+        },
+        "availability": {
+          "empty": {
+            "heading": "No hay bloqueos de disponibilidad en este periodo",
+            "body": "Este creador no ha marcado tiempo no disponible para las fechas mostradas."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Aún no hay historial de campañas",
+            "body": "Las campañas que realices con este creador aparecerán aquí."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Cerrar sesión",
+      "signingOut": "Cerrando sesión…"
+    },
+    "workspaceSwitcher": {
+      "label": "Cambiar de espacio de trabajo",
+      "placeholder": "Selecciona un espacio de trabajo"
+    },
+    "brands": {
+      "title": "Marcas",
+      "actions": {
+        "create": "Nueva marca",
+        "edit": "Editar",
+        "archive": "Archivar",
+        "restore": "Restaurar",
+        "save": "Guardar marca",
+        "saving": "Guardando…",
+        "backToList": "Volver a marcas",
+        "backToDetail": "Volver a la marca"
+      },
+      "fields": {
+        "name": "Nombre de la marca",
+        "slug": "Slug",
+        "description": "Descripción",
+        "industry": "Sector",
+        "websiteUrl": "URL del sitio web",
+        "defaultCurrency": "Moneda predeterminada",
+        "defaultLanguage": "Idioma predeterminado",
+        "status": "Estado"
+      },
+      "status": {
+        "active": "Activa",
+        "archived": "Archivada",
+        "all": "Todas"
+      },
+      "detail": {
+        "title": "Detalles de la marca"
+      },
+      "create": {
+        "title": "Nueva marca",
+        "success": "Marca creada correctamente."
+      },
+      "edit": {
+        "title": "Editar marca",
+        "success": "Marca actualizada correctamente."
+      },
+      "archive": {
+        "confirmTitle": "Archivar marca",
+        "confirmMessage": "¿Archivar {name}? Se ocultará de la lista activa, pero podrás restaurarla más tarde.",
+        "confirm": "Archivar",
+        "cancel": "Cancelar",
+        "success": "Marca archivada."
+      },
+      "restore": {
+        "confirmTitle": "Restaurar marca",
+        "confirmMessage": "¿Restaurar {name}? Volverá a aparecer en la lista de marcas activas.",
+        "confirm": "Restaurar",
+        "cancel": "Cancelar",
+        "success": "{name} restaurada."
+      },
+      "empty": {
+        "heading": "Aún no hay marcas",
+        "body": "Crea tu primera marca para empezar a gestionar campañas de influencers.",
+        "cta": "Crear marca"
+      },
+      "emptyFiltered": {
+        "heading": "Ninguna marca coincide con tu filtro",
+        "body": "Prueba a cambiar el filtro de estado de arriba."
+      },
+      "loading": "Cargando marcas…",
+      "errors": {
+        "loadFailed": "No se han podido cargar las marcas.",
+        "saveFailed": "No se ha podido guardar la marca.",
+        "archiveFailed": "No se ha podido archivar la marca.",
+        "restoreFailed": "No se ha podido restaurar la marca."
+      }
+    },
+    "campaigns": {
+      "title": "Campañas",
+      "actions": {
+        "create": "Nueva campaña",
+        "save": "Crear campaña",
+        "saveSettings": "Guardar configuración",
+        "backToList": "Volver a campañas"
+      },
+      "fields": {
+        "name": "Nombre de la campaña",
+        "brand": "Marca",
+        "objective": "Objetivo",
+        "description": "Descripción",
+        "budget": "Presupuesto",
+        "currency": "Moneda",
+        "startsAt": "Fecha de inicio",
+        "endsAt": "Fecha de fin",
+        "targetCreatorCount": "Número objetivo de creadores",
+        "deliverables": "Entregables",
+        "deliverablesHint": "Un entregable por línea (p. ej. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Separados por espacios o comas.",
+        "usageRights": "Derechos de uso",
+        "requiresContract": "Exigir un contrato por campaña",
+        "status": "Estado"
+      },
+      "objective": {
+        "awareness": "Notoriedad",
+        "engagement": "Interacción",
+        "conversion": "Conversión",
+        "ugc": "UGC",
+        "launch": "Lanzamiento"
+      },
+      "status": {
+        "all": "Todas",
+        "draft": "Borrador",
+        "active": "Activa",
+        "paused": "En pausa",
+        "completed": "Completada",
+        "cancelled": "Cancelada"
+      },
+      "filters": {
+        "brand": "Marca",
+        "startsFrom": "Empieza desde",
+        "startsTo": "Empieza hasta"
+      },
+      "tabs": {
+        "overview": "Resumen",
+        "creators": "Creadores",
+        "board": "Tablero",
+        "drafts": "Borradores",
+        "payments": "Pagos",
+        "messages": "Mensajes",
+        "settings": "Configuración"
+      },
+      "create": {
+        "title": "Nueva campaña"
+      },
+      "detail": {
+        "title": "Detalles de la campaña"
+      },
+      "settings": {
+        "saved": "Configuración de la campaña guardada."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Aún no hay creadores",
+          "body": "Invita a creadores a esta campaña para empezar."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Todos los borradores"
+        },
+        "empty": {
+          "heading": "Aún no hay borradores",
+          "body": "Los borradores enviados por los creadores aparecerán aquí una vez enviados."
+        },
+        "loadFailed": "No hemos podido cargar los borradores. Inténtalo de nuevo.",
+        "submittedAt": "Enviado el {date}"
+      },
+      "fees": {
+        "offered": "Ofrecida",
+        "countered": "Contraofertada"
+      },
+      "reinvite": {
+        "action": "Volver a invitar",
+        "title": "Volver a invitar al creador",
+        "body": "Contraofertó con {fee}. Vuelve a ofrecer a:",
+        "feeLabel": "Nueva tarifa acordada ({currency})",
+        "cancel": "Cancelar",
+        "submit": "Volver a invitar",
+        "success": "Nueva invitación enviada."
+      },
+      "contract": {
+        "attach": {
+          "action": "Emitir contrato",
+          "title": "Emitir contrato",
+          "body": "Adjunta las condiciones del contrato para que el creador las revise y acepte antes de poder enviar un borrador.",
+          "titleLabel": "Título del contrato",
+          "termsLabel": "Condiciones (markdown)",
+          "termsHint": "Proporciona condiciones en línea o sube un PDF abajo.",
+          "pdfLabel": "PDF del contrato (opcional)",
+          "pdfReady": "PDF listo: {name}",
+          "cancel": "Cancelar",
+          "submit": "Emitir contrato",
+          "success": "Contrato emitido. Se ha avisado al creador.",
+          "alreadyAttached": "Ya hay un contrato a la espera de la aceptación de este creador.",
+          "error": "No hemos podido emitir el contrato. Inténtalo de nuevo."
+        },
+        "pending": "Contrato enviado: a la espera del creador",
+        "proceedWithout": {
+          "action": "Continuar sin contrato",
+          "success": "Asignación avanzada sin contrato.",
+          "requiredError": "Esta campaña requiere un contrato por campaña; emite uno para que el creador lo acepte.",
+          "error": "No hemos podido avanzar esta asignación. Inténtalo de nuevo."
+        }
+      },
+      "invite": {
+        "open": "Invitar a creadores",
+        "title": "Invitar a creadores",
+        "loadFailed": "No hemos podido cargar tu roster. Inténtalo de nuevo.",
+        "feeLabel": "Tarifa acordada ({currency})",
+        "search": "Buscar creadores",
+        "noRoster": "Aún no hay creadores en el roster para invitar.",
+        "noSearchMatch": "Ningún creador coincide con tu búsqueda.",
+        "unnamed": "Creador sin nombre",
+        "blockedHint": "En la lista negra: no se puede invitar.",
+        "cancel": "Cancelar",
+        "submit": "Invitar ({count})",
+        "summary": "Invitados: {ok}. Omitidos: {blacklisted} (en lista negra), {conflicts} con conflictos.",
+        "conflict": {
+          "title": "Conflicto de disponibilidad",
+          "body": "{count} creador(es) seleccionado(s) no está(n) disponible(s) durante la ventana de la campaña. ¿Invitarlos de todos modos?",
+          "cancel": "Omitirlos",
+          "proceed": "Invitar de todos modos"
+        }
+      },
+      "board": {
+        "loadError": "No hemos podido cargar el tablero. Inténtalo de nuevo.",
+        "empty": "Este tablero aún no tiene columnas.",
+        "moveFailed": "No se ha podido mover la tarjeta: ha vuelto a su sitio.",
+        "reorderFailed": "No se han podido reordenar las columnas: se ha restaurado el orden.",
+        "automationsButton": "Automatizaciones",
+        "card": {
+          "unnamed": "Creador sin nombre",
+          "removed": "Asignación eliminada",
+          "daysLeft": "Quedan {n} d",
+          "dueToday": "Vence hoy",
+          "overdue": "Vencida"
+        },
+        "column": {
+          "add": "Añadir columna",
+          "edit": "Renombrar / recolorear",
+          "delete": "Eliminar columna",
+          "addTitle": "Añadir columna",
+          "editTitle": "Editar columna",
+          "name": "Nombre de la columna",
+          "color": "Color",
+          "terminalSuccess": "Marcar como éxito (terminal)",
+          "terminalFailure": "Marcar como fallo (terminal)",
+          "save": "Guardar",
+          "cancel": "Cancelar",
+          "saveFailed": "No hemos podido guardar la columna. Inténtalo de nuevo.",
+          "deleteTitle": "Eliminar columna",
+          "deleteBody": "¿Eliminar \"{name}\"? Esto no se puede deshacer.",
+          "deleteBodyNonEmpty": "\"{name}\" tiene {count} tarjeta(s). Elige a dónde moverlas antes de eliminar.",
+          "deleteDestination": "Mover tarjetas a",
+          "deleteConfirm": "Eliminar",
+          "errorLastColumn": "Un tablero debe mantener al menos una columna.",
+          "errorDestinationRequired": "Esta columna tiene tarjetas: elige una columna de destino para moverlas antes de eliminar.",
+          "errorGeneric": "No hemos podido eliminar la columna. Inténtalo de nuevo."
+        },
+        "automation": {
+          "title": "Automatizaciones",
+          "subtitle": "Cada evento puede mover una tarjeta a una columna automáticamente. Los arrastres manuales nunca las activan.",
+          "event": "Evento",
+          "target": "Mueve la tarjeta a",
+          "none": "Sin automatización",
+          "enabled": "Activada",
+          "broken": "La columna de destino se eliminó: elige una nueva",
+          "updateFailed": "No hemos podido actualizar la automatización. Inténtalo de nuevo.",
+          "close": "Cerrar"
+        },
+        "drawer": {
+          "title": "Asignación",
+          "close": "Cerrar",
+          "loadError": "No hemos podido cargar esta asignación. Inténtalo de nuevo.",
+          "tabs": {
+            "detail": "Detalle",
+            "history": "Historial de movimientos"
+          },
+          "detail": {
+            "status": "Estado",
+            "creator": "Creador",
+            "postingDue": "Publicación pendiente",
+            "deliverables": "Entregables",
+            "latestDraft": "Último borrador",
+            "postedContent": "Contenido publicado",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Aún no hay movimientos registrados.",
+            "removed": "(eliminada)",
+            "manual": "Movimiento manual",
+            "auto": "Automatización",
+            "from": "de",
+            "to": "a"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Pagos próximamente",
+          "body": "La financiación en depósito de garantía y los pagos se gestionarán aquí."
+        },
+        "messages": {
+          "heading": "Mensajes próximamente",
+          "body": "La mensajería de la campaña aparecerá aquí."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Invitado",
+        "declined": "Rechazada",
+        "countered": "Contraofertada",
+        "accepted": "Aceptada",
+        "contracted": "Con contrato",
+        "producing": "En producción",
+        "draft_submitted": "Borrador enviado",
+        "revision_requested": "Revisión solicitada",
+        "approved": "Aprobado",
+        "rejected": "Rechazado",
+        "posted": "Publicado",
+        "live_verified": "Verificado en directo",
+        "manually_verified": "Verificado manualmente",
+        "payment_held": "Pago retenido",
+        "payment_released": "Pago liberado",
+        "cancelled": "Cancelada"
+      },
+      "review": {
+        "action": "Revisar",
+        "title": "Revisar borrador",
+        "loadFailed": "No hemos podido cargar este borrador. Inténtalo de nuevo.",
+        "draftVersion": "Borrador v{n}",
+        "noCaption": "No se ha proporcionado texto.",
+        "hashtags": "Hashtags",
+        "mentions": "Menciones",
+        "noMedia": "No hay contenido multimedia adjunto.",
+        "feedbackLabel": "Comentarios para el creador",
+        "feedbackHint": "Obligatorio al solicitar cambios o rechazar.",
+        "approve": "Aprobar",
+        "requestRevision": "Solicitar cambios",
+        "reject": "Rechazar",
+        "close": "Cerrar",
+        "history": "Historial de versiones",
+        "postedContent": "Contenido publicado",
+        "draftStatus": {
+          "pending": "Pendiente de revisión",
+          "approved": "Aprobado",
+          "rejected": "Rechazado",
+          "revision_requested": "Revisión solicitada"
+        },
+        "verification": {
+          "pending": "A la espera de verificación",
+          "verified": "Verificado",
+          "not_found": "No encontrado",
+          "mismatch": "No coincide"
+        },
+        "simulated": "Verificación simulada (proveedor de prueba)",
+        "toast": {
+          "approved": "Borrador aprobado.",
+          "revisionRequested": "Revisión solicitada.",
+          "rejected": "Borrador rechazado.",
+          "error": "Algo ha salido mal. Inténtalo de nuevo."
+        },
+        "media": {
+          "video": "Vídeo",
+          "preview": "Abrir vista previa",
+          "close": "Cerrar",
+          "empty": "No hay contenido multimedia adjunto."
+        }
+      },
+      "resolution": {
+        "action": "Resolver",
+        "title": "Resolver verificación",
+        "loadFailed": "No hemos podido cargar esta asignación. Inténtalo de nuevo.",
+        "postedContent": "Publicación enviada",
+        "simulated": "Verificación simulada (proveedor de prueba)",
+        "intro": "La verificación automática de esta publicación ha fallado. Acéptala manualmente, devuélvela para una nueva publicación o pide al creador que corrija el enlace en su sitio.",
+        "verification": {
+          "pending": "A la espera de verificación",
+          "verified": "Verificado",
+          "not_found": "No encontrado",
+          "mismatch": "No coincide"
+        },
+        "noteLabel": "Motivo / nota para el creador",
+        "noteHint": "Obligatorio al verificar manualmente; opcional para las solicitudes de reenvío.",
+        "manuallyVerify": "Verificar manualmente",
+        "requestFresh": "Solicitar nueva publicación",
+        "requestInPlace": "Pedir que se corrija el enlace",
+        "close": "Cerrar",
+        "notActionable": "Esta asignación ya no está a la espera de resolución.",
+        "toast": {
+          "verified": "Publicación verificada manualmente.",
+          "resubmitFresh": "Devuelta para una nueva publicación.",
+          "resubmitInPlace": "Se ha pedido al creador que corrija el enlace.",
+          "error": "Algo ha salido mal. Inténtalo de nuevo."
+        }
+      },
+      "viewPost": {
+        "action": "Ver publicación",
+        "title": "Contenido publicado",
+        "loadFailed": "No hemos podido cargar esta publicación. Inténtalo de nuevo.",
+        "empty": "El creador aún no ha publicado ningún contenido.",
+        "current": "Actual",
+        "postedAt": "Publicado",
+        "verifiedAt": "Verificado",
+        "simulated": "La verificación se ejecuta contra un proveedor simulado en este entorno.",
+        "close": "Cerrar",
+        "verification": {
+          "pending": "A la espera de verificación",
+          "verified": "Verificado",
+          "not_found": "No encontrado",
+          "mismatch": "No coincide"
+        }
+      },
+      "empty": {
+        "heading": "Aún no hay campañas",
+        "body": "Crea tu primera campaña para empezar a colaborar con creadores.",
+        "cta": "Crear campaña"
+      },
+      "errors": {
+        "loadFailed": "No se han podido cargar las campañas.",
+        "saveFailed": "No se ha podido guardar la campaña."
+      }
+    },
+    "pools": {
+      "title": "Grupos de talento",
+      "agencyWide": "De toda la agencia",
+      "actions": {
+        "create": "Nuevo grupo",
+        "edit": "Editar",
+        "archive": "Archivar",
+        "restore": "Restaurar",
+        "save": "Guardar grupo",
+        "backToList": "Volver a grupos de talento",
+        "backToDetail": "Volver al grupo"
+      },
+      "fields": {
+        "name": "Nombre del grupo",
+        "description": "Descripción",
+        "brand": "Marca",
+        "brandHint": "Opcional: etiqueta el grupo para el trabajo de una marca. Déjalo en blanco para un grupo de toda la agencia.",
+        "members": "Miembros"
+      },
+      "status": {
+        "active": "Activo",
+        "archived": "Archivado",
+        "all": "Todos"
+      },
+      "create": {
+        "title": "Nuevo grupo de talento"
+      },
+      "edit": {
+        "title": "Editar grupo de talento"
+      },
+      "detail": {
+        "title": "Detalles del grupo",
+        "notFound": "Este grupo ya no existe.",
+        "membersHeading": "Miembros",
+        "membersEmpty": "Aún no hay creadores en este grupo. Añade creadores desde la página de detalle de un creador.",
+        "memberCount": "{count} creadores",
+        "unnamed": "Creador sin nombre",
+        "remove": "Quitar del grupo",
+        "removed": "{name} se ha quitado del grupo."
+      },
+      "archive": {
+        "confirmTitle": "Archivar grupo",
+        "confirmMessage": "¿Archivar {name}? Se ocultará de la lista activa, pero podrás restaurarlo más tarde con sus miembros intactos.",
+        "confirm": "Archivar",
+        "cancel": "Cancelar"
+      },
+      "restore": {
+        "confirmTitle": "Restaurar grupo",
+        "confirmMessage": "¿Restaurar {name}? Volverá a aparecer en la lista de grupos activos.",
+        "confirm": "Restaurar",
+        "cancel": "Cancelar",
+        "success": "{name} restaurado."
+      },
+      "empty": {
+        "heading": "Aún no hay grupos de talento",
+        "body": "Crea un grupo para agrupar creadores para una marca o un briefing de campaña.",
+        "cta": "Crear grupo"
+      },
+      "emptyFiltered": {
+        "heading": "Ningún grupo coincide con tu filtro",
+        "body": "Prueba a cambiar el filtro de estado de arriba."
+      },
+      "picker": {
+        "openLabel": "Añadir a un grupo",
+        "title": "Añadir a grupos de talento",
+        "empty": "Aún no hay grupos de talento. Crea uno desde la página de Grupos de talento.",
+        "done": "Listo",
+        "added": "Añadido a {name}.",
+        "removed": "Quitado de {name}.",
+        "loadFailed": "No se han podido cargar los grupos de talento.",
+        "toggleFailed": "No se ha podido actualizar la pertenencia al grupo."
+      },
+      "addCreators": {
+        "open": "Añadir creadores",
+        "title": "Añadir creadores a este grupo",
+        "search": "Busca en tu roster",
+        "noRoster": "Tu roster está vacío. Añade primero creadores a tu roster.",
+        "allInPool": "Todos los creadores de tu roster ya están en este grupo.",
+        "noSearchMatch": "Ningún creador del roster coincide con tu búsqueda.",
+        "cancel": "Cancelar",
+        "add": "Añadir {count}",
+        "added": "{count} creadores añadidos al grupo.",
+        "loadFailed": "No se ha podido cargar tu roster.",
+        "addFailed": "No se han podido añadir creadores al grupo.",
+        "confirmHard": {
+          "one": "Tu agencia tiene a {name} en la lista negra. ¿Añadirlo igualmente a este grupo?",
+          "many": "Tu agencia tiene en la lista negra a {count} creadores seleccionados ({names}). ¿Añadirlos igualmente?"
+        }
+      },
+      "errors": {
+        "loadFailed": "No se han podido cargar los grupos de talento.",
+        "membersLoadFailed": "No se han podido cargar los miembros del grupo.",
+        "saveFailed": "No se ha podido guardar el grupo de talento.",
+        "archiveFailed": "No se ha podido archivar el grupo.",
+        "restoreFailed": "No se ha podido restaurar el grupo.",
+        "removeFailed": "No se ha podido quitar al creador del grupo."
+      }
+    },
+    "agencyUsers": {
+      "title": "Equipo",
+      "columns": {
+        "name": "Nombre",
+        "email": "Correo electrónico",
+        "role": "Rol",
+        "status": "Estado",
+        "joinedAt": "Se unió"
+      },
+      "roles": {
+        "agency_admin": "Administrador",
+        "agency_manager": "Gestor",
+        "agency_staff": "Personal"
+      },
+      "status": {
+        "active": "Activo",
+        "pending": "Pendiente"
+      },
+      "members": {
+        "heading": "Miembros actuales"
+      },
+      "filters": {
+        "allRoles": "Todos los roles",
+        "allStatuses": "Todos los estados"
+      },
+      "search": {
+        "label": "Buscar",
+        "placeholder": "Nombre o correo electrónico"
+      },
+      "invitations": {
+        "heading": "Historial de invitaciones",
+        "columns": {
+          "email": "Invitado",
+          "invitedAt": "Invitado el",
+          "invitedBy": "Invitado por"
+        },
+        "status": {
+          "pending": "Pendiente",
+          "accepted": "Aceptada",
+          "expired": "Caducada"
+        },
+        "empty": "Aún no hay invitaciones."
+      },
+      "invite": {
+        "button": "Invitar a un usuario",
+        "title": "Invitar a un miembro del equipo",
+        "fields": {
+          "email": "Dirección de correo electrónico",
+          "role": "Rol"
+        },
+        "submit": "Enviar invitación",
+        "submitting": "Enviando…",
+        "success": "Invitación enviada a {email}.",
+        "errors": {
+          "failed": "No se ha podido enviar la invitación."
+        }
+      },
+      "empty": {
+        "heading": "No hay miembros en el equipo",
+        "body": "Invita a tu primer miembro del equipo para empezar."
+      },
+      "emptyFiltered": "Ningún miembro del equipo coincide con tu filtro.",
+      "errors": {
+        "membersLoadFailed": "No se han podido cargar los miembros del equipo.",
+        "invitationsLoadFailed": "No se ha podido cargar el historial de invitaciones."
+      },
+      "loading": "Cargando equipo…",
+      "bulkInviteCreators": {
+        "button": "Invitar a creadores en bloque"
+      }
+    },
+    "bulkInvite": {
+      "title": "Invitar a creadores en bloque",
+      "description": "Sube un CSV con una columna `email`. Cada fila se convierte en una invitación con enlace mágico. Se aceptan otras columnas, pero se ignoran.",
+      "file": {
+        "label": "Archivo CSV",
+        "hint": "Máximo 5 MB / 1000 filas. La única columna obligatoria es `email`."
+      },
+      "softWarning": "{count} filas es un lote grande; el procesamiento puede tardar unos minutos.",
+      "preview": {
+        "heading": "Filas analizadas ({count})",
+        "row": "Fila",
+        "email": "Correo electrónico",
+        "errorCount": "{count} errores de análisis",
+        "errorHeading": "Estas filas se omitirán:",
+        "errorItem": "Fila {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Enviar invitaciones ({count})",
+        "reset": "Borrar",
+        "startOver": "Enviar otro lote"
+      },
+      "status": {
+        "queued": "En cola: esperando para empezar",
+        "processing": "Procesando invitaciones",
+        "complete": "Todo listo",
+        "failed": "El trabajo ha fallado"
+      },
+      "tracking": {
+        "progress": "{percent}% completado"
+      },
+      "timeout": {
+        "heading": "Seguimos trabajando en esto",
+        "description": "Tus invitaciones están tardando más de lo esperado en procesarse. Puedes volver a intentarlo o consultar más tarde.",
+        "retry": "Inténtalo de nuevo"
+      },
+      "complete": {
+        "heading": "Resultados",
+        "invited": "Invitados",
+        "alreadyInvited": "Ya invitados",
+        "failed": "Fallidos",
+        "failureReason": "Motivo"
+      },
+      "failed": {
+        "heading": "El trabajo de invitación en bloque ha fallado."
+      },
+      "errors": {
+        "submitFailed": "No hemos podido enviar el CSV. Inténtalo de nuevo."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "Te han invitado",
+        "joining": "Te están invitando a unirte a {agencyName} como {role}.",
+        "accept": "Aceptar invitación",
+        "accepting": "Aceptando…",
+        "signInToContinue": "Inicia sesión para aceptar esta invitación",
+        "signIn": "Iniciar sesión",
+        "noAccount": "¿No tienes cuenta?",
+        "signUp": "Crea una ahora",
+        "success": "¡Te damos la bienvenida a {agencyName}! Ahora eres {role}.",
+        "expired": {
+          "heading": "Esta invitación ha caducado",
+          "body": "Contacta con el administrador de tu agencia para solicitar una nueva invitación."
+        },
+        "alreadyAccepted": {
+          "heading": "Invitación ya aceptada",
+          "body": "Esta invitación ya se ha usado. Inicia sesión para acceder a tu espacio de trabajo.",
+          "signIn": "Iniciar sesión"
+        },
+        "alreadyMember": {
+          "heading": "Ya eres miembro",
+          "body": "Ya eres miembro de este espacio de trabajo."
+        },
+        "emailMismatch": {
+          "heading": "Cuenta incorrecta",
+          "body": "Esta invitación se envió a otra dirección de correo. Inicia sesión con la cuenta correcta."
+        },
+        "notFound": {
+          "heading": "Invitación no encontrada",
+          "body": "Este enlace de invitación no es válido o ya se ha usado."
+        },
+        "errors": {
+          "failed": "No se ha podido aceptar la invitación."
+        }
+      }
+    },
+    "settings": {
+      "title": "Configuración de la agencia",
+      "fields": {
+        "defaultCurrency": "Moneda predeterminada",
+        "defaultLanguage": "Idioma predeterminado",
+        "blacklistNotificationPolicy": "Avisar a los creadores cuando se les añade a la lista negra",
+        "blacklistNotificationPolicyHint": "Cuando está activado, se envía un correo al creador si tu agencia lo añade a la lista negra. El motivo nunca se comparte."
+      },
+      "save": "Guardar configuración",
+      "saving": "Guardando…",
+      "success": "Configuración guardada.",
+      "readOnly": "Solo los administradores pueden editar la configuración de la agencia.",
+      "loading": "Cargando configuración…",
+      "errors": {
+        "loadFailed": "No se ha podido cargar la configuración.",
+        "saveFailed": "No se ha podido guardar la configuración."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "Este campo es obligatorio."
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "Búsqueda de usuarios",
+        "subtitle": "Encuentra un usuario para verlo o suplantarlo. Los administradores de la plataforma no se pueden suplantar.",
+        "label": "Busca por nombre, correo o ULID",
+        "empty": "Ningún usuario coincide con esta búsqueda.",
+        "load_failed": "No hemos podido buscar usuarios. Inténtalo de nuevo."
+      },
+      "impersonate": {
+        "button": "Suplantar",
+        "title": "Suplantar a {name}",
+        "warning": "Abrirás una nueva pestaña con la sesión iniciada COMO este usuario. Tu sesión de administrador permanece activa aquí. Cada acción que realices queda registrada a nombre de este usuario, contigo registrado como suplantador, y la sesión caduca automáticamente.",
+        "reason_label": "Motivo de la suplantación",
+        "reason_hint": "Obligatorio, al menos {count} caracteres. Queda registrado en el registro de auditoría.",
+        "confirm": "Iniciar suplantación",
+        "cancel": "Cancelar",
+        "success": "Suplantación de {name} iniciada en una nueva pestaña.",
+        "failed": "No hemos podido iniciar la suplantación. Inténtalo de nuevo."
+      },
+      "impersonation_log": {
+        "title": "Registro de suplantaciones",
+        "subtitle": "Todas las sesiones de suplantación de administrador iniciadas, las más recientes primero.",
+        "empty": "Ninguna sesión de suplantación coincide con estos filtros.",
+        "load_failed": "No hemos podido cargar el registro de suplantaciones. Actualiza la página.",
+        "filters": {
+          "status": "Estado",
+          "search": "Administrador o usuario (nombre, correo, ULID)",
+          "date_from": "Desde",
+          "date_to": "Hasta",
+          "apply": "Aplicar"
+        },
+        "status_filter": {
+          "all": "Todas",
+          "active": "Activas",
+          "ended": "Finalizadas",
+          "expired": "Caducadas"
+        },
+        "statuses": {
+          "active": "Activa",
+          "ended": "Finalizada",
+          "expired": "Caducada"
+        },
+        "fields": {
+          "admin": "Administrador",
+          "impersonated_user": "Usuario suplantado",
+          "reason": "Motivo",
+          "status": "Estado",
+          "started_at": "Iniciada",
+          "ended_at": "Finalizada"
+        },
+        "pagination": {
+          "prev": "Anterior",
+          "next": "Siguiente"
+        }
+      }
+    },
+    "impersonation": {
+      "target_admin": "Los administradores de la plataforma no se pueden suplantar.",
+      "target_self": "No puedes suplantarte a ti mismo.",
+      "already_active": "Ya tienes una suplantación activa. Finalízala antes de iniciar otra.",
+      "invalid_handoff": "Esta transferencia de suplantación no es válida, ya se ha usado o ha caducado."
+    }
+  }
+}

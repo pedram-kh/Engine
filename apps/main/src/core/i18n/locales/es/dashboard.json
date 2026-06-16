@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "welcome": {
+      "greeting": "Bienvenido de nuevo",
+      "greetingNamed": "Bienvenido de nuevo, {name}"
+    },
+    "kpi": {
+      "activeCampaigns": "Campañas activas",
+      "creatorsInRoster": "Creadores en el roster",
+      "pendingApplications": "Solicitudes de creador pendientes",
+      "paymentsDue": "Pagos pendientes"
+    },
+    "activity": {
+      "title": "Actividad reciente",
+      "empty": "Aún no hay actividad reciente.",
+      "loadFailed": "No hemos podido cargar la actividad reciente.",
+      "system": "El sistema",
+      "actions": {
+        "creatorInvited": "{actor} invitó a un creador",
+        "bulkInviteCompleted": "{actor} realizó una invitación masiva ({invited} invitados, {failed} fallidos)",
+        "agencyCreatorRelationCreated": "{actor} añadió un creador al roster",
+        "brandCreated": "{actor} creó una marca",
+        "brandArchived": "{actor} archivó una marca",
+        "brandRestored": "{actor} restauró una marca",
+        "invitationCreated": "{actor} invitó a un miembro del equipo",
+        "invitationAccepted": "{actor} se unió al equipo",
+        "agencySettingsUpdated": "{actor} actualizó la configuración de la agencia",
+        "fallback": "{actor} realizó una acción"
+      }
+    },
+    "errors": {
+      "loadFailed": "No hemos podido cargar tu panel. Inténtalo de nuevo."
+    }
+  }
+}

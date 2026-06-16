@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "compliance": {
+      "shellNotice": "Esta cola está lista, pero aún no está conectada a los datos: el procesamiento de exportaciones y borrados llegará en un sprint posterior.",
+      "load_failed": "No hemos podido cargar esta cola. Actualiza la página.",
+      "fields": {
+        "subject": "Interesado",
+        "status": "Estado",
+        "requested": "Solicitado"
+      },
+      "exports": {
+        "title": "Solicitudes de exportación",
+        "subtitle": "Solicitudes de acceso y portabilidad de los interesados (RGPD art. 15/20).",
+        "empty": "No hay solicitudes de exportación."
+      },
+      "erasures": {
+        "title": "Cola de borrado",
+        "subtitle": "Solicitudes de derecho al olvido pendientes de revisión (RGPD art. 17).",
+        "empty": "No hay solicitudes de borrado."
+      }
+    }
+  }
+}

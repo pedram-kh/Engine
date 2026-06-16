@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Alertas operativas",
+      "subtitle": "Notificaciones operativas y de actividad de auditoría dirigidas a ti.",
+      "empty": "No hay alertas operativas.",
+      "load_failed": "No hemos podido cargar las alertas operativas. Actualiza la página.",
+      "paymentAlerts": {
+        "title": "Alertas de pagos",
+        "body": "Las alertas de financiación y liberación del depósito de garantía se activarán cuando llegue el procesamiento de pagos (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Creador aprobado",
+          "rejected": "Creador rechazado"
+        }
+      }
+    }
+  }
+}

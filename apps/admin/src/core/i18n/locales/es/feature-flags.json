@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "featureFlags": {
+      "title": "Indicadores de funciones",
+      "subtitle": "Conmutadores de activación/desactivación a nivel de plataforma. Cada cambio se audita y tiene efecto de inmediato.",
+      "load_failed": "No hemos podido cargar los indicadores de funciones. Actualiza la página.",
+      "toggle": {
+        "enable_title": "¿Activar {label}?",
+        "disable_title": "¿Desactivar {label}?",
+        "description": "Esto cambia el indicador en toda la plataforma y tiene efecto de inmediato. Se requiere un motivo, que queda registrado en el registro de auditoría.",
+        "reason_label": "Motivo",
+        "reason_hint": "Al menos {count} caracteres; queda registrado junto a este cambio.",
+        "cancel": "Cancelar",
+        "confirm": "Confirmar",
+        "success": "Indicador de función actualizado.",
+        "failed": "No hemos podido actualizar el indicador. Inténtalo de nuevo."
+      }
+    }
+  }
+}

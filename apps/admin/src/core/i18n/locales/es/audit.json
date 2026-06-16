@@ -1,0 +1,27 @@
+{
+  "admin": {
+    "audit": {
+      "title": "Registro de auditoría",
+      "empty": "Ninguna entrada de auditoría coincide con estos filtros.",
+      "load_failed": "No hemos podido cargar el registro de auditoría. Actualiza la página.",
+      "filters": {
+        "action": "Acción",
+        "subject": "ULID del sujeto",
+        "date_from": "Desde",
+        "date_to": "Hasta",
+        "apply": "Aplicar"
+      },
+      "fields": {
+        "action": "Acción",
+        "actor": "Autor",
+        "subject": "Sujeto",
+        "reason": "Motivo",
+        "created_at": "Cuándo"
+      },
+      "pagination": {
+        "prev": "Anterior",
+        "next": "Siguiente"
+      }
+    }
+  }
+}

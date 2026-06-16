@@ -1,0 +1,84 @@
+{
+  "availability": {
+    "title": "Disponibilidad",
+    "subtitle": "Bloquea los momentos en los que no estás disponible para que las agencias vean tu calendario real.",
+    "allDay": "Todo el día",
+    "moreCount": "+{count} más",
+    "dayPopover": {
+      "title": "Bloqueos de este día",
+      "viewAll": "Mostrar todos los bloqueos de este día"
+    },
+    "creatorNav": {
+      "dashboard": "Panel",
+      "assignments": "Invitaciones",
+      "availability": "Disponibilidad"
+    },
+    "nav": {
+      "prevMonth": "Mes anterior",
+      "nextMonth": "Mes siguiente"
+    },
+    "actions": {
+      "add": "Añadir bloqueo"
+    },
+    "empty": {
+      "heading": "Aún no hay bloqueos de disponibilidad",
+      "body": "Añade un bloqueo para indicar cuándo estás ausente o no disponible."
+    },
+    "errors": {
+      "loadFailed": "No hemos podido cargar tu disponibilidad. Inténtalo de nuevo."
+    },
+    "blockType": {
+      "hard": "No disponible (estricto)",
+      "soft": "Preferencia (flexible)"
+    },
+    "kind": {
+      "vacation": "Vacaciones",
+      "personal": "Personal",
+      "exclusive_contract": "Contrato en exclusiva",
+      "assignment_auto": "De una campaña",
+      "other": "Otro"
+    },
+    "weekday": {
+      "MO": "Lun",
+      "TU": "Mar",
+      "WE": "Mié",
+      "TH": "Jue",
+      "FR": "Vie",
+      "SA": "Sáb",
+      "SU": "Dom"
+    },
+    "dialog": {
+      "createTitle": "Añadir bloqueo de disponibilidad",
+      "editTitle": "Editar bloqueo de disponibilidad",
+      "seriesNotice": "Este es un bloqueo repetitivo: los cambios se aplican a todas sus repeticiones, no solo a este día.",
+      "blockTypeHint": "Los bloqueos estrictos te excluyen por completo; los flexibles son solo una preferencia.",
+      "fields": {
+        "allDay": "Todo el día",
+        "startDate": "Fecha de inicio",
+        "startTime": "Hora de inicio",
+        "endDate": "Fecha de fin",
+        "endTime": "Hora de fin",
+        "blockType": "Tipo",
+        "kind": "Motivo",
+        "reason": "Nota (opcional)",
+        "recurring": "Se repite cada semana"
+      },
+      "recurrence": {
+        "interval": "Repetir cada (semanas)",
+        "weekdays": "En estos días",
+        "hasEnd": "Establecer una fecha de fin",
+        "endsOn": "Termina el"
+      },
+      "actions": {
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "confirmDelete": "Confirmar eliminación"
+      },
+      "errors": {
+        "saveFailed": "No hemos podido guardar el bloqueo. Inténtalo de nuevo.",
+        "deleteFailed": "No hemos podido eliminar el bloqueo. Inténtalo de nuevo."
+      }
+    }
+  }
+}

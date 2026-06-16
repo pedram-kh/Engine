@@ -1,0 +1,15 @@
+{
+  "impersonation": {
+    "claim": {
+      "in_progress": "Iniciando sesión de suplantación…",
+      "missing_token": "No se ha proporcionado ningún token de transferencia. Vuelve a iniciar la suplantación desde el panel de administración.",
+      "invalid": "Esta transferencia de suplantación no es válida, ya se ha usado o ha caducado. Vuelve a iniciarla desde el panel de administración.",
+      "failed": "No hemos podido iniciar la sesión de suplantación. Inténtalo de nuevo desde el panel de administración."
+    },
+    "banner": {
+      "message": "Sesión de soporte de administración: estás viendo esta cuenta como el usuario.",
+      "expires_in": "Caduca en {time}",
+      "end": "Finalizar sesión"
+    }
+  }
+}

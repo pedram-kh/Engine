@@ -1,0 +1,63 @@
+{
+  "notifications": {
+    "center": {
+      "title": "Notificaciones",
+      "empty": "Estás al día.",
+      "markAll": "Marcar todo como leído",
+      "viewAll": "Ver todas las notificaciones",
+      "loading": "Cargando…",
+      "error": "No se han podido cargar las notificaciones.",
+      "unreadBadgeLabel": "{count} notificaciones sin leer",
+      "feedbackLabel": "Comentarios",
+      "reasonLabel": "Motivo"
+    },
+    "page": {
+      "title": "Notificaciones",
+      "empty": "Aún no tienes notificaciones."
+    },
+    "types": {
+      "assignment_draft_approved": "Tu borrador para {campaign_name} se ha aprobado.",
+      "assignment_revision_requested": "Se han solicitado cambios en tu borrador para {campaign_name}.",
+      "assignment_draft_rejected": "Tu borrador para {campaign_name} se ha rechazado.",
+      "assignment_manually_verified": "Tu publicación para {campaign_name} se ha verificado.",
+      "assignment_draft_submitted": "{creator_name} ha enviado un borrador para {campaign_name}.",
+      "assignment_contracted": "{creator_name} ha aceptado el contrato para {campaign_name}.",
+      "creator_approved": "Tu cuenta de creador se ha aprobado.",
+      "creator_rejected": "Tu solicitud de creador no se ha aprobado.",
+      "message_received_by_creator": "{sender_name} te ha enviado un mensaje sobre {campaign_name}.",
+      "message_received_by_agency": "{sender_name} ha enviado un mensaje sobre {campaign_name}.",
+      "fallback": "Tienes una nueva notificación."
+    },
+    "preferences": {
+      "title": "Configuración de notificaciones",
+      "description": "Elige qué notificaciones dentro de la aplicación quieres recibir.",
+      "menuItem": "Configuración de notificaciones",
+      "save": "Guardar cambios",
+      "saving": "Guardando…",
+      "success": "Se ha guardado tu configuración de notificaciones.",
+      "loadError": "No se ha podido cargar tu configuración de notificaciones.",
+      "saveError": "No se ha podido guardar tu configuración de notificaciones. Inténtalo de nuevo.",
+      "groups": {
+        "assignment": "Asignaciones",
+        "creator": "Cuenta de creador",
+        "messaging": "Mensajes"
+      },
+      "channels": {
+        "in_app": "En la aplicación",
+        "digest": "Resumen diario por correo"
+      },
+      "typeLabels": {
+        "assignment_draft_submitted": "Se envía un borrador para revisión",
+        "assignment_contracted": "Se acepta un contrato",
+        "assignment_revision_requested": "Se solicitan cambios en un borrador",
+        "assignment_draft_approved": "Se aprueba un borrador",
+        "assignment_draft_rejected": "Se rechaza un borrador",
+        "assignment_manually_verified": "Se verifica una publicación",
+        "creator_approved": "Se aprueba una cuenta de creador",
+        "creator_rejected": "Se rechaza una solicitud de creador",
+        "message_received_by_creator": "Un nuevo mensaje de la agencia",
+        "message_received_by_agency": "Un nuevo mensaje del creador"
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "operations": {
+      "health": {
+        "title": "Estado del sistema",
+        "heading": "Estado de los servicios",
+        "load_failed": "No hemos podido cargar la comprobación de estado. Actualiza la página.",
+        "status": {
+          "ok": "Correcto",
+          "degraded": "Degradado"
+        },
+        "checks": {
+          "database": "Base de datos",
+          "cache": "Caché"
+        }
+      }
+    }
+  }
+}

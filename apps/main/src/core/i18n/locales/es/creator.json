@@ -1,0 +1,416 @@
+{
+  "creator": {
+    "not_found": "No hay ningún perfil de creador asociado a tu cuenta. Cierra sesión y vuelve a iniciarla, o contacta con soporte.",
+    "already_approved": "Este creador ya se ha aprobado.",
+    "already_rejected": "Este creador ya se ha rechazado.",
+    "kyc_not_verified": "Hay que verificar la identidad de este creador antes de poder aprobar la solicitud.",
+    "kyc_already_verified": "La identidad de este creador ya se ha verificado.",
+    "admin": {
+      "field_status_immutable": "El estado de la solicitud no se puede cambiar desde este formulario. Usa las acciones de aprobar o rechazar."
+    },
+    "social": {
+      "invalid_platform": "Esa plataforma social no es compatible."
+    },
+    "wizard": {
+      "feature_disabled": "Este paso no está disponible por ahora mientras se aplica un cambio de configuración. Sáltalo para continuar con tu solicitud.",
+      "feature_enabled": "Esta opción no está disponible en este momento; usa el flujo estándar para este paso.",
+      "incomplete": "Aún no puedes enviar tu solicitud: uno o más pasos del asistente siguen incompletos."
+    },
+    "reopen": {
+      "invalid_state": "Solo se puede reabrir una solicitud rechazada."
+    },
+    "ui": {
+      "wizard": {
+        "title": "Configura tu perfil de creador",
+        "subtitle": "Unos pocos pasos para presentarte ante las marcas.",
+        "progress": {
+          "step_of": "Paso {current} de {total}",
+          "completed": "Completado",
+          "current": "Paso actual",
+          "skipped": "Omitido",
+          "pending": "Sin empezar"
+        },
+        "actions": {
+          "save": "Guardar",
+          "save_and_continue": "Guardar y continuar",
+          "back": "Atrás",
+          "skip_for_now": "Omitir por ahora",
+          "save_and_exit": "Guardar y salir",
+          "submit_for_approval": "Enviar para aprobación",
+          "continue_from_here": "Continuar desde aquí",
+          "edit_step": "Editar paso",
+          "review_and_submit": "Revisar y enviar",
+          "connect": "Conectar",
+          "update": "Actualizar",
+          "remove": "Eliminar"
+        },
+        "skipped": {
+          "label": "Omitido",
+          "explanation": "Este paso no es obligatorio en este momento. Un administrador revisará tu solicitud sin él."
+        },
+        "save_status": {
+          "saving": "Guardando…",
+          "saved": "Guardado",
+          "error": "No se ha podido guardar; inténtalo de nuevo."
+        },
+        "steps": {
+          "profile": {
+            "name": "Datos del perfil",
+            "title": "Cuéntanos sobre ti",
+            "description": "Tu nombre visible, tu biografía, tu foto y las categorías en las que creas."
+          },
+          "social": {
+            "name": "Cuentas sociales",
+            "title": "Conecta tus cuentas sociales",
+            "description": "Conecta al menos una plataforma para que las marcas vean tu alcance."
+          },
+          "portfolio": {
+            "name": "Portafolio",
+            "title": "Muestra tu mejor trabajo",
+            "description": "Sube hasta 10 elementos (vídeos, imágenes o enlaces externos) que representen tu estilo.",
+            "gallery_heading": "Tu portafolio",
+            "gallery_empty": "Aún no has subido elementos al portafolio.",
+            "gallery_remove": "Eliminar elemento",
+            "gallery_status": "La galería del portafolio contiene {count} elemento(s).",
+            "video_badge_label": "Vídeo",
+            "link_badge_label": "Enlace externo",
+            "untitled_item": "Elemento del portafolio sin título",
+            "preview_label": "Abrir vista previa",
+            "preview_close": "Cerrar vista previa"
+          },
+          "kyc": {
+            "name": "Verificación de identidad",
+            "title": "Verifica tu identidad",
+            "description": "Una comprobación rápida con nuestro socio de verificación. Obligatoria para los pagos.",
+            "skipped_title": "Verificación de identidad omitida",
+            "skipped_explanation": "La verificación de identidad no es obligatoria en este momento.",
+            "current_status": "Estado:",
+            "begin_button": "Comenzar verificación",
+            "status_labels": {
+              "none": "Sin empezar",
+              "pending": "En curso",
+              "verified": "Verificada",
+              "rejected": "Rechazada",
+              "not_required": "Omitida"
+            }
+          },
+          "tax": {
+            "name": "Información fiscal",
+            "title": "Formulario fiscal",
+            "description": "Necesitamos un formulario fiscal para los pagos, incluso antes del primero.",
+            "current_status": "Estado:",
+            "status_complete": "Enviado",
+            "status_incomplete": "Aún sin enviar",
+            "on_file_title": "Información fiscal registrada",
+            "on_file_body": "Tus datos fiscales se guardan de forma segura. Por tu privacidad no los mostramos de nuevo; elige Actualizar para volver a introducirlos.",
+            "update_button": "Actualizar información fiscal"
+          },
+          "payout": {
+            "name": "Método de pago",
+            "title": "Configura los pagos",
+            "description": "Conecta una cuenta de Stripe Express para recibir pagos.",
+            "skipped_title": "Configuración de pagos omitida",
+            "skipped_explanation": "La configuración de pagos no es obligatoria en este momento.",
+            "current_status": "Estado:",
+            "begin_button": "Configurar pagos",
+            "status_set": "Conectada",
+            "status_unset": "Sin conectar"
+          },
+          "contract": {
+            "name": "Acuerdo marco",
+            "title": "Firma el acuerdo marco",
+            "description": "Nuestro acuerdo estándar para creadores cubre las colaboraciones con marcas en la plataforma.",
+            "skipped_explanation": "La firma del contrato no es obligatoria en este momento; acepta las condiciones de aceptación rápida de abajo.",
+            "click_through_label": "He leído y acepto estas condiciones.",
+            "click_through_help": "Lee el acuerdo de arriba y marca la casilla para continuar.",
+            "terms_version": "Acuerdo Marco de Creador v{version}",
+            "current_status": "Estado:",
+            "begin_button": "Abrir el acuerdo para firmar",
+            "status_labels": {
+              "signed": "Firmado",
+              "click_through_accepted": "Aceptado",
+              "none": "Sin empezar"
+            },
+            "accepted_title": "Acuerdo aceptado",
+            "accepted_body": "Has aceptado el acuerdo marco. Continúa con el siguiente paso."
+          },
+          "account_created": {
+            "name": "Cuenta creada"
+          },
+          "review": {
+            "name": "Revisar y enviar",
+            "title": "Revisa tu solicitud",
+            "description": "Tómate un momento para revisarlo todo antes de enviar.",
+            "completeness": "{percent}% completado",
+            "edit_step": "Editar",
+            "submit_button": "Enviar solicitud",
+            "incomplete_blocker": "Tienes 1 paso incompleto: {names}. Haz clic en Editar para terminarlo antes de enviar. | Tienes {count} pasos incompletos: {names}. Haz clic en Editar en cada uno para terminarlos antes de enviar."
+          }
+        },
+        "fields": {
+          "display_name": "Nombre visible",
+          "display_name_help": "Cómo te verán las marcas: tu alias o nombre artístico.",
+          "bio": "Biografía",
+          "bio_help": "Una breve presentación. Puedes usar **negrita**, *cursiva* y [enlaces](https://example.com).",
+          "avatar": "Foto de perfil",
+          "avatar_drop": "Arrastra una foto aquí o haz clic para elegir. JPG, PNG o WebP de hasta 5 MB.",
+          "country": "País",
+          "region": "Región o ciudad",
+          "primary_language": "Idioma principal",
+          "secondary_languages": "Otros idiomas",
+          "categories": "Categorías",
+          "categories_help": "Elige las categorías que mejor describen lo que creas.",
+          "avatar_required": "Se necesita una foto de perfil para terminar este paso.",
+          "step_requirements_hint": "Añade una foto de perfil y al menos una categoría para continuar.",
+          "social_handle": "Nombre de usuario",
+          "social_handle_hint": "Introduce solo tu nombre de usuario, sin el símbolo {'@'} ni la URL completa del perfil.",
+          "social_handle_invalid": "Introduce un nombre de usuario válido: de 2 a 30 letras, números, puntos, guiones bajos o guiones (sin espacios, {'@'} ni URLs).",
+          "social_profile_url": "URL del perfil",
+          "portfolio_title": "Título",
+          "portfolio_description": "Descripción",
+          "portfolio_external_url": "URL externa (opcional)",
+          "tax_form_type": "Formulario fiscal",
+          "legal_name": "Nombre legal",
+          "tax_id": "NIF",
+          "address_country": "País",
+          "address_city": "Ciudad",
+          "address_postal_code": "Código postal",
+          "address_street": "Calle"
+        },
+        "categories": {
+          "fashion": "Moda",
+          "beauty": "Belleza",
+          "lifestyle": "Estilo de vida",
+          "fitness": "Fitness",
+          "travel": "Viajes",
+          "food": "Gastronomía",
+          "tech": "Tecnología",
+          "gaming": "Videojuegos",
+          "music": "Música",
+          "comedy": "Comedia",
+          "education": "Educación",
+          "parenting": "Crianza",
+          "business": "Negocios",
+          "art": "Arte",
+          "sports": "Deportes",
+          "other": "Otra"
+        },
+        "tax_form_types": {
+          "eu_self_employed": "UE — autónomo",
+          "eu_company": "UE — empresa",
+          "uk_self_employed": "Reino Unido — autónomo",
+          "uk_company": "Reino Unido — empresa"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Próximamente"
+        },
+        "vendor_bounce": {
+          "waiting_title": "Casi listo…",
+          "waiting_description": "Estamos esperando una respuesta de nuestro socio. Esto suele tardar menos de un minuto.",
+          "timeout_title": "Seguimos esperando a nuestro socio",
+          "timeout_description": "Está tardando más de lo esperado. Puedes volver a intentarlo o contactar con soporte.",
+          "retry": "Inténtalo de nuevo",
+          "contact_support": "Contactar con soporte"
+        },
+        "welcome_back": {
+          "title": "Bienvenido de nuevo",
+          "subtitle": "Estuviste aquí por última vez {time_ago}. Retoma donde lo dejaste.",
+          "first_time_title": "Vamos a empezar",
+          "first_time_subtitle": "Te damos la bienvenida a Catalyst. Vamos a configurar tu perfil de creador: solo te llevará unos minutos.",
+          "first_time_prompt": "Empieza con {step} para presentarte ante las marcas.",
+          "next_step_prompt": "Estás en el paso {step}. Continúa aquí o vuelve atrás para editar un paso anterior.",
+          "all_complete_prompt": "Buena pinta: has completado todos los pasos. ¿Listo para enviar?",
+          "continue_button": "Continuar a {step_name}",
+          "review_button": "Revisar y enviar"
+        }
+      },
+      "dashboard": {
+        "title": "Tu solicitud",
+        "greeting": "Hola, {name}.",
+        "completeness": "{percent}% completado",
+        "submitted_at": "Enviada el {datetime}",
+        "submitted": {
+          "heading": "Solicitud enviada",
+          "description": "Tu perfil está en revisión. Te avisaremos en un plazo de 3 días laborables.",
+          "completeness_label": "Completitud del perfil",
+          "last_updated": "Última actualización {time_ago}"
+        },
+        "pending_review": {
+          "title": "Solicitud en revisión",
+          "description": "Tu solicitud está en nuestra cola. Te avisaremos en un plazo de 3 días laborables."
+        },
+        "approved": {
+          "title": "Te damos la bienvenida a Catalyst",
+          "heading": "Estás aprobado",
+          "description": "Estás aprobado para recibir colaboraciones con marcas. El panel completo del creador llegará pronto."
+        },
+        "rejected": {
+          "title": "Solicitud no aprobada",
+          "heading": "La solicitud necesita cambios",
+          "description": "Revisa las notas de abajo, actualiza tu solicitud y vuelve a enviarla para otra revisión.",
+          "reason_label": "Motivo:",
+          "edit_profile": "Editar perfil",
+          "resubmit": "Actualizar y reenviar",
+          "resubmit_failed": "No hemos podido reabrir tu solicitud. Inténtalo de nuevo."
+        },
+        "incomplete": {
+          "title": "Continúa tu solicitud",
+          "description": "Retoma donde lo dejaste: tu progreso en el asistente está guardado."
+        },
+        "requests": {
+          "title": "Solicitudes de conexión",
+          "sent": "Enviada el {date}",
+          "sent_unknown": "Enviada recientemente",
+          "accept": "Aceptar",
+          "decline": "Rechazar",
+          "empty": {
+            "title": "No hay solicitudes de conexión",
+            "body": "Cuando una agencia te invite a conectar, aparecerá aquí."
+          },
+          "toast": {
+            "accepted": "Ya estás conectado con {agency}.",
+            "declined": "Solicitud rechazada.",
+            "error": "Algo ha salido mal. Inténtalo de nuevo."
+          }
+        },
+        "assignments": {
+          "title": "Invitaciones a campañas",
+          "pending": "Tienes {count} invitación(es) esperando tu respuesta.",
+          "none": "No hay invitaciones esperando tu respuesta.",
+          "cta": "Ver invitaciones"
+        }
+      },
+      "assignments": {
+        "title": "Invitaciones a campañas",
+        "subtitle": "Acepta, rechaza o contraoferta la tarifa en las campañas a las que te han invitado.",
+        "fee": "Tarifa",
+        "youCountered": "has contraofertado",
+        "accept": "Aceptar",
+        "counter": "Contraofertar",
+        "decline": "Rechazar",
+        "view": "Ver",
+        "detail": {
+          "back": "Volver a las invitaciones",
+          "notFound": "No se ha podido encontrar esta asignación.",
+          "loadFailed": "No hemos podido cargar esta asignación. Inténtalo de nuevo.",
+          "retry": "Reintentar",
+          "awaitingReview": "Tu borrador se ha enviado y está a la espera de la revisión de la agencia.",
+          "awaitingVerification": "Tu publicación se ha registrado y está a la espera de verificación.",
+          "resubmitInPlace": {
+            "title": "No hemos podido verificar tu publicación",
+            "intro": "La verificación automática de tu publicación ha fallado. Comprueba que el enlace es correcto y apunta a tu publicación publicada, y luego vuelve a enviarlo abajo.",
+            "url": "URL de la publicación",
+            "submit": "Reenviar enlace",
+            "toast": "Enlace reenviado: lo volveremos a comprobar en breve."
+          },
+          "contract": {
+            "title": "Contrato de la campaña",
+            "viewPdf": "Ver el contrato (PDF)",
+            "accept": "Aceptar el contrato",
+            "awaitingAgency": "La agencia enviará un contrato para que lo revises y aceptes. Te avisaremos cuando esté listo; vuelve aquí entonces.",
+            "signingDisabled": "La firma de contratos aún no está activada. La agencia te contactará cuando sea el momento de continuar.",
+            "toast": {
+              "accepted": "Contrato aceptado. Ya puedes enviar tu borrador."
+            }
+          },
+          "revision": {
+            "title": "Revisión solicitada",
+            "noFeedback": "La agencia ha solicitado cambios. Vuelve a enviar un borrador actualizado."
+          },
+          "draft": {
+            "submitTitle": "Envía tu borrador",
+            "resubmitTitle": "Reenvía tu borrador",
+            "caption": "Texto",
+            "hashtags": "Hashtags",
+            "hashtagsHint": "Sepáralos con espacios o comas",
+            "mentions": "Menciones",
+            "mentionsHint": "Sepáralas con espacios o comas",
+            "media": "Contenido multimedia",
+            "submit": "Enviar borrador",
+            "resubmit": "Reenviar borrador",
+            "mediaStatus": {
+              "uploading": "Subiendo…",
+              "done": "Subido",
+              "error": "La subida ha fallado"
+            }
+          },
+          "posted": {
+            "title": "Marcar como publicado",
+            "platform": "Plataforma",
+            "url": "URL de la publicación",
+            "submit": "Enviar publicación",
+            "summaryTitle": "Contenido publicado"
+          },
+          "history": {
+            "title": "Historial de borradores",
+            "version": "Versión {n}"
+          },
+          "reviewStatus": {
+            "pending": "Pendiente de revisión",
+            "approved": "Aprobado",
+            "rejected": "Rechazado",
+            "revision_requested": "Revisión solicitada"
+          },
+          "verificationStatus": {
+            "pending": "Verificación pendiente",
+            "verified": "Verificada",
+            "not_found": "No encontrada",
+            "mismatch": "No coincide"
+          },
+          "toast": {
+            "draftSubmitted": "Borrador enviado.",
+            "posted": "Publicación registrada.",
+            "error": "Algo ha salido mal. Inténtalo de nuevo."
+          }
+        },
+        "window": {
+          "range": "{start} – {end}",
+          "unset": "Fechas por confirmar"
+        },
+        "empty": {
+          "title": "No hay invitaciones a campañas",
+          "body": "Cuando una agencia te invite a una campaña, aparecerá aquí."
+        },
+        "toast": {
+          "accepted": "Invitación aceptada.",
+          "countered": "Contraoferta enviada.",
+          "declined": "Invitación rechazada.",
+          "error": "Algo ha salido mal. Inténtalo de nuevo."
+        },
+        "counterDialog": {
+          "title": "Contraofertar la tarifa",
+          "body": "Propón una tarifa distinta para esta campaña. La agencia puede volver a ofertar o retirarse.",
+          "feeLabel": "Tu tarifa ({currency})",
+          "cancel": "Cancelar",
+          "submit": "Enviar contraoferta"
+        }
+      },
+      "upload": {
+        "avatar_prompt": "Arrastra una foto aquí o haz clic para elegir",
+        "avatar_preview_alt": "Vista previa de la foto de perfil",
+        "size_hint": "{types} · hasta {max_mb} MB",
+        "portfolio_prompt": "Arrastra archivos aquí o haz clic para elegir",
+        "portfolio_size_hint": "Imágenes de hasta {image_mb} MB · vídeos de hasta {video_mb} MB",
+        "portfolio_slots_remaining": "{remaining} espacios restantes",
+        "portfolio_queue_status": "{in_flight} de {total} subiéndose (hasta {concurrency} a la vez).",
+        "uploading": "Subiendo…",
+        "remove": "Eliminar",
+        "remove_avatar": "Eliminar foto",
+        "remove_portfolio_item_label": "Eliminar {name}",
+        "status_pending": "Esperando…",
+        "status_uploading": "Subiendo…",
+        "status_done": "Subido",
+        "status_error": "Fallido"
+      },
+      "errors": {
+        "upload_too_large": "Este archivo es demasiado grande. El tamaño máximo es {max_mb} MB.",
+        "upload_wrong_type": "Este tipo de archivo no es compatible. Usa {allowed_types}.",
+        "upload_failed": "La subida ha fallado. Inténtalo de nuevo.",
+        "portfolio_max_reached": "Puedes subir hasta {max} elementos al portafolio."
+      }
+    }
+  }
+}
