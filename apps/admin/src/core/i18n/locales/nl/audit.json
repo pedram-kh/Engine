@@ -1,0 +1,27 @@
+{
+  "admin": {
+    "audit": {
+      "title": "Auditlogboek",
+      "empty": "Geen auditregistraties komen overeen met deze filters.",
+      "load_failed": "Het auditlogboek kon niet worden geladen. Ververs de pagina.",
+      "filters": {
+        "action": "Actie",
+        "subject": "Onderwerp-ULID",
+        "date_from": "Van",
+        "date_to": "Tot",
+        "apply": "Toepassen"
+      },
+      "fields": {
+        "action": "Actie",
+        "actor": "Actor",
+        "subject": "Onderwerp",
+        "reason": "Reden",
+        "created_at": "Wanneer"
+      },
+      "pagination": {
+        "prev": "Vorige",
+        "next": "Volgende"
+      }
+    }
+  }
+}

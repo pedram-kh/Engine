@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Bureaus",
+        "search_label": "Bureaus zoeken",
+        "load_failed": "Bureaus konden niet worden geladen. Ververs de pagina.",
+        "empty": "Geen bureau komt overeen met dit filter.",
+        "filters": {
+          "all": "Alle",
+          "active": "Actief",
+          "suspended": "Opgeschort"
+        },
+        "fields": {
+          "name": "Bureau",
+          "status": "Status",
+          "members": "Leden",
+          "tier": "Niveau",
+          "created_at": "Aangemaakt"
+        },
+        "status_labels": {
+          "active": "Actief",
+          "suspended": "Opgeschort"
+        },
+        "view": "Bureau bekijken"
+      },
+      "detail": {
+        "fallback_title": "Bureau",
+        "load_failed": "Dit bureau kon niet worden geladen. Ververs de pagina.",
+        "overview_heading": "Overzicht",
+        "suspension_heading": "Opschorting",
+        "fields": {
+          "slug": "Slug",
+          "country": "Land",
+          "tier": "Abonnementsniveau",
+          "subscription_status": "Abonnementsstatus",
+          "members": "Leden",
+          "created_at": "Aangemaakt",
+          "suspended_at": "Opgeschort op",
+          "suspended_reason": "Reden"
+        },
+        "active_state": "Dit bureau is actief. Zijn gebruikers kunnen normaal inloggen.",
+        "suspended_state": "Dit bureau is opgeschort. Al zijn gebruikers zijn geblokkeerd voor inloggen."
+      },
+      "suspend": {
+        "button": "Bureau opschorten",
+        "title": "{name} opschorten",
+        "description": "Het opschorten van dit bureau blokkeert AL zijn gebruikers voor inloggen. Dit wordt vastgelegd in het auditlogboek.",
+        "reason_label": "Reden voor opschorting",
+        "reason_hint": "Vereist, minimaal {count} tekens. Wordt vastgelegd in het auditlogboek.",
+        "confirm": "Opschorten",
+        "cancel": "Annuleren",
+        "success": "Bureau opgeschort.",
+        "failed": "Dit bureau kon niet worden opgeschort. Probeer het opnieuw."
+      },
+      "reactivate": {
+        "button": "Bureau reactiveren",
+        "title": "{name} reactiveren",
+        "description": "Het reactiveren van dit bureau herstelt de inlogmogelijkheid voor al zijn gebruikers. Dit wordt vastgelegd in het auditlogboek.",
+        "confirm": "Reactiveren",
+        "cancel": "Annuleren",
+        "success": "Bureau gereactiveerd.",
+        "failed": "Dit bureau kon niet worden gereactiveerd. Probeer het opnieuw."
+      }
+    }
+  }
+}

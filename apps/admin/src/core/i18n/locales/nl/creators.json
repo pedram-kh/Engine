@@ -1,0 +1,228 @@
+{
+  "admin": {
+    "creators": {
+      "list": {
+        "title": "Creator-beoordelingswachtrij",
+        "unnamed": "Naamloze creator",
+        "view": "Creator bekijken",
+        "load_failed": "De beoordelingswachtrij kon niet worden geladen. Ververs de pagina.",
+        "fields": {
+          "name": "Creator",
+          "email": "E-mail",
+          "status": "Status",
+          "kyc": "KYC",
+          "completeness": "Volledigheid",
+          "submitted_at": "Ingediend"
+        },
+        "filters": {
+          "pending": "In behandeling",
+          "approved": "Goedgekeurd",
+          "rejected": "Afgewezen",
+          "incomplete": "Onvolledig",
+          "all": "Alle"
+        },
+        "status_labels": {
+          "incomplete": "Onvolledig",
+          "pending": "In behandeling",
+          "approved": "Goedgekeurd",
+          "rejected": "Afgewezen"
+        }
+      },
+      "kyc": {
+        "title": "KYC-beoordelingswachtrij",
+        "empty": "Geen creators komen overeen met dit KYC-filter.",
+        "load_failed": "De KYC-wachtrij kon niet worden geladen. Ververs de pagina.",
+        "filters": {
+          "pending": "In behandeling",
+          "verified": "Geverifieerd",
+          "rejected": "Afgewezen",
+          "none": "Niet gestart",
+          "all": "Alle"
+        }
+      },
+      "all": {
+        "title": "Alle creators",
+        "empty": "Nog geen creators.",
+        "load_failed": "Creators konden niet worden geladen. Ververs de pagina."
+      },
+      "detail": {
+        "fallback_title": "Creator",
+        "application_status": "Aanmeldingsstatus: {status}",
+        "completeness": "{percent}% volledig",
+        "rejection_heading": "Afwijzingsnotities",
+        "profile_heading": "Profiel",
+        "social_heading": "Sociale accounts",
+        "portfolio_heading": "Portfolio",
+        "onboarding_heading": "Onboardingstatus",
+        "kyc_history_heading": "KYC-verificatiehistorie",
+        "kyc_history": {
+          "provider": "Provider",
+          "status": "Status",
+          "started_at": "Gestart op",
+          "completed_at": "Voltooid op"
+        },
+        "assignments_heading": "Campagnehistorie",
+        "assignments": {
+          "empty": "Deze creator heeft nog geen campagneopdrachten.",
+          "load_failed": "De campagnehistorie kon niet worden geladen.",
+          "campaign": "Campagne",
+          "brand": "Merk",
+          "agency": "Bureau",
+          "status": "Status",
+          "created_at": "Gestart"
+        },
+        "audit_heading": "Audithistorie",
+        "audit": {
+          "empty": "Nog geen auditregistraties voor deze creator.",
+          "load_failed": "De audithistorie kon niet worden geladen.",
+          "action": "Actie",
+          "actor": "Actor",
+          "reason": "Reden",
+          "created_at": "Wanneer"
+        },
+        "payments_heading": "Betalingshistorie",
+        "payments_coming_soon": "De betalingshistorie verschijnt wanneer betalingsverwerking beschikbaar komt (Sprint 10).",
+        "load_failed": "Deze creator kon niet worden geladen. Ververs de pagina.",
+        "fields": {
+          "display_name": "Weergavenaam",
+          "bio": "Bio",
+          "country_code": "Land",
+          "region": "Regio",
+          "primary_language": "Primaire taal",
+          "secondary_languages": "Overige talen",
+          "categories": "Categorieën"
+        },
+        "edit": {
+          "title": "{field} bewerken",
+          "save": "Wijzigingen opslaan",
+          "cancel": "Annuleren",
+          "reason_label": "Reden voor wijziging",
+          "reason_hint": "Vereist voor gevoelige velden. Wordt vastgelegd in het auditlogboek.",
+          "custom_code_hint": "Kies een waarde of typ een 2-letterige ISO-code.",
+          "button_aria_label": "{field} bewerken",
+          "save_failed": "Deze wijziging kon niet worden opgeslagen. Probeer het opnieuw.",
+          "saved": "{field} bijgewerkt."
+        },
+        "errors": {
+          "field_status_immutable": "Statusovergangen gebruiken de goedkeurings-/afwijsacties, niet de veldbewerkingen."
+        },
+        "approve": {
+          "button": "Aanmelding goedkeuren",
+          "title": "Aanmelding van {name} goedkeuren",
+          "description": "Hiermee wordt de creator goedgekeurd en krijgt productietoegang. De actie wordt vastgelegd in het auditlogboek.",
+          "welcome_label": "Welkomstbericht (optioneel)",
+          "welcome_hint": "Wordt weergegeven op het dashboard van de creator de volgende keer dat hij/zij inlogt.",
+          "confirm": "Goedkeuren",
+          "cancel": "Annuleren",
+          "success": "Creator goedgekeurd.",
+          "failed": "Deze creator kon niet worden goedgekeurd. Probeer het opnieuw."
+        },
+        "reject": {
+          "button": "Aanmelding afwijzen",
+          "title": "Aanmelding van {name} afwijzen",
+          "description": "De creator ziet de reden op zijn/haar dashboard de volgende keer dat hij/zij inlogt.",
+          "reason_label": "Afwijzingsreden",
+          "min_hint": "Vereist, minimaal {count} tekens.",
+          "confirm": "Afwijzen",
+          "cancel": "Annuleren",
+          "success": "Creator afgewezen.",
+          "failed": "Deze creator kon niet worden afgewezen. Probeer het opnieuw."
+        },
+        "identity": {
+          "heading": "Identiteitsverificatie",
+          "status": "Status: {status}",
+          "verify_manual": "Handmatig verifiëren",
+          "verify_vendor": "Leveranciersverificatie aanvragen",
+          "vendor_disabled_tooltip": "Geen KYC-provider geconfigureerd",
+          "method_labels": {
+            "vendor": "Geverifieerd door leverancier",
+            "manual": "Handmatig geverifieerd door een admin"
+          }
+        },
+        "verify": {
+          "title": "Identiteit van {name} handmatig verifiëren",
+          "description": "Dit markeert de identiteit van de creator permanent als geverifieerd en wordt vastgelegd in het auditlogboek. Gebruik dit alleen als je de identiteit buiten het systeem hebt bevestigd.",
+          "note_label": "Notitie (optioneel)",
+          "note_hint": "Wordt vastgelegd in het auditlogboek samen met je naam.",
+          "confirm": "Identiteit verifiëren",
+          "cancel": "Annuleren",
+          "success": "Identiteit geverifieerd.",
+          "failed": "De identiteit van deze creator kon niet worden geverifieerd. Probeer het opnieuw."
+        }
+      }
+    }
+  },
+  "creator": {
+    "already_approved": "Deze creator is al goedgekeurd.",
+    "already_rejected": "Deze creator is al afgewezen.",
+    "kyc_not_verified": "Goedkeuring is geblokkeerd totdat de identiteit van de creator is geverifieerd.",
+    "kyc_already_verified": "De identiteit van deze creator is al geverifieerd.",
+    "admin": {
+      "field_status_immutable": "Statusovergangen gebruiken de goedkeurings-/afwijsacties, niet de veldbewerkingen."
+    },
+    "ui": {
+      "wizard": {
+        "steps": {
+          "kyc": {
+            "name": "Identiteitsverificatie",
+            "status_labels": {
+              "none": "Niet gestart",
+              "pending": "Bezig",
+              "verified": "Geverifieerd",
+              "rejected": "Afgewezen",
+              "not_required": "Niet vereist"
+            }
+          },
+          "tax": {
+            "name": "Belastinginformatie",
+            "status_complete": "Ingediend",
+            "status_incomplete": "Nog niet ingediend"
+          },
+          "payout": {
+            "name": "Uitbetalingsmethode",
+            "status_set": "Verbonden",
+            "status_unset": "Niet verbonden"
+          },
+          "contract": {
+            "name": "Raamovereenkomst",
+            "status_labels": {
+              "signed": "Ondertekend",
+              "click_through_accepted": "Geaccepteerd",
+              "none": "Niet gestart"
+            }
+          },
+          "portfolio": {
+            "gallery_empty": "Nog geen portfolio-items geüpload.",
+            "video_badge_label": "Video",
+            "link_badge_label": "Externe link",
+            "untitled_item": "Naamloos portfolio-item"
+          }
+        },
+        "categories": {
+          "fashion": "Mode",
+          "beauty": "Beauty",
+          "lifestyle": "Lifestyle",
+          "fitness": "Fitness",
+          "travel": "Reizen",
+          "food": "Eten",
+          "tech": "Technologie",
+          "gaming": "Gaming",
+          "music": "Muziek",
+          "comedy": "Comedy",
+          "education": "Onderwijs",
+          "parenting": "Ouderschap",
+          "business": "Business",
+          "art": "Kunst",
+          "sports": "Sport",
+          "other": "Overig"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Binnenkort beschikbaar"
+        }
+      }
+    }
+  }
+}

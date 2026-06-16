@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "load_failed": "Het dashboard kon niet worden geladen. Ververs de pagina.",
+      "kpi": {
+        "agencies_total": "Bureaus",
+        "agencies_suspended": "Opgeschorte bureaus",
+        "creators_pending_approval": "Openstaande goedkeuringen",
+        "creators_pending_kyc": "KYC-wachtrij",
+        "queue_pending": "Taken in wachtrij",
+        "queue_failed": "Mislukte taken",
+        "open_disputes": "Openstaande geschillen",
+        "failed_payments_today": "Mislukte betalingen vandaag"
+      },
+      "activity": {
+        "heading": "Recente activiteit",
+        "empty": "Nog geen recente activiteit."
+      }
+    }
+  }
+}

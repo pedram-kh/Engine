@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "operations": {
+      "health": {
+        "title": "Systeemstatus",
+        "heading": "Dienststatus",
+        "load_failed": "De statuscontrole kon niet worden geladen. Ververs de pagina.",
+        "status": {
+          "ok": "Gezond",
+          "degraded": "Verslechterd"
+        },
+        "checks": {
+          "database": "Database",
+          "cache": "Cache"
+        }
+      }
+    }
+  }
+}

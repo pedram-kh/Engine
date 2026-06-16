@@ -1,0 +1,66 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "Gebruikerszoeken",
+        "subtitle": "Zoek een gebruiker om te bekijken of te imiteren. Platformbeheerders kunnen niet worden geïmiteerd.",
+        "label": "Zoek op naam, e-mail of ULID",
+        "empty": "Geen gebruikers komen overeen met deze zoekopdracht.",
+        "load_failed": "Gebruikerszoeken mislukt. Probeer het opnieuw."
+      },
+      "impersonate": {
+        "button": "Imiteren",
+        "title": "{name} imiteren",
+        "warning": "Je opent een nieuw tabblad ingelogd ALS deze gebruiker. Je adminsessie blijft hier actief. Elke actie wordt vastgelegd tegen deze gebruiker en jij wordt geregistreerd als imitator. De sessie verloopt automatisch.",
+        "reason_label": "Reden voor imitatie",
+        "reason_hint": "Vereist, minimaal {count} tekens. Wordt vastgelegd in het auditlogboek.",
+        "confirm": "Imitatie starten",
+        "cancel": "Annuleren",
+        "success": "Imitatie van {name} gestart in een nieuw tabblad.",
+        "failed": "De imitatie kon niet worden gestart. Probeer het opnieuw."
+      },
+      "impersonation_log": {
+        "title": "Imitatielogboek",
+        "subtitle": "Alle ooit gestarte admin-imitatiesessies, nieuwste eerst.",
+        "empty": "Geen imitatiesessies komen overeen met deze filters.",
+        "load_failed": "Het imitatielogboek kon niet worden geladen. Ververs de pagina.",
+        "filters": {
+          "status": "Status",
+          "search": "Admin of gebruiker (naam, e-mail, ULID)",
+          "date_from": "Van",
+          "date_to": "Tot",
+          "apply": "Toepassen"
+        },
+        "status_filter": {
+          "all": "Alle",
+          "active": "Actief",
+          "ended": "Beëindigd",
+          "expired": "Verlopen"
+        },
+        "statuses": {
+          "active": "Actief",
+          "ended": "Beëindigd",
+          "expired": "Verlopen"
+        },
+        "fields": {
+          "admin": "Admin",
+          "impersonated_user": "Geïmiteerde gebruiker",
+          "reason": "Reden",
+          "status": "Status",
+          "started_at": "Gestart",
+          "ended_at": "Beëindigd"
+        },
+        "pagination": {
+          "prev": "Vorige",
+          "next": "Volgende"
+        }
+      }
+    },
+    "impersonation": {
+      "target_admin": "Platformbeheerders kunnen niet worden geïmiteerd.",
+      "target_self": "Je kunt jezelf niet imiteren.",
+      "already_active": "Je hebt al een actieve imitatie. Beëindig deze voordat je een nieuwe start.",
+      "invalid_handoff": "Deze imitatieoverdracht is ongeldig, al gebruikt of verlopen."
+    }
+  }
+}

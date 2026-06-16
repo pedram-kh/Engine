@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "featureFlags": {
+      "title": "Functievlaggen",
+      "subtitle": "Platform-brede aan/uit-schakelaars. Elke wijziging wordt geauditeerd en treedt onmiddellijk in werking.",
+      "load_failed": "De functievlaggen konden niet worden geladen. Ververs de pagina.",
+      "toggle": {
+        "enable_title": "{label} inschakelen?",
+        "disable_title": "{label} uitschakelen?",
+        "description": "Dit schakelt de vlag platform-breed om en treedt onmiddellijk in werking. Een reden is vereist en wordt vastgelegd in het auditlogboek.",
+        "reason_label": "Reden",
+        "reason_hint": "Minimaal {count} tekens — wordt vastgelegd tegen deze wijziging.",
+        "cancel": "Annuleren",
+        "confirm": "Bevestigen",
+        "success": "Functievlag bijgewerkt.",
+        "failed": "De vlag kon niet worden bijgewerkt. Probeer het opnieuw."
+      }
+    }
+  }
+}

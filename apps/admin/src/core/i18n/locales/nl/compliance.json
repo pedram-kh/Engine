@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "compliance": {
+      "shellNotice": "Deze wachtrij is klaar maar nog niet gekoppeld aan data — export- en verwijderingsverwerking verschijnt in een later sprint.",
+      "load_failed": "Deze wachtrij kon niet worden geladen. Ververs de pagina.",
+      "fields": {
+        "subject": "Betrokkene",
+        "status": "Status",
+        "requested": "Aangevraagd"
+      },
+      "exports": {
+        "title": "Exportverzoeken",
+        "subtitle": "Verzoeken van betrokkenen voor inzage en overdraagbaarheid (AVG art. 15/20).",
+        "empty": "Geen exportverzoeken."
+      },
+      "erasures": {
+        "title": "Verwijderingswachtrij",
+        "subtitle": "Verzoeken om te worden vergeten die wachten op beoordeling (AVG art. 17).",
+        "empty": "Geen verwijderingsverzoeken."
+      }
+    }
+  }
+}

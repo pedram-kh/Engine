@@ -1,0 +1,63 @@
+{
+  "notifications": {
+    "center": {
+      "title": "Meldingen",
+      "empty": "Je bent helemaal bij.",
+      "markAll": "Alles als gelezen markeren",
+      "viewAll": "Alle meldingen bekijken",
+      "loading": "Laden…",
+      "error": "Meldingen konden niet worden geladen.",
+      "unreadBadgeLabel": "{count} ongelezen meldingen",
+      "feedbackLabel": "Feedback",
+      "reasonLabel": "Reden"
+    },
+    "page": {
+      "title": "Meldingen",
+      "empty": "Je hebt nog geen meldingen."
+    },
+    "types": {
+      "assignment_draft_approved": "Je concept voor {campaign_name} is goedgekeurd.",
+      "assignment_revision_requested": "Wijzigingen zijn gevraagd voor je concept van {campaign_name}.",
+      "assignment_draft_rejected": "Je concept voor {campaign_name} is afgewezen.",
+      "assignment_manually_verified": "Je post voor {campaign_name} is geverifieerd.",
+      "assignment_draft_submitted": "{creator_name} heeft een concept ingediend voor {campaign_name}.",
+      "assignment_contracted": "{creator_name} heeft het contract voor {campaign_name} geaccepteerd.",
+      "creator_approved": "Je creator-account is goedgekeurd.",
+      "creator_rejected": "Je creator-aanmelding is niet goedgekeurd.",
+      "message_received_by_creator": "{sender_name} heeft je een bericht gestuurd over {campaign_name}.",
+      "message_received_by_agency": "{sender_name} heeft een bericht gestuurd over {campaign_name}.",
+      "fallback": "Je hebt een nieuwe melding."
+    },
+    "preferences": {
+      "title": "Meldingsinstellingen",
+      "description": "Kies welke in-app meldingen je wilt ontvangen.",
+      "menuItem": "Meldingsinstellingen",
+      "save": "Wijzigingen opslaan",
+      "saving": "Opslaan…",
+      "success": "Je meldingsinstellingen zijn opgeslagen.",
+      "loadError": "Je meldingsinstellingen konden niet worden geladen.",
+      "saveError": "Je meldingsinstellingen konden niet worden opgeslagen. Probeer het opnieuw.",
+      "groups": {
+        "assignment": "Opdrachten",
+        "creator": "Creator-account",
+        "messaging": "Berichten"
+      },
+      "channels": {
+        "in_app": "In de app",
+        "digest": "Dagelijkse e-mailsamenvatting"
+      },
+      "typeLabels": {
+        "assignment_draft_submitted": "Een concept wordt ingediend ter beoordeling",
+        "assignment_contracted": "Een contract wordt geaccepteerd",
+        "assignment_revision_requested": "Wijzigingen worden gevraagd voor een concept",
+        "assignment_draft_approved": "Een concept wordt goedgekeurd",
+        "assignment_draft_rejected": "Een concept wordt afgewezen",
+        "assignment_manually_verified": "Een post wordt geverifieerd",
+        "creator_approved": "Een creator-account wordt goedgekeurd",
+        "creator_rejected": "Een creator-aanmelding wordt afgewezen",
+        "message_received_by_creator": "Een nieuw bericht van het bureau",
+        "message_received_by_agency": "Een nieuw bericht van de creator"
+      }
+    }
+  }
+}

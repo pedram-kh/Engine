@@ -1,0 +1,15 @@
+{
+  "impersonation": {
+    "claim": {
+      "in_progress": "Imitatiesessie wordt gestart…",
+      "missing_token": "Er is geen overdrachtstoken opgegeven. Start de imitatie opnieuw via het adminpaneel.",
+      "invalid": "Deze imitatieoverdracht is ongeldig, al gebruikt of verlopen. Start opnieuw via het adminpaneel.",
+      "failed": "We konden de imitatiesessie niet starten. Probeer het opnieuw via het adminpaneel."
+    },
+    "banner": {
+      "message": "Admin-ondersteuningssessie — je bekijkt dit account als de gebruiker.",
+      "expires_in": "Verloopt over {time}",
+      "end": "Sessie beëindigen"
+    }
+  }
+}

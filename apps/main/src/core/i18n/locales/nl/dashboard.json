@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "welcome": {
+      "greeting": "Welkom terug",
+      "greetingNamed": "Welkom terug, {name}"
+    },
+    "kpi": {
+      "activeCampaigns": "Actieve campagnes",
+      "creatorsInRoster": "Creators in roster",
+      "pendingApplications": "Openstaande creator-aanmeldingen",
+      "paymentsDue": "Openstaande betalingen"
+    },
+    "activity": {
+      "title": "Recente activiteit",
+      "empty": "Nog geen recente activiteit.",
+      "loadFailed": "Recente activiteit kon niet worden geladen.",
+      "system": "Het systeem",
+      "actions": {
+        "creatorInvited": "{actor} heeft een creator uitgenodigd",
+        "bulkInviteCompleted": "{actor} heeft een bulkuitnodiging uitgevoerd ({invited} uitgenodigd, {failed} mislukt)",
+        "agencyCreatorRelationCreated": "{actor} heeft een creator aan het roster toegevoegd",
+        "brandCreated": "{actor} heeft een merk aangemaakt",
+        "brandArchived": "{actor} heeft een merk gearchiveerd",
+        "brandRestored": "{actor} heeft een merk hersteld",
+        "invitationCreated": "{actor} heeft een teamlid uitgenodigd",
+        "invitationAccepted": "{actor} is lid geworden van het team",
+        "agencySettingsUpdated": "{actor} heeft de bureau-instellingen bijgewerkt",
+        "fallback": "{actor} heeft een actie uitgevoerd"
+      }
+    },
+    "errors": {
+      "loadFailed": "Je dashboard kon niet worden geladen. Probeer het opnieuw."
+    }
+  }
+}

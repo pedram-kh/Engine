@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Admin",
+    "subtitle": "Super-adminconsole.",
+    "sprint0Notice": "Sprint 0 scaffolding — admin-SPA",
+    "dashboardPlaceholder": "Admin-dashboardplaatshouder — volledig oppervlak verschijnt in een later sprint.",
+    "env": {
+      "local": "Lokaal",
+      "staging": "Staging",
+      "production": "Productie — alle acties worden gelogd"
+    },
+    "nav": {
+      "comingSoon": "Binnenkort",
+      "dashboard": "Dashboard",
+      "agencies": "Bureaus",
+      "creators": "Creators",
+      "creatorApprovals": "Openstaande goedkeuringen",
+      "kycQueue": "KYC-wachtrij",
+      "allCreators": "Alle creators",
+      "payments": "Betalingen",
+      "disputes": "Geschillen",
+      "recentPayments": "Recent",
+      "audit": "Auditlogboek",
+      "alerts": "Operationele meldingen",
+      "support": "Support",
+      "userSearch": "Gebruikerszoeken",
+      "impersonationLog": "Imitatielogboek",
+      "operations": "Operaties",
+      "systemHealth": "Systeemstatus",
+      "horizon": "Achtergrondtaken …",
+      "compliance": "Compliance",
+      "exportRequests": "Exportverzoeken",
+      "erasureQueue": "Verwijderingswachtrij",
+      "featureFlags": "Functievlaggen"
+    },
+    "userMenu": {
+      "signOut": "Uitloggen",
+      "signingOut": "Bezig met uitloggen…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Binnenkort beschikbaar",
+      "body": "Dit oppervlak wordt actief wanneer betalingsverwerking beschikbaar komt (Sprint 10).",
+      "disputes": "Geschillen",
+      "recentPayments": "Recente betalingen"
+    },
+    "sectionStub": {
+      "body": "Dit admin-oppervlak wordt in dit sprint gebouwd."
+    },
+    "locale": {
+      "switcher": "Taal",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Thema",
+        "light": "Licht",
+        "dark": "Donker"
+      }
+    }
+  }
+}

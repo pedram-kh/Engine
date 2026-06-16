@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Influencer-marketing, geleid als een echt bedrijf.",
+    "sprint0Notice": "Sprint 0 scaffolding — hoofd-platform-SPA",
+    "locale": {
+      "switcher": "Taal",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Thema",
+        "light": "Licht",
+        "dark": "Donker"
+      }
+    },
+    "messaging": {
+      "title": "Berichten",
+      "you": "Jij",
+      "participant": "Deelnemer",
+      "composePlaceholder": "Schrijf een bericht…",
+      "send": "Versturen",
+      "attachment": "Bijlage",
+      "empty": "Nog geen berichten. Begin het gesprek.",
+      "loadEarlier": "Eerdere berichten laden",
+      "loadError": "Dit gesprek kon niet worden geladen. Er wordt binnenkort opnieuw geprobeerd.",
+      "sendError": "Je bericht kon niet worden verstuurd. Probeer het opnieuw.",
+      "attachmentUploadError": "Een bijlage kon niet worden geüpload. Probeer het opnieuw.",
+      "closed": "Dit gesprek is gesloten — de opdracht is niet meer actief.",
+      "systemFallback": "De opdracht is bijgewerkt.",
+      "system": {
+        "assignment": {
+          "contracted": "Het contract is ondertekend — de productie kan beginnen.",
+          "draft_submitted": "Een concept is ingediend ter beoordeling.",
+          "draft_approved": "Het concept is goedgekeurd.",
+          "revision_requested": "Er zijn wijzigingen gevraagd voor het concept.",
+          "draft_rejected": "Het concept is afgewezen.",
+          "posted_by_creator": "De creator heeft de content als geplaatst gemarkeerd.",
+          "live_verified": "De live post is geverifieerd.",
+          "manually_verified": "De post is handmatig geverifieerd.",
+          "resubmit_requested": "Er is een herindienst gevraagd.",
+          "payment_released": "De betaling is vrijgegeven."
+        }
+      },
+      "rollup": {
+        "empty": "Nog geen berichtenthreads voor deze campagne.",
+        "noMessages": "Nog geen berichten.",
+        "loadError": "De berichtenthreads konden niet worden geladen."
+      }
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "roster": "Mijn creators",
+      "discover": "Ontdekken",
+      "pools": "Talentpools",
+      "brands": "Merken",
+      "campaigns": "Campagnes",
+      "agencyUsers": "Team",
+      "settings": "Instellingen"
+    },
+    "discover": {
+      "title": "Creators ontdekken",
+      "subtitle": "Blader door en zoek in de wereldwijde creatorpool.",
+      "unnamed": "Naamloze creator",
+      "notConnected": "Niet verbonden",
+      "search": {
+        "label": "Creators zoeken",
+        "placeholder": "Zoek op naam of bio"
+      },
+      "filters": {
+        "country": "Land",
+        "language": "Taal",
+        "category": "Categorie"
+      },
+      "connection": {
+        "connected": "Verbonden",
+        "pending": "Verzoek in behandeling",
+        "declined": "Geweigerd",
+        "notConnected": "Niet verbonden",
+        "sendRequest": "Verzoek sturen",
+        "requestAgain": "Opnieuw verzoeken",
+        "sent": "Verzoek verstuurd",
+        "reRequested": "Verzoek opnieuw verstuurd",
+        "alreadyPending": "Er is al een verzoek in behandeling",
+        "alreadyConnected": "Deze creator staat al in je roster",
+        "error": "Verzoek kon niet worden verstuurd. Probeer het opnieuw."
+      },
+      "empty": {
+        "heading": "Nog geen creators",
+        "body": "Goedgekeurde creators verschijnen hier naarmate de pool groeit."
+      },
+      "emptyFiltered": {
+        "heading": "Geen overeenkomsten",
+        "body": "Geen creators komen overeen met je filters. Probeer je zoekopdracht te verbreden."
+      },
+      "errors": {
+        "loadFailed": "Creators konden niet worden geladen. Probeer het opnieuw."
+      },
+      "detail": {
+        "back": "Terug naar Ontdekken",
+        "notFound": "Deze creator is niet beschikbaar.",
+        "loadFailed": "Dit profiel kon niet worden geladen. Probeer het opnieuw.",
+        "viewInRoster": "Bekijken in roster",
+        "sections": {
+          "profile": "Profiel",
+          "social": "Sociale accounts",
+          "portfolio": "Portfolio"
+        },
+        "social": {
+          "empty": "Geen sociale accounts gekoppeld."
+        },
+        "portfolio": {
+          "empty": "Nog geen portfolio-items.",
+          "untitled": "Naamloos item"
+        }
+      }
+    },
+    "roster": {
+      "title": "Mijn creators",
+      "unnamed": "Naamloze creator",
+      "blacklisted": "Geblokkeerd",
+      "blacklist": {
+        "badge": {
+          "hard": "Geblokkeerd",
+          "soft": "Blokkeringswaarschuwing"
+        },
+        "openAction": "Creator blokkeren",
+        "liftAction": "Blokkering opheffen",
+        "lifted": "Blokkering opgeheven.",
+        "liftFailed": "Blokkering kon niet worden opgeheven.",
+        "section": {
+          "title": "Blokkeerlijst",
+          "none": "Deze creator is niet geblokkeerd door je bureau."
+        },
+        "status": {
+          "hard": "Hard geblokkeerd — uitgesloten van je ontdekking en geblokkeerd voor verbindingsverzoeken.",
+          "soft": "Zacht geblokkeerd — alleen een waarschuwing; de creator blijft vindbaar."
+        },
+        "dialog": {
+          "title": "Creator blokkeren",
+          "scopeLabel": "Bereik",
+          "scope": {
+            "agency": "Volledig bureau",
+            "brand": "Een specifiek merk"
+          },
+          "noRelationHint": "Bureau-brede blokkering vereist een verbonden creator.",
+          "brandLabel": "Merk",
+          "typeLabel": "Type",
+          "type": {
+            "hard": "Hard — uitsluiten van ontdekking en verzoeken blokkeren",
+            "soft": "Zacht — alleen waarschuwen, vindbaar houden"
+          },
+          "reasonLabel": "Reden",
+          "reasonPlaceholder": "Waarom wordt deze creator geblokkeerd? (alleen zichtbaar voor je bureau)",
+          "cancel": "Annuleren",
+          "confirm": "Blokkeren",
+          "success": "Creator geblokkeerd.",
+          "invalid": "Vul de verplichte velden in.",
+          "failed": "Creator kon niet worden geblokkeerd."
+        }
+      },
+      "fields": {
+        "name": "Naam",
+        "email": "E-mail",
+        "status": "Status",
+        "applicationStatus": "Aanmelding",
+        "country": "Land",
+        "language": "Taal",
+        "categories": "Categorieën",
+        "rating": "Beoordeling",
+        "campaigns": "Campagnes"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Prospect",
+        "external": "Extern",
+        "pending_request": "Verzoek in behandeling",
+        "declined": "Geweigerd"
+      },
+      "applicationStatus": {
+        "incomplete": "Onvolledig",
+        "pending": "In behandeling",
+        "approved": "Goedgekeurd",
+        "rejected": "Afgewezen"
+      },
+      "search": {
+        "label": "Creators zoeken",
+        "placeholder": "Zoek op naam of bio"
+      },
+      "filters": {
+        "status": {
+          "all": "Alle",
+          "roster": "Roster",
+          "prospect": "Prospects",
+          "external": "Extern",
+          "pending_request": "Openstaande verzoeken",
+          "declined": "Geweigerd"
+        },
+        "country": "Land",
+        "language": "Taal",
+        "category": "Categorie",
+        "availability": {
+          "from": "Beschikbaar vanaf",
+          "to": "Beschikbaar tot"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Volgers"
+        },
+        "engagement": {
+          "label": "Engagementrate"
+        },
+        "metrics": {
+          "tooltip": "Sociale statistieken zijn nog niet gekoppeld."
+        }
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Nog geen creators",
+        "body": "Creators die je uitnodigt of engageert, verschijnen hier in je roster, prospects en externe medewerkers."
+      },
+      "emptyFiltered": {
+        "heading": "Geen creators komen overeen met deze filters",
+        "body": "Probeer een filter te verwijderen of te wijzigen om meer creators te zien."
+      },
+      "errors": {
+        "loadFailed": "Je creators konden niet worden geladen. Probeer het opnieuw."
+      },
+      "detail": {
+        "back": "Terug naar mijn creators",
+        "unnamed": "Naamloze creator",
+        "loadFailed": "Deze creator kon niet worden geladen. Probeer het opnieuw.",
+        "notFound": "Deze creator staat niet in je roster.",
+        "sections": {
+          "profile": "Profiel",
+          "rating": "Beoordeling & notities",
+          "social": "Sociale accounts",
+          "metrics": "Sociale statistieken",
+          "portfolio": "Portfolio",
+          "availability": "Beschikbaarheid",
+          "campaigns": "Campagnehistorie"
+        },
+        "editor": {
+          "starLabel": "{n} van 5 sterren",
+          "ratingUnset": "Niet beoordeeld",
+          "notesLabel": "Interne notities",
+          "notesPlaceholder": "Privénotities over de samenwerking met deze creator (alleen zichtbaar voor je bureau).",
+          "notesEmpty": "Nog geen notities.",
+          "save": "Opslaan",
+          "saved": "Wijzigingen opgeslagen.",
+          "saveFailed": "Je wijzigingen konden niet worden opgeslagen. Probeer het opnieuw."
+        },
+        "social": {
+          "empty": "Geen sociale accounts gekoppeld."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Sociale statistieken verschijnen zodra accounts zijn gekoppeld",
+            "body": "Volgersaantallen en engagementrates zijn nog niet beschikbaar — ze verschijnen hier zodra de sociale integraties beschikbaar zijn."
+          }
+        },
+        "portfolio": {
+          "empty": "Nog geen portfolio-items.",
+          "untitled": "Naamloos portfolio-item"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Geen beschikbaarheidsblokken in deze periode",
+            "body": "Deze creator heeft voor de weergegeven datums geen onbeschikbare tijd ingevoerd."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Nog geen campagnehistorie",
+            "body": "Campagnes die je met deze creator uitvoert, verschijnen hier."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Uitloggen",
+      "signingOut": "Bezig met uitloggen…"
+    },
+    "workspaceSwitcher": {
+      "label": "Werkruimte wisselen",
+      "placeholder": "Werkruimte selecteren"
+    },
+    "brands": {
+      "title": "Merken",
+      "actions": {
+        "create": "Nieuw merk",
+        "edit": "Bewerken",
+        "archive": "Archiveren",
+        "restore": "Herstellen",
+        "save": "Merk opslaan",
+        "saving": "Opslaan…",
+        "backToList": "Terug naar merken",
+        "backToDetail": "Terug naar merk"
+      },
+      "fields": {
+        "name": "Merknaam",
+        "slug": "Slug",
+        "description": "Beschrijving",
+        "industry": "Sector",
+        "websiteUrl": "Website-URL",
+        "defaultCurrency": "Standaardvaluta",
+        "defaultLanguage": "Standaardtaal",
+        "status": "Status"
+      },
+      "status": {
+        "active": "Actief",
+        "archived": "Gearchiveerd",
+        "all": "Alle"
+      },
+      "detail": {
+        "title": "Merkdetails"
+      },
+      "create": {
+        "title": "Nieuw merk",
+        "success": "Merk succesvol aangemaakt."
+      },
+      "edit": {
+        "title": "Merk bewerken",
+        "success": "Merk succesvol bijgewerkt."
+      },
+      "archive": {
+        "confirmTitle": "Merk archiveren",
+        "confirmMessage": "{name} archiveren? Het wordt verborgen in de actieve lijst maar kan later worden hersteld.",
+        "confirm": "Archiveren",
+        "cancel": "Annuleren",
+        "success": "Merk gearchiveerd."
+      },
+      "restore": {
+        "confirmTitle": "Merk herstellen",
+        "confirmMessage": "{name} herstellen? Het verschijnt weer in de actieve merkenlijst.",
+        "confirm": "Herstellen",
+        "cancel": "Annuleren",
+        "success": "{name} hersteld."
+      },
+      "empty": {
+        "heading": "Nog geen merken",
+        "body": "Maak je eerste merk aan om influencer-campagnes te beheren.",
+        "cta": "Merk aanmaken"
+      },
+      "emptyFiltered": {
+        "heading": "Geen merken komen overeen met je filter",
+        "body": "Probeer het statusfilter hierboven te wijzigen."
+      },
+      "loading": "Merken laden…",
+      "errors": {
+        "loadFailed": "Merken konden niet worden geladen.",
+        "saveFailed": "Merk kon niet worden opgeslagen.",
+        "archiveFailed": "Merk kon niet worden gearchiveerd.",
+        "restoreFailed": "Merk kon niet worden hersteld."
+      }
+    },
+    "campaigns": {
+      "title": "Campagnes",
+      "actions": {
+        "create": "Nieuwe campagne",
+        "save": "Campagne aanmaken",
+        "saveSettings": "Instellingen opslaan",
+        "backToList": "Terug naar campagnes"
+      },
+      "fields": {
+        "name": "Campagnenaam",
+        "brand": "Merk",
+        "objective": "Doel",
+        "description": "Beschrijving",
+        "budget": "Budget",
+        "currency": "Valuta",
+        "startsAt": "Startdatum",
+        "endsAt": "Einddatum",
+        "targetCreatorCount": "Doelantal creators",
+        "deliverables": "Deliverables",
+        "deliverablesHint": "Eén deliverable per regel (bijv. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Gescheiden door spaties of komma's.",
+        "usageRights": "Gebruiksrechten",
+        "requiresContract": "Per-campagnecontract vereisen",
+        "status": "Status"
+      },
+      "objective": {
+        "awareness": "Bewustwording",
+        "engagement": "Betrokkenheid",
+        "conversion": "Conversie",
+        "ugc": "UGC",
+        "launch": "Lancering"
+      },
+      "status": {
+        "all": "Alle",
+        "draft": "Concept",
+        "active": "Actief",
+        "paused": "Gepauzeerd",
+        "completed": "Voltooid",
+        "cancelled": "Geannuleerd"
+      },
+      "filters": {
+        "brand": "Merk",
+        "startsFrom": "Start vanaf",
+        "startsTo": "Start tot"
+      },
+      "tabs": {
+        "overview": "Overzicht",
+        "creators": "Creators",
+        "board": "Board",
+        "drafts": "Concepten",
+        "payments": "Betalingen",
+        "messages": "Berichten",
+        "settings": "Instellingen"
+      },
+      "create": {
+        "title": "Nieuwe campagne"
+      },
+      "detail": {
+        "title": "Campagnedetails"
+      },
+      "settings": {
+        "saved": "Campagne-instellingen opgeslagen."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Nog geen creators",
+          "body": "Nodig creators uit voor deze campagne om te beginnen."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Alle concepten"
+        },
+        "empty": {
+          "heading": "Nog geen concepten",
+          "body": "Conceptinzendingen van creators verschijnen hier zodra ze zijn ingediend."
+        },
+        "loadFailed": "Concepten konden niet worden geladen. Probeer het opnieuw.",
+        "submittedAt": "Ingediend {date}"
+      },
+      "fees": {
+        "offered": "Aangeboden",
+        "countered": "Tegenbod"
+      },
+      "reinvite": {
+        "action": "Opnieuw uitnodigen",
+        "title": "Creator opnieuw uitnodigen",
+        "body": "Hij/zij deed een tegenbod van {fee}. Nieuw aanbod:",
+        "feeLabel": "Nieuwe overeengekomen vergoeding ({currency})",
+        "cancel": "Annuleren",
+        "submit": "Opnieuw uitnodigen",
+        "success": "Nieuwe uitnodiging verstuurd."
+      },
+      "contract": {
+        "attach": {
+          "action": "Contract uitgeven",
+          "title": "Contract uitgeven",
+          "body": "Voeg contractvoorwaarden toe die de creator moet beoordelen en accepteren voordat hij/zij een concept kan indienen.",
+          "titleLabel": "Contracttitel",
+          "termsLabel": "Voorwaarden (markdown)",
+          "termsHint": "Voer inline voorwaarden in en/of upload een PDF hieronder.",
+          "pdfLabel": "Contract PDF (optioneel)",
+          "pdfReady": "PDF klaar: {name}",
+          "cancel": "Annuleren",
+          "submit": "Contract uitgeven",
+          "success": "Contract uitgegeven. De creator is op de hoogte gebracht.",
+          "alreadyAttached": "Er wacht al een contract op acceptatie van deze creator.",
+          "error": "Het contract kon niet worden uitgegeven. Probeer het opnieuw."
+        },
+        "pending": "Contract verstuurd — wacht op creator",
+        "proceedWithout": {
+          "action": "Doorgaan zonder contract",
+          "success": "Opdracht voortgezet zonder contract.",
+          "requiredError": "Deze campagne vereist een per-campagnecontract; geef er een uit zodat de creator het kan accepteren.",
+          "error": "Deze opdracht kon niet worden voortgezet. Probeer het opnieuw."
+        }
+      },
+      "invite": {
+        "open": "Creators uitnodigen",
+        "title": "Creators uitnodigen",
+        "loadFailed": "Je roster kon niet worden geladen. Probeer het opnieuw.",
+        "feeLabel": "Overeengekomen vergoeding ({currency})",
+        "search": "Creators zoeken",
+        "noRoster": "Nog geen roster-creators om uit te nodigen.",
+        "noSearchMatch": "Geen creators komen overeen met je zoekopdracht.",
+        "unnamed": "Naamloze creator",
+        "blockedHint": "Geblokkeerd — kan niet worden uitgenodigd.",
+        "cancel": "Annuleren",
+        "submit": "Uitnodigen ({count})",
+        "summary": "{ok} uitgenodigd. {blacklisted} overgeslagen (geblokkeerd), {conflicts} met conflicten.",
+        "conflict": {
+          "title": "Beschikbaarheidsconflict",
+          "body": "{count} geselecteerde creator(s) is/zijn niet beschikbaar tijdens de campagneperiode. Toch uitnodigen?",
+          "cancel": "Overslaan",
+          "proceed": "Toch uitnodigen"
+        }
+      },
+      "board": {
+        "loadError": "Het board kon niet worden geladen. Probeer het opnieuw.",
+        "empty": "Dit board heeft nog geen kolommen.",
+        "moveFailed": "Kaart kon niet worden verplaatst — hij staat weer op de oorspronkelijke plek.",
+        "reorderFailed": "Kolommen konden niet worden herschikt — de volgorde is hersteld.",
+        "automationsButton": "Automatiseringen",
+        "card": {
+          "unnamed": "Naamloze creator",
+          "removed": "Verwijderde opdracht",
+          "daysLeft": "{n}d over",
+          "dueToday": "Vandaag deadline",
+          "overdue": "Verlopen"
+        },
+        "column": {
+          "add": "Kolom toevoegen",
+          "edit": "Hernoemen / herkleur",
+          "delete": "Kolom verwijderen",
+          "addTitle": "Kolom toevoegen",
+          "editTitle": "Kolom bewerken",
+          "name": "Kolomnaam",
+          "color": "Kleur",
+          "terminalSuccess": "Markeren als succes (terminal)",
+          "terminalFailure": "Markeren als mislukking (terminal)",
+          "save": "Opslaan",
+          "cancel": "Annuleren",
+          "saveFailed": "Kolom kon niet worden opgeslagen. Probeer het opnieuw.",
+          "deleteTitle": "Kolom verwijderen",
+          "deleteBody": "\"{name}\" verwijderen? Dit kan niet ongedaan worden gemaakt.",
+          "deleteBodyNonEmpty": "\"{name}\" heeft {count} kaart(en). Kies een bestemming voor de kaarten voordat je verwijdert.",
+          "deleteDestination": "Kaarten verplaatsen naar",
+          "deleteConfirm": "Verwijderen",
+          "errorLastColumn": "Een board moet ten minste één kolom bevatten.",
+          "errorDestinationRequired": "Deze kolom heeft kaarten — kies een bestemmingskolom voordat je verwijdert.",
+          "errorGeneric": "Kolom kon niet worden verwijderd. Probeer het opnieuw."
+        },
+        "automation": {
+          "title": "Automatiseringen",
+          "subtitle": "Elk evenement kan een kaart automatisch naar een kolom verplaatsen. Handmatige verplaatsingen triggeren deze nooit.",
+          "event": "Evenement",
+          "target": "Verplaatst kaart naar",
+          "none": "Geen automatisering",
+          "enabled": "Ingeschakeld",
+          "broken": "Doelkolom is verwijderd — kies een nieuwe",
+          "updateFailed": "De automatisering kon niet worden bijgewerkt. Probeer het opnieuw.",
+          "close": "Sluiten"
+        },
+        "drawer": {
+          "title": "Opdracht",
+          "close": "Sluiten",
+          "loadError": "Deze opdracht kon niet worden geladen. Probeer het opnieuw.",
+          "tabs": {
+            "detail": "Details",
+            "history": "Bewegingshistorie"
+          },
+          "detail": {
+            "status": "Status",
+            "creator": "Creator",
+            "postingDue": "Plaatsen deadline",
+            "deliverables": "Deliverables",
+            "latestDraft": "Laatste concept",
+            "postedContent": "Geplaatste content",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Nog geen bewegingen geregistreerd.",
+            "removed": "(verwijderd)",
+            "manual": "Handmatig verplaatst",
+            "auto": "Automatisering",
+            "from": "van",
+            "to": "naar"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Betalingen binnenkort beschikbaar",
+          "body": "Escrow-financiering en uitbetalingen worden hier beheerd."
+        },
+        "messages": {
+          "heading": "Berichten binnenkort beschikbaar",
+          "body": "Campagneberichten verschijnen hier."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Uitgenodigd",
+        "declined": "Geweigerd",
+        "countered": "Tegenbod",
+        "accepted": "Geaccepteerd",
+        "contracted": "Contract getekend",
+        "producing": "In productie",
+        "draft_submitted": "Concept ingediend",
+        "revision_requested": "Wijziging gevraagd",
+        "approved": "Goedgekeurd",
+        "rejected": "Afgewezen",
+        "posted": "Geplaatst",
+        "live_verified": "Live geverifieerd",
+        "manually_verified": "Handmatig geverifieerd",
+        "payment_held": "Betaling ingehouden",
+        "payment_released": "Betaling vrijgegeven",
+        "cancelled": "Geannuleerd"
+      },
+      "review": {
+        "action": "Beoordelen",
+        "title": "Concept beoordelen",
+        "loadFailed": "Dit concept kon niet worden geladen. Probeer het opnieuw.",
+        "draftVersion": "Concept v{n}",
+        "noCaption": "Geen bijschrift opgegeven.",
+        "hashtags": "Hashtags",
+        "mentions": "Vermeldingen",
+        "noMedia": "Geen media bijgevoegd.",
+        "feedbackLabel": "Feedback aan de creator",
+        "feedbackHint": "Vereist bij het aanvragen van wijzigingen of afwijzing.",
+        "approve": "Goedkeuren",
+        "requestRevision": "Wijzigingen aanvragen",
+        "reject": "Afwijzen",
+        "close": "Sluiten",
+        "history": "Versiehistorie",
+        "postedContent": "Geplaatste content",
+        "draftStatus": {
+          "pending": "In afwachting van beoordeling",
+          "approved": "Goedgekeurd",
+          "rejected": "Afgewezen",
+          "revision_requested": "Wijziging gevraagd"
+        },
+        "verification": {
+          "pending": "In afwachting van verificatie",
+          "verified": "Geverifieerd",
+          "not_found": "Niet gevonden",
+          "mismatch": "Niet overeenkomstig"
+        },
+        "simulated": "Gesimuleerde verificatie (mock-provider)",
+        "toast": {
+          "approved": "Concept goedgekeurd.",
+          "revisionRequested": "Wijziging aangevraagd.",
+          "rejected": "Concept afgewezen.",
+          "error": "Er is iets misgegaan. Probeer het opnieuw."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Voorbeeld openen",
+          "close": "Sluiten",
+          "empty": "Geen media bijgevoegd."
+        }
+      },
+      "resolution": {
+        "action": "Oplossen",
+        "title": "Verificatie oplossen",
+        "loadFailed": "Deze opdracht kon niet worden geladen. Probeer het opnieuw.",
+        "postedContent": "Ingediende post",
+        "simulated": "Gesimuleerde verificatie (mock-provider)",
+        "intro": "Automatische verificatie van deze post is mislukt. Accepteer hem handmatig, stuur hem terug voor een nieuwe post, of vraag de creator de link te corrigeren.",
+        "verification": {
+          "pending": "In afwachting van verificatie",
+          "verified": "Geverifieerd",
+          "not_found": "Niet gevonden",
+          "mismatch": "Niet overeenkomstig"
+        },
+        "noteLabel": "Reden / opmerking aan de creator",
+        "noteHint": "Vereist bij handmatige verificatie; optioneel bij herindienstverzoeken.",
+        "manuallyVerify": "Handmatig verifiëren",
+        "requestFresh": "Nieuwe post aanvragen",
+        "requestInPlace": "Vraag link te corrigeren",
+        "close": "Sluiten",
+        "notActionable": "Deze opdracht wacht niet meer op een oplossing.",
+        "toast": {
+          "verified": "Post handmatig geverifieerd.",
+          "resubmitFresh": "Teruggestuurd voor een nieuwe post.",
+          "resubmitInPlace": "Creator gevraagd de link te corrigeren.",
+          "error": "Er is iets misgegaan. Probeer het opnieuw."
+        }
+      },
+      "viewPost": {
+        "action": "Post bekijken",
+        "title": "Geplaatste content",
+        "loadFailed": "Deze post kon niet worden geladen. Probeer het opnieuw.",
+        "empty": "De creator heeft nog geen content geplaatst.",
+        "current": "Huidig",
+        "postedAt": "Geplaatst",
+        "verifiedAt": "Geverifieerd",
+        "simulated": "Verificatie loopt tegen een gesimuleerde provider in deze omgeving.",
+        "close": "Sluiten",
+        "verification": {
+          "pending": "In afwachting van verificatie",
+          "verified": "Geverifieerd",
+          "not_found": "Niet gevonden",
+          "mismatch": "Niet overeenkomstig"
+        }
+      },
+      "empty": {
+        "heading": "Nog geen campagnes",
+        "body": "Maak je eerste campagne aan om creators te engageren.",
+        "cta": "Campagne aanmaken"
+      },
+      "errors": {
+        "loadFailed": "Campagnes konden niet worden geladen.",
+        "saveFailed": "Campagne kon niet worden opgeslagen."
+      }
+    },
+    "pools": {
+      "title": "Talentpools",
+      "agencyWide": "Bureau-breed",
+      "actions": {
+        "create": "Nieuwe pool",
+        "edit": "Bewerken",
+        "archive": "Archiveren",
+        "restore": "Herstellen",
+        "save": "Pool opslaan",
+        "backToList": "Terug naar talentpools",
+        "backToDetail": "Terug naar pool"
+      },
+      "fields": {
+        "name": "Poolnaam",
+        "description": "Beschrijving",
+        "brand": "Merk",
+        "brandHint": "Optioneel — koppelt de pool aan het werk van een merk. Leeg laten voor een bureau-brede pool.",
+        "members": "Leden"
+      },
+      "status": {
+        "active": "Actief",
+        "archived": "Gearchiveerd",
+        "all": "Alle"
+      },
+      "create": {
+        "title": "Nieuwe talentpool"
+      },
+      "edit": {
+        "title": "Talentpool bewerken"
+      },
+      "detail": {
+        "title": "Pooldetails",
+        "notFound": "Deze pool bestaat niet meer.",
+        "membersHeading": "Leden",
+        "membersEmpty": "Nog geen creators in deze pool. Voeg creators toe via de detailpagina van een creator.",
+        "memberCount": "{count} creators",
+        "unnamed": "Naamloze creator",
+        "remove": "Uit pool verwijderen",
+        "removed": "{name} verwijderd uit de pool."
+      },
+      "archive": {
+        "confirmTitle": "Pool archiveren",
+        "confirmMessage": "{name} archiveren? Het wordt verborgen in de actieve lijst maar kan later worden hersteld met zijn leden.",
+        "confirm": "Archiveren",
+        "cancel": "Annuleren"
+      },
+      "restore": {
+        "confirmTitle": "Pool herstellen",
+        "confirmMessage": "{name} herstellen? Het verschijnt weer in de actieve poollijst.",
+        "confirm": "Herstellen",
+        "cancel": "Annuleren",
+        "success": "{name} hersteld."
+      },
+      "empty": {
+        "heading": "Nog geen talentpools",
+        "body": "Maak een pool aan om creators te groeperen voor een merk of een campagnebrief.",
+        "cta": "Pool aanmaken"
+      },
+      "emptyFiltered": {
+        "heading": "Geen pools komen overeen met je filter",
+        "body": "Probeer het statusfilter hierboven te wijzigen."
+      },
+      "picker": {
+        "openLabel": "Aan pool toevoegen",
+        "title": "Aan talentpools toevoegen",
+        "empty": "Nog geen talentpools. Maak er een aan op de talentpools-pagina.",
+        "done": "Klaar",
+        "added": "Toegevoegd aan {name}.",
+        "removed": "Verwijderd uit {name}.",
+        "loadFailed": "Talentpools konden niet worden geladen.",
+        "toggleFailed": "Poollidmaatschap kon niet worden bijgewerkt."
+      },
+      "addCreators": {
+        "open": "Creators toevoegen",
+        "title": "Creators aan deze pool toevoegen",
+        "search": "Roster doorzoeken",
+        "noRoster": "Je roster is leeg. Voeg eerst creators aan je roster toe.",
+        "allInPool": "Alle roster-creators staan al in deze pool.",
+        "noSearchMatch": "Geen roster-creators komen overeen met je zoekopdracht.",
+        "cancel": "Annuleren",
+        "add": "{count} toevoegen",
+        "added": "{count} creators aan de pool toegevoegd.",
+        "loadFailed": "Je roster kon niet worden geladen.",
+        "addFailed": "Creators konden niet aan de pool worden toegevoegd.",
+        "confirmHard": {
+          "one": "{name} is geblokkeerd door je bureau. Toch aan deze pool toevoegen?",
+          "many": "{count} geselecteerde creators zijn geblokkeerd door je bureau ({names}). Toch toevoegen?"
+        }
+      },
+      "errors": {
+        "loadFailed": "Talentpools konden niet worden geladen.",
+        "membersLoadFailed": "Poolleden konden niet worden geladen.",
+        "saveFailed": "Talentpool kon niet worden opgeslagen.",
+        "archiveFailed": "Pool kon niet worden gearchiveerd.",
+        "restoreFailed": "Pool kon niet worden hersteld.",
+        "removeFailed": "Creator kon niet uit de pool worden verwijderd."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Naam",
+        "email": "E-mail",
+        "role": "Rol",
+        "status": "Status",
+        "joinedAt": "Lid geworden"
+      },
+      "roles": {
+        "agency_admin": "Beheerder",
+        "agency_manager": "Manager",
+        "agency_staff": "Medewerker"
+      },
+      "status": {
+        "active": "Actief",
+        "pending": "In behandeling"
+      },
+      "members": {
+        "heading": "Huidige leden"
+      },
+      "filters": {
+        "allRoles": "Alle rollen",
+        "allStatuses": "Alle statussen"
+      },
+      "search": {
+        "label": "Zoeken",
+        "placeholder": "Naam of e-mail"
+      },
+      "invitations": {
+        "heading": "Uitnodigingshistorie",
+        "columns": {
+          "email": "Genodigde",
+          "invitedAt": "Uitgenodigd",
+          "invitedBy": "Uitgenodigd door"
+        },
+        "status": {
+          "pending": "In behandeling",
+          "accepted": "Geaccepteerd",
+          "expired": "Verlopen"
+        },
+        "empty": "Nog geen uitnodigingen."
+      },
+      "invite": {
+        "button": "Gebruiker uitnodigen",
+        "title": "Teamlid uitnodigen",
+        "fields": {
+          "email": "E-mailadres",
+          "role": "Rol"
+        },
+        "submit": "Uitnodiging sturen",
+        "submitting": "Versturen…",
+        "success": "Uitnodiging verstuurd naar {email}.",
+        "errors": {
+          "failed": "Uitnodiging kon niet worden verstuurd."
+        }
+      },
+      "empty": {
+        "heading": "Geen teamleden",
+        "body": "Nodig je eerste teamlid uit om te beginnen."
+      },
+      "emptyFiltered": "Geen teamleden komen overeen met je filter.",
+      "errors": {
+        "membersLoadFailed": "Teamleden konden niet worden geladen.",
+        "invitationsLoadFailed": "Uitnodigingshistorie kon niet worden geladen."
+      },
+      "loading": "Team laden…",
+      "bulkInviteCreators": {
+        "button": "Creators bulkuitnodigen"
+      }
+    },
+    "bulkInvite": {
+      "title": "Creators bulkuitnodigen",
+      "description": "Upload een CSV met een `email`-kolom. Elke rij wordt een magic-link-uitnodiging. Andere kolommen worden geaccepteerd maar genegeerd.",
+      "file": {
+        "label": "CSV-bestand",
+        "hint": "Max. 5 MB / 1000 rijen. De enige verplichte kolom is `email`."
+      },
+      "softWarning": "{count} rijen is een grote batch — verwerking kan enkele minuten duren.",
+      "preview": {
+        "heading": "Geparseerde rijen ({count})",
+        "row": "Rij",
+        "email": "E-mail",
+        "errorCount": "{count} parseerfouten",
+        "errorHeading": "Deze rijen worden overgeslagen:",
+        "errorItem": "Rij {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Uitnodigingen sturen ({count})",
+        "reset": "Wissen",
+        "startOver": "Nieuwe batch sturen"
+      },
+      "status": {
+        "queued": "In de wachtrij — wacht op start",
+        "processing": "Uitnodigingen worden verwerkt",
+        "complete": "Alles klaar",
+        "failed": "Job mislukt"
+      },
+      "tracking": {
+        "progress": "{percent}% voltooid"
+      },
+      "timeout": {
+        "heading": "Nog bezig",
+        "description": "De verwerking van je uitnodigingen duurt langer dan verwacht. Je kunt het opnieuw proberen of later terugkomen.",
+        "retry": "Opnieuw proberen"
+      },
+      "complete": {
+        "heading": "Resultaten",
+        "invited": "Uitgenodigd",
+        "alreadyInvited": "Al uitgenodigd",
+        "failed": "Mislukt",
+        "failureReason": "Reden"
+      },
+      "failed": {
+        "heading": "De bulkuitnodigingsjob is mislukt."
+      },
+      "errors": {
+        "submitFailed": "De CSV kon niet worden ingediend. Probeer het opnieuw."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "Je bent uitgenodigd",
+        "joining": "Je wordt uitgenodigd om lid te worden van {agencyName} als {role}.",
+        "accept": "Uitnodiging accepteren",
+        "accepting": "Accepteren…",
+        "signInToContinue": "Log in om deze uitnodiging te accepteren",
+        "signIn": "Inloggen",
+        "noAccount": "Nog geen account?",
+        "signUp": "Nu aanmaken",
+        "success": "Welkom bij {agencyName}! Je bent nu {role}.",
+        "expired": {
+          "heading": "Deze uitnodiging is verlopen",
+          "body": "Neem contact op met je bureaubeheerder voor een nieuwe uitnodiging."
+        },
+        "alreadyAccepted": {
+          "heading": "Uitnodiging al geaccepteerd",
+          "body": "Deze uitnodiging is al gebruikt. Log in om toegang te krijgen tot je werkruimte.",
+          "signIn": "Inloggen"
+        },
+        "alreadyMember": {
+          "heading": "Al lid",
+          "body": "Je bent al lid van deze werkruimte."
+        },
+        "emailMismatch": {
+          "heading": "Verkeerd account",
+          "body": "Deze uitnodiging is verstuurd naar een ander e-mailadres. Log in met het juiste account."
+        },
+        "notFound": {
+          "heading": "Uitnodiging niet gevonden",
+          "body": "Deze uitnodigingslink is ongeldig of al gebruikt."
+        },
+        "errors": {
+          "failed": "Uitnodiging kon niet worden geaccepteerd."
+        }
+      }
+    },
+    "settings": {
+      "title": "Bureau-instellingen",
+      "fields": {
+        "defaultCurrency": "Standaardvaluta",
+        "defaultLanguage": "Standaardtaal",
+        "blacklistNotificationPolicy": "Creators informeren bij blokkering",
+        "blacklistNotificationPolicyHint": "Als ingeschakeld, ontvangt een creator een e-mail als je bureau hem/haar blokkeert. De reden wordt nooit gedeeld."
+      },
+      "save": "Instellingen opslaan",
+      "saving": "Opslaan…",
+      "success": "Instellingen opgeslagen.",
+      "readOnly": "Alleen beheerders kunnen bureau-instellingen bewerken.",
+      "loading": "Instellingen laden…",
+      "errors": {
+        "loadFailed": "Instellingen konden niet worden geladen.",
+        "saveFailed": "Instellingen konden niet worden opgeslagen."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "Dit veld is verplicht."
+  }
+}

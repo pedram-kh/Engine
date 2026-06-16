@@ -1,0 +1,416 @@
+{
+  "creator": {
+    "not_found": "Er is geen creatorprofiel gekoppeld aan je account. Log uit en log opnieuw in, of neem contact op met support.",
+    "already_approved": "Deze creator is al goedgekeurd.",
+    "already_rejected": "Deze creator is al afgewezen.",
+    "kyc_not_verified": "De identiteit van deze creator moet worden geverifieerd voordat de aanmelding kan worden goedgekeurd.",
+    "kyc_already_verified": "De identiteit van deze creator is al geverifieerd.",
+    "admin": {
+      "field_status_immutable": "De aanmeldingsstatus kan niet via dit formulier worden gewijzigd. Gebruik de goedkeurings- of afwijsacties."
+    },
+    "social": {
+      "invalid_platform": "Dit sociale platform wordt niet ondersteund."
+    },
+    "wizard": {
+      "feature_disabled": "Deze stap is momenteel niet beschikbaar omdat een configuratiewijziging wordt doorgevoerd. Sla over om je aanmelding voort te zetten.",
+      "feature_enabled": "Deze optie is momenteel niet beschikbaar — gebruik de standaardflow voor deze stap.",
+      "incomplete": "Aanmelding kan nog niet worden ingediend — een of meer wizardstappen zijn nog niet volledig."
+    },
+    "reopen": {
+      "invalid_state": "Alleen een afgewezen aanmelding kan opnieuw worden geopend."
+    },
+    "ui": {
+      "wizard": {
+        "title": "Creatorprofiel instellen",
+        "subtitle": "Een paar stappen om jezelf voor te stellen aan merken.",
+        "progress": {
+          "step_of": "Stap {current} van {total}",
+          "completed": "Voltooid",
+          "current": "Huidige stap",
+          "skipped": "Overgeslagen",
+          "pending": "Nog niet gestart"
+        },
+        "actions": {
+          "save": "Opslaan",
+          "save_and_continue": "Opslaan en verder",
+          "back": "Terug",
+          "skip_for_now": "Voor nu overslaan",
+          "save_and_exit": "Opslaan en afsluiten",
+          "submit_for_approval": "Indienen ter goedkeuring",
+          "continue_from_here": "Hier verder gaan",
+          "edit_step": "Stap bewerken",
+          "review_and_submit": "Beoordelen en indienen",
+          "connect": "Verbinden",
+          "update": "Bijwerken",
+          "remove": "Verwijderen"
+        },
+        "skipped": {
+          "label": "Overgeslagen",
+          "explanation": "Deze stap is momenteel niet vereist. Een admin beoordeelt je aanmelding zonder deze."
+        },
+        "save_status": {
+          "saving": "Opslaan…",
+          "saved": "Opgeslagen",
+          "error": "Kon niet opslaan — probeer het opnieuw."
+        },
+        "steps": {
+          "profile": {
+            "name": "Profielbasics",
+            "title": "Vertel ons over jezelf",
+            "description": "Je weergavenaam, bio, foto en de categorieën waarin je maakt."
+          },
+          "social": {
+            "name": "Sociale accounts",
+            "title": "Koppel je sociale accounts",
+            "description": "Koppel ten minste één platform zodat merken je bereik kunnen zien."
+          },
+          "portfolio": {
+            "name": "Portfolio",
+            "title": "Laat je beste werk zien",
+            "description": "Upload maximaal 10 items — video's, afbeeldingen of externe links — die je stijl weerspiegelen.",
+            "gallery_heading": "Je portfolio",
+            "gallery_empty": "Nog geen portfolio-items geüpload.",
+            "gallery_remove": "Item verwijderen",
+            "gallery_status": "Portfoliogalerij bevat {count} item(s).",
+            "video_badge_label": "Video",
+            "link_badge_label": "Externe link",
+            "untitled_item": "Naamloos portfolio-item",
+            "preview_label": "Voorbeeld openen",
+            "preview_close": "Voorbeeld sluiten"
+          },
+          "kyc": {
+            "name": "Identiteitsverificatie",
+            "title": "Identiteit verifiëren",
+            "description": "Een snelle controle met onze verificatiepartner. Vereist voor uitbetalingen.",
+            "skipped_title": "Identiteitsverificatie overgeslagen",
+            "skipped_explanation": "Identiteitsverificatie is momenteel niet vereist.",
+            "current_status": "Status:",
+            "begin_button": "Verificatie starten",
+            "status_labels": {
+              "none": "Niet gestart",
+              "pending": "Bezig",
+              "verified": "Geverifieerd",
+              "rejected": "Afgewezen",
+              "not_required": "Overgeslagen"
+            }
+          },
+          "tax": {
+            "name": "Belastinginformatie",
+            "title": "Belastingformulier",
+            "description": "We hebben een belastingformulier nodig voor uitbetalingen, ook vóór je eerste uitbetaling.",
+            "current_status": "Status:",
+            "status_complete": "Ingediend",
+            "status_incomplete": "Nog niet ingediend",
+            "on_file_title": "Belastinginformatie opgeslagen",
+            "on_file_body": "Je belastinggegevens zijn veilig opgeslagen. Uit privacyoverwegingen tonen we ze niet opnieuw — kies Bijwerken om ze opnieuw in te voeren.",
+            "update_button": "Belastinginformatie bijwerken"
+          },
+          "payout": {
+            "name": "Uitbetalingsmethode",
+            "title": "Uitbetalingen instellen",
+            "description": "Koppel een Stripe Express-account om betalingen te ontvangen.",
+            "skipped_title": "Uitbetalingsinstellingen overgeslagen",
+            "skipped_explanation": "Uitbetalingsinstellingen zijn momenteel niet vereist.",
+            "current_status": "Status:",
+            "begin_button": "Uitbetalingen instellen",
+            "status_set": "Verbonden",
+            "status_unset": "Niet verbonden"
+          },
+          "contract": {
+            "name": "Raamovereenkomst",
+            "title": "Raamovereenkomst ondertekenen",
+            "description": "Onze standaard creator-overeenkomst geldt voor merksamenwerkingen op het platform.",
+            "skipped_explanation": "Contractondertekening is momenteel niet vereist — accepteer hieronder de click-through voorwaarden.",
+            "click_through_label": "Ik heb deze voorwaarden gelezen en accepteer ze.",
+            "click_through_help": "Lees de overeenkomst hierboven en vink het vakje aan om verder te gaan.",
+            "terms_version": "Master Creator-overeenkomst v{version}",
+            "current_status": "Status:",
+            "begin_button": "Overeenkomst openen om te ondertekenen",
+            "status_labels": {
+              "signed": "Ondertekend",
+              "click_through_accepted": "Geaccepteerd",
+              "none": "Niet gestart"
+            },
+            "accepted_title": "Overeenkomst geaccepteerd",
+            "accepted_body": "Je hebt de raamovereenkomst geaccepteerd. Ga verder naar de volgende stap."
+          },
+          "account_created": {
+            "name": "Account aangemaakt"
+          },
+          "review": {
+            "name": "Beoordelen en indienen",
+            "title": "Aanmelding beoordelen",
+            "description": "Neem even de tijd om alles te beoordelen voordat je indient.",
+            "completeness": "{percent}% volledig",
+            "edit_step": "Bewerken",
+            "submit_button": "Aanmelding indienen",
+            "incomplete_blocker": "Je hebt 1 onvolledige stap: {names}. Klik op Bewerken om hem af te ronden. | Je hebt {count} onvolledige stappen: {names}. Klik op Bewerken bij elke stap om ze af te ronden."
+          }
+        },
+        "fields": {
+          "display_name": "Weergavenaam",
+          "display_name_help": "Hoe merken je zien — je handle of artiestennaam.",
+          "bio": "Bio",
+          "bio_help": "Een korte introductie. Je kunt **vet**, *cursief* en [links](https://example.com) gebruiken.",
+          "avatar": "Profielfoto",
+          "avatar_drop": "Foto hier neerzetten of klikken om te kiezen. JPG, PNG of WebP tot 5 MB.",
+          "country": "Land",
+          "region": "Regio of stad",
+          "primary_language": "Primaire taal",
+          "secondary_languages": "Andere talen",
+          "categories": "Categorieën",
+          "categories_help": "Kies de categorieën die het beste beschrijven wat je maakt.",
+          "avatar_required": "Een profielfoto is vereist om deze stap te voltooien.",
+          "step_requirements_hint": "Voeg een profielfoto en ten minste één categorie toe om verder te gaan.",
+          "social_handle": "Gebruikersnaam",
+          "social_handle_hint": "Voer alleen je gebruikersnaam in — geen {'@'}-symbool of volledige profiel-URL.",
+          "social_handle_invalid": "Voer een geldige gebruikersnaam in: 2–30 letters, cijfers, punten, underscores of koppeltekens (geen spaties, {'@'} of URL's).",
+          "social_profile_url": "Profiel-URL",
+          "portfolio_title": "Titel",
+          "portfolio_description": "Beschrijving",
+          "portfolio_external_url": "Externe URL (optioneel)",
+          "tax_form_type": "Belastingformulier",
+          "legal_name": "Wettelijke naam",
+          "tax_id": "Belasting-ID",
+          "address_country": "Land",
+          "address_city": "Stad",
+          "address_postal_code": "Postcode",
+          "address_street": "Straat"
+        },
+        "categories": {
+          "fashion": "Mode",
+          "beauty": "Beauty",
+          "lifestyle": "Lifestyle",
+          "fitness": "Fitness",
+          "travel": "Reizen",
+          "food": "Eten",
+          "tech": "Technologie",
+          "gaming": "Gaming",
+          "music": "Muziek",
+          "comedy": "Comedy",
+          "education": "Onderwijs",
+          "parenting": "Ouderschap",
+          "business": "Business",
+          "art": "Kunst",
+          "sports": "Sport",
+          "other": "Overig"
+        },
+        "tax_form_types": {
+          "eu_self_employed": "EU — zelfstandige",
+          "eu_company": "EU — bedrijf",
+          "uk_self_employed": "VK — zelfstandige",
+          "uk_company": "VK — bedrijf"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Binnenkort beschikbaar"
+        },
+        "vendor_bounce": {
+          "waiting_title": "Bijna klaar…",
+          "waiting_description": "We wachten op een reactie van onze partner. Dit duurt gewoonlijk minder dan een minuut.",
+          "timeout_title": "Nog steeds wachten op onze partner",
+          "timeout_description": "Dit duurt langer dan verwacht. Je kunt het opnieuw proberen of contact opnemen met support.",
+          "retry": "Opnieuw proberen",
+          "contact_support": "Contact opnemen met support"
+        },
+        "welcome_back": {
+          "title": "Welkom terug",
+          "subtitle": "Je was hier voor het laatst {time_ago}. Ga verder waar je gebleven was.",
+          "first_time_title": "Laten we beginnen",
+          "first_time_subtitle": "Welkom bij Catalyst. Laten we je creatorprofiel instellen — het duurt maar een paar minuten.",
+          "first_time_prompt": "Begin met {step} om jezelf voor te stellen aan merken.",
+          "next_step_prompt": "Je bent bij stap {step}. Ga hier verder of spring terug om een eerdere stap te bewerken.",
+          "all_complete_prompt": "Goed gedaan — je hebt elke stap voltooid. Klaar om in te dienen?",
+          "continue_button": "Doorgaan naar {step_name}",
+          "review_button": "Beoordelen en indienen"
+        }
+      },
+      "dashboard": {
+        "title": "Je aanmelding",
+        "greeting": "Welkom, {name}.",
+        "completeness": "{percent}% volledig",
+        "submitted_at": "Ingediend op {datetime}",
+        "submitted": {
+          "heading": "Aanmelding ingediend",
+          "description": "Je profiel wordt beoordeeld. We sturen je binnen 3 werkdagen een bericht.",
+          "completeness_label": "Profielvolledigheid",
+          "last_updated": "Laatst bijgewerkt {time_ago}"
+        },
+        "pending_review": {
+          "title": "Aanmelding wordt beoordeeld",
+          "description": "Je aanmelding staat in onze wachtrij. We sturen je binnen 3 werkdagen een bericht."
+        },
+        "approved": {
+          "title": "Welkom bij Catalyst",
+          "heading": "Je bent goedgekeurd",
+          "description": "Je bent goedgekeurd voor merksamenwerkingen. Het volledige creator-dashboard verschijnt binnenkort."
+        },
+        "rejected": {
+          "title": "Aanmelding niet goedgekeurd",
+          "heading": "Aanmelding heeft wijzigingen nodig",
+          "description": "Bekijk de opmerkingen hieronder, werk je aanmelding bij en dien deze opnieuw in ter beoordeling.",
+          "reason_label": "Reden:",
+          "edit_profile": "Profiel bewerken",
+          "resubmit": "Bijwerken en opnieuw indienen",
+          "resubmit_failed": "We konden je aanmelding niet opnieuw openen. Probeer het opnieuw."
+        },
+        "incomplete": {
+          "title": "Aanmelding voortzetten",
+          "description": "Ga verder waar je gebleven was — je wizardvoortgang is opgeslagen."
+        },
+        "requests": {
+          "title": "Verbindingsverzoeken",
+          "sent": "Verstuurd op {date}",
+          "sent_unknown": "Recent verstuurd",
+          "accept": "Accepteren",
+          "decline": "Weigeren",
+          "empty": {
+            "title": "Geen verbindingsverzoeken",
+            "body": "Als een bureau je uitnodigt om te verbinden, verschijnt dat hier."
+          },
+          "toast": {
+            "accepted": "Je bent nu verbonden met {agency}.",
+            "declined": "Verzoek geweigerd.",
+            "error": "Er is iets misgegaan. Probeer het opnieuw."
+          }
+        },
+        "assignments": {
+          "title": "Campagne-uitnodigingen",
+          "pending": "Je hebt {count} uitnodiging(en) die wacht(en) op je reactie.",
+          "none": "Geen uitnodigingen wachten op je reactie.",
+          "cta": "Uitnodigingen bekijken"
+        }
+      },
+      "assignments": {
+        "title": "Campagne-uitnodigingen",
+        "subtitle": "Accepteer, weiger of doe een tegenbod voor campagnes waarvoor je bent uitgenodigd.",
+        "fee": "Vergoeding",
+        "youCountered": "jij deed een tegenbod",
+        "accept": "Accepteren",
+        "counter": "Tegenbod",
+        "decline": "Weigeren",
+        "view": "Bekijken",
+        "detail": {
+          "back": "Terug naar uitnodigingen",
+          "notFound": "Deze opdracht kon niet worden gevonden.",
+          "loadFailed": "We konden deze opdracht niet laden. Probeer het opnieuw.",
+          "retry": "Opnieuw proberen",
+          "awaitingReview": "Je concept is ingediend en wacht op beoordeling door het bureau.",
+          "awaitingVerification": "Je post is geregistreerd en wacht op verificatie.",
+          "resubmitInPlace": {
+            "title": "We konden je post niet verifiëren",
+            "intro": "Automatische verificatie van je post is mislukt. Controleer of de link correct is en verwijst naar je gepubliceerde post, en dien hem dan opnieuw in.",
+            "url": "Post-URL",
+            "submit": "Link opnieuw indienen",
+            "toast": "Link opnieuw ingediend — we controleren hem binnenkort opnieuw."
+          },
+          "contract": {
+            "title": "Campagnecontract",
+            "viewPdf": "Contract bekijken (PDF)",
+            "accept": "Contract accepteren",
+            "awaitingAgency": "Het bureau stuurt je een contract ter beoordeling en acceptatie. Je wordt gewaarschuwd als het klaar is — kom dan hier terug.",
+            "signingDisabled": "Contractondertekening is nog niet beschikbaar. Het bureau neemt contact met je op als het tijd is om verder te gaan.",
+            "toast": {
+              "accepted": "Contract geaccepteerd. Je kunt nu je concept indienen."
+            }
+          },
+          "revision": {
+            "title": "Wijziging gevraagd",
+            "noFeedback": "Het bureau heeft wijzigingen gevraagd. Dien een bijgewerkt concept in."
+          },
+          "draft": {
+            "submitTitle": "Je concept indienen",
+            "resubmitTitle": "Je concept opnieuw indienen",
+            "caption": "Bijschrift",
+            "hashtags": "Hashtags",
+            "hashtagsHint": "Scheid met spaties of komma's",
+            "mentions": "Vermeldingen",
+            "mentionsHint": "Scheid met spaties of komma's",
+            "media": "Media",
+            "submit": "Concept indienen",
+            "resubmit": "Concept opnieuw indienen",
+            "mediaStatus": {
+              "uploading": "Uploaden…",
+              "done": "Geüpload",
+              "error": "Upload mislukt"
+            }
+          },
+          "posted": {
+            "title": "Markeren als geplaatst",
+            "platform": "Platform",
+            "url": "Post-URL",
+            "submit": "Post indienen",
+            "summaryTitle": "Geplaatste content"
+          },
+          "history": {
+            "title": "Concepthistorie",
+            "version": "Versie {n}"
+          },
+          "reviewStatus": {
+            "pending": "In afwachting van beoordeling",
+            "approved": "Goedgekeurd",
+            "rejected": "Afgewezen",
+            "revision_requested": "Wijziging gevraagd"
+          },
+          "verificationStatus": {
+            "pending": "Verificatie in behandeling",
+            "verified": "Geverifieerd",
+            "not_found": "Niet gevonden",
+            "mismatch": "Niet overeenkomstig"
+          },
+          "toast": {
+            "draftSubmitted": "Concept ingediend.",
+            "posted": "Post geregistreerd.",
+            "error": "Er is iets misgegaan. Probeer het opnieuw."
+          }
+        },
+        "window": {
+          "range": "{start} – {end}",
+          "unset": "Datums nog te bevestigen"
+        },
+        "empty": {
+          "title": "Geen campagne-uitnodigingen",
+          "body": "Als een bureau je uitnodigt voor een campagne, verschijnt dat hier."
+        },
+        "toast": {
+          "accepted": "Uitnodiging geaccepteerd.",
+          "countered": "Tegenbod verstuurd.",
+          "declined": "Uitnodiging geweigerd.",
+          "error": "Er is iets misgegaan. Probeer het opnieuw."
+        },
+        "counterDialog": {
+          "title": "Vergoeding onderhandelen",
+          "body": "Stel een andere vergoeding voor voor deze campagne. Het bureau kan een nieuw aanbod doen of terugtrekken.",
+          "feeLabel": "Jouw vergoeding ({currency})",
+          "cancel": "Annuleren",
+          "submit": "Tegenbod sturen"
+        }
+      },
+      "upload": {
+        "avatar_prompt": "Foto hier neerzetten of klikken om te kiezen",
+        "avatar_preview_alt": "Voorbeeld profielfoto",
+        "size_hint": "{types} · tot {max_mb} MB",
+        "portfolio_prompt": "Bestanden hier neerzetten of klikken om te kiezen",
+        "portfolio_size_hint": "Afbeeldingen tot {image_mb} MB · video's tot {video_mb} MB",
+        "portfolio_slots_remaining": "{remaining} plaatsen beschikbaar",
+        "portfolio_queue_status": "{in_flight} van {total} wordt geüpload (maximaal {concurrency} tegelijk).",
+        "uploading": "Uploaden…",
+        "remove": "Verwijderen",
+        "remove_avatar": "Foto verwijderen",
+        "remove_portfolio_item_label": "{name} verwijderen",
+        "status_pending": "Wachten…",
+        "status_uploading": "Uploaden…",
+        "status_done": "Geüpload",
+        "status_error": "Mislukt"
+      },
+      "errors": {
+        "upload_too_large": "Dit bestand is te groot. De maximale grootte is {max_mb} MB.",
+        "upload_wrong_type": "Dit bestandstype wordt niet ondersteund. Gebruik {allowed_types}.",
+        "upload_failed": "De upload is mislukt. Probeer het opnieuw.",
+        "portfolio_max_reached": "Je kunt maximaal {max} portfolio-items uploaden."
+      }
+    }
+  }
+}

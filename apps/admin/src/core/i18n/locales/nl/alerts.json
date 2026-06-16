@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Operationele meldingen",
+      "subtitle": "Auditactiviteit en operationele meldingen gericht aan jou.",
+      "empty": "Geen operationele meldingen.",
+      "load_failed": "Operationele meldingen konden niet worden geladen. Ververs de pagina.",
+      "paymentAlerts": {
+        "title": "Betalingsmeldingen",
+        "body": "Escrow-financierings- en vrijgavemeldingen verschijnen wanneer betalingsverwerking beschikbaar komt (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Creator goedgekeurd",
+          "rejected": "Creator afgewezen"
+        }
+      }
+    }
+  }
+}

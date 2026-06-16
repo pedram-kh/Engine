@@ -1,0 +1,84 @@
+{
+  "availability": {
+    "title": "Beschikbaarheid",
+    "subtitle": "Blokkeer tijden waarop je niet beschikbaar bent, zodat bureaus je echte agenda zien.",
+    "allDay": "Hele dag",
+    "moreCount": "+{count} meer",
+    "dayPopover": {
+      "title": "Blokken op deze dag",
+      "viewAll": "Alle blokken voor deze dag bekijken"
+    },
+    "creatorNav": {
+      "dashboard": "Dashboard",
+      "assignments": "Uitnodigingen",
+      "availability": "Beschikbaarheid"
+    },
+    "nav": {
+      "prevMonth": "Vorige maand",
+      "nextMonth": "Volgende maand"
+    },
+    "actions": {
+      "add": "Blok toevoegen"
+    },
+    "empty": {
+      "heading": "Nog geen beschikbaarheidsblokken",
+      "body": "Voeg een blok toe om aan te geven wanneer je afwezig of niet beschikbaar bent."
+    },
+    "errors": {
+      "loadFailed": "Je beschikbaarheid kon niet worden geladen. Probeer het opnieuw."
+    },
+    "blockType": {
+      "hard": "Niet beschikbaar (vast)",
+      "soft": "Voorkeur (zacht)"
+    },
+    "kind": {
+      "vacation": "Vakantie",
+      "personal": "Persoonlijk",
+      "exclusive_contract": "Exclusief contract",
+      "assignment_auto": "Vanuit campagne",
+      "other": "Overig"
+    },
+    "weekday": {
+      "MO": "Ma",
+      "TU": "Di",
+      "WE": "Wo",
+      "TH": "Do",
+      "FR": "Vr",
+      "SA": "Za",
+      "SU": "Zo"
+    },
+    "dialog": {
+      "createTitle": "Beschikbaarheidsblok toevoegen",
+      "editTitle": "Beschikbaarheidsblok bewerken",
+      "seriesNotice": "Dit is een terugkerend blok — wijzigingen gelden voor alle voorkomens, niet alleen voor deze dag.",
+      "blockTypeHint": "Vaste blokken sluiten je volledig uit; zachte blokken zijn slechts een voorkeur.",
+      "fields": {
+        "allDay": "Hele dag",
+        "startDate": "Startdatum",
+        "startTime": "Starttijd",
+        "endDate": "Einddatum",
+        "endTime": "Eindtijd",
+        "blockType": "Type",
+        "kind": "Reden",
+        "reason": "Notitie (optioneel)",
+        "recurring": "Wekelijks herhalend"
+      },
+      "recurrence": {
+        "interval": "Herhalen elke (weken)",
+        "weekdays": "Op deze dagen",
+        "hasEnd": "Einddatum instellen",
+        "endsOn": "Eindigt op"
+      },
+      "actions": {
+        "save": "Opslaan",
+        "cancel": "Annuleren",
+        "delete": "Verwijderen",
+        "confirmDelete": "Verwijdering bevestigen"
+      },
+      "errors": {
+        "saveFailed": "Het blok kon niet worden opgeslagen. Probeer het opnieuw.",
+        "deleteFailed": "Het blok kon niet worden verwijderd. Probeer het opnieuw."
+      }
+    }
+  }
+}
