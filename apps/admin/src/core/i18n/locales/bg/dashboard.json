@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Табло за управление",
+      "load_failed": "We couldn't load the dashboard. Моля refresh.",
+      "kpi": {
+        "agencies_total": "Agencies",
+        "agencies_suspended": "Suspended agencies",
+        "creators_pending_approval": "В изчакване approvals",
+        "creators_pending_kyc": "KYC queue",
+        "queue_pending": "Queued jobs",
+        "queue_failed": "Failed jobs",
+        "open_disputes": "Open disputes",
+        "failed_payments_today": "Failed payments today"
+      },
+      "activity": {
+        "heading": "Recent activity",
+        "empty": "Не recent activity."
+      }
+    }
+  }
+}

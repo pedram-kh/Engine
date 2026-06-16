@@ -1,0 +1,84 @@
+{
+  "availability": {
+    "title": "Наличност",
+    "subtitle": "Block out the times you're unavailable so agencies see your real calendar.",
+    "allDay": "Всички day",
+    "moreCount": "+{count} more",
+    "dayPopover": {
+      "title": "Blocks this day",
+      "viewAll": "Show all blocks for this day"
+    },
+    "creatorNav": {
+      "dashboard": "Табло за управление",
+      "assignments": "Поканаs",
+      "availability": "Наличност"
+    },
+    "nav": {
+      "prevMonth": "Предишен month",
+      "nextMonth": "Напред month"
+    },
+    "actions": {
+      "add": "Добавете block"
+    },
+    "empty": {
+      "heading": "Не availability blocks yet",
+      "body": "Добавете a block to mark when you're away or unavailable."
+    },
+    "errors": {
+      "loadFailed": "We couldn't load your availability. Моля try again."
+    },
+    "blockType": {
+      "hard": "Unavailable (hard)",
+      "soft": "Preference (sотt)"
+    },
+    "kind": {
+      "vacation": "Vacation",
+      "personal": "Personal",
+      "exclusive_contract": "Exclusive contract",
+      "assignment_auto": "From campaign",
+      "other": "Other"
+    },
+    "weekday": {
+      "MO": "Mon",
+      "TU": "Tue",
+      "WE": "Wed",
+      "TH": "Thu",
+      "FR": "Fri",
+      "SA": "Sat",
+      "SU": "Sun"
+    },
+    "dialog": {
+      "createTitle": "Добавете availability block",
+      "editTitle": "Редактирайте availability block",
+      "seriesNotice": "This is a repeating block — changes apply to all от its occurrences, not just this day.",
+      "blockTypeHint": "Hard blocks exclude you entirely; sотt blocks are a preference only.",
+      "fields": {
+        "allDay": "Всички day",
+        "startDate": "Start date",
+        "startTime": "Start time",
+        "endDate": "End date",
+        "endTime": "End time",
+        "blockType": "Type",
+        "kind": "Reason",
+        "reason": "Неte (optional)",
+        "recurring": "Repeats weekly"
+      },
+      "recurrence": {
+        "interval": "Repeat every (weeks)",
+        "weekdays": "On these days",
+        "hasEnd": "Set an end date",
+        "endsOn": "Ends on"
+      },
+      "actions": {
+        "save": "Запазете",
+        "cancel": "Отменете",
+        "delete": "Изтрийте",
+        "confirmDelete": "Потвърдете delete"
+      },
+      "errors": {
+        "saveFailed": "We couldn't save the block. Моля try again.",
+        "deleteFailed": "We couldn't delete the block. Моля try again."
+      }
+    }
+  }
+}

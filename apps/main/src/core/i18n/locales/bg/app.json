@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Influencer marketing, run like a real business.",
+    "sprint0Notice": "Sprint 0 scaffolding — main platform SPA",
+    "locale": {
+      "switcher": "Език",
+      "en": "Английски",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    },
+    "messaging": {
+      "title": "Съобщения",
+      "you": "You",
+      "participant": "Participant",
+      "composePlaceholder": "Write a message…",
+      "send": "Изпратете",
+      "attachment": "Attachment",
+      "empty": "Не messages yet. Start the conversation.",
+      "loadEarlier": "Load earlier messages",
+      "loadError": "We couldn't load this conversation. It will retry shortly.",
+      "sendError": "Your message couldn't be sent. Моля try again.",
+      "attachmentUploadError": "An attachment failed to upload. Моля try again.",
+      "closed": "This conversation is closed — the assignment is no longer active.",
+      "systemFallback": "The assignment was updated.",
+      "system": {
+        "assignment": {
+          "contracted": "The contract was signed — production can begin.",
+          "draft_submitted": "A draft was submitted for review.",
+          "draft_approved": "The draft was approved.",
+          "revision_requested": "Revisions were requested on the draft.",
+          "draft_rejected": "The draft was rejected.",
+          "posted_by_creator": "The creator marked the content as posted.",
+          "live_verified": "The live post was verified.",
+          "manually_verified": "The post was manually verified.",
+          "resubmit_requested": "A resubmission was requested.",
+          "payment_released": "Плащане was released."
+        }
+      },
+      "rollup": {
+        "empty": "Не message threads yet for this campaign.",
+        "noMessages": "Не messages yet.",
+        "loadError": "We couldn't load the message threads."
+      }
+    },
+    "nav": {
+      "dashboard": "Табло за управление",
+      "roster": "My creators",
+      "discover": "Discover",
+      "pools": "Talent pools",
+      "brands": "Brands",
+      "campaigns": "Кампанияs",
+      "agencyUsers": "Team",
+      "settings": "Настройки"
+    },
+    "discover": {
+      "title": "Discover creators",
+      "subtitle": "Browse and search the global creator pool.",
+      "unnamed": "Unnamed creator",
+      "notConnected": "Неt connected",
+      "search": {
+        "label": "Търсене creators",
+        "placeholder": "Търсене by name or bio"
+      },
+      "filters": {
+        "country": "Country",
+        "language": "Език",
+        "category": "Category"
+      },
+      "connection": {
+        "connected": "Connected",
+        "pending": "Request pending",
+        "declined": "Отклонетеd",
+        "notConnected": "Неt connected",
+        "sendRequest": "Изпратете request",
+        "requestAgain": "Request again",
+        "sent": "Request sent",
+        "reRequested": "Request sent again",
+        "alreadyPending": "A request is already pending",
+        "alreadyConnected": "This creator is already on your roster",
+        "error": "Couldn't send the request. Моля try again."
+      },
+      "empty": {
+        "heading": "Не creators yet",
+        "body": "Одобретеd creators will appear here as the pool grows."
+      },
+      "emptyFiltered": {
+        "heading": "Не matches",
+        "body": "Не creators match your filters. Try broadening your search."
+      },
+      "errors": {
+        "loadFailed": "Couldn't load creators. Моля try again."
+      },
+      "detail": {
+        "back": "Назад to Discover",
+        "notFound": "This creator isn't available.",
+        "loadFailed": "Couldn't load this prотile. Моля try again.",
+        "viewInRoster": "Вижте in roster",
+        "sections": {
+          "profile": "Профил",
+          "social": "Social accounts",
+          "portfolio": "Портфолио"
+        },
+        "social": {
+          "empty": "Не social accounts linked."
+        },
+        "portfolio": {
+          "empty": "Не portfolio елементи yet.",
+          "untitled": "Untitled item"
+        }
+      }
+    },
+    "roster": {
+      "title": "My creators",
+      "unnamed": "Unnamed creator",
+      "blacklisted": "Blacklisted",
+      "blacklist": {
+        "badge": {
+          "hard": "Blacklisted",
+          "soft": "Blacklist warning"
+        },
+        "openAction": "Blacklist creator",
+        "liftAction": "Remove blacklist",
+        "lifted": "Blacklist removed.",
+        "liftFailed": "Failed to remove the blacklist.",
+        "section": {
+          "title": "Blacklist",
+          "none": "This creator is not blacklisted by your agency."
+        },
+        "status": {
+          "hard": "Hard blacklisted — excluded from your discovery and blocked from connection requests.",
+          "soft": "Sотt blacklisted — a warning only; the creator stays matchable."
+        },
+        "dialog": {
+          "title": "Blacklist creator",
+          "scopeLabel": "Scope",
+          "scope": {
+            "agency": "Entire agency",
+            "brand": "A specific brand"
+          },
+          "noRelationHint": "Агенция-wide blacklisting requires a connected creator.",
+          "brandLabel": "Brand",
+          "typeLabel": "Type",
+          "type": {
+            "hard": "Hard — exclude from discovery and block requests",
+            "soft": "Sотt — warn only, keep matchable"
+          },
+          "reasonLabel": "Reason",
+          "reasonPlaceholder": "Why is this creator being blacklisted? (kept private to your agency)",
+          "cancel": "Отменете",
+          "confirm": "Blacklist",
+          "success": "Творец blacklisted.",
+          "invalid": "Моля complete the required fields.",
+          "failed": "Failed to blacklist the creator."
+        }
+      },
+      "fields": {
+        "name": "Name",
+        "email": "Имейл",
+        "status": "Статус",
+        "applicationStatus": "Application",
+        "country": "Country",
+        "language": "Език",
+        "categories": "Categories",
+        "rating": "Rating",
+        "campaigns": "Кампанияs"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Prospect",
+        "external": "External",
+        "pending_request": "В изчакване request",
+        "declined": "Отклонетеd"
+      },
+      "applicationStatus": {
+        "incomplete": "Incomplete",
+        "pending": "В изчакване",
+        "approved": "Одобретеd",
+        "rejected": "Отхвърлетеed"
+      },
+      "search": {
+        "label": "Търсене creators",
+        "placeholder": "Търсене by name or bio"
+      },
+      "filters": {
+        "status": {
+          "all": "Всички",
+          "roster": "Roster",
+          "prospect": "Prospect",
+          "external": "External",
+          "pending_request": "В изчакване requests",
+          "declined": "Отклонетеd"
+        },
+        "country": "Country",
+        "language": "Език",
+        "category": "Category",
+        "availability": {
+          "from": "Available from",
+          "to": "Available to"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Followers"
+        },
+        "engagement": {
+          "label": "Engagement rate"
+        },
+        "metrics": {
+          "tooltip": "Social metrics aren't connected yet."
+        }
+      },
+      "languages": {
+        "en": "Английски",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Не creators yet",
+        "body": "Творецs you invite or engage will appear here across your roster, prospects, and external collaborators."
+      },
+      "emptyFiltered": {
+        "heading": "Не creators match these filters",
+        "body": "Try clearing or changing a filter to see more от your creators."
+      },
+      "errors": {
+        "loadFailed": "Failed to load your creators. Моля try again."
+      },
+      "detail": {
+        "back": "Назад to my creators",
+        "unnamed": "Unnamed creator",
+        "loadFailed": "We couldn't load this creator. Моля try again.",
+        "notFound": "This creator isn't in your roster.",
+        "sections": {
+          "profile": "Профил",
+          "rating": "Rating & notes",
+          "social": "Social accounts",
+          "metrics": "Social metrics",
+          "portfolio": "Портфолио",
+          "availability": "Наличност",
+          "campaigns": "Кампания history"
+        },
+        "editor": {
+          "starLabel": "Rate {n} от 5",
+          "ratingUnset": "Неt rated",
+          "notesLabel": "Internal notes",
+          "notesPlaceholder": "Private notes about working with this creator (visible to your agency only).",
+          "notesEmpty": "Не notes yet.",
+          "save": "Запазете",
+          "saved": "Changes saved.",
+          "saveFailed": "We couldn't save your changes. Моля try again."
+        },
+        "social": {
+          "empty": "Не social accounts connected."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Social metrics will appear once accounts are connected",
+            "body": "Follower counts and engagement rates aren't available yet — they'll show here when the social integrations land."
+          }
+        },
+        "portfolio": {
+          "empty": "Не portfolio елементи yet.",
+          "untitled": "Untitled portfolio item"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Не availability blocks in this period",
+            "body": "This creator hasn't marked any unavailable time for the dates shown."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Не campaign history yet",
+            "body": "Кампанияs you run with this creator will appear here."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Излезте",
+      "signingOut": "Signing out…"
+    },
+    "workspaceSwitcher": {
+      "label": "Switch workspace",
+      "placeholder": "Select workspace"
+    },
+    "brands": {
+      "title": "Brands",
+      "actions": {
+        "create": "New brand",
+        "edit": "Редактирайте",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Запазете brand",
+        "saving": "Saving…",
+        "backToList": "Назад to brands",
+        "backToDetail": "Назад to brand"
+      },
+      "fields": {
+        "name": "Brand name",
+        "slug": "Slug",
+        "description": "Description",
+        "industry": "Industry",
+        "websiteUrl": "Website URL",
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "status": "Статус"
+      },
+      "status": {
+        "active": "Активен",
+        "archived": "Архивиран",
+        "all": "Всички"
+      },
+      "detail": {
+        "title": "Brand details"
+      },
+      "create": {
+        "title": "New brand",
+        "success": "Brand created successfully."
+      },
+      "edit": {
+        "title": "Редактирайте brand",
+        "success": "Brand updated successfully."
+      },
+      "archive": {
+        "confirmTitle": "Archive brand",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later.",
+        "confirm": "Archive",
+        "cancel": "Отменете",
+        "success": "Brand archived."
+      },
+      "restore": {
+        "confirmTitle": "Restore brand",
+        "confirmMessage": "Restore {name}? It will appear in the active brand list again.",
+        "confirm": "Restore",
+        "cancel": "Отменете",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Не brands yet",
+        "body": "Създайте your first brand to start managing influencer campaigns.",
+        "cta": "Създайте brand"
+      },
+      "emptyFiltered": {
+        "heading": "Не brands match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "loading": "Зареждане brands…",
+      "errors": {
+        "loadFailed": "Failed to load brands.",
+        "saveFailed": "Failed to save brand.",
+        "archiveFailed": "Failed to archive brand.",
+        "restoreFailed": "Failed to restore brand."
+      }
+    },
+    "campaigns": {
+      "title": "Кампанияs",
+      "actions": {
+        "create": "New campaign",
+        "save": "Създайте campaign",
+        "saveSettings": "Запазете settings",
+        "backToList": "Назад to campaigns"
+      },
+      "fields": {
+        "name": "Кампания name",
+        "brand": "Brand",
+        "objective": "Objective",
+        "description": "Description",
+        "budget": "Budget",
+        "currency": "Валута",
+        "startsAt": "Start date",
+        "endsAt": "End date",
+        "targetCreatorCount": "Target creator count",
+        "deliverables": "Deliverables",
+        "deliverablesHint": "One deliverable per line (e.g. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Space or comma separated.",
+        "usageRights": "Usage rights",
+        "requiresContract": "Require a per-campaign contract",
+        "status": "Статус"
+      },
+      "objective": {
+        "awareness": "Awareness",
+        "engagement": "Engagement",
+        "conversion": "Conversion",
+        "ugc": "UGC",
+        "launch": "Launch"
+      },
+      "status": {
+        "all": "Всички",
+        "draft": "Чернова",
+        "active": "Активен",
+        "paused": "Paused",
+        "completed": "Завършен",
+        "cancelled": "Отменетеled"
+      },
+      "filters": {
+        "brand": "Brand",
+        "startsFrom": "Starts from",
+        "startsTo": "Starts to"
+      },
+      "tabs": {
+        "overview": "Преглед",
+        "creators": "Творецs",
+        "board": "Board",
+        "drafts": "Черноваs",
+        "payments": "Плащанеs",
+        "messages": "Съобщения",
+        "settings": "Настройки"
+      },
+      "create": {
+        "title": "New campaign"
+      },
+      "detail": {
+        "title": "Кампания details"
+      },
+      "settings": {
+        "saved": "Кампания settings saved."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Не creators yet",
+          "body": "Поканете creators to this campaign to get started."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Всички drafts"
+        },
+        "empty": {
+          "heading": "Не drafts yet",
+          "body": "Творец draft submissions will appear here once submitted."
+        },
+        "loadFailed": "We couldn't load drafts. Моля try again.",
+        "submittedAt": "Изпратетеted {date}"
+      },
+      "fees": {
+        "offered": "Offered",
+        "countered": "Countered"
+      },
+      "reinvite": {
+        "action": "Re-invite",
+        "title": "Re-invite creator",
+        "body": "They countered with {fee}. Re-отfer at:",
+        "feeLabel": "New agreed fee ({currency})",
+        "cancel": "Отменете",
+        "submit": "Re-invite",
+        "success": "Re-invitation sent."
+      },
+      "contract": {
+        "attach": {
+          "action": "Issue contract",
+          "title": "Issue contract",
+          "body": "Attach contract terms for the creator to review and accept before they can submit a draft.",
+          "titleLabel": "Договор title",
+          "termsLabel": "Terms (markdown)",
+          "termsHint": "Provide inline terms and/or upload a PDF below.",
+          "pdfLabel": "Договор PDF (optional)",
+          "pdfReady": "PDF ready: {name}",
+          "cancel": "Отменете",
+          "submit": "Issue contract",
+          "success": "Договор issued. The creator has been notified.",
+          "alreadyAttached": "A contract is already awaiting this creator's acceptance.",
+          "error": "We couldn't issue the contract. Моля try again."
+        },
+        "pending": "Договор sent — awaiting creator",
+        "proceedWithout": {
+          "action": "Proceed without contract",
+          "success": "Задача advanced without a contract.",
+          "requiredError": "This campaign requires a per-campaign contract; issue one for the creator to accept.",
+          "error": "We couldn't advance this assignment. Моля try again."
+        }
+      },
+      "invite": {
+        "open": "Поканете creators",
+        "title": "Поканете creators",
+        "loadFailed": "We couldn't load your roster. Моля try again.",
+        "feeLabel": "Agreed fee ({currency})",
+        "search": "Търсене creators",
+        "noRoster": "Не roster creators to invite yet.",
+        "noSearchMatch": "Не creators match your search.",
+        "unnamed": "Unnamed creator",
+        "blockedHint": "Blacklisted — can't be invited.",
+        "cancel": "Отменете",
+        "submit": "Поканете ({count})",
+        "summary": "Поканетеd {ok}. Skipped {blacklisted} (blacklisted), {conflicts} with conflicts.",
+        "conflict": {
+          "title": "Наличност conflict",
+          "body": "{count} selected creator(s) are unavailable during the campaign window. Поканете them anyway?",
+          "cancel": "Skip them",
+          "proceed": "Поканете anyway"
+        }
+      },
+      "board": {
+        "loadError": "We couldn't load the board. Моля try again.",
+        "empty": "This board has no columns yet.",
+        "moveFailed": "Couldn't move the card — it's back where it was.",
+        "reorderFailed": "Couldn't reorder the columns — the order was restored.",
+        "automationsButton": "Automations",
+        "card": {
+          "unnamed": "Unnamed creator",
+          "removed": "Removed assignment",
+          "daysLeft": "{n}d left",
+          "dueToday": "Due today",
+          "overdue": "Overdue"
+        },
+        "column": {
+          "add": "Добавете column",
+          "edit": "Rename / recolor",
+          "delete": "Изтрийте column",
+          "addTitle": "Добавете column",
+          "editTitle": "Редактирайте column",
+          "name": "Column name",
+          "color": "Color",
+          "terminalSuccess": "Mark as success (terminal)",
+          "terminalFailure": "Mark as failure (terminal)",
+          "save": "Запазете",
+          "cancel": "Отменете",
+          "saveFailed": "We couldn't save the column. Моля try again.",
+          "deleteTitle": "Изтрийте column",
+          "deleteBody": "Изтрийте \"{name}\"? This can't be undone.",
+          "deleteBodyNonEmpty": "\"{name}\" has {count} card(s). Choose where to move them before deleting.",
+          "deleteDestination": "Move cards to",
+          "deleteConfirm": "Изтрийте",
+          "errorLastColumn": "A board must keep at least one column.",
+          "errorDestinationRequired": "This column has cards — choose a destination column to move them to before deleting.",
+          "errorGeneric": "We couldn't delete the column. Моля try again."
+        },
+        "automation": {
+          "title": "Automations",
+          "subtitle": "Each event can move a card to a column automatically. Manual drags never trigger these.",
+          "event": "Event",
+          "target": "Moves card to",
+          "none": "Не automation",
+          "enabled": "Enabled",
+          "broken": "Target column was deleted — pick a new one",
+          "updateFailed": "We couldn't update the automation. Моля try again.",
+          "close": "Затворете"
+        },
+        "drawer": {
+          "title": "Задача",
+          "close": "Затворете",
+          "loadError": "We couldn't load this assignment. Моля try again.",
+          "tabs": {
+            "detail": "Detail",
+            "history": "Movement history"
+          },
+          "detail": {
+            "status": "Статус",
+            "creator": "Творец",
+            "postingDue": "Posting due",
+            "deliverables": "Deliverables",
+            "latestDraft": "Latest draft",
+            "postedContent": "Posted content",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Не movements recorded yet.",
+            "removed": "(removed)",
+            "manual": "Manual move",
+            "auto": "Automation",
+            "from": "from",
+            "to": "to"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Плащанеs coming soon",
+          "body": "Escrow funding and payouts will be managed here."
+        },
+        "messages": {
+          "heading": "Съобщения coming soon",
+          "body": "Кампания messaging will appear here."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Поканетеd",
+        "declined": "Отклонетеd",
+        "countered": "Countered",
+        "accepted": "Приеметеed",
+        "contracted": "Договорed",
+        "producing": "Producing",
+        "draft_submitted": "Чернова submitted",
+        "revision_requested": "Revision requested",
+        "approved": "Одобретеd",
+        "rejected": "Отхвърлетеed",
+        "posted": "Posted",
+        "live_verified": "Live verified",
+        "manually_verified": "Manually verified",
+        "payment_held": "Плащане held",
+        "payment_released": "Плащане released",
+        "cancelled": "Отменетеled"
+      },
+      "review": {
+        "action": "Review",
+        "title": "Review draft",
+        "loadFailed": "We couldn't load this draft. Моля try again.",
+        "draftVersion": "Чернова v{n}",
+        "noCaption": "Не caption provided.",
+        "hashtags": "Hashtags",
+        "mentions": "Mentions",
+        "noMedia": "Не media attached.",
+        "feedbackLabel": "Feedback to the creator",
+        "feedbackHint": "Задължително when requesting changes or rejecting.",
+        "approve": "Одобрете",
+        "requestRevision": "Request changes",
+        "reject": "Отхвърлете",
+        "close": "Затворете",
+        "history": "Version history",
+        "postedContent": "Posted content",
+        "draftStatus": {
+          "pending": "В изчакване review",
+          "approved": "Одобретеd",
+          "rejected": "Отхвърлетеed",
+          "revision_requested": "Revision requested"
+        },
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Неt found",
+          "mismatch": "Mismatch"
+        },
+        "simulated": "Simulated verification (mock provider)",
+        "toast": {
+          "approved": "Чернова approved.",
+          "revisionRequested": "Revision requested.",
+          "rejected": "Чернова rejected.",
+          "error": "Something went wrong. Моля try again."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Open preview",
+          "close": "Затворете",
+          "empty": "Не media attached."
+        }
+      },
+      "resolution": {
+        "action": "Resolve",
+        "title": "Resolve verification",
+        "loadFailed": "We couldn't load this assignment. Моля try again.",
+        "postedContent": "Изпратетеted post",
+        "simulated": "Simulated verification (mock provider)",
+        "intro": "Automatic verification от this post failed. Приемете it manually, send it back for a fresh post, or ask the creator to fix the link in place.",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Неt found",
+          "mismatch": "Mismatch"
+        },
+        "noteLabel": "Reason / note to the creator",
+        "noteHint": "Задължително when verifying manually; optional for resubmit requests.",
+        "manuallyVerify": "Verify manually",
+        "requestFresh": "Request fresh post",
+        "requestInPlace": "Ask to fix link",
+        "close": "Затворете",
+        "notActionable": "This assignment is no longer awaiting resolution.",
+        "toast": {
+          "verified": "Post manually verified.",
+          "resubmitFresh": "Sent back for a fresh post.",
+          "resubmitInPlace": "Asked the creator to fix the link.",
+          "error": "Something went wrong. Моля try again."
+        }
+      },
+      "viewPost": {
+        "action": "Вижте post",
+        "title": "Posted content",
+        "loadFailed": "We couldn't load this post. Моля try again.",
+        "empty": "The creator hasn't posted any content yet.",
+        "current": "Current",
+        "postedAt": "Posted",
+        "verifiedAt": "Verified",
+        "simulated": "Верификация runs against a simulated provider in this environment.",
+        "close": "Затворете",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Неt found",
+          "mismatch": "Mismatch"
+        }
+      },
+      "empty": {
+        "heading": "Не campaigns yet",
+        "body": "Създайте your first campaign to start engaging creators.",
+        "cta": "Създайте campaign"
+      },
+      "errors": {
+        "loadFailed": "Failed to load campaigns.",
+        "saveFailed": "Failed to save campaign."
+      }
+    },
+    "pools": {
+      "title": "Talent pools",
+      "agencyWide": "Агенция-wide",
+      "actions": {
+        "create": "New pool",
+        "edit": "Редактирайте",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Запазете pool",
+        "backToList": "Назад to talent pools",
+        "backToDetail": "Назад to pool"
+      },
+      "fields": {
+        "name": "Pool name",
+        "description": "Description",
+        "brand": "Brand",
+        "brandHint": "По желание — labels the pool for a brand's work. Leave blank for an agency-wide pool.",
+        "members": "Members"
+      },
+      "status": {
+        "active": "Активен",
+        "archived": "Архивиран",
+        "all": "Всички"
+      },
+      "create": {
+        "title": "New talent pool"
+      },
+      "edit": {
+        "title": "Редактирайте talent pool"
+      },
+      "detail": {
+        "title": "Pool details",
+        "notFound": "This pool no longer exists.",
+        "membersHeading": "Members",
+        "membersEmpty": "Не creators in this pool yet. Добавете creators from a creator's detail page.",
+        "memberCount": "{count} creators",
+        "unnamed": "Unnamed creator",
+        "remove": "Remove from pool",
+        "removed": "{name} removed from the pool."
+      },
+      "archive": {
+        "confirmTitle": "Archive pool",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later with its members intact.",
+        "confirm": "Archive",
+        "cancel": "Отменете"
+      },
+      "restore": {
+        "confirmTitle": "Restore pool",
+        "confirmMessage": "Restore {name}? It will appear in the active pool list again.",
+        "confirm": "Restore",
+        "cancel": "Отменете",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Не talent pools yet",
+        "body": "Създайте a pool to group creators for a brand or a campaign brief.",
+        "cta": "Създайте pool"
+      },
+      "emptyFiltered": {
+        "heading": "Не pools match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "picker": {
+        "openLabel": "Добавете to pool",
+        "title": "Добавете to talent pools",
+        "empty": "Не talent pools yet. Създайте one from the Talent pools page.",
+        "done": "Done",
+        "added": "Добаветеed to {name}.",
+        "removed": "Removed from {name}.",
+        "loadFailed": "Failed to load talent pools.",
+        "toggleFailed": "Failed to update pool membership."
+      },
+      "addCreators": {
+        "open": "Добавете creators",
+        "title": "Добавете creators to this pool",
+        "search": "Търсене your roster",
+        "noRoster": "Your roster is empty. Добавете creators to your roster first.",
+        "allInPool": "Всички your roster creators are already in this pool.",
+        "noSearchMatch": "Не roster creators match your search.",
+        "cancel": "Отменете",
+        "add": "Добавете {count}",
+        "added": "{count} creators added to the pool.",
+        "loadFailed": "Failed to load your roster.",
+        "addFailed": "Failed to add creators to the pool.",
+        "confirmHard": {
+          "one": "{name} is blacklisted by your agency. Добавете them to this pool anyway?",
+          "many": "{count} selected creators are blacklisted by your agency ({names}). Добавете them anyway?"
+        }
+      },
+      "errors": {
+        "loadFailed": "Failed to load talent pools.",
+        "membersLoadFailed": "Failed to load pool members.",
+        "saveFailed": "Failed to save talent pool.",
+        "archiveFailed": "Failed to archive pool.",
+        "restoreFailed": "Failed to restore pool.",
+        "removeFailed": "Failed to remove creator from the pool."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Name",
+        "email": "Имейл",
+        "role": "Роля",
+        "status": "Статус",
+        "joinedAt": "Joined"
+      },
+      "roles": {
+        "agency_admin": "Администратор",
+        "agency_manager": "Мениджър",
+        "agency_staff": "Персонал"
+      },
+      "status": {
+        "active": "Активен",
+        "pending": "В изчакване"
+      },
+      "members": {
+        "heading": "Current members"
+      },
+      "filters": {
+        "allRoles": "Всички roles",
+        "allStatuses": "Всички statuses"
+      },
+      "search": {
+        "label": "Търсене",
+        "placeholder": "Name or email"
+      },
+      "invitations": {
+        "heading": "Покана history",
+        "columns": {
+          "email": "Поканетеe",
+          "invitedAt": "Поканетеd",
+          "invitedBy": "Поканетеd by"
+        },
+        "status": {
+          "pending": "В изчакване",
+          "accepted": "Приеметеed",
+          "expired": "Expired"
+        },
+        "empty": "Не invitations yet."
+      },
+      "invite": {
+        "button": "Поканете user",
+        "title": "Поканете a team member",
+        "fields": {
+          "email": "Имейл адрес",
+          "role": "Роля"
+        },
+        "submit": "Изпратете invitation",
+        "submitting": "Изпратетеing…",
+        "success": "Покана sent to {email}.",
+        "errors": {
+          "failed": "Failed to send invitation."
+        }
+      },
+      "empty": {
+        "heading": "Не team members",
+        "body": "Поканете your first team member to get started."
+      },
+      "emptyFiltered": "Не team members match your filter.",
+      "errors": {
+        "membersLoadFailed": "Failed to load team members.",
+        "invitationsLoadFailed": "Failed to load invitation history."
+      },
+      "loading": "Зареждане team…",
+      "bulkInviteCreators": {
+        "button": "Bulk-invite creators"
+      }
+    },
+    "bulkInvite": {
+      "title": "Bulk-invite creators",
+      "description": "Качете a CSV with an `email` column. Each row becomes a magic-link invitation. Other columns are accepted but ignored.",
+      "file": {
+        "label": "CSV file",
+        "hint": "5 MB / 1000 rows max. The only required column is `email`."
+      },
+      "softWarning": "{count} rows is a large batch — processing may take a few minutes.",
+      "preview": {
+        "heading": "Parsed rows ({count})",
+        "row": "Row",
+        "email": "Имейл",
+        "errorCount": "{count} parse errors",
+        "errorHeading": "These rows will be skipped:",
+        "errorItem": "Row {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Изпратете invitations ({count})",
+        "reset": "Clear",
+        "startOver": "Изпратете another batch"
+      },
+      "status": {
+        "queued": "Queued — waiting to start",
+        "processing": "Processing invitations",
+        "complete": "Всички done",
+        "failed": "Job failed"
+      },
+      "tracking": {
+        "progress": "{percent}% complete"
+      },
+      "timeout": {
+        "heading": "Still working on this",
+        "description": "Your invitations are taking longer than expected to process. You can try again or check back later.",
+        "retry": "Try again"
+      },
+      "complete": {
+        "heading": "Results",
+        "invited": "Поканетеd",
+        "alreadyInvited": "Already invited",
+        "failed": "Failed",
+        "failureReason": "Reason"
+      },
+      "failed": {
+        "heading": "The bulk invitation job failed."
+      },
+      "errors": {
+        "submitFailed": "We couldn't submit the CSV. Моля try again."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "You've been invited",
+        "joining": "You're being invited to join {agencyName} as {role}.",
+        "accept": "Приемете invitation",
+        "accepting": "Приеметеing…",
+        "signInToContinue": "Влезте to accept this invitation",
+        "signIn": "Влезте",
+        "noAccount": "Don't have an account?",
+        "signUp": "Създайте one now",
+        "success": "Добре дошли to {agencyName}! You're now a {role}.",
+        "expired": {
+          "heading": "This invitation has expired",
+          "body": "Моля contact your agency administrator to request a new invitation."
+        },
+        "alreadyAccepted": {
+          "heading": "Покана already accepted",
+          "body": "This invitation has already been used. Влезте to access your workspace.",
+          "signIn": "Влезте"
+        },
+        "alreadyMember": {
+          "heading": "Already a member",
+          "body": "You are already a member от this workspace."
+        },
+        "emailMismatch": {
+          "heading": "Wrong account",
+          "body": "This invitation was sent to a different email address. Моля sign in with the correct account."
+        },
+        "notFound": {
+          "heading": "Покана not found",
+          "body": "This invitation link is invalid or has already been used."
+        },
+        "errors": {
+          "failed": "Failed to accept invitation."
+        }
+      }
+    },
+    "settings": {
+      "title": "Агенция settings",
+      "fields": {
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "blacklistNotificationPolicy": "Неtify creators when blacklisted",
+        "blacklistNotificationPolicyHint": "When on, a creator is emailed if your agency blacklists them. The reason is never shared."
+      },
+      "save": "Запазете settings",
+      "saving": "Saving…",
+      "success": "Настройки saved.",
+      "readOnly": "Only administrators can edit agency settings.",
+      "loading": "Зареждане settings…",
+      "errors": {
+        "loadFailed": "Failed to load settings.",
+        "saveFailed": "Failed to save settings."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "This field is required."
+  }
+}

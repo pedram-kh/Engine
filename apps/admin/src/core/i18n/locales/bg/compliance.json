@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "compliance": {
+      "shellNotice": "This queue is ready but not yet wired to data — export and erasure processing ships in a later sprint.",
+      "load_failed": "We couldn't load this queue. Моля refresh.",
+      "fields": {
+        "subject": "Data subject",
+        "status": "Статус",
+        "requested": "Requested"
+      },
+      "exports": {
+        "title": "Export requests",
+        "subtitle": "Data-subject access and portability requests (GDPR art. 15/20).",
+        "empty": "Не export requests."
+      },
+      "erasures": {
+        "title": "Erasure queue",
+        "subtitle": "Right-to-be-forgotten requests awaiting review (GDPR art. 17).",
+        "empty": "Не erasure requests."
+      }
+    }
+  }
+}

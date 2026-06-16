@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Agencies",
+        "search_label": "Търсене agencies",
+        "load_failed": "We couldn't load agencies. Моля refresh.",
+        "empty": "Не agencies match this filter.",
+        "filters": {
+          "all": "Всички",
+          "active": "Активен",
+          "suspended": "Suspended"
+        },
+        "fields": {
+          "name": "Агенция",
+          "status": "Статус",
+          "members": "Members",
+          "tier": "Tier",
+          "created_at": "Създайтеd"
+        },
+        "status_labels": {
+          "active": "Активен",
+          "suspended": "Suspended"
+        },
+        "view": "Вижте agency"
+      },
+      "detail": {
+        "fallback_title": "Агенция",
+        "load_failed": "We couldn't load this agency. Моля refresh.",
+        "overview_heading": "Преглед",
+        "suspension_heading": "Suspension",
+        "fields": {
+          "slug": "Slug",
+          "country": "Country",
+          "tier": "Subscription tier",
+          "subscription_status": "Subscription status",
+          "members": "Members",
+          "created_at": "Създайтеd",
+          "suspended_at": "Suspended at",
+          "suspended_reason": "Reason"
+        },
+        "active_state": "This agency is active. Its users can sign in normally.",
+        "suspended_state": "This agency is suspended. Всички от its users are blocked from signing in."
+      },
+      "suspend": {
+        "button": "Suspend agency",
+        "title": "Suspend {name}",
+        "description": "Suspending this agency blocks ALL от its users from signing in. This is recorded in the audit log.",
+        "reason_label": "Reason for suspension",
+        "reason_hint": "Задължително, at least {count} characters. Recorded in the audit log.",
+        "confirm": "Suspend",
+        "cancel": "Отменете",
+        "success": "Агенция suspended.",
+        "failed": "We couldn't suspend this agency. Моля try again."
+      },
+      "reactivate": {
+        "button": "Reactivate agency",
+        "title": "Reactivate {name}",
+        "description": "Reactivating this agency restores sign-in for all от its users. This is recorded in the audit log.",
+        "confirm": "Reactivate",
+        "cancel": "Отменете",
+        "success": "Агенция reactivated.",
+        "failed": "We couldn't reactivate this agency. Моля try again."
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Администратор",
+    "subtitle": "Super-admin console.",
+    "sprint0Notice": "Sprint 0 scaffolding — admin SPA",
+    "dashboardPlaceholder": "Администратор dashboard placeholder — full surface lands in a later sprint.",
+    "env": {
+      "local": "Local",
+      "staging": "Staging",
+      "production": "Production — all actions logged"
+    },
+    "nav": {
+      "comingSoon": "Soon",
+      "dashboard": "Табло за управление",
+      "agencies": "Agencies",
+      "creators": "Творецs",
+      "creatorApprovals": "В изчакване approvals",
+      "kycQueue": "KYC queue",
+      "allCreators": "Всички creators",
+      "payments": "Плащанеs",
+      "disputes": "Disputes",
+      "recentPayments": "Recent",
+      "audit": "Одиторски журнал",
+      "alerts": "Operational alerts",
+      "support": "Поддръжка",
+      "userSearch": "User search",
+      "impersonationLog": "Имперсониране log",
+      "operations": "Операции",
+      "systemHealth": "System health",
+      "horizon": "Назадground jobs …",
+      "compliance": "Съответствие",
+      "exportRequests": "Export requests",
+      "erasureQueue": "Erasure queue",
+      "featureFlags": "Флагове за функции"
+    },
+    "userMenu": {
+      "signOut": "Излезте",
+      "signingOut": "Signing out…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Coming soon",
+      "body": "This surface lights up when payment processing ships (Sprint 10).",
+      "disputes": "Disputes",
+      "recentPayments": "Recent payments"
+    },
+    "sectionStub": {
+      "body": "This admin surface is being built this sprint."
+    },
+    "locale": {
+      "switcher": "Език",
+      "en": "Английски",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    }
+  }
+}

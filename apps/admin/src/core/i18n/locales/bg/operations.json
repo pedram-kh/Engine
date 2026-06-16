@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "operations": {
+      "health": {
+        "title": "System health",
+        "heading": "Service status",
+        "load_failed": "We couldn't load the health probe. Моля refresh.",
+        "status": {
+          "ok": "Healthy",
+          "degraded": "Degraded"
+        },
+        "checks": {
+          "database": "Database",
+          "cache": "Cache"
+        }
+      }
+    }
+  }
+}
