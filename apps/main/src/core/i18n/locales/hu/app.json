@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Influencer marketing, run like a real business.",
+    "sprint0Notice": "Sprint 0 scaffolding — main platform SPA",
+    "locale": {
+      "switcher": "Nyelv",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    },
+    "messaging": {
+      "title": "Üzenetek",
+      "you": "You",
+      "participant": "Participant",
+      "composePlaceholder": "Write a message…",
+      "send": "Küldés",
+      "attachment": "Attachment",
+      "empty": "Nem messages yet. Start the conversation.",
+      "loadEarlier": "Load earlier messages",
+      "loadError": "We couldn't load this conversation. It will retry shortly.",
+      "sendError": "Your message couldn't be sent. Please try again.",
+      "attachmentUploadError": "An attachment failed to upload. Please try again.",
+      "closed": "This conversation is closed — the assignment is no longer active.",
+      "systemFallback": "The assignment was updated.",
+      "system": {
+        "assignment": {
+          "contracted": "The contract was signed — production can begin.",
+          "draft_submitted": "A draft was submitted for review.",
+          "draft_approved": "The draft was approved.",
+          "revision_requested": "Revisions were requested on the draft.",
+          "draft_rejected": "The draft was rejected.",
+          "posted_by_creator": "The creator marked the content as posted.",
+          "live_verified": "The live post was verified.",
+          "manually_verified": "The post was manually verified.",
+          "resubmit_requested": "A resubmission was requested.",
+          "payment_released": "Fizetés was released."
+        }
+      },
+      "rollup": {
+        "empty": "Nem message threads yet for this campaign.",
+        "noMessages": "Nem messages yet.",
+        "loadError": "We couldn't load the message threads."
+      }
+    },
+    "nav": {
+      "dashboard": "Irányítópult",
+      "roster": "My creators",
+      "discover": "Discover",
+      "pools": "Talent pools",
+      "brands": "Brands",
+      "campaigns": "Kampánys",
+      "agencyUsers": "Team",
+      "settings": "Beállítások"
+    },
+    "discover": {
+      "title": "Discover creators",
+      "subtitle": "Browse and search the global creator pool.",
+      "unnamed": "Unnamed creator",
+      "notConnected": "Nemt connected",
+      "search": {
+        "label": "Keresés creators",
+        "placeholder": "Keresés by name or bio"
+      },
+      "filters": {
+        "country": "Country",
+        "language": "Nyelv",
+        "category": "Category"
+      },
+      "connection": {
+        "connected": "Connected",
+        "pending": "Request pending",
+        "declined": "Elutasításd",
+        "notConnected": "Nemt connected",
+        "sendRequest": "Küldés request",
+        "requestAgain": "Request again",
+        "sent": "Request sent",
+        "reRequested": "Request sent again",
+        "alreadyPending": "A request is already pending",
+        "alreadyConnected": "This creator is already on your roster",
+        "error": "Couldn't send the request. Please try again."
+      },
+      "empty": {
+        "heading": "Nem creators yet",
+        "body": "Jóváhagyásd creators will appear here as the pool grows."
+      },
+      "emptyFiltered": {
+        "heading": "Nem matches",
+        "body": "Nem creators match your filters. Try broadening your search."
+      },
+      "errors": {
+        "loadFailed": "Couldn't load creators. Please try again."
+      },
+      "detail": {
+        "back": "Vissza to Discover",
+        "notFound": "This creator isn't available.",
+        "loadFailed": "Couldn't load this profile. Please try again.",
+        "viewInRoster": "Megtekintés in roster",
+        "sections": {
+          "profile": "Profil",
+          "social": "Social accounts",
+          "portfolio": "Portfólió"
+        },
+        "social": {
+          "empty": "Nem social accounts linked."
+        },
+        "portfolio": {
+          "empty": "Nem portfolio elemek yet.",
+          "untitled": "Untitled item"
+        }
+      }
+    },
+    "roster": {
+      "title": "My creators",
+      "unnamed": "Unnamed creator",
+      "blacklisted": "Blacklisted",
+      "blacklist": {
+        "badge": {
+          "hard": "Blacklisted",
+          "soft": "Blacklist warning"
+        },
+        "openAction": "Blacklist creator",
+        "liftAction": "Remove blacklist",
+        "lifted": "Blacklist removed.",
+        "liftFailed": "Failed to remove the blacklist.",
+        "section": {
+          "title": "Blacklist",
+          "none": "This creator is not blacklisted by your agency."
+        },
+        "status": {
+          "hard": "Hard blacklisted — excluded from your discovery and blocked from connection requests.",
+          "soft": "Soft blacklisted — a warning only; the creator stays matchable."
+        },
+        "dialog": {
+          "title": "Blacklist creator",
+          "scopeLabel": "Scope",
+          "scope": {
+            "agency": "Entire agency",
+            "brand": "A specific brand"
+          },
+          "noRelationHint": "Ügynökség-wide blacklisting requires a connected creator.",
+          "brandLabel": "Brand",
+          "typeLabel": "Type",
+          "type": {
+            "hard": "Hard — exclude from discovery and block requests",
+            "soft": "Soft — warn only, keep matchable"
+          },
+          "reasonLabel": "Reason",
+          "reasonPlaceholder": "Why is this creator being blacklisted? (kept private to your agency)",
+          "cancel": "Mégse",
+          "confirm": "Blacklist",
+          "success": "Alkotó blacklisted.",
+          "invalid": "Please complete the required fields.",
+          "failed": "Failed to blacklist the creator."
+        }
+      },
+      "fields": {
+        "name": "Name",
+        "email": "E-mail",
+        "status": "Állapot",
+        "applicationStatus": "Application",
+        "country": "Country",
+        "language": "Nyelv",
+        "categories": "Categories",
+        "rating": "Rating",
+        "campaigns": "Kampánys"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Prospect",
+        "external": "External",
+        "pending_request": "Függőben request",
+        "declined": "Elutasításd"
+      },
+      "applicationStatus": {
+        "incomplete": "Incomplete",
+        "pending": "Függőben",
+        "approved": "Jóváhagyásd",
+        "rejected": "Elutasításed"
+      },
+      "search": {
+        "label": "Keresés creators",
+        "placeholder": "Keresés by name or bio"
+      },
+      "filters": {
+        "status": {
+          "all": "Összes",
+          "roster": "Roster",
+          "prospect": "Prospect",
+          "external": "External",
+          "pending_request": "Függőben requests",
+          "declined": "Elutasításd"
+        },
+        "country": "Country",
+        "language": "Nyelv",
+        "category": "Category",
+        "availability": {
+          "from": "Available from",
+          "to": "Available to"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Followers"
+        },
+        "engagement": {
+          "label": "Engagement rate"
+        },
+        "metrics": {
+          "tooltip": "Social metrics aren't connected yet."
+        }
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Nem creators yet",
+        "body": "Alkotós you invite or engage will appear here across your roster, prospects, and external collaborators."
+      },
+      "emptyFiltered": {
+        "heading": "Nem creators match these filters",
+        "body": "Try clearing or changing a filter to see more of your creators."
+      },
+      "errors": {
+        "loadFailed": "Failed to load your creators. Please try again."
+      },
+      "detail": {
+        "back": "Vissza to my creators",
+        "unnamed": "Unnamed creator",
+        "loadFailed": "We couldn't load this creator. Please try again.",
+        "notFound": "This creator isn't in your roster.",
+        "sections": {
+          "profile": "Profil",
+          "rating": "Rating & notes",
+          "social": "Social accounts",
+          "metrics": "Social metrics",
+          "portfolio": "Portfólió",
+          "availability": "Elérhetőség",
+          "campaigns": "Kampány history"
+        },
+        "editor": {
+          "starLabel": "Rate {n} of 5",
+          "ratingUnset": "Nemt rated",
+          "notesLabel": "Internal notes",
+          "notesPlaceholder": "Private notes about working with this creator (visible to your agency only).",
+          "notesEmpty": "Nem notes yet.",
+          "save": "Mentés",
+          "saved": "Changes saved.",
+          "saveFailed": "We couldn't save your changes. Please try again."
+        },
+        "social": {
+          "empty": "Nem social accounts connected."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Social metrics will appear once accounts are connected",
+            "body": "Follower counts and engagement rates aren't available yet — they'll show here when the social integrations land."
+          }
+        },
+        "portfolio": {
+          "empty": "Nem portfolio elemek yet.",
+          "untitled": "Untitled portfolio item"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Nem availability blocks in this period",
+            "body": "This creator hasn't marked any unavailable time for the dates shown."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Nem campaign history yet",
+            "body": "Kampánys you run with this creator will appear here."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Kijelentkezés",
+      "signingOut": "Signing out…"
+    },
+    "workspaceSwitcher": {
+      "label": "Switch workspace",
+      "placeholder": "Select workspace"
+    },
+    "brands": {
+      "title": "Brands",
+      "actions": {
+        "create": "New brand",
+        "edit": "Szerkesztés",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Mentés brand",
+        "saving": "Saving…",
+        "backToList": "Vissza to brands",
+        "backToDetail": "Vissza to brand"
+      },
+      "fields": {
+        "name": "Brand name",
+        "slug": "Slug",
+        "description": "Description",
+        "industry": "Industry",
+        "websiteUrl": "Website URL",
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "status": "Állapot"
+      },
+      "status": {
+        "active": "Aktív",
+        "archived": "Archivált",
+        "all": "Összes"
+      },
+      "detail": {
+        "title": "Brand details"
+      },
+      "create": {
+        "title": "New brand",
+        "success": "Brand created successfully."
+      },
+      "edit": {
+        "title": "Szerkesztés brand",
+        "success": "Brand updated successfully."
+      },
+      "archive": {
+        "confirmTitle": "Archive brand",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later.",
+        "confirm": "Archive",
+        "cancel": "Mégse",
+        "success": "Brand archived."
+      },
+      "restore": {
+        "confirmTitle": "Restore brand",
+        "confirmMessage": "Restore {name}? It will appear in the active brand list again.",
+        "confirm": "Restore",
+        "cancel": "Mégse",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Nem brands yet",
+        "body": "Létrehozás your first brand to start managing influencer campaigns.",
+        "cta": "Létrehozás brand"
+      },
+      "emptyFiltered": {
+        "heading": "Nem brands match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "loading": "Betöltés brands…",
+      "errors": {
+        "loadFailed": "Failed to load brands.",
+        "saveFailed": "Failed to save brand.",
+        "archiveFailed": "Failed to archive brand.",
+        "restoreFailed": "Failed to restore brand."
+      }
+    },
+    "campaigns": {
+      "title": "Kampánys",
+      "actions": {
+        "create": "New campaign",
+        "save": "Létrehozás campaign",
+        "saveSettings": "Mentés settings",
+        "backToList": "Vissza to campaigns"
+      },
+      "fields": {
+        "name": "Kampány name",
+        "brand": "Brand",
+        "objective": "Objective",
+        "description": "Description",
+        "budget": "Budget",
+        "currency": "Valuta",
+        "startsAt": "Start date",
+        "endsAt": "End date",
+        "targetCreatorCount": "Target creator count",
+        "deliverables": "Deliverables",
+        "deliverablesHint": "One deliverable per line (e.g. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Space or comma separated.",
+        "usageRights": "Usage rights",
+        "requiresContract": "Require a per-campaign contract",
+        "status": "Állapot"
+      },
+      "objective": {
+        "awareness": "Awareness",
+        "engagement": "Engagement",
+        "conversion": "Conversion",
+        "ugc": "UGC",
+        "launch": "Launch"
+      },
+      "status": {
+        "all": "Összes",
+        "draft": "Vázlat",
+        "active": "Aktív",
+        "paused": "Paused",
+        "completed": "Befejezett",
+        "cancelled": "Mégseled"
+      },
+      "filters": {
+        "brand": "Brand",
+        "startsFrom": "Starts from",
+        "startsTo": "Starts to"
+      },
+      "tabs": {
+        "overview": "Áttekintés",
+        "creators": "Alkotós",
+        "board": "Board",
+        "drafts": "Vázlats",
+        "payments": "Fizetéss",
+        "messages": "Üzenetek",
+        "settings": "Beállítások"
+      },
+      "create": {
+        "title": "New campaign"
+      },
+      "detail": {
+        "title": "Kampány details"
+      },
+      "settings": {
+        "saved": "Kampány settings saved."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Nem creators yet",
+          "body": "Meghívás creators to this campaign to get started."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Összes drafts"
+        },
+        "empty": {
+          "heading": "Nem drafts yet",
+          "body": "Alkotó draft submissions will appear here once submitted."
+        },
+        "loadFailed": "We couldn't load drafts. Please try again.",
+        "submittedAt": "Küldésted {date}"
+      },
+      "fees": {
+        "offered": "Offered",
+        "countered": "Countered"
+      },
+      "reinvite": {
+        "action": "Re-invite",
+        "title": "Re-invite creator",
+        "body": "They countered with {fee}. Re-offer at:",
+        "feeLabel": "New agreed fee ({currency})",
+        "cancel": "Mégse",
+        "submit": "Re-invite",
+        "success": "Re-invitation sent."
+      },
+      "contract": {
+        "attach": {
+          "action": "Issue contract",
+          "title": "Issue contract",
+          "body": "Attach contract terms for the creator to review and accept before they can submit a draft.",
+          "titleLabel": "Szerződés title",
+          "termsLabel": "Terms (markdown)",
+          "termsHint": "Provide inline terms and/or upload a PDF below.",
+          "pdfLabel": "Szerződés PDF (optional)",
+          "pdfReady": "PDF ready: {name}",
+          "cancel": "Mégse",
+          "submit": "Issue contract",
+          "success": "Szerződés issued. The creator has been notified.",
+          "alreadyAttached": "A contract is already awaiting this creator's acceptance.",
+          "error": "We couldn't issue the contract. Please try again."
+        },
+        "pending": "Szerződés sent — awaiting creator",
+        "proceedWithout": {
+          "action": "Proceed without contract",
+          "success": "Feladat advanced without a contract.",
+          "requiredError": "This campaign requires a per-campaign contract; issue one for the creator to accept.",
+          "error": "We couldn't advance this assignment. Please try again."
+        }
+      },
+      "invite": {
+        "open": "Meghívás creators",
+        "title": "Meghívás creators",
+        "loadFailed": "We couldn't load your roster. Please try again.",
+        "feeLabel": "Agreed fee ({currency})",
+        "search": "Keresés creators",
+        "noRoster": "Nem roster creators to invite yet.",
+        "noSearchMatch": "Nem creators match your search.",
+        "unnamed": "Unnamed creator",
+        "blockedHint": "Blacklisted — can't be invited.",
+        "cancel": "Mégse",
+        "submit": "Meghívás ({count})",
+        "summary": "Meghívásd {ok}. Skipped {blacklisted} (blacklisted), {conflicts} with conflicts.",
+        "conflict": {
+          "title": "Elérhetőség conflict",
+          "body": "{count} selected creator(s) are unavailable during the campaign window. Meghívás them anyway?",
+          "cancel": "Skip them",
+          "proceed": "Meghívás anyway"
+        }
+      },
+      "board": {
+        "loadError": "We couldn't load the board. Please try again.",
+        "empty": "This board has no columns yet.",
+        "moveFailed": "Couldn't move the card — it's back where it was.",
+        "reorderFailed": "Couldn't reorder the columns — the order was restored.",
+        "automationsButton": "Automations",
+        "card": {
+          "unnamed": "Unnamed creator",
+          "removed": "Removed assignment",
+          "daysLeft": "{n}d left",
+          "dueToday": "Due today",
+          "overdue": "Overdue"
+        },
+        "column": {
+          "add": "Hozzáadás column",
+          "edit": "Rename / recolor",
+          "delete": "Törlés column",
+          "addTitle": "Hozzáadás column",
+          "editTitle": "Szerkesztés column",
+          "name": "Column name",
+          "color": "Color",
+          "terminalSuccess": "Mark as success (terminal)",
+          "terminalFailure": "Mark as failure (terminal)",
+          "save": "Mentés",
+          "cancel": "Mégse",
+          "saveFailed": "We couldn't save the column. Please try again.",
+          "deleteTitle": "Törlés column",
+          "deleteBody": "Törlés \"{name}\"? This can't be undone.",
+          "deleteBodyNonEmpty": "\"{name}\" has {count} card(s). Choose where to move them before deleting.",
+          "deleteDestination": "Move cards to",
+          "deleteConfirm": "Törlés",
+          "errorLastColumn": "A board must keep at least one column.",
+          "errorDestinationRequired": "This column has cards — choose a destination column to move them to before deleting.",
+          "errorGeneric": "We couldn't delete the column. Please try again."
+        },
+        "automation": {
+          "title": "Automations",
+          "subtitle": "Each event can move a card to a column automatically. Manual drags never trigger these.",
+          "event": "Event",
+          "target": "Moves card to",
+          "none": "Nem automation",
+          "enabled": "Enabled",
+          "broken": "Target column was deleted — pick a new one",
+          "updateFailed": "We couldn't update the automation. Please try again.",
+          "close": "Bezárás"
+        },
+        "drawer": {
+          "title": "Feladat",
+          "close": "Bezárás",
+          "loadError": "We couldn't load this assignment. Please try again.",
+          "tabs": {
+            "detail": "Detail",
+            "history": "Movement history"
+          },
+          "detail": {
+            "status": "Állapot",
+            "creator": "Alkotó",
+            "postingDue": "Posting due",
+            "deliverables": "Deliverables",
+            "latestDraft": "Latest draft",
+            "postedContent": "Posted content",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Nem movements recorded yet.",
+            "removed": "(removed)",
+            "manual": "Manual move",
+            "auto": "Automation",
+            "from": "from",
+            "to": "to"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Fizetéss coming soon",
+          "body": "Escrow funding and payouts will be managed here."
+        },
+        "messages": {
+          "heading": "Üzenetek coming soon",
+          "body": "Kampány messaging will appear here."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Meghívásd",
+        "declined": "Elutasításd",
+        "countered": "Countered",
+        "accepted": "Elfogadásed",
+        "contracted": "Szerződésed",
+        "producing": "Producing",
+        "draft_submitted": "Vázlat submitted",
+        "revision_requested": "Revision requested",
+        "approved": "Jóváhagyásd",
+        "rejected": "Elutasításed",
+        "posted": "Posted",
+        "live_verified": "Live verified",
+        "manually_verified": "Manually verified",
+        "payment_held": "Fizetés held",
+        "payment_released": "Fizetés released",
+        "cancelled": "Mégseled"
+      },
+      "review": {
+        "action": "Review",
+        "title": "Review draft",
+        "loadFailed": "We couldn't load this draft. Please try again.",
+        "draftVersion": "Vázlat v{n}",
+        "noCaption": "Nem caption provided.",
+        "hashtags": "Hashtags",
+        "mentions": "Mentions",
+        "noMedia": "Nem media attached.",
+        "feedbackLabel": "Feedback to the creator",
+        "feedbackHint": "Kötelező when requesting changes or rejecting.",
+        "approve": "Jóváhagyás",
+        "requestRevision": "Request changes",
+        "reject": "Elutasítás",
+        "close": "Bezárás",
+        "history": "Version history",
+        "postedContent": "Posted content",
+        "draftStatus": {
+          "pending": "Függőben review",
+          "approved": "Jóváhagyásd",
+          "rejected": "Elutasításed",
+          "revision_requested": "Revision requested"
+        },
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Nemt found",
+          "mismatch": "Mismatch"
+        },
+        "simulated": "Simulated verification (mock provider)",
+        "toast": {
+          "approved": "Vázlat approved.",
+          "revisionRequested": "Revision requested.",
+          "rejected": "Vázlat rejected.",
+          "error": "Something went wrong. Please try again."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Open preview",
+          "close": "Bezárás",
+          "empty": "Nem media attached."
+        }
+      },
+      "resolution": {
+        "action": "Resolve",
+        "title": "Resolve verification",
+        "loadFailed": "We couldn't load this assignment. Please try again.",
+        "postedContent": "Küldésted post",
+        "simulated": "Simulated verification (mock provider)",
+        "intro": "Automatic verification of this post failed. Elfogadás it manually, send it back for a fresh post, or ask the creator to fix the link in place.",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Nemt found",
+          "mismatch": "Mismatch"
+        },
+        "noteLabel": "Reason / note to the creator",
+        "noteHint": "Kötelező when verifying manually; optional for resubmit requests.",
+        "manuallyVerify": "Verify manually",
+        "requestFresh": "Request fresh post",
+        "requestInPlace": "Ask to fix link",
+        "close": "Bezárás",
+        "notActionable": "This assignment is no longer awaiting resolution.",
+        "toast": {
+          "verified": "Post manually verified.",
+          "resubmitFresh": "Sent back for a fresh post.",
+          "resubmitInPlace": "Asked the creator to fix the link.",
+          "error": "Something went wrong. Please try again."
+        }
+      },
+      "viewPost": {
+        "action": "Megtekintés post",
+        "title": "Posted content",
+        "loadFailed": "We couldn't load this post. Please try again.",
+        "empty": "The creator hasn't posted any content yet.",
+        "current": "Current",
+        "postedAt": "Posted",
+        "verifiedAt": "Verified",
+        "simulated": "Ellenőrzés runs against a simulated provider in this environment.",
+        "close": "Bezárás",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Nemt found",
+          "mismatch": "Mismatch"
+        }
+      },
+      "empty": {
+        "heading": "Nem campaigns yet",
+        "body": "Létrehozás your first campaign to start engaging creators.",
+        "cta": "Létrehozás campaign"
+      },
+      "errors": {
+        "loadFailed": "Failed to load campaigns.",
+        "saveFailed": "Failed to save campaign."
+      }
+    },
+    "pools": {
+      "title": "Talent pools",
+      "agencyWide": "Ügynökség-wide",
+      "actions": {
+        "create": "New pool",
+        "edit": "Szerkesztés",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Mentés pool",
+        "backToList": "Vissza to talent pools",
+        "backToDetail": "Vissza to pool"
+      },
+      "fields": {
+        "name": "Pool name",
+        "description": "Description",
+        "brand": "Brand",
+        "brandHint": "Nem kötelező — labels the pool for a brand's work. Leave blank for an agency-wide pool.",
+        "members": "Members"
+      },
+      "status": {
+        "active": "Aktív",
+        "archived": "Archivált",
+        "all": "Összes"
+      },
+      "create": {
+        "title": "New talent pool"
+      },
+      "edit": {
+        "title": "Szerkesztés talent pool"
+      },
+      "detail": {
+        "title": "Pool details",
+        "notFound": "This pool no longer exists.",
+        "membersHeading": "Members",
+        "membersEmpty": "Nem creators in this pool yet. Hozzáadás creators from a creator's detail page.",
+        "memberCount": "{count} creators",
+        "unnamed": "Unnamed creator",
+        "remove": "Remove from pool",
+        "removed": "{name} removed from the pool."
+      },
+      "archive": {
+        "confirmTitle": "Archive pool",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later with its members intact.",
+        "confirm": "Archive",
+        "cancel": "Mégse"
+      },
+      "restore": {
+        "confirmTitle": "Restore pool",
+        "confirmMessage": "Restore {name}? It will appear in the active pool list again.",
+        "confirm": "Restore",
+        "cancel": "Mégse",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Nem talent pools yet",
+        "body": "Létrehozás a pool to group creators for a brand or a campaign brief.",
+        "cta": "Létrehozás pool"
+      },
+      "emptyFiltered": {
+        "heading": "Nem pools match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "picker": {
+        "openLabel": "Hozzáadás to pool",
+        "title": "Hozzáadás to talent pools",
+        "empty": "Nem talent pools yet. Létrehozás one from the Talent pools page.",
+        "done": "Done",
+        "added": "Hozzáadásed to {name}.",
+        "removed": "Removed from {name}.",
+        "loadFailed": "Failed to load talent pools.",
+        "toggleFailed": "Failed to update pool membership."
+      },
+      "addCreators": {
+        "open": "Hozzáadás creators",
+        "title": "Hozzáadás creators to this pool",
+        "search": "Keresés your roster",
+        "noRoster": "Your roster is empty. Hozzáadás creators to your roster first.",
+        "allInPool": "Összes your roster creators are already in this pool.",
+        "noSearchMatch": "Nem roster creators match your search.",
+        "cancel": "Mégse",
+        "add": "Hozzáadás {count}",
+        "added": "{count} creators added to the pool.",
+        "loadFailed": "Failed to load your roster.",
+        "addFailed": "Failed to add creators to the pool.",
+        "confirmHard": {
+          "one": "{name} is blacklisted by your agency. Hozzáadás them to this pool anyway?",
+          "many": "{count} selected creators are blacklisted by your agency ({names}). Hozzáadás them anyway?"
+        }
+      },
+      "errors": {
+        "loadFailed": "Failed to load talent pools.",
+        "membersLoadFailed": "Failed to load pool members.",
+        "saveFailed": "Failed to save talent pool.",
+        "archiveFailed": "Failed to archive pool.",
+        "restoreFailed": "Failed to restore pool.",
+        "removeFailed": "Failed to remove creator from the pool."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Name",
+        "email": "E-mail",
+        "role": "Szerepkör",
+        "status": "Állapot",
+        "joinedAt": "Joined"
+      },
+      "roles": {
+        "agency_admin": "Adminisztrátor",
+        "agency_manager": "Vezető",
+        "agency_staff": "Személyzet"
+      },
+      "status": {
+        "active": "Aktív",
+        "pending": "Függőben"
+      },
+      "members": {
+        "heading": "Current members"
+      },
+      "filters": {
+        "allRoles": "Összes roles",
+        "allStatuses": "Összes statuses"
+      },
+      "search": {
+        "label": "Keresés",
+        "placeholder": "Name or email"
+      },
+      "invitations": {
+        "heading": "Meghívó history",
+        "columns": {
+          "email": "Meghíváse",
+          "invitedAt": "Meghívásd",
+          "invitedBy": "Meghívásd by"
+        },
+        "status": {
+          "pending": "Függőben",
+          "accepted": "Elfogadásed",
+          "expired": "Expired"
+        },
+        "empty": "Nem invitations yet."
+      },
+      "invite": {
+        "button": "Meghívás user",
+        "title": "Meghívás a team member",
+        "fields": {
+          "email": "E-mail cím",
+          "role": "Szerepkör"
+        },
+        "submit": "Küldés invitation",
+        "submitting": "Küldésing…",
+        "success": "Meghívó sent to {email}.",
+        "errors": {
+          "failed": "Failed to send invitation."
+        }
+      },
+      "empty": {
+        "heading": "Nem team members",
+        "body": "Meghívás your first team member to get started."
+      },
+      "emptyFiltered": "Nem team members match your filter.",
+      "errors": {
+        "membersLoadFailed": "Failed to load team members.",
+        "invitationsLoadFailed": "Failed to load invitation history."
+      },
+      "loading": "Betöltés team…",
+      "bulkInviteCreators": {
+        "button": "Bulk-invite creators"
+      }
+    },
+    "bulkInvite": {
+      "title": "Bulk-invite creators",
+      "description": "Feltöltés a CSV with an `email` column. Each row becomes a magic-link invitation. Other columns are accepted but ignored.",
+      "file": {
+        "label": "CSV file",
+        "hint": "5 MB / 1000 rows max. The only required column is `email`."
+      },
+      "softWarning": "{count} rows is a large batch — processing may take a few minutes.",
+      "preview": {
+        "heading": "Parsed rows ({count})",
+        "row": "Row",
+        "email": "E-mail",
+        "errorCount": "{count} parse errors",
+        "errorHeading": "These rows will be skipped:",
+        "errorItem": "Row {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Küldés invitations ({count})",
+        "reset": "Clear",
+        "startOver": "Küldés another batch"
+      },
+      "status": {
+        "queued": "Queued — waiting to start",
+        "processing": "Processing invitations",
+        "complete": "Összes done",
+        "failed": "Job failed"
+      },
+      "tracking": {
+        "progress": "{percent}% complete"
+      },
+      "timeout": {
+        "heading": "Still working on this",
+        "description": "Your invitations are taking longer than expected to process. You can try again or check back later.",
+        "retry": "Try again"
+      },
+      "complete": {
+        "heading": "Results",
+        "invited": "Meghívásd",
+        "alreadyInvited": "Already invited",
+        "failed": "Failed",
+        "failureReason": "Reason"
+      },
+      "failed": {
+        "heading": "The bulk invitation job failed."
+      },
+      "errors": {
+        "submitFailed": "We couldn't submit the CSV. Please try again."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "You've been invited",
+        "joining": "You're being invited to join {agencyName} as {role}.",
+        "accept": "Elfogadás invitation",
+        "accepting": "Elfogadásing…",
+        "signInToContinue": "Bejelentkezés to accept this invitation",
+        "signIn": "Bejelentkezés",
+        "noAccount": "Don't have an account?",
+        "signUp": "Létrehozás one now",
+        "success": "Üdvözöljük to {agencyName}! You're now a {role}.",
+        "expired": {
+          "heading": "This invitation has expired",
+          "body": "Please contact your agency administrator to request a new invitation."
+        },
+        "alreadyAccepted": {
+          "heading": "Meghívó already accepted",
+          "body": "This invitation has already been used. Bejelentkezés to access your workspace.",
+          "signIn": "Bejelentkezés"
+        },
+        "alreadyMember": {
+          "heading": "Already a member",
+          "body": "You are already a member of this workspace."
+        },
+        "emailMismatch": {
+          "heading": "Wrong account",
+          "body": "This invitation was sent to a different email address. Please sign in with the correct account."
+        },
+        "notFound": {
+          "heading": "Meghívó not found",
+          "body": "This invitation link is invalid or has already been used."
+        },
+        "errors": {
+          "failed": "Failed to accept invitation."
+        }
+      }
+    },
+    "settings": {
+      "title": "Ügynökség settings",
+      "fields": {
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "blacklistNotificationPolicy": "Nemtify creators when blacklisted",
+        "blacklistNotificationPolicyHint": "When on, a creator is emailed if your agency blacklists them. The reason is never shared."
+      },
+      "save": "Mentés settings",
+      "saving": "Saving…",
+      "success": "Beállítások saved.",
+      "readOnly": "Only administrators can edit agency settings.",
+      "loading": "Betöltés settings…",
+      "errors": {
+        "loadFailed": "Failed to load settings.",
+        "saveFailed": "Failed to save settings."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "This field is required."
+  }
+}

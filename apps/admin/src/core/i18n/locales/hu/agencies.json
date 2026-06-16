@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Agencies",
+        "search_label": "Keresés agencies",
+        "load_failed": "We couldn't load agencies. Please refresh.",
+        "empty": "Nem agencies match this filter.",
+        "filters": {
+          "all": "Összes",
+          "active": "Aktív",
+          "suspended": "Suspended"
+        },
+        "fields": {
+          "name": "Ügynökség",
+          "status": "Állapot",
+          "members": "Members",
+          "tier": "Tier",
+          "created_at": "Létrehozásd"
+        },
+        "status_labels": {
+          "active": "Aktív",
+          "suspended": "Suspended"
+        },
+        "view": "Megtekintés agency"
+      },
+      "detail": {
+        "fallback_title": "Ügynökség",
+        "load_failed": "We couldn't load this agency. Please refresh.",
+        "overview_heading": "Áttekintés",
+        "suspension_heading": "Suspension",
+        "fields": {
+          "slug": "Slug",
+          "country": "Country",
+          "tier": "Subscription tier",
+          "subscription_status": "Subscription status",
+          "members": "Members",
+          "created_at": "Létrehozásd",
+          "suspended_at": "Suspended at",
+          "suspended_reason": "Reason"
+        },
+        "active_state": "This agency is active. Its users can sign in normally.",
+        "suspended_state": "This agency is suspended. Összes of its users are blocked from signing in."
+      },
+      "suspend": {
+        "button": "Suspend agency",
+        "title": "Suspend {name}",
+        "description": "Suspending this agency blocks ALL of its users from signing in. This is recorded in the audit log.",
+        "reason_label": "Reason for suspension",
+        "reason_hint": "Kötelező, at least {count} characters. Recorded in the audit log.",
+        "confirm": "Suspend",
+        "cancel": "Mégse",
+        "success": "Ügynökség suspended.",
+        "failed": "We couldn't suspend this agency. Please try again."
+      },
+      "reactivate": {
+        "button": "Reactivate agency",
+        "title": "Reactivate {name}",
+        "description": "Reactivating this agency restores sign-in for all of its users. This is recorded in the audit log.",
+        "confirm": "Reactivate",
+        "cancel": "Mégse",
+        "success": "Ügynökség reactivated.",
+        "failed": "We couldn't reactivate this agency. Please try again."
+      }
+    }
+  }
+}

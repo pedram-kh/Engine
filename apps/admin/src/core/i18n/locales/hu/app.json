@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Adminisztrátor",
+    "subtitle": "Super-admin console.",
+    "sprint0Notice": "Sprint 0 scaffolding — admin SPA",
+    "dashboardPlaceholder": "Adminisztrátor dashboard placeholder — full surface lands in a later sprint.",
+    "env": {
+      "local": "Local",
+      "staging": "Staging",
+      "production": "Production — all actions logged"
+    },
+    "nav": {
+      "comingSoon": "Soon",
+      "dashboard": "Irányítópult",
+      "agencies": "Agencies",
+      "creators": "Alkotós",
+      "creatorApprovals": "Függőben approvals",
+      "kycQueue": "KYC queue",
+      "allCreators": "Összes creators",
+      "payments": "Fizetéss",
+      "disputes": "Disputes",
+      "recentPayments": "Recent",
+      "audit": "Ellenőrzésnapló",
+      "alerts": "Operational alerts",
+      "support": "Támogatás",
+      "userSearch": "User search",
+      "impersonationLog": "Megszemélyesítés log",
+      "operations": "Műveletek",
+      "systemHealth": "System health",
+      "horizon": "Visszaground jobs …",
+      "compliance": "Megfelelőség",
+      "exportRequests": "Export requests",
+      "erasureQueue": "Erasure queue",
+      "featureFlags": "Funkciójelzők"
+    },
+    "userMenu": {
+      "signOut": "Kijelentkezés",
+      "signingOut": "Signing out…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Coming soon",
+      "body": "This surface lights up when payment processing ships (Sprint 10).",
+      "disputes": "Disputes",
+      "recentPayments": "Recent payments"
+    },
+    "sectionStub": {
+      "body": "This admin surface is being built this sprint."
+    },
+    "locale": {
+      "switcher": "Nyelv",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    }
+  }
+}
