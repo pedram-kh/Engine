@@ -272,3 +272,29 @@ S7 makes locale drift a CI failure instead of a runtime fallback. It generalises
 2. **Placeholder + plural (FE):** collapsed `pt` `incomplete_blocker` to a single form `"Tem etapas por concluir: {names}."` → the placeholder gate flagged `[names] != en [count,names]` AND the plural gate flagged `1 plural forms != en 2` → restored.
 
 **Done-gate (S7):** main architecture suite 108 green (19 files, incl. the new locale-parity ×4 cases + the 3 generalised specs); admin architecture suite 66 green (14 files); backend `tests/Unit/Core` 17 green (incl. the new `LangParityTest` 3 cases). Both SPAs typecheck clean (`vue-tsc --noEmit`); ESLint clean on all touched specs; Pint clean on `LangParityTest`. No production surface touched — S7 is tests + the registry-driven generalisation only.
+
+---
+
+## S8 — Generate the 21 net-new locales + flip to 24 (in progress)
+
+The final chunk: produce a model-authored machine-translation baseline for the 21 EU locales not yet rendered (`en/pt/it` already exist), across all three roots, then flip `UI_LOCALES`/`availableLocales` to the full 24 **as the very last action** — and only once every locale is parity-green. The [i18n glossary](../i18n-glossary.md) governs the pass: brand nouns (`Engine C`, `Catalyst`, `Stripe`, …) stay byte-identical, placeholders/plurals are preserved, and `resources/contracts/**` is never touched (it lives outside the string files specifically so the legal carve-out is enforceable).
+
+**Method:** model-authored translations (the agreed MT baseline, for architect review before merge), kept structurally honest by the S7 parity gates. Per locale the corpus is ~1,757 strings — main 1,185 + admin 434 (frontend, 18 JSON files) + 138 (backend, 7 `lang/` files) — so 21 × ~1,757 ≈ 36,900 strings total. Generation is incremental and committed locale-by-locale so progress is durable; the dropdown stays at 3 until the final flip, so half-generated locales are inert (the `SetLocale` middleware and the SPA `availableLocales` only ever apply `UI_LOCALES`).
+
+### Pre-flip verifier (S8a)
+
+The S7 architecture specs only iterate `UI_LOCALES` (3 today), so a not-yet-flipped locale is otherwise unguarded until the flip. Two standalone verifiers mirror the S7 gates for an arbitrary locale so each generated locale is validated **before** it joins the registry:
+
+- [scripts/i18n/verify-locale.mjs](../../scripts/i18n/verify-locale.mjs) — frontend (both SPAs): file-set + keyset parity, `{named}` placeholder integrity, and plural form-count parity + CLDR renderability (categories via `Intl.PluralRules`, the S3 SOT).
+- [scripts/i18n/verify-locale.php](../../scripts/i18n/verify-locale.php) — backend `lang/`: file + keyset + `:named` placeholder parity.
+
+Both take one-or-more locale args, print every violation, and exit non-zero on drift. Smoke-tested: `pt`/`it` PASS, a missing locale FAILs cleanly.
+
+### Progress
+
+| Locale    | Backend `lang/` | Frontend (main+admin) | Verifier     |
+| --------- | --------------- | --------------------- | ------------ |
+| es        | done            | pending               | backend PASS |
+| (20 more) | pending         | pending               | —            |
+
+The `UI_LOCALES` flip and the full 24-locale parity run remain the last step (S8e).
