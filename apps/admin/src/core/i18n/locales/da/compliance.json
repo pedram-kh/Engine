@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "compliance": {
+      "shellNotice": "Denne kø er klar, men endnu ikke forbundet til data — eksport- og sletningsbehandling leveres i et senere sprint.",
+      "load_failed": "Denne kø kunne ikke indlæses. Opdater venligst siden.",
+      "fields": {
+        "subject": "Registreret person",
+        "status": "Status",
+        "requested": "Anmodet"
+      },
+      "exports": {
+        "title": "Eksportanmodninger",
+        "subtitle": "Adgangs- og portabilitetsanmodninger fra registrerede personer (GDPR art. 15/20).",
+        "empty": "Ingen eksportanmodninger."
+      },
+      "erasures": {
+        "title": "Sletningskø",
+        "subtitle": "Anmodninger om at blive glemt, der afventer gennemgang (GDPR art. 17).",
+        "empty": "Ingen sletningsanmodninger."
+      }
+    }
+  }
+}

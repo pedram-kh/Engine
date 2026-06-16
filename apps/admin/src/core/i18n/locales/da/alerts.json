@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Driftsadvarsler",
+      "subtitle": "Revisionsaktivitet og driftsnotifikationer adresseret til dig.",
+      "empty": "Ingen driftsadvarsler.",
+      "load_failed": "Driftsadvarsler kunne ikke indlæses. Opdater venligst siden.",
+      "paymentAlerts": {
+        "title": "Betalingsadvarsler",
+        "body": "Escrow-finansierings- og frigivelsesadvarsler aktiveres, når betalingsbehandling leveres (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Creator godkendt",
+          "rejected": "Creator afvist"
+        }
+      }
+    }
+  }
+}

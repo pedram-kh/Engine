@@ -1,0 +1,228 @@
+{
+  "admin": {
+    "creators": {
+      "list": {
+        "title": "Creator-gennemgangskø",
+        "unnamed": "Unavngivet creator",
+        "view": "Se creator",
+        "load_failed": "Gennemgangskøen kunne ikke indlæses. Opdater venligst siden.",
+        "fields": {
+          "name": "Creator",
+          "email": "E-mail",
+          "status": "Status",
+          "kyc": "KYC",
+          "completeness": "Fuldstændighed",
+          "submitted_at": "Indsendt"
+        },
+        "filters": {
+          "pending": "Afventende",
+          "approved": "Godkendt",
+          "rejected": "Afvist",
+          "incomplete": "Ufuldstændig",
+          "all": "Alle"
+        },
+        "status_labels": {
+          "incomplete": "Ufuldstændig",
+          "pending": "Afventende",
+          "approved": "Godkendt",
+          "rejected": "Afvist"
+        }
+      },
+      "kyc": {
+        "title": "KYC-gennemgangskø",
+        "empty": "Ingen creators matcher dette KYC-filter.",
+        "load_failed": "KYC-køen kunne ikke indlæses. Opdater venligst siden.",
+        "filters": {
+          "pending": "Afventende",
+          "verified": "Bekræftet",
+          "rejected": "Afvist",
+          "none": "Ikke startet",
+          "all": "Alle"
+        }
+      },
+      "all": {
+        "title": "Alle creators",
+        "empty": "Ingen creators endnu.",
+        "load_failed": "Creators kunne ikke indlæses. Opdater venligst siden."
+      },
+      "detail": {
+        "fallback_title": "Creator",
+        "application_status": "Ansøgningsstatus: {status}",
+        "completeness": "{percent}% fuldført",
+        "rejection_heading": "Afslagsnoter",
+        "profile_heading": "Profil",
+        "social_heading": "Sociale konti",
+        "portfolio_heading": "Portefølje",
+        "onboarding_heading": "Onboarding-status",
+        "kyc_history_heading": "KYC-bekræftelseshistorik",
+        "kyc_history": {
+          "provider": "Udbyder",
+          "status": "Status",
+          "started_at": "Startet den",
+          "completed_at": "Afsluttet den"
+        },
+        "assignments_heading": "Kampagnehistorik",
+        "assignments": {
+          "empty": "Denne creator har ingen kampagnetildelinger endnu.",
+          "load_failed": "Kampagnehistorikken kunne ikke indlæses.",
+          "campaign": "Kampagne",
+          "brand": "Brand",
+          "agency": "Bureau",
+          "status": "Status",
+          "created_at": "Startet"
+        },
+        "audit_heading": "Revisionshistorik",
+        "audit": {
+          "empty": "Ingen revisionsposter for denne creator endnu.",
+          "load_failed": "Revisionshistorikken kunne ikke indlæses.",
+          "action": "Handling",
+          "actor": "Aktør",
+          "reason": "Årsag",
+          "created_at": "Hvornår"
+        },
+        "payments_heading": "Betalingshistorik",
+        "payments_coming_soon": "Betalingshistorik aktiveres, når betalingsbehandling leveres (Sprint 10).",
+        "load_failed": "Denne creator kunne ikke indlæses. Opdater venligst siden.",
+        "fields": {
+          "display_name": "Visningsnavn",
+          "bio": "Bio",
+          "country_code": "Land",
+          "region": "Region",
+          "primary_language": "Primært sprog",
+          "secondary_languages": "Sekundære sprog",
+          "categories": "Kategorier"
+        },
+        "edit": {
+          "title": "Rediger {field}",
+          "save": "Gem ændringer",
+          "cancel": "Annuller",
+          "reason_label": "Årsag til ændring",
+          "reason_hint": "Krævet for følsomme felter. Registreres i revisionsloggen.",
+          "custom_code_hint": "Vælg en værdi eller indtast en 2-bogstavs ISO-kode.",
+          "button_aria_label": "Rediger {field}",
+          "save_failed": "Denne ændring kunne ikke gemmes. Prøv igen.",
+          "saved": "{field} opdateret."
+        },
+        "errors": {
+          "field_status_immutable": "Statusovergange sker via godkend / afvis-handlingerne, ikke feltrediger."
+        },
+        "approve": {
+          "button": "Godkend ansøgning",
+          "title": "Godkend {name}s ansøgning",
+          "description": "Dette markerer creatoret som godkendt og giver produktionsadgang. Handlingen registreres i revisionsloggen.",
+          "welcome_label": "Velkomstbesked (valgfri)",
+          "welcome_hint": "Vises på creatorens dashboard, næste gang de logger ind.",
+          "confirm": "Godkend",
+          "cancel": "Annuller",
+          "success": "Creator godkendt.",
+          "failed": "Denne creator kunne ikke godkendes. Prøv igen."
+        },
+        "reject": {
+          "button": "Afvis ansøgning",
+          "title": "Afvis {name}s ansøgning",
+          "description": "Creatoret vil se årsagen på sit dashboard, næste gang de logger ind.",
+          "reason_label": "Afslagsårsag",
+          "min_hint": "Påkrævet, mindst {count} tegn.",
+          "confirm": "Afvis",
+          "cancel": "Annuller",
+          "success": "Creator afvist.",
+          "failed": "Denne creator kunne ikke afvises. Prøv igen."
+        },
+        "identity": {
+          "heading": "Identitetsbekræftelse",
+          "status": "Status: {status}",
+          "verify_manual": "Bekræft manuelt",
+          "verify_vendor": "Anmod om leverandørbekræftelse",
+          "vendor_disabled_tooltip": "Ingen KYC-udbyder konfigureret",
+          "method_labels": {
+            "vendor": "Bekræftet af leverandør",
+            "manual": "Bekræftet manuelt af en administrator"
+          }
+        },
+        "verify": {
+          "title": "Bekræft {name}s identitet manuelt",
+          "description": "Dette markerer creatorens identitet permanent som bekræftet og registreres mod din konto i revisionsloggen. Brug kun, når du har bekræftet identiteten uden for systemet.",
+          "note_label": "Note (valgfri)",
+          "note_hint": "Registreres i revisionsloggen sammen med dit navn.",
+          "confirm": "Bekræft identitet",
+          "cancel": "Annuller",
+          "success": "Identitet bekræftet.",
+          "failed": "Denne creators identitet kunne ikke bekræftes. Prøv igen."
+        }
+      }
+    }
+  },
+  "creator": {
+    "already_approved": "Denne creator er allerede godkendt.",
+    "already_rejected": "Denne creator er allerede afvist.",
+    "kyc_not_verified": "Godkendelse er blokeret, indtil creatorens identitet er bekræftet.",
+    "kyc_already_verified": "Denne creators identitet er allerede bekræftet.",
+    "admin": {
+      "field_status_immutable": "Statusovergange sker via godkend / afvis-handlingerne, ikke feltrediger."
+    },
+    "ui": {
+      "wizard": {
+        "steps": {
+          "kyc": {
+            "name": "Identitetsbekræftelse",
+            "status_labels": {
+              "none": "Ikke startet",
+              "pending": "I gang",
+              "verified": "Bekræftet",
+              "rejected": "Afvist",
+              "not_required": "Ikke påkrævet"
+            }
+          },
+          "tax": {
+            "name": "Skatteoplysninger",
+            "status_complete": "Indsendt",
+            "status_incomplete": "Endnu ikke indsendt"
+          },
+          "payout": {
+            "name": "Udbetalingsmetode",
+            "status_set": "Tilsluttet",
+            "status_unset": "Ikke tilsluttet"
+          },
+          "contract": {
+            "name": "Masteraftale",
+            "status_labels": {
+              "signed": "Underskrevet",
+              "click_through_accepted": "Accepteret",
+              "none": "Ikke startet"
+            }
+          },
+          "portfolio": {
+            "gallery_empty": "Ingen porteføljeelementer uploadet endnu.",
+            "video_badge_label": "Video",
+            "link_badge_label": "Eksternt link",
+            "untitled_item": "Unavngivet porteføljeelement"
+          }
+        },
+        "categories": {
+          "fashion": "Mode",
+          "beauty": "Skønhed",
+          "lifestyle": "Livsstil",
+          "fitness": "Fitness",
+          "travel": "Rejser",
+          "food": "Mad",
+          "tech": "Teknologi",
+          "gaming": "Gaming",
+          "music": "Musik",
+          "comedy": "Komedie",
+          "education": "Uddannelse",
+          "parenting": "Forældre",
+          "business": "Erhverv",
+          "art": "Kunst",
+          "sports": "Sport",
+          "other": "Andet"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Kommer snart"
+        }
+      }
+    }
+  }
+}

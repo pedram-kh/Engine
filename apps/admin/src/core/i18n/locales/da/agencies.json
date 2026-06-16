@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Bureauer",
+        "search_label": "Søg bureauer",
+        "load_failed": "Bureauer kunne ikke indlæses. Opdater venligst siden.",
+        "empty": "Ingen bureauer matcher dette filter.",
+        "filters": {
+          "all": "Alle",
+          "active": "Aktive",
+          "suspended": "Suspenderede"
+        },
+        "fields": {
+          "name": "Bureau",
+          "status": "Status",
+          "members": "Medlemmer",
+          "tier": "Niveau",
+          "created_at": "Oprettet"
+        },
+        "status_labels": {
+          "active": "Aktiv",
+          "suspended": "Suspenderet"
+        },
+        "view": "Se bureau"
+      },
+      "detail": {
+        "fallback_title": "Bureau",
+        "load_failed": "Dette bureau kunne ikke indlæses. Opdater venligst siden.",
+        "overview_heading": "Oversigt",
+        "suspension_heading": "Suspension",
+        "fields": {
+          "slug": "Slug",
+          "country": "Land",
+          "tier": "Abonnementsniveau",
+          "subscription_status": "Abonnementsstatus",
+          "members": "Medlemmer",
+          "created_at": "Oprettet",
+          "suspended_at": "Suspenderet den",
+          "suspended_reason": "Årsag"
+        },
+        "active_state": "Dette bureau er aktivt. Dets brugere kan logge ind normalt.",
+        "suspended_state": "Dette bureau er suspenderet. Alle dets brugere er blokeret fra at logge ind."
+      },
+      "suspend": {
+        "button": "Suspendér bureau",
+        "title": "Suspendér {name}",
+        "description": "Suspension af dette bureau blokerer ALLE dets brugere fra at logge ind. Dette registreres i revisionsloggen.",
+        "reason_label": "Årsag til suspension",
+        "reason_hint": "Påkrævet, mindst {count} tegn. Registreres i revisionsloggen.",
+        "confirm": "Suspendér",
+        "cancel": "Annuller",
+        "success": "Bureau suspenderet.",
+        "failed": "Dette bureau kunne ikke suspenderes. Prøv igen."
+      },
+      "reactivate": {
+        "button": "Genaktivér bureau",
+        "title": "Genaktivér {name}",
+        "description": "Genaktivering af dette bureau gendanner login for alle dets brugere. Dette registreres i revisionsloggen.",
+        "confirm": "Genaktivér",
+        "cancel": "Annuller",
+        "success": "Bureau genaktiveret.",
+        "failed": "Dette bureau kunne ikke genaktiveres. Prøv igen."
+      }
+    }
+  }
+}

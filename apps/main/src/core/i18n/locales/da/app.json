@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Influencer-marketing drevet som en rigtig virksomhed.",
+    "sprint0Notice": "Sprint 0 scaffolding — hoved-platform-SPA",
+    "locale": {
+      "switcher": "Sprog",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Tema",
+        "light": "Lyst",
+        "dark": "Mørkt"
+      }
+    },
+    "messaging": {
+      "title": "Beskeder",
+      "you": "Dig",
+      "participant": "Deltager",
+      "composePlaceholder": "Skriv en besked…",
+      "send": "Send",
+      "attachment": "Vedhæftning",
+      "empty": "Ingen beskeder endnu. Start samtalen.",
+      "loadEarlier": "Indlæs tidligere beskeder",
+      "loadError": "Denne samtale kunne ikke indlæses. Den forsøges igen om lidt.",
+      "sendError": "Din besked kunne ikke sendes. Prøv igen.",
+      "attachmentUploadError": "En vedhæftning kunne ikke uploades. Prøv igen.",
+      "closed": "Denne samtale er lukket — opgaven er ikke længere aktiv.",
+      "systemFallback": "Opgaven er opdateret.",
+      "system": {
+        "assignment": {
+          "contracted": "Kontrakten er underskrevet — produktionen kan begynde.",
+          "draft_submitted": "Et udkast er indsendt til gennemgang.",
+          "draft_approved": "Udkastet er godkendt.",
+          "revision_requested": "Der er anmodet om ændringer til udkastet.",
+          "draft_rejected": "Udkastet er afvist.",
+          "posted_by_creator": "Creatoren har markeret indholdet som publiceret.",
+          "live_verified": "Det live opslag er verificeret.",
+          "manually_verified": "Opslaget er manuelt verificeret.",
+          "resubmit_requested": "Der er anmodet om genindsendelse.",
+          "payment_released": "Betalingen er frigivet."
+        }
+      },
+      "rollup": {
+        "empty": "Ingen beskedtråde endnu for denne kampagne.",
+        "noMessages": "Ingen beskeder endnu.",
+        "loadError": "Beskedtrådene kunne ikke indlæses."
+      }
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "roster": "Mine creatorer",
+      "discover": "Opdage",
+      "pools": "Talentpuljer",
+      "brands": "Brands",
+      "campaigns": "Kampagner",
+      "agencyUsers": "Team",
+      "settings": "Indstillinger"
+    },
+    "discover": {
+      "title": "Opdage creatorer",
+      "subtitle": "Gennemse og søg i den globale creator-pulje.",
+      "unnamed": "Unavngivet creator",
+      "notConnected": "Ikke forbundet",
+      "search": {
+        "label": "Søg creatorer",
+        "placeholder": "Søg efter navn eller bio"
+      },
+      "filters": {
+        "country": "Land",
+        "language": "Sprog",
+        "category": "Kategori"
+      },
+      "connection": {
+        "connected": "Forbundet",
+        "pending": "Anmodning afventer",
+        "declined": "Afvist",
+        "notConnected": "Ikke forbundet",
+        "sendRequest": "Send anmodning",
+        "requestAgain": "Anmod igen",
+        "sent": "Anmodning sendt",
+        "reRequested": "Anmodning sendt igen",
+        "alreadyPending": "En anmodning afventer allerede",
+        "alreadyConnected": "Denne creator er allerede i dit roster",
+        "error": "Anmodning kunne ikke sendes. Prøv igen."
+      },
+      "empty": {
+        "heading": "Ingen creatorer endnu",
+        "body": "Godkendte creatorer vises her, efterhånden som puljen vokser."
+      },
+      "emptyFiltered": {
+        "heading": "Ingen matches",
+        "body": "Ingen creatorer matcher dine filtre. Prøv at udvide din søgning."
+      },
+      "errors": {
+        "loadFailed": "Creatorer kunne ikke indlæses. Prøv igen."
+      },
+      "detail": {
+        "back": "Tilbage til Opdage",
+        "notFound": "Denne creator er ikke tilgængelig.",
+        "loadFailed": "Denne profil kunne ikke indlæses. Prøv igen.",
+        "viewInRoster": "Se i roster",
+        "sections": {
+          "profile": "Profil",
+          "social": "Sociale konti",
+          "portfolio": "Portfolio"
+        },
+        "social": {
+          "empty": "Ingen sociale konti tilknyttet."
+        },
+        "portfolio": {
+          "empty": "Ingen portfolio-elementer endnu.",
+          "untitled": "Unavngivet element"
+        }
+      }
+    },
+    "roster": {
+      "title": "Mine creatorer",
+      "unnamed": "Unavngivet creator",
+      "blacklisted": "Sortlistet",
+      "blacklist": {
+        "badge": {
+          "hard": "Sortlistet",
+          "soft": "Sortlisteadvarsel"
+        },
+        "openAction": "Sortlist creator",
+        "liftAction": "Fjern sortlistning",
+        "lifted": "Sortlistning fjernet.",
+        "liftFailed": "Sortlistning kunne ikke fjernes.",
+        "section": {
+          "title": "Sortliste",
+          "none": "Denne creator er ikke sortlistet af dit bureau."
+        },
+        "status": {
+          "hard": "Hårdt sortlistet — udelukket fra din opdagelse og blokeret for forbindelsesanmodninger.",
+          "soft": "Blødt sortlistet — kun en advarsel; creatoren forbliver matchbar."
+        },
+        "dialog": {
+          "title": "Sortlist creator",
+          "scopeLabel": "Omfang",
+          "scope": {
+            "agency": "Hele bureauet",
+            "brand": "Et bestemt brand"
+          },
+          "noRelationHint": "Bureau-bred sortlistning kræver en forbundet creator.",
+          "brandLabel": "Brand",
+          "typeLabel": "Type",
+          "type": {
+            "hard": "Hård — udeluk fra opdagelse og blokér anmodninger",
+            "soft": "Blød — advar kun, behold matchbar"
+          },
+          "reasonLabel": "Årsag",
+          "reasonPlaceholder": "Hvorfor sortlistes denne creator? (kun synlig for dit bureau)",
+          "cancel": "Annuller",
+          "confirm": "Sortlist",
+          "success": "Creator sortlistet.",
+          "invalid": "Udfyld venligst de påkrævede felter.",
+          "failed": "Creator kunne ikke sortlistes."
+        }
+      },
+      "fields": {
+        "name": "Navn",
+        "email": "E-mail",
+        "status": "Status",
+        "applicationStatus": "Ansøgning",
+        "country": "Land",
+        "language": "Sprog",
+        "categories": "Kategorier",
+        "rating": "Vurdering",
+        "campaigns": "Kampagner"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Potentiel",
+        "external": "Ekstern",
+        "pending_request": "Anmodning afventer",
+        "declined": "Afvist"
+      },
+      "applicationStatus": {
+        "incomplete": "Ufuldstændig",
+        "pending": "Afventer",
+        "approved": "Godkendt",
+        "rejected": "Afvist"
+      },
+      "search": {
+        "label": "Søg creatorer",
+        "placeholder": "Søg efter navn eller bio"
+      },
+      "filters": {
+        "status": {
+          "all": "Alle",
+          "roster": "Roster",
+          "prospect": "Potentielle",
+          "external": "Eksterne",
+          "pending_request": "Afventende anmodninger",
+          "declined": "Afvist"
+        },
+        "country": "Land",
+        "language": "Sprog",
+        "category": "Kategori",
+        "availability": {
+          "from": "Tilgængelig fra",
+          "to": "Tilgængelig til"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Følgere"
+        },
+        "engagement": {
+          "label": "Engagementsrate"
+        },
+        "metrics": {
+          "tooltip": "Sociale metrics er endnu ikke forbundet."
+        }
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Ingen creatorer endnu",
+        "body": "Creatorer, du inviterer eller engagerer, vises her på tværs af dit roster, potentielle og eksterne samarbejdspartnere."
+      },
+      "emptyFiltered": {
+        "heading": "Ingen creatorer matcher disse filtre",
+        "body": "Prøv at fjerne eller ændre et filter for at se flere af dine creatorer."
+      },
+      "errors": {
+        "loadFailed": "Dine creatorer kunne ikke indlæses. Prøv igen."
+      },
+      "detail": {
+        "back": "Tilbage til mine creatorer",
+        "unnamed": "Unavngivet creator",
+        "loadFailed": "Denne creator kunne ikke indlæses. Prøv igen.",
+        "notFound": "Denne creator er ikke i dit roster.",
+        "sections": {
+          "profile": "Profil",
+          "rating": "Vurdering & noter",
+          "social": "Sociale konti",
+          "metrics": "Sociale metrics",
+          "portfolio": "Portfolio",
+          "availability": "Tilgængelighed",
+          "campaigns": "Kampagnehistorik"
+        },
+        "editor": {
+          "starLabel": "Vurder {n} af 5",
+          "ratingUnset": "Ikke vurderet",
+          "notesLabel": "Interne noter",
+          "notesPlaceholder": "Private noter om samarbejdet med denne creator (kun synlig for dit bureau).",
+          "notesEmpty": "Ingen noter endnu.",
+          "save": "Gem",
+          "saved": "Ændringer gemt.",
+          "saveFailed": "Dine ændringer kunne ikke gemmes. Prøv igen."
+        },
+        "social": {
+          "empty": "Ingen sociale konti forbundet."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Sociale metrics vises, når konti er forbundet",
+            "body": "Følgerantal og engagementsrater er endnu ikke tilgængelige — de vises her, når de sociale integrationer er klar."
+          }
+        },
+        "portfolio": {
+          "empty": "Ingen portfolio-elementer endnu.",
+          "untitled": "Unavngivet portfolio-element"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Ingen tilgængelighedsblokke i denne periode",
+            "body": "Denne creator har ikke markeret nogen utilgængelig tid for de viste datoer."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Ingen kampagnehistorik endnu",
+            "body": "Kampagner, du kører med denne creator, vises her."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Log ud",
+      "signingOut": "Logger ud…"
+    },
+    "workspaceSwitcher": {
+      "label": "Skift arbejdsområde",
+      "placeholder": "Vælg arbejdsområde"
+    },
+    "brands": {
+      "title": "Brands",
+      "actions": {
+        "create": "Nyt brand",
+        "edit": "Rediger",
+        "archive": "Arkivér",
+        "restore": "Gendan",
+        "save": "Gem brand",
+        "saving": "Gemmer…",
+        "backToList": "Tilbage til brands",
+        "backToDetail": "Tilbage til brand"
+      },
+      "fields": {
+        "name": "Brandnavn",
+        "slug": "Slug",
+        "description": "Beskrivelse",
+        "industry": "Branche",
+        "websiteUrl": "Websted-URL",
+        "defaultCurrency": "Standardvaluta",
+        "defaultLanguage": "Standardsprog",
+        "status": "Status"
+      },
+      "status": {
+        "active": "Aktiv",
+        "archived": "Arkiveret",
+        "all": "Alle"
+      },
+      "detail": {
+        "title": "Branddetaljer"
+      },
+      "create": {
+        "title": "Nyt brand",
+        "success": "Brand oprettet."
+      },
+      "edit": {
+        "title": "Rediger brand",
+        "success": "Brand opdateret."
+      },
+      "archive": {
+        "confirmTitle": "Arkivér brand",
+        "confirmMessage": "Arkivér {name}? Det skjules fra den aktive liste, men kan gendannes senere.",
+        "confirm": "Arkivér",
+        "cancel": "Annuller",
+        "success": "Brand arkiveret."
+      },
+      "restore": {
+        "confirmTitle": "Gendan brand",
+        "confirmMessage": "Gendan {name}? Det vises igen på den aktive brandliste.",
+        "confirm": "Gendan",
+        "cancel": "Annuller",
+        "success": "{name} gendannet."
+      },
+      "empty": {
+        "heading": "Ingen brands endnu",
+        "body": "Opret dit første brand for at begynde at administrere influencer-kampagner.",
+        "cta": "Opret brand"
+      },
+      "emptyFiltered": {
+        "heading": "Ingen brands matcher dit filter",
+        "body": "Prøv at ændre statusfilteret ovenfor."
+      },
+      "loading": "Indlæser brands…",
+      "errors": {
+        "loadFailed": "Brands kunne ikke indlæses.",
+        "saveFailed": "Brand kunne ikke gemmes.",
+        "archiveFailed": "Brand kunne ikke arkiveres.",
+        "restoreFailed": "Brand kunne ikke gendannes."
+      }
+    },
+    "campaigns": {
+      "title": "Kampagner",
+      "actions": {
+        "create": "Ny kampagne",
+        "save": "Opret kampagne",
+        "saveSettings": "Gem indstillinger",
+        "backToList": "Tilbage til kampagner"
+      },
+      "fields": {
+        "name": "Kampagnenavn",
+        "brand": "Brand",
+        "objective": "Mål",
+        "description": "Beskrivelse",
+        "budget": "Budget",
+        "currency": "Valuta",
+        "startsAt": "Startdato",
+        "endsAt": "Slutdato",
+        "targetCreatorCount": "Målantal creatorer",
+        "deliverables": "Leverancer",
+        "deliverablesHint": "Én leverance per linje (f.eks. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Adskilt med mellemrum eller kommaer.",
+        "usageRights": "Brugsrettigheder",
+        "requiresContract": "Kræv kontrakt per kampagne",
+        "status": "Status"
+      },
+      "objective": {
+        "awareness": "Kendskab",
+        "engagement": "Engagement",
+        "conversion": "Konvertering",
+        "ugc": "UGC",
+        "launch": "Lancering"
+      },
+      "status": {
+        "all": "Alle",
+        "draft": "Udkast",
+        "active": "Aktiv",
+        "paused": "Sat på pause",
+        "completed": "Afsluttet",
+        "cancelled": "Annulleret"
+      },
+      "filters": {
+        "brand": "Brand",
+        "startsFrom": "Starter fra",
+        "startsTo": "Starter til"
+      },
+      "tabs": {
+        "overview": "Oversigt",
+        "creators": "Creatorer",
+        "board": "Board",
+        "drafts": "Udkast",
+        "payments": "Betalinger",
+        "messages": "Beskeder",
+        "settings": "Indstillinger"
+      },
+      "create": {
+        "title": "Ny kampagne"
+      },
+      "detail": {
+        "title": "Kampagnedetaljer"
+      },
+      "settings": {
+        "saved": "Kampagneindstillinger gemt."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Ingen creatorer endnu",
+          "body": "Invitér creatorer til denne kampagne for at komme i gang."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Alle udkast"
+        },
+        "empty": {
+          "heading": "Ingen udkast endnu",
+          "body": "Creator-udkastindsendelser vises her, når de er indsendt."
+        },
+        "loadFailed": "Udkast kunne ikke indlæses. Prøv igen.",
+        "submittedAt": "Indsendt {date}"
+      },
+      "fees": {
+        "offered": "Tilbudt",
+        "countered": "Modbud"
+      },
+      "reinvite": {
+        "action": "Invitér igen",
+        "title": "Invitér creator igen",
+        "body": "De kom med et modbud på {fee}. Nyt tilbud:",
+        "feeLabel": "Nyt aftalt honorar ({currency})",
+        "cancel": "Annuller",
+        "submit": "Invitér igen",
+        "success": "Geninvitation sendt."
+      },
+      "contract": {
+        "attach": {
+          "action": "Udsted kontrakt",
+          "title": "Udsted kontrakt",
+          "body": "Vedhæft kontraktvilkår, som creatoren skal gennemse og acceptere, inden de kan indsende et udkast.",
+          "titleLabel": "Kontrakttitel",
+          "termsLabel": "Vilkår (markdown)",
+          "termsHint": "Angiv inline vilkår og/eller upload en PDF nedenfor.",
+          "pdfLabel": "Kontrakt PDF (valgfrit)",
+          "pdfReady": "PDF klar: {name}",
+          "cancel": "Annuller",
+          "submit": "Udsted kontrakt",
+          "success": "Kontrakt udstedt. Creatoren er underrettet.",
+          "alreadyAttached": "En kontrakt afventer allerede denne creators accept.",
+          "error": "Kontrakten kunne ikke udstedes. Prøv igen."
+        },
+        "pending": "Kontrakt sendt — afventer creator",
+        "proceedWithout": {
+          "action": "Fortsæt uden kontrakt",
+          "success": "Opgave fremskyndet uden kontrakt.",
+          "requiredError": "Denne kampagne kræver en per-kampagne-kontrakt; udsted en, så creatoren kan acceptere den.",
+          "error": "Denne opgave kunne ikke fremskyndes. Prøv igen."
+        }
+      },
+      "invite": {
+        "open": "Invitér creatorer",
+        "title": "Invitér creatorer",
+        "loadFailed": "Dit roster kunne ikke indlæses. Prøv igen.",
+        "feeLabel": "Aftalt honorar ({currency})",
+        "search": "Søg creatorer",
+        "noRoster": "Ingen roster-creatorer at invitere endnu.",
+        "noSearchMatch": "Ingen creatorer matcher din søgning.",
+        "unnamed": "Unavngivet creator",
+        "blockedHint": "Sortlistet — kan ikke inviteres.",
+        "cancel": "Annuller",
+        "submit": "Invitér ({count})",
+        "summary": "{ok} inviteret. {blacklisted} sprunget over (sortlistet), {conflicts} med konflikter.",
+        "conflict": {
+          "title": "Tilgængelighedskonflikt",
+          "body": "{count} valgt(e) creator(er) er ikke tilgængelig(e) i kampagneperioden. Invitér dem alligevel?",
+          "cancel": "Spring over",
+          "proceed": "Invitér alligevel"
+        }
+      },
+      "board": {
+        "loadError": "Boardet kunne ikke indlæses. Prøv igen.",
+        "empty": "Dette board har ingen kolonner endnu.",
+        "moveFailed": "Kortet kunne ikke flyttes — det er tilbage, hvor det var.",
+        "reorderFailed": "Kolonnerne kunne ikke omarrangeres — rækkefølgen er gendannet.",
+        "automationsButton": "Automatiseringer",
+        "card": {
+          "unnamed": "Unavngivet creator",
+          "removed": "Fjernet opgave",
+          "daysLeft": "{n}d tilbage",
+          "dueToday": "Deadline i dag",
+          "overdue": "Overskredet"
+        },
+        "column": {
+          "add": "Tilføj kolonne",
+          "edit": "Omdøb / farveændring",
+          "delete": "Slet kolonne",
+          "addTitle": "Tilføj kolonne",
+          "editTitle": "Rediger kolonne",
+          "name": "Kolonnenavn",
+          "color": "Farve",
+          "terminalSuccess": "Markér som succes (terminal)",
+          "terminalFailure": "Markér som fejl (terminal)",
+          "save": "Gem",
+          "cancel": "Annuller",
+          "saveFailed": "Kolonnen kunne ikke gemmes. Prøv igen.",
+          "deleteTitle": "Slet kolonne",
+          "deleteBody": "Slet \"{name}\"? Dette kan ikke fortrydes.",
+          "deleteBodyNonEmpty": "\"{name}\" har {count} kort. Vælg, hvor de skal flyttes, inden du sletter.",
+          "deleteDestination": "Flyt kort til",
+          "deleteConfirm": "Slet",
+          "errorLastColumn": "Et board skal have mindst én kolonne.",
+          "errorDestinationRequired": "Denne kolonne har kort — vælg en destinationskolonne, inden du sletter.",
+          "errorGeneric": "Kolonnen kunne ikke slettes. Prøv igen."
+        },
+        "automation": {
+          "title": "Automatiseringer",
+          "subtitle": "Hvert hændelse kan automatisk flytte et kort til en kolonne. Manuelle træk udløser aldrig disse.",
+          "event": "Hændelse",
+          "target": "Flytter kort til",
+          "none": "Ingen automatisering",
+          "enabled": "Aktiveret",
+          "broken": "Målkolonne er slettet — vælg en ny",
+          "updateFailed": "Automatiseringen kunne ikke opdateres. Prøv igen.",
+          "close": "Luk"
+        },
+        "drawer": {
+          "title": "Opgave",
+          "close": "Luk",
+          "loadError": "Denne opgave kunne ikke indlæses. Prøv igen.",
+          "tabs": {
+            "detail": "Detalje",
+            "history": "Bevægelseshistorik"
+          },
+          "detail": {
+            "status": "Status",
+            "creator": "Creator",
+            "postingDue": "Opslag deadline",
+            "deliverables": "Leverancer",
+            "latestDraft": "Seneste udkast",
+            "postedContent": "Opslået indhold",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Ingen bevægelser registreret endnu.",
+            "removed": "(fjernet)",
+            "manual": "Manuel flytning",
+            "auto": "Automatisering",
+            "from": "fra",
+            "to": "til"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Betalinger kommer snart",
+          "body": "Escrow-finansiering og udbetalinger administreres her."
+        },
+        "messages": {
+          "heading": "Beskeder kommer snart",
+          "body": "Kampagnebeskeder vises her."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Inviteret",
+        "declined": "Afvist",
+        "countered": "Modbud",
+        "accepted": "Accepteret",
+        "contracted": "Kontrakt underskrevet",
+        "producing": "I produktion",
+        "draft_submitted": "Udkast indsendt",
+        "revision_requested": "Revision anmodet",
+        "approved": "Godkendt",
+        "rejected": "Afvist",
+        "posted": "Opslået",
+        "live_verified": "Live verificeret",
+        "manually_verified": "Manuelt verificeret",
+        "payment_held": "Betaling tilbageholdt",
+        "payment_released": "Betaling frigivet",
+        "cancelled": "Annulleret"
+      },
+      "review": {
+        "action": "Gennemse",
+        "title": "Gennemse udkast",
+        "loadFailed": "Dette udkast kunne ikke indlæses. Prøv igen.",
+        "draftVersion": "Udkast v{n}",
+        "noCaption": "Ingen billedtekst angivet.",
+        "hashtags": "Hashtags",
+        "mentions": "Omtaler",
+        "noMedia": "Ingen medier vedhæftet.",
+        "feedbackLabel": "Feedback til creatoren",
+        "feedbackHint": "Påkrævet ved anmodning om ændringer eller afvisning.",
+        "approve": "Godkend",
+        "requestRevision": "Anmod om ændringer",
+        "reject": "Afvis",
+        "close": "Luk",
+        "history": "Versionshistorik",
+        "postedContent": "Opslået indhold",
+        "draftStatus": {
+          "pending": "Afventer gennemgang",
+          "approved": "Godkendt",
+          "rejected": "Afvist",
+          "revision_requested": "Revision anmodet"
+        },
+        "verification": {
+          "pending": "Afventer verifikation",
+          "verified": "Verificeret",
+          "not_found": "Ikke fundet",
+          "mismatch": "Uoverensstemmelse"
+        },
+        "simulated": "Simuleret verifikation (mock-udbyder)",
+        "toast": {
+          "approved": "Udkast godkendt.",
+          "revisionRequested": "Revision anmodet.",
+          "rejected": "Udkast afvist.",
+          "error": "Noget gik galt. Prøv igen."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Åbn forhåndsvisning",
+          "close": "Luk",
+          "empty": "Ingen medier vedhæftet."
+        }
+      },
+      "resolution": {
+        "action": "Løs",
+        "title": "Løs verifikation",
+        "loadFailed": "Denne opgave kunne ikke indlæses. Prøv igen.",
+        "postedContent": "Indsendt opslag",
+        "simulated": "Simuleret verifikation (mock-udbyder)",
+        "intro": "Automatisk verifikation af dette opslag mislykkedes. Acceptér det manuelt, send det tilbage for et nyt opslag, eller bed creatoren om at rette linket.",
+        "verification": {
+          "pending": "Afventer verifikation",
+          "verified": "Verificeret",
+          "not_found": "Ikke fundet",
+          "mismatch": "Uoverensstemmelse"
+        },
+        "noteLabel": "Årsag / note til creatoren",
+        "noteHint": "Påkrævet ved manuel verifikation; valgfrit ved genindsendelsesanmodninger.",
+        "manuallyVerify": "Verificér manuelt",
+        "requestFresh": "Anmod om nyt opslag",
+        "requestInPlace": "Bed om at rette link",
+        "close": "Luk",
+        "notActionable": "Denne opgave afventer ikke længere løsning.",
+        "toast": {
+          "verified": "Opslag manuelt verificeret.",
+          "resubmitFresh": "Sendt tilbage for et nyt opslag.",
+          "resubmitInPlace": "Bedt creator om at rette linket.",
+          "error": "Noget gik galt. Prøv igen."
+        }
+      },
+      "viewPost": {
+        "action": "Se opslag",
+        "title": "Opslået indhold",
+        "loadFailed": "Dette opslag kunne ikke indlæses. Prøv igen.",
+        "empty": "Creatoren har ikke opslået noget indhold endnu.",
+        "current": "Nuværende",
+        "postedAt": "Opslået",
+        "verifiedAt": "Verificeret",
+        "simulated": "Verifikation kører mod en simuleret udbyder i dette miljø.",
+        "close": "Luk",
+        "verification": {
+          "pending": "Afventer verifikation",
+          "verified": "Verificeret",
+          "not_found": "Ikke fundet",
+          "mismatch": "Uoverensstemmelse"
+        }
+      },
+      "empty": {
+        "heading": "Ingen kampagner endnu",
+        "body": "Opret din første kampagne for at engagere creatorer.",
+        "cta": "Opret kampagne"
+      },
+      "errors": {
+        "loadFailed": "Kampagner kunne ikke indlæses.",
+        "saveFailed": "Kampagne kunne ikke gemmes."
+      }
+    },
+    "pools": {
+      "title": "Talentpuljer",
+      "agencyWide": "Bureau-bred",
+      "actions": {
+        "create": "Ny pulje",
+        "edit": "Rediger",
+        "archive": "Arkivér",
+        "restore": "Gendan",
+        "save": "Gem pulje",
+        "backToList": "Tilbage til talentpuljer",
+        "backToDetail": "Tilbage til pulje"
+      },
+      "fields": {
+        "name": "Puljenavn",
+        "description": "Beskrivelse",
+        "brand": "Brand",
+        "brandHint": "Valgfrit — mærker puljen for et brands arbejde. Lad stå tomt for en bureau-bred pulje.",
+        "members": "Medlemmer"
+      },
+      "status": {
+        "active": "Aktiv",
+        "archived": "Arkiveret",
+        "all": "Alle"
+      },
+      "create": {
+        "title": "Ny talentpulje"
+      },
+      "edit": {
+        "title": "Rediger talentpulje"
+      },
+      "detail": {
+        "title": "Puljedetaljer",
+        "notFound": "Denne pulje eksisterer ikke længere.",
+        "membersHeading": "Medlemmer",
+        "membersEmpty": "Ingen creatorer i denne pulje endnu. Tilføj creatorer fra en creators detaljeside.",
+        "memberCount": "{count} creatorer",
+        "unnamed": "Unavngivet creator",
+        "remove": "Fjern fra pulje",
+        "removed": "{name} fjernet fra puljen."
+      },
+      "archive": {
+        "confirmTitle": "Arkivér pulje",
+        "confirmMessage": "Arkivér {name}? Det skjules fra den aktive liste, men kan gendannes senere med dets medlemmer intakt.",
+        "confirm": "Arkivér",
+        "cancel": "Annuller"
+      },
+      "restore": {
+        "confirmTitle": "Gendan pulje",
+        "confirmMessage": "Gendan {name}? Det vises igen på den aktive puljeliste.",
+        "confirm": "Gendan",
+        "cancel": "Annuller",
+        "success": "{name} gendannet."
+      },
+      "empty": {
+        "heading": "Ingen talentpuljer endnu",
+        "body": "Opret en pulje for at gruppere creatorer til et brand eller et kampagne-brief.",
+        "cta": "Opret pulje"
+      },
+      "emptyFiltered": {
+        "heading": "Ingen puljer matcher dit filter",
+        "body": "Prøv at ændre statusfilteret ovenfor."
+      },
+      "picker": {
+        "openLabel": "Tilføj til pulje",
+        "title": "Tilføj til talentpuljer",
+        "empty": "Ingen talentpuljer endnu. Opret en fra siden Talentpuljer.",
+        "done": "Færdig",
+        "added": "Tilføjet til {name}.",
+        "removed": "Fjernet fra {name}.",
+        "loadFailed": "Talentpuljer kunne ikke indlæses.",
+        "toggleFailed": "Puljemedlemskab kunne ikke opdateres."
+      },
+      "addCreators": {
+        "open": "Tilføj creatorer",
+        "title": "Tilføj creatorer til denne pulje",
+        "search": "Søg dit roster",
+        "noRoster": "Dit roster er tomt. Tilføj først creatorer til dit roster.",
+        "allInPool": "Alle dine roster-creatorer er allerede i denne pulje.",
+        "noSearchMatch": "Ingen roster-creatorer matcher din søgning.",
+        "cancel": "Annuller",
+        "add": "Tilføj {count}",
+        "added": "{count} creatorer tilføjet til puljen.",
+        "loadFailed": "Dit roster kunne ikke indlæses.",
+        "addFailed": "Creatorer kunne ikke tilføjes til puljen.",
+        "confirmHard": {
+          "one": "{name} er sortlistet af dit bureau. Tilføj dem til denne pulje alligevel?",
+          "many": "{count} valgte creatorer er sortlistet af dit bureau ({names}). Tilføj dem alligevel?"
+        }
+      },
+      "errors": {
+        "loadFailed": "Talentpuljer kunne ikke indlæses.",
+        "membersLoadFailed": "Puljemedlemmer kunne ikke indlæses.",
+        "saveFailed": "Talentpulje kunne ikke gemmes.",
+        "archiveFailed": "Pulje kunne ikke arkiveres.",
+        "restoreFailed": "Pulje kunne ikke gendannes.",
+        "removeFailed": "Creator kunne ikke fjernes fra puljen."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Navn",
+        "email": "E-mail",
+        "role": "Rolle",
+        "status": "Status",
+        "joinedAt": "Tilsluttet"
+      },
+      "roles": {
+        "agency_admin": "Administrator",
+        "agency_manager": "Manager",
+        "agency_staff": "Medarbejder"
+      },
+      "status": {
+        "active": "Aktiv",
+        "pending": "Afventer"
+      },
+      "members": {
+        "heading": "Nuværende medlemmer"
+      },
+      "filters": {
+        "allRoles": "Alle roller",
+        "allStatuses": "Alle statusser"
+      },
+      "search": {
+        "label": "Søg",
+        "placeholder": "Navn eller e-mail"
+      },
+      "invitations": {
+        "heading": "Invitationshistorik",
+        "columns": {
+          "email": "Inviteret",
+          "invitedAt": "Inviteret",
+          "invitedBy": "Inviteret af"
+        },
+        "status": {
+          "pending": "Afventer",
+          "accepted": "Accepteret",
+          "expired": "Udløbet"
+        },
+        "empty": "Ingen invitationer endnu."
+      },
+      "invite": {
+        "button": "Invitér bruger",
+        "title": "Invitér et teammedlem",
+        "fields": {
+          "email": "E-mailadresse",
+          "role": "Rolle"
+        },
+        "submit": "Send invitation",
+        "submitting": "Sender…",
+        "success": "Invitation sendt til {email}.",
+        "errors": {
+          "failed": "Invitation kunne ikke sendes."
+        }
+      },
+      "empty": {
+        "heading": "Ingen teammedlemmer",
+        "body": "Invitér dit første teammedlem for at komme i gang."
+      },
+      "emptyFiltered": "Ingen teammedlemmer matcher dit filter.",
+      "errors": {
+        "membersLoadFailed": "Teammedlemmer kunne ikke indlæses.",
+        "invitationsLoadFailed": "Invitationshistorik kunne ikke indlæses."
+      },
+      "loading": "Indlæser team…",
+      "bulkInviteCreators": {
+        "button": "Masseinvitér creatorer"
+      }
+    },
+    "bulkInvite": {
+      "title": "Masseinvitér creatorer",
+      "description": "Upload en CSV med en `email`-kolonne. Hver række bliver en magic-link-invitation. Andre kolonner accepteres, men ignoreres.",
+      "file": {
+        "label": "CSV-fil",
+        "hint": "Maks. 5 MB / 1000 rækker. Den eneste påkrævede kolonne er `email`."
+      },
+      "softWarning": "{count} rækker er en stor batch — behandling kan tage et par minutter.",
+      "preview": {
+        "heading": "Parsede rækker ({count})",
+        "row": "Række",
+        "email": "E-mail",
+        "errorCount": "{count} parsefejl",
+        "errorHeading": "Disse rækker springes over:",
+        "errorItem": "Række {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Send invitationer ({count})",
+        "reset": "Ryd",
+        "startOver": "Send endnu en batch"
+      },
+      "status": {
+        "queued": "I kø — venter på at starte",
+        "processing": "Behandler invitationer",
+        "complete": "Færdig",
+        "failed": "Job mislykkedes"
+      },
+      "tracking": {
+        "progress": "{percent}% fuldført"
+      },
+      "timeout": {
+        "heading": "Stadig i gang",
+        "description": "Dine invitationer tager længere tid at behandle end forventet. Du kan prøve igen eller komme tilbage senere.",
+        "retry": "Prøv igen"
+      },
+      "complete": {
+        "heading": "Resultater",
+        "invited": "Inviteret",
+        "alreadyInvited": "Allerede inviteret",
+        "failed": "Mislykkedes",
+        "failureReason": "Årsag"
+      },
+      "failed": {
+        "heading": "Masseinvitations-jobbet mislykkedes."
+      },
+      "errors": {
+        "submitFailed": "CSV'en kunne ikke indsendes. Prøv igen."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "Du er blevet inviteret",
+        "joining": "Du er inviteret til at tilslutte dig {agencyName} som {role}.",
+        "accept": "Acceptér invitation",
+        "accepting": "Accepterer…",
+        "signInToContinue": "Log ind for at acceptere denne invitation",
+        "signIn": "Log ind",
+        "noAccount": "Har du ikke en konto?",
+        "signUp": "Opret en nu",
+        "success": "Velkommen til {agencyName}! Du er nu {role}.",
+        "expired": {
+          "heading": "Denne invitation er udløbet",
+          "body": "Kontakt venligst din bureauadministrator for at anmode om en ny invitation."
+        },
+        "alreadyAccepted": {
+          "heading": "Invitation allerede accepteret",
+          "body": "Denne invitation er allerede brugt. Log ind for at få adgang til dit arbejdsområde.",
+          "signIn": "Log ind"
+        },
+        "alreadyMember": {
+          "heading": "Allerede et medlem",
+          "body": "Du er allerede et medlem af dette arbejdsområde."
+        },
+        "emailMismatch": {
+          "heading": "Forkert konto",
+          "body": "Denne invitation er sendt til en anden e-mailadresse. Log ind med den korrekte konto."
+        },
+        "notFound": {
+          "heading": "Invitation ikke fundet",
+          "body": "Dette invitationslink er ugyldigt eller er allerede brugt."
+        },
+        "errors": {
+          "failed": "Invitation kunne ikke accepteres."
+        }
+      }
+    },
+    "settings": {
+      "title": "Bureauindstillinger",
+      "fields": {
+        "defaultCurrency": "Standardvaluta",
+        "defaultLanguage": "Standardsprog",
+        "blacklistNotificationPolicy": "Underret creatorer ved sortlistning",
+        "blacklistNotificationPolicyHint": "Når aktiveret, sendes en e-mail til en creator, hvis dit bureau sortlister dem. Årsagen deles aldrig."
+      },
+      "save": "Gem indstillinger",
+      "saving": "Gemmer…",
+      "success": "Indstillinger gemt.",
+      "readOnly": "Kun administratorer kan redigere bureauindstillinger.",
+      "loading": "Indlæser indstillinger…",
+      "errors": {
+        "loadFailed": "Indstillinger kunne ikke indlæses.",
+        "saveFailed": "Indstillinger kunne ikke gemmes."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "Dette felt er påkrævet."
+  }
+}

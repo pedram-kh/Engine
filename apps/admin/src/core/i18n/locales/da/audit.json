@@ -1,0 +1,27 @@
+{
+  "admin": {
+    "audit": {
+      "title": "Revisionslog",
+      "empty": "Ingen revisionsposter matcher disse filtre.",
+      "load_failed": "Revisionsloggen kunne ikke indlæses. Opdater venligst siden.",
+      "filters": {
+        "action": "Handling",
+        "subject": "Emne-ULID",
+        "date_from": "Fra",
+        "date_to": "Til",
+        "apply": "Anvend"
+      },
+      "fields": {
+        "action": "Handling",
+        "actor": "Aktør",
+        "subject": "Emne",
+        "reason": "Årsag",
+        "created_at": "Hvornår"
+      },
+      "pagination": {
+        "prev": "Forrige",
+        "next": "Næste"
+      }
+    }
+  }
+}

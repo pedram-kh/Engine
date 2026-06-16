@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "load_failed": "Dashboardet kunne ikke indlæses. Opdater venligst siden.",
+      "kpi": {
+        "agencies_total": "Bureauer",
+        "agencies_suspended": "Suspenderede bureauer",
+        "creators_pending_approval": "Afventende godkendelser",
+        "creators_pending_kyc": "KYC-kø",
+        "queue_pending": "Jobs i kø",
+        "queue_failed": "Mislykkede jobs",
+        "open_disputes": "Åbne tvister",
+        "failed_payments_today": "Mislykkede betalinger i dag"
+      },
+      "activity": {
+        "heading": "Seneste aktivitet",
+        "empty": "Ingen seneste aktivitet."
+      }
+    }
+  }
+}

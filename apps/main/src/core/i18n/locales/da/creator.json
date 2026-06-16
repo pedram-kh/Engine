@@ -1,0 +1,416 @@
+{
+  "creator": {
+    "not_found": "Ingen creator-profil er tilknyttet din konto. Log ud og log ind igen, eller kontakt support.",
+    "already_approved": "Denne creator er allerede godkendt.",
+    "already_rejected": "Denne creator er allerede afvist.",
+    "kyc_not_verified": "Denne creators identitet skal verificeres, før ansøgningen kan godkendes.",
+    "kyc_already_verified": "Denne creators identitet er allerede verificeret.",
+    "admin": {
+      "field_status_immutable": "Ansøgningsstatus kan ikke ændres via denne formular. Brug godkend- eller afvis-handlingerne i stedet."
+    },
+    "social": {
+      "invalid_platform": "Den sociale platform understøttes ikke."
+    },
+    "wizard": {
+      "feature_disabled": "Dette trin er i øjeblikket ikke tilgængeligt, da en konfigurationsændring er i gang. Spring over for at fortsætte din ansøgning.",
+      "feature_enabled": "Denne mulighed er ikke tilgængelig lige nu — brug standardflowet for dette trin.",
+      "incomplete": "Ansøgningen kan ikke indsendes endnu — et eller flere guidetrin er stadig ufuldstændige."
+    },
+    "reopen": {
+      "invalid_state": "Kun en afvist ansøgning kan genåbnes."
+    },
+    "ui": {
+      "wizard": {
+        "title": "Opsæt din creator-profil",
+        "subtitle": "Et par trin til at introducere dig for brands.",
+        "progress": {
+          "step_of": "Trin {current} af {total}",
+          "completed": "Fuldført",
+          "current": "Nuværende trin",
+          "skipped": "Sprunget over",
+          "pending": "Ikke startet"
+        },
+        "actions": {
+          "save": "Gem",
+          "save_and_continue": "Gem og fortsæt",
+          "back": "Tilbage",
+          "skip_for_now": "Spring over nu",
+          "save_and_exit": "Gem og afslut",
+          "submit_for_approval": "Indsend til godkendelse",
+          "continue_from_here": "Fortsæt herfra",
+          "edit_step": "Rediger trin",
+          "review_and_submit": "Gennemse og indsend",
+          "connect": "Forbind",
+          "update": "Opdater",
+          "remove": "Fjern"
+        },
+        "skipped": {
+          "label": "Sprunget over",
+          "explanation": "Dette trin er ikke påkrævet på nuværende tidspunkt. En admin gennemser din ansøgning uden det."
+        },
+        "save_status": {
+          "saving": "Gemmer…",
+          "saved": "Gemt",
+          "error": "Kunne ikke gemme — prøv igen."
+        },
+        "steps": {
+          "profile": {
+            "name": "Profilgrundlæggende",
+            "title": "Fortæl os om dig selv",
+            "description": "Dit visningsnavn, bio, foto og de kategorier, du laver indhold i."
+          },
+          "social": {
+            "name": "Sociale konti",
+            "title": "Forbind dine sociale konti",
+            "description": "Forbind mindst én platform, så brands kan se din rækkevidde."
+          },
+          "portfolio": {
+            "name": "Portfolio",
+            "title": "Vis dit bedste arbejde",
+            "description": "Upload op til 10 elementer — videoer, billeder eller eksterne links — der repræsenterer din stil.",
+            "gallery_heading": "Dit portfolio",
+            "gallery_empty": "Ingen portfolio-elementer uploadet endnu.",
+            "gallery_remove": "Fjern element",
+            "gallery_status": "Portfoliogalleri indeholder {count} element(er).",
+            "video_badge_label": "Video",
+            "link_badge_label": "Eksternt link",
+            "untitled_item": "Unavngivet portfolio-element",
+            "preview_label": "Åbn forhåndsvisning",
+            "preview_close": "Luk forhåndsvisning"
+          },
+          "kyc": {
+            "name": "Identitetsverifikation",
+            "title": "Verificér din identitet",
+            "description": "En hurtig kontrol med vores verifikationspartner. Påkrævet for udbetalinger.",
+            "skipped_title": "Identitetsverifikation sprunget over",
+            "skipped_explanation": "Identitetsverifikation er ikke påkrævet på nuværende tidspunkt.",
+            "current_status": "Status:",
+            "begin_button": "Start verifikation",
+            "status_labels": {
+              "none": "Ikke startet",
+              "pending": "I gang",
+              "verified": "Verificeret",
+              "rejected": "Afvist",
+              "not_required": "Sprunget over"
+            }
+          },
+          "tax": {
+            "name": "Skatteoplysninger",
+            "title": "Skatteformular",
+            "description": "Vi har brug for en skatteformular til udbetalinger, også inden din første.",
+            "current_status": "Status:",
+            "status_complete": "Indsendt",
+            "status_incomplete": "Ikke indsendt endnu",
+            "on_file_title": "Skatteoplysninger gemt",
+            "on_file_body": "Dine skatteoplysninger er gemt sikkert. Af privatlivshensyn viser vi dem ikke igen — vælg Opdater for at genindtaste dem.",
+            "update_button": "Opdater skatteoplysninger"
+          },
+          "payout": {
+            "name": "Udbetalingsmetode",
+            "title": "Opsæt udbetalinger",
+            "description": "Forbind en Stripe Express-konto for at modtage betalinger.",
+            "skipped_title": "Udbetalingsopsætning sprunget over",
+            "skipped_explanation": "Udbetalingsopsætning er ikke påkrævet på nuværende tidspunkt.",
+            "current_status": "Status:",
+            "begin_button": "Opsæt udbetalinger",
+            "status_set": "Forbundet",
+            "status_unset": "Ikke forbundet"
+          },
+          "contract": {
+            "name": "Rammeaftale",
+            "title": "Underskriv rammeaftalen",
+            "description": "Vores standard creator-aftale dækker brandsamarbejder på platformen.",
+            "skipped_explanation": "Kontraktunderskrivelse er ikke påkrævet på nuværende tidspunkt — acceptér click-through-vilkårene nedenfor.",
+            "click_through_label": "Jeg har læst og accepterer disse vilkår.",
+            "click_through_help": "Læs aftalen ovenfor, og sæt derefter flueben for at fortsætte.",
+            "terms_version": "Master Creator-aftale v{version}",
+            "current_status": "Status:",
+            "begin_button": "Åbn aftale til underskrivelse",
+            "status_labels": {
+              "signed": "Underskrevet",
+              "click_through_accepted": "Accepteret",
+              "none": "Ikke startet"
+            },
+            "accepted_title": "Aftale accepteret",
+            "accepted_body": "Du har accepteret rammeaftalen. Fortsæt til næste trin."
+          },
+          "account_created": {
+            "name": "Konto oprettet"
+          },
+          "review": {
+            "name": "Gennemse og indsend",
+            "title": "Gennemse din ansøgning",
+            "description": "Tag et øjeblik til at gennemse alt, inden du indsender.",
+            "completeness": "{percent}% fuldført",
+            "edit_step": "Rediger",
+            "submit_button": "Indsend ansøgning",
+            "incomplete_blocker": "Du har 1 ufuldstændigt trin: {names}. Klik på Rediger for at afslutte det. | Du har {count} ufuldstændige trin: {names}. Klik på Rediger på hvert for at afslutte dem."
+          }
+        },
+        "fields": {
+          "display_name": "Visningsnavn",
+          "display_name_help": "Hvordan brands ser dig — dit handle eller kunstnernavn.",
+          "bio": "Bio",
+          "bio_help": "En kort introduktion. Du kan bruge **fed**, *kursiv* og [links](https://example.com).",
+          "avatar": "Profilbillede",
+          "avatar_drop": "Drop et billede her, eller klik for at vælge. JPG, PNG eller WebP op til 5 MB.",
+          "country": "Land",
+          "region": "Region eller by",
+          "primary_language": "Primært sprog",
+          "secondary_languages": "Andre sprog",
+          "categories": "Kategorier",
+          "categories_help": "Vælg de kategorier, der bedst beskriver, hvad du laver.",
+          "avatar_required": "Et profilbillede er påkrævet for at afslutte dette trin.",
+          "step_requirements_hint": "Tilføj et profilbillede og mindst én kategori for at fortsætte.",
+          "social_handle": "Brugernavn",
+          "social_handle_hint": "Indtast kun dit brugernavn — intet {'@'}-symbol eller fuld profil-URL.",
+          "social_handle_invalid": "Indtast et gyldigt brugernavn: 2–30 bogstaver, tal, punktummer, underscores eller bindestreger (ingen mellemrum, {'@'} eller URL'er).",
+          "social_profile_url": "Profil-URL",
+          "portfolio_title": "Titel",
+          "portfolio_description": "Beskrivelse",
+          "portfolio_external_url": "Ekstern URL (valgfrit)",
+          "tax_form_type": "Skatteformular",
+          "legal_name": "Juridisk navn",
+          "tax_id": "Skatte-ID",
+          "address_country": "Land",
+          "address_city": "By",
+          "address_postal_code": "Postnummer",
+          "address_street": "Gade"
+        },
+        "categories": {
+          "fashion": "Mode",
+          "beauty": "Skønhed",
+          "lifestyle": "Livsstil",
+          "fitness": "Fitness",
+          "travel": "Rejser",
+          "food": "Mad",
+          "tech": "Teknologi",
+          "gaming": "Gaming",
+          "music": "Musik",
+          "comedy": "Komedie",
+          "education": "Uddannelse",
+          "parenting": "Forældreskab",
+          "business": "Erhverv",
+          "art": "Kunst",
+          "sports": "Sport",
+          "other": "Andet"
+        },
+        "tax_form_types": {
+          "eu_self_employed": "EU — selvstændig",
+          "eu_company": "EU — virksomhed",
+          "uk_self_employed": "UK — selvstændig",
+          "uk_company": "UK — virksomhed"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Kommer snart"
+        },
+        "vendor_bounce": {
+          "waiting_title": "Næsten der…",
+          "waiting_description": "Vi venter på svar fra vores partner. Dette tager normalt under et minut.",
+          "timeout_title": "Venter stadig på vores partner",
+          "timeout_description": "Dette tager længere tid end forventet. Du kan prøve igen eller kontakte support.",
+          "retry": "Prøv igen",
+          "contact_support": "Kontakt support"
+        },
+        "welcome_back": {
+          "title": "Velkommen tilbage",
+          "subtitle": "Du var sidst her {time_ago}. Fortsæt, hvor du slap.",
+          "first_time_title": "Lad os komme i gang",
+          "first_time_subtitle": "Velkommen til Catalyst. Lad os opsætte din creator-profil — det tager kun et par minutter.",
+          "first_time_prompt": "Start med {step} for at introducere dig for brands.",
+          "next_step_prompt": "Du er ved trin {step}. Fortsæt her, eller hop tilbage for at redigere et tidligere trin.",
+          "all_complete_prompt": "Ser godt ud — du har fuldført hvert trin. Klar til at indsende?",
+          "continue_button": "Fortsæt til {step_name}",
+          "review_button": "Gennemse og indsend"
+        }
+      },
+      "dashboard": {
+        "title": "Din ansøgning",
+        "greeting": "Velkommen, {name}.",
+        "completeness": "{percent}% fuldført",
+        "submitted_at": "Indsendt den {datetime}",
+        "submitted": {
+          "heading": "Ansøgning indsendt",
+          "description": "Din profil er til gennemgang. Vi giver dig besked inden for 3 arbejdsdage.",
+          "completeness_label": "Profil-fuldstændighed",
+          "last_updated": "Sidst opdateret {time_ago}"
+        },
+        "pending_review": {
+          "title": "Ansøgning til gennemgang",
+          "description": "Din ansøgning er i vores kø. Vi giver dig besked inden for 3 arbejdsdage."
+        },
+        "approved": {
+          "title": "Velkommen til Catalyst",
+          "heading": "Du er godkendt",
+          "description": "Du er godkendt til at modtage brandsamarbejder. Det fulde creator-dashboard kommer snart."
+        },
+        "rejected": {
+          "title": "Ansøgning ikke godkendt",
+          "heading": "Ansøgning kræver ændringer",
+          "description": "Gennemse noterne nedenfor, opdater din ansøgning og indsend den igen til gennemgang.",
+          "reason_label": "Årsag:",
+          "edit_profile": "Rediger profil",
+          "resubmit": "Opdater og indsend igen",
+          "resubmit_failed": "Vi kunne ikke genåbne din ansøgning. Prøv igen."
+        },
+        "incomplete": {
+          "title": "Fortsæt din ansøgning",
+          "description": "Fortsæt, hvor du slap — din guide-fremgang er gemt."
+        },
+        "requests": {
+          "title": "Forbindelsesanmodninger",
+          "sent": "Sendt {date}",
+          "sent_unknown": "Sendt for nylig",
+          "accept": "Acceptér",
+          "decline": "Afvis",
+          "empty": {
+            "title": "Ingen forbindelsesanmodninger",
+            "body": "Når et bureau inviterer dig til at forbinde, vises det her."
+          },
+          "toast": {
+            "accepted": "Du er nu forbundet med {agency}.",
+            "declined": "Anmodning afvist.",
+            "error": "Noget gik galt. Prøv igen."
+          }
+        },
+        "assignments": {
+          "title": "Kampagneinvitationer",
+          "pending": "Du har {count} invitation(er), der venter på dit svar.",
+          "none": "Ingen invitationer venter på dit svar.",
+          "cta": "Se invitationer"
+        }
+      },
+      "assignments": {
+        "title": "Kampagneinvitationer",
+        "subtitle": "Acceptér, afvis eller kom med et modbud på kampagner, du er inviteret til.",
+        "fee": "Honorar",
+        "youCountered": "du kom med et modbud",
+        "accept": "Acceptér",
+        "counter": "Modbud",
+        "decline": "Afvis",
+        "view": "Se",
+        "detail": {
+          "back": "Tilbage til invitationer",
+          "notFound": "Denne opgave kunne ikke findes.",
+          "loadFailed": "Vi kunne ikke indlæse denne opgave. Prøv igen.",
+          "retry": "Prøv igen",
+          "awaitingReview": "Dit udkast er indsendt og afventer bureauets gennemgang.",
+          "awaitingVerification": "Dit opslag er registreret og afventer verifikation.",
+          "resubmitInPlace": {
+            "title": "Vi kunne ikke verificere dit opslag",
+            "intro": "Automatisk verifikation af dit opslag mislykkedes. Kontrollér, at linket er korrekt og peger på dit publicerede opslag, og indsend det derefter igen.",
+            "url": "Opslags-URL",
+            "submit": "Indsend link igen",
+            "toast": "Link indsendt igen — vi kontrollerer det snart igen."
+          },
+          "contract": {
+            "title": "Kampagnekontrakt",
+            "viewPdf": "Se kontrakt (PDF)",
+            "accept": "Acceptér kontrakt",
+            "awaitingAgency": "Bureauet sender dig en kontrakt til gennemgang og accept. Du vil blive underrettet, når den er klar — kom så tilbage her.",
+            "signingDisabled": "Kontraktunderskrivelse er ikke aktiveret endnu. Bureauet kontakter dig, når det er tid til at fortsætte.",
+            "toast": {
+              "accepted": "Kontrakt accepteret. Du kan nu indsende dit udkast."
+            }
+          },
+          "revision": {
+            "title": "Revision anmodet",
+            "noFeedback": "Bureauet har anmodet om ændringer. Indsend venligst et opdateret udkast."
+          },
+          "draft": {
+            "submitTitle": "Indsend dit udkast",
+            "resubmitTitle": "Indsend dit udkast igen",
+            "caption": "Billedtekst",
+            "hashtags": "Hashtags",
+            "hashtagsHint": "Adskil med mellemrum eller kommaer",
+            "mentions": "Omtaler",
+            "mentionsHint": "Adskil med mellemrum eller kommaer",
+            "media": "Medier",
+            "submit": "Indsend udkast",
+            "resubmit": "Indsend udkast igen",
+            "mediaStatus": {
+              "uploading": "Uploader…",
+              "done": "Uploadet",
+              "error": "Upload mislykkedes"
+            }
+          },
+          "posted": {
+            "title": "Markér som opslået",
+            "platform": "Platform",
+            "url": "Opslags-URL",
+            "submit": "Indsend opslag",
+            "summaryTitle": "Opslået indhold"
+          },
+          "history": {
+            "title": "Udkastshistorik",
+            "version": "Version {n}"
+          },
+          "reviewStatus": {
+            "pending": "Afventer gennemgang",
+            "approved": "Godkendt",
+            "rejected": "Afvist",
+            "revision_requested": "Revision anmodet"
+          },
+          "verificationStatus": {
+            "pending": "Verifikation afventer",
+            "verified": "Verificeret",
+            "not_found": "Ikke fundet",
+            "mismatch": "Uoverensstemmelse"
+          },
+          "toast": {
+            "draftSubmitted": "Udkast indsendt.",
+            "posted": "Opslag registreret.",
+            "error": "Noget gik galt. Prøv igen."
+          }
+        },
+        "window": {
+          "range": "{start} – {end}",
+          "unset": "Datoer TBD"
+        },
+        "empty": {
+          "title": "Ingen kampagneinvitationer",
+          "body": "Når et bureau inviterer dig til en kampagne, vises det her."
+        },
+        "toast": {
+          "accepted": "Invitation accepteret.",
+          "countered": "Modbud sendt.",
+          "declined": "Invitation afvist.",
+          "error": "Noget gik galt. Prøv igen."
+        },
+        "counterDialog": {
+          "title": "Forhandl honoraret",
+          "body": "Foreslå et andet honorar for denne kampagne. Bureauet kan komme med et nyt tilbud eller trække sig.",
+          "feeLabel": "Dit honorar ({currency})",
+          "cancel": "Annuller",
+          "submit": "Send modbud"
+        }
+      },
+      "upload": {
+        "avatar_prompt": "Drop et billede her, eller klik for at vælge",
+        "avatar_preview_alt": "Forhåndsvisning af profilbillede",
+        "size_hint": "{types} · op til {max_mb} MB",
+        "portfolio_prompt": "Drop filer her, eller klik for at vælge",
+        "portfolio_size_hint": "Billeder op til {image_mb} MB · videoer op til {video_mb} MB",
+        "portfolio_slots_remaining": "{remaining} pladser tilbage",
+        "portfolio_queue_status": "{in_flight} af {total} uploader (op til {concurrency} ad gangen).",
+        "uploading": "Uploader…",
+        "remove": "Fjern",
+        "remove_avatar": "Fjern billede",
+        "remove_portfolio_item_label": "Fjern {name}",
+        "status_pending": "Venter…",
+        "status_uploading": "Uploader…",
+        "status_done": "Uploadet",
+        "status_error": "Mislykkedes"
+      },
+      "errors": {
+        "upload_too_large": "Denne fil er for stor. Maksimal størrelse er {max_mb} MB.",
+        "upload_wrong_type": "Denne filtype understøttes ikke. Brug {allowed_types}.",
+        "upload_failed": "Upload mislykkedes. Prøv igen.",
+        "portfolio_max_reached": "Du kan uploade op til {max} portfolio-elementer."
+      }
+    }
+  }
+}

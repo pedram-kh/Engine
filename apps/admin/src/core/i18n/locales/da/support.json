@@ -1,0 +1,66 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "Brugersøgning",
+        "subtitle": "Find en bruger for at se eller efterligne vedkommende. Platformadministratorer kan ikke efterlignes.",
+        "label": "Søg efter navn, e-mail eller ULID",
+        "empty": "Ingen brugere matcher denne søgning.",
+        "load_failed": "Brugere kunne ikke søges. Prøv venligst igen."
+      },
+      "impersonate": {
+        "button": "Efterlign",
+        "title": "Efterlign {name}",
+        "warning": "Du åbner en ny fane, logget ind SOM denne bruger. Din adminsession forbliver aktiv her. Enhver handling, du foretager, registreres mod denne bruger med dig logget som efterligner, og sessionen udløber automatisk.",
+        "reason_label": "Årsag til efterligning",
+        "reason_hint": "Påkrævet, mindst {count} tegn. Registreres i revisionsloggen.",
+        "confirm": "Start efterligning",
+        "cancel": "Annuller",
+        "success": "Efterligning af {name} startet i en ny fane.",
+        "failed": "Efterligningen kunne ikke startes. Prøv igen."
+      },
+      "impersonation_log": {
+        "title": "Efterligningslog",
+        "subtitle": "Alle admin-efterligningssessioner, der nogensinde er startet, nyeste først.",
+        "empty": "Ingen efterligningssessioner matcher disse filtre.",
+        "load_failed": "Efterligningsloggen kunne ikke indlæses. Opdater venligst siden.",
+        "filters": {
+          "status": "Status",
+          "search": "Admin eller bruger (navn, e-mail, ULID)",
+          "date_from": "Fra",
+          "date_to": "Til",
+          "apply": "Anvend"
+        },
+        "status_filter": {
+          "all": "Alle",
+          "active": "Aktiv",
+          "ended": "Afsluttet",
+          "expired": "Udløbet"
+        },
+        "statuses": {
+          "active": "Aktiv",
+          "ended": "Afsluttet",
+          "expired": "Udløbet"
+        },
+        "fields": {
+          "admin": "Administrator",
+          "impersonated_user": "Efterlignet bruger",
+          "reason": "Årsag",
+          "status": "Status",
+          "started_at": "Startet",
+          "ended_at": "Afsluttet"
+        },
+        "pagination": {
+          "prev": "Forrige",
+          "next": "Næste"
+        }
+      }
+    },
+    "impersonation": {
+      "target_admin": "Platformadministratorer kan ikke efterlignes.",
+      "target_self": "Du kan ikke efterligne dig selv.",
+      "already_active": "Du har allerede en aktiv efterligning. Afslut den, før du starter en ny.",
+      "invalid_handoff": "Dette efterlignings-handoff er ugyldigt, allerede brugt eller udløbet."
+    }
+  }
+}

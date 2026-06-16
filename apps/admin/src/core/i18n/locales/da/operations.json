@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "operations": {
+      "health": {
+        "title": "Systemsundhed",
+        "heading": "Tjenestestatus",
+        "load_failed": "Sundhedskontrollen kunne ikke indlæses. Opdater venligst siden.",
+        "status": {
+          "ok": "Sund",
+          "degraded": "Nedsat"
+        },
+        "checks": {
+          "database": "Database",
+          "cache": "Cache"
+        }
+      }
+    }
+  }
+}

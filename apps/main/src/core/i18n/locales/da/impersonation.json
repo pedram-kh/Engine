@@ -1,0 +1,15 @@
+{
+  "impersonation": {
+    "claim": {
+      "in_progress": "Imitation-session startes…",
+      "missing_token": "Intet overdragelsestoken er angivet. Start imitationen igen via adminpanelet.",
+      "invalid": "Denne imitationsoverdragelse er ugyldig, allerede brugt eller udløbet. Start igen via adminpanelet.",
+      "failed": "Vi kunne ikke starte imitation-sessionen. Prøv igen via adminpanelet."
+    },
+    "banner": {
+      "message": "Admin-supportsession — du ser denne konto som brugeren.",
+      "expires_in": "Udløber om {time}",
+      "end": "Afslut session"
+    }
+  }
+}

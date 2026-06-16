@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Admin",
+    "subtitle": "Superadmin-konsol.",
+    "sprint0Notice": "Sprint 0-scaffolding — admin SPA",
+    "dashboardPlaceholder": "Admin-dashboard-pladsholder — fuld overflade leveres i et senere sprint.",
+    "env": {
+      "local": "Lokal",
+      "staging": "Staging",
+      "production": "Produktion — alle handlinger logges"
+    },
+    "nav": {
+      "comingSoon": "Snart",
+      "dashboard": "Dashboard",
+      "agencies": "Bureauer",
+      "creators": "Creators",
+      "creatorApprovals": "Afventende godkendelser",
+      "kycQueue": "KYC-kø",
+      "allCreators": "Alle creators",
+      "payments": "Betalinger",
+      "disputes": "Tvister",
+      "recentPayments": "Seneste",
+      "audit": "Revisionslog",
+      "alerts": "Driftsadvarsler",
+      "support": "Support",
+      "userSearch": "Brugersøgning",
+      "impersonationLog": "Efterligningslog",
+      "operations": "Drift",
+      "systemHealth": "Systemsundhed",
+      "horizon": "Baggrundsjobs …",
+      "compliance": "Overholdelse",
+      "exportRequests": "Eksportanmodninger",
+      "erasureQueue": "Sletningskø",
+      "featureFlags": "Funktionsflag"
+    },
+    "userMenu": {
+      "signOut": "Log ud",
+      "signingOut": "Logger ud…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Kommer snart",
+      "body": "Denne overflade aktiveres, når betalingsbehandling leveres (Sprint 10).",
+      "disputes": "Tvister",
+      "recentPayments": "Seneste betalinger"
+    },
+    "sectionStub": {
+      "body": "Denne admin-overflade bygges i dette sprint."
+    },
+    "locale": {
+      "switcher": "Sprog",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Tema",
+        "light": "Lyst",
+        "dark": "Mørkt"
+      }
+    }
+  }
+}

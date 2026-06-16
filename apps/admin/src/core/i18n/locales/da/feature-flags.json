@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "featureFlags": {
+      "title": "Funktionsflag",
+      "subtitle": "Platformsdækkende til/fra-skifter. Hvert skift auditeres og træder i kraft med det samme.",
+      "load_failed": "Funktionsflagene kunne ikke indlæses. Opdater venligst siden.",
+      "toggle": {
+        "enable_title": "Aktivér {label}?",
+        "disable_title": "Deaktivér {label}?",
+        "description": "Dette skifter flaget på tværs af platformen og træder i kraft med det samme. En årsag er påkrævet og registreres i revisionsloggen.",
+        "reason_label": "Årsag",
+        "reason_hint": "Mindst {count} tegn — registreres mod dette skift.",
+        "cancel": "Annuller",
+        "confirm": "Bekræft",
+        "success": "Funktionsflag opdateret.",
+        "failed": "Flaget kunne ikke opdateres. Prøv igen."
+      }
+    }
+  }
+}

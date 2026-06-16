@@ -1,0 +1,84 @@
+{
+  "availability": {
+    "title": "Tilgængelighed",
+    "subtitle": "Blokér tidspunkter, hvor du ikke er tilgængelig, så bureauer kan se din reelle kalender.",
+    "allDay": "Hele dagen",
+    "moreCount": "+{count} mere",
+    "dayPopover": {
+      "title": "Blokke på denne dag",
+      "viewAll": "Se alle blokke for denne dag"
+    },
+    "creatorNav": {
+      "dashboard": "Dashboard",
+      "assignments": "Invitationer",
+      "availability": "Tilgængelighed"
+    },
+    "nav": {
+      "prevMonth": "Forrige måned",
+      "nextMonth": "Næste måned"
+    },
+    "actions": {
+      "add": "Tilføj blok"
+    },
+    "empty": {
+      "heading": "Ingen tilgængelighedsblokke endnu",
+      "body": "Tilføj en blok for at angive, hvornår du er fraværende eller utilgængelig."
+    },
+    "errors": {
+      "loadFailed": "Din tilgængelighed kunne ikke indlæses. Prøv igen."
+    },
+    "blockType": {
+      "hard": "Ikke tilgængelig (fast)",
+      "soft": "Præference (blød)"
+    },
+    "kind": {
+      "vacation": "Ferie",
+      "personal": "Personligt",
+      "exclusive_contract": "Eksklusiv kontrakt",
+      "assignment_auto": "Fra kampagne",
+      "other": "Andet"
+    },
+    "weekday": {
+      "MO": "Ma",
+      "TU": "Ti",
+      "WE": "On",
+      "TH": "To",
+      "FR": "Fr",
+      "SA": "Lø",
+      "SU": "Sø"
+    },
+    "dialog": {
+      "createTitle": "Tilføj tilgængelighedsblok",
+      "editTitle": "Rediger tilgængelighedsblok",
+      "seriesNotice": "Dette er en tilbagevendende blok — ændringer gælder for alle forekomster, ikke kun denne dag.",
+      "blockTypeHint": "Faste blokke udelukker dig helt; bløde blokke er kun en præference.",
+      "fields": {
+        "allDay": "Hele dagen",
+        "startDate": "Startdato",
+        "startTime": "Starttidspunkt",
+        "endDate": "Slutdato",
+        "endTime": "Sluttidspunkt",
+        "blockType": "Type",
+        "kind": "Årsag",
+        "reason": "Note (valgfrit)",
+        "recurring": "Gentager sig ugentligt"
+      },
+      "recurrence": {
+        "interval": "Gentag hver (uger)",
+        "weekdays": "På disse dage",
+        "hasEnd": "Angiv slutdato",
+        "endsOn": "Slutter den"
+      },
+      "actions": {
+        "save": "Gem",
+        "cancel": "Annuller",
+        "delete": "Slet",
+        "confirmDelete": "Bekræft sletning"
+      },
+      "errors": {
+        "saveFailed": "Blokken kunne ikke gemmes. Prøv igen.",
+        "deleteFailed": "Blokken kunne ikke slettes. Prøv igen."
+      }
+    }
+  }
+}

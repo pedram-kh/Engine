@@ -1,0 +1,63 @@
+{
+  "notifications": {
+    "center": {
+      "title": "Notifikationer",
+      "empty": "Du er opdateret.",
+      "markAll": "Markér alle som læst",
+      "viewAll": "Se alle notifikationer",
+      "loading": "Indlæser…",
+      "error": "Notifikationer kunne ikke indlæses.",
+      "unreadBadgeLabel": "{count} ulæste notifikationer",
+      "feedbackLabel": "Feedback",
+      "reasonLabel": "Årsag"
+    },
+    "page": {
+      "title": "Notifikationer",
+      "empty": "Du har ingen notifikationer endnu."
+    },
+    "types": {
+      "assignment_draft_approved": "Dit udkast til {campaign_name} er godkendt.",
+      "assignment_revision_requested": "Der er anmodet om ændringer til dit udkast til {campaign_name}.",
+      "assignment_draft_rejected": "Dit udkast til {campaign_name} er afvist.",
+      "assignment_manually_verified": "Dit opslag til {campaign_name} er verificeret.",
+      "assignment_draft_submitted": "{creator_name} har indsendt et udkast til {campaign_name}.",
+      "assignment_contracted": "{creator_name} har accepteret kontrakten til {campaign_name}.",
+      "creator_approved": "Din creator-konto er godkendt.",
+      "creator_rejected": "Din creator-ansøgning er ikke godkendt.",
+      "message_received_by_creator": "{sender_name} har sendt dig en besked om {campaign_name}.",
+      "message_received_by_agency": "{sender_name} har sendt en besked om {campaign_name}.",
+      "fallback": "Du har en ny notifikation."
+    },
+    "preferences": {
+      "title": "Notifikationsindstillinger",
+      "description": "Vælg, hvilke in-app-notifikationer du vil modtage.",
+      "menuItem": "Notifikationsindstillinger",
+      "save": "Gem ændringer",
+      "saving": "Gemmer…",
+      "success": "Dine notifikationsindstillinger er gemt.",
+      "loadError": "Dine notifikationsindstillinger kunne ikke indlæses.",
+      "saveError": "Dine notifikationsindstillinger kunne ikke gemmes. Prøv igen.",
+      "groups": {
+        "assignment": "Opgaver",
+        "creator": "Creator-konto",
+        "messaging": "Beskeder"
+      },
+      "channels": {
+        "in_app": "I appen",
+        "digest": "Dagligt e-mail-sammendrag"
+      },
+      "typeLabels": {
+        "assignment_draft_submitted": "Et udkast indsendes til gennemgang",
+        "assignment_contracted": "En kontrakt accepteres",
+        "assignment_revision_requested": "Ændringer anmodes til et udkast",
+        "assignment_draft_approved": "Et udkast godkendes",
+        "assignment_draft_rejected": "Et udkast afvises",
+        "assignment_manually_verified": "Et opslag verificeres",
+        "creator_approved": "En creator-konto godkendes",
+        "creator_rejected": "En creator-ansøgning afvises",
+        "message_received_by_creator": "En ny besked fra bureauet",
+        "message_received_by_agency": "En ny besked fra creatoren"
+      }
+    }
+  }
+}

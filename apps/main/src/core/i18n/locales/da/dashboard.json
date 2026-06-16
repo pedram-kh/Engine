@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "welcome": {
+      "greeting": "Velkommen tilbage",
+      "greetingNamed": "Velkommen tilbage, {name}"
+    },
+    "kpi": {
+      "activeCampaigns": "Aktive kampagner",
+      "creatorsInRoster": "Creatorer i roster",
+      "pendingApplications": "Afventende creator-ansøgninger",
+      "paymentsDue": "Forfaldne betalinger"
+    },
+    "activity": {
+      "title": "Seneste aktivitet",
+      "empty": "Ingen seneste aktivitet endnu.",
+      "loadFailed": "Seneste aktivitet kunne ikke indlæses.",
+      "system": "Systemet",
+      "actions": {
+        "creatorInvited": "{actor} har inviteret en creator",
+        "bulkInviteCompleted": "{actor} har udført en masseinvitation ({invited} inviteret, {failed} mislykkedes)",
+        "agencyCreatorRelationCreated": "{actor} har tilføjet en creator til rosteret",
+        "brandCreated": "{actor} har oprettet et brand",
+        "brandArchived": "{actor} har arkiveret et brand",
+        "brandRestored": "{actor} har gendannet et brand",
+        "invitationCreated": "{actor} har inviteret et teammedlem",
+        "invitationAccepted": "{actor} er tiltrådt teamet",
+        "agencySettingsUpdated": "{actor} har opdateret bureauindstillingerne",
+        "fallback": "{actor} har udført en handling"
+      }
+    },
+    "errors": {
+      "loadFailed": "Dit dashboard kunne ikke indlæses. Prøv igen."
+    }
+  }
+}
