@@ -14,7 +14,7 @@
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { ApiError } from '@catalyst/api-client'
+import { formatDateTime, ApiError } from '@catalyst/api-client'
 
 import {
   impersonationApi,
@@ -23,7 +23,7 @@ import {
   type ImpersonationSessionStatus,
 } from '../api/impersonation.api'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const items = ref<ImpersonationLogEntry[]>([])
 const loading = ref(false)
@@ -104,8 +104,8 @@ function statusLabel(status: ImpersonationSessionStatus): string {
   return t(`admin.support.impersonation_log.statuses.${status}`)
 }
 
-function formatDateTime(iso: string | null): string {
-  return iso === null ? '—' : new Date(iso).toLocaleString()
+function formatTimestamp(iso: string | null): string {
+  return formatDateTime(iso, locale.value)
 }
 
 onMounted(() => {
@@ -222,8 +222,8 @@ onMounted(() => {
               {{ statusLabel(row.attributes.status) }}
             </v-chip>
           </td>
-          <td>{{ formatDateTime(row.attributes.started_at) }}</td>
-          <td>{{ formatDateTime(row.attributes.ended_at) }}</td>
+          <td>{{ formatTimestamp(row.attributes.started_at) }}</td>
+          <td>{{ formatTimestamp(row.attributes.ended_at) }}</td>
         </tr>
       </tbody>
     </v-table>

@@ -19,6 +19,8 @@ import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { formatDate } from '@catalyst/api-client'
+
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 
 const { t, locale } = useI18n()
@@ -28,12 +30,12 @@ const { user } = storeToRefs(authStore)
 const userName = computed(() => user.value?.attributes.name ?? '')
 
 const today = computed(() =>
-  new Intl.DateTimeFormat(locale.value, {
+  formatDate(new Date(), locale.value, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  }).format(new Date()),
+  }),
 )
 </script>
 

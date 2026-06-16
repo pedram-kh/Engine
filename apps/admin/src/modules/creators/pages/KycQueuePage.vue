@@ -13,7 +13,7 @@ import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-import { ApiError } from '@catalyst/api-client'
+import { formatDateTime, ApiError } from '@catalyst/api-client'
 import type { CreatorKycStatus } from '@catalyst/api-client'
 
 import { useNavBadges } from '@/core/stores/useNavBadges'
@@ -22,7 +22,7 @@ import { adminCreatorsApi, type AdminCreatorListItem } from '../api/creators.api
 
 type KycFilter = CreatorKycStatus | 'all'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
 const navBadges = useNavBadges()
 
@@ -100,7 +100,7 @@ function goToDetail(ulid: string): void {
 }
 
 function formatDate(iso: string | null): string {
-  return iso === null ? '—' : new Date(iso).toLocaleDateString()
+  return formatDateTime(iso, locale.value, { dateStyle: 'medium' })
 }
 </script>
 

@@ -31,6 +31,7 @@
  * never the only signal — icon + text are also distinct.
  */
 
+import { formatDate } from '@catalyst/api-client'
 import type { ConnectionRequestListItem } from '@catalyst/api-client'
 import { CompletenessBar, CEmptyState } from '@catalyst/ui'
 import { computed, onMounted, ref } from 'vue'
@@ -100,7 +101,7 @@ function sentLabel(iso: string | null): string {
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return t('creator.ui.dashboard.requests.sent_unknown')
   return t('creator.ui.dashboard.requests.sent', {
-    date: new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(date),
+    date: formatDate(date, locale.value),
   })
 }
 

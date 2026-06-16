@@ -39,7 +39,7 @@
  * "Edit" + the field label; section headings remain `<h2>`s.
  */
 
-import { ApiError, languageEndonym } from '@catalyst/api-client'
+import { formatDateTime, ApiError, languageEndonym } from '@catalyst/api-client'
 import type {
   CreatorKycVerificationSummary,
   CreatorResource,
@@ -77,7 +77,7 @@ import {
 
 type AdminCreatorPayload = CreatorResource
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 
 const creator = ref<AdminCreatorPayload | null>(null)
@@ -219,7 +219,7 @@ async function loadHistory(): Promise<void> {
 }
 
 function formatHistoryDate(iso: string | null): string {
-  return iso === null ? '—' : new Date(iso).toLocaleString()
+  return formatDateTime(iso, locale.value)
 }
 
 onMounted(() => {

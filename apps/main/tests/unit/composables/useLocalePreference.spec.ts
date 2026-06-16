@@ -54,14 +54,14 @@ describe('useLocalePreference (main)', () => {
   })
 
   it('treats an unrenderable / stale stored value as unset without rewriting it', () => {
-    window.localStorage.setItem(LOCALE_STORAGE_KEY, 'fr')
+    window.localStorage.setItem(LOCALE_STORAGE_KEY, 'ja')
     expect(readStoredLocale()).toBeNull()
     // Passive-on-read: the stale value is left in place, not cleared.
-    expect(window.localStorage.getItem(LOCALE_STORAGE_KEY)).toBe('fr')
+    expect(window.localStorage.getItem(LOCALE_STORAGE_KEY)).toBe('ja')
   })
 
   it('never persists a non-rendered locale', () => {
-    writeStoredLocale('fr')
+    writeStoredLocale('ja')
     expect(window.localStorage.getItem(LOCALE_STORAGE_KEY)).toBeNull()
   })
 

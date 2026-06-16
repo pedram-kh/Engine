@@ -90,7 +90,7 @@ describe('ReinviteDialog (re-invite UI chunk)', () => {
   it('shows the countered fee as context in the dialog body', () => {
     const wrapper = mountDialog()
     const body = wrapper.find('[data-test="reinvite-dialog-body"]')
-    expect(body.text()).toContain('1,500.00 EUR')
+    expect(body.text()).toContain('€1,500.00')
     wrapper.unmount()
   })
 

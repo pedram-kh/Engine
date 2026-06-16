@@ -14,6 +14,7 @@
  */
 
 import {
+  formatDateTime,
   type AgencyAssignmentDetailResource,
   type CampaignAssignmentResource,
   type PostedContentVerificationStatus,
@@ -34,7 +35,7 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const detail = ref<AgencyAssignmentDetailResource | null>(null)
 const loading = ref(false)
@@ -73,11 +74,6 @@ watch(
 
 function close(): void {
   emit('update:modelValue', false)
-}
-
-function formatDate(iso: string | null): string {
-  if (iso === null) return '—'
-  return new Date(iso).toLocaleString()
 }
 </script>
 
@@ -172,10 +168,10 @@ function formatDate(iso: string | null): string {
               </a>
               <div class="text-caption text-medium-emphasis mt-2">
                 {{ t('app.campaigns.viewPost.postedAt') }}:
-                {{ formatDate(post.attributes.posted_at) }}
+                {{ formatDateTime(post.attributes.posted_at, locale) }}
                 <template v-if="post.attributes.verified_at">
                   · {{ t('app.campaigns.viewPost.verifiedAt') }}:
-                  {{ formatDate(post.attributes.verified_at) }}
+                  {{ formatDateTime(post.attributes.verified_at, locale) }}
                 </template>
               </div>
             </v-card-text>

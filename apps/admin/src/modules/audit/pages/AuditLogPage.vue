@@ -11,11 +11,11 @@
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { ApiError } from '@catalyst/api-client'
+import { formatDateTime, ApiError } from '@catalyst/api-client'
 
 import { adminAuditApi, type AdminAuditLog } from '../api/audit.api'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const items = ref<AdminAuditLog[]>([])
 const loading = ref(false)
@@ -74,8 +74,8 @@ function goPrev(): void {
   void fetchPage(target)
 }
 
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString()
+function formatTimestamp(iso: string): string {
+  return formatDateTime(iso, locale.value)
 }
 
 onMounted(() => {
@@ -181,7 +181,7 @@ onMounted(() => {
           <td>{{ row.attributes.actor_name ?? row.attributes.actor_email ?? '—' }}</td>
           <td>{{ row.attributes.subject_ulid ?? '—' }}</td>
           <td>{{ row.attributes.reason ?? '—' }}</td>
-          <td>{{ formatDateTime(row.attributes.created_at) }}</td>
+          <td>{{ formatTimestamp(row.attributes.created_at) }}</td>
         </tr>
       </tbody>
     </v-table>

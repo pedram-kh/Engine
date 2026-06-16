@@ -13,11 +13,11 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
-import { ApiError } from '@catalyst/api-client'
+import { formatDateTime, ApiError } from '@catalyst/api-client'
 
 import { adminAgenciesApi, type AdminAgency } from '../api/agencies.api'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 
 const ulid = computed(() => String(route.params.ulid))
@@ -89,8 +89,8 @@ async function confirmReactivate(): Promise<void> {
   }
 }
 
-function formatDateTime(iso: string | null): string {
-  return iso === null ? '—' : new Date(iso).toLocaleString()
+function formatTimestamp(iso: string | null): string {
+  return formatDateTime(iso, locale.value)
 }
 </script>
 
@@ -182,7 +182,7 @@ function formatDateTime(iso: string | null): string {
               <div class="text-caption text-medium-emphasis">
                 {{ t('admin.agencies.detail.fields.created_at') }}
               </div>
-              <div class="text-body-2">{{ formatDateTime(agency.attributes.created_at) }}</div>
+              <div class="text-body-2">{{ formatTimestamp(agency.attributes.created_at) }}</div>
             </v-col>
           </v-row>
         </v-card-text>
@@ -204,7 +204,9 @@ function formatDateTime(iso: string | null): string {
             <div class="text-caption text-medium-emphasis">
               {{ t('admin.agencies.detail.fields.suspended_at') }}
             </div>
-            <div class="text-body-2 mb-2">{{ formatDateTime(agency.attributes.suspended_at) }}</div>
+            <div class="text-body-2 mb-2">
+              {{ formatTimestamp(agency.attributes.suspended_at) }}
+            </div>
             <div class="text-caption text-medium-emphasis">
               {{ t('admin.agencies.detail.fields.suspended_reason') }}
             </div>

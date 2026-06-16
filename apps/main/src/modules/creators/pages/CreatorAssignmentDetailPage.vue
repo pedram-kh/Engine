@@ -21,6 +21,7 @@
  */
 
 import {
+  formatCurrency,
   ApiError,
   extractFieldErrors,
   uploadToPresignedUrl,
@@ -165,8 +166,7 @@ function tokenize(raw: string): string[] | null {
 }
 
 function formatMoney(minor: number | null, currency: string | null): string {
-  if (minor === null) return '—'
-  return `${(minor / 100).toLocaleString(locale.value, { minimumFractionDigits: 2 })} ${currency ?? ''}`.trim()
+  return formatCurrency(minor, currency, locale.value)
 }
 
 async function load(): Promise<void> {

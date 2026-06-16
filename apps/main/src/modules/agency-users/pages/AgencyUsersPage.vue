@@ -31,6 +31,7 @@
  * keeps the management surfaces hidden).
  */
 
+import { formatDateTime } from '@catalyst/api-client'
 import type {
   AgencyInvitationResource,
   AgencyInvitationStatus,
@@ -47,7 +48,7 @@ import { invitationsApi } from '../api/invitations.api'
 import { membersApi } from '../api/members.api'
 import InviteUserModal from '../components/InviteUserModal.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const agencyStore = useAgencyStore()
 
 // ---------------------------------------------------------------------------
@@ -226,10 +227,6 @@ function onInvited(email: string): void {
   // immediately.
   void loadInvitations()
 }
-
-function formatDate(iso: string | null): string {
-  return iso !== null ? new Date(iso).toLocaleDateString() : '—'
-}
 </script>
 
 <template>
@@ -358,7 +355,7 @@ function formatDate(iso: string | null): string {
         </v-chip>
       </template>
       <template #item.attributes.created_at="{ item }">
-        {{ formatDate(item.attributes.created_at) }}
+        {{ formatDateTime(item.attributes.created_at, locale, { dateStyle: 'medium' }) }}
       </template>
     </v-data-table-server>
 
@@ -442,7 +439,7 @@ function formatDate(iso: string | null): string {
           </v-chip>
         </template>
         <template #item.attributes.invited_at="{ item }">
-          {{ formatDate(item.attributes.invited_at) }}
+          {{ formatDateTime(item.attributes.invited_at, locale, { dateStyle: 'medium' }) }}
         </template>
         <template #item.attributes.invited_by_user_name="{ item }">
           {{ item.attributes.invited_by_user_name ?? '—' }}

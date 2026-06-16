@@ -6,7 +6,12 @@
  * per-field 422 binding via extractFieldErrors.
  */
 
-import { ApiError, extractFieldErrors, type CampaignAssignmentResource } from '@catalyst/api-client'
+import {
+  formatCurrency,
+  ApiError,
+  extractFieldErrors,
+  type CampaignAssignmentResource,
+} from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -47,8 +52,7 @@ const counteredFeeFormatted = computed(() =>
 const feeValid = computed(() => feeAmount.value !== null && feeAmount.value > 0)
 
 function formatMoney(minor: number | null, cur: string | null): string {
-  if (minor === null) return '—'
-  return `${(minor / 100).toLocaleString(locale.value, { minimumFractionDigits: 2 })} ${cur ?? ''}`.trim()
+  return formatCurrency(minor, cur, locale.value)
 }
 
 watch(

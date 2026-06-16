@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatDateTime } from '@catalyst/api-client'
 import type { BrandResource } from '@catalyst/api-client'
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -7,7 +8,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { brandsApi } from '../api/brands.api'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const agencyStore = useAgencyStore()
@@ -53,10 +54,6 @@ async function confirmArchive(): Promise<void> {
   } finally {
     archiving.value = false
   }
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString()
 }
 
 onMounted(loadBrand)
@@ -160,7 +157,7 @@ onMounted(loadBrand)
         />
         <v-list-item
           :title="'Created'"
-          :subtitle="formatDate(brand.attributes.created_at)"
+          :subtitle="formatDateTime(brand.attributes.created_at, locale, { dateStyle: 'medium' })"
           data-test="brand-detail-created-at"
         />
       </v-list>

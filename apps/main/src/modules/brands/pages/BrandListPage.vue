@@ -10,6 +10,7 @@
  *   - Archive confirmation modal (inline)
  */
 
+import { formatDateTime } from '@catalyst/api-client'
 import type { BrandResource } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -19,7 +20,7 @@ import { CEmptyState } from '@catalyst/ui'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { brandsApi } from '../api/brands.api'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const agencyStore = useAgencyStore()
 
@@ -117,10 +118,6 @@ watch(statusFilter, () => {
 function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
   tableOptions.value = opts
   void loadBrands()
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString()
 }
 
 function openArchiveDialog(brand: BrandResource): void {
@@ -287,7 +284,7 @@ async function confirmRestore(): Promise<void> {
       </template>
 
       <template #item.attributes.created_at="{ item }">
-        {{ formatDate(item.attributes.created_at) }}
+        {{ formatDateTime(item.attributes.created_at, locale, { dateStyle: 'medium' }) }}
       </template>
 
       <template #item.actions="{ item }">

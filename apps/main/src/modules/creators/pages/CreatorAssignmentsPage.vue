@@ -15,7 +15,13 @@
  * status chip (fail-closed server-side too — a stale action 422s).
  */
 
-import { ApiError, extractFieldErrors, type CreatorAssignmentResource } from '@catalyst/api-client'
+import {
+  formatCurrency,
+  formatDate,
+  ApiError,
+  extractFieldErrors,
+  type CreatorAssignmentResource,
+} from '@catalyst/api-client'
 import { CEmptyState } from '@catalyst/ui'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -44,18 +50,16 @@ const counterCurrency = computed(() => counterTarget.value?.attributes.agreed_fe
 const counterValid = computed(() => counterAmount.value !== null && counterAmount.value > 0)
 
 function formatMoney(minor: number | null, currency: string | null): string {
-  if (minor === null) return '—'
-  return `${(minor / 100).toLocaleString(locale.value, { minimumFractionDigits: 2 })} ${currency ?? ''}`.trim()
+  return formatCurrency(minor, currency, locale.value)
 }
 
 function windowLabel(a: CreatorAssignmentResource): string {
   const start = a.attributes.campaign?.posting_window_starts_at
   const end = a.attributes.campaign?.posting_window_ends_at
   if (!start || !end) return t('creator.ui.assignments.window.unset')
-  const fmt = new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' })
   return t('creator.ui.assignments.window.range', {
-    start: fmt.format(new Date(start)),
-    end: fmt.format(new Date(end)),
+    start: formatDate(start, locale.value),
+    end: formatDate(end, locale.value),
   })
 }
 

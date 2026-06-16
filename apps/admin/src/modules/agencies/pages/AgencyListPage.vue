@@ -15,11 +15,11 @@ import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-import { ApiError } from '@catalyst/api-client'
+import { formatDateTime, ApiError } from '@catalyst/api-client'
 
 import { adminAgenciesApi, type AdminAgency, type AgencyStatusFilter } from '../api/agencies.api'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
 
 const statusFilter = ref<AgencyStatusFilter>('all')
@@ -116,7 +116,7 @@ function goToDetail(ulid: string): void {
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString()
+  return formatDateTime(iso, locale.value, { dateStyle: 'medium' })
 }
 </script>
 

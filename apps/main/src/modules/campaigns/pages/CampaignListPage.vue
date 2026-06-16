@@ -6,6 +6,7 @@
  * admin/manager (a staff member's POST 403s).
  */
 
+import { formatCurrency } from '@catalyst/api-client'
 import type { BrandResource, CampaignListParams, CampaignResource } from '@catalyst/api-client'
 import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -16,7 +17,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { brandsApi } from '@/modules/brands/api/brands.api'
 import { campaignsApi } from '../api/campaigns.api'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const agencyStore = useAgencyStore()
 
 type StatusFilter = 'all' | 'draft' | 'active' | 'paused' | 'completed' | 'cancelled'
@@ -137,8 +138,7 @@ function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
 }
 
 function formatMoney(minor: number | null, currency: string | null): string {
-  if (minor === null) return '—'
-  return `${(minor / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${currency ?? ''}`.trim()
+  return formatCurrency(minor, currency, locale.value)
 }
 </script>
 

@@ -12,6 +12,7 @@
  */
 
 import {
+  formatCurrency,
   ApiError,
   extractFieldErrors,
   type CampaignAssignmentResource,
@@ -40,7 +41,7 @@ import CampaignMessagesPanel from '@/modules/messaging/components/CampaignMessag
 import BoardView from '@/modules/boards/components/BoardView.vue'
 import DraftsTab from '../components/DraftsTab.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const agencyStore = useAgencyStore()
 const { currentRole } = storeToRefs(agencyStore)
@@ -321,8 +322,7 @@ async function onSaveSettings(): Promise<void> {
 }
 
 function formatMoney(minor: number | null, currency: string | null): string {
-  if (minor === null) return '—'
-  return `${(minor / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${currency ?? ''}`.trim()
+  return formatCurrency(minor, currency, locale.value)
 }
 </script>
 

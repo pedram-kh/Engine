@@ -6,6 +6,7 @@
  * showAssignment (signed media URLs load lazily there, not in this list).
  */
 
+import { formatDateTime } from '@catalyst/api-client'
 import type {
   CampaignAssignmentResource,
   CampaignDraftListItemResource,
@@ -30,7 +31,7 @@ const emit = defineEmits<{
   'open-review': [assignment: CampaignAssignmentResource]
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const rows = ref<CampaignDraftListItemResource[]>([])
 const loading = ref(false)
@@ -104,8 +105,7 @@ function openReview(row: CampaignDraftListItemResource): void {
 }
 
 function formatSubmittedAt(iso: string | null): string {
-  if (iso === null) return '—'
-  return new Date(iso).toLocaleString()
+  return formatDateTime(iso, locale.value)
 }
 
 watch(filter, () => {

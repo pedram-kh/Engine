@@ -13,7 +13,7 @@
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { ApiError } from '@catalyst/api-client'
+import { formatDateTime, ApiError } from '@catalyst/api-client'
 import { CKpiCard } from '@catalyst/ui'
 
 import { useNavBadges } from '@/core/stores/useNavBadges'
@@ -24,7 +24,7 @@ import {
   type AdminDashboardSummary,
 } from '../api/dashboard.api'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const navBadges = useNavBadges()
 
 const summary = ref<AdminDashboardSummary | null>(null)
@@ -57,8 +57,8 @@ onMounted(() => {
   void load()
 })
 
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString()
+function formatTimestamp(iso: string): string {
+  return formatDateTime(iso, locale.value)
 }
 </script>
 
@@ -165,7 +165,7 @@ function formatDateTime(iso: string): string {
             {{ row.attributes.actor_name ?? row.attributes.actor_email ?? '—' }}
           </v-list-item-title>
           <v-list-item-subtitle>
-            {{ formatDateTime(row.attributes.created_at) }}
+            {{ formatTimestamp(row.attributes.created_at) }}
             <template v-if="row.attributes.reason"> — {{ row.attributes.reason }}</template>
           </v-list-item-subtitle>
         </v-list-item>

@@ -15,6 +15,7 @@
  * zero-rows state), so the page just drops `<ActivityFeed />` in.
  */
 
+import { formatDateTime } from '@catalyst/api-client'
 import { CEmptyState } from '@catalyst/ui'
 import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -79,10 +80,7 @@ function rowLabel(item: DashboardActivityItem): string {
 }
 
 function rowTime(item: DashboardActivityItem): string {
-  return new Intl.DateTimeFormat(locale.value, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(item.created_at))
+  return formatDateTime(item.created_at, locale.value)
 }
 </script>
 

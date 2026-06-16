@@ -340,15 +340,15 @@ describe('CampaignDetailPage — Creators tab re-invite (re-invite UI chunk)', (
     const fees = wrapper.find('[data-test="creators-fees-C"]')
     expect(fees.text()).toContain('Offered')
     expect(fees.text()).toContain('Countered')
-    expect(fees.text()).toContain('1,000.00 EUR')
-    expect(fees.text()).toContain('1,500.00 EUR')
+    expect(fees.text()).toContain('€1,000.00')
+    expect(fees.text()).toContain('€1,500.00')
     expect(wrapper.find('[data-test="creators-reinvite-C"]').exists()).toBe(true)
   })
 
   it('shows agreed fee only and NO re-invite action on a non-countered row', async () => {
     const wrapper = await openCreatorsTab('agency_staff', [makeAssignment('I', 'invited')])
     const fees = wrapper.find('[data-test="creators-fees-I"]')
-    expect(fees.text()).toContain('1,000.00 EUR')
+    expect(fees.text()).toContain('€1,000.00')
     expect(fees.text()).not.toContain('Countered')
     expect(wrapper.find('[data-test="creators-reinvite-I"]').exists()).toBe(false)
   })
