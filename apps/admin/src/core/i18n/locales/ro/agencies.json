@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Agencies",
+        "search_label": "Căutați agencies",
+        "load_failed": "We couldn't load agencies. Please refresh.",
+        "empty": "Nu agencies match this filter.",
+        "filters": {
+          "all": "Toate",
+          "active": "Activ",
+          "suspended": "Suspended"
+        },
+        "fields": {
+          "name": "Agenție",
+          "status": "Stare",
+          "members": "Members",
+          "tier": "Tier",
+          "created_at": "Creațid"
+        },
+        "status_labels": {
+          "active": "Activ",
+          "suspended": "Suspended"
+        },
+        "view": "Vizualizați agency"
+      },
+      "detail": {
+        "fallback_title": "Agenție",
+        "load_failed": "We couldn't load this agency. Please refresh.",
+        "overview_heading": "Prezentare generală",
+        "suspension_heading": "Suspension",
+        "fields": {
+          "slug": "Slug",
+          "country": "Country",
+          "tier": "Subscription tier",
+          "subscription_status": "Subscription status",
+          "members": "Members",
+          "created_at": "Creațid",
+          "suspended_at": "Suspended at",
+          "suspended_reason": "Reason"
+        },
+        "active_state": "This agency is active. Its users can sign in normally.",
+        "suspended_state": "This agency is suspended. Toate of its users are blocked from signing in."
+      },
+      "suspend": {
+        "button": "Suspend agency",
+        "title": "Suspend {name}",
+        "description": "Suspending this agency blocks ALL of its users from signing in. This is recorded in the audit log.",
+        "reason_label": "Reason for suspension",
+        "reason_hint": "Obligatoriu, at least {count} characters. Recorded in the audit log.",
+        "confirm": "Suspend",
+        "cancel": "Anulați",
+        "success": "Agenție suspended.",
+        "failed": "We couldn't suspend this agency. Please try again."
+      },
+      "reactivate": {
+        "button": "Reactivate agency",
+        "title": "Reactivate {name}",
+        "description": "Reactivating this agency restores sign-in for all of its users. This is recorded in the audit log.",
+        "confirm": "Reactivate",
+        "cancel": "Anulați",
+        "success": "Agenție reactivated.",
+        "failed": "We couldn't reactivate this agency. Please try again."
+      }
+    }
+  }
+}

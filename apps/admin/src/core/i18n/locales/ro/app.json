@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Administrator",
+    "subtitle": "Super-admin console.",
+    "sprint0Notice": "Sprint 0 scaffolding — admin SPA",
+    "dashboardPlaceholder": "Administrator dashboard placeholder — full surface lands in a later sprint.",
+    "env": {
+      "local": "Local",
+      "staging": "Staging",
+      "production": "Production — all actions logged"
+    },
+    "nav": {
+      "comingSoon": "Soon",
+      "dashboard": "Panou de control",
+      "agencies": "Agencies",
+      "creators": "Creators",
+      "creatorApprovals": "În așteptare approvals",
+      "kycQueue": "KYC queue",
+      "allCreators": "Toate creators",
+      "payments": "Platăs",
+      "disputes": "Disputes",
+      "recentPayments": "Recent",
+      "audit": "Jurnal de audit",
+      "alerts": "Operational alerts",
+      "support": "Asistență",
+      "userSearch": "User search",
+      "impersonationLog": "Uzurpare de identitate log",
+      "operations": "Operațiuni",
+      "systemHealth": "System health",
+      "horizon": "Înapoiground jobs …",
+      "compliance": "Conformitate",
+      "exportRequests": "Export requests",
+      "erasureQueue": "Erasure queue",
+      "featureFlags": "Indicatori de funcții"
+    },
+    "userMenu": {
+      "signOut": "Deconectați-vă",
+      "signingOut": "Signing out…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Coming soon",
+      "body": "This surface lights up when payment processing ships (Sprint 10).",
+      "disputes": "Disputes",
+      "recentPayments": "Recent payments"
+    },
+    "sectionStub": {
+      "body": "This admin surface is being built this sprint."
+    },
+    "locale": {
+      "switcher": "Limbă",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    }
+  }
+}

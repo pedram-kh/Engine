@@ -1,0 +1,84 @@
+{
+  "availability": {
+    "title": "Disponibilitate",
+    "subtitle": "Block out the times you're unavailable so agencies see your real calendar.",
+    "allDay": "Toate day",
+    "moreCount": "+{count} more",
+    "dayPopover": {
+      "title": "Blocks this day",
+      "viewAll": "Show all blocks for this day"
+    },
+    "creatorNav": {
+      "dashboard": "Panou de control",
+      "assignments": "Invitațies",
+      "availability": "Disponibilitate"
+    },
+    "nav": {
+      "prevMonth": "Anterior month",
+      "nextMonth": "Următor month"
+    },
+    "actions": {
+      "add": "Adăugați block"
+    },
+    "empty": {
+      "heading": "Nu availability blocks yet",
+      "body": "Adăugați a block to mark when you're away or unavailable."
+    },
+    "errors": {
+      "loadFailed": "We couldn't load your availability. Please try again."
+    },
+    "blockType": {
+      "hard": "Unavailable (hard)",
+      "soft": "Preference (soft)"
+    },
+    "kind": {
+      "vacation": "Vacation",
+      "personal": "Personal",
+      "exclusive_contract": "Exclusive contract",
+      "assignment_auto": "From campaign",
+      "other": "Other"
+    },
+    "weekday": {
+      "MO": "Mon",
+      "TU": "Tue",
+      "WE": "Wed",
+      "TH": "Thu",
+      "FR": "Fri",
+      "SA": "Sat",
+      "SU": "Sun"
+    },
+    "dialog": {
+      "createTitle": "Adăugați availability block",
+      "editTitle": "Editați availability block",
+      "seriesNotice": "This is a repeating block — changes apply to all of its occurrences, not just this day.",
+      "blockTypeHint": "Hard blocks exclude you entirely; soft blocks are a preference only.",
+      "fields": {
+        "allDay": "Toate day",
+        "startDate": "Start date",
+        "startTime": "Start time",
+        "endDate": "End date",
+        "endTime": "End time",
+        "blockType": "Type",
+        "kind": "Reason",
+        "reason": "Nute (optional)",
+        "recurring": "Repeats weekly"
+      },
+      "recurrence": {
+        "interval": "Repeat every (weeks)",
+        "weekdays": "On these days",
+        "hasEnd": "Set an end date",
+        "endsOn": "Ends on"
+      },
+      "actions": {
+        "save": "Salvați",
+        "cancel": "Anulați",
+        "delete": "Ștergeți",
+        "confirmDelete": "Confirmați delete"
+      },
+      "errors": {
+        "saveFailed": "We couldn't save the block. Please try again.",
+        "deleteFailed": "We couldn't delete the block. Please try again."
+      }
+    }
+  }
+}

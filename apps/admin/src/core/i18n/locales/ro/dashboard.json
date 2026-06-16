@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Panou de control",
+      "load_failed": "We couldn't load the dashboard. Please refresh.",
+      "kpi": {
+        "agencies_total": "Agencies",
+        "agencies_suspended": "Suspended agencies",
+        "creators_pending_approval": "În așteptare approvals",
+        "creators_pending_kyc": "KYC queue",
+        "queue_pending": "Queued jobs",
+        "queue_failed": "Failed jobs",
+        "open_disputes": "Open disputes",
+        "failed_payments_today": "Failed payments today"
+      },
+      "activity": {
+        "heading": "Recent activity",
+        "empty": "Nu recent activity."
+      }
+    }
+  }
+}
