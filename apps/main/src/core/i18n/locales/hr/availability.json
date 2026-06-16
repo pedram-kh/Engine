@@ -1,0 +1,84 @@
+{
+  "availability": {
+    "title": "Dostupnost",
+    "subtitle": "Zablokujte vrijemey, kdy nejste k dispozici, aby agencije viděly váš skutečný kalendář.",
+    "allDay": "Cel dan",
+    "moreCount": "+{count} dalších",
+    "dayPopover": {
+      "title": "Bloky v tento den",
+      "viewAll": "Prikaži vsechny bloky v tento den"
+    },
+    "creatorNav": {
+      "dashboard": "Upravljačka ploča",
+      "assignments": "Pozivi",
+      "availability": "Dostupnost"
+    },
+    "nav": {
+      "prevMonth": "Předchozí měsíc",
+      "nextMonth": "Další měsíc"
+    },
+    "actions": {
+      "add": "Dodaj blok"
+    },
+    "empty": {
+      "heading": "Žádné bloky dostupnosti",
+      "body": "Přidejte blok a označte, kdy jste pryč nebo nedostupní."
+    },
+    "errors": {
+      "loadFailed": "Ni uspelo učitajti vaši dostupnost. Zkuste to znova."
+    },
+    "blockType": {
+      "hard": "Nedostupný (pevný)",
+      "soft": "Preference (měkký)"
+    },
+    "kind": {
+      "vacation": "Dopust",
+      "personal": "Osebno",
+      "exclusive_contract": "Exkluzivní ugovor",
+      "assignment_auto": "Z kampanje",
+      "other": "Drugo"
+    },
+    "weekday": {
+      "MO": "Po",
+      "TU": "Út",
+      "WE": "St",
+      "TH": "Čt",
+      "FR": "Pá",
+      "SA": "So",
+      "SU": "Ne"
+    },
+    "dialog": {
+      "createTitle": "Dodaj blok dostupnosti",
+      "editTitle": "Uredi blok dostupnosti",
+      "seriesNotice": "Toto je opakující se blok — změny se vztahují na vsechny výskyty, nejen na tento den.",
+      "blockTypeHint": "Pevné bloky vás zcela vylučují; měkké bloky jsou jen preferencí.",
+      "fields": {
+        "allDay": "Cel dan",
+        "startDate": "Datum začátku",
+        "startTime": "Vrijeme začátku",
+        "endDate": "Datum konce",
+        "endTime": "Vrijeme konce",
+        "blockType": "Typ",
+        "kind": "Razlog",
+        "reason": "Poznámka (volitelné)",
+        "recurring": "Opakuje se každý týden"
+      },
+      "recurrence": {
+        "interval": "Opakovat každý (týdny)",
+        "weekdays": "V tyto dny",
+        "hasEnd": "Nastanjeit datum konce",
+        "endsOn": "Končí"
+      },
+      "actions": {
+        "save": "Spremi",
+        "cancel": "Otkažite",
+        "delete": "Izbriši",
+        "confirmDelete": "Potvrdi smazání"
+      },
+      "errors": {
+        "saveFailed": "Ni uspelo spremiti blok. Zkuste to znova.",
+        "deleteFailed": "Ni uspelo smazat blok. Zkuste to znova."
+      }
+    }
+  }
+}

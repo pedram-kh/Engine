@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Admin",
+    "subtitle": "Konzole superadministrator.",
+    "sprint0Notice": "Scaffolding Sprint 0 — admin SPA",
+    "dashboardPlaceholder": "Zástupný symbol řídicího panelu administrator — plná plocha přijde v pozdějším sprintu.",
+    "env": {
+      "local": "Lokální",
+      "staging": "Staging",
+      "production": "Produkce — vsechny akce se zaznamenávají"
+    },
+    "nav": {
+      "comingSoon": "Kmalu",
+      "dashboard": "Upravljačka ploča",
+      "agencies": "Agencije",
+      "creators": "Kreatori",
+      "creatorApprovals": "V čakanju schválení",
+      "kycQueue": "Čakalna vrsta KYC",
+      "allCreators": "Vsi kreatori",
+      "payments": "Plaćanja",
+      "disputes": "Spori",
+      "recentPayments": "Nedávné",
+      "audit": "Revizijski dnevnik",
+      "alerts": "Operacijení opozorila",
+      "support": "Podrška",
+      "userSearch": "Pretraživanje uporabnikov",
+      "impersonationLog": "Dnevnik lažnega predstanjeljanja",
+      "operations": "Operacije",
+      "systemHealth": "Stanje systému",
+      "horizon": "Úlohy na pozadí …",
+      "compliance": "Skladnost",
+      "exportRequests": "Žádosti o export",
+      "erasureQueue": "Čakalna vrsta smazání",
+      "featureFlags": "Stikaloe funkcí"
+    },
+    "userMenu": {
+      "signOut": "Odjava",
+      "signingOut": "Odjavljanje…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Kmalu",
+      "body": "Tato plocha se aktivuje, až přijde zpracování plateb (Sprint 10).",
+      "disputes": "Spori",
+      "recentPayments": "Nedávné plaćanja"
+    },
+    "sectionStub": {
+      "body": "Tato správcovská plocha se buduje v tomto sprintu."
+    },
+    "locale": {
+      "switcher": "Jazyk",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Motiv",
+        "light": "Světlý",
+        "dark": "Tmavý"
+      }
+    }
+  }
+}
