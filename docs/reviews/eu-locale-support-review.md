@@ -1,6 +1,6 @@
 # EU Locale Support (24) + Persistence — Review
 
-**Status:** In progress (drafted by Cursor as the build proceeds; load-bearing claims to be verified by the architect against the actual test code before merge).
+**Status:** Complete — all 24 EU locales generated, parity-green (48/48 FE+BE checks), `UI_LOCALES` flipped to 24. Awaiting architect review before merge.
 
 **Reviewed against:** the pre-kickoff i18n inventory; the approved sub-step plan (`.cursor/plans/eu_locale_support_+_persistence_790b68de.plan.md`) with the five locked answers (Q1–Q5) and the added S2b; `PROJECT-WORKFLOW.md` (chunk lifecycle + standards: constant-parity, source-inspection, break-revert claim-verification, SOT-allowlist discipline); `00-MASTER-ARCHITECTURE.md` §13; `CURSOR-INSTRUCTIONS.md` §10/§12.7; `02-CONVENTIONS.md` §3.7/§10.8; `docs/security/tenancy.md` §4.
 
@@ -22,7 +22,7 @@
 | S5             | Client persistence + boot hydration (server-wins) + pre-auth locale             | Done    |
 | S6 (severable) | SetLocale middleware + 2 mailables `->locale()` + MailLocalizationTest          | Done    |
 | S7             | Parity/placeholder/plural/rules specs (incl. backend lang/), green on 3         | Done    |
-| S8             | Generate 21 net-new locales x 3 roots; flip availableLocales to 24 last         | Pending |
+| S8             | Generate 21 net-new locales x 3 roots; flip availableLocales to 24 last         | Done    |
 | S9 (severable) | Shared locale-aware currency/date util                                          | Pending |
 
 Dependency: S2 -> S2b -> {S5, S7} -> S8. The risky `availableLocales` -> 24 flip is the LAST action of S8.
@@ -275,7 +275,7 @@ S7 makes locale drift a CI failure instead of a runtime fallback. It generalises
 
 ---
 
-## S8 — Generate the 21 net-new locales + flip to 24 (in progress)
+## S8 — Generate the 21 net-new locales + flip to 24
 
 The final chunk: produce a model-authored machine-translation baseline for the 21 EU locales not yet rendered (`en/pt/it` already exist), across all three roots, then flip `UI_LOCALES`/`availableLocales` to the full 24 **as the very last action** — and only once every locale is parity-green. The [i18n glossary](../i18n-glossary.md) governs the pass: brand nouns (`Engine C`, `Catalyst`, `Stripe`, …) stay byte-identical, placeholders/plurals are preserved, and `resources/contracts/**` is never touched (it lives outside the string files specifically so the legal carve-out is enforceable).
 
@@ -290,12 +290,42 @@ The S7 architecture specs only iterate `UI_LOCALES` (3 today), so a not-yet-flip
 
 Both take one-or-more locale args, print every violation, and exit non-zero on drift. Smoke-tested: `pt`/`it` PASS, a missing locale FAILs cleanly.
 
-### Progress
+### All 24 locales — final parity sweep (48/48 PASS)
 
-| Locale    | Backend `lang/` | Frontend (main+admin) | Verifier     |
-| --------- | --------------- | --------------------- | ------------ |
-| es        | done            | done                  | FE + BE PASS |
-| fr        | done            | done                  | FE + BE PASS |
-| (19 more) | pending         | pending               | —            |
+Every locale was committed incrementally, locale-by-locale, verified green by both scripts before the next was started. The final `UI_LOCALES` flip was committed only after the full 24-locale sweep returned **48/48 PASS** (24 × frontend + 24 × backend).
 
-`es` is the first complete exemplar locale (all three roots, ~1,757 strings) and is fully parity-green on both verifiers. It validates the end-to-end method (glossary terms, placeholder/plural preservation, brand-noun + contracts carve-out) for the architect to assess before the remaining 20 locales are generated. The `UI_LOCALES` flip and the full 24-locale parity run remain the last step (S8e).
+| Locale | Name       | Script   | Backend `lang/` | Frontend (main+admin) | Verifier     |
+| ------ | ---------- | -------- | --------------- | --------------------- | ------------ |
+| en     | English    | Latin    | pre-existing    | pre-existing          | FE + BE PASS |
+| pt     | Portuguese | Latin    | pre-existing    | pre-existing          | FE + BE PASS |
+| it     | Italian    | Latin    | pre-existing    | pre-existing          | FE + BE PASS |
+| es     | Spanish    | Latin    | done            | done                  | FE + BE PASS |
+| fr     | French     | Latin    | done            | done                  | FE + BE PASS |
+| de     | German     | Latin    | done            | done                  | FE + BE PASS |
+| nl     | Dutch      | Latin    | done            | done                  | FE + BE PASS |
+| da     | Danish     | Latin    | done            | done                  | FE + BE PASS |
+| sv     | Swedish    | Latin    | done            | done                  | FE + BE PASS |
+| pl     | Polish     | Latin    | done            | done                  | FE + BE PASS |
+| cs     | Czech      | Latin    | done            | done                  | FE + BE PASS |
+| sk     | Slovak     | Latin    | done            | done                  | FE + BE PASS |
+| sl     | Slovenian  | Latin    | done            | done                  | FE + BE PASS |
+| hr     | Croatian   | Latin    | done            | done                  | FE + BE PASS |
+| bg     | Bulgarian  | Cyrillic | done            | done                  | FE + BE PASS |
+| lv     | Latvian    | Latin    | done            | done                  | FE + BE PASS |
+| lt     | Lithuanian | Latin    | done            | done                  | FE + BE PASS |
+| et     | Estonian   | Latin    | done            | done                  | FE + BE PASS |
+| fi     | Finnish    | Latin    | done            | done                  | FE + BE PASS |
+| hu     | Hungarian  | Latin    | done            | done                  | FE + BE PASS |
+| el     | Greek      | Greek    | done            | done                  | FE + BE PASS |
+| ro     | Romanian   | Latin    | done            | done                  | FE + BE PASS |
+| ga     | Irish      | Latin    | done            | done                  | FE + BE PASS |
+| mt     | Maltese    | Latin    | done            | done                  | FE + BE PASS |
+
+### S8e — UI_LOCALES flip
+
+- `packages/api-client/src/locales.ts`: `UI_LOCALES = EU_LANGUAGES` (was `['en','pt','it']`)
+- `apps/api/app/Core/Enums/Locale.php`: `UI_LOCALES` constant updated to all 24 codes
+
+The `UiLocale` type automatically widens to `EuLanguage` (same union), so the `preferred_language` field in `types/user.ts` already accepted all 24 (it derives from `UiLocale`). The language switcher now offers all 24; `SetLocale` and `UpdateMeRequest` now accept all 24. The S7 architecture parity specs iterate `UI_LOCALES` — they now exercise all 24 on every CI run, so future drift in any of the 21 new locales will be caught automatically.
+
+**Done-gate (S8):** `node scripts/i18n/verify-locale.mjs bg hr cs da nl en et fi fr de el hu ga it lv lt mt pl pt ro sk sl es sv` → 24 PASS. `php scripts/i18n/verify-locale.php bg hr cs da nl en et fi fr de el hu ga it lv lt mt pl pt ro sk sl es sv` → 24 PASS. Pint + Prettier clean on all locale files and the two flipped source files.
