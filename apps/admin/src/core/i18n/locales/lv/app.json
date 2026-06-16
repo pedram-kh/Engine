@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Administrators",
+    "subtitle": "Super-admin console.",
+    "sprint0Notice": "Sprint 0 scaffolding — admin SPA",
+    "dashboardPlaceholder": "Administrators dashboard placeholder — full surface lands in a later sprint.",
+    "env": {
+      "local": "Local",
+      "staging": "Staging",
+      "production": "Production — all actions logged"
+    },
+    "nav": {
+      "comingSoon": "Soon",
+      "dashboard": "Vadības panelis",
+      "agencies": "Agencies",
+      "creators": "Radītājss",
+      "creatorApprovals": "Gaida approvals",
+      "kycQueue": "KYC queue",
+      "allCreators": "Visi creators",
+      "payments": "Maksājumss",
+      "disputes": "Disputes",
+      "recentPayments": "Recent",
+      "audit": "Auditsa žurnāls",
+      "alerts": "Operational alerts",
+      "support": "Atbalsts",
+      "userSearch": "User search",
+      "impersonationLog": "Uzdošanās log",
+      "operations": "Operācijas",
+      "systemHealth": "System health",
+      "horizon": "Atpakaļground jobs …",
+      "compliance": "Atbilstība",
+      "exportRequests": "Export requests",
+      "erasureQueue": "Erasure queue",
+      "featureFlags": "Funkciju karodziņi"
+    },
+    "userMenu": {
+      "signOut": "Izrakstīties",
+      "signingOut": "Signing out…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Coming soon",
+      "body": "This surface lights up when payment processing ships (Sprint 10).",
+      "disputes": "Disputes",
+      "recentPayments": "Recent payments"
+    },
+    "sectionStub": {
+      "body": "This admin surface is being built this sprint."
+    },
+    "locale": {
+      "switcher": "Valoda",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    }
+  }
+}

@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Influencer marketing, run like a real business.",
+    "sprint0Notice": "Sprint 0 scaffolding — main platform SPA",
+    "locale": {
+      "switcher": "Valoda",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    },
+    "messaging": {
+      "title": "Ziņojumi",
+      "you": "You",
+      "participant": "Participant",
+      "composePlaceholder": "Write a message…",
+      "send": "Nēsūtīt",
+      "attachment": "Attachment",
+      "empty": "Nē messages yet. Start the conversation.",
+      "loadEarlier": "Load earlier messages",
+      "loadError": "We couldn't load this conversation. It will retry shortly.",
+      "sendError": "Your message couldn't be sent. Please try again.",
+      "attachmentUploadError": "An attachment failed to upload. Please try again.",
+      "closed": "This conversation is closed — the assignment is no longer active.",
+      "systemFallback": "The assignment was updated.",
+      "system": {
+        "assignment": {
+          "contracted": "The contract was signed — production can begin.",
+          "draft_submitted": "A draft was submitted for review.",
+          "draft_approved": "The draft was approved.",
+          "revision_requested": "Revisions were requested on the draft.",
+          "draft_rejected": "The draft was rejected.",
+          "posted_by_creator": "The creator marked the content as posted.",
+          "live_verified": "The live post was verified.",
+          "manually_verified": "The post was manually verified.",
+          "resubmit_requested": "A resubmission was requested.",
+          "payment_released": "Maksājums was released."
+        }
+      },
+      "rollup": {
+        "empty": "Nē message threads yet for this campaign.",
+        "noMessages": "Nē messages yet.",
+        "loadError": "We couldn't load the message threads."
+      }
+    },
+    "nav": {
+      "dashboard": "Vadības panelis",
+      "roster": "My creators",
+      "discover": "Discover",
+      "pools": "Talent pools",
+      "brands": "Brands",
+      "campaigns": "Kampaņas",
+      "agencyUsers": "Team",
+      "settings": "Iestatījumi"
+    },
+    "discover": {
+      "title": "Discover creators",
+      "subtitle": "Browse and search the global creator pool.",
+      "unnamed": "Unnamed creator",
+      "notConnected": "Nēt connected",
+      "search": {
+        "label": "Meklēt creators",
+        "placeholder": "Meklēt by name or bio"
+      },
+      "filters": {
+        "country": "Country",
+        "language": "Valoda",
+        "category": "Category"
+      },
+      "connection": {
+        "connected": "Connected",
+        "pending": "Request pending",
+        "declined": "Atteiktd",
+        "notConnected": "Nēt connected",
+        "sendRequest": "Nēsūtīt request",
+        "requestAgain": "Request again",
+        "sent": "Request sent",
+        "reRequested": "Request sent again",
+        "alreadyPending": "A request is already pending",
+        "alreadyConnected": "This creator is already on your roster",
+        "error": "Couldn't send the request. Please try again."
+      },
+      "empty": {
+        "heading": "Nē creators yet",
+        "body": "Apstiprinātd creators will appear here as the pool grows."
+      },
+      "emptyFiltered": {
+        "heading": "Nē matches",
+        "body": "Nē creators match your filters. Try broadening your search."
+      },
+      "errors": {
+        "loadFailed": "Couldn't load creators. Please try again."
+      },
+      "detail": {
+        "back": "Atpakaļ to Discover",
+        "notFound": "This creator isn't available.",
+        "loadFailed": "Couldn't load this profile. Please try again.",
+        "viewInRoster": "Skatīt in roster",
+        "sections": {
+          "profile": "Profils",
+          "social": "Social accounts",
+          "portfolio": "Portfolio"
+        },
+        "social": {
+          "empty": "Nē social accounts linked."
+        },
+        "portfolio": {
+          "empty": "Nē portfolio vienumi yet.",
+          "untitled": "Untitled item"
+        }
+      }
+    },
+    "roster": {
+      "title": "My creators",
+      "unnamed": "Unnamed creator",
+      "blacklisted": "Blacklisted",
+      "blacklist": {
+        "badge": {
+          "hard": "Blacklisted",
+          "soft": "Blacklist warning"
+        },
+        "openAction": "Blacklist creator",
+        "liftAction": "Remove blacklist",
+        "lifted": "Blacklist removed.",
+        "liftFailed": "Failed to remove the blacklist.",
+        "section": {
+          "title": "Blacklist",
+          "none": "This creator is not blacklisted by your agency."
+        },
+        "status": {
+          "hard": "Hard blacklisted — excluded from your discovery and blocked from connection requests.",
+          "soft": "Soft blacklisted — a warning only; the creator stays matchable."
+        },
+        "dialog": {
+          "title": "Blacklist creator",
+          "scopeLabel": "Scope",
+          "scope": {
+            "agency": "Entire agency",
+            "brand": "A specific brand"
+          },
+          "noRelationHint": "Aģentūra-wide blacklisting requires a connected creator.",
+          "brandLabel": "Brand",
+          "typeLabel": "Type",
+          "type": {
+            "hard": "Hard — exclude from discovery and block requests",
+            "soft": "Soft — warn only, keep matchable"
+          },
+          "reasonLabel": "Reason",
+          "reasonPlaceholder": "Why is this creator being blacklisted? (kept private to your agency)",
+          "cancel": "Atcelt",
+          "confirm": "Blacklist",
+          "success": "Radītājs blacklisted.",
+          "invalid": "Please complete the required fields.",
+          "failed": "Failed to blacklist the creator."
+        }
+      },
+      "fields": {
+        "name": "Name",
+        "email": "E-pasts",
+        "status": "Statuss",
+        "applicationStatus": "Application",
+        "country": "Country",
+        "language": "Valoda",
+        "categories": "Categories",
+        "rating": "Rating",
+        "campaigns": "Kampaņas"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Prospect",
+        "external": "External",
+        "pending_request": "Gaida request",
+        "declined": "Atteiktd"
+      },
+      "applicationStatus": {
+        "incomplete": "Incomplete",
+        "pending": "Gaida",
+        "approved": "Apstiprinātd",
+        "rejected": "Nēraidīted"
+      },
+      "search": {
+        "label": "Meklēt creators",
+        "placeholder": "Meklēt by name or bio"
+      },
+      "filters": {
+        "status": {
+          "all": "Visi",
+          "roster": "Roster",
+          "prospect": "Prospect",
+          "external": "External",
+          "pending_request": "Gaida requests",
+          "declined": "Atteiktd"
+        },
+        "country": "Country",
+        "language": "Valoda",
+        "category": "Category",
+        "availability": {
+          "from": "Available from",
+          "to": "Available to"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Followers"
+        },
+        "engagement": {
+          "label": "Engagement rate"
+        },
+        "metrics": {
+          "tooltip": "Social metrics aren't connected yet."
+        }
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Nē creators yet",
+        "body": "Radītājss you invite or engage will appear here across your roster, prospects, and external collaborators."
+      },
+      "emptyFiltered": {
+        "heading": "Nē creators match these filters",
+        "body": "Try clearing or changing a filter to see more of your creators."
+      },
+      "errors": {
+        "loadFailed": "Failed to load your creators. Please try again."
+      },
+      "detail": {
+        "back": "Atpakaļ to my creators",
+        "unnamed": "Unnamed creator",
+        "loadFailed": "We couldn't load this creator. Please try again.",
+        "notFound": "This creator isn't in your roster.",
+        "sections": {
+          "profile": "Profils",
+          "rating": "Rating & notes",
+          "social": "Social accounts",
+          "metrics": "Social metrics",
+          "portfolio": "Portfolio",
+          "availability": "Pieejamība",
+          "campaigns": "Kampaņa history"
+        },
+        "editor": {
+          "starLabel": "Rate {n} of 5",
+          "ratingUnset": "Nēt rated",
+          "notesLabel": "Internal notes",
+          "notesPlaceholder": "Private notes about working with this creator (visible to your agency only).",
+          "notesEmpty": "Nē notes yet.",
+          "save": "Saglabāt",
+          "saved": "Changes saved.",
+          "saveFailed": "We couldn't save your changes. Please try again."
+        },
+        "social": {
+          "empty": "Nē social accounts connected."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Social metrics will appear once accounts are connected",
+            "body": "Follower counts and engagement rates aren't available yet — they'll show here when the social integrations land."
+          }
+        },
+        "portfolio": {
+          "empty": "Nē portfolio vienumi yet.",
+          "untitled": "Untitled portfolio item"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Nē availability blocks in this period",
+            "body": "This creator hasn't marked any unavailable time for the dates shown."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Nē campaign history yet",
+            "body": "Kampaņas you run with this creator will appear here."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Izrakstīties",
+      "signingOut": "Signing out…"
+    },
+    "workspaceSwitcher": {
+      "label": "Switch workspace",
+      "placeholder": "Select workspace"
+    },
+    "brands": {
+      "title": "Brands",
+      "actions": {
+        "create": "New brand",
+        "edit": "Rediģēt",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Saglabāt brand",
+        "saving": "Saving…",
+        "backToList": "Atpakaļ to brands",
+        "backToDetail": "Atpakaļ to brand"
+      },
+      "fields": {
+        "name": "Brand name",
+        "slug": "Slug",
+        "description": "Description",
+        "industry": "Industry",
+        "websiteUrl": "Website URL",
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "status": "Statuss"
+      },
+      "status": {
+        "active": "Aktīvs",
+        "archived": "Arhivēts",
+        "all": "Visi"
+      },
+      "detail": {
+        "title": "Brand details"
+      },
+      "create": {
+        "title": "New brand",
+        "success": "Brand created successfully."
+      },
+      "edit": {
+        "title": "Rediģēt brand",
+        "success": "Brand updated successfully."
+      },
+      "archive": {
+        "confirmTitle": "Archive brand",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later.",
+        "confirm": "Archive",
+        "cancel": "Atcelt",
+        "success": "Brand archived."
+      },
+      "restore": {
+        "confirmTitle": "Restore brand",
+        "confirmMessage": "Restore {name}? It will appear in the active brand list again.",
+        "confirm": "Restore",
+        "cancel": "Atcelt",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Nē brands yet",
+        "body": "Izveidot your first brand to start managing influencer campaigns.",
+        "cta": "Izveidot brand"
+      },
+      "emptyFiltered": {
+        "heading": "Nē brands match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "loading": "Ielādē brands…",
+      "errors": {
+        "loadFailed": "Failed to load brands.",
+        "saveFailed": "Failed to save brand.",
+        "archiveFailed": "Failed to archive brand.",
+        "restoreFailed": "Failed to restore brand."
+      }
+    },
+    "campaigns": {
+      "title": "Kampaņas",
+      "actions": {
+        "create": "New campaign",
+        "save": "Izveidot campaign",
+        "saveSettings": "Saglabāt settings",
+        "backToList": "Atpakaļ to campaigns"
+      },
+      "fields": {
+        "name": "Kampaņa name",
+        "brand": "Brand",
+        "objective": "Objective",
+        "description": "Description",
+        "budget": "Budget",
+        "currency": "Valūta",
+        "startsAt": "Start date",
+        "endsAt": "End date",
+        "targetCreatorCount": "Target creator count",
+        "deliverables": "Deliverables",
+        "deliverablesHint": "One deliverable per line (e.g. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Space or comma separated.",
+        "usageRights": "Usage rights",
+        "requiresContract": "Require a per-campaign contract",
+        "status": "Statuss"
+      },
+      "objective": {
+        "awareness": "Awareness",
+        "engagement": "Engagement",
+        "conversion": "Conversion",
+        "ugc": "UGC",
+        "launch": "Launch"
+      },
+      "status": {
+        "all": "Visi",
+        "draft": "Melnraksts",
+        "active": "Aktīvs",
+        "paused": "Paused",
+        "completed": "Pabeigts",
+        "cancelled": "Atceltled"
+      },
+      "filters": {
+        "brand": "Brand",
+        "startsFrom": "Starts from",
+        "startsTo": "Starts to"
+      },
+      "tabs": {
+        "overview": "Pārskats",
+        "creators": "Radītājss",
+        "board": "Board",
+        "drafts": "Melnrakstss",
+        "payments": "Maksājumss",
+        "messages": "Ziņojumi",
+        "settings": "Iestatījumi"
+      },
+      "create": {
+        "title": "New campaign"
+      },
+      "detail": {
+        "title": "Kampaņa details"
+      },
+      "settings": {
+        "saved": "Kampaņa settings saved."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Nē creators yet",
+          "body": "Uzaicināt creators to this campaign to get started."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Visi drafts"
+        },
+        "empty": {
+          "heading": "Nē drafts yet",
+          "body": "Radītājs draft submissions will appear here once submitted."
+        },
+        "loadFailed": "We couldn't load drafts. Please try again.",
+        "submittedAt": "Iesniegtted {date}"
+      },
+      "fees": {
+        "offered": "Offered",
+        "countered": "Countered"
+      },
+      "reinvite": {
+        "action": "Re-invite",
+        "title": "Re-invite creator",
+        "body": "They countered with {fee}. Re-offer at:",
+        "feeLabel": "New agreed fee ({currency})",
+        "cancel": "Atcelt",
+        "submit": "Re-invite",
+        "success": "Re-invitation sent."
+      },
+      "contract": {
+        "attach": {
+          "action": "Issue contract",
+          "title": "Issue contract",
+          "body": "Attach contract terms for the creator to review and accept before they can submit a draft.",
+          "titleLabel": "Līgums title",
+          "termsLabel": "Terms (markdown)",
+          "termsHint": "Provide inline terms and/or upload a PDF below.",
+          "pdfLabel": "Līgums PDF (optional)",
+          "pdfReady": "PDF ready: {name}",
+          "cancel": "Atcelt",
+          "submit": "Issue contract",
+          "success": "Līgums issued. The creator has been notified.",
+          "alreadyAttached": "A contract is already awaiting this creator's acceptance.",
+          "error": "We couldn't issue the contract. Please try again."
+        },
+        "pending": "Līgums sent — awaiting creator",
+        "proceedWithout": {
+          "action": "Proceed without contract",
+          "success": "Uzdevums advanced without a contract.",
+          "requiredError": "This campaign requires a per-campaign contract; issue one for the creator to accept.",
+          "error": "We couldn't advance this assignment. Please try again."
+        }
+      },
+      "invite": {
+        "open": "Uzaicināt creators",
+        "title": "Uzaicināt creators",
+        "loadFailed": "We couldn't load your roster. Please try again.",
+        "feeLabel": "Agreed fee ({currency})",
+        "search": "Meklēt creators",
+        "noRoster": "Nē roster creators to invite yet.",
+        "noSearchMatch": "Nē creators match your search.",
+        "unnamed": "Unnamed creator",
+        "blockedHint": "Blacklisted — can't be invited.",
+        "cancel": "Atcelt",
+        "submit": "Uzaicināt ({count})",
+        "summary": "Uzaicinātd {ok}. Skipped {blacklisted} (blacklisted), {conflicts} with conflicts.",
+        "conflict": {
+          "title": "Pieejamība conflict",
+          "body": "{count} selected creator(s) are unavailable during the campaign window. Uzaicināt them anyway?",
+          "cancel": "Skip them",
+          "proceed": "Uzaicināt anyway"
+        }
+      },
+      "board": {
+        "loadError": "We couldn't load the board. Please try again.",
+        "empty": "This board has no columns yet.",
+        "moveFailed": "Couldn't move the card — it's back where it was.",
+        "reorderFailed": "Couldn't reorder the columns — the order was restored.",
+        "automationsButton": "Automations",
+        "card": {
+          "unnamed": "Unnamed creator",
+          "removed": "Removed assignment",
+          "daysLeft": "{n}d left",
+          "dueToday": "Due today",
+          "overdue": "Overdue"
+        },
+        "column": {
+          "add": "Pievienot column",
+          "edit": "Rename / recolor",
+          "delete": "Dzēst column",
+          "addTitle": "Pievienot column",
+          "editTitle": "Rediģēt column",
+          "name": "Column name",
+          "color": "Color",
+          "terminalSuccess": "Mark as success (terminal)",
+          "terminalFailure": "Mark as failure (terminal)",
+          "save": "Saglabāt",
+          "cancel": "Atcelt",
+          "saveFailed": "We couldn't save the column. Please try again.",
+          "deleteTitle": "Dzēst column",
+          "deleteBody": "Dzēst \"{name}\"? This can't be undone.",
+          "deleteBodyNonEmpty": "\"{name}\" has {count} card(s). Choose where to move them before deleting.",
+          "deleteDestination": "Move cards to",
+          "deleteConfirm": "Dzēst",
+          "errorLastColumn": "A board must keep at least one column.",
+          "errorDestinationRequired": "This column has cards — choose a destination column to move them to before deleting.",
+          "errorGeneric": "We couldn't delete the column. Please try again."
+        },
+        "automation": {
+          "title": "Automations",
+          "subtitle": "Each event can move a card to a column automatically. Manual drags never trigger these.",
+          "event": "Event",
+          "target": "Moves card to",
+          "none": "Nē automation",
+          "enabled": "Enabled",
+          "broken": "Target column was deleted — pick a new one",
+          "updateFailed": "We couldn't update the automation. Please try again.",
+          "close": "Aizvērt"
+        },
+        "drawer": {
+          "title": "Uzdevums",
+          "close": "Aizvērt",
+          "loadError": "We couldn't load this assignment. Please try again.",
+          "tabs": {
+            "detail": "Detail",
+            "history": "Movement history"
+          },
+          "detail": {
+            "status": "Statuss",
+            "creator": "Radītājs",
+            "postingDue": "Posting due",
+            "deliverables": "Deliverables",
+            "latestDraft": "Latest draft",
+            "postedContent": "Posted content",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Nē movements recorded yet.",
+            "removed": "(removed)",
+            "manual": "Manual move",
+            "auto": "Automation",
+            "from": "from",
+            "to": "to"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Maksājumss coming soon",
+          "body": "Escrow funding and payouts will be managed here."
+        },
+        "messages": {
+          "heading": "Ziņojumi coming soon",
+          "body": "Kampaņa messaging will appear here."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Uzaicinātd",
+        "declined": "Atteiktd",
+        "countered": "Countered",
+        "accepted": "Pieņemted",
+        "contracted": "Līgumsed",
+        "producing": "Producing",
+        "draft_submitted": "Melnraksts submitted",
+        "revision_requested": "Revision requested",
+        "approved": "Apstiprinātd",
+        "rejected": "Nēraidīted",
+        "posted": "Posted",
+        "live_verified": "Live verified",
+        "manually_verified": "Manually verified",
+        "payment_held": "Maksājums held",
+        "payment_released": "Maksājums released",
+        "cancelled": "Atceltled"
+      },
+      "review": {
+        "action": "Review",
+        "title": "Review draft",
+        "loadFailed": "We couldn't load this draft. Please try again.",
+        "draftVersion": "Melnraksts v{n}",
+        "noCaption": "Nē caption provided.",
+        "hashtags": "Hashtags",
+        "mentions": "Mentions",
+        "noMedia": "Nē media attached.",
+        "feedbackLabel": "Feedback to the creator",
+        "feedbackHint": "Obligāts when requesting changes or rejecting.",
+        "approve": "Apstiprināt",
+        "requestRevision": "Request changes",
+        "reject": "Nēraidīt",
+        "close": "Aizvērt",
+        "history": "Version history",
+        "postedContent": "Posted content",
+        "draftStatus": {
+          "pending": "Gaida review",
+          "approved": "Apstiprinātd",
+          "rejected": "Nēraidīted",
+          "revision_requested": "Revision requested"
+        },
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Nēt found",
+          "mismatch": "Mismatch"
+        },
+        "simulated": "Simulated verification (mock provider)",
+        "toast": {
+          "approved": "Melnraksts approved.",
+          "revisionRequested": "Revision requested.",
+          "rejected": "Melnraksts rejected.",
+          "error": "Something went wrong. Please try again."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Open preview",
+          "close": "Aizvērt",
+          "empty": "Nē media attached."
+        }
+      },
+      "resolution": {
+        "action": "Resolve",
+        "title": "Resolve verification",
+        "loadFailed": "We couldn't load this assignment. Please try again.",
+        "postedContent": "Iesniegtted post",
+        "simulated": "Simulated verification (mock provider)",
+        "intro": "Automatic verification of this post failed. Pieņemt it manually, send it back for a fresh post, or ask the creator to fix the link in place.",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Nēt found",
+          "mismatch": "Mismatch"
+        },
+        "noteLabel": "Reason / note to the creator",
+        "noteHint": "Obligāts when verifying manually; optional for resubmit requests.",
+        "manuallyVerify": "Verify manually",
+        "requestFresh": "Request fresh post",
+        "requestInPlace": "Ask to fix link",
+        "close": "Aizvērt",
+        "notActionable": "This assignment is no longer awaiting resolution.",
+        "toast": {
+          "verified": "Post manually verified.",
+          "resubmitFresh": "Sent back for a fresh post.",
+          "resubmitInPlace": "Asked the creator to fix the link.",
+          "error": "Something went wrong. Please try again."
+        }
+      },
+      "viewPost": {
+        "action": "Skatīt post",
+        "title": "Posted content",
+        "loadFailed": "We couldn't load this post. Please try again.",
+        "empty": "The creator hasn't posted any content yet.",
+        "current": "Current",
+        "postedAt": "Posted",
+        "verifiedAt": "Verified",
+        "simulated": "Verifikācija runs against a simulated provider in this environment.",
+        "close": "Aizvērt",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Nēt found",
+          "mismatch": "Mismatch"
+        }
+      },
+      "empty": {
+        "heading": "Nē campaigns yet",
+        "body": "Izveidot your first campaign to start engaging creators.",
+        "cta": "Izveidot campaign"
+      },
+      "errors": {
+        "loadFailed": "Failed to load campaigns.",
+        "saveFailed": "Failed to save campaign."
+      }
+    },
+    "pools": {
+      "title": "Talent pools",
+      "agencyWide": "Aģentūra-wide",
+      "actions": {
+        "create": "New pool",
+        "edit": "Rediģēt",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Saglabāt pool",
+        "backToList": "Atpakaļ to talent pools",
+        "backToDetail": "Atpakaļ to pool"
+      },
+      "fields": {
+        "name": "Pool name",
+        "description": "Description",
+        "brand": "Brand",
+        "brandHint": "Neobligāts — labels the pool for a brand's work. Leave blank for an agency-wide pool.",
+        "members": "Members"
+      },
+      "status": {
+        "active": "Aktīvs",
+        "archived": "Arhivēts",
+        "all": "Visi"
+      },
+      "create": {
+        "title": "New talent pool"
+      },
+      "edit": {
+        "title": "Rediģēt talent pool"
+      },
+      "detail": {
+        "title": "Pool details",
+        "notFound": "This pool no longer exists.",
+        "membersHeading": "Members",
+        "membersEmpty": "Nē creators in this pool yet. Pievienot creators from a creator's detail page.",
+        "memberCount": "{count} creators",
+        "unnamed": "Unnamed creator",
+        "remove": "Remove from pool",
+        "removed": "{name} removed from the pool."
+      },
+      "archive": {
+        "confirmTitle": "Archive pool",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later with its members intact.",
+        "confirm": "Archive",
+        "cancel": "Atcelt"
+      },
+      "restore": {
+        "confirmTitle": "Restore pool",
+        "confirmMessage": "Restore {name}? It will appear in the active pool list again.",
+        "confirm": "Restore",
+        "cancel": "Atcelt",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Nē talent pools yet",
+        "body": "Izveidot a pool to group creators for a brand or a campaign brief.",
+        "cta": "Izveidot pool"
+      },
+      "emptyFiltered": {
+        "heading": "Nē pools match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "picker": {
+        "openLabel": "Pievienot to pool",
+        "title": "Pievienot to talent pools",
+        "empty": "Nē talent pools yet. Izveidot one from the Talent pools page.",
+        "done": "Done",
+        "added": "Pievienoted to {name}.",
+        "removed": "Removed from {name}.",
+        "loadFailed": "Failed to load talent pools.",
+        "toggleFailed": "Failed to update pool membership."
+      },
+      "addCreators": {
+        "open": "Pievienot creators",
+        "title": "Pievienot creators to this pool",
+        "search": "Meklēt your roster",
+        "noRoster": "Your roster is empty. Pievienot creators to your roster first.",
+        "allInPool": "Visi your roster creators are already in this pool.",
+        "noSearchMatch": "Nē roster creators match your search.",
+        "cancel": "Atcelt",
+        "add": "Pievienot {count}",
+        "added": "{count} creators added to the pool.",
+        "loadFailed": "Failed to load your roster.",
+        "addFailed": "Failed to add creators to the pool.",
+        "confirmHard": {
+          "one": "{name} is blacklisted by your agency. Pievienot them to this pool anyway?",
+          "many": "{count} selected creators are blacklisted by your agency ({names}). Pievienot them anyway?"
+        }
+      },
+      "errors": {
+        "loadFailed": "Failed to load talent pools.",
+        "membersLoadFailed": "Failed to load pool members.",
+        "saveFailed": "Failed to save talent pool.",
+        "archiveFailed": "Failed to archive pool.",
+        "restoreFailed": "Failed to restore pool.",
+        "removeFailed": "Failed to remove creator from the pool."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Name",
+        "email": "E-pasts",
+        "role": "Loma",
+        "status": "Statuss",
+        "joinedAt": "Joined"
+      },
+      "roles": {
+        "agency_admin": "Administrators",
+        "agency_manager": "Vadītājs",
+        "agency_staff": "Darbinieki"
+      },
+      "status": {
+        "active": "Aktīvs",
+        "pending": "Gaida"
+      },
+      "members": {
+        "heading": "Current members"
+      },
+      "filters": {
+        "allRoles": "Visi roles",
+        "allStatuses": "Visi statuses"
+      },
+      "search": {
+        "label": "Meklēt",
+        "placeholder": "Name or email"
+      },
+      "invitations": {
+        "heading": "Uzaicinājums history",
+        "columns": {
+          "email": "Uzaicināte",
+          "invitedAt": "Uzaicinātd",
+          "invitedBy": "Uzaicinātd by"
+        },
+        "status": {
+          "pending": "Gaida",
+          "accepted": "Pieņemted",
+          "expired": "Expired"
+        },
+        "empty": "Nē invitations yet."
+      },
+      "invite": {
+        "button": "Uzaicināt user",
+        "title": "Uzaicināt a team member",
+        "fields": {
+          "email": "E-pasta adrese",
+          "role": "Loma"
+        },
+        "submit": "Nēsūtīt invitation",
+        "submitting": "Nēsūtīting…",
+        "success": "Uzaicinājums sent to {email}.",
+        "errors": {
+          "failed": "Failed to send invitation."
+        }
+      },
+      "empty": {
+        "heading": "Nē team members",
+        "body": "Uzaicināt your first team member to get started."
+      },
+      "emptyFiltered": "Nē team members match your filter.",
+      "errors": {
+        "membersLoadFailed": "Failed to load team members.",
+        "invitationsLoadFailed": "Failed to load invitation history."
+      },
+      "loading": "Ielādē team…",
+      "bulkInviteCreators": {
+        "button": "Bulk-invite creators"
+      }
+    },
+    "bulkInvite": {
+      "title": "Bulk-invite creators",
+      "description": "Augšupielādēt a CSV with an `email` column. Each row becomes a magic-link invitation. Other columns are accepted but ignored.",
+      "file": {
+        "label": "CSV file",
+        "hint": "5 MB / 1000 rows max. The only required column is `email`."
+      },
+      "softWarning": "{count} rows is a large batch — processing may take a few minutes.",
+      "preview": {
+        "heading": "Parsed rows ({count})",
+        "row": "Row",
+        "email": "E-pasts",
+        "errorCount": "{count} parse errors",
+        "errorHeading": "These rows will be skipped:",
+        "errorItem": "Row {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Nēsūtīt invitations ({count})",
+        "reset": "Clear",
+        "startOver": "Nēsūtīt another batch"
+      },
+      "status": {
+        "queued": "Queued — waiting to start",
+        "processing": "Processing invitations",
+        "complete": "Visi done",
+        "failed": "Job failed"
+      },
+      "tracking": {
+        "progress": "{percent}% complete"
+      },
+      "timeout": {
+        "heading": "Still working on this",
+        "description": "Your invitations are taking longer than expected to process. You can try again or check back later.",
+        "retry": "Try again"
+      },
+      "complete": {
+        "heading": "Results",
+        "invited": "Uzaicinātd",
+        "alreadyInvited": "Already invited",
+        "failed": "Failed",
+        "failureReason": "Reason"
+      },
+      "failed": {
+        "heading": "The bulk invitation job failed."
+      },
+      "errors": {
+        "submitFailed": "We couldn't submit the CSV. Please try again."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "You've been invited",
+        "joining": "You're being invited to join {agencyName} as {role}.",
+        "accept": "Pieņemt invitation",
+        "accepting": "Pieņemting…",
+        "signInToContinue": "Pierakstīties to accept this invitation",
+        "signIn": "Pierakstīties",
+        "noAccount": "Don't have an account?",
+        "signUp": "Izveidot one now",
+        "success": "Laipni lūgti to {agencyName}! You're now a {role}.",
+        "expired": {
+          "heading": "This invitation has expired",
+          "body": "Please contact your agency administrator to request a new invitation."
+        },
+        "alreadyAccepted": {
+          "heading": "Uzaicinājums already accepted",
+          "body": "This invitation has already been used. Pierakstīties to access your workspace.",
+          "signIn": "Pierakstīties"
+        },
+        "alreadyMember": {
+          "heading": "Already a member",
+          "body": "You are already a member of this workspace."
+        },
+        "emailMismatch": {
+          "heading": "Wrong account",
+          "body": "This invitation was sent to a different email address. Please sign in with the correct account."
+        },
+        "notFound": {
+          "heading": "Uzaicinājums not found",
+          "body": "This invitation link is invalid or has already been used."
+        },
+        "errors": {
+          "failed": "Failed to accept invitation."
+        }
+      }
+    },
+    "settings": {
+      "title": "Aģentūra settings",
+      "fields": {
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "blacklistNotificationPolicy": "Nētify creators when blacklisted",
+        "blacklistNotificationPolicyHint": "When on, a creator is emailed if your agency blacklists them. The reason is never shared."
+      },
+      "save": "Saglabāt settings",
+      "saving": "Saving…",
+      "success": "Iestatījumi saved.",
+      "readOnly": "Only administrators can edit agency settings.",
+      "loading": "Ielādē settings…",
+      "errors": {
+        "loadFailed": "Failed to load settings.",
+        "saveFailed": "Failed to save settings."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "This field is required."
+  }
+}

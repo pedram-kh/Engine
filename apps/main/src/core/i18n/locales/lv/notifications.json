@@ -1,0 +1,63 @@
+{
+  "notifications": {
+    "center": {
+      "title": "Paziņojumi",
+      "empty": "You're all caught up.",
+      "markAll": "Mark all read",
+      "viewAll": "Skatīt all notifications",
+      "loading": "Ielādē…",
+      "error": "Couldn't load notifications.",
+      "unreadBadgeLabel": "{count} unread notifications",
+      "feedbackLabel": "Feedback",
+      "reasonLabel": "Reason"
+    },
+    "page": {
+      "title": "Paziņojumi",
+      "empty": "You have no notifications yet."
+    },
+    "types": {
+      "assignment_draft_approved": "Your draft for {campaign_name} was approved.",
+      "assignment_revision_requested": "Revisions were requested on your draft for {campaign_name}.",
+      "assignment_draft_rejected": "Your draft for {campaign_name} was rejected.",
+      "assignment_manually_verified": "Your post for {campaign_name} was verified.",
+      "assignment_draft_submitted": "{creator_name} submitted a draft for {campaign_name}.",
+      "assignment_contracted": "{creator_name} accepted the contract for {campaign_name}.",
+      "creator_approved": "Your creator account has been approved.",
+      "creator_rejected": "Your creator application was not approved.",
+      "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",
+      "message_received_by_agency": "{sender_name} sent a message about {campaign_name}.",
+      "fallback": "You have a new notification."
+    },
+    "preferences": {
+      "title": "Nētification settings",
+      "description": "Choose which in-app notifications you'd like to receive.",
+      "menuItem": "Nētification settings",
+      "save": "Saglabāt izmaiņas",
+      "saving": "Saving…",
+      "success": "Your notification settings were saved.",
+      "loadError": "Couldn't load your notification settings.",
+      "saveError": "Couldn't save your notification settings. Please try again.",
+      "groups": {
+        "assignment": "Uzdevumss",
+        "creator": "Radītājs account",
+        "messaging": "Ziņojumi"
+      },
+      "channels": {
+        "in_app": "In-app",
+        "digest": "Daily email digest"
+      },
+      "typeLabels": {
+        "assignment_draft_submitted": "A draft is submitted for review",
+        "assignment_contracted": "A contract is accepted",
+        "assignment_revision_requested": "Revisions are requested on a draft",
+        "assignment_draft_approved": "A draft is approved",
+        "assignment_draft_rejected": "A draft is rejected",
+        "assignment_manually_verified": "A post is verified",
+        "creator_approved": "A creator account is approved",
+        "creator_rejected": "A creator application is declined",
+        "message_received_by_creator": "A new message from the agency",
+        "message_received_by_agency": "A new message from the creator"
+      }
+    }
+  }
+}

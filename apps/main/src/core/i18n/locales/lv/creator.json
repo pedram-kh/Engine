@@ -1,0 +1,416 @@
+{
+  "creator": {
+    "not_found": "Nē creator profile is associated with your account. Please sign out and sign in again, or contact support.",
+    "already_approved": "This creator has already been approved.",
+    "already_rejected": "This creator has already been rejected.",
+    "kyc_not_verified": "This creator's identity must be verified before the application can be approved.",
+    "kyc_already_verified": "This creator's identity has already been verified.",
+    "admin": {
+      "field_status_immutable": "Application status cannot be changed through this form. Use the approve or reject actions instead."
+    },
+    "social": {
+      "invalid_platform": "That social platform is not supported."
+    },
+    "wizard": {
+      "feature_disabled": "This step is currently unavailable while a configuration change is in progress. Skip to continue your application.",
+      "feature_enabled": "This option is not available right now — please use the standard flow for this step.",
+      "incomplete": "Cannot submit your application yet — one or more wizard steps are still incomplete."
+    },
+    "reopen": {
+      "invalid_state": "Only a rejected application can be reopened."
+    },
+    "ui": {
+      "wizard": {
+        "title": "Set up your creator profile",
+        "subtitle": "A few steps to introduce yourself to brands.",
+        "progress": {
+          "step_of": "Step {current} of {total}",
+          "completed": "Pabeigts",
+          "current": "Current step",
+          "skipped": "Skipped",
+          "pending": "Nēt started"
+        },
+        "actions": {
+          "save": "Saglabāt",
+          "save_and_continue": "Saglabāt and continue",
+          "back": "Atpakaļ",
+          "skip_for_now": "Skip for now",
+          "save_and_exit": "Saglabāt and exit",
+          "submit_for_approval": "Iesniegt for approval",
+          "continue_from_here": "Turpināt from here",
+          "edit_step": "Rediģēt step",
+          "review_and_submit": "Review and submit",
+          "connect": "Connect",
+          "update": "Atjaunināt",
+          "remove": "Remove"
+        },
+        "skipped": {
+          "label": "Skipped",
+          "explanation": "This step is not required at this time. An admin will review your application without it."
+        },
+        "save_status": {
+          "saving": "Saving…",
+          "saved": "Saglabātd",
+          "error": "Could not save — please try again."
+        },
+        "steps": {
+          "profile": {
+            "name": "Profils basics",
+            "title": "Tell us about yourself",
+            "description": "Your display name, bio, photo, and the categories you create in."
+          },
+          "social": {
+            "name": "Social accounts",
+            "title": "Connect your social accounts",
+            "description": "Connect at least one platform so brands can see your reach."
+          },
+          "portfolio": {
+            "name": "Portfolio",
+            "title": "Show your best work",
+            "description": "Augšupielādēt up to 10 vienumi — videos, images, or external links — that represent your style.",
+            "gallery_heading": "Your portfolio",
+            "gallery_empty": "Nē portfolio vienumi uploaded yet.",
+            "gallery_remove": "Remove item",
+            "gallery_status": "Portfolio gallery contains {count} item(s).",
+            "video_badge_label": "Video",
+            "link_badge_label": "External link",
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Open preview",
+            "preview_close": "Aizvērt preview"
+          },
+          "kyc": {
+            "name": "Identity verification",
+            "title": "Verify your identity",
+            "description": "A quick check with our verification partner. Obligāts for payouts.",
+            "skipped_title": "Identity verification skipped",
+            "skipped_explanation": "Identity verification is not required at this time.",
+            "current_status": "Statuss:",
+            "begin_button": "Begin verification",
+            "status_labels": {
+              "none": "Nēt started",
+              "pending": "In progress",
+              "verified": "Verified",
+              "rejected": "Nēraidīted",
+              "not_required": "Skipped"
+            }
+          },
+          "tax": {
+            "name": "Tax information",
+            "title": "Tax form",
+            "description": "We need a tax form for payouts, even before your first one.",
+            "current_status": "Statuss:",
+            "status_complete": "Iesniegtted",
+            "status_incomplete": "Nēt yet submitted",
+            "on_file_title": "Tax information on file",
+            "on_file_body": "Your tax details are saved securely. For your privacy we don't display them again — choose Atjaunināt to re-enter them.",
+            "update_button": "Atjaunināt tax information"
+          },
+          "payout": {
+            "name": "Payout method",
+            "title": "Set up payouts",
+            "description": "Connect a Stripe Express account to receive payments.",
+            "skipped_title": "Payout setup skipped",
+            "skipped_explanation": "Payout setup is not required at this time.",
+            "current_status": "Statuss:",
+            "begin_button": "Set up payouts",
+            "status_set": "Connected",
+            "status_unset": "Nēt connected"
+          },
+          "contract": {
+            "name": "Master agreement",
+            "title": "Sign the master agreement",
+            "description": "Our standard creator agreement covers brand collaborations on the platform.",
+            "skipped_explanation": "Līgums signing is not required at this time — please accept the click-through terms below.",
+            "click_through_label": "I have read and accept these terms.",
+            "click_through_help": "Read the agreement above, then check the box to continue.",
+            "terms_version": "Master Radītājs Agreement v{version}",
+            "current_status": "Statuss:",
+            "begin_button": "Open agreement to sign",
+            "status_labels": {
+              "signed": "Signed",
+              "click_through_accepted": "Pieņemted",
+              "none": "Nēt started"
+            },
+            "accepted_title": "Agreement accepted",
+            "accepted_body": "You've accepted the master agreement. Turpināt to the next step."
+          },
+          "account_created": {
+            "name": "Konts created"
+          },
+          "review": {
+            "name": "Review and submit",
+            "title": "Review your application",
+            "description": "Take a moment to review everything before submitting.",
+            "completeness": "{percent}% complete",
+            "edit_step": "Rediģēt",
+            "submit_button": "Iesniegt application",
+            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Rediģēt to finish it before submitting. | You have {count} incomplete steps: {names}. Click Rediģēt on each to finish them before submitting."
+          }
+        },
+        "fields": {
+          "display_name": "Display name",
+          "display_name_help": "How brands will see you — your handle or stage name.",
+          "bio": "Bio",
+          "bio_help": "A short introduction. You can use **bold**, *italics*, and [links](https://example.com).",
+          "avatar": "Profils photo",
+          "avatar_drop": "Drop a photo here, or click to choose. JPG, PNG, or WebP up to 5 MB.",
+          "country": "Country",
+          "region": "Region or city",
+          "primary_language": "Primary language",
+          "secondary_languages": "Other languages",
+          "categories": "Categories",
+          "categories_help": "Pick the categories that best describe what you create.",
+          "avatar_required": "A profile photo is required to finish this step.",
+          "step_requirements_hint": "Pievienot a profile photo and at least one category to continue.",
+          "social_handle": "Username",
+          "social_handle_hint": "Enter your username only — no {'@'} symbol or full profile URL.",
+          "social_handle_invalid": "Enter a valid username: 2–30 letters, numbers, dots, underscores or hyphens (no spaces, {'@'}, or URLs).",
+          "social_profile_url": "Profils URL",
+          "portfolio_title": "Title",
+          "portfolio_description": "Description",
+          "portfolio_external_url": "External URL (optional)",
+          "tax_form_type": "Tax form",
+          "legal_name": "Legal name",
+          "tax_id": "Tax ID",
+          "address_country": "Country",
+          "address_city": "City",
+          "address_postal_code": "Postal code",
+          "address_street": "Street"
+        },
+        "categories": {
+          "fashion": "Fashion",
+          "beauty": "Beauty",
+          "lifestyle": "Lifestyle",
+          "fitness": "Fitness",
+          "travel": "Travel",
+          "food": "Food",
+          "tech": "Technology",
+          "gaming": "Gaming",
+          "music": "Music",
+          "comedy": "Comedy",
+          "education": "Education",
+          "parenting": "Parenting",
+          "business": "Business",
+          "art": "Art",
+          "sports": "Sports",
+          "other": "Other"
+        },
+        "tax_form_types": {
+          "eu_self_employed": "EU — self-employed",
+          "eu_company": "EU — company",
+          "uk_self_employed": "UK — self-employed",
+          "uk_company": "UK — company"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Coming soon"
+        },
+        "vendor_bounce": {
+          "waiting_title": "Almost there…",
+          "waiting_description": "We're waiting on a response from our partner. This usually takes under a minute.",
+          "timeout_title": "Still waiting on our partner",
+          "timeout_description": "This is taking longer than expected. You can try again or contact support.",
+          "retry": "Try again",
+          "contact_support": "Contact support"
+        },
+        "welcome_back": {
+          "title": "Laipni lūgti back",
+          "subtitle": "You were last here {time_ago}. Pick up where you left off.",
+          "first_time_title": "Let's get started",
+          "first_time_subtitle": "Laipni lūgti to Catalyst. Let's set up your creator profile — it only takes a few minutes.",
+          "first_time_prompt": "Start with {step} to introduce yourself to brands.",
+          "next_step_prompt": "You're on Step {step}. Turpināt here, or jump back to edit an earlier step.",
+          "all_complete_prompt": "Looking good — you've completed every step. Ready to submit?",
+          "continue_button": "Turpināt to {step_name}",
+          "review_button": "Review and submit"
+        }
+      },
+      "dashboard": {
+        "title": "Your application",
+        "greeting": "Laipni lūgti, {name}.",
+        "completeness": "{percent}% complete",
+        "submitted_at": "Iesniegtted on {datetime}",
+        "submitted": {
+          "heading": "Application submitted",
+          "description": "Your profile is under review. We'll notify you within 3 business days.",
+          "completeness_label": "Profils completeness",
+          "last_updated": "Last updated {time_ago}"
+        },
+        "pending_review": {
+          "title": "Application under review",
+          "description": "Your application is in our queue. We'll notify you within 3 business days."
+        },
+        "approved": {
+          "title": "Laipni lūgti to Catalyst",
+          "heading": "You're approved",
+          "description": "You're approved to receive brand collaborations. The full creator dashboard ships soon."
+        },
+        "rejected": {
+          "title": "Application not approved",
+          "heading": "Application needs changes",
+          "description": "Review the notes below, update your application, and resubmit it for another review.",
+          "reason_label": "Reason:",
+          "edit_profile": "Rediģēt profile",
+          "resubmit": "Atjaunināt & resubmit",
+          "resubmit_failed": "We couldn't reopen your application. Please try again."
+        },
+        "incomplete": {
+          "title": "Turpināt your application",
+          "description": "Pick up where you left off — your wizard progress is saved."
+        },
+        "requests": {
+          "title": "Savienojums requests",
+          "sent": "Sent {date}",
+          "sent_unknown": "Sent recently",
+          "accept": "Pieņemt",
+          "decline": "Atteikt",
+          "empty": {
+            "title": "Nē connection requests",
+            "body": "When an agency invites you to connect, it'll appear here."
+          },
+          "toast": {
+            "accepted": "You're now connected with {agency}.",
+            "declined": "Request declined.",
+            "error": "Something went wrong. Please try again."
+          }
+        },
+        "assignments": {
+          "title": "Kampaņa invitations",
+          "pending": "You have {count} invitation(s) awaiting your response.",
+          "none": "Nē invitations awaiting your response.",
+          "cta": "Skatīt invitations"
+        }
+      },
+      "assignments": {
+        "title": "Kampaņa invitations",
+        "subtitle": "Pieņemt, decline, or counter the fee on campaigns you've been invited to.",
+        "fee": "Fee",
+        "youCountered": "you countered",
+        "accept": "Pieņemt",
+        "counter": "Counter",
+        "decline": "Atteikt",
+        "view": "Skatīt",
+        "detail": {
+          "back": "Atpakaļ to invitations",
+          "notFound": "This assignment could not be found.",
+          "loadFailed": "We couldn't load this assignment. Please try again.",
+          "retry": "Retry",
+          "awaitingReview": "Your draft has been submitted and is awaiting agency review.",
+          "awaitingVerification": "Your post has been recorded and is awaiting verification.",
+          "resubmitInPlace": {
+            "title": "We couldn't verify your post",
+            "intro": "Automatic verification of your post failed. Check the link is correct and points to your published post, then resubmit it below.",
+            "url": "Post URL",
+            "submit": "Resubmit link",
+            "toast": "Link resubmitted — we'll re-check it shortly."
+          },
+          "contract": {
+            "title": "Kampaņa contract",
+            "viewPdf": "Skatīt contract (PDF)",
+            "accept": "Pieņemt contract",
+            "awaitingAgency": "The agency will send a contract for you to review and accept. You'll be notified when it's ready — check back here then.",
+            "signingDisabled": "Līgums signing is not enabled yet. The agency will contact you when it's time to proceed.",
+            "toast": {
+              "accepted": "Līgums accepted. You can now submit your draft."
+            }
+          },
+          "revision": {
+            "title": "Revision requested",
+            "noFeedback": "The agency has requested changes. Please resubmit an updated draft."
+          },
+          "draft": {
+            "submitTitle": "Iesniegt your draft",
+            "resubmitTitle": "Resubmit your draft",
+            "caption": "Caption",
+            "hashtags": "Hashtags",
+            "hashtagsHint": "Separate with spaces or commas",
+            "mentions": "Mentions",
+            "mentionsHint": "Separate with spaces or commas",
+            "media": "Media",
+            "submit": "Iesniegt draft",
+            "resubmit": "Resubmit draft",
+            "mediaStatus": {
+              "uploading": "Augšupielādēting…",
+              "done": "Augšupielādēted",
+              "error": "Augšupielādēt failed"
+            }
+          },
+          "posted": {
+            "title": "Mark as posted",
+            "platform": "Platform",
+            "url": "Post URL",
+            "submit": "Iesniegt post",
+            "summaryTitle": "Posted content"
+          },
+          "history": {
+            "title": "Melnraksts history",
+            "version": "Version {n}"
+          },
+          "reviewStatus": {
+            "pending": "Gaida review",
+            "approved": "Apstiprinātd",
+            "rejected": "Nēraidīted",
+            "revision_requested": "Revision requested"
+          },
+          "verificationStatus": {
+            "pending": "Verifikācija pending",
+            "verified": "Verified",
+            "not_found": "Nēt found",
+            "mismatch": "Mismatch"
+          },
+          "toast": {
+            "draftSubmitted": "Melnraksts submitted.",
+            "posted": "Post recorded.",
+            "error": "Something went wrong. Please try again."
+          }
+        },
+        "window": {
+          "range": "{start} – {end}",
+          "unset": "Datumss TBC"
+        },
+        "empty": {
+          "title": "Nē campaign invitations",
+          "body": "When an agency invites you to a campaign, it'll appear here."
+        },
+        "toast": {
+          "accepted": "Uzaicinājums accepted.",
+          "countered": "Counter-offer sent.",
+          "declined": "Uzaicinājums declined.",
+          "error": "Something went wrong. Please try again."
+        },
+        "counterDialog": {
+          "title": "Counter the fee",
+          "body": "Propose a different fee for this campaign. The agency can re-offer or withdraw.",
+          "feeLabel": "Your fee ({currency})",
+          "cancel": "Atcelt",
+          "submit": "Nēsūtīt counter"
+        }
+      },
+      "upload": {
+        "avatar_prompt": "Drop a photo here, or click to choose",
+        "avatar_preview_alt": "Profils photo preview",
+        "size_hint": "{types} · up to {max_mb} MB",
+        "portfolio_prompt": "Drop files here, or click to choose",
+        "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
+        "portfolio_slots_remaining": "{remaining} slots remaining",
+        "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",
+        "uploading": "Augšupielādēting…",
+        "remove": "Remove",
+        "remove_avatar": "Remove photo",
+        "remove_portfolio_item_label": "Remove {name}",
+        "status_pending": "Waiting…",
+        "status_uploading": "Augšupielādēting…",
+        "status_done": "Augšupielādēted",
+        "status_error": "Failed"
+      },
+      "errors": {
+        "upload_too_large": "This file is too large. The maximum size is {max_mb} MB.",
+        "upload_wrong_type": "This file type is not supported. Use {allowed_types}.",
+        "upload_failed": "The upload failed. Please try again.",
+        "portfolio_max_reached": "You can upload up to {max} portfolio vienumi."
+      }
+    }
+  }
+}

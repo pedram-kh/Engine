@@ -1,0 +1,84 @@
+{
+  "availability": {
+    "title": "Pieejamība",
+    "subtitle": "Block out the times you're unavailable so agencies see your real calendar.",
+    "allDay": "Visi day",
+    "moreCount": "+{count} more",
+    "dayPopover": {
+      "title": "Blocks this day",
+      "viewAll": "Show all blocks for this day"
+    },
+    "creatorNav": {
+      "dashboard": "Vadības panelis",
+      "assignments": "Uzaicinājumss",
+      "availability": "Pieejamība"
+    },
+    "nav": {
+      "prevMonth": "Iepriekšējais month",
+      "nextMonth": "Nākamais month"
+    },
+    "actions": {
+      "add": "Pievienot block"
+    },
+    "empty": {
+      "heading": "Nē availability blocks yet",
+      "body": "Pievienot a block to mark when you're away or unavailable."
+    },
+    "errors": {
+      "loadFailed": "We couldn't load your availability. Please try again."
+    },
+    "blockType": {
+      "hard": "Unavailable (hard)",
+      "soft": "Preference (soft)"
+    },
+    "kind": {
+      "vacation": "Vacation",
+      "personal": "Personal",
+      "exclusive_contract": "Exclusive contract",
+      "assignment_auto": "From campaign",
+      "other": "Other"
+    },
+    "weekday": {
+      "MO": "Mon",
+      "TU": "Tue",
+      "WE": "Wed",
+      "TH": "Thu",
+      "FR": "Fri",
+      "SA": "Sat",
+      "SU": "Sun"
+    },
+    "dialog": {
+      "createTitle": "Pievienot availability block",
+      "editTitle": "Rediģēt availability block",
+      "seriesNotice": "This is a repeating block — changes apply to all of its occurrences, not just this day.",
+      "blockTypeHint": "Hard blocks exclude you entirely; soft blocks are a preference only.",
+      "fields": {
+        "allDay": "Visi day",
+        "startDate": "Start date",
+        "startTime": "Start time",
+        "endDate": "End date",
+        "endTime": "End time",
+        "blockType": "Type",
+        "kind": "Reason",
+        "reason": "Nēte (optional)",
+        "recurring": "Repeats weekly"
+      },
+      "recurrence": {
+        "interval": "Repeat every (weeks)",
+        "weekdays": "On these days",
+        "hasEnd": "Set an end date",
+        "endsOn": "Ends on"
+      },
+      "actions": {
+        "save": "Saglabāt",
+        "cancel": "Atcelt",
+        "delete": "Dzēst",
+        "confirmDelete": "Apstiprināt delete"
+      },
+      "errors": {
+        "saveFailed": "We couldn't save the block. Please try again.",
+        "deleteFailed": "We couldn't delete the block. Please try again."
+      }
+    }
+  }
+}
