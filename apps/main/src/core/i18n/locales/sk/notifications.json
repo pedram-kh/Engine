@@ -1,0 +1,63 @@
+{
+  "notifications": {
+    "center": {
+      "title": "Oznámenia",
+      "empty": "Všetko je přečteno.",
+      "markAll": "Označit všetko jako přečtené",
+      "viewAll": "Zobraziť všetkotkochna oznámenia",
+      "loading": "Načítanie…",
+      "error": "Nepodařilo sa načíst oznámenia.",
+      "unreadBadgeLabel": "{count} nepřečtených oznámenia",
+      "feedbackLabel": "Zpětná vazba",
+      "reasonLabel": "Dôvod"
+    },
+    "page": {
+      "title": "Oznámenia",
+      "empty": "Zatím nemáte žádná oznámenia."
+    },
+    "types": {
+      "assignment_draft_approved": "Váš návrh pro {campaign_name} byl schválen.",
+      "assignment_revision_requested": "Byly požadovány revize vašeho návrhu pro {campaign_name}.",
+      "assignment_draft_rejected": "Váš návrh pro {campaign_name} byl zamítnut.",
+      "assignment_manually_verified": "Váš příspěvek pro {campaign_name} byl ověřen.",
+      "assignment_draft_submitted": "{creator_name} odeslal návrh pro {campaign_name}.",
+      "assignment_contracted": "{creator_name} přijal zmlúvu pro {campaign_name}.",
+      "creator_approved": "Váš účet tvorcu byl schválen.",
+      "creator_rejected": "Vaše prihláška tvorcu nebola schválená.",
+      "message_received_by_creator": "{sender_name} vám poslal zprávu ohledně {campaign_name}.",
+      "message_received_by_agency": "{sender_name} poslal zprávu ohledně {campaign_name}.",
+      "fallback": "Máte nové oznámenia."
+    },
+    "preferences": {
+      "title": "Nastavenia oznámenia",
+      "description": "Vyberte, která oznámenia v aplikaci chcete dostávat.",
+      "menuItem": "Nastavenia oznámenia",
+      "save": "Uložiť změny",
+      "saving": "Ukladanie…",
+      "success": "Vaše nastavenia oznámenia bolo uložené.",
+      "loadError": "Nepodařilo sa načíst nastavenia oznámenia.",
+      "saveError": "Nepodařilo sa uložiť nastavenia oznámenia. Zkuste to znova.",
+      "groups": {
+        "assignment": "Úkoly",
+        "creator": "Účet tvorcu",
+        "messaging": "Správy"
+      },
+      "channels": {
+        "in_app": "V aplikaci",
+        "digest": "Denní e-mailový souhrn"
+      },
+      "typeLabels": {
+        "assignment_draft_submitted": "Návrh je odeslán k posúdenie",
+        "assignment_contracted": "Zmluva je přijata",
+        "assignment_revision_requested": "Sú požadovány revize návrhu",
+        "assignment_draft_approved": "Návrh je schválen",
+        "assignment_draft_rejected": "Návrh je zamítnut",
+        "assignment_manually_verified": "Příspěvek je ověřen",
+        "creator_approved": "Účet tvorcu je schválen",
+        "creator_rejected": "Prihláška tvorcu je odmietnutá",
+        "message_received_by_creator": "Nová správa od agentúry",
+        "message_received_by_agency": "Nová správa od tvorcu"
+      }
+    }
+  }
+}

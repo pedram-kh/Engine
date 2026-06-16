@@ -1,0 +1,416 @@
+{
+  "creator": {
+    "not_found": "S vašejm účtem není spojen žádný profil tvorcu. Odhláste sa a prihláste sa znova nebo kontaktujte podporu.",
+    "already_approved": "Tento tvorcu již byl schválen.",
+    "already_rejected": "Tento tvorcu již byl odmietnutý.",
+    "kyc_not_verified": "Před schválením prihlášky musí byť ověřena totožnost tohoto tvorcu.",
+    "kyc_already_verified": "Totožnost tohoto tvorcu již bola ověřena.",
+    "admin": {
+      "field_status_immutable": "Stav prihlášky nie je možné změnit prostřednictvím tohoto formuláře. Místo toho použijte akce schválení nebo odmietnutýí."
+    },
+    "social": {
+      "invalid_platform": "Tato sociální platforma není podporována."
+    },
+    "wizard": {
+      "feature_disabled": "Tento krok je momentálně nedostupný v průběhu změny konfigurace. Přeskočte pro pokračování v prihláške.",
+      "feature_enabled": "Tato možnost nyní není dostupná — použijte standardní postup pro tento krok.",
+      "incomplete": "Prihlášku zatím nie je možné odoslať — jeden nebo více kroků průvodce je stále neúplných."
+    },
+    "reopen": {
+      "invalid_state": "Znova otevřít lze pouze odmietnutéu prihlášku."
+    },
+    "ui": {
+      "wizard": {
+        "title": "Nastavte svůj profil tvorcu",
+        "subtitle": "Několik kroků pro představení sa značkám.",
+        "progress": {
+          "step_of": "Krok {current} z {total}",
+          "completed": "Dokončeno",
+          "current": "Aktuální krok",
+          "skipped": "Přeskočeno",
+          "pending": "Nezahájeno"
+        },
+        "actions": {
+          "save": "Uložiť",
+          "save_and_continue": "Uložiť a pokračovať",
+          "back": "Zpět",
+          "skip_for_now": "Přeskočit nyní",
+          "save_and_exit": "Uložiť a ukončit",
+          "submit_for_approval": "Odoslať ke schválení",
+          "continue_from_here": "Pokračovať odtud",
+          "edit_step": "Upraviť krok",
+          "review_and_submit": "Skontrolovať a odoslať",
+          "connect": "Prepojiť",
+          "update": "Aktualizovat",
+          "remove": "Odobrať"
+        },
+        "skipped": {
+          "label": "Přeskočeno",
+          "explanation": "Tento krok nyní není povinný. Správce přezkoumá vaši prihlášku bez něj."
+        },
+        "save_status": {
+          "saving": "Ukladanie…",
+          "saved": "Uložené",
+          "error": "Nie je možné uložiť — zkuste to znova."
+        },
+        "steps": {
+          "profile": {
+            "name": "Základy profilu",
+            "title": "Řekněte nám o sobě",
+            "description": "Vaše zobrazované meno, bio, foto a kategorie, ve kterých tvoříte."
+          },
+          "social": {
+            "name": "Sociální sítě",
+            "title": "Propojte své sociální sítě",
+            "description": "Propojte alespoň jednu platformu, aby značky viděly váš dosah."
+          },
+          "portfolio": {
+            "name": "Portfólio",
+            "title": "Ukažte svou nejlepší práci",
+            "description": "Nahrajte až 10 položek — videa, obrázky nebo externí odkazy — které představují váš styl.",
+            "gallery_heading": "Vaše portfólio",
+            "gallery_empty": "Zatím žádné nahrané položky portfolia.",
+            "gallery_remove": "Odobrať položku",
+            "gallery_status": "Galerie portfolia obsahuje {count} položku/položek.",
+            "video_badge_label": "Video",
+            "link_badge_label": "Externí odkaz",
+            "untitled_item": "Nepojmenovaná položka portfolia",
+            "preview_label": "Otevřít náhled",
+            "preview_close": "Zavrieť náhled"
+          },
+          "kyc": {
+            "name": "Overenie totožnosti",
+            "title": "Overte svou totožnost",
+            "description": "Rychlé overenie u našeho partnera. Vyžadováno pro výplaty.",
+            "skipped_title": "Overenie totožnosti přeskočeno",
+            "skipped_explanation": "Overenie totožnosti nyní není povinné.",
+            "current_status": "Stav:",
+            "begin_button": "Zahájit overenie",
+            "status_labels": {
+              "none": "Nezahájeno",
+              "pending": "Probíhá",
+              "verified": "Overené",
+              "rejected": "Odmietnuté",
+              "not_required": "Přeskočeno"
+            }
+          },
+          "tax": {
+            "name": "Daňové informace",
+            "title": "Daňový formulář",
+            "description": "Pro výplaty potřebujeme daňový formulář, a to i před první výplatou.",
+            "current_status": "Stav:",
+            "status_complete": "Odoslané",
+            "status_incomplete": "Ještě neodoslané",
+            "on_file_title": "Daňové informace v archivu",
+            "on_file_body": "Vaše daňové údaje sú bezpečně uloženy. Z dôvodu soukromí je znova nezobrazujeme — pro jejich opětovné zadání zvolte Aktualizovat.",
+            "update_button": "Aktualizovat daňové informace"
+          },
+          "payout": {
+            "name": "Způsob výplaty",
+            "title": "Nastavit výplaty",
+            "description": "Propojte účet Stripe Express pro příjem plateb.",
+            "skipped_title": "Nastavenia výplat přeskočeno",
+            "skipped_explanation": "Nastavenia výplat nyní není povinné.",
+            "current_status": "Stav:",
+            "begin_button": "Nastavit výplaty",
+            "status_set": "Prepojené",
+            "status_unset": "Neprepojené"
+          },
+          "contract": {
+            "name": "Rámcová zmluva",
+            "title": "Podepište rámcovou zmlúvu",
+            "description": "Naše standardní zmluva tvorcu pokrývá spolupráce sa značkami na platformě.",
+            "skipped_explanation": "Podpis zmluvy nyní není povinný — přijměte níže podmínky kliknutím.",
+            "click_through_label": "Přečetl/a som a přijímám tyto podmínky.",
+            "click_through_help": "Přečtěte si výše uvedenou zmlúvu a zaškrtnutím políčka pokračujte.",
+            "terms_version": "Rámcová zmluva tvorcu v{version}",
+            "current_status": "Stav:",
+            "begin_button": "Otevřít zmlúvu k podpisu",
+            "status_labels": {
+              "signed": "Podepsáno",
+              "click_through_accepted": "Prijaté",
+              "none": "Nezahájeno"
+            },
+            "accepted_title": "Zmluva přijata",
+            "accepted_body": "Přijali ste rámcovou zmlúvu. Pokračujte na další krok."
+          },
+          "account_created": {
+            "name": "Účet vytvořen"
+          },
+          "review": {
+            "name": "Skontrolovať a odoslať",
+            "title": "Zkontrolujte svou prihlášku",
+            "description": "Věnujte chvíli kontrole všetkoho před odesláním.",
+            "completeness": "{percent} % dokončeno",
+            "edit_step": "Upraviť",
+            "submit_button": "Odoslať prihlášku",
+            "incomplete_blocker": "Máte 1 neúplný krok: {names}. Klikněte na Upraviť pro jeho dokončení před odesláním. | Máte {count} neúplných kroků: {names}. Klikněte na Upraviť u každého pro jejich dokončení před odesláním."
+          }
+        },
+        "fields": {
+          "display_name": "Zobrazované meno",
+          "display_name_help": "Jak vás uvidí značky — váš přezdívka nebo umělecké meno.",
+          "bio": "Bio",
+          "bio_help": "Krátké představení. Môžete používat **tučné**, *kurzívu* a [odkazy](https://example.com).",
+          "avatar": "Profilová fotografie",
+          "avatar_drop": "Přetáhněte foto sem nebo klikněte pro výběr. JPG, PNG nebo WebP do 5 MB.",
+          "country": "Země",
+          "region": "Oblast nebo město",
+          "primary_language": "Primární jazyk",
+          "secondary_languages": "Ostatní jazyky",
+          "categories": "Kategorie",
+          "categories_help": "Vyberte kategorie, které nejlépe popisují, co tvoříte.",
+          "avatar_required": "Pro dokončení tohoto kroku je vyžadována profilová fotografie.",
+          "step_requirements_hint": "Přidejte profilovou fotografii a alespoň jednu kategorii pro pokračování.",
+          "social_handle": "Uživatelské meno",
+          "social_handle_hint": "Zadejte pouze své uživatelské meno — bez symbolu {'@'} nebo plné URL profilu.",
+          "social_handle_invalid": "Zadejte platné uživatelské meno: 2–30 písmen, číslic, teček, podtržítek nebo pomlček (bez mezer, {'@'} nebo URL).",
+          "social_profile_url": "URL profilu",
+          "portfolio_title": "Název",
+          "portfolio_description": "Popis",
+          "portfolio_external_url": "Externí URL (volitelné)",
+          "tax_form_type": "Daňový formulář",
+          "legal_name": "Právní meno",
+          "tax_id": "Daňové identifikační číslo",
+          "address_country": "Země",
+          "address_city": "Město",
+          "address_postal_code": "PSČ",
+          "address_street": "Ulice"
+        },
+        "categories": {
+          "fashion": "Móda",
+          "beauty": "Krása",
+          "lifestyle": "Životní styl",
+          "fitness": "Fitness",
+          "travel": "Cestování",
+          "food": "Jídlo",
+          "tech": "Technologie",
+          "gaming": "Gaming",
+          "music": "Hudba",
+          "comedy": "Komedie",
+          "education": "Vzdělávání",
+          "parenting": "Rodičovství",
+          "business": "Byznys",
+          "art": "Umění",
+          "sports": "Sport",
+          "other": "Iné"
+        },
+        "tax_form_types": {
+          "eu_self_employed": "EU — OSVČ",
+          "eu_company": "EU — firma",
+          "uk_self_employed": "UK — OSVČ",
+          "uk_company": "UK — firma"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Čoskoro"
+        },
+        "vendor_bounce": {
+          "waiting_title": "Téměř hotovo…",
+          "waiting_description": "Čekáme na odpověď od našeho partnera. Obvykle to trvá méně než minutu.",
+          "timeout_title": "Stále čekáme na partnera",
+          "timeout_description": "Trvá to déle, než sa čekalo. Môžete skúsiť znova nebo kontaktovat podporu.",
+          "retry": "Skúsiť znova",
+          "contact_support": "Kontaktovat podporu"
+        },
+        "welcome_back": {
+          "title": "Vítejte zpět",
+          "subtitle": "Naposledy ste tu byli {time_ago}. Pokračujte tam, kde ste skončili.",
+          "first_time_title": "Začněme",
+          "first_time_subtitle": "Vítejte v Catalyst. Nastavme váš profil tvorcu — potrvá to jen několik minut.",
+          "first_time_prompt": "Začněte s {step} pro představení sa značkám.",
+          "next_step_prompt": "Ste na kroku {step}. Pokračujte zde nebo sa vraťte k úpravě dřívějšího kroku.",
+          "all_complete_prompt": "Skvělé — dokončili ste každý krok. Připraveni k odeslání?",
+          "continue_button": "Pokračovať na {step_name}",
+          "review_button": "Skontrolovať a odoslať"
+        }
+      },
+      "dashboard": {
+        "title": "Vaše prihláška",
+        "greeting": "Vítejte, {name}.",
+        "completeness": "{percent} % dokončeno",
+        "submitted_at": "Odoslané {datetime}",
+        "submitted": {
+          "heading": "Prihláška odoslaná",
+          "description": "Váš profil je v procesu posúdenie. Budeme vás informovat do 3 pracovních dnů.",
+          "completeness_label": "Úplnost profilu",
+          "last_updated": "Naposledy aktualizováno {time_ago}"
+        },
+        "pending_review": {
+          "title": "Prihláška v procesu posúdenie",
+          "description": "Vaše prihláška je ve frontě. Budeme vás informovat do 3 pracovních dnů."
+        },
+        "approved": {
+          "title": "Vítejte v Catalyst",
+          "heading": "Ste schváleni",
+          "description": "Ste schváleni pro přijímání spolupráce sa značkami. Plný riadiaci panel tvorcu přijde čoskoro."
+        },
+        "rejected": {
+          "title": "Prihláška neschválená",
+          "heading": "Prihláška vyžaduje změny",
+          "description": "Zkontrolujte níže uvedené poznámky, aktualizujte prihlášku a znova ji odešlete k dalšímu posúdenie.",
+          "reason_label": "Dôvod:",
+          "edit_profile": "Upraviť profil",
+          "resubmit": "Aktualizovat a znova odoslať",
+          "resubmit_failed": "Nepodařilo sa nám znova otevřít vaši prihlášku. Zkuste to znova."
+        },
+        "incomplete": {
+          "title": "Pokračovať v prihláške",
+          "description": "Pokračujte tam, kde ste skončili — postup průvodce je uložen."
+        },
+        "requests": {
+          "title": "Žádosti o propojení",
+          "sent": "Odoslané {date}",
+          "sent_unknown": "Odoslané nedávno",
+          "accept": "Prijať",
+          "decline": "Odmietnuť",
+          "empty": {
+            "title": "Žádné žádosti o propojení",
+            "body": "Když vás agentura pozve k propojení, zobrazí sa zde."
+          },
+          "toast": {
+            "accepted": "Nyní ste propojeni s {agency}.",
+            "declined": "Žádost odmietnutá.",
+            "error": "Niečo sa pokazilo. Zkuste to znova."
+          }
+        },
+        "assignments": {
+          "title": "Pozvánky do kampaní",
+          "pending": "Máte {count} pozvánku/pozvánek čakajúci na vaši odpověď.",
+          "none": "Žádné pozvánky čakajúci na vaši odpověď.",
+          "cta": "Zobraziť pozvánky"
+        }
+      },
+      "assignments": {
+        "title": "Pozvánky do kampaní",
+        "subtitle": "Přijměte, odmítněte nebo nabídněte protinabídku za kampaně, do nichž ste byli pozváni.",
+        "fee": "Odměna",
+        "youCountered": "protinabídka odoslaná",
+        "accept": "Prijať",
+        "counter": "Protinabídka",
+        "decline": "Odmietnuť",
+        "view": "Zobraziť",
+        "detail": {
+          "back": "Späť na pozvánky",
+          "notFound": "Tento úkol nie je možné nalézt.",
+          "loadFailed": "Nepodařilo sa nám načíst tento úkol. Zkuste to znova.",
+          "retry": "Skúsiť znova",
+          "awaitingReview": "Váš návrh byl odeslán a čaká na posúdenie agentúry.",
+          "awaitingVerification": "Váš příspěvek byl zaznamenán a čaká na overenie.",
+          "resubmitInPlace": {
+            "title": "Nepodařilo sa nám overiť váš příspěvek",
+            "intro": "Automatické overenie vašeho příspěvku selhalo. Zkontrolujte, zda je odkaz správný a ukazuje na váš zveřejněný příspěvek, a poté ho níže znova odešlete.",
+            "url": "URL příspěvku",
+            "submit": "Znova odoslať odkaz",
+            "toast": "Odkaz znova odeslán — čoskoro ho znova zkontrolujeme."
+          },
+          "contract": {
+            "title": "Zmluva kampaně",
+            "viewPdf": "Zobraziť zmlúvu (PDF)",
+            "accept": "Prijať zmlúvu",
+            "awaitingAgency": "Agentúra vám zašle zmlúvu k posúdenie a přijetí. Budete upozorněni, až bude připravena — pak sa sem vraťte.",
+            "signingDisabled": "Podepisování smluv ještě není povoleno. Agentúra vás kontaktuje, až nastane čas.",
+            "toast": {
+              "accepted": "Zmluva přijata. Nyní môžete odoslať svůj návrh."
+            }
+          },
+          "revision": {
+            "title": "Požadovány revize",
+            "noFeedback": "Agentúra požaduje změny. Prosím odešlete aktualizovaný návrh."
+          },
+          "draft": {
+            "submitTitle": "Odoslať svůj návrh",
+            "resubmitTitle": "Znova odoslať svůj návrh",
+            "caption": "Popisek",
+            "hashtags": "Hashtagy",
+            "hashtagsHint": "Oddělte mezerami nebo čárkami",
+            "mentions": "Zmínky",
+            "mentionsHint": "Oddělte mezerami nebo čárkami",
+            "media": "Média",
+            "submit": "Odoslať návrh",
+            "resubmit": "Znova odoslať návrh",
+            "mediaStatus": {
+              "uploading": "Nahrávanie…",
+              "done": "Nahrané",
+              "error": "Nahrávanie selhalo"
+            }
+          },
+          "posted": {
+            "title": "Označit jako zveřejněné",
+            "platform": "Platforma",
+            "url": "URL příspěvku",
+            "submit": "Odoslať příspěvek",
+            "summaryTitle": "Zveřejněný obsah"
+          },
+          "history": {
+            "title": "Historie návrhů",
+            "version": "Verze {n}"
+          },
+          "reviewStatus": {
+            "pending": "Čaká na posúdenie",
+            "approved": "Schválené",
+            "rejected": "Odmietnuté",
+            "revision_requested": "Požadovány revize"
+          },
+          "verificationStatus": {
+            "pending": "Overenie čeká",
+            "verified": "Overené",
+            "not_found": "Nenalezeno",
+            "mismatch": "Neshoda"
+          },
+          "toast": {
+            "draftSubmitted": "Návrh odeslán.",
+            "posted": "Příspěvek zaznamenán.",
+            "error": "Niečo sa pokazilo. Zkuste to znova."
+          }
+        },
+        "window": {
+          "range": "{start} – {end}",
+          "unset": "Data budou upřesněna"
+        },
+        "empty": {
+          "title": "Žádné pozvánky do kampaní",
+          "body": "Když vás agentura pozve do kampaně, zobrazí sa zde."
+        },
+        "toast": {
+          "accepted": "Pozvánka přijata.",
+          "countered": "Protinabídka odoslaná.",
+          "declined": "Pozvánka odmietnutá.",
+          "error": "Niečo sa pokazilo. Zkuste to znova."
+        },
+        "counterDialog": {
+          "title": "Protinabídka odměny",
+          "body": "Navrhněte jinou odměnu za tuto kampaň. Agentúra môže znova navrhnout nebo sa stiahnuť.",
+          "feeLabel": "Vaše odměna ({currency})",
+          "cancel": "Zrušiť",
+          "submit": "Odoslať protinabídku"
+        }
+      },
+      "upload": {
+        "avatar_prompt": "Přetáhněte foto sem nebo klikněte pro výběr",
+        "avatar_preview_alt": "Náhled profilové fotografie",
+        "size_hint": "{types} · do {max_mb} MB",
+        "portfolio_prompt": "Přetáhněte soubory sem nebo klikněte pro výběr",
+        "portfolio_size_hint": "Obrázky do {image_mb} MB · videa do {video_mb} MB",
+        "portfolio_slots_remaining": "Zbývá {remaining} míst",
+        "portfolio_queue_status": "{in_flight} z {total} sa nahrává (max. {concurrency} najednou).",
+        "uploading": "Nahrávanie…",
+        "remove": "Odobrať",
+        "remove_avatar": "Odobrať foto",
+        "remove_portfolio_item_label": "Odobrať {name}",
+        "status_pending": "Čekání…",
+        "status_uploading": "Nahrávanie…",
+        "status_done": "Nahrané",
+        "status_error": "Selhalo"
+      },
+      "errors": {
+        "upload_too_large": "Tento soubor je příliš velký. Maximální velikost je {max_mb} MB.",
+        "upload_wrong_type": "Tento typ souboru není podporován. Použijte {allowed_types}.",
+        "upload_failed": "Nahrávanie selhalo. Zkuste to znova.",
+        "portfolio_max_reached": "Môžete nahrať až {max} položek portfolia."
+      }
+    }
+  }
+}

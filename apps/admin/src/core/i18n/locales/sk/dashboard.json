@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Riadiaci panel",
+      "load_failed": "Nepodařilo sa načíst riadiaci panel. Obnovte stránku.",
+      "kpi": {
+        "agencies_total": "Agentúry",
+        "agencies_suspended": "Pozastavené agentúry",
+        "creators_pending_approval": "Čakajúci schválení",
+        "creators_pending_kyc": "Fronta KYC",
+        "queue_pending": "Úlohy ve frontě",
+        "queue_failed": "Neúspěšné úlohy",
+        "open_disputes": "Otevřené spory",
+        "failed_payments_today": "Neúspěšné platby dnes"
+      },
+      "activity": {
+        "heading": "Nedávná aktivita",
+        "empty": "Žádná nedávná aktivita."
+      }
+    }
+  }
+}

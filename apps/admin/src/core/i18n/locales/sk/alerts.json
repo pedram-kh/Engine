@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Provozní upozornění",
+      "subtitle": "Aktivita auditu a provozní oznámenia určená vám.",
+      "empty": "Žádná provozní upozornění.",
+      "load_failed": "Nepodařilo sa načíst provozní upozornění. Obnovte stránku.",
+      "paymentAlerts": {
+        "title": "Platební upozornění",
+        "body": "Upozornění na financování escrow a uvolnění sa aktivují po spuštění zpracování plateb (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Tvorcu schválen",
+          "rejected": "Tvorcu odmietnutý"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "compliance": {
+      "shellNotice": "Tato fronta je připravena, ale zatím nepřipojena k datům — zpracování exportu a smazání přijde v pozdějším sprintu.",
+      "load_failed": "Nepodařilo sa načíst tuto frontu. Obnovte stránku.",
+      "fields": {
+        "subject": "Subjekt údajů",
+        "status": "Stav",
+        "requested": "Požadováno"
+      },
+      "exports": {
+        "title": "Žádosti o export",
+        "subtitle": "Žádosti o přístup a přenositelnost od subjektů údajů (GDPR čl. 15/20).",
+        "empty": "Žádné žádosti o export."
+      },
+      "erasures": {
+        "title": "Fronta smazání",
+        "subtitle": "Žádosti o právo na zapomenutí čakajúci na overenie (GDPR čl. 17).",
+        "empty": "Žádné žádosti o smazání."
+      }
+    }
+  }
+}
