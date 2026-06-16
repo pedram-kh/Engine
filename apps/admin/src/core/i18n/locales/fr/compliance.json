@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "compliance": {
+      "shellNotice": "Cette file est prête mais n'est pas encore connectée aux données — le traitement des exportations et des effacements arrivera dans un sprint ultérieur.",
+      "load_failed": "Nous n'avons pas pu charger cette file. Veuillez actualiser.",
+      "fields": {
+        "subject": "Personne concernée",
+        "status": "Statut",
+        "requested": "Demandé"
+      },
+      "exports": {
+        "title": "Demandes d'exportation",
+        "subtitle": "Demandes d'accès et de portabilité des personnes concernées (RGPD art. 15/20).",
+        "empty": "Aucune demande d'exportation."
+      },
+      "erasures": {
+        "title": "File d'effacement",
+        "subtitle": "Demandes de droit à l'oubli en attente d'examen (RGPD art. 17).",
+        "empty": "Aucune demande d'effacement."
+      }
+    }
+  }
+}

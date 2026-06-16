@@ -1,0 +1,15 @@
+{
+  "impersonation": {
+    "claim": {
+      "in_progress": "Démarrage de la session d'emprunt d'identité…",
+      "missing_token": "Aucun jeton de transfert n'a été fourni. Relancez l'emprunt d'identité depuis le panneau d'administration.",
+      "invalid": "Ce transfert d'emprunt d'identité est invalide, déjà utilisé ou expiré. Relancez-le depuis le panneau d'administration.",
+      "failed": "Nous n'avons pas pu démarrer la session d'emprunt d'identité. Veuillez réessayer depuis le panneau d'administration."
+    },
+    "banner": {
+      "message": "Session d'assistance administrateur — vous consultez ce compte en tant qu'utilisateur.",
+      "expires_in": "Expire dans {time}",
+      "end": "Terminer la session"
+    }
+  }
+}

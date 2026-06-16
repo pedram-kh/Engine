@@ -1,0 +1,84 @@
+{
+  "availability": {
+    "title": "Disponibilité",
+    "subtitle": "Bloquez les créneaux où vous n'êtes pas disponible pour que les agences voient votre vrai calendrier.",
+    "allDay": "Toute la journée",
+    "moreCount": "+{count} de plus",
+    "dayPopover": {
+      "title": "Blocs de ce jour",
+      "viewAll": "Afficher tous les blocs de ce jour"
+    },
+    "creatorNav": {
+      "dashboard": "Tableau de bord",
+      "assignments": "Invitations",
+      "availability": "Disponibilité"
+    },
+    "nav": {
+      "prevMonth": "Mois précédent",
+      "nextMonth": "Mois suivant"
+    },
+    "actions": {
+      "add": "Ajouter un bloc"
+    },
+    "empty": {
+      "heading": "Aucun bloc de disponibilité pour le moment",
+      "body": "Ajoutez un bloc pour indiquer quand vous êtes absent ou indisponible."
+    },
+    "errors": {
+      "loadFailed": "Nous n'avons pas pu charger votre disponibilité. Veuillez réessayer."
+    },
+    "blockType": {
+      "hard": "Indisponible (strict)",
+      "soft": "Préférence (souple)"
+    },
+    "kind": {
+      "vacation": "Vacances",
+      "personal": "Personnel",
+      "exclusive_contract": "Contrat exclusif",
+      "assignment_auto": "Depuis une campagne",
+      "other": "Autre"
+    },
+    "weekday": {
+      "MO": "Lun",
+      "TU": "Mar",
+      "WE": "Mer",
+      "TH": "Jeu",
+      "FR": "Ven",
+      "SA": "Sam",
+      "SU": "Dim"
+    },
+    "dialog": {
+      "createTitle": "Ajouter un bloc de disponibilité",
+      "editTitle": "Modifier le bloc de disponibilité",
+      "seriesNotice": "Ceci est un bloc récurrent — les modifications s'appliquent à toutes ses occurrences, pas seulement à ce jour.",
+      "blockTypeHint": "Les blocs stricts vous excluent entièrement ; les blocs souples ne sont qu'une préférence.",
+      "fields": {
+        "allDay": "Toute la journée",
+        "startDate": "Date de début",
+        "startTime": "Heure de début",
+        "endDate": "Date de fin",
+        "endTime": "Heure de fin",
+        "blockType": "Type",
+        "kind": "Motif",
+        "reason": "Note (facultatif)",
+        "recurring": "Se répète chaque semaine"
+      },
+      "recurrence": {
+        "interval": "Répéter tous les (semaines)",
+        "weekdays": "Ces jours-là",
+        "hasEnd": "Définir une date de fin",
+        "endsOn": "Se termine le"
+      },
+      "actions": {
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "confirmDelete": "Confirmer la suppression"
+      },
+      "errors": {
+        "saveFailed": "Nous n'avons pas pu enregistrer le bloc. Veuillez réessayer.",
+        "deleteFailed": "Nous n'avons pas pu supprimer le bloc. Veuillez réessayer."
+      }
+    }
+  }
+}

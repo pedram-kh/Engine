@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "operations": {
+      "health": {
+        "title": "État du système",
+        "heading": "État des services",
+        "load_failed": "Nous n'avons pas pu charger la sonde d'état. Veuillez actualiser.",
+        "status": {
+          "ok": "Sain",
+          "degraded": "Dégradé"
+        },
+        "checks": {
+          "database": "Base de données",
+          "cache": "Cache"
+        }
+      }
+    }
+  }
+}

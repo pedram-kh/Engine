@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Tableau de bord",
+      "load_failed": "Nous n'avons pas pu charger le tableau de bord. Veuillez actualiser.",
+      "kpi": {
+        "agencies_total": "Agences",
+        "agencies_suspended": "Agences suspendues",
+        "creators_pending_approval": "Approbations en attente",
+        "creators_pending_kyc": "File KYC",
+        "queue_pending": "Tâches en file d'attente",
+        "queue_failed": "Tâches échouées",
+        "open_disputes": "Litiges ouverts",
+        "failed_payments_today": "Paiements échoués aujourd'hui"
+      },
+      "activity": {
+        "heading": "Activité récente",
+        "empty": "Aucune activité récente."
+      }
+    }
+  }
+}

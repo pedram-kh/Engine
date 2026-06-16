@@ -1,0 +1,66 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "Recherche d'utilisateurs",
+        "subtitle": "Trouvez un utilisateur à consulter ou dont emprunter l'identité. L'identité des administrateurs de la plateforme ne peut pas être empruntée.",
+        "label": "Rechercher par nom, e-mail ou ULID",
+        "empty": "Aucun utilisateur ne correspond à cette recherche.",
+        "load_failed": "Nous n'avons pas pu rechercher les utilisateurs. Veuillez réessayer."
+      },
+      "impersonate": {
+        "button": "Emprunter l'identité",
+        "title": "Emprunter l'identité de {name}",
+        "warning": "Vous ouvrirez un nouvel onglet connecté EN TANT QUE cet utilisateur. Votre session d'administration reste active ici. Chaque action que vous effectuez est consignée au nom de cet utilisateur, avec vous enregistré comme l'usurpateur, et la session expire automatiquement.",
+        "reason_label": "Motif de l'emprunt d'identité",
+        "reason_hint": "Obligatoire, au moins {count} caractères. Consigné dans le journal d'audit.",
+        "confirm": "Démarrer l'emprunt d'identité",
+        "cancel": "Annuler",
+        "success": "Emprunt d'identité de {name} démarré dans un nouvel onglet.",
+        "failed": "Nous n'avons pas pu démarrer l'emprunt d'identité. Veuillez réessayer."
+      },
+      "impersonation_log": {
+        "title": "Journal d'emprunt d'identité",
+        "subtitle": "Toutes les sessions d'emprunt d'identité administrateur jamais démarrées, les plus récentes d'abord.",
+        "empty": "Aucune session d'emprunt d'identité ne correspond à ces filtres.",
+        "load_failed": "Nous n'avons pas pu charger le journal d'emprunt d'identité. Veuillez actualiser.",
+        "filters": {
+          "status": "Statut",
+          "search": "Administrateur ou utilisateur (nom, e-mail, ULID)",
+          "date_from": "Du",
+          "date_to": "Au",
+          "apply": "Appliquer"
+        },
+        "status_filter": {
+          "all": "Toutes",
+          "active": "Actives",
+          "ended": "Terminées",
+          "expired": "Expirées"
+        },
+        "statuses": {
+          "active": "Active",
+          "ended": "Terminée",
+          "expired": "Expirée"
+        },
+        "fields": {
+          "admin": "Administrateur",
+          "impersonated_user": "Utilisateur usurpé",
+          "reason": "Motif",
+          "status": "Statut",
+          "started_at": "Démarrée",
+          "ended_at": "Terminée"
+        },
+        "pagination": {
+          "prev": "Précédent",
+          "next": "Suivant"
+        }
+      }
+    },
+    "impersonation": {
+      "target_admin": "L'identité des administrateurs de la plateforme ne peut pas être empruntée.",
+      "target_self": "Vous ne pouvez pas emprunter votre propre identité.",
+      "already_active": "Vous avez déjà un emprunt d'identité actif. Terminez-le avant d'en démarrer un autre.",
+      "invalid_handoff": "Ce transfert d'emprunt d'identité est invalide, déjà utilisé ou expiré."
+    }
+  }
+}

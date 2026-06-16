@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Alertes opérationnelles",
+      "subtitle": "Notifications opérationnelles et d'activité d'audit qui vous sont adressées.",
+      "empty": "Aucune alerte opérationnelle.",
+      "load_failed": "Nous n'avons pas pu charger les alertes opérationnelles. Veuillez actualiser.",
+      "paymentAlerts": {
+        "title": "Alertes de paiement",
+        "body": "Les alertes de financement et de libération de l'entiercement s'activeront lors de la mise en place du traitement des paiements (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Créateur approuvé",
+          "rejected": "Créateur rejeté"
+        }
+      }
+    }
+  }
+}

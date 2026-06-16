@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Agences",
+        "search_label": "Rechercher des agences",
+        "load_failed": "Nous n'avons pas pu charger les agences. Veuillez actualiser.",
+        "empty": "Aucune agence ne correspond à ce filtre.",
+        "filters": {
+          "all": "Toutes",
+          "active": "Actives",
+          "suspended": "Suspendues"
+        },
+        "fields": {
+          "name": "Agence",
+          "status": "Statut",
+          "members": "Membres",
+          "tier": "Formule",
+          "created_at": "Créée"
+        },
+        "status_labels": {
+          "active": "Active",
+          "suspended": "Suspendue"
+        },
+        "view": "Voir l'agence"
+      },
+      "detail": {
+        "fallback_title": "Agence",
+        "load_failed": "Nous n'avons pas pu charger cette agence. Veuillez actualiser.",
+        "overview_heading": "Aperçu",
+        "suspension_heading": "Suspension",
+        "fields": {
+          "slug": "Slug",
+          "country": "Pays",
+          "tier": "Formule d'abonnement",
+          "subscription_status": "Statut de l'abonnement",
+          "members": "Membres",
+          "created_at": "Créée",
+          "suspended_at": "Suspendue le",
+          "suspended_reason": "Motif"
+        },
+        "active_state": "Cette agence est active. Ses utilisateurs peuvent se connecter normalement.",
+        "suspended_state": "Cette agence est suspendue. Tous ses utilisateurs sont bloqués pour la connexion."
+      },
+      "suspend": {
+        "button": "Suspendre l'agence",
+        "title": "Suspendre {name}",
+        "description": "Suspendre cette agence bloque la connexion de TOUS ses utilisateurs. Ceci est consigné dans le journal d'audit.",
+        "reason_label": "Motif de la suspension",
+        "reason_hint": "Obligatoire, au moins {count} caractères. Consigné dans le journal d'audit.",
+        "confirm": "Suspendre",
+        "cancel": "Annuler",
+        "success": "Agence suspendue.",
+        "failed": "Nous n'avons pas pu suspendre cette agence. Veuillez réessayer."
+      },
+      "reactivate": {
+        "button": "Réactiver l'agence",
+        "title": "Réactiver {name}",
+        "description": "Réactiver cette agence rétablit la connexion pour tous ses utilisateurs. Ceci est consigné dans le journal d'audit.",
+        "confirm": "Réactiver",
+        "cancel": "Annuler",
+        "success": "Agence réactivée.",
+        "failed": "Nous n'avons pas pu réactiver cette agence. Veuillez réessayer."
+      }
+    }
+  }
+}

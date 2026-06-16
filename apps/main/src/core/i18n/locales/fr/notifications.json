@@ -1,0 +1,63 @@
+{
+  "notifications": {
+    "center": {
+      "title": "Notifications",
+      "empty": "Vous êtes à jour.",
+      "markAll": "Tout marquer comme lu",
+      "viewAll": "Voir toutes les notifications",
+      "loading": "Chargement…",
+      "error": "Impossible de charger les notifications.",
+      "unreadBadgeLabel": "{count} notifications non lues",
+      "feedbackLabel": "Commentaires",
+      "reasonLabel": "Motif"
+    },
+    "page": {
+      "title": "Notifications",
+      "empty": "Vous n'avez pas encore de notifications."
+    },
+    "types": {
+      "assignment_draft_approved": "Votre brouillon pour {campaign_name} a été approuvé.",
+      "assignment_revision_requested": "Des modifications ont été demandées sur votre brouillon pour {campaign_name}.",
+      "assignment_draft_rejected": "Votre brouillon pour {campaign_name} a été rejeté.",
+      "assignment_manually_verified": "Votre publication pour {campaign_name} a été vérifiée.",
+      "assignment_draft_submitted": "{creator_name} a soumis un brouillon pour {campaign_name}.",
+      "assignment_contracted": "{creator_name} a accepté le contrat pour {campaign_name}.",
+      "creator_approved": "Votre compte de créateur a été approuvé.",
+      "creator_rejected": "Votre candidature de créateur n'a pas été approuvée.",
+      "message_received_by_creator": "{sender_name} vous a envoyé un message à propos de {campaign_name}.",
+      "message_received_by_agency": "{sender_name} a envoyé un message à propos de {campaign_name}.",
+      "fallback": "Vous avez une nouvelle notification."
+    },
+    "preferences": {
+      "title": "Paramètres de notification",
+      "description": "Choisissez les notifications dans l'application que vous souhaitez recevoir.",
+      "menuItem": "Paramètres de notification",
+      "save": "Enregistrer les modifications",
+      "saving": "Enregistrement…",
+      "success": "Vos paramètres de notification ont été enregistrés.",
+      "loadError": "Impossible de charger vos paramètres de notification.",
+      "saveError": "Impossible d'enregistrer vos paramètres de notification. Veuillez réessayer.",
+      "groups": {
+        "assignment": "Missions",
+        "creator": "Compte de créateur",
+        "messaging": "Messages"
+      },
+      "channels": {
+        "in_app": "Dans l'application",
+        "digest": "Résumé quotidien par e-mail"
+      },
+      "typeLabels": {
+        "assignment_draft_submitted": "Un brouillon est soumis pour révision",
+        "assignment_contracted": "Un contrat est accepté",
+        "assignment_revision_requested": "Des modifications sont demandées sur un brouillon",
+        "assignment_draft_approved": "Un brouillon est approuvé",
+        "assignment_draft_rejected": "Un brouillon est rejeté",
+        "assignment_manually_verified": "Une publication est vérifiée",
+        "creator_approved": "Un compte de créateur est approuvé",
+        "creator_rejected": "Une candidature de créateur est refusée",
+        "message_received_by_creator": "Un nouveau message de l'agence",
+        "message_received_by_agency": "Un nouveau message du créateur"
+      }
+    }
+  }
+}

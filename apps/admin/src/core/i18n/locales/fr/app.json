@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Administration",
+    "subtitle": "Console de super-administration.",
+    "sprint0Notice": "Échafaudage Sprint 0 — SPA d'administration",
+    "dashboardPlaceholder": "Espace réservé au tableau de bord d'administration — la surface complète arrivera dans un sprint ultérieur.",
+    "env": {
+      "local": "Local",
+      "staging": "Préproduction",
+      "production": "Production — toutes les actions sont journalisées"
+    },
+    "nav": {
+      "comingSoon": "Bientôt",
+      "dashboard": "Tableau de bord",
+      "agencies": "Agences",
+      "creators": "Créateurs",
+      "creatorApprovals": "Approbations en attente",
+      "kycQueue": "File KYC",
+      "allCreators": "Tous les créateurs",
+      "payments": "Paiements",
+      "disputes": "Litiges",
+      "recentPayments": "Récents",
+      "audit": "Journal d'audit",
+      "alerts": "Alertes opérationnelles",
+      "support": "Support",
+      "userSearch": "Recherche d'utilisateurs",
+      "impersonationLog": "Journal d'emprunt d'identité",
+      "operations": "Opérations",
+      "systemHealth": "État du système",
+      "horizon": "Tâches en arrière-plan…",
+      "compliance": "Conformité",
+      "exportRequests": "Demandes d'exportation",
+      "erasureQueue": "File d'effacement",
+      "featureFlags": "Indicateurs de fonctionnalités"
+    },
+    "userMenu": {
+      "signOut": "Se déconnecter",
+      "signingOut": "Déconnexion…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Bientôt disponible",
+      "body": "Cette surface s'activera lors de la mise en place du traitement des paiements (Sprint 10).",
+      "disputes": "Litiges",
+      "recentPayments": "Paiements récents"
+    },
+    "sectionStub": {
+      "body": "Cette surface d'administration est en cours de construction durant ce sprint."
+    },
+    "locale": {
+      "switcher": "Langue",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Thème",
+        "light": "Clair",
+        "dark": "Sombre"
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "welcome": {
+      "greeting": "Bon retour",
+      "greetingNamed": "Bon retour, {name}"
+    },
+    "kpi": {
+      "activeCampaigns": "Campagnes actives",
+      "creatorsInRoster": "Créateurs dans le roster",
+      "pendingApplications": "Candidatures de créateurs en attente",
+      "paymentsDue": "Paiements dus"
+    },
+    "activity": {
+      "title": "Activité récente",
+      "empty": "Aucune activité récente pour le moment.",
+      "loadFailed": "Nous n'avons pas pu charger l'activité récente.",
+      "system": "Le système",
+      "actions": {
+        "creatorInvited": "{actor} a invité un créateur",
+        "bulkInviteCompleted": "{actor} a lancé une invitation groupée ({invited} invités, {failed} échecs)",
+        "agencyCreatorRelationCreated": "{actor} a ajouté un créateur au roster",
+        "brandCreated": "{actor} a créé une marque",
+        "brandArchived": "{actor} a archivé une marque",
+        "brandRestored": "{actor} a restauré une marque",
+        "invitationCreated": "{actor} a invité un membre de l'équipe",
+        "invitationAccepted": "{actor} a rejoint l'équipe",
+        "agencySettingsUpdated": "{actor} a mis à jour les paramètres de l'agence",
+        "fallback": "{actor} a effectué une action"
+      }
+    },
+    "errors": {
+      "loadFailed": "Nous n'avons pas pu charger votre tableau de bord. Veuillez réessayer."
+    }
+  }
+}

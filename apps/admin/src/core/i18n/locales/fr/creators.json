@@ -1,0 +1,228 @@
+{
+  "admin": {
+    "creators": {
+      "list": {
+        "title": "File de révision des créateurs",
+        "unnamed": "Créateur sans nom",
+        "view": "Voir le créateur",
+        "load_failed": "Nous n'avons pas pu charger la file de révision. Veuillez actualiser.",
+        "fields": {
+          "name": "Créateur",
+          "email": "E-mail",
+          "status": "Statut",
+          "kyc": "KYC",
+          "completeness": "Complétude",
+          "submitted_at": "Soumise"
+        },
+        "filters": {
+          "pending": "En attente",
+          "approved": "Approuvés",
+          "rejected": "Rejetés",
+          "incomplete": "Incomplets",
+          "all": "Tous"
+        },
+        "status_labels": {
+          "incomplete": "Incomplète",
+          "pending": "En attente",
+          "approved": "Approuvée",
+          "rejected": "Rejetée"
+        }
+      },
+      "kyc": {
+        "title": "File de révision KYC",
+        "empty": "Aucun créateur ne correspond à ce filtre KYC.",
+        "load_failed": "Nous n'avons pas pu charger la file KYC. Veuillez actualiser.",
+        "filters": {
+          "pending": "En attente",
+          "verified": "Vérifiés",
+          "rejected": "Rejetés",
+          "none": "Non commencée",
+          "all": "Tous"
+        }
+      },
+      "all": {
+        "title": "Tous les créateurs",
+        "empty": "Aucun créateur pour le moment.",
+        "load_failed": "Nous n'avons pas pu charger les créateurs. Veuillez actualiser."
+      },
+      "detail": {
+        "fallback_title": "Créateur",
+        "application_status": "Statut de la candidature : {status}",
+        "completeness": "{percent}% terminé",
+        "rejection_heading": "Notes de rejet",
+        "profile_heading": "Profil",
+        "social_heading": "Comptes sociaux",
+        "portfolio_heading": "Portfolio",
+        "onboarding_heading": "Statut de l'intégration",
+        "kyc_history_heading": "Historique de vérification KYC",
+        "kyc_history": {
+          "provider": "Fournisseur",
+          "status": "Statut",
+          "started_at": "Commencée le",
+          "completed_at": "Terminée le"
+        },
+        "assignments_heading": "Historique des campagnes",
+        "assignments": {
+          "empty": "Ce créateur n'a pas encore de missions de campagne.",
+          "load_failed": "Nous n'avons pas pu charger l'historique des campagnes.",
+          "campaign": "Campagne",
+          "brand": "Marque",
+          "agency": "Agence",
+          "status": "Statut",
+          "created_at": "Commencée"
+        },
+        "audit_heading": "Historique d'audit",
+        "audit": {
+          "empty": "Aucune entrée d'audit pour ce créateur pour le moment.",
+          "load_failed": "Nous n'avons pas pu charger l'historique d'audit.",
+          "action": "Action",
+          "actor": "Auteur",
+          "reason": "Motif",
+          "created_at": "Quand"
+        },
+        "payments_heading": "Historique des paiements",
+        "payments_coming_soon": "L'historique des paiements s'activera lors de la mise en place du traitement des paiements (Sprint 10).",
+        "load_failed": "Nous n'avons pas pu charger ce créateur. Veuillez actualiser.",
+        "fields": {
+          "display_name": "Nom d'affichage",
+          "bio": "Bio",
+          "country_code": "Pays",
+          "region": "Région",
+          "primary_language": "Langue principale",
+          "secondary_languages": "Langues secondaires",
+          "categories": "Catégories"
+        },
+        "edit": {
+          "title": "Modifier {field}",
+          "save": "Enregistrer les modifications",
+          "cancel": "Annuler",
+          "reason_label": "Motif de la modification",
+          "reason_hint": "Obligatoire pour les champs sensibles. Consigné dans le journal d'audit.",
+          "custom_code_hint": "Choisissez une valeur ou saisissez un code ISO à 2 lettres.",
+          "button_aria_label": "Modifier {field}",
+          "save_failed": "Nous n'avons pas pu enregistrer cette modification. Veuillez réessayer.",
+          "saved": "{field} mis à jour."
+        },
+        "errors": {
+          "field_status_immutable": "Les transitions de statut utilisent les actions d'approbation / de rejet, pas la modification de champ."
+        },
+        "approve": {
+          "button": "Approuver la candidature",
+          "title": "Approuver la candidature de {name}",
+          "description": "Ceci marquera le créateur comme approuvé et accordera l'accès à la production. L'action est consignée dans le journal d'audit.",
+          "welcome_label": "Message de bienvenue (facultatif)",
+          "welcome_hint": "Affiché sur le tableau de bord du créateur lors de sa prochaine connexion.",
+          "confirm": "Approuver",
+          "cancel": "Annuler",
+          "success": "Créateur approuvé.",
+          "failed": "Nous n'avons pas pu approuver ce créateur. Veuillez réessayer."
+        },
+        "reject": {
+          "button": "Rejeter la candidature",
+          "title": "Rejeter la candidature de {name}",
+          "description": "Le créateur verra le motif sur son tableau de bord lors de sa prochaine connexion.",
+          "reason_label": "Motif du rejet",
+          "min_hint": "Obligatoire, au moins {count} caractères.",
+          "confirm": "Rejeter",
+          "cancel": "Annuler",
+          "success": "Créateur rejeté.",
+          "failed": "Nous n'avons pas pu rejeter ce créateur. Veuillez réessayer."
+        },
+        "identity": {
+          "heading": "Vérification d'identité",
+          "status": "Statut : {status}",
+          "verify_manual": "Vérifier manuellement",
+          "verify_vendor": "Demander la vérification par le fournisseur",
+          "vendor_disabled_tooltip": "Aucun fournisseur KYC configuré",
+          "method_labels": {
+            "vendor": "Vérifiée par le fournisseur",
+            "manual": "Vérifiée manuellement par un administrateur"
+          }
+        },
+        "verify": {
+          "title": "Vérifier manuellement l'identité de {name}",
+          "description": "Ceci marque définitivement l'identité du créateur comme vérifiée et est consigné à votre nom dans le journal d'audit. À utiliser uniquement lorsque vous avez confirmé l'identité par un autre moyen.",
+          "note_label": "Note (facultatif)",
+          "note_hint": "Consignée dans le journal d'audit aux côtés de votre nom.",
+          "confirm": "Vérifier l'identité",
+          "cancel": "Annuler",
+          "success": "Identité vérifiée.",
+          "failed": "Nous n'avons pas pu vérifier l'identité de ce créateur. Veuillez réessayer."
+        }
+      }
+    }
+  },
+  "creator": {
+    "already_approved": "Ce créateur a déjà été approuvé.",
+    "already_rejected": "Ce créateur a déjà été rejeté.",
+    "kyc_not_verified": "L'approbation est bloquée jusqu'à ce que l'identité du créateur soit vérifiée.",
+    "kyc_already_verified": "L'identité de ce créateur a déjà été vérifiée.",
+    "admin": {
+      "field_status_immutable": "Les transitions de statut utilisent les actions d'approbation / de rejet, pas la modification de champ."
+    },
+    "ui": {
+      "wizard": {
+        "steps": {
+          "kyc": {
+            "name": "Vérification d'identité",
+            "status_labels": {
+              "none": "Non commencée",
+              "pending": "En cours",
+              "verified": "Vérifiée",
+              "rejected": "Rejetée",
+              "not_required": "Non requise"
+            }
+          },
+          "tax": {
+            "name": "Informations fiscales",
+            "status_complete": "Soumises",
+            "status_incomplete": "Pas encore soumises"
+          },
+          "payout": {
+            "name": "Méthode de versement",
+            "status_set": "Connecté",
+            "status_unset": "Non connecté"
+          },
+          "contract": {
+            "name": "Accord-cadre",
+            "status_labels": {
+              "signed": "Signé",
+              "click_through_accepted": "Accepté",
+              "none": "Non commencé"
+            }
+          },
+          "portfolio": {
+            "gallery_empty": "Aucun élément de portfolio téléversé pour le moment.",
+            "video_badge_label": "Vidéo",
+            "link_badge_label": "Lien externe",
+            "untitled_item": "Élément de portfolio sans titre"
+          }
+        },
+        "categories": {
+          "fashion": "Mode",
+          "beauty": "Beauté",
+          "lifestyle": "Style de vie",
+          "fitness": "Fitness",
+          "travel": "Voyage",
+          "food": "Cuisine",
+          "tech": "Technologie",
+          "gaming": "Jeux vidéo",
+          "music": "Musique",
+          "comedy": "Humour",
+          "education": "Éducation",
+          "parenting": "Parentalité",
+          "business": "Business",
+          "art": "Art",
+          "sports": "Sport",
+          "other": "Autre"
+        },
+        "social_platforms": {
+          "instagram": "Instagram",
+          "tiktok": "TikTok",
+          "youtube": "YouTube",
+          "coming_soon": "Bientôt disponible"
+        }
+      }
+    }
+  }
+}

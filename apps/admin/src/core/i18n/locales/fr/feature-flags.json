@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "featureFlags": {
+      "title": "Indicateurs de fonctionnalités",
+      "subtitle": "Interrupteurs d'activation/désactivation au niveau de la plateforme. Chaque bascule est auditée et prend effet immédiatement.",
+      "load_failed": "Nous n'avons pas pu charger les indicateurs de fonctionnalités. Veuillez actualiser.",
+      "toggle": {
+        "enable_title": "Activer {label} ?",
+        "disable_title": "Désactiver {label} ?",
+        "description": "Cela bascule l'indicateur à l'échelle de la plateforme et prend effet immédiatement. Un motif est requis et consigné dans le journal d'audit.",
+        "reason_label": "Motif",
+        "reason_hint": "Au moins {count} caractères — consigné avec cette bascule.",
+        "cancel": "Annuler",
+        "confirm": "Confirmer",
+        "success": "Indicateur de fonctionnalité mis à jour.",
+        "failed": "Nous n'avons pas pu mettre à jour l'indicateur. Veuillez réessayer."
+      }
+    }
+  }
+}

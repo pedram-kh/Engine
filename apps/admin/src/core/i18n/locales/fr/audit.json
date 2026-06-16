@@ -1,0 +1,27 @@
+{
+  "admin": {
+    "audit": {
+      "title": "Journal d'audit",
+      "empty": "Aucune entrée d'audit ne correspond à ces filtres.",
+      "load_failed": "Nous n'avons pas pu charger le journal d'audit. Veuillez actualiser.",
+      "filters": {
+        "action": "Action",
+        "subject": "ULID du sujet",
+        "date_from": "Du",
+        "date_to": "Au",
+        "apply": "Appliquer"
+      },
+      "fields": {
+        "action": "Action",
+        "actor": "Auteur",
+        "subject": "Sujet",
+        "reason": "Motif",
+        "created_at": "Quand"
+      },
+      "pagination": {
+        "prev": "Précédent",
+        "next": "Suivant"
+      }
+    }
+  }
+}
