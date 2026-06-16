@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Engine C — Administraator",
+    "subtitle": "Super-admin console.",
+    "sprint0Notice": "Sprint 0 scaffolding — admin SPA",
+    "dashboardPlaceholder": "Administraator dashboard placeholder — full surface lands in a later sprint.",
+    "env": {
+      "local": "Local",
+      "staging": "Staging",
+      "production": "Production — all actions logged"
+    },
+    "nav": {
+      "comingSoon": "Soon",
+      "dashboard": "Juhtpaneel",
+      "agencies": "Agencies",
+      "creators": "Loojas",
+      "creatorApprovals": "Ootel approvals",
+      "kycQueue": "KYC queue",
+      "allCreators": "Kõik creators",
+      "payments": "Makses",
+      "disputes": "Disputes",
+      "recentPayments": "Recent",
+      "audit": "Auditilogi",
+      "alerts": "Operational alerts",
+      "support": "Tugi",
+      "userSearch": "User search",
+      "impersonationLog": "Teisena esinemine log",
+      "operations": "Toimingud",
+      "systemHealth": "System health",
+      "horizon": "Tagasiground jobs …",
+      "compliance": "Vastavus",
+      "exportRequests": "Export requests",
+      "erasureQueue": "Erasure queue",
+      "featureFlags": "Funktsioonilipud"
+    },
+    "userMenu": {
+      "signOut": "Logi välja",
+      "signingOut": "Signing out…"
+    },
+    "comingSoon": {
+      "defaultTitle": "Coming soon",
+      "body": "This surface lights up when payment processing ships (Sprint 10).",
+      "disputes": "Disputes",
+      "recentPayments": "Recent payments"
+    },
+    "sectionStub": {
+      "body": "This admin surface is being built this sprint."
+    },
+    "locale": {
+      "switcher": "Keel",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    }
+  }
+}

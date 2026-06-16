@@ -1,0 +1,67 @@
+{
+  "admin": {
+    "agencies": {
+      "list": {
+        "title": "Agencies",
+        "search_label": "Otsi agencies",
+        "load_failed": "We couldn't load agencies. Please refresh.",
+        "empty": "Ei agencies match this filter.",
+        "filters": {
+          "all": "Kõik",
+          "active": "Aktiivne",
+          "suspended": "Suspended"
+        },
+        "fields": {
+          "name": "Agentuur",
+          "status": "Olek",
+          "members": "Members",
+          "tier": "Tier",
+          "created_at": "Lood"
+        },
+        "status_labels": {
+          "active": "Aktiivne",
+          "suspended": "Suspended"
+        },
+        "view": "Vaata agency"
+      },
+      "detail": {
+        "fallback_title": "Agentuur",
+        "load_failed": "We couldn't load this agency. Please refresh.",
+        "overview_heading": "Ülevaade",
+        "suspension_heading": "Suspension",
+        "fields": {
+          "slug": "Slug",
+          "country": "Country",
+          "tier": "Subscription tier",
+          "subscription_status": "Subscription status",
+          "members": "Members",
+          "created_at": "Lood",
+          "suspended_at": "Suspended at",
+          "suspended_reason": "Reason"
+        },
+        "active_state": "This agency is active. Its users can sign in normally.",
+        "suspended_state": "This agency is suspended. Kõik of its users are blocked from signing in."
+      },
+      "suspend": {
+        "button": "Suspend agency",
+        "title": "Suspend {name}",
+        "description": "Suspending this agency blocks ALL of its users from signing in. This is recorded in the audit log.",
+        "reason_label": "Reason for suspension",
+        "reason_hint": "Kohustuslik, at least {count} characters. Recorded in the audit log.",
+        "confirm": "Suspend",
+        "cancel": "Tühista",
+        "success": "Agentuur suspended.",
+        "failed": "We couldn't suspend this agency. Please try again."
+      },
+      "reactivate": {
+        "button": "Reactivate agency",
+        "title": "Reactivate {name}",
+        "description": "Reactivating this agency restores sign-in for all of its users. This is recorded in the audit log.",
+        "confirm": "Reactivate",
+        "cancel": "Tühista",
+        "success": "Agentuur reactivated.",
+        "failed": "We couldn't reactivate this agency. Please try again."
+      }
+    }
+  }
+}

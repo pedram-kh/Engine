@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Influencer marketing, run like a real business.",
+    "sprint0Notice": "Sprint 0 scaffolding — main platform SPA",
+    "locale": {
+      "switcher": "Keel",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    },
+    "messaging": {
+      "title": "Sõnumid",
+      "you": "You",
+      "participant": "Participant",
+      "composePlaceholder": "Write a message…",
+      "send": "Saada",
+      "attachment": "Attachment",
+      "empty": "Ei messages yet. Start the conversation.",
+      "loadEarlier": "Load earlier messages",
+      "loadError": "We couldn't load this conversation. It will retry shortly.",
+      "sendError": "Your message couldn't be sent. Please try again.",
+      "attachmentUploadError": "An attachment failed to upload. Please try again.",
+      "closed": "This conversation is closed — the assignment is no longer active.",
+      "systemFallback": "The assignment was updated.",
+      "system": {
+        "assignment": {
+          "contracted": "The contract was signed — production can begin.",
+          "draft_submitted": "A draft was submitted for review.",
+          "draft_approved": "The draft was approved.",
+          "revision_requested": "Revisions were requested on the draft.",
+          "draft_rejected": "The draft was rejected.",
+          "posted_by_creator": "The creator marked the content as posted.",
+          "live_verified": "The live post was verified.",
+          "manually_verified": "The post was manually verified.",
+          "resubmit_requested": "A resubmission was requested.",
+          "payment_released": "Makse was released."
+        }
+      },
+      "rollup": {
+        "empty": "Ei message threads yet for this campaign.",
+        "noMessages": "Ei messages yet.",
+        "loadError": "We couldn't load the message threads."
+      }
+    },
+    "nav": {
+      "dashboard": "Juhtpaneel",
+      "roster": "My creators",
+      "discover": "Discover",
+      "pools": "Talent pools",
+      "brands": "Brands",
+      "campaigns": "Kampaanias",
+      "agencyUsers": "Team",
+      "settings": "Seaded"
+    },
+    "discover": {
+      "title": "Discover creators",
+      "subtitle": "Browse and search the global creator pool.",
+      "unnamed": "Unnamed creator",
+      "notConnected": "Eit connected",
+      "search": {
+        "label": "Otsi creators",
+        "placeholder": "Otsi by name or bio"
+      },
+      "filters": {
+        "country": "Country",
+        "language": "Keel",
+        "category": "Category"
+      },
+      "connection": {
+        "connected": "Connected",
+        "pending": "Request pending",
+        "declined": "Keeldud",
+        "notConnected": "Eit connected",
+        "sendRequest": "Saada request",
+        "requestAgain": "Request again",
+        "sent": "Request sent",
+        "reRequested": "Request sent again",
+        "alreadyPending": "A request is already pending",
+        "alreadyConnected": "This creator is already on your roster",
+        "error": "Couldn't send the request. Please try again."
+      },
+      "empty": {
+        "heading": "Ei creators yet",
+        "body": "Kinnitad creators will appear here as the pool grows."
+      },
+      "emptyFiltered": {
+        "heading": "Ei matches",
+        "body": "Ei creators match your filters. Try broadening your search."
+      },
+      "errors": {
+        "loadFailed": "Couldn't load creators. Please try again."
+      },
+      "detail": {
+        "back": "Tagasi to Discover",
+        "notFound": "This creator isn't available.",
+        "loadFailed": "Couldn't load this profile. Please try again.",
+        "viewInRoster": "Vaata in roster",
+        "sections": {
+          "profile": "Profiil",
+          "social": "Social accounts",
+          "portfolio": "Portfolio"
+        },
+        "social": {
+          "empty": "Ei social accounts linked."
+        },
+        "portfolio": {
+          "empty": "Ei portfolio üksused yet.",
+          "untitled": "Untitled item"
+        }
+      }
+    },
+    "roster": {
+      "title": "My creators",
+      "unnamed": "Unnamed creator",
+      "blacklisted": "Blacklisted",
+      "blacklist": {
+        "badge": {
+          "hard": "Blacklisted",
+          "soft": "Blacklist warning"
+        },
+        "openAction": "Blacklist creator",
+        "liftAction": "Remove blacklist",
+        "lifted": "Blacklist removed.",
+        "liftFailed": "Failed to remove the blacklist.",
+        "section": {
+          "title": "Blacklist",
+          "none": "This creator is not blacklisted by your agency."
+        },
+        "status": {
+          "hard": "Hard blacklisted — excluded from your discovery and blocked from connection requests.",
+          "soft": "Soft blacklisted — a warning only; the creator stays matchable."
+        },
+        "dialog": {
+          "title": "Blacklist creator",
+          "scopeLabel": "Scope",
+          "scope": {
+            "agency": "Entire agency",
+            "brand": "A specific brand"
+          },
+          "noRelationHint": "Agentuur-wide blacklisting requires a connected creator.",
+          "brandLabel": "Brand",
+          "typeLabel": "Type",
+          "type": {
+            "hard": "Hard — exclude from discovery and block requests",
+            "soft": "Soft — warn only, keep matchable"
+          },
+          "reasonLabel": "Reason",
+          "reasonPlaceholder": "Why is this creator being blacklisted? (kept private to your agency)",
+          "cancel": "Tühista",
+          "confirm": "Blacklist",
+          "success": "Looja blacklisted.",
+          "invalid": "Please complete the required fields.",
+          "failed": "Failed to blacklist the creator."
+        }
+      },
+      "fields": {
+        "name": "Name",
+        "email": "E-post",
+        "status": "Olek",
+        "applicationStatus": "Application",
+        "country": "Country",
+        "language": "Keel",
+        "categories": "Categories",
+        "rating": "Rating",
+        "campaigns": "Kampaanias"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Prospect",
+        "external": "External",
+        "pending_request": "Ootel request",
+        "declined": "Keeldud"
+      },
+      "applicationStatus": {
+        "incomplete": "Incomplete",
+        "pending": "Ootel",
+        "approved": "Kinnitad",
+        "rejected": "Lükka tagasied"
+      },
+      "search": {
+        "label": "Otsi creators",
+        "placeholder": "Otsi by name or bio"
+      },
+      "filters": {
+        "status": {
+          "all": "Kõik",
+          "roster": "Roster",
+          "prospect": "Prospect",
+          "external": "External",
+          "pending_request": "Ootel requests",
+          "declined": "Keeldud"
+        },
+        "country": "Country",
+        "language": "Keel",
+        "category": "Category",
+        "availability": {
+          "from": "Available from",
+          "to": "Available to"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Followers"
+        },
+        "engagement": {
+          "label": "Engagement rate"
+        },
+        "metrics": {
+          "tooltip": "Social metrics aren't connected yet."
+        }
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Ei creators yet",
+        "body": "Loojas you invite or engage will appear here across your roster, prospects, and external collaborators."
+      },
+      "emptyFiltered": {
+        "heading": "Ei creators match these filters",
+        "body": "Try clearing or changing a filter to see more of your creators."
+      },
+      "errors": {
+        "loadFailed": "Failed to load your creators. Please try again."
+      },
+      "detail": {
+        "back": "Tagasi to my creators",
+        "unnamed": "Unnamed creator",
+        "loadFailed": "We couldn't load this creator. Please try again.",
+        "notFound": "This creator isn't in your roster.",
+        "sections": {
+          "profile": "Profiil",
+          "rating": "Rating & notes",
+          "social": "Social accounts",
+          "metrics": "Social metrics",
+          "portfolio": "Portfolio",
+          "availability": "Kättesaadavus",
+          "campaigns": "Kampaania history"
+        },
+        "editor": {
+          "starLabel": "Rate {n} of 5",
+          "ratingUnset": "Eit rated",
+          "notesLabel": "Internal notes",
+          "notesPlaceholder": "Private notes about working with this creator (visible to your agency only).",
+          "notesEmpty": "Ei notes yet.",
+          "save": "Salvesta",
+          "saved": "Changes saved.",
+          "saveFailed": "We couldn't save your changes. Please try again."
+        },
+        "social": {
+          "empty": "Ei social accounts connected."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Social metrics will appear once accounts are connected",
+            "body": "Follower counts and engagement rates aren't available yet — they'll show here when the social integrations land."
+          }
+        },
+        "portfolio": {
+          "empty": "Ei portfolio üksused yet.",
+          "untitled": "Untitled portfolio item"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Ei availability blocks in this period",
+            "body": "This creator hasn't marked any unavailable time for the dates shown."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Ei campaign history yet",
+            "body": "Kampaanias you run with this creator will appear here."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Logi välja",
+      "signingOut": "Signing out…"
+    },
+    "workspaceSwitcher": {
+      "label": "Switch workspace",
+      "placeholder": "Select workspace"
+    },
+    "brands": {
+      "title": "Brands",
+      "actions": {
+        "create": "New brand",
+        "edit": "Muuda",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Salvesta brand",
+        "saving": "Saving…",
+        "backToList": "Tagasi to brands",
+        "backToDetail": "Tagasi to brand"
+      },
+      "fields": {
+        "name": "Brand name",
+        "slug": "Slug",
+        "description": "Description",
+        "industry": "Industry",
+        "websiteUrl": "Website URL",
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "status": "Olek"
+      },
+      "status": {
+        "active": "Aktiivne",
+        "archived": "Arhiveeritud",
+        "all": "Kõik"
+      },
+      "detail": {
+        "title": "Brand details"
+      },
+      "create": {
+        "title": "New brand",
+        "success": "Brand created successfully."
+      },
+      "edit": {
+        "title": "Muuda brand",
+        "success": "Brand updated successfully."
+      },
+      "archive": {
+        "confirmTitle": "Archive brand",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later.",
+        "confirm": "Archive",
+        "cancel": "Tühista",
+        "success": "Brand archived."
+      },
+      "restore": {
+        "confirmTitle": "Restore brand",
+        "confirmMessage": "Restore {name}? It will appear in the active brand list again.",
+        "confirm": "Restore",
+        "cancel": "Tühista",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Ei brands yet",
+        "body": "Loo your first brand to start managing influencer campaigns.",
+        "cta": "Loo brand"
+      },
+      "emptyFiltered": {
+        "heading": "Ei brands match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "loading": "Laadimine brands…",
+      "errors": {
+        "loadFailed": "Failed to load brands.",
+        "saveFailed": "Failed to save brand.",
+        "archiveFailed": "Failed to archive brand.",
+        "restoreFailed": "Failed to restore brand."
+      }
+    },
+    "campaigns": {
+      "title": "Kampaanias",
+      "actions": {
+        "create": "New campaign",
+        "save": "Loo campaign",
+        "saveSettings": "Salvesta settings",
+        "backToList": "Tagasi to campaigns"
+      },
+      "fields": {
+        "name": "Kampaania name",
+        "brand": "Brand",
+        "objective": "Objective",
+        "description": "Description",
+        "budget": "Budget",
+        "currency": "Valuuta",
+        "startsAt": "Start date",
+        "endsAt": "End date",
+        "targetCreatorCount": "Target creator count",
+        "deliverables": "Deliverables",
+        "deliverablesHint": "One deliverable per line (e.g. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Space or comma separated.",
+        "usageRights": "Usage rights",
+        "requiresContract": "Require a per-campaign contract",
+        "status": "Olek"
+      },
+      "objective": {
+        "awareness": "Awareness",
+        "engagement": "Engagement",
+        "conversion": "Conversion",
+        "ugc": "UGC",
+        "launch": "Launch"
+      },
+      "status": {
+        "all": "Kõik",
+        "draft": "Mustand",
+        "active": "Aktiivne",
+        "paused": "Paused",
+        "completed": "Lõpetatud",
+        "cancelled": "Tühistaled"
+      },
+      "filters": {
+        "brand": "Brand",
+        "startsFrom": "Starts from",
+        "startsTo": "Starts to"
+      },
+      "tabs": {
+        "overview": "Ülevaade",
+        "creators": "Loojas",
+        "board": "Board",
+        "drafts": "Mustands",
+        "payments": "Makses",
+        "messages": "Sõnumid",
+        "settings": "Seaded"
+      },
+      "create": {
+        "title": "New campaign"
+      },
+      "detail": {
+        "title": "Kampaania details"
+      },
+      "settings": {
+        "saved": "Kampaania settings saved."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Ei creators yet",
+          "body": "Kutsu creators to this campaign to get started."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Kõik drafts"
+        },
+        "empty": {
+          "heading": "Ei drafts yet",
+          "body": "Looja draft submissions will appear here once submitted."
+        },
+        "loadFailed": "We couldn't load drafts. Please try again.",
+        "submittedAt": "Esitated {date}"
+      },
+      "fees": {
+        "offered": "Offered",
+        "countered": "Countered"
+      },
+      "reinvite": {
+        "action": "Re-invite",
+        "title": "Re-invite creator",
+        "body": "They countered with {fee}. Re-offer at:",
+        "feeLabel": "New agreed fee ({currency})",
+        "cancel": "Tühista",
+        "submit": "Re-invite",
+        "success": "Re-invitation sent."
+      },
+      "contract": {
+        "attach": {
+          "action": "Issue contract",
+          "title": "Issue contract",
+          "body": "Attach contract terms for the creator to review and accept before they can submit a draft.",
+          "titleLabel": "Leping title",
+          "termsLabel": "Terms (markdown)",
+          "termsHint": "Provide inline terms and/or upload a PDF below.",
+          "pdfLabel": "Leping PDF (optional)",
+          "pdfReady": "PDF ready: {name}",
+          "cancel": "Tühista",
+          "submit": "Issue contract",
+          "success": "Leping issued. The creator has been notified.",
+          "alreadyAttached": "A contract is already awaiting this creator's acceptance.",
+          "error": "We couldn't issue the contract. Please try again."
+        },
+        "pending": "Leping sent — awaiting creator",
+        "proceedWithout": {
+          "action": "Proceed without contract",
+          "success": "Ülesanne advanced without a contract.",
+          "requiredError": "This campaign requires a per-campaign contract; issue one for the creator to accept.",
+          "error": "We couldn't advance this assignment. Please try again."
+        }
+      },
+      "invite": {
+        "open": "Kutsu creators",
+        "title": "Kutsu creators",
+        "loadFailed": "We couldn't load your roster. Please try again.",
+        "feeLabel": "Agreed fee ({currency})",
+        "search": "Otsi creators",
+        "noRoster": "Ei roster creators to invite yet.",
+        "noSearchMatch": "Ei creators match your search.",
+        "unnamed": "Unnamed creator",
+        "blockedHint": "Blacklisted — can't be invited.",
+        "cancel": "Tühista",
+        "submit": "Kutsu ({count})",
+        "summary": "Kutsud {ok}. Skipped {blacklisted} (blacklisted), {conflicts} with conflicts.",
+        "conflict": {
+          "title": "Kättesaadavus conflict",
+          "body": "{count} selected creator(s) are unavailable during the campaign window. Kutsu them anyway?",
+          "cancel": "Skip them",
+          "proceed": "Kutsu anyway"
+        }
+      },
+      "board": {
+        "loadError": "We couldn't load the board. Please try again.",
+        "empty": "This board has no columns yet.",
+        "moveFailed": "Couldn't move the card — it's back where it was.",
+        "reorderFailed": "Couldn't reorder the columns — the order was restored.",
+        "automationsButton": "Automations",
+        "card": {
+          "unnamed": "Unnamed creator",
+          "removed": "Removed assignment",
+          "daysLeft": "{n}d left",
+          "dueToday": "Due today",
+          "overdue": "Overdue"
+        },
+        "column": {
+          "add": "Lisa column",
+          "edit": "Rename / recolor",
+          "delete": "Kustuta column",
+          "addTitle": "Lisa column",
+          "editTitle": "Muuda column",
+          "name": "Column name",
+          "color": "Color",
+          "terminalSuccess": "Mark as success (terminal)",
+          "terminalFailure": "Mark as failure (terminal)",
+          "save": "Salvesta",
+          "cancel": "Tühista",
+          "saveFailed": "We couldn't save the column. Please try again.",
+          "deleteTitle": "Kustuta column",
+          "deleteBody": "Kustuta \"{name}\"? This can't be undone.",
+          "deleteBodyNonEmpty": "\"{name}\" has {count} card(s). Choose where to move them before deleting.",
+          "deleteDestination": "Move cards to",
+          "deleteConfirm": "Kustuta",
+          "errorLastColumn": "A board must keep at least one column.",
+          "errorDestinationRequired": "This column has cards — choose a destination column to move them to before deleting.",
+          "errorGeneric": "We couldn't delete the column. Please try again."
+        },
+        "automation": {
+          "title": "Automations",
+          "subtitle": "Each event can move a card to a column automatically. Manual drags never trigger these.",
+          "event": "Event",
+          "target": "Moves card to",
+          "none": "Ei automation",
+          "enabled": "Enabled",
+          "broken": "Target column was deleted — pick a new one",
+          "updateFailed": "We couldn't update the automation. Please try again.",
+          "close": "Sulge"
+        },
+        "drawer": {
+          "title": "Ülesanne",
+          "close": "Sulge",
+          "loadError": "We couldn't load this assignment. Please try again.",
+          "tabs": {
+            "detail": "Detail",
+            "history": "Movement history"
+          },
+          "detail": {
+            "status": "Olek",
+            "creator": "Looja",
+            "postingDue": "Posting due",
+            "deliverables": "Deliverables",
+            "latestDraft": "Latest draft",
+            "postedContent": "Posted content",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Ei movements recorded yet.",
+            "removed": "(removed)",
+            "manual": "Manual move",
+            "auto": "Automation",
+            "from": "from",
+            "to": "to"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Makses coming soon",
+          "body": "Escrow funding and payouts will be managed here."
+        },
+        "messages": {
+          "heading": "Sõnumid coming soon",
+          "body": "Kampaania messaging will appear here."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Kutsud",
+        "declined": "Keeldud",
+        "countered": "Countered",
+        "accepted": "Nõustued",
+        "contracted": "Lepinged",
+        "producing": "Producing",
+        "draft_submitted": "Mustand submitted",
+        "revision_requested": "Revision requested",
+        "approved": "Kinnitad",
+        "rejected": "Lükka tagasied",
+        "posted": "Posted",
+        "live_verified": "Live verified",
+        "manually_verified": "Manually verified",
+        "payment_held": "Makse held",
+        "payment_released": "Makse released",
+        "cancelled": "Tühistaled"
+      },
+      "review": {
+        "action": "Review",
+        "title": "Review draft",
+        "loadFailed": "We couldn't load this draft. Please try again.",
+        "draftVersion": "Mustand v{n}",
+        "noCaption": "Ei caption provided.",
+        "hashtags": "Hashtags",
+        "mentions": "Mentions",
+        "noMedia": "Ei media attached.",
+        "feedbackLabel": "Feedback to the creator",
+        "feedbackHint": "Kohustuslik when requesting changes or rejecting.",
+        "approve": "Kinnita",
+        "requestRevision": "Request changes",
+        "reject": "Lükka tagasi",
+        "close": "Sulge",
+        "history": "Version history",
+        "postedContent": "Posted content",
+        "draftStatus": {
+          "pending": "Ootel review",
+          "approved": "Kinnitad",
+          "rejected": "Lükka tagasied",
+          "revision_requested": "Revision requested"
+        },
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Eit found",
+          "mismatch": "Mismatch"
+        },
+        "simulated": "Simulated verification (mock provider)",
+        "toast": {
+          "approved": "Mustand approved.",
+          "revisionRequested": "Revision requested.",
+          "rejected": "Mustand rejected.",
+          "error": "Something went wrong. Please try again."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Open preview",
+          "close": "Sulge",
+          "empty": "Ei media attached."
+        }
+      },
+      "resolution": {
+        "action": "Resolve",
+        "title": "Resolve verification",
+        "loadFailed": "We couldn't load this assignment. Please try again.",
+        "postedContent": "Esitated post",
+        "simulated": "Simulated verification (mock provider)",
+        "intro": "Automatic verification of this post failed. Nõustu it manually, send it back for a fresh post, or ask the creator to fix the link in place.",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Eit found",
+          "mismatch": "Mismatch"
+        },
+        "noteLabel": "Reason / note to the creator",
+        "noteHint": "Kohustuslik when verifying manually; optional for resubmit requests.",
+        "manuallyVerify": "Verify manually",
+        "requestFresh": "Request fresh post",
+        "requestInPlace": "Ask to fix link",
+        "close": "Sulge",
+        "notActionable": "This assignment is no longer awaiting resolution.",
+        "toast": {
+          "verified": "Post manually verified.",
+          "resubmitFresh": "Sent back for a fresh post.",
+          "resubmitInPlace": "Asked the creator to fix the link.",
+          "error": "Something went wrong. Please try again."
+        }
+      },
+      "viewPost": {
+        "action": "Vaata post",
+        "title": "Posted content",
+        "loadFailed": "We couldn't load this post. Please try again.",
+        "empty": "The creator hasn't posted any content yet.",
+        "current": "Current",
+        "postedAt": "Posted",
+        "verifiedAt": "Verified",
+        "simulated": "Kinnitamine runs against a simulated provider in this environment.",
+        "close": "Sulge",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Eit found",
+          "mismatch": "Mismatch"
+        }
+      },
+      "empty": {
+        "heading": "Ei campaigns yet",
+        "body": "Loo your first campaign to start engaging creators.",
+        "cta": "Loo campaign"
+      },
+      "errors": {
+        "loadFailed": "Failed to load campaigns.",
+        "saveFailed": "Failed to save campaign."
+      }
+    },
+    "pools": {
+      "title": "Talent pools",
+      "agencyWide": "Agentuur-wide",
+      "actions": {
+        "create": "New pool",
+        "edit": "Muuda",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Salvesta pool",
+        "backToList": "Tagasi to talent pools",
+        "backToDetail": "Tagasi to pool"
+      },
+      "fields": {
+        "name": "Pool name",
+        "description": "Description",
+        "brand": "Brand",
+        "brandHint": "Valikuline — labels the pool for a brand's work. Leave blank for an agency-wide pool.",
+        "members": "Members"
+      },
+      "status": {
+        "active": "Aktiivne",
+        "archived": "Arhiveeritud",
+        "all": "Kõik"
+      },
+      "create": {
+        "title": "New talent pool"
+      },
+      "edit": {
+        "title": "Muuda talent pool"
+      },
+      "detail": {
+        "title": "Pool details",
+        "notFound": "This pool no longer exists.",
+        "membersHeading": "Members",
+        "membersEmpty": "Ei creators in this pool yet. Lisa creators from a creator's detail page.",
+        "memberCount": "{count} creators",
+        "unnamed": "Unnamed creator",
+        "remove": "Remove from pool",
+        "removed": "{name} removed from the pool."
+      },
+      "archive": {
+        "confirmTitle": "Archive pool",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later with its members intact.",
+        "confirm": "Archive",
+        "cancel": "Tühista"
+      },
+      "restore": {
+        "confirmTitle": "Restore pool",
+        "confirmMessage": "Restore {name}? It will appear in the active pool list again.",
+        "confirm": "Restore",
+        "cancel": "Tühista",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Ei talent pools yet",
+        "body": "Loo a pool to group creators for a brand or a campaign brief.",
+        "cta": "Loo pool"
+      },
+      "emptyFiltered": {
+        "heading": "Ei pools match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "picker": {
+        "openLabel": "Lisa to pool",
+        "title": "Lisa to talent pools",
+        "empty": "Ei talent pools yet. Loo one from the Talent pools page.",
+        "done": "Done",
+        "added": "Lisaed to {name}.",
+        "removed": "Removed from {name}.",
+        "loadFailed": "Failed to load talent pools.",
+        "toggleFailed": "Failed to update pool membership."
+      },
+      "addCreators": {
+        "open": "Lisa creators",
+        "title": "Lisa creators to this pool",
+        "search": "Otsi your roster",
+        "noRoster": "Your roster is empty. Lisa creators to your roster first.",
+        "allInPool": "Kõik your roster creators are already in this pool.",
+        "noSearchMatch": "Ei roster creators match your search.",
+        "cancel": "Tühista",
+        "add": "Lisa {count}",
+        "added": "{count} creators added to the pool.",
+        "loadFailed": "Failed to load your roster.",
+        "addFailed": "Failed to add creators to the pool.",
+        "confirmHard": {
+          "one": "{name} is blacklisted by your agency. Lisa them to this pool anyway?",
+          "many": "{count} selected creators are blacklisted by your agency ({names}). Lisa them anyway?"
+        }
+      },
+      "errors": {
+        "loadFailed": "Failed to load talent pools.",
+        "membersLoadFailed": "Failed to load pool members.",
+        "saveFailed": "Failed to save talent pool.",
+        "archiveFailed": "Failed to archive pool.",
+        "restoreFailed": "Failed to restore pool.",
+        "removeFailed": "Failed to remove creator from the pool."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Name",
+        "email": "E-post",
+        "role": "Roll",
+        "status": "Olek",
+        "joinedAt": "Joined"
+      },
+      "roles": {
+        "agency_admin": "Administraator",
+        "agency_manager": "Haldur",
+        "agency_staff": "Personal"
+      },
+      "status": {
+        "active": "Aktiivne",
+        "pending": "Ootel"
+      },
+      "members": {
+        "heading": "Current members"
+      },
+      "filters": {
+        "allRoles": "Kõik roles",
+        "allStatuses": "Kõik statuses"
+      },
+      "search": {
+        "label": "Otsi",
+        "placeholder": "Name or email"
+      },
+      "invitations": {
+        "heading": "Kutse history",
+        "columns": {
+          "email": "Kutsue",
+          "invitedAt": "Kutsud",
+          "invitedBy": "Kutsud by"
+        },
+        "status": {
+          "pending": "Ootel",
+          "accepted": "Nõustued",
+          "expired": "Expired"
+        },
+        "empty": "Ei invitations yet."
+      },
+      "invite": {
+        "button": "Kutsu user",
+        "title": "Kutsu a team member",
+        "fields": {
+          "email": "E-posti aadress",
+          "role": "Roll"
+        },
+        "submit": "Saada invitation",
+        "submitting": "Saadaing…",
+        "success": "Kutse sent to {email}.",
+        "errors": {
+          "failed": "Failed to send invitation."
+        }
+      },
+      "empty": {
+        "heading": "Ei team members",
+        "body": "Kutsu your first team member to get started."
+      },
+      "emptyFiltered": "Ei team members match your filter.",
+      "errors": {
+        "membersLoadFailed": "Failed to load team members.",
+        "invitationsLoadFailed": "Failed to load invitation history."
+      },
+      "loading": "Laadimine team…",
+      "bulkInviteCreators": {
+        "button": "Bulk-invite creators"
+      }
+    },
+    "bulkInvite": {
+      "title": "Bulk-invite creators",
+      "description": "Lae üles a CSV with an `email` column. Each row becomes a magic-link invitation. Other columns are accepted but ignored.",
+      "file": {
+        "label": "CSV file",
+        "hint": "5 MB / 1000 rows max. The only required column is `email`."
+      },
+      "softWarning": "{count} rows is a large batch — processing may take a few minutes.",
+      "preview": {
+        "heading": "Parsed rows ({count})",
+        "row": "Row",
+        "email": "E-post",
+        "errorCount": "{count} parse errors",
+        "errorHeading": "These rows will be skipped:",
+        "errorItem": "Row {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Saada invitations ({count})",
+        "reset": "Clear",
+        "startOver": "Saada another batch"
+      },
+      "status": {
+        "queued": "Queued — waiting to start",
+        "processing": "Processing invitations",
+        "complete": "Kõik done",
+        "failed": "Job failed"
+      },
+      "tracking": {
+        "progress": "{percent}% complete"
+      },
+      "timeout": {
+        "heading": "Still working on this",
+        "description": "Your invitations are taking longer than expected to process. You can try again or check back later.",
+        "retry": "Try again"
+      },
+      "complete": {
+        "heading": "Results",
+        "invited": "Kutsud",
+        "alreadyInvited": "Already invited",
+        "failed": "Failed",
+        "failureReason": "Reason"
+      },
+      "failed": {
+        "heading": "The bulk invitation job failed."
+      },
+      "errors": {
+        "submitFailed": "We couldn't submit the CSV. Please try again."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "You've been invited",
+        "joining": "You're being invited to join {agencyName} as {role}.",
+        "accept": "Nõustu invitation",
+        "accepting": "Nõustuing…",
+        "signInToContinue": "Logi sisse to accept this invitation",
+        "signIn": "Logi sisse",
+        "noAccount": "Don't have an account?",
+        "signUp": "Loo one now",
+        "success": "Tere tulemast to {agencyName}! You're now a {role}.",
+        "expired": {
+          "heading": "This invitation has expired",
+          "body": "Please contact your agency administrator to request a new invitation."
+        },
+        "alreadyAccepted": {
+          "heading": "Kutse already accepted",
+          "body": "This invitation has already been used. Logi sisse to access your workspace.",
+          "signIn": "Logi sisse"
+        },
+        "alreadyMember": {
+          "heading": "Already a member",
+          "body": "You are already a member of this workspace."
+        },
+        "emailMismatch": {
+          "heading": "Wrong account",
+          "body": "This invitation was sent to a different email address. Please sign in with the correct account."
+        },
+        "notFound": {
+          "heading": "Kutse not found",
+          "body": "This invitation link is invalid or has already been used."
+        },
+        "errors": {
+          "failed": "Failed to accept invitation."
+        }
+      }
+    },
+    "settings": {
+      "title": "Agentuur settings",
+      "fields": {
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "blacklistNotificationPolicy": "Eitify creators when blacklisted",
+        "blacklistNotificationPolicyHint": "When on, a creator is emailed if your agency blacklists them. The reason is never shared."
+      },
+      "save": "Salvesta settings",
+      "saving": "Saving…",
+      "success": "Seaded saved.",
+      "readOnly": "Only administrators can edit agency settings.",
+      "loading": "Laadimine settings…",
+      "errors": {
+        "loadFailed": "Failed to load settings.",
+        "saveFailed": "Failed to save settings."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "This field is required."
+  }
+}
