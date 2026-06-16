@@ -1,6 +1,6 @@
 # EU Locale Support (24) + Persistence — Review
 
-**Status:** Complete — all 24 EU locales generated, parity-green (48/48 FE+BE checks), `UI_LOCALES` flipped to 24. Awaiting architect review before merge.
+**Status:** Complete — all 9 stages done (S1–S9). 24 EU locales generated, parity-green (48/48 FE+BE checks), `UI_LOCALES` flipped to 24, shared format utility live across 21 call-sites. Awaiting architect review before merge.
 
 **Reviewed against:** the pre-kickoff i18n inventory; the approved sub-step plan (`.cursor/plans/eu_locale_support_+_persistence_790b68de.plan.md`) with the five locked answers (Q1–Q5) and the added S2b; `PROJECT-WORKFLOW.md` (chunk lifecycle + standards: constant-parity, source-inspection, break-revert claim-verification, SOT-allowlist discipline); `00-MASTER-ARCHITECTURE.md` §13; `CURSOR-INSTRUCTIONS.md` §10/§12.7; `02-CONVENTIONS.md` §3.7/§10.8; `docs/security/tenancy.md` §4.
 
@@ -12,18 +12,18 @@
 
 ## Sub-step ledger
 
-| Sub-step       | Title                                                                           | Status  |
-| -------------- | ------------------------------------------------------------------------------- | ------- |
-| S1             | Docs-first SOT updates + glossary                                               | Done    |
-| S2             | EU_LANGUAGES registry + UI_LOCALES + PHP enum + validation split + 5.25 parity  | Done    |
-| S2b            | Lazy on-demand locale loading (both SPAs)                                       | Done    |
-| S3             | CLDR pluralizationRules (vetted source) + category SOT + rules-correctness spec | Done    |
-| S4             | PATCH /me + /admin/me (locale-only, reject-unknown-422) + tenancy allowlist     | Done    |
-| S5             | Client persistence + boot hydration (server-wins) + pre-auth locale             | Done    |
-| S6 (severable) | SetLocale middleware + 2 mailables `->locale()` + MailLocalizationTest          | Done    |
-| S7             | Parity/placeholder/plural/rules specs (incl. backend lang/), green on 3         | Done    |
-| S8             | Generate 21 net-new locales x 3 roots; flip availableLocales to 24 last         | Done    |
-| S9 (severable) | Shared locale-aware currency/date util                                          | Pending |
+| Sub-step       | Title                                                                           | Status |
+| -------------- | ------------------------------------------------------------------------------- | ------ |
+| S1             | Docs-first SOT updates + glossary                                               | Done   |
+| S2             | EU_LANGUAGES registry + UI_LOCALES + PHP enum + validation split + 5.25 parity  | Done   |
+| S2b            | Lazy on-demand locale loading (both SPAs)                                       | Done   |
+| S3             | CLDR pluralizationRules (vetted source) + category SOT + rules-correctness spec | Done   |
+| S4             | PATCH /me + /admin/me (locale-only, reject-unknown-422) + tenancy allowlist     | Done   |
+| S5             | Client persistence + boot hydration (server-wins) + pre-auth locale             | Done   |
+| S6 (severable) | SetLocale middleware + 2 mailables `->locale()` + MailLocalizationTest          | Done   |
+| S7             | Parity/placeholder/plural/rules specs (incl. backend lang/), green on 3         | Done   |
+| S8             | Generate 21 net-new locales x 3 roots; flip availableLocales to 24 last         | Done   |
+| S9 (severable) | Shared locale-aware currency/date util                                          | Done   |
 
 Dependency: S2 -> S2b -> {S5, S7} -> S8. The risky `availableLocales` -> 24 flip is the LAST action of S8.
 
@@ -329,3 +329,32 @@ Every locale was committed incrementally, locale-by-locale, verified green by bo
 The `UiLocale` type automatically widens to `EuLanguage` (same union), so the `preferred_language` field in `types/user.ts` already accepted all 24 (it derives from `UiLocale`). The language switcher now offers all 24; `SetLocale` and `UpdateMeRequest` now accept all 24. The S7 architecture parity specs iterate `UI_LOCALES` — they now exercise all 24 on every CI run, so future drift in any of the 21 new locales will be caught automatically.
 
 **Done-gate (S8):** `node scripts/i18n/verify-locale.mjs bg hr cs da nl en et fi fr de el hu ga it lv lt mt pl pt ro sk sl es sv` → 24 PASS. `php scripts/i18n/verify-locale.php bg hr cs da nl en et fi fr de el hu ga it lv lt mt pl pt ro sk sl es sv` → 24 PASS. Pint + Prettier clean on all locale files and the two flipped source files.
+
+## S9 — Shared locale-aware currency/date utility (severable)
+
+**Motivation:** By the time the 21 new locales were added, the monorepo had accumulated ~15 duplicated inline date/currency helpers, two of which silently used `undefined` as the locale (falling back to the browser's OS locale rather than the user's stored preference), and eight admin helpers that passed no locale at all.
+
+**Deliverable:** `packages/api-client/src/format.ts` — three pure, framework-agnostic functions:
+
+| Function         | Signature                                                                                         | Behaviour                                                                                                                                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `formatCurrency` | `(minorAmount: number \| null, currency: string \| null \| undefined, locale: string, fallback?)` | `null` amount → fallback (`'—'`); no currency code → plain 2-dp number; valid ISO 4217 → `Intl.NumberFormat style:currency` (locale-native symbol placement); invalid code → graceful degradation. |
+| `formatDate`     | `(date: Date \| string, locale: string, opts?)`                                                   | Defaults to `{ dateStyle: 'medium' }`. Accepts `Date` objects directly (no `.toISOString()` burden on caller).                                                                                     |
+| `formatDateTime` | `(date: Date \| string \| null, locale: string, opts?, fallback?)`                                | Returns `'—'` for `null`; defaults to `{ dateStyle: 'medium', timeStyle: 'short' }`.                                                                                                               |
+
+All three delegate to `Intl.NumberFormat` / `Intl.DateTimeFormat`, which are the same ICU/CLDR engines used by `Intl.PluralRules` (the S3 SOT).
+
+**Spec:** `packages/api-client/src/format.spec.ts` — 21 tests covering null inputs, custom fallbacks, locale-native divergence (en vs de), `Date` object inputs, ground-truth assertions against the `Intl.*` engines, and a graceful-degradation smoke test for an invalid ISO 4217 code. 21/21 PASS.
+
+**Exports:** added to `packages/api-client/src/index.ts` so both SPAs consume from a single import.
+
+**Call-site migration:** 21 files updated across both SPAs (13 main, 8 admin). Local `formatDate` / `formatMoney` / `formatDateTime` / `formatSubmittedAt` / `rowTime` / `formatHistoryDate` helper functions were removed and replaced with the shared import. Where locale was missing from the `useI18n()` destructuring it was added (`const { t, locale } = useI18n()`).
+
+**Bugs fixed by the migration:**
+
+- `CampaignListPage` and `CampaignDetailPage` (main SPA): `toLocaleString(undefined, ...)` — silently rendering in the OS locale rather than the user's selected app locale.
+- `DashboardPage`, `AuditLogPage`, `ImpersonationLogPage`, `AgencyDetailPage`, `AgencyListPage`, `CreatorDetailPage`, `CreatorListPage`, `KycQueuePage` (admin SPA): `new Date(iso).toLocaleString()` — no locale argument at all.
+
+**Spec fixtures updated:** `CampaignDetailPage.spec.ts` and `ReinviteDialog.spec.ts` — assertions on the rendered fee string updated from `'1,000.00 EUR'` (old plain-number + code) to `'€1,000.00'` (Intl currency symbol, locale-native). `useLocalePreference.spec.ts` in both SPAs — the "unrenderable locale" sentinel changed from `'fr'` to `'ja'` (`fr` is now in `UI_LOCALES` after the S8e flip).
+
+**Done-gate (S9):** `@catalyst/api-client` full suite 187/187 PASS. Prettier clean on all 21 migrated call-sites. No linter errors.
