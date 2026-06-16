@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Deais",
+      "load_failed": "We couldn't load the dashboard. Please refresh.",
+      "kpi": {
+        "agencies_total": "Agencies",
+        "agencies_suspended": "Suspended agencies",
+        "creators_pending_approval": "Ar feitheamh approvals",
+        "creators_pending_kyc": "KYC queue",
+        "queue_pending": "Queued jobs",
+        "queue_failed": "Failed jobs",
+        "open_disputes": "Open disputes",
+        "failed_payments_today": "Failed payments today"
+      },
+      "activity": {
+        "heading": "Recent activity",
+        "empty": "Níl recent activity."
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "welcome": {
+      "greeting": "Fáilte back",
+      "greetingNamed": "Fáilte back, {name}"
+    },
+    "kpi": {
+      "activeCampaigns": "Gníomhach campaigns",
+      "creatorsInRoster": "Cruthaitheoirs in roster",
+      "pendingApplications": "Ar feitheamh creator applications",
+      "paymentsDue": "Íocaíochts due"
+    },
+    "activity": {
+      "title": "Recent activity",
+      "empty": "Níl recent activity yet.",
+      "loadFailed": "We couldn't load recent activity.",
+      "system": "The system",
+      "actions": {
+        "creatorInvited": "{actor} invited a creator",
+        "bulkInviteCompleted": "{actor} ran a bulk invite ({invited} invited, {failed} failed)",
+        "agencyCreatorRelationCreated": "{actor} added a creator to the roster",
+        "brandCreated": "{actor} created a brand",
+        "brandArchived": "{actor} archived a brand",
+        "brandRestored": "{actor} restored a brand",
+        "invitationCreated": "{actor} invited a team member",
+        "invitationAccepted": "{actor} joined the team",
+        "agencySettingsUpdated": "{actor} updated agency settings",
+        "fallback": "{actor} performed an action"
+      }
+    },
+    "errors": {
+      "loadFailed": "We couldn't load your dashboard. Please try again."
+    }
+  }
+}

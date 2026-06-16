@@ -1,0 +1,66 @@
+{
+  "admin": {
+    "support": {
+      "search": {
+        "title": "User search",
+        "subtitle": "Find a user to view or impersonate. Platform admins cannot be impersonated.",
+        "label": "Cuardaigh by name, email, or ULID",
+        "empty": "Níl users match this search.",
+        "load_failed": "We couldn't search users. Please try again."
+      },
+      "impersonate": {
+        "button": "Impersonate",
+        "title": "Impersonate {name}",
+        "warning": "You will open a new tab signed in AS this user. Your admin session stays active here. Every action you take is recorded against this user with you logged as the impersonator, and the session expires automatically.",
+        "reason_label": "Reason for impersonation",
+        "reason_hint": "Riachtanach, at least {count} characters. Recorded in the audit log.",
+        "confirm": "Start impersonation",
+        "cancel": "Cealaigh",
+        "success": "Pearsanú of {name} started in a new tab.",
+        "failed": "We couldn't start impersonation. Please try again."
+      },
+      "impersonation_log": {
+        "title": "Pearsanú log",
+        "subtitle": "Every admin impersonation session ever started, newest first.",
+        "empty": "Níl impersonation sessions match these filters.",
+        "load_failed": "We couldn't load the impersonation log. Please refresh.",
+        "filters": {
+          "status": "Stádas",
+          "search": "Riarthóir or user (name, email, ULID)",
+          "date_from": "From",
+          "date_to": "To",
+          "apply": "Apply"
+        },
+        "status_filter": {
+          "all": "Gach",
+          "active": "Gníomhach",
+          "ended": "Ended",
+          "expired": "Expired"
+        },
+        "statuses": {
+          "active": "Gníomhach",
+          "ended": "Ended",
+          "expired": "Expired"
+        },
+        "fields": {
+          "admin": "Riarthóir",
+          "impersonated_user": "Impersonated user",
+          "reason": "Reason",
+          "status": "Stádas",
+          "started_at": "Started",
+          "ended_at": "Ended"
+        },
+        "pagination": {
+          "prev": "Roimhe",
+          "next": "Ar aghaidh"
+        }
+      }
+    },
+    "impersonation": {
+      "target_admin": "Platform admins cannot be impersonated.",
+      "target_self": "You cannot impersonate yourself.",
+      "already_active": "You already have an active impersonation. End it before starting another.",
+      "invalid_handoff": "This impersonation hand-off is invalid, already used, or expired."
+    }
+  }
+}

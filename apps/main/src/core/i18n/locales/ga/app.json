@@ -1,0 +1,980 @@
+{
+  "app": {
+    "title": "Engine C",
+    "subtitle": "Influencer marketing, run like a real business.",
+    "sprint0Notice": "Sprint 0 scaffolding — main platform SPA",
+    "locale": {
+      "switcher": "Teanga",
+      "en": "English",
+      "pt": "Português",
+      "it": "Italiano"
+    },
+    "theme": {
+      "toggle": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    },
+    "messaging": {
+      "title": "Teachtaireachtaí",
+      "you": "You",
+      "participant": "Participant",
+      "composePlaceholder": "Write a message…",
+      "send": "Seol",
+      "attachment": "Attachment",
+      "empty": "Níl messages yet. Start the conversation.",
+      "loadEarlier": "Load earlier messages",
+      "loadError": "We couldn't load this conversation. It will retry shortly.",
+      "sendError": "Your message couldn't be sent. Please try again.",
+      "attachmentUploadError": "An attachment failed to upload. Please try again.",
+      "closed": "This conversation is closed — the assignment is no longer active.",
+      "systemFallback": "The assignment was updated.",
+      "system": {
+        "assignment": {
+          "contracted": "The contract was signed — production can begin.",
+          "draft_submitted": "A draft was submitted for review.",
+          "draft_approved": "The draft was approved.",
+          "revision_requested": "Revisions were requested on the draft.",
+          "draft_rejected": "The draft was rejected.",
+          "posted_by_creator": "The creator marked the content as posted.",
+          "live_verified": "The live post was verified.",
+          "manually_verified": "The post was manually verified.",
+          "resubmit_requested": "A resubmission was requested.",
+          "payment_released": "Íocaíocht was released."
+        }
+      },
+      "rollup": {
+        "empty": "Níl message threads yet for this campaign.",
+        "noMessages": "Níl messages yet.",
+        "loadError": "We couldn't load the message threads."
+      }
+    },
+    "nav": {
+      "dashboard": "Deais",
+      "roster": "My creators",
+      "discover": "Discover",
+      "pools": "Talent pools",
+      "brands": "Brands",
+      "campaigns": "Feachtass",
+      "agencyUsers": "Team",
+      "settings": "Socruithe"
+    },
+    "discover": {
+      "title": "Discover creators",
+      "subtitle": "Browse and search the global creator pool.",
+      "unnamed": "Unnamed creator",
+      "notConnected": "Nílt connected",
+      "search": {
+        "label": "Cuardaigh creators",
+        "placeholder": "Cuardaigh by name or bio"
+      },
+      "filters": {
+        "country": "Country",
+        "language": "Teanga",
+        "category": "Category"
+      },
+      "connection": {
+        "connected": "Connected",
+        "pending": "Request pending",
+        "declined": "Diúltaighd",
+        "notConnected": "Nílt connected",
+        "sendRequest": "Seol request",
+        "requestAgain": "Request again",
+        "sent": "Request sent",
+        "reRequested": "Request sent again",
+        "alreadyPending": "A request is already pending",
+        "alreadyConnected": "This creator is already on your roster",
+        "error": "Couldn't send the request. Please try again."
+      },
+      "empty": {
+        "heading": "Níl creators yet",
+        "body": "Faomhaighd creators will appear here as the pool grows."
+      },
+      "emptyFiltered": {
+        "heading": "Níl matches",
+        "body": "Níl creators match your filters. Try broadening your search."
+      },
+      "errors": {
+        "loadFailed": "Couldn't load creators. Please try again."
+      },
+      "detail": {
+        "back": "Ar ais to Discover",
+        "notFound": "This creator isn't available.",
+        "loadFailed": "Couldn't load this profile. Please try again.",
+        "viewInRoster": "Féach in roster",
+        "sections": {
+          "profile": "Próifíl",
+          "social": "Social accounts",
+          "portfolio": "Punann"
+        },
+        "social": {
+          "empty": "Níl social accounts linked."
+        },
+        "portfolio": {
+          "empty": "Níl portfolio míreanna yet.",
+          "untitled": "Untitled item"
+        }
+      }
+    },
+    "roster": {
+      "title": "My creators",
+      "unnamed": "Unnamed creator",
+      "blacklisted": "Blacklisted",
+      "blacklist": {
+        "badge": {
+          "hard": "Blacklisted",
+          "soft": "Blacklist warning"
+        },
+        "openAction": "Blacklist creator",
+        "liftAction": "Remove blacklist",
+        "lifted": "Blacklist removed.",
+        "liftFailed": "Failed to remove the blacklist.",
+        "section": {
+          "title": "Blacklist",
+          "none": "This creator is not blacklisted by your agency."
+        },
+        "status": {
+          "hard": "Hard blacklisted — excluded from your discovery and blocked from connection requests.",
+          "soft": "Soft blacklisted — a warning only; the creator stays matchable."
+        },
+        "dialog": {
+          "title": "Blacklist creator",
+          "scopeLabel": "Scope",
+          "scope": {
+            "agency": "Entire agency",
+            "brand": "A specific brand"
+          },
+          "noRelationHint": "Gníomhaireacht-wide blacklisting requires a connected creator.",
+          "brandLabel": "Brand",
+          "typeLabel": "Type",
+          "type": {
+            "hard": "Hard — exclude from discovery and block requests",
+            "soft": "Soft — warn only, keep matchable"
+          },
+          "reasonLabel": "Reason",
+          "reasonPlaceholder": "Why is this creator being blacklisted? (kept private to your agency)",
+          "cancel": "Cealaigh",
+          "confirm": "Blacklist",
+          "success": "Cruthaitheoir blacklisted.",
+          "invalid": "Please complete the required fields.",
+          "failed": "Failed to blacklist the creator."
+        }
+      },
+      "fields": {
+        "name": "Name",
+        "email": "Ríomhphost",
+        "status": "Stádas",
+        "applicationStatus": "Application",
+        "country": "Country",
+        "language": "Teanga",
+        "categories": "Categories",
+        "rating": "Rating",
+        "campaigns": "Feachtass"
+      },
+      "status": {
+        "roster": "Roster",
+        "prospect": "Prospect",
+        "external": "External",
+        "pending_request": "Ar feitheamh request",
+        "declined": "Diúltaighd"
+      },
+      "applicationStatus": {
+        "incomplete": "Incomplete",
+        "pending": "Ar feitheamh",
+        "approved": "Faomhaighd",
+        "rejected": "Diúltaighed"
+      },
+      "search": {
+        "label": "Cuardaigh creators",
+        "placeholder": "Cuardaigh by name or bio"
+      },
+      "filters": {
+        "status": {
+          "all": "Gach",
+          "roster": "Roster",
+          "prospect": "Prospect",
+          "external": "External",
+          "pending_request": "Ar feitheamh requests",
+          "declined": "Diúltaighd"
+        },
+        "country": "Country",
+        "language": "Teanga",
+        "category": "Category",
+        "availability": {
+          "from": "Available from",
+          "to": "Available to"
+        }
+      },
+      "affordances": {
+        "followers": {
+          "label": "Followers"
+        },
+        "engagement": {
+          "label": "Engagement rate"
+        },
+        "metrics": {
+          "tooltip": "Social metrics aren't connected yet."
+        }
+      },
+      "languages": {
+        "en": "English",
+        "pt": "Português",
+        "it": "Italiano",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch"
+      },
+      "empty": {
+        "heading": "Níl creators yet",
+        "body": "Cruthaitheoirs you invite or engage will appear here across your roster, prospects, and external collaborators."
+      },
+      "emptyFiltered": {
+        "heading": "Níl creators match these filters",
+        "body": "Try clearing or changing a filter to see more of your creators."
+      },
+      "errors": {
+        "loadFailed": "Failed to load your creators. Please try again."
+      },
+      "detail": {
+        "back": "Ar ais to my creators",
+        "unnamed": "Unnamed creator",
+        "loadFailed": "We couldn't load this creator. Please try again.",
+        "notFound": "This creator isn't in your roster.",
+        "sections": {
+          "profile": "Próifíl",
+          "rating": "Rating & notes",
+          "social": "Social accounts",
+          "metrics": "Social metrics",
+          "portfolio": "Punann",
+          "availability": "Infhaighteacht",
+          "campaigns": "Feachtas history"
+        },
+        "editor": {
+          "starLabel": "Rate {n} of 5",
+          "ratingUnset": "Nílt rated",
+          "notesLabel": "Internal notes",
+          "notesPlaceholder": "Private notes about working with this creator (visible to your agency only).",
+          "notesEmpty": "Níl notes yet.",
+          "save": "Sábháil",
+          "saved": "Changes saved.",
+          "saveFailed": "We couldn't save your changes. Please try again."
+        },
+        "social": {
+          "empty": "Níl social accounts connected."
+        },
+        "metrics": {
+          "empty": {
+            "heading": "Social metrics will appear once accounts are connected",
+            "body": "Follower counts and engagement rates aren't available yet — they'll show here when the social integrations land."
+          }
+        },
+        "portfolio": {
+          "empty": "Níl portfolio míreanna yet.",
+          "untitled": "Untitled portfolio item"
+        },
+        "availability": {
+          "empty": {
+            "heading": "Níl availability blocks in this period",
+            "body": "This creator hasn't marked any unavailable time for the dates shown."
+          }
+        },
+        "campaigns": {
+          "empty": {
+            "heading": "Níl campaign history yet",
+            "body": "Feachtass you run with this creator will appear here."
+          }
+        }
+      }
+    },
+    "userMenu": {
+      "signOut": "Sínigh amach",
+      "signingOut": "Signing out…"
+    },
+    "workspaceSwitcher": {
+      "label": "Switch workspace",
+      "placeholder": "Select workspace"
+    },
+    "brands": {
+      "title": "Brands",
+      "actions": {
+        "create": "New brand",
+        "edit": "Cuir in eagar",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Sábháil brand",
+        "saving": "Saving…",
+        "backToList": "Ar ais to brands",
+        "backToDetail": "Ar ais to brand"
+      },
+      "fields": {
+        "name": "Brand name",
+        "slug": "Slug",
+        "description": "Description",
+        "industry": "Industry",
+        "websiteUrl": "Website URL",
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "status": "Stádas"
+      },
+      "status": {
+        "active": "Gníomhach",
+        "archived": "Cartlannaithe",
+        "all": "Gach"
+      },
+      "detail": {
+        "title": "Brand details"
+      },
+      "create": {
+        "title": "New brand",
+        "success": "Brand created successfully."
+      },
+      "edit": {
+        "title": "Cuir in eagar brand",
+        "success": "Brand updated successfully."
+      },
+      "archive": {
+        "confirmTitle": "Archive brand",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later.",
+        "confirm": "Archive",
+        "cancel": "Cealaigh",
+        "success": "Brand archived."
+      },
+      "restore": {
+        "confirmTitle": "Restore brand",
+        "confirmMessage": "Restore {name}? It will appear in the active brand list again.",
+        "confirm": "Restore",
+        "cancel": "Cealaigh",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Níl brands yet",
+        "body": "Cruthaigh your first brand to start managing influencer campaigns.",
+        "cta": "Cruthaigh brand"
+      },
+      "emptyFiltered": {
+        "heading": "Níl brands match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "loading": "Á lódáil brands…",
+      "errors": {
+        "loadFailed": "Failed to load brands.",
+        "saveFailed": "Failed to save brand.",
+        "archiveFailed": "Failed to archive brand.",
+        "restoreFailed": "Failed to restore brand."
+      }
+    },
+    "campaigns": {
+      "title": "Feachtass",
+      "actions": {
+        "create": "New campaign",
+        "save": "Cruthaigh campaign",
+        "saveSettings": "Sábháil settings",
+        "backToList": "Ar ais to campaigns"
+      },
+      "fields": {
+        "name": "Feachtas name",
+        "brand": "Brand",
+        "objective": "Objective",
+        "description": "Description",
+        "budget": "Budget",
+        "currency": "Airgeadra",
+        "startsAt": "Start date",
+        "endsAt": "End date",
+        "targetCreatorCount": "Target creator count",
+        "deliverables": "Deliverables",
+        "deliverablesHint": "One deliverable per line (e.g. 1 Reel, 3 Stories).",
+        "hashtags": "Hashtags",
+        "hashtagsHint": "Space or comma separated.",
+        "usageRights": "Usage rights",
+        "requiresContract": "Require a per-campaign contract",
+        "status": "Stádas"
+      },
+      "objective": {
+        "awareness": "Awareness",
+        "engagement": "Engagement",
+        "conversion": "Conversion",
+        "ugc": "UGC",
+        "launch": "Launch"
+      },
+      "status": {
+        "all": "Gach",
+        "draft": "Dréacht",
+        "active": "Gníomhach",
+        "paused": "Paused",
+        "completed": "Críochnaithe",
+        "cancelled": "Cealaighled"
+      },
+      "filters": {
+        "brand": "Brand",
+        "startsFrom": "Starts from",
+        "startsTo": "Starts to"
+      },
+      "tabs": {
+        "overview": "Forbhreathnú",
+        "creators": "Cruthaitheoirs",
+        "board": "Board",
+        "drafts": "Dréachts",
+        "payments": "Íocaíochts",
+        "messages": "Teachtaireachtaí",
+        "settings": "Socruithe"
+      },
+      "create": {
+        "title": "New campaign"
+      },
+      "detail": {
+        "title": "Feachtas details"
+      },
+      "settings": {
+        "saved": "Feachtas settings saved."
+      },
+      "creators": {
+        "empty": {
+          "heading": "Níl creators yet",
+          "body": "Tabhair cuireadh creators to this campaign to get started."
+        }
+      },
+      "drafts": {
+        "filters": {
+          "all": "Gach drafts"
+        },
+        "empty": {
+          "heading": "Níl drafts yet",
+          "body": "Cruthaitheoir draft submissions will appear here once submitted."
+        },
+        "loadFailed": "We couldn't load drafts. Please try again.",
+        "submittedAt": "Cuir isteachted {date}"
+      },
+      "fees": {
+        "offered": "Offered",
+        "countered": "Countered"
+      },
+      "reinvite": {
+        "action": "Re-invite",
+        "title": "Re-invite creator",
+        "body": "They countered with {fee}. Re-offer at:",
+        "feeLabel": "New agreed fee ({currency})",
+        "cancel": "Cealaigh",
+        "submit": "Re-invite",
+        "success": "Re-invitation sent."
+      },
+      "contract": {
+        "attach": {
+          "action": "Issue contract",
+          "title": "Issue contract",
+          "body": "Attach contract terms for the creator to review and accept before they can submit a draft.",
+          "titleLabel": "Conradh title",
+          "termsLabel": "Terms (markdown)",
+          "termsHint": "Provide inline terms and/or upload a PDF below.",
+          "pdfLabel": "Conradh PDF (optional)",
+          "pdfReady": "PDF ready: {name}",
+          "cancel": "Cealaigh",
+          "submit": "Issue contract",
+          "success": "Conradh issued. The creator has been notified.",
+          "alreadyAttached": "A contract is already awaiting this creator's acceptance.",
+          "error": "We couldn't issue the contract. Please try again."
+        },
+        "pending": "Conradh sent — awaiting creator",
+        "proceedWithout": {
+          "action": "Proceed without contract",
+          "success": "Cúram advanced without a contract.",
+          "requiredError": "This campaign requires a per-campaign contract; issue one for the creator to accept.",
+          "error": "We couldn't advance this assignment. Please try again."
+        }
+      },
+      "invite": {
+        "open": "Tabhair cuireadh creators",
+        "title": "Tabhair cuireadh creators",
+        "loadFailed": "We couldn't load your roster. Please try again.",
+        "feeLabel": "Agreed fee ({currency})",
+        "search": "Cuardaigh creators",
+        "noRoster": "Níl roster creators to invite yet.",
+        "noSearchMatch": "Níl creators match your search.",
+        "unnamed": "Unnamed creator",
+        "blockedHint": "Blacklisted — can't be invited.",
+        "cancel": "Cealaigh",
+        "submit": "Tabhair cuireadh ({count})",
+        "summary": "Tabhair cuireadhd {ok}. Skipped {blacklisted} (blacklisted), {conflicts} with conflicts.",
+        "conflict": {
+          "title": "Infhaighteacht conflict",
+          "body": "{count} selected creator(s) are unavailable during the campaign window. Tabhair cuireadh them anyway?",
+          "cancel": "Skip them",
+          "proceed": "Tabhair cuireadh anyway"
+        }
+      },
+      "board": {
+        "loadError": "We couldn't load the board. Please try again.",
+        "empty": "This board has no columns yet.",
+        "moveFailed": "Couldn't move the card — it's back where it was.",
+        "reorderFailed": "Couldn't reorder the columns — the order was restored.",
+        "automationsButton": "Automations",
+        "card": {
+          "unnamed": "Unnamed creator",
+          "removed": "Removed assignment",
+          "daysLeft": "{n}d left",
+          "dueToday": "Due today",
+          "overdue": "Overdue"
+        },
+        "column": {
+          "add": "Cuir leis column",
+          "edit": "Rename / recolor",
+          "delete": "Scrios column",
+          "addTitle": "Cuir leis column",
+          "editTitle": "Cuir in eagar column",
+          "name": "Column name",
+          "color": "Color",
+          "terminalSuccess": "Mark as success (terminal)",
+          "terminalFailure": "Mark as failure (terminal)",
+          "save": "Sábháil",
+          "cancel": "Cealaigh",
+          "saveFailed": "We couldn't save the column. Please try again.",
+          "deleteTitle": "Scrios column",
+          "deleteBody": "Scrios \"{name}\"? This can't be undone.",
+          "deleteBodyNonEmpty": "\"{name}\" has {count} card(s). Choose where to move them before deleting.",
+          "deleteDestination": "Move cards to",
+          "deleteConfirm": "Scrios",
+          "errorLastColumn": "A board must keep at least one column.",
+          "errorDestinationRequired": "This column has cards — choose a destination column to move them to before deleting.",
+          "errorGeneric": "We couldn't delete the column. Please try again."
+        },
+        "automation": {
+          "title": "Automations",
+          "subtitle": "Each event can move a card to a column automatically. Manual drags never trigger these.",
+          "event": "Event",
+          "target": "Moves card to",
+          "none": "Níl automation",
+          "enabled": "Enabled",
+          "broken": "Target column was deleted — pick a new one",
+          "updateFailed": "We couldn't update the automation. Please try again.",
+          "close": "Dún"
+        },
+        "drawer": {
+          "title": "Cúram",
+          "close": "Dún",
+          "loadError": "We couldn't load this assignment. Please try again.",
+          "tabs": {
+            "detail": "Detail",
+            "history": "Movement history"
+          },
+          "detail": {
+            "status": "Stádas",
+            "creator": "Cruthaitheoir",
+            "postingDue": "Posting due",
+            "deliverables": "Deliverables",
+            "latestDraft": "Latest draft",
+            "postedContent": "Posted content",
+            "none": "—"
+          },
+          "history": {
+            "empty": "Níl movements recorded yet.",
+            "removed": "(removed)",
+            "manual": "Manual move",
+            "auto": "Automation",
+            "from": "from",
+            "to": "to"
+          }
+        }
+      },
+      "comingSoon": {
+        "payments": {
+          "heading": "Íocaíochts coming soon",
+          "body": "Escrow funding and payouts will be managed here."
+        },
+        "messages": {
+          "heading": "Teachtaireachtaí coming soon",
+          "body": "Feachtas messaging will appear here."
+        }
+      },
+      "assignmentStatus": {
+        "invited": "Tabhair cuireadhd",
+        "declined": "Diúltaighd",
+        "countered": "Countered",
+        "accepted": "Glaced",
+        "contracted": "Conradhed",
+        "producing": "Producing",
+        "draft_submitted": "Dréacht submitted",
+        "revision_requested": "Revision requested",
+        "approved": "Faomhaighd",
+        "rejected": "Diúltaighed",
+        "posted": "Posted",
+        "live_verified": "Live verified",
+        "manually_verified": "Manually verified",
+        "payment_held": "Íocaíocht held",
+        "payment_released": "Íocaíocht released",
+        "cancelled": "Cealaighled"
+      },
+      "review": {
+        "action": "Review",
+        "title": "Review draft",
+        "loadFailed": "We couldn't load this draft. Please try again.",
+        "draftVersion": "Dréacht v{n}",
+        "noCaption": "Níl caption provided.",
+        "hashtags": "Hashtags",
+        "mentions": "Mentions",
+        "noMedia": "Níl media attached.",
+        "feedbackLabel": "Feedback to the creator",
+        "feedbackHint": "Riachtanach when requesting changes or rejecting.",
+        "approve": "Faomhaigh",
+        "requestRevision": "Request changes",
+        "reject": "Diúltaigh",
+        "close": "Dún",
+        "history": "Version history",
+        "postedContent": "Posted content",
+        "draftStatus": {
+          "pending": "Ar feitheamh review",
+          "approved": "Faomhaighd",
+          "rejected": "Diúltaighed",
+          "revision_requested": "Revision requested"
+        },
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Nílt found",
+          "mismatch": "Mismatch"
+        },
+        "simulated": "Simulated verification (mock provider)",
+        "toast": {
+          "approved": "Dréacht approved.",
+          "revisionRequested": "Revision requested.",
+          "rejected": "Dréacht rejected.",
+          "error": "Something went wrong. Please try again."
+        },
+        "media": {
+          "video": "Video",
+          "preview": "Open preview",
+          "close": "Dún",
+          "empty": "Níl media attached."
+        }
+      },
+      "resolution": {
+        "action": "Resolve",
+        "title": "Resolve verification",
+        "loadFailed": "We couldn't load this assignment. Please try again.",
+        "postedContent": "Cuir isteachted post",
+        "simulated": "Simulated verification (mock provider)",
+        "intro": "Automatic verification of this post failed. Glac it manually, send it back for a fresh post, or ask the creator to fix the link in place.",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Nílt found",
+          "mismatch": "Mismatch"
+        },
+        "noteLabel": "Reason / note to the creator",
+        "noteHint": "Riachtanach when verifying manually; optional for resubmit requests.",
+        "manuallyVerify": "Verify manually",
+        "requestFresh": "Request fresh post",
+        "requestInPlace": "Ask to fix link",
+        "close": "Dún",
+        "notActionable": "This assignment is no longer awaiting resolution.",
+        "toast": {
+          "verified": "Post manually verified.",
+          "resubmitFresh": "Sent back for a fresh post.",
+          "resubmitInPlace": "Asked the creator to fix the link.",
+          "error": "Something went wrong. Please try again."
+        }
+      },
+      "viewPost": {
+        "action": "Féach post",
+        "title": "Posted content",
+        "loadFailed": "We couldn't load this post. Please try again.",
+        "empty": "The creator hasn't posted any content yet.",
+        "current": "Current",
+        "postedAt": "Posted",
+        "verifiedAt": "Verified",
+        "simulated": "Fíorú runs against a simulated provider in this environment.",
+        "close": "Dún",
+        "verification": {
+          "pending": "Awaiting verification",
+          "verified": "Verified",
+          "not_found": "Nílt found",
+          "mismatch": "Mismatch"
+        }
+      },
+      "empty": {
+        "heading": "Níl campaigns yet",
+        "body": "Cruthaigh your first campaign to start engaging creators.",
+        "cta": "Cruthaigh campaign"
+      },
+      "errors": {
+        "loadFailed": "Failed to load campaigns.",
+        "saveFailed": "Failed to save campaign."
+      }
+    },
+    "pools": {
+      "title": "Talent pools",
+      "agencyWide": "Gníomhaireacht-wide",
+      "actions": {
+        "create": "New pool",
+        "edit": "Cuir in eagar",
+        "archive": "Archive",
+        "restore": "Restore",
+        "save": "Sábháil pool",
+        "backToList": "Ar ais to talent pools",
+        "backToDetail": "Ar ais to pool"
+      },
+      "fields": {
+        "name": "Pool name",
+        "description": "Description",
+        "brand": "Brand",
+        "brandHint": "Roghnach — labels the pool for a brand's work. Leave blank for an agency-wide pool.",
+        "members": "Members"
+      },
+      "status": {
+        "active": "Gníomhach",
+        "archived": "Cartlannaithe",
+        "all": "Gach"
+      },
+      "create": {
+        "title": "New talent pool"
+      },
+      "edit": {
+        "title": "Cuir in eagar talent pool"
+      },
+      "detail": {
+        "title": "Pool details",
+        "notFound": "This pool no longer exists.",
+        "membersHeading": "Members",
+        "membersEmpty": "Níl creators in this pool yet. Cuir leis creators from a creator's detail page.",
+        "memberCount": "{count} creators",
+        "unnamed": "Unnamed creator",
+        "remove": "Remove from pool",
+        "removed": "{name} removed from the pool."
+      },
+      "archive": {
+        "confirmTitle": "Archive pool",
+        "confirmMessage": "Archive {name}? It will be hidden from the active list but can be restored later with its members intact.",
+        "confirm": "Archive",
+        "cancel": "Cealaigh"
+      },
+      "restore": {
+        "confirmTitle": "Restore pool",
+        "confirmMessage": "Restore {name}? It will appear in the active pool list again.",
+        "confirm": "Restore",
+        "cancel": "Cealaigh",
+        "success": "{name} restored."
+      },
+      "empty": {
+        "heading": "Níl talent pools yet",
+        "body": "Cruthaigh a pool to group creators for a brand or a campaign brief.",
+        "cta": "Cruthaigh pool"
+      },
+      "emptyFiltered": {
+        "heading": "Níl pools match your filter",
+        "body": "Try changing the status filter above."
+      },
+      "picker": {
+        "openLabel": "Cuir leis to pool",
+        "title": "Cuir leis to talent pools",
+        "empty": "Níl talent pools yet. Cruthaigh one from the Talent pools page.",
+        "done": "Done",
+        "added": "Cuir leised to {name}.",
+        "removed": "Removed from {name}.",
+        "loadFailed": "Failed to load talent pools.",
+        "toggleFailed": "Failed to update pool membership."
+      },
+      "addCreators": {
+        "open": "Cuir leis creators",
+        "title": "Cuir leis creators to this pool",
+        "search": "Cuardaigh your roster",
+        "noRoster": "Your roster is empty. Cuir leis creators to your roster first.",
+        "allInPool": "Gach your roster creators are already in this pool.",
+        "noSearchMatch": "Níl roster creators match your search.",
+        "cancel": "Cealaigh",
+        "add": "Cuir leis {count}",
+        "added": "{count} creators added to the pool.",
+        "loadFailed": "Failed to load your roster.",
+        "addFailed": "Failed to add creators to the pool.",
+        "confirmHard": {
+          "one": "{name} is blacklisted by your agency. Cuir leis them to this pool anyway?",
+          "many": "{count} selected creators are blacklisted by your agency ({names}). Cuir leis them anyway?"
+        }
+      },
+      "errors": {
+        "loadFailed": "Failed to load talent pools.",
+        "membersLoadFailed": "Failed to load pool members.",
+        "saveFailed": "Failed to save talent pool.",
+        "archiveFailed": "Failed to archive pool.",
+        "restoreFailed": "Failed to restore pool.",
+        "removeFailed": "Failed to remove creator from the pool."
+      }
+    },
+    "agencyUsers": {
+      "title": "Team",
+      "columns": {
+        "name": "Name",
+        "email": "Ríomhphost",
+        "role": "Ról",
+        "status": "Stádas",
+        "joinedAt": "Joined"
+      },
+      "roles": {
+        "agency_admin": "Riarthóir",
+        "agency_manager": "Bainisteoir",
+        "agency_staff": "Foireann"
+      },
+      "status": {
+        "active": "Gníomhach",
+        "pending": "Ar feitheamh"
+      },
+      "members": {
+        "heading": "Current members"
+      },
+      "filters": {
+        "allRoles": "Gach roles",
+        "allStatuses": "Gach statuses"
+      },
+      "search": {
+        "label": "Cuardaigh",
+        "placeholder": "Name or email"
+      },
+      "invitations": {
+        "heading": "Cuireadh history",
+        "columns": {
+          "email": "Tabhair cuireadhe",
+          "invitedAt": "Tabhair cuireadhd",
+          "invitedBy": "Tabhair cuireadhd by"
+        },
+        "status": {
+          "pending": "Ar feitheamh",
+          "accepted": "Glaced",
+          "expired": "Expired"
+        },
+        "empty": "Níl invitations yet."
+      },
+      "invite": {
+        "button": "Tabhair cuireadh user",
+        "title": "Tabhair cuireadh a team member",
+        "fields": {
+          "email": "Seoladh ríomhphoist",
+          "role": "Ról"
+        },
+        "submit": "Seol invitation",
+        "submitting": "Seoling…",
+        "success": "Cuireadh sent to {email}.",
+        "errors": {
+          "failed": "Failed to send invitation."
+        }
+      },
+      "empty": {
+        "heading": "Níl team members",
+        "body": "Tabhair cuireadh your first team member to get started."
+      },
+      "emptyFiltered": "Níl team members match your filter.",
+      "errors": {
+        "membersLoadFailed": "Failed to load team members.",
+        "invitationsLoadFailed": "Failed to load invitation history."
+      },
+      "loading": "Á lódáil team…",
+      "bulkInviteCreators": {
+        "button": "Bulk-invite creators"
+      }
+    },
+    "bulkInvite": {
+      "title": "Bulk-invite creators",
+      "description": "Uaslódáil a CSV with an `email` column. Each row becomes a magic-link invitation. Other columns are accepted but ignored.",
+      "file": {
+        "label": "CSV file",
+        "hint": "5 MB / 1000 rows max. The only required column is `email`."
+      },
+      "softWarning": "{count} rows is a large batch — processing may take a few minutes.",
+      "preview": {
+        "heading": "Parsed rows ({count})",
+        "row": "Row",
+        "email": "Ríomhphost",
+        "errorCount": "{count} parse errors",
+        "errorHeading": "These rows will be skipped:",
+        "errorItem": "Row {row}: {detail}"
+      },
+      "actions": {
+        "submit": "Seol invitations ({count})",
+        "reset": "Clear",
+        "startOver": "Seol another batch"
+      },
+      "status": {
+        "queued": "Queued — waiting to start",
+        "processing": "Processing invitations",
+        "complete": "Gach done",
+        "failed": "Job failed"
+      },
+      "tracking": {
+        "progress": "{percent}% complete"
+      },
+      "timeout": {
+        "heading": "Still working on this",
+        "description": "Your invitations are taking longer than expected to process. You can try again or check back later.",
+        "retry": "Try again"
+      },
+      "complete": {
+        "heading": "Results",
+        "invited": "Tabhair cuireadhd",
+        "alreadyInvited": "Already invited",
+        "failed": "Failed",
+        "failureReason": "Reason"
+      },
+      "failed": {
+        "heading": "The bulk invitation job failed."
+      },
+      "errors": {
+        "submitFailed": "We couldn't submit the CSV. Please try again."
+      }
+    },
+    "invitation": {
+      "accept": {
+        "title": "You've been invited",
+        "joining": "You're being invited to join {agencyName} as {role}.",
+        "accept": "Glac invitation",
+        "accepting": "Glacing…",
+        "signInToContinue": "Sínigh isteach to accept this invitation",
+        "signIn": "Sínigh isteach",
+        "noAccount": "Don't have an account?",
+        "signUp": "Cruthaigh one now",
+        "success": "Fáilte to {agencyName}! You're now a {role}.",
+        "expired": {
+          "heading": "This invitation has expired",
+          "body": "Please contact your agency administrator to request a new invitation."
+        },
+        "alreadyAccepted": {
+          "heading": "Cuireadh already accepted",
+          "body": "This invitation has already been used. Sínigh isteach to access your workspace.",
+          "signIn": "Sínigh isteach"
+        },
+        "alreadyMember": {
+          "heading": "Already a member",
+          "body": "You are already a member of this workspace."
+        },
+        "emailMismatch": {
+          "heading": "Wrong account",
+          "body": "This invitation was sent to a different email address. Please sign in with the correct account."
+        },
+        "notFound": {
+          "heading": "Cuireadh not found",
+          "body": "This invitation link is invalid or has already been used."
+        },
+        "errors": {
+          "failed": "Failed to accept invitation."
+        }
+      }
+    },
+    "settings": {
+      "title": "Gníomhaireacht settings",
+      "fields": {
+        "defaultCurrency": "Default currency",
+        "defaultLanguage": "Default language",
+        "blacklistNotificationPolicy": "Níltify creators when blacklisted",
+        "blacklistNotificationPolicyHint": "When on, a creator is emailed if your agency blacklists them. The reason is never shared."
+      },
+      "save": "Sábháil settings",
+      "saving": "Saving…",
+      "success": "Socruithe saved.",
+      "readOnly": "Only administrators can edit agency settings.",
+      "loading": "Á lódáil settings…",
+      "errors": {
+        "loadFailed": "Failed to load settings.",
+        "saveFailed": "Failed to save settings."
+      }
+    }
+  },
+  "validation": {
+    "field_required": "This field is required."
+  }
+}

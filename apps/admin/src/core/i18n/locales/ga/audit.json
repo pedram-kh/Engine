@@ -1,0 +1,27 @@
+{
+  "admin": {
+    "audit": {
+      "title": "Loga iniúchta",
+      "empty": "Níl audit entries match these filters.",
+      "load_failed": "We couldn't load the audit log. Please refresh.",
+      "filters": {
+        "action": "Action",
+        "subject": "Subject ULID",
+        "date_from": "From",
+        "date_to": "To",
+        "apply": "Apply"
+      },
+      "fields": {
+        "action": "Action",
+        "actor": "Actor",
+        "subject": "Subject",
+        "reason": "Reason",
+        "created_at": "When"
+      },
+      "pagination": {
+        "prev": "Roimhe",
+        "next": "Ar aghaidh"
+      }
+    }
+  }
+}

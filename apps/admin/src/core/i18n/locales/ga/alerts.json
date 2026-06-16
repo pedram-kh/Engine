@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "alerts": {
+      "title": "Operational alerts",
+      "subtitle": "Iniúchadh-activity and operational notifications addressed to you.",
+      "empty": "Níl operational alerts.",
+      "load_failed": "We couldn't load operational alerts. Please refresh.",
+      "paymentAlerts": {
+        "title": "Íocaíocht alerts",
+        "body": "Escrow funding and release alerts light up when payment processing ships (Sprint 10)."
+      },
+      "types": {
+        "creator": {
+          "approved": "Cruthaitheoir approved",
+          "rejected": "Cruthaitheoir rejected"
+        }
+      }
+    }
+  }
+}
