@@ -37,7 +37,7 @@ it('persists preferred_language and returns the updated resource on the main gua
         ->assertJsonPath('data.id', $user->ulid)
         ->assertJsonPath('data.attributes.preferred_language', 'pt');
 
-    expect($user->fresh()->preferred_language)->toBe('pt');
+    expect($user->fresh()?->preferred_language)->toBe('pt');
 });
 
 it('rejects an EU locale we do not render (fr) with a 422 envelope', function (): void {
@@ -48,7 +48,7 @@ it('rejects an EU locale we do not render (fr) with a 422 envelope', function ()
         ->patchJson('/api/v1/me', ['preferred_language' => 'fr'])
         ->assertEnvelopeValidationErrors(['preferred_language']);
 
-    expect($user->fresh()->preferred_language)->toBe('en');
+    expect($user->fresh()?->preferred_language)->toBe('en');
 });
 
 it('rejects an unknown locale code with a 422 envelope', function (): void {
@@ -86,6 +86,7 @@ it('is locale-only — other fields in the body are ignored', function (): void 
         ->assertOk();
 
     $fresh = $user->fresh();
+    assert($fresh !== null);
     expect($fresh->preferred_language)->toBe('it')
         ->and($fresh->name)->toBe('Original Name')
         ->and($fresh->email)->toBe('original@example.com');
@@ -108,7 +109,7 @@ it('updates preferred_language for a creator with no agency context', function (
         ->assertOk()
         ->assertJsonPath('data.attributes.preferred_language', 'pt');
 
-    expect($creator->fresh()->preferred_language)->toBe('pt')
+    expect($creator->fresh()?->preferred_language)->toBe('pt')
         ->and(app(TenancyContext::class)->hasAgency())->toBeFalse();
 });
 
@@ -121,7 +122,7 @@ it('updates preferred_language for an agency user without requiring tenant scopi
         ->patchJson('/api/v1/me', ['preferred_language' => 'it'])
         ->assertOk();
 
-    expect($user->fresh()->preferred_language)->toBe('it');
+    expect($user->fresh()?->preferred_language)->toBe('it');
 });
 
 // -----------------------------------------------------------------------------
@@ -139,7 +140,7 @@ it('persists preferred_language on the admin guard for an MFA-enrolled admin', f
         ->assertOk()
         ->assertJsonPath('data.attributes.preferred_language', 'pt');
 
-    expect($admin->fresh()->preferred_language)->toBe('pt')
+    expect($admin->fresh()?->preferred_language)->toBe('pt')
         ->and(app(TenancyContext::class)->hasAgency())->toBeFalse();
 });
 
