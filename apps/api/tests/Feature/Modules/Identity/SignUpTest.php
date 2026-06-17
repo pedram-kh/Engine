@@ -258,7 +258,7 @@ it('rejects an unsupported preferred_language', function (): void {
 
     $this->postJson('/api/v1/auth/sign-up', [
         ...VALID_PAYLOAD,
-        'preferred_language' => 'fr',
+        'preferred_language' => 'ja',
     ])->assertEnvelopeValidationErrors(['preferred_language']);
 });
 

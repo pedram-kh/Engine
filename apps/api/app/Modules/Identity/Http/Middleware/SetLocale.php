@@ -53,8 +53,13 @@ final class SetLocale
         }
 
         // Narrowed to UI_LOCALES, so the result is always renderable. With no
-        // (or no matching) `Accept-Language` header Symfony returns the first
-        // list entry — `en` — which is exactly the intended default.
-        return $request->getPreferredLanguage(Locale::UI_LOCALES) ?? 'en';
+        // (or no matching) `Accept-Language` header Symfony returns the FIRST
+        // list entry, so `en` must lead the candidate list to remain the
+        // default — UI_LOCALES is ordered alphabetically (bg first), not
+        // en-first. A header that genuinely matches another UI locale still
+        // wins over this leading default.
+        $candidates = array_values(array_unique(['en', ...Locale::UI_LOCALES]));
+
+        return $request->getPreferredLanguage($candidates) ?? 'en';
     }
 }

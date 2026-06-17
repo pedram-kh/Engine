@@ -150,9 +150,8 @@ it('accepts any of the 24 EU content languages as default_language', function ()
     $agency = Agency::factory()->createOne();
     $admin = User::factory()->agencyAdmin($agency)->createOne();
 
-    // 'fr' (French) is an EU content language that is not in UI_LOCALES —
-    // content-language fields validate against the full 24, not the
-    // rendered UI subset.
+    // 'fr' (French) is an EU content language — content-language fields
+    // validate against the full 24-language case set.
     $this->actingAs($admin)
         ->patchJson("/api/v1/agencies/{$agency->ulid}/settings", [
             'default_language' => 'fr',

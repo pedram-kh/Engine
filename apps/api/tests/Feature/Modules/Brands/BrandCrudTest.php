@@ -324,7 +324,7 @@ it('update accepts any of the 24 EU content languages as default_language', func
     ['agency' => $agency, 'user' => $user] = makeAdmin();
     $brand = Brand::factory()->forAgency($agency->id)->createOne();
 
-    // 'fr' is an EU content language outside the rendered UI subset.
+    // 'fr' is an EU content language — validated against the full 24.
     $this->actingAs($user)
         ->patchJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}", [
             'default_language' => 'fr',

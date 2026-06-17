@@ -66,8 +66,8 @@ it('falls back to a UI Accept-Language when the user has no renderable preferenc
 });
 
 it('ignores a preferred_language we cannot render and falls back', function (): void {
-    // `fr` is a valid EU content language but not a rendered UI locale.
-    $user = User::factory()->make(['preferred_language' => 'fr']);
+    // `ja` is not one of the 24 rendered UI locales.
+    $user = User::factory()->make(['preferred_language' => 'ja']);
 
     expect(localeResolvedBy($user, 'it'))->toBe('it');
     expect(localeResolvedBy($user, null))->toBe('en');
@@ -78,7 +78,7 @@ it('uses Accept-Language for an anonymous request', function (): void {
 });
 
 it('clamps a non-UI Accept-Language to the en default', function (): void {
-    expect(localeResolvedBy(null, 'fr'))->toBe('en');
+    expect(localeResolvedBy(null, 'ja'))->toBe('en');
 });
 
 it('defaults to en for an anonymous request with no Accept-Language', function (): void {

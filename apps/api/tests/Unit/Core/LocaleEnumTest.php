@@ -29,7 +29,11 @@ it('Locale catalogue pins the exact 24-language case set', function (): void {
 });
 
 it('UI_LOCALES is the rendered subset and is a subset of all cases', function (): void {
-    expect(Locale::uiValues())->toBe(['en', 'pt', 'it']);
+    expect(Locale::uiValues())->toBe([
+        'bg', 'hr', 'cs', 'da', 'nl', 'en', 'et', 'fi', 'fr', 'de',
+        'el', 'hu', 'ga', 'it', 'lv', 'lt', 'mt', 'pl', 'pt', 'ro',
+        'sk', 'sl', 'es', 'sv',
+    ]);
 
     foreach (Locale::uiValues() as $code) {
         expect(in_array($code, Locale::values(), true))->toBeTrue();

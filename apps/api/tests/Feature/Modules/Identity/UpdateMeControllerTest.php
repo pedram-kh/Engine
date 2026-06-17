@@ -40,12 +40,12 @@ it('persists preferred_language and returns the updated resource on the main gua
     expect($user->fresh()?->preferred_language)->toBe('pt');
 });
 
-it('rejects an EU locale we do not render (fr) with a 422 envelope', function (): void {
+it('rejects a locale we do not render (ja) with a 422 envelope', function (): void {
     /** @var User $user */
     $user = User::factory()->createOne(['preferred_language' => 'en']);
 
     $this->actingAs($user, 'web')
-        ->patchJson('/api/v1/me', ['preferred_language' => 'fr'])
+        ->patchJson('/api/v1/me', ['preferred_language' => 'ja'])
         ->assertEnvelopeValidationErrors(['preferred_language']);
 
     expect($user->fresh()?->preferred_language)->toBe('en');
