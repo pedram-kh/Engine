@@ -1,5 +1,7 @@
 import { describe, expect, it, afterEach } from 'vitest'
 
+import { UI_LOCALES } from '@catalyst/api-client'
+
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
 import AuthLayout from './AuthLayout.vue'
 
@@ -53,6 +55,6 @@ describe('AuthLayout', () => {
     const select = harness.wrapper.findComponent({ name: 'VSelect' })
     expect(select.exists()).toBe(true)
     const items = select.props('items') as Array<{ value: string; title: string }>
-    expect(new Set(items.map((i) => i.value))).toEqual(new Set(['en', 'pt', 'it']))
+    expect(new Set(items.map((i) => i.value))).toEqual(new Set(UI_LOCALES))
   })
 })

@@ -27,12 +27,12 @@ import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 
-const { t, locale, availableLocales } = useI18n()
+const { t, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
 const router = useRouter()
 const authStore = useAuthStore()
 const { user, isLoggingOut } = storeToRefs(authStore)
-const localeOptions = buildLocaleOptions(availableLocales, t)
+const localeOptions = buildLocaleOptions()
 const userMenuOpen = ref(false)
 
 /**

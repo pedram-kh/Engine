@@ -39,7 +39,7 @@ import { NAV_ENTRIES, isNavGroup, type NavBadgeKey, type NavLeaf } from '@/core/
  * and the admin needs every surface one glance away. */
 const openedGroups = ref<string[]>(NAV_ENTRIES.filter(isNavGroup).map((g) => g.key))
 
-const { t, locale, availableLocales } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
 const authStore = useAdminAuthStore()
 
@@ -49,7 +49,7 @@ const { creatorApprovals, kycQueue } = storeToRefs(navBadges)
 
 const banner = useDeployEnv()
 const { selectLocale } = useLocaleSwitch()
-const localeOptions = buildLocaleOptions(availableLocales, t)
+const localeOptions = buildLocaleOptions()
 
 const drawer = ref(true)
 const userMenuOpen = ref(false)

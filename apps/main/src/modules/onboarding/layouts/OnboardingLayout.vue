@@ -42,7 +42,7 @@ import AnimatedWizardChrome, { type WizardChromeStep } from '../components/Anima
 import { resolveStepStatus } from '../composables/useFeatureFlags'
 import { WIZARD_STEP_ROUTE_NAMES } from '../routes'
 
-const { t, locale, availableLocales } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
@@ -54,7 +54,7 @@ const { isBootstrapped, bootstrapStatus, creator, stepCompletion, flags, nextSte
 const { isLoggingOut } = storeToRefs(authStore)
 
 const { selectLocale } = useLocaleSwitch()
-const localeOptions = buildLocaleOptions(availableLocales, t)
+const localeOptions = buildLocaleOptions()
 const userMenuOpen = ref(false)
 
 const TOTAL_STEPS = 9

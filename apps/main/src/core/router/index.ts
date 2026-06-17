@@ -76,8 +76,7 @@ export function createRouter(
 
   r.beforeEach(async (to, from) => {
     const store = useAuthStore()
-    const result = await runGuards(to, from, store)
-    return result ?? true
+    return (await runGuards(to, from, store)) ?? true
   })
 
   return r

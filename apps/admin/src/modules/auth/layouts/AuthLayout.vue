@@ -23,11 +23,11 @@ import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import { buildLocaleOptions } from './localeOptions'
 
-const { t, locale, availableLocales } = useI18n()
+const { t, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
 const route = useRoute()
 
-const localeOptions = buildLocaleOptions(availableLocales, t)
+const localeOptions = buildLocaleOptions()
 const isHero = computed(() => route.name === 'auth.sign-in')
 </script>
 
