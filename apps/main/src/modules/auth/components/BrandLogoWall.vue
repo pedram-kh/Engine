@@ -20,25 +20,40 @@ import yonderLogo from '@/modules/auth/assets/brands/yonder.svg'
 import zoeLogo from '@/modules/auth/assets/brands/zoe.svg'
 
 /** Order mirrors the Figma frame: row 1 then row 2, left to right. */
-const brands: ReadonlyArray<{ name: string; src: string }> = [
-  { name: 'Perplexity', src: perplexityLogo },
-  { name: 'Huel', src: huelLogo },
-  { name: 'Bolt', src: boltLogo },
-  { name: 'Wild', src: wildLogo },
-  { name: 'Purdy & Figg', src: purdyFiggLogo },
-  { name: 'Zoe', src: zoeLogo },
-  { name: 'Canva', src: canvaLogo },
-  { name: 'Runna', src: runnaLogo },
-  { name: 'Yonder', src: yonderLogo },
-  { name: 'Granola', src: granolaLogo },
+const brands: ReadonlyArray<{ name: string; src: string; href: string }> = [
+  {
+    name: 'Perplexity',
+    src: perplexityLogo,
+    href: 'https://www.catalyst-growth.com/work/perplexity',
+  },
+  { name: 'Huel', src: huelLogo, href: 'https://www.catalyst-growth.com/work/huel' },
+  { name: 'Bolt', src: boltLogo, href: 'https://www.catalyst-growth.com/work/bolt-food' },
+  { name: 'Wild', src: wildLogo, href: 'https://www.catalyst-growth.com/work/wild' },
+  {
+    name: 'Purdy & Figg',
+    src: purdyFiggLogo,
+    href: 'https://www.catalyst-growth.com/work/purdy-figg',
+  },
+  { name: 'Zoe', src: zoeLogo, href: 'https://www.catalyst-growth.com/work/zoe' },
+  { name: 'Canva', src: canvaLogo, href: 'https://www.catalyst-growth.com/work/canva' },
+  { name: 'Runna', src: runnaLogo, href: 'https://www.catalyst-growth.com/work/runna' },
+  { name: 'Yonder', src: yonderLogo, href: 'https://www.catalyst-growth.com/work/yonder' },
+  { name: 'Granola', src: granolaLogo, href: 'https://www.catalyst-growth.com/work/granola-ai' },
 ]
 </script>
 
 <template>
   <div class="brand-wall" data-test="auth-brand-wall">
-    <div v-for="brand in brands" :key="brand.name" class="brand-wall__cell">
+    <a
+      v-for="brand in brands"
+      :key="brand.name"
+      :href="brand.href"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="brand-wall__cell"
+    >
       <img :src="brand.src" :alt="brand.name" class="brand-wall__logo" loading="lazy" />
-    </div>
+    </a>
   </div>
 </template>
 
@@ -57,6 +72,8 @@ const brands: ReadonlyArray<{ name: string; src: string }> = [
   aspect-ratio: 375.6 / 194.6;
   border-right: 1px solid var(--auth-cell-border);
   border-bottom: 1px solid var(--auth-cell-border);
+  cursor: pointer;
+  text-decoration: none;
 }
 
 .brand-wall__cell:hover {
