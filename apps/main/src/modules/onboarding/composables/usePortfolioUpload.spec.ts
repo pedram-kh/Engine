@@ -6,8 +6,11 @@ vi.mock('../api/onboarding.api', () => ({
   onboardingApi: {
     bootstrap: vi.fn(),
     uploadPortfolioImage: vi.fn(),
+    initiatePortfolioImageUpload: vi.fn(),
+    completePortfolioImageUpload: vi.fn(),
     initiatePortfolioVideoUpload: vi.fn(),
     completePortfolioVideoUpload: vi.fn(),
+    createPortfolioLink: vi.fn(),
     deletePortfolioItem: vi.fn(),
   },
 }))
@@ -49,6 +52,27 @@ function makeFile({
   return f
 }
 
+/** Default happy-path presign mocks for the image flow (init → PUT → complete). */
+function mockImageSuccess(): void {
+  vi.mocked(uploadToPresignedUrl).mockResolvedValue(undefined)
+  vi.mocked(onboardingApi.initiatePortfolioImageUpload).mockResolvedValue({
+    data: {
+      upload_id: 'img-u',
+      upload_url: 'https://s3/img-u',
+      storage_path: 'media/img-u',
+      expires_at: '2026-05-14T12:00:00+00:00',
+    },
+  })
+  vi.mocked(onboardingApi.completePortfolioImageUpload).mockImplementation(async (payload) => ({
+    data: {
+      id: `pid-${payload.upload_id}`,
+      kind: 'image',
+      s3_path: 'media/img-u',
+      position: 1,
+    },
+  }))
+}
+
 beforeEach(() => {
   setActivePinia(createPinia())
   vi.clearAllMocks()
@@ -61,16 +85,7 @@ beforeEach(() => {
       wizard: {} as never,
     },
   } as never)
-  vi.mocked(onboardingApi.uploadPortfolioImage).mockImplementation(async (file) => {
-    return {
-      data: {
-        id: `pid-${file.name}`,
-        kind: 'image',
-        s3_path: 'media/x',
-        position: 1,
-      },
-    }
-  })
+  mockImageSuccess()
 })
 
 describe('usePortfolioUpload', () => {
@@ -132,24 +147,38 @@ describe('usePortfolioUpload', () => {
   })
 
   describe('image uploads', () => {
-    it('uploads a single image through the direct-multipart endpoint', async () => {
+    it('uploads a single image through the presigned-PUT path (AH-004)', async () => {
       const { enqueue, items } = usePortfolioUpload()
       const item = enqueue(makeFile())
-      // The scheduler's synchronous prelude bumps status to
-      // 'uploading' before enqueue() returns (no microtask yield
-      // until the first await inside uploadOne); the externally
-      // visible journey is therefore pending → uploading → done.
+      // The scheduler's synchronous prelude bumps status to 'uploading'
+      // before enqueue() returns; the externally visible journey is
+      // pending → uploading → done.
       expect(item.status).toBe('uploading')
       await flushPromises()
       await flushPromises()
-      expect(onboardingApi.uploadPortfolioImage).toHaveBeenCalledTimes(1)
+
+      expect(onboardingApi.initiatePortfolioImageUpload).toHaveBeenCalledWith({
+        mime_type: 'image/jpeg',
+        declared_bytes: 1024,
+      })
+      expect(uploadToPresignedUrl).toHaveBeenCalledWith(
+        'https://s3/img-u',
+        expect.any(File),
+        expect.objectContaining({ onProgress: expect.any(Function) }),
+      )
+      expect(onboardingApi.completePortfolioImageUpload).toHaveBeenCalledWith(
+        expect.objectContaining({ upload_id: 'img-u', mime_type: 'image/jpeg', size_bytes: 1024 }),
+      )
+      // The legacy direct-multipart endpoint is no longer used for images.
+      expect(onboardingApi.uploadPortfolioImage).not.toHaveBeenCalled()
+
       const final = items.value[0]
       expect(final?.status).toBe('done')
-      expect(final?.portfolioId).toBe('pid-asset.jpg')
+      expect(final?.portfolioId).toBe('pid-img-u')
     })
 
-    it('marks status=error when the API rejects', async () => {
-      vi.mocked(onboardingApi.uploadPortfolioImage).mockRejectedValueOnce(new Error('boom'))
+    it('marks status=error when the complete call rejects', async () => {
+      vi.mocked(onboardingApi.completePortfolioImageUpload).mockRejectedValueOnce(new Error('boom'))
       const { enqueue, items } = usePortfolioUpload()
       enqueue(makeFile({ name: 'fail.jpg' }))
       await flushPromises()
@@ -162,13 +191,12 @@ describe('usePortfolioUpload', () => {
 
   describe('bounded concurrency', () => {
     it('runs no more than PORTFOLIO_CONCURRENCY uploads in flight', async () => {
-      // Use a deferred image-upload promise so we can inspect the
-      // in-flight count mid-flight.
+      // Hold the complete-call promise so we can inspect the in-flight count.
       const pendingResolvers: Array<() => void> = []
-      vi.mocked(onboardingApi.uploadPortfolioImage).mockImplementation(async (file) => {
+      vi.mocked(onboardingApi.completePortfolioImageUpload).mockImplementation(async (payload) => {
         await new Promise<void>((resolve) => pendingResolvers.push(resolve))
         return {
-          data: { id: `pid-${file.name}`, kind: 'image', s3_path: 'x', position: 1 },
+          data: { id: `pid-${payload.upload_id}`, kind: 'image', s3_path: 'x', position: 1 },
         }
       })
 
@@ -176,7 +204,6 @@ describe('usePortfolioUpload', () => {
       for (let i = 0; i < 5; i++) {
         enqueue(makeFile({ name: `f${i}.jpg` }))
       }
-      // Let the scheduler microtask the first batch.
       await flushPromises()
 
       expect(inFlightCount.value).toBe(PORTFOLIO_CONCURRENCY)
@@ -184,8 +211,6 @@ describe('usePortfolioUpload', () => {
         5 - PORTFOLIO_CONCURRENCY,
       )
 
-      // Drain — release each resolver and let the scheduler pick up
-      // the queued items.
       while (pendingResolvers.length > 0) {
         const next = pendingResolvers.shift()
         next?.()
@@ -199,14 +224,11 @@ describe('usePortfolioUpload', () => {
 
   describe('per-creator cap', () => {
     it('rejects enqueue past the per-creator cap with portfolio_max_reached', async () => {
-      // Hold the upload promises open so the items stay in
-      // `uploading` (counted against the cap) while we test the
-      // overflow branch.
       const heldResolvers: Array<() => void> = []
-      vi.mocked(onboardingApi.uploadPortfolioImage).mockImplementation(async (file) => {
+      vi.mocked(onboardingApi.completePortfolioImageUpload).mockImplementation(async (payload) => {
         await new Promise<void>((resolve) => heldResolvers.push(resolve))
         return {
-          data: { id: `pid-${file.name}`, kind: 'image', s3_path: 'x', position: 1 },
+          data: { id: `pid-${payload.upload_id}`, kind: 'image', s3_path: 'x', position: 1 },
         }
       })
 
@@ -215,12 +237,10 @@ describe('usePortfolioUpload', () => {
         enqueue(makeFile({ name: `f${i}.jpg` }))
       }
       await flushPromises()
-      // 11th item should be rejected as portfolio_max_reached.
       const overflow = enqueue(makeFile({ name: 'extra.jpg' }))
       expect(overflow.status).toBe('error')
       expect(overflow.errorKey).toBe('creator.ui.errors.portfolio_max_reached')
 
-      // Drain held uploads to clean up.
       while (heldResolvers.length > 0) {
         const next = heldResolvers.shift()
         next?.()
@@ -254,7 +274,11 @@ describe('usePortfolioUpload', () => {
         mime_type: 'video/mp4',
         declared_bytes: 5_000_000,
       })
-      expect(uploadToPresignedUrl).toHaveBeenCalledWith('https://s3/u-1', expect.any(File))
+      expect(uploadToPresignedUrl).toHaveBeenCalledWith(
+        'https://s3/u-1',
+        expect.any(File),
+        expect.objectContaining({ onProgress: expect.any(Function) }),
+      )
       expect(onboardingApi.completePortfolioVideoUpload).toHaveBeenCalledWith(
         expect.objectContaining({
           upload_id: 'u-1',
@@ -318,14 +342,63 @@ describe('usePortfolioUpload', () => {
     })
   })
 
+  describe('add link (AH-004 D9/D11)', () => {
+    it('creates a link and re-bootstraps, returning true', async () => {
+      const store = useOnboardingStore()
+      const bootstrapSpy = vi.spyOn(store, 'bootstrap').mockResolvedValue(undefined)
+      vi.mocked(onboardingApi.createPortfolioLink).mockResolvedValue({
+        data: { id: 'link-1', kind: 'link', s3_path: '', position: 1 },
+      } as never)
+
+      const { addLink } = usePortfolioUpload()
+      const ok = await addLink('https://example.com/reel', 'My reel')
+
+      expect(ok).toBe(true)
+      expect(onboardingApi.createPortfolioLink).toHaveBeenCalledWith({
+        external_url: 'https://example.com/reel',
+        title: 'My reel',
+      })
+      expect(bootstrapSpy).toHaveBeenCalled()
+    })
+
+    it('returns false (and does not call the API) when the cap is reached', async () => {
+      const store = useOnboardingStore()
+      store.creator = {
+        id: '01H',
+        type: 'creators',
+        attributes: {
+          portfolio: Array.from({ length: PORTFOLIO_MAX_ITEMS }, (_, i) => ({
+            id: `seed-${i}`,
+            kind: 'image',
+          })),
+        } as never,
+        wizard: {} as never,
+      } as never
+
+      const { addLink } = usePortfolioUpload()
+      const ok = await addLink('https://example.com/reel')
+
+      expect(ok).toBe(false)
+      expect(onboardingApi.createPortfolioLink).not.toHaveBeenCalled()
+    })
+
+    it('returns false when the create call rejects', async () => {
+      const store = useOnboardingStore()
+      vi.spyOn(store, 'bootstrap').mockResolvedValue(undefined)
+      vi.mocked(onboardingApi.createPortfolioLink).mockRejectedValue(new Error('boom'))
+
+      const { addLink } = usePortfolioUpload()
+      expect(await addLink('https://example.com/reel')).toBe(false)
+    })
+  })
+
   describe('remove', () => {
     it('removes a pending item without calling the backend', async () => {
-      // Hold the first upload so the second item stays pending.
       const heldResolvers: Array<() => void> = []
-      vi.mocked(onboardingApi.uploadPortfolioImage).mockImplementation(async (file) => {
+      vi.mocked(onboardingApi.completePortfolioImageUpload).mockImplementation(async (payload) => {
         await new Promise<void>((r) => heldResolvers.push(r))
         return {
-          data: { id: `pid-${file.name}`, kind: 'image', s3_path: 'x', position: 1 },
+          data: { id: `pid-${payload.upload_id}`, kind: 'image', s3_path: 'x', position: 1 },
         }
       })
 
@@ -345,7 +418,6 @@ describe('usePortfolioUpload', () => {
       expect(items.value.find((i) => i.id === pendingId)).toBeUndefined()
       expect(onboardingApi.deletePortfolioItem).not.toHaveBeenCalled()
 
-      // Drain held.
       while (heldResolvers.length > 0) {
         heldResolvers.shift()?.()
       }
@@ -368,7 +440,7 @@ describe('usePortfolioUpload', () => {
       if (id === undefined) throw new Error('expected id')
 
       await remove(id)
-      expect(onboardingApi.deletePortfolioItem).toHaveBeenCalledWith('pid-a.jpg')
+      expect(onboardingApi.deletePortfolioItem).toHaveBeenCalledWith('pid-img-u')
       expect(items.value).toHaveLength(0)
     })
   })
@@ -389,27 +461,29 @@ describe('usePortfolioUpload', () => {
     it('counts already-persisted portfolio items against the cap', () => {
       seedPersistedPortfolio(3)
       const { remainingSlots } = usePortfolioUpload()
-      // 10 cap − 3 persisted − 0 in-flight = 7 (not 9/10).
+      // cap − 3 persisted − 0 in-flight.
       expect(remainingSlots.value).toBe(PORTFOLIO_MAX_ITEMS - 3)
     })
 
     it('subtracts in-flight uploads on top of persisted items', async () => {
-      seedPersistedPortfolio(8)
+      seedPersistedPortfolio(PORTFOLIO_MAX_ITEMS - 2)
       const heldResolvers: Array<() => void> = []
-      vi.mocked(onboardingApi.uploadPortfolioImage).mockImplementation(async (file) => {
+      vi.mocked(onboardingApi.completePortfolioImageUpload).mockImplementation(async (payload) => {
         await new Promise<void>((r) => heldResolvers.push(r))
-        return { data: { id: `pid-${file.name}`, kind: 'image', s3_path: 'x', position: 1 } }
+        return {
+          data: { id: `pid-${payload.upload_id}`, kind: 'image', s3_path: 'x', position: 1 },
+        }
       })
 
       const { enqueue, remainingSlots } = usePortfolioUpload()
       enqueue(makeFile({ name: 'a.jpg' }))
       await flushPromises()
-      // 10 − 8 persisted − 1 uploading = 1 slot left.
+      // cap − (cap−2) persisted − 1 uploading = 1 slot left.
       expect(remainingSlots.value).toBe(1)
 
       enqueue(makeFile({ name: 'b.jpg' }))
       await flushPromises()
-      // Now full: 10 − 8 − 2 = 0.
+      // Now full.
       expect(remainingSlots.value).toBe(0)
 
       const overflow = enqueue(makeFile({ name: 'c.jpg' }))

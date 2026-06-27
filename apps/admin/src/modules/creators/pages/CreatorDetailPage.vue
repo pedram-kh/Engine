@@ -53,6 +53,7 @@ import {
   KycStatusBadge,
   LanguageList,
   PayoutMethodStatus,
+  PortfolioDrawer,
   PortfolioGallery,
   SocialAccountList,
   TaxProfileDisplay,
@@ -136,8 +137,12 @@ const portfolioItems = computed(() => {
     viewUrl: item.view_url,
     externalUrl: item.external_url,
     altText: item.title ?? t('creator.ui.wizard.steps.portfolio.untitled_item'),
+    processingStatus: item.processing_status,
+    downloadUrl: item.download_url,
   }))
 })
+
+const portfolioDrawerOpen = ref(false)
 
 const score = computed(() => creator.value?.attributes.profile_completeness_score ?? 0)
 const completenessLabel = computed(() =>
@@ -618,13 +623,41 @@ const decisionSnackbarColor = computed(() =>
       </section>
 
       <section class="admin-creator-detail__section">
-        <h2 class="text-h6">{{ t('admin.creators.detail.portfolio_heading') }}</h2>
+        <div class="d-flex align-center justify-space-between">
+          <h2 class="text-h6">{{ t('admin.creators.detail.portfolio_heading') }}</h2>
+          <v-btn
+            v-if="portfolioItems.length > 0"
+            variant="text"
+            size="small"
+            prepend-icon="mdi-view-gallery-outline"
+            data-testid="admin-creator-detail-portfolio-open-drawer"
+            @click="portfolioDrawerOpen = true"
+          >
+            {{ t('creator.ui.wizard.steps.portfolio.view_all_label') }}
+          </v-btn>
+        </div>
         <PortfolioGallery
           :items="portfolioItems"
           :editable="false"
           :empty-label="t('creator.ui.wizard.steps.portfolio.gallery_empty')"
           :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
           :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
+          :processing-label="t('creator.ui.wizard.steps.portfolio.processing_label')"
+          :failed-label="t('creator.ui.wizard.steps.portfolio.failed_label')"
+          :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
+        />
+        <PortfolioDrawer
+          v-model="portfolioDrawerOpen"
+          :items="portfolioItems"
+          :title="t('admin.creators.detail.portfolio_heading')"
+          :empty-label="t('creator.ui.wizard.steps.portfolio.gallery_empty')"
+          :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
+          :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
+          :preview-label="t('creator.ui.wizard.steps.portfolio.preview_label')"
+          :close-label="t('creator.ui.wizard.steps.portfolio.preview_close')"
+          :processing-label="t('creator.ui.wizard.steps.portfolio.processing_label')"
+          :failed-label="t('creator.ui.wizard.steps.portfolio.failed_label')"
+          :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
         />
       </section>
 

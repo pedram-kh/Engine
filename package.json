@@ -13,7 +13,7 @@
     "dev:api": "cd apps/api && php artisan serve --host=127.0.0.1 --port=8000",
     "dev:main": "pnpm --filter @catalyst/main dev",
     "dev:admin": "pnpm --filter @catalyst/admin dev",
-    "dev:queue": "cd apps/api && php artisan queue:work",
+    "dev:queue": "cd apps/api && php artisan queue:work --memory=768",
     "build": "pnpm -r --parallel build",
     "test": "pnpm test:backend && pnpm test:frontend",
     "test:backend": "cd apps/api && composer test",

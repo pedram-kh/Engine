@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfólió",
             "title": "Show your best work",
-            "description": "Feltöltés up to 10 elemek — videos, images, or external links — that represent your style.",
+            "description": "Feltöltés up to 30 elemek — videos, images, or external links — that represent your style.",
             "gallery_heading": "Your portfolio",
             "gallery_empty": "Nem portfolio elemek uploaded yet.",
             "gallery_remove": "Remove item",
@@ -81,7 +81,11 @@
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
             "preview_label": "Open preview",
-            "preview_close": "Bezárás preview"
+            "preview_close": "Bezárás preview",
+            "processing_label": "Feldolgozás…",
+            "failed_label": "A feltöltés sikertelen",
+            "download_label": "Letöltés",
+            "view_all_label": "Összes megtekintése"
           },
           "kyc": {
             "name": "Identity verification",
@@ -407,7 +411,13 @@
         "status_pending": "Waiting…",
         "status_uploading": "Feltöltésing…",
         "status_done": "Feltöltésed",
-        "status_error": "Failed"
+        "status_error": "Failed",
+        "add_link_prompt": "Vagy adjon hozzá egy hivatkozást a máshol elérhető munkájához",
+        "add_link_url_label": "Hivatkozás URL-címe",
+        "add_link_title_label": "Cím (nem kötelező)",
+        "add_link_button": "Hivatkozás hozzáadása",
+        "add_link_invalid": "Adjon meg egy érvényes http vagy https hivatkozást.",
+        "add_link_failed": "Nem sikerült hozzáadni a hivatkozást. Kérjük, próbálja újra."
       },
       "errors": {
         "upload_too_large": "This file is too large. The maximum size is {max_mb} MB.",

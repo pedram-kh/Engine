@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Show your best work",
-            "description": "Augšupielādēt up to 10 vienumi — videos, images, or external links — that represent your style.",
+            "description": "Augšupielādēt up to 30 vienumi — videos, images, or external links — that represent your style.",
             "gallery_heading": "Your portfolio",
             "gallery_empty": "Nē portfolio vienumi uploaded yet.",
             "gallery_remove": "Remove item",
@@ -81,7 +81,11 @@
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
             "preview_label": "Open preview",
-            "preview_close": "Aizvērt preview"
+            "preview_close": "Aizvērt preview",
+            "processing_label": "Apstrādā…",
+            "failed_label": "Augšupielāde neizdevās",
+            "download_label": "Lejupielādēt",
+            "view_all_label": "Skatīt visus"
           },
           "kyc": {
             "name": "Identity verification",
@@ -407,7 +411,13 @@
         "status_pending": "Waiting…",
         "status_uploading": "Augšupielādēting…",
         "status_done": "Augšupielādēted",
-        "status_error": "Failed"
+        "status_error": "Failed",
+        "add_link_prompt": "Vai pievienojiet saiti uz savu darbu citur",
+        "add_link_url_label": "Saites URL",
+        "add_link_title_label": "Nosaukums (neobligāts)",
+        "add_link_button": "Pievienot saiti",
+        "add_link_invalid": "Ievadiet derīgu http vai https saiti.",
+        "add_link_failed": "Neizdevās pievienot šo saiti. Lūdzu, mēģiniet vēlreiz."
       },
       "errors": {
         "upload_too_large": "This file is too large. The maximum size is {max_mb} MB.",

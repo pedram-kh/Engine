@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Modules\Agencies\Http\Resources;
 
 use App\Modules\Creators\Models\Creator;
-use App\Modules\Creators\Models\CreatorPortfolioItem;
 use App\Modules\Creators\Models\CreatorSocialAccount;
+use App\Modules\Creators\Support\PortfolioItemPresenter;
 use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -114,29 +114,10 @@ final class CreatorPublicProfileResource extends JsonResource
      */
     private function mapPortfolio(Creator $creator): array
     {
-        $items = $creator->relationLoaded('portfolioItems')
-            ? $creator->portfolioItems
-            : $creator->portfolioItems()->get();
-
-        return array_values(
-            $items
-                ->map(fn (CreatorPortfolioItem $item): array => [
-                    'id' => $item->ulid,
-                    'kind' => $item->kind->value,
-                    'title' => $item->title,
-                    'description' => $item->description,
-                    's3_path' => $item->s3_path,
-                    'view_url' => $this->signedViewUrl($item->s3_path),
-                    'external_url' => $item->external_url,
-                    'thumbnail_path' => $item->thumbnail_path,
-                    'thumbnail_view_url' => $this->signedViewUrl($item->thumbnail_path),
-                    'mime_type' => $item->mime_type,
-                    'size_bytes' => $item->size_bytes,
-                    'duration_seconds' => $item->duration_seconds,
-                    'position' => $item->position,
-                ])
-                ->all(),
-        );
+        // AH-004: shared presenter applies the server-authoritative `ready`-gate
+        // (signed URLs withheld for processing/failed items) uniformly across
+        // every portfolio surface.
+        return (new PortfolioItemPresenter)->mapForCreator($creator);
     }
 
     /**

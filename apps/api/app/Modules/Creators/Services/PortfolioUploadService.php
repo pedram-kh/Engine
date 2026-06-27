@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Creators\Services;
 
+use App\Modules\Creators\Jobs\ProcessPortfolioImageJob;
 use App\Modules\Creators\Models\Creator;
 use Aws\S3\S3Client;
 use Illuminate\Filesystem\AwsS3V3Adapter;
@@ -32,7 +33,9 @@ final class PortfolioUploadService
 
     public const int MAX_PRESIGNED_BYTES = 500 * 1024 * 1024; // 500MB
 
-    public const int MAX_ITEMS_PER_CREATOR = 10;
+    // AH-004 D8: 10 → 30 files/creator, uniform 500 MB ceiling for ALL file
+    // types (images now join the presigned-PUT path video already proved).
+    public const int MAX_ITEMS_PER_CREATOR = 30;
 
     /**
      * @var array<string, string>
@@ -104,12 +107,108 @@ final class PortfolioUploadService
         int $declaredBytes,
         string $namespace = 'portfolio',
     ): array {
-        $accepted = $this->acceptedMimeTypesFor($namespace);
+        // Preserve the original 'video' wording for the portfolio namespace
+        // (its contract test pins the message) — drafts use a namespace-
+        // accurate label since they also accept images.
+        $label = $namespace === 'drafts' ? 'draft' : 'video';
+
+        return $this->presign(
+            $creator,
+            $mimeType,
+            $declaredBytes,
+            $namespace,
+            $this->acceptedMimeTypesFor($namespace),
+            $label,
+        );
+    }
+
+    /**
+     * Initiate a presigned upload for a large portfolio IMAGE (ad-hoc AH-004
+     * Q5/D8). Same single-PUT mechanics + uniform 500 MB ceiling as video; the
+     * object lands under the `portfolio` prefix and is sanitised asynchronously
+     * by {@see ProcessPortfolioImageJob} after
+     * complete().
+     *
+     * @return array{upload_url: string, upload_id: string, storage_path: string, expires_at: string, max_bytes: int}
+     */
+    public function initiatePresignedImageUpload(
+        Creator $creator,
+        string $mimeType,
+        int $declaredBytes,
+    ): array {
+        return $this->presign(
+            $creator,
+            $mimeType,
+            $declaredBytes,
+            'portfolio',
+            self::ACCEPTED_IMAGE_MIME_TYPES,
+            'image',
+        );
+    }
+
+    /**
+     * Verify the presigned upload landed (object exists at the planned
+     * path) and return the path. Caller is responsible for creating
+     * the creator_portfolio_items row referencing this path.
+     *
+     * `$namespace` must match the value passed to
+     * {@see initiatePresignedUpload()} — the prefix check rejects a path that
+     * is not scoped under `creators/{ulid}/{namespace}/`, so a creator can
+     * neither inject another creator's path nor cross namespaces.
+     */
+    public function completePresignedUpload(Creator $creator, string $uploadId, string $namespace = 'portfolio'): string
+    {
+        // upload_id is the planned path; sanity-check that it's scoped
+        // under the creator's prefix to prevent cross-creator path
+        // injection.
+        $expectedPrefix = sprintf('creators/%s/%s/', $creator->ulid, $namespace);
+        if (! str_starts_with($uploadId, $expectedPrefix)) {
+            throw new RuntimeException('Upload ID does not belong to this creator.');
+        }
+
+        $disk = Storage::disk('media');
+        if (! $disk->exists($uploadId)) {
+            throw new RuntimeException('Uploaded object not found at the expected path.');
+        }
+
+        return $uploadId;
+    }
+
+    /**
+     * Delete stored objects for a removed portfolio item (AH-004). Cleans up
+     * the source AND thumbnail keys so a deleted item — including a `failed`
+     * one whose raw upload is unreachable behind the resource gate — never
+     * lingers as orphaned S3 storage. Null/blank paths (e.g. link items) are
+     * skipped.
+     */
+    public function deleteStoredObjects(?string ...$paths): void
+    {
+        $disk = Storage::disk('media');
+
+        foreach ($paths as $path) {
+            if (is_string($path) && $path !== '') {
+                $disk->delete($path);
+            }
+        }
+    }
+
+    /**
+     * Shared presigned-PUT mechanics. Validates the MIME against the supplied
+     * accepted set + the 500 MB ceiling, plans a per-creator-scoped key under
+     * `creators/{ulid}/{namespace}/`, and returns the presigned URL + upload-id.
+     *
+     * @param  array<string, string>  $accepted  MIME → extension map.
+     * @return array{upload_url: string, upload_id: string, storage_path: string, expires_at: string, max_bytes: int}
+     */
+    private function presign(
+        Creator $creator,
+        string $mimeType,
+        int $declaredBytes,
+        string $namespace,
+        array $accepted,
+        string $label,
+    ): array {
         if (! array_key_exists($mimeType, $accepted)) {
-            // Preserve the original 'video' wording for the portfolio
-            // namespace (its contract test pins the message) — drafts use a
-            // namespace-accurate label since they also accept images.
-            $label = $namespace === 'drafts' ? 'draft' : 'video';
             throw new RuntimeException("Unsupported {$label} MIME type: {$mimeType}.");
         }
 
@@ -159,34 +258,6 @@ final class PortfolioUploadService
             'expires_at' => now()->addMinutes(15)->toIso8601String(),
             'max_bytes' => self::MAX_PRESIGNED_BYTES,
         ];
-    }
-
-    /**
-     * Verify the presigned upload landed (object exists at the planned
-     * path) and return the path. Caller is responsible for creating
-     * the creator_portfolio_items row referencing this path.
-     *
-     * `$namespace` must match the value passed to
-     * {@see initiatePresignedUpload()} — the prefix check rejects a path that
-     * is not scoped under `creators/{ulid}/{namespace}/`, so a creator can
-     * neither inject another creator's path nor cross namespaces.
-     */
-    public function completePresignedUpload(Creator $creator, string $uploadId, string $namespace = 'portfolio'): string
-    {
-        // upload_id is the planned path; sanity-check that it's scoped
-        // under the creator's prefix to prevent cross-creator path
-        // injection.
-        $expectedPrefix = sprintf('creators/%s/%s/', $creator->ulid, $namespace);
-        if (! str_starts_with($uploadId, $expectedPrefix)) {
-            throw new RuntimeException('Upload ID does not belong to this creator.');
-        }
-
-        $disk = Storage::disk('media');
-        if (! $disk->exists($uploadId)) {
-            throw new RuntimeException('Uploaded object not found at the expected path.');
-        }
-
-        return $uploadId;
     }
 
     /**

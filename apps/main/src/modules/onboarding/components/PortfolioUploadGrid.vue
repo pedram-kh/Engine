@@ -31,9 +31,40 @@ import {
 } from '../composables/usePortfolioUpload'
 
 const { t } = useI18n()
-const { items, enqueue, remove, inFlightCount, remainingSlots } = usePortfolioUpload()
+const { items, enqueue, addLink, remove, inFlightCount, remainingSlots } = usePortfolioUpload()
 
 const isDragOver = ref(false)
+
+// ── Add-link affordance (AH-004 D9/D11) ──────────────────────────────────
+const linkUrl = ref('')
+const linkTitle = ref('')
+const linkError = ref<string | null>(null)
+const linkSubmitting = ref(false)
+
+function isHttpUrl(value: string): boolean {
+  return /^https?:\/\//i.test(value.trim())
+}
+
+async function onAddLink(): Promise<void> {
+  linkError.value = null
+  const url = linkUrl.value.trim()
+  if (!isHttpUrl(url)) {
+    linkError.value = t('creator.ui.upload.add_link_invalid')
+    return
+  }
+  linkSubmitting.value = true
+  try {
+    const ok = await addLink(url, linkTitle.value.trim() || undefined)
+    if (ok) {
+      linkUrl.value = ''
+      linkTitle.value = ''
+    } else {
+      linkError.value = t('creator.ui.upload.add_link_failed')
+    }
+  } finally {
+    linkSubmitting.value = false
+  }
+}
 const acceptAttr = [
   ...PORTFOLIO_IMAGE_ALLOWED_MIME_TYPES,
   ...PORTFOLIO_VIDEO_ALLOWED_MIME_TYPES,
@@ -139,6 +170,54 @@ function statusLabel(status: string): string {
       <span class="portfolio-upload-grid__slots">{{ slotsLabel }}</span>
     </label>
 
+    <!-- Add-link affordance (AH-004 D9/D11): the single "Add to portfolio"
+         affordance is upload files OR add a titled external link. -->
+    <form
+      class="portfolio-upload-grid__link"
+      data-testid="portfolio-add-link"
+      @submit.prevent="onAddLink"
+    >
+      <span class="portfolio-upload-grid__link-prompt">{{
+        t('creator.ui.upload.add_link_prompt')
+      }}</span>
+      <div class="portfolio-upload-grid__link-fields">
+        <v-text-field
+          v-model="linkUrl"
+          type="url"
+          density="compact"
+          hide-details
+          :label="t('creator.ui.upload.add_link_url_label')"
+          :disabled="remainingSlots <= 0 || linkSubmitting"
+          data-testid="portfolio-add-link-url"
+        />
+        <v-text-field
+          v-model="linkTitle"
+          density="compact"
+          hide-details
+          :label="t('creator.ui.upload.add_link_title_label')"
+          :disabled="remainingSlots <= 0 || linkSubmitting"
+          data-testid="portfolio-add-link-title"
+        />
+        <v-btn
+          type="submit"
+          variant="tonal"
+          :loading="linkSubmitting"
+          :disabled="remainingSlots <= 0 || linkUrl.trim() === ''"
+          data-testid="portfolio-add-link-submit"
+        >
+          {{ t('creator.ui.upload.add_link_button') }}
+        </v-btn>
+      </div>
+      <div
+        v-if="linkError"
+        role="alert"
+        class="portfolio-upload-grid__item-error"
+        data-testid="portfolio-add-link-error"
+      >
+        {{ linkError }}
+      </div>
+    </form>
+
     <div
       v-if="items.length > 0"
       class="portfolio-upload-grid__items"
@@ -161,7 +240,8 @@ function statusLabel(status: string): string {
         </div>
         <v-progress-linear
           v-if="item.status === 'uploading'"
-          indeterminate
+          :indeterminate="item.progress === 0"
+          :model-value="item.progress"
           color="primary"
           height="4"
         />
@@ -248,6 +328,24 @@ function statusLabel(status: string): string {
 .portfolio-upload-grid__slots {
   font-size: 0.75rem;
   color: rgb(var(--v-theme-on-surface-variant));
+}
+
+.portfolio-upload-grid__link {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.portfolio-upload-grid__link-prompt {
+  font-size: 0.75rem;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+.portfolio-upload-grid__link-fields {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .portfolio-upload-grid__items {

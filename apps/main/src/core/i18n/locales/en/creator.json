@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Show your best work",
-            "description": "Upload up to 10 items — videos, images, or external links — that represent your style.",
+            "description": "Upload up to 30 items — videos, images, or external links — that represent your style.",
             "gallery_heading": "Your portfolio",
             "gallery_empty": "No portfolio items uploaded yet.",
             "gallery_remove": "Remove item",
@@ -81,7 +81,11 @@
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
             "preview_label": "Open preview",
-            "preview_close": "Close preview"
+            "preview_close": "Close preview",
+            "processing_label": "Processing…",
+            "failed_label": "Upload failed",
+            "download_label": "Download",
+            "view_all_label": "View all"
           },
           "kyc": {
             "name": "Identity verification",
@@ -400,6 +404,12 @@
         "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slots remaining",
         "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",
+        "add_link_prompt": "Or add a link to your work elsewhere",
+        "add_link_url_label": "Link URL",
+        "add_link_title_label": "Title (optional)",
+        "add_link_button": "Add link",
+        "add_link_invalid": "Enter a valid http or https link.",
+        "add_link_failed": "We couldn't add that link. Please try again.",
         "uploading": "Uploading…",
         "remove": "Remove",
         "remove_avatar": "Remove photo",

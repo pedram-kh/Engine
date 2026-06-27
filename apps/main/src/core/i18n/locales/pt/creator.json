@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfólio",
             "title": "Mostre o seu melhor trabalho",
-            "description": "Carregue até 10 itens — vídeos, imagens ou links externos — que representem o seu estilo.",
+            "description": "Carregue até 30 itens — vídeos, imagens ou links externos — que representem o seu estilo.",
             "gallery_heading": "O seu portfólio",
             "gallery_empty": "Ainda não foram carregados itens do portfólio.",
             "gallery_remove": "Remover item",
@@ -81,7 +81,11 @@
             "link_badge_label": "Link externo",
             "untitled_item": "Item do portfólio sem título",
             "preview_label": "Abrir pré-visualização",
-            "preview_close": "Fechar pré-visualização"
+            "preview_close": "Fechar pré-visualização",
+            "processing_label": "A processar…",
+            "failed_label": "Falha no carregamento",
+            "download_label": "Transferir",
+            "view_all_label": "Ver tudo"
           },
           "kyc": {
             "name": "Verificação de identidade",
@@ -407,7 +411,13 @@
         "status_pending": "À espera…",
         "status_uploading": "A carregar…",
         "status_done": "Carregado",
-        "status_error": "Falhou"
+        "status_error": "Falhou",
+        "add_link_prompt": "Ou adicione um link para o seu trabalho noutro local",
+        "add_link_url_label": "URL do link",
+        "add_link_title_label": "Título (opcional)",
+        "add_link_button": "Adicionar link",
+        "add_link_invalid": "Introduza um link http ou https válido.",
+        "add_link_failed": "Não foi possível adicionar esse link. Tente novamente."
       },
       "errors": {
         "upload_too_large": "Este ficheiro é demasiado grande. O tamanho máximo é {max_mb} MB.",

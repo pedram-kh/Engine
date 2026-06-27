@@ -7,6 +7,7 @@ namespace App\Modules\Creators\Models;
 use App\Core\Concerns\HasUlid;
 use App\Modules\Creators\Database\Factories\CreatorPortfolioItemFactory;
 use App\Modules\Creators\Enums\PortfolioItemKind;
+use App\Modules\Creators\Enums\PortfolioProcessingStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,6 +25,7 @@ use Illuminate\Support\Carbon;
  * @property string $ulid
  * @property int $creator_id
  * @property PortfolioItemKind $kind
+ * @property PortfolioProcessingStatus $processing_status
  * @property string|null $title
  * @property string|null $description
  * @property string|null $s3_path
@@ -51,6 +53,7 @@ final class CreatorPortfolioItem extends Model
     protected $fillable = [
         'creator_id',
         'kind',
+        'processing_status',
         'title',
         'description',
         's3_path',
@@ -77,6 +80,7 @@ final class CreatorPortfolioItem extends Model
     {
         return [
             'kind' => PortfolioItemKind::class,
+            'processing_status' => PortfolioProcessingStatus::class,
             'size_bytes' => 'integer',
             'duration_seconds' => 'integer',
             'position' => 'integer',

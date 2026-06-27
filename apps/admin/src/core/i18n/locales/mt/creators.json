@@ -195,7 +195,13 @@
             "gallery_empty": "Le portfolio oġġetti uploaded yet.",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
-            "untitled_item": "Untitled portfolio item"
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Iftaħ l-anteprima",
+            "preview_close": "Agħlaq l-anteprima",
+            "processing_label": "Qed jiġi pproċessat…",
+            "failed_label": "It-tlugħ falla",
+            "download_label": "Niżżel",
+            "view_all_label": "Ara kollox"
           }
         },
         "categories": {

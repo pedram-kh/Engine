@@ -45,6 +45,18 @@ interface PortfolioGalleryItem {
   viewUrl?: string | null
   externalUrl: string | null
   altText: string
+  /**
+   * Asset-processing state (AH-004). `processing` images show a spinner
+   * overlay and are not previewable/downloadable; `failed` images show an
+   * error overlay (the owner can remove them). Undefined / `ready` render
+   * normally. Links + videos are always `ready`.
+   */
+  processingStatus?: 'processing' | 'ready' | 'failed'
+  /**
+   * Presigned `attachment` URL for downloading the full-res sanitised asset
+   * (AH-004 D10). Null for links / non-ready items.
+   */
+  downloadUrl?: string | null
 }
 
 interface Props {
@@ -63,6 +75,12 @@ interface Props {
   previewLabel?: string
   /** Localized accessible label for the lightbox close button. */
   closeLabel?: string
+  /** Localized "processing…" overlay copy for in-flight image items. */
+  processingLabel?: string
+  /** Localized "upload failed" overlay copy for failed image items. */
+  failedLabel?: string
+  /** Localized accessible label for the per-item download affordance. */
+  downloadLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -73,6 +91,9 @@ const props = withDefaults(defineProps<Props>(), {
   linkLabel: 'External link',
   previewLabel: 'Open preview',
   closeLabel: 'Close',
+  processingLabel: 'Processing…',
+  failedLabel: 'Upload failed',
+  downloadLabel: 'Download',
 })
 
 const emit = defineEmits<{
@@ -82,9 +103,27 @@ const emit = defineEmits<{
 /** The item currently shown in the lightbox, or null when closed. */
 const active = ref<PortfolioGalleryItem | null>(null)
 
+function isProcessing(item: PortfolioGalleryItem): boolean {
+  return item.processingStatus === 'processing'
+}
+
+function isFailed(item: PortfolioGalleryItem): boolean {
+  return item.processingStatus === 'failed'
+}
+
 /** Media (image/video) with a resolvable full-size URL is previewable. */
 function canPreview(item: PortfolioGalleryItem): boolean {
-  return (item.kind === 'image' || item.kind === 'video') && Boolean(item.viewUrl)
+  return (
+    (item.kind === 'image' || item.kind === 'video') &&
+    Boolean(item.viewUrl) &&
+    !isProcessing(item) &&
+    !isFailed(item)
+  )
+}
+
+/** A ready file item with a download URL can be downloaded. */
+function canDownload(item: PortfolioGalleryItem): boolean {
+  return Boolean(item.downloadUrl) && !isProcessing(item) && !isFailed(item)
 }
 
 function openPreview(item: PortfolioGalleryItem): void {
@@ -141,6 +180,26 @@ function onRemove(itemId: string): void {
           <v-icon icon="mdi-open-in-new" size="24" aria-hidden="true" />
         </span>
 
+        <!-- AH-004 processing / failed overlays. A processing image has no
+             servable URL yet (gated server-side); a failed one is kept so the
+             owner can remove + re-upload. Both block preview/download. -->
+        <div
+          v-if="isProcessing(item)"
+          class="portfolio-gallery__state portfolio-gallery__state--processing"
+          :data-testid="`portfolio-gallery-processing-${item.id}`"
+        >
+          <v-progress-circular indeterminate size="28" width="3" aria-hidden="true" />
+          <span class="portfolio-gallery__state-label">{{ props.processingLabel }}</span>
+        </div>
+        <div
+          v-else-if="isFailed(item)"
+          class="portfolio-gallery__state portfolio-gallery__state--failed"
+          :data-testid="`portfolio-gallery-failed-${item.id}`"
+        >
+          <v-icon icon="mdi-alert-circle-outline" size="28" aria-hidden="true" />
+          <span class="portfolio-gallery__state-label">{{ props.failedLabel }}</span>
+        </div>
+
         <!-- Click target. Links open externally; previewable media open
              the lightbox. Sits above the thumbnail but below the (later,
              absolutely-positioned) remove button so removal still wins. -->
@@ -166,6 +225,19 @@ function onRemove(itemId: string): void {
       <div v-if="item.title" class="portfolio-gallery__title">
         {{ item.title }}
       </div>
+
+      <!-- Download (AH-004 D10): a presigned attachment URL for the full-res
+           sanitised asset. Available on every surface (read-only included). -->
+      <a
+        v-if="canDownload(item)"
+        class="portfolio-gallery__download"
+        :href="item.downloadUrl ?? undefined"
+        :aria-label="`${props.downloadLabel}${item.title ? ': ' + item.title : ''}`"
+        :data-testid="`portfolio-gallery-download-${item.id}`"
+        :download="item.title ?? ''"
+      >
+        <v-icon icon="mdi-download" size="18" aria-hidden="true" />
+      </a>
 
       <button
         v-if="props.editable"
@@ -324,6 +396,53 @@ function onRemove(itemId: string): void {
   background: rgb(var(--v-theme-error-container));
   color: rgb(var(--v-theme-on-error-container));
   outline: none;
+}
+
+.portfolio-gallery__download {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--v-theme-outline-variant));
+  background: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-on-surface));
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.portfolio-gallery__download:hover,
+.portfolio-gallery__download:focus-visible {
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  outline: none;
+}
+
+.portfolio-gallery__state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  padding: 8px;
+  background: rgba(var(--v-theme-surface), 0.82);
+}
+
+.portfolio-gallery__state--failed {
+  color: rgb(var(--v-theme-error));
+}
+
+.portfolio-gallery__state-label {
+  font-size: var(--catalyst-typography-caption-size, 0.75rem);
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 .portfolio-gallery--empty {

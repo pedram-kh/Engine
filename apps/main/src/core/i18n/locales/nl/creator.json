@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Laat je beste werk zien",
-            "description": "Upload maximaal 10 items — video's, afbeeldingen of externe links — die je stijl weerspiegelen.",
+            "description": "Upload maximaal 30 items — video's, afbeeldingen of externe links — die je stijl weerspiegelen.",
             "gallery_heading": "Je portfolio",
             "gallery_empty": "Nog geen portfolio-items geüpload.",
             "gallery_remove": "Item verwijderen",
@@ -81,7 +81,11 @@
             "link_badge_label": "Externe link",
             "untitled_item": "Naamloos portfolio-item",
             "preview_label": "Voorbeeld openen",
-            "preview_close": "Voorbeeld sluiten"
+            "preview_close": "Voorbeeld sluiten",
+            "processing_label": "Bezig met verwerken…",
+            "failed_label": "Uploaden mislukt",
+            "download_label": "Downloaden",
+            "view_all_label": "Alles weergeven"
           },
           "kyc": {
             "name": "Identiteitsverificatie",
@@ -407,7 +411,13 @@
         "status_pending": "Wachten…",
         "status_uploading": "Uploaden…",
         "status_done": "Geüpload",
-        "status_error": "Mislukt"
+        "status_error": "Mislukt",
+        "add_link_prompt": "Of voeg een link toe naar je werk elders",
+        "add_link_url_label": "Link-URL",
+        "add_link_title_label": "Titel (optioneel)",
+        "add_link_button": "Link toevoegen",
+        "add_link_invalid": "Voer een geldige http- of https-link in.",
+        "add_link_failed": "We konden die link niet toevoegen. Probeer het opnieuw."
       },
       "errors": {
         "upload_too_large": "Dit bestand is te groot. De maximale grootte is {max_mb} MB.",

@@ -195,7 +195,13 @@
             "gallery_empty": "No portfolio items uploaded yet.",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
-            "untitled_item": "Untitled portfolio item"
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Open preview",
+            "preview_close": "Close preview",
+            "processing_label": "Processing…",
+            "failed_label": "Upload failed",
+            "download_label": "Download",
+            "view_all_label": "View all"
           }
         },
         "categories": {

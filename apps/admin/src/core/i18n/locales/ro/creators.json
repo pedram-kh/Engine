@@ -195,7 +195,13 @@
             "gallery_empty": "Nu portfolio elemente uploaded yet.",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
-            "untitled_item": "Untitled portfolio item"
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Deschide previzualizarea",
+            "preview_close": "Închide previzualizarea",
+            "processing_label": "Se procesează…",
+            "failed_label": "Încărcarea a eșuat",
+            "download_label": "Descarcă",
+            "view_all_label": "Vezi toate"
           }
         },
         "categories": {

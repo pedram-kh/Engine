@@ -195,7 +195,13 @@
             "gallery_empty": "Не portfolio елементи uploaded yet.",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
-            "untitled_item": "Untitled portfolio item"
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Отвори визуализация",
+            "preview_close": "Затвори визуализацията",
+            "processing_label": "Обработва се…",
+            "failed_label": "Качването е неуспешно",
+            "download_label": "Изтегляне",
+            "view_all_label": "Виж всички"
           }
         },
         "categories": {

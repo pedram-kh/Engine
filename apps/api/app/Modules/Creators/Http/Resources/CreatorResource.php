@@ -10,10 +10,10 @@ use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorKycVerification;
-use App\Modules\Creators\Models\CreatorPortfolioItem;
 use App\Modules\Creators\Models\CreatorSocialAccount;
 use App\Modules\Creators\Services\CompletenessScoreCalculator;
 use App\Modules\Creators\Services\PortfolioUploadService;
+use App\Modules\Creators\Support\PortfolioItemPresenter;
 use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -273,31 +273,10 @@ final class CreatorResource extends JsonResource
      */
     private function mapPortfolio(Creator $creator): array
     {
-        $items = $creator->relationLoaded('portfolioItems')
-            ? $creator->portfolioItems
-            : $creator->portfolioItems()->get();
-
-        // array_values() pins the list shape for Larastan — see the
-        // note on mapSocialAccounts() above.
-        return array_values(
-            $items
-                ->map(fn (CreatorPortfolioItem $item): array => [
-                    'id' => $item->ulid,
-                    'kind' => $item->kind->value,
-                    'title' => $item->title,
-                    'description' => $item->description,
-                    's3_path' => $item->s3_path,
-                    'view_url' => $this->signedViewUrl($item->s3_path),
-                    'external_url' => $item->external_url,
-                    'thumbnail_path' => $item->thumbnail_path,
-                    'thumbnail_view_url' => $this->signedViewUrl($item->thumbnail_path),
-                    'mime_type' => $item->mime_type,
-                    'size_bytes' => $item->size_bytes,
-                    'duration_seconds' => $item->duration_seconds,
-                    'position' => $item->position,
-                ])
-                ->all(),
-        );
+        // AH-004: routed through the shared presenter so the server-authoritative
+        // `ready`-gate (withhold signed URLs for processing/failed items) lives
+        // in one place across all portfolio surfaces.
+        return (new PortfolioItemPresenter)->mapForCreator($creator);
     }
 
     /**

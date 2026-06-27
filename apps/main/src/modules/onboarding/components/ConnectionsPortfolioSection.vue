@@ -34,6 +34,8 @@ const galleryItems = computed(() => {
     viewUrl: item.view_url,
     externalUrl: item.external_url,
     altText: item.title ?? t('creator.ui.wizard.steps.portfolio.untitled_item'),
+    processingStatus: item.processing_status,
+    downloadUrl: item.download_url,
   }))
 })
 
@@ -79,6 +81,9 @@ async function onRemove(itemId: string): Promise<void> {
         :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
         :preview-label="t('creator.ui.wizard.steps.portfolio.preview_label')"
         :close-label="t('creator.ui.wizard.steps.portfolio.preview_close')"
+        :processing-label="t('creator.ui.wizard.steps.portfolio.processing_label')"
+        :failed-label="t('creator.ui.wizard.steps.portfolio.failed_label')"
+        :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
         @remove="onRemove"
       />
       <div

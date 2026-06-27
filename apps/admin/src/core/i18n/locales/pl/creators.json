@@ -195,7 +195,13 @@
             "gallery_empty": "Brak przesłanych pozycji portfolio.",
             "video_badge_label": "Wideo",
             "link_badge_label": "Zewnętrzny link",
-            "untitled_item": "Nienazwana pozycja portfolio"
+            "untitled_item": "Nienazwana pozycja portfolio",
+            "preview_label": "Otwórz podgląd",
+            "preview_close": "Zamknij podgląd",
+            "processing_label": "Przetwarzanie…",
+            "failed_label": "Przesyłanie nie powiodło się",
+            "download_label": "Pobierz",
+            "view_all_label": "Zobacz wszystkie"
           }
         },
         "categories": {

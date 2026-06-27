@@ -6,6 +6,8 @@ namespace App\Modules\Creators\Http\Controllers;
 
 use App\Core\Errors\ErrorResponse;
 use App\Modules\Creators\Enums\PortfolioItemKind;
+use App\Modules\Creators\Enums\PortfolioProcessingStatus;
+use App\Modules\Creators\Jobs\ProcessPortfolioImageJob;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorPortfolioItem;
 use App\Modules\Creators\Services\PortfolioUploadService;
@@ -74,6 +76,91 @@ final class PortfolioController
             'data' => [
                 'id' => $item->ulid,
                 'kind' => $item->kind->value,
+                's3_path' => $item->s3_path,
+                'position' => $item->position,
+            ],
+        ], 201);
+    }
+
+    /**
+     * Start a presigned-PUT upload for a large portfolio image (AH-004 Q5/D8).
+     * Mirrors the video init; the client PUTs the raw bytes to the returned
+     * URL, then calls completeImageUpload().
+     */
+    public function initiateImageUpload(Request $request): JsonResponse
+    {
+        $request->validate([
+            'mime_type' => ['required', 'string'],
+            'declared_bytes' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $creator = $this->resolveCreator($request);
+        $this->assertHasCapacity($creator);
+
+        try {
+            $payload = $this->service->initiatePresignedImageUpload(
+                $creator,
+                (string) $request->string('mime_type'),
+                (int) $request->integer('declared_bytes'),
+            );
+        } catch (RuntimeException $e) {
+            return ErrorResponse::single($request, 422, 'portfolio.presign_failed', $e->getMessage());
+        }
+
+        return response()->json([
+            'data' => $payload,
+        ]);
+    }
+
+    /**
+     * Finalise a presigned image upload (AH-004 Q5). Verifies the object
+     * landed, creates the item as `processing` (its signed URL is WITHHELD by
+     * every resource until ready), and dispatches the EXIF-strip / thumbnail
+     * worker. The raw, EXIF-bearing object is never served in the meantime.
+     */
+    public function completeImageUpload(Request $request): JsonResponse
+    {
+        $request->validate([
+            'upload_id' => ['required', 'string'],
+            'title' => ['nullable', 'string', 'max:120'],
+            'description' => ['nullable', 'string', 'max:2000'],
+            'mime_type' => ['required', 'string'],
+            'size_bytes' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $creator = $this->resolveCreator($request);
+        $this->assertHasCapacity($creator);
+
+        try {
+            $item = DB::transaction(function () use ($creator, $request): CreatorPortfolioItem {
+                $path = $this->service->completePresignedUpload(
+                    $creator,
+                    (string) $request->string('upload_id'),
+                );
+
+                return CreatorPortfolioItem::create([
+                    'creator_id' => $creator->id,
+                    'kind' => PortfolioItemKind::Image->value,
+                    'processing_status' => PortfolioProcessingStatus::Processing->value,
+                    'title' => $request->string('title')->value() ?: null,
+                    'description' => $request->string('description')->value() ?: null,
+                    's3_path' => $path,
+                    'mime_type' => (string) $request->string('mime_type'),
+                    'size_bytes' => (int) $request->integer('size_bytes'),
+                    'position' => $this->nextPosition($creator),
+                ]);
+            });
+        } catch (RuntimeException $e) {
+            return ErrorResponse::single($request, 422, 'portfolio.complete_failed', $e->getMessage());
+        }
+
+        ProcessPortfolioImageJob::dispatch($item->id);
+
+        return response()->json([
+            'data' => [
+                'id' => $item->ulid,
+                'kind' => $item->kind->value,
+                'processing_status' => $item->processing_status->value,
                 's3_path' => $item->s3_path,
                 'position' => $item->position,
             ],
@@ -167,6 +254,58 @@ final class PortfolioController
         ], 201);
     }
 
+    /**
+     * Add a link portfolio item (AH-004 D9). Migration-free — the kind / enum /
+     * external_url column / read-path already exist; this only adds the write +
+     * validation + the add-link affordance behind it.
+     *
+     * URL validation is an XSS guard: the gallery renders `external_url` as a
+     * clickable `href`, so only `http`/`https` are allowed and `javascript:` /
+     * `data:` (and any other scheme) are rejected, with a length bound matching
+     * the column.
+     */
+    public function createLink(Request $request): JsonResponse
+    {
+        $request->validate([
+            'external_url' => [
+                'required',
+                'string',
+                'max:2048',
+                'url',
+                // Scheme allowlist: http/https only. `javascript:` / `data:` /
+                // `file:` etc. fail this anchored pattern and are rejected.
+                'regex:/^https?:\/\//i',
+            ],
+            'title' => ['nullable', 'string', 'max:120'],
+            'description' => ['nullable', 'string', 'max:2000'],
+        ], [
+            'external_url.regex' => 'The link must be an http or https URL.',
+        ]);
+
+        $creator = $this->resolveCreator($request);
+        $this->assertHasCapacity($creator);
+
+        $item = CreatorPortfolioItem::create([
+            'creator_id' => $creator->id,
+            'kind' => PortfolioItemKind::Link->value,
+            'processing_status' => PortfolioProcessingStatus::Ready->value,
+            'title' => $request->string('title')->value() ?: null,
+            'description' => $request->string('description')->value() ?: null,
+            'external_url' => (string) $request->string('external_url'),
+            'position' => $this->nextPosition($creator),
+        ]);
+
+        return response()->json([
+            'data' => [
+                'id' => $item->ulid,
+                'kind' => $item->kind->value,
+                'processing_status' => $item->processing_status->value,
+                'external_url' => $item->external_url,
+                'position' => $item->position,
+            ],
+        ], 201);
+    }
+
     public function destroy(Request $request, string $portfolioItem): JsonResponse
     {
         $creator = $this->resolveCreator($request);
@@ -176,6 +315,12 @@ final class PortfolioController
         if ($item === null) {
             return ErrorResponse::single($request, 404, 'portfolio.not_found', 'Portfolio item not found.');
         }
+
+        // AH-004: clean up the stored objects so a removed item — including a
+        // `failed` one whose raw upload is unreachable behind the resource
+        // gate — never lingers as orphaned S3 storage. Link items have no
+        // s3_path/thumbnail_path and are skipped by the helper.
+        $this->service->deleteStoredObjects($item->s3_path, $item->thumbnail_path);
 
         $item->delete();
 

@@ -38,7 +38,11 @@ import type {
   CreatorTaxUpdatePayload,
   KycInitiateResponse,
   PayoutInitiateResponse,
+  PortfolioImageCompletePayload,
+  PortfolioImageInitPayload,
+  PortfolioImageInitResponse,
   PortfolioItemEnvelope,
+  PortfolioLinkPayload,
   PortfolioVideoCompletePayload,
   PortfolioVideoInitPayload,
   PortfolioVideoInitResponse,
@@ -166,6 +170,31 @@ export const onboardingApi = {
     if (meta.title !== undefined) form.append('title', meta.title)
     if (meta.description !== undefined) form.append('description', meta.description)
     return http.post<PortfolioItemEnvelope>(`${BASE}/portfolio/images`, form)
+  },
+
+  /**
+   * Start a presigned-PUT upload for a large image (AH-004 Q5/D8). Mirrors the
+   * video flow: init → PUT to S3 → complete. The completed item starts
+   * `processing` while the server worker strips EXIF + builds the thumbnail.
+   */
+  initiatePortfolioImageUpload(
+    payload: PortfolioImageInitPayload,
+  ): Promise<PortfolioImageInitResponse> {
+    return http.post<PortfolioImageInitResponse>(`${BASE}/portfolio/images/init`, payload)
+  },
+
+  completePortfolioImageUpload(
+    payload: PortfolioImageCompletePayload,
+  ): Promise<PortfolioItemEnvelope> {
+    return http.post<PortfolioItemEnvelope>(`${BASE}/portfolio/images/complete`, payload)
+  },
+
+  /**
+   * Add a titled external link (AH-004 D9). http/https only — the backend
+   * rejects `javascript:` / `data:` schemes.
+   */
+  createPortfolioLink(payload: PortfolioLinkPayload): Promise<PortfolioItemEnvelope> {
+    return http.post<PortfolioItemEnvelope>(`${BASE}/portfolio/links`, payload)
   },
 
   initiatePortfolioVideoUpload(

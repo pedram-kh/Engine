@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Creators\Database\Factories;
 
 use App\Modules\Creators\Enums\PortfolioItemKind;
+use App\Modules\Creators\Enums\PortfolioProcessingStatus;
 use App\Modules\Creators\Models\CreatorPortfolioItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,6 +24,7 @@ final class CreatorPortfolioItemFactory extends Factory
         return [
             'creator_id' => CreatorFactory::new(),
             'kind' => PortfolioItemKind::Image,
+            'processing_status' => PortfolioProcessingStatus::Ready,
             'title' => fake()->optional()->sentence(),
             'description' => fake()->optional()->paragraph(),
             's3_path' => 'creators/test/portfolio/'.fake()->uuid().'.jpg',
@@ -61,6 +63,32 @@ final class CreatorPortfolioItemFactory extends Factory
     {
         return $this->state(fn (array $attributes): array => [
             'position' => $position,
+        ]);
+    }
+
+    /**
+     * A large image still awaiting the EXIF-strip / thumbnail worker. Its
+     * signed URLs must be withheld by every portfolio resource until ready.
+     */
+    public function processing(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'kind' => PortfolioItemKind::Image,
+            'processing_status' => PortfolioProcessingStatus::Processing,
+            'thumbnail_path' => null,
+        ]);
+    }
+
+    /**
+     * A rejected upload (megapixel-guard trip or corrupt file) — kept so the
+     * creator can delete / re-upload it.
+     */
+    public function failed(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'kind' => PortfolioItemKind::Image,
+            'processing_status' => PortfolioProcessingStatus::Failed,
+            'thumbnail_path' => null,
         ]);
     }
 }

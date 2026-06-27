@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Zeig deine besten Arbeiten",
-            "description": "Lade bis zu 10 Einträge hoch — Videos, Bilder oder externe Links — die deinen Stil zeigen.",
+            "description": "Lade bis zu 30 Einträge hoch — Videos, Bilder oder externe Links — die deinen Stil zeigen.",
             "gallery_heading": "Dein Portfolio",
             "gallery_empty": "Noch keine Portfolio-Einträge hochgeladen.",
             "gallery_remove": "Eintrag entfernen",
@@ -81,7 +81,11 @@
             "link_badge_label": "Externer Link",
             "untitled_item": "Unbenannter Portfolio-Eintrag",
             "preview_label": "Vorschau öffnen",
-            "preview_close": "Vorschau schließen"
+            "preview_close": "Vorschau schließen",
+            "processing_label": "Wird verarbeitet…",
+            "failed_label": "Upload fehlgeschlagen",
+            "download_label": "Herunterladen",
+            "view_all_label": "Alle anzeigen"
           },
           "kyc": {
             "name": "Identitätsverifizierung",
@@ -407,7 +411,13 @@
         "status_pending": "Warten…",
         "status_uploading": "Wird hochgeladen…",
         "status_done": "Hochgeladen",
-        "status_error": "Fehlgeschlagen"
+        "status_error": "Fehlgeschlagen",
+        "add_link_prompt": "Oder füge einen Link zu deiner Arbeit anderswo hinzu",
+        "add_link_url_label": "Link-URL",
+        "add_link_title_label": "Titel (optional)",
+        "add_link_button": "Link hinzufügen",
+        "add_link_invalid": "Gib einen gültigen http- oder https-Link ein.",
+        "add_link_failed": "Wir konnten diesen Link nicht hinzufügen. Bitte versuche es erneut."
       },
       "errors": {
         "upload_too_large": "Diese Datei ist zu groß. Die maximale Größe beträgt {max_mb} MB.",

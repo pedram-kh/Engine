@@ -195,7 +195,13 @@
             "gallery_empty": "Aún no has subido elementos al portafolio.",
             "video_badge_label": "Vídeo",
             "link_badge_label": "Enlace externo",
-            "untitled_item": "Elemento del portafolio sin título"
+            "untitled_item": "Elemento del portafolio sin título",
+            "preview_label": "Abrir vista previa",
+            "preview_close": "Cerrar vista previa",
+            "processing_label": "Procesando…",
+            "failed_label": "Error al subir",
+            "download_label": "Descargar",
+            "view_all_label": "Ver todo"
           }
         },
         "categories": {

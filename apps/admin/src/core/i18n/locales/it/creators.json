@@ -195,7 +195,13 @@
             "gallery_empty": "Nessun elemento del portfolio caricato finora.",
             "video_badge_label": "Video",
             "link_badge_label": "Link esterno",
-            "untitled_item": "Elemento del portfolio senza titolo"
+            "untitled_item": "Elemento del portfolio senza titolo",
+            "preview_label": "Apri anteprima",
+            "preview_close": "Chiudi anteprima",
+            "processing_label": "Elaborazione…",
+            "failed_label": "Caricamento non riuscito",
+            "download_label": "Scarica",
+            "view_all_label": "Vedi tutti"
           }
         },
         "categories": {

@@ -195,7 +195,13 @@
             "gallery_empty": "Ei portfolio kohteet uploaded yet.",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
-            "untitled_item": "Untitled portfolio item"
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Avaa esikatselu",
+            "preview_close": "Sulje esikatselu",
+            "processing_label": "Käsitellään…",
+            "failed_label": "Lataus epäonnistui",
+            "download_label": "Lataa",
+            "view_all_label": "Näytä kaikki"
           }
         },
         "categories": {

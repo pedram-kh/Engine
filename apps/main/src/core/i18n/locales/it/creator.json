@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Mostra i tuoi lavori migliori",
-            "description": "Carica fino a 10 elementi — video, immagini o link esterni — che rappresentino il tuo stile.",
+            "description": "Carica fino a 30 elementi — video, immagini o link esterni — che rappresentino il tuo stile.",
             "gallery_heading": "Il tuo portfolio",
             "gallery_empty": "Nessun elemento del portfolio caricato finora.",
             "gallery_remove": "Rimuovi elemento",
@@ -81,7 +81,11 @@
             "link_badge_label": "Link esterno",
             "untitled_item": "Elemento del portfolio senza titolo",
             "preview_label": "Apri anteprima",
-            "preview_close": "Chiudi anteprima"
+            "preview_close": "Chiudi anteprima",
+            "processing_label": "Elaborazione…",
+            "failed_label": "Caricamento non riuscito",
+            "download_label": "Scarica",
+            "view_all_label": "Vedi tutti"
           },
           "kyc": {
             "name": "Verifica dell'identità",
@@ -407,7 +411,13 @@
         "status_pending": "In attesa…",
         "status_uploading": "Caricamento…",
         "status_done": "Caricato",
-        "status_error": "Errore"
+        "status_error": "Errore",
+        "add_link_prompt": "Oppure aggiungi un link al tuo lavoro altrove",
+        "add_link_url_label": "URL del link",
+        "add_link_title_label": "Titolo (facoltativo)",
+        "add_link_button": "Aggiungi link",
+        "add_link_invalid": "Inserisci un link http o https valido.",
+        "add_link_failed": "Non siamo riusciti ad aggiungere il link. Riprova."
       },
       "errors": {
         "upload_too_large": "Questo file è troppo grande. La dimensione massima è {max_mb} MB.",

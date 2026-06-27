@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Show your best work",
-            "description": "Įkelti up to 10 elementai — videos, images, or external links — that represent your style.",
+            "description": "Įkelti up to 30 elementai — videos, images, or external links — that represent your style.",
             "gallery_heading": "Your portfolio",
             "gallery_empty": "Ne portfolio elementai uploaded yet.",
             "gallery_remove": "Remove item",
@@ -81,7 +81,11 @@
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
             "preview_label": "Open preview",
-            "preview_close": "Uždaryti preview"
+            "preview_close": "Uždaryti preview",
+            "processing_label": "Apdorojama…",
+            "failed_label": "Įkelti nepavyko",
+            "download_label": "Atsisiųsti",
+            "view_all_label": "Peržiūrėti visus"
           },
           "kyc": {
             "name": "Identity verification",
@@ -407,7 +411,13 @@
         "status_pending": "Waiting…",
         "status_uploading": "Įkeltiing…",
         "status_done": "Įkeltied",
-        "status_error": "Failed"
+        "status_error": "Failed",
+        "add_link_prompt": "Arba pridėkite nuorodą į savo darbą kitur",
+        "add_link_url_label": "Nuorodos URL",
+        "add_link_title_label": "Pavadinimas (nebūtina)",
+        "add_link_button": "Pridėti nuorodą",
+        "add_link_invalid": "Įveskite galiojančią http arba https nuorodą.",
+        "add_link_failed": "Nepavyko pridėti šios nuorodos. Bandykite dar kartą."
       },
       "errors": {
         "upload_too_large": "This file is too large. The maximum size is {max_mb} MB.",

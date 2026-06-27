@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Vis dit bedste arbejde",
-            "description": "Upload op til 10 elementer — videoer, billeder eller eksterne links — der repræsenterer din stil.",
+            "description": "Upload op til 30 elementer — videoer, billeder eller eksterne links — der repræsenterer din stil.",
             "gallery_heading": "Dit portfolio",
             "gallery_empty": "Ingen portfolio-elementer uploadet endnu.",
             "gallery_remove": "Fjern element",
@@ -81,7 +81,11 @@
             "link_badge_label": "Eksternt link",
             "untitled_item": "Unavngivet portfolio-element",
             "preview_label": "Åbn forhåndsvisning",
-            "preview_close": "Luk forhåndsvisning"
+            "preview_close": "Luk forhåndsvisning",
+            "processing_label": "Behandler…",
+            "failed_label": "Upload mislykkedes",
+            "download_label": "Download",
+            "view_all_label": "Se alle"
           },
           "kyc": {
             "name": "Identitetsverifikation",
@@ -407,7 +411,13 @@
         "status_pending": "Venter…",
         "status_uploading": "Uploader…",
         "status_done": "Uploadet",
-        "status_error": "Mislykkedes"
+        "status_error": "Mislykkedes",
+        "add_link_prompt": "Eller tilføj et link til dit arbejde et andet sted",
+        "add_link_url_label": "Link-URL",
+        "add_link_title_label": "Titel (valgfri)",
+        "add_link_button": "Tilføj link",
+        "add_link_invalid": "Indtast et gyldigt http- eller https-link.",
+        "add_link_failed": "Vi kunne ikke tilføje det link. Prøv igen."
       },
       "errors": {
         "upload_too_large": "Denne fil er for stor. Maksimal størrelse er {max_mb} MB.",

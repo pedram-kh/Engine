@@ -139,10 +139,19 @@ Route::prefix('creators/me')
         Route::prefix('portfolio')->name('portfolio.')->group(function (): void {
             Route::post('images', [PortfolioController::class, 'uploadImage'])
                 ->name('image.store');
+            // AH-004 Q5/D8: large images join the presigned-PUT path (full-res
+            // EXIF-strip + thumbnail happen async in ProcessPortfolioImageJob).
+            Route::post('images/init', [PortfolioController::class, 'initiateImageUpload'])
+                ->name('image.init');
+            Route::post('images/complete', [PortfolioController::class, 'completeImageUpload'])
+                ->name('image.complete');
             Route::post('videos/init', [PortfolioController::class, 'initiateVideoUpload'])
                 ->name('video.init');
             Route::post('videos/complete', [PortfolioController::class, 'completeVideoUpload'])
                 ->name('video.complete');
+            // AH-004 D9: add a titled external link (http/https only).
+            Route::post('links', [PortfolioController::class, 'createLink'])
+                ->name('link.store');
             Route::delete('{portfolioItem}', [PortfolioController::class, 'destroy'])
                 ->name('destroy');
         });

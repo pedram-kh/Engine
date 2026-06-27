@@ -195,7 +195,13 @@
             "gallery_empty": "Όχι portfolio στοιχεία uploaded yet.",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
-            "untitled_item": "Untitled portfolio item"
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Άνοιγμα προεπισκόπησης",
+            "preview_close": "Κλείσιμο προεπισκόπησης",
+            "processing_label": "Επεξεργασία…",
+            "failed_label": "Η μεταφόρτωση απέτυχε",
+            "download_label": "Λήψη",
+            "view_all_label": "Προβολή όλων"
           }
         },
         "categories": {

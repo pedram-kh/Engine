@@ -195,7 +195,13 @@
             "gallery_empty": "Ainda não foram carregados itens do portfólio.",
             "video_badge_label": "Vídeo",
             "link_badge_label": "Link externo",
-            "untitled_item": "Item do portfólio sem título"
+            "untitled_item": "Item do portfólio sem título",
+            "preview_label": "Abrir pré-visualização",
+            "preview_close": "Fechar pré-visualização",
+            "processing_label": "A processar…",
+            "failed_label": "Falha no carregamento",
+            "download_label": "Transferir",
+            "view_all_label": "Ver tudo"
           }
         },
         "categories": {

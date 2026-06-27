@@ -368,6 +368,71 @@ it('exposes view_url + thumbnail_view_url on every portfolio item', function ():
     expect($video['thumbnail_view_url'])->toBe('https://signed.example/creators/01/portfolio/thumbs/clip.jpg?sig=test');
 });
 
+it('WITHHOLDS view_url + thumbnail_view_url + download_url for a processing image (AH-004 ready-gate)', function (): void {
+    // The load-bearing server-authoritative gate (#break-revert: delete the
+    // `$isReady ?` guards in PortfolioItemPresenter and this test must fail —
+    // a `processing` image would then leak a presigned URL to the raw,
+    // EXIF-bearing object before the worker strips it).
+    //
+    // The disk IS S3-backed here, so an UNGATED presenter would happily mint a
+    // signed URL. The gate must withhold it because the asset is not `ready`.
+    $adapter = Mockery::mock(AwsS3V3Adapter::class);
+    $adapter->shouldReceive('temporaryUrl')
+        ->andReturnUsing(fn (string $path): string => "https://signed.example/{$path}?sig=test");
+    Storage::shouldReceive('disk')->with('media')->andReturn($adapter);
+
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+    CreatorPortfolioItemFactory::new()->processing()->createOne([
+        'creator_id' => $creator->id,
+        's3_path' => 'creators/01/portfolio/raw.jpg',
+    ]);
+
+    $creator->load('portfolioItems');
+    $payload = makeResource($creator)->toArray(Request::create('/'));
+    /** @var array<int, array<string, mixed>> $items */
+    $items = $payload['attributes']['portfolio'];
+
+    expect($items)->toHaveCount(1);
+    expect($items[0]['processing_status'])->toBe('processing');
+    expect($items[0]['view_url'])->toBeNull();
+    expect($items[0]['thumbnail_view_url'])->toBeNull();
+    expect($items[0]['download_url'])->toBeNull();
+    // The raw key is still present (old contract) — only the signed URLs are gated.
+    expect($items[0]['s3_path'])->toBe('creators/01/portfolio/raw.jpg');
+});
+
+it('mints view_url + download_url for a READY image and forces attachment on download (AH-004)', function (): void {
+    $adapter = Mockery::mock(AwsS3V3Adapter::class);
+    $adapter->shouldReceive('temporaryUrl')
+        ->andReturnUsing(function (string $path, $expiry, array $options = []): string {
+            $disposition = isset($options['ResponseContentDisposition']) ? '&cd=1' : '';
+
+            return "https://signed.example/{$path}?sig=test{$disposition}";
+        });
+    Storage::shouldReceive('disk')->with('media')->andReturn($adapter);
+
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+    CreatorPortfolioItemFactory::new()->createOne([
+        'creator_id' => $creator->id,
+        'title' => 'My Best Shot',
+        's3_path' => 'creators/01/portfolio/img.jpg',
+        'thumbnail_path' => 'creators/01/portfolio/thumbs/img.jpg',
+    ]);
+
+    $creator->load('portfolioItems');
+    $payload = makeResource($creator)->toArray(Request::create('/'));
+    /** @var array<int, array<string, mixed>> $items */
+    $items = $payload['attributes']['portfolio'];
+
+    expect($items[0]['processing_status'])->toBe('ready');
+    expect($items[0]['view_url'])->toContain('https://signed.example/');
+    // download_url carries the attachment content-disposition (full-res source).
+    expect($items[0]['download_url'])->toContain('cd=1');
+    expect($items[0]['download_url'])->toContain('creators/01/portfolio/img.jpg');
+});
+
 it('link portfolio items have null view_url + thumbnail_view_url (no S3 asset)', function (): void {
     Storage::fake('media');
 

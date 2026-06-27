@@ -195,7 +195,13 @@
             "gallery_empty": "Ne portfolio elementai uploaded yet.",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
-            "untitled_item": "Untitled portfolio item"
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Atidaryti peržiūrą",
+            "preview_close": "Uždaryti peržiūrą",
+            "processing_label": "Apdorojama…",
+            "failed_label": "Įkelti nepavyko",
+            "download_label": "Atsisiųsti",
+            "view_all_label": "Peržiūrėti visus"
           }
         },
         "categories": {

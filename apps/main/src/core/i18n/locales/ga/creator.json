@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Punann",
             "title": "Show your best work",
-            "description": "Uaslódáil up to 10 míreanna — videos, images, or external links — that represent your style.",
+            "description": "Uaslódáil up to 30 míreanna — videos, images, or external links — that represent your style.",
             "gallery_heading": "Your portfolio",
             "gallery_empty": "Níl portfolio míreanna uploaded yet.",
             "gallery_remove": "Remove item",
@@ -81,7 +81,11 @@
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
             "preview_label": "Open preview",
-            "preview_close": "Dún preview"
+            "preview_close": "Dún preview",
+            "processing_label": "Á phróiseáil…",
+            "failed_label": "Theip ar an uaslódáil",
+            "download_label": "Íoslódáil",
+            "view_all_label": "Féach ar gach ceann"
           },
           "kyc": {
             "name": "Identity verification",
@@ -407,7 +411,13 @@
         "status_pending": "Waiting…",
         "status_uploading": "Uaslódáiling…",
         "status_done": "Uaslódáiled",
-        "status_error": "Failed"
+        "status_error": "Failed",
+        "add_link_prompt": "Nó cuir nasc le do chuid oibre in áit eile",
+        "add_link_url_label": "URL an naisc",
+        "add_link_title_label": "Teideal (roghnach)",
+        "add_link_button": "Cuir nasc leis",
+        "add_link_invalid": "Cuir isteach nasc bailí http nó https.",
+        "add_link_failed": "Níorbh fhéidir linn an nasc sin a chur leis. Bain triail eile as, le do thoil."
       },
       "errors": {
         "upload_too_large": "This file is too large. The maximum size is {max_mb} MB.",

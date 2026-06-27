@@ -10,6 +10,7 @@ use App\Modules\Creators\Database\Factories\CreatorSocialAccountFactory;
 use App\Modules\Creators\Enums\EsignStatus;
 use App\Modules\Creators\Enums\KycStatus;
 use App\Modules\Creators\Enums\PayoutStatus;
+use App\Modules\Creators\Enums\PortfolioProcessingStatus;
 use App\Modules\Creators\Enums\SocialPlatform;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
@@ -24,6 +25,7 @@ use App\Modules\Creators\Integrations\DataTransferObjects\KycInitiationResult;
 use App\Modules\Creators\Integrations\DataTransferObjects\KycWebhookEvent;
 use App\Modules\Creators\Integrations\DataTransferObjects\PaymentAccountResult;
 use App\Modules\Creators\Integrations\DataTransferObjects\PaymentsWebhookEvent;
+use App\Modules\Creators\Jobs\ProcessPortfolioImageJob;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorKycVerification;
 use App\Modules\Creators\Models\CreatorPayoutMethod;
@@ -33,6 +35,7 @@ use App\Modules\Creators\Models\CreatorTaxProfile;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Pennant\Feature;
 use Tests\TestCase;
@@ -368,6 +371,126 @@ it('POST /portfolio/videos/complete works without a poster (thumbnail stays null
 
     $item = CreatorPortfolioItem::query()->where('creator_id', $creator->id)->sole();
     expect($item->thumbnail_path)->toBeNull();
+});
+
+// ── AH-004: large-image presigned upload + link + cleanup ──────────────────
+
+it('POST /portfolio/images/init returns a presigned upload payload', function (): void {
+    Storage::fake('media');
+    $user = User::factory()->create();
+    CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/portfolio/images/init', [
+            'mime_type' => 'image/jpeg',
+            'declared_bytes' => 120 * 1024 * 1024,
+        ])
+        ->assertOk()
+        ->assertJsonStructure(['data' => ['upload_url', 'upload_id', 'storage_path', 'expires_at', 'max_bytes']]);
+});
+
+it('POST /portfolio/images/init rejects a non-image mime type', function (): void {
+    Storage::fake('media');
+    $user = User::factory()->create();
+    CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/portfolio/images/init', [
+            'mime_type' => 'video/mp4',
+            'declared_bytes' => 1000,
+        ])
+        ->assertStatus(422);
+});
+
+it('POST /portfolio/images/complete creates a PROCESSING item and dispatches the sanitiser job', function (): void {
+    Queue::fake();
+    Storage::fake('media');
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    // Simulate the presigned PUT having already landed the raw image.
+    $uploadId = "creators/{$creator->ulid}/portfolio/01RAWIMG00000000000000000.jpg";
+    Storage::disk('media')->put($uploadId, 'fake raw image bytes');
+
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/portfolio/images/complete', [
+            'upload_id' => $uploadId,
+            'mime_type' => 'image/jpeg',
+            'size_bytes' => 120 * 1024 * 1024,
+            'title' => 'Big shot',
+        ])
+        ->assertCreated()
+        ->assertJsonPath('data.kind', 'image')
+        ->assertJsonPath('data.processing_status', 'processing');
+
+    $item = CreatorPortfolioItem::query()->where('creator_id', $creator->id)->sole();
+    expect($item->processing_status)->toBe(PortfolioProcessingStatus::Processing);
+
+    Queue::assertPushed(ProcessPortfolioImageJob::class, fn (ProcessPortfolioImageJob $job): bool => $job->portfolioItemId === $item->id);
+});
+
+it('POST /portfolio/links creates a READY link for an http(s) URL', function (): void {
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/portfolio/links', [
+            'external_url' => 'https://example.com/my-reel',
+            'title' => 'My reel',
+        ])
+        ->assertCreated()
+        ->assertJsonPath('data.kind', 'link')
+        ->assertJsonPath('data.processing_status', 'ready')
+        ->assertJsonPath('data.external_url', 'https://example.com/my-reel');
+
+    expect(CreatorPortfolioItem::query()->where('creator_id', $creator->id)->count())->toBe(1);
+});
+
+it('POST /portfolio/links rejects javascript:, data:, and non-http schemes (XSS guard)', function (string $url): void {
+    $user = User::factory()->create();
+    CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/portfolio/links', ['external_url' => $url])
+        ->assertStatus(422);
+})->with([
+    'javascript scheme' => ['javascript:alert(1)'],
+    'data scheme' => ['data:text/html;base64,PHNjcmlwdD4='],
+    'ftp scheme' => ['ftp://example.com/file'],
+    'not a url' => ['not-a-url'],
+]);
+
+it('POST /portfolio/links rejects an over-length URL', function (): void {
+    $user = User::factory()->create();
+    CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/portfolio/links', [
+            'external_url' => 'https://example.com/'.str_repeat('a', 2100),
+        ])
+        ->assertStatus(422);
+});
+
+it('DELETE /portfolio/{item} cleans up the raw S3 object of a FAILED item (no orphaned storage)', function (): void {
+    Storage::fake('media');
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+
+    $rawPath = "creators/{$creator->ulid}/portfolio/01FAILEDRAW0000000000000.jpg";
+    Storage::disk('media')->put($rawPath, 'raw exif-bearing bytes');
+
+    $item = CreatorPortfolioItemFactory::new()->failed()->createOne([
+        'creator_id' => $creator->id,
+        's3_path' => $rawPath,
+    ]);
+
+    Storage::disk('media')->assertExists($rawPath);
+
+    $this->actingAs($user)
+        ->deleteJson("/api/v1/creators/me/portfolio/{$item->ulid}")
+        ->assertNoContent();
+
+    Storage::disk('media')->assertMissing($rawPath);
 });
 
 it('POST /wizard/kyc returns the hosted-flow URL and persists a KYC row', function (): void {

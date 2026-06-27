@@ -195,7 +195,13 @@
             "gallery_empty": "Nem portfolio elemek uploaded yet.",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
-            "untitled_item": "Untitled portfolio item"
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Előnézet megnyitása",
+            "preview_close": "Előnézet bezárása",
+            "processing_label": "Feldolgozás…",
+            "failed_label": "A feltöltés sikertelen",
+            "download_label": "Letöltés",
+            "view_all_label": "Összes megtekintése"
           }
         },
         "categories": {

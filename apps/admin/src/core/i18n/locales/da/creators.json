@@ -195,7 +195,13 @@
             "gallery_empty": "Ingen porteføljeelementer uploadet endnu.",
             "video_badge_label": "Video",
             "link_badge_label": "Eksternt link",
-            "untitled_item": "Unavngivet porteføljeelement"
+            "untitled_item": "Unavngivet porteføljeelement",
+            "preview_label": "Åbn forhåndsvisning",
+            "preview_close": "Luk forhåndsvisning",
+            "processing_label": "Behandler…",
+            "failed_label": "Upload mislykkedes",
+            "download_label": "Download",
+            "view_all_label": "Se alle"
           }
         },
         "categories": {

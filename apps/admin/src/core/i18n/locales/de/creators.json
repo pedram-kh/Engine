@@ -195,7 +195,13 @@
             "gallery_empty": "Noch keine Portfolio-Einträge hochgeladen.",
             "video_badge_label": "Video",
             "link_badge_label": "Externer Link",
-            "untitled_item": "Unbenannter Portfolio-Eintrag"
+            "untitled_item": "Unbenannter Portfolio-Eintrag",
+            "preview_label": "Vorschau öffnen",
+            "preview_close": "Vorschau schließen",
+            "processing_label": "Wird verarbeitet…",
+            "failed_label": "Upload fehlgeschlagen",
+            "download_label": "Herunterladen",
+            "view_all_label": "Alle anzeigen"
           }
         },
         "categories": {

@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Портфолио",
             "title": "Show your best work",
-            "description": "Качете up to 10 елементи — videos, images, or external links — that represent your style.",
+            "description": "Качете up to 30 елементи — videos, images, or external links — that represent your style.",
             "gallery_heading": "Your portfolio",
             "gallery_empty": "Не portfolio елементи uploaded yet.",
             "gallery_remove": "Remove item",
@@ -81,7 +81,11 @@
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
             "preview_label": "Open preview",
-            "preview_close": "Затворете preview"
+            "preview_close": "Затворете preview",
+            "processing_label": "Обработва се…",
+            "failed_label": "Качването е неуспешно",
+            "download_label": "Изтегляне",
+            "view_all_label": "Виж всички"
           },
           "kyc": {
             "name": "Identity verification",
@@ -407,7 +411,13 @@
         "status_pending": "Waiting…",
         "status_uploading": "Качетеing…",
         "status_done": "Качетеed",
-        "status_error": "Failed"
+        "status_error": "Failed",
+        "add_link_prompt": "Или добавете връзка към ваша работа другаде",
+        "add_link_url_label": "URL на връзката",
+        "add_link_title_label": "Заглавие (по желание)",
+        "add_link_button": "Добави връзка",
+        "add_link_invalid": "Въведете валидна http или https връзка.",
+        "add_link_failed": "Не успяхме да добавим тази връзка. Моля, опитайте отново."
       },
       "errors": {
         "upload_too_large": "This file is too large. The maximum size is {max_mb} MB.",

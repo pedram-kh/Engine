@@ -55,9 +55,11 @@ import { onboardingApi } from '../api/onboarding.api'
 import { captureVideoPoster } from '../internal/captureVideoPoster'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
-export const PORTFOLIO_MAX_ITEMS = 10
+// AH-004 D8: 10 → 30 items/creator, uniform 500 MB ceiling for ALL file types
+// (images now ride the same presigned-PUT path as video).
+export const PORTFOLIO_MAX_ITEMS = 30
 export const PORTFOLIO_CONCURRENCY = 3
-export const PORTFOLIO_IMAGE_MAX_BYTES = 10 * 1024 * 1024
+export const PORTFOLIO_IMAGE_MAX_BYTES = 500 * 1024 * 1024
 export const PORTFOLIO_VIDEO_MAX_BYTES = 500 * 1024 * 1024
 export const PORTFOLIO_IMAGE_MAX_MB = PORTFOLIO_IMAGE_MAX_BYTES / (1024 * 1024)
 export const PORTFOLIO_VIDEO_MAX_MB = PORTFOLIO_VIDEO_MAX_BYTES / (1024 * 1024)
@@ -137,6 +139,7 @@ export interface PortfolioUploadHandle {
   inFlightCount: ComputedRef<number>
   remainingSlots: ComputedRef<number>
   enqueue: (file: File) => PortfolioUploadItem
+  addLink: (externalUrl: string, title?: string) => Promise<boolean>
   remove: (id: string) => Promise<void>
   reset: () => void
 }
@@ -272,15 +275,31 @@ export function usePortfolioUpload(): PortfolioUploadHandle {
 
   async function uploadOne(item: PortfolioUploadItem): Promise<void> {
     try {
+      const onProgress = (percent: number): void => {
+        item.progress = percent
+      }
+
       if (item.kind === 'image') {
-        const envelope = await onboardingApi.uploadPortfolioImage(item.file)
-        item.portfolioId = envelope.data.id
+        // AH-004 Q5/D8: images now use the presigned-PUT path (uniform 500 MB).
+        // The completed item starts `processing` server-side while the worker
+        // strips EXIF + builds the thumbnail; the gallery reflects that state.
+        const init = await onboardingApi.initiatePortfolioImageUpload({
+          mime_type: item.file.type,
+          declared_bytes: item.file.size,
+        })
+        await uploadToPresignedUrl(init.data.upload_url, item.file, { onProgress })
+        const complete = await onboardingApi.completePortfolioImageUpload({
+          upload_id: init.data.upload_id,
+          mime_type: item.file.type,
+          size_bytes: item.file.size,
+        })
+        item.portfolioId = complete.data.id
       } else {
         const init = await onboardingApi.initiatePortfolioVideoUpload({
           mime_type: item.file.type,
           declared_bytes: item.file.size,
         })
-        await uploadToPresignedUrl(init.data.upload_url, item.file)
+        await uploadToPresignedUrl(init.data.upload_url, item.file, { onProgress })
         // Best-effort poster frame so the gallery shows a real preview.
         // Returns null on any failure — the upload proceeds regardless.
         const poster = await captureVideoPoster(item.file)
@@ -304,12 +323,35 @@ export function usePortfolioUpload(): PortfolioUploadHandle {
     }
   }
 
+  /**
+   * Add a titled external link (AH-004 D9/D11). Distinct from the file-upload
+   * queue: a link is created server-side immediately (no S3), then the store
+   * re-bootstraps so the gallery shows it. Honors the same per-creator cap.
+   * Returns true on success, false when the cap is reached or the create fails.
+   */
+  async function addLink(externalUrl: string, title?: string): Promise<boolean> {
+    if (remainingSlots.value <= 0) {
+      return false
+    }
+    try {
+      await onboardingApi.createPortfolioLink({
+        external_url: externalUrl,
+        ...(title !== undefined && title !== '' ? { title } : {}),
+      })
+      await store.bootstrap()
+      return true
+    } catch {
+      return false
+    }
+  }
+
   return {
     items,
     hasError,
     inFlightCount,
     remainingSlots,
     enqueue,
+    addLink,
     remove,
     reset,
   }

@@ -31,7 +31,22 @@ import { ApiError } from './errors'
 export async function uploadToPresignedUrl(
   url: string,
   body: File | Blob,
-  options: { contentType?: string } = {},
+  options: {
+    contentType?: string
+    /**
+     * Best-effort byte-progress callback (0..100), driven by the XHR
+     * upload-progress events axios surfaces. Used by the portfolio upload
+     * UI to show a determinate bar for large image / video PUTs (AH-004).
+     * Not all environments report `total`; when absent, no tick is emitted.
+     */
+    onProgress?: (percent: number) => void
+    /**
+     * Total upload timeout in ms. Defaults to 10 minutes — generous enough
+     * for a 500 MB file on a slow connection without aborting healthy
+     * uploads.
+     */
+    timeoutMs?: number
+  } = {},
 ): Promise<void> {
   const contentType = options.contentType ?? body.type
   try {
@@ -40,12 +55,18 @@ export async function uploadToPresignedUrl(
       headers: {
         'Content-Type': contentType,
       },
-      // The Sprint 3 chunk 1 backend signs presigned URLs with a
-      // 30-minute expiry; the upload itself can legitimately take
-      // several minutes for a 500 MB video, so we set a generous
-      // 10-minute total timeout to defend against truly stalled
-      // connections without aborting healthy uploads.
-      timeout: 10 * 60 * 1000,
+      // The backend signs presigned URLs with a 15-minute expiry; the
+      // upload itself can legitimately take several minutes for a 500 MB
+      // file, so we default to a generous 10-minute total timeout to defend
+      // against truly stalled connections without aborting healthy uploads.
+      timeout: options.timeoutMs ?? 10 * 60 * 1000,
+      onUploadProgress: options.onProgress
+        ? (event) => {
+            if (event.total !== undefined && event.total > 0) {
+              options.onProgress?.(Math.round((event.loaded / event.total) * 100))
+            }
+          }
+        : undefined,
     })
   } catch (error) {
     const axiosError = error as AxiosError

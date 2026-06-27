@@ -195,7 +195,13 @@
             "gallery_empty": "Nē portfolio vienumi uploaded yet.",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
-            "untitled_item": "Untitled portfolio item"
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Atvērt priekšskatījumu",
+            "preview_close": "Aizvērt priekšskatījumu",
+            "processing_label": "Apstrādā…",
+            "failed_label": "Augšupielāde neizdevās",
+            "download_label": "Lejupielādēt",
+            "view_all_label": "Skatīt visus"
           }
         },
         "categories": {

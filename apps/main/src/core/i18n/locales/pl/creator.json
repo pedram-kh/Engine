@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Pokaż swoje najlepsze prace",
-            "description": "Prześlij do 10 pozycji — filmy, obrazy lub zewnętrzne linki — reprezentujących Twój styl.",
+            "description": "Prześlij do 30 pozycji — filmy, obrazy lub zewnętrzne linki — reprezentujących Twój styl.",
             "gallery_heading": "Twoje portfolio",
             "gallery_empty": "Brak przesłanych pozycji portfolio.",
             "gallery_remove": "Usuń pozycję",
@@ -81,7 +81,11 @@
             "link_badge_label": "Zewnętrzny link",
             "untitled_item": "Nienazwana pozycja portfolio",
             "preview_label": "Otwórz podgląd",
-            "preview_close": "Zamknij podgląd"
+            "preview_close": "Zamknij podgląd",
+            "processing_label": "Przetwarzanie…",
+            "failed_label": "Przesyłanie nie powiodło się",
+            "download_label": "Pobierz",
+            "view_all_label": "Zobacz wszystkie"
           },
           "kyc": {
             "name": "Weryfikacja tożsamości",
@@ -407,7 +411,13 @@
         "status_pending": "Oczekiwanie…",
         "status_uploading": "Przesyłanie…",
         "status_done": "Przesłano",
-        "status_error": "Nie powiodło się"
+        "status_error": "Nie powiodło się",
+        "add_link_prompt": "Albo dodaj link do swojej pracy w innym miejscu",
+        "add_link_url_label": "Adres URL linku",
+        "add_link_title_label": "Tytuł (opcjonalnie)",
+        "add_link_button": "Dodaj link",
+        "add_link_invalid": "Wprowadź prawidłowy link http lub https.",
+        "add_link_failed": "Nie udało się dodać tego linku. Spróbuj ponownie."
       },
       "errors": {
         "upload_too_large": "Ten plik jest za duży. Maksymalny rozmiar to {max_mb} MB.",

@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Visa ditt bästa arbete",
-            "description": "Ladda upp upp till 10 poster — videor, bilder eller externa länkar — som representerar din stil.",
+            "description": "Ladda upp upp till 30 poster — videor, bilder eller externa länkar — som representerar din stil.",
             "gallery_heading": "Din portfolio",
             "gallery_empty": "Inga portfolioposter uppladdade ännu.",
             "gallery_remove": "Ta bort post",
@@ -81,7 +81,11 @@
             "link_badge_label": "Extern länk",
             "untitled_item": "Ej namngiven portfoliopost",
             "preview_label": "Öppna förhandsgranskning",
-            "preview_close": "Stäng förhandsgranskning"
+            "preview_close": "Stäng förhandsgranskning",
+            "processing_label": "Bearbetar…",
+            "failed_label": "Uppladdningen misslyckades",
+            "download_label": "Ladda ner",
+            "view_all_label": "Visa alla"
           },
           "kyc": {
             "name": "Identitetsverifiering",
@@ -407,7 +411,13 @@
         "status_pending": "Väntar…",
         "status_uploading": "Laddar upp…",
         "status_done": "Uppladdad",
-        "status_error": "Misslyckades"
+        "status_error": "Misslyckades",
+        "add_link_prompt": "Eller lägg till en länk till ditt arbete någon annanstans",
+        "add_link_url_label": "Länk-URL",
+        "add_link_title_label": "Titel (valfritt)",
+        "add_link_button": "Lägg till länk",
+        "add_link_invalid": "Ange en giltig http- eller https-länk.",
+        "add_link_failed": "Vi kunde inte lägga till den länken. Försök igen."
       },
       "errors": {
         "upload_too_large": "Den här filen är för stor. Maxstorleken är {max_mb} MB.",

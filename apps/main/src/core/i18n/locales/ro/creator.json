@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portofoliu",
             "title": "Show your best work",
-            "description": "Încărcați up to 10 elemente — videos, images, or external links — that represent your style.",
+            "description": "Încărcați up to 30 elemente — videos, images, or external links — that represent your style.",
             "gallery_heading": "Your portfolio",
             "gallery_empty": "Nu portfolio elemente uploaded yet.",
             "gallery_remove": "Remove item",
@@ -81,7 +81,11 @@
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
             "preview_label": "Open preview",
-            "preview_close": "Închideți preview"
+            "preview_close": "Închideți preview",
+            "processing_label": "Se procesează…",
+            "failed_label": "Încărcarea a eșuat",
+            "download_label": "Descarcă",
+            "view_all_label": "Vezi toate"
           },
           "kyc": {
             "name": "Identity verification",
@@ -407,7 +411,13 @@
         "status_pending": "Waiting…",
         "status_uploading": "Încărcațiing…",
         "status_done": "Încărcațied",
-        "status_error": "Failed"
+        "status_error": "Failed",
+        "add_link_prompt": "Sau adaugă un link către munca ta din altă parte",
+        "add_link_url_label": "URL-ul linkului",
+        "add_link_title_label": "Titlu (opțional)",
+        "add_link_button": "Adaugă link",
+        "add_link_invalid": "Introdu un link http sau https valid.",
+        "add_link_failed": "Nu am putut adăuga acel link. Încearcă din nou."
       },
       "errors": {
         "upload_too_large": "This file is too large. The maximum size is {max_mb} MB.",

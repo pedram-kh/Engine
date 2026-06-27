@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portafolio",
             "title": "Muestra tu mejor trabajo",
-            "description": "Sube hasta 10 elementos (vídeos, imágenes o enlaces externos) que representen tu estilo.",
+            "description": "Sube hasta 30 elementos (vídeos, imágenes o enlaces externos) que representen tu estilo.",
             "gallery_heading": "Tu portafolio",
             "gallery_empty": "Aún no has subido elementos al portafolio.",
             "gallery_remove": "Eliminar elemento",
@@ -81,7 +81,11 @@
             "link_badge_label": "Enlace externo",
             "untitled_item": "Elemento del portafolio sin título",
             "preview_label": "Abrir vista previa",
-            "preview_close": "Cerrar vista previa"
+            "preview_close": "Cerrar vista previa",
+            "processing_label": "Procesando…",
+            "failed_label": "Error al subir",
+            "download_label": "Descargar",
+            "view_all_label": "Ver todo"
           },
           "kyc": {
             "name": "Verificación de identidad",
@@ -407,7 +411,13 @@
         "status_pending": "Esperando…",
         "status_uploading": "Subiendo…",
         "status_done": "Subido",
-        "status_error": "Fallido"
+        "status_error": "Fallido",
+        "add_link_prompt": "O añade un enlace a tu trabajo en otro sitio",
+        "add_link_url_label": "URL del enlace",
+        "add_link_title_label": "Título (opcional)",
+        "add_link_button": "Añadir enlace",
+        "add_link_invalid": "Introduce un enlace http o https válido.",
+        "add_link_failed": "No pudimos añadir ese enlace. Inténtalo de nuevo."
       },
       "errors": {
         "upload_too_large": "Este archivo es demasiado grande. El tamaño máximo es {max_mb} MB.",

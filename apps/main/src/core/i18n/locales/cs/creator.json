@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Ukažte svou nejlepší práci",
-            "description": "Nahrajte až 10 položek — videa, obrázky nebo externí odkazy — které představují váš styl.",
+            "description": "Nahrajte až 30 položek — videa, obrázky nebo externí odkazy — které představují váš styl.",
             "gallery_heading": "Vaše portfolio",
             "gallery_empty": "Zatím žádné nahrané položky portfolia.",
             "gallery_remove": "Odebrat položku",
@@ -81,7 +81,11 @@
             "link_badge_label": "Externí odkaz",
             "untitled_item": "Nepojmenovaná položka portfolia",
             "preview_label": "Otevřít náhled",
-            "preview_close": "Zavřít náhled"
+            "preview_close": "Zavřít náhled",
+            "processing_label": "Zpracovává se…",
+            "failed_label": "Nahrávání se nezdařilo",
+            "download_label": "Stáhnout",
+            "view_all_label": "Zobrazit vše"
           },
           "kyc": {
             "name": "Ověření totožnosti",
@@ -407,7 +411,13 @@
         "status_pending": "Čekání…",
         "status_uploading": "Nahrávání…",
         "status_done": "Nahráno",
-        "status_error": "Selhalo"
+        "status_error": "Selhalo",
+        "add_link_prompt": "Nebo přidejte odkaz na svou práci jinde",
+        "add_link_url_label": "URL odkazu",
+        "add_link_title_label": "Název (volitelné)",
+        "add_link_button": "Přidat odkaz",
+        "add_link_invalid": "Zadejte platný odkaz http nebo https.",
+        "add_link_failed": "Tento odkaz se nepodařilo přidat. Zkuste to prosím znovu."
       },
       "errors": {
         "upload_too_large": "Tento soubor je příliš velký. Maximální velikost je {max_mb} MB.",

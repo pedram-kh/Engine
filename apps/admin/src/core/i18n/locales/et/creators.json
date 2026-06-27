@@ -195,7 +195,13 @@
             "gallery_empty": "Ei portfolio üksused uploaded yet.",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
-            "untitled_item": "Untitled portfolio item"
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Ava eelvaade",
+            "preview_close": "Sulge eelvaade",
+            "processing_label": "Töötlemine…",
+            "failed_label": "Üleslaadimine ebaõnnestus",
+            "download_label": "Laadi alla",
+            "view_all_label": "Vaata kõiki"
           }
         },
         "categories": {

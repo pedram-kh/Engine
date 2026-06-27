@@ -195,7 +195,13 @@
             "gallery_empty": "Zatím žádné nahrané položky portfolia.",
             "video_badge_label": "Video",
             "link_badge_label": "Externí odkaz",
-            "untitled_item": "Nepojmenovaná položka portfolia"
+            "untitled_item": "Nepojmenovaná položka portfolia",
+            "preview_label": "Otevřít náhled",
+            "preview_close": "Zavřít náhled",
+            "processing_label": "Zpracovává se…",
+            "failed_label": "Nahrávání se nezdařilo",
+            "download_label": "Stáhnout",
+            "view_all_label": "Zobrazit vše"
           }
         },
         "categories": {

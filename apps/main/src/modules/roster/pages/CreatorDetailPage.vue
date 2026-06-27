@@ -32,6 +32,7 @@ import {
   CEmptyState,
   CountryDisplay,
   LanguageList,
+  PortfolioDrawer,
   PortfolioGallery,
   SocialAccountList,
 } from '@catalyst/ui'
@@ -114,8 +115,12 @@ const portfolioItems = computed(() => {
     viewUrl: item.view_url,
     externalUrl: item.external_url,
     altText: item.title ?? t('app.roster.detail.portfolio.untitled'),
+    processingStatus: item.processing_status,
+    downloadUrl: item.download_url,
   }))
 })
+
+const portfolioDrawerOpen = ref(false)
 
 // ── Rating/notes editor state ────────────────────────────────────────────────
 const ratingDraft = ref<number | null>(null)
@@ -378,8 +383,18 @@ onMounted(() => {
 
           <!-- Portfolio -->
           <v-card variant="outlined" data-test="creator-detail-portfolio">
-            <v-card-title class="text-h6">
-              {{ t('app.roster.detail.sections.portfolio') }}
+            <v-card-title class="d-flex align-center justify-space-between text-h6">
+              <span>{{ t('app.roster.detail.sections.portfolio') }}</span>
+              <v-btn
+                v-if="portfolioItems.length > 0"
+                variant="text"
+                size="small"
+                prepend-icon="mdi-view-gallery-outline"
+                data-test="creator-detail-portfolio-open-drawer"
+                @click="portfolioDrawerOpen = true"
+              >
+                {{ t('creator.ui.wizard.steps.portfolio.view_all_label') }}
+              </v-btn>
             </v-card-title>
             <v-card-text>
               <PortfolioGallery
@@ -388,9 +403,26 @@ onMounted(() => {
                 :empty-label="t('app.roster.detail.portfolio.empty')"
                 :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
                 :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
+                :processing-label="t('creator.ui.wizard.steps.portfolio.processing_label')"
+                :failed-label="t('creator.ui.wizard.steps.portfolio.failed_label')"
+                :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
               />
             </v-card-text>
           </v-card>
+
+          <PortfolioDrawer
+            v-model="portfolioDrawerOpen"
+            :items="portfolioItems"
+            :title="t('app.roster.detail.sections.portfolio')"
+            :empty-label="t('app.roster.detail.portfolio.empty')"
+            :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
+            :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
+            :preview-label="t('creator.ui.wizard.steps.portfolio.preview_label')"
+            :close-label="t('creator.ui.wizard.steps.portfolio.preview_close')"
+            :processing-label="t('creator.ui.wizard.steps.portfolio.processing_label')"
+            :failed-label="t('creator.ui.wizard.steps.portfolio.failed_label')"
+            :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
+          />
 
           <!-- Availability (read-only, consumes the Sprint-5 agency endpoint) -->
           <v-card variant="outlined" data-test="creator-detail-availability">

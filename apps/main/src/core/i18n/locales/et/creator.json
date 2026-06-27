@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Show your best work",
-            "description": "Lae üles up to 10 üksused — videos, images, or external links — that represent your style.",
+            "description": "Lae üles up to 30 üksused — videos, images, or external links — that represent your style.",
             "gallery_heading": "Your portfolio",
             "gallery_empty": "Ei portfolio üksused uploaded yet.",
             "gallery_remove": "Remove item",
@@ -81,7 +81,11 @@
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
             "preview_label": "Open preview",
-            "preview_close": "Sulge preview"
+            "preview_close": "Sulge preview",
+            "processing_label": "Töötlemine…",
+            "failed_label": "Üleslaadimine ebaõnnestus",
+            "download_label": "Laadi alla",
+            "view_all_label": "Vaata kõiki"
           },
           "kyc": {
             "name": "Identity verification",
@@ -407,7 +411,13 @@
         "status_pending": "Waiting…",
         "status_uploading": "Lae ülesing…",
         "status_done": "Lae ülesed",
-        "status_error": "Failed"
+        "status_error": "Failed",
+        "add_link_prompt": "Või lisa link oma tööle mujal",
+        "add_link_url_label": "Lingi URL",
+        "add_link_title_label": "Pealkiri (valikuline)",
+        "add_link_button": "Lisa link",
+        "add_link_invalid": "Sisesta kehtiv http- või https-link.",
+        "add_link_failed": "Me ei saanud seda linki lisada. Palun proovi uuesti."
       },
       "errors": {
         "upload_too_large": "This file is too large. The maximum size is {max_mb} MB.",

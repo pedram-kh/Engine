@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Show your best work",
-            "description": "Ittella' up to 10 oġġetti — videos, images, or external links — that represent your style.",
+            "description": "Ittella' up to 30 oġġetti — videos, images, or external links — that represent your style.",
             "gallery_heading": "Your portfolio",
             "gallery_empty": "Le portfolio oġġetti uploaded yet.",
             "gallery_remove": "Remove item",
@@ -81,7 +81,11 @@
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
             "preview_label": "Open preview",
-            "preview_close": "Agħlaq preview"
+            "preview_close": "Agħlaq preview",
+            "processing_label": "Qed jiġi pproċessat…",
+            "failed_label": "It-tlugħ falla",
+            "download_label": "Niżżel",
+            "view_all_label": "Ara kollox"
           },
           "kyc": {
             "name": "Identity verification",
@@ -407,7 +411,13 @@
         "status_pending": "Waiting…",
         "status_uploading": "Ittella'ing…",
         "status_done": "Ittella'ed",
-        "status_error": "Failed"
+        "status_error": "Failed",
+        "add_link_prompt": "Jew żid link għax-xogħol tiegħek band'oħra",
+        "add_link_url_label": "URL tal-link",
+        "add_link_title_label": "Titlu (mhux obbligatorju)",
+        "add_link_button": "Żid link",
+        "add_link_invalid": "Daħħal link http jew https validu.",
+        "add_link_failed": "Ma stajniex inżidu dak il-link. Jekk jogħġbok erġa' pprova."
       },
       "errors": {
         "upload_too_large": "This file is too large. The maximum size is {max_mb} MB.",

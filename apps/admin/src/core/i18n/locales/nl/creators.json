@@ -195,7 +195,13 @@
             "gallery_empty": "Nog geen portfolio-items geüpload.",
             "video_badge_label": "Video",
             "link_badge_label": "Externe link",
-            "untitled_item": "Naamloos portfolio-item"
+            "untitled_item": "Naamloos portfolio-item",
+            "preview_label": "Voorbeeld openen",
+            "preview_close": "Voorbeeld sluiten",
+            "processing_label": "Bezig met verwerken…",
+            "failed_label": "Uploaden mislukt",
+            "download_label": "Downloaden",
+            "view_all_label": "Alles weergeven"
           }
         },
         "categories": {

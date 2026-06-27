@@ -383,13 +383,28 @@ export interface CreatorSocialAccountSummary {
  * read these for `<img src>` bindings — the `*_path` fields refer
  * to keys on the private `media` disk and are NOT browser-fetchable.
  */
+export type CreatorPortfolioProcessingStatus = 'processing' | 'ready' | 'failed'
+
 export interface CreatorPortfolioItemSummary {
   id: string
   kind: 'image' | 'video' | 'link'
+  /**
+   * Asset-processing state (AH-004). Large images upload as `processing`
+   * while the worker strips EXIF + builds a thumbnail; `view_url` /
+   * `thumbnail_view_url` / `download_url` are WITHHELD (null) by the server
+   * until `ready`. `failed` items (over-cap / corrupt) are kept so the owner
+   * can delete + re-upload. Links + videos are `ready` from creation.
+   */
+  processing_status: CreatorPortfolioProcessingStatus
   title: string | null
   description: string | null
   s3_path: string | null
   view_url: string | null
+  /**
+   * Presigned GET that forces an `attachment` download of the full-res
+   * sanitised asset (AH-004 D10). Null for links and non-ready items.
+   */
+  download_url: string | null
   external_url: string | null
   thumbnail_path: string | null
   thumbnail_view_url: string | null
@@ -469,6 +484,37 @@ export interface PortfolioVideoCompletePayload {
    * instead of a play-badge placeholder. Absent → JSON body as before.
    */
   thumbnail?: Blob | null
+}
+
+/**
+ * Initiate / complete payloads for a large portfolio IMAGE (AH-004 Q5/D8).
+ * Images now ride the same presigned-PUT path as video (uniform 500 MB
+ * ceiling); the object is sanitised asynchronously after `complete`, so the
+ * created item starts `processing`.
+ */
+export interface PortfolioImageInitPayload {
+  mime_type: string
+  declared_bytes: number
+}
+
+export type PortfolioImageInitResponse = PortfolioVideoInitResponse
+
+export interface PortfolioImageCompletePayload {
+  upload_id: string
+  title?: string
+  description?: string
+  mime_type: string
+  size_bytes: number
+}
+
+/**
+ * Add a titled external link (AH-004 D9). The backend allows http/https only
+ * and rejects `javascript:` / `data:` schemes (XSS guard).
+ */
+export interface PortfolioLinkPayload {
+  external_url: string
+  title?: string
+  description?: string
 }
 
 export interface PortfolioItemSummary {

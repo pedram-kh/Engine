@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Χαρτοφυλάκιο",
             "title": "Show your best work",
-            "description": "Μεταφόρτωση up to 10 στοιχεία — videos, images, or external links — that represent your style.",
+            "description": "Μεταφόρτωση up to 30 στοιχεία — videos, images, or external links — that represent your style.",
             "gallery_heading": "Your portfolio",
             "gallery_empty": "Όχι portfolio στοιχεία uploaded yet.",
             "gallery_remove": "Remove item",
@@ -81,7 +81,11 @@
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
             "preview_label": "Open preview",
-            "preview_close": "Κλείσιμο preview"
+            "preview_close": "Κλείσιμο preview",
+            "processing_label": "Επεξεργασία…",
+            "failed_label": "Η μεταφόρτωση απέτυχε",
+            "download_label": "Λήψη",
+            "view_all_label": "Προβολή όλων"
           },
           "kyc": {
             "name": "Identity verification",
@@ -407,7 +411,13 @@
         "status_pending": "Waiting…",
         "status_uploading": "Μεταφόρτωσηing…",
         "status_done": "Μεταφόρτωσηed",
-        "status_error": "Failed"
+        "status_error": "Failed",
+        "add_link_prompt": "Ή προσθέστε έναν σύνδεσμο για τη δουλειά σας αλλού",
+        "add_link_url_label": "URL συνδέσμου",
+        "add_link_title_label": "Τίτλος (προαιρετικό)",
+        "add_link_button": "Προσθήκη συνδέσμου",
+        "add_link_invalid": "Εισαγάγετε έναν έγκυρο σύνδεσμο http ή https.",
+        "add_link_failed": "Δεν μπορέσαμε να προσθέσουμε αυτόν τον σύνδεσμο. Δοκιμάστε ξανά."
       },
       "errors": {
         "upload_too_large": "This file is too large. The maximum size is {max_mb} MB.",

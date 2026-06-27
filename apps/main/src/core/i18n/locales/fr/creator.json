@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Montrez vos meilleures réalisations",
-            "description": "Téléversez jusqu'à 10 éléments — vidéos, images ou liens externes — qui représentent votre style.",
+            "description": "Téléversez jusqu'à 30 éléments — vidéos, images ou liens externes — qui représentent votre style.",
             "gallery_heading": "Votre portfolio",
             "gallery_empty": "Aucun élément de portfolio téléversé pour le moment.",
             "gallery_remove": "Supprimer l'élément",
@@ -81,7 +81,11 @@
             "link_badge_label": "Lien externe",
             "untitled_item": "Élément de portfolio sans titre",
             "preview_label": "Ouvrir l'aperçu",
-            "preview_close": "Fermer l'aperçu"
+            "preview_close": "Fermer l'aperçu",
+            "processing_label": "Traitement…",
+            "failed_label": "Échec du téléversement",
+            "download_label": "Télécharger",
+            "view_all_label": "Voir tout"
           },
           "kyc": {
             "name": "Vérification d'identité",
@@ -407,7 +411,13 @@
         "status_pending": "En attente…",
         "status_uploading": "Téléversement…",
         "status_done": "Téléversé",
-        "status_error": "Échec"
+        "status_error": "Échec",
+        "add_link_prompt": "Ou ajoutez un lien vers votre travail ailleurs",
+        "add_link_url_label": "URL du lien",
+        "add_link_title_label": "Titre (facultatif)",
+        "add_link_button": "Ajouter un lien",
+        "add_link_invalid": "Saisissez un lien http ou https valide.",
+        "add_link_failed": "Nous n'avons pas pu ajouter ce lien. Veuillez réessayer."
       },
       "errors": {
         "upload_too_large": "Ce fichier est trop volumineux. La taille maximale est de {max_mb} Mo.",

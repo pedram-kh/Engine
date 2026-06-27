@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Ukažte svou nejlepší práci",
-            "description": "Nahrajte až 10 položek — videa, obrázky nebo externí odkazy — které předstanjeují váš styl.",
+            "description": "Nahrajte až 30 položek — videa, obrázky nebo externí odkazy — které předstanjeují váš styl.",
             "gallery_heading": "Vaše portfolio",
             "gallery_empty": "Zatím žádné nahrané položky portfolia.",
             "gallery_remove": "Odstrani položku",
@@ -81,7 +81,11 @@
             "link_badge_label": "Externí odkaz",
             "untitled_item": "Nepojmenovaná položka portfolia",
             "preview_label": "Otevřít náhled",
-            "preview_close": "Zapri náhled"
+            "preview_close": "Zapri náhled",
+            "processing_label": "Obdelava…",
+            "failed_label": "Nalaganje ni uspelo",
+            "download_label": "Prenesi",
+            "view_all_label": "Prikaži vse"
           },
           "kyc": {
             "name": "Preverjanje totožnosti",
@@ -407,7 +411,13 @@
         "status_pending": "Čakaní…",
         "status_uploading": "Nalaganje…",
         "status_done": "Naloženo",
-        "status_error": "Selhalo"
+        "status_error": "Selhalo",
+        "add_link_prompt": "Ali dodajte povezavo do svojega dela drugje",
+        "add_link_url_label": "URL povezave",
+        "add_link_title_label": "Naslov (neobvezno)",
+        "add_link_button": "Dodaj povezavo",
+        "add_link_invalid": "Vnesite veljavno povezavo http ali https.",
+        "add_link_failed": "Te povezave nismo mogli dodati. Poskusite znova."
       },
       "errors": {
         "upload_too_large": "Tento soubor je příliš velký. Maximální velikost je {max_mb} MB.",

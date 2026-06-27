@@ -11,8 +11,10 @@ use App\Modules\Creators\Database\Factories\CreatorSocialAccountFactory;
 use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
+use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -173,6 +175,67 @@ it('shows blacklist STATUS read-only but WITHHOLDS the free-text reason (D-2a-3/
 
     expect($response->getContent())->not->toContain('blacklist_reason')
         ->and($response->getContent())->not->toContain('SECRET BLACKLIST JUSTIFICATION');
+});
+
+// ---------------------------------------------------------------------------
+// Portfolio download authz (AH-004 sub-step 6): the download_url is NOT a
+// separate endpoint — it rides this resource, so it inherits the exact view
+// authz (relation-exists tenancy). A caller who can see the roster creator
+// receives a ready item's download_url; a non-member who gets 404 on the
+// resource never receives a download_url at all (no broader grant than view).
+// ---------------------------------------------------------------------------
+
+it('mints a portfolio download_url for a roster member who can view the creator (AH-004 authz inherit)', function (): void {
+    $adapter = Mockery::mock(AwsS3V3Adapter::class);
+    $adapter->shouldReceive('temporaryUrl')
+        ->andReturnUsing(function (string $path, $expiry, array $options = []): string {
+            $disposition = isset($options['ResponseContentDisposition']) ? '&cd=1' : '';
+
+            return "https://signed.example/{$path}?sig=test{$disposition}";
+        });
+    Storage::shouldReceive('disk')->with('media')->andReturn($adapter);
+
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = rosterDetailCreator($agency);
+    CreatorPortfolioItemFactory::new()->for($creator)->createOne([
+        's3_path' => 'creators/01/portfolio/img.jpg',
+        'thumbnail_path' => 'creators/01/portfolio/thumbs/img.jpg',
+    ]);
+
+    $response = $this->actingAs($admin)->getJson(detailUrl($agency, $creator));
+
+    $response->assertOk();
+    $items = $response->json('data.attributes.creator.portfolio');
+
+    expect($items)->toHaveCount(1);
+    expect($items[0]['processing_status'])->toBe('ready');
+    expect($items[0]['download_url'])->toContain('cd=1');
+    expect($items[0]['download_url'])->toContain('creators/01/portfolio/img.jpg');
+});
+
+it('denies the portfolio download to a non-member — 404 before any download_url is minted (AH-004 authz break-revert)', function (): void {
+    // The download is a presigned GET behind the resource gate. An outsider
+    // who fails the relation-exists tenancy gets 404 and never receives the
+    // resource body — so a download_url cannot leak as a broader grant.
+    $adapter = Mockery::mock(AwsS3V3Adapter::class);
+    $adapter->shouldReceive('temporaryUrl')
+        ->andReturnUsing(fn (string $path): string => "https://signed.example/{$path}?sig=test");
+    Storage::shouldReceive('disk')->with('media')->andReturn($adapter);
+
+    $agency = Agency::factory()->createOne();
+    $creator = rosterDetailCreator($agency);
+    CreatorPortfolioItemFactory::new()->for($creator)->createOne([
+        's3_path' => 'creators/01/portfolio/img.jpg',
+        'thumbnail_path' => 'creators/01/portfolio/thumbs/img.jpg',
+    ]);
+    $outsider = User::factory()->agencyAdmin(Agency::factory()->createOne())->createOne();
+
+    $response = $this->actingAs($outsider)->getJson(detailUrl($agency, $creator));
+
+    $response->assertStatus(404);
+    expect($response->getContent())->not->toContain('download_url')
+        ->and($response->getContent())->not->toContain('creators/01/portfolio/img.jpg');
 });
 
 // ---------------------------------------------------------------------------

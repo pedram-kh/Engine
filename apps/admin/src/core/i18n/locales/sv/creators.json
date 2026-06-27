@@ -195,7 +195,13 @@
             "gallery_empty": "Inga portfolioposter uppladdade ännu.",
             "video_badge_label": "Video",
             "link_badge_label": "Extern länk",
-            "untitled_item": "Ej namngiven portfoliopost"
+            "untitled_item": "Ej namngiven portfoliopost",
+            "preview_label": "Öppna förhandsvisning",
+            "preview_close": "Stäng förhandsvisning",
+            "processing_label": "Bearbetar…",
+            "failed_label": "Uppladdningen misslyckades",
+            "download_label": "Ladda ner",
+            "view_all_label": "Visa alla"
           }
         },
         "categories": {

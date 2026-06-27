@@ -72,7 +72,7 @@
           "portfolio": {
             "name": "Portfolio",
             "title": "Show your best work",
-            "description": "Lähetä tiedosto up to 10 kohteet — videos, images, or external links — that represent your style.",
+            "description": "Lähetä tiedosto up to 30 kohteet — videos, images, or external links — that represent your style.",
             "gallery_heading": "Your portfolio",
             "gallery_empty": "Ei portfolio kohteet uploaded yet.",
             "gallery_remove": "Remove item",
@@ -81,7 +81,11 @@
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
             "preview_label": "Open preview",
-            "preview_close": "Sulje preview"
+            "preview_close": "Sulje preview",
+            "processing_label": "Käsitellään…",
+            "failed_label": "Lataus epäonnistui",
+            "download_label": "Lataa",
+            "view_all_label": "Näytä kaikki"
           },
           "kyc": {
             "name": "Identity verification",
@@ -407,7 +411,13 @@
         "status_pending": "Waiting…",
         "status_uploading": "Lähetä tiedostoing…",
         "status_done": "Lähetä tiedostoed",
-        "status_error": "Failed"
+        "status_error": "Failed",
+        "add_link_prompt": "Tai lisää linkki työhösi muualla",
+        "add_link_url_label": "Linkin URL-osoite",
+        "add_link_title_label": "Otsikko (valinnainen)",
+        "add_link_button": "Lisää linkki",
+        "add_link_invalid": "Anna kelvollinen http- tai https-linkki.",
+        "add_link_failed": "Linkin lisääminen epäonnistui. Yritä uudelleen."
       },
       "errors": {
         "upload_too_large": "This file is too large. The maximum size is {max_mb} MB.",

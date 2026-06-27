@@ -68,10 +68,10 @@
       "@php artisan key:generate --ansi"
     ],
     "test": [
-      "@php vendor/bin/pest --colors=always"
+      "@php -d memory_limit=512M vendor/bin/pest --colors=always"
     ],
     "test:coverage": [
-      "@php vendor/bin/pest --coverage --min=80"
+      "@php -d memory_limit=512M vendor/bin/pest --coverage --min=80"
     ],
     "pint": [
       "@php vendor/bin/pint"
@@ -89,7 +89,7 @@
     ],
     "dev": [
       "Composer\\Config::disableProcessTimeout",
-      "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185\" \"php artisan serve --host=127.0.0.1 --port=8000\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" --names=server,queue,logs"
+      "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185\" \"php artisan serve --host=127.0.0.1 --port=8000\" \"php artisan queue:listen --tries=1 --memory=768\" \"php artisan pail --timeout=0\" --names=server,queue,logs"
     ]
   },
   "extra": {

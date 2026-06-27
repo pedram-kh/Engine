@@ -195,7 +195,13 @@
             "gallery_empty": "Níl portfolio míreanna uploaded yet.",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
-            "untitled_item": "Untitled portfolio item"
+            "untitled_item": "Untitled portfolio item",
+            "preview_label": "Oscail réamhamharc",
+            "preview_close": "Dún an réamhamharc",
+            "processing_label": "Á phróiseáil…",
+            "failed_label": "Theip ar an uaslódáil",
+            "download_label": "Íoslódáil",
+            "view_all_label": "Féach ar gach ceann"
           }
         },
         "categories": {
