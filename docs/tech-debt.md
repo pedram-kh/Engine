@@ -1505,11 +1505,41 @@ anyone reviewing it later.
 - **Triggered by:** measured upload failure rates (resume/expiry) or storage-cost review (S3).
 - **Owner:** AH-004 portfolio workstream / infra-cost review.
 - **Status:** open (deferred).
-- **Build-time addendum (2026-06-27, AH-004 landed):** the **legacy** direct-multipart
-  `POST /creators/me/portfolio` image endpoint (`uploadPortfolioImage`) was kept for the
-  Playwright seed + any pre-AH-004 caller, but it does **not** route through
-  `ProcessPortfolioImageJob` — so an image added that way is stored as-is (no EXIF strip, no
-  re-encode, no thumbnail, status defaults to `ready`). New uploads go through the presigned
-  `images/init` → `PUT` → `images/complete` flow, which dispatches the worker. Retiring the
-  legacy path (or routing it through the same worker) is deferred; until then "uploaded via the
-  legacy endpoint" is the one way a portfolio image can carry original EXIF.
+- **Build-time addendum (2026-06-27, AH-004 landed) — CORRECTED:** the **legacy** direct-multipart
+  `POST /creators/me/portfolio/images` endpoint (`PortfolioController::uploadImage`) is still
+  mounted unconditionally (prod-reachable, behind the `creators/me` auth), but it is **NOT** an
+  EXIF/GPS-stripping bypass — an earlier note here claimed it was, which was wrong. It delegates to
+  `PortfolioUploadService::uploadImage()` → `AvatarUploadService::upload()`, which decodes the
+  upload and **re-encodes it through Intervention (`strip: true` + render-from-raster)**, so
+  EXIF/GPS is stripped on this path exactly as on the AH-004 worker path. The EXIF guarantee holds
+  on **both** routes. The real residual difference (a fidelity gap, not a security one): the legacy
+  path runs the **avatar** re-encoder, so it (a) **downscales to 1024px** longest edge rather than
+  retaining full resolution, (b) caps at 10 MB, and (c) does not generate a portfolio thumbnail or
+  set `processing_status` (it defaults to `ready`). New SPA uploads no longer call it (they use the
+  presigned `images/init` → `PUT` → `images/complete` worker flow); the endpoint remains for the
+  Playwright `seedPortfolioImage` helper + any pre-AH-004 caller, and the `usePortfolioUpload`
+  docblock still describing image uploads as "direct-multipart POST to /portfolio/images" is now
+  stale. Retiring the endpoint (or routing it through the full-res worker for parity) is deferred;
+  because EXIF is stripped either way, deferral is safe.
+
+## AH-001 i18n completeness — English fragments inside translated values (parity-invisible)
+
+- **Where:** the AH-001 machine-translation locale baseline across `apps/main` / `apps/admin`
+  (`src/core/i18n/locales/**`). Surfaced during the AH-004 i18n pass.
+- **What we found:** at least ~10 locales (`bg`, `et`, `fi`, `el`, `hu`, `ga`, `lv`, `lt`, `mt`,
+  `ro`) carry **English fragments inside otherwise-translated values** — e.g. the creator portfolio
+  `description` string still contains English wording like "up to … that represent your style"
+  under a foreign-language key. AH-004 only touched the `10 → 30` number in those strings (in
+  scope), so this predates and is independent of AH-004.
+- **Why the gates don't catch it:** the i18n CI gate is **keyset/placeholder/plural parity** — it
+  proves a key _exists_ in every locale with matching interpolation/plural shape, but it can
+  **never** prove a value isn't still English. "English text under a foreign label" is structurally
+  invisible to parity. The AH-001 review already flagged the MT baseline as
+  structurally-validated, **not** meaning-verified (per-market human review is a go-live gate, not
+  a merge gate) — this is concrete evidence of that gap, not a regression.
+- **Fix:** a content cleanup pass (human / higher-quality MT) over the affected locales' values,
+  ideally with a heuristic lint (e.g. flag values that are byte-identical to `en`, or that match an
+  English-token dictionary) to surface untranslated strings that parity cannot.
+- **Triggered by:** per-market localization QA / go-live review.
+- **Owner:** i18n / localization workstream.
+- **Status:** open (deferred; not a merge blocker).

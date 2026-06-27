@@ -120,7 +120,9 @@ portfolio/images/complete`, which dispatches the worker. Uniform **500 MB** ceil
   and S3 storage-cost-at-scale remain deferred (tech-debt AH-004 carry-overs).
 - **Ref:** `docs/reviews/ah-004-portfolio-overhaul-plan.md` (audited plan); tech-debt
   "Portfolio upload — resume / presign-expiry / storage cost (AH-004 plan carry-overs)" +
-  its build-time addendum. Commit-pair (this entry's landing commit).
+  its build-time addendum. Commit-pair: `7b62272` (feat) + `b0605be` (docs); pre-push
+  reconciliation follow-up adds the corrected legacy-endpoint disposition + the AH-001 i18n
+  completeness debt entry.
 
 ---
 
