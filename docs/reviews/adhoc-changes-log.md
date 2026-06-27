@@ -49,10 +49,9 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID     | Title                                    | Status   | Notes                                                                |
-| ------ | ---------------------------------------- | -------- | -------------------------------------------------------------------- |
-| AH-002 | Digest/invite email docblock + debt      | Proposed | Cursor prompt issued; not yet landed. Cosmetic doc fix + debt entry. |
-| —      | Campaign Drafts tab — independent review | Pending  | Merged in code; review file reads "pending independent review pass." |
+| ID  | Title                                    | Status  | Notes                                                                |
+| --- | ---------------------------------------- | ------- | -------------------------------------------------------------------- |
+| —   | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass." |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -60,6 +59,24 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-002 · Digest/invite email locale docblock + English-only decision
+
+- **Status:** Landed
+- **Date:** 2026-06-28
+- **Why:** The `UnreadMessagesDigestMail` docblock falsely implied per-recipient locale handling,
+  and the deliberate English-only disposition of the digest + agency-invite emails was unrecorded.
+- **What:** Corrected the docblock to state the digest renders in the application default locale
+  (`en`) for all recipients — no `->locale(...)` at the send site — and logged the English-only
+  decision as tech-debt, including why the digest is harder to localize than a normal mailable: its
+  lines are built with `__()` in console context inside `MessageDigestService` (`:204`/`:212`/
+  `:220`) before the job is queued, so a future fix must localize at line-build time, not just chain
+  `->locale()` at the send site. No behavior change; no test change.
+- **Touched:** `apps/api/app/Modules/Messaging/Mail/UnreadMessagesDigestMail.php` (docblock only),
+  `docs/tech-debt.md` ("Digest + agency-invite emails are English-only (deliberate)").
+- **Ref:** `766d925` (docblock + tech-debt entry); this log reconciliation commit.
+
+---
 
 ### AH-004 · Portfolio overhaul (schema + async image worker + drawer)
 
