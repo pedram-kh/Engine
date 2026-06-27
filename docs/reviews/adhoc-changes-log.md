@@ -49,11 +49,10 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID     | Title                                    | Status   | Notes                                                                                          |
-| ------ | ---------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
-| AH-002 | Digest/invite email docblock + debt      | Proposed | Cursor prompt issued; not yet landed. Cosmetic doc fix + debt entry.                           |
-| AH-004 | Portfolio overhaul (schema + feature)    | Proposed | Plan-pause: two open items (image EXIF/thumbnail; drawer presentation). No code until audited. |
-| —      | Campaign Drafts tab — independent review | Pending  | Merged in code; review file reads "pending independent review pass."                           |
+| ID     | Title                                    | Status   | Notes                                                                |
+| ------ | ---------------------------------------- | -------- | -------------------------------------------------------------------- |
+| AH-002 | Digest/invite email docblock + debt      | Proposed | Cursor prompt issued; not yet landed. Cosmetic doc fix + debt entry. |
+| —      | Campaign Drafts tab — independent review | Pending  | Merged in code; review file reads "pending independent review pass." |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -61,6 +60,69 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-004 · Portfolio overhaul (schema + async image worker + drawer)
+
+- **Status:** Landed
+- **Date:** 2026-06-27
+- **Why:** The portfolio was a thin, image-only path: small per-creator cap, no full-resolution
+  download, raw EXIF-bearing originals served straight back, no link entries, and three separate
+  resources each minting signed URLs with their own copy of the (missing) safety logic. It also
+  presented inconsistently across the creator, agency-roster, agency-discover, and admin surfaces.
+- **What:**
+  - **`processing_status` lifecycle** (`processing` → `ready` / `failed`) on portfolio items —
+    new enum + migration (`default('ready')` so all existing rows + link items are ready) + model
+    cast + factory `processing()` / `failed()` states.
+  - **Presigned image uploads** mirroring the proven video path: `POST portfolio/images/init`
+    (presigned `PUT`) → client `PUT` with **progress + a client timeout** → `POST
+portfolio/images/complete`, which dispatches the worker. Uniform **500 MB** ceiling for all
+    file types; per-creator cap raised **10 → 30**.
+  - **`ProcessPortfolioImageJob` + `PortfolioImageProcessor`** — an async worker that re-encodes
+    the upload at **full resolution with EXIF stripped** (not the avatar downscale path),
+    generates a 512px-max-edge thumbnail, and guards a **`MAX_MEGAPIXELS = 50`** decompression-bomb
+    cap. On success → `ready`; on over-cap / corrupt input → `failed`. The 50 MP cap is a **matched
+    pair** with the memory pins (below): a near-cap decode stays inside the 512 MB test / 768 MB
+    worker envelope.
+  - **Shared `PortfolioItemPresenter`** — the single source of truth that all **three** portfolio
+    mint sites (`CreatorResource`, `AgencyCreatorDetailResource`, `CreatorPublicProfileResource`)
+    now route through, so the **server-authoritative `ready`-gate lives in one place**: `view_url`,
+    `thumbnail_view_url`, and `download_url` are minted **only** when `processing_status === ready`;
+    otherwise null. A break-revert on this gate is the load-bearing spec.
+  - **Download** = a presigned GET on the **same already-authorized resource** with
+    `ResponseContentDisposition=attachment` (full-res source, never the thumbnail). It therefore
+    **inherits each surface's view authz** and the same `ready`-gate — never a broader grant than
+    view. Per-surface authz feature tests pin that a caller who 404s the resource never receives a
+    `download_url`.
+  - **Link portfolio items** — `POST portfolio/links` with http/https-only URL validation (XSS
+    guard), surfaced as `ready`-by-definition items with an `external_url`.
+  - **`PortfolioDrawer`** — one reusable `v-dialog` (the `ReviewDraftDrawer` pattern) wrapping
+    `PortfolioGallery`, wired into all four surfaces with a "View all" affordance + processing
+    spinner / failed-state overlays / download button.
+  - **Deleting an item cleans up its S3 objects** (raw + thumbnail), including `failed` items whose
+    raw object is unreachable behind the gate but would otherwise orphan.
+  - **Memory pins (matched pair):** `composer test` runs at `-d memory_limit=512M`; the prod/dev
+    `queue:work` worker is sized at `--memory=768` and documented in `local-dev.md`.
+  - **i18n done-gate:** new `creator` (main) + `creators` (admin) strings — processing / failed /
+    download / view-all labels and the add-link form — regenerated across all 24 locales;
+    parity/placeholder/plural gates green.
+- **Touched:** `apps/api` (`PortfolioProcessingStatus` enum, migration, `CreatorPortfolioItem`
+  model + factory, `PortfolioImageProcessor`, `ProcessPortfolioImageJob`, `PortfolioUploadService`,
+  `PortfolioController`, routes, the shared `PortfolioItemPresenter`, the three portfolio resources,
+  `composer.json`), `packages/api-client` (`presigned.ts` progress/timeout, `types/creator.ts`),
+  `packages/ui` (`PortfolioGallery`, new `PortfolioDrawer`, `index.ts`), `apps/main` (onboarding
+  api/composable + spec, `ConnectionsPortfolioSection`, `PortfolioUploadGrid`, roster + discover
+  detail pages), `apps/admin` (creator detail page), all `creator.json` / `creators.json` locales,
+  `package.json`, `docs/runbooks/local-dev.md`, backend feature/job tests.
+- **Decisions:** `MAX_MEGAPIXELS = 50` (not 100) to keep a near-cap decode inside the 512/768 MB
+  envelope while still guarding the bomb line; download inherits view authz rather than being a
+  separate (broader) grant; the legacy direct-multipart image endpoint is kept for the Playwright
+  seed but bypasses the worker (recorded in tech-debt). Resume/multipart, presign-expiry handshake,
+  and S3 storage-cost-at-scale remain deferred (tech-debt AH-004 carry-overs).
+- **Ref:** `docs/reviews/ah-004-portfolio-overhaul-plan.md` (audited plan); tech-debt
+  "Portfolio upload — resume / presign-expiry / storage cost (AH-004 plan carry-overs)" +
+  its build-time addendum. Commit-pair (this entry's landing commit).
+
+---
 
 ### AH-003 · Wizard slim + profile-basics polish
 

@@ -1505,3 +1505,11 @@ anyone reviewing it later.
 - **Triggered by:** measured upload failure rates (resume/expiry) or storage-cost review (S3).
 - **Owner:** AH-004 portfolio workstream / infra-cost review.
 - **Status:** open (deferred).
+- **Build-time addendum (2026-06-27, AH-004 landed):** the **legacy** direct-multipart
+  `POST /creators/me/portfolio` image endpoint (`uploadPortfolioImage`) was kept for the
+  Playwright seed + any pre-AH-004 caller, but it does **not** route through
+  `ProcessPortfolioImageJob` — so an image added that way is stored as-is (no EXIF strip, no
+  re-encode, no thumbnail, status defaults to `ready`). New uploads go through the presigned
+  `images/init` → `PUT` → `images/complete` flow, which dispatches the worker. Retiring the
+  legacy path (or routing it through the same worker) is deferred; until then "uploaded via the
+  legacy endpoint" is the one way a portfolio image can carry original EXIF.

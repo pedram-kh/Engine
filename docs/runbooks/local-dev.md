@@ -208,8 +208,18 @@ To run a worker standalone (e.g. when iterating on the API without the
 SPAs):
 
 ```bash
-cd apps/api && php artisan queue:work
+cd apps/api && php artisan queue:work --memory=768
 ```
+
+> **Worker memory (AH-004).** `ProcessPortfolioImageJob` decodes full-resolution
+> portfolio images (up to `PortfolioImageProcessor::MAX_MEGAPIXELS` = 50 MP). A
+> near-cap decode needs well over the default 128 MB, so the worker is launched
+> with `--memory=768`. This is the production counterpart of the `composer test`
+> `-d memory_limit=512M` pin: the **test ceiling and the cap are a matched pair**
+> (see `docs/reviews/ah-004-portfolio-overhaul-plan.md` §6). If `MAX_MEGAPIXELS`
+> is ever raised toward 100 MP, both the test pin and this `--memory` value must
+> rise to ~1 GB+ **together** — and any production process manager (supervisor /
+> container / Horizon) must size the worker container the same way.
 
 ### 7.3 Symptom of a missing worker
 
