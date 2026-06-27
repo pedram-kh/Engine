@@ -35,12 +35,17 @@ import ImpersonationBanner from '@/modules/impersonation/components/Impersonatio
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
-import type { CreatorWizardStepId } from '@catalyst/api-client'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 import OnboardingProgress from '../components/OnboardingProgress.vue'
 import AnimatedWizardChrome, { type WizardChromeStep } from '../components/AnimatedWizardChrome.vue'
-import { resolveStepStatus } from '../composables/useFeatureFlags'
-import { WIZARD_STEP_ROUTE_NAMES } from '../routes'
+import {
+  VISIBLE_UX_STEPS,
+  WIZARD_TOTAL_STEPS,
+  resolveUxStepStatus,
+  uxIndexForBackendStep,
+  uxIndexForRoute,
+  uxStepTitleKey,
+} from '../composables/useWizardSteps'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -57,42 +62,14 @@ const { selectLocale } = useLocaleSwitch()
 const localeOptions = buildLocaleOptions()
 const userMenuOpen = ref(false)
 
-const TOTAL_STEPS = 9
-
-/** Ordered rail: implicit Step 1 (account) + the eight backend steps. */
-const RAIL_STEPS: ReadonlyArray<{ id: string; stepId: CreatorWizardStepId | null }> = [
-  { id: 'account_created', stepId: null },
-  { id: 'profile', stepId: 'profile' },
-  { id: 'social', stepId: 'social' },
-  { id: 'portfolio', stepId: 'portfolio' },
-  { id: 'kyc', stepId: 'kyc' },
-  { id: 'tax', stepId: 'tax' },
-  { id: 'payout', stepId: 'payout' },
-  { id: 'contract', stepId: 'contract' },
-  { id: 'review', stepId: 'review' },
-]
-
-const ROUTE_TO_INDEX: Record<string, number> = {
-  'onboarding.profile': 1,
-  'onboarding.social': 2,
-  'onboarding.portfolio': 3,
-  'onboarding.kyc': 4,
-  'onboarding.tax': 5,
-  'onboarding.payout': 6,
-  'onboarding.contract': 7,
-  'onboarding.review': 8,
-}
-
-const STEP_ID_TO_INDEX: Record<CreatorWizardStepId, number> = {
-  profile: 1,
-  social: 2,
-  portfolio: 3,
-  kyc: 4,
-  tax: 5,
-  payout: 6,
-  contract: 7,
-  review: 8,
-}
+/**
+ * Rail rows + numbering are DERIVED from {@link VISIBLE_UX_STEPS} (AH-003):
+ * the account row, the visible wizard steps (social + portfolio merged
+ * into "connections"; kyc/tax/payout hidden), and review. Indices into
+ * that list drive both "Step X of N" and the animated chrome's geometry,
+ * so a reversible-hide flip needs no edit here.
+ */
+const TOTAL_STEPS = WIZARD_TOTAL_STEPS
 
 const showSaveAndExit = computed(() => route.name !== 'onboarding.welcome-back')
 
@@ -119,32 +96,26 @@ const useAnimatedChrome = computed(
  *  already points at where they'll continue. */
 const activeIndex = computed(() => {
   if (isWelcomeBack.value) {
-    return nextStep.value ? (STEP_ID_TO_INDEX[nextStep.value] ?? 1) : STEP_ID_TO_INDEX.review
+    const reviewIndex = VISIBLE_UX_STEPS.findIndex((s) => s.id === 'review')
+    return nextStep.value ? uxIndexForBackendStep(nextStep.value) : reviewIndex
   }
-  return ROUTE_TO_INDEX[String(route.name)] ?? -1
+  return uxIndexForRoute(String(route.name))
 })
 
 const chromeSteps = computed<WizardChromeStep[]>(() =>
-  RAIL_STEPS.map((row, i) => {
-    const routeName = row.stepId === null ? null : (WIZARD_STEP_ROUTE_NAMES[row.stepId] as string)
+  VISIBLE_UX_STEPS.map((step, i) => {
+    const routeName = step.routeName
 
     let status: WizardChromeStep['status']
     if (i === activeIndex.value) {
       status = 'active'
-    } else if (row.stepId === null) {
-      status = 'completed'
     } else {
-      status = resolveStepStatus(row.stepId, stepCompletion.value[row.stepId] ?? false, flags.value)
+      status = resolveUxStepStatus(step, stepCompletion.value, flags.value)
     }
 
-    const title =
-      row.stepId === null
-        ? t('creator.ui.wizard.steps.account_created.name')
-        : t(`creator.ui.wizard.steps.${row.stepId}.name`)
-
     return {
-      id: row.id,
-      title,
+      id: step.id,
+      title: t(uxStepTitleKey(step)),
       status,
       routeName,
       clickable: i < activeIndex.value && routeName !== null,

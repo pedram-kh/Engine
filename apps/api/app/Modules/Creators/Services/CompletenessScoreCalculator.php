@@ -150,7 +150,7 @@ final class CompletenessScoreCalculator
         $contractSatisfied = $creator->signed_master_contract_id !== null
             || ! Feature::active(ContractSigningEnabled::NAME);
 
-        return [
+        $completion = [
             WizardStep::Profile->value => $this->isProfileComplete($creator),
             WizardStep::Social->value => $creator->socialAccounts()->exists(),
             WizardStep::Portfolio->value => $creator->portfolioItems()->exists(),
@@ -159,6 +159,18 @@ final class CompletenessScoreCalculator
             WizardStep::Payout->value => $payoutSatisfied,
             WizardStep::Contract->value => $contractSatisfied,
         ];
+
+        // Build-time hidden steps (WIZARD_HIDDEN_STEPS, ad-hoc AH-003) are
+        // not collected and MUST NOT gate submit or score — drop them from
+        // the completion map entirely. In particular this is what stops the
+        // always-required `tax_profile_complete` check from dead-locking
+        // submit while the Tax step is hidden (Q1). Reversible: shrink the
+        // list and the step's completion check reappears here untouched.
+        return array_filter(
+            $completion,
+            static fn (string $step): bool => ! in_array($step, WizardStep::WIZARD_HIDDEN_STEPS, true),
+            ARRAY_FILTER_USE_KEY,
+        );
     }
 
     /**
@@ -171,7 +183,9 @@ final class CompletenessScoreCalculator
         $completion = $this->stepCompletion($creator);
 
         foreach (WizardStep::ordered() as $step) {
-            if ($step === WizardStep::Review) {
+            // Review is the submit action, not a navigable step; hidden
+            // steps (WIZARD_HIDDEN_STEPS) are not part of the flow.
+            if ($step === WizardStep::Review || $step->isHidden()) {
                 continue;
             }
 
@@ -206,6 +220,13 @@ final class CompletenessScoreCalculator
         $applicable = [];
 
         foreach (array_keys($this->weights()) as $step) {
+            // Build-time hidden steps (WIZARD_HIDDEN_STEPS) drop out of the
+            // denominator entirely so the percentage reflects only the
+            // steps the creator can actually see and complete.
+            if (in_array($step, WizardStep::WIZARD_HIDDEN_STEPS, true)) {
+                continue;
+            }
+
             $flag = $gatedFlagByStep[$step] ?? null;
 
             if ($flag !== null && ! Feature::active($flag)) {

@@ -40,8 +40,8 @@
           "continue_from_here": "Continuar daqui",
           "edit_step": "Editar etapa",
           "review_and_submit": "Rever e submeter",
-          "connect": "Ligar",
-          "update": "Atualizar",
+          "connect": "Adicionar",
+          "edit": "Editar",
           "remove": "Remover"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Perfil básico",
             "title": "Conte-nos sobre si",
             "description": "O seu nome, biografia, fotografia e as categorias em que cria conteúdo."
+          },
+          "connections": {
+            "name": "Redes sociais e portfólio",
+            "title": "Ligue as suas contas e adicione o seu trabalho",
+            "description": "Adicione pelo menos uma conta social e um item do portfólio para que as marcas vejam o seu alcance e o seu estilo."
           },
           "social": {
             "name": "Redes sociais",
@@ -156,8 +161,7 @@
           "avatar_drop": "Largue uma fotografia aqui ou clique para escolher. JPG, PNG ou WebP até 5 MB.",
           "country": "País",
           "region": "Região ou cidade",
-          "primary_language": "Idioma principal",
-          "secondary_languages": "Outros idiomas",
+          "primary_language": "Língua materna",
           "categories": "Categorias",
           "categories_help": "Selecione as categorias que melhor descrevem o que cria.",
           "avatar_required": "É necessária uma foto de perfil para concluir este passo.",

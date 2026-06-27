@@ -169,15 +169,19 @@ final class CreatorResource extends JsonResource
             'wizard' => [
                 'next_step' => $nextStep->value,
                 'is_submitted' => $creator->submitted_at !== null,
+                // Only the VISIBLE substantive steps are surfaced. Build-time
+                // hidden steps (WizardStep::WIZARD_HIDDEN_STEPS, ad-hoc AH-003)
+                // are excluded here so the SPA never renders, numbers, or gates
+                // on them; Review is the submit action, not a step row.
                 'steps' => array_map(
                     fn (WizardStep $step): array => [
                         'id' => $step->value,
                         'is_complete' => $stepCompletion[$step->value] ?? false,
                     ],
-                    array_filter(
-                        WizardStep::ordered(),
+                    array_values(array_filter(
+                        WizardStep::visibleOrdered(),
                         fn (WizardStep $s): bool => $s !== WizardStep::Review,
-                    ),
+                    )),
                 ),
                 'weights' => $this->calculator->weights(),
                 'flags' => [

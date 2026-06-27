@@ -40,8 +40,8 @@
           "continue_from_here": "Hier verder gaan",
           "edit_step": "Stap bewerken",
           "review_and_submit": "Beoordelen en indienen",
-          "connect": "Verbinden",
-          "update": "Bijwerken",
+          "connect": "Toevoegen",
+          "edit": "Bewerken",
           "remove": "Verwijderen"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Profielbasics",
             "title": "Vertel ons over jezelf",
             "description": "Je weergavenaam, bio, foto en de categorieën waarin je maakt."
+          },
+          "connections": {
+            "name": "Sociale media en portfolio",
+            "title": "Koppel je accounts en voeg je werk toe",
+            "description": "Voeg minstens één sociaal account en één portfolio-item toe zodat merken je bereik en je stijl kunnen zien."
           },
           "social": {
             "name": "Sociale accounts",
@@ -156,8 +161,7 @@
           "avatar_drop": "Foto hier neerzetten of klikken om te kiezen. JPG, PNG of WebP tot 5 MB.",
           "country": "Land",
           "region": "Regio of stad",
-          "primary_language": "Primaire taal",
-          "secondary_languages": "Andere talen",
+          "primary_language": "Moedertaal",
           "categories": "Categorieën",
           "categories_help": "Kies de categorieën die het beste beschrijven wat je maakt.",
           "avatar_required": "Een profielfoto is vereist om deze stap te voltooien.",

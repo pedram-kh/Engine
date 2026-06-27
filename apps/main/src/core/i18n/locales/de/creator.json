@@ -40,8 +40,8 @@
           "continue_from_here": "Hier fortfahren",
           "edit_step": "Schritt bearbeiten",
           "review_and_submit": "Prüfen und einreichen",
-          "connect": "Verbinden",
-          "update": "Aktualisieren",
+          "connect": "Hinzufügen",
+          "edit": "Bearbeiten",
           "remove": "Entfernen"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Profil-Grundlagen",
             "title": "Erzähl uns von dir",
             "description": "Dein Anzeigename, Bio, Foto und die Kategorien, in denen du erstellst."
+          },
+          "connections": {
+            "name": "Social & Portfolio",
+            "title": "Verknüpfe deine Konten und füge deine Arbeiten hinzu",
+            "description": "Füge mindestens ein Social-Konto und ein Portfolio-Element hinzu, damit Marken deine Reichweite und deinen Stil sehen können."
           },
           "social": {
             "name": "Social-Konten",
@@ -156,8 +161,7 @@
           "avatar_drop": "Foto hier ablegen oder klicken, um eines auszuwählen. JPG, PNG oder WebP bis zu 5 MB.",
           "country": "Land",
           "region": "Region oder Stadt",
-          "primary_language": "Hauptsprache",
-          "secondary_languages": "Weitere Sprachen",
+          "primary_language": "Muttersprache",
           "categories": "Kategorien",
           "categories_help": "Wähle die Kategorien aus, die am besten beschreiben, was du erstellst.",
           "avatar_required": "Ein Profilfoto ist erforderlich, um diesen Schritt abzuschließen.",

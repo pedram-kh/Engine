@@ -40,8 +40,8 @@
           "continue_from_here": "Pokračovat odtud",
           "edit_step": "Upravit krok",
           "review_and_submit": "Zkontrolovat a odeslat",
-          "connect": "Propojit",
-          "update": "Aktualizovat",
+          "connect": "Přidat",
+          "edit": "Upravit",
           "remove": "Odebrat"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Základy profilu",
             "title": "Řekněte nám o sobě",
             "description": "Vaše zobrazované jméno, bio, foto a kategorie, ve kterých tvoříte."
+          },
+          "connections": {
+            "name": "Sociální sítě a portfolio",
+            "title": "Propojte své účty a přidejte svou tvorbu",
+            "description": "Přidejte alespoň jeden sociální účet a jednu položku portfolia, aby značky viděly váš dosah i váš styl."
           },
           "social": {
             "name": "Sociální sítě",
@@ -156,8 +161,7 @@
           "avatar_drop": "Přetáhněte foto sem nebo klikněte pro výběr. JPG, PNG nebo WebP do 5 MB.",
           "country": "Země",
           "region": "Oblast nebo město",
-          "primary_language": "Primární jazyk",
-          "secondary_languages": "Ostatní jazyky",
+          "primary_language": "Mateřský jazyk",
           "categories": "Kategorie",
           "categories_help": "Vyberte kategorie, které nejlépe popisují, co tvoříte.",
           "avatar_required": "Pro dokončení tohoto kroku je vyžadována profilová fotografie.",

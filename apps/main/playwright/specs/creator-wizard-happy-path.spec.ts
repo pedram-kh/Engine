@@ -28,19 +28,24 @@ import {
  *      driving the file-upload UI in the spec (the upload UI has
  *      dedicated Vitest coverage in `usePortfolioUpload.spec.ts`
  *      and `PortfolioUploadGrid.spec.ts`).
- *   5. Drive the SPA through:
+ *   5. Drive the SPA through the AH-003 slimmed wizard:
  *        /onboarding (Welcome Back, first-mount branch)
- *          → /onboarding/profile  (Step 2)
- *          → /onboarding/social   (Step 3)
- *          → /onboarding/portfolio (Step 4 — gallery already
- *             carries the seeded item, so advance is enabled)
- *          → /onboarding/kyc      (Step 5, flag OFF — skipped)
- *          → /onboarding/tax      (Step 6 — form save)
- *          → /onboarding/payout   (Step 7, flag OFF — skipped)
- *          → /onboarding/contract (Step 8, flag OFF — click-through)
- *          → /onboarding/review   (Step 9)
+ *          → /onboarding/profile      (profile basics)
+ *          → /onboarding/connections  (merged Social + Portfolio —
+ *             connect one social account; the seeded portfolio image
+ *             satisfies the portfolio sub-section, so the single
+ *             "Continue" enables once both are present)
+ *          → /onboarding/contract     (master agreement, flag OFF —
+ *             click-through; kyc/tax/payout are build-time hidden)
+ *          → /onboarding/review       (review + submit)
  *      and finally
- *          → /creator/dashboard   (pending-review banner).
+ *          → /creator/dashboard       (pending-review banner).
+ *
+ * AH-003 note: Identity verification (kyc), Tax information (tax), and
+ * Payout method (payout) are build-time HIDDEN (WizardStep::
+ * WIZARD_HIDDEN_STEPS), so they are absent from the flow, the rail, the
+ * numbering, the completeness denominator, and the submit gate. Social
+ * and portfolio are merged into one "connections" step.
  *
  * Conventions (chunk-7.1):
  *   - `auth-ip` neutralised + restored (cumulative auth hits ~6
@@ -52,12 +57,11 @@ import {
  *   - No English-string matches — every assertion anchors on
  *     `data-test` / `data-testid` attributes or URLs.
  *
- * Feature flags: every vendor-gated flag (kyc, payout, contract)
- * defaults to OFF in the running app (see `docs/feature-flags.md`).
- * Steps 5, 7, and 8 therefore render their "skipped" surface and
- * the spec does NOT need to drive a vendor-bounce. The vendor-ON
- * paths have dedicated Vitest component-test coverage; this E2E
- * spec exercises the production end-to-end shape.
+ * Feature flags: the contract flag defaults to OFF in the running app
+ * (see `docs/feature-flags.md`), so the contract step renders its
+ * click-through fallback. The vendor-ON paths have dedicated Vitest
+ * component-test coverage; this E2E spec exercises the production
+ * end-to-end shape of the slimmed wizard.
  */
 
 const PASSWORD = 'Cata1yst-Wizard-E2E!'
@@ -165,12 +169,15 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     await page.locator('[data-testid="profile-submit"]').click()
 
     // -----------------------------------------------------------------
-    // Step 3 — Social accounts. Connect Instagram with a fake handle.
-    // The "save and continue" advance button is enabled once we see
-    // at least one connected account in the bootstrap state.
+    // Merged Connections step (AH-003) — Social + Portfolio in one
+    // page. Connect Instagram with a fake handle; the pre-seeded
+    // portfolio image already satisfies the portfolio sub-section. The
+    // single "Continue" enables once BOTH sub-sections are satisfied.
     // -----------------------------------------------------------------
-    await expect(page).toHaveURL(/\/onboarding\/social/, { timeout: 10_000 })
+    await expect(page).toHaveURL(/\/onboarding\/connections/, { timeout: 10_000 })
+    await expect(page.locator('[data-testid="step-connections"]')).toBeVisible()
     await expect(page.locator('[data-testid="step-social-accounts"]')).toBeVisible()
+    await expect(page.locator('[data-testid="step-portfolio"]')).toBeVisible()
 
     await page
       .locator('[data-testid="social-handle-instagram"]')
@@ -183,119 +190,16 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
       timeout: 10_000,
     })
 
-    await expect(page.locator('[data-testid="social-advance"]')).toBeEnabled()
-    await page.locator('[data-testid="social-advance"]').click()
-
-    // -----------------------------------------------------------------
-    // Step 4 — Portfolio. We pre-seeded one image via the API helper,
-    // so the gallery hydrates with one item and the advance button
-    // is enabled on mount.
-    // -----------------------------------------------------------------
-    await expect(page).toHaveURL(/\/onboarding\/portfolio/, { timeout: 10_000 })
-    await expect(page.locator('[data-testid="step-portfolio"]')).toBeVisible()
-    await expect(page.locator('[data-testid="portfolio-advance"]')).toBeEnabled({
+    // Both sub-sections satisfied (1 social + the seeded portfolio item)
+    // → the single Continue button enables. kyc/tax/payout are hidden,
+    // so the next step is the master agreement (contract).
+    await expect(page.locator('[data-testid="connections-advance"]')).toBeEnabled({
       timeout: 10_000,
     })
-    await page.locator('[data-testid="portfolio-advance"]').click()
-
-    // -----------------------------------------------------------------
-    // Step 5 — KYC. Flag OFF in the local env, so the "skipped"
-    // surface renders. The advance button is unconditionally enabled
-    // in the flag-OFF branch (the disabled binding only applies when
-    // `kycFlag.enabled === true`).
-    // -----------------------------------------------------------------
-    await expect(page).toHaveURL(/\/onboarding\/kyc/, { timeout: 10_000 })
-    await expect(page.locator('[data-testid="step-kyc"]')).toBeVisible()
-    await expect(page.locator('[data-testid="kyc-flag-off"]')).toBeVisible()
-    await page.locator('[data-testid="kyc-advance"]').click()
-
-    // -----------------------------------------------------------------
-    // Step 6 — Tax. Form-only step; fill all seven required fields,
-    // save (turns the status chip green), then advance.
-    // -----------------------------------------------------------------
-    await expect(page).toHaveURL(/\/onboarding\/tax/, { timeout: 10_000 })
-    await expect(page.locator('[data-testid="step-tax"]')).toBeVisible()
-
-    await page.locator('[data-testid="tax-legal-name"]').locator('input').fill('E2E Creator Ltd')
-    await page.locator('[data-testid="tax-id"]').locator('input').fill('IE1234567A')
-    await page.locator('[data-testid="tax-address-street"]').locator('input').fill('1 Test Lane')
-    await page.locator('[data-testid="tax-address-city"]').locator('input').fill('Dublin')
-    await page.locator('[data-testid="tax-address-postal"]').locator('input').fill('D01XYZ')
-
-    // Step 6's address country flipped from <v-text-field> to <v-select>
-    // in commit 2dd649c (per-field 422 rendering + ISO country picker)
-    // so the backend's `address.country_code` rule (`size:2`) no longer
-    // bounces creators who type "Spain". The previous `.fill('IE')` on
-    // the inner readonly input does not propagate to v-model on a
-    // v-select; drive it the same way the Step 2 profile country
-    // picker is driven (click → role=option) so the v-model
-    // actually updates and the save button enables.
-    await page.locator('[data-testid="tax-address-country"]').click()
-    await page.getByRole('option', { name: 'Ireland' }).click()
-
-    // Step 6 now uses a single "Save and continue" button (the old split
-    // Save / advance + "Submitted" status badge was removed) — it saves
-    // the tax profile and navigates to payout in one action.
-    await expect(page.locator('[data-testid="tax-submit"]')).toBeEnabled({ timeout: 10_000 })
-    await page.locator('[data-testid="tax-submit"]').click()
-
-    // -----------------------------------------------------------------
-    // Step 7 — Payout. Flag OFF; skipped surface; advance.
-    // -----------------------------------------------------------------
-    await expect(page).toHaveURL(/\/onboarding\/payout/, { timeout: 10_000 })
-    await expect(page.locator('[data-testid="step-payout"]')).toBeVisible()
-    await expect(page.locator('[data-testid="payout-flag-off"]')).toBeVisible()
-    await expect(page.locator('[data-testid="payout-advance"]')).toBeEnabled({
-      timeout: 10_000,
-    })
-    // Pair the click with an explicit `waitForURL` so we don't poll
-    // `toHaveURL` against a navigation that has not yet been
-    // initiated (CI run 25896340741 attempt #1 symptom: the click
-    // fired during a re-render flush and the navigation-to-poll race
-    // exhausted the budget).
-    //
-    // In-spec retry on the whole "click + waitForURL + assert
-    // step-contract" block — not just the click — because the local
-    // forensic trace from this spec exposes TWO flake variants on
-    // this single hop:
-    //
-    //   (a) `waitForURL(/contract)` times out at 30s+ (CI run
-    //       25936109470 attempt #1 — three "navigated to /payout"
-    //       entries inside the 60s wait window, URL never advances).
-    //
-    //   (b) `waitForURL(/contract)` resolves briefly (URL IS at
-    //       /contract for ~25ms in the trace) but the URL then
-    //       bounces back to /payout before `step-contract` renders.
-    //       Local trace
-    //       `apps/main/test-results/.../trace.zip` events at
-    //       22008.828/22008.854/22032.098/22035.808 ms expose the
-    //       /payout↔/contract ping-pong. The step-contract visibility
-    //       assertion then times out at 10s because the page is back
-    //       on payout, not contract.
-    //
-    // Both variants are intermittent. The Playwright `retries: 2`
-    // policy catches both (attempt #2 always succeeds on a fresh
-    // page with Vite chunks warm), but emits a per-attempt
-    // `##[error]` GitHub annotation on the failed attempt — which
-    // surfaces on the run-details page even when CI is green. The
-    // in-spec retry replicates the same fresh-attempt semantic
-    // INSIDE the spec so the spec passes on its FIRST Playwright
-    // attempt and no annotation is emitted. We wrap BOTH the
-    // navigation AND the step-contract presence check inside the
-    // retry block so variant (b) is also caught.
-    //
-    // Leg-budgets stay honest at 30s × 2 + 10s × 2 = 80s total cap
-    // so a real navigation regression still surfaces fast. The
-    // deeper root-cause investigation — the bounce pattern points
-    // at a Vue Router 4 dual-navigation race, not cold-chunk
-    // latency — is tracked in docs/tech-debt.md "Residual
-    // Playwright-retry flakiness" entry; the workflow now always
-    // uploads Playwright artifacts so the next CI flake's trace is
-    // automatically captured for analysis.
     const advanceToContract = async (): Promise<void> => {
       await Promise.all([
         page.waitForURL(/\/onboarding\/contract/, { timeout: 30_000 }),
-        page.locator('[data-testid="payout-advance"]').click(),
+        page.locator('[data-testid="connections-advance"]').click(),
       ])
       await expect(page.locator('[data-testid="step-contract"]')).toBeVisible({
         timeout: 10_000,
@@ -304,15 +208,14 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     try {
       await advanceToContract()
     } catch {
-      // If we bounced back to /payout, the button still exists; if
-      // we're on a fresh chunk, the click handler will dispatch
-      // normally. Either way, the second attempt has Vite chunks
-      // warm and (empirically) succeeds.
+      // Fresh-chunk / router-race retry (see docs/tech-debt.md
+      // "Residual Playwright-retry flakiness"): the second attempt has
+      // Vite chunks warm and empirically succeeds.
       await advanceToContract()
     }
 
     // -----------------------------------------------------------------
-    // Step 8 — Contract. Flag OFF; click-through fallback. Wait for
+    // Contract step. Flag OFF; click-through fallback. Wait for
     // the server-rendered terms to load, tick the checkbox, submit.
     // The ClickThroughAccept component emits 'accepted' on success,
     // which the page handler translates into a router.push to review.

@@ -40,8 +40,8 @@
           "continue_from_here": "Συνέχεια from here",
           "edit_step": "Επεξεργασία step",
           "review_and_submit": "Review and submit",
-          "connect": "Connect",
-          "update": "Ενημέρωση",
+          "connect": "Προσθήκη",
+          "edit": "Επεξεργασία",
           "remove": "Remove"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Προφίλ basics",
             "title": "Tell us about yourself",
             "description": "Your display name, bio, photo, and the categories you create in."
+          },
+          "connections": {
+            "name": "Κοινωνικά δίκτυα και χαρτοφυλάκιο",
+            "title": "Συνδέστε τους λογαριασμούς σας και προσθέστε τη δουλειά σας",
+            "description": "Προσθέστε τουλάχιστον έναν λογαριασμό κοινωνικού δικτύου και ένα έργο στο χαρτοφυλάκιό σας, ώστε οι μάρκες να δουν την απήχηση και το στιλ σας."
           },
           "social": {
             "name": "Social accounts",
@@ -156,8 +161,7 @@
           "avatar_drop": "Drop a photo here, or click to choose. JPG, PNG, or WebP up to 5 MB.",
           "country": "Country",
           "region": "Region or city",
-          "primary_language": "Primary language",
-          "secondary_languages": "Other languages",
+          "primary_language": "Μητρική γλώσσα",
           "categories": "Categories",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",

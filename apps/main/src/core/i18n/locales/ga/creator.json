@@ -40,8 +40,8 @@
           "continue_from_here": "Lean ar aghaidh from here",
           "edit_step": "Cuir in eagar step",
           "review_and_submit": "Review and submit",
-          "connect": "Connect",
-          "update": "Nuashonraigh",
+          "connect": "Cuir leis",
+          "edit": "Cuir in eagar",
           "remove": "Remove"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Próifíl basics",
             "title": "Tell us about yourself",
             "description": "Your display name, bio, photo, and the categories you create in."
+          },
+          "connections": {
+            "name": "Meáin shóisialta agus punann",
+            "title": "Ceangail do chuntais agus cuir do chuid oibre leis",
+            "description": "Cuir cuntas sóisialta amháin ar a laghad agus mír amháin den phunann leis ionas gur féidir le brandaí do raon feidhme agus do stíl a fheiceáil."
           },
           "social": {
             "name": "Social accounts",
@@ -156,8 +161,7 @@
           "avatar_drop": "Drop a photo here, or click to choose. JPG, PNG, or WebP up to 5 MB.",
           "country": "Country",
           "region": "Region or city",
-          "primary_language": "Primary language",
-          "secondary_languages": "Other languages",
+          "primary_language": "Teanga dhúchais",
           "categories": "Categories",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",

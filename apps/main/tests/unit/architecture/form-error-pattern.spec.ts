@@ -53,7 +53,9 @@ const CANONICAL_422_FILES: readonly string[] = [
   'modules/campaigns/pages/CampaignDetailPage.vue',
   'modules/agency-users/components/InviteUserModal.vue',
   'modules/onboarding/pages/Step2ProfileBasicsPage.vue',
-  'modules/onboarding/pages/Step3SocialAccountsPage.vue',
+  // AH-003: the former Step3SocialAccountsPage is now the social sub-section
+  // of the merged "connections" step; the 422 binding moved with it.
+  'modules/onboarding/components/ConnectionsSocialSection.vue',
   'modules/onboarding/pages/Step6TaxPage.vue',
   'modules/creators/availability/components/AvailabilityBlockDialog.vue',
   // Sprint 8 Chunk 2 (D-8): the creator counter fee-form binds the 422 from a

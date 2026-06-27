@@ -278,7 +278,7 @@ it('completeness score = 0 for a fresh creator with all three vendor flags OFF (
     expect($score)->toBe(0);
 });
 
-it('completeness score renormalises to 42 when only profile is complete and the vendor flags are OFF', function (): void {
+it('completeness score renormalises to 50 when only profile is complete and the vendor flags are OFF', function (): void {
     [, $creator] = makeFlagOffCreator();
 
     $creator->forceFill([
@@ -288,16 +288,17 @@ it('completeness score renormalises to 42 when only profile is complete and the 
         'categories' => ['lifestyle'],
     ])->save();
 
-    // Applicable denominator with all three vendor flags OFF is
-    // profile(25) + social(15) + portfolio(10) + tax(10) = 60.
-    // Profile alone => round(25 / 60 * 100) = 42.
+    // Applicable denominator with all three vendor flags OFF AND the
+    // AH-003 build-time hidden steps (kyc/tax/payout) excluded is
+    // profile(25) + social(15) + portfolio(10) = 50 (tax no longer counts).
+    // Profile alone => round(25 / 50 * 100) = 50.
     $score = app(CompletenessScoreCalculator::class)
         ->score($creator->fresh());
 
-    expect($score)->toBe(42);
+    expect($score)->toBe(50);
 });
 
-it('completeness score renormalises to 67 when profile + social are complete and the vendor flags are OFF', function (): void {
+it('completeness score renormalises to 80 when profile + social are complete and the vendor flags are OFF', function (): void {
     [, $creator] = makeFlagOffCreator();
 
     $creator->forceFill([
@@ -309,9 +310,9 @@ it('completeness score renormalises to 67 when profile + social are complete and
 
     CreatorSocialAccountFactory::new()->createOne(['creator_id' => $creator->id]);
 
-    // (25 + 15) / 60 * 100 = round(66.67) = 67.
+    // Denominator 50 (tax hidden, AH-003): (25 + 15) / 50 * 100 = 80.
     $score = app(CompletenessScoreCalculator::class)
         ->score($creator->fresh());
 
-    expect($score)->toBe(67);
+    expect($score)->toBe(80);
 });

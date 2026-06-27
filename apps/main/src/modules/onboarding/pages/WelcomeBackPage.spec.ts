@@ -225,7 +225,9 @@ describe('WelcomeBackPage — Decision B (session-vs-fresh hybrid)', () => {
 
     expect(second.wrapper.find('[data-test="welcome-back-page"]').exists()).toBe(false)
     expect(replaceSpy).not.toBeNull()
-    expect(replaceSpy!).toHaveBeenCalledWith({ name: 'onboarding.social' })
+    // AH-003: social + portfolio are merged, so next_step "social" routes
+    // to the combined "connections" step.
+    expect(replaceSpy!).toHaveBeenCalledWith({ name: 'onboarding.connections' })
   })
 
   it('redirects submitted creators to /creator/dashboard (defensive guard fall-through)', async () => {

@@ -16,16 +16,19 @@ import Step9ReviewPage from './Step9ReviewPage.vue'
 
 let teardown: (() => void) | null = null
 
-const STEP_IDS = ['profile', 'social', 'portfolio', 'kyc', 'tax', 'payout', 'contract'] as const
+// Backend substantive steps surfaced post-AH-003 (kyc/tax/payout hidden).
+const BACKEND_STEP_IDS = ['profile', 'social', 'portfolio', 'contract'] as const
+// UX review rows: social + portfolio collapse into the merged "connections" row.
+const UX_ROW_IDS = ['profile', 'connections', 'contract'] as const
 
-type StepId = (typeof STEP_IDS)[number]
+type BackendStepId = (typeof BACKEND_STEP_IDS)[number]
 
 function makeBootstrap(opts: {
   allComplete: boolean
   score?: number
   isSubmitted?: boolean
   /** Per-step is_complete overrides; defaults all to `allComplete`. */
-  stepCompleteness?: Partial<Record<StepId, boolean>>
+  stepCompleteness?: Partial<Record<BackendStepId, boolean>>
   /** Per-flag overrides; defaults all to true (on). */
   flagOverrides?: Partial<{
     kyc_verification_enabled: boolean
@@ -69,7 +72,7 @@ function makeBootstrap(opts: {
       wizard: {
         next_step: 'review',
         is_submitted: opts.isSubmitted ?? false,
-        steps: STEP_IDS.map((id) => ({
+        steps: BACKEND_STEP_IDS.map((id) => ({
           id,
           is_complete: opts.stepCompleteness?.[id] ?? opts.allComplete,
         })),
@@ -94,7 +97,7 @@ afterEach(() => {
 })
 
 describe('Step9ReviewPage', () => {
-  it('renders one row per wizard step', async () => {
+  it('renders one row per VISIBLE UX step (profile, merged connections, contract)', async () => {
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap({ allComplete: false }))
 
     const { wrapper, unmount } = await mountAuthPage(Step9ReviewPage, {
@@ -106,12 +109,16 @@ describe('Step9ReviewPage', () => {
     teardown = unmount
     await flushPromises()
 
-    for (const id of STEP_IDS) {
+    for (const id of UX_ROW_IDS) {
       expect(wrapper.find(`[data-testid="review-row-${id}"]`).exists()).toBe(true)
+    }
+    // Merged-away / hidden steps must not appear as their own rows.
+    for (const id of ['social', 'portfolio', 'kyc', 'tax', 'payout']) {
+      expect(wrapper.find(`[data-testid="review-row-${id}"]`).exists()).toBe(false)
     }
   })
 
-  it('disables submit when any step is incomplete', async () => {
+  it('disables submit when any visible step is incomplete', async () => {
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap({ allComplete: false }))
 
     const { wrapper, unmount } = await mountAuthPage(Step9ReviewPage, {
@@ -126,7 +133,7 @@ describe('Step9ReviewPage', () => {
     expect(wrapper.find('[data-testid="review-submit"]').attributes('disabled')).toBeDefined()
   })
 
-  it('enables submit when all steps complete and is_submitted=false', async () => {
+  it('enables submit when all visible steps complete and is_submitted=false', async () => {
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap({ allComplete: true }))
 
     const { wrapper, unmount } = await mountAuthPage(Step9ReviewPage, {
@@ -162,16 +169,29 @@ describe('Step9ReviewPage', () => {
     expect(onboardingApi.submit).toHaveBeenCalledTimes(1)
   })
 
-  // -------------------------------------------------------------------------
-  // Sprint 3 stabilization (May 19, 2026): the page disabled Submit but
-  // gave the creator zero on-page explanation of which step was blocking.
-  // These specs pin the new row-status + inline-blocker UX so the next
-  // regression turns this UI muffled-failure mode into a test failure
-  // instead.
-  // -------------------------------------------------------------------------
+  it('treats the merged connections row as incomplete unless BOTH social and portfolio are complete', async () => {
+    // social complete, portfolio NOT → connections row is "Not started".
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
+      makeBootstrap({
+        allComplete: true,
+        stepCompleteness: { portfolio: false },
+      }),
+    )
+
+    const { wrapper, unmount } = await mountAuthPage(Step9ReviewPage, {
+      initialRoute: { path: '/onboarding/review' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="review-row-status-connections"]').text()).toBe('Not started')
+    expect(wrapper.find('[data-testid="review-submit"]').attributes('disabled')).toBeDefined()
+  })
+
   it('renders the localized status label on every row (Completed / Not started)', async () => {
-    // Mixed state: 5 complete, 2 incomplete. Mirrors what the user saw
-    // in the wild — most steps green, profile blocking submit.
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
       makeBootstrap({
         allComplete: true,
@@ -189,21 +209,19 @@ describe('Step9ReviewPage', () => {
     await flushPromises()
 
     expect(wrapper.find('[data-testid="review-row-status-profile"]').text()).toBe('Not started')
-    expect(wrapper.find('[data-testid="review-row-status-social"]').text()).toBe('Not started')
-    expect(wrapper.find('[data-testid="review-row-status-portfolio"]').text()).toBe('Completed')
-    expect(wrapper.find('[data-testid="review-row-status-tax"]').text()).toBe('Completed')
-    // data-status attribute carries the machine-readable form for tests
-    // that want to assert without depending on i18n text.
+    // connections is "Not started" because social is incomplete.
+    expect(wrapper.find('[data-testid="review-row-status-connections"]').text()).toBe('Not started')
+    expect(wrapper.find('[data-testid="review-row-status-contract"]').text()).toBe('Completed')
     expect(wrapper.find('[data-testid="review-row-profile"]').attributes('data-status')).toBe(
       'not-started',
     )
   })
 
-  it('renders the "Skipped" status when a flag-gated step is complete via flag-OFF satisfaction', async () => {
+  it('renders the "Skipped" status when the contract step is complete via flag-OFF satisfaction', async () => {
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
       makeBootstrap({
         allComplete: true,
-        flagOverrides: { kyc_verification_enabled: false, creator_payout_method_enabled: false },
+        flagOverrides: { contract_signing_enabled: false },
       }),
     )
 
@@ -216,11 +234,9 @@ describe('Step9ReviewPage', () => {
     teardown = unmount
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="review-row-status-kyc"]').text()).toBe('Skipped')
-    expect(wrapper.find('[data-testid="review-row-status-payout"]').text()).toBe('Skipped')
-    // Vendor-cleared steps stay "Completed" even when their flag-on
-    // path is live. Contract here was completed AND its flag is on.
-    expect(wrapper.find('[data-testid="review-row-status-contract"]').text()).toBe('Completed')
+    expect(wrapper.find('[data-testid="review-row-status-contract"]').text()).toBe('Skipped')
+    // The merged connections row has no flag-gated sub-step → stays Completed.
+    expect(wrapper.find('[data-testid="review-row-status-connections"]').text()).toBe('Completed')
   })
 
   it('shows the inline blocker listing every incomplete step name when submit is disabled', async () => {
@@ -242,19 +258,18 @@ describe('Step9ReviewPage', () => {
 
     const blocker = wrapper.find('[data-testid="review-incomplete-blocker"]')
     expect(blocker.exists()).toBe(true)
-    // The blocker should name the actual incomplete step ("Profile
-    // basics") so the creator knows WHERE to click "Edit". The exact
-    // count word is locale-specific; pin only the singular case here.
     expect(blocker.text()).toContain('Profile basics')
     expect(blocker.text()).toContain('1')
     expect(wrapper.find('[data-testid="review-submit"]').attributes('disabled')).toBeDefined()
   })
 
   it('uses the plural form of the blocker when more than one step is incomplete', async () => {
+    // profile incomplete + portfolio incomplete → 2 incomplete rows
+    // (profile + the merged connections step).
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
       makeBootstrap({
         allComplete: true,
-        stepCompleteness: { profile: false, tax: false, social: false },
+        stepCompleteness: { profile: false, portfolio: false },
       }),
     )
 
@@ -269,10 +284,9 @@ describe('Step9ReviewPage', () => {
 
     const blocker = wrapper.find('[data-testid="review-incomplete-blocker"]')
     expect(blocker.exists()).toBe(true)
-    expect(blocker.text()).toContain('3')
+    expect(blocker.text()).toContain('2')
     expect(blocker.text()).toContain('Profile basics')
-    expect(blocker.text()).toContain('Social accounts')
-    expect(blocker.text()).toContain('Tax information')
+    expect(blocker.text()).toContain('Social & portfolio')
   })
 
   it('hides the inline blocker when every step is complete', async () => {

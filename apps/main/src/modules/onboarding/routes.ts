@@ -38,18 +38,12 @@ export const onboardingRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/onboarding/social',
-    name: 'onboarding.social',
-    component: () => import('./pages/Step3SocialAccountsPage.vue'),
-    meta: {
-      layout: 'onboarding',
-      guards: ['requireAuth', 'requireOnboardingAccess'],
-    },
-  },
-  {
-    path: '/onboarding/portfolio',
-    name: 'onboarding.portfolio',
-    component: () => import('./pages/Step4PortfolioPage.vue'),
+    // Merged Social + Portfolio step (ad-hoc AH-003 D2). Social and
+    // portfolio are kept as distinct sub-sections inside one page; the
+    // backend still tracks them as separate completion units.
+    path: '/onboarding/connections',
+    name: 'onboarding.connections',
+    component: () => import('./pages/Step3ConnectionsPage.vue'),
     meta: {
       layout: 'onboarding',
       guards: ['requireAuth', 'requireOnboardingAccess'],
@@ -110,8 +104,11 @@ export const onboardingRoutes: RouteRecordRaw[] = [
  */
 export const WIZARD_STEP_ROUTE_NAMES = {
   profile: 'onboarding.profile',
-  social: 'onboarding.social',
-  portfolio: 'onboarding.portfolio',
+  // Social + portfolio are merged into the single "connections" step
+  // (AH-003 D2): both backend step ids resolve to the merged route so the
+  // Welcome Back resume + auto-advance land on the combined page.
+  social: 'onboarding.connections',
+  portfolio: 'onboarding.connections',
   kyc: 'onboarding.kyc',
   tax: 'onboarding.tax',
   payout: 'onboarding.payout',

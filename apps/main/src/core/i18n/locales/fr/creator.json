@@ -40,8 +40,8 @@
           "continue_from_here": "Continuer à partir d'ici",
           "edit_step": "Modifier l'étape",
           "review_and_submit": "Vérifier et soumettre",
-          "connect": "Connecter",
-          "update": "Mettre à jour",
+          "connect": "Ajouter",
+          "edit": "Modifier",
           "remove": "Supprimer"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Informations de base",
             "title": "Parlez-nous de vous",
             "description": "Votre nom d'affichage, votre bio, votre photo et les catégories dans lesquelles vous créez."
+          },
+          "connections": {
+            "name": "Réseaux sociaux et portfolio",
+            "title": "Connectez vos comptes et ajoutez vos réalisations",
+            "description": "Ajoutez au moins un compte social et une réalisation à votre portfolio pour que les marques voient votre portée et votre style."
           },
           "social": {
             "name": "Comptes sociaux",
@@ -156,8 +161,7 @@
           "avatar_drop": "Déposez une photo ici, ou cliquez pour choisir. JPG, PNG ou WebP jusqu'à 5 Mo.",
           "country": "Pays",
           "region": "Région ou ville",
-          "primary_language": "Langue principale",
-          "secondary_languages": "Autres langues",
+          "primary_language": "Langue maternelle",
           "categories": "Catégories",
           "categories_help": "Choisissez les catégories qui décrivent le mieux ce que vous créez.",
           "avatar_required": "Une photo de profil est requise pour terminer cette étape.",

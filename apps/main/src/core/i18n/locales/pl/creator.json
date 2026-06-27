@@ -40,8 +40,8 @@
           "continue_from_here": "Kontynuuj stąd",
           "edit_step": "Edytuj krok",
           "review_and_submit": "Przejrzyj i prześlij",
-          "connect": "Połącz",
-          "update": "Zaktualizuj",
+          "connect": "Dodaj",
+          "edit": "Edytuj",
           "remove": "Usuń"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Podstawy profilu",
             "title": "Opowiedz nam o sobie",
             "description": "Twoja nazwa wyświetlana, bio, zdjęcie i kategorie, w których tworzysz."
+          },
+          "connections": {
+            "name": "Media społecznościowe i portfolio",
+            "title": "Połącz swoje konta i dodaj swoje prace",
+            "description": "Dodaj co najmniej jedno konto społecznościowe i jedną pozycję portfolio, aby marki widziały Twój zasięg i Twój styl."
           },
           "social": {
             "name": "Konta społecznościowe",
@@ -156,8 +161,7 @@
           "avatar_drop": "Upuść zdjęcie tutaj lub kliknij, aby wybrać. JPG, PNG lub WebP do 5 MB.",
           "country": "Kraj",
           "region": "Region lub miasto",
-          "primary_language": "Język główny",
-          "secondary_languages": "Inne języki",
+          "primary_language": "Język ojczysty",
           "categories": "Kategorie",
           "categories_help": "Wybierz kategorie, które najlepiej opisują to, co tworzysz.",
           "avatar_required": "Zdjęcie profilowe jest wymagane do ukończenia tego kroku.",

@@ -3,8 +3,15 @@
  * Step2ProfileBasicsPage — wizard Step 2 (Profile basics).
  *
  * Sprint 3 Chunk 3 sub-step 5. Form for display name, bio, avatar,
- * country, region, primary language, secondary languages, and
- * categories.
+ * country, region, native language, and categories.
+ *
+ * AH-003 (D5/D6): the primary-language field is now labelled "Native
+ * language" (label only — the `primary_language` column is unchanged),
+ * and the onboarding "Other languages" (secondary_languages) INPUT was
+ * removed. The `secondary_languages` column and its roster/discover/
+ * detail/admin displays are untouched — this removes the onboarding
+ * field, not the data model, so the save payload deliberately omits
+ * `secondary_languages` to avoid clearing existing values.
  *
  * Implementation notes:
  *   - Form lives in apps/main per Decision C1 (form-main); display
@@ -22,8 +29,8 @@
  *     triggers the same `updateProfile` mutation + navigates to
  *     Step 3 on success.
  *
- * Step 2 → Step 3 advance: after a successful save the page calls
- * `router.push({ name: 'onboarding.social' })`. The
+ * Step 2 → next advance: after a successful save the page navigates to
+ * the merged "connections" step (`onboarding.connections`). The
  * `requireOnboardingAccess` guard already gates the wizard at the
  * group level, so no per-step gate is needed.
  *
@@ -54,11 +61,11 @@ const store = useOnboardingStore()
 
 /**
  * Backend field-key union (matches `UpdateProfileRequest::rules()`).
- * The array-of-strings rules (`secondary_languages.*`, `categories.*`)
- * surface from Laravel's validator as keys like `secondary_languages.0`
- * — those collapse to the parent field for UI purposes (the input is
- * a multi-select chip group, no per-item slot to bind to). We add the
- * parent keys here so per-input binding works on the canonical shape.
+ * The array-of-strings rule (`categories.*`) surfaces from Laravel's
+ * validator as keys like `categories.0` — those collapse to the parent
+ * field for UI purposes (the input is a multi-select chip group, no
+ * per-item slot to bind to). We add the parent keys here so per-input
+ * binding works on the canonical shape.
  */
 type ProfileField =
   | 'display_name'
@@ -66,7 +73,6 @@ type ProfileField =
   | 'country_code'
   | 'region'
   | 'primary_language'
-  | 'secondary_languages'
   | 'categories'
 
 const displayName = ref('')
@@ -74,7 +80,6 @@ const bio = ref('')
 const countryCode = ref<string | null>(null)
 const region = ref<string | null>(null)
 const primaryLanguage = ref<string | null>(null)
-const secondaryLanguages = ref<string[]>([])
 const categories = ref<string[]>([])
 const submitErrorKey = ref<string | null>(null)
 const fieldErrors = ref<Partial<Record<ProfileField, readonly string[]>>>({})
@@ -118,10 +123,6 @@ const primaryLanguageLabel = computed(() => {
   return languageEndonym(primaryLanguage.value)
 })
 
-const secondaryLanguageLabels = computed(() =>
-  secondaryLanguages.value.map((code) => languageEndonym(code)),
-)
-
 const categoryLabels = computed(() =>
   categories.value.map((key) => t(`creator.ui.wizard.categories.${key}`)),
 )
@@ -151,7 +152,6 @@ function hydrateFromCreator(): void {
   countryCode.value = attrs.country_code ?? null
   region.value = attrs.region ?? null
   primaryLanguage.value = attrs.primary_language ?? null
-  secondaryLanguages.value = [...(attrs.secondary_languages ?? [])]
   categories.value = [...(attrs.categories ?? [])]
 }
 
@@ -165,7 +165,9 @@ async function save(): Promise<boolean> {
       country_code: countryCode.value ?? undefined,
       region: region.value,
       primary_language: primaryLanguage.value ?? undefined,
-      secondary_languages: secondaryLanguages.value,
+      // secondary_languages intentionally omitted (AH-003 D6): the input
+      // was removed; the backend rule is `sometimes`, so omitting it
+      // preserves any existing value rather than clearing it.
       categories: categories.value,
     })
     return true
@@ -186,7 +188,7 @@ async function onSubmit(): Promise<void> {
   if (!canContinue.value) return
   const ok = await save()
   if (ok) {
-    await router.push({ name: 'onboarding.social' })
+    await router.push({ name: 'onboarding.connections' })
   }
 }
 
@@ -282,18 +284,6 @@ onMounted(() => {
       />
 
       <v-select
-        v-model="secondaryLanguages"
-        :items="languageOptions"
-        item-title="label"
-        item-value="value"
-        :label="t('creator.ui.wizard.fields.secondary_languages')"
-        multiple
-        chips
-        :error-messages="fieldErrors.secondary_languages"
-        data-testid="profile-secondary-languages"
-      />
-
-      <v-select
         v-model="categories"
         :items="categoryItems"
         :label="t('creator.ui.wizard.fields.categories')"
@@ -312,10 +302,7 @@ onMounted(() => {
         <h3 class="text-subtitle-2">{{ t('creator.ui.wizard.fields.country') }}</h3>
         <CountryDisplay :code="countryCode" :label="countryLabel" />
         <h3 class="text-subtitle-2">{{ t('creator.ui.wizard.fields.primary_language') }}</h3>
-        <LanguageList
-          :primary-label="primaryLanguageLabel"
-          :secondary-labels="secondaryLanguageLabels"
-        />
+        <LanguageList :primary-label="primaryLanguageLabel" :secondary-labels="[]" />
         <h3 class="text-subtitle-2">{{ t('creator.ui.wizard.fields.categories') }}</h3>
         <CategoryChips :labels="categoryLabels" />
       </div>

@@ -40,8 +40,8 @@
           "continue_from_here": "Folytatás from here",
           "edit_step": "Szerkesztés step",
           "review_and_submit": "Review and submit",
-          "connect": "Connect",
-          "update": "Frissítés",
+          "connect": "Hozzáadás",
+          "edit": "Szerkesztés",
           "remove": "Remove"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Profil basics",
             "title": "Tell us about yourself",
             "description": "Your display name, bio, photo, and the categories you create in."
+          },
+          "connections": {
+            "name": "Közösségi média és portfólió",
+            "title": "Kapcsolja össze fiókjait és adja hozzá munkáit",
+            "description": "Adjon hozzá legalább egy közösségi fiókot és egy portfólióelemet, hogy a márkák lássák az elérését és a stílusát."
           },
           "social": {
             "name": "Social accounts",
@@ -156,8 +161,7 @@
           "avatar_drop": "Drop a photo here, or click to choose. JPG, PNG, or WebP up to 5 MB.",
           "country": "Country",
           "region": "Region or city",
-          "primary_language": "Primary language",
-          "secondary_languages": "Other languages",
+          "primary_language": "Anyanyelv",
           "categories": "Categories",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",

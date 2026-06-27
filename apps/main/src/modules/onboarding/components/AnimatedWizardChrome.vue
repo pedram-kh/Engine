@@ -118,8 +118,15 @@ function computeLayout(): void {
   layout.H = H
   layout.CENTER = H / 2
   layout.TOP_Y = Math.max(56, H * 0.1)
-  layout.COMP_GAP = clamp((layout.CENTER - 60 - layout.TOP_Y) / 7, 24, 44)
-  layout.UP_GAP = clamp((H - 70 - layout.CENTER) / 8, 36, 58)
+  // Spacing divisors are DERIVED from the rendered step count (AH-003) so
+  // the rail packs correctly for any number of visible steps instead of
+  // assuming the old fixed 9-row layout. COMP_GAP spreads the completed
+  // rows parked above centre (at most n-1 of them); UP_GAP spreads the
+  // upcoming rows below centre (at most n-1). The clamps keep both gaps
+  // within the same visual band the 9-step layout used.
+  const n = Math.max(props.steps.length, 2)
+  layout.COMP_GAP = clamp((layout.CENTER - 60 - layout.TOP_Y) / (n - 2 || 1), 24, 44)
+  layout.UP_GAP = clamp((H - 70 - layout.CENTER) / (n - 1), 36, 58)
 }
 
 /* ---- phase state ---- */

@@ -41,4 +41,5 @@ export {
   type PluralCategory,
   type PluralRule,
 } from './plural-rules'
+export { WIZARD_HIDDEN_STEPS, isWizardStepHidden } from './wizard'
 export * from './types'

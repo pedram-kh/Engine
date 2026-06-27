@@ -164,7 +164,8 @@ function onDragLeave(): void {
 .avatar-upload-drop__preview {
   width: 128px;
   height: 128px;
-  border-radius: 50%;
+  /* AH-003 D4: rectangular (rounded-rect) profile photo, was a circle. */
+  border-radius: 12px;
   overflow: hidden;
   background-color: rgb(var(--v-theme-surface-variant));
 }

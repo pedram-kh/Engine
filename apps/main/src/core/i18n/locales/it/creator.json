@@ -40,8 +40,8 @@
           "continue_from_here": "Continua da qui",
           "edit_step": "Modifica passaggio",
           "review_and_submit": "Rivedi e invia",
-          "connect": "Collega",
-          "update": "Aggiorna",
+          "connect": "Aggiungi",
+          "edit": "Modifica",
           "remove": "Rimuovi"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Profilo base",
             "title": "Parlaci di te",
             "description": "Il tuo nome, biografia, foto e le categorie in cui crei contenuti."
+          },
+          "connections": {
+            "name": "Social e portfolio",
+            "title": "Collega i tuoi account e aggiungi i tuoi lavori",
+            "description": "Aggiungi almeno un account social e un elemento del portfolio così i brand possono vedere la tua portata e il tuo stile."
           },
           "social": {
             "name": "Account social",
@@ -156,8 +161,7 @@
           "avatar_drop": "Trascina una foto qui o clicca per sceglierla. JPG, PNG o WebP fino a 5 MB.",
           "country": "Paese",
           "region": "Regione o città",
-          "primary_language": "Lingua principale",
-          "secondary_languages": "Altre lingue",
+          "primary_language": "Lingua madre",
           "categories": "Categorie",
           "categories_help": "Scegli le categorie che descrivono meglio quello che crei.",
           "avatar_required": "È necessaria una foto profilo per completare questo passaggio.",

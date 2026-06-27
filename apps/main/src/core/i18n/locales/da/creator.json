@@ -40,8 +40,8 @@
           "continue_from_here": "Fortsæt herfra",
           "edit_step": "Rediger trin",
           "review_and_submit": "Gennemse og indsend",
-          "connect": "Forbind",
-          "update": "Opdater",
+          "connect": "Tilføj",
+          "edit": "Rediger",
           "remove": "Fjern"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Profilgrundlæggende",
             "title": "Fortæl os om dig selv",
             "description": "Dit visningsnavn, bio, foto og de kategorier, du laver indhold i."
+          },
+          "connections": {
+            "name": "Sociale medier og portfolio",
+            "title": "Forbind dine konti og tilføj dit arbejde",
+            "description": "Tilføj mindst én social konto og ét portfolio-element, så brands kan se din rækkevidde og din stil."
           },
           "social": {
             "name": "Sociale konti",
@@ -156,8 +161,7 @@
           "avatar_drop": "Drop et billede her, eller klik for at vælge. JPG, PNG eller WebP op til 5 MB.",
           "country": "Land",
           "region": "Region eller by",
-          "primary_language": "Primært sprog",
-          "secondary_languages": "Andre sprog",
+          "primary_language": "Modersmål",
           "categories": "Kategorier",
           "categories_help": "Vælg de kategorier, der bedst beskriver, hvad du laver.",
           "avatar_required": "Et profilbillede er påkrævet for at afslutte dette trin.",

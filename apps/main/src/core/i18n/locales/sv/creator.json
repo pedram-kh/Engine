@@ -40,8 +40,8 @@
           "continue_from_here": "Fortsätt härifrån",
           "edit_step": "Redigera steg",
           "review_and_submit": "Granska och skicka in",
-          "connect": "Anslut",
-          "update": "Uppdatera",
+          "connect": "Lägg till",
+          "edit": "Redigera",
           "remove": "Ta bort"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Profilgrunder",
             "title": "Berätta om dig själv",
             "description": "Ditt visningsnamn, bio, foto och de kategorier du skapar i."
+          },
+          "connections": {
+            "name": "Sociala medier och portfolio",
+            "title": "Anslut dina konton och lägg till ditt arbete",
+            "description": "Lägg till minst ett socialt konto och ett portfolioobjekt så att varumärken kan se din räckvidd och din stil."
           },
           "social": {
             "name": "Sociala konton",
@@ -156,8 +161,7 @@
           "avatar_drop": "Släpp ett foto här, eller klicka för att välja. JPG, PNG eller WebP upp till 5 MB.",
           "country": "Land",
           "region": "Region eller stad",
-          "primary_language": "Primärt språk",
-          "secondary_languages": "Andra språk",
+          "primary_language": "Modersmål",
           "categories": "Kategorier",
           "categories_help": "Välj de kategorier som bäst beskriver vad du skapar.",
           "avatar_required": "Ett profilfoto krävs för att slutföra det här steget.",

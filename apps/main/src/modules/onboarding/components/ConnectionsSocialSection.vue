@@ -1,23 +1,15 @@
 <script setup lang="ts">
 /**
- * Step3SocialAccountsPage — wizard Step 3 (Social accounts).
+ * ConnectionsSocialSection — the Social-accounts sub-section of the merged
+ * "Connections" wizard step (ad-hoc AH-003 D2). This is the former
+ * Step3SocialAccountsPage body, extracted verbatim so the connect / update
+ * / remove logic is unchanged; the page-level header and the single
+ * "Continue" affordance now live on the parent {@link Step3ConnectionsPage}.
  *
- * Sprint 3 Chunk 3 sub-step 5. Connect one or more social media
- * accounts (Instagram, TikTok, YouTube). The "connection" in
- * Sprint 3 is form-based — the creator pastes a handle and the
- * profile URL is auto-derived; later sprints upgrade to OAuth.
- *
- * Decisions applied:
- *   - Decision C1: form-main (this page), display-shared
- *     ({@link SocialAccountList} from `@catalyst/ui`).
- *   - At least one social account is required to advance; the
- *     submit button is disabled until the SPA sees at least one
- *     connected account in the bootstrap state.
- *
- * Each row in the form is a per-platform group: when the creator
- * fills in a handle and clicks "Connect", the SPA POSTs to
- * `/wizard/social` and re-bootstraps. The display below the form
- * always reflects the canonical server-side state.
+ * Social and portfolio are kept as DISTINCT sub-sections — never folded
+ * into each other. The "Connect" CTA reads "Add" (empty) / "Edit"
+ * (already added) because the connection is form-based, not adapter-
+ * connected (no metadata is fetched), so "Connect" would mislead.
  */
 
 import { SocialAccountList } from '@catalyst/ui'
@@ -25,12 +17,10 @@ import type { CreatorSocialAccountSummary, CreatorSocialPlatform } from '@cataly
 import { ApiError, extractFieldErrors } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 const { t } = useI18n()
-const router = useRouter()
 const store = useOnboardingStore()
 
 const PLATFORMS: readonly CreatorSocialPlatform[] = ['instagram', 'tiktok', 'youtube']
@@ -47,14 +37,6 @@ function normalizeHandle(raw: string): string {
   return raw.trim().replace(/^@/, '')
 }
 
-/**
- * Backend field-key union (matches `ConnectSocialRequest::rules()`).
- * The `platform` key is set programmatically per-row, so a backend
- * `platform` violation is exceptional — we still surface it to the
- * row that triggered it, attached to the handle input (no separate
- * UI surface). `profile_url` is also derived programmatically from
- * `handle`, so any error there folds back onto the handle input.
- */
 type SocialField = 'platform' | 'handle' | 'profile_url'
 
 interface PlatformDraft {
@@ -99,8 +81,6 @@ const connectedAccounts = computed(() => {
   }))
 })
 
-const canAdvance = computed(() => connectedAccounts.value.length > 0)
-
 function isConnected(platform: CreatorSocialPlatform): boolean {
   return connectedByPlatform.value[platform] !== undefined
 }
@@ -138,17 +118,11 @@ async function connectPlatform(platform: CreatorSocialPlatform): Promise<void> {
       handle,
       profile_url: PROFILE_URL_BUILDERS[platform](handle),
     })
-    // Re-sync so the row now shows the persisted (possibly normalized)
-    // handle instead of clearing — reinforces that it is editable.
     syncDraftsFromServer()
   } catch (error) {
     if (error instanceof ApiError) {
       draft.fieldErrors = extractFieldErrors<SocialField>(error)
     }
-    // Fold any `platform` or `profile_url` violations into the handle
-    // surface — those fields are derived/programmatic, the creator
-    // can only act on the handle. We collapse to a single line in
-    // priority order to keep the per-row UI compact.
     const collapsed = [
       ...(drafts.value[platform].fieldErrors.handle ?? []),
       ...(drafts.value[platform].fieldErrors.profile_url ?? []),
@@ -157,7 +131,6 @@ async function connectPlatform(platform: CreatorSocialPlatform): Promise<void> {
     if (collapsed.length > 0) {
       drafts.value[platform].fieldErrors = { handle: collapsed }
     } else {
-      // No per-field violations — fall back to the generic banner.
       draft.errorKey = 'creator.ui.errors.upload_failed'
     }
   }
@@ -179,17 +152,12 @@ async function removePlatform(platform: CreatorSocialPlatform): Promise<void> {
     }
   }
 }
-
-async function advance(): Promise<void> {
-  if (!canAdvance.value) return
-  await router.push({ name: 'onboarding.portfolio' })
-}
 </script>
 
 <template>
   <section class="social-accounts" data-testid="step-social-accounts">
     <header class="social-accounts__header">
-      <h2 class="text-h5">{{ t('creator.ui.wizard.steps.social.title') }}</h2>
+      <h3 class="text-subtitle-1">{{ t('creator.ui.wizard.steps.social.title') }}</h3>
       <p class="text-body-2 text-medium-emphasis">
         {{ t('creator.ui.wizard.steps.social.description') }}
       </p>
@@ -239,7 +207,7 @@ async function advance(): Promise<void> {
         >
           {{
             isConnected(platform)
-              ? t('creator.ui.wizard.actions.update')
+              ? t('creator.ui.wizard.actions.edit')
               : t('creator.ui.wizard.actions.connect')
           }}
         </v-btn>
@@ -254,12 +222,6 @@ async function advance(): Promise<void> {
           {{ t('creator.ui.wizard.actions.remove') }}
         </v-btn>
       </div>
-    </div>
-
-    <div class="social-accounts__actions">
-      <v-btn color="primary" :disabled="!canAdvance" data-testid="social-advance" @click="advance">
-        {{ t('creator.ui.wizard.actions.save_and_continue') }}
-      </v-btn>
     </div>
   </section>
 </template>
@@ -298,10 +260,5 @@ async function advance(): Promise<void> {
 
 .social-accounts__platform-label {
   font-weight: 500;
-}
-
-.social-accounts__actions {
-  display: flex;
-  justify-content: flex-end;
 }
 </style>

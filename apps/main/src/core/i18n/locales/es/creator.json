@@ -40,8 +40,8 @@
           "continue_from_here": "Continuar desde aquí",
           "edit_step": "Editar paso",
           "review_and_submit": "Revisar y enviar",
-          "connect": "Conectar",
-          "update": "Actualizar",
+          "connect": "Añadir",
+          "edit": "Editar",
           "remove": "Eliminar"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Datos del perfil",
             "title": "Cuéntanos sobre ti",
             "description": "Tu nombre visible, tu biografía, tu foto y las categorías en las que creas."
+          },
+          "connections": {
+            "name": "Redes sociales y portafolio",
+            "title": "Conecta tus cuentas y añade tu trabajo",
+            "description": "Añade al menos una cuenta social y un elemento de tu portafolio para que las marcas vean tu alcance y tu estilo."
           },
           "social": {
             "name": "Cuentas sociales",
@@ -156,8 +161,7 @@
           "avatar_drop": "Arrastra una foto aquí o haz clic para elegir. JPG, PNG o WebP de hasta 5 MB.",
           "country": "País",
           "region": "Región o ciudad",
-          "primary_language": "Idioma principal",
-          "secondary_languages": "Otros idiomas",
+          "primary_language": "Lengua materna",
           "categories": "Categorías",
           "categories_help": "Elige las categorías que mejor describen lo que creas.",
           "avatar_required": "Se necesita una foto de perfil para terminar este paso.",

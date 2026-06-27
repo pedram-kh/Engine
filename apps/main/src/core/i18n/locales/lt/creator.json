@@ -40,8 +40,8 @@
           "continue_from_here": "Tęsti from here",
           "edit_step": "Redaguoti step",
           "review_and_submit": "Review and submit",
-          "connect": "Connect",
-          "update": "Atnaujinti",
+          "connect": "Pridėti",
+          "edit": "Redaguoti",
           "remove": "Remove"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Profilis basics",
             "title": "Tell us about yourself",
             "description": "Your display name, bio, photo, and the categories you create in."
+          },
+          "connections": {
+            "name": "Socialiniai tinklai ir portfolio",
+            "title": "Prijunkite savo paskyras ir pridėkite savo darbus",
+            "description": "Pridėkite bent vieną socialinio tinklo paskyrą ir bent vieną portfolio darbą, kad prekės ženklai matytų jūsų pasiekiamumą ir stilių."
           },
           "social": {
             "name": "Social accounts",
@@ -156,8 +161,7 @@
           "avatar_drop": "Drop a photo here, or click to choose. JPG, PNG, or WebP up to 5 MB.",
           "country": "Country",
           "region": "Region or city",
-          "primary_language": "Primary language",
-          "secondary_languages": "Other languages",
+          "primary_language": "Gimtoji kalba",
           "categories": "Categories",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",

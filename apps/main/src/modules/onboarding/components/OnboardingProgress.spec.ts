@@ -73,11 +73,11 @@ afterEach(() => {
 })
 
 describe('OnboardingProgress', () => {
-  // Sprint 3 stabilization (May 19, 2026): the wizard surfaces "Step
-  // X of 9" but the side rail historically only rendered 8 rows
-  // (steps 2-9). The implicit Step 1 = sign-up is now visible as a
-  // non-navigable static row so the numbering is self-consistent.
-  it('renders a static "Step 1 of 9 — Account created" row at the top', async () => {
+  // The implicit Step 1 = sign-up is rendered as a non-navigable static
+  // row so the numbering is self-consistent. Post-AH-003 the wizard has
+  // 5 visible steps (account, profile, connections, contract, review),
+  // so the static row reads "Step 1 of 5".
+  it('renders a static "Step 1 of 5 — Account created" row at the top', async () => {
     const { wrapper, unmount } = await mountAuthPage(OnboardingProgress, {
       initialRoute: { path: '/onboarding/profile' },
       beforeMount: async () => {
@@ -89,7 +89,7 @@ describe('OnboardingProgress', () => {
 
     const row = wrapper.find('[data-test="progress-step-account-created"]')
     expect(row.exists()).toBe(true)
-    expect(row.text()).toContain('Step 1 of 9')
+    expect(row.text()).toContain('Step 1 of 5')
     expect(row.text()).toContain('Account created')
     expect(row.text()).toContain('Completed')
     // The static row must NOT be a button — clicking it has no
@@ -97,7 +97,7 @@ describe('OnboardingProgress', () => {
     expect(row.find('button').exists()).toBe(false)
   })
 
-  it('renders the seven substantive steps below the static Step 1 row', async () => {
+  it('renders the visible substantive steps (profile, merged connections, contract)', async () => {
     const { wrapper, unmount } = await mountAuthPage(OnboardingProgress, {
       initialRoute: { path: '/onboarding/profile' },
       beforeMount: async () => {
@@ -107,8 +107,12 @@ describe('OnboardingProgress', () => {
     teardown = unmount
     await flushPromises()
 
-    for (const id of ['profile', 'social', 'portfolio', 'kyc', 'tax', 'payout', 'contract']) {
+    for (const id of ['profile', 'connections', 'contract']) {
       expect(wrapper.find(`[data-test="progress-step-${id}"]`).exists()).toBe(true)
+    }
+    // Social + portfolio are merged; kyc/tax/payout are build-time hidden.
+    for (const id of ['social', 'portfolio', 'kyc', 'tax', 'payout']) {
+      expect(wrapper.find(`[data-test="progress-step-${id}"]`).exists()).toBe(false)
     }
   })
 })

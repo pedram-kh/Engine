@@ -10,14 +10,12 @@
  *     surface a documented skip-explanation; status icon paired
  *     with color so colour is never the only signal — 01-UI-UX § 9)
  *
- * Sourcing:
- *   - Step list: `useOnboardingStore.creator.wizard.steps` (backend
- *     authoritative; the order is the backend's `WizardStep::ordered()`).
- *   - Per-step completion: `stepCompletion` getter.
- *   - Flag state: `flags` getter (for Skipped rendering — when a
- *     vendor-gated step is flag-OFF the step is auto-completed by
- *     the backend's stepCompletion logic, so we render "Skipped"
- *     visually distinct from "Completed").
+ * Sourcing (AH-003): the rail is DERIVED from {@link VISIBLE_UX_STEPS}
+ * (the single frontend step registry), not a hard-coded list or a
+ * `TOTAL_STEPS = 9` constant. Build-time hidden steps (kyc/tax/payout)
+ * are already absent from that list, and social + portfolio are merged
+ * into the single "connections" UX step. Per-step completion + flag
+ * state come from the store's `stepCompletion` + `flags` getters.
  *
  * a11y (F2=b):
  *   - The progress list is a `<nav aria-label="Onboarding progress">`.
@@ -31,10 +29,15 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
-import { resolveStepStatus } from '../composables/useFeatureFlags'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
-import { WIZARD_STEP_ROUTE_NAMES } from '../routes'
-import type { CreatorWizardStepId } from '@catalyst/api-client'
+import {
+  REVIEW_UX_STEPS,
+  VISIBLE_UX_STEPS,
+  WIZARD_TOTAL_STEPS,
+  resolveUxStepComplete,
+  resolveUxStepStatus,
+  uxStepTitleKey,
+} from '../composables/useWizardSteps'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -44,18 +47,16 @@ const onboardingStore = useOnboardingStore()
 const { creator, stepCompletion, flags } = storeToRefs(onboardingStore)
 
 /**
- * Total step count visible in the rail. `9` = the 8 backend wizard
- * steps + the implicit Step 1 (account creation / sign-up). Step 1
- * is rendered as a non-navigable static row at the top so the
- * "Step X of 9" labels on the other rows are self-consistent rather
- * than visually skipping a number. Caught during the May 19, 2026
- * stabilization audit — a creator landing on Review saw "Step 2 of
- * 9" with no Step 1 anywhere and was confused.
+ * Total step count visible in the rail = the static account row + every
+ * visible UX step (review included, since it numbers the final submit
+ * surface). Derived from {@link VISIBLE_UX_STEPS} so a reversible-hide
+ * flip re-numbers automatically — never a magic `9`.
  */
-const TOTAL_STEPS = 9
+const TOTAL_STEPS = WIZARD_TOTAL_STEPS
 
 interface StepView {
-  id: CreatorWizardStepId
+  id: string
+  titleKey: string
   routeName: string
   isComplete: boolean
   isCurrent: boolean
@@ -63,38 +64,25 @@ interface StepView {
   position: number
 }
 
-const steps = computed<StepView[]>(() => {
-  // Display order: the eight `WizardStep::ordered()` cases, with
-  // Review being the final "submit" landing. We don't render Review
-  // as a navigable step in the progress indicator — it's reached via
-  // "Submit for approval" on the last substantive step.
-  const baseList: CreatorWizardStepId[] = [
-    'profile',
-    'social',
-    'portfolio',
-    'kyc',
-    'tax',
-    'payout',
-    'contract',
-  ]
-
-  return baseList.map((id, index) => {
-    const isComplete = stepCompletion.value[id] ?? false
-    const status = resolveStepStatus(id, isComplete, flags.value)
+const steps = computed<StepView[]>(() =>
+  // Navigable rows: every visible UX step except the static account row
+  // and review (review is reached via "Submit" on the last step). The
+  // position is the step's ordinal within the full visible list (account
+  // is position 1), so the captions never skip a number.
+  REVIEW_UX_STEPS.map((step) => {
+    const isComplete = resolveUxStepComplete(step, stepCompletion.value)
+    const status = resolveUxStepStatus(step, stepCompletion.value, flags.value)
     return {
-      id,
-      routeName: WIZARD_STEP_ROUTE_NAMES[id],
+      id: step.id,
+      titleKey: uxStepTitleKey(step),
+      routeName: step.routeName ?? '',
       isComplete,
-      isCurrent: route.name === WIZARD_STEP_ROUTE_NAMES[id],
-      // A step is "skipped" only when (a) the flag is off AND (b) the
-      // creator has not vendor-completed it (e.g. NotRequired stamp).
-      // Vendor-completed steps render "Completed" regardless of flag
-      // state — the chunk-2 forensic distinction.
+      isCurrent: route.name === step.routeName,
       isSkipped: status === 'skipped',
-      position: index + 2, // Step 1 (account creation) is implicit
+      position: VISIBLE_UX_STEPS.indexOf(step) + 1,
     }
-  })
-})
+  }),
+)
 
 function navigateTo(stepRouteName: string): void {
   void router.push({ name: stepRouteName })
@@ -152,7 +140,7 @@ function statusLabel(step: StepView): string {
         Static Step 1 row — account creation is "implicit" (handled
         by the Identity module's sign-up endpoint and complete by the
         time the creator can authenticate). We surface it visually so
-        the "Step X of 9" numbering on the other rows isn't off by
+        the "Step X of N" numbering on the other rows isn't off by
         one from the user's perspective. Non-navigable: there's no
         in-wizard route to return to sign-up.
       -->
@@ -215,7 +203,7 @@ function statusLabel(step: StepView): string {
               }}
             </span>
             <span class="onboarding-progress__name text-body-2">
-              {{ t(`creator.ui.wizard.steps.${step.id}.name`) }}
+              {{ t(step.titleKey) }}
             </span>
             <span class="onboarding-progress__status text-caption">
               {{ statusLabel(step) }}

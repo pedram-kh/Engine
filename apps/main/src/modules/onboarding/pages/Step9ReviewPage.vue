@@ -27,16 +27,20 @@
  * layout's status region.
  */
 
-import type { CreatorWizardStepId } from '@catalyst/api-client'
 import { CompletenessBar } from '@catalyst/ui'
 import { computed, ref } from 'vue'
 
-import { resolveStepStatus, type WizardStepStatus } from '../composables/useFeatureFlags'
+import { type WizardStepStatus } from '../composables/useFeatureFlags'
 import { resolveSubmitErrorKey } from '../composables/useSubmitErrorKey'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-import { WIZARD_STEP_ROUTE_NAMES } from '../routes'
+import {
+  REVIEW_UX_STEPS,
+  resolveUxStepComplete,
+  resolveUxStepStatus,
+  uxStepTitleKey,
+} from '../composables/useWizardSteps'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 const { t } = useI18n()
@@ -44,16 +48,6 @@ const router = useRouter()
 const store = useOnboardingStore()
 
 const submitErrorKey = ref<string | null>(null)
-
-const REVIEWABLE_STEPS: ReadonlyArray<CreatorWizardStepId> = [
-  'profile',
-  'social',
-  'portfolio',
-  'kyc',
-  'tax',
-  'payout',
-  'contract',
-]
 
 const score = computed(() => store.completenessScore)
 const completenessLabel = computed(() =>
@@ -76,7 +70,7 @@ const STATUS_I18N_KEY: Record<WizardStepStatus, string> = {
 }
 
 interface StepRow {
-  id: CreatorWizardStepId
+  id: string
   name: string
   isComplete: boolean
   status: WizardStepStatus
@@ -84,17 +78,21 @@ interface StepRow {
   routeName: string
 }
 
+// Review rows are DERIVED from the visible UX step list (AH-003): profile,
+// the merged "connections" step, and contract. Hidden steps (kyc/tax/
+// payout) never appear, and social/portfolio collapse into one row whose
+// completion requires BOTH sub-sections.
 const stepRows = computed<StepRow[]>(() =>
-  REVIEWABLE_STEPS.map((step) => {
-    const isComplete = store.stepCompletion[step] ?? false
-    const status = resolveStepStatus(step, isComplete, store.flags)
+  REVIEW_UX_STEPS.map((step) => {
+    const isComplete = resolveUxStepComplete(step, store.stepCompletion)
+    const status = resolveUxStepStatus(step, store.stepCompletion, store.flags)
     return {
-      id: step,
-      name: t(`creator.ui.wizard.steps.${step}.name`),
+      id: step.id,
+      name: t(uxStepTitleKey(step)),
       isComplete,
       status,
       statusLabel: t(STATUS_I18N_KEY[status]),
-      routeName: WIZARD_STEP_ROUTE_NAMES[step],
+      routeName: step.routeName ?? '',
     }
   }),
 )
@@ -119,8 +117,9 @@ async function submit(): Promise<void> {
   }
 }
 
-async function goToStep(step: CreatorWizardStepId): Promise<void> {
-  await router.push({ name: WIZARD_STEP_ROUTE_NAMES[step] })
+async function goToStep(routeName: string): Promise<void> {
+  if (routeName === '') return
+  await router.push({ name: routeName })
 }
 </script>
 
@@ -171,7 +170,7 @@ async function goToStep(step: CreatorWizardStepId): Promise<void> {
           variant="text"
           size="small"
           :data-testid="`review-edit-${row.id}`"
-          @click="goToStep(row.id)"
+          @click="goToStep(row.routeName)"
         >
           {{ t('creator.ui.wizard.steps.review.edit_step') }}
         </v-btn>

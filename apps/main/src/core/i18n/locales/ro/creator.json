@@ -40,8 +40,8 @@
           "continue_from_here": "Continuați from here",
           "edit_step": "Editați step",
           "review_and_submit": "Review and submit",
-          "connect": "Connect",
-          "update": "Actualizați",
+          "connect": "Adaugă",
+          "edit": "Editează",
           "remove": "Remove"
         },
         "skipped": {
@@ -58,6 +58,11 @@
             "name": "Profil basics",
             "title": "Tell us about yourself",
             "description": "Your display name, bio, photo, and the categories you create in."
+          },
+          "connections": {
+            "name": "Rețele sociale și portofoliu",
+            "title": "Conectează-ți conturile și adaugă-ți munca",
+            "description": "Adaugă cel puțin un cont social și un element de portofoliu pentru ca mărcile să-ți vadă acoperirea și stilul."
           },
           "social": {
             "name": "Social accounts",
@@ -156,8 +161,7 @@
           "avatar_drop": "Drop a photo here, or click to choose. JPG, PNG, or WebP up to 5 MB.",
           "country": "Country",
           "region": "Region or city",
-          "primary_language": "Primary language",
-          "secondary_languages": "Other languages",
+          "primary_language": "Limba maternă",
           "categories": "Categories",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",
