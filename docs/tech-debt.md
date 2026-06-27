@@ -1430,3 +1430,26 @@ anyone reviewing it later.
   (whichever first).
 - **Owner:** the Sprint 10 payments workstream (when resumed).
 - **Status:** open (deferred).
+
+---
+
+## Digest + agency-invite emails are English-only (deliberate)
+
+- **Where:**
+  - `UnreadMessagesDigestMail` dispatched from `SendMessageDigests.php:33`
+  - `InviteAgencyUserMail` dispatched from `AgencyInvitationService.php:75`
+- **What we accepted (2026-06-27, Sprint 11 mail-locale audit):** both mailables send without
+  `->locale(...)` and render in `en` for all recipients regardless of `User::preferred_language`.
+  This is a deliberate product decision, not an oversight.
+- **Why the digest is harder to fix than a normal mailable:** its `$lines` strings are built inside
+  `MessageDigestService` (`::204`, `::212`, `::220`) using `__()` while the Artisan command runs in
+  console context (also `en`). Those strings are baked into the queued payload before the mailable
+  is ever dispatched, so chaining `->locale(...)` at the send site alone is insufficient — a future
+  fix must localize at line-build time, iterating per-recipient with the correct locale set before
+  each `__()` call.
+- **`InviteAgencyUserMail` note:** `InvitationMailTest` proves the template renders correctly in
+  `en`/`pt`/`it` via manual `App::setLocale()`; nothing at the dispatch site selects per-invitee
+  locale. No false docblock claim (nothing to correct in the class itself).
+- **Triggered by:** product need for per-recipient localized digest or invite emails.
+- **Owner:** future Messaging / Identity polish workstream.
+- **Status:** open (by design).

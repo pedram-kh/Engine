@@ -15,8 +15,10 @@ use Illuminate\Mail\Mailables\Envelope;
  * per opted-in user with unread messages. This is messaging's email channel:
  * there is deliberately no immediate per-message email (D-8 spec-divergence).
  *
- * Queued + localized at queue time + rendered through the shared `catalyst`
- * markdown theme — mirrors the Sprint 9 assignment Mailables.
+ * Queued + rendered through the shared `catalyst` markdown theme. Renders in
+ * the application default locale (`en`) for all recipients — no per-recipient
+ * locale is set at the send site (SendMessageDigests.php) by deliberate decision.
+ * See docs/tech-debt.md "Digest + agency-invite emails are English-only".
  */
 final class UnreadMessagesDigestMail extends Mailable implements ShouldQueue
 {
