@@ -1,0 +1,143 @@
+# Catalyst Engine — Ad-Hoc Changes Log
+
+A running record of changes made **outside** the sprint plan and the phase roadmap —
+out-of-band UX improvements, polish, small fixes, and tech-debt paydowns that don't
+belong to any numbered sprint. The aim is simple: nothing the platform does should be
+unexplained. If a change isn't a sprint and isn't on the roadmap, it lives here, so any
+developer (or future us) can open this one file and know **what changed, why, and where**.
+
+This file is the **index and history** for ad-hoc work. Changes that go through the full
+chunk loop still get their own detailed review file in `docs/reviews/`; the entry here is
+a short pointer to it, not a duplicate.
+
+---
+
+## How this file works
+
+**Scope.** Any change not driven by the active sprint or the phase spec: UX tweaks, copy
+fixes, accessibility, performance polish, small bugfixes, doc corrections, tech-debt
+cleanup. If it _is_ part of a sprint, it belongs in that sprint's review, not here.
+
+**Relationship to the existing workflow.** Ad-hoc changes still follow the house loop —
+inventory (when the surface is unknown) → kickoff with locked decisions → plan-pause →
+build → spot-check → two-commit pair → push. This file doesn't replace that; it's the
+durable record so the work isn't invisible afterward. Larger ad-hoc changes get a full
+`docs/reviews/<name>-review.md` and this log just links to it.
+
+**Entry lifecycle.** An item starts in **Live Status** (below) when proposed, moves through
+`In progress`, and graduates into the **Change Log** as `Landed` once merged. Parked or
+dropped items stay in the log with that status so the decision is on record.
+
+**IDs.** Each entry gets a stable `AH-NNN` id so it can be referenced from commits,
+reviews, and conversations.
+
+**Entry template** (copy this for each new change):
+
+```
+### AH-NNN · <short title>
+
+- **Status:** Proposed | In progress | Landed | Parked
+- **Date:** YYYY-MM-DD (landed date, or last-updated while open)
+- **Why:** the user problem / motivation in one or two sentences
+- **What:** the change in plain terms
+- **Touched:** files / modules / surfaces affected
+- **Decisions:** any locked calls made along the way
+- **Ref:** kickoff / review file / commit(s), if applicable
+```
+
+---
+
+## Live Status (open + in-flight)
+
+| ID     | Title                                    | Status   | Notes                                                                                          |
+| ------ | ---------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| AH-002 | Digest/invite email docblock + debt      | Proposed | Cursor prompt issued; not yet landed. Cosmetic doc fix + debt entry.                           |
+| AH-004 | Portfolio overhaul (schema + feature)    | Proposed | Plan-pause: two open items (image EXIF/thumbnail; drawer presentation). No code until audited. |
+| —      | Campaign Drafts tab — independent review | Pending  | Merged in code; review file reads "pending independent review pass."                           |
+
+> Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
+> roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
+
+---
+
+## Change Log (newest first)
+
+### AH-003 · Wizard slim + profile-basics polish
+
+- **Status:** Landed
+- **Date:** 2026-06-27
+- **Why:** Sprint 10 (payments) and automated KYC aren't built, and KYC is manual today, so
+  the Identity-verification / Tax / Payout steps collect nothing actionable yet — they made
+  onboarding longer without value. Separately, the wizard hard-coded its step count (and a
+  comment falsely claimed it rendered dynamically), "Connect" misled on form-only social, and
+  the profile photo was circular.
+- **What:**
+  - **Reversible-hide of kyc/tax/payout** via a single static registry
+    (`WizardStep::WIZARD_HIDDEN_STEPS`, mirrored by the TS `WIZARD_HIDDEN_STEPS`), held in
+    lockstep by a 5.25 parity test. Hidden steps are excluded from the rail, numbering,
+    completeness denominator, and the submit gate (so the always-required `tax_profile_complete`
+    no longer dead-locks submit). Re-introduction = remove from the list (+ flip the kyc/payout
+    Pennant flags ON). NOT a feature flag — it's a build-time "not ready yet" hide.
+  - **Merged Social + Portfolio** into one "connections" step with the two kept as distinct
+    sub-sections (backend keeps them as separate completion units; APIs/weights unchanged).
+  - **Derived numbering/progress/geometry** from a single visible-step list
+    (`useWizardSteps`) — removed `TOTAL_STEPS = 9`, the index maps, and the animated chrome's
+    `/7`·`/8` divisors, and fixed the false "renders dynamically" comment. A future hide/show
+    is now a one-line registry flip.
+  - **Profile-basics polish:** photo rectangular (was circular, style-only); "Primary
+    language" → "Native language" (label only, column unchanged); removed the "Other languages"
+    onboarding input (the `secondary_languages` column + its roster/discover/detail/admin
+    displays from AH-001 are untouched; the save payload omits the field so existing data is
+    preserved); social CTA "Connect" → "Add" (empty) / "Edit" (added).
+  - **i18n done-gate:** the changed/new `creator` strings regenerated across all 24 locales;
+    the orphaned `creator.ui.wizard.fields.secondary_languages` key deleted from all 24
+    (verified wizard-only first); parity/placeholder/plural gates green.
+- **Touched:** `apps/api` (`WizardStep` enum + hidden registry, `CompletenessScoreCalculator`,
+  `CreatorResource` bootstrap), `packages/api-client` (`wizard.ts` registry + parity spec),
+  `apps/main` onboarding module (new `useWizardSteps`, merged `Step3ConnectionsPage` + two
+  section components, `OnboardingLayout`, `OnboardingProgress`, `AnimatedWizardChrome`,
+  `Step2ProfileBasicsPage`, `Step9ReviewPage`, `AvatarUploadDrop`, routes), all `apps/main`
+  `creator.json` locales, unit + architecture specs, Playwright happy-path.
+- **Decisions:** Q1 submit gate ignores `tax_profile_complete` while tax is hidden (the
+  alternative is a literal deadlock) — **re-introduction obligation recorded in tech-debt**:
+  Sprint 10 must backfill tax for creators who onboard during the hidden window, since tax is
+  legally required before a first payout. Q2 static config (not Pennant); hidden takes
+  precedence over the existing flag-based skip. Q8 the orphaned `secondary_languages` key is
+  deleted from all 24 (parity forces all-24 anyway). D7 "Connect"→"Add", added→"Edit".
+- **Ref:** kickoff "Creator onboarding + profile + portfolio reshape (AH-003 + AH-004)";
+  tech-debt entries "Hidden onboarding steps (kyc/tax/payout) — Sprint-10-gated" + the AH-004
+  upload-ceiling debt. Commit-pair (this entry's landing commit).
+
+---
+
+### AH-001 · EU locale support (24 languages) + persistence
+
+- **Status:** Landed
+- **Date:** 2026-06-27
+- **Why:** The language switcher reset on every reload/login (a selected language never
+  stuck), and the platform shipped only 3 locales (en/pt/it) while serving EU-wide users.
+- **What:** A selected UI language now persists across reload and login in both SPAs
+  (server-authoritative via `PATCH /me`, with localStorage for the pre-auth choice), and the
+  UI + content-language sets expanded from 3 to all 24 official EU languages via a
+  model-authored machine-translation baseline. Includes lazy per-locale loading (only the
+  active language is fetched), CLDR pluralization rules for all 24, a request-locale
+  middleware so server error strings/emails follow the caller, and parity/placeholder/plural
+  CI gates across both SPAs and the backend `lang/` tree. Legally binding content
+  (`resources/contracts/**`) is carved out and stays English.
+- **Touched:** `packages/api-client` (locale + plural-rules + format registries), both SPA
+  i18n bootstraps + switchers + auth stores, Identity module (`PATCH /me`, `SetLocale`
+  middleware), `apps/api/lang/**`, all locale JSON across `apps/main` + `apps/admin`,
+  architecture parity specs, SOT docs (`00-MASTER-ARCHITECTURE §13`, `CURSOR-INSTRUCTIONS`,
+  `02-CONVENTIONS`), new `docs/i18n-glossary.md`.
+- **Decisions:** `preferred_language` validates against the rendered `UI_LOCALES`;
+  content-language fields against the full `EU_LANGUAGES` (24). `PATCH /me` ignores unknown
+  fields rather than 422-ing (matches the notification-preferences precedent; extra fields
+  are provably inert). Translation baseline is structurally validated (keys/placeholders/
+  plural-form-counts), **not** meaning-verified — per-market human review is a go-live gate,
+  not a merge gate. Digest + agency-invite emails remain English-only by decision (see AH-002).
+- **Ref:** `docs/reviews/eu-locale-support-review.md` (full review, 9 sub-steps, 48/48 parity).
+
+---
+
+_Maintained alongside the work: when an ad-hoc change lands, its entry moves here in the
+same pass — the log and the build move together, never as an afterthought._

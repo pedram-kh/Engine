@@ -1453,3 +1453,55 @@ anyone reviewing it later.
 - **Triggered by:** product need for per-recipient localized digest or invite emails.
 - **Owner:** future Messaging / Identity polish workstream.
 - **Status:** open (by design).
+
+---
+
+## Hidden onboarding steps (kyc/tax/payout) — Sprint-10-gated re-introduction + tax backfill obligation
+
+- **Where:** `WizardStep::WIZARD_HIDDEN_STEPS` (`apps/api/.../Creators/Enums/WizardStep.php`),
+  mirrored by `WIZARD_HIDDEN_STEPS` in `packages/api-client/src/wizard.ts` (lockstep parity test
+  `wizard.spec.ts`).
+- **What we accepted (2026-06-27, AH-003):** the Identity-verification (`kyc`), Tax-information
+  (`tax`), and Payout-method (`payout`) steps are **build-time HIDDEN** — excluded from the wizard
+  rail, the 01…0N numbering, the completeness denominator, and the submit gate. In particular the
+  submit gate **no longer requires `tax_profile_complete`** while `tax` is hidden (Q1 — the
+  alternative was a literal deadlock: an always-required step that the creator can never reach).
+  This is a reversible hide via a static registry, NOT a Pennant flag (the flag semantics —
+  runtime/per-tenant — are wrong for a "not built yet" gate).
+- **Re-introduction trigger:** Sprint 10 (Payments/Escrow) + automated KYC land (same trigger for
+  all three). Re-introduction = remove the step id(s) from `WIZARD_HIDDEN_STEPS`; for kyc/payout
+  also flip their Pennant flags ON. The visible-step list then re-derives numbering/progress/
+  geometry automatically (AH-003 made the wizard derive these from the list, so no magic-number
+  edits are needed).
+- **Tax backfill obligation (must NOT be a surprise at Sprint 10):** creators who onboard during
+  the hidden window submit with **no tax profile**. Tax data is **legally required before a first
+  payout**, so Sprint 10 cannot simply re-show the step for new creators — it must **collect tax
+  from the already-onboarded backlog before anyone is paid**. Plan a backfill/blocking path: gate
+  the first payout on tax completeness and prompt the existing cohort to fill it, rather than
+  assuming the wizard step alone covers everyone.
+- **Triggered by:** Sprint 10 + automated KYC.
+- **Owner:** Sprint 10 payments workstream + onboarding.
+- **Status:** open (deferred, by design).
+
+---
+
+## Portfolio upload — resume / presign-expiry / storage cost (AH-004 plan carry-overs)
+
+- **Where:** the creator portfolio upload path (single presigned S3 `PUT`; `PortfolioUploadService`
+  / the wizard portfolio sub-section). Logged during the AH-004 plan-pause (Q3).
+- **What we accepted:** AH-004 keeps the **single presigned `PUT`** (video already proves it at
+  500 MB, so the planned uniform 500 MB ceiling for all file types needs no multipart rewrite) and
+  adds **upload progress + a client timeout**. The following are explicitly deferred as
+  quality-of-life / cost items, not built in AH-004:
+  - **Resumable / multipart uploads** — on a flaky connection a large (hundreds-of-MB) `PUT` that
+    drops restarts from zero. Multipart/resumable presigning would let it resume. Deferred until a
+    real failure-rate signal justifies it.
+  - **15-minute presign expiry** — a slow uploader on a bad connection can outrun the URL's TTL and
+    get a hard failure late in a large upload. Consider a longer TTL for the portfolio path or a
+    re-presign-on-expiry handshake.
+  - **S3 storage cost at scale** — up to 30 files × 500 MB ≈ ~15 GB/creator of durable object
+    storage. At creator scale this is a real recurring cost; name it in capacity/cost planning
+    (lifecycle rules, storage class, or a per-creator soft quota are all options, none built here).
+- **Triggered by:** measured upload failure rates (resume/expiry) or storage-cost review (S3).
+- **Owner:** AH-004 portfolio workstream / infra-cost review.
+- **Status:** open (deferred).
