@@ -130,14 +130,17 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     await seedAvatar(page)
 
     // -----------------------------------------------------------------
-    // /onboarding — a brand-new creator (no wizard step finished;
-    // next_step is still `profile`) skips the Welcome Back interstitial
-    // entirely and is redirected straight to Step 1 inside the animated
-    // wizard (Option-1 entry consistency). The Welcome Back resume
-    // screen only renders for returners who have completed >=1 step,
-    // covered by WelcomeBackPage.spec.ts.
+    // /onboarding — the Welcome Back landing now renders on EVERY login
+    // for any non-submitted creator (a fresh sign-in is a fresh page
+    // load, so the tab-scoped auto-advance flag is unset). A brand-new
+    // creator (score 0) gets the "Let's get started" copy; the CTA
+    // routes to `next_step` (still `profile` here). We click it to enter
+    // Step 1. The copy/auto-advance variants are covered by
+    // WelcomeBackPage.spec.ts.
     // -----------------------------------------------------------------
     await page.goto('/onboarding')
+    await expect(page.locator(dt(testIds.welcomeBackPage))).toBeVisible({ timeout: 10_000 })
+    await page.locator(dt(testIds.welcomeBackContinueBtn)).click()
 
     // -----------------------------------------------------------------
     // Step 2 — Profile basics. Fill the required fields and submit.
