@@ -1531,6 +1531,10 @@ anyone reviewing it later.
   `description` string still contains English wording like "up to … that represent your style"
   under a foreign-language key. AH-004 only touched the `10 → 30` number in those strings (in
   scope), so this predates and is independent of AH-004.
+- **AH-005 addendum (2026-06-28):** the AH-005 contact-detail labels were regenerated across all 24
+  locales (parity green), but the `mt` (Maltese) and `ga` (Irish) translations of the new keys were
+  flagged for a native-speaker pass. Both locales are already on the list above; this reaffirms them
+  as the highest-priority candidates for the content cleanup.
 - **Why the gates don't catch it:** the i18n CI gate is **keyset/placeholder/plural parity** — it
   proves a key _exists_ in every locale with matching interpolation/plural shape, but it can
   **never** prove a value isn't still English. "English text under a foreign label" is structurally
