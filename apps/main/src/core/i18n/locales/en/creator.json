@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Social & portfolio",
-            "title": "Connect your accounts and add your work",
+            "title": "Add your accounts and your work",
             "description": "Add at least one social account and one portfolio piece so brands can see your reach and your style."
           },
           "social": {
             "name": "Social accounts",
-            "title": "Connect your social accounts",
-            "description": "Connect at least one platform so brands can see your reach."
+            "title": "Add your social accounts",
+            "description": "Add at least one platform so brands can see your reach."
           },
           "portfolio": {
             "name": "Portfolio",

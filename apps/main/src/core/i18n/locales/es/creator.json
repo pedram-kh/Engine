@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Redes sociales y portafolio",
-            "title": "Conecta tus cuentas y añade tu trabajo",
+            "title": "Añade tus cuentas y tu trabajo",
             "description": "Añade al menos una cuenta social y un elemento de tu portafolio para que las marcas vean tu alcance y tu estilo."
           },
           "social": {
             "name": "Cuentas sociales",
-            "title": "Conecta tus cuentas sociales",
-            "description": "Conecta al menos una plataforma para que las marcas vean tu alcance."
+            "title": "Añade tus cuentas sociales",
+            "description": "Añade al menos una plataforma para que las marcas vean tu alcance."
           },
           "portfolio": {
             "name": "Portafolio",

@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Social & Portfolio",
-            "title": "Verknüpfe deine Konten und füge deine Arbeiten hinzu",
+            "title": "Füge deine Konten und deine Arbeiten hinzu",
             "description": "Füge mindestens ein Social-Konto und ein Portfolio-Element hinzu, damit Marken deine Reichweite und deinen Stil sehen können."
           },
           "social": {
             "name": "Social-Konten",
-            "title": "Verknüpfe deine Social-Konten",
-            "description": "Verbinde mindestens eine Plattform, damit Marken deine Reichweite sehen können."
+            "title": "Füge deine Social-Konten hinzu",
+            "description": "Füge mindestens eine Plattform hinzu, damit Marken deine Reichweite sehen können."
           },
           "portfolio": {
             "name": "Portfolio",

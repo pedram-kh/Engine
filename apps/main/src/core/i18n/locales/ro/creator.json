@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Rețele sociale și portofoliu",
-            "title": "Conectează-ți conturile și adaugă-ți munca",
+            "title": "Adaugă-ți conturile și munca ta",
             "description": "Adaugă cel puțin un cont social și un element de portofoliu pentru ca mărcile să-ți vadă acoperirea și stilul."
           },
           "social": {
             "name": "Social accounts",
-            "title": "Connect your social accounts",
-            "description": "Connect at least one platform so brands can see your reach."
+            "title": "Adaugă-ți conturile de socializare",
+            "description": "Adaugă cel puțin o platformă pentru ca brandurile să îți vadă audiența."
           },
           "portfolio": {
             "name": "Portofoliu",

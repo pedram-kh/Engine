@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Sociālie tīkli un portfolio",
-            "title": "Savienojiet savus kontus un pievienojiet savus darbus",
+            "title": "Pievienojiet savus kontus un savus darbus",
             "description": "Pievienojiet vismaz vienu sociālo kontu un vienu portfolio darbu, lai zīmoli varētu redzēt jūsu sasniedzamību un stilu."
           },
           "social": {
             "name": "Social accounts",
-            "title": "Connect your social accounts",
-            "description": "Connect at least one platform so brands can see your reach."
+            "title": "Pievienojiet savus sociālo tīklu kontus",
+            "description": "Pievienojiet vismaz vienu platformu, lai zīmoli varētu redzēt jūsu sasniedzamību."
           },
           "portfolio": {
             "name": "Portfolio",

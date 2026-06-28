@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Sosiaalinen media ja portfolio",
-            "title": "Yhdistä tilisi ja lisää työsi",
+            "title": "Lisää tilisi ja työsi",
             "description": "Lisää vähintään yksi sosiaalisen median tili ja yksi portfolio-työ, jotta brändit näkevät tavoittavuutesi ja tyylisi."
           },
           "social": {
             "name": "Social accounts",
-            "title": "Connect your social accounts",
-            "description": "Connect at least one platform so brands can see your reach."
+            "title": "Lisää sosiaalisen median tilisi",
+            "description": "Lisää vähintään yksi alusta, jotta brändit näkevät kattavuutesi."
           },
           "portfolio": {
             "name": "Portfolio",

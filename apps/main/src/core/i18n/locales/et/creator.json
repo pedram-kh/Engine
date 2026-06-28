@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Sotsiaalmeedia ja portfoolio",
-            "title": "Ühenda oma kontod ja lisa oma tööd",
+            "title": "Lisa oma kontod ja oma tööd",
             "description": "Lisa vähemalt üks sotsiaalmeedia konto ja üks portfooliotöö, et brändid näeksid sinu haaret ja stiili."
           },
           "social": {
             "name": "Social accounts",
-            "title": "Connect your social accounts",
-            "description": "Connect at least one platform so brands can see your reach."
+            "title": "Lisa oma sotsiaalmeediakontod",
+            "description": "Lisa vähemalt üks platvorm, et kaubamärgid näeksid sinu haaret."
           },
           "portfolio": {
             "name": "Portfolio",

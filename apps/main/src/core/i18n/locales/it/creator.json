@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Social e portfolio",
-            "title": "Collega i tuoi account e aggiungi i tuoi lavori",
+            "title": "Aggiungi i tuoi account e i tuoi lavori",
             "description": "Aggiungi almeno un account social e un elemento del portfolio così i brand possono vedere la tua portata e il tuo stile."
           },
           "social": {
             "name": "Account social",
-            "title": "Collega i tuoi account social",
-            "description": "Collega almeno una piattaforma in modo che i brand possano vedere la tua portata."
+            "title": "Aggiungi i tuoi account social",
+            "description": "Aggiungi almeno una piattaforma in modo che i brand possano vedere la tua portata."
           },
           "portfolio": {
             "name": "Portfolio",

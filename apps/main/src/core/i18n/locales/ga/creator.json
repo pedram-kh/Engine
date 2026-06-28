@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Meáin shóisialta agus punann",
-            "title": "Ceangail do chuntais agus cuir do chuid oibre leis",
+            "title": "Cuir do chuntais agus do chuid oibre leis",
             "description": "Cuir cuntas sóisialta amháin ar a laghad agus mír amháin den phunann leis ionas gur féidir le brandaí do raon feidhme agus do stíl a fheiceáil."
           },
           "social": {
             "name": "Social accounts",
-            "title": "Connect your social accounts",
-            "description": "Connect at least one platform so brands can see your reach."
+            "title": "Cuir do chuntais sóisialta leis",
+            "description": "Cuir ar a laghad ardán amháin leis ionas gur féidir le brandaí do theacht a fheiceáil."
           },
           "portfolio": {
             "name": "Punann",

@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Društvene mreže i portfolio",
-            "title": "Povežite svoje račune i dodajte svoje radove",
+            "title": "Dodajte svoje račune i svoje radove",
             "description": "Dodajte barem jedan društveni račun i jedan rad iz portfolija kako bi robne marke vidjele vaš doseg i vaš stil."
           },
           "social": {
             "name": "Sociální sítě",
-            "title": "Propojte své sociální sítě",
-            "description": "Propojte alespoň jednu platformu, aby znamke viděly váš dosah."
+            "title": "Dodajte svoje račune na društvenim mrežama",
+            "description": "Dodajte barem jednu platformu kako bi brendovi mogli vidjeti vaš doseg."
           },
           "portfolio": {
             "name": "Portfolio",

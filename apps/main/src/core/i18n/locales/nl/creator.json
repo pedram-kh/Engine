@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Sociale media en portfolio",
-            "title": "Koppel je accounts en voeg je werk toe",
+            "title": "Voeg je accounts en je werk toe",
             "description": "Voeg minstens één sociaal account en één portfolio-item toe zodat merken je bereik en je stijl kunnen zien."
           },
           "social": {
             "name": "Sociale accounts",
-            "title": "Koppel je sociale accounts",
-            "description": "Koppel ten minste één platform zodat merken je bereik kunnen zien."
+            "title": "Voeg je sociale accounts toe",
+            "description": "Voeg ten minste één platform toe zodat merken je bereik kunnen zien."
           },
           "portfolio": {
             "name": "Portfolio",

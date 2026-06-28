@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Réseaux sociaux et portfolio",
-            "title": "Connectez vos comptes et ajoutez vos réalisations",
+            "title": "Ajoutez vos comptes et vos réalisations",
             "description": "Ajoutez au moins un compte social et une réalisation à votre portfolio pour que les marques voient votre portée et votre style."
           },
           "social": {
             "name": "Comptes sociaux",
-            "title": "Connectez vos comptes sociaux",
-            "description": "Connectez au moins une plateforme pour que les marques puissent voir votre portée."
+            "title": "Ajoutez vos comptes sociaux",
+            "description": "Ajoutez au moins une plateforme pour que les marques puissent voir votre portée."
           },
           "portfolio": {
             "name": "Portfolio",

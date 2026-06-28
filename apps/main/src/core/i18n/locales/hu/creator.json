@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Közösségi média és portfólió",
-            "title": "Kapcsolja össze fiókjait és adja hozzá munkáit",
+            "title": "Adja hozzá fiókjait és munkáit",
             "description": "Adjon hozzá legalább egy közösségi fiókot és egy portfólióelemet, hogy a márkák lássák az elérését és a stílusát."
           },
           "social": {
             "name": "Social accounts",
-            "title": "Connect your social accounts",
-            "description": "Connect at least one platform so brands can see your reach."
+            "title": "Adja hozzá közösségi média fiókjait",
+            "description": "Adjon hozzá legalább egy platformot, hogy a márkák lássák az elérését."
           },
           "portfolio": {
             "name": "Portfólió",

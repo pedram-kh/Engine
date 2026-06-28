@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Socialiniai tinklai ir portfolio",
-            "title": "Prijunkite savo paskyras ir pridėkite savo darbus",
+            "title": "Pridėkite savo paskyras ir savo darbus",
             "description": "Pridėkite bent vieną socialinio tinklo paskyrą ir bent vieną portfolio darbą, kad prekės ženklai matytų jūsų pasiekiamumą ir stilių."
           },
           "social": {
             "name": "Social accounts",
-            "title": "Connect your social accounts",
-            "description": "Connect at least one platform so brands can see your reach."
+            "title": "Pridėkite savo socialinių tinklų paskyras",
+            "description": "Pridėkite bent vieną platformą, kad prekių ženklai matytų jūsų pasiekiamumą."
           },
           "portfolio": {
             "name": "Portfolio",

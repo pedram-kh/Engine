@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Sociale medier og portfolio",
-            "title": "Forbind dine konti og tilføj dit arbejde",
+            "title": "Tilføj dine konti og dit arbejde",
             "description": "Tilføj mindst én social konto og ét portfolio-element, så brands kan se din rækkevidde og din stil."
           },
           "social": {
             "name": "Sociale konti",
-            "title": "Forbind dine sociale konti",
-            "description": "Forbind mindst én platform, så brands kan se din rækkevidde."
+            "title": "Tilføj dine sociale konti",
+            "description": "Tilføj mindst én platform, så brands kan se din rækkevidde."
           },
           "portfolio": {
             "name": "Portfolio",

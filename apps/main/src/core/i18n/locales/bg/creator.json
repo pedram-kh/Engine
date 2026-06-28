@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Социални мрежи и портфолио",
-            "title": "Свържете акаунтите си и добавете работата си",
+            "title": "Добавете акаунтите си и работата си",
             "description": "Добавете поне един социален акаунт и един елемент от портфолиото, за да могат марките да видят обхвата и стила ви."
           },
           "social": {
             "name": "Social accounts",
-            "title": "Connect your social accounts",
-            "description": "Connect at least one platform so brands can see your reach."
+            "title": "Добавете социалните си акаунти",
+            "description": "Добавете поне една платформа, за да видят марките вашия обхват."
           },
           "portfolio": {
             "name": "Портфолио",

@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Soċjali u portfolio",
-            "title": "Qabbad il-kontijiet tiegħek u żid ix-xogħol tiegħek",
+            "title": "Żid il-kontijiet tiegħek u x-xogħol tiegħek",
             "description": "Żid mill-inqas kont soċjali wieħed u biċċa waħda mill-portfolio biex il-marki jaraw il-firxa u l-istil tiegħek."
           },
           "social": {
             "name": "Social accounts",
-            "title": "Connect your social accounts",
-            "description": "Connect at least one platform so brands can see your reach."
+            "title": "Żid il-kontijiet soċjali tiegħek",
+            "description": "Żid mill-inqas pjattaforma waħda sabiex il-marki jkunu jistgħu jaraw il-firxa tiegħek."
           },
           "portfolio": {
             "name": "Portfolio",

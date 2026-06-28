@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Media społecznościowe i portfolio",
-            "title": "Połącz swoje konta i dodaj swoje prace",
+            "title": "Dodaj swoje konta i swoje prace",
             "description": "Dodaj co najmniej jedno konto społecznościowe i jedną pozycję portfolio, aby marki widziały Twój zasięg i Twój styl."
           },
           "social": {
             "name": "Konta społecznościowe",
-            "title": "Połącz swoje konta społecznościowe",
-            "description": "Połącz co najmniej jedną platformę, aby marki widziały Twój zasięg."
+            "title": "Dodaj swoje konta społecznościowe",
+            "description": "Dodaj co najmniej jedną platformę, aby marki widziały Twój zasięg."
           },
           "portfolio": {
             "name": "Portfolio",

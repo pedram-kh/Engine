@@ -61,13 +61,13 @@
           },
           "connections": {
             "name": "Sociální sítě a portfolio",
-            "title": "Propojte své účty a přidejte svou tvorbu",
+            "title": "Přidejte své účty a svou tvorbu",
             "description": "Přidejte alespoň jeden sociální účet a jednu položku portfolia, aby značky viděly váš dosah i váš styl."
           },
           "social": {
             "name": "Sociální sítě",
-            "title": "Propojte své sociální sítě",
-            "description": "Propojte alespoň jednu platformu, aby značky viděly váš dosah."
+            "title": "Přidejte své sociální sítě",
+            "description": "Přidejte alespoň jednu platformu, aby značky viděly váš dosah."
           },
           "portfolio": {
             "name": "Portfolio",
