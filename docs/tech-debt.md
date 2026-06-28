@@ -1591,3 +1591,21 @@ anyone reviewing it later.
   overloading `region`; optionally converge on the tax-profile address value-object shape.
 - **Owner:** future creator-profile / logistics workstream.
 - **Status:** open (by design; not a blocker).
+
+---
+
+## AH-006 — agency-side social-metrics/empty-state copy presumes future social integration
+
+- **Where:** `apps/main/src/core/i18n/locales/en/app.json`
+  - `app.roster.detail.social.empty` = "No social accounts connected."
+  - `app.roster.detail.metrics.empty.heading` = "Social metrics will appear once accounts are connected"
+  - `app.roster.detail.metrics.empty.body` = "…they'll show here when the social integrations land."
+- **What we accepted (AH-006, 2026-06-28):** these strings were identified during the
+  Connect→Add copy sweep but left untouched because they live on the **agency-side roster-detail
+  view** (out of scope) and because the `metrics.empty` copy explicitly anticipates a future
+  social-metrics integration — "connected" is correct future-state language there.
+- **Trigger:** social verification / metrics integration shipping (Sprint 5 or equivalent).
+  When OAuth-linked social accounts land, audit these three strings and update to reflect
+  whether "connected" = "OAuth-linked" (keep) or "manually added" (change to "added").
+- **Owner:** future Social verification workstream.
+- **Status:** open; intentionally deferred.

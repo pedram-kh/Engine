@@ -60,6 +60,25 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-006 · Finish the Connect→Add rename (step-3 social copy)
+
+- **Status:** Landed
+- **Date:** 2026-06-28
+- **Why:** AH-003 renamed the social-account button Connect→Add (nothing actually connects —
+  username entry only), but left the surrounding step-3 headings/labels saying "Connect," so the
+  screen contradicted itself across all 24 locales.
+- **What:** Swept the remaining "Connect"-family copy on the social-account CTA surface to "Add"
+  framing — three value edits (`connections.title`, `social.title`, `social.description` in
+  `creator.json`) — and regenerated across all 24 locales. Several locales (bg, el, et, fi, ga,
+  hr, hu, lt, lv, mt, ro, sk, sl) had never received a translation for the social sub-keys at all;
+  hr/sk/sl had Czech copy-pasted into their social block. All corrected in this pass.
+- **Decisions:** copy-only, no behavior change; value-edit over key-rename to avoid keyset churn;
+  unrelated "connect" uses left untouched (Stripe payout copy, agency connection-request
+  workflow, discover connection-status badges, network-error strings, JS identifiers). Two
+  agency-side social-metrics empty-state strings flagged as ambiguous but left untouched and
+  recorded as tech-debt (social integration deferred).
+- **Ref:** `33f2941` (feat) + `90832f4` (docs)
+
 ### AH-005 · Creator contact details (phone, WhatsApp, address) — connected-agency-visible
 
 - **Status:** Landed
