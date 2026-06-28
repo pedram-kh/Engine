@@ -170,7 +170,10 @@
         "language": "Jazyk",
         "categories": "Kategorie",
         "rating": "Hodnocení",
-        "campaigns": "Kampaně"
+        "campaigns": "Kampaně",
+        "phone": "Telefon",
+        "whatsapp": "WhatsApp",
+        "address": "Poštovní adresa"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "Tento tvůrce není ve vašem rosteru.",
         "sections": {
           "profile": "Profil",
+          "contact": "Kontaktní údaje",
           "rating": "Hodnocení a poznámky",
           "social": "Sociální sítě",
           "metrics": "Sociální metriky",

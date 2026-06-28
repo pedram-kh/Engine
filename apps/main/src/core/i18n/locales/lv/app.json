@@ -170,7 +170,10 @@
         "language": "Valoda",
         "categories": "Categories",
         "rating": "Rating",
-        "campaigns": "Kampaņas"
+        "campaigns": "Kampaņas",
+        "phone": "Tālrunis",
+        "whatsapp": "WhatsApp",
+        "address": "Pasta adrese"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "This creator isn't in your roster.",
         "sections": {
           "profile": "Profils",
+          "contact": "Kontaktinformācija",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

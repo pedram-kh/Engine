@@ -31,6 +31,12 @@ final class CreatorFactory extends Factory
             'bio' => fake()->optional()->paragraph(),
             'country_code' => fake()->randomElement(['US', 'GB', 'PT', 'IT', 'DE', 'FR']),
             'region' => fake()->optional()->city(),
+            // AH-005 — optional contact details. Null by default; compose
+            // with withContact() when a test needs populated values.
+            'phone' => null,
+            'whatsapp' => null,
+            'address_street' => null,
+            'address_postal_code' => null,
             'primary_language' => fake()->randomElement(['en', 'pt', 'it']),
             'secondary_languages' => null,
             'avatar_path' => null,
@@ -96,6 +102,20 @@ final class CreatorFactory extends Factory
     {
         return $this->state(fn (array $attributes): array => [
             'is_discoverable' => false,
+        ]);
+    }
+
+    /**
+     * AH-005 — populated optional contact details (phone, WhatsApp, mailing
+     * street + postal code). Used by the contact-visibility specs.
+     */
+    public function withContact(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'phone' => '+1 555 0100',
+            'whatsapp' => '+1 555 0142',
+            'address_street' => '12 Market Street',
+            'address_postal_code' => 'D02 XY45',
         ]);
     }
 

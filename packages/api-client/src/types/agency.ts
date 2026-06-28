@@ -309,6 +309,19 @@ export interface AgencyCreatorDetailProfile {
   email: string | null
   country_code: string | null
   region: string | null
+  /**
+   * Optional contact details (AH-005). Present ONLY when this agency's
+   * relation to the creator is non-blacklisted (the server gates the whole
+   * block by omission — see CreatorPolicy::canSeeContactDetails). A
+   * blacklisted-but-rostered agency receives the detail page WITHOUT these
+   * keys, so they are optional at the type level and callers must narrow.
+   * The mailing address composes from country_code + region (city line) +
+   * address_street + address_postal_code.
+   */
+  phone?: string | null
+  whatsapp?: string | null
+  address_street?: string | null
+  address_postal_code?: string | null
   primary_language: string | null
   secondary_languages: string[] | null
   categories: string[] | null

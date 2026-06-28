@@ -38,6 +38,10 @@ use Illuminate\Support\Carbon;
  * @property string|null $bio
  * @property string|null $country_code
  * @property string|null $region
+ * @property string|null $phone
+ * @property string|null $whatsapp
+ * @property string|null $address_street
+ * @property string|null $address_postal_code
  * @property string|null $primary_language
  * @property array<int, string>|null $secondary_languages
  * @property string|null $avatar_path
@@ -102,6 +106,13 @@ final class Creator extends Model implements Auditable
         'bio',
         'country_code',
         'region',
+        // AH-005 — optional, self-edited contact details. Plaintext (NOT
+        // encrypted like the tax address): they are surfaced to non-blacklisted
+        // connected agencies on the roster-detail surface.
+        'phone',
+        'whatsapp',
+        'address_street',
+        'address_postal_code',
         'primary_language',
         'secondary_languages',
         'avatar_path',

@@ -170,7 +170,10 @@
         "language": "Idioma",
         "categories": "Categorias",
         "rating": "Avaliação",
-        "campaigns": "Campanhas"
+        "campaigns": "Campanhas",
+        "phone": "Telefone",
+        "whatsapp": "WhatsApp",
+        "address": "Morada postal"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "Este criador não está no seu portfólio.",
         "sections": {
           "profile": "Perfil",
+          "contact": "Dados de contacto",
           "rating": "Avaliação e notas",
           "social": "Contas sociais",
           "metrics": "Métricas sociais",

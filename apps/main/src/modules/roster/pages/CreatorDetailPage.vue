@@ -72,6 +72,29 @@ const creator = computed(() => detail.value?.attributes.creator ?? null)
 const displayName = computed(() => creator.value?.display_name ?? t('app.roster.detail.unnamed'))
 const email = computed(() => creator.value?.email ?? null)
 
+// AH-005 — optional contact details. The server gates the whole block by
+// omission (present only when this agency's relation is non-blacklisted), so
+// a blacklisted-but-rostered agency receives no keys and the card stays hidden.
+const phone = computed(() => creator.value?.phone ?? null)
+const whatsapp = computed(() => creator.value?.whatsapp ?? null)
+const addressStreet = computed(() => creator.value?.address_street ?? null)
+const addressPostalCode = computed(() => creator.value?.address_postal_code ?? null)
+
+// Mailing address composes from street + "postal_code region (city)" + country.
+const mailingAddressLines = computed<string[]>(() => {
+  const c = creator.value
+  if (c === null) return []
+  const cityLine = [c.address_postal_code, c.region].filter((p): p is string => !!p).join(' ')
+  return [c.address_street ?? '', cityLine, countryLabel.value].filter((line) => line !== '')
+})
+
+const hasMailingAddress = computed(
+  () => addressStreet.value !== null || addressPostalCode.value !== null,
+)
+const hasContactDetails = computed(
+  () => phone.value !== null || whatsapp.value !== null || hasMailingAddress.value,
+)
+
 const countryLabel = computed(() => {
   const code = creator.value?.country_code ?? null
   if (code === null) return ''
@@ -345,6 +368,37 @@ onMounted(() => {
                   <span class="creator-detail__label">{{ t('app.roster.fields.categories') }}</span>
                   <CategoryChips :labels="categoryLabels" />
                 </div>
+              </div>
+            </v-card-text>
+          </v-card>
+
+          <!-- Contact details (AH-005) — phone / WhatsApp / mailing address.
+               Rendered ONLY when the server surfaced the block (non-blacklisted
+               relation). A blacklisted-but-rostered agency sees no card. -->
+          <v-card v-if="hasContactDetails" variant="outlined" data-test="creator-detail-contact">
+            <v-card-title class="text-h6">
+              {{ t('app.roster.detail.sections.contact') }}
+            </v-card-title>
+            <v-card-text class="creator-detail__profile-grid">
+              <div v-if="phone">
+                <span class="creator-detail__label">{{ t('app.roster.fields.phone') }}</span>
+                <a
+                  :href="`tel:${phone}`"
+                  class="creator-detail__email"
+                  data-test="creator-detail-phone"
+                >
+                  {{ phone }}
+                </a>
+              </div>
+              <div v-if="whatsapp">
+                <span class="creator-detail__label">{{ t('app.roster.fields.whatsapp') }}</span>
+                <span class="text-body-2" data-test="creator-detail-whatsapp">{{ whatsapp }}</span>
+              </div>
+              <div v-if="hasMailingAddress" class="creator-detail__profile-categories">
+                <span class="creator-detail__label">{{ t('app.roster.fields.address') }}</span>
+                <address class="creator-detail__address" data-test="creator-detail-address">
+                  <span v-for="(line, i) in mailingAddressLines" :key="i">{{ line }}</span>
+                </address>
               </div>
             </v-card-text>
           </v-card>
@@ -748,5 +802,13 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.creator-detail__address {
+  display: flex;
+  flex-direction: column;
+  font-style: normal;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 </style>

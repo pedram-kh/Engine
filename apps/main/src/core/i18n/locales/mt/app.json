@@ -170,7 +170,10 @@
         "language": "Lingwa",
         "categories": "Categories",
         "rating": "Rating",
-        "campaigns": "Kampanjas"
+        "campaigns": "Kampanjas",
+        "phone": "Telefon",
+        "whatsapp": "WhatsApp",
+        "address": "Indirizz postali"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "This creator isn't in your roster.",
         "sections": {
           "profile": "Profil",
+          "contact": "Dettalji ta' kuntatt",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

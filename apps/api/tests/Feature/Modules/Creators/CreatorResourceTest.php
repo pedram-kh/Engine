@@ -61,6 +61,33 @@ it('exposes wizard.flags reflecting all three flags OFF (default state)', functi
     ]);
 });
 
+it('exposes the AH-005 contact details in the base (owner-self) attributes', function (): void {
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->withContact()->createOne(['user_id' => $user->id]);
+
+    $payload = makeResource($creator)->toArray(Request::create('/'));
+
+    expect($payload['attributes']['phone'])->toBe('+1 555 0100')
+        ->and($payload['attributes']['whatsapp'])->toBe('+1 555 0142')
+        ->and($payload['attributes']['address_street'])->toBe('12 Market Street')
+        ->and($payload['attributes']['address_postal_code'])->toBe('D02 XY45');
+});
+
+it('exposes the AH-005 contact details to admin via the same base attributes (view-only, not admin_attributes)', function (): void {
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->withContact()->createOne(['user_id' => $user->id]);
+
+    $payload = makeResource($creator)->withAdmin(true)->toArray(Request::create('/'));
+
+    // Admin reads the same base block (D6 view-only) — the contact fields are
+    // NOT duplicated into admin_attributes.
+    expect($payload['attributes']['phone'])->toBe('+1 555 0100')
+        ->and($payload['admin_attributes'])->not->toHaveKey('phone')
+        ->and($payload['admin_attributes'])->not->toHaveKey('whatsapp')
+        ->and($payload['admin_attributes'])->not->toHaveKey('address_street')
+        ->and($payload['admin_attributes'])->not->toHaveKey('address_postal_code');
+});
+
 it('exposes wizard.flags reflecting all three flags ON', function (): void {
     Feature::activate(KycVerificationEnabled::NAME);
     Feature::activate(CreatorPayoutMethodEnabled::NAME);

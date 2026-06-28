@@ -170,7 +170,10 @@
         "language": "Teanga",
         "categories": "Categories",
         "rating": "Rating",
-        "campaigns": "Feachtass"
+        "campaigns": "Feachtass",
+        "phone": "Guthán",
+        "whatsapp": "WhatsApp",
+        "address": "Seoladh poist"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "This creator isn't in your roster.",
         "sections": {
           "profile": "Próifíl",
+          "contact": "Sonraí teagmhála",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

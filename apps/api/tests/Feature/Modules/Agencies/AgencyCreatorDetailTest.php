@@ -140,6 +140,64 @@ it('surfaces the creator contact email (D-2a-8 deliberate privacy decision)', fu
         ->assertJsonPath('data.attributes.creator.email', 'ada@example.com');
 });
 
+// ---------------------------------------------------------------------------
+// AH-005 — contact details (phone / WhatsApp / mailing address). Load-bearing
+// privacy gate: a NON-blacklisted connected agency sees the block; a
+// blacklisted-but-rostered agency gets the detail page but ZERO contact data.
+// Break-revert: loosen the controller gate to relation-exists → the
+// blacklisted-agency-sees-nothing spec below fails → revert.
+// ---------------------------------------------------------------------------
+
+it('surfaces the AH-005 contact block to a non-blacklisted connected agency', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $creator = CreatorFactory::new()->withContact()->createOne();
+    AgencyCreatorRelation::factory()->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'is_blacklisted' => false,
+    ]);
+
+    $response = $this->actingAs($admin)->getJson(detailUrl($agency, $creator));
+
+    $response->assertOk()
+        ->assertJsonPath('data.attributes.creator.phone', '+1 555 0100')
+        ->assertJsonPath('data.attributes.creator.whatsapp', '+1 555 0142')
+        ->assertJsonPath('data.attributes.creator.address_street', '12 Market Street')
+        ->assertJsonPath('data.attributes.creator.address_postal_code', 'D02 XY45');
+});
+
+it('WITHHOLDS the contact block from a blacklisted-but-rostered agency (load-bearing gate)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $creator = CreatorFactory::new()->withContact()->createOne();
+    AgencyCreatorRelation::factory()->blacklisted('Hard ban')->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+    ]);
+
+    $response = $this->actingAs($admin)->getJson(detailUrl($agency, $creator));
+
+    // The detail page still renders (the relation exists) …
+    $response->assertOk();
+    $creatorBlock = $response->json('data.attributes.creator');
+
+    // … but carries NO contact keys at all (withheld by omission) …
+    expect($creatorBlock)->not->toHaveKey('phone')
+        ->and($creatorBlock)->not->toHaveKey('whatsapp')
+        ->and($creatorBlock)->not->toHaveKey('address_street')
+        ->and($creatorBlock)->not->toHaveKey('address_postal_code');
+
+    // … and none of the values leak anywhere in the payload.
+    $body = $response->getContent();
+    expect($body)->not->toContain('+1 555 0100')
+        ->and($body)->not->toContain('+1 555 0142')
+        ->and($body)->not->toContain('12 Market Street')
+        ->and($body)->not->toContain('D02 XY45');
+});
+
 it('does NOT carry admin-only KYC PII (no-admin-PII break-revert)', function (): void {
     $agency = Agency::factory()->createOne();
     $admin = User::factory()->agencyAdmin($agency)->createOne();

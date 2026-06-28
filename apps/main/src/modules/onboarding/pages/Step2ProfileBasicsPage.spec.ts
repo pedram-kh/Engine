@@ -216,6 +216,108 @@ describe('Step2ProfileBasicsPage', () => {
     expect(onboardingApi.updateProfile).not.toHaveBeenCalled()
   })
 
+  it('hydrates and persists the AH-005 contact details', async () => {
+    mockBootstrap({
+      avatar_path: 'creators/seed/avatar/x.jpg',
+      categories: ['lifestyle'],
+      phone: '+1 555 0100',
+      whatsapp: '+1 555 0142',
+      address_street: '12 Market Street',
+      address_postal_code: 'D02 XY45',
+    })
+    vi.mocked(onboardingApi.updateProfile).mockResolvedValue({
+      data: {
+        id: '01',
+        type: 'creators',
+        attributes: { ...baseAttributes },
+        wizard: {
+          next_step: 'profile',
+          is_submitted: false,
+          steps: [],
+          weights: {},
+          flags: {
+            kyc_verification_enabled: false,
+            creator_payout_method_enabled: false,
+            contract_signing_enabled: false,
+          },
+        },
+      } as never,
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    // Hydrated from the bootstrap state.
+    const phoneInput = wrapper.find('[data-testid="profile-phone"] input')
+    expect((phoneInput.element as HTMLInputElement).value).toBe('+1 555 0100')
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(onboardingApi.updateProfile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        phone: '+1 555 0100',
+        whatsapp: '+1 555 0142',
+        address_street: '12 Market Street',
+        address_postal_code: 'D02 XY45',
+      }),
+    )
+  })
+
+  it('sends null for a cleared (empty) contact field', async () => {
+    mockBootstrap({
+      avatar_path: 'creators/seed/avatar/x.jpg',
+      categories: ['lifestyle'],
+      phone: null,
+      whatsapp: null,
+      address_street: null,
+      address_postal_code: null,
+    })
+    vi.mocked(onboardingApi.updateProfile).mockResolvedValue({
+      data: {
+        id: '01',
+        type: 'creators',
+        attributes: { ...baseAttributes },
+        wizard: {
+          next_step: 'profile',
+          is_submitted: false,
+          steps: [],
+          weights: {},
+          flags: {
+            kyc_verification_enabled: false,
+            creator_payout_method_enabled: false,
+            contract_signing_enabled: false,
+          },
+        },
+      } as never,
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(vi.mocked(onboardingApi.updateProfile).mock.calls.at(-1)?.[0]).toMatchObject({
+      phone: null,
+      whatsapp: null,
+      address_street: null,
+      address_postal_code: null,
+    })
+  })
+
   it('enables Save and continue and hides the hint once avatar + category are present', async () => {
     mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg', categories: ['lifestyle'] })
     const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {

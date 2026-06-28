@@ -119,6 +119,18 @@ export interface CreatorAttributes {
   bio: string | null
   country_code: string | null
   region: string | null
+  /**
+   * Optional creator contact details (AH-005). Surfaced in the BASE
+   * attributes (owner-self + admin view-only); the connected-agency
+   * roster-detail surface carries them too, gated by a non-blacklisted
+   * relation. NEVER on discover. The mailing address composes from
+   * `country_code` + `region` (the city line) + `address_street` +
+   * `address_postal_code`.
+   */
+  phone: string | null
+  whatsapp: string | null
+  address_street: string | null
+  address_postal_code: string | null
   primary_language: string | null
   secondary_languages: string[] | null
   categories: string[] | null
@@ -292,6 +304,11 @@ export interface CreatorProfileUpdatePayload {
   bio?: string | null
   country_code?: string
   region?: string | null
+  /** Optional contact details (AH-005). All nullable; partial entry is fine. */
+  phone?: string | null
+  whatsapp?: string | null
+  address_street?: string | null
+  address_postal_code?: string | null
   primary_language?: string
   secondary_languages?: string[]
   categories?: string[]

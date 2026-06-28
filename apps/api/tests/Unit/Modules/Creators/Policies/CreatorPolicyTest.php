@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Modules\Agencies\Database\Factories\AgencyFactory;
+use App\Modules\Agencies\Database\Factories\AgencyMembershipFactory;
+use App\Modules\Agencies\Enums\AgencyRole;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Policies\CreatorPolicy;
@@ -202,4 +204,112 @@ it('reject returns true for platform admins and false for everyone else', functi
     expect(creatorPolicy()->reject($admin, $creator))->toBeTrue()
         ->and(creatorPolicy()->reject($owner, $creator))->toBeFalse()
         ->and(creatorPolicy()->reject($member, $creator))->toBeFalse();
+});
+
+// ---------------------------------------------------------------------------
+// canSeeContactDetails (AH-005) — AGENCY-scoped contact-visibility gate.
+// admin OR (active member of THIS agency AND this agency's relation is
+// non-blacklisted). Never a user-wide union across the caller's agencies.
+// ---------------------------------------------------------------------------
+
+it('canSeeContactDetails returns true for an agency member with a non-blacklisted relation', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = Creator::factory()->createOne();
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canSeeContactDetails($member, $creator, $agency))->toBeTrue();
+});
+
+it('canSeeContactDetails returns true for platform admins', function (): void {
+    $admin = User::factory()->platformAdmin()->createOne();
+    $agency = AgencyFactory::new()->createOne();
+    $creator = Creator::factory()->createOne();
+
+    expect(creatorPolicy()->canSeeContactDetails($admin, $creator, $agency))->toBeTrue();
+});
+
+it('canSeeContactDetails returns false when THIS agency has blacklisted the rostered creator', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = Creator::factory()->createOne();
+
+    AgencyCreatorRelation::factory()
+        ->blacklisted('Hard ban')
+        ->createOne([
+            'agency_id' => $agency->id,
+            'creator_id' => $creator->id,
+        ]);
+
+    expect(creatorPolicy()->canSeeContactDetails($member, $creator, $agency))->toBeFalse();
+});
+
+it('canSeeContactDetails returns false for an agency member when no relation exists', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = Creator::factory()->createOne();
+
+    expect(creatorPolicy()->canSeeContactDetails($member, $creator, $agency))->toBeFalse();
+});
+
+it('canSeeContactDetails is AGENCY-scoped: a multi-agency user sees no contact on Agency A even when their Agency B relation is clean', function (): void {
+    $agencyA = AgencyFactory::new()->createOne();
+    $agencyB = AgencyFactory::new()->createOne();
+
+    // One user, active member of BOTH agencies.
+    $member = User::factory()->agencyAdmin($agencyA)->createOne();
+    AgencyMembershipFactory::new()->state([
+        'agency_id' => $agencyB->id,
+        'user_id' => $member->id,
+        'role' => AgencyRole::AgencyAdmin,
+        'accepted_at' => now(),
+    ])->create();
+
+    $creator = Creator::factory()->createOne();
+
+    // Agency A has BLACKLISTED the creator; Agency B has a clean relation.
+    AgencyCreatorRelation::factory()
+        ->blacklisted('Hard ban')
+        ->createOne(['agency_id' => $agencyA->id, 'creator_id' => $creator->id]);
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agencyB->id,
+        'creator_id' => $creator->id,
+        'is_blacklisted' => false,
+    ]);
+
+    // On Agency A's page → withheld (A's own relation is blacklisted), even
+    // though the same user has a clean relation via Agency B.
+    expect(creatorPolicy()->canSeeContactDetails($member, $creator, $agencyA))->toBeFalse()
+        // On Agency B's page → visible. Proves the scope cuts BOTH ways.
+        ->and(creatorPolicy()->canSeeContactDetails($member, $creator, $agencyB))->toBeTrue();
+});
+
+it('canSeeContactDetails returns false for a member of a different agency (non-member of the target agency)', function (): void {
+    $targetAgency = AgencyFactory::new()->createOne();
+    $otherAgency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($otherAgency)->createOne();
+    $creator = Creator::factory()->createOne();
+
+    // A clean relation exists on the TARGET agency, but the caller does not
+    // belong to it — membership is required, not merely a relation.
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $targetAgency->id,
+        'creator_id' => $creator->id,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canSeeContactDetails($member, $creator, $targetAgency))->toBeFalse();
+});
+
+it('canSeeContactDetails returns false for the owning creator user (not an agency surface)', function (): void {
+    $owner = User::factory()->creator()->createOne();
+    $agency = AgencyFactory::new()->createOne();
+    $creator = Creator::factory()->createOne(['user_id' => $owner->id]);
+
+    expect(creatorPolicy()->canSeeContactDetails($owner, $creator, $agency))->toBeFalse();
 });

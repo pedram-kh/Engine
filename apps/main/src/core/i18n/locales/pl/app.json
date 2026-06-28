@@ -170,7 +170,10 @@
         "language": "Język",
         "categories": "Kategorie",
         "rating": "Ocena",
-        "campaigns": "Kampanie"
+        "campaigns": "Kampanie",
+        "phone": "Telefon",
+        "whatsapp": "WhatsApp",
+        "address": "Adres korespondencyjny"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "Ten twórca nie jest w Twoim rosterze.",
         "sections": {
           "profile": "Profil",
+          "contact": "Dane kontaktowe",
           "rating": "Ocena i notatki",
           "social": "Konta społecznościowe",
           "metrics": "Metryki społecznościowe",

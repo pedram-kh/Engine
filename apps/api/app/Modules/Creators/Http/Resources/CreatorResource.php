@@ -116,6 +116,17 @@ final class CreatorResource extends JsonResource
                 'bio' => $creator->bio,
                 'country_code' => $creator->country_code,
                 'region' => $creator->region,
+                // AH-005 — optional contact details. These live in the BASE
+                // (owner-self) attributes because the creator must read their
+                // own values to hydrate the wizard's Contact-details form. The
+                // admin inherits them through the same resource (admin view-only,
+                // D6 — NOT added to admin_attributes, NOT to EDITABLE_FIELDS).
+                // Agencies NEVER reach this resource — they read the gated
+                // AgencyCreatorDetailResource — so this is not an agency surface.
+                'phone' => $creator->phone,
+                'whatsapp' => $creator->whatsapp,
+                'address_street' => $creator->address_street,
+                'address_postal_code' => $creator->address_postal_code,
                 'primary_language' => $creator->primary_language,
                 'secondary_languages' => $creator->secondary_languages,
                 'categories' => $creator->categories,

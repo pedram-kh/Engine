@@ -170,7 +170,10 @@
         "language": "Sprog",
         "categories": "Kategorier",
         "rating": "Vurdering",
-        "campaigns": "Kampagner"
+        "campaigns": "Kampagner",
+        "phone": "Telefon",
+        "whatsapp": "WhatsApp",
+        "address": "Postadresse"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "Denne creator er ikke i dit roster.",
         "sections": {
           "profile": "Profil",
+          "contact": "Kontaktoplysninger",
           "rating": "Vurdering & noter",
           "social": "Sociale konti",
           "metrics": "Sociale metrics",

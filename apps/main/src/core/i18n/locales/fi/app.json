@@ -170,7 +170,10 @@
         "language": "Kieli",
         "categories": "Categories",
         "rating": "Rating",
-        "campaigns": "Kampanjas"
+        "campaigns": "Kampanjas",
+        "phone": "Puhelin",
+        "whatsapp": "WhatsApp",
+        "address": "Postiosoite"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "This creator isn't in your roster.",
         "sections": {
           "profile": "Profiili",
+          "contact": "Yhteystiedot",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

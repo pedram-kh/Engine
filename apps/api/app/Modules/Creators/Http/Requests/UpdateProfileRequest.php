@@ -35,6 +35,15 @@ final class UpdateProfileRequest extends FormRequest
             'bio' => ['sometimes', 'nullable', 'string', 'max:5000'],
             'country_code' => ['sometimes', 'string', 'size:2'],
             'region' => ['sometimes', 'nullable', 'string', 'max:120'],
+            // AH-005 — optional contact details (all nullable; partial entry
+            // is fine). phone / whatsapp are validated as LENIENT phone-ish
+            // strings: an E.164-friendly character set with a digit floor (so
+            // an all-punctuation value like "()- " is rejected) — deliberately
+            // NOT strict libphonenumber parsing.
+            'phone' => ['sometimes', 'nullable', 'string', 'max:32', 'regex:/^[+]?[0-9 ()\-]{6,32}$/', 'regex:/[0-9].*[0-9].*[0-9]/'],
+            'whatsapp' => ['sometimes', 'nullable', 'string', 'max:32', 'regex:/^[+]?[0-9 ()\-]{6,32}$/', 'regex:/[0-9].*[0-9].*[0-9]/'],
+            'address_street' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'address_postal_code' => ['sometimes', 'nullable', 'string', 'max:20'],
             // Content-language metadata: validated against the full 24 EU
             // languages (speaker metadata is legitimately the full set).
             'primary_language' => ['sometimes', 'string', Rule::enum(Locale::class)],

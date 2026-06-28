@@ -170,7 +170,10 @@
         "language": "Γλώσσα",
         "categories": "Categories",
         "rating": "Rating",
-        "campaigns": "Καμπάνιαs"
+        "campaigns": "Καμπάνιαs",
+        "phone": "Τηλέφωνο",
+        "whatsapp": "WhatsApp",
+        "address": "Ταχυδρομική διεύθυνση"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "This creator isn't in your roster.",
         "sections": {
           "profile": "Προφίλ",
+          "contact": "Στοιχεία επικοινωνίας",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

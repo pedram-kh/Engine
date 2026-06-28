@@ -170,7 +170,10 @@
         "language": "Jazyk",
         "categories": "Kategorie",
         "rating": "Ocenjevanje",
-        "campaigns": "Kampanje"
+        "campaigns": "Kampanje",
+        "phone": "Telefon",
+        "whatsapp": "WhatsApp",
+        "address": "Poštni naslov"
       },
       "status": {
         "roster": "Zasedba",
@@ -243,6 +246,7 @@
         "notFound": "Tento ustvarjalca není ve vašem zasedbau.",
         "sections": {
           "profile": "Profil",
+          "contact": "Kontaktni podatki",
           "rating": "Ocenjevanje a poznámky",
           "social": "Sociální sítě",
           "metrics": "Sociální metriky",

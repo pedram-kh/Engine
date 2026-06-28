@@ -47,7 +47,7 @@ final class AgencyCreatorDetailController
 
         $relation = $this->requireRosterRelation($agency, $creator);
 
-        return $this->detailResponse($relation, $creator, $request);
+        return $this->detailResponse($relation, $creator, $agency, $request);
     }
 
     public function update(UpdateAgencyCreatorRelationRequest $request, Agency $agency, Creator $creator): JsonResponse
@@ -88,15 +88,23 @@ final class AgencyCreatorDetailController
             );
         }
 
-        return $this->detailResponse($relation, $creator, $request);
+        return $this->detailResponse($relation, $creator, $agency, $request);
     }
 
-    private function detailResponse(AgencyCreatorRelation $relation, Creator $creator, Request $request): JsonResponse
+    private function detailResponse(AgencyCreatorRelation $relation, Creator $creator, Agency $agency, Request $request): JsonResponse
     {
         $creator->loadMissing(['user', 'socialAccounts', 'portfolioItems']);
         $relation->setRelation('creator', $creator);
 
-        return (new AgencyCreatorDetailResource($relation))->response($request);
+        // AH-005 — the contact block is shown only to this agency when its OWN
+        // relation is non-blacklisted (the canonical agency-scoped gate). A
+        // blacklisted-but-rostered agency still gets the detail page (the
+        // relation exists) but with the contact block withheld.
+        $canSeeContact = Gate::allows('canSeeContactDetails', [$creator, $agency]);
+
+        return (new AgencyCreatorDetailResource($relation))
+            ->withContact($canSeeContact)
+            ->response($request);
     }
 
     /**

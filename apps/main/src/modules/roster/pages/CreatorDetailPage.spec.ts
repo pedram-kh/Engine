@@ -204,6 +204,39 @@ describe('CreatorDetailPage (Sprint 6 Chunk 2a)', () => {
     expect(emailLink.attributes('href')).toBe('mailto:ada@example.com')
   })
 
+  it('renders the AH-005 contact card when the server surfaced contact details', async () => {
+    const harness = await mountDetail({
+      detail: makeDetail(
+        {},
+        {
+          phone: '+1 555 0100',
+          whatsapp: '+1 555 0142',
+          address_street: '12 Market Street',
+          address_postal_code: 'D02 XY45',
+          region: 'Dublin',
+        },
+      ),
+    })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="creator-detail-contact"]').exists()).toBe(true)
+    expect(harness.wrapper.find('[data-test="creator-detail-phone"]').text()).toBe('+1 555 0100')
+    expect(harness.wrapper.find('[data-test="creator-detail-whatsapp"]').text()).toBe('+1 555 0142')
+    const address = harness.wrapper.find('[data-test="creator-detail-address"]').text()
+    expect(address).toContain('12 Market Street')
+    expect(address).toContain('D02 XY45')
+    expect(address).toContain('Dublin')
+  })
+
+  it('hides the contact card entirely when the server withheld contact details (blacklisted agency)', async () => {
+    // No contact keys on the creator block — the server omits the whole block
+    // for a blacklisted-but-rostered agency.
+    const harness = await mountDetail()
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="creator-detail-contact"]').exists()).toBe(false)
+  })
+
   it('renders honest empty states for the two blocked sections (D-2a-10)', async () => {
     const harness = await mountDetail()
     cleanup = harness.cleanup

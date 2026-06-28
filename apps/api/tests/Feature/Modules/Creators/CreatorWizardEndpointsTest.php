@@ -167,6 +167,72 @@ it('PATCH /wizard/profile validates the categories enum', function (): void {
         ->assertStatus(422);
 });
 
+it('PATCH /wizard/profile persists the AH-005 contact details', function (): void {
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->bootstrap()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->patchJson('/api/v1/creators/me/wizard/profile', [
+            'phone' => '+353 1 555 0100',
+            'whatsapp' => '+353 1 555 0142',
+            'address_street' => '12 Market Street',
+            'address_postal_code' => 'D02 XY45',
+        ])
+        ->assertOk();
+
+    $creator->refresh();
+    expect($creator->phone)->toBe('+353 1 555 0100')
+        ->and($creator->whatsapp)->toBe('+353 1 555 0142')
+        ->and($creator->address_street)->toBe('12 Market Street')
+        ->and($creator->address_postal_code)->toBe('D02 XY45');
+});
+
+it('PATCH /wizard/profile accepts partial + null contact details (all optional)', function (): void {
+    $user = User::factory()->create();
+    $creator = CreatorFactory::new()->withContact()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->patchJson('/api/v1/creators/me/wizard/profile', [
+            'phone' => null,
+            'address_street' => 'Only a street, no postal',
+        ])
+        ->assertOk();
+
+    $creator->refresh();
+    expect($creator->phone)->toBeNull()
+        ->and($creator->address_street)->toBe('Only a street, no postal')
+        // Untouched fields survive a partial PATCH.
+        ->and($creator->whatsapp)->toBe('+1 555 0142');
+});
+
+it('PATCH /wizard/profile rejects an all-punctuation phone (digit floor)', function (): void {
+    $user = User::factory()->create();
+    CreatorFactory::new()->bootstrap()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->patchJson('/api/v1/creators/me/wizard/profile', [
+            'phone' => '+()- ()-',
+        ])
+        ->assertEnvelopeValidationErrors(['phone']);
+});
+
+it('PATCH /wizard/profile rejects a phone with illegal characters / over length', function (): void {
+    $user = User::factory()->create();
+    CreatorFactory::new()->bootstrap()->createOne(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->patchJson('/api/v1/creators/me/wizard/profile', [
+            'phone' => 'CALL-ME-NOW',
+        ])
+        ->assertEnvelopeValidationErrors(['phone']);
+
+    $this->actingAs($user)
+        ->patchJson('/api/v1/creators/me/wizard/profile', [
+            'whatsapp' => str_repeat('1', 40),
+        ])
+        ->assertEnvelopeValidationErrors(['whatsapp']);
+});
+
 it('PATCH /wizard/profile emits CreatorWizardProfileCompleted exactly once on first completion (#6 idempotent)', function (): void {
     $user = User::factory()->create();
     $creator = CreatorFactory::new()->bootstrap()->createOne([

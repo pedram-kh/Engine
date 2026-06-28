@@ -7,6 +7,7 @@ namespace App\Modules\Agencies\Http\Resources;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorSocialAccount;
+use App\Modules\Creators\Policies\CreatorPolicy;
 use App\Modules\Creators\Support\PortfolioItemPresenter;
 use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\Request;
@@ -53,6 +54,33 @@ final class AgencyCreatorDetailResource extends JsonResource
     private const int SIGNED_URL_TTL_MINUTES = 60;
 
     /**
+     * AH-005 — whether to embed the creator's optional CONTACT block (phone /
+     * WhatsApp / mailing street + postal code) in the nested creator profile.
+     * Toggled by {@see self::withContact()}; the controller computes the gate
+     * ({@see CreatorPolicy::canSeeContactDetails})
+     * because only it holds the calling user + agency. Default false → the
+     * block is OMITTED ENTIRELY (no keys), so a blacklisted-rostered agency
+     * receives zero contact data. This withhold is the load-bearing privacy
+     * pin (break-revert: loosen the controller gate to relation-exists → the
+     * blacklisted-agency-sees-nothing spec fails).
+     */
+    private bool $includeContact = false;
+
+    /**
+     * Fluent setter — mirror of {@see CreatorResource::withAdmin()}. The
+     * controller chains this with the result of the contact-visibility gate:
+     *
+     *   (new AgencyCreatorDetailResource($relation))
+     *       ->withContact($canSeeContact)->response($request);
+     */
+    public function withContact(bool $includeContact = true): self
+    {
+        $this->includeContact = $includeContact;
+
+        return $this;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -90,7 +118,7 @@ final class AgencyCreatorDetailResource extends JsonResource
      */
     private function mapCreator(Creator $creator): array
     {
-        return [
+        $payload = [
             'id' => $creator->ulid,
             'display_name' => $creator->display_name,
             'bio' => $creator->bio,
@@ -109,6 +137,19 @@ final class AgencyCreatorDetailResource extends JsonResource
             'social_accounts' => $this->mapSocialAccounts($creator),
             'portfolio' => $this->mapPortfolio($creator),
         ];
+
+        // AH-005 — the optional contact block, gated by the controller. The
+        // mailing address composes from country_code + region (the city line)
+        // + these two new lines. Keys are present ONLY when the gate passed,
+        // so a withheld view carries no phone/whatsapp/address_* keys at all.
+        if ($this->includeContact) {
+            $payload['phone'] = $creator->phone;
+            $payload['whatsapp'] = $creator->whatsapp;
+            $payload['address_street'] = $creator->address_street;
+            $payload['address_postal_code'] = $creator->address_postal_code;
+        }
+
+        return $payload;
     }
 
     /**

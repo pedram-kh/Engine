@@ -170,7 +170,10 @@
         "language": "Nyelv",
         "categories": "Categories",
         "rating": "Rating",
-        "campaigns": "Kampánys"
+        "campaigns": "Kampánys",
+        "phone": "Telefon",
+        "whatsapp": "WhatsApp",
+        "address": "Levelezési cím"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "This creator isn't in your roster.",
         "sections": {
           "profile": "Profil",
+          "contact": "Elérhetőségek",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

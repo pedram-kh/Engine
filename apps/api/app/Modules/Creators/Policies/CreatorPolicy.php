@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Creators\Policies;
 
 use App\Core\Tenancy\BelongsToAgencyScope;
+use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Creators\Models\Creator;
@@ -93,6 +94,39 @@ final class CreatorPolicy
     }
 
     /**
+     * AH-005 — may the caller see this creator's optional CONTACT details
+     * (phone / WhatsApp / mailing address) on the agency roster-detail surface?
+     *
+     * AGENCY-SCOPED, deliberately NOT a user-wide union: the caller must be an
+     * active member of THIS {@param $agency} AND that agency's OWN relation to
+     * the creator must be non-blacklisted. A multi-agency user viewing Agency
+     * A's page for a creator that Agency A has blacklisted sees no contact —
+     * even if a different agency they belong to has a clean relation. This is
+     * the same blacklist rule {@see self::hasAgencyAccess()} uses (shared via
+     * {@see self::hasNonBlacklistedRelation()}), only narrowed to one agency.
+     *
+     * Platform admins always pass (admin view-only, AH-005 D6).
+     */
+    public function canSeeContactDetails(User $user, Creator $creator, Agency $agency): bool
+    {
+        if ($user->type === UserType::PlatformAdmin) {
+            return true;
+        }
+
+        if ($user->type !== UserType::AgencyUser) {
+            return false;
+        }
+
+        // Caller must actively belong to THIS agency (not merely any agency).
+        if (! in_array($agency->id, $this->activeAgencyIds($user), true)) {
+            return false;
+        }
+
+        // …and THIS agency's relation to the creator must be non-blacklisted.
+        return $this->hasNonBlacklistedRelation($creator, [$agency->id]);
+    }
+
+    /**
      * Sprint 4 Chunk 3 admin action (D-c3-3) — manually clears identity
      * verification (kyc_status → verified, kyc_method = manual). A
      * permanent compliance-sensitive override; platform_admin only, same
@@ -113,7 +147,8 @@ final class CreatorPolicy
     /**
      * True when the user is an active member of an agency that has a
      * non-blacklisted agency_creator_relations row pointing at this
-     * creator.
+     * creator. User-wide union across ALL the caller's active agencies —
+     * the broad "can this user view the creator at all" question.
      */
     private function hasAgencyAccess(User $user, Creator $creator): bool
     {
@@ -121,7 +156,21 @@ final class CreatorPolicy
             return false;
         }
 
-        $agencyIds = $this->activeAgencyIds($user);
+        return $this->hasNonBlacklistedRelation($creator, $this->activeAgencyIds($user));
+    }
+
+    /**
+     * The one canonical blacklist rule (AH-005): does a non-blacklisted
+     * relation exist between this creator and ANY of the given agencies?
+     * Shared by {@see self::hasAgencyAccess()} (user-wide union) and
+     * {@see self::canSeeContactDetails()} (single agency) so the
+     * "non-blacklisted relation" predicate lives in exactly one place and
+     * the two surfaces can never drift on what "blacklisted" means.
+     *
+     * @param  list<int>  $agencyIds
+     */
+    private function hasNonBlacklistedRelation(Creator $creator, array $agencyIds): bool
+    {
         if ($agencyIds === []) {
             return false;
         }

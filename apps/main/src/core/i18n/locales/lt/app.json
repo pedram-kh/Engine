@@ -170,7 +170,10 @@
         "language": "Kalba",
         "categories": "Categories",
         "rating": "Rating",
-        "campaigns": "Kampanijas"
+        "campaigns": "Kampanijas",
+        "phone": "Telefonas",
+        "whatsapp": "WhatsApp",
+        "address": "Pašto adresas"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "This creator isn't in your roster.",
         "sections": {
           "profile": "Profilis",
+          "contact": "Kontaktiniai duomenys",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

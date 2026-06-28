@@ -72,6 +72,10 @@ type ProfileField =
   | 'bio'
   | 'country_code'
   | 'region'
+  | 'phone'
+  | 'whatsapp'
+  | 'address_street'
+  | 'address_postal_code'
   | 'primary_language'
   | 'categories'
 
@@ -79,6 +83,11 @@ const displayName = ref('')
 const bio = ref('')
 const countryCode = ref<string | null>(null)
 const region = ref<string | null>(null)
+// AH-005 — optional contact details. All optional; partial entry is fine.
+const phone = ref('')
+const whatsapp = ref('')
+const addressStreet = ref('')
+const addressPostalCode = ref('')
 const primaryLanguage = ref<string | null>(null)
 const categories = ref<string[]>([])
 const submitErrorKey = ref<string | null>(null)
@@ -151,8 +160,18 @@ function hydrateFromCreator(): void {
   bio.value = attrs.bio ?? ''
   countryCode.value = attrs.country_code ?? null
   region.value = attrs.region ?? null
+  phone.value = attrs.phone ?? ''
+  whatsapp.value = attrs.whatsapp ?? ''
+  addressStreet.value = attrs.address_street ?? ''
+  addressPostalCode.value = attrs.address_postal_code ?? ''
   primaryLanguage.value = attrs.primary_language ?? null
   categories.value = [...(attrs.categories ?? [])]
+}
+
+/** Trim, mapping an empty string to `null` (clear the optional field). */
+function nullableTrim(value: string): string | null {
+  const trimmed = value.trim()
+  return trimmed === '' ? null : trimmed
 }
 
 async function save(): Promise<boolean> {
@@ -164,6 +183,12 @@ async function save(): Promise<boolean> {
       bio: bio.value === '' ? null : bio.value,
       country_code: countryCode.value ?? undefined,
       region: region.value,
+      // AH-005 — optional contact details. Empty input clears the field
+      // (null); the backend rule is `nullable`, so this is safe.
+      phone: nullableTrim(phone.value),
+      whatsapp: nullableTrim(whatsapp.value),
+      address_street: nullableTrim(addressStreet.value),
+      address_postal_code: nullableTrim(addressPostalCode.value),
       primary_language: primaryLanguage.value ?? undefined,
       // secondary_languages intentionally omitted (AH-003 D6): the input
       // was removed; the backend rule is `sometimes`, so omitting it
@@ -273,6 +298,49 @@ onMounted(() => {
         data-testid="profile-region"
       />
 
+      <fieldset class="profile-basics__contact" data-testid="profile-contact-section">
+        <legend class="text-subtitle-2">
+          {{ t('creator.ui.wizard.fields.contact_section') }}
+        </legend>
+        <p class="profile-basics__contact-note text-caption">
+          {{ t('creator.ui.wizard.fields.contact_section_help') }}
+        </p>
+
+        <v-text-field
+          v-model="phone"
+          type="tel"
+          :label="t('creator.ui.wizard.fields.phone')"
+          :counter="32"
+          :error-messages="fieldErrors.phone"
+          data-testid="profile-phone"
+        />
+
+        <v-text-field
+          v-model="whatsapp"
+          type="tel"
+          :label="t('creator.ui.wizard.fields.whatsapp')"
+          :counter="32"
+          :error-messages="fieldErrors.whatsapp"
+          data-testid="profile-whatsapp"
+        />
+
+        <v-text-field
+          v-model="addressStreet"
+          :label="t('creator.ui.wizard.fields.address_street')"
+          :counter="255"
+          :error-messages="fieldErrors.address_street"
+          data-testid="profile-address-street"
+        />
+
+        <v-text-field
+          v-model="addressPostalCode"
+          :label="t('creator.ui.wizard.fields.address_postal_code')"
+          :counter="20"
+          :error-messages="fieldErrors.address_postal_code"
+          data-testid="profile-address-postal-code"
+        />
+      </fieldset>
+
       <v-select
         v-model="primaryLanguage"
         :items="languageOptions"
@@ -374,6 +442,24 @@ onMounted(() => {
 .profile-basics__error {
   color: rgb(var(--v-theme-error));
   font-size: 0.875rem;
+}
+
+.profile-basics__contact {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid rgb(var(--v-theme-outline-variant, var(--v-theme-outline)));
+  border-radius: 6px;
+}
+
+.profile-basics__contact legend {
+  padding: 0 6px;
+}
+
+.profile-basics__contact-note {
+  margin-top: -8px;
+  color: rgb(var(--v-theme-on-surface-variant));
 }
 
 .profile-basics__avatar-note {

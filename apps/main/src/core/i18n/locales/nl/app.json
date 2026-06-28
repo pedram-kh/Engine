@@ -170,7 +170,10 @@
         "language": "Taal",
         "categories": "Categorieën",
         "rating": "Beoordeling",
-        "campaigns": "Campagnes"
+        "campaigns": "Campagnes",
+        "phone": "Telefoon",
+        "whatsapp": "WhatsApp",
+        "address": "Postadres"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "Deze creator staat niet in je roster.",
         "sections": {
           "profile": "Profiel",
+          "contact": "Contactgegevens",
           "rating": "Beoordeling & notities",
           "social": "Sociale accounts",
           "metrics": "Sociale statistieken",

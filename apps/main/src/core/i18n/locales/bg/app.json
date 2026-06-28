@@ -170,7 +170,10 @@
         "language": "Език",
         "categories": "Categories",
         "rating": "Rating",
-        "campaigns": "Кампанияs"
+        "campaigns": "Кампанияs",
+        "phone": "Телефон",
+        "whatsapp": "WhatsApp",
+        "address": "Адрес за кореспонденция"
       },
       "status": {
         "roster": "Roster",
@@ -243,6 +246,7 @@
         "notFound": "This creator isn't in your roster.",
         "sections": {
           "profile": "Профил",
+          "contact": "Данни за контакт",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",
