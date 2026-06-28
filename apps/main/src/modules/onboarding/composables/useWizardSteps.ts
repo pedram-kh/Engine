@@ -114,14 +114,21 @@ export function resolveUxStepComplete(
 
 /**
  * Resolve the visible status of a UX step. Single steps defer to
- * {@link resolveStepStatus} so a flag-OFF step still renders "skipped";
- * merged steps have no flag-gated sub-steps, so they are simply
- * completed / not-started; the account row is always completed.
+ * {@link resolveStepStatus} so a flag-OFF step still renders "skipped"
+ * (except an accepted contract — see `contractAccepted`); merged steps
+ * have no flag-gated sub-steps, so they are simply completed /
+ * not-started; the account row is always completed.
+ *
+ * @param contractAccepted Whether the master agreement was accepted via
+ *   the click-through (`store.clickThroughAccepted`). Forwarded to
+ *   {@link resolveStepStatus} so the flag-OFF contract row reads
+ *   "completed" once accepted.
  */
 export function resolveUxStepStatus(
   step: WizardUxStep,
   stepCompletion: Record<CreatorWizardStepId, boolean>,
   flags: CreatorWizardFlags | null,
+  contractAccepted = false,
 ): WizardStepStatus {
   if (step.kind === 'account') return 'completed'
   if (step.kind === 'merged') {
@@ -129,7 +136,7 @@ export function resolveUxStepStatus(
   }
   const stepId = step.stepIds[0]
   if (stepId === undefined) return 'not-started'
-  return resolveStepStatus(stepId, stepCompletion[stepId] ?? false, flags)
+  return resolveStepStatus(stepId, stepCompletion[stepId] ?? false, flags, contractAccepted)
 }
 
 /** Index of the visible UX step served by a route name, or -1. */

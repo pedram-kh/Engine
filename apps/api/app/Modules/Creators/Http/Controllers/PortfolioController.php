@@ -10,6 +10,7 @@ use App\Modules\Creators\Enums\PortfolioProcessingStatus;
 use App\Modules\Creators\Jobs\ProcessPortfolioImageJob;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorPortfolioItem;
+use App\Modules\Creators\Services\CompletenessScoreCalculator;
 use App\Modules\Creators\Services\PortfolioUploadService;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -26,12 +27,16 @@ use RuntimeException;
  *   POST   /api/v1/creators/me/portfolio/videos/complete  finish presigned video upload
  *   DELETE /api/v1/creators/me/portfolio/{item}        remove an item
  *
- * Each path enforces the per-creator 10-item cap (Spec §6.1 Step 4).
+ * Each path enforces the per-creator item cap
+ * ({@see PortfolioUploadService::MAX_ITEMS_PER_CREATOR}) and refreshes the
+ * stored completeness score (the portfolio step flips on the first add /
+ * last delete).
  */
 final class PortfolioController
 {
     public function __construct(
         private readonly PortfolioUploadService $service,
+        private readonly CompletenessScoreCalculator $calculator,
     ) {}
 
     public function uploadImage(Request $request): JsonResponse
@@ -71,6 +76,8 @@ final class PortfolioController
         } catch (RuntimeException $e) {
             return ErrorResponse::single($request, 422, 'portfolio.upload_failed', $e->getMessage());
         }
+
+        $this->refreshCompleteness($creator);
 
         return response()->json([
             'data' => [
@@ -155,6 +162,11 @@ final class PortfolioController
         }
 
         ProcessPortfolioImageJob::dispatch($item->id);
+
+        // The item counts toward the portfolio step the moment it exists
+        // (a `processing` item still satisfies "at least one portfolio
+        // item"), so refresh now rather than waiting for the worker.
+        $this->refreshCompleteness($creator);
 
         return response()->json([
             'data' => [
@@ -244,6 +256,8 @@ final class PortfolioController
             return ErrorResponse::single($request, 422, 'portfolio.complete_failed', $e->getMessage());
         }
 
+        $this->refreshCompleteness($creator);
+
         return response()->json([
             'data' => [
                 'id' => $item->ulid,
@@ -295,6 +309,8 @@ final class PortfolioController
             'position' => $this->nextPosition($creator),
         ]);
 
+        $this->refreshCompleteness($creator);
+
         return response()->json([
             'data' => [
                 'id' => $item->ulid,
@@ -324,7 +340,25 @@ final class PortfolioController
 
         $item->delete();
 
+        // Deleting the last item flips the portfolio step back to incomplete;
+        // recompute so the stored score doesn't over-report.
+        $this->refreshCompleteness($creator);
+
         return response()->json([], 204);
+    }
+
+    /**
+     * Recompute + persist the 0–100 completeness score after a portfolio
+     * mutation. The portfolio step flips complete/incomplete on the first
+     * add / last delete, so — like the profile / social / tax write paths
+     * in CreatorWizardService — these endpoints must refresh the stored
+     * score; otherwise it goes stale (e.g. stuck at 80% after the creator
+     * has actually reached 100%).
+     */
+    private function refreshCompleteness(Creator $creator): void
+    {
+        $creator->profile_completeness_score = $this->calculator->score($creator);
+        $creator->save();
     }
 
     private function nextPosition(Creator $creator): int

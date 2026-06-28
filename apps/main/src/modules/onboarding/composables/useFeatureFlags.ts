@@ -45,10 +45,16 @@ export interface FeatureFlagsHandle {
  *   - `completed`   — server marked `is_complete: true` AND the step
  *                     was vendor-cleared (creator actually did the
  *                     work). The forensic distinction in the
- *                     `CompletenessScoreCalculator` docblock.
+ *                     `CompletenessScoreCalculator` docblock. The
+ *                     contract step ALSO reads "completed" when the
+ *                     creator accepts the master agreement via the
+ *                     flag-OFF click-through (real work was performed),
+ *                     mirroring the backend score (AH-004).
  *   - `skipped`     — server marked `is_complete: true` BUT the
- *                     feature flag is OFF. The step is satisfied for
- *                     submit-validation but no work was performed.
+ *                     feature flag is OFF and no creator action was
+ *                     taken (kyc / payout, or contract not yet
+ *                     accepted). Satisfied for submit-validation but
+ *                     no work was performed.
  *   - `not-started` — server marked `is_complete: false`. Blocks submit.
  */
 export type WizardStepStatus = 'completed' | 'skipped' | 'not-started'
@@ -76,15 +82,30 @@ const FLAG_BY_STEP: Partial<Record<CreatorWizardStepId, keyof CreatorWizardFlags
  * @param isComplete   `creator.wizard.steps[i].is_complete`.
  * @param flags        `creator.wizard.flags`, or null on a fresh
  *                     boot before bootstrap has resolved.
+ * @param contractAccepted Whether the master agreement was actually
+ *                     accepted (`click_through_accepted_at` set). Only
+ *                     meaningful for the contract step on the flag-OFF
+ *                     path: an accepted agreement reads "completed"
+ *                     rather than "skipped". Ignored for every other
+ *                     step (kyc / payout have no creator-side fallback
+ *                     action, so they remain "skipped").
  */
 export function resolveStepStatus(
   stepId: CreatorWizardStepId,
   isComplete: boolean,
   flags: CreatorWizardFlags | null,
+  contractAccepted = false,
 ): WizardStepStatus {
   const flagKey = FLAG_BY_STEP[stepId]
   const isFlagOff = flagKey !== undefined && flags !== null && flags[flagKey] === false
-  if (isFlagOff && isComplete) return 'skipped'
+  if (isFlagOff && isComplete) {
+    // Contract is the exception to the flag-OFF "skipped" rule: the
+    // creator still accepts the master agreement via the click-through,
+    // so an accepted agreement is genuine work and reads "completed"
+    // (the backend score credits the contract weight on the same signal).
+    if (stepId === 'contract' && contractAccepted) return 'completed'
+    return 'skipped'
+  }
   if (isComplete) return 'completed'
   return 'not-started'
 }

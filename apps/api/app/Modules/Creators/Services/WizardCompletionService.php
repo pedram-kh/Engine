@@ -50,6 +50,7 @@ final class WizardCompletionService
 {
     public function __construct(
         private readonly AuditLogger $auditLogger,
+        private readonly CompletenessScoreCalculator $calculator,
     ) {}
 
     /**
@@ -131,7 +132,12 @@ final class WizardCompletionService
             if ($creator->signed_master_contract_id === null) {
                 $creator->forceFill([
                     'signed_master_contract_id' => now()->timestamp,
-                ])->save();
+                ]);
+                // The contract weight is now part of the completeness score
+                // (credited on the FK being set), so recompute + persist
+                // alongside the transition.
+                $creator->profile_completeness_score = $this->calculator->score($creator);
+                $creator->save();
 
                 $this->auditLogger->log(
                     action: AuditAction::CreatorWizardContractCompleted,

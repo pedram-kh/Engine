@@ -64,16 +64,20 @@ final class CompletenessScoreCalculator
      *
      * The score is renormalised over the steps that actually apply in
      * the current environment. A vendor-gated step whose feature flag
-     * is OFF is "skipped" (Decision E1=a) — it requires no creator
-     * action — so it is excluded from BOTH the numerator AND the
-     * denominator. Previously such steps were credited their full
-     * weight up front, which inflated the score for a creator who had
-     * done nothing (e.g. a fresh creator reading 40% with KYC/payout/
-     * contract all flag-OFF). Now the percentage reflects only the work
-     * the creator can actually do, starts at 0, and still reaches 100
-     * once every applicable step is complete (the all-flags-OFF
-     * "score = 100 when the four enabled steps are done" contract in
-     * CreatorWizardFlagOffTest is preserved: 60/60 = 100).
+     * is OFF AND that requires no creator action (KYC, payout) is
+     * "skipped" (Decision E1=a) — it is excluded from BOTH the
+     * numerator AND the denominator, so the percentage reflects only
+     * the work the creator can actually do and starts at 0.
+     *
+     * The contract step is the deliberate exception: even when
+     * `contract_signing_enabled` is OFF, the creator STILL performs an
+     * action — they accept the master agreement via the click-through.
+     * So contract always counts toward the score (numerator AND
+     * denominator), and is credited only once the agreement is actually
+     * accepted (`signed_master_contract_id` set — by a signature OR the
+     * click-through tick; see {@see scoreCompletion()}). Ticking the
+     * click-through therefore earns the contract weight exactly as a
+     * full signature does, instead of being invisible to the score.
      */
     public function score(Creator $creator): int
     {
@@ -83,7 +87,7 @@ final class CompletenessScoreCalculator
         $earned = 0;
         $total = 0;
 
-        foreach ($this->stepCompletion($creator) as $step => $isComplete) {
+        foreach ($this->scoreCompletion($creator) as $step => $isComplete) {
             if (! isset($weights[$step]) || ! in_array($step, $applicable, true)) {
                 continue;
             }
@@ -198,14 +202,46 @@ final class CompletenessScoreCalculator
     }
 
     /**
-     * The subset of weighted steps that count toward the score in the
-     * current environment. Vendor-gated steps drop out when their
-     * feature flag is OFF (see {@see score()} for the renormalisation
-     * rationale). Non-gated steps (profile / social / portfolio / tax)
-     * always apply.
+     * Per-step completion as it counts TOWARD THE SCORE.
      *
-     * Kept in lockstep with {@see stepCompletion()}'s flag-OFF branches
-     * and the SPA's `resolveStepStatus` / `FLAG_BY_STEP` maps.
+     * Identical to {@see stepCompletion()} except for the contract step:
+     * {@see stepCompletion()} auto-satisfies contract whenever
+     * `contract_signing_enabled` is OFF (so submit-validation never
+     * dead-locks on a vendor flow the operator has turned off). For the
+     * score, however, the contract weight must be EARNED by actually
+     * accepting the agreement — a signature or the click-through tick,
+     * both of which set `signed_master_contract_id`. Otherwise a
+     * flag-OFF creator who never accepted would be handed the contract
+     * weight for free, which defeats the "the tick scores like signing"
+     * intent. Flag-ON behaviour is identical between the two maps.
+     *
+     * @return array<string, bool>
+     */
+    private function scoreCompletion(Creator $creator): array
+    {
+        $completion = $this->stepCompletion($creator);
+
+        if (array_key_exists(WizardStep::Contract->value, $completion)) {
+            $completion[WizardStep::Contract->value] = $creator->signed_master_contract_id !== null;
+        }
+
+        return $completion;
+    }
+
+    /**
+     * The subset of weighted steps that count toward the score in the
+     * current environment. The no-action vendor-gated steps (KYC,
+     * payout) drop out when their feature flag is OFF (see {@see score()}
+     * for the renormalisation rationale). Non-gated steps (profile /
+     * social / portfolio / tax) always apply.
+     *
+     * Contract is intentionally NOT gated out here: even with
+     * `contract_signing_enabled` OFF the creator still accepts the
+     * agreement via the click-through, so it remains in the denominator
+     * and is credited once accepted (see {@see scoreCompletion()}).
+     *
+     * Kept in lockstep with {@see scoreCompletion()} and the SPA's
+     * `resolveStepStatus` / `FLAG_BY_STEP` maps.
      *
      * @return list<string>
      */
@@ -214,7 +250,6 @@ final class CompletenessScoreCalculator
         $gatedFlagByStep = [
             WizardStep::Kyc->value => KycVerificationEnabled::NAME,
             WizardStep::Payout->value => CreatorPayoutMethodEnabled::NAME,
-            WizardStep::Contract->value => ContractSigningEnabled::NAME,
         ];
 
         $applicable = [];

@@ -122,6 +122,20 @@ export const useOnboardingStore = defineStore('onboarding', () => {
 
   const flags = computed(() => creator.value?.wizard.flags ?? null)
 
+  /**
+   * Whether the creator has accepted the master agreement via the
+   * click-through fallback (the flag-OFF path; `click_through_accepted_at`
+   * is stamped). Lets the review / progress surfaces render the contract
+   * row as "completed" rather than "skipped" once the agreement is
+   * actually accepted — mirroring the backend score, which credits the
+   * contract weight on acceptance (AH-004).
+   */
+  const clickThroughAccepted = computed(
+    () =>
+      creator.value?.attributes.click_through_accepted_at !== null &&
+      creator.value?.attributes.click_through_accepted_at !== undefined,
+  )
+
   const completenessScore = computed(
     () => creator.value?.attributes.profile_completeness_score ?? 0,
   )
@@ -411,6 +425,7 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     isSubmitted,
     stepCompletion,
     flags,
+    clickThroughAccepted,
     completenessScore,
     lastActivityAt,
     applicationStatus,

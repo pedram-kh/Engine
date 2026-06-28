@@ -10,6 +10,7 @@ use App\Modules\Audit\Services\AuditLogger;
 use App\Modules\Creators\Enums\EsignStatus;
 use App\Modules\Creators\Integrations\Contracts\EsignProvider;
 use App\Modules\Creators\Models\Creator;
+use App\Modules\Creators\Services\CompletenessScoreCalculator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -55,8 +56,11 @@ final class ProcessEsignWebhookJob implements ShouldQueue
 
     public function __construct(public readonly int $integrationEventId) {}
 
-    public function handle(EsignProvider $provider, AuditLogger $auditLogger): void
-    {
+    public function handle(
+        EsignProvider $provider,
+        AuditLogger $auditLogger,
+        CompletenessScoreCalculator $calculator,
+    ): void {
         $event = IntegrationEvent::query()->findOrFail($this->integrationEventId);
 
         try {
@@ -80,7 +84,7 @@ final class ProcessEsignWebhookJob implements ShouldQueue
                 return;
             }
 
-            DB::transaction(function () use ($creator, $parsed, $event, $auditLogger): void {
+            DB::transaction(function () use ($creator, $parsed, $event, $auditLogger, $calculator): void {
                 if ($parsed->envelopeStatus !== EsignStatus::Signed) {
                     // Non-success terminal states (declined,
                     // expired) and heartbeats are recorded on the
@@ -109,7 +113,12 @@ final class ProcessEsignWebhookJob implements ShouldQueue
                 // the originating envelope.
                 $creator->forceFill([
                     'signed_master_contract_id' => $event->id,
-                ])->save();
+                ]);
+                // Contract now contributes to the completeness score (credited
+                // on the FK being set), so recompute + persist with the same
+                // write rather than letting the stored score go stale.
+                $creator->profile_completeness_score = $calculator->score($creator);
+                $creator->save();
 
                 $auditLogger->log(
                     action: AuditAction::CreatorWizardContractCompleted,

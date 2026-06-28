@@ -35,6 +35,8 @@ function makeBootstrap(opts: {
     creator_payout_method_enabled: boolean
     contract_signing_enabled: boolean
   }>
+  /** ISO timestamp when the click-through agreement was accepted, or null. */
+  clickThroughAcceptedAt?: string | null
 }): never {
   return {
     data: {
@@ -60,7 +62,7 @@ function makeBootstrap(opts: {
         tax_profile_complete: opts.allComplete,
         payout_method_set: opts.allComplete,
         has_signed_master_contract: opts.allComplete,
-        click_through_accepted_at: null,
+        click_through_accepted_at: opts.clickThroughAcceptedAt ?? null,
         social_accounts: [],
         portfolio: [],
         profile_completeness_score: opts.score ?? (opts.allComplete ? 100 : 60),
@@ -237,6 +239,31 @@ describe('Step9ReviewPage', () => {
     expect(wrapper.find('[data-testid="review-row-status-contract"]').text()).toBe('Skipped')
     // The merged connections row has no flag-gated sub-step → stays Completed.
     expect(wrapper.find('[data-testid="review-row-status-connections"]').text()).toBe('Completed')
+  })
+
+  it('renders "Completed" for a flag-OFF contract once the agreement is accepted (AH-004)', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(
+      makeBootstrap({
+        allComplete: true,
+        flagOverrides: { contract_signing_enabled: false },
+        clickThroughAcceptedAt: '2026-06-28T00:00:00+00:00',
+      }),
+    )
+
+    const { wrapper, unmount } = await mountAuthPage(Step9ReviewPage, {
+      initialRoute: { path: '/onboarding/review' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    // The click-through acceptance is real work → "Completed", not "Skipped".
+    expect(wrapper.find('[data-testid="review-row-status-contract"]').text()).toBe('Completed')
+    expect(wrapper.find('[data-testid="review-row-contract"]').attributes('data-status')).toBe(
+      'completed',
+    )
   })
 
   it('shows the inline blocker listing every incomplete step name when submit is disabled', async () => {

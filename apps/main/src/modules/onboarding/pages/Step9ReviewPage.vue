@@ -85,7 +85,12 @@ interface StepRow {
 const stepRows = computed<StepRow[]>(() =>
   REVIEW_UX_STEPS.map((step) => {
     const isComplete = resolveUxStepComplete(step, store.stepCompletion)
-    const status = resolveUxStepStatus(step, store.stepCompletion, store.flags)
+    const status = resolveUxStepStatus(
+      step,
+      store.stepCompletion,
+      store.flags,
+      store.clickThroughAccepted,
+    )
     return {
       id: step.id,
       name: t(uxStepTitleKey(step)),

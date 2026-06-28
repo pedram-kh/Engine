@@ -80,6 +80,12 @@ final class AvatarController
             DB::transaction(function () use ($creator, $file): void {
                 $path = $this->service->upload($creator, $file);
                 $creator->forceFill(['avatar_path' => $path])->save();
+
+                // Avatar is part of the profile-step completion check, so an
+                // upload can flip the profile step (and therefore the score)
+                // complete. Refresh in-band like the wizard write paths.
+                $creator->profile_completeness_score = $this->calculator->score($creator);
+                $creator->save();
             });
         } catch (RuntimeException $e) {
             return ErrorResponse::single($request, 422, 'avatar.upload_failed', $e->getMessage());
@@ -99,6 +105,11 @@ final class AvatarController
                 $this->service->delete($path);
             }
             $creator->forceFill(['avatar_path' => null])->save();
+
+            // Removing the avatar can flip the profile step incomplete; keep
+            // the stored score honest.
+            $creator->profile_completeness_score = $this->calculator->score($creator);
+            $creator->save();
         });
 
         return (new CreatorResource($creator->refresh(), $this->calculator))

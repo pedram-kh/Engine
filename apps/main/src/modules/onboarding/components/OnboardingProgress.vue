@@ -44,7 +44,7 @@ const route = useRoute()
 const router = useRouter()
 const onboardingStore = useOnboardingStore()
 
-const { creator, stepCompletion, flags } = storeToRefs(onboardingStore)
+const { creator, stepCompletion, flags, clickThroughAccepted } = storeToRefs(onboardingStore)
 
 /**
  * Total step count visible in the rail = the static account row + every
@@ -71,7 +71,12 @@ const steps = computed<StepView[]>(() =>
   // is position 1), so the captions never skip a number.
   REVIEW_UX_STEPS.map((step) => {
     const isComplete = resolveUxStepComplete(step, stepCompletion.value)
-    const status = resolveUxStepStatus(step, stepCompletion.value, flags.value)
+    const status = resolveUxStepStatus(
+      step,
+      stepCompletion.value,
+      flags.value,
+      clickThroughAccepted.value,
+    )
     return {
       id: step.id,
       titleKey: uxStepTitleKey(step),

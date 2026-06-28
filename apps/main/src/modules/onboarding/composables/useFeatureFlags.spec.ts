@@ -107,7 +107,19 @@ describe('resolveStepStatus', () => {
   it('returns `skipped` for a flag-gated step when its flag is OFF and is_complete is true', () => {
     expect(resolveStepStatus('kyc', true, flagsOff)).toBe('skipped')
     expect(resolveStepStatus('payout', true, flagsOff)).toBe('skipped')
+    // Contract with the agreement NOT yet accepted is still "skipped".
     expect(resolveStepStatus('contract', true, flagsOff)).toBe('skipped')
+    expect(resolveStepStatus('contract', true, flagsOff, false)).toBe('skipped')
+  })
+
+  it('returns `completed` for a flag-OFF contract once the agreement is accepted (AH-004)', () => {
+    // The click-through acceptance is genuine work, so it reads
+    // "completed" — mirroring the backend score crediting the weight.
+    expect(resolveStepStatus('contract', true, flagsOff, true)).toBe('completed')
+    // The accepted flag is contract-specific: it must NOT promote kyc /
+    // payout out of "skipped".
+    expect(resolveStepStatus('kyc', true, flagsOff, true)).toBe('skipped')
+    expect(resolveStepStatus('payout', true, flagsOff, true)).toBe('skipped')
   })
 
   it('returns `completed` for a flag-gated step when the flag is ON (vendor-cleared)', () => {

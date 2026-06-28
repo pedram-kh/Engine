@@ -240,7 +240,7 @@ it('submit DOES NOT downgrade an already-Verified creator to NotRequired even if
 // 5 — CompletenessScoreCalculator credits flag-OFF steps
 // ---------------------------------------------------------------------------
 
-it('completeness score = 100 for a creator with profile/social/portfolio/tax filled and all three vendor flags OFF', function (): void {
+it('completeness score = 100 for a creator with profile/social/portfolio filled + agreement accepted, all three vendor flags OFF', function (): void {
     [, $creator] = makeFlagOffCreator();
 
     $creator->forceFill([
@@ -249,11 +249,18 @@ it('completeness score = 100 for a creator with profile/social/portfolio/tax fil
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
         'tax_profile_complete' => true,
+        // Agreement accepted via the click-through (which sets the FK). With
+        // contract counting toward the score even flag-OFF, the contract
+        // weight is now part of reaching 100.
+        'signed_master_contract_id' => 1,
     ])->save();
 
     CreatorSocialAccountFactory::new()->createOne(['creator_id' => $creator->id]);
     CreatorPortfolioItemFactory::new()->createOne(['creator_id' => $creator->id]);
 
+    // Applicable denominator with kyc/tax/payout hidden (AH-003) is
+    // profile(25) + social(15) + portfolio(10) + contract(15) = 65.
+    // All four done => 65/65 = 100.
     $score = app(CompletenessScoreCalculator::class)
         ->score($creator->fresh());
 
@@ -261,24 +268,29 @@ it('completeness score = 100 for a creator with profile/social/portfolio/tax fil
 });
 
 // Stabilization (May 29, 2026): the flag-OFF skip-path no longer
-// CREDITS the disabled steps up front — it EXCLUDES them from the
-// score's denominator (renormalisation). The end-state (all applicable
-// steps done = 100, pinned above) is unchanged, but partial progress
-// now reflects only the work the creator can actually do, starting at
-// 0 instead of the old phantom 40 (kyc 15 + payout 10 + contract 15).
+// CREDITS the disabled steps up front — it EXCLUDES the no-action ones
+// (kyc / payout) from the score's denominator (renormalisation).
+//
+// Update (AH-004, Jun 28, 2026): the CONTRACT step is the deliberate
+// exception — even with contract_signing_enabled OFF the creator still
+// accepts the master agreement via the click-through, so contract stays
+// in the denominator and is credited once accepted (the FK is set).
+// "Ticking the agreement scores like signing." The applicable
+// denominator with kyc/tax/payout hidden (AH-003) is therefore
+// profile(25) + social(15) + portfolio(10) + contract(15) = 65.
 it('completeness score = 0 for a fresh creator with all three vendor flags OFF (no phantom credit)', function (): void {
     [, $creator] = makeFlagOffCreator();
 
     // Bootstrap state: avatar seeded by the helper, but no profile
-    // fields, no social/portfolio, tax incomplete. The three flag-OFF
-    // steps must NOT pre-credit their weight.
+    // fields, no social/portfolio, tax incomplete, agreement not yet
+    // accepted. Nothing earned => 0 / 65 = 0.
     $score = app(CompletenessScoreCalculator::class)
         ->score($creator->fresh());
 
     expect($score)->toBe(0);
 });
 
-it('completeness score renormalises to 50 when only profile is complete and the vendor flags are OFF', function (): void {
+it('completeness score renormalises to 38 when only profile is complete and the vendor flags are OFF', function (): void {
     [, $creator] = makeFlagOffCreator();
 
     $creator->forceFill([
@@ -288,17 +300,15 @@ it('completeness score renormalises to 50 when only profile is complete and the 
         'categories' => ['lifestyle'],
     ])->save();
 
-    // Applicable denominator with all three vendor flags OFF AND the
-    // AH-003 build-time hidden steps (kyc/tax/payout) excluded is
-    // profile(25) + social(15) + portfolio(10) = 50 (tax no longer counts).
-    // Profile alone => round(25 / 50 * 100) = 50.
+    // Denominator 65 (kyc/tax/payout hidden; contract still counts).
+    // Profile alone => round(25 / 65 * 100) = 38.
     $score = app(CompletenessScoreCalculator::class)
         ->score($creator->fresh());
 
-    expect($score)->toBe(50);
+    expect($score)->toBe(38);
 });
 
-it('completeness score renormalises to 80 when profile + social are complete and the vendor flags are OFF', function (): void {
+it('completeness score renormalises to 62 when profile + social are complete and the vendor flags are OFF', function (): void {
     [, $creator] = makeFlagOffCreator();
 
     $creator->forceFill([
@@ -310,9 +320,42 @@ it('completeness score renormalises to 80 when profile + social are complete and
 
     CreatorSocialAccountFactory::new()->createOne(['creator_id' => $creator->id]);
 
-    // Denominator 50 (tax hidden, AH-003): (25 + 15) / 50 * 100 = 80.
+    // Denominator 65: round((25 + 15) / 65 * 100) = 62.
     $score = app(CompletenessScoreCalculator::class)
         ->score($creator->fresh());
 
-    expect($score)->toBe(80);
+    expect($score)->toBe(62);
+});
+
+// Load-bearing test for AH-004: accepting the agreement via the
+// click-through earns the contract weight in the score, exactly as a
+// full signature would — and NOT before it is accepted.
+it('click-through acceptance earns the contract weight in the score (flag OFF)', function (): void {
+    [$user, $creator] = makeFlagOffCreator();
+
+    $creator->forceFill([
+        'display_name' => 'Catalyst',
+        'country_code' => 'IT',
+        'primary_language' => 'en',
+        'categories' => ['lifestyle'],
+    ])->save();
+    CreatorSocialAccountFactory::new()->createOne(['creator_id' => $creator->id]);
+    CreatorPortfolioItemFactory::new()->createOne(['creator_id' => $creator->id]);
+
+    $calc = app(CompletenessScoreCalculator::class);
+
+    // Before accepting: profile + social + portfolio = 50 / 65 = 77.
+    expect($calc->score($creator->fresh()))->toBe(77);
+
+    // Accept via the real click-through endpoint (sets signed_master_contract_id).
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/wizard/contract/click-through-accept')
+        ->assertOk();
+
+    // After accepting: the contract weight is earned => 65 / 65 = 100.
+    expect($calc->score($creator->fresh()))->toBe(100);
+
+    // And the STORED score is refreshed by the accept path (not left stale) —
+    // this is the regression that left creators stuck at 77% after accepting.
+    expect($creator->fresh()->profile_completeness_score)->toBe(100);
 });

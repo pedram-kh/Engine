@@ -54,8 +54,15 @@ const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
 const display = useDisplay()
 
-const { isBootstrapped, bootstrapStatus, creator, stepCompletion, flags, nextStep } =
-  storeToRefs(onboardingStore)
+const {
+  isBootstrapped,
+  bootstrapStatus,
+  creator,
+  stepCompletion,
+  flags,
+  clickThroughAccepted,
+  nextStep,
+} = storeToRefs(onboardingStore)
 const { isLoggingOut } = storeToRefs(authStore)
 
 const { selectLocale } = useLocaleSwitch()
@@ -110,7 +117,12 @@ const chromeSteps = computed<WizardChromeStep[]>(() =>
     if (i === activeIndex.value) {
       status = 'active'
     } else {
-      status = resolveUxStepStatus(step, stepCompletion.value, flags.value)
+      status = resolveUxStepStatus(
+        step,
+        stepCompletion.value,
+        flags.value,
+        clickThroughAccepted.value,
+      )
     }
 
     return {

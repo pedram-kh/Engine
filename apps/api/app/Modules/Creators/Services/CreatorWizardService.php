@@ -471,7 +471,15 @@ final class CreatorWizardService
             $creator->forceFill([
                 'signed_master_contract_id' => $contract->id,
                 'click_through_accepted_at' => $acceptedAt,
-            ])->save();
+            ]);
+            // Accepting the agreement earns the contract weight in the
+            // completeness score, so recompute + persist it here — without
+            // this the stored score goes stale (e.g. stuck at 77% after the
+            // creator has actually reached 100%), exactly like the portfolio
+            // path. refreshCompleteness() only sets the attribute; the save
+            // below persists both the FK and the new score in one write.
+            $this->refreshCompleteness($creator);
+            $creator->save();
 
             Audit::log(
                 action: AuditAction::CreatorWizardClickThroughAccepted,
