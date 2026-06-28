@@ -21,7 +21,10 @@
  *     mirroring the Sprint 5 OAuth job pattern.
  *
  * Image vs video routing:
- *   - `image/*` MIME → direct-multipart POST to /portfolio/images.
+ *   - `image/*` MIME → presigned-S3 two-phase shape (AH-004), then the item
+ *     lands `processing` server-side while a worker strips EXIF + builds the
+ *     thumbnail; we poll the bootstrap until it flips to `ready`/`failed` so
+ *     the gallery's processing spinner clears without a manual reload.
  *   - `video/*` MIME → presigned-S3 two-phase shape:
  *       1. POST /portfolio/videos/init with mime + size →
  *          { upload_id, upload_url }.
@@ -59,6 +62,13 @@ import { useOnboardingStore } from '../stores/useOnboardingStore'
 // (images now ride the same presigned-PUT path as video).
 export const PORTFOLIO_MAX_ITEMS = 30
 export const PORTFOLIO_CONCURRENCY = 3
+// AH-004: an uploaded image is created `processing`; the worker (queue:work)
+// strips EXIF + builds the thumbnail asynchronously. Poll the bootstrap until
+// the item leaves `processing`, bounded so a stuck/failed worker can't spin the
+// gallery's loading state forever — on timeout we stop and the eventual result
+// is picked up on the next bootstrap (navigation / reload).
+export const PORTFOLIO_PROCESSING_POLL_INTERVAL_MS = 1500
+export const PORTFOLIO_PROCESSING_POLL_MAX_ATTEMPTS = 40
 export const PORTFOLIO_IMAGE_MAX_BYTES = 500 * 1024 * 1024
 export const PORTFOLIO_VIDEO_MAX_BYTES = 500 * 1024 * 1024
 export const PORTFOLIO_IMAGE_MAX_MB = PORTFOLIO_IMAGE_MAX_BYTES / (1024 * 1024)
@@ -273,6 +283,36 @@ export function usePortfolioUpload(): PortfolioUploadHandle {
     }
   }
 
+  /**
+   * The current `processing_status` of a persisted portfolio item in the
+   * canonical bootstrap state, or null when it's not present (e.g. not yet
+   * fetched). Used to decide when to stop polling an image's worker.
+   */
+  function processingStatusOf(portfolioId: string): string | null {
+    const persisted = store.creator?.attributes.portfolio ?? []
+    return persisted.find((it) => it.id === portfolioId)?.processing_status ?? null
+  }
+
+  /**
+   * Poll the bootstrap until the given image item leaves `processing` (the
+   * worker finished → `ready`, or failed → `failed`), so the gallery's
+   * processing spinner clears without a manual reload. Bounded by
+   * {@link PORTFOLIO_PROCESSING_POLL_MAX_ATTEMPTS}; on timeout we stop quietly
+   * and the item keeps its last-seen state until the next bootstrap.
+   */
+  async function pollUntilProcessed(portfolioId: string): Promise<void> {
+    for (let attempt = 0; attempt < PORTFOLIO_PROCESSING_POLL_MAX_ATTEMPTS; attempt += 1) {
+      const status = processingStatusOf(portfolioId)
+      if (status !== 'processing') {
+        return
+      }
+      await new Promise<void>((resolve) =>
+        setTimeout(resolve, PORTFOLIO_PROCESSING_POLL_INTERVAL_MS),
+      )
+      await store.bootstrap()
+    }
+  }
+
   async function uploadOne(item: PortfolioUploadItem): Promise<void> {
     try {
       const onProgress = (percent: number): void => {
@@ -316,6 +356,13 @@ export function usePortfolioUpload(): PortfolioUploadHandle {
       // Refresh the store so the wizard step's completion flag flips
       // when the first portfolio item lands.
       await store.bootstrap()
+      // AH-004: an image lands `processing` while the worker strips EXIF +
+      // builds the thumbnail. Poll the bootstrap so the gallery's processing
+      // spinner clears once the worker finishes — without this the item is
+      // stuck showing "Processing…" until a manual reload.
+      if (item.kind === 'image' && item.portfolioId !== null) {
+        await pollUntilProcessed(item.portfolioId)
+      }
     } catch {
       item.status = 'error'
       item.errorKey = 'creator.ui.errors.upload_failed'
