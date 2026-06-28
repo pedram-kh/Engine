@@ -253,9 +253,9 @@ describe('Step2ProfileBasicsPage', () => {
     teardown = unmount
     await flushPromises()
 
-    // Hydrated from the bootstrap state.
-    const phoneInput = wrapper.find('[data-testid="profile-phone"] input')
-    expect((phoneInput.element as HTMLInputElement).value).toBe('+1 555 0100')
+    // Hydrated from the bootstrap state — phone is split into dial + local.
+    const phoneLocalInput = wrapper.find('[data-testid="profile-phone"] input')
+    expect((phoneLocalInput.element as HTMLInputElement).value).toBe('555 0100')
 
     await wrapper.find('form').trigger('submit.prevent')
     await flushPromises()

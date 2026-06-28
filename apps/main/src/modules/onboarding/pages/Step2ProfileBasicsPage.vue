@@ -53,6 +53,7 @@ import { useRouter } from 'vue-router'
 import AvatarUploadDrop from '../components/AvatarUploadDrop.vue'
 import { renderBio } from '../composables/useBioRenderer'
 import { COUNTRY_OPTIONS, labelForCountryCode } from '../data/countries'
+import { DIAL_CODE_OPTIONS, dialCodeForCountry, splitPhoneValue } from '../data/dialCodes'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 const { t } = useI18n()
@@ -84,8 +85,12 @@ const bio = ref('')
 const countryCode = ref<string | null>(null)
 const region = ref<string | null>(null)
 // AH-005 — optional contact details. All optional; partial entry is fine.
-const phone = ref('')
-const whatsapp = ref('')
+// phone / whatsapp are split into a dial-code part and a local-number part;
+// they are joined back to a single string on save (e.g. "+34 612 345 678").
+const phoneDial = ref('')
+const phoneLocal = ref('')
+const whatsappDial = ref('')
+const whatsappLocal = ref('')
 const addressStreet = ref('')
 const addressPostalCode = ref('')
 const primaryLanguage = ref<string | null>(null)
@@ -160,8 +165,15 @@ function hydrateFromCreator(): void {
   bio.value = attrs.bio ?? ''
   countryCode.value = attrs.country_code ?? null
   region.value = attrs.region ?? null
-  phone.value = attrs.phone ?? ''
-  whatsapp.value = attrs.whatsapp ?? ''
+  // AH-005 — split any existing stored value (e.g. "+34 612 345 678") back
+  // into dial code + local number. Falls back to the country-derived dial
+  // code when no known prefix is found (covers legacy free-text entries).
+  const pSplit = splitPhoneValue(attrs.phone ?? null)
+  phoneDial.value = pSplit.dialCode || dialCodeForCountry(attrs.country_code ?? null)
+  phoneLocal.value = pSplit.local
+  const wSplit = splitPhoneValue(attrs.whatsapp ?? null)
+  whatsappDial.value = wSplit.dialCode || dialCodeForCountry(attrs.country_code ?? null)
+  whatsappLocal.value = wSplit.local
   addressStreet.value = attrs.address_street ?? ''
   addressPostalCode.value = attrs.address_postal_code ?? ''
   primaryLanguage.value = attrs.primary_language ?? null
@@ -183,10 +195,14 @@ async function save(): Promise<boolean> {
       bio: bio.value === '' ? null : bio.value,
       country_code: countryCode.value ?? undefined,
       region: region.value,
-      // AH-005 — optional contact details. Empty input clears the field
-      // (null); the backend rule is `nullable`, so this is safe.
-      phone: nullableTrim(phone.value),
-      whatsapp: nullableTrim(whatsapp.value),
+      // AH-005 — join dial code + local number back to a single string.
+      // An empty local-number field clears the value (null).
+      phone: nullableTrim(phoneLocal.value)
+        ? `${phoneDial.value} ${nullableTrim(phoneLocal.value) ?? ''}`.trim()
+        : null,
+      whatsapp: nullableTrim(whatsappLocal.value)
+        ? `${whatsappDial.value} ${nullableTrim(whatsappLocal.value) ?? ''}`.trim()
+        : null,
       address_street: nullableTrim(addressStreet.value),
       address_postal_code: nullableTrim(addressPostalCode.value),
       primary_language: primaryLanguage.value ?? undefined,
@@ -225,6 +241,17 @@ watch(
     }
   },
 )
+
+// When the creator changes their country, update the dial-code prefix for
+// any field that is still empty or whose current dial code matches the OLD
+// country (i.e. the user hasn't manually overridden it).
+watch(countryCode, (newCode, oldCode) => {
+  const newDial = dialCodeForCountry(newCode)
+  if (!newDial) return
+  const oldDial = dialCodeForCountry(oldCode ?? null)
+  if (!phoneLocal.value || phoneDial.value === oldDial) phoneDial.value = newDial
+  if (!whatsappLocal.value || whatsappDial.value === oldDial) whatsappDial.value = newDial
+})
 
 onMounted(() => {
   hydrateFromCreator()
@@ -298,6 +325,22 @@ onMounted(() => {
         data-testid="profile-region"
       />
 
+      <v-text-field
+        v-model="addressStreet"
+        :label="t('creator.ui.wizard.fields.address_street')"
+        :counter="255"
+        :error-messages="fieldErrors.address_street"
+        data-testid="profile-address-street"
+      />
+
+      <v-text-field
+        v-model="addressPostalCode"
+        :label="t('creator.ui.wizard.fields.address_postal_code')"
+        :counter="20"
+        :error-messages="fieldErrors.address_postal_code"
+        data-testid="profile-address-postal-code"
+      />
+
       <fieldset class="profile-basics__contact" data-testid="profile-contact-section">
         <legend class="text-subtitle-2">
           {{ t('creator.ui.wizard.fields.contact_section') }}
@@ -306,39 +349,59 @@ onMounted(() => {
           {{ t('creator.ui.wizard.fields.contact_section_help') }}
         </p>
 
-        <v-text-field
-          v-model="phone"
-          type="tel"
-          :label="t('creator.ui.wizard.fields.phone')"
-          :counter="32"
-          :error-messages="fieldErrors.phone"
-          data-testid="profile-phone"
-        />
+        <div class="profile-basics__tel-row">
+          <v-autocomplete
+            v-model="phoneDial"
+            :items="DIAL_CODE_OPTIONS"
+            item-title="label"
+            item-value="dialCode"
+            hide-details
+            class="profile-basics__dial-code"
+            data-testid="profile-phone-dial"
+          >
+            <template #selection="{ item }">
+              <span class="profile-basics__dial-selection">
+                {{ item.raw.flag }}&nbsp;{{ item.raw.dialCode }}
+              </span>
+            </template>
+          </v-autocomplete>
+          <v-text-field
+            v-model="phoneLocal"
+            type="tel"
+            :label="t('creator.ui.wizard.fields.phone')"
+            :counter="28"
+            :error-messages="fieldErrors.phone"
+            class="profile-basics__tel-number"
+            data-testid="profile-phone"
+          />
+        </div>
 
-        <v-text-field
-          v-model="whatsapp"
-          type="tel"
-          :label="t('creator.ui.wizard.fields.whatsapp')"
-          :counter="32"
-          :error-messages="fieldErrors.whatsapp"
-          data-testid="profile-whatsapp"
-        />
-
-        <v-text-field
-          v-model="addressStreet"
-          :label="t('creator.ui.wizard.fields.address_street')"
-          :counter="255"
-          :error-messages="fieldErrors.address_street"
-          data-testid="profile-address-street"
-        />
-
-        <v-text-field
-          v-model="addressPostalCode"
-          :label="t('creator.ui.wizard.fields.address_postal_code')"
-          :counter="20"
-          :error-messages="fieldErrors.address_postal_code"
-          data-testid="profile-address-postal-code"
-        />
+        <div class="profile-basics__tel-row">
+          <v-autocomplete
+            v-model="whatsappDial"
+            :items="DIAL_CODE_OPTIONS"
+            item-title="label"
+            item-value="dialCode"
+            hide-details
+            class="profile-basics__dial-code"
+            data-testid="profile-whatsapp-dial"
+          >
+            <template #selection="{ item }">
+              <span class="profile-basics__dial-selection">
+                {{ item.raw.flag }}&nbsp;{{ item.raw.dialCode }}
+              </span>
+            </template>
+          </v-autocomplete>
+          <v-text-field
+            v-model="whatsappLocal"
+            type="tel"
+            :label="t('creator.ui.wizard.fields.whatsapp')"
+            :counter="28"
+            :error-messages="fieldErrors.whatsapp"
+            class="profile-basics__tel-number"
+            data-testid="profile-whatsapp"
+          />
+        </div>
       </fieldset>
 
       <v-select
@@ -460,6 +523,30 @@ onMounted(() => {
 .profile-basics__contact-note {
   margin-top: -8px;
   color: rgb(var(--v-theme-on-surface-variant));
+}
+
+.profile-basics__tel-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.profile-basics__dial-code {
+  flex: 0 0 125px;
+  min-width: 125px;
+}
+
+/* The selection slot renders a <span> so CSS text-overflow applies cleanly,
+   unlike the native <input> that the autocomplete uses by default. */
+.profile-basics__dial-selection {
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+.profile-basics__tel-number {
+  flex: 1 1 auto;
 }
 
 .profile-basics__avatar-note {
