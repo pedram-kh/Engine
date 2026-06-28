@@ -35,6 +35,7 @@ import ImpersonationBanner from '@/modules/impersonation/components/Impersonatio
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
+import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 import OnboardingProgress from '../components/OnboardingProgress.vue'
 import AnimatedWizardChrome, { type WizardChromeStep } from '../components/AnimatedWizardChrome.vue'
@@ -161,11 +162,8 @@ async function saveAndExit(): Promise<void> {
     <ImpersonationBanner />
 
     <v-app-bar elevation="1" class="onboarding-topbar" data-test="onboarding-topbar">
-      <div class="d-flex align-center px-4">
-        <v-icon icon="mdi-lightning-bolt" color="primary" size="small" class="mr-2" />
-        <span class="text-subtitle-1 font-weight-bold" data-test="onboarding-brand">
-          {{ t('app.title') }}
-        </span>
+      <div class="d-flex align-center px-4" data-test="onboarding-brand">
+        <img :src="catalystLogo" alt="Catalyst" class="onboarding-topbar__logo" />
       </div>
 
       <v-spacer />
@@ -246,6 +244,11 @@ async function saveAndExit(): Promise<void> {
   right: 0;
   height: 2px;
   background: var(--brand-aurora-gradient);
+}
+
+.onboarding-topbar__logo {
+  display: block;
+  height: 28px;
 }
 
 .onboarding-topbar__locale {
