@@ -1543,3 +1543,47 @@ anyone reviewing it later.
 - **Triggered by:** per-market localization QA / go-live review.
 - **Owner:** i18n / localization workstream.
 - **Status:** open (deferred; not a merge blocker).
+
+---
+
+## AH-005 contact details — no dedicated post-onboarding "profile settings" surface (wizard-as-settings)
+
+- **Where:** the creator self-edit path — the onboarding wizard's profile-basics step
+  ([`apps/main/src/modules/onboarding/pages/Step2ProfileBasicsPage.vue`](../apps/main/src/modules/onboarding/pages/Step2ProfileBasicsPage.vue))
+  - its backend write (`UpdateProfileRequest` → `CreatorWizardService::updateProfile`).
+- **What we accepted (AH-005, 2026-06-28):** the new optional contact fields (phone, WhatsApp,
+  street, postal code) are edited in the SAME place every other profile field is — the wizard step.
+  There is **no separate post-onboarding "Profile settings" page**: an approved creator who wants to
+  change their phone re-enters the wizard surface. This matches how `display_name` / `bio` /
+  `categories` are already edited today (the wizard step doubles as the settings page), so AH-005
+  adds no new debt category — it inherits the existing posture.
+- **Why it's fine for now:** the wizard step is reachable post-approval and the write path is
+  idempotent; contact details are low-churn. A dedicated settings IA is a broader UX project than a
+  four-field add.
+- **Trigger:** a product decision to give creators a first-class "Account / Profile settings" page
+  distinct from the onboarding flow.
+- **Owner:** future creator-account UX.
+- **Status:** open (by design; not a blocker).
+
+---
+
+## AH-005 contact details — mailing address reuses `region` as the city/locality line
+
+- **Where:** the creators table contact columns ([migration `2026_06_28_120000`](../apps/api/database/migrations))
+  - the address composition on the agency roster-detail surface
+    ([`CreatorDetailPage.vue`](../apps/main/src/modules/roster/pages/CreatorDetailPage.vue)).
+- **What we accepted (AH-005, 2026-06-28):** the mailing address is composed from the EXISTING
+  `country_code` + `region` columns plus two NEW lines (`address_street`, `address_postal_code`).
+  No dedicated `address_city` column was added — `region` (labelled "Region or city" in the wizard)
+  doubles as the locality line. This deliberately avoids duplicating a city field that overlaps the
+  profile-level `region`, at the cost of a slightly loose semantic (a creator whose `region` is a
+  province rather than a city yields a less precise mailing line). It also intentionally does NOT
+  mirror the richer, encrypted `creator_tax_profiles.address` value-object
+  (`country_code`/`city`/`postal_code`/`street`) — the contact address is a lightweight, plaintext,
+  agency-visible convenience, not a billing/legal address.
+- **Trigger:** a need for a precise, structured mailing address (e.g. shipping product to creators)
+  that can't tolerate `region`-as-city.
+- **Resolution:** add a dedicated `address_city` column (+ wizard field + resource key) and stop
+  overloading `region`; optionally converge on the tax-profile address value-object shape.
+- **Owner:** future creator-profile / logistics workstream.
+- **Status:** open (by design; not a blocker).

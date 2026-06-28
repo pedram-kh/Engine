@@ -60,6 +60,52 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-005 · Creator contact details (phone, WhatsApp, address) with connected-agency visibility
+
+- **Status:** Landed
+- **Date:** 2026-06-28
+- **Why:** Creators had no way to record contact details (phone, WhatsApp, a mailing address), and
+  connected agencies had no read-only surface for them. The data must be visible ONLY to a
+  non-blacklisted connected agency and to platform-admin — never on discover, never to a
+  not-yet-connected agency.
+- **What:**
+  - **Schema:** four OPTIONAL, plaintext, nullable columns on `creators` — `phone`, `whatsapp`,
+    `address_street`, `address_postal_code` (deliberately NOT encrypted like the tax-profile
+    address; they are agency-visible by design). The mailing address composes from the existing
+    `country_code` + `region` (city line) + the two new lines.
+  - **Self-edit (D5):** added lenient `nullable` validation to `UpdateProfileRequest` — phone/
+    WhatsApp accept an E.164-friendly charset with a **digit floor** (an all-punctuation value is
+    rejected); street ≤255, postal ≤20. Surfaced as a "Contact details" sub-section on the wizard
+    profile step.
+  - **Visibility gate (D3):** new agency-scoped `CreatorPolicy::canSeeContactDetails(User, Creator,
+Agency)` = admin OR (active member of THAT agency AND that agency's relation is non-blacklisted).
+    The "non-blacklisted relation" predicate was extracted into ONE private primitive that
+    `hasAgencyAccess` also calls (one canonical blacklist rule). The gate is agency-scoped, never a
+    user-wide union: a multi-agency user on Agency A's page for a creator A has blacklisted sees no
+    contact even if their Agency B relation is clean.
+  - **Surfacing:** the contact block is added to `AgencyCreatorDetailResource` (gated by the policy —
+    withheld by omission for a blacklisted-but-rostered agency) and to `CreatorResource` base
+    attributes (owner-self hydrate + admin view-only). The agency roster-detail page renders a
+    Contact card (hidden entirely when withheld).
+  - **Privacy spine (D4):** explicit negative assertions that contact keys are absent on all six
+    other creator-bearing surfaces (discover detail/list, roster list row, talent-pool member,
+    campaign assignment, messaging thread list).
+- **Decisions:** D1 inline plaintext columns; D2 reuse `region` as city (tech-debt); D3 agency-scoped
+  policy gate; D4 assert-don't-assume withholding; D5 wizard step is the self-edit home; D6 admin
+  view-only — `AdminUpdateCreatorRequest::EDITABLE_FIELDS` (and its parity spec) untouched.
+- **Load-bearing tests + break-reverts:** the gate (blacklisted-rostered + cross-agency leak both
+  rejected) and the six withholding specs; two break-reverts captured — loosening the detail gate to
+  relation-exists fails the blacklisted-withhold spec, and adding `phone` to
+  `CreatorPublicProfileResource` fails the discover-absence spec (this break-revert also caught a
+  neutered `toHaveKey($key, $message)` assertion, since fixed to assert against the key set).
+- **Touched:** `apps/api` (migration; `Creator` model + factory; `UpdateProfileRequest`;
+  `CreatorPolicy`; `AgencyCreatorDetailResource` + controller; `CreatorResource`; tests),
+  `packages/api-client` (`creator.ts`, `agency.ts` types), `apps/main` (`Step2ProfileBasicsPage.vue`,
+  `CreatorDetailPage.vue`, en+24-locale i18n).
+- **Ref:** kickoff (AH-005 plan, approved Q1–Q5); `5dc1e1f` (feat); this docs commit.
+
+---
+
 ### AH-002 · Digest/invite email locale docblock + English-only decision
 
 - **Status:** Landed
