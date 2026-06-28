@@ -24,6 +24,8 @@ uses(TestCase::class, RefreshDatabase::class);
  */
 function rawJpeg(int $width, int $height): string
 {
+    assert($width >= 1 && $height >= 1);
+
     $image = imagecreatetruecolor($width, $height);
     assert($image !== false);
 
@@ -56,16 +58,19 @@ it('sanitises a ready image at FULL resolution and generates a bounded thumbnail
     $item->refresh();
     expect($item->processing_status)->toBe(PortfolioProcessingStatus::Ready);
     expect($item->thumbnail_path)->not->toBeNull();
-    Storage::disk('media')->assertExists($item->thumbnail_path);
+    $thumbnailPath = (string) $item->thumbnail_path;
+    Storage::disk('media')->assertExists($thumbnailPath);
 
     // Full-res retained — NOT the avatar 1024px downscale.
     $full = getimagesizefromstring((string) Storage::disk('media')->get($path));
     expect($full)->not->toBeFalse();
+    assert($full !== false);
     expect($full[0])->toBe(1600)->and($full[1])->toBe(1200);
 
     // Thumbnail bounded to <=512px longest side.
-    $thumb = getimagesizefromstring((string) Storage::disk('media')->get($item->thumbnail_path));
+    $thumb = getimagesizefromstring((string) Storage::disk('media')->get($thumbnailPath));
     expect($thumb)->not->toBeFalse();
+    assert($thumb !== false);
     expect(max((int) $thumb[0], (int) $thumb[1]))->toBeLessThanOrEqual(PortfolioImageProcessor::THUMBNAIL_MAX_EDGE);
 });
 
