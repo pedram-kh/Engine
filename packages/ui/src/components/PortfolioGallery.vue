@@ -31,6 +31,24 @@
 
 import { ref } from 'vue'
 
+/** IDs of link items whose URL was recently copied (shows ✓ for 1.5 s). */
+const copiedIds = ref<Set<string>>(new Set())
+
+async function copyLink(item: PortfolioGalleryItem): Promise<void> {
+  if (!item.externalUrl) return
+  try {
+    await navigator.clipboard.writeText(item.externalUrl)
+    copiedIds.value = new Set(copiedIds.value).add(item.id)
+    setTimeout(() => {
+      const next = new Set(copiedIds.value)
+      next.delete(item.id)
+      copiedIds.value = next
+    }, 1500)
+  } catch {
+    // Clipboard API unavailable (e.g. non-HTTPS) — silently ignore.
+  }
+}
+
 interface PortfolioGalleryItem {
   id: string
   kind: 'image' | 'video' | 'link'
@@ -81,6 +99,8 @@ interface Props {
   failedLabel?: string
   /** Localized accessible label for the per-item download affordance. */
   downloadLabel?: string
+  /** Localized accessible label for the per-link copy-URL affordance. */
+  copyLinkLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -94,6 +114,7 @@ const props = withDefaults(defineProps<Props>(), {
   processingLabel: 'Processing…',
   failedLabel: 'Upload failed',
   downloadLabel: 'Download',
+  copyLinkLabel: 'Copy link',
 })
 
 const emit = defineEmits<{
@@ -222,8 +243,25 @@ function onRemove(itemId: string): void {
         />
       </div>
 
-      <div v-if="item.title" class="portfolio-gallery__title">
-        {{ item.title }}
+      <div class="portfolio-gallery__footer">
+        <div v-if="item.title" class="portfolio-gallery__title">
+          {{ item.title }}
+        </div>
+        <button
+          v-if="item.kind === 'link' && item.externalUrl"
+          type="button"
+          class="portfolio-gallery__copy-link"
+          :class="{ 'portfolio-gallery__copy-link--copied': copiedIds.has(item.id) }"
+          :aria-label="`${props.copyLinkLabel}${item.title ? ': ' + item.title : ''}`"
+          :data-testid="`portfolio-gallery-copy-${item.id}`"
+          @click.prevent="copyLink(item)"
+        >
+          <v-icon
+            :icon="copiedIds.has(item.id) ? 'mdi-check' : 'mdi-content-copy'"
+            size="16"
+            aria-hidden="true"
+          />
+        </button>
       </div>
 
       <!-- Download (AH-004 D10): a presigned attachment URL for the full-res
@@ -373,6 +411,44 @@ function onRemove(itemId: string): void {
   font-weight: 500;
   line-height: 1.3;
   word-break: break-word;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.portfolio-gallery__footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+  min-height: 22px;
+}
+
+.portfolio-gallery__copy-link {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: rgb(var(--v-theme-on-surface-variant));
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.portfolio-gallery__copy-link:hover,
+.portfolio-gallery__copy-link:focus-visible {
+  background: rgb(var(--v-theme-surface-variant));
+  outline: none;
+}
+
+.portfolio-gallery__copy-link--copied {
+  color: rgb(var(--v-theme-success, var(--v-theme-primary)));
 }
 
 .portfolio-gallery__remove {

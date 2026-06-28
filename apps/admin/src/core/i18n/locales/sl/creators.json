@@ -201,6 +201,7 @@
             "processing_label": "Obdelava…",
             "failed_label": "Nalaganje ni uspelo",
             "download_label": "Prenesi",
+            "copy_link_label": "Kopiraj povezavo",
             "view_all_label": "Prikaži vse"
           }
         },

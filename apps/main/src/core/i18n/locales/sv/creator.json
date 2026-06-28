@@ -66,8 +66,8 @@
           },
           "social": {
             "name": "Sociala konton",
-            "title": "Anslut dina sociala konton",
-            "description": "Anslut minst en plattform så att varumärken kan se din räckvidd."
+            "title": "Lägg till dina sociala konton",
+            "description": "Lägg till minst en plattform så att varumärken kan se din räckvidd."
           },
           "portfolio": {
             "name": "Portfolio",
@@ -85,6 +85,7 @@
             "processing_label": "Bearbetar…",
             "failed_label": "Uppladdningen misslyckades",
             "download_label": "Ladda ner",
+            "copy_link_label": "Kopiera länk",
             "view_all_label": "Visa alla"
           },
           "kyc": {

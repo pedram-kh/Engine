@@ -85,6 +85,7 @@
             "processing_label": "Käsitellään…",
             "failed_label": "Lataus epäonnistui",
             "download_label": "Lataa",
+            "copy_link_label": "Kopioi linkki",
             "view_all_label": "Näytä kaikki"
           },
           "kyc": {

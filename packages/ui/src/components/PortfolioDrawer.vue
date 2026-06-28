@@ -50,6 +50,8 @@ interface Props {
   processingLabel?: string
   failedLabel?: string
   downloadLabel?: string
+  /** Localized accessible label for the copy-link affordance. */
+  copyLinkLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -64,6 +66,7 @@ const props = withDefaults(defineProps<Props>(), {
   processingLabel: 'Processing…',
   failedLabel: 'Upload failed',
   downloadLabel: 'Download',
+  copyLinkLabel: 'Copy link',
 })
 
 const emit = defineEmits<{
@@ -111,6 +114,7 @@ function close(): void {
           :processing-label="props.processingLabel"
           :failed-label="props.failedLabel"
           :download-label="props.downloadLabel"
+          :copy-link-label="props.copyLinkLabel"
           @remove="(itemId: string) => emit('remove', itemId)"
         />
       </v-card-text>

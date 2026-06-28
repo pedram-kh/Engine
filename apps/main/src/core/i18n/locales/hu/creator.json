@@ -85,6 +85,7 @@
             "processing_label": "Feldolgozás…",
             "failed_label": "A feltöltés sikertelen",
             "download_label": "Letöltés",
+            "copy_link_label": "Link másolása",
             "view_all_label": "Összes megtekintése"
           },
           "kyc": {

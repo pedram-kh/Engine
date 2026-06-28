@@ -201,6 +201,7 @@
             "processing_label": "Behandler…",
             "failed_label": "Upload mislykkedes",
             "download_label": "Download",
+            "copy_link_label": "Kopier link",
             "view_all_label": "Se alle"
           }
         },

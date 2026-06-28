@@ -201,6 +201,7 @@
             "processing_label": "Zpracovává se…",
             "failed_label": "Nahrávání se nezdařilo",
             "download_label": "Stáhnout",
+            "copy_link_label": "Kopírovat odkaz",
             "view_all_label": "Zobrazit vše"
           }
         },

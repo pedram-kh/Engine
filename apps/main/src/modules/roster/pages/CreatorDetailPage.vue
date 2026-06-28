@@ -460,6 +460,7 @@ onMounted(() => {
                 :processing-label="t('creator.ui.wizard.steps.portfolio.processing_label')"
                 :failed-label="t('creator.ui.wizard.steps.portfolio.failed_label')"
                 :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
+                :copy-link-label="t('creator.ui.wizard.steps.portfolio.copy_link_label')"
               />
             </v-card-text>
           </v-card>
@@ -476,6 +477,7 @@ onMounted(() => {
             :processing-label="t('creator.ui.wizard.steps.portfolio.processing_label')"
             :failed-label="t('creator.ui.wizard.steps.portfolio.failed_label')"
             :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
+            :copy-link-label="t('creator.ui.wizard.steps.portfolio.copy_link_label')"
           />
 
           <!-- Availability (read-only, consumes the Sprint-5 agency endpoint) -->

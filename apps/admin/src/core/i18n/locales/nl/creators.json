@@ -201,6 +201,7 @@
             "processing_label": "Bezig met verwerken…",
             "failed_label": "Uploaden mislukt",
             "download_label": "Downloaden",
+            "copy_link_label": "Link kopiëren",
             "view_all_label": "Alles weergeven"
           }
         },

@@ -84,6 +84,7 @@
             "preview_close": "Close preview",
             "processing_label": "Processing…",
             "failed_label": "Upload failed",
+            "copy_link_label": "Copy link",
             "download_label": "Download",
             "view_all_label": "View all"
           },

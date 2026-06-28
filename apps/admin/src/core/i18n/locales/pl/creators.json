@@ -201,6 +201,7 @@
             "processing_label": "Przetwarzanie…",
             "failed_label": "Przesyłanie nie powiodło się",
             "download_label": "Pobierz",
+            "copy_link_label": "Kopiuj link",
             "view_all_label": "Zobacz wszystkie"
           }
         },

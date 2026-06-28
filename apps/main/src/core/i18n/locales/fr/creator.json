@@ -85,6 +85,7 @@
             "processing_label": "Traitement…",
             "failed_label": "Échec du téléversement",
             "download_label": "Télécharger",
+            "copy_link_label": "Copier le lien",
             "view_all_label": "Voir tout"
           },
           "kyc": {

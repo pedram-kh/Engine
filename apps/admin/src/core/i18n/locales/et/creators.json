@@ -201,6 +201,7 @@
             "processing_label": "Töötlemine…",
             "failed_label": "Üleslaadimine ebaõnnestus",
             "download_label": "Laadi alla",
+            "copy_link_label": "Kopeeri link",
             "view_all_label": "Vaata kõiki"
           }
         },

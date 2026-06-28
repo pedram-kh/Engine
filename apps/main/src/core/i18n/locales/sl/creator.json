@@ -66,8 +66,8 @@
           },
           "social": {
             "name": "Sociální sítě",
-            "title": "Propojte své sociální sítě",
-            "description": "Propojte alespoň jednu platformu, aby znamke viděly váš dosah."
+            "title": "Dodajte svoje račune na družbenih omrežjih",
+            "description": "Dodajte vsaj eno platformo, da bodo znamke videle vaš doseg."
           },
           "portfolio": {
             "name": "Portfolio",
@@ -85,6 +85,7 @@
             "processing_label": "Obdelava…",
             "failed_label": "Nalaganje ni uspelo",
             "download_label": "Prenesi",
+            "copy_link_label": "Kopiraj povezavo",
             "view_all_label": "Prikaži vse"
           },
           "kyc": {

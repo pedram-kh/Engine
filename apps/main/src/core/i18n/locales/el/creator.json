@@ -85,6 +85,7 @@
             "processing_label": "Επεξεργασία…",
             "failed_label": "Η μεταφόρτωση απέτυχε",
             "download_label": "Λήψη",
+            "copy_link_label": "Αντιγραφή συνδέσμου",
             "view_all_label": "Προβολή όλων"
           },
           "kyc": {

@@ -201,6 +201,7 @@
             "processing_label": "Bearbetar…",
             "failed_label": "Uppladdningen misslyckades",
             "download_label": "Ladda ner",
+            "copy_link_label": "Kopiera länk",
             "view_all_label": "Visa alla"
           }
         },

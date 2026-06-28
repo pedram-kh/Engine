@@ -84,6 +84,7 @@ async function onRemove(itemId: string): Promise<void> {
         :processing-label="t('creator.ui.wizard.steps.portfolio.processing_label')"
         :failed-label="t('creator.ui.wizard.steps.portfolio.failed_label')"
         :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
+        :copy-link-label="t('creator.ui.wizard.steps.portfolio.copy_link_label')"
         @remove="onRemove"
       />
       <div

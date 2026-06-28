@@ -201,6 +201,7 @@
             "processing_label": "Elaborazione…",
             "failed_label": "Caricamento non riuscito",
             "download_label": "Scarica",
+            "copy_link_label": "Copia link",
             "view_all_label": "Vedi tutti"
           }
         },

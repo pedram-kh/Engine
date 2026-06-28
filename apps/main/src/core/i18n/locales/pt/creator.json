@@ -66,8 +66,8 @@
           },
           "social": {
             "name": "Redes sociais",
-            "title": "Ligue as suas contas sociais",
-            "description": "Ligue pelo menos uma plataforma para as marcas verem o seu alcance."
+            "title": "Adicione as suas contas sociais",
+            "description": "Adicione pelo menos uma plataforma para as marcas verem o seu alcance."
           },
           "portfolio": {
             "name": "Portfólio",
@@ -85,6 +85,7 @@
             "processing_label": "A processar…",
             "failed_label": "Falha no carregamento",
             "download_label": "Transferir",
+            "copy_link_label": "Copiar ligação",
             "view_all_label": "Ver tudo"
           },
           "kyc": {

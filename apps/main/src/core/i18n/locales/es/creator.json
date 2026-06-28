@@ -85,6 +85,7 @@
             "processing_label": "Procesando…",
             "failed_label": "Error al subir",
             "download_label": "Descargar",
+            "copy_link_label": "Copiar enlace",
             "view_all_label": "Ver todo"
           },
           "kyc": {
