@@ -26,6 +26,7 @@ import NotificationBell from '@/modules/notifications/components/NotificationBel
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
+import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 
 const { t, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
@@ -58,11 +59,8 @@ async function signOut(): Promise<void> {
     <ImpersonationBanner />
 
     <v-app-bar elevation="1" data-test="creator-topbar">
-      <div class="d-flex align-center px-4">
-        <v-icon icon="mdi-lightning-bolt" color="primary" size="small" class="mr-2" />
-        <span class="text-subtitle-1 font-weight-bold" data-test="creator-brand">
-          {{ t('app.title') }}
-        </span>
+      <div class="d-flex align-center px-4" data-test="creator-brand">
+        <img :src="catalystLogo" alt="Catalyst" class="creator-topbar__logo" />
       </div>
 
       <nav class="d-flex align-center ml-2 ml-sm-6" data-test="creator-nav" aria-label="Primary">
@@ -159,3 +157,10 @@ async function signOut(): Promise<void> {
     </v-main>
   </v-app>
 </template>
+
+<style scoped>
+.creator-topbar__logo {
+  display: block;
+  height: 28px;
+}
+</style>

@@ -34,6 +34,7 @@ import { useAdminAuthStore } from '@/modules/auth/stores/useAdminAuthStore'
 import { useDeployEnv } from '@/core/composables/useDeployEnv'
 import { useNavBadges } from '@/core/stores/useNavBadges'
 import { NAV_ENTRIES, isNavGroup, type NavBadgeKey, type NavLeaf } from '@/core/nav/navItems'
+import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 
 /** Groups start expanded — the Phase-1 sidebar never collapses (§ 5.1)
  * and the admin needs every surface one glance away. */
@@ -94,10 +95,7 @@ async function signOut(): Promise<void> {
       data-testid="admin-sidebar"
     >
       <div class="px-4 py-3 d-flex align-center ga-2" data-test="admin-wordmark">
-        <v-icon icon="mdi-shield-crown-outline" color="primary" size="small" />
-        <span class="text-subtitle-2 font-weight-bold text-truncate">
-          {{ t('app.title') }}
-        </span>
+        <img :src="catalystLogo" alt="Catalyst" class="admin-sidebar__logo" />
       </div>
 
       <v-divider />
@@ -245,6 +243,11 @@ async function signOut(): Promise<void> {
 </template>
 
 <style scoped>
+.admin-sidebar__logo {
+  display: block;
+  height: 24px;
+}
+
 .admin-env-banner {
   letter-spacing: 0.08em;
 }

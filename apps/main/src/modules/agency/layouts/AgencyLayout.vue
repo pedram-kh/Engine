@@ -35,6 +35,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
+import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 
 const { t, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
@@ -91,7 +92,7 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
     <v-navigation-drawer v-model="drawer" permanent width="260" data-test="agency-sidebar">
       <!-- Workspace name -->
       <div class="px-4 py-4 d-flex align-center ga-2" data-test="sidebar-workspace-name">
-        <v-icon icon="mdi-lightning-bolt" color="primary" size="small" />
+        <img :src="catalystLogo" alt="Catalyst" class="agency-sidebar__logo" />
         <span class="text-subtitle-2 font-weight-semibold text-truncate">
           {{ currentAgencyName || t('app.title') }}
         </span>
@@ -222,6 +223,12 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
 </template>
 
 <style scoped>
+.agency-sidebar__logo {
+  display: block;
+  height: 22px;
+  flex-shrink: 0;
+}
+
 .agency-topbar__switcher {
   max-width: 220px;
 }
