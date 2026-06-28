@@ -117,12 +117,13 @@ describe('WelcomeBackPage — Decision B (session-vs-fresh hybrid)', () => {
     expect(h.wrapper.find('[data-test="welcome-back-heading"]').text()).toBe('Welcome back')
   })
 
-  it('redirects a brand-new creator (nextStep still "profile") straight to Step 1, skipping the interstitial', async () => {
-    // Option-1 entry consistency: a creator who has not completed a
-    // single wizard step should NOT see a separate "Let's get started"
-    // screen in a different layout and then jump into the animated
-    // wizard on the next click — that double-design was jarring. They
-    // land directly on `onboarding.profile` (Step 1) inside the wizard.
+  it('renders the landing with "Let\'s get started" copy for a brand-new creator (nextStep still "profile"), NOT a redirect', async () => {
+    // Updated behaviour: the landing now shows on every login for any
+    // non-submitted creator, including first-timers. A brand-new creator
+    // (next_step still `profile`) gets the "Let's get started" copy
+    // instead of "Welcome back" — but it renders rather than redirecting
+    // straight to Step 1. Both variants live inside the same wizard
+    // chrome, so there is no jarring layout switch.
     const recentISO = new Date(Date.now() - 16 * 60 * 1000).toISOString()
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue({
       data: makeCreator(
@@ -141,9 +142,41 @@ describe('WelcomeBackPage — Decision B (session-vs-fresh hybrid)', () => {
     teardown = h.unmount
     await flushPromises()
 
-    expect(h.wrapper.find('[data-test="welcome-back-page"]').exists()).toBe(false)
-    expect(replaceSpy).not.toBeNull()
-    expect(replaceSpy!).toHaveBeenCalledWith({ name: 'onboarding.profile' })
+    expect(h.wrapper.find('[data-test="welcome-back-page"]').exists()).toBe(true)
+    expect(h.wrapper.find('[data-test="welcome-back-heading"]').text()).toBe("Let's get started")
+    // No redirect away from the landing on first mount.
+    if (replaceSpy !== null) {
+      expect(replaceSpy).not.toHaveBeenCalled()
+    }
+  })
+
+  it('shows "Welcome back" (not "Let\'s get started") when a step is done even if next_step is still "profile" (score > 0)', async () => {
+    // Edge case: a creator who completed social / portfolio before
+    // profile has next_step === "profile" but a non-zero score. "First
+    // time" keys off the score (real work), so they get the resume copy.
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue({
+      data: makeCreator(
+        { profile_completeness_score: 38 },
+        {
+          next_step: 'profile',
+          steps: [
+            { id: 'profile', is_complete: false },
+            { id: 'social', is_complete: true },
+            { id: 'portfolio', is_complete: true },
+          ],
+        },
+      ),
+    })
+    const h = await mountAuthPage(WelcomeBackPage, {
+      initialRoute: { path: '/onboarding' },
+    })
+    teardown = h.unmount
+
+    await useOnboardingStore().bootstrap()
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-test="welcome-back-page"]').exists()).toBe(true)
+    expect(h.wrapper.find('[data-test="welcome-back-heading"]').text()).toBe('Welcome back')
   })
 
   it('renders the creator completeness score (35%)', async () => {

@@ -105,16 +105,17 @@ const { creator, nextStep, isSubmitted, completenessScore, lastActivityAt } =
 
 const shouldRender = ref(false)
 
-// A creator whose first incomplete step is still `profile` has not
-// finished a single wizard step yet, so there is no genuine prior
-// session to welcome them "back" to. The existing copy ("Welcome
-// back / you were last here X ago") plus the `updated_at`-derived
-// time-ago would read as a falsehood for a brand-new account (e.g.
-// "last here 16 min ago" on a first visit). Branch them onto the
-// "Let's get started" copy with no time-ago. Returners who have
-// completed at least one step (nextStep beyond profile, or null when
-// fully complete) keep the welcome-back copy.
-const isFirstTime = computed(() => nextStep.value === 'profile')
+// "First time" = the creator has done genuinely nothing yet, so there
+// is no prior session to welcome them "back" to and the "Welcome back /
+// last here X ago" copy would read as a falsehood. We key this off the
+// completeness score being 0 rather than "is the next step profile",
+// because the score credits ONLY real work (profile, social, portfolio,
+// an accepted agreement — a flag-OFF contract is NOT auto-credited). So
+// anyone who has finished at least one step scores > 0 and gets the
+// "Welcome back / resume" copy — EVEN IF their next step is still
+// `profile` (e.g. they completed social or portfolio before profile).
+// A truly fresh account (score 0) gets the "Let's get started" copy.
+const isFirstTime = computed(() => completenessScore.value === 0)
 
 function timeAgoCopy(timestamp: string | null): string {
   if (timestamp === null) {
@@ -154,23 +155,14 @@ onMounted(async () => {
     return
   }
 
-  // Brand-new creators (no wizard step finished yet — next_step is
-  // still `profile`) skip the Welcome Back interstitial entirely and
-  // land DIRECTLY on Step 1 inside the animated wizard. Showing them a
-  // separate "Let's get started" screen in a different layout, then
-  // switching to the wizard chrome on the next click, was a jarring
-  // double-design. The interstitial only earns its place as a *resume*
-  // affordance for returners who have completed at least one step.
-  if (isFirstTime.value) {
-    markMounted()
-    await router.replace({ name: 'onboarding.profile' })
-    return
-  }
-
-  // First mount in this tab for a RETURNING creator — render the
-  // resume UI (inside the same animated chrome). Flip the flag now so
-  // any subsequent mount within the same tab (router navigation back
-  // to this route from another wizard step) auto-advances.
+  // First mount in this tab for ANY non-submitted creator — render the
+  // landing. Brand-new creators (next_step still `profile`) get the
+  // "Let's get started" copy via {@link isFirstTime}; returners get the
+  // "Welcome back / resume" copy. Both render inside the same animated
+  // wizard chrome (no layout switch), so showing a consistent landing on
+  // every login is the desired behaviour. Flip the flag now so any
+  // subsequent mount within the SAME tab (navigating back to this route
+  // from a wizard step) auto-advances instead of re-showing the landing.
   markMounted()
   shouldRender.value = true
 })
