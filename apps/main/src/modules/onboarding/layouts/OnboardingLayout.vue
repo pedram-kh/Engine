@@ -71,6 +71,14 @@ const localeOptions = buildLocaleOptions()
 const userMenuOpen = ref(false)
 
 /**
+ * Mobile chrome (smAndDown): the inline locale switcher + "Save and exit"
+ * button are collapsed into a right-side hamburger drawer so the cramped
+ * mobile app-bar stays just logo + menu. Desktop is untouched.
+ */
+const isMobile = computed(() => display.smAndDown.value)
+const menuDrawerOpen = ref(false)
+
+/**
  * Rail rows + numbering are DERIVED from {@link VISIBLE_UX_STEPS} (AH-003):
  * the account row, the visible wizard steps (social + portfolio merged
  * into "connections"; kyc/tax/payout hidden), and review. Indices into
@@ -168,32 +176,80 @@ async function saveAndExit(): Promise<void> {
 
       <v-spacer />
 
-      <v-select
-        :model-value="locale"
-        :items="localeOptions"
-        :label="t('app.locale.switcher')"
-        item-title="title"
-        item-value="value"
-        density="compact"
-        variant="outlined"
-        hide-details
-        class="onboarding-topbar__locale mx-3"
-        data-test="onboarding-locale-switcher"
-        @update:model-value="selectLocale"
-      />
+      <!-- Desktop: inline locale switcher + Save and exit (unchanged). -->
+      <template v-if="!isMobile">
+        <v-select
+          :model-value="locale"
+          :items="localeOptions"
+          :label="t('app.locale.switcher')"
+          item-title="title"
+          item-value="value"
+          density="compact"
+          variant="outlined"
+          hide-details
+          class="onboarding-topbar__locale mx-3"
+          data-test="onboarding-locale-switcher"
+          @update:model-value="selectLocale"
+        />
 
-      <v-btn
-        v-if="showSaveAndExit"
-        variant="text"
-        class="text-none"
-        :disabled="isLoggingOut"
-        data-test="save-and-exit-btn"
-        @click="saveAndExit"
-      >
-        <v-icon icon="mdi-content-save-outline" start />
-        {{ t('creator.ui.wizard.actions.save_and_exit') }}
-      </v-btn>
+        <v-btn
+          v-if="showSaveAndExit"
+          variant="text"
+          class="text-none"
+          :disabled="isLoggingOut"
+          data-test="save-and-exit-btn"
+          @click="saveAndExit"
+        >
+          <v-icon icon="mdi-content-save-outline" start />
+          {{ t('creator.ui.wizard.actions.save_and_exit') }}
+        </v-btn>
+      </template>
+
+      <!-- Mobile: collapse those controls behind a top-right hamburger. -->
+      <v-app-bar-nav-icon
+        v-else
+        :aria-label="t('app.nav.menu')"
+        data-test="onboarding-menu-btn"
+        @click="menuDrawerOpen = !menuDrawerOpen"
+      />
     </v-app-bar>
+
+    <!-- Mobile menu drawer (smAndDown only): the app-bar's overflow. -->
+    <v-navigation-drawer
+      v-if="isMobile"
+      v-model="menuDrawerOpen"
+      location="right"
+      temporary
+      data-test="onboarding-menu-drawer"
+    >
+      <div class="d-flex flex-column ga-4 pa-4">
+        <v-select
+          :model-value="locale"
+          :items="localeOptions"
+          :label="t('app.locale.switcher')"
+          item-title="title"
+          item-value="value"
+          density="compact"
+          variant="outlined"
+          hide-details
+          data-test="onboarding-menu-locale-switcher"
+          @update:model-value="selectLocale"
+        />
+
+        <v-btn
+          v-if="showSaveAndExit"
+          variant="tonal"
+          class="text-none"
+          block
+          :disabled="isLoggingOut"
+          prepend-icon="mdi-content-save-outline"
+          data-test="onboarding-menu-save-and-exit-btn"
+          @click="saveAndExit"
+        >
+          {{ t('creator.ui.wizard.actions.save_and_exit') }}
+        </v-btn>
+      </div>
+    </v-navigation-drawer>
 
     <v-main data-test="onboarding-main">
       <!-- Option A: animated chrome (desktop, motion allowed, step route) -->

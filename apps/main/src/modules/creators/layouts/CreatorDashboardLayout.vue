@@ -15,10 +15,11 @@
  * new structural region. No workspace switcher (creator is global).
  */
 
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
+import { useDisplay } from 'vuetify'
 
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
@@ -32,9 +33,17 @@ const { t, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
 const router = useRouter()
 const authStore = useAuthStore()
+const display = useDisplay()
 const { user, isLoggingOut } = storeToRefs(authStore)
 const localeOptions = buildLocaleOptions()
 const userMenuOpen = ref(false)
+
+/**
+ * Mobile chrome (smAndDown): the primary topbar nav (3 items) overflows the
+ * cramped mobile app-bar, so it moves to a thumb-reachable bottom navigation
+ * bar. Utility actions stay in the topbar avatar menu. Desktop is untouched.
+ */
+const isMobile = computed(() => display.smAndDown.value)
 
 /**
  * Creator topbar nav (D-b13). Two router-linked items; active-state is
@@ -63,7 +72,13 @@ async function signOut(): Promise<void> {
         <img :src="catalystLogo" alt="Catalyst" class="creator-topbar__logo" />
       </div>
 
-      <nav class="d-flex align-center ml-2 ml-sm-6" data-test="creator-nav" aria-label="Primary">
+      <!-- Desktop: inline topbar nav. On mobile this moves to a bottom bar. -->
+      <nav
+        v-if="!isMobile"
+        class="d-flex align-center ml-2 ml-sm-6"
+        data-test="creator-nav"
+        aria-label="Primary"
+      >
         <v-btn
           v-for="item in navItems"
           :key="item.key"
@@ -155,6 +170,20 @@ async function signOut(): Promise<void> {
         <slot />
       </v-container>
     </v-main>
+
+    <!-- Mobile: primary nav as a thumb-reachable bottom bar (smAndDown only).
+         Active state is router-driven, mirroring the desktop topbar nav. -->
+    <v-bottom-navigation v-if="isMobile" grow color="primary" data-test="creator-bottom-nav">
+      <v-btn
+        v-for="item in navItems"
+        :key="item.key"
+        :to="{ name: item.routeName }"
+        :data-test="`creator-bottom-nav-${item.key}`"
+      >
+        <v-icon :icon="item.icon" />
+        <span>{{ t(`availability.creatorNav.${item.key}`) }}</span>
+      </v-btn>
+    </v-bottom-navigation>
   </v-app>
 </template>
 
