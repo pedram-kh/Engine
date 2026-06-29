@@ -42,7 +42,8 @@
           "review_and_submit": "Review and submit",
           "connect": "Lisa",
           "edit": "Muuda",
-          "remove": "Remove"
+          "remove": "Remove",
+          "cancel": "Tühista"
         },
         "skipped": {
           "label": "Skipped",

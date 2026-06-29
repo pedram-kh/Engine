@@ -36,16 +36,35 @@ const copiedIds = ref<Set<string>>(new Set())
 
 async function copyLink(item: PortfolioGalleryItem): Promise<void> {
   if (!item.externalUrl) return
+
+  let ok = false
   try {
     await navigator.clipboard.writeText(item.externalUrl)
+    ok = true
+  } catch {
+    // Clipboard API blocked (non-HTTPS / iOS restrictions) — fall back to
+    // the legacy execCommand path which works on HTTP origins.
+    try {
+      const ta = document.createElement('textarea')
+      ta.value = item.externalUrl
+      ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0'
+      document.body.appendChild(ta)
+      ta.focus()
+      ta.select()
+      ok = document.execCommand('copy')
+      document.body.removeChild(ta)
+    } catch {
+      // Both methods failed — nothing to show.
+    }
+  }
+
+  if (ok) {
     copiedIds.value = new Set(copiedIds.value).add(item.id)
     setTimeout(() => {
       const next = new Set(copiedIds.value)
       next.delete(item.id)
       copiedIds.value = next
     }, 1500)
-  } catch {
-    // Clipboard API unavailable (e.g. non-HTTPS) — silently ignore.
   }
 }
 

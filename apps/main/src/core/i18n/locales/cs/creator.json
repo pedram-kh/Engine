@@ -42,7 +42,8 @@
           "review_and_submit": "Zkontrolovat a odeslat",
           "connect": "Přidat",
           "edit": "Upravit",
-          "remove": "Odebrat"
+          "remove": "Odebrat",
+          "cancel": "Zrušit"
         },
         "skipped": {
           "label": "Přeskočeno",

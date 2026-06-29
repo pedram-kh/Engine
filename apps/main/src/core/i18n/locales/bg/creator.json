@@ -42,7 +42,8 @@
           "review_and_submit": "Review and submit",
           "connect": "Добави",
           "edit": "Редактиране",
-          "remove": "Remove"
+          "remove": "Remove",
+          "cancel": "Отказ"
         },
         "skipped": {
           "label": "Skipped",

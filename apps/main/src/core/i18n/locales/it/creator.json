@@ -42,7 +42,8 @@
           "review_and_submit": "Rivedi e invia",
           "connect": "Aggiungi",
           "edit": "Modifica",
-          "remove": "Rimuovi"
+          "remove": "Rimuovi",
+          "cancel": "Annulla"
         },
         "skipped": {
           "label": "Saltato",

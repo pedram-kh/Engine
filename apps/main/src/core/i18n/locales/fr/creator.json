@@ -42,7 +42,8 @@
           "review_and_submit": "Vérifier et soumettre",
           "connect": "Ajouter",
           "edit": "Modifier",
-          "remove": "Supprimer"
+          "remove": "Supprimer",
+          "cancel": "Annuler"
         },
         "skipped": {
           "label": "Ignorée",

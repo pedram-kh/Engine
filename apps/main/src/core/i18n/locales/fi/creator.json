@@ -42,7 +42,8 @@
           "review_and_submit": "Review and submit",
           "connect": "Lisää",
           "edit": "Muokkaa",
-          "remove": "Remove"
+          "remove": "Remove",
+          "cancel": "Peruuta"
         },
         "skipped": {
           "label": "Skipped",

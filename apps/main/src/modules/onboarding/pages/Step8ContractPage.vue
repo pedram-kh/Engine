@@ -230,6 +230,7 @@ async function onClickThroughAccepted(): Promise<void> {
 .contract-step__actions {
   display: flex;
   justify-content: flex-end;
+  margin-top: 16px;
 }
 
 .contract-step__sr-status {

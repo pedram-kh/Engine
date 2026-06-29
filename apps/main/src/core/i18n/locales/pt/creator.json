@@ -42,7 +42,8 @@
           "review_and_submit": "Rever e submeter",
           "connect": "Adicionar",
           "edit": "Editar",
-          "remove": "Remover"
+          "remove": "Remover",
+          "cancel": "Cancelar"
         },
         "skipped": {
           "label": "Saltada",

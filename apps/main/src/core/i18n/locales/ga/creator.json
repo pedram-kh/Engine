@@ -42,7 +42,8 @@
           "review_and_submit": "Review and submit",
           "connect": "Cuir leis",
           "edit": "Cuir in eagar",
-          "remove": "Remove"
+          "remove": "Remove",
+          "cancel": "Cealaigh"
         },
         "skipped": {
           "label": "Skipped",

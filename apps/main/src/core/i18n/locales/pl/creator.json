@@ -42,7 +42,8 @@
           "review_and_submit": "Przejrzyj i prześlij",
           "connect": "Dodaj",
           "edit": "Edytuj",
-          "remove": "Usuń"
+          "remove": "Usuń",
+          "cancel": "Anuluj"
         },
         "skipped": {
           "label": "Pominięty",

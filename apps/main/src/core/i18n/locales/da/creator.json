@@ -42,7 +42,8 @@
           "review_and_submit": "Gennemse og indsend",
           "connect": "Tilføj",
           "edit": "Rediger",
-          "remove": "Fjern"
+          "remove": "Fjern",
+          "cancel": "Annuller"
         },
         "skipped": {
           "label": "Sprunget over",

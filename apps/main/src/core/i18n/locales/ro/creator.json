@@ -42,7 +42,8 @@
           "review_and_submit": "Review and submit",
           "connect": "Adaugă",
           "edit": "Editează",
-          "remove": "Remove"
+          "remove": "Remove",
+          "cancel": "Anulează"
         },
         "skipped": {
           "label": "Skipped",

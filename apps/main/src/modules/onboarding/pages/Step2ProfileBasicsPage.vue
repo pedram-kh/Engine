@@ -490,6 +490,16 @@ onMounted(() => {
   background-color: rgb(var(--v-theme-surface));
   font-size: 0.9375rem;
   line-height: 1.6;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.profile-basics__bio-preview :deep(*) {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
 }
 
 .profile-basics__preview {
@@ -500,6 +510,10 @@ onMounted(() => {
   border: 1px solid rgb(var(--v-theme-outline-variant, var(--v-theme-outline)));
   border-radius: 6px;
   background-color: rgb(var(--v-theme-surface-variant));
+  overflow: hidden;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .profile-basics__error {
@@ -534,6 +548,21 @@ onMounted(() => {
 .profile-basics__dial-code {
   flex: 0 0 125px;
   min-width: 125px;
+}
+
+/* Vuetify autocomplete renders the #selection slot AND a live search <input>
+   in the same flex container.  On mobile when focused that input wraps to a
+   second line.  Force the row to stay on one line and shrink the search input
+   to zero until the user actually starts typing — the input remains fully
+   functional, it just doesn't push the layout. */
+.profile-basics__dial-code :deep(.v-field__input) {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.profile-basics__dial-code :deep(.v-field__input input) {
+  min-width: 0 !important;
+  width: 0 !important;
+  flex: 0 1 auto;
 }
 
 /* The selection slot renders a <span> so CSS text-overflow applies cleanly,

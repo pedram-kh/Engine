@@ -42,7 +42,8 @@
           "review_and_submit": "Granska och skicka in",
           "connect": "Lägg till",
           "edit": "Redigera",
-          "remove": "Ta bort"
+          "remove": "Ta bort",
+          "cancel": "Avbryt"
         },
         "skipped": {
           "label": "Hoppat över",

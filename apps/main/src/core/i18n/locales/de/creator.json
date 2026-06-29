@@ -42,7 +42,8 @@
           "review_and_submit": "Prüfen und einreichen",
           "connect": "Hinzufügen",
           "edit": "Bearbeiten",
-          "remove": "Entfernen"
+          "remove": "Entfernen",
+          "cancel": "Abbrechen"
         },
         "skipped": {
           "label": "Übersprungen",

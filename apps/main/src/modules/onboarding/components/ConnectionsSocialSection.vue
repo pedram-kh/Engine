@@ -17,11 +17,25 @@ import type { CreatorSocialAccountSummary, CreatorSocialPlatform } from '@cataly
 import { ApiError, extractFieldErrors } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useDisplay } from 'vuetify'
 
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 const { t } = useI18n()
 const store = useOnboardingStore()
+const display = useDisplay()
+
+// Mobile swaps the rigid 4-column desktop row for a stacked card with a
+// view/edit toggle (a connected account reads as a clean card until "Edit").
+const isMobile = computed(() => display.smAndDown.value)
+
+// Per-platform "currently editing the handle" flag. Only meaningful on the
+// mobile card path; the desktop row keeps its always-visible input.
+const editing = ref<Record<CreatorSocialPlatform, boolean>>({
+  instagram: false,
+  tiktok: false,
+  youtube: false,
+})
 
 const PLATFORMS: readonly CreatorSocialPlatform[] = ['instagram', 'tiktok', 'youtube']
 
@@ -152,6 +166,32 @@ async function removePlatform(platform: CreatorSocialPlatform): Promise<void> {
     }
   }
 }
+
+/* ---- mobile card view/edit toggle ---- */
+function startEdit(platform: CreatorSocialPlatform): void {
+  drafts.value[platform].handle = connectedByPlatform.value[platform]?.handle ?? ''
+  drafts.value[platform].fieldErrors = {}
+  drafts.value[platform].errorKey = null
+  editing.value[platform] = true
+}
+
+function cancelEdit(platform: CreatorSocialPlatform): void {
+  drafts.value[platform].handle = connectedByPlatform.value[platform]?.handle ?? ''
+  drafts.value[platform].fieldErrors = {}
+  drafts.value[platform].errorKey = null
+  editing.value[platform] = false
+}
+
+/** Save from the mobile edit state: run the shared connect/update, then leave
+ *  edit mode only if it succeeded (a 422 keeps the input open with its error). */
+async function saveEdit(platform: CreatorSocialPlatform): Promise<void> {
+  await connectPlatform(platform)
+  const draft = drafts.value[platform]
+  const hasError =
+    draft.errorKey !== null ||
+    Object.values(draft.fieldErrors).some((messages) => (messages?.length ?? 0) > 0)
+  if (!hasError) editing.value[platform] = false
+}
 </script>
 
 <template>
@@ -172,56 +212,140 @@ async function removePlatform(platform: CreatorSocialPlatform): Promise<void> {
     </p>
 
     <div class="social-accounts__forms">
-      <div
-        v-for="platform in PLATFORMS"
-        :key="platform"
-        class="social-accounts__form-row"
-        :data-testid="`social-form-${platform}`"
-      >
-        <span class="social-accounts__platform-label">
-          {{ t(`creator.ui.wizard.social_platforms.${platform}`) }}
-        </span>
-        <v-text-field
-          v-model="drafts[platform].handle"
-          :label="t('creator.ui.wizard.fields.social_handle')"
-          :data-testid="`social-handle-${platform}`"
-          density="compact"
-          hide-details="auto"
-          :rules="[
-            (v: string) =>
-              normalizeHandle(v) === '' ||
-              HANDLE_RE.test(normalizeHandle(v)) ||
-              t('creator.ui.wizard.fields.social_handle_invalid'),
-          ]"
-          :error-messages="
-            drafts[platform].fieldErrors.handle ??
-            (drafts[platform].errorKey === null ? undefined : t(drafts[platform].errorKey!))
-          "
-        />
-        <v-btn
-          variant="tonal"
-          :loading="store.isLoadingSocial"
-          :disabled="drafts[platform].handle.trim() === '' || !isHandleValid(platform)"
-          :data-testid="`social-connect-${platform}`"
-          @click="connectPlatform(platform)"
+      <template v-for="platform in PLATFORMS" :key="platform">
+        <!-- Desktop: the original 4-column row (unchanged). -->
+        <div
+          v-if="!isMobile"
+          class="social-accounts__form-row"
+          :data-testid="`social-form-${platform}`"
         >
-          {{
-            isConnected(platform)
-              ? t('creator.ui.wizard.actions.edit')
-              : t('creator.ui.wizard.actions.connect')
-          }}
-        </v-btn>
-        <v-btn
-          v-if="isConnected(platform)"
-          variant="text"
-          color="error"
-          :loading="store.isLoadingSocial"
-          :data-testid="`social-remove-${platform}`"
-          @click="removePlatform(platform)"
-        >
-          {{ t('creator.ui.wizard.actions.remove') }}
-        </v-btn>
-      </div>
+          <span class="social-accounts__platform-label">
+            {{ t(`creator.ui.wizard.social_platforms.${platform}`) }}
+          </span>
+          <v-text-field
+            v-model="drafts[platform].handle"
+            :label="t('creator.ui.wizard.fields.social_handle')"
+            :data-testid="`social-handle-${platform}`"
+            density="compact"
+            hide-details="auto"
+            :rules="[
+              (v: string) =>
+                normalizeHandle(v) === '' ||
+                HANDLE_RE.test(normalizeHandle(v)) ||
+                t('creator.ui.wizard.fields.social_handle_invalid'),
+            ]"
+            :error-messages="
+              drafts[platform].fieldErrors.handle ??
+              (drafts[platform].errorKey === null ? undefined : t(drafts[platform].errorKey!))
+            "
+          />
+          <v-btn
+            variant="tonal"
+            :loading="store.isLoadingSocial"
+            :disabled="drafts[platform].handle.trim() === '' || !isHandleValid(platform)"
+            :data-testid="`social-connect-${platform}`"
+            @click="connectPlatform(platform)"
+          >
+            {{
+              isConnected(platform)
+                ? t('creator.ui.wizard.actions.edit')
+                : t('creator.ui.wizard.actions.connect')
+            }}
+          </v-btn>
+          <v-btn
+            v-if="isConnected(platform)"
+            variant="outlined"
+            color="error"
+            :loading="store.isLoadingSocial"
+            :data-testid="`social-remove-${platform}`"
+            @click="removePlatform(platform)"
+          >
+            {{ t('creator.ui.wizard.actions.remove') }}
+          </v-btn>
+        </div>
+
+        <!-- Mobile: stacked card with a view/edit toggle. -->
+        <div v-else class="social-card" :data-testid="`social-form-${platform}`">
+          <!-- Connected, view mode: read-only card like the review step. -->
+          <template v-if="isConnected(platform) && !editing[platform]">
+            <div class="social-card__head">
+              <span class="social-card__platform">
+                {{ t(`creator.ui.wizard.social_platforms.${platform}`) }}
+              </span>
+              <span class="social-card__handle">@{{ connectedByPlatform[platform]?.handle }}</span>
+            </div>
+            <div class="social-card__actions">
+              <v-btn
+                variant="tonal"
+                size="small"
+                :data-testid="`social-edit-${platform}`"
+                @click="startEdit(platform)"
+              >
+                {{ t('creator.ui.wizard.actions.edit') }}
+              </v-btn>
+              <v-btn
+                variant="outlined"
+                color="error"
+                size="small"
+                :loading="store.isLoadingSocial"
+                :data-testid="`social-remove-${platform}`"
+                @click="removePlatform(platform)"
+              >
+                {{ t('creator.ui.wizard.actions.remove') }}
+              </v-btn>
+            </div>
+          </template>
+
+          <!-- Empty platform, or editing a connected one: show the input. -->
+          <template v-else>
+            <span class="social-card__platform">
+              {{ t(`creator.ui.wizard.social_platforms.${platform}`) }}
+            </span>
+            <v-text-field
+              v-model="drafts[platform].handle"
+              :label="t('creator.ui.wizard.fields.social_handle')"
+              :data-testid="`social-handle-${platform}`"
+              density="compact"
+              hide-details="auto"
+              :rules="[
+                (v: string) =>
+                  normalizeHandle(v) === '' ||
+                  HANDLE_RE.test(normalizeHandle(v)) ||
+                  t('creator.ui.wizard.fields.social_handle_invalid'),
+              ]"
+              :error-messages="
+                drafts[platform].fieldErrors.handle ??
+                (drafts[platform].errorKey === null ? undefined : t(drafts[platform].errorKey!))
+              "
+            />
+            <div class="social-card__actions">
+              <v-btn
+                variant="tonal"
+                size="small"
+                :loading="store.isLoadingSocial"
+                :disabled="drafts[platform].handle.trim() === '' || !isHandleValid(platform)"
+                :data-testid="`social-connect-${platform}`"
+                @click="editing[platform] ? saveEdit(platform) : connectPlatform(platform)"
+              >
+                {{
+                  editing[platform]
+                    ? t('creator.ui.wizard.actions.save')
+                    : t('creator.ui.wizard.actions.connect')
+                }}
+              </v-btn>
+              <v-btn
+                v-if="editing[platform]"
+                variant="text"
+                size="small"
+                :data-testid="`social-cancel-${platform}`"
+                @click="cancelEdit(platform)"
+              >
+                {{ t('creator.ui.wizard.actions.cancel') }}
+              </v-btn>
+            </div>
+          </template>
+        </div>
+      </template>
     </div>
   </section>
 </template>
@@ -260,5 +384,41 @@ async function removePlatform(platform: CreatorSocialPlatform): Promise<void> {
 
 .social-accounts__platform-label {
   font-weight: 500;
+}
+
+/* ---- mobile card (view/edit toggle) ---- */
+.social-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgb(var(--v-theme-outline-variant, var(--v-theme-outline)));
+  border-radius: 6px;
+}
+
+.social-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.social-card__platform {
+  font-weight: 500;
+}
+
+.social-card__handle {
+  color: rgb(var(--v-theme-on-surface-variant));
+  font-size: 0.875rem;
+  text-align: right;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.social-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 </style>

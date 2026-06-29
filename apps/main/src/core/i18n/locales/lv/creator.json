@@ -42,7 +42,8 @@
           "review_and_submit": "Review and submit",
           "connect": "Pievienot",
           "edit": "Rediģēt",
-          "remove": "Remove"
+          "remove": "Remove",
+          "cancel": "Atcelt"
         },
         "skipped": {
           "label": "Skipped",

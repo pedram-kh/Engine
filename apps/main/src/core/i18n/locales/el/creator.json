@@ -42,7 +42,8 @@
           "review_and_submit": "Review and submit",
           "connect": "Προσθήκη",
           "edit": "Επεξεργασία",
-          "remove": "Remove"
+          "remove": "Remove",
+          "cancel": "Άκυρο"
         },
         "skipped": {
           "label": "Skipped",

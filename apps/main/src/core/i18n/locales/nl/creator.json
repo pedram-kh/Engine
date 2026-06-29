@@ -42,7 +42,8 @@
           "review_and_submit": "Beoordelen en indienen",
           "connect": "Toevoegen",
           "edit": "Bewerken",
-          "remove": "Verwijderen"
+          "remove": "Verwijderen",
+          "cancel": "Annuleren"
         },
         "skipped": {
           "label": "Overgeslagen",

@@ -39,6 +39,7 @@ import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 import OnboardingProgress from '../components/OnboardingProgress.vue'
 import AnimatedWizardChrome, { type WizardChromeStep } from '../components/AnimatedWizardChrome.vue'
+import AnimatedWizardChromeMobile from '../components/AnimatedWizardChromeMobile.vue'
 import {
   VISIBLE_UX_STEPS,
   WIZARD_TOTAL_STEPS,
@@ -105,6 +106,15 @@ onMounted(() => {
  *  its `next_step` highlighted on the rail. */
 const useAnimatedChrome = computed(
   () => !display.smAndDown.value && !prefersReducedMotion.value && creator.value !== null,
+)
+
+/** Mobile animated chrome: the horizontal top-rail variant. Motion-allowed
+ *  small viewports with a creator — including the Welcome Back resume screen,
+ *  which renders inside the chrome with its `next_step` highlighted (full
+ *  parity with the desktop chrome). Reduced-motion + the no-creator cold-load
+ *  fall through to the fallback below. */
+const useMobileChrome = computed(
+  () => display.smAndDown.value && !prefersReducedMotion.value && creator.value !== null,
 )
 
 /** On a step route the active row is that step; on the Welcome Back
@@ -264,8 +274,19 @@ async function saveAndExit(): Promise<void> {
         </AnimatedWizardChrome>
       </div>
 
-      <!-- Fallback: original rail + plain body (mobile / reduced-motion /
-           Welcome Back takeover) -->
+      <!-- Mobile animated chrome: horizontal top rail + framed panel. -->
+      <div v-else-if="useMobileChrome" class="onboarding-stage onboarding-stage--mobile">
+        <AnimatedWizardChromeMobile
+          :steps="chromeSteps"
+          :active-index="activeIndex"
+          :reduced-motion="prefersReducedMotion"
+          @navigate="onNavigate"
+        >
+          <slot />
+        </AnimatedWizardChromeMobile>
+      </div>
+
+      <!-- Fallback: original rail + plain body (reduced-motion / no creator) -->
       <v-container v-else class="onboarding-container pa-6">
         <div class="onboarding-layout__shell">
           <aside class="onboarding-layout__progress" data-test="onboarding-progress">
@@ -317,6 +338,12 @@ async function saveAndExit(): Promise<void> {
   height: calc(100dvh - 64px);
   min-height: 480px;
   overflow: hidden;
+}
+
+/* Mobile stage: no tall min-height (short/landscape phones), the horizontal
+ * chrome manages its own internal layout. */
+.onboarding-stage--mobile {
+  min-height: 0;
 }
 
 .onboarding-layout__shell {
