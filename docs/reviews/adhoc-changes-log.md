@@ -49,11 +49,11 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID      | Title                                          | Status   | Notes                                                                                                                                                                                                                  |
-| ------- | ---------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AH-010a | Relationship messaging — backend spine + gate  | Landed   | 1:1 connected agency↔creator. Mirrored spine + status-aware gate + file/link attachments (EXIF-strip) + 2 notification types. Committed `2656e5a` (feat) + docs; **push held** for AH-010b sequencing. See Change Log. |
-| AH-010b | Relationship messaging — WhatsApp-shaped inbox | Proposed | Net-new conversations inbox + thread on the existing 15s poll; reuses `ChatPanel`/`useMessageThread`. Creator nav item + agency roster-detail entry. Paired commit after AH-010a.                                      |
-| —       | Campaign Drafts tab — independent review       | Pending  | Merged in code; review file reads "pending independent review pass."                                                                                                                                                   |
+| ID      | Title                                          | Status  | Notes                                                                                                                                                                                                                                                                                                                        |
+| ------- | ---------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AH-010a | Relationship messaging — backend spine + gate  | Landed  | 1:1 connected agency↔creator. Mirrored spine + status-aware gate + file/link attachments (EXIF-strip) + 2 notification types. Committed `2656e5a` (feat) + docs; **push held** for AH-010b sequencing. See Change Log.                                                                                                       |
+| AH-010b | Relationship messaging — WhatsApp-shaped inbox | Landed  | Net-new conversations inbox + full-screen thread on the existing 15s poll; reuses generic `useMessageThread`. 2-state read tick from `read_by_counterparty`. Symmetric inboxes + nav (creator desktop/mobile + agency sidebar) + roster-detail shortcut. 23-locale fill green. **Push held** for spot-check. See Change Log. |
+| —       | Campaign Drafts tab — independent review       | Pending | Merged in code; review file reads "pending independent review pass."                                                                                                                                                                                                                                                         |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -61,6 +61,48 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-010b · Relationship messaging — WhatsApp-shaped inbox + thread (frontend)
+
+- **Status:** Landed (push held for final spot-check)
+- **Date:** 2026-06-29
+- **Why:** AH-010a shipped the backend spine; AH-010b is the surface — a
+  WhatsApp-shaped 1:1 inbox + thread for the connected agency↔creator DM, on the
+  existing 15s poll (D7, NOT realtime).
+- **What:** A net-new conversations surface, both sides, with zero new chat engine.
+  - **Generic engine reuse (zero blast radius):** the thread runs on the now-generic
+    `useMessageThread<TMessage, TMeta, TSend>` (campaign defaults unchanged) via new
+    relationship transports. The 5 `ChatPanel` + the `useMessageThread` campaign
+    specs stay green — the engine was generalized, not forked.
+  - **Inbox (D8):** a shared, direction-agnostic `RelationshipInbox` (avatar, name,
+    last-message preview, timestamp, unread badge). Both pages normalize their own
+    rows to one item shape — agency keyed by creator, creator keyed by agency. A 45s
+    poll refreshes unread badges.
+  - **Thread (D7/D10):** `RelationshipThreadView` — bubbles (own-right/theirs-left),
+    per-message sender name on incoming (Q4 — the creator sees which agency member
+    wrote each line), HH:mm timestamps, file + link attachments (D4), composer with a
+    client-side `http(s)`-only link guard. The **two-state read tick reads straight
+    from `read_by_counterparty`** (server truth, never a client guess): single check =
+    sent, double check (primary) = read; no tick on incoming.
+  - **Entry points (D9, Q5 symmetric):** creator top-level `/creator/messages`
+    - thread, "Messages" nav in both the desktop topbar and the AH-007 mobile
+      bottom-nav; agency top-level `/messages` + thread (pinned into the
+      `requireAgencyUser` arch-test) and a roster-detail "Message" shortcut whose
+      visibility mirrors the backend gate (approved + roster + non-blacklisted).
+  - **i18n done-gate:** en `app.messaging.relationship.*` + `nav.messages` +
+    `availability.creatorNav.messages`, then the full **23-locale fill** (app +
+    availability + notifications) — the locale-parity gate is genuinely green
+    (`{sender_name}` placeholder preserved across every locale).
+- **Touched:** new `apps/main/src/modules/messaging/{components,pages}/Relationship*`
+  (+ specs), `relationshipMessaging.api.ts`, generic `useMessageThread`,
+  `creators/routes.ts` + `auth/routes.ts` (+ guard arch-test), `CreatorDashboardLayout`
+  - `AgencyLayout` nav, `roster/CreatorDetailPage`, notification registry/union/en
+  - parity specs, 23 locales × {app,availability,notifications}.json.
+- **Build assertions met:** new inbox/thread/transport specs green; the 5 campaign
+  `ChatPanel` + `useMessageThread` specs untouched; the agency-route guard spec
+  updated + green; locale-parity + notifications-parity green; typecheck + lint clean.
+- **Ref:** this FE pair (feat + docs). Backend is AH-010a (`2656e5a`); push held for
+  the final spot-check before both ship.
 
 ### AH-010a · Relationship messaging — backend spine + gate + attachments + notifications
 
