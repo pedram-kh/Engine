@@ -60,6 +60,82 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-007 · Creator platform mobile-responsive pass
+
+- **Status:** Landed
+- **Date:** 2026-06-29
+- **Why:** The creator-facing surfaces (onboarding wizard + post-submit dashboard) were
+  built desktop-first and were cramped/unusable on small viewports — the wizard's left step
+  rail and the dashboard/wizard topbar controls overflowed, the framed wizard content was
+  locked to a fixed-viewport inner scroll, and several step-2/step-3 fields broke layout on a
+  phone.
+- **What:** A frontend-only pass (`apps/main` + one `packages/ui` component), with mobile
+  behaviour gated on Vuetify `smAndDown` so desktop is unchanged except where noted:
+  - **Navigation reflow.** Onboarding topbar collapses the locale switcher + "Save and exit"
+    into a right-side `v-navigation-drawer` hamburger (`v-app-bar-nav-icon`); the creator
+    dashboard moves its primary nav from the inline topbar to a `v-bottom-navigation` bar.
+  - **Mobile wizard chrome.** New `AnimatedWizardChromeMobile` — a horizontal top step rail
+    (fixed edge-anchored number boxes: completed pinned left, upcoming pinned right, active
+    centred; thin per-state rectangle outlines) with a snap → SVG-frame-draw → typewriter
+    step transition, used instead of the desktop left-rail chrome on `smAndDown`.
+  - **Full-height framed content.** The mobile frame moved from a fixed-viewport box with an
+    inner scroll to a full-height card the _page_ scrolls; the SVG outline draws the card's
+    full height (all four antennas still fire), the step rail is `position: sticky` under the
+    app-bar, and a panel `ResizeObserver` (`syncFrameSize`) keeps the outline glued as content
+    height changes.
+  - **Per-step scroll reset.** Both chromes (desktop + mobile) reset the framed content to its
+    top on each step change so a step never opens inheriting the previous step's scroll.
+  - **Step-level fixes.** Step 2: the bio/profile preview wraps long unbroken strings
+    (`overflow-wrap`/`word-break`) and the dial-code autocomplete no longer wraps to two lines
+    on mobile focus. Step 3 social: a mobile-only stacked card with a view/edit toggle
+    (read-only `@handle` → Edit reveals the input with Save/Cancel). Step 8: spacing between
+    the agreement alert and "Save and continue".
+  - **Light-mode logo regression fix.** The light-header logo darkening (added with the
+    Catalyst-logo branding swap) used a `:global(...)` scoped rule that Vue's compiler
+    collapsed to a bare `.v-theme--light { filter: brightness(0) }`, blacking out the whole
+    dashboard in light mode; re-driven from a theme-bound class on the `<img>`.
+  - **i18n:** added `app.nav.menu` (hamburger aria-label) and `creator.ui.wizard.actions.cancel`
+    across all 24 locales.
+- **Touched:** `apps/main` onboarding (`OnboardingLayout`, new `AnimatedWizardChromeMobile`,
+  `AnimatedWizardChrome` scroll-reset only, `Step2ProfileBasicsPage` CSS, `Step8ContractPage`
+  CSS, `ConnectionsSocialSection` mobile card + view/edit), creator dashboard
+  (`CreatorDashboardLayout` bottom nav + logo theme-class fix), shared `packages/ui`
+  (`PortfolioGallery` copy-link clipboard fallback), locales (`app.json` `nav.menu` +
+  `creator.json` `actions.cancel`, all 24).
+- **Decisions:** all mobile branches gated on `smAndDown` (desktop untouched) — _except_ the
+  social **Remove** button, deliberately given an outline (`variant="text"` →
+  `variant="outlined"`) on **both** desktop and mobile. Mobile wizard frame grows with content
+  and the page scrolls (not an inner scroll box). The mobile social view/edit toggle is local
+  UI state only and reuses the existing connect/remove flows verbatim (no payload change). Logo
+  darkening re-expressed as a theme-driven class, not an ancestor `:global` selector (the
+  scoped-CSS footgun that caused the blackout). Beyond-CSS notes: the `PortfolioGallery`
+  `execCommand` copy fallback is `<script>` logic in a shared component (affects all consumers,
+  copy-feedback only — no content change; desktop success path verified unchanged); no
+  API/resource-shape changes; the AH-005 contact card is untouched.
+- **Ref:** `dd7d93a` (mobile nav) · `d4e282b` (mobile chrome + polish) · `7e2c327` (scroll
+  reset) · `0b176a3` (full-height frame) · `1da5dae` (light-mode blackout fix) + this docs
+  commit.
+
+### AH-008 · Portfolio link cards — copy-URL button
+
+- **Status:** Landed
+- **Date:** 2026-06-28
+- **Why:** Portfolio link items showed their destination URL but offered no quick way to copy
+  it — agencies/creators had to open the link and copy from the address bar.
+- **What:** Added a copy-link affordance to link-kind cards in the shared `PortfolioGallery` —
+  an icon button that writes the item's `externalUrl` to the clipboard and shows a ✓ tick for
+  1.5 s. Surfaced on every gallery consumer (creator onboarding, roster detail, discover
+  profile, admin creator detail) via a localized `copyLinkLabel` aria-label across all 24
+  locales (main `creator.json` + admin `creators.json`); the consumer pages only pass the new
+  label prop. No API or data-shape change.
+- **Touched:** `packages/ui` (`PortfolioGallery` button + `PortfolioDrawer` label passthrough),
+  `apps/main` (`ConnectionsPortfolioSection`, roster + discover detail pages), `apps/admin`
+  (creator detail page), all 24 `creator.json` / `creators.json` locales.
+- **Decisions:** the copy logic lives in the shared component, which stays i18n-free (label via
+  prop); no persistence/analytics. The HTTP/iOS `execCommand` copy fallback was added later as
+  part of the AH-007 mobile pass, not here.
+- **Ref:** `185f1a9` (feat) + this docs commit.
+
 ### AH-006 · Finish the Connect→Add rename (step-3 social copy)
 
 - **Status:** Landed
@@ -115,7 +191,13 @@ reviews, and conversations.
   city line (no duplicate city column); admin view-only (not the `EDITABLE_FIELDS` contract);
   distinct WhatsApp number (not a flag). Break-revert surfaced and fixed a `toHaveKey($key, $msg)`
   misuse that had silently neutered the withholding guards.
-- **Ref:** `5dc1e1f` (feat) + `e58dfec` (docs).
+- **Follow-up — country-code dial selector (`1399ee3`):** the phone + WhatsApp contact inputs
+  this entry added gained a searchable dial-code selector (a `v-autocomplete` of `+NN` codes,
+  backed by new static `countries.ts` / `dialCodes.ts` data and a small `vuetify.ts` default),
+  so the dial code is picked separately from the national number on `Step2ProfileBasicsPage`.
+  Frontend + static data only — no `apps/api` / `packages/api-client` change, so the `phone` /
+  `whatsapp` resource shape is unchanged.
+- **Ref:** `5dc1e1f` (feat) + `e58dfec` (docs); dial-code follow-up `1399ee3`.
 
 ---
 
