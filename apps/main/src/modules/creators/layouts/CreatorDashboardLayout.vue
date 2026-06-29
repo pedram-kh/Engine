@@ -27,6 +27,7 @@ import NotificationBell from '@/modules/notifications/components/NotificationBel
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
+import { useTheme } from '@/composables/useTheme'
 import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 
 const { t, locale } = useI18n()
@@ -34,9 +35,20 @@ const { selectLocale } = useLocaleSwitch()
 const router = useRouter()
 const authStore = useAuthStore()
 const display = useDisplay()
+const { currentTheme } = useTheme()
 const { user, isLoggingOut } = storeToRefs(authStore)
 const localeOptions = buildLocaleOptions()
 const userMenuOpen = ref(false)
+
+/**
+ * The logo's wordmark is near-white and vanishes on the light header, so we
+ * render it solid-dark in light mode. This MUST be a theme-driven class on the
+ * <img> itself — NOT a `:global(.v-theme--light) … { filter }` scoped rule:
+ * Vue's scoped compiler collapses a leading `:global()` + descendant down to
+ * just `.v-theme--light { filter: brightness(0) }`, which blacks out the whole
+ * app root in light mode (regression fixed here).
+ */
+const logoNeedsDarkening = computed(() => currentTheme.value === 'light')
 
 /**
  * Mobile chrome (smAndDown): the primary topbar nav (3 items) overflows the
@@ -69,7 +81,12 @@ async function signOut(): Promise<void> {
 
     <v-app-bar elevation="1" data-test="creator-topbar">
       <div class="d-flex align-center px-4" data-test="creator-brand">
-        <img :src="catalystLogo" alt="Catalyst" class="creator-topbar__logo" />
+        <img
+          :src="catalystLogo"
+          alt="Catalyst"
+          class="creator-topbar__logo"
+          :class="{ 'creator-topbar__logo--on-light': logoNeedsDarkening }"
+        />
       </div>
 
       <!-- Desktop: inline topbar nav. On mobile this moves to a bottom bar. -->
@@ -191,5 +208,13 @@ async function signOut(): Promise<void> {
 .creator-topbar__logo {
   display: block;
   height: 28px;
+}
+
+/* Light-mode only: the near-white wordmark is invisible on the light header,
+ * so render it solid dark. Toggled by `logoNeedsDarkening` (theme-driven class)
+ * rather than an ancestor `:global(.v-theme--light)` selector — see the script
+ * comment for why that scoped-CSS pattern blacked out the whole app. */
+.creator-topbar__logo--on-light {
+  filter: brightness(0);
 }
 </style>
