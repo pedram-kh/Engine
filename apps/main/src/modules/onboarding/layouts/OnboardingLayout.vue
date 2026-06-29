@@ -340,10 +340,13 @@ async function saveAndExit(): Promise<void> {
   overflow: hidden;
 }
 
-/* Mobile stage: no tall min-height (short/landscape phones), the horizontal
- * chrome manages its own internal layout. */
+/* Mobile stage: the framed card grows to its full content height and the
+ * PAGE scrolls (no inner scroll box), so drop the fixed viewport height and
+ * the overflow clip. `min-height` still fills the viewport for short steps. */
 .onboarding-stage--mobile {
-  min-height: 0;
+  height: auto;
+  min-height: calc(100dvh - 64px);
+  overflow: visible;
 }
 
 .onboarding-layout__shell {

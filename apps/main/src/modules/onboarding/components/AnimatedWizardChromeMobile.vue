@@ -342,6 +342,12 @@ function showFrame(): void {
 
   void svgUnder.getBoundingClientRect()
 
+  // Drop the rail's solid background while the antennas draw + retract, so the
+  // sticky bar doesn't clip the lines emerging from the active number. The
+  // antennas stay BEHIND the content (clean retract); the rail only needs to
+  // be opaque once the user can scroll, so we restore it after the frame settles.
+  railEl.value?.classList.add('wizm__rail--clear')
+
   a.forEach((el) => {
     el.style.transition = `stroke-dashoffset ${FRAME_ANTENNA_MS}ms ease-out`
     el.style.strokeDashoffset = '0'
@@ -356,8 +362,47 @@ function showFrame(): void {
       el.style.transition = `stroke-dashoffset ${FRAME_RETRACT_MS}ms ease-in`
       el.style.strokeDashoffset = String(-(Number(el.dataset.len) || 0))
     })
+    after(FRAME_RETRACT_MS + 40, () => {
+      railEl.value?.classList.remove('wizm__rail--clear')
+    })
   })
   frameVisible = true
+}
+
+/** Re-fit the SETTLED border to the panel's current size with no draw-in.
+ *  Used on viewport/content resize: because the card now grows with its
+ *  content (and the page scrolls), the continuous full-height outline must
+ *  follow height changes without replaying the antenna/rectangle animation. */
+function syncFrameSize(): void {
+  const svgUnder = svgUnderEl.value
+  const svgOver = svgOverEl.value
+  const root = rootEl.value
+  const rect = panelRect()
+  if (!svgUnder || !svgOver || !root || !rect) return
+  const W = root.clientWidth
+  const H = root.clientHeight
+  if (W === 0 || H === 0) return
+  sizeSvg(svgUnder, W, H)
+  sizeSvg(svgOver, W, H)
+
+  const { L, R, T, B } = rect
+  const s = rectLines
+  if (s.length < 4) return
+  setLine(s[0]!, L, T, R, T)
+  setLine(s[1]!, R, T, R, B)
+  setLine(s[2]!, R, B, L, B)
+  setLine(s[3]!, L, B, L, T)
+  s.forEach((el) => {
+    el.style.transition = 'none'
+    el.style.strokeDashoffset = '0'
+    el.style.opacity = '1'
+  })
+  // The antennas only exist during the draw-in; keep them hidden when settled.
+  antennaLines.forEach((el) => {
+    el.style.opacity = '0'
+  })
+  svgOver.style.transition = 'none'
+  svgOver.style.opacity = '1'
 }
 
 function hideFrame(): void {
@@ -371,11 +416,23 @@ function hideFrame(): void {
   panelEl.value?.classList.add('is-hidden')
 }
 
-/** Scroll the framed content back to its top so each step opens at its
- *  beginning rather than inheriting the previous step's scroll position. */
+/** The framed content now grows to its full height and the PAGE scrolls (no
+ *  inner scroll box), so each step must re-anchor the page to the top — both
+ *  to reset the previous step's scroll and so the frame draw-in plays in view.
+ *  Walks up to the nearest scrollable ancestor, falling back to the window. */
 function resetPanelScroll(): void {
-  const scroll = panelEl.value?.querySelector<HTMLElement>('.wizm__panel-scroll')
-  if (scroll) scroll.scrollTop = 0
+  let el: HTMLElement | null = rootEl.value?.parentElement ?? null
+  while (el) {
+    const oy = window.getComputedStyle(el).overflowY
+    if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight) {
+      el.scrollTop = 0
+      return
+    }
+    el = el.parentElement
+  }
+  const doc = document.scrollingElement as HTMLElement | null
+  if (doc) doc.scrollTop = 0
+  window.scrollTo(0, 0)
 }
 
 /* ---- the active-step change sequence: snap → frame → type ---- */
@@ -442,9 +499,13 @@ function onResize(): void {
       wrap.style.width = `${full}px`
     }
     positionChips()
-    if (frameVisible) showFrame()
+    if (frameVisible) syncFrameSize()
   })
 }
+
+/** Keep the full-height outline glued to the card as its content height
+ *  changes (async data, expanding sections, font swap) without re-animating. */
+let panelRO: ResizeObserver | null = null
 
 onMounted(() => {
   current = props.activeIndex
@@ -461,12 +522,19 @@ onMounted(() => {
     after(FRAME_SHOW_DELAY, () => showFrame())
   })
   window.addEventListener('resize', onResize)
+  if (typeof ResizeObserver !== 'undefined' && panelEl.value) {
+    panelRO = new ResizeObserver(() => {
+      if (animating || !frameVisible) return
+      syncFrameSize()
+    })
+    panelRO.observe(panelEl.value)
+  }
   if (typeof document !== 'undefined' && document.fonts && 'ready' in document.fonts) {
     void document.fonts.ready.then(() => {
       if (animating) return
       fitAndMeasureTitle()
       positionChips()
-      if (frameVisible) showFrame()
+      if (frameVisible) syncFrameSize()
     })
   }
 })
@@ -475,6 +543,8 @@ onBeforeUnmount(() => {
   clearTimers()
   window.removeEventListener('resize', onResize)
   window.cancelAnimationFrame(resizeRaf)
+  panelRO?.disconnect()
+  panelRO = null
 })
 
 watch(
@@ -558,8 +628,7 @@ watch(
 .wizm {
   position: relative;
   width: 100%;
-  height: 100%;
-  min-height: 0;
+  /* Grows to its content height; the PAGE scrolls (no inner scroll box). */
 }
 
 .wizm__frame {
@@ -589,13 +658,23 @@ watch(
 }
 
 /* ---- rail ---- */
+/* Sticky under the fixed 64px app-bar with a solid background and a z-index
+ * above the over-frame (z 3), so the continuous border and content scroll
+ * cleanly UNDERNEATH the numbers instead of bleeding through or painting over. */
 .wizm__rail {
-  position: absolute;
+  position: sticky;
+  top: 64px;
   left: 0;
   right: 0;
-  top: 0;
   height: 64px;
-  z-index: 2;
+  z-index: 5;
+  background: rgb(var(--v-theme-background));
+}
+
+/* While the frame draws in, the rail goes transparent so it doesn't clip the
+ * antennas shooting up from the active number; restored to solid once settled. */
+.wizm__rail.wizm__rail--clear {
+  background: transparent;
 }
 
 .chip {
@@ -676,15 +755,16 @@ watch(
 }
 
 /* ---- panel ---- */
+/* In normal flow now (was absolute): it sits below the 64px rail with a 16px
+ * gap so its top still lands at y≈80 (the SVG frame anchors there), and grows
+ * to its content height. `min-height` keeps short steps filling the viewport
+ * (matches the previous fixed-card height: 100dvh − app-bar − rail − margins). */
 .wizm__panel {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  top: 80px;
-  bottom: 12px;
+  position: relative;
+  margin: 16px 12px 12px;
+  min-height: calc(100dvh - 156px);
   background: rgb(var(--v-theme-surface));
   border-radius: 2px;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   z-index: 1;
@@ -699,10 +779,7 @@ watch(
 }
 
 .wizm__panel-scroll {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 20px 18px;
-  height: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
