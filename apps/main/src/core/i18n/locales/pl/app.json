@@ -63,7 +63,19 @@
         "linkName": "Etykieta (opcjonalnie)",
         "linkInvalid": "Wprowadź prawidłowy link http lub https.",
         "linksHeading": "Linki",
-        "remove": "Usuń"
+        "remove": "Usuń",
+        "newConversation": "Nowa rozmowa",
+        "startConversation": "Rozpocznij rozmowę",
+        "picker": {
+          "titleCreators": "Nowa rozmowa",
+          "titleAgencies": "Nowa rozmowa",
+          "searchPlaceholder": "Szukaj twórców",
+          "emptyCreators": "Brak twórców do napisania wiadomości.",
+          "emptyAgencies": "Brak agencji do napisania wiadomości.",
+          "loadMore": "Załaduj więcej",
+          "loadError": "Nie udało się załadować kontaktów. Spróbuj ponownie.",
+          "close": "Zamknij"
+        }
       }
     },
     "nav": {

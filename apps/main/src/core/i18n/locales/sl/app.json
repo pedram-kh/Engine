@@ -63,7 +63,19 @@
         "linkName": "Oznaka (neobvezno)",
         "linkInvalid": "Vnesite veljavno povezavo http ali https.",
         "linksHeading": "Povezave",
-        "remove": "Odstrani"
+        "remove": "Odstrani",
+        "newConversation": "Nov pogovor",
+        "startConversation": "Začni pogovor",
+        "picker": {
+          "titleCreators": "Nov pogovor",
+          "titleAgencies": "Nov pogovor",
+          "searchPlaceholder": "Iskanje ustvarjalcev",
+          "emptyCreators": "Zaenkrat ni ustvarjalcev za sporočilo.",
+          "emptyAgencies": "Zaenkrat ni agencij za sporočilo.",
+          "loadMore": "Naloži več",
+          "loadError": "Vaših stikov ni bilo mogoče naložiti. Poskusite znova.",
+          "close": "Zapri"
+        }
       }
     },
     "nav": {

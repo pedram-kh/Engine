@@ -19,6 +19,8 @@ import type {
   MessageAttachmentCompleteEnvelope,
   MessageAttachmentInitEnvelope,
   MessageAttachmentInitPayload,
+  MessageableAgenciesEnvelope,
+  MessageableCreatorsEnvelope,
   MessageMarkReadEnvelope,
   RelationshipMessageEnvelope,
   RelationshipMessageFeedEnvelope,
@@ -87,5 +89,37 @@ export const relationshipMessagingApi = {
   /** GET /creators/me/relationship-threads — the creator conversations inbox. */
   creatorInbox(): Promise<CreatorRelationshipInboxEnvelope> {
     return http.get<CreatorRelationshipInboxEnvelope>('/creators/me/relationship-threads')
+  },
+
+  /**
+   * GET /agencies/{agency}/messageable-creators — the agency contact picker
+   * (AH-012). Gate-filtered, paginated, optional name search (D6).
+   */
+  messageableCreators(
+    agencyId: string,
+    params: { search?: string; page?: number; perPage?: number } = {},
+  ): Promise<MessageableCreatorsEnvelope> {
+    const query = new URLSearchParams()
+    if (params.search !== undefined && params.search !== '') {
+      query.set('search', params.search)
+    }
+    if (params.page !== undefined) {
+      query.set('page', String(params.page))
+    }
+    if (params.perPage !== undefined) {
+      query.set('per_page', String(params.perPage))
+    }
+    const qs = query.toString()
+    return http.get<MessageableCreatorsEnvelope>(
+      `/agencies/${agencyId}/messageable-creators${qs === '' ? '' : `?${qs}`}`,
+    )
+  },
+
+  /**
+   * GET /creators/me/messageable-agencies — the creator contact picker
+   * (AH-012). Gate-filtered, small + unpaginated (D6).
+   */
+  messageableAgencies(): Promise<MessageableAgenciesEnvelope> {
+    return http.get<MessageableAgenciesEnvelope>('/creators/me/messageable-agencies')
   },
 }

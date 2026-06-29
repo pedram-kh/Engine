@@ -63,7 +63,19 @@
         "linkName": "Etiqueta (opcional)",
         "linkInvalid": "Introduza um link http ou https válido.",
         "linksHeading": "Links",
-        "remove": "Remover"
+        "remove": "Remover",
+        "newConversation": "Nova conversa",
+        "startConversation": "Iniciar uma conversa",
+        "picker": {
+          "titleCreators": "Nova conversa",
+          "titleAgencies": "Nova conversa",
+          "searchPlaceholder": "Pesquisar criadores",
+          "emptyCreators": "Ainda não há criadores para enviar mensagem.",
+          "emptyAgencies": "Ainda não há agências para enviar mensagem.",
+          "loadMore": "Carregar mais",
+          "loadError": "Não foi possível carregar os seus contactos. Tente novamente.",
+          "close": "Fechar"
+        }
       }
     },
     "nav": {

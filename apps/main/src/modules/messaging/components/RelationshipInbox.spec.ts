@@ -78,6 +78,16 @@ describe('RelationshipInbox', () => {
     wrapper.unmount()
   })
 
+  it('emits `start` from the empty-state CTA (AH-012 D8 — no longer a dead end)', async () => {
+    const wrapper = await mountInbox({ items: [] })
+    const cta = wrapper.find('[data-test="relationship-inbox-start"]')
+    expect(cta.exists()).toBe(true)
+    expect(cta.text()).toContain('Start a conversation')
+    await cta.trigger('click')
+    expect(wrapper.emitted('start')).toHaveLength(1)
+    wrapper.unmount()
+  })
+
   it('renders the load-error alert', async () => {
     const wrapper = await mountInbox({ items: [], loadError: true })
     expect(wrapper.text()).toContain("We couldn't load your conversations.")

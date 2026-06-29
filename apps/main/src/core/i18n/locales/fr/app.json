@@ -63,7 +63,19 @@
         "linkName": "Libellé (facultatif)",
         "linkInvalid": "Saisissez un lien http ou https valide.",
         "linksHeading": "Liens",
-        "remove": "Supprimer"
+        "remove": "Supprimer",
+        "newConversation": "Nouvelle conversation",
+        "startConversation": "Démarrer une conversation",
+        "picker": {
+          "titleCreators": "Nouvelle conversation",
+          "titleAgencies": "Nouvelle conversation",
+          "searchPlaceholder": "Rechercher des créateurs",
+          "emptyCreators": "Aucun créateur à contacter pour le moment.",
+          "emptyAgencies": "Aucune agence à contacter pour le moment.",
+          "loadMore": "Charger plus",
+          "loadError": "Impossible de charger vos contacts. Veuillez réessayer.",
+          "close": "Fermer"
+        }
       }
     },
     "nav": {

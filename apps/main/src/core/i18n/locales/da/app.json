@@ -63,7 +63,19 @@
         "linkName": "Etiket (valgfrit)",
         "linkInvalid": "Indtast et gyldigt http- eller https-link.",
         "linksHeading": "Links",
-        "remove": "Fjern"
+        "remove": "Fjern",
+        "newConversation": "Ny samtale",
+        "startConversation": "Start en samtale",
+        "picker": {
+          "titleCreators": "Ny samtale",
+          "titleAgencies": "Ny samtale",
+          "searchPlaceholder": "Søg efter creators",
+          "emptyCreators": "Ingen creators at skrive til endnu.",
+          "emptyAgencies": "Ingen bureauer at skrive til endnu.",
+          "loadMore": "Indlæs flere",
+          "loadError": "Vi kunne ikke indlæse dine kontakter. Prøv igen.",
+          "close": "Luk"
+        }
       }
     },
     "nav": {

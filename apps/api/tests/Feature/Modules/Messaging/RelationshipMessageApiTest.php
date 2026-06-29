@@ -14,6 +14,7 @@ use App\Modules\Messaging\Models\RelationshipMessage;
 use App\Modules\Messaging\Models\RelationshipThread;
 use App\Modules\Notifications\Models\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -289,4 +290,117 @@ it('mark-read resolves the unread count for the viewer', function (): void {
 
     $this->actingAs($creatorUser)->getJson(creatorRelUrl($agency))
         ->assertJsonPath('meta.thread.unread_count', 0);
+});
+
+// ── Provisioning is lazy on first send / first attachment-upload (AH-012 D1) ─
+// Opening a conversation must NOT persist a thread row; the row materializes
+// only when a message is sent (or an attachment is uploaded — intent). These
+// pin the corrected behavior the old "lazy on first send" docblocks claimed but
+// the code did not honor (it provisioned on read).
+
+it('a gate-passing agency GET with no prior thread does NOT persist a row (transient feed)', function (): void {
+    ['agency' => $agency, 'creator' => $creator, 'admin' => $admin] = relationshipSetup();
+
+    $this->actingAs($admin)->getJson(agencyRelUrl($agency, $creator))
+        ->assertOk()
+        ->assertJsonCount(0, 'data')
+        ->assertJsonPath('meta.has_more', false)
+        ->assertJsonPath('meta.thread.unread_count', 0)
+        ->assertJsonPath('meta.thread.last_message_at', null);
+
+    expect(RelationshipThread::withoutGlobalScopes()->count())->toBe(0);
+});
+
+it('a gate-passing creator GET with no prior thread does NOT persist a row (transient feed)', function (): void {
+    ['agency' => $agency, 'creatorUser' => $creatorUser] = relationshipSetup();
+
+    $this->actingAs($creatorUser)->getJson(creatorRelUrl($agency))
+        ->assertOk()
+        ->assertJsonCount(0, 'data')
+        ->assertJsonPath('meta.has_more', false)
+        ->assertJsonPath('meta.thread.unread_count', 0)
+        ->assertJsonPath('meta.thread.last_message_at', null);
+
+    expect(RelationshipThread::withoutGlobalScopes()->count())->toBe(0);
+});
+
+it('mark-read on a not-yet-existing thread does NOT persist a row', function (): void {
+    ['agency' => $agency, 'creatorUser' => $creatorUser] = relationshipSetup();
+
+    $this->actingAs($creatorUser)->postJson(creatorRelUrl($agency, '/read'))
+        ->assertOk()
+        ->assertJsonPath('meta.unread_count', 0);
+
+    expect(RelationshipThread::withoutGlobalScopes()->count())->toBe(0);
+});
+
+it('open-then-send provisions exactly one thread (the row materializes on send)', function (): void {
+    ['agency' => $agency, 'creator' => $creator, 'admin' => $admin] = relationshipSetup();
+
+    // Open (no row yet).
+    $this->actingAs($admin)->getJson(agencyRelUrl($agency, $creator))->assertOk();
+    expect(RelationshipThread::withoutGlobalScopes()->count())->toBe(0);
+
+    // Send (row materializes).
+    $this->actingAs($admin)->postJson(agencyRelUrl($agency, $creator), ['body' => 'now we begin'])->assertCreated();
+    expect(RelationshipThread::withoutGlobalScopes()->count())->toBe(1);
+});
+
+it('an attachment-upload provisions the thread (intent), even before the send lands', function (): void {
+    Storage::fake('media');
+    ['agency' => $agency, 'creator' => $creator, 'admin' => $admin] = relationshipSetup();
+
+    // No thread on open…
+    $this->actingAs($admin)->getJson(agencyRelUrl($agency, $creator))->assertOk();
+    expect(RelationshipThread::withoutGlobalScopes()->count())->toBe(0);
+
+    // …but uploading an attachment is intent → provisions (Q1).
+    $this->actingAs($admin)
+        ->postJson(agencyRelUrl($agency, $creator, '/attachments/init'), ['mime_type' => 'application/pdf', 'size_bytes' => 1024])
+        ->assertOk();
+
+    expect(RelationshipThread::withoutGlobalScopes()->count())->toBe(1);
+});
+
+// ── Inbox shows only threads with ≥1 message (AH-012 D2) ─────────────────────
+
+it('the agency inbox HIDES a provisioned-but-empty thread (no ghosts)', function (): void {
+    Storage::fake('media');
+    ['agency' => $agency, 'creator' => $creator, 'admin' => $admin] = relationshipSetup();
+
+    // Provision an empty thread via an attachment-upload (no message sent).
+    $this->actingAs($admin)
+        ->postJson(agencyRelUrl($agency, $creator, '/attachments/init'), ['mime_type' => 'application/pdf', 'size_bytes' => 1024])
+        ->assertOk();
+    expect(RelationshipThread::withoutGlobalScopes()->count())->toBe(1);
+
+    // The empty thread is invisible in the inbox until a message exists.
+    $this->actingAs($admin)->getJson("/api/v1/agencies/{$agency->ulid}/relationship-threads")
+        ->assertOk()
+        ->assertJsonCount(0, 'data');
+
+    // After a send, it appears.
+    $this->actingAs($admin)->postJson(agencyRelUrl($agency, $creator), ['body' => 'hello'])->assertCreated();
+    $this->actingAs($admin)->getJson("/api/v1/agencies/{$agency->ulid}/relationship-threads")
+        ->assertOk()
+        ->assertJsonCount(1, 'data');
+});
+
+it('the creator inbox HIDES a provisioned-but-empty thread (no ghosts)', function (): void {
+    Storage::fake('media');
+    ['agency' => $agency, 'creator' => $creator, 'creatorUser' => $creatorUser, 'admin' => $admin] = relationshipSetup();
+
+    // Provision empty via the agency attachment-upload path.
+    $this->actingAs($admin)
+        ->postJson(agencyRelUrl($agency, $creator, '/attachments/init'), ['mime_type' => 'application/pdf', 'size_bytes' => 1024])
+        ->assertOk();
+
+    $this->actingAs($creatorUser)->getJson('/api/v1/creators/me/relationship-threads')
+        ->assertOk()
+        ->assertJsonCount(0, 'data');
+
+    $this->actingAs($admin)->postJson(agencyRelUrl($agency, $creator), ['body' => 'hi'])->assertCreated();
+    $this->actingAs($creatorUser)->getJson('/api/v1/creators/me/relationship-threads')
+        ->assertOk()
+        ->assertJsonCount(1, 'data');
 });

@@ -63,7 +63,19 @@
         "linkName": "Popisek (volitelné)",
         "linkInvalid": "Zadejte platný odkaz http nebo https.",
         "linksHeading": "Odkazy",
-        "remove": "Odebrat"
+        "remove": "Odebrat",
+        "newConversation": "Nová konverzace",
+        "startConversation": "Začít konverzaci",
+        "picker": {
+          "titleCreators": "Nová konverzace",
+          "titleAgencies": "Nová konverzace",
+          "searchPlaceholder": "Hledat tvůrce",
+          "emptyCreators": "Zatím žádní tvůrci k napsání zprávy.",
+          "emptyAgencies": "Zatím žádné agentury k napsání zprávy.",
+          "loadMore": "Načíst další",
+          "loadError": "Nepodařilo se načíst vaše kontakty. Zkuste to prosím znovu.",
+          "close": "Zavřít"
+        }
       }
     },
     "nav": {

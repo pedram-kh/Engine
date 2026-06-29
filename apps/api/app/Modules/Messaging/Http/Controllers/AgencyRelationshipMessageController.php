@@ -58,6 +58,9 @@ final class AgencyRelationshipMessageController
         $viewer = $request->user();
 
         $threads = RelationshipThread::query()
+            // Only conversations that actually have a message (AH-012 D2) — no
+            // empty ghosts, even if a transient/attachment row ever slips in.
+            ->has('messages')
             ->with(['creator:id,ulid,display_name', 'latestMessage'])
             ->orderByDesc('last_message_at')
             ->orderByDesc('id')
@@ -155,7 +158,10 @@ final class AgencyRelationshipMessageController
      * Resolve the thread for a READ. An EXISTING thread is readable by any
      * active member (D6 — history stays readable). With no thread yet, opening
      * one requires the current send gate (you cannot start a conversation with
-     * someone you may not message).
+     * someone you may not message) — but opening alone does NOT persist a row
+     * (AH-012 D1): we return a TRANSIENT thread, and the row materializes only
+     * on the first send / attachment-upload. The service tolerates the
+     * unsaved thread (empty feed, zero unread).
      */
     private function resolveThreadForRead(Agency $agency, Creator $creator): RelationshipThread
     {
@@ -169,7 +175,7 @@ final class AgencyRelationshipMessageController
 
         Gate::authorize('canMessageRelationship', [$creator, $agency]);
 
-        return $this->messages->provisionForPair($agency, $creator);
+        return $this->messages->transientThread($agency, $creator);
     }
 
     private function resolveBeforeCursor(Request $request, RelationshipThread $thread): ?int

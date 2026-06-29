@@ -14,7 +14,10 @@ use App\Modules\Audit\Contracts\Auditable;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
+use App\Modules\Creators\Policies\CreatorPolicy;
 use App\Modules\Identity\Models\User;
+use App\Modules\Messaging\Services\MessageableContactsFinder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -126,6 +129,32 @@ final class AgencyCreatorRelation extends Model implements Auditable
     public function blacklistedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'blacklisted_by_user_id');
+    }
+
+    /**
+     * AH-012 (D3) — the RELATION leg of the messaging gate, as a query scope so
+     * the single-pair {@see CreatorPolicy::relationPermitsMessaging()}
+     * and the set-valued {@see MessageableContactsFinder}
+     * share ONE source of truth and cannot drift: a `roster` relation that is
+     * non-blacklisted (NULL counts as not-blacklisted, the AH-005 convention).
+     *
+     * This scope is the relation leg ONLY — the creator-`approved` leg lives at
+     * each call site (it is a `creators`-table fact, not a relation column). The
+     * agreement test pins the two forms together; the break-revert is: drop the
+     * roster constraint here → a non-roster relation leaks into the set the
+     * single-pair gate still rejects → the agreement test fails → revert.
+     *
+     * @param  Builder<AgencyCreatorRelation>  $query
+     * @return Builder<AgencyCreatorRelation>
+     */
+    public function scopePermitsMessaging(Builder $query): Builder
+    {
+        return $query
+            ->where('relationship_status', RelationshipStatus::Roster->value)
+            ->where(function (Builder $inner): void {
+                $inner->where('is_blacklisted', false)
+                    ->orWhereNull('is_blacklisted');
+            });
     }
 
     public function isProspect(): bool

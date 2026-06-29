@@ -63,7 +63,19 @@
         "linkName": "Etikett (valfritt)",
         "linkInvalid": "Ange en giltig http- eller https-länk.",
         "linksHeading": "Länkar",
-        "remove": "Ta bort"
+        "remove": "Ta bort",
+        "newConversation": "Ny konversation",
+        "startConversation": "Starta en konversation",
+        "picker": {
+          "titleCreators": "Ny konversation",
+          "titleAgencies": "Ny konversation",
+          "searchPlaceholder": "Sök creators",
+          "emptyCreators": "Inga creators att meddela ännu.",
+          "emptyAgencies": "Inga byråer att meddela ännu.",
+          "loadMore": "Ladda fler",
+          "loadError": "Vi kunde inte ladda dina kontakter. Försök igen.",
+          "close": "Stäng"
+        }
       }
     },
     "nav": {

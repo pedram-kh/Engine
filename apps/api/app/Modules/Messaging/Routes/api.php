@@ -6,6 +6,7 @@ use App\Modules\Messaging\Http\Controllers\AgencyMessageController;
 use App\Modules\Messaging\Http\Controllers\AgencyRelationshipMessageController;
 use App\Modules\Messaging\Http\Controllers\CreatorMessageController;
 use App\Modules\Messaging\Http\Controllers\CreatorRelationshipMessageController;
+use App\Modules\Messaging\Http\Controllers\MessageableContactsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -80,6 +81,10 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
     ->group(function (): void {
         Route::get('relationship-threads', [AgencyRelationshipMessageController::class, 'inbox'])
             ->name('inbox');
+        // AH-012 — the gate-filtered creator contact picker (new-conversation
+        // flow). Paginated + name-searched; lists only messageable creators.
+        Route::get('messageable-creators', [MessageableContactsController::class, 'creators'])
+            ->name('messageable-creators');
         Route::get('creators/{creator}/relationship-messages', [AgencyRelationshipMessageController::class, 'index'])
             ->name('messages.index');
         Route::post('creators/{creator}/relationship-messages', [AgencyRelationshipMessageController::class, 'store'])
@@ -90,6 +95,18 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
             ->name('messages.attachments.init');
         Route::post('creators/{creator}/relationship-messages/attachments/complete', [AgencyRelationshipMessageController::class, 'attachmentComplete'])
             ->name('messages.attachments.complete');
+    });
+
+// AH-012 — the gate-filtered agency contact picker (creator side of the
+// new-conversation flow). Keeps the `creators/me/*` prefix (mirroring
+// connection-requests); the controller class lives in Messaging (Q2). Small,
+// unpaginated list of messageable agencies.
+Route::prefix('creators/me')
+    ->name('creators.me.messaging.')
+    ->middleware(['auth:web', 'tenancy.set', 'verified'])
+    ->group(function (): void {
+        Route::get('messageable-agencies', [MessageableContactsController::class, 'agencies'])
+            ->name('messageable-agencies');
     });
 
 Route::prefix('creators/me/relationship-threads')

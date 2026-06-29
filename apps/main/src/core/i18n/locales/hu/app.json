@@ -63,7 +63,19 @@
         "linkName": "Címke (nem kötelező)",
         "linkInvalid": "Adjon meg egy érvényes http vagy https hivatkozást.",
         "linksHeading": "Hivatkozások",
-        "remove": "Eltávolítás"
+        "remove": "Eltávolítás",
+        "newConversation": "Új beszélgetés",
+        "startConversation": "Beszélgetés indítása",
+        "picker": {
+          "titleCreators": "Új beszélgetés",
+          "titleAgencies": "Új beszélgetés",
+          "searchPlaceholder": "Alkotók keresése",
+          "emptyCreators": "Még nincs üzenetküldéshez elérhető alkotó.",
+          "emptyAgencies": "Még nincs üzenetküldéshez elérhető ügynökség.",
+          "loadMore": "Több betöltése",
+          "loadError": "Nem sikerült betölteni a névjegyeket. Próbáld újra.",
+          "close": "Bezárás"
+        }
       }
     },
     "nav": {

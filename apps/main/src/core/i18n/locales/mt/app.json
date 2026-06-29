@@ -63,7 +63,19 @@
         "linkName": "Tikketta (mhux obbligatorju)",
         "linkInvalid": "Daħħal link http jew https validu.",
         "linksHeading": "Links",
-        "remove": "Neħħi"
+        "remove": "Neħħi",
+        "newConversation": "Konversazzjoni ġdida",
+        "startConversation": "Ibda konversazzjoni",
+        "picker": {
+          "titleCreators": "Konversazzjoni ġdida",
+          "titleAgencies": "Konversazzjoni ġdida",
+          "searchPlaceholder": "Fittex creators",
+          "emptyCreators": "Għad m'hemm l-ebda creators biex tibgħat messaġġ.",
+          "emptyAgencies": "Għad m'hemm l-ebda aġenziji biex tibgħat messaġġ.",
+          "loadMore": "Itgħabba aktar",
+          "loadError": "Ma stajniex intellgħu l-kuntatti tiegħek. Jekk jogħġbok erġa' pprova.",
+          "close": "Agħlaq"
+        }
       }
     },
     "nav": {

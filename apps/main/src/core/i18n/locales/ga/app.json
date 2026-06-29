@@ -63,7 +63,19 @@
         "linkName": "Lipéad (roghnach)",
         "linkInvalid": "Cuir isteach nasc http nó https bailí.",
         "linksHeading": "Naisc",
-        "remove": "Bain"
+        "remove": "Bain",
+        "newConversation": "Comhrá nua",
+        "startConversation": "Tosaigh comhrá",
+        "picker": {
+          "titleCreators": "Comhrá nua",
+          "titleAgencies": "Comhrá nua",
+          "searchPlaceholder": "Cuardaigh cruthaitheoirí",
+          "emptyCreators": "Níl aon chruthaitheoirí le teachtaireacht a sheoladh fós.",
+          "emptyAgencies": "Níl aon ghníomhaireachtaí le teachtaireacht a sheoladh fós.",
+          "loadMore": "Lódáil tuilleadh",
+          "loadError": "Níorbh fhéidir do theagmhálaithe a lódáil. Bain triail eile as.",
+          "close": "Dún"
+        }
       }
     },
     "nav": {

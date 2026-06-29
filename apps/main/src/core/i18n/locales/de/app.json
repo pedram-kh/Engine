@@ -63,7 +63,19 @@
         "linkName": "Bezeichnung (optional)",
         "linkInvalid": "Geben Sie einen gültigen http- oder https-Link ein.",
         "linksHeading": "Links",
-        "remove": "Entfernen"
+        "remove": "Entfernen",
+        "newConversation": "Neue Unterhaltung",
+        "startConversation": "Unterhaltung beginnen",
+        "picker": {
+          "titleCreators": "Neue Unterhaltung",
+          "titleAgencies": "Neue Unterhaltung",
+          "searchPlaceholder": "Creator suchen",
+          "emptyCreators": "Noch keine Creator zum Anschreiben.",
+          "emptyAgencies": "Noch keine Agenturen zum Anschreiben.",
+          "loadMore": "Mehr laden",
+          "loadError": "Wir konnten deine Kontakte nicht laden. Bitte versuche es erneut.",
+          "close": "Schließen"
+        }
       }
     },
     "nav": {

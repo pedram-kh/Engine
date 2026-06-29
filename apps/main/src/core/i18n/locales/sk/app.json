@@ -63,7 +63,19 @@
         "linkName": "Štítok (voliteľné)",
         "linkInvalid": "Zadajte platný odkaz http alebo https.",
         "linksHeading": "Odkazy",
-        "remove": "Odstrániť"
+        "remove": "Odstrániť",
+        "newConversation": "Nová konverzácia",
+        "startConversation": "Začať konverzáciu",
+        "picker": {
+          "titleCreators": "Nová konverzácia",
+          "titleAgencies": "Nová konverzácia",
+          "searchPlaceholder": "Hľadať tvorcov",
+          "emptyCreators": "Zatiaľ žiadni tvorcovia na napísanie správy.",
+          "emptyAgencies": "Zatiaľ žiadne agentúry na napísanie správy.",
+          "loadMore": "Načítať viac",
+          "loadError": "Nepodarilo sa načítať vaše kontakty. Skúste to znova.",
+          "close": "Zavrieť"
+        }
       }
     },
     "nav": {

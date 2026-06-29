@@ -63,7 +63,19 @@
         "linkName": "Label (optional)",
         "linkInvalid": "Enter a valid http or https link.",
         "linksHeading": "Links",
-        "remove": "Remove"
+        "remove": "Remove",
+        "newConversation": "New conversation",
+        "startConversation": "Start a conversation",
+        "picker": {
+          "titleCreators": "New conversation",
+          "titleAgencies": "New conversation",
+          "searchPlaceholder": "Search creators",
+          "emptyCreators": "No creators to message yet.",
+          "emptyAgencies": "No agencies to message yet.",
+          "loadMore": "Load more",
+          "loadError": "We couldn't load your contacts. Please try again.",
+          "close": "Close"
+        }
       }
     },
     "nav": {

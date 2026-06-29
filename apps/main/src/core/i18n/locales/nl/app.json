@@ -63,7 +63,19 @@
         "linkName": "Label (optioneel)",
         "linkInvalid": "Voer een geldige http- of https-link in.",
         "linksHeading": "Links",
-        "remove": "Verwijderen"
+        "remove": "Verwijderen",
+        "newConversation": "Nieuw gesprek",
+        "startConversation": "Een gesprek starten",
+        "picker": {
+          "titleCreators": "Nieuw gesprek",
+          "titleAgencies": "Nieuw gesprek",
+          "searchPlaceholder": "Zoek creators",
+          "emptyCreators": "Nog geen creators om een bericht te sturen.",
+          "emptyAgencies": "Nog geen bureaus om een bericht te sturen.",
+          "loadMore": "Meer laden",
+          "loadError": "We konden je contacten niet laden. Probeer het opnieuw.",
+          "close": "Sluiten"
+        }
       }
     },
     "nav": {

@@ -63,7 +63,19 @@
         "linkName": "Oznaka (neobavezno)",
         "linkInvalid": "Unesite valjanu http ili https poveznicu.",
         "linksHeading": "Poveznice",
-        "remove": "Ukloni"
+        "remove": "Ukloni",
+        "newConversation": "Novi razgovor",
+        "startConversation": "Započni razgovor",
+        "picker": {
+          "titleCreators": "Novi razgovor",
+          "titleAgencies": "Novi razgovor",
+          "searchPlaceholder": "Pretraži kreatore",
+          "emptyCreators": "Još nema kreatora za poruku.",
+          "emptyAgencies": "Još nema agencija za poruku.",
+          "loadMore": "Učitaj više",
+          "loadError": "Nismo mogli učitati vaše kontakte. Pokušajte ponovno.",
+          "close": "Zatvori"
+        }
       }
     },
     "nav": {

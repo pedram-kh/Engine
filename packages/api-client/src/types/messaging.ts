@@ -179,7 +179,12 @@ export interface RelationshipMessageResource {
 }
 
 export interface RelationshipThreadMeta {
-  id: string
+  /**
+   * The thread ULID, or `null` for a TRANSIENT thread (AH-012 D1) — a
+   * gate-passing conversation opened but not yet provisioned (no message sent).
+   * The row materializes on the first send / attachment-upload.
+   */
+  id: string | null
   last_message_at: string | null
   unread_count: number
 }
@@ -238,4 +243,47 @@ export interface AgencyRelationshipInboxEnvelope {
 
 export interface CreatorRelationshipInboxEnvelope {
   data: CreatorRelationshipThreadRow[]
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AH-012 — gate-filtered contact pickers (new-conversation flow)
+//
+// The set-valued half of the messaging gate: contacts the picker may open a
+// conversation with. Only messageable contacts appear (roster + approved +
+// non-blacklisted), so picking one can never 403 on the subsequent send.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** A creator the agency may message (agency-side picker row). */
+export interface MessageableCreatorRow {
+  id: string
+  type: 'messageable_creator'
+  attributes: {
+    display_name: string | null
+  }
+}
+
+/** Paginated envelope for the agency picker (D6: rosters can be large). */
+export interface MessageableCreatorsEnvelope {
+  data: MessageableCreatorRow[]
+  meta: {
+    total: number
+    page: number
+    per_page: number
+    last_page: number
+  }
+}
+
+/** An agency the creator may message (creator-side picker row). */
+export interface MessageableAgencyRow {
+  id: string
+  type: 'messageable_agency'
+  attributes: {
+    name: string | null
+    logo_path: string | null
+  }
+}
+
+/** Unpaginated envelope for the creator picker (small list, D6). */
+export interface MessageableAgenciesEnvelope {
+  data: MessageableAgencyRow[]
 }

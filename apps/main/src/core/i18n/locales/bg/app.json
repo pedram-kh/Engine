@@ -63,7 +63,19 @@
         "linkName": "Етикет (по избор)",
         "linkInvalid": "Въведете валидна http или https връзка.",
         "linksHeading": "Връзки",
-        "remove": "Премахни"
+        "remove": "Премахни",
+        "newConversation": "Нов разговор",
+        "startConversation": "Започнете разговор",
+        "picker": {
+          "titleCreators": "Нов разговор",
+          "titleAgencies": "Нов разговор",
+          "searchPlaceholder": "Търсене на създатели",
+          "emptyCreators": "Все още няма създатели за съобщения.",
+          "emptyAgencies": "Все още няма агенции за съобщения.",
+          "loadMore": "Зареди още",
+          "loadError": "Не успяхме да заредим контактите ви. Моля, опитайте отново.",
+          "close": "Затвори"
+        }
       }
     },
     "nav": {

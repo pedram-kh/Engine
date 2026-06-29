@@ -70,6 +70,24 @@ final class RelationshipMessageService
     }
 
     /**
+     * AH-012 (D1) — an UNSAVED thread for the pair, used when a gate-passing
+     * READ lands on a not-yet-provisioned conversation. Opening alone must NOT
+     * persist a row (the corrected "lazy on first send / first attachment-upload"
+     * rule): the read surfaces resolve this transient thread instead of
+     * provisioning, and {@see self::pageForThread()} / {@see self::threadMeta()} /
+     * {@see self::markThreadReadForUser()} all short-circuit on `! exists`. The
+     * row materializes only when {@see self::sendHumanMessage()} (via
+     * {@see self::provisionForPair()} at the controller) actually writes.
+     */
+    public function transientThread(Agency $agency, Creator $creator): RelationshipThread
+    {
+        return new RelationshipThread([
+            'agency_id' => $agency->id,
+            'creator_id' => $creator->id,
+        ]);
+    }
+
+    /**
      * Send a human message (text or attachment-only). NOT terminal-guarded — the
      * send-time permission check lives in the controller (the messaging gate,
      * D6). Stamps the thread's `last_message_at` and emits the counterparty
@@ -118,6 +136,13 @@ final class RelationshipMessageService
      */
     public function pageForThread(RelationshipThread $thread, ?int $beforeId = null, int $perPage = self::DEFAULT_PAGE_SIZE): array
     {
+        // A transient (not-yet-provisioned) thread has no id and therefore no
+        // messages — return an empty page WITHOUT querying on a null thread_id
+        // (AH-012 D1; the freshly-opened-not-yet-sent conversation).
+        if (! $thread->exists) {
+            return ['messages' => Collection::make(), 'has_more' => false];
+        }
+
         $query = RelationshipMessage::query()
             ->where('thread_id', $thread->id)
             ->with(['sender:id,name', 'readReceipts:id,message_id,user_id'])
@@ -150,6 +175,12 @@ final class RelationshipMessageService
      */
     public function markThreadReadForUser(RelationshipThread $thread, User $user): int
     {
+        // Nothing to mark on a transient thread (AH-012 D1) — no row, no
+        // messages, no receipts.
+        if (! $thread->exists) {
+            return 0;
+        }
+
         $unreadIds = $this->unreadQuery($thread, $user)->pluck('relationship_messages.id');
 
         if ($unreadIds->isEmpty()) {
@@ -172,6 +203,12 @@ final class RelationshipMessageService
 
     public function unreadCountForUser(RelationshipThread $thread, User $user): int
     {
+        // A transient thread (AH-012 D1) has no id — short-circuit to 0 rather
+        // than counting on a null thread_id.
+        if (! $thread->exists) {
+            return 0;
+        }
+
         return $this->unreadQuery($thread, $user)->count();
     }
 

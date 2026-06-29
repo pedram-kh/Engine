@@ -9,7 +9,6 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Creators\Enums\ApplicationStatus;
-use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
@@ -202,15 +201,16 @@ final class CreatorPolicy
             return false;
         }
 
+        // AH-012 (D3): the relation leg is now sourced from the shared
+        // `permitsMessaging` scope so this single-pair gate and the set-valued
+        // MessageableContactsFinder cannot drift. Semantics are unchanged — the
+        // CreatorPolicyTest messaging suite stays green-unchanged (the
+        // preservation proof).
         return AgencyCreatorRelation::query()
             ->withoutGlobalScope(BelongsToAgencyScope::class)
             ->where('creator_id', $creator->id)
             ->where('agency_id', $agency->id)
-            ->where('relationship_status', RelationshipStatus::Roster->value)
-            ->where(function ($query): void {
-                $query->where('is_blacklisted', false)
-                    ->orWhereNull('is_blacklisted');
-            })
+            ->permitsMessaging()
             ->exists();
     }
 

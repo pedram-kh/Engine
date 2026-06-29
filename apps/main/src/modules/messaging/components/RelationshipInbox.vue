@@ -31,6 +31,16 @@ defineProps<{
   loadError: boolean
 }>()
 
+/**
+ * AH-012 (D8) — the empty state is no longer a dead end: it offers a
+ * "Start a conversation" CTA. The action is INJECTED (the picker source differs
+ * per side — creator → agencies, agency → creators), so the shared component
+ * emits `start` and the parent opens its own picker rather than hardcoding one.
+ */
+const emit = defineEmits<{
+  start: []
+}>()
+
 const { t, locale } = useI18n()
 
 const dateFormatter = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'short' }))
@@ -52,9 +62,22 @@ function formatStamp(iso: string | null): string {
       {{ t('app.messaging.relationship.inboxLoadError') }}
     </v-alert>
 
-    <p v-else-if="items.length === 0" class="rel-inbox__empty" data-test="relationship-inbox-empty">
-      {{ t('app.messaging.relationship.inboxEmpty') }}
-    </p>
+    <div
+      v-else-if="items.length === 0"
+      class="rel-inbox__empty"
+      data-test="relationship-inbox-empty"
+    >
+      <p class="rel-inbox__empty-text">{{ t('app.messaging.relationship.inboxEmpty') }}</p>
+      <v-btn
+        color="primary"
+        variant="tonal"
+        prepend-icon="mdi-message-plus-outline"
+        data-test="relationship-inbox-start"
+        @click="emit('start')"
+      >
+        {{ t('app.messaging.relationship.startConversation') }}
+      </v-btn>
+    </div>
 
     <v-list v-else lines="two" data-test="relationship-inbox-list">
       <v-list-item
@@ -96,9 +119,17 @@ function formatStamp(iso: string | null): string {
 
 <style scoped>
 .rel-inbox__empty {
-  opacity: 0.6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   text-align: center;
   padding: 32px 0;
+}
+
+.rel-inbox__empty-text {
+  opacity: 0.6;
+  margin: 0;
 }
 
 .rel-inbox__meta {

@@ -63,7 +63,19 @@
         "linkName": "Etiketė (nebūtina)",
         "linkInvalid": "Įveskite galiojančią http arba https nuorodą.",
         "linksHeading": "Nuorodos",
-        "remove": "Pašalinti"
+        "remove": "Pašalinti",
+        "newConversation": "Naujas pokalbis",
+        "startConversation": "Pradėti pokalbį",
+        "picker": {
+          "titleCreators": "Naujas pokalbis",
+          "titleAgencies": "Naujas pokalbis",
+          "searchPlaceholder": "Ieškoti kūrėjų",
+          "emptyCreators": "Kol kas nėra kūrėjų, kuriems galima rašyti.",
+          "emptyAgencies": "Kol kas nėra agentūrų, kurioms galima rašyti.",
+          "loadMore": "Įkelti daugiau",
+          "loadError": "Nepavyko įkelti jūsų kontaktų. Bandykite dar kartą.",
+          "close": "Uždaryti"
+        }
       }
     },
     "nav": {

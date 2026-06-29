@@ -63,7 +63,19 @@
         "linkName": "Nimike (valinnainen)",
         "linkInvalid": "Anna kelvollinen http- tai https-linkki.",
         "linksHeading": "Linkit",
-        "remove": "Poista"
+        "remove": "Poista",
+        "newConversation": "Uusi keskustelu",
+        "startConversation": "Aloita keskustelu",
+        "picker": {
+          "titleCreators": "Uusi keskustelu",
+          "titleAgencies": "Uusi keskustelu",
+          "searchPlaceholder": "Hae sisällöntuottajia",
+          "emptyCreators": "Ei vielä sisällöntuottajia, joille viestiä.",
+          "emptyAgencies": "Ei vielä toimistoja, joille viestiä.",
+          "loadMore": "Lataa lisää",
+          "loadError": "Yhteystietojesi lataaminen epäonnistui. Yritä uudelleen.",
+          "close": "Sulje"
+        }
       }
     },
     "nav": {

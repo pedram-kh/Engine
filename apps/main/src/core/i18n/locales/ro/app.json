@@ -63,7 +63,19 @@
         "linkName": "Etichetă (opțional)",
         "linkInvalid": "Introdu un link http sau https valid.",
         "linksHeading": "Linkuri",
-        "remove": "Elimină"
+        "remove": "Elimină",
+        "newConversation": "Conversație nouă",
+        "startConversation": "Începe o conversație",
+        "picker": {
+          "titleCreators": "Conversație nouă",
+          "titleAgencies": "Conversație nouă",
+          "searchPlaceholder": "Caută creatori",
+          "emptyCreators": "Încă niciun creator căruia să-i scrii.",
+          "emptyAgencies": "Încă nicio agenție căreia să-i scrii.",
+          "loadMore": "Încarcă mai multe",
+          "loadError": "Nu am putut încărca contactele. Încearcă din nou.",
+          "close": "Închide"
+        }
       }
     },
     "nav": {

@@ -63,7 +63,19 @@
         "linkName": "Silt (valikuline)",
         "linkInvalid": "Sisestage kehtiv http- või https-link.",
         "linksHeading": "Lingid",
-        "remove": "Eemalda"
+        "remove": "Eemalda",
+        "newConversation": "Uus vestlus",
+        "startConversation": "Alusta vestlust",
+        "picker": {
+          "titleCreators": "Uus vestlus",
+          "titleAgencies": "Uus vestlus",
+          "searchPlaceholder": "Otsi loojaid",
+          "emptyCreators": "Veel pole loojaid, kellele sõnumit saata.",
+          "emptyAgencies": "Veel pole agentuure, kellele sõnumit saata.",
+          "loadMore": "Laadi veel",
+          "loadError": "Kontaktide laadimine ebaõnnestus. Palun proovi uuesti.",
+          "close": "Sulge"
+        }
       }
     },
     "nav": {

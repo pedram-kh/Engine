@@ -62,6 +62,9 @@ final class CreatorRelationshipMessageController
         $threads = RelationshipThread::query()
             ->withoutGlobalScope(BelongsToAgencyScope::class)
             ->where('creator_id', $creator->id)
+            // Only conversations that actually have a message (AH-012 D2) — no
+            // empty ghosts, even if a transient/attachment row ever slips in.
+            ->has('messages')
             ->with(['agency:id,ulid,name,logo_path', 'latestMessage'])
             ->orderByDesc('last_message_at')
             ->orderByDesc('id')
@@ -164,7 +167,9 @@ final class CreatorRelationshipMessageController
     /**
      * Resolve (viewer, creator, thread) for a READ. An EXISTING owned thread is
      * always readable by its creator (D6). With no thread yet, opening one
-     * requires the current send gate.
+     * requires the current send gate — but opening alone does NOT persist a row
+     * (AH-012 D1): we return a TRANSIENT thread, and the row materializes only
+     * on the first send / attachment-upload.
      *
      * @return array{0: User, 1: Creator, 2: RelationshipThread}
      */
@@ -182,7 +187,7 @@ final class CreatorRelationshipMessageController
 
         if ($thread === null) {
             Gate::authorize('canMessageRelationship', [$creator, $agency]);
-            $thread = $this->messages->provisionForPair($agency, $creator);
+            $thread = $this->messages->transientThread($agency, $creator);
         }
 
         return [$viewer, $creator, $thread];

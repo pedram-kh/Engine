@@ -7,11 +7,12 @@
  * thread.
  */
 
-import type { CreatorRelationshipThreadRow } from '@catalyst/api-client'
+import type { CreatorRelationshipThreadRow, MessageableAgencyRow } from '@catalyst/api-client'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { relationshipMessagingApi } from '../api/relationshipMessaging.api'
+import ContactPicker, { type ContactPickerItem } from '../components/ContactPicker.vue'
 import RelationshipInbox, { type RelationshipInboxItem } from '../components/RelationshipInbox.vue'
 
 const { t } = useI18n()
@@ -87,6 +88,43 @@ async function tick(): Promise<void> {
   schedule()
 }
 
+// ── New-conversation contact picker (AH-012) ─────────────────────────────────
+const pickerOpen = ref(false)
+const pickerLoading = ref(false)
+const pickerError = ref(false)
+const agencies = ref<MessageableAgencyRow[]>([])
+
+const pickerItems = computed<ContactPickerItem[]>(() =>
+  agencies.value.map((row) => {
+    const name = row.attributes.name ?? t('app.messaging.participant')
+    return {
+      id: row.id,
+      title: name,
+      avatarText: name,
+      avatarUrl: httpAvatar(row.attributes.logo_path),
+      to: {
+        name: 'creator.messages.thread',
+        params: { agencyUlid: row.id },
+        query: { name },
+      },
+    }
+  }),
+)
+
+async function openPicker(): Promise<void> {
+  pickerOpen.value = true
+  pickerLoading.value = agencies.value.length === 0
+  pickerError.value = false
+  try {
+    const res = await relationshipMessagingApi.messageableAgencies()
+    agencies.value = [...res.data]
+  } catch {
+    pickerError.value = true
+  } finally {
+    pickerLoading.value = false
+  }
+}
+
 onMounted(() => {
   cancelled = false
   void load(true)
@@ -104,13 +142,38 @@ onBeforeUnmount(() => {
 
 <template>
   <section data-test="creator-messages-page">
-    <header class="mb-4">
-      <h1 class="text-h5 mb-1">{{ t('app.messaging.relationship.inboxTitle') }}</h1>
-      <p class="text-body-2 text-medium-emphasis ma-0">
-        {{ t('app.messaging.relationship.inboxSubtitle') }}
-      </p>
+    <header class="d-flex align-start justify-space-between ga-3 mb-4">
+      <div>
+        <h1 class="text-h5 mb-1">{{ t('app.messaging.relationship.inboxTitle') }}</h1>
+        <p class="text-body-2 text-medium-emphasis ma-0">
+          {{ t('app.messaging.relationship.inboxSubtitle') }}
+        </p>
+      </div>
+      <v-btn
+        color="primary"
+        variant="tonal"
+        prepend-icon="mdi-message-plus-outline"
+        data-test="creator-new-conversation"
+        @click="openPicker"
+      >
+        {{ t('app.messaging.relationship.newConversation') }}
+      </v-btn>
     </header>
 
-    <RelationshipInbox :items="items" :loading="loading" :load-error="loadError" />
+    <RelationshipInbox
+      :items="items"
+      :loading="loading"
+      :load-error="loadError"
+      @start="openPicker"
+    />
+
+    <ContactPicker
+      v-model="pickerOpen"
+      :title="t('app.messaging.relationship.picker.titleAgencies')"
+      :items="pickerItems"
+      :loading="pickerLoading"
+      :load-error="pickerError"
+      :empty-label="t('app.messaging.relationship.picker.emptyAgencies')"
+    />
   </section>
 </template>

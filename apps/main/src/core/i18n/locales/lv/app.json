@@ -63,7 +63,19 @@
         "linkName": "Etiķete (neobligāti)",
         "linkInvalid": "Ievadiet derīgu http vai https saiti.",
         "linksHeading": "Saites",
-        "remove": "Noņemt"
+        "remove": "Noņemt",
+        "newConversation": "Jauna saruna",
+        "startConversation": "Sākt sarunu",
+        "picker": {
+          "titleCreators": "Jauna saruna",
+          "titleAgencies": "Jauna saruna",
+          "searchPlaceholder": "Meklēt veidotājus",
+          "emptyCreators": "Pagaidām nav veidotāju, kuriem rakstīt.",
+          "emptyAgencies": "Pagaidām nav aģentūru, kurām rakstīt.",
+          "loadMore": "Ielādēt vairāk",
+          "loadError": "Neizdevās ielādēt jūsu kontaktus. Lūdzu, mēģiniet vēlreiz.",
+          "close": "Aizvērt"
+        }
       }
     },
     "nav": {
