@@ -49,9 +49,11 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID  | Title                                    | Status  | Notes                                                                |
-| --- | ---------------------------------------- | ------- | -------------------------------------------------------------------- |
-| —   | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass." |
+| ID      | Title                                          | Status   | Notes                                                                                                                                                                                                                  |
+| ------- | ---------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AH-010a | Relationship messaging — backend spine + gate  | Landed   | 1:1 connected agency↔creator. Mirrored spine + status-aware gate + file/link attachments (EXIF-strip) + 2 notification types. Committed `2656e5a` (feat) + docs; **push held** for AH-010b sequencing. See Change Log. |
+| AH-010b | Relationship messaging — WhatsApp-shaped inbox | Proposed | Net-new conversations inbox + thread on the existing 15s poll; reuses `ChatPanel`/`useMessageThread`. Creator nav item + agency roster-detail entry. Paired commit after AH-010a.                                      |
+| —       | Campaign Drafts tab — independent review       | Pending  | Merged in code; review file reads "pending independent review pass."                                                                                                                                                   |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -59,6 +61,55 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-010a · Relationship messaging — backend spine + gate + attachments + notifications
+
+- **Status:** Landed (push held for AH-010b sequencing)
+- **Date:** 2026-06-29
+- **Why:** A connected agency and an approved creator had no way to talk outside a
+  campaign. AH-010 adds 1:1 direct messaging (WhatsApp-shaped, AH-010b is the FE)
+  gated by the relationship — so a blacklisted/declined/prospect agency cannot DM,
+  consistent with the AH-005 contact-visibility posture but stricter.
+- **What:** A backend relationship-messaging layer built **alongside** campaign
+  messaging, not on top of it.
+  - **Mirrored spine (Q1, deliberate duplication-debt):** `relationship_threads`
+    (`UNIQUE(agency_id, creator_id)`) / `relationship_messages` /
+    `relationship_message_read_receipts` + `RelationshipMessageService`. NOT shared
+    with the `messages` table / `MessageService` — the campaign `messages.thread_id`
+    FK forbids it without a campaign-path change (AH-010 Step-0). Consolidation
+    trigger logged in tech-debt.
+  - **Gate (D2, load-bearing):** `CreatorPolicy::canMessageRelationship` —
+    approved creator + roster + non-blacklisted + active membership/ownership.
+    Built from a new status-aware relation query, NOT `canSeeContactDetails`/
+    `hasNonBlacklistedRelation` verbatim. Break-revert verified: loosening to the
+    not-blacklisted-only predicate fails the declined/prospect/pending/external/
+    non-approved specs; reverted.
+  - **Attachments (D4):** thread-keyed presigned files + net-new http/https links
+    (`javascript:`/`data:` rejected); **synchronous on-complete EXIF strip**
+    (reuses `PortfolioImageProcessor`, 25 MB / 50 MP) before any row or signed URL
+    — undecodable image → clean 422, not a 500.
+  - **Notifications (D5):** two dual-recipient `NotificationType` +
+    `AuditAction` verbs. The AuditAction verbs are **inert vocabulary** required
+    only by the NotificationType↔AuditAction one-vocabulary tie (the Sprint-11
+    `message.received_by_*` precedent) — **NO `audit_logs` row is written on a
+    message send**, so a private DM leaves no content or metadata trail. Enforced
+    by a guard test (`writes NO audit row on message send`). Recipient resolution
+    is relationship-shaped (no assignment to deref).
+- **Touched:** `apps/api/app/Modules/Messaging/*` (models, factories, services,
+  controllers + concern, request, resource, routes), `database/migrations/2026_06_29_1000{00,01,02}`,
+  `CreatorPolicy`, `AuditAction` + `NotificationType` enums (+ their tripwires),
+  new `RelationshipMessage{Api,Attachment}Test` + `CreatorPolicyTest` cases.
+- **Decisions:** Q1 mirror (duplication-debt + named consolidation trigger);
+  Q2 roster-only gate (`external` unreachable + non-roster); Q3 synchronous
+  on-complete EXIF strip; Q4 agency-org-level participants (`sender_user_id` per
+  message); Q5 symmetric inboxes both sides; Q6 no extra agency eligibility.
+  Digest deferred + virus-scan out (tech-debt). `deleted_at` present-but-unwritten.
+- **Build assertions met:** full suite **1755 passed / 0 failed** (zero blast
+  radius on campaign messaging), gate break-revert, EXIF genuinely stripped on a
+  sent image, idempotent per-pair provisioning, PHPStan + Pint clean.
+- **Ref:** `2656e5a` (feat) + this docs commit (the AH-010a pair). Kickoff +
+  Step-0 in chat; duplication-debt in [`tech-debt.md`](../tech-debt.md). AH-010b
+  (WhatsApp-shaped inbox) is the next, separate pair.
 
 ### AH-009 · Standalone creator Profile-edit page (reuses wizard steps 2 & 3)
 
