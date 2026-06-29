@@ -678,8 +678,9 @@ watch(
 }
 
 .chip {
-  /* vivid, unmistakable "go" green for the active step */
-  --chip-active: #16a34a;
+  /* vivid, unmistakable "go" green for the active step — the semantic
+     `success` theme token, so it tracks the theme instead of a literal. */
+  --chip-active: rgb(var(--v-theme-success));
   position: absolute;
   left: 50%;
   top: 50%;

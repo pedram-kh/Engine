@@ -52,7 +52,13 @@ const CANONICAL_422_FILES: readonly string[] = [
   'modules/campaigns/pages/CampaignCreatePage.vue',
   'modules/campaigns/pages/CampaignDetailPage.vue',
   'modules/agency-users/components/InviteUserModal.vue',
-  'modules/onboarding/pages/Step2ProfileBasicsPage.vue',
+  // AH-009: the step-2 body was extracted into the host-agnostic
+  // `ProfileBasicsForm` (shared by the wizard's Step2ProfileBasicsPage AND the
+  // standalone `/creator/profile` page). The 422 binding (extractFieldErrors +
+  // per-field `error-messages`) moved WITH it — the page is now a thin host that
+  // owns only the submit affordance, so it comes off the allowlist and the form
+  // that carries the binding goes on.
+  'modules/onboarding/components/ProfileBasicsForm.vue',
   // AH-003: the former Step3SocialAccountsPage is now the social sub-section
   // of the merged "connections" step; the 422 binding moved with it.
   'modules/onboarding/components/ConnectionsSocialSection.vue',
