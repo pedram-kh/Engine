@@ -90,15 +90,15 @@ describe('NotificationPreferencesPage', () => {
     wrapper.unmount()
   })
 
-  it('role filter — a CREATOR sees 7 types / 8 toggles across 3 groups (messaging has the digest)', async () => {
+  it('role filter — a CREATOR sees 8 types / 9 toggles across 3 groups (messaging has the digest)', async () => {
     vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
     const wrapper = mountPage('creator')
     await flushPromises()
 
-    // 7 types, 8 toggles: 6 in_app-only types + the messaging type's
-    // in_app + digest pair (D-10).
-    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(7)
-    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(8)
+    // 8 types, 9 toggles: 7 in_app-only types (incl. the AH-010 relationship DM)
+    // + the campaign messaging type's in_app + digest pair (D-10).
+    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(8)
+    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(9)
     // All three groups present (assignment + creator + messaging).
     expect(wrapper.find('[data-test="prefs-group-assignment"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="prefs-group-creator"]').exists()).toBe(true)
@@ -120,13 +120,13 @@ describe('NotificationPreferencesPage', () => {
     wrapper.unmount()
   })
 
-  it('role filter — an AGENCY user sees 3 types / 4 toggles (assignment + messaging w/ digest)', async () => {
+  it('role filter — an AGENCY user sees 4 types / 5 toggles (assignment + messaging w/ digest)', async () => {
     vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
     const wrapper = mountPage('agency_user')
     await flushPromises()
 
-    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(3)
-    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(4)
+    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(4)
+    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(5)
     expect(
       wrapper.find('[data-test="prefs-toggle-assignment.draft_submitted-in_app"]').exists(),
     ).toBe(true)
@@ -186,8 +186,8 @@ describe('NotificationPreferencesPage', () => {
 
     expect(notificationsApi.updatePreferences).toHaveBeenCalledTimes(1)
     const payload = vi.mocked(notificationsApi.updatePreferences).mock.calls[0]?.[0]
-    // A creator submits all 8 (type, channel) toggles — 7 in_app + 1 digest.
-    expect(payload?.preferences).toHaveLength(8)
+    // A creator submits all 9 (type, channel) toggles — 8 in_app + 1 digest.
+    expect(payload?.preferences).toHaveLength(9)
     expect(payload?.preferences.filter((p) => p.channel === 'digest')).toHaveLength(1)
     // The flipped in_app rides false; the opted-in digest rides true.
     expect(

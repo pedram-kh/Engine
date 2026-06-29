@@ -12,7 +12,8 @@
       "profile": "Profil",
       "dashboard": "Dashboard",
       "assignments": "Invitationer",
-      "availability": "Tilgængelighed"
+      "availability": "Tilgængelighed",
+      "messages": "Beskeder"
     },
     "nav": {
       "prevMonth": "Forrige måned",

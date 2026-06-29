@@ -48,6 +48,22 @@
         "empty": "Žádná vlákna zpráv pro tuto kampanja.",
         "noMessages": "Žádné zprávy.",
         "loadError": "Ni nam uspelo načíst vlákna zpráv."
+      },
+      "relationship": {
+        "inboxTitle": "Poruke",
+        "inboxSubtitle": "Vaši izravni razgovori.",
+        "inboxEmpty": "Još nema razgovora.",
+        "inboxLoadError": "Nismo mogli učitati vaše razgovore. Uskoro ćemo pokušati ponovno.",
+        "threadEmpty": "Još nema poruka. Pozdravite.",
+        "back": "Natrag na poruke",
+        "sent": "Poslano",
+        "read": "Pročitano",
+        "addLink": "Dodaj poveznicu",
+        "linkUrl": "URL poveznice",
+        "linkName": "Oznaka (neobavezno)",
+        "linkInvalid": "Unesite valjanu http ili https poveznicu.",
+        "linksHeading": "Poveznice",
+        "remove": "Ukloni"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Kampanje",
       "agencyUsers": "Ekipa",
       "settings": "Nastanjeitve",
-      "menu": "Izbornik"
+      "menu": "Izbornik",
+      "messages": "Poruke"
     },
     "discover": {
       "title": "Odkrivanje ustvarjalca",

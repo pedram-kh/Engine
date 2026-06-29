@@ -48,6 +48,22 @@
         "empty": "Не message threads yet for this campaign.",
         "noMessages": "Не messages yet.",
         "loadError": "We couldn't load the message threads."
+      },
+      "relationship": {
+        "inboxTitle": "Съобщения",
+        "inboxSubtitle": "Вашите директни разговори.",
+        "inboxEmpty": "Все още няма разговори.",
+        "inboxLoadError": "Не успяхме да заредим разговорите ви. Ще опитаме отново скоро.",
+        "threadEmpty": "Все още няма съобщения. Поздравете.",
+        "back": "Назад към съобщенията",
+        "sent": "Изпратено",
+        "read": "Прочетено",
+        "addLink": "Добави връзка",
+        "linkUrl": "URL адрес на връзката",
+        "linkName": "Етикет (по избор)",
+        "linkInvalid": "Въведете валидна http или https връзка.",
+        "linksHeading": "Връзки",
+        "remove": "Премахни"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Кампанияs",
       "agencyUsers": "Team",
       "settings": "Настройки",
-      "menu": "Меню"
+      "menu": "Меню",
+      "messages": "Съобщения"
     },
     "discover": {
       "title": "Discover creators",

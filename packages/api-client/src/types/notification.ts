@@ -43,6 +43,8 @@ export type NotificationType =
   | 'creator.rejected'
   | 'message.received_by_creator'
   | 'message.received_by_agency'
+  | 'message.relationship_received_by_creator'
+  | 'message.relationship_received_by_agency'
 
 /** The acting user who drove the event, when one exists (null for system-driven). */
 export interface NotificationActor {

@@ -12,7 +12,8 @@
       "profile": "Profiil",
       "dashboard": "Juhtpaneel",
       "assignments": "Kutses",
-      "availability": "Kättesaadavus"
+      "availability": "Kättesaadavus",
+      "messages": "Sõnumid"
     },
     "nav": {
       "prevMonth": "Eelmine month",

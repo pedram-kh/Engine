@@ -48,6 +48,22 @@
         "empty": "Noch keine Nachrichtenthreads für diese Kampagne.",
         "noMessages": "Noch keine Nachrichten.",
         "loadError": "Die Nachrichtenthreads konnten nicht geladen werden."
+      },
+      "relationship": {
+        "inboxTitle": "Nachrichten",
+        "inboxSubtitle": "Ihre direkten Unterhaltungen.",
+        "inboxEmpty": "Noch keine Unterhaltungen.",
+        "inboxLoadError": "Wir konnten Ihre Unterhaltungen nicht laden. Es wird in Kürze erneut versucht.",
+        "threadEmpty": "Noch keine Nachrichten. Sagen Sie Hallo.",
+        "back": "Zurück zu den Nachrichten",
+        "sent": "Gesendet",
+        "read": "Gelesen",
+        "addLink": "Link hinzufügen",
+        "linkUrl": "Link-URL",
+        "linkName": "Bezeichnung (optional)",
+        "linkInvalid": "Geben Sie einen gültigen http- oder https-Link ein.",
+        "linksHeading": "Links",
+        "remove": "Entfernen"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Kampagnen",
       "agencyUsers": "Team",
       "settings": "Einstellungen",
-      "menu": "Menü"
+      "menu": "Menü",
+      "messages": "Nachrichten"
     },
     "discover": {
       "title": "Creator entdecken",

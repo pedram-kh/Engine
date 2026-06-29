@@ -48,6 +48,22 @@
         "empty": "No message threads yet for this campaign.",
         "noMessages": "No messages yet.",
         "loadError": "We couldn't load the message threads."
+      },
+      "relationship": {
+        "inboxTitle": "Messages",
+        "inboxSubtitle": "Your direct conversations.",
+        "inboxEmpty": "No conversations yet.",
+        "inboxLoadError": "We couldn't load your conversations. It will retry shortly.",
+        "threadEmpty": "No messages yet. Say hello.",
+        "back": "Back to messages",
+        "sent": "Sent",
+        "read": "Read",
+        "addLink": "Add link",
+        "linkUrl": "Link URL",
+        "linkName": "Label (optional)",
+        "linkInvalid": "Enter a valid http or https link.",
+        "linksHeading": "Links",
+        "remove": "Remove"
       }
     },
     "nav": {
@@ -59,6 +75,7 @@
       "campaigns": "Campaigns",
       "agencyUsers": "Team",
       "settings": "Settings",
+      "messages": "Messages",
       "menu": "Menu"
     },
     "discover": {

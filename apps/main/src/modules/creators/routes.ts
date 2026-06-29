@@ -99,4 +99,26 @@ export const creatorsRoutes: RouteRecordRaw[] = [
       guards: ['requireAuth'],
     },
   },
+  {
+    // AH-010b — the creator-shell relationship-messaging inbox (top-level
+    // "Messages" nav, D9). Lists the creator's 1:1 threads, one per connected
+    // agency. Symmetric to the agency inbox (Q5).
+    path: '/creator/messages',
+    name: 'creator.messages',
+    component: () => import('@/modules/messaging/pages/CreatorMessagesPage.vue'),
+    meta: {
+      layout: 'creator',
+      guards: ['requireAuth'],
+    },
+  },
+  {
+    // AH-010b — the full-screen relationship thread (keyed by the agency ULID).
+    path: '/creator/messages/:agencyUlid',
+    name: 'creator.messages.thread',
+    component: () => import('@/modules/messaging/pages/CreatorRelationshipThreadPage.vue'),
+    meta: {
+      layout: 'creator',
+      guards: ['requireAuth'],
+    },
+  },
 ]

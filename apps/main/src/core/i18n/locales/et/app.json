@@ -48,6 +48,22 @@
         "empty": "Ei message threads yet for this campaign.",
         "noMessages": "Ei messages yet.",
         "loadError": "We couldn't load the message threads."
+      },
+      "relationship": {
+        "inboxTitle": "Sõnumid",
+        "inboxSubtitle": "Teie otsevestlused.",
+        "inboxEmpty": "Vestlusi veel pole.",
+        "inboxLoadError": "Me ei saanud teie vestlusi laadida. Proovime peagi uuesti.",
+        "threadEmpty": "Sõnumeid veel pole. Tervita.",
+        "back": "Tagasi sõnumite juurde",
+        "sent": "Saadetud",
+        "read": "Loetud",
+        "addLink": "Lisa link",
+        "linkUrl": "Lingi URL",
+        "linkName": "Silt (valikuline)",
+        "linkInvalid": "Sisestage kehtiv http- või https-link.",
+        "linksHeading": "Lingid",
+        "remove": "Eemalda"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Kampaanias",
       "agencyUsers": "Team",
       "settings": "Seaded",
-      "menu": "Menüü"
+      "menu": "Menüü",
+      "messages": "Sõnumid"
     },
     "discover": {
       "title": "Discover creators",

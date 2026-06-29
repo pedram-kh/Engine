@@ -26,7 +26,9 @@
       "creator_rejected": "Din creator-ansökan godkändes inte.",
       "message_received_by_creator": "{sender_name} skickade dig ett meddelande om {campaign_name}.",
       "message_received_by_agency": "{sender_name} skickade ett meddelande om {campaign_name}.",
-      "fallback": "Du har en ny avisering."
+      "fallback": "Du har en ny avisering.",
+      "message_relationship_received_by_creator": "{sender_name} skickade ett direktmeddelande till dig.",
+      "message_relationship_received_by_agency": "{sender_name} skickade ett direktmeddelande till dig."
     },
     "preferences": {
       "title": "Aviseringsinställningar",
@@ -56,7 +58,9 @@
         "creator_approved": "Ett creator-konto godkänns",
         "creator_rejected": "En creator-ansökan avslås",
         "message_received_by_creator": "Ett nytt meddelande från byrån",
-        "message_received_by_agency": "Ett nytt meddelande från creatorn"
+        "message_received_by_agency": "Ett nytt meddelande från creatorn",
+        "message_relationship_received_by_creator": "Ett nytt direktmeddelande från byrån",
+        "message_relationship_received_by_agency": "Ett nytt direktmeddelande från skaparen"
       }
     }
   }

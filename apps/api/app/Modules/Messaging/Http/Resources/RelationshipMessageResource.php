@@ -43,6 +43,12 @@ final class RelationshipMessageResource extends JsonResource
                 'sender' => $this->relationLoaded('sender') && $this->sender !== null
                     ? ['name' => $this->sender->name]
                     : null,
+                // Two-state read indicator (D10): only meaningful on the viewer's
+                // OWN bubbles — whether the counterparty has read it. Null for the
+                // other party's messages (no tick on incoming).
+                'read_by_counterparty' => $this->sender_user_id === $viewerId
+                    ? (bool) ($this->read_by_counterparty ?? false)
+                    : null,
                 'created_at' => $this->created_at->toIso8601String(),
             ],
         ];

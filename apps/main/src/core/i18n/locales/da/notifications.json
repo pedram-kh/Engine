@@ -26,7 +26,9 @@
       "creator_rejected": "Din creator-ansøgning er ikke godkendt.",
       "message_received_by_creator": "{sender_name} har sendt dig en besked om {campaign_name}.",
       "message_received_by_agency": "{sender_name} har sendt en besked om {campaign_name}.",
-      "fallback": "Du har en ny notifikation."
+      "fallback": "Du har en ny notifikation.",
+      "message_relationship_received_by_creator": "{sender_name} sendte dig en direkte besked.",
+      "message_relationship_received_by_agency": "{sender_name} sendte dig en direkte besked."
     },
     "preferences": {
       "title": "Notifikationsindstillinger",
@@ -56,7 +58,9 @@
         "creator_approved": "En creator-konto godkendes",
         "creator_rejected": "En creator-ansøgning afvises",
         "message_received_by_creator": "En ny besked fra bureauet",
-        "message_received_by_agency": "En ny besked fra creatoren"
+        "message_received_by_agency": "En ny besked fra creatoren",
+        "message_relationship_received_by_creator": "En ny direkte besked fra bureauet",
+        "message_relationship_received_by_agency": "En ny direkte besked fra skaberen"
       }
     }
   }

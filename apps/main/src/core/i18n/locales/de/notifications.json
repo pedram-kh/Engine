@@ -26,7 +26,9 @@
       "creator_rejected": "Deine Creator-Bewerbung wurde nicht genehmigt.",
       "message_received_by_creator": "{sender_name} hat dir eine Nachricht zu {campaign_name} gesendet.",
       "message_received_by_agency": "{sender_name} hat eine Nachricht zu {campaign_name} gesendet.",
-      "fallback": "Du hast eine neue Benachrichtigung."
+      "fallback": "Du hast eine neue Benachrichtigung.",
+      "message_relationship_received_by_creator": "{sender_name} hat Ihnen eine Direktnachricht gesendet.",
+      "message_relationship_received_by_agency": "{sender_name} hat Ihnen eine Direktnachricht gesendet."
     },
     "preferences": {
       "title": "Benachrichtigungseinstellungen",
@@ -56,7 +58,9 @@
         "creator_approved": "Ein Creator-Konto wird genehmigt",
         "creator_rejected": "Eine Creator-Bewerbung wird abgelehnt",
         "message_received_by_creator": "Eine neue Nachricht von der Agentur",
-        "message_received_by_agency": "Eine neue Nachricht vom Creator"
+        "message_received_by_agency": "Eine neue Nachricht vom Creator",
+        "message_relationship_received_by_creator": "Eine neue Direktnachricht von der Agentur",
+        "message_relationship_received_by_agency": "Eine neue Direktnachricht vom Creator"
       }
     }
   }

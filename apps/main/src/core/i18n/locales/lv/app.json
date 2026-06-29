@@ -48,6 +48,22 @@
         "empty": "Nē message threads yet for this campaign.",
         "noMessages": "Nē messages yet.",
         "loadError": "We couldn't load the message threads."
+      },
+      "relationship": {
+        "inboxTitle": "Ziņojumi",
+        "inboxSubtitle": "Jūsu tiešās sarunas.",
+        "inboxEmpty": "Vēl nav sarunu.",
+        "inboxLoadError": "Neizdevās ielādēt jūsu sarunas. Drīz mēģināsim vēlreiz.",
+        "threadEmpty": "Vēl nav ziņojumu. Pasveiciniet.",
+        "back": "Atpakaļ uz ziņojumiem",
+        "sent": "Nosūtīts",
+        "read": "Izlasīts",
+        "addLink": "Pievienot saiti",
+        "linkUrl": "Saites URL",
+        "linkName": "Etiķete (neobligāti)",
+        "linkInvalid": "Ievadiet derīgu http vai https saiti.",
+        "linksHeading": "Saites",
+        "remove": "Noņemt"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Kampaņas",
       "agencyUsers": "Team",
       "settings": "Iestatījumi",
-      "menu": "Izvēlne"
+      "menu": "Izvēlne",
+      "messages": "Ziņojumi"
     },
     "discover": {
       "title": "Discover creators",

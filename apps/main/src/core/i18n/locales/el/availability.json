@@ -12,7 +12,8 @@
       "profile": "Προφίλ",
       "dashboard": "Πίνακας ελέγχου",
       "assignments": "Πρόσκλησηs",
-      "availability": "Διαθεσιμότητα"
+      "availability": "Διαθεσιμότητα",
+      "messages": "Μηνύματα"
     },
     "nav": {
       "prevMonth": "Προηγούμενο month",

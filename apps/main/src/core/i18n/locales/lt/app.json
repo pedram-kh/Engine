@@ -48,6 +48,22 @@
         "empty": "Ne message threads yet for this campaign.",
         "noMessages": "Ne messages yet.",
         "loadError": "We couldn't load the message threads."
+      },
+      "relationship": {
+        "inboxTitle": "Žinutės",
+        "inboxSubtitle": "Jūsų tiesioginiai pokalbiai.",
+        "inboxEmpty": "Pokalbių dar nėra.",
+        "inboxLoadError": "Nepavyko įkelti jūsų pokalbių. Netrukus bandysime dar kartą.",
+        "threadEmpty": "Žinučių dar nėra. Pasisveikinkite.",
+        "back": "Atgal į žinutes",
+        "sent": "Išsiųsta",
+        "read": "Perskaityta",
+        "addLink": "Pridėti nuorodą",
+        "linkUrl": "Nuorodos URL",
+        "linkName": "Etiketė (nebūtina)",
+        "linkInvalid": "Įveskite galiojančią http arba https nuorodą.",
+        "linksHeading": "Nuorodos",
+        "remove": "Pašalinti"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Kampanijas",
       "agencyUsers": "Team",
       "settings": "Nustatymai",
-      "menu": "Meniu"
+      "menu": "Meniu",
+      "messages": "Žinutės"
     },
     "discover": {
       "title": "Discover creators",

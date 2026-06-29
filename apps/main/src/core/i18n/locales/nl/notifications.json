@@ -26,7 +26,9 @@
       "creator_rejected": "Je creator-aanmelding is niet goedgekeurd.",
       "message_received_by_creator": "{sender_name} heeft je een bericht gestuurd over {campaign_name}.",
       "message_received_by_agency": "{sender_name} heeft een bericht gestuurd over {campaign_name}.",
-      "fallback": "Je hebt een nieuwe melding."
+      "fallback": "Je hebt een nieuwe melding.",
+      "message_relationship_received_by_creator": "{sender_name} heeft je een direct bericht gestuurd.",
+      "message_relationship_received_by_agency": "{sender_name} heeft je een direct bericht gestuurd."
     },
     "preferences": {
       "title": "Meldingsinstellingen",
@@ -56,7 +58,9 @@
         "creator_approved": "Een creator-account wordt goedgekeurd",
         "creator_rejected": "Een creator-aanmelding wordt afgewezen",
         "message_received_by_creator": "Een nieuw bericht van het bureau",
-        "message_received_by_agency": "Een nieuw bericht van de creator"
+        "message_received_by_agency": "Een nieuw bericht van de creator",
+        "message_relationship_received_by_creator": "Een nieuw direct bericht van het bureau",
+        "message_relationship_received_by_agency": "Een nieuw direct bericht van de maker"
       }
     }
   }

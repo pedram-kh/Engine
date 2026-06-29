@@ -12,7 +12,8 @@
       "profile": "Profilis",
       "dashboard": "Valdymo skydelis",
       "assignments": "Kvietimass",
-      "availability": "Pasiekiamumas"
+      "availability": "Pasiekiamumas",
+      "messages": "Žinutės"
     },
     "nav": {
       "prevMonth": "Ankstesnis month",

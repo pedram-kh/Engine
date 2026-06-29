@@ -48,6 +48,22 @@
         "empty": "Žádná vlákna zpráv pro tuto kampaň.",
         "noMessages": "Žádné zprávy.",
         "loadError": "Nepodařilo se nám načíst vlákna zpráv."
+      },
+      "relationship": {
+        "inboxTitle": "Zprávy",
+        "inboxSubtitle": "Vaše přímé konverzace.",
+        "inboxEmpty": "Zatím žádné konverzace.",
+        "inboxLoadError": "Nepodařilo se načíst vaše konverzace. Brzy to zkusíme znovu.",
+        "threadEmpty": "Zatím žádné zprávy. Pozdravte.",
+        "back": "Zpět na zprávy",
+        "sent": "Odesláno",
+        "read": "Přečteno",
+        "addLink": "Přidat odkaz",
+        "linkUrl": "URL odkazu",
+        "linkName": "Popisek (volitelné)",
+        "linkInvalid": "Zadejte platný odkaz http nebo https.",
+        "linksHeading": "Odkazy",
+        "remove": "Odebrat"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Kampaně",
       "agencyUsers": "Tým",
       "settings": "Nastavení",
-      "menu": "Nabídka"
+      "menu": "Nabídka",
+      "messages": "Zprávy"
     },
     "discover": {
       "title": "Objevit tvůrce",

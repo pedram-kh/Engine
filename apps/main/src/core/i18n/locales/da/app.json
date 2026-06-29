@@ -48,6 +48,22 @@
         "empty": "Ingen beskedtråde endnu for denne kampagne.",
         "noMessages": "Ingen beskeder endnu.",
         "loadError": "Beskedtrådene kunne ikke indlæses."
+      },
+      "relationship": {
+        "inboxTitle": "Beskeder",
+        "inboxSubtitle": "Dine direkte samtaler.",
+        "inboxEmpty": "Ingen samtaler endnu.",
+        "inboxLoadError": "Vi kunne ikke indlæse dine samtaler. Vi prøver igen snart.",
+        "threadEmpty": "Ingen beskeder endnu. Sig hej.",
+        "back": "Tilbage til beskeder",
+        "sent": "Sendt",
+        "read": "Læst",
+        "addLink": "Tilføj link",
+        "linkUrl": "Link-URL",
+        "linkName": "Etiket (valgfrit)",
+        "linkInvalid": "Indtast et gyldigt http- eller https-link.",
+        "linksHeading": "Links",
+        "remove": "Fjern"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Kampagner",
       "agencyUsers": "Team",
       "settings": "Indstillinger",
-      "menu": "Menu"
+      "menu": "Menu",
+      "messages": "Beskeder"
     },
     "discover": {
       "title": "Opdage creatorer",

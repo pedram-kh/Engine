@@ -12,7 +12,8 @@
       "profile": "Profil",
       "dashboard": "Pulpit nawigacyjny",
       "assignments": "Zaproszenia",
-      "availability": "Dostępność"
+      "availability": "Dostępność",
+      "messages": "Wiadomości"
     },
     "nav": {
       "prevMonth": "Poprzedni miesiąc",

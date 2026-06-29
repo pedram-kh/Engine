@@ -48,6 +48,22 @@
         "empty": "Nem message threads yet for this campaign.",
         "noMessages": "Nem messages yet.",
         "loadError": "We couldn't load the message threads."
+      },
+      "relationship": {
+        "inboxTitle": "Üzenetek",
+        "inboxSubtitle": "Az Ön közvetlen beszélgetései.",
+        "inboxEmpty": "Még nincsenek beszélgetések.",
+        "inboxLoadError": "Nem sikerült betölteni a beszélgetéseit. Hamarosan újrapróbáljuk.",
+        "threadEmpty": "Még nincsenek üzenetek. Köszönjön.",
+        "back": "Vissza az üzenetekhez",
+        "sent": "Elküldve",
+        "read": "Elolvasva",
+        "addLink": "Hivatkozás hozzáadása",
+        "linkUrl": "Hivatkozás URL-címe",
+        "linkName": "Címke (nem kötelező)",
+        "linkInvalid": "Adjon meg egy érvényes http vagy https hivatkozást.",
+        "linksHeading": "Hivatkozások",
+        "remove": "Eltávolítás"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Kampánys",
       "agencyUsers": "Team",
       "settings": "Beállítások",
-      "menu": "Menü"
+      "menu": "Menü",
+      "messages": "Üzenetek"
     },
     "discover": {
       "title": "Discover creators",

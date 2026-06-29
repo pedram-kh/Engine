@@ -38,11 +38,9 @@ vi.mock('@/modules/notifications/api/notifications.api', () => ({
       data: [],
       meta: { total: 0, page: 1, per_page: 8, last_page: 1, unread_count: 0 },
     }),
-    unreadCount: vi
-      .fn()
-      .mockResolvedValue({
-        data: { type: 'notification_unread_count', attributes: { unread_count: 0 } },
-      }),
+    unreadCount: vi.fn().mockResolvedValue({
+      data: { type: 'notification_unread_count', attributes: { unread_count: 0 } },
+    }),
     markRead: vi.fn().mockResolvedValue({}),
     readAll: vi.fn().mockResolvedValue({}),
   },
@@ -85,6 +83,7 @@ async function mountLayout(
         name: 'creator.assignments',
         component: { template: '<div />' },
       },
+      { path: '/creator/messages', name: 'creator.messages', component: { template: '<div />' } },
       { path: '/sign-in', name: 'auth.sign-in', component: { template: '<div />' } },
     ],
   })

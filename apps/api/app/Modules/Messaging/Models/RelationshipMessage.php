@@ -40,6 +40,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ * @property bool $read_by_counterparty Non-persisted, set by RelationshipMessageService::pageForThread (D10 read tick).
  */
 final class RelationshipMessage extends Model
 {

@@ -48,6 +48,22 @@
         "empty": "Ei message threads yet for this campaign.",
         "noMessages": "Ei messages yet.",
         "loadError": "We couldn't load the message threads."
+      },
+      "relationship": {
+        "inboxTitle": "Viestit",
+        "inboxSubtitle": "Suorat keskustelusi.",
+        "inboxEmpty": "Ei vielä keskusteluja.",
+        "inboxLoadError": "Keskustelujesi lataaminen epäonnistui. Yritetään pian uudelleen.",
+        "threadEmpty": "Ei vielä viestejä. Sano moi.",
+        "back": "Takaisin viesteihin",
+        "sent": "Lähetetty",
+        "read": "Luettu",
+        "addLink": "Lisää linkki",
+        "linkUrl": "Linkin URL-osoite",
+        "linkName": "Nimike (valinnainen)",
+        "linkInvalid": "Anna kelvollinen http- tai https-linkki.",
+        "linksHeading": "Linkit",
+        "remove": "Poista"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Kampanjas",
       "agencyUsers": "Team",
       "settings": "Asetukset",
-      "menu": "Valikko"
+      "menu": "Valikko",
+      "messages": "Viestit"
     },
     "discover": {
       "title": "Discover creators",

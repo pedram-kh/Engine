@@ -125,3 +125,117 @@ export interface MessageAttachmentCompleteEnvelope {
     storage_path: string
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AH-010 — Relationship messaging (1:1 connected agency↔creator)
+//
+// A parallel wire contract to the campaign messaging types above, mirroring the
+// backend's mirrored spine (RelationshipMessageResource). Differences from the
+// campaign shape: NO `system_event_key` (relationship threads have no system
+// messages); a `read_by_counterparty` two-state read tick on own messages (D10);
+// and attachments are a discriminated union of `file` | `link` (D4).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Relationship messages are never system messages; sender is always human. */
+export type RelationshipMessageKind = 'text' | 'attachment_only'
+
+export type RelationshipMessageSenderRole = 'creator' | 'agency_user'
+
+/** A stored file attachment + a freshly-minted signed GET URL. */
+export interface RelationshipFileAttachment {
+  kind: 'file'
+  s3_path: string | null
+  mime_type: string | null
+  name: string | null
+  size_bytes: number | null
+  view_url: string | null
+}
+
+/** A net-new link attachment (http/https only; validated server-side). */
+export interface RelationshipLinkAttachment {
+  kind: 'link'
+  url: string | null
+  name: string | null
+}
+
+export type RelationshipMessageAttachment = RelationshipFileAttachment | RelationshipLinkAttachment
+
+export interface RelationshipMessageAttributes {
+  kind: RelationshipMessageKind
+  sender_role: RelationshipMessageSenderRole
+  body: string | null
+  attachments: RelationshipMessageAttachment[]
+  is_own: boolean
+  sender: MessageSender | null
+  /** D10: whether the counterparty has read this OWN message. Null on incoming. */
+  read_by_counterparty: boolean | null
+  created_at: string
+}
+
+export interface RelationshipMessageResource {
+  id: string
+  type: 'relationship_message'
+  attributes: RelationshipMessageAttributes
+}
+
+export interface RelationshipThreadMeta {
+  id: string
+  last_message_at: string | null
+  unread_count: number
+}
+
+export interface RelationshipMessageFeedEnvelope {
+  data: RelationshipMessageResource[]
+  meta: {
+    thread: RelationshipThreadMeta
+    has_more: boolean
+  }
+}
+
+export interface RelationshipMessageEnvelope {
+  data: RelationshipMessageResource
+}
+
+/** A link attachment on the way out (the send payload half). */
+export interface SendRelationshipLink {
+  url: string
+  name?: string
+}
+
+export interface SendRelationshipMessagePayload {
+  body?: string
+  attachments?: SendMessageAttachment[]
+  links?: SendRelationshipLink[]
+}
+
+/** A row in the AGENCY relationship inbox (keyed by the creator). */
+export interface AgencyRelationshipThreadRow {
+  id: string
+  type: 'relationship_thread'
+  attributes: {
+    creator: { id: string | null; display_name: string | null }
+    last_message_at: string | null
+    last_message_preview: string | null
+    unread_count: number
+  }
+}
+
+/** A row in the CREATOR relationship inbox (keyed by the agency). */
+export interface CreatorRelationshipThreadRow {
+  id: string
+  type: 'relationship_thread'
+  attributes: {
+    agency: { id: string | null; name: string | null; logo_path: string | null }
+    last_message_at: string | null
+    last_message_preview: string | null
+    unread_count: number
+  }
+}
+
+export interface AgencyRelationshipInboxEnvelope {
+  data: AgencyRelationshipThreadRow[]
+}
+
+export interface CreatorRelationshipInboxEnvelope {
+  data: CreatorRelationshipThreadRow[]
+}

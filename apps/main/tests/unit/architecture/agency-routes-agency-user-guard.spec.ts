@@ -89,6 +89,9 @@ describe('agency-shell routes — requireAgencyUser guard registration (Sprint 6
       // public profile). New agency-shell routes; both carry requireAgencyUser.
       'discover.detail',
       'discover.list',
+      // AH-010b — the agency-shell relationship-messaging inbox + thread.
+      'messages.inbox',
+      'messages.thread',
       // S11.0 Ch3a — the agency-shell notification archive (full paginated feed).
       'notifications',
       // S11.0 Ch3b — the agency-shell notification-preferences page.

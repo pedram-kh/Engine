@@ -193,6 +193,25 @@ export const appRoutes: RouteRecordRaw[] = [
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
+  // ── Relationship messaging (AH-010b) ───────────────────────────────────────
+  // The agency-shell conversations inbox + full-screen thread (1:1 connected
+  // agency↔creator DM, Q5 symmetric with the creator surface). Org-level (Q4):
+  // any active member shares the inbox. `:creatorUlid` keys the thread; both
+  // routes carry the agency-shell guard chain and are pinned into the
+  // requireAgencyUser arch-test's expected set.
+  {
+    path: '/messages',
+    name: 'messages.inbox',
+    component: () => import('@/modules/messaging/pages/AgencyMessagesPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+  {
+    path: '/messages/:creatorUlid',
+    name: 'messages.thread',
+    component: () => import('@/modules/messaging/pages/AgencyRelationshipThreadPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+
   // ── Creator discovery (the global pool) ────────────────────────────────────
   // Sprint 6.6a (D-8). A SEPARATE surface from the roster (NOT a tab): the
   // roster is "creators I have a relationship with"; Discover is "the global

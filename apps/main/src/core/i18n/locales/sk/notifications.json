@@ -26,7 +26,9 @@
       "creator_rejected": "Vaše prihláška tvorcu nebola schválená.",
       "message_received_by_creator": "{sender_name} vám poslal zprávu ohledně {campaign_name}.",
       "message_received_by_agency": "{sender_name} poslal zprávu ohledně {campaign_name}.",
-      "fallback": "Máte nové oznámenia."
+      "fallback": "Máte nové oznámenia.",
+      "message_relationship_received_by_creator": "{sender_name} vám poslal priamu správu.",
+      "message_relationship_received_by_agency": "{sender_name} vám poslal priamu správu."
     },
     "preferences": {
       "title": "Nastavenia oznámenia",
@@ -56,7 +58,9 @@
         "creator_approved": "Účet tvorcu je schválen",
         "creator_rejected": "Prihláška tvorcu je odmietnutá",
         "message_received_by_creator": "Nová správa od agentúry",
-        "message_received_by_agency": "Nová správa od tvorcu"
+        "message_received_by_agency": "Nová správa od tvorcu",
+        "message_relationship_received_by_creator": "Nová priama správa od agentúry",
+        "message_relationship_received_by_agency": "Nová priama správa od tvorcu"
       }
     }
   }

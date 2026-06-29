@@ -26,7 +26,9 @@
       "creator_rejected": "Twoja aplikacja twórcy nie została zatwierdzona.",
       "message_received_by_creator": "{sender_name} wysłał Ci wiadomość dotyczącą {campaign_name}.",
       "message_received_by_agency": "{sender_name} wysłał wiadomość dotyczącą {campaign_name}.",
-      "fallback": "Masz nowe powiadomienie."
+      "fallback": "Masz nowe powiadomienie.",
+      "message_relationship_received_by_creator": "{sender_name} wysłał(a) Ci wiadomość bezpośrednią.",
+      "message_relationship_received_by_agency": "{sender_name} wysłał(a) Ci wiadomość bezpośrednią."
     },
     "preferences": {
       "title": "Ustawienia powiadomień",
@@ -56,7 +58,9 @@
         "creator_approved": "Konto twórcy zostaje zatwierdzone",
         "creator_rejected": "Aplikacja twórcy zostaje odrzucona",
         "message_received_by_creator": "Nowa wiadomość od agencji",
-        "message_received_by_agency": "Nowa wiadomość od twórcy"
+        "message_received_by_agency": "Nowa wiadomość od twórcy",
+        "message_relationship_received_by_creator": "Nowa wiadomość bezpośrednia od agencji",
+        "message_relationship_received_by_agency": "Nowa wiadomość bezpośrednia od twórcy"
       }
     }
   }

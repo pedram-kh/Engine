@@ -72,6 +72,16 @@ const creator = computed(() => detail.value?.attributes.creator ?? null)
 const displayName = computed(() => creator.value?.display_name ?? t('app.roster.detail.unnamed'))
 const email = computed(() => creator.value?.email ?? null)
 
+// AH-010b — the "Message" entry point (D9). Mirror the backend
+// `canMessageRelationship` gate (approved creator + roster + non-blacklisted) so
+// we never surface a shortcut that would 403; the backend stays the SOT.
+const canMessage = computed(
+  () =>
+    attrs.value?.relationship_status === 'roster' &&
+    attrs.value?.is_blacklisted !== true &&
+    creator.value?.application_status === 'approved',
+)
+
 // AH-005 — optional contact details. The server gates the whole block by
 // omission (present only when this agency's relation is non-blacklisted), so
 // a blacklisted-but-rostered agency receives no keys and the card stays hidden.
@@ -325,18 +335,35 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Add-to-pool action (D-2b-9). Net-new chrome on the 2a header;
-               admin/manager only (canEdit). -->
-          <v-btn
-            v-if="canEdit"
-            color="primary"
-            variant="tonal"
-            prepend-icon="mdi-account-multiple-plus-outline"
-            data-test="creator-detail-add-to-pool"
-            @click="poolDialog = true"
-          >
-            {{ t('app.pools.picker.openLabel') }}
-          </v-btn>
+          <!-- Header actions: message shortcut (AH-010b, D9) + add-to-pool
+               (D-2b-9). The message shortcut mirrors the relationship gate; the
+               pool action is admin/manager only (canEdit). -->
+          <div class="d-flex flex-wrap ga-2">
+            <v-btn
+              v-if="canMessage"
+              color="primary"
+              variant="tonal"
+              prepend-icon="mdi-message-text-outline"
+              data-test="creator-detail-message"
+              :to="{
+                name: 'messages.thread',
+                params: { creatorUlid },
+                query: { name: displayName },
+              }"
+            >
+              {{ t('app.messaging.relationship.inboxTitle') }}
+            </v-btn>
+            <v-btn
+              v-if="canEdit"
+              color="primary"
+              variant="tonal"
+              prepend-icon="mdi-account-multiple-plus-outline"
+              data-test="creator-detail-add-to-pool"
+              @click="poolDialog = true"
+            >
+              {{ t('app.pools.picker.openLabel') }}
+            </v-btn>
+          </div>
         </v-card-text>
       </v-card>
 

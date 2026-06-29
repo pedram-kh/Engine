@@ -12,7 +12,8 @@
       "profile": "Profil",
       "dashboard": "Panou de control",
       "assignments": "Invitațies",
-      "availability": "Disponibilitate"
+      "availability": "Disponibilitate",
+      "messages": "Mesaje"
     },
     "nav": {
       "prevMonth": "Anterior month",

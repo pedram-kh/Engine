@@ -74,6 +74,10 @@ const CANONICAL_422_FILES: readonly string[] = [
   // attachments) onto its fields. Consumed by both the agency Messages tab and
   // the creator's inline thread.
   'modules/messaging/components/ChatPanel.vue',
+  // AH-010b: the relationship-thread composer binds the send 422 (body /
+  // attachments / links) onto its fields — the WhatsApp-shaped DM counterpart
+  // to ChatPanel, on both the agency and creator surfaces.
+  'modules/messaging/components/RelationshipThreadView.vue',
   // Sprint 12 Chunk 2 (D-6): the board column add/edit form binds the create /
   // update 422 onto the name + color_token fields. (The column DELETE dialog
   // deliberately uses ApiError.code BANNERS instead — a whole-operation refusal

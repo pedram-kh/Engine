@@ -48,6 +48,22 @@
         "empty": "Όχι message threads yet for this campaign.",
         "noMessages": "Όχι messages yet.",
         "loadError": "We couldn't load the message threads."
+      },
+      "relationship": {
+        "inboxTitle": "Μηνύματα",
+        "inboxSubtitle": "Οι απευθείας συνομιλίες σας.",
+        "inboxEmpty": "Δεν υπάρχουν ακόμη συνομιλίες.",
+        "inboxLoadError": "Δεν μπορέσαμε να φορτώσουμε τις συνομιλίες σας. Θα γίνει νέα προσπάθεια σύντομα.",
+        "threadEmpty": "Δεν υπάρχουν ακόμη μηνύματα. Πείτε ένα γεια.",
+        "back": "Πίσω στα μηνύματα",
+        "sent": "Απεστάλη",
+        "read": "Αναγνώστηκε",
+        "addLink": "Προσθήκη συνδέσμου",
+        "linkUrl": "URL συνδέσμου",
+        "linkName": "Ετικέτα (προαιρετικό)",
+        "linkInvalid": "Εισαγάγετε έναν έγκυρο σύνδεσμο http ή https.",
+        "linksHeading": "Σύνδεσμοι",
+        "remove": "Αφαίρεση"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Καμπάνιαs",
       "agencyUsers": "Team",
       "settings": "Ρυθμίσεις",
-      "menu": "Μενού"
+      "menu": "Μενού",
+      "messages": "Μηνύματα"
     },
     "discover": {
       "title": "Discover creators",

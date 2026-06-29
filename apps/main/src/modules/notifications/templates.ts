@@ -135,6 +135,23 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
     group: 'messaging',
     channels: ['in_app', 'digest'],
   },
+  // Relationship messaging (AH-010, D5) — the 1:1 connected agency↔creator DM,
+  // distinct from the campaign-assignment thread above. Dual-recipient, same as
+  // the campaign pair. UNLIKE campaign messaging these are `in_app` ONLY: the
+  // relationship-message digest is deferred (AH-010 D5), so no `digest` toggle
+  // ships until that job consumes them (no dead control).
+  'message.relationship_received_by_creator': {
+    templateKey: 'notifications.types.message_relationship_received_by_creator',
+    recipient: 'creator',
+    group: 'messaging',
+    channels: IN_APP_ONLY,
+  },
+  'message.relationship_received_by_agency': {
+    templateKey: 'notifications.types.message_relationship_received_by_agency',
+    recipient: 'agency',
+    group: 'messaging',
+    channels: IN_APP_ONLY,
+  },
 }
 
 /**

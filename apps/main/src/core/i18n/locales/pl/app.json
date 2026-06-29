@@ -48,6 +48,22 @@
         "empty": "Brak wątków wiadomości dla tej kampanii.",
         "noMessages": "Brak wiadomości.",
         "loadError": "Nie mogliśmy załadować wątków wiadomości."
+      },
+      "relationship": {
+        "inboxTitle": "Wiadomości",
+        "inboxSubtitle": "Twoje bezpośrednie rozmowy.",
+        "inboxEmpty": "Brak rozmów.",
+        "inboxLoadError": "Nie udało się załadować Twoich rozmów. Wkrótce spróbujemy ponownie.",
+        "threadEmpty": "Brak wiadomości. Przywitaj się.",
+        "back": "Powrót do wiadomości",
+        "sent": "Wysłano",
+        "read": "Przeczytano",
+        "addLink": "Dodaj link",
+        "linkUrl": "Adres URL linku",
+        "linkName": "Etykieta (opcjonalnie)",
+        "linkInvalid": "Wprowadź prawidłowy link http lub https.",
+        "linksHeading": "Linki",
+        "remove": "Usuń"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Kampanie",
       "agencyUsers": "Zespół",
       "settings": "Ustawienia",
-      "menu": "Menu"
+      "menu": "Menu",
+      "messages": "Wiadomości"
     },
     "discover": {
       "title": "Odkryj twórców",

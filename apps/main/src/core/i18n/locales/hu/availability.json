@@ -12,7 +12,8 @@
       "profile": "Profil",
       "dashboard": "Irányítópult",
       "assignments": "Meghívós",
-      "availability": "Elérhetőség"
+      "availability": "Elérhetőség",
+      "messages": "Üzenetek"
     },
     "nav": {
       "prevMonth": "Előző month",

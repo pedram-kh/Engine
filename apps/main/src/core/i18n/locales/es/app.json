@@ -48,6 +48,22 @@
         "empty": "Aún no hay hilos de mensajes para esta campaña.",
         "noMessages": "Aún no hay mensajes.",
         "loadError": "No hemos podido cargar los hilos de mensajes."
+      },
+      "relationship": {
+        "inboxTitle": "Mensajes",
+        "inboxSubtitle": "Tus conversaciones directas.",
+        "inboxEmpty": "Aún no hay conversaciones.",
+        "inboxLoadError": "No pudimos cargar tus conversaciones. Se reintentará en breve.",
+        "threadEmpty": "Aún no hay mensajes. Saluda.",
+        "back": "Volver a los mensajes",
+        "sent": "Enviado",
+        "read": "Leído",
+        "addLink": "Añadir enlace",
+        "linkUrl": "URL del enlace",
+        "linkName": "Etiqueta (opcional)",
+        "linkInvalid": "Introduce un enlace http o https válido.",
+        "linksHeading": "Enlaces",
+        "remove": "Quitar"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Campañas",
       "agencyUsers": "Equipo",
       "settings": "Configuración",
-      "menu": "Menú"
+      "menu": "Menú",
+      "messages": "Mensajes"
     },
     "discover": {
       "title": "Descubrir creadores",

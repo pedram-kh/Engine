@@ -236,6 +236,41 @@ it('the creator inbox lists the thread with the agency + unread count', function
         ->assertJsonPath('data.0.attributes.last_message_preview', 'hello there');
 });
 
+// ── Read indicator (D10) — two-state, counterparty-aware ────────────────────
+
+it('exposes read_by_counterparty on own messages: false until the creator reads, then true', function (): void {
+    ['agency' => $agency, 'creator' => $creator, 'creatorUser' => $creatorUser, 'admin' => $admin] = relationshipSetup();
+
+    $this->actingAs($admin)->postJson(agencyRelUrl($agency, $creator), ['body' => 'did you see this?'])->assertCreated();
+
+    // Before the creator reads: the agency's own message is unread by the counterparty.
+    $this->actingAs($admin)->getJson(agencyRelUrl($agency, $creator))
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.is_own', true)
+        ->assertJsonPath('data.0.attributes.read_by_counterparty', false);
+
+    // The creator opens the thread and marks it read (what the 15s poll does).
+    $this->actingAs($creatorUser)->getJson(creatorRelUrl($agency))->assertOk();
+    $this->actingAs($creatorUser)->postJson(creatorRelUrl($agency, '/read'))->assertOk();
+
+    // Now the agency sees its own message as read by the counterparty.
+    $this->actingAs($admin)->getJson(agencyRelUrl($agency, $creator))
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.read_by_counterparty', true);
+});
+
+it('returns read_by_counterparty=null on the other party\'s incoming messages (no tick on incoming)', function (): void {
+    ['agency' => $agency, 'creator' => $creator, 'admin' => $admin] = relationshipSetup();
+
+    $this->actingAs($admin)->postJson(agencyRelUrl($agency, $creator), ['body' => 'from agency'])->assertCreated();
+
+    // The creator views the agency's message as INCOMING → no read tick.
+    $this->actingAs($creator->user)->getJson(creatorRelUrl($agency))
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.is_own', false)
+        ->assertJsonPath('data.0.attributes.read_by_counterparty', null);
+});
+
 // ── Unread / mark-read (D10) ─────────────────────────────────────────────────
 
 it('mark-read resolves the unread count for the viewer', function (): void {

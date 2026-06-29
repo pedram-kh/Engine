@@ -26,7 +26,9 @@
       "creator_rejected": "A sua candidatura de criador não foi aprovada.",
       "message_received_by_creator": "{sender_name} enviou-lhe uma mensagem sobre {campaign_name}.",
       "message_received_by_agency": "{sender_name} enviou uma mensagem sobre {campaign_name}.",
-      "fallback": "Tem uma nova notificação."
+      "fallback": "Tem uma nova notificação.",
+      "message_relationship_received_by_creator": "{sender_name} enviou-lhe uma mensagem direta.",
+      "message_relationship_received_by_agency": "{sender_name} enviou-lhe uma mensagem direta."
     },
     "preferences": {
       "title": "Definições de notificações",
@@ -56,7 +58,9 @@
         "creator_approved": "Uma conta de criador é aprovada",
         "creator_rejected": "Uma candidatura de criador é recusada",
         "message_received_by_creator": "Uma nova mensagem da agência",
-        "message_received_by_agency": "Uma nova mensagem do criador"
+        "message_received_by_agency": "Uma nova mensagem do criador",
+        "message_relationship_received_by_creator": "Uma nova mensagem direta da agência",
+        "message_relationship_received_by_agency": "Uma nova mensagem direta do criador"
       }
     }
   }

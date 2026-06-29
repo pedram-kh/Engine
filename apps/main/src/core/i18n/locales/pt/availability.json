@@ -12,7 +12,8 @@
       "profile": "Perfil",
       "dashboard": "Painel",
       "assignments": "Convites",
-      "availability": "Disponibilidade"
+      "availability": "Disponibilidade",
+      "messages": "Mensagens"
     },
     "nav": {
       "prevMonth": "Mês anterior",

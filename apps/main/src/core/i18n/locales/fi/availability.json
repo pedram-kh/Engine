@@ -12,7 +12,8 @@
       "profile": "Profiili",
       "dashboard": "Kojelauta",
       "assignments": "Kutsus",
-      "availability": "Saatavuus"
+      "availability": "Saatavuus",
+      "messages": "Viestit"
     },
     "nav": {
       "prevMonth": "Edellinen month",

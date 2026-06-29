@@ -48,6 +48,22 @@
         "empty": "Aucun fil de messages pour cette campagne pour le moment.",
         "noMessages": "Aucun message pour le moment.",
         "loadError": "Nous n'avons pas pu charger les fils de messages."
+      },
+      "relationship": {
+        "inboxTitle": "Messages",
+        "inboxSubtitle": "Vos conversations directes.",
+        "inboxEmpty": "Aucune conversation pour le moment.",
+        "inboxLoadError": "Nous n'avons pas pu charger vos conversations. Nouvelle tentative sous peu.",
+        "threadEmpty": "Aucun message pour le moment. Dites bonjour.",
+        "back": "Retour aux messages",
+        "sent": "Envoyé",
+        "read": "Lu",
+        "addLink": "Ajouter un lien",
+        "linkUrl": "URL du lien",
+        "linkName": "Libellé (facultatif)",
+        "linkInvalid": "Saisissez un lien http ou https valide.",
+        "linksHeading": "Liens",
+        "remove": "Supprimer"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Campagnes",
       "agencyUsers": "Équipe",
       "settings": "Paramètres",
-      "menu": "Menu"
+      "menu": "Menu",
+      "messages": "Messages"
     },
     "discover": {
       "title": "Découvrir des créateurs",

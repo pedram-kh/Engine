@@ -48,6 +48,22 @@
         "empty": "Nu message threads yet for this campaign.",
         "noMessages": "Nu messages yet.",
         "loadError": "We couldn't load the message threads."
+      },
+      "relationship": {
+        "inboxTitle": "Mesaje",
+        "inboxSubtitle": "Conversațiile tale directe.",
+        "inboxEmpty": "Încă nu există conversații.",
+        "inboxLoadError": "Nu am putut încărca conversațiile tale. Vom reîncerca în curând.",
+        "threadEmpty": "Încă nu există mesaje. Salută.",
+        "back": "Înapoi la mesaje",
+        "sent": "Trimis",
+        "read": "Citit",
+        "addLink": "Adaugă link",
+        "linkUrl": "URL-ul linkului",
+        "linkName": "Etichetă (opțional)",
+        "linkInvalid": "Introdu un link http sau https valid.",
+        "linksHeading": "Linkuri",
+        "remove": "Elimină"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Campanies",
       "agencyUsers": "Team",
       "settings": "Setări",
-      "menu": "Meniu"
+      "menu": "Meniu",
+      "messages": "Mesaje"
     },
     "discover": {
       "title": "Discover creators",

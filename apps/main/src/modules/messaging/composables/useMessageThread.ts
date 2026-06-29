@@ -4,21 +4,50 @@
  * localStorage), "load earlier" history paging, optimistic send append, and
  * mark-read on poll.
  *
- * Surface-agnostic: it consumes a {@link ChatTransport} (agency or creator), so
- * the same composable backs both mounts. The poll is independent of the
- * notification bell's own 45s poll.
+ * Surface-agnostic AND message-shape-agnostic: it is generic over the message /
+ * thread-meta / send-payload types and consumes any transport matching
+ * {@link GenericChatTransport}, so it backs BOTH the campaign `ChatTransport`
+ * (default type params — campaign behavior is byte-for-byte unchanged) and the
+ * AH-010 relationship transport (explicit type params). The poll is independent
+ * of the notification bell's own 45s poll.
  */
 
 import type { MessageResource, MessageThreadMeta, SendMessagePayload } from '@catalyst/api-client'
 import { computed, getCurrentInstance, onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
 
-import type { ChatTransport } from '../api/messaging.api'
-
 export const THREAD_POLL_INTERVAL_MS = 15000
 
-export function useMessageThread(transport: Ref<ChatTransport | null>) {
-  const messages = ref<MessageResource[]>([])
-  const threadMeta = ref<MessageThreadMeta | null>(null)
+/** The minimal message shape the engine needs: an id + a created_at. */
+interface ThreadMessageLike {
+  id: string
+  attributes: { created_at: string }
+}
+
+/** The minimal thread-meta shape: unread count + last-message stamp (+ optional campaign-only block flag). */
+interface ThreadMetaLike {
+  unread_count: number
+  last_message_at: string | null
+  human_send_blocked?: boolean
+}
+
+/** The minimal transport the engine drives (a structural subset of both surfaces' transports). */
+export interface GenericChatTransport<
+  TMessage extends ThreadMessageLike,
+  TMeta extends ThreadMetaLike,
+  TSend,
+> {
+  list(before?: string): Promise<{ data: TMessage[]; meta: { thread: TMeta; has_more: boolean } }>
+  send(payload: TSend): Promise<{ data: TMessage }>
+  markRead(): Promise<unknown>
+}
+
+export function useMessageThread<
+  TMessage extends ThreadMessageLike = MessageResource,
+  TMeta extends ThreadMetaLike = MessageThreadMeta,
+  TSend = SendMessagePayload,
+>(transport: Ref<GenericChatTransport<TMessage, TMeta, TSend> | null>) {
+  const messages = ref<TMessage[]>([]) as Ref<TMessage[]>
+  const threadMeta = ref<TMeta | null>(null) as Ref<TMeta | null>
   const hasMore = ref(false)
   const loading = ref(false)
   const loadingOlder = ref(false)
@@ -110,7 +139,7 @@ export function useMessageThread(transport: Ref<ChatTransport | null>) {
     }
   }
 
-  async function sendMessage(payload: SendMessagePayload): Promise<MessageResource> {
+  async function sendMessage(payload: TSend): Promise<TMessage> {
     const client = transport.value
     if (client === null) {
       throw new Error('Chat transport is not ready.')

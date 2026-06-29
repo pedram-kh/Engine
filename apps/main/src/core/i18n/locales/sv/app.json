@@ -48,6 +48,22 @@
         "empty": "Inga meddelandetrådar ännu för den här kampanjen.",
         "noMessages": "Inga meddelanden ännu.",
         "loadError": "Vi kunde inte ladda meddelandetrådarna."
+      },
+      "relationship": {
+        "inboxTitle": "Meddelanden",
+        "inboxSubtitle": "Dina direktkonversationer.",
+        "inboxEmpty": "Inga konversationer ännu.",
+        "inboxLoadError": "Vi kunde inte ladda dina konversationer. Vi försöker igen snart.",
+        "threadEmpty": "Inga meddelanden ännu. Säg hej.",
+        "back": "Tillbaka till meddelanden",
+        "sent": "Skickat",
+        "read": "Läst",
+        "addLink": "Lägg till länk",
+        "linkUrl": "Länk-URL",
+        "linkName": "Etikett (valfritt)",
+        "linkInvalid": "Ange en giltig http- eller https-länk.",
+        "linksHeading": "Länkar",
+        "remove": "Ta bort"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Kampanjer",
       "agencyUsers": "Team",
       "settings": "Inställningar",
-      "menu": "Meny"
+      "menu": "Meny",
+      "messages": "Meddelanden"
     },
     "discover": {
       "title": "Utforska creators",

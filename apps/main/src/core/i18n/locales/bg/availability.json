@@ -12,7 +12,8 @@
       "profile": "Профил",
       "dashboard": "Табло за управление",
       "assignments": "Поканаs",
-      "availability": "Наличност"
+      "availability": "Наличност",
+      "messages": "Съобщения"
     },
     "nav": {
       "prevMonth": "Предишен month",

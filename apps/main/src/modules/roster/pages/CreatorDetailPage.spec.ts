@@ -133,6 +133,12 @@ async function mountDetail(
     routes: [
       { path: '/roster', name: 'roster.list', component: { template: '<div />' } },
       { path: '/roster/:ulid', name: 'roster.detail', component: { template: '<div />' } },
+      // AH-010b — the roster-detail "Message" shortcut targets the agency thread.
+      {
+        path: '/messages/:creatorUlid',
+        name: 'messages.thread',
+        component: { template: '<div />' },
+      },
     ],
   })
   await router.push(`/roster/${CREATOR_ULID}`)

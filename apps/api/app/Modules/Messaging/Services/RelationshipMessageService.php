@@ -107,13 +107,20 @@ final class RelationshipMessageService
      * page). Without a cursor, the most-recent page; with `$beforeId`, the page
      * immediately older than it (the "load earlier" history cursor).
      *
+     * Each message is decorated with a non-persisted `read_by_counterparty`
+     * boolean (AH-010b, D10) — whether the OTHER side has read it. Direction-aware:
+     * an agency message is "read" when the creator's user holds a receipt; a
+     * creator message is "read" when ANY agency member does (org-level, Q4).
+     * Receipts are only ever written for non-senders, so this is the read tick on
+     * the viewer's own bubbles (the resource only surfaces it for own messages).
+     *
      * @return array{messages: Collection<int, RelationshipMessage>, has_more: bool}
      */
     public function pageForThread(RelationshipThread $thread, ?int $beforeId = null, int $perPage = self::DEFAULT_PAGE_SIZE): array
     {
         $query = RelationshipMessage::query()
             ->where('thread_id', $thread->id)
-            ->with('sender:id,name')
+            ->with(['sender:id,name', 'readReceipts:id,message_id,user_id'])
             ->orderByDesc('id');
 
         if ($beforeId !== null) {
@@ -124,6 +131,13 @@ final class RelationshipMessageService
         $hasMore = $rows->count() > $perPage;
 
         $page = $rows->take($perPage)->reverse()->values();
+
+        $thread->loadMissing('creator:id,user_id');
+        $creatorUserId = $thread->creator?->user_id;
+
+        $page->each(function (RelationshipMessage $message) use ($creatorUserId): void {
+            $message->setAttribute('read_by_counterparty', $this->readByCounterparty($message, $creatorUserId));
+        });
 
         return ['messages' => $page, 'has_more' => $hasMore];
     }
@@ -175,6 +189,26 @@ final class RelationshipMessageService
             'last_message_at' => $thread->last_message_at?->toIso8601String(),
             'unread_count' => $this->unreadCountForUser($thread, $viewer),
         ];
+    }
+
+    /**
+     * Whether the counterparty has read this message (AH-010b, D10). Direction-aware:
+     *   - agency_user sender → the creator's user must hold a receipt;
+     *   - creator sender     → ANY receipt (only agency members can hold one).
+     */
+    private function readByCounterparty(RelationshipMessage $message, ?int $creatorUserId): bool
+    {
+        if ($message->sender_role === MessageSenderRole::AgencyUser) {
+            if ($creatorUserId === null) {
+                return false;
+            }
+
+            return $message->readReceipts->contains(
+                static fn (RelationshipMessageReadReceipt $receipt): bool => $receipt->user_id === $creatorUserId,
+            );
+        }
+
+        return $message->readReceipts->isNotEmpty();
     }
 
     /**

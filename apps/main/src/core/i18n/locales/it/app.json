@@ -48,6 +48,22 @@
         "empty": "Ancora nessuna conversazione per questa campagna.",
         "noMessages": "Ancora nessun messaggio.",
         "loadError": "Impossibile caricare le conversazioni."
+      },
+      "relationship": {
+        "inboxTitle": "Messaggi",
+        "inboxSubtitle": "Le tue conversazioni dirette.",
+        "inboxEmpty": "Ancora nessuna conversazione.",
+        "inboxLoadError": "Non siamo riusciti a caricare le tue conversazioni. Riproveremo a breve.",
+        "threadEmpty": "Ancora nessun messaggio. Saluta.",
+        "back": "Torna ai messaggi",
+        "sent": "Inviato",
+        "read": "Letto",
+        "addLink": "Aggiungi link",
+        "linkUrl": "URL del link",
+        "linkName": "Etichetta (facoltativo)",
+        "linkInvalid": "Inserisci un link http o https valido.",
+        "linksHeading": "Link",
+        "remove": "Rimuovi"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Campagne",
       "agencyUsers": "Team",
       "settings": "Impostazioni",
-      "menu": "Menu"
+      "menu": "Menu",
+      "messages": "Messaggi"
     },
     "discover": {
       "title": "Scopri creator",
@@ -327,9 +344,17 @@
         "archived": "Archiviato",
         "all": "Tutti"
       },
-      "detail": { "title": "Dettagli brand" },
-      "create": { "title": "Nuovo brand", "success": "Brand creato con successo." },
-      "edit": { "title": "Modifica brand", "success": "Brand aggiornato con successo." },
+      "detail": {
+        "title": "Dettagli brand"
+      },
+      "create": {
+        "title": "Nuovo brand",
+        "success": "Brand creato con successo."
+      },
+      "edit": {
+        "title": "Modifica brand",
+        "success": "Brand aggiornato con successo."
+      },
       "archive": {
         "confirmTitle": "Archivia brand",
         "confirmMessage": "Archiviare {name}? Sarà nascosto dall'elenco attivo ma potrà essere ripristinato.",
@@ -809,8 +834,13 @@
         "agency_manager": "Manager",
         "agency_staff": "Collaboratore"
       },
-      "status": { "active": "Attivo", "pending": "In attesa" },
-      "members": { "heading": "Membri attuali" },
+      "status": {
+        "active": "Attivo",
+        "pending": "In attesa"
+      },
+      "members": {
+        "heading": "Membri attuali"
+      },
       "filters": {
         "allRoles": "Tutti i ruoli",
         "allStatuses": "Tutti gli stati"
@@ -836,11 +866,16 @@
       "invite": {
         "button": "Invita utente",
         "title": "Invita un membro del team",
-        "fields": { "email": "Indirizzo email", "role": "Ruolo" },
+        "fields": {
+          "email": "Indirizzo email",
+          "role": "Ruolo"
+        },
         "submit": "Invia invito",
         "submitting": "Invio…",
         "success": "Invito inviato a {email}.",
-        "errors": { "failed": "Invio invito fallito." }
+        "errors": {
+          "failed": "Invio invito fallito."
+        }
       },
       "empty": {
         "heading": "Nessun membro del team",
@@ -852,7 +887,9 @@
         "invitationsLoadFailed": "Caricamento cronologia inviti fallito."
       },
       "loading": "Caricamento team…",
-      "bulkInviteCreators": { "button": "Invita creator in massa" }
+      "bulkInviteCreators": {
+        "button": "Invita creator in massa"
+      }
     },
     "bulkInvite": {
       "title": "Invita creator in massa",
@@ -881,7 +918,9 @@
         "complete": "Completato",
         "failed": "Il job è fallito"
       },
-      "tracking": { "progress": "{percent}% completato" },
+      "tracking": {
+        "progress": "{percent}% completato"
+      },
       "timeout": {
         "heading": "Ancora in elaborazione",
         "description": "I tuoi inviti stanno richiedendo più tempo del previsto. Puoi riprovare o controllare più tardi.",
@@ -894,8 +933,12 @@
         "failed": "Falliti",
         "failureReason": "Motivo"
       },
-      "failed": { "heading": "Il job di invio in massa è fallito." },
-      "errors": { "submitFailed": "Impossibile inviare il CSV. Riprova." }
+      "failed": {
+        "heading": "Il job di invio in massa è fallito."
+      },
+      "errors": {
+        "submitFailed": "Impossibile inviare il CSV. Riprova."
+      }
     },
     "invitation": {
       "accept": {
@@ -929,7 +972,9 @@
           "heading": "Invito non trovato",
           "body": "Questo link di invito non è valido o è già stato usato."
         },
-        "errors": { "failed": "Accettazione invito fallita." }
+        "errors": {
+          "failed": "Accettazione invito fallita."
+        }
       }
     },
     "settings": {

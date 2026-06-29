@@ -48,6 +48,22 @@
         "empty": "Níl message threads yet for this campaign.",
         "noMessages": "Níl messages yet.",
         "loadError": "We couldn't load the message threads."
+      },
+      "relationship": {
+        "inboxTitle": "Teachtaireachtaí",
+        "inboxSubtitle": "Do chomhráite díreacha.",
+        "inboxEmpty": "Níl aon chomhrá ann go fóill.",
+        "inboxLoadError": "Níorbh fhéidir linn do chomhráite a lódáil. Bainfear triail eile as go luath.",
+        "threadEmpty": "Níl aon teachtaireacht ann go fóill. Abair Dia duit.",
+        "back": "Ar ais go dtí na teachtaireachtaí",
+        "sent": "Seolta",
+        "read": "Léite",
+        "addLink": "Cuir nasc leis",
+        "linkUrl": "URL an naisc",
+        "linkName": "Lipéad (roghnach)",
+        "linkInvalid": "Cuir isteach nasc http nó https bailí.",
+        "linksHeading": "Naisc",
+        "remove": "Bain"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Feachtass",
       "agencyUsers": "Team",
       "settings": "Socruithe",
-      "menu": "Roghchlár"
+      "menu": "Roghchlár",
+      "messages": "Teachtaireachtaí"
     },
     "discover": {
       "title": "Discover creators",

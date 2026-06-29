@@ -87,6 +87,9 @@ const navItems = computed(() => {
   items.push(
     { key: 'assignments', icon: 'mdi-clipboard-text-outline', routeName: 'creator.assignments' },
     { key: 'availability', icon: 'mdi-calendar-month-outline', routeName: 'creator.availability' },
+    // AH-010b — top-level relationship-messaging inbox (D9). Rendered in both the
+    // desktop topbar and the AH-007 mobile bottom-nav off this same array.
+    { key: 'messages', icon: 'mdi-message-text-outline', routeName: 'creator.messages' },
   )
   return items
 })

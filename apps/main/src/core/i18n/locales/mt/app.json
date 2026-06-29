@@ -48,6 +48,22 @@
         "empty": "Le message threads yet for this campaign.",
         "noMessages": "Le messages yet.",
         "loadError": "We couldn't load the message threads."
+      },
+      "relationship": {
+        "inboxTitle": "Messaġġi",
+        "inboxSubtitle": "Il-konversazzjonijiet diretti tiegħek.",
+        "inboxEmpty": "Għad m'hemm l-ebda konversazzjoni.",
+        "inboxLoadError": "Ma stajniex intellgħu l-konversazzjonijiet tiegħek. Nerġgħu nippruvaw dalwaqt.",
+        "threadEmpty": "Għad m'hemm l-ebda messaġġ. Sellem.",
+        "back": "Lura għall-messaġġi",
+        "sent": "Mibgħut",
+        "read": "Moqri",
+        "addLink": "Żid link",
+        "linkUrl": "URL tal-link",
+        "linkName": "Tikketta (mhux obbligatorju)",
+        "linkInvalid": "Daħħal link http jew https validu.",
+        "linksHeading": "Links",
+        "remove": "Neħħi"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Kampanjas",
       "agencyUsers": "Team",
       "settings": "Settings",
-      "menu": "Menu"
+      "menu": "Menu",
+      "messages": "Messaġġi"
     },
     "discover": {
       "title": "Discover creators",

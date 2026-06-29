@@ -26,7 +26,9 @@
       "creator_rejected": "La tua candidatura come creator non è stata approvata.",
       "message_received_by_creator": "{sender_name} ti ha inviato un messaggio su {campaign_name}.",
       "message_received_by_agency": "{sender_name} ha inviato un messaggio su {campaign_name}.",
-      "fallback": "Hai una nuova notifica."
+      "fallback": "Hai una nuova notifica.",
+      "message_relationship_received_by_creator": "{sender_name} ti ha inviato un messaggio diretto.",
+      "message_relationship_received_by_agency": "{sender_name} ti ha inviato un messaggio diretto."
     },
     "preferences": {
       "title": "Impostazioni notifiche",
@@ -56,7 +58,9 @@
         "creator_approved": "Un account creator viene approvato",
         "creator_rejected": "Una candidatura creator viene rifiutata",
         "message_received_by_creator": "Un nuovo messaggio dall'agenzia",
-        "message_received_by_agency": "Un nuovo messaggio dal creator"
+        "message_received_by_agency": "Un nuovo messaggio dal creator",
+        "message_relationship_received_by_creator": "Un nuovo messaggio diretto dall'agenzia",
+        "message_relationship_received_by_agency": "Un nuovo messaggio diretto dal creator"
       }
     }
   }

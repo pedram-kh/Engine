@@ -48,6 +48,22 @@
         "empty": "Nog geen berichtenthreads voor deze campagne.",
         "noMessages": "Nog geen berichten.",
         "loadError": "De berichtenthreads konden niet worden geladen."
+      },
+      "relationship": {
+        "inboxTitle": "Berichten",
+        "inboxSubtitle": "Je directe gesprekken.",
+        "inboxEmpty": "Nog geen gesprekken.",
+        "inboxLoadError": "We konden je gesprekken niet laden. We proberen het binnenkort opnieuw.",
+        "threadEmpty": "Nog geen berichten. Zeg hallo.",
+        "back": "Terug naar berichten",
+        "sent": "Verzonden",
+        "read": "Gelezen",
+        "addLink": "Link toevoegen",
+        "linkUrl": "Link-URL",
+        "linkName": "Label (optioneel)",
+        "linkInvalid": "Voer een geldige http- of https-link in.",
+        "linksHeading": "Links",
+        "remove": "Verwijderen"
       }
     },
     "nav": {
@@ -59,7 +75,8 @@
       "campaigns": "Campagnes",
       "agencyUsers": "Team",
       "settings": "Instellingen",
-      "menu": "Menu"
+      "menu": "Menu",
+      "messages": "Berichten"
     },
     "discover": {
       "title": "Creators ontdekken",
