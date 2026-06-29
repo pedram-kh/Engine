@@ -9,6 +9,15 @@ anyone reviewing it later.
 
 ---
 
+## Recorded decision (NOT debt) — a pending creator below 100% completeness is intentional; do NOT gate approval on completeness
+
+- **Where:** the admin creator review queue ([`apps/admin/src/modules/creators`](../apps/admin/src/modules/creators)) — the `profile_completeness_score` column + the approve action — and the wizard write paths that recompute that score (`CreatorWizardService`, `PATCH /creators/me/wizard/profile` + the social / portfolio writes).
+- **The decision (so it isn't re-litigated as a bug):** A creator in `application_status = pending` can sit **below 100% completeness**. After submission a creator can still edit — e.g. via the AH-009 `/creator/profile` page they may clear an optional field or remove a social / portfolio item — and `profile_completeness_score` recomputes downward while `application_status` does **not** change (the writes never touch status; only `submit()` does). That is **intentional, not a defect:** approval is **admin judgment, not a completeness gate**. The completeness column surfaces the signal; the admin either approves anyway, or rejects-with-reason naming what's missing. **Do NOT add a completeness gate (a "must be 100%") to the approve action.**
+- **Why this is recorded here:** AH-009 made post-submission editing a first-class surface, so the "incomplete creator in the pending queue" state is now reachable in normal use and will look surprising to someone who assumes pending ⇒ complete. The AH-009 page-edge floor already guards the _silent_ part of the regression (pending/rejected hard-block on profile basics; approved soft-warn because `profile_completeness_score` is agency-visible on discovery) — but it deliberately neither freezes the score nor blocks admin approval. The page-edge floor + the admin's judgment are the two controls by design; a server-side approve-time completeness gate is explicitly **out**.
+- **Trigger:** none. **Owner:** none. **Status:** recorded decision — needs no work; it exists solely to prevent a future "fix." (Distinct from the real, separately-logged deferral: the wizard write endpoints carry no `application_status` guard — defence-in-depth deferred, noted in the AH-009 ad-hoc log. That is about _who may call the write_, not about _gating approval on completeness_.)
+
+---
+
 ## Sprint 13 (Admin Panel Core) — the coming-soon / shell seams (each a discrete swappable block)
 
 - **Where:** the admin SPA ([`apps/admin/src`](../apps/admin/src)) + the admin/notifications/compliance backend modules.
