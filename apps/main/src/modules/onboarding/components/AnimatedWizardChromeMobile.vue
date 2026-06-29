@@ -371,11 +371,19 @@ function hideFrame(): void {
   panelEl.value?.classList.add('is-hidden')
 }
 
+/** Scroll the framed content back to its top so each step opens at its
+ *  beginning rather than inheriting the previous step's scroll position. */
+function resetPanelScroll(): void {
+  const scroll = panelEl.value?.querySelector<HTMLElement>('.wizm__panel-scroll')
+  if (scroll) scroll.scrollTop = 0
+}
+
 /* ---- the active-step change sequence: snap → frame → type ---- */
 function advanceTo(target: number): void {
   if (target === current) return
   animating = true
   clearTimers()
+  nextTick(resetPanelScroll)
 
   if (reduced()) {
     current = target

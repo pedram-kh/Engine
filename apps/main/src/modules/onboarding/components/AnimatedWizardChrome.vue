@@ -341,9 +341,17 @@ function scheduleFrame(delay: number): void {
 }
 
 /* ---- transitions on active-step change ---- */
+/** Scroll the framed content back to its top so each step opens at its
+ *  beginning rather than inheriting the previous step's scroll position. */
+function resetPanelScroll(): void {
+  const scroll = panelEl.value?.querySelector<HTMLElement>('.wizchrome__panel-scroll')
+  if (scroll) scroll.scrollTop = 0
+}
+
 function advanceTo(target: number): void {
   if (target === current) return
   animating = true
+  nextTick(resetPanelScroll)
   if (reduced()) {
     current = target
     phase = 'idle'
