@@ -8,6 +8,8 @@ use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Agencies\Models\AgencyMembership;
+use App\Modules\Creators\Enums\ApplicationStatus;
+use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
@@ -135,6 +137,81 @@ final class CreatorPolicy
     public function verifyIdentity(User $user, Creator $creator): bool
     {
         return $user->type === UserType::PlatformAdmin;
+    }
+
+    /**
+     * AH-010 (D2) — may the caller participate in the 1:1 relationship message
+     * thread between this {@param $agency} and this {@param $creator}?
+     *
+     * The LOAD-BEARING security gate (spam vector). Deliberately status-aware
+     * and STRICTER than {@see self::canSeeContactDetails()} /
+     * {@see self::hasNonBlacklistedRelation()} — those answer only
+     * "not blacklisted," which would let a `declined` (or `prospect` /
+     * `pending_request`) agency open a DM. Relationship messaging requires a
+     * genuine, accepted, two-way working relationship, so {@see self::relationPermitsMessaging()}
+     * demands an APPROVED creator AND a `roster` (only) relation that is
+     * non-blacklisted — `external` is excluded (it is currently unreachable and
+     * is semantically a non-roster, campaign-only engagement, AH-010 Step-0).
+     *
+     * On top of that relation predicate (which is symmetric — it is the same
+     * for both parties), the AGENCY side additionally requires the caller to be
+     * an active member of THIS agency; the CREATOR side requires owning the
+     * creator profile. Platform admins are NOT party to a 1:1 relationship
+     * thread and never pass (messaging is participation, not view-only).
+     *
+     * Break-revert (the spine's load-bearing test): loosen
+     * {@see self::relationPermitsMessaging()} to the not-blacklisted-only
+     * predicate → the declined-agency-blocked spec MUST fail → revert.
+     */
+    public function canMessageRelationship(User $user, Creator $creator, Agency $agency): bool
+    {
+        if (! $this->relationPermitsMessaging($creator, $agency)) {
+            return false;
+        }
+
+        // Creator side — the owning user of the creator profile.
+        if ($this->isOwner($user, $creator)) {
+            return true;
+        }
+
+        // Agency side — an ACTIVE member of THIS agency (org-level: any active
+        // member of the connected agency may participate, AH-010 Q4). A
+        // multi-agency user only passes for the agency that actually holds the
+        // qualifying relation.
+        return $user->type === UserType::AgencyUser
+            && in_array($agency->id, $this->activeAgencyIds($user), true);
+    }
+
+    /**
+     * AH-010 (D2) — the status-aware relation predicate behind
+     * {@see self::canMessageRelationship()}. Distinct from
+     * {@see self::hasNonBlacklistedRelation()} ON PURPOSE: this is the
+     * "these two have a real, active, accepted relationship" question, not the
+     * looser "not blacklisted" one.
+     *
+     * ALL must hold:
+     *   1. the creator's application is APPROVED (excludes incomplete / pending
+     *      / rejected);
+     *   2. THIS agency holds a `roster` relation to the creator (excludes
+     *      prospect / pending_request / declined / external);
+     *   3. that relation is non-blacklisted.
+     */
+    private function relationPermitsMessaging(Creator $creator, Agency $agency): bool
+    {
+        if ($creator->application_status !== ApplicationStatus::Approved) {
+            return false;
+        }
+
+        return AgencyCreatorRelation::query()
+            ->withoutGlobalScope(BelongsToAgencyScope::class)
+            ->where('creator_id', $creator->id)
+            ->where('agency_id', $agency->id)
+            ->where('relationship_status', RelationshipStatus::Roster->value)
+            ->where(function ($query): void {
+                $query->where('is_blacklisted', false)
+                    ->orWhereNull('is_blacklisted');
+            })
+            ->exists();
     }
 
     // -------------------------------------------------------------------------

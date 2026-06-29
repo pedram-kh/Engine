@@ -1,0 +1,100 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modules\Messaging\Http\Resources;
+
+use App\Modules\Messaging\Models\RelationshipMessage;
+use Illuminate\Filesystem\AwsS3V3Adapter;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
+
+/**
+ * A single relationship message on the wire (AH-010a). Mirrors
+ * {@see MessageResource}, minus the system-message branch (relationship threads
+ * have no system messages) and PLUS the link-attachment kind.
+ *
+ * `is_own` is computed against the authenticated viewer so the chat UI can
+ * right-align the caller's own bubbles. `sender.name` is always present (every
+ * relationship message has a human author) so the FE can label each agency-side
+ * bubble with the member who sent it (Q4).
+ *
+ * @mixin RelationshipMessage
+ */
+final class RelationshipMessageResource extends JsonResource
+{
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        $viewerId = $request->user()?->getKey();
+
+        return [
+            'id' => $this->ulid,
+            'type' => 'relationship_message',
+            'attributes' => [
+                'kind' => $this->kind->value,
+                'sender_role' => $this->sender_role->value,
+                'body' => $this->body,
+                'attachments' => $this->presentAttachments(),
+                'is_own' => $this->sender_user_id === $viewerId,
+                'sender' => $this->relationLoaded('sender') && $this->sender !== null
+                    ? ['name' => $this->sender->name]
+                    : null,
+                'created_at' => $this->created_at->toIso8601String(),
+            ],
+        ];
+    }
+
+    /**
+     * Present each stored attachment by kind: a `file` echoes its metadata with
+     * a freshly-minted signed GET URL (null when the disk is not S3 — e.g.
+     * Storage::fake in tests, the MessageResource precedent); a `link` echoes its
+     * http/https URL verbatim (no signing — it is an external resource).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function presentAttachments(): array
+    {
+        $attachments = $this->attachments ?? [];
+
+        return array_values(array_map(function (array $item): array {
+            $kind = is_string($item['kind'] ?? null) ? $item['kind'] : 'file';
+
+            if ($kind === 'link') {
+                return [
+                    'kind' => 'link',
+                    'url' => $item['url'] ?? null,
+                    'name' => $item['name'] ?? null,
+                ];
+            }
+
+            $path = is_string($item['s3_path'] ?? null) ? $item['s3_path'] : null;
+
+            return [
+                'kind' => 'file',
+                's3_path' => $path,
+                'mime_type' => $item['mime_type'] ?? null,
+                'name' => $item['name'] ?? null,
+                'size_bytes' => $item['size_bytes'] ?? null,
+                'view_url' => $this->signedViewUrl($path),
+            ];
+        }, $attachments));
+    }
+
+    private function signedViewUrl(?string $path): ?string
+    {
+        if ($path === null) {
+            return null;
+        }
+
+        $disk = Storage::disk('media');
+        if (! $disk instanceof AwsS3V3Adapter) {
+            return null;
+        }
+
+        return $disk->temporaryUrl($path, now()->addMinutes(15));
+    }
+}

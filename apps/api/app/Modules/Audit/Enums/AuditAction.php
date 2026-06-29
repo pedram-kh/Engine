@@ -278,6 +278,15 @@ enum AuditAction: string
     case MessageReceivedByCreator = 'message.received_by_creator';
     case MessageReceivedByAgency = 'message.received_by_agency';
 
+    // AH-010 — the two dual-recipient RELATIONSHIP-message verbs (1:1 connected
+    // agency↔creator messaging, distinct from the campaign-assignment thread
+    // above). Same rationale as the campaign pair: they exist ONLY to satisfy
+    // NotificationType's one-vocabulary tie; NO audit row is written on send
+    // (relationship messages are their own append-only log). Two verbs so each
+    // direction carries its own type + prefs toggle.
+    case MessageRelationshipReceivedByCreator = 'message.relationship_received_by_creator';
+    case MessageRelationshipReceivedByAgency = 'message.relationship_received_by_agency';
+
     // Sprint 12 Chunk 1 (D-9) — a human dragged a card to another column on the
     // campaign board. The one net-new board verb (the messaging-verb precedent +
     // its tripwire ripple). Board state is a VISUALIZATION layer (§4.4): a manual

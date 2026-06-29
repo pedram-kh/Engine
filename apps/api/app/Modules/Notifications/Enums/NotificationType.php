@@ -71,6 +71,14 @@ enum NotificationType: string
     case MessageReceivedByCreator = 'message.received_by_creator';
     case MessageReceivedByAgency = 'message.received_by_agency';
 
+    // Relationship messaging (AH-010). The 1:1 connected agency↔creator DM
+    // surface, distinct from the campaign-assignment thread above. Dual-recipient
+    // for the same reason: a new relationship message notifies the COUNTERPARTY,
+    // and each direction needs its own type + prefs toggle. Digest is deferred
+    // (AH-010 D5 — in-app unread covers it); these flow through the in-app path.
+    case MessageRelationshipReceivedByCreator = 'message.relationship_received_by_creator';
+    case MessageRelationshipReceivedByAgency = 'message.relationship_received_by_agency';
+
     /**
      * The AuditAction this notification type mirrors. Proves the one-vocabulary
      * tie — every NotificationType value MUST be a live AuditAction value.

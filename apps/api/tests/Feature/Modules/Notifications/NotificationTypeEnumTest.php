@@ -37,6 +37,9 @@ it('NotificationType catalogue lists exactly the curated membership', function (
         // Messaging (Sprint 11, D-7) — the dual-recipient new-message types.
         'message.received_by_creator',
         'message.received_by_agency',
+        // Relationship messaging (AH-010) — the dual-recipient 1:1 DM types.
+        'message.relationship_received_by_creator',
+        'message.relationship_received_by_agency',
     ];
 
     $actual = array_map(fn (NotificationType $case): string => $case->value, NotificationType::cases());

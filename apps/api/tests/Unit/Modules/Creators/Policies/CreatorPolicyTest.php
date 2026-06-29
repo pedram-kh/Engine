@@ -6,6 +6,7 @@ use App\Modules\Agencies\Database\Factories\AgencyFactory;
 use App\Modules\Agencies\Database\Factories\AgencyMembershipFactory;
 use App\Modules\Agencies\Enums\AgencyRole;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
+use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Policies\CreatorPolicy;
 use App\Modules\Identity\Models\User;
@@ -312,4 +313,163 @@ it('canSeeContactDetails returns false for the owning creator user (not an agenc
     $creator = Creator::factory()->createOne(['user_id' => $owner->id]);
 
     expect(creatorPolicy()->canSeeContactDetails($owner, $creator, $agency))->toBeFalse();
+});
+
+// ---------------------------------------------------------------------------
+// canMessageRelationship (AH-010, D2) — the LOAD-BEARING messaging gate.
+// Permits messaging ONLY for: approved creator + roster relation +
+// non-blacklisted + (active member of THIS agency OR the owning creator).
+// Explicitly excludes prospect / pending_request / declined / external /
+// blacklisted / non-approved. STRICTER than canSeeContactDetails on purpose:
+// the not-blacklisted-only predicate would let a declined agency DM (spam
+// vector). Break-revert: loosen relationPermitsMessaging() to not-blacklisted
+// -only → the declined-agency-blocked spec fails → revert.
+// ---------------------------------------------------------------------------
+
+it('canMessageRelationship returns true for an active agency member with an approved creator on a non-blacklisted roster relation', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = Creator::factory()->approved()->createOne();
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::Roster,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canMessageRelationship($member, $creator, $agency))->toBeTrue();
+});
+
+it('canMessageRelationship returns true for the owning creator user on a qualifying relation', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $owner = User::factory()->creator()->createOne();
+    $creator = Creator::factory()->approved()->createOne(['user_id' => $owner->id]);
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::Roster,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canMessageRelationship($owner, $creator, $agency))->toBeTrue();
+});
+
+it('canMessageRelationship BLOCKS a declined relation (break-revert anchor — the spam vector)', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = Creator::factory()->approved()->createOne();
+
+    // A declined relation is NOT blacklisted — so the AH-005 not-blacklisted
+    // predicate would (wrongly) allow it. This gate must still block.
+    AgencyCreatorRelation::factory()
+        ->declined()
+        ->createOne(['agency_id' => $agency->id, 'creator_id' => $creator->id]);
+
+    expect(creatorPolicy()->canMessageRelationship($member, $creator, $agency))->toBeFalse();
+});
+
+it('canMessageRelationship BLOCKS a prospect relation', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = Creator::factory()->approved()->createOne();
+
+    AgencyCreatorRelation::factory()
+        ->prospect()
+        ->createOne(['agency_id' => $agency->id, 'creator_id' => $creator->id]);
+
+    expect(creatorPolicy()->canMessageRelationship($member, $creator, $agency))->toBeFalse();
+});
+
+it('canMessageRelationship BLOCKS a pending_request relation', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = Creator::factory()->approved()->createOne();
+
+    AgencyCreatorRelation::factory()
+        ->pendingRequest()
+        ->createOne(['agency_id' => $agency->id, 'creator_id' => $creator->id]);
+
+    expect(creatorPolicy()->canMessageRelationship($member, $creator, $agency))->toBeFalse();
+});
+
+it('canMessageRelationship BLOCKS an external relation (unreachable + semantically non-roster)', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = Creator::factory()->approved()->createOne();
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::External,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canMessageRelationship($member, $creator, $agency))->toBeFalse();
+});
+
+it('canMessageRelationship BLOCKS a blacklisted roster relation', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = Creator::factory()->approved()->createOne();
+
+    AgencyCreatorRelation::factory()
+        ->blacklisted('Hard ban')
+        ->createOne([
+            'agency_id' => $agency->id,
+            'creator_id' => $creator->id,
+            'relationship_status' => RelationshipStatus::Roster,
+        ]);
+
+    expect(creatorPolicy()->canMessageRelationship($member, $creator, $agency))->toBeFalse();
+});
+
+it('canMessageRelationship BLOCKS a non-approved creator even on a clean roster relation', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($agency)->createOne();
+    // Default factory creator is `incomplete` (not approved).
+    $creator = Creator::factory()->createOne();
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::Roster,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canMessageRelationship($member, $creator, $agency))->toBeFalse();
+});
+
+it('canMessageRelationship returns false for a platform admin (admins are not party to a 1:1 thread)', function (): void {
+    $admin = User::factory()->platformAdmin()->createOne();
+    $agency = AgencyFactory::new()->createOne();
+    $creator = Creator::factory()->approved()->createOne();
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::Roster,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canMessageRelationship($admin, $creator, $agency))->toBeFalse();
+});
+
+it('canMessageRelationship returns false for an agency member who does not belong to the qualifying agency', function (): void {
+    $qualifyingAgency = AgencyFactory::new()->createOne();
+    $otherAgency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($otherAgency)->createOne();
+    $creator = Creator::factory()->approved()->createOne();
+
+    // The qualifying roster relation is on an agency the caller does NOT belong
+    // to — org membership of THIS agency is required, not merely a relation.
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $qualifyingAgency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::Roster,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canMessageRelationship($member, $creator, $qualifyingAgency))->toBeFalse();
 });
