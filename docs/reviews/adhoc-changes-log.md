@@ -51,8 +51,9 @@ reviews, and conversations.
 
 | ID      | Title                                          | Status  | Notes                                                                                                                                                                                                                                                                                                                        |
 | ------- | ---------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AH-010a | Relationship messaging — backend spine + gate  | Landed  | 1:1 connected agency↔creator. Mirrored spine + status-aware gate + file/link attachments (EXIF-strip) + 2 notification types. Committed `2656e5a` (feat) + docs; **push held** for AH-010b sequencing. See Change Log.                                                                                                       |
-| AH-010b | Relationship messaging — WhatsApp-shaped inbox | Landed  | Net-new conversations inbox + full-screen thread on the existing 15s poll; reuses generic `useMessageThread`. 2-state read tick from `read_by_counterparty`. Symmetric inboxes + nav (creator desktop/mobile + agency sidebar) + roster-detail shortcut. 23-locale fill green. **Push held** for spot-check. See Change Log. |
+| AH-010a | Relationship messaging — backend spine + gate  | Landed  | 1:1 connected agency↔creator. Mirrored spine + status-aware gate + file/link attachments (EXIF-strip) + 2 notification types. Committed `2656e5a` (feat) + docs; pushed with the AH-010b pair. See Change Log.                                                                                                               |
+| AH-010b | Relationship messaging — WhatsApp-shaped inbox | Landed  | Net-new conversations inbox + full-screen thread on the existing 15s poll; reuses generic `useMessageThread`. 2-state read tick from `read_by_counterparty`. Symmetric inboxes + nav (creator desktop/mobile + agency sidebar) + roster-detail shortcut. 23-locale fill green. Pushed (`5d48941`+`1b37dca`). See Change Log. |
+| AH-011  | Onboarding architecture-test cleanup           | Landed  | Two pre-existing source-scan reds from recent onboarding work: hex literal in `AnimatedWizardChromeMobile` (AH-007) → `success` token; `Step2ProfileBasicsPage` 422-allowlist mismatch (AH-009 extraction) → binding now lives in `ProfileBasicsForm`. Both arch tests green. See Change Log.                                |
 | —       | Campaign Drafts tab — independent review       | Pending | Merged in code; review file reads "pending independent review pass."                                                                                                                                                                                                                                                         |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
@@ -61,6 +62,39 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-011 · Onboarding architecture-test cleanup (two pre-existing reds)
+
+- **Status:** Landed
+- **Date:** 2026-06-29
+- **Why:** Two source-scan architecture tests were red on `main`, both fallout
+  from recent onboarding work (surfaced — not caused — by the AH-010b suite run).
+  Standalone cleanup so the FE arch gates are honest again.
+- **What:**
+  - **`no-hard-coded-colors` (AH-007 fallout):** `AnimatedWizardChromeMobile.vue`
+    carried a literal `--chip-active: <hex>` for the active-step "go" green. Traced
+    the value: it is exactly `semantic.success[500]` and already exposed as the
+    Vuetify `success` theme color (both modes) — same value AND role. Replaced the
+    literal with `rgb(var(--v-theme-success))` (no palette addition needed; mapping
+    to "nearest" was explicitly avoided). The hex must also stay out of the
+    surrounding comment — the scan reads raw text.
+  - **`form-error-pattern` (AH-009 fallout):** `Step2ProfileBasicsPage.vue` was on
+    the 422-binding allowlist but had dropped its `extractFieldErrors` import. Traced
+    where step-2's 422s surface now: the AH-009 profile-edit extraction moved the
+    whole body into the host-agnostic `ProfileBasicsForm` (shared by the wizard page
+    AND `/creator/profile`), and the binding (`extractFieldErrors` + per-field
+    `error-messages` + the `ApiError` catch) moved with it. So this is a genuine
+    relocation, not a silent drop: the page comes **off** the allowlist and
+    `ProfileBasicsForm` (which now carries the binding) goes **on**.
+- **Touched:** `apps/main/src/modules/onboarding/components/AnimatedWizardChromeMobile.vue`,
+  `tests/unit/architecture/form-error-pattern.spec.ts` (allowlist swap).
+- **Decisions:** Use the existing `success` token (value+role match), not a new one.
+  Allowlist relocation is valid because the binding is pointed-at in `ProfileBasicsForm`
+  (the invariant the test guards) — confirmed by the page's per-field-422 runtime spec
+  still passing through the extracted form.
+- **Ref:** this cleanup pair (fix + docs). Both `no-hard-coded-colors` and
+  `form-error-pattern` green; `Step2ProfileBasicsPage` spec (10 tests, incl. the
+  through-the-form 422 binding) green.
 
 ### AH-010b · Relationship messaging — WhatsApp-shaped inbox + thread (frontend)
 
