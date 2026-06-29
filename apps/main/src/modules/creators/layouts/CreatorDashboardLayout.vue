@@ -25,6 +25,7 @@ import ThemeToggle from '@/components/ThemeToggle.vue'
 import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
 import NotificationBell from '@/modules/notifications/components/NotificationBell.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
+import { useOnboardingStore } from '@/modules/onboarding/stores/useOnboardingStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import { useTheme } from '@/composables/useTheme'
@@ -34,9 +35,11 @@ const { t, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
 const router = useRouter()
 const authStore = useAuthStore()
+const onboardingStore = useOnboardingStore()
 const display = useDisplay()
 const { currentTheme } = useTheme()
 const { user, isLoggingOut } = storeToRefs(authStore)
+const { applicationStatus } = storeToRefs(onboardingStore)
 const localeOptions = buildLocaleOptions()
 const userMenuOpen = ref(false)
 
@@ -58,15 +61,35 @@ const logoNeedsDarkening = computed(() => currentTheme.value === 'light')
 const isMobile = computed(() => display.smAndDown.value)
 
 /**
- * Creator topbar nav (D-b13). Two router-linked items; active-state is
- * driven by vue-router's link matching on the current route (no manual
- * `route.name` checks). Localized via the `availability` bundle.
+ * Creator topbar nav (D-b13). Router-linked items; active-state is driven by
+ * vue-router's link matching on the current route (no manual `route.name`
+ * checks). Localized via the `availability` bundle. Rendered identically in
+ * the desktop topbar and the AH-007 mobile bottom-nav.
+ *
+ * AH-009: the "Profile" editor is shown to post-submission creators only
+ * (pending / approved / rejected). Incomplete creators are still in the wizard
+ * — their self-edit path is the wizard itself — so the item is hidden for them
+ * to avoid two competing edit surfaces. `applicationStatus` is null until the
+ * onboarding store bootstraps (driven by the landed page); the computed picks
+ * the item up reactively once it resolves.
  */
-const navItems = [
-  { key: 'dashboard', icon: 'mdi-view-dashboard-outline', routeName: 'creator.dashboard' },
-  { key: 'assignments', icon: 'mdi-clipboard-text-outline', routeName: 'creator.assignments' },
-  { key: 'availability', icon: 'mdi-calendar-month-outline', routeName: 'creator.availability' },
-] as const
+const navItems = computed(() => {
+  const items: { key: string; icon: string; routeName: string }[] = [
+    { key: 'dashboard', icon: 'mdi-view-dashboard-outline', routeName: 'creator.dashboard' },
+  ]
+  if (applicationStatus.value !== null && applicationStatus.value !== 'incomplete') {
+    items.push({
+      key: 'profile',
+      icon: 'mdi-account-circle-outline',
+      routeName: 'creator.profile',
+    })
+  }
+  items.push(
+    { key: 'assignments', icon: 'mdi-clipboard-text-outline', routeName: 'creator.assignments' },
+    { key: 'availability', icon: 'mdi-calendar-month-outline', routeName: 'creator.availability' },
+  )
+  return items
+})
 
 async function signOut(): Promise<void> {
   userMenuOpen.value = false

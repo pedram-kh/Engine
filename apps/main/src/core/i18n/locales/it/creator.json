@@ -243,6 +243,19 @@
           "review_button": "Rivedi e invia"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Completa nome visualizzato, paese, lingua, categorie e foto profilo prima di salvare.",
+          "approved_warning": "Questo ridurrà la completezza del tuo profilo, che le agenzie vedono nella scoperta.",
+          "social_warning": "Rimuovendo il tuo ultimo account social, il profilo verrà contrassegnato come incompleto.",
+          "portfolio_warning": "Rimuovendo il tuo ultimo elemento del portfolio, il profilo verrà contrassegnato come incompleto."
+        },
+        "title": "Modifica profilo",
+        "basics_heading": "Dati di base del profilo",
+        "connections_heading": "Social e portfolio",
+        "save": "Salva modifiche",
+        "saved": "Profilo salvato"
+      },
       "dashboard": {
         "title": "La tua candidatura",
         "greeting": "Ciao, {name}.",

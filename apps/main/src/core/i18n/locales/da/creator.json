@@ -243,6 +243,19 @@
           "review_button": "Gennemse og indsend"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Udfyld dit visningsnavn, land, sprog, kategorier og profilbillede, før du gemmer.",
+          "approved_warning": "Dette sænker din profils fuldstændighed, som bureauer kan se ved opdagelse.",
+          "social_warning": "Hvis du fjerner din sidste sociale konto, markeres din profil som ufuldstændig.",
+          "portfolio_warning": "Hvis du fjerner dit sidste porteføljeelement, markeres din profil som ufuldstændig."
+        },
+        "title": "Rediger profil",
+        "basics_heading": "Profilens grundoplysninger",
+        "connections_heading": "Sociale medier og portfolio",
+        "save": "Gem ændringer",
+        "saved": "Profil gemt"
+      },
       "dashboard": {
         "title": "Din ansøgning",
         "greeting": "Velkommen, {name}.",

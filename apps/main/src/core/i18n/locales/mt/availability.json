@@ -9,6 +9,7 @@
       "viewAll": "Show all blocks for this day"
     },
     "creatorNav": {
+      "profile": "Profil",
       "dashboard": "Dashboard",
       "assignments": "Stedinas",
       "availability": "Disponibilità"

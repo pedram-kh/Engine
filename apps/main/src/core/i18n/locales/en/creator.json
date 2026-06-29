@@ -243,6 +243,19 @@
           "review_button": "Review and submit"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Complete your display name, country, language, categories, and profile photo before saving.",
+          "approved_warning": "This will lower your profile completeness, which agencies can see on discovery.",
+          "social_warning": "Removing your last social account will mark your profile incomplete.",
+          "portfolio_warning": "Removing your last portfolio item will mark your profile incomplete."
+        },
+        "title": "Edit profile",
+        "basics_heading": "Profile basics",
+        "connections_heading": "Socials & portfolio",
+        "save": "Save changes",
+        "saved": "Profile saved"
+      },
       "dashboard": {
         "title": "Your application",
         "greeting": "Welcome, {name}.",

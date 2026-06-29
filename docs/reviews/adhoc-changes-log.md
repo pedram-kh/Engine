@@ -60,6 +60,38 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-009 · Standalone creator Profile-edit page (reuses wizard steps 2 & 3)
+
+- **Status:** Proposed
+- **Date:** 2026-06-29 (last-updated)
+- **Why:** The wizard was the only creator self-edit path (logged as the wizard-as-settings
+  stopgap). Post-onboarding creators had no place to update their profile, socials, or
+  portfolio.
+- **What:** A "Profile" nav item (desktop topbar + AH-007 mobile bottom-nav) opens an editable
+  `/creator/profile` page with two bordered sections — Profile basics (extracted step-2 form
+  body, incl. AH-005 contact) and Socials & portfolio (the two step-3 sub-sections mounted
+  directly). Reuses the existing save paths; step 2's form body is extracted into a shared
+  `ProfileBasicsForm` component so the wizard and the profile page render one form in two hosts.
+  One `GET /creators/me` bootstrap hydrates everything. New strings (`creatorNav.profile`, the
+  page title/headings/save/saved copy) authored in `en` and across all 24 locales (parity green).
+- **Touched:** `apps/main` — new `onboarding/components/ProfileBasicsForm.vue` (extracted body),
+  `onboarding/pages/Step2ProfileBasicsPage.vue` (now hosts the shared form, keeps wizard chrome),
+  new `creators/pages/CreatorProfilePage.vue`, `creators/routes.ts` (+`creator.profile`),
+  `creators/layouts/CreatorDashboardLayout.vue` (conditional nav item), 24× `creator.json` +
+  `availability.json` locales.
+- **Decisions:** editable (not read-only); extract-not-duplicate (wizard keeps working on the
+  same shared body); `requireAuth`-only on the creator shell (NOT `requireOnboardingAccess`,
+  which redirects non-incomplete creators away); post-submission audience only (incomplete
+  creators soft-redirect to `onboarding.welcome-back` from the page, not the guard);
+  lifecycle-aware page-level completeness floor so an approved creator can't silently regress
+  `next_step`/score (read-question resolved: `next_step` is vestigial post-approval, but
+  `profile_completeness_score` IS surfaced to the creator dashboard, admin, AND agency discovery
+  — so approved = soft-warn not block; pending/rejected = hard block; socials/portfolio = warn,
+  don't block, sub-sections unmodified). Backend status guard deferred to tech-debt — the API
+  has none.
+- **Ref:** kickoff "AH-009 profile-edit page" (two-commit pair: extraction + page/floor; push
+  held for spot-check).
+
 ### AH-007 · Creator platform mobile-responsive pass
 
 - **Status:** Landed

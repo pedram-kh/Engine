@@ -243,6 +243,19 @@
           "review_button": "Granska och skicka in"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Fyll i ditt visningsnamn, land, språk, kategorier och profilbild innan du sparar.",
+          "approved_warning": "Detta sänker din profils fullständighet, som byråer kan se vid upptäckt.",
+          "social_warning": "Om du tar bort ditt sista sociala konto markeras din profil som ofullständig.",
+          "portfolio_warning": "Om du tar bort ditt sista portföljobjekt markeras din profil som ofullständig."
+        },
+        "title": "Redigera profil",
+        "basics_heading": "Profilens grunduppgifter",
+        "connections_heading": "Sociala medier och portfölj",
+        "save": "Spara ändringar",
+        "saved": "Profil sparad"
+      },
       "dashboard": {
         "title": "Din ansökan",
         "greeting": "Välkommen, {name}.",

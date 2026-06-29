@@ -243,6 +243,19 @@
           "review_button": "Revisar y enviar"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Completa tu nombre visible, país, idioma, categorías y foto de perfil antes de guardar.",
+          "approved_warning": "Esto reducirá la completitud de tu perfil, que las agencias pueden ver en el descubrimiento.",
+          "social_warning": "Si eliminas tu última cuenta social, tu perfil se marcará como incompleto.",
+          "portfolio_warning": "Si eliminas tu último elemento del portafolio, tu perfil se marcará como incompleto."
+        },
+        "title": "Editar perfil",
+        "basics_heading": "Datos básicos del perfil",
+        "connections_heading": "Redes sociales y portafolio",
+        "save": "Guardar cambios",
+        "saved": "Perfil guardado"
+      },
       "dashboard": {
         "title": "Tu solicitud",
         "greeting": "Hola, {name}.",

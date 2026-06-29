@@ -9,6 +9,7 @@
       "viewAll": "Mostrar todos los bloqueos de este día"
     },
     "creatorNav": {
+      "profile": "Perfil",
       "dashboard": "Panel",
       "assignments": "Invitaciones",
       "availability": "Disponibilidad"

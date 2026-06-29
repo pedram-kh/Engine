@@ -243,6 +243,19 @@
           "review_button": "Review and submit"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Täytä näyttönimi, maa, kieli, kategoriat ja profiilikuva ennen tallentamista.",
+          "approved_warning": "Tämä heikentää profiilisi täydellisyyttä, jonka toimistot näkevät haussa.",
+          "social_warning": "Viimeisen sosiaalisen tilin poistaminen merkitsee profiilisi keskeneräiseksi.",
+          "portfolio_warning": "Viimeisen portfoliokohteen poistaminen merkitsee profiilisi keskeneräiseksi."
+        },
+        "title": "Muokkaa profiilia",
+        "basics_heading": "Profiilin perustiedot",
+        "connections_heading": "Sosiaalinen media ja portfolio",
+        "save": "Tallenna muutokset",
+        "saved": "Profiili tallennettu"
+      },
       "dashboard": {
         "title": "Your application",
         "greeting": "Tervetuloa, {name}.",

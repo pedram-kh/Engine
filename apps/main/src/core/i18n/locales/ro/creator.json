@@ -243,6 +243,19 @@
           "review_button": "Review and submit"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Completează numele afișat, țara, limba, categoriile și fotografia de profil înainte de a salva.",
+          "approved_warning": "Acest lucru va reduce completitudinea profilului tău, pe care agențiile o văd la descoperire.",
+          "social_warning": "Eliminarea ultimului cont social va marca profilul tău ca incomplet.",
+          "portfolio_warning": "Eliminarea ultimului element din portofoliu va marca profilul tău ca incomplet."
+        },
+        "title": "Editează profilul",
+        "basics_heading": "Informații de bază ale profilului",
+        "connections_heading": "Rețele sociale și portofoliu",
+        "save": "Salvează modificările",
+        "saved": "Profil salvat"
+      },
       "dashboard": {
         "title": "Your application",
         "greeting": "Bun venit, {name}.",

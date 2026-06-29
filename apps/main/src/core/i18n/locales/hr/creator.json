@@ -243,6 +243,19 @@
           "review_button": "Preveri a odeslat"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Prije spremanja ispunite prikazano ime, državu, jezik, kategorije i profilnu fotografiju.",
+          "approved_warning": "Time ćete smanjiti potpunost svog profila, koju agencije vide pri otkrivanju.",
+          "social_warning": "Uklanjanjem posljednjeg društvenog računa vaš će profil biti označen kao nepotpun.",
+          "portfolio_warning": "Uklanjanjem posljednje stavke portfelja vaš će profil biti označen kao nepotpun."
+        },
+        "title": "Uredi profil",
+        "basics_heading": "Osnovni podaci profila",
+        "connections_heading": "Društvene mreže i portfelj",
+        "save": "Spremi promjene",
+        "saved": "Profil spremljen"
+      },
       "dashboard": {
         "title": "Vaše prijava",
         "greeting": "Vítejte, {name}.",

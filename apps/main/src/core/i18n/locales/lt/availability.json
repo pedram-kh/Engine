@@ -9,6 +9,7 @@
       "viewAll": "Show all blocks for this day"
     },
     "creatorNav": {
+      "profile": "Profilis",
       "dashboard": "Valdymo skydelis",
       "assignments": "Kvietimass",
       "availability": "Pasiekiamumas"

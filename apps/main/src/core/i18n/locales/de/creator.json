@@ -243,6 +243,19 @@
           "review_button": "Prüfen und einreichen"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Fülle vor dem Speichern Anzeigename, Land, Sprache, Kategorien und Profilbild aus.",
+          "approved_warning": "Dies verringert die Vollständigkeit deines Profils, die Agenturen bei der Suche sehen.",
+          "social_warning": "Wenn du dein letztes soziales Konto entfernst, wird dein Profil als unvollständig markiert.",
+          "portfolio_warning": "Wenn du dein letztes Portfolio-Element entfernst, wird dein Profil als unvollständig markiert."
+        },
+        "title": "Profil bearbeiten",
+        "basics_heading": "Profil-Grunddaten",
+        "connections_heading": "Soziale Netzwerke & Portfolio",
+        "save": "Änderungen speichern",
+        "saved": "Profil gespeichert"
+      },
       "dashboard": {
         "title": "Deine Bewerbung",
         "greeting": "Willkommen, {name}.",

@@ -9,6 +9,7 @@
       "viewAll": "Afficher tous les blocs de ce jour"
     },
     "creatorNav": {
+      "profile": "Profil",
       "dashboard": "Tableau de bord",
       "assignments": "Invitations",
       "availability": "Disponibilité"

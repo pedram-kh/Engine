@@ -243,6 +243,19 @@
           "review_button": "Przejrzyj i prześlij"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Przed zapisaniem uzupełnij nazwę wyświetlaną, kraj, język, kategorie i zdjęcie profilowe.",
+          "approved_warning": "Spowoduje to obniżenie kompletności Twojego profilu, którą agencje widzą podczas wyszukiwania.",
+          "social_warning": "Usunięcie ostatniego konta społecznościowego oznaczy Twój profil jako niekompletny.",
+          "portfolio_warning": "Usunięcie ostatniego elementu portfolio oznaczy Twój profil jako niekompletny."
+        },
+        "title": "Edytuj profil",
+        "basics_heading": "Podstawowe dane profilu",
+        "connections_heading": "Media społecznościowe i portfolio",
+        "save": "Zapisz zmiany",
+        "saved": "Profil zapisany"
+      },
       "dashboard": {
         "title": "Twoja aplikacja",
         "greeting": "Witaj, {name}.",

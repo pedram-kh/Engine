@@ -243,6 +243,19 @@
           "review_button": "Vérifier et soumettre"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Complétez votre nom affiché, pays, langue, catégories et photo de profil avant d'enregistrer.",
+          "approved_warning": "Cela réduira la complétude de votre profil, que les agences voient lors de la découverte.",
+          "social_warning": "Supprimer votre dernier compte social marquera votre profil comme incomplet.",
+          "portfolio_warning": "Supprimer votre dernier élément de portfolio marquera votre profil comme incomplet."
+        },
+        "title": "Modifier le profil",
+        "basics_heading": "Informations de base du profil",
+        "connections_heading": "Réseaux sociaux et portfolio",
+        "save": "Enregistrer les modifications",
+        "saved": "Profil enregistré"
+      },
       "dashboard": {
         "title": "Votre candidature",
         "greeting": "Bienvenue, {name}.",

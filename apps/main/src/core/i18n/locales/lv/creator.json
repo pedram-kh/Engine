@@ -243,6 +243,19 @@
           "review_button": "Review and submit"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Pirms saglabāšanas aizpildiet attēloto vārdu, valsti, valodu, kategorijas un profila fotoattēlu.",
+          "approved_warning": "Tas samazinās jūsu profila pilnīgumu, ko aģentūras redz atklāšanas laikā.",
+          "social_warning": "Noņemot pēdējo sociālo kontu, jūsu profils tiks atzīmēts kā nepilnīgs.",
+          "portfolio_warning": "Noņemot pēdējo portfolio vienumu, jūsu profils tiks atzīmēts kā nepilnīgs."
+        },
+        "title": "Rediģēt profilu",
+        "basics_heading": "Profila pamatinformācija",
+        "connections_heading": "Sociālie tīkli un portfolio",
+        "save": "Saglabāt izmaiņas",
+        "saved": "Profils saglabāts"
+      },
       "dashboard": {
         "title": "Your application",
         "greeting": "Laipni lūgti, {name}.",

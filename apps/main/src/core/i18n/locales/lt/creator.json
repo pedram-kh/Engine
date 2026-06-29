@@ -243,6 +243,19 @@
           "review_button": "Review and submit"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Prieš išsaugodami užpildykite rodomą vardą, šalį, kalbą, kategorijas ir profilio nuotrauką.",
+          "approved_warning": "Tai sumažins jūsų profilio išsamumą, kurį agentūros mato atrandant.",
+          "social_warning": "Pašalinus paskutinę socialinę paskyrą, jūsų profilis bus pažymėtas kaip neužbaigtas.",
+          "portfolio_warning": "Pašalinus paskutinį portfelio elementą, jūsų profilis bus pažymėtas kaip neužbaigtas."
+        },
+        "title": "Redaguoti profilį",
+        "basics_heading": "Pagrindiniai profilio duomenys",
+        "connections_heading": "Socialiniai tinklai ir portfelis",
+        "save": "Išsaugoti pakeitimus",
+        "saved": "Profilis išsaugotas"
+      },
       "dashboard": {
         "title": "Your application",
         "greeting": "Sveiki atvykę, {name}.",

@@ -9,6 +9,7 @@
       "viewAll": "Show all blocks for this day"
     },
     "creatorNav": {
+      "profile": "Profils",
       "dashboard": "Vadības panelis",
       "assignments": "Uzaicinājumss",
       "availability": "Pieejamība"

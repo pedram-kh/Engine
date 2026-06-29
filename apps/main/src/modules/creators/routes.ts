@@ -26,6 +26,19 @@ export const creatorsRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    // AH-009 — standalone post-onboarding profile-edit surface. Reuses the
+    // wizard step-2 body + the step-3 sub-sections. `requireAuth` only (NOT
+    // `requireOnboardingAccess`, which would redirect non-incomplete creators
+    // away); the page itself soft-redirects incomplete creators to the wizard.
+    path: '/creator/profile',
+    name: 'creator.profile',
+    component: () => import('./pages/CreatorProfilePage.vue'),
+    meta: {
+      layout: 'creator',
+      guards: ['requireAuth'],
+    },
+  },
+  {
     // Sprint 5 Chunk B — creator availability calendar (month view).
     path: '/creator/availability',
     name: 'creator.availability',

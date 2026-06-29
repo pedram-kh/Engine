@@ -243,6 +243,19 @@
           "review_button": "Review and submit"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Mentés előtt töltsd ki a megjelenített nevet, országot, nyelvet, kategóriákat és a profilképet.",
+          "approved_warning": "Ez csökkenti a profilod teljességét, amelyet az ügynökségek a felfedezésnél látnak.",
+          "social_warning": "Az utolsó közösségi fiók eltávolításával a profilod hiányosként lesz megjelölve.",
+          "portfolio_warning": "Az utolsó portfólióelem eltávolításával a profilod hiányosként lesz megjelölve."
+        },
+        "title": "Profil szerkesztése",
+        "basics_heading": "Profil alapadatai",
+        "connections_heading": "Közösségi média és portfólió",
+        "save": "Módosítások mentése",
+        "saved": "Profil elmentve"
+      },
       "dashboard": {
         "title": "Your application",
         "greeting": "Üdvözöljük, {name}.",

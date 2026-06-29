@@ -243,6 +243,19 @@
           "review_button": "Review and submit"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Comhlánaigh d'ainm taispeána, tír, teanga, catagóirí agus grianghraf próifíle sula sábhálann tú.",
+          "approved_warning": "Laghdóidh sé seo iomláine do phróifíle, rud is féidir le gníomhaireachtaí a fheiceáil ar fhionnachtain.",
+          "social_warning": "Má bhaineann tú do chuntas sóisialta deireanach, marcálfar do phróifíl mar neamhiomlán.",
+          "portfolio_warning": "Má bhaineann tú do mhír phunainne deireanach, marcálfar do phróifíl mar neamhiomlán."
+        },
+        "title": "Cuir an phróifíl in eagar",
+        "basics_heading": "Bunfhaisnéis na próifíle",
+        "connections_heading": "Líonraí sóisialta agus punann",
+        "save": "Sábháil na hathruithe",
+        "saved": "Próifíl sábháilte"
+      },
       "dashboard": {
         "title": "Your application",
         "greeting": "Fáilte, {name}.",

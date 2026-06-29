@@ -243,6 +243,19 @@
           "review_button": "Review and submit"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Imla l-isem tal-wiri, il-pajjiż, il-lingwa, il-kategoriji u r-ritratt tal-profil qabel ma ssejvja.",
+          "approved_warning": "Dan inaqqas il-kompletezza tal-profil tiegħek, li l-aġenziji jaraw fl-iskoperta.",
+          "social_warning": "Jekk tneħħi l-aħħar kont soċjali tiegħek, il-profil tiegħek jiġi mmarkat bħala mhux komplut.",
+          "portfolio_warning": "Jekk tneħħi l-aħħar element tal-portfolio tiegħek, il-profil tiegħek jiġi mmarkat bħala mhux komplut."
+        },
+        "title": "Editja l-profil",
+        "basics_heading": "Informazzjoni bażika tal-profil",
+        "connections_heading": "Midja soċjali u portfolio",
+        "save": "Issejvja l-bidliet",
+        "saved": "Il-profil ġie ssejvjat"
+      },
       "dashboard": {
         "title": "Your application",
         "greeting": "Merħba, {name}.",

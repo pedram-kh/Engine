@@ -9,6 +9,7 @@
       "viewAll": "Show all blocks for this day"
     },
     "creatorNav": {
+      "profile": "Profile",
       "dashboard": "Dashboard",
       "assignments": "Invitations",
       "availability": "Availability"

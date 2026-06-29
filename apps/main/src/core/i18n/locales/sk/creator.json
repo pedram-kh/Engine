@@ -243,6 +243,19 @@
           "review_button": "Skontrolovať a odoslať"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Pred uložením vyplňte zobrazované meno, krajinu, jazyk, kategórie a profilovú fotku.",
+          "approved_warning": "Tým znížite úplnosť svojho profilu, ktorú agentúry vidia pri vyhľadávaní.",
+          "social_warning": "Odstránením posledného sociálneho účtu sa váš profil označí ako neúplný.",
+          "portfolio_warning": "Odstránením poslednej položky portfólia sa váš profil označí ako neúplný."
+        },
+        "title": "Upraviť profil",
+        "basics_heading": "Základné údaje profilu",
+        "connections_heading": "Sociálne siete a portfólio",
+        "save": "Uložiť zmeny",
+        "saved": "Profil uložený"
+      },
       "dashboard": {
         "title": "Vaše prihláška",
         "greeting": "Vítejte, {name}.",

@@ -243,6 +243,19 @@
           "review_button": "Rever e submeter"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Preencha o nome de exibição, país, idioma, categorias e foto de perfil antes de guardar.",
+          "approved_warning": "Isto reduzirá a completude do seu perfil, que as agências veem na descoberta.",
+          "social_warning": "Remover a sua última conta social marcará o seu perfil como incompleto.",
+          "portfolio_warning": "Remover o seu último item do portefólio marcará o seu perfil como incompleto."
+        },
+        "title": "Editar perfil",
+        "basics_heading": "Dados básicos do perfil",
+        "connections_heading": "Redes sociais e portefólio",
+        "save": "Guardar alterações",
+        "saved": "Perfil guardado"
+      },
       "dashboard": {
         "title": "A sua candidatura",
         "greeting": "Olá, {name}.",

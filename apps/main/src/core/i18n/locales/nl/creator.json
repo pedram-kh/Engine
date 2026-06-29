@@ -243,6 +243,19 @@
           "review_button": "Beoordelen en indienen"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Vul je weergavenaam, land, taal, categorieën en profielfoto in voordat je opslaat.",
+          "approved_warning": "Dit verlaagt de volledigheid van je profiel, die bureaus zien bij het ontdekken.",
+          "social_warning": "Als je je laatste social-account verwijdert, wordt je profiel als onvolledig gemarkeerd.",
+          "portfolio_warning": "Als je je laatste portfolio-item verwijdert, wordt je profiel als onvolledig gemarkeerd."
+        },
+        "title": "Profiel bewerken",
+        "basics_heading": "Basisgegevens profiel",
+        "connections_heading": "Social media & portfolio",
+        "save": "Wijzigingen opslaan",
+        "saved": "Profiel opgeslagen"
+      },
       "dashboard": {
         "title": "Je aanmelding",
         "greeting": "Welkom, {name}.",

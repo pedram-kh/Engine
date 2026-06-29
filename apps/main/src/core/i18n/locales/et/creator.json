@@ -243,6 +243,19 @@
           "review_button": "Review and submit"
         }
       },
+      "profile": {
+        "floor": {
+          "incomplete_hint": "Enne salvestamist täida kuvatav nimi, riik, keel, kategooriad ja profiilipilt.",
+          "approved_warning": "See vähendab sinu profiili täielikkust, mida agentuurid avastamisel näevad.",
+          "social_warning": "Viimase suhtluskonto eemaldamine märgib sinu profiili mittetäielikuks.",
+          "portfolio_warning": "Viimase portfooliokirje eemaldamine märgib sinu profiili mittetäielikuks."
+        },
+        "title": "Muuda profiili",
+        "basics_heading": "Profiili põhiandmed",
+        "connections_heading": "Sotsiaalmeedia ja portfoolio",
+        "save": "Salvesta muudatused",
+        "saved": "Profiil salvestatud"
+      },
       "dashboard": {
         "title": "Your application",
         "greeting": "Tere tulemast, {name}.",
