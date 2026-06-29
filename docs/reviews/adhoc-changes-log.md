@@ -49,12 +49,13 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID      | Title                                          | Status  | Notes                                                                                                                                                                                                                                                                                                                        |
-| ------- | ---------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AH-010a | Relationship messaging — backend spine + gate  | Landed  | 1:1 connected agency↔creator. Mirrored spine + status-aware gate + file/link attachments (EXIF-strip) + 2 notification types. Committed `2656e5a` (feat) + docs; pushed with the AH-010b pair. See Change Log.                                                                                                               |
-| AH-010b | Relationship messaging — WhatsApp-shaped inbox | Landed  | Net-new conversations inbox + full-screen thread on the existing 15s poll; reuses generic `useMessageThread`. 2-state read tick from `read_by_counterparty`. Symmetric inboxes + nav (creator desktop/mobile + agency sidebar) + roster-detail shortcut. 23-locale fill green. Pushed (`5d48941`+`1b37dca`). See Change Log. |
-| AH-011  | Onboarding architecture-test cleanup           | Landed  | Two pre-existing source-scan reds from recent onboarding work: hex literal in `AnimatedWizardChromeMobile` (AH-007) → `success` token; `Step2ProfileBasicsPage` 422-allowlist mismatch (AH-009 extraction) → binding now lives in `ProfileBasicsForm`. Both arch tests green. See Change Log.                                |
-| —       | Campaign Drafts tab — independent review       | Pending | Merged in code; review file reads "pending independent review pass."                                                                                                                                                                                                                                                         |
+| ID      | Title                                             | Status  | Notes                                                                                                                                                                                                                                                                                                                                                     |
+| ------- | ------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AH-010a | Relationship messaging — backend spine + gate     | Landed  | 1:1 connected agency↔creator. Mirrored spine + status-aware gate + file/link attachments (EXIF-strip) + 2 notification types. Committed `2656e5a` (feat) + docs; pushed with the AH-010b pair. See Change Log.                                                                                                                                            |
+| AH-010b | Relationship messaging — WhatsApp-shaped inbox    | Landed  | Net-new conversations inbox + full-screen thread on the existing 15s poll; reuses generic `useMessageThread`. 2-state read tick from `read_by_counterparty`. Symmetric inboxes + nav (creator desktop/mobile + agency sidebar) + roster-detail shortcut. 23-locale fill green. Pushed (`5d48941`+`1b37dca`). See Change Log.                              |
+| AH-011  | Onboarding architecture-test cleanup              | Landed  | Two pre-existing source-scan reds from recent onboarding work: hex literal in `AnimatedWizardChromeMobile` (AH-007) → `success` token; `Step2ProfileBasicsPage` 422-allowlist mismatch (AH-009 extraction) → binding now lives in `ProfileBasicsForm`. Both arch tests green. See Change Log.                                                             |
+| AH-012  | WhatsApp-style new-conversation flow (both sides) | Landed  | Symmetric gate-filtered contact picker (creator→messageable agencies, agency→messageable creators) + provisioning fix (open never provisions; first send/attachment does) + shared `scopePermitsMessaging` gate⇔picker predicate. Spot-check passed; gates green (BE 125 ✓, FE 28 ✓, 24-locale parity ✓). Pushed (`68e0266` feat + docs). See Change Log. |
+| —       | Campaign Drafts tab — independent review          | Pending | Merged in code; review file reads "pending independent review pass."                                                                                                                                                                                                                                                                                      |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -62,6 +63,80 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-012 · WhatsApp-style new-conversation flow (symmetric contact picker, both sides) + provisioning fix
+
+- **Status:** Landed
+- **Date:** 2026-06-29
+- **Why:** AH-010b shipped the messaging inbox but left **no way to start a
+  conversation** — the agency had only a roster-detail "Message" shortcut, the
+  creator had no initiation surface at all, and an empty inbox was a dead end.
+  This adds a WhatsApp-style "new chat → gate-filtered contact list → thread" entry
+  point on **both** sides, and corrects a provisioning bug where opening a thread
+  (not sending) persisted a row — contradicting the code's own "lazy on first send"
+  docblocks.
+- **What:**
+  - **D1 · Provisioning deferred to intent.** A gate-passing GET with no existing
+    thread now returns a **transient (unsaved) thread** — no row persisted on open.
+    The row materializes on the **first sent message** OR an **attachment upload**
+    (both are intent; opening alone never provisions). This corrects the live
+    behaviour and makes the roster "Message" shortcut stop creating ghost threads.
+  - **D2 · Inbox shows only threads with ≥1 message.** Both inbox queries filter to
+    threads that have at least one message — a safety net against empty ghosts.
+  - **D3 · One shared messaging predicate, gate ⇔ picker.** Extracted
+    `AgencyCreatorRelation::scopePermitsMessaging()` (roster + non-blacklisted); the
+    single-pair `CreatorPolicy` gate is **re-sourced** through it, and the new
+    set-valued `MessageableContactsFinder` shares the same scope (+ the identical
+    creator-`approved` leg) so the two forms **cannot drift**. An agreement test
+    pins it (every set member passes the gate; every gate-reject is absent), and the
+    break-revert (diverge the finder's predicate → agreement fails) is **proven**.
+    The `CreatorPolicy` spine tests stay green-unchanged (the preservation proof).
+  - **D4 · Two net-new gate-filtered endpoints** (controller homes in Messaging):
+    `GET /creators/me/messageable-agencies` → `{ulid, name, logo_path}` (unpaginated,
+    small list); a dedicated `GET /agencies/{agency}/messageable-creators` →
+    `{ulid, display_name}` with name search + pagination (NOT a flag on the
+    display-oriented roster endpoint — that one deliberately includes
+    blacklisted/prospect/non-approved).
+  - **D5 · Avatars:** initials fallback on the agency picker (no per-row signed-URL
+    minting — the roster-index N+1 judgment); the creator side gets agency
+    `logo_path` free. Real creator avatars on the agency picker are **deferred**.
+  - **D6 · Search + pagination** on the agency-side creator picker (simple
+    case-insensitive `LIKE` on `display_name`); creator-side agency list is small,
+    so unpaginated.
+  - **D7/D8 · Shared `ContactPicker` surface + entry points.** A presentation-only
+    picker reusing `RelationshipInbox`'s row shape; a "New conversation" button in
+    each inbox header **and** an injected "Start a conversation" empty-state CTA
+    (the dead end). The CTA action is injected per side (creator →
+    messageable-agencies, agency → messageable-creators), not hardcoded.
+  - **i18n:** new strings (picker title, search placeholder, CTAs, empty states) →
+    `en` → 24-locale regen → **parity green**.
+- **Touched:**
+  - BE: `AgencyCreatorRelation` (shared scope), `CreatorPolicy` (re-sourced gate),
+    `MessageableContactsFinder` (new), `MessageableContactsController` (new) + routes,
+    `RelationshipMessageService` (transient thread + page/meta/mark-read guards),
+    both `*RelationshipMessageController`s (open=transient, send/attachment=provision,
+    inbox ≥1-message filter).
+  - FE: `ContactPicker.vue` (new), `RelationshipInbox.vue` (empty-state CTA),
+    both `*MessagesPage.vue` (header button + picker wiring), api-client
+    `messaging.ts` types (+ nullable transient thread-meta `id`) and
+    `relationshipMessaging.api.ts` methods.
+  - Tests: `MessageableContactsAgreementTest` (D3 proof + break-revert),
+    `MessageableContactsApiTest`, additions to `RelationshipMessageApiTest`
+    (no-provision-on-open both sides, transient mark-read, open-then-send,
+    attachment-upload provisions, inbox ghost-hiding), `ContactPicker.spec.ts`,
+    `RelationshipInbox.spec.ts` (CTA emit).
+  - Docs: this entry + the attachment-orphan tech-debt note (below).
+- **Decisions:** D1–D8 above; Q1 — attachment-upload provisions (intent), the
+  uploaded-then-abandoned orphan is **logged** (not resolved by D2) in
+  `tech-debt.md` (S3-hygiene family); Q2 — both controllers home in Messaging,
+  creator route keeps its `creators/me/*` prefix; Q4 — picker lists all messageable
+  contacts incl. those with an existing thread (the UNIQUE pair routes into it).
+- **Gates:** BE `Messaging|CreatorPolicy` 125 passed; FE messaging specs 28 passed;
+  `@catalyst/main` typecheck + lint clean; `@catalyst/api-client` typecheck clean;
+  verify-locale parity green across all 23 non-`en` locales.
+- **Ref:** AH-012 kickoff + approval; two-commit pair — `68e0266` (feat) + this
+  docs commit. Spot-check passed (predicate-agreement + both-ways break-revert,
+  no-provision-on-open, transient-meta id-null safety, inbox ≥1-message filter).
 
 ### AH-011 · Onboarding architecture-test cleanup (two pre-existing reds)
 

@@ -1546,6 +1546,29 @@ anyone reviewing it later.
   stale. Retiring the endpoint (or routing it through the full-res worker for parity) is deferred;
   because EXIF is stripped either way, deferral is safe.
 
+## Relationship-message attachment orphans — uploaded-then-abandoned (AH-012 / S3-hygiene family)
+
+- **Where:** the relationship-messaging attachment path
+  (`apps/api/app/Modules/Messaging/...` — `attachmentInit` presign → `PUT` → send).
+  Surfaced during the AH-012 plan-pause (Q1) and confirmed at build.
+- **What we accepted:** AH-012 made thread provisioning **lazy on intent** — opening a
+  conversation alone never persists a `relationship_threads` row (D1), but **either** the
+  first sent message **or** an attachment upload provisions the thread (both are intent).
+  The attachment-upload leg provisions because the presigned S3 key is **scoped under the
+  thread ULID** (the per-thread isolation guard), so the thread must exist before the
+  object can be keyed. We deliberately did **not** re-architect that key scheme.
+- **The residual orphan:** a user who **uploads a file then abandons** (never sends) leaves
+  an **empty thread row + an orphaned S3 object**. D2 (the inbox shows only threads with
+  ≥1 message) **hides** this from both inboxes — but the row and the object are still real;
+  D2 is a display filter, **not** a cleanup. So this is genuine residue, not resolved.
+- **Fix (deferred):** an orphan sweep / delete-on-abandon in the same family as the AH-004
+  S3 storage-hygiene carry-overs — e.g. a scheduled sweep that deletes message-less
+  relationship threads older than a TTL **and** their prefixed S3 objects, or a
+  delete-on-navigate-away handshake. None built here.
+- **Triggered by:** an S3 storage-cost / hygiene review, or measured orphan volume.
+- **Owner:** the messaging workstream / infra-cost review (AH-004 S3-hygiene family).
+- **Status:** open (deferred).
+
 ## AH-001 i18n completeness — English fragments inside translated values (parity-invisible)
 
 - **Where:** the AH-001 machine-translation locale baseline across `apps/main` / `apps/admin`
