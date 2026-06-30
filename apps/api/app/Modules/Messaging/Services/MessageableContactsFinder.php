@@ -100,7 +100,7 @@ final class MessageableContactsFinder
             ->permitsMessaging()
             ->with('agency:id,ulid,name,logo_path')
             ->get()
-            ->map(static fn (AgencyCreatorRelation $relation): ?Agency => $relation->agency)
+            ->map(static fn (AgencyCreatorRelation $relation): Agency => $relation->agency)
             ->filter()
             ->values();
     }
