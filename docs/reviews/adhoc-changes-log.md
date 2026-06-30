@@ -64,6 +64,86 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-017 · Creator assignments mobile card redesign
+
+- **Status:** Landed
+- **Date:** 2026-06-29
+- **Why:** The creator assignments list was cramped on mobile.
+- **What:** Restructured the assignment cards for mobile; View action → outlined, Decline → red
+  outlined.
+- **Touched:** `apps/main` `modules/creators/pages/CreatorAssignmentsPage.vue`.
+- **Decisions:** UX polish only.
+- **Ref:** commit-pair (this entry's landing commit).
+
+### AH-016 · Creator mobile Profile-nav bootstrap fix
+
+- **Status:** Landed
+- **Date:** 2026-06-29
+- **Why:** On a deep-link or hard refresh into a creator route, the Profile nav item could be
+  missing because the onboarding store hadn't bootstrapped (nav visibility depends on it).
+- **What:** `CreatorDashboardLayout` now bootstraps the onboarding store on mount, so the
+  Profile nav item renders reliably on deep-link/refresh. Bugfix, not polish.
+- **Touched:** `apps/main` `modules/creators/layouts/CreatorDashboardLayout.vue` + spec.
+- **Decisions:** a nav-visibility correctness fix — not an auth gate (nav visibility ≠ route
+  authorization, which the guards still enforce independently).
+- **Ref:** commit-pair (this entry's landing commit).
+
+### AH-015 · Portfolio inline collapsible drawer + preview download
+
+- **Status:** Landed
+- **Date:** 2026-06-29
+- **Why:** The portfolio "View all" opened a popup; a download affordance was missing from the
+  preview lightbox.
+- **What:** Replaced the View-all popup with an inline collapsible drawer on the roster + discover
+  profile surfaces, and added a download icon to the top-left of the `PortfolioGallery` preview
+  lightbox. Unrelated to messaging.
+- **Touched:** `packages/ui` `PortfolioGallery.vue`, `apps/main` `roster/CreatorDetailPage.vue` +
+  `discover/DiscoverProfilePage.vue`.
+- **Decisions:** UX presentation only — no resource-shape or authz change (download inherits the
+  existing AH-004 presigned-GET path).
+- **Ref:** commit-pair (this entry's landing commit).
+
+### AH-014 · Campaign ChatPanel parity with relationship chat
+
+- **Status:** Landed
+- **Date:** 2026-06-29
+- **Why:** After the relationship-chat redesign (AH-013), the campaign `ChatPanel` looked
+  inconsistent — older bubbles, no composer parity.
+- **What:** Restyled campaign chat bubbles + timestamps and brought the composer to parity
+  (inline send, `+` file menu, auto-scroll, desktop-only Enter-to-send). Campaign messaging
+  surface only — the relationship spine is unaffected.
+- **Touched:** `apps/main` `modules/messaging/components/ChatPanel.vue`.
+- **Decisions:** styling/composer parity only — no change to campaign messaging behavior, data, or gate.
+- **Ref:** commit-pair (this entry's landing commit).
+
+### AH-013 · Two-pane (WhatsApp Web) messaging + real contact avatars
+
+- **Status:** Landed
+- **Date:** 2026-06-29
+- **Why:** Relationship messaging was a single-column inbox→thread navigation; on
+  desktop it didn't read like WhatsApp Web, and contact/inbox rows showed initials only.
+- **What:**
+  - **Two-pane shell** on both inboxes (list left, active thread right) via route nesting —
+    `messages.thread` / `creator.messages.thread` are now children of their inbox routes
+    (same URLs, full guard chain preserved) + a `meta.wide` flag driving a fluid container.
+  - **Active-row highlight** (`RelationshipInbox.activeId`) for the two-pane selection.
+  - **Real contact avatars** (resolves the AH-012 D5 deferral): new shared `ContactMediaUrl`
+    resolver (passthrough absolute URL / sign a bare S3 key / null on non-S3 disk); both
+    inboxes gain `creator.avatar_url` / `agency.logo_url` and both picker endpoints gain the
+    same — additive response-shape change, api-client types updated, backend assertions added.
+  - **Thread-view redesign** (`RelationshipThreadView`): back-chevron header, inline send,
+    `+` attach menu (file picker + link dialog), 100dvh, desktop-only Enter-to-send, auto-scroll.
+  - New i18n key `app.messaging.relationship.selectConversation` across all 24 locales (parity green).
+- **Touched:** `apps/api` (both relationship message controllers, `MessageableContactsController`,
+  `MessageableContactsFinder` eager-load, new `Support/ContactMediaUrl`, tests), `packages/api-client`
+  (`messaging.ts` row types), `apps/main` (auth/creators routes nesting + `wide`, both `*MessagesPage`,
+  both thread pages, `RelationshipInbox`, `RelationshipThreadView`, `CreatorDashboardLayout` wide
+  container, locales + specs).
+- **Decisions:** route-nesting (not new URLs) for two-pane so guards/URLs are unchanged; avatar URLs
+  additive (no field removed); `ContactMediaUrl` is the single shared resolver (passthrough/sign/null).
+  Gate untouched — `MessageableContactsFinder` changed only its eager-load, not `scopePermitsMessaging`.
+- **Ref:** commit-pair (this entry's landing commit).
+
 ### AH-012 · WhatsApp-style new-conversation flow (symmetric contact picker, both sides) + provisioning fix
 
 - **Status:** Landed
@@ -99,7 +179,10 @@ reviews, and conversations.
     blacklisted/prospect/non-approved).
   - **D5 · Avatars:** initials fallback on the agency picker (no per-row signed-URL
     minting — the roster-index N+1 judgment); the creator side gets agency
-    `logo_path` free. Real creator avatars on the agency picker are **deferred**.
+    `logo_path` free. Real creator avatars on the agency picker were **deferred** —
+    now **resolved by AH-013** (the shared `ContactMediaUrl` resolver + per-row
+    `avatar_url` on the picker; per-row signing is acceptable on the bounded,
+    paginated picker list).
   - **D6 · Search + pagination** on the agency-side creator picker (simple
     case-insensitive `LIKE` on `display_name`); creator-side agency list is small,
     so unpaginated.
