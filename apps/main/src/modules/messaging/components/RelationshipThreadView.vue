@@ -22,8 +22,10 @@ import type {
   SendRelationshipLink,
   SendRelationshipMessagePayload,
 } from '@catalyst/api-client'
-import { computed, ref, toRef } from 'vue'
+import { computed, nextTick, ref, toRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import type { RouteLocationRaw } from 'vue-router'
+import { useDisplay } from 'vuetify'
 
 import type { RelationshipChatTransport } from '../api/relationshipMessaging.api'
 import { useMessageThread } from '../composables/useMessageThread'
@@ -34,9 +36,21 @@ const props = defineProps<{
   title: string
   avatarText?: string
   avatarUrl?: string | null
+  /**
+   * When set, a back chevron renders before the avatar and navigates here. The
+   * parent supplies it only when a back affordance is wanted (mobile single-pane);
+   * on desktop two-pane it's omitted, so the chevron is hidden.
+   */
+  backTo?: RouteLocationRaw | null
 }>()
 
 const { t, locale } = useI18n()
+const { smAndDown } = useDisplay()
+
+// Enter-to-send is a DESKTOP affordance. On mobile the on-screen keyboard's
+// return key must insert a newline (the native textarea behaviour) — sending is
+// the explicit send icon — so Enter is only intercepted on larger screens.
+const isMobile = computed(() => smAndDown.value)
 
 const transportRef = toRef(props, 'transport')
 const { messages, hasMore, loading, loadingOlder, sending, loadError, loadOlder, sendMessage } =
@@ -45,6 +59,53 @@ const { messages, hasMore, loading, loadingOlder, sending, loadError, loadOlder,
     RelationshipThreadMeta,
     SendRelationshipMessagePayload
   >(transportRef)
+
+// Stick-to-bottom: the feed is the scroll container. We jump to the newest
+// message on the first load and whenever messages arrive — but only when the
+// viewer is already near the bottom (or it's their own send), so an incoming
+// poll never yanks them down while they're reading older history.
+const feedEl = ref<HTMLElement | null>(null)
+const NEAR_BOTTOM_PX = 120
+
+function isNearBottom(): boolean {
+  const el = feedEl.value
+  if (el === null) {
+    return true
+  }
+  return el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_PX
+}
+
+function scrollToBottom(): void {
+  const el = feedEl.value
+  if (el !== null) {
+    el.scrollTop = el.scrollHeight
+  }
+}
+
+// Keyed on the *last* message id so a "load earlier" prepend (tail unchanged)
+// never scrolls — only a genuinely-new tail message (send / incoming) can.
+let prevLastId: string | null = null
+watch(
+  messages,
+  (list) => {
+    const len = list.length
+    if (len === 0) {
+      prevLastId = null
+      return
+    }
+    const last = list[len - 1]
+    const lastId = last?.id ?? null
+    const tailChanged = lastId !== prevLastId
+    const isInitialLoad = prevLastId === null
+    const lastIsOwn = last?.attributes.is_own === true
+    // isNearBottom() reads the pre-update DOM (the watcher runs before re-render).
+    if (tailChanged && (isInitialLoad || lastIsOwn || isNearBottom())) {
+      void nextTick(scrollToBottom)
+    }
+    prevLastId = lastId
+  },
+  { immediate: true },
+)
 
 type ComposeField = 'body' | 'attachments' | 'links'
 
@@ -55,6 +116,10 @@ const linkUrl = ref('')
 const linkName = ref('')
 const linkError = ref<string | null>(null)
 const uploading = ref(false)
+
+// The "+" attach menu (file / link) below the composer, and the link dialog.
+const attachOpen = ref(false)
+const linkDialogOpen = ref(false)
 const generalError = ref<string | null>(null)
 const fieldErrors = ref<Partial<Record<ComposeField, readonly string[]>>>({})
 
@@ -71,6 +136,19 @@ const canSend = computed(
     (body.value.trim() !== '' || selectedFiles.value.length > 0 || links.value.length > 0),
 )
 
+function onComposerKeydown(event: KeyboardEvent): void {
+  // Mobile: never intercept — let the soft-keyboard return insert a newline.
+  if (isMobile.value) {
+    return
+  }
+  // Desktop: Enter sends, Shift+Enter inserts a newline; ignore IME composition.
+  if (event.key !== 'Enter' || event.shiftKey || event.isComposing) {
+    return
+  }
+  event.preventDefault()
+  void submit()
+}
+
 function formatTime(iso: string): string {
   const date = new Date(iso)
   return Number.isNaN(date.getTime()) ? '' : timeFormatter.value.format(date)
@@ -80,9 +158,32 @@ function senderLabel(message: RelationshipMessageResource): string {
   return message.attributes.sender?.name ?? t('app.messaging.participant')
 }
 
+/**
+ * The per-message sender label disambiguates WHICH agency member wrote each line
+ * (an agency has many members — the Q4 intent). It is only meaningful on
+ * agency-authored bubbles: a creator is a single person, so labelling their
+ * incoming messages with their raw account name is noise (and confusingly
+ * differs from the thread's display-name title). So: show the label only on
+ * incoming AGENCY-member bubbles.
+ */
+function showSenderLabel(message: RelationshipMessageResource): boolean {
+  return !message.attributes.is_own && message.attributes.sender_role === 'agency_user'
+}
+
 function onFilesPicked(event: Event): void {
   const target = event.target as HTMLInputElement
   selectedFiles.value = target.files !== null ? Array.from(target.files) : []
+}
+
+/** The "+" menu actions: open the OS file picker, or the link dialog. */
+function openFilePicker(): void {
+  fileInput.value?.click()
+  attachOpen.value = false
+}
+
+function openLinkDialog(): void {
+  linkError.value = null
+  linkDialogOpen.value = true
 }
 
 function removeFile(index: number): void {
@@ -100,6 +201,8 @@ function addLink(): void {
   links.value = [...links.value, name === '' ? { url } : { url, name }]
   linkUrl.value = ''
   linkName.value = ''
+  linkDialogOpen.value = false
+  attachOpen.value = false
 }
 
 function removeLink(index: number): void {
@@ -181,6 +284,16 @@ async function submit(): Promise<void> {
 <template>
   <div class="rel-thread" data-test="relationship-thread">
     <header class="rel-thread__header">
+      <v-btn
+        v-if="backTo"
+        :to="backTo"
+        icon="mdi-chevron-left"
+        variant="text"
+        density="comfortable"
+        class="rel-thread__back"
+        :aria-label="t('app.messaging.relationship.back')"
+        data-test="relationship-thread-back"
+      />
       <v-avatar size="40" color="primary" class="rel-thread__avatar">
         <v-img v-if="avatarUrl" :src="avatarUrl" :alt="title" />
         <span v-else class="text-body-2 font-weight-bold text-white">
@@ -190,7 +303,7 @@ async function submit(): Promise<void> {
       <span class="rel-thread__title" data-test="relationship-thread-title">{{ title }}</span>
     </header>
 
-    <div class="rel-thread__feed" data-test="relationship-thread-feed">
+    <div ref="feedEl" class="rel-thread__feed" data-test="relationship-thread-feed">
       <v-skeleton-loader v-if="loading" type="list-item-three-line@3" />
 
       <v-alert v-else-if="loadError" type="error" variant="tonal" density="compact">
@@ -228,7 +341,7 @@ async function submit(): Promise<void> {
           >
             <div class="rel-bubble">
               <div
-                v-if="!message.attributes.is_own"
+                v-if="showSenderLabel(message)"
                 class="rel-bubble__sender"
                 data-test="relationship-message-sender"
               >
@@ -297,19 +410,6 @@ async function submit(): Promise<void> {
     </div>
 
     <form class="rel-thread__compose" data-test="relationship-compose" @submit.prevent="submit">
-      <v-textarea
-        v-model="body"
-        :label="t('app.messaging.composePlaceholder')"
-        :error-messages="fieldErrors.body as string[]"
-        rows="1"
-        auto-grow
-        max-rows="5"
-        density="compact"
-        variant="outlined"
-        hide-details="auto"
-        data-test="relationship-compose-body"
-      />
-
       <ul
         v-if="selectedFiles.length > 0"
         class="rel-thread__pending"
@@ -334,35 +434,6 @@ async function submit(): Promise<void> {
         </li>
       </ul>
 
-      <div class="rel-thread__link-adder">
-        <v-text-field
-          v-model="linkUrl"
-          :label="t('app.messaging.relationship.linkUrl')"
-          :error-messages="linkError ? [linkError] : []"
-          density="compact"
-          variant="outlined"
-          hide-details="auto"
-          data-test="relationship-link-url"
-        />
-        <v-text-field
-          v-model="linkName"
-          :label="t('app.messaging.relationship.linkName')"
-          density="compact"
-          variant="outlined"
-          hide-details
-          data-test="relationship-link-name"
-        />
-        <v-btn
-          variant="tonal"
-          size="small"
-          :disabled="linkUrl.trim() === ''"
-          data-test="relationship-link-add"
-          @click="addLink"
-        >
-          {{ t('app.messaging.relationship.addLink') }}
-        </v-btn>
-      </div>
-
       <p v-if="fieldErrors.attachments" class="rel-thread__error">
         {{ (fieldErrors.attachments as string[]).join(' ') }}
       </p>
@@ -373,26 +444,109 @@ async function submit(): Promise<void> {
         {{ generalError }}
       </p>
 
-      <div class="rel-thread__actions">
-        <input
-          ref="fileInput"
-          type="file"
-          multiple
-          class="rel-thread__file-input"
-          data-test="relationship-file-input"
-          @change="onFilesPicked"
-        />
-        <v-spacer />
+      <div class="rel-thread__compose-row">
         <v-btn
-          type="submit"
-          color="primary"
-          :loading="sending || uploading"
-          :disabled="!canSend"
-          data-test="relationship-send"
+          icon="mdi-plus"
+          variant="text"
+          density="comfortable"
+          class="rel-thread__attach-btn"
+          :class="{ 'rel-thread__attach-btn--active': attachOpen }"
+          :aria-label="t('app.messaging.attachment')"
+          data-test="relationship-attach-toggle"
+          @click="attachOpen = !attachOpen"
+        />
+
+        <v-textarea
+          v-model="body"
+          :placeholder="t('app.messaging.composePlaceholder')"
+          :error-messages="fieldErrors.body as string[]"
+          rows="1"
+          auto-grow
+          max-rows="5"
+          density="compact"
+          variant="outlined"
+          hide-details="auto"
+          class="rel-thread__input"
+          data-test="relationship-compose-body"
+          @keydown="onComposerKeydown"
         >
-          {{ t('app.messaging.send') }}
-        </v-btn>
+          <template #append-inner>
+            <v-btn
+              icon="mdi-send"
+              variant="text"
+              size="small"
+              color="primary"
+              :loading="sending || uploading"
+              :disabled="!canSend"
+              :aria-label="t('app.messaging.send')"
+              data-test="relationship-send"
+              @click="submit"
+            />
+          </template>
+        </v-textarea>
       </div>
+
+      <div v-if="attachOpen" class="rel-thread__attach-menu" data-test="relationship-attach-menu">
+        <v-btn
+          icon="mdi-paperclip"
+          variant="tonal"
+          size="small"
+          :aria-label="t('app.messaging.attachment')"
+          data-test="relationship-attach-file"
+          @click="openFilePicker"
+        />
+        <v-btn
+          icon="mdi-link-variant"
+          variant="tonal"
+          size="small"
+          :aria-label="t('app.messaging.relationship.addLink')"
+          data-test="relationship-attach-link"
+          @click="openLinkDialog"
+        />
+      </div>
+
+      <input
+        ref="fileInput"
+        type="file"
+        multiple
+        class="rel-thread__file-input"
+        data-test="relationship-file-input"
+        @change="onFilesPicked"
+      />
+
+      <v-dialog v-model="linkDialogOpen" max-width="420" data-test="relationship-link-dialog">
+        <v-card>
+          <v-card-text class="rel-thread__link-form">
+            <v-text-field
+              v-model="linkUrl"
+              :label="t('app.messaging.relationship.linkUrl')"
+              :error-messages="linkError ? [linkError] : []"
+              density="comfortable"
+              variant="outlined"
+              hide-details="auto"
+              data-test="relationship-link-url"
+            />
+            <v-text-field
+              v-model="linkName"
+              :label="t('app.messaging.relationship.linkName')"
+              density="comfortable"
+              variant="outlined"
+              hide-details
+              data-test="relationship-link-name"
+            />
+            <v-btn
+              color="primary"
+              size="large"
+              block
+              :disabled="linkUrl.trim() === ''"
+              data-test="relationship-link-add"
+              @click="addLink"
+            >
+              {{ t('app.messaging.relationship.addLink') }}
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </form>
   </div>
 </template>
@@ -401,16 +555,33 @@ async function submit(): Promise<void> {
 .rel-thread {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 180px);
+  /* dvh (dynamic viewport) tracks the *visible* area as the mobile URL bar /
+     keyboard show & hide, so the pinned header + composer never get pushed
+     off-screen (the bug that forced a scroll to reveal them). */
+  height: calc(100dvh - 180px);
   min-height: 420px;
+}
+
+/* Mobile single-pane: fit between the top app-bar and bottom nav so only the
+   feed scrolls. Smaller offset matches the tighter mobile page padding, and
+   min-height is released so short viewports can't overflow. */
+@media (max-width: 959px) {
+  .rel-thread {
+    height: calc(100dvh - 140px);
+    min-height: 0;
+  }
 }
 
 .rel-thread__header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-bottom: 12px;
+  padding-bottom: 8px;
   border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+}
+
+.rel-thread__back {
+  margin-right: -4px;
 }
 
 .rel-thread__title {
@@ -511,7 +682,7 @@ async function submit(): Promise<void> {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-top: 12px;
+  padding-top: 8px;
   border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }
 
@@ -522,25 +693,48 @@ async function submit(): Promise<void> {
   font-size: 0.85rem;
 }
 
-.rel-thread__link-adder {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-}
-
 .rel-thread__error {
   color: rgb(var(--v-theme-error));
   font-size: 0.85rem;
   margin: 0;
 }
 
-.rel-thread__actions {
+/* WhatsApp-style composer: [+] [ field …………… (send) ] */
+.rel-thread__compose-row {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-end;
+  gap: 4px;
 }
 
+.rel-thread__attach-btn {
+  margin-bottom: 2px;
+  transition: transform 0.15s ease;
+}
+
+.rel-thread__attach-btn--active {
+  transform: rotate(45deg);
+}
+
+.rel-thread__input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The file / link icon menu the "+" reveals, aligned under the field. */
+.rel-thread__attach-menu {
+  display: flex;
+  gap: 8px;
+  padding-left: 44px;
+}
+
+.rel-thread__link-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* The native file input is triggered programmatically from the "+" menu. */
 .rel-thread__file-input {
-  font-size: 0.8rem;
+  display: none;
 }
 </style>

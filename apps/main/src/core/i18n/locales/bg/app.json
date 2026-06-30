@@ -66,6 +66,7 @@
         "remove": "Премахни",
         "newConversation": "Нов разговор",
         "startConversation": "Започнете разговор",
+        "selectConversation": "Изберете разговор, за да започнете да пишете.",
         "picker": {
           "titleCreators": "Нов разговор",
           "titleAgencies": "Нов разговор",

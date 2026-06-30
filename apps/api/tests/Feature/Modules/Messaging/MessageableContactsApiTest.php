@@ -130,7 +130,7 @@ it('the creator picker lists only messageable agencies (roster + non-blacklisted
         ->assertJsonPath('data.0.attributes.name', 'Bright Talent');
 });
 
-it('the creator picker carries the agency logo_path for the contact-row avatar', function (): void {
+it('the creator picker carries the agency logo for the contact-row avatar (AH-013 logo_url)', function (): void {
     $creatorUser = User::factory()->createOne();
     $creator = CreatorFactory::new()->approved()->createOne(['user_id' => $creatorUser->id]);
 
@@ -144,5 +144,22 @@ it('the creator picker carries the agency logo_path for the contact-row avatar',
 
     $this->actingAs($creatorUser)->getJson('/api/v1/creators/me/messageable-agencies')
         ->assertOk()
-        ->assertJsonPath('data.0.attributes.logo_path', 'https://cdn.example.com/logo.png');
+        ->assertJsonPath('data.0.attributes.logo_path', 'https://cdn.example.com/logo.png')
+        // AH-013 — an absolute logo URL resolves through verbatim.
+        ->assertJsonPath('data.0.attributes.logo_url', 'https://cdn.example.com/logo.png');
+});
+
+it('the agency picker carries the creator avatar_url for the contact-row avatar (AH-013)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $creator = relatedCreator($agency, RelationshipStatus::Roster, approved: true, blacklisted: false, name: 'Ada Lovelace');
+    // An absolute avatar reference resolves through verbatim (a bare S3 key would
+    // be signed; null on a non-S3 test disk). Pins the field is wired per-row.
+    $creator->forceFill(['avatar_path' => 'https://cdn.example.com/ada.png'])->save();
+
+    $this->actingAs($admin)->getJson("/api/v1/agencies/{$agency->ulid}/messageable-creators")
+        ->assertOk()
+        ->assertJsonPath('data.0.id', $creator->ulid)
+        ->assertJsonPath('data.0.attributes.avatar_url', 'https://cdn.example.com/ada.png');
 });

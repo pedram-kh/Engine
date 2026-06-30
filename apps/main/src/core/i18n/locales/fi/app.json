@@ -66,6 +66,7 @@
         "remove": "Poista",
         "newConversation": "Uusi keskustelu",
         "startConversation": "Aloita keskustelu",
+        "selectConversation": "Valitse keskustelu aloittaaksesi viestittelyn.",
         "picker": {
           "titleCreators": "Uusi keskustelu",
           "titleAgencies": "Uusi keskustelu",

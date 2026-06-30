@@ -29,6 +29,12 @@ defineProps<{
   items: RelationshipInboxItem[]
   loading: boolean
   loadError: boolean
+  /**
+   * AH-013 — the currently-open conversation's id, used to highlight the active
+   * row in the two-pane (WhatsApp Web) layout. Optional + defaulted, so the
+   * single-pane callers are unaffected.
+   */
+  activeId?: string | null
 }>()
 
 /**
@@ -84,6 +90,8 @@ function formatStamp(iso: string | null): string {
         v-for="item in items"
         :key="item.id"
         :to="item.to"
+        :active="item.id === activeId"
+        color="primary"
         :data-test="`relationship-inbox-row-${item.id}`"
       >
         <template #prepend>

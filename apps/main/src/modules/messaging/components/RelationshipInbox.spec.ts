@@ -27,6 +27,7 @@ async function mountInbox(props: {
   items: RelationshipInboxItem[]
   loading?: boolean
   loadError?: boolean
+  activeId?: string | null
 }) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: enApp } as never })
   const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
@@ -75,6 +76,27 @@ describe('RelationshipInbox', () => {
     const wrapper = await mountInbox({ items: [] })
     expect(wrapper.find('[data-test="relationship-inbox-empty"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('No conversations yet.')
+    wrapper.unmount()
+  })
+
+  it('marks the active row (AH-013 two-pane highlight)', async () => {
+    const wrapper = await mountInbox({
+      items: [
+        makeItem({ id: 'c1', to: { name: 'messages.thread', params: { creatorUlid: 'c1' } } }),
+        makeItem({
+          id: 'c2',
+          title: 'Other',
+          to: { name: 'messages.thread', params: { creatorUlid: 'c2' } },
+        }),
+      ],
+      activeId: 'c2',
+    })
+    expect(wrapper.find('[data-test="relationship-inbox-row-c2"]').classes()).toContain(
+      'v-list-item--active',
+    )
+    expect(wrapper.find('[data-test="relationship-inbox-row-c1"]').classes()).not.toContain(
+      'v-list-item--active',
+    )
     wrapper.unmount()
   })
 

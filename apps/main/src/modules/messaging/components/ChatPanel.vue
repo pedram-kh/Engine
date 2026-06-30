@@ -5,8 +5,9 @@ import type {
   SendMessageAttachment,
   SendMessagePayload,
 } from '@catalyst/api-client'
-import { computed, ref, toRef } from 'vue'
+import { computed, nextTick, ref, toRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useDisplay } from 'vuetify'
 
 import type { ChatTransport } from '../api/messaging.api'
 import { useMessageThread } from '../composables/useMessageThread'
@@ -17,7 +18,11 @@ const props = defineProps<{
   title?: string
 }>()
 
-const { t, te } = useI18n()
+const { t, te, locale } = useI18n()
+const { smAndDown } = useDisplay()
+
+// Enter-to-send is desktop-only; on mobile the keyboard return inserts a newline.
+const isMobile = computed(() => smAndDown.value)
 
 const transportRef = toRef(props, 'transport')
 const {
@@ -32,6 +37,58 @@ const {
   sendMessage,
 } = useMessageThread(transportRef)
 
+const timeFormatter = computed(
+  () => new Intl.DateTimeFormat(locale.value, { hour: '2-digit', minute: '2-digit' }),
+)
+
+function formatTime(iso: string): string {
+  const date = new Date(iso)
+  return Number.isNaN(date.getTime()) ? '' : timeFormatter.value.format(date)
+}
+
+// Stick-to-bottom: jump to the newest message on first load + own send, and on
+// incoming messages only when already near the bottom (mirrors the relationship
+// thread; the shared composable is untouched).
+const feedEl = ref<HTMLElement | null>(null)
+const NEAR_BOTTOM_PX = 120
+
+function scrollToBottom(): void {
+  const el = feedEl.value
+  if (el !== null) {
+    el.scrollTop = el.scrollHeight
+  }
+}
+
+function isNearBottom(): boolean {
+  const el = feedEl.value
+  if (el === null) {
+    return true
+  }
+  return el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_PX
+}
+
+let prevLastId: string | null = null
+watch(
+  messages,
+  (list) => {
+    const len = list.length
+    if (len === 0) {
+      prevLastId = null
+      return
+    }
+    const last = list[len - 1]
+    const lastId = last?.id ?? null
+    const tailChanged = lastId !== prevLastId
+    const isInitialLoad = prevLastId === null
+    const lastIsOwn = last?.attributes.is_own === true
+    if (tailChanged && (isInitialLoad || lastIsOwn || isNearBottom())) {
+      void nextTick(scrollToBottom)
+    }
+    prevLastId = lastId
+  },
+  { immediate: true },
+)
+
 type ComposeField = 'body' | 'attachments'
 
 const body = ref('')
@@ -41,6 +98,23 @@ const generalError = ref<string | null>(null)
 const fieldErrors = ref<Partial<Record<ComposeField, readonly string[]>>>({})
 
 const fileInput = ref<HTMLInputElement | null>(null)
+const attachOpen = ref(false)
+
+function onComposerKeydown(event: KeyboardEvent): void {
+  if (isMobile.value) {
+    return
+  }
+  if (event.key !== 'Enter' || event.shiftKey || event.isComposing) {
+    return
+  }
+  event.preventDefault()
+  void submit()
+}
+
+function openFilePicker(): void {
+  fileInput.value?.click()
+  attachOpen.value = false
+}
 
 const canSend = computed(
   () =>
@@ -148,7 +222,7 @@ async function submit(): Promise<void> {
   <div class="chat-panel" data-test="chat-panel">
     <div v-if="title" class="chat-panel__header">{{ title }}</div>
 
-    <div class="chat-panel__feed" data-test="chat-feed">
+    <div ref="feedEl" class="chat-panel__feed" data-test="chat-feed">
       <v-skeleton-loader v-if="loading" type="list-item-three-line@2" />
 
       <v-alert v-else-if="loadError" type="error" variant="tonal" density="compact">
@@ -187,9 +261,7 @@ async function submit(): Promise<void> {
               {{ systemLine(message) }}
             </div>
             <div v-else class="chat-message__bubble">
-              <div class="chat-message__meta">
-                <span class="chat-message__sender">{{ senderLabel(message) }}</span>
-              </div>
+              <div class="chat-message__sender">{{ senderLabel(message) }}</div>
               <p v-if="message.attributes.body" class="chat-message__body">
                 {{ message.attributes.body }}
               </p>
@@ -204,11 +276,16 @@ async function submit(): Promise<void> {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
+                    <v-icon icon="mdi-paperclip" size="x-small" class="mr-1" />
                     {{ att.name ?? t('app.messaging.attachment') }}
                   </a>
-                  <span v-else>{{ att.name ?? t('app.messaging.attachment') }}</span>
+                  <span v-else>
+                    <v-icon icon="mdi-paperclip" size="x-small" class="mr-1" />
+                    {{ att.name ?? t('app.messaging.attachment') }}
+                  </span>
                 </li>
               </ul>
+              <div class="chat-message__time">{{ formatTime(message.attributes.created_at) }}</div>
             </div>
           </li>
         </ul>
@@ -222,24 +299,13 @@ async function submit(): Promise<void> {
     </div>
 
     <form v-else class="chat-panel__compose" data-test="chat-compose" @submit.prevent="submit">
-      <v-textarea
-        v-model="body"
-        :label="t('app.messaging.composePlaceholder')"
-        :error-messages="fieldErrors.body as string[]"
-        rows="2"
-        auto-grow
-        density="compact"
-        variant="outlined"
-        hide-details="auto"
-        data-test="chat-compose-body"
-      />
-
       <ul
         v-if="selectedFiles.length > 0"
         class="chat-panel__pending"
         data-test="chat-pending-files"
       >
         <li v-for="(file, i) in selectedFiles" :key="i">
+          <v-icon icon="mdi-paperclip" size="x-small" class="mr-1" />
           {{ file.name }}
           <v-btn icon="mdi-close" size="x-small" variant="text" @click="removeFile(i)" />
         </li>
@@ -252,26 +318,67 @@ async function submit(): Promise<void> {
         {{ generalError }}
       </p>
 
-      <div class="chat-panel__actions">
-        <input
-          ref="fileInput"
-          type="file"
-          multiple
-          class="chat-panel__file-input"
-          data-test="chat-file-input"
-          @change="onFilesPicked"
-        />
-        <v-spacer />
+      <div class="chat-panel__compose-row">
         <v-btn
-          type="submit"
-          color="primary"
-          :loading="sending || uploading"
-          :disabled="!canSend"
-          data-test="chat-send"
+          icon="mdi-plus"
+          variant="text"
+          density="comfortable"
+          class="chat-panel__attach-btn"
+          :class="{ 'chat-panel__attach-btn--active': attachOpen }"
+          :aria-label="t('app.messaging.attachment')"
+          data-test="chat-attach-toggle"
+          @click="attachOpen = !attachOpen"
+        />
+
+        <v-textarea
+          v-model="body"
+          :placeholder="t('app.messaging.composePlaceholder')"
+          :error-messages="fieldErrors.body as string[]"
+          rows="1"
+          auto-grow
+          max-rows="5"
+          density="compact"
+          variant="outlined"
+          hide-details="auto"
+          class="chat-panel__input"
+          data-test="chat-compose-body"
+          @keydown="onComposerKeydown"
         >
-          {{ t('app.messaging.send') }}
-        </v-btn>
+          <template #append-inner>
+            <v-btn
+              icon="mdi-send"
+              variant="text"
+              size="small"
+              color="primary"
+              :loading="sending || uploading"
+              :disabled="!canSend"
+              :aria-label="t('app.messaging.send')"
+              data-test="chat-send"
+              @click="submit"
+            />
+          </template>
+        </v-textarea>
       </div>
+
+      <div v-if="attachOpen" class="chat-panel__attach-menu" data-test="chat-attach-menu">
+        <v-btn
+          icon="mdi-paperclip"
+          variant="tonal"
+          size="small"
+          :aria-label="t('app.messaging.attachment')"
+          data-test="chat-attach-file"
+          @click="openFilePicker"
+        />
+      </div>
+
+      <input
+        ref="fileInput"
+        type="file"
+        multiple
+        class="chat-panel__file-input"
+        data-test="chat-file-input"
+        @change="onFilesPicked"
+      />
     </form>
   </div>
 </template>
@@ -301,11 +408,12 @@ async function submit(): Promise<void> {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .chat-message {
   display: flex;
+  justify-content: flex-start;
 }
 
 .chat-message--own {
@@ -318,13 +426,13 @@ async function submit(): Promise<void> {
 
 .chat-message__bubble {
   max-width: 75%;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 12px;
   background: rgba(var(--v-theme-on-surface), 0.06);
 }
 
 .chat-message--own .chat-message__bubble {
-  background: rgba(var(--v-theme-primary), 0.12);
+  background: rgba(var(--v-theme-primary), 0.14);
 }
 
 .chat-message__system {
@@ -333,9 +441,10 @@ async function submit(): Promise<void> {
   text-align: center;
 }
 
-.chat-message__meta {
-  font-size: 0.75rem;
-  opacity: 0.7;
+.chat-message__sender {
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0.8;
   margin-bottom: 2px;
 }
 
@@ -350,6 +459,13 @@ async function submit(): Promise<void> {
   margin: 4px 0 0;
   padding: 0;
   font-size: 0.85rem;
+}
+
+.chat-message__time {
+  font-size: 0.68rem;
+  opacity: 0.6;
+  text-align: right;
+  margin-top: 2px;
 }
 
 .chat-panel__empty {
@@ -375,13 +491,35 @@ async function submit(): Promise<void> {
   margin: 0;
 }
 
-.chat-panel__actions {
+/* WhatsApp-style composer: [+] [ field …………… (send) ] */
+.chat-panel__compose-row {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-end;
+  gap: 4px;
 }
 
+.chat-panel__attach-btn {
+  margin-bottom: 2px;
+  transition: transform 0.15s ease;
+}
+
+.chat-panel__attach-btn--active {
+  transform: rotate(45deg);
+}
+
+.chat-panel__input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.chat-panel__attach-menu {
+  display: flex;
+  gap: 8px;
+  padding-left: 44px;
+}
+
+/* The native file input is triggered programmatically from the "+" menu. */
 .chat-panel__file-input {
-  font-size: 0.8rem;
+  display: none;
 }
 </style>

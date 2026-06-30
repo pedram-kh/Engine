@@ -1,5 +1,5 @@
 import type { RelationshipMessageResource } from '@catalyst/api-client'
-import { flushPromises, mount } from '@vue/test-utils'
+import { type VueWrapper, flushPromises, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
 import { createVuetify } from 'vuetify'
@@ -77,6 +77,20 @@ describe('RelationshipThreadView', () => {
     const row = wrapper.find('[data-test="relationship-message-m1"]')
     expect(row.classes()).not.toContain('rel-bubble-row--own')
     expect(row.find('[data-test="relationship-message-sender"]').text()).toBe('Agency Op')
+    wrapper.unmount()
+  })
+
+  it('hides the sender label on incoming CREATOR bubbles (AH-013 — label is agency-member only)', async () => {
+    const wrapper = await mountView(
+      makeTransport({
+        list: vi
+          .fn()
+          .mockResolvedValue(feed([msg('m1', { is_own: false, sender_role: 'creator' })])),
+      }),
+    )
+    const row = wrapper.find('[data-test="relationship-message-m1"]')
+    expect(row.classes()).not.toContain('rel-bubble-row--own')
+    expect(row.find('[data-test="relationship-message-sender"]').exists()).toBe(false)
     wrapper.unmount()
   })
 
@@ -158,6 +172,22 @@ describe('RelationshipThreadView', () => {
     wrapper.unmount()
   })
 
+  // The link composer now lives in a dialog reached via the "+" attach menu →
+  // link icon. The dialog teleports to <body>, so its fields are queried there.
+  async function addLinkViaDialog(wrapper: VueWrapper, url: string): Promise<void> {
+    await wrapper.find('[data-test="relationship-attach-toggle"]').trigger('click')
+    await wrapper.find('[data-test="relationship-attach-link"]').trigger('click')
+    await flushPromises()
+    const urlInput = document.body.querySelector(
+      '[data-test="relationship-link-url"] input',
+    ) as HTMLInputElement
+    urlInput.value = url
+    urlInput.dispatchEvent(new Event('input'))
+    await flushPromises()
+    ;(document.body.querySelector('[data-test="relationship-link-add"]') as HTMLElement).click()
+    await flushPromises()
+  }
+
   it('sends a typed message + an attached link through the transport and clears the composer', async () => {
     const transport = makeTransport({
       send: vi.fn().mockResolvedValue({ data: msg('m2', { is_own: true, body: 'my reply' }) }),
@@ -165,8 +195,7 @@ describe('RelationshipThreadView', () => {
     const wrapper = await mountView(transport)
 
     await wrapper.find('[data-test="relationship-compose-body"] textarea').setValue('my reply')
-    await wrapper.find('[data-test="relationship-link-url"] input').setValue('https://x.example/a')
-    await wrapper.find('[data-test="relationship-link-add"]').trigger('click')
+    await addLinkViaDialog(wrapper, 'https://x.example/a')
     await wrapper.find('[data-test="relationship-compose"]').trigger('submit')
     await flushPromises()
 
@@ -185,10 +214,8 @@ describe('RelationshipThreadView', () => {
 
   it('rejects a non-http(s) link client-side before it is attached', async () => {
     const wrapper = await mountView(makeTransport())
-    await wrapper.find('[data-test="relationship-link-url"] input').setValue('javascript:alert(1)')
-    await wrapper.find('[data-test="relationship-link-add"]').trigger('click')
-    await flushPromises()
-    expect(wrapper.text()).toContain('Enter a valid http or https link.')
+    await addLinkViaDialog(wrapper, 'javascript:alert(1)')
+    expect(document.body.textContent).toContain('Enter a valid http or https link.')
     expect(wrapper.find('[data-test="relationship-pending-links"]').exists()).toBe(false)
     wrapper.unmount()
   })

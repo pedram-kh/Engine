@@ -66,6 +66,7 @@
         "remove": "Verwijderen",
         "newConversation": "Nieuw gesprek",
         "startConversation": "Een gesprek starten",
+        "selectConversation": "Selecteer een gesprek om te beginnen met berichten.",
         "picker": {
           "titleCreators": "Nieuw gesprek",
           "titleAgencies": "Nieuw gesprek",

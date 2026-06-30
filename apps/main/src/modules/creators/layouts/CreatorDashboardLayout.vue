@@ -15,9 +15,9 @@
  * new structural region. No workspace switcher (creator is global).
  */
 
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useDisplay } from 'vuetify'
 
@@ -34,6 +34,7 @@ import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 const { t, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
 const display = useDisplay()
@@ -52,6 +53,14 @@ const userMenuOpen = ref(false)
  * app root in light mode (regression fixed here).
  */
 const logoNeedsDarkening = computed(() => currentTheme.value === 'light')
+
+/**
+ * AH-013 — pages opt into a full-width content area via `meta.wide` (the
+ * messaging two-pane). Everything else keeps the comfortable 960px reading
+ * column. `route.meta` merges parent → child, so the flag holds while a
+ * conversation is open in the nested thread route.
+ */
+const wideContent = computed(() => route.meta.wide === true)
 
 /**
  * Mobile chrome (smAndDown): the primary topbar nav (3 items) overflows the
@@ -99,6 +108,20 @@ async function signOut(): Promise<void> {
   await authStore.logout()
   await router.push({ name: 'auth.sign-in' })
 }
+
+/**
+ * Bootstrap the onboarding store once at the shell level so `applicationStatus`
+ * (and thus the conditional "Profile" nav item) resolves no matter which creator
+ * page the user lands on or refreshes — previously only the Dashboard/Profile
+ * pages bootstrapped, so a deep-link/refresh onto Messages/Availability left the
+ * nav missing Profile. The `isBootstrapped` guard + the store's in-flight dedupe
+ * make this a no-op when a page (or a prior visit) already fetched it.
+ */
+onMounted(() => {
+  if (!onboardingStore.isBootstrapped) {
+    void onboardingStore.bootstrap()
+  }
+})
 </script>
 
 <template>
@@ -209,7 +232,11 @@ async function signOut(): Promise<void> {
     </v-app-bar>
 
     <v-main data-test="creator-main">
-      <v-container class="pa-6" style="max-width: 960px">
+      <v-container
+        :class="wideContent ? 'pa-2 pa-md-6' : 'pa-6'"
+        :fluid="wideContent"
+        :style="wideContent ? undefined : 'max-width: 960px'"
+      >
         <slot />
       </v-container>
     </v-main>

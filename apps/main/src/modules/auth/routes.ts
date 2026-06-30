@@ -58,6 +58,11 @@ declare module 'vue-router' {
      * `'error'` is the terminal error layout.
      */
     layout?: 'auth' | 'agency' | 'onboarding' | 'creator' | 'app' | 'error'
+    /**
+     * AH-013 — when true, the layout drops its centered reading-width column and
+     * renders the page full-width (the messaging two-pane / WhatsApp Web shell).
+     */
+    wide?: boolean
   }
 }
 
@@ -193,23 +198,29 @@ export const appRoutes: RouteRecordRaw[] = [
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
-  // ── Relationship messaging (AH-010b) ───────────────────────────────────────
-  // The agency-shell conversations inbox + full-screen thread (1:1 connected
-  // agency↔creator DM, Q5 symmetric with the creator surface). Org-level (Q4):
-  // any active member shares the inbox. `:creatorUlid` keys the thread; both
-  // routes carry the agency-shell guard chain and are pinned into the
-  // requireAgencyUser arch-test's expected set.
+  // ── Relationship messaging (AH-010b; AH-013 two-pane) ──────────────────────
+  // The agency-shell conversations inbox + thread (1:1 connected agency↔creator
+  // DM, Q5 symmetric with the creator surface). Org-level (Q4): any active
+  // member shares the inbox. AH-013: `messages.thread` is now a CHILD of
+  // `messages.inbox` so the inbox shell stays mounted and renders the thread in
+  // a right pane on desktop (WhatsApp Web two-pane); on mobile the shell shows
+  // one pane at a time. Both routes keep their names + the agency-shell guard
+  // chain (each declares its own `meta.guards` — Vue Router's leaf wins, so the
+  // child must carry the full chain) and stay pinned in the requireAgencyUser
+  // arch-test's expected set.
   {
     path: '/messages',
     name: 'messages.inbox',
     component: () => import('@/modules/messaging/pages/AgencyMessagesPage.vue'),
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
-  },
-  {
-    path: '/messages/:creatorUlid',
-    name: 'messages.thread',
-    component: () => import('@/modules/messaging/pages/AgencyRelationshipThreadPage.vue'),
-    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+    children: [
+      {
+        path: ':creatorUlid',
+        name: 'messages.thread',
+        component: () => import('@/modules/messaging/pages/AgencyRelationshipThreadPage.vue'),
+        meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+      },
+    ],
   },
 
   // ── Creator discovery (the global pool) ────────────────────────────────────

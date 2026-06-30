@@ -11,7 +11,8 @@
 import type { AgencyRelationshipThreadRow } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
+import { type RouteLocationRaw, useRoute } from 'vue-router'
+import { useDisplay } from 'vuetify'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 
@@ -24,6 +25,13 @@ import RelationshipThreadView from '../components/RelationshipThreadView.vue'
 const { t } = useI18n()
 const route = useRoute()
 const agencyStore = useAgencyStore()
+const display = useDisplay()
+
+// AH-013 — the thread renders in the two-pane right column on desktop, so the
+// header back chevron is only needed on mobile (single-pane). Null hides it.
+const backTo = computed<RouteLocationRaw | null>(() =>
+  display.smAndDown.value ? { name: 'messages.inbox' } : null,
+)
 
 const creatorUlid = computed(() => String(route.params.creatorUlid ?? ''))
 const nameHint = computed(() => (typeof route.query.name === 'string' ? route.query.name : ''))
@@ -44,6 +52,9 @@ const title = computed(
     (nameHint.value || t('app.messaging.relationship.inboxTitle')),
 )
 
+// AH-013 — the signed creator avatar for the thread header (null → initials).
+const avatarUrl = computed(() => resolvedRow.value?.attributes.creator.avatar_url ?? null)
+
 onMounted(async () => {
   const agencyId = agencyStore.currentAgencyId
   if (agencyId === null) {
@@ -61,17 +72,12 @@ onMounted(async () => {
 
 <template>
   <section data-test="agency-thread-page">
-    <v-btn
-      variant="text"
-      size="small"
-      prepend-icon="mdi-arrow-left"
-      class="mb-2"
-      :to="{ name: 'messages.inbox' }"
-      data-test="relationship-thread-back"
-    >
-      {{ t('app.messaging.relationship.back') }}
-    </v-btn>
-
-    <RelationshipThreadView :transport="transport" :title="title" />
+    <RelationshipThreadView
+      :transport="transport"
+      :title="title"
+      :avatar-text="title"
+      :avatar-url="avatarUrl"
+      :back-to="backTo"
+    />
   </section>
 </template>

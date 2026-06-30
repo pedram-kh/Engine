@@ -46,6 +46,19 @@ vi.mock('@/modules/notifications/api/notifications.api', () => ({
   },
 }))
 
+// The layout bootstraps the onboarding store on mount so `applicationStatus`
+// (and the conditional "Profile" nav item) resolves on any landed page. Stub the
+// API so it's inert here — these tests assert the static nav, not the Profile
+// branch. Resolve as `incomplete` so Profile stays hidden (the spec router has
+// no `creator.profile` record, matching the original nav set).
+vi.mock('@/modules/onboarding/api/onboarding.api', () => ({
+  onboardingApi: {
+    bootstrap: vi.fn().mockResolvedValue({
+      data: { type: 'creators', attributes: { application_status: 'incomplete' } },
+    }),
+  },
+}))
+
 import CreatorDashboardLayout from './CreatorDashboardLayout.vue'
 
 async function mountLayout(

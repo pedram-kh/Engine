@@ -218,7 +218,7 @@ export interface AgencyRelationshipThreadRow {
   id: string
   type: 'relationship_thread'
   attributes: {
-    creator: { id: string | null; display_name: string | null }
+    creator: { id: string | null; display_name: string | null; avatar_url: string | null }
     last_message_at: string | null
     last_message_preview: string | null
     unread_count: number
@@ -230,7 +230,12 @@ export interface CreatorRelationshipThreadRow {
   id: string
   type: 'relationship_thread'
   attributes: {
-    agency: { id: string | null; name: string | null; logo_path: string | null }
+    agency: {
+      id: string | null
+      name: string | null
+      logo_path: string | null
+      logo_url: string | null
+    }
     last_message_at: string | null
     last_message_preview: string | null
     unread_count: number
@@ -259,6 +264,7 @@ export interface MessageableCreatorRow {
   type: 'messageable_creator'
   attributes: {
     display_name: string | null
+    avatar_url: string | null
   }
 }
 
@@ -280,6 +286,7 @@ export interface MessageableAgencyRow {
   attributes: {
     name: string | null
     logo_path: string | null
+    logo_url: string | null
   }
 }
 

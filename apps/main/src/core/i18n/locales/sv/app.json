@@ -66,6 +66,7 @@
         "remove": "Ta bort",
         "newConversation": "Ny konversation",
         "startConversation": "Starta en konversation",
+        "selectConversation": "Välj en konversation för att börja meddela.",
         "picker": {
           "titleCreators": "Ny konversation",
           "titleAgencies": "Ny konversation",

@@ -322,6 +322,20 @@ function onRemove(itemId: string): void {
     "
   >
     <div v-if="active" class="portfolio-gallery__preview" data-testid="portfolio-gallery-preview">
+      <!-- Download (AH-004 D10) — the same presigned `attachment` URL the
+           thumbnail exposes, surfaced top-left of the lightbox so the viewer
+           can grab the full-res asset without leaving the preview. -->
+      <a
+        v-if="canDownload(active)"
+        class="portfolio-gallery__preview-download"
+        :href="active.downloadUrl ?? undefined"
+        :aria-label="`${props.downloadLabel}${active.title ? ': ' + active.title : ''}`"
+        data-testid="portfolio-gallery-preview-download"
+        :download="active.title ?? ''"
+      >
+        <v-icon icon="mdi-download" size="24" aria-hidden="true" />
+      </a>
+
       <button
         type="button"
         class="portfolio-gallery__preview-close"
@@ -592,6 +606,31 @@ function onRemove(itemId: string): void {
 .portfolio-gallery__preview-close:hover,
 .portfolio-gallery__preview-close:focus-visible {
   background: rgb(var(--v-theme-surface-variant));
+  outline: none;
+}
+
+.portfolio-gallery__preview-download {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--v-theme-outline-variant));
+  background: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-on-surface));
+  cursor: pointer;
+  text-decoration: none;
+  z-index: 1;
+}
+
+.portfolio-gallery__preview-download:hover,
+.portfolio-gallery__preview-download:focus-visible {
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
   outline: none;
 }
 </style>

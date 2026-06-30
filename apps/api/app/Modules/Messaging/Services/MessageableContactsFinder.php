@@ -61,7 +61,7 @@ final class MessageableContactsFinder
                     $creatorQuery->whereRaw('LOWER(display_name) LIKE ?', ['%'.mb_strtolower($search).'%']);
                 }
             })
-            ->with(['creator:id,ulid,display_name'])
+            ->with(['creator:id,ulid,display_name,avatar_path'])
             // display_name ASC via a correlated subquery (the roster precedent —
             // avoids a join + hydration clobber), stable id tiebreaker.
             ->orderBy(

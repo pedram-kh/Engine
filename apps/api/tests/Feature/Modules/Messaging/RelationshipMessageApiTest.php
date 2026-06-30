@@ -214,6 +214,9 @@ it('writes NO audit row on message send (the message.* verbs are inert vocabular
 
 it('the agency inbox lists the thread with the creator + last-message preview', function (): void {
     ['agency' => $agency, 'creator' => $creator, 'admin' => $admin] = relationshipSetup();
+    // AH-013 — an absolute avatar reference resolves through verbatim (a bare S3
+    // key would be signed; null on the non-S3 test disk).
+    $creator->forceFill(['avatar_path' => 'https://cdn.example.com/ada.png'])->save();
 
     $this->actingAs($admin)->postJson(agencyRelUrl($agency, $creator), ['body' => 'newest'])->assertCreated();
 
@@ -221,11 +224,13 @@ it('the agency inbox lists the thread with the creator + last-message preview', 
         ->assertOk()
         ->assertJsonPath('data.0.type', 'relationship_thread')
         ->assertJsonPath('data.0.attributes.creator.id', $creator->ulid)
+        ->assertJsonPath('data.0.attributes.creator.avatar_url', 'https://cdn.example.com/ada.png')
         ->assertJsonPath('data.0.attributes.last_message_preview', 'newest');
 });
 
 it('the creator inbox lists the thread with the agency + unread count', function (): void {
     ['agency' => $agency, 'creator' => $creator, 'creatorUser' => $creatorUser, 'admin' => $admin] = relationshipSetup();
+    $agency->forceFill(['logo_path' => 'https://cdn.example.com/logo.png'])->save();
 
     $this->actingAs($admin)->postJson(agencyRelUrl($agency, $creator), ['body' => 'hello there'])->assertCreated();
 
@@ -233,6 +238,8 @@ it('the creator inbox lists the thread with the agency + unread count', function
         ->assertOk()
         ->assertJsonPath('data.0.attributes.agency.id', $agency->ulid)
         ->assertJsonPath('data.0.attributes.agency.name', $agency->name)
+        // AH-013 — resolved logo URL for the contact-row avatar.
+        ->assertJsonPath('data.0.attributes.agency.logo_url', 'https://cdn.example.com/logo.png')
         ->assertJsonPath('data.0.attributes.unread_count', 1)
         ->assertJsonPath('data.0.attributes.last_message_preview', 'hello there');
 });

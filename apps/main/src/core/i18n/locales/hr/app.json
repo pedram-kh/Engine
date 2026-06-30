@@ -66,6 +66,7 @@
         "remove": "Ukloni",
         "newConversation": "Novi razgovor",
         "startConversation": "Započni razgovor",
+        "selectConversation": "Odaberite razgovor da biste počeli slati poruke.",
         "picker": {
           "titleCreators": "Novi razgovor",
           "titleAgencies": "Novi razgovor",

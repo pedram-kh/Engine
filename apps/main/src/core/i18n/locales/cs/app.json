@@ -66,6 +66,7 @@
         "remove": "Odebrat",
         "newConversation": "Nová konverzace",
         "startConversation": "Začít konverzaci",
+        "selectConversation": "Vyberte konverzaci a začněte psát zprávy.",
         "picker": {
           "titleCreators": "Nová konverzace",
           "titleAgencies": "Nová konverzace",

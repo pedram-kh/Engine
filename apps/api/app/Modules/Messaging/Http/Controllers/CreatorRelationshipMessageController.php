@@ -17,6 +17,7 @@ use App\Modules\Messaging\Models\RelationshipMessage;
 use App\Modules\Messaging\Models\RelationshipThread;
 use App\Modules\Messaging\Services\RelationshipMessageAttachmentUploadService;
 use App\Modules\Messaging\Services\RelationshipMessageService;
+use App\Modules\Messaging\Support\ContactMediaUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -79,6 +80,9 @@ final class CreatorRelationshipMessageController
                         'id' => $thread->agency->ulid,
                         'name' => $thread->agency->name,
                         'logo_path' => $thread->agency->logo_path,
+                        // AH-013 — resolved logo for the contact-row image: an
+                        // absolute URL passes through; a bare S3 key is signed.
+                        'logo_url' => ContactMediaUrl::resolve($thread->agency->logo_path),
                     ],
                     'last_message_at' => $thread->last_message_at?->toIso8601String(),
                     'last_message_preview' => $this->preview($thread->latestMessage),

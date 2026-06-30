@@ -10,6 +10,7 @@ use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use App\Modules\Messaging\Services\MessageableContactsFinder;
+use App\Modules\Messaging\Support\ContactMediaUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -61,6 +62,9 @@ final class MessageableContactsController
                 'type' => 'messageable_creator',
                 'attributes' => [
                     'display_name' => $creator?->display_name,
+                    // AH-013 — signed avatar for the picker row (paginated list,
+                    // so per-row signing is bounded; null when unset / non-S3).
+                    'avatar_url' => ContactMediaUrl::resolve($creator?->avatar_path),
                 ],
             ];
         }, $rows);
@@ -95,6 +99,9 @@ final class MessageableContactsController
                 'attributes' => [
                     'name' => $agency->name,
                     'logo_path' => $agency->logo_path,
+                    // AH-013 — resolved logo for the picker row (passthrough URL
+                    // or signed S3 key).
+                    'logo_url' => ContactMediaUrl::resolve($agency->logo_path),
                 ],
             ])->all(),
         ]);

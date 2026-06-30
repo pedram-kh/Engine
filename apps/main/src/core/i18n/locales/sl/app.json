@@ -66,6 +66,7 @@
         "remove": "Odstrani",
         "newConversation": "Nov pogovor",
         "startConversation": "Začni pogovor",
+        "selectConversation": "Izberite pogovor za začetek pošiljanja sporočil.",
         "picker": {
           "titleCreators": "Nov pogovor",
           "titleAgencies": "Nov pogovor",

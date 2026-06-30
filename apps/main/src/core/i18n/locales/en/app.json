@@ -66,6 +66,7 @@
         "remove": "Remove",
         "newConversation": "New conversation",
         "startConversation": "Start a conversation",
+        "selectConversation": "Select a conversation to start messaging.",
         "picker": {
           "titleCreators": "New conversation",
           "titleAgencies": "New conversation",

@@ -66,6 +66,7 @@
         "remove": "Usuń",
         "newConversation": "Nowa rozmowa",
         "startConversation": "Rozpocznij rozmowę",
+        "selectConversation": "Wybierz rozmowę, aby rozpocząć przesyłanie wiadomości.",
         "picker": {
           "titleCreators": "Nowa rozmowa",
           "titleAgencies": "Nowa rozmowa",

@@ -66,6 +66,7 @@
         "remove": "Entfernen",
         "newConversation": "Neue Unterhaltung",
         "startConversation": "Unterhaltung beginnen",
+        "selectConversation": "Wähle eine Unterhaltung aus, um zu schreiben.",
         "picker": {
           "titleCreators": "Neue Unterhaltung",
           "titleAgencies": "Neue Unterhaltung",

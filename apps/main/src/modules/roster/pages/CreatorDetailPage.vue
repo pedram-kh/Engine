@@ -32,7 +32,6 @@ import {
   CEmptyState,
   CountryDisplay,
   LanguageList,
-  PortfolioDrawer,
   PortfolioGallery,
   SocialAccountList,
 } from '@catalyst/ui'
@@ -153,7 +152,9 @@ const portfolioItems = computed(() => {
   }))
 })
 
-const portfolioDrawerOpen = ref(false)
+// Portfolio renders as a collapsible drawer (collapsed by default): the
+// card header carries a down-chevron that expands the grid in place.
+const portfolioExpanded = ref(false)
 
 // ── Rating/notes editor state ────────────────────────────────────────────────
 const ratingDraft = ref<number | null>(null)
@@ -462,50 +463,63 @@ onMounted(() => {
             </v-card-text>
           </v-card>
 
-          <!-- Portfolio -->
+          <!-- Portfolio — a collapsible drawer (collapsed by default). The
+               header is the toggle; the down-chevron expands the grid in
+               place. With no items the grid stays open to show the empty
+               state and the chevron is suppressed. -->
           <v-card variant="outlined" data-test="creator-detail-portfolio">
-            <v-card-title class="d-flex align-center justify-space-between text-h6">
-              <span>{{ t('app.roster.detail.sections.portfolio') }}</span>
+            <v-card-title
+              class="d-flex align-center justify-space-between text-h6 creator-detail__portfolio-head"
+              :class="{ 'creator-detail__portfolio-head--clickable': portfolioItems.length > 0 }"
+              :role="portfolioItems.length > 0 ? 'button' : undefined"
+              :tabindex="portfolioItems.length > 0 ? 0 : undefined"
+              :aria-expanded="portfolioItems.length > 0 ? portfolioExpanded : undefined"
+              @click="portfolioItems.length > 0 && (portfolioExpanded = !portfolioExpanded)"
+              @keydown.enter.prevent="
+                portfolioItems.length > 0 && (portfolioExpanded = !portfolioExpanded)
+              "
+              @keydown.space.prevent="
+                portfolioItems.length > 0 && (portfolioExpanded = !portfolioExpanded)
+              "
+            >
+              <span class="d-flex align-center ga-2">
+                {{ t('app.roster.detail.sections.portfolio') }}
+                <span
+                  v-if="portfolioItems.length > 0"
+                  class="text-body-2 text-medium-emphasis"
+                  data-test="creator-detail-portfolio-count"
+                >
+                  ({{ portfolioItems.length }})
+                </span>
+              </span>
               <v-btn
                 v-if="portfolioItems.length > 0"
+                :icon="portfolioExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
                 variant="text"
                 size="small"
-                prepend-icon="mdi-view-gallery-outline"
-                data-test="creator-detail-portfolio-open-drawer"
-                @click="portfolioDrawerOpen = true"
-              >
-                {{ t('creator.ui.wizard.steps.portfolio.view_all_label') }}
-              </v-btn>
-            </v-card-title>
-            <v-card-text>
-              <PortfolioGallery
-                :items="portfolioItems"
-                :editable="false"
-                :empty-label="t('app.roster.detail.portfolio.empty')"
-                :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
-                :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
-                :processing-label="t('creator.ui.wizard.steps.portfolio.processing_label')"
-                :failed-label="t('creator.ui.wizard.steps.portfolio.failed_label')"
-                :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
-                :copy-link-label="t('creator.ui.wizard.steps.portfolio.copy_link_label')"
+                :aria-label="t('creator.ui.wizard.steps.portfolio.view_all_label')"
+                data-test="creator-detail-portfolio-toggle"
+                @click.stop="portfolioExpanded = !portfolioExpanded"
               />
-            </v-card-text>
+            </v-card-title>
+            <v-expand-transition>
+              <v-card-text v-show="portfolioExpanded || portfolioItems.length === 0">
+                <PortfolioGallery
+                  :items="portfolioItems"
+                  :editable="false"
+                  :empty-label="t('app.roster.detail.portfolio.empty')"
+                  :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
+                  :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
+                  :preview-label="t('creator.ui.wizard.steps.portfolio.preview_label')"
+                  :close-label="t('creator.ui.wizard.steps.portfolio.preview_close')"
+                  :processing-label="t('creator.ui.wizard.steps.portfolio.processing_label')"
+                  :failed-label="t('creator.ui.wizard.steps.portfolio.failed_label')"
+                  :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
+                  :copy-link-label="t('creator.ui.wizard.steps.portfolio.copy_link_label')"
+                />
+              </v-card-text>
+            </v-expand-transition>
           </v-card>
-
-          <PortfolioDrawer
-            v-model="portfolioDrawerOpen"
-            :items="portfolioItems"
-            :title="t('app.roster.detail.sections.portfolio')"
-            :empty-label="t('app.roster.detail.portfolio.empty')"
-            :video-label="t('creator.ui.wizard.steps.portfolio.video_badge_label')"
-            :link-label="t('creator.ui.wizard.steps.portfolio.link_badge_label')"
-            :preview-label="t('creator.ui.wizard.steps.portfolio.preview_label')"
-            :close-label="t('creator.ui.wizard.steps.portfolio.preview_close')"
-            :processing-label="t('creator.ui.wizard.steps.portfolio.processing_label')"
-            :failed-label="t('creator.ui.wizard.steps.portfolio.failed_label')"
-            :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
-            :copy-link-label="t('creator.ui.wizard.steps.portfolio.copy_link_label')"
-          />
 
           <!-- Availability (read-only, consumes the Sprint-5 agency endpoint) -->
           <v-card variant="outlined" data-test="creator-detail-availability">
@@ -839,5 +853,15 @@ onMounted(() => {
   font-style: normal;
   font-size: 0.875rem;
   line-height: 1.5;
+}
+
+.creator-detail__portfolio-head--clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.creator-detail__portfolio-head--clickable:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: -2px;
 }
 </style>

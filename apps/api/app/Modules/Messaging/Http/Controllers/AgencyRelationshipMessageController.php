@@ -16,6 +16,7 @@ use App\Modules\Messaging\Models\RelationshipMessage;
 use App\Modules\Messaging\Models\RelationshipThread;
 use App\Modules\Messaging\Services\RelationshipMessageAttachmentUploadService;
 use App\Modules\Messaging\Services\RelationshipMessageService;
+use App\Modules\Messaging\Support\ContactMediaUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -61,7 +62,7 @@ final class AgencyRelationshipMessageController
             // Only conversations that actually have a message (AH-012 D2) — no
             // empty ghosts, even if a transient/attachment row ever slips in.
             ->has('messages')
-            ->with(['creator:id,ulid,display_name', 'latestMessage'])
+            ->with(['creator:id,ulid,display_name,avatar_path', 'latestMessage'])
             ->orderByDesc('last_message_at')
             ->orderByDesc('id')
             ->get();
@@ -74,6 +75,10 @@ final class AgencyRelationshipMessageController
                     'creator' => [
                         'id' => $thread->creator?->ulid,
                         'display_name' => $thread->creator?->display_name,
+                        // AH-013 — signed avatar for the contact-row image
+                        // (bounded list → per-row signing is fine; null when
+                        // unset or on a non-S3 test disk).
+                        'avatar_url' => ContactMediaUrl::resolve($thread->creator?->avatar_path),
                     ],
                     'last_message_at' => $thread->last_message_at?->toIso8601String(),
                     'last_message_preview' => $this->preview($thread->latestMessage),

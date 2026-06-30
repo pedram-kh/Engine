@@ -66,6 +66,7 @@
         "remove": "Eltávolítás",
         "newConversation": "Új beszélgetés",
         "startConversation": "Beszélgetés indítása",
+        "selectConversation": "Válassz egy beszélgetést az üzenetküldés megkezdéséhez.",
         "picker": {
           "titleCreators": "Új beszélgetés",
           "titleAgencies": "Új beszélgetés",

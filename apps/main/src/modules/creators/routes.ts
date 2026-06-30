@@ -102,23 +102,31 @@ export const creatorsRoutes: RouteRecordRaw[] = [
   {
     // AH-010b — the creator-shell relationship-messaging inbox (top-level
     // "Messages" nav, D9). Lists the creator's 1:1 threads, one per connected
-    // agency. Symmetric to the agency inbox (Q5).
+    // agency. Symmetric to the agency inbox (Q5). AH-013: the thread is now a
+    // CHILD route so the inbox shell stays mounted and renders the thread in a
+    // right pane on desktop (WhatsApp Web two-pane); single pane on mobile.
     path: '/creator/messages',
     name: 'creator.messages',
     component: () => import('@/modules/messaging/pages/CreatorMessagesPage.vue'),
     meta: {
       layout: 'creator',
       guards: ['requireAuth'],
+      // AH-013 — the two-pane chat fills the viewport (WhatsApp Web), so this
+      // page opts out of the layout's 960px reading column. Merged onto the
+      // nested thread route too, so it holds while a conversation is open.
+      wide: true,
     },
-  },
-  {
-    // AH-010b — the full-screen relationship thread (keyed by the agency ULID).
-    path: '/creator/messages/:agencyUlid',
-    name: 'creator.messages.thread',
-    component: () => import('@/modules/messaging/pages/CreatorRelationshipThreadPage.vue'),
-    meta: {
-      layout: 'creator',
-      guards: ['requireAuth'],
-    },
+    children: [
+      {
+        // AH-010b — the relationship thread (keyed by the agency ULID).
+        path: ':agencyUlid',
+        name: 'creator.messages.thread',
+        component: () => import('@/modules/messaging/pages/CreatorRelationshipThreadPage.vue'),
+        meta: {
+          layout: 'creator',
+          guards: ['requireAuth'],
+        },
+      },
+    ],
   },
 ]

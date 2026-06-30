@@ -66,6 +66,7 @@
         "remove": "Eemalda",
         "newConversation": "Uus vestlus",
         "startConversation": "Alusta vestlust",
+        "selectConversation": "Sõnumite saatmiseks vali vestlus.",
         "picker": {
           "titleCreators": "Uus vestlus",
           "titleAgencies": "Uus vestlus",

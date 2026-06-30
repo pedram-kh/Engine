@@ -10,7 +10,8 @@
 import type { CreatorRelationshipThreadRow } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
+import { type RouteLocationRaw, useRoute } from 'vue-router'
+import { useDisplay } from 'vuetify'
 
 import {
   creatorRelationshipTransport,
@@ -20,6 +21,13 @@ import RelationshipThreadView from '../components/RelationshipThreadView.vue'
 
 const { t } = useI18n()
 const route = useRoute()
+const display = useDisplay()
+
+// AH-013 — desktop renders this in the two-pane right column; the header back
+// chevron is mobile-only (single-pane). Null on desktop hides it in the view.
+const backTo = computed<RouteLocationRaw | null>(() =>
+  display.smAndDown.value ? { name: 'creator.messages' } : null,
+)
 
 const agencyUlid = computed(() => String(route.params.agencyUlid ?? ''))
 const nameHint = computed(() => (typeof route.query.name === 'string' ? route.query.name : ''))
@@ -36,10 +44,8 @@ const title = computed(
     (nameHint.value || t('app.messaging.relationship.inboxTitle')),
 )
 
-const avatarUrl = computed(() => {
-  const path = resolvedRow.value?.attributes.agency.logo_path ?? null
-  return path !== null && /^https?:\/\//i.test(path) ? path : null
-})
+// AH-013 — the resolved agency logo for the thread header (null → initials).
+const avatarUrl = computed(() => resolvedRow.value?.attributes.agency.logo_url ?? null)
 
 onMounted(async () => {
   try {
@@ -54,17 +60,11 @@ onMounted(async () => {
 
 <template>
   <section data-test="creator-thread-page">
-    <v-btn
-      variant="text"
-      size="small"
-      prepend-icon="mdi-arrow-left"
-      class="mb-2"
-      :to="{ name: 'creator.messages' }"
-      data-test="relationship-thread-back"
-    >
-      {{ t('app.messaging.relationship.back') }}
-    </v-btn>
-
-    <RelationshipThreadView :transport="transport" :title="title" :avatar-url="avatarUrl" />
+    <RelationshipThreadView
+      :transport="transport"
+      :title="title"
+      :avatar-url="avatarUrl"
+      :back-to="backTo"
+    />
   </section>
 </template>

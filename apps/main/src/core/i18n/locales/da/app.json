@@ -66,6 +66,7 @@
         "remove": "Fjern",
         "newConversation": "Ny samtale",
         "startConversation": "Start en samtale",
+        "selectConversation": "Vælg en samtale for at begynde at skrive.",
         "picker": {
           "titleCreators": "Ny samtale",
           "titleAgencies": "Ny samtale",

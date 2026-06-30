@@ -171,98 +171,100 @@ onMounted(() => {
     />
 
     <template v-else>
-      <v-list v-if="!isEmpty" lines="three" data-testid="creator-assignments-list">
-        <v-list-item
+      <div v-if="!isEmpty" class="assignments" data-testid="creator-assignments-list">
+        <article
           v-for="item in assignments"
           :key="item.id"
+          class="assignment"
           :data-testid="`creator-assignment-${item.id}`"
         >
-          <v-list-item-title class="d-flex align-center ga-2">
-            {{ item.attributes.campaign?.name ?? '—' }}
-            <v-chip
-              size="x-small"
-              variant="tonal"
-              :data-testid="`creator-assignment-status-${item.id}`"
-            >
-              {{ t(`app.campaigns.assignmentStatus.${item.attributes.status}`) }}
-            </v-chip>
-          </v-list-item-title>
-          <v-list-item-subtitle>
-            <span v-if="item.attributes.campaign?.brand_name">
-              {{ item.attributes.campaign.brand_name }} ·
-            </span>
-            {{ t('creator.ui.assignments.fee') }}:
-            {{
-              formatMoney(
-                item.attributes.agreed_fee_minor_units,
-                item.attributes.agreed_fee_currency,
-              )
-            }}
-            · {{ windowLabel(item) }}
-            <span
-              v-if="
-                item.attributes.status === 'countered' &&
-                item.attributes.countered_fee_minor_units !== null
-              "
-              :data-testid="`creator-assignment-countered-${item.id}`"
-            >
-              · {{ t('creator.ui.assignments.youCountered') }}:
+          <div class="assignment__info">
+            <div class="assignment__title">
+              <span class="assignment__name">{{ item.attributes.campaign?.name ?? '—' }}</span>
+              <v-chip
+                size="x-small"
+                variant="tonal"
+                :data-testid="`creator-assignment-status-${item.id}`"
+              >
+                {{ t(`app.campaigns.assignmentStatus.${item.attributes.status}`) }}
+              </v-chip>
+            </div>
+            <p class="assignment__meta">
+              <span v-if="item.attributes.campaign?.brand_name">
+                {{ item.attributes.campaign.brand_name }} ·
+              </span>
+              {{ t('creator.ui.assignments.fee') }}:
               {{
                 formatMoney(
-                  item.attributes.countered_fee_minor_units,
-                  item.attributes.countered_fee_currency,
+                  item.attributes.agreed_fee_minor_units,
+                  item.attributes.agreed_fee_currency,
                 )
               }}
-            </span>
-          </v-list-item-subtitle>
-
-          <template #append>
-            <div class="d-flex ga-2 align-center">
-              <v-btn
-                variant="text"
-                size="small"
-                :to="{ name: 'creator.assignment.detail', params: { ulid: item.id } }"
-                :data-testid="`creator-assignment-view-${item.id}`"
+              · {{ windowLabel(item) }}
+              <span
+                v-if="
+                  item.attributes.status === 'countered' &&
+                  item.attributes.countered_fee_minor_units !== null
+                "
+                :data-testid="`creator-assignment-countered-${item.id}`"
               >
-                {{ t('creator.ui.assignments.view') }}
+                · {{ t('creator.ui.assignments.youCountered') }}:
+                {{
+                  formatMoney(
+                    item.attributes.countered_fee_minor_units,
+                    item.attributes.countered_fee_currency,
+                  )
+                }}
+              </span>
+            </p>
+          </div>
+
+          <div class="assignment__actions">
+            <v-btn
+              variant="outlined"
+              size="small"
+              :to="{ name: 'creator.assignment.detail', params: { ulid: item.id } }"
+              :data-testid="`creator-assignment-view-${item.id}`"
+            >
+              {{ t('creator.ui.assignments.view') }}
+            </v-btn>
+            <template v-if="item.attributes.status === 'invited'">
+              <v-btn
+                color="primary"
+                variant="flat"
+                size="small"
+                :loading="actioningId === item.id"
+                :disabled="actioningId !== null && actioningId !== item.id"
+                :data-testid="`creator-assignment-accept-${item.id}`"
+                @click="accept(item)"
+              >
+                {{ t('creator.ui.assignments.accept') }}
               </v-btn>
-              <div v-if="item.attributes.status === 'invited'" class="d-flex ga-2">
-                <v-btn
-                  color="primary"
-                  variant="flat"
-                  size="small"
-                  :loading="actioningId === item.id"
-                  :disabled="actioningId !== null && actioningId !== item.id"
-                  :data-testid="`creator-assignment-accept-${item.id}`"
-                  @click="accept(item)"
-                >
-                  {{ t('creator.ui.assignments.accept') }}
-                </v-btn>
-                <v-btn
-                  variant="tonal"
-                  size="small"
-                  :loading="actioningId === item.id"
-                  :disabled="actioningId !== null && actioningId !== item.id"
-                  :data-testid="`creator-assignment-counter-${item.id}`"
-                  @click="openCounter(item)"
-                >
-                  {{ t('creator.ui.assignments.counter') }}
-                </v-btn>
-                <v-btn
-                  variant="text"
-                  size="small"
-                  :loading="actioningId === item.id"
-                  :disabled="actioningId !== null && actioningId !== item.id"
-                  :data-testid="`creator-assignment-decline-${item.id}`"
-                  @click="decline(item)"
-                >
-                  {{ t('creator.ui.assignments.decline') }}
-                </v-btn>
-              </div>
-            </div>
-          </template>
-        </v-list-item>
-      </v-list>
+              <v-btn
+                variant="tonal"
+                size="small"
+                :loading="actioningId === item.id"
+                :disabled="actioningId !== null && actioningId !== item.id"
+                :data-testid="`creator-assignment-counter-${item.id}`"
+                @click="openCounter(item)"
+              >
+                {{ t('creator.ui.assignments.counter') }}
+              </v-btn>
+              <v-btn
+                color="error"
+                variant="outlined"
+                size="small"
+                :loading="actioningId === item.id"
+                :disabled="actioningId !== null && actioningId !== item.id"
+                :data-testid="`creator-assignment-decline-${item.id}`"
+                @click="decline(item)"
+              >
+                {{ t('creator.ui.assignments.decline') }}
+              </v-btn>
+            </template>
+          </div>
+        </article>
+      </div>
 
       <CEmptyState
         v-else
@@ -344,5 +346,69 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.assignments {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Desktop: text on the left, actions on the right. */
+.assignment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+}
+
+.assignment__info {
+  min-width: 0;
+}
+
+.assignment__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.assignment__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assignment__meta {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+  opacity: 0.75;
+}
+
+.assignment__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Mobile: stack the name + description, then the actions in one row below,
+   each button sharing the width equally so all fit on a single line. */
+@media (max-width: 599px) {
+  .assignment {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .assignment__name {
+    white-space: normal;
+  }
+
+  .assignment__actions > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
 }
 </style>
