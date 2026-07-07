@@ -104,7 +104,12 @@ function postLoginTarget(): RouteLocationRaw {
     // and sign in directly. Bounce to `/verify-email/pending` so the
     // precondition is fixed before the wizard guard chain runs.
     if (store.user?.attributes.email_verified_at == null) {
-      return { name: 'auth.verify-email.pending' }
+      // Carry the email so the pending page can interpolate it and the
+      // resend button works (it reads the address from the route query).
+      return {
+        name: 'auth.verify-email.pending',
+        query: { email: store.user?.attributes.email },
+      }
     }
     return { name: 'onboarding.welcome-back' }
   }

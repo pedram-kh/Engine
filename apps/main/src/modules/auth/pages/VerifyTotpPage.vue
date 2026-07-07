@@ -49,7 +49,12 @@ function postLoginTarget(): RouteLocationRaw {
     // but keeping the two dispatch surfaces identical prevents
     // path-specific drift.
     if (store.user?.attributes.email_verified_at == null) {
-      return { name: 'auth.verify-email.pending' }
+      // Carry the email so the pending page can interpolate it and the
+      // resend button works — mirrors SignInPage.postLoginTarget.
+      return {
+        name: 'auth.verify-email.pending',
+        query: { email: store.user?.attributes.email },
+      }
     }
     return { name: 'onboarding.welcome-back' }
   }

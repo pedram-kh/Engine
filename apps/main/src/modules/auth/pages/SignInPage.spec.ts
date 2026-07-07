@@ -161,7 +161,10 @@ describe('SignInPage', () => {
     await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
     await h.wrapper.find('form').trigger('submit')
     await flushPromises()
-    expect(pushSpy).toHaveBeenCalledWith({ name: 'auth.verify-email.pending' })
+    expect(pushSpy).toHaveBeenCalledWith({
+      name: 'auth.verify-email.pending',
+      query: { email: 'a@b.c' },
+    })
   })
 
   it('happy path: unverified creator with ?redirect=/ still bounces to verify-email-pending (the /-default redirect is ignored on this branch too)', async () => {
@@ -176,7 +179,10 @@ describe('SignInPage', () => {
     await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
     await h.wrapper.find('form').trigger('submit')
     await flushPromises()
-    expect(pushSpy).toHaveBeenCalledWith({ name: 'auth.verify-email.pending' })
+    expect(pushSpy).toHaveBeenCalledWith({
+      name: 'auth.verify-email.pending',
+      query: { email: 'a@b.c' },
+    })
   })
 
   it('happy path: pushes to ?redirect=/foo when query param is set (session-expired flow, both user_types)', async () => {

@@ -23,6 +23,28 @@ vi.mock('@/modules/auth/api/auth.api', () => ({
 }))
 
 import { authApi } from '@/modules/auth/api/auth.api'
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
+
+// Unverified-creator fixture for the store-fallback tests (the sign-in
+// bounce path lands here with an authenticated-but-unverified user).
+const UNVERIFIED_USER = {
+  type: 'user' as const,
+  id: '01HQ',
+  attributes: {
+    email: 'store@user.example',
+    email_verified_at: null,
+    name: 'A',
+    user_type: 'creator' as const,
+    preferred_language: 'en' as const,
+    preferred_currency: 'USD',
+    timezone: 'Europe/Lisbon',
+    theme_preference: 'system' as const,
+    mfa_required: false,
+    two_factor_enabled: false,
+    last_login_at: null,
+    created_at: '2026-01-01T00:00:00Z',
+  },
+}
 
 describe('EmailVerificationPendingPage', () => {
   let teardown: (() => void) | null = null
@@ -65,6 +87,27 @@ describe('EmailVerificationPendingPage', () => {
     await h.wrapper.find('[data-test="email-verification-pending-resend"]').trigger('click')
     await flushPromises()
     expect(authApi.resendVerification).toHaveBeenCalledWith({ email: 'a@b.c' })
+    expect(h.wrapper.find('[data-test="email-verification-pending-resent-banner"]').exists()).toBe(
+      true,
+    )
+  })
+
+  it('falls back to the signed-in user email when the route query is absent (sign-in bounce path)', async () => {
+    vi.mocked(authApi.resendVerification).mockResolvedValue(undefined)
+    const h = await mountAuthPage(EmailVerificationPendingPage, {
+      initialRoute: { path: '/verify-email/pending' },
+      beforeMount: () => {
+        useAuthStore().user = UNVERIFIED_USER
+      },
+    })
+    teardown = h.unmount
+    await flushPromises()
+    expect(h.wrapper.find('[data-test="email-verification-pending-description"]').text()).toContain(
+      'store@user.example',
+    )
+    await h.wrapper.find('[data-test="email-verification-pending-resend"]').trigger('click')
+    await flushPromises()
+    expect(authApi.resendVerification).toHaveBeenCalledWith({ email: 'store@user.example' })
     expect(h.wrapper.find('[data-test="email-verification-pending-resent-banner"]').exists()).toBe(
       true,
     )

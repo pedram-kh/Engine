@@ -19,7 +19,14 @@ const route = useRoute()
 const store = useAuthStore()
 const { isResendingVerification } = storeToRefs(store)
 
-const email = computed(() => (typeof route.query.email === 'string' ? route.query.email : ''))
+// Primary source is the route query (set by the sign-up flow and the
+// unverified-account bounces). Fall back to the authenticated user's email
+// so any entry path that omits the query — e.g. a stale bookmark — still
+// renders the address and keeps the resend button functional.
+const email = computed(() => {
+  const fromQuery = typeof route.query.email === 'string' ? route.query.email : ''
+  return fromQuery !== '' ? fromQuery : (store.user?.attributes.email ?? '')
+})
 
 const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
