@@ -134,6 +134,19 @@ const categoryItems = computed(() =>
   })),
 )
 
+// "Select all" affordance for the category multi-select. `all` drives the
+// checkbox's checked state; `some` drives its indeterminate state so partial
+// selections read correctly. Toggling clears everything when all are already
+// selected, otherwise selects the full set.
+const allCategoriesSelected = computed(() => categories.value.length === CATEGORY_KEYS.length)
+const someCategoriesSelected = computed(
+  () => categories.value.length > 0 && !allCategoriesSelected.value,
+)
+
+function toggleSelectAllCategories(): void {
+  categories.value = allCategoriesSelected.value ? [] : [...CATEGORY_KEYS]
+}
+
 const renderedBio = computed(() => renderBio(bio.value))
 
 const countryLabel = computed(() => labelForCountryCode(countryCode.value))
@@ -437,7 +450,24 @@ defineExpose({ save, hydrate, isPristine })
       ]"
       :error-messages="fieldErrors.categories"
       data-testid="profile-categories"
-    />
+    >
+      <template #prepend-item>
+        <v-list-item
+          :title="t('creator.ui.wizard.fields.categories_select_all')"
+          data-testid="profile-categories-select-all"
+          @click="toggleSelectAllCategories"
+        >
+          <template #prepend>
+            <v-checkbox-btn
+              :model-value="allCategoriesSelected"
+              :indeterminate="someCategoriesSelected"
+              tabindex="-1"
+            />
+          </template>
+        </v-list-item>
+        <v-divider />
+      </template>
+    </v-select>
 
     <div class="profile-basics-form__preview" data-testid="profile-preview">
       <h3 class="text-subtitle-2">{{ t('creator.ui.wizard.fields.country') }}</h3>

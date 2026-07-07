@@ -175,6 +175,7 @@
           "address_postal_code": "Kodiċi postali",
           "primary_language": "Lingwa nattiva",
           "categories": "Categories",
+          "categories_select_all": "Agħżel kollox",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",
           "step_requirements_hint": "Żid a profile photo and at least one category to continue.",

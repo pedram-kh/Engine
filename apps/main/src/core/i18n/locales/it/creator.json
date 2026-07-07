@@ -175,6 +175,7 @@
           "address_postal_code": "Codice postale",
           "primary_language": "Lingua madre",
           "categories": "Categorie",
+          "categories_select_all": "Seleziona tutto",
           "categories_help": "Scegli le categorie che descrivono meglio quello che crei.",
           "avatar_required": "È necessaria una foto profilo per completare questo passaggio.",
           "step_requirements_hint": "Aggiungi una foto profilo e almeno una categoria per continuare.",

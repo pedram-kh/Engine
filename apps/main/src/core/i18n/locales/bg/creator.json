@@ -175,6 +175,7 @@
           "address_postal_code": "Пощенски код",
           "primary_language": "Роден език",
           "categories": "Categories",
+          "categories_select_all": "Изберете всички",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A prотile photo is required to finish this step.",
           "step_requirements_hint": "Добавете a prотile photo and at least one category to continue.",

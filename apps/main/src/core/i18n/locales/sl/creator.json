@@ -175,6 +175,7 @@
           "address_postal_code": "Poštna številka",
           "primary_language": "Materni jezik",
           "categories": "Kategorie",
+          "categories_select_all": "Izberi vse",
           "categories_help": "Vyberte kategorie, které nejlépe popisují, co tvoříte.",
           "avatar_required": "Pro dokončení tohoto kroku je vyžadována profilová fotografie.",
           "step_requirements_hint": "Přidejte profilovou fotografii a alespoň jednu kategorii pro pokračování.",

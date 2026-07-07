@@ -175,6 +175,7 @@
           "address_postal_code": "PSČ",
           "primary_language": "Materinský jazyk",
           "categories": "Kategorie",
+          "categories_select_all": "Vybrať všetko",
           "categories_help": "Vyberte kategorie, které nejlépe popisují, co tvoříte.",
           "avatar_required": "Pro dokončení tohoto kroku je vyžadována profilová fotografie.",
           "step_requirements_hint": "Přidejte profilovou fotografii a alespoň jednu kategorii pro pokračování.",

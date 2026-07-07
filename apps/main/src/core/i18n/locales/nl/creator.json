@@ -175,6 +175,7 @@
           "address_postal_code": "Postcode",
           "primary_language": "Moedertaal",
           "categories": "Categorieën",
+          "categories_select_all": "Alles selecteren",
           "categories_help": "Kies de categorieën die het beste beschrijven wat je maakt.",
           "avatar_required": "Een profielfoto is vereist om deze stap te voltooien.",
           "step_requirements_hint": "Voeg een profielfoto en ten minste één categorie toe om verder te gaan.",

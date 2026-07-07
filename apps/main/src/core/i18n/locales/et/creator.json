@@ -175,6 +175,7 @@
           "address_postal_code": "Sihtnumber",
           "primary_language": "Emakeel",
           "categories": "Categories",
+          "categories_select_all": "Vali kõik",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",
           "step_requirements_hint": "Lisa a profile photo and at least one category to continue.",

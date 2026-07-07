@@ -175,6 +175,7 @@
           "address_postal_code": "Postinumero",
           "primary_language": "Äidinkieli",
           "categories": "Categories",
+          "categories_select_all": "Valitse kaikki",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",
           "step_requirements_hint": "Lisää a profile photo and at least one category to continue.",

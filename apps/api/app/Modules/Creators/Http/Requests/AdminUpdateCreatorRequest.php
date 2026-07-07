@@ -96,7 +96,7 @@ final class AdminUpdateCreatorRequest extends FormRequest
             'primary_language' => ['sometimes', 'string', Rule::enum(Locale::class)],
             'secondary_languages' => ['sometimes', 'array'],
             'secondary_languages.*' => ['string', Rule::enum(Locale::class)],
-            'categories' => ['sometimes', 'array', 'min:1', 'max:8'],
+            'categories' => ['sometimes', 'array', 'min:1', 'max:16'],
             'categories.*' => ['string', Rule::in(self::CATEGORY_ENUM)],
 
             // Reason metadata for the audit row. Conditionally required

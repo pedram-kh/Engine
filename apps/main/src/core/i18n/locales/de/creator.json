@@ -175,6 +175,7 @@
           "address_postal_code": "Postleitzahl",
           "primary_language": "Muttersprache",
           "categories": "Kategorien",
+          "categories_select_all": "Alle auswählen",
           "categories_help": "Wähle die Kategorien aus, die am besten beschreiben, was du erstellst.",
           "avatar_required": "Ein Profilfoto ist erforderlich, um diesen Schritt abzuschließen.",
           "step_requirements_hint": "Füge ein Profilfoto und mindestens eine Kategorie hinzu, um fortzufahren.",
