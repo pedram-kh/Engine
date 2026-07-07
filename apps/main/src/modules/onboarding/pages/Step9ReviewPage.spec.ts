@@ -18,8 +18,9 @@ let teardown: (() => void) | null = null
 
 // Backend substantive steps surfaced post-AH-003 (kyc/tax/payout hidden).
 const BACKEND_STEP_IDS = ['profile', 'social', 'portfolio', 'contract'] as const
-// UX review rows: social + portfolio collapse into the merged "connections" row.
-const UX_ROW_IDS = ['profile', 'connections', 'contract'] as const
+// UX review rows: the static account row leads, then social + portfolio
+// collapse into the merged "connections" row.
+const UX_ROW_IDS = ['account_created', 'profile', 'connections', 'contract'] as const
 
 type BackendStepId = (typeof BACKEND_STEP_IDS)[number]
 
@@ -99,7 +100,7 @@ afterEach(() => {
 })
 
 describe('Step9ReviewPage', () => {
-  it('renders one row per VISIBLE UX step (profile, merged connections, contract)', async () => {
+  it('renders one row per VISIBLE UX step (account, profile, merged connections, contract)', async () => {
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap({ allComplete: false }))
 
     const { wrapper, unmount } = await mountAuthPage(Step9ReviewPage, {
@@ -118,6 +119,50 @@ describe('Step9ReviewPage', () => {
     for (const id of ['social', 'portfolio', 'kyc', 'tax', 'payout']) {
       expect(wrapper.find(`[data-testid="review-row-${id}"]`).exists()).toBe(false)
     }
+  })
+
+  it('numbers the rows with the side-rail ordinals (1-4, review itself excluded)', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap({ allComplete: false }))
+
+    const { wrapper, unmount } = await mountAuthPage(Step9ReviewPage, {
+      initialRoute: { path: '/onboarding/review' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    const expected: Record<(typeof UX_ROW_IDS)[number], string> = {
+      account_created: '1',
+      profile: '2',
+      connections: '3',
+      contract: '4',
+    }
+    for (const [id, position] of Object.entries(expected)) {
+      expect(wrapper.find(`[data-testid="review-row-number-${id}"]`).text()).toBe(position)
+    }
+  })
+
+  it('renders the account row as Completed with no Edit affordance and never blocks submit', async () => {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap({ allComplete: true }))
+
+    const { wrapper, unmount } = await mountAuthPage(Step9ReviewPage, {
+      initialRoute: { path: '/onboarding/review' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="review-row-status-account_created"]').text()).toBe(
+      'Completed',
+    )
+    expect(wrapper.find('[data-testid="review-edit-account_created"]').exists()).toBe(false)
+    // The other rows keep their Edit button.
+    expect(wrapper.find('[data-testid="review-edit-profile"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="review-submit"]').attributes('disabled')).toBeUndefined()
   })
 
   it('disables submit when any visible step is incomplete', async () => {

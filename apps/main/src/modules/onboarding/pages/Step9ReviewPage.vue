@@ -36,7 +36,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import {
-  REVIEW_UX_STEPS,
+  VISIBLE_UX_STEPS,
   resolveUxStepComplete,
   resolveUxStepStatus,
   uxStepTitleKey,
@@ -71,6 +71,8 @@ const STATUS_I18N_KEY: Record<WizardStepStatus, string> = {
 
 interface StepRow {
   id: string
+  /** Ordinal within the full visible step list — matches the side rail. */
+  position: number
   name: string
   isComplete: boolean
   status: WizardStepStatus
@@ -78,12 +80,16 @@ interface StepRow {
   routeName: string
 }
 
-// Review rows are DERIVED from the visible UX step list (AH-003): profile,
-// the merged "connections" step, and contract. Hidden steps (kyc/tax/
-// payout) never appear, and social/portfolio collapse into one row whose
-// completion requires BOTH sub-sections.
+// Review rows are DERIVED from the visible UX step list (AH-003): the
+// static "Account created" row (always complete, non-editable — there is
+// no in-wizard route back to sign-up), profile, the merged "connections"
+// step, and contract. Hidden steps (kyc/tax/payout) never appear, and
+// social/portfolio collapse into one row whose completion requires BOTH
+// sub-sections. The position is each step's ordinal in the full visible
+// list so the numbering matches the side rail (review itself is the last
+// ordinal but renders as this page, not as a row).
 const stepRows = computed<StepRow[]>(() =>
-  REVIEW_UX_STEPS.map((step) => {
+  VISIBLE_UX_STEPS.filter((step) => step.id !== 'review').map((step) => {
     const isComplete = resolveUxStepComplete(step, store.stepCompletion)
     const status = resolveUxStepStatus(
       step,
@@ -93,6 +99,7 @@ const stepRows = computed<StepRow[]>(() =>
     )
     return {
       id: step.id,
+      position: VISIBLE_UX_STEPS.indexOf(step) + 1,
       name: t(uxStepTitleKey(step)),
       isComplete,
       status,
@@ -164,6 +171,12 @@ async function goToStep(routeName: string): Promise<void> {
           size="20"
           aria-hidden="true"
         />
+        <span
+          class="review-step__row-number text-caption text-medium-emphasis"
+          :data-testid="`review-row-number-${row.id}`"
+        >
+          {{ row.position }}
+        </span>
         <span class="review-step__row-name">{{ row.name }}</span>
         <span
           class="review-step__row-status text-caption"
@@ -171,7 +184,10 @@ async function goToStep(routeName: string): Promise<void> {
         >
           {{ row.statusLabel }}
         </span>
+        <!-- The account row is not navigable (no in-wizard route back to
+             sign-up), so it renders without an Edit affordance. -->
         <v-btn
+          v-if="row.routeName !== ''"
           variant="text"
           size="small"
           :data-testid="`review-edit-${row.id}`"
@@ -179,6 +195,7 @@ async function goToStep(routeName: string): Promise<void> {
         >
           {{ t('creator.ui.wizard.steps.review.edit_step') }}
         </v-btn>
+        <span v-else class="review-step__row-no-action" aria-hidden="true"></span>
       </li>
     </ul>
 
@@ -242,12 +259,18 @@ async function goToStep(routeName: string): Promise<void> {
 
 .review-step__row {
   display: grid;
-  grid-template-columns: 24px 1fr auto auto;
+  grid-template-columns: 24px auto 1fr auto auto;
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
   border: 1px solid rgb(var(--v-theme-outline-variant, var(--v-theme-outline)));
   border-radius: 6px;
+}
+
+.review-step__row-number {
+  min-width: 1ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Visible "this is why submit is disabled" cue on the offending row. */
