@@ -91,7 +91,7 @@ export const COUNTRY_OPTIONS: ReadonlyArray<{ value: string; label: string }> = 
 export const LANGUAGE_OPTIONS: ReadonlyArray<{ value: string; label: string }> = euLanguageOptions()
 
 /**
- * 16-category enum — must stay in sync with
+ * 28-category enum — must stay in sync with
  * `AdminUpdateCreatorRequest::CATEGORY_ENUM` and wizard Step 2's
  * `CATEGORY_KEYS`. Architecture test in
  * `field-edit-config-parity.spec.ts` enforces parity.
@@ -112,6 +112,18 @@ export const CATEGORY_KEYS: ReadonlyArray<string> = [
   'business',
   'education',
   'comedy',
+  'pets',
+  'photography',
+  'home',
+  'health',
+  'finance',
+  'automotive',
+  'entertainment',
+  'design',
+  'dance',
+  'sustainability',
+  'news',
+  'science',
   'other',
 ]
 
@@ -175,7 +187,8 @@ export const FIELD_EDIT_CONFIG: Readonly<Record<AdminEditableField, EditFieldCon
     labelKey: 'admin.creators.detail.fields.categories',
     control: {
       kind: 'multi-select',
-      maxItems: 8,
+      // Mirrors the backend `max:28` rule (AdminUpdateCreatorRequest).
+      maxItems: 28,
       minItems: 1,
       options: CATEGORY_KEYS.map((key) => ({ value: key, label: key })),
     },

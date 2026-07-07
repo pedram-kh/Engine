@@ -190,9 +190,7 @@
           "legal_name": "Právní jméno",
           "tax_id": "Daňové identifikační číslo",
           "address_country": "Země",
-          "address_city": "Město",
-          "address_postal_code": "PSČ",
-          "address_street": "Ulice"
+          "address_city": "Město"
         },
         "categories": {
           "fashion": "Móda",
@@ -210,6 +208,18 @@
           "business": "Byznys",
           "art": "Umění",
           "sports": "Sport",
+          "pets": "Domácí mazlíčci",
+          "photography": "Fotografie",
+          "home": "Domov a dekorace",
+          "health": "Zdraví a wellness",
+          "finance": "Finance",
+          "automotive": "Automobily",
+          "entertainment": "Zábava",
+          "design": "Design",
+          "dance": "Tanec",
+          "sustainability": "Udržitelnost",
+          "news": "Zprávy",
+          "science": "Věda",
           "other": "Jiné"
         },
         "tax_form_types": {

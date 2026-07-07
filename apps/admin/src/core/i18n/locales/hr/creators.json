@@ -221,6 +221,18 @@
           "business": "Byznys",
           "art": "Umění",
           "sports": "Sport",
+          "pets": "Kućni ljubimci",
+          "photography": "Fotografija",
+          "home": "Dom i dekor",
+          "health": "Zdravlje i wellness",
+          "finance": "Financije",
+          "automotive": "Automobili",
+          "entertainment": "Zabava",
+          "design": "Dizajn",
+          "dance": "Ples",
+          "sustainability": "Održivost",
+          "news": "Vijesti",
+          "science": "Znanost",
           "other": "Drugo"
         },
         "social_platforms": {

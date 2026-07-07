@@ -221,6 +221,18 @@
           "business": "Företag",
           "art": "Konst",
           "sports": "Sport",
+          "pets": "Husdjur",
+          "photography": "Fotografi",
+          "home": "Hem och inredning",
+          "health": "Hälsa och wellness",
+          "finance": "Finans",
+          "automotive": "Bilar",
+          "entertainment": "Underhållning",
+          "design": "Design",
+          "dance": "Dans",
+          "sustainability": "Hållbarhet",
+          "news": "Nyheter",
+          "science": "Vetenskap",
           "other": "Övrigt"
         },
         "social_platforms": {

@@ -190,9 +190,7 @@
           "legal_name": "Juridisk navn",
           "tax_id": "Skatte-ID",
           "address_country": "Land",
-          "address_city": "By",
-          "address_postal_code": "Postnummer",
-          "address_street": "Gade"
+          "address_city": "By"
         },
         "categories": {
           "fashion": "Mode",
@@ -210,6 +208,18 @@
           "business": "Erhverv",
           "art": "Kunst",
           "sports": "Sport",
+          "pets": "Kæledyr",
+          "photography": "Fotografi",
+          "home": "Hjem og indretning",
+          "health": "Sundhed og wellness",
+          "finance": "Finans",
+          "automotive": "Biler",
+          "entertainment": "Underholdning",
+          "design": "Design",
+          "dance": "Dans",
+          "sustainability": "Bæredygtighed",
+          "news": "Nyheder",
+          "science": "Videnskab",
           "other": "Andet"
         },
         "tax_form_types": {

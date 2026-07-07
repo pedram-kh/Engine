@@ -221,6 +221,18 @@
           "business": "Byznys",
           "art": "Umění",
           "sports": "Sport",
+          "pets": "Domáce zvieratá",
+          "photography": "Fotografia",
+          "home": "Domov a dekor",
+          "health": "Zdravie a wellness",
+          "finance": "Financie",
+          "automotive": "Autá",
+          "entertainment": "Zábava",
+          "design": "Dizajn",
+          "dance": "Tanec",
+          "sustainability": "Udržateľnosť",
+          "news": "Správy",
+          "science": "Veda",
           "other": "Iné"
         },
         "social_platforms": {

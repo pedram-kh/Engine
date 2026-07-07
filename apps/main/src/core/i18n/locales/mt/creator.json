@@ -171,8 +171,8 @@
           "contact_section_help": "Mhux obbligatorju. Jiġi kondiviż biss mal-aġenziji li int konness magħhom — qatt ma jintwera pubblikament.",
           "phone": "Numru tat-telefon",
           "whatsapp": "Numru tal-WhatsApp",
-          "address_street": "Indirizz tat-triq",
-          "address_postal_code": "Kodiċi postali",
+          "address_street": "Street",
+          "address_postal_code": "Postal code",
           "primary_language": "Lingwa nattiva",
           "categories": "Categories",
           "categories_select_all": "Agħżel kollox",
@@ -190,9 +190,7 @@
           "legal_name": "Legal name",
           "tax_id": "Tax ID",
           "address_country": "Country",
-          "address_city": "City",
-          "address_postal_code": "Postal code",
-          "address_street": "Street"
+          "address_city": "City"
         },
         "categories": {
           "fashion": "Fashion",
@@ -210,6 +208,18 @@
           "business": "Business",
           "art": "Art",
           "sports": "Sports",
+          "pets": "Pets",
+          "photography": "Photography",
+          "home": "Home & Decor",
+          "health": "Health & Wellness",
+          "finance": "Finance",
+          "automotive": "Automotive",
+          "entertainment": "Entertainment",
+          "design": "Design",
+          "dance": "Dance",
+          "sustainability": "Sustainability",
+          "news": "News",
+          "science": "Science",
           "other": "Other"
         },
         "tax_form_types": {

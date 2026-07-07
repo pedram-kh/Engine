@@ -49,10 +49,10 @@ final class UpdateProfileRequest extends FormRequest
             'primary_language' => ['sometimes', 'string', Rule::enum(Locale::class)],
             'secondary_languages' => ['sometimes', 'array'],
             'secondary_languages.*' => ['string', Rule::enum(Locale::class)],
-            'categories' => ['sometimes', 'array', 'min:1', 'max:16'],
+            'categories' => ['sometimes', 'array', 'min:1', 'max:28'],
             'categories.*' => [
                 'string',
-                'in:lifestyle,sports,beauty,fashion,food,travel,gaming,tech,music,art,fitness,parenting,business,education,comedy,other',
+                'in:lifestyle,sports,beauty,fashion,food,travel,gaming,tech,music,art,fitness,parenting,business,education,comedy,pets,photography,home,health,finance,automotive,entertainment,design,dance,sustainability,news,science,other',
             ],
         ];
     }

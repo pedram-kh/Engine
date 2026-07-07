@@ -7,7 +7,7 @@
  *
  *   - `EDITABLE_FIELDS`         (the 7 fields)
  *   - `REASON_REQUIRED_FIELDS`  (the 2 sensitive fields)
- *   - `CATEGORY_ENUM`           (the 16-category set)
+ *   - `CATEGORY_ENUM`           (the 28-category set)
  *
  * The backend is the source of truth; the frontend mirrors at the
  * UX layer so admins get feedback without a 422 round-trip. Keeping
@@ -86,7 +86,7 @@ describe('admin per-field edit config parity (Sprint 3 Chunk 4 sub-step 9)', () 
 
   it('CATEGORY_KEYS matches AdminUpdateCreatorRequest::CATEGORY_ENUM', () => {
     const backend = parsePhpArrayConst(php, 'private', 'CATEGORY_ENUM')
-    expect(backend).toHaveLength(16)
+    expect(backend).toHaveLength(28)
     expect([...CATEGORY_KEYS].sort()).toEqual([...backend].sort())
   })
 })

@@ -64,7 +64,7 @@ final class AdminUpdateCreatorRequest extends FormRequest
     public const array REASON_REQUIRED_FIELDS = ['bio', 'categories'];
 
     /**
-     * The 16-category enum shared with the wizard's Step 2. Keep this list
+     * The 28-category enum shared with the wizard's Step 2. Keep this list
      * in sync with {@see UpdateProfileRequest::rules()} `categories.*` rule.
      *
      * @var list<string>
@@ -72,7 +72,9 @@ final class AdminUpdateCreatorRequest extends FormRequest
     private const array CATEGORY_ENUM = [
         'lifestyle', 'sports', 'beauty', 'fashion', 'food', 'travel',
         'gaming', 'tech', 'music', 'art', 'fitness', 'parenting',
-        'business', 'education', 'comedy', 'other',
+        'business', 'education', 'comedy', 'pets', 'photography', 'home',
+        'health', 'finance', 'automotive', 'entertainment', 'design',
+        'dance', 'sustainability', 'news', 'science', 'other',
     ];
 
     public function authorize(): bool
@@ -96,7 +98,7 @@ final class AdminUpdateCreatorRequest extends FormRequest
             'primary_language' => ['sometimes', 'string', Rule::enum(Locale::class)],
             'secondary_languages' => ['sometimes', 'array'],
             'secondary_languages.*' => ['string', Rule::enum(Locale::class)],
-            'categories' => ['sometimes', 'array', 'min:1', 'max:16'],
+            'categories' => ['sometimes', 'array', 'min:1', 'max:28'],
             'categories.*' => ['string', Rule::in(self::CATEGORY_ENUM)],
 
             // Reason metadata for the audit row. Conditionally required

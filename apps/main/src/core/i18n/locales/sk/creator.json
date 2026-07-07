@@ -171,7 +171,7 @@
           "contact_section_help": "Voliteľné. Zdieľa sa iba s agentúrami, s ktorými ste prepojení — nikdy sa nezobrazuje verejne.",
           "phone": "Telefónne číslo",
           "whatsapp": "Číslo WhatsApp",
-          "address_street": "Ulica",
+          "address_street": "Ulice",
           "address_postal_code": "PSČ",
           "primary_language": "Materinský jazyk",
           "categories": "Kategorie",
@@ -190,9 +190,7 @@
           "legal_name": "Právní meno",
           "tax_id": "Daňové identifikační číslo",
           "address_country": "Země",
-          "address_city": "Město",
-          "address_postal_code": "PSČ",
-          "address_street": "Ulice"
+          "address_city": "Město"
         },
         "categories": {
           "fashion": "Móda",
@@ -210,6 +208,18 @@
           "business": "Byznys",
           "art": "Umění",
           "sports": "Sport",
+          "pets": "Domáce zvieratá",
+          "photography": "Fotografia",
+          "home": "Domov a dekor",
+          "health": "Zdravie a wellness",
+          "finance": "Financie",
+          "automotive": "Autá",
+          "entertainment": "Zábava",
+          "design": "Dizajn",
+          "dance": "Tanec",
+          "sustainability": "Udržateľnosť",
+          "news": "Správy",
+          "science": "Veda",
           "other": "Iné"
         },
         "tax_form_types": {

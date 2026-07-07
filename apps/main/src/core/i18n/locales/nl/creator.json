@@ -190,9 +190,7 @@
           "legal_name": "Wettelijke naam",
           "tax_id": "Belasting-ID",
           "address_country": "Land",
-          "address_city": "Stad",
-          "address_postal_code": "Postcode",
-          "address_street": "Straat"
+          "address_city": "Stad"
         },
         "categories": {
           "fashion": "Mode",
@@ -210,6 +208,18 @@
           "business": "Business",
           "art": "Kunst",
           "sports": "Sport",
+          "pets": "Huisdieren",
+          "photography": "Fotografie",
+          "home": "Huis en interieur",
+          "health": "Gezondheid en wellness",
+          "finance": "Financiën",
+          "automotive": "Auto's",
+          "entertainment": "Entertainment",
+          "design": "Design",
+          "dance": "Dans",
+          "sustainability": "Duurzaamheid",
+          "news": "Nieuws",
+          "science": "Wetenschap",
           "other": "Overig"
         },
         "tax_form_types": {

@@ -190,9 +190,7 @@
           "legal_name": "Nom légal",
           "tax_id": "Numéro fiscal",
           "address_country": "Pays",
-          "address_city": "Ville",
-          "address_postal_code": "Code postal",
-          "address_street": "Rue"
+          "address_city": "Ville"
         },
         "categories": {
           "fashion": "Mode",
@@ -210,6 +208,18 @@
           "business": "Business",
           "art": "Art",
           "sports": "Sport",
+          "pets": "Animaux",
+          "photography": "Photographie",
+          "home": "Maison et déco",
+          "health": "Santé et bien-être",
+          "finance": "Finance",
+          "automotive": "Automobile",
+          "entertainment": "Divertissement",
+          "design": "Design",
+          "dance": "Danse",
+          "sustainability": "Développement durable",
+          "news": "Actualités",
+          "science": "Science",
           "other": "Autre"
         },
         "tax_form_types": {

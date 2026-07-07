@@ -171,8 +171,8 @@
           "contact_section_help": "Valinnainen. Jaetaan vain niille toimistoille, joihin sinulla on yhteys — ei koskaan näytetä julkisesti.",
           "phone": "Puhelinnumero",
           "whatsapp": "WhatsApp-numero",
-          "address_street": "Katuosoite",
-          "address_postal_code": "Postinumero",
+          "address_street": "Street",
+          "address_postal_code": "Postal code",
           "primary_language": "Äidinkieli",
           "categories": "Categories",
           "categories_select_all": "Valitse kaikki",
@@ -190,9 +190,7 @@
           "legal_name": "Legal name",
           "tax_id": "Tax ID",
           "address_country": "Country",
-          "address_city": "City",
-          "address_postal_code": "Postal code",
-          "address_street": "Street"
+          "address_city": "City"
         },
         "categories": {
           "fashion": "Fashion",
@@ -210,6 +208,18 @@
           "business": "Business",
           "art": "Art",
           "sports": "Sports",
+          "pets": "Pets",
+          "photography": "Photography",
+          "home": "Home & Decor",
+          "health": "Health & Wellness",
+          "finance": "Finance",
+          "automotive": "Automotive",
+          "entertainment": "Entertainment",
+          "design": "Design",
+          "dance": "Dance",
+          "sustainability": "Sustainability",
+          "news": "News",
+          "science": "Science",
           "other": "Other"
         },
         "tax_form_types": {

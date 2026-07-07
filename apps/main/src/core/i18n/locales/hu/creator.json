@@ -171,8 +171,8 @@
           "contact_section_help": "Nem kötelező. Csak azokkal az ügynökségekkel osztjuk meg, amelyekhez csatlakozott — soha nem jelenik meg nyilvánosan.",
           "phone": "Telefonszám",
           "whatsapp": "WhatsApp-szám",
-          "address_street": "Utca",
-          "address_postal_code": "Irányítószám",
+          "address_street": "Street",
+          "address_postal_code": "Postal code",
           "primary_language": "Anyanyelv",
           "categories": "Categories",
           "categories_select_all": "Az összes kijelölése",
@@ -190,9 +190,7 @@
           "legal_name": "Legal name",
           "tax_id": "Tax ID",
           "address_country": "Country",
-          "address_city": "City",
-          "address_postal_code": "Postal code",
-          "address_street": "Street"
+          "address_city": "City"
         },
         "categories": {
           "fashion": "Fashion",
@@ -210,6 +208,18 @@
           "business": "Business",
           "art": "Art",
           "sports": "Sports",
+          "pets": "Pets",
+          "photography": "Photography",
+          "home": "Home & Decor",
+          "health": "Health & Wellness",
+          "finance": "Finance",
+          "automotive": "Automotive",
+          "entertainment": "Entertainment",
+          "design": "Design",
+          "dance": "Dance",
+          "sustainability": "Sustainability",
+          "news": "News",
+          "science": "Science",
           "other": "Other"
         },
         "tax_form_types": {

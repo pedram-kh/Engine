@@ -104,6 +104,10 @@ const categories = ref<string[]>([])
 const submitErrorKey = ref<string | null>(null)
 const fieldErrors = ref<Partial<Record<ProfileField, readonly string[]>>>({})
 
+// 28-category enum — must stay in sync with the backend
+// `UpdateProfileRequest::rules()` `categories.*` list (and its admin mirror,
+// pinned by field-edit-config-parity.spec.ts). Labels come from
+// `creator.ui.wizard.categories.*` in every locale.
 const CATEGORY_KEYS = [
   'fashion',
   'beauty',
@@ -120,6 +124,18 @@ const CATEGORY_KEYS = [
   'business',
   'art',
   'sports',
+  'pets',
+  'photography',
+  'home',
+  'health',
+  'finance',
+  'automotive',
+  'entertainment',
+  'design',
+  'dance',
+  'sustainability',
+  'news',
+  'science',
   'other',
 ] as const
 
@@ -437,37 +453,52 @@ defineExpose({ save, hydrate, isPristine })
       data-testid="profile-primary-language"
     />
 
-    <v-select
-      v-model="categories"
-      :items="categoryItems"
-      :label="t('creator.ui.wizard.fields.categories')"
-      :hint="t('creator.ui.wizard.fields.categories_help')"
-      persistent-hint
-      multiple
-      chips
-      :rules="[
-        (v: string[]) => (Array.isArray(v) && v.length > 0) || t('validation.field_required'),
-      ]"
-      :error-messages="fieldErrors.categories"
-      data-testid="profile-categories"
-    >
-      <template #prepend-item>
-        <v-list-item
-          :title="t('creator.ui.wizard.fields.categories_select_all')"
-          data-testid="profile-categories-select-all"
-          @click="toggleSelectAllCategories"
+    <fieldset class="profile-basics-form__categories" data-testid="profile-categories">
+      <legend class="text-subtitle-2">{{ t('creator.ui.wizard.fields.categories') }}</legend>
+      <p class="profile-basics-form__categories-note text-caption">
+        {{ t('creator.ui.wizard.fields.categories_help') }}
+      </p>
+
+      <label
+        class="profile-basics-form__categories-select-all"
+        data-testid="profile-categories-select-all"
+      >
+        <v-checkbox-btn
+          :model-value="allCategoriesSelected"
+          :indeterminate="someCategoriesSelected"
+          density="compact"
+          inline
+          @click.prevent="toggleSelectAllCategories"
+        />
+        <span class="text-body-2">{{ t('creator.ui.wizard.fields.categories_select_all') }}</span>
+      </label>
+
+      <v-chip-group
+        v-model="categories"
+        multiple
+        column
+        filter
+        class="profile-basics-form__category-chips"
+      >
+        <v-chip
+          v-for="item in categoryItems"
+          :key="item.value"
+          :value="item.value"
+          variant="outlined"
+          :data-testid="`profile-category-chip-${item.value}`"
         >
-          <template #prepend>
-            <v-checkbox-btn
-              :model-value="allCategoriesSelected"
-              :indeterminate="someCategoriesSelected"
-              tabindex="-1"
-            />
-          </template>
-        </v-list-item>
-        <v-divider />
-      </template>
-    </v-select>
+          {{ item.title }}
+        </v-chip>
+      </v-chip-group>
+
+      <div
+        v-if="fieldErrors.categories !== undefined"
+        class="profile-basics-form__error"
+        data-testid="profile-categories-error"
+      >
+        {{ fieldErrors.categories.join(' ') }}
+      </div>
+    </fieldset>
 
     <div class="profile-basics-form__preview" data-testid="profile-preview">
       <h3 class="text-subtitle-2">{{ t('creator.ui.wizard.fields.country') }}</h3>
@@ -545,6 +576,32 @@ defineExpose({ save, hydrate, isPristine })
 
 .profile-basics-form__contact legend {
   padding: 0 6px;
+}
+
+.profile-basics-form__categories {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid rgb(var(--v-theme-outline-variant, var(--v-theme-outline)));
+  border-radius: 6px;
+}
+
+.profile-basics-form__categories legend {
+  padding: 0 6px;
+}
+
+.profile-basics-form__categories-note {
+  margin-top: -4px;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+.profile-basics-form__categories-select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  align-self: flex-start;
 }
 
 .profile-basics-form__contact-note {

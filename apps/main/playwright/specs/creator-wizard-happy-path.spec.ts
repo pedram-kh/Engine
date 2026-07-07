@@ -165,9 +165,8 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     await page.locator('[data-testid="profile-primary-language"]').click()
     await page.getByRole('option', { name: 'English' }).click()
 
-    await page.locator('[data-testid="profile-categories"]').click()
-    await page.getByRole('option').first().click()
-    await page.keyboard.press('Escape')
+    // Categories render as a visible chip grid — click the first chip.
+    await page.locator('[data-testid="profile-category-chip-fashion"]').click()
 
     await page.locator('[data-testid="profile-submit"]').click()
 

@@ -221,6 +221,18 @@
           "business": "Negocios",
           "art": "Arte",
           "sports": "Deportes",
+          "pets": "Mascotas",
+          "photography": "Fotografía",
+          "home": "Hogar y decoración",
+          "health": "Salud y bienestar",
+          "finance": "Finanzas",
+          "automotive": "Automoción",
+          "entertainment": "Entretenimiento",
+          "design": "Diseño",
+          "dance": "Baile",
+          "sustainability": "Sostenibilidad",
+          "news": "Noticias",
+          "science": "Ciencia",
           "other": "Otra"
         },
         "social_platforms": {

@@ -171,8 +171,8 @@
           "contact_section_help": "Roghnach. Roinnte amháin le gníomhaireachtaí a bhfuil ceangal agat leo — ní thaispeántar go poiblí é riamh.",
           "phone": "Uimhir ghutháin",
           "whatsapp": "Uimhir WhatsApp",
-          "address_street": "Seoladh sráide",
-          "address_postal_code": "Cód poist",
+          "address_street": "Street",
+          "address_postal_code": "Postal code",
           "primary_language": "Teanga dhúchais",
           "categories": "Categories",
           "categories_select_all": "Roghnaigh gach rud",
@@ -190,9 +190,7 @@
           "legal_name": "Legal name",
           "tax_id": "Tax ID",
           "address_country": "Country",
-          "address_city": "City",
-          "address_postal_code": "Postal code",
-          "address_street": "Street"
+          "address_city": "City"
         },
         "categories": {
           "fashion": "Fashion",
@@ -210,6 +208,18 @@
           "business": "Business",
           "art": "Art",
           "sports": "Sports",
+          "pets": "Pets",
+          "photography": "Photography",
+          "home": "Home & Decor",
+          "health": "Health & Wellness",
+          "finance": "Finance",
+          "automotive": "Automotive",
+          "entertainment": "Entertainment",
+          "design": "Design",
+          "dance": "Dance",
+          "sustainability": "Sustainability",
+          "news": "News",
+          "science": "Science",
           "other": "Other"
         },
         "tax_form_types": {

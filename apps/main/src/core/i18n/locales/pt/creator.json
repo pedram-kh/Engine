@@ -190,9 +190,7 @@
           "legal_name": "Nome legal",
           "tax_id": "NIF",
           "address_country": "País",
-          "address_city": "Cidade",
-          "address_postal_code": "Código postal",
-          "address_street": "Morada"
+          "address_city": "Cidade"
         },
         "categories": {
           "fashion": "Moda",
@@ -210,6 +208,18 @@
           "business": "Negócios",
           "art": "Arte",
           "sports": "Desporto",
+          "pets": "Animais de estimação",
+          "photography": "Fotografia",
+          "home": "Casa e decoração",
+          "health": "Saúde e bem-estar",
+          "finance": "Finanças",
+          "automotive": "Automóveis",
+          "entertainment": "Entretenimento",
+          "design": "Design",
+          "dance": "Dança",
+          "sustainability": "Sustentabilidade",
+          "news": "Notícias",
+          "science": "Ciência",
           "other": "Outras"
         },
         "tax_form_types": {

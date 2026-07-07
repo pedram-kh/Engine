@@ -97,6 +97,18 @@ const CATEGORY_FILTER_KEYS = [
   'business',
   'art',
   'sports',
+  'pets',
+  'photography',
+  'home',
+  'health',
+  'finance',
+  'automotive',
+  'entertainment',
+  'design',
+  'dance',
+  'sustainability',
+  'news',
+  'science',
   'other',
 ] as const
 

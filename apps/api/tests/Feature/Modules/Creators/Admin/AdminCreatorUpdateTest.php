@@ -321,17 +321,49 @@ it('rejects categories outside the 16-enum set (matches wizard enum)', function 
     expect($response->status())->toBe(422);
 });
 
-it('rejects categories array with > 8 entries (matches wizard cap)', function (): void {
+it('rejects categories array with > 28 entries (matches wizard cap)', function (): void {
     $admin = makePlatformAdmin();
     $creator = CreatorFactory::new()->createOne();
 
+    // 28 valid entries + 1 repeat = 29 items, one over the max:28 cap.
+    $allCategories = [
+        'lifestyle', 'sports', 'beauty', 'fashion', 'food', 'travel',
+        'gaming', 'tech', 'music', 'art', 'fitness', 'parenting',
+        'business', 'education', 'comedy', 'pets', 'photography', 'home',
+        'health', 'finance', 'automotive', 'entertainment', 'design',
+        'dance', 'sustainability', 'news', 'science', 'other',
+    ];
+
     $response = $this->actingAs($admin, 'web_admin')
         ->patchJson("/api/v1/admin/creators/{$creator->ulid}", [
-            'categories' => ['lifestyle', 'sports', 'beauty', 'fashion', 'food', 'travel', 'gaming', 'tech', 'music'],
+            'categories' => [...$allCategories, 'lifestyle'],
             'reason' => 'Test.',
         ]);
 
     expect($response->status())->toBe(422);
+});
+
+it('accepts the full 28-category set', function (): void {
+    $admin = makePlatformAdmin();
+    $creator = CreatorFactory::new()->createOne();
+
+    $allCategories = [
+        'lifestyle', 'sports', 'beauty', 'fashion', 'food', 'travel',
+        'gaming', 'tech', 'music', 'art', 'fitness', 'parenting',
+        'business', 'education', 'comedy', 'pets', 'photography', 'home',
+        'health', 'finance', 'automotive', 'entertainment', 'design',
+        'dance', 'sustainability', 'news', 'science', 'other',
+    ];
+
+    $response = $this->actingAs($admin, 'web_admin')
+        ->patchJson("/api/v1/admin/creators/{$creator->ulid}", [
+            'categories' => $allCategories,
+            'reason' => 'Test.',
+        ]);
+
+    expect($response->status())->toBe(200);
+    expect($response->json('data.attributes.categories'))
+        ->toEqualCanonicalizing($allCategories);
 });
 
 it('rejects bio longer than 5000 chars (matches wizard cap)', function (): void {

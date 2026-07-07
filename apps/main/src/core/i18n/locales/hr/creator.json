@@ -171,8 +171,8 @@
           "contact_section_help": "Neobavezno. Dijeli se samo s agencijama s kojima ste povezani — nikada se ne prikazuje javno.",
           "phone": "Telefonski broj",
           "whatsapp": "WhatsApp broj",
-          "address_street": "Ulica",
-          "address_postal_code": "Poštanski broj",
+          "address_street": "Ulice",
+          "address_postal_code": "PSČ",
           "primary_language": "Materinski jezik",
           "categories": "Kategorie",
           "categories_select_all": "Odaberi sve",
@@ -190,9 +190,7 @@
           "legal_name": "Právní ime",
           "tax_id": "Daňové identifikační číslo",
           "address_country": "Země",
-          "address_city": "Město",
-          "address_postal_code": "PSČ",
-          "address_street": "Ulice"
+          "address_city": "Město"
         },
         "categories": {
           "fashion": "Móda",
@@ -210,6 +208,18 @@
           "business": "Byznys",
           "art": "Umění",
           "sports": "Sport",
+          "pets": "Kućni ljubimci",
+          "photography": "Fotografija",
+          "home": "Dom i dekor",
+          "health": "Zdravlje i wellness",
+          "finance": "Financije",
+          "automotive": "Automobili",
+          "entertainment": "Zabava",
+          "design": "Dizajn",
+          "dance": "Ples",
+          "sustainability": "Održivost",
+          "news": "Vijesti",
+          "science": "Znanost",
           "other": "Drugo"
         },
         "tax_form_types": {
