@@ -100,6 +100,7 @@ test.describe('spec #19 — 2FA enrollment + sign-in', () => {
     await expect(page.locator(dt(testIds.signUpPage))).toBeVisible()
 
     await page.locator(dt(testIds.signUpName)).locator('input').fill('Spec User')
+    await page.locator(dt(testIds.signUpLastName)).locator('input').fill('E2E')
     await page.locator(dt(testIds.signUpEmail)).locator('input').fill(email)
     await page.locator(dt(testIds.signUpPassword)).locator('input').fill(PASSWORD)
     await page.locator(dt(testIds.signUpPasswordConfirmation)).locator('input').fill(PASSWORD)

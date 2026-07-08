@@ -76,11 +76,14 @@ export async function signUpUser(
   email: string,
   password: string,
   name: string = 'Test User',
+  lastName: string = 'E2E',
 ): Promise<SignUpUserResult> {
   const response = await request.post('http://127.0.0.1:8000/api/v1/auth/sign-up', {
     headers: defaultHeaders,
     data: {
       name,
+      // Required since AH-023 (surname at sign-up) — omitting it 422s.
+      last_name: lastName,
       email,
       password,
       password_confirmation: password,

@@ -41,6 +41,7 @@ export const testIds = {
   signUpPage: 'sign-up-page',
   signUpHeading: 'sign-up-heading',
   signUpName: 'sign-up-name',
+  signUpLastName: 'sign-up-last-name',
   signUpEmail: 'sign-up-email',
   signUpPassword: 'sign-up-password',
   signUpPasswordConfirmation: 'sign-up-password-confirmation',
