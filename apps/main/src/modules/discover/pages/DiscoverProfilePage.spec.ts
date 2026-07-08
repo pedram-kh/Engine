@@ -66,6 +66,7 @@ function makeProfile(
       region: 'London',
       primary_language: 'en',
       secondary_languages: [],
+      accent: null,
       categories: ['tech'],
       avatar_url: null,
       cover_url: null,

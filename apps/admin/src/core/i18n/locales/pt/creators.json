@@ -90,6 +90,7 @@
           "region": "Região",
           "primary_language": "Idioma principal",
           "secondary_languages": "Idiomas secundários",
+          "accent": "Sotaque",
           "categories": "Categorias"
         },
         "edit": {

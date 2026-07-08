@@ -169,7 +169,7 @@ it('exposes the slim card shape and carries NONE of the relation block', functio
 
     $attrs = $response->json('data.0.attributes');
     expect(array_keys($attrs))->toEqualCanonicalizing([
-        'display_name', 'country_code', 'primary_language', 'categories',
+        'display_name', 'country_code', 'primary_language', 'accent', 'categories',
         'avatar_url', 'relationship_status',
     ]);
 

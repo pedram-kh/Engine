@@ -39,7 +39,12 @@
  * "Edit" + the field label; section headings remain `<h2>`s.
  */
 
-import { formatDateTime, ApiError, languageEndonym } from '@catalyst/api-client'
+import {
+  formatDateTime,
+  ApiError,
+  labelForCountryCode,
+  languageEndonym,
+} from '@catalyst/api-client'
 import type {
   CreatorKycVerificationSummary,
   CreatorResource,
@@ -87,11 +92,12 @@ const errorKey = ref<string | null>(null)
 
 const creatorUlid = computed(() => String(route.params.ulid ?? ''))
 
-const countryLabel = computed(() => {
-  const cc = creator.value?.attributes.country_code
-  if (!cc) return ''
-  return t(`countries.${cc}`, cc)
-})
+// Country label from the shared full ISO registry (previously an i18n
+// lookup that fell back to the raw code — there is no `countries.*`
+// bundle namespace).
+const countryLabel = computed(() =>
+  labelForCountryCode(creator.value?.attributes.country_code ?? null),
+)
 
 const categoryLabels = computed(() => {
   const cats = creator.value?.attributes.categories ?? []
@@ -259,6 +265,8 @@ const editingCurrentValue = computed<unknown>(() => {
       return attrs.primary_language ?? null
     case 'secondary_languages':
       return [...(attrs.secondary_languages ?? [])]
+    case 'accent':
+      return attrs.accent ?? ''
     case 'categories':
       return [...(attrs.categories ?? [])]
     default:
@@ -606,6 +614,16 @@ const decisionSnackbarColor = computed(() =>
           @edit="openEdit('secondary_languages')"
         >
           <LanguageList :primary-label="null" :secondary-labels="secondaryLanguageLabels" />
+        </EditFieldRow>
+
+        <EditFieldRow
+          label-key="admin.creators.detail.fields.accent"
+          test-id="admin-creator-detail-row-accent"
+          @edit="openEdit('accent')"
+        >
+          <span data-testid="admin-creator-detail-value-accent">
+            {{ creator.attributes.accent ?? '' }}
+          </span>
         </EditFieldRow>
 
         <EditFieldRow

@@ -82,7 +82,14 @@ function languageLabel(code: string | null): string | null {
   return languageEndonym(code)
 }
 
-const primaryLanguageLabel = computed(() => languageLabel(attrs.value?.primary_language ?? null))
+// Accent / dialect hint appended to the primary-language label
+// ("English · British") — free-text, shown exactly as the creator wrote it.
+const primaryLanguageLabel = computed(() => {
+  const label = languageLabel(attrs.value?.primary_language ?? null)
+  const accent = attrs.value?.accent ?? null
+  if (label === null) return null
+  return accent !== null && accent !== '' ? `${label} · ${accent}` : label
+})
 const secondaryLanguageLabels = computed(() =>
   (attrs.value?.secondary_languages ?? [])
     .map((c) => languageLabel(c))

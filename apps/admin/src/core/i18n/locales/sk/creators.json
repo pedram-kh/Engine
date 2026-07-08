@@ -90,6 +90,7 @@
           "region": "Oblast",
           "primary_language": "Primární jazyk",
           "secondary_languages": "Další jazyky",
+          "accent": "Prízvuk",
           "categories": "Kategorie"
         },
         "edit": {

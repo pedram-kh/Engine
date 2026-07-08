@@ -130,6 +130,7 @@ final class AgencyCreatorDetailResource extends JsonResource
             'region' => $creator->region,
             'primary_language' => $creator->primary_language,
             'secondary_languages' => $creator->secondary_languages,
+            'accent' => $creator->accent,
             'categories' => $creator->categories,
             'avatar_url' => $this->signedViewUrl($creator->avatar_path),
             'cover_url' => $this->signedViewUrl($creator->cover_path),

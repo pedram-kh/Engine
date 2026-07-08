@@ -133,6 +133,12 @@ export interface CreatorAttributes {
   address_postal_code: string | null
   primary_language: string | null
   secondary_languages: string[] | null
+  /**
+   * Free-text accent / dialect hint shown next to the spoken language
+   * (e.g. "British", "Brazilian"). Display-only matching signal —
+   * deliberately not an enum.
+   */
+  accent: string | null
   categories: string[] | null
   avatar_path: string | null
   cover_path: string | null
@@ -311,6 +317,8 @@ export interface CreatorProfileUpdatePayload {
   address_postal_code?: string | null
   primary_language?: string
   secondary_languages?: string[]
+  /** Free-text accent / dialect hint. Nullable — clearing it is valid. */
+  accent?: string | null
   categories?: string[]
 }
 

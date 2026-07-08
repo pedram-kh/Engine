@@ -90,6 +90,7 @@ function makeDetail(
         region: null,
         primary_language: 'en',
         secondary_languages: null,
+        accent: null,
         categories: ['tech'],
         avatar_url: null,
         cover_url: null,

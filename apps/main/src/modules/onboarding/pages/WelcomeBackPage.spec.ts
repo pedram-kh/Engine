@@ -45,6 +45,7 @@ function makeCreator(
       address_postal_code: null,
       primary_language: 'en',
       secondary_languages: null,
+      accent: null,
       categories: ['lifestyle'],
       avatar_path: null,
       cover_path: null,

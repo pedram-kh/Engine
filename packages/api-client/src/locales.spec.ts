@@ -18,7 +18,15 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
-import { EU_LANGUAGES, UI_LOCALES, LANGUAGE_ENDONYMS, euLanguageOptions } from './locales'
+import {
+  EU_LANGUAGES,
+  UI_LOCALES,
+  WORLD_LANGUAGES,
+  LANGUAGE_ENDONYMS,
+  WORLD_LANGUAGE_ENDONYMS,
+  euLanguageOptions,
+  worldLanguageOptions,
+} from './locales'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 // packages/api-client/src -> api-client -> packages -> repo root
@@ -79,6 +87,44 @@ describe('locale registry integrity', () => {
     )
     expect(rest).toEqual(sorted)
   })
+
+  it('WORLD_LANGUAGES is a superset of EU_LANGUAGES with valid 2-letter codes, no duplicates', () => {
+    expect(new Set(WORLD_LANGUAGES).size).toBe(WORLD_LANGUAGES.length)
+    for (const code of WORLD_LANGUAGES) {
+      expect(code).toMatch(/^[a-z]{2}$/)
+    }
+    for (const code of EU_LANGUAGES) {
+      expect(WORLD_LANGUAGES).toContain(code)
+    }
+  })
+
+  it('WORLD_LANGUAGES excludes historical / constructed codes by design', () => {
+    for (const excluded of ['ae', 'cu', 'la', 'pi', 'eo', 'ia', 'ie', 'io', 'vo', 'bh']) {
+      expect(WORLD_LANGUAGES).not.toContain(excluded)
+    }
+  })
+
+  it('WORLD_LANGUAGE_ENDONYMS has exactly one entry per world language', () => {
+    expect(Object.keys(WORLD_LANGUAGE_ENDONYMS).sort()).toEqual([...WORLD_LANGUAGES].sort())
+  })
+
+  it('WORLD_LANGUAGE_ENDONYMS agrees with LANGUAGE_ENDONYMS on the EU set', () => {
+    for (const code of EU_LANGUAGES) {
+      expect(WORLD_LANGUAGE_ENDONYMS[code]).toBe(LANGUAGE_ENDONYMS[code])
+    }
+  })
+
+  it('worldLanguageOptions lists the full set, English first, then by endonym', () => {
+    const options = worldLanguageOptions()
+    expect(options).toHaveLength(WORLD_LANGUAGES.length)
+    expect(options[0]?.value).toBe('en')
+
+    const rest = options.slice(1).map((o) => o.label)
+    const sorted = [...rest].sort((a, b) =>
+      new Intl.Collator('en', { sensitivity: 'base' }).compare(a, b),
+    )
+    expect(rest).toEqual(sorted)
+  })
 })
 
 describe('TS <-> PHP locale parity (standing standard 5.25)', () => {
@@ -93,5 +139,10 @@ describe('TS <-> PHP locale parity (standing standard 5.25)', () => {
   it('Locale::UI_LOCALES matches the TS UI_LOCALES', () => {
     const backend = parsePhpArrayConst(php, 'UI_LOCALES')
     expect([...backend].sort()).toEqual([...UI_LOCALES].sort())
+  })
+
+  it('Locale::WORLD_LANGUAGES matches the TS WORLD_LANGUAGES', () => {
+    const backend = parsePhpArrayConst(php, 'WORLD_LANGUAGES')
+    expect([...backend].sort()).toEqual([...WORLD_LANGUAGES].sort())
   })
 })

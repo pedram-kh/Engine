@@ -90,6 +90,7 @@
           "region": "Région",
           "primary_language": "Langue principale",
           "secondary_languages": "Langues secondaires",
+          "accent": "Accent",
           "categories": "Catégories"
         },
         "edit": {

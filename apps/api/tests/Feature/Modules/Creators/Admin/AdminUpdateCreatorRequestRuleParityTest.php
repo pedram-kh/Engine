@@ -16,7 +16,7 @@ uses(TestCase::class);
  * a value the wizard would reject (or vice versa), we've reintroduced
  * the seam mismatch the Chunk 3 saga taught us about.
  *
- * Source-inspection regression (#1): walks the 7 admin-editable fields
+ * Source-inspection regression (#1): walks the 8 admin-editable fields
  * and asserts the rule strings are identical.
  */
 it('AdminUpdateCreatorRequest rules match the wizard UpdateProfileRequest rules for each editable field', function (string $field): void {
@@ -34,6 +34,7 @@ it('AdminUpdateCreatorRequest rules match the wizard UpdateProfileRequest rules 
     'region' => ['region'],
     'primary_language' => ['primary_language'],
     'secondary_languages' => ['secondary_languages'],
+    'accent' => ['accent'],
 ]);
 
 it('AdminUpdateCreatorRequest categories rules contain the same 16-enum check as the wizard', function (): void {

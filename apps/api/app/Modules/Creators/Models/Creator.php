@@ -44,6 +44,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $address_postal_code
  * @property string|null $primary_language
  * @property array<int, string>|null $secondary_languages
+ * @property string|null $accent
  * @property string|null $avatar_path
  * @property string|null $cover_path
  * @property array<int, string>|null $categories
@@ -115,6 +116,7 @@ final class Creator extends Model implements Auditable
         'address_postal_code',
         'primary_language',
         'secondary_languages',
+        'accent',
         'avatar_path',
         'cover_path',
         'categories',

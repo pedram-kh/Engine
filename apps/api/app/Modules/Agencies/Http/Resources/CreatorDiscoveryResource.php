@@ -60,6 +60,7 @@ final class CreatorDiscoveryResource extends JsonResource
                 'display_name' => $creator->display_name,
                 'country_code' => $creator->country_code,
                 'primary_language' => $creator->primary_language,
+                'accent' => $creator->accent,
                 'categories' => $creator->categories,
                 'avatar_url' => $this->signedViewUrl($creator->avatar_path),
                 // The calling-agency-only relation status (D-4), emitted RAW

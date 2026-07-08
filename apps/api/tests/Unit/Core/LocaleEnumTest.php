@@ -39,3 +39,30 @@ it('UI_LOCALES is the rendered subset and is a subset of all cases', function ()
         expect(in_array($code, Locale::values(), true))->toBeTrue();
     }
 });
+
+it('WORLD_LANGUAGES is a superset of the EU cases with valid unique 2-letter codes', function (): void {
+    $world = Locale::worldValues();
+
+    // 174 = the 184 ISO 639-1 codes minus the deliberately excluded
+    // historical / liturgical / constructed / collection codes.
+    expect(count($world))->toBe(174);
+    expect(count(array_unique($world)))->toBe(count($world));
+
+    foreach ($world as $code) {
+        expect(preg_match('/^[a-z]{2}$/', $code))->toBe(1);
+    }
+
+    foreach (Locale::values() as $code) {
+        expect(in_array($code, $world, true))->toBeTrue(
+            "EU language `{$code}` missing from WORLD_LANGUAGES.",
+        );
+    }
+
+    // Excluded-by-design codes must stay out (ae Avestan, cu Church
+    // Slavonic, la Latin, pi Pali, constructed eo/ia/ie/io/vo, bh).
+    foreach (['ae', 'cu', 'la', 'pi', 'eo', 'ia', 'ie', 'io', 'vo', 'bh'] as $excluded) {
+        expect(in_array($excluded, $world, true))->toBeFalse(
+            "Excluded code `{$excluded}` found in WORLD_LANGUAGES.",
+        );
+    }
+});

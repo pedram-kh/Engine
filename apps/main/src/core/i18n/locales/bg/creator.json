@@ -174,6 +174,8 @@
           "address_street": "Street",
           "address_postal_code": "Postal code",
           "primary_language": "Роден език",
+          "accent": "Акцент или диалект",
+          "accent_help": "По избор. Например британски, бразилски или баварски.",
           "categories": "Categories",
           "categories_select_all": "Изберете всички",
           "categories_help": "Pick the categories that best describe what you create.",

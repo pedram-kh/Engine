@@ -145,7 +145,7 @@ final class AgencyCreatorController
             // roster list can surface it without an N+1 — `user_id` is added to
             // the creator select so the belongsTo can hydrate.
             ->with([
-                'creator:id,ulid,user_id,display_name,country_code,primary_language,categories,application_status',
+                'creator:id,ulid,user_id,display_name,country_code,primary_language,accent,categories,application_status',
                 'creator.user:id,email',
             ])
             // Default sort: creator display_name ASC via a correlated
@@ -348,6 +348,7 @@ final class AgencyCreatorController
                 'application_status' => $creator?->application_status->value,
                 'country_code' => $creator?->country_code,
                 'primary_language' => $creator?->primary_language,
+                'accent' => $creator?->accent,
                 'categories' => $creator?->categories,
             ],
         ];

@@ -36,9 +36,9 @@
 import { CategoryChips, CountryDisplay, LanguageList } from '@catalyst/ui'
 import {
   ApiError,
-  euLanguageOptions,
   extractFieldErrors,
   languageEndonym,
+  worldLanguageOptions,
 } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -84,6 +84,7 @@ type ProfileField =
   | 'address_street'
   | 'address_postal_code'
   | 'primary_language'
+  | 'accent'
   | 'categories'
 
 const displayName = ref('')
@@ -100,6 +101,7 @@ const whatsappLocal = ref('')
 const addressStreet = ref('')
 const addressPostalCode = ref('')
 const primaryLanguage = ref<string | null>(null)
+const accent = ref('')
 const categories = ref<string[]>([])
 const submitErrorKey = ref<string | null>(null)
 const fieldErrors = ref<Partial<Record<ProfileField, readonly string[]>>>({})
@@ -139,9 +141,10 @@ const CATEGORY_KEYS = [
   'other',
 ] as const
 
-// Content-language options: all 24 EU languages, labelled by endonym
-// (the single registry in @catalyst/api-client).
-const languageOptions = euLanguageOptions()
+// Spoken-language options: the full world ISO 639-1 set, labelled by
+// endonym (the single registry in @catalyst/api-client). The platform's
+// rendered UI locales stay a separate, smaller set.
+const languageOptions = worldLanguageOptions()
 
 const categoryItems = computed(() =>
   CATEGORY_KEYS.map((key) => ({
@@ -169,7 +172,9 @@ const countryLabel = computed(() => labelForCountryCode(countryCode.value))
 
 const primaryLanguageLabel = computed(() => {
   if (primaryLanguage.value === null) return null
-  return languageEndonym(primaryLanguage.value)
+  const label = languageEndonym(primaryLanguage.value)
+  const accentTrimmed = accent.value.trim()
+  return accentTrimmed === '' ? label : `${label} · ${accentTrimmed}`
 })
 
 const categoryLabels = computed(() =>
@@ -245,6 +250,7 @@ function hydrate(): void {
   addressStreet.value = attrs.address_street ?? ''
   addressPostalCode.value = attrs.address_postal_code ?? ''
   primaryLanguage.value = attrs.primary_language ?? null
+  accent.value = attrs.accent ?? ''
   categories.value = [...(attrs.categories ?? [])]
 }
 
@@ -277,6 +283,7 @@ async function save(): Promise<boolean> {
       // secondary_languages intentionally omitted (AH-003 D6): the input
       // was removed; the backend rule is `sometimes`, so omitting it
       // preserves any existing value rather than clearing it.
+      accent: nullableTrim(accent.value),
       categories: categories.value,
     })
     return true
@@ -347,7 +354,9 @@ defineExpose({ save, hydrate, isPristine })
       v-html="renderedBio"
     ></div>
 
-    <v-select
+    <!-- Autocomplete (not plain select): the full ISO list is ~250 entries,
+         so type-to-filter is the only usable interaction. -->
+    <v-autocomplete
       v-model="countryCode"
       :items="COUNTRY_OPTIONS"
       item-title="label"
@@ -443,7 +452,8 @@ defineExpose({ save, hydrate, isPristine })
       </div>
     </fieldset>
 
-    <v-select
+    <!-- Autocomplete: the world language list is ~175 entries. -->
+    <v-autocomplete
       v-model="primaryLanguage"
       :items="languageOptions"
       item-title="label"
@@ -451,6 +461,16 @@ defineExpose({ save, hydrate, isPristine })
       :label="t('creator.ui.wizard.fields.primary_language')"
       :error-messages="fieldErrors.primary_language"
       data-testid="profile-primary-language"
+    />
+
+    <v-text-field
+      v-model="accent"
+      :label="t('creator.ui.wizard.fields.accent')"
+      :hint="t('creator.ui.wizard.fields.accent_help')"
+      persistent-hint
+      :counter="80"
+      :error-messages="fieldErrors.accent"
+      data-testid="profile-accent"
     />
 
     <fieldset class="profile-basics-form__categories" data-testid="profile-categories">

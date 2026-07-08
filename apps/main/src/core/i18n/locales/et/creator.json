@@ -174,6 +174,8 @@
           "address_street": "Street",
           "address_postal_code": "Postal code",
           "primary_language": "Emakeel",
+          "accent": "Aktsent või murre",
+          "accent_help": "Valikuline. Näiteks briti, brasiilia või baieri.",
           "categories": "Categories",
           "categories_select_all": "Vali kõik",
           "categories_help": "Pick the categories that best describe what you create.",

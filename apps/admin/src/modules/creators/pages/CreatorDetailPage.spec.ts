@@ -51,6 +51,7 @@ function buildCreator(overrides: Partial<CreatorResource['attributes']> = {}): C
       address_postal_code: null,
       primary_language: 'en',
       secondary_languages: ['pt'],
+      accent: null,
       categories: ['fashion', 'beauty'],
       avatar_path: null,
       cover_path: null,
@@ -135,7 +136,7 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
     document.body.innerHTML = ''
   })
 
-  it('renders an EditFieldRow for each of the 7 editable fields', async () => {
+  it('renders an EditFieldRow for each of the 8 editable fields', async () => {
     vi.mocked(adminCreatorsApi.show).mockResolvedValue(envelope(buildCreator()))
     const h = await mountCreatorPage(CreatorDetailPage)
     teardown = h.unmount
@@ -148,6 +149,7 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
       'region',
       'primary_language',
       'secondary_languages',
+      'accent',
       'categories',
     ]
     for (const field of expectedFields) {

@@ -20,7 +20,7 @@ import type {
   DiscoveryCreatorListItem,
   DiscoveryListParams,
 } from '@catalyst/api-client'
-import { deriveConnectionState, euLanguageOptions, languageEndonym } from '@catalyst/api-client'
+import { deriveConnectionState, languageEndonym, worldLanguageOptions } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -86,7 +86,7 @@ const countryFilterItems = computed(() =>
   COUNTRY_OPTIONS.map((c) => ({ title: c.label, value: c.code })),
 )
 const languageFilterItems = computed(() =>
-  euLanguageOptions().map((o) => ({ title: o.label, value: o.value })),
+  worldLanguageOptions().map((o) => ({ title: o.label, value: o.value })),
 )
 const categoryFilterItems = computed(() =>
   CATEGORY_FILTER_KEYS.map((key) => ({
@@ -108,9 +108,10 @@ function countryLabel(code: string | null): string {
   return COUNTRY_OPTIONS.find((c) => c.code === code)?.label ?? code
 }
 
-function languageLabel(code: string | null): string | null {
+function languageLabel(code: string | null, accent?: string | null): string | null {
   if (code === null) return null
-  return languageEndonym(code)
+  const label = languageEndonym(code)
+  return accent != null && accent !== '' ? `${label} · ${accent}` : label
 }
 
 function avatarInitial(name: string | null): string {
@@ -346,7 +347,7 @@ function openProfile(item: DiscoveryCreatorListItem): void {
               <div class="text-caption text-medium-emphasis mt-1">
                 <span>{{ countryLabel(item.attributes.country_code) }}</span>
                 <template v-if="languageLabel(item.attributes.primary_language)">
-                  · {{ languageLabel(item.attributes.primary_language) }}
+                  · {{ languageLabel(item.attributes.primary_language, item.attributes.accent) }}
                 </template>
               </div>
 

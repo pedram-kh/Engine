@@ -31,7 +31,7 @@ import type {
   RosterListParams,
   RosterRelationshipStatus,
 } from '@catalyst/api-client'
-import { euLanguageOptions, languageEndonym } from '@catalyst/api-client'
+import { languageEndonym, worldLanguageOptions } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -129,7 +129,7 @@ const countryFilterItems = computed(() =>
 )
 
 const languageFilterItems = computed(() =>
-  euLanguageOptions().map((o) => ({ title: o.label, value: o.value })),
+  worldLanguageOptions().map((o) => ({ title: o.label, value: o.value })),
 )
 
 const categoryFilterItems = computed(() =>
@@ -203,9 +203,10 @@ function countryLabel(code: string | null): string {
   return COUNTRY_OPTIONS.find((c) => c.code === code)?.label ?? code
 }
 
-function languageLabel(code: string | null): string {
+function languageLabel(code: string | null, accent?: string | null): string {
   if (code === null) return '—'
-  return languageEndonym(code)
+  const label = languageEndonym(code)
+  return accent != null && accent !== '' ? `${label} · ${accent}` : label
 }
 
 // Semantic colour per application state — deliberately a different visual
@@ -572,7 +573,7 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
       </template>
 
       <template #item.attributes.primary_language="{ item }">
-        {{ languageLabel(item.attributes.primary_language) }}
+        {{ languageLabel(item.attributes.primary_language, item.attributes.accent) }}
       </template>
 
       <template #item.attributes.categories="{ item }">

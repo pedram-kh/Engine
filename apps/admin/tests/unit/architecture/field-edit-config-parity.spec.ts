@@ -5,7 +5,7 @@
  * `apps/admin/src/modules/creators/config/field-edit.ts` mirrors three
  * backend constants on `AdminUpdateCreatorRequest`:
  *
- *   - `EDITABLE_FIELDS`         (the 7 fields)
+ *   - `EDITABLE_FIELDS`         (the 8 fields)
  *   - `REASON_REQUIRED_FIELDS`  (the 2 sensitive fields)
  *   - `CATEGORY_ENUM`           (the 28-category set)
  *
@@ -75,7 +75,7 @@ describe('admin per-field edit config parity (Sprint 3 Chunk 4 sub-step 9)', () 
 
   it('EDITABLE_FIELDS matches AdminUpdateCreatorRequest::EDITABLE_FIELDS', () => {
     const backend = parsePhpArrayConst(php, 'public', 'EDITABLE_FIELDS')
-    expect(backend).toHaveLength(7)
+    expect(backend).toHaveLength(8)
     expect([...EDITABLE_FIELDS].sort()).toEqual([...backend].sort())
   })
 

@@ -120,6 +120,7 @@ export type AdminEditableField =
   | 'region'
   | 'primary_language'
   | 'secondary_languages'
+  | 'accent'
   | 'categories'
 
 /**

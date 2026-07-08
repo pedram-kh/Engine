@@ -44,11 +44,16 @@ final class UpdateProfileRequest extends FormRequest
             'whatsapp' => ['sometimes', 'nullable', 'string', 'max:32', 'regex:/^[+]?[0-9 ()\-]{6,32}$/', 'regex:/[0-9].*[0-9].*[0-9]/'],
             'address_street' => ['sometimes', 'nullable', 'string', 'max:255'],
             'address_postal_code' => ['sometimes', 'nullable', 'string', 'max:20'],
-            // Content-language metadata: validated against the full 24 EU
-            // languages (speaker metadata is legitimately the full set).
-            'primary_language' => ['sometimes', 'string', Rule::enum(Locale::class)],
+            // Spoken-language metadata: validated against the full world
+            // ISO 639-1 set (creators come from anywhere, so speaker
+            // metadata is legitimately the world set).
+            'primary_language' => ['sometimes', 'string', Rule::in(Locale::WORLD_LANGUAGES)],
             'secondary_languages' => ['sometimes', 'array'],
-            'secondary_languages.*' => ['string', Rule::enum(Locale::class)],
+            'secondary_languages.*' => ['string', Rule::in(Locale::WORLD_LANGUAGES)],
+            // Free-text accent / dialect hint shown next to the spoken
+            // language (e.g. "British", "Brazilian"). Display-only signal,
+            // deliberately not an enum.
+            'accent' => ['sometimes', 'nullable', 'string', 'max:80'],
             'categories' => ['sometimes', 'array', 'min:1', 'max:28'],
             'categories.*' => [
                 'string',

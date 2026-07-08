@@ -14,9 +14,9 @@ use Illuminate\Validation\ValidationException;
  * Validation for PATCH /api/v1/admin/creators/{creator} — Sprint 3 Chunk 4.
  *
  * Per-field admin edit endpoint. The body MUST contain exactly one of the
- * 7 editable fields (display_name | bio | country_code | region |
- * primary_language | secondary_languages | categories) plus an optional
- * `reason` field. `application_status` is intentionally absent from the
+ * 8 editable fields (display_name | bio | country_code | region |
+ * primary_language | secondary_languages | accent | categories) plus an
+ * optional `reason` field. `application_status` is intentionally absent from the
  * editable set — status transitions use the dedicated approve / reject
  * endpoints per Decision E2=b. Submitting `application_status` here returns
  * 422 + `creator.admin.field_status_immutable` (Q-chunk-4-2 answer = (a):
@@ -50,6 +50,7 @@ final class AdminUpdateCreatorRequest extends FormRequest
         'region',
         'primary_language',
         'secondary_languages',
+        'accent',
         'categories',
     ];
 
@@ -95,9 +96,10 @@ final class AdminUpdateCreatorRequest extends FormRequest
             'bio' => ['sometimes', 'nullable', 'string', 'max:5000'],
             'country_code' => ['sometimes', 'string', 'size:2'],
             'region' => ['sometimes', 'nullable', 'string', 'max:120'],
-            'primary_language' => ['sometimes', 'string', Rule::enum(Locale::class)],
+            'primary_language' => ['sometimes', 'string', Rule::in(Locale::WORLD_LANGUAGES)],
             'secondary_languages' => ['sometimes', 'array'],
-            'secondary_languages.*' => ['string', Rule::enum(Locale::class)],
+            'secondary_languages.*' => ['string', Rule::in(Locale::WORLD_LANGUAGES)],
+            'accent' => ['sometimes', 'nullable', 'string', 'max:80'],
             'categories' => ['sometimes', 'array', 'min:1', 'max:28'],
             'categories.*' => ['string', Rule::in(self::CATEGORY_ENUM)],
 

@@ -17,14 +17,18 @@
  * (sub-step 9) walks the backend file and fails CI if those
  * constants drift apart.
  *
- * Country options are a curated subset (backend still accepts any
- * `size:2` country string), so the country select keeps a free-text
- * fallback. Language options now come from the shared 24-language EU
- * registry, which the backend `Locale` enum enforces exactly — so the
- * language list is exhaustive and needs no free-text escape hatch.
+ * Country options come from the shared full ISO 3166-1 registry (the
+ * backend accepts any `size:2` country string, so the free-text escape
+ * hatch is kept for future-proofing). Language options come from the
+ * shared world ISO 639-1 registry, which the backend
+ * `Locale::WORLD_LANGUAGES` constant enforces exactly — exhaustive, no
+ * free-text escape hatch needed.
  */
 
-import { euLanguageOptions } from '@catalyst/api-client'
+import {
+  COUNTRY_OPTIONS as SHARED_COUNTRY_OPTIONS,
+  worldLanguageOptions,
+} from '@catalyst/api-client'
 
 import type { AdminEditableField } from '../api/creators.api'
 
@@ -67,28 +71,24 @@ export const BIO_MAX = 5000
 /** Backend cap (`region` = `max:120`). */
 export const REGION_MAX = 120
 
-/** Wizard-curated country list — kept structurally aligned with
- * `apps/main/src/modules/onboarding/pages/Step2ProfileBasicsPage.vue`
- * `COUNTRY_OPTIONS`. */
-export const COUNTRY_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
-  { value: 'IE', label: 'Ireland' },
-  { value: 'GB', label: 'United Kingdom' },
-  { value: 'PT', label: 'Portugal' },
-  { value: 'IT', label: 'Italy' },
-  { value: 'ES', label: 'Spain' },
-  { value: 'FR', label: 'France' },
-  { value: 'DE', label: 'Germany' },
-  { value: 'US', label: 'United States' },
-  { value: 'CA', label: 'Canada' },
-]
+/** Backend cap (`accent` = `max:80`). */
+export const ACCENT_MAX = 80
+
+/** Full ISO 3166-1 country list from the shared `@catalyst/api-client`
+ * registry — the same list the wizard offers, launch markets pinned
+ * first. */
+export const COUNTRY_OPTIONS: ReadonlyArray<{ value: string; label: string }> =
+  SHARED_COUNTRY_OPTIONS.map((c) => ({ value: c.code, label: c.label }))
 
 /**
- * Content-language list — all 24 EU languages, labelled by endonym, from
- * the shared `@catalyst/api-client` registry. The backend now validates
- * content-language fields against the same 24-language `Locale` enum, so
- * the list is exhaustive (no free-text fallback needed for languages).
+ * Spoken-language list — the full world ISO 639-1 set, labelled by
+ * endonym, from the shared `@catalyst/api-client` registry. The backend
+ * validates creator language fields against the same
+ * `Locale::WORLD_LANGUAGES` constant, so the list is exhaustive (no
+ * free-text fallback needed for languages).
  */
-export const LANGUAGE_OPTIONS: ReadonlyArray<{ value: string; label: string }> = euLanguageOptions()
+export const LANGUAGE_OPTIONS: ReadonlyArray<{ value: string; label: string }> =
+  worldLanguageOptions()
 
 /**
  * 28-category enum — must stay in sync with
@@ -182,6 +182,13 @@ export const FIELD_EDIT_CONFIG: Readonly<Record<AdminEditableField, EditFieldCon
     },
     reasonRequired: false,
   },
+  accent: {
+    field: 'accent',
+    labelKey: 'admin.creators.detail.fields.accent',
+    // Free-text like `region` (nullable — clearing is a valid edit).
+    control: { kind: 'region-text', maxLength: ACCENT_MAX, nullable: true },
+    reasonRequired: false,
+  },
   categories: {
     field: 'categories',
     labelKey: 'admin.creators.detail.fields.categories',
@@ -205,6 +212,7 @@ export const EDITABLE_FIELDS: ReadonlyArray<AdminEditableField> = [
   'region',
   'primary_language',
   'secondary_languages',
+  'accent',
   'categories',
 ]
 

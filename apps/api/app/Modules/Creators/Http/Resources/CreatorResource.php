@@ -129,6 +129,7 @@ final class CreatorResource extends JsonResource
                 'address_postal_code' => $creator->address_postal_code,
                 'primary_language' => $creator->primary_language,
                 'secondary_languages' => $creator->secondary_languages,
+                'accent' => $creator->accent,
                 'categories' => $creator->categories,
                 'avatar_path' => $creator->avatar_path,
                 'cover_path' => $creator->cover_path,

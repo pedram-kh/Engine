@@ -243,6 +243,8 @@ export interface RosterCreatorListItem {
     application_status: CreatorApplicationStatus
     country_code: string | null
     primary_language: string | null
+    /** Free-text accent / dialect hint (e.g. "British"). Display-only. */
+    accent: string | null
     categories: string[] | null
   }
 }
@@ -324,6 +326,8 @@ export interface AgencyCreatorDetailProfile {
   address_postal_code?: string | null
   primary_language: string | null
   secondary_languages: string[] | null
+  /** Free-text accent / dialect hint (e.g. "British"). Display-only. */
+  accent: string | null
   categories: string[] | null
   /** Signed view URL for the private `media` disk; null when unset / non-S3. */
   avatar_url: string | null
@@ -451,6 +455,8 @@ export interface DiscoveryCreatorListItem {
     display_name: string | null
     country_code: string | null
     primary_language: string | null
+    /** Free-text accent / dialect hint (e.g. "British"). Display-only. */
+    accent: string | null
     categories: string[] | null
     /** Single signed avatar URL; null when unset / non-S3. */
     avatar_url: string | null
@@ -508,6 +514,8 @@ export interface CreatorPublicProfile {
     region: string | null
     primary_language: string | null
     secondary_languages: string[] | null
+    /** Free-text accent / dialect hint (e.g. "British"). Display-only. */
+    accent: string | null
     categories: string[] | null
     avatar_url: string | null
     cover_url: string | null

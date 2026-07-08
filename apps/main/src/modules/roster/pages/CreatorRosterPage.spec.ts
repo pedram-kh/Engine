@@ -70,6 +70,7 @@ function makeRow(
       email: 'ada@example.test',
       country_code: 'GB',
       primary_language: 'en',
+      accent: null,
       categories: ['tech'],
       ...overrides,
     },

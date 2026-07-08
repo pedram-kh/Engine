@@ -57,6 +57,7 @@ function makeCard(
       display_name: 'Ada Lovelace',
       country_code: 'GB',
       primary_language: 'en',
+      accent: null,
       categories: ['tech'],
       avatar_url: null,
       relationship_status: null,
