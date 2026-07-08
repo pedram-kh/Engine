@@ -47,7 +47,7 @@ describe('ResetPasswordPage', () => {
   it('happy path: calls resetPassword with token + email + passwords and shows success', async () => {
     vi.mocked(authApi.resetPassword).mockResolvedValue(undefined)
     const h = await mountAuthPage(ResetPasswordPage, {
-      initialRoute: { path: '/reset-password', query: { token: 't', email: 'a@b.c' } },
+      initialRoute: { path: '/auth/reset-password', query: { token: 't', email: 'a@b.c' } },
     })
     teardown = h.unmount
     await flushPromises()
@@ -69,7 +69,7 @@ describe('ResetPasswordPage', () => {
 
   it('renders missing-token error when token or email is absent', async () => {
     const h = await mountAuthPage(ResetPasswordPage, {
-      initialRoute: { path: '/reset-password' },
+      initialRoute: { path: '/auth/reset-password' },
     })
     teardown = h.unmount
     await flushPromises()
@@ -87,7 +87,7 @@ describe('ResetPasswordPage', () => {
 
   it('renders missing-token error when only email is present', async () => {
     const h = await mountAuthPage(ResetPasswordPage, {
-      initialRoute: { path: '/reset-password', query: { email: 'a@b.c' } },
+      initialRoute: { path: '/auth/reset-password', query: { email: 'a@b.c' } },
     })
     teardown = h.unmount
     await flushPromises()
@@ -104,7 +104,7 @@ describe('ResetPasswordPage', () => {
 
   it('renders missing-token error when only token is present (covers email-falsy branch)', async () => {
     const h = await mountAuthPage(ResetPasswordPage, {
-      initialRoute: { path: '/reset-password', query: { token: 't' } },
+      initialRoute: { path: '/auth/reset-password', query: { token: 't' } },
     })
     teardown = h.unmount
     await flushPromises()
@@ -124,7 +124,7 @@ describe('ResetPasswordPage', () => {
       new ApiError({ status: 410, code: 'auth.password.invalid_token', message: 'no.' }),
     )
     const h = await mountAuthPage(ResetPasswordPage, {
-      initialRoute: { path: '/reset-password', query: { token: 't', email: 'a@b.c' } },
+      initialRoute: { path: '/auth/reset-password', query: { token: 't', email: 'a@b.c' } },
     })
     teardown = h.unmount
     await flushPromises()
@@ -167,7 +167,7 @@ describe('ResetPasswordPage', () => {
       }),
     )
     const h = await mountAuthPage(ResetPasswordPage, {
-      initialRoute: { path: '/reset-password', query: { token: 't', email: 'a@b.c' } },
+      initialRoute: { path: '/auth/reset-password', query: { token: 't', email: 'a@b.c' } },
     })
     teardown = h.unmount
     await flushPromises()
@@ -201,7 +201,7 @@ describe('ResetPasswordPage', () => {
         }),
     )
     const h = await mountAuthPage(ResetPasswordPage, {
-      initialRoute: { path: '/reset-password', query: { token: 't', email: 'a@b.c' } },
+      initialRoute: { path: '/auth/reset-password', query: { token: 't', email: 'a@b.c' } },
     })
     teardown = h.unmount
     await flushPromises()

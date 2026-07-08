@@ -124,8 +124,13 @@ export const authRoutes: RouteRecordRaw[] = [
     component: () => import('./pages/ForgotPasswordPage.vue'),
     meta: { layout: 'auth' },
   },
+  // Path is `/auth/reset-password` to match the link the backend mints in
+  // `PasswordResetService::buildResetUrl()`. Same class of mismatch as the
+  // verify-email one above: the SPA previously sat on `/reset-password`
+  // while the emails pointed at `/auth/reset-password`, landing real users
+  // on a blank unmatched route.
   {
-    path: '/reset-password',
+    path: '/auth/reset-password',
     name: 'auth.reset-password',
     component: () => import('./pages/ResetPasswordPage.vue'),
     meta: { layout: 'auth' },
