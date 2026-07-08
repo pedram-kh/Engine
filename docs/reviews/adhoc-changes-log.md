@@ -64,6 +64,131 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-025 · Production admin bootstrap command (admin:create)
+
+- **Status:** Landed
+- **Date:** 2026-07-08
+- **Why:** No safe way to mint a production platform admin (the seeder is dev-guarded).
+- **What:** New `admin:create` artisan command — email as argument, names prompted or passed,
+  password generated server-side (`Str::password(24)`) and printed once, never accepted as an
+  argument. Minted admin gets `mfa_required => true` (first sign-in forces TOTP enrollment —
+  flagged INTO the Sprint-13 admin MFA posture, not around it). Deliberately NOT idempotent:
+  an existing email (incl. soft-deleted, via `withTrashed()`) is refused — the command can
+  never rotate a live password or escalate an existing account. No HTTP invocation path
+  exists. User-creation audit rides the `Audited` trait (`actor_type='system'` in console
+  context).
+- **Touched:** `apps/api` `Console/Commands/CreateAdminUser.php` + `CreateAdminUserCommandTest.php`.
+- **Decisions:** refuse-don't-upsert on duplicate email (§5.6 posture inverted deliberately —
+  refusal IS the safe idempotency here); generated-not-supplied password (no shell-history
+  leak); `AdminProfile`/`AgencyMembership` rows not independently audited — pre-existing trait
+  coverage posture, recorded in tech-debt.
+- **Ref:** `2e197a7`.
+
+### AH-024 · Reset-password route moved to match the emailed link
+
+- **Status:** Landed
+- **Date:** 2026-07-08
+- **Why:** Emailed reset links pointed at `/auth/reset-password`; the SPA registered
+  `/reset-password` — links landed on an unmatched route.
+- **What:** SPA route moved to `/auth/reset-password`.
+- **Touched:** `apps/main` `auth/routes.ts` + `ResetPasswordPage.spec.ts`.
+- **Decisions:** second instance of the emailed-URL↔SPA-route mismatch class (after
+  verify-email) — a backend-minted-URL↔registered-route parity test is now logged as
+  tech-debt (the two-strikes ratchet).
+- **Ref:** `1d9a85c`.
+
+### AH-023 · Surname at sign-up + account-creation details on three surfaces
+
+- **Status:** Landed
+- **Date:** 2026-07-08
+- **Why:** Sign-up collected no surname, and the account-creation identity (name/email)
+  wasn't visible anywhere post-signup.
+- **What:** `users.last_name` (nullable varchar(160)); `last_name` required at sign-up
+  (`min:1,max:120`); read-only account-details sections on creator self-profile, admin
+  creator detail (`admin_attributes` block), and connected-agency roster detail
+  (`account_name`/`account_last_name` beside the email, same relation-exists privacy basis,
+  in-source "NEVER on discover" comment). Discover surfaces got nothing — proven by the
+  exact-keyset discovery assertion + the untouched AH-005 negative assertions.
+- **Touched:** `apps/api` (migration, `SignUpRequest`, `SignUpService`, `User`, 3 resources,
+  tests), `packages/api-client` (4 type files), `apps/main` (sign-up, profile, roster +
+  specs), `apps/admin` (detail + spec), 96 locale files (i18n done-gate, parity green).
+- **Decisions:** column nullable for pre-existing accounts (render "—", no backfill possible —
+  tech-debt); sign-up contract change is safe because the SPA form ships in the same deploy;
+  column width 160 vs validation max 120 is a recorded cosmetic inconsistency (validation is
+  the effective bound).
+- **Ref:** `ce3bbda`.
+
+### AH-022 · Full ISO country/language pickers + creator accent field
+
+- **Status:** Landed
+- **Date:** 2026-07-08
+- **Why:** 58 hand-picked countries and 24 languages were too narrow for a worldwide creator
+  base.
+- **What:** Full ISO 3166-1 (250) country and ISO 639-1 (174) language pickers; new nullable
+  `creators.accent` (free text, `max:80`, deliberately not an enum) shown on discover
+  cards/profile, roster list/detail, and admin — an explicit product ask, same sensitivity
+  class as `primary_language`. Completeness-inert.
+- **Touched:** 86 files — `packages/api-client` (`countries.ts` new, `locales.ts`, types),
+  `apps/api` (migration, `Locale` enum, 2 requests, 5 resources, 2 controllers, model,
+  tests), `apps/main`, `apps/admin`, 48 locale files (parity green).
+- **Decisions:** AH-001 reinterpretation, structural intent preserved: the two-concept locale
+  split becomes three — enum cases stay the 24 EU languages (agency/brand content validation,
+  unchanged), `UI_LOCALES` stays 24 (render set, unchanged), new `WORLD_LANGUAGES` (174)
+  validates creator spoken-language metadata only, pinned by a §5.25 parity spec
+  (`locales.spec.ts` + `LocaleEnumTest`). `00-MASTER-ARCHITECTURE.md` §13 updated to the
+  three-concept model in this pass. Accent sits outside the AH-005 contact block (profile
+  data, not contact data).
+- **Ref:** `7faeff8`.
+
+### AH-021 · Review page numbering + account step surfaced
+
+- **Status:** Landed
+- **Date:** 2026-07-08
+- **Why:** The wizard sidebar numbered steps; the review page didn't match.
+- **What:** Numbered review rows incl. "Account created". UI-only.
+- **Touched:** `apps/main` `Step9ReviewPage.vue` + spec.
+- **Ref:** `b6f49eb`.
+
+### AH-020 · Verify-email pending page — email carry on the unverified bounce
+
+- **Status:** Landed
+- **Date:** 2026-07-08
+- **Why:** After an unverified sign-in bounce, the pending page showed no address and resend
+  failed.
+- **What:** Sign-in/TOTP redirects carry `?email=`; the page uses it as display/prefill only
+  (auth-store fallback), grants nothing. Resend endpoint untouched — the §5.9 silent-204
+  enumeration posture stands.
+- **Touched:** `apps/main` `SignInPage.vue`, `VerifyTotpPage.vue`,
+  `EmailVerificationPendingPage.vue` + 2 specs.
+- **Ref:** `80ac4c0`.
+
+### AH-019 · Category taxonomy 16→28 + chip-grid picker with select-all
+
+- **Status:** Landed
+- **Date:** 2026-07-08
+- **Why:** The 8-category cap and cramped dropdown didn't fit the taxonomy.
+- **What:** 12 new categories (28 total), backend cap `max:8`→`max:28` with the enumerated
+  whitelist in both requests, dropdown→chip grid + "Select all" (selects exactly the 28-key
+  registry).
+- **Touched:** `apps/main` (`ProfileBasicsForm.vue`, roster page), `apps/api` (2 requests),
+  `apps/admin` field-edit config, 48 locale files (parity green), category specs.
+- **Decisions:** FE has no numeric cap — structurally bounded by the 28-chip registry (no
+  free entry); per §5.25 honesty the number 28 is enforced backend-only. Admin↔backend
+  registry parity is spec-pinned; main↔backend is NOT — logged as tech-debt, and the
+  overclaiming in-code comment corrected in this batch's closure commit.
+- **Ref:** `6cf26cb` + `d0462a2`.
+
+### AH-018 · Verify-email :app placeholder fix
+
+- **Status:** Landed
+- **Date:** 2026-07-08
+- **Why:** Verification emails rendered a literal `:app` in the greeting/ignore lines.
+- **What:** Passed the `app` parameter to the two `trans()` calls; regression now pinned by a
+  `not->toContain(':app')` assertion in the existing §5.3 real-rendering test (closure
+  commit, break-revert verified).
+- **Touched:** `apps/api` verify-email Blade template; rendering test (closure commit).
+- **Ref:** `be87dc0` + `10ac480` (closure commit).
+
 ### AH-017 · Creator assignments mobile card redesign
 
 - **Status:** Landed

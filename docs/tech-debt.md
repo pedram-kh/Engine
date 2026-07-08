@@ -9,6 +9,50 @@ anyone reviewing it later.
 
 ---
 
+## Backend-minted email URL ↔ SPA registered route has no parity test (two strikes: verify-email, reset-password)
+
+- **Where:** the backend URL-minting services (`EmailVerificationService` / `PasswordResetService::buildResetUrl()` and any future emailed-link minters in [`apps/api/app/Modules/Identity`](../apps/api/app/Modules/Identity)) vs the SPA route registrations ([`apps/main/src/modules/auth/routes.ts`](../apps/main/src/modules/auth/routes.ts)).
+- **What we accepted (AH-024, July 8, 2026):** nothing pins that a backend-minted email link lands on a registered SPA route. The mismatch class has now occurred **twice** — the verify-email link (fixed earlier) and the reset-password link (`/auth/reset-password` minted vs `/reset-password` registered, AH-024) — each time discovered by a real user clicking a real email into a blank page. Both fixes were route moves; the class itself is unguarded.
+- **Trigger:** the next auth-surface chunk, or a third occurrence of the class — whichever comes first (the two-strikes ratchet is why this is now logged rather than shrugged off).
+- **Resolution:** a parity test that extracts every backend-minted SPA path (the `buildResetUrl`-style helpers) and asserts each resolves against the SPA route table (path-string parity is enough; no need to boot the router).
+- **Owner:** the next auth-surface chunk.
+- **Status:** open. Surfaced by AH-024, July 8, 2026 ([ad-hoc log](reviews/adhoc-changes-log.md)).
+
+---
+
+## Main-SPA `CATEGORY_KEYS` has no direct PHP parity spec (the admin registry does)
+
+- **Where:** [`apps/main/src/modules/onboarding/components/ProfileBasicsForm.vue`](../apps/main/src/modules/onboarding/components/ProfileBasicsForm.vue) `CATEGORY_KEYS` vs the backend `categories.*` whitelist in `UpdateProfileRequest` / `AdminUpdateCreatorRequest::CATEGORY_ENUM`.
+- **What we accepted (AH-019, July 8, 2026):** the admin SPA's category registry is spec-pinned against the actual PHP source (`field-edit-config-parity.spec.ts` parses `CATEGORY_ENUM` out of the Request file); the **main** SPA's copy is not — a key-set drift there surfaces as a runtime 422 on save, not a test failure. The overclaiming in-code comment (which credited the admin spec with pinning this copy too) was corrected in the AH-018–025 closure commit.
+- **Trigger:** the next category-taxonomy change, or the next main-SPA architecture-test pass.
+- **Resolution:** mirror `field-edit-config-parity`'s PHP-parse approach in a main-SPA architecture spec (parse the `in:` rule string or `CATEGORY_ENUM` and compare to `CATEGORY_KEYS`).
+- **Owner:** the next chunk that touches the category taxonomy.
+- **Status:** open. Surfaced by the AH-019 spot-check, July 8, 2026 ([ad-hoc log](reviews/adhoc-changes-log.md)).
+
+---
+
+## Pre-surname accounts render `last_name` as "—" (no backfill possible)
+
+- **Where:** `users.last_name` ([migration `2026_07_08_130000`](../apps/api/database/migrations)) and every account-details surface that renders it (creator self-profile, admin creator detail, connected-agency roster detail).
+- **What we accepted (AH-023, July 8, 2026):** `last_name` became required at sign-up, but the column is nullable because every pre-existing account signed up before the field existed — there is no data source to backfill from, so those accounts render an em-dash on the account-details surfaces indefinitely (or until the user is given an edit path; account details are deliberately read-only today).
+- **Trigger:** a product call that the gap matters (e.g. compliance/KYC wants full legal names for legacy accounts) — at which point the fix is a prompt-to-complete flow, not a migration.
+- **Resolution:** none possible at the data layer; if triggered, add a profile-side "complete your account details" prompt for null-`last_name` users.
+- **Owner:** product.
+- **Status:** recorded posture. Surfaced by AH-023, July 8, 2026 ([ad-hoc log](reviews/adhoc-changes-log.md)).
+
+---
+
+## `AdminProfile` / `AgencyMembership` creation rows are not independently audited
+
+- **Where:** [`apps/api/app/Modules/Admin/Models/AdminProfile.php`](../apps/api/app/Modules/Admin/Models/AdminProfile.php) and [`apps/api/app/Modules/Agencies/Models/AgencyMembership.php`](../apps/api/app/Modules/Agencies/Models/AgencyMembership.php) — neither uses the `Audited` trait, so creating one writes no audit row.
+- **What we accepted (surfaced by AH-025, July 8, 2026):** `admin:create` minting a platform admin audits the **User** creation (the `Audited` trait on `User`, `actor_type='system'` in console context) but the privilege-carrying rows — the `AdminProfile` (role) and `AgencyMembership` (agency + role) — leave no independent trail. This is the **pre-existing** trait-coverage posture (the invite flow has the same shape), not something AH-025 introduced; it is logged because the command made the gap visible for the most privileged account type.
+- **Trigger:** an audit-coverage hardening pass (privilege grants are exactly what an auditor asks about first).
+- **Resolution:** add the `Audited` trait (or explicit `AuditLogger` calls) to both models, with the role/agency in the allowlisted snapshot.
+- **Owner:** a future audit/compliance hardening pass.
+- **Status:** open (pre-existing, newly recorded). Surfaced by AH-025, July 8, 2026 ([ad-hoc log](reviews/adhoc-changes-log.md)).
+
+---
+
 ## Recorded decision (NOT debt) — a pending creator below 100% completeness is intentional; do NOT gate approval on completeness
 
 - **Where:** the admin creator review queue ([`apps/admin/src/modules/creators`](../apps/admin/src/modules/creators)) — the `profile_completeness_score` column + the approve action — and the wizard write paths that recompute that score (`CreatorWizardService`, `PATCH /creators/me/wizard/profile` + the social / portfolio writes).

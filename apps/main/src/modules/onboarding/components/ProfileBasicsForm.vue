@@ -110,7 +110,7 @@ const fieldErrors = ref<Partial<Record<ProfileField, readonly string[]>>>({})
 // `UpdateProfileRequest::rules()` `categories.*` list. NOTE: parity with the
 // backend enum is NOT spec-verified for this copy — field-edit-config-parity
 // pins only the ADMIN registry against the PHP; a drift here surfaces as a
-// runtime 422, not a test failure (recorded in docs/reviews/tech-debt.md).
+// runtime 422, not a test failure (recorded in docs/tech-debt.md).
 // Labels come from `creator.ui.wizard.categories.*` in every locale.
 const CATEGORY_KEYS = [
   'fashion',

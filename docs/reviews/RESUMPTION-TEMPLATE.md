@@ -104,14 +104,16 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-07 · **Through:** AH-017 (ad-hoc run) · **HEAD:** `07a136a`
+**Last updated:** 2026-07-08 · **Through:** AH-025 (ad-hoc run) · **HEAD:** `10ac480` (closure
+commit; the AH-018–025 docs commit sits one atop it — push HELD, both unpushed at close)
 
 ### Delivered
 
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-017 — all Landed and pushed.** One line each (detail + decisions in
+- **Ad-hoc run AH-001 → AH-025 — all Landed** (AH-001–017 pushed; the AH-018–025 batch is
+  committed with **push HELD**). One line each (detail + decisions in
   `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.
@@ -131,6 +133,14 @@ discipline in §7.
   - **AH-015** — Portfolio inline collapsible drawer + preview download.
   - **AH-016** — Creator mobile Profile-nav bootstrap fix.
   - **AH-017** — Creator assignments mobile card redesign.
+  - **AH-018** — Verify-email `:app` placeholder fix (regression pinned in the §5.3 rendering test).
+  - **AH-019** — Category taxonomy 16→28 + chip-grid picker with select-all.
+  - **AH-020** — Verify-email pending page: `?email=` carry on the unverified bounce.
+  - **AH-021** — Review page numbering + account step surfaced.
+  - **AH-022** — Full ISO country/language pickers + creator accent field (three-concept locale split).
+  - **AH-023** — Surname at sign-up + account-creation details on three surfaces.
+  - **AH-024** — Reset-password route moved to match the emailed link.
+  - **AH-025** — Production admin bootstrap command (`admin:create`).
 
 ### Load-bearing invariants (do not regress)
 

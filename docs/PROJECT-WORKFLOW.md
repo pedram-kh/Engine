@@ -468,6 +468,12 @@ When a single event can notify EITHER party depending on who triggered it (e.g. 
 
 > **⚠ Flagged to the reviewer for ratification — this generalises beyond boards.** When a domain already emits ONE rich event implementing a small interface (here `AssignmentTransitioned` implements `AssignmentEventContract` — `assignment()` / `eventKey()` / `metadata()` / `triggeredByUserId()`), a NEW reactive feature should add a listener that **binds to the contract and switches on `eventKey()`**, NOT a fan of dedicated per-event classes. Sprint 8 deliberately built the single `AssignmentTransitioned` keyed by the `AuditAction` value; the board-automation spec sketched dedicated `AssignmentDraftApproved`-style classes, and that sketch was **superseded** — the listener (`BoardAutomationListener`) reads the contract and the service maps `processEvent(assignmentId, eventKey, metadata, triggeredByUserId)` 1:1 onto it. Benefits: the new consumer shares the existing single `Event::listen` subscription (no event-class proliferation, no re-dispatch plumbing), and config-driven reactions (the `board_automations.event_key` rows) bind directly to the same `eventKey` vocabulary the audit catalogue already owns — one source of truth for "what happened." When ordering matters between consumers of the same event, register them explicitly in order AND make the later consumer a no-op on the precondition the earlier one establishes (belt + suspenders — here `CreateBoardCard` before `BoardAutomationListener`, and the automation no-ops on a missing card). Reusable for any future event-reactive feature on an already-contract'd event spine.
 
+### 5.39 Session close: refresh the resumption template
+
+**Established:** AH-018–025 close-out, 2026-07-08
+
+At session close, before switching threads, Cursor refreshes Part 2 of `docs/reviews/RESUMPTION-TEMPLATE.md` (new AH entries, HEAD SHA, open threads) in the closing docs commit, so the next resumption is copy-paste from the repo, not reconstruction from chat.
+
 ---
 
 ## 6. The "Q-and-A before code" pattern
