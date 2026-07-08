@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Name",
+        "firstName": "Όνομα",
+        "lastName": "Επώνυμο",
         "email": "Email",
         "status": "Κατάσταση",
         "applicationStatus": "Application",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Προφίλ",
           "contact": "Στοιχεία επικοινωνίας",
+          "account": "Στοιχεία δημιουργίας λογαριασμού",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

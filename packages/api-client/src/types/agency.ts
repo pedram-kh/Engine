@@ -309,6 +309,13 @@ export interface AgencyCreatorDetailProfile {
   bio: string | null
   /** Contact email (D-2a-8). Null only if the related user has none. */
   email: string | null
+  /**
+   * Account-creation identity: the first/last name the creator signed up
+   * with. Same relation-exists privacy basis as `email`; never on discover.
+   * `account_last_name` is null for accounts predating the name split.
+   */
+  account_name: string | null
+  account_last_name: string | null
   country_code: string | null
   region: string | null
   /**

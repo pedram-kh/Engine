@@ -265,6 +265,11 @@
         },
         "title": "Profiel bewerken",
         "basics_heading": "Basisgegevens profiel",
+        "account_heading": "Gegevens bij accountaanmaak",
+        "account_hint": "Opgegeven bij registratie. Deze gegevens kunnen hier niet worden bewerkt.",
+        "account_first_name": "Voornaam",
+        "account_last_name": "Achternaam",
+        "account_email": "E-mail",
         "connections_heading": "Social media & portfolio",
         "save": "Wijzigingen opslaan",
         "saved": "Profiel opgeslagen"

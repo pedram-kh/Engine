@@ -265,6 +265,11 @@
         },
         "title": "Edytuj profil",
         "basics_heading": "Podstawowe dane profilu",
+        "account_heading": "Dane utworzenia konta",
+        "account_hint": "Podane przy rejestracji. Tych danych nie można tu edytować.",
+        "account_first_name": "Imię",
+        "account_last_name": "Nazwisko",
+        "account_email": "E-mail",
         "connections_heading": "Media społecznościowe i portfolio",
         "save": "Zapisz zmiany",
         "saved": "Profil zapisany"

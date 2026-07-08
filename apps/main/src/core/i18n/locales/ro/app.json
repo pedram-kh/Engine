@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Name",
+        "firstName": "Prenume",
+        "lastName": "Nume de familie",
         "email": "Email",
         "status": "Stare",
         "applicationStatus": "Application",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profil",
           "contact": "Date de contact",
+          "account": "Detalii despre crearea contului",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

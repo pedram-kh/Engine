@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Name",
+        "firstName": "Vardas",
+        "lastName": "Pavardė",
         "email": "El. paštas",
         "status": "Būsena",
         "applicationStatus": "Application",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profilis",
           "contact": "Kontaktiniai duomenys",
+          "account": "Paskyros sukūrimo duomenys",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

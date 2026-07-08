@@ -50,6 +50,12 @@
         "application_status": "Application status: {status}",
         "completeness": "{percent}% complete",
         "rejection_heading": "Hylkääion notes",
+        "account_heading": "Tilin luontitiedot",
+        "account": {
+          "first_name": "Etunimi",
+          "last_name": "Sukunimi",
+          "email": "Sähköposti"
+        },
         "profile_heading": "Profiili",
         "social_heading": "Social accounts",
         "portfolio_heading": "Portfolio",

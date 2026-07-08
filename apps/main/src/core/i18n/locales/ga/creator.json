@@ -265,6 +265,11 @@
         },
         "title": "Cuir an phróifíl in eagar",
         "basics_heading": "Bunfhaisnéis na próifíle",
+        "account_heading": "Sonraí chruthú an chuntais",
+        "account_hint": "Curtha ar fáil ag clárú. Ní féidir na sonraí seo a chur in eagar anseo.",
+        "account_first_name": "Céadainm",
+        "account_last_name": "Sloinne",
+        "account_email": "Ríomhphost",
         "connections_heading": "Líonraí sóisialta agus punann",
         "save": "Sábháil na hathruithe",
         "saved": "Próifíl sábháilte"

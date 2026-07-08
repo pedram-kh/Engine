@@ -1,6 +1,9 @@
 <script setup lang="ts">
 /**
- * SignUpPage — name + email + password + password_confirmation form.
+ * SignUpPage — first name + last name + email + password +
+ * password_confirmation form. The first-name field maps to the backend
+ * `name` attribute (historical single-name column); `last_name` is the
+ * surname added alongside it.
  *
  * On the 2xx path, navigates to the email-verification-pending page,
  * passing the entered email through as a route query so the next page
@@ -28,6 +31,7 @@ const store = useAuthStore()
 const { isSigningUp } = storeToRefs(store)
 
 const name = ref('')
+const lastName = ref('')
 const email = ref('')
 const password = ref('')
 const passwordConfirmation = ref('')
@@ -56,7 +60,7 @@ const errorValues = ref<Record<string, string | number>>({})
  * those, `extractFieldErrors` returns `{}` (no pointer in details)
  * and the resolver path takes over.
  */
-type SignUpField = 'name' | 'email' | 'password' | 'password_confirmation'
+type SignUpField = 'name' | 'last_name' | 'email' | 'password' | 'password_confirmation'
 const fieldErrors = ref<Partial<Record<SignUpField, readonly string[]>>>({})
 
 /**
@@ -95,6 +99,7 @@ async function onSubmit(): Promise<void> {
   try {
     await store.signUp({
       name: name.value,
+      last_name: lastName.value,
       email: email.value,
       password: password.value,
       password_confirmation: passwordConfirmation.value,
@@ -154,11 +159,20 @@ async function onSubmit(): Promise<void> {
       <v-text-field
         id="sign-up-name"
         v-model="name"
-        :label="t('auth.ui.labels.name')"
+        :label="t('auth.ui.labels.first_name')"
         :error-messages="fieldErrors.name"
-        autocomplete="name"
+        autocomplete="given-name"
         required
         data-test="sign-up-name"
+      />
+      <v-text-field
+        id="sign-up-last-name"
+        v-model="lastName"
+        :label="t('auth.ui.labels.last_name')"
+        :error-messages="fieldErrors.last_name"
+        autocomplete="family-name"
+        required
+        data-test="sign-up-last-name"
       />
       <v-text-field
         id="sign-up-email"

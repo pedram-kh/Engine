@@ -50,6 +50,12 @@
         "application_status": "Application status: {status}",
         "completeness": "{percent}% complete",
         "rejection_heading": "Irrifjutaion notes",
+        "account_heading": "Dettalji tal-ħolqien tal-kont",
+        "account": {
+          "first_name": "Isem",
+          "last_name": "Kunjom",
+          "email": "Email"
+        },
         "profile_heading": "Profil",
         "social_heading": "Social accounts",
         "portfolio_heading": "Portfolio",

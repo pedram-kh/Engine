@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Nazwa",
+        "firstName": "Imię",
+        "lastName": "Nazwisko",
         "email": "E-mail",
         "status": "Status",
         "applicationStatus": "Aplikacja",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profil",
           "contact": "Dane kontaktowe",
+          "account": "Dane utworzenia konta",
           "rating": "Ocena i notatki",
           "social": "Konta społecznościowe",
           "metrics": "Metryki społecznościowe",

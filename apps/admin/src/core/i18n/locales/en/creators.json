@@ -50,6 +50,12 @@
         "application_status": "Application status: {status}",
         "completeness": "{percent}% complete",
         "rejection_heading": "Rejection notes",
+        "account_heading": "Account creation details",
+        "account": {
+          "first_name": "First name",
+          "last_name": "Last name",
+          "email": "Email"
+        },
         "profile_heading": "Profile",
         "social_heading": "Social accounts",
         "portfolio_heading": "Portfolio",

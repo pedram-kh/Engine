@@ -50,6 +50,12 @@
         "application_status": "Application status: {status}",
         "completeness": "{percent}% complete",
         "rejection_heading": "Lükka tagasiion notes",
+        "account_heading": "Konto loomise andmed",
+        "account": {
+          "first_name": "Eesnimi",
+          "last_name": "Perekonnanimi",
+          "email": "E-post"
+        },
         "profile_heading": "Profiil",
         "social_heading": "Social accounts",
         "portfolio_heading": "Portfolio",

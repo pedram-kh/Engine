@@ -36,6 +36,7 @@ final class UserResource extends JsonResource
                 'email' => $user->email,
                 'email_verified_at' => $user->email_verified_at?->toIso8601String(),
                 'name' => $user->name,
+                'last_name' => $user->last_name,
                 'user_type' => $user->type->value,
                 'preferred_language' => $user->preferred_language,
                 'preferred_currency' => $user->preferred_currency,

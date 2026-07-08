@@ -34,6 +34,7 @@ const UNVERIFIED_USER = {
     email: 'store@user.example',
     email_verified_at: null,
     name: 'A',
+    last_name: null,
     user_type: 'creator' as const,
     preferred_language: 'en' as const,
     preferred_currency: 'USD',

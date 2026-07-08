@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Ime",
+        "firstName": "Ime",
+        "lastName": "Prezime",
         "email": "E-mail",
         "status": "Stanje",
         "applicationStatus": "Prijava",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profil",
           "contact": "Podaci za kontakt",
+          "account": "Podaci o izradi računa",
           "rating": "Ocenjevanje a poznámky",
           "social": "Sociální sítě",
           "metrics": "Sociální metriky",

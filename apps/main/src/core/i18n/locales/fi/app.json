@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Name",
+        "firstName": "Etunimi",
+        "lastName": "Sukunimi",
         "email": "Sähköposti",
         "status": "Tila",
         "applicationStatus": "Application",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profiili",
           "contact": "Yhteystiedot",
+          "account": "Tilin luontitiedot",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

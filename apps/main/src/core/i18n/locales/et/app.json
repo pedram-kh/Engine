@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Name",
+        "firstName": "Eesnimi",
+        "lastName": "Perekonnanimi",
         "email": "E-post",
         "status": "Olek",
         "applicationStatus": "Application",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profiil",
           "contact": "Kontaktandmed",
+          "account": "Konto loomise andmed",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

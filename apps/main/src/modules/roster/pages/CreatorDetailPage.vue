@@ -71,6 +71,14 @@ const creator = computed(() => detail.value?.attributes.creator ?? null)
 const displayName = computed(() => creator.value?.display_name ?? t('app.roster.detail.unnamed'))
 const email = computed(() => creator.value?.email ?? null)
 
+// Account-creation identity (sign-up first/last name). Same relation-exists
+// privacy basis as the contact email; never surfaced on discover.
+const accountFirstName = computed(() => creator.value?.account_name ?? null)
+const accountLastName = computed(() => creator.value?.account_last_name ?? null)
+const hasAccountDetails = computed(
+  () => accountFirstName.value !== null || accountLastName.value !== null || email.value !== null,
+)
+
 // AH-010b — the "Message" entry point (D9). Mirror the backend
 // `canMessageRelationship` gate (approved creator + roster + non-blacklisted) so
 // we never surface a shortcut that would 403; the backend stays the SOT.
@@ -434,6 +442,35 @@ onMounted(() => {
                 <address class="creator-detail__address" data-test="creator-detail-address">
                   <span v-for="(line, i) in mailingAddressLines" :key="i">{{ line }}</span>
                 </address>
+              </div>
+            </v-card-text>
+          </v-card>
+
+          <!-- Account creation details — the fixed sign-up identity (first
+               name, surname, email). Same relation-exists privacy basis as
+               the contact email in the header. -->
+          <v-card v-if="hasAccountDetails" variant="outlined" data-test="creator-detail-account">
+            <v-card-title class="text-h6">
+              {{ t('app.roster.detail.sections.account') }}
+            </v-card-title>
+            <v-card-text class="creator-detail__profile-grid">
+              <div>
+                <span class="creator-detail__label">{{ t('app.roster.fields.firstName') }}</span>
+                <span class="text-body-2" data-test="creator-detail-account-first-name">
+                  {{ accountFirstName ?? '—' }}
+                </span>
+              </div>
+              <div>
+                <span class="creator-detail__label">{{ t('app.roster.fields.lastName') }}</span>
+                <span class="text-body-2" data-test="creator-detail-account-last-name">
+                  {{ accountLastName ?? '—' }}
+                </span>
+              </div>
+              <div>
+                <span class="creator-detail__label">{{ t('app.roster.fields.email') }}</span>
+                <span class="text-body-2" data-test="creator-detail-account-email">
+                  {{ email ?? '—' }}
+                </span>
               </div>
             </v-card-text>
           </v-card>

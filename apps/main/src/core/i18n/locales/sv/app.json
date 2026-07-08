@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Namn",
+        "firstName": "Förnamn",
+        "lastName": "Efternamn",
         "email": "E-post",
         "status": "Status",
         "applicationStatus": "Ansökan",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profil",
           "contact": "Kontaktuppgifter",
+          "account": "Kontouppgifter vid registrering",
           "rating": "Betyg & anteckningar",
           "social": "Sociala konton",
           "metrics": "Sociala mätvärden",

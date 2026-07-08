@@ -47,7 +47,10 @@ export interface LoginRequest {
  * client-side" shortcut.
  */
 export interface SignUpRequest {
+  /** First (given) name — the backend field is still called `name`. */
   name: string
+  /** Surname. Required for new sign-ups (pre-split accounts have null). */
+  last_name: string
   email: string
   password: string
   password_confirmation: string

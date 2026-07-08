@@ -61,6 +61,7 @@ function makeAdminUser(overrides: Partial<User['attributes']> = {}): User {
       email: 'admin@example.test',
       email_verified_at: '2026-04-30T12:00:00+00:00',
       name: 'Platform Admin',
+      last_name: null,
       user_type: 'platform_admin',
       preferred_language: 'en',
       preferred_currency: 'USD',

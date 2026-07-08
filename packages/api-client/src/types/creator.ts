@@ -266,6 +266,13 @@ export type CreatorKycMethod = 'vendor' | 'manual'
 export interface CreatorAdminAttributes {
   /** The creator's account email — admin-only PII for reviewer identification. */
   email: string | null
+  /**
+   * Account-creation identity: the first/last name the creator signed up
+   * with. Fixed account facts, distinct from the editable display_name.
+   * `account_last_name` is null for accounts predating the name split.
+   */
+  account_name: string | null
+  account_last_name: string | null
   rejection_reason: string | null
   rejected_at: string | null
   last_active_at: string | null

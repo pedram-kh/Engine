@@ -50,6 +50,12 @@
         "application_status": "Aanmeldingsstatus: {status}",
         "completeness": "{percent}% volledig",
         "rejection_heading": "Afwijzingsnotities",
+        "account_heading": "Gegevens bij accountaanmaak",
+        "account": {
+          "first_name": "Voornaam",
+          "last_name": "Achternaam",
+          "email": "E-mail"
+        },
         "profile_heading": "Profiel",
         "social_heading": "Sociale accounts",
         "portfolio_heading": "Portfolio",

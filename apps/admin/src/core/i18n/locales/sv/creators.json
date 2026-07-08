@@ -50,6 +50,12 @@
         "application_status": "Ansökningsstatus: {status}",
         "completeness": "{percent}% klart",
         "rejection_heading": "Avslagsnoteringar",
+        "account_heading": "Kontouppgifter vid registrering",
+        "account": {
+          "first_name": "Förnamn",
+          "last_name": "Efternamn",
+          "email": "E-post"
+        },
         "profile_heading": "Profil",
         "social_heading": "Sociala konton",
         "portfolio_heading": "Portfolio",

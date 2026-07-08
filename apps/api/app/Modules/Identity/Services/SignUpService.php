@@ -76,6 +76,12 @@ final class SignUpService
     {
         $email = strtolower(trim((string) $attributes['email']));
         $name = trim((string) $attributes['name']);
+        // Nullable at the service boundary: the request rule requires it for
+        // new sign-ups, but internal callers (tests, seeders) may omit it.
+        $lastName = isset($attributes['last_name']) && is_string($attributes['last_name'])
+            ? trim($attributes['last_name'])
+            : null;
+        $lastName = $lastName === '' ? null : $lastName;
         $password = (string) $attributes['password'];
         $preferredLanguage = $this->normaliseLanguage($attributes['preferred_language'] ?? null);
         // Sprint 5 Chunk C (D-c3): read the browser-captured tz, IANA-validated
@@ -101,14 +107,16 @@ final class SignUpService
                 preferredLanguage: $preferredLanguage,
                 timezone: $timezone,
                 request: $request,
+                lastName: $lastName,
             );
         }
 
         /** @var User $user */
-        $user = DB::transaction(function () use ($email, $name, $password, $preferredLanguage, $timezone): User {
+        $user = DB::transaction(function () use ($email, $name, $lastName, $password, $preferredLanguage, $timezone): User {
             $user = User::query()->create([
                 'email' => $email,
                 'name' => $name,
+                'last_name' => $lastName,
                 'password' => $password,
                 'type' => UserType::Creator,
                 'preferred_language' => $preferredLanguage,
@@ -168,6 +176,7 @@ final class SignUpService
         string $preferredLanguage,
         string $timezone,
         Request $request,
+        ?string $lastName = null,
     ): User {
         $tokenHash = hash('sha256', $token);
 
@@ -217,13 +226,14 @@ final class SignUpService
         }
 
         /** @var User $user */
-        $user = DB::transaction(function () use ($relation, $invitedUser, $name, $password, $preferredLanguage, $timezone): User {
+        $user = DB::transaction(function () use ($relation, $invitedUser, $name, $lastName, $password, $preferredLanguage, $timezone): User {
             // The hashing cast on User normally runs on attribute mutation,
             // but we forceFill() here to update the placeholder password
             // from bulk-invite without bypassing the hash. Setting the
             // attribute through the standard setter ensures the hashed
             // cast fires.
             $invitedUser->name = $name;
+            $invitedUser->last_name = $lastName;
             $invitedUser->password = $password;
             $invitedUser->preferred_language = $preferredLanguage;
             // D-c3: overwrite the UTC seed from bulk-invite with the real,

@@ -50,7 +50,11 @@ final class SignUpRequest extends FormRequest
         }
 
         return [
+            // `name` is the FIRST (given) name; `last_name` the surname.
+            // Both required for new sign-ups (pre-split accounts keep a
+            // null last_name until edited).
             'name' => ['required', 'string', 'min:1', 'max:120'],
+            'last_name' => ['required', 'string', 'min:1', 'max:120'],
             'email' => $emailRules,
             'password' => [
                 'required',
@@ -97,17 +101,19 @@ final class SignUpRequest extends FormRequest
     }
 
     /**
-     * Normalise the email and name BEFORE validation so the unique check
+     * Normalise the email and names BEFORE validation so the unique check
      * is case-insensitive and the SignUpService receives clean values.
      */
     protected function prepareForValidation(): void
     {
         $email = $this->input('email');
         $name = $this->input('name');
+        $lastName = $this->input('last_name');
 
         $this->merge([
             'email' => is_string($email) ? strtolower(trim($email)) : $email,
             'name' => is_string($name) ? trim($name) : $name,
+            'last_name' => is_string($lastName) ? trim($lastName) : $lastName,
         ]);
     }
 }

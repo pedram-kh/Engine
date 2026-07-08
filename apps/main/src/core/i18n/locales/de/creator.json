@@ -265,6 +265,11 @@
         },
         "title": "Profil bearbeiten",
         "basics_heading": "Profil-Grunddaten",
+        "account_heading": "Angaben zur Kontoerstellung",
+        "account_hint": "Bei der Registrierung angegeben. Diese Angaben können hier nicht bearbeitet werden.",
+        "account_first_name": "Vorname",
+        "account_last_name": "Nachname",
+        "account_email": "E-Mail",
         "connections_heading": "Soziale Netzwerke & Portfolio",
         "save": "Änderungen speichern",
         "saved": "Profil gespeichert"

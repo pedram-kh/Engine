@@ -265,6 +265,11 @@
         },
         "title": "Rediģēt profilu",
         "basics_heading": "Profila pamatinformācija",
+        "account_heading": "Konta izveides dati",
+        "account_hint": "Norādīti reģistrējoties. Šos datus šeit nevar rediģēt.",
+        "account_first_name": "Vārds",
+        "account_last_name": "Uzvārds",
+        "account_email": "E-pasts",
         "connections_heading": "Sociālie tīkli un portfolio",
         "save": "Saglabāt izmaiņas",
         "saved": "Profils saglabāts"

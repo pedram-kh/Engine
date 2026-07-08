@@ -50,6 +50,12 @@
         "application_status": "Bewerbungsstatus: {status}",
         "completeness": "{percent}% vollständig",
         "rejection_heading": "Ablehnungshinweise",
+        "account_heading": "Angaben zur Kontoerstellung",
+        "account": {
+          "first_name": "Vorname",
+          "last_name": "Nachname",
+          "email": "E-Mail"
+        },
         "profile_heading": "Profil",
         "social_heading": "Social-Konten",
         "portfolio_heading": "Portfolio",

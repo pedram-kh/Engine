@@ -31,6 +31,7 @@ const USER = {
     email: 'a@b.c',
     email_verified_at: null,
     name: 'A',
+    last_name: 'B',
     user_type: 'creator' as const,
     preferred_language: 'en' as const,
     preferred_currency: null,
@@ -67,6 +68,7 @@ describe('SignUpPage', () => {
     teardown = h.unmount
     const pushSpy = vi.spyOn(h.router, 'push')
     await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
+    await h.wrapper.find('[data-test="sign-up-last-name"] input').setValue('Smith')
     await h.wrapper.find('[data-test="sign-up-email"] input').setValue('a@b.c')
     await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
     await h.wrapper
@@ -76,6 +78,7 @@ describe('SignUpPage', () => {
     await flushPromises()
     expect(authApi.signUp).toHaveBeenCalledWith({
       name: 'Alice',
+      last_name: 'Smith',
       email: 'a@b.c',
       password: 'Pa$$w0rd!12',
       password_confirmation: 'Pa$$w0rd!12',
@@ -333,6 +336,7 @@ describe('SignUpPage', () => {
     })
     teardown = h.unmount
     await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
+    await h.wrapper.find('[data-test="sign-up-last-name"] input').setValue('Smith')
     await h.wrapper.find('[data-test="sign-up-email"] input').setValue('a@b.c')
     await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
     await h.wrapper
@@ -342,6 +346,7 @@ describe('SignUpPage', () => {
     await flushPromises()
     expect(authApi.signUp).toHaveBeenCalledWith({
       name: 'Alice',
+      last_name: 'Smith',
       email: 'a@b.c',
       password: 'Pa$$w0rd!12',
       password_confirmation: 'Pa$$w0rd!12',

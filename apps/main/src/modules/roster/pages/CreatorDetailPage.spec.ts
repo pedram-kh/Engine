@@ -86,6 +86,8 @@ function makeDetail(
         display_name: 'Ada Lovelace',
         bio: 'Pioneering mathematician',
         email: 'ada@example.com',
+        account_name: 'Ada',
+        account_last_name: 'Lovelace',
         country_code: 'GB',
         region: null,
         primary_language: 'en',

@@ -265,6 +265,11 @@
         },
         "title": "Editar perfil",
         "basics_heading": "Dados básicos do perfil",
+        "account_heading": "Detalhes de criação da conta",
+        "account_hint": "Fornecidos no registo. Estes dados não podem ser editados aqui.",
+        "account_first_name": "Nome próprio",
+        "account_last_name": "Apelido",
+        "account_email": "E-mail",
         "connections_heading": "Redes sociais e portefólio",
         "save": "Guardar alterações",
         "saved": "Perfil guardado"

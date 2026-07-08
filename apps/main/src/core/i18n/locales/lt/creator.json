@@ -265,6 +265,11 @@
         },
         "title": "Redaguoti profilį",
         "basics_heading": "Pagrindiniai profilio duomenys",
+        "account_heading": "Paskyros sukūrimo duomenys",
+        "account_hint": "Pateikta registruojantis. Šių duomenų čia redaguoti negalima.",
+        "account_first_name": "Vardas",
+        "account_last_name": "Pavardė",
+        "account_email": "El. paštas",
         "connections_heading": "Socialiniai tinklai ir portfelis",
         "save": "Išsaugoti pakeitimus",
         "saved": "Profilis išsaugotas"

@@ -265,6 +265,11 @@
         },
         "title": "Rediger profil",
         "basics_heading": "Profilens grundoplysninger",
+        "account_heading": "Kontooprettelsesoplysninger",
+        "account_hint": "Angivet ved tilmelding. Disse oplysninger kan ikke redigeres her.",
+        "account_first_name": "Fornavn",
+        "account_last_name": "Efternavn",
+        "account_email": "E-mail",
         "connections_heading": "Sociale medier og portfolio",
         "save": "Gem ændringer",
         "saved": "Profil gemt"

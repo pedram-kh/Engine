@@ -82,7 +82,10 @@ export type TimezoneIdentifier = string
 export interface UserAttributes {
   email: string
   email_verified_at: string | null
+  /** First (given) name captured at sign-up. */
   name: string
+  /** Surname captured at sign-up; null for accounts predating the split. */
+  last_name: string | null
   user_type: UserType
   preferred_language: PreferredLanguage | null
   preferred_currency: CurrencyCode | null

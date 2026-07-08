@@ -30,6 +30,7 @@ use Illuminate\Support\Carbon;
  * @property string $password
  * @property UserType $type
  * @property string $name
+ * @property string|null $last_name
  * @property string $preferred_language
  * @property string $preferred_currency
  * @property string $timezone
@@ -74,6 +75,7 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
         'password',
         'type',
         'name',
+        'last_name',
         'preferred_language',
         'preferred_currency',
         'timezone',
@@ -125,6 +127,7 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
             'email_verified_at',
             'type',
             'name',
+            'last_name',
             'preferred_language',
             'preferred_currency',
             'timezone',

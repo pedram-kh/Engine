@@ -210,6 +210,10 @@ final class CreatorResource extends JsonResource
                 // reviewers can identify / contact the applicant. Lives on
                 // the related User; eager-loaded by the admin controller.
                 'email' => $creator->user?->email,
+                // Account-creation identity (sign-up first/last name). Fixed
+                // account facts, distinct from the editable display_name.
+                'account_name' => $creator->user?->name,
+                'account_last_name' => $creator->user?->last_name,
                 'rejection_reason' => $creator->rejection_reason,
                 'rejected_at' => $creator->rejected_at?->toIso8601String(),
                 'last_active_at' => $creator->last_active_at?->toIso8601String(),

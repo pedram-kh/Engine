@@ -50,10 +50,22 @@ import ProfileBasicsForm from '../../onboarding/components/ProfileBasicsForm.vue
 import ConnectionsSocialSection from '../../onboarding/components/ConnectionsSocialSection.vue'
 import ConnectionsPortfolioSection from '../../onboarding/components/ConnectionsPortfolioSection.vue'
 import { useOnboardingStore } from '../../onboarding/stores/useOnboardingStore'
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 
 const { t } = useI18n()
 const router = useRouter()
 const store = useOnboardingStore()
+const authStore = useAuthStore()
+
+/**
+ * Account-creation details — fixed facts captured at sign-up (first name,
+ * surname, email). Read from the authenticated user, NOT the creator
+ * profile: they are account identity, not editable profile content.
+ * `last_name` is null for accounts created before the name split.
+ */
+const accountFirstName = computed(() => authStore.user?.attributes.name ?? null)
+const accountLastName = computed(() => authStore.user?.attributes.last_name ?? null)
+const accountEmail = computed(() => authStore.user?.attributes.email ?? null)
 
 const formRef = ref<InstanceType<typeof ProfileBasicsForm> | null>(null)
 
@@ -141,6 +153,42 @@ onMounted(async () => {
     <header class="creator-profile__header">
       <h1 class="text-h4">{{ t('creator.ui.profile.title') }}</h1>
     </header>
+
+    <!-- Section 0: Account creation details — read-only sign-up facts. -->
+    <section class="creator-profile__section" data-testid="creator-profile-account">
+      <h2 class="text-h6 creator-profile__section-heading">
+        {{ t('creator.ui.profile.account_heading') }}
+      </h2>
+      <p class="text-body-2 text-medium-emphasis creator-profile__account-hint">
+        {{ t('creator.ui.profile.account_hint') }}
+      </p>
+      <div class="creator-profile__account-grid">
+        <div>
+          <span class="creator-profile__account-label">
+            {{ t('creator.ui.profile.account_first_name') }}
+          </span>
+          <span class="text-body-2" data-testid="creator-profile-account-first-name">
+            {{ accountFirstName ?? '—' }}
+          </span>
+        </div>
+        <div>
+          <span class="creator-profile__account-label">
+            {{ t('creator.ui.profile.account_last_name') }}
+          </span>
+          <span class="text-body-2" data-testid="creator-profile-account-last-name">
+            {{ accountLastName ?? '—' }}
+          </span>
+        </div>
+        <div>
+          <span class="creator-profile__account-label">
+            {{ t('creator.ui.profile.account_email') }}
+          </span>
+          <span class="text-body-2" data-testid="creator-profile-account-email">
+            {{ accountEmail ?? '—' }}
+          </span>
+        </div>
+      </div>
+    </section>
 
     <!-- Section 1: Profile basics (extracted step-2 body). -->
     <section class="creator-profile__section" data-testid="creator-profile-basics">
@@ -253,6 +301,26 @@ onMounted(async () => {
 
 .creator-profile__section-heading {
   margin-bottom: 4px;
+}
+
+.creator-profile__account-hint {
+  margin: -12px 0 0;
+}
+
+.creator-profile__account-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.creator-profile__account-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(var(--v-theme-on-surface), 0.6);
+  margin-bottom: 2px;
 }
 
 .creator-profile__actions {

@@ -265,6 +265,11 @@
         },
         "title": "Muuda profiili",
         "basics_heading": "Profiili põhiandmed",
+        "account_heading": "Konto loomise andmed",
+        "account_hint": "Esitatud registreerumisel. Neid andmeid ei saa siin muuta.",
+        "account_first_name": "Eesnimi",
+        "account_last_name": "Perekonnanimi",
+        "account_email": "E-post",
         "connections_heading": "Sotsiaalmeedia ja portfoolio",
         "save": "Salvesta muudatused",
         "saved": "Profiil salvestatud"

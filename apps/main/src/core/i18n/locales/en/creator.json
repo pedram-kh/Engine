@@ -265,6 +265,11 @@
         },
         "title": "Edit profile",
         "basics_heading": "Profile basics",
+        "account_heading": "Account creation details",
+        "account_hint": "Provided at sign-up. These details can't be edited here.",
+        "account_first_name": "First name",
+        "account_last_name": "Last name",
+        "account_email": "Email",
         "connections_heading": "Socials & portfolio",
         "save": "Save changes",
         "saved": "Profile saved"

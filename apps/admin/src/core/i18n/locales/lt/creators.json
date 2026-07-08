@@ -50,6 +50,12 @@
         "application_status": "Application status: {status}",
         "completeness": "{percent}% complete",
         "rejection_heading": "Atmestiion notes",
+        "account_heading": "Paskyros sukūrimo duomenys",
+        "account": {
+          "first_name": "Vardas",
+          "last_name": "Pavardė",
+          "email": "El. paštas"
+        },
         "profile_heading": "Profilis",
         "social_heading": "Social accounts",
         "portfolio_heading": "Portfolio",

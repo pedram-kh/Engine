@@ -50,6 +50,12 @@
         "application_status": "Stanje prijave: {status}",
         "completeness": "{percent} % dokončeno",
         "rejection_heading": "Poznámky k odmítnutí",
+        "account_heading": "Podatki ob ustvarjanju računa",
+        "account": {
+          "first_name": "Ime",
+          "last_name": "Priimek",
+          "email": "E-mail"
+        },
         "profile_heading": "Profil",
         "social_heading": "Sociální sítě",
         "portfolio_heading": "Portfolio",

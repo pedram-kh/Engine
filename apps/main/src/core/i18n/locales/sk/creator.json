@@ -265,6 +265,11 @@
         },
         "title": "Upraviť profil",
         "basics_heading": "Základné údaje profilu",
+        "account_heading": "Údaje o vytvorení účtu",
+        "account_hint": "Zadané pri registrácii. Tieto údaje tu nie je možné upraviť.",
+        "account_first_name": "Meno",
+        "account_last_name": "Priezvisko",
+        "account_email": "E-mail",
         "connections_heading": "Sociálne siete a portfólio",
         "save": "Uložiť zmeny",
         "saved": "Profil uložený"

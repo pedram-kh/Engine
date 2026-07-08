@@ -35,6 +35,7 @@ const ADMIN_USER = {
     email: 'admin@example.com',
     email_verified_at: '2026-01-01T00:00:00Z',
     name: 'Admin User',
+    last_name: null,
     user_type: 'platform_admin' as const,
     preferred_language: 'en' as const,
     preferred_currency: 'EUR',

@@ -97,7 +97,8 @@ it('sign-up endpoint creates the Creator satellite atomically', function (): voi
 
     $response = $this->postJson('/api/v1/auth/sign-up', [
         'email' => 'wizard.endpoint@example.com',
-        'name' => 'Wizard Endpoint',
+        'name' => 'Wizard',
+        'last_name' => 'Endpoint',
         'password' => 'this-is-a-strong-password-1!',
         'password_confirmation' => 'this-is-a-strong-password-1!',
         'preferred_language' => 'it',

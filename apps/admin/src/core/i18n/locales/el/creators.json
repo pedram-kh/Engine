@@ -50,6 +50,12 @@
         "application_status": "Application status: {status}",
         "completeness": "{percent}% complete",
         "rejection_heading": "Απόρριψηion notes",
+        "account_heading": "Στοιχεία δημιουργίας λογαριασμού",
+        "account": {
+          "first_name": "Όνομα",
+          "last_name": "Επώνυμο",
+          "email": "Email"
+        },
         "profile_heading": "Προφίλ",
         "social_heading": "Social accounts",
         "portfolio_heading": "Χαρτοφυλάκιο",

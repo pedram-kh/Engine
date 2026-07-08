@@ -265,6 +265,11 @@
         },
         "title": "Editează profilul",
         "basics_heading": "Informații de bază ale profilului",
+        "account_heading": "Detalii despre crearea contului",
+        "account_hint": "Furnizate la înregistrare. Aceste date nu pot fi editate aici.",
+        "account_first_name": "Prenume",
+        "account_last_name": "Nume de familie",
+        "account_email": "Email",
         "connections_heading": "Rețele sociale și portofoliu",
         "save": "Salvează modificările",
         "saved": "Profil salvat"

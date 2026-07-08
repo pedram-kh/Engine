@@ -31,6 +31,7 @@ const USER_AFTER_DISABLE = {
     email: 'a@b.c',
     email_verified_at: '2026-01-01T00:00:00Z',
     name: 'A',
+    last_name: null,
     user_type: 'creator' as const,
     preferred_language: 'en' as const,
     preferred_currency: 'USD',

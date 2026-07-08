@@ -265,6 +265,11 @@
         },
         "title": "Uredi profil",
         "basics_heading": "Osnovni podaci profila",
+        "account_heading": "Podaci o izradi računa",
+        "account_hint": "Navedeni pri registraciji. Ti se podaci ovdje ne mogu uređivati.",
+        "account_first_name": "Ime",
+        "account_last_name": "Prezime",
+        "account_email": "E-mail",
         "connections_heading": "Društvene mreže i portfelj",
         "save": "Spremi promjene",
         "saved": "Profil spremljen"

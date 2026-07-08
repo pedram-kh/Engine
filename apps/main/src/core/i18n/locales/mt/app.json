@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Name",
+        "firstName": "Isem",
+        "lastName": "Kunjom",
         "email": "Email",
         "status": "Status",
         "applicationStatus": "Application",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profil",
           "contact": "Dettalji ta' kuntatt",
+          "account": "Dettalji tal-ħolqien tal-kont",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

@@ -96,6 +96,7 @@ it('queues VerifyEmailMail with the user preferred_language as the locale', func
 
     $payload = [
         'name' => 'Maria',
+        'last_name' => 'Silva',
         'email' => 'maria@example.com',
         'password' => 'a-strong-passphrase-1234',
         'password_confirmation' => 'a-strong-passphrase-1234',

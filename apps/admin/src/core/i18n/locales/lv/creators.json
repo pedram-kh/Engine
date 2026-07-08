@@ -50,6 +50,12 @@
         "application_status": "Application status: {status}",
         "completeness": "{percent}% complete",
         "rejection_heading": "Nēraidītion notes",
+        "account_heading": "Konta izveides dati",
+        "account": {
+          "first_name": "Vārds",
+          "last_name": "Uzvārds",
+          "email": "E-pasts"
+        },
         "profile_heading": "Profils",
         "social_heading": "Social accounts",
         "portfolio_heading": "Portfolio",

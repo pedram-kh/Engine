@@ -50,6 +50,12 @@
         "application_status": "Status aplikacji: {status}",
         "completeness": "{percent}% ukończono",
         "rejection_heading": "Uwagi odrzucenia",
+        "account_heading": "Dane utworzenia konta",
+        "account": {
+          "first_name": "Imię",
+          "last_name": "Nazwisko",
+          "email": "E-mail"
+        },
         "profile_heading": "Profil",
         "social_heading": "Konta społecznościowe",
         "portfolio_heading": "Portfolio",

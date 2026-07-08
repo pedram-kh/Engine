@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Navn",
+        "firstName": "Fornavn",
+        "lastName": "Efternavn",
         "email": "E-mail",
         "status": "Status",
         "applicationStatus": "Ansøgning",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profil",
           "contact": "Kontaktoplysninger",
+          "account": "Kontooprettelsesoplysninger",
           "rating": "Vurdering & noter",
           "social": "Sociale konti",
           "metrics": "Sociale metrics",

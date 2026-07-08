@@ -50,6 +50,12 @@
         "application_status": "Ansøgningsstatus: {status}",
         "completeness": "{percent}% fuldført",
         "rejection_heading": "Afslagsnoter",
+        "account_heading": "Kontooprettelsesoplysninger",
+        "account": {
+          "first_name": "Fornavn",
+          "last_name": "Efternavn",
+          "email": "E-mail"
+        },
         "profile_heading": "Profil",
         "social_heading": "Sociale konti",
         "portfolio_heading": "Portefølje",

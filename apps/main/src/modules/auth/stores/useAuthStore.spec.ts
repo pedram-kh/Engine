@@ -52,6 +52,7 @@ function makeUser(overrides: Partial<User['attributes']> = {}): User {
       email: 'creator@example.test',
       email_verified_at: '2026-04-30T12:00:00+00:00',
       name: 'Creator Account',
+      last_name: null,
       user_type: 'creator',
       preferred_language: 'en',
       preferred_currency: 'USD',
@@ -430,6 +431,7 @@ describe('useAuthStore', () => {
 
       const result = await store.signUp({
         name: 'New Account',
+        last_name: 'Surname',
         email: 'new@example.test',
         password: 'pw',
         password_confirmation: 'pw',
@@ -446,6 +448,7 @@ describe('useAuthStore', () => {
       await expect(
         store.signUp({
           name: 'a',
+          last_name: 'b',
           email: 'taken@example.test',
           password: 'pw',
           password_confirmation: 'pw',
@@ -712,7 +715,7 @@ describe('useAuthStore', () => {
       [
         'signUp',
         'isSigningUp',
-        { name: 'a', email: 'a@b.c', password: 'pw', password_confirmation: 'pw' },
+        { name: 'a', last_name: 'b', email: 'a@b.c', password: 'pw', password_confirmation: 'pw' },
       ],
       ['verifyEmail', 'isVerifyingEmail', { token: 'tok' }],
       ['resendVerification', 'isResendingVerification', { email: 'a@b.c' }],

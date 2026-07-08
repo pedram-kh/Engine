@@ -50,6 +50,12 @@
         "application_status": "Application status: {status}",
         "completeness": "{percent}% complete",
         "rejection_heading": "Elutasításion notes",
+        "account_heading": "Fiók létrehozási adatai",
+        "account": {
+          "first_name": "Keresztnév",
+          "last_name": "Vezetéknév",
+          "email": "E-mail"
+        },
         "profile_heading": "Profil",
         "social_heading": "Social accounts",
         "portfolio_heading": "Portfólió",

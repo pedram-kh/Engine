@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Name",
+        "firstName": "Keresztnév",
+        "lastName": "Vezetéknév",
         "email": "E-mail",
         "status": "Állapot",
         "applicationStatus": "Application",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profil",
           "contact": "Elérhetőségek",
+          "account": "Fiók létrehozási adatai",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

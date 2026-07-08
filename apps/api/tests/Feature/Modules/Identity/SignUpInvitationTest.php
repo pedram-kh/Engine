@@ -91,6 +91,7 @@ it('accepts a valid invitation: updates the User, flips the relation to roster, 
 
     $response = $this->postJson('/api/v1/auth/sign-up', [
         'name' => 'Real Name',
+        'last_name' => 'Real Surname',
         'email' => 'invitee@example.com',
         'password' => STRONG_PASSWORD,
         'password_confirmation' => STRONG_PASSWORD,
@@ -103,6 +104,7 @@ it('accepts a valid invitation: updates the User, flips the relation to roster, 
     $fresh = $invitee->fresh();
     assert($fresh !== null);
     expect($fresh->name)->toBe('Real Name');
+    expect($fresh->last_name)->toBe('Real Surname');
     expect($fresh->email_verified_at)->not->toBeNull();
     expect(Hash::check(STRONG_PASSWORD, $fresh->password))->toBeTrue();
     expect($fresh->preferred_language)->toBe('pt');
@@ -132,6 +134,7 @@ it('updates the pre-created (UTC) invitee row to the captured browser timezone o
 
     $this->postJson('/api/v1/auth/sign-up', [
         'name' => 'Real Name',
+        'last_name' => 'Real Surname',
         'email' => 'invitee@example.com',
         'password' => STRONG_PASSWORD,
         'password_confirmation' => STRONG_PASSWORD,
@@ -150,6 +153,7 @@ it('falls back to UTC on an invalid timezone during invitation acceptance — st
 
     $this->postJson('/api/v1/auth/sign-up', [
         'name' => 'Real Name',
+        'last_name' => 'Real Surname',
         'email' => 'invitee@example.com',
         'password' => STRONG_PASSWORD,
         'password_confirmation' => STRONG_PASSWORD,
@@ -168,6 +172,7 @@ it('does not create a new User row when the invitation path is used (the bulk-in
 
     $this->postJson('/api/v1/auth/sign-up', [
         'name' => 'Real Name',
+        'last_name' => 'Real Surname',
         'email' => 'invitee@example.com',
         'password' => STRONG_PASSWORD,
         'password_confirmation' => STRONG_PASSWORD,
@@ -186,6 +191,7 @@ it('does not create a new User row when the invitation path is used (the bulk-in
 it('returns 422 + invitation.not_found when the token does not match any relation', function (): void {
     $response = $this->postJson('/api/v1/auth/sign-up', [
         'name' => 'Real Name',
+        'last_name' => 'Real Surname',
         'email' => 'someone@example.com',
         'password' => STRONG_PASSWORD,
         'password_confirmation' => STRONG_PASSWORD,
@@ -207,6 +213,7 @@ it('returns 422 + invitation.expired when the invitation expires_at is past', fu
 
     $response = $this->postJson('/api/v1/auth/sign-up', [
         'name' => 'Real Name',
+        'last_name' => 'Real Surname',
         'email' => 'invitee@example.com',
         'password' => STRONG_PASSWORD,
         'password_confirmation' => STRONG_PASSWORD,
@@ -231,6 +238,7 @@ it('returns 422 + invitation.already_accepted when the relation is already in ro
 
     $response = $this->postJson('/api/v1/auth/sign-up', [
         'name' => 'Real Name',
+        'last_name' => 'Real Surname',
         'email' => 'invitee@example.com',
         'password' => STRONG_PASSWORD,
         'password_confirmation' => STRONG_PASSWORD,
@@ -252,6 +260,7 @@ it('returns 422 + invitation.email_mismatch when the typed email differs from th
 
     $response = $this->postJson('/api/v1/auth/sign-up', [
         'name' => 'Real Name',
+        'last_name' => 'Real Surname',
         'email' => 'different-email@example.com',
         'password' => STRONG_PASSWORD,
         'password_confirmation' => STRONG_PASSWORD,
@@ -275,6 +284,7 @@ it('treats the typed email case-insensitively when comparing to the bound user',
 
     $response = $this->postJson('/api/v1/auth/sign-up', [
         'name' => 'Real Name',
+        'last_name' => 'Real Surname',
         // Same email, different case — must NOT trigger email_mismatch.
         'email' => 'INVITEE@EXAMPLE.COM',
         'password' => STRONG_PASSWORD,
@@ -297,6 +307,7 @@ it('does not return 422 unique-email error when invitation_token is present (rel
 
     $response = $this->postJson('/api/v1/auth/sign-up', [
         'name' => 'Real Name',
+        'last_name' => 'Real Surname',
         'email' => 'invitee@example.com',
         'password' => STRONG_PASSWORD,
         'password_confirmation' => STRONG_PASSWORD,
@@ -311,6 +322,7 @@ it('still enforces unique-email when no invitation_token is provided', function 
 
     $response = $this->postJson('/api/v1/auth/sign-up', [
         'name' => 'Real Name',
+        'last_name' => 'Real Surname',
         'email' => 'taken@example.com',
         'password' => STRONG_PASSWORD,
         'password_confirmation' => STRONG_PASSWORD,

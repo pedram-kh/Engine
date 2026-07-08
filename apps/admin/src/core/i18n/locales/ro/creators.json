@@ -50,6 +50,12 @@
         "application_status": "Application status: {status}",
         "completeness": "{percent}% complete",
         "rejection_heading": "Respingețiion notes",
+        "account_heading": "Detalii despre crearea contului",
+        "account": {
+          "first_name": "Prenume",
+          "last_name": "Nume de familie",
+          "email": "Email"
+        },
         "profile_heading": "Profil",
         "social_heading": "Social accounts",
         "portfolio_heading": "Portofoliu",

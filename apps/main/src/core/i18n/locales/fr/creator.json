@@ -265,6 +265,11 @@
         },
         "title": "Modifier le profil",
         "basics_heading": "Informations de base du profil",
+        "account_heading": "Détails de création du compte",
+        "account_hint": "Fournis lors de l'inscription. Ces informations ne peuvent pas être modifiées ici.",
+        "account_first_name": "Prénom",
+        "account_last_name": "Nom",
+        "account_email": "E-mail",
         "connections_heading": "Réseaux sociaux et portfolio",
         "save": "Enregistrer les modifications",
         "saved": "Profil enregistré"

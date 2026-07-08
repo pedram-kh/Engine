@@ -265,6 +265,11 @@
         },
         "title": "Redigera profil",
         "basics_heading": "Profilens grunduppgifter",
+        "account_heading": "Kontouppgifter vid registrering",
+        "account_hint": "Angavs vid registreringen. Dessa uppgifter kan inte redigeras här.",
+        "account_first_name": "Förnamn",
+        "account_last_name": "Efternamn",
+        "account_email": "E-post",
         "connections_heading": "Sociala medier och portfölj",
         "save": "Spara ändringar",
         "saved": "Profil sparad"

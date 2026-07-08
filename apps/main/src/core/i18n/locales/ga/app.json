@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Name",
+        "firstName": "Céadainm",
+        "lastName": "Sloinne",
         "email": "Ríomhphost",
         "status": "Stádas",
         "applicationStatus": "Application",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Próifíl",
           "contact": "Sonraí teagmhála",
+          "account": "Sonraí chruthú an chuntais",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

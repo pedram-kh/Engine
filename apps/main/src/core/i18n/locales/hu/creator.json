@@ -265,6 +265,11 @@
         },
         "title": "Profil szerkesztése",
         "basics_heading": "Profil alapadatai",
+        "account_heading": "Fiók létrehozási adatai",
+        "account_hint": "A regisztrációkor megadva. Ezek az adatok itt nem szerkeszthetők.",
+        "account_first_name": "Keresztnév",
+        "account_last_name": "Vezetéknév",
+        "account_email": "E-mail",
         "connections_heading": "Közösségi média és portfólió",
         "save": "Módosítások mentése",
         "saved": "Profil elmentve"

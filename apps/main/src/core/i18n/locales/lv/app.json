@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Name",
+        "firstName": "Vārds",
+        "lastName": "Uzvārds",
         "email": "E-pasts",
         "status": "Statuss",
         "applicationStatus": "Application",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profils",
           "contact": "Kontaktinformācija",
+          "account": "Konta izveides dati",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

@@ -50,6 +50,12 @@
         "application_status": "Application status: {status}",
         "completeness": "{percent}% complete",
         "rejection_heading": "Отхвърлетеion notes",
+        "account_heading": "Данни от създаването на акаунта",
+        "account": {
+          "first_name": "Собствено име",
+          "last_name": "Фамилия",
+          "email": "Имейл"
+        },
         "profile_heading": "Профил",
         "social_heading": "Social accounts",
         "portfolio_heading": "Портфолио",

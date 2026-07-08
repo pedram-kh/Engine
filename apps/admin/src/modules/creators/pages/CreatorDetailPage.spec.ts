@@ -92,6 +92,8 @@ function buildCreator(overrides: Partial<CreatorResource['attributes']> = {}): C
     },
     admin_attributes: {
       email: 'creator@example.com',
+      account_name: 'Creator',
+      account_last_name: 'Example',
       rejection_reason: null,
       rejected_at: null,
       last_active_at: null,

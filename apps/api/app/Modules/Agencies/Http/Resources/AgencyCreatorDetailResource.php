@@ -126,6 +126,10 @@ final class AgencyCreatorDetailResource extends JsonResource
             // by the controller. The agency-with-relation invariant (the
             // relation-exists tenancy check) is what makes this appropriate.
             'email' => $creator->user?->email,
+            // Account-creation identity (sign-up first/last name) — same
+            // relation-exists privacy basis as the email. NEVER on discover.
+            'account_name' => $creator->user?->name,
+            'account_last_name' => $creator->user?->last_name,
             'country_code' => $creator->country_code,
             'region' => $creator->region,
             'primary_language' => $creator->primary_language,

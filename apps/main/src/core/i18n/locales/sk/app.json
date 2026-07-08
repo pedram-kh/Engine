@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Meno",
+        "firstName": "Meno",
+        "lastName": "Priezvisko",
         "email": "E-mail",
         "status": "Stav",
         "applicationStatus": "Prihláška",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profil",
           "contact": "Kontaktné údaje",
+          "account": "Údaje o vytvorení účtu",
           "rating": "Hodnotenie a poznámky",
           "social": "Sociální sítě",
           "metrics": "Sociální metriky",

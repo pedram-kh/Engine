@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Name",
+        "firstName": "Собствено име",
+        "lastName": "Фамилия",
         "email": "Имейл",
         "status": "Статус",
         "applicationStatus": "Application",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Профил",
           "contact": "Данни за контакт",
+          "account": "Данни от създаването на акаунта",
           "rating": "Rating & notes",
           "social": "Social accounts",
           "metrics": "Social metrics",

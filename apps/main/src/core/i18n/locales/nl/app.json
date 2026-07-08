@@ -194,6 +194,8 @@
       },
       "fields": {
         "name": "Naam",
+        "firstName": "Voornaam",
+        "lastName": "Achternaam",
         "email": "E-mail",
         "status": "Status",
         "applicationStatus": "Aanmelding",
@@ -278,6 +280,7 @@
         "sections": {
           "profile": "Profiel",
           "contact": "Contactgegevens",
+          "account": "Gegevens bij accountaanmaak",
           "rating": "Beoordeling & notities",
           "social": "Sociale accounts",
           "metrics": "Sociale statistieken",

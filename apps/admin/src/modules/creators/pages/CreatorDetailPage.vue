@@ -186,6 +186,11 @@ const taxLabel = computed(() =>
 )
 
 const creatorEmail = computed(() => creator.value?.admin_attributes?.email ?? null)
+
+// Account-creation identity (sign-up first/last name) — read-only facts,
+// distinct from the editable display_name below.
+const accountFirstName = computed(() => creator.value?.admin_attributes?.account_name ?? null)
+const accountLastName = computed(() => creator.value?.admin_attributes?.account_last_name ?? null)
 const rejectionReason = computed(() => creator.value?.admin_attributes?.rejection_reason ?? null)
 const kycVerifications = computed<ReadonlyArray<CreatorKycVerificationSummary>>(
   () => creator.value?.admin_attributes?.kyc_verifications ?? [],
@@ -557,6 +562,39 @@ const decisionSnackbarColor = computed(() =>
       >
         <h2 class="text-h6">{{ t('admin.creators.detail.rejection_heading') }}</h2>
         <p>{{ rejectionReason }}</p>
+      </section>
+
+      <!-- Account creation details — read-only sign-up identity. NOT part of
+           the per-field edit surface (these are account facts, not profile
+           content). -->
+      <section class="admin-creator-detail__section" data-testid="admin-creator-detail-account">
+        <h2 class="text-h6">{{ t('admin.creators.detail.account_heading') }}</h2>
+        <div class="admin-creator-detail__account-grid">
+          <div>
+            <span class="admin-creator-detail__account-label">
+              {{ t('admin.creators.detail.account.first_name') }}
+            </span>
+            <span class="text-body-2" data-testid="admin-creator-detail-account-first-name">
+              {{ accountFirstName ?? '—' }}
+            </span>
+          </div>
+          <div>
+            <span class="admin-creator-detail__account-label">
+              {{ t('admin.creators.detail.account.last_name') }}
+            </span>
+            <span class="text-body-2" data-testid="admin-creator-detail-account-last-name">
+              {{ accountLastName ?? '—' }}
+            </span>
+          </div>
+          <div>
+            <span class="admin-creator-detail__account-label">
+              {{ t('admin.creators.detail.account.email') }}
+            </span>
+            <span class="text-body-2" data-testid="admin-creator-detail-account-email">
+              {{ creatorEmail ?? '—' }}
+            </span>
+          </div>
+        </div>
       </section>
 
       <section class="admin-creator-detail__section">
@@ -991,6 +1029,22 @@ const decisionSnackbarColor = computed(() =>
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.admin-creator-detail__account-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.admin-creator-detail__account-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(var(--v-theme-on-surface), 0.6);
+  margin-bottom: 2px;
 }
 
 .admin-creator-detail__rejection {

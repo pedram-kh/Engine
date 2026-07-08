@@ -265,6 +265,11 @@
         },
         "title": "Editja l-profil",
         "basics_heading": "Informazzjoni bażika tal-profil",
+        "account_heading": "Dettalji tal-ħolqien tal-kont",
+        "account_hint": "Mogħtija mar-reġistrazzjoni. Dawn id-dettalji ma jistgħux jiġu editjati hawn.",
+        "account_first_name": "Isem",
+        "account_last_name": "Kunjom",
+        "account_email": "Email",
         "connections_heading": "Midja soċjali u portfolio",
         "save": "Issejvja l-bidliet",
         "saved": "Il-profil ġie ssejvjat"

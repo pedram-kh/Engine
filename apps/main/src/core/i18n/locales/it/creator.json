@@ -265,6 +265,11 @@
         },
         "title": "Modifica profilo",
         "basics_heading": "Dati di base del profilo",
+        "account_heading": "Dettagli di creazione dell'account",
+        "account_hint": "Forniti alla registrazione. Questi dati non possono essere modificati qui.",
+        "account_first_name": "Nome",
+        "account_last_name": "Cognome",
+        "account_email": "Email",
         "connections_heading": "Social e portfolio",
         "save": "Salva modifiche",
         "saved": "Profilo salvato"

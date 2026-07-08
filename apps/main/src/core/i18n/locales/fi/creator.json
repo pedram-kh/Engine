@@ -265,6 +265,11 @@
         },
         "title": "Muokkaa profiilia",
         "basics_heading": "Profiilin perustiedot",
+        "account_heading": "Tilin luontitiedot",
+        "account_hint": "Annettu rekisteröitymisen yhteydessä. Näitä tietoja ei voi muokata tässä.",
+        "account_first_name": "Etunimi",
+        "account_last_name": "Sukunimi",
+        "account_email": "Sähköposti",
         "connections_heading": "Sosiaalinen media ja portfolio",
         "save": "Tallenna muutokset",
         "saved": "Profiili tallennettu"

@@ -37,7 +37,8 @@ beforeEach(function (): void {
 });
 
 const VALID_PAYLOAD = [
-    'name' => 'Pedro Costa',
+    'name' => 'Pedro',
+    'last_name' => 'Costa',
     'email' => 'pedro@example.com',
     'password' => 'a-strong-passphrase-1234',
     'password_confirmation' => 'a-strong-passphrase-1234',
@@ -77,7 +78,8 @@ it('returns 201 with the public UserResource projection', function (): void {
     $response->assertStatus(201)
         ->assertJsonPath('data.type', 'user')
         ->assertJsonPath('data.attributes.email', 'pedro@example.com')
-        ->assertJsonPath('data.attributes.name', 'Pedro Costa')
+        ->assertJsonPath('data.attributes.name', 'Pedro')
+        ->assertJsonPath('data.attributes.last_name', 'Costa')
         ->assertJsonPath('data.attributes.user_type', UserType::Creator->value)
         ->assertJsonPath('data.attributes.preferred_language', 'pt')
         ->assertJsonPath('data.attributes.email_verified_at', null)
@@ -260,6 +262,30 @@ it('rejects an unsupported preferred_language', function (): void {
         ...VALID_PAYLOAD,
         'preferred_language' => 'ja',
     ])->assertEnvelopeValidationErrors(['preferred_language']);
+});
+
+it('rejects a missing last_name (required for new sign-ups)', function (): void {
+    Mail::fake();
+
+    $payload = VALID_PAYLOAD;
+    unset($payload['last_name']);
+
+    $this->postJson('/api/v1/auth/sign-up', $payload)
+        ->assertEnvelopeValidationErrors(['last_name']);
+
+    expect(User::query()->where('email', 'pedro@example.com')->exists())->toBeFalse();
+});
+
+it('trims and persists last_name on the created user', function (): void {
+    Mail::fake();
+
+    $this->postJson('/api/v1/auth/sign-up', [
+        ...VALID_PAYLOAD,
+        'last_name' => '  Costa  ',
+    ])->assertStatus(201);
+
+    expect(User::query()->where('email', 'pedro@example.com')->value('last_name'))
+        ->toBe('Costa');
 });
 
 // -----------------------------------------------------------------------------

@@ -50,6 +50,12 @@
         "application_status": "Statut de la candidature : {status}",
         "completeness": "{percent}% terminé",
         "rejection_heading": "Notes de rejet",
+        "account_heading": "Détails de création du compte",
+        "account": {
+          "first_name": "Prénom",
+          "last_name": "Nom",
+          "email": "E-mail"
+        },
         "profile_heading": "Profil",
         "social_heading": "Comptes sociaux",
         "portfolio_heading": "Portfolio",
