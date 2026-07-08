@@ -43,6 +43,11 @@ it('inlines the brand teal mail theme into VerifyEmailMail', function (): void {
 
     expect($html)->toContain(BRAND_TEAL_700);
     expect($html)->not->toContain(STOCK_DEFAULT_BUTTON);
+    // AH-018 regression pin: the greeting/ignore lines once rendered a
+    // literal ":app" because trans() was called without the app parameter.
+    // Real-rendering catches it; the template lowercases cleanly (:app has
+    // no case), so this matches the raw placeholder verbatim.
+    expect($html)->not->toContain(':app');
 });
 
 it('inlines the brand teal mail theme into ResetPasswordMail', function (): void {

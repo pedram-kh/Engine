@@ -107,9 +107,11 @@ const submitErrorKey = ref<string | null>(null)
 const fieldErrors = ref<Partial<Record<ProfileField, readonly string[]>>>({})
 
 // 28-category enum — must stay in sync with the backend
-// `UpdateProfileRequest::rules()` `categories.*` list (and its admin mirror,
-// pinned by field-edit-config-parity.spec.ts). Labels come from
-// `creator.ui.wizard.categories.*` in every locale.
+// `UpdateProfileRequest::rules()` `categories.*` list. NOTE: parity with the
+// backend enum is NOT spec-verified for this copy — field-edit-config-parity
+// pins only the ADMIN registry against the PHP; a drift here surfaces as a
+// runtime 422, not a test failure (recorded in docs/reviews/tech-debt.md).
+// Labels come from `creator.ui.wizard.categories.*` in every locale.
 const CATEGORY_KEYS = [
   'fashion',
   'beauty',
