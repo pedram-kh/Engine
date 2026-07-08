@@ -22,7 +22,27 @@ import { fileURLToPath } from 'node:url'
  *
  * Setup runs once per `pnpm test:e2e` invocation. It does NOT touch
  * the test clock — the per-spec fixtures own the clock lifecycle.
+ *
+ * ⚠ DB_DATABASE isolation (post-incident, 2026-07-08). This used to
+ * inherit `DB_DATABASE` from `apps/api/.env` unchanged — i.e. the
+ * SAME Postgres database as `pnpm dev`. A local `pnpm test:e2e` run
+ * therefore ran `migrate:fresh` (drop + recreate every table) against
+ * a developer's real dev data, with no confirmation prompt, because
+ * `--force` is required for a non-interactive `migrate:fresh` and this
+ * script always passes it. That incident deleted a developer's local
+ * accounts. `DB_DATABASE` is now hard-overridden to a dedicated
+ * `catalyst_e2e` database (never the dev DB), unless CI has already
+ * set `DB_DATABASE` to its own throwaway per-job Postgres service
+ * (`.github/workflows/ci.yml`), which is honored via the `??`
+ * fallback below. The same override MUST be applied everywhere else
+ * the API process's env is constructed for E2E — see the matching
+ * `DB_DATABASE` line in the API `webServer` block in
+ * `playwright.config.ts`, which also forces `reuseExistingServer:
+ * false` so a stray already-running dev server (which reads the real
+ * `.env` unmodified) can never silently absorb the E2E run instead of
+ * this isolated one.
  */
+const E2E_DB_DATABASE = process.env.DB_DATABASE ?? 'catalyst_e2e'
 export default async function globalSetup(): Promise<void> {
   if (process.env.TEST_HELPERS_TOKEN === undefined || process.env.TEST_HELPERS_TOKEN === '') {
     throw new Error(
@@ -65,6 +85,9 @@ export default async function globalSetup(): Promise<void> {
       // `playwright.config.ts` documents — keep both in lock-step.
       APP_ENV: 'local',
       CACHE_STORE: 'array',
+      // Isolation from the developer's real dev database — see the
+      // docblock above. NEVER remove this override.
+      DB_DATABASE: E2E_DB_DATABASE,
     },
   })
 }

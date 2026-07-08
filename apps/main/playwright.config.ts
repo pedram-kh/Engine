@@ -41,6 +41,13 @@ import { defineConfig, devices } from '@playwright/test'
 const TEST_HELPERS_TOKEN =
   process.env.TEST_HELPERS_TOKEN ?? 'local-dev-test-helpers-token-replace-me'
 
+// Isolation from the developer's real dev database (post-incident,
+// 2026-07-08 — see the matching docblock in `playwright/global-setup.ts`
+// for the full incident writeup). MUST match the value global-setup.ts
+// uses for its `migrate:fresh` call, or the API server and the schema
+// reset target different databases.
+const E2E_DB_DATABASE = process.env.DB_DATABASE ?? 'catalyst_e2e'
+
 export default defineConfig({
   testDir: './playwright/specs',
   fullyParallel: false,
@@ -91,12 +98,27 @@ export default defineConfig({
       // by every spec's first `/_test/*` call (which would 404 if
       // the gate were closed).
       url: 'http://127.0.0.1:8000/up',
-      reuseExistingServer: !process.env.CI,
+      // ⚠ Always `false` (post-incident, 2026-07-08) — NEVER
+      // `!process.env.CI`. Reusing an already-running `pnpm dev` API
+      // server means this `env` block (including the DB_DATABASE
+      // override below) is silently never applied — the reused
+      // process is still bound to whatever `apps/api/.env` says,
+      // i.e. the developer's real dev database. `global-setup.ts`'s
+      // `migrate:fresh` runs unconditionally regardless of reuse, so
+      // that combination wiped a developer's real accounts. Forcing
+      // `false` means a `pnpm test:e2e` run with a dev server already
+      // on :8000 fails loudly (port already in use) instead of
+      // quietly running — and possibly resetting — the wrong database.
+      reuseExistingServer: false,
       timeout: 60_000,
       env: {
         APP_ENV: 'local',
         CACHE_STORE: 'database',
         TEST_HELPERS_TOKEN,
+        // Isolation from the developer's real dev database — see the
+        // top-of-file docblock const and `playwright/global-setup.ts`.
+        // NEVER remove this override.
+        DB_DATABASE: E2E_DB_DATABASE,
       },
       ignoreHTTPSErrors: true,
     },
