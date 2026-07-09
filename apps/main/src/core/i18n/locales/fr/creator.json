@@ -136,6 +136,7 @@
             "skipped_explanation": "La signature du contrat n'est pas requise pour le moment — veuillez accepter les conditions d'acceptation rapide ci-dessous.",
             "click_through_label": "J'ai lu et j'accepte ces conditions.",
             "click_through_help": "Lisez l'accord ci-dessus, puis cochez la case pour continuer.",
+            "click_through_scroll_hint": "Faites défiler jusqu'en bas de l'accord pour continuer.",
             "terms_version": "Accord-cadre du créateur v{version}",
             "current_status": "Statut :",
             "begin_button": "Ouvrir l'accord pour signer",

@@ -71,6 +71,39 @@ describe('ClickThroughAccept', () => {
     expect(button.attributes('disabled')).toBeDefined()
   })
 
+  it('gates the acceptance checkbox until the terms are scrolled to the end', async () => {
+    vi.mocked(onboardingApi.getContractTerms).mockResolvedValue({
+      data: { html: '<p>terms</p>', version: '1.0', locale: 'en' },
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(ClickThroughAccept, {
+      initialRoute: { path: '/onboarding/contract' },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    const region = wrapper.find('[data-testid="click-through-terms"]')
+    const el = region.element as HTMLElement
+    // Simulate content taller than the scroll region, not yet scrolled.
+    Object.defineProperty(el, 'scrollHeight', { configurable: true, value: 1000 })
+    Object.defineProperty(el, 'clientHeight', { configurable: true, value: 360 })
+    el.scrollTop = 0
+    await region.trigger('scroll')
+    await flushPromises()
+
+    expect(wrapper.find('input[type="checkbox"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.find('#click-through-help').text()).toContain(
+      'Scroll to the bottom of the agreement',
+    )
+
+    // Scroll to the bottom → the gate opens and the checkbox becomes usable.
+    el.scrollTop = 640
+    await region.trigger('scroll')
+    await flushPromises()
+
+    expect(wrapper.find('input[type="checkbox"]').attributes('disabled')).toBeUndefined()
+  })
+
   it('calls clickThroughAcceptContract on submit and emits accepted', async () => {
     vi.mocked(onboardingApi.getContractTerms).mockResolvedValue({
       data: { html: '<p>terms</p>', version: '1.0', locale: 'en' },

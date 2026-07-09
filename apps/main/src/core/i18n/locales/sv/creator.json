@@ -136,6 +136,7 @@
             "skipped_explanation": "Kontraktssignering krävs inte för tillfället — acceptera klick-igenom-villkoren nedan.",
             "click_through_label": "Jag har läst och accepterat dessa villkor.",
             "click_through_help": "Läs avtalet ovan och kryssa sedan i rutan för att fortsätta.",
+            "click_through_scroll_hint": "Skrolla längst ner i avtalet för att fortsätta.",
             "terms_version": "Master Creator Agreement v{version}",
             "current_status": "Status:",
             "begin_button": "Öppna avtal för signering",

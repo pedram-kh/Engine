@@ -136,6 +136,7 @@
             "skipped_explanation": "A assinatura do contrato não é necessária neste momento — por favor aceite os termos abaixo.",
             "click_through_label": "Li e aceito estes termos.",
             "click_through_help": "Leia o contrato acima e marque a caixa para continuar.",
+            "click_through_scroll_hint": "Desloque-se até ao fim do contrato para continuar.",
             "terms_version": "Acordo-mestre do criador v{version}",
             "current_status": "Estado:",
             "begin_button": "Abrir o contrato para assinar",

@@ -136,6 +136,7 @@
             "skipped_explanation": "Kontraktunderskrivelse er ikke påkrævet på nuværende tidspunkt — acceptér click-through-vilkårene nedenfor.",
             "click_through_label": "Jeg har læst og accepterer disse vilkår.",
             "click_through_help": "Læs aftalen ovenfor, og sæt derefter flueben for at fortsætte.",
+            "click_through_scroll_hint": "Rul til bunden af aftalen for at fortsætte.",
             "terms_version": "Master Creator-aftale v{version}",
             "current_status": "Status:",
             "begin_button": "Åbn aftale til underskrivelse",

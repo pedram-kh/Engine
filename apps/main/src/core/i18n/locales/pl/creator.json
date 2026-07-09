@@ -136,6 +136,7 @@
             "skipped_explanation": "Podpisanie umowy nie jest teraz wymagane — zaakceptuj poniższe warunki kliknięciem.",
             "click_through_label": "Przeczytałem/am i akceptuję te warunki.",
             "click_through_help": "Przeczytaj powyższą umowę, a następnie zaznacz pole, aby kontynuować.",
+            "click_through_scroll_hint": "Przewiń na dół umowy, aby kontynuować.",
             "terms_version": "Umowa Ramowa Twórcy v{version}",
             "current_status": "Status:",
             "begin_button": "Otwórz umowę do podpisania",

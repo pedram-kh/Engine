@@ -136,6 +136,7 @@
             "skipped_explanation": "Contractondertekening is momenteel niet vereist — accepteer hieronder de click-through voorwaarden.",
             "click_through_label": "Ik heb deze voorwaarden gelezen en accepteer ze.",
             "click_through_help": "Lees de overeenkomst hierboven en vink het vakje aan om verder te gaan.",
+            "click_through_scroll_hint": "Scroll naar het einde van de overeenkomst om verder te gaan.",
             "terms_version": "Master Creator-overeenkomst v{version}",
             "current_status": "Status:",
             "begin_button": "Overeenkomst openen om te ondertekenen",

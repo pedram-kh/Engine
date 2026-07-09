@@ -36,7 +36,7 @@
 
 import { ApiError } from '@catalyst/api-client'
 import type { ContractTermsResource } from '@catalyst/api-client'
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { onboardingApi } from '../api/onboarding.api'
@@ -54,6 +54,37 @@ const isLoading = ref(false)
 const accepted = ref(false)
 const submitErrorKey = ref<string | null>(null)
 const loadErrorKey = ref<string | null>(null)
+
+const termsRef = ref<HTMLElement | null>(null)
+const reachedEnd = ref(false)
+
+// px tolerance so sub-pixel layout / browser-zoom rounding still registers as
+// "scrolled to the end" rather than leaving the gate one pixel short.
+const SCROLL_END_THRESHOLD = 4
+
+// The click-through is a legal attestation ("I have read and accept these
+// terms"), so the acceptance checkbox stays disabled until the creator has
+// actually scrolled the agreement to the end. If the content is short enough
+// not to overflow the region, there is nothing to scroll — satisfy the gate
+// immediately rather than stranding them behind a permanently-disabled box.
+function evaluateScrollState(): void {
+  const el = termsRef.value
+  if (el === null) {
+    return
+  }
+  const overflow = el.scrollHeight - el.clientHeight
+  if (overflow <= SCROLL_END_THRESHOLD) {
+    reachedEnd.value = true
+    return
+  }
+  reachedEnd.value = el.scrollTop + el.clientHeight >= el.scrollHeight - SCROLL_END_THRESHOLD
+}
+
+const helpTextKey = computed(() =>
+  reachedEnd.value
+    ? 'creator.ui.wizard.steps.contract.click_through_help'
+    : 'creator.ui.wizard.steps.contract.click_through_scroll_hint',
+)
 
 const isSubmitDisabled = computed(
   () => !accepted.value || terms.value === null || store.isLoadingClickThrough,
@@ -81,6 +112,9 @@ async function loadTerms(): Promise<void> {
     const response = await onboardingApi.getContractTerms()
     terms.value = response.data
     void locale // referenced so a future locale-aware fetch sees the dep
+    reachedEnd.value = false
+    await nextTick()
+    evaluateScrollState()
   } catch (error) {
     loadErrorKey.value =
       error instanceof ApiError
@@ -141,6 +175,7 @@ onMounted(() => {
       :aria-label="t('creator.ui.wizard.steps.contract.title')"
       :aria-busy="isLoading"
       data-testid="click-through-terms"
+      @scroll="evaluateScrollState"
       v-html="terms?.html ?? ''"
     ></div>
 
@@ -154,13 +189,14 @@ onMounted(() => {
 
     <v-checkbox
       v-model="accepted"
+      :disabled="!reachedEnd"
       :label="t('creator.ui.wizard.steps.contract.click_through_label')"
       data-testid="click-through-checkbox"
       hide-details
     />
 
     <p id="click-through-help" class="click-through-accept__help">
-      {{ t('creator.ui.wizard.steps.contract.click_through_help') }}
+      {{ t(helpTextKey) }}
     </p>
 
     <div

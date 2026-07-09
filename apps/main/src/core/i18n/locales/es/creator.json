@@ -136,6 +136,7 @@
             "skipped_explanation": "La firma del contrato no es obligatoria en este momento; acepta las condiciones de aceptación rápida de abajo.",
             "click_through_label": "He leído y acepto estas condiciones.",
             "click_through_help": "Lee el acuerdo de arriba y marca la casilla para continuar.",
+            "click_through_scroll_hint": "Desplázate hasta el final del acuerdo para continuar.",
             "terms_version": "Acuerdo Marco de Creador v{version}",
             "current_status": "Estado:",
             "begin_button": "Abrir el acuerdo para firmar",

@@ -136,6 +136,7 @@
             "skipped_explanation": "La firma del contratto non è richiesta in questo momento — accetta i termini di seguito.",
             "click_through_label": "Ho letto e accetto questi termini.",
             "click_through_help": "Leggi il contratto qui sopra e seleziona la casella per continuare.",
+            "click_through_scroll_hint": "Scorri fino in fondo al contratto per continuare.",
             "terms_version": "Contratto master del creator v{version}",
             "current_status": "Stato:",
             "begin_button": "Apri il contratto per firmare",

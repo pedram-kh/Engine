@@ -136,6 +136,7 @@
             "skipped_explanation": "Podpis pogodbe nyní není povinný — přijměte níže podmínky kliknutím.",
             "click_through_label": "Přečetl/a jsem a přijímám tyto podmínky.",
             "click_through_help": "Přečtěte si výše uvedenou smlouvu a zaškrtnutím políčka pokračujte.",
+            "click_through_scroll_hint": "Pomaknite se na dno pogodbe za nadaljevanje.",
             "terms_version": "Rámcová pogodba ustvarjalca v{version}",
             "current_status": "Stanje:",
             "begin_button": "Otevřít smlouvu k podpisu",

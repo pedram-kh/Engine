@@ -136,6 +136,7 @@
             "skipped_explanation": "Die Vertragsunterzeichnung ist derzeit nicht erforderlich — bitte akzeptiere unten die Click-Through-Bedingungen.",
             "click_through_label": "Ich habe diese Bedingungen gelesen und akzeptiere sie.",
             "click_through_help": "Lese die Vereinbarung oben und setze dann das Häkchen, um fortzufahren.",
+            "click_through_scroll_hint": "Scrolle bis zum Ende der Vereinbarung, um fortzufahren.",
             "terms_version": "Master-Creator-Vereinbarung v{version}",
             "current_status": "Status:",
             "begin_button": "Vereinbarung zum Unterzeichnen öffnen",
