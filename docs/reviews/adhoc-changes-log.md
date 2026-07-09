@@ -64,6 +64,66 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-026 · Onboarding floor + score reweight + wizard % display
+
+- **Status:** Landed
+- **Date:** 2026-07-09
+- **Why:** Region wasn't in the profile floor (so a creator could reach submit and only then
+  discover it was missing), optional profile fields earned nothing (the completeness meter didn't
+  move as they filled bio/accent/contact), and the wizard chrome showed only "Step X of N" — never
+  the completeness % that agencies actually see on discovery.
+- **What:** Six-field profile floor (region joined `display_name`/`country`/`primary_language`/
+  `categories`/`avatar`), mirrored 1:1 FE↔BE. The profile unit's 25 points split into an
+  all-or-nothing **floor (13)** + per-optional **credit (12)**: bio 4, accent 2, phone 2, whatsapp
+  2, street 1, postal 1 — the gate boolean stays floor-only, the score numerator goes partial
+  (`profileEarned()`). Step-2 forward gate aligned to the full floor. Both wizard chromes + the rail
+  now surface `profile_completeness_score` as a `%` alongside "Step X of N" (static prop threaded
+  past the animation state machines — no competing calculation). Review-step copy rewritten to the
+  explicit two-signal model ("everything required is done; add more to strengthen"). Mandatory fields
+  marked with `*`; bio/accent gained an "Optional" hint. One-shot `creators:recompute-completeness`
+  artisan command (idempotent, `--dry-run`, count summary) for the cohort. New source-scan
+  floor-mirror parity spec pins the six tokens once and asserts both `isProfileComplete` (BE) and
+  `floorMet` (FE) reference exactly that set.
+- **Touched:** `apps/api` (`CompletenessScoreCalculator` floor+`profileEarned`, `RecomputeCreatorCompleteness`
+  command + test, calculator/endpoint/flag-off/reopen fixtures gain region+optionals), `apps/main`
+  (`ProfileBasicsForm` floor+required markers, `Step2ProfileBasicsPage` full-floor gate,
+  `CreatorProfilePage`, both `AnimatedWizardChrome*` + `OnboardingProgress` + `OnboardingLayout` %
+  display, `Step9ReviewPage` two-signal copy + submit-ready colour re-key, `WelcomeBackPage` docblock,
+  floor-mirror parity spec, FE specs, Playwright happy-path region fill), 25 locale files (i18n
+  done-gate, parity green).
+- **Decisions:**
+  - **D1/D2 (floor):** region is a floor field on both sides (FE trimmed-non-empty; BE `!== null`,
+    and the SPA already maps empty→null so the two agree). Validation requests stay
+    `sometimes|nullable` — the floor gates, validation doesn't, so partial saves keep working.
+  - **D3 (backfill-on-next-edit, no grandfather clause):** a `pending`/`rejected` creator with
+    `region = null` hard-blocks on their next profile edit until region is filled (deliberate forced
+    backfill — one field, self-healing, the block always names the fillable field). Approved creators
+    stay soft-warn (unchanged). No creator is permanently stranded.
+  - **D4 (gate/score separation):** `stepCompletion['profile']` stays floor-only; the score awards
+    partial optional credit. **Q2 = award-regardless:** optional credit is granted independently of
+    floor state (the meter must never lie by refusing to move). Denominator, hidden-step exclusion,
+    and every other unit's ratio are untouched — a fully-complete creator still scores 100, pinned by
+    the sum-to-25 sub-split assertion + the sum-to-100 weights pin.
+  - **Q1 (WelcomeBack drift, accepted):** under D4, `score > 0` now means "any engagement, including
+    optionals" — a creator who typed only a bio gets "Welcome back / resume", which is the correct
+    experience. Docblock updated; the alternative (re-deriving first-time-ness from structural
+    signals) was rejected as fragile.
+  - **Q3 (durable parity):** source-scan spec pins the six floor tokens once; both sides must contain
+    exactly that set — a legitimate floor change is a one-line fixture edit, a silent one-sided edit
+    is a red. Break-revert verified both directions.
+  - **Sub-100-submit sweep (negative):** no gate anywhere reads the completeness score; the review
+    submit gate is `incompleteSteps.length === 0`. The `Step9ReviewPage` bar colour was re-keyed from
+    `score >= 100` to submit-readiness so "success" tracks done-ness, not perfection. Dashboard bar
+    left as-is (genuinely just a progress bar). Recorded in `tech-debt.md`.
+  - **D7/D8:** submit-gate unit membership (social ≥1, portfolio ≥1, contract) and the admin
+    approval path are untouched — approval is never gated on completeness (the existing recorded
+    decision, now reinforced in `tech-debt.md`).
+- **Post-deploy step (D5):** after this ships, run `php artisan creators:recompute-completeness` once
+  (optionally `--dry-run` first) so every existing creator's persisted `profile_completeness_score`
+  moves to the new formula. Idempotent — safe to re-run; a second run reports 0 changes. Recorded as
+  an operational obligation in `tech-debt.md` (there is no scheduled recompute).
+- **Ref:** AH-026 feat+docs pair (push HELD).
+
 ### AH-025 · Production admin bootstrap command (admin:create)
 
 - **Status:** Landed

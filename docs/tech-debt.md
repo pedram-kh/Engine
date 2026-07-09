@@ -9,6 +9,28 @@ anyone reviewing it later.
 
 ---
 
+## Completeness-formula changes need a manual `creators:recompute-completeness` run (no scheduled/automatic recompute)
+
+- **Where:** [`apps/api/app/Console/Commands/RecomputeCreatorCompleteness.php`](../apps/api/app/Console/Commands/RecomputeCreatorCompleteness.php) (`creators:recompute-completeness`) + the denormalised `creators.profile_completeness_score` column it maintains, agency-visible on discovery.
+- **What we accepted (AH-026, July 9, 2026):** `profile_completeness_score` is persisted, not computed on read. The live write paths (`CreatorWizardService::refreshCompleteness()` and the avatar/portfolio/esign callers of `score()`) keep an individual creator's stored score fresh as they edit — but a change to the **formula itself** (like AH-026's region floor + D4 optional credit) leaves every un-touched row stale until an operator runs the one-shot command. There is no scheduler, no migration hook, and no drift-detector; the recompute is a **documented, manual post-deploy step** by deliberate design (the formula lives in app code, so the recompute belongs to the app, not the schema).
+- **Trigger:** the next change to `CompletenessScoreCalculator`'s weights, floor, or optional-credit split — at which point the same post-deploy run is required again.
+- **Resolution:** none required while formula changes are rare and shipped through the loop (the runbook step + the idempotency test are the controls). If formula churn increases, promote to a deploy-pipeline step or a scheduled reconciliation command.
+- **Owner:** whoever ships the next completeness-formula change (must re-run the command post-deploy).
+- **Status:** recorded operational obligation. Surfaced by AH-026, July 9, 2026 ([ad-hoc log](reviews/adhoc-changes-log.md)).
+
+---
+
+## `creators.region` column width (160) exceeds its validation cap (120)
+
+- **Where:** the `region` column ([`create_creators_table`](../apps/api/database/migrations), `string('region', 160)`) vs its request cap `max:120` (`UpdateProfileRequest` / `AdminUpdateCreatorRequest`).
+- **What we accepted (AH-026, July 9, 2026):** region joined the six-field profile floor (D1), which drew attention to a pre-existing width-vs-validation gap — the column is 160 chars, validation caps at 120. Same cosmetic class AH-023 logged for `users.last_name`; validation is the effective bound, so no bad data can land, but the schema over-provisions.
+- **Trigger:** a schema-tidy pass, or the next migration that touches the `creators` table for unrelated reasons.
+- **Resolution:** align the column to `string('region', 120)` (or lift the validation cap to 160 if a longer region name is wanted) in a future migration — not worth a standalone migration now.
+- **Owner:** the next `creators`-table schema pass.
+- **Status:** open (cosmetic). Surfaced by AH-026, July 9, 2026 ([ad-hoc log](reviews/adhoc-changes-log.md)).
+
+---
+
 ## Backend-minted email URL ↔ SPA registered route has no parity test (two strikes: verify-email, reset-password)
 
 - **Where:** the backend URL-minting services (`EmailVerificationService` / `PasswordResetService::buildResetUrl()` and any future emailed-link minters in [`apps/api/app/Modules/Identity`](../apps/api/app/Modules/Identity)) vs the SPA route registrations ([`apps/main/src/modules/auth/routes.ts`](../apps/main/src/modules/auth/routes.ts)).
@@ -58,6 +80,7 @@ anyone reviewing it later.
 - **Where:** the admin creator review queue ([`apps/admin/src/modules/creators`](../apps/admin/src/modules/creators)) — the `profile_completeness_score` column + the approve action — and the wizard write paths that recompute that score (`CreatorWizardService`, `PATCH /creators/me/wizard/profile` + the social / portfolio writes).
 - **The decision (so it isn't re-litigated as a bug):** A creator in `application_status = pending` can sit **below 100% completeness**. After submission a creator can still edit — e.g. via the AH-009 `/creator/profile` page they may clear an optional field or remove a social / portfolio item — and `profile_completeness_score` recomputes downward while `application_status` does **not** change (the writes never touch status; only `submit()` does). That is **intentional, not a defect:** approval is **admin judgment, not a completeness gate**. The completeness column surfaces the signal; the admin either approves anyway, or rejects-with-reason naming what's missing. **Do NOT add a completeness gate (a "must be 100%") to the approve action.**
 - **Why this is recorded here:** AH-009 made post-submission editing a first-class surface, so the "incomplete creator in the pending queue" state is now reachable in normal use and will look surprising to someone who assumes pending ⇒ complete. The AH-009 page-edge floor already guards the _silent_ part of the regression (pending/rejected hard-block on profile basics; approved soft-warn because `profile_completeness_score` is agency-visible on discovery) — but it deliberately neither freezes the score nor blocks admin approval. The page-edge floor + the admin's judgment are the two controls by design; a server-side approve-time completeness gate is explicitly **out**.
+- **AH-026 reinforcement (July 9, 2026):** the D4 optional-field score credit makes "submit-ready but below 100%" the **normal** case, not an edge — a creator who meets every gate (floor + social + portfolio + contract) but fills no optional profile field now submits at ~82%. The mandated sub-100-submit sweep confirmed **no gate anywhere reads the score** (the review submit gate is `incompleteSteps.length === 0`, step-boolean based), and the AH-026 review copy makes the two-signal model explicit so a creator at 82% never wonders whether they can submit. This entry's "do NOT gate approval/submit on 100%" posture is therefore now load-bearing, not hypothetical.
 - **Trigger:** none. **Owner:** none. **Status:** recorded decision — needs no work; it exists solely to prevent a future "fix." (Distinct from the real, separately-logged deferral: the wizard write endpoints carry no `application_status` guard — defence-in-depth deferred, noted in the AH-009 ad-hoc log. That is about _who may call the write_, not about _gating approval on completeness_.)
 
 ---

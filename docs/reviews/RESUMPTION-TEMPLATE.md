@@ -104,17 +104,18 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-08 · **Through:** AH-025 (ad-hoc run) · **HEAD:** `10ac480` (closure
-commit; the AH-018–025 docs commit sits one atop it — push HELD, both unpushed at close)
+**Last updated:** 2026-07-09 · **Through:** AH-026 (ad-hoc run) · **HEAD:** `10ac480` (the AH-018–025
+batch is committed atop it — push HELD; **AH-026 is built but its feat+docs pair is not yet committed**
+— uncommitted at this refresh, push still HELD)
 
 ### Delivered
 
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-025 — all Landed** (AH-001–017 pushed; the AH-018–025 batch is
-  committed with **push HELD**). One line each (detail + decisions in
-  `docs/reviews/adhoc-changes-log.md`):
+- **Ad-hoc run AH-001 → AH-026 — all Landed** (AH-001–017 pushed; the AH-018–025 batch is
+  committed with **push HELD**; **AH-026 built, feat+docs pair not yet committed**). One line each
+  (detail + decisions in `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.
   - **AH-003** — Wizard slim + profile-basics polish.
@@ -141,6 +142,12 @@ commit; the AH-018–025 docs commit sits one atop it — push HELD, both unpush
   - **AH-023** — Surname at sign-up + account-creation details on three surfaces.
   - **AH-024** — Reset-password route moved to match the emailed link.
   - **AH-025** — Production admin bootstrap command (`admin:create`).
+  - **AH-026** — Onboarding floor + score reweight + wizard % display: region joins the six-field
+    profile floor (1:1 FE↔BE, source-scan parity spec); profile unit's 25 pts split floor 13 +
+    per-optional credit 12 (gate boolean stays floor-only, score numerator partial via
+    `profileEarned()`); both wizard chromes + rail show the `%` alongside "Step X of N"; review
+    two-signal copy; `creators:recompute-completeness` one-shot command. **Post-deploy:** run
+    `php artisan creators:recompute-completeness` once (idempotent).
 
 ### Load-bearing invariants (do not regress)
 
@@ -160,6 +167,13 @@ commit; the AH-018–025 docs commit sits one atop it — push HELD, both unpush
   ≥1-message threads.
 - **Campaign messaging is untouched** by the relationship-messaging work. AH-014 changed only
   `ChatPanel` **presentation** — no campaign data/behavior/gate change. Keep the spine separate.
+- **Profile floor is a 1:1 FE↔BE mirror** (AH-026). The six floor fields (`display_name`,
+  `country_code`, `region`, `primary_language`, `categories`, `avatar_path`) live in BE
+  `isProfileComplete()` and FE `floorMet` and are pinned by a **source-scan parity spec**
+  (`floor-mirror-parity.spec.ts`) that lists the tokens once — a one-sided floor edit is a red.
+  **Gate/score separation:** the profile gate boolean is floor-only; the score awards partial
+  optional credit (`profileEarned()`), so submit-ready-but-<100% is normal. **No gate reads the
+  score** — the submit gate is `incompleteSteps.length === 0`.
 
 ### Open threads
 
@@ -173,4 +187,8 @@ commit; the AH-018–025 docs commit sits one atop it — push HELD, both unpush
   - **Attachment-orphan sweep** — an upload-then-abandon leaves an empty thread row + orphaned S3
     object; D2 hides it from inboxes but does not clean it up. Deferred to an S3-hygiene sweep.
   - **Pending-incomplete-is-intentional** — a recorded decision (needs no work); it exists to prevent
-    a future "fix" of intended behavior.
+    a future "fix" of intended behavior. AH-026 reinforced it: with per-optional score credit,
+    submit-ready-but-<100% is now the normal case, not an edge.
+  - **Completeness-formula recompute is manual** (AH-026) — a formula change leaves un-touched rows
+    stale until an operator runs `creators:recompute-completeness`. No scheduler; it's a documented
+    post-deploy step. Re-run it on the next weights/floor/split change.
