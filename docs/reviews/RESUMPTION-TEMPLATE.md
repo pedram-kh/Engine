@@ -104,19 +104,19 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-09 · **Through:** AH-027 (ad-hoc run) · **HEAD:** `ffe4ab9` (AH-027 feat;
-the AH-018–025 batch + AH-026 (`a23623a` feat + `9929db8` docs) + AH-027 (`ffe4ab9` feat) are all
-committed atop the last push — the docs commit that logs AH-027 / closes the AH-026 review / prunes
-Live Status / refreshes this template sits **atop `ffe4ab9`**; **push still HELD** across the whole
-range)
+**Last updated:** 2026-07-09 · **Through:** AH-028 (ad-hoc run) · **HEAD:** `ddeed88` (AH-028
+closure; AH-018–025 + AH-026 (`a23623a` feat + `9929db8` docs) + AH-027 (`ffe4ab9` feat + `d87c96f`
+docs) + a docs-only ops runbook (`12a7ef5`, not an AH entry — see Delivered note) + AH-028
+(`9fce489` feat + `ddeed88` closure) are all committed atop the last push — the docs commit that
+logs AH-028 sits **atop `ddeed88`**; **push still HELD** across the whole range)
 
 ### Delivered
 
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-027 — all Landed** (AH-001–017 pushed; the AH-018–025 batch, AH-026,
-  and AH-027 are all committed with **push HELD**). One line each
+- **Ad-hoc run AH-001 → AH-028 — all Landed** (AH-001–017 pushed; the AH-018–025 batch, AH-026,
+  AH-027, and AH-028 are all committed with **push HELD**). One line each
   (detail + decisions in `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.
@@ -154,6 +154,17 @@ range)
     already-on-the-wire `profile_completeness_score` as a `%` bar on `DiscoverProfilePage`; no BE /
     resource / gate / formula change (`app.discover.detail.completeness` × 24 locales, parity green).
     Rode the AH-026 session by go-ahead but logged as a separate entry (separate surface).
+  - **AH-028** — Scroll-to-end gate on the click-through master agreement: the acceptance checkbox
+    disables until the terms region is scrolled to the bottom (zoom-tolerant, auto-satisfies on
+    non-overflowing content — branch spec-pinned); client-side only, backend/accept-endpoint
+    unaware. One additive i18n key (`click_through_scroll_hint`) initially shipped with 10 locales
+    on English fallback (AH-001 debt class) — fixed with an MT baseline in the closure commit; the
+    Playwright happy-path now genuinely scrolls the terms region (the real markdown overflows it).
+
+  > **Not an AH entry:** `docs/runbooks/production-queue-worker.md` (`12a7ef5`) landed this session
+  > as a docs-only ops runbook (supervisord/systemd config + the `queue:restart` deploy hook,
+  > written after the live stuck-at-Processing portfolio incident). It's an operational reference,
+  > not an app change — no AH log entry.
 
 ### Load-bearing invariants (do not regress)
 
@@ -187,12 +198,14 @@ range)
   Live Status pointer in the ad-hoc log).
 - **Sprint 10 (Payments/Escrow)** — **blocked on Stripe Connect production approval**; the
   `payment_released` automation is wired but inert until then. Tracked in `tech-debt.md`.
-- **Pending post-deploy operational step (AH-026 D5)** — when the AH-026/027 range ships, run
-  `php artisan creators:recompute-completeness` **once** (optionally `--dry-run` first) so every
-  existing creator's persisted `profile_completeness_score` moves to the new formula (region floor +
-  D4 optional credit). Idempotent — safe to re-run; a second run reports 0 changes. There is **no
-  scheduler**, so this must not be forgotten at the next deploy. (Also logged as a standing tech-debt
-  obligation below.)
+- **Pending post-deploy operational step (AH-026 D5) — still pending, carry forward.** When the
+  AH-026→028 range ships, run `php artisan creators:recompute-completeness` **once** (optionally
+  `--dry-run` first) so every existing creator's persisted `profile_completeness_score` moves to the
+  new formula (region floor + D4 optional credit). Idempotent — safe to re-run; a second run reports
+  0 changes. There is **no scheduler**, so this must not be forgotten at the next deploy. The new
+  `docs/runbooks/production-queue-worker.md` (`12a7ef5`) cross-links this step so a deploy checklist
+  finds both operational obligations in one place. (Also logged as a standing tech-debt obligation
+  below.)
 - **Key tech-debt pointers** (full detail in `tech-debt.md`):
   - **AH-001 i18n completeness** — English fragments inside translated values in ~10 locales; parity
     is structurally blind to it (per-market human QA is a go-live gate, not a merge gate).

@@ -60,6 +60,31 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-028 · Scroll-to-end gate on the click-through master agreement
+
+- **Status:** Landed
+- **Date:** 2026-07-09
+- **Why:** A creator could accept the master agreement without scrolling past the visible fold —
+  a weak attestation for a binding e-sign-equivalent acceptance.
+- **What:** The acceptance checkbox disables until the terms region is scrolled to within 4px of
+  the bottom (`SCROLL_END_THRESHOLD`, zoom-tolerant); content that doesn't overflow auto-satisfies
+  on mount (a mis-measure can never permanently block onboarding — branch spec-pinned). Help text
+  swaps keys by gate state. Client-side only — the accept endpoint and backend are untouched and
+  unaware.
+- **Touched:** `apps/main` `ClickThroughAccept.vue` + spec, 24× `creator.json`
+  (`click_through_scroll_hint`), parity green. Closure commit also touched
+  `creator-wizard-happy-path.spec.ts` (E2E now genuinely scrolls the terms region — the real
+  master-agreement markdown overflows the region, so the happy-path exercises the actual gate, not
+  the auto-satisfy branch).
+- **Decisions:** shipped as a UI batch despite the one additive i18n key — retroactively accepted
+  exception (parity green, single key), recorded rather than normalized: new keys still flag
+  mid-batch per the mode guidance. The key initially carried English fallback in 10 locales (`bg`,
+  `el`, `et`, `fi`, `ga`, `hu`, `lt`, `lv`, `mt`, `ro` — the AH-001 debt class propagating via the
+  same generation path) — fixed in the closure commit with a machine-translation baseline; the
+  pre-existing neighboring fallbacks in those same files remain AH-001 debt, untouched.
+- **Ref:** `9fce489` (feat) + `ddeed88` (closure: auto-satisfy branch spec, MT fill, Playwright
+  scroll fix) + this docs commit.
+
 ### AH-027 · Creator completeness % on the agency discover detail
 
 - **Status:** Landed
