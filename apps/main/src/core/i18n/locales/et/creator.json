@@ -136,7 +136,7 @@
             "skipped_explanation": "Leping signing is not required at this time — please accept the click-through terms below.",
             "click_through_label": "I have read and accept these terms.",
             "click_through_help": "Read the agreement above, then check the box to continue.",
-            "click_through_scroll_hint": "Scroll to the bottom of the agreement to continue.",
+            "click_through_scroll_hint": "Kerige lepingu lõppu, et jätkata.",
             "terms_version": "Master Looja Agreement v{version}",
             "current_status": "Olek:",
             "begin_button": "Open agreement to sign",

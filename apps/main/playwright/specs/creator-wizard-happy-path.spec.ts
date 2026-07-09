@@ -233,10 +233,25 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     // retry block) — continue with the contract-specific assertions.
     // -----------------------------------------------------------------
     await expect(page.locator('[data-testid="contract-flag-off"]')).toBeVisible()
-    await expect(page.locator('[data-testid="click-through-terms"]')).toBeVisible({
+    const termsRegion = page.locator('[data-testid="click-through-terms"]')
+    await expect(termsRegion).toBeVisible({
       timeout: 10_000,
     })
     await expect(page.locator('[data-testid="click-through-version"]')).toBeVisible()
+
+    // AH-028: the checkbox is disabled until the terms region is scrolled to
+    // the end (a legal-attestation gate, not a rendering artifact) — the real
+    // master-agreement markdown is long enough to overflow the region, so
+    // this is the genuine gated path, not the short-content auto-satisfy
+    // branch (that branch has dedicated Vitest coverage). Scroll the native
+    // element directly: `scrollTop` assignment fires a real 'scroll' event
+    // in Chromium, which the component's handler listens for.
+    const checkbox = page.locator('[data-testid="click-through-checkbox"] input[type="checkbox"]')
+    await expect(checkbox).toBeDisabled()
+    await termsRegion.evaluate((el) => {
+      el.scrollTop = el.scrollHeight
+    })
+    await expect(checkbox).toBeEnabled({ timeout: 5_000 })
 
     // Drill into the nested `<input type="checkbox">` — Vuetify's
     // v-checkbox renders a Vuetify-styled wrapper around the native
@@ -247,7 +262,7 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     // hit on dead space). `check()` on the input itself drives the
     // 'change' event directly so `accepted` flips and the submit
     // button enables.
-    await page.locator('[data-testid="click-through-checkbox"] input[type="checkbox"]').check()
+    await checkbox.check()
     await expect(page.locator('[data-testid="click-through-submit"]')).toBeEnabled({
       timeout: 5_000,
     })

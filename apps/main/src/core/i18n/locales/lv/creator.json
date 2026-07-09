@@ -136,7 +136,7 @@
             "skipped_explanation": "Līgums signing is not required at this time — please accept the click-through terms below.",
             "click_through_label": "I have read and accept these terms.",
             "click_through_help": "Read the agreement above, then check the box to continue.",
-            "click_through_scroll_hint": "Scroll to the bottom of the agreement to continue.",
+            "click_through_scroll_hint": "Ritiniet līdz līguma beigām, lai turpinātu.",
             "terms_version": "Master Radītājs Agreement v{version}",
             "current_status": "Statuss:",
             "begin_button": "Open agreement to sign",

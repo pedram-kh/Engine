@@ -71,6 +71,28 @@ describe('ClickThroughAccept', () => {
     expect(button.attributes('disabled')).toBeDefined()
   })
 
+  it('auto-satisfies the scroll gate on mount when the content does not overflow', async () => {
+    vi.mocked(onboardingApi.getContractTerms).mockResolvedValue({
+      data: { html: '<p>short terms</p>', version: '1.0', locale: 'en' },
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(ClickThroughAccept, {
+      initialRoute: { path: '/onboarding/contract' },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    // jsdom defaults scrollHeight/clientHeight to 0 — no explicit override, so
+    // this pins the REAL no-overflow branch (not a simulated equal-heights
+    // case). Content this short never fires a `scroll` event, so the gate
+    // must open on mount alone — a mis-measured "always overflowing" region
+    // must never permanently strand a creator behind a disabled checkbox.
+    expect(wrapper.find('input[type="checkbox"]').attributes('disabled')).toBeUndefined()
+    expect(wrapper.find('#click-through-help').text()).toContain(
+      'Read the agreement above, then check the box to continue',
+    )
+  })
+
   it('gates the acceptance checkbox until the terms are scrolled to the end', async () => {
     vi.mocked(onboardingApi.getContractTerms).mockResolvedValue({
       data: { html: '<p>terms</p>', version: '1.0', locale: 'en' },

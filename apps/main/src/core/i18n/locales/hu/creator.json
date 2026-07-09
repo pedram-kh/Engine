@@ -136,7 +136,7 @@
             "skipped_explanation": "Szerződés signing is not required at this time — please accept the click-through terms below.",
             "click_through_label": "I have read and accept these terms.",
             "click_through_help": "Read the agreement above, then check the box to continue.",
-            "click_through_scroll_hint": "Scroll to the bottom of the agreement to continue.",
+            "click_through_scroll_hint": "Görgessen a megállapodás végére a folytatáshoz.",
             "terms_version": "Master Alkotó Agreement v{version}",
             "current_status": "Állapot:",
             "begin_button": "Open agreement to sign",
