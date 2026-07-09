@@ -28,7 +28,9 @@
           "completed": "Dokončeno",
           "current": "Aktuální krok",
           "skipped": "Přeskočeno",
-          "pending": "Nezahájeno"
+          "pending": "Nezahájeno",
+          "percent_complete": "{percent}% dovršeno",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Spremi",
@@ -155,7 +157,8 @@
             "completeness": "{percent} % dokončeno",
             "edit_step": "Uredi",
             "submit_button": "Pošalji prijavo",
-            "incomplete_blocker": "Máte 1 neúplný krok: {names}. Klikněte na Uredi pro jeho dokončení před odesláním. | Máte {count} neúplných kroků: {names}. Klikněte na Uredi u každého pro jejich dokončení před odesláním."
+            "incomplete_blocker": "Máte 1 neúplný krok: {names}. Klikněte na Uredi pro jeho dokončení před odesláním. | Máte {count} neúplných kroků: {names}. Klikněte na Uredi u každého pro jejich dokončení před odesláním.",
+            "two_signal_ready": "Vaš je profil {percent}% dovršen — sve što je potrebno za slanje je gotovo. Možete dodati više kako biste ojačali svoj profil."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Odaberi sve",
           "categories_help": "Vyberte kategorie, které nejlépe popisují, co tvoříte.",
           "avatar_required": "Pro dokončení tohoto kroku je vyžadována profilová fotografie.",
-          "step_requirements_hint": "Přidejte profilovou fotografii a alespoň jednu kategorii pro pokračování.",
+          "step_requirements_hint": "Ispunite sva obavezna polja (označena *) za nastavak.",
           "social_handle": "Uživatelské ime",
           "social_handle_hint": "Zadejte pouze své uživatelské ime — bez symbolu {'@'} nebo plné URL profilu.",
           "social_handle_invalid": "Zadejte platné uživatelské ime: 2–30 písmen, číslic, teček, podtržítek nebo pomlček (bez mezer, {'@'} nebo URL).",
@@ -192,7 +195,8 @@
           "legal_name": "Právní ime",
           "tax_id": "Daňové identifikační číslo",
           "address_country": "Země",
-          "address_city": "Město"
+          "address_city": "Město",
+          "optional_prefix": "Neobavezno."
         },
         "categories": {
           "fashion": "Móda",

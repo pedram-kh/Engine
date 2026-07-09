@@ -28,7 +28,9 @@
           "completed": "Pabeigts",
           "current": "Current step",
           "skipped": "Skipped",
-          "pending": "Nēt started"
+          "pending": "Nēt started",
+          "percent_complete": "{percent}% pabeigts",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Saglabāt",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% complete",
             "edit_step": "Rediģēt",
             "submit_button": "Iesniegt application",
-            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Rediģēt to finish it before submitting. | You have {count} incomplete steps: {names}. Click Rediģēt on each to finish them before submitting."
+            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Rediģēt to finish it before submitting. | You have {count} incomplete steps: {names}. Click Rediģēt on each to finish them before submitting.",
+            "two_signal_ready": "Jūsu profils ir pabeigts {percent}% — viss, kas nepieciešams iesniegšanai, ir izdarīts. Varat pievienot vairāk, lai stiprinātu savu profilu."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Atlasīt visu",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",
-          "step_requirements_hint": "Pievienot a profile photo and at least one category to continue.",
+          "step_requirements_hint": "Lai turpinātu, aizpildiet visus obligātos laukus (atzīmētus ar *).",
           "social_handle": "Username",
           "social_handle_hint": "Enter your username only — no {'@'} symbol or full profile URL.",
           "social_handle_invalid": "Enter a valid username: 2–30 letters, numbers, dots, underscores or hyphens (no spaces, {'@'}, or URLs).",
@@ -192,7 +195,8 @@
           "legal_name": "Legal name",
           "tax_id": "Tax ID",
           "address_country": "Country",
-          "address_city": "City"
+          "address_city": "City",
+          "optional_prefix": "Neobligāts."
         },
         "categories": {
           "fashion": "Fashion",

@@ -10,15 +10,17 @@
  *
  *   - the step header,
  *   - the <v-form> wrapper + the "Save and continue" submit button,
- *   - the avatar+category forward-gate (`canContinue`) + the requirements hint,
+ *   - the full-floor forward-gate (`canContinue`) + the requirements hint,
  *   - the post-save navigation to `onboarding.connections`,
  *   - the wizard-mount hydration (onMounted + the guarded re-hydration watch).
  *
- * The forward-gate mirrors the backend's `isProfileComplete` floor (avatar AND
- * ≥1 category — CompletenessScoreCalculator): without it a creator could "Save
- * and continue" with the step still incomplete, leaving them stuck at
- * next_step=profile with 0 score credit for the step. Both readiness signals
- * come from the shared form via its `readiness` emit.
+ * The forward-gate mirrors the backend's `isProfileComplete` floor in FULL
+ * (D2): the shared form's `floorMet` readiness — display_name, country, region,
+ * primary_language, ≥1 category, avatar. Gating on the whole floor (not just
+ * avatar+category) means a creator can't "Save and continue" with a floor
+ * field missing and only discover it at submit; they'd otherwise be bounced
+ * back by next_step=profile. The signal comes from the shared form's
+ * `readiness` emit.
  *
  * Step 2 → next advance: after a successful save the page navigates to the
  * merged "connections" step (`onboarding.connections`). The
@@ -39,16 +41,16 @@ const store = useOnboardingStore()
 
 const formRef = ref<InstanceType<typeof ProfileBasicsForm> | null>(null)
 
-// Readiness mirrored from the shared form. The backend's `isProfileComplete`
-// gate requires an avatar AND ≥1 category; we gate "Save and continue" on the
-// same two so the step is never silently left incomplete.
+// Readiness mirrored from the shared form. "Save and continue" gates on the
+// FULL floor (`floorMet`, D2) so the step is never silently left incomplete —
+// a missing floor field blocks here rather than surfacing only at submit.
 const readiness = ref({ hasAvatar: false, hasCategory: false, floorMet: false })
 function onReadiness(value: { hasAvatar: boolean; hasCategory: boolean; floorMet: boolean }): void {
   readiness.value = value
 }
 
 const isSaving = computed(() => store.isLoadingProfile)
-const canContinue = computed(() => readiness.value.hasAvatar && readiness.value.hasCategory)
+const canContinue = computed(() => readiness.value.floorMet)
 
 async function onSubmit(): Promise<void> {
   // Guard the keyboard-submit path (Enter inside a field) too — the button is

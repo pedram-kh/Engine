@@ -28,7 +28,9 @@
           "completed": "Befejezett",
           "current": "Current step",
           "skipped": "Skipped",
-          "pending": "Nemt started"
+          "pending": "Nemt started",
+          "percent_complete": "{percent}% kész",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Mentés",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% complete",
             "edit_step": "Szerkesztés",
             "submit_button": "Küldés application",
-            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Szerkesztés to finish it before submitting. | You have {count} incomplete steps: {names}. Click Szerkesztés on each to finish them before submitting."
+            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Szerkesztés to finish it before submitting. | You have {count} incomplete steps: {names}. Click Szerkesztés on each to finish them before submitting.",
+            "two_signal_ready": "A profilja {percent}%-ban kész — a beküldéshez szükséges minden megvan. Továbbiakat is hozzáadhat a profilja erősítéséhez."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Az összes kijelölése",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",
-          "step_requirements_hint": "Hozzáadás a profile photo and at least one category to continue.",
+          "step_requirements_hint": "A folytatáshoz töltse ki az összes kötelező mezőt (* jelöléssel).",
           "social_handle": "Username",
           "social_handle_hint": "Enter your username only — no {'@'} symbol or full profile URL.",
           "social_handle_invalid": "Enter a valid username: 2–30 letters, numbers, dots, underscores or hyphens (no spaces, {'@'}, or URLs).",
@@ -192,7 +195,8 @@
           "legal_name": "Legal name",
           "tax_id": "Tax ID",
           "address_country": "Country",
-          "address_city": "City"
+          "address_city": "City",
+          "optional_prefix": "Nem kötelező."
         },
         "categories": {
           "fashion": "Fashion",

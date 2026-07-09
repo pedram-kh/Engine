@@ -37,9 +37,10 @@ interface SeedOptions {
 }
 
 /**
- * A complete, floor-MEETING creator by default (display_name + country +
- * primary_language + ≥1 category + avatar). Individual tests drop fields via
- * `attrs` or counts via `socials`/`portfolio`.
+ * A complete, floor-MEETING creator by default — the six-field floor
+ * (display_name + country + region + primary_language + ≥1 category + avatar,
+ * D1). Individual tests drop fields via `attrs` or counts via
+ * `socials`/`portfolio`.
  */
 function makeBootstrap(options: SeedOptions = {}): never {
   const { status = 'pending', attrs = {}, socials = 1, portfolio = 1 } = options
@@ -51,7 +52,7 @@ function makeBootstrap(options: SeedOptions = {}): never {
         display_name: 'Existing Name',
         bio: null,
         country_code: 'IT',
-        region: null,
+        region: 'Lazio',
         phone: null,
         whatsapp: null,
         address_street: null,
@@ -165,6 +166,24 @@ describe('CreatorProfilePage — completeness floor', () => {
     await wrapper.find('form').trigger('submit.prevent')
     await flushPromises()
     expect(onboardingApi.updateProfile).not.toHaveBeenCalled()
+  })
+
+  // D3 (backfill-on-next-edit): a pending creator who submitted under the old
+  // rules with region = null now hard-blocks on their next edit until region
+  // is filled — the FE floor gained region (D1) so the block is automatic.
+  it('hard-blocks the save for a pending creator seeded with region = null (D3 backfill)', async () => {
+    const { wrapper } = await mount({ status: 'pending', attrs: { region: null } })
+
+    const saveBtn = wrapper.find('[data-testid="creator-profile-save"]')
+    expect(saveBtn.classes()).toContain('v-btn--disabled')
+    expect(wrapper.find('[data-testid="creator-profile-incomplete-hint"]').exists()).toBe(true)
+
+    // Filling region clears the block (self-healing, one field).
+    await wrapper.find('[data-testid="profile-region"] input').setValue('Lazio')
+    await flushPromises()
+    expect(wrapper.find('[data-testid="creator-profile-save"]').classes()).not.toContain(
+      'v-btn--disabled',
+    )
   })
 
   it('hard-blocks the save for a rejected creator when display_name is cleared', async () => {

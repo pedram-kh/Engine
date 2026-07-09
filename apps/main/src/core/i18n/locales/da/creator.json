@@ -28,7 +28,9 @@
           "completed": "Fuldført",
           "current": "Nuværende trin",
           "skipped": "Sprunget over",
-          "pending": "Ikke startet"
+          "pending": "Ikke startet",
+          "percent_complete": "{percent}% færdig",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Gem",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% fuldført",
             "edit_step": "Rediger",
             "submit_button": "Indsend ansøgning",
-            "incomplete_blocker": "Du har 1 ufuldstændigt trin: {names}. Klik på Rediger for at afslutte det. | Du har {count} ufuldstændige trin: {names}. Klik på Rediger på hvert for at afslutte dem."
+            "incomplete_blocker": "Du har 1 ufuldstændigt trin: {names}. Klik på Rediger for at afslutte det. | Du har {count} ufuldstændige trin: {names}. Klik på Rediger på hvert for at afslutte dem.",
+            "two_signal_ready": "Din profil er {percent}% færdig — alt, der kræves for at indsende, er udført. Du kan tilføje mere for at styrke din profil."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Vælg alle",
           "categories_help": "Vælg de kategorier, der bedst beskriver, hvad du laver.",
           "avatar_required": "Et profilbillede er påkrævet for at afslutte dette trin.",
-          "step_requirements_hint": "Tilføj et profilbillede og mindst én kategori for at fortsætte.",
+          "step_requirements_hint": "Udfyld alle påkrævede felter (markeret med *) for at fortsætte.",
           "social_handle": "Brugernavn",
           "social_handle_hint": "Indtast kun dit brugernavn — intet {'@'}-symbol eller fuld profil-URL.",
           "social_handle_invalid": "Indtast et gyldigt brugernavn: 2–30 bogstaver, tal, punktummer, underscores eller bindestreger (ingen mellemrum, {'@'} eller URL'er).",
@@ -192,7 +195,8 @@
           "legal_name": "Juridisk navn",
           "tax_id": "Skatte-ID",
           "address_country": "Land",
-          "address_city": "By"
+          "address_city": "By",
+          "optional_prefix": "Valgfrit."
         },
         "categories": {
           "fashion": "Mode",

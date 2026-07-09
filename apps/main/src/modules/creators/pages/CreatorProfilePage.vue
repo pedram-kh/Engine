@@ -26,9 +26,16 @@
  *   - Pending / rejected: their profile is still (re-)judged by an admin, so a
  *     cleared required basics field HARD-BLOCKS the save. The gate is
  *     `floorMet` from the shared form, a 1:1 mirror of the backend
- *     `isProfileComplete` (display_name + country + primary_language + ≥1
- *     category + avatar) — so it also covers the avatar-delete-then-save path
- *     (delete avatar → avatar_path null → floorMet false → save blocked).
+ *     `isProfileComplete` — the six-field floor (display_name + country +
+ *     region + primary_language + ≥1 category + avatar) — so it also covers
+ *     the avatar-delete-then-save path (delete avatar → avatar_path null →
+ *     floorMet false → save blocked).
+ *
+ *     D3 (backfill-on-next-edit, no grandfather clause): region joined the
+ *     floor, so a pre-existing pending/rejected creator who submitted under the
+ *     old rules with region = null now hard-blocks on their next profile edit
+ *     until region is filled — a deliberate, self-healing forced backfill of a
+ *     single named field. Approved creators stay soft-warn (below), unchanged.
  *   - Approved: already past the gate, but `profile_completeness_score` is
  *     surfaced to agencies on discovery (CreatorPublicProfileResource), so a
  *     regressing edit is the creator's call — ALLOWED, but SOFT-WARNED, never

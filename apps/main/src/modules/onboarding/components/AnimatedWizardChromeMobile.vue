@@ -43,6 +43,14 @@ const props = defineProps<{
   steps: WizardChromeStep[]
   activeIndex: number
   reducedMotion?: boolean
+  /**
+   * D6 — a pre-formatted "{n}% complete" label (the field-weighted
+   * profile_completeness_score). Rendered as a static caption BELOW the rail
+   * and above the framed panel; it's outside the chip animation entirely. The
+   * SVG frame anchors to `panel.offsetTop`, which already accounts for this
+   * caption's height, so the draw-in geometry stays correct.
+   */
+  completenessLabel?: string
 }>()
 
 const emit = defineEmits<{ (e: 'navigate', routeName: string): void }>()
@@ -59,13 +67,18 @@ const FRAME_RETRACT_MS = 260
 const FRAME_SHOW_DELAY = 360
 
 /* ---- chip geometry (px) ---- */
-/** Parked numbers sit at fixed, index-based slots anchored to the rail edges:
- *  completed at the LEFT, upcoming at the RIGHT. `PARK_STRIDE` is the spacing
- *  between adjacent slots; `EDGE_MARGIN` the inset from the rail edge to the
- *  first slot. The active step is locked to the rail's horizontal centre, so
- *  only the two transitioning steps ever move. */
+/** Completed numbers sit at fixed, index-based slots anchored to the LEFT
+ *  (`slotCentreLeft`): `EDGE_MARGIN` inset + `PARK_STRIDE` apart. The active
+ *  step is locked to the rail's horizontal centre. Upcoming numbers are NOT
+ *  fixed — they distribute EVENLY across the span between the active chip's
+ *  right edge and the fixed % pill (D6), so the gaps active→next→…→% are equal
+ *  (see `positionChips`). `PARK_STRIDE` doubles as the minimum right-side gap
+ *  the title fit reserves for those numbers. */
 const PARK_STRIDE = 23
 const EDGE_MARGIN = 22
+/** The completeness pill's inset from the rail's right edge (mirrors its CSS
+ *  `right`), used to locate its left edge as the upcoming-steps' right anchor. */
+const PILL_RIGHT = 12
 const NUM_HALF = 9
 const PILL_GAP = 8
 const TITLE_FONT_BASE = 18
@@ -151,15 +164,30 @@ function reduced(): boolean {
   return props.reducedMotion === true
 }
 
-/* ---- horizontal layout: fixed, edge-anchored slots ---- */
-/** Centre (px from the rail's left edge) of the k-th completed slot. */
+/* ---- horizontal layout ---- */
+/** Centre (px from the rail's left edge) of the k-th COMPLETED slot. Completed
+ *  numbers keep fixed, left-anchored slots. */
 function slotCentreLeft(k: number): number {
   return EDGE_MARGIN + k * PARK_STRIDE
 }
-/** Centre (px from the rail's left edge) of an upcoming step pinned to the
- *  right, where `fromEnd` is its distance (in steps) from the last step. */
-function slotCentreRight(fromEnd: number, railW: number): number {
-  return railW - EDGE_MARGIN - fromEnd * PARK_STRIDE
+
+/** The right anchor (px from rail left) the upcoming steps distribute up to —
+ *  the fixed % pill's LEFT edge, measured live so the final upcoming→pill gap
+ *  matches the rest. Falls back to the rail's right inset when no pill shows
+ *  (e.g. pre-bootstrap, before the completeness label resolves). */
+function rightAnchor(railW: number): number {
+  const pillW = railEl.value?.querySelector<HTMLElement>('.wizm__completeness')?.offsetWidth ?? 0
+  return pillW > 0 ? railW - PILL_RIGHT - pillW : railW - EDGE_MARGIN
+}
+
+/** Half the active chip's rendered width for a given fitted title width, so the
+ *  upcoming steps can distribute from its right edge. Mirrors the `.chip` box:
+ *  border(1)+padding(3) per side (=8) plus the num↔title gap(6) when a title
+ *  shows. */
+function activeHalfWidth(titleW: number): number {
+  const numW = activeChip()?.querySelector<HTMLElement>('.chip__num')?.offsetWidth ?? 14
+  const boxed = numW + 8 + (titleW > 0 ? 6 + titleW : 0)
+  return boxed / 2
 }
 
 /** Set each chip's centre offset (`--cx`, px from the rail's centre). The
@@ -168,14 +196,27 @@ function slotCentreRight(fromEnd: number, railW: number): number {
  *  parked number never shifts when a different step is selected. */
 function positionChips(): void {
   const railW = railEl.value?.clientWidth ?? 0
+  if (railW === 0) return
   const half = railW / 2
   const n = props.steps.length
+
+  // Upcoming steps distribute EVENLY between the active chip's right edge and
+  // the % pill's left edge, so the gaps active→next→…→pill are equal. The
+  // active width comes from the fitted title (measured here), and the layout is
+  // computed from the SETTLED title width, so the numbers sit at their final
+  // spots while the title types into its reserved space (no reshuffle).
+  const titleW = fitAndMeasureTitle()
+  const endX = rightAnchor(railW)
+  const k = n - 1 - current
+  const activeRight = Math.min(half + activeHalfWidth(titleW), endX - k * PARK_STRIDE)
+  const gap = k > 0 ? (endX - activeRight) / (k + 1) : 0
+
   for (let i = 0; i < n; i++) {
     const el = chipEls.value[i]
     if (!el) continue
     let cx = 0
     if (i < current) cx = slotCentreLeft(i) - half
-    else if (i > current) cx = slotCentreRight(n - 1 - i, railW) - half
+    else if (i > current) cx = activeRight + (i - current) * gap - half
     el.style.setProperty('--cx', `${cx}px`)
     el.style.transition = chipTransition()
   }
@@ -195,15 +236,15 @@ function fitAndMeasureTitle(): number {
   if (!wrap || !span) return 0
   span.style.fontSize = `${TITLE_FONT_BASE}px`
   // The active pill is centred and grows symmetrically, so the room it has is
-  // twice the distance from centre to the nearest parked cluster's inner edge.
+  // twice the distance from centre to the nearest inner edge.
   const railW = railEl.value?.clientWidth ?? 0
   const half = railW / 2
   const n = props.steps.length
+  const k = n - 1 - current
   const leftInner = current > 0 ? slotCentreLeft(current - 1) + NUM_HALF + PILL_GAP : EDGE_MARGIN
-  const rightInner =
-    current < n - 1
-      ? slotCentreRight(n - 1 - (current + 1), railW) - NUM_HALF - PILL_GAP
-      : railW - EDGE_MARGIN
+  // Reserve room on the right for the upcoming numbers (≥ PARK_STRIDE each) and
+  // the % pill, so the active title never eats the span they distribute into.
+  const rightInner = rightAnchor(railW) - k * PARK_STRIDE
   const availHalf = Math.max(40, Math.min(half - leftInner, rightInner - half))
   const maxPill = availHalf * 2
   const numW = activeChip()?.querySelector<HTMLElement>('.chip__num')?.offsetWidth ?? 14
@@ -604,6 +645,15 @@ watch(
           <span class="chip__title">{{ step.title }}</span>
         </span>
       </component>
+
+      <!-- D6: number-only completeness readout, fixed at the rail's right end.
+           The upcoming step numbers distribute evenly up to its left edge (see
+           positionChips). The aurora-gradient border (same accent as the
+           app-bar) fences it off from the step numbers so it never reads as a
+           step. Static: outside the chip animation. -->
+      <span v-if="completenessLabel" class="wizm__completeness" data-test="wizard-completeness">
+        {{ completenessLabel }}
+      </span>
     </nav>
 
     <!-- full-size, scrollable content panel framed by the SVG -->
@@ -675,6 +725,32 @@ watch(
  * antennas shooting up from the active number; restored to solid once settled. */
 .wizm__rail.wizm__rail--clear {
   background: transparent;
+}
+
+/* Same box metrics as a parked step number (.chip: border 1px, 4px vertical
+ * padding, 13px, normal line-height) so the pill's HEIGHT matches the step
+ * frames exactly — only the aurora-gradient border-image (the app-bar accent,
+ * an authored utility var, never a Vuetify theme colour) and the wider
+ * horizontal padding for the "%" differ. `right` mirrors PILL_RIGHT (12). */
+.wizm__completeness {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 7px;
+  border: 1px solid transparent;
+  border-image: var(--brand-aurora-gradient) 1;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: rgb(var(--v-theme-on-surface));
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .chip {

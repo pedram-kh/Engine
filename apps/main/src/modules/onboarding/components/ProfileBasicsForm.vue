@@ -67,6 +67,16 @@ const { t } = useI18n()
 const store = useOnboardingStore()
 
 /**
+ * D9 — append the required-field indicator (asterisk) to a translated label.
+ * The marker is locale-neutral (no translation key), so it needs no locale
+ * files; the asterisk flags every field in the six-field floor so a creator
+ * can tell blocking fields from score-only ones at a glance.
+ */
+function requiredLabel(key: string): string {
+  return `${t(key)} *`
+}
+
+/**
  * Backend field-key union (matches `UpdateProfileRequest::rules()`).
  * The array-of-strings rule (`categories.*`) surfaces from Laravel's
  * validator as keys like `categories.0` — those collapse to the parent
@@ -187,24 +197,29 @@ const submitErrorMessage = computed(() =>
   submitErrorKey.value === null ? null : t(submitErrorKey.value),
 )
 
-// The backend's `isProfileComplete` gate requires an avatar AND at least one
-// category (CompletenessScoreCalculator). Both are surfaced to the host via
-// `readiness` so the wizard can keep its avatar+category forward-gate and the
-// profile page can apply its lifecycle-aware completeness floor. Avatar is
-// persisted via its own immediate upload mutation, so we read it from the
-// store; categories is local form state.
+// `hasAvatar` / `hasCategory` are still surfaced individually (some hosts read
+// them for finer-grained hints), but the forward/floor gate is now the full
+// `floorMet` mirror below. Avatar is persisted via its own immediate upload
+// mutation, so we read it from the store; categories is local form state.
 const hasAvatar = computed(() => store.creator?.attributes.avatar_path != null)
 const hasCategory = computed(() => categories.value.length > 0)
 
 /**
- * Full mirror of the backend `isProfileComplete` gate (display_name, country,
- * primary_language, ≥1 category, avatar). The profile page's hard floor keys
- * off this; the wizard ignores it (it gates on avatar+category only).
+ * Full mirror of the backend `isProfileComplete` gate — the SIX-FIELD FLOOR
+ * (display_name, country, region, primary_language, ≥1 category, avatar).
+ * region joined the floor with D1; it uses trimmed-non-empty here while the BE
+ * uses `!== null` — the field SET is the mirror invariant (pinned by the
+ * floor-mirror parity spec), not the exact operator. Both wizard step 2's
+ * forward gate (D2) and the profile page's hard floor key off this.
+ *
+ * NOTE: the "filled" test for region matches the optional-field `nullableTrim`
+ * rule so BE-earned points and this floor never disagree on whitespace.
  */
 const floorMet = computed(
   () =>
     displayName.value.trim() !== '' &&
     countryCode.value !== null &&
+    (region.value?.trim() ?? '') !== '' &&
     primaryLanguage.value !== null &&
     categories.value.length > 0 &&
     hasAvatar.value,
@@ -327,7 +342,7 @@ defineExpose({ save, hydrate, isPristine })
 
     <v-text-field
       v-model="displayName"
-      :label="t('creator.ui.wizard.fields.display_name')"
+      :label="requiredLabel('creator.ui.wizard.fields.display_name')"
       :hint="t('creator.ui.wizard.fields.display_name_help')"
       persistent-hint
       :counter="60"
@@ -340,7 +355,7 @@ defineExpose({ save, hydrate, isPristine })
     <v-textarea
       v-model="bio"
       :label="t('creator.ui.wizard.fields.bio')"
-      :hint="t('creator.ui.wizard.fields.bio_help')"
+      :hint="`${t('creator.ui.wizard.fields.optional_prefix')} ${t('creator.ui.wizard.fields.bio_help')}`"
       persistent-hint
       rows="4"
       auto-grow
@@ -363,14 +378,14 @@ defineExpose({ save, hydrate, isPristine })
       :items="COUNTRY_OPTIONS"
       item-title="label"
       item-value="code"
-      :label="t('creator.ui.wizard.fields.country')"
+      :label="requiredLabel('creator.ui.wizard.fields.country')"
       :error-messages="fieldErrors.country_code"
       data-testid="profile-country"
     />
 
     <v-text-field
       v-model="region"
-      :label="t('creator.ui.wizard.fields.region')"
+      :label="requiredLabel('creator.ui.wizard.fields.region')"
       :error-messages="fieldErrors.region"
       data-testid="profile-region"
     />
@@ -460,7 +475,7 @@ defineExpose({ save, hydrate, isPristine })
       :items="languageOptions"
       item-title="label"
       item-value="value"
-      :label="t('creator.ui.wizard.fields.primary_language')"
+      :label="requiredLabel('creator.ui.wizard.fields.primary_language')"
       :error-messages="fieldErrors.primary_language"
       data-testid="profile-primary-language"
     />
@@ -476,7 +491,9 @@ defineExpose({ save, hydrate, isPristine })
     />
 
     <fieldset class="profile-basics-form__categories" data-testid="profile-categories">
-      <legend class="text-subtitle-2">{{ t('creator.ui.wizard.fields.categories') }}</legend>
+      <legend class="text-subtitle-2">
+        {{ requiredLabel('creator.ui.wizard.fields.categories') }}
+      </legend>
       <p class="profile-basics-form__categories-note text-caption">
         {{ t('creator.ui.wizard.fields.categories_help') }}
       </p>

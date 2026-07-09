@@ -28,7 +28,9 @@
           "completed": "Concluída",
           "current": "Etapa atual",
           "skipped": "Saltada",
-          "pending": "Não iniciada"
+          "pending": "Não iniciada",
+          "percent_complete": "{percent}% concluído",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Guardar",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% completo",
             "edit_step": "Editar",
             "submit_button": "Submeter candidatura",
-            "incomplete_blocker": "Tem 1 etapa por concluir: {names}. Clique em Editar para a terminar antes de submeter. | Tem {count} etapas por concluir: {names}. Clique em Editar em cada uma para as terminar antes de submeter."
+            "incomplete_blocker": "Tem 1 etapa por concluir: {names}. Clique em Editar para a terminar antes de submeter. | Tem {count} etapas por concluir: {names}. Clique em Editar em cada uma para as terminar antes de submeter.",
+            "two_signal_ready": "O seu perfil está {percent}% concluído — tudo o que é necessário para enviar está feito. Pode adicionar mais para reforçar o seu perfil."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Selecionar tudo",
           "categories_help": "Selecione as categorias que melhor descrevem o que cria.",
           "avatar_required": "É necessária uma foto de perfil para concluir este passo.",
-          "step_requirements_hint": "Adicione uma foto de perfil e pelo menos uma categoria para continuar.",
+          "step_requirements_hint": "Preencha todos os campos obrigatórios (marcados com *) para continuar.",
           "social_handle": "Nome de utilizador",
           "social_handle_hint": "Indique apenas o nome de utilizador — sem o símbolo {'@'} nem o URL completo do perfil.",
           "social_handle_invalid": "Indique um nome de utilizador válido: 2 a 30 letras, números, pontos, sublinhados ou hífenes (sem espaços, {'@'} ou URLs).",
@@ -192,7 +195,8 @@
           "legal_name": "Nome legal",
           "tax_id": "NIF",
           "address_country": "País",
-          "address_city": "Cidade"
+          "address_city": "Cidade",
+          "optional_prefix": "Opcional."
         },
         "categories": {
           "fashion": "Moda",

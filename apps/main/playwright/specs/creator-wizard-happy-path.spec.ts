@@ -162,6 +162,12 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     await page.locator('[data-testid="profile-country"]').click()
     await page.getByRole('option', { name: 'Ireland' }).click()
 
+    // Region joined the six-field floor (AH-026 D1): the Step-2 forward gate
+    // now aligns to the full floor (D2), so without a region the "Save and
+    // continue" button stays disabled and this traversal would stall here.
+    // It's a plain text field.
+    await page.locator('[data-testid="profile-region"]').locator('input').fill('Leinster')
+
     await page.locator('[data-testid="profile-primary-language"]').click()
     await page.getByRole('option', { name: 'English' }).click()
 

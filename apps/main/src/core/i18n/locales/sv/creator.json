@@ -28,7 +28,9 @@
           "completed": "Klart",
           "current": "Aktuellt steg",
           "skipped": "Hoppat över",
-          "pending": "Inte startat"
+          "pending": "Inte startat",
+          "percent_complete": "{percent}% klart",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Spara",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% klart",
             "edit_step": "Redigera",
             "submit_button": "Skicka in ansökan",
-            "incomplete_blocker": "Du har 1 ofullständigt steg: {names}. Klicka på Redigera för att slutföra det innan du skickar in. | Du har {count} ofullständiga steg: {names}. Klicka på Redigera för vart och ett för att slutföra dem innan du skickar in."
+            "incomplete_blocker": "Du har 1 ofullständigt steg: {names}. Klicka på Redigera för att slutföra det innan du skickar in. | Du har {count} ofullständiga steg: {names}. Klicka på Redigera för vart och ett för att slutföra dem innan du skickar in.",
+            "two_signal_ready": "Din profil är {percent}% klar — allt som krävs för att skicka in är gjort. Du kan lägga till mer för att stärka din profil."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Välj alla",
           "categories_help": "Välj de kategorier som bäst beskriver vad du skapar.",
           "avatar_required": "Ett profilfoto krävs för att slutföra det här steget.",
-          "step_requirements_hint": "Lägg till ett profilfoto och minst en kategori för att fortsätta.",
+          "step_requirements_hint": "Fyll i alla obligatoriska fält (markerade med *) för att fortsätta.",
           "social_handle": "Användarnamn",
           "social_handle_hint": "Ange bara ditt användarnamn — inget {'@'-tecken} eller fullständig profil-URL.",
           "social_handle_invalid": "Ange ett giltigt användarnamn: 2–30 bokstäver, siffror, punkter, understreck eller bindestreck (inga mellanslag, {'@'} eller URL:er).",
@@ -192,7 +195,8 @@
           "legal_name": "Juridiskt namn",
           "tax_id": "Skatteidentifikationsnummer",
           "address_country": "Land",
-          "address_city": "Stad"
+          "address_city": "Stad",
+          "optional_prefix": "Valfritt."
         },
         "categories": {
           "fashion": "Mode",

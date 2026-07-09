@@ -28,7 +28,9 @@
           "completed": "Baigta",
           "current": "Current step",
           "skipped": "Skipped",
-          "pending": "Net started"
+          "pending": "Net started",
+          "percent_complete": "{percent}% užbaigta",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Išsaugoti",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% complete",
             "edit_step": "Redaguoti",
             "submit_button": "Pateikti application",
-            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Redaguoti to finish it before submitting. | You have {count} incomplete steps: {names}. Click Redaguoti on each to finish them before submitting."
+            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Redaguoti to finish it before submitting. | You have {count} incomplete steps: {names}. Click Redaguoti on each to finish them before submitting.",
+            "two_signal_ready": "Jūsų profilis užbaigtas {percent}% — viskas, ko reikia pateikimui, atlikta. Galite pridėti daugiau, kad sustiprintumėte savo profilį."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Pasirinkti visus",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",
-          "step_requirements_hint": "Pridėti a profile photo and at least one category to continue.",
+          "step_requirements_hint": "Norėdami tęsti, užpildykite visus privalomus laukus (pažymėtus *).",
           "social_handle": "Username",
           "social_handle_hint": "Enter your username only — no {'@'} symbol or full profile URL.",
           "social_handle_invalid": "Enter a valid username: 2–30 letters, numbers, dots, underscores or hyphens (no spaces, {'@'}, or URLs).",
@@ -192,7 +195,8 @@
           "legal_name": "Legal name",
           "tax_id": "Tax ID",
           "address_country": "Country",
-          "address_city": "City"
+          "address_city": "City",
+          "optional_prefix": "Neprivaloma."
         },
         "categories": {
           "fashion": "Fashion",

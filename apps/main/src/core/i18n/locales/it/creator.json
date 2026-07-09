@@ -28,7 +28,9 @@
           "completed": "Completato",
           "current": "Passaggio corrente",
           "skipped": "Saltato",
-          "pending": "Non iniziato"
+          "pending": "Non iniziato",
+          "percent_complete": "{percent}% completato",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Salva",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% completato",
             "edit_step": "Modifica",
             "submit_button": "Invia candidatura",
-            "incomplete_blocker": "Hai 1 passaggio incompleto: {names}. Clicca Modifica per completarlo prima di inviare. | Hai {count} passaggi incompleti: {names}. Clicca Modifica su ciascuno per completarli prima di inviare."
+            "incomplete_blocker": "Hai 1 passaggio incompleto: {names}. Clicca Modifica per completarlo prima di inviare. | Hai {count} passaggi incompleti: {names}. Clicca Modifica su ciascuno per completarli prima di inviare.",
+            "two_signal_ready": "Il tuo profilo è completo al {percent}% — tutto ciò che serve per l'invio è pronto. Puoi aggiungere altro per rafforzare il tuo profilo."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Seleziona tutto",
           "categories_help": "Scegli le categorie che descrivono meglio quello che crei.",
           "avatar_required": "È necessaria una foto profilo per completare questo passaggio.",
-          "step_requirements_hint": "Aggiungi una foto profilo e almeno una categoria per continuare.",
+          "step_requirements_hint": "Compila tutti i campi obbligatori (contrassegnati con *) per continuare.",
           "social_handle": "Nome utente",
           "social_handle_hint": "Inserisci solo il nome utente — senza il simbolo {'@'} né l'URL completo del profilo.",
           "social_handle_invalid": "Inserisci un nome utente valido: 2-30 lettere, numeri, punti, trattini bassi o trattini (senza spazi, {'@'} o URL).",
@@ -192,7 +195,8 @@
           "legal_name": "Nome legale",
           "tax_id": "Codice fiscale / P. IVA",
           "address_country": "Paese",
-          "address_city": "Città"
+          "address_city": "Città",
+          "optional_prefix": "Facoltativo."
         },
         "categories": {
           "fashion": "Moda",

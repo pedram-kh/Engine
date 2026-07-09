@@ -28,7 +28,9 @@
           "completed": "Finalizat",
           "current": "Current step",
           "skipped": "Skipped",
-          "pending": "Nut started"
+          "pending": "Nut started",
+          "percent_complete": "{percent}% finalizat",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Salvați",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% complete",
             "edit_step": "Editați",
             "submit_button": "Trimiteți application",
-            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Editați to finish it before submitting. | You have {count} incomplete steps: {names}. Click Editați on each to finish them before submitting."
+            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Editați to finish it before submitting. | You have {count} incomplete steps: {names}. Click Editați on each to finish them before submitting.",
+            "two_signal_ready": "Profilul tău este completat {percent}% — tot ce este necesar pentru trimitere este gata. Poți adăuga mai multe pentru a-ți consolida profilul."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Selectează tot",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",
-          "step_requirements_hint": "Adăugați a profile photo and at least one category to continue.",
+          "step_requirements_hint": "Completați toate câmpurile obligatorii (marcate cu *) pentru a continua.",
           "social_handle": "Username",
           "social_handle_hint": "Enter your username only — no {'@'} symbol or full profile URL.",
           "social_handle_invalid": "Enter a valid username: 2–30 letters, numbers, dots, underscores or hyphens (no spaces, {'@'}, or URLs).",
@@ -192,7 +195,8 @@
           "legal_name": "Legal name",
           "tax_id": "Tax ID",
           "address_country": "Country",
-          "address_city": "City"
+          "address_city": "City",
+          "optional_prefix": "Opțional."
         },
         "categories": {
           "fashion": "Fashion",

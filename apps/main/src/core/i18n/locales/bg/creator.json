@@ -28,7 +28,9 @@
           "completed": "Завършен",
           "current": "Current step",
           "skipped": "Skipped",
-          "pending": "Неt started"
+          "pending": "Неt started",
+          "percent_complete": "{percent}% завършено",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Запазете",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% complete",
             "edit_step": "Редактирайте",
             "submit_button": "Изпратете application",
-            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Редактирайте to finish it before submitting. | You have {count} incomplete steps: {names}. Click Редактирайте on each to finish them before submitting."
+            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Редактирайте to finish it before submitting. | You have {count} incomplete steps: {names}. Click Редактирайте on each to finish them before submitting.",
+            "two_signal_ready": "Профилът ви е завършен {percent}% — всичко необходимо за подаване е готово. Можете да добавите още, за да засилите профила си."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Изберете всички",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A prотile photo is required to finish this step.",
-          "step_requirements_hint": "Добавете a prотile photo and at least one category to continue.",
+          "step_requirements_hint": "Попълнете всички задължителни полета (отбелязани с *), за да продължите.",
           "social_handle": "Username",
           "social_handle_hint": "Enter your username only — no {'@'} symbol or full prотile URL.",
           "social_handle_invalid": "Enter a valid username: 2–30 letters, numbers, dots, underscores or hyphens (no spaces, {'@'}, or URLs).",
@@ -192,7 +195,8 @@
           "legal_name": "Legal name",
           "tax_id": "Tax ID",
           "address_country": "Country",
-          "address_city": "City"
+          "address_city": "City",
+          "optional_prefix": "По желание."
         },
         "categories": {
           "fashion": "Fashion",

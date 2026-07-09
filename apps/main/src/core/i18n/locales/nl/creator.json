@@ -28,7 +28,9 @@
           "completed": "Voltooid",
           "current": "Huidige stap",
           "skipped": "Overgeslagen",
-          "pending": "Nog niet gestart"
+          "pending": "Nog niet gestart",
+          "percent_complete": "{percent}% voltooid",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Opslaan",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% volledig",
             "edit_step": "Bewerken",
             "submit_button": "Aanmelding indienen",
-            "incomplete_blocker": "Je hebt 1 onvolledige stap: {names}. Klik op Bewerken om hem af te ronden. | Je hebt {count} onvolledige stappen: {names}. Klik op Bewerken bij elke stap om ze af te ronden."
+            "incomplete_blocker": "Je hebt 1 onvolledige stap: {names}. Klik op Bewerken om hem af te ronden. | Je hebt {count} onvolledige stappen: {names}. Klik op Bewerken bij elke stap om ze af te ronden.",
+            "two_signal_ready": "Je profiel is voor {percent}% compleet — alles wat nodig is om in te dienen is klaar. Je kunt meer toevoegen om je profiel te versterken."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Alles selecteren",
           "categories_help": "Kies de categorieën die het beste beschrijven wat je maakt.",
           "avatar_required": "Een profielfoto is vereist om deze stap te voltooien.",
-          "step_requirements_hint": "Voeg een profielfoto en ten minste één categorie toe om verder te gaan.",
+          "step_requirements_hint": "Vul alle verplichte velden (gemarkeerd met *) in om door te gaan.",
           "social_handle": "Gebruikersnaam",
           "social_handle_hint": "Voer alleen je gebruikersnaam in — geen {'@'}-symbool of volledige profiel-URL.",
           "social_handle_invalid": "Voer een geldige gebruikersnaam in: 2–30 letters, cijfers, punten, underscores of koppeltekens (geen spaties, {'@'} of URL's).",
@@ -192,7 +195,8 @@
           "legal_name": "Wettelijke naam",
           "tax_id": "Belasting-ID",
           "address_country": "Land",
-          "address_city": "Stad"
+          "address_city": "Stad",
+          "optional_prefix": "Optioneel."
         },
         "categories": {
           "fashion": "Mode",

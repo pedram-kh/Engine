@@ -53,7 +53,6 @@ const score = computed(() => store.completenessScore)
 const completenessLabel = computed(() =>
   t('creator.ui.wizard.steps.review.completeness', { percent: score.value }),
 )
-const completenessColor = computed(() => (score.value >= 100 ? 'success' : 'primary'))
 
 /**
  * Sprint 3 stabilization (May 19, 2026): rows now carry their visible
@@ -110,7 +109,18 @@ const stepRows = computed<StepRow[]>(() =>
 )
 
 const incompleteSteps = computed(() => stepRows.value.filter((row) => !row.isComplete))
-const canSubmit = computed(() => incompleteSteps.value.length === 0 && !store.isSubmitted)
+
+/**
+ * Submit-readiness is the STEP-boolean signal (every visible step complete) —
+ * the true "can I submit?" answer. The completeness % is a separate,
+ * motivational signal (D4/D9): a creator can be 100% submit-ready at, say, 82%
+ * because they've skipped optional profile fields. The bar colour tracks
+ * submit-readiness (not perfection) so "success" green never contradicts the
+ * copy telling a submit-ready creator they're done.
+ */
+const submitReady = computed(() => incompleteSteps.value.length === 0)
+const completenessColor = computed(() => (submitReady.value ? 'success' : 'primary'))
+const canSubmit = computed(() => submitReady.value && !store.isSubmitted)
 
 /**
  * Joined human-readable names of every incomplete step, in display
@@ -145,6 +155,18 @@ async function goToStep(routeName: string): Promise<void> {
     </header>
 
     <CompletenessBar :score="score" :label="completenessLabel" :color="completenessColor" />
+
+    <!-- D9 two-signal model: when every required step is done, say so explicitly
+         so a submit-ready creator at <100% never wonders whether they can
+         submit. The completeness % is framed as "add more to strengthen", not
+         a gate. -->
+    <p
+      v-if="submitReady"
+      class="review-step__two-signal text-body-2"
+      data-testid="review-two-signal-ready"
+    >
+      {{ t('creator.ui.wizard.steps.review.two_signal_ready', { percent: score }) }}
+    </p>
 
     <ul class="review-step__rows" data-testid="review-step-rows">
       <li
@@ -246,6 +268,15 @@ async function goToStep(routeName: string): Promise<void> {
   flex-direction: column;
   gap: 20px;
   max-width: 720px;
+}
+
+.review-step__two-signal {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgb(var(--v-theme-success));
+  background-color: rgb(var(--v-theme-success) / 0.06);
+  border-radius: 6px;
+  color: rgb(var(--v-theme-on-surface));
 }
 
 .review-step__rows {

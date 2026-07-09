@@ -24,7 +24,11 @@ const baseAttributes = {
   display_name: 'Existing Name',
   bio: null,
   country_code: 'IT',
-  region: null,
+  // D1: region is part of the six-field floor. The base fixture fills it so
+  // the "happy" gate paths satisfy the full floor; the avatar-missing tests
+  // still isolate on the single missing avatar, and the region-gates test
+  // overrides it back to null with the avatar present.
+  region: 'Lazio',
   primary_language: 'en',
   secondary_languages: [] as string[],
   categories: ['lifestyle'] as string[],
@@ -73,9 +77,9 @@ function mockBootstrap(attrOverrides: Record<string, unknown> = {}): void {
 
 beforeEach(() => {
   vi.clearAllMocks()
-  // Default fixture has a category but NO avatar — Step 2's completion
-  // gate (avatar + ≥1 category) therefore starts unmet. Tests that need
-  // to exercise the submit path opt in via mockBootstrap({ avatar_path }).
+  // Default fixture satisfies every floor field EXCEPT the avatar — Step 2's
+  // full-floor gate (D2) therefore starts unmet on the avatar alone. Tests
+  // that need to exercise the submit path opt in via mockBootstrap({ avatar_path }).
   mockBootstrap()
 })
 
@@ -181,12 +185,11 @@ describe('Step2ProfileBasicsPage', () => {
     expect(wrapper.find('[data-testid="profile-submit-error"]').exists()).toBe(false)
   })
 
-  // Stabilization (May 29, 2026): the backend's isProfileComplete gate
-  // requires an avatar AND ≥1 category, but the form let creators "Save
-  // and continue" without them — leaving the step silently incomplete.
-  // The client now mirrors the gate.
+  // D2 (was: May 29, 2026 stabilization): the forward gate mirrors the FULL
+  // backend `isProfileComplete` floor. A creator can't "Save and continue"
+  // with any floor field missing — here, the avatar.
   it('disables Save and continue and shows the requirements hint when the avatar is missing', async () => {
-    // Default fixture: category present, avatar absent → gate unmet.
+    // Default fixture: every floor field present EXCEPT the avatar → gate unmet.
     const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
       initialRoute: { path: '/onboarding/profile' },
       beforeMount: async () => {
@@ -318,7 +321,9 @@ describe('Step2ProfileBasicsPage', () => {
     })
   })
 
-  it('enables Save and continue and hides the hint once avatar + category are present', async () => {
+  it('enables Save and continue and hides the hint once the full floor is met', async () => {
+    // Base fixture fills display_name/country/region/language/category; adding
+    // the avatar completes the six-field floor → gate met.
     mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg', categories: ['lifestyle'] })
     const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
       initialRoute: { path: '/onboarding/profile' },
@@ -333,5 +338,39 @@ describe('Step2ProfileBasicsPage', () => {
       'v-btn--disabled',
     )
     expect(wrapper.find('[data-testid="profile-requirements-hint"]').exists()).toBe(false)
+  })
+
+  // D1 + D2: region is a floor field, so it gates step 2 on its own — a
+  // creator with every OTHER floor field (incl. avatar) still can't advance
+  // until region is filled. This is the FE half of the floor-mirror.
+  it('disables Save and continue when only region is missing (D1 floor)', async () => {
+    mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg', region: null })
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="profile-submit"]').classes()).toContain('v-btn--disabled')
+    expect(wrapper.find('[data-testid="profile-requirements-hint"]').exists()).toBe(true)
+  })
+
+  it('enables Save and continue once region is filled with the rest of the floor met (D1 floor)', async () => {
+    mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg', region: 'Lombardy' })
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="profile-submit"]').classes()).not.toContain(
+      'v-btn--disabled',
+    )
   })
 })

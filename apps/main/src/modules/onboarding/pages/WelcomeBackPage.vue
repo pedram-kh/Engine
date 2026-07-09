@@ -108,13 +108,19 @@ const shouldRender = ref(false)
 // "First time" = the creator has done genuinely nothing yet, so there
 // is no prior session to welcome them "back" to and the "Welcome back /
 // last here X ago" copy would read as a falsehood. We key this off the
-// completeness score being 0 rather than "is the next step profile",
-// because the score credits ONLY real work (profile, social, portfolio,
-// an accepted agreement — a flag-OFF contract is NOT auto-credited). So
-// anyone who has finished at least one step scores > 0 and gets the
-// "Welcome back / resume" copy — EVEN IF their next step is still
-// `profile` (e.g. they completed social or portfolio before profile).
-// A truly fresh account (score 0) gets the "Let's get started" copy.
+// completeness score being 0 rather than "is the next step profile".
+//
+// AH-026 D4 semantic drift (decided Q1 = accept): the profile unit now
+// awards per-optional-field credit (bio/accent/phone/whatsapp/street/
+// postal), so `score > 0` now means "ANY engagement" — INCLUDING a
+// creator who has only typed a bio and filled no floor field or completed
+// step. That person really did start something, so "Welcome back /
+// resume" is the correct (arguably more correct) experience for them; the
+// alternative — re-deriving first-time-ness from structural signals — was
+// already rejected as fragile and would re-break the next time the score
+// semantics move. So: score > 0 → "Welcome back / resume"; a truly
+// untouched account (score 0, no floor/optional/step work at all) → the
+// "Let's get started" copy.
 const isFirstTime = computed(() => completenessScore.value === 0)
 
 function timeAgoCopy(timestamp: string | null): string {

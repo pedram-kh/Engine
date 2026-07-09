@@ -28,7 +28,9 @@
           "completed": "Ukończono",
           "current": "Bieżący krok",
           "skipped": "Pominięty",
-          "pending": "Nie rozpoczęto"
+          "pending": "Nie rozpoczęto",
+          "percent_complete": "Ukończono {percent}%",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Zapisz",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% ukończono",
             "edit_step": "Edytuj",
             "submit_button": "Prześlij aplikację",
-            "incomplete_blocker": "Masz 1 niekompletny krok: {names}. Kliknij Edytuj, aby go ukończyć przed przesłaniem. | Masz {count} niekompletnych kroków: {names}. Kliknij Edytuj na każdym, aby je ukończyć przed przesłaniem."
+            "incomplete_blocker": "Masz 1 niekompletny krok: {names}. Kliknij Edytuj, aby go ukończyć przed przesłaniem. | Masz {count} niekompletnych kroków: {names}. Kliknij Edytuj na każdym, aby je ukończyć przed przesłaniem.",
+            "two_signal_ready": "Twój profil jest ukończony w {percent}% — wszystko, co potrzebne do przesłania, jest gotowe. Możesz dodać więcej, aby wzmocnić swój profil."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Zaznacz wszystko",
           "categories_help": "Wybierz kategorie, które najlepiej opisują to, co tworzysz.",
           "avatar_required": "Zdjęcie profilowe jest wymagane do ukończenia tego kroku.",
-          "step_requirements_hint": "Dodaj zdjęcie profilowe i co najmniej jedną kategorię, aby kontynuować.",
+          "step_requirements_hint": "Wypełnij wszystkie wymagane pola (oznaczone *), aby kontynuować.",
           "social_handle": "Nazwa użytkownika",
           "social_handle_hint": "Podaj tylko swoją nazwę użytkownika — bez symbolu {'@'} ani pełnego adresu URL profilu.",
           "social_handle_invalid": "Podaj prawidłową nazwę użytkownika: 2–30 liter, cyfr, kropek, podkreśleń lub myślników (bez spacji, {'@'} lub adresów URL).",
@@ -192,7 +195,8 @@
           "legal_name": "Imię i nazwisko (prawne)",
           "tax_id": "Numer identyfikacji podatkowej",
           "address_country": "Kraj",
-          "address_city": "Miasto"
+          "address_city": "Miasto",
+          "optional_prefix": "Opcjonalne."
         },
         "categories": {
           "fashion": "Moda",

@@ -44,7 +44,16 @@ const route = useRoute()
 const router = useRouter()
 const onboardingStore = useOnboardingStore()
 
-const { creator, stepCompletion, flags, clickThroughAccepted } = storeToRefs(onboardingStore)
+const { creator, stepCompletion, flags, clickThroughAccepted, completenessScore } =
+  storeToRefs(onboardingStore)
+
+// D6: the field-weighted completeness % surfaced alongside the step rail. It's
+// the SAME profile_completeness_score the dashboard + review bar read (via the
+// store getter) — navigation ("Step X of N") and completeness are two distinct
+// signals, so both are shown; no competing calculation lives here.
+const completenessLabel = computed(() =>
+  t('creator.ui.wizard.progress.percent_complete', { percent: completenessScore.value }),
+)
 
 /**
  * Total step count visible in the rail = the static account row + every
@@ -140,6 +149,9 @@ function statusLabel(step: StepView): string {
     class="onboarding-progress"
     data-test="onboarding-progress-list"
   >
+    <p class="onboarding-progress__completeness text-caption" data-test="onboarding-completeness">
+      {{ completenessLabel }}
+    </p>
     <ol class="onboarding-progress__list">
       <!--
         Static Step 1 row — account creation is "implicit" (handled
@@ -228,6 +240,13 @@ function statusLabel(step: StepView): string {
 </template>
 
 <style scoped>
+.onboarding-progress__completeness {
+  margin: 0 0 0.5rem 0.75rem;
+  font-weight: 600;
+  color: rgb(var(--v-theme-on-surface-variant));
+  font-variant-numeric: tabular-nums;
+}
+
 .onboarding-progress__list {
   list-style: none;
   padding: 0;

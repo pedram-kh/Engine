@@ -28,7 +28,9 @@
           "completed": "Dokončeno",
           "current": "Aktuální krok",
           "skipped": "Přeskočeno",
-          "pending": "Nezahájeno"
+          "pending": "Nezahájeno",
+          "percent_complete": "{percent}% hotovo",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Uložit",
@@ -155,7 +157,8 @@
             "completeness": "{percent} % dokončeno",
             "edit_step": "Upravit",
             "submit_button": "Odeslat přihlášku",
-            "incomplete_blocker": "Máte 1 neúplný krok: {names}. Klikněte na Upravit pro jeho dokončení před odesláním. | Máte {count} neúplných kroků: {names}. Klikněte na Upravit u každého pro jejich dokončení před odesláním."
+            "incomplete_blocker": "Máte 1 neúplný krok: {names}. Klikněte na Upravit pro jeho dokončení před odesláním. | Máte {count} neúplných kroků: {names}. Klikněte na Upravit u každého pro jejich dokončení před odesláním.",
+            "two_signal_ready": "Váš profil je hotový z {percent}% — vše potřebné k odeslání je splněno. Můžete přidat další informace a posílit svůj profil."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Vybrat vše",
           "categories_help": "Vyberte kategorie, které nejlépe popisují, co tvoříte.",
           "avatar_required": "Pro dokončení tohoto kroku je vyžadována profilová fotografie.",
-          "step_requirements_hint": "Přidejte profilovou fotografii a alespoň jednu kategorii pro pokračování.",
+          "step_requirements_hint": "Vyplňte všechna povinná pole (označená *), abyste mohli pokračovat.",
           "social_handle": "Uživatelské jméno",
           "social_handle_hint": "Zadejte pouze své uživatelské jméno — bez symbolu {'@'} nebo plné URL profilu.",
           "social_handle_invalid": "Zadejte platné uživatelské jméno: 2–30 písmen, číslic, teček, podtržítek nebo pomlček (bez mezer, {'@'} nebo URL).",
@@ -192,7 +195,8 @@
           "legal_name": "Právní jméno",
           "tax_id": "Daňové identifikační číslo",
           "address_country": "Země",
-          "address_city": "Město"
+          "address_city": "Město",
+          "optional_prefix": "Nepovinné."
         },
         "categories": {
           "fashion": "Móda",

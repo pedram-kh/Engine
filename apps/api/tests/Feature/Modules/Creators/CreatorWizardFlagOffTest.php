@@ -181,8 +181,19 @@ it('POST /wizard/submit succeeds when all three vendor flags are OFF + stamps ky
     $creator->forceFill([
         'display_name' => 'Catalyst',
         'country_code' => 'IT',
+        'region' => 'Lazio',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
+        // D1 + D4: region joins the floor, and the profile unit only reaches
+        // its full 25 when the optionals are filled too — so these
+        // renormalisation fixtures fill both to keep the documented
+        // denominator math (25/65 = 38, etc.) exact.
+        'bio' => 'A short bio.',
+        'accent' => 'Roman',
+        'phone' => '+39 06 1234 5678',
+        'whatsapp' => '+39 06 1234 5679',
+        'address_street' => 'Via del Corso 1',
+        'address_postal_code' => '00186',
         'tax_profile_complete' => true,
     ])->save();
 
@@ -212,8 +223,19 @@ it('submit DOES NOT downgrade an already-Verified creator to NotRequired even if
     $creator->forceFill([
         'display_name' => 'Catalyst',
         'country_code' => 'IT',
+        'region' => 'Lazio',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
+        // D1 + D4: region joins the floor, and the profile unit only reaches
+        // its full 25 when the optionals are filled too — so these
+        // renormalisation fixtures fill both to keep the documented
+        // denominator math (25/65 = 38, etc.) exact.
+        'bio' => 'A short bio.',
+        'accent' => 'Roman',
+        'phone' => '+39 06 1234 5678',
+        'whatsapp' => '+39 06 1234 5679',
+        'address_street' => 'Via del Corso 1',
+        'address_postal_code' => '00186',
         'tax_profile_complete' => true,
         'kyc_status' => KycStatus::Verified->value,
     ])->save();
@@ -246,8 +268,19 @@ it('completeness score = 100 for a creator with profile/social/portfolio filled 
     $creator->forceFill([
         'display_name' => 'Catalyst',
         'country_code' => 'IT',
+        'region' => 'Lazio',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
+        // D1 + D4: region joins the floor, and the profile unit only reaches
+        // its full 25 when the optionals are filled too — so these
+        // renormalisation fixtures fill both to keep the documented
+        // denominator math (25/65 = 38, etc.) exact.
+        'bio' => 'A short bio.',
+        'accent' => 'Roman',
+        'phone' => '+39 06 1234 5678',
+        'whatsapp' => '+39 06 1234 5679',
+        'address_street' => 'Via del Corso 1',
+        'address_postal_code' => '00186',
         'tax_profile_complete' => true,
         // Agreement accepted via the click-through (which sets the FK). With
         // contract counting toward the score even flag-OFF, the contract
@@ -296,8 +329,19 @@ it('completeness score renormalises to 38 when only profile is complete and the 
     $creator->forceFill([
         'display_name' => 'Catalyst',
         'country_code' => 'IT',
+        'region' => 'Lazio',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
+        // D1 + D4: region joins the floor, and the profile unit only reaches
+        // its full 25 when the optionals are filled too — so these
+        // renormalisation fixtures fill both to keep the documented
+        // denominator math (25/65 = 38, etc.) exact.
+        'bio' => 'A short bio.',
+        'accent' => 'Roman',
+        'phone' => '+39 06 1234 5678',
+        'whatsapp' => '+39 06 1234 5679',
+        'address_street' => 'Via del Corso 1',
+        'address_postal_code' => '00186',
     ])->save();
 
     // Denominator 65 (kyc/tax/payout hidden; contract still counts).
@@ -314,8 +358,19 @@ it('completeness score renormalises to 62 when profile + social are complete and
     $creator->forceFill([
         'display_name' => 'Catalyst',
         'country_code' => 'IT',
+        'region' => 'Lazio',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
+        // D1 + D4: region joins the floor, and the profile unit only reaches
+        // its full 25 when the optionals are filled too — so these
+        // renormalisation fixtures fill both to keep the documented
+        // denominator math (25/65 = 38, etc.) exact.
+        'bio' => 'A short bio.',
+        'accent' => 'Roman',
+        'phone' => '+39 06 1234 5678',
+        'whatsapp' => '+39 06 1234 5679',
+        'address_street' => 'Via del Corso 1',
+        'address_postal_code' => '00186',
     ])->save();
 
     CreatorSocialAccountFactory::new()->createOne(['creator_id' => $creator->id]);
@@ -336,8 +391,19 @@ it('click-through acceptance earns the contract weight in the score (flag OFF)',
     $creator->forceFill([
         'display_name' => 'Catalyst',
         'country_code' => 'IT',
+        'region' => 'Lazio',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
+        // D1 + D4: region joins the floor, and the profile unit only reaches
+        // its full 25 when the optionals are filled too — so these
+        // renormalisation fixtures fill both to keep the documented
+        // denominator math (25/65 = 38, etc.) exact.
+        'bio' => 'A short bio.',
+        'accent' => 'Roman',
+        'phone' => '+39 06 1234 5678',
+        'whatsapp' => '+39 06 1234 5679',
+        'address_street' => 'Via del Corso 1',
+        'address_postal_code' => '00186',
     ])->save();
     CreatorSocialAccountFactory::new()->createOne(['creator_id' => $creator->id]);
     CreatorPortfolioItemFactory::new()->createOne(['creator_id' => $creator->id]);

@@ -28,7 +28,9 @@
           "completed": "Abgeschlossen",
           "current": "Aktueller Schritt",
           "skipped": "Übersprungen",
-          "pending": "Noch nicht gestartet"
+          "pending": "Noch nicht gestartet",
+          "percent_complete": "{percent}% abgeschlossen",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Speichern",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% vollständig",
             "edit_step": "Bearbeiten",
             "submit_button": "Bewerbung einreichen",
-            "incomplete_blocker": "Du hast 1 unvollständigen Schritt: {names}. Klicke auf Bearbeiten, um ihn abzuschließen. | Du hast {count} unvollständige Schritte: {names}. Klicke auf jeden Schritt auf Bearbeiten, um ihn abzuschließen."
+            "incomplete_blocker": "Du hast 1 unvollständigen Schritt: {names}. Klicke auf Bearbeiten, um ihn abzuschließen. | Du hast {count} unvollständige Schritte: {names}. Klicke auf jeden Schritt auf Bearbeiten, um ihn abzuschließen.",
+            "two_signal_ready": "Ihr Profil ist zu {percent}% vollständig — alles für die Einreichung Erforderliche ist erledigt. Sie können mehr hinzufügen, um Ihr Profil zu stärken."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Alle auswählen",
           "categories_help": "Wähle die Kategorien aus, die am besten beschreiben, was du erstellst.",
           "avatar_required": "Ein Profilfoto ist erforderlich, um diesen Schritt abzuschließen.",
-          "step_requirements_hint": "Füge ein Profilfoto und mindestens eine Kategorie hinzu, um fortzufahren.",
+          "step_requirements_hint": "Füllen Sie alle Pflichtfelder (mit * markiert) aus, um fortzufahren.",
           "social_handle": "Nutzername",
           "social_handle_hint": "Gib nur deinen Nutzernamen ein — kein {'@'}-Symbol oder vollständige Profil-URL.",
           "social_handle_invalid": "Gib einen gültigen Nutzernamen ein: 2–30 Buchstaben, Zahlen, Punkte, Unterstriche oder Bindestriche (keine Leerzeichen, {'@'} oder URLs).",
@@ -192,7 +195,8 @@
           "legal_name": "Rechtlicher Name",
           "tax_id": "Steuer-ID",
           "address_country": "Land",
-          "address_city": "Stadt"
+          "address_city": "Stadt",
+          "optional_prefix": "Optional."
         },
         "categories": {
           "fashion": "Mode",

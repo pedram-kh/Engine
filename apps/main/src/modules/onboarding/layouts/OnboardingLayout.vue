@@ -64,6 +64,7 @@ const {
   flags,
   clickThroughAccepted,
   nextStep,
+  completenessScore,
 } = storeToRefs(onboardingStore)
 const { isLoggingOut } = storeToRefs(authStore)
 
@@ -156,6 +157,26 @@ const chromeSteps = computed<WizardChromeStep[]>(() =>
       }),
     }
   }),
+)
+
+/**
+ * D6 — pre-formatted completeness caption threaded to both animated chromes as
+ * a static prop. Same profile_completeness_score the dashboard/review bar read;
+ * the chromes stay i18n-free (they already receive pre-translated strings like
+ * `positionLabel`), so this is formatted here in the host.
+ */
+const completenessLabel = computed(() =>
+  t('creator.ui.wizard.progress.percent_complete', { percent: completenessScore.value }),
+)
+
+/**
+ * Mobile variant: the number-only form ("{n}%"). The mobile chrome shows it in
+ * a compact, aurora-bordered pill at the rail's right end, where the verbose
+ * "…complete" wording would not fit — so the host formats a dedicated short
+ * label rather than the chrome slicing the string.
+ */
+const completenessLabelShort = computed(() =>
+  t('creator.ui.wizard.progress.percent_only', { percent: completenessScore.value }),
 )
 
 function onNavigate(routeName: string): void {
@@ -268,6 +289,7 @@ async function saveAndExit(): Promise<void> {
           :steps="chromeSteps"
           :active-index="activeIndex"
           :reduced-motion="prefersReducedMotion"
+          :completeness-label="completenessLabel"
           @navigate="onNavigate"
         >
           <slot />
@@ -280,6 +302,7 @@ async function saveAndExit(): Promise<void> {
           :steps="chromeSteps"
           :active-index="activeIndex"
           :reduced-motion="prefersReducedMotion"
+          :completeness-label="completenessLabelShort"
           @navigate="onNavigate"
         >
           <slot />

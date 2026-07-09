@@ -28,7 +28,9 @@
           "completed": "Lest",
           "current": "Current step",
           "skipped": "Skipped",
-          "pending": "Let started"
+          "pending": "Let started",
+          "percent_complete": "{percent}% lest",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Issejvja",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% complete",
             "edit_step": "Editja",
             "submit_button": "Ibgħat application",
-            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Editja to finish it before submitting. | You have {count} incomplete steps: {names}. Click Editja on each to finish them before submitting."
+            "incomplete_blocker": "You have 1 incomplete step: {names}. Click Editja to finish it before submitting. | You have {count} incomplete steps: {names}. Click Editja on each to finish them before submitting.",
+            "two_signal_ready": "Il-profil tiegħek huwa {percent}% lest — dak kollu meħtieġ għas-sottomissjoni sar. Tista' żżid aktar biex issaħħaħ il-profil tiegħek."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Agħżel kollox",
           "categories_help": "Pick the categories that best describe what you create.",
           "avatar_required": "A profile photo is required to finish this step.",
-          "step_requirements_hint": "Żid a profile photo and at least one category to continue.",
+          "step_requirements_hint": "Imla l-oqsma obbligatorji kollha (immarkati bi *) biex tkompli.",
           "social_handle": "Username",
           "social_handle_hint": "Enter your username only — no {'@'} symbol or full profile URL.",
           "social_handle_invalid": "Enter a valid username: 2–30 letters, numbers, dots, underscores or hyphens (no spaces, {'@'}, or URLs).",
@@ -192,7 +195,8 @@
           "legal_name": "Legal name",
           "tax_id": "Tax ID",
           "address_country": "Country",
-          "address_city": "City"
+          "address_city": "City",
+          "optional_prefix": "Fakultattiv."
         },
         "categories": {
           "fashion": "Fashion",

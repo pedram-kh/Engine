@@ -28,7 +28,9 @@
           "completed": "Terminée",
           "current": "Étape actuelle",
           "skipped": "Ignorée",
-          "pending": "Non commencée"
+          "pending": "Non commencée",
+          "percent_complete": "{percent}% terminé",
+          "percent_only": "{percent}%"
         },
         "actions": {
           "save": "Enregistrer",
@@ -155,7 +157,8 @@
             "completeness": "{percent}% terminé",
             "edit_step": "Modifier",
             "submit_button": "Soumettre la candidature",
-            "incomplete_blocker": "Vous avez 1 étape incomplète : {names}. Cliquez sur Modifier pour la terminer avant de soumettre. | Vous avez {count} étapes incomplètes : {names}. Cliquez sur Modifier sur chacune pour les terminer avant de soumettre."
+            "incomplete_blocker": "Vous avez 1 étape incomplète : {names}. Cliquez sur Modifier pour la terminer avant de soumettre. | Vous avez {count} étapes incomplètes : {names}. Cliquez sur Modifier sur chacune pour les terminer avant de soumettre.",
+            "two_signal_ready": "Votre profil est complété à {percent}% — tout ce qui est requis pour l'envoi est terminé. Vous pouvez en ajouter davantage pour renforcer votre profil."
           }
         },
         "fields": {
@@ -180,7 +183,7 @@
           "categories_select_all": "Tout sélectionner",
           "categories_help": "Choisissez les catégories qui décrivent le mieux ce que vous créez.",
           "avatar_required": "Une photo de profil est requise pour terminer cette étape.",
-          "step_requirements_hint": "Ajoutez une photo de profil et au moins une catégorie pour continuer.",
+          "step_requirements_hint": "Remplissez tous les champs obligatoires (marqués d'un *) pour continuer.",
           "social_handle": "Nom d'utilisateur",
           "social_handle_hint": "Saisissez uniquement votre nom d'utilisateur — sans symbole {'@'} ni URL de profil complète.",
           "social_handle_invalid": "Saisissez un nom d'utilisateur valide : 2 à 30 lettres, chiffres, points, traits de soulignement ou tirets (sans espaces, {'@'} ni URL).",
@@ -192,7 +195,8 @@
           "legal_name": "Nom légal",
           "tax_id": "Numéro fiscal",
           "address_country": "Pays",
-          "address_city": "Ville"
+          "address_city": "Ville",
+          "optional_prefix": "Facultatif."
         },
         "categories": {
           "fashion": "Mode",

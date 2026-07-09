@@ -46,6 +46,14 @@ const props = defineProps<{
   steps: WizardChromeStep[]
   activeIndex: number
   reducedMotion?: boolean
+  /**
+   * D6 — a pre-formatted "{n}% complete" label (the field-weighted
+   * profile_completeness_score, same source as the dashboard/review bar). It's
+   * a STATIC caption: threaded past the tick/drift state machine and never
+   * participates in the row animation. Optional so the chrome renders without
+   * it (e.g. before bootstrap resolves).
+   */
+  completenessLabel?: string
 }>()
 
 const emit = defineEmits<{ (e: 'navigate', routeName: string): void }>()
@@ -522,6 +530,14 @@ watch(
       </div>
     </nav>
 
+    <!-- D6: static completeness caption. Sits above the framed panel's
+         top-left corner as a header to the content the creator is filling
+         (the field-weighted score). Outside the rail's animated row flow and
+         pointer-events none, so it never touches the tick/drift geometry. -->
+    <p v-if="completenessLabel" class="wizchrome__completeness" data-test="wizard-completeness">
+      {{ completenessLabel }}
+    </p>
+
     <!-- full-size, scrollable content panel framed by the SVG -->
     <section ref="panelEl" class="wizchrome__panel is-hidden" data-test="onboarding-body">
       <div class="wizchrome__panel-scroll">
@@ -567,6 +583,23 @@ watch(
   width: 40%;
   max-width: 460px;
   z-index: 2;
+}
+
+/* Sits just above the framed panel's top-left corner. The panel starts at
+ * left: 40% / top: 12% (see .wizchrome__panel), so the label aligns to the
+ * frame's left edge and floats in the gap above its top line. */
+.wizchrome__completeness {
+  position: absolute;
+  left: 40%;
+  top: calc(12% - 30px);
+  z-index: 2;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(var(--v-theme-on-surface), 0.72);
+  pointer-events: none;
 }
 
 .row {
