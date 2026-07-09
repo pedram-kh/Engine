@@ -104,17 +104,19 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-09 · **Through:** AH-026 (ad-hoc run) · **HEAD:** `10ac480` (the AH-018–025
-batch is committed atop it — push HELD; **AH-026 is built but its feat+docs pair is not yet committed**
-— uncommitted at this refresh, push still HELD)
+**Last updated:** 2026-07-09 · **Through:** AH-027 (ad-hoc run) · **HEAD:** `ffe4ab9` (AH-027 feat;
+the AH-018–025 batch + AH-026 (`a23623a` feat + `9929db8` docs) + AH-027 (`ffe4ab9` feat) are all
+committed atop the last push — the docs commit that logs AH-027 / closes the AH-026 review / prunes
+Live Status / refreshes this template sits **atop `ffe4ab9`**; **push still HELD** across the whole
+range)
 
 ### Delivered
 
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-026 — all Landed** (AH-001–017 pushed; the AH-018–025 batch is
-  committed with **push HELD**; **AH-026 built, feat+docs pair not yet committed**). One line each
+- **Ad-hoc run AH-001 → AH-027 — all Landed** (AH-001–017 pushed; the AH-018–025 batch, AH-026,
+  and AH-027 are all committed with **push HELD**). One line each
   (detail + decisions in `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.
@@ -148,6 +150,10 @@ batch is committed atop it — push HELD; **AH-026 is built but its feat+docs pa
     `profileEarned()`); both wizard chromes + rail show the `%` alongside "Step X of N"; review
     two-signal copy; `creators:recompute-completeness` one-shot command. **Post-deploy:** run
     `php artisan creators:recompute-completeness` once (idempotent).
+  - **AH-027** — Creator completeness `%` on the agency discover detail: read-only display of the
+    already-on-the-wire `profile_completeness_score` as a `%` bar on `DiscoverProfilePage`; no BE /
+    resource / gate / formula change (`app.discover.detail.completeness` × 24 locales, parity green).
+    Rode the AH-026 session by go-ahead but logged as a separate entry (separate surface).
 
 ### Load-bearing invariants (do not regress)
 
@@ -181,6 +187,12 @@ batch is committed atop it — push HELD; **AH-026 is built but its feat+docs pa
   Live Status pointer in the ad-hoc log).
 - **Sprint 10 (Payments/Escrow)** — **blocked on Stripe Connect production approval**; the
   `payment_released` automation is wired but inert until then. Tracked in `tech-debt.md`.
+- **Pending post-deploy operational step (AH-026 D5)** — when the AH-026/027 range ships, run
+  `php artisan creators:recompute-completeness` **once** (optionally `--dry-run` first) so every
+  existing creator's persisted `profile_completeness_score` moves to the new formula (region floor +
+  D4 optional credit). Idempotent — safe to re-run; a second run reports 0 changes. There is **no
+  scheduler**, so this must not be forgotten at the next deploy. (Also logged as a standing tech-debt
+  obligation below.)
 - **Key tech-debt pointers** (full detail in `tech-debt.md`):
   - **AH-001 i18n completeness** — English fragments inside translated values in ~10 locales; parity
     is structurally blind to it (per-market human QA is a go-live gate, not a merge gate).

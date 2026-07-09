@@ -49,13 +49,9 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID      | Title                                             | Status  | Notes                                                                                                                                                                                                                                                                                                                                                     |
-| ------- | ------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AH-010a | Relationship messaging — backend spine + gate     | Landed  | 1:1 connected agency↔creator. Mirrored spine + status-aware gate + file/link attachments (EXIF-strip) + 2 notification types. Committed `2656e5a` (feat) + docs; pushed with the AH-010b pair. See Change Log.                                                                                                                                            |
-| AH-010b | Relationship messaging — WhatsApp-shaped inbox    | Landed  | Net-new conversations inbox + full-screen thread on the existing 15s poll; reuses generic `useMessageThread`. 2-state read tick from `read_by_counterparty`. Symmetric inboxes + nav (creator desktop/mobile + agency sidebar) + roster-detail shortcut. 23-locale fill green. Pushed (`5d48941`+`1b37dca`). See Change Log.                              |
-| AH-011  | Onboarding architecture-test cleanup              | Landed  | Two pre-existing source-scan reds from recent onboarding work: hex literal in `AnimatedWizardChromeMobile` (AH-007) → `success` token; `Step2ProfileBasicsPage` 422-allowlist mismatch (AH-009 extraction) → binding now lives in `ProfileBasicsForm`. Both arch tests green. See Change Log.                                                             |
-| AH-012  | WhatsApp-style new-conversation flow (both sides) | Landed  | Symmetric gate-filtered contact picker (creator→messageable agencies, agency→messageable creators) + provisioning fix (open never provisions; first send/attachment does) + shared `scopePermitsMessaging` gate⇔picker predicate. Spot-check passed; gates green (BE 125 ✓, FE 28 ✓, 24-locale parity ✓). Pushed (`68e0266` feat + docs). See Change Log. |
-| —       | Campaign Drafts tab — independent review          | Pending | Merged in code; review file reads "pending independent review pass."                                                                                                                                                                                                                                                                                      |
+| ID  | Title                                    | Status  | Notes                                                                |
+| --- | ---------------------------------------- | ------- | -------------------------------------------------------------------- |
+| —   | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass." |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -63,6 +59,22 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-027 · Creator completeness % on the agency discover detail
+
+- **Status:** Landed
+- **Date:** 2026-07-09
+- **Why:** Agencies evaluating a creator on discover couldn't see the completeness signal the
+  platform already computes and exposes.
+- **What:** The discover-detail page renders the creator's `profile_completeness_score` as a `%`
+  bar. Read-only display of an already-on-the-wire field (`CreatorPublicProfileResource` has exposed
+  it since the AH-009-era) — no resource, gate, or score-formula change. Bar colour keys `>= 100`
+  cosmetically (cleared in the AH-026 sub-100 sweep).
+- **Touched:** `apps/main` discover detail page + spec (`modules/discover/pages/DiscoverProfilePage.vue`
+  - `DiscoverProfilePage.spec.ts`), 24× `app.json` (`app.discover.detail.completeness`), parity green.
+- **Decisions:** rode the AH-026 session by explicit go-ahead but logged separately (separate surface,
+  separate entry — the house rule). No BE diff.
+- **Ref:** `ffe4ab9`.
 
 ### AH-026 · Onboarding floor + score reweight + wizard % display
 
