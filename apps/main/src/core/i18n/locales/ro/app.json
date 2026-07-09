@@ -134,6 +134,7 @@
         "notFound": "This creator isn't available.",
         "loadFailed": "Couldn't load this profile. Please try again.",
         "viewInRoster": "Vizualizați in roster",
+        "completeness": "Profil completat {percent}%",
         "sections": {
           "profile": "Profil",
           "social": "Social accounts",

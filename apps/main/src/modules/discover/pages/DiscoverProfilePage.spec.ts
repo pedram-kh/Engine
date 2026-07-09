@@ -193,6 +193,18 @@ describe('DiscoverProfilePage', () => {
     expect(harness.wrapper.find('[data-test="creator-detail-rating"]').exists()).toBe(false)
   })
 
+  it('surfaces the read-only profile completeness score to the agency', async () => {
+    const harness = await mountProfile({
+      profile: makeProfile({ profile_completeness_score: 90 }),
+    })
+    cleanup = harness.cleanup
+
+    const bar = harness.wrapper.find('[data-test="discover-profile-completeness"]')
+    expect(bar.exists()).toBe(true)
+    // The agency-voice label ("Profile {percent}% complete") renders the score.
+    expect(bar.text()).toContain('Profile 90% complete')
+  })
+
   it('connected (roster) → "Connected" chip + the View-in-roster link, navigating to the 2a detail', async () => {
     const harness = await mountProfile({ profile: makeProfile({ relationship_status: 'roster' }) })
     cleanup = harness.cleanup

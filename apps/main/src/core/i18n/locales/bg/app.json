@@ -134,6 +134,7 @@
         "notFound": "This creator isn't available.",
         "loadFailed": "Couldn't load this prотile. Моля try again.",
         "viewInRoster": "Вижте in roster",
+        "completeness": "Профилът е попълнен {percent}%",
         "sections": {
           "profile": "Профил",
           "social": "Social accounts",

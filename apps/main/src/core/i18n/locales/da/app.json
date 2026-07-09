@@ -134,6 +134,7 @@
         "notFound": "Denne creator er ikke tilgængelig.",
         "loadFailed": "Denne profil kunne ikke indlæses. Prøv igen.",
         "viewInRoster": "Se i roster",
+        "completeness": "Profil {percent}% fuldført",
         "sections": {
           "profile": "Profil",
           "social": "Sociale konti",

@@ -134,6 +134,7 @@
         "notFound": "This creator isn't available.",
         "loadFailed": "Couldn't load this profile. Please try again.",
         "viewInRoster": "Vaata in roster",
+        "completeness": "Profiil {percent}% täidetud",
         "sections": {
           "profile": "Profiil",
           "social": "Social accounts",

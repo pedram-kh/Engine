@@ -134,6 +134,7 @@
         "notFound": "Deze creator is niet beschikbaar.",
         "loadFailed": "Dit profiel kon niet worden geladen. Probeer het opnieuw.",
         "viewInRoster": "Bekijken in roster",
+        "completeness": "Profiel {percent}% volledig",
         "sections": {
           "profile": "Profiel",
           "social": "Sociale accounts",

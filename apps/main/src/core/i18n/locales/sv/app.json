@@ -134,6 +134,7 @@
         "notFound": "Den här creatorn är inte tillgänglig.",
         "loadFailed": "Kunde inte ladda den här profilen. Försök igen.",
         "viewInRoster": "Visa i roster",
+        "completeness": "Profil {percent}% klar",
         "sections": {
           "profile": "Profil",
           "social": "Sociala konton",

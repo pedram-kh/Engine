@@ -134,6 +134,7 @@
         "notFound": "This creator isn't available.",
         "loadFailed": "Couldn't load this profile. Please try again.",
         "viewInRoster": "Megtekintés in roster",
+        "completeness": "A profil {percent}%-ban kész",
         "sections": {
           "profile": "Profil",
           "social": "Social accounts",

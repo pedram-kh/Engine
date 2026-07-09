@@ -134,6 +134,7 @@
         "notFound": "Este criador não está disponível.",
         "loadFailed": "Não foi possível carregar este perfil. Tente novamente.",
         "viewInRoster": "Ver na lista",
+        "completeness": "Perfil {percent}% completo",
         "sections": {
           "profile": "Perfil",
           "social": "Contas sociais",

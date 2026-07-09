@@ -134,6 +134,7 @@
         "notFound": "This creator isn't available.",
         "loadFailed": "Couldn't load this profile. Please try again.",
         "viewInRoster": "Skatīt in roster",
+        "completeness": "Profils aizpildīts par {percent}%",
         "sections": {
           "profile": "Profils",
           "social": "Social accounts",

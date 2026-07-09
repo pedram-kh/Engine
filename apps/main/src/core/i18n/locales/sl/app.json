@@ -134,6 +134,7 @@
         "notFound": "Tento ustvarjalca není k dispozici.",
         "loadFailed": "Ni uspelo naložiti tento profil. Zkuste to znova.",
         "viewInRoster": "Prikaži v zasedbau",
+        "completeness": "Profil {percent}% dokončan",
         "sections": {
           "profile": "Profil",
           "social": "Sociální sítě",

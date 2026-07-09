@@ -29,6 +29,7 @@ import type {
 import { ApiError, deriveConnectionState, languageEndonym } from '@catalyst/api-client'
 import {
   CategoryChips,
+  CompletenessBar,
   CountryDisplay,
   LanguageList,
   PortfolioGallery,
@@ -70,6 +71,16 @@ const connectionState = computed<DiscoveryConnectionState>(() =>
 )
 
 const displayName = computed(() => attrs.value?.display_name ?? t('app.discover.unnamed'))
+
+// Profile completeness (the same profile_completeness_score the creator sees on
+// their dashboard) surfaced read-only to the agency. The score→colour rule
+// mirrors CreatorDashboardPage verbatim so "complete" reads identically on both
+// sides; CompletenessBar stays dumb and takes the resolved colour.
+const completenessScore = computed(() => attrs.value?.profile_completeness_score ?? 0)
+const completenessLabel = computed(() =>
+  t('app.discover.detail.completeness', { percent: completenessScore.value }),
+)
+const completenessColor = computed(() => (completenessScore.value >= 100 ? 'success' : 'primary'))
 
 const countryLabel = computed(() => {
   const code = attrs.value?.country_code ?? null
@@ -274,6 +285,17 @@ onMounted(() => {
                 {{ t('app.discover.connection.notConnected') }}
               </span>
             </div>
+
+            <!-- Read-only profile completeness (same score the creator sees on
+                 their dashboard). Sits with the identity block so the agency
+                 reads it as a property of the profile, not an action. -->
+            <CompletenessBar
+              class="discover-profile__completeness mt-3"
+              :score="completenessScore"
+              :label="completenessLabel"
+              :color="completenessColor"
+              data-test="discover-profile-completeness"
+            />
           </div>
 
           <!-- Status-driven action (D-10). Admin/manager only (canSend). -->
@@ -461,6 +483,10 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.discover-profile__completeness {
+  max-width: 320px;
 }
 
 .discover-profile__grid {

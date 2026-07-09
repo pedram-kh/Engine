@@ -134,6 +134,7 @@
         "notFound": "This creator isn't available.",
         "loadFailed": "Couldn't load this profile. Please try again.",
         "viewInRoster": "View in roster",
+        "completeness": "Profile {percent}% complete",
         "sections": {
           "profile": "Profile",
           "social": "Social accounts",
