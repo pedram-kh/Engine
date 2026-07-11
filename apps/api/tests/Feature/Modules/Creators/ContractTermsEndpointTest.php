@@ -35,8 +35,8 @@ it('returns the rendered HTML, version, and locale for the authenticated creator
 
     $html = $response->json('data.html');
     expect($html)->toBeString();
-    expect($html)->toContain('<h1>Engine C');
-    expect($html)->toContain('<h2>1. Definitions</h2>');
+    expect($html)->toContain('<h1>Catalyst Creator Terms and Conditions');
+    expect($html)->toContain('<h2>2. Services</h2>');
 });
 
 it('falls back to `en` when an unknown locale is requested', function (): void {
@@ -86,9 +86,9 @@ it('source() exposes the RAW markdown + title + version without altering render(
     $source = $renderer->source('en');
 
     // Raw markdown — NOT rendered HTML.
-    expect($source['markdown'])->toContain('# Engine C — Master Creator Agreement');
+    expect($source['markdown'])->toContain('# Catalyst Creator Terms and Conditions');
     expect($source['markdown'])->not->toContain('<h1>');
-    expect($source['title'])->toBe('Engine C — Master Creator Agreement');
+    expect($source['title'])->toBe('Catalyst Creator Terms and Conditions');
     expect($source['version'])->toBe(ContractTermsRenderer::CURRENT_VERSION);
     expect($source['locale'])->toBe('en');
 
@@ -97,8 +97,8 @@ it('source() exposes the RAW markdown + title + version without altering render(
     // before — alter the render path and this (plus the HTML-shape test
     // above) fails.
     $rendered = $renderer->render('en');
-    expect($rendered['html'])->toContain('<h1>Engine C');
-    expect($rendered['html'])->toContain('<h2>1. Definitions</h2>');
+    expect($rendered['html'])->toContain('<h1>Catalyst Creator Terms and Conditions');
+    expect($rendered['html'])->toContain('<h2>2. Services</h2>');
     expect($rendered['version'])->toBe(ContractTermsRenderer::CURRENT_VERSION);
 });
 

@@ -85,7 +85,7 @@ it('snapshots the agreed title and RAW markdown source (not rendered HTML) onto 
     expect($contract->title)->toBe($source['title']);
     expect($contract->body_markdown)->toBe($source['markdown']);
     // Raw markdown, never the rendered HTML.
-    expect($contract->body_markdown)->toContain('# Engine C');
+    expect($contract->body_markdown)->toContain('# Catalyst Creator Terms and Conditions');
     expect($contract->body_markdown)->not->toContain('<h1>');
 });
 
