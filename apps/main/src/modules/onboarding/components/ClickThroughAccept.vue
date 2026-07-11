@@ -145,14 +145,9 @@ onMounted(() => {
 
 <template>
   <section class="click-through-accept" data-testid="click-through-accept">
-    <header class="click-through-accept__header">
-      <h2 class="click-through-accept__title">
-        {{ t('creator.ui.wizard.steps.contract.title') }}
-      </h2>
-      <p class="click-through-accept__subtitle">
-        {{ t('creator.ui.wizard.steps.contract.skipped_explanation') }}
-      </p>
-    </header>
+    <p class="click-through-accept__subtitle">
+      {{ t('creator.ui.wizard.steps.contract.skipped_explanation') }}
+    </p>
 
     <div
       v-if="loadErrorMessage !== null"
@@ -227,11 +222,6 @@ onMounted(() => {
   flex-direction: column;
   gap: 16px;
   max-width: 720px;
-}
-
-.click-through-accept__title {
-  font-size: 1.5rem;
-  font-weight: 600;
 }
 
 .click-through-accept__subtitle {
