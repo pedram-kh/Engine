@@ -109,6 +109,55 @@ it('counter: invited → countered records countered_fee and NOT agreed_fee (D-7
     expect(($audit->metadata ?? [])['countered_fee_minor_units'] ?? null)->toBe(750_000);
 });
 
+it('reofferAfterDecline: declined → invited overwrites the whole offer, clears responded_at, sets previously_declined', function (): void {
+    Event::fake([AssignmentTransitioned::class]);
+    $assignment = CampaignAssignment::factory()->status(AssignmentStatus::Declined)->create([
+        'agreed_fee_minor_units' => 200_00,
+        'agreed_fee_currency' => 'EUR',
+        'fee_per' => 'per post',
+        'offer_description' => 'Old brief.',
+        'offer_attachment_path' => 'agencies/OLD/campaigns/OLD/offer-attachments/OLD.pdf',
+        'offer_attachment_name' => 'old.pdf',
+        'responded_at' => now()->subDay(),
+    ]);
+
+    sm()->reofferAfterDecline(
+        $assignment,
+        350_00,
+        'EUR',
+        'per script',
+        'Revised brief.',
+        ['path' => 'agencies/NEW/campaigns/NEW/offer-attachments/NEW.pdf', 'name' => 'new.pdf', 'mime' => 'application/pdf', 'size' => 2048],
+    );
+
+    $fresh = reload($assignment);
+    expect($fresh->status)->toBe(AssignmentStatus::Invited)
+        ->and($fresh->agreed_fee_minor_units)->toBe(350_00)
+        ->and($fresh->fee_per)->toBe('per script')
+        ->and($fresh->offer_description)->toBe('Revised brief.')
+        ->and($fresh->offer_attachment_name)->toBe('new.pdf')
+        ->and($fresh->previously_declined)->toBeTrue()
+        ->and($fresh->responded_at)->toBeNull();
+
+    expect(lastAuditFor($assignment, AuditAction::AssignmentReInvited))->not->toBeNull();
+
+    Event::assertDispatched(
+        AssignmentTransitioned::class,
+        fn (AssignmentTransitioned $e): bool => $e->eventKey() === 'assignment.re_invited'
+            && $e->metadata()['from'] === 'declined'
+            && $e->metadata()['to'] === 'invited',
+    );
+});
+
+it('reofferAfterDecline: a non-declined source throws invalid_transition (fail-closed)', function (): void {
+    $assignment = assignmentInStatus(AssignmentStatus::Accepted);
+
+    expect(fn () => sm()->reofferAfterDecline($assignment, 350_00, 'EUR', null, null, null))
+        ->toThrow(AssignmentTransitionException::class);
+
+    expect(reload($assignment)->status)->toBe(AssignmentStatus::Accepted);
+});
+
 it('contract: accepted → contracted is reachable when per_campaign_contract_enabled is ON', function (): void {
     Feature::define(PerCampaignContractEnabled::NAME, true);
     $assignment = assignmentInStatus(AssignmentStatus::Accepted);

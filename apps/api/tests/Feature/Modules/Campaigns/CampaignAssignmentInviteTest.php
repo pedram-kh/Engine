@@ -557,6 +557,119 @@ it('rejects an invite whose attachment upload_id escapes the campaign prefix (42
     expect(CampaignAssignment::query()->where('campaign_id', $campaign->id)->exists())->toBeFalse();
 });
 
+// ── Re-offer after decline (declined → invited via the invite front-door) ────
+
+it('re-opens a DECLINED assignment through the invite endpoint — same row flips to invited, new offer overwrites, previously_declined set', function (): void {
+    [$agency, , $campaign] = campaignWithBrand();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = invitableCreator();
+
+    $declined = CampaignAssignment::factory()->status(AssignmentStatus::Declined)->create([
+        'campaign_id' => $campaign->id,
+        'creator_id' => $creator->id,
+        'agreed_fee_minor_units' => 200_00,
+        'agreed_fee_currency' => 'EUR',
+        'fee_per' => 'per post',
+        'responded_at' => now()->subDay(),
+    ]);
+
+    $response = $this->actingAs($admin)
+        ->postJson(inviteUrl($agency, $campaign), invitePayload($creator, [
+            'agreed_fee_minor_units' => 350_00,
+            'fee_per' => 'per script',
+            'offer_description' => 'Revised brief — one 30s Reel.',
+        ]))
+        ->assertOk()
+        ->assertJsonPath('data.attributes.status', 'invited')
+        ->assertJsonPath('data.attributes.agreed_fee_minor_units', 350_00)
+        ->assertJsonPath('data.attributes.fee_per', 'per script')
+        ->assertJsonPath('data.attributes.offer_description', 'Revised brief — one 30s Reel.')
+        ->assertJsonPath('data.attributes.previously_declined', true);
+
+    // SAME row (chat-thread continuity): the ULID is unchanged, no second row.
+    expect($response->json('data.id'))->toBe($declined->ulid)
+        ->and(CampaignAssignment::query()->where('campaign_id', $campaign->id)->where('creator_id', $creator->id)->count())->toBe(1);
+
+    $fresh = reloadAssignment($declined);
+    expect($fresh->status)->toBe(AssignmentStatus::Invited)
+        ->and($fresh->agreed_fee_minor_units)->toBe(350_00)
+        ->and($fresh->fee_per)->toBe('per script')
+        ->and($fresh->previously_declined)->toBeTrue()
+        ->and($fresh->responded_at)->toBeNull();
+
+    // The re-open is a machine edge — it audits the re_invited verb.
+    expect(AuditLog::query()->where('action', 'assignment.re_invited')->where('subject_id', $declined->id)->exists())->toBeTrue();
+});
+
+it('leaves a NON-declined existing row untouched (idempotent no-op — no offer overwrite)', function (): void {
+    [$agency, , $campaign] = campaignWithBrand();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = invitableCreator();
+
+    $accepted = CampaignAssignment::factory()->status(AssignmentStatus::Accepted)->create([
+        'campaign_id' => $campaign->id,
+        'creator_id' => $creator->id,
+        'agreed_fee_minor_units' => 500_00,
+        'agreed_fee_currency' => 'EUR',
+    ]);
+
+    $this->actingAs($admin)
+        ->postJson(inviteUrl($agency, $campaign), invitePayload($creator, [
+            'agreed_fee_minor_units' => 999_00,
+            'fee_per' => 'per script',
+        ]))
+        ->assertOk()
+        ->assertJsonPath('data.attributes.status', 'accepted')
+        ->assertJsonPath('data.attributes.agreed_fee_minor_units', 500_00);
+
+    $fresh = reloadAssignment($accepted);
+    expect($fresh->status)->toBe(AssignmentStatus::Accepted)
+        ->and($fresh->agreed_fee_minor_units)->toBe(500_00)
+        ->and($fresh->fee_per)->toBeNull()
+        ->and($fresh->previously_declined)->toBeFalse();
+});
+
+it('re-opens a declined row with an offer attachment, overwriting the prior offer file', function (): void {
+    Storage::fake('media');
+    [$agency, , $campaign] = campaignWithBrand();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = invitableCreator();
+
+    CampaignAssignment::factory()->status(AssignmentStatus::Declined)->create([
+        'campaign_id' => $campaign->id,
+        'creator_id' => $creator->id,
+        'agreed_fee_minor_units' => 200_00,
+        'agreed_fee_currency' => 'EUR',
+        'offer_attachment_path' => 'agencies/OLD/campaigns/OLD/offer-attachments/OLD.pdf',
+        'offer_attachment_name' => 'old-brief.pdf',
+    ]);
+
+    $storagePath = $this->actingAs($admin)
+        ->postJson(offerAttachmentInitUrl($agency, $campaign), ['mime_type' => 'application/pdf', 'size_bytes' => 2048])
+        ->json('data.storage_path');
+    Storage::disk('media')->put($storagePath, 'pdf-bytes');
+    $this->actingAs($admin)
+        ->postJson(inviteUrl($agency, $campaign).'/attachments/complete', ['upload_id' => $storagePath])
+        ->assertOk();
+
+    $response = $this->actingAs($admin)
+        ->postJson(inviteUrl($agency, $campaign), invitePayload($creator, [
+            'attachment' => [
+                'upload_id' => $storagePath,
+                'name' => 'revised-brief.pdf',
+                'mime_type' => 'application/pdf',
+                'size_bytes' => 2048,
+            ],
+        ]))
+        ->assertOk()
+        ->assertJsonPath('data.attributes.status', 'invited')
+        ->assertJsonPath('data.attributes.offer_attachment.name', 'revised-brief.pdf');
+
+    $assignment = CampaignAssignment::query()->where('campaign_id', $campaign->id)->firstOrFail();
+    expect($assignment->offer_attachment_path)->toBe($storagePath)
+        ->and($assignment->offer_attachment_name)->toBe('revised-brief.pdf');
+});
+
 it('EXIF-strips a supported image at complete time (the AH-010a discipline)', function (): void {
     Storage::fake('media');
     [$agency, , $campaign] = campaignWithBrand();

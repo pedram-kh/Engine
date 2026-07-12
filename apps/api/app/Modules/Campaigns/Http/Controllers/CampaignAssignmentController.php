@@ -91,6 +91,7 @@ final class CampaignAssignmentController
         Campaign $campaign,
         AssignmentInviteGate $gate,
         AssignmentOfferAttachmentUploadService $offerUploads,
+        CampaignAssignmentStateMachine $machine,
     ): JsonResponse {
         $this->assertBelongsToAgency($campaign, $agency);
         Gate::authorize('invite', $campaign);
@@ -141,15 +142,37 @@ final class CampaignAssignmentController
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        // Idempotent on the unique (campaign_id, creator_id): a creator already
-        // on this campaign is returned as-is (the bulk loop relies on this) —
-        // no second row, no duplicate audit/event.
+        // Existing row on the unique (campaign_id, creator_id). Two outcomes:
+        //   - DECLINED → re-open it (re-offer-after-decline chunk): the SAME
+        //     row flips declined → invited via the machine, carrying the fresh
+        //     offer, so the chat thread + history are preserved and the agency
+        //     sees the "declined then re-invited" tag. Returned 200.
+        //   - ANY OTHER status → idempotent no-op returned as-is (the bulk loop
+        //     relies on this; no second row, no duplicate audit/event, no
+        //     surprise overwrite of a live invited/accepted/countered offer).
         $existing = CampaignAssignment::query()
             ->where('campaign_id', $campaign->id)
             ->where('creator_id', $creator->id)
             ->first();
 
         if ($existing !== null) {
+            if ($existing->status === AssignmentStatus::Declined) {
+                $machine->reofferAfterDecline(
+                    $existing,
+                    (int) $validated['agreed_fee_minor_units'],
+                    strtoupper((string) $validated['agreed_fee_currency']),
+                    $validated['fee_per'] ?? null,
+                    $validated['offer_description'] ?? null,
+                    $attachment === null ? null : [
+                        'path' => (string) $attachment['upload_id'],
+                        'name' => (string) $attachment['name'],
+                        'mime' => (string) $attachment['mime_type'],
+                        'size' => (int) $attachment['size_bytes'],
+                    ],
+                    $actor,
+                );
+            }
+
             return (new CampaignAssignmentResource($existing->load('creator:id,ulid,display_name')))
                 ->response()
                 ->setStatusCode(Response::HTTP_OK);

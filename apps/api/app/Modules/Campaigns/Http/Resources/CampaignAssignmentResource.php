@@ -72,6 +72,11 @@ final class CampaignAssignmentResource extends JsonResource
                 ] : null,
                 'countered_fee_minor_units' => $assignment->countered_fee_minor_units,
                 'countered_fee_currency' => $assignment->countered_fee_currency,
+                // True once this row has been declined then re-offered
+                // (re-offer-after-decline chunk) — drives the agency Creators
+                // tab "declined, then re-invited" history tag, which persists
+                // after the status flips back to `invited`.
+                'previously_declined' => $assignment->previously_declined,
                 'invited_at' => $assignment->invited_at?->toIso8601String(),
                 'responded_at' => $assignment->responded_at?->toIso8601String(),
                 'posting_due_at' => $assignment->posting_due_at?->toIso8601String(),

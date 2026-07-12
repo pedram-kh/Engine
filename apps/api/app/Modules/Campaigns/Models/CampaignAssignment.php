@@ -45,6 +45,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $invited_at
  * @property int|null $invited_by_user_id
  * @property Carbon|null $responded_at
+ * @property bool $previously_declined
  * @property Carbon|null $accepted_at
  * @property int|null $contract_id
  * @property int|null $agreed_fee_minor_units
@@ -111,6 +112,7 @@ final class CampaignAssignment extends Model
         'offer_attachment_size_bytes',
         'countered_fee_minor_units',
         'countered_fee_currency',
+        'previously_declined',
         'markup_minor_units',
         'total_charged_to_brand_minor_units',
         'deliverables',
@@ -252,6 +254,7 @@ final class CampaignAssignment extends Model
             'accepted_at' => 'datetime',
             'agreed_fee_minor_units' => 'integer',
             'offer_attachment_size_bytes' => 'integer',
+            'previously_declined' => 'boolean',
             'countered_fee_minor_units' => 'integer',
             'markup_minor_units' => 'integer',
             'total_charged_to_brand_minor_units' => 'integer',

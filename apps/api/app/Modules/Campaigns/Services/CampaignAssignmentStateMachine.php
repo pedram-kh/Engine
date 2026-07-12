@@ -35,6 +35,8 @@ use Laravel\Pennant\Feature;
  * The graph (docs/03-DATA-MODEL.md §7):
  *   invited → {declined, countered, accepted}
  *   countered → invited (re-invite, D-7 — the agency re-offers)
+ *   declined → invited (re-offer-after-decline — the agency re-opens a
+ *     declined invite with a fresh offer; the one edge out of `declined`)
  *   accepted → contracted (flag-gated) → producing → draft_submitted
  *   draft_submitted → {revision_requested → producing(loop), approved, rejected}
  *   approved → posted → live_verified → payment_held → payment_released
@@ -146,6 +148,59 @@ final class CampaignAssignmentStateMachine
             context: [
                 'agreed_fee_minor_units' => $agreedFeeMinorUnits,
                 'agreed_fee_currency' => $agreedFeeCurrency,
+            ],
+        );
+    }
+
+    /**
+     * declined → invited (re-offer-after-decline chunk). The agency re-opens a
+     * DECLINED invitation with a fresh offer. A GUARDED machine edge that lifts
+     * `declined` out of its terminal dead-end — the SAME assignment row is
+     * re-used (so the existing chat thread + history are preserved), the whole
+     * offer is OVERWRITTEN (fee, currency, per-unit, description, attachment),
+     * `responded_at` is cleared so the re-opened invite reads clean, and the
+     * durable `previously_declined` marker is raised so the agency surface can
+     * show a "declined then re-invited" history tag even after the status flips
+     * back to `invited`.
+     *
+     * Distinct from {@see reinvite()} (`countered → invited`, fee-only): this
+     * carries the full offer and comes from the invite front-door, not a
+     * counter response. Reuses the `assignment.re_invited` audit verb.
+     *
+     * @param  array{path: string, name: ?string, mime: ?string, size: ?int}|null  $attachment
+     */
+    public function reofferAfterDecline(
+        CampaignAssignment $assignment,
+        int $agreedFeeMinorUnits,
+        string $agreedFeeCurrency,
+        ?string $feePer,
+        ?string $offerDescription,
+        ?array $attachment,
+        ?User $actor = null,
+    ): CampaignAssignment {
+        $this->assertSource($assignment, [AssignmentStatus::Declined], AssignmentStatus::Invited);
+
+        return $this->commit(
+            $assignment,
+            AssignmentStatus::Invited,
+            AuditAction::AssignmentReInvited,
+            $actor,
+            mutate: function (CampaignAssignment $a) use ($agreedFeeMinorUnits, $agreedFeeCurrency, $feePer, $offerDescription, $attachment): void {
+                $a->agreed_fee_minor_units = $agreedFeeMinorUnits;
+                $a->agreed_fee_currency = $agreedFeeCurrency;
+                $a->fee_per = $feePer;
+                $a->offer_description = $offerDescription;
+                $a->offer_attachment_path = $attachment['path'] ?? null;
+                $a->offer_attachment_name = $attachment['name'] ?? null;
+                $a->offer_attachment_mime = $attachment['mime'] ?? null;
+                $a->offer_attachment_size_bytes = $attachment['size'] ?? null;
+                $a->responded_at = null;
+                $a->previously_declined = true;
+            },
+            context: [
+                'agreed_fee_minor_units' => $agreedFeeMinorUnits,
+                'agreed_fee_currency' => $agreedFeeCurrency,
+                're_offered_after_decline' => true,
             ],
         );
     }
