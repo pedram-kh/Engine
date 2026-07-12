@@ -153,7 +153,6 @@ onMounted(() => {
               >
                 / {{ item.attributes.fee_per }}</span
               >
-              · {{ windowLabel(item) }}
               <span
                 v-if="
                   item.attributes.status === 'countered' &&
@@ -170,6 +169,7 @@ onMounted(() => {
                 }}
               </span>
             </p>
+            <p class="assignment__meta">{{ windowLabel(item) }}</p>
             <!-- The agency's offer expectations (invite-offer-details batch). -->
             <p
               v-if="item.attributes.offer_description"
