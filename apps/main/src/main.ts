@@ -7,7 +7,7 @@ import { router } from './core/router'
 import { i18n, setLocale } from './core/i18n'
 import { vuetify } from './plugins/vuetify'
 
-// Self-hosted Inter typeface (Engine C v2). Imported before the design
+// Self-hosted Inter typeface (Catalyst Engine v2). Imported before the design
 // tokens so the @font-face + .v-application family override are
 // registered alongside the token CSS variables they consume.
 import '@catalyst/ui/assets/fonts/inter.css'

@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Engine C — Admin",
+    "title": "Catalyst Engine — Admin",
     "subtitle": "Superadmin-konsol.",
     "sprint0Notice": "Sprint 0-scaffolding — admin SPA",
     "dashboardPlaceholder": "Admin-dashboard-pladsholder — fuld overflade leveres i et senere sprint.",

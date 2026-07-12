@@ -16,7 +16,7 @@ describe('AuthLayout', () => {
   it('renders the brand mark from app.title', async () => {
     const harness = await mountAuthPage(AuthLayout)
     teardown = harness.unmount
-    expect(harness.wrapper.find('[data-test="auth-brand"]').text()).toBe('Engine C')
+    expect(harness.wrapper.find('[data-test="auth-brand"]').text()).toBe('Catalyst Engine')
   })
 
   it('exposes the locale switcher', async () => {
@@ -38,7 +38,7 @@ describe('AuthLayout', () => {
   it('switches to Portuguese when locale is set to pt', async () => {
     const harness = await mountAuthPage(AuthLayout, { locale: 'pt' })
     teardown = harness.unmount
-    expect(harness.wrapper.find('[data-test="auth-brand"]').text()).toBe('Engine C')
+    expect(harness.wrapper.find('[data-test="auth-brand"]').text()).toBe('Catalyst Engine')
     // Switcher label flipped — assert via the rendered DOM.
     expect(harness.wrapper.html()).toContain('Idioma')
   })

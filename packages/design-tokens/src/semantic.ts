@@ -1,10 +1,10 @@
 /**
  * Semantic tokens — components reference these via CSS variables or the Vuetify theme.
- * Source of truth: docs/01-UI-UX.md §2 (Catalyst v1) + Sprint 3.5 Chunk 1 (Engine C v2).
+ * Source of truth: docs/01-UI-UX.md §2 (Catalyst v1) + Sprint 3.5 Chunk 1 (Catalyst Engine v2).
  *
  * Use these names. Do not reach into ./tokens.ts directly from components.
  *
- * Sprint 3.5 Chunk 1 — Engine C v2 brand layer (co-brand path):
+ * Sprint 3.5 Chunk 1 — Catalyst Engine v2 brand layer (co-brand path):
  *   The neutral surface/border/text tokens migrated from the warm-grey
  *   `neutral` scale to the true-neutral `zinc` scale per Decisions D4
  *   (dark) + D5 (light). The action.primary tokens INTENTIONALLY stay on

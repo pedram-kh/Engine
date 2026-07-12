@@ -120,7 +120,7 @@ return [
     | Markdown Mail Settings
     |--------------------------------------------------------------------------
     |
-    | The Engine C v2 brand mail theme (Sprint 3.5 Chunk 4, Workstream C).
+    | The Catalyst Engine v2 brand mail theme (Sprint 3.5 Chunk 4, Workstream C).
     | Markdown mailables render through the published vendor views under
     | resources/views/vendor/mail and inline the 'catalyst' theme CSS as hex
     | literals (email clients do not resolve CSS custom properties). The theme

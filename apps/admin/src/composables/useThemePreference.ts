@@ -11,7 +11,7 @@
  *
  * When the user has never set a preference (storage empty), the
  * effective theme falls back to the SPA default (admin = `dark`, the
- * operator-preferred default since Sprint 0 and the Engine C v2
+ * operator-preferred default since Sprint 0 and the Catalyst Engine v2
  * dark-first identity).
  *
  * Sprint 3.5 Chunk 1 — dropped `'system'`:

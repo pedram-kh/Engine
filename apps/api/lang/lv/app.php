@@ -3,6 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'name' => 'Engine C',
+    'name' => 'Catalyst Engine',
     'tagline' => 'Influenceru mārketings, vadīts kā īsts bizness.',
 ];

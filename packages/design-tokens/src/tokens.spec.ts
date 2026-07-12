@@ -1,5 +1,5 @@
 /**
- * Value-presence tests for the Engine C v2 brand primitives added in
+ * Value-presence tests for the Catalyst Engine v2 brand primitives added in
  * Sprint 3.5 Chunk 1: the aurora accent (Decision D7) and the zinc
  * neutral scale (Decisions D4 + D5).
  *

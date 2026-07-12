@@ -2,7 +2,7 @@
  * Typography-consumption architecture test (Sprint 3.5 Chunk 2 — § 1.3,
  * Decision D-fork-b).
  *
- * The Engine C v2 type scale was exposed as `--catalyst-typography-*` CSS
+ * The Catalyst Engine v2 type scale was exposed as `--catalyst-typography-*` CSS
  * variables in Chunk 1 but had ZERO consumers (cargo-cult risk). Chunk 2
  * wires the shared `@catalyst/ui` components to consume those variables
  * instead of hardcoded `font-size: <n>rem` literals. This test pins both

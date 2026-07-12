@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Engine C — Administration",
+    "title": "Catalyst Engine — Administration",
     "subtitle": "Console de super-administration.",
     "sprint0Notice": "Échafaudage Sprint 0 — SPA d'administration",
     "dashboardPlaceholder": "Espace réservé au tableau de bord d'administration — la surface complète arrivera dans un sprint ultérieur.",

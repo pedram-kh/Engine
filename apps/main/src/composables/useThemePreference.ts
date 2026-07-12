@@ -11,7 +11,7 @@
  *
  * When the user has never set a preference (storage empty), the
  * effective theme falls back to the SPA default (main = `dark` as of
- * Sprint 3.5 Chunk 1 — the Engine C v2 dark-first identity).
+ * Sprint 3.5 Chunk 1 — the Catalyst Engine v2 dark-first identity).
  *
  * Sprint 3.5 Chunk 1 — dropped `'system'`:
  *   Chunk 8.2 shipped a tri-state preference (`light` / `dark` /

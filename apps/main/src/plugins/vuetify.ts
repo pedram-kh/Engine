@@ -3,7 +3,7 @@
  *
  * Theme registration (chunk 8.1; dark default since Sprint 3.5 Chunk 1):
  *   Both `light` and `dark` palettes are registered. The main SPA defaults
- *   to `dark` as of Sprint 3.5 Chunk 1 — the Engine C v2 brand is
+ *   to `dark` as of Sprint 3.5 Chunk 1 — the Catalyst Engine v2 brand is
  *   dark-first, matching admin. Theme switching is owned by the `useTheme`
  *   composable (`@/composables/useTheme`) — components MUST NOT mutate
  *   `theme.global.name.value` directly. Enforcement lives in

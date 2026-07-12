@@ -18,7 +18,7 @@ import { dt, testIds } from '../helpers/selectors'
 test('SPA boots and renders the AuthLayout shell on /sign-in', async ({ page }) => {
   await page.goto('/sign-in')
 
-  await expect(page).toHaveTitle(/Engine C/)
+  await expect(page).toHaveTitle(/Catalyst Engine/)
   await expect(page.locator(dt(testIds.authBrand))).toBeVisible()
   await expect(page.locator(dt(testIds.signInPage))).toBeVisible()
 })

@@ -40,7 +40,7 @@
   --brand-ink: #0a0a0b;
   --brand-gradient: linear-gradient(135deg, #14b8a6 0%, #8b5cf6 100%);
 
-  /* Aurora accent (Engine C v2 — Sprint 3.5 Chunk 1, Decision D7).
+  /* Aurora accent (Catalyst Engine v2 — Sprint 3.5 Chunk 1, Decision D7).
    * Utility-only: consumed directly via var(--brand-aurora-gradient) on
    * specific surfaces. NOT a Vuetify theme color (the color-system-parity
    * architecture test pins the not-in-theme-colors invariant). */
@@ -121,7 +121,7 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-  /* Engine C v2 brand font (Sprint 3.5 Chunk 1, Decision D6 reinterpreted).
+  /* Catalyst Engine v2 brand font (Sprint 3.5 Chunk 1, Decision D6 reinterpreted).
    * Single source of the family stack consumed by the self-hosted Inter
    * @font-face cascade override in @catalyst/ui/assets/fonts/inter.css
    * (`.v-application { font-family: var(--brand-font-primary) }`). */

@@ -22,7 +22,7 @@ yarn-error.log
 /.vscode
 /.zed
 
-# Published Laravel mail views (Sprint 3.5 Chunk 4 — Engine C v2 brand mail
+# Published Laravel mail views (Sprint 3.5 Chunk 4 — Catalyst Engine v2 brand mail
 # theme). The repo-root .gitignore `vendor/` rule (intended for Composer
 # dependencies) also matches this published path; re-include it so the brand
 # mail theme + the vendor blade templates it depends on are committed.

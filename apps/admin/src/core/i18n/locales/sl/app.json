@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Engine C — Admin",
+    "title": "Catalyst Engine — Admin",
     "subtitle": "Konzole superskrbnik.",
     "sprint0Notice": "Scaffolding Sprint 0 — admin SPA",
     "dashboardPlaceholder": "Zástupný symbol řídicího panelu skrbnik — plná plocha přijde v pozdějším sprintu.",

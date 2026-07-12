@@ -3,7 +3,7 @@
  * standing standard 5.1). Mirror of
  * `apps/main/tests/unit/architecture/aurora-surfacing.spec.ts`.
  *
- * Aurora is the Engine C v2 brand accent. Per Decision D7 it is a UTILITY
+ * Aurora is the Catalyst Engine v2 brand accent. Per Decision D7 it is a UTILITY
  * value consumed via `var(--brand-aurora-gradient)`, NEVER registered in a
  * Vuetify `theme.colors` slot (pinned separately by
  * `color-system-parity.spec.ts` invariant 3). Chunk 4 applies it as a thin

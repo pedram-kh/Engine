@@ -14,7 +14,7 @@
  *     extending the same logic to *theme* keys).
  *   - Sprint 3.5 Chunk 1 Refinement R1: the kickoff's proposed
  *     `engineCDark` / `engineCLight` key rename was reinterpreted back to
- *     these `dark` / `light` keys. The Engine C v2 brand identity lives in
+ *     these `dark` / `light` keys. The Catalyst Engine v2 brand identity lives in
  *     the theme VALUES (zinc neutrals, aurora utility, Inter font), not
  *     the key names — so chunk 8.1's Vuetify-standard-naming decision is
  *     preserved unchanged.

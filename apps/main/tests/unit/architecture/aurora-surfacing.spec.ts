@@ -2,7 +2,7 @@
  * Source-inspection regression test (Sprint 3.5 Chunk 4, Workstream A —
  * standing standard 5.1).
  *
- * Aurora is the Engine C v2 brand accent. Per Decision D7 it is a UTILITY
+ * Aurora is the Catalyst Engine v2 brand accent. Per Decision D7 it is a UTILITY
  * value consumed via `var(--brand-aurora-gradient)`, NEVER registered in a
  * Vuetify `theme.colors` slot (that invariant is pinned separately by
  * `color-system-parity.spec.ts` invariant 3). Chunk 4 applies it as THIN

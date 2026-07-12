@@ -52,7 +52,7 @@ return new class extends Migration
             $table->id();
             $table->ulid('ulid')->unique();
 
-            // Null for global Engine C T&Cs (the master_universal
+            // Null for global Catalyst Engine T&Cs (the master_universal
             // click-through case); set for agency-scoped agreements.
             $table->unsignedBigInteger('agency_id')->nullable();
             $table->foreign('agency_id')

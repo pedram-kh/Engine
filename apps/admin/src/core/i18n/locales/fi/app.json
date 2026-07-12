@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Engine C — Ylläpitäjä",
+    "title": "Catalyst Engine — Ylläpitäjä",
     "subtitle": "Super-admin console.",
     "sprint0Notice": "Sprint 0 scaffolding — admin SPA",
     "dashboardPlaceholder": "Ylläpitäjä dashboard placeholder — full surface lands in a later sprint.",

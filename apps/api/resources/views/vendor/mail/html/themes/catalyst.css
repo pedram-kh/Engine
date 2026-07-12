@@ -2,7 +2,7 @@
  * Catalyst Engine — brand mail theme (Sprint 3.5 Chunk 4, Workstream C).
  *
  * A rebrand of Laravel's stock `default.css` markdown-mail theme to the
- * Engine C v2 brand palette. Pointed at by `config/mail.php`
+ * Catalyst Engine v2 brand palette. Pointed at by `config/mail.php`
  * (`markdown.theme => 'catalyst'`); Laravel inlines this CSS into the
  * `style=""` attributes of the rendered email via css-to-inline-styles.
  *

@@ -2,7 +2,7 @@
  * Color-system parity architecture test (Sprint 3.5 Chunk 1 — § 1.5,
  * the load-bearing new artifact of this chunk).
  *
- * Pins the structural contracts of the Engine C v2 colour + typography
+ * Pins the structural contracts of the Catalyst Engine v2 colour + typography
  * system so a future edit to `@catalyst/design-tokens` cannot silently
  * break the brand layer. Five invariants:
  *

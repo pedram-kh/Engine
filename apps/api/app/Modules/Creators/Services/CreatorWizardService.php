@@ -405,7 +405,7 @@ final class CreatorWizardService
      * versioned + timestamped + attributed + unified with the future
      * vendor record (closes the inventory's continuity gap). The row is:
      *
-     *   kind               master_universal (global Engine C T&Cs)
+     *   kind               master_universal (global Catalyst Engine T&Cs)
      *   subject            creator → this creator
      *   version            ContractTermsRenderer::currentVersionNumber()
      *                      (server-side — the client never sends a version)

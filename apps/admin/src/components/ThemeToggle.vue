@@ -17,7 +17,7 @@
  *
  * Binary toggle (Sprint 3.5 Chunk 1 — Q `tri_state_disposition`):
  *   Chunk 8.2 shipped a tri-state toggle (light / dark / system). The
- *   `system` affordance was dropped in Sprint 3.5: the Engine C v2 brand
+ *   `system` affordance was dropped in Sprint 3.5: the Catalyst Engine v2 brand
  *   is dark-first and the toggle is a deliberate binary choice. The two
  *   values map 1:1 to the persistence layer's storage values.
  *

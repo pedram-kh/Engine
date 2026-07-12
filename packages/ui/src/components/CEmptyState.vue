@@ -22,7 +22,7 @@
  *   - `dataTest`       — applied to the root for spec/Playwright anchoring.
  *     Call-site migrations preserve each existing `data-test` anchor.
  *
- * Styling consumes the Engine C v2 type scale (`--catalyst-typography-*`)
+ * Styling consumes the Catalyst Engine v2 type scale (`--catalyst-typography-*`)
  * and zinc neutrals via the Vuetify theme (`rgb(var(--v-theme-on-surface*))`),
  * so it re-themes automatically across light/dark.
  *

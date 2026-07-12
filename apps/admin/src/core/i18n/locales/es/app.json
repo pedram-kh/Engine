@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Engine C — Administración",
+    "title": "Catalyst Engine — Administración",
     "subtitle": "Consola de superadministrador.",
     "sprint0Notice": "Estructura de Sprint 0 — SPA de administración",
     "dashboardPlaceholder": "Marcador de posición del panel de administración: la superficie completa llegará en un sprint posterior.",

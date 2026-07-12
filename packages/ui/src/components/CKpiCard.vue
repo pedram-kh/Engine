@@ -14,7 +14,7 @@
  * renders a muted em dash (`—`) — the card holds its slot in the strip and
  * becomes real in place when its backing data lands. No "coming soon" text.
  *
- * Typography is consumed via the Engine C v2 `--catalyst-typography-*` CSS
+ * Typography is consumed via the Catalyst Engine v2 `--catalyst-typography-*` CSS
  * vars (no rem literals — `typography-consumption.spec.ts` scans this
  * package). Colours flow through the Vuetify theme
  * (`rgb(var(--v-theme-*))`), so the card re-themes automatically across

@@ -35,7 +35,7 @@ export const brand = {
   ink: '#0A0A0B',
   gradient: 'linear-gradient(135deg, #14B8A6 0%, #8B5CF6 100%)',
   /**
-   * Aurora accent (Sprint 3.5 Chunk 1 — Engine C v2 brand layer).
+   * Aurora accent (Sprint 3.5 Chunk 1 — Catalyst Engine v2 brand layer).
    *
    * The aurora gradient is the partner-agency-aligned brand accent. Per
    * Sprint 3.5 Decision D7 it is a UTILITY value, NOT a Vuetify theme
@@ -57,7 +57,7 @@ export const brand = {
 } as const
 
 /**
- * Zinc neutral scale (Sprint 3.5 Chunk 1 — Engine C v2 brand layer).
+ * Zinc neutral scale (Sprint 3.5 Chunk 1 — Catalyst Engine v2 brand layer).
  *
  * Per Sprint 3.5 Decisions D4 (dark) + D5 (light), the v2 neutral surface
  * uses Tailwind's zinc family — a true-neutral grey. It is the canonical
