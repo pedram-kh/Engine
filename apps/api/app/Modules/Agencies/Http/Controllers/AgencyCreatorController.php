@@ -18,9 +18,11 @@ use App\Modules\Creators\Services\Availability\AvailabilityConflictService;
 use App\Modules\Creators\Services\Availability\AvailabilityExpansionService;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * GET /api/v1/agencies/{agency}/creators — the agency roster list
@@ -145,7 +147,7 @@ final class AgencyCreatorController
             // roster list can surface it without an N+1 — `user_id` is added to
             // the creator select so the belongsTo can hydrate.
             ->with([
-                'creator:id,ulid,user_id,display_name,country_code,primary_language,accent,categories,application_status',
+                'creator:id,ulid,user_id,display_name,country_code,primary_language,accent,categories,application_status,avatar_path',
                 'creator.user:id,email',
             ])
             // Default sort: creator display_name ASC via a correlated
@@ -310,8 +312,15 @@ final class AgencyCreatorController
 
     /**
      * Slim per-row shape (D-c5-5). Carries internal_rating (read-only) and
-     * the denormalized counters; deliberately omits internal_notes and any
-     * signed media URLs.
+     * the denormalized counters; deliberately omits internal_notes and heavy
+     * relations.
+     *
+     * `avatar_url` (invite-offer-details batch) revisits the original "no
+     * signed URLs on the list" call: per-row presigning is a LOCAL HMAC
+     * computation (no S3 round-trip), and AH-013 accepted it on bounded,
+     * paginated picker lists — which this is (per_page ≤ 100). The consumer
+     * is the campaign invite picker's real avatars; the roster page gets them
+     * for free.
      *
      * @return array<string, mixed>
      */
@@ -350,7 +359,27 @@ final class AgencyCreatorController
                 'primary_language' => $creator?->primary_language,
                 'accent' => $creator?->accent,
                 'categories' => $creator?->categories,
+                'avatar_url' => $this->signedAvatarUrl($creator?->avatar_path),
             ],
         ];
+    }
+
+    /**
+     * Short-lived signed GET for the creator avatar (the ContactMediaUrl /
+     * AgencyCreatorDetailResource behaviour, kept local to this module): null
+     * when there is no path or the `media` disk is not S3 (tests).
+     */
+    private function signedAvatarUrl(?string $path): ?string
+    {
+        if ($path === null || $path === '') {
+            return null;
+        }
+
+        $disk = Storage::disk('media');
+        if (! $disk instanceof AwsS3V3Adapter) {
+            return null;
+        }
+
+        return $disk->temporaryUrl($path, now()->addMinutes(60));
     }
 }

@@ -51,6 +51,15 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         Route::post('campaigns/{campaign}/assignments', [CampaignAssignmentController::class, 'store'])
             ->name('campaigns.assignments.store');
 
+        // Invite-offer attachment (invite-offer-details batch) — presigned
+        // init/complete, campaign-keyed (the upload precedes any assignment
+        // row). Registered BEFORE the {assignment} routes; the static
+        // `attachments` segment never collides with an {assignment} ULID.
+        Route::post('campaigns/{campaign}/assignments/attachments/init', [CampaignAssignmentController::class, 'attachmentInit'])
+            ->name('campaigns.assignments.attachments.init');
+        Route::post('campaigns/{campaign}/assignments/attachments/complete', [CampaignAssignmentController::class, 'attachmentComplete'])
+            ->name('campaigns.assignments.attachments.complete');
+
         // Re-invite after a counter (Chunk 2, D-7) — the guarded machine edge.
         Route::post('campaigns/{campaign}/assignments/{assignment}/reinvite', [CampaignAssignmentController::class, 'reinvite'])
             ->name('campaigns.assignments.reinvite');

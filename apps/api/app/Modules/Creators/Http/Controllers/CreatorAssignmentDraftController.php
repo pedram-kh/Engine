@@ -17,6 +17,7 @@ use App\Modules\Campaigns\Jobs\VerifyPostedContentJob;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
 use App\Modules\Campaigns\Models\CampaignPostedContent;
+use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Creators\Enums\ContractStatus;
 use App\Modules\Creators\Enums\SocialPlatform;
@@ -109,6 +110,16 @@ final class CreatorAssignmentDraftController
                     'status' => $model->status->value,
                     'agreed_fee_minor_units' => $model->agreed_fee_minor_units,
                     'agreed_fee_currency' => $model->agreed_fee_currency,
+                    // Invite-offer context (invite-offer-details batch); the
+                    // signed URL inherits this owner-scoped surface's authz.
+                    'fee_per' => $model->fee_per,
+                    'offer_description' => $model->offer_description,
+                    'offer_attachment' => $model->offer_attachment_path !== null ? [
+                        'name' => $model->offer_attachment_name,
+                        'mime_type' => $model->offer_attachment_mime,
+                        'size_bytes' => $model->offer_attachment_size_bytes,
+                        'url' => AssignmentOfferAttachmentUploadService::signedViewUrl($model->offer_attachment_path),
+                    ] : null,
                     'countered_fee_minor_units' => $model->countered_fee_minor_units,
                     'countered_fee_currency' => $model->countered_fee_currency,
                     'deliverables' => $model->deliverables,

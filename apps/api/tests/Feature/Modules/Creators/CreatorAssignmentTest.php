@@ -87,6 +87,29 @@ it('lists the creator\'s OWN assignments across all agencies (scope bypass)', fu
         ->assertJsonCount(2, 'data');
 });
 
+it('emits the invite-offer context (fee_per, offer_description, offer_attachment) on the list row', function (): void {
+    [$user, $creator] = creatorUser();
+    invitedAssignmentFor($creator, [
+        'fee_per' => 'per script',
+        'offer_description' => 'One 60s UGC video.',
+        'offer_attachment_path' => 'agencies/01A/campaigns/01B/offer-attachments/01C.pdf',
+        'offer_attachment_name' => 'brief.pdf',
+        'offer_attachment_mime' => 'application/pdf',
+        'offer_attachment_size_bytes' => 2048,
+    ]);
+
+    $response = $this->actingAs($user)
+        ->getJson('/api/v1/creators/me/assignments')
+        ->assertOk();
+
+    // Local test disk cannot sign, so `url` is null — the metadata block is
+    // the assertable surface (the CampaignAssignmentInviteTest counterpart).
+    expect($response->json('data.0.attributes.fee_per'))->toBe('per script')
+        ->and($response->json('data.0.attributes.offer_description'))->toBe('One 60s UGC video.')
+        ->and($response->json('data.0.attributes.offer_attachment.name'))->toBe('brief.pdf')
+        ->and($response->json('data.0.attributes.offer_attachment.size_bytes'))->toBe(2048);
+});
+
 // ── Accept / decline (machine-driven) ────────────────────────────────────────
 
 it('accepts an invited assignment (invited → accepted) via the state machine', function (): void {

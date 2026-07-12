@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Campaigns\Http\Resources;
 
 use App\Modules\Campaigns\Models\CampaignAssignment;
+use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
 use App\Modules\Creators\Models\Creator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -58,6 +59,17 @@ final class CampaignAssignmentResource extends JsonResource
                 'status' => $assignment->status->value,
                 'agreed_fee_minor_units' => $assignment->agreed_fee_minor_units,
                 'agreed_fee_currency' => $assignment->agreed_fee_currency,
+                // Invite-offer context (invite-offer-details batch). The
+                // attachment URL is a short-lived signed GET minted here, so
+                // the download inherits this surface's view authz (AH-004).
+                'fee_per' => $assignment->fee_per,
+                'offer_description' => $assignment->offer_description,
+                'offer_attachment' => $assignment->offer_attachment_path !== null ? [
+                    'name' => $assignment->offer_attachment_name,
+                    'mime_type' => $assignment->offer_attachment_mime,
+                    'size_bytes' => $assignment->offer_attachment_size_bytes,
+                    'url' => AssignmentOfferAttachmentUploadService::signedViewUrl($assignment->offer_attachment_path),
+                ] : null,
                 'countered_fee_minor_units' => $assignment->countered_fee_minor_units,
                 'countered_fee_currency' => $assignment->countered_fee_currency,
                 'invited_at' => $assignment->invited_at?->toIso8601String(),

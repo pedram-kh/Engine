@@ -37,6 +37,21 @@ final class InviteAssignmentRequest extends FormRequest
             'agreed_fee_minor_units' => ['required', 'integer', 'min:1'],
             'agreed_fee_currency' => ['required', 'string', 'size:3'],
 
+            // Invite-offer-details batch — free-text offer context, all
+            // optional. `fee_per` is the unit the fee applies to ("per
+            // script"); agency-authored content, deliberately not an enum.
+            'fee_per' => ['nullable', 'string', 'max:120'],
+            'offer_description' => ['nullable', 'string', 'max:2000'],
+
+            // ONE optional offer attachment, uploaded via the presigned
+            // init/complete pair BEFORE the invite; the upload_id is re-verified
+            // against the campaign prefix in the controller (isolation backstop).
+            'attachment' => ['nullable', 'array'],
+            'attachment.upload_id' => ['required_with:attachment', 'string', 'max:500'],
+            'attachment.name' => ['required_with:attachment', 'string', 'max:255'],
+            'attachment.mime_type' => ['required_with:attachment', 'string', 'max:120'],
+            'attachment.size_bytes' => ['required_with:attachment', 'integer', 'min:1'],
+
             'deliverables' => ['nullable', 'array'],
             'posting_due_at' => ['nullable', 'date'],
             // Sprint 12 Chunk 3 (D-2) — the draft deadline, an exact mirror of

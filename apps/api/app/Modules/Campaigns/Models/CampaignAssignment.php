@@ -49,6 +49,12 @@ use Illuminate\Support\Carbon;
  * @property int|null $contract_id
  * @property int|null $agreed_fee_minor_units
  * @property string|null $agreed_fee_currency
+ * @property string|null $fee_per
+ * @property string|null $offer_description
+ * @property string|null $offer_attachment_path
+ * @property string|null $offer_attachment_name
+ * @property string|null $offer_attachment_mime
+ * @property int|null $offer_attachment_size_bytes
  * @property int|null $countered_fee_minor_units
  * @property string|null $countered_fee_currency
  * @property int|null $markup_minor_units
@@ -97,6 +103,12 @@ final class CampaignAssignment extends Model
         'contract_id',
         'agreed_fee_minor_units',
         'agreed_fee_currency',
+        'fee_per',
+        'offer_description',
+        'offer_attachment_path',
+        'offer_attachment_name',
+        'offer_attachment_mime',
+        'offer_attachment_size_bytes',
         'countered_fee_minor_units',
         'countered_fee_currency',
         'markup_minor_units',
@@ -239,6 +251,7 @@ final class CampaignAssignment extends Model
             'responded_at' => 'datetime',
             'accepted_at' => 'datetime',
             'agreed_fee_minor_units' => 'integer',
+            'offer_attachment_size_bytes' => 'integer',
             'countered_fee_minor_units' => 'integer',
             'markup_minor_units' => 'integer',
             'total_charged_to_brand_minor_units' => 'integer',

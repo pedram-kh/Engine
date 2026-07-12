@@ -156,7 +156,7 @@ it('filters BY declined — the chip returns exactly those (D-6)', function (): 
 // Slim resource shape (D-c5-5)
 // ---------------------------------------------------------------------------
 
-it('exposes the slim row shape with internal_rating but NOT internal_notes and no signed URLs', function (): void {
+it('exposes the slim row shape with internal_rating but NOT internal_notes', function (): void {
     $agency = Agency::factory()->createOne();
     $admin = User::factory()->agencyAdmin($agency)->createOne();
 
@@ -185,8 +185,14 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes and n
         'country_code',
         'primary_language',
         'categories',
+        // avatar_url joined the slim row (invite-offer-details batch): the
+        // AH-012 D5 "no per-row signing on the roster index" call was
+        // revisited under the AH-013 bounded-paginated-list precedent so the
+        // invite picker can show real avatars. Null on a non-S3 disk (tests).
+        'avatar_url',
     ]);
     expect($attributes['internal_rating'])->toBe(4);
+    expect($attributes['avatar_url'])->toBeNull();
 
     // The GDPR-sensitive note must NEVER appear anywhere in the payload
     // (break-revert: adding it to the row shape fails this).
@@ -194,8 +200,8 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes and n
     expect($response->getContent())->not->toContain('internal_notes');
     expect($response->getContent())->not->toContain('private agency note');
 
-    // No signed media URLs (the slim resource is not CreatorResource).
-    expect($attributes)->not->toHaveKey('avatar_url');
+    // Still no heavy media beyond the avatar (the slim resource is not
+    // CreatorResource — cover stays off the list).
     expect($attributes)->not->toHaveKey('cover_url');
 });
 

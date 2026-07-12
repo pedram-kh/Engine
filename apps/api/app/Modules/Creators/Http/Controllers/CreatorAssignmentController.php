@@ -7,6 +7,7 @@ namespace App\Modules\Creators\Http\Controllers;
 use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Models\CampaignAssignment;
+use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Creators\Http\Requests\CounterAssignmentRequest;
 use App\Modules\Creators\Models\Creator;
@@ -158,6 +159,17 @@ final class CreatorAssignmentController
                 'status' => $assignment->status->value,
                 'agreed_fee_minor_units' => $assignment->agreed_fee_minor_units,
                 'agreed_fee_currency' => $assignment->agreed_fee_currency,
+                // Invite-offer context (invite-offer-details batch). The signed
+                // attachment URL is minted inside this already-owner-scoped row,
+                // so the download inherits the creator's own view authz.
+                'fee_per' => $assignment->fee_per,
+                'offer_description' => $assignment->offer_description,
+                'offer_attachment' => $assignment->offer_attachment_path !== null ? [
+                    'name' => $assignment->offer_attachment_name,
+                    'mime_type' => $assignment->offer_attachment_mime,
+                    'size_bytes' => $assignment->offer_attachment_size_bytes,
+                    'url' => AssignmentOfferAttachmentUploadService::signedViewUrl($assignment->offer_attachment_path),
+                ] : null,
                 'countered_fee_minor_units' => $assignment->countered_fee_minor_units,
                 'countered_fee_currency' => $assignment->countered_fee_currency,
                 'deliverables' => $assignment->deliverables,

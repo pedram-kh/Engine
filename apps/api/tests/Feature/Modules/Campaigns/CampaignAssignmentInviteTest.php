@@ -10,11 +10,13 @@ use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
+use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorAvailabilityBlock;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -398,4 +400,180 @@ it('fails closed on an illegal re-invite source (e.g. accepted → invited) — 
         ->assertJsonPath('errors.0.code', 'assignment.invalid_transition');
 
     expect(reloadAssignment($assignment)->status)->toBe(AssignmentStatus::Accepted);
+});
+
+// ── Invite-offer details (fee_per + offer_description + attachment) ──────────
+
+function offerAttachmentInitUrl(Agency $agency, Campaign $campaign): string
+{
+    return inviteUrl($agency, $campaign).'/attachments/init';
+}
+
+/**
+ * A minimal JPEG with an APP1/EXIF segment carrying a unique ASCII marker —
+ * the complete-time re-encode must drop it. (Named distinctly from the
+ * messaging test's helper: Pest loads all test files into one function scope.)
+ */
+function jpegWithOfferExifMarker(string $marker): string
+{
+    $image = imagecreatetruecolor(48, 48);
+    assert($image !== false);
+    ob_start();
+    imagejpeg($image, null, 90);
+    $jpeg = (string) ob_get_clean();
+    imagedestroy($image);
+
+    $payload = "Exif\x00\x00".$marker;
+    $length = strlen($payload) + 2;
+    $app1 = "\xFF\xE1".pack('n', $length).$payload;
+
+    return substr($jpeg, 0, 2).$app1.substr($jpeg, 2);
+}
+
+it('persists fee_per + offer_description on invite and emits them in the resource', function (): void {
+    [$agency, , $campaign] = campaignWithBrand();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = invitableCreator();
+
+    $this->actingAs($admin)
+        ->postJson(inviteUrl($agency, $campaign), invitePayload($creator, [
+            'fee_per' => 'per script',
+            'offer_description' => 'One 60s UGC video, casual tone, product in frame.',
+        ]))
+        ->assertCreated()
+        ->assertJsonPath('data.attributes.fee_per', 'per script')
+        ->assertJsonPath('data.attributes.offer_description', 'One 60s UGC video, casual tone, product in frame.')
+        ->assertJsonPath('data.attributes.offer_attachment', null);
+
+    $assignment = CampaignAssignment::query()->where('campaign_id', $campaign->id)->firstOrFail();
+    expect($assignment->fee_per)->toBe('per script')
+        ->and($assignment->offer_description)->toBe('One 60s UGC video, casual tone, product in frame.');
+});
+
+it('initiates an offer-attachment upload scoped under the campaign prefix', function (): void {
+    Storage::fake('media');
+    [$agency, , $campaign] = campaignWithBrand();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $response = $this->actingAs($admin)
+        ->postJson(offerAttachmentInitUrl($agency, $campaign), ['mime_type' => 'application/pdf', 'size_bytes' => 1024])
+        ->assertOk();
+
+    expect($response->json('data.storage_path'))
+        ->toStartWith("agencies/{$agency->ulid}/campaigns/{$campaign->ulid}/offer-attachments/")
+        ->toEndWith('.pdf')
+        ->and($response->json('data.max_bytes'))->toBe(AssignmentOfferAttachmentUploadService::MAX_BYTES);
+});
+
+it('rejects an unsupported offer-attachment mime type on init (422)', function (): void {
+    Storage::fake('media');
+    [$agency, , $campaign] = campaignWithBrand();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $this->actingAs($admin)
+        ->postJson(offerAttachmentInitUrl($agency, $campaign), ['mime_type' => 'application/x-msdownload', 'size_bytes' => 1024])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'assignment.attachment_invalid');
+});
+
+it('rejects completing an upload_id that belongs to another campaign prefix (isolation backstop)', function (): void {
+    Storage::fake('media');
+    [$agency, $brand, $campaign] = campaignWithBrand();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $otherCampaign = Campaign::factory()->createOne([
+        'agency_id' => $agency->id,
+        'brand_id' => $brand->id,
+        'budget_currency' => 'EUR',
+    ]);
+    $foreignPath = "agencies/{$agency->ulid}/campaigns/{$otherCampaign->ulid}/offer-attachments/01FOREIGN.pdf";
+    Storage::disk('media')->put($foreignPath, 'pdf-bytes');
+
+    $this->actingAs($admin)
+        ->postJson(inviteUrl($agency, $campaign).'/attachments/complete', ['upload_id' => $foreignPath])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'assignment.attachment_invalid');
+});
+
+it('invites with an offer attachment — persists the metadata and emits the offer_attachment block', function (): void {
+    Storage::fake('media');
+    [$agency, , $campaign] = campaignWithBrand();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = invitableCreator();
+
+    $storagePath = $this->actingAs($admin)
+        ->postJson(offerAttachmentInitUrl($agency, $campaign), ['mime_type' => 'application/pdf', 'size_bytes' => 2048])
+        ->json('data.storage_path');
+    Storage::disk('media')->put($storagePath, 'pdf-bytes');
+
+    $this->actingAs($admin)
+        ->postJson(inviteUrl($agency, $campaign).'/attachments/complete', ['upload_id' => $storagePath])
+        ->assertOk()
+        ->assertJsonPath('data.storage_path', $storagePath);
+
+    $response = $this->actingAs($admin)
+        ->postJson(inviteUrl($agency, $campaign), invitePayload($creator, [
+            'attachment' => [
+                'upload_id' => $storagePath,
+                'name' => 'brief.pdf',
+                'mime_type' => 'application/pdf',
+                'size_bytes' => 2048,
+            ],
+        ]))
+        ->assertCreated();
+
+    // Storage::fake is a local (non-S3) disk, so the signed URL is null in
+    // tests — the metadata block is the assertable surface.
+    expect($response->json('data.attributes.offer_attachment.name'))->toBe('brief.pdf')
+        ->and($response->json('data.attributes.offer_attachment.mime_type'))->toBe('application/pdf')
+        ->and($response->json('data.attributes.offer_attachment.size_bytes'))->toBe(2048);
+
+    $assignment = CampaignAssignment::query()->where('campaign_id', $campaign->id)->firstOrFail();
+    expect($assignment->offer_attachment_path)->toBe($storagePath)
+        ->and($assignment->offer_attachment_name)->toBe('brief.pdf');
+});
+
+it('rejects an invite whose attachment upload_id escapes the campaign prefix (422)', function (): void {
+    Storage::fake('media');
+    [$agency, , $campaign] = campaignWithBrand();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = invitableCreator();
+
+    $foreignPath = 'relationship-messages/01SOMETHREAD/01SOMEFILE.pdf';
+    Storage::disk('media')->put($foreignPath, 'pdf-bytes');
+
+    $this->actingAs($admin)
+        ->postJson(inviteUrl($agency, $campaign), invitePayload($creator, [
+            'attachment' => [
+                'upload_id' => $foreignPath,
+                'name' => 'brief.pdf',
+                'mime_type' => 'application/pdf',
+                'size_bytes' => 2048,
+            ],
+        ]))
+        ->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'assignment.attachment_invalid');
+
+    expect(CampaignAssignment::query()->where('campaign_id', $campaign->id)->exists())->toBeFalse();
+});
+
+it('EXIF-strips a supported image at complete time (the AH-010a discipline)', function (): void {
+    Storage::fake('media');
+    [$agency, , $campaign] = campaignWithBrand();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $storagePath = $this->actingAs($admin)
+        ->postJson(offerAttachmentInitUrl($agency, $campaign), ['mime_type' => 'image/jpeg', 'size_bytes' => 4096])
+        ->json('data.storage_path');
+
+    $marker = 'OFFER-EXIF-MARKER-9F2';
+    Storage::disk('media')->put($storagePath, jpegWithOfferExifMarker($marker));
+
+    $this->actingAs($admin)
+        ->postJson(inviteUrl($agency, $campaign).'/attachments/complete', ['upload_id' => $storagePath])
+        ->assertOk();
+
+    $stored = Storage::disk('media')->get($storagePath);
+    expect($stored)->not->toBeNull()
+        ->and(str_contains((string) $stored, $marker))->toBeFalse();
 });
