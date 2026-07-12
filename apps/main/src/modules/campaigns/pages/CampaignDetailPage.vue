@@ -601,7 +601,7 @@ function formatDay(iso: string | null): string {
                 </v-btn>
                 <v-btn
                   v-if="canViewPost(a)"
-                  color="secondary"
+                  color="primary"
                   variant="outlined"
                   size="small"
                   :data-test="`creators-view-post-${a.id}`"
