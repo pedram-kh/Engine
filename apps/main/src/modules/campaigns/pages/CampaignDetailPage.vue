@@ -425,6 +425,24 @@ function formatDay(iso: string | null): string {
                 :subtitle="formatDay(campaign.attributes.ends_at)"
                 data-test="overview-ends-at"
               />
+              <v-list-item :title="t('app.campaigns.fields.requiresContract')">
+                <template #subtitle>
+                  <v-icon
+                    :icon="
+                      campaign.attributes.requires_per_campaign_contract
+                        ? 'mdi-check-circle'
+                        : 'mdi-minus-circle-outline'
+                    "
+                    :color="
+                      campaign.attributes.requires_per_campaign_contract
+                        ? 'success'
+                        : 'medium-emphasis'
+                    "
+                    size="small"
+                    data-test="overview-requires-contract"
+                  />
+                </template>
+              </v-list-item>
               <v-list-item
                 v-if="campaign.attributes.description"
                 class="overview-description"
