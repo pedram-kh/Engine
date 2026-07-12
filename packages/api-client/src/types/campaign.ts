@@ -194,6 +194,13 @@ export interface CampaignAssignmentResource {
     offer_attachment?: AssignmentOfferAttachment | null
     countered_fee_minor_units: number | null
     countered_fee_currency: string | null
+    /**
+     * True once this row has been declined then re-offered (re-offer-after-
+     * decline chunk) — drives the Creators-tab "declined, then re-invited"
+     * history tag, which persists after the status flips back to `invited`.
+     * Optional for back-compat with older payloads.
+     */
+    previously_declined?: boolean
     invited_at: string | null
     responded_at: string | null
     posting_due_at: string | null
