@@ -61,6 +61,12 @@ export interface BoardCardAssignmentData {
   id: string
   type: 'campaign_assignments'
   status: AssignmentStatus
+  /**
+   * True once the row was declined then re-offered (re-offer-after-decline
+   * chunk) — drives the "was declined, re-invited" tag on the card face + the
+   * drawer. Optional for back-compat with older payloads.
+   */
+  previously_declined?: boolean
   deliverables: string[] | null
   posting_due_at: string | null
   creator: {
