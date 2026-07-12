@@ -490,6 +490,19 @@ function formatDay(iso: string | null): string {
             <v-list-item v-for="a in assignments" :key="a.id" :data-test="`creators-row-${a.id}`">
               <v-list-item-title class="d-flex align-center ga-2">
                 {{ a.attributes.creator?.display_name ?? '—' }}
+                <!-- History tag: this row was declined, then re-offered
+                     (re-offer-after-decline chunk). Shown alongside the live
+                     status so the agency sees "declined → re-invited". Reuses
+                     the declined status label. -->
+                <v-chip
+                  v-if="a.attributes.previously_declined && a.attributes.status !== 'declined'"
+                  size="x-small"
+                  variant="tonal"
+                  color="medium-emphasis"
+                  :data-test="`creators-declined-history-${a.id}`"
+                >
+                  {{ t('app.campaigns.assignmentStatus.declined') }}
+                </v-chip>
                 <v-chip size="x-small" variant="tonal" :data-test="`creators-status-${a.id}`">
                   {{ t(`app.campaigns.assignmentStatus.${a.attributes.status}`) }}
                 </v-chip>

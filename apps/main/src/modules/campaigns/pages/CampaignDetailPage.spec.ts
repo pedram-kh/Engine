@@ -142,6 +142,7 @@ function makeAssignment(
   status: CampaignAssignmentResource['attributes']['status'],
   verificationStatus: CampaignAssignmentResource['attributes']['verification_status'] = null,
   hasPendingContract: CampaignAssignmentResource['attributes']['has_pending_contract'] = null,
+  previouslyDeclined = false,
 ): CampaignAssignmentResource {
   return {
     id,
@@ -152,6 +153,7 @@ function makeAssignment(
       agreed_fee_currency: 'EUR',
       countered_fee_minor_units: status === 'countered' ? 150000 : null,
       countered_fee_currency: status === 'countered' ? 'EUR' : null,
+      previously_declined: previouslyDeclined,
       invited_at: '2026-06-01T10:00:00.000000Z',
       responded_at: status === 'countered' ? '2026-06-02T10:00:00.000000Z' : null,
       posting_due_at: null,
@@ -333,6 +335,18 @@ describe('CampaignDetailPage — Creators tab re-invite (re-invite UI chunk)', (
     ])
     expect(wrapper.find('[data-test="creators-status-A"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="creators-status-B"]').exists()).toBe(true)
+  })
+
+  it('shows a Declined history chip alongside the live status on a re-offered row', async () => {
+    const wrapper = await openCreatorsTab('agency_staff', [
+      // Re-offered after a decline: previously_declined + status back to invited.
+      makeAssignment('R', 'invited', null, null, true),
+      // A plain invited row (never declined) shows NO history chip.
+      makeAssignment('P', 'invited'),
+    ])
+    expect(wrapper.find('[data-test="creators-declined-history-R"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="creators-status-R"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="creators-declined-history-P"]').exists()).toBe(false)
   })
 
   it('shows both fees + the re-invite action on a countered row', async () => {

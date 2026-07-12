@@ -1,8 +1,11 @@
 /**
  * Sprint 8 Chunk 2 (D-9/D-10) — Vitest coverage for the creator's campaign-
- * invitation surface. Pins: rows render with a status chip; accept/counter/
- * decline actions appear ONLY for `invited` rows (fail-closed UI); accept calls
- * the API then re-fetches; the empty state renders when there are no rows.
+ * invitation surface. Pins: rows render with a status chip; accept/decline
+ * actions appear ONLY for `invited` rows (fail-closed UI); accept calls the API
+ * then re-fetches; the empty state renders when there are no rows.
+ *
+ * Countering was removed (re-offer-after-decline chunk): the creator has NO
+ * counter action — this spec pins its absence.
  */
 
 import type { CreatorAssignmentResource } from '@catalyst/api-client'
@@ -16,7 +19,6 @@ vi.mock('../assignments.api', () => ({
     list: vi.fn(),
     accept: vi.fn(),
     decline: vi.fn(),
-    counter: vi.fn(),
   },
 }))
 
@@ -77,7 +79,7 @@ describe('CreatorAssignmentsPage', () => {
     expect(wrapper.find('[data-testid="creator-assignment-B"]').exists()).toBe(true)
   })
 
-  it('shows accept/counter/decline ONLY for an invited row (fail-closed UI)', async () => {
+  it('shows accept/decline ONLY for an invited row, and NEVER a counter action', async () => {
     vi.mocked(creatorAssignmentsApi.list).mockResolvedValue({
       data: [makeAssignment('A', 'invited'), makeAssignment('B', 'accepted')],
     })
@@ -87,8 +89,11 @@ describe('CreatorAssignmentsPage', () => {
     await flushPromises()
 
     expect(wrapper.find('[data-testid="creator-assignment-accept-A"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="creator-assignment-counter-A"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="creator-assignment-decline-A"]').exists()).toBe(true)
+    // Countering is gone (re-offer-after-decline chunk) — the button + dialog
+    // must not render for any row.
+    expect(wrapper.find('[data-testid="creator-assignment-counter-A"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="creator-assignment-counter-dialog"]').exists()).toBe(false)
     // The accepted row has NO actions.
     expect(wrapper.find('[data-testid="creator-assignment-accept-B"]').exists()).toBe(false)
   })
