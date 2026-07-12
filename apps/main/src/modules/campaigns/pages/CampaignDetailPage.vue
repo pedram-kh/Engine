@@ -229,18 +229,19 @@ function toDateInput(iso: string | null): string | undefined {
 }
 
 function seedEditForm(c: CampaignResource): void {
+  // `objective`, `target_creator_count`, and `brief` are intentionally NOT
+  // seeded: the simplified form omits them on save, so the backend `sometimes`
+  // rules preserve their stored values by omission (D-1/D-2/D-3). Re-seeding
+  // them here would re-send them and revive the brief overwrite path.
   editForm.value = {
     brand_id: c.relationships.brand.data.id,
     name: c.attributes.name,
-    objective: c.attributes.objective,
     budget_minor_units: c.attributes.budget_minor_units ?? 0,
     budget_currency: c.attributes.budget_currency ?? 'EUR',
     description: c.attributes.description ?? undefined,
     starts_at: toDateInput(c.attributes.starts_at),
     ends_at: toDateInput(c.attributes.ends_at),
-    target_creator_count: c.attributes.target_creator_count ?? undefined,
     requires_per_campaign_contract: c.attributes.requires_per_campaign_contract,
-    brief: c.attributes.brief ?? null,
   }
   editStatus.value = c.attributes.status
 }

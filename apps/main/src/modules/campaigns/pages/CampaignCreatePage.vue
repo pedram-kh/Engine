@@ -19,10 +19,10 @@ const router = useRouter()
 const agencyStore = useAgencyStore()
 
 function emptyForm(): CreateCampaignPayload {
+  // `objective` is omitted — the server defaults it to `ugc` (D-1).
   return {
     brand_id: '',
     name: '',
-    objective: 'awareness',
     budget_minor_units: 0,
     budget_currency: 'EUR',
   }

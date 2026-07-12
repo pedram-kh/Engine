@@ -1,18 +1,25 @@
 <script setup lang="ts">
 /**
- * Shared campaign form (Sprint 8 Chunk 1). Used by CampaignCreatePage and the
- * detail page's Settings tab.
+ * Shared campaign form (Sprint 8 Chunk 1; simplified in the campaign-form
+ * simplification pass, D-1..D-4). Used by CampaignCreatePage and the detail
+ * page's Settings tab.
  *
  * Money UX: the user types a major-unit amount (e.g. 2500.00) + a currency;
  * the form converts to integer minor units (the wire contract, D-3) on every
- * change. The structured brief sub-fields (deliverables / hashtags /
- * usage_rights) are assembled into the `brief` jsonb blob.
+ * change.
+ *
+ * The `objective`, `target_creator_count`, and structured `brief` sub-fields
+ * (deliverables / hashtags / usage_rights) were removed from this form. The
+ * form no longer sends `objective` (server defaults to `ugc`), and never sends
+ * `brief` / `target_creator_count` — so on edit their stored values are
+ * preserved by omission (backend `sometimes` rules). Free-text deliverables
+ * and usage terms now live in `description`.
  *
  * Per-field 422 errors arrive via `fieldErrors` (the canonical
  * extractFieldErrors pattern); the parent owns the network layer.
  */
 
-import type { CampaignObjective, CreateCampaignPayload } from '@catalyst/api-client'
+import type { CreateCampaignPayload } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -56,19 +63,11 @@ const budgetMajor = ref<string>(
     : '',
 )
 
-// Brief sub-fields surfaced as friendly inputs.
-const deliverablesText = ref<string>((props.modelValue.brief?.deliverables ?? []).join('\n'))
-const hashtagsText = ref<string>((props.modelValue.brief?.hashtags ?? []).join(' '))
-const usageRights = ref<string>(props.modelValue.brief?.usage_rights ?? '')
-
 watch(
   () => props.modelValue,
   (v) => {
     local.value = { ...v }
     budgetMajor.value = v.budget_minor_units != null ? String(v.budget_minor_units / 100) : ''
-    deliverablesText.value = (v.brief?.deliverables ?? []).join('\n')
-    hashtagsText.value = (v.brief?.hashtags ?? []).join(' ')
-    usageRights.value = v.brief?.usage_rights ?? ''
   },
 )
 
@@ -94,30 +93,7 @@ function onBudgetChange(value: string): void {
   emitUpdate()
 }
 
-function assembleBrief(): CreateCampaignPayload['brief'] {
-  const deliverables = deliverablesText.value
-    .split('\n')
-    .map((s) => s.trim())
-    .filter((s) => s !== '')
-  const hashtags = hashtagsText.value
-    .split(/[\s,]+/)
-    .map((s) => s.trim())
-    .filter((s) => s !== '')
-  const usage = usageRights.value.trim()
-
-  if (deliverables.length === 0 && hashtags.length === 0 && usage === '') {
-    return null
-  }
-  return {
-    ...(deliverables.length > 0 ? { deliverables } : {}),
-    ...(hashtags.length > 0 ? { hashtags } : {}),
-    ...(usage !== '' ? { usage_rights: usage } : {}),
-  }
-}
-
 function onSubmit(): void {
-  local.value = { ...local.value, brief: assembleBrief() }
-  emitUpdate()
   emit('submit')
 }
 
@@ -125,19 +101,10 @@ const fieldErrorList = (field: string): readonly string[] => props.fieldErrors?.
 
 const nameErrors = computed(() => fieldErrorList('name'))
 const brandErrors = computed(() => fieldErrorList('brand_id'))
-const objectiveErrors = computed(() => fieldErrorList('objective'))
 const budgetErrors = computed(() => [
   ...fieldErrorList('budget_minor_units'),
   ...fieldErrorList('budget_currency'),
 ])
-
-const objectiveOptions: { title: string; value: CampaignObjective }[] = [
-  { title: t('app.campaigns.objective.awareness'), value: 'awareness' },
-  { title: t('app.campaigns.objective.engagement'), value: 'engagement' },
-  { title: t('app.campaigns.objective.conversion'), value: 'conversion' },
-  { title: t('app.campaigns.objective.ugc'), value: 'ugc' },
-  { title: t('app.campaigns.objective.launch'), value: 'launch' },
-]
 
 const currencyOptions = [
   { title: 'EUR — Euro', value: 'EUR' },
@@ -175,23 +142,14 @@ const brandSelectItems = computed(() => props.brands.map((b) => ({ title: b.name
       @update:model-value="update('name', $event)"
     />
 
-    <v-select
-      :model-value="local.objective || null"
-      :label="t('app.campaigns.fields.objective')"
-      :error-messages="objectiveErrors as string[]"
-      :items="objectiveOptions"
-      item-title="title"
-      item-value="value"
-      required
-      data-test="campaign-objective"
-      @update:model-value="update('objective', $event)"
-    />
-
     <v-textarea
       :model-value="local.description ?? ''"
       :label="t('app.campaigns.fields.description')"
-      rows="2"
+      :hint="t('app.campaigns.fields.descriptionHint')"
+      persistent-hint
+      rows="3"
       auto-grow
+      class="mb-3"
       data-test="campaign-description"
       @update:model-value="update('description', $event || undefined)"
     />
@@ -235,46 +193,6 @@ const brandSelectItems = computed(() => props.brands.map((b) => ({ title: b.name
         @update:model-value="update('ends_at', $event || undefined)"
       />
     </div>
-
-    <v-text-field
-      :model-value="local.target_creator_count ?? ''"
-      :label="t('app.campaigns.fields.targetCreatorCount')"
-      type="number"
-      min="0"
-      data-test="campaign-target-count"
-      @update:model-value="
-        update('target_creator_count', $event === '' ? undefined : Number($event))
-      "
-    />
-
-    <v-textarea
-      :model-value="deliverablesText"
-      :label="t('app.campaigns.fields.deliverables')"
-      :hint="t('app.campaigns.fields.deliverablesHint')"
-      persistent-hint
-      rows="3"
-      auto-grow
-      data-test="campaign-deliverables"
-      @update:model-value="deliverablesText = $event"
-    />
-
-    <v-text-field
-      :model-value="hashtagsText"
-      :label="t('app.campaigns.fields.hashtags')"
-      :hint="t('app.campaigns.fields.hashtagsHint')"
-      persistent-hint
-      data-test="campaign-hashtags"
-      @update:model-value="hashtagsText = $event"
-    />
-
-    <v-textarea
-      :model-value="usageRights"
-      :label="t('app.campaigns.fields.usageRights')"
-      rows="2"
-      auto-grow
-      data-test="campaign-usage-rights"
-      @update:model-value="usageRights = $event"
-    />
 
     <v-switch
       :model-value="local.requires_per_campaign_contract ?? false"

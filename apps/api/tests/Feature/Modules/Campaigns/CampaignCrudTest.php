@@ -115,6 +115,38 @@ it('rejects an invalid objective + missing budget (422)', function (): void {
         ->assertStatus(422);
 });
 
+// ── Objective default (D-1 — the form no longer sends it) ────────────────────
+
+it('defaults a missing objective to ugc on create (D-1)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $brand = Brand::factory()->forAgency($agency->id)->createOne();
+
+    // The simplified form omits `objective` entirely.
+    $payload = validCampaignPayload($brand);
+    unset($payload['objective']);
+
+    $this->actingAs($admin)->postJson(campaignsUrl($agency), $payload)
+        ->assertCreated()
+        ->assertJsonPath('data.attributes.objective', 'ugc');
+
+    $campaign = Campaign::query()->where('agency_id', $agency->id)->firstOrFail();
+    expect($campaign->objective->value)->toBe('ugc');
+});
+
+it('honors an explicit objective on create (contract only relaxes, D-1)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $brand = Brand::factory()->forAgency($agency->id)->createOne();
+
+    $this->actingAs($admin)
+        ->postJson(campaignsUrl($agency), validCampaignPayload($brand, ['objective' => 'awareness']))
+        ->assertCreated()
+        ->assertJsonPath('data.attributes.objective', 'awareness');
+
+    expect(Campaign::query()->where('agency_id', $agency->id)->firstOrFail()->objective->value)->toBe('awareness');
+});
+
 // ── List (agency-scoped + filters) ───────────────────────────────────────────
 
 it('lists campaigns scoped to the agency, filtered by brand / status / dates', function (): void {
@@ -212,6 +244,39 @@ it('forbids a staff member from editing campaign settings (403)', function (): v
     ])->assertForbidden();
 
     expect(reloadCampaign($campaign)->status)->toBe(CampaignStatus::Draft);
+});
+
+it('preserves the stored brief byte-identical when the edit omits it (D-3 — the form no longer sends brief)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    // A RICH brief, including the sub-keys the old form rebuilt-and-wiped
+    // (dos/donts/mentions/links/attachments). The simplified form omits `brief`
+    // on save, so `sometimes` must leave every key untouched.
+    $storedBrief = [
+        'deliverables' => ['1 Reel', '3 Stories'],
+        'hashtags' => ['#summer', '#launch'],
+        'usage_rights' => '30 days paid usage',
+        'dos' => ['Tag the brand'],
+        'donts' => ['No competitor mentions'],
+        'mentions' => ['@brandhandle'],
+        'links' => ['https://brand.example/landing'],
+        'attachments' => ['brief.pdf'],
+    ];
+    $campaign = Campaign::factory()->forAgency($agency->id)->create(['brief' => $storedBrief]);
+
+    // Edit only the name — no `brief` key in the payload (the D-3 mechanism).
+    $this->actingAs($admin)->patchJson(campaignsUrl($agency)."/{$campaign->ulid}", [
+        'name' => 'Renamed campaign',
+    ])->assertOk()->assertJsonPath('data.attributes.name', 'Renamed campaign');
+
+    // Byte-identical: the whole blob AND each sub-key the wipe-bug used to drop.
+    expect(reloadCampaign($campaign)->brief)->toBe($storedBrief)
+        ->and(reloadCampaign($campaign)->brief['dos'] ?? null)->toBe(['Tag the brand'])
+        ->and(reloadCampaign($campaign)->brief['donts'] ?? null)->toBe(['No competitor mentions'])
+        ->and(reloadCampaign($campaign)->brief['mentions'] ?? null)->toBe(['@brandhandle'])
+        ->and(reloadCampaign($campaign)->brief['links'] ?? null)->toBe(['https://brand.example/landing'])
+        ->and(reloadCampaign($campaign)->brief['attachments'] ?? null)->toBe(['brief.pdf']);
 });
 
 // ── Creators tab assignment list (read-only, Chunk 1) ─────────────────────────

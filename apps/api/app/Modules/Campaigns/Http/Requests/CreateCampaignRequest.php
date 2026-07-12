@@ -18,6 +18,11 @@ use Illuminate\Validation\Rules\Enum;
  * (the `exists` scope is the tenancy guard). Money is integer minor units
  * (D-3) + an ISO-4217 currency. The structured `brief` sub-fields land in the
  * `brief` jsonb blob (NOT normalized tables).
+ *
+ * `objective` is OPTIONAL at the edge and defaults to `ugc` when absent
+ * (campaign-form simplification, D-1) — {@see prepareForValidation()}. The
+ * contract only RELAXES: an explicit valid objective in the payload still
+ * validates against the enum and is honored.
  */
 final class CreateCampaignRequest extends FormRequest
 {
@@ -37,7 +42,7 @@ final class CreateCampaignRequest extends FormRequest
             ],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
-            'objective' => ['required', new Enum(CampaignObjective::class)],
+            'objective' => ['sometimes', new Enum(CampaignObjective::class)],
 
             // Money — integer minor units (D-3) + ISO-4217 currency.
             'budget_minor_units' => ['required', 'integer', 'min:0'],
@@ -62,5 +67,17 @@ final class CreateCampaignRequest extends FormRequest
             'brief.usage_rights' => ['sometimes', 'nullable', 'string', 'max:5000'],
             'brief.attachments' => ['sometimes', 'array'],
         ];
+    }
+
+    /**
+     * Default a missing `objective` to `ugc` BEFORE validation, so the enum
+     * rule sees a valid value and the controller persists it uniformly (no
+     * null-coalesce at the write site). An explicit objective is untouched.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (! $this->has('objective') || $this->input('objective') === null || $this->input('objective') === '') {
+            $this->merge(['objective' => CampaignObjective::Ugc->value]);
+        }
     }
 }

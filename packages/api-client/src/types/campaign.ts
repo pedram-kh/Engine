@@ -142,7 +142,12 @@ export interface CreateCampaignPayload {
   brand_id: string
   name: string
   description?: string | null
-  objective: CampaignObjective
+  /**
+   * Optional at the edge (campaign-form simplification, D-1): the simplified
+   * form omits it and the server defaults to `ugc`. An explicit valid value is
+   * still honored — the contract only relaxes.
+   */
+  objective?: CampaignObjective
   budget_minor_units: number
   budget_currency: string
   starts_at?: string | null
