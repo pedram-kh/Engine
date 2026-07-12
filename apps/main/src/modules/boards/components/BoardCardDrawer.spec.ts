@@ -37,7 +37,10 @@ const VDialogStub = {
   template: '<div class="vdialog-stub"><slot /></div>',
 }
 
-function card(assignmentId: string | null): BoardCardResource {
+function card(
+  assignmentId: string | null,
+  overrides: Partial<NonNullable<BoardCardResource['relationships']['assignment']['data']>> = {},
+): BoardCardResource {
   return {
     id: 'k1',
     type: 'board_cards',
@@ -55,6 +58,7 @@ function card(assignmentId: string | null): BoardCardResource {
                 deliverables: null,
                 posting_due_at: null,
                 creator: { id: 'cr1', display_name: 'Jane Q' },
+                ...overrides,
               },
       },
     },
@@ -190,6 +194,21 @@ describe('BoardCardDrawer', () => {
     const wrapper = await mountDrawer(card(null), [movement('1')])
     expect(mockCampaigns.showAssignment).not.toHaveBeenCalled()
     expect(mockBoard.movements).toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('shows the Declined history tag for a re-offered (previously_declined) assignment', async () => {
+    const wrapper = await mountDrawer(
+      card('a1', { status: 'invited', previously_declined: true }),
+      [],
+    )
+    expect(wrapper.find('[data-test="board-card-drawer-declined-history"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('hides the Declined history tag for a plain assignment', async () => {
+    const wrapper = await mountDrawer(card('a1', { status: 'invited' }), [])
+    expect(wrapper.find('[data-test="board-card-drawer-declined-history"]').exists()).toBe(false)
     wrapper.unmount()
   })
 })

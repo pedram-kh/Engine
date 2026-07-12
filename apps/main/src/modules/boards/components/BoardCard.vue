@@ -5,7 +5,8 @@
  * `BoardCardResource` exposes (under `relationships.assignment.data`):
  *
  *   - creator display name
- *   - the assignment status badge
+ *   - the assignment status badge (+ a muted "declined, then re-invited"
+ *     history tag when `previously_declined` and the status has moved on)
  *   - days-remaining derived from `posting_due_at`
  *   - the column colour strip (the `color_token` → boardStatus hex, D-11)
  *
@@ -45,6 +46,12 @@ const statusLabel = computed(() => {
   return status ? t(`app.campaigns.assignmentStatus.${status}`) : null
 })
 
+// Only surface the history tag once the row has moved on from `declined` —
+// while it's actually declined the live status chip already says so.
+const showDeclinedHistory = computed(
+  () => assignment.value?.previously_declined === true && assignment.value.status !== 'declined',
+)
+
 interface DueInfo {
   label: string
   overdue: boolean
@@ -83,6 +90,19 @@ const dueInfo = computed<DueInfo | null>(() => {
           {{ displayName }}
         </div>
         <div class="d-flex align-center ga-2 mt-1 flex-wrap">
+          <!-- History tag: this row was declined, then re-offered
+               (re-offer-after-decline chunk). Shown next to the live status so
+               the board reads "declined → re-invited". Reuses the declined
+               status label. -->
+          <v-chip
+            v-if="showDeclinedHistory"
+            size="x-small"
+            variant="tonal"
+            color="medium-emphasis"
+            :data-test="`board-card-declined-history-${card.id}`"
+          >
+            {{ t('app.campaigns.assignmentStatus.declined') }}
+          </v-chip>
           <v-chip
             v-if="statusLabel"
             size="x-small"

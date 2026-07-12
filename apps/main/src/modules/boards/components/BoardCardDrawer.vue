@@ -49,6 +49,14 @@ const loading = ref(false)
 const loadError = ref(false)
 
 const assignmentData = computed(() => props.card?.relationships.assignment.data ?? null)
+
+// Surface the re-offer-after-decline history once the row has moved on from
+// `declined` (while it's declined, the status line already says so).
+const showDeclinedHistory = computed(
+  () =>
+    assignmentData.value?.previously_declined === true &&
+    assignmentData.value.status !== 'declined',
+)
 const latestDraft = computed(() => detail.value?.relationships.drafts[0] ?? null)
 const postedContent = computed(() => detail.value?.relationships.posted_content[0] ?? null)
 
@@ -174,12 +182,23 @@ function close(): void {
                   <v-list-item-title>{{
                     t('app.campaigns.board.drawer.detail.status')
                   }}</v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{
+                  <v-list-item-subtitle class="d-flex align-center ga-2">
+                    <span>{{
                       assignmentData
                         ? t(`app.campaigns.assignmentStatus.${assignmentData.status}`)
                         : t('app.campaigns.board.drawer.detail.none')
-                    }}
+                    }}</span>
+                    <!-- "Declined, then re-invited" history tag (re-offer-
+                         after-decline chunk); reuses the declined label. -->
+                    <v-chip
+                      v-if="showDeclinedHistory"
+                      size="x-small"
+                      variant="tonal"
+                      color="medium-emphasis"
+                      data-test="board-card-drawer-declined-history"
+                    >
+                      {{ t('app.campaigns.assignmentStatus.declined') }}
+                    </v-chip>
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item>

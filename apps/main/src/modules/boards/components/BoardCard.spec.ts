@@ -96,4 +96,23 @@ describe('BoardCard', () => {
     expect(wrapper.find('[data-test="board-card-removed-k1"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="board-card-name-k1"]').exists()).toBe(false)
   })
+
+  it('shows a Declined history tag on a re-offered row, alongside the live status', () => {
+    const wrapper = mountCard(
+      card(assignmentData({ status: 'invited', previously_declined: true })),
+    )
+    expect(wrapper.find('[data-test="board-card-declined-history-k1"]').text()).toBe('Declined')
+    expect(wrapper.find('[data-test="board-card-status-k1"]').text()).toBe('Invited')
+  })
+
+  it('hides the history tag on a plain invited row, and while still declined', () => {
+    const plain = mountCard(card(assignmentData({ status: 'invited' })))
+    expect(plain.find('[data-test="board-card-declined-history-k1"]').exists()).toBe(false)
+
+    // A still-declined row shows only the status chip (no redundant tag).
+    const declined = mountCard(
+      card(assignmentData({ status: 'declined', previously_declined: true })),
+    )
+    expect(declined.find('[data-test="board-card-declined-history-k1"]').exists()).toBe(false)
+  })
 })
