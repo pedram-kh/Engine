@@ -60,6 +60,63 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-032 · Campaign-creation form simplification
+
+- **Status:** Landed
+- **Date:** 2026-07-12
+- **Why:** The campaign create/edit form asked for more than agencies needed: an `objective`
+  select (rarely meaningful — most work is UGC), a write-only `target_creator_count`, and a
+  structured brief block (`deliverables` / `hashtags` / `usage_rights`) that nothing in the product
+  ever rendered back. The brief inputs also carried a latent data-loss bug (see Decisions).
+- **What:** Removed three things from the form, relaxing (never breaking) the API contract:
+  - **Objective (D-1):** dropped the select. `CreateCampaignRequest` now validates `objective` as
+    `['sometimes', Enum]` and `prepareForValidation()` defaults it to `ugc` when absent. The enum,
+    column, `CampaignResource` emission, and Overview-tab display row are untouched — existing
+    campaigns keep and display their objective; new ones default to UGC. An explicit objective in a
+    payload is still honored.
+  - **Target creator count (D-2):** dropped the input. Column, `sometimes|nullable` validation, and
+    Resource emission stay — write-only became API-only. No backend change (omission preserved by
+    `sometimes`).
+  - **Brief (D-3):** removed the three inputs and `assembleBrief()`; the form no longer sends `brief`
+    at all. Backend brief validation and Resource emission are untouched. On edit, omission +
+    `sometimes` preserves the stored brief blob byte-identical.
+  - **Description (D-4):** absorbs the prose role via a new persistent hint
+    (`app.campaigns.fields.descriptionHint`) inviting deliverables and usage terms as free text.
+    `max:5000` unchanged.
+  - **i18n (D-5):** removed the orphaned `fields.{targetCreatorCount,deliverables,deliverablesHint,`
+    `hashtags,hashtagsHint,usageRights}` and `board.drawer.detail.deliverables` across all 24
+    locales; added `fields.descriptionHint` ×24 (real MT baseline for the 10 flaky locales, not
+    English fallback). `fields.objective` + the `objective.*` block are **kept** — the Overview tab
+    consumes them. Parity green.
+- **Wipe-bug fix (by omission, not by design):** the shipped form rebuilt the entire `brief` jsonb
+  from only its three visible inputs on every save, silently wiping any other stored sub-keys
+  (`dos`/`donts`/`mentions`/`links`/`attachments`) written by any other path. Removing the inputs so
+  the form stops sending `brief` eliminates the wipe as a side effect of the simplification — it is
+  fixed **by omission, not by a deliberate merge fix**. A named regression test
+  (`preserves the stored brief byte-identical when the edit omits it`) pins this as an invariant, and
+  a forward-guard is recorded in `tech-debt.md` so a future brief editor can't reintroduce the class.
+- **Touched:** `apps/api/app/Modules/Campaigns/Http/Requests/CreateCampaignRequest.php`,
+  `apps/api/tests/Feature/Modules/Campaigns/CampaignCrudTest.php`,
+  `packages/api-client/src/types/campaign.ts`,
+  `apps/main/src/modules/campaigns/components/CampaignForm.vue`,
+  `apps/main/src/modules/campaigns/pages/CampaignCreatePage.vue`,
+  `apps/main/src/modules/campaigns/pages/CampaignDetailPage.vue`,
+  `apps/main/src/core/i18n/locales/*/app.json` (24), `docs/tech-debt.md`.
+- **Decisions:** contract only relaxes (`objective` optional at edge + in the TS mirror); the form
+  never sends `brief`/`target_creator_count`, preserving stored values by omission via backend
+  `sometimes` rules; `seedEditForm()` deliberately does NOT re-seed the removed fields (re-seeding
+  would revive the overwrite path and make the preservation test theatre). Out of scope, logged not
+  built: creator-visible campaign description/brief (product gap — `tech-debt.md`); the vestigial
+  `posting_window_*` fields absent from the form (validated backend, no input); admin campaign
+  surfaces. No Playwright exposure exists for campaigns — none created this chunk.
+- **Gates:** backend Campaigns suite 167 passed; `CampaignCrudTest` 16 passed (3 new); FE campaigns
+  vitest 68 passed (no spec edits needed); api-client + main typecheck clean; ESLint clean; Pint +
+  PHPStan clean; locale parity 23/23. Break-revert on the brief-preservation invariant confirmed it
+  bites (forced `brief = null` in the controller → test red → reverted, empty diff).
+- **Ref:** two-commit pair (feat + docs); push held pending review.
+
+---
+
 ### AH-031 · Platform rebrand: Engine C → Catalyst Engine
 
 - **Status:** Landed

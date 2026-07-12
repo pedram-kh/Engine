@@ -38,6 +38,40 @@ anyone reviewing it later.
 
 ---
 
+## Campaign brief/description is invisible to creators + brief-write forward-guard
+
+- **Where:** the campaign `brief` jsonb blob + `description` column
+  ([`Campaign`](../apps/api/app/Modules/Campaigns/Models/Campaign.php)), the creator-facing assignment
+  detail surface ([`CreatorAssignmentDetailPage.vue`](../apps/main/src/modules/creators/pages/CreatorAssignmentDetailPage.vue)),
+  and any future campaign brief editor.
+- **What we accepted (AH-032, July 12, 2026):** the campaign-form simplification folded the prose role
+  of the old structured brief (deliverables / hashtags / usage rights) into `description` as free
+  text. But **creators still cannot see the campaign `description` or `brief` anywhere** — the
+  assignment detail page renders only campaign id / name / posting window / brand. So the "put your
+  deliverables and usage terms in the description" hint the agency now sees has **no creator-facing
+  output surface yet**. Agencies can write it; creators can't read it. This is a pre-existing product
+  gap the simplification made more visible, not one it introduced.
+- **Forward-guard (the reason this entry also covers writes):** the old form rebuilt the entire
+  `brief` jsonb from only its three visible inputs on every save, silently wiping every other stored
+  sub-key (`dos`/`donts`/`mentions`/`links`/`attachments`). AH-032 fixed this **by omission** (the
+  form stopped sending `brief`), not by a deliberate merge. Therefore: **any future brief write path
+  must merge or consciously replace, never rebuild from partial inputs** — a partial-input rebuild is
+  exactly the wipe-bug class, and it will return the moment a brief editor is added without this
+  discipline. A named regression test
+  (`preserves the stored brief byte-identical when the edit omits it`, `CampaignCrudTest`) pins the
+  current invariant.
+- **Trigger:** building a creator-visible campaign brief/description surface, OR building any campaign
+  brief editor (at which point the merge-not-rebuild rule is mandatory).
+- **Resolution sketch:** (1) render `description` (and, if productised, a structured brief) on the
+  creator assignment detail, legibly (markdown or sanitised prose); (2) if a brief editor is built,
+  load-merge-save the full blob (or explicitly, consciously replace named keys), never reconstruct it
+  from whatever inputs happen to be on screen.
+- **Owner:** whoever next builds creator-visible campaign brief/description or a campaign brief editor.
+- **Status:** open (product gap + forward-guard). Surfaced by AH-032, July 12, 2026
+  ([ad-hoc log](reviews/adhoc-changes-log.md)).
+
+---
+
 ## Completeness-formula changes need a manual `creators:recompute-completeness` run (no scheduled/automatic recompute)
 
 - **Where:** [`apps/api/app/Console/Commands/RecomputeCreatorCompleteness.php`](../apps/api/app/Console/Commands/RecomputeCreatorCompleteness.php) (`creators:recompute-completeness`) + the denormalised `creators.profile_completeness_score` column it maintains, agency-visible on discovery.
