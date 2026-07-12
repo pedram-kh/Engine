@@ -48,6 +48,11 @@ final class BoardCardResource extends JsonResource
                         'id' => $assignment->ulid,
                         'type' => 'campaign_assignments',
                         'status' => $assignment->status->value,
+                        // Decline-history marker (re-offer-after-decline chunk)
+                        // — lets the card face + drawer show a "was declined,
+                        // re-invited" tag even after the status flips back to
+                        // `invited`. Same flag the Creators tab reads.
+                        'previously_declined' => $assignment->previously_declined,
                         'deliverables' => $assignment->deliverables,
                         'posting_due_at' => $assignment->posting_due_at?->toIso8601String(),
                         'creator' => $creator === null ? null : [

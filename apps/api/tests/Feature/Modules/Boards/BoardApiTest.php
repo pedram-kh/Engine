@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Boards\Models\Board;
+use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Identity\Models\User;
@@ -42,6 +43,19 @@ it('GET board lazy-provisions the board + columns + automations + heals cards', 
         ->assertJsonCount(2, 'data.cards');
 
     expect(Board::query()->where('campaign_id', $campaign->id)->count())->toBe(1);
+});
+
+it('GET board emits previously_declined on the card assignment (re-offer-after-decline chunk)', function (): void {
+    [$agency, $admin, $campaign] = agencyCampaign();
+    CampaignAssignment::factory()->create([
+        'campaign_id' => $campaign->id,
+        'status' => AssignmentStatus::Invited,
+        'previously_declined' => true,
+    ]);
+
+    $this->actingAs($admin)->getJson(boardUrl($agency, $campaign))
+        ->assertOk()
+        ->assertJsonPath('data.cards.0.relationships.assignment.data.previously_declined', true);
 });
 
 it('GET board is idempotent across polls (no duplicate rows)', function (): void {

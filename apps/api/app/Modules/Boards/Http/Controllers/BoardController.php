@@ -49,7 +49,7 @@ final class BoardController
             'columns' => fn ($q) => $q->withCount('cards'),
             'automations.targetColumn:id,ulid',
             'cards.column:id,ulid',
-            'cards.assignment:id,ulid,status,deliverables,posting_due_at,creator_id',
+            'cards.assignment:id,ulid,status,previously_declined,deliverables,posting_due_at,creator_id',
             'cards.assignment.creator:id,ulid,display_name',
         ]);
 
@@ -74,7 +74,7 @@ final class BoardController
             'columns' => fn ($q) => $q->withCount('cards'),
             'automations.targetColumn:id,ulid',
             'cards.column:id,ulid',
-            'cards.assignment:id,ulid,status,deliverables,posting_due_at,creator_id',
+            'cards.assignment:id,ulid,status,previously_declined,deliverables,posting_due_at,creator_id',
             'cards.assignment.creator:id,ulid,display_name',
         ]);
 
