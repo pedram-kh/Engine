@@ -104,19 +104,20 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-09 · **Through:** AH-028 (ad-hoc run) · **HEAD:** `ddeed88` (AH-028
+**Last updated:** 2026-07-12 · **Through:** AH-031 (ad-hoc run) · **HEAD:** `9f37609` (AH-031
 closure; AH-018–025 + AH-026 (`a23623a` feat + `9929db8` docs) + AH-027 (`ffe4ab9` feat + `d87c96f`
-docs) + a docs-only ops runbook (`12a7ef5`, not an AH entry — see Delivered note) + AH-028
-(`9fce489` feat + `ddeed88` closure) are all committed atop the last push — the docs commit that
-logs AH-028 sits **atop `ddeed88`**; **push still HELD** across the whole range)
+docs) + a docs-only ops runbook (`12a7ef5`, not an AH entry) + AH-028 (`9fce489` feat + `ddeed88`
+closure + `ec66b85` docs) + AH-029 (`7eb5f20`) + AH-030 (`27d6017`) + AH-031
+(`a32c042` + `9f37609`) are all committed atop the last push — the docs commit that logs AH-029–031
+sits **atop `9f37609`**; **push still HELD** across the whole range)
 
 ### Delivered
 
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-028 — all Landed** (AH-001–017 pushed; the AH-018–025 batch, AH-026,
-  AH-027, and AH-028 are all committed with **push HELD**). One line each
+- **Ad-hoc run AH-001 → AH-031 — all Landed** (AH-001–017 pushed; the AH-018–025 batch, AH-026,
+  AH-027, AH-028, AH-029, AH-030, and AH-031 are all committed with **push HELD**). One line each
   (detail + decisions in `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.
@@ -160,6 +161,15 @@ logs AH-028 sits **atop `ddeed88`**; **push still HELD** across the whole range)
     unaware. One additive i18n key (`click_through_scroll_hint`) initially shipped with 10 locales
     on English fallback (AH-001 debt class) — fixed with an MT baseline in the closure commit; the
     Playwright happy-path now genuinely scrolls the terms region (the real markdown overflows it).
+  - **AH-029** — Master agreement replaced with the real Catalyst Creator T&Cs (new entity, new
+    governing law, 10-clause restructure). Version deliberately held at `1.0`; snapshot is the
+    authority, not the label — logged as mandatory tech-debt (no re-consent flow for pre-swap
+    signees). Engineering reviewed; legal soundness for existing signees is explicitly for counsel.
+  - **AH-030** — Contract step: removed the duplicate `<h2>` inside `ClickThroughAccept` (page-level
+    title retained as the single heading).
+  - **AH-031** — Platform rebrand, Engine C → Catalyst Engine, across emails (`APP_NAME`), both SPA
+    titles, 48× `app.json`, 24× `lang/app.php`, API root JSON, seeded admin name, brand-layer
+    comments. Value-only swaps, zero keyset change, parity green.
 
   > **Not an AH entry:** `docs/runbooks/production-queue-worker.md` (`12a7ef5`) landed this session
   > as a docs-only ops runbook (supervisord/systemd config + the `queue:restart` deploy hook,
@@ -198,6 +208,12 @@ logs AH-028 sits **atop `ddeed88`**; **push still HELD** across the whole range)
   Live Status pointer in the ad-hoc log).
 - **Sprint 10 (Payments/Escrow)** — **blocked on Stripe Connect production approval**; the
   `payment_released` automation is wired but inert until then. Tracked in `tech-debt.md`.
+- **AH-029 counsel check (external dependency)** — the master-agreement swap held the version at
+  `1.0` across an entity + governing-law change, with no re-consent flow for pre-swap signees. The
+  engineering was reviewed (snapshots immutable, tests green); whether that posture is legally sound
+  for existing signees is explicitly outside this codebase's review and needs a counsel sign-off.
+  Logged as tech-debt (`docs/tech-debt.md` — "Contract version-label ambiguity + missing re-consent
+  flow") until resolved either way.
 - **Pending post-deploy operational step (AH-026 D5) — still pending, carry forward.** When the
   AH-026→028 range ships, run `php artisan creators:recompute-completeness` **once** (optionally
   `--dry-run` first) so every existing creator's persisted `profile_completeness_score` moves to the

@@ -9,6 +9,35 @@ anyone reviewing it later.
 
 ---
 
+## Contract version-label ambiguity + missing re-consent flow
+
+- **Where:** `apps/api/resources/contracts/master-agreement.en.md`, the `contracts` table's
+  immutable snapshot column (the row content is the authority, not the version string), and any
+  future re-consent / version-comparison feature.
+- **What we accepted (AH-029, July 12, 2026):** the master agreement's contracting entity and
+  governing law changed (Engine C/Ireland → Catalyst Performance Ltd/England & Wales) without
+  bumping the version string — it stays `"1.0"` for both the pre- and post-swap text. This is
+  defensible today only because acceptances are snapshotted at accept-time (existing signed
+  contracts keep their immutable old-entity text regardless of what the source markdown now says)
+  and no code anywhere compares or reasons about the version label. But the label itself is now
+  ambiguous: `"1.0"` denotes two different legal documents depending on when it was accepted. There
+  is also **no re-consent flow** — a creator who signed before the swap will never be shown the new
+  terms unless a future feature explicitly prompts them.
+- **Trigger:** before building **any** re-consent or version-comparison feature (e.g. "notify
+  creators when the agreement changes," or any code that reads/compares the version string), or on
+  counsel's advice regarding the existing pre-swap signees.
+- **Resolution sketch:** move to a real version scheme (bump on every content change, not just
+  cosmetically) and add a re-consent prompt keyed on the **snapshot hash**, not the version label —
+  the label has already proven unreliable as an identity key for the underlying text.
+- **Owner:** whoever next touches contract versioning or builds a re-consent feature.
+- **Status:** open, mandatory (not a "someday" item — the ambiguity already exists in the data).
+  Surfaced by AH-029, July 12, 2026 ([ad-hoc log](reviews/adhoc-changes-log.md)). Note: the
+  engineering side of AH-029 was reviewed (snapshots immutable, tests updated); whether skipping
+  re-consent for pre-swap signees is legally sound is an open question for counsel, not resolved by
+  this entry.
+
+---
+
 ## Completeness-formula changes need a manual `creators:recompute-completeness` run (no scheduled/automatic recompute)
 
 - **Where:** [`apps/api/app/Console/Commands/RecomputeCreatorCompleteness.php`](../apps/api/app/Console/Commands/RecomputeCreatorCompleteness.php) (`creators:recompute-completeness`) + the denormalised `creators.profile_completeness_score` column it maintains, agency-visible on discovery.
