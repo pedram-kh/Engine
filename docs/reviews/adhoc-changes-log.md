@@ -113,7 +113,9 @@ reviews, and conversations.
   vitest 68 passed (no spec edits needed); api-client + main typecheck clean; ESLint clean; Pint +
   PHPStan clean; locale parity 23/23. Break-revert on the brief-preservation invariant confirmed it
   bites (forced `brief = null` in the controller → test red → reverted, empty diff).
-- **Ref:** two-commit pair (feat + docs); push held pending review.
+- **Ref:** `d1f2608` (feat) + `797ba05` (docs); independent review approved and closed in the AH-032
+  close-out commit (`docs/reviews/campaign-form-simplification-review.md`, Status: Closed). Pushed on
+  Pedram's call at close-out.
 
 ---
 

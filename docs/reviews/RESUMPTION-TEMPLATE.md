@@ -104,21 +104,24 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-12 · **Through:** AH-031 (ad-hoc run) · **HEAD:** `9f37609` (AH-031
-closure; AH-018–025 + AH-026 (`a23623a` feat + `9929db8` docs) + AH-027 (`ffe4ab9` feat + `d87c96f`
-docs) + a docs-only ops runbook (`12a7ef5`, not an AH entry) + AH-028 (`9fce489` feat + `ddeed88`
-closure + `ec66b85` docs) + AH-029 (`7eb5f20`) + AH-030 (`27d6017`) + AH-031
-(`a32c042` + `9f37609`) are all committed atop the last push — the docs commit that logs AH-029–031
-sits **atop `9f37609`**; **push still HELD** across the whole range)
+**Last updated:** 2026-07-12 · **Through:** AH-032 (ad-hoc run) · **HEAD:** the AH-032 close-out
+commit (`docs: close AH-032 review, refresh resumption template`), sitting atop the AH-032 pair
+`d1f2608` (feat) + `797ba05` (AH-032 docs), atop the prior baseline `4c1a154` — a **three-commit
+trio** (`git rev-list --left-right --count origin/main...HEAD` = `0 3`). _(The close-out commit is
+not pinned by SHA here — a commit can't contain its own hash; the two SHAs above are the stable
+pins.)_ Prior baseline **`4c1a154`** = the AH-029–031 docs commit, i.e. AH-018–031 are **already
+pushed** (the earlier templates' blanket "push HELD across AH-018→031" prose was stale; the repo ref
+is the source of truth). **Push:** the AH-032 trio is pushed this session on Pedram's call —
+post-push `origin/main` = HEAD (the close-out commit).
 
 ### Delivered
 
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-031 — all Landed** (AH-001–017 pushed; the AH-018–025 batch, AH-026,
-  AH-027, AH-028, AH-029, AH-030, and AH-031 are all committed with **push HELD**). One line each
-  (detail + decisions in `docs/reviews/adhoc-changes-log.md`):
+- **Ad-hoc run AH-001 → AH-032 — all Landed** (AH-001–031 pushed at `origin/main` = `4c1a154`; the
+  **AH-032 trio is committed with push HELD**). One line each (detail + decisions in
+  `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.
   - **AH-003** — Wizard slim + profile-basics polish.
@@ -170,6 +173,15 @@ sits **atop `9f37609`**; **push still HELD** across the whole range)
   - **AH-031** — Platform rebrand, Engine C → Catalyst Engine, across emails (`APP_NAME`), both SPA
     titles, 48× `app.json`, 24× `lang/app.php`, API root JSON, seeded admin name, brand-layer
     comments. Value-only swaps, zero keyset change, parity green.
+  - **AH-032** — Campaign-creation form simplification: `objective` select removed (server defaults
+    `ugc` via `prepareForValidation`; enum/column/Resource/Overview-tab row stay — contract only
+    relaxes), `target_creator_count` input removed (storage/emission stay, API-only), and the whole
+    brief block removed (form stops sending `brief`; `sometimes` preserves stored blobs by omission).
+    Description absorbs the prose role via a new persistent hint. **Wipe-bug fixed by omission** (the
+    old form rebuilt the brief jsonb from partial inputs, wiping `dos/donts/mentions/links/attachments`
+    on every save) — pinned by a byte-identical preservation test + a tech-debt forward-guard. i18n
+    orphan cleanup ×24 (`fields.objective`/`objective.*` kept for the Overview tab); parity green.
+    Full loop, review closed (`docs/reviews/campaign-form-simplification-review.md`).
 
   > **Not an AH entry:** `docs/runbooks/production-queue-worker.md` (`12a7ef5`) landed this session
   > as a docs-only ops runbook (supervisord/systemd config + the `queue:restart` deploy hook,
