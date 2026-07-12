@@ -207,8 +207,9 @@ export type RosterRelationshipStatus =
  * A single row in the agency roster list
  * (GET /api/v1/agencies/{agency}/creators). Slim hand-rolled shape
  * (D-c5-5) — NOT the heavy `CreatorResource`. Carries `internal_rating`
- * read-only; deliberately omits `internal_notes` (GDPR-sensitive) and any
- * signed media URLs.
+ * read-only; deliberately omits `internal_notes` (GDPR-sensitive). The one
+ * signed URL is `avatar_url` (invite-offer-details batch, the AH-013
+ * bounded-list precedent); cover/portfolio media stay off the list.
  */
 export interface RosterCreatorListItem {
   id: string
@@ -246,6 +247,12 @@ export interface RosterCreatorListItem {
     /** Free-text accent / dialect hint (e.g. "British"). Display-only. */
     accent: string | null
     categories: string[] | null
+    /**
+     * Short-lived signed GET for the creator avatar (invite-offer-details
+     * batch — real avatars in the campaign invite picker). Null when the
+     * creator has no avatar. Optional for back-compat with older payloads.
+     */
+    avatar_url?: string | null
   }
 }
 

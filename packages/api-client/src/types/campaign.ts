@@ -168,6 +168,18 @@ export type UpdateCampaignPayload = Partial<Omit<CreateCampaignPayload, 'brand_i
 // Campaign assignment (read-only Creators tab — Chunk 1)
 // ---------------------------------------------------------------------------
 
+/**
+ * The one optional offer attachment stamped on an assignment at invite time
+ * (invite-offer-details batch). `url` is a short-lived signed GET minted
+ * inside the emitting surface's authz; null on a non-S3 disk (tests).
+ */
+export interface AssignmentOfferAttachment {
+  name: string | null
+  mime_type: string | null
+  size_bytes: number | null
+  url: string | null
+}
+
 export interface CampaignAssignmentResource {
   id: string
   type: 'campaign_assignments'
@@ -175,6 +187,11 @@ export interface CampaignAssignmentResource {
     status: AssignmentStatus
     agreed_fee_minor_units: number | null
     agreed_fee_currency: string | null
+    /** Free-text unit the fee applies to ("per script"). Agency-authored. */
+    fee_per?: string | null
+    /** Free-text expectations from the agency, set at invite time. */
+    offer_description?: string | null
+    offer_attachment?: AssignmentOfferAttachment | null
     countered_fee_minor_units: number | null
     countered_fee_currency: string | null
     invited_at: string | null
@@ -229,6 +246,21 @@ export interface InviteAssignmentPayload {
   agreed_fee_minor_units: number
   /** ISO-4217; must match the campaign currency when set (D-8). */
   agreed_fee_currency: string
+  /** Free-text unit the fee applies to ("per script"). Optional. */
+  fee_per?: string | null
+  /** Free-text expectations from the agency. Optional. */
+  offer_description?: string | null
+  /**
+   * The one optional offer attachment — uploaded via the presigned
+   * init/complete pair first; `upload_id` is the storage path returned by
+   * complete. The bulk loop carries the same block on every invite.
+   */
+  attachment?: {
+    upload_id: string
+    name: string
+    mime_type: string
+    size_bytes: number
+  } | null
   deliverables?: string[] | null
   posting_due_at?: string | null
   /**
@@ -276,6 +308,10 @@ export interface CreatorAssignmentResource {
     status: AssignmentStatus
     agreed_fee_minor_units: number | null
     agreed_fee_currency: string | null
+    /** Invite-offer context (invite-offer-details batch). */
+    fee_per?: string | null
+    offer_description?: string | null
+    offer_attachment?: AssignmentOfferAttachment | null
     countered_fee_minor_units: number | null
     countered_fee_currency: string | null
     deliverables: string[] | null
@@ -371,6 +407,10 @@ export interface CreatorAssignmentDetailResource {
     status: AssignmentStatus
     agreed_fee_minor_units: number | null
     agreed_fee_currency: string | null
+    /** Invite-offer context (invite-offer-details batch). */
+    fee_per?: string | null
+    offer_description?: string | null
+    offer_attachment?: AssignmentOfferAttachment | null
     countered_fee_minor_units: number | null
     countered_fee_currency: string | null
     deliverables: string[] | null
@@ -606,6 +646,33 @@ export interface DraftMediaCompletePayload {
 }
 
 export interface DraftMediaCompleteResponse {
+  data: { storage_path: string }
+}
+
+// ---------------------------------------------------------------------------
+// Invite-offer attachment (invite-offer-details batch) — presigned init/complete
+// ---------------------------------------------------------------------------
+
+export interface OfferAttachmentInitPayload {
+  mime_type: string
+  size_bytes: number
+}
+
+export interface OfferAttachmentInitResponse {
+  data: {
+    upload_url: string
+    upload_id: string
+    storage_path: string
+    expires_at: string
+    max_bytes: number
+  }
+}
+
+export interface OfferAttachmentCompletePayload {
+  upload_id: string
+}
+
+export interface OfferAttachmentCompleteResponse {
   data: { storage_path: string }
 }
 
