@@ -517,7 +517,7 @@ function formatDay(iso: string | null): string {
                       a.attributes.agreed_fee_minor_units,
                       a.attributes.agreed_fee_currency,
                     )
-                  }}
+                  }}<template v-if="a.attributes.fee_per"> / {{ a.attributes.fee_per }}</template>
                 </template>
               </v-list-item-subtitle>
               <template #append>

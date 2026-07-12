@@ -26,6 +26,10 @@ import type {
   CreateCampaignPayload,
   InviteAssignmentPayload,
   ManuallyVerifyPayload,
+  OfferAttachmentCompletePayload,
+  OfferAttachmentCompleteResponse,
+  OfferAttachmentInitPayload,
+  OfferAttachmentInitResponse,
   ProceedWithoutContractResponse,
   RejectDraftPayload,
   ReinviteAssignmentPayload,
@@ -114,6 +118,34 @@ export const campaignsApi = {
   ): Promise<{ data: CampaignAssignmentResource }> {
     return http.post<{ data: CampaignAssignmentResource }>(
       `${campaignsBase(agencyId)}/${campaignId}/assignments`,
+      payload,
+    )
+  },
+
+  /**
+   * Presigned init for the one optional invite-offer attachment
+   * (invite-offer-details batch) — campaign-keyed, since the upload precedes
+   * any assignment row. Same `invite` ability as the invite itself.
+   */
+  offerAttachmentInit(
+    agencyId: string,
+    campaignId: string,
+    payload: OfferAttachmentInitPayload,
+  ): Promise<OfferAttachmentInitResponse> {
+    return http.post<OfferAttachmentInitResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/attachments/init`,
+      payload,
+    )
+  },
+
+  /** Verify the presigned offer-attachment upload landed (+ EXIF strip server-side). */
+  offerAttachmentComplete(
+    agencyId: string,
+    campaignId: string,
+    payload: OfferAttachmentCompletePayload,
+  ): Promise<OfferAttachmentCompleteResponse> {
+    return http.post<OfferAttachmentCompleteResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/attachments/complete`,
       payload,
     )
   },
