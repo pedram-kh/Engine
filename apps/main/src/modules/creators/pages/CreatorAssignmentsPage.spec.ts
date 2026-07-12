@@ -26,6 +26,7 @@ import CreatorAssignmentsPage from './CreatorAssignmentsPage.vue'
 function makeAssignment(
   id: string,
   status: CreatorAssignmentResource['attributes']['status'],
+  offer: Partial<CreatorAssignmentResource['attributes']> = {},
 ): CreatorAssignmentResource {
   return {
     id,
@@ -46,6 +47,7 @@ function makeAssignment(
         posting_window_ends_at: '2026-07-10T00:00:00+00:00',
         brand_name: 'Acme',
       },
+      ...offer,
     },
   }
 }
@@ -110,6 +112,44 @@ describe('CreatorAssignmentsPage', () => {
     expect(creatorAssignmentsApi.accept).toHaveBeenCalledWith('A')
     // list() once on mount + once after the mutation.
     expect(creatorAssignmentsApi.list).toHaveBeenCalledTimes(2)
+  })
+
+  it('renders the invite-offer context — fee_per, description, and the attachment chip', async () => {
+    vi.mocked(creatorAssignmentsApi.list).mockResolvedValue({
+      data: [
+        makeAssignment('A', 'invited', {
+          fee_per: 'per script',
+          offer_description: 'One 60s UGC video, casual tone.',
+          offer_attachment: {
+            name: 'brief.pdf',
+            mime_type: 'application/pdf',
+            size_bytes: 2048,
+            url: 'https://media.example/signed/brief.pdf',
+          },
+        }),
+        // A plain row must render NONE of the offer extras.
+        makeAssignment('B', 'invited'),
+      ],
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(CreatorAssignmentsPage)
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="creator-assignment-fee-per-A"]').text()).toContain(
+      'per script',
+    )
+    expect(wrapper.find('[data-test="creator-assignment-description-A"]').text()).toContain(
+      'One 60s UGC video, casual tone.',
+    )
+    const chip = wrapper.find('[data-test="creator-assignment-attachment-A"]')
+    expect(chip.exists()).toBe(true)
+    expect(chip.text()).toContain('brief.pdf')
+    expect(chip.attributes('href')).toBe('https://media.example/signed/brief.pdf')
+
+    expect(wrapper.find('[data-test="creator-assignment-fee-per-B"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="creator-assignment-description-B"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="creator-assignment-attachment-B"]').exists()).toBe(false)
   })
 
   it('renders the empty state when there are no assignments', async () => {

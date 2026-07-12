@@ -199,7 +199,12 @@ onMounted(() => {
                   item.attributes.agreed_fee_minor_units,
                   item.attributes.agreed_fee_currency,
                 )
-              }}
+              }}<span
+                v-if="item.attributes.fee_per"
+                :data-test="`creator-assignment-fee-per-${item.id}`"
+              >
+                / {{ item.attributes.fee_per }}</span
+              >
               · {{ windowLabel(item) }}
               <span
                 v-if="
@@ -217,6 +222,29 @@ onMounted(() => {
                 }}
               </span>
             </p>
+            <!-- The agency's offer expectations (invite-offer-details batch). -->
+            <p
+              v-if="item.attributes.offer_description"
+              class="assignment__description"
+              :data-test="`creator-assignment-description-${item.id}`"
+            >
+              {{ item.attributes.offer_description }}
+            </p>
+            <!-- The one optional offer attachment — the chip label is the
+                 agency-given file name, opened via the short-lived signed URL. -->
+            <v-chip
+              v-if="item.attributes.offer_attachment?.url"
+              size="small"
+              variant="tonal"
+              prepend-icon="mdi-paperclip"
+              class="mt-1"
+              :href="item.attributes.offer_attachment.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              :data-test="`creator-assignment-attachment-${item.id}`"
+            >
+              {{ item.attributes.offer_attachment.name }}
+            </v-chip>
           </div>
 
           <div class="assignment__actions">
@@ -384,6 +412,14 @@ onMounted(() => {
   margin: 4px 0 0;
   font-size: 0.875rem;
   opacity: 0.75;
+}
+
+.assignment__description {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+  opacity: 0.75;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .assignment__actions {

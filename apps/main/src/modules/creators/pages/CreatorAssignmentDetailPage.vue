@@ -394,8 +394,32 @@ onMounted(() => {
             assignment.attributes.agreed_fee_minor_units,
             assignment.attributes.agreed_fee_currency,
           )
-        }}
+        }}<span v-if="assignment.attributes.fee_per" data-testid="assignment-detail-fee-per">
+          / {{ assignment.attributes.fee_per }}</span
+        >
       </p>
+
+      <!-- The agency's offer expectations + attachment (invite-offer-details batch). -->
+      <p
+        v-if="assignment.attributes.offer_description"
+        class="text-body-2 assignment-offer-description"
+        data-testid="assignment-detail-offer-description"
+      >
+        {{ assignment.attributes.offer_description }}
+      </p>
+      <div v-if="assignment.attributes.offer_attachment?.url">
+        <v-chip
+          size="small"
+          variant="tonal"
+          prepend-icon="mdi-paperclip"
+          :href="assignment.attributes.offer_attachment.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="assignment-detail-attachment"
+        >
+          {{ assignment.attributes.offer_attachment.name }}
+        </v-chip>
+      </div>
 
       <!-- Inline chat thread with the agency (Sprint 11, D-11) -->
       <v-card variant="outlined" data-testid="assignment-chat">
@@ -768,5 +792,10 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.assignment-offer-description {
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 </style>
