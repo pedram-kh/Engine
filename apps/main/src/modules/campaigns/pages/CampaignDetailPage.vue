@@ -13,6 +13,7 @@
 
 import {
   formatCurrency,
+  formatDate,
   ApiError,
   extractFieldErrors,
   type CampaignAssignmentResource,
@@ -325,6 +326,10 @@ async function onSaveSettings(): Promise<void> {
 function formatMoney(minor: number | null, currency: string | null): string {
   return formatCurrency(minor, currency, locale.value)
 }
+
+function formatDay(iso: string | null): string {
+  return iso ? formatDate(iso, locale.value) : '—'
+}
 </script>
 
 <template>
@@ -386,12 +391,13 @@ function formatMoney(minor: number | null, currency: string | null): string {
           <v-card class="pa-4" max-width="720">
             <v-list density="comfortable">
               <v-list-item
-                :title="t('app.campaigns.fields.brand')"
-                :subtitle="campaign.relationships.brand.data.name"
+                :title="t('app.campaigns.fields.name')"
+                :subtitle="campaign.attributes.name"
+                data-test="overview-name"
               />
               <v-list-item
-                :title="t('app.campaigns.fields.objective')"
-                :subtitle="t(`app.campaigns.objective.${campaign.attributes.objective}`)"
+                :title="t('app.campaigns.fields.brand')"
+                :subtitle="campaign.relationships.brand.data.name"
               />
               <v-list-item :title="t('app.campaigns.fields.status')">
                 <template #subtitle>
@@ -410,10 +416,27 @@ function formatMoney(minor: number | null, currency: string | null): string {
                 "
               />
               <v-list-item
-                v-if="campaign.attributes.description"
-                :title="t('app.campaigns.fields.description')"
-                :subtitle="campaign.attributes.description"
+                :title="t('app.campaigns.fields.startsAt')"
+                :subtitle="formatDay(campaign.attributes.starts_at)"
+                data-test="overview-starts-at"
               />
+              <v-list-item
+                :title="t('app.campaigns.fields.endsAt')"
+                :subtitle="formatDay(campaign.attributes.ends_at)"
+                data-test="overview-ends-at"
+              />
+              <v-list-item
+                v-if="campaign.attributes.description"
+                class="overview-description"
+                :title="t('app.campaigns.fields.description')"
+                data-test="overview-description"
+              >
+                <template #subtitle>
+                  <div class="overview-description__text">
+                    {{ campaign.attributes.description }}
+                  </div>
+                </template>
+              </v-list-item>
             </v-list>
           </v-card>
         </v-window-item>
@@ -806,3 +829,23 @@ function formatMoney(minor: number | null, currency: string | null): string {
     </template>
   </div>
 </template>
+
+<style scoped>
+/* The Overview description must render in full — override Vuetify's default
+   single-line clamp on list subtitles (white-space: nowrap + ellipsis). */
+.overview-description :deep(.v-list-item-subtitle) {
+  white-space: normal;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  opacity: 1;
+}
+
+.overview-description :deep(.v-list-item__content) {
+  overflow: visible;
+}
+
+.overview-description__text {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+</style>
