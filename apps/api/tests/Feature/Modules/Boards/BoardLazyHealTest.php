@@ -21,7 +21,7 @@ it('first forCampaign creates the board + default columns + automations (D-4)', 
     expect($board->campaign_id)->toBe($campaign->id)
         ->and($board->agency_id)->toBe($campaign->agency_id)
         ->and($board->columns()->count())->toBe(7)
-        ->and($board->automations()->count())->toBe(9)
+        ->and($board->automations()->count())->toBe(10)
         ->and(Board::query()->where('campaign_id', $campaign->id)->count())->toBe(1);
 });
 
@@ -56,6 +56,6 @@ it('is idempotent — a second forCampaign creates no new rows', function (): vo
     $board = Board::query()->where('campaign_id', $campaign->id)->firstOrFail();
     expect(Board::query()->where('campaign_id', $campaign->id)->count())->toBe(1)
         ->and($board->columns()->count())->toBe(7)
-        ->and($board->automations()->count())->toBe(9)
+        ->and($board->automations()->count())->toBe(10)
         ->and($board->cards()->count())->toBe(2);
 });

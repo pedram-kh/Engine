@@ -48,9 +48,9 @@ function overdueFixture(array $assignmentAttrs, ?string $eventKey = null, Assign
 
     $target = null;
     if ($eventKey !== null) {
-        // Map the overdue event → "Cancelled" (distinct from where an Invited
+        // Map the overdue event → "Cancelled / Rejected" (distinct from where an Invited
         // card sits, so a fire is an observable move).
-        $target = $board->columns()->where('name', 'Cancelled')->firstOrFail();
+        $target = $board->columns()->where('name', 'Cancelled / Rejected')->firstOrFail();
         BoardAutomation::query()->create([
             'board_id' => $board->id,
             'event_key' => $eventKey,
@@ -199,7 +199,7 @@ it('skips draft_overdue when draft_due_at is NULL (capable-but-inert until a dea
  * agency A's overdue automation can never move agency B's card.
  */
 it("does NOT let agency A's overdue automation fire on agency B's card (cross-agency absence)", function (): void {
-    // A has an overdue automation mapped → A's "Cancelled".
+    // A has an overdue automation mapped → A's "Cancelled / Rejected".
     ['assignment' => $assignmentA, 'card' => $cardA, 'target' => $targetA] = overdueFixture(
         ['posting_due_at' => now()->subDay()],
         'assignment.posting_overdue',

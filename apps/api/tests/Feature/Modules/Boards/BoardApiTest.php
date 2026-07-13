@@ -39,7 +39,7 @@ it('GET board lazy-provisions the board + columns + automations + heals cards', 
     $response->assertOk()
         ->assertJsonPath('data.type', 'boards')
         ->assertJsonCount(7, 'data.columns')
-        ->assertJsonCount(9, 'data.automations')
+        ->assertJsonCount(10, 'data.automations')
         ->assertJsonCount(2, 'data.cards');
 
     expect(Board::query()->where('campaign_id', $campaign->id)->count())->toBe(1);
@@ -175,7 +175,7 @@ it('lists automations and updates one (disable + retarget)', function (): void {
 
     $this->actingAs($admin)->getJson(boardUrl($agency, $campaign, '/automations'))
         ->assertOk()
-        ->assertJsonCount(9, 'data');
+        ->assertJsonCount(10, 'data');
 
     $automation = $board->automations()->where('event_key', 'assignment.draft_approved')->firstOrFail();
     $posted = $board->columns()->where('name', 'Posted')->firstOrFail();

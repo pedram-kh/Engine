@@ -51,6 +51,21 @@ it('moves the card to the mapped column + records an event movement (triggered_b
         ->and($movement->to_column_id)->toBe($card->column_id);
 });
 
+it('draft rejection moves the card to the failure column (Cancelled / Rejected)', function (): void {
+    $card = seededCardInInvited();
+
+    app(BoardAutomationService::class)->processEvent(
+        assignmentId: $card->assignment_id,
+        eventKey: 'assignment.draft_rejected',
+        metadata: [],
+        triggeredByUserId: null,
+    );
+
+    $card->refresh()->load('column');
+    expect($card->column?->name)->toBe('Cancelled / Rejected')
+        ->and($card->column?->is_terminal_failure)->toBeTrue();
+});
+
 it('is an idempotent no-op when the card is already in the target column (§14.2)', function (): void {
     $card = seededCardInInvited();
     $service = app(BoardAutomationService::class);

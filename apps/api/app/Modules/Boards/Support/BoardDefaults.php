@@ -24,7 +24,8 @@ final class BoardDefaults
 {
     /**
      * The 7 default columns, in order (§3.1). `success`/`failure` mark the
-     * terminal columns (§7.5).
+     * terminal columns (§7.5). The failure terminal is "Cancelled / Rejected" —
+     * it hosts BOTH dead-end verbs (cancel and draft-reject share one column).
      *
      * @return list<array{name: string, color_token: string, is_terminal_success: bool, is_terminal_failure: bool}>
      */
@@ -37,13 +38,13 @@ final class BoardDefaults
             self::column('Approved', 'status-aligned'),
             self::column('Posted', 'status-posted'),
             self::column('Paid', 'status-paid', success: true),
-            self::column('Cancelled', 'status-blocked', failure: true),
+            self::column('Cancelled / Rejected', 'status-blocked', failure: true),
         ];
     }
 
     /**
-     * The 9 default automations (§3.2): event key → target column NAME. The
-     * provisioner resolves the name to the seeded column's id.
+     * The 10 default automations (§3.2 + draft-reject): event key → target
+     * column NAME. The provisioner resolves the name to the seeded column's id.
      *
      * @return list<array{event_key: string, target_column_name: string}>
      */
@@ -59,7 +60,10 @@ final class BoardDefaults
             self::automation(AuditAction::AssignmentResubmitRequested, 'Approved'),
             // INERT until Sprint 10 (D-11) — escrow is gated, so the event never fires.
             self::automation(AuditAction::AssignmentPaymentReleased, 'Paid'),
-            self::automation(AuditAction::AssignmentCancelled, 'Cancelled'),
+            self::automation(AuditAction::AssignmentCancelled, 'Cancelled / Rejected'),
+            // Draft rejection is the terminal review outcome — the card lands in
+            // the same failure column as a cancel.
+            self::automation(AuditAction::AssignmentDraftRejected, 'Cancelled / Rejected'),
         ];
     }
 
