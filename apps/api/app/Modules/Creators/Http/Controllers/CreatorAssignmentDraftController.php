@@ -244,6 +244,12 @@ final class CreatorAssignmentDraftController
             'media.*.kind' => ['required', 'string', Rule::in(['image', 'video'])],
             'media.*.thumbnail_path' => ['nullable', 'string'],
             'media.*.duration_seconds' => ['nullable', 'integer', 'min:1'],
+            // External reference links (draft-composer facelift) — the same
+            // url+name pair the relationship-messaging composer sends. http(s)
+            // is enforced by the url rule's scheme list.
+            'links' => ['nullable', 'array', 'max:10'],
+            'links.*.url' => ['required', 'string', 'url:http,https', 'max:2048'],
+            'links.*.name' => ['nullable', 'string', 'max:255'],
         ]);
 
         $creator = $this->requireCreator($request);
@@ -303,6 +309,10 @@ final class CreatorAssignmentDraftController
                     'thumbnail_path' => $item['thumbnail_path'] ?? null,
                     'duration_seconds' => $item['duration_seconds'] ?? null,
                 ], $media),
+                'links' => array_values(array_map(static fn (array $link): array => [
+                    'url' => $link['url'],
+                    'name' => ($link['name'] ?? '') === '' ? null : $link['name'],
+                ], $validated['links'] ?? [])) ?: null,
                 'review_status' => DraftReviewStatus::Pending,
             ]);
 
@@ -317,6 +327,8 @@ final class CreatorAssignmentDraftController
                 'draft_id' => $draft->ulid,
                 'version' => $version,
                 'media_count' => count($media),
+                // Link URLs are free text — count only (the D-3 discipline).
+                'link_count' => count($draft->links ?? []),
             ]);
 
             return $draft;

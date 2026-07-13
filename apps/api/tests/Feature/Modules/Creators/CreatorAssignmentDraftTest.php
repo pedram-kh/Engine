@@ -253,6 +253,52 @@ it('rejects draft media that does not belong to the creator (422 draft.media_inv
     expect(reloadAssignment($assignment)->status)->toBe(AssignmentStatus::Producing);
 });
 
+// ── Draft links (draft-composer facelift) ─────────────────────────────────────
+
+it('persists draft links (url + optional name) and emits them on the resource', function (): void {
+    [$user, $creator] = draftCreatorUser();
+    $assignment = assignmentForCreatorInStatus($creator, AssignmentStatus::Producing);
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/creators/me/assignments/{$assignment->ulid}/drafts", [
+            'media' => [draftMedia($creator)],
+            'links' => [
+                ['url' => 'https://example.com/moodboard', 'name' => 'Moodboard'],
+                ['url' => 'https://example.com/raw-cut'],
+            ],
+        ])
+        ->assertCreated()
+        ->assertJsonPath('data.attributes.links.0.url', 'https://example.com/moodboard')
+        ->assertJsonPath('data.attributes.links.0.name', 'Moodboard')
+        ->assertJsonPath('data.attributes.links.1.url', 'https://example.com/raw-cut')
+        ->assertJsonPath('data.attributes.links.1.name', null);
+
+    $draft = CampaignDraft::query()->where('assignment_id', $assignment->id)->firstOrFail();
+    expect($draft->links)->toHaveCount(2);
+
+    // The transition audit carries the link COUNT, never the free-text URLs (D-3).
+    $audit = AuditLog::query()
+        ->where('action', 'assignment.draft_submitted')
+        ->where('subject_id', $assignment->id)
+        ->firstOrFail();
+    expect($audit->metadata['link_count'] ?? null)->toBe(2)
+        ->and(json_encode($audit->metadata))->not->toContain('example.com');
+});
+
+it('rejects a draft link that is not a valid http(s) URL (422)', function (): void {
+    [$user, $creator] = draftCreatorUser();
+    $assignment = assignmentForCreatorInStatus($creator, AssignmentStatus::Producing);
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/creators/me/assignments/{$assignment->ulid}/drafts", [
+            'media' => [draftMedia($creator)],
+            'links' => [['url' => 'javascript:alert(1)']],
+        ])
+        ->assertStatus(422);
+
+    expect(reloadAssignment($assignment)->status)->toBe(AssignmentStatus::Producing);
+});
+
 // ── Posted content (approved → posted) ────────────────────────────────────────
 
 it('submits posted content, transitions approved → posted, leaving verification pending', function (): void {

@@ -42,6 +42,7 @@ use Illuminate\Support\Carbon;
  * @property array<int, string>|null $hashtags
  * @property array<int, string>|null $mentions
  * @property array<int, array<string, mixed>>|null $media_attachments
+ * @property array<int, array<string, mixed>>|null $links
  * @property DraftReviewStatus $review_status
  * @property Carbon|null $reviewed_at
  * @property int|null $reviewed_by_user_id
@@ -70,6 +71,7 @@ final class CampaignDraft extends Model
         'hashtags',
         'mentions',
         'media_attachments',
+        'links',
         'review_status',
         'reviewed_at',
         'reviewed_by_user_id',
@@ -111,6 +113,7 @@ final class CampaignDraft extends Model
             'hashtags' => 'array',
             'mentions' => 'array',
             'media_attachments' => 'array',
+            'links' => 'array',
             'review_status' => DraftReviewStatus::class,
             'reviewed_at' => 'datetime',
         ];

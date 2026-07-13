@@ -375,6 +375,12 @@ export interface DraftMediaAttachment {
   thumbnail_view_url: string | null
 }
 
+/** An external reference link on a draft (draft-composer facelift). */
+export interface DraftLink {
+  url: string
+  name?: string | null
+}
+
 /** One `campaign_drafts` row (a single submission version). */
 export interface CampaignDraftResource {
   id: string
@@ -386,6 +392,8 @@ export interface CampaignDraftResource {
     hashtags: string[] | null
     mentions: string[] | null
     media: DraftMediaAttachment[]
+    /** External reference links (url + optional name), unsigned. */
+    links?: DraftLink[] | null
     review_status: DraftReviewStatus
     reviewed_at: string | null
     review_feedback: string | null
@@ -616,6 +624,8 @@ export interface SubmitDraftPayload {
   hashtags?: string[] | null
   mentions?: string[] | null
   media: DraftMediaInput[]
+  /** External reference links (draft-composer facelift). */
+  links?: DraftLink[] | null
 }
 
 export interface CreatorDraftSubmitResponse {

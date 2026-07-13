@@ -41,6 +41,9 @@ final class CampaignDraftResource extends JsonResource
                 'hashtags' => $draft->hashtags,
                 'mentions' => $draft->mentions,
                 'media' => $this->mapMedia($draft),
+                // External reference links (draft-composer facelift): plain
+                // url+name pairs, no signing — they are external URLs.
+                'links' => $draft->links,
                 'review_status' => $draft->review_status->value,
                 'reviewed_at' => $draft->reviewed_at?->toIso8601String(),
                 'review_feedback' => $draft->review_feedback,
