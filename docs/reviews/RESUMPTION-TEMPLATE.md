@@ -104,28 +104,43 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-13 · **Through:** AH-041 (ad-hoc run) · **HEAD:** the AH-033→AH-041
-close-out **docs** commit, sitting atop the **direct-iteration fix batch** `cc86bb8 … fdbec40` (33
-code/spec commits + the Part-A closure commit `fdbec40`), atop the AH-032 baseline **`7051123`**
-(`docs: close AH-032 review, refresh resumption template`) — which is `origin/main` (the AH-032 trio
-was pushed on Pedram's call at the prior close-out). _(The docs commit is not pinned by SHA here — a
-commit can't contain its own hash; `7051123` is the stable baseline pin, `fdbec40` the last code
-commit below it.)_ **Push:** **HELD** for the whole AH-033→AH-041 batch — nothing pushed this
-session; `git rev-list --count 7051123..HEAD` = **34** (33 batch commits + this docs commit).
-**⚠ Next-deploy note:** this batch adds **three schema migrations + one data backfill** — run
-`php artisan migrate` before serving: `2026_07_12_100000_add_offer_fields_to_campaign_assignments`,
+**Last updated:** 2026-07-13 · **Through:** AH-042 (ad-hoc chunk) · **Baseline:** `94a357b`
+(`fix(playwright): isolate admin E2E database from the dev DB`) — the prior `origin/main`, which
+already includes the **pushed** AH-033→AH-041 close-out (`ed2e0dc`). AH-042 lands atop it as a
+four-commit range: `98dec53` (backend), `8260dd0` (frontend), `76e416d` (full-board test fixups), and
+this docs commit. **Push:** AH-001→AH-041 are all at `origin/main`; the AH-042 four-commit range is
+**pushed this session**, advancing `origin/main` to HEAD. _(The docs commit is not SHA-pinned here —
+a commit can't contain its own hash.)_
+
+> **AH-042 · Toggle-OFF campaigns flow without contract involvement** (full chunk loop). The
+> `requires_per_campaign_contract` toggle is now load-bearing end-to-end: the machine permits a
+> contract-less advance regardless of the `per_campaign_contract_enabled` flag (D1); OFF campaigns
+> auto-advance `accepted → contracted` on accept (D2); the creator copy consults the toggle (D3); a
+> one-shot command remediates stuck rows (D4). Also fixes a pre-existing false-fire (the agency
+> proceed-without-contract path announced a non-existent contract acceptance). ON path byte-identical.
+> **No new migrations.** Full board green: backend 1841 Pest, main 1177 + admin 425 Vitest, 24/24
+> Playwright, typecheck/lint/parity clean. Review: `docs/reviews/contract-toggle-off-flow-review.md`
+> (Closed, approved). Adds one post-deploy command (below).
+
+**Prior batch (AH-033→AH-041) — PUSHED** (`ed2e0dc` close-out **docs** commit at `origin/main`,
+sitting atop the **direct-iteration fix batch** `cc86bb8 … fdbec40` (33 code/spec commits + the
+Part-A closure commit `fdbec40`), atop the AH-032 baseline **`7051123`**). **⚠ Next-deploy note
+(still pending):** that batch adds **three schema migrations + one data backfill** — run
+`php artisan migrate` before serving:
+`2026_07_12_100000_add_offer_fields_to_campaign_assignments`,
 `2026_07_12_110000_add_previously_declined_to_campaign_assignments`,
 `2026_07_13_100000_add_links_to_campaign_drafts` (schema), and
 `2026_07_13_110000_backfill_cancelled_rejected_board_column` (data backfill — renames default
 "Cancelled" columns to "Cancelled / Rejected" + inserts the draft-rejected automation; idempotent).
+AH-042 adds **no** migrations.
 
 ### Delivered
 
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-041 — all Landed** (AH-001–032 pushed at `origin/main` = `7051123`; the
-  **AH-033→AH-041 direct-iteration batch is committed with push HELD**). One line each (detail +
+- **Ad-hoc run AH-001 → AH-042 — all Landed** (AH-001→AH-041 **pushed**; `origin/main` was `94a357b`
+  before this session and is **advanced to HEAD by the AH-042 push**). One line each (detail +
   decisions in `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.

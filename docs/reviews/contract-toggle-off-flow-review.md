@@ -1,9 +1,14 @@
 # Toggle-OFF campaigns flow without contract involvement — Build Review
 
-**Status: Draft (push HELD)**
+**Status: Closed** — approved (push HELD)
 **Date:** 2026-07-13
 **Baseline HEAD:** `94a357b` (origin/main)
 **Scope:** Single chunk. Extends the contract-gate-decouple chunk (which added the agency _manual_ proceed-without-contract path but left the creator stranded at `accepted`). Ref: kickoff "Toggle-OFF campaigns flow without contract involvement", investigation I1–I6 (same thread).
+**Provenance:** built + reviewed in the same session; two-commit pair (`98dec53` backend, `8260dd0` frontend) + full-board fixups + this docs commit, push HELD.
+
+## Review verdict — approved
+
+Approved on substance. **Three break-reverts verified** (Direction A: restore the unconditional flag gate → OFF-flows spec red; Direction B: drop the accept toggle read → ON-mandatory spec red; toggle-veto pin: remove the D-8 refusal → requires=true veto red — all reverted to green, the agency-controller file at zero diff). **§5.2 four-leg notification split green** (dispatched-event leg + no-mail leg + unchanged positive + false-fire fix). Full board green (see Local verification).
 
 ## Goal
 
@@ -143,13 +148,19 @@ Reverted → green (the `CampaignAssignmentContractController.php` file shows **
 | D3 FE §5.34 negative              | `shows NO contract copy when accepted on an OFF campaign` + the two requires=true copy tests | ✓ (17 tests) |
 | D4 command                        | idempotent / dry-run / skips ON / skips non-accepted / flag-independent / backfill audit     | ✓            |
 
-### Local verification
+### Local verification (full board)
 
-- Backend affected suites (`CampaignAssignmentContract|CampaignAssignmentStateMachine|AdvanceContractlessAccepted|CreatorAssignmentDraft|SendAssignmentNotifications|CreatorFeatureFlags`) → **140 passed**.
-- FE (`CampaignDetailPage.spec` decouple + `CreatorAssignmentDetailPage.spec`) → **43 passed**.
-- Typecheck (`@catalyst/api-client` + main + admin + ui) → clean. PHPStan (touched files, `--memory-limit=1G`) → clean. Pint (`--dirty`) → clean. ESLint + Prettier (touched FE) → clean.
+- **Backend Pest full** (serial, `-d memory_limit=2G`) → **1841 passed, 1 skipped** (the 1 skip is pre-existing).
+- **Frontend Vitest full** → main **1177 passed** (130 files), admin **425 passed** (51 files). Locale parity spec (`i18n-locale-parity.spec.ts`) green — zero new keys (OFF renders nothing).
+- **Playwright E2E full** → **24/24** (22 main + 2 admin). The four invitations specs green (D2's auto-advance does not touch the invite/accept-user flows).
+- **Typecheck** (PHPStan full `composer stan` + vue-tsc across main/admin/ui + api-client tsc) → clean. **Lint** (`pint --test` all + ESLint) → clean (2 pre-existing `v-html` warnings on unrelated files).
 
-> Note: PHPStan's parallel worker hits a pre-existing 128 MB `memory_limit` fatal; re-run with `--memory-limit=1G` passes. Not introduced by this chunk.
+#### Full-board fixture ripples (fixed this pass — both are correct-behaviour updates, not regressions)
+
+1. `CreatorAssignmentTest` — `accepts an invited assignment (invited → accepted)` used a requires=false campaign, which now auto-advances (D2). Set the campaign `requires_per_campaign_contract = true` so the test still pins the accept transition in isolation.
+2. `NotificationFanOutTest` — `contracted fans out …` fired a contracted event on a contract-less assignment, which the Q1 gate now correctly silences. Attached a `contract_id` so the test exercises a genuine contract-acceptance fan-out (the contract-less silence is covered by `CampaignAssignmentContractTest`).
+
+> Note: PHPStan's parallel worker hits a pre-existing 128 MB `memory_limit` fatal in isolation; `composer stan` sets the limit and passes. Not introduced by this chunk. Three Vitest specs on unrelated onboarding surfaces (`CreatorProfilePage`, `Step2ProfileBasicsPage`) timed out only under 3-way parallel CPU contention; green in isolation.
 
 ---
 
