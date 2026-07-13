@@ -113,7 +113,7 @@ const dueInfo = computed<DueInfo | null>(() => {
             <span v-else class="text-caption">{{ avatarInitial }}</span>
           </v-avatar>
           <div
-            class="text-body-2 font-weight-medium text-truncate flex-grow-1"
+            class="text-body-2 font-weight-bold text-truncate flex-grow-1"
             :data-test="`board-card-name-${card.id}`"
           >
             {{ displayName }}
