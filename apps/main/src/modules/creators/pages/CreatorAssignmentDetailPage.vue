@@ -73,6 +73,11 @@ const loadedOnce = ref(false)
 const loadError = ref<'not_found' | 'generic' | null>(null)
 // The per-campaign manual-contract flag (NOT the e-sign vendor flag), D-5.
 const perCampaignContractEnabled = ref(false)
+// Whether THIS campaign requires a per-campaign contract (toggle-off-flow D3).
+// The contract copy consults this so an OFF campaign never claims a contract is
+// coming. With the D2 auto-advance an OFF assignment shouldn't sit at
+// `accepted` at all; this is belt-and-suspenders for any residual row.
+const requiresPerCampaignContract = ref(false)
 const snackbar = ref<{ color: string; text: string } | null>(null)
 
 // Draft form state.
@@ -115,11 +120,15 @@ const canAcceptContract = computed(
 const isAwaitingContract = computed(
   () =>
     status.value === 'accepted' &&
+    requiresPerCampaignContract.value &&
     perCampaignContractEnabled.value &&
     pendingContract.value?.attributes.status !== 'sent',
 )
 const isContractSigningDisabled = computed(
-  () => status.value === 'accepted' && !perCampaignContractEnabled.value,
+  () =>
+    status.value === 'accepted' &&
+    requiresPerCampaignContract.value &&
+    !perCampaignContractEnabled.value,
 )
 
 const canSubmitDraft = computed(
@@ -179,6 +188,7 @@ async function load(): Promise<void> {
     const res = await creatorAssignmentsApi.show(ulid.value)
     assignment.value = res.data
     perCampaignContractEnabled.value = res.meta?.per_campaign_contract_enabled ?? false
+    requiresPerCampaignContract.value = res.meta?.requires_per_campaign_contract ?? false
     // Prefill the in-place edit with the failed URL so the creator edits, not retypes.
     inPlaceUrl.value = verificationFailed.value
       ? (latestPosted.value?.attributes.post_url ?? '')

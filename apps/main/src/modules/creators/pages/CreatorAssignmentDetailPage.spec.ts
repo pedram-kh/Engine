@@ -265,10 +265,10 @@ describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', 
     expect(wrapper.find('[data-testid="assignment-draft-form"]').exists()).toBe(true)
   })
 
-  it('shows awaiting-contract when accepted without a sent contract', async () => {
+  it('shows awaiting-contract when accepted on a requires=true campaign without a sent contract', async () => {
     vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
       data: makeDetail('accepted'),
-      meta: { per_campaign_contract_enabled: true },
+      meta: { per_campaign_contract_enabled: true, requires_per_campaign_contract: true },
     })
     const { wrapper } = await mountDetail()
 
@@ -276,15 +276,32 @@ describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', 
     expect(wrapper.find('[data-testid="assignment-contract-form"]').exists()).toBe(false)
   })
 
-  it('shows signing-disabled when accepted and per_campaign_contract_enabled is OFF', async () => {
+  it('shows signing-disabled when accepted on a requires=true campaign and per_campaign_contract_enabled is OFF', async () => {
     vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
       data: makeDetail('accepted'),
-      meta: { per_campaign_contract_enabled: false },
+      meta: { per_campaign_contract_enabled: false, requires_per_campaign_contract: true },
     })
     const { wrapper } = await mountDetail()
 
     expect(wrapper.find('[data-testid="assignment-contract-signing-disabled"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="assignment-awaiting-contract"]').exists()).toBe(false)
+  })
+
+  // §5.34 negative (toggle-off-flow D3) — an OFF (requires=false) campaign never
+  // shows ANY contract copy, even in the belt-and-suspenders case where a row is
+  // still `accepted` (the D2 auto-advance should have moved it past this).
+  it('shows NO contract copy when accepted on an OFF (requires=false) campaign', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('accepted'),
+      meta: { per_campaign_contract_enabled: true, requires_per_campaign_contract: false },
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-awaiting-contract"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-contract-signing-disabled"]').exists()).toBe(
+      false,
+    )
+    expect(wrapper.find('[data-testid="assignment-contract-form"]').exists()).toBe(false)
   })
 })
 

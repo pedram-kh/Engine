@@ -473,6 +473,12 @@ export interface CreatorAssignmentDetailResponse {
      * flow (attach / accept) is available on this instance (D-5 key rename).
      */
     per_campaign_contract_enabled: boolean
+    /**
+     * Whether THIS campaign requires a per-campaign contract (toggle-off-flow
+     * chunk, D3). The creator copy consults this so an OFF campaign never shows
+     * "the agency will send a contract". Optional for back-compat.
+     */
+    requires_per_campaign_contract?: boolean
   }
 }
 
