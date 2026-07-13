@@ -1,49 +1,64 @@
 <script setup lang="ts">
 /**
- * The reduced card face (Sprint 12 Chunk 2, D-10). A card IS a
- * CampaignAssignment (§4.1) — the face renders ONLY what the closed Chunk 1
- * `BoardCardResource` exposes (under `relationships.assignment.data`):
+ * The card face (Sprint 12 Chunk 2, D-10; board-card facelift). A card IS a
+ * CampaignAssignment (§4.1). The face renders what `BoardCardResource` exposes
+ * under `relationships.assignment.data`:
  *
- *   - creator display name
- *   - the assignment status badge (+ a muted "declined, then re-invited"
- *     history tag when `previously_declined` and the status has moved on)
- *   - days-remaining derived from `posting_due_at`
- *   - the column colour strip (the `color_token` → boardStatus hex, D-11)
+ *   - a lead avatar (signed `creator.avatar_url`, initial fallback) + name
+ *   - days-remaining derived from `posting_due_at` (right-aligned, row 1)
+ *   - the status badge (+ a muted "declined, then re-invited" history tag when
+ *     `previously_declined` and the status has moved on)
+ *   - the agreed fee ("€200 / script"), anchored at the end of the chip row
  *
- * §4.2's richer wants (avatar, platform icon, unread count) are NOT exposed and
- * we do NOT reopen the Chunk 1 Resource for them — they're logged as tech-debt.
+ * Concept-inspired chrome: a thin aurora accent bar across the top (the brand
+ * utility gradient, `var(--brand-aurora-gradient)` — token path, never a hex,
+ * so it clears no-hard-coded-colors; a class, not an inline style, so it clears
+ * no-inline-color-styles). The per-column colour still reads from the column
+ * header, so the card face no longer repeats it.
+ *
  * `assignment.data` can be null (a card whose assignment failed to load); the
  * face is null-safe and renders a minimal "removed" tile rather than crashing.
- *
- * The colour strip binds `:style="{ backgroundColor: boardColorHex(token) }"` —
- * the hex lives in `boardTokens.ts`, never here (clears no-hard-coded-colors),
- * and the camelCase object-binding clears no-inline-color-styles (Q1).
  */
 
-import type { BoardCardResource } from '@catalyst/api-client'
+import { formatCurrency, type BoardCardResource } from '@catalyst/api-client'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { boardColorHex } from '../support/boardTokens'
-
 const props = defineProps<{
   card: BoardCardResource
-  colorToken: string
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const assignment = computed(() => props.card.relationships.assignment.data)
-
-const stripStyle = computed(() => ({ backgroundColor: boardColorHex(props.colorToken) }))
 
 const displayName = computed(
   () => assignment.value?.creator?.display_name ?? t('app.campaigns.board.card.unnamed'),
 )
 
+const avatarUrl = computed(() => assignment.value?.creator?.avatar_url ?? null)
+
+const avatarInitial = computed(() => {
+  const name = assignment.value?.creator?.display_name?.trim()
+  return name ? name.charAt(0).toUpperCase() : '?'
+})
+
 const statusLabel = computed(() => {
   const status = assignment.value?.status
   return status ? t(`app.campaigns.assignmentStatus.${status}`) : null
+})
+
+const feeLabel = computed(() => {
+  const a = assignment.value
+  if (a?.agreed_fee_minor_units === null || a?.agreed_fee_minor_units === undefined) {
+    return null
+  }
+  const money = formatCurrency(
+    a.agreed_fee_minor_units,
+    a.agreed_fee_currency ?? null,
+    locale.value,
+  )
+  return a.fee_per ? `${money} / ${a.fee_per}` : money
 })
 
 // Only surface the history tag once the row has moved on from `declined` —
@@ -82,18 +97,41 @@ const dueInfo = computed<DueInfo | null>(() => {
 </script>
 
 <template>
-  <v-card class="board-card d-flex" variant="outlined" :data-test="`board-card-${card.id}`">
-    <div class="board-card__strip" :style="stripStyle" aria-hidden="true" />
+  <v-card class="board-card" variant="outlined" :data-test="`board-card-${card.id}`">
+    <div class="board-card__accent" aria-hidden="true" />
     <div class="board-card__body pa-2">
       <template v-if="assignment">
-        <div class="text-body-2 font-weight-medium" :data-test="`board-card-name-${card.id}`">
-          {{ displayName }}
+        <!-- Row 1: avatar + name, with days-remaining anchored at the end. -->
+        <div class="d-flex align-center ga-2">
+          <v-avatar size="28" class="board-card__avatar flex-shrink-0">
+            <v-img
+              v-if="avatarUrl"
+              :src="avatarUrl"
+              :alt="displayName"
+              :data-test="`board-card-avatar-${card.id}`"
+            />
+            <span v-else class="text-caption">{{ avatarInitial }}</span>
+          </v-avatar>
+          <div
+            class="text-body-2 font-weight-medium text-truncate flex-grow-1"
+            :data-test="`board-card-name-${card.id}`"
+          >
+            {{ displayName }}
+          </div>
+          <span
+            v-if="dueInfo"
+            class="text-caption flex-shrink-0"
+            :class="dueInfo.overdue ? 'text-error' : 'text-medium-emphasis'"
+            :data-test="`board-card-due-${card.id}`"
+          >
+            {{ dueInfo.label }}
+          </span>
         </div>
-        <div class="d-flex align-center ga-2 mt-1 flex-wrap">
+
+        <!-- Row 2: status chips on the left, agreed fee at the far end. -->
+        <div class="d-flex align-center ga-2 mt-2">
           <!-- History tag: this row was declined, then re-offered
-               (re-offer-after-decline chunk). Shown next to the live status so
-               the board reads "declined → re-invited". Reuses the declined
-               status label. -->
+               (re-offer-after-decline chunk). Reuses the declined status label. -->
           <v-chip
             v-if="showDeclinedHistory"
             size="x-small"
@@ -111,13 +149,13 @@ const dueInfo = computed<DueInfo | null>(() => {
           >
             {{ statusLabel }}
           </v-chip>
+          <v-spacer />
           <span
-            v-if="dueInfo"
-            class="text-caption"
-            :class="dueInfo.overdue ? 'text-error' : 'text-medium-emphasis'"
-            :data-test="`board-card-due-${card.id}`"
+            v-if="feeLabel"
+            class="text-caption text-medium-emphasis flex-shrink-0"
+            :data-test="`board-card-fee-${card.id}`"
           >
-            {{ dueInfo.label }}
+            {{ feeLabel }}
           </span>
         </div>
       </template>
@@ -147,12 +185,16 @@ const dueInfo = computed<DueInfo | null>(() => {
 .board-card:active {
   transform: scale(0.997);
 }
-.board-card__strip {
-  width: 4px;
-  flex: 0 0 4px;
+/* Thin brand accent across the top (concept top-bar), consuming the aurora
+   utility token — token path only, no raw hex. */
+.board-card__accent {
+  height: 3px;
+  background: var(--brand-aurora-gradient);
+}
+.board-card__avatar {
+  background: rgba(var(--v-theme-on-surface), 0.08);
 }
 .board-card__body {
-  flex: 1 1 auto;
   min-width: 0;
 }
 </style>

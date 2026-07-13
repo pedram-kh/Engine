@@ -58,6 +58,26 @@ it('GET board emits previously_declined on the card assignment (re-offer-after-d
         ->assertJsonPath('data.cards.0.relationships.assignment.data.previously_declined', true);
 });
 
+it('GET board emits the offer fee + signed avatar on the card assignment (board-card facelift)', function (): void {
+    [$agency, $admin, $campaign] = agencyCampaign();
+    CampaignAssignment::factory()->create([
+        'campaign_id' => $campaign->id,
+        'status' => AssignmentStatus::Invited,
+        'agreed_fee_minor_units' => 20000,
+        'agreed_fee_currency' => 'EUR',
+        'fee_per' => 'script',
+    ]);
+
+    $this->actingAs($admin)->getJson(boardUrl($agency, $campaign))
+        ->assertOk()
+        ->assertJsonPath('data.cards.0.relationships.assignment.data.agreed_fee_minor_units', 20000)
+        ->assertJsonPath('data.cards.0.relationships.assignment.data.agreed_fee_currency', 'EUR')
+        ->assertJsonPath('data.cards.0.relationships.assignment.data.fee_per', 'script')
+        // Signed avatar is minted here; null on the local (non-S3) test disk,
+        // but the key is present so the SPA can rely on the shape.
+        ->assertJsonPath('data.cards.0.relationships.assignment.data.creator.avatar_url', null);
+});
+
 it('GET board is idempotent across polls (no duplicate rows)', function (): void {
     [$agency, $admin, $campaign] = agencyCampaign();
     CampaignAssignment::factory()->create(['campaign_id' => $campaign->id]);

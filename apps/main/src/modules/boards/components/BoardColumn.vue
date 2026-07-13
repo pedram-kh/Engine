@@ -126,7 +126,7 @@ defineExpose({ onCardChange })
     >
       <template #item="{ element }">
         <div @click="emit('open-card', element)">
-          <BoardCard :card="element" :color-token="column.attributes.color_token" />
+          <BoardCard :card="element" />
         </div>
       </template>
     </draggable>

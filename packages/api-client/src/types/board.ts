@@ -69,9 +69,15 @@ export interface BoardCardAssignmentData {
   previously_declined?: boolean
   deliverables: string[] | null
   posting_due_at: string | null
+  /** Offer fee for the card face (board-card facelift): amount + free-text unit. */
+  agreed_fee_minor_units?: number | null
+  agreed_fee_currency?: string | null
+  fee_per?: string | null
   creator: {
     id: string
     display_name: string | null
+    /** Single signed avatar for the card face; bounded (one page of cards). */
+    avatar_url?: string | null
   } | null
 }
 

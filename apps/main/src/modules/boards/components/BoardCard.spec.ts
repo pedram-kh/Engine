@@ -1,7 +1,7 @@
 /**
- * BoardCard (Sprint 12 Chunk 2, D-10). Pins the REDUCED, null-safe card face:
- * display name + status badge + days-remaining + the colour strip — and nothing
- * the closed Chunk 1 Resource doesn't expose. A null assignment renders the
+ * BoardCard (Sprint 12 Chunk 2, D-10; board-card facelift). Pins the null-safe
+ * card face: lead avatar + name + days-remaining, status/history chips, the
+ * agreed fee, and the aurora accent bar. A null assignment renders the
  * "removed" tile instead of crashing.
  */
 
@@ -49,11 +49,11 @@ function assignmentData(
   }
 }
 
-function mountCard(c: BoardCardResource, colorToken = 'status-paid') {
+function mountCard(c: BoardCardResource) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: enApp } as never })
   const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
   return mount(BoardCard, {
-    props: { card: c, colorToken },
+    props: { card: c },
     global: { plugins: [i18n, vuetify] },
   })
 }
@@ -65,13 +65,49 @@ function isoInDays(days: number): string {
 }
 
 describe('BoardCard', () => {
-  it('renders the creator name + status badge + colour strip', () => {
+  it('renders the creator name + status badge + aurora accent', () => {
     const wrapper = mountCard(card(assignmentData()))
     expect(wrapper.find('[data-test="board-card-name-k1"]').text()).toBe('Jane Q')
     expect(wrapper.find('[data-test="board-card-status-k1"]').text()).toBe('Invited')
-    const strip = wrapper.find('.board-card__strip')
-    expect(strip.exists()).toBe(true)
-    expect(strip.attributes('style') ?? '').toContain('background')
+    expect(wrapper.find('.board-card__accent').exists()).toBe(true)
+  })
+
+  it('leads with the initial when no avatar, and the photo when present', () => {
+    const noAvatar = mountCard(card(assignmentData()))
+    expect(noAvatar.find('[data-test="board-card-avatar-k1"]').exists()).toBe(false)
+    expect(noAvatar.text()).toContain('J')
+
+    const withAvatar = mountCard(
+      card(
+        assignmentData({
+          creator: { id: 'cr1', display_name: 'Jane Q', avatar_url: 'https://cdn/x.jpg' },
+        }),
+      ),
+    )
+    expect(withAvatar.find('[data-test="board-card-avatar-k1"]').exists()).toBe(true)
+    // The url is the VImg's `src` prop (the fall-through data-test sits on the
+    // VImg root, so the inner <img> src isn't a root attribute).
+    const vimg = withAvatar.findComponent({ name: 'VImg' })
+    expect(vimg.props('src')).toBe('https://cdn/x.jpg')
+  })
+
+  it('anchors the agreed fee with its unit when present, and hides it otherwise', () => {
+    const withFee = mountCard(
+      card(
+        assignmentData({
+          agreed_fee_minor_units: 20000,
+          agreed_fee_currency: 'EUR',
+          fee_per: 'script',
+        }),
+      ),
+    )
+    const fee = withFee.find('[data-test="board-card-fee-k1"]')
+    expect(fee.exists()).toBe(true)
+    expect(fee.text()).toContain('200')
+    expect(fee.text()).toContain('script')
+
+    const noFee = mountCard(card(assignmentData()))
+    expect(noFee.find('[data-test="board-card-fee-k1"]').exists()).toBe(false)
   })
 
   it('shows days-remaining for a future due date', () => {
