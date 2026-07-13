@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Submit draft",
             "resubmit": "Resubmit draft",
+            "emptyHint": "Add at least one media attachment or link to submit.",
             "mediaStatus": {
               "uploading": "Uploading…",
               "done": "Uploaded",

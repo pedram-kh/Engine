@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Prześlij szkic",
             "resubmit": "Prześlij szkic ponownie",
+            "emptyHint": "Dodaj co najmniej jeden załącznik multimedialny lub link, aby przesłać.",
             "mediaStatus": {
               "uploading": "Przesyłanie…",
               "done": "Przesłano",

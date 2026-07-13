@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Küldés draft",
             "resubmit": "Resubmit draft",
+            "emptyHint": "A beküldéshez adj hozzá legalább egy médiamellékletet vagy hivatkozást.",
             "mediaStatus": {
               "uploading": "Feltöltésing…",
               "done": "Feltöltésed",

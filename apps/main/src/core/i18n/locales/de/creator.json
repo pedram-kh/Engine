@@ -383,6 +383,7 @@
             "media": "Medien",
             "submit": "Entwurf einreichen",
             "resubmit": "Entwurf erneut einreichen",
+            "emptyHint": "Füge mindestens einen Medienanhang oder Link hinzu, um einzureichen.",
             "mediaStatus": {
               "uploading": "Wird hochgeladen…",
               "done": "Hochgeladen",

@@ -383,6 +383,7 @@
             "media": "Multimédia",
             "submit": "Enviar rascunho",
             "resubmit": "Reenviar rascunho",
+            "emptyHint": "Adicione pelo menos um anexo de mídia ou link para enviar.",
             "mediaStatus": {
               "uploading": "A carregar…",
               "done": "Carregado",

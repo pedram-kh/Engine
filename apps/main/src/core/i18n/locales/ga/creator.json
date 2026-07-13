@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Cuir isteach draft",
             "resubmit": "Resubmit draft",
+            "emptyHint": "Cuir ceangaltán meáin nó nasc amháin ar a laghad leis chun é a chur isteach.",
             "mediaStatus": {
               "uploading": "Uaslódáiling…",
               "done": "Uaslódáiled",

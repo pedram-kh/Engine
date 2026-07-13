@@ -383,6 +383,7 @@
             "media": "Média",
             "submit": "Pošalji nacrt",
             "resubmit": "Znova odeslat nacrt",
+            "emptyHint": "Dodajte barem jedan medijski privitak ili poveznicu za slanje.",
             "mediaStatus": {
               "uploading": "Učitavanje…",
               "done": "Učitano",

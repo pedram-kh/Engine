@@ -171,7 +171,10 @@ const mediaUploading = computed(() => media.value.some((m) => m.status === 'uplo
 const readyMedia = computed(() =>
   media.value.filter((m) => m.status === 'done' && m.s3_path !== null),
 )
-const draftSubmittable = computed(() => readyMedia.value.length > 0 && !mediaUploading.value)
+// A draft is submittable with at least one of {media, links} (AH-044) — a link
+// alone is a valid draft. Still blocked while any media upload is in flight.
+const hasDraftContent = computed(() => readyMedia.value.length > 0 || draftLinks.value.length > 0)
+const draftSubmittable = computed(() => hasDraftContent.value && !mediaUploading.value)
 
 function newId(): string {
   return `media-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
@@ -710,6 +713,13 @@ onMounted(() => {
           </v-dialog>
         </v-card-text>
         <v-card-actions>
+          <p
+            v-if="!hasDraftContent"
+            class="text-caption text-medium-emphasis mb-0"
+            data-testid="assignment-draft-empty-hint"
+          >
+            {{ t('creator.ui.assignments.detail.draft.emptyHint') }}
+          </p>
           <v-spacer />
           <v-btn
             color="primary"

@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Pateikti draft",
             "resubmit": "Resubmit draft",
+            "emptyHint": "Norėdami pateikti, pridėkite bent vieną mediją arba nuorodą.",
             "mediaStatus": {
               "uploading": "Įkeltiing…",
               "done": "Įkeltied",

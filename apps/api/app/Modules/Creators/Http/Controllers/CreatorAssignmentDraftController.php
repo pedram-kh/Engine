@@ -244,7 +244,10 @@ final class CreatorAssignmentDraftController
             'hashtags.*' => ['string', 'max:100'],
             'mentions' => ['nullable', 'array'],
             'mentions.*' => ['string', 'max:100'],
-            'media' => ['required', 'array', 'min:1'],
+            // Media is no longer mandatory on its own — a draft may be carried by
+            // media, by external links, or both (AH-044). The "at least one of the
+            // two" invariant is enforced after validation (below).
+            'media' => ['nullable', 'array'],
             'media.*.s3_path' => ['required', 'string'],
             'media.*.mime_type' => ['required', 'string'],
             'media.*.kind' => ['required', 'string', Rule::in(['image', 'video'])],
@@ -277,12 +280,26 @@ final class CreatorAssignmentDraftController
             );
         }
 
+        // A draft must carry SOMETHING to review: at least one media attachment
+        // OR at least one external link (AH-044). Both empty is a no-op draft.
+        /** @var list<array<string, mixed>> $media */
+        $media = $validated['media'] ?? [];
+        /** @var list<array<string, mixed>> $links */
+        $links = $validated['links'] ?? [];
+        if ($media === [] && $links === []) {
+            return ErrorResponse::single(
+                $request,
+                422,
+                'draft.empty',
+                'Add at least one media attachment or link before submitting.',
+                source: ['pointer' => '/data/attributes/media'],
+            );
+        }
+
         // Structural ownership of every media path: a creator may only
         // reference media under their OWN drafts prefix (defense-in-depth on
         // top of the init/complete creator-scoping).
         $expectedPrefix = sprintf('creators/%s/%s/', $creator->ulid, self::MEDIA_NAMESPACE);
-        /** @var list<array<string, mixed>> $media */
-        $media = $validated['media'];
         foreach ($media as $item) {
             if (! str_starts_with((string) $item['s3_path'], $expectedPrefix)) {
                 return ErrorResponse::single(
@@ -295,7 +312,7 @@ final class CreatorAssignmentDraftController
             }
         }
 
-        $draft = DB::transaction(function () use ($model, $creator, $user, $validated, $media, $machine): CampaignDraft {
+        $draft = DB::transaction(function () use ($model, $creator, $user, $validated, $media, $links, $machine): CampaignDraft {
             $version = (int) (CampaignDraft::query()
                 ->where('assignment_id', $model->id)
                 ->max('version') ?? 0) + 1;
@@ -314,11 +331,11 @@ final class CreatorAssignmentDraftController
                     'kind' => $item['kind'],
                     'thumbnail_path' => $item['thumbnail_path'] ?? null,
                     'duration_seconds' => $item['duration_seconds'] ?? null,
-                ], $media),
+                ], $media) ?: null,
                 'links' => array_values(array_map(static fn (array $link): array => [
                     'url' => $link['url'],
                     'name' => ($link['name'] ?? '') === '' ? null : $link['name'],
-                ], $validated['links'] ?? [])) ?: null,
+                ], $links)) ?: null,
                 'review_status' => DraftReviewStatus::Pending,
             ]);
 

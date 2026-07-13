@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Lähetä draft",
             "resubmit": "Resubmit draft",
+            "emptyHint": "Lisää vähintään yksi medialiite tai linkki lähettääksesi.",
             "mediaStatus": {
               "uploading": "Lähetä tiedostoing…",
               "done": "Lähetä tiedostoed",

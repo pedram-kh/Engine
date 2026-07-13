@@ -383,6 +383,7 @@
             "media": "Média",
             "submit": "Odeslat návrh",
             "resubmit": "Znovu odeslat návrh",
+            "emptyHint": "Přidejte alespoň jednu mediální přílohu nebo odkaz k odeslání.",
             "mediaStatus": {
               "uploading": "Nahrávání…",
               "done": "Nahráno",

@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Skicka in utkast",
             "resubmit": "Skicka in utkast igen",
+            "emptyHint": "Lägg till minst en mediebilaga eller länk för att skicka in.",
             "mediaStatus": {
               "uploading": "Laddar upp…",
               "done": "Uppladdad",

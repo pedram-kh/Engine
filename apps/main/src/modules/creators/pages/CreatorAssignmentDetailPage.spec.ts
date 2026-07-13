@@ -426,7 +426,7 @@ describe('CreatorAssignmentDetailPage — draft submit form', () => {
 
     const { wrapper } = await mountDetail()
 
-    // Ready one media file (media is still required for a submittable draft).
+    // Ready one media file alongside the link (media + links together).
     const fileInput = wrapper.find('[data-testid="assignment-draft-media-input"]')
     const file = new File(['x'], 'clip.mp4', { type: 'video/mp4' })
     Object.defineProperty(fileInput.element, 'files', { value: [file], configurable: true })
@@ -471,6 +471,55 @@ describe('CreatorAssignmentDetailPage — draft submit form', () => {
       ULID,
       expect.objectContaining({
         links: [{ url: 'https://example.com/raw-cut', name: 'Raw cut' }],
+      }),
+    )
+  })
+
+  it('gates submit behind content and shows the empty hint until a link (or media) is added (AH-044)', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('producing') })
+    vi.mocked(creatorAssignmentsApi.submitDraft).mockResolvedValue({
+      data: makeDraft(1),
+      meta: { code: 'assignment.draft_submitted' },
+    })
+
+    const { wrapper } = await mountDetail()
+
+    // Nothing added yet: hint visible, submit disabled.
+    expect(wrapper.find('[data-testid="assignment-draft-empty-hint"]').exists()).toBe(true)
+    expect(
+      (wrapper.find('[data-testid="assignment-draft-submit"]').element as HTMLButtonElement)
+        .disabled,
+    ).toBe(true)
+
+    // Add a link only — no media at all.
+    await wrapper.find('[data-testid="assignment-draft-attach-link"]').trigger('click')
+    await flushPromises()
+    const urlInput = document.body.querySelector(
+      '[data-testid="assignment-draft-link-url"] input',
+    ) as HTMLInputElement
+    urlInput.value = 'https://example.com/final-cut'
+    urlInput.dispatchEvent(new Event('input'))
+    await flushPromises()
+    ;(
+      document.body.querySelector('[data-testid="assignment-draft-link-add"]') as HTMLElement
+    ).click()
+    await flushPromises()
+
+    // A link alone now satisfies the gate: hint gone, submit enabled.
+    expect(wrapper.find('[data-testid="assignment-draft-empty-hint"]').exists()).toBe(false)
+    expect(
+      (wrapper.find('[data-testid="assignment-draft-submit"]').element as HTMLButtonElement)
+        .disabled,
+    ).toBe(false)
+
+    await wrapper.find('[data-testid="assignment-draft-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(creatorAssignmentsApi.submitDraft).toHaveBeenCalledWith(
+      ULID,
+      expect.objectContaining({
+        media: [],
+        links: [{ url: 'https://example.com/final-cut' }],
       }),
     )
   })

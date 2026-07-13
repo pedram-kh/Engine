@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Изпратете draft",
             "resubmit": "Resubmit draft",
+            "emptyHint": "Добавете поне един медиен файл или връзка, за да изпратите.",
             "mediaStatus": {
               "uploading": "Качетеing…",
               "done": "Качетеed",

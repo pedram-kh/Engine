@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Υποβολή draft",
             "resubmit": "Resubmit draft",
+            "emptyHint": "Προσθέστε τουλάχιστον ένα αρχείο πολυμέσων ή σύνδεσμο για υποβολή.",
             "mediaStatus": {
               "uploading": "Μεταφόρτωσηing…",
               "done": "Μεταφόρτωσηed",

@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Ibgħat draft",
             "resubmit": "Resubmit draft",
+            "emptyHint": "Żid mill-inqas mehmuż tal-midja jew link wieħed biex tissottometti.",
             "mediaStatus": {
               "uploading": "Ittella'ing…",
               "done": "Ittella'ed",

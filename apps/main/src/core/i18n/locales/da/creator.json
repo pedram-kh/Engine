@@ -383,6 +383,7 @@
             "media": "Medier",
             "submit": "Indsend udkast",
             "resubmit": "Indsend udkast igen",
+            "emptyHint": "Tilføj mindst én medievedhæftning eller et link for at indsende.",
             "mediaStatus": {
               "uploading": "Uploader…",
               "done": "Uploadet",

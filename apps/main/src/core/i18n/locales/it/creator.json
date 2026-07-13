@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Invia bozza",
             "resubmit": "Reinvia bozza",
+            "emptyHint": "Aggiungi almeno un contenuto multimediale o un link per inviare.",
             "mediaStatus": {
               "uploading": "Caricamento…",
               "done": "Caricato",

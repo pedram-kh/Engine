@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Trimiteți draft",
             "resubmit": "Resubmit draft",
+            "emptyHint": "Adaugă cel puțin un fișier media sau un link pentru a trimite.",
             "mediaStatus": {
               "uploading": "Încărcațiing…",
               "done": "Încărcațied",

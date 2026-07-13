@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Iesniegt draft",
             "resubmit": "Resubmit draft",
+            "emptyHint": "Lai iesniegtu, pievienojiet vismaz vienu multivides failu vai saiti.",
             "mediaStatus": {
               "uploading": "Augšupielādēting…",
               "done": "Augšupielādēted",

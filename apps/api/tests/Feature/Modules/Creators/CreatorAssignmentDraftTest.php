@@ -299,6 +299,49 @@ it('rejects a draft link that is not a valid http(s) URL (422)', function (): vo
     expect(reloadAssignment($assignment)->status)->toBe(AssignmentStatus::Producing);
 });
 
+it('submits a LINK-ONLY draft with no media (AH-044) — links carry the draft', function (): void {
+    [$user, $creator] = draftCreatorUser();
+    $assignment = assignmentForCreatorInStatus($creator, AssignmentStatus::Producing);
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/creators/me/assignments/{$assignment->ulid}/drafts", [
+            'caption' => 'Hosted externally',
+            'links' => [['url' => 'https://example.com/final-cut', 'name' => 'Final cut']],
+        ])
+        ->assertCreated()
+        ->assertJsonPath('meta.code', 'assignment.draft_submitted')
+        ->assertJsonPath('data.attributes.version', 1)
+        ->assertJsonPath('data.attributes.links.0.url', 'https://example.com/final-cut');
+
+    expect(reloadAssignment($assignment)->status)->toBe(AssignmentStatus::DraftSubmitted);
+
+    $draft = CampaignDraft::query()->where('assignment_id', $assignment->id)->firstOrFail();
+    expect($draft->media_attachments)->toBeNull()
+        ->and($draft->links)->toHaveCount(1);
+
+    $audit = AuditLog::query()
+        ->where('action', 'assignment.draft_submitted')
+        ->where('subject_id', $assignment->id)
+        ->firstOrFail();
+    expect($audit->metadata['media_count'] ?? null)->toBe(0)
+        ->and($audit->metadata['link_count'] ?? null)->toBe(1);
+});
+
+it('rejects an EMPTY draft — neither media nor links (422 draft.empty)', function (): void {
+    [$user, $creator] = draftCreatorUser();
+    $assignment = assignmentForCreatorInStatus($creator, AssignmentStatus::Producing);
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/creators/me/assignments/{$assignment->ulid}/drafts", [
+            'caption' => 'Nothing attached',
+        ])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'draft.empty');
+
+    expect(reloadAssignment($assignment)->status)->toBe(AssignmentStatus::Producing);
+    expect(CampaignDraft::query()->where('assignment_id', $assignment->id)->exists())->toBeFalse();
+});
+
 // ── Posted content (approved → posted) ────────────────────────────────────────
 
 it('submits posted content, transitions approved → posted, leaving verification pending', function (): void {

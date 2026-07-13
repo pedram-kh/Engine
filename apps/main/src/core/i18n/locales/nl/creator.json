@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Concept indienen",
             "resubmit": "Concept opnieuw indienen",
+            "emptyHint": "Voeg minstens één media-bijlage of link toe om in te dienen.",
             "mediaStatus": {
               "uploading": "Uploaden…",
               "done": "Geüpload",

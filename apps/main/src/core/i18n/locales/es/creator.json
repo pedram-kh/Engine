@@ -383,6 +383,7 @@
             "media": "Contenido multimedia",
             "submit": "Enviar borrador",
             "resubmit": "Reenviar borrador",
+            "emptyHint": "Añade al menos un archivo multimedia o enlace para enviar.",
             "mediaStatus": {
               "uploading": "Subiendo…",
               "done": "Subido",

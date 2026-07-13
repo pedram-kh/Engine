@@ -383,6 +383,7 @@
             "media": "Media",
             "submit": "Esita draft",
             "resubmit": "Resubmit draft",
+            "emptyHint": "Lisa esitamiseks vähemalt üks meediafail või link.",
             "mediaStatus": {
               "uploading": "Lae ülesing…",
               "done": "Lae ülesed",

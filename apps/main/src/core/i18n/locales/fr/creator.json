@@ -383,6 +383,7 @@
             "media": "Médias",
             "submit": "Soumettre le brouillon",
             "resubmit": "Soumettre à nouveau le brouillon",
+            "emptyHint": "Ajoutez au moins un média ou un lien pour soumettre.",
             "mediaStatus": {
               "uploading": "Téléversement…",
               "done": "Téléversé",

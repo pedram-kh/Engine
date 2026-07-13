@@ -383,6 +383,7 @@
             "media": "Média",
             "submit": "Pošlji osnutek",
             "resubmit": "Znova odeslat osnutek",
+            "emptyHint": "Dodajte vsaj eno medijsko prilogo ali povezavo za oddajo.",
             "mediaStatus": {
               "uploading": "Nalaganje…",
               "done": "Naloženo",
