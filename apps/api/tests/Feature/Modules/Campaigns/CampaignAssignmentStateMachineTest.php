@@ -13,6 +13,7 @@ use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
+use App\Modules\Creators\Models\Contract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Laravel\Pennant\Feature;
@@ -591,16 +592,48 @@ it('holdPayment + releasePayment are escrow-gated (Sprint 10) — no manual path
     expect(reload($released)->status)->toBe(AssignmentStatus::PaymentHeld);
 });
 
-it('contract is gated when per_campaign_contract_enabled is OFF (no transition)', function (): void {
+// §5.35 break-revert — Direction A: the flag gate is load-bearing ONLY when a
+// real contract is involved. Flag OFF + a real contract still refuses.
+it('contract is gated when per_campaign_contract_enabled is OFF AND a real contract is passed', function (): void {
     Feature::define(PerCampaignContractEnabled::NAME, false);
     $assignment = assignmentInStatus(AssignmentStatus::Accepted);
+    $contract = Contract::factory()->create();
 
     try {
-        sm()->contract($assignment);
+        sm()->contract($assignment, $contract);
         $this->fail('Expected a per-campaign-contract gate.');
     } catch (AssignmentTransitionGatedException $e) {
         expect($e->errorCode)->toBe('assignment.per_campaign_contract_disabled');
     }
 
     expect(reload($assignment)->status)->toBe(AssignmentStatus::Accepted);
+});
+
+// §5.35 break-revert — Direction B: a contract-less advance ($contract === null)
+// is the ABSENCE of the contract feature and is permitted regardless of the
+// flag (toggle-off-flow chunk, D1). Restoring the unconditional flag gate
+// reddens this spec.
+it('contract: a null (contract-less) advance succeeds even when per_campaign_contract_enabled is OFF (toggle-off flow, D1)', function (): void {
+    Feature::define(PerCampaignContractEnabled::NAME, false);
+    $assignment = assignmentInStatus(AssignmentStatus::Accepted);
+
+    sm()->contract($assignment, null);
+
+    $fresh = reload($assignment);
+    expect($fresh->status)->toBe(AssignmentStatus::Contracted)
+        ->and($fresh->contract_id)->toBeNull();
+    expect(lastAuditFor($assignment, AuditAction::AssignmentContracted))->not->toBeNull();
+});
+
+// D6 — the $context threads into the transition audit metadata so the three
+// contract-less paths (accept-chained auto-advance, D4 backfill, agency manual
+// proceed) are distinguishable in the audit trail.
+it('contract: the $context is merged into the transition audit metadata (D6)', function (): void {
+    $assignment = assignmentInStatus(AssignmentStatus::Accepted);
+
+    sm()->contract($assignment, null, null, ['auto_advanced' => true]);
+
+    $audit = lastAuditFor($assignment, AuditAction::AssignmentContracted);
+    expect($audit)->not->toBeNull()
+        ->and($audit?->metadata['auto_advanced'] ?? null)->toBeTrue();
 });

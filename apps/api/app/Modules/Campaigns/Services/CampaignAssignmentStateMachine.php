@@ -57,9 +57,10 @@ use Laravel\Pennant\Feature;
  * VENDOR/FLAG-GATED — the methods + their source guards exist + are tested.
  * `holdPayment` / `releasePayment` refuse because Stripe escrow (Sprint 10)
  * does not exist yet; there is NO manual path to those states (the footgun
- * guard). `contract` is gated on `per_campaign_contract_enabled` (the
- * per-campaign manual flow — NOT the e-sign vendor flag, decoupled by the
- * contract-gate-decouple chunk); `verifyLive` is gated on `social_verification_enabled` (the social
+ * guard). `contract` is gated on `per_campaign_contract_enabled` ONLY when a
+ * real contract is involved (`$contract !== null`) — a contract-less advance
+ * (`$contract === null`, the requires=false toggle-off flow) is permitted
+ * regardless of the flag (toggle-off-flow chunk, D1); `verifyLive` is gated on `social_verification_enabled` (the social
  * mock exists — flag-ON + the verification job is the path; flag-OFF stays
  * gated, production-without-adapter safe).
  *
@@ -223,22 +224,35 @@ final class CampaignAssignmentStateMachine
     }
 
     /**
-     * accepted → contracted. Flag-gated on `per_campaign_contract_enabled` (the
-     * per-campaign MANUAL contract flow — decoupled from the e-sign vendor flag
-     * by the contract-gate-decouple chunk, D-3). The optional signed addendum is
-     * recorded on `contract_id`. A `null` $contract is legal (D-7): the agency
-     * "proceed without a per-campaign contract" caller passes null when the
-     * campaign does not require a contract — `contract_id` simply stays null,
+     * accepted → contracted. The optional signed addendum is recorded on
+     * `contract_id`. A `null` $contract is legal (D-7): a contract-less advance
+     * for a campaign that needs no contract — `contract_id` simply stays null,
      * keeping the graph single-edged (`accepted → contracted` always).
+     *
+     * FLAG POSTURE (toggle-off-flow chunk, D1): `per_campaign_contract_enabled`
+     * governs the contract FEATURE (attaching / signing a real per-campaign
+     * contract), so it is load-bearing ONLY when a contract is actually involved
+     * (`$contract !== null`). A contract-less advance (`$contract === null`) is
+     * the ABSENCE of the feature and is permitted REGARDLESS of the flag —
+     * "does this campaign need a contract" is the campaign toggle's question,
+     * "is the contract feature operational" is the flag's. The two are distinct.
+     *
+     * `$context` is merged into the transition audit metadata + the dispatched
+     * event (D6): a contract-less auto-advance carries `auto_advanced: true` so
+     * the audit trail distinguishes it from the agency's manual proceed-without
+     * (no such key) and the D4 backfill (`auto_advanced: true, source: backfill`).
+     *
+     * @param  array<string, mixed>  $context
      */
     public function contract(
         CampaignAssignment $assignment,
         ?Contract $contract = null,
         ?User $actor = null,
+        array $context = [],
     ): CampaignAssignment {
         $this->assertSource($assignment, [AssignmentStatus::Accepted], AssignmentStatus::Contracted);
 
-        if (! Feature::active(PerCampaignContractEnabled::NAME)) {
+        if ($contract !== null && ! Feature::active(PerCampaignContractEnabled::NAME)) {
             throw AssignmentTransitionGatedException::perCampaignContractDisabled();
         }
 
@@ -252,6 +266,7 @@ final class CampaignAssignmentStateMachine
                     $a->contract_id = $contract->id;
                 }
             },
+            context: $context,
         );
     }
 

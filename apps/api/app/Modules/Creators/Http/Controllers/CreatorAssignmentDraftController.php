@@ -149,6 +149,12 @@ final class CreatorAssignmentDraftController
                 // flag) — the assignment-detail surface reflects whether the
                 // per-campaign flow is available (D-5 key rename).
                 'per_campaign_contract_enabled' => Feature::active(PerCampaignContractEnabled::NAME),
+                // Whether THIS campaign requires a per-campaign contract
+                // (toggle-off-flow chunk, D3). The creator copy consults this so
+                // an OFF campaign never shows "the agency will send a contract".
+                // Belt-and-suspenders: with the D2 auto-advance an OFF assignment
+                // should never sit at `accepted`, but a residual row is covered.
+                'requires_per_campaign_contract' => $campaign !== null && $campaign->requires_per_campaign_contract,
             ],
         ]);
     }
@@ -488,7 +494,7 @@ final class CreatorAssignmentDraftController
             ->withoutGlobalScope(BelongsToAgencyScope::class)
             ->where('creator_id', $creator->id)
             ->where('ulid', $assignmentUlid)
-            ->with(['campaign:id,ulid,name,posting_window_starts_at,posting_window_ends_at,starts_at,ends_at,brand_id', 'campaign.brand:id,ulid,name'])
+            ->with(['campaign:id,ulid,name,posting_window_starts_at,posting_window_ends_at,starts_at,ends_at,brand_id,requires_per_campaign_contract', 'campaign.brand:id,ulid,name'])
             ->first();
 
         if ($assignment === null) {

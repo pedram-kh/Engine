@@ -269,6 +269,13 @@ session; `git rev-list --count 7051123..HEAD` = **34** (33 batch commits + this 
   `docs/runbooks/production-queue-worker.md` (`12a7ef5`) cross-links this step so a deploy checklist
   finds both operational obligations in one place. (Also logged as a standing tech-debt obligation
   below.)
+- **Pending post-deploy operational step (AH-042 D4) — new, carry forward.** When AH-042
+  (toggle-OFF contract flow) ships, run `php artisan campaigns:advance-contractless-accepted` **once**
+  (optionally `--dry-run` first) so any assignment stuck at `accepted` on a `requires=false` campaign
+  advances to `contracted` (contract-less). Idempotent — a second run reports 0; scoped to
+  accepted-only + requires=false-only. **No scheduler**, so it must not be forgotten at the next
+  deploy. This now **joins the AH-026 `creators:recompute-completeness`** command in the pending-deploy
+  list — two one-shot post-deploy commands to run together.
 - **Key tech-debt pointers** (full detail in `tech-debt.md`):
   - **AH-001 i18n completeness** — English fragments inside translated values in ~10 locales; parity
     is structurally blind to it (per-market human QA is a go-live gate, not a merge gate).

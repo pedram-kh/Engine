@@ -3,9 +3,11 @@
 declare(strict_types=1);
 
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
+use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Mail\ContractAcceptedMail;
 use App\Modules\Campaigns\Mail\ContractAttachedMail;
 use App\Modules\Campaigns\Models\Campaign;
@@ -310,7 +312,20 @@ it('creator show includes pending contract relationship when accepted', function
         ->assertOk()
         ->assertJsonPath('data.relationships.contract.attributes.status', 'sent')
         ->assertJsonPath('data.relationships.contract.attributes.body_markdown', 'Review these terms.')
-        ->assertJsonPath('meta.per_campaign_contract_enabled', true);
+        ->assertJsonPath('meta.per_campaign_contract_enabled', true)
+        // D3 — the creator show surfaces the campaign toggle so the copy can
+        // consult it (this campaign is requires=false by factory default).
+        ->assertJsonPath('meta.requires_per_campaign_contract', false);
+});
+
+it('creator show surfaces requires_per_campaign_contract = true for a requires=true campaign (D3)', function (): void {
+    [$agency, $campaign, $assignment, , $creatorUser] = contractSetup();
+    $campaign->forceFill(['requires_per_campaign_contract' => true])->save();
+
+    $this->actingAs($creatorUser)
+        ->getJson("/api/v1/creators/me/assignments/{$assignment->ulid}")
+        ->assertOk()
+        ->assertJsonPath('meta.requires_per_campaign_contract', true);
 });
 
 // ---------------------------------------------------------------------------
@@ -333,6 +348,18 @@ it('proceed-without-contract advances accepted → contracted with no contract r
     expect($fresh?->status)->toBe(AssignmentStatus::Contracted)
         ->and($fresh?->contract_id)->toBeNull()
         ->and(Contract::query()->count())->toBe(0);
+
+    // D6 — the agency's MANUAL proceed carries NO auto_advanced context, so a
+    // future reader can tell it apart from the accept-chained auto-advance
+    // (auto_advanced: true) and the D4 backfill (auto_advanced + source).
+    $audit = AuditLog::query()
+        ->where('action', 'assignment.contracted')
+        ->where('subject_type', $assignment->getMorphClass())
+        ->where('subject_id', $assignment->id)
+        ->latest('id')
+        ->first();
+    expect($audit)->not->toBeNull()
+        ->and($audit?->metadata['auto_advanced'] ?? null)->toBeNull();
 });
 
 it('after proceed-without-contract the existing draft submit flow continues (NOT a dead-end, the L1 fix)', function (): void {
@@ -412,6 +439,124 @@ it('proceed-without-contract rejects non-members with 404', function (): void {
     $this->actingAs($outsider)
         ->postJson(agencyContractUrl($agency, $campaign, $assignment, 'proceed-without-contract'))
         ->assertNotFound();
+});
+
+// ---------------------------------------------------------------------------
+// Toggle-off flow (D1/D2/D6) — a requires=false campaign auto-advances through
+// `accepted → contracted` at INVITE-accept time, with ZERO contract involvement
+// and NO agency action. §5.34 negative: the OFF path flows freely.
+// ---------------------------------------------------------------------------
+
+it('OFF: creator accept auto-advances accepted → contracted with no contract and no agency action (D2)', function (): void {
+    Mail::fake();
+    // requires_per_campaign_contract defaults false on the factory.
+    [$agency, $campaign, $assignment, $creator, $creatorUser] = contractSetup(AssignmentStatus::Invited);
+
+    $this->actingAs($creatorUser)
+        ->postJson("/api/v1/creators/me/assignments/{$assignment->ulid}/accept")
+        ->assertOk()
+        ->assertJsonPath('data.attributes.status', 'contracted');
+
+    $fresh = $assignment->fresh();
+    expect($fresh?->status)->toBe(AssignmentStatus::Contracted)
+        ->and($fresh?->contract_id)->toBeNull()
+        ->and(Contract::query()->count())->toBe(0);
+
+    // Zero contract involvement — neither contract mailable is queued.
+    Mail::assertNotQueued(ContractAttachedMail::class);
+    Mail::assertNotQueued(ContractAcceptedMail::class);
+
+    // And the draft form is immediately reachable — no agency step in between.
+    $mediaPath = "creators/{$creator->ulid}/drafts/test.mp4";
+    Storage::disk('media')->put($mediaPath, 'video');
+
+    $this->actingAs($creatorUser)
+        ->postJson("/api/v1/creators/me/assignments/{$assignment->ulid}/drafts", [
+            'caption' => 'Draft v1',
+            'media' => [['s3_path' => $mediaPath, 'mime_type' => 'video/mp4', 'kind' => 'video']],
+        ])
+        ->assertCreated()
+        ->assertJsonPath('meta.code', 'assignment.draft_submitted');
+
+    expect($assignment->fresh()?->status)->toBe(AssignmentStatus::DraftSubmitted);
+});
+
+it('OFF: the auto-advance transition is audit-distinguishable via auto_advanced context (D6)', function (): void {
+    [$agency, $campaign, $assignment, , $creatorUser] = contractSetup(AssignmentStatus::Invited);
+
+    $this->actingAs($creatorUser)
+        ->postJson("/api/v1/creators/me/assignments/{$assignment->ulid}/accept")
+        ->assertOk();
+
+    $contractedAudit = AuditLog::query()
+        ->where('action', 'assignment.contracted')
+        ->where('subject_type', $assignment->getMorphClass())
+        ->where('subject_id', $assignment->id)
+        ->latest('id')
+        ->first();
+
+    expect($contractedAudit)->not->toBeNull()
+        ->and($contractedAudit?->metadata['auto_advanced'] ?? null)->toBeTrue();
+});
+
+it('OFF auto-advance still works when per_campaign_contract_enabled is OFF (D1 — the flag is irrelevant to a contract-less advance)', function (): void {
+    Feature::define(PerCampaignContractEnabled::NAME, false);
+    [$agency, $campaign, $assignment, , $creatorUser] = contractSetup(AssignmentStatus::Invited);
+
+    $this->actingAs($creatorUser)
+        ->postJson("/api/v1/creators/me/assignments/{$assignment->ulid}/accept")
+        ->assertOk()
+        ->assertJsonPath('data.attributes.status', 'contracted');
+
+    expect($assignment->fresh()?->status)->toBe(AssignmentStatus::Contracted);
+});
+
+it('ON: requires=true accept stays at accepted — no auto-advance (D7, the contract path is unchanged)', function (): void {
+    [$agency, $campaign, $assignment, , $creatorUser] = contractSetup(AssignmentStatus::Invited);
+    $campaign->forceFill(['requires_per_campaign_contract' => true])->save();
+
+    $this->actingAs($creatorUser)
+        ->postJson("/api/v1/creators/me/assignments/{$assignment->ulid}/accept")
+        ->assertOk()
+        ->assertJsonPath('data.attributes.status', 'accepted');
+
+    expect($assignment->fresh()?->status)->toBe(AssignmentStatus::Accepted)
+        ->and(Contract::query()->count())->toBe(0);
+});
+
+// §5.2 Event::fake split — the LISTENER-swallowing leg: assert the
+// `assignment.contracted` transition genuinely fires on auto-advance. Its
+// companion (the no-fake leg) is the D2 test above, which asserts no
+// ContractAcceptedMail is queued (the listener runs and chooses not to send).
+it('OFF: creator accept dispatches the assignment.contracted transition event (§5.2 split)', function (): void {
+    Event::fake([AssignmentTransitioned::class]);
+    [$agency, $campaign, $assignment, , $creatorUser] = contractSetup(AssignmentStatus::Invited);
+
+    $this->actingAs($creatorUser)
+        ->postJson("/api/v1/creators/me/assignments/{$assignment->ulid}/accept")
+        ->assertOk();
+
+    Event::assertDispatched(
+        AssignmentTransitioned::class,
+        fn (AssignmentTransitioned $e): bool => $e->action === AuditAction::AssignmentContracted
+            && $e->assignment->id === $assignment->id,
+    );
+});
+
+// The pre-existing false-fire fix (named finding): the agency's manual
+// proceed-without-contract path is contract-less, so it must NOT announce a
+// contract acceptance. Before this chunk it queued ContractAcceptedMail for a
+// contract that never existed.
+it('the agency proceed-without-contract path does NOT announce a contract acceptance (pre-existing false-fire fix)', function (): void {
+    Mail::fake();
+    [$agency, $campaign, $assignment] = contractSetup();
+
+    $this->actingAs(User::factory()->agencyStaff($agency)->createOne())
+        ->postJson(agencyContractUrl($agency, $campaign, $assignment, 'proceed-without-contract'))
+        ->assertOk();
+
+    expect($assignment->fresh()?->contract_id)->toBeNull();
+    Mail::assertNotQueued(ContractAcceptedMail::class);
 });
 
 it('the Creators listing exposes has_pending_contract once a contract is sent (issue-visibility fix)', function (): void {

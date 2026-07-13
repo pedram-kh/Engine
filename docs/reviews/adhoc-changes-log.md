@@ -60,6 +60,57 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-042 · Toggle-OFF campaigns flow without contract involvement
+
+- **Status:** Landed (push HELD)
+- **Date:** 2026-07-13
+- **Why:** A campaign's "Require a per-campaign contract" toggle (`requires_per_campaign_contract`)
+  was set OFF but the assignment pipeline still dead-ended the creator at `accepted` with no step
+  forward — identical to the ON behaviour. The decouple chunk had added an _agency_ escape button but
+  the creator remained stuck. OFF must flow with **zero** contract involvement; ON stays as-is.
+- **What:**
+  - The state-machine `contract()` gate now reads `$contract !== null` — a **contract-less advance is
+    permitted regardless of the `per_campaign_contract_enabled` flag** (the flag gates the contract
+    _feature_, irrelevant when no contract is involved).
+  - `CreatorAssignmentController::accept` **auto-advances** `accepted → contracted` (contract-less, one
+    outer transaction) when the campaign toggle is OFF, landing the creator straight on the draft form.
+  - The creator detail copy ("the agency will send a contract" / signing-disabled) now consults the
+    campaign toggle via a new `requires_per_campaign_contract` meta key (belt-and-suspenders).
+  - New one-shot idempotent command `campaigns:advance-contractless-accepted` (`--dry-run`,
+    accepted-only + requires=false-only) to advance rows stuck before this shipped.
+  - **Pre-existing false-fire fixed:** the agency proceed-without-contract path had been announcing
+    "the creator accepted the contract" for contracts that never existed — the contract-acceptance
+    notification is now gated on `contract_id !== null` everywhere.
+- **Touched:** `CampaignAssignmentStateMachine`, `CreatorAssignmentController`,
+  `CreatorAssignmentDraftController` (meta), `SendAssignmentNotifications`,
+  `AdvanceContractlessAcceptedAssignments` (new command); `campaign.ts` type,
+  `CreatorAssignmentDetailPage.vue`; backend + FE + console tests.
+- **Decisions:**
+  - **D1 (flag vs. toggle):** the toggle is the single source of "does this campaign need a contract";
+    the flag is the single source of "is the contract feature operational." The machine permits
+    `contract(null)` irrespective of the flag; the flag stays load-bearing for `contract !== null`.
+  - **D5 (accept-time snapshot posture):** flipping the toggle ON after acceptance does **not**
+    retroactively demand a contract (contracted rows stay contracted); flipping OFF advances stuck rows
+    **only** via the D4 command or the agency button, never automatically on campaign edit.
+  - **Q2 asymmetry (recorded):** the machine permits `contract(null)` while the agency
+    proceed-without-contract _endpoint_ keeps its `flagGate` — the endpoint is part of the contract
+    feature's surface (flag territory), the auto-advance is the absence of the feature (toggle
+    territory). Manifests only when the flag is manually OFF; the D4 command drives the machine
+    directly so remediation is never blocked.
+  - **Uniform notification gate (incl. the pre-existing false-fire):** a contract-less advance never
+    announces a contract acceptance, regardless of path (auto-advance, backfill, or agency button);
+    the agency still learns of the accept itself.
+  - **D6 (audit distinguishability):** three contract-less paths carry distinct audit signatures —
+    accept-chained (`auto_advanced: true`), backfill (`auto_advanced: true, source: backfill`), agency
+    manual (neither key).
+  - **D4 post-deploy step:** run `php artisan campaigns:advance-contractless-accepted` once after
+    deploy — **joins the AH-026 `creators:recompute-completeness` in the pending-deploy list**
+    (see `RESUMPTION-TEMPLATE.md` Part 2). Idempotent; no scheduler.
+- **Ref:** kickoff "Toggle-OFF campaigns flow without contract involvement" (investigation I1–I6);
+  review `docs/reviews/contract-toggle-off-flow-review.md`.
+
+---
+
 > **AH-033 → AH-041 are one direct-iteration fix batch** (the AH-007 pattern: Pedram
 > directs each change interactively, no per-item kickoff; one independent review + one
 > close-out at the end). Nine themes, committed as small conventional commits

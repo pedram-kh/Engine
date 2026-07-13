@@ -233,6 +233,19 @@ final class SendAssignmentNotifications
 
     private function notifyAgencyOfContractAcceptance(CampaignAssignment $assignment, ?User $actor): void
     {
+        // Q1 invariant (toggle-off-flow chunk): a CONTRACT-LESS advance must
+        // NEVER announce a contract acceptance — no contract was signed. This
+        // covers BOTH the requires=false auto-advance (D2) and the agency's
+        // manual "proceed without contract" — and it CORRECTS a pre-existing
+        // false-fire: since the decouple chunk shipped, the agency proceed-
+        // without-contract path (contract($assignment, null)) has been sending
+        // "the creator accepted the contract" for contracts that never existed.
+        // The agency still learns of the accept itself via the accepted
+        // notification, so no information is lost — only the false claim.
+        if ($assignment->contract_id === null) {
+            return;
+        }
+
         $campaign = $assignment->campaign;
         $creator = $assignment->creator;
 

@@ -6,6 +6,7 @@ namespace App\Modules\Creators\Http\Controllers;
 
 use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
+use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
@@ -14,6 +15,7 @@ use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * The CREATOR half of the assignment lifecycle (Sprint 8 Chunk 2, D-9) — mirrors
@@ -58,7 +60,27 @@ final class CreatorAssignmentController
     public function accept(Request $request, string $assignment, CampaignAssignmentStateMachine $machine): JsonResponse
     {
         return $this->transition($request, $assignment, 'assignment.accepted', static function (CampaignAssignment $a, User $actor) use ($machine): void {
-            $machine->accept($a, $actor);
+            // Toggle-off flow (D2): a campaign that does NOT require a
+            // per-campaign contract auto-advances straight through
+            // `accepted → contracted` with NO contract, so the creator never
+            // sees, waits for, or hears about a contract — the next screen is
+            // the draft form. requires=true stays at `accepted` (the
+            // creator-accepts-a-contract path, unchanged, D7). Both flips run
+            // in ONE outer transaction (all-or-nothing). The contract-less
+            // advance is audit-distinguished from the agency's manual
+            // proceed-without-contract via `auto_advanced: true` (D6); the
+            // machine permits the null advance regardless of the flag (D1).
+            DB::transaction(function () use ($machine, $a, $actor): void {
+                $machine->accept($a, $actor);
+
+                $campaign = Campaign::query()
+                    ->withoutGlobalScope(BelongsToAgencyScope::class)
+                    ->find($a->campaign_id);
+
+                if ($campaign !== null && ! $campaign->requires_per_campaign_contract) {
+                    $machine->contract($a, null, $actor, ['auto_advanced' => true]);
+                }
+            });
         });
     }
 
