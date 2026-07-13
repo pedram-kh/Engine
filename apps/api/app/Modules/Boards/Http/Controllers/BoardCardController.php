@@ -55,8 +55,14 @@ final class BoardCardController
         $this->moves->move($card, $target, $actor, $validated['reason'] ?? null);
 
         return new BoardCardResource(
-            $card->fresh(['column:id,ulid', 'assignment:id,ulid,status,deliverables,posting_due_at,creator_id', 'assignment.creator:id,ulid,display_name'])
-                ?? $card,
+            $card->fresh([
+                'column:id,ulid',
+                // Keep the moved-card face in parity with the board GET select
+                // (board-card facelift + re-offer chunk) — otherwise the card
+                // loses its avatar / fee / decline-history on move.
+                'assignment:id,ulid,status,previously_declined,deliverables,posting_due_at,agreed_fee_minor_units,agreed_fee_currency,fee_per,creator_id',
+                'assignment.creator:id,ulid,display_name,avatar_path',
+            ]) ?? $card,
         );
     }
 

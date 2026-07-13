@@ -93,6 +93,32 @@ it('manual move has NO side effect on assignment state (the critical safety inva
     ])->exists())->toBeFalse();
 });
 
+it('move response keeps the full card face (fee + decline-history in parity with board GET)', function (): void {
+    [$agency, $admin, $campaign] = boardWithCard();
+    $assignment = CampaignAssignment::factory()->create([
+        'campaign_id' => $campaign->id,
+        'status' => AssignmentStatus::Invited,
+        'previously_declined' => true,
+        'agreed_fee_minor_units' => 20000,
+        'agreed_fee_currency' => 'EUR',
+        'fee_per' => 'script',
+    ]);
+    app(BoardService::class)->forCampaign($campaign);
+    $card = BoardCard::query()->where('assignment_id', $assignment->id)->firstOrFail();
+
+    $board = Board::query()->where('campaign_id', $campaign->id)->firstOrFail();
+    $approved = $board->columns()->where('name', 'Approved')->firstOrFail();
+
+    $this->actingAs($admin)->postJson(moveUrl($agency, $campaign, $card), [
+        'target_column_id' => $approved->ulid,
+    ])
+        ->assertOk()
+        ->assertJsonPath('data.relationships.assignment.data.agreed_fee_minor_units', 20000)
+        ->assertJsonPath('data.relationships.assignment.data.fee_per', 'script')
+        ->assertJsonPath('data.relationships.assignment.data.previously_declined', true)
+        ->assertJsonPath('data.relationships.assignment.data.creator.avatar_url', null);
+});
+
 it('lists the card movement history', function (): void {
     [$agency, $admin, $campaign, $assignment, $card] = boardWithCard();
     $board = Board::query()->where('campaign_id', $campaign->id)->firstOrFail();
