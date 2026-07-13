@@ -320,38 +320,66 @@ function openProfile(item: DiscoveryCreatorListItem): void {
         <v-col v-for="item in items" :key="item.id" cols="12" sm="6" md="4" lg="3">
           <v-card
             variant="outlined"
-            class="discover-card h-100"
+            class="discover-card h-100 d-flex flex-column"
             hover
             :data-test="`discover-card-${item.id}`"
             @click="openProfile(item)"
           >
-            <v-card-text class="d-flex flex-column align-center text-center">
-              <v-avatar size="72" color="primary" class="mb-3">
-                <v-img
-                  v-if="item.attributes.avatar_url"
-                  :src="item.attributes.avatar_url"
-                  :alt="item.attributes.display_name ?? ''"
-                />
-                <span v-else class="text-h6 text-white">{{
+            <!-- Photo-forward hero (concept-inspired): a full-bleed portrait,
+                 falling back to a tinted initial when no avatar is set. -->
+            <div class="discover-card__hero">
+              <v-img
+                v-if="item.attributes.avatar_url"
+                :src="item.attributes.avatar_url"
+                :alt="item.attributes.display_name ?? ''"
+                cover
+                class="discover-card__img"
+              />
+              <div v-else class="discover-card__fallback">
+                <span class="text-h3 text-medium-emphasis">{{
                   avatarInitial(item.attributes.display_name)
                 }}</span>
-              </v-avatar>
+              </div>
+            </div>
 
-              <span
-                class="text-subtitle-1 font-weight-medium"
-                :data-test="`discover-name-${item.id}`"
-              >
-                {{ item.attributes.display_name ?? t('app.discover.unnamed') }}
-              </span>
-
-              <div class="text-caption text-medium-emphasis mt-1">
-                <span>{{ countryLabel(item.attributes.country_code) }}</span>
-                <template v-if="languageLabel(item.attributes.primary_language)">
-                  · {{ languageLabel(item.attributes.primary_language, item.attributes.accent) }}
-                </template>
+            <div class="discover-card__body pa-3 d-flex flex-column flex-grow-1">
+              <div class="d-flex align-center ga-1">
+                <span
+                  class="text-subtitle-1 font-weight-bold text-truncate"
+                  :data-test="`discover-name-${item.id}`"
+                >
+                  {{ item.attributes.display_name ?? t('app.discover.unnamed') }}
+                </span>
+                <!-- Connected → a verified-style check by the name (the
+                     concept's badge position); the footer chip carries the
+                     label + the annotation the specs assert. -->
+                <v-icon
+                  v-if="connectionState(item) === 'connected'"
+                  icon="mdi-check-decagram"
+                  size="16"
+                  color="primary"
+                  :data-test="`discover-verified-${item.id}`"
+                />
               </div>
 
-              <div class="d-flex flex-wrap justify-center ga-1 mt-2">
+              <!-- Icon meta row, concept-style (pin · language) with our data. -->
+              <div
+                class="d-flex flex-wrap align-center ga-3 text-caption text-medium-emphasis mt-1"
+              >
+                <span class="d-inline-flex align-center ga-1">
+                  <v-icon icon="mdi-map-marker-outline" size="14" />
+                  {{ countryLabel(item.attributes.country_code) }}
+                </span>
+                <span
+                  v-if="languageLabel(item.attributes.primary_language)"
+                  class="d-inline-flex align-center ga-1"
+                >
+                  <v-icon icon="mdi-translate" size="14" />
+                  {{ languageLabel(item.attributes.primary_language, item.attributes.accent) }}
+                </span>
+              </div>
+
+              <div class="d-flex flex-wrap ga-1 mt-2">
                 <v-chip
                   v-for="cat in (item.attributes.categories ?? []).slice(0, 3)"
                   :key="cat"
@@ -362,27 +390,28 @@ function openProfile(item: DiscoveryCreatorListItem): void {
                 </v-chip>
               </div>
 
-              <!-- Calling-agency-only connection annotation, three states
-                   (D-5/D-11): connected / pending / declined / not connected. -->
-              <v-chip
-                v-if="connectionChip(item)"
-                size="small"
-                :color="connectionChip(item)!.color"
-                variant="tonal"
-                class="mt-3"
-                :prepend-icon="connectionChip(item)!.icon"
-                :data-test="`discover-connection-${connectionState(item)}-${item.id}`"
-              >
-                {{ t(connectionChip(item)!.key) }}
-              </v-chip>
-              <span
-                v-else
-                class="text-caption text-disabled mt-3"
-                :data-test="`discover-notconnected-${item.id}`"
-              >
-                {{ t('app.discover.connection.notConnected') }}
-              </span>
-            </v-card-text>
+              <!-- Footer strip — calling-agency-only connection annotation,
+                   three states (D-5/D-11), pinned to the bottom of the card. -->
+              <div class="discover-card__footer mt-auto pt-3">
+                <v-chip
+                  v-if="connectionChip(item)"
+                  size="small"
+                  :color="connectionChip(item)!.color"
+                  variant="tonal"
+                  :prepend-icon="connectionChip(item)!.icon"
+                  :data-test="`discover-connection-${connectionState(item)}-${item.id}`"
+                >
+                  {{ t(connectionChip(item)!.key) }}
+                </v-chip>
+                <span
+                  v-else
+                  class="text-caption text-disabled"
+                  :data-test="`discover-notconnected-${item.id}`"
+                >
+                  {{ t('app.discover.connection.notConnected') }}
+                </span>
+              </div>
+            </div>
           </v-card>
         </v-col>
       </v-row>
@@ -403,6 +432,37 @@ function openProfile(item: DiscoveryCreatorListItem): void {
 <style scoped>
 .discover-card {
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  overflow: hidden;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.discover-card:hover {
+  box-shadow: 0 2px 12px rgba(var(--v-theme-on-surface), 0.14);
+}
+.discover-card__hero {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: rgba(var(--v-theme-on-surface), 0.06);
+}
+.discover-card__img {
+  height: 100%;
+  width: 100%;
+}
+.discover-card__fallback {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--v-theme-primary), 0.18),
+    rgba(var(--v-theme-surface), 0.4)
+  );
+}
+.discover-card__footer {
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }
 </style>
