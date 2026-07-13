@@ -293,7 +293,7 @@ async function submit(): Promise<void> {
     </div>
 
     <div v-if="humanSendBlocked" class="chat-panel__closed" data-test="chat-closed">
-      <v-alert type="info" variant="tonal" density="compact">
+      <v-alert type="error" variant="tonal" density="compact">
         {{ t('app.messaging.closed') }}
       </v-alert>
     </div>

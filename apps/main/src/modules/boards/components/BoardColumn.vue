@@ -70,7 +70,10 @@ defineExpose({ onCardChange })
         :style="{ backgroundColor: boardColorHex(column.attributes.color_token) }"
         aria-hidden="true"
       />
-      <span class="text-subtitle-2" :data-test="`board-column-name-${column.id}`">
+      <span
+        class="text-subtitle-2 text-no-wrap text-truncate"
+        :data-test="`board-column-name-${column.id}`"
+      >
         {{ column.attributes.name }}
       </span>
       <v-chip size="x-small" variant="tonal" :data-test="`board-column-count-${column.id}`">
