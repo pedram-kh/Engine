@@ -108,11 +108,16 @@ final class Campaign extends Model
     }
 
     /**
+     * Includes trashed rows: archiving a brand is a soft delete, and a
+     * campaign must keep rendering its (historical) brand after the archive —
+     * otherwise the SoftDeletes scope nulls the relation and every campaign
+     * serialization crashes (the production July-Wave-4 incident).
+     *
      * @return BelongsTo<Brand, $this>
      */
     public function brand(): BelongsTo
     {
-        return $this->belongsTo(Brand::class);
+        return $this->belongsTo(Brand::class)->withTrashed();
     }
 
     /**

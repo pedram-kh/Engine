@@ -187,6 +187,28 @@ it('returns an empty page for an unknown status filter', function (): void {
         ->assertJsonPath('meta.total', 0);
 });
 
+it('still lists + shows a campaign whose brand was ARCHIVED (soft-deleted) — the July-Wave-4 incident', function (): void {
+    // Archiving a brand is a soft delete (BrandController::destroy). Before the
+    // Campaign::brand() withTrashed() fix, the SoftDeletes scope nulled the
+    // relation and CampaignResource's assert crashed the ENTIRE campaigns page
+    // for one archived brand.
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $brand = Brand::factory()->forAgency($agency->id)->createOne(['name' => 'Bolt Food']);
+    $campaign = Campaign::factory()->forAgency($agency->id)->create(['brand_id' => $brand->id]);
+
+    $brand->delete(); // soft delete — exactly what the archive endpoint does
+
+    $this->actingAs($admin)->getJson(campaignsUrl($agency))
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('data.0.relationships.brand.data.name', 'Bolt Food');
+
+    $this->actingAs($admin)->getJson(campaignsUrl($agency)."/{$campaign->ulid}")
+        ->assertOk()
+        ->assertJsonPath('data.relationships.brand.data.name', 'Bolt Food');
+});
+
 // ── Show / tenancy ────────────────────────────────────────────────────────────
 
 it('shows a campaign to any member', function (): void {
