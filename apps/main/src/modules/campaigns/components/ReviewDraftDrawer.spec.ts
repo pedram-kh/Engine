@@ -65,6 +65,10 @@ function makeDraft(): CampaignDraftResource {
       hashtags: ['#ad'],
       mentions: ['@brand'],
       media: [],
+      links: [
+        { url: 'https://example.com/raw-cut', name: 'Raw cut' },
+        { url: 'https://example.com/moodboard' },
+      ],
       review_status: 'pending',
       reviewed_at: null,
       review_feedback: null,
@@ -156,6 +160,18 @@ describe('ReviewDraftDrawer (Sprint 9 Chunk 2)', () => {
       ASSIGNMENT_ID,
     )
     expect(wrapper.find('[data-test="review-caption"]').text()).toContain('A shiny new caption')
+
+    // Hashtags/mentions chips are gone (draft-composer facelift); the draft's
+    // external links render as anchors instead.
+    expect(wrapper.text()).not.toContain('#ad')
+    expect(wrapper.text()).not.toContain('@brand')
+    const first = wrapper.find('[data-test="review-link-0"]')
+    expect(first.text()).toContain('Raw cut')
+    expect(first.attributes('href')).toBe('https://example.com/raw-cut')
+    // A name-less link falls back to its URL.
+    expect(wrapper.find('[data-test="review-link-1"]').text()).toContain(
+      'https://example.com/moodboard',
+    )
     wrapper.unmount()
   })
 

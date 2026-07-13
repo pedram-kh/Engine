@@ -4,8 +4,10 @@
  * Chunk 1, D-9). The flat invitation list links here; this is the home for the
  * draft version history + the state-dependent, FAIL-CLOSED actions:
  *
- *   - producing / contracted  → submit a draft (caption + hashtags/mentions +
- *     presigned media upload). Backend lifts contracted → producing first (D-4).
+ *   - producing / contracted  → submit a draft (caption + presigned media
+ *     upload + external links, via the chat-composer-style attach controls;
+ *     draft-composer facelift dropped the hashtags/mentions fields). Backend
+ *     lifts contracted → producing first (D-4).
  *   - revision_requested       → show the agency feedback (Chunk 2 writes it) +
  *     resubmit (a new version via the two-step machine path, D-6).
  *   - draft_submitted          → awaiting review (read-only).
@@ -26,6 +28,7 @@ import {
   extractFieldErrors,
   uploadToPresignedUrl,
   type CreatorAssignmentDetailResource,
+  type DraftLink,
   type DraftMediaInput,
 } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
@@ -36,7 +39,7 @@ import { creatorAssignmentsApi } from '../assignments.api'
 import { creatorChatTransport } from '@/modules/messaging/api/messaging.api'
 import ChatPanel from '@/modules/messaging/components/ChatPanel.vue'
 
-type DraftField = 'caption' | 'hashtags' | 'mentions' | 'media'
+type DraftField = 'caption' | 'media' | 'links'
 type PostedField = 'platform' | 'post_url'
 
 type MediaUploadStatus = 'uploading' | 'done' | 'error'
@@ -74,11 +77,19 @@ const snackbar = ref<{ color: string; text: string } | null>(null)
 
 // Draft form state.
 const caption = ref('')
-const hashtagsInput = ref('')
-const mentionsInput = ref('')
 const media = ref<MediaUploadItem[]>([])
 const draftFieldErrors = ref<Partial<Record<DraftField, readonly string[]>>>({})
 const submittingDraft = ref(false)
+
+// Chat-composer-style attach controls (draft-composer facelift): a hidden OS
+// file picker behind the paperclip icon, and a link dialog behind the link
+// icon — mirroring RelationshipThreadView's file/link pair.
+const fileInput = ref<HTMLInputElement | null>(null)
+const draftLinks = ref<DraftLink[]>([])
+const linkDialogOpen = ref(false)
+const linkUrl = ref('')
+const linkName = ref('')
+const linkError = ref<string | null>(null)
 
 // Posted-content form state.
 const platform = ref<(typeof PLATFORMS)[number]>('instagram')
@@ -155,14 +166,6 @@ const draftSubmittable = computed(() => readyMedia.value.length > 0 && !mediaUpl
 
 function newId(): string {
   return `media-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-}
-
-function tokenize(raw: string): string[] | null {
-  const parts = raw
-    .split(/[\s,]+/)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 0)
-  return parts.length > 0 ? parts : null
 }
 
 function formatMoney(minor: number | null, currency: string | null): string {
@@ -242,11 +245,53 @@ function removeMedia(id: string): void {
   media.value = media.value.filter((m) => m.id !== id)
 }
 
+/** The paperclip icon → the hidden OS file picker (the chat-composer pattern). */
+function openFilePicker(): void {
+  fileInput.value?.click()
+}
+
+function onFilesPicked(event: Event): void {
+  const input = event.target as HTMLInputElement
+  const files = input.files === null ? [] : Array.from(input.files)
+  input.value = ''
+  void onFilesSelected(files)
+}
+
+function openLinkDialog(): void {
+  linkError.value = null
+  linkDialogOpen.value = true
+}
+
+/** Same URL guard as the chat composer: parseable + http(s) only. */
+function addLink(): void {
+  linkError.value = null
+  const url = linkUrl.value.trim()
+  let valid = false
+  try {
+    const parsed = new URL(url)
+    valid = parsed.protocol === 'http:' || parsed.protocol === 'https:'
+  } catch {
+    valid = false
+  }
+  if (!valid) {
+    linkError.value = t('app.messaging.relationship.linkInvalid')
+    return
+  }
+  const name = linkName.value.trim()
+  draftLinks.value = [...draftLinks.value, name === '' ? { url } : { url, name }]
+  linkUrl.value = ''
+  linkName.value = ''
+  linkDialogOpen.value = false
+}
+
+function removeLink(index: number): void {
+  draftLinks.value = draftLinks.value.filter((_, i) => i !== index)
+}
+
 function resetDraftForm(): void {
   caption.value = ''
-  hashtagsInput.value = ''
-  mentionsInput.value = ''
   media.value = []
+  draftLinks.value = []
   draftFieldErrors.value = {}
 }
 
@@ -263,9 +308,8 @@ async function submitDraft(): Promise<void> {
     }))
     await creatorAssignmentsApi.submitDraft(ulid.value, {
       caption: caption.value.trim() === '' ? null : caption.value.trim(),
-      hashtags: tokenize(hashtagsInput.value),
-      mentions: tokenize(mentionsInput.value),
       media: payloadMedia,
+      links: draftLinks.value.length > 0 ? [...draftLinks.value] : null,
     })
     snackbar.value = {
       color: 'success',
@@ -523,35 +567,45 @@ onMounted(() => {
             :error-messages="draftFieldErrors.caption as string[]"
             data-testid="assignment-draft-caption"
           />
-          <v-text-field
-            v-model="hashtagsInput"
-            :label="t('creator.ui.assignments.detail.draft.hashtags')"
-            :hint="t('creator.ui.assignments.detail.draft.hashtagsHint')"
-            persistent-hint
-            variant="outlined"
-            density="compact"
-            data-testid="assignment-draft-hashtags"
-          />
-          <v-text-field
-            v-model="mentionsInput"
-            :label="t('creator.ui.assignments.detail.draft.mentions')"
-            :hint="t('creator.ui.assignments.detail.draft.mentionsHint')"
-            persistent-hint
-            variant="outlined"
-            density="compact"
-            data-testid="assignment-draft-mentions"
-          />
-
-          <v-file-input
-            :label="t('creator.ui.assignments.detail.draft.media')"
-            variant="outlined"
-            density="compact"
+          <!-- Chat-composer-style attach pair (draft-composer facelift): a
+               paperclip for files (hidden OS picker) + a link icon for
+               external URLs — mirrors RelationshipThreadView. -->
+          <div class="d-flex align-center ga-2">
+            <v-btn
+              icon="mdi-paperclip"
+              variant="tonal"
+              size="small"
+              :aria-label="t('creator.ui.assignments.detail.draft.media')"
+              data-testid="assignment-draft-attach-file"
+              @click="openFilePicker"
+            />
+            <v-btn
+              icon="mdi-link-variant"
+              variant="tonal"
+              size="small"
+              :aria-label="t('app.messaging.relationship.addLink')"
+              data-testid="assignment-draft-attach-link"
+              @click="openLinkDialog"
+            />
+            <span class="text-caption text-medium-emphasis">
+              {{ t('creator.ui.assignments.detail.draft.media') }}
+            </span>
+          </div>
+          <input
+            ref="fileInput"
+            type="file"
             multiple
-            prepend-icon="mdi-paperclip"
-            :error-messages="draftFieldErrors.media as string[]"
+            accept="image/*,video/*"
+            class="d-none"
             data-testid="assignment-draft-media-input"
-            @update:model-value="onFilesSelected"
+            @change="onFilesPicked"
           />
+          <p v-if="draftFieldErrors.media" class="text-caption text-error mb-0">
+            {{ (draftFieldErrors.media as string[]).join(' ') }}
+          </p>
+          <p v-if="draftFieldErrors.links" class="text-caption text-error mb-0">
+            {{ (draftFieldErrors.links as string[]).join(' ') }}
+          </p>
 
           <v-list
             v-if="media.length > 0"
@@ -563,6 +617,9 @@ onMounted(() => {
               :key="m.id"
               :data-testid="`assignment-draft-media-${m.id}`"
             >
+              <template #prepend>
+                <v-icon icon="mdi-paperclip" size="small" />
+              </template>
               <v-list-item-title>{{ m.fileName }}</v-list-item-title>
               <v-list-item-subtitle>
                 {{ t(`creator.ui.assignments.detail.draft.mediaStatus.${m.status}`) }}
@@ -578,6 +635,66 @@ onMounted(() => {
               </template>
             </v-list-item>
           </v-list>
+
+          <v-list
+            v-if="draftLinks.length > 0"
+            density="compact"
+            data-testid="assignment-draft-links-list"
+          >
+            <v-list-item
+              v-for="(link, i) in draftLinks"
+              :key="`${link.url}-${i}`"
+              :data-testid="`assignment-draft-link-${i}`"
+            >
+              <template #prepend>
+                <v-icon icon="mdi-link-variant" size="small" />
+              </template>
+              <v-list-item-title>{{ link.name ?? link.url }}</v-list-item-title>
+              <v-list-item-subtitle v-if="link.name">{{ link.url }}</v-list-item-subtitle>
+              <template #append>
+                <v-btn icon="mdi-close" size="x-small" variant="text" @click="removeLink(i)" />
+              </template>
+            </v-list-item>
+          </v-list>
+
+          <!-- The chat composer's link dialog, verbatim mechanics. -->
+          <v-dialog
+            v-model="linkDialogOpen"
+            max-width="420"
+            data-testid="assignment-draft-link-dialog"
+          >
+            <v-card>
+              <v-card-text class="d-flex flex-column ga-3">
+                <v-text-field
+                  v-model="linkUrl"
+                  :label="t('app.messaging.relationship.linkUrl')"
+                  :error-messages="linkError ? [linkError] : []"
+                  density="comfortable"
+                  variant="outlined"
+                  hide-details="auto"
+                  data-testid="assignment-draft-link-url"
+                />
+                <v-text-field
+                  v-model="linkName"
+                  :label="t('app.messaging.relationship.linkName')"
+                  density="comfortable"
+                  variant="outlined"
+                  hide-details
+                  data-testid="assignment-draft-link-name"
+                />
+                <v-btn
+                  color="primary"
+                  size="large"
+                  block
+                  :disabled="linkUrl.trim() === ''"
+                  data-testid="assignment-draft-link-add"
+                  @click="addLink"
+                >
+                  {{ t('app.messaging.relationship.addLink') }}
+                </v-btn>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
         </v-card-text>
         <v-card-actions>
           <v-spacer />

@@ -6,7 +6,7 @@
  *
  *   - loads the agency-side assignment detail (latest draft + version history +
  *     posted content with signed media URLs);
- *   - previews the latest draft (caption / hashtags / mentions + the media via
+ *   - previews the latest draft (caption / external links + the media via
  *     the shared PortfolioGallery lightbox);
  *   - offers the three review actions — Approve / Request changes / Reject —
  *     with per-field 422 binding on `review_feedback` (the canonical pattern).
@@ -207,40 +207,25 @@ async function runAction(kind: ActionKind): Promise<void> {
               {{ latestDraft.attributes.caption || t('app.campaigns.review.noCaption') }}
             </p>
 
+            <!-- External reference links on the draft (draft-composer facelift).
+                 The hashtags/mentions chip rows were dropped with the fields. -->
             <div
-              v-if="latestDraft.attributes.hashtags && latestDraft.attributes.hashtags.length > 0"
-              class="mt-2"
+              v-if="latestDraft.attributes.links && latestDraft.attributes.links.length > 0"
+              class="mt-2 d-flex flex-column ga-1"
+              data-test="review-links"
             >
-              <span class="text-caption text-medium-emphasis"
-                >{{ t('app.campaigns.review.hashtags') }}:</span
+              <a
+                v-for="(link, i) in latestDraft.attributes.links"
+                :key="`${link.url}-${i}`"
+                :href="link.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-body-2 d-inline-flex align-center ga-1"
+                :data-test="`review-link-${i}`"
               >
-              <v-chip
-                v-for="tag in latestDraft.attributes.hashtags"
-                :key="tag"
-                size="x-small"
-                variant="tonal"
-                class="ml-1"
-              >
-                {{ tag }}
-              </v-chip>
-            </div>
-
-            <div
-              v-if="latestDraft.attributes.mentions && latestDraft.attributes.mentions.length > 0"
-              class="mt-1"
-            >
-              <span class="text-caption text-medium-emphasis"
-                >{{ t('app.campaigns.review.mentions') }}:</span
-              >
-              <v-chip
-                v-for="mention in latestDraft.attributes.mentions"
-                :key="mention"
-                size="x-small"
-                variant="tonal"
-                class="ml-1"
-              >
-                {{ mention }}
-              </v-chip>
+                <v-icon icon="mdi-link-variant" size="x-small" />
+                {{ link.name ?? link.url }}
+              </a>
             </div>
 
             <div class="mt-3">

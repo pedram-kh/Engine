@@ -361,10 +361,15 @@ describe('CreatorAssignmentDetailPage — draft submit form', () => {
 
     const { wrapper } = await mountDetail()
 
-    // Drive the file input → presigned upload chain (init → PUT → complete).
-    const fileInput = wrapper.findComponent({ name: 'VFileInput' })
+    // The hashtags/mentions fields are gone (draft-composer facelift).
+    expect(wrapper.find('[data-testid="assignment-draft-hashtags"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-draft-mentions"]').exists()).toBe(false)
+
+    // Drive the hidden OS file picker → presigned upload chain (init → PUT → complete).
+    const fileInput = wrapper.find('[data-testid="assignment-draft-media-input"]')
     const file = new File(['x'], 'clip.mp4', { type: 'video/mp4' })
-    fileInput.vm.$emit('update:modelValue', [file])
+    Object.defineProperty(fileInput.element, 'files', { value: [file], configurable: true })
+    await fileInput.trigger('change')
     await flushPromises()
 
     expect(creatorAssignmentsApi.initDraftMedia).toHaveBeenCalled()
@@ -381,5 +386,75 @@ describe('CreatorAssignmentDetailPage — draft submit form', () => {
       }),
     )
     expect(wrapper.text()).toContain('The caption is invalid.')
+  })
+
+  it('adds an external link via the dialog and sends it on the payload', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('producing') })
+    vi.mocked(creatorAssignmentsApi.initDraftMedia).mockResolvedValue({
+      data: {
+        upload_url: 'https://s3.example/put',
+        upload_id: 'creators/c/drafts/f.mp4',
+        storage_path: 'creators/c/drafts/f.mp4',
+        expires_at: '2026-06-01T10:15:00+00:00',
+        max_bytes: 500000000,
+      },
+    })
+    vi.mocked(creatorAssignmentsApi.completeDraftMedia).mockResolvedValue({
+      data: { storage_path: 'creators/c/drafts/f.mp4' },
+    })
+    vi.mocked(creatorAssignmentsApi.submitDraft).mockResolvedValue({
+      data: makeDraft(1),
+      meta: { code: 'assignment.draft_submitted' },
+    })
+
+    const { wrapper } = await mountDetail()
+
+    // Ready one media file (media is still required for a submittable draft).
+    const fileInput = wrapper.find('[data-testid="assignment-draft-media-input"]')
+    const file = new File(['x'], 'clip.mp4', { type: 'video/mp4' })
+    Object.defineProperty(fileInput.element, 'files', { value: [file], configurable: true })
+    await fileInput.trigger('change')
+    await flushPromises()
+
+    // Open the link dialog (it teleports to <body>, so fields are queried there).
+    await wrapper.find('[data-testid="assignment-draft-attach-link"]').trigger('click')
+    await flushPromises()
+    const urlInput = document.body.querySelector(
+      '[data-testid="assignment-draft-link-url"] input',
+    ) as HTMLInputElement
+    const addBtn = document.body.querySelector(
+      '[data-testid="assignment-draft-link-add"]',
+    ) as HTMLElement
+
+    // An invalid URL is refused in place.
+    urlInput.value = 'not-a-url'
+    urlInput.dispatchEvent(new Event('input'))
+    await flushPromises()
+    addBtn.click()
+    await flushPromises()
+    expect(wrapper.find('[data-testid="assignment-draft-links-list"]').exists()).toBe(false)
+
+    // A valid http(s) URL + label lands in the pending list.
+    urlInput.value = 'https://example.com/raw-cut'
+    urlInput.dispatchEvent(new Event('input'))
+    const nameInput = document.body.querySelector(
+      '[data-testid="assignment-draft-link-name"] input',
+    ) as HTMLInputElement
+    nameInput.value = 'Raw cut'
+    nameInput.dispatchEvent(new Event('input'))
+    await flushPromises()
+    addBtn.click()
+    await flushPromises()
+    expect(wrapper.find('[data-testid="assignment-draft-link-0"]').text()).toContain('Raw cut')
+
+    await wrapper.find('[data-testid="assignment-draft-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(creatorAssignmentsApi.submitDraft).toHaveBeenCalledWith(
+      ULID,
+      expect.objectContaining({
+        links: [{ url: 'https://example.com/raw-cut', name: 'Raw cut' }],
+      }),
+    )
   })
 })
