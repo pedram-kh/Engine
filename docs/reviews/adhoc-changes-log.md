@@ -60,6 +60,188 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-047 · Creator sees a green "post verified" closure banner
+
+- **Status:** Landed (push HELD)
+- **Commit:** `aca03b0` — `feat(creators): show verified-by-agency success banner`
+- **Date:** 2026-07-13
+- **Why:** After a post was verified — automatically (`live_verified`) or by the agency's manual
+  override (`manually_verified`) — the creator detail page showed nothing new: the status chip
+  changed but no surface said "you're done." (Pedram's report: the page just goes quiet.)
+- **What:** `CreatorAssignmentDetailPage.vue` gains an `isVerified` computed
+  (`live_verified || manually_verified`) and a green success `v-alert`
+  (`assignment-verified-notice`) in the state-dependent action slot: "Your post has been verified
+  by the agency. This assignment is complete — no further action is needed." New i18n key
+  `creator.ui.assignments.detail.verifiedNotice` across all 24 `creator.json` locales.
+- **Touched:** `CreatorAssignmentDetailPage.vue` (+spec: manual + live variants),
+  `locales/*/creator.json` ×24.
+- **Decisions:**
+  - **One message for both verified states** — the creator doesn't need to know whether a human
+    or the checker confirmed it; "verified by the agency" covers both truthfully.
+  - The Posted-content history line keeps the row's factual last automatic result (e.g. "Not
+    found" under a manual override) — the banner above carries the assignment-level truth.
+  - **Ruling (with AH-046):** the initial pass left this key in English for the flaky 10, matching
+    surrounding placeholder strings — rejected on review; no English fallback for new
+    creator-facing copy, all 24 locales (including the flaky 10 — `bg, el, et, fi, ga, hu, lt, lv,
+mt, ro`) ship a real MT baseline at merge time, same standard as AH-028.
+- **Ref:** report "when we manually verified, or automatically verified, we should show a message
+  in green … so the creator knows that the process is done".
+
+---
+
+### AH-046 · Failed-verification copy tells the creator the agency can resolve it too
+
+- **Status:** Landed (push HELD)
+- **Commit:** `48f7afc` — `fix(creators): clarify failed-verification copy mentions manual agency review`
+- **Date:** 2026-07-13
+- **Why:** The creator-side "We couldn't verify your post" alert only said "check the link and
+  resubmit" — implying the creator MUST act even when their link is fine (a false verification
+  failure). With AH-045 giving the agency the Resolve action everywhere, the copy should say so.
+- **What:** Rewrote `creator.ui.assignments.detail.resubmitInPlace.intro` to a two-branch
+  instruction: link wrong → correct and resubmit below; link already correct → no action needed,
+  the agency will review and can verify manually. Translated across all **24 SPA `creator.json`**
+  locales — also fixed the pre-existing garbled Czech/Slovenian-mix text in this exact line for
+  `hr`, `sk`, `sl`, and a stray mixed-language word in `bg` (incidental to the rewrite; the
+  broader corruption in those three files beyond this one line is unrelated and tracked in
+  `tech-debt.md`).
+- **Touched:** `locales/*/creator.json` ×24. Copy-only — no logic or key changes.
+- **Decisions:**
+  - Keep the same single `intro` key (no new keys); parity gate stays green.
+  - **Flaky-10 MT baseline (ruling, applies retroactively to this key too):** the initial pass
+    left the 10 flaky locales (`bg, el, et, fi, ga, hu, lt, lv, mt, ro`) on English copy, reasoning
+    that it matched already-English surrounding strings in those files. **Rejected on review** —
+    "match the surrounding English" just inherits pre-existing debt rather than fixing it. All 10
+    now carry a real MT-baseline translation of this key, same standard as AH-028 and AH-047.
+- **Ref:** report "we should tell the creator … if the link is correct wait for the agency to
+  verify the link manually".
+
+---
+
+### AH-045 · Resolve action surfaced on the board card drawer + Drafts tab rows
+
+- **Status:** Landed (push HELD)
+- **Commit:** `55fc474` — `feat(campaigns): surface manual Resolve action for failed verifications`
+- **Date:** 2026-07-13
+- **Why:** After a failed post verification, the **Resolve** action lived only on the Creators-tab
+  row — the agency operator looking at the board card drawer's Detail timeline (the "Live verified —"
+  row) or at the Drafts tab had no way to act (Pedram's report + explicit request for both spots).
+- **What:**
+  - **Board card drawer** (`BoardCardDrawer.vue`): a `Resolve` button now sits inline on the
+    **Live verified** timeline row when the assignment is `posted` and the LATEST posted-content
+    row's verification is `not_found`/`mismatch` (the D-7 detail already carried the data —
+    `posted_content` is newest-first). The drawer emits a `CampaignAssignmentResource` stub;
+    `BoardView` closes the card drawer and bubbles it to `CampaignDetailPage`, which opens the
+    existing page-level `ResolveVerificationDrawer`. New `canResolve` prop threads the `review`
+    ability down (`:can-resolve="canReview"`).
+  - **Drafts tab** (`DraftsTab.vue`): a warning-colored `Resolve` button renders next to `Review`
+    on rows meeting the same gate, emitting `open-resolve` with the same assignment stub the Review
+    flow uses. `onResolved` now also reloads the Drafts tab (mirrors `onReviewed`).
+  - **Backend** (`CampaignDraftListItemResource` + `CampaignDraftController`): the draft-list
+    assignment stub now emits `verification_status` (the latest posted row's status, D-7 mirror),
+    with `assignment.latestPostedContent` eager-loaded. api-client type extended (optional field —
+    back-compat).
+- **Touched:** `BoardCardDrawer.vue` (+spec), `BoardView.vue`, `DraftsTab.vue` (+spec),
+  `CampaignDetailPage.vue`, `packages/api-client` `campaign.ts`, `CampaignDraftListItemResource`,
+  `CampaignDraftController`, `CampaignDraftListTest` (latest-post status + null cases).
+- **Decisions:**
+  - **One drawer, three doors, zero new backend surface:** all three UI entry points (Creators
+    tab, Drafts tab, board drawer) open the SAME pre-existing page-level `ResolveVerificationDrawer`
+    with the same `CampaignAssignmentResource` stub shape, calling the same pre-existing
+    `manuallyVerify` / `requestResubmitFresh` / `requestResubmitInPlace` endpoints and the same
+    authorization gate (`canReview`) — no new backend action, route, or authorization path; this
+    chunk is UI wiring only (confirmed: `ResolveVerificationDrawer.vue` has zero diff in this batch).
+  - **`verification_status` is additive and back-compat:** a new, optional field on the existing
+    `CampaignDraftListItemResource` assignment stub (agency-only resource — the route sits under
+    `auth:web + tenancy.agency`), null when `latestPostedContent` isn't eager-loaded; the
+    `packages/api-client` type change is optional (`?:`), so no existing consumer breaks.
+  - **Same gate everywhere:** `canReview && status === 'posted' && verification ∈ {not_found,
+mismatch}` — copied verbatim from the Creators-tab `canResolveVerification`.
+  - No new i18n keys — reuses `app.campaigns.resolution.action` ("Resolve").
+- **Ref:** report "no place to verify it or manually verify it" → request "add the resolve button
+  on the card details … and on the draft tab next to review".
+
+---
+
+### AH-044 · Draft submit — a link alone is a valid draft (media no longer mandatory)
+
+- **Status:** Landed (push HELD)
+- **Commit:** `ebf736f` — `feat(creators): allow link-only draft submissions`
+- **Date:** 2026-07-13
+- **Why:** A creator added an external link to a draft but the **Submit/Resubmit** button stayed dead
+  with no explanation (Pedram's report). The draft composer required at least one uploaded **media**
+  file — a link alone couldn't carry a draft — and nothing told the creator why the button was disabled.
+- **What:**
+  - **Backend** (`CreatorAssignmentDraftController::submitDraft`): `media` relaxed from
+    `required|array|min:1` to `nullable|array`; a new **"at least one of {media, links}"** invariant is
+    enforced after validation, returning `422 draft.empty` when both are empty. Empty media now persists
+    as `null` (mirrors the `links` normalisation).
+  - **Frontend** (`CreatorAssignmentDetailPage.vue`): the submit gate is now
+    `(readyMedia > 0 || draftLinks > 0) && !mediaUploading`, so a link alone enables submit. Added an
+    `emptyHint` caption next to the button explaining the requirement while the draft is empty.
+  - New i18n key `creator.ui.assignments.detail.draft.emptyHint` across all **24 SPA `creator.json`**
+    locales (full parity gate).
+- **Touched:** `CreatorAssignmentDraftController`; `CreatorAssignmentDetailPage.vue`;
+  `locales/*/creator.json` ×24; `CreatorAssignmentDraftTest` (link-only success + empty-draft 422),
+  `CreatorAssignmentDetailPage.spec.ts` (gate + hint).
+- **Decisions:**
+  - **Media OR links** (not media-mandatory): a draft hosted entirely on an external link is a
+    first-class draft. The only hard rule — "at least one of {media, links}" — is enforced once,
+    after validation, in `submitDraft()`; submit and resubmit are the **same endpoint/method**
+    (producing / contracted / revision_requested all route through it), so the rule applies
+    identically to both.
+  - **`media: null` is safe downstream:** the only reader of `media_attachments` outside the model
+    is `CampaignDraftResource::mapMedia()`, which already null-coalesces to `[]` before
+    serialization — so every consumer (`ReviewDraftDrawer`'s `.media.map(...)`, the board drawer's
+    latest-draft row, which doesn't render media at all) sees a plain array, never `null`. The
+    creator's own detail page doesn't render past-draft media either — no null-safety change was
+    needed anywhere.
+  - **Silent-disabled is a bug:** a disabled primary action always states its precondition (the
+    `emptyHint`).
+- **Ref:** report "added a link but couldn't resubmit, or submit".
+
+---
+
+### AH-043 · Toggle-OFF: the thread system message stops claiming a signed contract
+
+- **Status:** Landed (push HELD)
+- **Commit:** `b99ac31` — `fix(messaging): fork system-message copy for contract-less advances`
+- **Date:** 2026-07-13
+- **Why:** Direct follow-on to AH-042. With the per-campaign contract toggle OFF, the assignment
+  **Messages** tab still showed the lifecycle system line _"The contract was signed — production can
+  begin."_ (Pedram's report). AH-042 gated the _notification_ surface (Q1) but missed the **in-thread
+  system message** — a third contract-announcement surface written by a separate listener. The false
+  line also fired on the agency's manual proceed-without-contract path (contract-less since the
+  decouple chunk).
+- **What:**
+  - `WriteSystemMessage` now forks the rendered copy on `contract_id`: a **contract-less**
+    `AssignmentContracted` (`contract_id === null`) writes the new key
+    `assignment.contracted_without_contract` → _"Production can begin."_; a real contract keeps
+    `assignment.contracted` → _"The contract was signed — production can begin."_ Same Q1 discriminator
+    (`contract_id === null`), so it covers **both** the requires=false auto-advance and the agency
+    manual proceed-without-contract.
+  - New i18n key `messaging.system.assignment.contracted_without_contract` added across **all 24 SPA
+    locales** and `lang/*/messages.php`, reusing each locale's own "production can begin" clause
+    (full 24-locale parity gate applied).
+- **Touched:** `WriteSystemMessage` (listener); `lang/*/messages.php` ×24,
+  `apps/main/.../locales/*/app.json` ×24; `SystemMessageTest` (split real vs. contract-less),
+  `ChatPanel.spec.ts` (truthful no-contract render).
+- **Decisions:**
+  - **Neutral copy, not suppression:** `contracted` on an OFF campaign genuinely _does_ mean
+    production can begin — only the "contract was signed" clause is false. A distinct, truthful key
+    preserves the production-start milestone rather than dropping it.
+  - **Same invariant as AH-042 Q1:** a contract-less advance never announces a contract, on any
+    surface (notification, and now the thread system message + digest render).
+  - **This closes a gap the AH-042 review itself missed:** that review's coverage table enumerated
+    only the notification listener; `WriteSystemMessage` is a distinct `AssignmentTransitioned`
+    consumer with the identical invariant and was never swept. Recorded as a dated,
+    clearly-marked **Post-close addendum (AH-043, 2026-07-13)** appended to
+    `docs/reviews/contract-toggle-off-flow-review.md`, with the review's original closed text left
+    verbatim and unmodified above it.
+- **Ref:** report "toggle off … in the messages i can still see the signing contract phase";
+  see the Post-close addendum in `docs/reviews/contract-toggle-off-flow-review.md`.
+
+---
+
 ### AH-042 · Toggle-OFF campaigns flow without contract involvement
 
 - **Status:** Landed (push HELD)

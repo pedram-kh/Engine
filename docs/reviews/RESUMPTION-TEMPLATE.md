@@ -104,13 +104,15 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-13 · **Through:** AH-042 (ad-hoc chunk) · **Baseline:** `94a357b`
-(`fix(playwright): isolate admin E2E database from the dev DB`) — the prior `origin/main`, which
-already includes the **pushed** AH-033→AH-041 close-out (`ed2e0dc`). AH-042 lands atop it as a
-four-commit range: `98dec53` (backend), `8260dd0` (frontend), `76e416d` (full-board test fixups), and
-this docs commit. **Push:** AH-001→AH-041 are all at `origin/main`; the AH-042 four-commit range is
-**pushed this session**, advancing `origin/main` to HEAD. _(The docs commit is not SHA-pinned here —
-a commit can't contain its own hash.)_
+**Last updated:** 2026-07-13 · **Through:** AH-047 (ad-hoc batch) · **Baseline:** `37a796d`
+(`docs(ah-042): close review (approved) + resumption template through AH-042`) — the prior
+`origin/main`, which already includes the **pushed** AH-001→AH-042 range. AH-043→AH-047 land atop it
+as a five-commit range, one per theme: `b99ac31` (AH-043, `fix(messaging)`), `ebf736f` (AH-044,
+`feat(creators)`), `55fc474` (AH-045, `feat(campaigns)`), `48f7afc` (AH-046, `fix(creators)`),
+`aca03b0` (AH-047, `feat(creators)`), plus this docs commit. **Push:** AH-001→AH-042 are all at
+`origin/main`; the AH-043→AH-047 five-commit range + this docs commit are **committed locally this
+session, push HELD** — per Pedram's explicit batch-close instruction, awaiting his call. _(The docs
+commit is not SHA-pinned here — a commit can't contain its own hash.)_
 
 > **AH-042 · Toggle-OFF campaigns flow without contract involvement** (full chunk loop). The
 > `requires_per_campaign_contract` toggle is now load-bearing end-to-end: the machine permits a
@@ -132,16 +134,17 @@ Part-A closure commit `fdbec40`), atop the AH-032 baseline **`7051123`**). **⚠
 `2026_07_13_100000_add_links_to_campaign_drafts` (schema), and
 `2026_07_13_110000_backfill_cancelled_rejected_board_column` (data backfill — renames default
 "Cancelled" columns to "Cancelled / Rejected" + inserts the draft-rejected automation; idempotent).
-AH-042 adds **no** migrations.
+AH-042 adds **no** migrations. **AH-043→AH-047 add no migrations either** — the pending-deploy list
+below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot commands).
 
 ### Delivered
 
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-042 — all Landed** (AH-001→AH-041 **pushed**; `origin/main` was `94a357b`
-  before this session and is **advanced to HEAD by the AH-042 push**). One line each (detail +
-  decisions in `docs/reviews/adhoc-changes-log.md`):
+- **Ad-hoc run AH-001 → AH-047 — all Landed** (AH-001→AH-042 **pushed** at `origin/main`;
+  AH-043→AH-047 **committed locally this session, push HELD**). One line each (detail + decisions in
+  `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.
   - **AH-003** — Wizard slim + profile-basics polish.
@@ -233,6 +236,34 @@ AH-042 adds **no** migrations.
     card) + a data backfill (default-named-only rename, idempotent automation insert, `down()` blunt);
     one-line column name; red closed-conversation notice. New Campaigns→Boards coupling recorded.
 
+  - **AH-043** — Toggle-OFF: `WriteSystemMessage` was a third contract-announcement surface the
+    AH-042 review missed — forks the in-thread system-message copy on `contract_id` so a
+    contract-less advance never claims a contract was signed (both auto-advance and the agency's
+    manual proceed-without-contract). New key across all 24 locales + `messages.php`. Dated
+    post-close addendum appended to `contract-toggle-off-flow-review.md`.
+  - **AH-044** — Draft submit/resubmit (same endpoint) now accepts **media OR links**, not
+    media-mandatory; cross-field `422 draft.empty` when both are absent; empty media persists as
+    `null` (the sole downstream reader already null-coalesces, no renderer changed). New
+    `emptyHint` i18n key ×24.
+  - **AH-045** — Resolve action surfaced on the Board card drawer (Live-verified row) and the
+    Drafts tab (next to Review) for a failed post verification — pure UI wiring onto the
+    pre-existing `ResolveVerificationDrawer` + its existing endpoints/authorization; no new backend
+    surface. Additive, back-compat `verification_status` field on the (agency-only) drafts-list
+    resource.
+  - **AH-046** — Reworded the creator-facing failed-verification copy to say the agency can review
+    and manually verify a post whose link is already correct — closing a "nothing to do, no
+    guidance" dead end. All 24 locales carry a real MT-baseline translation (flaky-10 ruling
+    below); incidentally fixed the one corrupted `hr`/`sk`/`sl`/`bg` occurrence of this line.
+  - **AH-047** — Green "verified by the agency" success banner on the creator assignment-detail
+    page for `live_verified`/`manually_verified`, closing the "did anything happen?" gap after a
+    successful verification. New `verifiedNotice` key ×24 (same MT-baseline ruling).
+
+  > **Ruling (AH-046/047, flaky-10 MT baseline):** new creator-facing copy gets a real
+  > machine-translation baseline in **all 24 locales at merge time**, including the flaky 10
+  > (`bg, el, et, fi, ga, hu, lt, lv, mt, ro`) — the same standard AH-028 set. "Match the
+  > already-English surrounding strings in that locale" is **rejected** as a rationale; it just
+  > inherits pre-existing debt instead of fixing it.
+
   > **Not an AH entry:** `docs/runbooks/production-queue-worker.md` (`12a7ef5`) landed this session
   > as a docs-only ops runbook (supervisord/systemd config + the `queue:restart` deploy hook,
   > written after the live stuck-at-Processing portfolio incident). It's an operational reference,
@@ -309,3 +340,15 @@ AH-042 adds **no** migrations.
   - **Counter flow is API-without-UI** (AH-035) — the counter endpoint + `counter()` machine edge +
     tests stay (fail-closed, `invited`-only), but no client calls them. Trigger: a product decision to
     restore (re-wire a client) or remove (delete route + edge + tests together).
+  - **`hr`/`sk`/`sl` `creator.json` systemic mixed-language corruption** (surfaced by AH-046) — the
+    one `resubmitInPlace.intro` line AH-046 fixed was a Czech/Slovenian/Slovak grammar-broken mix,
+    not a clean translation, and the immediately surrounding keys in the same three files show the
+    same pattern. Scope beyond the keys this batch happened to touch is **unknown**. Trigger: a
+    dedicated locale-audit pass (native-speaker read-through or a cross-locale token/dictionary
+    heuristic).
+  - **E2E coverage gap confirmed + extended past the Creators tab** (AH-043→047) — zero of the five
+    surfaces this batch touched (Board, Drafts tab, creator assignment-detail, in-thread system
+    message, the manual-resolve drawer) has any Playwright coverage; the whole batch is Vitest/Pest-
+    pinned only. Extends the existing "No agency-side campaign-detail Playwright E2E" entry; the
+    resolution there is updated to recommend a dedicated assignment-lifecycle Playwright pass rather
+    than further one-off specs per chunk.

@@ -1534,6 +1534,8 @@ anyone reviewing it later.
 - **Resolution:** add a counter→re-invite round-trip Playwright E2E when the campaign-detail surface grows enough to warrant its own browser harness.
 - **Owner:** Sprint 8+ (campaigns FE).
 - **Status:** open (deferred by design — Vitest-only this chunk). Surfaced + accepted by re-invite UI chunk, 2026-06-05 ([review](reviews/reinvite-ui-review.md)).
+- **Confirmed + extended by the AH-043..047 batch (2026-07-13):** the gap is wider than the Creators tab alone. Zero of the five surfaces this batch touched — the Board (`BoardView`/`BoardCardDrawer`), the campaign-detail Drafts tab (`DraftsTab`), the creator assignment-detail page (`CreatorAssignmentDetailPage`), the in-thread system message (`ChatPanel`), and the manual-resolve drawer (`ResolveVerificationDrawer`) — has any Playwright coverage; every one of AH-043 through AH-047 is pinned by Vitest/Pest only. The entire batch — a contract-copy fork, a validation-rule relaxation, three new agency-side UI entry points into an existing action, and a creator-facing success banner — shipped and landed **completely invisible to the E2E suite**. This is the same shape of gap as this entry, just proven to extend past the Creators tab to Boards, Drafts, and the creator-side assignment detail page as well.
+- **Resolution (updated):** the fix scope has grown past "add one round-trip spec" — a dedicated Playwright pass across the assignment lifecycle (board card actions, drafts-tab actions, creator submit/resubmit, verification resolve) is warranted rather than one-off specs per chunk. Track as its own harness-design task rather than deferring further piecemeal.
 
 ---
 
@@ -1812,3 +1814,38 @@ anyone reviewing it later.
   whether "connected" = "OAuth-linked" (keep) or "manually added" (change to "added").
 - **Owner:** future Social verification workstream.
 - **Status:** open; intentionally deferred.
+
+---
+
+## `hr` / `sk` / `sl` `creator.json` — systemic mixed-language corruption (surfaced by AH-046)
+
+- **Where:** `apps/main/src/core/i18n/locales/{hr,sk,sl}/creator.json`. Surfaced incidentally
+  while rewriting `assignments.detail.resubmitInPlace.intro` for AH-046 — the PRE-EXISTING value
+  of that single key, in all three locales, was not a clean translation but a mix of at least two
+  Slavic languages in the same string. Example, `hr/creator.json` (Croatian file) before the fix:
+
+  > `"Automatické preverjanje vašeho příspěvku selhalo. Zkontrolujte, zda je odkaz správný a
+ukazuje na váš zveřejněný příspěvek, a poté ho níže znova odešlete."`
+
+  That sentence is Czech (`Zkontrolujte, zda je odkaz správný…`) and Slovenian
+  (`preverjanje`, `níže` is Slovak) grafted together — **not** Croatian, despite living in the
+  `hr` file. The immediately surrounding keys in the same file (`awaitingVerification`,
+  `resubmitInPlace.title/url/submit/toast`) show the same pattern, e.g. `hr`'s
+  `awaitingVerification` reads `"Váš příspěvek byl zaznamenán a čaka na preverjanje."` — Czech
+  possessive + Slovenian verb, still not Croatian.
+
+- **What we know:** this is broader than the one line AH-046 fixed (that line is now clean
+  Croatian/Slovak/Slovenian respectively in all three files). The corruption's exact scope
+  (how many keys, whether it's confined to the `assignments.detail` block or spans the whole
+  file, and whether it originates from a bad MT batch or a copy/paste mix-up) is **unknown** —
+  it was not audited beyond the single key each of the AH-043..047 batch happened to touch.
+- **Risk:** medium — these are live creator-facing strings in three locales' production build;
+  a Croatian/Slovak/Slovenian creator is currently reading sentences that are grammatically
+  broken mixes of a different language, not just imperfect MT.
+- **Triggered by:** none yet — this entry IS the trigger. Needs a dedicated locale-audit pass.
+- **Resolution:** run a full audit of `hr`, `sk`, `sl` (and, opportunistically, the other 21
+  locale files) — either a heuristic cross-locale token/dictionary check similar to the one
+  proposed in the AH-001 entry above, or a native-speaker read-through of each file — to find
+  and re-translate every corrupted value, not just the ones this batch happened to touch.
+- **Owner:** i18n / localization workstream.
+- **Status:** open (real finding, not a merge blocker; scope unknown pending audit).
