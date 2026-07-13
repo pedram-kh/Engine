@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Contractul a fost semnat — producția poate începe.',
+            'contracted_without_contract' => 'Producția poate începe.',
             'draft_submitted' => 'Ciorna a fost trimisă pentru revizuire.',
             'draft_approved' => 'Ciorna a fost aprobată.',
             'revision_requested' => 'Au fost solicitate revizuiri ale ciornei.',

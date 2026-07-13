@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Ugovor je potpisan — produkcija može početi.',
+            'contracted_without_contract' => 'Produkcija može početi.',
             'draft_submitted' => 'Nacrt je poslan na pregled.',
             'draft_approved' => 'Nacrt je odobren.',
             'revision_requested' => 'Zatražene su revizije nacrta.',

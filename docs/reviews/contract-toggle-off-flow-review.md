@@ -184,3 +184,13 @@ Idempotent — advances the stuck `accepted` rows on requires=false campaigns to
 
 1. **Backend:** machine gate + `$context`; accept auto-advance; notification gate (incl. false-fire fix); draft-show meta; D4 command; tests.
 2. **Frontend:** api-client type; `CreatorAssignmentDetailPage.vue` conditions; FE spec.
+
+---
+
+## Post-close addendum (AH-043, 2026-07-13) — gap found, fix ref
+
+This review closed the notification surface (the "Named finding" above) but **missed a second announcement surface with the identical invariant**: the assignment's message-thread **system message**, written by a _separate_ `AssignmentTransitioned` consumer (`WriteSystemMessage`, not `SendAssignmentNotifications`). On a contract-less advance — both the requires=false auto-advance (D2) and the agency's manual `proceed-without-contract` button — that listener was still rendering _"The contract was signed — production can begin."_ in the thread, the same false claim this review fixed for notifications.
+
+**Why this review didn't catch it:** the coverage table above enumerates the notification listener's tests (`Q-notify §5.2 split`) but has no row for `WriteSystemMessage`, even though it is the same kind of `AssignmentTransitioned` consumer the D6 three-way-distinguishability analysis was written for. The review's "every announcement surface" framing (D6 / named finding) was scoped to notifications only and never swept the other four listeners registered on the same event.
+
+**Fix (AH-043):** `WriteSystemMessage::eventKeyFor()` now forks the rendered key on `contract_id`: contract-less → `assignment.contracted_without_contract` (_"Production can begin."_), real contract → `assignment.contracted` (unchanged). New i18n key added across all 24 SPA locales + `lang/*/messages.php`. See AH-043 in `docs/reviews/adhoc-changes-log.md` for the full change record, touched files, and test evidence.

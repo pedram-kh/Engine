@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Leping on allkirjastatud — tootmine võib alata.',
+            'contracted_without_contract' => 'Tootmine võib alata.',
             'draft_submitted' => 'Mustand on ülevaatamiseks esitatud.',
             'draft_approved' => 'Mustand on kinnitatud.',
             'revision_requested' => 'Mustandi läbivaatamised on taotletud.',

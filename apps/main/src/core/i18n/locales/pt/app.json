@@ -33,6 +33,7 @@
       "system": {
         "assignment": {
           "contracted": "O contrato foi assinado — a produção pode começar.",
+          "contracted_without_contract": "A produção pode começar.",
           "draft_submitted": "Um rascunho foi enviado para revisão.",
           "draft_approved": "O rascunho foi aprovado.",
           "revision_requested": "Foram solicitadas revisões no rascunho.",

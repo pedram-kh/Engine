@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Der Vertrag wurde unterzeichnet – die Produktion kann beginnen.',
+            'contracted_without_contract' => 'Die Produktion kann beginnen.',
             'draft_submitted' => 'Ein Entwurf wurde zur Überprüfung eingereicht.',
             'draft_approved' => 'Der Entwurf wurde genehmigt.',
             'revision_requested' => 'Überarbeitungen des Entwurfs wurden angefordert.',

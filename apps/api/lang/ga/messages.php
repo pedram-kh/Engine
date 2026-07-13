@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Síníodh an conradh — is féidir léiriú tosú.',
+            'contracted_without_contract' => 'Is féidir léiriú tosú.',
             'draft_submitted' => 'Cuireadh an dréacht isteach le hathbhreithniú.',
             'draft_approved' => 'Ceadaíodh an dréacht.',
             'revision_requested' => 'Iarradh athbhreithnithe dréachta.',

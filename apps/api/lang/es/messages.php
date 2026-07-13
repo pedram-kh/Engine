@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Se ha firmado el contrato: puede comenzar la producción.',
+            'contracted_without_contract' => 'Puede comenzar la producción.',
             'draft_submitted' => 'Se ha enviado un borrador para revisión.',
             'draft_approved' => 'El borrador se ha aprobado.',
             'revision_requested' => 'Se han solicitado revisiones del borrador.',

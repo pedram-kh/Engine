@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Līgums ir parakstīts — ražošana var sākties.',
+            'contracted_without_contract' => 'Ražošana var sākties.',
             'draft_submitted' => 'Melnraksts ir iesniegts pārskatīšanai.',
             'draft_approved' => 'Melnraksts ir apstiprināts.',
             'revision_requested' => 'Pieprasītas melnraksta pārskatīšanas.',

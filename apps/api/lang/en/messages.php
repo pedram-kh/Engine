@@ -10,6 +10,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'The contract was signed — production can begin.',
+            'contracted_without_contract' => 'Production can begin.',
             'draft_submitted' => 'A draft was submitted for review.',
             'draft_approved' => 'The draft was approved.',
             'revision_requested' => 'Revisions were requested on the draft.',

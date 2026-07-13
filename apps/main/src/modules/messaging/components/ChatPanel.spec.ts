@@ -97,6 +97,23 @@ describe('ChatPanel', () => {
     wrapper.unmount()
   })
 
+  it('renders the truthful no-contract line for a contract-less advance (never claims a signed contract)', async () => {
+    const system = msg('s2', {
+      kind: 'system',
+      sender_role: 'system',
+      body: null,
+      sender: null,
+      system_event_key: 'assignment.contracted_without_contract',
+    })
+    const wrapper = await mountPanel(
+      makeTransport({ list: vi.fn().mockResolvedValue(feed([system])) }),
+    )
+    const feedText = wrapper.find('[data-test="chat-feed"]').text()
+    expect(feedText).toContain('Production can begin.')
+    expect(feedText).not.toContain('The contract was signed')
+    wrapper.unmount()
+  })
+
   it('hides the compose form and shows the closed notice on a terminal thread', async () => {
     const wrapper = await mountPanel(
       makeTransport({ list: vi.fn().mockResolvedValue(feed([msg('m1')], { blocked: true })) }),

@@ -46,6 +46,20 @@ final class WriteSystemMessage
         AuditAction::AssignmentPaymentReleased,
     ];
 
+    /**
+     * The `system_event_key` for a CONTRACT-LESS `contracted` advance (toggle-off
+     * flow). The default `assignment.contracted` line ("The contract was signed —
+     * production can begin.") is a false claim when no contract exists, so a
+     * contract-less advance writes this distinct, truthful key instead ("Production
+     * can begin."). Same Q1 invariant as the notification gate: a contract-less
+     * advance NEVER announces a contract — covering BOTH the requires=false
+     * auto-advance (D2) and the agency's manual "proceed without contract".
+     *
+     * Not an AuditAction value — the transition is still `assignment.contracted`;
+     * only the rendered COPY forks on contract presence.
+     */
+    public const string CONTRACTED_WITHOUT_CONTRACT_KEY = 'assignment.contracted_without_contract';
+
     public function __construct(
         private readonly MessageThreadService $threads,
         private readonly MessageService $messages,
@@ -58,6 +72,23 @@ final class WriteSystemMessage
         }
 
         $thread = $this->threads->forAssignment($event->assignment);
-        $this->messages->writeSystemMessage($thread, $event->action->value);
+        $this->messages->writeSystemMessage($thread, $this->eventKeyFor($event));
+    }
+
+    /**
+     * Fork the rendered copy for a contract-less `contracted` advance (see
+     * {@see self::CONTRACTED_WITHOUT_CONTRACT_KEY}). Every other transition
+     * renders straight from its AuditAction verb string.
+     */
+    private function eventKeyFor(AssignmentTransitioned $event): string
+    {
+        if (
+            $event->action === AuditAction::AssignmentContracted
+            && $event->assignment->contract_id === null
+        ) {
+            return self::CONTRACTED_WITHOUT_CONTRACT_KEY;
+        }
+
+        return $event->action->value;
     }
 }

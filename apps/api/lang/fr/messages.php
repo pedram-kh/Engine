@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Le contrat a été signé — la production peut commencer.',
+            'contracted_without_contract' => 'La production peut commencer.',
             'draft_submitted' => 'Un brouillon a été soumis pour révision.',
             'draft_approved' => 'Le brouillon a été approuvé.',
             'revision_requested' => 'Des modifications ont été demandées sur le brouillon.',

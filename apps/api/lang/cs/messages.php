@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Smlouva byla podepsána — výroba může začít.',
+            'contracted_without_contract' => 'Výroba může začít.',
             'draft_submitted' => 'Byl odeslán návrh k posouzení.',
             'draft_approved' => 'Návrh byl schválen.',
             'revision_requested' => 'Byly požadovány revize návrhu.',

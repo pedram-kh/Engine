@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Il-kuntratt ġie ffirmat — il-produzzjoni tista\' tibda.',
+            'contracted_without_contract' => 'Il-produzzjoni tista\' tibda.',
             'draft_submitted' => 'L-abbozz ġie mibgħut għar-reviżjoni.',
             'draft_approved' => 'L-abbozz ġie approvat.',
             'revision_requested' => 'Intalbu reviżjonijiet tal-abbozz.',

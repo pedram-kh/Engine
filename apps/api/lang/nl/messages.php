@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Het contract is ondertekend — de productie kan beginnen.',
+            'contracted_without_contract' => 'De productie kan beginnen.',
             'draft_submitted' => 'Een concept is ingediend ter beoordeling.',
             'draft_approved' => 'Het concept is goedgekeurd.',
             'revision_requested' => 'Er zijn wijzigingen gevraagd voor het concept.',

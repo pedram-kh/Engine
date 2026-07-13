@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'A szerződés aláírva — a gyártás megkezdődhet.',
+            'contracted_without_contract' => 'A gyártás megkezdődhet.',
             'draft_submitted' => 'A vázlat ellenőrzésre beküldve.',
             'draft_approved' => 'A vázlat jóváhagyva.',
             'revision_requested' => 'Vázlat módosításait kérték.',

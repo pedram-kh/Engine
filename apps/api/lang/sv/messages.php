@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Kontraktet signerades — produktion kan börja.',
+            'contracted_without_contract' => 'Produktion kan börja.',
             'draft_submitted' => 'Ett utkast skickades in för granskning.',
             'draft_approved' => 'Utkastet godkändes.',
             'revision_requested' => 'Revisioner begärdes för utkastet.',

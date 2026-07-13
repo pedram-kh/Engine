@@ -8,6 +8,7 @@ use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Listeners\WriteSystemMessage;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
+use App\Modules\Creators\Models\Contract;
 use App\Modules\Messaging\Enums\MessageKind;
 use App\Modules\Messaging\Enums\MessageSenderRole;
 use App\Modules\Messaging\Models\Message;
@@ -70,6 +71,9 @@ it('a real transition dispatches AssignmentTransitioned (producer)', function ()
 
 it('writes a system message on an allowlisted lifecycle transition + provisions the thread defensively', function (): void {
     $assignment = systemMessageAssignment();
+    // A REAL contract is attached — the `contracted` verb renders the
+    // contract-signed copy (see the contract-less split below).
+    $assignment->contract_id = Contract::factory()->createOne()->id;
 
     expect(MessageThread::withoutGlobalScopes()->where('assignment_id', $assignment->id)->exists())->toBeFalse();
 
@@ -85,6 +89,23 @@ it('writes a system message on an allowlisted lifecycle transition + provisions 
 
     $thread = MessageThread::withoutGlobalScopes()->where('assignment_id', $assignment->id)->firstOrFail();
     expect($thread->last_message_at)->not->toBeNull();
+});
+
+it('a CONTRACT-LESS contracted advance writes the truthful no-contract key, not the contract-signed one', function (): void {
+    // Toggle-off flow (AH-043): a contract-less advance (contract_id === null)
+    // must NEVER claim a contract was signed — same Q1 invariant as the
+    // notification gate. Covers BOTH the requires=false auto-advance AND the
+    // agency's manual proceed-without-contract; both reach here as a
+    // contract-less `AssignmentContracted`.
+    $assignment = systemMessageAssignment();
+    expect($assignment->contract_id)->toBeNull();
+
+    dispatchTransition($assignment, AuditAction::AssignmentContracted, AssignmentStatus::Contracted);
+
+    $message = latestSystemMessage($assignment);
+    expect($message)->not->toBeNull()
+        ->and($message?->system_event_key)->toBe(WriteSystemMessage::CONTRACTED_WITHOUT_CONTRACT_KEY)
+        ->and($message?->system_event_key)->toBe('assignment.contracted_without_contract');
 });
 
 it('writes NO system message on a non-allowlisted transition (field churn / payment_funded)', function (): void {

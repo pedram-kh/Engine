@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Sopimus on allekirjoitettu — tuotanto voi alkaa.',
+            'contracted_without_contract' => 'Tuotanto voi alkaa.',
             'draft_submitted' => 'Luonnos on lähetetty tarkistettavaksi.',
             'draft_approved' => 'Luonnos on hyväksytty.',
             'revision_requested' => 'Luonnoksen tarkistuksia on pyydetty.',

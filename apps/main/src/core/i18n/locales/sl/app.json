@@ -33,6 +33,7 @@
       "system": {
         "assignment": {
           "contracted": "Pogodba byla podepsána — produkce může začít.",
+          "contracted_without_contract": "Produkcija se lahko začne.",
           "draft_submitted": "Byl odeslán osnutek k pregled.",
           "draft_approved": "Osnutek byl schválen.",
           "revision_requested": "Byly požadovány revize osnuteku.",

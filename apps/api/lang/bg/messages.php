@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Договорът е подписан — производството може да започне.',
+            'contracted_without_contract' => 'Производството може да започне.',
             'draft_submitted' => 'Черновата е изпратена за преглед.',
             'draft_approved' => 'Черновата е одобрена.',
             'revision_requested' => 'Поискани са ревизии на черновата.',

@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Il contratto è stato firmato — la produzione può iniziare.',
+            'contracted_without_contract' => 'La produzione può iniziare.',
             'draft_submitted' => 'Una bozza è stata inviata per la revisione.',
             'draft_approved' => 'La bozza è stata approvata.',
             'revision_requested' => 'Sono state richieste revisioni sulla bozza.',

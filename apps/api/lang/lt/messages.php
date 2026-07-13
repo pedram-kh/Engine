@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Sutartis pasirašyta — gamyba gali prasidėti.',
+            'contracted_without_contract' => 'Gamyba gali prasidėti.',
             'draft_submitted' => 'Juodraštis pateiktas peržiūrai.',
             'draft_approved' => 'Juodraštis patvirtintas.',
             'revision_requested' => 'Paprašyta juodraščio pataisymų.',

@@ -6,6 +6,7 @@ return [
     'system' => [
         'assignment' => [
             'contracted' => 'Η σύμβαση υπογράφτηκε — η παραγωγή μπορεί να ξεκινήσει.',
+            'contracted_without_contract' => 'Η παραγωγή μπορεί να ξεκινήσει.',
             'draft_submitted' => 'Το πρόχειρο υποβλήθηκε για επανεξέταση.',
             'draft_approved' => 'Το πρόχειρο εγκρίθηκε.',
             'revision_requested' => 'Ζητήθηκαν αναθεωρήσεις προχείρου.',
