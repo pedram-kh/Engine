@@ -689,6 +689,11 @@
           "preview": "Otevřít náhled",
           "close": "Zapri",
           "empty": "Žádná přiložená média."
+        },
+        "rejectConfirm": {
+          "title": "Odbiti ovaj nacrt?",
+          "body": "Odbijanje je konačno. Trajno završava ovaj zadatak — kreator ne može poslati novu verziju i suradnja u ovoj kampanji se zatvara. Ako želite samo izmjene, upotrijebite „Zatraži izmjene\".",
+          "keep": "Nastavi pregled"
         }
       },
       "resolution": {

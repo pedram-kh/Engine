@@ -689,6 +689,11 @@
           "preview": "Open preview",
           "close": "Sulje",
           "empty": "Ei media attached."
+        },
+        "rejectConfirm": {
+          "title": "Hylätäänkö tämä luonnos?",
+          "body": "Hylkääminen on lopullista. Se päättää tämän toimeksiannon pysyvästi — sisällöntekijä ei voi lähettää uutta versiota ja yhteistyö tässä kampanjassa suljetaan. Jos haluat vain muutoksia, käytä sen sijaan \"Pyydä muutoksia\".",
+          "keep": "Jatka tarkistusta"
         }
       },
       "resolution": {

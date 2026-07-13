@@ -689,6 +689,11 @@
           "preview": "Otevřít náhled",
           "close": "Zavřít",
           "empty": "Žádná přiložená média."
+        },
+        "rejectConfirm": {
+          "title": "Odmítnout tento návrh?",
+          "body": "Odmítnutí je konečné. Trvale ukončí toto zadání — tvůrce nebude moci odeslat novou verzi a spolupráce v této kampani bude uzavřena. Pokud chcete jen změny, použijte místo toho „Požádat o změny\".",
+          "keep": "Pokračovat v kontrole"
         }
       },
       "resolution": {

@@ -689,6 +689,11 @@
           "preview": "Open preview",
           "close": "Uždaryti",
           "empty": "Ne media attached."
+        },
+        "rejectConfirm": {
+          "title": "Atmesti šį juodraštį?",
+          "body": "Atmetimas yra galutinis. Jis visam laikui užbaigia šią užduotį — kūrėjas negalės pateikti naujos versijos, o bendradarbiavimas šioje kampanijoje bus uždarytas. Jei norite tik pakeitimų, verčiau naudokite „Prašyti pakeitimų\".",
+          "keep": "Tęsti peržiūrą"
         }
       },
       "resolution": {

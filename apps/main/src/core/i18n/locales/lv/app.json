@@ -689,6 +689,11 @@
           "preview": "Open preview",
           "close": "Aizvērt",
           "empty": "Nē media attached."
+        },
+        "rejectConfirm": {
+          "title": "Noraidīt šo melnrakstu?",
+          "body": "Noraidīšana ir galīga. Tā neatgriezeniski izbeidz šo uzdevumu — satura veidotājs nevarēs iesniegt jaunu versiju, un sadarbība šajā kampaņā tiks slēgta. Ja vēlaties tikai izmaiņas, tā vietā izmantojiet „Pieprasīt izmaiņas\".",
+          "keep": "Turpināt pārskatīšanu"
         }
       },
       "resolution": {

@@ -689,6 +689,11 @@
           "preview": "Apri anteprima",
           "close": "Chiudi",
           "empty": "Nessun media allegato."
+        },
+        "rejectConfirm": {
+          "title": "Rifiutare questa bozza?",
+          "body": "Il rifiuto è definitivo. Termina questo incarico in modo permanente: il creator non potrà inviare una nuova versione e la collaborazione su questa campagna sarà chiusa. Se desideri solo delle modifiche, usa invece \"Richiedi modifiche\".",
+          "keep": "Continua la revisione"
         }
       },
       "resolution": {

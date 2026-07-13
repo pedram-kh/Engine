@@ -689,6 +689,11 @@
           "preview": "Ouvrir l'aperçu",
           "close": "Fermer",
           "empty": "Aucun média joint."
+        },
+        "rejectConfirm": {
+          "title": "Rejeter ce brouillon ?",
+          "body": "Le rejet est définitif. Il met fin à cette mission de façon permanente — le créateur ne pourra pas soumettre de nouvelle version et la collaboration sur cette campagne sera close. Si vous souhaitez simplement des modifications, utilisez plutôt « Demander des modifications ».",
+          "keep": "Continuer la revue"
         }
       },
       "resolution": {

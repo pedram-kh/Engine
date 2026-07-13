@@ -689,6 +689,11 @@
           "preview": "Open preview",
           "close": "Sulge",
           "empty": "Ei media attached."
+        },
+        "rejectConfirm": {
+          "title": "Kas lükata see mustand tagasi?",
+          "body": "Tagasilükkamine on lõplik. See lõpetab selle ülesande jäädavalt — looja ei saa uut versiooni esitada ja koostöö selles kampaanias suletakse. Kui soovite ainult muudatusi, kasutage hoopis „Küsi muudatusi\".",
+          "keep": "Jätka ülevaatust"
         }
       },
       "resolution": {

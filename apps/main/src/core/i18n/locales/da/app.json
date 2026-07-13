@@ -689,6 +689,11 @@
           "preview": "Åbn forhåndsvisning",
           "close": "Luk",
           "empty": "Ingen medier vedhæftet."
+        },
+        "rejectConfirm": {
+          "title": "Afvis dette udkast?",
+          "body": "Afvisningen er endelig. Den afslutter denne opgave permanent — kreatøren kan ikke indsende en ny version, og samarbejdet i denne kampagne lukkes. Hvis du blot ønsker ændringer, skal du bruge \"Anmod om ændringer\" i stedet.",
+          "keep": "Fortsæt gennemgang"
         }
       },
       "resolution": {

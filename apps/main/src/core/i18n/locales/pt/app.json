@@ -689,6 +689,11 @@
           "preview": "Abrir pré-visualização",
           "close": "Fechar",
           "empty": "Nenhuma mídia anexada."
+        },
+        "rejectConfirm": {
+          "title": "Rejeitar este rascunho?",
+          "body": "A rejeição é definitiva. Termina esta atribuição de forma permanente — o criador não poderá enviar uma nova versão e a colaboração nesta campanha será encerrada. Se apenas pretende alterações, use antes \"Pedir alterações\".",
+          "keep": "Continuar a rever"
         }
       },
       "resolution": {

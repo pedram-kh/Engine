@@ -689,6 +689,11 @@
           "preview": "Abrir vista previa",
           "close": "Cerrar",
           "empty": "No hay contenido multimedia adjunto."
+        },
+        "rejectConfirm": {
+          "title": "¿Rechazar este borrador?",
+          "body": "El rechazo es definitivo. Finaliza esta asignación de forma permanente: el creador no podrá enviar una nueva versión y la colaboración en esta campaña quedará cerrada. Si solo quieres cambios, usa «Solicitar cambios» en su lugar.",
+          "keep": "Seguir revisando"
         }
       },
       "resolution": {

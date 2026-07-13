@@ -689,6 +689,11 @@
           "preview": "Open preview",
           "close": "Închideți",
           "empty": "Nu media attached."
+        },
+        "rejectConfirm": {
+          "title": "Respingi această schiță?",
+          "body": "Respingerea este definitivă. Încheie permanent această atribuire — creatorul nu va putea trimite o versiune nouă, iar colaborarea în această campanie se închide. Dacă vrei doar modificări, folosește „Solicită modificări\".",
+          "keep": "Continuă verificarea"
         }
       },
       "resolution": {

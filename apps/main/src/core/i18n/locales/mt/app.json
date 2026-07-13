@@ -689,6 +689,11 @@
           "preview": "Open preview",
           "close": "Agħlaq",
           "empty": "Le media attached."
+        },
+        "rejectConfirm": {
+          "title": "Tiċħad dan l-abbozz?",
+          "body": "Iċ-ċaħda hija finali. Ittemm din l-assenjazzjoni b'mod permanenti — il-kreatur ma jistax jissottometti verżjoni ġdida u l-kollaborazzjoni f'din il-kampanja tingħalaq. Jekk trid biss bidliet, uża \"Itlob bidliet\" minflok.",
+          "keep": "Kompli r-reviżjoni"
         }
       },
       "resolution": {

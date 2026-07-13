@@ -689,6 +689,11 @@
           "preview": "Open preview",
           "close": "Close",
           "empty": "No media attached."
+        },
+        "rejectConfirm": {
+          "title": "Reject this draft?",
+          "body": "Rejecting is final. It permanently ends this assignment — the creator cannot submit a new version and the collaboration on this campaign is closed. If you just want changes, use \"Request changes\" instead.",
+          "keep": "Keep reviewing"
         }
       },
       "resolution": {

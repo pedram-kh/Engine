@@ -689,6 +689,11 @@
           "preview": "Öppna förhandsgranskning",
           "close": "Stäng",
           "empty": "Inga medier bifogade."
+        },
+        "rejectConfirm": {
+          "title": "Avvisa det här utkastet?",
+          "body": "Avvisandet är slutgiltigt. Det avslutar uppdraget permanent — kreatören kan inte skicka in en ny version och samarbetet i den här kampanjen stängs. Om du bara vill ha ändringar, använd \"Begär ändringar\" i stället.",
+          "keep": "Fortsätt granska"
         }
       },
       "resolution": {

@@ -689,6 +689,11 @@
           "preview": "Otwórz podgląd",
           "close": "Zamknij",
           "empty": "Brak dołączonych mediów."
+        },
+        "rejectConfirm": {
+          "title": "Odrzucić tę wersję roboczą?",
+          "body": "Odrzucenie jest ostateczne. Trwale kończy to zlecenie — twórca nie będzie mógł przesłać nowej wersji, a współpraca w tej kampanii zostanie zamknięta. Jeśli chcesz tylko zmian, użyj opcji „Poproś o zmiany\".",
+          "keep": "Kontynuuj przegląd"
         }
       },
       "resolution": {

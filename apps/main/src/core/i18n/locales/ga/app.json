@@ -689,6 +689,11 @@
           "preview": "Open preview",
           "close": "Dún",
           "empty": "Níl media attached."
+        },
+        "rejectConfirm": {
+          "title": "An dréacht seo a dhiúltú?",
+          "body": "Tá an diúltú críochnaitheach. Cuireann sé deireadh buan leis an tasc seo — ní féidir leis an gcruthaitheoir leagan nua a chur isteach agus dúnfar an comhoibriú san fheachtas seo. Mura bhfuil uait ach athruithe, úsáid \"Iarr athruithe\" ina ionad sin.",
+          "keep": "Lean den athbhreithniú"
         }
       },
       "resolution": {

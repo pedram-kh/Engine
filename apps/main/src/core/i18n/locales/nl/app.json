@@ -689,6 +689,11 @@
           "preview": "Voorbeeld openen",
           "close": "Sluiten",
           "empty": "Geen media bijgevoegd."
+        },
+        "rejectConfirm": {
+          "title": "Dit concept afwijzen?",
+          "body": "Afwijzen is definitief. Het beëindigt deze opdracht permanent — de creator kan geen nieuwe versie indienen en de samenwerking in deze campagne wordt gesloten. Wilt u alleen wijzigingen, gebruik dan \"Wijzigingen aanvragen\".",
+          "keep": "Verder beoordelen"
         }
       },
       "resolution": {

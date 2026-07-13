@@ -122,6 +122,17 @@ function close(): void {
   emit('update:modelValue', false)
 }
 
+// Reject is a DEDICATED TERMINAL transition (draft_submitted → rejected, no
+// edge out) — one click permanently ends the assignment. The confirm dialog
+// stands between the click and the API call; Approve / Request changes stay
+// single-click (both are recoverable).
+const rejectConfirmOpen = ref(false)
+
+async function confirmReject(): Promise<void> {
+  rejectConfirmOpen.value = false
+  await runAction('reject')
+}
+
 async function runAction(kind: ActionKind): Promise<void> {
   const assignment = props.assignment
   if (assignment === null || submitting.value !== null) return
@@ -343,7 +354,7 @@ async function runAction(kind: ActionKind): Promise<void> {
           :loading="submitting === 'reject'"
           :disabled="submitting !== null"
           data-test="review-reject"
-          @click="runAction('reject')"
+          @click="rejectConfirmOpen = true"
         >
           {{ t('app.campaigns.review.reject') }}
         </v-btn>
@@ -368,6 +379,39 @@ async function runAction(kind: ActionKind): Promise<void> {
           {{ t('app.campaigns.review.approve') }}
         </v-btn>
       </v-card-actions>
+
+      <!-- Terminal-action guard: rejecting has NO edge out of `rejected`, so
+           the destructive call sits behind an explicit confirmation. The v-if
+           keeps the dialog out of the DOM until asked for. -->
+      <v-dialog
+        v-if="rejectConfirmOpen"
+        v-model="rejectConfirmOpen"
+        max-width="440"
+        data-test="review-reject-confirm"
+      >
+        <v-card>
+          <v-card-title class="text-h6">
+            {{ t('app.campaigns.review.rejectConfirm.title') }}
+          </v-card-title>
+          <v-card-text class="text-body-2">
+            {{ t('app.campaigns.review.rejectConfirm.body') }}
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn variant="text" data-test="review-reject-keep" @click="rejectConfirmOpen = false">
+              {{ t('app.campaigns.review.rejectConfirm.keep') }}
+            </v-btn>
+            <v-btn
+              color="error"
+              variant="flat"
+              data-test="review-reject-confirm-btn"
+              @click="confirmReject"
+            >
+              {{ t('app.campaigns.review.reject') }}
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-card>
   </v-dialog>
 </template>

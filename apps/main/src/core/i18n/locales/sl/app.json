@@ -689,6 +689,11 @@
           "preview": "Otevřít náhled",
           "close": "Zapri",
           "empty": "Žádná přiložená média."
+        },
+        "rejectConfirm": {
+          "title": "Zavrniti ta osnutek?",
+          "body": "Zavrnitev je dokončna. Trajno konča to nalogo — ustvarjalec ne more oddati nove različice in sodelovanje v tej kampanji se zapre. Če želite le spremembe, raje uporabite „Zahtevaj spremembe\".",
+          "keep": "Nadaljuj pregled"
         }
       },
       "resolution": {

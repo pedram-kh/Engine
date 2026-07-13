@@ -195,15 +195,23 @@ describe('ReviewDraftDrawer (Sprint 9 Chunk 2)', () => {
     wrapper.unmount()
   })
 
-  it('reject calls rejectDraft with the feedback as the reason', async () => {
+  it('reject asks for confirmation first, then calls rejectDraft with the feedback', async () => {
     vi.mocked(campaignsApi.rejectDraft).mockResolvedValue({
       data: makeDraft(),
       meta: { code: 'assignment.draft_rejected' },
     })
     const wrapper = await mountOpen()
 
+    // The terminal-action guard: clicking Reject opens the confirm dialog —
+    // no API call yet.
+    expect(wrapper.find('[data-test="review-reject-confirm"]').exists()).toBe(false)
     await wrapper.find('[data-test="review-feedback"] textarea').setValue('Off brief.')
     await wrapper.find('[data-test="review-reject"]').trigger('click')
+    await flushPromises()
+    expect(campaignsApi.rejectDraft).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-test="review-reject-confirm"]').exists()).toBe(true)
+
+    await wrapper.find('[data-test="review-reject-confirm-btn"]').trigger('click')
     await flushPromises()
 
     expect(campaignsApi.rejectDraft).toHaveBeenCalledWith(
@@ -214,6 +222,21 @@ describe('ReviewDraftDrawer (Sprint 9 Chunk 2)', () => {
         review_feedback: 'Off brief.',
       },
     )
+    wrapper.unmount()
+  })
+
+  it('"Keep reviewing" backs out of the reject confirmation without calling the API', async () => {
+    const wrapper = await mountOpen()
+
+    await wrapper.find('[data-test="review-reject"]').trigger('click')
+    await flushPromises()
+    await wrapper.find('[data-test="review-reject-keep"]').trigger('click')
+    await flushPromises()
+
+    expect(campaignsApi.rejectDraft).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-test="review-reject-confirm"]').exists()).toBe(false)
+    // The drawer itself stays open for further review.
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).not.toEqual([false])
     wrapper.unmount()
   })
 

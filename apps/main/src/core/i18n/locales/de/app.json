@@ -689,6 +689,11 @@
           "preview": "Vorschau öffnen",
           "close": "Schließen",
           "empty": "Kein Medieninhalt beigefügt."
+        },
+        "rejectConfirm": {
+          "title": "Diesen Entwurf ablehnen?",
+          "body": "Die Ablehnung ist endgültig. Sie beendet diesen Auftrag dauerhaft — der Creator kann keine neue Version einreichen und die Zusammenarbeit in dieser Kampagne wird geschlossen. Wenn Sie nur Änderungen wünschen, nutzen Sie stattdessen „Änderungen anfordern\".",
+          "keep": "Weiter prüfen"
         }
       },
       "resolution": {

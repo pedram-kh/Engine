@@ -689,6 +689,11 @@
           "preview": "Open preview",
           "close": "Bezárás",
           "empty": "Nem media attached."
+        },
+        "rejectConfirm": {
+          "title": "Elutasítod ezt a vázlatot?",
+          "body": "Az elutasítás végleges. Véglegesen lezárja ezt a megbízást — az alkotó nem küldhet be új verziót, és az együttműködés ebben a kampányban lezárul. Ha csak változtatásokat szeretnél, használd inkább a „Módosítások kérése\" lehetőséget.",
+          "keep": "Ellenőrzés folytatása"
         }
       },
       "resolution": {
