@@ -318,7 +318,8 @@ function openProfile(item: DiscoveryCreatorListItem): void {
     <template v-else>
       <v-row dense data-test="discover-grid">
         <!-- ~30% smaller cards: tighter breakpoints pack more per row (2→3,
-             3→4, 4→6), shrinking each card proportionally (hero keeps ratio). -->
+             3→4, 4→6), shrinking each card proportionally (hero keeps its
+             concept-matched 5:4 landscape ratio). -->
         <v-col v-for="item in items" :key="item.id" cols="6" sm="4" md="3" lg="2">
           <v-card
             variant="outlined"
@@ -444,7 +445,7 @@ function openProfile(item: DiscoveryCreatorListItem): void {
 }
 .discover-card__hero {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 5 / 4;
   overflow: hidden;
   background: rgba(var(--v-theme-on-surface), 0.06);
 }
