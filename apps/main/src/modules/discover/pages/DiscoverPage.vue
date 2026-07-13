@@ -339,16 +339,16 @@ function openProfile(item: DiscoveryCreatorListItem): void {
                 class="discover-card__img"
               />
               <div v-else class="discover-card__fallback">
-                <span class="text-h3 text-medium-emphasis">{{
+                <span class="discover-card__initial text-medium-emphasis">{{
                   avatarInitial(item.attributes.display_name)
                 }}</span>
               </div>
             </div>
 
-            <div class="discover-card__body pa-3 d-flex flex-column flex-grow-1">
-              <div class="d-flex align-center ga-1">
+            <div class="discover-card__body d-flex flex-column flex-grow-1">
+              <div class="discover-card__namerow d-flex align-center">
                 <span
-                  class="text-subtitle-1 font-weight-bold text-truncate"
+                  class="discover-card__name font-weight-bold text-truncate"
                   :data-test="`discover-name-${item.id}`"
                 >
                   {{ item.attributes.display_name ?? t('app.discover.unnamed') }}
@@ -366,9 +366,7 @@ function openProfile(item: DiscoveryCreatorListItem): void {
               </div>
 
               <!-- Icon meta row, concept-style (pin · language) with our data. -->
-              <div
-                class="d-flex flex-wrap align-center ga-3 text-caption text-medium-emphasis mt-1"
-              >
+              <div class="discover-card__meta d-flex flex-wrap align-center text-medium-emphasis">
                 <span class="d-inline-flex align-center ga-1">
                   <v-icon icon="mdi-map-marker-outline" size="14" />
                   {{ countryLabel(item.attributes.country_code) }}
@@ -386,7 +384,7 @@ function openProfile(item: DiscoveryCreatorListItem): void {
                    show at most 2, collapse the rest into a "+N" chip so the
                    body height — and thus the content-to-image proportion —
                    stays identical across breakpoints. -->
-              <div class="discover-card__cats d-flex ga-1 mt-2">
+              <div class="discover-card__cats d-flex">
                 <v-chip
                   v-for="cat in (item.attributes.categories ?? []).slice(0, 2)"
                   :key="cat"
@@ -409,7 +407,7 @@ function openProfile(item: DiscoveryCreatorListItem): void {
 
               <!-- Footer strip — calling-agency-only connection annotation,
                    three states (D-5/D-11), pinned to the bottom of the card. -->
-              <div class="discover-card__footer mt-auto pt-3">
+              <div class="discover-card__footer">
                 <v-chip
                   v-if="connectionChip(item)"
                   size="small"
@@ -450,6 +448,9 @@ function openProfile(item: DiscoveryCreatorListItem): void {
 .discover-card {
   cursor: pointer;
   overflow: hidden;
+  /* The card is its own query container: everything inside sizes off the
+     card's width (cqi units), so the whole card scales as one unit. */
+  container-type: inline-size;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
@@ -479,12 +480,73 @@ function openProfile(item: DiscoveryCreatorListItem): void {
     rgba(var(--v-theme-surface), 0.4)
   );
 }
+.discover-card__initial {
+  font-size: clamp(1.5rem, 22cqi, 3rem);
+  font-weight: 300;
+}
+
+/* Base type tracks the card width (clamped so it never gets illegible, nor
+   larger than the big-monitor reference the design was tuned at). Every inner
+   size is expressed in em/cqi off this base, so text, icons, chips, gaps and
+   padding all shrink and grow together with the card. */
+.discover-card__body {
+  font-size: clamp(0.6rem, 6.2cqi, 0.8rem);
+  padding: 1.15em;
+}
+.discover-card__namerow {
+  column-gap: 0.35em;
+}
+.discover-card__name {
+  min-width: 0;
+  font-size: 1.3em;
+  line-height: 1.25;
+}
+.discover-card__namerow :deep(.v-icon) {
+  font-size: 1.25em;
+  width: 1.25em;
+  height: 1.25em;
+}
+.discover-card__meta {
+  margin-top: 0.4em;
+  column-gap: 0.9em;
+  row-gap: 0.2em;
+}
+.discover-card__meta > span {
+  column-gap: 0.3em;
+}
+.discover-card__meta :deep(.v-icon) {
+  font-size: 1.05em;
+  width: 1.05em;
+  height: 1.05em;
+}
 .discover-card__cats {
   flex-wrap: nowrap;
   overflow: hidden;
-  min-height: 20px;
+  gap: 0.35em;
+  margin-top: 0.6em;
+  min-height: 1.7em;
 }
 .discover-card__footer {
+  margin-top: auto;
+  padding-top: 0.8em;
   border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+}
+
+/* Chips (categories + connection annotation) scale off the same em base. */
+.discover-card :deep(.v-chip) {
+  height: auto;
+  min-height: 0;
+  font-size: 0.85em;
+  padding-inline: 0.6em;
+  border-radius: 0.5em;
+}
+.discover-card :deep(.v-chip__content) {
+  padding-block: 0.24em;
+  line-height: 1.2;
+}
+.discover-card :deep(.v-chip .v-icon) {
+  font-size: 1.1em;
+  width: 1.1em;
+  height: 1.1em;
 }
 </style>
