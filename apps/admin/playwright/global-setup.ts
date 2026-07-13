@@ -31,7 +31,21 @@ import { fileURLToPath } from 'node:url'
  * so this `migrate:fresh` only ever wipes the admin-suite DB, never
  * e2e-main's. The two jobs run in parallel service containers with
  * disjoint port assignments (admin's API: 8001; main's API: 8000).
+ *
+ * ⚠ DB_DATABASE isolation (post-incident, retrofitted 2026-07-13).
+ * LOCALLY, CI's per-job `DB_DATABASE` is absent, so this used to inherit
+ * `apps/api/.env` → the real dev `catalyst` DB, and `migrate:fresh
+ * --force` dropped every table (the same class of incident that hit
+ * e2e-main on 2026-07-08 — fixed there, missed here — and did wipe a
+ * dev DB on 2026-07-13). `DB_DATABASE` is now hard-overridden to the
+ * dedicated `catalyst_e2e` database (shared with e2e-main locally — run
+ * the two suites sequentially), unless CI has already set its own
+ * throwaway value, honored via the `??` fallback. The SAME override is
+ * mirrored in the API `webServer` block of `playwright.config.ts`,
+ * which also forces `reuseExistingServer: false`. An architecture test
+ * pins both suites' overrides.
  */
+const E2E_DB_DATABASE = process.env.DB_DATABASE ?? 'catalyst_e2e'
 export default async function globalSetup(): Promise<void> {
   if (process.env.TEST_HELPERS_TOKEN === undefined || process.env.TEST_HELPERS_TOKEN === '') {
     throw new Error(
@@ -69,6 +83,9 @@ export default async function globalSetup(): Promise<void> {
       // `playwright.config.ts` documents — keep both in lock-step.
       APP_ENV: 'local',
       CACHE_STORE: 'array',
+      // Isolation from the developer's real dev database — see the
+      // docblock above. NEVER remove this override.
+      DB_DATABASE: E2E_DB_DATABASE,
     },
   })
 }

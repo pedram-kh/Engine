@@ -44,6 +44,22 @@ import { defineConfig, devices } from '@playwright/test'
  * Laravel 11's built-in `/up` health route (enabled in
  * `apps/api/bootstrap/app.php` via `health: '/up'`), a GET-200
  * endpoint with no auth or gate dependencies.
+ *
+ * ⚠ DB_DATABASE isolation (post-incident, retrofitted 2026-07-13).
+ * The `e2e-main` suite hard-overrides `DB_DATABASE` to a dedicated
+ * `catalyst_e2e` database and forces `reuseExistingServer: false` on
+ * the API so a local run can never point `migrate:fresh` at the real
+ * dev DB (the 2026-07-08 incident — see `apps/main/playwright.config.ts`
+ * + `apps/main/playwright/global-setup.ts`). That fix was applied to
+ * `e2e-main` but **not** here, and on 2026-07-13 a local admin E2E run
+ * dropped a developer's dev `catalyst` DB. This suite now carries the
+ * SAME isolation: the API `webServer` and `global-setup.ts` both
+ * override `DB_DATABASE` (honoring CI's per-job value via the `??`
+ * fallback) and force `reuseExistingServer: false`. NB the admin suite
+ * shares `catalyst_e2e` with `e2e-main` locally — run them sequentially
+ * (each `migrate:fresh`es at start); CI runs them in disjoint service
+ * containers with their own `DB_DATABASE`, so there is no collision
+ * there. An architecture test pins both suites' overrides.
  */
 
 const TEST_HELPERS_TOKEN =
@@ -51,6 +67,12 @@ const TEST_HELPERS_TOKEN =
 
 const ADMIN_API_PORT = process.env.CATALYST_ADMIN_API_PORT ?? '8001'
 const ADMIN_VITE_PORT = '5174'
+
+// Isolation from the developer's real dev database — see the docblock
+// above and the matching const in `global-setup.ts`. MUST match the
+// value global-setup.ts uses for its `migrate:fresh` call, or the API
+// server and the schema reset target different databases. NEVER remove.
+const E2E_DB_DATABASE = process.env.DB_DATABASE ?? 'catalyst_e2e'
 
 export default defineConfig({
   testDir: './playwright/specs',
@@ -85,12 +107,24 @@ export default defineConfig({
       command: `php artisan serve --host=127.0.0.1 --port=${ADMIN_API_PORT}`,
       cwd: '../api',
       url: `http://127.0.0.1:${ADMIN_API_PORT}/up`,
-      reuseExistingServer: !process.env.CI,
+      // ⚠ Always `false` (post-incident) — NEVER `!process.env.CI`.
+      // Reusing an already-running dev API server means this `env` block
+      // (including the DB_DATABASE override below) is silently never
+      // applied — the reused process stays bound to `apps/api/.env`, i.e.
+      // the developer's real dev database. `global-setup.ts`'s
+      // `migrate:fresh` runs unconditionally, so that combination wiped a
+      // developer's real dev DB (2026-07-13). Forcing `false` makes a run
+      // with a dev server already on :8001 fail loudly (port in use)
+      // instead of quietly resetting the wrong database.
+      reuseExistingServer: false,
       timeout: 60_000,
       env: {
         APP_ENV: 'local',
         CACHE_STORE: 'database',
         TEST_HELPERS_TOKEN,
+        // Isolation from the developer's real dev database — see the
+        // top-of-file docblock const and `global-setup.ts`. NEVER remove.
+        DB_DATABASE: E2E_DB_DATABASE,
       },
       ignoreHTTPSErrors: true,
     },
