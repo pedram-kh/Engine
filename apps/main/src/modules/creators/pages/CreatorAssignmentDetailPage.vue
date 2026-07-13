@@ -569,27 +569,30 @@ onMounted(() => {
           />
           <!-- Chat-composer-style attach pair (draft-composer facelift): a
                paperclip for files (hidden OS picker) + a link icon for
-               external URLs — mirrors RelationshipThreadView. -->
-          <div class="d-flex align-center ga-2">
-            <v-btn
-              icon="mdi-paperclip"
-              variant="tonal"
-              size="small"
-              :aria-label="t('creator.ui.assignments.detail.draft.media')"
-              data-testid="assignment-draft-attach-file"
-              @click="openFilePicker"
-            />
-            <v-btn
-              icon="mdi-link-variant"
-              variant="tonal"
-              size="small"
-              :aria-label="t('app.messaging.relationship.addLink')"
-              data-testid="assignment-draft-attach-link"
-              @click="openLinkDialog"
-            />
-            <span class="text-caption text-medium-emphasis">
+               external URLs — mirrors RelationshipThreadView. The label sits
+               ABOVE the pair as a section heading, not beside the icons. -->
+          <div>
+            <div class="text-caption text-medium-emphasis mb-1">
               {{ t('creator.ui.assignments.detail.draft.media') }}
-            </span>
+            </div>
+            <div class="d-flex align-center ga-2">
+              <v-btn
+                icon="mdi-paperclip"
+                variant="tonal"
+                size="small"
+                :aria-label="t('creator.ui.assignments.detail.draft.media')"
+                data-testid="assignment-draft-attach-file"
+                @click="openFilePicker"
+              />
+              <v-btn
+                icon="mdi-link-variant"
+                variant="tonal"
+                size="small"
+                :aria-label="t('app.messaging.relationship.addLink')"
+                data-testid="assignment-draft-attach-link"
+                @click="openLinkDialog"
+              />
+            </div>
           </div>
           <input
             ref="fileInput"
