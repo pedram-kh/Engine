@@ -353,7 +353,7 @@
           "awaitingVerification": "Váš příspěvek byl zaznamenán a čaká na overenie.",
           "resubmitInPlace": {
             "title": "Nepodařilo sa nám overiť váš příspěvek",
-            "intro": "Automatické overenie vašeho příspěvku selhalo. Zkontrolujte, zda je odkaz správný a ukazuje na váš zveřejněný příspěvek, a poté ho níže znova odešlete.",
+            "intro": "Automatické overenie vášho príspevku zlyhalo. Ak je odkaz nesprávny, opravte ho a znova ho odošlite nižšie. Ak je odkaz správny, nemusíte nič robiť — agentúra ho skontroluje a môže váš príspevok overiť manuálne.",
             "url": "URL příspěvku",
             "submit": "Znova odoslať odkaz",
             "toast": "Odkaz znova odeslán — čoskoro ho znova zkontrolujeme."

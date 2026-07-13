@@ -353,7 +353,7 @@
           "awaitingVerification": "Twój post został zarejestrowany i oczekuje na weryfikację.",
           "resubmitInPlace": {
             "title": "Nie mogliśmy zweryfikować Twojego posta",
-            "intro": "Automatyczna weryfikacja Twojego posta nie powiodła się. Sprawdź, czy link jest poprawny i wskazuje na Twój opublikowany post, a następnie prześlij go ponownie poniżej.",
+            "intro": "Automatyczna weryfikacja Twojego posta nie powiodła się. Jeśli link jest błędny, popraw go i prześlij ponownie poniżej. Jeśli link jest już poprawny, nie musisz nic robić — agencja go sprawdzi i może zweryfikować Twój post ręcznie.",
             "url": "Adres URL posta",
             "submit": "Prześlij link ponownie",
             "toast": "Link przesłany ponownie — sprawdzimy go wkrótce."

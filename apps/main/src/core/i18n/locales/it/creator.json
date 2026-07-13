@@ -353,7 +353,7 @@
           "awaitingVerification": "Il tuo post è stato registrato ed è in attesa di verifica.",
           "resubmitInPlace": {
             "title": "Non siamo riusciti a verificare il tuo post",
-            "intro": "La verifica automatica del tuo post non è riuscita. Controlla che il link sia corretto e rimandi al tuo post pubblicato, poi reinvialo qui sotto.",
+            "intro": "La verifica automatica del tuo post non è riuscita. Se il link è errato, correggilo e reinvialo qui sotto. Se il link è già corretto, non devi fare nulla — l'agenzia lo controllerà e può verificare il tuo post manualmente.",
             "url": "URL del post",
             "submit": "Reinvia il link",
             "toast": "Link reinviato — lo ricontrolleremo a breve."

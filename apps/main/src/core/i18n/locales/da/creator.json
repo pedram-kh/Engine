@@ -353,7 +353,7 @@
           "awaitingVerification": "Dit opslag er registreret og afventer verifikation.",
           "resubmitInPlace": {
             "title": "Vi kunne ikke verificere dit opslag",
-            "intro": "Automatisk verifikation af dit opslag mislykkedes. Kontrollér, at linket er korrekt og peger på dit publicerede opslag, og indsend det derefter igen.",
+            "intro": "Automatisk verifikation af dit opslag mislykkedes. Hvis linket er forkert, skal du rette det og indsende det igen nedenfor. Hvis linket allerede er korrekt, behøver du ikke gøre noget — bureauet gennemgår det og kan verificere dit opslag manuelt.",
             "url": "Opslags-URL",
             "submit": "Indsend link igen",
             "toast": "Link indsendt igen — vi kontrollerer det snart igen."

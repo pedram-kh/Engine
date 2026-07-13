@@ -353,7 +353,7 @@
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
           "resubmitInPlace": {
             "title": "We couldn't verify your post",
-            "intro": "Automatic verification of your post failed. Check the link is correct and points to your published post, then resubmit it below.",
+            "intro": "Verificarea automată a postării tale a eșuat. Dacă linkul este greșit, corectează-l și retrimite-l mai jos. Dacă linkul este deja corect, nu este necesară nicio acțiune — agenția îl va revizui și poate verifica manual postarea ta.",
             "url": "Post URL",
             "submit": "Resubmit link",
             "toast": "Link resubmitted — we'll re-check it shortly."

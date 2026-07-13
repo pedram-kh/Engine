@@ -353,7 +353,7 @@
           "awaitingVerification": "Dein Post wurde erfasst und wartet auf Verifizierung.",
           "resubmitInPlace": {
             "title": "Wir konnten deinen Post nicht verifizieren",
-            "intro": "Die automatische Verifizierung deines Posts ist fehlgeschlagen. Überprüfe, ob der Link korrekt ist und auf deinen veröffentlichten Post verweist, und reiche ihn dann erneut ein.",
+            "intro": "Die automatische Verifizierung deines Posts ist fehlgeschlagen. Wenn der Link falsch ist, korrigiere ihn und reiche ihn unten erneut ein. Wenn der Link bereits korrekt ist, musst du nichts tun — die Agentur prüft ihn und kann deinen Post manuell verifizieren.",
             "url": "Post-URL",
             "submit": "Link erneut einreichen",
             "toast": "Link erneut eingereicht — wir prüfen ihn in Kürze erneut."

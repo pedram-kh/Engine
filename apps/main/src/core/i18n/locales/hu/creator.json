@@ -353,7 +353,7 @@
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
           "resubmitInPlace": {
             "title": "We couldn't verify your post",
-            "intro": "Automatic verification of your post failed. Check the link is correct and points to your published post, then resubmit it below.",
+            "intro": "A bejegyzésed automatikus ellenőrzése sikertelen volt. Ha a link hibás, javítsd ki, és küldd el újra alább. Ha a link már helyes, nincs szükség további teendőre — az ügynökség átnézi, és manuálisan is ellenőrizheti a bejegyzésedet.",
             "url": "Post URL",
             "submit": "Resubmit link",
             "toast": "Link resubmitted — we'll re-check it shortly."

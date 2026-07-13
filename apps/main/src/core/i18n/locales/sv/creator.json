@@ -353,7 +353,7 @@
           "awaitingVerification": "Ditt inlägg har registrerats och väntar på verifiering.",
           "resubmitInPlace": {
             "title": "Vi kunde inte verifiera ditt inlägg",
-            "intro": "Automatisk verifiering av ditt inlägg misslyckades. Kontrollera att länken är korrekt och pekar på ditt publicerade inlägg, och skicka sedan in den igen nedan.",
+            "intro": "Automatisk verifiering av ditt inlägg misslyckades. Om länken är felaktig, rätta den och skicka in den igen nedan. Om länken redan är korrekt behöver du inte göra något — byrån granskar den och kan verifiera ditt inlägg manuellt.",
             "url": "Inläggets URL",
             "submit": "Skicka in länk igen",
             "toast": "Länk återinlämnad — vi kontrollerar den igen inom kort."

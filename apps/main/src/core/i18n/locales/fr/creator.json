@@ -353,7 +353,7 @@
           "awaitingVerification": "Votre publication a été enregistrée et est en attente de vérification.",
           "resubmitInPlace": {
             "title": "Nous n'avons pas pu vérifier votre publication",
-            "intro": "La vérification automatique de votre publication a échoué. Vérifiez que le lien est correct et pointe vers votre publication publiée, puis soumettez-le à nouveau ci-dessous.",
+            "intro": "La vérification automatique de votre publication a échoué. Si le lien est incorrect, corrigez-le et soumettez-le à nouveau ci-dessous. Si le lien est déjà correct, aucune action n'est nécessaire — l'agence le vérifiera et peut valider votre publication manuellement.",
             "url": "URL de la publication",
             "submit": "Soumettre à nouveau le lien",
             "toast": "Lien soumis à nouveau — nous le revérifierons sous peu."

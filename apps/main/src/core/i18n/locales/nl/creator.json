@@ -353,7 +353,7 @@
           "awaitingVerification": "Je post is geregistreerd en wacht op verificatie.",
           "resubmitInPlace": {
             "title": "We konden je post niet verifiëren",
-            "intro": "Automatische verificatie van je post is mislukt. Controleer of de link correct is en verwijst naar je gepubliceerde post, en dien hem dan opnieuw in.",
+            "intro": "Automatische verificatie van je post is mislukt. Als de link onjuist is, corrigeer deze dan en dien hem hieronder opnieuw in. Als de link al correct is, hoef je niets te doen — het bureau beoordeelt hem en kan je post handmatig verifiëren.",
             "url": "Post-URL",
             "submit": "Link opnieuw indienen",
             "toast": "Link opnieuw ingediend — we controleren hem binnenkort opnieuw."

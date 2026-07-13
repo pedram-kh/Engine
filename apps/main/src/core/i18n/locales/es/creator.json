@@ -353,7 +353,7 @@
           "awaitingVerification": "Tu publicación se ha registrado y está a la espera de verificación.",
           "resubmitInPlace": {
             "title": "No hemos podido verificar tu publicación",
-            "intro": "La verificación automática de tu publicación ha fallado. Comprueba que el enlace es correcto y apunta a tu publicación publicada, y luego vuelve a enviarlo abajo.",
+            "intro": "La verificación automática de tu publicación ha fallado. Si el enlace es incorrecto, corrígelo y vuelve a enviarlo abajo. Si el enlace ya es correcto, no necesitas hacer nada — la agencia lo revisará y puede verificar tu publicación manualmente.",
             "url": "URL de la publicación",
             "submit": "Reenviar enlace",
             "toast": "Enlace reenviado: lo volveremos a comprobar en breve."

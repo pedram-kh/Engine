@@ -353,7 +353,7 @@
           "awaitingVerification": "Váš příspěvek byl zaznamenán a čeká na ověření.",
           "resubmitInPlace": {
             "title": "Nepodařilo se nám ověřit váš příspěvek",
-            "intro": "Automatické ověření vašeho příspěvku selhalo. Zkontrolujte, zda je odkaz správný a ukazuje na váš zveřejněný příspěvek, a poté ho níže znovu odešlete.",
+            "intro": "Automatické ověření vašeho příspěvku selhalo. Pokud je odkaz chybný, opravte ho a znovu ho odešlete níže. Pokud je odkaz správný, nemusíte nic dělat — agentura ho zkontroluje a může váš příspěvek ověřit ručně.",
             "url": "URL příspěvku",
             "submit": "Znovu odeslat odkaz",
             "toast": "Odkaz znovu odeslán — brzy ho znovu zkontrolujeme."

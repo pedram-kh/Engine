@@ -353,7 +353,7 @@
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
           "resubmitInPlace": {
             "title": "We couldn't verify your post",
-            "intro": "Automatic verification of your post failed. Check the link is correct and points to your published post, then resubmit it below.",
+            "intro": "Theip ar an fhíorúchán uathoibríoch ar do phostáil. Má tá an nasc mícheart, ceartaigh é agus cuir isteach arís é thíos. Má tá an nasc ceart cheana féin, níl gá le gníomh ar bith — déanfaidh an ghníomhaireacht athbhreithniú air agus is féidir léi do phostáil a fhíorú de láimh.",
             "url": "Post URL",
             "submit": "Resubmit link",
             "toast": "Link resubmitted — we'll re-check it shortly."
