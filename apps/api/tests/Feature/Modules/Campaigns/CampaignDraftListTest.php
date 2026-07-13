@@ -6,9 +6,11 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Enums\DraftReviewStatus;
+use App\Modules\Campaigns\Enums\PostedContentVerificationStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
+use App\Modules\Campaigns\Models\CampaignPostedContent;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -160,6 +162,40 @@ it('returns the summary shape with assignment context and no signed media URLs',
     expect($encoded)->not->toContain('view_url')
         ->and($encoded)->not->toContain('thumbnail_view_url')
         ->and($encoded)->not->toContain('"media"');
+});
+
+it('emits the LATEST post verification status on the assignment stub (Drafts-tab resolve action, AH-045)', function (): void {
+    [$agency, $campaign, $assignments] = draftsListSetup(1, 1);
+    $assignment = $assignments[0];
+    $assignment->update(['status' => AssignmentStatus::Posted, 'posted_at' => now()]);
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    // Two posted rows — the stub must reflect the LATEST one (not_found), not
+    // the older verified one.
+    CampaignPostedContent::factory()->createOne([
+        'assignment_id' => $assignment->id,
+        'verification_status' => PostedContentVerificationStatus::Verified,
+    ]);
+    CampaignPostedContent::factory()->createOne([
+        'assignment_id' => $assignment->id,
+        'verification_status' => PostedContentVerificationStatus::NotFound,
+    ]);
+
+    $this->actingAs($admin)
+        ->getJson(draftsUrl($agency, $campaign))
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.assignment.status', 'posted')
+        ->assertJsonPath('data.0.attributes.assignment.verification_status', 'not_found');
+});
+
+it('emits a null verification status when the assignment has no posted content', function (): void {
+    [$agency, $campaign] = draftsListSetup(1, 1);
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $this->actingAs($admin)
+        ->getJson(draftsUrl($agency, $campaign))
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.assignment.verification_status', null);
 });
 
 it('returns an empty page for an invalid review_status (CampaignController precedent)', function (): void {

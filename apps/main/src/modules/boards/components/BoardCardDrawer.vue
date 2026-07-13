@@ -30,6 +30,7 @@ import type {
   AgencyAssignmentDetailResource,
   BoardCardMovementResource,
   BoardCardResource,
+  CampaignAssignmentResource,
 } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -46,10 +47,14 @@ const props = defineProps<{
   agencyId: string
   campaignId: string
   card: BoardCardResource | null
+  /** May open the verification-failure resolution drawer (the `review` ability). */
+  canResolve?: boolean
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
+  /** The one WRITE hand-off from this drawer: open the page-level resolve drawer. */
+  resolve: [assignment: CampaignAssignmentResource]
 }>()
 
 const { t, locale } = useI18n()
@@ -86,6 +91,44 @@ const chatTitle = computed(
 )
 const latestDraft = computed(() => detail.value?.relationships.drafts[0] ?? null)
 const postedContent = computed(() => detail.value?.relationships.posted_content[0] ?? null)
+
+// The verification-failure resolution hand-off (same gate as the Creators
+// tab): offered when the assignment is `posted` and its LATEST post's
+// verification FAILED. `posted_content` arrives newest-first (D-7), so [0]
+// is the row that matters.
+const showResolveAction = computed(() => {
+  if (props.canResolve !== true) return false
+  const verification = postedContent.value?.attributes.verification_status
+  return (
+    detail.value?.attributes.status === 'posted' &&
+    (verification === 'not_found' || verification === 'mismatch')
+  )
+})
+
+// Build the CampaignAssignmentResource stub the page-level resolve drawer
+// expects (the DraftsTab stub pattern) — it only reads `id`, the creator
+// display name, and the status fields.
+function onResolveClick(): void {
+  const d = detail.value
+  if (d === null) return
+  emit('resolve', {
+    id: d.id,
+    type: 'campaign_assignments',
+    attributes: {
+      status: d.attributes.status,
+      agreed_fee_minor_units: d.attributes.agreed_fee_minor_units,
+      agreed_fee_currency: d.attributes.agreed_fee_currency,
+      countered_fee_minor_units: null,
+      countered_fee_currency: null,
+      invited_at: d.attributes.invited_at ?? null,
+      responded_at: null,
+      posting_due_at: d.attributes.posting_due_at,
+      verification_status: postedContent.value?.attributes.verification_status ?? null,
+      has_pending_contract: null,
+      creator: d.attributes.creator,
+    },
+  })
+}
 
 // ── Detail-tab facelift derivations ─────────────────────────────────────────
 
@@ -406,6 +449,16 @@ function close(): void {
                     <span class="text-body-2" :class="step.at ? '' : 'text-medium-emphasis'">
                       {{ step.label }}
                     </span>
+                    <v-btn
+                      v-if="step.key === 'live_verified' && showResolveAction"
+                      color="warning"
+                      variant="flat"
+                      size="x-small"
+                      data-test="board-card-drawer-resolve"
+                      @click="onResolveClick"
+                    >
+                      {{ t('app.campaigns.resolution.action') }}
+                    </v-btn>
                     <v-spacer />
                     <span class="text-caption text-medium-emphasis">{{ stepDate(step.at) }}</span>
                   </div>

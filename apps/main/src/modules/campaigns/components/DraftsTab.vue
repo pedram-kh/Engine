@@ -29,6 +29,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'open-review': [assignment: CampaignAssignmentResource]
+  'open-resolve': [assignment: CampaignAssignmentResource]
 }>()
 
 const { t, locale } = useI18n()
@@ -67,11 +68,23 @@ function toAssignmentStub(row: CampaignDraftListItemResource): CampaignAssignmen
       invited_at: null,
       responded_at: null,
       posting_due_at: null,
-      verification_status: null,
+      verification_status: assignment.verification_status ?? null,
       has_pending_contract: null,
       creator: assignment.creator,
     },
   }
+}
+
+// The failure-resolution row action (mirrors the Creators tab): offered when
+// the assignment is `posted` and its latest verification FAILED.
+function canResolveRow(row: CampaignDraftListItemResource): boolean {
+  const assignment = row.attributes.assignment
+  return (
+    props.canReview &&
+    assignment?.status === 'posted' &&
+    (assignment.verification_status === 'not_found' ||
+      assignment.verification_status === 'mismatch')
+  )
 }
 
 async function load(initial = false): Promise<void> {
@@ -101,6 +114,13 @@ function openReview(row: CampaignDraftListItemResource): void {
   const stub = toAssignmentStub(row)
   if (stub !== null) {
     emit('open-review', stub)
+  }
+}
+
+function openResolve(row: CampaignDraftListItemResource): void {
+  const stub = toAssignmentStub(row)
+  if (stub !== null) {
+    emit('open-resolve', stub)
   }
 }
 
@@ -191,15 +211,27 @@ defineExpose({
             </span>
           </v-list-item-subtitle>
           <template v-if="canReview" #append>
-            <v-btn
-              color="primary"
-              variant="flat"
-              size="small"
-              :data-test="`drafts-review-${row.id}`"
-              @click="openReview(row)"
-            >
-              {{ t('app.campaigns.review.action') }}
-            </v-btn>
+            <div class="d-flex align-center ga-2">
+              <v-btn
+                v-if="canResolveRow(row)"
+                color="warning"
+                variant="flat"
+                size="small"
+                :data-test="`drafts-resolve-${row.id}`"
+                @click="openResolve(row)"
+              >
+                {{ t('app.campaigns.resolution.action') }}
+              </v-btn>
+              <v-btn
+                color="primary"
+                variant="flat"
+                size="small"
+                :data-test="`drafts-review-${row.id}`"
+                @click="openReview(row)"
+              >
+                {{ t('app.campaigns.review.action') }}
+              </v-btn>
+            </div>
           </template>
         </v-list-item>
       </v-list>

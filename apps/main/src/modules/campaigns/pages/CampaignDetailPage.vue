@@ -195,6 +195,9 @@ function openViewPost(assignment: CampaignAssignmentResource): void {
 function onResolved(message: string): void {
   reviewSnackbar.value = message
   void loadAssignments()
+  if (tab.value === 'drafts') {
+    void draftsTabRef.value?.reload()
+  }
 }
 
 const ulid = computed(() => String(route.params.ulid))
@@ -736,6 +739,8 @@ function formatDay(iso: string | null): string {
             :agency-id="agencyStore.currentAgencyId"
             :campaign-id="ulid"
             :can-configure="canEdit"
+            :can-resolve="canReview"
+            @resolve="openResolve"
           />
         </v-window-item>
 
@@ -748,6 +753,7 @@ function formatDay(iso: string | null): string {
             :campaign-id="ulid"
             :can-review="canReview"
             @open-review="openReview"
+            @open-resolve="openResolve"
           />
         </v-window-item>
 

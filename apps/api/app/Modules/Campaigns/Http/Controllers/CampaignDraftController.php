@@ -45,7 +45,7 @@ final class CampaignDraftController
         $this->applyReviewStatusFilter($query, $request);
 
         $paginator = $query
-            ->with(['assignment.creator:id,ulid,display_name'])
+            ->with(['assignment.creator:id,ulid,display_name', 'assignment.latestPostedContent'])
             ->orderBy('campaign_assignments.id')
             ->orderByDesc('campaign_drafts.version')
             ->paginate($perPage)

@@ -143,7 +143,27 @@ async function seedStore() {
   await store.load('agency-ulid', 'campaign-ulid')
 }
 
-async function mountDrawer(c: BoardCardResource, movements: BoardCardMovementResource[]) {
+/** A posted-content row for the detail's `posted_content` relationship. */
+function postedRow(verificationStatus: string, id = 'p1') {
+  return {
+    id,
+    type: 'campaign_posted_content',
+    attributes: {
+      platform: 'instagram',
+      post_url: 'https://instagram.com/p/abc',
+      platform_post_id: null,
+      posted_at: '2026-06-05T00:00:00+00:00',
+      verified_at: null,
+      verification_status: verificationStatus,
+    },
+  }
+}
+
+async function mountDrawer(
+  c: BoardCardResource,
+  movements: BoardCardMovementResource[],
+  opts: { canResolve?: boolean; postedContent?: ReturnType<typeof postedRow>[] } = {},
+) {
   setActivePinia(createPinia())
   await seedStore()
   mockBoard.movements.mockResolvedValue({ data: movements })
@@ -172,14 +192,20 @@ async function mountDrawer(c: BoardCardResource, movements: BoardCardMovementRes
         creator: { id: 'cr1', display_name: 'Jane Q' },
         campaign: { id: 'cmp1', name: 'Summer Push', brand_name: 'Acme' },
       },
-      relationships: { drafts: [], posted_content: [] },
+      relationships: { drafts: [], posted_content: opts.postedContent ?? [] },
     },
   } as never)
 
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: enApp } as never })
   const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
   const wrapper = mount(BoardCardDrawer, {
-    props: { modelValue: true, agencyId: 'agency-ulid', campaignId: 'campaign-ulid', card: c },
+    props: {
+      modelValue: true,
+      agencyId: 'agency-ulid',
+      campaignId: 'campaign-ulid',
+      card: c,
+      canResolve: opts.canResolve ?? false,
+    },
     global: {
       plugins: [i18n, vuetify],
       stubs: { VDialog: VDialogStub, ChatPanel: ChatPanelStub },
@@ -307,6 +333,54 @@ describe('BoardCardDrawer', () => {
     expect(chips.exists()).toBe(true)
     expect(chips.text()).toContain('1 Reel')
     expect(chips.text()).toContain('3 Stories')
+    wrapper.unmount()
+  })
+
+  // ── Live-verified row Resolve hand-off (AH-045) ────────────────────────────
+
+  it('offers Resolve on the Live-verified row for a posted assignment whose LATEST verification failed, and emits the stub', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], {
+      canResolve: true,
+      // Newest-first (D-7 ordering): [0] failed, the older row verified.
+      postedContent: [postedRow('not_found', 'p2'), postedRow('verified', 'p1')],
+    })
+
+    const btn = wrapper.find('[data-test="board-card-drawer-resolve"]')
+    expect(btn.exists()).toBe(true)
+    // It sits inside the Live-verified timeline row.
+    expect(
+      wrapper
+        .find('[data-test="board-card-drawer-step-live_verified"]')
+        .find('[data-test="board-card-drawer-resolve"]')
+        .exists(),
+    ).toBe(true)
+
+    await btn.trigger('click')
+    const emitted = wrapper.emitted('resolve')?.[0]?.[0] as {
+      id: string
+      attributes: { status: string; verification_status: string | null }
+    }
+    expect(emitted.id).toBe('a1')
+    expect(emitted.attributes.status).toBe('posted')
+    expect(emitted.attributes.verification_status).toBe('not_found')
+    wrapper.unmount()
+  })
+
+  it('hides Resolve when the latest verification did not fail', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], {
+      canResolve: true,
+      postedContent: [postedRow('verified')],
+    })
+    expect(wrapper.find('[data-test="board-card-drawer-resolve"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('hides Resolve without the canResolve ability even on a failed post', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], {
+      canResolve: false,
+      postedContent: [postedRow('mismatch')],
+    })
+    expect(wrapper.find('[data-test="board-card-drawer-resolve"]').exists()).toBe(false)
     wrapper.unmount()
   })
 

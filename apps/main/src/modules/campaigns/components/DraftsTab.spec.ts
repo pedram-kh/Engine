@@ -29,6 +29,9 @@ const DRAFT_ID = '01DRAFTULIDXXXXXXXXXXXXXXX'
 
 function makeRow(
   reviewStatus: CampaignDraftListItemResource['attributes']['review_status'] = 'pending',
+  assignmentOverrides: Partial<
+    NonNullable<CampaignDraftListItemResource['attributes']['assignment']>
+  > = {},
 ): CampaignDraftListItemResource {
   return {
     id: DRAFT_ID,
@@ -42,6 +45,7 @@ function makeRow(
         id: ASSIGNMENT_ID,
         status: 'draft_submitted',
         creator: { id: 'creator-ulid', display_name: 'Alex Creator' },
+        ...assignmentOverrides,
       },
     },
   }
@@ -125,6 +129,46 @@ describe('DraftsTab', () => {
     expect(wrapper.find('[data-test="drafts-review-01DRAFTULIDXXXXXXXXXXXXXXX"]').exists()).toBe(
       false,
     )
+    wrapper.unmount()
+  })
+
+  it('offers Resolve next to Review on a posted row whose verification FAILED, and emits open-resolve (AH-045)', async () => {
+    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+      data: [makeRow('approved', { status: 'posted', verification_status: 'not_found' })],
+      meta: { total: 1, page: 1, per_page: 25, last_page: 1 },
+    })
+    const wrapper = await mountTab()
+
+    const resolveBtn = wrapper.find(`[data-test="drafts-resolve-${DRAFT_ID}"]`)
+    expect(resolveBtn.exists()).toBe(true)
+    // Review stays available alongside it.
+    expect(wrapper.find(`[data-test="drafts-review-${DRAFT_ID}"]`).exists()).toBe(true)
+
+    await resolveBtn.trigger('click')
+    const emitted = wrapper.emitted('open-resolve')?.[0]?.[0] as CampaignAssignmentResource
+    expect(emitted.id).toBe(ASSIGNMENT_ID)
+    expect(emitted.attributes.status).toBe('posted')
+    expect(emitted.attributes.verification_status).toBe('not_found')
+    wrapper.unmount()
+  })
+
+  it('hides Resolve on a row whose verification did not fail', async () => {
+    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+      data: [makeRow('approved', { status: 'posted', verification_status: 'verified' })],
+      meta: { total: 1, page: 1, per_page: 25, last_page: 1 },
+    })
+    const wrapper = await mountTab()
+    expect(wrapper.find(`[data-test="drafts-resolve-${DRAFT_ID}"]`).exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('hides Resolve when canReview is false even on a failed row', async () => {
+    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+      data: [makeRow('approved', { status: 'posted', verification_status: 'mismatch' })],
+      meta: { total: 1, page: 1, per_page: 25, last_page: 1 },
+    })
+    const wrapper = await mountTab(false)
+    expect(wrapper.find(`[data-test="drafts-resolve-${DRAFT_ID}"]`).exists()).toBe(false)
     wrapper.unmount()
   })
 

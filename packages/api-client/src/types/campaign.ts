@@ -564,6 +564,12 @@ export interface CampaignDraftListItemResource {
     assignment: {
       id: string
       status: AssignmentStatus
+      /**
+       * The LATEST posted-content row's verification status (D-7 mirror) —
+       * drives the Drafts-tab failure-resolution row action. null/absent =
+       * no action.
+       */
+      verification_status?: PostedContentVerificationStatus | null
       creator: {
         id: string
         display_name: string | null

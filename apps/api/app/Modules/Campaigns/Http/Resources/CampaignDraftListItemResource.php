@@ -16,6 +16,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * lazily via {@see CampaignDraftResource} when the review drawer opens
  * (`showAssignment`).
  *
+ * `assignment.verification_status` is the LATEST posted-content row's status
+ * (the same D-7 field CampaignAssignmentResource emits) — it lets the Drafts
+ * tab offer the failure-resolution row action next to Review. Emitted only
+ * when `latestPostedContent` is eager-loaded (null otherwise); the FE treats
+ * null/absent as "no action".
+ *
  * @mixin CampaignDraft
  */
 final class CampaignDraftListItemResource extends JsonResource
@@ -33,6 +39,11 @@ final class CampaignDraftListItemResource extends JsonResource
             ? $assignment->creator
             : null;
 
+        $verificationStatus = null;
+        if ($assignment instanceof CampaignAssignment && $assignment->relationLoaded('latestPostedContent')) {
+            $verificationStatus = $assignment->latestPostedContent?->verification_status->value;
+        }
+
         return [
             'id' => $draft->ulid,
             'type' => 'campaign_draft_list_item',
@@ -44,6 +55,7 @@ final class CampaignDraftListItemResource extends JsonResource
                 'assignment' => $assignment instanceof CampaignAssignment ? [
                     'id' => $assignment->ulid,
                     'status' => $assignment->status->value,
+                    'verification_status' => $verificationStatus,
                     'creator' => $creator instanceof Creator ? [
                         'id' => $creator->ulid,
                         'display_name' => $creator->display_name,

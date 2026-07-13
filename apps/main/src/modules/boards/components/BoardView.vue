@@ -15,7 +15,11 @@
  * rejected one surfaces here as a snackbar toast (load-bearing #1's UI half).
  */
 
-import type { BoardCardResource, BoardColumnResource } from '@catalyst/api-client'
+import type {
+  BoardCardResource,
+  BoardColumnResource,
+  CampaignAssignmentResource,
+} from '@catalyst/api-client'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -31,6 +35,13 @@ const props = defineProps<{
   agencyId: string
   campaignId: string
   canConfigure: boolean
+  /** May open the verification-failure resolution drawer (the `review` ability). */
+  canResolve?: boolean
+}>()
+
+const emit = defineEmits<{
+  /** Bubbled from the card drawer — the page owns the resolve drawer. */
+  resolve: [assignment: CampaignAssignmentResource]
 }>()
 
 const { t } = useI18n()
@@ -64,6 +75,13 @@ async function onReorder(orderedIds: string[]): Promise<void> {
 function onOpenCard(card: BoardCardResource): void {
   drawerCard.value = card
   drawerOpen.value = true
+}
+
+// Hand the resolve target to the page (which mounts the resolve drawer) and
+// close the card drawer underneath it.
+function onResolve(assignment: CampaignAssignmentResource): void {
+  drawerOpen.value = false
+  emit('resolve', assignment)
 }
 
 function onAddColumn(): void {
@@ -140,6 +158,8 @@ onBeforeUnmount(() => {
       :agency-id="agencyId"
       :campaign-id="campaignId"
       :card="drawerCard"
+      :can-resolve="props.canResolve ?? false"
+      @resolve="onResolve"
     />
 
     <v-snackbar
