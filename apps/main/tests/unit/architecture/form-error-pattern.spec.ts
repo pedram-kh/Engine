@@ -64,9 +64,9 @@ const CANONICAL_422_FILES: readonly string[] = [
   'modules/onboarding/components/ConnectionsSocialSection.vue',
   'modules/onboarding/pages/Step6TaxPage.vue',
   'modules/creators/availability/components/AvailabilityBlockDialog.vue',
-  // Sprint 8 Chunk 2 (D-8): the creator counter fee-form binds the 422 from a
-  // non-positive / wrong-currency fee onto the amount field.
-  'modules/creators/pages/CreatorAssignmentsPage.vue',
+  // (Re-offer-after-decline chunk removed the creator counter dialog — and
+  // with it CreatorAssignmentsPage.vue's only 422-bound form — so the page
+  // left this list; re-offers replaced countering.)
   // Sprint 9 Chunk 1 (D-9): the creator draft-submit + posted-content forms bind
   // 422s onto their fields (caption/media, platform/post_url).
   'modules/creators/pages/CreatorAssignmentDetailPage.vue',

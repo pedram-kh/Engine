@@ -605,6 +605,9 @@
             "postingDue": "Opslag deadline",
             "latestDraft": "Seneste udkast",
             "postedContent": "Opslået indhold",
+            "offer": "Tilbud",
+            "deliverables": "Leverancer",
+            "timeline": "Fremdrift",
             "none": "—"
           },
           "history": {

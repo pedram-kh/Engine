@@ -151,7 +151,27 @@ async function mountDrawer(c: BoardCardResource, movements: BoardCardMovementRes
     data: {
       id: 'a1',
       type: 'campaign_assignment',
-      attributes: { status: 'posted' },
+      attributes: {
+        status: 'posted',
+        agreed_fee_minor_units: 20000,
+        agreed_fee_currency: 'EUR',
+        fee_per: 'script',
+        offer_description: 'Two hooks, one CTA.',
+        offer_attachment: {
+          name: 'brief.pdf',
+          mime_type: 'application/pdf',
+          size_bytes: 2048,
+          url: 'https://cdn/brief.pdf',
+        },
+        invited_at: '2026-06-01T00:00:00+00:00',
+        posting_due_at: null,
+        submitted_draft_at: '2026-06-03T00:00:00+00:00',
+        approved_at: null,
+        posted_at: null,
+        verified_live_at: null,
+        creator: { id: 'cr1', display_name: 'Jane Q' },
+        campaign: { id: 'cmp1', name: 'Summer Push', brand_name: 'Acme' },
+      },
       relationships: { drafts: [], posted_content: [] },
     },
   } as never)
@@ -245,6 +265,58 @@ describe('BoardCardDrawer', () => {
     const wrapper = await mountDrawer(card(null), [])
     expect(wrapper.find('[data-test="board-card-drawer-messages-none"]').exists()).toBe(true)
     expect(wrapper.findComponent(ChatPanelStub).exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  // ── Detail-tab facelift ────────────────────────────────────────────────────
+
+  it('renders the identity header with campaign · brand and the offer terms', async () => {
+    const wrapper = await mountDrawer(card('a1'), [])
+    expect(wrapper.find('[data-test="board-card-drawer-campaign"]').text()).toBe(
+      'Summer Push · Acme',
+    )
+    const fee = wrapper.find('[data-test="board-card-drawer-fee"]')
+    expect(fee.text()).toContain('200')
+    expect(fee.text()).toContain('script')
+    expect(wrapper.find('[data-test="board-card-drawer-offer-description"]').text()).toBe(
+      'Two hooks, one CTA.',
+    )
+    const attachment = wrapper.find('[data-test="board-card-drawer-attachment"]')
+    expect(attachment.text()).toContain('brief.pdf')
+    expect(attachment.attributes('href')).toBe('https://cdn/brief.pdf')
+    wrapper.unmount()
+  })
+
+  it('renders the progress timeline with reached steps checked and dates formatted', async () => {
+    const wrapper = await mountDrawer(card('a1'), [])
+    const timeline = wrapper.find('[data-test="board-card-drawer-timeline"]')
+    expect(timeline.exists()).toBe(true)
+    // Reached steps carry a formatted date; unreached fall back to the em dash.
+    expect(wrapper.find('[data-test="board-card-drawer-step-invited"]').text()).toContain('2026')
+    expect(wrapper.find('[data-test="board-card-drawer-step-draft_submitted"]').text()).toContain(
+      '2026',
+    )
+    expect(wrapper.find('[data-test="board-card-drawer-step-approved"]').text()).toContain('—')
+    expect(wrapper.find('[data-test="board-card-drawer-step-live_verified"]').text()).toContain('—')
+    wrapper.unmount()
+  })
+
+  it('renders deliverable chips from the card-face data', async () => {
+    const wrapper = await mountDrawer(card('a1', { deliverables: ['1 Reel', '3 Stories'] }), [])
+    const chips = wrapper.find('[data-test="board-card-drawer-deliverables"]')
+    expect(chips.exists()).toBe(true)
+    expect(chips.text()).toContain('1 Reel')
+    expect(chips.text()).toContain('3 Stories')
+    wrapper.unmount()
+  })
+
+  it('formats the movement timestamp instead of dumping the ISO string', async () => {
+    const wrapper = await mountDrawer(card('a1'), [
+      movement('1', { created_at: '2026-06-01T12:30:00+00:00' }),
+    ])
+    const row = wrapper.find('[data-test="board-card-movement-1"]')
+    expect(row.text()).not.toContain('2026-06-01T12:30:00')
+    expect(row.text()).toContain('2026')
     wrapper.unmount()
   })
 })

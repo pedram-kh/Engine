@@ -605,6 +605,9 @@
             "postingDue": "Posting due",
             "latestDraft": "Latest draft",
             "postedContent": "Posted content",
+            "offer": "Оферта",
+            "deliverables": "Резултати",
+            "timeline": "Напредък",
             "none": "—"
           },
           "history": {

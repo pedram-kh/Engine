@@ -15,6 +15,7 @@ use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
 use App\Modules\Campaigns\Models\CampaignPostedContent;
+use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -76,6 +77,20 @@ final class CampaignAssignmentReviewController
                     'status' => $assignment->status->value,
                     'agreed_fee_minor_units' => $assignment->agreed_fee_minor_units,
                     'agreed_fee_currency' => $assignment->agreed_fee_currency,
+                    // Invite-offer context (board-drawer detail facelift) —
+                    // the same block CampaignAssignmentResource emits, so the
+                    // drawer can show the terms the invitation was sent with.
+                    // The attachment URL is a short-lived signed GET minted
+                    // here, inheriting this surface's review authz (AH-004).
+                    'fee_per' => $assignment->fee_per,
+                    'offer_description' => $assignment->offer_description,
+                    'offer_attachment' => $assignment->offer_attachment_path !== null ? [
+                        'name' => $assignment->offer_attachment_name,
+                        'mime_type' => $assignment->offer_attachment_mime,
+                        'size_bytes' => $assignment->offer_attachment_size_bytes,
+                        'url' => AssignmentOfferAttachmentUploadService::signedViewUrl($assignment->offer_attachment_path),
+                    ] : null,
+                    'invited_at' => $assignment->invited_at?->toIso8601String(),
                     'posting_due_at' => $assignment->posting_due_at?->toIso8601String(),
                     'submitted_draft_at' => $assignment->submitted_draft_at?->toIso8601String(),
                     'approved_at' => $assignment->approved_at?->toIso8601String(),

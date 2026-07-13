@@ -605,6 +605,9 @@
             "postingDue": "Posting due",
             "latestDraft": "Latest draft",
             "postedContent": "Posted content",
+            "offer": "Tarjous",
+            "deliverables": "Toimitukset",
+            "timeline": "Edistyminen",
             "none": "—"
           },
           "history": {

@@ -605,6 +605,9 @@
             "postingDue": "Posting due",
             "latestDraft": "Latest draft",
             "postedContent": "Posted content",
+            "offer": "Piedāvājums",
+            "deliverables": "Nodevumi",
+            "timeline": "Progress",
             "none": "—"
           },
           "history": {

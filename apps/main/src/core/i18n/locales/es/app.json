@@ -605,6 +605,9 @@
             "postingDue": "Publicación pendiente",
             "latestDraft": "Último borrador",
             "postedContent": "Contenido publicado",
+            "offer": "Oferta",
+            "deliverables": "Entregables",
+            "timeline": "Progreso",
             "none": "—"
           },
           "history": {

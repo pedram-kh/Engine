@@ -605,6 +605,9 @@
             "postingDue": "Termín zveřejnění",
             "latestDraft": "Poslední nacrt",
             "postedContent": "Zveřejněný obsah",
+            "offer": "Ponuda",
+            "deliverables": "Isporuke",
+            "timeline": "Napredak",
             "none": "—"
           },
           "history": {

@@ -605,6 +605,9 @@
             "postingDue": "Plaatsen deadline",
             "latestDraft": "Laatste concept",
             "postedContent": "Geplaatste content",
+            "offer": "Aanbod",
+            "deliverables": "Deliverables",
+            "timeline": "Voortgang",
             "none": "—"
           },
           "history": {

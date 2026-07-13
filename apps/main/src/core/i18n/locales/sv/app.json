@@ -605,6 +605,9 @@
             "postingDue": "Publicering förfaller",
             "latestDraft": "Senaste utkast",
             "postedContent": "Publicerat innehåll",
+            "offer": "Erbjudande",
+            "deliverables": "Leverabler",
+            "timeline": "Förlopp",
             "none": "—"
           },
           "history": {

@@ -480,6 +480,16 @@ export interface AgencyAssignmentDetailResource {
     status: AssignmentStatus
     agreed_fee_minor_units: number | null
     agreed_fee_currency: string | null
+    /** Invite-offer context (board-drawer detail facelift). */
+    fee_per?: string | null
+    offer_description?: string | null
+    offer_attachment?: {
+      name: string | null
+      mime_type: string | null
+      size_bytes: number | null
+      url: string | null
+    } | null
+    invited_at?: string | null
     posting_due_at: string | null
     submitted_draft_at: string | null
     approved_at: string | null

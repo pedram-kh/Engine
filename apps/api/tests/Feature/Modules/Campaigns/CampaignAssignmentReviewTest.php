@@ -215,6 +215,28 @@ it('the agency show returns the assignment with its draft history + posted conte
         ->assertJsonCount(1, 'data.relationships.posted_content');
 });
 
+it('the agency show emits the invite-offer block (board-drawer detail facelift)', function (): void {
+    [$agency, $campaign, $assignment] = reviewSetup();
+    $assignment->update([
+        'fee_per' => 'script',
+        'offer_description' => 'Two hooks, one CTA.',
+        'offer_attachment_path' => 'agencies/x/campaigns/y/offer-attachments/z.pdf',
+        'offer_attachment_name' => 'brief.pdf',
+        'offer_attachment_mime' => 'application/pdf',
+        'offer_attachment_size_bytes' => 2048,
+    ]);
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $this->actingAs($admin)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/campaigns/{$campaign->ulid}/assignments/{$assignment->ulid}")
+        ->assertOk()
+        ->assertJsonPath('data.attributes.fee_per', 'script')
+        ->assertJsonPath('data.attributes.offer_description', 'Two hooks, one CTA.')
+        ->assertJsonPath('data.attributes.offer_attachment.name', 'brief.pdf')
+        ->assertJsonPath('data.attributes.offer_attachment.size_bytes', 2048)
+        ->assertJsonPath('data.attributes.invited_at', $assignment->invited_at?->toIso8601String());
+});
+
 it('404s when the assignment does not belong to the campaign', function (): void {
     [$agency, $campaign] = reviewSetup();
     [, , $otherAssignment] = reviewSetup();

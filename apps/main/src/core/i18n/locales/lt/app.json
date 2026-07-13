@@ -605,6 +605,9 @@
             "postingDue": "Posting due",
             "latestDraft": "Latest draft",
             "postedContent": "Posted content",
+            "offer": "Pasiūlymas",
+            "deliverables": "Rezultatai",
+            "timeline": "Eiga",
             "none": "—"
           },
           "history": {

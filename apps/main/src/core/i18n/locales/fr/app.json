@@ -605,6 +605,9 @@
             "postingDue": "Publication due",
             "latestDraft": "Dernier brouillon",
             "postedContent": "Contenu publié",
+            "offer": "Offre",
+            "deliverables": "Livrables",
+            "timeline": "Progression",
             "none": "—"
           },
           "history": {

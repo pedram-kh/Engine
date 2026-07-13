@@ -605,6 +605,9 @@
             "postingDue": "Posting due",
             "latestDraft": "Latest draft",
             "postedContent": "Posted content",
+            "offer": "Offer",
+            "deliverables": "Deliverables",
+            "timeline": "Progress",
             "none": "—"
           },
           "history": {

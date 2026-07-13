@@ -605,6 +605,9 @@
             "postingDue": "Termin publikacji",
             "latestDraft": "Ostatni szkic",
             "postedContent": "Opublikowana treść",
+            "offer": "Oferta",
+            "deliverables": "Materiały",
+            "timeline": "Postęp",
             "none": "—"
           },
           "history": {

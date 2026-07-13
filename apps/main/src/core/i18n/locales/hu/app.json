@@ -605,6 +605,9 @@
             "postingDue": "Posting due",
             "latestDraft": "Latest draft",
             "postedContent": "Posted content",
+            "offer": "Ajánlat",
+            "deliverables": "Leszállítandók",
+            "timeline": "Folyamat",
             "none": "—"
           },
           "history": {

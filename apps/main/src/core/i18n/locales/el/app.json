@@ -605,6 +605,9 @@
             "postingDue": "Posting due",
             "latestDraft": "Latest draft",
             "postedContent": "Posted content",
+            "offer": "Προσφορά",
+            "deliverables": "Παραδοτέα",
+            "timeline": "Πρόοδος",
             "none": "—"
           },
           "history": {

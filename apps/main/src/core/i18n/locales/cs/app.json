@@ -605,6 +605,9 @@
             "postingDue": "Termín zveřejnění",
             "latestDraft": "Poslední návrh",
             "postedContent": "Zveřejněný obsah",
+            "offer": "Nabídka",
+            "deliverables": "Výstupy",
+            "timeline": "Průběh",
             "none": "—"
           },
           "history": {

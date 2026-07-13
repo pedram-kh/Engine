@@ -605,6 +605,9 @@
             "postingDue": "Veröffentlichung fällig",
             "latestDraft": "Letzter Entwurf",
             "postedContent": "Veröffentlichter Inhalt",
+            "offer": "Angebot",
+            "deliverables": "Leistungen",
+            "timeline": "Fortschritt",
             "none": "—"
           },
           "history": {
