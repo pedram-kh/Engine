@@ -351,6 +351,7 @@
           "retry": "Retry",
           "awaitingReview": "Your draft has been submitted and is awaiting agency review.",
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
+          "verifiedNotice": "Rinne an ghníomhaireacht do phostáil a fhíorú. Tá an tasc seo críochnaithe — níl gá le gníomh eile ar bith.",
           "resubmitInPlace": {
             "title": "We couldn't verify your post",
             "intro": "Theip ar an fhíorúchán uathoibríoch ar do phostáil. Má tá an nasc mícheart, ceartaigh é agus cuir isteach arís é thíos. Má tá an nasc ceart cheana féin, níl gá le gníomh ar bith — déanfaidh an ghníomhaireacht athbhreithniú air agus is féidir léi do phostáil a fhíorú de láimh.",

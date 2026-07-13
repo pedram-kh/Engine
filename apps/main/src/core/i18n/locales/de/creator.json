@@ -351,6 +351,7 @@
           "retry": "Erneut versuchen",
           "awaitingReview": "Dein Entwurf wurde eingereicht und wartet auf die Prüfung der Agentur.",
           "awaitingVerification": "Dein Post wurde erfasst und wartet auf Verifizierung.",
+          "verifiedNotice": "Dein Post wurde von der Agentur verifiziert. Dieser Auftrag ist abgeschlossen — es ist nichts weiter zu tun.",
           "resubmitInPlace": {
             "title": "Wir konnten deinen Post nicht verifizieren",
             "intro": "Die automatische Verifizierung deines Posts ist fehlgeschlagen. Wenn der Link falsch ist, korrigiere ihn und reiche ihn unten erneut ein. Wenn der Link bereits korrekt ist, musst du nichts tun — die Agentur prüft ihn und kann deinen Post manuell verifizieren.",

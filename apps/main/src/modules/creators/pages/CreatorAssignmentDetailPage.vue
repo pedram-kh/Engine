@@ -158,6 +158,14 @@ const verificationFailed = computed(
 const isAwaitingVerification = computed(
   () => status.value === 'posted' && !verificationFailed.value,
 )
+/**
+ * The post is confirmed live — automatically (`live_verified`) or by the
+ * agency's manual override (`manually_verified`). One green banner closes the
+ * loop so the creator knows nothing more is needed (AH-047).
+ */
+const isVerified = computed(
+  () => status.value === 'live_verified' || status.value === 'manually_verified',
+)
 
 /** The most recent agency feedback (Chunk 2 populates `review_feedback`). */
 const revisionFeedback = computed<string | null>(() => {
@@ -832,6 +840,16 @@ onMounted(() => {
         data-testid="assignment-awaiting-verification"
       >
         {{ t('creator.ui.assignments.detail.awaitingVerification') }}
+      </v-alert>
+
+      <!-- Verified (live or manual) — the loop is closed, nothing more to do -->
+      <v-alert
+        v-else-if="isVerified"
+        type="success"
+        variant="tonal"
+        data-testid="assignment-verified-notice"
+      >
+        {{ t('creator.ui.assignments.detail.verifiedNotice') }}
       </v-alert>
 
       <!-- Draft version history (always shown when versions exist, D-6) -->

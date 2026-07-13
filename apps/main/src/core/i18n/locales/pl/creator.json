@@ -351,6 +351,7 @@
           "retry": "Spróbuj ponownie",
           "awaitingReview": "Twój szkic został przesłany i oczekuje na recenzję agencji.",
           "awaitingVerification": "Twój post został zarejestrowany i oczekuje na weryfikację.",
+          "verifiedNotice": "Twój post został zweryfikowany przez agencję. To zlecenie jest zakończone — nie musisz nic więcej robić.",
           "resubmitInPlace": {
             "title": "Nie mogliśmy zweryfikować Twojego posta",
             "intro": "Automatyczna weryfikacja Twojego posta nie powiodła się. Jeśli link jest błędny, popraw go i prześlij ponownie poniżej. Jeśli link jest już poprawny, nie musisz nic robić — agencja go sprawdzi i może zweryfikować Twój post ręcznie.",

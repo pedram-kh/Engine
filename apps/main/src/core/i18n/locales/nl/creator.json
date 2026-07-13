@@ -351,6 +351,7 @@
           "retry": "Opnieuw proberen",
           "awaitingReview": "Je concept is ingediend en wacht op beoordeling door het bureau.",
           "awaitingVerification": "Je post is geregistreerd en wacht op verificatie.",
+          "verifiedNotice": "Je post is geverifieerd door het bureau. Deze opdracht is voltooid — er is geen verdere actie nodig.",
           "resubmitInPlace": {
             "title": "We konden je post niet verifiëren",
             "intro": "Automatische verificatie van je post is mislukt. Als de link onjuist is, corrigeer deze dan en dien hem hieronder opnieuw in. Als de link al correct is, hoef je niets te doen — het bureau beoordeelt hem en kan je post handmatig verifiëren.",

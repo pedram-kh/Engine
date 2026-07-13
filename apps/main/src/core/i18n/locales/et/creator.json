@@ -351,6 +351,7 @@
           "retry": "Retry",
           "awaitingReview": "Your draft has been submitted and is awaiting agency review.",
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
+          "verifiedNotice": "Agentuur on teie postituse kinnitanud. See tellimus on lõpetatud — täiendavaid toiminguid ei ole vaja teha.",
           "resubmitInPlace": {
             "title": "We couldn't verify your post",
             "intro": "Teie postituse automaatne kinnitamine ebaõnnestus. Kui link on vale, parandage see ja esitage allpool uuesti. Kui link on juba õige, ei ole vaja midagi teha — agentuur vaatab selle üle ja saab teie postituse käsitsi kinnitada.",

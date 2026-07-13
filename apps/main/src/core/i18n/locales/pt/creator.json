@@ -351,6 +351,7 @@
           "retry": "Tentar novamente",
           "awaitingReview": "O seu rascunho foi enviado e aguarda revisão da agência.",
           "awaitingVerification": "A sua publicação foi registada e aguarda verificação.",
+          "verifiedNotice": "A sua publicação foi verificada pela agência. Esta atribuição está concluída — não é necessária mais nenhuma ação.",
           "resubmitInPlace": {
             "title": "Não foi possível verificar a sua publicação",
             "intro": "A verificação automática da sua publicação falhou. Se o link estiver errado, corrija-o e reenvie-o abaixo. Se o link já estiver correto, não precisa de fazer nada — a agência irá analisá-lo e pode verificar a sua publicação manualmente.",

@@ -351,6 +351,7 @@
           "retry": "Försök igen",
           "awaitingReview": "Ditt utkast har skickats in och väntar på byråns granskning.",
           "awaitingVerification": "Ditt inlägg har registrerats och väntar på verifiering.",
+          "verifiedNotice": "Ditt inlägg har verifierats av byrån. Det här uppdraget är slutfört — ingen ytterligare åtgärd behövs.",
           "resubmitInPlace": {
             "title": "Vi kunde inte verifiera ditt inlägg",
             "intro": "Automatisk verifiering av ditt inlägg misslyckades. Om länken är felaktig, rätta den och skicka in den igen nedan. Om länken redan är korrekt behöver du inte göra något — byrån granskar den och kan verifiera ditt inlägg manuellt.",

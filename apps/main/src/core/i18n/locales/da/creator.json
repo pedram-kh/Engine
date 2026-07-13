@@ -351,6 +351,7 @@
           "retry": "Prøv igen",
           "awaitingReview": "Dit udkast er indsendt og afventer bureauets gennemgang.",
           "awaitingVerification": "Dit opslag er registreret og afventer verifikation.",
+          "verifiedNotice": "Dit opslag er blevet verificeret af bureauet. Denne opgave er fuldført — ingen yderligere handling er nødvendig.",
           "resubmitInPlace": {
             "title": "Vi kunne ikke verificere dit opslag",
             "intro": "Automatisk verifikation af dit opslag mislykkedes. Hvis linket er forkert, skal du rette det og indsende det igen nedenfor. Hvis linket allerede er korrekt, behøver du ikke gøre noget — bureauet gennemgår det og kan verificere dit opslag manuelt.",

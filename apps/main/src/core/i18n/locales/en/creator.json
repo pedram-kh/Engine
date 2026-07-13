@@ -351,6 +351,7 @@
           "retry": "Retry",
           "awaitingReview": "Your draft has been submitted and is awaiting agency review.",
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
+          "verifiedNotice": "Your post has been verified by the agency. This assignment is complete — no further action is needed.",
           "resubmitInPlace": {
             "title": "We couldn't verify your post",
             "intro": "Automatic verification of your post failed. If the link is wrong, correct it and resubmit below. If the link is already correct, no action is needed — the agency will review it and can verify your post manually.",

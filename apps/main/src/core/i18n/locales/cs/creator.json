@@ -351,6 +351,7 @@
           "retry": "Zkusit znovu",
           "awaitingReview": "Váš návrh byl odeslán a čeká na posouzení agentury.",
           "awaitingVerification": "Váš příspěvek byl zaznamenán a čeká na ověření.",
+          "verifiedNotice": "Váš příspěvek byl agenturou ověřen. Tato zakázka je dokončena — není potřeba žádná další akce.",
           "resubmitInPlace": {
             "title": "Nepodařilo se nám ověřit váš příspěvek",
             "intro": "Automatické ověření vašeho příspěvku selhalo. Pokud je odkaz chybný, opravte ho a znovu ho odešlete níže. Pokud je odkaz správný, nemusíte nic dělat — agentura ho zkontroluje a může váš příspěvek ověřit ručně.",

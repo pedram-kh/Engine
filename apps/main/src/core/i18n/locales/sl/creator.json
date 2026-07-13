@@ -351,6 +351,7 @@
           "retry": "Poskusi znova",
           "awaitingReview": "Váš osnutek byl odeslán a čaka na pregled agencije.",
           "awaitingVerification": "Váš příspěvek byl zaznamenán a čaka na preverjanje.",
+          "verifiedNotice": "Agencija je potrdila vašo objavo. Ta naloga je zaključena — nadaljnje ukrepanje ni potrebno.",
           "resubmitInPlace": {
             "title": "Ni nam uspelo ověřit váš příspěvek",
             "intro": "Samodejno preverjanje vaše objave ni uspelo. Če je povezava napačna, jo popravite in znova pošljite spodaj. Če je povezava že pravilna, vam ni treba storiti ničesar — agencija jo bo pregledala in lahko vašo objavo potrdi ročno.",

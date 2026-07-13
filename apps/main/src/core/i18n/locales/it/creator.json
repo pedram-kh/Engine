@@ -351,6 +351,7 @@
           "retry": "Riprova",
           "awaitingReview": "La tua bozza è stata inviata ed è in attesa di revisione dell'agenzia.",
           "awaitingVerification": "Il tuo post è stato registrato ed è in attesa di verifica.",
+          "verifiedNotice": "Il tuo post è stato verificato dall'agenzia. Questo incarico è completato — non è necessaria alcuna altra azione.",
           "resubmitInPlace": {
             "title": "Non siamo riusciti a verificare il tuo post",
             "intro": "La verifica automatica del tuo post non è riuscita. Se il link è errato, correggilo e reinvialo qui sotto. Se il link è già corretto, non devi fare nulla — l'agenzia lo controllerà e può verificare il tuo post manualmente.",

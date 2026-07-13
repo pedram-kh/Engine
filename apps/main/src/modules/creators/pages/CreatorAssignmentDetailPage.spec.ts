@@ -167,6 +167,30 @@ describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', 
     expect(wrapper.find('[data-testid="assignment-resubmit-in-place-form"]').exists()).toBe(false)
   })
 
+  // Verified closure banner (AH-047) — the green "process is done" notice.
+  it('renders the verified notice for a manually_verified assignment', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('manually_verified', [], [makePost('not_found')]),
+    })
+    const { wrapper } = await mountDetail()
+
+    const notice = wrapper.find('[data-testid="assignment-verified-notice"]')
+    expect(notice.exists()).toBe(true)
+    expect(notice.text()).toContain('verified by the agency')
+    // No lingering action surfaces.
+    expect(wrapper.find('[data-testid="assignment-resubmit-in-place-form"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-awaiting-verification"]').exists()).toBe(false)
+  })
+
+  it('renders the verified notice for a live_verified assignment', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('live_verified', [], [makePost('verified')]),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-verified-notice"]').exists()).toBe(true)
+  })
+
   // Verification-resolution chunk (ACT3) — the in-place fix form on a failed post.
   it('renders the in-place resubmit form for a posted assignment whose verification FAILED', async () => {
     vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({

@@ -351,6 +351,7 @@
           "retry": "Retry",
           "awaitingReview": "Your draft has been submitted and is awaiting agency review.",
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
+          "verifiedNotice": "Il-post tiegħek ġie vverifikat mill-aġenzija. Dan l-assignment huwa komplut — m'hemmx bżonn ta' aktar azzjoni.",
           "resubmitInPlace": {
             "title": "We couldn't verify your post",
             "intro": "Il-verifika awtomatika tal-post tiegħek fallita. Jekk il-link hija żbaljata, ikkoreġiha u erġa' ibgħatha hawn taħt. Jekk il-link diġà hija korretta, m'hemmx bżonn ta' azzjoni — l-aġenzija ser tirrevediha u tista' tivverifika l-post tiegħek manwalment.",

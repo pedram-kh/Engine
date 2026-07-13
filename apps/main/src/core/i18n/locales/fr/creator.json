@@ -351,6 +351,7 @@
           "retry": "Réessayer",
           "awaitingReview": "Votre brouillon a été soumis et est en attente de l'examen de l'agence.",
           "awaitingVerification": "Votre publication a été enregistrée et est en attente de vérification.",
+          "verifiedNotice": "Votre publication a été vérifiée par l'agence. Cette mission est terminée — aucune action supplémentaire n'est nécessaire.",
           "resubmitInPlace": {
             "title": "Nous n'avons pas pu vérifier votre publication",
             "intro": "La vérification automatique de votre publication a échoué. Si le lien est incorrect, corrigez-le et soumettez-le à nouveau ci-dessous. Si le lien est déjà correct, aucune action n'est nécessaire — l'agence le vérifiera et peut valider votre publication manuellement.",

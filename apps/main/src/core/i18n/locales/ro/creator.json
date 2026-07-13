@@ -351,6 +351,7 @@
           "retry": "Retry",
           "awaitingReview": "Your draft has been submitted and is awaiting agency review.",
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
+          "verifiedNotice": "Postarea ta a fost verificată de agenție. Această misiune este finalizată — nu este necesară nicio acțiune suplimentară.",
           "resubmitInPlace": {
             "title": "We couldn't verify your post",
             "intro": "Verificarea automată a postării tale a eșuat. Dacă linkul este greșit, corectează-l și retrimite-l mai jos. Dacă linkul este deja corect, nu este necesară nicio acțiune — agenția îl va revizui și poate verifica manual postarea ta.",

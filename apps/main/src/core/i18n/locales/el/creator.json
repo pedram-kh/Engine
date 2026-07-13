@@ -351,6 +351,7 @@
           "retry": "Retry",
           "awaitingReview": "Your draft has been submitted and is awaiting agency review.",
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
+          "verifiedNotice": "Η ανάρτησή σας επαληθεύτηκε από το πρακτορείο. Αυτή η ανάθεση έχει ολοκληρωθεί — δεν απαιτείται καμία περαιτέρω ενέργεια.",
           "resubmitInPlace": {
             "title": "We couldn't verify your post",
             "intro": "Η αυτόματη επαλήθευση της ανάρτησής σας απέτυχε. Αν ο σύνδεσμος είναι λανθασμένος, διορθώστε τον και υποβάλετέ τον εκ νέου παρακάτω. Αν ο σύνδεσμος είναι ήδη σωστός, δεν απαιτείται καμία ενέργεια — το πρακτορείο θα τον ελέγξει και μπορεί να επαληθεύσει την ανάρτησή σας χειροκίνητα.",

@@ -351,6 +351,7 @@
           "retry": "Reintentar",
           "awaitingReview": "Tu borrador se ha enviado y está a la espera de la revisión de la agencia.",
           "awaitingVerification": "Tu publicación se ha registrado y está a la espera de verificación.",
+          "verifiedNotice": "Tu publicación ha sido verificada por la agencia. Esta asignación está completa — no se necesita ninguna acción más.",
           "resubmitInPlace": {
             "title": "No hemos podido verificar tu publicación",
             "intro": "La verificación automática de tu publicación ha fallado. Si el enlace es incorrecto, corrígelo y vuelve a enviarlo abajo. Si el enlace ya es correcto, no necesitas hacer nada — la agencia lo revisará y puede verificar tu publicación manualmente.",

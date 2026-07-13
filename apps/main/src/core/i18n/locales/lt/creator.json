@@ -351,6 +351,7 @@
           "retry": "Retry",
           "awaitingReview": "Your draft has been submitted and is awaiting agency review.",
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
+          "verifiedNotice": "Jūsų įrašą patvirtino agentūra. Šis priskyrimas baigtas — daugiau veiksmų nereikia.",
           "resubmitInPlace": {
             "title": "We couldn't verify your post",
             "intro": "Automatinis jūsų įrašo patvirtinimas nepavyko. Jei nuoroda neteisinga, ištaisykite ją ir pateikite iš naujo žemiau. Jei nuoroda jau teisinga, jokių veiksmų nereikia — agentūra ją peržiūrės ir gali patvirtinti jūsų įrašą rankiniu būdu.",
