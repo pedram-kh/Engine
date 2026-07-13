@@ -592,8 +592,12 @@
           "close": "Aizvērt",
           "loadError": "We couldn't load this assignment. Please try again.",
           "tabs": {
+            "messages": "Ziņojumi",
             "detail": "Detail",
             "history": "Movement history"
+          },
+          "messages": {
+            "none": "Šai kartītei vēl nav sarunas."
           },
           "detail": {
             "status": "Statuss",

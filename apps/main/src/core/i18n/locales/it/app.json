@@ -592,8 +592,12 @@
           "close": "Chiudi",
           "loadError": "Impossibile caricare questa assegnazione. Riprova.",
           "tabs": {
+            "messages": "Messaggi",
             "detail": "Dettaglio",
             "history": "Cronologia spostamenti"
+          },
+          "messages": {
+            "none": "Nessuna conversazione per questa scheda al momento."
           },
           "detail": {
             "status": "Stato",

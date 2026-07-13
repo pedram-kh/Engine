@@ -592,8 +592,12 @@
           "close": "Sulge",
           "loadError": "We couldn't load this assignment. Please try again.",
           "tabs": {
+            "messages": "Sõnumid",
             "detail": "Detail",
             "history": "Movement history"
+          },
+          "messages": {
+            "none": "Selle kaardi jaoks pole veel vestlust."
           },
           "detail": {
             "status": "Olek",

@@ -592,8 +592,12 @@
           "close": "Dún",
           "loadError": "We couldn't load this assignment. Please try again.",
           "tabs": {
+            "messages": "Teachtaireachtaí",
             "detail": "Detail",
             "history": "Movement history"
+          },
+          "messages": {
+            "none": "Níl aon chomhrá don chárta seo go fóill."
           },
           "detail": {
             "status": "Stádas",

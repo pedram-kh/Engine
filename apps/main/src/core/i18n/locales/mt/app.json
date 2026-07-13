@@ -592,8 +592,12 @@
           "close": "Agħlaq",
           "loadError": "We couldn't load this assignment. Please try again.",
           "tabs": {
+            "messages": "Messaġġi",
             "detail": "Detail",
             "history": "Movement history"
+          },
+          "messages": {
+            "none": "Għad m'hemm l-ebda konversazzjoni għal din il-karta."
           },
           "detail": {
             "status": "Status",

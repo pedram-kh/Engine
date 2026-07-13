@@ -22,6 +22,20 @@ vi.mock('../api/board.api', () => ({
 vi.mock('@/modules/campaigns/api/campaigns.api', () => ({
   campaignsApi: { showAssignment: vi.fn() },
 }))
+// The Messages tab (campaign-messages chunk) builds an agency chat transport;
+// stub the factory so the ChatPanel stub receives a truthy transport without
+// touching the network.
+vi.mock('@/modules/messaging/api/messaging.api', () => ({
+  agencyChatTransport: vi.fn(() => ({ __transport: true })),
+}))
+
+// Stub ChatPanel — its own thread-fetch/poll is out of scope for the drawer's
+// wiring test; we only assert it mounts with a transport.
+const ChatPanelStub = {
+  name: 'ChatPanel',
+  props: ['transport', 'title'],
+  template: '<div data-test="chat-panel-stub" />',
+}
 
 import { campaignsApi } from '@/modules/campaigns/api/campaigns.api'
 import { boardApi } from '../api/board.api'
@@ -146,7 +160,10 @@ async function mountDrawer(c: BoardCardResource, movements: BoardCardMovementRes
   const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
   const wrapper = mount(BoardCardDrawer, {
     props: { modelValue: true, agencyId: 'agency-ulid', campaignId: 'campaign-ulid', card: c },
-    global: { plugins: [i18n, vuetify], stubs: { VDialog: VDialogStub } },
+    global: {
+      plugins: [i18n, vuetify],
+      stubs: { VDialog: VDialogStub, ChatPanel: ChatPanelStub },
+    },
     attachTo: document.createElement('div'),
   })
   await flushPromises()
@@ -209,6 +226,25 @@ describe('BoardCardDrawer', () => {
   it('hides the Declined history tag for a plain assignment', async () => {
     const wrapper = await mountDrawer(card('a1', { status: 'invited' }), [])
     expect(wrapper.find('[data-test="board-card-drawer-declined-history"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('mounts the Messages tab (default) with the per-assignment chat transport', async () => {
+    const wrapper = await mountDrawer(card('a1'), [])
+    expect(wrapper.find('[data-test="board-card-drawer-tab-messages"]').exists()).toBe(true)
+    // The ChatPanel is mounted with a truthy transport for a real assignment.
+    const panel = wrapper.findComponent(ChatPanelStub)
+    expect(panel.exists()).toBe(true)
+    expect(panel.props('transport')).toBeTruthy()
+    // No "no conversation" fallback for a card with an assignment.
+    expect(wrapper.find('[data-test="board-card-drawer-messages-none"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('shows the "no conversation" note (no ChatPanel) for a removed (null) assignment', async () => {
+    const wrapper = await mountDrawer(card(null), [])
+    expect(wrapper.find('[data-test="board-card-drawer-messages-none"]').exists()).toBe(true)
+    expect(wrapper.findComponent(ChatPanelStub).exists()).toBe(false)
     wrapper.unmount()
   })
 })

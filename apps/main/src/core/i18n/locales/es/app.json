@@ -592,8 +592,12 @@
           "close": "Cerrar",
           "loadError": "No hemos podido cargar esta asignación. Inténtalo de nuevo.",
           "tabs": {
+            "messages": "Mensajes",
             "detail": "Detalle",
             "history": "Historial de movimientos"
+          },
+          "messages": {
+            "none": "Aún no hay conversación para esta tarjeta."
           },
           "detail": {
             "status": "Estado",

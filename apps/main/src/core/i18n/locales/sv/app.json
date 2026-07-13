@@ -592,8 +592,12 @@
           "close": "Stäng",
           "loadError": "Vi kunde inte ladda det här uppdraget. Försök igen.",
           "tabs": {
+            "messages": "Meddelanden",
             "detail": "Detalj",
             "history": "Rörelsehistorik"
+          },
+          "messages": {
+            "none": "Ingen konversation för det här kortet ännu."
           },
           "detail": {
             "status": "Status",

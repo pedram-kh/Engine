@@ -592,8 +592,12 @@
           "close": "Zamknij",
           "loadError": "Nie mogliśmy załadować tego zadania. Spróbuj ponownie.",
           "tabs": {
+            "messages": "Wiadomości",
             "detail": "Szczegóły",
             "history": "Historia ruchów"
+          },
+          "messages": {
+            "none": "Brak konwersacji dla tej karty."
           },
           "detail": {
             "status": "Status",

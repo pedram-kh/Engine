@@ -592,8 +592,12 @@
           "close": "Zavrieť",
           "loadError": "Nepodařilo sa nám načíst tento úkol. Zkuste to znova.",
           "tabs": {
+            "messages": "Správy",
             "detail": "Podrobnosti",
             "history": "Historie přesunů"
+          },
+          "messages": {
+            "none": "Pre túto kartu zatiaľ neexistuje konverzácia."
           },
           "detail": {
             "status": "Stav",

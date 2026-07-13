@@ -592,8 +592,12 @@
           "close": "Fechar",
           "loadError": "Não foi possível carregar esta atribuição. Tente novamente.",
           "tabs": {
+            "messages": "Mensagens",
             "detail": "Detalhe",
             "history": "Histórico de movimentações"
+          },
+          "messages": {
+            "none": "Ainda não há conversa para este cartão."
           },
           "detail": {
             "status": "Status",

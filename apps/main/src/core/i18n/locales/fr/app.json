@@ -592,8 +592,12 @@
           "close": "Fermer",
           "loadError": "Nous n'avons pas pu charger cette mission. Veuillez réessayer.",
           "tabs": {
+            "messages": "Messages",
             "detail": "Détail",
             "history": "Historique des déplacements"
+          },
+          "messages": {
+            "none": "Aucune conversation pour cette carte pour le moment."
           },
           "detail": {
             "status": "Statut",

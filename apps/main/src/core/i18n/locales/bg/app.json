@@ -592,8 +592,12 @@
           "close": "Затворете",
           "loadError": "We couldn't load this assignment. Моля try again.",
           "tabs": {
+            "messages": "Съобщения",
             "detail": "Detail",
             "history": "Movement history"
+          },
+          "messages": {
+            "none": "Все още няма разговор за тази карта."
           },
           "detail": {
             "status": "Статус",

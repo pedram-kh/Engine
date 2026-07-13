@@ -1,9 +1,15 @@
 <script setup lang="ts">
 /**
  * Card drawer (Sprint 12 Chunk 2, D-9). A WIDE v-dialog (the ReviewDraftDrawer
- * pattern — no v-navigation-drawer in this app) opened by clicking a card. Two
- * tabs:
+ * pattern — no v-navigation-drawer in this app) opened by clicking a card.
+ * Three tabs:
  *
+ *   - Messages (DEFAULT, first): the per-assignment chat with this creator,
+ *     mounted from the shared `ChatPanel` on the agency `agencyChatTransport`
+ *     (the same thread the campaign Messages tab uses) so the agency can chat
+ *     straight from the board. Mounted only while the drawer is OPEN (`v-if`),
+ *     so the thread poll stops on close (the ChatDialog pattern). A card whose
+ *     assignment failed to load has no thread → a "no conversation" note.
  *   - Detail: the assignment summary, fetched via `campaignsApi.showAssignment`
  *     (the same agency-side detail the review drawer consumes) — status, creator,
  *     posting due, deliverables, latest draft caption, posted link. Null-safe.
@@ -11,7 +17,8 @@
  *     to names via the store; a since-deleted column renders "(removed)" rather
  *     than a dangling id (§14.3, null-safe).
  *
- * This is a READ surface — no manual-move reason control here (Q2 tech-debt note).
+ * This is a READ surface for Detail + History — no manual-move reason control
+ * here (Q2 tech-debt note); Messages is the one interactive tab.
  */
 
 import { ApiError } from '@catalyst/api-client'
@@ -24,6 +31,8 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { campaignsApi } from '@/modules/campaigns/api/campaigns.api'
+import { agencyChatTransport, type ChatTransport } from '@/modules/messaging/api/messaging.api'
+import ChatPanel from '@/modules/messaging/components/ChatPanel.vue'
 
 import { boardApi } from '../api/board.api'
 import { useBoardStore } from '../stores/useBoardStore'
@@ -42,7 +51,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const store = useBoardStore()
 
-const tab = ref<'detail' | 'history'>('detail')
+const tab = ref<'messages' | 'detail' | 'history'>('messages')
 const detail = ref<AgencyAssignmentDetailResource | null>(null)
 const movements = ref<BoardCardMovementResource[]>([])
 const loading = ref(false)
@@ -56,6 +65,20 @@ const showDeclinedHistory = computed(
   () =>
     assignmentData.value?.previously_declined === true &&
     assignmentData.value.status !== 'declined',
+)
+
+// The per-assignment agency chat transport for the Messages tab. Null for a
+// card whose assignment failed to load (no thread to open) — the tab then
+// shows a "no conversation" note instead of an empty ChatPanel.
+const chatTransport = computed<ChatTransport | null>(() => {
+  const assignmentId = assignmentData.value?.id ?? null
+  if (assignmentId === null) return null
+  return agencyChatTransport(props.agencyId, props.campaignId, assignmentId)
+})
+
+// The chat header label — the creator's name (the counterparty).
+const chatTitle = computed(
+  () => assignmentData.value?.creator?.display_name ?? t('app.campaigns.board.card.unnamed'),
 )
 const latestDraft = computed(() => detail.value?.relationships.drafts[0] ?? null)
 const postedContent = computed(() => detail.value?.relationships.posted_content[0] ?? null)
@@ -84,7 +107,7 @@ async function loadDrawer(): Promise<void> {
   loadError.value = false
   detail.value = null
   movements.value = []
-  tab.value = 'detail'
+  tab.value = 'messages'
 
   const assignmentId = card.relationships.assignment.data?.id ?? null
   try {
@@ -142,6 +165,9 @@ function close(): void {
       </v-card-title>
 
       <v-tabs v-model="tab" density="compact">
+        <v-tab value="messages" data-test="board-card-drawer-tab-messages">
+          {{ t('app.campaigns.board.drawer.tabs.messages') }}
+        </v-tab>
         <v-tab value="detail" data-test="board-card-drawer-tab-detail">
           {{ t('app.campaigns.board.drawer.tabs.detail') }}
         </v-tab>
@@ -152,21 +178,38 @@ function close(): void {
       <v-divider />
 
       <v-card-text style="min-height: 280px">
-        <v-skeleton-loader v-if="loading" type="paragraph" />
+        <v-window v-model="tab">
+          <!-- Messages (default): the per-assignment agency chat, mounted only
+               while the drawer is OPEN so the thread poll stops on close (the
+               ChatDialog pattern). Independent of the detail/movements fetch —
+               a detail load error never blocks messaging. -->
+          <v-window-item value="messages">
+            <ChatPanel
+              v-if="modelValue && chatTransport"
+              :transport="chatTransport"
+              :title="chatTitle"
+            />
+            <p
+              v-else
+              class="text-medium-emphasis text-body-2"
+              data-test="board-card-drawer-messages-none"
+            >
+              {{ t('app.campaigns.board.drawer.messages.none') }}
+            </p>
+          </v-window-item>
 
-        <v-alert
-          v-else-if="loadError"
-          type="error"
-          variant="tonal"
-          density="compact"
-          data-test="board-card-drawer-error"
-        >
-          {{ t('app.campaigns.board.drawer.loadError') }}
-        </v-alert>
-
-        <v-window v-else v-model="tab">
           <v-window-item value="detail" eager>
-            <div data-test="board-card-drawer-detail">
+            <v-skeleton-loader v-if="loading" type="paragraph" />
+            <v-alert
+              v-else-if="loadError"
+              type="error"
+              variant="tonal"
+              density="compact"
+              data-test="board-card-drawer-error"
+            >
+              {{ t('app.campaigns.board.drawer.loadError') }}
+            </v-alert>
+            <div v-else data-test="board-card-drawer-detail">
               <v-list density="compact">
                 <v-list-item>
                   <v-list-item-title>{{
@@ -241,7 +284,17 @@ function close(): void {
           </v-window-item>
 
           <v-window-item value="history" eager>
-            <div data-test="board-card-drawer-history">
+            <v-skeleton-loader v-if="loading" type="paragraph" />
+            <v-alert
+              v-else-if="loadError"
+              type="error"
+              variant="tonal"
+              density="compact"
+              data-test="board-card-drawer-history-error"
+            >
+              {{ t('app.campaigns.board.drawer.loadError') }}
+            </v-alert>
+            <div v-else data-test="board-card-drawer-history">
               <p
                 v-if="movements.length === 0"
                 class="text-medium-emphasis text-body-2"

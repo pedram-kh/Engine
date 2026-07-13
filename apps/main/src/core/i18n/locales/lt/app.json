@@ -592,8 +592,12 @@
           "close": "Uždaryti",
           "loadError": "We couldn't load this assignment. Please try again.",
           "tabs": {
+            "messages": "Žinutės",
             "detail": "Detail",
             "history": "Movement history"
+          },
+          "messages": {
+            "none": "Šiai kortelei dar nėra pokalbio."
           },
           "detail": {
             "status": "Būsena",

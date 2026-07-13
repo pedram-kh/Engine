@@ -592,8 +592,12 @@
           "close": "Zapri",
           "loadError": "Ni nam uspelo načíst tento úkol. Zkuste to znova.",
           "tabs": {
+            "messages": "Poruke",
             "detail": "Podrobnosti",
             "history": "Historie přesunů"
+          },
+          "messages": {
+            "none": "Za ovu karticu još nema razgovora."
           },
           "detail": {
             "status": "Stanje",

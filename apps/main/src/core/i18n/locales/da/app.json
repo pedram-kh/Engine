@@ -592,8 +592,12 @@
           "close": "Luk",
           "loadError": "Denne opgave kunne ikke indlæses. Prøv igen.",
           "tabs": {
+            "messages": "Beskeder",
             "detail": "Detalje",
             "history": "Bevægelseshistorik"
+          },
+          "messages": {
+            "none": "Ingen samtale for dette kort endnu."
           },
           "detail": {
             "status": "Status",

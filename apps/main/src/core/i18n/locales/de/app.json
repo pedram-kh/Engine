@@ -592,8 +592,12 @@
           "close": "Schließen",
           "loadError": "Dieser Auftrag konnte nicht geladen werden. Bitte versuche es erneut.",
           "tabs": {
+            "messages": "Nachrichten",
             "detail": "Details",
             "history": "Bewegungshistorie"
+          },
+          "messages": {
+            "none": "Noch keine Konversation für diese Karte."
           },
           "detail": {
             "status": "Status",

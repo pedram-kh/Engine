@@ -592,8 +592,12 @@
           "close": "Bezárás",
           "loadError": "We couldn't load this assignment. Please try again.",
           "tabs": {
+            "messages": "Üzenetek",
             "detail": "Detail",
             "history": "Movement history"
+          },
+          "messages": {
+            "none": "Ehhez a kártyához még nincs beszélgetés."
           },
           "detail": {
             "status": "Állapot",

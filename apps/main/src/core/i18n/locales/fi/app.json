@@ -592,8 +592,12 @@
           "close": "Sulje",
           "loadError": "We couldn't load this assignment. Please try again.",
           "tabs": {
+            "messages": "Viestit",
             "detail": "Detail",
             "history": "Movement history"
+          },
+          "messages": {
+            "none": "Tälle kortille ei ole vielä keskustelua."
           },
           "detail": {
             "status": "Tila",

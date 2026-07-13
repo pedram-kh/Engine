@@ -592,8 +592,12 @@
           "close": "Sluiten",
           "loadError": "Deze opdracht kon niet worden geladen. Probeer het opnieuw.",
           "tabs": {
+            "messages": "Berichten",
             "detail": "Details",
             "history": "Bewegingshistorie"
+          },
+          "messages": {
+            "none": "Nog geen gesprek voor deze kaart."
           },
           "detail": {
             "status": "Status",

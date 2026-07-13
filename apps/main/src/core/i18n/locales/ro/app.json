@@ -592,8 +592,12 @@
           "close": "Închideți",
           "loadError": "We couldn't load this assignment. Please try again.",
           "tabs": {
+            "messages": "Mesaje",
             "detail": "Detail",
             "history": "Movement history"
+          },
+          "messages": {
+            "none": "Încă nu există o conversație pentru acest card."
           },
           "detail": {
             "status": "Stare",

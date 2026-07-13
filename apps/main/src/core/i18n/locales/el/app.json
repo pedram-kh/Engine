@@ -592,8 +592,12 @@
           "close": "Κλείσιμο",
           "loadError": "We couldn't load this assignment. Please try again.",
           "tabs": {
+            "messages": "Μηνύματα",
             "detail": "Detail",
             "history": "Movement history"
+          },
+          "messages": {
+            "none": "Δεν υπάρχει ακόμη συνομιλία για αυτήν την κάρτα."
           },
           "detail": {
             "status": "Κατάσταση",

@@ -592,8 +592,12 @@
           "close": "Close",
           "loadError": "We couldn't load this assignment. Please try again.",
           "tabs": {
+            "messages": "Messages",
             "detail": "Detail",
             "history": "Movement history"
+          },
+          "messages": {
+            "none": "No conversation for this card yet."
           },
           "detail": {
             "status": "Status",
