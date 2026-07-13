@@ -12,6 +12,7 @@ use App\Modules\Campaigns\Mail\DraftSubmittedForReviewMail;
 use App\Modules\Campaigns\Mail\PostManuallyVerifiedMail;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
+use App\Modules\Creators\Models\Contract;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use App\Modules\Notifications\Enums\NotificationChannel;
@@ -138,6 +139,11 @@ it('draft-submitted fans out in-app to admins+managers (staff excluded), email s
 it('contracted fans out in-app to admins+managers (staff excluded), email stays single-inviter', function (): void {
     Mail::fake();
     $s = fanOutSetup();
+    // A genuine per-campaign contract acceptance — contract_id set so the
+    // acceptance fan-out fires. A contract-less advance is intentionally silent
+    // (AH-042 Q1 — covered by CampaignAssignmentContractTest).
+    $contract = Contract::factory()->create();
+    $s['assignment']->forceFill(['contract_id' => $contract->id])->save();
 
     event(new AssignmentTransitioned(
         assignment: $s['assignment'],

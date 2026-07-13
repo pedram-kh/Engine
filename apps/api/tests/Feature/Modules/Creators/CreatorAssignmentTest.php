@@ -115,6 +115,10 @@ it('emits the invite-offer context (fee_per, offer_description, offer_attachment
 it('accepts an invited assignment (invited → accepted) via the state machine', function (): void {
     [$user, $creator] = creatorUser();
     $assignment = invitedAssignmentFor($creator);
+    // requires=true keeps the accept landing at `accepted` in isolation. A
+    // requires=false campaign now auto-advances straight to `contracted`
+    // (AH-042 D2 — covered by CampaignAssignmentContractTest).
+    $assignment->campaign()->update(['requires_per_campaign_contract' => true]);
 
     $this->actingAs($user)
         ->postJson(assignmentUrl($assignment, 'accept'))
