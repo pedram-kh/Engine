@@ -60,6 +60,287 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+> **AH-033 → AH-041 are one direct-iteration fix batch** (the AH-007 pattern: Pedram
+> directs each change interactively, no per-item kickoff; one independent review + one
+> close-out at the end). Nine themes, committed as small conventional commits
+> (`cc86bb8 … fdbec40`, atop the AH-032 baseline `7051123`). Stop-gate exceptions taken
+> mid-batch on Pedram's explicit call are recorded per entry. Close-out Steps 1–2 ran
+> the full backend Pest suite, both SPA Vitest suites, and the **entire Playwright E2E
+> suite (24/24 green — 22 main + 2 admin)** against all four new migrations. **This batch
+> adds three schema migrations + one data backfill to the next deploy** (see the deploy
+> note in `RESUMPTION-TEMPLATE.md` Part 2). Push HELD at close-out.
+
+### AH-041 · Reject guard + board wiring (Cancelled / Rejected)
+
+- **Status:** Landed
+- **Date:** 2026-07-13
+- **Why:** Rejecting a draft is a **terminal** action (the assignment ends, the creator
+  cannot resubmit, the thread closes) but the agency got no warning before clicking it;
+  and a rejected assignment's card stayed wherever it was — no board column reflected
+  "rejected".
+- **What:**
+  - A confirmation dialog guards the terminal draft-reject action in `ReviewDraftDrawer`
+    ("Rejecting is final… use Request changes instead"), with a "Keep reviewing" escape.
+  - The default **"Cancelled"** board column is renamed **"Cancelled / Rejected"**, and the
+    `assignment.draft_rejected` audit event is wired as a **10th default automation** that
+    auto-moves the card to that column.
+  - A **data backfill** migration renames existing default-named terminal-failure columns
+    and inserts the new automation for boards that lack it.
+  - Column name forced onto one line (`text-no-wrap` + `text-truncate`); the
+    closed-conversation chat notice restyled from `info` to **`error`** (red).
+- **Touched:** `apps/api/app/Modules/Boards/Support/BoardDefaults.php`,
+  `apps/api/database/migrations/2026_07_13_110000_backfill_cancelled_rejected_board_column.php`,
+  `apps/api/tests/Feature/Modules/Boards/{BoardApiTest,BoardAutomationServiceTest,BoardLazyHealTest,BoardProvisioningServiceTest,OverdueScanTest}.php`,
+  `apps/main/src/modules/boards/components/BoardColumn.vue`,
+  `apps/main/src/modules/campaigns/components/ReviewDraftDrawer.{vue,spec.ts}`,
+  `apps/main/src/modules/messaging/components/ChatPanel.vue`,
+  `apps/main/src/core/i18n/locales/*/app.json` (24, `rejectConfirm` block).
+- **Decisions:** **reject now has a cross-module side effect** — Campaigns' draft-reject
+  fires an audit event that the Boards automation engine consumes (a new Campaigns→Boards
+  coupling, recorded here). The backfill **renames only default-named terminal-failure
+  columns** (`name = 'Cancelled' AND is_terminal_failure = true`), so an agency that
+  renamed the column keeps its name — **test-pinned** in `BoardProvisioningServiceTest`.
+  Automation insert is **idempotent on `(board_id, event_key)`**. `down()` is deliberately
+  **blunt** in the opposite direction: it **deletes ALL `assignment.draft_rejected`
+  automations** (including any later seeded by provisioning — the default is now part of
+  provisioning) and **conditionally renames back** any `Cancelled / Rejected` terminal-failure
+  column to `Cancelled` (which would also catch a legitimately custom column of that exact
+  name — low risk, since that name is now the default). The `is_terminal_*` flags stay
+  semantic labels, not gating logic.
+- **Ref:** `18d9845` (confirm dialog), `30bdcd8` (rename + automation + backfill),
+  `1f16fe8` (one-line column + red notice). **Stop-gate exceptions** (Pedram's explicit
+  call): the `rejectConfirm` i18n keys ×24 and the rename + data-backfill migration.
+
+### AH-040 · Draft submissions — external links + chat-style composer
+
+- **Status:** Landed
+- **Date:** 2026-07-13
+- **Why:** The draft form asked for **hashtags/mentions** that nothing consumed, the media
+  input was a bare `v-file-input`, and creators needed to attach **external links**
+  (hosted video, doc, reference) alongside files.
+- **What:** Hid the hashtags/mentions inputs on **both** the creator draft form and the
+  agency `ReviewDraftDrawer`; replaced the file input with a **chat-style two-icon
+  composer** (paperclip = file, link = link dialog, mirroring the messaging composer);
+  added **real external-link support** persisted on the draft (`links` jsonb) and rendered
+  back on the review side.
+- **Touched:** `apps/api/database/migrations/2026_07_13_100000_add_links_to_campaign_drafts.php`,
+  `apps/api/app/Modules/Campaigns/Models/CampaignDraft.php`,
+  `apps/api/app/Modules/Campaigns/Http/Resources/CampaignDraftResource.php`,
+  `apps/api/app/Modules/Creators/Http/Controllers/CreatorAssignmentDraftController.php`,
+  `apps/api/tests/Feature/Modules/Creators/CreatorAssignmentDraftTest.php`,
+  `apps/main/src/modules/creators/pages/CreatorAssignmentDetailPage.{vue,spec.ts}`,
+  `apps/main/src/modules/campaigns/components/ReviewDraftDrawer.{vue,spec.ts}`,
+  `packages/api-client/src/types/campaign.ts`.
+- **Decisions:** URL validation is a **`url:http,https` scheme allowlist**, **max 10 links
+  / 2048-char url / 255-char name**. Links render as **plain anchors with
+  `rel="noopener noreferrer"` + `target="_blank"`** (no preview fetch, no unfurl — a link
+  is inert text). Hashtags/mentions follow the **AH-032 retained-and-preserved-by-omission
+  pattern**: the columns, validation, and Resource emission stay; only the UI is dropped,
+  so nothing is lost and re-surfacing them is a pure front-end change.
+- **Ref:** `832f9ca` (links backend + migration + resource), `44afe5c` (composer + drop
+  hashtags/mentions), `e1ee4b2` (Media label above the icons). **Stop-gate exceptions**
+  (Pedram's explicit call, "do both a and b"): the `links` migration + api-client shape +
+  validation rules (real link persistence, not just a visual affordance).
+
+### AH-039 · Board card facelift + drawer Detail-tab redesign
+
+- **Status:** Landed
+- **Date:** 2026-07-13
+- **Why:** The board card face and the drawer's Detail tab were sparse — no photo, no fee
+  context, no deliverables, no progress at a glance.
+- **What:**
+  - **Card face:** creator avatar, **bold** name (matching the drawer header), deliverable
+    chips, fee-per line, and the brand **aurora gradient** as the accent strip (replacing
+    the per-column color token).
+  - **Drawer Detail tab:** redesigned into an identity header (avatar + name + status +
+    campaign · brand), **invite-offer terms** (fee / per / description / attachment),
+    deliverable chips, a **five-step progress timeline**, and latest-draft / posted-link
+    rows, with locale-aware date-format fixes.
+  - Card face is **preserved across a move** (the `move` response re-selects avatar, fee,
+    and decline-history so the face doesn't degrade after a drag).
+- **Touched:** `apps/api/app/Modules/Boards/Http/Controllers/{BoardController,BoardCardController}.php`,
+  `apps/api/app/Modules/Boards/Http/Resources/BoardCardResource.php`,
+  `apps/api/app/Modules/Campaigns/Http/Controllers/CampaignAssignmentReviewController.php`,
+  `apps/api/tests/Feature/Modules/Boards/{BoardApiTest,BoardManualMoveTest}.php`,
+  `apps/api/tests/Feature/Modules/Campaigns/CampaignAssignmentReviewTest.php`,
+  `apps/main/src/modules/boards/components/{BoardCard,BoardCardDrawer}.{vue,spec.ts}`,
+  `apps/main/src/modules/boards/components/BoardColumn.vue`,
+  `apps/main/tests/unit/architecture/form-error-pattern.spec.ts`,
+  `packages/api-client/src/types/{board,campaign}.ts`,
+  `apps/main/src/core/i18n/locales/*/app.json` (24, `board.drawer.detail` block).
+- **Decisions:** **API-resource-shape stop-gate exception** — `BoardCardResource` now emits
+  `avatar_url` + fee fields, and the review `show` emits `fee_per` / `offer_description` /
+  `offer_attachment` (signed) / `invited_at`. Signed attachment URL is emission-scoped
+  (60-min, AH-004). The aurora strip uses `var(--brand-aurora-gradient)` (an allowed
+  surface per the architectural CSS-token lint); the `colorToken` prop was removed.
+- **Ref:** `32e21f6` (concept card), `ec1596d` (keep face on move), `0930db1` (drawer
+  Detail redesign), `3ebbfb4` (bold name). **Stop-gate exceptions**: API resource shape +
+  the `board.drawer.detail` i18n keys ×24 (approved as items 1–5 of the proposal).
+
+### AH-038 · Discover card redesign (Phase A — front-end only)
+
+- **Status:** Landed
+- **Date:** 2026-07-13
+- **Why:** The discover card was a plain list tile; Pedram wanted a **photo-forward,
+  concept-inspired** card (from an uploaded reference), explicitly **Phase A only** —
+  pure restyle on existing data.
+- **What:** Full-width hero avatar block, name with a connection-state indicator, an
+  icon-based meta row (country + language/accent), ≤3 category chips with a **"+N"
+  overflow** chip, and a footer row (connection state + view-profile icon). Cards made
+  **~30% smaller** via tighter grid breakpoints, a **5:4 landscape** hero to match the
+  concept ratio, and **CSS container queries** so text/chips/icons scale with the card
+  (the font-to-card ratio holds as the viewport shrinks).
+- **Touched:** `apps/main/src/modules/discover/pages/DiscoverPage.vue`.
+- **Decisions:** **Phase A = pure front-end** — no backend, resource, gate, or i18n change
+  (all data already on the wire). `container-type: inline-size` + `cqi`/`clamp()` units for
+  proportional scaling. No stop-gate triggered.
+- **Ref:** `7b49e54` (photo-forward restyle), `71800a0` (~30% smaller), `3e96a53` (5:4
+  ratio), `fd3630e` (one-line categories + `+N`), `677cd64` (container-query scaling).
+
+### AH-037 · Board card drawer — Campaign messages tab
+
+- **Status:** Landed
+- **Date:** 2026-07-13
+- **Why:** Agencies wanted to read and reply to the per-assignment chat **from the board
+  card** rather than navigating away to the campaign messaging surface.
+- **What:** A **"Messages"** tab added as the **first and default** tab in the board card
+  drawer, mounting the existing `ChatPanel` keyed per assignment; a "no conversation" note
+  when the card has no assignment data.
+- **Touched:** `apps/main/src/modules/boards/components/BoardCardDrawer.{vue,spec.ts}`,
+  `apps/main/src/core/i18n/locales/*/app.json` (24, tab label + `none` note).
+- **Decisions:** **`ChatPanel` reuses `agencyChatTransport` with ZERO new provisioning**
+  — the AH-012 lesson held. The drawer is a **read/reply mount of the existing
+  campaign-messaging surface**; it introduces no new thread-creation path and inherits the
+  same Sprint-11 campaign-messaging gate. The Messages tab is **independent of the
+  detail/movements fetch**, so it renders even if the Detail tab's data errors.
+- **Ref:** `79298f8`. **Stop-gate exception**: the Messages-tab i18n keys ×24 (label +
+  "no conversation" note).
+
+### AH-036 · Invitation + admin readability fixes
+
+- **Status:** Landed
+- **Date:** 2026-07-13
+- **Why:** Three small visibility problems: the admin **"Pending approval"** nav item was
+  truncated, the creator invitation **fee + start/end dates** were crammed on one line, and
+  the **"View post"** button was near-invisible in dark mode.
+- **What:** Widened the admin sidebar `280px → 304px`; put fee and posting window on
+  separate lines in the creator invitation list; brightened the View-post button
+  (`secondary` → `primary`).
+- **Touched:** `apps/admin/src/core/layouts/AdminLayout.vue`,
+  `apps/main/src/modules/creators/pages/CreatorAssignmentsPage.vue`,
+  `apps/main/src/modules/campaigns/pages/CampaignDetailPage.vue`.
+- **Decisions:** Pure styling — no shape, prop, or i18n change. No stop-gate.
+- **Ref:** `a4c778b` (sidebar width), `a073b47` (fee/date lines), `3286590` (View-post
+  brightness).
+
+### AH-035 · Re-offer after decline (declined → invited)
+
+- **Status:** Landed
+- **Date:** 2026-07-13
+- **Why:** Re-inviting a **declined** creator silently no-op'd — the invite endpoint's
+  idempotency returned the existing declined row with a `200`, so the agency saw a success
+  toast but no new invitation and no updated offer ever reached the creator.
+- **What:** A new state-machine edge `reofferAfterDecline` (`declined → invited`); the
+  invite controller routes a declined existing row through it (other statuses keep the
+  idempotent no-op); a muted **"Declined"** history tag surfaces on the Creators tab, the
+  board card face, and the drawer; the creator-side **counter UI is removed entirely**.
+- **Touched:** `apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php`,
+  `apps/api/app/Modules/Campaigns/Http/Controllers/CampaignAssignmentController.php`,
+  `apps/api/app/Modules/Campaigns/Http/Resources/CampaignAssignmentResource.php`,
+  `apps/api/app/Modules/Campaigns/Models/CampaignAssignment.php`,
+  `apps/api/database/migrations/2026_07_12_110000_add_previously_declined_to_campaign_assignments.php`,
+  `apps/api/app/Modules/Boards/Http/{Controllers/BoardController.php,Resources/BoardCardResource.php}`,
+  `apps/api/tests/Feature/Modules/{Campaigns/CampaignAssignmentStateMachineTest,Campaigns/CampaignAssignmentInviteTest,Boards/BoardApiTest}.php`,
+  `apps/main/src/modules/boards/components/{BoardCard,BoardCardDrawer}.{vue,spec.ts}`,
+  `apps/main/src/modules/campaigns/pages/CampaignDetailPage.{vue,spec.ts}`,
+  `apps/main/src/modules/creators/pages/CreatorAssignmentsPage.{vue,spec.ts}`,
+  `packages/api-client/src/types/{campaign,board}.ts`.
+- **Decisions:**
+  - `declined → invited` **overwrites the full offer** (fee / currency / per / description /
+    attachment) + **clears `responded_at`** + **raises `previously_declined`**.
+  - **Fail-closed from any non-declined source** (`assertSource([Declined])`) — the batch's
+    only state-machine change, so a **break-revert was executed at close-out** (Part A3):
+    widening the guard to include `Accepted` turned the fail-closed unit test red
+    (`reofferAfterDecline: a non-declined source throws invalid_transition`), then reverted
+    to green — proving the guard is load-bearing.
+  - **Idempotent no-op preserved** on non-declined existing rows (invited/accepted/etc.
+    still return the existing row unchanged).
+  - Audit verb **reuses `assignment.re_invited`** (`AssignmentReInvited`) — no new action.
+  - The **creator counter UI is removed** while the **counter API remains fail-closed**
+    (`invited`-only) — recorded as **API-without-UI tech-debt**.
+  - `previously_declined` is **agency-side only** (`CampaignAssignmentResource` +
+    `BoardCardResource`), **never creator-visible** (verified, S7).
+- **Ref:** `34f5e84` (machine edge + migration), `64222b5` (api-client),
+  `5626ddf` (history tag + drop counter), `2d56cbd` (board resource),
+  `c9cba2a` (api-client board), `edfc56e` (card + drawer tag). **Stop-gate exception**
+  (Option 2, Pedram's explicit call): the `previously_declined` migration + state-machine
+  edge + resource shape.
+
+### AH-034 · Invite-offer context — fee-per, description, attachment, roster avatars
+
+- **Status:** Landed
+- **Date:** 2026-07-13
+- **Why:** An invite carried only a bare fee. Agencies wanted to say what the fee is **per**
+  (e.g. "per script"), add a free-text **description** of expectations, attach a **file**,
+  and see **real creator photos** (not initial avatars) in the invite modal.
+- **What:** Added `fee_per` + `offer_description` free-text to the invite payload and the
+  assignment; a **presigned-S3 offer attachment**, **campaign-keyed** (uploaded once per
+  invite batch, before any assignment row); surfaced the offer context on the invitation
+  card and the creator's assignment surfaces; showed real `avatar_url` in the invite
+  roster.
+- **Touched:** `apps/api/app/Modules/Campaigns/Http/{Controllers/CampaignAssignmentController.php,Requests/InviteAssignmentRequest.php,Resources/CampaignAssignmentResource.php}`,
+  `apps/api/app/Modules/Campaigns/Models/CampaignAssignment.php`,
+  `apps/api/app/Modules/Campaigns/Routes/api.php`,
+  `apps/api/app/Modules/Campaigns/Services/AssignmentOfferAttachmentUploadService.php`,
+  `apps/api/app/Modules/Agencies/Http/Controllers/AgencyCreatorController.php`,
+  `apps/api/app/Modules/Creators/Http/Controllers/{CreatorAssignmentController,CreatorAssignmentDraftController}.php`,
+  `apps/api/database/migrations/2026_07_12_100000_add_offer_fields_to_campaign_assignments.php`,
+  `apps/api/tests/Feature/Modules/{Campaigns/CampaignAssignmentInviteTest,Creators/CreatorAssignmentTest,Agencies/AgencyCreatorRosterTest}.php`,
+  `apps/main/src/modules/campaigns/{api/campaigns.api.ts,components/InviteCreatorsDialog.vue,pages/CampaignDetailPage.vue}`,
+  `apps/main/src/modules/creators/pages/{CreatorAssignmentDetailPage.vue,CreatorAssignmentsPage.{vue,spec.ts}}`,
+  `packages/api-client/src/types/{campaign,agency}.ts`,
+  `apps/main/src/core/i18n/locales/*/app.json` (24).
+- **Decisions:**
+  - The presigned flow **mirrors the messaging-attachment posture**: supported raster
+    images are re-encoded/EXIF-stripped at complete time (`PortfolioImageProcessor`, 50 MP
+    decompression-bomb guard); **non-image types are stored without content sniffing** —
+    recorded as **tech-debt** (extends the platform-wide AV gap).
+  - **Emission-scoped signed URLs** (60-min TTL, AH-004 posture), minted only inside an
+    already-authorized resource emission.
+  - **Cross-campaign prefix isolation pinned** — `assertUploadBelongs` requires the
+    `upload_id` to sit under `agencies/{agency}/campaigns/{campaign}/offer-attachments/`;
+    cross-campaign / cross-agency paths are rejected.
+  - **`tenancy.md §4` updated in the closure commit** (`fdbec40`) with the two attachment
+    routes, annotated as full-standard-tenant-stack (NOT scope bypasses).
+  - Roster `avatar_url` added on a **bounded, paginated** list (the AH-013 precedent — not
+    an N+1 concern).
+- **Ref:** `ac76e0f` (backend + migration + service + routes), `eb901db` (api-client),
+  `6b2dc5a` (invite dialog: Per + description + attachment + real avatars),
+  `8e9093b` (creator sees the offer context). **Stop-gate exception** (Items 1 + 3,
+  Pedram's explicit call): the offer-fields migration + resource shape + validation +
+  two new routes + i18n keys.
+
+### AH-033 · Campaign overview — name, duration, full description, contract requirement
+
+- **Status:** Landed
+- **Date:** 2026-07-13
+- **Why:** The campaign overview should show the campaign **name**, its **duration**, and
+  the **full description**, drop the **Objective (UGC)** row, and state whether the campaign
+  **requires a per-campaign contract**.
+- **What:** Show campaign name + start/end duration; removed the objective row; render the
+  full description **without** Vuetify's subtitle truncation; added a "Requires a
+  per-campaign contract" row as the **last** item.
+- **Touched:** `apps/main/src/modules/campaigns/pages/CampaignDetailPage.vue`.
+- **Decisions:** **No new i18n key** — reused existing keys and represented the
+  contract-requirement boolean with an **icon** (Required / Not required) rather than new
+  text keys, keeping the item inside the fast batch. A scoped style overrides
+  `v-list-item-subtitle` truncation (`white-space: pre-wrap; word-break: break-word;`). No
+  backend or resource change — everything reads from existing `CampaignResource`
+  attributes.
+- **Ref:** `cc86bb8` (name + duration + full description, drop objective), `9805b3b`
+  (contract-requirement row), `0ae30d9` (row moved to last). No stop-gate (existing i18n +
+  icon for the boolean).
+
 ### AH-032 · Campaign-creation form simplification
 
 - **Status:** Landed

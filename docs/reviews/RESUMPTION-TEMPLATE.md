@@ -104,24 +104,29 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-12 · **Through:** AH-032 (ad-hoc run) · **HEAD:** the AH-032 close-out
-commit (`docs: close AH-032 review, refresh resumption template`), sitting atop the AH-032 pair
-`d1f2608` (feat) + `797ba05` (AH-032 docs), atop the prior baseline `4c1a154` — a **three-commit
-trio** (`git rev-list --left-right --count origin/main...HEAD` = `0 3`). _(The close-out commit is
-not pinned by SHA here — a commit can't contain its own hash; the two SHAs above are the stable
-pins.)_ Prior baseline **`4c1a154`** = the AH-029–031 docs commit, i.e. AH-018–031 are **already
-pushed** (the earlier templates' blanket "push HELD across AH-018→031" prose was stale; the repo ref
-is the source of truth). **Push:** the AH-032 trio is pushed this session on Pedram's call —
-post-push `origin/main` = HEAD (the close-out commit).
+**Last updated:** 2026-07-13 · **Through:** AH-041 (ad-hoc run) · **HEAD:** the AH-033→AH-041
+close-out **docs** commit, sitting atop the **direct-iteration fix batch** `cc86bb8 … fdbec40` (33
+code/spec commits + the Part-A closure commit `fdbec40`), atop the AH-032 baseline **`7051123`**
+(`docs: close AH-032 review, refresh resumption template`) — which is `origin/main` (the AH-032 trio
+was pushed on Pedram's call at the prior close-out). _(The docs commit is not pinned by SHA here — a
+commit can't contain its own hash; `7051123` is the stable baseline pin, `fdbec40` the last code
+commit below it.)_ **Push:** **HELD** for the whole AH-033→AH-041 batch — nothing pushed this
+session; `git rev-list --count 7051123..HEAD` = **34** (33 batch commits + this docs commit).
+**⚠ Next-deploy note:** this batch adds **three schema migrations + one data backfill** — run
+`php artisan migrate` before serving: `2026_07_12_100000_add_offer_fields_to_campaign_assignments`,
+`2026_07_12_110000_add_previously_declined_to_campaign_assignments`,
+`2026_07_13_100000_add_links_to_campaign_drafts` (schema), and
+`2026_07_13_110000_backfill_cancelled_rejected_board_column` (data backfill — renames default
+"Cancelled" columns to "Cancelled / Rejected" + inserts the draft-rejected automation; idempotent).
 
 ### Delivered
 
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-032 — all Landed** (AH-001–031 pushed at `origin/main` = `4c1a154`; the
-  **AH-032 trio is committed with push HELD**). One line each (detail + decisions in
-  `docs/reviews/adhoc-changes-log.md`):
+- **Ad-hoc run AH-001 → AH-041 — all Landed** (AH-001–032 pushed at `origin/main` = `7051123`; the
+  **AH-033→AH-041 direct-iteration batch is committed with push HELD**). One line each (detail +
+  decisions in `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.
   - **AH-003** — Wizard slim + profile-basics polish.
@@ -182,6 +187,36 @@ post-push `origin/main` = HEAD (the close-out commit).
     on every save) — pinned by a byte-identical preservation test + a tech-debt forward-guard. i18n
     orphan cleanup ×24 (`fields.objective`/`objective.*` kept for the Overview tab); parity green.
     Full loop, review closed (`docs/reviews/campaign-form-simplification-review.md`).
+  - **AH-033** — Campaign overview: show name + duration + full description (scoped-style override of
+    Vuetify's subtitle truncation), drop the Objective row, add "Requires a per-campaign contract" as
+    the last item. Front-end only; no new i18n (icon for the boolean); no BE/shape change.
+  - **AH-034** — Invite-offer context: `fee_per` + `offer_description` free-text + a **presigned,
+    campaign-keyed offer attachment** (images EXIF-stripped; non-image types stored without content
+    sniff — tech-debt) + real roster avatars. Emission-scoped signed URLs (60-min, AH-004);
+    cross-campaign prefix isolation pinned; `tenancy.md §4` updated in the closure commit.
+  - **AH-035** — Re-offer after decline: `declined → invited` machine edge overwrites the full offer
+    - clears `responded_at` + raises `previously_declined`; fail-closed from any non-declined source
+      (**break-revert executed** at close-out); idempotent no-op on non-declined rows; audit reuses
+      `assignment.re_invited`; creator counter UI removed while the counter API stays fail-closed
+      (tech-debt); `previously_declined` is agency-side only, never creator-visible.
+  - **AH-036** — Readability fixes: widen the admin sidebar 280→304px, fee/dates on separate lines in
+    the creator invitation list, brighten the View-post button. Pure styling.
+  - **AH-037** — Board card drawer **Messages** tab (first + default): mounts `ChatPanel` via
+    `agencyChatTransport` with **zero new provisioning** (AH-012 lesson held); "no conversation" note
+    for assignment-less cards.
+  - **AH-038** — Discover card redesign (**Phase A, front-end only**): photo-forward hero, connection
+    indicator, icon meta row, ≤3 chips + `+N` overflow, footer; ~30% smaller grid, 5:4 hero, and
+    **container-query** content scaling. No BE/i18n change.
+  - **AH-039** — Board card facelift + drawer Detail-tab redesign: avatar / bold name / chips / fee /
+    aurora accent on the face; identity + offer-terms + deliverables + 5-step timeline in the drawer;
+    card face preserved on move. API-resource-shape + i18n stop-gate exceptions.
+  - **AH-040** — Draft submissions: hide hashtags/mentions (retained-and-preserved-by-omission,
+    AH-032 pattern), chat-style two-icon composer, and real external `links` (jsonb; `url:http,https`
+    allowlist, max 10/2048/255; plain anchors with `noopener noreferrer`).
+  - **AH-041** — Reject guard + board wiring: confirm dialog on the terminal draft-reject; "Cancelled"
+    → "Cancelled / Rejected" + a 10th default automation (`assignment.draft_rejected` auto-moves the
+    card) + a data backfill (default-named-only rename, idempotent automation insert, `down()` blunt);
+    one-line column name; red closed-conversation notice. New Campaigns→Boards coupling recorded.
 
   > **Not an AH entry:** `docs/runbooks/production-queue-worker.md` (`12a7ef5`) landed this session
   > as a docs-only ops runbook (supervisord/systemd config + the `queue:restart` deploy hook,
@@ -245,3 +280,10 @@ post-push `origin/main` = HEAD (the close-out commit).
   - **Completeness-formula recompute is manual** (AH-026) — a formula change leaves un-touched rows
     stale until an operator runs `creators:recompute-completeness`. No scheduler; it's a documented
     post-deploy step. Re-run it on the next weights/floor/split change.
+  - **Attachment content-verification gap** (AH-034, extends AH-010a) — four upload surfaces
+    (portfolio, campaign + relationship messaging, offer attachments) store non-image types without a
+    magic-byte sniff and no type without an AV scan. Trigger: a platform-wide AV/content-verification
+    workstream → one shared sniff-and-scan-on-complete seam.
+  - **Counter flow is API-without-UI** (AH-035) — the counter endpoint + `counter()` machine edge +
+    tests stay (fail-closed, `invited`-only), but no client calls them. Trigger: a product decision to
+    restore (re-wire a client) or remove (delete route + edge + tests together).

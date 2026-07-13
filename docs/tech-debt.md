@@ -38,6 +38,31 @@ anyone reviewing it later.
 
 ---
 
+## Counter-offer flow is API-without-UI (endpoint fail-closed, no client)
+
+- **Where:** the Campaigns assignment counter path — `CampaignAssignmentStateMachine::counter()`
+  (`invited → countered`), its controller action + route, and its tests. The creator-facing
+  **counter UI was removed** in AH-035 (the re-offer-after-decline feature covers the negotiation
+  need from the agency side), but the **backend counter capability was deliberately left in place**.
+- **What we accepted (AH-035, July 13, 2026):** the counter endpoint + state-machine edge + their
+  tests **remain**, fail-closed (`invited`-only source guard, same fail-closed matrix as every other
+  transition), but **no client calls them** — the `CreatorAssignmentsPage` counter button + dialog
+  are gone. This is a conscious **API-without-UI** state, not dead code: keeping the endpoint means
+  the machine edge stays covered and re-enabling counter is a pure front-end change, while removing
+  it would be a coordinated route + machine-edge + tests deletion. Removing UI without touching the
+  API is the lower-risk half of the decision.
+- **Trigger:** a product decision to **restore** the counter feature (re-add the client, no backend
+  work) **or** to **remove** it for good (then the route, the `counter()` machine edge, and their
+  tests must be deleted **together** — a half-removal that drops the route but leaves the edge, or
+  vice-versa, is the failure mode to avoid).
+- **Resolution:** either re-wire a counter client to the existing endpoint, or delete the route +
+  machine edge + tests as one coherent change.
+- **Owner:** whoever next owns the invite/negotiation product decision.
+- **Status:** open (by design). Surfaced by AH-035, July 13, 2026
+  ([ad-hoc log](reviews/adhoc-changes-log.md)).
+
+---
+
 ## Campaign brief/description is invisible to creators + brief-write forward-guard
 
 - **Where:** the campaign `brief` jsonb blob + `description` column
@@ -157,8 +182,9 @@ anyone reviewing it later.
 - **Two deferrals ride AH-010a (each a discrete, isolated block):**
   1. **Relationship-message DIGEST is deferred (D5).** The Sprint-11 `MessageDigestService` / `UnreadMessagesDigestMail` is campaign-shaped (it derefs `assignment->campaign` for queries + labels). Relationship messaging ships with **in-app unread + the new in-app notification types** covering the alerting need; the daily email digest is not extended to relationship threads this chunk. **Triggered by** a product call that relationship DMs need an email digest. **Resolution:** generalize the digest query/labelling to take a thread subject (rides the consolidation trigger above).
   2. **`relationship_messages.deleted_at` is present-but-unwritten.** The column is laid down (the campaign-`messages` D-14 parity) but **no delete endpoint ships** — message deletion is out of scope (no path on either surface). **Triggered by** a moderation/redaction sprint. **Resolution:** add the soft-delete write path + the read filter.
-- **Virus scanning is OUT (platform-wide gap, not AH-010-specific).** Relationship-message file attachments are MIME/size/prefix-validated + (for images) EXIF-stripped, but **not virus-scanned** — the same gap campaign messaging + portfolio uploads carry. Logged here so the relationship surface is not assumed safer than it is. **Triggered by** a platform-wide AV pass. **Resolution:** a shared scan-on-complete seam across all upload surfaces.
-- **Owner:** the next sprint that opens campaign messaging for change (consolidation + digest); a future moderation sprint (`deleted_at`); a platform-wide AV pass (scanning).
+- **Virus scanning + content verification are OUT (platform-wide gap, not AH-010-specific).** Relationship-message file attachments are MIME/size/prefix-validated + (for images) EXIF-stripped, but **not virus-scanned** — the same gap campaign messaging + portfolio uploads carry. Logged here so the relationship surface is not assumed safer than it is. **Triggered by** a platform-wide AV pass. **Resolution:** a shared scan-on-complete seam across all upload surfaces.
+  - **Extended by AH-034 (invite-offer attachment, July 13, 2026):** the new `AssignmentOfferAttachmentUploadService` (campaign-keyed presigned S3, images re-encoded/EXIF-stripped via `PortfolioImageProcessor`) inherits the **same posture**, so the gap is now on **four** upload surfaces: portfolio, campaign messaging, relationship messaging, and offer attachments. Two facets, both platform-wide: (1) **non-image types** (PDF / doc / xls / csv / txt / video) are stored **without a magic-byte content sniff** — the accepted MIME is the client-declared `Content-Type`, never verified against the object's actual bytes, so a mislabeled or polyglot file lands under its declared type; (2) **no AV scan** on any type. **Triggered by** a platform-wide AV/content-verification workstream. **Resolution:** a single shared scan-and-sniff-on-complete seam applied uniformly across all four `*AttachmentUploadService` / portfolio complete paths (magic-byte sniff to confirm declared MIME + AV scan), rather than per-surface.
+- **Owner:** the next sprint that opens campaign messaging for change (consolidation + digest); a future moderation sprint (`deleted_at`); a platform-wide AV/content-verification pass (scanning + magic-byte sniff across all four upload surfaces).
 - **Status:** open (by design). Surfaced + deliberately deferred by AH-010a, June 29, 2026 ([ad-hoc log](reviews/adhoc-changes-log.md)).
 
 ---
