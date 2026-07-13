@@ -317,7 +317,9 @@ function openProfile(item: DiscoveryCreatorListItem): void {
     <!-- Card grid -->
     <template v-else>
       <v-row dense data-test="discover-grid">
-        <v-col v-for="item in items" :key="item.id" cols="12" sm="6" md="4" lg="3">
+        <!-- ~30% smaller cards: tighter breakpoints pack more per row (2→3,
+             3→4, 4→6), shrinking each card proportionally (hero keeps ratio). -->
+        <v-col v-for="item in items" :key="item.id" cols="6" sm="4" md="3" lg="2">
           <v-card
             variant="outlined"
             class="discover-card h-100 d-flex flex-column"
