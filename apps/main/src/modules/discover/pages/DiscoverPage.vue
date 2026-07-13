@@ -382,14 +382,28 @@ function openProfile(item: DiscoveryCreatorListItem): void {
                 </span>
               </div>
 
-              <div class="d-flex flex-wrap ga-1 mt-2">
+              <!-- Single-line chip row (concept keeps categories on one row):
+                   show at most 2, collapse the rest into a "+N" chip so the
+                   body height — and thus the content-to-image proportion —
+                   stays identical across breakpoints. -->
+              <div class="discover-card__cats d-flex ga-1 mt-2">
                 <v-chip
-                  v-for="cat in (item.attributes.categories ?? []).slice(0, 3)"
+                  v-for="cat in (item.attributes.categories ?? []).slice(0, 2)"
                   :key="cat"
                   size="x-small"
                   variant="outlined"
+                  class="flex-shrink-0"
                 >
                   {{ t(`creator.ui.wizard.categories.${cat}`, cat) }}
+                </v-chip>
+                <v-chip
+                  v-if="(item.attributes.categories?.length ?? 0) > 2"
+                  size="x-small"
+                  variant="tonal"
+                  class="flex-shrink-0"
+                  :data-test="`discover-cats-more-${item.id}`"
+                >
+                  +{{ (item.attributes.categories?.length ?? 0) - 2 }}
                 </v-chip>
               </div>
 
@@ -464,6 +478,11 @@ function openProfile(item: DiscoveryCreatorListItem): void {
     rgba(var(--v-theme-primary), 0.18),
     rgba(var(--v-theme-surface), 0.4)
   );
+}
+.discover-card__cats {
+  flex-wrap: nowrap;
+  overflow: hidden;
+  min-height: 20px;
 }
 .discover-card__footer {
   border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
