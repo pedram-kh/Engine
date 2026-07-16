@@ -40,6 +40,23 @@ return [
             'ignore' => 'Ha nem ismeri ezt az ügynökséget, egyszerűen utasítsa el — semmi sem változik, amíg el nem fogadja.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Fejezze be a Catalyst-fiókja beállítását',
+            'greeting' => 'Szia :name,',
+            'body' => 'Elkezdte létrehozni a Catalyst alkotói fiókját, de még nem erősítette meg az e-mail-címét. Erősítse meg most, hogy onnan folytathassa, ahol abbahagyta, és befejezhesse a regisztrációt.',
+            'cta' => 'E-mail-cím megerősítése',
+            'expiry' => 'Ez a hivatkozás :hours óra múlva lejár. Ha lejár, a bejelentkezési oldalon kérhet újat.',
+            'ignore' => 'Ha nem Ön kezdeményezte ezt a regisztrációt, nyugodtan figyelmen kívül hagyhatja ezt az e-mailt.',
+        ],
+        'finish' => [
+            'subject' => 'Fejezze be a Catalyst alkotói profilja beállítását',
+            'greeting' => 'Szia :name,',
+            'body' => 'Elkezdte beállítani a Catalyst alkotói profilját, de még nem fejezte be. Folytassa onnan, ahol abbahagyta, hogy befejezze a regisztrációt.',
+            'cta' => 'Profil befejezése',
+            'ignore' => 'Ha már befejezte a profilját, nyugodtan figyelmen kívül hagyhatja ezt az e-mailt.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency frissítette az együttműködési státuszát a Catalystban',

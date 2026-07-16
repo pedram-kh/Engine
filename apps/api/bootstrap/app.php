@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Console\Commands\ScanOverdueAssignments;
+use App\Console\Commands\SendIncompleteCreatorNudges;
 use App\Console\Commands\SendMessageDigests;
 use App\Core\Errors\ValidationExceptionRenderer;
 use App\Core\Tenancy\EnsureTenancyContext;
@@ -36,6 +37,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // time-triggered board events for assignments past their posting/draft
         // deadline (a cross-agency sweep with per-card tenant self-resolution).
         $schedule->command(ScanOverdueAssignments::class)->daily();
+
+        // Incomplete-creator email nudge (D6): the daily one-time onboarding
+        // nudge. Flag-gated inside the service (incomplete_creator_nudge_enabled,
+        // default OFF) — this runs every day but is a no-op until an operator
+        // enables the flag from the admin Feature-flags page.
+        $schedule->command(SendIncompleteCreatorNudges::class)->daily();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         // Sanctum SPA cookie auth. EnsureFrontendRequestsAreStateful is

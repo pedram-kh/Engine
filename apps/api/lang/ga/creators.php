@@ -40,6 +40,23 @@ return [
             'ignore' => 'Mura n-aithníonn tú an ghníomhaireacht seo, diúltaigh di — ní athróidh aon rud go dtí go nglacfaidh tú leis.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Cuir bailchríoch ar shocrú do chuntais Catalyst',
+            'greeting' => 'Dia duit :name,',
+            'body' => 'Thosaigh tú ag cruthú do chuntas cruthaitheora ar Catalyst, ach níor dhearbhaigh tú do sheoladh ríomhphoist go fóill. Dearbhaigh anois é chun leanúint ar aghaidh ón áit ar stad tú agus do chlárú a chríochnú.',
+            'cta' => 'Dearbhaigh mo ríomhphost',
+            'expiry' => 'Rachaidh an nasc seo in éag i gceann :hours uair an chloig. Má théann sé in éag, is féidir leat ceann nua a iarraidh ón leathanach logála isteach.',
+            'ignore' => 'Mura tusa a thosaigh an clárú seo, is féidir leat neamhaird a dhéanamh den ríomhphost seo.',
+        ],
+        'finish' => [
+            'subject' => 'Cuir bailchríoch ar shocrú do phróifíle cruthaitheora Catalyst',
+            'greeting' => 'Dia duit :name,',
+            'body' => 'Thosaigh tú ag socrú do phróifíl chruthaitheora ar Catalyst, ach níor chríochnaigh tú go fóill í. Lean ar aghaidh ón áit ar stad tú chun do chlárú a chríochnú.',
+            'cta' => 'Críochnaigh mo phróifíl',
+            'ignore' => 'Má chríochnaigh tú do phróifíl cheana féin, is féidir leat neamhaird a dhéanamh den ríomhphost seo.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => 'D\'nuashonraigh :agency do stádas comhoibrithe ar Catalyst',

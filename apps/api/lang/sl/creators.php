@@ -40,6 +40,23 @@ return [
             'ignore' => 'Če te agencije ne poznate, jo preprosto zavrnite — nič se ne bo spremenilo, dokler ne sprejmete.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Dokončajte nastavitev svojega računa Catalyst',
+            'greeting' => 'Pozdravljeni, :name,',
+            'body' => 'Začeli ste ustvarjati svoj račun ustvarjalca na Catalystu, vendar še niste potrdili svojega e-poštnega naslova. Potrdite ga zdaj, da nadaljujete, kjer ste ostali, in dokončate registracijo.',
+            'cta' => 'Potrdi e-pošto',
+            'expiry' => 'Ta povezava poteče čez :hours ur. Če poteče, lahko na prijavni strani zahtevate novo.',
+            'ignore' => 'Če te registracije niste začeli vi, lahko to sporočilo mirno prezrete.',
+        ],
+        'finish' => [
+            'subject' => 'Dokončajte nastavitev svojega profila ustvarjalca na Catalystu',
+            'greeting' => 'Pozdravljeni, :name,',
+            'body' => 'Začeli ste nastavljati svoj profil ustvarjalca na Catalystu, vendar ga še niste dokončali. Nadaljujte, kjer ste ostali, da dokončate registracijo.',
+            'cta' => 'Dokončaj profil',
+            'ignore' => 'Če ste svoj profil že dokončali, lahko to sporočilo mirno prezrete.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency je posodobila vaš status sodelovanja na Catalyst',

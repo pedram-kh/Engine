@@ -40,6 +40,23 @@ return [
             'ignore' => 'Jekk ma tafsx din l-aġenzija, irrifjutaha biss — xejn ma jinbidel sakemm ma taċċettax.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Temm il-konfigurazzjoni tal-kont Catalyst tiegħek',
+            'greeting' => 'Bonġu :name,',
+            'body' => 'Bdejt toħloq il-kont tiegħek ta\' kreatur fuq Catalyst, iżda għadek ma kkonfermajtx l-indirizz elettroniku tiegħek. Ikkonfermah issa biex tkompli minn fejn waqaft u ttemm ir-reġistrazzjoni tiegħek.',
+            'cta' => 'Ikkonferma l-email tiegħi',
+            'expiry' => 'Din il-link tiskadi fi :hours siegħa. Jekk tiskadi, tista\' titlob waħda ġdida mill-paġna tad-dħul.',
+            'ignore' => 'Jekk ma bdejtx int din ir-reġistrazzjoni, tista\' tinjora din l-email.',
+        ],
+        'finish' => [
+            'subject' => 'Temm il-konfigurazzjoni tal-profil ta\' kreatur tiegħek fuq Catalyst',
+            'greeting' => 'Bonġu :name,',
+            'body' => 'Bdejt tikkonfigura l-profil tiegħek ta\' kreatur fuq Catalyst, iżda għadek ma temmejtux. Kompli minn fejn waqaft biex ittemm ir-reġistrazzjoni tiegħek.',
+            'cta' => 'Temm il-profil tiegħi',
+            'ignore' => 'Jekk diġà temmejt il-profil tiegħek, tista\' tinjora din l-email.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency aġġornat l-istatus tal-kollaborazzjoni tiegħek fuq Catalyst',

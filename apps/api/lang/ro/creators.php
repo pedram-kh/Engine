@@ -40,6 +40,23 @@ return [
             'ignore' => 'Dacă nu cunoașteți această agenție, respingeți-o — nimic nu se va schimba până când nu acceptați.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Finalizează configurarea contului tău Catalyst',
+            'greeting' => 'Bună :name,',
+            'body' => 'Ai început să îți creezi contul de creator pe Catalyst, dar nu ți-ai confirmat încă adresa de e-mail. Confirm-o acum pentru a relua de unde ai rămas și a-ți finaliza înregistrarea.',
+            'cta' => 'Confirmă e-mailul',
+            'expiry' => 'Acest link expiră în :hours ore. Dacă expiră, poți solicita unul nou din pagina de autentificare.',
+            'ignore' => 'Dacă nu tu ai început această înregistrare, poți ignora acest e-mail.',
+        ],
+        'finish' => [
+            'subject' => 'Finalizează configurarea profilului tău de creator pe Catalyst',
+            'greeting' => 'Bună :name,',
+            'body' => 'Ai început să îți configurezi profilul de creator pe Catalyst, dar nu l-ai finalizat încă. Reia de unde ai rămas pentru a-ți finaliza înregistrarea.',
+            'cta' => 'Finalizează profilul',
+            'ignore' => 'Dacă ți-ai finalizat deja profilul, poți ignora acest e-mail.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency și-a actualizat statutul de colaborare cu dvs. pe Catalyst',

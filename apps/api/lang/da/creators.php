@@ -40,6 +40,23 @@ return [
             'ignore' => 'Hvis du ikke kender dette bureau, kan du blot afvise anmodningen — ingenting ændres, før du accepterer.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Færdiggør opsætningen af din Catalyst-konto',
+            'greeting' => 'Hej :name,',
+            'body' => 'Du er begyndt at oprette din Catalyst-skaberkonto, men har endnu ikke bekræftet din e-mailadresse. Bekræft den nu for at fortsætte, hvor du slap, og færdiggøre din registrering.',
+            'cta' => 'Bekræft min e-mail',
+            'expiry' => 'Dette link udløber om :hours timer. Hvis det udløber, kan du anmode om et nyt fra login-siden.',
+            'ignore' => 'Hvis du ikke har startet denne registrering, kan du roligt ignorere denne e-mail.',
+        ],
+        'finish' => [
+            'subject' => 'Færdiggør opsætningen af din Catalyst-skaberprofil',
+            'greeting' => 'Hej :name,',
+            'body' => 'Du er begyndt at opsætte din Catalyst-skaberprofil, men har endnu ikke gjort den færdig. Fortsæt, hvor du slap, for at færdiggøre din registrering.',
+            'cta' => 'Færdiggør min profil',
+            'ignore' => 'Hvis du allerede har færdiggjort din profil, kan du roligt ignorere denne e-mail.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency har opdateret din samarbejdsstatus på Catalyst',

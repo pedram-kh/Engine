@@ -40,6 +40,23 @@ return [
             'ignore' => 'Wenn du diese Agentur nicht kennst, kannst du die Anfrage einfach ablehnen – es ändert sich nichts, bis du sie annimmst.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Schließen Sie die Einrichtung Ihres Catalyst-Kontos ab',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Sie haben begonnen, Ihr Catalyst-Creator-Konto zu erstellen, aber Ihre E-Mail-Adresse noch nicht bestätigt. Bestätigen Sie sie jetzt, um dort weiterzumachen, wo Sie aufgehört haben, und Ihre Registrierung abzuschließen.',
+            'cta' => 'E-Mail-Adresse bestätigen',
+            'expiry' => 'Dieser Link läuft in :hours Stunden ab. Falls er abläuft, können Sie auf der Anmeldeseite einen neuen anfordern.',
+            'ignore' => 'Wenn Sie diese Registrierung nicht gestartet haben, können Sie diese E-Mail ignorieren.',
+        ],
+        'finish' => [
+            'subject' => 'Schließen Sie die Einrichtung Ihres Catalyst-Creator-Profils ab',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Sie haben begonnen, Ihr Catalyst-Creator-Profil einzurichten, es aber noch nicht abgeschlossen. Machen Sie dort weiter, wo Sie aufgehört haben, um Ihre Registrierung abzuschließen.',
+            'cta' => 'Profil vervollständigen',
+            'ignore' => 'Wenn Sie Ihr Profil bereits abgeschlossen haben, können Sie diese E-Mail ignorieren.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency hat deinen Kooperationsstatus auf Catalyst aktualisiert',

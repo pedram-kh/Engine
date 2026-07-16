@@ -40,6 +40,23 @@ return [
             'ignore' => 'Jos et tunne tätä toimistoa, hylkää se — mikään ei muutu ennen kuin hyväksyt.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Viimeistele Catalyst-tilisi käyttöönotto',
+            'greeting' => 'Hei :name,',
+            'body' => 'Aloitit Catalyst-tekijätilisi luomisen, mutta et ole vielä vahvistanut sähköpostiosoitettasi. Vahvista se nyt jatkaaksesi siitä, mihin jäit, ja viimeistelläksesi rekisteröitymisen.',
+            'cta' => 'Vahvista sähköpostini',
+            'expiry' => 'Tämä linkki vanhenee :hours tunnin kuluttua. Jos se vanhenee, voit pyytää uuden kirjautumissivulta.',
+            'ignore' => 'Jos et aloittanut tätä rekisteröitymistä, voit jättää tämän viestin huomiotta.',
+        ],
+        'finish' => [
+            'subject' => 'Viimeistele Catalyst-tekijäprofiilisi',
+            'greeting' => 'Hei :name,',
+            'body' => 'Aloitit Catalyst-tekijäprofiilisi määrittämisen, mutta et ole vielä saanut sitä valmiiksi. Jatka siitä, mihin jäit, viimeistelläksesi rekisteröitymisen.',
+            'cta' => 'Viimeistele profiilini',
+            'ignore' => 'Jos olet jo viimeistellyt profiilisi, voit jättää tämän viestin huomiotta.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency on päivittänyt yhteistyöstatuksesi Catalystissa',

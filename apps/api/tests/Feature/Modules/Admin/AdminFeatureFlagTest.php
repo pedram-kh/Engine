@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Creators\Features\ContractSigningEnabled;
+use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
@@ -57,7 +58,8 @@ it('lists every registered flag with its current state', function (): void {
     $names = array_map(static fn (array $row): string => $row['attributes']['name'], $rows);
 
     expect($names)->toContain(KycVerificationEnabled::NAME)
-        ->and($names)->toContain(ContractSigningEnabled::NAME);
+        ->and($names)->toContain(ContractSigningEnabled::NAME)
+        ->and($names)->toContain(IncompleteCreatorNudgeEnabled::NAME);
     expect($response->json('data.0.attributes'))->toHaveKeys([
         'name', 'label', 'description', 'enabled',
     ]);

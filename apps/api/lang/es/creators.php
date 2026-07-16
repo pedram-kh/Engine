@@ -40,6 +40,23 @@ return [
             'ignore' => 'Si no reconoces a esta agencia, simplemente puedes rechazarla: no cambia nada hasta que aceptes.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Termina de configurar tu cuenta de Catalyst',
+            'greeting' => 'Hola :name,',
+            'body' => 'Empezaste a crear tu cuenta de creador en Catalyst, pero aún no has confirmado tu dirección de correo electrónico. Confírmala ahora para retomar donde lo dejaste y completar tu registro.',
+            'cta' => 'Confirmar mi correo',
+            'expiry' => 'Este enlace caduca en :hours horas. Si caduca, puedes solicitar uno nuevo desde la página de inicio de sesión.',
+            'ignore' => 'Si no iniciaste este registro, puedes ignorar este correo sin problema.',
+        ],
+        'finish' => [
+            'subject' => 'Termina de configurar tu perfil de creador en Catalyst',
+            'greeting' => 'Hola :name,',
+            'body' => 'Empezaste a configurar tu perfil de creador en Catalyst, pero aún no lo has terminado. Retoma donde lo dejaste para completar tu registro.',
+            'cta' => 'Completar mi perfil',
+            'ignore' => 'Si ya has completado tu perfil, puedes ignorar este correo sin problema.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency ha actualizado tu estado de colaboración en Catalyst',

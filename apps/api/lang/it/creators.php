@@ -40,6 +40,23 @@ return [
             'ignore' => 'Se non riconosci questa agenzia, puoi semplicemente rifiutare — nulla cambia finché non accetti.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Completa la configurazione del tuo account Catalyst',
+            'greeting' => 'Ciao :name,',
+            'body' => 'Hai iniziato a creare il tuo account creator su Catalyst, ma non hai ancora confermato il tuo indirizzo email. Confermalo ora per riprendere da dove avevi lasciato e completare la registrazione.',
+            'cta' => 'Conferma la tua email',
+            'expiry' => 'Questo link scade tra :hours ore. Se scade, puoi richiederne uno nuovo dalla pagina di accesso.',
+            'ignore' => 'Se non hai avviato tu questa registrazione, puoi ignorare questa email.',
+        ],
+        'finish' => [
+            'subject' => 'Completa la configurazione del tuo profilo creator su Catalyst',
+            'greeting' => 'Ciao :name,',
+            'body' => 'Hai iniziato a configurare il tuo profilo creator su Catalyst, ma non hai ancora finito. Riprendi da dove avevi lasciato per completare la registrazione.',
+            'cta' => 'Completa il tuo profilo',
+            'ignore' => 'Se hai già completato il tuo profilo, puoi ignorare questa email.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency ha aggiornato il tuo stato di collaborazione su Catalyst',

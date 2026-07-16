@@ -40,6 +40,23 @@ return [
             'ignore' => 'Als je dit bureau niet kent, kun je het verzoek gewoon weigeren — er verandert niets tot je het accepteert.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Voltooi het instellen van je Catalyst-account',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Je bent begonnen met het aanmaken van je Catalyst-creatoraccount, maar hebt je e-mailadres nog niet bevestigd. Bevestig het nu om verder te gaan waar je gebleven was en je registratie te voltooien.',
+            'cta' => 'Mijn e-mailadres bevestigen',
+            'expiry' => 'Deze link verloopt over :hours uur. Als hij verloopt, kun je een nieuwe aanvragen via de inlogpagina.',
+            'ignore' => 'Als je deze registratie niet bent begonnen, kun je deze e-mail veilig negeren.',
+        ],
+        'finish' => [
+            'subject' => 'Voltooi het instellen van je Catalyst-creatorprofiel',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Je bent begonnen met het instellen van je Catalyst-creatorprofiel, maar hebt het nog niet voltooid. Ga verder waar je gebleven was om je registratie te voltooien.',
+            'cta' => 'Mijn profiel voltooien',
+            'ignore' => 'Als je je profiel al hebt voltooid, kun je deze e-mail veilig negeren.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency heeft je samenwerkingsstatus op Catalyst bijgewerkt',

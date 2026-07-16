@@ -6,6 +6,7 @@ namespace App\Modules\Creators;
 
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
+use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
@@ -254,6 +255,7 @@ final class CreatorsServiceProvider extends ServiceProvider
         Feature::define(ContractSigningEnabled::NAME, ContractSigningEnabled::default());
         Feature::define(SocialVerificationEnabled::NAME, SocialVerificationEnabled::default());
         Feature::define(PerCampaignContractEnabled::NAME, PerCampaignContractEnabled::default());
+        Feature::define(IncompleteCreatorNudgeEnabled::NAME, IncompleteCreatorNudgeEnabled::default());
     }
 
     private function registerRoutes(): void

@@ -40,6 +40,23 @@ return [
             'ignore' => 'Om du inte känner igen den här byrån kan du helt enkelt avböja — ingenting ändras förrän du accepterar.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Slutför konfigurationen av ditt Catalyst-konto',
+            'greeting' => 'Hej :name,',
+            'body' => 'Du har börjat skapa ditt Catalyst-kreatörskonto men har ännu inte bekräftat din e-postadress. Bekräfta den nu för att fortsätta där du slutade och slutföra din registrering.',
+            'cta' => 'Bekräfta min e-post',
+            'expiry' => 'Den här länken upphör att gälla om :hours timmar. Om den upphör kan du begära en ny från inloggningssidan.',
+            'ignore' => 'Om du inte påbörjade den här registreringen kan du bortse från det här e-postmeddelandet.',
+        ],
+        'finish' => [
+            'subject' => 'Slutför konfigurationen av din Catalyst-kreatörsprofil',
+            'greeting' => 'Hej :name,',
+            'body' => 'Du har börjat konfigurera din Catalyst-kreatörsprofil men har ännu inte slutfört den. Fortsätt där du slutade för att slutföra din registrering.',
+            'cta' => 'Slutför min profil',
+            'ignore' => 'Om du redan har slutfört din profil kan du bortse från det här e-postmeddelandet.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency har uppdaterat din samarbetsstatus på Catalyst',

@@ -68,6 +68,7 @@ use Illuminate\Support\Carbon;
  * @property bool $tax_profile_complete
  * @property bool $payout_method_set
  * @property Carbon|null $submitted_at
+ * @property Carbon|null $incomplete_nudge_sent_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -140,6 +141,7 @@ final class Creator extends Model implements Auditable
         'tax_profile_complete',
         'payout_method_set',
         'submitted_at',
+        'incomplete_nudge_sent_at',
     ];
 
     /**
@@ -292,6 +294,7 @@ final class Creator extends Model implements Auditable
             'kyc_verified_at' => 'datetime',
             'last_active_at' => 'datetime',
             'submitted_at' => 'datetime',
+            'incomplete_nudge_sent_at' => 'datetime',
             'click_through_accepted_at' => 'datetime',
             'tax_profile_complete' => 'boolean',
             'payout_method_set' => 'boolean',

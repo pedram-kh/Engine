@@ -40,6 +40,26 @@ return [
             'ignore' => 'If you don\'t recognise this agency, you can simply decline — nothing changes until you accept.',
         ],
     ],
+    // Incomplete-creator email nudge (scheduled, once-only). Transactional
+    // tone — "finish the registration you started" — GDPR Contract basis, no
+    // promotional language (see docs/reviews/incomplete-creator-nudge-review.md).
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Finish setting up your Catalyst account',
+            'greeting' => 'Hi :name,',
+            'body' => 'You started creating your Catalyst creator account but haven\'t confirmed your email address yet. Confirm it now to pick up where you left off and finish your registration.',
+            'cta' => 'Confirm your email',
+            'expiry' => 'This link expires in :hours hours. If it lapses, you can request a new one from the sign-in page.',
+            'ignore' => 'If you didn\'t start this registration, you can safely ignore this email.',
+        ],
+        'finish' => [
+            'subject' => 'Finish setting up your Catalyst creator profile',
+            'greeting' => 'Hi :name,',
+            'body' => 'You started setting up your Catalyst creator profile but haven\'t finished yet. Pick up where you left off to complete your registration.',
+            'cta' => 'Finish your profile',
+            'ignore' => 'If you\'ve already finished your profile, you can safely ignore this email.',
+        ],
+    ],
     // Sprint 7 (D-4). Generic by design — no reason, no scope/type detail.
     'blacklisted' => [
         'email' => [

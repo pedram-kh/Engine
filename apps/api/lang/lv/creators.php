@@ -40,6 +40,23 @@ return [
             'ignore' => 'Ja nepazīstat šo aģentūru, vienkārši noraidiet to — nekas nemainīsies, kamēr nepieņemsiet.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Pabeidziet sava Catalyst konta iestatīšanu',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Jūs sākāt veidot savu Catalyst satura veidotāja kontu, taču vēl neesat apstiprinājis savu e-pasta adresi. Apstipriniet to tagad, lai turpinātu no vietas, kur pārtraucāt, un pabeigtu reģistrāciju.',
+            'cta' => 'Apstiprināt e-pastu',
+            'expiry' => 'Šī saite zaudēs derīgumu pēc :hours stundām. Ja tā zaudēs derīgumu, varat pieprasīt jaunu pieteikšanās lapā.',
+            'ignore' => 'Ja šo reģistrāciju sākāt nevis jūs, varat šo e-pastu droši ignorēt.',
+        ],
+        'finish' => [
+            'subject' => 'Pabeidziet sava Catalyst satura veidotāja profila iestatīšanu',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Jūs sākāt iestatīt savu Catalyst satura veidotāja profilu, taču vēl neesat to pabeidzis. Turpiniet no vietas, kur pārtraucāt, lai pabeigtu reģistrāciju.',
+            'cta' => 'Pabeigt profilu',
+            'ignore' => 'Ja jau esat pabeidzis savu profilu, varat šo e-pastu droši ignorēt.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency ir atjauninājusi jūsu sadarbības statusu Catalyst platformā',

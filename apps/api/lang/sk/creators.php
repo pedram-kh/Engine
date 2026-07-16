@@ -40,6 +40,23 @@ return [
             'ignore' => 'Ak túto agentúru nepoznáte, môžete ju jednoducho odmietnuť — nič sa nezmení, kým neprijmete.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Dokončite nastavenie svojho účtu Catalyst',
+            'greeting' => 'Dobrý deň, :name,',
+            'body' => 'Začali ste si vytvárať účet tvorcu na Catalyst, ale zatiaľ ste nepotvrdili svoju e-mailovú adresu. Potvrďte ju teraz, aby ste mohli pokračovať tam, kde ste prestali, a dokončiť registráciu.',
+            'cta' => 'Potvrdiť e-mail',
+            'expiry' => 'Tento odkaz vyprší o :hours hodín. Ak vyprší, môžete si vyžiadať nový na prihlasovacej stránke.',
+            'ignore' => 'Ak ste túto registráciu nezačali, môžete tento e-mail ignorovať.',
+        ],
+        'finish' => [
+            'subject' => 'Dokončite nastavenie svojho profilu tvorcu na Catalyst',
+            'greeting' => 'Dobrý deň, :name,',
+            'body' => 'Začali ste si nastavovať profil tvorcu na Catalyst, ale zatiaľ ste ho nedokončili. Pokračujte tam, kde ste prestali, a dokončite registráciu.',
+            'cta' => 'Dokončiť profil',
+            'ignore' => 'Ak už máte profil dokončený, môžete tento e-mail ignorovať.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency aktualizovala váš stav spolupráce na Catalyst',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
+use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
@@ -74,6 +75,14 @@ it('registers contract_signing_enabled with default OFF', function (): void {
     expect(Feature::active(ContractSigningEnabled::NAME))->toBeFalse();
 });
 
+it('registers incomplete_creator_nudge_enabled with default OFF', function (): void {
+    // Gates an outbound email side effect (the scheduled incomplete-creator
+    // nudge), so it ships OFF: an un-flipped instance sends nothing. The
+    // operator flips it globally after previewing volume via --dry-run.
+    expect(IncompleteCreatorNudgeEnabled::NAME)->toBe('incomplete_creator_nudge_enabled');
+    expect(Feature::active(IncompleteCreatorNudgeEnabled::NAME))->toBeFalse();
+});
+
 it('registers social_verification_enabled with a DRIVER-BASED default — ON under the mock driver (Sprint 9 Chunk 2, D-11)', function (): void {
     // Driver-based default (see SocialVerificationEnabled docblock): the mock
     // provider makes NO vendor calls, so the "no silent vendor calls" rationale
@@ -139,6 +148,7 @@ it('round-trips activate / deactivate for each Phase-1 flag (no scope arg per Ph
             KycVerificationEnabled::NAME,
             CreatorPayoutMethodEnabled::NAME,
             ContractSigningEnabled::NAME,
+            IncompleteCreatorNudgeEnabled::NAME,
             // social_verification_enabled is intentionally excluded — it has a
             // driver-based default (ON under the mock driver, the test env),
             // so it does not start from the default-OFF state. Its own default

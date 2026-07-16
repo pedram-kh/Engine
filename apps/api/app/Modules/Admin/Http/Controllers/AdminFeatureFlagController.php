@@ -9,6 +9,7 @@ use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
+use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
@@ -69,6 +70,10 @@ final class AdminFeatureFlagController
         PerCampaignContractEnabled::NAME => [
             'label' => 'Per-campaign contracts',
             'description' => 'Switches contract scope to per-campaign instead of per-creator.',
+        ],
+        IncompleteCreatorNudgeEnabled::NAME => [
+            'label' => 'Incomplete-creator nudge',
+            'description' => 'Sends a one-time email to creators sitting incomplete for 48+ hours.',
         ],
     ];
 

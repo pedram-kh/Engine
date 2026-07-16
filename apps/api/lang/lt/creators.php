@@ -40,6 +40,23 @@ return [
             'ignore' => 'Jei nepažįstate šios agentūros, tiesiog atmeskite ją — niekas nepasikeis, kol nepriimsite.',
         ],
     ],
+    'incomplete_nudge' => [
+        'verify' => [
+            'subject' => 'Užbaikite „Catalyst“ paskyros nustatymą',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Pradėjote kurti savo „Catalyst“ kūrėjo paskyrą, bet dar nepatvirtinote savo el. pašto adreso. Patvirtinkite jį dabar, kad galėtumėte tęsti nuo ten, kur baigėte, ir užbaigti registraciją.',
+            'cta' => 'Patvirtinti el. paštą',
+            'expiry' => 'Ši nuoroda nustos galioti po :hours val. Jei ji nustos galioti, galite paprašyti naujos prisijungimo puslapyje.',
+            'ignore' => 'Jei šios registracijos pradėjote ne jūs, galite nepaisyti šio el. laiško.',
+        ],
+        'finish' => [
+            'subject' => 'Užbaikite „Catalyst“ kūrėjo profilio nustatymą',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Pradėjote nustatyti savo „Catalyst“ kūrėjo profilį, bet dar jo nebaigėte. Tęskite nuo ten, kur baigėte, kad užbaigtumėte registraciją.',
+            'cta' => 'Užbaigti profilį',
+            'ignore' => 'Jei savo profilį jau užbaigėte, galite nepaisyti šio el. laiško.',
+        ],
+    ],
     'blacklisted' => [
         'email' => [
             'subject' => ':agency atnaujino jūsų bendradarbiavimo statusą Catalyst platformoje',
