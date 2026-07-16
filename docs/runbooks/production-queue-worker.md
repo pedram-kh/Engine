@@ -173,3 +173,118 @@ php artisan queue:failed
   `creators:recompute-completeness` run": a **separate** post-deploy artisan
   step (one-shot, idempotent), not a worker concern, listed here so deploy
   checklists find both.
+
+---
+
+## 7. The scheduler (`schedule:run`) — required, separate from the worker
+
+The queue worker (§1–§6) drains jobs that have **already been dispatched**. It
+does **not** trigger time-based commands. Those are registered in
+`apps/api/bootstrap/app.php` via `withSchedule()` and only fire if Laravel's
+scheduler runs once a minute:
+
+| Command                           | Cadence   | What it does when it fires                                                           |
+| --------------------------------- | --------- | ------------------------------------------------------------------------------------ |
+| `messages:send-digest`            | `daily()` | Queues the daily unread-messages digest (Sprint 11, D-9).                            |
+| `boards:scan-overdue`             | `daily()` | Fires overdue board events (Sprint 12 Chunk 3, D-5; class `ScanOverdueAssignments`). |
+| `creators:send-incomplete-nudges` | `daily()` | The incomplete-creator nudge — **a no-op until the flag is enabled** (see below).    |
+
+**Without `schedule:run`, none of these ever fire** — the incomplete-creator
+nudge will silently never send even after the flag is flipped ON. This is the
+scheduler's equivalent of the §1 "no worker → nothing sends" incident.
+
+### 7.1 The cron entry (standard)
+
+The scheduler is a single cron line that runs **every minute**; Laravel decides
+internally which commands are actually due:
+
+```cron
+* * * * * cd /var/www/catalyst/apps/api && php artisan schedule:run >> /dev/null 2>&1
+```
+
+Add it to the deploy user's crontab (`crontab -e` as `www-data`, or a file in
+`/etc/cron.d/`). The command must run with the **same `.env` as the API +
+worker** (same DB, same `QUEUE_CONNECTION`) — the scheduled commands only
+_queue_ Mailables, so the §1 worker must also be running for anything to be
+delivered.
+
+### 7.2 systemd timer (alternative, if you prefer no crontab)
+
+`/etc/systemd/system/catalyst-scheduler.service` + `.timer`:
+
+```ini
+# catalyst-scheduler.service
+[Unit]
+Description=Catalyst Engine scheduler tick
+
+[Service]
+Type=oneshot
+User=www-data
+WorkingDirectory=/var/www/catalyst/apps/api
+ExecStart=/usr/bin/php artisan schedule:run
+```
+
+```ini
+# catalyst-scheduler.timer
+[Unit]
+Description=Run the Catalyst scheduler every minute
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now catalyst-scheduler.timer
+sudo systemctl list-timers catalyst-scheduler.timer
+```
+
+Pick **one** of the cron / timer approaches — never both.
+
+### 7.3 First-enable procedure for the incomplete-creator nudge
+
+The nudge command runs daily but is gated by the `incomplete_creator_nudge_enabled`
+Pennant flag (default **OFF** — see `docs/feature-flags.md`). To turn it on
+safely:
+
+1. **Preview volume (mutates nothing, ignores the flag):**
+
+   ```bash
+   php artisan creators:send-incomplete-nudges --dry-run
+   # → [dry-run] would send N nudge(s): verify=X, finish=Y (cap 50). No changes made.
+   ```
+
+   The `(cap 50)` is the **per-run limit** — the command sends at most 50
+   nudges per run by default, **oldest-first** (by `creators.created_at`), so a
+   large backlog drains deterministically over successive daily ticks rather
+   than blasting everyone on the first enable. Override with `--limit=N` (e.g.
+   `--dry-run --limit=200` to preview a larger drain). `--limit=0` or a
+   non-numeric value fails loudly (exit non-zero, nothing sent).
+
+2. **Read the counts.** `verify` = unverified self-serve creators sitting
+   incomplete 48h+; `finish` = verified-but-incomplete. If the numbers look
+   sane (no surprise backlog spike), proceed. If the total is far above the cap
+   and you want a slower drain, leave the default; to drain faster, raise
+   `--limit` (the scheduled command uses the default cap — change it there only
+   if you deliberately want a bigger daily batch).
+3. **Flip the flag ON** from the admin **Feature-flags** page ("Incomplete-creator
+   nudge"). A reason is **mandatory** and is written to the audit log
+   (`feature_flag.toggled`).
+4. The next daily tick sends up to the cap (oldest-first) and stamps
+   `creators.incomplete_nudge_sent_at` on **only** the creators it sent to — the
+   once-only guard. Anyone over the cap is untouched and picked up by the next
+   run. A second run over the same set sends zero. Confirm the worker (§1) is
+   draining the mail queue.
+
+To pause it again, flip the flag OFF from the same page (again with a reason).
+Already-stamped creators are never re-nudged regardless.
+
+> **Deploy-note territory (template Part 2).** Production needs this
+> `schedule:run` cron/timer in place alongside the queue worker. The two
+> pending one-shot commands (`creators:recompute-completeness` and any future
+> backfill) are _manual_ post-deploy steps and are **not** on the scheduler —
+> don't conflate them with this cron.

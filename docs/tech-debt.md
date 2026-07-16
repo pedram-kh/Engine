@@ -108,6 +108,17 @@ anyone reviewing it later.
 
 ---
 
+## Incomplete-creator nudge eligibility query has no supporting composite index (D7)
+
+- **Where:** [`apps/api/app/Modules/Creators/Services/IncompleteCreatorNudgeEligibility.php`](../apps/api/app/Modules/Creators/Services/IncompleteCreatorNudgeEligibility.php) — the daily `creators:send-incomplete-nudges` eligibility query filters `creators` on `application_status = 'incomplete'` + `created_at <= now()-48h` + `incomplete_nudge_sent_at IS NULL`, joins `users` (not-suspended, not-soft-deleted, `email_verified_at` split), and a `NOT EXISTS` against `agency_creator_relations`.
+- **What we accepted (incomplete-creator nudge chunk, July 16, 2026):** no new index this chunk. The query is narrowed first by the existing `idx_creators_application_status` (incomplete is a shrinking minority of rows), runs **once daily** off the request path, and the remaining predicates (`created_at`, `incomplete_nudge_sent_at`, the user join, the `NOT EXISTS`) are cheap at current scale. Adding a composite index now (e.g. `(application_status, created_at, incomplete_nudge_sent_at)`) would be speculative — the same posture as the campaign-detail two-hop query that shipped index-free under its volume trigger.
+- **Trigger:** the `creators` table crossing a volume where the daily batch's status-narrowed scan is no longer trivially cheap (rule-of-thumb: tens of thousands of `incomplete` rows), OR the nudge becoming more than daily (a v2 second-reminder cadence).
+- **Resolution:** add a partial/composite index tuned to the observed predicate — likely `(application_status, incomplete_nudge_sent_at, created_at)`, optionally partial on `application_status = 'incomplete'` (pgsql) — and re-check the `EXPLAIN` for the `NOT EXISTS` join.
+- **Owner:** whoever ships the nudge v2, or the next `creators`-table scaling pass.
+- **Status:** open (deferred by design). Recorded in [incomplete-creator-nudge-review.md](reviews/incomplete-creator-nudge-review.md), July 16, 2026.
+
+---
+
 ## `creators.region` column width (160) exceeds its validation cap (120)
 
 - **Where:** the `region` column ([`create_creators_table`](../apps/api/database/migrations), `string('region', 160)`) vs its request cap `max:120` (`UpdateProfileRequest` / `AdminUpdateCreatorRequest`).

@@ -322,6 +322,21 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
   accepted-only + requires=false-only. **No scheduler**, so it must not be forgotten at the next
   deploy. This now **joins the AH-026 `creators:recompute-completeness`** command in the pending-deploy
   list — two one-shot post-deploy commands to run together.
+- **NEW deploy dependency — the scheduler cron (`schedule:run`) — carry forward (incomplete-creator
+  nudge chunk, July 16, 2026).** The app now has a **flag-gated daily command**,
+  `creators:send-incomplete-nudges`, registered `->daily()` in `bootstrap/app.php` alongside the
+  pre-existing `messages:send-digest` + `boards:scan-overdue`. Those earlier two already assumed a
+  scheduler; this chunk makes the gap explicit and **documents it for the first time**: production
+  must run `* * * * * php artisan schedule:run` (cron) or the equivalent systemd timer, or **none of
+  the scheduled commands ever fire**. See the new `docs/runbooks/production-queue-worker.md` **§7**
+  (cron/timer setup + first-enable procedure). This is a **standing infra dependency**, distinct from
+  the two one-shot post-deploy commands above — the scheduler is always-on, the one-shots run once.
+- **Incomplete-creator nudge first-enable — flag flip, NOT a migration/one-shot.** The nudge ships
+  **flag-OFF** (`incomplete_creator_nudge_enabled`, default OFF). To enable: run
+  `php artisan creators:send-incomplete-nudges --dry-run` (mutates nothing, ignores the flag), read
+  the `verify=X, finish=Y` counts, then flip the flag ON from the admin **Feature-flags** page
+  (reason mandatory → audit row). Once-only per creator via `creators.incomplete_nudge_sent_at`.
+  Review: `docs/reviews/incomplete-creator-nudge-review.md`.
 - **Key tech-debt pointers** (full detail in `tech-debt.md`):
   - **AH-001 i18n completeness** — English fragments inside translated values in ~10 locales; parity
     is structurally blind to it (per-market human QA is a go-live gate, not a merge gate).
