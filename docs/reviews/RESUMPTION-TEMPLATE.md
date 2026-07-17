@@ -322,6 +322,9 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
 
 ### Open threads
 
+- **Scheduler supervision:** production deployed with a different structure (colleague-managed);
+  runbook §7 scheduler-under-supervisor docs reverted pending a reality-sync pass from the actual
+  server config.
 - **Backup/restore posture UNVERIFIED — standing open item, owned by Pedram (blocks completion of
   §5.40).** The production-data-safety standard assumes a working snapshot-and-restore path, and that
   assumption is **not yet confirmed**: RDS automated snapshots (assumed enabled, unconfirmed), PITR
