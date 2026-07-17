@@ -92,13 +92,17 @@ discipline in §7.
 ### Read-first (a fresh thread reads these, in order)
 
 1. `docs/PROJECT-WORKFLOW.md` — master process doc (roles, chunk loop, §5.x standards). **First.**
-2. `docs/ACTIVE-PHASE.md` — which phase is live.
-3. `docs/reviews/adhoc-changes-log.md` — the ad-hoc index (**Part 2 below points into it**).
-4. `docs/tech-debt.md` — deferred items + triggers.
-5. `docs/security/tenancy.md` — tenancy contract. `docs/feature-flags.md` — flag registry.
-6. Phase spec (`docs/20-PHASE-1-SPEC.md` or the active one) + the specs in `PROJECT-WORKFLOW.md` §11
+2. `docs/WORKING-PROCESS.md` — the field manual for the three-party workflow (modes, stop-gate,
+   close-out checklist, testing disciplines, production-data safety, the alarm rule, review
+   integrity, session rituals). Summarizes §5 rather than duplicating it — the repo wins on any
+   divergence.
+3. `docs/ACTIVE-PHASE.md` — which phase is live.
+4. `docs/reviews/adhoc-changes-log.md` — the ad-hoc index (**Part 2 below points into it**).
+5. `docs/tech-debt.md` — deferred items + triggers.
+6. `docs/security/tenancy.md` — tenancy contract. `docs/feature-flags.md` — flag registry.
+7. Phase spec (`docs/20-PHASE-1-SPEC.md` or the active one) + the specs in `PROJECT-WORKFLOW.md` §11
    (architecture / conventions / API / security / testing) **as the task requires**.
-7. The relevant `docs/reviews/sprint-*` / AH log entries for the surface being touched.
+8. The relevant `docs/reviews/sprint-*` / AH log entries for the surface being touched.
 
 ---
 
