@@ -31,12 +31,21 @@ it('returns the rendered HTML, version, and locale for the authenticated creator
             'data' => ['html', 'version', 'locale'],
         ])
         ->assertJsonPath('data.version', ContractTermsRenderer::CURRENT_VERSION)
+        // AH-049: the emitted version is the label the SPA renders as
+        // "Master Creator Agreement v{version}". Pinned literally so the
+        // 1.0 → 1.1 bump is guarded, not just implied by the constant.
+        ->assertJsonPath('data.version', '1.1')
         ->assertJsonPath('data.locale', 'en');
 
     $html = $response->json('data.html');
     expect($html)->toBeString();
     expect($html)->toContain('<h1>Catalyst Creator Terms and Conditions');
     expect($html)->toContain('<h2>2. Services</h2>');
+    // v1.1 content pins (AH-049): the new clauses 2.4 / 4.3 must render.
+    expect($html)->toContain('<strong>2.4</strong>');
+    expect($html)->toContain('up to three (3)');
+    expect($html)->toContain('<strong>4.3</strong>');
+    expect($html)->toContain('within 30');
 });
 
 it('falls back to `en` when an unknown locale is requested', function (): void {

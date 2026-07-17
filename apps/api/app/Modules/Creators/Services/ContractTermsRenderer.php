@@ -38,7 +38,7 @@ use RuntimeException;
  */
 final class ContractTermsRenderer
 {
-    public const CURRENT_VERSION = '1.0';
+    public const CURRENT_VERSION = '1.1';
 
     /**
      * Fallback title when the markdown source has no leading `# ` heading.

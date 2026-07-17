@@ -28,7 +28,7 @@
  *     `role="status"`.
  *   - The checkbox label includes the agreement version so a
  *     screen reader announces "I have read and accept these terms
- *     — Master Creator Agreement v1.0".
+ *     — Master Creator Agreement v1.1".
  *   - Continue button is disabled until checked AND content has
  *     loaded; aria-describedby points at the help text explaining
  *     this.

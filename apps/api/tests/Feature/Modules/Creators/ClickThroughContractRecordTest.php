@@ -87,6 +87,17 @@ it('snapshots the agreed title and RAW markdown source (not rendered HTML) onto 
     // Raw markdown, never the rendered HTML.
     expect($contract->body_markdown)->toContain('# Catalyst Creator Terms and Conditions');
     expect($contract->body_markdown)->not->toContain('<h1>');
+
+    // v1.1 content pins (AH-049): the swap ADDED clause 2.4 (revision rounds)
+    // and clause 4.3 (30-day payment) and EXPANDED clause 7.3 (portfolio
+    // consent). I3 proved the pre-swap tests were content-blind — pin the
+    // distinctive new wording so a future content drop reds here. Verified by
+    // break-revert (delete clause 2.4 from the source → this fails).
+    expect($contract->body_markdown)->toContain('**2.4**');
+    expect($contract->body_markdown)->toContain('up to three (3)');
+    expect($contract->body_markdown)->toContain('**4.3**');
+    expect($contract->body_markdown)->toContain('within 30');
+    expect($contract->body_markdown)->toContain('portfolio purposes');
 });
 
 it('records method + ip + user_agent + version + accepted_at in signed_signature_data', function (): void {
@@ -100,7 +111,12 @@ it('records method + ip + user_agent + version + accepted_at in signed_signature
 
     expect($data)->toBeArray();
     expect(data_get($data, 'method'))->toBe(Contract::METHOD_CLICK_THROUGH);
-    expect(data_get($data, 'version'))->toBe(ContractTermsRenderer::CURRENT_VERSION); // precise '1.0'
+    // The precise (non-lossy) version string a NEW acceptance snapshots.
+    // AH-049 bumped it 1.0 → 1.1; existing rows keep their own '1.0' string
+    // (pinned in ClickThroughContractBackfillTest). Literal AND constant so
+    // the bump is guarded even if the constant is reverted by mistake.
+    expect(data_get($data, 'version'))->toBe(ContractTermsRenderer::CURRENT_VERSION);
+    expect(data_get($data, 'version'))->toBe('1.1');
     expect($data)->toHaveKeys(['ip', 'user_agent', 'accepted_at']);
     expect(data_get($data, 'ip'))->not->toBeNull();
 });
@@ -191,6 +207,58 @@ it('makes acceptances retrievable WITH version from one place (contracts)', func
         expect($c->version)->toBeInt();
         expect($c->version)->toBe(1);
     });
+});
+
+// ---------------------------------------------------------------------------
+// §5.34 — snapshot immutability across the content swap + version bump (AH-049)
+// ---------------------------------------------------------------------------
+
+it('leaves a pre-swap (v1.0) contract snapshot byte-untouched after the source + version bump', function (): void {
+    [$user, $creator] = makeContractCreator();
+
+    // A signee who accepted BEFORE this swap: their row carries the OLD text
+    // and the OLD precise version string. This is the row the production-data
+    // safety standard (§5.40) forbids us to ever mutate — the DB snapshot,
+    // not the source markdown, is the authority for what they agreed to.
+    $oldBody = "# Master Creator Agreement\n\nEngine C Ltd — governed by the laws of Ireland.";
+    $preSwap = Contract::factory()->create([
+        'subject_type' => Contract::SUBJECT_CREATOR,
+        'subject_id' => $creator->id,
+        'version' => 1,
+        'title' => 'Master Creator Agreement',
+        'body_markdown' => $oldBody,
+        'signed_by_creator_id' => $creator->id,
+        'signed_signature_data' => [
+            'method' => Contract::METHOD_CLICK_THROUGH,
+            'version' => '1.0',
+            'ip' => '203.0.113.10',
+            'user_agent' => 'PHPUnit',
+            'accepted_at' => now()->subYear()->toIso8601String(),
+        ],
+    ]);
+    $creator->forceFill([
+        'signed_master_contract_id' => $preSwap->id,
+        'click_through_accepted_at' => now()->subYear(),
+    ])->save();
+
+    // Sanity: the source really is bumped to v1.1 and carries the new clause.
+    expect(ContractTermsRenderer::CURRENT_VERSION)->toBe('1.1');
+    expect(app(ContractTermsRenderer::class)->source()['markdown'])->toContain('**2.4**');
+
+    // Re-entering the accept path is an idempotent no-op (the guard keys off
+    // the denormalised timestamp) — it must NOT re-snapshot the new v1.1 text
+    // onto the existing row or mint a duplicate.
+    $this->actingAs($user)
+        ->postJson('/api/v1/creators/me/wizard/contract/click-through-accept')
+        ->assertOk();
+
+    $preSwap->refresh();
+    expect(Contract::query()->count())->toBe(1);
+    // Byte-untouched: old body, old label — the swap changed neither.
+    expect($preSwap->body_markdown)->toBe($oldBody);
+    expect($preSwap->body_markdown)->not->toContain('**2.4**');
+    expect($preSwap->version)->toBe(1);
+    expect(data_get($preSwap->signed_signature_data, 'version'))->toBe('1.0');
 });
 
 // ---------------------------------------------------------------------------

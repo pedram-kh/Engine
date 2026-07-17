@@ -1,6 +1,6 @@
 # Catalyst Creator Terms and Conditions
 
-**Version:** 1.0 — Effective 2026-07-11
+**Version:** 1.1 — Effective 2026-07-17
 
 These terms govern the provision of Services by a Creator to Catalyst
 Performance Ltd (company number 13632394) ("Catalyst") in connection with
@@ -30,6 +30,13 @@ Creator shall promptly make any reasonably required amendments at no extra cost.
 
 **2.3** Catalyst may request Changes within the scope of the Brief; these are
 included within the Fees and no additional fee is payable.
+
+**2.4** The number of revision rounds to which clause 2.2 applies shall be
+determined on a Campaign-by-Campaign basis and set out in the relevant Brief.
+Unless the Brief specifies otherwise, Creator shall provide up to three (3)
+rounds of revisions per Deliverable at no additional cost. Any further
+amendments requested beyond the number specified in the Brief shall be treated
+as a Change under clause 2.3 only where Catalyst confirms this in writing.
 
 ## 3. Warranties
 
@@ -61,6 +68,12 @@ Catalyst's control — in which case Catalyst will use reasonable efforts to
 secure a pro-rata payment from the Brand for Services already provided, unless
 the cancellation results from Creator's breach.
 
+**4.3** Subject to clauses 4.1 and 4.2, and provided Creator has submitted a
+valid invoice, Catalyst shall pay the Fees due under a confirmed Brief within 30
+days of Catalyst's sign-off of the relevant wave. Where a wave spans multiple
+Deliverables or Briefs, the 30-day period runs from sign-off of the wave to
+which the relevant Deliverable belongs.
+
 ## 5. Non-Dealing
 
 For the Term and 12 months thereafter, Creator shall not, without Catalyst's
@@ -88,11 +101,17 @@ image, likeness and biography in connection with the Deliverables and Campaign.
 
 **7.3** Creator has no usage rights in the Deliverables. Creator shall not post,
 repost, or otherwise use any Deliverable — including content that is
-brand-approved and/or already published, and including for portfolio purposes —
-on Creator's own channels or elsewhere, without Catalyst's prior written consent
-given in each instance. This applies regardless of whether the relevant Brief
-specifies an embargo or exclusivity period. Creator shall not create their own
-edits from raw footage or audio supplied under a Brief.
+brand-approved and/or already published — on Creator's own channels or
+elsewhere, without Catalyst's prior written consent given in each instance. This
+applies regardless of whether the relevant Brief specifies an embargo or
+exclusivity period. Creator shall not create their own edits from raw footage or
+audio supplied under a Brief. Creator may request Catalyst's prior written
+consent to use a Deliverable for portfolio purposes (for example, on a personal
+website or portfolio reel). Any such consent is given, if at all, on a
+Deliverable-by-Deliverable or Campaign-by-Campaign basis at Catalyst's
+discretion, having regard to the relevant Brand's usage rights requirements, and
+does not create any standing or ongoing right to use that or any other
+Deliverable without a separate request and separate written consent.
 
 **7.4** Creator undertakes to do all further acts and execute all further
 documents as may be required by Catalyst in connection with the grant of rights
