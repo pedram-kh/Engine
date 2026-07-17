@@ -357,22 +357,15 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
   accepted-only + requires=false-only. **No scheduler**, so it must not be forgotten at the next
   deploy. This now **joins the AH-026 `creators:recompute-completeness`** command in the pending-deploy
   list — two one-shot post-deploy commands to run together.
-- **NEW deploy dependency — the scheduler process (`schedule:work` under Supervisor) — carry forward
-  (incomplete-creator nudge chunk, July 16, 2026).** The app now has a **flag-gated daily command**,
+- **NEW deploy dependency — the scheduler cron (`schedule:run`) — carry forward (incomplete-creator
+  nudge chunk, July 16, 2026).** The app now has a **flag-gated daily command**,
   `creators:send-incomplete-nudges`, registered `->daily()` in `bootstrap/app.php` alongside the
   pre-existing `messages:send-digest` + `boards:scan-overdue`. Those earlier two already assumed a
   scheduler; this chunk makes the gap explicit and **documents it for the first time**: production
-  must run the scheduler or **none of the scheduled commands ever fire**. **Our setup: a long-running
-  `php artisan schedule:work` process under the same Supervisor that runs the queue worker**
-  (`numprocs=1`, autostart/autorestart, `stopwaitsecs`, restarted alongside the worker on every
-  deploy). Cron (`* * * * * schedule:run`) / systemd timer remain documented alternatives — pick
-  exactly one, never two. **One-instance-cluster-wide constraint:** the scheduled commands are not
-  guarded with `onOneServer()`, so a second `schedule:work` (a second `numprocs`, or a second host)
-  double-fires everything; add `->onOneServer()` (Redis lock) before ever scaling the scheduler onto
-  a second host. See `docs/runbooks/production-queue-worker.md` **§7.1** (Supervisor program),
-  **§7.2** (cron/timer alternatives), **§4** (deploy-hook restart), and **§7.3** (first-enable
-  procedure). This is a **standing infra dependency**, distinct from the two one-shot post-deploy
-  commands above — the scheduler is always-on, the one-shots run once.
+  must run `* * * * * php artisan schedule:run` (cron) or the equivalent systemd timer, or **none of
+  the scheduled commands ever fire**. See the new `docs/runbooks/production-queue-worker.md` **§7**
+  (cron/timer setup + first-enable procedure). This is a **standing infra dependency**, distinct from
+  the two one-shot post-deploy commands above — the scheduler is always-on, the one-shots run once.
 - **Incomplete-creator nudge first-enable — flag flip, NOT a migration/one-shot.** The nudge ships
   **flag-OFF** (`incomplete_creator_nudge_enabled`, default OFF). To enable: run
   `php artisan creators:send-incomplete-nudges --dry-run` (mutates nothing, ignores the flag), read
