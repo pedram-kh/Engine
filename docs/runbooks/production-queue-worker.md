@@ -45,11 +45,7 @@ different connection consumes nothing and the queue silently piles up.
 
 ## 2. supervisord (the standard setup on a plain VPS)
 
-The program config is **version-controlled** at
-[`infra/supervisor/catalyst-worker.conf`](../../infra/supervisor/catalyst-worker.conf)
-— that repo file is the **source of truth**; the copy under
-`/etc/supervisor/conf.d/` is installed _from it_, never hand-edited in place.
-Its contents:
+`/etc/supervisor/conf.d/catalyst-worker.conf`:
 
 ```ini
 [program:catalyst-worker]
@@ -71,31 +67,19 @@ stdout_logfile_maxbytes=10MB
 stdout_logfile_backups=5
 ```
 
-Install it (alongside the §7.1 scheduler config — the two ship together):
+Adjust `command=`/`directory=` paths and `user=` to the real deploy location
+and PHP-FPM user. Then:
 
 ```bash
 sudo mkdir -p /var/log/catalyst
-sudo cp infra/supervisor/catalyst-worker.conf    /etc/supervisor/conf.d/
-sudo cp infra/supervisor/catalyst-scheduler.conf /etc/supervisor/conf.d/   # see §7.1
 sudo supervisorctl reread
 sudo supervisorctl update
-sudo supervisorctl start catalyst-worker:* catalyst-scheduler:*
-sudo supervisorctl status          # both must read RUNNING (see below)
+sudo supervisorctl start catalyst-worker:*
+sudo supervisorctl status          # → catalyst-worker:catalyst-worker_00  RUNNING
 ```
 
-Expected `supervisorctl status`:
-
-```
-catalyst-scheduler                 RUNNING
-catalyst-worker:catalyst-worker_00 RUNNING
-```
-
-If the real deploy location or PHP-FPM user differs from
-`/var/www/catalyst/apps/api` / `www-data`, change `command=`/`directory=`/`user=`
-**in the repo file** and re-install — keep the worker and scheduler configs in
-agreement on paths, user, and `.env`. Raise `numprocs` only when a single worker
-can't keep up (watch queue depth, §5) — each process must be budgeted ~768 MB+
-of RAM. (The scheduler, by contrast, must stay `numprocs=1` — see §7.1.)
+Raise `numprocs` only when a single worker can't keep up (watch queue depth,
+§5) — each process must be budgeted ~768 MB+ of RAM.
 
 ## 3. systemd (alternative, if supervisord isn't installed)
 
@@ -151,14 +135,8 @@ new code:
 sudo supervisorctl restart catalyst-scheduler:*
 ```
 
-So a full deploy restarts **both** programs — the worker via `queue:restart`, the
-scheduler via `supervisorctl restart` — and `supervisorctl status` should read
-`RUNNING` for `catalyst-worker` **and** `catalyst-scheduler` afterward. If this
-deploy changed either repo config under `infra/supervisor/`, re-install first
-(`cp … /etc/supervisor/conf.d/ && supervisorctl reread && update`, §2) so the
-restart picks up the new program definition. (If you drive the scheduler by
-cron/systemd `schedule:run` instead of §7.1, the scheduler restart is
-unnecessary — each tick is a fresh process that boots the new code.)
+(If you drive the scheduler by cron/systemd `schedule:run` instead of §7.1,
+this is unnecessary — each tick is a fresh process that boots the new code.)
 
 ---
 
@@ -236,10 +214,7 @@ stays resident and invokes the due commands itself every minute, so the
 scheduler gets the same autostart / autorestart / centralised-logging treatment
 as the worker, with no crontab to maintain.
 
-The program config is **version-controlled** at
-[`infra/supervisor/catalyst-scheduler.conf`](../../infra/supervisor/catalyst-scheduler.conf)
-— the **source of truth**, installed to `/etc/supervisor/conf.d/` the same way
-as the worker (§2), never hand-edited in place. Its contents:
+`/etc/supervisor/conf.d/catalyst-scheduler.conf`:
 
 ```ini
 [program:catalyst-scheduler]
@@ -258,11 +233,15 @@ stdout_logfile_maxbytes=10MB
 stdout_logfile_backups=5
 ```
 
-It installs together with the worker in the §2 `cp … && supervisorctl reread &&
-update` step — there is no separate procedure. `command=`/`directory=`/`user=`
-mirror the §2 worker exactly (same deploy path, PHP-FPM user, and `.env`); if you
-change one, change both. After install, `supervisorctl status` must show
-`catalyst-scheduler  RUNNING` alongside `catalyst-worker` (see §2).
+Adjust `command=`/`directory=`/`user=` to the real deploy location and PHP-FPM
+user (same as the §2 worker), then:
+
+```bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start catalyst-scheduler:*
+sudo supervisorctl status          # → catalyst-scheduler  RUNNING
+```
 
 - **This replaces the cron line.** Do **not** also run `* * * * * schedule:run`
   (or the §7.2 systemd timer) while this program is active — the two tick
@@ -405,14 +384,10 @@ Run these steps **in order**. Do not skip step 1.
 2. **`php artisan migrate`.** Migrations are additive-first (§5.40); a deploy
    should not carry a destructive migration without a separately-reviewed plan.
    Read the output — confirm the exact migration range that ran.
-3. **Infra changes** — install/update the Supervisor programs from the
-   version-controlled configs (`cp infra/supervisor/*.conf
-/etc/supervisor/conf.d/ && supervisorctl reread && update`, §2), covering both
-   the worker and the §7.1 `schedule:work` scheduler (our setup — or a §7.2
-   cron/timer); env var changes; worker + scheduler (re)starts (§4 deploy hook).
-   Apply these before running any command that depends on them. Confirm
-   `supervisorctl status` shows both `catalyst-worker` and `catalyst-scheduler`
-   RUNNING.
+3. **Infra changes** — the scheduler (§7.1 `schedule:work` Supervisor program —
+   our setup — or a §7.2 cron/timer), env var changes, worker + scheduler
+   (re)starts (§4 deploy hook). Apply these before running any command that
+   depends on them.
 4. **One-shot commands** — each with `--dry-run` first **where supported**: run
    the dry-run, **read the output**, confirm the counts/rows look sane, then run
    for real. One command at a time; do not batch-fire.
@@ -435,10 +410,9 @@ onto the checklist above (this is the next real deploy):
      agency-rename-survives test — see §5.40) and **AH-048's additive-nullable
      `creators.incomplete_nudge_sent_at` column\*\* (metadata-only `ADD COLUMN`, no
      backfill, no index).
-3. **Infra** — install both Supervisor programs from `infra/supervisor/*.conf`
-   (§2) and confirm `catalyst-worker` + `catalyst-scheduler` are RUNNING, so
-   `messages:send-digest`, `boards:scan-overdue`, and
-   `creators:send-incomplete-nudges` actually fire.
+3. **Infra** — ensure the **scheduler** (§7.1 `schedule:work` under Supervisor —
+   our setup — or a §7.2 cron/timer) is running, so `messages:send-digest`,
+   `boards:scan-overdue`, and `creators:send-incomplete-nudges` actually fire.
 4. **One-shot commands** (each `--dry-run` first, read, then real):
    - `php artisan creators:recompute-completeness` (AH-026 D5) — idempotent; a
      second run reports 0 changes.
