@@ -365,7 +365,9 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
   must run the scheduler or **none of the scheduled commands ever fire**. **Our setup: a long-running
   `php artisan schedule:work` process under the same Supervisor that runs the queue worker**
   (`numprocs=1`, autostart/autorestart, `stopwaitsecs`, restarted alongside the worker on every
-  deploy). Cron (`* * * * * schedule:run`) / systemd timer remain documented alternatives — pick
+  deploy). Both programs are **version-controlled** at `infra/supervisor/*.conf` (source of truth,
+  `cp`-installed to `/etc/supervisor/conf.d/`); after install `supervisorctl status` must show
+  `catalyst-worker` + `catalyst-scheduler` RUNNING. Cron (`* * * * * schedule:run`) / systemd timer remain documented alternatives — pick
   exactly one, never two. **One-instance-cluster-wide constraint:** the scheduled commands are not
   guarded with `onOneServer()`, so a second `schedule:work` (a second `numprocs`, or a second host)
   double-fires everything; add `->onOneServer()` (Redis lock) before ever scaling the scheduler onto
