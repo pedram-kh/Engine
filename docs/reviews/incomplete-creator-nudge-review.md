@@ -1,8 +1,8 @@
 # Incomplete-creator email nudge — Review (backend + i18n + docs)
 
-**Status:** Draft — awaiting independent review + merge. Push held.
+**Status:** Closed — independent review complete: D1–D8 + the suspended-exclusion extension verified, break-revert confirmed, §5.3 both variants + the queued-locale assertion green, the Q3 7-case negative set + the cap (no-over-stamping) case green, production posture verified, token-safety evidence accepted.
 
-**Reviewer:** drafted by Cursor (implementation); awaiting independent review.
+**Reviewer:** drafted by Cursor (implementation); reviewed and closed by Claude (independent review).
 
 **Reviewed against:** the read-only I1–I7 inventory (the evidence base), the Kickoff locked decisions **D1–D8 + Q1–Q3**, the two plan-clearance answers (the **suspended-exclusion** extension of D2 + the **verify-URL replication** guard), the existing precedents cited below (`SendMessageDigests`/`MessageDigestService` scheduler+console shape, `VerifyEmailMail`/`SignUpService` verification-mail + URL-mint pattern, `CreatorApprovedMail` localized-mailable shape, the `AdminFeatureFlagController` registry + reason-audit flow, `KycVerificationEnabled` default-OFF flag shape, `LangParityTest` 24-locale en-SOT gate), and `PROJECT-WORKFLOW.md §5` (5.3 real-render mailable tests, 5.4 transactional audit, 5.32 intent-over-mechanism, 5.34 negative-case pinning, 5.35 break-revert).
 

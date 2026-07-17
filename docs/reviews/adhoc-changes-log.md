@@ -60,6 +60,26 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-048 · Incomplete-creator email nudge (scheduled, flag-gated, once-only)
+
+- **Status:** Landed (push HELD)
+- **Commits:** `3d37f21` — `feat(creators): incomplete-creator email nudge (flag-gated, once-only, capped)`; `1870d1f` — `docs(creators): incomplete-creator nudge — flags, runbook, tech-debt, review`
+- **Date:** 2026-07-16
+- **Why:** Self-serve creators who sign up but stall in `application_status = incomplete` get no follow-up — they simply never finish. A one-time nudge recovers a slice of that abandoned-onboarding cohort, split by whether the blocker is an unconfirmed email (verify link) or an unfinished profile (finish-profile deep link).
+- **What:** A daily `creators:send-incomplete-nudges` command (registered `->daily()` in `withSchedule()`) delegating to `IncompleteCreatorNudgeService`. It emails self-serve creators sitting incomplete for **48h+**, in two variants — verify-email (`email_verified_at IS NULL`, fresh `EmailVerificationToken` + `/auth/verify-email?token=`) and finish-profile (`/onboarding`). Gated by a new default-OFF Pennant flag toggled from the admin Feature-flags page. Once-only via a new nullable `creators.incomplete_nudge_sent_at` stamp; per-run cap (default 50, oldest-first) via `--limit`; `--dry-run` previews counts and mutates nothing. Strings localized across all 24 `lang/*/creators.php`; full loop → detailed review file.
+- **Touched:** `Modules/Creators` (Features/`IncompleteCreatorNudgeEnabled`, Enums/`IncompleteCreatorNudgeVariant`, Services/`IncompleteCreatorNudgeEligibility` + `IncompleteCreatorNudgeService`, Mail/`IncompleteCreatorNudgeMail` + 2 Blade views, Support/`IncompleteNudgeReport`, `CreatorsServiceProvider`, `Creator` model), `Console/Commands/SendIncompleteCreatorNudges`, `bootstrap/app.php`, `Modules/Admin` `AdminFeatureFlagController`, migration `2026_07_16_100000_*`, `lang/*/creators.php` ×24, tests (eligibility, mail render, command); docs (`feature-flags.md`, `runbooks/production-queue-worker.md` §7, `tech-debt.md`, `RESUMPTION-TEMPLATE.md`, review file). **No frontend/`packages` changes** — the admin flags page lists the flag from the API.
+- **Decisions:**
+  - **Flag default-OFF + admin registry (D1).** New `incomplete_creator_nudge_enabled` (default-OFF Closure, the `KycVerificationEnabled` shape) added to `AdminFeatureFlagController::FLAGS` (English label, the house non-i18n admin pattern) — the flip inherits the reason-required `feature_flag.toggled` audit flow. `CreatorResource.wizard.flags` (the exact-3-key pin) untouched.
+  - **Self-serve origin only, Q1 exclusion + rejected alternatives (D2).** Excludes any creator with an `agency_creator_relations` row bearing `invitation_sent_at IS NOT NULL` (bulk-invite / connection-request) — a conservative over-exclusion so nobody whose correct next step is _accept-invite_ gets a verify-email link. **Rejected:** `users.password` presence (every row is hashed regardless of origin) and `users.last_name` nullability (nullable + added late in AH-023, never an origin signal) — recorded so the predicate is not "simplified" into something broken. Plus a plan-pause extension: `is_suspended = false` (a suspended user hits the login wall).
+  - **D3 lossiness (anchor = `creators.created_at`).** The 48h floor is measured off `creators.created_at`, not a `became_incomplete_at` column (not built — v2 territory). A reopened rejected→incomplete row becomes eligible on reopen if never nudged — accepted (genuinely old + incomplete), and the once-only stamp caps it at one.
+  - **50-cap, oldest-first (production-safety).** `--limit=N` (default 50), oldest-first (`created_at, id`), a per-run total across both variants — a backlog drains deterministically over successive days; only the capped set is stamped (no over-stamping); `--limit=0`/non-numeric fails loudly.
+  - **Token safety = the resend path.** The verify variant mints via `EmailVerificationToken::mint()` — the same call the resend endpoint uses (`EmailVerificationService::resend()` → `SignUpService::sendVerificationMail()`). `mint()` is a pure HMAC with no store, so a fresh mint neither invalidates an older outstanding token nor risks a uniqueness/collision; single-use stays carried by `users.email_verified_at`.
+  - **GDPR Contract framing (D5).** Transactional, not marketing — lawful basis is Contract (completing a registration the creator started), so the copy is service-framed with zero promotional language and **no unsubscribe link**; the `onboarding-nudge` envelope tag keeps it out of any future marketing stream.
+  - **Deploy obligations (D8).** Production now needs the `schedule:run` cron/timer (documented for the first time in `production-queue-worker.md` §7) or nothing fires; first-enable ritual is dry-run → read counts → flip the flag in admin. Migration is additive-nullable only; flag ships OFF; the command's only write is the `incomplete_nudge_sent_at` stamp.
+- **Ref:** [`docs/reviews/incomplete-creator-nudge-review.md`](incomplete-creator-nudge-review.md); kickoff decisions D1–D8 + Q1–Q3 + the production-safety addendum.
+
+---
+
 ### AH-047 · Creator sees a green "post verified" closure banner
 
 - **Status:** Landed (push HELD)
