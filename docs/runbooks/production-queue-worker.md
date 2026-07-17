@@ -126,6 +126,18 @@ php artisan queue:restart
 Skipping this runs **stale job code** until the next `--max-time` recycle —
 a classic source of "the fix is deployed but the bug still happens" confusion.
 
+The long-running `schedule:work` process (§7.1) caches command classes at boot
+the same way, and — unlike the worker — does **not** watch the `queue:restart`
+signal. Restart it explicitly through Supervisor on every deploy so it picks up
+new code:
+
+```bash
+sudo supervisorctl restart catalyst-scheduler:*
+```
+
+(If you drive the scheduler by cron/systemd `schedule:run` instead of §7.1,
+this is unnecessary — each tick is a fresh process that boots the new code.)
+
 ---
 
 ## 5. Troubleshooting
@@ -176,7 +188,7 @@ php artisan queue:failed
 
 ---
 
-## 7. The scheduler (`schedule:run`) — required, separate from the worker
+## 7. The scheduler — required, separate from the worker
 
 The queue worker (§1–§6) drains jobs that have **already been dispatched**. It
 does **not** trigger time-based commands. Those are registered in
@@ -189,28 +201,85 @@ scheduler runs once a minute:
 | `boards:scan-overdue`             | `daily()` | Fires overdue board events (Sprint 12 Chunk 3, D-5; class `ScanOverdueAssignments`). |
 | `creators:send-incomplete-nudges` | `daily()` | The incomplete-creator nudge — **a no-op until the flag is enabled** (see below).    |
 
-**Without `schedule:run`, none of these ever fire** — the incomplete-creator
-nudge will silently never send even after the flag is flipped ON. This is the
-scheduler's equivalent of the §1 "no worker → nothing sends" incident.
+**Without a running scheduler (§7.1), none of these ever fire** — the
+incomplete-creator nudge will silently never send even after the flag is flipped
+ON. This is the scheduler's equivalent of the §1 "no worker → nothing sends"
+incident.
 
-### 7.1 The cron entry (standard)
+### 7.1 The scheduler process — `schedule:work` under Supervisor (our setup)
 
-The scheduler is a single cron line that runs **every minute**; Laravel decides
-internally which commands are actually due:
+We run the scheduler as a **long-running `schedule:work` process under the same
+Supervisor that manages the queue worker (§2)** — not a crontab. `schedule:work`
+stays resident and invokes the due commands itself every minute, so the
+scheduler gets the same autostart / autorestart / centralised-logging treatment
+as the worker, with no crontab to maintain.
+
+`/etc/supervisor/conf.d/catalyst-scheduler.conf`:
+
+```ini
+[program:catalyst-scheduler]
+process_name=%(program_name)s
+command=php /var/www/catalyst/apps/api/artisan schedule:work
+directory=/var/www/catalyst/apps/api
+user=www-data
+numprocs=1
+autostart=true
+autorestart=true
+; schedule:work may be mid-command when told to stop; let a tick finish.
+stopwaitsecs=60
+redirect_stderr=true
+stdout_logfile=/var/log/catalyst/scheduler.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+```
+
+Adjust `command=`/`directory=`/`user=` to the real deploy location and PHP-FPM
+user (same as the §2 worker), then:
+
+```bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start catalyst-scheduler:*
+sudo supervisorctl status          # → catalyst-scheduler  RUNNING
+```
+
+- **This replaces the cron line.** Do **not** also run `* * * * * schedule:run`
+  (or the §7.2 systemd timer) while this program is active — the two tick
+  independently and every daily command fires **twice** (two nudge emails per
+  creator). Exactly one scheduler mechanism, ever.
+- **`numprocs=1` — exactly one instance, cluster-wide.** Unlike the worker
+  (which scales to N processes), the scheduler must be a **single** process on a
+  **single** host. Two `schedule:work` processes — whether `numprocs=2` here or
+  one per host in a multi-server deployment — double-fire every scheduled
+  command. Today's commands are **not** guarded with `onOneServer()`, so there
+  is **no framework-level protection** against a second instance; the
+  one-instance rule is operational, not enforced in code. **Before** the
+  scheduler ever runs on more than one host, add `->onOneServer()` to each
+  scheduled command in `withSchedule()` (it needs a shared atomic-lock cache —
+  Redis) so only one host wins the tick.
+- Runs with the **same `.env` as the API + worker** (same DB, same
+  `QUEUE_CONNECTION`) — the scheduled commands only _queue_ Mailables, so the §1
+  worker must also be running for anything to be delivered.
+- **`stopwaitsecs=60`** lets an in-flight tick finish on restart/deploy instead
+  of being killed mid-command.
+
+### 7.2 Alternative: cron or systemd timer (if you're not using Supervisor)
+
+If you are **not** running the §7.1 `schedule:work` program, drive the scheduler
+with a per-minute `schedule:run` instead — the classic Laravel production setup.
+Use exactly one of these, and never alongside §7.1.
+
+**Cron** — a single line, every minute; Laravel decides internally which
+commands are actually due:
 
 ```cron
 * * * * * cd /var/www/catalyst/apps/api && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 Add it to the deploy user's crontab (`crontab -e` as `www-data`, or a file in
-`/etc/cron.d/`). The command must run with the **same `.env` as the API +
-worker** (same DB, same `QUEUE_CONNECTION`) — the scheduled commands only
-_queue_ Mailables, so the §1 worker must also be running for anything to be
-delivered.
+`/etc/cron.d/`), running with the **same `.env` as the API + worker**.
 
-### 7.2 systemd timer (alternative, if you prefer no crontab)
-
-`/etc/systemd/system/catalyst-scheduler.service` + `.timer`:
+**systemd timer** — `/etc/systemd/system/catalyst-scheduler.service` + `.timer`:
 
 ```ini
 # catalyst-scheduler.service
@@ -243,7 +312,9 @@ sudo systemctl enable --now catalyst-scheduler.timer
 sudo systemctl list-timers catalyst-scheduler.timer
 ```
 
-Pick **one** of the cron / timer approaches — never both.
+Pick **one** scheduler mechanism total — the Supervisor `schedule:work` program
+(§7.1, our setup), the cron line, or the systemd timer. Never more than one, and
+the one-instance-cluster-wide constraint from §7.1 applies to all three.
 
 ### 7.3 First-enable procedure for the incomplete-creator nudge
 
@@ -283,11 +354,12 @@ safely:
 To pause it again, flip the flag OFF from the same page (again with a reason).
 Already-stamped creators are never re-nudged regardless.
 
-> **Deploy-note territory (template Part 2).** Production needs this
-> `schedule:run` cron/timer in place alongside the queue worker. The two
-> pending one-shot commands (`creators:recompute-completeness` and any future
-> backfill) are _manual_ post-deploy steps and are **not** on the scheduler —
-> don't conflate them with this cron.
+> **Deploy-note territory (template Part 2).** Production needs the scheduler
+> (§7.1 `schedule:work` under Supervisor — our setup — or a §7.2 cron/timer) in
+> place alongside the queue worker. The two pending one-shot commands
+> (`creators:recompute-completeness` and any future backfill) are _manual_
+> post-deploy steps and are **not** on the scheduler — don't conflate them with
+> the scheduler process.
 
 ---
 
@@ -312,9 +384,10 @@ Run these steps **in order**. Do not skip step 1.
 2. **`php artisan migrate`.** Migrations are additive-first (§5.40); a deploy
    should not carry a destructive migration without a separately-reviewed plan.
    Read the output — confirm the exact migration range that ran.
-3. **Infra changes** — cron/scheduler lines (the §7 `schedule:run` entry), env
-   var changes, worker (re)starts (§4 deploy hook). Apply these before running
-   any command that depends on them.
+3. **Infra changes** — the scheduler (§7.1 `schedule:work` Supervisor program —
+   our setup — or a §7.2 cron/timer), env var changes, worker + scheduler
+   (re)starts (§4 deploy hook). Apply these before running any command that
+   depends on them.
 4. **One-shot commands** — each with `--dry-run` first **where supported**: run
    the dry-run, **read the output**, confirm the counts/rows look sane, then run
    for real. One command at a time; do not batch-fire.
@@ -337,9 +410,9 @@ onto the checklist above (this is the next real deploy):
      agency-rename-survives test — see §5.40) and **AH-048's additive-nullable
      `creators.incomplete_nudge_sent_at` column\*\* (metadata-only `ADD COLUMN`, no
      backfill, no index).
-3. **Infra** — install the **`schedule:run` cron/timer** (§7) if not already
-   present, so `messages:send-digest`, `boards:scan-overdue`, and
-   `creators:send-incomplete-nudges` actually fire.
+3. **Infra** — ensure the **scheduler** (§7.1 `schedule:work` under Supervisor —
+   our setup — or a §7.2 cron/timer) is running, so `messages:send-digest`,
+   `boards:scan-overdue`, and `creators:send-incomplete-nudges` actually fire.
 4. **One-shot commands** (each `--dry-run` first, read, then real):
    - `php artisan creators:recompute-completeness` (AH-026 D5) — idempotent; a
      second run reports 0 changes.
