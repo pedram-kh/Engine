@@ -474,6 +474,22 @@ When a single event can notify EITHER party depending on who triggered it (e.g. 
 
 At session close, before switching threads, Cursor refreshes Part 2 of `docs/reviews/RESUMPTION-TEMPLATE.md` (new AH entries, HEAD SHA, open threads) in the closing docs commit, so the next resumption is copy-paste from the repo, not reconstruction from chat.
 
+### 5.40 Production-data safety (we are live)
+
+**Established:** production-data safety standing standard, 2026-07-17
+
+We are live in production with real users, and live data is the platform's most important asset. Every chunk is written under the assumption that a single mistake can destroy irreplaceable production data. This standard is binding on both agents.
+
+- **Migrations are additive-first.** New columns are nullable or defaulted. **No** `DROP COLUMN`, `DROP TABLE`, destructive `ALTER`, or type-narrowing on a populated table without an explicit, separately-reviewed migration plan. Renames happen **expand → migrate → contract** (add the new column, dual-write/backfill, retire the old one later) — never in-place on live data.
+- **Data mutations ship as guarded, idempotent, dry-runnable commands** — never as migration side effects. The only exception is a narrowly-scoped backfill that is (a) idempotent, (b) predicate-guarded to touch **only** the rows belonging to the concept it serves, and (c) test-pinned including the **leaves-everything-else-alone** case. Reference examples: the **AH-041** board backfill (default-name-only rename predicate + an agency-rename-survives test) and the **AH-048** posture (additive-nullable column, single-timestamp write, `--dry-run` mutates nothing).
+- **`down()` must be honest** — a true inverse, or an explicit comment stating exactly what it cannot restore. A `down()` that silently loses data is worse than one that aborts.
+- **Deletion is never casual.** No hard deletes of user-generated data in application code — soft-delete or archive instead. Any command or endpoint that can remove rows requires a §5.34 negative case proving it cannot over-reach its predicate.
+- **Every chunk's review file gains a "Production posture" section** (the AH-048 shape): what the migration does to existing rows, what the feature writes, and the blast radius of a bug. The sentence we aim to be able to write every time: _"additive-nullable only, flag OFF, single-column write."_
+- **Pre-deploy snapshot is mandatory** before any deploy carrying migrations, backfills, or one-shot commands. The deploy order is the checklist in `docs/runbooks/production-queue-worker.md` §8.
+- **The alarm rule (mandatory, both agents).** Before **any** code is written — at plan-pause for full-loop chunks, or before building each item in a direct-iteration batch — the implementing agent (Cursor) MUST state a production-data risk line: **`PROD-DATA RISK: NONE`** (pure read/UI/additive work) **or** an explicit **`⚠️ PROD-DATA RISK:`** naming every operation that modifies, deletes, migrates, or backfills existing production rows, in plain language Pedram can act on (e.g. _"this deletes X where Y"_, _"this rewrites column Z on all rows"_). A risky operation discovered mid-build that was not declared up front is a **stop-the-build event**: pause, declare it, wait for Pedram's explicit go. Silence is never acceptable — `NONE` must be stated **affirmatively**, not implied by omission. The independent reviewer (Claude) states the same line at kickoff/scoping; either agent staying silent is itself a process violation.
+
+> **Standing open item (owned by Pedram) — the standard is incomplete until this is done.** The backup/restore posture is currently **unverified**: RDS automated snapshots enabled, PITR retention window, and — critically — a **tested restore** have not been confirmed on this deployment. A snapshot you have never restored from is a hope, not a backup. Until a restore has been rehearsed once end-to-end, treat this standard as provisional and lean even more conservatively. Tracked in `docs/runbooks/production-queue-worker.md` §8 and the resumption template's open threads.
+
 ---
 
 ## 6. The "Q-and-A before code" pattern

@@ -288,3 +288,84 @@ Already-stamped creators are never re-nudged regardless.
 > pending one-shot commands (`creators:recompute-completeness` and any future
 > backfill) are _manual_ post-deploy steps and are **not** on the scheduler —
 > don't conflate them with this cron.
+
+---
+
+## 8. Deploy order (the checklist)
+
+> **Why this lives here.** We chose to extend this runbook with the deploy
+> checklist rather than spin up a separate `production-deploy.md` — deploy,
+> worker, and scheduler ops are one operational surface, and a single file
+> means an operator finds every obligation in one place. This section is the
+> concrete procedure behind `PROJECT-WORKFLOW.md` §5.40 (Production-data
+> safety). **We are live** — treat every deploy carrying a migration, backfill,
+> or one-shot command as capable of destroying irreplaceable data.
+
+Run these steps **in order**. Do not skip step 1.
+
+1. **Manual DB snapshot — and verify it completed before proceeding.** Take an
+   RDS snapshot (or the equivalent for the live DB) and **wait for it to report
+   `available`**. A snapshot that is still `creating` is not a safety net. Record
+   its identifier — it goes in the deploy record (step 6) and is what you restore
+   from if step 2 or 4 goes wrong. **Never** proceed to a migration on the word
+   of a snapshot you have not seen finish.
+2. **`php artisan migrate`.** Migrations are additive-first (§5.40); a deploy
+   should not carry a destructive migration without a separately-reviewed plan.
+   Read the output — confirm the exact migration range that ran.
+3. **Infra changes** — cron/scheduler lines (the §7 `schedule:run` entry), env
+   var changes, worker (re)starts (§4 deploy hook). Apply these before running
+   any command that depends on them.
+4. **One-shot commands** — each with `--dry-run` first **where supported**: run
+   the dry-run, **read the output**, confirm the counts/rows look sane, then run
+   for real. One command at a time; do not batch-fire.
+5. **Smoke-verify** — `GET /up` returns **200**, and **one authenticated request
+   succeeds** (log in / hit an authed endpoint). If either fails, stop and
+   assess before considering the deploy done.
+6. **Record the deploy** — date, migration range (from step 2), snapshot ID
+   (from step 1), and every command run (from step 4), appended to the deploy
+   log / this runbook's history or the resumption template, so the next deploy
+   and any incident review can reconstruct exactly what shipped.
+
+### 8.1 First concrete instance — the current pending-deploy list
+
+The pending-deploy obligations carried in `RESUMPTION-TEMPLATE.md` Part 2, mapped
+onto the checklist above (this is the next real deploy):
+
+1. **Snapshot** — take it, wait for `available`, record the ID.
+2. **`php artisan migrate`** — this range carries the \*\*AH-033–AH-041 migrations
+   - the AH-041 board backfill** (default-name-only rename predicate,
+     agency-rename-survives test — see §5.40) and **AH-048's additive-nullable
+     `creators.incomplete_nudge_sent_at` column\*\* (metadata-only `ADD COLUMN`, no
+     backfill, no index).
+3. **Infra** — install the **`schedule:run` cron/timer** (§7) if not already
+   present, so `messages:send-digest`, `boards:scan-overdue`, and
+   `creators:send-incomplete-nudges` actually fire.
+4. **One-shot commands** (each `--dry-run` first, read, then real):
+   - `php artisan creators:recompute-completeness` (AH-026 D5) — idempotent; a
+     second run reports 0 changes.
+   - `php artisan campaigns:advance-contractless-accepted` (AH-042 D4) —
+     idempotent; scoped to `accepted` + `requires=false`.
+   - The incomplete-creator nudge is **NOT** a one-shot here — it is a flag flip
+     (§7.3), done from the admin after the dry-run count looks sane. Not on this
+     list; noted so it isn't run as a command by mistake.
+5. **Smoke-verify** — `/up` 200 + one authenticated request.
+6. **Record** — date, the AH-033–041 + AH-048 migration range, the snapshot ID,
+   and the two one-shot commands run.
+
+### 8.2 Backup/restore posture — honest audit (standing open item, owned by Pedram)
+
+The checklist above assumes a working snapshot-and-restore path. That assumption
+is **currently unverified**:
+
+- **RDS automated snapshots** — assumed enabled; **not confirmed** on this
+  deployment.
+- **PITR (point-in-time recovery) retention** — retention window **not
+  confirmed**.
+- **A tested restore** — **never rehearsed.** A snapshot you have never restored
+  from is a hope, not a backup.
+
+Until a restore has been rehearsed **once**, end-to-end (snapshot → restore to a
+scratch instance → verify data integrity), the §5.40 production-data-safety
+standard is **incomplete** and every deploy should lean even more conservatively.
+This is a standing open item owned by Pedram, mirrored in
+`RESUMPTION-TEMPLATE.md` Part 2 → Open threads.

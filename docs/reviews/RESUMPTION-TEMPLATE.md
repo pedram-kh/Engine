@@ -294,9 +294,26 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
   **Gate/score separation:** the profile gate boolean is floor-only; the score awards partial
   optional credit (`profileEarned()`), so submit-ready-but-<100% is normal. **No gate reads the
   score** — the submit gate is `incompleteSteps.length === 0`.
+- **Production-data safety (`PROJECT-WORKFLOW.md` §5.40) — we are live.** Migrations additive-first
+  (nullable/defaulted; renames expand→migrate→contract; no destructive `ALTER`/`DROP` on populated
+  tables without a separately-reviewed plan); data mutations ship as guarded, idempotent,
+  dry-runnable commands, never as migration side effects; honest `down()`; no casual hard deletes.
+  **The alarm rule (both agents):** before any code, state a `PROD-DATA RISK:` line — `NONE`
+  (affirmatively) or `⚠️` naming every op that modifies/deletes/migrates/backfills existing rows; an
+  undeclared risky op mid-build is a stop-the-build event. Every review file gains a "Production
+  posture" section (the AH-048 shape). Deploy order: the §8 checklist in
+  `docs/runbooks/production-queue-worker.md` (snapshot-first).
 
 ### Open threads
 
+- **Backup/restore posture UNVERIFIED — standing open item, owned by Pedram (blocks completion of
+  §5.40).** The production-data-safety standard assumes a working snapshot-and-restore path, and that
+  assumption is **not yet confirmed**: RDS automated snapshots (assumed enabled, unconfirmed), PITR
+  retention window (unconfirmed), and — critically — a **tested restore** (**never rehearsed**). A
+  snapshot you have never restored from is a hope, not a backup. Until a restore is rehearsed once
+  end-to-end (snapshot → restore to a scratch instance → verify integrity), §5.40 is **incomplete**
+  and every deploy should lean even more conservatively. Full detail:
+  `docs/runbooks/production-queue-worker.md` §8.2.
 - **Campaign Drafts tab** — merged in code, still **pending an independent review pass** (see the
   Live Status pointer in the ad-hoc log).
 - **Sprint 10 (Payments/Escrow)** — **blocked on Stripe Connect production approval**; the
