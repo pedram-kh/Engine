@@ -35,6 +35,18 @@ anyone reviewing it later.
   engineering side of AH-029 was reviewed (snapshots immutable, tests updated); whether skipping
   re-consent for pre-swap signees is legally sound is an open question for counsel, not resolved by
   this entry.
+- **Update (AH-049, July 17, 2026):** the version-label _direction_ is now adopted — the master
+  agreement content was refreshed to the finalized Catalyst T&Cs and the label bumped `1.0 → 1.1`,
+  establishing the rule that **every content change bumps the label** (the resolution sketch's first
+  half). Two parts of this entry remain **open**: (1) **re-consent** — pre-swap signees are still
+  never re-prompted; and (2) the integer-column ambiguity is now _worse, not better_: `1.1` is the
+  first version where the queryable `contracts.version` integer is genuinely ambiguous
+  (`(int)'1.0' === (int)'1.1' === 1`), so the integer can no longer distinguish minor versions at
+  all. This is by design (the precise `signed_signature_data.version` string + the body snapshot are
+  the authority) and nothing queries the integer for minor distinctions today — but it strengthens
+  the "key any future re-consent/version-comparison feature on the **snapshot hash**, not the version
+  label _or_ the integer column" trigger. Entry stays open until re-consent is built (or counsel
+  closes the pre-swap-signees question).
 
 ---
 

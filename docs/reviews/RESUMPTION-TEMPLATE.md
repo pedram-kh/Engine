@@ -108,15 +108,14 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-13 · **Through:** AH-047 (ad-hoc batch) · **Baseline:** `37a796d`
-(`docs(ah-042): close review (approved) + resumption template through AH-042`) — the prior
-`origin/main`, which already includes the **pushed** AH-001→AH-042 range. AH-043→AH-047 land atop it
-as a five-commit range, one per theme: `b99ac31` (AH-043, `fix(messaging)`), `ebf736f` (AH-044,
-`feat(creators)`), `55fc474` (AH-045, `feat(campaigns)`), `48f7afc` (AH-046, `fix(creators)`),
-`aca03b0` (AH-047, `feat(creators)`), plus this docs commit. **Push:** AH-001→AH-042 are all at
-`origin/main`; the AH-043→AH-047 five-commit range + this docs commit are **committed locally this
-session, push HELD** — per Pedram's explicit batch-close instruction, awaiting his call. _(The docs
-commit is not SHA-pinned here — a commit can't contain its own hash.)_
+**Last updated:** 2026-07-17 · **Through:** AH-049 (single ad-hoc change) · **Baseline:** `a6928e36`
+— the prior `origin/main` at session start, which already includes the **pushed** AH-001→AH-048
+range. **AH-049** lands atop it as a two-commit pair: `77ef15b` (`feat(creators): master agreement
+content refresh + version bump to v1.1`) + the docs commit (this refresh). **Push:** AH-001→AH-048
+are all at `origin/main`; the AH-049 feat + docs pair is **committed locally this session, push
+HELD** — awaiting Claude's clearance + Pedram's go. _(The docs commit is not SHA-pinned here — a
+commit can't contain its own hash.)_ **AH-049 adds no migrations, no i18n, no schema change** — the
+pending-deploy obligations below are unchanged (still the AH-026 recompute + AH-042 one-shot).
 
 > **AH-042 · Toggle-OFF campaigns flow without contract involvement** (full chunk loop). The
 > `requires_per_campaign_contract` toggle is now load-bearing end-to-end: the machine permits a
@@ -146,8 +145,8 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-047 — all Landed** (AH-001→AH-042 **pushed** at `origin/main`;
-  AH-043→AH-047 **committed locally this session, push HELD**). One line each (detail + decisions in
+- **Ad-hoc run AH-001 → AH-049 — all Landed** (AH-001→AH-048 **pushed** at `origin/main`;
+  AH-049 **committed locally this session, push HELD**). One line each (detail + decisions in
   `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.
@@ -261,6 +260,19 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
   - **AH-047** — Green "verified by the agency" success banner on the creator assignment-detail
     page for `live_verified`/`manually_verified`, closing the "did anything happen?" gap after a
     successful verification. New `verifiedNotice` key ×24 (same MT-baseline ruling).
+  - **AH-048** — Incomplete-creator email nudge (scheduled daily, flag-gated default-OFF, once-only
+    via the additive-nullable `creators.incomplete_nudge_sent_at`, per-run cap + `--dry-run`): two
+    variants (verify-email / finish-profile) for self-serve creators stuck `incomplete` 48h+.
+    Strings ×24 `creators.php`; full loop. **Post-deploy:** enable the flag; the command runs on the
+    daily scheduler. Review: `docs/reviews/incomplete-creator-nudge-review.md`.
+  - **AH-049** — Master agreement content refresh + version bump `1.0 → 1.1`: swapped in the
+    finalized Catalyst T&Cs (adds clause 2.4 revision-rounds + 4.3 30-day payment; expands 7.3
+    portfolio-consent), bumped `ContractTermsRenderer::CURRENT_VERSION`. New acceptances snapshot the
+    new text + precise `'1.1'`; existing signed rows immutable, keep `'1.0'` (no re-consent — AH-029
+    counsel thread stays open). Adopts the AH-029 tech-debt _direction_ (every content change bumps
+    the label; the integer column stays `1` — lossy by design). Strengthened content-coupled tests
+    (break-revert executed) + §5.34 immutability case; no migration/i18n/schema change. Review:
+    `docs/reviews/master-agreement-v1-1-review.md`.
 
   > **Ruling (AH-046/047, flaky-10 MT baseline):** new creator-facing copy gets a real
   > machine-translation baseline in **all 24 locales at merge time**, including the flaky 10
@@ -322,12 +334,14 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
   Live Status pointer in the ad-hoc log).
 - **Sprint 10 (Payments/Escrow)** — **blocked on Stripe Connect production approval**; the
   `payment_released` automation is wired but inert until then. Tracked in `tech-debt.md`.
-- **AH-029 counsel check (external dependency)** — the master-agreement swap held the version at
-  `1.0` across an entity + governing-law change, with no re-consent flow for pre-swap signees. The
-  engineering was reviewed (snapshots immutable, tests green); whether that posture is legally sound
-  for existing signees is explicitly outside this codebase's review and needs a counsel sign-off.
-  Logged as tech-debt (`docs/tech-debt.md` — "Contract version-label ambiguity + missing re-consent
-  flow") until resolved either way.
+- **AH-029 counsel check (external dependency)** — the original master-agreement swap held the
+  version at `1.0` across an entity + governing-law change, with no re-consent flow for pre-swap
+  signees. **AH-049 (2026-07-17)** then refreshed the content again and adopted the version-bump
+  _direction_ (`1.0 → 1.1`; every content change now bumps the label) — but **re-consent is still
+  not built**, so pre-swap signees remain on their old snapshots un-prompted, and whether that
+  posture is legally sound for existing signees is still outside this codebase's review and needs a
+  counsel sign-off. Logged as tech-debt (`docs/tech-debt.md` — "Contract version-label ambiguity +
+  missing re-consent flow", updated by AH-049) until resolved either way.
 - **Pending post-deploy operational step (AH-026 D5) — still pending, carry forward.** When the
   AH-026→028 range ships, run `php artisan creators:recompute-completeness` **once** (optionally
   `--dry-run` first) so every existing creator's persisted `profile_completeness_score` moves to the

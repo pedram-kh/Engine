@@ -60,6 +60,67 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-049 · Master agreement content refresh + version bump to v1.1
+
+- **Status:** Landed (push HELD)
+- **Commits:** `77ef15b` — `feat(creators): master agreement content refresh + version bump to v1.1`; docs commit — `docs(creators): master agreement v1.1 — AH-049 entry, tech-debt update, review`.
+- **Date:** 2026-07-17
+- **Why:** Pedram supplied the finalized Catalyst Creator Terms & Conditions PDF. The
+  live click-through agreement predated it (missing the revision-rounds and 30-day
+  payment clauses, and the older shorter portfolio wording). Swap the content in and — the
+  deliberate part — **bump the version label 1.0 → 1.1**, resolving the AH-029 tech-debt
+  _direction_: "1.0" already labelled two historical documents, so from now on every content
+  change bumps the label.
+- **What:** Full rewrite of the server-rendered `master-agreement.en.md` to the supplied
+  PDF — **adds clause 2.4** (revision rounds: up to three per Deliverable unless the Brief
+  says otherwise; further amendments are a Change under 2.3 only on written confirmation),
+  **adds clause 4.3** (Fees payable within 30 days of Catalyst's wave sign-off), and
+  **expands clause 7.3** (restores the portfolio-consent request mechanism). Entity
+  (Catalyst Performance Ltd, 13632394) and governing law (England & Wales) unchanged; H1
+  and the `## 2. Services` heading kept byte-identical (test contract). `CURRENT_VERSION`
+  bumped `1.0 → 1.1`; the in-file `**Version:**` line bumped to `1.1 — Effective 2026-07-17`.
+  New acceptances now snapshot the new text + precise `'1.1'`; existing signed contracts are
+  untouched (immutable accept-time snapshots) and keep their `'1.0'` string. **No re-consent
+  flow** — pre-swap signees are not re-prompted (a conscious product/legal deferral, still
+  tied to the open AH-029 counsel thread).
+- **Touched:** `apps/api/resources/contracts/master-agreement.en.md`,
+  `apps/api/app/Modules/Creators/Services/ContractTermsRenderer.php` (`CURRENT_VERSION`),
+  `apps/api/tests/Feature/Modules/Creators/ContractTermsEndpointTest.php`,
+  `apps/api/tests/Feature/Modules/Creators/ClickThroughContractRecordTest.php`,
+  `apps/main/src/modules/onboarding/components/ClickThroughAccept.vue` (a11y docstring
+  example only). Docs: this entry, `tech-debt.md` (version-label entry updated, not deleted),
+  `docs/reviews/master-agreement-v1-1-review.md`, `RESUMPTION-TEMPLATE.md`. **No i18n, no
+  migration, no schema change** — the SPA label `"Master Creator Agreement v{version}"`
+  interpolates the version at runtime, so no locale file changed.
+- **Decisions:**
+  - **Version mechanism:** the single owner `CURRENT_VERSION` drives the endpoint, the
+    snapshot write, and the SPA label. The integer column `contracts.version` stays `1`
+    (`(int)'1.1' === 1` — the documented lossy major-version mapping); the **precise string**
+    in `signed_signature_data.version` and the **body snapshot** are the authority. Nothing in
+    the codebase compares version labels (re-verified post-AH-042/048; the only other
+    `.version` references are the unrelated `CampaignDraft` revision counter).
+  - **Snapshot immutability (§5.34):** a new Pest case pins that a pre-swap `'1.0'` row is
+    byte-untouched (old body, `version === 1`, string `'1.0'`) after the source + constant
+    bump, and that re-entering the accept path is an idempotent no-op that never re-snapshots.
+  - **Test strengthening + break-revert (§5.35):** I3 proved the pre-swap pins were
+    content-blind (they only pinned the unchanged H1 / `2. Services` heading, and version via
+    constant). New pins assert the presence of clauses 2.4 / 4.3 and the precise `'1.1'`
+    string; verified by deleting clause 2.4 from the markdown → the three content pins red →
+    revert → clean `git diff` → re-green.
+  - **Transcription fidelity:** faithful to the PDF with four recorded deviations (privacy
+    URL substituted for the placeholder; "Deliveable" typo corrected to "Deliverable";
+    dash/apostrophe normalization; page-marker stripping) — full list in the review file's
+    Transcription-deviations block.
+- **Verification:** full backend Pest (1870 passed / 1 skipped / 6604 assertions), Pint
+  `--all`, PHPStan, apps/main Vitest (1187 green; 3 concurrent-load timeout flakes re-run
+  green in isolation), vue-tsc, ESLint (0 errors), api-client (196), 23-locale parity, and the
+  Playwright `creator-wizard-happy-path` contract-step run (green — new longer content
+  traverses the AH-028 scroll gate).
+- **Ref:** `77ef15b` (feat) + docs commit (this entry); review file
+  `docs/reviews/master-agreement-v1-1-review.md`. Engineering review only — whether holding
+  existing signees on their old snapshots without re-consent is legally sound remains a
+  question for counsel (AH-029 thread), **not** blessed here.
+
 ### AH-048 · Incomplete-creator email nudge (scheduled, flag-gated, once-only)
 
 - **Status:** Landed (push HELD)
