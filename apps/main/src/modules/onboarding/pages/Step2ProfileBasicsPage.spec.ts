@@ -31,6 +31,8 @@ const baseAttributes = {
   region: 'Lazio',
   primary_language: 'en',
   secondary_languages: [] as string[],
+  // AH-050 — null means "undisclosed" (hydrates to an empty chip group).
+  content_companions: null as string[] | null,
   categories: ['lifestyle'] as string[],
   avatar_path: null,
   cover_path: null,
@@ -319,6 +321,162 @@ describe('Step2ProfileBasicsPage', () => {
       address_street: null,
       address_postal_code: null,
     })
+  })
+
+  // AH-050 — "Who appears in your content?" companion chip group.
+  it('hydrates the companion chips and persists the selection on save', async () => {
+    mockBootstrap({
+      avatar_path: 'creators/seed/avatar/x.jpg',
+      content_companions: ['partner', 'pets_dogs'],
+    })
+    vi.mocked(onboardingApi.updateProfile).mockResolvedValue({
+      data: {
+        id: '01',
+        type: 'creators',
+        attributes: { ...baseAttributes },
+        wizard: {
+          next_step: 'profile',
+          is_submitted: false,
+          steps: [],
+          weights: {},
+          flags: {
+            kyc_verification_enabled: false,
+            creator_payout_method_enabled: false,
+            contract_signing_enabled: false,
+          },
+        },
+      } as never,
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    // The chip group renders all 11 registry options; hydrated ones selected.
+    expect(wrapper.find('[data-testid="profile-companions"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="profile-companions-chip-partner"]').classes()).toContain(
+      'v-chip--selected',
+    )
+    expect(
+      wrapper.find('[data-testid="profile-companions-chip-roommates"]').classes(),
+    ).not.toContain('v-chip--selected')
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(onboardingApi.updateProfile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content_companions: ['partner', 'pets_dogs'],
+      }),
+    )
+  })
+
+  it('null companions hydrate to an empty chip group and save as [] (Q5 — no phantom state)', async () => {
+    mockBootstrap({
+      avatar_path: 'creators/seed/avatar/x.jpg',
+      content_companions: null,
+    })
+    vi.mocked(onboardingApi.updateProfile).mockResolvedValue({
+      data: {
+        id: '01',
+        type: 'creators',
+        attributes: { ...baseAttributes },
+        wizard: {
+          next_step: 'profile',
+          is_submitted: false,
+          steps: [],
+          weights: {},
+          flags: {
+            kyc_verification_enabled: false,
+            creator_payout_method_enabled: false,
+            contract_signing_enabled: false,
+          },
+        },
+      } as never,
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    // No chip selected — null and [] are visually identical (undisclosed).
+    const selected = wrapper.findAll('.profile-basics-form__companion-chips .v-chip--selected')
+    expect(selected).toHaveLength(0)
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(vi.mocked(onboardingApi.updateProfile).mock.calls.at(-1)?.[0]).toMatchObject({
+      content_companions: [],
+    })
+  })
+
+  it('toggling a companion chip adds it to the save payload', async () => {
+    mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg', content_companions: [] })
+    vi.mocked(onboardingApi.updateProfile).mockResolvedValue({
+      data: {
+        id: '01',
+        type: 'creators',
+        attributes: { ...baseAttributes },
+        wizard: {
+          next_step: 'profile',
+          is_submitted: false,
+          steps: [],
+          weights: {},
+          flags: {
+            kyc_verification_enabled: false,
+            creator_payout_method_enabled: false,
+            contract_signing_enabled: false,
+          },
+        },
+      } as never,
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('[data-testid="profile-companions-chip-teens"]').trigger('click')
+    await flushPromises()
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(vi.mocked(onboardingApi.updateProfile).mock.calls.at(-1)?.[0]).toMatchObject({
+      content_companions: ['teens'],
+    })
+  })
+
+  it('the companion chip group has NO select-all affordance (D3)', async () => {
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    // Categories keeps its select-all; companions must not grow one.
+    expect(wrapper.find('[data-testid="profile-categories-select-all"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="profile-companions-select-all"]').exists()).toBe(false)
+    const companionsFieldset = wrapper.find('[data-testid="profile-companions"]')
+    expect(companionsFieldset.find('.v-checkbox-btn').exists()).toBe(false)
   })
 
   it('enables Save and continue and hides the hint once the full floor is met', async () => {

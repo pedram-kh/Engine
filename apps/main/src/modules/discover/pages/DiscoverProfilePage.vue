@@ -111,6 +111,14 @@ const categoryLabels = computed(() =>
   (attrs.value?.categories ?? []).map((cat) => t(`creator.ui.wizard.categories.${cat}`, cat)),
 )
 
+// AH-050 — "Who appears in your content?" registry keys → localized labels.
+// null and [] both render the CategoryChips empty state (undisclosed).
+const companionLabels = computed(() =>
+  (attrs.value?.content_companions ?? []).map((key) =>
+    t(`creator.ui.wizard.companions.${key}`, key),
+  ),
+)
+
 const socialAccountRows = computed(() => {
   const raw: ReadonlyArray<CreatorSocialAccountSummary> = attrs.value?.social_accounts ?? []
   return raw.map((account) => ({
@@ -378,6 +386,10 @@ onMounted(() => {
             <div class="discover-profile__categories">
               <span class="discover-profile__label">{{ t('app.roster.fields.categories') }}</span>
               <CategoryChips :labels="categoryLabels" />
+            </div>
+            <div class="discover-profile__categories" data-testid="discover-profile-companions">
+              <span class="discover-profile__label">{{ t('app.roster.fields.companions') }}</span>
+              <CategoryChips :labels="companionLabels" />
             </div>
           </div>
         </v-card-text>

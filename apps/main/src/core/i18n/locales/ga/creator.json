@@ -180,6 +180,8 @@
           "primary_language": "Teanga dhúchais",
           "accent": "Blas nó canúint",
           "accent_help": "Roghnach. Mar shampla Briotanach, Brasaíleach nó Bavárach.",
+          "companions": "Cé a fheictear i do chuid ábhair?",
+          "companions_help": "Roghnach. Cabhraíonn sé le brandaí na cruthaitheoirí cearta a roghnú d'fheachtas. Fág gach rud gan roghnú más fearr leat gan é a rá.",
           "categories": "Categories",
           "categories_select_all": "Roghnaigh gach rud",
           "categories_help": "Pick the categories that best describe what you create.",
@@ -198,6 +200,19 @@
           "address_country": "Country",
           "address_city": "City",
           "optional_prefix": "Roghnach."
+        },
+        "companions": {
+          "partner": "Páirtí",
+          "baby_toddler": "Leanbh nó lapadán (0–3)",
+          "young_kids": "Páistí óga (4–12)",
+          "teens": "Déagóirí (13–17)",
+          "adult_children": "Clann fhásta",
+          "parents_grandparents": "Tuismitheoirí nó seantuismitheoirí",
+          "extended_family_friends": "Gaolta agus cairde",
+          "pets_dogs": "Peataí — madraí",
+          "pets_cats": "Peataí — cait",
+          "pets_other": "Peataí — eile",
+          "roommates": "Comrádaithe seomra"
         },
         "categories": {
           "fashion": "Fashion",

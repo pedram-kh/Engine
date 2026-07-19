@@ -180,6 +180,8 @@
           "primary_language": "Dzimtā valoda",
           "accent": "Akcents vai dialekts",
           "accent_help": "Neobligāti. Piemēram, britu, brazīliešu vai bavāriešu.",
+          "companions": "Kas parādās jūsu saturā?",
+          "companions_help": "Neobligāti. Palīdz zīmoliem kampaņai izvēlēties piemērotus satura veidotājus. Ja nevēlaties norādīt, atstājiet visu neatzīmētu.",
           "categories": "Categories",
           "categories_select_all": "Atlasīt visu",
           "categories_help": "Pick the categories that best describe what you create.",
@@ -198,6 +200,19 @@
           "address_country": "Country",
           "address_city": "City",
           "optional_prefix": "Neobligāts."
+        },
+        "companions": {
+          "partner": "Partneris(-e)",
+          "baby_toddler": "Zīdainis vai mazulis (0–3)",
+          "young_kids": "Mazi bērni (4–12)",
+          "teens": "Pusaudži (13–17)",
+          "adult_children": "Pieauguši bērni",
+          "parents_grandparents": "Vecāki vai vecvecāki",
+          "extended_family_friends": "Plašāka ģimene un draugi",
+          "pets_dogs": "Mājdzīvnieki — suņi",
+          "pets_cats": "Mājdzīvnieki — kaķi",
+          "pets_other": "Mājdzīvnieki — citi",
+          "roommates": "Istabas biedri"
         },
         "categories": {
           "fashion": "Fashion",

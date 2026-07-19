@@ -180,6 +180,8 @@
           "primary_language": "Modersmål",
           "accent": "Accent eller dialekt",
           "accent_help": "Valgfrit. For eksempel britisk, brasiliansk eller bayersk.",
+          "companions": "Hvem optræder i dit indhold?",
+          "companions_help": "Valgfrit. Hjælper brands med at caste de rette skabere til en kampagne. Lad alt være fravalgt, hvis du helst ikke vil oplyse det.",
           "categories": "Kategorier",
           "categories_select_all": "Vælg alle",
           "categories_help": "Vælg de kategorier, der bedst beskriver, hvad du laver.",
@@ -198,6 +200,19 @@
           "address_country": "Land",
           "address_city": "By",
           "optional_prefix": "Valgfrit."
+        },
+        "companions": {
+          "partner": "Partner",
+          "baby_toddler": "Baby eller lille barn (0–3)",
+          "young_kids": "Mindre børn (4–12)",
+          "teens": "Teenagere (13–17)",
+          "adult_children": "Voksne børn",
+          "parents_grandparents": "Forældre eller bedsteforældre",
+          "extended_family_friends": "Udvidet familie og venner",
+          "pets_dogs": "Kæledyr — hunde",
+          "pets_cats": "Kæledyr — katte",
+          "pets_other": "Kæledyr — andre",
+          "roommates": "Bofæller"
         },
         "categories": {
           "fashion": "Mode",

@@ -180,6 +180,8 @@
           "primary_language": "Muttersprache",
           "accent": "Akzent oder Dialekt",
           "accent_help": "Optional. Zum Beispiel Britisch, Brasilianisch oder Bairisch.",
+          "companions": "Wer erscheint in deinen Inhalten?",
+          "companions_help": "Optional. Hilft Marken, die passenden Creator für eine Kampagne zu besetzen. Lass alles abgewählt, wenn du es lieber nicht angeben möchtest.",
           "categories": "Kategorien",
           "categories_select_all": "Alle auswählen",
           "categories_help": "Wähle die Kategorien aus, die am besten beschreiben, was du erstellst.",
@@ -198,6 +200,19 @@
           "address_country": "Land",
           "address_city": "Stadt",
           "optional_prefix": "Optional."
+        },
+        "companions": {
+          "partner": "Partner/Partnerin",
+          "baby_toddler": "Baby oder Kleinkind (0–3)",
+          "young_kids": "Jüngere Kinder (4–12)",
+          "teens": "Teenager (13–17)",
+          "adult_children": "Erwachsene Kinder",
+          "parents_grandparents": "Eltern oder Großeltern",
+          "extended_family_friends": "Erweiterte Familie und Freunde",
+          "pets_dogs": "Haustiere — Hunde",
+          "pets_cats": "Haustiere — Katzen",
+          "pets_other": "Haustiere — andere",
+          "roommates": "Mitbewohner"
         },
         "categories": {
           "fashion": "Mode",

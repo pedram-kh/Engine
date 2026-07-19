@@ -97,7 +97,8 @@
           "primary_language": "Primary language",
           "secondary_languages": "Secondary languages",
           "accent": "Akcents",
-          "categories": "Categories"
+          "categories": "Categories",
+          "content_companions": "Kas parādās viņu saturā"
         },
         "edit": {
           "title": "Rediģēt {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Kopēt saiti",
             "view_all_label": "Skatīt visus"
           }
+        },
+        "companions": {
+          "partner": "Partneris(-e)",
+          "baby_toddler": "Zīdainis vai mazulis (0–3)",
+          "young_kids": "Mazi bērni (4–12)",
+          "teens": "Pusaudži (13–17)",
+          "adult_children": "Pieauguši bērni",
+          "parents_grandparents": "Vecāki vai vecvecāki",
+          "extended_family_friends": "Plašāka ģimene un draugi",
+          "pets_dogs": "Mājdzīvnieki — suņi",
+          "pets_cats": "Mājdzīvnieki — kaķi",
+          "pets_other": "Mājdzīvnieki — citi",
+          "roommates": "Istabas biedri"
         },
         "categories": {
           "fashion": "Fashion",

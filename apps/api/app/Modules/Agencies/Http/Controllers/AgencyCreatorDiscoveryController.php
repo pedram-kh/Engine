@@ -81,6 +81,7 @@ final class AgencyCreatorDiscoveryController
                 'creators.country_code',
                 'creators.primary_language',
                 'creators.accent',
+                'creators.content_companions',
                 'creators.categories',
                 'creators.avatar_path',
             ])

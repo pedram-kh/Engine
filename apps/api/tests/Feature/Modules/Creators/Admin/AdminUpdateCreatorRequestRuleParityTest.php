@@ -76,6 +76,14 @@ it('AdminUpdateCreatorRequest EDITABLE_FIELDS does not include application_statu
         ->not->toContain('application_status');
 });
 
+it('AdminUpdateCreatorRequest EDITABLE_FIELDS does not include content_companions (AH-050 D7, §5.34)', function (): void {
+    // Self-declared personal data an admin must never set on a creator's
+    // behalf — admins view, never write. The behavioural leg (PATCH → 422)
+    // lives in ContentCompanionsTest; this pins the constant itself.
+    expect(AdminUpdateCreatorRequest::EDITABLE_FIELDS)
+        ->not->toContain('content_companions');
+});
+
 it('AdminUpdateCreatorRequest REASON_REQUIRED_FIELDS pins the sensitive-field set', function (): void {
     expect(AdminUpdateCreatorRequest::REASON_REQUIRED_FIELDS)
         ->toEqual(['bio', 'categories']);

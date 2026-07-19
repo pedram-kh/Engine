@@ -97,7 +97,8 @@
           "primary_language": "Primaire taal",
           "secondary_languages": "Overige talen",
           "accent": "Accent",
-          "categories": "Categorieën"
+          "categories": "Categorieën",
+          "content_companions": "Wie verschijnt er in hun content"
         },
         "edit": {
           "title": "{field} bewerken",
@@ -211,6 +212,19 @@
             "copy_link_label": "Link kopiëren",
             "view_all_label": "Alles weergeven"
           }
+        },
+        "companions": {
+          "partner": "Partner",
+          "baby_toddler": "Baby of peuter (0–3)",
+          "young_kids": "Jonge kinderen (4–12)",
+          "teens": "Tieners (13–17)",
+          "adult_children": "Volwassen kinderen",
+          "parents_grandparents": "Ouders of grootouders",
+          "extended_family_friends": "Bredere familie en vrienden",
+          "pets_dogs": "Huisdieren — honden",
+          "pets_cats": "Huisdieren — katten",
+          "pets_other": "Huisdieren — overige",
+          "roommates": "Huisgenoten"
         },
         "categories": {
           "fashion": "Mode",

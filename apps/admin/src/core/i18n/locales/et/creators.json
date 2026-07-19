@@ -97,7 +97,8 @@
           "primary_language": "Primary language",
           "secondary_languages": "Secondary languages",
           "accent": "Aktsent",
-          "categories": "Categories"
+          "categories": "Categories",
+          "content_companions": "Kes nende sisus esineb"
         },
         "edit": {
           "title": "Muuda {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Kopeeri link",
             "view_all_label": "Vaata kõiki"
           }
+        },
+        "companions": {
+          "partner": "Partner",
+          "baby_toddler": "Beebi või väikelaps (0–3)",
+          "young_kids": "Väikesed lapsed (4–12)",
+          "teens": "Teismelised (13–17)",
+          "adult_children": "Täiskasvanud lapsed",
+          "parents_grandparents": "Vanemad või vanavanemad",
+          "extended_family_friends": "Laiem pere ja sõbrad",
+          "pets_dogs": "Lemmikloomad — koerad",
+          "pets_cats": "Lemmikloomad — kassid",
+          "pets_other": "Lemmikloomad — muud",
+          "roommates": "Toakaaslased"
         },
         "categories": {
           "fashion": "Fashion",

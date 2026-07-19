@@ -246,6 +246,8 @@ export interface RosterCreatorListItem {
     primary_language: string | null
     /** Free-text accent / dialect hint (e.g. "British"). Display-only. */
     accent: string | null
+    /** Self-declared companion keys (AH-050). Display-only; null/[] = undisclosed. */
+    content_companions: string[] | null
     categories: string[] | null
     /**
      * Short-lived signed GET for the creator avatar (invite-offer-details
@@ -342,6 +344,8 @@ export interface AgencyCreatorDetailProfile {
   secondary_languages: string[] | null
   /** Free-text accent / dialect hint (e.g. "British"). Display-only. */
   accent: string | null
+  /** Self-declared companion keys (AH-050). Display-only; null/[] = undisclosed. */
+  content_companions: string[] | null
   categories: string[] | null
   /** Signed view URL for the private `media` disk; null when unset / non-S3. */
   avatar_url: string | null
@@ -471,6 +475,12 @@ export interface DiscoveryCreatorListItem {
     primary_language: string | null
     /** Free-text accent / dialect hint (e.g. "British"). Display-only. */
     accent: string | null
+    /**
+     * Self-declared companion keys (AH-050). On the wire for payload symmetry
+     * with the accent set; the dense discover CARD does not render it in v1
+     * (D5) — detail surfaces do.
+     */
+    content_companions: string[] | null
     categories: string[] | null
     /** Single signed avatar URL; null when unset / non-S3. */
     avatar_url: string | null
@@ -530,6 +540,8 @@ export interface CreatorPublicProfile {
     secondary_languages: string[] | null
     /** Free-text accent / dialect hint (e.g. "British"). Display-only. */
     accent: string | null
+    /** Self-declared companion keys (AH-050). Display-only; null/[] = undisclosed. */
+    content_companions: string[] | null
     categories: string[] | null
     avatar_url: string | null
     cover_url: string | null

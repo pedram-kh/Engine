@@ -36,6 +36,7 @@ function makeCreator(overrides: Partial<CreatorResource> = {}): CreatorResource 
     primary_language: null,
     secondary_languages: null,
     accent: null,
+    content_companions: null,
     categories: null,
     avatar_path: null,
     cover_path: null,

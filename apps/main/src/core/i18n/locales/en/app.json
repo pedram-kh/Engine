@@ -204,6 +204,7 @@
         "country": "Country",
         "language": "Language",
         "categories": "Categories",
+        "companions": "Who appears in their content",
         "rating": "Rating",
         "campaigns": "Campaigns",
         "phone": "Phone",

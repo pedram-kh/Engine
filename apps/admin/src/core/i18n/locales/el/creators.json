@@ -97,7 +97,8 @@
           "primary_language": "Primary language",
           "secondary_languages": "Secondary languages",
           "accent": "Προφορά",
-          "categories": "Categories"
+          "categories": "Categories",
+          "content_companions": "Ποιος εμφανίζεται στο περιεχόμενό τους"
         },
         "edit": {
           "title": "Επεξεργασία {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Αντιγραφή συνδέσμου",
             "view_all_label": "Προβολή όλων"
           }
+        },
+        "companions": {
+          "partner": "Σύντροφος",
+          "baby_toddler": "Μωρό ή νήπιο (0–3)",
+          "young_kids": "Μικρά παιδιά (4–12)",
+          "teens": "Έφηβοι (13–17)",
+          "adult_children": "Ενήλικα παιδιά",
+          "parents_grandparents": "Γονείς ή παππούδες",
+          "extended_family_friends": "Ευρύτερη οικογένεια και φίλοι",
+          "pets_dogs": "Κατοικίδια — σκύλοι",
+          "pets_cats": "Κατοικίδια — γάτες",
+          "pets_other": "Κατοικίδια — άλλα",
+          "roommates": "Συγκάτοικοι"
         },
         "categories": {
           "fashion": "Fashion",

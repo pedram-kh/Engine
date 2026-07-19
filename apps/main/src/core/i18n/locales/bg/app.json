@@ -204,6 +204,7 @@
         "country": "Country",
         "language": "Език",
         "categories": "Categories",
+        "companions": "Кой се появява в съдържанието им",
         "rating": "Rating",
         "campaigns": "Кампанияs",
         "phone": "Телефон",

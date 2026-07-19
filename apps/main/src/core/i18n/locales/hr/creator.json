@@ -180,6 +180,8 @@
           "primary_language": "Materinski jezik",
           "accent": "Naglasak ili dijalekt",
           "accent_help": "Neobavezno. Na primjer britanski, brazilski ili bavarski.",
+          "companions": "Tko se pojavljuje u vašem sadržaju?",
+          "companions_help": "Neobavezno. Pomaže brendovima odabrati prave kreatore za kampanju. Ostavite sve neoznačeno ako radije ne želite reći.",
           "categories": "Kategorie",
           "categories_select_all": "Odaberi sve",
           "categories_help": "Vyberte kategorie, které nejlépe popisují, co tvoříte.",
@@ -198,6 +200,19 @@
           "address_country": "Země",
           "address_city": "Město",
           "optional_prefix": "Neobavezno."
+        },
+        "companions": {
+          "partner": "Partner/partnerica",
+          "baby_toddler": "Beba ili malo dijete (0–3)",
+          "young_kids": "Mlađa djeca (4–12)",
+          "teens": "Tinejdžeri (13–17)",
+          "adult_children": "Odrasla djeca",
+          "parents_grandparents": "Roditelji ili bake i djedovi",
+          "extended_family_friends": "Šira obitelj i prijatelji",
+          "pets_dogs": "Kućni ljubimci — psi",
+          "pets_cats": "Kućni ljubimci — mačke",
+          "pets_other": "Kućni ljubimci — ostalo",
+          "roommates": "Cimeri"
         },
         "categories": {
           "fashion": "Móda",

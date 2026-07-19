@@ -97,7 +97,8 @@
           "primary_language": "Primary language",
           "secondary_languages": "Secondary languages",
           "accent": "Accent",
-          "categories": "Categories"
+          "categories": "Categories",
+          "content_companions": "Cine apare în conținutul lor"
         },
         "edit": {
           "title": "Editați {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Copiați linkul",
             "view_all_label": "Vezi toate"
           }
+        },
+        "companions": {
+          "partner": "Partener/parteneră",
+          "baby_toddler": "Bebeluș sau copil mic (0–3)",
+          "young_kids": "Copii (4–12)",
+          "teens": "Adolescenți (13–17)",
+          "adult_children": "Copii adulți",
+          "parents_grandparents": "Părinți sau bunici",
+          "extended_family_friends": "Familie extinsă și prieteni",
+          "pets_dogs": "Animale de companie — câini",
+          "pets_cats": "Animale de companie — pisici",
+          "pets_other": "Animale de companie — altele",
+          "roommates": "Colegi de apartament"
         },
         "categories": {
           "fashion": "Fashion",

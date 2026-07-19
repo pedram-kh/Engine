@@ -135,6 +135,10 @@ final class AgencyCreatorDetailResource extends JsonResource
             'primary_language' => $creator->primary_language,
             'secondary_languages' => $creator->secondary_languages,
             'accent' => $creator->accent,
+            // AH-050 — self-declared companions (profile-class, NOT part of
+            // the AH-005 contact block; visible on the relation detail like
+            // accent/categories).
+            'content_companions' => $creator->content_companions,
             'categories' => $creator->categories,
             'avatar_url' => $this->signedViewUrl($creator->avatar_path),
             'cover_url' => $this->signedViewUrl($creator->cover_path),

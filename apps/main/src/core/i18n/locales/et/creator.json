@@ -180,6 +180,8 @@
           "primary_language": "Emakeel",
           "accent": "Aktsent või murre",
           "accent_help": "Valikuline. Näiteks briti, brasiilia või baieri.",
+          "companions": "Kes sinu sisus esineb?",
+          "companions_help": "Valikuline. Aitab brändidel valida kampaaniaks sobivad loojad. Kui eelistad mitte öelda, jäta kõik valimata.",
           "categories": "Categories",
           "categories_select_all": "Vali kõik",
           "categories_help": "Pick the categories that best describe what you create.",
@@ -198,6 +200,19 @@
           "address_country": "Country",
           "address_city": "City",
           "optional_prefix": "Valikuline."
+        },
+        "companions": {
+          "partner": "Partner",
+          "baby_toddler": "Beebi või väikelaps (0–3)",
+          "young_kids": "Väikesed lapsed (4–12)",
+          "teens": "Teismelised (13–17)",
+          "adult_children": "Täiskasvanud lapsed",
+          "parents_grandparents": "Vanemad või vanavanemad",
+          "extended_family_friends": "Laiem pere ja sõbrad",
+          "pets_dogs": "Lemmikloomad — koerad",
+          "pets_cats": "Lemmikloomad — kassid",
+          "pets_other": "Lemmikloomad — muud",
+          "roommates": "Toakaaslased"
         },
         "categories": {
           "fashion": "Fashion",

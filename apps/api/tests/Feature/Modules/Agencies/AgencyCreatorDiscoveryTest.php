@@ -169,8 +169,8 @@ it('exposes the slim card shape and carries NONE of the relation block', functio
 
     $attrs = $response->json('data.0.attributes');
     expect(array_keys($attrs))->toEqualCanonicalizing([
-        'display_name', 'country_code', 'primary_language', 'accent', 'categories',
-        'avatar_url', 'relationship_status',
+        'display_name', 'country_code', 'primary_language', 'accent',
+        'content_companions', 'categories', 'avatar_url', 'relationship_status',
     ]);
 
     // The per-agency relation block is absent (only the caller's own status
@@ -223,6 +223,8 @@ it('carries the public profile (bio, region, languages, categories, social, port
         'primary_language' => 'pt',
         'secondary_languages' => ['en'],
         'categories' => ['travel', 'food'],
+        // AH-050 — discover-visible by design (profile-class data).
+        'content_companions' => ['partner', 'pets_dogs'],
         'profile_completeness_score' => 80,
     ]);
     CreatorSocialAccountFactory::new()->for($creator)->create(['handle' => 'pat_public']);
@@ -236,6 +238,7 @@ it('carries the public profile (bio, region, languages, categories, social, port
         ->and($attrs['primary_language'])->toBe('pt')
         ->and($attrs['secondary_languages'])->toBe(['en'])
         ->and($attrs['categories'])->toEqualCanonicalizing(['travel', 'food'])
+        ->and($attrs['content_companions'])->toBe(['partner', 'pets_dogs'])
         ->and($attrs['profile_completeness_score'])->toBe(80)
         ->and($attrs['social_accounts'])->toHaveCount(1)
         ->and($attrs['social_accounts'][0]['handle'])->toBe('pat_public')

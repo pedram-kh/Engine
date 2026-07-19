@@ -147,7 +147,7 @@ final class AgencyCreatorController
             // roster list can surface it without an N+1 — `user_id` is added to
             // the creator select so the belongsTo can hydrate.
             ->with([
-                'creator:id,ulid,user_id,display_name,country_code,primary_language,accent,categories,application_status,avatar_path',
+                'creator:id,ulid,user_id,display_name,country_code,primary_language,accent,content_companions,categories,application_status,avatar_path',
                 'creator.user:id,email',
             ])
             // Default sort: creator display_name ASC via a correlated
@@ -358,6 +358,9 @@ final class AgencyCreatorController
                 'country_code' => $creator?->country_code,
                 'primary_language' => $creator?->primary_language,
                 'accent' => $creator?->accent,
+                // AH-050 — self-declared companions (in the eager-load select
+                // above; null/[] both render as "undisclosed").
+                'content_companions' => $creator?->content_companions,
                 'categories' => $creator?->categories,
                 'avatar_url' => $this->signedAvatarUrl($creator?->avatar_path),
             ],

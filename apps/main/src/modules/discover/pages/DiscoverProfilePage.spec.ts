@@ -67,6 +67,7 @@ function makeProfile(
       primary_language: 'en',
       secondary_languages: [],
       accent: null,
+      content_companions: null,
       categories: ['tech'],
       avatar_url: null,
       cover_url: null,
@@ -300,6 +301,34 @@ describe('DiscoverProfilePage', () => {
 
     expect(harness.wrapper.find('[data-test="discover-profile-notconnected"]').exists()).toBe(true)
     expect(harness.wrapper.find('[data-test="discover-profile-send-request"]').exists()).toBe(false)
+  })
+
+  // AH-050 — the "Who appears in their content" row (display-only, D5).
+  it('renders the companions row with localized chip labels when disclosed', async () => {
+    const harness = await mountProfile({
+      profile: makeProfile({ content_companions: ['partner', 'pets_dogs'] }),
+    })
+    cleanup = harness.cleanup
+
+    const row = harness.wrapper.find('[data-testid="discover-profile-companions"]')
+    expect(row.exists()).toBe(true)
+    expect(row.text()).toContain('Who appears in their content')
+
+    // CategoryChips is stubbed — assert the localized labels it receives.
+    const chips = row.findComponent({ name: 'CategoryChips' })
+    expect(chips.props('labels')).toEqual(['Partner', 'Pets — dogs'])
+  })
+
+  it('renders the companions row empty (undisclosed) for null — no phantom state', async () => {
+    const harness = await mountProfile({
+      profile: makeProfile({ content_companions: null }),
+    })
+    cleanup = harness.cleanup
+
+    const row = harness.wrapper.find('[data-testid="discover-profile-companions"]')
+    expect(row.exists()).toBe(true)
+    const chips = row.findComponent({ name: 'CategoryChips' })
+    expect(chips.props('labels')).toEqual([])
   })
 
   it('shows the not-found message on a 404 (non-discoverable creator)', async () => {

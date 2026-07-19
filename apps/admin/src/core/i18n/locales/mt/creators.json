@@ -97,7 +97,8 @@
           "primary_language": "Primary language",
           "secondary_languages": "Secondary languages",
           "accent": "Aċċent",
-          "categories": "Categories"
+          "categories": "Categories",
+          "content_companions": "Min jidher fil-kontenut tagħhom"
         },
         "edit": {
           "title": "Editja {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Ikkopja l-link",
             "view_all_label": "Ara kollox"
           }
+        },
+        "companions": {
+          "partner": "Sieħeb/Sieħba",
+          "baby_toddler": "Tarbija jew tifel żgħir (0–3)",
+          "young_kids": "Tfal żgħar (4–12)",
+          "teens": "Adolexxenti (13–17)",
+          "adult_children": "Ulied adulti",
+          "parents_grandparents": "Ġenituri jew nanniet",
+          "extended_family_friends": "Familja estiża u ħbieb",
+          "pets_dogs": "Annimali domestiċi — klieb",
+          "pets_cats": "Annimali domestiċi — qtates",
+          "pets_other": "Annimali domestiċi — oħrajn",
+          "roommates": "Sħab tal-kamra"
         },
         "categories": {
           "fashion": "Fashion",

@@ -97,7 +97,8 @@
           "primary_language": "Primární jazyk",
           "secondary_languages": "Další jazyky",
           "accent": "Naglasak",
-          "categories": "Kategorie"
+          "categories": "Kategorie",
+          "content_companions": "Tko se pojavljuje u njihovom sadržaju"
         },
         "edit": {
           "title": "Uredi {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Kopiraj vezu",
             "view_all_label": "Prikaži sve"
           }
+        },
+        "companions": {
+          "partner": "Partner/partnerica",
+          "baby_toddler": "Beba ili malo dijete (0–3)",
+          "young_kids": "Mlađa djeca (4–12)",
+          "teens": "Tinejdžeri (13–17)",
+          "adult_children": "Odrasla djeca",
+          "parents_grandparents": "Roditelji ili bake i djedovi",
+          "extended_family_friends": "Šira obitelj i prijatelji",
+          "pets_dogs": "Kućni ljubimci — psi",
+          "pets_cats": "Kućni ljubimci — mačke",
+          "pets_other": "Kućni ljubimci — ostalo",
+          "roommates": "Cimeri"
         },
         "categories": {
           "fashion": "Móda",

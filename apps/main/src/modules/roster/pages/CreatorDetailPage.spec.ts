@@ -93,6 +93,7 @@ function makeDetail(
         primary_language: 'en',
         secondary_languages: null,
         accent: null,
+        content_companions: null,
         categories: ['tech'],
         avatar_url: null,
         cover_url: null,
@@ -211,6 +212,33 @@ describe('CreatorDetailPage (Sprint 6 Chunk 2a)', () => {
     const emailLink = harness.wrapper.find('[data-test="creator-detail-email"]')
     expect(emailLink.exists()).toBe(true)
     expect(emailLink.attributes('href')).toBe('mailto:ada@example.com')
+  })
+
+  // AH-050 — the "Who appears in their content" row (display-only, D5).
+  it('renders the companions row with localized chip labels when disclosed', async () => {
+    const harness = await mountDetail({
+      detail: makeDetail({}, { content_companions: ['teens', 'roommates'] }),
+    })
+    cleanup = harness.cleanup
+
+    const row = harness.wrapper.find('[data-testid="roster-detail-companions"]')
+    expect(row.exists()).toBe(true)
+    expect(row.text()).toContain('Who appears in their content')
+
+    const chips = row.findComponent({ name: 'CategoryChips' })
+    expect(chips.props('labels')).toEqual(['Teens (13–17)', 'Roommates'])
+  })
+
+  it('renders the companions row empty (undisclosed) for null — no phantom state', async () => {
+    const harness = await mountDetail({
+      detail: makeDetail({}, { content_companions: null }),
+    })
+    cleanup = harness.cleanup
+
+    const row = harness.wrapper.find('[data-testid="roster-detail-companions"]')
+    expect(row.exists()).toBe(true)
+    const chips = row.findComponent({ name: 'CategoryChips' })
+    expect(chips.props('labels')).toEqual([])
   })
 
   it('renders the AH-005 contact card when the server surfaced contact details', async () => {

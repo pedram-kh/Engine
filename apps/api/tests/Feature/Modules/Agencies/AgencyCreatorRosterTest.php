@@ -163,7 +163,12 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes', fun
     makeRosterRelation(
         $agency,
         ['internal_rating' => 4, 'internal_notes' => 'private agency note — never surfaced'],
-        ['display_name' => 'Ada Lovelace', 'country_code' => 'GB', 'primary_language' => 'en'],
+        [
+            'display_name' => 'Ada Lovelace',
+            'country_code' => 'GB',
+            'primary_language' => 'en',
+            'content_companions' => ['roommates'],
+        ],
     );
 
     $response = $this->actingAs($admin)->getJson(rosterUrl($agency));
@@ -184,6 +189,8 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes', fun
         'application_status',
         'country_code',
         'primary_language',
+        // AH-050 — companions join the slim row (display-only, D5).
+        'content_companions',
         'categories',
         // avatar_url joined the slim row (invite-offer-details batch): the
         // AH-012 D5 "no per-row signing on the roster index" call was
@@ -193,6 +200,7 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes', fun
     ]);
     expect($attributes['internal_rating'])->toBe(4);
     expect($attributes['avatar_url'])->toBeNull();
+    expect($attributes['content_companions'])->toBe(['roommates']);
 
     // The GDPR-sensitive note must NEVER appear anywhere in the payload
     // (break-revert: adding it to the row shape fails this).

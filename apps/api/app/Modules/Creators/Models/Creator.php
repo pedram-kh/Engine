@@ -45,6 +45,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $primary_language
  * @property array<int, string>|null $secondary_languages
  * @property string|null $accent
+ * @property array<int, string>|null $content_companions
  * @property string|null $avatar_path
  * @property string|null $cover_path
  * @property array<int, string>|null $categories
@@ -118,6 +119,9 @@ final class Creator extends Model implements Auditable
         'primary_language',
         'secondary_languages',
         'accent',
+        // AH-050 — "Who appears in your content?" self-declared companion
+        // registry keys. Null and [] both mean "undisclosed".
+        'content_companions',
         'avatar_path',
         'cover_path',
         'categories',
@@ -246,6 +250,10 @@ final class Creator extends Model implements Auditable
      *   - avatar_path / cover_path (file paths, not state changes)
      *   - region               (free-text)
      *   - rejection_reason     (free-text — captured separately as audit reason)
+     *   - accent               (self-described personal data)
+     *   - content_companions   (AH-050 — self-declared personal data about who
+     *                           appears in the creator's content; deliberately
+     *                           NOT audited, the accent precedent)
      *
      * Asserted by tests/Feature/Modules/Creators/CreatorAuditTest.php.
      *
@@ -284,6 +292,7 @@ final class Creator extends Model implements Auditable
     {
         return [
             'secondary_languages' => 'array',
+            'content_companions' => 'array',
             'categories' => 'array',
             'verification_level' => VerificationLevel::class,
             'application_status' => ApplicationStatus::class,

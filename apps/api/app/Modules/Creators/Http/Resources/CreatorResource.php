@@ -130,6 +130,10 @@ final class CreatorResource extends JsonResource
                 'primary_language' => $creator->primary_language,
                 'secondary_languages' => $creator->secondary_languages,
                 'accent' => $creator->accent,
+                // AH-050 — self-declared companion registry keys ("Who appears
+                // in your content?"). Emitted verbatim: null and [] both mean
+                // "undisclosed" (no normalization, Q5).
+                'content_companions' => $creator->content_companions,
                 'categories' => $creator->categories,
                 'avatar_path' => $creator->avatar_path,
                 'cover_path' => $creator->cover_path,

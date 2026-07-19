@@ -97,7 +97,8 @@
           "primary_language": "Primární jazyk",
           "secondary_languages": "Další jazyky",
           "accent": "Přízvuk",
-          "categories": "Kategorie"
+          "categories": "Kategorie",
+          "content_companions": "Kdo se objevuje v jejich obsahu"
         },
         "edit": {
           "title": "Upravit {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Kopírovat odkaz",
             "view_all_label": "Zobrazit vše"
           }
+        },
+        "companions": {
+          "partner": "Partner/partnerka",
+          "baby_toddler": "Miminko nebo batole (0–3)",
+          "young_kids": "Malé děti (4–12)",
+          "teens": "Teenageři (13–17)",
+          "adult_children": "Dospělé děti",
+          "parents_grandparents": "Rodiče nebo prarodiče",
+          "extended_family_friends": "Širší rodina a přátelé",
+          "pets_dogs": "Mazlíčci — psi",
+          "pets_cats": "Mazlíčci — kočky",
+          "pets_other": "Mazlíčci — ostatní",
+          "roommates": "Spolubydlící"
         },
         "categories": {
           "fashion": "Móda",

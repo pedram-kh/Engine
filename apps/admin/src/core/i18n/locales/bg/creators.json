@@ -97,7 +97,8 @@
           "primary_language": "Primary language",
           "secondary_languages": "Secondary languages",
           "accent": "Акцент",
-          "categories": "Categories"
+          "categories": "Categories",
+          "content_companions": "Кой се появява в съдържанието им"
         },
         "edit": {
           "title": "Редактирайте {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Копирай линк",
             "view_all_label": "Виж всички"
           }
+        },
+        "companions": {
+          "partner": "Партньор",
+          "baby_toddler": "Бебе или малко дете (0–3)",
+          "young_kids": "Малки деца (4–12)",
+          "teens": "Тийнейджъри (13–17)",
+          "adult_children": "Пълнолетни деца",
+          "parents_grandparents": "Родители или баби и дядовци",
+          "extended_family_friends": "Разширено семейство и приятели",
+          "pets_dogs": "Домашни любимци — кучета",
+          "pets_cats": "Домашни любимци — котки",
+          "pets_other": "Домашни любимци — други",
+          "roommates": "Съквартиранти"
         },
         "categories": {
           "fashion": "Fashion",

@@ -97,7 +97,8 @@
           "primary_language": "Idioma principal",
           "secondary_languages": "Idiomas secundários",
           "accent": "Sotaque",
-          "categories": "Categorias"
+          "categories": "Categorias",
+          "content_companions": "Quem aparece no conteúdo deles"
         },
         "edit": {
           "title": "Editar {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Copiar ligação",
             "view_all_label": "Ver tudo"
           }
+        },
+        "companions": {
+          "partner": "Parceiro(a)",
+          "baby_toddler": "Bebé ou criança pequena (0–3)",
+          "young_kids": "Crianças (4–12)",
+          "teens": "Adolescentes (13–17)",
+          "adult_children": "Filhos adultos",
+          "parents_grandparents": "Pais ou avós",
+          "extended_family_friends": "Família alargada e amigos",
+          "pets_dogs": "Animais — cães",
+          "pets_cats": "Animais — gatos",
+          "pets_other": "Animais — outros",
+          "roommates": "Colegas de casa"
         },
         "categories": {
           "fashion": "Moda",

@@ -52,6 +52,7 @@ function buildCreator(overrides: Partial<CreatorResource['attributes']> = {}): C
       primary_language: 'en',
       secondary_languages: ['pt'],
       accent: null,
+      content_companions: ['partner', 'pets_dogs'],
       categories: ['fashion', 'beauty'],
       avatar_path: null,
       cover_path: null,
@@ -164,6 +165,27 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
         `Edit button for ${field} should be present`,
       ).toBe(true)
     }
+  })
+
+  // AH-050 (D7) — companions render read-only: a plain row with chips and
+  // NO pencil. Break-revert: give the row an edit affordance and the
+  // second assertion reds.
+  it('renders content_companions as a read-only row WITHOUT an edit button', async () => {
+    vi.mocked(adminCreatorsApi.show).mockResolvedValue(envelope(buildCreator()))
+    const h = await mountCreatorPage(CreatorDetailPage)
+    teardown = h.unmount
+    await flushPromises()
+
+    const row = h.wrapper.find('[data-testid="admin-creator-detail-row-content_companions"]')
+    expect(row.exists()).toBe(true)
+    // Fixture carries ['partner', 'pets_dogs'] → two localized chips.
+    expect(row.text()).toContain('Partner')
+    expect(row.text()).toContain('Pets — dogs')
+
+    expect(
+      h.wrapper.find('[data-testid="admin-creator-detail-row-content_companions-edit"]').exists(),
+    ).toBe(false)
+    expect(row.find('button').exists()).toBe(false)
   })
 
   it('opens the edit modal with the right field when an edit button is clicked', async () => {

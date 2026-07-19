@@ -97,7 +97,8 @@
           "primary_language": "Primary language",
           "secondary_languages": "Secondary languages",
           "accent": "Akcentas",
-          "categories": "Categories"
+          "categories": "Categories",
+          "content_companions": "Kas rodomas jų turinyje"
         },
         "edit": {
           "title": "Redaguoti {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Kopijuoti nuorodą",
             "view_all_label": "Peržiūrėti visus"
           }
+        },
+        "companions": {
+          "partner": "Partneris (-ė)",
+          "baby_toddler": "Kūdikis ar mažylis (0–3)",
+          "young_kids": "Maži vaikai (4–12)",
+          "teens": "Paaugliai (13–17)",
+          "adult_children": "Suaugę vaikai",
+          "parents_grandparents": "Tėvai ar seneliai",
+          "extended_family_friends": "Platesnė šeima ir draugai",
+          "pets_dogs": "Augintiniai — šunys",
+          "pets_cats": "Augintiniai — katės",
+          "pets_other": "Augintiniai — kiti",
+          "roommates": "Kambariokai"
         },
         "categories": {
           "fashion": "Fashion",

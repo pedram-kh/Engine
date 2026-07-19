@@ -180,6 +180,8 @@
           "primary_language": "Äidinkieli",
           "accent": "Aksentti tai murre",
           "accent_help": "Valinnainen. Esimerkiksi brittiläinen, brasilialainen tai baijerilainen.",
+          "companions": "Kuka esiintyy sisällössäsi?",
+          "companions_help": "Valinnainen. Auttaa brändejä valitsemaan kampanjaan sopivat tekijät. Jätä kaikki valitsematta, jos et halua kertoa.",
           "categories": "Categories",
           "categories_select_all": "Valitse kaikki",
           "categories_help": "Pick the categories that best describe what you create.",
@@ -198,6 +200,19 @@
           "address_country": "Country",
           "address_city": "City",
           "optional_prefix": "Valinnainen."
+        },
+        "companions": {
+          "partner": "Kumppani",
+          "baby_toddler": "Vauva tai taapero (0–3)",
+          "young_kids": "Pienet lapset (4–12)",
+          "teens": "Teinit (13–17)",
+          "adult_children": "Aikuiset lapset",
+          "parents_grandparents": "Vanhemmat tai isovanhemmat",
+          "extended_family_friends": "Laajempi perhe ja ystävät",
+          "pets_dogs": "Lemmikit — koirat",
+          "pets_cats": "Lemmikit — kissat",
+          "pets_other": "Lemmikit — muut",
+          "roommates": "Kämppäkaverit"
         },
         "categories": {
           "fashion": "Fashion",

@@ -174,6 +174,11 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     // Categories render as a visible chip grid — click the first chip.
     await page.locator('[data-testid="profile-category-chip-fashion"]').click()
 
+    // AH-050 — the optional "Who appears in your content?" chip group.
+    // Selecting a chip must neither gate nor block the step (the field is
+    // optional + completeness-inert); it simply rides along on the save.
+    await page.locator('[data-testid="profile-companions-chip-partner"]').click()
+
     await page.locator('[data-testid="profile-submit"]').click()
 
     // -----------------------------------------------------------------

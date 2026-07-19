@@ -97,7 +97,8 @@
           "primary_language": "Primární jazyk",
           "secondary_languages": "Další jazyky",
           "accent": "Prízvuk",
-          "categories": "Kategorie"
+          "categories": "Kategorie",
+          "content_companions": "Kto sa objavuje v ich obsahu"
         },
         "edit": {
           "title": "Upraviť {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Kopírovať odkaz",
             "view_all_label": "Zobraziť všetko"
           }
+        },
+        "companions": {
+          "partner": "Partner/partnerka",
+          "baby_toddler": "Bábätko alebo batoľa (0–3)",
+          "young_kids": "Malé deti (4–12)",
+          "teens": "Tínedžeri (13–17)",
+          "adult_children": "Dospelé deti",
+          "parents_grandparents": "Rodičia alebo starí rodičia",
+          "extended_family_friends": "Širšia rodina a priatelia",
+          "pets_dogs": "Domáce zvieratá — psy",
+          "pets_cats": "Domáce zvieratá — mačky",
+          "pets_other": "Domáce zvieratá — iné",
+          "roommates": "Spolubývajúci"
         },
         "categories": {
           "fashion": "Móda",

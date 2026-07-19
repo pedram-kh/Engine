@@ -180,6 +180,8 @@
           "primary_language": "Materni jezik",
           "accent": "Naglas ali narečje",
           "accent_help": "Neobvezno. Na primer britanski, brazilski ali bavarski.",
+          "companions": "Kdo se pojavlja v vaših vsebinah?",
+          "companions_help": "Neobvezno. Pomaga znamkam izbrati prave ustvarjalce za kampanjo. Če raje ne poveste, pustite vse neizbrano.",
           "categories": "Kategorie",
           "categories_select_all": "Izberi vse",
           "categories_help": "Vyberte kategorie, které nejlépe popisují, co tvoříte.",
@@ -198,6 +200,19 @@
           "address_country": "Země",
           "address_city": "Město",
           "optional_prefix": "Neobvezno."
+        },
+        "companions": {
+          "partner": "Partner/partnerica",
+          "baby_toddler": "Dojenček ali malček (0–3)",
+          "young_kids": "Mlajši otroci (4–12)",
+          "teens": "Najstniki (13–17)",
+          "adult_children": "Odrasli otroci",
+          "parents_grandparents": "Starši ali stari starši",
+          "extended_family_friends": "Širša družina in prijatelji",
+          "pets_dogs": "Hišni ljubljenčki — psi",
+          "pets_cats": "Hišni ljubljenčki — mačke",
+          "pets_other": "Hišni ljubljenčki — drugo",
+          "roommates": "Sostanovalci"
         },
         "categories": {
           "fashion": "Móda",

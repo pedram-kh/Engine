@@ -180,6 +180,8 @@
           "primary_language": "Lingwa nattiva",
           "accent": "Aċċent jew djalett",
           "accent_help": "Fakultattiv. Pereżempju Brittaniku, Brażiljan jew Bavariż.",
+          "companions": "Min jidher fil-kontenut tiegħek?",
+          "companions_help": "Mhux obbligatorju. Jgħin lill-brands jagħżlu l-kreaturi t-tajbin għal kampanja. Ħalli kollox mhux magħżul jekk tippreferi ma tgħidx.",
           "categories": "Categories",
           "categories_select_all": "Agħżel kollox",
           "categories_help": "Pick the categories that best describe what you create.",
@@ -198,6 +200,19 @@
           "address_country": "Country",
           "address_city": "City",
           "optional_prefix": "Fakultattiv."
+        },
+        "companions": {
+          "partner": "Sieħeb/Sieħba",
+          "baby_toddler": "Tarbija jew tifel żgħir (0–3)",
+          "young_kids": "Tfal żgħar (4–12)",
+          "teens": "Adolexxenti (13–17)",
+          "adult_children": "Ulied adulti",
+          "parents_grandparents": "Ġenituri jew nanniet",
+          "extended_family_friends": "Familja estiża u ħbieb",
+          "pets_dogs": "Annimali domestiċi — klieb",
+          "pets_cats": "Annimali domestiċi — qtates",
+          "pets_other": "Annimali domestiċi — oħrajn",
+          "roommates": "Sħab tal-kamra"
         },
         "categories": {
           "fashion": "Fashion",

@@ -97,7 +97,8 @@
           "primary_language": "Primary language",
           "secondary_languages": "Secondary languages",
           "accent": "Aksentti",
-          "categories": "Categories"
+          "categories": "Categories",
+          "content_companions": "Kuka esiintyy heidän sisällössään"
         },
         "edit": {
           "title": "Muokkaa {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Kopioi linkki",
             "view_all_label": "Näytä kaikki"
           }
+        },
+        "companions": {
+          "partner": "Kumppani",
+          "baby_toddler": "Vauva tai taapero (0–3)",
+          "young_kids": "Pienet lapset (4–12)",
+          "teens": "Teinit (13–17)",
+          "adult_children": "Aikuiset lapset",
+          "parents_grandparents": "Vanhemmat tai isovanhemmat",
+          "extended_family_friends": "Laajempi perhe ja ystävät",
+          "pets_dogs": "Lemmikit — koirat",
+          "pets_cats": "Lemmikit — kissat",
+          "pets_other": "Lemmikit — muut",
+          "roommates": "Kämppäkaverit"
         },
         "categories": {
           "fashion": "Fashion",

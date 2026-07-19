@@ -180,6 +180,8 @@
           "primary_language": "Limba maternă",
           "accent": "Accent sau dialect",
           "accent_help": "Opțional. De exemplu britanic, brazilian sau bavarez.",
+          "companions": "Cine apare în conținutul tău?",
+          "companions_help": "Opțional. Ajută brandurile să aleagă creatorii potriviți pentru o campanie. Lasă totul neselectat dacă preferi să nu spui.",
           "categories": "Categories",
           "categories_select_all": "Selectează tot",
           "categories_help": "Pick the categories that best describe what you create.",
@@ -198,6 +200,19 @@
           "address_country": "Country",
           "address_city": "City",
           "optional_prefix": "Opțional."
+        },
+        "companions": {
+          "partner": "Partener/parteneră",
+          "baby_toddler": "Bebeluș sau copil mic (0–3)",
+          "young_kids": "Copii (4–12)",
+          "teens": "Adolescenți (13–17)",
+          "adult_children": "Copii adulți",
+          "parents_grandparents": "Părinți sau bunici",
+          "extended_family_friends": "Familie extinsă și prieteni",
+          "pets_dogs": "Animale de companie — câini",
+          "pets_cats": "Animale de companie — pisici",
+          "pets_other": "Animale de companie — altele",
+          "roommates": "Colegi de apartament"
         },
         "categories": {
           "fashion": "Fashion",

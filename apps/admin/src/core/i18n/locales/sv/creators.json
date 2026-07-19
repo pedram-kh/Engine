@@ -97,7 +97,8 @@
           "primary_language": "Primärt språk",
           "secondary_languages": "Sekundära språk",
           "accent": "Accent",
-          "categories": "Kategorier"
+          "categories": "Kategorier",
+          "content_companions": "Vem syns i deras innehåll"
         },
         "edit": {
           "title": "Redigera {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Kopiera länk",
             "view_all_label": "Visa alla"
           }
+        },
+        "companions": {
+          "partner": "Partner",
+          "baby_toddler": "Bebis eller småbarn (0–3)",
+          "young_kids": "Yngre barn (4–12)",
+          "teens": "Tonåringar (13–17)",
+          "adult_children": "Vuxna barn",
+          "parents_grandparents": "Föräldrar eller far- och morföräldrar",
+          "extended_family_friends": "Släkt och vänner",
+          "pets_dogs": "Husdjur — hundar",
+          "pets_cats": "Husdjur — katter",
+          "pets_other": "Husdjur — övriga",
+          "roommates": "Rumskamrater"
         },
         "categories": {
           "fashion": "Mode",

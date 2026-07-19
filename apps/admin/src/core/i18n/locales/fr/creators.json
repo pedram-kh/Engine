@@ -97,7 +97,8 @@
           "primary_language": "Langue principale",
           "secondary_languages": "Langues secondaires",
           "accent": "Accent",
-          "categories": "Catégories"
+          "categories": "Catégories",
+          "content_companions": "Qui apparaît dans leur contenu"
         },
         "edit": {
           "title": "Modifier {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Copier le lien",
             "view_all_label": "Voir tout"
           }
+        },
+        "companions": {
+          "partner": "Partenaire",
+          "baby_toddler": "Bébé ou tout-petit (0–3)",
+          "young_kids": "Jeunes enfants (4–12)",
+          "teens": "Adolescents (13–17)",
+          "adult_children": "Enfants adultes",
+          "parents_grandparents": "Parents ou grands-parents",
+          "extended_family_friends": "Famille élargie et amis",
+          "pets_dogs": "Animaux — chiens",
+          "pets_cats": "Animaux — chats",
+          "pets_other": "Animaux — autres",
+          "roommates": "Colocataires"
         },
         "categories": {
           "fashion": "Mode",

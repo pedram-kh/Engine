@@ -92,6 +92,8 @@ it('carries the creator profile + relation block + portfolio + social accounts',
     $creator = CreatorFactory::new()->createOne([
         'display_name' => 'Ada Lovelace',
         'bio' => 'Pioneering mathematician',
+        // AH-050 — profile-class, relation-detail-visible like accent.
+        'content_companions' => ['partner', 'pets_cats'],
     ]);
     AgencyCreatorRelation::factory()->create([
         'agency_id' => $agency->id,
@@ -117,6 +119,7 @@ it('carries the creator profile + relation block + portfolio + social accounts',
     // Nested creator profile + portfolio + social.
     expect($attrs['creator']['display_name'])->toBe('Ada Lovelace')
         ->and($attrs['creator']['bio'])->toBe('Pioneering mathematician')
+        ->and($attrs['creator']['content_companions'])->toBe(['partner', 'pets_cats'])
         ->and($attrs['creator']['social_accounts'])->toHaveCount(1)
         ->and($attrs['creator']['social_accounts'][0]['handle'])->toBe('ada_l')
         ->and($attrs['creator']['portfolio'])->toHaveCount(1)

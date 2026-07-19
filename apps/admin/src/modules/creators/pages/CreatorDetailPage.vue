@@ -104,6 +104,15 @@ const categoryLabels = computed(() => {
   return cats.map((category) => t(`creator.ui.wizard.categories.${category}`, category))
 })
 
+// AH-050 — "Who appears in your content?" Self-declared, admin READ-ONLY
+// (D7): no EditFieldRow, no pencil — rendered as a plain row via the
+// account-details read-only pattern. null and [] both show the chips'
+// empty state (undisclosed).
+const companionLabels = computed(() => {
+  const keys = creator.value?.attributes.content_companions ?? []
+  return keys.map((key) => t(`creator.ui.wizard.companions.${key}`, key))
+})
+
 const primaryLanguageLabel = computed(() => {
   const lang = creator.value?.attributes.primary_language
   if (!lang) return null
@@ -671,6 +680,20 @@ const decisionSnackbarColor = computed(() =>
         >
           <CategoryChips :labels="categoryLabels" />
         </EditFieldRow>
+
+        <!-- AH-050 — admin read-only (D7): plain row, deliberately NOT an
+             EditFieldRow (no pencil). Self-declared personal data an admin
+             never edits on a creator's behalf; the backend rejects it too
+             (not in EDITABLE_FIELDS). -->
+        <div
+          class="admin-creator-detail__readonly-row"
+          data-testid="admin-creator-detail-row-content_companions"
+        >
+          <span class="admin-creator-detail__readonly-label">
+            {{ t('admin.creators.detail.fields.content_companions') }}
+          </span>
+          <CategoryChips :labels="companionLabels" />
+        </div>
       </section>
 
       <section class="admin-creator-detail__section">
@@ -1038,6 +1061,21 @@ const decisionSnackbarColor = computed(() =>
 }
 
 .admin-creator-detail__account-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(var(--v-theme-on-surface), 0.6);
+  margin-bottom: 2px;
+}
+
+/* AH-050 — the plain read-only profile row (no EditFieldRow pencil). */
+.admin-creator-detail__readonly-row {
+  padding: 8px 0;
+}
+
+.admin-creator-detail__readonly-label {
   display: block;
   font-size: 0.75rem;
   font-weight: 600;

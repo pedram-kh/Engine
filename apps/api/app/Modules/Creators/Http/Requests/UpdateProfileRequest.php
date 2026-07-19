@@ -20,6 +20,34 @@ use Illuminate\Validation\Rule;
  */
 final class UpdateProfileRequest extends FormRequest
 {
+    /**
+     * The fixed "Who appears in your content?" companion registry (AH-050).
+     * SOURCE OF TRUTH for the 11 keys — the admin request's read-only view and
+     * the wizard's FE copy (`ProfileBasicsForm.vue` COMPANION_KEYS) mirror this
+     * list. The FE-copy drift is the same recorded AH-019 debt class as
+     * categories (no source-parse parity spec on the wizard file — see
+     * docs/tech-debt.md).
+     *
+     * Deliberately coarse: no exact counts, no ages, no partner attributes —
+     * casting-purpose signal only (the AH-050 review file carries the GDPR
+     * purpose reasoning). Empty selection and null both mean "undisclosed".
+     *
+     * @var list<string>
+     */
+    public const array CONTENT_COMPANION_KEYS = [
+        'partner',
+        'baby_toddler',
+        'young_kids',
+        'teens',
+        'adult_children',
+        'parents_grandparents',
+        'extended_family_friends',
+        'pets_dogs',
+        'pets_cats',
+        'pets_other',
+        'roommates',
+    ];
+
     public function authorize(): bool
     {
         return true;
@@ -59,6 +87,12 @@ final class UpdateProfileRequest extends FormRequest
                 'string',
                 'in:lifestyle,sports,beauty,fashion,food,travel,gaming,tech,music,art,fitness,parenting,business,education,comedy,pets,photography,home,health,finance,automotive,entertainment,design,dance,sustainability,news,science,other',
             ],
+            // AH-050 — "Who appears in your content?" companion multi-select.
+            // No min:1 (unlike categories): an EMPTY array is a valid save
+            // meaning "undisclosed", identical to null. Every stored value is
+            // a deliberate individual disclosure (D3).
+            'content_companions' => ['sometimes', 'nullable', 'array', 'max:11'],
+            'content_companions.*' => ['string', Rule::in(self::CONTENT_COMPANION_KEYS)],
         ];
     }
 }

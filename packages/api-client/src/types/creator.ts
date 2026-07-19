@@ -139,6 +139,14 @@ export interface CreatorAttributes {
    * deliberately not an enum.
    */
   accent: string | null
+  /**
+   * "Who appears in your content?" (AH-050) — self-declared companion
+   * registry keys (partner / kids age-bands / pets / roommates, ...).
+   * Backend SOT: `UpdateProfileRequest::CONTENT_COMPANION_KEYS` (11 keys).
+   * Null and [] BOTH mean "undisclosed" — never normalized. Display-only
+   * casting signal; completeness-inert; admin read-only.
+   */
+  content_companions: string[] | null
   categories: string[] | null
   avatar_path: string | null
   cover_path: string | null
@@ -326,6 +334,11 @@ export interface CreatorProfileUpdatePayload {
   secondary_languages?: string[]
   /** Free-text accent / dialect hint. Nullable — clearing it is valid. */
   accent?: string | null
+  /**
+   * Companion registry keys (AH-050). [] and null both save as
+   * "undisclosed" — an empty selection is a valid state, not an error.
+   */
+  content_companions?: string[] | null
   categories?: string[]
 }
 

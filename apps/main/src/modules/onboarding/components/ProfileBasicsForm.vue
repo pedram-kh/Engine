@@ -95,6 +95,7 @@ type ProfileField =
   | 'address_postal_code'
   | 'primary_language'
   | 'accent'
+  | 'content_companions'
   | 'categories'
 
 const displayName = ref('')
@@ -112,6 +113,7 @@ const addressStreet = ref('')
 const addressPostalCode = ref('')
 const primaryLanguage = ref<string | null>(null)
 const accent = ref('')
+const companions = ref<string[]>([])
 const categories = ref<string[]>([])
 const submitErrorKey = ref<string | null>(null)
 const fieldErrors = ref<Partial<Record<ProfileField, readonly string[]>>>({})
@@ -153,6 +155,28 @@ const CATEGORY_KEYS = [
   'other',
 ] as const
 
+// 11-key companion registry (AH-050) — must stay in sync with the backend
+// `UpdateProfileRequest::CONTENT_COMPANION_KEYS` SOT. Like CATEGORY_KEYS
+// above, parity with the backend const is NOT spec-verified for this copy
+// (the AH-019 debt class, extended by AH-050 in docs/tech-debt.md) — a
+// drift surfaces as a runtime 422, not a test failure.
+// Labels come from `creator.ui.wizard.companions.*` in every locale.
+// Deliberately NO select-all (D3): selecting everything is meaningless
+// here — every stored value is an individual disclosure. Empty = undisclosed.
+const COMPANION_KEYS = [
+  'partner',
+  'baby_toddler',
+  'young_kids',
+  'teens',
+  'adult_children',
+  'parents_grandparents',
+  'extended_family_friends',
+  'pets_dogs',
+  'pets_cats',
+  'pets_other',
+  'roommates',
+] as const
+
 // Spoken-language options: the full world ISO 639-1 set, labelled by
 // endonym (the single registry in @catalyst/api-client). The platform's
 // rendered UI locales stay a separate, smaller set.
@@ -162,6 +186,13 @@ const categoryItems = computed(() =>
   CATEGORY_KEYS.map((key) => ({
     value: key,
     title: t(`creator.ui.wizard.categories.${key}`),
+  })),
+)
+
+const companionItems = computed(() =>
+  COMPANION_KEYS.map((key) => ({
+    value: key,
+    title: t(`creator.ui.wizard.companions.${key}`),
   })),
 )
 
@@ -268,6 +299,9 @@ function hydrate(): void {
   addressPostalCode.value = attrs.address_postal_code ?? ''
   primaryLanguage.value = attrs.primary_language ?? null
   accent.value = attrs.accent ?? ''
+  // AH-050 — null and [] both hydrate to an empty chip group (Q5): the two
+  // stored "undisclosed" states are indistinguishable in the UI by design.
+  companions.value = [...(attrs.content_companions ?? [])]
   categories.value = [...(attrs.categories ?? [])]
 }
 
@@ -301,6 +335,9 @@ async function save(): Promise<boolean> {
       // was removed; the backend rule is `sometimes`, so omitting it
       // preserves any existing value rather than clearing it.
       accent: nullableTrim(accent.value),
+      // AH-050 — sent as-is: clearing every chip saves [] (a valid
+      // "undisclosed" state, Q5 — no []→null normalization).
+      content_companions: companions.value,
       categories: categories.value,
     })
     return true
@@ -490,6 +527,44 @@ defineExpose({ save, hydrate, isPristine })
       data-testid="profile-accent"
     />
 
+    <!-- AH-050 — "Who appears in your content?" Optional multi-select chip
+         group (the categories pattern MINUS select-all, D3): empty means
+         undisclosed, every chip is a deliberate individual disclosure. -->
+    <fieldset class="profile-basics-form__companions" data-testid="profile-companions">
+      <legend class="text-subtitle-2">
+        {{ t('creator.ui.wizard.fields.companions') }}
+      </legend>
+      <p class="profile-basics-form__companions-note text-caption">
+        {{ t('creator.ui.wizard.fields.companions_help') }}
+      </p>
+
+      <v-chip-group
+        v-model="companions"
+        multiple
+        column
+        filter
+        class="profile-basics-form__companion-chips"
+      >
+        <v-chip
+          v-for="item in companionItems"
+          :key="item.value"
+          :value="item.value"
+          variant="outlined"
+          :data-testid="`profile-companions-chip-${item.value}`"
+        >
+          {{ item.title }}
+        </v-chip>
+      </v-chip-group>
+
+      <div
+        v-if="fieldErrors.content_companions !== undefined"
+        class="profile-basics-form__error"
+        data-testid="profile-companions-error"
+      >
+        {{ fieldErrors.content_companions.join(' ') }}
+      </div>
+    </fieldset>
+
     <fieldset class="profile-basics-form__categories" data-testid="profile-categories">
       <legend class="text-subtitle-2">
         {{ requiredLabel('creator.ui.wizard.fields.categories') }}
@@ -617,7 +692,8 @@ defineExpose({ save, hydrate, isPristine })
   padding: 0 6px;
 }
 
-.profile-basics-form__categories {
+.profile-basics-form__categories,
+.profile-basics-form__companions {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -626,8 +702,14 @@ defineExpose({ save, hydrate, isPristine })
   border-radius: 6px;
 }
 
-.profile-basics-form__categories legend {
+.profile-basics-form__categories legend,
+.profile-basics-form__companions legend {
   padding: 0 6px;
+}
+
+.profile-basics-form__companions-note {
+  margin-top: -4px;
+  color: rgb(var(--v-theme-on-surface-variant));
 }
 
 .profile-basics-form__categories-note {

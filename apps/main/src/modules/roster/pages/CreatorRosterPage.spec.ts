@@ -71,6 +71,7 @@ function makeRow(
       country_code: 'GB',
       primary_language: 'en',
       accent: null,
+      content_companions: null,
       categories: ['tech'],
       ...overrides,
     },

@@ -180,6 +180,8 @@
           "primary_language": "Modersmål",
           "accent": "Accent eller dialekt",
           "accent_help": "Valfritt. Till exempel brittisk, brasiliansk eller bayersk.",
+          "companions": "Vem syns i ditt innehåll?",
+          "companions_help": "Valfritt. Hjälper varumärken att välja rätt kreatörer för en kampanj. Lämna allt omarkerat om du hellre inte vill ange det.",
           "categories": "Kategorier",
           "categories_select_all": "Välj alla",
           "categories_help": "Välj de kategorier som bäst beskriver vad du skapar.",
@@ -198,6 +200,19 @@
           "address_country": "Land",
           "address_city": "Stad",
           "optional_prefix": "Valfritt."
+        },
+        "companions": {
+          "partner": "Partner",
+          "baby_toddler": "Bebis eller småbarn (0–3)",
+          "young_kids": "Yngre barn (4–12)",
+          "teens": "Tonåringar (13–17)",
+          "adult_children": "Vuxna barn",
+          "parents_grandparents": "Föräldrar eller far- och morföräldrar",
+          "extended_family_friends": "Släkt och vänner",
+          "pets_dogs": "Husdjur — hundar",
+          "pets_cats": "Husdjur — katter",
+          "pets_other": "Husdjur — övriga",
+          "roommates": "Rumskamrater"
         },
         "categories": {
           "fashion": "Mode",

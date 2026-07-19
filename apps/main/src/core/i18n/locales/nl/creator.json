@@ -180,6 +180,8 @@
           "primary_language": "Moedertaal",
           "accent": "Accent of dialect",
           "accent_help": "Optioneel. Bijvoorbeeld Brits, Braziliaans of Beiers.",
+          "companions": "Wie verschijnt er in je content?",
+          "companions_help": "Optioneel. Helpt merken de juiste creators voor een campagne te kiezen. Laat alles leeg als je het liever niet zegt.",
           "categories": "Categorieën",
           "categories_select_all": "Alles selecteren",
           "categories_help": "Kies de categorieën die het beste beschrijven wat je maakt.",
@@ -198,6 +200,19 @@
           "address_country": "Land",
           "address_city": "Stad",
           "optional_prefix": "Optioneel."
+        },
+        "companions": {
+          "partner": "Partner",
+          "baby_toddler": "Baby of peuter (0–3)",
+          "young_kids": "Jonge kinderen (4–12)",
+          "teens": "Tieners (13–17)",
+          "adult_children": "Volwassen kinderen",
+          "parents_grandparents": "Ouders of grootouders",
+          "extended_family_friends": "Bredere familie en vrienden",
+          "pets_dogs": "Huisdieren — honden",
+          "pets_cats": "Huisdieren — katten",
+          "pets_other": "Huisdieren — overige",
+          "roommates": "Huisgenoten"
         },
         "categories": {
           "fashion": "Mode",

@@ -180,6 +180,8 @@
           "primary_language": "Роден език",
           "accent": "Акцент или диалект",
           "accent_help": "По избор. Например британски, бразилски или баварски.",
+          "companions": "Кой се появява във вашето съдържание?",
+          "companions_help": "По избор. Помага на брандовете да подберат подходящите създатели за кампания. Оставете всичко неизбрано, ако предпочитате да не споделяте.",
           "categories": "Categories",
           "categories_select_all": "Изберете всички",
           "categories_help": "Pick the categories that best describe what you create.",
@@ -198,6 +200,19 @@
           "address_country": "Country",
           "address_city": "City",
           "optional_prefix": "По желание."
+        },
+        "companions": {
+          "partner": "Партньор",
+          "baby_toddler": "Бебе или малко дете (0–3)",
+          "young_kids": "Малки деца (4–12)",
+          "teens": "Тийнейджъри (13–17)",
+          "adult_children": "Пълнолетни деца",
+          "parents_grandparents": "Родители или баби и дядовци",
+          "extended_family_friends": "Разширено семейство и приятели",
+          "pets_dogs": "Домашни любимци — кучета",
+          "pets_cats": "Домашни любимци — котки",
+          "pets_other": "Домашни любимци — други",
+          "roommates": "Съквартиранти"
         },
         "categories": {
           "fashion": "Fashion",

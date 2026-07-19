@@ -180,6 +180,8 @@
           "primary_language": "Μητρική γλώσσα",
           "accent": "Προφορά ή διάλεκτος",
           "accent_help": "Προαιρετικό. Για παράδειγμα βρετανική, βραζιλιάνικη ή βαυαρική.",
+          "companions": "Ποιος εμφανίζεται στο περιεχόμενό σας;",
+          "companions_help": "Προαιρετικό. Βοηθά τα brands να επιλέξουν τους κατάλληλους δημιουργούς για μια καμπάνια. Αφήστε τα όλα ανεπίλεκτα αν προτιμάτε να μην το δηλώσετε.",
           "categories": "Categories",
           "categories_select_all": "Επιλογή όλων",
           "categories_help": "Pick the categories that best describe what you create.",
@@ -198,6 +200,19 @@
           "address_country": "Country",
           "address_city": "City",
           "optional_prefix": "Προαιρετικό."
+        },
+        "companions": {
+          "partner": "Σύντροφος",
+          "baby_toddler": "Μωρό ή νήπιο (0–3)",
+          "young_kids": "Μικρά παιδιά (4–12)",
+          "teens": "Έφηβοι (13–17)",
+          "adult_children": "Ενήλικα παιδιά",
+          "parents_grandparents": "Γονείς ή παππούδες",
+          "extended_family_friends": "Ευρύτερη οικογένεια και φίλοι",
+          "pets_dogs": "Κατοικίδια — σκύλοι",
+          "pets_cats": "Κατοικίδια — γάτες",
+          "pets_other": "Κατοικίδια — άλλα",
+          "roommates": "Συγκάτοικοι"
         },
         "categories": {
           "fashion": "Fashion",

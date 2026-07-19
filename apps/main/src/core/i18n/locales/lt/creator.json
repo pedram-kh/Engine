@@ -180,6 +180,8 @@
           "primary_language": "Gimtoji kalba",
           "accent": "Akcentas arba tarmė",
           "accent_help": "Neprivaloma. Pavyzdžiui, britų, brazilų ar bavarų.",
+          "companions": "Kas rodomas jūsų turinyje?",
+          "companions_help": "Neprivaloma. Padeda prekių ženklams kampanijai parinkti tinkamus kūrėjus. Jei nenorite nurodyti, palikite viską nepažymėtą.",
           "categories": "Categories",
           "categories_select_all": "Pasirinkti visus",
           "categories_help": "Pick the categories that best describe what you create.",
@@ -198,6 +200,19 @@
           "address_country": "Country",
           "address_city": "City",
           "optional_prefix": "Neprivaloma."
+        },
+        "companions": {
+          "partner": "Partneris (-ė)",
+          "baby_toddler": "Kūdikis ar mažylis (0–3)",
+          "young_kids": "Maži vaikai (4–12)",
+          "teens": "Paaugliai (13–17)",
+          "adult_children": "Suaugę vaikai",
+          "parents_grandparents": "Tėvai ar seneliai",
+          "extended_family_friends": "Platesnė šeima ir draugai",
+          "pets_dogs": "Augintiniai — šunys",
+          "pets_cats": "Augintiniai — katės",
+          "pets_other": "Augintiniai — kiti",
+          "roommates": "Kambariokai"
         },
         "categories": {
           "fashion": "Fashion",

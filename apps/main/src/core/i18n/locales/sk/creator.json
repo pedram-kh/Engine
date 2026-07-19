@@ -180,6 +180,8 @@
           "primary_language": "Materinský jazyk",
           "accent": "Prízvuk alebo dialekt",
           "accent_help": "Voliteľné. Napríklad britský, brazílsky alebo bavorský.",
+          "companions": "Kto sa objavuje vo vašom obsahu?",
+          "companions_help": "Voliteľné. Pomáha značkám vybrať vhodných tvorcov pre kampaň. Ak to radšej neuvediete, nechajte všetko nevybrané.",
           "categories": "Kategorie",
           "categories_select_all": "Vybrať všetko",
           "categories_help": "Vyberte kategorie, které nejlépe popisují, co tvoříte.",
@@ -198,6 +200,19 @@
           "address_country": "Země",
           "address_city": "Město",
           "optional_prefix": "Nepovinné."
+        },
+        "companions": {
+          "partner": "Partner/partnerka",
+          "baby_toddler": "Bábätko alebo batoľa (0–3)",
+          "young_kids": "Malé deti (4–12)",
+          "teens": "Tínedžeri (13–17)",
+          "adult_children": "Dospelé deti",
+          "parents_grandparents": "Rodičia alebo starí rodičia",
+          "extended_family_friends": "Širšia rodina a priatelia",
+          "pets_dogs": "Domáce zvieratá — psy",
+          "pets_cats": "Domáce zvieratá — mačky",
+          "pets_other": "Domáce zvieratá — iné",
+          "roommates": "Spolubývajúci"
         },
         "categories": {
           "fashion": "Móda",

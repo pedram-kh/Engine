@@ -58,6 +58,7 @@ function makeCard(
       country_code: 'GB',
       primary_language: 'en',
       accent: null,
+      content_companions: null,
       categories: ['tech'],
       avatar_url: null,
       relationship_status: null,

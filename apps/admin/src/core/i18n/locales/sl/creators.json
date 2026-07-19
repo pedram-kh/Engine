@@ -97,7 +97,8 @@
           "primary_language": "Primární jazyk",
           "secondary_languages": "Další jazyky",
           "accent": "Naglas",
-          "categories": "Kategorie"
+          "categories": "Kategorie",
+          "content_companions": "Kdo se pojavlja v njihovih vsebinah"
         },
         "edit": {
           "title": "Uredi {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Kopiraj povezavo",
             "view_all_label": "Prikaži vse"
           }
+        },
+        "companions": {
+          "partner": "Partner/partnerica",
+          "baby_toddler": "Dojenček ali malček (0–3)",
+          "young_kids": "Mlajši otroci (4–12)",
+          "teens": "Najstniki (13–17)",
+          "adult_children": "Odrasli otroci",
+          "parents_grandparents": "Starši ali stari starši",
+          "extended_family_friends": "Širša družina in prijatelji",
+          "pets_dogs": "Hišni ljubljenčki — psi",
+          "pets_cats": "Hišni ljubljenčki — mačke",
+          "pets_other": "Hišni ljubljenčki — drugo",
+          "roommates": "Sostanovalci"
         },
         "categories": {
           "fashion": "Móda",

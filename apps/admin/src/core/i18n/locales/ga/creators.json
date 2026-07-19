@@ -97,7 +97,8 @@
           "primary_language": "Primary language",
           "secondary_languages": "Secondary languages",
           "accent": "Blas",
-          "categories": "Categories"
+          "categories": "Categories",
+          "content_companions": "Cé a fheictear ina gcuid ábhair"
         },
         "edit": {
           "title": "Cuir in eagar {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Cóipeáil nasc",
             "view_all_label": "Féach ar gach ceann"
           }
+        },
+        "companions": {
+          "partner": "Páirtí",
+          "baby_toddler": "Leanbh nó lapadán (0–3)",
+          "young_kids": "Páistí óga (4–12)",
+          "teens": "Déagóirí (13–17)",
+          "adult_children": "Clann fhásta",
+          "parents_grandparents": "Tuismitheoirí nó seantuismitheoirí",
+          "extended_family_friends": "Gaolta agus cairde",
+          "pets_dogs": "Peataí — madraí",
+          "pets_cats": "Peataí — cait",
+          "pets_other": "Peataí — eile",
+          "roommates": "Comrádaithe seomra"
         },
         "categories": {
           "fashion": "Fashion",

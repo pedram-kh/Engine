@@ -61,6 +61,12 @@ final class CreatorDiscoveryResource extends JsonResource
                 'country_code' => $creator->country_code,
                 'primary_language' => $creator->primary_language,
                 'accent' => $creator->accent,
+                // AH-050 — emitted on the card shape for payload symmetry with
+                // the accent set, though the dense card does NOT render it in
+                // v1 (D5 — the category +N row already fills the chip slot).
+                // The payload cost (one array per row once populated) is an
+                // accepted, recorded trade (Q4).
+                'content_companions' => $creator->content_companions,
                 'categories' => $creator->categories,
                 'avatar_url' => $this->signedViewUrl($creator->avatar_path),
                 // The calling-agency-only relation status (D-4), emitted RAW

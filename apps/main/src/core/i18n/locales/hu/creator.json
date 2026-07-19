@@ -180,6 +180,8 @@
           "primary_language": "Anyanyelv",
           "accent": "Akcentus vagy nyelvjárás",
           "accent_help": "Nem kötelező. Például brit, brazil vagy bajor.",
+          "companions": "Ki jelenik meg a tartalmaidban?",
+          "companions_help": "Nem kötelező. Segít a márkáknak a megfelelő alkotókat kiválasztani egy kampányhoz. Hagyj mindent üresen, ha inkább nem adnád meg.",
           "categories": "Categories",
           "categories_select_all": "Az összes kijelölése",
           "categories_help": "Pick the categories that best describe what you create.",
@@ -198,6 +200,19 @@
           "address_country": "Country",
           "address_city": "City",
           "optional_prefix": "Nem kötelező."
+        },
+        "companions": {
+          "partner": "Partner",
+          "baby_toddler": "Baba vagy kisgyermek (0–3)",
+          "young_kids": "Kisebb gyerekek (4–12)",
+          "teens": "Tinédzserek (13–17)",
+          "adult_children": "Felnőtt gyermekek",
+          "parents_grandparents": "Szülők vagy nagyszülők",
+          "extended_family_friends": "Tágabb család és barátok",
+          "pets_dogs": "Háziállatok — kutyák",
+          "pets_cats": "Háziállatok — macskák",
+          "pets_other": "Háziállatok — egyéb",
+          "roommates": "Lakótársak"
         },
         "categories": {
           "fashion": "Fashion",

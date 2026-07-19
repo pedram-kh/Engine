@@ -97,7 +97,8 @@
           "primary_language": "Primary language",
           "secondary_languages": "Secondary languages",
           "accent": "Akcentus",
-          "categories": "Categories"
+          "categories": "Categories",
+          "content_companions": "Ki jelenik meg a tartalmaikban"
         },
         "edit": {
           "title": "Szerkesztés {field}",
@@ -211,6 +212,19 @@
             "copy_link_label": "Link másolása",
             "view_all_label": "Összes megtekintése"
           }
+        },
+        "companions": {
+          "partner": "Partner",
+          "baby_toddler": "Baba vagy kisgyermek (0–3)",
+          "young_kids": "Kisebb gyerekek (4–12)",
+          "teens": "Tinédzserek (13–17)",
+          "adult_children": "Felnőtt gyermekek",
+          "parents_grandparents": "Szülők vagy nagyszülők",
+          "extended_family_friends": "Tágabb család és barátok",
+          "pets_dogs": "Háziállatok — kutyák",
+          "pets_cats": "Háziállatok — macskák",
+          "pets_other": "Háziállatok — egyéb",
+          "roommates": "Lakótársak"
         },
         "categories": {
           "fashion": "Fashion",

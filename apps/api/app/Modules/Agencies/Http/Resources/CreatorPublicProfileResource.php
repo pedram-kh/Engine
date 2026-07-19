@@ -69,6 +69,9 @@ final class CreatorPublicProfileResource extends JsonResource
                 'primary_language' => $creator->primary_language,
                 'secondary_languages' => $creator->secondary_languages,
                 'accent' => $creator->accent,
+                // AH-050 — self-declared companions; discover-visible by
+                // design (profile-class data, the accent visibility set).
+                'content_companions' => $creator->content_companions,
                 'categories' => $creator->categories,
                 'avatar_url' => $this->signedViewUrl($creator->avatar_path),
                 'cover_url' => $this->signedViewUrl($creator->cover_path),
