@@ -273,6 +273,18 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
     the label; the integer column stays `1` — lossy by design). Strengthened content-coupled tests
     (break-revert executed) + §5.34 immutability case; no migration/i18n/schema change. Review:
     `docs/reviews/master-agreement-v1-1-review.md`.
+  - **AH-050** — "Who appears in your content?" optional companion multi-select
+    (`creators.content_companions`, additive-nullable jsonb; fixed 11-key registry, SOT
+    `UpdateProfileRequest::CONTENT_COMPANION_KEYS`). Self-declared; null AND `[]` both =
+    undisclosed (no normalization, round-trip pinned); **completeness-inert** (D6,
+    break-revert-proven — deliberately NOT the accent +2 weighting); **admin read-only**
+    (D7, break-revert-proven; plain row, no pencil); accent visibility class (discover
+    card payload + detail, roster list + detail, admin detail); display-only v1 (no
+    filter); wizard chip group after accent, NO select-all;
+    `profile-companions-chip-<key>` testids; i18n ×24 both apps (flaky-10 real MT). The
+    FE `COMPANION_KEYS` copy extends the AH-019 parity debt (one entry, one future fix
+    for both fields). GDPR purpose section in the review. Review:
+    `docs/reviews/content-companions-review.md`.
 
   > **Ruling (AH-046/047, flaky-10 MT baseline):** new creator-facing copy gets a real
   > machine-translation baseline in **all 24 locales at merge time**, including the flaky 10

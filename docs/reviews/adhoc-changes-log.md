@@ -60,6 +60,45 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-050 · "Who appears in your content?" — optional companion multi-select on the creator profile
+
+- **Status:** Landed (push HELD)
+- **Commits:** `84521e7` — `feat(creators): "Who appears in your content?" companion multi-select (AH-050)`; docs commit (this commit) — `docs(creators): content_companions — AH-050 entry, review, tech-debt extension`.
+- **Date:** 2026-07-19
+- **Why:** Agencies casting campaign briefs need to know who regularly appears in a
+  creator's content (partner, kids, pets, roommates…) — e.g. a dog-food brand wants
+  creators whose content features dogs. Today that signal doesn't exist anywhere on the
+  profile.
+- **What:** One additive-nullable `jsonb` column `creators.content_companions` holding
+  a subset of a fixed 11-key registry (partner, baby_toddler 0–3, young_kids 4–12,
+  teens 13–17, adult_children, parents_grandparents, extended_family_friends, pets_dogs,
+  pets_cats, pets_other, roommates). Self-declared, optional, empty (null OR `[]`) =
+  undisclosed; **completeness-inert**; **admin read-only**; same visibility class as
+  accent (AH-022): creator-self, discover (card payload + detail render), roster
+  (list + detail), admin detail. Wizard Step 2 gains a chip group (categories pattern
+  minus select-all, `data-testid="profile-companions-chip-<key>"`); display surfaces
+  render via the shared `CategoryChips`. Display-only in v1 — no filtering (logged
+  follow-up). i18n ×24 in both apps with real MT baselines incl. the flaky 10.
+- **Touched:** migration `2026_07_19_100000`; `Creator` model; `UpdateProfileRequest`
+  (SOT const `CONTENT_COMPANION_KEYS` + rules); `CreatorResource`,
+  `CreatorDiscoveryResource`, `CreatorPublicProfileResource`,
+  `AgencyCreatorDetailResource`, roster `toRow` + both column projections;
+  `ProfileBasicsForm.vue`; discover-profile + roster-detail + admin-detail pages;
+  api-client types (6 declarations); Playwright happy-path; 48 locale files; 14 new
+  backend test cases (`ContentCompanionsTest`) + extended keyset/value/parity tests +
+  9 new frontend spec cases.
+- **Decisions:** D1 naming `content_companions` (casting frame — "household" rejected);
+  D2/Q2 FE-registry parity inherited as debt (AH-019 tech-debt entry extended to cover
+  both fields, one resolution closes both); Q3 admin read-only row via the
+  account-details pattern (no `EditFieldRow` change); Q4 card-payload cost accepted and
+  recorded; Q5 `[]` persists as-is, null and `[]` both = undisclosed (round-trip
+  pinned); D6 inertness + D7 admin-rejection both §5.34-pinned **and** §5.35
+  break-revert-proven; GDPR purpose section (no counts/ages, no Art. 9 inference,
+  casting-framed helper text, not audited) in the review file.
+- **Ref:** review file [`content-companions-review.md`](content-companions-review.md)
+  (Production posture §5.40, D1–D11 evidence, both break-reverts verbatim, gate table);
+  I1–I7 inventory + kickoff in the session record.
+
 ### AH-049 · Master agreement content refresh + version bump to v1.1
 
 - **Status:** Landed (push HELD)

@@ -153,14 +153,14 @@ anyone reviewing it later.
 
 ---
 
-## Main-SPA `CATEGORY_KEYS` has no direct PHP parity spec (the admin registry does)
+## Main-SPA `CATEGORY_KEYS` + `COMPANION_KEYS` have no direct PHP parity spec (the admin registry does)
 
-- **Where:** [`apps/main/src/modules/onboarding/components/ProfileBasicsForm.vue`](../apps/main/src/modules/onboarding/components/ProfileBasicsForm.vue) `CATEGORY_KEYS` vs the backend `categories.*` whitelist in `UpdateProfileRequest` / `AdminUpdateCreatorRequest::CATEGORY_ENUM`.
-- **What we accepted (AH-019, July 8, 2026):** the admin SPA's category registry is spec-pinned against the actual PHP source (`field-edit-config-parity.spec.ts` parses `CATEGORY_ENUM` out of the Request file); the **main** SPA's copy is not — a key-set drift there surfaces as a runtime 422 on save, not a test failure. The overclaiming in-code comment (which credited the admin spec with pinning this copy too) was corrected in the AH-018–025 closure commit.
-- **Trigger:** the next category-taxonomy change, or the next main-SPA architecture-test pass.
-- **Resolution:** mirror `field-edit-config-parity`'s PHP-parse approach in a main-SPA architecture spec (parse the `in:` rule string or `CATEGORY_ENUM` and compare to `CATEGORY_KEYS`).
-- **Owner:** the next chunk that touches the category taxonomy.
-- **Status:** open. Surfaced by the AH-019 spot-check, July 8, 2026 ([ad-hoc log](reviews/adhoc-changes-log.md)).
+- **Where:** [`apps/main/src/modules/onboarding/components/ProfileBasicsForm.vue`](../apps/main/src/modules/onboarding/components/ProfileBasicsForm.vue) — `CATEGORY_KEYS` vs the backend `categories.*` whitelist in `UpdateProfileRequest` / `AdminUpdateCreatorRequest::CATEGORY_ENUM`, **and** (same drift class, added by AH-050) `COMPANION_KEYS` vs `UpdateProfileRequest::CONTENT_COMPANION_KEYS`.
+- **What we accepted (AH-019, July 8, 2026; extended by AH-050, July 19, 2026):** the admin SPA's category registry is spec-pinned against the actual PHP source (`field-edit-config-parity.spec.ts` parses `CATEGORY_ENUM` out of the Request file); the **main** SPA's copies are not — a key-set drift there surfaces as a runtime 422 on save, not a test failure. The overclaiming in-code comment (which credited the admin spec with pinning this copy too) was corrected in the AH-018–025 closure commit. AH-050's companions field inherits the identical debt deliberately (D2/Q2 ruling): because the field is admin-read-only there is no admin registry for the existing parity spec to check against, and building a wizard-file parser would be exactly the new mechanism the kickoff forbade. Backend `CONTENT_COMPANION_KEYS` is the source of truth; the 11-key set is additionally pinned by the backend catalogue tripwire in `ContentCompanionsTest`.
+- **Trigger:** the next category- or companion-taxonomy change, or the next main-SPA architecture-test pass.
+- **Resolution:** mirror `field-edit-config-parity`'s PHP-parse approach in a main-SPA architecture spec against the wizard file (parse the `in:` rule string / `CATEGORY_ENUM` / `CONTENT_COMPANION_KEYS` and compare to the wizard constants) — one spec closes the debt for **both** fields in one pass.
+- **Owner:** the next chunk that touches either taxonomy.
+- **Status:** open. Surfaced by the AH-019 spot-check, July 8, 2026; extended by AH-050, July 19, 2026 ([ad-hoc log](reviews/adhoc-changes-log.md)).
 
 ---
 
