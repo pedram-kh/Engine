@@ -109,6 +109,36 @@ it('marks a CORRUPT upload failed instead of hanging on processing', function ()
     expect($item->refresh()->processing_status)->toBe(PortfolioProcessingStatus::Failed);
 });
 
+it('failed() flips a still-processing item to failed (uncatchable OOM/timeout kill safety net)', function (): void {
+    $creator = CreatorFactory::new()->createOne();
+    $item = CreatorPortfolioItemFactory::new()->processing()->createOne([
+        'creator_id' => $creator->id,
+        's3_path' => "creators/{$creator->ulid}/portfolio/01OOMKILL000000000000000.jpg",
+        'mime_type' => 'image/jpeg',
+    ]);
+
+    // The queue invokes failed() after the final attempt of a job whose
+    // worker process was killed (OOM fatal / $timeout SIGALRM) — handle()'s
+    // catch never ran, so the item is still `processing`.
+    (new ProcessPortfolioImageJob($item->id))->failed(new RuntimeException('job timed out'));
+
+    expect($item->refresh()->processing_status)->toBe(PortfolioProcessingStatus::Failed);
+});
+
+it('failed() leaves an item alone when a concurrent attempt already resolved it', function (): void {
+    $creator = CreatorFactory::new()->createOne();
+    $item = CreatorPortfolioItemFactory::new()->createOne([
+        'creator_id' => $creator->id,
+        's3_path' => "creators/{$creator->ulid}/portfolio/01RESOLVED00000000000000.jpg",
+        'processing_status' => PortfolioProcessingStatus::Ready,
+        'thumbnail_path' => 'existing/thumb.jpg',
+    ]);
+
+    (new ProcessPortfolioImageJob($item->id))->failed(new RuntimeException('stale kill'));
+
+    expect($item->refresh()->processing_status)->toBe(PortfolioProcessingStatus::Ready);
+});
+
 it('is a no-op for an item that is already ready (idempotent on re-run)', function (): void {
     $creator = CreatorFactory::new()->createOne();
     $item = CreatorPortfolioItemFactory::new()->createOne([

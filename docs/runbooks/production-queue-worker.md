@@ -32,6 +32,11 @@ php artisan queue:work --memory=768 --tries=3 --max-time=3600
 
 - `--memory=768` — the AH-004 matched pair (see `local-dev.md` §7.2): if
   `MAX_MEGAPIXELS` ever rises toward 100, this must rise to ~1 GB+ with it.
+  **Note:** `--memory` only recycles the worker _between_ jobs; the hard cap
+  _during_ a decode is php.ini `memory_limit`. `ProcessPortfolioImageJob`
+  raises its own limit to 768M at runtime (`MEMORY_LIMIT_FLOOR`), so a low
+  ini default no longer OOM-kills the worker mid-decode — but the machine
+  still needs the RAM to back it.
 - `--tries=3` — transient failures (S3 blips) retry; real failures land in
   `failed_jobs` instead of looping forever.
 - `--max-time=3600` — the worker exits cleanly every hour and the supervisor
@@ -150,16 +155,29 @@ php artisan queue:failed
   stuck items resolve on their own (a stuck-`processing` portfolio item flips
   to `ready` with no re-upload needed).
 - **Worker up, queue empty, item still `processing`** → the job was lost
-  (dispatched before the worker existed on a queue that was since flushed, or
-  dispatched under a different `QUEUE_CONNECTION`). The creator deletes the
-  stuck item (✕) and re-uploads; the design keeps this safe (`ProcessPortfolioImageJob`
-  marks decode failures `failed`, never silent — a _lost_ job is the only way
-  to get forever-`processing`).
+  (dispatched before the worker existed on a queue that was since flushed,
+  dispatched under a different `QUEUE_CONNECTION`, or — pre-July-2026 fix —
+  the worker was killed mid-job by an OOM fatal / timeout, which `catch
+(Throwable)` cannot see). Recover with:
+
+  ```bash
+  php artisan portfolio:retry-stuck --dry-run    # read the list first
+  php artisan portfolio:retry-stuck              # re-dispatch the jobs
+  # add --include-failed to also retry items already marked `failed`
+  # (only after the underlying cause is fixed)
+  ```
+
+  The job is idempotent on re-run, so this is always safe. Delete + re-upload
+  by the creator remains the fallback of last resort.
+
 - **Jobs in `queue:failed`** → `php artisan queue:failed` shows the exception;
-  `php artisan queue:retry <id>` re-runs after fixing the cause. An
-  OOM-killed worker (image decode with too little memory) bypasses the
-  `failed` marking — if you see the worker process dying around large images,
-  check the `--memory` flag and the machine's available RAM first.
+  `php artisan queue:retry <id>` re-runs after fixing the cause. Since the
+  July 2026 hardening, `ProcessPortfolioImageJob` declares `$tries = 3` /
+  `$timeout = 240` / `backoff = 30`, raises `memory_limit` to 768M at runtime,
+  and its `failed()` hook flips the item to `failed` when the queue gives up —
+  an uncatchable worker kill can no longer strand an item at `processing`
+  forever. Soft decode failures are also logged now
+  (`Portfolio image processing failed`, in `laravel.log`).
 
 ---
 
