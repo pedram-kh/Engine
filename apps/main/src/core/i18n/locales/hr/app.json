@@ -110,6 +110,7 @@
         "connected": "Propojeno",
         "pending": "Žádost čaka",
         "declined": "Odbijeno",
+        "ended": "Prethodno povezano",
         "notConnected": "Nepropojeno",
         "sendRequest": "Pošalji žádost",
         "requestAgain": "Pošalji žádost znova",
@@ -216,7 +217,8 @@
         "prospect": "Prospekt",
         "external": "Externí",
         "pending_request": "V čakanju žádost",
-        "declined": "Odbijeno"
+        "declined": "Odbijeno",
+        "ended": "Prekinuto"
       },
       "applicationStatus": {
         "incomplete": "Neúplná",

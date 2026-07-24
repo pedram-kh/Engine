@@ -98,13 +98,23 @@ final class CreatorPolicy
      * AH-005 — may the caller see this creator's optional CONTACT details
      * (phone / WhatsApp / mailing address) on the agency roster-detail surface?
      *
+     * AH-051 (D-1) — the contact gate TIGHTENS to roster-only. It previously
+     * accepted any non-blacklisted relation (which let a `pending_request`,
+     * `declined`, or `prospect` agency see contact); it now requires THIS
+     * agency to hold a `roster` (connected) relation to the creator that is
+     * non-blacklisted. This aligns the code with the shipped consent promise
+     * ("shared only with agencies you are connected to") and with AH-010: the
+     * roster+non-blacklisted core is now sourced from the ONE shared
+     * {@see AgencyCreatorRelation::scopePermitsMessaging()} primitive so contact
+     * and messaging cannot drift on what "connected" means. Contact does NOT
+     * add messaging's `approved` leg — a rostered relation is the consent
+     * event; the creator's application-approval state is orthogonal here.
+     *
      * AGENCY-SCOPED, deliberately NOT a user-wide union: the caller must be an
-     * active member of THIS {@param $agency} AND that agency's OWN relation to
-     * the creator must be non-blacklisted. A multi-agency user viewing Agency
-     * A's page for a creator that Agency A has blacklisted sees no contact —
-     * even if a different agency they belong to has a clean relation. This is
-     * the same blacklist rule {@see self::hasAgencyAccess()} uses (shared via
-     * {@see self::hasNonBlacklistedRelation()}), only narrowed to one agency.
+     * active member of THIS {@param $agency} AND that agency's OWN relation must
+     * qualify. A multi-agency user viewing Agency A's page sees no contact if
+     * Agency A is not rostered/blacklisted — even if another agency they belong
+     * to has a clean roster relation.
      *
      * Platform admins always pass (admin view-only, AH-005 D6).
      */
@@ -123,8 +133,15 @@ final class CreatorPolicy
             return false;
         }
 
-        // …and THIS agency's relation to the creator must be non-blacklisted.
-        return $this->hasNonBlacklistedRelation($creator, [$agency->id]);
+        // …and THIS agency must hold a non-blacklisted `roster` relation — the
+        // shared roster+non-blacklisted primitive (AH-051 D-1). pending_request
+        // / declined / prospect / ended / external all fail here.
+        return AgencyCreatorRelation::query()
+            ->withoutGlobalScope(BelongsToAgencyScope::class)
+            ->where('creator_id', $creator->id)
+            ->where('agency_id', $agency->id)
+            ->permitsMessaging()
+            ->exists();
     }
 
     /**

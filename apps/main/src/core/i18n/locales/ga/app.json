@@ -110,6 +110,7 @@
         "connected": "Connected",
         "pending": "Request pending",
         "declined": "Diúltaighd",
+        "ended": "Ceangailte roimhe seo",
         "notConnected": "Nílt connected",
         "sendRequest": "Seol request",
         "requestAgain": "Request again",
@@ -216,7 +217,8 @@
         "prospect": "Prospect",
         "external": "External",
         "pending_request": "Ar feitheamh request",
-        "declined": "Diúltaighd"
+        "declined": "Diúltaighd",
+        "ended": "Dícheangailte"
       },
       "applicationStatus": {
         "incomplete": "Incomplete",

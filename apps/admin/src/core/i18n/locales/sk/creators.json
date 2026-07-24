@@ -156,6 +156,58 @@
           "cancel": "Zrušiť",
           "success": "Totožnost ověřena.",
           "failed": "Nepodařilo sa overiť totožnost tohoto tvorcu. Zkuste to znova."
+        },
+        "connections": {
+          "heading": "Prepojenia s agentúrami",
+          "empty": "Zatiaľ neprepojené so žiadnou agentúrou.",
+          "load_failed": "Nepodarilo sa načítať prepojenia tohto tvorcu s agentúrami.",
+          "connect_button": "Prepojiť s agentúrou",
+          "disconnect_button": "Odpojiť",
+          "blacklisted": "Na čiernej listine",
+          "table": {
+            "agency": "Agentúra",
+            "status": "Stav",
+            "since": "Od",
+            "actions": "Akcie"
+          },
+          "status_labels": {
+            "roster": "Prepojené",
+            "prospect": "Potenciálny",
+            "external": "Externý",
+            "pending_request": "Čakajúca žiadosť",
+            "declined": "Odmietnuté",
+            "ended": "Odpojené"
+          },
+          "connect": {
+            "title": "Prepojiť {name} s agentúrou",
+            "agency_label": "Agentúra",
+            "agency_placeholder": "Hľadať agentúry…",
+            "no_agencies": "Vášmu hľadaniu nezodpovedá žiadna agentúra.",
+            "mode_label": "Ako sa má toto prepojenie vytvoriť?",
+            "mode_request": "Odoslať žiadosť o prepojenie",
+            "mode_request_hint": "Tvorca ju prijme alebo odmietne, ako bežnú žiadosť agentúry.",
+            "mode_direct": "Prepojiť priamo",
+            "mode_direct_hint": "Zaznamená offline dohodu a okamžite prepojí dvojicu. Tvorca je upozornený.",
+            "reason_label": "Dôvod",
+            "reason_hint": "Vyžadované pre priame prepojenie, aspoň {count} znakov. Zaznamenané v audítnom denníku.",
+            "confirm": "Prepojiť",
+            "cancel": "Zrušiť",
+            "success_requested": "Žiadosť o prepojenie odoslaná.",
+            "success_re_requested": "Žiadosť o prepojenie odoslaná znova.",
+            "success_direct": "Tvorca prepojený.",
+            "success_noop": "Žiadna zmena — toto prepojenie už existuje.",
+            "failed": "Toto prepojenie sa nepodarilo vytvoriť. Skúste to znova."
+          },
+          "disconnect": {
+            "title": "Odpojiť {name} od {agency}?",
+            "description": "Týmto sa vzťah ukončí: viditeľnosť kontaktov a správy sa zatvoria a tvorca opustí talentové fondy tejto agentúry. Prebiehajúca práca na kampani zostáva nedotknutá. Obe strany sú upozornené.",
+            "reason_label": "Dôvod odpojenia",
+            "reason_hint": "Vyžadované, aspoň {count} znakov. Zaznamenané v audítnom denníku.",
+            "confirm": "Odpojiť",
+            "cancel": "Zrušiť",
+            "success": "Vzťah ukončený.",
+            "failed": "Tento vzťah sa nepodarilo odpojiť. Skúste to znova."
+          }
         }
       }
     }

@@ -67,8 +67,12 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
+import { adminAgenciesApi } from '@/modules/agencies/api/agencies.api'
+
 import ApproveCreatorDialog from '../components/ApproveCreatorDialog.vue'
+import ConnectToAgencyDialog, { type AgencyOption } from '../components/ConnectToAgencyDialog.vue'
 import CreatorPaymentSection from '../components/CreatorPaymentSection.vue'
+import DisconnectRelationDialog from '../components/DisconnectRelationDialog.vue'
 import EditFieldModal from '../components/EditFieldModal.vue'
 import EditFieldRow from '../components/EditFieldRow.vue'
 import RejectCreatorDialog from '../components/RejectCreatorDialog.vue'
@@ -76,6 +80,8 @@ import VerifyIdentityDialog from '../components/VerifyIdentityDialog.vue'
 import { FIELD_EDIT_CONFIG, type EditFieldConfig } from '../config/field-edit'
 import {
   adminCreatorsApi,
+  type AdminConnectionMode,
+  type AdminConnectionRelation,
   type AdminCreatorAssignment,
   type AdminCreatorAuditLog,
   type AdminEditableField,
@@ -250,6 +256,7 @@ function formatHistoryDate(iso: string | null): string {
 onMounted(() => {
   void load()
   void loadHistory()
+  void loadConnections()
 })
 
 const editingField = ref<AdminEditableField | null>(null)
@@ -488,6 +495,146 @@ async function handleVerifyConfirm(payload: { note: string | null }): Promise<vo
       error instanceof ApiError ? error.code : 'admin.creators.detail.verify.failed'
   } finally {
     isVerifying.value = false
+  }
+}
+
+// ─── AH-051 (D-4/D-5/D-6/D-9) — admin agency connections ────────────────
+const connections = ref<AdminConnectionRelation[]>([])
+const connectionsError = ref<string | null>(null)
+const isLoadingConnections = ref(false)
+
+async function loadConnections(): Promise<void> {
+  if (creatorUlid.value === '') return
+  isLoadingConnections.value = true
+  connectionsError.value = null
+  try {
+    const res = await adminCreatorsApi.connections(creatorUlid.value)
+    connections.value = res.data
+  } catch (error) {
+    connectionsError.value =
+      error instanceof ApiError ? error.code : 'admin.creators.detail.connections.load_failed'
+  } finally {
+    isLoadingConnections.value = false
+  }
+}
+
+// Connect-to-agency dialog (Doors 1 + 2). The picker is fed by a debounced
+// admin-agency search — the page owns the API call so the dialog stays pure.
+const connectDialogOpen = ref(false)
+const connectErrorKey = ref<string | null>(null)
+const isConnecting = ref(false)
+const agencyResults = ref<AgencyOption[]>([])
+const isSearchingAgencies = ref(false)
+let agencySearchTimer: ReturnType<typeof setTimeout> | null = null
+
+function openConnect(): void {
+  connectErrorKey.value = null
+  agencyResults.value = []
+  connectDialogOpen.value = true
+}
+
+function closeConnect(): void {
+  connectDialogOpen.value = false
+  connectErrorKey.value = null
+}
+
+function handleAgencySearch(query: string): void {
+  if (agencySearchTimer !== null) clearTimeout(agencySearchTimer)
+  const trimmed = query.trim()
+  if (trimmed === '') {
+    agencyResults.value = []
+    isSearchingAgencies.value = false
+    return
+  }
+  isSearchingAgencies.value = true
+  agencySearchTimer = setTimeout(() => {
+    void (async () => {
+      try {
+        const res = await adminAgenciesApi.list({ search: trimmed, status: 'active', per_page: 20 })
+        agencyResults.value = res.data.map((agency) => ({
+          ulid: agency.id,
+          name: agency.attributes.name,
+        }))
+      } catch {
+        agencyResults.value = []
+      } finally {
+        isSearchingAgencies.value = false
+      }
+    })()
+  }, 250)
+}
+
+const CONNECT_SUCCESS_KEY: Record<string, string> = {
+  'connection.requested': 'admin.creators.detail.connections.connect.success_requested',
+  'connection.re_requested': 'admin.creators.detail.connections.connect.success_re_requested',
+  'connection.direct_connected': 'admin.creators.detail.connections.connect.success_direct',
+  'connection.already_connected': 'admin.creators.detail.connections.connect.success_noop',
+  'connection.already_requested': 'admin.creators.detail.connections.connect.success_noop',
+}
+
+async function handleConnectConfirm(payload: {
+  agencyId: string
+  mode: AdminConnectionMode
+  reason: string | null
+}): Promise<void> {
+  if (creator.value === null) return
+  isConnecting.value = true
+  connectErrorKey.value = null
+  try {
+    const envelope = await adminCreatorsApi.connect(creatorUlid.value, payload)
+    decisionSnackbarKey.value =
+      CONNECT_SUCCESS_KEY[envelope.meta.code] ??
+      'admin.creators.detail.connections.connect.success_direct'
+    decisionSnackbarOpen.value = true
+    closeConnect()
+    await loadConnections()
+  } catch (error) {
+    connectErrorKey.value =
+      error instanceof ApiError ? error.code : 'admin.creators.detail.connections.connect.failed'
+  } finally {
+    isConnecting.value = false
+  }
+}
+
+// Disconnect dialog (D-6) — roster → ended, reason-gated.
+const disconnectDialogOpen = ref(false)
+const disconnectErrorKey = ref<string | null>(null)
+const isDisconnecting = ref(false)
+const disconnectTarget = ref<AdminConnectionRelation | null>(null)
+
+const disconnectAgencyName = computed(() => disconnectTarget.value?.attributes.agency_name ?? '')
+
+function openDisconnect(relation: AdminConnectionRelation): void {
+  disconnectTarget.value = relation
+  disconnectErrorKey.value = null
+  disconnectDialogOpen.value = true
+}
+
+function closeDisconnect(): void {
+  disconnectDialogOpen.value = false
+  disconnectErrorKey.value = null
+  disconnectTarget.value = null
+}
+
+async function handleDisconnectConfirm(payload: { reason: string }): Promise<void> {
+  if (creator.value === null || disconnectTarget.value === null) return
+  isDisconnecting.value = true
+  disconnectErrorKey.value = null
+  try {
+    await adminCreatorsApi.disconnect(
+      creatorUlid.value,
+      disconnectTarget.value.attributes.agency_id,
+      payload.reason,
+    )
+    decisionSnackbarKey.value = 'admin.creators.detail.connections.disconnect.success'
+    decisionSnackbarOpen.value = true
+    closeDisconnect()
+    await loadConnections()
+  } catch (error) {
+    disconnectErrorKey.value =
+      error instanceof ApiError ? error.code : 'admin.creators.detail.connections.disconnect.failed'
+  } finally {
+    isDisconnecting.value = false
   }
 }
 
@@ -901,6 +1048,94 @@ const decisionSnackbarColor = computed(() =>
         </v-table>
       </section>
 
+      <!-- AH-051 (D-9) — admin agency connections: cross-agency relation list
+           with the two-door "Connect to agency" action + per-row Disconnect
+           (roster only). -->
+      <section class="admin-creator-detail__section" data-testid="admin-creator-detail-connections">
+        <div class="d-flex align-center justify-space-between">
+          <h2 class="text-h6">{{ t('admin.creators.detail.connections.heading') }}</h2>
+          <v-btn
+            color="primary"
+            variant="elevated"
+            size="small"
+            prepend-icon="mdi-link-plus"
+            data-testid="admin-creator-detail-connect-button"
+            @click="openConnect"
+          >
+            {{ t('admin.creators.detail.connections.connect_button') }}
+          </v-btn>
+        </div>
+
+        <div
+          v-if="connectionsError"
+          role="alert"
+          class="admin-creator-detail__error"
+          data-testid="admin-creator-detail-connections-error"
+        >
+          {{ t(connectionsError) }}
+        </div>
+        <p
+          v-else-if="!isLoadingConnections && connections.length === 0"
+          class="text-body-2 text-medium-emphasis"
+          data-testid="admin-creator-detail-connections-empty"
+        >
+          {{ t('admin.creators.detail.connections.empty') }}
+        </p>
+        <v-table v-else density="compact">
+          <thead>
+            <tr>
+              <th>{{ t('admin.creators.detail.connections.table.agency') }}</th>
+              <th>{{ t('admin.creators.detail.connections.table.status') }}</th>
+              <th>{{ t('admin.creators.detail.connections.table.since') }}</th>
+              <th class="text-right">
+                {{ t('admin.creators.detail.connections.table.actions') }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="relation in connections"
+              :key="relation.id"
+              :data-testid="`admin-creator-detail-connection-row-${relation.attributes.agency_id}`"
+            >
+              <td>{{ relation.attributes.agency_name }}</td>
+              <td>
+                <v-chip size="x-small" variant="tonal">
+                  {{
+                    t(
+                      `admin.creators.detail.connections.status_labels.${relation.attributes.relationship_status}`,
+                    )
+                  }}
+                </v-chip>
+                <v-chip
+                  v-if="relation.attributes.is_blacklisted"
+                  size="x-small"
+                  variant="tonal"
+                  color="error"
+                  class="ml-1"
+                  data-testid="admin-creator-detail-connection-blacklisted"
+                >
+                  {{ t('admin.creators.detail.connections.blacklisted') }}
+                </v-chip>
+              </td>
+              <td>{{ formatHistoryDate(relation.attributes.since) }}</td>
+              <td class="text-right">
+                <v-btn
+                  v-if="relation.attributes.relationship_status === 'roster'"
+                  color="error"
+                  variant="text"
+                  size="small"
+                  :data-testid="`admin-creator-detail-disconnect-${relation.attributes.agency_id}`"
+                  @click="openDisconnect(relation)"
+                >
+                  {{ t('admin.creators.detail.connections.disconnect_button') }}
+                </v-btn>
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+      </section>
+
       <section class="admin-creator-detail__section" data-testid="admin-creator-detail-audit">
         <h2 class="text-h6">{{ t('admin.creators.detail.audit_heading') }}</h2>
         <div
@@ -982,6 +1217,28 @@ const decisionSnackbarColor = computed(() =>
       :creator-display-name="creatorDisplayName"
       @confirm="handleVerifyConfirm"
       @cancel="closeVerify"
+    />
+
+    <ConnectToAgencyDialog
+      v-model="connectDialogOpen"
+      :is-saving="isConnecting"
+      :error-key="connectErrorKey"
+      :creator-display-name="creatorDisplayName"
+      :agencies="agencyResults"
+      :is-searching="isSearchingAgencies"
+      @search="handleAgencySearch"
+      @confirm="handleConnectConfirm"
+      @cancel="closeConnect"
+    />
+
+    <DisconnectRelationDialog
+      v-model="disconnectDialogOpen"
+      :is-saving="isDisconnecting"
+      :error-key="disconnectErrorKey"
+      :creator-display-name="creatorDisplayName"
+      :agency-name="disconnectAgencyName"
+      @confirm="handleDisconnectConfirm"
+      @cancel="closeDisconnect"
     />
 
     <v-snackbar

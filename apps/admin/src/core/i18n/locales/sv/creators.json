@@ -156,6 +156,58 @@
           "cancel": "Avbryt",
           "success": "Identitet verifierad.",
           "failed": "Den här creatorns identitet kunde inte verifieras. Försök igen."
+        },
+        "connections": {
+          "heading": "Byråkopplingar",
+          "empty": "Ännu inte kopplad till någon byrå.",
+          "load_failed": "Vi kunde inte läsa in den här kreatörens byråkopplingar.",
+          "connect_button": "Koppla till byrå",
+          "disconnect_button": "Koppla från",
+          "blacklisted": "Svartlistad",
+          "table": {
+            "agency": "Byrå",
+            "status": "Status",
+            "since": "Sedan",
+            "actions": "Åtgärder"
+          },
+          "status_labels": {
+            "roster": "Kopplad",
+            "prospect": "Prospekt",
+            "external": "Extern",
+            "pending_request": "Väntande förfrågan",
+            "declined": "Avböjd",
+            "ended": "Frånkopplad"
+          },
+          "connect": {
+            "title": "Koppla {name} till en byrå",
+            "agency_label": "Byrå",
+            "agency_placeholder": "Sök byråer…",
+            "no_agencies": "Inga byråer matchar din sökning.",
+            "mode_label": "Hur ska den här kopplingen göras?",
+            "mode_request": "Skicka en kopplingsförfrågan",
+            "mode_request_hint": "Kreatören accepterar eller avböjer den, som en vanlig byråförfrågan.",
+            "mode_direct": "Koppla direkt",
+            "mode_direct_hint": "Registrerar en offlineöverenskommelse och kopplar paret omedelbart. Kreatören meddelas.",
+            "reason_label": "Anledning",
+            "reason_hint": "Krävs för en direktkoppling, minst {count} tecken. Registreras i granskningsloggen.",
+            "confirm": "Koppla",
+            "cancel": "Avbryt",
+            "success_requested": "Kopplingsförfrågan skickad.",
+            "success_re_requested": "Kopplingsförfrågan skickad igen.",
+            "success_direct": "Kreatör kopplad.",
+            "success_noop": "Ingen ändring — den kopplingen finns redan.",
+            "failed": "Vi kunde inte skapa den här kopplingen. Försök igen."
+          },
+          "disconnect": {
+            "title": "Koppla från {name} från {agency}?",
+            "description": "Detta avslutar relationen: kontaktsynlighet och meddelanden stängs, och kreatören lämnar den byråns talangpooler. Pågående kampanjarbete påverkas inte. Båda parter meddelas.",
+            "reason_label": "Anledning till frånkoppling",
+            "reason_hint": "Krävs, minst {count} tecken. Registreras i granskningsloggen.",
+            "confirm": "Koppla från",
+            "cancel": "Avbryt",
+            "success": "Relation avslutad.",
+            "failed": "Vi kunde inte koppla från den här relationen. Försök igen."
+          }
         }
       }
     }

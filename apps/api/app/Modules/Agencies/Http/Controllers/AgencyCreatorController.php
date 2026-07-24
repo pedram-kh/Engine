@@ -113,6 +113,9 @@ final class AgencyCreatorController
     private const array DEFAULT_EXCLUDED_STATUSES = [
         RelationshipStatus::PendingRequest,
         RelationshipStatus::Declined,
+        // AH-051 (D-3) — a severed relationship is not a working relationship;
+        // hidden from the default roster, filterable by an explicit chip.
+        RelationshipStatus::Ended,
     ];
 
     public function __construct(

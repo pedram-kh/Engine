@@ -40,6 +40,23 @@ return [
             'ignore' => 'Ak túto agentúru nepoznáte, môžete ju jednoducho odmietnuť — nič sa nezmení, kým neprijmete.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Teraz ste prepojení s :agency na Catalyst',
+            'greeting' => 'Dobrý deň :name,',
+            'body' => 'Administrátor Catalyst vás prepojil s :agency na platforme na základe dohody uzavretej mimo Catalyst. :agency teraz vidí váš profil a môže vám písať.',
+            'unexpected' => 'Ak je toto prepojenie neočakávané, kontaktujte podporu Catalyst.',
+            'cta' => 'Prejsť na váš prehľad',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Vaše prepojenie s :counterparty na Catalyst sa skončilo',
+            'greeting' => 'Dobrý deň :name,',
+            'body' => 'Administrátor Catalyst ukončil váš pracovný vzťah s :counterparty. Na platforme už nie ste prepojení.',
+            'unexpected' => 'Ak je toto neočakávané, kontaktujte podporu Catalyst.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Dokončite nastavenie svojho účtu Catalyst',

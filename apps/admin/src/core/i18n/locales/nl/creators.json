@@ -156,6 +156,58 @@
           "cancel": "Annuleren",
           "success": "Identiteit geverifieerd.",
           "failed": "De identiteit van deze creator kon niet worden geverifieerd. Probeer het opnieuw."
+        },
+        "connections": {
+          "heading": "Bureauverbindingen",
+          "empty": "Nog niet verbonden met een bureau.",
+          "load_failed": "We konden de bureauverbindingen van deze creator niet laden.",
+          "connect_button": "Verbinden met bureau",
+          "disconnect_button": "Verbreken",
+          "blacklisted": "Op zwarte lijst",
+          "table": {
+            "agency": "Bureau",
+            "status": "Status",
+            "since": "Sinds",
+            "actions": "Acties"
+          },
+          "status_labels": {
+            "roster": "Verbonden",
+            "prospect": "Prospect",
+            "external": "Extern",
+            "pending_request": "Verzoek in behandeling",
+            "declined": "Geweigerd",
+            "ended": "Verbroken"
+          },
+          "connect": {
+            "title": "{name} met een bureau verbinden",
+            "agency_label": "Bureau",
+            "agency_placeholder": "Bureaus zoeken…",
+            "no_agencies": "Geen bureaus komen overeen met je zoekopdracht.",
+            "mode_label": "Hoe moet deze verbinding tot stand komen?",
+            "mode_request": "Een verbindingsverzoek sturen",
+            "mode_request_hint": "De creator accepteert of weigert het, zoals een normaal bureauverzoek.",
+            "mode_direct": "Direct verbinden",
+            "mode_direct_hint": "Legt een offline afspraak vast en verbindt het paar onmiddellijk. De creator wordt op de hoogte gebracht.",
+            "reason_label": "Reden",
+            "reason_hint": "Vereist voor een directe verbinding, minstens {count} tekens. Vastgelegd in het auditlogboek.",
+            "confirm": "Verbinden",
+            "cancel": "Annuleren",
+            "success_requested": "Verbindingsverzoek verzonden.",
+            "success_re_requested": "Verbindingsverzoek opnieuw verzonden.",
+            "success_direct": "Creator verbonden.",
+            "success_noop": "Geen wijziging — die verbinding bestaat al.",
+            "failed": "We konden deze verbinding niet maken. Probeer het opnieuw."
+          },
+          "disconnect": {
+            "title": "{name} loskoppelen van {agency}?",
+            "description": "Dit beëindigt de relatie: contactzichtbaarheid en berichten sluiten, en de creator verlaat de talentpools van dat bureau. Lopend campagnewerk blijft ongemoeid. Beide partijen worden op de hoogte gebracht.",
+            "reason_label": "Reden voor het verbreken",
+            "reason_hint": "Vereist, minstens {count} tekens. Vastgelegd in het auditlogboek.",
+            "confirm": "Verbreken",
+            "cancel": "Annuleren",
+            "success": "Relatie beëindigd.",
+            "failed": "We konden deze relatie niet verbreken. Probeer het opnieuw."
+          }
         }
       }
     }

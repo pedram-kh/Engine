@@ -174,6 +174,25 @@ enum AuditAction: string
     // trait's normal allowlisted before/after diff (AgencyCreatorRelationUpdated).
     case AgencyCreatorRelationNotesUpdated = 'agency_creator_relation.notes_updated';
 
+    // AH-051 (D-7) — admin-initiated relation verbs. These make an admin-driven
+    // connection/termination FOREVER distinguishable from an agency-initiated
+    // one (D-8 provenance — the distinct verb IS the record; invited_by_user_id
+    // additionally stores the acting admin).
+    //   - admin_requested: admin Door 1 (send-request on the creator's behalf) —
+    //     mirrors the agency send path (rides the existing ConnectionRequestMail,
+    //     no reason). NOT a NotificationType (the creator sees it in their
+    //     connection-requests inbox, exactly like an agency-sent request).
+    //   - admin_connected: admin Door 2 (direct-connect, records an offline
+    //     agreement) — MANDATORY reason (the consent paper-trail). A
+    //     NotificationType (the creator is notified immediately, dual-emit).
+    //   - disconnected: admin disconnect (the platform's first termination,
+    //     roster → ended) — MANDATORY reason. A NotificationType (both parties
+    //     notified, dual-emit). The `reason` content is REDACTED from the audit
+    //     store (carried in the audit `reason` field, never in before/after).
+    case AgencyCreatorRelationAdminRequested = 'agency_creator_relation.admin_requested';
+    case AgencyCreatorRelationAdminConnected = 'agency_creator_relation.admin_connected';
+    case AgencyCreatorRelationDisconnected = 'agency_creator_relation.disconnected';
+
     // Creator blacklisting (Sprint 7, D-5). `creator.blacklisted` is the
     // dedicated semantic verb emitted MANUALLY by CreatorBlacklistController
     // on every blacklist write (agency-wide OR brand-scoped). It records the
@@ -368,7 +387,14 @@ enum AuditAction: string
             // restore the default/safe state).
             self::AgencySuspended,
             self::AdminImpersonationStarted,
-            self::FeatureFlagToggled => true,
+            self::FeatureFlagToggled,
+            // AH-051 (D-7) — admin Door 2 (direct-connect) records an offline
+            // agreement and admin disconnect severs a live relationship; both
+            // must answer "why" (the reason is the consent/termination
+            // paper-trail). Door 1 (admin_requested) does NOT require a reason
+            // — it is an ordinary connection request the creator can decline.
+            self::AgencyCreatorRelationAdminConnected,
+            self::AgencyCreatorRelationDisconnected => true,
             default => false,
         };
     }

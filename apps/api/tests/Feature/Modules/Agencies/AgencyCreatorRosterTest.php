@@ -114,14 +114,30 @@ it('EXCLUDES pending_request + declined from the DEFAULT (unfiltered) index (D-6
     makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::External]);
     makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::PendingRequest]);
     makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::Declined]);
+    // AH-051 (D-3) — a severed relationship joins the default-excluded set.
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::Ended]);
 
     $response = $this->actingAs($admin)->getJson(rosterUrl($agency));
 
-    // Default = real-relationship set only; the two lifecycle-in-flight
-    // statuses are hidden (the roster is not a request inbox).
+    // Default = real-relationship set only; the lifecycle-in-flight statuses
+    // (pending_request/declined) AND the severed `ended` state are hidden (the
+    // roster is not a request inbox nor a graveyard).
     expect($response->json('meta.total'))->toBe(3);
     expect($response->json('data.*.attributes.relationship_status'))
         ->toEqualCanonicalizing(['roster', 'prospect', 'external']);
+});
+
+it('filters BY ended — the chip returns exactly those (AH-051 D-3)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::Roster]);
+    makeRosterRelation($agency, ['relationship_status' => RelationshipStatus::Ended]);
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'status=ended'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.attributes.relationship_status'))->toBe('ended');
 });
 
 it('filters BY pending_request — the chip returns exactly those (D-6 break-revert: an unconditional whereNotIn breaks this)', function (): void {

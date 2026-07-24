@@ -28,12 +28,20 @@ uses(TestCase::class, RefreshDatabase::class);
  */
 
 /**
+ * An APPROVED creator by default — accepting a request re-gates on approval
+ * (AH-051 D-2), so the happy-path actor must be approved. Pass approved:false
+ * for the not-approved re-gate cases.
+ *
  * @return array{0: User, 1: Creator}
  */
-function creatorActor(array $attributes = []): array
+function creatorActor(array $attributes = [], bool $approved = true): array
 {
     $user = User::factory()->create($attributes);
-    $creator = CreatorFactory::new()->createOne(['user_id' => $user->id]);
+    $factory = CreatorFactory::new();
+    if ($approved) {
+        $factory = $factory->approved();
+    }
+    $creator = $factory->createOne(['user_id' => $user->id]);
 
     return [$user, $creator];
 }
@@ -133,7 +141,75 @@ it('rejects accepting a non-pending relation (break-revert the fail-closed guard
 
     $response->assertStatus(422)->assertJsonPath('errors.0.code', 'connection.not_pending');
     expect($relation->refresh()->relationship_status->value)->toBe($status);
-})->with(['roster', 'declined', 'prospect', 'external']);
+})->with(['roster', 'declined', 'prospect', 'external', 'ended']);
+
+// ---------------------------------------------------------------------------
+// Accept re-gates (AH-051 D-2) — approved + not-hard-blacklisted, fail-closed.
+// Distinct 422 codes; status UNCHANGED on failure. Decline never re-gates.
+// ---------------------------------------------------------------------------
+
+it('BLOCKS accepting when the creator is NOT approved (break-revert the approved re-gate)', function (): void {
+    [$user, $creator] = creatorActor(approved: false);
+    $agency = Agency::factory()->createOne();
+    $relation = pendingRequestFor($agency, $creator);
+
+    $response = $this->actingAs($user)
+        ->postJson("/api/v1/creators/me/connection-requests/{$relation->ulid}/accept");
+
+    $response->assertStatus(422)->assertJsonPath('errors.0.code', 'connection.creator_not_approved');
+    // Status unchanged — the accept refused before the flip.
+    expect($relation->refresh()->relationship_status)->toBe(RelationshipStatus::PendingRequest);
+});
+
+it('BLOCKS accepting when the relation is HARD-blacklisted (break-revert the blacklist re-gate)', function (): void {
+    [$user, $creator] = creatorActor();
+    $agency = Agency::factory()->createOne();
+    $relation = AgencyCreatorRelation::factory()->pendingRequest()->blacklisted('Hard ban')->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+    ]);
+
+    $response = $this->actingAs($user)
+        ->postJson("/api/v1/creators/me/connection-requests/{$relation->ulid}/accept");
+
+    $response->assertStatus(422)->assertJsonPath('errors.0.code', 'connection.blacklisted');
+    expect($relation->refresh()->relationship_status)->toBe(RelationshipStatus::PendingRequest);
+});
+
+it('ALLOWS accepting when the relation is only SOFT-blacklisted (soft is warn-only, never blocks)', function (): void {
+    [$user, $creator] = creatorActor();
+    $agency = Agency::factory()->createOne();
+    $relation = AgencyCreatorRelation::factory()->pendingRequest()->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'is_blacklisted' => true,
+        'blacklist_scope' => 'agency',
+        'blacklist_type' => 'soft',
+        'blacklist_reason' => 'Watchlist',
+        'blacklisted_at' => now(),
+    ]);
+
+    $response = $this->actingAs($user)
+        ->postJson("/api/v1/creators/me/connection-requests/{$relation->ulid}/accept");
+
+    $response->assertOk()->assertJsonPath('data.attributes.relationship_status', 'roster');
+    expect($relation->refresh()->relationship_status)->toBe(RelationshipStatus::Roster);
+});
+
+it('DECLINE is never re-gated — an unapproved, hard-blacklisted creator may still decline', function (): void {
+    [$user, $creator] = creatorActor(approved: false);
+    $agency = Agency::factory()->createOne();
+    $relation = AgencyCreatorRelation::factory()->pendingRequest()->blacklisted('Hard ban')->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+    ]);
+
+    $response = $this->actingAs($user)
+        ->postJson("/api/v1/creators/me/connection-requests/{$relation->ulid}/decline");
+
+    $response->assertOk()->assertJsonPath('data.attributes.relationship_status', 'declined');
+    expect($relation->refresh()->relationship_status)->toBe(RelationshipStatus::Declined);
+});
 
 // ---------------------------------------------------------------------------
 // Creator-self scoping — a creator can NOT act on another creator's request

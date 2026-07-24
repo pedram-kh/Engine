@@ -156,6 +156,58 @@
           "cancel": "Annulla",
           "success": "Identità verificata.",
           "failed": "Impossibile verificare l'identità di questo creator. Riprova."
+        },
+        "connections": {
+          "heading": "Connessioni con agenzie",
+          "empty": "Non ancora connesso a nessuna agenzia.",
+          "load_failed": "Impossibile caricare le connessioni con le agenzie di questo creator.",
+          "connect_button": "Connetti a un'agenzia",
+          "disconnect_button": "Disconnetti",
+          "blacklisted": "In lista nera",
+          "table": {
+            "agency": "Agenzia",
+            "status": "Stato",
+            "since": "Dal",
+            "actions": "Azioni"
+          },
+          "status_labels": {
+            "roster": "Connesso",
+            "prospect": "Potenziale",
+            "external": "Esterno",
+            "pending_request": "Richiesta in sospeso",
+            "declined": "Rifiutato",
+            "ended": "Disconnesso"
+          },
+          "connect": {
+            "title": "Connetti {name} a un'agenzia",
+            "agency_label": "Agenzia",
+            "agency_placeholder": "Cerca agenzie…",
+            "no_agencies": "Nessuna agenzia corrisponde alla tua ricerca.",
+            "mode_label": "Come deve essere effettuata questa connessione?",
+            "mode_request": "Invia una richiesta di connessione",
+            "mode_request_hint": "Il creator la accetta o la rifiuta, come una normale richiesta di agenzia.",
+            "mode_direct": "Connetti direttamente",
+            "mode_direct_hint": "Registra un accordo offline e connette la coppia immediatamente. Il creator viene avvisato.",
+            "reason_label": "Motivo",
+            "reason_hint": "Obbligatorio per una connessione diretta, almeno {count} caratteri. Registrato nel log di audit.",
+            "confirm": "Connetti",
+            "cancel": "Annulla",
+            "success_requested": "Richiesta di connessione inviata.",
+            "success_re_requested": "Richiesta di connessione inviata di nuovo.",
+            "success_direct": "Creator connesso.",
+            "success_noop": "Nessuna modifica — quella connessione esiste già.",
+            "failed": "Impossibile creare questa connessione. Riprova."
+          },
+          "disconnect": {
+            "title": "Disconnettere {name} da {agency}?",
+            "description": "Questo termina la relazione: la visibilità dei contatti e la messaggistica si chiudono e il creator lascia i pool di talenti di quell'agenzia. Il lavoro di campagna in corso non viene toccato. Entrambe le parti vengono avvisate.",
+            "reason_label": "Motivo della disconnessione",
+            "reason_hint": "Obbligatorio, almeno {count} caratteri. Registrato nel log di audit.",
+            "confirm": "Disconnetti",
+            "cancel": "Annulla",
+            "success": "Relazione terminata.",
+            "failed": "Impossibile disconnettere questa relazione. Riprova."
+          }
         }
       }
     }

@@ -82,6 +82,11 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'agency_creator_relation.deleted',
         // Sprint 6 Chunk 2a — redacted notes-edit event (D-2a-5)
         'agency_creator_relation.notes_updated',
+        // AH-051 (D-7) — admin-initiated relation verbs (Door 1 / Door 2 /
+        // disconnect). admin_connected + disconnected require a reason.
+        'agency_creator_relation.admin_requested',
+        'agency_creator_relation.admin_connected',
+        'agency_creator_relation.disconnected',
         // Sprint 7 — creator blacklisting (D-5)
         'creator.blacklisted',
         'brand_creator_blacklist.created',
@@ -190,6 +195,10 @@ it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', functi
         'agency.suspended',
         'admin.impersonation_started',
         'feature_flag.toggled',
+        // AH-051 (D-7) — direct-connect + disconnect are the consent/termination
+        // paper-trail; Door 1 (admin_requested) does NOT require a reason.
+        'agency_creator_relation.admin_connected',
+        'agency_creator_relation.disconnected',
     ]);
 });
 

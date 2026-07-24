@@ -132,6 +132,68 @@ export type AdminEditableField =
  */
 export const ADMIN_REASON_REQUIRED_FIELDS: ReadonlyArray<AdminEditableField> = ['bio', 'categories']
 
+/**
+ * AH-051 (D-4/D-5/D-9) — admin-initiated agency↔creator connections.
+ *
+ *   GET  /admin/creators/{ulid}/connections                    — cross-agency list
+ *   POST /admin/creators/{ulid}/connections                    — Door 1 / Door 2
+ *   POST /admin/creators/{ulid}/connections/{agency}/disconnect — D-6 termination
+ *
+ * The relationship status mirrors the backend `RelationshipStatus` enum; `ended`
+ * is the AH-051 severed-after-roster state (D-3). The two doors share one POST,
+ * mode-switched (`request` = Door 1; `direct` = Door 2 + mandatory reason).
+ */
+export type AdminConnectionRelationshipStatus =
+  | 'roster'
+  | 'prospect'
+  | 'external'
+  | 'pending_request'
+  | 'declined'
+  | 'ended'
+
+export type AdminConnectionMode = 'request' | 'direct'
+
+/** A single relation row in the cross-agency list (GET connections). */
+export interface AdminConnectionRelation {
+  id: string
+  type: 'admin_connection'
+  attributes: {
+    agency_id: string
+    agency_name: string
+    relationship_status: AdminConnectionRelationshipStatus
+    is_blacklisted: boolean
+    blacklist_type: 'soft' | 'hard' | null
+    since: string
+  }
+}
+
+export interface AdminConnectionListResponse {
+  data: AdminConnectionRelation[]
+}
+
+/** The write response (store / disconnect) — a single relation + a meta.code. */
+export interface AdminConnectionEnvelope {
+  data: {
+    id: string
+    type: 'admin_connection'
+    attributes: {
+      agency_id: string
+      agency_name: string
+      relationship_status: AdminConnectionRelationshipStatus
+      mode: AdminConnectionMode | 'disconnect'
+    }
+  }
+  meta: { code: string }
+}
+
+export interface AdminConnectPayload {
+  /** The target agency's ULID. */
+  agencyId: string
+  mode: AdminConnectionMode
+  /** Mandatory (min 10) for `direct`; ignored for `request`. */
+  reason?: string | null
+}
+
 export const adminCreatorsApi = {
   /**
    * Fetch the review queue — Sprint 4 Chunk 3 (Cluster 3) backend
@@ -279,6 +341,55 @@ export const adminCreatorsApi = {
     return http.post<CreatorResourceEnvelope>(
       `/admin/creators/${creatorUlid}/verify-identity`,
       payload,
+    )
+  },
+
+  /**
+   * AH-051 (D-9 read) — the creator's relations across ALL agencies.
+   * GET /admin/creators/{ulid}/connections. Scope-bypassed on the backend
+   * (admin is not a member of any of them).
+   */
+  connections(creatorUlid: string): Promise<AdminConnectionListResponse> {
+    return http.get<AdminConnectionListResponse>(`/admin/creators/${creatorUlid}/connections`)
+  },
+
+  /**
+   * AH-051 (D-4/D-5) — create an admin-initiated connection.
+   *   mode=request → Door 1: drives the agency send-request semantics (the
+   *     creator accepts/declines). `reason` is ignored.
+   *   mode=direct  → Door 2: records an offline agreement, targets `roster`
+   *     immediately. `reason` is REQUIRED (min 10; the backend re-validates).
+   *
+   * POST /admin/creators/{ulid}/connections. 422 codes are mode-distinct
+   * (`connection.request_blacklisted` vs `connection.direct_blacklisted`).
+   */
+  connect(creatorUlid: string, payload: AdminConnectPayload): Promise<AdminConnectionEnvelope> {
+    const body: Record<string, unknown> = {
+      agency_id: payload.agencyId,
+      mode: payload.mode,
+    }
+    if (payload.mode === 'direct' && payload.reason != null && payload.reason.trim() !== '') {
+      body.reason = payload.reason.trim()
+    }
+    return http.post<AdminConnectionEnvelope>(`/admin/creators/${creatorUlid}/connections`, body)
+  },
+
+  /**
+   * AH-051 (D-6) — admin disconnect (the platform's first termination path).
+   * roster → ended only (else 422 `connection.not_disconnectable`). `reason`
+   * is REQUIRED (min 10). Pool memberships for the pair are torn down in the
+   * same transaction; both parties are notified.
+   *
+   * POST /admin/creators/{ulid}/connections/{agencyUlid}/disconnect.
+   */
+  disconnect(
+    creatorUlid: string,
+    agencyUlid: string,
+    reason: string,
+  ): Promise<AdminConnectionEnvelope> {
+    return http.post<AdminConnectionEnvelope>(
+      `/admin/creators/${creatorUlid}/connections/${agencyUlid}/disconnect`,
+      { reason: reason.trim() },
     )
   },
 }

@@ -110,6 +110,7 @@
         "connected": "Forbundet",
         "pending": "Anmodning afventer",
         "declined": "Afvist",
+        "ended": "Tidligere forbundet",
         "notConnected": "Ikke forbundet",
         "sendRequest": "Send anmodning",
         "requestAgain": "Anmod igen",
@@ -216,7 +217,8 @@
         "prospect": "Potentiel",
         "external": "Ekstern",
         "pending_request": "Anmodning afventer",
-        "declined": "Afvist"
+        "declined": "Afvist",
+        "ended": "Afbrudt"
       },
       "applicationStatus": {
         "incomplete": "Ufuldstændig",

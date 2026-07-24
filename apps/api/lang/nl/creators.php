@@ -40,6 +40,23 @@ return [
             'ignore' => 'Als je dit bureau niet kent, kun je het verzoek gewoon weigeren — er verandert niets tot je het accepteert.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Je bent nu verbonden met :agency op Catalyst',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Een Catalyst-beheerder heeft je op het platform verbonden met :agency, op basis van een buiten Catalyst gemaakte afspraak. :agency kan nu je profiel zien en je berichten sturen.',
+            'unexpected' => 'Als deze verbinding onverwacht is, neem dan contact op met de Catalyst-ondersteuning.',
+            'cta' => 'Ga naar je dashboard',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Je verbinding met :counterparty op Catalyst is beëindigd',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Een Catalyst-beheerder heeft je werkrelatie met :counterparty beëindigd. Jullie zijn niet langer verbonden op het platform.',
+            'unexpected' => 'Als dit onverwacht is, neem dan contact op met de Catalyst-ondersteuning.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Voltooi het instellen van je Catalyst-account',

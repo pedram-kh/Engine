@@ -14,6 +14,9 @@
  *   - pending   → "Request pending" (disabled/info)
  *   - connected → "View in roster" (the existing 2a link — keys on `roster`)
  *   - declined  → "Declined" + an explicit "Request again" (the D-4 re-request)
+ *   - ended     → "Previously connected" + "Request again" (AH-051 D-3: an admin
+ *                 severed a prior connection; truthful label, re-requestable —
+ *                 NOT the "never connected" empty state)
  *
  * It deliberately carries no rating/notes editor, no contact email, no
  * availability, no admin actions — those are relation-gated surfaces (the
@@ -285,6 +288,17 @@ onMounted(() => {
               >
                 {{ t('app.discover.connection.declined') }}
               </v-chip>
+              <!-- ended → a TRUTHFUL "Previously connected" (AH-051 D-3); NOT
+                   the "never connected" empty state. -->
+              <v-chip
+                v-else-if="connectionState === 'ended'"
+                size="small"
+                variant="tonal"
+                prepend-icon="mdi-link-off"
+                data-test="discover-profile-connection-ended"
+              >
+                {{ t('app.discover.connection.ended') }}
+              </v-chip>
               <span
                 v-else
                 class="text-caption text-medium-emphasis"
@@ -341,6 +355,20 @@ onMounted(() => {
               prepend-icon="mdi-refresh"
               :loading="sending"
               data-test="discover-profile-request-again"
+              @click="sendConnectionRequest"
+            >
+              {{ t('app.discover.connection.requestAgain') }}
+            </v-btn>
+
+            <!-- ended → re-requestable like declined (AH-051 D-3), but the
+                 label reads "Previously connected"; admin/manager only. -->
+            <v-btn
+              v-else-if="connectionState === 'ended' && canSend"
+              variant="flat"
+              color="primary"
+              prepend-icon="mdi-refresh"
+              :loading="sending"
+              data-test="discover-profile-request-again-ended"
               @click="sendConnectionRequest"
             >
               {{ t('app.discover.connection.requestAgain') }}

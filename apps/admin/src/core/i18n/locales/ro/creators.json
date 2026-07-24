@@ -156,6 +156,58 @@
           "cancel": "Anulați",
           "success": "Identity verified.",
           "failed": "We couldn't verify this creator's identity. Please try again."
+        },
+        "connections": {
+          "heading": "Conexiuni cu agenții",
+          "empty": "Încă neconectat la nicio agenție.",
+          "load_failed": "Nu am putut încărca conexiunile cu agenții ale acestui creator.",
+          "connect_button": "Conectează la agenție",
+          "disconnect_button": "Deconectează",
+          "blacklisted": "Pe lista neagră",
+          "table": {
+            "agency": "Agenție",
+            "status": "Stare",
+            "since": "Din",
+            "actions": "Acțiuni"
+          },
+          "status_labels": {
+            "roster": "Conectat",
+            "prospect": "Prospect",
+            "external": "Extern",
+            "pending_request": "Cerere în așteptare",
+            "declined": "Refuzat",
+            "ended": "Deconectat"
+          },
+          "connect": {
+            "title": "Conectează {name} la o agenție",
+            "agency_label": "Agenție",
+            "agency_placeholder": "Caută agenții…",
+            "no_agencies": "Nicio agenție nu corespunde căutării tale.",
+            "mode_label": "Cum ar trebui realizată această conexiune?",
+            "mode_request": "Trimite o cerere de conexiune",
+            "mode_request_hint": "Creatorul o acceptă sau o refuză, ca pe o cerere obișnuită de agenție.",
+            "mode_direct": "Conectează direct",
+            "mode_direct_hint": "Înregistrează un acord offline și conectează perechea imediat. Creatorul este notificat.",
+            "reason_label": "Motiv",
+            "reason_hint": "Obligatoriu pentru o conexiune directă, cel puțin {count} caractere. Înregistrat în jurnalul de audit.",
+            "confirm": "Conectează",
+            "cancel": "Anulează",
+            "success_requested": "Cerere de conexiune trimisă.",
+            "success_re_requested": "Cerere de conexiune trimisă din nou.",
+            "success_direct": "Creator conectat.",
+            "success_noop": "Nicio schimbare — acea conexiune există deja.",
+            "failed": "Nu am putut crea această conexiune. Încearcă din nou."
+          },
+          "disconnect": {
+            "title": "Deconectezi {name} de la {agency}?",
+            "description": "Aceasta încheie relația: vizibilitatea contactului și mesageria se închid, iar creatorul părăsește rezervele de talente ale acelei agenții. Munca de campanie în curs rămâne neatinsă. Ambele părți sunt notificate.",
+            "reason_label": "Motivul deconectării",
+            "reason_hint": "Obligatoriu, cel puțin {count} caractere. Înregistrat în jurnalul de audit.",
+            "confirm": "Deconectează",
+            "cancel": "Anulează",
+            "success": "Relație încheiată.",
+            "failed": "Nu am putut deconecta această relație. Încearcă din nou."
+          }
         }
       }
     }

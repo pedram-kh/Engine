@@ -156,6 +156,58 @@
           "cancel": "Anuluj",
           "success": "Tożsamość zweryfikowana.",
           "failed": "Nie udało się zweryfikować tożsamości tego twórcy. Spróbuj ponownie."
+        },
+        "connections": {
+          "heading": "Połączenia z agencjami",
+          "empty": "Nie połączono jeszcze z żadną agencją.",
+          "load_failed": "Nie udało się załadować połączeń tego twórcy z agencjami.",
+          "connect_button": "Połącz z agencją",
+          "disconnect_button": "Rozłącz",
+          "blacklisted": "Na czarnej liście",
+          "table": {
+            "agency": "Agencja",
+            "status": "Status",
+            "since": "Od",
+            "actions": "Akcje"
+          },
+          "status_labels": {
+            "roster": "Połączono",
+            "prospect": "Potencjalny",
+            "external": "Zewnętrzny",
+            "pending_request": "Oczekująca prośba",
+            "declined": "Odrzucono",
+            "ended": "Rozłączono"
+          },
+          "connect": {
+            "title": "Połącz {name} z agencją",
+            "agency_label": "Agencja",
+            "agency_placeholder": "Szukaj agencji…",
+            "no_agencies": "Żadna agencja nie pasuje do wyszukiwania.",
+            "mode_label": "W jaki sposób ma zostać nawiązane to połączenie?",
+            "mode_request": "Wyślij prośbę o połączenie",
+            "mode_request_hint": "Twórca akceptuje ją lub odrzuca, jak zwykłą prośbę agencji.",
+            "mode_direct": "Połącz bezpośrednio",
+            "mode_direct_hint": "Rejestruje umowę offline i natychmiast łączy parę. Twórca zostaje powiadomiony.",
+            "reason_label": "Powód",
+            "reason_hint": "Wymagane dla bezpośredniego połączenia, co najmniej {count} znaków. Zapisywane w dzienniku audytu.",
+            "confirm": "Połącz",
+            "cancel": "Anuluj",
+            "success_requested": "Prośba o połączenie wysłana.",
+            "success_re_requested": "Prośba o połączenie wysłana ponownie.",
+            "success_direct": "Twórca połączony.",
+            "success_noop": "Brak zmian — to połączenie już istnieje.",
+            "failed": "Nie udało się utworzyć tego połączenia. Spróbuj ponownie."
+          },
+          "disconnect": {
+            "title": "Rozłączyć {name} z {agency}?",
+            "description": "To kończy relację: widoczność kontaktu i wiadomości zostają zamknięte, a twórca opuszcza pule talentów tej agencji. Trwające prace kampanijne pozostają nienaruszone. Obie strony zostają powiadomione.",
+            "reason_label": "Powód rozłączenia",
+            "reason_hint": "Wymagane, co najmniej {count} znaków. Zapisywane w dzienniku audytu.",
+            "confirm": "Rozłącz",
+            "cancel": "Anuluj",
+            "success": "Relacja zakończona.",
+            "failed": "Nie udało się rozłączyć tej relacji. Spróbuj ponownie."
+          }
         }
       }
     }

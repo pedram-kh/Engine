@@ -156,6 +156,58 @@
           "cancel": "Peruuta",
           "success": "Identity verified.",
           "failed": "We couldn't verify this creator's identity. Please try again."
+        },
+        "connections": {
+          "heading": "Toimistoyhteydet",
+          "empty": "Ei vielä yhteyttä mihinkään toimistoon.",
+          "load_failed": "Tämän luojan toimistoyhteyksiä ei voitu ladata.",
+          "connect_button": "Yhdistä toimistoon",
+          "disconnect_button": "Katkaise yhteys",
+          "blacklisted": "Mustalla listalla",
+          "table": {
+            "agency": "Toimisto",
+            "status": "Tila",
+            "since": "Alkaen",
+            "actions": "Toiminnot"
+          },
+          "status_labels": {
+            "roster": "Yhdistetty",
+            "prospect": "Mahdollinen",
+            "external": "Ulkoinen",
+            "pending_request": "Pyyntö odottaa",
+            "declined": "Hylätty",
+            "ended": "Yhteys katkaistu"
+          },
+          "connect": {
+            "title": "Yhdistä {name} toimistoon",
+            "agency_label": "Toimisto",
+            "agency_placeholder": "Hae toimistoja…",
+            "no_agencies": "Yksikään toimisto ei vastaa hakuasi.",
+            "mode_label": "Miten tämä yhteys tulisi luoda?",
+            "mode_request": "Lähetä yhteyspyyntö",
+            "mode_request_hint": "Luoja hyväksyy tai hylkää sen, kuten tavallisen toimistopyynnön.",
+            "mode_direct": "Yhdistä suoraan",
+            "mode_direct_hint": "Kirjaa offline-sopimuksen ja yhdistää parin heti. Luojalle ilmoitetaan.",
+            "reason_label": "Syy",
+            "reason_hint": "Pakollinen suoralle yhteydelle, vähintään {count} merkkiä. Kirjataan tarkastuslokiin.",
+            "confirm": "Yhdistä",
+            "cancel": "Peruuta",
+            "success_requested": "Yhteyspyyntö lähetetty.",
+            "success_re_requested": "Yhteyspyyntö lähetetty uudelleen.",
+            "success_direct": "Luoja yhdistetty.",
+            "success_noop": "Ei muutosta — kyseinen yhteys on jo olemassa.",
+            "failed": "Tätä yhteyttä ei voitu luoda. Yritä uudelleen."
+          },
+          "disconnect": {
+            "title": "Katkaistaanko {name} toimistosta {agency}?",
+            "description": "Tämä päättää suhteen: yhteystietojen näkyvyys ja viestit sulkeutuvat, ja luoja poistuu kyseisen toimiston kykyaltaista. Käynnissä oleva kampanjatyö säilyy koskemattomana. Molemmille osapuolille ilmoitetaan.",
+            "reason_label": "Yhteyden katkaisun syy",
+            "reason_hint": "Pakollinen, vähintään {count} merkkiä. Kirjataan tarkastuslokiin.",
+            "confirm": "Katkaise yhteys",
+            "cancel": "Peruuta",
+            "success": "Suhde päättyi.",
+            "failed": "Tätä suhdetta ei voitu katkaista. Yritä uudelleen."
+          }
         }
       }
     }

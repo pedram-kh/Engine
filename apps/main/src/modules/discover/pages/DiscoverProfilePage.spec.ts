@@ -9,6 +9,7 @@
  *   - pending   → "Request pending" (disabled)
  *   - connected → "View in roster" (keys on `roster`)
  *   - declined  → "Declined" + "Request again" (D-4)
+ *   - ended     → "Previously connected" + "Request again" (AH-051 D-3)
  *
  * The @catalyst/ui leaf components are stubbed to keep the mount lean; the
  * page chrome (header, connection chip, action button) renders for real.
@@ -287,6 +288,35 @@ describe('DiscoverProfilePage', () => {
 
     expect(discoveryApi.sendConnectionRequest).toHaveBeenCalledTimes(1)
     // Re-derives to pending after the re-request.
+    expect(harness.wrapper.find('[data-test="discover-profile-request-pending"]').exists()).toBe(
+      true,
+    )
+  })
+
+  it('ended → truthful "Previously connected" chip + "Request again" (AH-051 D-3), NOT the not-connected empty state', async () => {
+    vi.mocked(discoveryApi.sendConnectionRequest).mockResolvedValue(
+      sendResponse('pending_request', 'connection.re_requested'),
+    )
+    const harness = await mountProfile({
+      profile: makeProfile({ relationship_status: 'ended' }),
+    })
+    cleanup = harness.cleanup
+
+    // The chip states a TRUTHFUL prior-relationship fact...
+    expect(
+      harness.wrapper.find('[data-test="discover-profile-connection-ended"]').text(),
+    ).toContain('Previously connected')
+    // ...and it is NOT the "never connected" empty state.
+    expect(harness.wrapper.find('[data-test="discover-profile-notconnected"]').exists()).toBe(false)
+
+    // Re-requestable like `declined` (its own data-test seam so the two arms
+    // stay independently pinned).
+    const again = harness.wrapper.find('[data-test="discover-profile-request-again-ended"]')
+    expect(again.exists()).toBe(true)
+    await again.trigger('click')
+    await flushPromises()
+
+    expect(discoveryApi.sendConnectionRequest).toHaveBeenCalledTimes(1)
     expect(harness.wrapper.find('[data-test="discover-profile-request-pending"]').exists()).toBe(
       true,
     )

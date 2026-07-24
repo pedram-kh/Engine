@@ -110,6 +110,7 @@
         "connected": "Connected",
         "pending": "Request pending",
         "declined": "Atteiktd",
+        "ended": "Iepriekš savienots",
         "notConnected": "Nēt connected",
         "sendRequest": "Nēsūtīt request",
         "requestAgain": "Request again",
@@ -216,7 +217,8 @@
         "prospect": "Prospect",
         "external": "External",
         "pending_request": "Gaida request",
-        "declined": "Atteiktd"
+        "declined": "Atteiktd",
+        "ended": "Atvienots"
       },
       "applicationStatus": {
         "incomplete": "Incomplete",

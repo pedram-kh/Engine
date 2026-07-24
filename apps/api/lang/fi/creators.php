@@ -40,6 +40,23 @@ return [
             'ignore' => 'Jos et tunne tätä toimistoa, hylkää se — mikään ei muutu ennen kuin hyväksyt.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Sinut on nyt yhdistetty agentuuriin :agency Catalystissa',
+            'greeting' => 'Hei :name,',
+            'body' => 'Catalystin ylläpitäjä on yhdistänyt sinut agentuuriin :agency alustalla Catalystin ulkopuolella tehdyn sopimuksen perusteella. :agency näkee nyt profiilisi ja voi lähettää sinulle viestejä.',
+            'unexpected' => 'Jos tämä yhteys on odottamaton, ota yhteyttä Catalystin tukeen.',
+            'cta' => 'Siirry hallintapaneeliin',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Yhteytesi osapuoleen :counterparty Catalystissa on päättynyt',
+            'greeting' => 'Hei :name,',
+            'body' => 'Catalystin ylläpitäjä on päättänyt työsuhteesi osapuoleen :counterparty. Ette ole enää yhteydessä alustalla.',
+            'unexpected' => 'Jos tämä on odottamatonta, ota yhteyttä Catalystin tukeen.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Viimeistele Catalyst-tilisi käyttöönotto',

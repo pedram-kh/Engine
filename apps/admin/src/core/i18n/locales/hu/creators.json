@@ -156,6 +156,58 @@
           "cancel": "Mégse",
           "success": "Identity verified.",
           "failed": "We couldn't verify this creator's identity. Please try again."
+        },
+        "connections": {
+          "heading": "Ügynökségi kapcsolatok",
+          "empty": "Még nincs kapcsolat egyetlen ügynökséggel sem.",
+          "load_failed": "Nem sikerült betölteni ennek az alkotónak az ügynökségi kapcsolatait.",
+          "connect_button": "Kapcsolódás ügynökséghez",
+          "disconnect_button": "Leválasztás",
+          "blacklisted": "Feketelistán",
+          "table": {
+            "agency": "Ügynökség",
+            "status": "Állapot",
+            "since": "Ekkortól",
+            "actions": "Műveletek"
+          },
+          "status_labels": {
+            "roster": "Csatlakoztatva",
+            "prospect": "Érdeklődő",
+            "external": "Külső",
+            "pending_request": "Függőben lévő kérés",
+            "declined": "Elutasítva",
+            "ended": "Leválasztva"
+          },
+          "connect": {
+            "title": "{name} kapcsolása egy ügynökséghez",
+            "agency_label": "Ügynökség",
+            "agency_placeholder": "Ügynökségek keresése…",
+            "no_agencies": "Egyetlen ügynökség sem felel meg a keresésnek.",
+            "mode_label": "Hogyan jöjjön létre ez a kapcsolat?",
+            "mode_request": "Kapcsolódási kérés küldése",
+            "mode_request_hint": "Az alkotó elfogadja vagy elutasítja, mint egy szokásos ügynökségi kérést.",
+            "mode_direct": "Közvetlen kapcsolódás",
+            "mode_direct_hint": "Rögzít egy offline megállapodást, és azonnal összekapcsolja a párt. Az alkotó értesítést kap.",
+            "reason_label": "Indok",
+            "reason_hint": "Közvetlen kapcsolódáshoz kötelező, legalább {count} karakter. Rögzítve az auditnaplóban.",
+            "confirm": "Kapcsolódás",
+            "cancel": "Mégse",
+            "success_requested": "Kapcsolódási kérés elküldve.",
+            "success_re_requested": "Kapcsolódási kérés újraküldve.",
+            "success_direct": "Alkotó csatlakoztatva.",
+            "success_noop": "Nincs változás — ez a kapcsolat már létezik.",
+            "failed": "Nem sikerült létrehozni ezt a kapcsolatot. Próbálja újra."
+          },
+          "disconnect": {
+            "title": "Leválasztja {name} alkotót a következőről: {agency}?",
+            "description": "Ez lezárja a kapcsolatot: a kapcsolattartási láthatóság és az üzenetküldés bezárul, az alkotó pedig kilép az adott ügynökség tehetségállományaiból. A folyamatban lévő kampánymunka érintetlen marad. Mindkét fél értesítést kap.",
+            "reason_label": "A leválasztás indoka",
+            "reason_hint": "Kötelező, legalább {count} karakter. Rögzítve az auditnaplóban.",
+            "confirm": "Leválasztás",
+            "cancel": "Mégse",
+            "success": "Kapcsolat lezárva.",
+            "failed": "Nem sikerült leválasztani ezt a kapcsolatot. Próbálja újra."
+          }
         }
       }
     }

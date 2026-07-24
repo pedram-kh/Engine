@@ -40,6 +40,23 @@ return [
             'ignore' => 'Če te agencije ne poznate, jo preprosto zavrnite — nič se ne bo spremenilo, dokler ne sprejmete.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Zdaj ste povezani z :agency na Catalystu',
+            'greeting' => 'Pozdravljeni, :name,',
+            'body' => 'Skrbnik Catalysta vas je povezal z :agency na platformi na podlagi dogovora, sklenjenega zunaj Catalysta. :agency lahko zdaj vidi vaš profil in vam pošilja sporočila.',
+            'unexpected' => 'Če je ta povezava nepričakovana, se obrnite na podporo Catalyst.',
+            'cta' => 'Pojdite na svojo nadzorno ploščo',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Vaša povezava z :counterparty na Catalystu je končana',
+            'greeting' => 'Pozdravljeni, :name,',
+            'body' => 'Skrbnik Catalysta je končal vaše delovno razmerje z :counterparty. Na platformi niste več povezani.',
+            'unexpected' => 'Če je to nepričakovano, se obrnite na podporo Catalyst.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Dokončajte nastavitev svojega računa Catalyst',

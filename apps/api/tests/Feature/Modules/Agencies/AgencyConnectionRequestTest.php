@@ -164,6 +164,28 @@ it('re-requests a previously declined creator (declined → pending_request — 
     Mail::assertQueued(ConnectionRequestMail::class, 1);
 });
 
+it('re-requests an admin-severed creator (ended → pending_request — AH-051 D-3, the status MUST flip)', function (): void {
+    Mail::fake();
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = discoverableTarget();
+    AgencyCreatorRelation::factory()->ended()->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+    ]);
+
+    $response = $this->actingAs($admin)->postJson(requestUrl($agency, $creator));
+
+    $response->assertOk()
+        ->assertJsonPath('data.attributes.relationship_status', 'pending_request')
+        ->assertJsonPath('meta.code', 'connection.re_requested');
+
+    $relation = relationFor($agency, $creator);
+    /** @var AgencyCreatorRelation $relation */
+    expect($relation->relationship_status)->toBe(RelationshipStatus::PendingRequest);
+    Mail::assertQueued(ConnectionRequestMail::class, 1);
+});
+
 // ---------------------------------------------------------------------------
 // Idempotency — pending_request / roster no-op surfacing the existing state
 // ---------------------------------------------------------------------------

@@ -136,6 +136,13 @@ const CONNECTION_CHIP: Record<
     icon: 'mdi-close-circle-outline',
     key: 'app.discover.connection.declined',
   },
+  // AH-051 (D-3) — a severed prior connection reads as "Previously connected",
+  // NOT the "never connected" empty state (which is the `none` no-chip case).
+  ended: {
+    color: 'default',
+    icon: 'mdi-link-off',
+    key: 'app.discover.connection.ended',
+  },
 }
 
 function connectionState(item: DiscoveryCreatorListItem): DiscoveryConnectionState {

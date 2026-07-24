@@ -40,6 +40,23 @@ return [
             'ignore' => 'Jekk ma tafsx din l-aġenzija, irrifjutaha biss — xejn ma jinbidel sakemm ma taċċettax.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Issa inti konness ma\' :agency fuq Catalyst',
+            'greeting' => 'Bonġu :name,',
+            'body' => 'Amministratur ta\' Catalyst qabbadk ma\' :agency fuq il-pjattaforma, ibbażat fuq ftehim li sar barra minn Catalyst. :agency issa jista\' jara l-profil tiegħek u jibgħatlek messaġġi.',
+            'unexpected' => 'Jekk din il-konnessjoni mhux mistennija, jekk jogħġbok ikkuntattja lis-sapport ta\' Catalyst.',
+            'cta' => 'Mur fid-dashboard tiegħek',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Il-konnessjoni tiegħek ma\' :counterparty fuq Catalyst intemmet',
+            'greeting' => 'Bonġu :name,',
+            'body' => 'Amministratur ta\' Catalyst temm ir-relazzjoni tax-xogħol tiegħek ma\' :counterparty. M\'intomx aktar konnessi fuq il-pjattaforma.',
+            'unexpected' => 'Jekk dan mhux mistenni, jekk jogħġbok ikkuntattja lis-sapport ta\' Catalyst.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Temm il-konfigurazzjoni tal-kont Catalyst tiegħek',

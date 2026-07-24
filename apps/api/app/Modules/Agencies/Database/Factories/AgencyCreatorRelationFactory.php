@@ -81,6 +81,21 @@ final class AgencyCreatorRelationFactory extends Factory
         ]);
     }
 
+    /**
+     * Terminal "admin severed the relationship" state (AH-051, D-3/D-6). The
+     * platform's first relation termination: reachable only from `roster` via
+     * admin disconnect, retained to occupy the unique pair, and deliberately
+     * re-requestable (ended → pending_request), exactly like {@see self::declined()}.
+     */
+    public function ended(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'relationship_status' => RelationshipStatus::Ended,
+            'invitation_token_hash' => null,
+            'invitation_expires_at' => null,
+        ]);
+    }
+
     public function blacklisted(string $reason = 'Test blacklist'): static
     {
         return $this->state(fn (array $attributes): array => [

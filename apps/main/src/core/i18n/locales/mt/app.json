@@ -110,6 +110,7 @@
         "connected": "Connected",
         "pending": "Request pending",
         "declined": "Irrifjutad",
+        "ended": "Konness qabel",
         "notConnected": "Let connected",
         "sendRequest": "Ibgħat request",
         "requestAgain": "Request again",
@@ -216,7 +217,8 @@
         "prospect": "Prospect",
         "external": "External",
         "pending_request": "Pendenti request",
-        "declined": "Irrifjutad"
+        "declined": "Irrifjutad",
+        "ended": "Skonnettjat"
       },
       "applicationStatus": {
         "incomplete": "Incomplete",

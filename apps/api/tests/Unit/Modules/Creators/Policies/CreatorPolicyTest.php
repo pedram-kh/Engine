@@ -208,12 +208,16 @@ it('reject returns true for platform admins and false for everyone else', functi
 });
 
 // ---------------------------------------------------------------------------
-// canSeeContactDetails (AH-005) — AGENCY-scoped contact-visibility gate.
-// admin OR (active member of THIS agency AND this agency's relation is
-// non-blacklisted). Never a user-wide union across the caller's agencies.
+// canSeeContactDetails (AH-005 / AH-051 D-1) — AGENCY-scoped contact-visibility
+// gate. admin OR (active member of THIS agency AND this agency holds a
+// non-blacklisted ROSTER relation). Never a user-wide union. AH-051 TIGHTENS
+// this to roster-only: pending_request / declined / prospect / ended all fail
+// (they previously passed on the looser not-blacklisted-only rule).
+// Break-revert: relax canSeeContactDetails back to hasNonBlacklistedRelation
+// (any status) → the roster-only matrix below fails → revert.
 // ---------------------------------------------------------------------------
 
-it('canSeeContactDetails returns true for an agency member with a non-blacklisted relation', function (): void {
+it('canSeeContactDetails returns true for an agency member with a non-blacklisted ROSTER relation', function (): void {
     $agency = AgencyFactory::new()->createOne();
     $member = User::factory()->agencyAdmin($agency)->createOne();
     $creator = Creator::factory()->createOne();
@@ -314,6 +318,27 @@ it('canSeeContactDetails returns false for the owning creator user (not an agenc
 
     expect(creatorPolicy()->canSeeContactDetails($owner, $creator, $agency))->toBeFalse();
 });
+
+it('canSeeContactDetails is ROSTER-ONLY: every non-roster status is withheld (AH-051 D-1 tightening)', function (RelationshipStatus $status): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = Creator::factory()->createOne();
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => $status,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canSeeContactDetails($member, $creator, $agency))->toBeFalse();
+})->with([
+    'pending_request' => [RelationshipStatus::PendingRequest],
+    'declined' => [RelationshipStatus::Declined],
+    'prospect' => [RelationshipStatus::Prospect],
+    'ended' => [RelationshipStatus::Ended],
+    'external' => [RelationshipStatus::External],
+]);
 
 // ---------------------------------------------------------------------------
 // canMessageRelationship (AH-010, D2) — the LOAD-BEARING messaging gate.

@@ -110,6 +110,7 @@
         "connected": "Connected",
         "pending": "Request pending",
         "declined": "Declined",
+        "ended": "Previously connected",
         "notConnected": "Not connected",
         "sendRequest": "Send request",
         "requestAgain": "Request again",
@@ -216,7 +217,8 @@
         "prospect": "Prospect",
         "external": "External",
         "pending_request": "Pending request",
-        "declined": "Declined"
+        "declined": "Declined",
+        "ended": "Disconnected"
       },
       "applicationStatus": {
         "incomplete": "Incomplete",

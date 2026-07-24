@@ -156,6 +156,58 @@
           "cancel": "Cancelar",
           "success": "Identidade verificada.",
           "failed": "Não foi possível verificar a identidade deste criador. Tente novamente."
+        },
+        "connections": {
+          "heading": "Conexões de agência",
+          "empty": "Ainda não conectado a nenhuma agência.",
+          "load_failed": "Não foi possível carregar as conexões de agência deste criador.",
+          "connect_button": "Conectar a agência",
+          "disconnect_button": "Desconectar",
+          "blacklisted": "Na lista negra",
+          "table": {
+            "agency": "Agência",
+            "status": "Estado",
+            "since": "Desde",
+            "actions": "Ações"
+          },
+          "status_labels": {
+            "roster": "Conectado",
+            "prospect": "Potencial",
+            "external": "Externo",
+            "pending_request": "Pedido pendente",
+            "declined": "Recusado",
+            "ended": "Desconectado"
+          },
+          "connect": {
+            "title": "Conectar {name} a uma agência",
+            "agency_label": "Agência",
+            "agency_placeholder": "Pesquisar agências…",
+            "no_agencies": "Nenhuma agência corresponde à sua pesquisa.",
+            "mode_label": "Como deve ser feita esta conexão?",
+            "mode_request": "Enviar um pedido de conexão",
+            "mode_request_hint": "O criador aceita ou recusa, como um pedido normal de agência.",
+            "mode_direct": "Conectar diretamente",
+            "mode_direct_hint": "Regista um acordo offline e conecta o par imediatamente. O criador é notificado.",
+            "reason_label": "Motivo",
+            "reason_hint": "Obrigatório para uma conexão direta, pelo menos {count} caracteres. Registado no registo de auditoria.",
+            "confirm": "Conectar",
+            "cancel": "Cancelar",
+            "success_requested": "Pedido de conexão enviado.",
+            "success_re_requested": "Pedido de conexão enviado novamente.",
+            "success_direct": "Criador conectado.",
+            "success_noop": "Sem alterações — essa conexão já existe.",
+            "failed": "Não foi possível criar esta conexão. Tente novamente."
+          },
+          "disconnect": {
+            "title": "Desconectar {name} de {agency}?",
+            "description": "Isto termina a relação: a visibilidade de contacto e as mensagens fecham, e o criador sai dos grupos de talentos dessa agência. O trabalho de campanha em curso não é afetado. Ambas as partes são notificadas.",
+            "reason_label": "Motivo da desconexão",
+            "reason_hint": "Obrigatório, pelo menos {count} caracteres. Registado no registo de auditoria.",
+            "confirm": "Desconectar",
+            "cancel": "Cancelar",
+            "success": "Relação terminada.",
+            "failed": "Não foi possível desconectar esta relação. Tente novamente."
+          }
         }
       }
     }

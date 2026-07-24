@@ -40,6 +40,23 @@ return [
             'ignore' => 'Jei nepažįstate šios agentūros, tiesiog atmeskite ją — niekas nepasikeis, kol nepriimsite.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Dabar esate susieti su :agency platformoje Catalyst',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Catalyst administratorius susiejo jus su :agency platformoje remdamasis ne Catalyst platformoje sudarytu susitarimu. :agency dabar gali matyti jūsų profilį ir siųsti jums žinutes.',
+            'unexpected' => 'Jei šis ryšys netikėtas, kreipkitės į Catalyst palaikymo komandą.',
+            'cta' => 'Eiti į savo skydelį',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Jūsų ryšys su :counterparty platformoje Catalyst baigėsi',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Catalyst administratorius nutraukė jūsų darbo ryšį su :counterparty. Platformoje nebesate susieti.',
+            'unexpected' => 'Jei tai netikėta, kreipkitės į Catalyst palaikymo komandą.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Užbaikite „Catalyst“ paskyros nustatymą',

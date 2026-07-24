@@ -40,6 +40,23 @@ return [
             'ignore' => 'Wenn du diese Agentur nicht kennst, kannst du die Anfrage einfach ablehnen – es ändert sich nichts, bis du sie annimmst.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Sie sind jetzt mit :agency auf Catalyst verbunden',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Ein Catalyst-Administrator hat Sie auf der Plattform mit :agency verbunden, basierend auf einer außerhalb von Catalyst getroffenen Vereinbarung. :agency kann nun Ihr Profil sehen und Ihnen Nachrichten senden.',
+            'unexpected' => 'Falls diese Verbindung unerwartet ist, wenden Sie sich bitte an den Catalyst-Support.',
+            'cta' => 'Zu Ihrem Dashboard',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Ihre Verbindung mit :counterparty auf Catalyst wurde beendet',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Ein Catalyst-Administrator hat Ihre Arbeitsverbindung mit :counterparty beendet. Sie sind auf der Plattform nicht mehr verbunden.',
+            'unexpected' => 'Falls dies unerwartet ist, wenden Sie sich bitte an den Catalyst-Support.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Schließen Sie die Einrichtung Ihres Catalyst-Kontos ab',

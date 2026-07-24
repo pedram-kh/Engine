@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Creators\Http\Controllers\Admin\AdminCreatorConnectionController;
 use App\Modules\Creators\Http\Controllers\Admin\AdminCreatorController;
 use App\Modules\Creators\Http\Controllers\Admin\AdminCreatorHistoryController;
 use App\Modules\Creators\Http\Controllers\AvatarController;
@@ -339,6 +340,19 @@ Route::prefix('admin/creators')
             ->name('assignments');
         Route::get('{creator}/audit-logs', [AdminCreatorHistoryController::class, 'auditLogs'])
             ->name('audit-logs');
+
+        // AH-051 (D-4/D-5/D-6/D-9) — admin-initiated agency↔creator connections.
+        // Cross-module write of an Agencies model (AgencyCreatorRelation) via
+        // TenancyContext::runAs for the target agency (D-10 / §5.1). The two
+        // doors share one POST, mode-switched; disconnect is the first
+        // termination path (roster → ended). Allowlisted in
+        // docs/security/tenancy.md § 4.
+        Route::get('{creator}/connections', [AdminCreatorConnectionController::class, 'index'])
+            ->name('connections.index');
+        Route::post('{creator}/connections', [AdminCreatorConnectionController::class, 'store'])
+            ->name('connections.store');
+        Route::post('{creator}/connections/{agency}/disconnect', [AdminCreatorConnectionController::class, 'disconnect'])
+            ->name('connections.disconnect');
     });
 
 // ---------------------------------------------------------------------------

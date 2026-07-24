@@ -110,6 +110,7 @@
         "connected": "Connected",
         "pending": "Request pending",
         "declined": "Kieltäydyd",
+        "ended": "Aiemmin yhdistetty",
         "notConnected": "Eit connected",
         "sendRequest": "Lähetä request",
         "requestAgain": "Request again",
@@ -216,7 +217,8 @@
         "prospect": "Prospect",
         "external": "External",
         "pending_request": "Odottaa request",
-        "declined": "Kieltäydyd"
+        "declined": "Kieltäydyd",
+        "ended": "Yhteys katkaistu"
       },
       "applicationStatus": {
         "incomplete": "Incomplete",

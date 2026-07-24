@@ -110,6 +110,7 @@
         "connected": "Connected",
         "pending": "Request pending",
         "declined": "Refuzațid",
+        "ended": "Conectat anterior",
         "notConnected": "Nut connected",
         "sendRequest": "Trimiteți request",
         "requestAgain": "Request again",
@@ -216,7 +217,8 @@
         "prospect": "Prospect",
         "external": "External",
         "pending_request": "În așteptare request",
-        "declined": "Refuzațid"
+        "declined": "Refuzațid",
+        "ended": "Deconectat"
       },
       "applicationStatus": {
         "incomplete": "Incomplete",

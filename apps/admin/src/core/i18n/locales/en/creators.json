@@ -156,6 +156,58 @@
           "cancel": "Cancel",
           "success": "Identity verified.",
           "failed": "We couldn't verify this creator's identity. Please try again."
+        },
+        "connections": {
+          "heading": "Agency connections",
+          "empty": "Not connected to any agency yet.",
+          "load_failed": "We couldn't load this creator's agency connections.",
+          "connect_button": "Connect to agency",
+          "disconnect_button": "Disconnect",
+          "blacklisted": "Blacklisted",
+          "table": {
+            "agency": "Agency",
+            "status": "Status",
+            "since": "Since",
+            "actions": "Actions"
+          },
+          "status_labels": {
+            "roster": "Connected",
+            "prospect": "Prospect",
+            "external": "External",
+            "pending_request": "Pending request",
+            "declined": "Declined",
+            "ended": "Disconnected"
+          },
+          "connect": {
+            "title": "Connect {name} to an agency",
+            "agency_label": "Agency",
+            "agency_placeholder": "Search agencies…",
+            "no_agencies": "No agencies match your search.",
+            "mode_label": "How should this connection be made?",
+            "mode_request": "Send a connection request",
+            "mode_request_hint": "The creator accepts or declines it, like a normal agency request.",
+            "mode_direct": "Connect directly",
+            "mode_direct_hint": "Records an offline agreement and connects the pair immediately. The creator is notified.",
+            "reason_label": "Reason",
+            "reason_hint": "Required for a direct connection, at least {count} characters. Recorded in the audit log.",
+            "confirm": "Connect",
+            "cancel": "Cancel",
+            "success_requested": "Connection request sent.",
+            "success_re_requested": "Connection request sent again.",
+            "success_direct": "Creator connected.",
+            "success_noop": "No change — that connection already exists.",
+            "failed": "We couldn't create this connection. Please try again."
+          },
+          "disconnect": {
+            "title": "Disconnect {name} from {agency}?",
+            "description": "This ends the relationship: contact visibility and messaging close, and the creator leaves that agency's talent pools. In-flight campaign work is untouched. Both parties are notified.",
+            "reason_label": "Reason for disconnecting",
+            "reason_hint": "Required, at least {count} characters. Recorded in the audit log.",
+            "confirm": "Disconnect",
+            "cancel": "Cancel",
+            "success": "Connection ended.",
+            "failed": "We couldn't disconnect this relationship. Please try again."
+          }
         }
       }
     }

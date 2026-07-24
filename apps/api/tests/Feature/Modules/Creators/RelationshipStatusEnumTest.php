@@ -24,6 +24,8 @@ it('RelationshipStatus catalogue pins the exact case set', function (): void {
         // Sprint 6.6b — the two-sided discovery connection lifecycle (D-1).
         'pending_request',
         'declined',
+        // AH-051 — admin-severed, the platform's first termination state (D-3).
+        'ended',
     ];
 
     $actual = array_map(fn (RelationshipStatus $case): string => $case->value, RelationshipStatus::cases());
@@ -37,4 +39,8 @@ it('RelationshipStatus catalogue pins the exact case set', function (): void {
 it('exposes the two-sided lifecycle values added in Sprint 6.6b', function (): void {
     expect(RelationshipStatus::PendingRequest->value)->toBe('pending_request')
         ->and(RelationshipStatus::Declined->value)->toBe('declined');
+});
+
+it('exposes the AH-051 admin-severed termination value', function (): void {
+    expect(RelationshipStatus::Ended->value)->toBe('ended');
 });

@@ -110,6 +110,7 @@
         "connected": "Conectado",
         "pending": "Solicitud pendiente",
         "declined": "Rechazada",
+        "ended": "Conectado anteriormente",
         "notConnected": "Sin conexión",
         "sendRequest": "Enviar solicitud",
         "requestAgain": "Volver a solicitar",
@@ -216,7 +217,8 @@
         "prospect": "Posible creador",
         "external": "Externo",
         "pending_request": "Solicitud pendiente",
-        "declined": "Rechazada"
+        "declined": "Rechazada",
+        "ended": "Desconectado"
       },
       "applicationStatus": {
         "incomplete": "Incompleta",

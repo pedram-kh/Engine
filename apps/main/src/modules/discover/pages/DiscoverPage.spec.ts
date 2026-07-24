@@ -172,12 +172,16 @@ describe('DiscoverPage (Sprint 6.6a)', () => {
       { display_name: 'Declined Dan', relationship_status: 'declined' },
       '01DECLINEDXXXXXXXXXXXXXXXXX',
     )
+    const ended = makeCard(
+      { display_name: 'Ended Ellie', relationship_status: 'ended' },
+      '01ENDEDXXXXXXXXXXXXXXXXXXXX',
+    )
     const stranger = makeCard(
       { display_name: 'Stranger Sam', relationship_status: null },
       '01STRANGERXXXXXXXXXXXXXXXXX',
     )
     const harness = await mountDiscover({
-      cards: [connected, pending, declined, stranger],
+      cards: [connected, pending, declined, ended, stranger],
       agencyId: 'agency-xyz',
     })
     cleanup = harness.cleanup
@@ -195,6 +199,14 @@ describe('DiscoverPage (Sprint 6.6a)', () => {
     expect(
       harness.wrapper.find(`[data-test="discover-connection-declined-${declined.id}"]`).text(),
     ).toContain('Declined')
+    // AH-051 (D-3): `ended` reads as a TRUTHFUL "Previously connected" chip —
+    // NOT the not-connected empty state (it must not derive to `none`).
+    expect(
+      harness.wrapper.find(`[data-test="discover-connection-ended-${ended.id}"]`).text(),
+    ).toContain('Previously connected')
+    expect(harness.wrapper.find(`[data-test="discover-notconnected-${ended.id}"]`).exists()).toBe(
+      false,
+    )
     // The stranger card shows the not-connected affordance, no status chip.
     expect(
       harness.wrapper.find(`[data-test="discover-connection-connected-${stranger.id}"]`).exists(),

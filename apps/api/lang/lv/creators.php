@@ -40,6 +40,23 @@ return [
             'ignore' => 'Ja nepazīstat šo aģentūru, vienkārši noraidiet to — nekas nemainīsies, kamēr nepieņemsiet.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Tagad esat saistīts ar :agency platformā Catalyst',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Catalyst administrators ir saistījis jūs ar :agency platformā, pamatojoties uz vienošanos, kas panākta ārpus Catalyst. :agency tagad var redzēt jūsu profilu un sūtīt jums ziņas.',
+            'unexpected' => 'Ja šis savienojums ir negaidīts, lūdzu, sazinieties ar Catalyst atbalsta dienestu.',
+            'cta' => 'Doties uz jūsu paneli',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Jūsu saikne ar :counterparty platformā Catalyst ir beigusies',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Catalyst administrators ir pārtraucis jūsu darba attiecības ar :counterparty. Jūs vairs neesat saistīti platformā.',
+            'unexpected' => 'Ja tas ir negaidīti, lūdzu, sazinieties ar Catalyst atbalsta dienestu.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Pabeidziet sava Catalyst konta iestatīšanu',

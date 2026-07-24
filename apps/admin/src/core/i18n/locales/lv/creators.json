@@ -156,6 +156,58 @@
           "cancel": "Atcelt",
           "success": "Identity verified.",
           "failed": "We couldn't verify this creator's identity. Please try again."
+        },
+        "connections": {
+          "heading": "Aģentūru savienojumi",
+          "empty": "Vēl nav savienots ne ar vienu aģentūru.",
+          "load_failed": "Neizdevās ielādēt šī veidotāja aģentūru savienojumus.",
+          "connect_button": "Savienot ar aģentūru",
+          "disconnect_button": "Atvienot",
+          "blacklisted": "Melnajā sarakstā",
+          "table": {
+            "agency": "Aģentūra",
+            "status": "Statuss",
+            "since": "Kopš",
+            "actions": "Darbības"
+          },
+          "status_labels": {
+            "roster": "Savienots",
+            "prospect": "Potenciālais",
+            "external": "Ārējs",
+            "pending_request": "Gaidoša pieprasījuma",
+            "declined": "Noraidīts",
+            "ended": "Atvienots"
+          },
+          "connect": {
+            "title": "Savienot {name} ar aģentūru",
+            "agency_label": "Aģentūra",
+            "agency_placeholder": "Meklēt aģentūras…",
+            "no_agencies": "Nevienai aģentūrai neatbilst jūsu meklējums.",
+            "mode_label": "Kā šis savienojums jāizveido?",
+            "mode_request": "Nosūtīt savienojuma pieprasījumu",
+            "mode_request_hint": "Veidotājs to pieņem vai noraida, tāpat kā parastu aģentūras pieprasījumu.",
+            "mode_direct": "Savienot tieši",
+            "mode_direct_hint": "Reģistrē bezsaistes vienošanos un nekavējoties savieno pāri. Veidotājs tiek informēts.",
+            "reason_label": "Iemesls",
+            "reason_hint": "Nepieciešams tiešam savienojumam, vismaz {count} rakstzīmes. Reģistrēts audita žurnālā.",
+            "confirm": "Savienot",
+            "cancel": "Atcelt",
+            "success_requested": "Savienojuma pieprasījums nosūtīts.",
+            "success_re_requested": "Savienojuma pieprasījums nosūtīts atkārtoti.",
+            "success_direct": "Veidotājs savienots.",
+            "success_noop": "Nav izmaiņu — šis savienojums jau pastāv.",
+            "failed": "Neizdevās izveidot šo savienojumu. Mēģiniet vēlreiz."
+          },
+          "disconnect": {
+            "title": "Atvienot {name} no {agency}?",
+            "description": "Tas izbeidz attiecības: kontaktu redzamība un ziņojumi tiek slēgti, un veidotājs pamet šīs aģentūras talantu krātuves. Notiekošais kampaņas darbs paliek neskarts. Abas puses tiek informētas.",
+            "reason_label": "Atvienošanas iemesls",
+            "reason_hint": "Nepieciešams, vismaz {count} rakstzīmes. Reģistrēts audita žurnālā.",
+            "confirm": "Atvienot",
+            "cancel": "Atcelt",
+            "success": "Attiecības izbeigtas.",
+            "failed": "Neizdevās atvienot šīs attiecības. Mēģiniet vēlreiz."
+          }
         }
       }
     }

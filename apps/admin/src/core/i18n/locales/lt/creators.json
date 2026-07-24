@@ -156,6 +156,58 @@
           "cancel": "Atšaukti",
           "success": "Identity verified.",
           "failed": "We couldn't verify this creator's identity. Please try again."
+        },
+        "connections": {
+          "heading": "Agentūrų ryšiai",
+          "empty": "Dar nesusieta su jokia agentūra.",
+          "load_failed": "Nepavyko įkelti šio kūrėjo ryšių su agentūromis.",
+          "connect_button": "Susieti su agentūra",
+          "disconnect_button": "Atsieti",
+          "blacklisted": "Juodajame sąraše",
+          "table": {
+            "agency": "Agentūra",
+            "status": "Būsena",
+            "since": "Nuo",
+            "actions": "Veiksmai"
+          },
+          "status_labels": {
+            "roster": "Susieta",
+            "prospect": "Potencialus",
+            "external": "Išorinis",
+            "pending_request": "Laukiantis prašymas",
+            "declined": "Atmesta",
+            "ended": "Atsieta"
+          },
+          "connect": {
+            "title": "Susieti {name} su agentūra",
+            "agency_label": "Agentūra",
+            "agency_placeholder": "Ieškoti agentūrų…",
+            "no_agencies": "Jūsų paiešką atitinkančių agentūrų nėra.",
+            "mode_label": "Kaip turėtų būti sukurtas šis ryšys?",
+            "mode_request": "Siųsti prašymą susieti",
+            "mode_request_hint": "Kūrėjas jį priima arba atmeta, kaip įprastą agentūros prašymą.",
+            "mode_direct": "Susieti tiesiogiai",
+            "mode_direct_hint": "Užregistruoja neprisijungus sudarytą susitarimą ir iškart susieja porą. Kūrėjas informuojamas.",
+            "reason_label": "Priežastis",
+            "reason_hint": "Būtina tiesioginiam ryšiui, bent {count} simbolių. Registruojama audito žurnale.",
+            "confirm": "Susieti",
+            "cancel": "Atšaukti",
+            "success_requested": "Prašymas susieti išsiųstas.",
+            "success_re_requested": "Prašymas susieti išsiųstas dar kartą.",
+            "success_direct": "Kūrėjas susietas.",
+            "success_noop": "Jokių pakeitimų — šis ryšys jau egzistuoja.",
+            "failed": "Nepavyko sukurti šio ryšio. Bandykite dar kartą."
+          },
+          "disconnect": {
+            "title": "Atsieti {name} nuo {agency}?",
+            "description": "Tai užbaigia santykį: kontaktų matomumas ir žinutės uždaromi, o kūrėjas palieka tos agentūros talentų telkinius. Vykdomas kampanijos darbas lieka nepaliestas. Abi šalys informuojamos.",
+            "reason_label": "Atsiejimo priežastis",
+            "reason_hint": "Būtina, bent {count} simbolių. Registruojama audito žurnale.",
+            "confirm": "Atsieti",
+            "cancel": "Atšaukti",
+            "success": "Santykis užbaigtas.",
+            "failed": "Nepavyko atsieti šio santykio. Bandykite dar kartą."
+          }
         }
       }
     }

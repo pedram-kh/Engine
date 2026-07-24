@@ -110,6 +110,7 @@
         "connected": "Connected",
         "pending": "Request pending",
         "declined": "Keeldud",
+        "ended": "Varem ühendatud",
         "notConnected": "Eit connected",
         "sendRequest": "Saada request",
         "requestAgain": "Request again",
@@ -216,7 +217,8 @@
         "prospect": "Prospect",
         "external": "External",
         "pending_request": "Ootel request",
-        "declined": "Keeldud"
+        "declined": "Keeldud",
+        "ended": "Ühendus katkestatud"
       },
       "applicationStatus": {
         "incomplete": "Incomplete",

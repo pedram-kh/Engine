@@ -40,6 +40,23 @@ return [
             'ignore' => 'Ha nem ismeri ezt az ügynökséget, egyszerűen utasítsa el — semmi sem változik, amíg el nem fogadja.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Most már kapcsolatban áll a következővel: :agency a Catalyston',
+            'greeting' => 'Üdvözöljük, :name!',
+            'body' => 'A Catalyst adminisztrátora összekapcsolta Önt a(z) :agency ügynökséggel a platformon, a Catalyston kívül kötött megállapodás alapján. A(z) :agency mostantól láthatja a profilját, és üzenetet küldhet Önnek.',
+            'unexpected' => 'Ha ez a kapcsolat váratlan, kérjük, forduljon a Catalyst ügyfélszolgálatához.',
+            'cta' => 'Ugrás az irányítópultra',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'A(z) :counterparty féllel fennálló kapcsolata a Catalyston megszűnt',
+            'greeting' => 'Üdvözöljük, :name!',
+            'body' => 'A Catalyst adminisztrátora megszüntette a(z) :counterparty féllel fennálló munkakapcsolatát. Már nincsenek összekapcsolva a platformon.',
+            'unexpected' => 'Ha ez váratlan, kérjük, forduljon a Catalyst ügyfélszolgálatához.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Fejezze be a Catalyst-fiókja beállítását',

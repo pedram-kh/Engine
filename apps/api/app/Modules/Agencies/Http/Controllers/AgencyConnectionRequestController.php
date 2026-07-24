@@ -40,6 +40,9 @@ use Illuminate\Support\Facades\Gate;
  *   (none)   → pending_request   W1, net-new (201). Mail fired.
  *   declined → pending_request   explicit re-engagement (D-4, 200). Mail fired.
  *                                NOT a silent no-op — the status flips.
+ *   ended    → pending_request   re-engagement after an admin disconnect
+ *                                (AH-051 D-3, 200). Mail fired. Same shape as
+ *                                declined — a severed relationship is re-askable.
  *   pending_request → (no-op)    already asked; surface the existing state (200).
  *   roster          → (no-op)    already connected; surface the state (200).
  *   prospect/external → (no-op)  a real relation already exists (200).
@@ -98,11 +101,13 @@ final class AgencyConnectionRequestController
         }
 
         // No-op surfacing the existing state for any status that is NOT a legal
-        // entry point. The only existing-row transition is `declined → pending`
-        // (D-4); every other status (pending_request / roster / prospect /
-        // external) surfaces its state without duplicating a row or firing a
-        // second mail.
-        if ($relation !== null && $relation->relationship_status !== RelationshipStatus::Declined) {
+        // entry point. The existing-row transitions are `declined → pending`
+        // (D-4) and `ended → pending` (AH-051 D-3 — a severed relationship is
+        // deliberately re-requestable, exactly like declined); every other
+        // status (pending_request / roster / prospect / external) surfaces its
+        // state without duplicating a row or firing a second mail.
+        if ($relation !== null
+            && ! in_array($relation->relationship_status, [RelationshipStatus::Declined, RelationshipStatus::Ended], true)) {
             return $this->relationResponse($relation, Response::HTTP_OK, $this->noopCodeFor($relation));
         }
 
@@ -124,8 +129,9 @@ final class AgencyConnectionRequestController
                 ]);
             }
 
-            // declined → pending_request — explicit re-engagement (D-4). The
-            // status actually flips; this is NOT swallowed as a no-op.
+            // declined → pending_request (D-4) OR ended → pending_request
+            // (AH-051 D-3) — explicit re-engagement. The status actually flips;
+            // this is NOT swallowed as a no-op.
             $relation->relationship_status = RelationshipStatus::PendingRequest;
             $relation->invited_by_user_id = $actor->id;
             $relation->invitation_sent_at = now();

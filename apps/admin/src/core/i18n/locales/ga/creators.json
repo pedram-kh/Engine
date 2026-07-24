@@ -156,6 +156,58 @@
           "cancel": "Cealaigh",
           "success": "Identity verified.",
           "failed": "We couldn't verify this creator's identity. Please try again."
+        },
+        "connections": {
+          "heading": "Naisc ghníomhaireachta",
+          "empty": "Gan nasc le gníomhaireacht ar bith fós.",
+          "load_failed": "Níorbh fhéidir linn naisc ghníomhaireachta an chruthaitheora seo a lódáil.",
+          "connect_button": "Nasc le gníomhaireacht",
+          "disconnect_button": "Dínasc",
+          "blacklisted": "Ar an liosta dubh",
+          "table": {
+            "agency": "Gníomhaireacht",
+            "status": "Stádas",
+            "since": "Ó",
+            "actions": "Gníomhartha"
+          },
+          "status_labels": {
+            "roster": "Nasctha",
+            "prospect": "Ionchasach",
+            "external": "Seachtrach",
+            "pending_request": "Iarratas ar feitheamh",
+            "declined": "Diúltaithe",
+            "ended": "Dínasctha"
+          },
+          "connect": {
+            "title": "Nasc {name} le gníomhaireacht",
+            "agency_label": "Gníomhaireacht",
+            "agency_placeholder": "Cuardaigh gníomhaireachtaí…",
+            "no_agencies": "Níl gníomhaireacht ar bith ag teacht le do chuardach.",
+            "mode_label": "Conas ba cheart an nasc seo a dhéanamh?",
+            "mode_request": "Seol iarratas naisc",
+            "mode_request_hint": "Glacann an cruthaitheoir leis nó diúltaíonn dó, cosúil le gnáthiarratas gníomhaireachta.",
+            "mode_direct": "Nasc go díreach",
+            "mode_direct_hint": "Taifeadann comhaontú as líne agus nascann an péire láithreach. Cuirtear an cruthaitheoir ar an eolas.",
+            "reason_label": "Cúis",
+            "reason_hint": "Riachtanach do nasc díreach, {count} carachtar ar a laghad. Taifeadta sa loga iniúchta.",
+            "confirm": "Nasc",
+            "cancel": "Cealaigh",
+            "success_requested": "Iarratas naisc seolta.",
+            "success_re_requested": "Iarratas naisc seolta arís.",
+            "success_direct": "Cruthaitheoir nasctha.",
+            "success_noop": "Gan athrú — tá an nasc sin ann cheana.",
+            "failed": "Níorbh fhéidir linn an nasc seo a chruthú. Bain triail eile as."
+          },
+          "disconnect": {
+            "title": "Dínasc {name} ó {agency}?",
+            "description": "Cuireann sé seo deireadh leis an gcaidreamh: dúntar infheictheacht teagmhála agus teachtaireachtaí, agus fágann an cruthaitheoir linnte tallainne na gníomhaireachta sin. Fanann obair feachtais atá ar siúl gan bhaint léi. Cuirtear an dá pháirtí ar an eolas.",
+            "reason_label": "Cúis leis an dínascadh",
+            "reason_hint": "Riachtanach, {count} carachtar ar a laghad. Taifeadta sa loga iniúchta.",
+            "confirm": "Dínasc",
+            "cancel": "Cealaigh",
+            "success": "Caidreamh curtha i gcrích.",
+            "failed": "Níorbh fhéidir linn an caidreamh seo a dhínascadh. Bain triail eile as."
+          }
         }
       }
     }

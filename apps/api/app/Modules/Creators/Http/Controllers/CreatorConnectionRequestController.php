@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Modules\Creators\Http\Controllers;
 
 use App\Core\Tenancy\BelongsToAgencyScope;
+use App\Modules\Agencies\Enums\BlacklistType;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
+use App\Modules\Creators\Enums\ApplicationStatus;
 use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
@@ -39,8 +41,15 @@ use Illuminate\Http\Request;
  * on would make a creator-who-is-also-a-member see only one agency's requests.
  *
  * Fail-closed (D-2): accept/decline reject unless the relation is EXACTLY
- * `pending_request` — a roster/declined/prospect/external row cannot be
+ * `pending_request` — a roster/declined/prospect/external/ended row cannot be
  * accepted or declined (422 `connection.not_pending`).
+ *
+ * ACCEPT re-gates (AH-051 D-2, fail-closed, status unchanged on failure):
+ * accepting drives the relation to `roster`, which unlocks contact visibility
+ * (D-1) + messaging (AH-010), so accept additionally requires the creator's
+ * application to be APPROVED (422 `connection.creator_not_approved`) and the
+ * relation not HARD-blacklisted (422 `connection.blacklisted`). Decline is
+ * never re-gated.
  */
 final class CreatorConnectionRequestController
 {
@@ -107,6 +116,40 @@ final class CreatorConnectionRequestController
                     'detail' => 'This connection request is no longer pending.',
                 ]],
             ], 422));
+        }
+
+        // AH-051 (D-2) — ACCEPT re-gates, fail-closed. Accepting drives the
+        // relation to `roster`, which unlocks contact visibility (D-1) and
+        // messaging (AH-010); decline never re-gates (declining is always
+        // allowed). Both leave the status UNCHANGED on failure, with a distinct
+        // 422 code so the client can tell which invariant refused.
+        if ($to === RelationshipStatus::Roster) {
+            // 1. The creator's application must be APPROVED — a
+            //    non-approved creator cannot be elevated onto a roster.
+            //    Break-revert: drop this → a non-approved creator can accept.
+            if ($creator->application_status !== ApplicationStatus::Approved) {
+                abort(response()->json([
+                    'errors' => [[
+                        'status' => '422',
+                        'code' => 'connection.creator_not_approved',
+                        'detail' => 'Your creator profile must be approved before you can accept a connection.',
+                    ]],
+                ], 422));
+            }
+
+            // 2. A HARD-blacklisted relation cannot be accepted onto the roster
+            //    (an agency may hard-blacklist AFTER sending). soft does NOT
+            //    block (warn-only). Break-revert: drop this → a hard-blacklisted
+            //    creator can accept onto the roster.
+            if ($relation->is_blacklisted && $relation->blacklist_type === BlacklistType::Hard) {
+                abort(response()->json([
+                    'errors' => [[
+                        'status' => '422',
+                        'code' => 'connection.blacklisted',
+                        'detail' => 'This connection can no longer be accepted.',
+                    ]],
+                ], 422));
+            }
         }
 
         $relation->relationship_status = $to;

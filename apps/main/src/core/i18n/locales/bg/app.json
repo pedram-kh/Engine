@@ -110,6 +110,7 @@
         "connected": "Connected",
         "pending": "Request pending",
         "declined": "Отклонетеd",
+        "ended": "Преди това свързан",
         "notConnected": "Неt connected",
         "sendRequest": "Изпратете request",
         "requestAgain": "Request again",
@@ -216,7 +217,8 @@
         "prospect": "Prospect",
         "external": "External",
         "pending_request": "В изчакване request",
-        "declined": "Отклонетеd"
+        "declined": "Отклонетеd",
+        "ended": "Прекъснат"
       },
       "applicationStatus": {
         "incomplete": "Incomplete",

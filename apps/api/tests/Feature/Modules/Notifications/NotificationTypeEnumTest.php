@@ -40,6 +40,10 @@ it('NotificationType catalogue lists exactly the curated membership', function (
         // Relationship messaging (AH-010) — the dual-recipient 1:1 DM types.
         'message.relationship_received_by_creator',
         'message.relationship_received_by_agency',
+        // AH-051 (D-7) — admin-initiated relation events. Door 2 direct-connect
+        // notifies the creator; disconnect notifies both parties (one type).
+        'agency_creator_relation.admin_connected',
+        'agency_creator_relation.disconnected',
     ];
 
     $actual = array_map(fn (NotificationType $case): string => $case->value, NotificationType::cases());

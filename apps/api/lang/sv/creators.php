@@ -40,6 +40,23 @@ return [
             'ignore' => 'Om du inte känner igen den här byrån kan du helt enkelt avböja — ingenting ändras förrän du accepterar.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Du är nu ansluten till :agency på Catalyst',
+            'greeting' => 'Hej :name,',
+            'body' => 'En Catalyst-administratör har anslutit dig till :agency på plattformen, baserat på en överenskommelse utanför Catalyst. :agency kan nu se din profil och skicka meddelanden till dig.',
+            'unexpected' => 'Om denna anslutning är oväntad, kontakta Catalyst-supporten.',
+            'cta' => 'Gå till din instrumentpanel',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Din anslutning till :counterparty på Catalyst har avslutats',
+            'greeting' => 'Hej :name,',
+            'body' => 'En Catalyst-administratör har avslutat din arbetsrelation med :counterparty. Ni är inte längre anslutna på plattformen.',
+            'unexpected' => 'Om detta är oväntat, kontakta Catalyst-supporten.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Slutför konfigurationen av ditt Catalyst-konto',

@@ -156,6 +156,58 @@
           "cancel": "Annuller",
           "success": "Identitet bekræftet.",
           "failed": "Denne creators identitet kunne ikke bekræftes. Prøv igen."
+        },
+        "connections": {
+          "heading": "Bureauforbindelser",
+          "empty": "Endnu ikke forbundet til et bureau.",
+          "load_failed": "Vi kunne ikke indlæse denne skabers bureauforbindelser.",
+          "connect_button": "Forbind til bureau",
+          "disconnect_button": "Afbryd",
+          "blacklisted": "Sortlistet",
+          "table": {
+            "agency": "Bureau",
+            "status": "Status",
+            "since": "Siden",
+            "actions": "Handlinger"
+          },
+          "status_labels": {
+            "roster": "Forbundet",
+            "prospect": "Emne",
+            "external": "Ekstern",
+            "pending_request": "Anmodning afventer",
+            "declined": "Afvist",
+            "ended": "Afbrudt"
+          },
+          "connect": {
+            "title": "Forbind {name} til et bureau",
+            "agency_label": "Bureau",
+            "agency_placeholder": "Søg bureauer…",
+            "no_agencies": "Ingen bureauer matcher din søgning.",
+            "mode_label": "Hvordan skal denne forbindelse oprettes?",
+            "mode_request": "Send en forbindelsesanmodning",
+            "mode_request_hint": "Skaberen accepterer eller afviser den, som en almindelig bureauanmodning.",
+            "mode_direct": "Forbind direkte",
+            "mode_direct_hint": "Registrerer en offline-aftale og forbinder parret med det samme. Skaberen får besked.",
+            "reason_label": "Årsag",
+            "reason_hint": "Påkrævet for en direkte forbindelse, mindst {count} tegn. Registreres i revisionsloggen.",
+            "confirm": "Forbind",
+            "cancel": "Annuller",
+            "success_requested": "Forbindelsesanmodning sendt.",
+            "success_re_requested": "Forbindelsesanmodning sendt igen.",
+            "success_direct": "Skaber forbundet.",
+            "success_noop": "Ingen ændring — den forbindelse findes allerede.",
+            "failed": "Vi kunne ikke oprette denne forbindelse. Prøv igen."
+          },
+          "disconnect": {
+            "title": "Afbryd {name} fra {agency}?",
+            "description": "Dette afslutter forholdet: kontaktsynlighed og beskeder lukkes, og skaberen forlader det bureaus talentpuljer. Igangværende kampagnearbejde forbliver urørt. Begge parter får besked.",
+            "reason_label": "Årsag til afbrydelse",
+            "reason_hint": "Påkrævet, mindst {count} tegn. Registreres i revisionsloggen.",
+            "confirm": "Afbryd",
+            "cancel": "Annuller",
+            "success": "Forhold afsluttet.",
+            "failed": "Vi kunne ikke afbryde dette forhold. Prøv igen."
+          }
         }
       }
     }

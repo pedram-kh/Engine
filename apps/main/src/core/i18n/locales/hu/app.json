@@ -110,6 +110,7 @@
         "connected": "Connected",
         "pending": "Request pending",
         "declined": "Elutasításd",
+        "ended": "Korábban csatlakoztatva",
         "notConnected": "Nemt connected",
         "sendRequest": "Küldés request",
         "requestAgain": "Request again",
@@ -216,7 +217,8 @@
         "prospect": "Prospect",
         "external": "External",
         "pending_request": "Függőben request",
-        "declined": "Elutasításd"
+        "declined": "Elutasításd",
+        "ended": "Leválasztva"
       },
       "applicationStatus": {
         "incomplete": "Incomplete",

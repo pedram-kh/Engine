@@ -79,6 +79,20 @@ enum NotificationType: string
     case MessageRelationshipReceivedByCreator = 'message.relationship_received_by_creator';
     case MessageRelationshipReceivedByAgency = 'message.relationship_received_by_agency';
 
+    // AH-051 (D-7) — admin-initiated relation events the recipient must see.
+    //   - RelationAdminConnected: admin Door 2 directly connected an agency to
+    //     this creator (records an offline agreement) — the creator is notified
+    //     immediately (dual-emit in-app + mail), naming the agency.
+    //   - RelationDisconnected: an admin severed a roster relationship. ONE type
+    //     for BOTH parties (creator + agency members) — directional splits earn
+    //     their keep at messaging frequency, not rare-admin-action frequency
+    //     (D-7 ruling). Dual-emit in-app + mail.
+    // admin_requested is deliberately NOT here: it is an ordinary connection
+    // request the creator sees in their connection-requests inbox (Door 1 rides
+    // the existing ConnectionRequestMail, exactly like an agency-sent request).
+    case RelationAdminConnected = 'agency_creator_relation.admin_connected';
+    case RelationDisconnected = 'agency_creator_relation.disconnected';
+
     /**
      * The AuditAction this notification type mirrors. Proves the one-vocabulary
      * tie — every NotificationType value MUST be a live AuditAction value.

@@ -40,6 +40,23 @@ return [
             'ignore' => 'Dacă nu cunoașteți această agenție, respingeți-o — nimic nu se va schimba până când nu acceptați.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Acum ești conectat cu :agency pe Catalyst',
+            'greeting' => 'Bună :name,',
+            'body' => 'Un administrator Catalyst te-a conectat cu :agency pe platformă, pe baza unui acord încheiat în afara Catalyst. :agency îți poate vedea acum profilul și îți poate trimite mesaje.',
+            'unexpected' => 'Dacă această conexiune este neașteptată, contactează echipa de asistență Catalyst.',
+            'cta' => 'Mergi la panoul tău',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Conexiunea ta cu :counterparty pe Catalyst s-a încheiat',
+            'greeting' => 'Bună :name,',
+            'body' => 'Un administrator Catalyst a încheiat relația ta de lucru cu :counterparty. Nu mai sunteți conectați pe platformă.',
+            'unexpected' => 'Dacă acest lucru este neașteptat, contactează echipa de asistență Catalyst.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Finalizează configurarea contului tău Catalyst',

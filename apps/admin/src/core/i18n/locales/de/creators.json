@@ -156,6 +156,58 @@
           "cancel": "Abbrechen",
           "success": "Identität verifiziert.",
           "failed": "Die Identität dieses Creators konnte nicht verifiziert werden. Bitte versuche es erneut."
+        },
+        "connections": {
+          "heading": "Agentur-Verbindungen",
+          "empty": "Noch mit keiner Agentur verbunden.",
+          "load_failed": "Die Agentur-Verbindungen dieses Creators konnten nicht geladen werden.",
+          "connect_button": "Mit Agentur verbinden",
+          "disconnect_button": "Trennen",
+          "blacklisted": "Auf der Sperrliste",
+          "table": {
+            "agency": "Agentur",
+            "status": "Status",
+            "since": "Seit",
+            "actions": "Aktionen"
+          },
+          "status_labels": {
+            "roster": "Verbunden",
+            "prospect": "Interessent",
+            "external": "Extern",
+            "pending_request": "Anfrage ausstehend",
+            "declined": "Abgelehnt",
+            "ended": "Getrennt"
+          },
+          "connect": {
+            "title": "{name} mit einer Agentur verbinden",
+            "agency_label": "Agentur",
+            "agency_placeholder": "Agenturen suchen…",
+            "no_agencies": "Keine Agenturen entsprechen Ihrer Suche.",
+            "mode_label": "Wie soll diese Verbindung hergestellt werden?",
+            "mode_request": "Verbindungsanfrage senden",
+            "mode_request_hint": "Der Creator nimmt sie an oder lehnt sie ab, wie eine normale Agenturanfrage.",
+            "mode_direct": "Direkt verbinden",
+            "mode_direct_hint": "Erfasst eine Offline-Vereinbarung und verbindet das Paar sofort. Der Creator wird benachrichtigt.",
+            "reason_label": "Grund",
+            "reason_hint": "Für eine direkte Verbindung erforderlich, mindestens {count} Zeichen. Wird im Audit-Log erfasst.",
+            "confirm": "Verbinden",
+            "cancel": "Abbrechen",
+            "success_requested": "Verbindungsanfrage gesendet.",
+            "success_re_requested": "Verbindungsanfrage erneut gesendet.",
+            "success_direct": "Creator verbunden.",
+            "success_noop": "Keine Änderung – diese Verbindung besteht bereits.",
+            "failed": "Diese Verbindung konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
+          },
+          "disconnect": {
+            "title": "{name} von {agency} trennen?",
+            "description": "Dies beendet die Beziehung: Kontaktsichtbarkeit und Nachrichten werden geschlossen, und der Creator verlässt die Talentpools dieser Agentur. Laufende Kampagnenarbeit bleibt unberührt. Beide Parteien werden benachrichtigt.",
+            "reason_label": "Grund für die Trennung",
+            "reason_hint": "Erforderlich, mindestens {count} Zeichen. Wird im Audit-Log erfasst.",
+            "confirm": "Trennen",
+            "cancel": "Abbrechen",
+            "success": "Verbindung beendet.",
+            "failed": "Diese Beziehung konnte nicht getrennt werden. Bitte versuchen Sie es erneut."
+          }
         }
       }
     }

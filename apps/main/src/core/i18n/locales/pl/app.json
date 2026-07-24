@@ -110,6 +110,7 @@
         "connected": "Połączony",
         "pending": "Prośba oczekująca",
         "declined": "Odrzucona",
+        "ended": "Wcześniej połączony",
         "notConnected": "Niepołączony",
         "sendRequest": "Wyślij prośbę",
         "requestAgain": "Wyślij prośbę ponownie",
@@ -216,7 +217,8 @@
         "prospect": "Prospekt",
         "external": "Zewnętrzny",
         "pending_request": "Oczekująca prośba",
-        "declined": "Odrzucona"
+        "declined": "Odrzucona",
+        "ended": "Rozłączony"
       },
       "applicationStatus": {
         "incomplete": "Niekompletna",

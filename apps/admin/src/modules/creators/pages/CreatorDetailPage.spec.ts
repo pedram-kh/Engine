@@ -27,14 +27,43 @@ vi.mock('@/modules/creators/api/creators.api', async () => {
       list: vi.fn(),
       assignments: vi.fn(),
       auditLogs: vi.fn(),
+      connections: vi.fn(),
+      connect: vi.fn(),
+      disconnect: vi.fn(),
     },
   }
 })
 
+vi.mock('@/modules/agencies/api/agencies.api', () => ({
+  adminAgenciesApi: {
+    list: vi.fn(),
+  },
+}))
+
 import { adminCreatorsApi } from '@/modules/creators/api/creators.api'
+import type { AdminConnectionRelation } from '@/modules/creators/api/creators.api'
+import { adminAgenciesApi } from '@/modules/agencies/api/agencies.api'
 
 import { mountCreatorPage } from '../../../../tests/unit/helpers/mountCreatorPage'
 import CreatorDetailPage from './CreatorDetailPage.vue'
+
+function relation(
+  overrides: Partial<AdminConnectionRelation['attributes']> = {},
+): AdminConnectionRelation {
+  return {
+    id: `01REL${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+    type: 'admin_connection',
+    attributes: {
+      agency_id: '01AGENCYONEXXXXXXXXXXXXXXXX',
+      agency_name: 'Nova Talent',
+      relationship_status: 'roster',
+      is_blacklisted: false,
+      blacklist_type: null,
+      since: '2026-02-01T00:00:00Z',
+      ...overrides,
+    },
+  }
+}
 
 function buildCreator(overrides: Partial<CreatorResource['attributes']> = {}): CreatorResource {
   return {
@@ -131,6 +160,9 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
     const empty = { data: [], meta: { total: 0, page: 1, per_page: 25, last_page: 1 } }
     vi.mocked(adminCreatorsApi.assignments).mockResolvedValue(empty)
     vi.mocked(adminCreatorsApi.auditLogs).mockResolvedValue(empty)
+    // AH-051 (D-9): the detail page also loads agency connections on mount;
+    // default to empty so the edit-focused specs are unaffected.
+    vi.mocked(adminCreatorsApi.connections).mockResolvedValue({ data: [] })
   })
 
   afterEach(() => {
@@ -556,5 +588,225 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
     const vendor = h.wrapper.find('[data-testid="admin-creator-detail-verify-vendor"]')
     expect(vendor.exists()).toBe(true)
     expect(vendor.attributes('disabled')).toBeDefined()
+  })
+
+  // ── AH-051 (D-9) — admin agency connections ──────────────────────
+  describe('agency connections (AH-051 D-9)', () => {
+    it('renders the empty state when the creator has no connections', async () => {
+      vi.mocked(adminCreatorsApi.show).mockResolvedValue(envelope(buildCreator()))
+      vi.mocked(adminCreatorsApi.connections).mockResolvedValue({ data: [] })
+      const h = await mountCreatorPage(CreatorDetailPage)
+      teardown = h.unmount
+      await flushPromises()
+
+      expect(
+        h.wrapper.find('[data-testid="admin-creator-detail-connections-empty"]').exists(),
+      ).toBe(true)
+      // The connect action is always available.
+      expect(h.wrapper.find('[data-testid="admin-creator-detail-connect-button"]').exists()).toBe(
+        true,
+      )
+    })
+
+    it('lists relations and shows Disconnect ONLY on rostered rows', async () => {
+      vi.mocked(adminCreatorsApi.show).mockResolvedValue(envelope(buildCreator()))
+      vi.mocked(adminCreatorsApi.connections).mockResolvedValue({
+        data: [
+          relation({
+            agency_id: '01ROSTERAGENCYXXXXXXXXXXXXX',
+            agency_name: 'Rostered Co',
+            relationship_status: 'roster',
+          }),
+          relation({
+            agency_id: '01PENDINGAGENCYXXXXXXXXXXXX',
+            agency_name: 'Pending Co',
+            relationship_status: 'pending_request',
+          }),
+        ],
+      })
+      const h = await mountCreatorPage(CreatorDetailPage)
+      teardown = h.unmount
+      await flushPromises()
+
+      expect(h.wrapper.text()).toContain('Rostered Co')
+      expect(h.wrapper.text()).toContain('Pending Co')
+      // Disconnect is a roster-only affordance (D-6: roster → ended).
+      expect(
+        h.wrapper
+          .find('[data-testid="admin-creator-detail-disconnect-01ROSTERAGENCYXXXXXXXXXXXXX"]')
+          .exists(),
+      ).toBe(true)
+      expect(
+        h.wrapper
+          .find('[data-testid="admin-creator-detail-disconnect-01PENDINGAGENCYXXXXXXXXXXXX"]')
+          .exists(),
+      ).toBe(false)
+    })
+
+    it('opens the connect dialog from the Connect-to-agency action', async () => {
+      vi.mocked(adminCreatorsApi.show).mockResolvedValue(envelope(buildCreator()))
+      vi.mocked(adminCreatorsApi.connections).mockResolvedValue({ data: [] })
+      const h = await mountCreatorPage(CreatorDetailPage)
+      teardown = h.unmount
+      await flushPromises()
+
+      expect(
+        document.body.querySelector('[data-testid="admin-creator-connect-dialog-title"]'),
+      ).toBeFalsy()
+      await h.wrapper.find('[data-testid="admin-creator-detail-connect-button"]').trigger('click')
+      await flushPromises()
+      expect(
+        document.body.querySelector('[data-testid="admin-creator-connect-dialog-title"]'),
+      ).toBeTruthy()
+    })
+
+    it('direct-connect: confirms, calls connect(), and reloads the list', async () => {
+      vi.mocked(adminCreatorsApi.show).mockResolvedValue(envelope(buildCreator()))
+      vi.mocked(adminCreatorsApi.connections)
+        .mockResolvedValueOnce({ data: [] })
+        .mockResolvedValueOnce({
+          data: [relation({ agency_name: 'Nova Talent', relationship_status: 'roster' })],
+        })
+      vi.mocked(adminAgenciesApi.list).mockResolvedValue({
+        data: [
+          {
+            id: '01AGENCYONEXXXXXXXXXXXXXXXX',
+            type: 'agencies',
+            attributes: {
+              name: 'Nova Talent',
+              slug: 'nova',
+              country_code: 'IE',
+              subscription_tier: 'pro',
+              subscription_status: 'active',
+              is_active: true,
+              is_suspended: false,
+              suspended_at: null,
+              suspended_reason: null,
+              member_count: 3,
+              created_at: '2026-01-01T00:00:00Z',
+            },
+          },
+        ],
+        meta: { total: 1, page: 1, per_page: 20, last_page: 1 },
+      })
+      vi.mocked(adminCreatorsApi.connect).mockResolvedValue({
+        data: {
+          id: '01RELNEWXXXXXXXXXXXXXXXXXXX',
+          type: 'admin_connection',
+          attributes: {
+            agency_id: '01AGENCYONEXXXXXXXXXXXXXXXX',
+            agency_name: 'Nova Talent',
+            relationship_status: 'roster',
+            mode: 'direct',
+          },
+        },
+        meta: { code: 'connection.direct_connected' },
+      })
+
+      const h = await mountCreatorPage(CreatorDetailPage)
+      teardown = h.unmount
+      await flushPromises()
+
+      await h.wrapper.find('[data-testid="admin-creator-detail-connect-button"]').trigger('click')
+      await flushPromises()
+
+      // Drive the dialog's exposed state directly (the autocomplete + radio are
+      // covered by the component spec; here we assert the page-level wiring).
+      const dialogVm = h.wrapper.findComponent({ name: 'ConnectToAgencyDialog' }).vm as unknown as {
+        selectedAgencyId: string | null
+        mode: 'request' | 'direct'
+        reason: string
+      }
+      dialogVm.selectedAgencyId = '01AGENCYONEXXXXXXXXXXXXXXXX'
+      dialogVm.mode = 'direct'
+      dialogVm.reason = 'Signed offline agreement on file.'
+      await flushPromises()
+
+      document
+        .querySelector<HTMLButtonElement>('[data-testid="admin-creator-connect-dialog-confirm"]')!
+        .click()
+      await flushPromises()
+
+      expect(adminCreatorsApi.connect).toHaveBeenCalledWith('01HQABCD', {
+        agencyId: '01AGENCYONEXXXXXXXXXXXXXXXX',
+        mode: 'direct',
+        reason: 'Signed offline agreement on file.',
+      })
+      // Reloaded: the second connections() resolve now shows the rostered row.
+      expect(adminCreatorsApi.connections).toHaveBeenCalledTimes(2)
+      expect(h.wrapper.text()).toContain('Nova Talent')
+    })
+
+    it('disconnect: opens the reason dialog, confirms, calls disconnect(), and reloads', async () => {
+      vi.mocked(adminCreatorsApi.show).mockResolvedValue(envelope(buildCreator()))
+      vi.mocked(adminCreatorsApi.connections)
+        .mockResolvedValueOnce({
+          data: [
+            relation({
+              agency_id: '01ROSTERAGENCYXXXXXXXXXXXXX',
+              agency_name: 'Rostered Co',
+              relationship_status: 'roster',
+            }),
+          ],
+        })
+        .mockResolvedValueOnce({
+          data: [
+            relation({
+              agency_id: '01ROSTERAGENCYXXXXXXXXXXXXX',
+              agency_name: 'Rostered Co',
+              relationship_status: 'ended',
+            }),
+          ],
+        })
+      vi.mocked(adminCreatorsApi.disconnect).mockResolvedValue({
+        data: {
+          id: '01RELXXXXXXXXXXXXXXXXXXXXXX',
+          type: 'admin_connection',
+          attributes: {
+            agency_id: '01ROSTERAGENCYXXXXXXXXXXXXX',
+            agency_name: 'Rostered Co',
+            relationship_status: 'ended',
+            mode: 'disconnect',
+          },
+        },
+        meta: { code: 'connection.disconnected' },
+      })
+
+      const h = await mountCreatorPage(CreatorDetailPage)
+      teardown = h.unmount
+      await flushPromises()
+
+      await h.wrapper
+        .find('[data-testid="admin-creator-detail-disconnect-01ROSTERAGENCYXXXXXXXXXXXXX"]')
+        .trigger('click')
+      await flushPromises()
+
+      const textarea = document.body.querySelector<HTMLTextAreaElement>(
+        '[data-testid="admin-creator-disconnect-dialog-reason"] textarea',
+      )!
+      textarea.value = 'Agency requested offboarding.'
+      textarea.dispatchEvent(new Event('input'))
+      await flushPromises()
+
+      document
+        .querySelector<HTMLButtonElement>(
+          '[data-testid="admin-creator-disconnect-dialog-confirm"]',
+        )!
+        .click()
+      await flushPromises()
+
+      expect(adminCreatorsApi.disconnect).toHaveBeenCalledWith(
+        '01HQABCD',
+        '01ROSTERAGENCYXXXXXXXXXXXXX',
+        'Agency requested offboarding.',
+      )
+      expect(adminCreatorsApi.connections).toHaveBeenCalledTimes(2)
+      // After reload the row is `ended` → the Disconnect affordance is gone.
+      expect(
+        h.wrapper
+          .find('[data-testid="admin-creator-detail-disconnect-01ROSTERAGENCYXXXXXXXXXXXXX"]')
+          .exists(),
+      ).toBe(false)
+    })
   })
 })

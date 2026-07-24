@@ -156,6 +156,58 @@
           "cancel": "Tühista",
           "success": "Identity verified.",
           "failed": "We couldn't verify this creator's identity. Please try again."
+        },
+        "connections": {
+          "heading": "Agentuuriühendused",
+          "empty": "Pole veel ühegi agentuuriga ühendatud.",
+          "load_failed": "Selle looja agentuuriühendusi ei õnnestunud laadida.",
+          "connect_button": "Ühenda agentuuriga",
+          "disconnect_button": "Katkesta ühendus",
+          "blacklisted": "Mustas nimekirjas",
+          "table": {
+            "agency": "Agentuur",
+            "status": "Olek",
+            "since": "Alates",
+            "actions": "Toimingud"
+          },
+          "status_labels": {
+            "roster": "Ühendatud",
+            "prospect": "Potentsiaalne",
+            "external": "Väline",
+            "pending_request": "Ootel taotlus",
+            "declined": "Tagasi lükatud",
+            "ended": "Ühendus katkestatud"
+          },
+          "connect": {
+            "title": "Ühenda {name} agentuuriga",
+            "agency_label": "Agentuur",
+            "agency_placeholder": "Otsi agentuure…",
+            "no_agencies": "Ükski agentuur ei vasta teie otsingule.",
+            "mode_label": "Kuidas see ühendus tuleks luua?",
+            "mode_request": "Saada ühendustaotlus",
+            "mode_request_hint": "Looja võtab selle vastu või lükkab tagasi, nagu tavalise agentuuritaotluse.",
+            "mode_direct": "Ühenda otse",
+            "mode_direct_hint": "Salvestab võrguühenduseta kokkuleppe ja ühendab paari kohe. Loojat teavitatakse.",
+            "reason_label": "Põhjus",
+            "reason_hint": "Otseühenduse jaoks kohustuslik, vähemalt {count} tähemärki. Salvestatakse auditilogisse.",
+            "confirm": "Ühenda",
+            "cancel": "Tühista",
+            "success_requested": "Ühendustaotlus saadetud.",
+            "success_re_requested": "Ühendustaotlus uuesti saadetud.",
+            "success_direct": "Looja ühendatud.",
+            "success_noop": "Muudatusi pole — see ühendus on juba olemas.",
+            "failed": "Seda ühendust ei õnnestunud luua. Proovige uuesti."
+          },
+          "disconnect": {
+            "title": "Kas katkestada {name} ühendus agentuuriga {agency}?",
+            "description": "See lõpetab suhte: kontaktide nähtavus ja sõnumid suletakse ning looja lahkub selle agentuuri talendibassenidest. Käimasolev kampaaniatöö jääb puutumata. Mõlemat osapoolt teavitatakse.",
+            "reason_label": "Ühenduse katkestamise põhjus",
+            "reason_hint": "Kohustuslik, vähemalt {count} tähemärki. Salvestatakse auditilogisse.",
+            "confirm": "Katkesta ühendus",
+            "cancel": "Tühista",
+            "success": "Suhe lõpetatud.",
+            "failed": "Seda suhet ei õnnestunud katkestada. Proovige uuesti."
+          }
         }
       }
     }

@@ -40,6 +40,25 @@ return [
             'ignore' => 'If you don\'t recognise this agency, you can simply decline — nothing changes until you accept.',
         ],
     ],
+    // AH-051 (D-7) — admin Door 2 direct-connect notification to the creator.
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'You are now connected with :agency on Catalyst',
+            'greeting' => 'Hi :name,',
+            'body' => 'A Catalyst administrator has connected you with :agency on the platform, based on an agreement made outside Catalyst. :agency can now see your roster profile and message you.',
+            'unexpected' => 'If this connection is unexpected, please contact Catalyst support.',
+            'cta' => 'Go to your dashboard',
+        ],
+    ],
+    // AH-051 (D-7) — admin disconnect notification to BOTH parties.
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Your connection with :counterparty on Catalyst has ended',
+            'greeting' => 'Hi :name,',
+            'body' => 'A Catalyst administrator has ended your working connection with :counterparty. You are no longer connected on the platform.',
+            'unexpected' => 'If this is unexpected, please contact Catalyst support.',
+        ],
+    ],
     // Incomplete-creator email nudge (scheduled, once-only). Transactional
     // tone — "finish the registration you started" — GDPR Contract basis, no
     // promotional language (see docs/reviews/incomplete-creator-nudge-review.md).

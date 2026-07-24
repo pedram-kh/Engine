@@ -110,6 +110,7 @@
         "connected": "Ansluten",
         "pending": "Förfrågan väntar",
         "declined": "Avböjd",
+        "ended": "Tidigare ansluten",
         "notConnected": "Inte ansluten",
         "sendRequest": "Skicka förfrågan",
         "requestAgain": "Skicka förfrågan igen",
@@ -216,7 +217,8 @@
         "prospect": "Prospekt",
         "external": "Extern",
         "pending_request": "Väntande förfrågan",
-        "declined": "Avböjd"
+        "declined": "Avböjd",
+        "ended": "Frånkopplad"
       },
       "applicationStatus": {
         "incomplete": "Ofullständig",

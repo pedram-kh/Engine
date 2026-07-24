@@ -110,6 +110,7 @@
         "connected": "Verbonden",
         "pending": "Verzoek in behandeling",
         "declined": "Geweigerd",
+        "ended": "Eerder verbonden",
         "notConnected": "Niet verbonden",
         "sendRequest": "Verzoek sturen",
         "requestAgain": "Opnieuw verzoeken",
@@ -216,7 +217,8 @@
         "prospect": "Prospect",
         "external": "Extern",
         "pending_request": "Verzoek in behandeling",
-        "declined": "Geweigerd"
+        "declined": "Geweigerd",
+        "ended": "Verbroken"
       },
       "applicationStatus": {
         "incomplete": "Onvolledig",

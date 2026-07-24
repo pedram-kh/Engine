@@ -40,6 +40,23 @@ return [
             'ignore' => 'Kui te seda agentuuri ei tunne, lükkake see lihtsalt tagasi — midagi ei muutu, kuni te ei nõustu.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Olete nüüd Catalystis ühendatud agentuuriga :agency',
+            'greeting' => 'Tere :name,',
+            'body' => 'Catalysti administraator ühendas teid platvormil agentuuriga :agency väljaspool Catalysti sõlmitud kokkuleppe alusel. :agency näeb nüüd teie profiili ja saab teile sõnumeid saata.',
+            'unexpected' => 'Kui see ühendus on ootamatu, võtke ühendust Catalysti toega.',
+            'cta' => 'Ava oma töölaud',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Teie ühendus osapoolega :counterparty Catalystis on lõppenud',
+            'greeting' => 'Tere :name,',
+            'body' => 'Catalysti administraator lõpetas teie töösuhte osapoolega :counterparty. Te ei ole enam platvormil ühendatud.',
+            'unexpected' => 'Kui see on ootamatu, võtke ühendust Catalysti toega.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Lõpetage oma Catalysti konto seadistamine',

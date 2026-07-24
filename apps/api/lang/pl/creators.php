@@ -40,6 +40,23 @@ return [
             'ignore' => 'Jeśli nie rozpoznajesz tej agencji, możesz po prostu odrzucić — nic się nie zmienia, dopóki nie zaakceptujesz.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Masz teraz połączenie z :agency w Catalyst',
+            'greeting' => 'Cześć :name,',
+            'body' => 'Administrator Catalyst połączył Cię z :agency na platformie na podstawie umowy zawartej poza Catalyst. :agency może teraz widzieć Twój profil i wysyłać Ci wiadomości.',
+            'unexpected' => 'Jeśli to połączenie jest nieoczekiwane, skontaktuj się z pomocą techniczną Catalyst.',
+            'cta' => 'Przejdź do panelu',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Twoje połączenie z :counterparty w Catalyst zostało zakończone',
+            'greeting' => 'Cześć :name,',
+            'body' => 'Administrator Catalyst zakończył Twoją współpracę z :counterparty. Nie jesteście już połączeni na platformie.',
+            'unexpected' => 'Jeśli to nieoczekiwane, skontaktuj się z pomocą techniczną Catalyst.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Dokończ konfigurację swojego konta Catalyst',

@@ -156,6 +156,58 @@
           "cancel": "Otkažite",
           "success": "Totožnost ověřena.",
           "failed": "Ni uspelo ověřit totožnost tohoto ustvarjalca. Zkuste to znova."
+        },
+        "connections": {
+          "heading": "Veze s agencijama",
+          "empty": "Još nije povezano ni s jednom agencijom.",
+          "load_failed": "Nismo mogli učitati veze ovog kreatora s agencijama.",
+          "connect_button": "Poveži s agencijom",
+          "disconnect_button": "Prekini vezu",
+          "blacklisted": "Na crnoj listi",
+          "table": {
+            "agency": "Agencija",
+            "status": "Status",
+            "since": "Od",
+            "actions": "Radnje"
+          },
+          "status_labels": {
+            "roster": "Povezano",
+            "prospect": "Potencijalni",
+            "external": "Vanjski",
+            "pending_request": "Zahtjev na čekanju",
+            "declined": "Odbijeno",
+            "ended": "Prekinuto"
+          },
+          "connect": {
+            "title": "Poveži {name} s agencijom",
+            "agency_label": "Agencija",
+            "agency_placeholder": "Pretraži agencije…",
+            "no_agencies": "Nijedna agencija ne odgovara vašoj pretrazi.",
+            "mode_label": "Kako treba uspostaviti ovu vezu?",
+            "mode_request": "Pošalji zahtjev za povezivanje",
+            "mode_request_hint": "Kreator ga prihvaća ili odbija, kao uobičajeni zahtjev agencije.",
+            "mode_direct": "Poveži izravno",
+            "mode_direct_hint": "Bilježi izvanmrežni dogovor i odmah povezuje par. Kreator je obaviješten.",
+            "reason_label": "Razlog",
+            "reason_hint": "Obavezno za izravnu vezu, najmanje {count} znakova. Zabilježeno u revizijskom zapisniku.",
+            "confirm": "Poveži",
+            "cancel": "Odustani",
+            "success_requested": "Zahtjev za povezivanje poslan.",
+            "success_re_requested": "Zahtjev za povezivanje ponovno poslan.",
+            "success_direct": "Kreator povezan.",
+            "success_noop": "Nema promjene — ta veza već postoji.",
+            "failed": "Nismo mogli stvoriti ovu vezu. Pokušajte ponovno."
+          },
+          "disconnect": {
+            "title": "Prekinuti vezu {name} s {agency}?",
+            "description": "Time se odnos završava: vidljivost kontakata i poruke se zatvaraju, a kreator napušta talent-baze te agencije. Tekući rad na kampanji ostaje netaknut. Obje strane su obaviještene.",
+            "reason_label": "Razlog prekida veze",
+            "reason_hint": "Obavezno, najmanje {count} znakova. Zabilježeno u revizijskom zapisniku.",
+            "confirm": "Prekini vezu",
+            "cancel": "Odustani",
+            "success": "Odnos završen.",
+            "failed": "Nismo mogli prekinuti ovaj odnos. Pokušajte ponovno."
+          }
         }
       }
     }

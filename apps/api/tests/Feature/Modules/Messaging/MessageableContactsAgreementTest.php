@@ -80,6 +80,8 @@ it('agency set-finder agrees with the single-pair gate across the full status ma
         RelationshipStatus::External,
         RelationshipStatus::PendingRequest,
         RelationshipStatus::Declined,
+        // AH-051 (D-3) — the severed state must never be messageable.
+        RelationshipStatus::Ended,
     ];
 
     /** @var list<Creator> $creators */
@@ -123,6 +125,8 @@ it('creator set-finder agrees with the single-pair gate across the agency matrix
         RelationshipStatus::External,
         RelationshipStatus::PendingRequest,
         RelationshipStatus::Declined,
+        // AH-051 (D-3) — the severed state must never be messageable.
+        RelationshipStatus::Ended,
     ];
 
     /** @var list<Agency> $agencies */

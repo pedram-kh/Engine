@@ -28,9 +28,21 @@ namespace App\Modules\Creators\Enums;
  *                       the agency can deliberately re-request (declined →
  *                       pending_request, D-4). Excluded from the default
  *                       roster index (D-6) but filterable by an explicit chip.
+ *   - ended:            a previously-`roster` relationship the platform admin
+ *                       SEVERED (AH-051, D-3) — the platform's first relation
+ *                       termination. Like `declined`, it is a retained terminal
+ *                       state that occupies the unique pair and is
+ *                       RE-REQUESTABLE (ended → pending_request, via the agency
+ *                       send-request path or admin Door 1). Never messageable,
+ *                       never contact-visible, and excluded from the default
+ *                       roster index (joins DEFAULT_EXCLUDED_STATUSES) —
+ *                       filterable by an explicit chip. Reachable ONLY from
+ *                       `roster` via admin disconnect (D-6).
  *
- * Stored as varchar(16) on agency_creator_relations.relationship_status.
- * See docs/03-DATA-MODEL.md §6.
+ * Stored as varchar(16) on agency_creator_relations.relationship_status
+ * (a plain varchar with NO DB CHECK constraint — adding a case needs no
+ * migration; the enum + RelationshipStatusEnumTest catalogue are the
+ * documentation). See docs/03-DATA-MODEL.md §6.
  */
 enum RelationshipStatus: string
 {
@@ -39,4 +51,5 @@ enum RelationshipStatus: string
     case Prospect = 'prospect';
     case PendingRequest = 'pending_request';
     case Declined = 'declined';
+    case Ended = 'ended';
 }

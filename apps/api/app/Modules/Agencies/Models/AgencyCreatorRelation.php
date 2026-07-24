@@ -173,6 +173,16 @@ final class AgencyCreatorRelation extends Model implements Auditable
         return $this->relationship_status === RelationshipStatus::PendingRequest;
     }
 
+    /**
+     * True when this relation was severed by a platform admin (AH-051, D-6) —
+     * the terminal `ended` state. Reachable only from `roster` via admin
+     * disconnect; retained + re-requestable. Never messageable / contact-visible.
+     */
+    public function isEnded(): bool
+    {
+        return $this->relationship_status === RelationshipStatus::Ended;
+    }
+
     public function isInvitationExpired(): bool
     {
         return $this->invitation_expires_at?->isPast() ?? false;

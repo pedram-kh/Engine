@@ -40,6 +40,23 @@ return [
             'ignore' => 'Mura n-aithníonn tú an ghníomhaireacht seo, diúltaigh di — ní athróidh aon rud go dtí go nglacfaidh tú leis.',
         ],
     ],
+    'admin_connected' => [
+        'email' => [
+            'subject' => 'Tá tú ceangailte le :agency ar Catalyst anois',
+            'greeting' => 'Dia duit :name,',
+            'body' => 'Cheangail riarthóir Catalyst thú le :agency ar an ardán, bunaithe ar chomhaontú a rinneadh lasmuigh de Catalyst. Is féidir le :agency do phróifíl a fheiceáil agus teachtaireachtaí a sheoladh chugat anois.',
+            'unexpected' => 'Má tá an ceangal seo gan choinne, déan teagmháil le tacaíocht Catalyst le do thoil.',
+            'cta' => 'Téigh chuig do dheais',
+        ],
+    ],
+    'disconnected' => [
+        'email' => [
+            'subject' => 'Tá do cheangal le :counterparty ar Catalyst thart',
+            'greeting' => 'Dia duit :name,',
+            'body' => 'Chuir riarthóir Catalyst deireadh le do chaidreamh oibre le :counterparty. Níl sibh ceangailte ar an ardán a thuilleadh.',
+            'unexpected' => 'Má tá sé seo gan choinne, déan teagmháil le tacaíocht Catalyst le do thoil.',
+        ],
+    ],
     'incomplete_nudge' => [
         'verify' => [
             'subject' => 'Cuir bailchríoch ar shocrú do chuntais Catalyst',

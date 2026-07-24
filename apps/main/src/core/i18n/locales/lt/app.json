@@ -110,6 +110,7 @@
         "connected": "Connected",
         "pending": "Request pending",
         "declined": "Atsisakytid",
+        "ended": "Anksčiau prijungta",
         "notConnected": "Net connected",
         "sendRequest": "Siųsti request",
         "requestAgain": "Request again",
@@ -216,7 +217,8 @@
         "prospect": "Prospect",
         "external": "External",
         "pending_request": "Laukiama request",
-        "declined": "Atsisakytid"
+        "declined": "Atsisakytid",
+        "ended": "Atjungta"
       },
       "applicationStatus": {
         "incomplete": "Incomplete",

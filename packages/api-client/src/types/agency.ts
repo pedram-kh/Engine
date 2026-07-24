@@ -202,6 +202,10 @@ export type RosterRelationshipStatus =
   | 'external'
   | 'pending_request'
   | 'declined'
+  // AH-051 (D-3) — a previously-`roster` relationship an admin SEVERED (the
+  // platform's first termination). Retained + re-requestable like `declined`;
+  // excluded from the default roster index but filterable by an explicit chip.
+  | 'ended'
 
 /**
  * A single row in the agency roster list
@@ -571,13 +575,18 @@ export interface CreatorPublicProfileEnvelope {
  *   - `pending`    → `pending_request` (request sent, awaiting the creator).
  *   - `declined`   → `declined` (creator declined; offer an explicit
  *                    "Request again", D-4).
+ *   - `ended`      → `ended` (AH-051 D-3 — an admin severed a prior connection;
+ *                    a TRUTHFUL "Previously connected" label with a re-request
+ *                    affordance, NOT a silent fall-through to `none`, which
+ *                    would falsely read as "never connected — Send request").
  *   - `none`       → no relation / prospect / external — "Send request".
  *
  * ⚠ `prospect`/`external` fall through to `none` for the discovery SEND
  * affordance: discovery is the cold-outreach surface, and those statuses have
- * no send/accept semantics here.
+ * no send/accept semantics here. `ended` deliberately does NOT fall through —
+ * it is a real prior-relationship fact the surface must state truthfully.
  */
-export type DiscoveryConnectionState = 'connected' | 'pending' | 'declined' | 'none'
+export type DiscoveryConnectionState = 'connected' | 'pending' | 'declined' | 'ended' | 'none'
 
 export function deriveConnectionState(
   status: DiscoveryRelationshipStatus | null,
@@ -589,6 +598,10 @@ export function deriveConnectionState(
       return 'pending'
     case 'declined':
       return 'declined'
+    // AH-051 (D-3) — explicit, truthful: a severed prior connection is NOT
+    // `none`. Re-requestable like `declined`, but labelled "Previously connected".
+    case 'ended':
+      return 'ended'
     default:
       return 'none'
   }

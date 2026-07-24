@@ -171,3 +171,58 @@ it('the agency message-thread list withholds the contact details', function (): 
     $response->assertOk();
     expectNoContactValues($response->getContent());
 });
+
+// ---------------------------------------------------------------------------
+// 7. Roster DETAIL contact gate — AH-051 D-1: the contact block is exposed ONLY
+//    to a rostered (connected) non-blacklisted agency. Every non-roster status
+//    (pending_request / declined / prospect / ended) is WITHHELD — this is the
+//    gate that TIGHTENS in AH-051 (pending_request previously saw contact).
+//    Break-revert: relax CreatorPolicy::canSeeContactDetails back to
+//    hasNonBlacklistedRelation (any status) → the pending_request/declined/
+//    prospect/ended cases below fail → revert.
+// ---------------------------------------------------------------------------
+
+it('the roster detail EXPOSES contact only to a rostered non-blacklisted agency', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = CreatorFactory::new()->withContact()->createOne();
+    AgencyCreatorRelation::factory()->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::Roster,
+        'is_blacklisted' => false,
+    ]);
+
+    $response = $this->actingAs($admin)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/creators/{$creator->ulid}");
+
+    $response->assertOk()
+        ->assertJsonPath('data.attributes.creator.phone', '+1 555 0100')
+        ->assertJsonPath('data.attributes.creator.whatsapp', '+1 555 0142');
+});
+
+it('the roster detail WITHHOLDS contact from every non-roster status (AH-051 D-1 tightening)', function (RelationshipStatus $status): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = CreatorFactory::new()->withContact()->createOne();
+    AgencyCreatorRelation::factory()->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => $status,
+        'is_blacklisted' => false,
+    ]);
+
+    $response = $this->actingAs($admin)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/creators/{$creator->ulid}");
+
+    // The detail page renders (the relation exists) …
+    $response->assertOk();
+    // … but carries NO contact keys and leaks no values (withheld by omission).
+    expectNoContactKeys($response->json('data.attributes.creator'));
+    expectNoContactValues($response->getContent());
+})->with([
+    'pending_request' => [RelationshipStatus::PendingRequest],
+    'declined' => [RelationshipStatus::Declined],
+    'prospect' => [RelationshipStatus::Prospect],
+    'ended' => [RelationshipStatus::Ended],
+]);

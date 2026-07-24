@@ -110,6 +110,7 @@
         "connected": "Connected",
         "pending": "Request pending",
         "declined": "Άρνησηd",
+        "ended": "Συνδεδεμένο στο παρελθόν",
         "notConnected": "Όχιt connected",
         "sendRequest": "Αποστολή request",
         "requestAgain": "Request again",
@@ -216,7 +217,8 @@
         "prospect": "Prospect",
         "external": "External",
         "pending_request": "Εκκρεμές request",
-        "declined": "Άρνησηd"
+        "declined": "Άρνησηd",
+        "ended": "Αποσυνδεδεμένο"
       },
       "applicationStatus": {
         "incomplete": "Incomplete",

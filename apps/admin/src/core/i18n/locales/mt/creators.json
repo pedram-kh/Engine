@@ -156,6 +156,58 @@
           "cancel": "Ikkanċella",
           "success": "Identity verified.",
           "failed": "We couldn't verify this creator's identity. Please try again."
+        },
+        "connections": {
+          "heading": "Konnessjonijiet ta' aġenziji",
+          "empty": "Għadu mhux konness ma' ebda aġenzija.",
+          "load_failed": "Ma stajniex intellgħu l-konnessjonijiet ta' dan il-kreatur mal-aġenziji.",
+          "connect_button": "Qabbad ma' aġenzija",
+          "disconnect_button": "Aqta' l-konnessjoni",
+          "blacklisted": "Fil-lista s-sewda",
+          "table": {
+            "agency": "Aġenzija",
+            "status": "Status",
+            "since": "Minn",
+            "actions": "Azzjonijiet"
+          },
+          "status_labels": {
+            "roster": "Konness",
+            "prospect": "Prospett",
+            "external": "Estern",
+            "pending_request": "Talba pendenti",
+            "declined": "Miċħud",
+            "ended": "Skonness"
+          },
+          "connect": {
+            "title": "Qabbad lil {name} ma' aġenzija",
+            "agency_label": "Aġenzija",
+            "agency_placeholder": "Fittex aġenziji…",
+            "no_agencies": "Ebda aġenzija ma taqbel mat-tfittxija tiegħek.",
+            "mode_label": "Kif għandha ssir din il-konnessjoni?",
+            "mode_request": "Ibgħat talba għal konnessjoni",
+            "mode_request_hint": "Il-kreatur jaċċettaha jew jiċħadha, bħal talba normali ta' aġenzija.",
+            "mode_direct": "Qabbad direttament",
+            "mode_direct_hint": "Jirreġistra ftehim offline u jqabbad il-par immedjatament. Il-kreatur jiġi nnotifikat.",
+            "reason_label": "Raġuni",
+            "reason_hint": "Meħtieġ għal konnessjoni diretta, mill-inqas {count} karattri. Irreġistrat fir-reġistru tal-verifika.",
+            "confirm": "Qabbad",
+            "cancel": "Ikkanċella",
+            "success_requested": "Talba għal konnessjoni mibgħuta.",
+            "success_re_requested": "Talba għal konnessjoni mibgħuta mill-ġdid.",
+            "success_direct": "Kreatur konness.",
+            "success_noop": "Ebda bidla — dik il-konnessjoni diġà teżisti.",
+            "failed": "Ma stajniex noħolqu din il-konnessjoni. Erġa' pprova."
+          },
+          "disconnect": {
+            "title": "Taqta' l-konnessjoni ta' {name} minn {agency}?",
+            "description": "Dan itemm ir-relazzjoni: il-viżibbiltà tal-kuntatti u l-messaġġi jingħalqu, u l-kreatur jitlaq mill-ġabriet tat-talent ta' dik l-aġenzija. Ix-xogħol tal-kampanja li għaddej jibqa' mhux mittiefes. Iż-żewġ partijiet jiġu nnotifikati.",
+            "reason_label": "Raġuni għall-qtugħ tal-konnessjoni",
+            "reason_hint": "Meħtieġ, mill-inqas {count} karattri. Irreġistrat fir-reġistru tal-verifika.",
+            "confirm": "Aqta' l-konnessjoni",
+            "cancel": "Ikkanċella",
+            "success": "Relazzjoni ntemmet.",
+            "failed": "Ma stajniex naqtgħu l-konnessjoni ta' din ir-relazzjoni. Erġa' pprova."
+          }
         }
       }
     }
