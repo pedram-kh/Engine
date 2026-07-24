@@ -9,6 +9,36 @@ anyone reviewing it later.
 
 ---
 
+## Relation disconnect — only the admin-mediated path exists (no self-service exit)
+
+- **Where:** `AdminCreatorConnectionController::disconnect` (the ONLY termination path),
+  `RelationshipStatus::Ended`, and any future creator- or agency-facing "end relationship"
+  surface.
+- **What we accepted (AH-051, July 24, 2026):** the platform's first relation-termination path
+  is **admin-only**. There is deliberately NO creator-side disconnect ("leave this agency") and
+  NO agency-side disconnect ("remove from roster / end relationship") in this chunk. A creator or
+  agency that wants to end a relationship must go through an admin. The `ended` status, the
+  transactional teardown (status flip + pool-membership deletion + audit), and the dual-party
+  notification are all built and reusable — only the self-service entry points are missing.
+  Additionally, agencies are still NOT notified on creator accept/decline of a connection request
+  (deferred pre-existing gap, unchanged here), and the `external` status remains unreachable
+  (untouched).
+- **Trigger:** the first product request for self-service relationship exit (creator offboarding
+  from an agency, or an agency ending representation without an admin), or when admin-mediated
+  disconnect volume makes the manual funnel a support bottleneck.
+- **Resolution sketch:** add creator- and/or agency-facing endpoints that reuse the existing
+  `roster → ended` teardown transaction, gated by the appropriate policy (creator owns their
+  side; agency admin/manager owns theirs), with the same reason-required audit + dual-emit
+  notification. The mechanism is done; this is authorization surface + UI + who-may-initiate
+  rules. Decide separately whether a creator-initiated exit should notify the agency
+  differently from an admin-mediated one.
+- **Owner:** whoever next builds self-service relationship management.
+- **Status:** open, product-gated (not mandatory — the admin path is a sufficient interim exit).
+  Surfaced by AH-051, July 24, 2026 ([ad-hoc log](reviews/adhoc-changes-log.md),
+  [review](reviews/admin-connections-review.md)).
+
+---
+
 ## Contract version-label ambiguity + missing re-consent flow
 
 - **Where:** `apps/api/resources/contracts/master-agreement.en.md`, the `contracts` table's

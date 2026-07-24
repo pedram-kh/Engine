@@ -108,14 +108,16 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-17 · **Through:** AH-049 (single ad-hoc change) · **Baseline:** `a6928e36`
-— the prior `origin/main` at session start, which already includes the **pushed** AH-001→AH-048
-range. **AH-049** lands atop it as a two-commit pair: `77ef15b` (`feat(creators): master agreement
-content refresh + version bump to v1.1`) + the docs commit (this refresh). **Push:** AH-001→AH-048
-are all at `origin/main`; the AH-049 feat + docs pair is **committed locally this session, push
-HELD** — awaiting Claude's clearance + Pedram's go. _(The docs commit is not SHA-pinned here — a
-commit can't contain its own hash.)_ **AH-049 adds no migrations, no i18n, no schema change** — the
-pending-deploy obligations below are unchanged (still the AH-026 recompute + AH-042 one-shot).
+**Last updated:** 2026-07-24 · **Through:** AH-051 · **Baseline:** `3fccd36` — the `origin/main`
+tip at session start, which already includes the **pushed** AH-001→AH-050 range (plus the
+`3fccd36` portfolio-`processing`-rescue fix). Atop it, this session commits three, **push HELD**:
+`c6b6cde` (Step 0 — `fix(identity)` 2-SPA dev-cookie fix), `98defa9` (**AH-051** feat), and
+`bd3e278` (**AH-051** docs). **Push:** AH-001→AH-050 at `origin/main`; the three local commits held,
+awaiting Claude's clearance + Pedram's go. **Deploy notes:** **AH-051 adds NO migration** (`ended`
+is a plain-varchar enum value, no CHECK), but (a) it TIGHTENS the live contact gate — run
+`php artisan relations:audit-contact-exposure` pre-deploy to read the blast radius; and (b) admin
+disconnect DELETES pool-membership rows — **snapshot-first** stays the rule. The AH-026 recompute +
+AH-042 one-shot remain the only outstanding post-deploy commands (AH-050 adds none).
 
 > **AH-042 · Toggle-OFF campaigns flow without contract involvement** (full chunk loop). The
 > `requires_per_campaign_contract` toggle is now load-bearing end-to-end: the machine permits a
@@ -145,8 +147,8 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-049 — all Landed** (AH-001→AH-048 **pushed** at `origin/main`;
-  AH-049 **committed locally this session, push HELD**). One line each (detail + decisions in
+- **Ad-hoc run AH-001 → AH-051 — all Landed** (AH-001→AH-050 **pushed** at `origin/main`;
+  AH-051 **committed locally, push HELD**). One line each (detail + decisions in
   `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.
@@ -285,6 +287,21 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
     FE `COMPANION_KEYS` copy extends the AH-019 parity debt (one entry, one future fix
     for both fields). GDPR purpose section in the review. Review:
     `docs/reviews/content-companions-review.md`.
+  - **AH-051** — Admin-initiated agency↔creator connections + contact-gate fix + first
+    termination path (full loop). (1) AH-005 contact gate TIGHTENS to roster-only
+    (`CreatorPolicy::canSeeContactDetails` requires non-blacklisted `roster`; a read-only
+    `relations:audit-contact-exposure` count command reports the pre-deploy blast radius).
+    (2) Sixth `RelationshipStatus` `ended` (severed-after-roster, re-requestable, never
+    messageable/contact-visible, excluded from the default roster) reached ONLY via the
+    new admin disconnect — the platform's first termination path (roster→ended + pool-
+    membership deletion + reason audit in one txn; campaign assignments survive). (3) Admin
+    Creator-detail doors: Door 1 send-request, Door 2 direct-connect (mandatory reason +
+    creator notification), per-row Disconnect — one mode-switched `POST …/connections` +
+    `…/disconnect`, all `runAs`-scoped. Accept re-gated (approved + not hard-blacklisted).
+    3 new audit verbs + 2 notification types + 2 mailables; `ended` FE ripple (api-client
+    union + `deriveConnectionState` "Previously connected"). Break-reverts executed (D1
+    gate, D2 blacklist, D6 pool-scope). **No migration** (`ended` = plain varchar, no CHECK).
+    i18n ×24 both apps + backend. Review: `docs/reviews/admin-connections-review.md`.
 
   > **Ruling (AH-046/047, flaky-10 MT baseline):** new creator-facing copy gets a real
   > machine-translation baseline in **all 24 locales at merge time**, including the flaky 10

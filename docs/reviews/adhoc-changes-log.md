@@ -60,6 +60,47 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-051 · Admin-initiated agency↔creator connections + contact-gate fix + first termination path
+
+- **Status:** Landed (push HELD)
+- **Commits:** `98defa9` — `feat(creators): admin agency-creator connections + roster contact gate + disconnect (AH-051)`; docs commit (this entry) — `docs(creators): AH-051 review + change-log entry + tenancy allowlist + tech-debt`. Rides with Step 0 `c6b6cde` (`fix(identity): allow phone-on-LAN dev access to the admin SPA cookie`).
+- **Date:** 2026-07-24
+- **Why:** Admins had no way to broker an agency↔creator connection (e.g. an offline
+  representation agreement) or to end a relationship as a mediated exit. Separately, the
+  AH-005 contact gate was looser than the shipped consent promise: an agency merely holding
+  a `pending_request` could see the creator's contact details.
+- **What:** Three linked changes. (1) The contact gate TIGHTENS to roster-only —
+  `CreatorPolicy::canSeeContactDetails` now requires a non-blacklisted `roster` relation, so
+  `pending_request`/`declined`/`prospect`/`ended`/`external` no longer expose contact (a
+  read-only `relations:audit-contact-exposure` command reports the pre-deploy blast radius).
+  (2) A sixth `RelationshipStatus`, `ended` (severed-after-roster, re-requestable, never
+  messageable/contact-visible, excluded from the default roster), reached ONLY via the new
+  admin disconnect — the platform's first relation-termination path, which flips `roster →
+ended`, deletes the pair's pool memberships, and audits with a mandatory reason, all in one
+  transaction (campaign assignments deliberately survive). (3) Admin Creator-detail doors:
+  Door 1 (send-request, re-drives the agency flow), Door 2 (direct-connect, mandatory reason
+  - immediate creator notification), and a per-relation Disconnect — one mode-switched
+    `POST …/connections` + a `…/disconnect` route, all `runAs`-scoped. Accept was also
+    re-gated (approved + not hard-blacklisted). New audit verbs + notification types + two
+    localized mailables.
+- **Touched:** `apps/api` (RelationshipStatus enum, CreatorPolicy contact gate,
+  Creator/Agency connection controllers + re-gates, admin connection controller + two form
+  requests, AuditAction/NotificationType enums, two mailables + views, count command,
+  `lang/**/creators.php` ×24, tenancy.md §4), `packages/api-client` (`ended` union +
+  `deriveConnectionState` + spec), `apps/main` discover (chip + derive, `app.json` ×24,
+  specs), `apps/admin` creators module (CreatorDetailPage connections section + two dialogs
+  - api + `creators.json` ×24 + specs).
+- **Decisions:** No `ended` migration (plain varchar, no CHECK — enum + tripwire are the doc).
+  `is_discoverable` bypassed for admin (browsing preference, not eligibility); `approved`
+  binds both doors. Single `POST …/connections` with `mode`; 422 codes mode-distinct. One
+  direction-agnostic `RelationDisconnected` type. `ended` derives to a truthful "Previously
+  connected" (never silently to `none`). Pool-posture reversal recorded: blacklist =
+  warn-don't-remove vs disconnect = remove (coherent together). No D-8 marker column; D-10
+  `runAs` per §5.1. Creator-/agency-side disconnect deferred (tech-debt).
+- **Ref:** kickoff "Admin-initiated connections + contact-gate fix + first termination path";
+  review file [`admin-connections-review.md`](admin-connections-review.md); commit-pair
+  (this entry's landing commit).
+
 ### AH-050 · "Who appears in your content?" — optional companion multi-select on the creator profile
 
 - **Status:** Landed (push HELD)
