@@ -63,7 +63,9 @@ export default defineConfig({
     include: ['vuetify', 'vuetify/directives', ...vuetifyComponents],
   },
   server: {
-    host: '127.0.0.1',
+    // `true` binds 0.0.0.0 so a phone on the same LAN can hit the SPA
+    // (Vite still proxies /api + /sanctum to the local Laravel server).
+    host: true,
     port: 5173,
     strictPort: true,
     proxy: {

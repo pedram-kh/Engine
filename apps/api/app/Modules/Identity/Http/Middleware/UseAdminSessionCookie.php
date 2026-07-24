@@ -99,7 +99,10 @@ final class UseAdminSessionCookie
      * and on same-origin POSTs in modern browsers) or `Referer` (fallback
      * for the request shapes where Origin is suppressed, e.g. some
      * navigation-initiated GETs). Matches against the canonical admin SPA
-     * URL from `config('app.frontend_admin_url')`. Origin comparison
+     * URL from `config('app.frontend_admin_url')`, plus any
+     * `cors.allowed_origins` entry that shares the admin SPA's port
+     * (so a phone on the LAN via `FRONTEND_EXTRA_ORIGINS` still gets the
+     * admin session cookie on the CSRF preflight). Origin comparison
      * strips trailing slashes so both `http://127.0.0.1:5174` and
      * `http://127.0.0.1:5174/` count as the same host.
      *
@@ -109,13 +112,13 @@ final class UseAdminSessionCookie
      */
     private static function originIsAdminSpa(Request $request): bool
     {
-        $expected = self::normalise((string) config('app.frontend_admin_url', ''));
-        if ($expected === '') {
+        $allowed = self::adminSpaOrigins();
+        if ($allowed === []) {
             return false;
         }
 
         $rawOrigin = (string) $request->headers->get('Origin', '');
-        if ($rawOrigin !== '' && self::normalise($rawOrigin) === $expected) {
+        if ($rawOrigin !== '' && in_array(self::normalise($rawOrigin), $allowed, true)) {
             return true;
         }
 
@@ -132,7 +135,40 @@ final class UseAdminSessionCookie
         $port = isset($parts['port']) ? ':'.$parts['port'] : '';
         $reconstructed = $parts['scheme'].'://'.$parts['host'].$port;
 
-        return self::normalise($reconstructed) === $expected;
+        return in_array(self::normalise($reconstructed), $allowed, true);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function adminSpaOrigins(): array
+    {
+        $primary = self::normalise((string) config('app.frontend_admin_url', ''));
+        if ($primary === '') {
+            return [];
+        }
+
+        $origins = [$primary];
+        $adminPort = parse_url($primary, PHP_URL_PORT);
+
+        /** @var list<string> $corsOrigins */
+        $corsOrigins = config('cors.allowed_origins', []);
+
+        foreach ($corsOrigins as $candidate) {
+            $normalised = self::normalise((string) $candidate);
+            if ($normalised === '' || in_array($normalised, $origins, true)) {
+                continue;
+            }
+
+            // Same port as the admin SPA → treat as an admin origin
+            // (e.g. http://192.168.x.x:5174 from FRONTEND_EXTRA_ORIGINS).
+            // Main-SPA extras on 5173 are intentionally excluded.
+            if ($adminPort !== null && parse_url($normalised, PHP_URL_PORT) === $adminPort) {
+                $origins[] = $normalised;
+            }
+        }
+
+        return $origins;
     }
 
     private static function normalise(string $origin): string

@@ -95,6 +95,30 @@ it('shouldApply does NOT fire on /sanctum/csrf-cookie from the main SPA Origin',
     expect(UseAdminSessionCookie::shouldApply($request))->toBeFalse();
 });
 
+it('shouldApply fires on /sanctum/csrf-cookie from a LAN admin origin in FRONTEND_EXTRA_ORIGINS', function (): void {
+    // Phone-on-LAN access: Vite binds 0.0.0.0 and the phone hits
+    // http://192.168.x.x:5174. That origin is listed in
+    // FRONTEND_EXTRA_ORIGINS (→ cors.allowed_origins) and must get the
+    // admin session cookie on the CSRF preflight — matching on the
+    // admin SPA port, not the main SPA's 5173 entry.
+    config()->set('app.frontend_admin_url', 'http://127.0.0.1:5174');
+    config()->set('cors.allowed_origins', [
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174',
+        'http://192.168.1.133:5173',
+        'http://192.168.1.133:5174',
+    ]);
+
+    $adminLan = Request::create('/sanctum/csrf-cookie', 'GET');
+    $adminLan->headers->set('Origin', 'http://192.168.1.133:5174');
+
+    $mainLan = Request::create('/sanctum/csrf-cookie', 'GET');
+    $mainLan->headers->set('Origin', 'http://192.168.1.133:5173');
+
+    expect(UseAdminSessionCookie::shouldApply($adminLan))->toBeTrue()
+        ->and(UseAdminSessionCookie::shouldApply($mainLan))->toBeFalse();
+});
+
 it('shouldApply does NOT fire on /sanctum/csrf-cookie with no Origin and no Referer', function (): void {
     // A bare same-origin preflight without any browser-issued Origin
     // header (e.g. server-side health probes, curl without -e) must
