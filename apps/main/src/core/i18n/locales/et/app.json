@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Kõik",
+          "active": "Aktiivsed",
           "roster": "Roster",
           "prospect": "Prospect",
           "external": "External",
           "pending_request": "Ootel requests",
-          "declined": "Keeldud"
+          "declined": "Keeldud",
+          "ended": "Lõppenud"
         },
         "country": "Country",
         "language": "Keel",

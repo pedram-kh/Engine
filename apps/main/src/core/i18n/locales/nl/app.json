@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Alle",
+          "active": "Actief",
           "roster": "Roster",
           "prospect": "Prospects",
           "external": "Extern",
           "pending_request": "Openstaande verzoeken",
-          "declined": "Geweigerd"
+          "declined": "Geweigerd",
+          "ended": "Beëindigd"
         },
         "country": "Land",
         "language": "Taal",

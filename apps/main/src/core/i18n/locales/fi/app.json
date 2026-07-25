@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Kaikki",
+          "active": "Aktiiviset",
           "roster": "Roster",
           "prospect": "Prospect",
           "external": "External",
           "pending_request": "Odottaa requests",
-          "declined": "Kieltäydyd"
+          "declined": "Kieltäydyd",
+          "ended": "Päättyneet"
         },
         "country": "Country",
         "language": "Kieli",

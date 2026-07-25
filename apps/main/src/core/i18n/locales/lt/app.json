@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Visi",
+          "active": "Aktyvūs",
           "roster": "Roster",
           "prospect": "Prospect",
           "external": "External",
           "pending_request": "Laukiama requests",
-          "declined": "Atsisakytid"
+          "declined": "Atsisakytid",
+          "ended": "Pasibaigę"
         },
         "country": "Country",
         "language": "Kalba",

@@ -302,6 +302,30 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     })
   })
 
+  it('labels the default chip "Active" (not "All") and offers an `ended` chip', async () => {
+    // The default index deliberately hides pending_request/declined/ended, so
+    // the chip must NOT promise "All" — that read as missing data. And `ended`
+    // (AH-051 D-3) needs its own chip or those relations are unreachable.
+    const harness = await mountRoster({ rows: [makeRow()] })
+    cleanup = harness.cleanup
+
+    const chipLabels = (
+      harness.wrapper.vm as unknown as {
+        statusFilterItems: { label: string; value: string }[]
+      }
+    ).statusFilterItems
+
+    expect(chipLabels.find((c) => c.value === 'all')?.label).toBe('Active')
+    expect(chipLabels.some((c) => c.label === 'All')).toBe(false)
+    expect(chipLabels.find((c) => c.value === 'ended')?.label).toBe('Ended')
+
+    // The ended chip filters server-side like any other explicit status.
+    vi.mocked(rosterApi.list).mockClear()
+    ;(harness.wrapper.vm as unknown as { statusFilter: string }).statusFilter = 'ended'
+    await flushPromises()
+    expect(vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1]).toMatchObject({ status: 'ended' })
+  })
+
   it('shows the no-creators and no-match empty states', async () => {
     const harness = await mountRoster({ rows: [] })
     cleanup = harness.cleanup

@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Alle",
+          "active": "Aktive",
           "roster": "Roster",
           "prospect": "Potentielle",
           "external": "Eksterne",
           "pending_request": "Afventende anmodninger",
-          "declined": "Afvist"
+          "declined": "Afvist",
+          "ended": "Afsluttede"
         },
         "country": "Land",
         "language": "Sprog",

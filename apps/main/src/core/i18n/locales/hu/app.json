@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Összes",
+          "active": "Aktív",
           "roster": "Roster",
           "prospect": "Prospect",
           "external": "External",
           "pending_request": "Függőben requests",
-          "declined": "Elutasításd"
+          "declined": "Elutasításd",
+          "ended": "Befejezett"
         },
         "country": "Country",
         "language": "Nyelv",

@@ -112,16 +112,22 @@ const CATEGORY_FILTER_KEYS = [
   'other',
 ] as const
 
-// The two lifecycle-in-flight statuses (Sprint 6.6b, D-6) are EXCLUDED from
-// the default index but get their own chips here, so the agency can
-// deliberately filter to "my pending requests" / "who declined me".
+// The lifecycle-in-flight / severed statuses (Sprint 6.6b D-6, plus AH-051 D-3
+// for `ended`) are EXCLUDED from the default index but get their own chips
+// here, so the agency can deliberately filter to "my pending requests" /
+// "who declined me" / "relationships that ended".
+//
+// The default chip is therefore labelled "Active", NOT "All": it deliberately
+// shows only working relationships. Calling it "All" promised a total the
+// backend never returns, which read as missing data.
 const statusFilterItems: { label: string; value: StatusFilter }[] = [
-  { label: t('app.roster.filters.status.all'), value: 'all' },
+  { label: t('app.roster.filters.status.active'), value: 'all' },
   { label: t('app.roster.filters.status.roster'), value: 'roster' },
   { label: t('app.roster.filters.status.prospect'), value: 'prospect' },
   { label: t('app.roster.filters.status.external'), value: 'external' },
   { label: t('app.roster.filters.status.pending_request'), value: 'pending_request' },
   { label: t('app.roster.filters.status.declined'), value: 'declined' },
+  { label: t('app.roster.filters.status.ended'), value: 'ended' },
 ]
 
 const countryFilterItems = computed(() =>

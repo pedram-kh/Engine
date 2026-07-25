@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Toate",
+          "active": "Active",
           "roster": "Roster",
           "prospect": "Prospect",
           "external": "External",
           "pending_request": "În așteptare requests",
-          "declined": "Refuzațid"
+          "declined": "Refuzațid",
+          "ended": "Încheiate"
         },
         "country": "Country",
         "language": "Limbă",

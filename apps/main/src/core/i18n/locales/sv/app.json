@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Alla",
+          "active": "Aktiva",
           "roster": "Roster",
           "prospect": "Prospekt",
           "external": "Extern",
           "pending_request": "Väntande förfrågningar",
-          "declined": "Avböjda"
+          "declined": "Avböjda",
+          "ended": "Avslutade"
         },
         "country": "Land",
         "language": "Språk",

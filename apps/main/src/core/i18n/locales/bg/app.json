@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Всички",
+          "active": "Активни",
           "roster": "Roster",
           "prospect": "Prospect",
           "external": "External",
           "pending_request": "В изчакване requests",
-          "declined": "Отклонетеd"
+          "declined": "Отклонетеd",
+          "ended": "Прекратени"
         },
         "country": "Country",
         "language": "Език",

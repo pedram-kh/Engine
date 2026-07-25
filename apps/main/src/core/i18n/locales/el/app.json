@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Όλα",
+          "active": "Ενεργές",
           "roster": "Roster",
           "prospect": "Prospect",
           "external": "External",
           "pending_request": "Εκκρεμές requests",
-          "declined": "Άρνησηd"
+          "declined": "Άρνησηd",
+          "ended": "Ολοκληρωμένες"
         },
         "country": "Country",
         "language": "Γλώσσα",

@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Vsi",
+          "active": "Aktivni",
           "roster": "Zasedba",
           "prospect": "Prospekty",
           "external": "Externí",
           "pending_request": "V čakanju žádosti",
-          "declined": "Zavrnjené"
+          "declined": "Zavrnjené",
+          "ended": "Končani"
         },
         "country": "Země",
         "language": "Jazyk",

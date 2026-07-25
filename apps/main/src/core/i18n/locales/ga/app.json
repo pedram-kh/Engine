@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Gach",
+          "active": "Gníomhach",
           "roster": "Roster",
           "prospect": "Prospect",
           "external": "External",
           "pending_request": "Ar feitheamh requests",
-          "declined": "Diúltaighd"
+          "declined": "Diúltaighd",
+          "ended": "Críochnaithe"
         },
         "country": "Country",
         "language": "Teanga",

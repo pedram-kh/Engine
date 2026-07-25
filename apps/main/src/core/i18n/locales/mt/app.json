@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Kollox",
+          "active": "Attivi",
           "roster": "Roster",
           "prospect": "Prospect",
           "external": "External",
           "pending_request": "Pendenti requests",
-          "declined": "Irrifjutad"
+          "declined": "Irrifjutad",
+          "ended": "Mitmiema"
         },
         "country": "Country",
         "language": "Lingwa",

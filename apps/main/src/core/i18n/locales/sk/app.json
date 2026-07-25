@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Všetci",
+          "active": "Aktívne",
           "roster": "Roster",
           "prospect": "Prospekty",
           "external": "Externí",
           "pending_request": "Čakajúci žádosti",
-          "declined": "Odmietnutýé"
+          "declined": "Odmietnutýé",
+          "ended": "Ukončené"
         },
         "country": "Země",
         "language": "Jazyk",

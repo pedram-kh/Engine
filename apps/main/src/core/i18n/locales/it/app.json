@@ -232,12 +232,13 @@
       },
       "filters": {
         "status": {
-          "all": "Tutti",
+          "active": "Attive",
           "roster": "Roster",
           "prospect": "Potenziale",
           "external": "Esterno",
           "pending_request": "Richieste in attesa",
-          "declined": "Rifiutate"
+          "declined": "Rifiutate",
+          "ended": "Terminate"
         },
         "country": "Paese",
         "language": "Lingua",
