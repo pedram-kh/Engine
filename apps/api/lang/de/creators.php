@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Sie sind jetzt mit :agency auf Catalyst verbunden',
             'greeting' => 'Hallo :name,',
-            'body' => 'Ein Catalyst-Administrator hat Sie auf der Plattform mit :agency verbunden. :agency kann nun Ihr Profil sehen und Ihnen Nachrichten senden.',
+            'body' => 'Ein Catalyst-Administrator hat Sie auf der Plattform mit :agency verbunden.',
             'unexpected' => 'Falls diese Verbindung unerwartet ist, wenden Sie sich bitte an den Catalyst-Support.',
             'cta' => 'Zu Ihrem Dashboard',
         ],

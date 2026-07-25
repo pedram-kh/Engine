@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Dabar esate susieti su :agency platformoje Catalyst',
             'greeting' => 'Sveiki, :name,',
-            'body' => 'Catalyst administratorius susiejo jus su :agency platformoje. :agency dabar gali matyti jūsų profilį ir siųsti jums žinutes.',
+            'body' => 'Catalyst administratorius susiejo jus su :agency platformoje.',
             'unexpected' => 'Jei šis ryšys netikėtas, kreipkitės į Catalyst palaikymo komandą.',
             'cta' => 'Eiti į savo skydelį',
         ],

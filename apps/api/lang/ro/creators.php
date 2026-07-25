@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Acum ești conectat cu :agency pe Catalyst',
             'greeting' => 'Bună :name,',
-            'body' => 'Un administrator Catalyst te-a conectat cu :agency pe platformă. :agency îți poate vedea acum profilul și îți poate trimite mesaje.',
+            'body' => 'Un administrator Catalyst te-a conectat cu :agency pe platformă.',
             'unexpected' => 'Dacă această conexiune este neașteptată, contactează echipa de asistență Catalyst.',
             'cta' => 'Mergi la panoul tău',
         ],

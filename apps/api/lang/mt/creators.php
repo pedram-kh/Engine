@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Issa inti konness ma\' :agency fuq Catalyst',
             'greeting' => 'Bonġu :name,',
-            'body' => 'Amministratur ta\' Catalyst qabbadk ma\' :agency fuq il-pjattaforma. :agency issa jista\' jara l-profil tiegħek u jibgħatlek messaġġi.',
+            'body' => 'Amministratur ta\' Catalyst qabbadk ma\' :agency fuq il-pjattaforma.',
             'unexpected' => 'Jekk din il-konnessjoni mhux mistennija, jekk jogħġbok ikkuntattja lis-sapport ta\' Catalyst.',
             'cta' => 'Mur fid-dashboard tiegħek',
         ],

@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Sinut on nyt yhdistetty agentuuriin :agency Catalystissa',
             'greeting' => 'Hei :name,',
-            'body' => 'Catalystin ylläpitäjä on yhdistänyt sinut agentuuriin :agency alustalla. :agency näkee nyt profiilisi ja voi lähettää sinulle viestejä.',
+            'body' => 'Catalystin ylläpitäjä on yhdistänyt sinut agentuuriin :agency alustalla.',
             'unexpected' => 'Jos tämä yhteys on odottamaton, ota yhteyttä Catalystin tukeen.',
             'cta' => 'Siirry hallintapaneeliin',
         ],

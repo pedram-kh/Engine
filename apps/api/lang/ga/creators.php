@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Tá tú ceangailte le :agency ar Catalyst anois',
             'greeting' => 'Dia duit :name,',
-            'body' => 'Cheangail riarthóir Catalyst thú le :agency ar an ardán. Is féidir le :agency do phróifíl a fheiceáil agus teachtaireachtaí a sheoladh chugat anois.',
+            'body' => 'Cheangail riarthóir Catalyst thú le :agency ar an ardán.',
             'unexpected' => 'Má tá an ceangal seo gan choinne, déan teagmháil le tacaíocht Catalyst le do thoil.',
             'cta' => 'Téigh chuig do dheais',
         ],
