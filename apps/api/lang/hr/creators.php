@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Sada ste povezani s :agency na Catalystu',
             'greeting' => 'Pozdrav :name,',
-            'body' => 'Administrator Catalysta povezao vas je s :agency na platformi na temelju dogovora postignutog izvan Catalysta. :agency sada može vidjeti vaš profil i slati vam poruke.',
+            'body' => 'Administrator Catalysta povezao vas je s :agency na platformi. :agency sada može vidjeti vaš profil i slati vam poruke.',
             'unexpected' => 'Ako je ova veza neočekivana, obratite se podršci Catalysta.',
             'cta' => 'Idite na svoju nadzornu ploču',
         ],

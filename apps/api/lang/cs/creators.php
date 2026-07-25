@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Nyní jste propojeni s :agency na Catalyst',
             'greeting' => 'Dobrý den :name,',
-            'body' => 'Administrátor Catalyst vás propojil s :agency na platformě na základě dohody uzavřené mimo Catalyst. :agency nyní vidí váš profil a může vám psát.',
+            'body' => 'Administrátor Catalyst vás propojil s :agency na platformě. :agency nyní vidí váš profil a může vám psát.',
             'unexpected' => 'Pokud je toto propojení neočekávané, kontaktujte prosím podporu Catalyst.',
             'cta' => 'Přejít na váš přehled',
         ],

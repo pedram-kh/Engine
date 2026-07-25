@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Je bent nu verbonden met :agency op Catalyst',
             'greeting' => 'Hallo :name,',
-            'body' => 'Een Catalyst-beheerder heeft je op het platform verbonden met :agency, op basis van een buiten Catalyst gemaakte afspraak. :agency kan nu je profiel zien en je berichten sturen.',
+            'body' => 'Een Catalyst-beheerder heeft je op het platform verbonden met :agency. :agency kan nu je profiel zien en je berichten sturen.',
             'unexpected' => 'Als deze verbinding onverwacht is, neem dan contact op met de Catalyst-ondersteuning.',
             'cta' => 'Ga naar je dashboard',
         ],

@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Du är nu ansluten till :agency på Catalyst',
             'greeting' => 'Hej :name,',
-            'body' => 'En Catalyst-administratör har anslutit dig till :agency på plattformen, baserat på en överenskommelse utanför Catalyst. :agency kan nu se din profil och skicka meddelanden till dig.',
+            'body' => 'En Catalyst-administratör har anslutit dig till :agency på plattformen. :agency kan nu se din profil och skicka meddelanden till dig.',
             'unexpected' => 'Om denna anslutning är oväntad, kontakta Catalyst-supporten.',
             'cta' => 'Gå till din instrumentpanel',
         ],

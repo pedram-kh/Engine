@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Ahora estás conectado con :agency en Catalyst',
             'greeting' => 'Hola :name,',
-            'body' => 'Un administrador de Catalyst te ha conectado con :agency en la plataforma, según un acuerdo alcanzado fuera de Catalyst. :agency ya puede ver tu perfil y enviarte mensajes.',
+            'body' => 'Un administrador de Catalyst te ha conectado con :agency en la plataforma. :agency ya puede ver tu perfil y enviarte mensajes.',
             'unexpected' => 'Si esta conexión es inesperada, ponte en contacto con el soporte de Catalyst.',
             'cta' => 'Ir a tu panel',
         ],

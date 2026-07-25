@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Tagad esat saistīts ar :agency platformā Catalyst',
             'greeting' => 'Sveiki, :name,',
-            'body' => 'Catalyst administrators ir saistījis jūs ar :agency platformā, pamatojoties uz vienošanos, kas panākta ārpus Catalyst. :agency tagad var redzēt jūsu profilu un sūtīt jums ziņas.',
+            'body' => 'Catalyst administrators ir saistījis jūs ar :agency platformā. :agency tagad var redzēt jūsu profilu un sūtīt jums ziņas.',
             'unexpected' => 'Ja šis savienojums ir negaidīts, lūdzu, sazinieties ar Catalyst atbalsta dienestu.',
             'cta' => 'Doties uz jūsu paneli',
         ],

@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Most már kapcsolatban áll a következővel: :agency a Catalyston',
             'greeting' => 'Üdvözöljük, :name!',
-            'body' => 'A Catalyst adminisztrátora összekapcsolta Önt a(z) :agency ügynökséggel a platformon, a Catalyston kívül kötött megállapodás alapján. A(z) :agency mostantól láthatja a profilját, és üzenetet küldhet Önnek.',
+            'body' => 'A Catalyst adminisztrátora összekapcsolta Önt a(z) :agency ügynökséggel a platformon. A(z) :agency mostantól láthatja a profilját, és üzenetet küldhet Önnek.',
             'unexpected' => 'Ha ez a kapcsolat váratlan, kérjük, forduljon a Catalyst ügyfélszolgálatához.',
             'cta' => 'Ugrás az irányítópultra',
         ],

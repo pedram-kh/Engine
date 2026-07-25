@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Olete nüüd Catalystis ühendatud agentuuriga :agency',
             'greeting' => 'Tere :name,',
-            'body' => 'Catalysti administraator ühendas teid platvormil agentuuriga :agency väljaspool Catalysti sõlmitud kokkuleppe alusel. :agency näeb nüüd teie profiili ja saab teile sõnumeid saata.',
+            'body' => 'Catalysti administraator ühendas teid platvormil agentuuriga :agency. :agency näeb nüüd teie profiili ja saab teile sõnumeid saata.',
             'unexpected' => 'Kui see ühendus on ootamatu, võtke ühendust Catalysti toega.',
             'cta' => 'Ava oma töölaud',
         ],

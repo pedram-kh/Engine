@@ -44,7 +44,7 @@ return [
         'email' => [
             'subject' => 'Zdaj ste povezani z :agency na Catalystu',
             'greeting' => 'Pozdravljeni, :name,',
-            'body' => 'Skrbnik Catalysta vas je povezal z :agency na platformi na podlagi dogovora, sklenjenega zunaj Catalysta. :agency lahko zdaj vidi vaš profil in vam pošilja sporočila.',
+            'body' => 'Skrbnik Catalysta vas je povezal z :agency na platformi. :agency lahko zdaj vidi vaš profil in vam pošilja sporočila.',
             'unexpected' => 'Če je ta povezava nepričakovana, se obrnite na podporo Catalyst.',
             'cta' => 'Pojdite na svojo nadzorno ploščo',
         ],

@@ -45,7 +45,7 @@ return [
         'email' => [
             'subject' => 'You are now connected with :agency on Catalyst',
             'greeting' => 'Hi :name,',
-            'body' => 'A Catalyst administrator has connected you with :agency on the platform, based on an agreement made outside Catalyst. :agency can now see your roster profile and message you.',
+            'body' => 'A Catalyst administrator has connected you with :agency on the platform. :agency can now see your roster profile and message you.',
             'unexpected' => 'If this connection is unexpected, please contact Catalyst support.',
             'cta' => 'Go to your dashboard',
         ],
