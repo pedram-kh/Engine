@@ -196,7 +196,10 @@
             "success_re_requested": "Zahtjev za povezivanje ponovno poslan.",
             "success_direct": "Kreator povezan.",
             "success_noop": "Nema promjene — ta veza već postoji.",
-            "failed": "Nismo mogli stvoriti ovu vezu. Pokušajte ponovno."
+            "failed": "Nismo mogli stvoriti ovu vezu. Pokušajte ponovno.",
+            "not_approved_warning": "Ovaj kreator još nije odobren i ne može se povezati s agencijom. Najprije odobrite njegovu prijavu.",
+            "error_not_approved": "Ovaj kreator još nije odobren. Odobrite njegovu prijavu prije povezivanja s agencijom.",
+            "error_blacklisted": "Ovaj par kreator–agencija nalazi se na crnoj listi, pa se veza ne može stvoriti."
           },
           "disconnect": {
             "title": "Prekinuti vezu {name} s {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Prekini vezu",
             "cancel": "Odustani",
             "success": "Odnos završen.",
-            "failed": "Nismo mogli prekinuti ovaj odnos. Pokušajte ponovno."
+            "failed": "Nismo mogli prekinuti ovaj odnos. Pokušajte ponovno.",
+            "error_not_disconnectable": "Ne postoji aktivna veza s ovom agencijom koja bi se mogla prekinuti."
           }
         }
       }

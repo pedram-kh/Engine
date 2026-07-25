@@ -196,7 +196,10 @@
             "success_re_requested": "Verbindingsverzoek opnieuw verzonden.",
             "success_direct": "Creator verbonden.",
             "success_noop": "Geen wijziging — die verbinding bestaat al.",
-            "failed": "We konden deze verbinding niet maken. Probeer het opnieuw."
+            "failed": "We konden deze verbinding niet maken. Probeer het opnieuw.",
+            "not_approved_warning": "Deze creator is nog niet goedgekeurd en kan niet met een bureau worden verbonden. Keur eerst de aanmelding goed.",
+            "error_not_approved": "Deze creator is nog niet goedgekeurd. Keur de aanmelding goed voordat je hem met een bureau verbindt.",
+            "error_blacklisted": "Dit creator-bureau-paar staat op de zwarte lijst, dus er kan geen verbinding worden gemaakt."
           },
           "disconnect": {
             "title": "{name} loskoppelen van {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Verbreken",
             "cancel": "Annuleren",
             "success": "Relatie beëindigd.",
-            "failed": "We konden deze relatie niet verbreken. Probeer het opnieuw."
+            "failed": "We konden deze relatie niet verbreken. Probeer het opnieuw.",
+            "error_not_disconnectable": "Er is geen actieve verbinding met dit bureau om te verbreken."
           }
         }
       }

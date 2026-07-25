@@ -196,7 +196,10 @@
             "success_re_requested": "Kapcsolódási kérés újraküldve.",
             "success_direct": "Alkotó csatlakoztatva.",
             "success_noop": "Nincs változás — ez a kapcsolat már létezik.",
-            "failed": "Nem sikerült létrehozni ezt a kapcsolatot. Próbálja újra."
+            "failed": "Nem sikerült létrehozni ezt a kapcsolatot. Próbálja újra.",
+            "not_approved_warning": "Ezt az alkotót még nem hagyták jóvá, ezért nem kapcsolható ügynökséghez. Először hagyja jóvá a jelentkezését.",
+            "error_not_approved": "Ezt az alkotót még nem hagyták jóvá. Hagyja jóvá a jelentkezését, mielőtt ügynökséghez kapcsolná.",
+            "error_blacklisted": "Ez az alkotó–ügynökség páros feketelistán van, ezért nem hozható létre kapcsolat."
           },
           "disconnect": {
             "title": "Leválasztja {name} alkotót a következőről: {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Leválasztás",
             "cancel": "Mégse",
             "success": "Kapcsolat lezárva.",
-            "failed": "Nem sikerült leválasztani ezt a kapcsolatot. Próbálja újra."
+            "failed": "Nem sikerült leválasztani ezt a kapcsolatot. Próbálja újra.",
+            "error_not_disconnectable": "Nincs aktív kapcsolat ezzel az ügynökséggel, amelyet meg lehetne szüntetni."
           }
         }
       }

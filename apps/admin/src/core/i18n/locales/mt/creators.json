@@ -196,7 +196,10 @@
             "success_re_requested": "Talba għal konnessjoni mibgħuta mill-ġdid.",
             "success_direct": "Kreatur konness.",
             "success_noop": "Ebda bidla — dik il-konnessjoni diġà teżisti.",
-            "failed": "Ma stajniex noħolqu din il-konnessjoni. Erġa' pprova."
+            "failed": "Ma stajniex noħolqu din il-konnessjoni. Erġa' pprova.",
+            "not_approved_warning": "Dan il-kreatur għadu ma ġiex approvat u ma jistax jiġi mgħaqqad ma' aġenzija. L-ewwel approva l-applikazzjoni tiegħu.",
+            "error_not_approved": "Dan il-kreatur għadu ma ġiex approvat. Approva l-applikazzjoni tiegħu qabel ma tgħaqqdu ma' aġenzija.",
+            "error_blacklisted": "Dan il-par kreatur–aġenzija jinsab fuq il-lista s-sewda, għalhekk ma tistax tinħoloq konnessjoni."
           },
           "disconnect": {
             "title": "Taqta' l-konnessjoni ta' {name} minn {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Aqta' l-konnessjoni",
             "cancel": "Ikkanċella",
             "success": "Relazzjoni ntemmet.",
-            "failed": "Ma stajniex naqtgħu l-konnessjoni ta' din ir-relazzjoni. Erġa' pprova."
+            "failed": "Ma stajniex naqtgħu l-konnessjoni ta' din ir-relazzjoni. Erġa' pprova.",
+            "error_not_disconnectable": "M'hemm l-ebda konnessjoni attiva ma' din l-aġenzija x'tinqata'."
           }
         }
       }

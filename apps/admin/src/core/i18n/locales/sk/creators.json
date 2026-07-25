@@ -196,7 +196,10 @@
             "success_re_requested": "Žiadosť o prepojenie odoslaná znova.",
             "success_direct": "Tvorca prepojený.",
             "success_noop": "Žiadna zmena — toto prepojenie už existuje.",
-            "failed": "Toto prepojenie sa nepodarilo vytvoriť. Skúste to znova."
+            "failed": "Toto prepojenie sa nepodarilo vytvoriť. Skúste to znova.",
+            "not_approved_warning": "Tento tvorca ešte nebol schválený a nemožno ho prepojiť s agentúrou. Najprv schváľte jeho prihlášku.",
+            "error_not_approved": "Tento tvorca ešte nebol schválený. Pred prepojením s agentúrou schváľte jeho prihlášku.",
+            "error_blacklisted": "Táto dvojica tvorca–agentúra je na čiernej listine, spojenie preto nemožno vytvoriť."
           },
           "disconnect": {
             "title": "Odpojiť {name} od {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Odpojiť",
             "cancel": "Zrušiť",
             "success": "Vzťah ukončený.",
-            "failed": "Tento vzťah sa nepodarilo odpojiť. Skúste to znova."
+            "failed": "Tento vzťah sa nepodarilo odpojiť. Skúste to znova.",
+            "error_not_disconnectable": "S touto agentúrou neexistuje žiadne aktívne spojenie, ktoré by bolo možné ukončiť."
           }
         }
       }

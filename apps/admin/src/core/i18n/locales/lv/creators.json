@@ -196,7 +196,10 @@
             "success_re_requested": "Savienojuma pieprasījums nosūtīts atkārtoti.",
             "success_direct": "Veidotājs savienots.",
             "success_noop": "Nav izmaiņu — šis savienojums jau pastāv.",
-            "failed": "Neizdevās izveidot šo savienojumu. Mēģiniet vēlreiz."
+            "failed": "Neizdevās izveidot šo savienojumu. Mēģiniet vēlreiz.",
+            "not_approved_warning": "Šis satura veidotājs vēl nav apstiprināts, un viņu nevar savienot ar aģentūru. Vispirms apstipriniet viņa pieteikumu.",
+            "error_not_approved": "Šis satura veidotājs vēl nav apstiprināts. Apstipriniet viņa pieteikumu, pirms savienojat viņu ar aģentūru.",
+            "error_blacklisted": "Šis satura veidotāja un aģentūras pāris ir melnajā sarakstā, tāpēc savienojumu nevar izveidot."
           },
           "disconnect": {
             "title": "Atvienot {name} no {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Atvienot",
             "cancel": "Atcelt",
             "success": "Attiecības izbeigtas.",
-            "failed": "Neizdevās atvienot šīs attiecības. Mēģiniet vēlreiz."
+            "failed": "Neizdevās atvienot šīs attiecības. Mēģiniet vēlreiz.",
+            "error_not_disconnectable": "Ar šo aģentūru nav aktīva savienojuma, ko atvienot."
           }
         }
       }

@@ -196,7 +196,10 @@
             "success_re_requested": "Demande de connexion renvoyée.",
             "success_direct": "Créateur connecté.",
             "success_noop": "Aucun changement — cette connexion existe déjà.",
-            "failed": "Impossible de créer cette connexion. Veuillez réessayer."
+            "failed": "Impossible de créer cette connexion. Veuillez réessayer.",
+            "not_approved_warning": "Ce créateur n'a pas encore été approuvé et ne peut pas être connecté à une agence. Approuvez d'abord sa candidature.",
+            "error_not_approved": "Ce créateur n'a pas encore été approuvé. Approuvez sa candidature avant de le connecter à une agence.",
+            "error_blacklisted": "Ce duo créateur–agence est sur liste noire, la connexion ne peut donc pas être créée."
           },
           "disconnect": {
             "title": "Déconnecter {name} de {agency} ?",
@@ -206,7 +209,8 @@
             "confirm": "Déconnecter",
             "cancel": "Annuler",
             "success": "Relation terminée.",
-            "failed": "Impossible de déconnecter cette relation. Veuillez réessayer."
+            "failed": "Impossible de déconnecter cette relation. Veuillez réessayer.",
+            "error_not_disconnectable": "Il n'y a aucune connexion active avec cette agence à déconnecter."
           }
         }
       }

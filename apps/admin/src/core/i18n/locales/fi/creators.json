@@ -196,7 +196,10 @@
             "success_re_requested": "Yhteyspyyntö lähetetty uudelleen.",
             "success_direct": "Luoja yhdistetty.",
             "success_noop": "Ei muutosta — kyseinen yhteys on jo olemassa.",
-            "failed": "Tätä yhteyttä ei voitu luoda. Yritä uudelleen."
+            "failed": "Tätä yhteyttä ei voitu luoda. Yritä uudelleen.",
+            "not_approved_warning": "Tätä sisällöntekijää ei ole vielä hyväksytty, eikä häntä voi yhdistää toimistoon. Hyväksy hakemus ensin.",
+            "error_not_approved": "Tätä sisällöntekijää ei ole vielä hyväksytty. Hyväksy hakemus ennen kuin yhdistät hänet toimistoon.",
+            "error_blacklisted": "Tämä tekijä–toimisto-pari on estolistalla, joten yhteyttä ei voi luoda."
           },
           "disconnect": {
             "title": "Katkaistaanko {name} toimistosta {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Katkaise yhteys",
             "cancel": "Peruuta",
             "success": "Suhde päättyi.",
-            "failed": "Tätä suhdetta ei voitu katkaista. Yritä uudelleen."
+            "failed": "Tätä suhdetta ei voitu katkaista. Yritä uudelleen.",
+            "error_not_disconnectable": "Tähän toimistoon ei ole aktiivista yhteyttä, jonka voisi katkaista."
           }
         }
       }

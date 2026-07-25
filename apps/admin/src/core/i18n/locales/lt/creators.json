@@ -196,7 +196,10 @@
             "success_re_requested": "Prašymas susieti išsiųstas dar kartą.",
             "success_direct": "Kūrėjas susietas.",
             "success_noop": "Jokių pakeitimų — šis ryšys jau egzistuoja.",
-            "failed": "Nepavyko sukurti šio ryšio. Bandykite dar kartą."
+            "failed": "Nepavyko sukurti šio ryšio. Bandykite dar kartą.",
+            "not_approved_warning": "Šis kūrėjas dar nepatvirtintas ir negali būti susietas su agentūra. Pirmiausia patvirtinkite jo paraišką.",
+            "error_not_approved": "Šis kūrėjas dar nepatvirtintas. Prieš susiedami jį su agentūra, patvirtinkite jo paraišką.",
+            "error_blacklisted": "Ši kūrėjo ir agentūros pora yra juodajame sąraše, todėl ryšio sukurti negalima."
           },
           "disconnect": {
             "title": "Atsieti {name} nuo {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Atsieti",
             "cancel": "Atšaukti",
             "success": "Santykis užbaigtas.",
-            "failed": "Nepavyko atsieti šio santykio. Bandykite dar kartą."
+            "failed": "Nepavyko atsieti šio santykio. Bandykite dar kartą.",
+            "error_not_disconnectable": "Su šia agentūra nėra aktyvaus ryšio, kurį būtų galima nutraukti."
           }
         }
       }

@@ -196,7 +196,10 @@
             "success_re_requested": "Cerere de conexiune trimisă din nou.",
             "success_direct": "Creator conectat.",
             "success_noop": "Nicio schimbare — acea conexiune există deja.",
-            "failed": "Nu am putut crea această conexiune. Încearcă din nou."
+            "failed": "Nu am putut crea această conexiune. Încearcă din nou.",
+            "not_approved_warning": "Acest creator nu a fost încă aprobat și nu poate fi conectat la o agenție. Aprobați-i mai întâi candidatura.",
+            "error_not_approved": "Acest creator nu a fost încă aprobat. Aprobați-i candidatura înainte de a-l conecta la o agenție.",
+            "error_blacklisted": "Această pereche creator–agenție este pe lista neagră, așa că nu se poate crea o conexiune."
           },
           "disconnect": {
             "title": "Deconectezi {name} de la {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Deconectează",
             "cancel": "Anulează",
             "success": "Relație încheiată.",
-            "failed": "Nu am putut deconecta această relație. Încearcă din nou."
+            "failed": "Nu am putut deconecta această relație. Încearcă din nou.",
+            "error_not_disconnectable": "Nu există nicio conexiune activă cu această agenție de deconectat."
           }
         }
       }

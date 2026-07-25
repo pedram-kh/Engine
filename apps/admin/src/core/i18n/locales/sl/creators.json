@@ -196,7 +196,10 @@
             "success_re_requested": "Zahteva za povezavo znova poslana.",
             "success_direct": "Ustvarjalec povezan.",
             "success_noop": "Ni sprememb — ta povezava že obstaja.",
-            "failed": "Te povezave ni bilo mogoče ustvariti. Poskusite znova."
+            "failed": "Te povezave ni bilo mogoče ustvariti. Poskusite znova.",
+            "not_approved_warning": "Ta ustvarjalec še ni odobren in ga ni mogoče povezati z agencijo. Najprej odobrite njegovo prijavo.",
+            "error_not_approved": "Ta ustvarjalec še ni odobren. Pred povezavo z agencijo odobrite njegovo prijavo.",
+            "error_blacklisted": "Ta par ustvarjalec–agencija je na črnem seznamu, zato povezave ni mogoče ustvariti."
           },
           "disconnect": {
             "title": "Prekiniti povezavo {name} z {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Prekini povezavo",
             "cancel": "Prekliči",
             "success": "Odnos končan.",
-            "failed": "Tega odnosa ni bilo mogoče prekiniti. Poskusite znova."
+            "failed": "Tega odnosa ni bilo mogoče prekiniti. Poskusite znova.",
+            "error_not_disconnectable": "S to agencijo ni aktivne povezave, ki bi jo bilo mogoče prekiniti."
           }
         }
       }

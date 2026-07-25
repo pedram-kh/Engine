@@ -46,6 +46,7 @@ function mountDialog(
     creatorDisplayName: string
     agencies: ReadonlyArray<AgencyOption>
     isSearching: boolean
+    creatorIsApproved: boolean
   }> = {},
 ): VueWrapper<InstanceType<typeof ConnectToAgencyDialog>> {
   const i18n = buildI18n()
@@ -61,6 +62,7 @@ function mountDialog(
       creatorDisplayName: props.creatorDisplayName ?? 'Jane Doe',
       agencies: props.agencies ?? AGENCIES,
       isSearching: props.isSearching ?? false,
+      creatorIsApproved: props.creatorIsApproved ?? true,
     },
     global: { plugins: [i18n, vuetify] },
     attachTo: document.createElement('div'),
@@ -159,6 +161,48 @@ describe('ConnectToAgencyDialog', () => {
     await flushPromises()
     const searchEvents = wrapper.emitted('search') as string[][] | undefined
     expect(searchEvents?.some((call) => call[0] === 'nova')).toBe(true)
+  })
+
+  it('keeps rendering the selected agency NAME after the search results reset', async () => {
+    // Selecting an agency clears the search input, which resets the parent's
+    // `agencies` to []. Without the selected-option merge the autocomplete
+    // would fall back to displaying the raw ULID.
+    wrapper = mountDialog()
+    await flushPromises()
+    wrapper.vm.selectedAgencyId = AGENCIES[0]!.ulid
+    await flushPromises()
+
+    await wrapper.setProps({ agencies: [] })
+    await flushPromises()
+
+    const items = (wrapper.vm as unknown as { agencyItems: { title: string; value: string }[] })
+      .agencyItems
+    expect(items).toContainEqual({ title: 'Nova Talent', value: AGENCIES[0]!.ulid })
+    // And the field's rendered selection is the NAME, not the ULID.
+    expect(document.body.textContent).toContain('Nova Talent')
+  })
+
+  it('unapproved creator → warning alert shown and confirm disabled even with a valid selection', async () => {
+    wrapper = mountDialog({ creatorIsApproved: false })
+    await flushPromises()
+
+    const alert = document.body.querySelector(
+      '[data-testid="admin-creator-connect-dialog-not-approved"]',
+    )
+    expect(alert?.textContent).toContain("This creator hasn't been approved yet")
+
+    // Even a fully valid form stays blocked — the backend would 422 anyway.
+    wrapper.vm.selectedAgencyId = AGENCIES[0]!.ulid
+    await flushPromises()
+    expect(confirmBtn().disabled).toBe(true)
+  })
+
+  it('approved creator → no warning alert', async () => {
+    wrapper = mountDialog({ creatorIsApproved: true })
+    await flushPromises()
+    expect(
+      document.body.querySelector('[data-testid="admin-creator-connect-dialog-not-approved"]'),
+    ).toBeNull()
   })
 
   it('emits cancel + closes when the cancel button is clicked', async () => {

@@ -196,7 +196,10 @@
             "success_re_requested": "Pedido de conexão enviado novamente.",
             "success_direct": "Criador conectado.",
             "success_noop": "Sem alterações — essa conexão já existe.",
-            "failed": "Não foi possível criar esta conexão. Tente novamente."
+            "failed": "Não foi possível criar esta conexão. Tente novamente.",
+            "not_approved_warning": "Este criador ainda não foi aprovado e não pode ser ligado a uma agência. Aprove primeiro a candidatura.",
+            "error_not_approved": "Este criador ainda não foi aprovado. Aprove a candidatura antes de o ligar a uma agência.",
+            "error_blacklisted": "Este par criador–agência está na lista negra, pelo que não é possível criar uma ligação."
           },
           "disconnect": {
             "title": "Desconectar {name} de {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Desconectar",
             "cancel": "Cancelar",
             "success": "Relação terminada.",
-            "failed": "Não foi possível desconectar esta relação. Tente novamente."
+            "failed": "Não foi possível desconectar esta relação. Tente novamente.",
+            "error_not_disconnectable": "Não existe nenhuma ligação ativa com esta agência para desligar."
           }
         }
       }

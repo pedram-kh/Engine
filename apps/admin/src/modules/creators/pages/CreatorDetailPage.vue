@@ -572,6 +572,21 @@ const CONNECT_SUCCESS_KEY: Record<string, string> = {
   'connection.already_requested': 'admin.creators.detail.connections.connect.success_noop',
 }
 
+// Backend 422 codes → localized messages. Without this map the raw code
+// (e.g. `connection.creator_not_approved`) would be handed to `t()` as if it
+// were an i18n key and rendered literally. Unknown codes fall back to the
+// generic `failed` message.
+const CONNECT_ERROR_KEY: Record<string, string> = {
+  'connection.creator_not_approved': 'admin.creators.detail.connections.connect.error_not_approved',
+  'connection.request_blacklisted': 'admin.creators.detail.connections.connect.error_blacklisted',
+  'connection.direct_blacklisted': 'admin.creators.detail.connections.connect.error_blacklisted',
+}
+
+const DISCONNECT_ERROR_KEY: Record<string, string> = {
+  'connection.not_disconnectable':
+    'admin.creators.detail.connections.disconnect.error_not_disconnectable',
+}
+
 async function handleConnectConfirm(payload: {
   agencyId: string
   mode: AdminConnectionMode
@@ -590,7 +605,9 @@ async function handleConnectConfirm(payload: {
     await loadConnections()
   } catch (error) {
     connectErrorKey.value =
-      error instanceof ApiError ? error.code : 'admin.creators.detail.connections.connect.failed'
+      error instanceof ApiError
+        ? (CONNECT_ERROR_KEY[error.code] ?? 'admin.creators.detail.connections.connect.failed')
+        : 'admin.creators.detail.connections.connect.failed'
   } finally {
     isConnecting.value = false
   }
@@ -632,7 +649,10 @@ async function handleDisconnectConfirm(payload: { reason: string }): Promise<voi
     await loadConnections()
   } catch (error) {
     disconnectErrorKey.value =
-      error instanceof ApiError ? error.code : 'admin.creators.detail.connections.disconnect.failed'
+      error instanceof ApiError
+        ? (DISCONNECT_ERROR_KEY[error.code] ??
+          'admin.creators.detail.connections.disconnect.failed')
+        : 'admin.creators.detail.connections.disconnect.failed'
   } finally {
     isDisconnecting.value = false
   }
@@ -1224,6 +1244,7 @@ const decisionSnackbarColor = computed(() =>
       :is-saving="isConnecting"
       :error-key="connectErrorKey"
       :creator-display-name="creatorDisplayName"
+      :creator-is-approved="applicationStatus === 'approved'"
       :agencies="agencyResults"
       :is-searching="isSearchingAgencies"
       @search="handleAgencySearch"

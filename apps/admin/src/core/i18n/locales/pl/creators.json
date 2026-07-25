@@ -196,7 +196,10 @@
             "success_re_requested": "Prośba o połączenie wysłana ponownie.",
             "success_direct": "Twórca połączony.",
             "success_noop": "Brak zmian — to połączenie już istnieje.",
-            "failed": "Nie udało się utworzyć tego połączenia. Spróbuj ponownie."
+            "failed": "Nie udało się utworzyć tego połączenia. Spróbuj ponownie.",
+            "not_approved_warning": "Ten twórca nie został jeszcze zatwierdzony i nie można go połączyć z agencją. Najpierw zatwierdź jego zgłoszenie.",
+            "error_not_approved": "Ten twórca nie został jeszcze zatwierdzony. Zatwierdź jego zgłoszenie, zanim połączysz go z agencją.",
+            "error_blacklisted": "Ta para twórca–agencja znajduje się na czarnej liście, więc nie można utworzyć połączenia."
           },
           "disconnect": {
             "title": "Rozłączyć {name} z {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Rozłącz",
             "cancel": "Anuluj",
             "success": "Relacja zakończona.",
-            "failed": "Nie udało się rozłączyć tej relacji. Spróbuj ponownie."
+            "failed": "Nie udało się rozłączyć tej relacji. Spróbuj ponownie.",
+            "error_not_disconnectable": "Nie ma aktywnego połączenia z tą agencją, które można by rozłączyć."
           }
         }
       }

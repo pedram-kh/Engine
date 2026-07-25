@@ -196,7 +196,10 @@
             "success_re_requested": "Connection request sent again.",
             "success_direct": "Creator connected.",
             "success_noop": "No change — that connection already exists.",
-            "failed": "We couldn't create this connection. Please try again."
+            "failed": "We couldn't create this connection. Please try again.",
+            "not_approved_warning": "This creator hasn't been approved yet and can't be connected to an agency. Approve their application first.",
+            "error_not_approved": "This creator hasn't been approved yet. Approve their application before connecting them to an agency.",
+            "error_blacklisted": "This creator–agency pair is blacklisted, so a connection can't be created."
           },
           "disconnect": {
             "title": "Disconnect {name} from {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Disconnect",
             "cancel": "Cancel",
             "success": "Connection ended.",
-            "failed": "We couldn't disconnect this relationship. Please try again."
+            "failed": "We couldn't disconnect this relationship. Please try again.",
+            "error_not_disconnectable": "There's no active connection with this agency to disconnect."
           }
         }
       }

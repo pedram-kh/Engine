@@ -196,7 +196,10 @@
             "success_re_requested": "Ühendustaotlus uuesti saadetud.",
             "success_direct": "Looja ühendatud.",
             "success_noop": "Muudatusi pole — see ühendus on juba olemas.",
-            "failed": "Seda ühendust ei õnnestunud luua. Proovige uuesti."
+            "failed": "Seda ühendust ei õnnestunud luua. Proovige uuesti.",
+            "not_approved_warning": "See looja pole veel heaks kiidetud ja teda ei saa agentuuriga ühendada. Kinnitage kõigepealt tema taotlus.",
+            "error_not_approved": "See looja pole veel heaks kiidetud. Kinnitage tema taotlus enne agentuuriga ühendamist.",
+            "error_blacklisted": "See looja–agentuuri paar on mustas nimekirjas, seega ei saa ühendust luua."
           },
           "disconnect": {
             "title": "Kas katkestada {name} ühendus agentuuriga {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Katkesta ühendus",
             "cancel": "Tühista",
             "success": "Suhe lõpetatud.",
-            "failed": "Seda suhet ei õnnestunud katkestada. Proovige uuesti."
+            "failed": "Seda suhet ei õnnestunud katkestada. Proovige uuesti.",
+            "error_not_disconnectable": "Selle agentuuriga pole aktiivset ühendust, mida katkestada."
           }
         }
       }

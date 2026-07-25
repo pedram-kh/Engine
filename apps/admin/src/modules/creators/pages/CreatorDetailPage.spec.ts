@@ -661,7 +661,11 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
     })
 
     it('direct-connect: confirms, calls connect(), and reloads the list', async () => {
-      vi.mocked(adminCreatorsApi.show).mockResolvedValue(envelope(buildCreator()))
+      // Approved creator — the dialog's upfront gate mirrors the backend's
+      // `approved` requirement, so only approved creators can reach confirm.
+      vi.mocked(adminCreatorsApi.show).mockResolvedValue(
+        envelope(buildCreator({ application_status: 'approved' })),
+      )
       vi.mocked(adminCreatorsApi.connections)
         .mockResolvedValueOnce({ data: [] })
         .mockResolvedValueOnce({
@@ -735,6 +739,116 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
       // Reloaded: the second connections() resolve now shows the rostered row.
       expect(adminCreatorsApi.connections).toHaveBeenCalledTimes(2)
       expect(h.wrapper.text()).toContain('Nova Talent')
+    })
+
+    it('maps a connect 422 code to a localized message (NOT the raw code)', async () => {
+      vi.mocked(adminCreatorsApi.show).mockResolvedValue(
+        envelope(buildCreator({ application_status: 'approved' })),
+      )
+      vi.mocked(adminCreatorsApi.connections).mockResolvedValue({ data: [] })
+      // The race case: the creator loses approval between page load and
+      // confirm — the backend still refuses, and the message must be human.
+      vi.mocked(adminCreatorsApi.connect).mockRejectedValue(
+        new ApiError({
+          status: 422,
+          code: 'connection.creator_not_approved',
+          message: 'This creator is not approved and cannot be connected.',
+        }),
+      )
+
+      const h = await mountCreatorPage(CreatorDetailPage)
+      teardown = h.unmount
+      await flushPromises()
+
+      await h.wrapper.find('[data-testid="admin-creator-detail-connect-button"]').trigger('click')
+      await flushPromises()
+
+      const dialogVm = h.wrapper.findComponent({ name: 'ConnectToAgencyDialog' }).vm as unknown as {
+        selectedAgencyId: string | null
+      }
+      dialogVm.selectedAgencyId = '01AGENCYONEXXXXXXXXXXXXXXXX'
+      await flushPromises()
+
+      document
+        .querySelector<HTMLButtonElement>('[data-testid="admin-creator-connect-dialog-confirm"]')!
+        .click()
+      await flushPromises()
+
+      const error = document.body.querySelector(
+        '[data-testid="admin-creator-connect-dialog-error"]',
+      )
+      expect(error?.textContent).toContain("This creator hasn't been approved yet")
+      expect(error?.textContent).not.toContain('connection.creator_not_approved')
+    })
+
+    it('maps a disconnect 422 code to a localized message (NOT the raw code)', async () => {
+      vi.mocked(adminCreatorsApi.show).mockResolvedValue(envelope(buildCreator()))
+      vi.mocked(adminCreatorsApi.connections).mockResolvedValue({
+        data: [
+          relation({
+            agency_id: '01ROSTERAGENCYXXXXXXXXXXXXX',
+            agency_name: 'Rostered Co',
+            relationship_status: 'roster',
+          }),
+        ],
+      })
+      vi.mocked(adminCreatorsApi.disconnect).mockRejectedValue(
+        new ApiError({
+          status: 422,
+          code: 'connection.not_disconnectable',
+          message: 'There is no active connection to disconnect.',
+        }),
+      )
+
+      const h = await mountCreatorPage(CreatorDetailPage)
+      teardown = h.unmount
+      await flushPromises()
+
+      await h.wrapper
+        .find('[data-testid="admin-creator-detail-disconnect-01ROSTERAGENCYXXXXXXXXXXXXX"]')
+        .trigger('click')
+      await flushPromises()
+
+      const textarea = document.body.querySelector<HTMLTextAreaElement>(
+        '[data-testid="admin-creator-disconnect-dialog-reason"] textarea',
+      )!
+      textarea.value = 'Agency requested offboarding.'
+      textarea.dispatchEvent(new Event('input'))
+      await flushPromises()
+
+      document
+        .querySelector<HTMLButtonElement>(
+          '[data-testid="admin-creator-disconnect-dialog-confirm"]',
+        )!
+        .click()
+      await flushPromises()
+
+      const error = document.body.querySelector(
+        '[data-testid="admin-creator-disconnect-dialog-error"]',
+      )
+      expect(error?.textContent).toContain('no active connection with this agency')
+      expect(error?.textContent).not.toContain('connection.not_disconnectable')
+    })
+
+    it('unapproved creator: the connect dialog opens gated (warning shown, confirm disabled)', async () => {
+      // Default fixture is `pending` — the page must pass the gate down.
+      vi.mocked(adminCreatorsApi.show).mockResolvedValue(envelope(buildCreator()))
+      vi.mocked(adminCreatorsApi.connections).mockResolvedValue({ data: [] })
+
+      const h = await mountCreatorPage(CreatorDetailPage)
+      teardown = h.unmount
+      await flushPromises()
+
+      await h.wrapper.find('[data-testid="admin-creator-detail-connect-button"]').trigger('click')
+      await flushPromises()
+
+      expect(
+        document.body.querySelector('[data-testid="admin-creator-connect-dialog-not-approved"]'),
+      ).toBeTruthy()
+      const confirm = document.body.querySelector<HTMLButtonElement>(
+        '[data-testid="admin-creator-connect-dialog-confirm"]',
+      )!
+      expect(confirm.disabled).toBe(true)
     })
 
     it('disconnect: opens the reason dialog, confirms, calls disconnect(), and reloads', async () => {

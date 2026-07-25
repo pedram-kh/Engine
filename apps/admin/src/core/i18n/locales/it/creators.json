@@ -196,7 +196,10 @@
             "success_re_requested": "Richiesta di connessione inviata di nuovo.",
             "success_direct": "Creator connesso.",
             "success_noop": "Nessuna modifica — quella connessione esiste già.",
-            "failed": "Impossibile creare questa connessione. Riprova."
+            "failed": "Impossibile creare questa connessione. Riprova.",
+            "not_approved_warning": "Questo creator non è ancora stato approvato e non può essere collegato a un'agenzia. Approva prima la sua candidatura.",
+            "error_not_approved": "Questo creator non è ancora stato approvato. Approva la sua candidatura prima di collegarlo a un'agenzia.",
+            "error_blacklisted": "Questa coppia creator–agenzia è nella lista nera, quindi non è possibile creare un collegamento."
           },
           "disconnect": {
             "title": "Disconnettere {name} da {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Disconnetti",
             "cancel": "Annulla",
             "success": "Relazione terminata.",
-            "failed": "Impossibile disconnettere questa relazione. Riprova."
+            "failed": "Impossibile disconnettere questa relazione. Riprova.",
+            "error_not_disconnectable": "Non c'è alcun collegamento attivo con questa agenzia da disconnettere."
           }
         }
       }

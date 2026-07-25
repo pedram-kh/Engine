@@ -196,7 +196,10 @@
             "success_re_requested": "Iarratas naisc seolta arís.",
             "success_direct": "Cruthaitheoir nasctha.",
             "success_noop": "Gan athrú — tá an nasc sin ann cheana.",
-            "failed": "Níorbh fhéidir linn an nasc seo a chruthú. Bain triail eile as."
+            "failed": "Níorbh fhéidir linn an nasc seo a chruthú. Bain triail eile as.",
+            "not_approved_warning": "Níl an cruthaitheoir seo faofa fós agus ní féidir é a nascadh le gníomhaireacht. Faomh a iarratas ar dtús.",
+            "error_not_approved": "Níl an cruthaitheoir seo faofa fós. Faomh a iarratas sula nascann tú le gníomhaireacht é.",
+            "error_blacklisted": "Tá an péire cruthaitheoir–gníomhaireacht seo ar an liosta dubh, mar sin ní féidir nasc a chruthú."
           },
           "disconnect": {
             "title": "Dínasc {name} ó {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Dínasc",
             "cancel": "Cealaigh",
             "success": "Caidreamh curtha i gcrích.",
-            "failed": "Níorbh fhéidir linn an caidreamh seo a dhínascadh. Bain triail eile as."
+            "failed": "Níorbh fhéidir linn an caidreamh seo a dhínascadh. Bain triail eile as.",
+            "error_not_disconnectable": "Níl aon nasc gníomhach leis an ngníomhaireacht seo le dínascadh."
           }
         }
       }

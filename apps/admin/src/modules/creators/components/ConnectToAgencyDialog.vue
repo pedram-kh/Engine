@@ -35,6 +35,13 @@ const props = defineProps<{
   creatorDisplayName: string
   agencies: ReadonlyArray<AgencyOption>
   isSearching: boolean
+  /**
+   * Mirrors the backend `approved` gate (both doors 422 with
+   * `connection.creator_not_approved` otherwise). When false the dialog
+   * shows an upfront warning and disables confirm — the backend stays
+   * authoritative; this only saves the admin a doomed round-trip.
+   */
+  creatorIsApproved: boolean
 }>()
 
 const emit = defineEmits<{
@@ -57,11 +64,20 @@ const mode = ref<AdminConnectionMode>('request')
 const reason = ref('')
 const searchQuery = ref('')
 
+// The last option the admin actually picked. Vuetify resolves the displayed
+// selection TITLE from `items`; when a selection clears the search input, the
+// parent's empty-query handler resets `agencies` to [], which would orphan the
+// selected ULID and make the field display the raw id. Keeping the picked
+// option here (and merging it into `agencyItems` below) guarantees the agency
+// NAME keeps rendering no matter what happens to the live search results.
+const selectedOption = ref<AgencyOption | null>(null)
+
 watch(
   () => props.modelValue,
   (open) => {
     if (open === true) {
       selectedAgencyId.value = null
+      selectedOption.value = null
       mode.value = 'request'
       reason.value = ''
       searchQuery.value = ''
@@ -69,21 +85,39 @@ watch(
   },
 )
 
+watch(selectedAgencyId, (id) => {
+  if (id === null) {
+    selectedOption.value = null
+    return
+  }
+  const match = props.agencies.find((agency) => agency.ulid === id)
+  if (match !== undefined) {
+    selectedOption.value = { ulid: match.ulid, name: match.name }
+  }
+})
+
 // Vuetify's autocomplete fires update:search on every keystroke; the parent
 // debounces the actual list call.
 watch(searchQuery, (query) => {
   emit('search', query ?? '')
 })
 
-const agencyItems = computed(() =>
-  props.agencies.map((agency) => ({ title: agency.name, value: agency.ulid })),
-)
+const agencyItems = computed(() => {
+  const items = props.agencies.map((agency) => ({ title: agency.name, value: agency.ulid }))
+  const picked = selectedOption.value
+  if (picked !== null && !props.agencies.some((agency) => agency.ulid === picked.ulid)) {
+    items.unshift({ title: picked.name, value: picked.ulid })
+  }
+  return items
+})
 
 const isDirect = computed(() => mode.value === 'direct')
 const trimmedReasonLength = computed(() => reason.value.trim().length)
 
 const canConfirm = computed<boolean>(() => {
   if (props.isSaving) return false
+  // Mirrors the backend approved gate — the warning alert explains why.
+  if (!props.creatorIsApproved) return false
   if (selectedAgencyId.value === null) return false
   if (isDirect.value) {
     if (trimmedReasonLength.value < REASON_MIN) return false
@@ -114,8 +148,10 @@ function onCancel(): void {
 
 // Test seam: the agency PICKER is a Vuetify autocomplete whose selection is
 // impractical to drive through the DOM in jsdom, so the reactive form state is
-// exposed for unit assertions of the two-door gate logic.
-defineExpose({ selectedAgencyId, mode, reason, searchQuery })
+// exposed for unit assertions of the two-door gate logic (`agencyItems` for
+// the selected-option merge that keeps the agency NAME rendering after the
+// live search results reset).
+defineExpose({ selectedAgencyId, mode, reason, searchQuery, agencyItems })
 </script>
 
 <template>
@@ -132,6 +168,17 @@ defineExpose({ selectedAgencyId, mode, reason, searchQuery })
       </v-card-title>
 
       <v-card-text>
+        <v-alert
+          v-if="!creatorIsApproved"
+          type="warning"
+          variant="tonal"
+          density="compact"
+          class="mb-4"
+          data-testid="admin-creator-connect-dialog-not-approved"
+        >
+          {{ t('admin.creators.detail.connections.connect.not_approved_warning') }}
+        </v-alert>
+
         <v-autocomplete
           v-model="selectedAgencyId"
           v-model:search="searchQuery"

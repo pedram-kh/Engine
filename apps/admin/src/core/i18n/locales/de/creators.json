@@ -196,7 +196,10 @@
             "success_re_requested": "Verbindungsanfrage erneut gesendet.",
             "success_direct": "Creator verbunden.",
             "success_noop": "Keine Änderung – diese Verbindung besteht bereits.",
-            "failed": "Diese Verbindung konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
+            "failed": "Diese Verbindung konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+            "not_approved_warning": "Dieser Creator wurde noch nicht genehmigt und kann nicht mit einer Agentur verbunden werden. Genehmigen Sie zuerst die Bewerbung.",
+            "error_not_approved": "Dieser Creator wurde noch nicht genehmigt. Genehmigen Sie die Bewerbung, bevor Sie ihn mit einer Agentur verbinden.",
+            "error_blacklisted": "Dieses Creator-Agentur-Paar steht auf der schwarzen Liste, daher kann keine Verbindung erstellt werden."
           },
           "disconnect": {
             "title": "{name} von {agency} trennen?",
@@ -206,7 +209,8 @@
             "confirm": "Trennen",
             "cancel": "Abbrechen",
             "success": "Verbindung beendet.",
-            "failed": "Diese Beziehung konnte nicht getrennt werden. Bitte versuchen Sie es erneut."
+            "failed": "Diese Beziehung konnte nicht getrennt werden. Bitte versuchen Sie es erneut.",
+            "error_not_disconnectable": "Es gibt keine aktive Verbindung mit dieser Agentur, die getrennt werden könnte."
           }
         }
       }

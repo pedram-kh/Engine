@@ -196,7 +196,10 @@
             "success_re_requested": "Forbindelsesanmodning sendt igen.",
             "success_direct": "Skaber forbundet.",
             "success_noop": "Ingen ændring — den forbindelse findes allerede.",
-            "failed": "Vi kunne ikke oprette denne forbindelse. Prøv igen."
+            "failed": "Vi kunne ikke oprette denne forbindelse. Prøv igen.",
+            "not_approved_warning": "Denne skaber er endnu ikke godkendt og kan ikke forbindes med et bureau. Godkend ansøgningen først.",
+            "error_not_approved": "Denne skaber er endnu ikke godkendt. Godkend ansøgningen, før du forbinder vedkommende med et bureau.",
+            "error_blacklisted": "Dette skaber–bureau-par er sortlistet, så der kan ikke oprettes en forbindelse."
           },
           "disconnect": {
             "title": "Afbryd {name} fra {agency}?",
@@ -206,7 +209,8 @@
             "confirm": "Afbryd",
             "cancel": "Annuller",
             "success": "Forhold afsluttet.",
-            "failed": "Vi kunne ikke afbryde dette forhold. Prøv igen."
+            "failed": "Vi kunne ikke afbryde dette forhold. Prøv igen.",
+            "error_not_disconnectable": "Der er ingen aktiv forbindelse med dette bureau at afbryde."
           }
         }
       }
