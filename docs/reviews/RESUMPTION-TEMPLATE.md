@@ -122,26 +122,50 @@ eyes-on fix** commits — `4af63b2` (admin dialog: 422 copy, picker name, `appro
 (roster "Active" chip, `ended` chip), `530d7d8` and `bdc957b` (admin-connected mail body trims ×24),
 `dd65868` (**AH-052** canonical 403 envelope, closed-thread composer, notification registry),
 `d381a77` (an `ended` relation could be re-pooled) — plus the addendum/AH-052 docs commit `d1dc3d2`.
-**Pushed ≠ deployed:** the deploy notes below are all still outstanding.
+
+**Deployed through:** **`f5be920` (AH-052), deployed 2026-07-26.** Push and deploy are **in sync** —
+everything landed on `origin/main` after `f5be920` is docs-only, so there is **no undeployed code**.
+This holds until the next code push; re-derive then. Read from the server, not inferred:
+`php artisan migrate:status` reports **Ran through batch 5**, and today's deploy correctly reported
+`Nothing to migrate` (AH-051/052 add none).
+
+> **Tracking lesson (2026-07-26).** Deploy state must be **read from the server**
+> (`migrate:status`, and see the scheduler blocker below), never inferred from push history —
+> deploys are colleague-managed and advance without notice. Everything through AH-050
+> (`content_companions`) turned out to be already live before today, while this file still listed
+> its migrations as pending. Verify at each session close; do not carry forward an assumption.
 
 **Deploy notes.** **No migrations** anywhere in AH-051 or AH-052 (`ended` is a plain-varchar enum
-value, no CHECK). Standing AH-051 notes: (a) it TIGHTENS the live contact gate — run
-`php artisan relations:audit-contact-exposure` pre-deploy to read the blast radius; and (b) admin
-disconnect DELETES pool-membership rows — **snapshot-first** stays the rule. **Two new permanent
-notes** from the eyes-on fixes:
+value, no CHECK). AH-051 notes, now **post**-deploy: (a) the live contact gate is TIGHTENED as of
+2026-07-26 — `php artisan relations:audit-contact-exposure` now reads what changed rather than
+what would (see outstanding items); and (b) admin disconnect DELETES pool-membership rows, so
+**snapshot-first** stays the standing rule for any deploy carrying it. **Two permanent notes**
+from the eyes-on fixes:
 
 1. **⚠ Restart the queue worker on every deploy that changes mail copy.** The long-running worker
    **caches translations in memory** — a `lang/**` copy change will keep sending the OLD body until
    the worker is restarted. Found the hard way while verifying the `530d7d8`/`bdc957b` mail trims:
    the new text did not appear until the dev stack was bounced. This is **not** AH-051-specific; it
    applies to every mail-copy change the platform ever ships.
-2. **⚠ The 403 body shape changes with this push (client-visible contract).** AH-052 makes every
-   `authorize()` denial — all 82 call sites, plus every `abort(403)` — return the canonical JSON:API
-   error envelope (`auth.forbidden`) instead of Laravel's default `{"message": …}`. Any consumer
-   that pattern-matched the old shape must be checked before this ships.
+2. **⚠ The 403 body shape CHANGED in production on 2026-07-26 (client-visible contract).** AH-052
+   makes every `authorize()` denial — all 82 call sites, plus every `abort(403)` — return the
+   canonical JSON:API error envelope (`auth.forbidden`) instead of Laravel's default
+   `{"message": …}`. Both SPAs consume the envelope via `ApiError.fromEnvelope` and were verified;
+   the residual exposure is anything **outside this repo** that pattern-matched the old shape. This
+   is live now, so it is a thing to check **if 403 handling misbehaves**, not a pre-deploy gate.
 
-The AH-026 recompute and AH-042 one-shot remain the only outstanding post-deploy **commands**
-(AH-050, AH-051 and AH-052 add none).
+**Outstanding operational items** (post-deploy commands; AH-050, AH-051 and AH-052 add none):
+
+- **The two one-shots — status unknown, possibly already moot.** `creators:recompute-completeness`
+  (AH-026 D5) and `campaigns:advance-contractless-accepted` (AH-042 D4). Their chunks are long
+  since deployed, so they may already have been run — or may never have been. Both are idempotent
+  and both support `--dry-run`. **Verify on prod with `--dry-run` first:** a `0 changes` report
+  means the item is closed and can be struck from this list; anything else means run it once.
+- **Queue-worker restart on mail-copy changes — standing rule, not a one-shot.** See note 1 below.
+- **The D-1 contact-exposure number — record it here when Pedram supplies it.** AH-051 tightened
+  the gate; `php artisan relations:audit-contact-exposure` reports the blast radius (per-status
+  breakdown + distinct agencies). The gate shipped with the AH-051/052 deploy, so this is now a
+  read of what changed rather than a pre-deploy check.
 
 > **AH-042 · Toggle-OFF campaigns flow without contract involvement** (full chunk loop). The
 > `requires_per_campaign_contract` toggle is now load-bearing end-to-end: the machine permits a
@@ -153,18 +177,14 @@ The AH-026 recompute and AH-042 one-shot remain the only outstanding post-deploy
 > Playwright, typecheck/lint/parity clean. Review: `docs/reviews/contract-toggle-off-flow-review.md`
 > (Closed, approved). Adds one post-deploy command (below).
 
-**Prior batch (AH-033→AH-041) — PUSHED** (`ed2e0dc` close-out **docs** commit at `origin/main`,
+**Prior batch (AH-033→AH-041) — PUSHED AND DEPLOYED** (`ed2e0dc` close-out **docs** commit,
 sitting atop the **direct-iteration fix batch** `cc86bb8 … fdbec40` (33 code/spec commits + the
-Part-A closure commit `fdbec40`), atop the AH-032 baseline **`7051123`**). **⚠ Next-deploy note
-(still pending):** that batch adds **three schema migrations + one data backfill** — run
-`php artisan migrate` before serving:
-`2026_07_12_100000_add_offer_fields_to_campaign_assignments`,
-`2026_07_12_110000_add_previously_declined_to_campaign_assignments`,
-`2026_07_13_100000_add_links_to_campaign_drafts` (schema), and
-`2026_07_13_110000_backfill_cancelled_rejected_board_column` (data backfill — renames default
-"Cancelled" columns to "Cancelled / Rejected" + inserts the draft-rejected automation; idempotent).
-AH-042 adds **no** migrations. **AH-043→AH-047 add no migrations either** — the pending-deploy list
-below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot commands).
+Part-A closure commit `fdbec40`), atop the AH-032 baseline **`7051123`**). **✅ Migrations all Ran
+— nothing pending.** This paragraph previously carried a next-deploy warning for three schema
+migrations plus a data backfill; `migrate:status` on prod (2026-07-26) shows all of them **Ran**,
+with `2026_07_13_110000_backfill_cancelled_rejected_board_column` in **batch 3**. AH-042 through
+AH-052 add **no migrations at all**, so **the pending-migration list is empty** and
+`php artisan migrate` is not a required deploy step for anything currently on `origin/main`.
 
 ### Delivered
 
@@ -394,9 +414,16 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
 
 ### Open threads
 
-- **Scheduler supervision:** production deployed with a different structure (colleague-managed);
-  runbook §7 scheduler-under-supervisor docs reverted pending a reality-sync pass from the actual
-  server config.
+- **🚫 BLOCKER — scheduler existence UNVERIFIED.** Until `supervisorctl status` / `crontab -l` from
+  prod confirms a scheduler, **assume NO scheduled command runs in production.** Consequences, all
+  currently assumed dormant: **AH-048's incomplete-creator nudge enablement is blocked on this**
+  (flipping the flag ON achieves nothing without `schedule:run`), and **`messages:send-digest` +
+  `boards:scan-overdue` are likewise assumed not firing** — they predate the nudge and have always
+  silently assumed a scheduler nobody has confirmed. Production was deployed with a different
+  structure (colleague-managed), and runbook §7's scheduler-under-supervisor docs stay reverted
+  pending this reality-sync pass. **Unblock with two commands** on the prod box:
+  `supervisorctl status` and `crontab -l`; record the output here, then either restore §7 or open a
+  chunk to install the cron/timer.
 - **Backup/restore posture UNVERIFIED — standing open item, owned by Pedram (blocks completion of
   §5.40).** The production-data-safety standard assumes a working snapshot-and-restore path, and that
   assumption is **not yet confirmed**: RDS automated snapshots (assumed enabled, unconfirmed), PITR
@@ -417,21 +444,23 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
   posture is legally sound for existing signees is still outside this codebase's review and needs a
   counsel sign-off. Logged as tech-debt (`docs/tech-debt.md` — "Contract version-label ambiguity +
   missing re-consent flow", updated by AH-049) until resolved either way.
-- **Pending post-deploy operational step (AH-026 D5) — still pending, carry forward.** When the
-  AH-026→028 range ships, run `php artisan creators:recompute-completeness` **once** (optionally
-  `--dry-run` first) so every existing creator's persisted `profile_completeness_score` moves to the
-  new formula (region floor + D4 optional credit). Idempotent — safe to re-run; a second run reports
-  0 changes. There is **no scheduler**, so this must not be forgotten at the next deploy. The new
+- **Post-deploy operational step (AH-026 D5) — SHIPPED, run-status unknown.** The AH-026→028 range
+  is deployed, so the trigger condition has passed; what is unknown is whether the command was ever
+  run. Run `php artisan creators:recompute-completeness --dry-run` on prod: **`0 changes` closes
+  this item**, anything else means run it once without the flag, so every existing creator's
+  persisted `profile_completeness_score` moves to the new formula (region floor + D4 optional
+  credit). Idempotent — safe to re-run. There is **no scheduler** (see the blocker above), so
+  nothing will do this on its own. The new
   `docs/runbooks/production-queue-worker.md` (`12a7ef5`) cross-links this step so a deploy checklist
   finds both operational obligations in one place. (Also logged as a standing tech-debt obligation
   below.)
-- **Pending post-deploy operational step (AH-042 D4) — new, carry forward.** When AH-042
-  (toggle-OFF contract flow) ships, run `php artisan campaigns:advance-contractless-accepted` **once**
-  (optionally `--dry-run` first) so any assignment stuck at `accepted` on a `requires=false` campaign
-  advances to `contracted` (contract-less). Idempotent — a second run reports 0; scoped to
-  accepted-only + requires=false-only. **No scheduler**, so it must not be forgotten at the next
-  deploy. This now **joins the AH-026 `creators:recompute-completeness`** command in the pending-deploy
-  list — two one-shot post-deploy commands to run together.
+- **Post-deploy operational step (AH-042 D4) — SHIPPED, run-status unknown.** AH-042 (toggle-OFF
+  contract flow) is deployed. Run `php artisan campaigns:advance-contractless-accepted --dry-run`
+  on prod: **`0` closes this item**, anything else means run it once without the flag, so any
+  assignment stuck at `accepted` on a `requires=false` campaign advances to `contracted`
+  (contract-less). Idempotent; scoped to accepted-only + requires=false-only. **No scheduler** (see
+  the blocker above), so nothing will do this on its own. Pairs with the AH-026
+  `creators:recompute-completeness` dry-run — verify both together in one pass.
 - **NEW deploy dependency — the scheduler cron (`schedule:run`) — carry forward (incomplete-creator
   nudge chunk, July 16, 2026).** The app now has a **flag-gated daily command**,
   `creators:send-incomplete-nudges`, registered `->daily()` in `bootstrap/app.php` alongside the
