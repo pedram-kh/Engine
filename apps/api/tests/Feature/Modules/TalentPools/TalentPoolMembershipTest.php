@@ -6,6 +6,7 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Brands\Models\Brand;
+use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\TalentPools\Models\TalentPool;
 use App\Modules\TalentPools\Models\TalentPoolMembership;
@@ -137,8 +138,105 @@ it('add emits talent_pool.creator_added audit log', function (): void {
 });
 
 // ---------------------------------------------------------------------------
+// Add — the AH-051 `ended` relation guard
+// ---------------------------------------------------------------------------
+
+it('add REFUSES a severed relation — an `ended` creator cannot be re-pooled (422 pool.relation_ended)', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolAdmin();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    ['creator' => $creator, 'relation' => $relation] = makePooledRelation($agency);
+    $relation->update(['relationship_status' => RelationshipStatus::Ended]);
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/talent-pools/{$pool->ulid}/creators", [
+            'creator_id' => $creator->ulid,
+        ])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'pool.relation_ended');
+
+    // The refusal is real, not cosmetic: no row was written.
+    $this->assertDatabaseMissing('talent_pool_creators', [
+        'talent_pool_id' => $pool->id,
+        'creator_id' => $creator->id,
+    ]);
+});
+
+it('the `ended` refusal is a 422, NOT the 404 a missing relation gets — the row exists and the agency can see it', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolAdmin();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    ['creator' => $creator, 'relation' => $relation] = makePooledRelation($agency);
+    $relation->update(['relationship_status' => RelationshipStatus::Ended]);
+
+    // A severed relation is visible to the agency under its own `ended` roster
+    // filter, so 404 would be a lie; the distinct code lets the SPA say why.
+    $this->actingAs($user)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/talent-pools/{$pool->ulid}/creators", [
+            'creator_id' => $creator->ulid,
+        ])
+        ->assertStatus(422);
+});
+
+it('ONLY `ended` is refused — every other status stays poolable (no over-block)', function (string $status): void {
+    ['agency' => $agency, 'user' => $user] = poolAdmin();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    ['creator' => $creator, 'relation' => $relation] = makePooledRelation($agency);
+    $relation->update(['relationship_status' => $status]);
+
+    $this->actingAs($user)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/talent-pools/{$pool->ulid}/creators", [
+            'creator_id' => $creator->ulid,
+        ])
+        ->assertCreated();
+
+    $this->assertDatabaseHas('talent_pool_creators', [
+        'talent_pool_id' => $pool->id,
+        'creator_id' => $creator->id,
+    ]);
+})->with([
+    'roster' => RelationshipStatus::Roster->value,
+    'external' => RelationshipStatus::External->value,
+    'prospect' => RelationshipStatus::Prospect->value,
+    'pending_request' => RelationshipStatus::PendingRequest->value,
+    'declined' => RelationshipStatus::Declined->value,
+]);
+
+it('a re-connected creator becomes poolable again — `ended` is a state, not a tombstone', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolAdmin();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    ['creator' => $creator, 'relation' => $relation] = makePooledRelation($agency);
+    $url = "/api/v1/agencies/{$agency->ulid}/talent-pools/{$pool->ulid}/creators";
+    $payload = ['creator_id' => $creator->ulid];
+
+    $relation->update(['relationship_status' => RelationshipStatus::Ended]);
+    $this->actingAs($user)->postJson($url, $payload)->assertStatus(422);
+
+    // The relation is re-requestable (D-3); once back on the roster the pool
+    // action must return with it.
+    $relation->update(['relationship_status' => RelationshipStatus::Roster]);
+    $this->actingAs($user)->postJson($url, $payload)->assertCreated();
+});
+
+// ---------------------------------------------------------------------------
 // Remove (DELETE .../creators/{creator})
 // ---------------------------------------------------------------------------
+
+it('remove STAYS open for an `ended` relation — severed rows must always be cleanable', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolAdmin();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    ['creator' => $creator, 'relation' => $relation] = makePooledRelation($agency);
+    $pool->creators()->attach($creator->id);
+    $relation->update(['relationship_status' => RelationshipStatus::Ended]);
+
+    // Gating removal too would strand rows the add path now refuses to recreate.
+    $this->actingAs($user)
+        ->deleteJson("/api/v1/agencies/{$agency->ulid}/talent-pools/{$pool->ulid}/creators/{$creator->ulid}")
+        ->assertOk();
+
+    $this->assertDatabaseMissing('talent_pool_creators', [
+        'talent_pool_id' => $pool->id,
+        'creator_id' => $creator->id,
+    ]);
+});
 
 it('agency_manager can remove a creator from a pool', function (): void {
     ['agency' => $agency, 'user' => $user] = poolManager();

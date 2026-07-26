@@ -89,6 +89,13 @@ const canMessage = computed(
     creator.value?.application_status === 'approved',
 )
 
+// AH-051 follow-up — pooling ends with the relationship. Admin disconnect
+// deletes this pair's memberships, so re-adding would undo that; the backend
+// refuses with `pool.relation_ended` and this mirrors it so we never surface an
+// action that would fail. Hidden (not disabled), matching `canMessage` above.
+// Only `ended` is excluded — every other status stays poolable.
+const canAddToPool = computed(() => canEdit.value && attrs.value?.relationship_status !== 'ended')
+
 // AH-005 — optional contact details. The server gates the whole block by
 // omission (present only when this agency's relation is non-blacklisted), so
 // a blacklisted-but-rostered agency receives no keys and the card stays hidden.
@@ -378,7 +385,7 @@ onMounted(() => {
               {{ t('app.messaging.relationship.inboxTitle') }}
             </v-btn>
             <v-btn
-              v-if="canEdit"
+              v-if="canAddToPool"
               color="primary"
               variant="tonal"
               prepend-icon="mdi-account-multiple-plus-outline"

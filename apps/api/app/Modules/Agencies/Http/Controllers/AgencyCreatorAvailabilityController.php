@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Modules\Agencies\Http\Controllers;
 
+use App\Core\Errors\ErrorResponse;
 use App\Modules\Agencies\Http\Resources\AgencyAvailabilityResource;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
+use App\Modules\Agencies\Support\AgencyCreatorRelationGuard;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Services\Availability\AvailabilityExpansionService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -55,7 +58,22 @@ final class AgencyCreatorAvailabilityController
     {
         Gate::authorize('viewAny', AgencyCreatorRelation::class);
 
-        $this->requireRosterRelation($agency, $creator);
+        $relation = AgencyCreatorRelationGuard::requireExisting($agency, $creator);
+
+        // AH-051 follow-up — availability is forward-looking scheduling data, so
+        // it ends with the relationship. 403 rather than 404: the agency can see
+        // this creator under its own `ended` roster filter, so the row's
+        // existence is not a secret from them — refusing the capability is the
+        // honest answer. Read-only HISTORY (the detail record, past messages)
+        // deliberately survives; a calendar of future dates is not history.
+        if ($relation->isEnded()) {
+            return ErrorResponse::single(
+                $request,
+                Response::HTTP_FORBIDDEN,
+                'availability.relation_ended',
+                'This connection has ended, so this creator\'s availability is no longer shared with you.',
+            );
+        }
 
         $validated = $request->validate([
             'from' => ['sometimes', 'date'],
@@ -87,22 +105,5 @@ final class AgencyCreatorAvailabilityController
                 ],
             ])
             ->response();
-    }
-
-    /**
-     * 404 unless the creator is in this agency's roster (any relationship
-     * status). The belt-and-suspenders explicit agency_id filter sits on top
-     * of the BelongsToAgency global scope, mirroring the roster controller.
-     */
-    private function requireRosterRelation(Agency $agency, Creator $creator): void
-    {
-        $hasRelation = AgencyCreatorRelation::query()
-            ->where('agency_id', $agency->id)
-            ->where('creator_id', $creator->id)
-            ->exists();
-
-        if (! $hasRelation) {
-            abort(404);
-        }
     }
 }

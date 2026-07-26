@@ -8,6 +8,7 @@ use App\Modules\Agencies\Http\Requests\UpdateAgencyCreatorRelationRequest;
 use App\Modules\Agencies\Http\Resources\AgencyCreatorDetailResource;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
+use App\Modules\Agencies\Support\AgencyCreatorRelationGuard;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Services\AuditLogger;
 use App\Modules\Creators\Models\Creator;
@@ -108,23 +109,13 @@ final class AgencyCreatorDetailController
     }
 
     /**
-     * 404 unless the creator is in this agency's roster (any relationship
-     * status). Returns the relation so the caller can read/write it. The
-     * belt-and-suspenders explicit agency_id filter sits on top of the
-     * BelongsToAgency global scope, mirroring the roster + availability
-     * controllers.
+     * The relation, whatever its status — this surface is the read-only RECORD
+     * of the relationship, so a terminal state (`declined`, `ended`) still
+     * resolves. Contact details are withheld separately by
+     * `canSeeContactDetails`, which AH-051 (D-1) narrowed to `roster`.
      */
     private function requireRosterRelation(Agency $agency, Creator $creator): AgencyCreatorRelation
     {
-        $relation = AgencyCreatorRelation::query()
-            ->where('agency_id', $agency->id)
-            ->where('creator_id', $creator->id)
-            ->first();
-
-        if ($relation === null) {
-            abort(404);
-        }
-
-        return $relation;
+        return AgencyCreatorRelationGuard::requireExisting($agency, $creator);
     }
 }

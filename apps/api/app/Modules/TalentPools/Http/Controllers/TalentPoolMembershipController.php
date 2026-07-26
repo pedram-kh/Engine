@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Modules\TalentPools\Http\Controllers;
 
+use App\Core\Errors\ErrorResponse;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
+use App\Modules\Agencies\Support\AgencyCreatorRelationGuard;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
 use App\Modules\Creators\Models\Creator;
@@ -17,6 +19,7 @@ use App\Modules\TalentPools\Models\TalentPoolMembership;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -95,7 +98,23 @@ final class TalentPoolMembershipController
         $this->assertBelongsToAgency($talentPool, $agency);
 
         $creator = $this->resolveCreator($request->validated()['creator_id']);
-        $this->requireRosterRelation($agency, $creator);
+        $relation = AgencyCreatorRelationGuard::requireExisting($agency, $creator);
+
+        // AH-051 follow-up — a SEVERED relation may not be re-pooled. Admin
+        // disconnect deletes this pair's memberships (D-6) on the reasoning that
+        // pool presence would leak a relationship that has ended; permitting an
+        // add here would let the agency undo that a second later and make the
+        // deletion decorative. REMOVE stays open (see destroy) so rows can
+        // always be cleaned up, and every other status is unaffected — a
+        // prospect shortlist is still legitimate curation.
+        if ($relation->isEnded()) {
+            return ErrorResponse::single(
+                $request,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                'pool.relation_ended',
+                'This connection has ended, so the creator can no longer be added to a pool.',
+            );
+        }
 
         Gate::authorize('update', $talentPool);
 
@@ -131,7 +150,10 @@ final class TalentPoolMembershipController
     public function destroy(Request $request, Agency $agency, TalentPool $talentPool, Creator $creator): JsonResponse
     {
         $this->assertBelongsToAgency($talentPool, $agency);
-        $this->requireRosterRelation($agency, $creator);
+        // Deliberately NOT status-gated: removal must stay possible for every
+        // status, including `ended`, or a severed relation could strand rows
+        // that the add path now refuses to recreate.
+        AgencyCreatorRelationGuard::requireExisting($agency, $creator);
 
         Gate::authorize('update', $talentPool);
 
@@ -164,24 +186,6 @@ final class TalentPoolMembershipController
         }
 
         return $creator;
-    }
-
-    /**
-     * 404 unless the creator is in this agency's roster (any relationship
-     * status) — the exact requireRosterRelation pattern from the availability
-     * + detail controllers (D-2b-5). Break-revert: dropping this check lets an
-     * agency pool a creator it has no relation with.
-     */
-    private function requireRosterRelation(Agency $agency, Creator $creator): void
-    {
-        $hasRelation = AgencyCreatorRelation::query()
-            ->where('agency_id', $agency->id)
-            ->where('creator_id', $creator->id)
-            ->exists();
-
-        if (! $hasRelation) {
-            abort(404);
-        }
     }
 
     /**

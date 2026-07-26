@@ -76,13 +76,39 @@ it('returns 404 when the creator has NO relation with the agency (no-relation bo
     expect($this->actingAs($admin)->getJson(availabilityUrl($agency, $stranger))->status())->toBe(404);
 });
 
-it('reads availability across any relationship status (mirrors roster scope)', function (string $status): void {
+it('reads availability across any LIVE relationship status (mirrors roster scope)', function (string $status): void {
     $agency = Agency::factory()->createOne();
     $admin = User::factory()->agencyAdmin($agency)->createOne();
     $creator = rosterCreator($agency, RelationshipStatus::from($status));
 
     expect($this->actingAs($admin)->getJson(availabilityUrl($agency, $creator))->status())->toBe(200);
-})->with(['roster', 'prospect', 'external']);
+})->with(['roster', 'prospect', 'external', 'pending_request', 'declined']);
+
+it('STOPS at a severed relation — an `ended` creator\'s availability is 403 (AH-051 follow-up)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $creator = rosterCreator($agency, RelationshipStatus::Ended);
+
+    // Availability is forward-looking scheduling data, so it ends with the
+    // relationship — unlike the detail record, which stays readable as history.
+    $this->actingAs($admin)
+        ->getJson(availabilityUrl($agency, $creator))
+        ->assertForbidden()
+        ->assertJsonPath('errors.0.code', 'availability.relation_ended');
+});
+
+it('the `ended` refusal is 403, distinct from the 404 a no-relation creator gets', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $ended = rosterCreator($agency, RelationshipStatus::Ended);
+    $stranger = CreatorFactory::new()->createOne();
+
+    // 404 protects the existence of a creator the agency has no relation with;
+    // an `ended` relation is already visible to them under their own roster
+    // filter, so the honest answer is a refusal, not a denial of existence.
+    expect($this->actingAs($admin)->getJson(availabilityUrl($agency, $ended))->status())->toBe(403)
+        ->and($this->actingAs($admin)->getJson(availabilityUrl($agency, $stranger))->status())->toBe(404);
+});
 
 // ---------------------------------------------------------------------------
 // Shape — expanded occurrences, reason omitted (break-revert)

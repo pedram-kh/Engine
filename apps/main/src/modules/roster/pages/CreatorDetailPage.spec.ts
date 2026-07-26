@@ -360,6 +360,54 @@ describe('CreatorDetailPage (Sprint 6 Chunk 2a)', () => {
     })
   })
 
+  // AH-051 follow-up — pooling ends with the relationship. The backend refuses
+  // an `ended` creator with 422 `pool.relation_ended`; these pin that the UI
+  // never offers the action in the first place.
+  it('offers add-to-pool for a live relation', async () => {
+    const harness = await mountDetail({ role: 'agency_admin' })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="creator-detail-add-to-pool"]').exists()).toBe(true)
+  })
+
+  it('withdraws add-to-pool once the relation has ENDED — the disconnect deleted the memberships', async () => {
+    const harness = await mountDetail({
+      role: 'agency_admin',
+      detail: makeDetail({ relationship_status: 'ended' }),
+    })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="creator-detail-add-to-pool"]').exists()).toBe(false)
+  })
+
+  it('withdraws add-to-pool for ended even from an admin — it is a relationship gate, not a role gate', async () => {
+    for (const role of ['agency_admin', 'agency_manager'] as const) {
+      const harness = await mountDetail({
+        role,
+        detail: makeDetail({ relationship_status: 'ended' }),
+      })
+      expect(harness.wrapper.find('[data-test="creator-detail-add-to-pool"]').exists()).toBe(false)
+      harness.cleanup()
+    }
+  })
+
+  it('keeps add-to-pool for every status EXCEPT ended (no over-block)', async () => {
+    for (const status of [
+      'roster',
+      'external',
+      'prospect',
+      'pending_request',
+      'declined',
+    ] as const) {
+      const harness = await mountDetail({
+        role: 'agency_admin',
+        detail: makeDetail({ relationship_status: status }),
+      })
+      expect(harness.wrapper.find('[data-test="creator-detail-add-to-pool"]').exists()).toBe(true)
+      harness.cleanup()
+    }
+  })
+
   it('shows the blacklist section + open action for an admin on a non-blacklisted creator', async () => {
     const harness = await mountDetail({ role: 'agency_admin' })
     cleanup = harness.cleanup

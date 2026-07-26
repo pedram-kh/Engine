@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\TalentPools\Http\Controllers;
 
 use App\Modules\Agencies\Models\Agency;
-use App\Modules\Agencies\Models\AgencyCreatorRelation;
+use App\Modules\Agencies\Support\AgencyCreatorRelationGuard;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\TalentPools\Http\Resources\TalentPoolPickerResource;
 use App\Modules\TalentPools\Models\TalentPool;
@@ -48,18 +48,13 @@ final class CreatorTalentPoolController
     }
 
     /**
-     * 404 unless the creator is in this agency's roster (any relationship
-     * status) — the requireRosterRelation pattern (D-2b-5).
+     * The relation must exist, whatever its status. This is the picker's READ:
+     * it reports current membership, and after an admin disconnect that is
+     * empty (D-6 deleted the rows). The WRITE is where `ended` is refused —
+     * see TalentPoolMembershipController::store().
      */
     private function requireRosterRelation(Agency $agency, Creator $creator): void
     {
-        $hasRelation = AgencyCreatorRelation::query()
-            ->where('agency_id', $agency->id)
-            ->where('creator_id', $creator->id)
-            ->exists();
-
-        if (! $hasRelation) {
-            abort(404);
-        }
+        AgencyCreatorRelationGuard::requireExisting($agency, $creator);
     }
 }
