@@ -62,7 +62,7 @@ reviews, and conversations.
 
 ### AH-052 · Canonical 403 envelope — every `authorize()` denial now speaks the platform's error contract
 
-- **Status:** Landed (push HELD)
+- **Status:** Landed — **pushed 2026-07-26** (`origin/main` at `d1dc3d2`)
 - **Commits:** `dd65868` — `fix(api,main): return a canonical 403 envelope and explain closed threads`.
   Shared commit: its closed-thread and notification-registry halves belong to AH-051 and are recorded
   in that review's post-close addendum; this entry owns the 403 contract change.
@@ -94,15 +94,17 @@ reviews, and conversations.
   SPA's `ApiError.fromEnvelope` contract**, which is the case that actually closes the gap. A
   canonical-envelope assertion on a blocked send was also added to `RelationshipMessageApiTest`.
 - **⚠ Deploy note:** this is a **client-visible contract change**. Any consumer that pattern-matched
-  Laravel's default `{"message": …}` 403 body will now receive the envelope instead. Ships with the
-  AH-051 push.
+  Laravel's default `{"message": …}` 403 body will now receive the envelope instead. Shipped with the
+  AH-051 push (`30116da..d1dc3d2`, 2026-07-26) — **not yet deployed**, so the note still binds at the
+  next deploy.
 - **Ref:** [`admin-connections-review.md`](admin-connections-review.md) post-close addendum
   (cross-referenced); AH-051 entry below.
 
 ### AH-051 · Admin-initiated agency↔creator connections + contact-gate fix + first termination path
 
-- **Status:** Landed (push HELD)
-- **Commits:** `98defa9` — `feat(creators): admin agency-creator connections + roster contact gate + disconnect (AH-051)`; docs commit (this entry) — `docs(creators): AH-051 review + change-log entry + tenancy allowlist + tech-debt`. Rides with Step 0 `c6b6cde` (`fix(identity): allow phone-on-LAN dev access to the admin SPA cookie`).
+- **Status:** Landed — **pushed 2026-07-26** (`origin/main` at `d1dc3d2`; the chunk itself landed at
+  `30116da`, the six eyes-on fixes and their docs commit rode the same push)
+- **Commits:** `98defa9` — `feat(creators): admin agency-creator connections + roster contact gate + disconnect (AH-051)`; docs commit (this entry) — `docs(creators): AH-051 review + change-log entry + tenancy allowlist + tech-debt` (amended to `30116da`). Rides with Step 0 `c6b6cde` (`fix(identity): allow phone-on-LAN dev access to the admin SPA cookie`).
 - **Date:** 2026-07-24
 - **Why:** Admins had no way to broker an agency↔creator connection (e.g. an offline
   representation agreement) or to end a relationship as a mediated exit. Separately, the

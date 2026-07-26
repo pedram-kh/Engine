@@ -63,6 +63,11 @@ discipline in §7.
   plural shape_ exist in every locale — it can **never** prove a value isn't still English (see the
   AH-001 i18n-completeness tech-debt entry).
 - **Read-first.** Read the relevant docs/code before proposing or building. Cite `path:line`.
+- **E2E output goes somewhere durable, never `/tmp`.** Pipe Playwright runs into the gitignored
+  `playwright-report/` (or `test-results/`) inside the app, not `/tmp` — macOS clears it, and the
+  `list` reporter leaves no artifact behind, so a green run becomes unciteable within hours. Learned
+  the hard way on the AH-051/052 pre-push run: the 24/24 result could not be re-pasted per-spec for
+  retroactive verification because both logs were gone (only the lines quoted in-session survived).
 
 ### Where the truth lives
 
@@ -108,16 +113,16 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-26 · **Through:** AH-052 · **Baseline:** `30116da` — the current
-`origin/main` tip, which includes the **pushed** AH-001→AH-051 range in full: `c6b6cde` (Step 0 —
-`fix(identity)` 2-SPA dev-cookie fix), `98defa9` (**AH-051** feat) and `30116da` (**AH-051** docs,
-the amended close-out; the pre-amend `ce959cc` is no longer reachable) are all ancestors of
-`origin/main`. **Held set (push HELD):** the six **AH-051 eyes-on fix** commits — `4af63b2` (admin
-dialog: 422 copy, picker name, `approved` gate), `046d26c` (roster "Active" chip, `ended` chip),
-`530d7d8` and `bdc957b` (admin-connected mail body trims ×24), `dd65868` (**AH-052** canonical 403
-envelope, closed-thread composer, notification registry), `d381a77` (an `ended` relation could be
-re-pooled) — plus this session's docs commit. **Push:** AH-001→AH-051 at `origin/main`; the eyes-on
-fixes and docs held, awaiting Pedram's go.
+**Last updated:** 2026-07-26 · **Through:** AH-052 · **Baseline:** `d1dc3d2` — the current
+`origin/main` tip. **Nothing is held.** The AH-001→AH-052 range is pushed in full, including
+`c6b6cde` (Step 0 — `fix(identity)` 2-SPA dev-cookie fix), `98defa9` (**AH-051** feat) and
+`30116da` (**AH-051** docs, the amended close-out; the pre-amend `ce959cc` is no longer reachable).
+The final push on 2026-07-26 moved `origin/main` `30116da..d1dc3d2`, carrying the six **AH-051
+eyes-on fix** commits — `4af63b2` (admin dialog: 422 copy, picker name, `approved` gate), `046d26c`
+(roster "Active" chip, `ended` chip), `530d7d8` and `bdc957b` (admin-connected mail body trims ×24),
+`dd65868` (**AH-052** canonical 403 envelope, closed-thread composer, notification registry),
+`d381a77` (an `ended` relation could be re-pooled) — plus the addendum/AH-052 docs commit `d1dc3d2`.
+**Pushed ≠ deployed:** the deploy notes below are all still outstanding.
 
 **Deploy notes.** **No migrations** anywhere in AH-051 or AH-052 (`ended` is a plain-varchar enum
 value, no CHECK). Standing AH-051 notes: (a) it TIGHTENS the live contact gate — run
@@ -166,9 +171,8 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-052 — all Landed** (AH-001→AH-051 **pushed** at `origin/main`; the
-  AH-051 eyes-on fixes and **AH-052** **committed locally, push HELD**). One line each (detail and
-  decisions in `docs/reviews/adhoc-changes-log.md`):
+- **Ad-hoc run AH-001 → AH-052 — all Landed and all pushed** (`origin/main` at `d1dc3d2`; nothing
+  held). One line each (detail and decisions in `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.
   - **AH-003** — Wizard slim + profile-basics polish.
@@ -321,7 +325,7 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
     union + `deriveConnectionState` "Previously connected"). Break-reverts executed (D1
     gate, D2 blacklist, D6 pool-scope). **No migration** (`ended` = plain varchar, no CHECK).
     i18n ×24 both apps + backend. Review: `docs/reviews/admin-connections-review.md`.
-    **Post-close eyes-on fixes (6, held):** `4af63b2` admin dialog (raw 422 code rendered as
+    **Post-close eyes-on fixes (6, pushed 2026-07-26):** `4af63b2` admin dialog (raw 422 code rendered as
     copy, agency ULID replacing the name in the picker, no upfront `approved` gate),
     `046d26c` the roster "All" chip promised a total the backend never returns, renamed
     "Active" with an `ended` chip added, `530d7d8`/`bdc957b` admin-connected mail body trims

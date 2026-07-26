@@ -279,8 +279,9 @@ suite never asserted, a copy judgment, or one genuine gap in D-3's status sweep.
 
 **Provenance:** found by Pedram in eyes-on, fixed by Cursor.
 
-**Held set:** `4af63b2`, `046d26c`, `530d7d8`, `bdc957b`, `dd65868`, `d381a77` — all atop the
-pushed docs commit `30116da`, all held with the AH-051 push call.
+**The six fix commits:** `4af63b2`, `046d26c`, `530d7d8`, `bdc957b`, `dd65868`, `d381a77` — all atop
+the AH-051 close-out `30116da`, and all **pushed 2026-07-26** together with this addendum's own docs
+commit, taking `origin/main` from `30116da` to `d1dc3d2`.
 
 ### The six fixes
 
