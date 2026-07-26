@@ -267,3 +267,174 @@ main: `DiscoverPage.vue`, `DiscoverProfilePage.vue` (+specs), `app.json` ×24 (`
 
 - `roster.status.ended`). Packages: `api-client` `agency.ts` (`ended` union + derive) +
   `agency.spec.ts`. Docs: this file, ad-hoc log (AH-051), tech-debt, resumption template.
+
+---
+
+## Post-close addendum (eyes-on fixes, 2026-07-26)
+
+The original review above is unchanged. This section records six defects Pedram found by
+driving the shipped feature by hand **after** the chunk closed, and the fixes that answer
+them. Nothing here reopens a D-1…D-11 decision; every fix is either a presentation seam the
+suite never asserted, a copy judgment, or one genuine gap in D-3's status sweep.
+
+**Provenance:** found by Pedram in eyes-on, fixed by Cursor.
+
+**Held set:** `4af63b2`, `046d26c`, `530d7d8`, `bdc957b`, `dd65868`, `d381a77` — all atop the
+pushed docs commit `30116da`, all held with the AH-051 push call.
+
+### The six fixes
+
+**1 · `4af63b2` — admin connect dialog (three defects in one commit).** _Bug:_ connecting an
+unapproved creator produced a correct refusal rendered as the raw string
+`connection.creator_not_approved`, and afterwards the agency picker showed a ULID instead of
+the agency name. _Root cause:_ three independent frontend seams — the catch handler passed
+`error.code` into `t()` as though a 422 code were an i18n key; Vuetify resolves a selection's
+displayed title from `items`, and the parent reset `agencies` to `[]` on an empty query,
+orphaning the selected ULID; and the dialog had no upfront `approved` gate, so the admin could
+walk into a guaranteed rejection. The suite missed all three because the admin specs asserted
+_that the API was called with the right payload_, never _what the user sees when it refuses_.
+_Pin:_ `maps a connect 422 code to a localized message (NOT the raw code)` + the disconnect
+twin, `keeps rendering the selected agency NAME after the search results reset`, and the
+unapproved-warning / approved-no-warning pair at both dialog and page level.
+
+**2 · `046d26c` — roster status chip.** _Bug:_ the "All" chip showed two creators while the
+Pending-requests chip revealed a third, reading as missing data. _Root cause:_ not a data
+defect. D-6 deliberately excludes `pending_request` + `declined` from the default index and
+D-3 added `ended` to that set; the word "All" promised a total the backend never returns. The
+backend exclusion **was** correctly pinned and the FE spec asserted the chip list existed —
+nobody asserted the label was honest about the query behind it. _Pin:_ the spec case
+_labels the default chip "Active" (not "All") and offers an `ended` chip_.
+
+**3–4 · `530d7d8` + `bdc957b` — admin-connected mail body.** _Bug:_ reading the real email,
+the body over-explained: it disclosed the outside-agreement rationale to the creator and then
+narrated the mechanism. _Root cause:_ a copy judgment, not a defect — the D-7 mailable shipped
+with prose that only reads wrong once seen in an inbox. _Pin:_ none needed, and deliberately
+so — `AdminRelationMailTest` already pins the structural invariants (agency name, recipient
+name, support line, placeholder resolution across all 24 locales) and does **not** pin prose
+verbatim. Pinning marketing sentences would be brittle without protecting anything.
+
+**5 · `dd65868` — canonical 403 envelope, closed threads, notification registry.** _Bug:_ after
+a disconnect, opening the chat produced a 403 the SPA rendered as "Unrecognized error
+response", and the disconnect notification read "You have a new notification." _Root cause:_
+two independent holes. The SPA's `ApiError.fromEnvelope` expects the canonical JSON:API
+envelope, but Laravel's default handler returns `{"message": …}` for `HttpException` — so
+**every** 403 platform-wide (all 82 `authorize()` call sites) hit the generic fallback. A
+`ValidationExceptionRenderer` with tests existed; nothing equivalent for 403, and no test
+anywhere asserted a 403 **body** — only status codes were ever asserted. Separately, the two
+new AH-051 `NotificationType` cases were added to the backend enum (pinned by
+`NotificationTypeEnumTest`) but never registered in the frontend `LIVE_TYPES`, and no parity
+spec existed between the backend enum and the FE registry. Fixing the first exposed a third
+asymmetry: reading a relationship thread was never gated the way sending was, so a severed
+relation presented a live composer on a dead thread. _Pin:_ `ForbiddenExceptionRendererTest`
+(3 cases including the `ApiError.fromEnvelope` contract), a canonical-envelope case in
+`RelationshipMessageApiTest`, `templates.spec.ts` pinning the registry against the backend
+enum, and the `RelationshipThreadView` closed-state block.
+**The 403-envelope half of this commit is carried as its own entry, [AH-052](adhoc-changes-log.md)** —
+its blast radius is the whole platform's error contract, not this chunk, and a future reader
+debugging error shapes will search for "403 envelope", not "admin connections". The
+closed-composer and notification-registry halves stay here.
+
+**6 · `d381a77` — re-pooling an ended relation.** _Bug:_ a creator disconnected by super-admin
+sat correctly in the roster's Ended section, yet the detail page still offered Add to pool and
+it worked. _Root cause:_ the genuine gap of the six. D-6 deletes the pair's pool memberships,
+but nothing stopped a re-add — the guard only checked that a relation **row exists**, and an
+`ended` relation keeps its row. That guard had been hand-copied into four controllers, each
+documented as "any status qualifies", which was true until D-3 introduced `ended`. D-3 asked
+for a sweep of every status consumer; pool membership was missed. The suite missed it because
+the pin was on the **deletion** (pools-emptied on disconnect) and nobody asked the inverse
+question: can it come back? _Pin:_ 9 backend cases + 4 frontend cases, including a dataset
+proving `roster`/`external`/`prospect`/`pending_request`/`declined` all stay poolable (no
+over-block) and one proving a re-connected creator becomes poolable again.
+
+### Risk answers — did any fix touch a gated surface?
+
+Verified mechanically over `30116da..HEAD`: **all three break-revert subjects show zero
+diffs.** `CreatorPolicy.php` (the D-1 contact gate), `CreatorConnectionRequestController.php`
+(the D-2 re-gates) and the D-6 disconnect controllers were not touched by any of the six
+commits. The pre-close break-reverts therefore still stand as evidence and did not need
+re-execution; their pinning tests were re-run regardless and are green.
+
+Per fix, explicitly:
+
+| Fix       | D-1 gate | D-2 re-gates | D-6 txn / pool-scope            | §5.34 pins    | Notification path   | i18n keyset         |
+| --------- | -------- | ------------ | ------------------------------- | ------------- | ------------------- | ------------------- |
+| `4af63b2` | no       | no           | no                              | no            | no                  | **yes** — admin ×24 |
+| `046d26c` | no       | no           | no (presentational only)        | no            | no                  | **yes** — main ×24  |
+| `530d7d8` | no       | no           | no                              | no            | **yes** — mail body | no (values only)    |
+| `bdc957b` | no       | no           | no                              | no            | **yes** — mail body | no (values only)    |
+| `dd65868` | no       | no           | no                              | AH-010 (read) | **yes** — registry  | **yes** — main ×24  |
+| `d381a77` | consumer | no           | adjacent (txn itself untouched) | re-run green  | no                  | no                  |
+
+Notes on the three non-obvious cells. `046d26c` is presentational only — `DEFAULT_EXCLUDED_STATUSES`
+is untouched, and the new chip drives `?status=ended`, already pinned by _"filters BY ended —
+the chip returns exactly those (AH-051 D-3)"_. `dd65868` touches the AH-010 messaging agreement
+on the **read** path only: `can_send` is computed _from_ the existing policy rather than
+reimplementing it, so it cannot drift from the gate. `d381a77` touches
+`AgencyCreatorDetailController`, a D-1 consumer, as a guard refactor only — contact gating is
+unchanged, and both the pools-emptied and assignments-survive §5.34 sets were re-run green.
+
+The mail-copy commits changed placeholder counts (the body went from two `:agency`
+occurrences to one), applied identically across all 24 locales; `LangParityTest`'s placeholder
+check is green.
+
+### Break-reverts on the new guards (fresh, executed at `d381a77`)
+
+Three, each failing exactly the tests that claim to protect it, each restored clean:
+
+- **Pool add `ended` guard** — `if ($relation->isEnded())` → `if (false)`: 2 failed, 1 passed
+  (the re-connected-creator case correctly still passes, since it asserts the _allow_ leg).
+- **Availability `ended` guard** — same inversion: 2 failed.
+- **Frontend `canAddToPool`** — drop the status clause, leaving the role check: 2 failed.
+
+### Accept-as-untestable
+
+Two, recorded so no future reviewer reads them as missing coverage:
+
+1. **The "All" chip class of defect.** The corrected label is pinned, but _a label that
+   misdescribes the query behind it_ is not reachable by assertion — the backend was right, the
+   chip list was right, and only a human reading the word "All" could see the lie. No test
+   shape would have caught this.
+2. **Mail prose.** Deliberately unpinned, as above: the structural invariants are pinned and
+   the sentences are not, because pinning copy verbatim is brittle without protecting anything.
+
+### Operational finding (carried to the resumption template)
+
+While verifying the mail-copy change, the new body did not appear until the dev stack was
+restarted: the **long-running queue worker caches translations in memory**. This is not
+specific to AH-051 — it applies to every mail-copy change the platform ever ships. The worker
+must be restarted on deploy or it will keep sending the old body from cache.
+
+### Gate board at `d381a77` (full re-run, post-fixes)
+
+| Gate                                       | Result                                                                                               |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Pest (full, serial, 2G)                    | **2001 passed**, 1 skipped (7080 assertions), 86.9s                                                  |
+| Vitest — apps/main                         | **1217 passed** (131 files)                                                                          |
+| Vitest — apps/admin                        | **449 passed** (53 files)                                                                            |
+| Vitest — packages/api-client               | **204 passed** (9 files)                                                                             |
+| vue-tsc — main / admin / api-client        | clean                                                                                                |
+| ESLint                                     | admin **0 errors**; main **0 errors** (2 pre-existing `vue/no-v-html` warnings, both predate AH-051) |
+| Pint `--test` (all)                        | **passed**                                                                                           |
+| PHPStan                                    | **No errors**                                                                                        |
+| Locale parity                              | green (`LangParityTest` keyset + `:named` placeholders ×24)                                          |
+| Playwright (full, isolated `catalyst_e2e`) | **GREEN — 24/24, all first-run, zero flakes.** main **22/22** (3.0m), admin **2/2** (27s)            |
+
+All sixteen pinned suites pass by name, including contact withholding, the AH-010 messageable-
+contacts agreement, the relationship-status catalogue, both connection-request suites, admin
+connect + disconnect, and the mail suite. The single skip is the pre-existing `[postgres-only]`
+full-text-search case in `AgencyCreatorRosterTest`, unrelated to this work.
+
+The Playwright re-run improves on the AH-051 close, which was 24/24 _effective_ (20 first-run
+plus two cold-start flakes green on isolated re-run); this run is 24/24 **first-run** with no
+retries. All five specs traversing changed surfaces passed:
+`roster-search-and-affordances` (the chip rename), both `creator-detail` cases (the pool-button
+gate), all three `talent-pools` cases, both `permissions` cases (403 handling), and
+`creator-connection-requests` (the D-2 accept path). The two `talent-pools` add-a-creator specs
+are the useful negative evidence for `d381a77`: they add **live** relations to pools and still
+pass, so the new `ended` guard did not over-block.
+
+Run hygiene: dev stack down, `DB_DATABASE` overridden to `catalyst_e2e` with
+`reuseExistingServer: false` on the API (the post-incident contract), `migrate:fresh` confirmed in
+the log, then the stack restarted and health-checked (API `/up` 200, both SPAs 200, queue worker
+up). The developer database `catalyst` was verified untouched afterwards (12 users / 7 creators /
+2 agencies / 7 relations).

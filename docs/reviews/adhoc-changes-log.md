@@ -60,6 +60,45 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-052 · Canonical 403 envelope — every `authorize()` denial now speaks the platform's error contract
+
+- **Status:** Landed (push HELD)
+- **Commits:** `dd65868` — `fix(api,main): return a canonical 403 envelope and explain closed threads`.
+  Shared commit: its closed-thread and notification-registry halves belong to AH-051 and are recorded
+  in that review's post-close addendum; this entry owns the 403 contract change.
+- **Date:** 2026-07-26
+- **Why:** Surfaced by AH-051 eyes-on — a creator disconnected from an agency opened the chat and got
+  a 403 the SPA rendered as **"Unrecognized error response."** The refusal was correct; the platform
+  simply could not say so. The blast radius was never AH-051's: **every** 403 in the product behaved
+  this way.
+- **What:** 403s now return the canonical JSON:API error envelope with code `auth.forbidden`, the same
+  shape `ValidationExceptionRenderer` has always produced for 422. A new `ForbiddenExceptionRenderer`
+  is registered in `bootstrap/app.php` against `HttpExceptionInterface` filtered to
+  `HTTP_FORBIDDEN` — deliberately the interface, not `AuthorizationException`, because Laravel has
+  already converted the latter into an `AccessDeniedHttpException` by the time render callbacks run.
+  The exception's own message is used as the envelope title when it carries one, falling back to a
+  canonical sentence when the gate denied silently. This reaches all **82** `authorize()` call sites
+  plus every `abort(403)`.
+- **Root cause:** a renderer existed for 422 and never for 403, and **no test anywhere asserted a 403
+  body** — the suite asserted status codes only, so a 403 could return any shape at all and stay
+  green. That is why a client-visible contract gap survived to eyes-on.
+- **Touched:** `apps/api/app/Core/Errors/ForbiddenExceptionRenderer.php` (new),
+  `apps/api/bootstrap/app.php`, `apps/api/tests/Unit/Core/Errors/ForbiddenExceptionRendererTest.php`
+  (new).
+- **Decisions:** Register against `HttpExceptionInterface` + status filter rather than
+  `AuthorizationException` (the conversion happens first). Fall back to a canonical sentence rather
+  than leaking an empty title. Error titles stay plain literals, matching the established
+  `ErrorResponse::single` convention rather than becoming translation keys.
+- **Pin:** `ForbiddenExceptionRendererTest` — three cases: a gate denial emits the canonical envelope;
+  a message-less exception falls back to the canonical sentence; and the output **is parseable by the
+  SPA's `ApiError.fromEnvelope` contract**, which is the case that actually closes the gap. A
+  canonical-envelope assertion on a blocked send was also added to `RelationshipMessageApiTest`.
+- **⚠ Deploy note:** this is a **client-visible contract change**. Any consumer that pattern-matched
+  Laravel's default `{"message": …}` 403 body will now receive the envelope instead. Ships with the
+  AH-051 push.
+- **Ref:** [`admin-connections-review.md`](admin-connections-review.md) post-close addendum
+  (cross-referenced); AH-051 entry below.
+
 ### AH-051 · Admin-initiated agency↔creator connections + contact-gate fix + first termination path
 
 - **Status:** Landed (push HELD)
@@ -97,9 +136,22 @@ ended`, deletes the pair's pool memberships, and audits with a mandatory reason,
   connected" (never silently to `none`). Pool-posture reversal recorded: blacklist =
   warn-don't-remove vs disconnect = remove (coherent together). No D-8 marker column; D-10
   `runAs` per §5.1. Creator-/agency-side disconnect deferred (tech-debt).
+- **Eyes-on fixes (post-close):** Pedram drove the shipped feature by hand after close and found
+  six defects; all six are fixed, pinned, and held with this chunk's push. `4af63b2` (admin dialog:
+  raw 422 code shown as copy, agency ULID replacing the name in the picker, no upfront `approved`
+  gate), `046d26c` (the roster "All" chip promised a total the backend never returns — renamed
+  "Active", `ended` chip added), `530d7d8` + `bdc957b` (admin-connected mail body trimmed: the
+  outside-agreement rationale and the mechanism narration both removed, ×24), `dd65868` (canonical
+  403 envelope — see **AH-052** — plus the closed-thread composer state and the two AH-051
+  notification types registered in the FE `LIVE_TYPES`), `d381a77` (an `ended` relation could be
+  re-added to a talent pool, undoing D-6's membership deletion). Only the last is a genuine gap in
+  D-3's status sweep; the rest are presentation seams the suite never asserted, or copy judgments.
+  Per-fix bug/root-cause/pin, the risk answers (**zero diffs on all three break-revert subjects**),
+  three fresh break-reverts on the new guards, and two accept-as-untestable notes are in the
+  review's **Post-close addendum**. Found by Pedram in eyes-on, fixed by Cursor.
 - **Ref:** kickoff "Admin-initiated connections + contact-gate fix + first termination path";
-  review file [`admin-connections-review.md`](admin-connections-review.md); commit-pair
-  (this entry's landing commit).
+  review file [`admin-connections-review.md`](admin-connections-review.md) (incl. the post-close
+  addendum); commit-pair (this entry's landing commit) + the six fix commits above.
 
 ### AH-050 · "Who appears in your content?" — optional companion multi-select on the creator profile
 

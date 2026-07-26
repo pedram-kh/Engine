@@ -9,6 +9,60 @@ anyone reviewing it later.
 
 ---
 
+## Backend `NotificationType` ↔ frontend `LIVE_TYPES` registry drift (eyes-on finding — CLOSED)
+
+- **Where:** `apps/api/app/Modules/Notifications/Enums/NotificationType.php` and
+  `apps/main/src/modules/notifications/templates.ts` (`LIVE_TYPES`).
+- **The gap:** adding a notification type to the backend enum required a matching hand-edit in the
+  frontend registry, and **nothing enforced the pair**. The backend side was pinned
+  (`NotificationTypeEnumTest`); the frontend side was not, and a type missing from `LIVE_TYPES`
+  fell through to the generic template silently. AH-051 eyes-on caught exactly this: both new
+  relation types rendered as "You have a new notification." A type can be _emitted in production_
+  and _invisible in the UI_ with the whole suite green.
+- **What closed it (AH-051 eyes-on fixes, 2026-07-26):** `templates.spec.ts` — the durable tripwire.
+  It pins the frontend registry **against the backend enum**, verifies every live template key
+  resolves to a real translation, and asserts that no live type silently resolves to the fallback.
+  A deliberately-deferred type must now be named in an explicit allowlist rather than simply
+  forgotten. Registering the two AH-051 types also required making `preference: null` an explicit
+  "always-on" state, so a non-toggleable notification can be live without inventing a fake
+  preference toggle.
+- **Status:** CLOSED — 2026-07-26 ([review](reviews/admin-connections-review.md) post-close
+  addendum). Found by Pedram in eyes-on, fixed by Cursor.
+
+---
+
+## No exhaustiveness tripwire for `RelationshipStatus` consumers (a new case can be missed surface-by-surface)
+
+- **Where:** `RelationshipStatus` and every surface that branches on it — notably
+  `AgencyCreatorRelationGuard::requireExisting` callers (pool membership, the pool picker,
+  availability, roster detail), the roster index's `DEFAULT_EXCLUDED_STATUSES`, the discovery
+  collision matrix, and `deriveConnectionState` on the frontend.
+- **What we accepted (AH-051 eyes-on fixes, 2026-07-26):** the enum is a plain PHP enum with no
+  CHECK constraint and no compiler-enforced exhaustiveness at its consumers. D-3 asked for a sweep
+  of every consumer when `ended` was added; **pool membership was missed**, and an ended relation
+  stayed poolable — undoing the membership deletion D-6 performs on disconnect. The four
+  hand-copied `requireRosterRelation()` guards, each commented "any status qualifies", were the
+  proximate cause: four copies meant four places to remember, and the comment was true right up
+  until it wasn't. `d381a77` consolidated them into one shared
+  `AgencyCreatorRelationGuard::requireExisting`, which **centralises the lookup while deliberately
+  leaving the status decision at each call site** — a read surface and a write surface genuinely
+  want different answers, so forcing one policy would be wrong. That is a real improvement (one
+  place to find every caller) but it is **not** a tripwire: nothing fails if a future status is
+  added and a call site ignores it.
+- **Trigger:** adding a seventh `RelationshipStatus` case, or the next time a status-dependent
+  capability is found leaking on a terminal state.
+- **Resolution sketch:** an architecture spec in the shape of the notification-registry tripwire —
+  enumerate the guard's callers by source scan and assert each one branches on status (or is
+  named in an explicit "status-agnostic by design" allowlist), so a new case forces a per-surface
+  decision instead of a silent fallthrough. The `RelationshipStatusEnumTest` catalogue already
+  pins the _case set_; what is missing is pinning the _consumers_.
+- **Owner:** whoever adds the next `RelationshipStatus` case.
+- **Status:** open, low-severity (the known consumers are correct as of `d381a77`; this is about
+  the _next_ case). Surfaced by AH-051 eyes-on, 2026-07-26
+  ([review](reviews/admin-connections-review.md) post-close addendum).
+
+---
+
 ## Relation disconnect — only the admin-mediated path exists (no self-service exit)
 
 - **Where:** `AdminCreatorConnectionController::disconnect` (the ONLY termination path),

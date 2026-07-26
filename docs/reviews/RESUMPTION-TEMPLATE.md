@@ -108,16 +108,35 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-24 · **Through:** AH-051 · **Baseline:** `3fccd36` — the `origin/main`
-tip at session start, which already includes the **pushed** AH-001→AH-050 range (plus the
-`3fccd36` portfolio-`processing`-rescue fix). Atop it, this session commits three, **push HELD**:
-`c6b6cde` (Step 0 — `fix(identity)` 2-SPA dev-cookie fix), `98defa9` (**AH-051** feat), and
-`bd3e278` (**AH-051** docs). **Push:** AH-001→AH-050 at `origin/main`; the three local commits held,
-awaiting Claude's clearance + Pedram's go. **Deploy notes:** **AH-051 adds NO migration** (`ended`
-is a plain-varchar enum value, no CHECK), but (a) it TIGHTENS the live contact gate — run
+**Last updated:** 2026-07-26 · **Through:** AH-052 · **Baseline:** `30116da` — the current
+`origin/main` tip, which includes the **pushed** AH-001→AH-051 range in full: `c6b6cde` (Step 0 —
+`fix(identity)` 2-SPA dev-cookie fix), `98defa9` (**AH-051** feat) and `30116da` (**AH-051** docs,
+the amended close-out; the pre-amend `ce959cc` is no longer reachable) are all ancestors of
+`origin/main`. **Held set (push HELD):** the six **AH-051 eyes-on fix** commits — `4af63b2` (admin
+dialog: 422 copy, picker name, `approved` gate), `046d26c` (roster "Active" chip, `ended` chip),
+`530d7d8` and `bdc957b` (admin-connected mail body trims ×24), `dd65868` (**AH-052** canonical 403
+envelope, closed-thread composer, notification registry), `d381a77` (an `ended` relation could be
+re-pooled) — plus this session's docs commit. **Push:** AH-001→AH-051 at `origin/main`; the eyes-on
+fixes and docs held, awaiting Pedram's go.
+
+**Deploy notes.** **No migrations** anywhere in AH-051 or AH-052 (`ended` is a plain-varchar enum
+value, no CHECK). Standing AH-051 notes: (a) it TIGHTENS the live contact gate — run
 `php artisan relations:audit-contact-exposure` pre-deploy to read the blast radius; and (b) admin
-disconnect DELETES pool-membership rows — **snapshot-first** stays the rule. The AH-026 recompute +
-AH-042 one-shot remain the only outstanding post-deploy commands (AH-050 adds none).
+disconnect DELETES pool-membership rows — **snapshot-first** stays the rule. **Two new permanent
+notes** from the eyes-on fixes:
+
+1. **⚠ Restart the queue worker on every deploy that changes mail copy.** The long-running worker
+   **caches translations in memory** — a `lang/**` copy change will keep sending the OLD body until
+   the worker is restarted. Found the hard way while verifying the `530d7d8`/`bdc957b` mail trims:
+   the new text did not appear until the dev stack was bounced. This is **not** AH-051-specific; it
+   applies to every mail-copy change the platform ever ships.
+2. **⚠ The 403 body shape changes with this push (client-visible contract).** AH-052 makes every
+   `authorize()` denial — all 82 call sites, plus every `abort(403)` — return the canonical JSON:API
+   error envelope (`auth.forbidden`) instead of Laravel's default `{"message": …}`. Any consumer
+   that pattern-matched the old shape must be checked before this ships.
+
+The AH-026 recompute and AH-042 one-shot remain the only outstanding post-deploy **commands**
+(AH-050, AH-051 and AH-052 add none).
 
 > **AH-042 · Toggle-OFF campaigns flow without contract involvement** (full chunk loop). The
 > `requires_per_campaign_contract` toggle is now load-bearing end-to-end: the machine permits a
@@ -147,9 +166,9 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
 - **Sprints 0–13 + 3.5 closed** (the full Phase-1 spine: identity/auth, onboarding wizard,
   integrations seams, roster + discovery + pools, campaigns/boards, notifications subsystem, EU
   locale support). Per-chunk decisions in `docs/reviews/sprint-*`.
-- **Ad-hoc run AH-001 → AH-051 — all Landed** (AH-001→AH-050 **pushed** at `origin/main`;
-  AH-051 **committed locally, push HELD**). One line each (detail + decisions in
-  `docs/reviews/adhoc-changes-log.md`):
+- **Ad-hoc run AH-001 → AH-052 — all Landed** (AH-001→AH-051 **pushed** at `origin/main`; the
+  AH-051 eyes-on fixes and **AH-052** **committed locally, push HELD**). One line each (detail and
+  decisions in `docs/reviews/adhoc-changes-log.md`):
   - **AH-001** — EU locale support (24 languages) + persistence.
   - **AH-002** — Digest/invite email locale docblock + English-only decision.
   - **AH-003** — Wizard slim + profile-basics polish.
@@ -302,6 +321,26 @@ below is unchanged by this batch (still exactly the two AH-026 + AH-042 one-shot
     union + `deriveConnectionState` "Previously connected"). Break-reverts executed (D1
     gate, D2 blacklist, D6 pool-scope). **No migration** (`ended` = plain varchar, no CHECK).
     i18n ×24 both apps + backend. Review: `docs/reviews/admin-connections-review.md`.
+    **Post-close eyes-on fixes (6, held):** `4af63b2` admin dialog (raw 422 code rendered as
+    copy, agency ULID replacing the name in the picker, no upfront `approved` gate),
+    `046d26c` the roster "All" chip promised a total the backend never returns, renamed
+    "Active" with an `ended` chip added, `530d7d8`/`bdc957b` admin-connected mail body trims
+    ×24, `dd65868` (**AH-052** below, plus the closed-thread composer and the 2 relation types
+    registered in the FE `LIVE_TYPES`), `d381a77` an `ended` relation could be re-added to a
+    talent pool, undoing D-6's membership deletion — the one genuine gap in D-3's status
+    sweep. **Zero diffs on all three break-revert subjects** (verified over `30116da..HEAD`);
+    3 fresh break-reverts on the new guards. Detail: the review's **Post-close addendum**.
+  - **AH-052** — Canonical 403 envelope. Every `authorize()` denial (all 82 call sites, plus
+    every `abort(403)`) now returns the JSON:API error envelope with code `auth.forbidden`,
+    the same shape 422 has always produced; previously they fell through to Laravel's default
+    `{"message": …}` and the SPA rendered "Unrecognized error response." Registered against
+    `HttpExceptionInterface` filtered to `HTTP_FORBIDDEN`, **not** `AuthorizationException`
+    (Laravel converts it to `AccessDeniedHttpException` before render callbacks run). Root
+    cause: a renderer existed for 422 and never for 403, and **no test asserted a 403 body**,
+    only status codes. Pinned by `ForbiddenExceptionRendererTest`, including a case proving
+    the output parses under the SPA's `ApiError.fromEnvelope` contract. **⚠ client-visible
+    contract change** (see deploy notes). Surfaced by AH-051 eyes-on; commit `dd65868` is
+    shared with the AH-051 addendum items.
 
   > **Ruling (AH-046/047, flaky-10 MT baseline):** new creator-facing copy gets a real
   > machine-translation baseline in **all 24 locales at merge time**, including the flaky 10
