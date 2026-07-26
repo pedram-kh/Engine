@@ -68,6 +68,13 @@
         "newConversation": "Comhrá nua",
         "startConversation": "Tosaigh comhrá",
         "selectConversation": "Roghnaigh comhrá chun tús a chur le teachtaireachtaí.",
+        "closed": {
+          "relation_ended": "Tá an comhrá seo dúnta toisc gur tháinig deireadh le do nasc le {name}. Is féidir leat stair na dteachtaireachtaí a léamh fós.",
+          "blacklisted": "Tá an comhrá seo dúnta. Is féidir leat stair na dteachtaireachtaí a léamh fós.",
+          "not_connected": "Ní féidir leat teachtaireacht a sheoladh chuig {name} ach nuair atá sibh nasctha. Is féidir leat stair na dteachtaireachtaí a léamh fós.",
+          "creator_not_approved": "Tá an comhrá seo dúnta go dtí go gceadaítear cuntas an chruthaitheora. Is féidir leat stair na dteachtaireachtaí a léamh fós.",
+          "generic": "Tá an comhrá seo dúnta. Is féidir leat stair na dteachtaireachtaí a léamh fós."
+        },
         "picker": {
           "titleCreators": "Comhrá nua",
           "titleAgencies": "Comhrá nua",

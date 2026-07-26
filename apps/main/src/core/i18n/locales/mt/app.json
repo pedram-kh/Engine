@@ -68,6 +68,13 @@
         "newConversation": "Konversazzjoni ġdida",
         "startConversation": "Ibda konversazzjoni",
         "selectConversation": "Agħżel konversazzjoni biex tibda tibgħat messaġġi.",
+        "closed": {
+          "relation_ended": "Din il-konverżazzjoni ngħalqet għax il-konnessjoni tiegħek ma' {name} intemmet. Xorta tista' taqra l-istorja tal-messaġġi.",
+          "blacklisted": "Din il-konverżazzjoni ngħalqet. Xorta tista' taqra l-istorja tal-messaġġi.",
+          "not_connected": "Tista' tibgħat messaġġi lil {name} biss waqt li tkunu konnessi. Xorta tista' taqra l-istorja tal-messaġġi.",
+          "creator_not_approved": "Din il-konverżazzjoni ngħalqet sakemm il-kont tal-kreatur ma jiġix approvat. Xorta tista' taqra l-istorja tal-messaġġi.",
+          "generic": "Din il-konverżazzjoni ngħalqet. Xorta tista' taqra l-istorja tal-messaġġi."
+        },
         "picker": {
           "titleCreators": "Konversazzjoni ġdida",
           "titleAgencies": "Konversazzjoni ġdida",

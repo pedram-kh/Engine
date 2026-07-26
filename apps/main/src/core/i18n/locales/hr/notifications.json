@@ -26,9 +26,11 @@
       "creator_rejected": "Vaše prijava ustvarjalca nebyla schválena.",
       "message_received_by_creator": "{sender_name} vám poslal zprávu ohledně {campaign_name}.",
       "message_received_by_agency": "{sender_name} poslal zprávu ohledně {campaign_name}.",
-      "fallback": "Máte nové oznámení.",
       "message_relationship_received_by_creator": "{sender_name} vam je poslao izravnu poruku.",
-      "message_relationship_received_by_agency": "{sender_name} vam je poslao izravnu poruku."
+      "message_relationship_received_by_agency": "{sender_name} vam je poslao izravnu poruku.",
+      "agency_creator_relation_admin_connected": "Administrator Catalysta povezao vas je s {agency_name}.",
+      "agency_creator_relation_disconnected": "Vaša veza s {counterparty_name} je završila.",
+      "fallback": "Máte nové oznámení."
     },
     "preferences": {
       "title": "Nastanjeitve oznámení",

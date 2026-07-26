@@ -26,9 +26,11 @@
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",
       "message_received_by_agency": "{sender_name} sent a message about {campaign_name}.",
-      "fallback": "You have a new notification.",
       "message_relationship_received_by_creator": "{sender_name} közvetlen üzenetet küldött Önnek.",
-      "message_relationship_received_by_agency": "{sender_name} közvetlen üzenetet küldött Önnek."
+      "message_relationship_received_by_agency": "{sender_name} közvetlen üzenetet küldött Önnek.",
+      "agency_creator_relation_admin_connected": "A Catalyst adminisztrátora összekapcsolta Önt a(z) {agency_name} partnerrel.",
+      "agency_creator_relation_disconnected": "A(z) {counterparty_name} partnerrel fennálló kapcsolata véget ért.",
+      "fallback": "You have a new notification."
     },
     "preferences": {
       "title": "Nemtification settings",

@@ -26,9 +26,11 @@
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",
       "message_received_by_agency": "{sender_name} sent a message about {campaign_name}.",
-      "fallback": "You have a new notification.",
       "message_relationship_received_by_creator": "{sender_name} lähetti sinulle suoraviestin.",
-      "message_relationship_received_by_agency": "{sender_name} lähetti sinulle suoraviestin."
+      "message_relationship_received_by_agency": "{sender_name} lähetti sinulle suoraviestin.",
+      "agency_creator_relation_admin_connected": "Catalystin ylläpitäjä yhdisti sinut kontaktiin {agency_name}.",
+      "agency_creator_relation_disconnected": "Yhteytesi käyttäjään {counterparty_name} on päättynyt.",
+      "fallback": "You have a new notification."
     },
     "preferences": {
       "title": "Eitification settings",

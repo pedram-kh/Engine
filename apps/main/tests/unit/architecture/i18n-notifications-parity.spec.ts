@@ -39,10 +39,21 @@ const LOCALE_ROOT = path.resolve(__dirname, '../../../src/core/i18n/locales')
 const LOCALES = UI_LOCALES
 
 /**
- * The 12 notification types with a live emit site (Ch1/Ch2 + Sprint 11 campaign
- * messaging + AH-010 relationship messaging). AH-010 (D5) grew the live-set
- * 10 → 12: the two dual-recipient relationship-message types each gained a live
- * emit site (RelationshipMessageNotifications).
+ * The 14 notification types with a live emit site (Ch1/Ch2 + Sprint 11 campaign
+ * messaging + AH-010 relationship messaging + AH-051 relation lifecycle).
+ * AH-010 (D5) grew the live-set 10 → 12: the two dual-recipient
+ * relationship-message types each gained a live emit site
+ * (RelationshipMessageNotifications). AH-051 (D7) grew it 12 → 14 with the
+ * admin-mediated connect + disconnect verbs.
+ *
+ * ⚠ This list is a DELIBERATE restatement, so adding a template is a conscious
+ * act — but a restatement can go stale, and this one did: AH-051 shipped both
+ * relation verbs with live emit sites while this const still said 12, so the
+ * loop below never asked about them and users got the fallback. The derived
+ * guard that cannot go stale lives in
+ * `src/modules/notifications/templates.spec.ts`, which checks the registry
+ * against the backend enum read from source. Keep both: this one catches a
+ * missing TRANSLATION, that one catches a missing REGISTRATION.
  */
 const LIVE_TYPES = [
   'assignment.draft_approved',
@@ -57,6 +68,8 @@ const LIVE_TYPES = [
   'message.received_by_agency',
   'message.relationship_received_by_creator',
   'message.relationship_received_by_agency',
+  'agency_creator_relation.admin_connected',
+  'agency_creator_relation.disconnected',
 ] as const
 
 /** Emit-less / forward-declared types that MUST route to the fallback. */
@@ -113,11 +126,13 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
     }
   })
 
-  it('notifications.types holds EXACTLY the 12 live templates + fallback', async () => {
+  it('notifications.types holds EXACTLY the 14 live templates + fallback', async () => {
     const en = await loadBundle('en')
     const typeKeys = Object.keys(en.notifications.types).sort()
 
     const expected = [
+      'agency_creator_relation_admin_connected',
+      'agency_creator_relation_disconnected',
       'assignment_contracted',
       'assignment_draft_approved',
       'assignment_draft_rejected',
@@ -164,10 +179,19 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
 /**
  * S11.0 Ch3b + Sprint 11 — the prefs role-partition and the Ch3a template map
  * are ONE source of truth (the `LIVE_TYPES` registry). These pin that they can't
- * drift: the union of the two recipient roles' prefs types is EXACTLY the 10
- * live-template types, the two roles are disjoint, and every prefs-exposed type
- * has a bespoke (non-fallback) template. A type added to / dropped from the
- * registry, or given a recipient that doesn't match its template, fails here.
+ * drift: the union of the two recipient roles' prefs types is EXACTLY the
+ * TOGGLEABLE live-template types, the two roles are disjoint, and every
+ * prefs-exposed type has a bespoke (non-fallback) template. A type added to /
+ * dropped from the registry, or given a recipient that doesn't match its
+ * template, fails here.
+ *
+ * AH-051 (D7) split "live" from "toggleable": the two relation-lifecycle verbs
+ * are live (they render a real template) but ALWAYS-ON (`preference: null`), so
+ * they are deliberately absent from both role partitions. Being connected to or
+ * disconnected from an agency changes who can see and message you — it is not
+ * something a user should be able to silence. The completeness assertion
+ * therefore measures the toggleable set, and {@link ALWAYS_ON_TYPES} names the
+ * carve-out explicitly so it can never grow by accident.
  *
  * Sprint 11 (D-10) also pins the CHANNEL partition: the `digest` channel is
  * exposed ONLY for the messaging types (the only ones whose digest consumer
@@ -177,11 +201,26 @@ describe('notifications prefs role-partition — single live-set source of truth
   const creatorTypes = preferenceGroupsForRole('creator').flatMap((g) => g.types.map((t) => t.type))
   const agencyTypes = preferenceGroupsForRole('agency').flatMap((g) => g.types.map((t) => t.type))
 
-  it('creator + agency prefs types partition the 12 live types exactly (disjoint, complete)', () => {
+  /** Live, rendered, and deliberately not user-mutable (AH-051 D7). */
+  const ALWAYS_ON_TYPES: readonly string[] = [
+    'agency_creator_relation.admin_connected',
+    'agency_creator_relation.disconnected',
+  ]
+
+  it('creator + agency prefs types partition the TOGGLEABLE live types exactly (disjoint, complete)', () => {
     // Disjoint — no type is offered to both roles.
     expect(creatorTypes.filter((t) => agencyTypes.includes(t))).toEqual([])
-    // Complete — together they are exactly the LIVE_TYPES set.
-    expect([...creatorTypes, ...agencyTypes].sort()).toEqual([...LIVE_TYPES].sort())
+    // Complete — together they are exactly the live set MINUS the always-on ones.
+    const toggleable = LIVE_TYPES.filter((type) => !ALWAYS_ON_TYPES.includes(type))
+    expect([...creatorTypes, ...agencyTypes].sort()).toEqual([...toggleable].sort())
+  })
+
+  it('the always-on types are live but offered to NEITHER role', () => {
+    for (const type of ALWAYS_ON_TYPES) {
+      expect(hasLiveTemplate(type)).toBe(true)
+      expect(creatorTypes).not.toContain(type)
+      expect(agencyTypes).not.toContain(type)
+    }
   })
 
   it('the known role split is honest (creator = 8 review/lifecycle/messaging, agency = 4 fan-out/messaging)', () => {

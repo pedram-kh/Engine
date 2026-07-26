@@ -26,9 +26,11 @@
       "creator_rejected": "Votre candidature de créateur n'a pas été approuvée.",
       "message_received_by_creator": "{sender_name} vous a envoyé un message à propos de {campaign_name}.",
       "message_received_by_agency": "{sender_name} a envoyé un message à propos de {campaign_name}.",
-      "fallback": "Vous avez une nouvelle notification.",
       "message_relationship_received_by_creator": "{sender_name} vous a envoyé un message direct.",
-      "message_relationship_received_by_agency": "{sender_name} vous a envoyé un message direct."
+      "message_relationship_received_by_agency": "{sender_name} vous a envoyé un message direct.",
+      "agency_creator_relation_admin_connected": "Un administrateur Catalyst vous a connecté avec {agency_name}.",
+      "agency_creator_relation_disconnected": "Votre connexion avec {counterparty_name} a pris fin.",
+      "fallback": "Vous avez une nouvelle notification."
     },
     "preferences": {
       "title": "Paramètres de notification",

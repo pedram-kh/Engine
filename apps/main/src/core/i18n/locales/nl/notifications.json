@@ -26,9 +26,11 @@
       "creator_rejected": "Je creator-aanmelding is niet goedgekeurd.",
       "message_received_by_creator": "{sender_name} heeft je een bericht gestuurd over {campaign_name}.",
       "message_received_by_agency": "{sender_name} heeft een bericht gestuurd over {campaign_name}.",
-      "fallback": "Je hebt een nieuwe melding.",
       "message_relationship_received_by_creator": "{sender_name} heeft je een direct bericht gestuurd.",
-      "message_relationship_received_by_agency": "{sender_name} heeft je een direct bericht gestuurd."
+      "message_relationship_received_by_agency": "{sender_name} heeft je een direct bericht gestuurd.",
+      "agency_creator_relation_admin_connected": "Een Catalyst-beheerder heeft je verbonden met {agency_name}.",
+      "agency_creator_relation_disconnected": "Je verbinding met {counterparty_name} is beëindigd.",
+      "fallback": "Je hebt een nieuwe melding."
     },
     "preferences": {
       "title": "Meldingsinstellingen",

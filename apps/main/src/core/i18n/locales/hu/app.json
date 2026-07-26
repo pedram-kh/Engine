@@ -68,6 +68,13 @@
         "newConversation": "Új beszélgetés",
         "startConversation": "Beszélgetés indítása",
         "selectConversation": "Válassz egy beszélgetést az üzenetküldés megkezdéséhez.",
+        "closed": {
+          "relation_ended": "Ez a beszélgetés lezárult, mert a(z) {name} partnerrel fennálló kapcsolata véget ért. Az üzenetelőzményeket továbbra is elolvashatja.",
+          "blacklisted": "Ez a beszélgetés lezárult. Az üzenetelőzményeket továbbra is elolvashatja.",
+          "not_connected": "A(z) {name} partnernek csak a kapcsolat fennállása alatt írhat. Az üzenetelőzményeket továbbra is elolvashatja.",
+          "creator_not_approved": "Ez a beszélgetés lezárult, amíg az alkotói fiók nincs jóváhagyva. Az üzenetelőzményeket továbbra is elolvashatja.",
+          "generic": "Ez a beszélgetés lezárult. Az üzenetelőzményeket továbbra is elolvashatja."
+        },
         "picker": {
           "titleCreators": "Új beszélgetés",
           "titleAgencies": "Új beszélgetés",

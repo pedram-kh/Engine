@@ -68,6 +68,13 @@
         "newConversation": "Uus vestlus",
         "startConversation": "Alusta vestlust",
         "selectConversation": "Sõnumite saatmiseks vali vestlus.",
+        "closed": {
+          "relation_ended": "See vestlus on suletud, sest teie side kasutajaga {name} on lõppenud. Sõnumite ajalugu saate endiselt lugeda.",
+          "blacklisted": "See vestlus on suletud. Sõnumite ajalugu saate endiselt lugeda.",
+          "not_connected": "Saate kasutajale {name} kirjutada ainult ühenduse ajal. Sõnumite ajalugu saate endiselt lugeda.",
+          "creator_not_approved": "See vestlus on suletud, kuni looja konto pole kinnitatud. Sõnumite ajalugu saate endiselt lugeda.",
+          "generic": "See vestlus on suletud. Sõnumite ajalugu saate endiselt lugeda."
+        },
         "picker": {
           "titleCreators": "Uus vestlus",
           "titleAgencies": "Uus vestlus",

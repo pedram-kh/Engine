@@ -178,6 +178,19 @@ export interface RelationshipMessageResource {
   attributes: RelationshipMessageAttributes
 }
 
+/**
+ * Why a relationship thread refuses new messages. A DIAGNOSTIC for copy only —
+ * never an access decision (the server holds the gate). Present exactly when
+ * `can_send` is false.
+ */
+export type RelationshipThreadClosedReason =
+  | 'no_relation'
+  | 'relation_ended'
+  | 'blacklisted'
+  | 'not_connected'
+  | 'creator_not_approved'
+  | 'not_a_party'
+
 export interface RelationshipThreadMeta {
   /**
    * The thread ULID, or `null` for a TRANSIENT thread (AH-012 D1) — a
@@ -187,6 +200,15 @@ export interface RelationshipThreadMeta {
   id: string | null
   last_message_at: string | null
   unread_count: number
+  /**
+   * Whether THIS viewer may post right now. History on a relationship thread
+   * outlives the relation (D6: readable after blacklist/disconnect), so a
+   * readable thread is not necessarily a writable one — render the composer off
+   * this flag rather than assuming a loaded feed means an open conversation.
+   */
+  can_send: boolean
+  /** Set when (and only when) `can_send` is false. */
+  closed_reason: RelationshipThreadClosedReason | null
 }
 
 export interface RelationshipMessageFeedEnvelope {

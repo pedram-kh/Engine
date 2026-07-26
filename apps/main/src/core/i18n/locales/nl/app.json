@@ -68,6 +68,13 @@
         "newConversation": "Nieuw gesprek",
         "startConversation": "Een gesprek starten",
         "selectConversation": "Selecteer een gesprek om te beginnen met berichten.",
+        "closed": {
+          "relation_ended": "Dit gesprek is gesloten omdat je verbinding met {name} is beëindigd. Je kunt je berichtgeschiedenis nog steeds lezen.",
+          "blacklisted": "Dit gesprek is gesloten. Je kunt je berichtgeschiedenis nog steeds lezen.",
+          "not_connected": "Je kunt {name} alleen berichten sturen zolang jullie verbonden zijn. Je kunt je berichtgeschiedenis nog steeds lezen.",
+          "creator_not_approved": "Dit gesprek is gesloten zolang het creator-account niet is goedgekeurd. Je kunt je berichtgeschiedenis nog steeds lezen.",
+          "generic": "Dit gesprek is gesloten. Je kunt je berichtgeschiedenis nog steeds lezen."
+        },
         "picker": {
           "titleCreators": "Nieuw gesprek",
           "titleAgencies": "Nieuw gesprek",

@@ -68,6 +68,13 @@
         "newConversation": "Nov pogovor",
         "startConversation": "Začni pogovor",
         "selectConversation": "Izberite pogovor za začetek pošiljanja sporočil.",
+        "closed": {
+          "relation_ended": "Ta pogovor je zaprt, ker se je vaša povezava z {name} končala. Zgodovino sporočil lahko še vedno berete.",
+          "blacklisted": "Ta pogovor je zaprt. Zgodovino sporočil lahko še vedno berete.",
+          "not_connected": "Uporabniku {name} lahko pišete le, dokler ste povezani. Zgodovino sporočil lahko še vedno berete.",
+          "creator_not_approved": "Ta pogovor je zaprt, dokler račun ustvarjalca ni odobren. Zgodovino sporočil lahko še vedno berete.",
+          "generic": "Ta pogovor je zaprt. Zgodovino sporočil lahko še vedno berete."
+        },
         "picker": {
           "titleCreators": "Nov pogovor",
           "titleAgencies": "Nov pogovor",

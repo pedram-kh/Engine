@@ -68,6 +68,13 @@
         "newConversation": "Uusi keskustelu",
         "startConversation": "Aloita keskustelu",
         "selectConversation": "Valitse keskustelu aloittaaksesi viestittelyn.",
+        "closed": {
+          "relation_ended": "Tämä keskustelu on suljettu, koska yhteytesi käyttäjään {name} on päättynyt. Voit yhä lukea viestihistoriasi.",
+          "blacklisted": "Tämä keskustelu on suljettu. Voit yhä lukea viestihistoriasi.",
+          "not_connected": "Voit lähettää viestejä käyttäjälle {name} vain yhteyden ollessa voimassa. Voit yhä lukea viestihistoriasi.",
+          "creator_not_approved": "Tämä keskustelu on suljettu, kunnes tekijätili on hyväksytty. Voit yhä lukea viestihistoriasi.",
+          "generic": "Tämä keskustelu on suljettu. Voit yhä lukea viestihistoriasi."
+        },
         "picker": {
           "titleCreators": "Uusi keskustelu",
           "titleAgencies": "Uusi keskustelu",

@@ -1,4 +1,4 @@
-import type { RelationshipMessageResource } from '@catalyst/api-client'
+import type { RelationshipMessageResource, RelationshipThreadMeta } from '@catalyst/api-client'
 import { type VueWrapper, flushPromises, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
@@ -32,11 +32,22 @@ function msg(
   }
 }
 
-function feed(messages: RelationshipMessageResource[], hasMore = false) {
+function feed(
+  messages: RelationshipMessageResource[],
+  hasMore = false,
+  threadOverrides: Partial<RelationshipThreadMeta> = {},
+) {
   return {
     data: messages,
     meta: {
-      thread: { id: 'thread-ulid', last_message_at: null, unread_count: 0 },
+      thread: {
+        id: 'thread-ulid',
+        last_message_at: null,
+        unread_count: 0,
+        can_send: true,
+        closed_reason: null,
+        ...threadOverrides,
+      } satisfies RelationshipThreadMeta,
       has_more: hasMore,
     },
   }
@@ -217,6 +228,97 @@ describe('RelationshipThreadView', () => {
     await addLinkViaDialog(wrapper, 'javascript:alert(1)')
     expect(document.body.textContent).toContain('Enter a valid http or https link.')
     expect(wrapper.find('[data-test="relationship-pending-links"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})
+
+describe('RelationshipThreadView — closed conversation (AH-051 follow-up)', () => {
+  it('renders the composer while the thread is open', async () => {
+    const wrapper = await mountView(makeTransport())
+
+    expect(wrapper.find('[data-test="relationship-compose"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="relationship-closed"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('replaces the composer with an explanation when the relation has ENDED', async () => {
+    // The reported bug: a disconnected creator saw a live composer, typed, and
+    // got `Unrecognized error response (HTTP 403).` The composer must be gone
+    // BEFORE they type, and the notice must name the counterparty.
+    const wrapper = await mountView(
+      makeTransport({
+        list: vi
+          .fn()
+          .mockResolvedValue(
+            feed([msg('m1')], false, { can_send: false, closed_reason: 'relation_ended' }),
+          ),
+      }),
+    )
+
+    expect(wrapper.find('[data-test="relationship-compose"]').exists()).toBe(false)
+
+    const closed = wrapper.find('[data-test="relationship-closed"]')
+    expect(closed.exists()).toBe(true)
+    expect(closed.text()).toContain('your connection with Acme Agency has ended')
+    // History survives the closure (server D6) — the point of a read-only state.
+    expect(wrapper.text()).toContain('hello there')
+    wrapper.unmount()
+  })
+
+  it('never renders a raw reason code to the user', async () => {
+    const wrapper = await mountView(
+      makeTransport({
+        list: vi
+          .fn()
+          .mockResolvedValue(
+            feed([msg('m1')], false, { can_send: false, closed_reason: 'relation_ended' }),
+          ),
+      }),
+    )
+
+    const closed = wrapper.find('[data-test="relationship-closed"]').text()
+    expect(closed).not.toContain('relation_ended')
+    expect(closed).not.toContain('app.messaging')
+    wrapper.unmount()
+  })
+
+  it('maps every closed_reason to distinct, resolved copy', async () => {
+    const reasons: RelationshipThreadMeta['closed_reason'][] = [
+      'relation_ended',
+      'blacklisted',
+      'not_connected',
+      'creator_not_approved',
+      'no_relation',
+      'not_a_party',
+    ]
+
+    for (const reason of reasons) {
+      const wrapper = await mountView(
+        makeTransport({
+          list: vi
+            .fn()
+            .mockResolvedValue(
+              feed([msg('m1')], false, { can_send: false, closed_reason: reason }),
+            ),
+        }),
+      )
+
+      const text = wrapper.find('[data-test="relationship-closed"]').text()
+      // Resolved copy, never a leaked key or an empty alert.
+      expect(text.length).toBeGreaterThan(0)
+      expect(text).not.toContain('app.messaging')
+      wrapper.unmount()
+    }
+  })
+
+  it('falls back to an open composer while thread meta is still unknown', async () => {
+    // First paint has no meta yet; flashing "closed" on every thread open would
+    // be worse than a brief optimistic composer (the server still refuses).
+    const wrapper = await mountView(
+      makeTransport({ list: vi.fn().mockImplementation(() => new Promise(() => {})) }),
+    )
+
+    expect(wrapper.find('[data-test="relationship-closed"]').exists()).toBe(false)
     wrapper.unmount()
   })
 })

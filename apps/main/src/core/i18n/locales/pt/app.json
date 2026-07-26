@@ -68,6 +68,13 @@
         "newConversation": "Nova conversa",
         "startConversation": "Iniciar uma conversa",
         "selectConversation": "Selecione uma conversa para começar a enviar mensagens.",
+        "closed": {
+          "relation_ended": "Esta conversa está fechada porque a sua ligação com {name} terminou. Ainda pode ler o seu histórico de mensagens.",
+          "blacklisted": "Esta conversa está fechada. Ainda pode ler o seu histórico de mensagens.",
+          "not_connected": "Só pode enviar mensagens a {name} enquanto estiverem ligados. Ainda pode ler o seu histórico de mensagens.",
+          "creator_not_approved": "Esta conversa está fechada enquanto a conta do criador não estiver aprovada. Ainda pode ler o seu histórico de mensagens.",
+          "generic": "Esta conversa está fechada. Ainda pode ler o seu histórico de mensagens."
+        },
         "picker": {
           "titleCreators": "Nova conversa",
           "titleAgencies": "Nova conversa",

@@ -26,9 +26,11 @@
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",
       "message_received_by_agency": "{sender_name} sent a message about {campaign_name}.",
-      "fallback": "You have a new notification.",
       "message_relationship_received_by_creator": "{sender_name} ви изпрати директно съобщение.",
-      "message_relationship_received_by_agency": "{sender_name} ви изпрати директно съобщение."
+      "message_relationship_received_by_agency": "{sender_name} ви изпрати директно съобщение.",
+      "agency_creator_relation_admin_connected": "Администратор на Catalyst ви свърза с {agency_name}.",
+      "agency_creator_relation_disconnected": "Връзката ви с {counterparty_name} приключи.",
+      "fallback": "You have a new notification."
     },
     "preferences": {
       "title": "Неtification settings",

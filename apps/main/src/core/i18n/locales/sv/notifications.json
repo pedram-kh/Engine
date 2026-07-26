@@ -26,9 +26,11 @@
       "creator_rejected": "Din creator-ansökan godkändes inte.",
       "message_received_by_creator": "{sender_name} skickade dig ett meddelande om {campaign_name}.",
       "message_received_by_agency": "{sender_name} skickade ett meddelande om {campaign_name}.",
-      "fallback": "Du har en ny avisering.",
       "message_relationship_received_by_creator": "{sender_name} skickade ett direktmeddelande till dig.",
-      "message_relationship_received_by_agency": "{sender_name} skickade ett direktmeddelande till dig."
+      "message_relationship_received_by_agency": "{sender_name} skickade ett direktmeddelande till dig.",
+      "agency_creator_relation_admin_connected": "En Catalyst-administratör kopplade dig till {agency_name}.",
+      "agency_creator_relation_disconnected": "Din koppling till {counterparty_name} har upphört.",
+      "fallback": "Du har en ny avisering."
     },
     "preferences": {
       "title": "Aviseringsinställningar",

@@ -68,6 +68,13 @@
         "newConversation": "Neue Unterhaltung",
         "startConversation": "Unterhaltung beginnen",
         "selectConversation": "Wähle eine Unterhaltung aus, um zu schreiben.",
+        "closed": {
+          "relation_ended": "Diese Unterhaltung ist geschlossen, da Ihre Verbindung mit {name} beendet wurde. Sie können den Nachrichtenverlauf weiterhin lesen.",
+          "blacklisted": "Diese Unterhaltung ist geschlossen. Sie können den Nachrichtenverlauf weiterhin lesen.",
+          "not_connected": "Sie können {name} nur schreiben, solange Sie verbunden sind. Sie können den Nachrichtenverlauf weiterhin lesen.",
+          "creator_not_approved": "Diese Unterhaltung ist geschlossen, solange das Creator-Konto nicht freigegeben ist. Sie können den Nachrichtenverlauf weiterhin lesen.",
+          "generic": "Diese Unterhaltung ist geschlossen. Sie können den Nachrichtenverlauf weiterhin lesen."
+        },
         "picker": {
           "titleCreators": "Neue Unterhaltung",
           "titleAgencies": "Neue Unterhaltung",

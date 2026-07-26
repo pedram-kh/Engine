@@ -26,9 +26,11 @@
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",
       "message_received_by_agency": "{sender_name} sent a message about {campaign_name}.",
-      "fallback": "You have a new notification.",
       "message_relationship_received_by_creator": "{sender_name} atsiuntė jums tiesioginę žinutę.",
-      "message_relationship_received_by_agency": "{sender_name} atsiuntė jums tiesioginę žinutę."
+      "message_relationship_received_by_agency": "{sender_name} atsiuntė jums tiesioginę žinutę.",
+      "agency_creator_relation_admin_connected": "Catalyst administratorius susiejo jus su {agency_name}.",
+      "agency_creator_relation_disconnected": "Jūsų ryšys su {counterparty_name} baigėsi.",
+      "fallback": "You have a new notification."
     },
     "preferences": {
       "title": "Netification settings",

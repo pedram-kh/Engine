@@ -26,9 +26,11 @@
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",
       "message_received_by_agency": "{sender_name} sent a message about {campaign_name}.",
-      "fallback": "You have a new notification.",
       "message_relationship_received_by_creator": "{sender_name} bagħatlek messaġġ dirett.",
-      "message_relationship_received_by_agency": "{sender_name} bagħatlek messaġġ dirett."
+      "message_relationship_received_by_agency": "{sender_name} bagħatlek messaġġ dirett.",
+      "agency_creator_relation_admin_connected": "Amministratur ta' Catalyst qabbdek ma' {agency_name}.",
+      "agency_creator_relation_disconnected": "Il-konnessjoni tiegħek ma' {counterparty_name} intemmet.",
+      "fallback": "You have a new notification."
     },
     "preferences": {
       "title": "Letification settings",

@@ -26,9 +26,11 @@
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",
       "message_received_by_agency": "{sender_name} sent a message about {campaign_name}.",
-      "fallback": "You have a new notification.",
       "message_relationship_received_by_creator": "{sender_name} nosūtīja jums tiešo ziņojumu.",
-      "message_relationship_received_by_agency": "{sender_name} nosūtīja jums tiešo ziņojumu."
+      "message_relationship_received_by_agency": "{sender_name} nosūtīja jums tiešo ziņojumu.",
+      "agency_creator_relation_admin_connected": "Catalyst administrators saistīja jūs ar {agency_name}.",
+      "agency_creator_relation_disconnected": "Jūsu saikne ar {counterparty_name} ir beigusies.",
+      "fallback": "You have a new notification."
     },
     "preferences": {
       "title": "Nētification settings",

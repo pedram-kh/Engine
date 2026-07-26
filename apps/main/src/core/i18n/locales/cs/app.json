@@ -68,6 +68,13 @@
         "newConversation": "Nová konverzace",
         "startConversation": "Začít konverzaci",
         "selectConversation": "Vyberte konverzaci a začněte psát zprávy.",
+        "closed": {
+          "relation_ended": "Tato konverzace je uzavřena, protože vaše spojení s {name} skončilo. Historii zpráv si stále můžete přečíst.",
+          "blacklisted": "Tato konverzace je uzavřena. Historii zpráv si stále můžete přečíst.",
+          "not_connected": "Psát uživateli {name} můžete jen po dobu propojení. Historii zpráv si stále můžete přečíst.",
+          "creator_not_approved": "Tato konverzace je uzavřena, dokud není účet tvůrce schválen. Historii zpráv si stále můžete přečíst.",
+          "generic": "Tato konverzace je uzavřena. Historii zpráv si stále můžete přečíst."
+        },
         "picker": {
           "titleCreators": "Nová konverzace",
           "titleAgencies": "Nová konverzace",

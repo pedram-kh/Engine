@@ -26,9 +26,11 @@
       "creator_rejected": "Deine Creator-Bewerbung wurde nicht genehmigt.",
       "message_received_by_creator": "{sender_name} hat dir eine Nachricht zu {campaign_name} gesendet.",
       "message_received_by_agency": "{sender_name} hat eine Nachricht zu {campaign_name} gesendet.",
-      "fallback": "Du hast eine neue Benachrichtigung.",
       "message_relationship_received_by_creator": "{sender_name} hat Ihnen eine Direktnachricht gesendet.",
-      "message_relationship_received_by_agency": "{sender_name} hat Ihnen eine Direktnachricht gesendet."
+      "message_relationship_received_by_agency": "{sender_name} hat Ihnen eine Direktnachricht gesendet.",
+      "agency_creator_relation_admin_connected": "Ein Catalyst-Administrator hat Sie mit {agency_name} verbunden.",
+      "agency_creator_relation_disconnected": "Ihre Verbindung mit {counterparty_name} wurde beendet.",
+      "fallback": "Du hast eine neue Benachrichtigung."
     },
     "preferences": {
       "title": "Benachrichtigungseinstellungen",

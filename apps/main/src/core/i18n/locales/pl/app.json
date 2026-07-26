@@ -68,6 +68,13 @@
         "newConversation": "Nowa rozmowa",
         "startConversation": "Rozpocznij rozmowę",
         "selectConversation": "Wybierz rozmowę, aby rozpocząć przesyłanie wiadomości.",
+        "closed": {
+          "relation_ended": "Ta rozmowa jest zamknięta, ponieważ Twoje połączenie z {name} zakończyło się. Nadal możesz czytać historię wiadomości.",
+          "blacklisted": "Ta rozmowa jest zamknięta. Nadal możesz czytać historię wiadomości.",
+          "not_connected": "Możesz pisać do {name} tylko wtedy, gdy jesteście połączeni. Nadal możesz czytać historię wiadomości.",
+          "creator_not_approved": "Ta rozmowa jest zamknięta, dopóki konto twórcy nie zostanie zatwierdzone. Nadal możesz czytać historię wiadomości.",
+          "generic": "Ta rozmowa jest zamknięta. Nadal możesz czytać historię wiadomości."
+        },
         "picker": {
           "titleCreators": "Nowa rozmowa",
           "titleAgencies": "Nowa rozmowa",

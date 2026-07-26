@@ -68,6 +68,13 @@
         "newConversation": "Novi razgovor",
         "startConversation": "Započni razgovor",
         "selectConversation": "Odaberite razgovor da biste počeli slati poruke.",
+        "closed": {
+          "relation_ended": "Ovaj je razgovor zatvoren jer je vaša veza s {name} završila. Povijest poruka i dalje možete čitati.",
+          "blacklisted": "Ovaj je razgovor zatvoren. Povijest poruka i dalje možete čitati.",
+          "not_connected": "Korisniku {name} možete pisati samo dok ste povezani. Povijest poruka i dalje možete čitati.",
+          "creator_not_approved": "Ovaj je razgovor zatvoren dok račun kreatora nije odobren. Povijest poruka i dalje možete čitati.",
+          "generic": "Ovaj je razgovor zatvoren. Povijest poruka i dalje možete čitati."
+        },
         "picker": {
           "titleCreators": "Novi razgovor",
           "titleAgencies": "Novi razgovor",

@@ -26,9 +26,11 @@
       "creator_rejected": "Twoja aplikacja twórcy nie została zatwierdzona.",
       "message_received_by_creator": "{sender_name} wysłał Ci wiadomość dotyczącą {campaign_name}.",
       "message_received_by_agency": "{sender_name} wysłał wiadomość dotyczącą {campaign_name}.",
-      "fallback": "Masz nowe powiadomienie.",
       "message_relationship_received_by_creator": "{sender_name} wysłał(a) Ci wiadomość bezpośrednią.",
-      "message_relationship_received_by_agency": "{sender_name} wysłał(a) Ci wiadomość bezpośrednią."
+      "message_relationship_received_by_agency": "{sender_name} wysłał(a) Ci wiadomość bezpośrednią.",
+      "agency_creator_relation_admin_connected": "Administrator Catalyst połączył Cię z {agency_name}.",
+      "agency_creator_relation_disconnected": "Twoje połączenie z {counterparty_name} zakończyło się.",
+      "fallback": "Masz nowe powiadomienie."
     },
     "preferences": {
       "title": "Ustawienia powiadomień",

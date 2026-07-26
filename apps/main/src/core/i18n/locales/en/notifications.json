@@ -28,6 +28,8 @@
       "message_received_by_agency": "{sender_name} sent a message about {campaign_name}.",
       "message_relationship_received_by_creator": "{sender_name} sent you a direct message.",
       "message_relationship_received_by_agency": "{sender_name} sent you a direct message.",
+      "agency_creator_relation_admin_connected": "A Catalyst administrator connected you with {agency_name}.",
+      "agency_creator_relation_disconnected": "Your connection with {counterparty_name} has ended.",
       "fallback": "You have a new notification."
     },
     "preferences": {

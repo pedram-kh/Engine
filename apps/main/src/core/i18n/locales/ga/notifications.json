@@ -26,9 +26,11 @@
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",
       "message_received_by_agency": "{sender_name} sent a message about {campaign_name}.",
-      "fallback": "You have a new notification.",
       "message_relationship_received_by_creator": "Sheol {sender_name} teachtaireacht dhíreach chugat.",
-      "message_relationship_received_by_agency": "Sheol {sender_name} teachtaireacht dhíreach chugat."
+      "message_relationship_received_by_agency": "Sheol {sender_name} teachtaireacht dhíreach chugat.",
+      "agency_creator_relation_admin_connected": "Cheangail riarthóir Catalyst thú le {agency_name}.",
+      "agency_creator_relation_disconnected": "Tá deireadh tagtha le do nasc le {counterparty_name}.",
+      "fallback": "You have a new notification."
     },
     "preferences": {
       "title": "Níltification settings",

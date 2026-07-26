@@ -68,6 +68,13 @@
         "newConversation": "Ny konversation",
         "startConversation": "Starta en konversation",
         "selectConversation": "Välj en konversation för att börja meddela.",
+        "closed": {
+          "relation_ended": "Den här konversationen är stängd eftersom din koppling till {name} har upphört. Du kan fortfarande läsa din meddelandehistorik.",
+          "blacklisted": "Den här konversationen är stängd. Du kan fortfarande läsa din meddelandehistorik.",
+          "not_connected": "Du kan bara skicka meddelanden till {name} medan ni är kopplade. Du kan fortfarande läsa din meddelandehistorik.",
+          "creator_not_approved": "Den här konversationen är stängd tills creator-kontot är godkänt. Du kan fortfarande läsa din meddelandehistorik.",
+          "generic": "Den här konversationen är stängd. Du kan fortfarande läsa din meddelandehistorik."
+        },
         "picker": {
           "titleCreators": "Ny konversation",
           "titleAgencies": "Ny konversation",

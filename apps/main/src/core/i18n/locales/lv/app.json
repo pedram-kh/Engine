@@ -68,6 +68,13 @@
         "newConversation": "Jauna saruna",
         "startConversation": "Sākt sarunu",
         "selectConversation": "Atlasiet sarunu, lai sāktu sūtīt ziņas.",
+        "closed": {
+          "relation_ended": "Šī saruna ir slēgta, jo jūsu saikne ar {name} ir beigusies. Ziņojumu vēsturi joprojām varat lasīt.",
+          "blacklisted": "Šī saruna ir slēgta. Ziņojumu vēsturi joprojām varat lasīt.",
+          "not_connected": "Rakstīt {name} varat tikai tad, kamēr esat saistīti. Ziņojumu vēsturi joprojām varat lasīt.",
+          "creator_not_approved": "Šī saruna ir slēgta, kamēr veidotāja konts nav apstiprināts. Ziņojumu vēsturi joprojām varat lasīt.",
+          "generic": "Šī saruna ir slēgta. Ziņojumu vēsturi joprojām varat lasīt."
+        },
         "picker": {
           "titleCreators": "Jauna saruna",
           "titleAgencies": "Jauna saruna",

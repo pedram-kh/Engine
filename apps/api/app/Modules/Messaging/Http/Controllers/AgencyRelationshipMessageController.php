@@ -17,6 +17,7 @@ use App\Modules\Messaging\Models\RelationshipThread;
 use App\Modules\Messaging\Services\RelationshipMessageAttachmentUploadService;
 use App\Modules\Messaging\Services\RelationshipMessageService;
 use App\Modules\Messaging\Support\ContactMediaUrl;
+use App\Modules\Messaging\Support\RelationshipSendState;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -100,7 +101,13 @@ final class AgencyRelationshipMessageController
         return response()->json([
             'data' => RelationshipMessageResource::collection($page['messages'])->resolve($request),
             'meta' => [
-                'thread' => $this->messages->threadMeta($thread, $viewer),
+                // The send-state rides the READ payload so the client can render
+                // a closed thread up front instead of discovering closure by
+                // POSTing into a 403 (AH-051 follow-up).
+                'thread' => [
+                    ...$this->messages->threadMeta($thread, $viewer),
+                    ...RelationshipSendState::for($viewer, $creator, $agency),
+                ],
                 'has_more' => $page['has_more'],
             ],
         ]);

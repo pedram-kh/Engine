@@ -68,6 +68,13 @@
         "newConversation": "Naujas pokalbis",
         "startConversation": "Pradėti pokalbį",
         "selectConversation": "Pasirinkite pokalbį, kad pradėtumėte rašyti žinutes.",
+        "closed": {
+          "relation_ended": "Šis pokalbis uždarytas, nes jūsų ryšys su {name} baigėsi. Žinučių istoriją vis dar galite skaityti.",
+          "blacklisted": "Šis pokalbis uždarytas. Žinučių istoriją vis dar galite skaityti.",
+          "not_connected": "Rašyti {name} galite tik tol, kol esate susieti. Žinučių istoriją vis dar galite skaityti.",
+          "creator_not_approved": "Šis pokalbis uždarytas, kol kūrėjo paskyra nepatvirtinta. Žinučių istoriją vis dar galite skaityti.",
+          "generic": "Šis pokalbis uždarytas. Žinučių istoriją vis dar galite skaityti."
+        },
         "picker": {
           "titleCreators": "Naujas pokalbis",
           "titleAgencies": "Naujas pokalbis",

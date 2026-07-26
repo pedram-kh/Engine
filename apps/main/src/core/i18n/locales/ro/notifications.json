@@ -26,9 +26,11 @@
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",
       "message_received_by_agency": "{sender_name} sent a message about {campaign_name}.",
-      "fallback": "You have a new notification.",
       "message_relationship_received_by_creator": "{sender_name} ți-a trimis un mesaj direct.",
-      "message_relationship_received_by_agency": "{sender_name} ți-a trimis un mesaj direct."
+      "message_relationship_received_by_agency": "{sender_name} ți-a trimis un mesaj direct.",
+      "agency_creator_relation_admin_connected": "Un administrator Catalyst te-a conectat cu {agency_name}.",
+      "agency_creator_relation_disconnected": "Conexiunea ta cu {counterparty_name} s-a încheiat.",
+      "fallback": "You have a new notification."
     },
     "preferences": {
       "title": "Nutification settings",

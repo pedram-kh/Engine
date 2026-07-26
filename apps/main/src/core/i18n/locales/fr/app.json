@@ -68,6 +68,13 @@
         "newConversation": "Nouvelle conversation",
         "startConversation": "Démarrer une conversation",
         "selectConversation": "Sélectionnez une conversation pour commencer à discuter.",
+        "closed": {
+          "relation_ended": "Cette conversation est fermée car votre connexion avec {name} a pris fin. Vous pouvez toujours consulter votre historique de messages.",
+          "blacklisted": "Cette conversation est fermée. Vous pouvez toujours consulter votre historique de messages.",
+          "not_connected": "Vous ne pouvez écrire à {name} que pendant que vous êtes connectés. Vous pouvez toujours consulter votre historique de messages.",
+          "creator_not_approved": "Cette conversation est fermée tant que le compte du créateur n'est pas approuvé. Vous pouvez toujours consulter votre historique de messages.",
+          "generic": "Cette conversation est fermée. Vous pouvez toujours consulter votre historique de messages."
+        },
         "picker": {
           "titleCreators": "Nouvelle conversation",
           "titleAgencies": "Nouvelle conversation",

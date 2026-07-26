@@ -68,6 +68,13 @@
         "newConversation": "New conversation",
         "startConversation": "Start a conversation",
         "selectConversation": "Select a conversation to start messaging.",
+        "closed": {
+          "relation_ended": "This conversation is closed because your connection with {name} has ended. You can still read your message history.",
+          "blacklisted": "This conversation is closed. You can still read your message history.",
+          "not_connected": "You can only message {name} while you are connected. You can still read your message history.",
+          "creator_not_approved": "This conversation is closed while the creator account is not approved. You can still read your message history.",
+          "generic": "This conversation is closed. You can still read your message history."
+        },
         "picker": {
           "titleCreators": "New conversation",
           "titleAgencies": "New conversation",

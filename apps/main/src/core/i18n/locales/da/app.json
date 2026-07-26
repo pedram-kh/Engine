@@ -68,6 +68,13 @@
         "newConversation": "Ny samtale",
         "startConversation": "Start en samtale",
         "selectConversation": "Vælg en samtale for at begynde at skrive.",
+        "closed": {
+          "relation_ended": "Denne samtale er lukket, fordi din forbindelse med {name} er ophørt. Du kan stadig læse din beskedhistorik.",
+          "blacklisted": "Denne samtale er lukket. Du kan stadig læse din beskedhistorik.",
+          "not_connected": "Du kan kun skrive til {name}, mens I er forbundet. Du kan stadig læse din beskedhistorik.",
+          "creator_not_approved": "Denne samtale er lukket, indtil creator-kontoen er godkendt. Du kan stadig læse din beskedhistorik.",
+          "generic": "Denne samtale er lukket. Du kan stadig læse din beskedhistorik."
+        },
         "picker": {
           "titleCreators": "Ny samtale",
           "titleAgencies": "Ny samtale",

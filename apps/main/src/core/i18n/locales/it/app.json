@@ -68,6 +68,13 @@
         "newConversation": "Nuova conversazione",
         "startConversation": "Avvia una conversazione",
         "selectConversation": "Seleziona una conversazione per iniziare a scrivere.",
+        "closed": {
+          "relation_ended": "Questa conversazione è chiusa perché il tuo collegamento con {name} è terminato. Puoi ancora leggere la cronologia dei messaggi.",
+          "blacklisted": "Questa conversazione è chiusa. Puoi ancora leggere la cronologia dei messaggi.",
+          "not_connected": "Puoi scrivere a {name} solo mentre siete collegati. Puoi ancora leggere la cronologia dei messaggi.",
+          "creator_not_approved": "Questa conversazione è chiusa finché l'account del creator non è approvato. Puoi ancora leggere la cronologia dei messaggi.",
+          "generic": "Questa conversazione è chiusa. Puoi ancora leggere la cronologia dei messaggi."
+        },
         "picker": {
           "titleCreators": "Nuova conversazione",
           "titleAgencies": "Nuova conversazione",

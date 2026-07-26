@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Console\Commands\ScanOverdueAssignments;
 use App\Console\Commands\SendIncompleteCreatorNudges;
 use App\Console\Commands\SendMessageDigests;
+use App\Core\Errors\ForbiddenExceptionRenderer;
 use App\Core\Errors\ValidationExceptionRenderer;
 use App\Core\Tenancy\EnsureTenancyContext;
 use App\Core\Tenancy\SetTenancyContext;
@@ -19,6 +20,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -112,6 +115,21 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->expectsJson()) {
                 return ValidationExceptionRenderer::render($e, $request);
+            }
+
+            return null;
+        });
+
+        // The 403 counterpart of the same bug (AH-051 follow-up): a `Gate`
+        // denial returned `{message: "This action is unauthorized."}`, which the
+        // SPA parser rejects — surfacing `Unrecognized error response (HTTP
+        // 403).` at every authorization boundary. See
+        // `App\Core\Errors\ForbiddenExceptionRenderer` for why this is typed
+        // `HttpExceptionInterface` rather than `AuthorizationException`, and why
+        // it filters on the status code.
+        $exceptions->render(function (HttpExceptionInterface $e, Request $request) {
+            if ($e->getStatusCode() === Response::HTTP_FORBIDDEN && $request->expectsJson()) {
+                return ForbiddenExceptionRenderer::render($e, $request);
             }
 
             return null;

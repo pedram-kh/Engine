@@ -68,6 +68,13 @@
         "newConversation": "Conversație nouă",
         "startConversation": "Începe o conversație",
         "selectConversation": "Selectează o conversație pentru a începe să trimiți mesaje.",
+        "closed": {
+          "relation_ended": "Această conversație este închisă deoarece conexiunea ta cu {name} s-a încheiat. Poți citi în continuare istoricul mesajelor.",
+          "blacklisted": "Această conversație este închisă. Poți citi în continuare istoricul mesajelor.",
+          "not_connected": "Îi poți scrie lui {name} doar cât timp sunteți conectați. Poți citi în continuare istoricul mesajelor.",
+          "creator_not_approved": "Această conversație este închisă cât timp contul creatorului nu este aprobat. Poți citi în continuare istoricul mesajelor.",
+          "generic": "Această conversație este închisă. Poți citi în continuare istoricul mesajelor."
+        },
         "picker": {
           "titleCreators": "Conversație nouă",
           "titleAgencies": "Conversație nouă",

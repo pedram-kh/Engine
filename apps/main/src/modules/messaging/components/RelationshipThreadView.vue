@@ -17,6 +17,7 @@
 import { ApiError, extractFieldErrors, uploadToPresignedUrl } from '@catalyst/api-client'
 import type {
   RelationshipMessageResource,
+  RelationshipThreadClosedReason,
   RelationshipThreadMeta,
   SendMessageAttachment,
   SendRelationshipLink,
@@ -53,12 +54,53 @@ const { smAndDown } = useDisplay()
 const isMobile = computed(() => smAndDown.value)
 
 const transportRef = toRef(props, 'transport')
-const { messages, hasMore, loading, loadingOlder, sending, loadError, loadOlder, sendMessage } =
-  useMessageThread<
-    RelationshipMessageResource,
-    RelationshipThreadMeta,
-    SendRelationshipMessagePayload
-  >(transportRef)
+const {
+  messages,
+  threadMeta,
+  hasMore,
+  loading,
+  loadingOlder,
+  sending,
+  loadError,
+  loadOlder,
+  sendMessage,
+} = useMessageThread<
+  RelationshipMessageResource,
+  RelationshipThreadMeta,
+  SendRelationshipMessagePayload
+>(transportRef)
+
+// Whether the CONVERSATION accepts new messages at all — distinct from the
+// `canSend` below, which is form validity (is there anything to send, are we
+// mid-flight). A readable thread is not necessarily a writable one: history
+// outlives the relation (server D6), so this is driven by the server's
+// send-state rather than by "the feed loaded". Default TRUE while `threadMeta`
+// is still null on first paint — an open composer is the normal case, and a
+// brief optimistic composer beats flashing a "closed" notice on every thread
+// open. The server stays authoritative either way.
+const threadOpen = computed(() => threadMeta.value?.can_send ?? true)
+
+// Reason → copy. `relation_ended` is the case a real user hits (an admin
+// disconnect); the rest are mapped so no state can silently fall through to
+// wording that would be wrong for it.
+const CLOSED_REASON_KEY: Record<RelationshipThreadClosedReason, string> = {
+  relation_ended: 'app.messaging.relationship.closed.relation_ended',
+  blacklisted: 'app.messaging.relationship.closed.blacklisted',
+  not_connected: 'app.messaging.relationship.closed.not_connected',
+  no_relation: 'app.messaging.relationship.closed.not_connected',
+  creator_not_approved: 'app.messaging.relationship.closed.creator_not_approved',
+  not_a_party: 'app.messaging.relationship.closed.generic',
+}
+
+const closedMessage = computed(() => {
+  const reason = threadMeta.value?.closed_reason ?? null
+  const key =
+    reason === null
+      ? 'app.messaging.relationship.closed.generic'
+      : (CLOSED_REASON_KEY[reason] ?? 'app.messaging.relationship.closed.generic')
+
+  return t(key, { name: props.title })
+})
 
 // Stick-to-bottom: the feed is the scroll container. We jump to the newest
 // message on the first load and whenever messages arrive — but only when the
@@ -409,7 +451,18 @@ async function submit(): Promise<void> {
       </template>
     </div>
 
-    <form class="rel-thread__compose" data-test="relationship-compose" @submit.prevent="submit">
+    <div v-if="!threadOpen" class="rel-thread__closed" data-test="relationship-closed">
+      <v-alert type="info" variant="tonal" density="compact">
+        {{ closedMessage }}
+      </v-alert>
+    </div>
+
+    <form
+      v-else
+      class="rel-thread__compose"
+      data-test="relationship-compose"
+      @submit.prevent="submit"
+    >
       <ul
         v-if="selectedFiles.length > 0"
         class="rel-thread__pending"
@@ -682,6 +735,13 @@ async function submit(): Promise<void> {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+}
+
+/* Occupies the composer's slot when the conversation can no longer be posted
+   to, so history stays readable without a dead input inviting a doomed send. */
+.rel-thread__closed {
   padding-top: 8px;
   border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }

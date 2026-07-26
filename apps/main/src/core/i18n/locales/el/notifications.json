@@ -26,9 +26,11 @@
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",
       "message_received_by_agency": "{sender_name} sent a message about {campaign_name}.",
-      "fallback": "You have a new notification.",
       "message_relationship_received_by_creator": "Ο/Η {sender_name} σας έστειλε ένα απευθείας μήνυμα.",
-      "message_relationship_received_by_agency": "Ο/Η {sender_name} σας έστειλε ένα απευθείας μήνυμα."
+      "message_relationship_received_by_agency": "Ο/Η {sender_name} σας έστειλε ένα απευθείας μήνυμα.",
+      "agency_creator_relation_admin_connected": "Ένας διαχειριστής του Catalyst σας συνέδεσε με {agency_name}.",
+      "agency_creator_relation_disconnected": "Η σύνδεσή σας με {counterparty_name} έληξε.",
+      "fallback": "You have a new notification."
     },
     "preferences": {
       "title": "Όχιtification settings",

@@ -6,6 +6,7 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
+use App\Modules\Creators\Enums\ApplicationStatus;
 use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
@@ -410,4 +411,143 @@ it('the creator inbox HIDES a provisioned-but-empty thread (no ghosts)', functio
     $this->actingAs($creatorUser)->getJson('/api/v1/creators/me/relationship-threads')
         ->assertOk()
         ->assertJsonCount(1, 'data');
+});
+
+// ── Send-state on the READ payload + enveloped 403s (AH-051 follow-up) ───────
+//
+// A creator disconnected from an agency kept its thread history (D6) but the
+// SPA had no signal that the thread was dead, so it rendered a live composer
+// and the send surfaced a bare, unparseable 403. Two fixes, pinned here: the
+// read payload now carries the send-state, and every 403 carries the canonical
+// envelope.
+
+it('an OPEN thread reports can_send true with no closed_reason', function (): void {
+    ['agency' => $agency, 'creator' => $creator, 'creatorUser' => $creatorUser, 'admin' => $admin] = relationshipSetup();
+
+    $this->actingAs($admin)->postJson(agencyRelUrl($agency, $creator), ['body' => 'hi'])->assertCreated();
+
+    $this->actingAs($creatorUser)->getJson(creatorRelUrl($agency))
+        ->assertOk()
+        ->assertJsonPath('meta.thread.can_send', true)
+        ->assertJsonPath('meta.thread.closed_reason', null);
+
+    $this->actingAs($admin)->getJson(agencyRelUrl($agency, $creator))
+        ->assertOk()
+        ->assertJsonPath('meta.thread.can_send', true)
+        ->assertJsonPath('meta.thread.closed_reason', null);
+});
+
+it('an ENDED relation reports can_send false + relation_ended to BOTH parties', function (): void {
+    ['agency' => $agency, 'creator' => $creator, 'creatorUser' => $creatorUser, 'admin' => $admin] = relationshipSetup();
+
+    // History exists from while the relation was live, then it is severed.
+    $this->actingAs($admin)->postJson(agencyRelUrl($agency, $creator), ['body' => 'while connected'])->assertCreated();
+    AgencyCreatorRelation::query()
+        ->where('agency_id', $agency->id)->where('creator_id', $creator->id)
+        ->update(['relationship_status' => RelationshipStatus::Ended->value]);
+
+    // Creator side: history still readable (D6), composer must be closed.
+    $this->actingAs($creatorUser)->getJson(creatorRelUrl($agency))
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.body', 'while connected')
+        ->assertJsonPath('meta.thread.can_send', false)
+        ->assertJsonPath('meta.thread.closed_reason', 'relation_ended');
+
+    // Agency side: same verdict — closure is mutual.
+    $this->actingAs($admin)->getJson(agencyRelUrl($agency, $creator))
+        ->assertOk()
+        ->assertJsonPath('meta.thread.can_send', false)
+        ->assertJsonPath('meta.thread.closed_reason', 'relation_ended');
+});
+
+it('reports a distinct closed_reason per blocking cause', function (RelationshipStatus $status, bool $blacklisted, bool $approved, string $expected): void {
+    // The thread must be seeded WHILE the pair is connected: reading a
+    // non-existent thread requires the send gate (D6 opens history only for a
+    // thread that already exists), so the closed-state payload is only
+    // reachable for a conversation that once was live — which is exactly the
+    // real scenario.
+    ['agency' => $agency, 'creator' => $creator, 'admin' => $admin] = relationshipSetup();
+    $this->actingAs($admin)->postJson(agencyRelUrl($agency, $creator), ['body' => 'history'])->assertCreated();
+
+    AgencyCreatorRelation::query()
+        ->where('agency_id', $agency->id)->where('creator_id', $creator->id)
+        ->update(['relationship_status' => $status->value, 'is_blacklisted' => $blacklisted]);
+
+    if (! $approved) {
+        $creator->forceFill(['application_status' => ApplicationStatus::Pending->value])->save();
+    }
+
+    $this->actingAs($admin)->getJson(agencyRelUrl($agency, $creator))
+        ->assertOk()
+        ->assertJsonPath('meta.thread.can_send', false)
+        ->assertJsonPath('meta.thread.closed_reason', $expected);
+})->with([
+    'ended' => [RelationshipStatus::Ended, false, true, 'relation_ended'],
+    'blacklisted roster' => [RelationshipStatus::Roster, true, true, 'blacklisted'],
+    'declined' => [RelationshipStatus::Declined, false, true, 'not_connected'],
+    'prospect' => [RelationshipStatus::Prospect, false, true, 'not_connected'],
+    'pending request' => [RelationshipStatus::PendingRequest, false, true, 'not_connected'],
+    'creator not approved' => [RelationshipStatus::Roster, false, false, 'creator_not_approved'],
+]);
+
+it('closed_reason is null if and only if can_send is true (no drift from the policy)', function (): void {
+    // The equivalence that keeps the DIAGNOSTIC honest against the GATE: the
+    // reason exists to explain a refusal, so it must be present for exactly the
+    // states the policy refuses — including the OPEN state, where it must be
+    // absent.
+    $cases = [
+        [RelationshipStatus::Roster, false, true],
+        [RelationshipStatus::Ended, false, true],
+        [RelationshipStatus::Declined, false, true],
+        [RelationshipStatus::Roster, true, true],
+        [RelationshipStatus::Roster, false, false],
+    ];
+
+    foreach ($cases as [$status, $blacklisted, $approved]) {
+        ['agency' => $agency, 'creator' => $creator, 'admin' => $admin] = relationshipSetup();
+        $this->actingAs($admin)->postJson(agencyRelUrl($agency, $creator), ['body' => 'history'])->assertCreated();
+
+        AgencyCreatorRelation::query()
+            ->where('agency_id', $agency->id)->where('creator_id', $creator->id)
+            ->update(['relationship_status' => $status->value, 'is_blacklisted' => $blacklisted]);
+
+        if (! $approved) {
+            $creator->forceFill(['application_status' => ApplicationStatus::Pending->value])->save();
+        }
+
+        $meta = $this->actingAs($admin)->getJson(agencyRelUrl($agency, $creator))->assertOk()->json('meta.thread');
+
+        expect($meta['closed_reason'] === null)->toBe($meta['can_send'] === true);
+    }
+});
+
+it('a blocked send returns the CANONICAL 403 envelope, not Laravel default shape', function (): void {
+    // The regression: `{message: "This action is unauthorized."}` has no
+    // `errors[]`, so the SPA rendered `Unrecognized error response (HTTP 403).`
+    ['agency' => $agency, 'creator' => $creator, 'creatorUser' => $creatorUser, 'admin' => $admin] = relationshipSetup();
+
+    AgencyCreatorRelation::query()
+        ->where('agency_id', $agency->id)->where('creator_id', $creator->id)
+        ->update(['relationship_status' => RelationshipStatus::Ended->value]);
+
+    $response = $this->actingAs($creatorUser)
+        ->postJson(creatorRelUrl($agency), ['body' => 'still there?'])
+        ->assertForbidden();
+
+    $response->assertJsonPath('errors.0.code', 'auth.forbidden')
+        ->assertJsonPath('errors.0.status', '403')
+        ->assertJsonStructure([
+            'errors' => [['id', 'status', 'code', 'title']],
+            'meta' => ['request_id'],
+        ]);
+
+    expect((string) $response->json('errors.0.title'))->not->toBe('');
+    // Nothing was written by the refused send.
+    expect(RelationshipMessage::query()->where('body', 'still there?')->exists())->toBeFalse();
+
+    // The agency direction is enveloped too.
+    $this->actingAs($admin)
+        ->postJson(agencyRelUrl($agency, $creator), ['body' => 'hello?'])
+        ->assertForbidden()
+        ->assertJsonPath('errors.0.code', 'auth.forbidden');
 });

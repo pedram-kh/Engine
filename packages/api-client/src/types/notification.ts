@@ -19,11 +19,15 @@
 
 /**
  * Mirrors `App\Modules\Notifications\Enums\NotificationType` — the curated
- * subset of `AuditAction` verbs a recipient sees in their feed. Only 8 of
- * these currently have a live emit site (see `notificationTemplateKey` in the
- * notifications FE module); the rest are forward-declared (deferred-S10 escrow
- * alerts + lifecycle verbs awaiting a net-new emitter) and fall to the generic
- * fallback template until a producer ships.
+ * subset of `AuditAction` verbs a recipient sees in their feed. Not all of
+ * these have a live emit site: the rest are forward-declared (deferred-S10
+ * escrow alerts + lifecycle verbs awaiting a net-new emitter) and fall to the
+ * generic fallback template until a producer ships. The authoritative live-set
+ * is the FE notifications registry (`LIVE_TYPES` in
+ * `apps/main/src/modules/notifications/templates.ts`), whose parity spec pins
+ * this union against the backend enum — so a verb added on one side without the
+ * other fails the build rather than reaching a user as "You have a new
+ * notification."
  */
 export type NotificationType =
   | 'assignment.invited'
@@ -45,6 +49,8 @@ export type NotificationType =
   | 'message.received_by_agency'
   | 'message.relationship_received_by_creator'
   | 'message.relationship_received_by_agency'
+  | 'agency_creator_relation.admin_connected'
+  | 'agency_creator_relation.disconnected'
 
 /** The acting user who drove the event, when one exists (null for system-driven). */
 export interface NotificationActor {
