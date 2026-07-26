@@ -154,18 +154,27 @@ from the eyes-on fixes:
    the residual exposure is anything **outside this repo** that pattern-matched the old shape. This
    is live now, so it is a thing to check **if 403 handling misbehaves**, not a pre-deploy gate.
 
-**Outstanding operational items** (post-deploy commands; AH-050, AH-051 and AH-052 add none):
+**Outstanding operational items.** **Both one-shot post-deploy commands are now CLOSED** (prod
+session, 2026-07-26/27). Nothing one-shot remains; AH-050, AH-051 and AH-052 added none.
 
-- **The two one-shots — status unknown, possibly already moot.** `creators:recompute-completeness`
-  (AH-026 D5) and `campaigns:advance-contractless-accepted` (AH-042 D4). Their chunks are long
-  since deployed, so they may already have been run — or may never have been. Both are idempotent
-  and both support `--dry-run`. **Verify on prod with `--dry-run` first:** a `0 changes` report
-  means the item is closed and can be struck from this list; anything else means run it once.
-- **Queue-worker restart on mail-copy changes — standing rule, not a one-shot.** See note 1 below.
-- **The D-1 contact-exposure number — record it here when Pedram supplies it.** AH-051 tightened
-  the gate; `php artisan relations:audit-contact-exposure` reports the blast radius (per-status
-  breakdown + distinct agencies). The gate shipped with the AH-051/052 deploy, so this is now a
-  read of what changed rather than a pre-deploy check.
+- ✅ **AH-026 D5 `creators:recompute-completeness` — CLOSED, run on prod 2026-07-26.** Dry-run
+  verified first, then executed: **279 creators checked, 1 score updated.** The near-zero delta is
+  the expected result, not a failure — it means the persisted scores were already consistent with
+  the AH-026 formula (region floor + D4 optional credit) for all but one row.
+- ✅ **AH-042 D4 `campaigns:advance-contractless-accepted` — CLOSED as moot.** **0 eligible rows on
+  prod**: nothing was ever stuck at `accepted` on a `requires=false` campaign, so the remediation
+  had nothing to remediate. The command stays in the codebase as a safety net; no action pending.
+- 📋 **D-1 contact-exposure audit — RECORDED, no action.** **2 `pending_request` relations across
+  1 agency, of which 1 had contact data populated** — audited **post**-deploy, gate already live.
+  This is the realized blast radius of the AH-051 tightening: one agency lost visibility of one
+  creator's contact details. Small enough that no remediation or notification is warranted.
+- ♻️ **Queue-worker restart on mail-copy changes — standing rule, not a one-shot.** See note 1
+  below. Never "closes"; it binds on every future deploy carrying a `lang/**` change.
+
+**Observed production scale (2026-07-26):** **~279 creators**, per the recompute command's own
+count. Useful as the blast-radius denominator when sizing any future data migration or backfill.
+Not to be confused with the capacity **targets** in `docs/00-MASTER-ARCHITECTURE.md` (500,000+
+registered creators, 200+ concurrent admin users), which are design goals, not current state.
 
 > **AH-042 · Toggle-OFF campaigns flow without contract involvement** (full chunk loop). The
 > `requires_per_campaign_contract` toggle is now load-bearing end-to-end: the machine permits a
@@ -223,8 +232,8 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     profile floor (1:1 FE↔BE, source-scan parity spec); profile unit's 25 pts split floor 13 +
     per-optional credit 12 (gate boolean stays floor-only, score numerator partial via
     `profileEarned()`); both wizard chromes + rail show the `%` alongside "Step X of N"; review
-    two-signal copy; `creators:recompute-completeness` one-shot command. **Post-deploy:** run
-    `php artisan creators:recompute-completeness` once (idempotent).
+    two-signal copy; `creators:recompute-completeness` one-shot command. **Post-deploy: DONE** —
+    run on prod 2026-07-26 (279 creators checked, 1 updated).
   - **AH-027** — Creator completeness `%` on the agency discover detail: read-only display of the
     already-on-the-wire `profile_completeness_score` as a `%` bar on `DiscoverProfilePage`; no BE /
     resource / gate / formula change (`app.discover.detail.completeness` × 24 locales, parity green).
@@ -444,23 +453,19 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
   posture is legally sound for existing signees is still outside this codebase's review and needs a
   counsel sign-off. Logged as tech-debt (`docs/tech-debt.md` — "Contract version-label ambiguity +
   missing re-consent flow", updated by AH-049) until resolved either way.
-- **Post-deploy operational step (AH-026 D5) — SHIPPED, run-status unknown.** The AH-026→028 range
-  is deployed, so the trigger condition has passed; what is unknown is whether the command was ever
-  run. Run `php artisan creators:recompute-completeness --dry-run` on prod: **`0 changes` closes
-  this item**, anything else means run it once without the flag, so every existing creator's
-  persisted `profile_completeness_score` moves to the new formula (region floor + D4 optional
-  credit). Idempotent — safe to re-run. There is **no scheduler** (see the blocker above), so
-  nothing will do this on its own. The new
-  `docs/runbooks/production-queue-worker.md` (`12a7ef5`) cross-links this step so a deploy checklist
-  finds both operational obligations in one place. (Also logged as a standing tech-debt obligation
-  below.)
-- **Post-deploy operational step (AH-042 D4) — SHIPPED, run-status unknown.** AH-042 (toggle-OFF
-  contract flow) is deployed. Run `php artisan campaigns:advance-contractless-accepted --dry-run`
-  on prod: **`0` closes this item**, anything else means run it once without the flag, so any
-  assignment stuck at `accepted` on a `requires=false` campaign advances to `contracted`
-  (contract-less). Idempotent; scoped to accepted-only + requires=false-only. **No scheduler** (see
-  the blocker above), so nothing will do this on its own. Pairs with the AH-026
-  `creators:recompute-completeness` dry-run — verify both together in one pass.
+- ✅ **Post-deploy operational step (AH-026 D5) — CLOSED 2026-07-26.** Ran
+  `php artisan creators:recompute-completeness` on prod (dry-run verified first): **279 creators
+  checked, 1 score updated**. Every persisted `profile_completeness_score` is now on the AH-026
+  formula (region floor + D4 optional credit). No longer an outstanding obligation; the command
+  remains idempotent if it is ever needed again.
+  `docs/runbooks/production-queue-worker.md` (`12a7ef5`) still cross-links it from the deploy
+  checklist — that cross-link can stay, it now documents a completed step.
+- ✅ **Post-deploy operational step (AH-042 D4) — CLOSED as moot, 2026-07-26.** Dry-run on prod
+  found **0 eligible rows**: no assignment was ever stuck at `accepted` on a `requires=false`
+  campaign, so the remediation had nothing to remediate and was not run. The command
+  (`campaigns:advance-contractless-accepted`, idempotent, scoped to accepted-only +
+  requires=false-only) stays in the codebase as a safety net. **With AH-026 also closed, no
+  one-shot post-deploy obligations remain.**
 - **NEW deploy dependency — the scheduler cron (`schedule:run`) — carry forward (incomplete-creator
   nudge chunk, July 16, 2026).** The app now has a **flag-gated daily command**,
   `creators:send-incomplete-nudges`, registered `->daily()` in `bootstrap/app.php` alongside the
