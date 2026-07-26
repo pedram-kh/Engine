@@ -28,6 +28,16 @@ durable record so the work isn't invisible afterward. Larger ad-hoc changes get 
 `In progress`, and graduates into the **Change Log** as `Landed` once merged. Parked or
 dropped items stay in the log with that status so the decision is on record.
 
+**Reading a `Status:` line.** `Status: Landed (push HELD)` records the state at
+entry-writing time — it is a **close-time snapshot, not a live claim**. Many older entries
+still carry it despite having been pushed long since; the marker means "the push was held
+when this was written," never "the push is held now." **Live push state is `origin/main`;
+live deploy state is the resumption template's Pushed-≠-deployed section.** Those two are
+the only authorities, and they are the reason older entries are deliberately **not**
+retro-edited: rewriting history to track a moving fact is how the drift started.
+**Convention change (2026-07-26):** new entries write `Status: Landed` plain and keep push
+state out of this file entirely, so an entry can never go stale by standing still.
+
 **IDs.** Each entry gets a stable `AH-NNN` id so it can be referenced from commits,
 reviews, and conversations.
 
