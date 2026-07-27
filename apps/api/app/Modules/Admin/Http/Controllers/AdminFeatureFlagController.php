@@ -10,6 +10,7 @@ use App\Modules\Audit\Facades\Audit;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
+use App\Modules\Creators\Features\JobPostedNotificationsEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
@@ -74,6 +75,10 @@ final class AdminFeatureFlagController
         IncompleteCreatorNudgeEnabled::NAME => [
             'label' => 'Incomplete-creator nudge',
             'description' => 'Sends a one-time email to creators sitting incomplete for 48+ hours.',
+        ],
+        JobPostedNotificationsEnabled::NAME => [
+            'label' => 'Job-posted notifications',
+            'description' => 'Tells an agency’s roster when a campaign is listed on the jobs board.',
         ],
     ];
 

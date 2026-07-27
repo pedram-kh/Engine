@@ -6,6 +6,7 @@ use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
+use App\Modules\Creators\Features\JobPostedNotificationsEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
@@ -59,10 +60,34 @@ it('lists every registered flag with its current state', function (): void {
 
     expect($names)->toContain(KycVerificationEnabled::NAME)
         ->and($names)->toContain(ContractSigningEnabled::NAME)
-        ->and($names)->toContain(IncompleteCreatorNudgeEnabled::NAME);
+        ->and($names)->toContain(IncompleteCreatorNudgeEnabled::NAME)
+        ->and($names)->toContain(JobPostedNotificationsEnabled::NAME);
     expect($response->json('data.0.attributes'))->toHaveKeys([
         'name', 'label', 'description', 'enabled',
     ]);
+});
+
+it('lets an admin arm the jobs-board fan-out from the same registry (AH-056, D6)', function (): void {
+    $admin = makeFlagAdmin();
+    expect(Feature::active(JobPostedNotificationsEnabled::NAME))->toBeFalse();
+
+    $response = $this->actingAs($admin, 'web_admin')->postJson(
+        '/api/v1/admin/feature-flags/'.JobPostedNotificationsEnabled::NAME,
+        ['enabled' => true, 'reason' => 'Dry-run read is clean; arming job-posted mail.'],
+    );
+
+    expect($response->status())->toBe(200);
+    expect(Feature::active(JobPostedNotificationsEnabled::NAME))->toBeTrue();
+
+    // The kill switch has to be reachable in BOTH directions from the SPA —
+    // arming a mail fan-out you cannot disarm is not a kill switch.
+    $off = $this->actingAs($admin, 'web_admin')->postJson(
+        '/api/v1/admin/feature-flags/'.JobPostedNotificationsEnabled::NAME,
+        ['enabled' => false, 'reason' => 'Pausing the fan-out.'],
+    );
+
+    expect($off->status())->toBe(200);
+    expect(Feature::active(JobPostedNotificationsEnabled::NAME))->toBeFalse();
 });
 
 it('activates a flag, flips Feature::active live, and writes an audit row', function (): void {
