@@ -364,8 +364,6 @@
         "description": "Igakuised tulemid",
         "industry": "Industry",
         "websiteUrl": "Website URL",
-        "defaultCurrency": "Default currency",
-        "defaultLanguage": "Default language",
         "status": "Olek",
         "descriptionHint": "Mida looja iga kuu toodab (nt 2 Reels'i ja 3 Stories't) ning kasutustingimused.",
         "slugHint": "Pakutakse automaatselt nime järgi. Kasutatakse URL-ides.",

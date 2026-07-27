@@ -364,8 +364,6 @@
         "description": "Miesięczne rezultaty",
         "industry": "Branża",
         "websiteUrl": "URL strony internetowej",
-        "defaultCurrency": "Domyślna waluta",
-        "defaultLanguage": "Domyślny język",
         "status": "Status",
         "descriptionHint": "Co twórca przygotowuje co miesiąc (np. 2 Reels i 3 Stories) oraz warunki wykorzystania.",
         "slugHint": "Proponowany automatycznie na podstawie nazwy. Używany w adresach URL.",

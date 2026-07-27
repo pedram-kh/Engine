@@ -364,8 +364,6 @@
         "description": "Entregas mensais",
         "industry": "Setor",
         "websiteUrl": "URL do site",
-        "defaultCurrency": "Moeda padrão",
-        "defaultLanguage": "Idioma padrão",
         "status": "Status",
         "descriptionHint": "O que o criador produz por mês (por ex., 2 Reels e 3 Stories), além das condições de utilização.",
         "slugHint": "Sugerido automaticamente a partir do nome. Usado nos URL.",

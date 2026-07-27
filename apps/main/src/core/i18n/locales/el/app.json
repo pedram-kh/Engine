@@ -364,8 +364,6 @@
         "description": "Μηνιαία παραδοτέα",
         "industry": "Industry",
         "websiteUrl": "Website URL",
-        "defaultCurrency": "Default currency",
-        "defaultLanguage": "Default language",
         "status": "Κατάσταση",
         "descriptionHint": "Τι παράγει ο δημιουργός κάθε μήνα (π.χ. 2 Reels και 3 Stories), καθώς και οι όροι χρήσης.",
         "slugHint": "Προτείνεται αυτόματα από το όνομα. Χρησιμοποιείται στα URL.",

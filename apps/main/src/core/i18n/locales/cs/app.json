@@ -364,8 +364,6 @@
         "description": "Měsíční výstupy",
         "industry": "Odvětví",
         "websiteUrl": "URL webu",
-        "defaultCurrency": "Výchozí měna",
-        "defaultLanguage": "Výchozí jazyk",
         "status": "Stav",
         "descriptionHint": "Co tvůrce každý měsíc vytvoří (např. 2 Reels a 3 Stories) a podmínky užití.",
         "slugHint": "Automaticky navrženo podle názvu. Používá se v URL adresách.",

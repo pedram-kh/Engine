@@ -364,8 +364,6 @@
         "description": "Entregables mensuales",
         "industry": "Sector",
         "websiteUrl": "URL del sitio web",
-        "defaultCurrency": "Moneda predeterminada",
-        "defaultLanguage": "Idioma predeterminado",
         "status": "Estado",
         "descriptionHint": "Lo que el creador produce cada mes (p. ej. 2 Reels y 3 Stories), además de las condiciones de uso.",
         "slugHint": "Se sugiere automáticamente a partir del nombre. Se usa en las URL.",

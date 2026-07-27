@@ -364,8 +364,6 @@
         "description": "Konsenji ta' kull xahar",
         "industry": "Industry",
         "websiteUrl": "Website URL",
-        "defaultCurrency": "Default currency",
-        "defaultLanguage": "Default language",
         "status": "Status",
         "descriptionHint": "X'jipproduċi l-kreatur kull xahar (ngħidu aħna 2 Reels u 3 Stories), flimkien mat-termini tal-użu.",
         "slugHint": "Jiġi suġġerit awtomatikament mill-isem. Jintuża fl-URLs.",

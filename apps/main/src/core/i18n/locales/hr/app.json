@@ -364,8 +364,6 @@
         "description": "Mjesečni isporučivi sadržaj",
         "industry": "Odvětví",
         "websiteUrl": "URL webu",
-        "defaultCurrency": "Výchozí měna",
-        "defaultLanguage": "Výchozí jazyk",
         "status": "Stanje",
         "descriptionHint": "Što kreator izrađuje svaki mjesec (npr. 2 Reels i 3 Stories) te uvjeti korištenja.",
         "slugHint": "Automatski se predlaže prema nazivu. Koristi se u URL-ovima.",

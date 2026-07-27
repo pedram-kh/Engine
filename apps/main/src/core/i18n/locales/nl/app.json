@@ -364,8 +364,6 @@
         "description": "Maandelijkse opleveringen",
         "industry": "Sector",
         "websiteUrl": "Website-URL",
-        "defaultCurrency": "Standaardvaluta",
-        "defaultLanguage": "Standaardtaal",
         "status": "Status",
         "descriptionHint": "Wat de creator elke maand maakt (bijv. 2 Reels en 3 Stories), plus de gebruiksvoorwaarden.",
         "slugHint": "Automatisch voorgesteld op basis van de naam. Wordt gebruikt in URL's.",

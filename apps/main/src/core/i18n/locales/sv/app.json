@@ -364,8 +364,6 @@
         "description": "Månatliga leveranser",
         "industry": "Bransch",
         "websiteUrl": "Webbplatsens URL",
-        "defaultCurrency": "Standardvaluta",
-        "defaultLanguage": "Standardspråk",
         "status": "Status",
         "descriptionHint": "Vad creatorn producerar varje månad (t.ex. 2 Reels och 3 Stories), samt användningsvillkor.",
         "slugHint": "Föreslås automatiskt utifrån namnet. Används i URL:er.",

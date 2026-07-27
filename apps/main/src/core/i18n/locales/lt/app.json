@@ -364,8 +364,6 @@
         "description": "Mėnesio rezultatai",
         "industry": "Industry",
         "websiteUrl": "Website URL",
-        "defaultCurrency": "Default currency",
-        "defaultLanguage": "Default language",
         "status": "Būsena",
         "descriptionHint": "Ką kūrėjas sukuria kas mėnesį (pvz., 2 „Reels“ ir 3 „Stories“) bei naudojimo sąlygos.",
         "slugHint": "Automatiškai siūloma pagal pavadinimą. Naudojama URL adresuose.",

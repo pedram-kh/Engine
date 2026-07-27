@@ -175,18 +175,6 @@ onMounted(loadBrand)
           data-test="brand-detail-website"
         />
         <v-list-item
-          v-if="brand.attributes.default_currency"
-          :title="t('app.brands.fields.defaultCurrency')"
-          :subtitle="brand.attributes.default_currency"
-          data-test="brand-detail-currency"
-        />
-        <v-list-item
-          v-if="brand.attributes.default_language"
-          :title="t('app.brands.fields.defaultLanguage')"
-          :subtitle="brand.attributes.default_language"
-          data-test="brand-detail-language"
-        />
-        <v-list-item
           :title="'Created'"
           :subtitle="formatDateTime(brand.attributes.created_at, locale, { dateStyle: 'medium' })"
           data-test="brand-detail-created-at"

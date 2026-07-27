@@ -364,8 +364,6 @@
         "description": "Livrables mensuels",
         "industry": "Secteur",
         "websiteUrl": "URL du site web",
-        "defaultCurrency": "Devise par défaut",
-        "defaultLanguage": "Langue par défaut",
         "status": "Statut",
         "descriptionHint": "Ce que le créateur produit chaque mois (par ex. 2 Reels et 3 Stories), ainsi que les conditions d'utilisation.",
         "slugHint": "Suggéré automatiquement à partir du nom. Utilisé dans les URL.",

@@ -364,8 +364,6 @@
         "description": "Consegne mensili",
         "industry": "Settore",
         "websiteUrl": "URL sito web",
-        "defaultCurrency": "Valuta predefinita",
-        "defaultLanguage": "Lingua predefinita",
         "status": "Stato",
         "descriptionHint": "Cosa produce il creator ogni mese (ad es. 2 Reels e 3 Stories), oltre alle condizioni di utilizzo.",
         "slugHint": "Suggerito automaticamente dal nome. Usato negli URL.",

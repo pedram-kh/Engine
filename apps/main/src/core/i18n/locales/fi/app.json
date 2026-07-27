@@ -364,8 +364,6 @@
         "description": "Kuukausittaiset tuotokset",
         "industry": "Industry",
         "websiteUrl": "Website URL",
-        "defaultCurrency": "Default currency",
-        "defaultLanguage": "Default language",
         "status": "Tila",
         "descriptionHint": "Mitä tekijä tuottaa joka kuukausi (esim. 2 Reels ja 3 Stories) sekä käyttöehdot.",
         "slugHint": "Ehdotetaan automaattisesti nimen perusteella. Käytetään URL-osoitteissa.",

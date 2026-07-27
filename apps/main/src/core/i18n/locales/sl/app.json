@@ -364,8 +364,6 @@
         "description": "Mesečni rezultati",
         "industry": "Odvětví",
         "websiteUrl": "URL webu",
-        "defaultCurrency": "Výchozí měna",
-        "defaultLanguage": "Výchozí jazyk",
         "status": "Stanje",
         "descriptionHint": "Kaj ustvarjalec pripravi vsak mesec (npr. 2 Reels in 3 Stories) ter pogoji uporabe.",
         "slugHint": "Samodejno predlagano iz imena. Uporablja se v naslovih URL.",

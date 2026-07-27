@@ -364,8 +364,6 @@
         "description": "Месечни резултати",
         "industry": "Industry",
         "websiteUrl": "Website URL",
-        "defaultCurrency": "Default currency",
-        "defaultLanguage": "Default language",
         "status": "Статус",
         "descriptionHint": "Какво произвежда криейтърът всеки месец (напр. 2 Reels и 3 Stories), плюс условията за използване.",
         "slugHint": "Предлага се автоматично от името. Използва се в URL адресите.",
