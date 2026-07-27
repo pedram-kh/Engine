@@ -1847,6 +1847,25 @@ anyone reviewing it later.
   locales (parity green), but the `mt` (Maltese) and `ga` (Irish) translations of the new keys were
   flagged for a native-speaker pass. Both locales are already on the list above; this reaffirms them
   as the highest-priority candidates for the content cleanup.
+- **AH-053 addendum — the magnitude, measured (2026-07-27):** the entry above said "English
+  fragments"; the AH-053 glossary pass measured the actual scale and it is far larger. Counting
+  leaves in `apps/main/src/core/i18n/locales/*/app.json` that are **byte-identical to the English
+  value**, the ten flagged locales sit at **759–787 of 1351 leaves (≈56–58%)**, of which **~320 are
+  multi-word sentences** — not shared proper nouns or units. The other thirteen locales sit at
+  **26–68 identical leaves each, none of them multi-word**, which is the expected residue of brand
+  names and glossary terms. In other words the flaky-10 are not lightly contaminated; more than half
+  of each bundle was never translated, and the untranslated half is prose.
+  Concrete example, from `bg`: `"Творецs you invite or engage will appear here…"` — an English
+  sentence with one Bulgarian noun substituted in, complete with an English plural `s` on a Cyrillic
+  stem. This also has a second-order effect worth naming: those strings are the reason a term-
+  consistency scan can appear to disagree with itself. AH-053 kept `bg` / `fi` / `lv` on
+  `криейтър` / `tekijä` / `veidotājs` precisely because their competing forms (`Творец` / `Luoja` /
+  `Radītājs`) occur **only** inside these still-English strings, never in translated prose. Fixing
+  the leakage will change which term looks dominant, so the glossary decision must be re-taken as
+  part of the cleanup rather than treated as settled.
+  The count above is also the heuristic lint proposed below, run by hand — a byte-identity check
+  against `en`, filtered to multi-word values, separates the two populations cleanly and is cheap
+  enough to run in CI as a **reporting** step (never a blocking one, since some identity is correct).
 - **Why the gates don't catch it:** the i18n CI gate is **keyset/placeholder/plural parity** — it
   proves a key _exists_ in every locale with matching interpolation/plural shape, but it can
   **never** prove a value isn't still English. "English text under a foreign label" is structurally
@@ -1956,3 +1975,99 @@ ukazuje na váš zveřejněný příspěvek, a poté ho níže znova odešlete."
   and re-translate every corrupted value, not just the ones this batch happened to touch.
 - **Owner:** i18n / localization workstream.
 - **Status:** open (real finding, not a merge blocker; scope unknown pending audit).
+
+---
+
+## Campaign `listing_regions` / `listing_languages` are shape-validated, not registry-validated (AH-054)
+
+- **Where:** [`ValidatesJobsBoardListing`](../apps/api/app/Modules/Campaigns/Http/Requests/Concerns/ValidatesJobsBoardListing.php)
+  — the rules behind `listing_regions` and `listing_languages` on
+  `Create`/`UpdateCampaignRequest`, and their frontend multi-selects in
+  [`CampaignForm.vue`](../apps/main/src/modules/campaigns/components/CampaignForm.vue).
+- **What we accepted (AH-054, 2026-07-27):** the review offered a validated registry (option B) or a
+  bounded shape check (option C); C shipped. `listing_regions` is uppercase-normalised in
+  `prepareForValidation()`, then required to be `size:2`, `distinct`, alphabetic, and at most **60**
+  entries; `listing_languages` validates against `Locale::values()`, `distinct`, at most **24**.
+  So `ZZ` is accepted as a region and stored, because nothing checks it against a real ISO-3166 list.
+  The frontend only ever offers `COUNTRY_OPTIONS`, so a bad code takes a hand-written API call.
+- **Why it's fine for now:** the columns are display-only in this chunk — nothing reads them, nothing
+  filters on them, nothing prices from them. The caps are the part that actually matters today, since
+  they are what stops an unbounded jsonb array being written to a row that the board will later fan
+  out over. The languages side is already registry-validated; only regions are loose.
+- **Why it stops being fine:** the moment the Jobs Board **filters** by region — a creator in
+  Portugal seeing jobs tagged `PT` — an unvalidated code becomes a job that is silently invisible to
+  everyone, with no error anywhere to explain it. That is the trigger.
+- **Trigger:** chunk 3 (or any later surface) reading `listing_regions` as anything other than
+  display text — filtering, faceting, matching, or pricing.
+- **Resolution:** option B — promote the country list to a shared backend registry (an enum or a
+  config-backed value list) that both `COUNTRY_OPTIONS` and the request rules consume, validate with
+  `Rule::in(...)`, and pin the pair with a source-scan parity spec in the same shape as
+  [`brand-floor-parity.spec.ts`](../apps/main/tests/unit/architecture/brand-floor-parity.spec.ts).
+  This overlaps the existing "no canonical country list" entry above — resolve them together rather
+  than adding a second list. Estimated effort: half a day including the parity spec.
+- **Owner:** Jobs Board workstream (chunk 3).
+- **Status:** open; deliberately deferred with the caps in place as the interim guard.
+
+---
+
+## `Storage::put()` returns `false` instead of throwing on every object-storage disk (AH-053)
+
+- **Where:** [`config/filesystems.php`](../apps/api/config/filesystems.php) — every S3-family disk is
+  configured `'throw' => false`. Consumers: any code calling `Storage::disk(...)->put()`.
+- **What AH-053 found and fixed for two callers:** neither `BrandLogoUploadService` (new) nor its
+  precedent `AvatarUploadService` (shipped earlier) checked the `put()` return. With an unreachable
+  bucket, `put()` returned `false`, the `logo_path` / `avatar_path` column was assigned regardless,
+  and the API answered **200** over a row pointing at an object that does not exist. Both now check
+  the return and raise
+  [`StorageWriteFailedException`](../apps/api/app/Core/Storage/StorageWriteFailedException.php) —
+  deliberately extending `Exception`, **not** `RuntimeException`, so it escapes the controllers'
+  content-rejection catch (which would have blamed the user with a 422), rolls the surrounding
+  transaction back, and surfaces as a reported 500. Each has a named test.
+- **What remains open:** the **class** of bug, not these two instances. Nothing prevents the next
+  upload surface from repeating it — there is no lint, no architecture test, and no shared helper
+  that makes the checked call the path of least resistance. The `'throw' => false` setting is itself
+  the root cause and is not something a reviewer would notice while reading a service.
+- **Risk:** medium. Every occurrence is silent by construction: a green suite, a 200 response, and a
+  database row that lies about what is in storage. It cannot be found by reading the failing path,
+  because there is no failing path.
+- **Trigger:** the next feature that writes to the `media` disk (or any object-storage disk).
+- **Resolution:** two options for the follow-up to pick from — (i) flip `'throw' => true` on the
+  object-storage disks and audit the callers that currently rely on a soft `false` (smallest change,
+  but a blast radius that needs the audit first); (ii) add a thin `MediaStorage` wrapper whose `put()`
+  is the only sanctioned entry point and always raises, plus an architecture test forbidding direct
+  `Storage::disk('media')->put()` outside it. (ii) is the durable shape; (i) is the honest one-liner.
+- **Owner:** platform / storage.
+- **Status:** open (the two known callers are fixed; the class is not).
+
+---
+
+## E2E media storage is a local-disk stand-in, not a real object store (AH-053)
+
+- **Where:** [`config/filesystems.php`](../apps/api/config/filesystems.php) (the `MEDIA_DISK_DRIVER`
+  branch on the `media` disk), [`playwright.config.ts`](../apps/main/playwright/playwright.config.ts),
+  [`global-setup.ts`](../apps/main/playwright/global-setup.ts), and the pin
+  [`e2e-media-disk.spec.ts`](../apps/main/tests/unit/architecture/e2e-media-disk.spec.ts).
+- **What we accepted (AH-053, 2026-07-27):** the `e2e-main` CI job provisions Postgres and Redis
+  only. Combined with the silent-`put()` behaviour above, a Playwright logo leg would have stored
+  nothing and passed — the dishonest green this arc exists to prevent. Rather than add MinIO to CI,
+  `MEDIA_DISK_DRIVER=local` selects a local-filesystem branch of the `media` disk with `serve => true`,
+  so `signedViewUrl()` keeps its real signing semantics instead of being special-cased for tests.
+  Production is unaffected: the variable is unset everywhere else and the branch defaults to `s3`.
+- **The gap:** the E2E leg proves the pipeline end-to-end — accept, sniff, re-encode, store, sign,
+  render — but against a filesystem. It does **not** exercise S3 credentials, bucket policy, region
+  routing, or the signed-URL implementation the production driver actually uses. A misconfigured
+  bucket still reaches production unexercised by any automated gate.
+- **A trap recorded so it isn't rediscovered:** with `serve => true` and no explicit `url`, the served
+  route defaults to `/storage/{path}` — the same URI the stock `local` disk already registers, with a
+  `.*` wildcard. First registration wins, so `storage.local` silently swallowed every
+  `/storage/media/...` request, was handed `media/agencies/…`, found nothing, and 404'd. The signature
+  still validated (it is computed over the URL, not the route), so the only symptom was a logo that
+  never rendered. The E2E branch therefore serves from `/e2e-media`, and the architecture spec pins
+  that it must not sit under `/storage`.
+- **Trigger:** the first media bug that reaches production without a failing test, or any change to
+  the storage driver / bucket configuration.
+- **Resolution:** add a MinIO service container to the `e2e-main` job and point `MEDIA_DISK_DRIVER`
+  at a real S3-compatible endpoint; the disk indirection already exists, so this is CI-config work
+  plus deleting the local branch. Estimated effort: half a day.
+- **Owner:** platform / CI.
+- **Status:** open; the local branch is the deliberate interim, pinned by an architecture test.

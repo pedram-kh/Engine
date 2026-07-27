@@ -70,6 +70,118 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-054 · Jobs Board chunk 2 — campaign listing fields, the two gates, and the read-time scope
+
+- **Status:** Landed
+- **Commits:** `b7ea3e1` — `feat(campaigns): jobs-board listing fields, gates and Settings toggle (AH-054)`; docs
+  commit (this entry) — `docs(jobs-board): AH-053/AH-054 review + change-log entries + tech-debt`.
+  Built in one pass with **AH-053** because the two halves share the floor-predicate shape and one
+  i18n gate; they are separate commits because each half is independently green.
+- **Date:** 2026-07-27
+- **Why:** The Jobs Board (chunk 3) needs campaigns to carry the copy a creator reads — duration,
+  fee, languages, regions, an examples link — and needs an agency-controlled switch that decides
+  whether a campaign appears at all. Neither existed.
+- **What:** Six additive columns on `campaigns` (`listed_on_jobs_board` boolean default `false`;
+  `listing_duration`/`listing_fee` varchar 120; `listing_languages`/`listing_regions` jsonb;
+  `listing_examples_url` varchar 2048), the two gates below, a Settings-tab toggle that mirrors both
+  gates client-side, and `Campaign::scopeListedOnJobsBoard()` — the read-time predicate chunk 3 will
+  consume, shipped now so that chunk binds to a tested contract rather than a promise.
+- **Decisions:** **D3 (completeness) is a resulting-state rule** — if the campaign will be listed
+  after this write, every floor field must be filled, whether the payload flips the switch or the
+  campaign was already listed. This is what makes "refuses to gut a live listing" possible.
+  **D5 (terminal status) is a transition rule** — only `false → true` is refused for a `completed` or
+  `cancelled` campaign. The asymmetry is deliberate and is the whole of ruling **A1**: a campaign that
+  was listed when it ended keeps an inert `true` and stays editable, because auto-clearing it would
+  put the write path and the read scope in charge of the same fact, and the two would drift. The read
+  scope alone decides visibility. **D4:** create accepts the five content fields and ignores the
+  switch entirely, so nothing is ever listed by accident. **Q1 = A + C cap:** region/language values
+  are uppercase-normalised, `size:2`, distinct and bounded (60 / 24) rather than validated against a
+  registry — registry deferred to tech-debt. **Q4:** Settings-only; no Overview rows until the board
+  defines what it reads. **Q6:** the flip rides `campaign.updated` rather than earning a new verb.
+- **Root cause of the read-pass catch (F2):** `CampaignController::store()` writes through an explicit
+  whitelist, not `$fillable`. Fields added to the model only would have validated, returned 201 and
+  silently never persisted. Every create test in this chunk asserts the **persisted** value.
+- **Touched:** migration `2026_07_27_100000_add_jobs_board_listing_to_campaigns`;
+  `Campaigns/Models/Campaign.php`; `Campaigns/Http/Requests/Concerns/ValidatesJobsBoardListing.php`
+  (new, the single source of the floor + rules); `Create/UpdateCampaignRequest.php`;
+  `CampaignController.php` (whitelist + audit snapshot); `CampaignResource.php`; `CampaignFactory.php`
+  (`jobReady()` / `listed()` states); `packages/api-client/src/types/campaign.ts`;
+  `apps/main/src/modules/campaigns/listingFloor.ts` (new FE mirror);
+  `campaigns/components/CampaignForm.vue`; `campaigns/pages/CampaignDetailPage.vue`; en + 23 locales.
+- **Pin:** `CampaignJobsBoardListingTest` (31 tests / 191 assertions) — the D3 gate naming every
+  missing field at once, the gut-a-live-listing refusal, the D5 transition block and its complete
+  positive partition, the A1 case (`status → terminal leaves the flag untouched`), the F3 audit
+  assertion, preserve-by-omission, and the **disjoint** scope negative set plus a pin that
+  `LISTABLE_STATUSES` is exactly the complement of the terminal statuses. FE: a jobs-board-toggle
+  block in `CampaignDetailPage.spec.ts` and a source-scan parity spec holding the FE floor to the
+  backend constant.
+- **Break-revert:** neutering the D3 loop reds 4 tests (BR-1 in the review file, verbatim).
+- **§5.40:** **LOW** — the migration is purely additive with an honest inverse; no existing row is
+  read or rewritten.
+- **Ref:** [`jobs-board-brand-amends-review.md`](jobs-board-brand-amends-review.md)
+
+### AH-053 · Jobs Board chunk 1 — brand completeness floor, logo pipeline, and form relabel
+
+- **Status:** Landed
+- **Commits:** `2568a96` — `feat(brands): completeness floor, logo pipeline and form relabel (AH-053)`;
+  docs commit shared with AH-054 above.
+- **Date:** 2026-07-27
+- **Why:** A creator browsing the Jobs Board sees the brand before the job. Brands could be created
+  with a name alone — no description, no industry, no site, no logo — so the board would have shipped
+  rows that say nothing. The form also asked for the wrong thing: `description` was a generic blurb
+  where the board needs the monthly deliverables.
+- **What:** (1) A six-field completeness floor (`name`, `slug`, `description`, `industry`,
+  `website_url`, `logo_path`) required at create (logo excepted — see below) and enforced on every
+  subsequent edit. (2) A brand-logo upload/delete pipeline on the avatar pattern. (3) `description`
+  relabelled "Monthly deliverables" with a shape-naming hint, and the `default_currency` /
+  `default_language` selects removed from the form. (4) `brands:audit-floor`, a read-only command
+  reporting the platform-wide blocked population before the deploy.
+- **Decisions:** **A2 — the floor predicate takes MERGED state**, payload value where the payload
+  supplies one and stored value otherwise. Full-payload-required was rejected on the **AH-032**
+  evidence: forcing clients to echo fields they cannot see is precisely the mechanic that produced
+  that brief wipe-bug. `Brand::floorMissingFields()` is the single source, consumed by the request,
+  the command and — under a source-scan parity spec — the FE mirror; `isFilled()` treats whitespace
+  as empty and the mirror agrees. **Restore is explicitly outside the gate** and pinned there rather
+  than left as a routing accident (F6). **F7 — create is honestly non-atomic:** the logo needs a row
+  to attach to, so `logo_path` is the one floor field not required at create; the SPA does
+  `POST /brands` then `POST …/logo`, names the failure if the second write fails, and the edit gate
+  is the backstop. **Q5 — replace does not delete** (avatar precedent), which reduces the chunk's
+  destructive surface to the single explicit remove and keeps its over-reach negative meaningful.
+  **Q2 = B —** `brand_logo_max_bytes` joins a registry that `UploadLimitChecker::requiredBytes()`
+  now maxes over, so the `/health` assertion stays honest as upload surfaces multiply. **D8 is a
+  form change only:** both removed selects keep their columns, defaults, validation and API
+  emission, and two tests pin that the contract did not narrow.
+- **Root cause of the read-pass catch (F1):** `BrandFactory` used `fake()->optional()` for exactly
+  the fields the floor now requires, so introducing the gate would have produced a randomly-red suite
+  — the failure mode whose usual "fix" is weakening the gate. The factory is now deterministic and
+  floor-complete by default, with explicit `incomplete()` and `missingFloorField()` states.
+- **Touched:** `Brands/Models/Brand.php` (`FLOOR_FIELDS`, `floorMissingFields()`, `isFilled()`);
+  `Create/UpdateBrandRequest.php`; `Brands/Services/BrandLogoUploadService.php` (new);
+  `Brands/Http/Controllers/BrandLogoController.php` (new); `Brands/Routes/api.php`;
+  `BrandResource.php` (`logo_url`); `BrandFactory.php`; `Console/Commands/AuditBrandFloor.php` (new);
+  `config/uploads.php`; `Core/Health/UploadLimitChecker.php`; `docs/security/tenancy.md`;
+  `packages/api-client/src/types/agency.ts`; `apps/main/src/modules/brands/brandFloor.ts` (new),
+  `api/brands.api.ts`, `components/BrandForm.vue`, `pages/Brand{Create,Edit,Detail,List}Page.vue`;
+  en + 23 locales; `playwright/fixtures/brand-logo.png` (new) and `specs/brands.spec.ts`.
+- **Pin:** `BrandFloorGateTest` (both directions — block an incomplete edit naming every missing
+  field, and refuse to _empty_ a floor field on a complete brand — plus read/list/campaign-carry/
+  archive/restore all confirmed ungated, and the two D8 contract-preservation cases);
+  `BrandLogoUploadTest` (scoped path, replace-without-delete, delete over-reach negative, content-
+  sniffed script refusal at both request and service layer, GIF refusal, size cap, EXIF stripping,
+  cross-tenant 404 on all three verbs, role posture, signed-URL emission, audit, and the D6
+  interaction in both directions); `AuditBrandFloorCommandTest` (output shape, cross-agency and
+  soft-deleted inclusion, and a read-only assertion); `BrandForm.spec.ts` + `brand-floor-parity.spec.ts`.
+- **Break-revert:** BR-2 (neuter the predicate) reds 8; BR-3 (make the predicate ignore the payload)
+  reds exactly the 5 merged-state cases while the blocking cases stay green — the discriminating
+  break that shows A2 is enforced, not incidentally satisfied; BR-4 (pull restore inside the gate)
+  reds 1. Verbatim in the review file.
+- **⚠ Deploy note:** this is a **behaviour change for existing data**, though not a data change.
+  Agencies holding pre-floor brands will meet a 422 on their next brand edit, surfaced inline by the
+  form rather than discovered through the API. Run `brands:audit-floor` **before** the deploy — it is
+  a pure read and reports the exact blocked population, per field and per lifecycle state.
+- **§5.40:** **LOW** — no migration, no backfill, no mutation. D6 is a new refusal, not a new write.
+- **Ref:** [`jobs-board-brand-amends-review.md`](jobs-board-brand-amends-review.md)
+
 ### AH-052 · Canonical 403 envelope — every `authorize()` denial now speaks the platform's error contract
 
 - **Status:** Landed — **pushed 2026-07-26** (`origin/main` at `d1dc3d2`)

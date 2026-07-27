@@ -113,8 +113,19 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-26 · **Through:** AH-052 · **Baseline:** `d1dc3d2` — the current
-`origin/main` tip. **Nothing is held.** The AH-001→AH-052 range is pushed in full, including
+**Last updated:** 2026-07-27 · **Through:** AH-054 · **Baseline:** the AH-053/AH-054 docs commit —
+the current `origin/main` tip. **Nothing is held.** (A commit cannot record its own hash, so the tip
+is named descriptively; the two feat SHAs below are the stable anchors, and
+`git rev-parse --short origin/main` gives the tip.)
+
+> **⚠ UNDEPLOYED CODE EXISTS — and it carries a migration and a pre-deploy read.** The push on
+> 2026-07-27 moved `origin/main` from `d1dc3d2` with **AH-053 + AH-054** (Jobs Board chunks 1+2
+> — brand completeness floor, brand logo pipeline, campaign listing fields): `b7ea3e1` (AH-054 feat),
+> `2568a96` (AH-053 feat), then the shared docs commit at the tip. Review closed and approved:
+> `docs/reviews/jobs-board-brand-amends-review.md`. **This is the arc's first migration since AH-041,
+> and AH-053 needs an operator read run BEFORE it deploys — see the deploy notes below.**
+
+The AH-001→AH-052 range is pushed in full, including
 `c6b6cde` (Step 0 — `fix(identity)` 2-SPA dev-cookie fix), `98defa9` (**AH-051** feat) and
 `30116da` (**AH-051** docs, the amended close-out; the pre-amend `ce959cc` is no longer reachable).
 The final push on 2026-07-26 moved `origin/main` `30116da..d1dc3d2`, carrying the six **AH-051
@@ -123,11 +134,12 @@ eyes-on fix** commits — `4af63b2` (admin dialog: 422 copy, picker name, `appro
 `dd65868` (**AH-052** canonical 403 envelope, closed-thread composer, notification registry),
 `d381a77` (an `ended` relation could be re-pooled) — plus the addendum/AH-052 docs commit `d1dc3d2`.
 
-**Deployed through:** **`f5be920` (AH-052), deployed 2026-07-26.** Push and deploy are **in sync** —
-everything landed on `origin/main` after `f5be920` is docs-only, so there is **no undeployed code**.
-This holds until the next code push; re-derive then. Read from the server, not inferred:
-`php artisan migrate:status` reports **Ran through batch 5**, and today's deploy correctly reported
-`Nothing to migrate` (AH-051/052 add none).
+**Deployed through:** **`f5be920` (AH-052), deployed 2026-07-26.** Push and deploy were in sync as of
+that date; **they are no longer** — the AH-053/AH-054 push on 2026-07-27 is **code, and undeployed**.
+That is the first undeployed code since AH-052. Deploy state as last read from the server, not
+inferred: `php artisan migrate:status` reported **Ran through batch 5**, and the 2026-07-26 deploy
+correctly reported `Nothing to migrate` (AH-051/052 add none). **AH-054 adds one migration**, so the
+next deploy will not say that — see the deploy notes below.
 
 > **Tracking lesson (2026-07-26).** Deploy state must be **read from the server**
 > (`migrate:status`, and see the scheduler blocker below), never inferred from push history —
@@ -135,7 +147,21 @@ This holds until the next code push; re-derive then. Read from the server, not i
 > (`content_companions`) turned out to be already live before today, while this file still listed
 > its migrations as pending. Verify at each session close; do not carry forward an assumption.
 
-**Deploy notes.** **No migrations** anywhere in AH-051 or AH-052 (`ended` is a plain-varchar enum
+**Deploy notes — AH-053/AH-054 (pushed 2026-07-27, NOT deployed).** Two obligations, both new:
+
+1. **One migration** — `2026_07_27_100000_add_jobs_board_listing_to_campaigns`. Purely additive (six
+   nullable columns plus one boolean defaulting `false`), honest `down()`, no backfill, no existing
+   row read or rewritten. `php artisan migrate` becomes a required deploy step again for the first
+   time since AH-041.
+2. **📋 PRE-deploy read, not post-deploy** — run `php artisan brands:audit-floor` **before** shipping
+   AH-053. It is a pure read (no writes, pinned by a test) and reports, platform-wide, how many
+   brands each floor field blocks and the lifecycle split of the blocked population. AH-053 makes an
+   incomplete brand's **next edit** return 422 — a behaviour change for existing data, though not a
+   data change — and this command is how the size of that population becomes knowable in advance
+   rather than through support tickets. Nothing is backfilled; the brands themselves stay readable,
+   listable, campaign-carrying, archivable and restorable.
+
+**Deploy notes (prior).** **No migrations** anywhere in AH-051 or AH-052 (`ended` is a plain-varchar enum
 value, no CHECK). AH-051 notes, now **post**-deploy: (a) the live contact gate is TIGHTENED as of
 2026-07-26 — `php artisan relations:audit-contact-exposure` now reads what changed rather than
 what would (see outstanding items); and (b) admin disconnect DELETES pool-membership rows, so
@@ -193,7 +219,8 @@ Part-A closure commit `fdbec40`), atop the AH-032 baseline **`7051123`**). **✅
 migrations plus a data backfill; `migrate:status` on prod (2026-07-26) shows all of them **Ran**,
 with `2026_07_13_110000_backfill_cancelled_rejected_board_column` in **batch 3**. AH-042 through
 AH-052 add **no migrations at all**, so **the pending-migration list is empty** and
-`php artisan migrate` is not a required deploy step for anything currently on `origin/main`.
+`php artisan migrate` was not a required deploy step for anything on `origin/main` **as of AH-052**.
+(That statement expired with the AH-054 push, which adds one — see the deploy notes above.)
 
 ### Delivered
 
@@ -375,6 +402,35 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     contract change** (see deploy notes). Surfaced by AH-051 eyes-on; commit `dd65868` is
     shared with the AH-051 addendum items.
 
+  - **AH-053** — Jobs Board chunk 1: brand completeness floor + logo pipeline + form relabel
+    (`2568a96`, **pushed, NOT deployed**). Six-field floor (`name`, `slug`, `description`, `industry`,
+    `website_url`, `logo_path`) required at create — logo excepted, it needs a row to attach to —
+    and enforced on every later edit via a **merged-state** predicate (payload value where supplied,
+    stored value otherwise), so PATCH stays PATCH; full-payload-required was rejected on the AH-032
+    wipe-bug evidence. `Brand::floorMissingFields()` is the single source consumed by the request,
+    the `brands:audit-floor` command and the FE mirror under a source-scan parity spec.
+    Read/list/campaign-carry/**archive/restore stay ungated** and are pinned there. Logo pipeline on
+    the avatar pattern: content-sniffed MIME, re-encode-to-strip-EXIF, agency+brand-scoped key,
+    signed-URL-only emission, **replace does not delete** (one destructive path, over-reach negative
+    kept). `description` relabelled "Monthly deliverables"; `default_currency`/`default_language`
+    selects removed **from the form only** — columns, defaults, validation and API emission all
+    unchanged and pinned. Break-reverts: BR-2 (neuter the predicate) reds 8, BR-3 (make it ignore
+    the payload) reds exactly the 5 merged-state cases while the blocking cases stay green, BR-4
+    (pull restore inside the gate) reds 1. **⚠ Behaviour change for existing data** — see deploy
+    notes. Review: `docs/reviews/jobs-board-brand-amends-review.md`.
+  - **AH-054** — Jobs Board chunk 2: campaign listing fields + gates + Settings toggle
+    (`b7ea3e1`, **pushed, NOT deployed**). Six additive columns; create accepts the five content
+    fields and ignores
+    `listed_on_jobs_board` entirely. **D3 (completeness) is a resulting-state rule** — if the
+    campaign will be listed after this write, every floor field must be filled, which is what makes
+    "refuses to gut a live listing" possible. **D5 (terminal status) is a transition rule** — only
+    `false → true` is refused for `completed`/`cancelled`. The asymmetry is ruling **A1**: a campaign
+    listed when it ended keeps an inert `true` and stays editable, because auto-clearing would put
+    the write path and the read scope in charge of the same fact. `scopeListedOnJobsBoard()` ships
+    now (Q3 = A) with a **disjoint** negative set, so chunk 3 binds to a tested contract. The flip
+    joins the `campaign.updated` audit snapshot; the four free-text/jsonb fields stay out. Regions
+    are shape-capped, not registry-validated (tech-debt). One additive migration.
+
   > **Ruling (AH-046/047, flaky-10 MT baseline):** new creator-facing copy gets a real
   > machine-translation baseline in **all 24 locales at merge time**, including the flaky 10
   > (`bg, el, et, fi, ga, hu, lt, lv, mt, ro`) — the same standard AH-028 set. "Match the
@@ -422,6 +478,14 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
   `docs/runbooks/production-queue-worker.md` (snapshot-first).
 
 ### Open threads
+
+- **📋 `brands:audit-floor` before the AH-053 deploy — the one open obligation from this arc.** A
+  pure read, but the number it returns should be looked at before agencies meet the new 422, not
+  after. Pairs with `php artisan migrate` for AH-054's additive migration. See the deploy notes above.
+- **Chunk 3 — the Jobs Board itself — is the next piece.** It binds to
+  `Campaign::scopeListedOnJobsBoard()`, which AH-054 shipped already tested with a disjoint negative
+  set, so the contract is fixed rather than open. Reading `listing_regions` as anything other than
+  display text is also the trigger on the region-registry tech-debt entry.
 
 - **🚫 BLOCKER — scheduler existence UNVERIFIED.** Until `supervisorctl status` / `crontab -l` from
   prod confirms a scheduler, **assume NO scheduled command runs in production.** Consequences, all
@@ -482,8 +546,23 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
   (reason mandatory → audit row). Once-only per creator via `creators.incomplete_nudge_sent_at`.
   Review: `docs/reviews/incomplete-creator-nudge-review.md`.
 - **Key tech-debt pointers** (full detail in `tech-debt.md`):
-  - **AH-001 i18n completeness** — English fragments inside translated values in ~10 locales; parity
-    is structurally blind to it (per-market human QA is a go-live gate, not a merge gate).
+  - **AH-001 i18n completeness** — not "fragments": **measured by AH-053**, the flaky-10 locales sit
+    at **759–787 of 1351 `app.json` leaves byte-identical to English (≈57%), ~320 of them multi-word
+    sentences**, versus 26–68 (none multi-word) in the other thirteen. More than half of each bundle
+    was never translated and the untranslated half is prose. Parity is structurally blind to it
+    (per-market human QA is a go-live gate, not a merge gate). Second-order effect: term-consistency
+    scans can appear to disagree with themselves, because a competing translation may exist _only_
+    inside strings that are still English — so glossary rulings must be re-taken after the cleanup.
+  - **`Storage::put()` returns `false`, never throws** (AH-053) — every object-storage disk is
+    `'throw' => false`. The two known callers (`BrandLogoUploadService`, `AvatarUploadService`) now
+    check the return and raise `StorageWriteFailedException`; **the class of bug is not closed** —
+    nothing stops the next upload surface answering 200 over a row that points at nothing.
+  - **E2E media is a local-disk stand-in** (AH-053) — `MEDIA_DISK_DRIVER=local` gives the Playwright
+    logo leg a real store because CI has no MinIO; S3 credentials, bucket policy and the production
+    signing path stay unexercised by any gate. Also records the `/storage` route-shadowing trap.
+  - **Campaign `listing_regions` shape-validated, not registry-validated** (AH-054) — `ZZ` is
+    storable. Harmless while the fields are display-only; becomes a silently-invisible job the moment
+    chunk 3 filters by region. Resolve together with the existing "no canonical country list" entry.
   - **Attachment-orphan sweep** — an upload-then-abandon leaves an empty thread row + orphaned S3
     object; D2 hides it from inboxes but does not clean it up. Deferred to an S3-hygiene sweep.
   - **Pending-incomplete-is-intentional** — a recorded decision (needs no work); it exists to prevent
