@@ -457,6 +457,53 @@
           "submit": "Odeslat protinabídku"
         }
       },
+      "jobs": {
+        "title": "Nabídky práce",
+        "subtitle": "Nabídky od agentur, se kterými spolupracuješ. Přihlas se na ty, které ti sedí.",
+        "fee": "Odměna",
+        "duration": "Délka",
+        "applicants": "{count} uchazeč | {count} uchazečů",
+        "listedToday": "Zveřejněno dnes",
+        "listedDaysAgo": "Zveřejněno před {count} dnem | Zveřejněno před {count} dny",
+        "status": {
+          "pending": "Přihlášeno",
+          "accepted": "Přijato",
+          "rejected": "Nevybráno"
+        },
+        "empty": {
+          "title": "Zatím žádné nabídky",
+          "body": "Jakmile agentura, se kterou spolupracuješ, zveřejní nabídku, objeví se zde."
+        },
+        "detail": {
+          "back": "Zpět na nabídky",
+          "notFound": "Tato nabídka již není dostupná.",
+          "loadFailed": "Nabídku se nepodařilo načíst. Zkus to prosím znovu.",
+          "retry": "Zkusit znovu",
+          "about": "O této nabídce",
+          "languages": "Jazyky",
+          "regions": "Regiony",
+          "examples": "Zobrazit ukázky práce",
+          "website": "Web značky",
+          "apply": "Přihlásit se",
+          "appliedNotice": "Na tuto nabídku ses přihlásil. Agentura se ti ozve.",
+          "rejectedNotice": "Pro tuto nabídku jsi nebyl vybrán."
+        },
+        "applyDialog": {
+          "title": "Přihlásit se na tuto nabídku",
+          "body": "Agentura uvidí tvůj profil. Můžeš přidat krátkou poznámku.",
+          "noteLabel": "Poznámka (nepovinné)",
+          "noteHint": "Až 1000 znaků",
+          "cancel": "Zrušit",
+          "submit": "Odeslat přihlášku"
+        },
+        "toast": {
+          "applied": "Přihláška odeslána.",
+          "alreadyApplied": "Na tuto nabídku ses už přihlásil.",
+          "applicationRejected": "Pro tuto nabídku jsi nebyl vybrán, proto se nelze přihlásit znovu.",
+          "gone": "Tato nabídka již není dostupná.",
+          "error": "Něco se pokazilo. Zkus to prosím znovu."
+        }
+      },
       "upload": {
         "avatar_prompt": "Přetáhněte foto sem nebo klikněte pro výběr",
         "avatar_preview_alt": "Náhled profilové fotografie",

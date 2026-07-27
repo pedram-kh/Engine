@@ -457,6 +457,53 @@
           "submit": "Seol counter"
         }
       },
+      "jobs": {
+        "title": "Poist",
+        "subtitle": "Poist ó na gníomhaireachtaí a n-oibríonn tú leo. Cuir isteach ar na cinn a oireann duit.",
+        "fee": "Táille",
+        "duration": "Fad",
+        "applicants": "{count} iarratasóir | {count} iarratasóir",
+        "listedToday": "Liostáilte inniu",
+        "listedDaysAgo": "Liostáilte {count} lá ó shin | Liostáilte {count} lá ó shin",
+        "status": {
+          "pending": "Curtha isteach",
+          "accepted": "Glactha",
+          "rejected": "Níor roghnaíodh thú"
+        },
+        "empty": {
+          "title": "Níl aon phost ann fós",
+          "body": "Nuair a chuirfidh gníomhaireacht a n-oibríonn tú léi post suas, taispeánfar anseo é."
+        },
+        "detail": {
+          "back": "Ar ais chuig na poist",
+          "notFound": "Níl an post seo ar fáil a thuilleadh.",
+          "loadFailed": "Níorbh fhéidir linn an post seo a lódáil. Bain triail eile as.",
+          "retry": "Bain triail eile as",
+          "about": "Faoin bpost seo",
+          "languages": "Teangacha",
+          "regions": "Réigiúin",
+          "examples": "Féach ar shamplaí oibre",
+          "website": "Suíomh gréasáin an bhranda",
+          "apply": "Cuir isteach",
+          "appliedNotice": "Chuir tú isteach ar an bpost seo. Beidh an ghníomhaireacht i dteagmháil leat.",
+          "rejectedNotice": "Níor roghnaíodh thú don phost seo."
+        },
+        "applyDialog": {
+          "title": "Cuir isteach ar an bpost seo",
+          "body": "Feicfidh an ghníomhaireacht do phróifíl. Is féidir leat nóta gairid a chur leis.",
+          "noteLabel": "Nóta (roghnach)",
+          "noteHint": "Suas le 1000 carachtar",
+          "cancel": "Cealaigh",
+          "submit": "Seol an t-iarratas"
+        },
+        "toast": {
+          "applied": "Iarratas seolta.",
+          "alreadyApplied": "Chuir tú isteach ar an bpost seo cheana féin.",
+          "applicationRejected": "Níor roghnaíodh thú don phost seo, mar sin ní féidir cur isteach air arís.",
+          "gone": "Níl an post seo ar fáil a thuilleadh.",
+          "error": "Chuaigh rud éigin mícheart. Bain triail eile as."
+        }
+      },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
         "avatar_preview_alt": "Próifíl photo preview",

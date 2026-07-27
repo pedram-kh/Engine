@@ -457,6 +457,53 @@
           "submit": "Tegenbod sturen"
         }
       },
+      "jobs": {
+        "title": "Vacatures",
+        "subtitle": "Opdrachten van de bureaus waarmee je werkt. Solliciteer op wat bij je past.",
+        "fee": "Vergoeding",
+        "duration": "Duur",
+        "applicants": "{count} sollicitatie | {count} sollicitaties",
+        "listedToday": "Vandaag geplaatst",
+        "listedDaysAgo": "{count} dag geleden geplaatst | {count} dagen geleden geplaatst",
+        "status": {
+          "pending": "Gesolliciteerd",
+          "accepted": "Geaccepteerd",
+          "rejected": "Niet gekozen"
+        },
+        "empty": {
+          "title": "Nog geen vacatures",
+          "body": "Zodra een bureau waarmee je werkt een opdracht plaatst, verschijnt die hier."
+        },
+        "detail": {
+          "back": "Terug naar vacatures",
+          "notFound": "Deze opdracht is niet meer beschikbaar.",
+          "loadFailed": "We konden deze opdracht niet laden. Probeer het opnieuw.",
+          "retry": "Opnieuw proberen",
+          "about": "Over deze opdracht",
+          "languages": "Talen",
+          "regions": "Regio's",
+          "examples": "Bekijk voorbeeldwerk",
+          "website": "Website van het merk",
+          "apply": "Solliciteren",
+          "appliedNotice": "Je hebt op deze opdracht gesolliciteerd. Het bureau neemt contact met je op.",
+          "rejectedNotice": "Je bent niet gekozen voor deze opdracht."
+        },
+        "applyDialog": {
+          "title": "Solliciteren op deze opdracht",
+          "body": "Het bureau ziet je profiel. Je kunt een korte toelichting toevoegen.",
+          "noteLabel": "Toelichting (optioneel)",
+          "noteHint": "Maximaal 1000 tekens",
+          "cancel": "Annuleren",
+          "submit": "Sollicitatie versturen"
+        },
+        "toast": {
+          "applied": "Sollicitatie verstuurd.",
+          "alreadyApplied": "Je hebt al op deze opdracht gesolliciteerd.",
+          "applicationRejected": "Je bent niet gekozen voor deze opdracht, dus opnieuw solliciteren kan niet.",
+          "gone": "Deze opdracht is niet meer beschikbaar.",
+          "error": "Er is iets misgegaan. Probeer het opnieuw."
+        }
+      },
       "upload": {
         "avatar_prompt": "Foto hier neerzetten of klikken om te kiezen",
         "avatar_preview_alt": "Voorbeeld profielfoto",

@@ -457,6 +457,53 @@
           "submit": "Invia controproposta"
         }
       },
+      "jobs": {
+        "title": "Offerte di lavoro",
+        "subtitle": "Lavori dalle agenzie con cui collabori. Candidati a quelli che fanno per te.",
+        "fee": "Compenso",
+        "duration": "Durata",
+        "applicants": "{count} candidatura | {count} candidature",
+        "listedToday": "Pubblicato oggi",
+        "listedDaysAgo": "Pubblicato {count} giorno fa | Pubblicato {count} giorni fa",
+        "status": {
+          "pending": "Candidatura inviata",
+          "accepted": "Accettata",
+          "rejected": "Non selezionato"
+        },
+        "empty": {
+          "title": "Ancora nessuna offerta",
+          "body": "Quando un'agenzia con cui collabori pubblicherà un lavoro, comparirà qui."
+        },
+        "detail": {
+          "back": "Torna alle offerte",
+          "notFound": "Questa offerta non è più disponibile.",
+          "loadFailed": "Non siamo riusciti a caricare questa offerta. Riprova.",
+          "retry": "Riprova",
+          "about": "Informazioni sul lavoro",
+          "languages": "Lingue",
+          "regions": "Regioni",
+          "examples": "Guarda lavori di esempio",
+          "website": "Sito del brand",
+          "apply": "Candidati",
+          "appliedNotice": "Ti sei candidato a questa offerta. L'agenzia ti contatterà.",
+          "rejectedNotice": "Non sei stato selezionato per questa offerta."
+        },
+        "applyDialog": {
+          "title": "Candidati a questa offerta",
+          "body": "L'agenzia vedrà il tuo profilo. Se vuoi, aggiungi una breve nota.",
+          "noteLabel": "Nota (facoltativa)",
+          "noteHint": "Massimo 1000 caratteri",
+          "cancel": "Annulla",
+          "submit": "Invia candidatura"
+        },
+        "toast": {
+          "applied": "Candidatura inviata.",
+          "alreadyApplied": "Ti sei già candidato a questa offerta.",
+          "applicationRejected": "Non sei stato selezionato per questa offerta, quindi non è possibile candidarsi di nuovo.",
+          "gone": "Questa offerta non è più disponibile.",
+          "error": "Qualcosa è andato storto. Riprova."
+        }
+      },
       "upload": {
         "avatar_prompt": "Trascina una foto qui o clicca per selezionare",
         "avatar_preview_alt": "Anteprima della foto del profilo",

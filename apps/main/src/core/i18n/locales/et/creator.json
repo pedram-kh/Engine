@@ -457,6 +457,53 @@
           "submit": "Saada counter"
         }
       },
+      "jobs": {
+        "title": "Tööpakkumised",
+        "subtitle": "Tööd agentuuridelt, kellega koostööd teed. Kandideeri neile, mis sobivad.",
+        "fee": "Tasu",
+        "duration": "Kestus",
+        "applicants": "{count} kandideerija | {count} kandideerijat",
+        "listedToday": "Lisatud täna",
+        "listedDaysAgo": "Lisatud {count} päev tagasi | Lisatud {count} päeva tagasi",
+        "status": {
+          "pending": "Kandideeritud",
+          "accepted": "Vastu võetud",
+          "rejected": "Ei osutunud valituks"
+        },
+        "empty": {
+          "title": "Tööpakkumisi veel pole",
+          "body": "Kui agentuur, kellega koostööd teed, lisab töö, ilmub see siia."
+        },
+        "detail": {
+          "back": "Tagasi tööpakkumiste juurde",
+          "notFound": "See töö pole enam saadaval.",
+          "loadFailed": "Me ei saanud seda tööd laadida. Palun proovi uuesti.",
+          "retry": "Proovi uuesti",
+          "about": "Sellest tööst",
+          "languages": "Keeled",
+          "regions": "Piirkonnad",
+          "examples": "Vaata näidistöid",
+          "website": "Brändi veebisait",
+          "apply": "Kandideeri",
+          "appliedNotice": "Kandideerisid sellele tööle. Agentuur võtab sinuga ühendust.",
+          "rejectedNotice": "Sa ei osutunud sellele tööle valituks."
+        },
+        "applyDialog": {
+          "title": "Kandideeri sellele tööle",
+          "body": "Agentuur näeb sinu profiili. Soovi korral lisa lühike märkus.",
+          "noteLabel": "Märkus (valikuline)",
+          "noteHint": "Kuni 1000 tähemärki",
+          "cancel": "Loobu",
+          "submit": "Saada kandideerimine"
+        },
+        "toast": {
+          "applied": "Kandideerimine saadetud.",
+          "alreadyApplied": "Oled sellele tööle juba kandideerinud.",
+          "applicationRejected": "Sa ei osutunud sellele tööle valituks, seega uuesti kandideerida ei saa.",
+          "gone": "See töö pole enam saadaval.",
+          "error": "Midagi läks valesti. Palun proovi uuesti."
+        }
+      },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
         "avatar_preview_alt": "Profiil photo preview",

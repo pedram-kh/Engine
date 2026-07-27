@@ -93,6 +93,13 @@ const navItems = computed(() => {
       routeName: 'creator.profile',
     })
   }
+  if (applicationStatus.value === 'approved') {
+    // AH-056 (D9) — the jobs board. Shown to APPROVED creators only: an
+    // unapproved creator's board is empty by the server predicate, and an
+    // always-visible item that always leads to an empty state is a worse
+    // answer than no item. The server, not this branch, is the boundary.
+    items.push({ key: 'jobs', icon: 'mdi-briefcase-search-outline', routeName: 'creator.jobs' })
+  }
   items.push(
     { key: 'assignments', icon: 'mdi-clipboard-text-outline', routeName: 'creator.assignments' },
     { key: 'availability', icon: 'mdi-calendar-month-outline', routeName: 'creator.availability' },

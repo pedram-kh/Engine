@@ -812,3 +812,100 @@ export interface ProceedWithoutContractResponse {
   }
   meta: { code: string }
 }
+
+// ---------------------------------------------------------------------------
+// Creator jobs board (Jobs Board chunk 3, AH-056) — creators/me/jobs
+// ---------------------------------------------------------------------------
+
+/**
+ * Mirror of `CampaignApplicationStatus`. The creator surface reads it as the
+ * CALLER's own application state for a job: `null` means never applied, and
+ * `rejected` is terminal — Apply stays dead (D1's no-re-apply rule).
+ */
+export type CampaignApplicationStatus = 'pending' | 'accepted' | 'rejected'
+
+/**
+ * The brand subset a creator may see (D3) — three fields, and adding a fourth
+ * is a decision rather than a patch. `website_url` is detail-only; the card's
+ * brand object carries `name` + `logo_url` and nothing else.
+ */
+export interface CreatorJobBrand {
+  name: string
+  /** Short-lived signed GET, minted per-emission. Null when the brand has no logo. */
+  logo_url: string | null
+  /** Detail surface only — absent on the card. */
+  website_url?: string | null
+}
+
+/** One card on the creator's jobs board. */
+export interface CreatorJobCardResource {
+  id: string
+  type: 'creator_job'
+  attributes: {
+    name: string
+    /** Display-only fee copy, e.g. "€300 per video". Never a binding offer. */
+    listing_fee: string | null
+    /** Free text, e.g. "4 weeks". */
+    listing_duration: string | null
+    /** Every application status counts — "how much interest does this job have". */
+    applicant_count: number
+    /** Stamped on the listing flip only; powers the recency chip. */
+    listed_at: string | null
+    /** The CALLER's own application status. Null ⟹ never applied. */
+    application_status: CampaignApplicationStatus | null
+    brand: CreatorJobBrand | null
+  }
+}
+
+/** The job detail payload — the card plus the four fields the page adds. */
+export interface CreatorJobDetailResource {
+  id: string
+  type: 'creator_job'
+  attributes: CreatorJobCardResource['attributes'] & {
+    /** The CAMPAIGN's description (the job copy) — never the brand's. */
+    description: string | null
+    listing_languages: string[] | null
+    listing_regions: string[] | null
+    /** External link; rendered with rel="noopener". */
+    listing_examples_url: string | null
+  }
+}
+
+export interface CreatorJobListResponse {
+  data: CreatorJobCardResource[]
+  meta: {
+    total: number
+    page: number
+    per_page: number
+    last_page: number
+  }
+}
+
+export interface CreatorJobDetailResponse {
+  data: CreatorJobDetailResource
+}
+
+/** One tap, plus an optional note (max 1000 chars, trimmed server-side). */
+export interface ApplyToJobPayload {
+  note?: string | null
+}
+
+export interface CreatorJobApplyResponse {
+  data: {
+    id: string
+    type: 'campaign_application'
+    attributes: {
+      status: CampaignApplicationStatus
+      note: string | null
+      created_at: string
+    }
+  }
+}
+
+/**
+ * The two 409 codes the apply endpoint returns. Both facts are the caller's
+ * own, so distinguishing them leaks nothing: `job.already_applied` (a pending
+ * or accepted row exists) versus `job.application_rejected` (a terminal
+ * rejection — Apply never re-opens).
+ */
+export type JobApplyBlockCode = 'job.already_applied' | 'job.application_rejected'

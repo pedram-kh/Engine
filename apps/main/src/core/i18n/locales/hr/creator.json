@@ -457,6 +457,53 @@
           "submit": "Pošalji protinabídku"
         }
       },
+      "jobs": {
+        "title": "Oglasi za posao",
+        "subtitle": "Poslovi agencija s kojima surađuješ. Prijavi se na one koji ti odgovaraju.",
+        "fee": "Honorar",
+        "duration": "Trajanje",
+        "applicants": "{count} prijava | {count} prijava",
+        "listedToday": "Objavljeno danas",
+        "listedDaysAgo": "Objavljeno prije {count} dan | Objavljeno prije {count} dana",
+        "status": {
+          "pending": "Prijavljeno",
+          "accepted": "Prihvaćeno",
+          "rejected": "Nisi odabran"
+        },
+        "empty": {
+          "title": "Još nema oglasa",
+          "body": "Kad agencija s kojom surađuješ objavi posao, pojavit će se ovdje."
+        },
+        "detail": {
+          "back": "Natrag na oglase",
+          "notFound": "Ovaj posao više nije dostupan.",
+          "loadFailed": "Nismo mogli učitati ovaj posao. Pokušaj ponovno.",
+          "retry": "Pokušaj ponovno",
+          "about": "O ovom poslu",
+          "languages": "Jezici",
+          "regions": "Regije",
+          "examples": "Pogledaj primjere radova",
+          "website": "Web-stranica brenda",
+          "apply": "Prijavi se",
+          "appliedNotice": "Prijavio si se na ovaj posao. Agencija će ti se javiti.",
+          "rejectedNotice": "Nisi odabran za ovaj posao."
+        },
+        "applyDialog": {
+          "title": "Prijavi se na ovaj posao",
+          "body": "Agencija će vidjeti tvoj profil. Možeš dodati kratku poruku.",
+          "noteLabel": "Poruka (nije obavezno)",
+          "noteHint": "Do 1000 znakova",
+          "cancel": "Odustani",
+          "submit": "Pošalji prijavu"
+        },
+        "toast": {
+          "applied": "Prijava poslana.",
+          "alreadyApplied": "Već si se prijavio na ovaj posao.",
+          "applicationRejected": "Nisi odabran za ovaj posao pa se nije moguće ponovno prijaviti.",
+          "gone": "Ovaj posao više nije dostupan.",
+          "error": "Nešto je pošlo po zlu. Pokušaj ponovno."
+        }
+      },
       "upload": {
         "avatar_prompt": "Přetáhněte foto sem nebo klikněte pro výběr",
         "avatar_preview_alt": "Náhled profilové fotografie",

@@ -457,6 +457,53 @@
           "submit": "Send counter"
         }
       },
+      "jobs": {
+        "title": "Job posts",
+        "subtitle": "Jobs from the agencies you work with. Apply to the ones that fit.",
+        "fee": "Fee",
+        "duration": "Duration",
+        "applicants": "{count} applicant | {count} applicants",
+        "listedToday": "Listed today",
+        "listedDaysAgo": "Listed {count} day ago | Listed {count} days ago",
+        "status": {
+          "pending": "Applied",
+          "accepted": "Accepted",
+          "rejected": "Not selected"
+        },
+        "empty": {
+          "title": "No job posts yet",
+          "body": "When an agency you work with posts a job, it'll appear here."
+        },
+        "detail": {
+          "back": "Back to job posts",
+          "notFound": "This job is no longer available.",
+          "loadFailed": "We couldn't load this job. Please try again.",
+          "retry": "Retry",
+          "about": "About this job",
+          "languages": "Languages",
+          "regions": "Regions",
+          "examples": "See example work",
+          "website": "Brand website",
+          "apply": "Apply",
+          "appliedNotice": "You've applied to this job. The agency will be in touch.",
+          "rejectedNotice": "You weren't selected for this job."
+        },
+        "applyDialog": {
+          "title": "Apply to this job",
+          "body": "The agency will see your profile. Add a short note if you'd like.",
+          "noteLabel": "Note (optional)",
+          "noteHint": "Up to 1000 characters",
+          "cancel": "Cancel",
+          "submit": "Send application"
+        },
+        "toast": {
+          "applied": "Application sent.",
+          "alreadyApplied": "You've already applied to this job.",
+          "applicationRejected": "You weren't selected for this job, so it can't be applied to again.",
+          "gone": "This job is no longer available.",
+          "error": "Something went wrong. Please try again."
+        }
+      },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
         "avatar_preview_alt": "Profile photo preview",

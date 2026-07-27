@@ -457,6 +457,53 @@
           "submit": "Pošlji protinabídku"
         }
       },
+      "jobs": {
+        "title": "Oglasi za delo",
+        "subtitle": "Dela agencij, s katerimi sodeluješ. Prijavi se na tista, ki ti ustrezajo.",
+        "fee": "Honorar",
+        "duration": "Trajanje",
+        "applicants": "{count} prijava | {count} prijav",
+        "listedToday": "Objavljeno danes",
+        "listedDaysAgo": "Objavljeno pred {count} dnevom | Objavljeno pred {count} dnevi",
+        "status": {
+          "pending": "Prijavljeno",
+          "accepted": "Sprejeto",
+          "rejected": "Nisi bil izbran"
+        },
+        "empty": {
+          "title": "Oglasov še ni",
+          "body": "Ko agencija, s katero sodeluješ, objavi delo, se bo pojavilo tukaj."
+        },
+        "detail": {
+          "back": "Nazaj na oglase",
+          "notFound": "To delo ni več na voljo.",
+          "loadFailed": "Tega dela nismo mogli naložiti. Poskusi znova.",
+          "retry": "Poskusi znova",
+          "about": "O tem delu",
+          "languages": "Jeziki",
+          "regions": "Regije",
+          "examples": "Oglej si primere dela",
+          "website": "Spletna stran znamke",
+          "apply": "Prijavi se",
+          "appliedNotice": "Prijavil si se na to delo. Agencija se ti bo oglasila.",
+          "rejectedNotice": "Za to delo nisi bil izbran."
+        },
+        "applyDialog": {
+          "title": "Prijavi se na to delo",
+          "body": "Agencija bo videla tvoj profil. Če želiš, dodaj kratko sporočilo.",
+          "noteLabel": "Sporočilo (neobvezno)",
+          "noteHint": "Do 1000 znakov",
+          "cancel": "Prekliči",
+          "submit": "Pošlji prijavo"
+        },
+        "toast": {
+          "applied": "Prijava poslana.",
+          "alreadyApplied": "Na to delo si se že prijavil.",
+          "applicationRejected": "Za to delo nisi bil izbran, zato se ni mogoče znova prijaviti.",
+          "gone": "To delo ni več na voljo.",
+          "error": "Nekaj je šlo narobe. Poskusi znova."
+        }
+      },
       "upload": {
         "avatar_prompt": "Přetáhněte foto sem nebo klikněte pro výběr",
         "avatar_preview_alt": "Náhled profilové fotografie",

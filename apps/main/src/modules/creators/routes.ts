@@ -72,6 +72,34 @@ export const creatorsRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    // Jobs Board chunk 3 (AH-056, D9) — the creator's job board: the listed
+    // campaigns of every agency that has them on its roster.
+    //
+    // `requireAuth` only, deliberately. The approved-creator gate is SERVER
+    // side (the predicate returns an empty board to an unapproved creator, not
+    // an error), and the nav item is hidden for them; the client branch is UX,
+    // never the boundary — the house pattern for every other creator route.
+    path: '/creator/jobs',
+    name: 'creator.jobs',
+    component: () => import('./pages/CreatorJobsPage.vue'),
+    meta: {
+      layout: 'creator',
+      guards: ['requireAuth'],
+    },
+  },
+  {
+    // AH-056 — one job, by campaign ULID. A job the caller may not see 404s
+    // server-side (fail-closed, non-probeable), so this route is safe to reach
+    // by a pasted URL.
+    path: '/creator/jobs/:ulid',
+    name: 'creator.job.detail',
+    component: () => import('./pages/CreatorJobDetailPage.vue'),
+    meta: {
+      layout: 'creator',
+      guards: ['requireAuth'],
+    },
+  },
+  {
     // S11.0 Ch3a (D-2) — the creator-shell full paginated notification feed.
     // Parallel to the agency `/notifications` route; renders the SAME
     // shell-agnostic NotificationsPage. Distinct path (the `/creator/*` prefix)

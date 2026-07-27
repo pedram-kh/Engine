@@ -457,6 +457,53 @@
           "submit": "Skicka motbud"
         }
       },
+      "jobs": {
+        "title": "Jobbannonser",
+        "subtitle": "Jobb från byråerna du samarbetar med. Sök de som passar dig.",
+        "fee": "Ersättning",
+        "duration": "Längd",
+        "applicants": "{count} ansökan | {count} ansökningar",
+        "listedToday": "Publicerat i dag",
+        "listedDaysAgo": "Publicerat för {count} dag sedan | Publicerat för {count} dagar sedan",
+        "status": {
+          "pending": "Ansökt",
+          "accepted": "Accepterad",
+          "rejected": "Inte vald"
+        },
+        "empty": {
+          "title": "Inga jobbannonser ännu",
+          "body": "När en byrå du samarbetar med publicerar ett jobb visas det här."
+        },
+        "detail": {
+          "back": "Tillbaka till jobbannonser",
+          "notFound": "Det här jobbet är inte längre tillgängligt.",
+          "loadFailed": "Vi kunde inte ladda jobbet. Försök igen.",
+          "retry": "Försök igen",
+          "about": "Om jobbet",
+          "languages": "Språk",
+          "regions": "Regioner",
+          "examples": "Se exempel på arbeten",
+          "website": "Varumärkets webbplats",
+          "apply": "Sök",
+          "appliedNotice": "Du har sökt det här jobbet. Byrån hör av sig.",
+          "rejectedNotice": "Du blev inte vald till det här jobbet."
+        },
+        "applyDialog": {
+          "title": "Sök det här jobbet",
+          "body": "Byrån ser din profil. Lägg gärna till en kort notering.",
+          "noteLabel": "Notering (valfritt)",
+          "noteHint": "Upp till 1000 tecken",
+          "cancel": "Avbryt",
+          "submit": "Skicka ansökan"
+        },
+        "toast": {
+          "applied": "Ansökan skickad.",
+          "alreadyApplied": "Du har redan sökt det här jobbet.",
+          "applicationRejected": "Du blev inte vald till det här jobbet, så det går inte att söka igen.",
+          "gone": "Det här jobbet är inte längre tillgängligt.",
+          "error": "Något gick fel. Försök igen."
+        }
+      },
       "upload": {
         "avatar_prompt": "Släpp ett foto här, eller klicka för att välja",
         "avatar_preview_alt": "Förhandsgranskning av profilfoto",

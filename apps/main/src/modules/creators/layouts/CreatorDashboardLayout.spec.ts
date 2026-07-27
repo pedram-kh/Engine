@@ -59,11 +59,28 @@ vi.mock('@/modules/onboarding/api/onboarding.api', () => ({
   },
 }))
 
+import { onboardingApi } from '@/modules/onboarding/api/onboarding.api'
+
 import CreatorDashboardLayout from './CreatorDashboardLayout.vue'
 
 async function mountLayout(
-  options: { locale?: 'en' | 'pt' | 'it'; route?: string; dark?: boolean } = {},
+  options: {
+    locale?: 'en' | 'pt' | 'it'
+    route?: string
+    dark?: boolean
+    applicationStatus?: string
+  } = {},
 ) {
+  // Always re-stated (not only when overridden): `vi.clearAllMocks()` clears
+  // calls but keeps implementations, so a test that mounts as `approved` would
+  // otherwise leak that status into every test after it.
+  vi.mocked(onboardingApi.bootstrap).mockResolvedValue({
+    data: {
+      type: 'creators',
+      attributes: { application_status: options.applicationStatus ?? 'incomplete' },
+    },
+  } as never)
+
   const pinia = createPinia()
   setActivePinia(pinia)
 
@@ -97,6 +114,8 @@ async function mountLayout(
         component: { template: '<div />' },
       },
       { path: '/creator/messages', name: 'creator.messages', component: { template: '<div />' } },
+      { path: '/creator/jobs', name: 'creator.jobs', component: { template: '<div />' } },
+      { path: '/creator/profile', name: 'creator.profile', component: { template: '<div />' } },
       { path: '/sign-in', name: 'auth.sign-in', component: { template: '<div />' } },
     ],
   })
@@ -198,6 +217,35 @@ describe('CreatorDashboardLayout — topbar nav (D-b13)', () => {
     const it = await mountLayout({ locale: 'it' })
     cleanup = it.cleanup
     expect(it.wrapper.find('[data-test="creator-nav-availability"]').text()).toBe('Disponibilità')
+  })
+
+  // AH-056 (D9) — the jobs board is an APPROVED-creator surface. The nav item
+  // follows that: an unapproved creator's board would be empty by the server
+  // predicate, and an item that always leads nowhere is worse than no item.
+  it('shows the Job Posts nav item to an approved creator', async () => {
+    const mounted = await mountLayout({ applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+    expect(mounted.wrapper.find('[data-test="creator-nav-jobs"]').text()).toBe('Job Posts')
+  })
+
+  it('hides the Job Posts nav item from a pending or incomplete creator', async () => {
+    const pending = await mountLayout({ applicationStatus: 'pending' })
+    expect(pending.wrapper.find('[data-test="creator-nav-jobs"]').exists()).toBe(false)
+    pending.cleanup()
+
+    const incomplete = await mountLayout({ applicationStatus: 'incomplete' })
+    cleanup = incomplete.cleanup
+    expect(incomplete.wrapper.find('[data-test="creator-nav-jobs"]').exists()).toBe(false)
+  })
+
+  it('localizes the Job Posts label in pt and it', async () => {
+    const pt = await mountLayout({ locale: 'pt', applicationStatus: 'approved' })
+    expect(pt.wrapper.find('[data-test="creator-nav-jobs"]').text()).toBe('Ofertas de trabalho')
+    pt.cleanup()
+
+    const it = await mountLayout({ locale: 'it', applicationStatus: 'approved' })
+    cleanup = it.cleanup
+    expect(it.wrapper.find('[data-test="creator-nav-jobs"]').text()).toBe('Offerte di lavoro')
   })
 
   it('renders the nav under the dark theme', async () => {

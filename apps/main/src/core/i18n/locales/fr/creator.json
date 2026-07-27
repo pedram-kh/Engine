@@ -457,6 +457,53 @@
           "submit": "Envoyer la contre-proposition"
         }
       },
+      "jobs": {
+        "title": "Offres de mission",
+        "subtitle": "Les missions des agences avec lesquelles vous travaillez. Postulez à celles qui vous conviennent.",
+        "fee": "Rémunération",
+        "duration": "Durée",
+        "applicants": "{count} candidature | {count} candidatures",
+        "listedToday": "Publiée aujourd'hui",
+        "listedDaysAgo": "Publiée il y a {count} jour | Publiée il y a {count} jours",
+        "status": {
+          "pending": "Candidature envoyée",
+          "accepted": "Acceptée",
+          "rejected": "Non retenue"
+        },
+        "empty": {
+          "title": "Aucune offre pour le moment",
+          "body": "Lorsqu'une agence avec laquelle vous travaillez publiera une mission, elle apparaîtra ici."
+        },
+        "detail": {
+          "back": "Retour aux offres",
+          "notFound": "Cette offre n'est plus disponible.",
+          "loadFailed": "Nous n'avons pas pu charger cette offre. Veuillez réessayer.",
+          "retry": "Réessayer",
+          "about": "À propos de cette mission",
+          "languages": "Langues",
+          "regions": "Régions",
+          "examples": "Voir des exemples de travaux",
+          "website": "Site de la marque",
+          "apply": "Postuler",
+          "appliedNotice": "Vous avez postulé à cette offre. L'agence vous recontactera.",
+          "rejectedNotice": "Vous n'avez pas été retenu pour cette offre."
+        },
+        "applyDialog": {
+          "title": "Postuler à cette offre",
+          "body": "L'agence verra votre profil. Vous pouvez ajouter un court message.",
+          "noteLabel": "Message (facultatif)",
+          "noteHint": "1000 caractères maximum",
+          "cancel": "Annuler",
+          "submit": "Envoyer la candidature"
+        },
+        "toast": {
+          "applied": "Candidature envoyée.",
+          "alreadyApplied": "Vous avez déjà postulé à cette offre.",
+          "applicationRejected": "Vous n'avez pas été retenu pour cette offre, il n'est donc plus possible d'y postuler.",
+          "gone": "Cette offre n'est plus disponible.",
+          "error": "Une erreur s'est produite. Veuillez réessayer."
+        }
+      },
       "upload": {
         "avatar_prompt": "Déposez une photo ici, ou cliquez pour choisir",
         "avatar_preview_alt": "Aperçu de la photo de profil",

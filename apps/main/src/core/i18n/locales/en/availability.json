@@ -11,6 +11,7 @@
     "creatorNav": {
       "profile": "Profile",
       "dashboard": "Dashboard",
+      "jobs": "Job Posts",
       "assignments": "Invitations",
       "availability": "Availability",
       "messages": "Messages"

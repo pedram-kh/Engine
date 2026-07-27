@@ -457,6 +457,53 @@
           "submit": "Nēsūtīt counter"
         }
       },
+      "jobs": {
+        "title": "Darba sludinājumi",
+        "subtitle": "Darbi no aģentūrām, ar kurām sadarbojies. Piesakies tiem, kas tev der.",
+        "fee": "Atlīdzība",
+        "duration": "Ilgums",
+        "applicants": "{count} pieteikums | {count} pieteikumi",
+        "listedToday": "Publicēts šodien",
+        "listedDaysAgo": "Publicēts pirms {count} dienas | Publicēts pirms {count} dienām",
+        "status": {
+          "pending": "Pieteikts",
+          "accepted": "Apstiprināts",
+          "rejected": "Nav izvēlēts"
+        },
+        "empty": {
+          "title": "Sludinājumu vēl nav",
+          "body": "Kad aģentūra, ar kuru sadarbojies, publicēs darbu, tas parādīsies šeit."
+        },
+        "detail": {
+          "back": "Atpakaļ uz sludinājumiem",
+          "notFound": "Šis darbs vairs nav pieejams.",
+          "loadFailed": "Neizdevās ielādēt šo darbu. Lūdzu, mēģini vēlreiz.",
+          "retry": "Mēģināt vēlreiz",
+          "about": "Par šo darbu",
+          "languages": "Valodas",
+          "regions": "Reģioni",
+          "examples": "Skatīt darbu paraugus",
+          "website": "Zīmola tīmekļa vietne",
+          "apply": "Pieteikties",
+          "appliedNotice": "Tu pieteicies šim darbam. Aģentūra ar tevi sazināsies.",
+          "rejectedNotice": "Šim darbam tu netiki izvēlēts."
+        },
+        "applyDialog": {
+          "title": "Pieteikties šim darbam",
+          "body": "Aģentūra redzēs tavu profilu. Ja vēlies, pievieno īsu piezīmi.",
+          "noteLabel": "Piezīme (neobligāti)",
+          "noteHint": "Līdz 1000 rakstzīmēm",
+          "cancel": "Atcelt",
+          "submit": "Nosūtīt pieteikumu"
+        },
+        "toast": {
+          "applied": "Pieteikums nosūtīts.",
+          "alreadyApplied": "Tu jau esi pieteicies šim darbam.",
+          "applicationRejected": "Šim darbam tu netiki izvēlēts, tāpēc atkārtoti pieteikties nevar.",
+          "gone": "Šis darbs vairs nav pieejams.",
+          "error": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz."
+        }
+      },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
         "avatar_preview_alt": "Profils photo preview",

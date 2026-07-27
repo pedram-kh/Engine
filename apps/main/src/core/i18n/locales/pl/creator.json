@@ -457,6 +457,53 @@
           "submit": "Wyślij kontrpropozycję"
         }
       },
+      "jobs": {
+        "title": "Ogłoszenia o pracę",
+        "subtitle": "Zlecenia od agencji, z którymi współpracujesz. Aplikuj na te, które do ciebie pasują.",
+        "fee": "Wynagrodzenie",
+        "duration": "Czas trwania",
+        "applicants": "{count} zgłoszenie | {count} zgłoszeń",
+        "listedToday": "Opublikowano dzisiaj",
+        "listedDaysAgo": "Opublikowano {count} dzień temu | Opublikowano {count} dni temu",
+        "status": {
+          "pending": "Zgłoszono",
+          "accepted": "Zaakceptowano",
+          "rejected": "Nie wybrano"
+        },
+        "empty": {
+          "title": "Nie ma jeszcze ogłoszeń",
+          "body": "Gdy agencja, z którą współpracujesz, opublikuje zlecenie, pojawi się ono tutaj."
+        },
+        "detail": {
+          "back": "Wróć do ogłoszeń",
+          "notFound": "To zlecenie nie jest już dostępne.",
+          "loadFailed": "Nie udało się wczytać tego zlecenia. Spróbuj ponownie.",
+          "retry": "Spróbuj ponownie",
+          "about": "O tym zleceniu",
+          "languages": "Języki",
+          "regions": "Regiony",
+          "examples": "Zobacz przykładowe prace",
+          "website": "Strona marki",
+          "apply": "Aplikuj",
+          "appliedNotice": "Zgłosiłeś się na to zlecenie. Agencja się z tobą skontaktuje.",
+          "rejectedNotice": "Nie zostałeś wybrany na to zlecenie."
+        },
+        "applyDialog": {
+          "title": "Aplikuj na to zlecenie",
+          "body": "Agencja zobaczy twój profil. Możesz dodać krótką wiadomość.",
+          "noteLabel": "Wiadomość (opcjonalnie)",
+          "noteHint": "Do 1000 znaków",
+          "cancel": "Anuluj",
+          "submit": "Wyślij zgłoszenie"
+        },
+        "toast": {
+          "applied": "Zgłoszenie wysłane.",
+          "alreadyApplied": "Już zgłosiłeś się na to zlecenie.",
+          "applicationRejected": "Nie zostałeś wybrany na to zlecenie, więc nie można zgłosić się ponownie.",
+          "gone": "To zlecenie nie jest już dostępne.",
+          "error": "Coś poszło nie tak. Spróbuj ponownie."
+        }
+      },
       "upload": {
         "avatar_prompt": "Upuść zdjęcie tutaj lub kliknij, aby wybrać",
         "avatar_preview_alt": "Podgląd zdjęcia profilowego",

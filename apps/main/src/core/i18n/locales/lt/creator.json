@@ -457,6 +457,53 @@
           "submit": "Siųsti counter"
         }
       },
+      "jobs": {
+        "title": "Darbo skelbimai",
+        "subtitle": "Darbai iš agentūrų, su kuriomis dirbi. Kandidatuok į tuos, kurie tau tinka.",
+        "fee": "Atlygis",
+        "duration": "Trukmė",
+        "applicants": "{count} kandidatas | {count} kandidatai",
+        "listedToday": "Paskelbta šiandien",
+        "listedDaysAgo": "Paskelbta prieš {count} dieną | Paskelbta prieš {count} dienas",
+        "status": {
+          "pending": "Kandidatuota",
+          "accepted": "Priimta",
+          "rejected": "Nepasirinkta"
+        },
+        "empty": {
+          "title": "Skelbimų kol kas nėra",
+          "body": "Kai agentūra, su kuria dirbi, paskelbs darbą, jis atsiras čia."
+        },
+        "detail": {
+          "back": "Atgal į skelbimus",
+          "notFound": "Šis darbas nebepasiekiamas.",
+          "loadFailed": "Nepavyko įkelti šio darbo. Bandyk dar kartą.",
+          "retry": "Bandyti dar kartą",
+          "about": "Apie šį darbą",
+          "languages": "Kalbos",
+          "regions": "Regionai",
+          "examples": "Peržiūrėti darbų pavyzdžius",
+          "website": "Prekės ženklo svetainė",
+          "apply": "Kandidatuoti",
+          "appliedNotice": "Kandidatavai į šį darbą. Agentūra su tavimi susisieks.",
+          "rejectedNotice": "Į šį darbą nebuvai pasirinktas."
+        },
+        "applyDialog": {
+          "title": "Kandidatuoti į šį darbą",
+          "body": "Agentūra matys tavo profilį. Jei nori, pridėk trumpą žinutę.",
+          "noteLabel": "Žinutė (nebūtina)",
+          "noteHint": "Iki 1000 simbolių",
+          "cancel": "Atšaukti",
+          "submit": "Siųsti kandidatūrą"
+        },
+        "toast": {
+          "applied": "Kandidatūra išsiųsta.",
+          "alreadyApplied": "Į šį darbą jau kandidatavai.",
+          "applicationRejected": "Į šį darbą nebuvai pasirinktas, todėl kandidatuoti iš naujo negalima.",
+          "gone": "Šis darbas nebepasiekiamas.",
+          "error": "Kažkas nepavyko. Bandyk dar kartą."
+        }
+      },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
         "avatar_preview_alt": "Profilis photo preview",

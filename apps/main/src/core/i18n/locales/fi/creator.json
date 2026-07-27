@@ -457,6 +457,53 @@
           "submit": "Lähetä counter"
         }
       },
+      "jobs": {
+        "title": "Työpaikat",
+        "subtitle": "Töitä toimistoilta, joiden kanssa työskentelet. Hae niihin, jotka sopivat sinulle.",
+        "fee": "Palkkio",
+        "duration": "Kesto",
+        "applicants": "{count} hakija | {count} hakijaa",
+        "listedToday": "Julkaistu tänään",
+        "listedDaysAgo": "Julkaistu {count} päivä sitten | Julkaistu {count} päivää sitten",
+        "status": {
+          "pending": "Haettu",
+          "accepted": "Hyväksytty",
+          "rejected": "Ei valittu"
+        },
+        "empty": {
+          "title": "Ei vielä työpaikkoja",
+          "body": "Kun toimisto, jonka kanssa työskentelet, julkaisee työn, se näkyy täällä."
+        },
+        "detail": {
+          "back": "Takaisin työpaikkoihin",
+          "notFound": "Tämä työ ei ole enää saatavilla.",
+          "loadFailed": "Työn lataaminen ei onnistunut. Yritä uudelleen.",
+          "retry": "Yritä uudelleen",
+          "about": "Tietoa tästä työstä",
+          "languages": "Kielet",
+          "regions": "Alueet",
+          "examples": "Katso esimerkkitöitä",
+          "website": "Brändin verkkosivusto",
+          "apply": "Hae",
+          "appliedNotice": "Olet hakenut tätä työtä. Toimisto on sinuun yhteydessä.",
+          "rejectedNotice": "Sinua ei valittu tähän työhön."
+        },
+        "applyDialog": {
+          "title": "Hae tätä työtä",
+          "body": "Toimisto näkee profiilisi. Voit halutessasi lisätä lyhyen viestin.",
+          "noteLabel": "Viesti (valinnainen)",
+          "noteHint": "Enintään 1000 merkkiä",
+          "cancel": "Peruuta",
+          "submit": "Lähetä hakemus"
+        },
+        "toast": {
+          "applied": "Hakemus lähetetty.",
+          "alreadyApplied": "Olet jo hakenut tätä työtä.",
+          "applicationRejected": "Sinua ei valittu tähän työhön, joten sitä ei voi hakea uudelleen.",
+          "gone": "Tämä työ ei ole enää saatavilla.",
+          "error": "Jokin meni pieleen. Yritä uudelleen."
+        }
+      },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
         "avatar_preview_alt": "Profiili photo preview",

@@ -457,6 +457,53 @@
           "submit": "Send modbud"
         }
       },
+      "jobs": {
+        "title": "Jobopslag",
+        "subtitle": "Job fra de bureauer, du samarbejder med. Søg dem, der passer.",
+        "fee": "Honorar",
+        "duration": "Varighed",
+        "applicants": "{count} ansøger | {count} ansøgere",
+        "listedToday": "Slået op i dag",
+        "listedDaysAgo": "Slået op for {count} dag siden | Slået op for {count} dage siden",
+        "status": {
+          "pending": "Ansøgt",
+          "accepted": "Accepteret",
+          "rejected": "Ikke valgt"
+        },
+        "empty": {
+          "title": "Ingen jobopslag endnu",
+          "body": "Når et bureau, du samarbejder med, slår et job op, vises det her."
+        },
+        "detail": {
+          "back": "Tilbage til jobopslag",
+          "notFound": "Dette job er ikke længere tilgængeligt.",
+          "loadFailed": "Vi kunne ikke indlæse dette job. Prøv igen.",
+          "retry": "Prøv igen",
+          "about": "Om dette job",
+          "languages": "Sprog",
+          "regions": "Regioner",
+          "examples": "Se eksempler på arbejde",
+          "website": "Brandets hjemmeside",
+          "apply": "Søg",
+          "appliedNotice": "Du har søgt dette job. Bureauet kontakter dig.",
+          "rejectedNotice": "Du blev ikke valgt til dette job."
+        },
+        "applyDialog": {
+          "title": "Søg dette job",
+          "body": "Bureauet kan se din profil. Tilføj gerne en kort note.",
+          "noteLabel": "Note (valgfri)",
+          "noteHint": "Op til 1000 tegn",
+          "cancel": "Annuller",
+          "submit": "Send ansøgning"
+        },
+        "toast": {
+          "applied": "Ansøgning sendt.",
+          "alreadyApplied": "Du har allerede søgt dette job.",
+          "applicationRejected": "Du blev ikke valgt til dette job, så du kan ikke søge igen.",
+          "gone": "Dette job er ikke længere tilgængeligt.",
+          "error": "Noget gik galt. Prøv igen."
+        }
+      },
       "upload": {
         "avatar_prompt": "Drop et billede her, eller klik for at vælge",
         "avatar_preview_alt": "Forhåndsvisning af profilbillede",

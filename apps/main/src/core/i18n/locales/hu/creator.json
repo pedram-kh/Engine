@@ -457,6 +457,53 @@
           "submit": "Küldés counter"
         }
       },
+      "jobs": {
+        "title": "Álláshirdetések",
+        "subtitle": "Munkák azoktól az ügynökségektől, amelyekkel dolgozol. Jelentkezz azokra, amelyek illenek hozzád.",
+        "fee": "Díjazás",
+        "duration": "Időtartam",
+        "applicants": "{count} jelentkező | {count} jelentkező",
+        "listedToday": "Ma hirdették meg",
+        "listedDaysAgo": "{count} napja hirdették meg | {count} napja hirdették meg",
+        "status": {
+          "pending": "Jelentkeztél",
+          "accepted": "Elfogadva",
+          "rejected": "Nem választottak ki"
+        },
+        "empty": {
+          "title": "Még nincs álláshirdetés",
+          "body": "Amikor egy ügynökség, amellyel dolgozol, munkát hirdet, itt fog megjelenni."
+        },
+        "detail": {
+          "back": "Vissza a hirdetésekhez",
+          "notFound": "Ez a munka már nem elérhető.",
+          "loadFailed": "Nem sikerült betölteni ezt a munkát. Próbáld újra.",
+          "retry": "Újrapróbálkozás",
+          "about": "A munkáról",
+          "languages": "Nyelvek",
+          "regions": "Régiók",
+          "examples": "Példamunkák megtekintése",
+          "website": "A márka weboldala",
+          "apply": "Jelentkezés",
+          "appliedNotice": "Jelentkeztél erre a munkára. Az ügynökség hamarosan jelentkezik.",
+          "rejectedNotice": "Nem téged választottak erre a munkára."
+        },
+        "applyDialog": {
+          "title": "Jelentkezés erre a munkára",
+          "body": "Az ügynökség látni fogja a profilodat. Ha szeretnéd, írhatsz egy rövid üzenetet.",
+          "noteLabel": "Üzenet (nem kötelező)",
+          "noteHint": "Legfeljebb 1000 karakter",
+          "cancel": "Mégse",
+          "submit": "Jelentkezés elküldése"
+        },
+        "toast": {
+          "applied": "Jelentkezés elküldve.",
+          "alreadyApplied": "Erre a munkára már jelentkeztél.",
+          "applicationRejected": "Nem téged választottak erre a munkára, ezért újra nem lehet jelentkezni.",
+          "gone": "Ez a munka már nem elérhető.",
+          "error": "Valami hiba történt. Próbáld újra."
+        }
+      },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
         "avatar_preview_alt": "Profil photo preview",

@@ -457,6 +457,53 @@
           "submit": "Odoslať protinabídku"
         }
       },
+      "jobs": {
+        "title": "Pracovné ponuky",
+        "subtitle": "Ponuky od agentúr, s ktorými spolupracuješ. Prihlás sa na tie, ktoré ti sedia.",
+        "fee": "Odmena",
+        "duration": "Dĺžka",
+        "applicants": "{count} uchádzač | {count} uchádzačov",
+        "listedToday": "Zverejnené dnes",
+        "listedDaysAgo": "Zverejnené pred {count} dňom | Zverejnené pred {count} dňami",
+        "status": {
+          "pending": "Prihlásené",
+          "accepted": "Prijaté",
+          "rejected": "Nevybraté"
+        },
+        "empty": {
+          "title": "Zatiaľ žiadne ponuky",
+          "body": "Keď agentúra, s ktorou spolupracuješ, zverejní ponuku, objaví sa tu."
+        },
+        "detail": {
+          "back": "Späť na ponuky",
+          "notFound": "Táto ponuka už nie je dostupná.",
+          "loadFailed": "Ponuku sa nepodarilo načítať. Skús to znova.",
+          "retry": "Skúsiť znova",
+          "about": "O tejto ponuke",
+          "languages": "Jazyky",
+          "regions": "Regióny",
+          "examples": "Pozrieť ukážky práce",
+          "website": "Web značky",
+          "apply": "Prihlásiť sa",
+          "appliedNotice": "Na túto ponuku si sa prihlásil. Agentúra sa ti ozve.",
+          "rejectedNotice": "Na túto ponuku ťa nevybrali."
+        },
+        "applyDialog": {
+          "title": "Prihlásiť sa na túto ponuku",
+          "body": "Agentúra uvidí tvoj profil. Môžeš pridať krátku poznámku.",
+          "noteLabel": "Poznámka (nepovinné)",
+          "noteHint": "Až 1000 znakov",
+          "cancel": "Zrušiť",
+          "submit": "Odoslať prihlášku"
+        },
+        "toast": {
+          "applied": "Prihláška odoslaná.",
+          "alreadyApplied": "Na túto ponuku si sa už prihlásil.",
+          "applicationRejected": "Na túto ponuku ťa nevybrali, preto sa nedá prihlásiť znova.",
+          "gone": "Táto ponuka už nie je dostupná.",
+          "error": "Niečo sa pokazilo. Skús to znova."
+        }
+      },
       "upload": {
         "avatar_prompt": "Přetáhněte foto sem nebo klikněte pro výběr",
         "avatar_preview_alt": "Náhled profilové fotografie",

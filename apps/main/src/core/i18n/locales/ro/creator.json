@@ -457,6 +457,53 @@
           "submit": "Trimiteți counter"
         }
       },
+      "jobs": {
+        "title": "Anunțuri de job",
+        "subtitle": "Joburi de la agențiile cu care colaborezi. Aplică la cele care ți se potrivesc.",
+        "fee": "Onorariu",
+        "duration": "Durată",
+        "applicants": "{count} candidatură | {count} candidaturi",
+        "listedToday": "Publicat astăzi",
+        "listedDaysAgo": "Publicat acum {count} zi | Publicat acum {count} zile",
+        "status": {
+          "pending": "Ai aplicat",
+          "accepted": "Acceptată",
+          "rejected": "Neselectat"
+        },
+        "empty": {
+          "title": "Încă nu există anunțuri",
+          "body": "Când o agenție cu care colaborezi publică un job, va apărea aici."
+        },
+        "detail": {
+          "back": "Înapoi la anunțuri",
+          "notFound": "Acest job nu mai este disponibil.",
+          "loadFailed": "Nu am putut încărca acest job. Încearcă din nou.",
+          "retry": "Încearcă din nou",
+          "about": "Despre acest job",
+          "languages": "Limbi",
+          "regions": "Regiuni",
+          "examples": "Vezi exemple de lucrări",
+          "website": "Site-ul brandului",
+          "apply": "Aplică",
+          "appliedNotice": "Ai aplicat la acest job. Agenția te va contacta.",
+          "rejectedNotice": "Nu ai fost selectat pentru acest job."
+        },
+        "applyDialog": {
+          "title": "Aplică la acest job",
+          "body": "Agenția îți va vedea profilul. Poți adăuga o notă scurtă.",
+          "noteLabel": "Notă (opțional)",
+          "noteHint": "Maximum 1000 de caractere",
+          "cancel": "Anulează",
+          "submit": "Trimite candidatura"
+        },
+        "toast": {
+          "applied": "Candidatură trimisă.",
+          "alreadyApplied": "Ai aplicat deja la acest job.",
+          "applicationRejected": "Nu ai fost selectat pentru acest job, așa că nu poți aplica din nou.",
+          "gone": "Acest job nu mai este disponibil.",
+          "error": "Ceva nu a mers bine. Încearcă din nou."
+        }
+      },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
         "avatar_preview_alt": "Profil photo preview",

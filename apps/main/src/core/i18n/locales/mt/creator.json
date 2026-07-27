@@ -457,6 +457,53 @@
           "submit": "Ibgħat counter"
         }
       },
+      "jobs": {
+        "title": "Postijiet tax-xogħol",
+        "subtitle": "Xogħlijiet mill-aġenziji li taħdem magħhom. Applika għal dawk li jaqblu miegħek.",
+        "fee": "Ħlas",
+        "duration": "Tul",
+        "applicants": "{count} applikant | {count} applikanti",
+        "listedToday": "Imtella' llum",
+        "listedDaysAgo": "Imtella' {count} ġurnata ilu | Imtella' {count} ijiem ilu",
+        "status": {
+          "pending": "Applikajt",
+          "accepted": "Aċċettata",
+          "rejected": "Ma ġejtx magħżul"
+        },
+        "empty": {
+          "title": "Għad m'hemm ebda post",
+          "body": "Meta aġenzija li taħdem magħha ttella' xogħol, jidher hawn."
+        },
+        "detail": {
+          "back": "Lura għall-postijiet",
+          "notFound": "Dan ix-xogħol m'għadux disponibbli.",
+          "loadFailed": "Ma stajniex intellgħu dan ix-xogħol. Erġa' pprova.",
+          "retry": "Erġa' pprova",
+          "about": "Dwar dan ix-xogħol",
+          "languages": "Lingwi",
+          "regions": "Reġjuni",
+          "examples": "Ara eżempji ta' xogħol",
+          "website": "Websajt tal-brand",
+          "apply": "Applika",
+          "appliedNotice": "Applikajt għal dan ix-xogħol. L-aġenzija tikkuntattjak.",
+          "rejectedNotice": "Ma ġejtx magħżul għal dan ix-xogħol."
+        },
+        "applyDialog": {
+          "title": "Applika għal dan ix-xogħol",
+          "body": "L-aġenzija tara l-profil tiegħek. Tista' żżid nota qasira.",
+          "noteLabel": "Nota (mhux obbligatorja)",
+          "noteHint": "Sa 1000 karattru",
+          "cancel": "Ikkanċella",
+          "submit": "Ibgħat l-applikazzjoni"
+        },
+        "toast": {
+          "applied": "Applikazzjoni mibgħuta.",
+          "alreadyApplied": "Diġà applikajt għal dan ix-xogħol.",
+          "applicationRejected": "Ma ġejtx magħżul għal dan ix-xogħol, għalhekk ma tistax terġa' tapplika.",
+          "gone": "Dan ix-xogħol m'għadux disponibbli.",
+          "error": "Xi ħaġa marret ħażin. Erġa' pprova."
+        }
+      },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
         "avatar_preview_alt": "Profil photo preview",

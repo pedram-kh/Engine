@@ -457,6 +457,53 @@
           "submit": "Enviar contraproposta"
         }
       },
+      "jobs": {
+        "title": "Ofertas de trabalho",
+        "subtitle": "Trabalhos das agências com que colaboras. Candidata-te aos que fazem sentido para ti.",
+        "fee": "Remuneração",
+        "duration": "Duração",
+        "applicants": "{count} candidatura | {count} candidaturas",
+        "listedToday": "Publicado hoje",
+        "listedDaysAgo": "Publicado há {count} dia | Publicado há {count} dias",
+        "status": {
+          "pending": "Candidatura enviada",
+          "accepted": "Aceite",
+          "rejected": "Não selecionado"
+        },
+        "empty": {
+          "title": "Ainda não há ofertas",
+          "body": "Quando uma agência com que colaboras publicar um trabalho, aparecerá aqui."
+        },
+        "detail": {
+          "back": "Voltar às ofertas",
+          "notFound": "Esta oferta já não está disponível.",
+          "loadFailed": "Não foi possível carregar esta oferta. Tenta novamente.",
+          "retry": "Tentar novamente",
+          "about": "Sobre este trabalho",
+          "languages": "Idiomas",
+          "regions": "Regiões",
+          "examples": "Ver exemplos de trabalho",
+          "website": "Site da marca",
+          "apply": "Candidatar-me",
+          "appliedNotice": "Candidataste-te a esta oferta. A agência entrará em contacto.",
+          "rejectedNotice": "Não foste selecionado para esta oferta."
+        },
+        "applyDialog": {
+          "title": "Candidatar-me a esta oferta",
+          "body": "A agência verá o teu perfil. Se quiseres, acrescenta uma nota curta.",
+          "noteLabel": "Nota (opcional)",
+          "noteHint": "Até 1000 caracteres",
+          "cancel": "Cancelar",
+          "submit": "Enviar candidatura"
+        },
+        "toast": {
+          "applied": "Candidatura enviada.",
+          "alreadyApplied": "Já te candidataste a esta oferta.",
+          "applicationRejected": "Não foste selecionado para esta oferta, por isso não é possível candidatar-te de novo.",
+          "gone": "Esta oferta já não está disponível.",
+          "error": "Algo correu mal. Tenta novamente."
+        }
+      },
       "upload": {
         "avatar_prompt": "Largue uma foto aqui ou clique para escolher",
         "avatar_preview_alt": "Pré-visualização da foto de perfil",

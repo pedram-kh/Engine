@@ -457,6 +457,53 @@
           "submit": "Gegenangebot senden"
         }
       },
+      "jobs": {
+        "title": "Jobangebote",
+        "subtitle": "Jobs der Agenturen, mit denen du arbeitest. Bewirb dich auf die passenden.",
+        "fee": "Honorar",
+        "duration": "Dauer",
+        "applicants": "{count} Bewerbung | {count} Bewerbungen",
+        "listedToday": "Heute eingestellt",
+        "listedDaysAgo": "Vor {count} Tag eingestellt | Vor {count} Tagen eingestellt",
+        "status": {
+          "pending": "Beworben",
+          "accepted": "Angenommen",
+          "rejected": "Nicht ausgewählt"
+        },
+        "empty": {
+          "title": "Noch keine Jobangebote",
+          "body": "Sobald eine Agentur, mit der du arbeitest, einen Job einstellt, erscheint er hier."
+        },
+        "detail": {
+          "back": "Zurück zu den Jobangeboten",
+          "notFound": "Dieser Job ist nicht mehr verfügbar.",
+          "loadFailed": "Wir konnten diesen Job nicht laden. Bitte versuche es erneut.",
+          "retry": "Erneut versuchen",
+          "about": "Über diesen Job",
+          "languages": "Sprachen",
+          "regions": "Regionen",
+          "examples": "Beispielarbeiten ansehen",
+          "website": "Website der Marke",
+          "apply": "Bewerben",
+          "appliedNotice": "Du hast dich auf diesen Job beworben. Die Agentur meldet sich bei dir.",
+          "rejectedNotice": "Du wurdest für diesen Job nicht ausgewählt."
+        },
+        "applyDialog": {
+          "title": "Auf diesen Job bewerben",
+          "body": "Die Agentur sieht dein Profil. Du kannst eine kurze Notiz hinzufügen.",
+          "noteLabel": "Notiz (optional)",
+          "noteHint": "Bis zu 1000 Zeichen",
+          "cancel": "Abbrechen",
+          "submit": "Bewerbung senden"
+        },
+        "toast": {
+          "applied": "Bewerbung gesendet.",
+          "alreadyApplied": "Du hast dich bereits auf diesen Job beworben.",
+          "applicationRejected": "Du wurdest für diesen Job nicht ausgewählt, daher ist keine erneute Bewerbung möglich.",
+          "gone": "Dieser Job ist nicht mehr verfügbar.",
+          "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+        }
+      },
       "upload": {
         "avatar_prompt": "Foto hier ablegen oder klicken, um eines auszuwählen",
         "avatar_preview_alt": "Profilfoto-Vorschau",
