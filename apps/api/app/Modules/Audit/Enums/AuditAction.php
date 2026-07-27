@@ -288,6 +288,29 @@ enum AuditAction: string
     case AssignmentPaymentReleased = 'assignment.payment_released';
     case AssignmentCancelled = 'assignment.cancelled';
 
+    // AH-056 (Jobs Board chunk 3, D1/D5) — a creator applied to a campaign
+    // listed on the jobs board.
+    //
+    // ⚠ The noun is `campaign_application`, NOT `application`. Two reasons:
+    // the house convention is <subject-keyed-to-table>.<verb> and the table is
+    // `campaign_applications`; and a bare `application.*` would read as the
+    // CREATOR ONBOARDING application (`creator.submitted`'s subject, and the
+    // thing `Creator::application_status` refers to), which is an entirely
+    // different domain object. The kickoff wrote `application.*` as shorthand;
+    // this is the §5.32 reinterpretation of it.
+    //
+    // Audit-only — deliberately NOT a NotificationType this chunk. The agency
+    // side of the loop (a notification telling the agency someone applied) is
+    // owned by chunk 4, which adds the type against this already-live verb; the
+    // arc deploys as one release, so no production gap exists where an agency
+    // could miss an application. Adding an unconsumed type now would put a dead
+    // row in the LIVE_TYPES allowlist, which is not a dumping ground.
+    //
+    // The free-text apply `note` is NEVER snapshotted — the hand-written-audit
+    // discipline the assignment `notes`/`cancelled_reason` columns established.
+    // The row records the FACT plus the campaign/creator ids.
+    case CampaignApplicationSubmitted = 'campaign_application.submitted';
+
     // Sprint 11 (D-7) — the two dual-recipient message-notification verbs. They
     // exist ONLY to satisfy NotificationType's one-vocabulary tie (a notification
     // type's value must be a live AuditAction value); NO audit row is ever

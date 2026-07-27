@@ -12,6 +12,7 @@ use App\Modules\Creators\Http\Controllers\CreatorAssignmentController;
 use App\Modules\Creators\Http\Controllers\CreatorAssignmentDraftController;
 use App\Modules\Creators\Http\Controllers\CreatorAvailabilityController;
 use App\Modules\Creators\Http\Controllers\CreatorConnectionRequestController;
+use App\Modules\Creators\Http\Controllers\CreatorJobBoardController;
 use App\Modules\Creators\Http\Controllers\CreatorWizardController;
 use App\Modules\Creators\Http\Controllers\InvitationPreviewController;
 use App\Modules\Creators\Http\Controllers\PortfolioController;
@@ -73,6 +74,9 @@ use Illuminate\Support\Facades\Route;
 |   POST   /api/v1/creators/me/assignments/{a}/drafts/media/init      Sprint 9 Chunk 1
 |   POST   /api/v1/creators/me/assignments/{a}/drafts/media/complete  Sprint 9 Chunk 1
 |   POST   /api/v1/creators/me/assignments/{a}/posted-content   Sprint 9 Chunk 1
+|   GET    /api/v1/creators/me/jobs                             AH-056 (Jobs Board c3)
+|   GET    /api/v1/creators/me/jobs/{campaign}                  AH-056 (Jobs Board c3)
+|   POST   /api/v1/creators/me/jobs/{campaign}/apply            AH-056 (Jobs Board c3)
 |
 */
 
@@ -241,6 +245,29 @@ Route::prefix('creators/me')
             // submission surface. Allowlisted in docs/security/tenancy.md § 4.
             Route::patch('{assignment}/posted-content', [CreatorAssignmentDraftController::class, 'updatePostedContent'])
                 ->name('posted-content.update');
+        });
+
+        // ─── Jobs board (the CREATOR half of the Jobs Board arc) ─────────────
+        // AH-056 (Jobs Board chunk 3). Rostered creators browse the campaigns
+        // their connected agencies have LISTED, read one job's detail, and
+        // apply once. Cross-module read of a Campaigns model (Campaign) plus a
+        // cross-module write of one (CampaignApplication) — both resolved
+        // STRUCTURALLY from $request->user()->creator, never a path agency id,
+        // so cross-creator access is impossible.
+        //
+        // ⚠ Unlike every other creators/me/* surface, this one is a BROWSE
+        // over rows the caller holds no relation to, so ownership cannot carry
+        // the authorization. It is carried instead by the six-leg
+        // JobsBoardVisibility predicate (approved caller ∩ rostered agency ∩
+        // listed ∩ non-terminal ∩ unexpired ∩ not brand-hard-blacklisted),
+        // shared byte-for-byte between the list, the detail and the apply
+        // re-validation — the discover feed's fail-closed whitelist posture, so
+        // a non-qualifying job is a 404 by ULID rather than probeable.
+        // Allowlisted in docs/security/tenancy.md § 4.
+        Route::prefix('jobs')->name('jobs.')->group(function (): void {
+            Route::get('/', [CreatorJobBoardController::class, 'index'])->name('index');
+            Route::get('{campaign}', [CreatorJobBoardController::class, 'show'])->name('show');
+            Route::post('{campaign}/apply', [CreatorJobBoardController::class, 'apply'])->name('apply');
         });
     });
 

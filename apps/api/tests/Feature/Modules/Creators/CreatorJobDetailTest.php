@@ -1,0 +1,268 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Modules\Agencies\Models\Agency;
+use App\Modules\Agencies\Models\BrandCreatorBlacklist;
+use App\Modules\Campaigns\Enums\CampaignStatus;
+use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Creators\Enums\ApplicationStatus;
+use App\Modules\Creators\Enums\RelationshipStatus;
+use App\Modules\Identity\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Fixtures\JobsBoard\CreatorJobFixture;
+use Tests\TestCase;
+
+uses(TestCase::class, RefreshDatabase::class);
+
+/**
+ * Jobs Board chunk 3 (AH-056) — the creator's JOB DETAIL endpoint.
+ *
+ *   GET /api/v1/creators/me/jobs/{campaign}
+ *
+ * Two jobs here:
+ *
+ * 1. The §5.34 seven-case set, RE-RUN against the detail surface. The predicate
+ *    is shared with the list, but "shared" is a claim about code; only running
+ *    the same seven cases against this endpoint proves the claim holds at the
+ *    HTTP boundary. Every one of them must be a flat 404 — never a 403, never a
+ *    partial render — so a job the creator may not see is not probeable by ULID.
+ *
+ * 2. The D3 EXACT-KEYSET assertions. Both job resources are pinned with exact
+ *    key-list equality, not `assertJsonStructure` (which passes on a superset).
+ *    This is the mechanism that stops a brand field joining a creator-facing
+ *    payload by accretion — the AH-005-class boundary this chunk crosses for
+ *    the first time.
+ */
+
+/** The complete, ordered key list the CARD may emit. */
+const CARD_KEYS = [
+    'name',
+    'listing_fee',
+    'listing_duration',
+    'applicant_count',
+    'listed_at',
+    'application_status',
+    'brand',
+];
+
+/** The complete, ordered key list the DETAIL may emit. */
+const DETAIL_KEYS = [
+    ...CARD_KEYS,
+    'description',
+    'listing_languages',
+    'listing_regions',
+    'listing_examples_url',
+];
+
+// ── The happy path ──────────────────────────────────────────────────────────
+
+it('renders the detail for a visible job', function (): void {
+    $f = CreatorJobFixture::make();
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()
+        ->assertJsonPath('data.id', $f->campaign->ulid)
+        ->assertJsonPath('data.type', 'creator_job')
+        ->assertJsonPath('data.attributes.name', 'Autumn UGC push')
+        ->assertJsonPath('data.attributes.description', 'Two Reels and three Stories per month, organic usage for 6 months.')
+        ->assertJsonPath('data.attributes.listing_languages', ['en', 'fr'])
+        ->assertJsonPath('data.attributes.listing_regions', ['IE', 'FR'])
+        ->assertJsonPath('data.attributes.listing_examples_url', 'https://example.com/reference-work')
+        ->assertJsonPath('data.attributes.brand.name', 'Northwind Coffee');
+});
+
+// ── §5.34 — the same seven cases, on the detail surface ─────────────────────
+
+it('LEG 2 — 404s the detail for a creator who is not approved', function (ApplicationStatus $status): void {
+    $f = CreatorJobFixture::make();
+    $f->creator->forceFill(['application_status' => $status])->save();
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertNotFound();
+})->with([ApplicationStatus::Incomplete, ApplicationStatus::Pending, ApplicationStatus::Rejected]);
+
+it('LEG 3a — 404s the detail for an agency the creator holds no relation with', function (): void {
+    $f = CreatorJobFixture::make();
+    $f->relation->delete();
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertNotFound();
+});
+
+it('LEG 3b — 404s the detail once the relation is no longer roster', function (RelationshipStatus $status): void {
+    $f = CreatorJobFixture::make();
+    $f->relation->forceFill(['relationship_status' => $status])->save();
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertNotFound();
+})->with([
+    RelationshipStatus::Ended,
+    RelationshipStatus::PendingRequest,
+    RelationshipStatus::Declined,
+    RelationshipStatus::Prospect,
+    RelationshipStatus::External,
+]);
+
+it('LEG 4 — 404s the detail for a delisted campaign', function (): void {
+    $f = CreatorJobFixture::make();
+    $f->campaign->forceFill(['listed_on_jobs_board' => false])->save();
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertNotFound();
+});
+
+it('LEG 4b — 404s the detail for a terminal-status campaign', function (CampaignStatus $status): void {
+    $f = CreatorJobFixture::make();
+    $f->campaign->forceFill(['status' => $status])->save();
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertNotFound();
+})->with([CampaignStatus::Completed, CampaignStatus::Cancelled]);
+
+it('LEG 5 — 404s the detail for an expired listing', function (): void {
+    $f = CreatorJobFixture::make(['ends_at' => now('UTC')->subDay()]);
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertNotFound();
+});
+
+it('LEG 6 — 404s the detail when the brand has hard-blacklisted the creator', function (): void {
+    $f = CreatorJobFixture::make();
+
+    BrandCreatorBlacklist::factory()->createOne(['brand_id' => $f->brand->id, 'creator_id' => $f->creator->id]);
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertNotFound();
+});
+
+it('404s an unknown ULID and another agency job identically — nothing is probeable', function (): void {
+    $f = CreatorJobFixture::make();
+
+    $otherAgencyJob = Campaign::factory()->listed()->createOne([
+        'agency_id' => Agency::factory()->createOne()->id,
+    ]);
+
+    $this->actingAs($f->user)->getJson(CreatorJobFixture::URL.'/01JZZZZZZZZZZZZZZZZZZZZZZZ')->assertNotFound();
+    $this->actingAs($f->user)->getJson($f->jobUrl($otherAgencyJob))->assertNotFound();
+});
+
+// ── D3 — the exact keysets ──────────────────────────────────────────────────
+
+it('emits EXACTLY the card keyset, and exactly two brand fields', function (): void {
+    $f = CreatorJobFixture::make();
+
+    $attributes = $this->actingAs($f->user)->getJson(CreatorJobFixture::URL)->assertOk()->json('data.0.attributes');
+
+    // Exact equality, not assertJsonStructure: a superset must FAIL.
+    expect(array_keys($attributes))->toBe(CARD_KEYS)
+        ->and(array_keys($attributes['brand']))->toBe(['name', 'logo_url']);
+});
+
+it('emits EXACTLY the detail keyset, and exactly three brand fields', function (): void {
+    $f = CreatorJobFixture::make();
+
+    $attributes = $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()->json('data.attributes');
+
+    expect(array_keys($attributes))->toBe(DETAIL_KEYS)
+        ->and(array_keys($attributes['brand']))->toBe(['name', 'logo_url', 'website_url']);
+});
+
+it('never crosses any other brand field to a creator, on either shape', function (): void {
+    $f = CreatorJobFixture::make();
+
+    // Populate every brand field a creator must NOT see with a distinctive
+    // marker, so their absence is a real exclusion rather than an empty column.
+    $f->brand->forceFill([
+        'slug' => 'withheld-brand-slug',
+        'description' => 'INTERNAL brand positioning notes',
+        'industry' => 'Food and Beverage',
+        'brand_safety_rules' => ['no alcohol adjacency'],
+        'default_currency' => 'USD',
+        'default_language' => 'de',
+        'client_portal_enabled' => true,
+        'website_url' => 'https://northwind.example',
+    ])->save();
+
+    $card = $this->actingAs($f->user)->getJson(CreatorJobFixture::URL)->assertOk()->json('data.0');
+    $detail = $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()->json('data');
+
+    $withheld = [
+        'withheld-brand-slug',
+        'INTERNAL brand positioning notes',
+        'Food and Beverage',
+        'no alcohol adjacency',
+        'client_portal_enabled',
+        'logo_path',
+        'default_currency',
+        'default_language',
+    ];
+
+    foreach (['card' => $card, 'detail' => $detail] as $shape => $payload) {
+        $flat = json_encode($payload, JSON_THROW_ON_ERROR);
+
+        foreach ($withheld as $marker) {
+            expect($flat)->not->toContain($marker, "The {$shape} shape leaked [{$marker}].");
+        }
+    }
+
+    // `website_url` is the ONE field where card and detail diverge (D3: detail
+    // page only), so it is asserted in both directions rather than only absent.
+    expect(json_encode($card, JSON_THROW_ON_ERROR))->not->toContain('https://northwind.example');
+    expect($detail['attributes']['brand']['website_url'])->toBe('https://northwind.example');
+});
+
+// ── Archived-brand posture (D3) ─────────────────────────────────────────────
+
+it('keeps rendering a listed job whose brand has been archived', function (): void {
+    $f = CreatorJobFixture::make();
+
+    $f->brand->delete();
+
+    // Archiving a brand is a soft delete, and LISTING STATE ALONE decides
+    // visibility (D3). The campaign renders its brand as stored — the same
+    // withTrashed() posture the July-Wave-4 production incident forced onto
+    // Campaign::brand(). A live card must not blank out because somebody tidied
+    // the brand list.
+    $this->actingAs($f->user)->getJson(CreatorJobFixture::URL)->assertOk()
+        ->assertJsonPath('data.0.attributes.brand.name', 'Northwind Coffee');
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()
+        ->assertJsonPath('data.attributes.brand.name', 'Northwind Coffee');
+});
+
+// ── listed_at is DISPLAY ONLY (D4, review priority 5) ───────────────────────
+
+it('emits listed_at for the recency chip and renders happily without one', function (): void {
+    $f = CreatorJobFixture::make(['listed_at' => now()->subDays(3)]);
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()
+        ->assertJsonPath('data.attributes.listed_at', $f->campaign->fresh()?->listed_at?->toIso8601String());
+
+    // A listed campaign with a null listed_at is unreachable in this release
+    // (the column ships with the board), but it is renderable — the chip just
+    // does not appear. The API must not 500 on it.
+    $f->campaign->forceFill(['listed_at' => null])->save();
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()
+        ->assertJsonPath('data.attributes.listed_at', null);
+});
+
+it('NEVER lets listed_at decide visibility — the scope is the sole authority', function (): void {
+    $f = CreatorJobFixture::make();
+
+    // A null listed_at on a LISTED campaign stays visible...
+    $f->campaign->forceFill(['listed_at' => null])->save();
+    $this->actingAs($f->user)->getJson(CreatorJobFixture::URL)->assertOk()->assertJsonCount(1, 'data');
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk();
+
+    // ...and a populated listed_at on a DELISTED campaign stays invisible.
+    $f->campaign->forceFill(['listed_at' => now(), 'listed_on_jobs_board' => false])->save();
+    $this->actingAs($f->user)->getJson(CreatorJobFixture::URL)->assertOk()->assertJsonCount(0, 'data');
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertNotFound();
+});
+
+it('requires authentication on the detail too', function (): void {
+    $f = CreatorJobFixture::make();
+
+    $this->getJson($f->jobUrl())->assertUnauthorized();
+});
+
+it('404s the detail for an authenticated user who is not a creator', function (): void {
+    $f = CreatorJobFixture::make();
+    $agencyUser = User::factory()->agencyAdmin()->createOne();
+
+    $this->actingAs($agencyUser)->getJson($f->jobUrl())->assertNotFound();
+});

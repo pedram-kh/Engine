@@ -161,6 +161,10 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'admin.impersonation_started',
         'admin.impersonation_ended',
         'feature_flag.toggled',
+        // AH-056 (Jobs Board chunk 3) — a creator applied to a listed campaign.
+        // Audit-only this chunk: the agency-facing NotificationType is chunk 4's
+        // (the arc deploys as one release, so nothing is missed in between).
+        'campaign_application.submitted',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());

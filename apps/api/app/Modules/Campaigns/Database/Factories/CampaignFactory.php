@@ -83,11 +83,19 @@ final class CampaignFactory extends Factory
         ]);
     }
 
-    /** Job-ready AND live on the board — the post-toggle state. */
+    /**
+     * Job-ready AND live on the board — the post-toggle state.
+     *
+     * `listed_at` is stamped alongside the flag (AH-056 D4) so a fixture
+     * matches what the production flip actually writes. A test that needs the
+     * null-`listed_at` degradation (a campaign listed before the column
+     * existed) overrides it explicitly.
+     */
     public function listed(): static
     {
         return $this->jobReady()->state(fn (array $attributes): array => [
             'listed_on_jobs_board' => true,
+            'listed_at' => now(),
         ]);
     }
 

@@ -59,6 +59,7 @@ use Illuminate\Support\Carbon;
  * @property list<string>|null $listing_languages
  * @property list<string>|null $listing_regions
  * @property string|null $listing_examples_url
+ * @property Carbon|null $listed_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -121,6 +122,11 @@ final class Campaign extends Model
         'listing_languages',
         'listing_regions',
         'listing_examples_url',
+        // AH-056 D4 — DISPLAY metadata, written only on the false→true listing
+        // flip in CampaignController::update(). Fillable for factory/test
+        // ergonomics only: no FormRequest validates it, so `fill(validated())`
+        // can never reach it from an HTTP request.
+        'listed_at',
     ];
 
     /**
@@ -158,6 +164,41 @@ final class Campaign extends Model
     public function assignments(): HasMany
     {
         return $this->hasMany(CampaignAssignment::class);
+    }
+
+    /**
+     * Creator applications to this campaign's jobs-board listing (AH-056, D1).
+     *
+     * Distinct from {@see assignments()} on purpose — an application is a
+     * creator-initiated expression of interest, an assignment is an
+     * agency-issued offer, and the two must not share a row (see the
+     * `campaign_applications` migration for the collision that would cause).
+     * The board card's applicant count is a `withCount('applications')` over
+     * this relation, unfiltered by status: pending, accepted and rejected all
+     * count, because the number a creator reads is "how much interest does this
+     * job have", not "how many are still in the running" (D4).
+     *
+     * ⚠ Emphatically NOT the same number as `CampaignResource.assignment_count`,
+     * which stays an unfiltered count of `assignments` and keeps its shipped
+     * meaning. Nothing about this relation changes that field.
+     *
+     * @return HasMany<CampaignApplication, $this>
+     */
+    public function applications(): HasMany
+    {
+        return $this->hasMany(CampaignApplication::class);
+    }
+
+    /**
+     * The per-creator once-only job-posted notification stamps (AH-056, D7).
+     * Read by the fan-out service to skip already-notified creators; never
+     * emitted in any resource.
+     *
+     * @return HasMany<CampaignJobNotification, $this>
+     */
+    public function jobNotifications(): HasMany
+    {
+        return $this->hasMany(CampaignJobNotification::class);
     }
 
     /**
@@ -222,6 +263,7 @@ final class Campaign extends Model
             'listed_on_jobs_board' => 'boolean',
             'listing_languages' => 'array',
             'listing_regions' => 'array',
+            'listed_at' => 'datetime',
         ];
     }
 
