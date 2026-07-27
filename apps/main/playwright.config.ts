@@ -53,6 +53,11 @@ const E2E_DB_DATABASE = process.env.DB_DATABASE ?? 'catalyst_e2e'
 // next to the DB-isolation override it sits beside in the webServer env.
 const E2E_MEDIA_DISK_DRIVER = 'local'
 
+// AH-057 — specs that belong to the `mobile` project ALONE. Named once so the
+// desktop project ignores exactly what the mobile project matches; two
+// independent globs would drift into either double-running or a silent gap.
+const MOBILE_ONLY_SPECS = ['**/creator-shell-mobile.spec.ts']
+
 export default defineConfig({
   testDir: './playwright/specs',
   fullyParallel: false,
@@ -80,6 +85,34 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      // The mobile leg is the `mobile` project's job. Without this the spec
+      // would also run at desktop width, where the bottom bar it asserts on
+      // does not render at all — a green that proves nothing.
+      testIgnore: MOBILE_ONLY_SPECS,
+    },
+    {
+      // AH-057 — the creator shell at phone width. Deliberately scoped to ONE
+      // spec rather than re-running the suite on a second device: the desktop
+      // legs already cover behaviour, and what went unseen here was purely a
+      // viewport-dependent LAYOUT fact (AH-056's sixth nav item clipped the
+      // bottom bar on a real phone while 24/24 stayed green, because
+      // `v-bottom-navigation` never renders at desktop width).
+      name: 'mobile',
+      use: {
+        ...devices['iPhone 13'],
+        // The iPhone 13 PROFILE (390×664 viewport, DPR 3, touch, mobile UA)
+        // on the Chromium ENGINE. The device descriptor's own
+        // `defaultBrowserType` is `webkit`, and Playwright's WebKit build for
+        // macOS 14 is frozen ("does not receive updates anymore on mac14") and
+        // bus-errors on launch on this host — a leg that is green only in CI is
+        // not a leg anyone will trust. What this spec measures is layout
+        // geometry produced by Vuetify's flex CSS at a phone viewport, which
+        // the profile supplies and which does not turn on the engine. If a
+        // WebKit-SPECIFIC rendering bug is ever the suspect, that is a
+        // different spec and a working WebKit build.
+        browserName: 'chromium',
+      },
+      testMatch: MOBILE_ONLY_SPECS,
     },
   ],
   // Global setup validates env + runs `migrate:fresh` so every

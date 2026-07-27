@@ -199,6 +199,17 @@ test.describe('spec #20 — failed-login lockout + reset / escalation', () => {
     page,
     request,
   }) => {
+    // AH-057 — this test is genuinely slow, not flaky. It drives ELEVEN
+    // sequential full sign-in round-trips through the SPA plus three clock
+    // manipulations, against `php artisan serve`'s single-process model, so its
+    // cost scales directly with how loaded the machine is: ~27s standalone on a
+    // quiet host, past the default 30s budget when the rest of the suite is
+    // competing for the same cores. Found by an AH-057 full-suite run where it
+    // was the only red and passed on its own immediately after. `test.slow()`
+    // (Playwright's own idiom: triple the timeout) states the cost instead of
+    // pretending a 30s budget was ever deliberate for this one.
+    test.slow()
+
     const email = uniqueEmail()
     await signUpUser(request, email, CORRECT_PASSWORD)
 
