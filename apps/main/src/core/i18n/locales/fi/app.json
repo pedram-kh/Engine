@@ -467,7 +467,8 @@
         "listingRegions": "Alueet",
         "listingExamplesUrl": "Linkki esimerkkeihin",
         "listingExamplesUrlHint": "Valinnainen linkki referenssitöihin.",
-        "listedOnJobsBoard": "Lisää työtauluun"
+        "listedOnJobsBoard": "Lisää työtauluun",
+        "jobBoard": "Työpaikat"
       },
       "objective": {
         "awareness": "Awareness",
@@ -806,7 +807,8 @@
           "listing_fee": "ilmoitettu palkkio",
           "listing_languages": "sisällön kielet",
           "listing_regions": "alueet"
-        }
+        },
+        "listed": "Julkaistu"
       }
     },
     "pools": {

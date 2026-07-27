@@ -44,6 +44,16 @@ const headers = [
     sortable: false,
     width: 120,
   },
+  // AH-057 — listing state is ORTHOGONAL to lifecycle status, so it gets its
+  // own column rather than a second chip in the status cell: a campaign can be
+  // active-and-unlisted or active-and-listed, and conflating the two is what
+  // makes a later "only listed" filter awkward to build.
+  {
+    title: t('app.campaigns.fields.jobBoard'),
+    key: 'attributes.listed_on_jobs_board',
+    sortable: false,
+    width: 120,
+  },
   {
     title: t('app.campaigns.fields.budget'),
     key: 'attributes.budget_minor_units',
@@ -257,6 +267,24 @@ function formatMoney(minor: number | null, currency: string | null): string {
         >
           {{ t(`app.campaigns.status.${item.attributes.status}`) }}
         </v-chip>
+      </template>
+
+      <!-- Listed campaigns get the chip; unlisted ones get a muted dash, so the
+           eye scans for the exception instead of reading two chips per row. -->
+      <template #item.attributes.listed_on_jobs_board="{ item }">
+        <v-chip
+          v-if="item.attributes.listed_on_jobs_board"
+          color="primary"
+          size="small"
+          variant="tonal"
+          prepend-icon="mdi-briefcase-outline"
+          :data-test="`campaign-job-board-${item.id}`"
+        >
+          {{ t('app.campaigns.listing.listed') }}
+        </v-chip>
+        <span v-else class="text-medium-emphasis" :data-test="`campaign-job-board-none-${item.id}`"
+          >—</span
+        >
       </template>
 
       <template #item.attributes.budget_minor_units="{ item }">

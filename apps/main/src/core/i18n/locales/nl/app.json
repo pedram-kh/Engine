@@ -467,7 +467,8 @@
         "listingRegions": "Regio's",
         "listingExamplesUrl": "Link naar voorbeelden",
         "listingExamplesUrlHint": "Optionele link naar referentiewerk.",
-        "listedOnJobsBoard": "Toevoegen aan het opdrachtenbord"
+        "listedOnJobsBoard": "Toevoegen aan het opdrachtenbord",
+        "jobBoard": "Vacaturebord"
       },
       "objective": {
         "awareness": "Bewustwording",
@@ -806,7 +807,8 @@
           "listing_fee": "vermelde vergoeding",
           "listing_languages": "talen van de content",
           "listing_regions": "regio's"
-        }
+        },
+        "listed": "Geplaatst"
       }
     },
     "pools": {

@@ -467,7 +467,8 @@
         "listingRegions": "Regiones",
         "listingExamplesUrl": "Enlace a ejemplos",
         "listingExamplesUrlHint": "Enlace opcional a trabajos de referencia.",
-        "listedOnJobsBoard": "Añadir al tablón de trabajos"
+        "listedOnJobsBoard": "Añadir al tablón de trabajos",
+        "jobBoard": "Bolsa de trabajo"
       },
       "objective": {
         "awareness": "Notoriedad",
@@ -806,7 +807,8 @@
           "listing_fee": "tarifa indicada",
           "listing_languages": "idiomas del contenido",
           "listing_regions": "regiones"
-        }
+        },
+        "listed": "Publicada"
       }
     },
     "pools": {

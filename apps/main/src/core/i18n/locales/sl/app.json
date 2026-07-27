@@ -467,7 +467,8 @@
         "listingRegions": "Regije",
         "listingExamplesUrl": "Povezava do primerov",
         "listingExamplesUrlHint": "Neobvezna povezava do referenčnih del.",
-        "listedOnJobsBoard": "Dodaj na oglasno desko del"
+        "listedOnJobsBoard": "Dodaj na oglasno desko del",
+        "jobBoard": "Oglasi za delo"
       },
       "objective": {
         "awareness": "Ozaveščenost",
@@ -806,7 +807,8 @@
           "listing_fee": "navedeno plačilo",
           "listing_languages": "jeziki vsebine",
           "listing_regions": "regije"
-        }
+        },
+        "listed": "Objavljeno"
       }
     },
     "pools": {

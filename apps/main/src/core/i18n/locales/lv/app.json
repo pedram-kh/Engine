@@ -467,7 +467,8 @@
         "listingRegions": "Reģioni",
         "listingExamplesUrl": "Saite uz piemēriem",
         "listingExamplesUrlHint": "Neobligāta saite uz atsauces darbiem.",
-        "listedOnJobsBoard": "Pievienot darbu tāfelei"
+        "listedOnJobsBoard": "Pievienot darbu tāfelei",
+        "jobBoard": "Darba piedāvājumi"
       },
       "objective": {
         "awareness": "Awareness",
@@ -806,7 +807,8 @@
           "listing_fee": "norādītā atlīdzība",
           "listing_languages": "satura valodas",
           "listing_regions": "reģioni"
-        }
+        },
+        "listed": "Publicēts"
       }
     },
     "pools": {

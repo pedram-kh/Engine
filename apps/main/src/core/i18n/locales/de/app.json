@@ -467,7 +467,8 @@
         "listingRegions": "Regionen",
         "listingExamplesUrl": "Link zu Beispielen",
         "listingExamplesUrlHint": "Optionaler Link zu Referenzarbeiten.",
-        "listedOnJobsBoard": "Zum Jobboard hinzufügen"
+        "listedOnJobsBoard": "Zum Jobboard hinzufügen",
+        "jobBoard": "Jobbörse"
       },
       "objective": {
         "awareness": "Bekanntheit",
@@ -806,7 +807,8 @@
           "listing_fee": "angegebenes Honorar",
           "listing_languages": "Content-Sprachen",
           "listing_regions": "Regionen"
-        }
+        },
+        "listed": "Veröffentlicht"
       }
     },
     "pools": {

@@ -467,7 +467,8 @@
         "listingRegions": "Regioner",
         "listingExamplesUrl": "Länk till exempel",
         "listingExamplesUrlHint": "Valfri länk till referensarbeten.",
-        "listedOnJobsBoard": "Lägg till på uppdragstavlan"
+        "listedOnJobsBoard": "Lägg till på uppdragstavlan",
+        "jobBoard": "Jobbanslag"
       },
       "objective": {
         "awareness": "Medvetenhet",
@@ -806,7 +807,8 @@
           "listing_fee": "angiven ersättning",
           "listing_languages": "innehållets språk",
           "listing_regions": "regioner"
-        }
+        },
+        "listed": "Publicerad"
       }
     },
     "pools": {

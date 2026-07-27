@@ -467,7 +467,8 @@
         "listingRegions": "Περιοχές",
         "listingExamplesUrl": "Σύνδεσμος παραδειγμάτων",
         "listingExamplesUrlHint": "Προαιρετικός σύνδεσμος σε δείγματα εργασίας.",
-        "listedOnJobsBoard": "Προσθήκη στον πίνακα εργασιών"
+        "listedOnJobsBoard": "Προσθήκη στον πίνακα εργασιών",
+        "jobBoard": "Αγγελίες"
       },
       "objective": {
         "awareness": "Awareness",
@@ -806,7 +807,8 @@
           "listing_fee": "αναγραφόμενη αμοιβή",
           "listing_languages": "γλώσσες περιεχομένου",
           "listing_regions": "περιοχές"
-        }
+        },
+        "listed": "Δημοσιευμένη"
       }
     },
     "pools": {

@@ -467,7 +467,8 @@
         "listingRegions": "Régions",
         "listingExamplesUrl": "Lien vers des exemples",
         "listingExamplesUrlHint": "Lien facultatif vers des travaux de référence.",
-        "listedOnJobsBoard": "Ajouter au tableau des missions"
+        "listedOnJobsBoard": "Ajouter au tableau des missions",
+        "jobBoard": "Offres d'emploi"
       },
       "objective": {
         "awareness": "Notoriété",
@@ -806,7 +807,8 @@
           "listing_fee": "rémunération indiquée",
           "listing_languages": "langues du contenu",
           "listing_regions": "régions"
-        }
+        },
+        "listed": "Publiée"
       }
     },
     "pools": {

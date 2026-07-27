@@ -467,7 +467,8 @@
         "listingRegions": "Regioni",
         "listingExamplesUrl": "Link agli esempi",
         "listingExamplesUrlHint": "Link facoltativo a lavori di riferimento.",
-        "listedOnJobsBoard": "Aggiungi alla bacheca lavori"
+        "listedOnJobsBoard": "Aggiungi alla bacheca lavori",
+        "jobBoard": "Offerte di lavoro"
       },
       "objective": {
         "awareness": "Notorietà",
@@ -806,7 +807,8 @@
           "listing_fee": "compenso indicato",
           "listing_languages": "lingue del contenuto",
           "listing_regions": "regioni"
-        }
+        },
+        "listed": "Pubblicata"
       }
     },
     "pools": {

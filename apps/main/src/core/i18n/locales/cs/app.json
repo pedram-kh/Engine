@@ -467,7 +467,8 @@
         "listingRegions": "Regiony",
         "listingExamplesUrl": "Odkaz na ukázky",
         "listingExamplesUrlHint": "Volitelný odkaz na referenční práce.",
-        "listedOnJobsBoard": "Přidat na nástěnku zakázek"
+        "listedOnJobsBoard": "Přidat na nástěnku zakázek",
+        "jobBoard": "Nabídky práce"
       },
       "objective": {
         "awareness": "Povědomí",
@@ -806,7 +807,8 @@
           "listing_fee": "uvedená odměna",
           "listing_languages": "jazyky obsahu",
           "listing_regions": "regiony"
-        }
+        },
+        "listed": "Zveřejněno"
       }
     },
     "pools": {

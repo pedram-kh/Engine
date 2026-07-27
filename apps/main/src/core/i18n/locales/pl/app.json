@@ -467,7 +467,8 @@
         "listingRegions": "Regiony",
         "listingExamplesUrl": "Link do przykładów",
         "listingExamplesUrlHint": "Opcjonalny link do prac referencyjnych.",
-        "listedOnJobsBoard": "Dodaj do tablicy zleceń"
+        "listedOnJobsBoard": "Dodaj do tablicy zleceń",
+        "jobBoard": "Oferty pracy"
       },
       "objective": {
         "awareness": "Świadomość",
@@ -806,7 +807,8 @@
           "listing_fee": "podane wynagrodzenie",
           "listing_languages": "języki treści",
           "listing_regions": "regiony"
-        }
+        },
+        "listed": "Opublikowano"
       }
     },
     "pools": {

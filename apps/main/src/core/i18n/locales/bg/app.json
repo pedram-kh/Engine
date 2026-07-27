@@ -467,7 +467,8 @@
         "listingRegions": "Региони",
         "listingExamplesUrl": "Връзка към примери",
         "listingExamplesUrlHint": "Незадължителна връзка към референтни работи.",
-        "listedOnJobsBoard": "Добавяне към борсата за задачи"
+        "listedOnJobsBoard": "Добавяне към борсата за задачи",
+        "jobBoard": "Работни обяви"
       },
       "objective": {
         "awareness": "Awareness",
@@ -806,7 +807,8 @@
           "listing_fee": "посочено възнаграждение",
           "listing_languages": "езици на съдържанието",
           "listing_regions": "региони"
-        }
+        },
+        "listed": "Публикувана"
       }
     },
     "pools": {

@@ -467,7 +467,8 @@
         "listingRegions": "Reġjuni",
         "listingExamplesUrl": "Link għal eżempji",
         "listingExamplesUrlHint": "Link mhux obbligatorju għal xogħol ta' referenza.",
-        "listedOnJobsBoard": "Żid mal-bord tax-xogħlijiet"
+        "listedOnJobsBoard": "Żid mal-bord tax-xogħlijiet",
+        "jobBoard": "Bord tax-xogħol"
       },
       "objective": {
         "awareness": "Awareness",
@@ -806,7 +807,8 @@
           "listing_fee": "ħlas indikat",
           "listing_languages": "lingwi tal-kontenut",
           "listing_regions": "reġjuni"
-        }
+        },
+        "listed": "Ippubblikata"
       }
     },
     "pools": {

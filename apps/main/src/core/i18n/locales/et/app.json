@@ -467,7 +467,8 @@
         "listingRegions": "Piirkonnad",
         "listingExamplesUrl": "Näidete link",
         "listingExamplesUrlHint": "Valikuline link näidistöödele.",
-        "listedOnJobsBoard": "Lisa tööde tahvlile"
+        "listedOnJobsBoard": "Lisa tööde tahvlile",
+        "jobBoard": "Tööpakkumised"
       },
       "objective": {
         "awareness": "Awareness",
@@ -806,7 +807,8 @@
           "listing_fee": "näidatud tasu",
           "listing_languages": "sisu keeled",
           "listing_regions": "piirkonnad"
-        }
+        },
+        "listed": "Avaldatud"
       }
     },
     "pools": {

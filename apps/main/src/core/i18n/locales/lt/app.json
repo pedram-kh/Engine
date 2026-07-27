@@ -467,7 +467,8 @@
         "listingRegions": "Regionai",
         "listingExamplesUrl": "Pavyzdžių nuoroda",
         "listingExamplesUrlHint": "Neprivaloma nuoroda į pavyzdinius darbus.",
-        "listedOnJobsBoard": "Įtraukti į darbų lentą"
+        "listedOnJobsBoard": "Įtraukti į darbų lentą",
+        "jobBoard": "Darbo skelbimai"
       },
       "objective": {
         "awareness": "Awareness",
@@ -806,7 +807,8 @@
           "listing_fee": "nurodytas atlygis",
           "listing_languages": "turinio kalbos",
           "listing_regions": "regionai"
-        }
+        },
+        "listed": "Paskelbta"
       }
     },
     "pools": {

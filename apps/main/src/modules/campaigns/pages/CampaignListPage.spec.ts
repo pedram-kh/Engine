@@ -174,6 +174,25 @@ describe('CampaignListPage (Sprint 8 Chunk 1)', () => {
     expect(harness.wrapper.find('[data-test="campaign-create-btn"]').exists()).toBe(true)
   })
 
+  it('marks a listed campaign on the jobs board, and only that one (AH-057)', async () => {
+    const listed = makeCampaign({ name: 'On the board', listed_on_jobs_board: true })
+    const unlisted = {
+      ...makeCampaign({ name: 'Not on the board' }),
+      id: 'SECONDCAMPAIGNULID000000001',
+    }
+
+    const harness = await mountList([listed, unlisted])
+    cleanup = harness.cleanup
+    const w = harness.wrapper
+
+    expect(w.find(`[data-test="campaign-job-board-${listed.id}"]`).text()).toBe('Listed')
+    // Listing is independent of lifecycle status: both rows are `active`, and
+    // only the listed one carries the chip.
+    expect(w.find(`[data-test="campaign-job-board-${unlisted.id}"]`).exists()).toBe(false)
+    expect(w.find(`[data-test="campaign-job-board-none-${unlisted.id}"]`).text()).toBe('—')
+    expect(w.text()).toContain('Job board')
+  })
+
   it('threads the status filter to the API when a chip is selected', async () => {
     const harness = await mountList([makeCampaign()])
     cleanup = harness.cleanup

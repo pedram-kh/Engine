@@ -467,7 +467,8 @@
         "listingRegions": "Régiók",
         "listingExamplesUrl": "Példák linkje",
         "listingExamplesUrlHint": "Opcionális link referenciamunkákhoz.",
-        "listedOnJobsBoard": "Hozzáadás a munkatáblához"
+        "listedOnJobsBoard": "Hozzáadás a munkatáblához",
+        "jobBoard": "Álláshirdetések"
       },
       "objective": {
         "awareness": "Awareness",
@@ -806,7 +807,8 @@
           "listing_fee": "feltüntetett díj",
           "listing_languages": "a tartalom nyelvei",
           "listing_regions": "régiók"
-        }
+        },
+        "listed": "Közzétéve"
       }
     },
     "pools": {

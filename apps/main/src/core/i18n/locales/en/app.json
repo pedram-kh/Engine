@@ -467,7 +467,8 @@
         "listingRegions": "Regions",
         "listingExamplesUrl": "Examples link",
         "listingExamplesUrlHint": "Optional link to reference work.",
-        "listedOnJobsBoard": "Add to jobs board"
+        "listedOnJobsBoard": "Add to jobs board",
+        "jobBoard": "Job board"
       },
       "objective": {
         "awareness": "Awareness",
@@ -806,7 +807,8 @@
           "listing_fee": "listed fee",
           "listing_languages": "content languages",
           "listing_regions": "regions"
-        }
+        },
+        "listed": "Listed"
       }
     },
     "pools": {

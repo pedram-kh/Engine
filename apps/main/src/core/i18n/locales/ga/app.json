@@ -467,7 +467,8 @@
         "listingRegions": "Réigiúin",
         "listingExamplesUrl": "Nasc chuig samplaí",
         "listingExamplesUrlHint": "Nasc roghnach chuig obair thagartha.",
-        "listedOnJobsBoard": "Cuir leis an gclár post"
+        "listedOnJobsBoard": "Cuir leis an gclár post",
+        "jobBoard": "Clár post"
       },
       "objective": {
         "awareness": "Awareness",
@@ -806,7 +807,8 @@
           "listing_fee": "táille luaite",
           "listing_languages": "teangacha an ábhair",
           "listing_regions": "réigiúin"
-        }
+        },
+        "listed": "Liostaithe"
       }
     },
     "pools": {

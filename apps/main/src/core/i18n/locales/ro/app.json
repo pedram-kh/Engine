@@ -467,7 +467,8 @@
         "listingRegions": "Regiuni",
         "listingExamplesUrl": "Link către exemple",
         "listingExamplesUrlHint": "Link opțional către lucrări de referință.",
-        "listedOnJobsBoard": "Adaugă în panoul de joburi"
+        "listedOnJobsBoard": "Adaugă în panoul de joburi",
+        "jobBoard": "Anunțuri de lucru"
       },
       "objective": {
         "awareness": "Awareness",
@@ -806,7 +807,8 @@
           "listing_fee": "remunerație afișată",
           "listing_languages": "limbile conținutului",
           "listing_regions": "regiuni"
-        }
+        },
+        "listed": "Publicată"
       }
     },
     "pools": {

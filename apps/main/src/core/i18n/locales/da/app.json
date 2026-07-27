@@ -467,7 +467,8 @@
         "listingRegions": "Regioner",
         "listingExamplesUrl": "Link til eksempler",
         "listingExamplesUrlHint": "Valgfrit link til referencearbejde.",
-        "listedOnJobsBoard": "Føj til opgavetavlen"
+        "listedOnJobsBoard": "Føj til opgavetavlen",
+        "jobBoard": "Jobopslag"
       },
       "objective": {
         "awareness": "Kendskab",
@@ -806,7 +807,8 @@
           "listing_fee": "oplyst honorar",
           "listing_languages": "indholdssprog",
           "listing_regions": "regioner"
-        }
+        },
+        "listed": "Opslået"
       }
     },
     "pools": {
