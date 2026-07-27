@@ -113,19 +113,34 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-27 · **Through:** AH-056 · **Baseline:** the AH-056 close commit — the
-current tip and, as of this push, also the `origin/main` tip. It sits atop the six AH-056 commits
-(`81df0b5`, `928ccce`, `0cf6275`, `4e527e7`, `d37d43c`, `ddf875c`) and the AH-055 docs commit, all on
-`aa8d410` (the AH-053/AH-054 close-out). **Nothing is held — AH-055 and AH-056 were pushed on
-2026-07-27** with the review closed and approved. (A commit cannot record its own hash, so the tip is
-named descriptively; `git rev-parse --short HEAD` gives it, and `git rev-parse --short origin/main`
-gives the pushed tip. Those two are the authority, not this sentence.)
+**Last updated:** 2026-07-27 · **Through:** AH-057 · **Baseline:** the AH-057 docs commit — the
+current tip and, as of this push, also the `origin/main` tip. It sits atop the three AH-057 commits
+(`fc88347`, `bbafc9c`, `d147baf`), which sit on the AH-056 close commit (`978bce5`), itself atop the
+six AH-056 commits (`81df0b5`, `928ccce`, `0cf6275`, `4e527e7`, `d37d43c`, `ddf875c`) and the AH-055
+docs commit, all on `aa8d410` (the AH-053/AH-054 close-out). **Nothing is held — AH-055, AH-056 and
+AH-057 were all pushed on 2026-07-27** with the review closed and approved. (A commit cannot record
+its own hash, so the tip is named descriptively; `git rev-parse --short HEAD` gives it, and
+`git rev-parse --short origin/main` gives the pushed tip. Those two are the authority, not this
+sentence.)
 
 > **⚠ The Jobs Board arc deploys as ONE unit — chunk 3 of 5 is done, and the deploy stays held.**
 > AH-056 ships the creator board, apply, and the job-posted fan-out, but the agency side (chunk 4)
 > does not exist yet: an application a creator submits today has nowhere to be read. Holding the
 > deploy to end-of-arc is what prevents that gap, and it is why the arc's chunks are safe to build
-> incrementally. Do not deploy AH-053/054/056 piecemeal.
+> incrementally. Do not deploy AH-053/054/056 piecemeal. **AH-057 carries nothing of its own** — it is
+> the eyes-on fix pass over AH-056's UI (mobile bottom bar, job detail framing, a campaigns-table
+> listing column) with a **zero backend diff**: no migration, no endpoint, no enum, no lang file. It
+> inherits AH-056's deploy obligations and adds none.
+
+> **A new Playwright project exists (AH-057).** The suite is now **25 specs across two projects** —
+> 24 desktop `chromium` plus one `mobile` leg on the iPhone 13 profile, scoped to
+> `creator-shell-mobile.spec.ts` alone. It runs on the **Chromium engine**, not WebKit: the device
+> descriptor's `defaultBrowserType` is `webkit`, and Playwright's WebKit build for macOS 14 is frozen
+> and bus-errors on launch on this host. `pnpm test:e2e:install` therefore still fetches chromium
+> alone — **do not "fix" it by adding webkit** without first verifying WebKit launches on the host in
+> question. Also note spec #20 (failed-login lockout) now carries `test.slow()`: it needs ~27s on a
+> quiet host and blows the default 30s budget when the machine is loaded, so a red there is a load
+> symptom to re-run in isolation before it is treated as a regression.
 
 > **⚠ UNDEPLOYED CODE EXISTS — and it carries a migration and a pre-deploy read.** The push on
 > 2026-07-27 moved `origin/main` `2cb6c11..` with **AH-053 + AH-054** (Jobs Board chunks 1+2

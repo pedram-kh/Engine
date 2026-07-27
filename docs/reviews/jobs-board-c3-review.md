@@ -671,3 +671,76 @@ fourth is a decision, not a patch.
 **The first creator-visible aggregate.** `applicant_count` shows creators how many others have
 applied. Non-identifying and deliberate, recorded here so a later "why do we show this?" has an
 answer.
+
+---
+
+## Addendum — 2026-07-27, post-close eyes-on fixes (AH-057)
+
+_The review above is closed and its text is unchanged. This addendum records what a local eyes-on
+walkthrough of the shipped chunk found afterwards, and is appended rather than merged because the
+findings postdate the verdict. The fixes themselves are AH-057 in
+[`adhoc-changes-log.md`](adhoc-changes-log.md); the full read-only report that preceded the ruling is
+[`jobs-board-c3-eyeson-fixes.md`](jobs-board-c3-eyeson-fixes.md)._
+
+### What eyes-on found that the gate board did not
+
+Three findings, all UI, none touching the six-leg predicate, the apply path, the fan-out, the
+exact-keyset brand subset, `listed_at` semantics, any §5.34-pinned behaviour, any notification or mail
+path, or any backend surface. The backend diff for AH-057 is zero.
+
+1. **The mobile bottom bar clipped two of its six items.** AH-056's "Job Posts" was the sixth nav
+   item, and a `v-bottom-navigation` neither wraps nor scrolls. Fixed with a four-slot bar plus a
+   "More" sheet.
+2. **The job detail page rendered unframed**, while the list page it is reached from renders outlined
+   cards. Fixed with one outlined card, back link outside, Apply in the footer.
+3. **The campaigns table never showed listing state.** AH-054 shipped the switch, AH-056 shipped what
+   it feeds, and the index knew about neither — the only readout was opening each campaign's settings
+   in turn. Fixed with a "Job board" column.
+
+### Why the gates could not see #1, and what changed so they can
+
+`useDisplay()` reads `window.innerWidth`; jsdom fixes it at 1024. The mobile chrome therefore never
+rendered under any Vitest spec in this repo, and Playwright ran one desktop project. The bottom bar
+was, in effect, unpinned at every layer — which is how a sixth item reached a phone before it reached
+a test.
+
+Both layers now cover it. The layout spec narrows the window before creating the Vuetify instance
+(and stubs `VMenu` inline, since it teleports and swallows its own activator), which makes the bar
+assertable for the first time; a second Playwright project on the iPhone 13 profile measures the
+geometry that jsdom cannot, since jsdom has no layout engine.
+
+The E2E leg justified itself on its first run: it found a **residual 5px overhang the fix had not
+removed**. Vuetify sets `min-width: 80px` via
+`.v-bottom-navigation .v-bottom-navigation__content > .v-btn`; the override was written at a shorter
+selector depth, which ties on specificity and loses on order. Five 80px floors make a 400px row inside
+a 390px viewport, so the bar still overhung 5px each side and scrolled — invisible to the eye, and
+invisible to every structural assertion, because the labels were inside the frame. Only measurement
+found it. The leg now holds the bar to zero horizontal overflow.
+
+### `listed_at` stays off the AGENCY side, and that is a choice
+
+The asymmetry fix 3 surfaced: `CreatorJobCardResource` emits `listed_at` and the creator's board
+renders D4's "Listed today / N days ago" chip from it, but `CampaignResource` does not emit it, so the
+agency's own campaigns table can show only _that_ a campaign is listed, never _when_. One resource
+line and an emission test would close it, and it was offered as part of fix 3.
+
+Recorded here as **Pedram's deliberate boolean-only choice** — the chip/dash column, not a date. Not
+an oversight, and explicitly **not** a tech-debt entry: the boolean is the authority the switch writes
+and the column is honest about what it shows. A chunk-5 polish decision if the date is ever wanted.
+
+### Gates at the AH-057 tip
+
+`apps/main` 139 files / 1287 tests, typecheck clean, lint 0 errors (the same 2 pre-existing `v-html`
+warnings), locale parity green after 48 files moved (`app.json` ×24 for the column, `availability.json`
+×24 for "More"). **Full Playwright 25/25 in 4.2m** — 24 desktop plus the new mobile leg — with the dev
+stack down for the run and health-checked after (API `/up` 200, both SPAs 200, queue worker up).
+Backend untouched, so no belt re-run: the six break-reverts and the seven-case §5.34 set stand as
+verified at the AH-056 close.
+
+One suite-infrastructure fix rode along. Spec #20 (failed-login lockout) is genuinely slow, not flaky
+— eleven sequential sign-in round-trips plus three clock manipulations against `php artisan serve`'s
+single-process model, ~27s standalone on a quiet host, past the default 30s budget when the rest of the
+suite competes for the same cores. It was the only red in a full AH-057 run and passed alone
+immediately after; on the verifying run it took 33.7s, so the budget was the bug. `test.slow()` states
+the cost. Worth recording that the diagnosis cost several full-suite runs, because a timeout under load
+and a real regression look identical from the summary line.

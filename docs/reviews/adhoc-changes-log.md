@@ -70,6 +70,94 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-057 · Jobs Board chunk 3, eyes-on fixes — the mobile bottom bar, the job detail frame, and the campaigns listing column
+
+- **Status:** Landed
+- **Commits:** `fc88347` — `fix(creators): unclip the mobile bottom bar and frame the job detail (AH-057)`;
+  `bbafc9c` — `feat(campaigns): show jobs-board listing state on the campaigns table (AH-057)`;
+  `d147baf` — `test(creators): iPhone-13 playwright project for the creator shell (AH-057)`;
+  plus the docs commit carrying this entry and the review addendum. Split by **kind**, not by
+  finding: the two creator-shell fixes are one commit because they are one eyes-on pass over one
+  shell, the campaigns column is a `feat` because it adds a surface nobody had, and the E2E project
+  is its own `test` commit on the AH-056 precedent (`d37d43c`) — a new Playwright project is
+  suite infrastructure and deserves to be readable alone.
+- **Date:** 2026-07-27
+- **Why:** Pedram ran the AH-056 chunk-3 walkthrough locally after the review closed and found three
+  things the gate board had not. All three are UI, all three are on surfaces AH-054/AH-056 shipped,
+  and none is a behaviour regression — which is precisely why they are worth a numbered entry: they
+  are the class of defect this project's gates are structurally blind to, and two of the three fixes
+  are about ending that blindness rather than about the pixels.
+- **What:** (1) The creator **mobile bottom bar** becomes four primary slots plus a "More" sheet, so
+  its width no longer depends on how many sections the creator shell has. (2) The **job detail page**
+  gets the outlined-card framing the list page it is reached from already had. (3) The **campaigns
+  table** gets a "Job board" column — a chip when listed, a dash when not. (4) A second Playwright
+  project on the **iPhone 13 profile**, scoped to one new spec, that measures the bar's geometry.
+- **Touched:** `apps/main` only — `CreatorDashboardLayout.vue`/`.spec.ts`,
+  `CreatorJobDetailPage.vue`/`.spec.ts`, `CampaignListPage.vue`/`.spec.ts`, `playwright.config.ts`,
+  the new `playwright/specs/creator-shell-mobile.spec.ts`, one `test.slow()` on
+  `failed-login-lockout-and-reset.spec.ts`, and i18n ×48 (`availability.json` ×24 for "More",
+  `app.json` ×24 for the column header and the "Listed" chip). **The backend diff is zero** — no
+  migration, no endpoint, no resource, no enum, no lang file.
+- **Decisions:** **Four slots, not five or six.** A bottom bar neither wraps nor scrolls, so its
+  width is a hard budget and the fix has to be a policy, not a nudge. The four are the working loop
+  — dashboard, jobs, assignments, messages; Profile and Availability are deliberate overflow,
+  because both are settings-shaped and neither is where a creator returns daily. Adding a nav item
+  now lands it in More by default, which is the safe direction; promoting one is a deliberate edit
+  to `MOBILE_PRIMARY_KEYS`, and the spec pins that every key in that list resolves to a real
+  `navItems` entry so a rename cannot silently empty a slot. **Listing state is its own column, not
+  a second chip in Status**, because listing is orthogonal to lifecycle — a campaign can be
+  active-and-unlisted or active-and-listed, and conflating them is what would make a later "listed
+  only" filter awkward. **The mobile E2E project is one spec, not the suite doubled**: the desktop
+  legs already cover behaviour, and what went unseen was a viewport-dependent layout fact.
+- **The gap this closes, which is the real content:** `useDisplay()` reads `window.innerWidth` and
+  jsdom fixes it at 1024, so the mobile chrome had **never rendered under any Vitest spec in this
+  repo**, and Playwright ran a single desktop project. The bottom bar was unpinned at every layer.
+  That is how AH-056's sixth nav item reached a phone before it reached a test, with 24/24 green.
+  Both layers now cover it: the layout spec narrows the window before creating the Vuetify instance
+  (and stubs `VMenu` inline, since it teleports and swallows its own activator), and the mobile
+  project measures what jsdom cannot, having no layout engine.
+- **The E2E leg paid for itself on its first run.** It found a **residual 5px overhang the fix had
+  not removed**: Vuetify sets `min-width: 80px` at
+  `.v-bottom-navigation .v-bottom-navigation__content > .v-btn`, and the override was written at a
+  shorter selector depth — which ties on specificity and loses on order. Five 80px floors make a
+  400px row inside a 390px viewport, so the bar overhung 5px each side and scrolled. Invisible to the
+  eye and invisible to every structural assertion, because the labels were inside the frame. The leg
+  now holds the bar to zero horizontal overflow and asserts both button boxes and **label** boxes,
+  since a button can sit inside the viewport while its label spills out — and it was labels the
+  eyes-on screenshot showed clipped.
+- **Reinterpretation, recorded:** the ruling specified `devices['iPhone 13']`, whose own
+  `defaultBrowserType` is `webkit`. Playwright's WebKit build for macOS 14 is frozen and bus-errors
+  on launch on this host, so the project runs the iPhone 13 **profile** (390×664, DPR 3, touch,
+  mobile UA) on the **Chromium engine**, and `test:e2e:install` still fetches chromium alone. What
+  the spec measures is layout geometry from Vuetify's flex CSS at a phone viewport — the profile
+  supplies that, and it does not turn on the engine. A leg green only in CI is not a leg anyone would
+  trust. If a WebKit-specific rendering bug is ever the suspect, that is a different spec and a
+  working WebKit build.
+- **`listed_at` stays off the agency side, deliberately.** Fix 3 surfaced an asymmetry:
+  `CreatorJobCardResource` emits `listed_at` and the creator's board renders D4's "Listed today /
+  N days ago" chip from it, while `CampaignResource` does not, so the agency's own table can show only
+  _that_ a campaign is listed, never _when_. One resource line and an emission test would close it,
+  and it was offered as part of fix 3. **Pedram's boolean-only choice, recorded as a choice**: not an
+  oversight, and explicitly **not** a tech-debt entry — the boolean is the authority the switch writes,
+  and the column is honest about what it shows. Chunk-5 polish if the date is ever wanted.
+- **Rode along:** `test.slow()` on spec #20 (failed-login lockout). It is genuinely slow, not flaky —
+  eleven sequential sign-in round-trips plus three clock manipulations against `php artisan serve`'s
+  single-process model, ~27s standalone on a quiet host and past the default 30s budget when the rest
+  of the suite competes for the same cores. It was the only red in a full AH-057 run and passed alone
+  immediately after; on the verifying run it took 33.7s, so the budget was the bug, not the
+  behaviour. Named because the diagnosis cost several full-suite runs: a timeout under machine load
+  and a real regression are indistinguishable from the summary line, and the honest way through was
+  to re-run in isolation rather than to guess.
+- **Gates:** `apps/main` 139 files / 1287 tests, typecheck clean, lint 0 errors (the same 2
+  pre-existing `v-html` warnings), locale parity green across the 48 moved files; **full Playwright
+  25/25 in 4.2m** — 24 desktop plus the new mobile leg — with the dev stack down for the run and
+  health-checked after (API `/up` 200, both SPAs 200, queue worker up). Backend untouched, so no belt
+  re-run: AH-056's six break-reverts and its seven-case §5.34 set stand as verified at that close.
+- **Ref:** [`jobs-board-c3-eyeson-fixes.md`](jobs-board-c3-eyeson-fixes.md) — the read-only report
+  that preceded the ruling; the dated addendum at the foot of
+  [`jobs-board-c3-review.md`](jobs-board-c3-review.md) — the closed review's own record, appended
+  without touching its text.
+
 ### AH-056 · Jobs Board chunk 3 — the creator job board, apply, and the job-posted fan-out
 
 - **Status:** Landed
