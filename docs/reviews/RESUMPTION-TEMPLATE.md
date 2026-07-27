@@ -119,11 +119,18 @@ is named descriptively; the two feat SHAs below are the stable anchors, and
 `git rev-parse --short origin/main` gives the tip.)
 
 > **⚠ UNDEPLOYED CODE EXISTS — and it carries a migration and a pre-deploy read.** The push on
-> 2026-07-27 moved `origin/main` from `d1dc3d2` with **AH-053 + AH-054** (Jobs Board chunks 1+2
+> 2026-07-27 moved `origin/main` `2cb6c11..` with **AH-053 + AH-054** (Jobs Board chunks 1+2
 > — brand completeness floor, brand logo pipeline, campaign listing fields): `b7ea3e1` (AH-054 feat),
 > `2568a96` (AH-053 feat), then the shared docs commit at the tip. Review closed and approved:
 > `docs/reviews/jobs-board-brand-amends-review.md`. **This is the arc's first migration since AH-041,
 > and AH-053 needs an operator read run BEFORE it deploys — see the deploy notes below.**
+
+> **Correction (2026-07-27).** This block previously named `d1dc3d2` as the `origin/main` tip. It was
+> stale by four commits: `f5be920`, `d83c223`, `710292b` and `2cb6c11` had landed on top of it. All
+> four are **docs-only** process syncs, so nothing about the code or deploy posture changes — but the
+> baseline number was wrong, and the AH-053/AH-054 push is what surfaced it. Same lesson as the
+> 2026-07-26 tracking note below, one level up: **re-derive the tip with `git rev-parse`, do not
+> carry the previous session's number forward.**
 
 The AH-001→AH-052 range is pushed in full, including
 `c6b6cde` (Step 0 — `fix(identity)` 2-SPA dev-cookie fix), `98defa9` (**AH-051** feat) and
