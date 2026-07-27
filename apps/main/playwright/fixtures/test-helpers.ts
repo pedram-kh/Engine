@@ -799,3 +799,74 @@ export async function seedPendingConnectionRequest(
     creatorUlid: body.data.creator_ulid,
   }
 }
+
+export interface SeedListedJobResult {
+  campaignUlid: string
+  campaignName: string
+  brandName: string
+  agencyUlid: string
+  creatorUlid: string
+}
+
+export interface SeedListedJobInput {
+  campaignName?: string
+  brandName?: string
+  agencyName?: string
+  listingFee?: string
+  listingDuration?: string
+  description?: string
+}
+
+/**
+ * Approve the creator with the given email, roster them with a fresh agency,
+ * and list one campaign on that agency's jobs board (AH-056).
+ *
+ * This assembles the whole left-hand side of the board's visibility predicate
+ * in one call. Reaching the same state through production surfaces would mean
+ * an admin approving the creator, an agency admin creating a brand and a
+ * campaign, filling the listing floor, and completing an invite/accept roster
+ * handshake — four sign-ins across two SPAs before the first assertion. The
+ * predicate itself is covered by the seven-case feature-test set; the E2E leg
+ * exists to prove the wiring, so it starts at the board.
+ */
+export async function seedListedJob(
+  request: APIRequestContext,
+  email: string,
+  input: SeedListedJobInput = {},
+): Promise<SeedListedJobResult> {
+  const response = await request.post('http://127.0.0.1:8000/api/v1/_test/creators/listed-job', {
+    headers: defaultHeaders,
+    data: {
+      email,
+      campaign_name: input.campaignName,
+      brand_name: input.brandName,
+      agency_name: input.agencyName,
+      listing_fee: input.listingFee,
+      listing_duration: input.listingDuration,
+      description: input.description,
+    },
+  })
+
+  if (response.status() !== 201) {
+    throw new Error(
+      `seedListedJob failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  const body = (await response.json()) as {
+    data: {
+      campaign_ulid: string
+      campaign_name: string
+      brand_name: string
+      agency_ulid: string
+      creator_ulid: string
+    }
+  }
+  return {
+    campaignUlid: body.data.campaign_ulid,
+    campaignName: body.data.campaign_name,
+    brandName: body.data.brand_name,
+    agencyUlid: body.data.agency_ulid,
+    creatorUlid: body.data.creator_ulid,
+  }
+}

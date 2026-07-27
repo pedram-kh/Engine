@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\TestHelpers\Http\Controllers\CreateAdminUserController;
 use App\TestHelpers\Http\Controllers\CreateAgencyInvitationController;
 use App\TestHelpers\Http\Controllers\CreateAgencyWithAdminController;
+use App\TestHelpers\Http\Controllers\CreateListedJobController;
 use App\TestHelpers\Http\Controllers\CreatePendingConnectionRequestController;
 use App\TestHelpers\Http\Controllers\CreateRosterCreatorsController;
 use App\TestHelpers\Http\Controllers\IssueTotpController;
@@ -106,6 +107,15 @@ Route::prefix('_test')
         // real request. No production path approves a self-signed-up creator.
         Route::post('creators/pending-connection-request', CreatePendingConnectionRequestController::class)
             ->name('creators.pending_connection_request.create');
+
+        // AH-056 — approve the signed-in creator, roster them with a fresh
+        // agency, and list one campaign on that agency's jobs board, so the
+        // Playwright browse → detail → apply leg can start at the board. Four
+        // sign-ins across two SPAs would be needed to reach this state through
+        // production paths; the predicate itself is proven by the seven-case
+        // feature-test set.
+        Route::post('creators/listed-job', CreateListedJobController::class)
+            ->name('creators.listed_job.create');
 
         // Sprint 3 Chunk 3 — queue mode override for E2E saga specs.
         // POST sets `config('queue.default')` for subsequent requests
