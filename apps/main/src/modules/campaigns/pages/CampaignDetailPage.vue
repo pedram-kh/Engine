@@ -32,6 +32,7 @@ import { CEmptyState } from '@catalyst/ui'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
+import { LISTING_FLOOR_FIELDS, missingListingFloorFields } from '../listingFloor'
 import InviteCreatorsDialog from '../components/InviteCreatorsDialog.vue'
 import AttachContractDialog from '../components/AttachContractDialog.vue'
 import ReinviteDialog from '../components/ReinviteDialog.vue'
@@ -226,6 +227,49 @@ const statusOptions: { title: string; value: CampaignStatus }[] = [
   { title: t('app.campaigns.status.cancelled'), value: 'cancelled' },
 ]
 
+// ── Jobs board (AH-054, D3/D4/D5) ───────────────────────────────────────────
+// The toggle is Settings-only and mirrors two backend rules so the user never
+// meets a 422 first: it needs the listing floor filled, and it cannot be
+// switched ON once the campaign is completed or cancelled.
+const editListed = ref(false)
+
+const listingFloorMissing = computed(() =>
+  editForm.value === null
+    ? LISTING_FLOOR_FIELDS.slice()
+    : missingListingFloorFields(editForm.value),
+)
+
+const listedFieldErrors = computed<string[]>(
+  () => (fieldErrors.value.listed_on_jobs_board as string[] | undefined) ?? [],
+)
+
+const listingStatusBlocked = computed(
+  () => editStatus.value === 'completed' || editStatus.value === 'cancelled',
+)
+
+/** Already-listed campaigns keep their switch usable — turning it OFF never gates. */
+const listedAtLoad = computed(() => campaign.value?.attributes.listed_on_jobs_board === true)
+
+const listingToggleDisabled = computed(() => {
+  if (editListed.value) return false // switching off is always allowed
+  if (listingStatusBlocked.value && !listedAtLoad.value) return true
+  return listingFloorMissing.value.length > 0
+})
+
+const listingToggleHint = computed(() => {
+  if (listingStatusBlocked.value && !listedAtLoad.value && !editListed.value) {
+    return t('app.campaigns.listing.terminalHint')
+  }
+  if (!editListed.value && listingFloorMissing.value.length > 0) {
+    return t('app.campaigns.listing.incompleteHint', {
+      fields: listingFloorMissing.value
+        .map((f) => t(`app.campaigns.listing.floorFields.${f}`))
+        .join(', '),
+    })
+  }
+  return t('app.campaigns.listing.toggleHint')
+})
+
 const comingSoonTabs = ['payments'] as const
 
 function toDateInput(iso: string | null): string | undefined {
@@ -246,8 +290,14 @@ function seedEditForm(c: CampaignResource): void {
     starts_at: toDateInput(c.attributes.starts_at),
     ends_at: toDateInput(c.attributes.ends_at),
     requires_per_campaign_contract: c.attributes.requires_per_campaign_contract,
+    listing_duration: c.attributes.listing_duration ?? undefined,
+    listing_fee: c.attributes.listing_fee ?? undefined,
+    listing_languages: c.attributes.listing_languages ?? [],
+    listing_regions: c.attributes.listing_regions ?? [],
+    listing_examples_url: c.attributes.listing_examples_url ?? undefined,
   }
   editStatus.value = c.attributes.status
+  editListed.value = c.attributes.listed_on_jobs_board
 }
 
 async function loadCampaign(): Promise<void> {
@@ -304,7 +354,11 @@ async function onSaveSettings(): Promise<void> {
   // Brand is fixed after creation — the Settings tab never re-binds brand_id.
   const { brand_id, ...rest } = editForm.value
   void brand_id
-  const payload: UpdateCampaignPayload = { ...rest, status: editStatus.value }
+  const payload: UpdateCampaignPayload = {
+    ...rest,
+    status: editStatus.value,
+    listed_on_jobs_board: editListed.value,
+  }
 
   try {
     const res = await campaignsApi.update(agencyId, ulid.value, payload)
@@ -796,6 +850,26 @@ function formatDay(iso: string | null): string {
               item-value="value"
               data-test="campaign-settings-status"
             />
+
+            <!--
+              Jobs board (AH-054, D4) — the switch sits next to status, the
+              per-campaign-contract switch as its shape precedent. Disabled
+              (never hidden) while the listing floor is unmet or the campaign
+              is terminal, with the reason named in the hint.
+            -->
+            <v-switch
+              v-model="editListed"
+              :label="t('app.campaigns.fields.listedOnJobsBoard')"
+              :hint="listingToggleHint"
+              :error-messages="listedFieldErrors"
+              :disabled="listingToggleDisabled"
+              persistent-hint
+              color="primary"
+              density="compact"
+              class="mb-4"
+              data-test="campaign-settings-listed"
+            />
+
             <CampaignForm
               v-if="editForm"
               v-model="editForm"

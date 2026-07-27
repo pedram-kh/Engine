@@ -434,7 +434,16 @@
         "startsAt": "Data rozpoczęcia",
         "endsAt": "Data zakończenia",
         "requiresContract": "Wymagaj umowy dla każdej kampanii",
-        "status": "Status"
+        "status": "Status",
+        "listingDuration": "Czas trwania ogłoszenia",
+        "listingDurationHint": "Ile czasu ma twórca, własnymi słowami (np. 4 tygodnie).",
+        "listingFee": "Podane wynagrodzenie",
+        "listingFeeHint": "Tylko informacyjnie — wynagrodzenie ustalasz z każdym twórcą przy zaproszeniu.",
+        "listingLanguages": "Języki treści",
+        "listingRegions": "Regiony",
+        "listingExamplesUrl": "Link do przykładów",
+        "listingExamplesUrlHint": "Opcjonalny link do prac referencyjnych.",
+        "listedOnJobsBoard": "Dodaj do tablicy zleceń"
       },
       "objective": {
         "awareness": "Świadomość",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Nie udało się załadować kampanii.",
         "saveFailed": "Nie udało się zapisać kampanii."
+      },
+      "listing": {
+        "sectionTitle": "Ogłoszenie na tablicy zleceń",
+        "sectionHint": "Widoczne dla twórców, gdy ta kampania znajduje się na Twojej tablicy zleceń.",
+        "toggleHint": "Powiązani z Tobą twórcy widzą tę kampanię jako zlecenie.",
+        "incompleteHint": "Uzupełnij przed dodaniem do tablicy zleceń: {fields}.",
+        "terminalHint": "Zakończonej lub anulowanej kampanii nie można dodać do tablicy zleceń.",
+        "floorFields": {
+          "description": "opis",
+          "listing_duration": "czas trwania ogłoszenia",
+          "listing_fee": "podane wynagrodzenie",
+          "listing_languages": "języki treści",
+          "listing_regions": "regiony"
+        }
       }
     },
     "pools": {

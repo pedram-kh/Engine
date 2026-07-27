@@ -434,7 +434,16 @@
         "startsAt": "Startdato",
         "endsAt": "Slutdato",
         "requiresContract": "Kræv kontrakt per kampagne",
-        "status": "Status"
+        "status": "Status",
+        "listingDuration": "Opslagets varighed",
+        "listingDurationHint": "Hvor lang tid creatoren har, med dine egne ord (fx 4 uger).",
+        "listingFee": "Oplyst honorar",
+        "listingFeeHint": "Kun til visning — honoraret aftales med hver creator ved invitationen.",
+        "listingLanguages": "Indholdssprog",
+        "listingRegions": "Regioner",
+        "listingExamplesUrl": "Link til eksempler",
+        "listingExamplesUrlHint": "Valgfrit link til referencearbejde.",
+        "listedOnJobsBoard": "Føj til opgavetavlen"
       },
       "objective": {
         "awareness": "Kendskab",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Kampagner kunne ikke indlæses.",
         "saveFailed": "Kampagne kunne ikke gemmes."
+      },
+      "listing": {
+        "sectionTitle": "Opslag på opgavetavlen",
+        "sectionHint": "Vises for creatorer, når kampagnen er på din opgavetavle.",
+        "toggleHint": "Dine tilknyttede creatorer kan se denne kampagne som en opgave.",
+        "incompleteHint": "Udfyld disse, før du føjer til opgavetavlen: {fields}.",
+        "terminalHint": "En afsluttet eller annulleret kampagne kan ikke føjes til opgavetavlen.",
+        "floorFields": {
+          "description": "beskrivelse",
+          "listing_duration": "opslagets varighed",
+          "listing_fee": "oplyst honorar",
+          "listing_languages": "indholdssprog",
+          "listing_regions": "regioner"
+        }
       }
     },
     "pools": {

@@ -434,7 +434,16 @@
         "startsAt": "Date de début",
         "endsAt": "Date de fin",
         "requiresContract": "Exiger un contrat par campagne",
-        "status": "Statut"
+        "status": "Statut",
+        "listingDuration": "Durée de l'annonce",
+        "listingDurationHint": "Le temps dont dispose le créateur, dans vos propres mots (par ex. 4 semaines).",
+        "listingFee": "Rémunération indiquée",
+        "listingFeeHint": "Affichage seul — la rémunération est convenue avec chaque créateur au moment de l'invitation.",
+        "listingLanguages": "Langues du contenu",
+        "listingRegions": "Régions",
+        "listingExamplesUrl": "Lien vers des exemples",
+        "listingExamplesUrlHint": "Lien facultatif vers des travaux de référence.",
+        "listedOnJobsBoard": "Ajouter au tableau des missions"
       },
       "objective": {
         "awareness": "Notoriété",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Échec du chargement des campagnes.",
         "saveFailed": "Échec de l'enregistrement de la campagne."
+      },
+      "listing": {
+        "sectionTitle": "Annonce sur le tableau des missions",
+        "sectionHint": "Affichée aux créateurs lorsque cette campagne figure sur votre tableau des missions.",
+        "toggleHint": "Les créateurs qui vous sont connectés voient cette campagne comme une mission.",
+        "incompleteHint": "À compléter avant l'ajout au tableau des missions : {fields}.",
+        "terminalHint": "Une campagne terminée ou annulée ne peut pas être ajoutée au tableau des missions.",
+        "floorFields": {
+          "description": "description",
+          "listing_duration": "durée de l'annonce",
+          "listing_fee": "rémunération indiquée",
+          "listing_languages": "langues du contenu",
+          "listing_regions": "régions"
+        }
       }
     },
     "pools": {

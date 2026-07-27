@@ -434,7 +434,16 @@
         "startsAt": "Start date",
         "endsAt": "End date",
         "requiresContract": "Require a per-campaign contract",
-        "status": "Status"
+        "status": "Status",
+        "listingDuration": "Tul tal-avviż",
+        "listingDurationHint": "Kemm għandu żmien il-kreatur, bi kliemek (ngħidu aħna 4 ġimgħat).",
+        "listingFee": "Ħlas indikat",
+        "listingFeeHint": "Għall-wiri biss — il-ħlas jiġi maqbul ma' kull kreatur meta tistiednu.",
+        "listingLanguages": "Lingwi tal-kontenut",
+        "listingRegions": "Reġjuni",
+        "listingExamplesUrl": "Link għal eżempji",
+        "listingExamplesUrlHint": "Link mhux obbligatorju għal xogħol ta' referenza.",
+        "listedOnJobsBoard": "Żid mal-bord tax-xogħlijiet"
       },
       "objective": {
         "awareness": "Awareness",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign."
+      },
+      "listing": {
+        "sectionTitle": "Avviż fuq il-bord tax-xogħlijiet",
+        "sectionHint": "Jintwera lill-kreaturi meta din il-kampanja tkun fuq il-bord tax-xogħlijiet tiegħek.",
+        "toggleHint": "Il-kreaturi konnessi miegħek jaraw din il-kampanja bħala xogħol.",
+        "incompleteHint": "Imla dan qabel iżżidha mal-bord tax-xogħlijiet: {fields}.",
+        "terminalHint": "Kampanja lesta jew ikkanċellata ma tistax tiżdied mal-bord tax-xogħlijiet.",
+        "floorFields": {
+          "description": "deskrizzjoni",
+          "listing_duration": "tul tal-avviż",
+          "listing_fee": "ħlas indikat",
+          "listing_languages": "lingwi tal-kontenut",
+          "listing_regions": "reġjuni"
+        }
       }
     },
     "pools": {

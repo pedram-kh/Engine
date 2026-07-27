@@ -434,7 +434,16 @@
         "startsAt": "Start date",
         "endsAt": "End date",
         "requiresContract": "Require a per-campaign contract",
-        "status": "Статус"
+        "status": "Статус",
+        "listingDuration": "Продължителност на обявата",
+        "listingDurationHint": "Колко време има криейтърът, с ваши думи (напр. 4 седмици).",
+        "listingFee": "Посочено възнаграждение",
+        "listingFeeHint": "Само за показване — възнаграждението с всеки криейтър се договаря при поканата.",
+        "listingLanguages": "Езици на съдържанието",
+        "listingRegions": "Региони",
+        "listingExamplesUrl": "Връзка към примери",
+        "listingExamplesUrlHint": "Незадължителна връзка към референтни работи.",
+        "listedOnJobsBoard": "Добавяне към борсата за задачи"
       },
       "objective": {
         "awareness": "Awareness",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign."
+      },
+      "listing": {
+        "sectionTitle": "Обява в борсата за задачи",
+        "sectionHint": "Показва се на криейтърите, когато кампанията е в борсата ви за задачи.",
+        "toggleHint": "Свързаните с вас криейтъри виждат тази кампания като задача.",
+        "incompleteHint": "Попълнете това преди добавяне към борсата за задачи: {fields}.",
+        "terminalHint": "Завършена или отменена кампания не може да бъде добавена към борсата за задачи.",
+        "floorFields": {
+          "description": "описание",
+          "listing_duration": "продължителност на обявата",
+          "listing_fee": "посочено възнаграждение",
+          "listing_languages": "езици на съдържанието",
+          "listing_regions": "региони"
+        }
       }
     },
     "pools": {

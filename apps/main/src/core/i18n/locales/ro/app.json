@@ -434,7 +434,16 @@
         "startsAt": "Start date",
         "endsAt": "End date",
         "requiresContract": "Require a per-campaign contract",
-        "status": "Stare"
+        "status": "Stare",
+        "listingDuration": "Durata anunțului",
+        "listingDurationHint": "Cât timp are creatorul, în cuvintele tale (de ex. 4 săptămâni).",
+        "listingFee": "Remunerație afișată",
+        "listingFeeHint": "Doar informativ — remunerația se stabilește cu fiecare creator la invitație.",
+        "listingLanguages": "Limbile conținutului",
+        "listingRegions": "Regiuni",
+        "listingExamplesUrl": "Link către exemple",
+        "listingExamplesUrlHint": "Link opțional către lucrări de referință.",
+        "listedOnJobsBoard": "Adaugă în panoul de joburi"
       },
       "objective": {
         "awareness": "Awareness",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign."
+      },
+      "listing": {
+        "sectionTitle": "Anunț în panoul de joburi",
+        "sectionHint": "Se afișează creatorilor când această campanie se află în panoul tău de joburi.",
+        "toggleHint": "Creatorii conectați cu tine văd această campanie ca pe un job.",
+        "incompleteHint": "Completează acestea înainte de a adăuga în panoul de joburi: {fields}.",
+        "terminalHint": "O campanie finalizată sau anulată nu poate fi adăugată în panoul de joburi.",
+        "floorFields": {
+          "description": "descriere",
+          "listing_duration": "durata anunțului",
+          "listing_fee": "remunerație afișată",
+          "listing_languages": "limbile conținutului",
+          "listing_regions": "regiuni"
+        }
       }
     },
     "pools": {

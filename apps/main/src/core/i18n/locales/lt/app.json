@@ -434,7 +434,16 @@
         "startsAt": "Start date",
         "endsAt": "End date",
         "requiresContract": "Require a per-campaign contract",
-        "status": "Būsena"
+        "status": "Būsena",
+        "listingDuration": "Skelbimo trukmė",
+        "listingDurationHint": "Kiek laiko turi kūrėjas, jūsų žodžiais (pvz., 4 savaitės).",
+        "listingFee": "Nurodytas atlygis",
+        "listingFeeHint": "Tik informacinis — atlygis su kiekvienu kūrėju sutariamas kviečiant.",
+        "listingLanguages": "Turinio kalbos",
+        "listingRegions": "Regionai",
+        "listingExamplesUrl": "Pavyzdžių nuoroda",
+        "listingExamplesUrlHint": "Neprivaloma nuoroda į pavyzdinius darbus.",
+        "listedOnJobsBoard": "Įtraukti į darbų lentą"
       },
       "objective": {
         "awareness": "Awareness",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign."
+      },
+      "listing": {
+        "sectionTitle": "Skelbimas darbų lentoje",
+        "sectionHint": "Rodoma kūrėjams, kai ši kampanija yra jūsų darbų lentoje.",
+        "toggleHint": "Su jumis susieti kūrėjai mato šią kampaniją kaip darbo pasiūlymą.",
+        "incompleteHint": "Užpildykite prieš įtraukdami į darbų lentą: {fields}.",
+        "terminalHint": "Užbaigtos arba atšauktos kampanijos į darbų lentą įtraukti negalima.",
+        "floorFields": {
+          "description": "aprašymas",
+          "listing_duration": "skelbimo trukmė",
+          "listing_fee": "nurodytas atlygis",
+          "listing_languages": "turinio kalbos",
+          "listing_regions": "regionai"
+        }
       }
     },
     "pools": {

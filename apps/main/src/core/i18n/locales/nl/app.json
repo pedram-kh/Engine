@@ -434,7 +434,16 @@
         "startsAt": "Startdatum",
         "endsAt": "Einddatum",
         "requiresContract": "Per-campagnecontract vereisen",
-        "status": "Status"
+        "status": "Status",
+        "listingDuration": "Duur van de vermelding",
+        "listingDurationHint": "Hoeveel tijd de creator heeft, in je eigen woorden (bijv. 4 weken).",
+        "listingFee": "Vermelde vergoeding",
+        "listingFeeHint": "Alleen ter weergave — de vergoeding spreek je met elke creator af bij de uitnodiging.",
+        "listingLanguages": "Talen van de content",
+        "listingRegions": "Regio's",
+        "listingExamplesUrl": "Link naar voorbeelden",
+        "listingExamplesUrlHint": "Optionele link naar referentiewerk.",
+        "listedOnJobsBoard": "Toevoegen aan het opdrachtenbord"
       },
       "objective": {
         "awareness": "Bewustwording",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Campagnes konden niet worden geladen.",
         "saveFailed": "Campagne kon niet worden opgeslagen."
+      },
+      "listing": {
+        "sectionTitle": "Vermelding op het opdrachtenbord",
+        "sectionHint": "Zichtbaar voor creators wanneer deze campagne op je opdrachtenbord staat.",
+        "toggleHint": "Creators met wie je verbonden bent, zien deze campagne als opdracht.",
+        "incompleteHint": "Vul dit in voordat je toevoegt aan het opdrachtenbord: {fields}.",
+        "terminalHint": "Een afgeronde of geannuleerde campagne kan niet aan het opdrachtenbord worden toegevoegd.",
+        "floorFields": {
+          "description": "omschrijving",
+          "listing_duration": "duur van de vermelding",
+          "listing_fee": "vermelde vergoeding",
+          "listing_languages": "talen van de content",
+          "listing_regions": "regio's"
+        }
       }
     },
     "pools": {

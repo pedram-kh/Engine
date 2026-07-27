@@ -434,7 +434,16 @@
         "startsAt": "Start date",
         "endsAt": "End date",
         "requiresContract": "Require a per-campaign contract",
-        "status": "Állapot"
+        "status": "Állapot",
+        "listingDuration": "A hirdetés időtartama",
+        "listingDurationHint": "Mennyi ideje van az alkotónak, saját szavaival (pl. 4 hét).",
+        "listingFee": "Feltüntetett díj",
+        "listingFeeHint": "Csak megjelenítésre — a díjat minden alkotóval a meghíváskor egyezteti.",
+        "listingLanguages": "A tartalom nyelvei",
+        "listingRegions": "Régiók",
+        "listingExamplesUrl": "Példák linkje",
+        "listingExamplesUrlHint": "Opcionális link referenciamunkákhoz.",
+        "listedOnJobsBoard": "Hozzáadás a munkatáblához"
       },
       "objective": {
         "awareness": "Awareness",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign."
+      },
+      "listing": {
+        "sectionTitle": "Hirdetés a munkatáblán",
+        "sectionHint": "Az alkotók akkor látják, ha ez a kampány a munkatáblán van.",
+        "toggleHint": "A önhöz kapcsolt alkotók munkaként látják ezt a kampányt.",
+        "incompleteHint": "Töltse ki ezeket a munkatáblához adás előtt: {fields}.",
+        "terminalHint": "Befejezett vagy visszavont kampány nem adható hozzá a munkatáblához.",
+        "floorFields": {
+          "description": "leírás",
+          "listing_duration": "a hirdetés időtartama",
+          "listing_fee": "feltüntetett díj",
+          "listing_languages": "a tartalom nyelvei",
+          "listing_regions": "régiók"
+        }
       }
     },
     "pools": {

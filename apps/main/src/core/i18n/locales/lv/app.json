@@ -434,7 +434,16 @@
         "startsAt": "Start date",
         "endsAt": "End date",
         "requiresContract": "Require a per-campaign contract",
-        "status": "Statuss"
+        "status": "Statuss",
+        "listingDuration": "Sludinājuma ilgums",
+        "listingDurationHint": "Cik daudz laika ir veidotājam, jūsu vārdiem (piem., 4 nedēļas).",
+        "listingFee": "Norādītā atlīdzība",
+        "listingFeeHint": "Tikai informācijai — atlīdzību ar katru veidotāju saskaņo, nosūtot uzaicinājumu.",
+        "listingLanguages": "Satura valodas",
+        "listingRegions": "Reģioni",
+        "listingExamplesUrl": "Saite uz piemēriem",
+        "listingExamplesUrlHint": "Neobligāta saite uz atsauces darbiem.",
+        "listedOnJobsBoard": "Pievienot darbu tāfelei"
       },
       "objective": {
         "awareness": "Awareness",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign."
+      },
+      "listing": {
+        "sectionTitle": "Sludinājums darbu tāfelē",
+        "sectionHint": "Tiek rādīts veidotājiem, kad šī kampaņa ir jūsu darbu tāfelē.",
+        "toggleHint": "Ar jums saistītie veidotāji redz šo kampaņu kā darba piedāvājumu.",
+        "incompleteHint": "Aizpildiet šos laukus pirms pievienošanas darbu tāfelei: {fields}.",
+        "terminalHint": "Pabeigtu vai atceltu kampaņu nevar pievienot darbu tāfelei.",
+        "floorFields": {
+          "description": "apraksts",
+          "listing_duration": "sludinājuma ilgums",
+          "listing_fee": "norādītā atlīdzība",
+          "listing_languages": "satura valodas",
+          "listing_regions": "reģioni"
+        }
       }
     },
     "pools": {

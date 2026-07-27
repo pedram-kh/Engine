@@ -434,7 +434,16 @@
         "startsAt": "Datum začátku",
         "endsAt": "Datum konce",
         "requiresContract": "Vyžadovat smlouvu pro každou kampaň",
-        "status": "Stav"
+        "status": "Stav",
+        "listingDuration": "Délka nabídky",
+        "listingDurationHint": "Kolik času tvůrce má, vlastními slovy (např. 4 týdny).",
+        "listingFee": "Uvedená odměna",
+        "listingFeeHint": "Pouze informativní — odměnu s každým tvůrcem sjednáte při pozvání.",
+        "listingLanguages": "Jazyky obsahu",
+        "listingRegions": "Regiony",
+        "listingExamplesUrl": "Odkaz na ukázky",
+        "listingExamplesUrlHint": "Volitelný odkaz na referenční práce.",
+        "listedOnJobsBoard": "Přidat na nástěnku zakázek"
       },
       "objective": {
         "awareness": "Povědomí",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Nepodařilo se načíst kampaně.",
         "saveFailed": "Nepodařilo se uložit kampaň."
+      },
+      "listing": {
+        "sectionTitle": "Nabídka na nástěnce zakázek",
+        "sectionHint": "Zobrazí se tvůrcům, když je kampaň na vaší nástěnce zakázek.",
+        "toggleHint": "Vaši propojení tvůrci uvidí tuto kampaň jako zakázku.",
+        "incompleteHint": "Před přidáním na nástěnku zakázek doplňte: {fields}.",
+        "terminalHint": "Dokončenou nebo zrušenou kampaň nelze přidat na nástěnku zakázek.",
+        "floorFields": {
+          "description": "popis",
+          "listing_duration": "délka nabídky",
+          "listing_fee": "uvedená odměna",
+          "listing_languages": "jazyky obsahu",
+          "listing_regions": "regiony"
+        }
       }
     },
     "pools": {

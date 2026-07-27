@@ -48,6 +48,17 @@ final class CampaignResource extends JsonResource
                 'target_creator_count' => $campaign->target_creator_count,
                 'requires_per_campaign_contract' => $campaign->requires_per_campaign_contract,
                 'is_marketplace_visible' => $campaign->is_marketplace_visible,
+
+                // Jobs board (AH-054). `listed_on_jobs_board` is the agency's
+                // stored intent, NOT "currently visible" — a terminal campaign
+                // keeps the flag while being invisible (D5). Agency-side
+                // surfaces only; nothing creator-facing consumes this chunk.
+                'listed_on_jobs_board' => $campaign->listed_on_jobs_board,
+                'listing_duration' => $campaign->listing_duration,
+                'listing_fee' => $campaign->listing_fee,
+                'listing_languages' => $campaign->listing_languages,
+                'listing_regions' => $campaign->listing_regions,
+                'listing_examples_url' => $campaign->listing_examples_url,
                 'published_at' => $campaign->published_at?->toIso8601String(),
                 'completed_at' => $campaign->completed_at?->toIso8601String(),
                 'assignment_count' => $campaign->assignments_count ?? null,

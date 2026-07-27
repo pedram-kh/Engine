@@ -105,7 +105,10 @@ function makeDraftRow(
   }
 }
 
-function makeCampaign(requiresContract = false): CampaignResource {
+function makeCampaign(
+  requiresContract = false,
+  listingOverrides: Partial<CampaignResource['attributes']> = {},
+): CampaignResource {
   return {
     id: CAMPAIGN_ULID,
     type: 'campaigns',
@@ -124,11 +127,18 @@ function makeCampaign(requiresContract = false): CampaignResource {
       target_creator_count: null,
       requires_per_campaign_contract: requiresContract,
       is_marketplace_visible: false,
+      listed_on_jobs_board: false,
+      listing_duration: null,
+      listing_fee: null,
+      listing_languages: null,
+      listing_regions: null,
+      listing_examples_url: null,
       published_at: null,
       completed_at: null,
       assignment_count: 0,
       created_at: '2026-06-01T10:00:00.000000Z',
       updated_at: '2026-06-01T10:00:00.000000Z',
+      ...listingOverrides,
     },
     relationships: {
       brand: { data: { id: 'brand-ulid', type: 'brands', name: 'Acme' } },
@@ -167,13 +177,17 @@ function makeAssignment(
 async function mountDetail(
   role: 'agency_admin' | 'agency_manager' | 'agency_staff' = 'agency_admin',
   assignments: CampaignAssignmentResource[] = [],
-  opts: { perCampaignContractEnabled?: boolean; requiresContract?: boolean } = {},
+  opts: {
+    perCampaignContractEnabled?: boolean
+    requiresContract?: boolean
+    campaign?: Partial<CampaignResource['attributes']>
+  } = {},
 ): Promise<{ wrapper: ReturnType<typeof mount>; cleanup: () => void }> {
   const pinia = createPinia()
   setActivePinia(pinia)
 
   vi.mocked(campaignsApi.show).mockResolvedValue({
-    data: makeCampaign(opts.requiresContract ?? false),
+    data: makeCampaign(opts.requiresContract ?? false, opts.campaign ?? {}),
   })
   vi.mocked(campaignsApi.assignments).mockResolvedValue({
     data: assignments,
@@ -630,5 +644,117 @@ describe('CampaignDetailPage — Drafts tab review (drafts tab chunk)', () => {
     await flushPromises()
 
     expect(campaignsApi.listDrafts).toHaveBeenCalledTimes(2)
+  })
+})
+
+/**
+ * Jobs board (AH-054) — the Settings toggle and its two mirrors. The API is
+ * the authority (D3/D5 are enforced there); these pins are about the user
+ * never meeting a 422 as their first notice.
+ */
+describe('CampaignDetailPage — jobs board toggle (AH-054)', () => {
+  let cleanup: (() => void) | null = null
+
+  const JOB_READY = {
+    description: 'Two Reels a month.',
+    listing_duration: '4 weeks',
+    listing_fee: '€300 per video',
+    listing_languages: ['en'],
+    listing_regions: ['IE'],
+  } satisfies Partial<CampaignResource['attributes']>
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 25, last_page: 1 },
+    })
+  })
+
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+  })
+
+  async function openSettings(
+    campaign: Partial<CampaignResource['attributes']> = {},
+  ): Promise<ReturnType<typeof mount>> {
+    const harness = await mountDetail('agency_admin', [], { campaign })
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'settings'
+    await flushPromises()
+    return harness.wrapper
+  }
+
+  function toggleInput(wrapper: ReturnType<typeof mount>): HTMLInputElement {
+    return wrapper.find('[data-test="campaign-settings-listed"] input').element as HTMLInputElement
+  }
+
+  it('disables the toggle and names the missing fields while the listing floor is unmet (D3 mirror)', async () => {
+    const wrapper = await openSettings({ description: null })
+
+    expect(toggleInput(wrapper).disabled).toBe(true)
+    const hint = wrapper.find('[data-test="campaign-settings-listed"]').text()
+    expect(hint).toContain('description')
+    expect(hint).toContain('listing duration')
+    expect(hint).toContain('regions')
+  })
+
+  it('enables the toggle once every floor field is present', async () => {
+    const wrapper = await openSettings(JOB_READY)
+
+    expect(toggleInput(wrapper).disabled).toBe(false)
+  })
+
+  it('disables the toggle for a completed campaign that is not already listed (D5 mirror)', async () => {
+    const wrapper = await openSettings({ ...JOB_READY, status: 'completed' })
+
+    expect(toggleInput(wrapper).disabled).toBe(true)
+    expect(wrapper.find('[data-test="campaign-settings-listed"]').text()).toContain(
+      'completed or cancelled',
+    )
+  })
+
+  it('keeps the toggle usable on an already-listed campaign that has ended — switching OFF never gates (A1)', async () => {
+    const wrapper = await openSettings({
+      ...JOB_READY,
+      status: 'completed',
+      listed_on_jobs_board: true,
+    })
+
+    expect(toggleInput(wrapper).disabled).toBe(false)
+    expect(toggleInput(wrapper).checked).toBe(true)
+  })
+
+  it('sends listed_on_jobs_board with the Settings save', async () => {
+    const wrapper = await openSettings(JOB_READY)
+    vi.mocked(campaignsApi.update).mockResolvedValue({
+      data: makeCampaign(false, { ...JOB_READY, listed_on_jobs_board: true }),
+    })
+
+    await wrapper.find('[data-test="campaign-settings-listed"] input').setValue(true)
+    await wrapper.find('[data-test="campaign-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(campaignsApi.update).toHaveBeenCalledWith(
+      'agency-ulid',
+      CAMPAIGN_ULID,
+      expect.objectContaining({ listed_on_jobs_board: true }),
+    )
+  })
+
+  it('seeds the listing fields into the edit form so an omitted field is never blanked', async () => {
+    const wrapper = await openSettings({
+      ...JOB_READY,
+      listing_examples_url: 'https://example.com/refs',
+    })
+
+    const duration = wrapper.find('[data-test="campaign-listing-duration"] input')
+      .element as HTMLInputElement
+    const examples = wrapper.find('[data-test="campaign-listing-examples-url"] input')
+      .element as HTMLInputElement
+
+    expect(duration.value).toBe('4 weeks')
+    expect(examples.value).toBe('https://example.com/refs')
   })
 })

@@ -434,7 +434,16 @@
         "startsAt": "Start date",
         "endsAt": "End date",
         "requiresContract": "Require a per-campaign contract",
-        "status": "Olek"
+        "status": "Olek",
+        "listingDuration": "Kuulutuse kestus",
+        "listingDurationHint": "Kui palju aega loojal on, sinu enda sõnadega (nt 4 nädalat).",
+        "listingFee": "Näidatud tasu",
+        "listingFeeHint": "Ainult kuvamiseks — tasu lepitakse iga loojaga kokku kutse saatmisel.",
+        "listingLanguages": "Sisu keeled",
+        "listingRegions": "Piirkonnad",
+        "listingExamplesUrl": "Näidete link",
+        "listingExamplesUrlHint": "Valikuline link näidistöödele.",
+        "listedOnJobsBoard": "Lisa tööde tahvlile"
       },
       "objective": {
         "awareness": "Awareness",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign."
+      },
+      "listing": {
+        "sectionTitle": "Kuulutus tööde tahvlil",
+        "sectionHint": "Kuvatakse loojatele, kui see kampaania on sinu tööde tahvlil.",
+        "toggleHint": "Sinuga seotud loojad näevad seda kampaaniat tööpakkumisena.",
+        "incompleteHint": "Täida enne tööde tahvlile lisamist: {fields}.",
+        "terminalHint": "Lõpetatud või tühistatud kampaaniat ei saa tööde tahvlile lisada.",
+        "floorFields": {
+          "description": "kirjeldus",
+          "listing_duration": "kuulutuse kestus",
+          "listing_fee": "näidatud tasu",
+          "listing_languages": "sisu keeled",
+          "listing_regions": "piirkonnad"
+        }
       }
     },
     "pools": {

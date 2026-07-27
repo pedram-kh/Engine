@@ -434,7 +434,16 @@
         "startsAt": "Data de início",
         "endsAt": "Data de término",
         "requiresContract": "Exigir contrato por campanha",
-        "status": "Status"
+        "status": "Status",
+        "listingDuration": "Duração do anúncio",
+        "listingDurationHint": "Quanto tempo o criador tem, nas suas palavras (por ex., 4 semanas).",
+        "listingFee": "Remuneração indicada",
+        "listingFeeHint": "Apenas informativo — a remuneração é acordada com cada criador no momento do convite.",
+        "listingLanguages": "Idiomas do conteúdo",
+        "listingRegions": "Regiões",
+        "listingExamplesUrl": "Ligação para exemplos",
+        "listingExamplesUrlHint": "Ligação opcional para trabalhos de referência.",
+        "listedOnJobsBoard": "Adicionar ao quadro de trabalhos"
       },
       "objective": {
         "awareness": "Reconhecimento",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Falha ao carregar campanhas.",
         "saveFailed": "Falha ao salvar campanha."
+      },
+      "listing": {
+        "sectionTitle": "Anúncio no quadro de trabalhos",
+        "sectionHint": "Visível para os criadores quando esta campanha está no seu quadro de trabalhos.",
+        "toggleHint": "Os criadores ligados a si veem esta campanha como um trabalho.",
+        "incompleteHint": "Preencha estes campos antes de adicionar ao quadro de trabalhos: {fields}.",
+        "terminalHint": "Uma campanha concluída ou cancelada não pode ser adicionada ao quadro de trabalhos.",
+        "floorFields": {
+          "description": "descrição",
+          "listing_duration": "duração do anúncio",
+          "listing_fee": "remuneração indicada",
+          "listing_languages": "idiomas do conteúdo",
+          "listing_regions": "regiões"
+        }
       }
     },
     "pools": {

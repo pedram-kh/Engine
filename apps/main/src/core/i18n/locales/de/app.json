@@ -434,7 +434,16 @@
         "startsAt": "Startdatum",
         "endsAt": "Enddatum",
         "requiresContract": "Pro-Kampagnen-Vertrag erforderlich",
-        "status": "Status"
+        "status": "Status",
+        "listingDuration": "Dauer der Ausschreibung",
+        "listingDurationHint": "Wie viel Zeit der Creator hat, in Ihren eigenen Worten (z. B. 4 Wochen).",
+        "listingFee": "Angegebenes Honorar",
+        "listingFeeHint": "Nur zur Anzeige — das Honorar vereinbaren Sie mit jedem Creator bei der Einladung.",
+        "listingLanguages": "Content-Sprachen",
+        "listingRegions": "Regionen",
+        "listingExamplesUrl": "Link zu Beispielen",
+        "listingExamplesUrlHint": "Optionaler Link zu Referenzarbeiten.",
+        "listedOnJobsBoard": "Zum Jobboard hinzufügen"
       },
       "objective": {
         "awareness": "Bekanntheit",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Kampagnen konnten nicht geladen werden.",
         "saveFailed": "Kampagne konnte nicht gespeichert werden."
+      },
+      "listing": {
+        "sectionTitle": "Jobboard-Eintrag",
+        "sectionHint": "Wird Creators angezeigt, wenn diese Kampagne auf Ihrem Jobboard steht.",
+        "toggleHint": "Ihre verbundenen Creator sehen diese Kampagne als Job.",
+        "incompleteHint": "Vor dem Hinzufügen zum Jobboard ausfüllen: {fields}.",
+        "terminalHint": "Eine abgeschlossene oder abgebrochene Kampagne kann nicht zum Jobboard hinzugefügt werden.",
+        "floorFields": {
+          "description": "Beschreibung",
+          "listing_duration": "Dauer der Ausschreibung",
+          "listing_fee": "angegebenes Honorar",
+          "listing_languages": "Content-Sprachen",
+          "listing_regions": "Regionen"
+        }
       }
     },
     "pools": {

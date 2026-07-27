@@ -434,7 +434,16 @@
         "startsAt": "Datum začátku",
         "endsAt": "Datum konce",
         "requiresContract": "Vyžadovat smlouvu pro každou kampanja",
-        "status": "Stanje"
+        "status": "Stanje",
+        "listingDuration": "Trajanje objave",
+        "listingDurationHint": "Koliko časa ima ustvarjalec, z vašimi besedami (npr. 4 tedne).",
+        "listingFee": "Navedeno plačilo",
+        "listingFeeHint": "Samo za prikaz — plačilo se z vsakim ustvarjalcem dogovori ob povabilu.",
+        "listingLanguages": "Jeziki vsebine",
+        "listingRegions": "Regije",
+        "listingExamplesUrl": "Povezava do primerov",
+        "listingExamplesUrlHint": "Neobvezna povezava do referenčnih del.",
+        "listedOnJobsBoard": "Dodaj na oglasno desko del"
       },
       "objective": {
         "awareness": "Ozaveščenost",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Ni uspelo naložiti kampanje.",
         "saveFailed": "Ni uspelo shraniti kampanja."
+      },
+      "listing": {
+        "sectionTitle": "Objava na oglasni deski del",
+        "sectionHint": "Prikaže se ustvarjalcem, ko je ta kampanja na vaši oglasni deski del.",
+        "toggleHint": "Ustvarjalci, povezani z vami, to kampanjo vidijo kot delo.",
+        "incompleteHint": "Dopolnite to pred dodajanjem na oglasno desko del: {fields}.",
+        "terminalHint": "Končane ali preklicane kampanje ni mogoče dodati na oglasno desko del.",
+        "floorFields": {
+          "description": "opis",
+          "listing_duration": "trajanje objave",
+          "listing_fee": "navedeno plačilo",
+          "listing_languages": "jeziki vsebine",
+          "listing_regions": "regije"
+        }
       }
     },
     "pools": {

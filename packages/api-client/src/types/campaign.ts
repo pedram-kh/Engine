@@ -78,6 +78,22 @@ export interface CampaignAttributes {
   target_creator_count: number | null
   requires_per_campaign_contract: boolean
   is_marketplace_visible: boolean
+  /**
+   * Jobs board (AH-054). The agency's stored INTENT, not "currently visible":
+   * a completed/cancelled campaign keeps this flag while showing nowhere (D5,
+   * enforced server-side by `Campaign::scopeListedOnJobsBoard`). Distinct from
+   * `is_marketplace_visible`, which is reserved for the P3 public marketplace.
+   */
+  listed_on_jobs_board: boolean
+  /** Free text, e.g. "4 weeks". Agency-authored, untranslated. */
+  listing_duration: string | null
+  /** Display-only fee copy, e.g. "€300 per video" — the binding offer is per-assignment. */
+  listing_fee: string | null
+  /** EU language codes (the campaign's production languages). */
+  listing_languages: string[] | null
+  /** ISO-3166-1 alpha-2, uppercase. */
+  listing_regions: string[] | null
+  listing_examples_url: string | null
   published_at: string | null
   completed_at: string | null
   /** withCount('assignments') — number of creators engaged; null in some lists. */
@@ -157,11 +173,31 @@ export interface CreateCampaignPayload {
   target_creator_count?: number | null
   requires_per_campaign_contract?: boolean
   brief?: CampaignBrief | null
+
+  /**
+   * Jobs-board listing copy (AH-054, D2). Optional everywhere — the toggle,
+   * not the fields, is what demands completeness. `listed_on_jobs_board` is
+   * deliberately absent from the create payload: the API refuses to list on
+   * create (D4), so offering it here would be a lie.
+   */
+  listing_duration?: string | null
+  listing_fee?: string | null
+  listing_languages?: string[] | null
+  listing_regions?: string[] | null
+  listing_examples_url?: string | null
 }
 
-/** PATCH — the Settings edit. Partial; `brand_id` is NOT editable. */
+/**
+ * PATCH — the Settings edit. Partial; `brand_id` is NOT editable.
+ *
+ * `listed_on_jobs_board` lives only here (D4 — listing is an edit-time act).
+ * Sending `true` requires the D3 floor (description + duration + fee + at
+ * least one language and region) to hold on the MERGED state, or the API
+ * answers 422 naming each missing field.
+ */
 export type UpdateCampaignPayload = Partial<Omit<CreateCampaignPayload, 'brand_id'>> & {
   status?: CampaignStatus
+  listed_on_jobs_board?: boolean
 }
 
 // ---------------------------------------------------------------------------

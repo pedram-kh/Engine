@@ -434,7 +434,16 @@
         "startsAt": "Start date",
         "endsAt": "End date",
         "requiresContract": "Require a per-campaign contract",
-        "status": "Status"
+        "status": "Status",
+        "listingDuration": "Listing duration",
+        "listingDurationHint": "How long the creator has, in your own words (e.g. 4 weeks).",
+        "listingFee": "Listed fee",
+        "listingFeeHint": "Display only — the fee you agree with each creator is set when you invite them.",
+        "listingLanguages": "Content languages",
+        "listingRegions": "Regions",
+        "listingExamplesUrl": "Examples link",
+        "listingExamplesUrlHint": "Optional link to reference work.",
+        "listedOnJobsBoard": "Add to jobs board"
       },
       "objective": {
         "awareness": "Awareness",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign."
+      },
+      "listing": {
+        "sectionTitle": "Jobs board listing",
+        "sectionHint": "Shown to creators when this campaign is on your jobs board.",
+        "toggleHint": "Your connected creators can see this campaign as a job.",
+        "incompleteHint": "Complete these before adding to the jobs board: {fields}.",
+        "terminalHint": "A completed or cancelled campaign cannot be added to the jobs board.",
+        "floorFields": {
+          "description": "description",
+          "listing_duration": "listing duration",
+          "listing_fee": "listed fee",
+          "listing_languages": "content languages",
+          "listing_regions": "regions"
+        }
       }
     },
     "pools": {

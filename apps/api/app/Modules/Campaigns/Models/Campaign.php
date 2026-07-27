@@ -13,6 +13,7 @@ use App\Modules\Campaigns\Database\Factories\CampaignFactory;
 use App\Modules\Campaigns\Enums\CampaignObjective;
 use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Identity\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -52,6 +53,12 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $marketplace_open_at
  * @property Carbon|null $marketplace_close_at
  * @property bool $requires_per_campaign_contract
+ * @property bool $listed_on_jobs_board
+ * @property string|null $listing_duration
+ * @property string|null $listing_fee
+ * @property list<string>|null $listing_languages
+ * @property list<string>|null $listing_regions
+ * @property string|null $listing_examples_url
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -66,10 +73,21 @@ final class Campaign extends Model
     use HasUlid;
     use SoftDeletes;
 
+    /**
+     * The campaign statuses in which a listing may be VISIBLE (D5). A terminal
+     * campaign keeps its `listed_on_jobs_board` value — the flag records the
+     * agency's intent and is never auto-cleared by a status change — so the
+     * status filter lives here, at read time, next to the flag it qualifies.
+     *
+     * @var list<string>
+     */
+    public const array LISTABLE_STATUSES = ['draft', 'active', 'paused'];
+
     protected $attributes = [
         'status' => 'draft',
         'is_marketplace_visible' => false,
         'requires_per_campaign_contract' => false,
+        'listed_on_jobs_board' => false,
     ];
 
     /**
@@ -97,6 +115,12 @@ final class Campaign extends Model
         'marketplace_open_at',
         'marketplace_close_at',
         'requires_per_campaign_contract',
+        'listed_on_jobs_board',
+        'listing_duration',
+        'listing_fee',
+        'listing_languages',
+        'listing_regions',
+        'listing_examples_url',
     ];
 
     /**
@@ -148,6 +172,33 @@ final class Campaign extends Model
     }
 
     /**
+     * The jobs-board visibility predicate (AH-054, D1/D5) — the SINGLE source
+     * of truth for "is this campaign showing on the jobs board right now?".
+     *
+     * Two legs, because the flag alone is not the answer: the agency's stored
+     * intent (`listed_on_jobs_board`) AND a non-terminal status. D5 rules that
+     * a status change never rewrites the flag — an auto-clear would be a hidden
+     * write to user intent, and a campaign that is reopened should light up
+     * again — so a `completed` / `cancelled` campaign can legitimately sit at
+     * `listed_on_jobs_board = true` while being invisible. That inertness is
+     * enforced HERE, at read time, exactly like the `ends_at` auto-delist the
+     * arc adds in chunk 3 (one mechanism for both, so the two cannot drift).
+     *
+     * NO consumer in this chunk — the feature ships dark (D10). The scope
+     * exists now so chunk 3's creator-facing surface binds to a tested
+     * contract instead of re-deriving the predicate and forgetting a leg.
+     *
+     * @param  Builder<Campaign>  $query
+     * @return Builder<Campaign>
+     */
+    public function scopeListedOnJobsBoard(Builder $query): Builder
+    {
+        return $query
+            ->where('listed_on_jobs_board', true)
+            ->whereIn('status', self::LISTABLE_STATUSES);
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
@@ -168,6 +219,9 @@ final class Campaign extends Model
             'marketplace_open_at' => 'datetime',
             'marketplace_close_at' => 'datetime',
             'requires_per_campaign_contract' => 'boolean',
+            'listed_on_jobs_board' => 'boolean',
+            'listing_languages' => 'array',
+            'listing_regions' => 'array',
         ];
     }
 

@@ -434,7 +434,16 @@
         "startsAt": "Startdatum",
         "endsAt": "Slutdatum",
         "requiresContract": "Kräv ett kampanjspecifikt kontrakt",
-        "status": "Status"
+        "status": "Status",
+        "listingDuration": "Annonsens längd",
+        "listingDurationHint": "Hur lång tid creatorn har, med dina egna ord (t.ex. 4 veckor).",
+        "listingFee": "Angiven ersättning",
+        "listingFeeHint": "Endast visning — ersättningen kommer du överens om med varje creator vid inbjudan.",
+        "listingLanguages": "Innehållets språk",
+        "listingRegions": "Regioner",
+        "listingExamplesUrl": "Länk till exempel",
+        "listingExamplesUrlHint": "Valfri länk till referensarbeten.",
+        "listedOnJobsBoard": "Lägg till på uppdragstavlan"
       },
       "objective": {
         "awareness": "Medvetenhet",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Kunde inte ladda kampanjer.",
         "saveFailed": "Kunde inte spara kampanj."
+      },
+      "listing": {
+        "sectionTitle": "Annons på uppdragstavlan",
+        "sectionHint": "Visas för creators när den här kampanjen finns på din uppdragstavla.",
+        "toggleHint": "Creators som är kopplade till dig ser den här kampanjen som ett uppdrag.",
+        "incompleteHint": "Fyll i det här innan du lägger till på uppdragstavlan: {fields}.",
+        "terminalHint": "En avslutad eller annullerad kampanj kan inte läggas till på uppdragstavlan.",
+        "floorFields": {
+          "description": "beskrivning",
+          "listing_duration": "annonsens längd",
+          "listing_fee": "angiven ersättning",
+          "listing_languages": "innehållets språk",
+          "listing_regions": "regioner"
+        }
       }
     },
     "pools": {

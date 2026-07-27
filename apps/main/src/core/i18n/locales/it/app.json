@@ -434,7 +434,16 @@
         "startsAt": "Data di inizio",
         "endsAt": "Data di fine",
         "requiresContract": "Richiedi un contratto per campagna",
-        "status": "Stato"
+        "status": "Stato",
+        "listingDuration": "Durata dell'annuncio",
+        "listingDurationHint": "Quanto tempo ha il creator, con parole tue (ad es. 4 settimane).",
+        "listingFee": "Compenso indicato",
+        "listingFeeHint": "Solo indicativo: il compenso viene concordato con ogni creator al momento dell'invito.",
+        "listingLanguages": "Lingue del contenuto",
+        "listingRegions": "Regioni",
+        "listingExamplesUrl": "Link agli esempi",
+        "listingExamplesUrlHint": "Link facoltativo a lavori di riferimento.",
+        "listedOnJobsBoard": "Aggiungi alla bacheca lavori"
       },
       "objective": {
         "awareness": "Notorietà",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Caricamento campagne fallito.",
         "saveFailed": "Salvataggio campagna fallito."
+      },
+      "listing": {
+        "sectionTitle": "Annuncio nella bacheca lavori",
+        "sectionHint": "Mostrato ai creator quando questa campagna è nella tua bacheca lavori.",
+        "toggleHint": "I creator collegati a te vedono questa campagna come un lavoro.",
+        "incompleteHint": "Completa questi campi prima di aggiungerla alla bacheca lavori: {fields}.",
+        "terminalHint": "Una campagna completata o annullata non può essere aggiunta alla bacheca lavori.",
+        "floorFields": {
+          "description": "descrizione",
+          "listing_duration": "durata dell'annuncio",
+          "listing_fee": "compenso indicato",
+          "listing_languages": "lingue del contenuto",
+          "listing_regions": "regioni"
+        }
       }
     },
     "pools": {

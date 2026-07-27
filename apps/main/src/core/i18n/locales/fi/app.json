@@ -434,7 +434,16 @@
         "startsAt": "Start date",
         "endsAt": "End date",
         "requiresContract": "Require a per-campaign contract",
-        "status": "Tila"
+        "status": "Tila",
+        "listingDuration": "Ilmoituksen kesto",
+        "listingDurationHint": "Kuinka paljon aikaa tekijällä on, omin sanoin (esim. 4 viikkoa).",
+        "listingFee": "Ilmoitettu palkkio",
+        "listingFeeHint": "Vain näyttöä varten — palkkio sovitaan kunkin tekijän kanssa kutsun yhteydessä.",
+        "listingLanguages": "Sisällön kielet",
+        "listingRegions": "Alueet",
+        "listingExamplesUrl": "Linkki esimerkkeihin",
+        "listingExamplesUrlHint": "Valinnainen linkki referenssitöihin.",
+        "listedOnJobsBoard": "Lisää työtauluun"
       },
       "objective": {
         "awareness": "Awareness",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign."
+      },
+      "listing": {
+        "sectionTitle": "Ilmoitus työtaulussa",
+        "sectionHint": "Näytetään tekijöille, kun tämä kampanja on työtaulussasi.",
+        "toggleHint": "Sinuun yhdistetyt tekijät näkevät tämän kampanjan työtehtävänä.",
+        "incompleteHint": "Täydennä nämä ennen työtauluun lisäämistä: {fields}.",
+        "terminalHint": "Valmista tai peruttua kampanjaa ei voi lisätä työtauluun.",
+        "floorFields": {
+          "description": "kuvaus",
+          "listing_duration": "ilmoituksen kesto",
+          "listing_fee": "ilmoitettu palkkio",
+          "listing_languages": "sisällön kielet",
+          "listing_regions": "alueet"
+        }
       }
     },
     "pools": {

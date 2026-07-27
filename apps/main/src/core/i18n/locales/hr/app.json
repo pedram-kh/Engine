@@ -434,7 +434,16 @@
         "startsAt": "Datum začátku",
         "endsAt": "Datum konce",
         "requiresContract": "Vyžadovat smlouvu pro každou kampanja",
-        "status": "Stanje"
+        "status": "Stanje",
+        "listingDuration": "Trajanje oglasa",
+        "listingDurationHint": "Koliko vremena kreator ima, vašim riječima (npr. 4 tjedna).",
+        "listingFee": "Navedena naknada",
+        "listingFeeHint": "Samo za prikaz — naknadu dogovarate sa svakim kreatorom pri pozivu.",
+        "listingLanguages": "Jezici sadržaja",
+        "listingRegions": "Regije",
+        "listingExamplesUrl": "Poveznica na primjere",
+        "listingExamplesUrlHint": "Neobavezna poveznica na referentne radove.",
+        "listedOnJobsBoard": "Dodaj na ploču poslova"
       },
       "objective": {
         "awareness": "Ozaveščenost",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Ni uspelo učitajti kampanje.",
         "saveFailed": "Ni uspelo spremiti kampanja."
+      },
+      "listing": {
+        "sectionTitle": "Oglas na ploči poslova",
+        "sectionHint": "Prikazuje se kreatorima kada je ova kampanja na vašoj ploči poslova.",
+        "toggleHint": "Kreatori povezani s vama vide ovu kampanju kao posao.",
+        "incompleteHint": "Dovršite ovo prije dodavanja na ploču poslova: {fields}.",
+        "terminalHint": "Dovršena ili otkazana kampanja ne može se dodati na ploču poslova.",
+        "floorFields": {
+          "description": "opis",
+          "listing_duration": "trajanje oglasa",
+          "listing_fee": "navedena naknada",
+          "listing_languages": "jezici sadržaja",
+          "listing_regions": "regije"
+        }
       }
     },
     "pools": {

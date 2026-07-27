@@ -434,7 +434,16 @@
         "startsAt": "Fecha de inicio",
         "endsAt": "Fecha de fin",
         "requiresContract": "Exigir un contrato por campaña",
-        "status": "Estado"
+        "status": "Estado",
+        "listingDuration": "Duración del anuncio",
+        "listingDurationHint": "Cuánto tiempo tiene el creador, en tus propias palabras (p. ej. 4 semanas).",
+        "listingFee": "Tarifa indicada",
+        "listingFeeHint": "Solo informativa: la tarifa se acuerda con cada creador al invitarlo.",
+        "listingLanguages": "Idiomas del contenido",
+        "listingRegions": "Regiones",
+        "listingExamplesUrl": "Enlace a ejemplos",
+        "listingExamplesUrlHint": "Enlace opcional a trabajos de referencia.",
+        "listedOnJobsBoard": "Añadir al tablón de trabajos"
       },
       "objective": {
         "awareness": "Notoriedad",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "No se han podido cargar las campañas.",
         "saveFailed": "No se ha podido guardar la campaña."
+      },
+      "listing": {
+        "sectionTitle": "Anuncio en el tablón de trabajos",
+        "sectionHint": "Se muestra a los creadores cuando esta campaña está en tu tablón de trabajos.",
+        "toggleHint": "Los creadores conectados contigo verán esta campaña como un trabajo.",
+        "incompleteHint": "Completa esto antes de añadirla al tablón de trabajos: {fields}.",
+        "terminalHint": "Una campaña completada o cancelada no puede añadirse al tablón de trabajos.",
+        "floorFields": {
+          "description": "descripción",
+          "listing_duration": "duración del anuncio",
+          "listing_fee": "tarifa indicada",
+          "listing_languages": "idiomas del contenido",
+          "listing_regions": "regiones"
+        }
       }
     },
     "pools": {

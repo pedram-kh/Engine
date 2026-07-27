@@ -6,6 +6,7 @@ namespace App\Modules\Campaigns\Http\Requests;
 
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Campaigns\Enums\CampaignObjective;
+use App\Modules\Campaigns\Http\Requests\Concerns\ValidatesJobsBoardListing;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -23,9 +24,17 @@ use Illuminate\Validation\Rules\Enum;
  * (campaign-form simplification, D-1) — {@see prepareForValidation()}. The
  * contract only RELAXES: an explicit valid objective in the payload still
  * validates against the enum and is honored.
+ *
+ * Jobs-board listing (AH-054): the listing FIELDS are accepted here so a
+ * campaign can be drafted job-ready in one pass, but `listed_on_jobs_board` is
+ * deliberately NOT accepted on create (D4) — listing is an edit-time act on
+ * the Settings tab. A freshly-created campaign is always unlisted; the column
+ * default carries it, so there is nothing to forge.
  */
 final class CreateCampaignRequest extends FormRequest
 {
+    use ValidatesJobsBoardListing;
+
     /**
      * @return array<string, mixed>
      */
@@ -35,6 +44,8 @@ final class CreateCampaignRequest extends FormRequest
         $agencyId = $agency instanceof Agency ? $agency->id : null;
 
         return [
+            ...$this->listingFieldRules(),
+
             'brand_id' => [
                 'required',
                 'string',
@@ -79,5 +90,7 @@ final class CreateCampaignRequest extends FormRequest
         if (! $this->has('objective') || $this->input('objective') === null || $this->input('objective') === '') {
             $this->merge(['objective' => CampaignObjective::Ugc->value]);
         }
+
+        $this->normalizeListingRegions();
     }
 }

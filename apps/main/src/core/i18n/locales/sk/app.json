@@ -434,7 +434,16 @@
         "startsAt": "Dátum začátku",
         "endsAt": "Dátum konce",
         "requiresContract": "Vyžadovat zmlúvu pro každou kampaň",
-        "status": "Stav"
+        "status": "Stav",
+        "listingDuration": "Trvanie inzerátu",
+        "listingDurationHint": "Koľko času má tvorca, vlastnými slovami (napr. 4 týždne).",
+        "listingFee": "Uvedená odmena",
+        "listingFeeHint": "Len informatívne — odmenu dohodnete s každým tvorcom pri pozvaní.",
+        "listingLanguages": "Jazyky obsahu",
+        "listingRegions": "Regióny",
+        "listingExamplesUrl": "Odkaz na ukážky",
+        "listingExamplesUrlHint": "Nepovinný odkaz na referenčné práce.",
+        "listedOnJobsBoard": "Pridať na nástenku zákaziek"
       },
       "objective": {
         "awareness": "Povědomí",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Nepodařilo sa načíst kampaně.",
         "saveFailed": "Nepodařilo sa uložiť kampaň."
+      },
+      "listing": {
+        "sectionTitle": "Inzerát na nástenke zákaziek",
+        "sectionHint": "Zobrazuje sa tvorcom, keď je táto kampaň na vašej nástenke zákaziek.",
+        "toggleHint": "Tvorcovia prepojení s vami vidia túto kampaň ako zákazku.",
+        "incompleteHint": "Doplňte pred pridaním na nástenku zákaziek: {fields}.",
+        "terminalHint": "Dokončenú alebo zrušenú kampaň nemožno pridať na nástenku zákaziek.",
+        "floorFields": {
+          "description": "popis",
+          "listing_duration": "trvanie inzerátu",
+          "listing_fee": "uvedená odmena",
+          "listing_languages": "jazyky obsahu",
+          "listing_regions": "regióny"
+        }
       }
     },
     "pools": {

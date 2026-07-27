@@ -15,11 +15,18 @@
  * preserved by omission (backend `sometimes` rules). Free-text deliverables
  * and usage terms now live in `description`.
  *
+ * Jobs board (AH-054, D4): the listing FIELDS live here, on both the create
+ * and Settings surfaces, and are optional everywhere. The toggle itself is
+ * Settings-only and lives on the detail page — a just-created campaign cannot
+ * satisfy the listing floor anyway, so offering the switch on create would
+ * only ever produce a 422.
+ *
  * Per-field 422 errors arrive via `fieldErrors` (the canonical
  * extractFieldErrors pattern); the parent owns the network layer.
  */
 
 import type { CreateCampaignPayload } from '@catalyst/api-client'
+import { COUNTRY_OPTIONS, euLanguageOptions } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -105,6 +112,18 @@ const budgetErrors = computed(() => [
   ...fieldErrorList('budget_minor_units'),
   ...fieldErrorList('budget_currency'),
 ])
+
+const listingDurationErrors = computed(() => fieldErrorList('listing_duration'))
+const listingFeeErrors = computed(() => fieldErrorList('listing_fee'))
+const listingLanguagesErrors = computed(() => fieldErrorList('listing_languages'))
+const listingRegionsErrors = computed(() => fieldErrorList('listing_regions'))
+const listingExamplesUrlErrors = computed(() => fieldErrorList('listing_examples_url'))
+
+// A campaign's production languages follow the operating markets, so the
+// listing picker uses the 24-EU set (not the creator-side world set); regions
+// use the shared ISO registry with launch markets pinned first.
+const listingLanguageItems = euLanguageOptions().map((o) => ({ title: o.label, value: o.value }))
+const listingRegionItems = COUNTRY_OPTIONS.map((c) => ({ title: c.label, value: c.code }))
 
 const currencyOptions = [
   { title: 'EUR — Euro', value: 'EUR' },
@@ -193,6 +212,84 @@ const brandSelectItems = computed(() => props.brands.map((b) => ({ title: b.name
         @update:model-value="update('ends_at', $event || undefined)"
       />
     </div>
+
+    <!--
+      Jobs-board listing details (AH-054, D2). Optional here; the Settings
+      toggle is what requires them (D3). Duration and fee are free text on
+      purpose — agencies phrase both in their own terms.
+    -->
+    <div class="text-subtitle-2 mt-4 mb-1">{{ t('app.campaigns.listing.sectionTitle') }}</div>
+    <div class="text-caption text-medium-emphasis mb-3">
+      {{ t('app.campaigns.listing.sectionHint') }}
+    </div>
+
+    <div class="d-flex ga-3">
+      <v-text-field
+        :model-value="local.listing_duration ?? ''"
+        :label="t('app.campaigns.fields.listingDuration')"
+        :hint="t('app.campaigns.fields.listingDurationHint')"
+        :error-messages="listingDurationErrors as string[]"
+        persistent-hint
+        maxlength="120"
+        autocomplete="off"
+        data-test="campaign-listing-duration"
+        @update:model-value="update('listing_duration', $event || undefined)"
+      />
+      <v-text-field
+        :model-value="local.listing_fee ?? ''"
+        :label="t('app.campaigns.fields.listingFee')"
+        :hint="t('app.campaigns.fields.listingFeeHint')"
+        :error-messages="listingFeeErrors as string[]"
+        persistent-hint
+        maxlength="120"
+        autocomplete="off"
+        data-test="campaign-listing-fee"
+        @update:model-value="update('listing_fee', $event || undefined)"
+      />
+    </div>
+
+    <v-select
+      :model-value="local.listing_languages ?? []"
+      :label="t('app.campaigns.fields.listingLanguages')"
+      :error-messages="listingLanguagesErrors as string[]"
+      :items="listingLanguageItems"
+      item-title="title"
+      item-value="value"
+      multiple
+      chips
+      closable-chips
+      class="mt-3"
+      data-test="campaign-listing-languages"
+      @update:model-value="update('listing_languages', $event)"
+    />
+
+    <v-select
+      :model-value="local.listing_regions ?? []"
+      :label="t('app.campaigns.fields.listingRegions')"
+      :error-messages="listingRegionsErrors as string[]"
+      :items="listingRegionItems"
+      item-title="title"
+      item-value="value"
+      multiple
+      chips
+      closable-chips
+      data-test="campaign-listing-regions"
+      @update:model-value="update('listing_regions', $event)"
+    />
+
+    <v-text-field
+      :model-value="local.listing_examples_url ?? ''"
+      :label="t('app.campaigns.fields.listingExamplesUrl')"
+      :hint="t('app.campaigns.fields.listingExamplesUrlHint')"
+      :error-messages="listingExamplesUrlErrors as string[]"
+      persistent-hint
+      type="url"
+      maxlength="2048"
+      autocomplete="off"
+      class="mb-3"
+      data-test="campaign-listing-examples-url"
+      @update:model-value="update('listing_examples_url', $event || undefined)"
+    />
 
     <v-switch
       :model-value="local.requires_per_campaign_contract ?? false"

@@ -434,7 +434,16 @@
         "startsAt": "Start date",
         "endsAt": "End date",
         "requiresContract": "Require a per-campaign contract",
-        "status": "Κατάσταση"
+        "status": "Κατάσταση",
+        "listingDuration": "Διάρκεια αγγελίας",
+        "listingDurationHint": "Πόσο χρόνο έχει ο δημιουργός, με δικά σας λόγια (π.χ. 4 εβδομάδες).",
+        "listingFee": "Αναγραφόμενη αμοιβή",
+        "listingFeeHint": "Μόνο για εμφάνιση — η αμοιβή συμφωνείται με κάθε δημιουργό κατά την πρόσκληση.",
+        "listingLanguages": "Γλώσσες περιεχομένου",
+        "listingRegions": "Περιοχές",
+        "listingExamplesUrl": "Σύνδεσμος παραδειγμάτων",
+        "listingExamplesUrlHint": "Προαιρετικός σύνδεσμος σε δείγματα εργασίας.",
+        "listedOnJobsBoard": "Προσθήκη στον πίνακα εργασιών"
       },
       "objective": {
         "awareness": "Awareness",
@@ -760,6 +769,20 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign."
+      },
+      "listing": {
+        "sectionTitle": "Αγγελία στον πίνακα εργασιών",
+        "sectionHint": "Εμφανίζεται στους δημιουργούς όταν η καμπάνια βρίσκεται στον πίνακα εργασιών σας.",
+        "toggleHint": "Οι συνδεδεμένοι δημιουργοί σας βλέπουν αυτή την καμπάνια ως εργασία.",
+        "incompleteHint": "Συμπληρώστε τα εξής πριν την προσθήκη στον πίνακα εργασιών: {fields}.",
+        "terminalHint": "Μια ολοκληρωμένη ή ακυρωμένη καμπάνια δεν μπορεί να προστεθεί στον πίνακα εργασιών.",
+        "floorFields": {
+          "description": "περιγραφή",
+          "listing_duration": "διάρκεια αγγελίας",
+          "listing_fee": "αναγραφόμενη αμοιβή",
+          "listing_languages": "γλώσσες περιεχομένου",
+          "listing_regions": "περιοχές"
+        }
       }
     },
     "pools": {

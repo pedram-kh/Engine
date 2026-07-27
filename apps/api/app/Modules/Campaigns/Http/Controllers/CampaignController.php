@@ -99,6 +99,15 @@ final class CampaignController
             'brief' => $validated['brief'] ?? null,
             'target_creator_count' => $validated['target_creator_count'] ?? null,
             'requires_per_campaign_contract' => $validated['requires_per_campaign_contract'] ?? false,
+
+            // Jobs-board listing copy (AH-054, D2). `listed_on_jobs_board` is
+            // absent by design — create never lists (D4); the column default
+            // (false) carries it.
+            'listing_duration' => $validated['listing_duration'] ?? null,
+            'listing_fee' => $validated['listing_fee'] ?? null,
+            'listing_languages' => $validated['listing_languages'] ?? null,
+            'listing_regions' => $validated['listing_regions'] ?? null,
+            'listing_examples_url' => $validated['listing_examples_url'] ?? null,
         ]);
 
         Audit::log(
@@ -215,6 +224,12 @@ final class CampaignController
      * Audit-safe snapshot — the structured/free-text `brief` is NEVER copied
      * into an audit row.
      *
+     * `listed_on_jobs_board` IS included (AH-054, F3): a visibility flip is
+     * exactly the kind of state change an audit trail exists to explain, and
+     * it is a boolean, not content. The free-text/jsonb listing fields stay
+     * OUT, on the same reasoning that keeps `brief` out — agency-authored
+     * content does not belong in an audit snapshot.
+     *
      * @return array<string, mixed>
      */
     private function auditableSnapshot(Campaign $campaign): array
@@ -229,6 +244,7 @@ final class CampaignController
             'agency_id' => $campaign->agency_id,
             'target_creator_count' => $campaign->target_creator_count,
             'requires_per_campaign_contract' => $campaign->requires_per_campaign_contract,
+            'listed_on_jobs_board' => $campaign->listed_on_jobs_board,
         ];
     }
 
