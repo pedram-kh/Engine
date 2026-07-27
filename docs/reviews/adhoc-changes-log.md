@@ -70,6 +70,84 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-056 · Jobs Board chunk 3 — the creator job board, apply, and the job-posted fan-out
+
+- **Status:** Landed
+- **Commits:** `81df0b5` — `feat(jobs-board): creator job board read + apply backend (AH-056)`;
+  `928ccce` — `feat(jobs-board): job-posted notification vocabulary + flag-gated capped fan-out (AH-056)`;
+  `0cf6275` — `feat(jobs-board): campaigns:preview-job-notifications operator command (AH-056)`;
+  `4e527e7` — `feat(jobs-board): creator job board SPA — routes, nav, pages, apply dialog (AH-056)`;
+  `d37d43c` — `test(jobs-board): playwright browse-detail-apply leg + listed-job helper (AH-056)`;
+  plus the docs commit carrying this entry and the review. Split by **surface**, not sub-step: the
+  read/apply backend, the outbound fan-out (a different risk profile — it sends mail, and deserves to
+  be readable alone), the operator command, the SPA, and the E2E leg.
+- **Date:** 2026-07-27
+- **Why:** Chunk 3 of the five-chunk Jobs Board arc. Chunks 1 and 2 gave campaigns the copy a creator
+  reads and the agency-controlled listing switch (AH-053/AH-054), but nothing consumed either. This is
+  the creator half: rostered creators of an agency see that agency's listed campaigns, open one, and
+  apply. It is the arc's **first creator-visible surface** and its **first mail fan-out to live
+  creators**.
+- **What:** Three additive migrations (`campaign_applications`, `campaign_job_notifications`,
+  `campaigns.listed_at`); one shared six-leg visibility predicate object; three creator endpoints
+  (`GET /creators/me/jobs`, `GET /creators/me/jobs/{campaign}`, `POST …/apply`); two narrow job
+  resources carrying a three-field brand subset; the `campaign.job_posted` notification/audit pair;
+  a Pennant-gated, capped, once-stamped fan-out fired by the listing flip; an operator command with
+  `--dry-run` and `--limit`; and the creator SPA's "Job Posts" section — nav item, list, detail, apply
+  dialog — behind the `layout: 'creator'` shell.
+- **Touched:** `Modules/Campaigns` (models, services, job, mailable, enums), `Modules/Creators`
+  (controller, resources, request, feature flag, routes), `Modules/Audit` + `Modules/Notifications`
+  (one enum case each), `Modules/Admin` (the flag registry — see below),
+  `apps/main` creators module (routes, nav, two pages, api file),
+  `packages/api-client` (`types/campaign.ts`), i18n ×24 in `creator.json` / `availability.json` /
+  `notifications.json` / backend `campaigns.php`, `docs/security/tenancy.md` (three §4 rows),
+  `docs/feature-flags.md`, `docs/tech-debt.md` (three entries).
+- **Decisions:** **Applications are a TABLE, not an assignment state** — the arc's biggest fork,
+  decided by the finding that a pre-invited assignment state would let `store()`'s idempotency branch
+  silently swallow an agency invite. **Visibility is one predicate object, six legs**, composed
+  identically by the list, the detail, the apply endpoint and the fan-out's recipient query; the
+  detail 404s rather than 403s, so an invisible job is not probeable by ULID. **The brand subset is
+  three fields** (`name`, `logo_url`, and `website_url` on detail only), pinned by exact-keyset
+  equality — the arc's first AH-005-class boundary crossing. **The fan-out is flag-gated (default
+  OFF), capped at 50 per run, and stamped once per (campaign, creator)**, so a re-list never
+  re-notifies. **The trigger is the listing flip, not a scheduler** — the production scheduler is
+  unverified, so a cron-triggered feature could ship, pass every gate, and never fire.
+- **Kickoff reinterpretations (§5.32), recorded:** the flip detector is the **existing** before/after
+  audit-snapshot pair in `CampaignController::update()`, not a new campaign event (the single
+  write-path grep makes it airtight); and the audit noun is `campaign_application.*`, not
+  `application.*` — the house `<subject-keyed-to-table>.<verb>` convention wins, and `application.*`
+  would have collided with the creator's ONBOARDING application, a different noun entirely.
+- **Added after plan-pause (C5):** a **sixth** predicate leg excluding creators the campaign's brand
+  has **hard**-blacklisted, on all four surfaces. The board must never solicit an application the
+  invite gate would hard-block. Hard only — soft is warn-at-invite semantics and must not hide jobs.
+  Note the two postures sit side by side deliberately: the relation-level leg excludes hard **and**
+  soft (stricter, via `permitsMessaging()`), the brand-level leg excludes hard only (mirroring the
+  invite gate).
+- **Known costs, accepted:** chunk 4's accept becomes a cross-table transaction (application closed +
+  assignment created atomically) — named now, solved there. The email has no per-creator opt-out,
+  because the email channel has never been wired through preference reads platform-wide. A creator
+  stamped before their mail dies at transport is never re-notified for that job (queue-then-stamp:
+  for a fan-out, one silent miss beats a double-send). All three are in `tech-debt.md` with triggers.
+- **Deliberately NOT shipped:** the `application_submitted` NotificationType (chunk 4 owns it — the
+  allowlist is not a dumping ground, and the arc deploys as one, so no production gap exists where
+  agencies miss applications) and the dashboard jobs teaser (chunk 5 polish; the slot is documented).
+- **In-scope hardening:** `creator-routes-guard.spec.ts`, the sibling the agency shell has had since
+  Sprint 6. The `layout: 'creator'` guard invariant stops being unpinned.
+- **One gap caught by writing the docs:** the flag worked but was never added to
+  `AdminFeatureFlagController::FLAGS`, so the kill switch on the platform's first mail fan-out was
+  reachable only from tinker. Fixed with a test that an admin can arm **and disarm** it over HTTP.
+  Named because everything else about the flag — default, service check, break-revert, enable
+  ritual — was green while the operator control did not exist.
+- **Gates:** api `pest` 2234 passed / 1 skipped (8045 assertions), PHPStan level max 0 errors, Pint
+  clean; `apps/main` 139 files / 1278 tests, `apps/admin` 53 / 449, `api-client` 9 / 204; all three
+  typechecks clean; lint 0 errors (the 2 pre-existing `v-html` warnings); i18n locale parity and the
+  notifications parity hand-list green at 15 live types; **full Playwright 24/24 in 3.9m** including
+  the new browse-detail-apply leg, with the dev stack down for the run and health-checked after.
+  Six break-reverts run and restored (approved leg, roster leg, brand-hard-blacklist leg, flag-OFF
+  no-op, `listed_at` non-consultation, and both halves of the architecture spec).
+- **Ref:** [`docs/reviews/jobs-board-c3-review.md`](jobs-board-c3-review.md) — the completion package;
+  [`jobs-board-c3-plan.md`](jobs-board-c3-plan.md) and
+  [`jobs-board-c3-inventory.md`](jobs-board-c3-inventory.md) for the loop that produced it.
+
 ### AH-055 · Brand detail page stops showing the two fields AH-053 made unsettable
 
 - **Status:** Landed

@@ -113,11 +113,19 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-27 · **Through:** AH-055 · **Baseline:** the AH-055 docs commit — the
-current local tip, sitting on `aa8d410` (the pushed AH-053/AH-054 close-out). **AH-055 is held**
-pending Pedram's push call; everything through AH-054 is pushed. (A commit cannot record its own
-hash, so the tip is named descriptively; `git rev-parse --short HEAD` gives it, and
-`git rev-parse --short origin/main` gives the pushed tip.)
+**Last updated:** 2026-07-27 · **Through:** AH-056 · **Baseline:** the AH-056 docs commit — the
+current local tip, atop the five AH-056 feature/test commits (`81df0b5`, `928ccce`, `0cf6275`,
+`4e527e7`, `d37d43c`) and the AH-055 docs commit, all sitting on `aa8d410` (the pushed
+AH-053/AH-054 close-out). **AH-055 and AH-056 are both held** pending Pedram's push call;
+everything through AH-054 is pushed. (A commit cannot record its own hash, so the tip is named
+descriptively; `git rev-parse --short HEAD` gives it, and `git rev-parse --short origin/main` gives
+the pushed tip.)
+
+> **⚠ The Jobs Board arc deploys as ONE unit — chunk 3 of 5 is done, and the deploy stays held.**
+> AH-056 ships the creator board, apply, and the job-posted fan-out, but the agency side (chunk 4)
+> does not exist yet: an application a creator submits today has nowhere to be read. Holding the
+> deploy to end-of-arc is what prevents that gap, and it is why the arc's chunks are safe to build
+> incrementally. Do not deploy AH-053/054/056 piecemeal.
 
 > **⚠ UNDEPLOYED CODE EXISTS — and it carries a migration and a pre-deploy read.** The push on
 > 2026-07-27 moved `origin/main` `2cb6c11..` with **AH-053 + AH-054** (Jobs Board chunks 1+2
@@ -154,6 +162,27 @@ next deploy will not say that — see the deploy notes below.
 > deploys are colleague-managed and advance without notice. Everything through AH-050
 > (`content_companions`) turned out to be already live before today, while this file still listed
 > its migrations as pending. Verify at each session close; do not carry forward an assumption.
+
+**Deploy notes — AH-056 (local, NOT pushed, NOT deployed).** Three obligations:
+
+1. **Three more migrations**, all additive: `2026_07_27_110000_create_campaign_applications_table`,
+   `2026_07_27_110001_create_campaign_job_notifications_table`, and
+   `2026_07_27_110002_add_listed_at_to_campaigns`. No existing row is read or rewritten. **The
+   `down()` on both new tables is lossy** — dropping them destroys every application and every
+   notification stamp. A rollback after creators have applied is a data-loss event, not a revert.
+   With AH-054's, the arc's pending-migration count is **four**.
+2. **🔴 `job_posted_notifications_enabled` ships OFF and must stay OFF until deliberately flipped.**
+   This is the platform's first outbound mail fan-out to the live creator base (~279). The
+   first-enable ritual is in `docs/feature-flags.md`: run
+   `php artisan campaigns:preview-job-notifications {campaign-ulid} --dry-run`, read the
+   would-notify / would-remain counts, then flip from the admin Feature-flags page. Zero campaigns
+   are listed at deploy, so the board is empty and the fan-out has nothing to send regardless.
+3. **The fan-out needs the queue worker, not the scheduler.** Its trigger is the listing flip
+   (`CampaignController::update()`), chosen precisely because the production scheduler is
+   unverified — see the standing blocker. If the worker is down, notifications queue and wait; the
+   `campaigns:preview-job-notifications` command drains any capped remainder by hand. Note also
+   that this deploy carries new `lang/**` mail copy, so the standing **queue-worker restart** rule
+   below binds.
 
 **Deploy notes — AH-053/AH-054 (pushed 2026-07-27, NOT deployed).** Two obligations, both new:
 
@@ -447,6 +476,26 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     now (Q3 = A) with a **disjoint** negative set, so chunk 3 binds to a tested contract. The flip
     joins the `campaign.updated` audit snapshot; the four free-text/jsonb fields stay out. Regions
     are shape-capped, not registry-validated (tech-debt). One additive migration.
+  - **AH-056** — Jobs Board chunk 3: the creator job board, apply, and the job-posted fan-out
+    (`81df0b5`, `928ccce`, `0cf6275`, `4e527e7`, `d37d43c` — **local, not pushed**). Applications
+    are a **table**, not an assignment state: a pre-invited state would let `store()`'s idempotency
+    branch silently swallow an agency invite, on the platform's most load-bearing machine.
+    Visibility is **one predicate object, six legs** — tenancy-scope bypass, approved caller,
+    `permitsMessaging()` roster, `scopeListedOnJobsBoard()`, `ends_at` start-of-day-UTC, and (added
+    at kickoff, ruling C5) NOT brand-**hard**-blacklisted — composed identically by the list, the
+    detail, the apply endpoint and the fan-out's recipient query, with a test walking every selected
+    recipient back through the predicate so the two directions cannot drift. Detail 404s rather than
+    403s, so an invisible job is not probeable by ULID. Brand-to-creator is **three fields**
+    (`name`, `logo_url`, +`website_url` on detail), pinned by **exact-keyset equality** so a fourth
+    cannot join by accretion — the arc's first AH-005-class crossing. The fan-out is Pennant-gated
+    (default OFF), capped at 50 per run, stamped once per `(campaign, creator)` in its own table so a
+    re-list never re-notifies, and **fired by the listing flip, not a scheduler** (the scheduler is
+    unverified — a cron-triggered feature could pass every gate and never fire). Two §5.32
+    reinterpretations recorded: the flip detector is the **existing** audit-snapshot pair in
+    `CampaignController::update()`, and the audit noun is `campaign_application.*`, not
+    `application.*` (which would collide with the creator's onboarding application). Six
+    break-reverts, all restored. Three additive migrations. `application_submitted` is deliberately
+    **left to chunk 4**. Review: `docs/reviews/jobs-board-c3-review.md`.
 
   > **Ruling (AH-046/047, flaky-10 MT baseline):** new creator-facing copy gets a real
   > machine-translation baseline in **all 24 locales at merge time**, including the flaky 10

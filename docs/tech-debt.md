@@ -2071,3 +2071,65 @@ ukazuje na váš zveřejněný příspěvek, a poté ho níže znova odešlete."
   plus deleting the local branch. Estimated effort: half a day.
 - **Owner:** platform / CI.
 - **Status:** open; the local branch is the deliberate interim, pinned by an architecture test.
+
+## The email channel is not wired through notification preferences (AH-056)
+
+- **Where:** [`JobPostedFanOutService::queueMail()`](../apps/api/app/Modules/Campaigns/Services/JobPostedFanOutService.php),
+  [`NotificationType::CampaignJobPosted`](../apps/api/app/Modules/Notifications/Enums/NotificationType.php),
+  and the preferences surface at
+  [`NotificationPreferencesPage.vue`](../apps/main/src/modules/notifications/pages/NotificationPreferencesPage.vue).
+- **What we accepted (AH-056, 2026-07-27):** the job-posted notification dual-emits — an in-app
+  notification the creator CAN switch off, and an email they cannot. That asymmetry is not new to
+  this chunk: the email channel has never been wired through preference reads platform-wide, so
+  every transactional mail the platform sends today ignores the preferences table. Shipping the
+  jobs-board fan-out did not fix it, and pretending otherwise in the UI would be worse than
+  naming it.
+- **The gap:** a rostered creator who does not want job emails has no self-serve way to stop them.
+  The v1 containment is the Pennant flag (a global kill switch), the 50-per-run cap, and a
+  recipient set restricted to creators who already have a working relationship with the agency —
+  not consent, but not cold outreach either.
+- **Trigger:** before any SECOND recurring creator-facing email ships, or on the first creator
+  complaint about job-posted mail. Either one converts this from accepted to due.
+- **Resolution:** read `notification_preferences` for the `email` channel inside the emission path
+  (one shared guard, since every mailable needs it), expose the email toggles on the preferences
+  page, and backfill defaults. Estimated effort: 1–2 days, most of it deciding the default and the
+  transactional-mail exemption list.
+- **Owner:** notifications.
+- **Status:** open; accepted for the jobs-board arc, named in that review's Production posture.
+
+## Jobs-board `ends_at` filter is non-sargable, and `ends_at` cannot lead an index (AH-056)
+
+- **Where:** leg 5 of [`JobsBoardVisibility::visibleTo()`](../apps/api/app/Modules/Campaigns/Services/JobsBoardVisibility.php)
+  (`ends_at IS NULL OR ends_at >= <UTC start of today>`), against the `campaigns` table's
+  `(starts_at, ends_at)` composite index.
+- **What we accepted (AH-056, 2026-07-27):** `NULL` means never-expires (kickoff Q4), so the leg
+  cannot be written as a plain range predicate; and the only index covering `ends_at` has it in the
+  trailing position, where it cannot lead. Every board query therefore filters `ends_at` outside the
+  index. At current volume — a few dozen campaigns per agency — this is invisible, and adding an
+  index for a query nobody has measured is the kind of speculative tuning this codebase avoids.
+- **The gap:** the board's cost grows with total listed campaigns rather than with the caller's
+  visible set. It shares this shape with AH-054's deferred partial index on `listed_on_jobs_board`.
+- **Trigger:** volume — the first agency with a few hundred listed campaigns, or a board request
+  appearing in slow-query logs. Same trigger as the AH-054 entry, and they should be resolved
+  together.
+- **Resolution:** a partial index on `(listed_on_jobs_board, status, ends_at)` filtered to listed
+  rows, measured before and after. Estimated effort: an hour plus a migration.
+- **Owner:** campaigns.
+- **Status:** open; volume-triggered, per the AH-054 precedent.
+
+## The job-posted fan-out shares the default queue (AH-056)
+
+- **Where:** [`SendJobPostedNotificationsJob`](../apps/api/app/Modules/Campaigns/Jobs/SendJobPostedNotificationsJob.php)
+  — no `$queue`, no `$connection`, framework-default retries.
+- **What we accepted (AH-056, 2026-07-27):** one listing flip can enqueue up to 50 mailables plus
+  the fan-out job itself onto the same default queue every other job uses. A burst of listings could
+  therefore delay latency-sensitive work — a verification email, a message notification — behind a
+  batch that nobody is waiting on. The alternative, a dedicated queue, means a second worker process
+  to provision and monitor, and the platform runs exactly one.
+- **The gap:** no queue isolation and no priority. The cap bounds each burst but not their frequency.
+- **Trigger:** the first observed delay in transactional mail attributable to a fan-out burst, or the
+  provisioning of a second worker for any other reason.
+- **Resolution:** move the fan-out and its mailables to a `bulk` queue and give the worker a
+  `--queue=default,bulk` priority order. Estimated effort: half a day including deployment config.
+- **Owner:** platform.
+- **Status:** open; accepted with the cap as the interim bound.
