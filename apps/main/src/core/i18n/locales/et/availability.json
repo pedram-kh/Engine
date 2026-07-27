@@ -14,7 +14,8 @@
       "jobs": "Tööpakkumised",
       "assignments": "Kutses",
       "availability": "Kättesaadavus",
-      "messages": "Sõnumid"
+      "messages": "Sõnumid",
+      "more": "Rohkem"
     },
     "nav": {
       "prevMonth": "Eelmine month",

@@ -155,6 +155,26 @@ describe('CreatorJobDetailPage', () => {
     )
   })
 
+  it('frames the job in a card, and leaves the failure states unframed (AH-057)', async () => {
+    const wrapper = await mountPage()
+
+    // The card is the framing the list page's job cards led the creator to
+    // expect; the back link stays outside it, page-level.
+    expect(wrapper.find('[data-testid="creator-job-detail-card"]').exists()).toBe(true)
+    expect(
+      wrapper
+        .find('[data-testid="creator-job-detail-card"] [data-testid="creator-job-back"]')
+        .exists(),
+    ).toBe(false)
+
+    // A tonal alert inside a bordered card reads as a double frame, so the two
+    // failure states render at page level instead.
+    mockApi.show.mockRejectedValue(apiError(404, 'job.not_found'))
+    const missing = await mountPage()
+    expect(missing.find('[data-testid="creator-job-not-found"]').exists()).toBe(true)
+    expect(missing.find('[data-testid="creator-job-detail-card"]').exists()).toBe(false)
+  })
+
   it('links the brand website with rel="noopener" on the external anchors', async () => {
     const wrapper = await mountPage()
 

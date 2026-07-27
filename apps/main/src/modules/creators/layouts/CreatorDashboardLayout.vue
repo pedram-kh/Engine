@@ -63,9 +63,9 @@ const logoNeedsDarkening = computed(() => currentTheme.value === 'light')
 const wideContent = computed(() => route.meta.wide === true)
 
 /**
- * Mobile chrome (smAndDown): the primary topbar nav (3 items) overflows the
- * cramped mobile app-bar, so it moves to a thumb-reachable bottom navigation
- * bar. Utility actions stay in the topbar avatar menu. Desktop is untouched.
+ * Mobile chrome (smAndDown): the primary topbar nav overflows the cramped
+ * mobile app-bar, so it moves to a thumb-reachable bottom navigation bar.
+ * Utility actions stay in the topbar avatar menu. Desktop is untouched.
  */
 const isMobile = computed(() => display.smAndDown.value)
 
@@ -109,6 +109,42 @@ const navItems = computed(() => {
   )
   return items
 })
+
+/**
+ * AH-057 — the mobile bottom bar's PRIMARY slots, in bar order.
+ *
+ * A bottom bar neither wraps nor scrolls: every item it is handed competes for
+ * the same fixed row, so past four the labels clip at the viewport edge (found
+ * on a real phone once AH-056's "Job Posts" made a sixth item). The fix is the
+ * standard overflow: four primary destinations plus a "More" sheet holding the
+ * rest, which means the bar's width no longer depends on how many sections the
+ * creator shell has.
+ *
+ * This is a declared POLICY, not a slice — the four are the working loop (find
+ * a job, answer an invite, read a message, land on the dashboard). Profile and
+ * Availability are deliberate overflow: both are settings-shaped, visited
+ * occasionally, and neither is where a creator returns daily. `navItems` stays
+ * the single ordered source for BOTH shells; this only decides which of its
+ * entries get a permanent slot.
+ *
+ * Adding a nav item does NOT require touching this list — the newcomer lands in
+ * More, which is the safe default. Promoting it is then a deliberate edit here,
+ * and the spec pins that every key in this list actually exists in `navItems`,
+ * so a rename cannot silently empty a slot.
+ */
+const MOBILE_PRIMARY_KEYS = ['dashboard', 'jobs', 'assignments', 'messages'] as const
+
+const mobilePrimaryItems = computed(() =>
+  MOBILE_PRIMARY_KEYS.map((key) => navItems.value.find((item) => item.key === key)).filter(
+    (item): item is { key: string; icon: string; routeName: string } => item !== undefined,
+  ),
+)
+
+const mobileOverflowItems = computed(() =>
+  navItems.value.filter((item) => !(MOBILE_PRIMARY_KEYS as readonly string[]).includes(item.key)),
+)
+
+const moreMenuOpen = ref(false)
 
 async function signOut(): Promise<void> {
   userMenuOpen.value = false
@@ -249,22 +285,86 @@ onMounted(() => {
     </v-main>
 
     <!-- Mobile: primary nav as a thumb-reachable bottom bar (smAndDown only).
-         Active state is router-driven, mirroring the desktop topbar nav. -->
-    <v-bottom-navigation v-if="isMobile" grow color="primary" data-test="creator-bottom-nav">
+         Active state is router-driven, mirroring the desktop topbar nav.
+         Four primary slots + a "More" sheet (AH-057) — the bar cannot scroll,
+         so its content must not depend on how many sections exist. -->
+    <v-bottom-navigation
+      v-if="isMobile"
+      grow
+      color="primary"
+      class="creator-bottom-nav"
+      data-test="creator-bottom-nav"
+    >
       <v-btn
-        v-for="item in navItems"
+        v-for="item in mobilePrimaryItems"
         :key="item.key"
         :to="{ name: item.routeName }"
         :data-test="`creator-bottom-nav-${item.key}`"
       >
         <v-icon :icon="item.icon" />
-        <span>{{ t(`availability.creatorNav.${item.key}`) }}</span>
+        <span class="creator-bottom-nav__label">
+          {{ t(`availability.creatorNav.${item.key}`) }}
+        </span>
       </v-btn>
+
+      <v-menu
+        v-if="mobileOverflowItems.length > 0"
+        v-model="moreMenuOpen"
+        location="top end"
+        data-test="creator-bottom-nav-more-wrapper"
+      >
+        <template #activator="{ props: moreProps }">
+          <v-btn v-bind="moreProps" data-test="creator-bottom-nav-more">
+            <v-icon icon="mdi-dots-horizontal" />
+            <span class="creator-bottom-nav__label">
+              {{ t('availability.creatorNav.more') }}
+            </span>
+          </v-btn>
+        </template>
+
+        <v-list density="compact" data-test="creator-bottom-nav-more-list">
+          <v-list-item
+            v-for="item in mobileOverflowItems"
+            :key="item.key"
+            :to="{ name: item.routeName }"
+            :prepend-icon="item.icon"
+            :title="t(`availability.creatorNav.${item.key}`)"
+            :data-test="`creator-bottom-nav-more-${item.key}`"
+            @click="moreMenuOpen = false"
+          />
+        </v-list>
+      </v-menu>
     </v-bottom-navigation>
   </v-app>
 </template>
 
 <style scoped>
+/* AH-057 — four slots stop the bar OVERFLOWING; this stops a single long label
+   from bursting its own slot. English is the short case: the same keys run to
+   "Табло за управление" (bg) and "Postijiet tax-xogħol" (mt), which are wider
+   than any quarter of a phone viewport. Ellipsis rather than wrap keeps every
+   button one line tall, so the bar's height never depends on the locale.
+
+   The selector mirrors Vuetify's own
+   (`.v-bottom-navigation .v-bottom-navigation__content > .v-btn`, which sets
+   `min-width: 80px`) because a shorter one TIES on specificity and loses on
+   order: five 80px floors make a 400px row inside a 390px viewport, so the bar
+   overhangs 5px each side and scrolls. Caught by the E2E leg measuring it, and
+   the leg now holds the bar to zero horizontal overflow. */
+.creator-bottom-nav :deep(.v-bottom-navigation__content > .v-btn) {
+  min-width: 0;
+}
+
+.creator-bottom-nav__label {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.625rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .creator-topbar__logo {
   display: block;
   height: 28px;

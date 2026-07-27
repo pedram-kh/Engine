@@ -153,124 +153,142 @@ onMounted(() => {
       </template>
     </v-alert>
 
-    <template v-else-if="job">
-      <header class="job-detail__head">
-        <v-avatar v-if="job.attributes.brand?.logo_url" size="56" rounded="lg">
-          <v-img :src="job.attributes.brand.logo_url" :alt="job.attributes.brand.name" />
-        </v-avatar>
-        <div>
-          <p class="job-detail__brand" data-testid="creator-job-detail-brand">
-            {{ job.attributes.brand?.name ?? '—' }}
+    <!-- AH-057 — the job body sits in ONE outlined card, the BrandDetailPage
+         shape (back link outside, body framed) with the jobs-list border, so a
+         creator arriving from a card lands on the same surface they clicked.
+         The skeleton and the two failure alerts stay OUTSIDE it: a bordered card
+         wrapping a tonal alert double-frames the message. -->
+    <v-card
+      v-else-if="job"
+      variant="outlined"
+      class="job-detail__card"
+      data-testid="creator-job-detail-card"
+    >
+      <v-card-text class="job-detail__body">
+        <header class="job-detail__head">
+          <v-avatar v-if="job.attributes.brand?.logo_url" size="56" rounded="lg">
+            <v-img :src="job.attributes.brand.logo_url" :alt="job.attributes.brand.name" />
+          </v-avatar>
+          <div>
+            <p class="job-detail__brand" data-testid="creator-job-detail-brand">
+              {{ job.attributes.brand?.name ?? '—' }}
+            </p>
+            <h1 class="text-h4" data-testid="creator-job-detail-name">{{ job.attributes.name }}</h1>
+          </div>
+        </header>
+
+        <div class="job-detail__meta">
+          <span v-if="job.attributes.listing_fee" data-testid="creator-job-detail-fee">
+            {{ t('creator.ui.jobs.fee') }}: {{ job.attributes.listing_fee }}
+          </span>
+          <span v-if="job.attributes.listing_duration">
+            {{ t('creator.ui.jobs.duration') }}: {{ job.attributes.listing_duration }}
+          </span>
+          <span data-testid="creator-job-detail-applicants">
+            {{ t('creator.ui.jobs.applicants', job.attributes.applicant_count) }}
+          </span>
+        </div>
+
+        <section v-if="job.attributes.description" class="job-detail__section">
+          <h2 class="text-subtitle-1">{{ t('creator.ui.jobs.detail.about') }}</h2>
+          <p class="job-detail__description" data-testid="creator-job-detail-description">
+            {{ job.attributes.description }}
           </p>
-          <h1 class="text-h4" data-testid="creator-job-detail-name">{{ job.attributes.name }}</h1>
-        </div>
-      </header>
+        </section>
 
-      <div class="job-detail__meta">
-        <span v-if="job.attributes.listing_fee" data-testid="creator-job-detail-fee">
-          {{ t('creator.ui.jobs.fee') }}: {{ job.attributes.listing_fee }}
-        </span>
-        <span v-if="job.attributes.listing_duration">
-          {{ t('creator.ui.jobs.duration') }}: {{ job.attributes.listing_duration }}
-        </span>
-        <span data-testid="creator-job-detail-applicants">
-          {{ t('creator.ui.jobs.applicants', job.attributes.applicant_count) }}
-        </span>
-      </div>
+        <section v-if="job.attributes.listing_languages?.length" class="job-detail__section">
+          <h2 class="text-subtitle-1">{{ t('creator.ui.jobs.detail.languages') }}</h2>
+          <div class="job-detail__chips">
+            <v-chip
+              v-for="language in job.attributes.listing_languages"
+              :key="language"
+              size="small"
+              variant="tonal"
+            >
+              {{ language.toUpperCase() }}
+            </v-chip>
+          </div>
+        </section>
 
-      <section v-if="job.attributes.description" class="job-detail__section">
-        <h2 class="text-subtitle-1">{{ t('creator.ui.jobs.detail.about') }}</h2>
-        <p class="job-detail__description" data-testid="creator-job-detail-description">
-          {{ job.attributes.description }}
-        </p>
-      </section>
+        <section v-if="job.attributes.listing_regions?.length" class="job-detail__section">
+          <h2 class="text-subtitle-1">{{ t('creator.ui.jobs.detail.regions') }}</h2>
+          <div class="job-detail__chips">
+            <v-chip
+              v-for="region in job.attributes.listing_regions"
+              :key="region"
+              size="small"
+              variant="tonal"
+            >
+              {{ region }}
+            </v-chip>
+          </div>
+        </section>
 
-      <section v-if="job.attributes.listing_languages?.length" class="job-detail__section">
-        <h2 class="text-subtitle-1">{{ t('creator.ui.jobs.detail.languages') }}</h2>
-        <div class="job-detail__chips">
-          <v-chip
-            v-for="language in job.attributes.listing_languages"
-            :key="language"
+        <div class="job-detail__links">
+          <!-- External, agency-authored links: rel="noopener" so the opened tab
+               cannot reach back into this one via window.opener. -->
+          <v-btn
+            v-if="job.attributes.listing_examples_url"
+            variant="outlined"
             size="small"
-            variant="tonal"
+            append-icon="mdi-open-in-new"
+            :href="job.attributes.listing_examples_url"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="creator-job-examples"
           >
-            {{ language.toUpperCase() }}
-          </v-chip>
-        </div>
-      </section>
-
-      <section v-if="job.attributes.listing_regions?.length" class="job-detail__section">
-        <h2 class="text-subtitle-1">{{ t('creator.ui.jobs.detail.regions') }}</h2>
-        <div class="job-detail__chips">
-          <v-chip
-            v-for="region in job.attributes.listing_regions"
-            :key="region"
+            {{ t('creator.ui.jobs.detail.examples') }}
+          </v-btn>
+          <v-btn
+            v-if="job.attributes.brand?.website_url"
+            variant="outlined"
             size="small"
-            variant="tonal"
+            append-icon="mdi-open-in-new"
+            :href="job.attributes.brand.website_url"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="creator-job-website"
           >
-            {{ region }}
-          </v-chip>
+            {{ t('creator.ui.jobs.detail.website') }}
+          </v-btn>
         </div>
-      </section>
+      </v-card-text>
 
-      <div class="job-detail__links">
-        <!-- External, agency-authored links: rel="noopener" so the opened tab
-             cannot reach back into this one via window.opener. -->
-        <v-btn
-          v-if="job.attributes.listing_examples_url"
-          variant="outlined"
-          size="small"
-          append-icon="mdi-open-in-new"
-          :href="job.attributes.listing_examples_url"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-testid="creator-job-examples"
+      <!-- The outcome of the caller's own application, or the way to make one.
+           In the footer because it is the card's ACTION, not its content. -->
+      <v-card-actions class="job-detail__actions">
+        <v-alert
+          v-if="status === 'rejected'"
+          type="info"
+          variant="tonal"
+          density="compact"
+          data-testid="creator-job-rejected-notice"
         >
-          {{ t('creator.ui.jobs.detail.examples') }}
-        </v-btn>
-        <v-btn
-          v-if="job.attributes.brand?.website_url"
-          variant="outlined"
-          size="small"
-          append-icon="mdi-open-in-new"
-          :href="job.attributes.brand.website_url"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-testid="creator-job-website"
+          {{ t('creator.ui.jobs.detail.rejectedNotice') }}
+        </v-alert>
+
+        <v-alert
+          v-else-if="status !== null"
+          type="success"
+          variant="tonal"
+          density="compact"
+          data-testid="creator-job-applied-notice"
         >
-          {{ t('creator.ui.jobs.detail.website') }}
+          {{ t('creator.ui.jobs.detail.appliedNotice') }}
+        </v-alert>
+
+        <v-btn
+          v-else
+          color="primary"
+          variant="flat"
+          :disabled="!canApply"
+          data-testid="creator-job-apply"
+          @click="openDialog()"
+        >
+          {{ t('creator.ui.jobs.detail.apply') }}
         </v-btn>
-      </div>
-
-      <v-alert
-        v-if="status === 'rejected'"
-        type="info"
-        variant="tonal"
-        data-testid="creator-job-rejected-notice"
-      >
-        {{ t('creator.ui.jobs.detail.rejectedNotice') }}
-      </v-alert>
-
-      <v-alert
-        v-else-if="status !== null"
-        type="success"
-        variant="tonal"
-        data-testid="creator-job-applied-notice"
-      >
-        {{ t('creator.ui.jobs.detail.appliedNotice') }}
-      </v-alert>
-
-      <v-btn
-        v-else
-        color="primary"
-        variant="flat"
-        :disabled="!canApply"
-        data-testid="creator-job-apply"
-        @click="openDialog()"
-      >
-        {{ t('creator.ui.jobs.detail.apply') }}
-      </v-btn>
-    </template>
+      </v-card-actions>
+    </v-card>
 
     <v-dialog v-model="dialogOpen" max-width="520" data-testid="creator-job-apply-dialog">
       <v-card>
@@ -328,6 +346,24 @@ onMounted(() => {
   flex-direction: column;
   align-items: flex-start;
   gap: 16px;
+}
+
+/* The page column is `align-items: flex-start` (so the back button and Apply
+   hug their content); the card is the one child that must span it. */
+.job-detail__card {
+  align-self: stretch;
+}
+
+/* The body carries the column rhythm the sections used to get from `.job-detail`
+   directly, now that a card sits between them. */
+.job-detail__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.job-detail__actions {
+  padding: 0 16px 16px;
 }
 
 .job-detail__head {

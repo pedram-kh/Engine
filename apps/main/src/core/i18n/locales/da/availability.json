@@ -14,7 +14,8 @@
       "jobs": "Jobopslag",
       "assignments": "Invitationer",
       "availability": "Tilgængelighed",
-      "messages": "Beskeder"
+      "messages": "Beskeder",
+      "more": "Mere"
     },
     "nav": {
       "prevMonth": "Forrige måned",

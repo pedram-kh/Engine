@@ -14,7 +14,8 @@
       "jobs": "Työpaikat",
       "assignments": "Kutsus",
       "availability": "Saatavuus",
-      "messages": "Viestit"
+      "messages": "Viestit",
+      "more": "Lisää"
     },
     "nav": {
       "prevMonth": "Edellinen month",

@@ -63,14 +63,41 @@ import { onboardingApi } from '@/modules/onboarding/api/onboarding.api'
 
 import CreatorDashboardLayout from './CreatorDashboardLayout.vue'
 
+/**
+ * `VMenu` teleports and renders nothing under `stubs: { VMenu: true }`, which
+ * also swallows its ACTIVATOR — and the AH-057 "More" button lives in that
+ * activator slot. This stub keeps both slots inline so the bottom bar's fifth
+ * button and the overflow list are both reachable from the wrapper. Same
+ * approach the apply-dialog spec takes with `VDialog`.
+ */
+const VMenuStub = {
+  name: 'VMenu',
+  template: '<div><slot name="activator" v-bind="{ props: {} }" /><slot /></div>',
+}
+
+/**
+ * Vuetify's `useDisplay()` reads `window.innerWidth`, which jsdom fixes at 1024
+ * — so the mobile chrome never rendered under test and the bottom bar went
+ * unpinned (which is how AH-056's sixth nav item reached a real phone before it
+ * reached a test). Narrowing the window BEFORE the Vuetify instance is created
+ * puts `smAndDown` on, so the bar is testable after all.
+ */
+function setViewportWidth(width: number): void {
+  Object.defineProperty(window, 'innerWidth', { value: width, writable: true, configurable: true })
+  window.dispatchEvent(new Event('resize'))
+}
+
 async function mountLayout(
   options: {
     locale?: 'en' | 'pt' | 'it'
     route?: string
     dark?: boolean
     applicationStatus?: string
+    mobile?: boolean
   } = {},
 ) {
+  setViewportWidth(options.mobile === true ? 390 : 1280)
+
   // Always re-stated (not only when overridden): `vi.clearAllMocks()` clears
   // calls but keeps implementations, so a test that mounts as `approved` would
   // otherwise leak that status into every test after it.
@@ -116,6 +143,18 @@ async function mountLayout(
       { path: '/creator/messages', name: 'creator.messages', component: { template: '<div />' } },
       { path: '/creator/jobs', name: 'creator.jobs', component: { template: '<div />' } },
       { path: '/creator/profile', name: 'creator.profile', component: { template: '<div />' } },
+      // Reachable only once VMenu renders inline (the AH-057 stub): the
+      // notification bell's "view all" and the avatar menu's preferences link.
+      {
+        path: '/creator/notifications',
+        name: 'creator.notifications',
+        component: { template: '<div />' },
+      },
+      {
+        path: '/creator/notifications/preferences',
+        name: 'creator.notifications.preferences',
+        component: { template: '<div />' },
+      },
       { path: '/sign-in', name: 'auth.sign-in', component: { template: '<div />' } },
     ],
   })
@@ -146,7 +185,10 @@ async function mountLayout(
   const wrapper = mount(CreatorDashboardLayout, {
     global: {
       plugins: [pinia, router, i18n, vuetify],
-      stubs: { VMenu: true, VSelect: true, ThemeToggle: true },
+      // `VSelect: true` warns under jsdom now that the avatar menu renders
+      // inline (auto-stubs try to set `prefix` on a bare element); an empty
+      // component is the same inertness without the noise.
+      stubs: { VMenu: VMenuStub, VSelect: { template: '<div />' }, ThemeToggle: true },
     },
     attachTo: document.createElement('div'),
   })
@@ -253,5 +295,123 @@ describe('CreatorDashboardLayout — topbar nav (D-b13)', () => {
     cleanup = mounted.cleanup
     expect(mounted.wrapper.find('[data-test="creator-nav"]').exists()).toBe(true)
     expect(mounted.wrapper.find('[data-test="creator-nav-availability"]').exists()).toBe(true)
+  })
+})
+
+/**
+ * AH-057 — the mobile bottom bar's overflow.
+ *
+ * A bottom bar neither wraps nor scrolls, so its width is a hard budget: past
+ * four items the labels clip at the viewport edge. AH-056's "Job Posts" made a
+ * sixth item and that is exactly what happened on a real phone. These tests pin
+ * the budget itself, so the next section added to the creator shell lands in the
+ * "More" sheet instead of breaking the bar again.
+ */
+describe('CreatorDashboardLayout — mobile bottom bar (AH-057)', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => vi.clearAllMocks())
+  afterEach(() => {
+    if (cleanup !== null) {
+      cleanup()
+      cleanup = null
+    }
+    setViewportWidth(1280)
+  })
+
+  it('never renders more than five buttons, however many sections exist', async () => {
+    const mounted = await mountLayout({ mobile: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    const bar = mounted.wrapper.find('[data-test="creator-bottom-nav"]')
+    expect(bar.exists()).toBe(true)
+
+    // Six sections exist for an approved creator, and all six stay reachable —
+    // but the BAR shows five. That upper bound is the whole point: a bar that
+    // grows with the section count is a bar that clips.
+    expect(bar.findAll('a').length).toBe(6)
+    const barButtons = bar.findAll('[data-test^="creator-bottom-nav-"]').filter((el) => {
+      const marker = el.attributes('data-test') ?? ''
+      return !marker.includes('more-') && marker !== 'creator-bottom-nav-more-wrapper'
+    })
+    expect(barButtons.length).toBe(5)
+  })
+
+  it('gives the working loop the four permanent slots', async () => {
+    const mounted = await mountLayout({ mobile: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+    const w = mounted.wrapper
+
+    for (const key of ['dashboard', 'jobs', 'assignments', 'messages']) {
+      expect(w.find(`[data-test="creator-bottom-nav-${key}"]`).exists()).toBe(true)
+    }
+    // Settings-shaped destinations do NOT hold a slot.
+    expect(w.find('[data-test="creator-bottom-nav-profile"]').exists()).toBe(false)
+    expect(w.find('[data-test="creator-bottom-nav-availability"]').exists()).toBe(false)
+    expect(w.find('[data-test="creator-bottom-nav-more"]').exists()).toBe(true)
+  })
+
+  it('puts every displaced item in the More sheet — nothing is dropped', async () => {
+    const mounted = await mountLayout({ mobile: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+    const w = mounted.wrapper
+
+    // The union of bar + sheet must be the WHOLE nav. An item that appears in
+    // neither is unreachable on a phone, which is a worse bug than clipping.
+    expect(w.find('[data-test="creator-bottom-nav-more-profile"]').exists()).toBe(true)
+    expect(w.find('[data-test="creator-bottom-nav-more-availability"]').exists()).toBe(true)
+    expect(w.findAll('[data-test="creator-bottom-nav-more-list"] .v-list-item').length).toBe(2)
+    expect(w.find('[data-test="creator-bottom-nav-more"]').text()).toContain('More')
+  })
+
+  it('keeps every primary slot filled — a renamed nav key cannot empty one', async () => {
+    const mounted = await mountLayout({ mobile: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    // The policy list names keys as strings, so it can drift from `navItems`
+    // silently. Asserting every named slot RESOLVED to a rendered link is what
+    // catches a rename that leaves a hole where a destination used to be.
+    const links = mounted.wrapper
+      .findAll('[data-test="creator-bottom-nav"] a')
+      .map((el) => el.attributes('data-test'))
+
+    expect(links).toEqual([
+      'creator-bottom-nav-dashboard',
+      'creator-bottom-nav-jobs',
+      'creator-bottom-nav-assignments',
+      'creator-bottom-nav-messages',
+      'creator-bottom-nav-more-profile',
+      'creator-bottom-nav-more-availability',
+    ])
+  })
+
+  it('shrinks the bar rather than leaving a gap when a section is hidden', async () => {
+    // An incomplete creator has no Job Posts and no Profile, so the bar holds
+    // three primaries and More carries Availability alone.
+    const mounted = await mountLayout({ mobile: true, applicationStatus: 'incomplete' })
+    cleanup = mounted.cleanup
+    const w = mounted.wrapper
+
+    expect(w.find('[data-test="creator-bottom-nav-jobs"]').exists()).toBe(false)
+    expect(w.find('[data-test="creator-bottom-nav-dashboard"]').exists()).toBe(true)
+    expect(w.findAll('[data-test="creator-bottom-nav-more-list"] .v-list-item').length).toBe(1)
+    expect(w.find('[data-test="creator-bottom-nav-more-availability"]').exists()).toBe(true)
+  })
+
+  it('localizes the More label', async () => {
+    const pt = await mountLayout({ mobile: true, locale: 'pt', applicationStatus: 'approved' })
+    expect(pt.wrapper.find('[data-test="creator-bottom-nav-more"]').text()).toContain('Mais')
+    pt.cleanup()
+
+    const it = await mountLayout({ mobile: true, locale: 'it', applicationStatus: 'approved' })
+    cleanup = it.cleanup
+    expect(it.wrapper.find('[data-test="creator-bottom-nav-more"]').text()).toContain('Altro')
+  })
+
+  it('stays off the desktop shell entirely', async () => {
+    const mounted = await mountLayout({ applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+    expect(mounted.wrapper.find('[data-test="creator-bottom-nav"]').exists()).toBe(false)
+    expect(mounted.wrapper.find('[data-test="creator-nav"]').exists()).toBe(true)
   })
 })
