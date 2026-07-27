@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Brands\Http\Resources;
 
 use App\Modules\Brands\Models\Brand;
+use App\Modules\Brands\Services\BrandLogoUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -38,7 +39,20 @@ final class BrandResource extends JsonResource
                 'description' => $brand->description,
                 'industry' => $brand->industry,
                 'website_url' => $brand->website_url,
+
+                // AH-053 (D7). `logo_url` is a short-lived signed GET, minted
+                // here — inside an emission that is already behind the brand
+                // policy — and never stored. It is what every consumer should
+                // render.
+                //
+                // `logo_path` stays for back-compat. It is the raw storage key
+                // on a PRIVATE disk, so it is not usable as a URL; nothing
+                // consumes it today, and it is kept only because removing an
+                // emitted attribute is a breaking change with no benefit. If a
+                // future audit wants the emission surface narrowed, this is the
+                // line to drop.
                 'logo_path' => $brand->logo_path,
+                'logo_url' => BrandLogoUploadService::signedViewUrl($brand->logo_path),
                 'default_currency' => $brand->default_currency,
                 'default_language' => $brand->default_language,
                 'status' => $brand->status->value,

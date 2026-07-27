@@ -96,8 +96,8 @@
       "campaigns": "Kampánys",
       "agencyUsers": "Team",
       "settings": "Beállítások",
-      "menu": "Menü",
-      "messages": "Üzenetek"
+      "messages": "Üzenetek",
+      "menu": "Menü"
     },
     "discover": {
       "title": "Discover creators",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Brand name",
         "slug": "Slug",
-        "description": "Description",
+        "description": "Havi teljesítendők",
         "industry": "Industry",
         "websiteUrl": "Website URL",
         "defaultCurrency": "Default currency",
         "defaultLanguage": "Default language",
-        "status": "Állapot"
+        "status": "Állapot",
+        "descriptionHint": "Amit az alkotó havonta készít (pl. 2 Reels és 3 Stories), valamint a felhasználási feltételek.",
+        "slugHint": "A névből automatikusan javasolt. Az URL-ekben használjuk.",
+        "logo": "Logó"
       },
       "status": {
         "active": "Aktív",
@@ -413,6 +416,29 @@
         "saveFailed": "Failed to save brand.",
         "archiveFailed": "Failed to archive brand.",
         "restoreFailed": "Failed to restore brand."
+      },
+      "logo": {
+        "upload": "Logó feltöltése",
+        "replace": "Logó cseréje",
+        "remove": "Eltávolítás",
+        "hint": "JPEG, PNG vagy WebP, legfeljebb 2 MB. A négyzetes logók működnek a legjobban.",
+        "alt": "Márkalogó",
+        "errors": {
+          "uploadFailed": "A logót nem sikerült feltölteni. Próbálkozzon másik képpel.",
+          "removeFailed": "A logót nem sikerült eltávolítani. Próbálja újra.",
+          "uploadFailedAfterCreate": "A márka létrejött, de a logó nem töltődött fel. Adjon hozzá logót a következő szerkesztés előtt — enélkül a márka nem menthető."
+        }
+      },
+      "floor": {
+        "hint": "Még szükséges: {fields}.",
+        "fields": {
+          "name": "márkanév",
+          "slug": "azonosító",
+          "description": "havi teljesítendők",
+          "industry": "iparág",
+          "website_url": "weboldal URL-je",
+          "logo_path": "logó"
+        }
       }
     },
     "campaigns": {

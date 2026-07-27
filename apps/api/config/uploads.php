@@ -26,4 +26,23 @@ return [
 
     'avatar_max_bytes' => (int) env('UPLOAD_AVATAR_MAX_BYTES', 5 * 1024 * 1024),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Brand logo upload cap (bytes)
+    |--------------------------------------------------------------------------
+    |
+    | AH-053 (D7). Same machinery as the avatar cap: BrandLogoUploadService's
+    | size guard and BrandLogoController's `max:` rule both derive from this
+    | value. Logos are small square marks rather than photographs, so the cap
+    | is deliberately tighter than the avatar's.
+    |
+    | Every cap registered here is covered by the `/health` upload assertion:
+    | UploadLimitChecker::requiredBytes() returns the LARGEST of them, so the
+    | check stays honest as caps are added (a runtime configured below the
+    | biggest advertised cap is flagged).
+    |
+    */
+
+    'brand_logo_max_bytes' => (int) env('UPLOAD_BRAND_LOGO_MAX_BYTES', 2 * 1024 * 1024),
+
 ];

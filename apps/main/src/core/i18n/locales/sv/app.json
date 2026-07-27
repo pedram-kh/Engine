@@ -96,8 +96,8 @@
       "campaigns": "Kampanjer",
       "agencyUsers": "Team",
       "settings": "Inställningar",
-      "menu": "Meny",
-      "messages": "Meddelanden"
+      "messages": "Meddelanden",
+      "menu": "Meny"
     },
     "discover": {
       "title": "Utforska creators",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Varumärkesnamn",
         "slug": "Slug",
-        "description": "Beskrivning",
+        "description": "Månatliga leveranser",
         "industry": "Bransch",
         "websiteUrl": "Webbplatsens URL",
         "defaultCurrency": "Standardvaluta",
         "defaultLanguage": "Standardspråk",
-        "status": "Status"
+        "status": "Status",
+        "descriptionHint": "Vad creatorn producerar varje månad (t.ex. 2 Reels och 3 Stories), samt användningsvillkor.",
+        "slugHint": "Föreslås automatiskt utifrån namnet. Används i URL:er.",
+        "logo": "Logotyp"
       },
       "status": {
         "active": "Aktiv",
@@ -413,6 +416,29 @@
         "saveFailed": "Kunde inte spara varumärke.",
         "archiveFailed": "Kunde inte arkivera varumärke.",
         "restoreFailed": "Kunde inte återställa varumärke."
+      },
+      "logo": {
+        "upload": "Ladda upp logotyp",
+        "replace": "Byt logotyp",
+        "remove": "Ta bort",
+        "hint": "JPEG, PNG eller WebP, upp till 2 MB. Kvadratiska logotyper fungerar bäst.",
+        "alt": "Varumärkets logotyp",
+        "errors": {
+          "uploadFailed": "Logotypen kunde inte laddas upp. Prova en annan bild.",
+          "removeFailed": "Logotypen kunde inte tas bort. Försök igen.",
+          "uploadFailedAfterCreate": "Varumärket skapades, men logotypen laddades inte upp. Lägg till en logotyp före nästa redigering — utan den går varumärket inte att spara."
+        }
+      },
+      "floor": {
+        "hint": "Saknas fortfarande: {fields}.",
+        "fields": {
+          "name": "varumärkesnamn",
+          "slug": "slug",
+          "description": "månatliga leveranser",
+          "industry": "bransch",
+          "website_url": "webbplatsens URL",
+          "logo_path": "logotyp"
+        }
       }
     },
     "campaigns": {

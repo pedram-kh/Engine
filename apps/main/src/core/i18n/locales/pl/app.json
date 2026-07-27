@@ -96,8 +96,8 @@
       "campaigns": "Kampanie",
       "agencyUsers": "Zespół",
       "settings": "Ustawienia",
-      "menu": "Menu",
-      "messages": "Wiadomości"
+      "messages": "Wiadomości",
+      "menu": "Menu"
     },
     "discover": {
       "title": "Odkryj twórców",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Nazwa marki",
         "slug": "Slug",
-        "description": "Opis",
+        "description": "Miesięczne rezultaty",
         "industry": "Branża",
         "websiteUrl": "URL strony internetowej",
         "defaultCurrency": "Domyślna waluta",
         "defaultLanguage": "Domyślny język",
-        "status": "Status"
+        "status": "Status",
+        "descriptionHint": "Co twórca przygotowuje co miesiąc (np. 2 Reels i 3 Stories) oraz warunki wykorzystania.",
+        "slugHint": "Proponowany automatycznie na podstawie nazwy. Używany w adresach URL.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Aktywna",
@@ -413,6 +416,29 @@
         "saveFailed": "Nie udało się zapisać marki.",
         "archiveFailed": "Nie udało się zarchiwizować marki.",
         "restoreFailed": "Nie udało się przywrócić marki."
+      },
+      "logo": {
+        "upload": "Prześlij logo",
+        "replace": "Zmień logo",
+        "remove": "Usuń",
+        "hint": "JPEG, PNG lub WebP, do 2 MB. Najlepiej sprawdzają się znaki kwadratowe.",
+        "alt": "Logo marki",
+        "errors": {
+          "uploadFailed": "Nie udało się przesłać logo. Spróbuj z innym obrazem.",
+          "removeFailed": "Nie udało się usunąć logo. Spróbuj ponownie.",
+          "uploadFailedAfterCreate": "Marka została utworzona, ale logo nie zostało przesłane. Dodaj logo przed kolejną edycją — bez niego nie da się zapisać marki."
+        }
+      },
+      "floor": {
+        "hint": "Nadal wymagane: {fields}.",
+        "fields": {
+          "name": "nazwa marki",
+          "slug": "identyfikator",
+          "description": "miesięczne rezultaty",
+          "industry": "branża",
+          "website_url": "adres URL strony",
+          "logo_path": "logo"
+        }
       }
     },
     "campaigns": {

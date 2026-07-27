@@ -67,6 +67,7 @@ function makeBrand(overrides: Partial<BrandResource['attributes']> = {}): BrandR
       industry: null,
       website_url: null,
       logo_path: null,
+      logo_url: null,
       default_currency: 'EUR',
       default_language: 'en',
       status: 'archived',

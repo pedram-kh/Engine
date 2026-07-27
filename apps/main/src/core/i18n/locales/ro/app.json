@@ -96,8 +96,8 @@
       "campaigns": "Campanies",
       "agencyUsers": "Team",
       "settings": "Setări",
-      "menu": "Meniu",
-      "messages": "Mesaje"
+      "messages": "Mesaje",
+      "menu": "Meniu"
     },
     "discover": {
       "title": "Discover creators",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Brand name",
         "slug": "Slug",
-        "description": "Description",
+        "description": "Livrabile lunare",
         "industry": "Industry",
         "websiteUrl": "Website URL",
         "defaultCurrency": "Default currency",
         "defaultLanguage": "Default language",
-        "status": "Stare"
+        "status": "Stare",
+        "descriptionHint": "Ce produce creatorul în fiecare lună (de ex. 2 Reels și 3 Stories), plus condițiile de utilizare.",
+        "slugHint": "Sugerat automat din nume. Se folosește în adresele URL.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Activ",
@@ -413,6 +416,29 @@
         "saveFailed": "Failed to save brand.",
         "archiveFailed": "Failed to archive brand.",
         "restoreFailed": "Failed to restore brand."
+      },
+      "logo": {
+        "upload": "Încarcă logo",
+        "replace": "Înlocuiește logoul",
+        "remove": "Elimină",
+        "hint": "JPEG, PNG sau WebP, până la 2 MB. Logourile pătrate funcționează cel mai bine.",
+        "alt": "Logoul brandului",
+        "errors": {
+          "uploadFailed": "Logoul nu a putut fi încărcat. Încearcă altă imagine.",
+          "removeFailed": "Logoul nu a putut fi eliminat. Încearcă din nou.",
+          "uploadFailedAfterCreate": "Brandul a fost creat, dar logoul nu s-a încărcat. Adaugă un logo înainte de următoarea editare — fără el brandul nu poate fi salvat."
+        }
+      },
+      "floor": {
+        "hint": "Mai este nevoie de: {fields}.",
+        "fields": {
+          "name": "numele brandului",
+          "slug": "identificator",
+          "description": "livrabile lunare",
+          "industry": "domeniu",
+          "website_url": "adresa URL a site-ului",
+          "logo_path": "logo"
+        }
       }
     },
     "campaigns": {

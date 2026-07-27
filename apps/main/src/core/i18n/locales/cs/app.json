@@ -96,8 +96,8 @@
       "campaigns": "Kampaně",
       "agencyUsers": "Tým",
       "settings": "Nastavení",
-      "menu": "Nabídka",
-      "messages": "Zprávy"
+      "messages": "Zprávy",
+      "menu": "Nabídka"
     },
     "discover": {
       "title": "Objevit tvůrce",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Název značky",
         "slug": "Slug",
-        "description": "Popis",
+        "description": "Měsíční výstupy",
         "industry": "Odvětví",
         "websiteUrl": "URL webu",
         "defaultCurrency": "Výchozí měna",
         "defaultLanguage": "Výchozí jazyk",
-        "status": "Stav"
+        "status": "Stav",
+        "descriptionHint": "Co tvůrce každý měsíc vytvoří (např. 2 Reels a 3 Stories) a podmínky užití.",
+        "slugHint": "Automaticky navrženo podle názvu. Používá se v URL adresách.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Aktivní",
@@ -413,6 +416,29 @@
         "saveFailed": "Nepodařilo se uložit značku.",
         "archiveFailed": "Nepodařilo se archivovat značku.",
         "restoreFailed": "Nepodařilo se obnovit značku."
+      },
+      "logo": {
+        "upload": "Nahrát logo",
+        "replace": "Nahradit logo",
+        "remove": "Odebrat",
+        "hint": "JPEG, PNG nebo WebP, do 2 MB. Nejlépe fungují čtvercová loga.",
+        "alt": "Logo značky",
+        "errors": {
+          "uploadFailed": "Logo se nepodařilo nahrát. Zkuste jiný obrázek.",
+          "removeFailed": "Logo se nepodařilo odebrat. Zkuste to znovu.",
+          "uploadFailedAfterCreate": "Značka byla vytvořena, ale logo se nenahrálo. Přidejte logo před příští úpravou — bez něj nelze značku uložit."
+        }
+      },
+      "floor": {
+        "hint": "Ještě chybí: {fields}.",
+        "fields": {
+          "name": "název značky",
+          "slug": "identifikátor",
+          "description": "měsíční výstupy",
+          "industry": "obor",
+          "website_url": "URL webu",
+          "logo_path": "logo"
+        }
       }
     },
     "campaigns": {

@@ -8,8 +8,8 @@ namespace App\Core\Health;
  * Verifies that the PHP runtime can actually accept the uploads the
  * application advertises.
  *
- * The application caps avatar uploads at `config('uploads.avatar_max_bytes')`,
- * but whether an upload of that size SUCCEEDS depends on runtime config that
+ * The application caps each upload surface in `config/uploads.php`, but
+ * whether an upload of that size SUCCEEDS depends on runtime config that
  * lives outside the codebase:
  *
  *   - PHP `upload_max_filesize` — max size of a single uploaded file.
@@ -29,11 +29,29 @@ namespace App\Core\Health;
 final class UploadLimitChecker
 {
     /**
-     * The application's advertised maximum upload size in bytes.
+     * Every upload cap the application advertises. Add a key here when a new
+     * direct-multipart surface ships, or its cap becomes invisible to the
+     * health check (AH-053, Q2).
+     *
+     * @var list<string>
+     */
+    private const array CAP_CONFIG_KEYS = [
+        'uploads.avatar_max_bytes',
+        'uploads.brand_logo_max_bytes',
+    ];
+
+    /**
+     * The application's advertised maximum upload size in bytes — the LARGEST
+     * registered cap. A runtime that can carry the biggest advertised upload
+     * can carry all of them, so one number keeps the assertion honest without
+     * needing a per-surface health row.
      */
     public function requiredBytes(): int
     {
-        return (int) config('uploads.avatar_max_bytes');
+        return max(array_map(
+            static fn (string $key): int => (int) config($key),
+            self::CAP_CONFIG_KEYS,
+        ));
     }
 
     /**

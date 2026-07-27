@@ -23,6 +23,9 @@ const archiveError = ref<string | null>(null)
 
 const ulid = route.params.ulid as string
 
+/** Set by BrandCreatePage when the post-create logo upload failed (D7). */
+const logoUploadFailed = route.query.logo_failed === '1'
+
 async function loadBrand(): Promise<void> {
   const agencyId = agencyStore.currentAgencyId
   if (agencyId === null) return
@@ -105,6 +108,34 @@ onMounted(loadBrand)
 
     <!-- Brand details -->
     <v-card v-else-if="brand" class="pa-6" max-width="640" data-test="brand-detail-card">
+      <!--
+        The create flow uploads the logo AFTER the brand row exists (D7), so a
+        failed upload lands here. Say it plainly: the brand was created, the
+        logo was not, and the next edit will require one.
+      -->
+      <v-alert
+        v-if="logoUploadFailed"
+        type="warning"
+        variant="tonal"
+        class="mb-4"
+        data-test="brand-detail-logo-failed"
+      >
+        {{ t('app.brands.logo.errors.uploadFailedAfterCreate') }}
+      </v-alert>
+
+      <div class="d-flex align-center ga-4 mb-4">
+        <v-avatar size="72" rounded="lg" color="surface-variant" data-test="brand-detail-logo">
+          <v-img
+            v-if="brand.attributes.logo_url"
+            :src="brand.attributes.logo_url"
+            :alt="t('app.brands.logo.alt')"
+            cover
+          />
+          <v-icon v-else icon="mdi-image-outline" />
+        </v-avatar>
+        <div class="text-h6">{{ brand.attributes.name }}</div>
+      </div>
+
       <v-list>
         <v-list-item :title="t('app.brands.fields.name')" :subtitle="brand.attributes.name" />
         <v-list-item

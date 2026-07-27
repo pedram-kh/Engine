@@ -96,8 +96,8 @@
       "campaigns": "Kampagner",
       "agencyUsers": "Team",
       "settings": "Indstillinger",
-      "menu": "Menu",
-      "messages": "Beskeder"
+      "messages": "Beskeder",
+      "menu": "Menu"
     },
     "discover": {
       "title": "Opdage creatorer",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Brandnavn",
         "slug": "Slug",
-        "description": "Beskrivelse",
+        "description": "Månedlige leverancer",
         "industry": "Branche",
         "websiteUrl": "Websted-URL",
         "defaultCurrency": "Standardvaluta",
         "defaultLanguage": "Standardsprog",
-        "status": "Status"
+        "status": "Status",
+        "descriptionHint": "Hvad creatoren producerer hver måned (fx 2 Reels og 3 Stories) samt brugsvilkår.",
+        "slugHint": "Foreslås automatisk ud fra navnet. Bruges i URL'er.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Aktiv",
@@ -413,6 +416,29 @@
         "saveFailed": "Brand kunne ikke gemmes.",
         "archiveFailed": "Brand kunne ikke arkiveres.",
         "restoreFailed": "Brand kunne ikke gendannes."
+      },
+      "logo": {
+        "upload": "Upload logo",
+        "replace": "Udskift logo",
+        "remove": "Fjern",
+        "hint": "JPEG, PNG eller WebP på op til 2 MB. Kvadratiske logoer fungerer bedst.",
+        "alt": "Brandlogo",
+        "errors": {
+          "uploadFailed": "Logoet kunne ikke uploades. Prøv et andet billede.",
+          "removeFailed": "Logoet kunne ikke fjernes. Prøv igen.",
+          "uploadFailedAfterCreate": "Brandet blev oprettet, men logoet blev ikke uploadet. Tilføj et logo inden næste redigering — brandet kan ikke gemmes uden."
+        }
+      },
+      "floor": {
+        "hint": "Mangler stadig: {fields}.",
+        "fields": {
+          "name": "brandnavn",
+          "slug": "slug",
+          "description": "månedlige leverancer",
+          "industry": "branche",
+          "website_url": "website-URL",
+          "logo_path": "logo"
+        }
       }
     },
     "campaigns": {

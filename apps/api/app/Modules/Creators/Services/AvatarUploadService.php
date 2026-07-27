@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Creators\Services;
 
+use App\Core\Storage\StorageWriteFailedException;
 use App\Modules\Creators\Models\Creator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -57,6 +58,7 @@ final class AvatarUploadService
      *                          intentionally generic — detailed error codes
      *                          are returned via the controller's form-request
      *                          path (this service is a low-level helper).
+     * @throws StorageWriteFailedException When the disk reports the write failed.
      */
     public function upload(Creator $creator, UploadedFile $file): string
     {
@@ -72,7 +74,9 @@ final class AvatarUploadService
             $extension,
         );
 
-        Storage::disk('media')->put($path, $reencoded);
+        if (Storage::disk('media')->put($path, $reencoded) === false) {
+            throw StorageWriteFailedException::forPath('media', $path);
+        }
 
         return $path;
     }

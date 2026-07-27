@@ -1,4 +1,17 @@
 <script setup lang="ts">
+/**
+ * Brand edit.
+ *
+ * The brand row already exists here, so the logo behaves exactly like the
+ * creator avatar (AH-053, D7): choosing a file uploads it immediately and the
+ * response carries the refreshed brand, including a freshly-signed
+ * `logo_url`. Removal is immediate too.
+ *
+ * The D6 floor is mirrored by the shared form: brands created before the floor
+ * arrive here missing fields, the submit button stays held with the missing
+ * fields named, and the API's refusal is never the first thing the user sees.
+ */
+
 import { ApiError, extractFieldErrors, type CreateBrandPayload } from '@catalyst/api-client'
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -15,12 +28,16 @@ const agencyStore = useAgencyStore()
 
 const ulid = route.params.ulid as string
 
-const form = ref<CreateBrandPayload>({ name: '' })
+const form = ref<Partial<CreateBrandPayload>>({ name: '' })
 const loading = ref(true)
 const submitting = ref(false)
 const loadError = ref<string | null>(null)
 const saveError = ref<string | null>(null)
-const fieldErrors = ref<Partial<Record<keyof CreateBrandPayload, readonly string[]>>>({})
+const fieldErrors = ref<Partial<Record<string, readonly string[]>>>({})
+
+const logoUrl = ref<string | null>(null)
+const logoBusy = ref(false)
+const logoError = ref<string | null>(null)
 
 async function loadBrand(): Promise<void> {
   const agencyId = agencyStore.currentAgencyId
@@ -31,19 +48,58 @@ async function loadBrand(): Promise<void> {
   try {
     const res = await brandsApi.show(agencyId, ulid)
     const attrs = res.data.attributes
+    // `default_currency` / `default_language` are deliberately NOT seeded
+    // (D8): the form no longer renders them, so omitting them from the PATCH
+    // preserves the stored values. Re-seeding would re-send fields the user
+    // never saw — the AH-032 wipe mechanic.
     form.value = {
       name: attrs.name,
       slug: attrs.slug ?? undefined,
       description: attrs.description ?? undefined,
       industry: attrs.industry ?? undefined,
       website_url: attrs.website_url ?? undefined,
-      default_currency: attrs.default_currency ?? undefined,
-      default_language: attrs.default_language ?? undefined,
     }
+    logoUrl.value = attrs.logo_url
   } catch {
     loadError.value = t('app.brands.errors.loadFailed')
   } finally {
     loading.value = false
+  }
+}
+
+async function onLogoSelected(file: File): Promise<void> {
+  const agencyId = agencyStore.currentAgencyId
+  if (agencyId === null) return
+
+  logoBusy.value = true
+  logoError.value = null
+  try {
+    const res = await brandsApi.uploadLogo(agencyId, ulid, file)
+    logoUrl.value = res.data.attributes.logo_url
+  } catch (err) {
+    logoError.value =
+      err instanceof ApiError ? err.message : t('app.brands.logo.errors.uploadFailed')
+    console.error('[BrandEditPage] logo upload failed', err)
+  } finally {
+    logoBusy.value = false
+  }
+}
+
+async function onLogoRemoved(): Promise<void> {
+  const agencyId = agencyStore.currentAgencyId
+  if (agencyId === null) return
+
+  logoBusy.value = true
+  logoError.value = null
+  try {
+    const res = await brandsApi.deleteLogo(agencyId, ulid)
+    logoUrl.value = res.data.attributes.logo_url
+  } catch (err) {
+    logoError.value =
+      err instanceof ApiError ? err.message : t('app.brands.logo.errors.removeFailed')
+    console.error('[BrandEditPage] logo removal failed', err)
+  } finally {
+    logoBusy.value = false
   }
 }
 
@@ -60,7 +116,7 @@ async function onSubmit(): Promise<void> {
     await router.push({ name: 'brands.detail', params: { ulid } })
   } catch (err) {
     if (err instanceof ApiError) {
-      const grouped = extractFieldErrors<keyof CreateBrandPayload>(err)
+      const grouped = extractFieldErrors<string>(err)
       fieldErrors.value = grouped
 
       if (Object.keys(grouped).length === 0) {
@@ -114,7 +170,12 @@ onMounted(loadBrand)
         :submit-label="t('app.brands.actions.save')"
         :error="saveError"
         :field-errors="fieldErrors"
+        :logo-url="logoUrl"
+        :logo-busy="logoBusy"
+        :logo-error="logoError"
         @submit="onSubmit"
+        @logo-selected="onLogoSelected"
+        @logo-removed="onLogoRemoved"
       />
     </v-card>
   </div>

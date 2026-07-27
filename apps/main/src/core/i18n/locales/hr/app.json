@@ -96,8 +96,8 @@
       "campaigns": "Kampanje",
       "agencyUsers": "Ekipa",
       "settings": "Nastanjeitve",
-      "menu": "Izbornik",
-      "messages": "Poruke"
+      "messages": "Poruke",
+      "menu": "Izbornik"
     },
     "discover": {
       "title": "Odkrivanje ustvarjalca",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Název znamke",
         "slug": "Slug",
-        "description": "Popis",
+        "description": "Mjesečni isporučivi sadržaj",
         "industry": "Odvětví",
         "websiteUrl": "URL webu",
         "defaultCurrency": "Výchozí měna",
         "defaultLanguage": "Výchozí jazyk",
-        "status": "Stanje"
+        "status": "Stanje",
+        "descriptionHint": "Što kreator izrađuje svaki mjesec (npr. 2 Reels i 3 Stories) te uvjeti korištenja.",
+        "slugHint": "Automatski se predlaže prema nazivu. Koristi se u URL-ovima.",
+        "logo": "Logotip"
       },
       "status": {
         "active": "Aktiven",
@@ -413,6 +416,29 @@
         "saveFailed": "Ni uspelo spremiti značku.",
         "archiveFailed": "Ni uspelo archivovat značku.",
         "restoreFailed": "Ni uspelo obnovit značku."
+      },
+      "logo": {
+        "upload": "Prenesi logotip",
+        "replace": "Zamijeni logotip",
+        "remove": "Ukloni",
+        "hint": "JPEG, PNG ili WebP, do 2 MB. Kvadratni logotipi najbolje funkcioniraju.",
+        "alt": "Logotip robne marke",
+        "errors": {
+          "uploadFailed": "Logotip nije bilo moguće prenijeti. Pokušajte s drugom slikom.",
+          "removeFailed": "Logotip nije bilo moguće ukloniti. Pokušajte ponovno.",
+          "uploadFailedAfterCreate": "Robna marka je stvorena, ali logotip nije prenesen. Dodajte logotip prije sljedećeg uređivanja — bez njega se marka ne može spremiti."
+        }
+      },
+      "floor": {
+        "hint": "Još je potrebno: {fields}.",
+        "fields": {
+          "name": "naziv marke",
+          "slug": "identifikator",
+          "description": "mjesečni isporučivi sadržaj",
+          "industry": "djelatnost",
+          "website_url": "URL web-mjesta",
+          "logo_path": "logotip"
+        }
       }
     },
     "campaigns": {

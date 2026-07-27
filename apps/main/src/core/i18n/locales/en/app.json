@@ -361,12 +361,15 @@
       "fields": {
         "name": "Brand name",
         "slug": "Slug",
-        "description": "Description",
+        "description": "Monthly deliverables",
         "industry": "Industry",
         "websiteUrl": "Website URL",
         "defaultCurrency": "Default currency",
         "defaultLanguage": "Default language",
-        "status": "Status"
+        "status": "Status",
+        "descriptionHint": "What the creator produces each month (e.g. 2 Reels and 3 Stories), plus usage terms.",
+        "slugHint": "Auto-suggested from the name. Used in URLs.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Active",
@@ -413,6 +416,29 @@
         "saveFailed": "Failed to save brand.",
         "archiveFailed": "Failed to archive brand.",
         "restoreFailed": "Failed to restore brand."
+      },
+      "logo": {
+        "upload": "Upload logo",
+        "replace": "Replace logo",
+        "remove": "Remove",
+        "hint": "JPEG, PNG or WebP, up to 2 MB. Square marks work best.",
+        "alt": "Brand logo",
+        "errors": {
+          "uploadFailed": "The logo could not be uploaded. Try a different image.",
+          "removeFailed": "The logo could not be removed. Try again.",
+          "uploadFailedAfterCreate": "The brand was created, but its logo did not upload. Add a logo before your next edit — the brand cannot be saved without one."
+        }
+      },
+      "floor": {
+        "hint": "Still needed: {fields}.",
+        "fields": {
+          "name": "brand name",
+          "slug": "slug",
+          "description": "monthly deliverables",
+          "industry": "industry",
+          "website_url": "website URL",
+          "logo_path": "logo"
+        }
       }
     },
     "campaigns": {

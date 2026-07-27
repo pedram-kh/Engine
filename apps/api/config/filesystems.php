@@ -90,18 +90,62 @@ return [
         | in those environments (Laravel's S3 driver defaults to AWS endpoints).
         */
 
-        'media' => [
-            'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET_MEDIA', env('AWS_BUCKET', 'catalyst-engine-media')),
-            'endpoint' => env('AWS_ENDPOINT_URL', env('AWS_ENDPOINT')),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'visibility' => 'private',
-            'throw' => false,
-            'report' => false,
-        ],
+        /*
+        |----------------------------------------------------------------------
+        | AH-053 — the one test-only branch in this file.
+        |----------------------------------------------------------------------
+        |
+        | The Playwright suites have no object store: the E2E CI job provisions
+        | Postgres and Redis only, and `make dev`'s MinIO is not part of it. An
+        | S3 write against an absent bucket does not raise here (every disk in
+        | this file is `'throw' => false`), so a brand-logo upload would answer
+        | 200 having stored nothing and the spec would go green over a lost
+        | file. `MEDIA_DISK_DRIVER=local` swaps the DRIVER for that run so the
+        | whole pipeline — write, signed URL, browser render — is exercised for
+        | real against the local filesystem.
+        |
+        | `'serve' => true` is what gives the local driver a working
+        | `temporaryUrl()`: Laravel registers a signed `storage.media` route
+        | (LocalFilesystemAdapter::temporaryUrl), so `BrandLogoUploadService::
+        | signedViewUrl()` keeps its exact production semantics — a
+        | short-lived, signature-checked GET — instead of being special-cased.
+        |
+        | The explicit `url` is load-bearing, not cosmetic. Without it the
+        | served route defaults to `/storage/{path}` — the SAME URI the `local`
+        | disk above already registers, and `{path}` is a `.*` wildcard, so the
+        | first-registered route wins and `storage.local` silently swallows
+        | every `/storage/media/...` request. The signature still validates (it
+        | is computed over the URL, not the route), the wrong disk is then
+        | asked for `media/agencies/...`, and the logo 404s. `/e2e-media` keeps
+        | the two off each other.
+        |
+        | The variable is set in exactly one place, `apps/main/playwright.
+        | config.ts`, and pinned there by `tests/unit/architecture/
+        | e2e-media-disk.spec.ts`. Unset — every other environment, production
+        | included — this resolves to the untouched S3 definition below.
+        */
+        'media' => env('MEDIA_DISK_DRIVER', 's3') === 'local'
+            ? [
+                'driver' => 'local',
+                'root' => storage_path('app/e2e-media'),
+                'url' => env('APP_URL').'/e2e-media',
+                'serve' => true,
+                'visibility' => 'private',
+                'throw' => false,
+                'report' => false,
+            ]
+            : [
+                'driver' => 's3',
+                'key' => env('AWS_ACCESS_KEY_ID'),
+                'secret' => env('AWS_SECRET_ACCESS_KEY'),
+                'region' => env('AWS_DEFAULT_REGION'),
+                'bucket' => env('AWS_BUCKET_MEDIA', env('AWS_BUCKET', 'catalyst-engine-media')),
+                'endpoint' => env('AWS_ENDPOINT_URL', env('AWS_ENDPOINT')),
+                'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+                'visibility' => 'private',
+                'throw' => false,
+                'report' => false,
+            ],
 
         'contracts' => [
             'driver' => 's3',

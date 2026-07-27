@@ -96,8 +96,8 @@
       "campaigns": "Кампанияs",
       "agencyUsers": "Team",
       "settings": "Настройки",
-      "menu": "Меню",
-      "messages": "Съобщения"
+      "messages": "Съобщения",
+      "menu": "Меню"
     },
     "discover": {
       "title": "Discover creators",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Brand name",
         "slug": "Slug",
-        "description": "Description",
+        "description": "Месечни резултати",
         "industry": "Industry",
         "websiteUrl": "Website URL",
         "defaultCurrency": "Default currency",
         "defaultLanguage": "Default language",
-        "status": "Статус"
+        "status": "Статус",
+        "descriptionHint": "Какво произвежда криейтърът всеки месец (напр. 2 Reels и 3 Stories), плюс условията за използване.",
+        "slugHint": "Предлага се автоматично от името. Използва се в URL адресите.",
+        "logo": "Лого"
       },
       "status": {
         "active": "Активен",
@@ -413,6 +416,29 @@
         "saveFailed": "Failed to save brand.",
         "archiveFailed": "Failed to archive brand.",
         "restoreFailed": "Failed to restore brand."
+      },
+      "logo": {
+        "upload": "Качване на лого",
+        "replace": "Смяна на логото",
+        "remove": "Премахване",
+        "hint": "JPEG, PNG или WebP, до 2 MB. Квадратните лога работят най-добре.",
+        "alt": "Лого на марката",
+        "errors": {
+          "uploadFailed": "Логото не можа да бъде качено. Опитайте с друго изображение.",
+          "removeFailed": "Логото не можа да бъде премахнато. Опитайте отново.",
+          "uploadFailedAfterCreate": "Марката беше създадена, но логото не се качи. Добавете лого преди следващата редакция — марката не може да бъде запазена без него."
+        }
+      },
+      "floor": {
+        "hint": "Все още е необходимо: {fields}.",
+        "fields": {
+          "name": "име на марката",
+          "slug": "идентификатор",
+          "description": "месечни резултати",
+          "industry": "индустрия",
+          "website_url": "URL на уебсайта",
+          "logo_path": "лого"
+        }
       }
     },
     "campaigns": {

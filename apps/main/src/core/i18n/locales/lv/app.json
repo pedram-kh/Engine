@@ -96,8 +96,8 @@
       "campaigns": "Kampaņas",
       "agencyUsers": "Team",
       "settings": "Iestatījumi",
-      "menu": "Izvēlne",
-      "messages": "Ziņojumi"
+      "messages": "Ziņojumi",
+      "menu": "Izvēlne"
     },
     "discover": {
       "title": "Discover creators",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Brand name",
         "slug": "Slug",
-        "description": "Description",
+        "description": "Ikmēneša nodevumi",
         "industry": "Industry",
         "websiteUrl": "Website URL",
         "defaultCurrency": "Default currency",
         "defaultLanguage": "Default language",
-        "status": "Statuss"
+        "status": "Statuss",
+        "descriptionHint": "Ko veidotājs izveido katru mēnesi (piem., 2 Reels un 3 Stories), kā arī lietošanas nosacījumi.",
+        "slugHint": "Automātiski ieteikts no nosaukuma. Tiek izmantots URL adresēs.",
+        "logo": "Logotips"
       },
       "status": {
         "active": "Aktīvs",
@@ -413,6 +416,29 @@
         "saveFailed": "Failed to save brand.",
         "archiveFailed": "Failed to archive brand.",
         "restoreFailed": "Failed to restore brand."
+      },
+      "logo": {
+        "upload": "Augšupielādēt logotipu",
+        "replace": "Nomainīt logotipu",
+        "remove": "Noņemt",
+        "hint": "JPEG, PNG vai WebP, līdz 2 MB. Vislabāk der kvadrātveida logotipi.",
+        "alt": "Zīmola logotips",
+        "errors": {
+          "uploadFailed": "Logotipu neizdevās augšupielādēt. Izmēģiniet citu attēlu.",
+          "removeFailed": "Logotipu neizdevās noņemt. Mēģiniet vēlreiz.",
+          "uploadFailedAfterCreate": "Zīmols tika izveidots, bet logotips netika augšupielādēts. Pievienojiet logotipu pirms nākamās rediģēšanas — bez tā zīmolu nevar saglabāt."
+        }
+      },
+      "floor": {
+        "hint": "Vēl nepieciešams: {fields}.",
+        "fields": {
+          "name": "zīmola nosaukums",
+          "slug": "identifikators",
+          "description": "ikmēneša nodevumi",
+          "industry": "nozare",
+          "website_url": "vietnes URL",
+          "logo_path": "logotips"
+        }
       }
     },
     "campaigns": {

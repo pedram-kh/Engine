@@ -1,6 +1,21 @@
 <script setup lang="ts">
+/**
+ * Brand creation.
+ *
+ * Two-step by necessity (AH-053, D7): the logo endpoint needs a brand row to
+ * attach the object to, so the page creates the brand and THEN uploads the
+ * chosen logo. The form holds the file and requires one before submit, so the
+ * user experiences a single act.
+ *
+ * The honest consequence: between the two calls the brand exists without a
+ * logo, and a failed upload leaves it floor-incomplete. That is surfaced —
+ * the page lands on the brand detail with an explicit "logo upload failed"
+ * message rather than pretending the create succeeded cleanly — and the D6
+ * edit gate will demand a logo before the next edit can be saved.
+ */
+
 import { ApiError, extractFieldErrors, type CreateBrandPayload } from '@catalyst/api-client'
-import { ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
@@ -12,10 +27,27 @@ const { t } = useI18n()
 const router = useRouter()
 const agencyStore = useAgencyStore()
 
-const form = ref<CreateBrandPayload>({ name: '' })
+const form = ref<Partial<CreateBrandPayload>>({ name: '' })
 const submitting = ref(false)
 const error = ref<string | null>(null)
-const fieldErrors = ref<Partial<Record<keyof CreateBrandPayload, readonly string[]>>>({})
+const fieldErrors = ref<Partial<Record<string, readonly string[]>>>({})
+
+// The logo is held locally until the brand row exists. `logoPreview` is an
+// object URL, revoked on replace/unmount so the blob is not leaked.
+const logoFile = ref<File | null>(null)
+const logoPreview = ref<string | null>(null)
+const logoError = ref<string | null>(null)
+
+function setLogo(file: File | null): void {
+  if (logoPreview.value !== null) URL.revokeObjectURL(logoPreview.value)
+  logoFile.value = file
+  logoPreview.value = file === null ? null : URL.createObjectURL(file)
+  logoError.value = null
+}
+
+onBeforeUnmount(() => {
+  if (logoPreview.value !== null) URL.revokeObjectURL(logoPreview.value)
+})
 
 async function onSubmit(): Promise<void> {
   const agencyId = agencyStore.currentAgencyId
@@ -23,14 +55,32 @@ async function onSubmit(): Promise<void> {
 
   submitting.value = true
   error.value = null
+  logoError.value = null
   fieldErrors.value = {}
 
   try {
-    const res = await brandsApi.create(agencyId, form.value)
-    await router.push({ name: 'brands.detail', params: { ulid: res.data.id } })
+    const res = await brandsApi.create(agencyId, form.value as CreateBrandPayload)
+    const brandId = res.data.id
+
+    if (logoFile.value !== null) {
+      try {
+        await brandsApi.uploadLogo(agencyId, brandId, logoFile.value)
+      } catch (uploadErr) {
+        // The brand IS created. Say so, and say what is still missing.
+        console.error('[BrandCreatePage] logo upload failed after create', uploadErr)
+        await router.push({
+          name: 'brands.detail',
+          params: { ulid: brandId },
+          query: { logo_failed: '1' },
+        })
+        return
+      }
+    }
+
+    await router.push({ name: 'brands.detail', params: { ulid: brandId } })
   } catch (err) {
     if (err instanceof ApiError) {
-      const grouped = extractFieldErrors<keyof CreateBrandPayload>(err)
+      const grouped = extractFieldErrors<string>(err)
       fieldErrors.value = grouped
 
       // Per-field rendering owns the validation case; surface a top-level
@@ -79,7 +129,11 @@ async function onSubmit(): Promise<void> {
         :submit-label="t('app.brands.actions.save')"
         :error="error"
         :field-errors="fieldErrors"
+        :logo-url="logoPreview"
+        :logo-error="logoError"
         @submit="onSubmit"
+        @logo-selected="setLogo"
+        @logo-removed="setLogo(null)"
       />
     </v-card>
   </div>

@@ -96,8 +96,8 @@
       "campaigns": "Campanhas",
       "agencyUsers": "Equipe",
       "settings": "Configurações",
-      "menu": "Menu",
-      "messages": "Mensagens"
+      "messages": "Mensagens",
+      "menu": "Menu"
     },
     "discover": {
       "title": "Descobrir criadores",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Nome da marca",
         "slug": "Slug",
-        "description": "Descrição",
+        "description": "Entregas mensais",
         "industry": "Setor",
         "websiteUrl": "URL do site",
         "defaultCurrency": "Moeda padrão",
         "defaultLanguage": "Idioma padrão",
-        "status": "Status"
+        "status": "Status",
+        "descriptionHint": "O que o criador produz por mês (por ex., 2 Reels e 3 Stories), além das condições de utilização.",
+        "slugHint": "Sugerido automaticamente a partir do nome. Usado nos URL.",
+        "logo": "Logótipo"
       },
       "status": {
         "active": "Ativo",
@@ -413,6 +416,29 @@
         "saveFailed": "Falha ao salvar marca.",
         "archiveFailed": "Falha ao arquivar marca.",
         "restoreFailed": "Falha ao restaurar marca."
+      },
+      "logo": {
+        "upload": "Carregar logótipo",
+        "replace": "Substituir logótipo",
+        "remove": "Remover",
+        "hint": "JPEG, PNG ou WebP, até 2 MB. Os logótipos quadrados funcionam melhor.",
+        "alt": "Logótipo da marca",
+        "errors": {
+          "uploadFailed": "Não foi possível carregar o logótipo. Experimente outra imagem.",
+          "removeFailed": "Não foi possível remover o logótipo. Tente novamente.",
+          "uploadFailedAfterCreate": "A marca foi criada, mas o logótipo não foi carregado. Adicione um logótipo antes da próxima edição — sem ele a marca não pode ser guardada."
+        }
+      },
+      "floor": {
+        "hint": "Ainda é necessário: {fields}.",
+        "fields": {
+          "name": "nome da marca",
+          "slug": "identificador",
+          "description": "entregas mensais",
+          "industry": "setor",
+          "website_url": "URL do site",
+          "logo_path": "logótipo"
+        }
       }
     },
     "campaigns": {

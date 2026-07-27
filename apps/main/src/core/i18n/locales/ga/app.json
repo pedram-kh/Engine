@@ -96,8 +96,8 @@
       "campaigns": "Feachtass",
       "agencyUsers": "Team",
       "settings": "Socruithe",
-      "menu": "Roghchlár",
-      "messages": "Teachtaireachtaí"
+      "messages": "Teachtaireachtaí",
+      "menu": "Roghchlár"
     },
     "discover": {
       "title": "Discover creators",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Brand name",
         "slug": "Slug",
-        "description": "Description",
+        "description": "Soláthairtí míosúla",
         "industry": "Industry",
         "websiteUrl": "Website URL",
         "defaultCurrency": "Default currency",
         "defaultLanguage": "Default language",
-        "status": "Stádas"
+        "status": "Stádas",
+        "descriptionHint": "A gcruthaíonn an cruthaitheoir gach mí (m.sh. 2 Reels agus 3 Stories), chomh maith le téarmaí úsáide.",
+        "slugHint": "Moltar go huathoibríoch ón ainm. Úsáidtear é i URLanna.",
+        "logo": "Lógó"
       },
       "status": {
         "active": "Gníomhach",
@@ -413,6 +416,29 @@
         "saveFailed": "Failed to save brand.",
         "archiveFailed": "Failed to archive brand.",
         "restoreFailed": "Failed to restore brand."
+      },
+      "logo": {
+        "upload": "Uaslódáil lógó",
+        "replace": "Cuir lógó nua ina áit",
+        "remove": "Bain",
+        "hint": "JPEG, PNG nó WebP, suas le 2 MB. Is fearr a oibríonn lógónna cearnógacha.",
+        "alt": "Lógó an bhranda",
+        "errors": {
+          "uploadFailed": "Níorbh fhéidir an lógó a uaslódáil. Bain triail as íomhá eile.",
+          "removeFailed": "Níorbh fhéidir an lógó a bhaint. Bain triail eile as.",
+          "uploadFailedAfterCreate": "Cruthaíodh an branda, ach níor uaslódáladh an lógó. Cuir lógó leis roimh an gcéad eagrán eile — ní féidir an branda a shábháil dá cheal."
+        }
+      },
+      "floor": {
+        "hint": "Fós de dhíth: {fields}.",
+        "fields": {
+          "name": "ainm an bhranda",
+          "slug": "aitheantóir",
+          "description": "soláthairtí míosúla",
+          "industry": "tionscal",
+          "website_url": "URL an tsuímh ghréasáin",
+          "logo_path": "lógó"
+        }
       }
     },
     "campaigns": {

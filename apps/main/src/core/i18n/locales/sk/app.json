@@ -96,8 +96,8 @@
       "campaigns": "Kampaně",
       "agencyUsers": "Tím",
       "settings": "Nastavenia",
-      "menu": "Ponuka",
-      "messages": "Správy"
+      "messages": "Správy",
+      "menu": "Ponuka"
     },
     "discover": {
       "title": "Objevit tvorcu",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Název značky",
         "slug": "Slug",
-        "description": "Popis",
+        "description": "Mesačné výstupy",
         "industry": "Odvětví",
         "websiteUrl": "URL webu",
         "defaultCurrency": "Výchozí měna",
         "defaultLanguage": "Výchozí jazyk",
-        "status": "Stav"
+        "status": "Stav",
+        "descriptionHint": "Čo tvorca vytvorí každý mesiac (napr. 2 Reels a 3 Stories) a podmienky použitia.",
+        "slugHint": "Automaticky navrhnuté podľa názvu. Používa sa v adresách URL.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Aktívny",
@@ -413,6 +416,29 @@
         "saveFailed": "Nepodařilo sa uložiť značku.",
         "archiveFailed": "Nepodařilo sa archivovať značku.",
         "restoreFailed": "Nepodařilo sa obnoviť značku."
+      },
+      "logo": {
+        "upload": "Nahrať logo",
+        "replace": "Nahradiť logo",
+        "remove": "Odstrániť",
+        "hint": "JPEG, PNG alebo WebP, do 2 MB. Najlepšie fungujú štvorcové logá.",
+        "alt": "Logo značky",
+        "errors": {
+          "uploadFailed": "Logo sa nepodarilo nahrať. Skúste iný obrázok.",
+          "removeFailed": "Logo sa nepodarilo odstrániť. Skúste to znova.",
+          "uploadFailedAfterCreate": "Značka bola vytvorená, ale logo sa nenahralo. Pridajte logo pred ďalšou úpravou — bez neho značku nemožno uložiť."
+        }
+      },
+      "floor": {
+        "hint": "Ešte je potrebné: {fields}.",
+        "fields": {
+          "name": "názov značky",
+          "slug": "identifikátor",
+          "description": "mesačné výstupy",
+          "industry": "odvetvie",
+          "website_url": "URL webovej stránky",
+          "logo_path": "logo"
+        }
       }
     },
     "campaigns": {

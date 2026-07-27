@@ -96,8 +96,8 @@
       "campaigns": "Kampaanias",
       "agencyUsers": "Team",
       "settings": "Seaded",
-      "menu": "Menüü",
-      "messages": "Sõnumid"
+      "messages": "Sõnumid",
+      "menu": "Menüü"
     },
     "discover": {
       "title": "Discover creators",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Brand name",
         "slug": "Slug",
-        "description": "Description",
+        "description": "Igakuised tulemid",
         "industry": "Industry",
         "websiteUrl": "Website URL",
         "defaultCurrency": "Default currency",
         "defaultLanguage": "Default language",
-        "status": "Olek"
+        "status": "Olek",
+        "descriptionHint": "Mida looja iga kuu toodab (nt 2 Reels'i ja 3 Stories't) ning kasutustingimused.",
+        "slugHint": "Pakutakse automaatselt nime järgi. Kasutatakse URL-ides.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Aktiivne",
@@ -413,6 +416,29 @@
         "saveFailed": "Failed to save brand.",
         "archiveFailed": "Failed to archive brand.",
         "restoreFailed": "Failed to restore brand."
+      },
+      "logo": {
+        "upload": "Laadi logo üles",
+        "replace": "Asenda logo",
+        "remove": "Eemalda",
+        "hint": "JPEG, PNG või WebP, kuni 2 MB. Kõige paremini sobivad ruudukujulised logod.",
+        "alt": "Brändi logo",
+        "errors": {
+          "uploadFailed": "Logo üleslaadimine ebaõnnestus. Proovi teist pilti.",
+          "removeFailed": "Logo eemaldamine ebaõnnestus. Proovi uuesti.",
+          "uploadFailedAfterCreate": "Bränd loodi, kuid logo ei laaditud üles. Lisa logo enne järgmist muutmist — ilma selleta ei saa brändi salvestada."
+        }
+      },
+      "floor": {
+        "hint": "Veel on vaja: {fields}.",
+        "fields": {
+          "name": "brändi nimi",
+          "slug": "lühinimi",
+          "description": "igakuised tulemid",
+          "industry": "valdkond",
+          "website_url": "veebisaidi URL",
+          "logo_path": "logo"
+        }
       }
     },
     "campaigns": {

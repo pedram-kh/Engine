@@ -96,8 +96,8 @@
       "campaigns": "Kampanjas",
       "agencyUsers": "Team",
       "settings": "Asetukset",
-      "menu": "Valikko",
-      "messages": "Viestit"
+      "messages": "Viestit",
+      "menu": "Valikko"
     },
     "discover": {
       "title": "Discover creators",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Brand name",
         "slug": "Slug",
-        "description": "Description",
+        "description": "Kuukausittaiset tuotokset",
         "industry": "Industry",
         "websiteUrl": "Website URL",
         "defaultCurrency": "Default currency",
         "defaultLanguage": "Default language",
-        "status": "Tila"
+        "status": "Tila",
+        "descriptionHint": "Mitä tekijä tuottaa joka kuukausi (esim. 2 Reels ja 3 Stories) sekä käyttöehdot.",
+        "slugHint": "Ehdotetaan automaattisesti nimen perusteella. Käytetään URL-osoitteissa.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Aktiivinen",
@@ -413,6 +416,29 @@
         "saveFailed": "Failed to save brand.",
         "archiveFailed": "Failed to archive brand.",
         "restoreFailed": "Failed to restore brand."
+      },
+      "logo": {
+        "upload": "Lataa logo",
+        "replace": "Vaihda logo",
+        "remove": "Poista",
+        "hint": "JPEG, PNG tai WebP, enintään 2 Mt. Neliönmuotoiset logot toimivat parhaiten.",
+        "alt": "Brändin logo",
+        "errors": {
+          "uploadFailed": "Logon lataus epäonnistui. Kokeile toista kuvaa.",
+          "removeFailed": "Logon poisto epäonnistui. Yritä uudelleen.",
+          "uploadFailedAfterCreate": "Brändi luotiin, mutta logo ei latautunut. Lisää logo ennen seuraavaa muokkausta — brändiä ei voi tallentaa ilman sitä."
+        }
+      },
+      "floor": {
+        "hint": "Puuttuu vielä: {fields}.",
+        "fields": {
+          "name": "brändin nimi",
+          "slug": "tunniste",
+          "description": "kuukausittaiset tuotokset",
+          "industry": "toimiala",
+          "website_url": "verkkosivun URL",
+          "logo_path": "logo"
+        }
       }
     },
     "campaigns": {

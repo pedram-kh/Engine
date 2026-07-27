@@ -96,8 +96,8 @@
       "campaigns": "Campagnes",
       "agencyUsers": "Équipe",
       "settings": "Paramètres",
-      "menu": "Menu",
-      "messages": "Messages"
+      "messages": "Messages",
+      "menu": "Menu"
     },
     "discover": {
       "title": "Découvrir des créateurs",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Nom de la marque",
         "slug": "Slug",
-        "description": "Description",
+        "description": "Livrables mensuels",
         "industry": "Secteur",
         "websiteUrl": "URL du site web",
         "defaultCurrency": "Devise par défaut",
         "defaultLanguage": "Langue par défaut",
-        "status": "Statut"
+        "status": "Statut",
+        "descriptionHint": "Ce que le créateur produit chaque mois (par ex. 2 Reels et 3 Stories), ainsi que les conditions d'utilisation.",
+        "slugHint": "Suggéré automatiquement à partir du nom. Utilisé dans les URL.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Active",
@@ -413,6 +416,29 @@
         "saveFailed": "Échec de l'enregistrement de la marque.",
         "archiveFailed": "Échec de l'archivage de la marque.",
         "restoreFailed": "Échec de la restauration de la marque."
+      },
+      "logo": {
+        "upload": "Téléverser un logo",
+        "replace": "Remplacer le logo",
+        "remove": "Supprimer",
+        "hint": "JPEG, PNG ou WebP, jusqu'à 2 Mo. Les logos carrés fonctionnent le mieux.",
+        "alt": "Logo de la marque",
+        "errors": {
+          "uploadFailed": "Le logo n'a pas pu être téléversé. Essayez une autre image.",
+          "removeFailed": "Le logo n'a pas pu être supprimé. Réessayez.",
+          "uploadFailedAfterCreate": "La marque a été créée, mais le logo n'a pas été téléversé. Ajoutez un logo avant la prochaine modification — la marque ne peut pas être enregistrée sans."
+        }
+      },
+      "floor": {
+        "hint": "Encore nécessaire : {fields}.",
+        "fields": {
+          "name": "nom de la marque",
+          "slug": "identifiant",
+          "description": "livrables mensuels",
+          "industry": "secteur",
+          "website_url": "URL du site web",
+          "logo_path": "logo"
+        }
       }
     },
     "campaigns": {

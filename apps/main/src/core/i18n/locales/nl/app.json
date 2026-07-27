@@ -96,8 +96,8 @@
       "campaigns": "Campagnes",
       "agencyUsers": "Team",
       "settings": "Instellingen",
-      "menu": "Menu",
-      "messages": "Berichten"
+      "messages": "Berichten",
+      "menu": "Menu"
     },
     "discover": {
       "title": "Creators ontdekken",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Merknaam",
         "slug": "Slug",
-        "description": "Beschrijving",
+        "description": "Maandelijkse opleveringen",
         "industry": "Sector",
         "websiteUrl": "Website-URL",
         "defaultCurrency": "Standaardvaluta",
         "defaultLanguage": "Standaardtaal",
-        "status": "Status"
+        "status": "Status",
+        "descriptionHint": "Wat de creator elke maand maakt (bijv. 2 Reels en 3 Stories), plus de gebruiksvoorwaarden.",
+        "slugHint": "Automatisch voorgesteld op basis van de naam. Wordt gebruikt in URL's.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Actief",
@@ -413,6 +416,29 @@
         "saveFailed": "Merk kon niet worden opgeslagen.",
         "archiveFailed": "Merk kon niet worden gearchiveerd.",
         "restoreFailed": "Merk kon niet worden hersteld."
+      },
+      "logo": {
+        "upload": "Logo uploaden",
+        "replace": "Logo vervangen",
+        "remove": "Verwijderen",
+        "hint": "JPEG, PNG of WebP, tot 2 MB. Vierkante logo's werken het best.",
+        "alt": "Merklogo",
+        "errors": {
+          "uploadFailed": "Het logo kon niet worden geüpload. Probeer een andere afbeelding.",
+          "removeFailed": "Het logo kon niet worden verwijderd. Probeer het opnieuw.",
+          "uploadFailedAfterCreate": "Het merk is aangemaakt, maar het logo is niet geüpload. Voeg een logo toe vóór je volgende bewerking — zonder logo kan het merk niet worden opgeslagen."
+        }
+      },
+      "floor": {
+        "hint": "Nog nodig: {fields}.",
+        "fields": {
+          "name": "merknaam",
+          "slug": "slug",
+          "description": "maandelijkse opleveringen",
+          "industry": "branche",
+          "website_url": "website-URL",
+          "logo_path": "logo"
+        }
       }
     },
     "campaigns": {

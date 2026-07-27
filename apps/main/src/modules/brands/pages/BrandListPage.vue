@@ -272,6 +272,29 @@ async function confirmRestore(): Promise<void> {
       data-test="brand-table"
       @update:options="onTableUpdate"
     >
+      <!-- Logo alongside the name (AH-053, D7) — the mark is how an agency
+           recognises a brand at a glance. Falls back to a placeholder icon
+           for brands that predate the floor. -->
+      <template #item.attributes.name="{ item }">
+        <div class="d-flex align-center ga-3">
+          <v-avatar
+            size="32"
+            rounded="sm"
+            color="surface-variant"
+            :data-test="`brand-logo-${item.id}`"
+          >
+            <v-img
+              v-if="item.attributes.logo_url"
+              :src="item.attributes.logo_url"
+              :alt="t('app.brands.logo.alt')"
+              cover
+            />
+            <v-icon v-else icon="mdi-image-outline" size="16" />
+          </v-avatar>
+          <span>{{ item.attributes.name }}</span>
+        </div>
+      </template>
+
       <template #item.attributes.status="{ item }">
         <v-chip
           :color="item.attributes.status === 'active' ? 'success' : 'default'"

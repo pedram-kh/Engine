@@ -96,8 +96,8 @@
       "campaigns": "Campagne",
       "agencyUsers": "Team",
       "settings": "Impostazioni",
-      "menu": "Menu",
-      "messages": "Messaggi"
+      "messages": "Messaggi",
+      "menu": "Menu"
     },
     "discover": {
       "title": "Scopri creator",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Nome brand",
         "slug": "Slug",
-        "description": "Descrizione",
+        "description": "Consegne mensili",
         "industry": "Settore",
         "websiteUrl": "URL sito web",
         "defaultCurrency": "Valuta predefinita",
         "defaultLanguage": "Lingua predefinita",
-        "status": "Stato"
+        "status": "Stato",
+        "descriptionHint": "Cosa produce il creator ogni mese (ad es. 2 Reels e 3 Stories), oltre alle condizioni di utilizzo.",
+        "slugHint": "Suggerito automaticamente dal nome. Usato negli URL.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Attivo",
@@ -413,6 +416,29 @@
         "saveFailed": "Salvataggio brand fallito.",
         "archiveFailed": "Archiviazione brand fallita.",
         "restoreFailed": "Ripristino brand fallito."
+      },
+      "logo": {
+        "upload": "Carica logo",
+        "replace": "Sostituisci logo",
+        "remove": "Rimuovi",
+        "hint": "JPEG, PNG o WebP, fino a 2 MB. I loghi quadrati funzionano meglio.",
+        "alt": "Logo del brand",
+        "errors": {
+          "uploadFailed": "Non è stato possibile caricare il logo. Prova con un'altra immagine.",
+          "removeFailed": "Non è stato possibile rimuovere il logo. Riprova.",
+          "uploadFailedAfterCreate": "Il brand è stato creato, ma il logo non è stato caricato. Aggiungi un logo prima della prossima modifica: senza non è possibile salvare il brand."
+        }
+      },
+      "floor": {
+        "hint": "Ancora necessario: {fields}.",
+        "fields": {
+          "name": "nome del brand",
+          "slug": "identificativo",
+          "description": "consegne mensili",
+          "industry": "settore",
+          "website_url": "URL del sito web",
+          "logo_path": "logo"
+        }
       }
     },
     "campaigns": {

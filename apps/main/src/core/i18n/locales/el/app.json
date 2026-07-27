@@ -96,8 +96,8 @@
       "campaigns": "Καμπάνιαs",
       "agencyUsers": "Team",
       "settings": "Ρυθμίσεις",
-      "menu": "Μενού",
-      "messages": "Μηνύματα"
+      "messages": "Μηνύματα",
+      "menu": "Μενού"
     },
     "discover": {
       "title": "Discover creators",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Brand name",
         "slug": "Slug",
-        "description": "Description",
+        "description": "Μηνιαία παραδοτέα",
         "industry": "Industry",
         "websiteUrl": "Website URL",
         "defaultCurrency": "Default currency",
         "defaultLanguage": "Default language",
-        "status": "Κατάσταση"
+        "status": "Κατάσταση",
+        "descriptionHint": "Τι παράγει ο δημιουργός κάθε μήνα (π.χ. 2 Reels και 3 Stories), καθώς και οι όροι χρήσης.",
+        "slugHint": "Προτείνεται αυτόματα από το όνομα. Χρησιμοποιείται στα URL.",
+        "logo": "Λογότυπο"
       },
       "status": {
         "active": "Ενεργό",
@@ -413,6 +416,29 @@
         "saveFailed": "Failed to save brand.",
         "archiveFailed": "Failed to archive brand.",
         "restoreFailed": "Failed to restore brand."
+      },
+      "logo": {
+        "upload": "Μεταφόρτωση λογοτύπου",
+        "replace": "Αντικατάσταση λογοτύπου",
+        "remove": "Αφαίρεση",
+        "hint": "JPEG, PNG ή WebP, έως 2 MB. Τα τετράγωνα λογότυπα λειτουργούν καλύτερα.",
+        "alt": "Λογότυπο μάρκας",
+        "errors": {
+          "uploadFailed": "Το λογότυπο δεν μεταφορτώθηκε. Δοκιμάστε άλλη εικόνα.",
+          "removeFailed": "Το λογότυπο δεν αφαιρέθηκε. Δοκιμάστε ξανά.",
+          "uploadFailedAfterCreate": "Η μάρκα δημιουργήθηκε, αλλά το λογότυπο δεν μεταφορτώθηκε. Προσθέστε λογότυπο πριν από την επόμενη επεξεργασία — η μάρκα δεν μπορεί να αποθηκευτεί χωρίς αυτό."
+        }
+      },
+      "floor": {
+        "hint": "Απαιτούνται ακόμη: {fields}.",
+        "fields": {
+          "name": "όνομα μάρκας",
+          "slug": "αναγνωριστικό",
+          "description": "μηνιαία παραδοτέα",
+          "industry": "κλάδος",
+          "website_url": "URL ιστοτόπου",
+          "logo_path": "λογότυπο"
+        }
       }
     },
     "campaigns": {

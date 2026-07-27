@@ -80,4 +80,22 @@ export const brandsApi = {
   restore(agencyId: string, brandId: string): Promise<SingleBrandEnvelope> {
     return http.post<SingleBrandEnvelope>(`${brandsBase(agencyId)}/${brandId}/restore`)
   },
+
+  /**
+   * Brand logo — direct multipart (AH-053, D7), the avatar precedent.
+   *
+   * The field name MUST be `file`: it is the project's canonical multipart
+   * field and what `BrandLogoController` validates. Both endpoints return the
+   * full brand envelope, so the caller gets the freshly-signed `logo_url`
+   * without a second request.
+   */
+  uploadLogo(agencyId: string, brandId: string, file: File): Promise<SingleBrandEnvelope> {
+    const form = new FormData()
+    form.append('file', file)
+    return http.post<SingleBrandEnvelope>(`${brandsBase(agencyId)}/${brandId}/logo`, form)
+  },
+
+  deleteLogo(agencyId: string, brandId: string): Promise<SingleBrandEnvelope> {
+    return http.delete<SingleBrandEnvelope>(`${brandsBase(agencyId)}/${brandId}/logo`)
+  },
 }

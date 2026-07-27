@@ -128,6 +128,9 @@ export const testIds = {
   brandDetailCard: 'brand-detail-card',
   brandDetailSkeleton: 'brand-detail-skeleton',
   brandDetailStatus: 'brand-detail-status',
+  brandDetailLogo: 'brand-detail-logo',
+  brandDetailLogoFailed: 'brand-detail-logo-failed',
+  brandDetailDescription: 'brand-detail-description',
   brandEditBtn: 'brand-edit-btn',
   brandArchiveBtn: 'brand-archive-btn',
   brandDetailArchiveDialog: 'brand-detail-archive-dialog',
@@ -149,6 +152,14 @@ export const testIds = {
   brandDefaultLanguage: 'brand-default-language',
   brandFormSubmit: 'brand-form-submit',
   brandFormError: 'brand-form-error',
+
+  // Brand logo control + floor mirror (AH-053, D6/D7)
+  brandLogoPreview: 'brand-logo-preview',
+  brandLogoInput: 'brand-logo-input',
+  brandLogoChoose: 'brand-logo-choose',
+  brandLogoRemove: 'brand-logo-remove',
+  brandLogoError: 'brand-logo-error',
+  brandFloorHint: 'brand-floor-hint',
 
   // Archive dialog (in list page)
   archiveDialog: 'archive-dialog',

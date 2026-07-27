@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Brands\Http\Controllers\BrandController;
+use App\Modules\Brands\Http\Controllers\BrandLogoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,4 +33,14 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // to the frontend's archive-filter restore action.
         Route::post('brands/{brand}/restore', [BrandController::class, 'restore'])
             ->name('brands.restore');
+
+        // AH-053 (D7) — brand logo, direct multipart (the avatar pattern).
+        // Tenant-scoped like everything else in this group; the controller
+        // adds the explicit brand-belongs-to-agency check that route-model
+        // binding cannot do, and gates on the brand UPDATE policy.
+        // Recorded in docs/security/tenancy.md §3.
+        Route::post('brands/{brand}/logo', [BrandLogoController::class, 'store'])
+            ->name('brands.logo.store');
+        Route::delete('brands/{brand}/logo', [BrandLogoController::class, 'destroy'])
+            ->name('brands.logo.destroy');
     });

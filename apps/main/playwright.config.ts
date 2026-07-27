@@ -48,6 +48,11 @@ const TEST_HELPERS_TOKEN =
 // reset target different databases.
 const E2E_DB_DATABASE = process.env.DB_DATABASE ?? 'catalyst_e2e'
 
+// The `media` disk driver for the E2E run (AH-053). Kept as a named const so
+// the architecture gate can pin it, and so the reason it is not `s3` lives
+// next to the DB-isolation override it sits beside in the webServer env.
+const E2E_MEDIA_DISK_DRIVER = 'local'
+
 export default defineConfig({
   testDir: './playwright/specs',
   fullyParallel: false,
@@ -119,6 +124,13 @@ export default defineConfig({
         // top-of-file docblock const and `playwright/global-setup.ts`.
         // NEVER remove this override.
         DB_DATABASE: E2E_DB_DATABASE,
+        // No object store runs under E2E — the CI job provisions Postgres
+        // and Redis only. The `media` disk is `'throw' => false`, so an S3
+        // write against an absent bucket returns false and the brand-logo
+        // endpoint would answer 200 having stored nothing. `local` swaps
+        // the driver for this run so the upload → signed URL → render path
+        // is exercised for real. See `apps/api/config/filesystems.php`.
+        MEDIA_DISK_DRIVER: E2E_MEDIA_DISK_DRIVER,
       },
       ignoreHTTPSErrors: true,
     },

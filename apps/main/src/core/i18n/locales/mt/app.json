@@ -96,8 +96,8 @@
       "campaigns": "Kampanjas",
       "agencyUsers": "Team",
       "settings": "Settings",
-      "menu": "Menu",
-      "messages": "Messaġġi"
+      "messages": "Messaġġi",
+      "menu": "Menu"
     },
     "discover": {
       "title": "Discover creators",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Brand name",
         "slug": "Slug",
-        "description": "Description",
+        "description": "Konsenji ta' kull xahar",
         "industry": "Industry",
         "websiteUrl": "Website URL",
         "defaultCurrency": "Default currency",
         "defaultLanguage": "Default language",
-        "status": "Status"
+        "status": "Status",
+        "descriptionHint": "X'jipproduċi l-kreatur kull xahar (ngħidu aħna 2 Reels u 3 Stories), flimkien mat-termini tal-użu.",
+        "slugHint": "Jiġi suġġerit awtomatikament mill-isem. Jintuża fl-URLs.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Attiv",
@@ -413,6 +416,29 @@
         "saveFailed": "Failed to save brand.",
         "archiveFailed": "Failed to archive brand.",
         "restoreFailed": "Failed to restore brand."
+      },
+      "logo": {
+        "upload": "Tella' logo",
+        "replace": "Ibdel il-logo",
+        "remove": "Neħħi",
+        "hint": "JPEG, PNG jew WebP, sa 2 MB. L-aħjar jaħdmu logos kwadri.",
+        "alt": "Logo tal-marka",
+        "errors": {
+          "uploadFailed": "Il-logo ma setax jittella'. Ipprova stampa oħra.",
+          "removeFailed": "Il-logo ma setax jitneħħa. Erġa' pprova.",
+          "uploadFailedAfterCreate": "Il-marka nħolqot, imma l-logo ma tellax. Żid logo qabel il-modifika li jmiss — mingħajru l-marka ma tistax tiġi salvata."
+        }
+      },
+      "floor": {
+        "hint": "Għad hemm bżonn: {fields}.",
+        "fields": {
+          "name": "isem tal-marka",
+          "slug": "identifikatur",
+          "description": "konsenji ta' kull xahar",
+          "industry": "industrija",
+          "website_url": "URL tal-websajt",
+          "logo_path": "logo"
+        }
       }
     },
     "campaigns": {

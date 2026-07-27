@@ -62,10 +62,17 @@ export type BrandStatus = 'active' | 'archived'
 export interface BrandAttributes {
   name: string
   slug: string | null
+  /** Relabelled "Monthly deliverables" in the UI (AH-053, D8); the key is unchanged. */
   description: string | null
   industry: string | null
   website_url: string | null
+  /**
+   * Raw storage key on a PRIVATE disk — NOT a URL and not renderable. Kept for
+   * back-compat only; render {@link logo_url} instead.
+   */
   logo_path: string | null
+  /** Short-lived signed GET (60 min), minted per response. Null when no logo. */
+  logo_url: string | null
   default_currency: string | null
   default_language: string | null
   status: BrandStatus
@@ -89,16 +96,43 @@ export interface BrandResource {
   }
 }
 
+/**
+ * POST /brands. The brand FLOOR (AH-053, D6) is required by the API, so it is
+ * required here: a payload missing any of these is a guaranteed 422.
+ *
+ * `slug` is required to match the backend rule — it always was `required`
+ * server-side; typing it optional was a mirror inaccuracy. The form still
+ * auto-derives it from the name, so nothing changes for a human user.
+ *
+ * The logo is NOT here: it is uploaded to `POST /brands/{brand}/logo` once the
+ * row exists (D7), which is why a brand is momentarily floor-incomplete
+ * between the two calls.
+ *
+ * `default_currency` / `default_language` stay OPTIONAL and accepted. The SPA
+ * form dropped both controls (D8) but the columns, their defaults and their
+ * emission are untouched, and an API client that still sends them is honored.
+ */
 export interface CreateBrandPayload {
   name: string
-  slug?: string
-  description?: string
-  industry?: string
-  website_url?: string
+  slug: string
+  description: string
+  industry: string
+  website_url: string
   default_currency?: string
   default_language?: string
 }
 
+/**
+ * PATCH /brands/{brand}. Deliberately `Partial<>`: the API keeps true partial
+ * semantics (every rule is `sometimes`, omitted fields keep their stored
+ * values), so a type that demanded the full floor would push clients into
+ * echoing fields they never fetched — the shape that caused the AH-032 brief
+ * wipe.
+ *
+ * The floor is enforced on the MERGED state instead: the API refuses any edit
+ * that would leave the brand incomplete, naming each missing field. A partial
+ * payload is legal; an incomplete RESULT is not.
+ */
 export type UpdateBrandPayload = Partial<CreateBrandPayload>
 
 // ---------------------------------------------------------------------------

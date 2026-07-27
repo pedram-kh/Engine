@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Core\Storage\StorageWriteFailedException;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Services\AvatarUploadService;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -86,4 +88,20 @@ it('delete() removes the path from the disk', function (): void {
     app(AvatarUploadService::class)->delete($path);
 
     Storage::disk('media')->assertMissing($path);
+});
+
+it('raises instead of returning a path when the disk reports the write failed', function (): void {
+    $creator = Creator::factory()->createOne();
+
+    // The `media` disk is `'throw' => false`: an unreachable bucket returns
+    // false from put() rather than raising. Returning the path anyway would
+    // let the caller assign `avatar_path` to a key holding nothing.
+    $failing = Mockery::mock(Filesystem::class);
+    $failing->shouldReceive('put')->once()->andReturnFalse();
+    Storage::set('media', $failing);
+
+    expect(fn () => app(AvatarUploadService::class)->upload(
+        $creator,
+        UploadedFile::fake()->image('avatar.jpg', 256, 256),
+    ))->toThrow(StorageWriteFailedException::class);
 });

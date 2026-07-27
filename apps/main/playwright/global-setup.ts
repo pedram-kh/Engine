@@ -1,4 +1,6 @@
 import { execSync } from 'node:child_process'
+import { rmSync } from 'node:fs'
+import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 /**
@@ -90,4 +92,12 @@ export default async function globalSetup(): Promise<void> {
       DB_DATABASE: E2E_DB_DATABASE,
     },
   })
+
+  // The E2E `media` disk is the local filesystem (AH-053 — see the
+  // `MEDIA_DISK_DRIVER` note in `playwright.config.ts`). `migrate:fresh`
+  // resets the rows that point at those objects, so the objects themselves
+  // are reset here for the same reason: otherwise every run leaves its
+  // uploads behind and the directory grows without bound. Scoped to the
+  // dedicated E2E root, never `storage/app` at large.
+  rmSync(path.join(apiDir, 'storage/app/e2e-media'), { recursive: true, force: true })
 }

@@ -96,8 +96,8 @@
       "campaigns": "Kampagnen",
       "agencyUsers": "Team",
       "settings": "Einstellungen",
-      "menu": "Menü",
-      "messages": "Nachrichten"
+      "messages": "Nachrichten",
+      "menu": "Menü"
     },
     "discover": {
       "title": "Creator entdecken",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Markenname",
         "slug": "Slug",
-        "description": "Beschreibung",
+        "description": "Monatliche Leistungen",
         "industry": "Branche",
         "websiteUrl": "Website-URL",
         "defaultCurrency": "Standardwährung",
         "defaultLanguage": "Standardsprache",
-        "status": "Status"
+        "status": "Status",
+        "descriptionHint": "Was der Creator jeden Monat produziert (z. B. 2 Reels und 3 Stories), plus Nutzungsbedingungen.",
+        "slugHint": "Wird automatisch aus dem Namen vorgeschlagen. Wird in URLs verwendet.",
+        "logo": "Logo"
       },
       "status": {
         "active": "Aktiv",
@@ -413,6 +416,29 @@
         "saveFailed": "Marke konnte nicht gespeichert werden.",
         "archiveFailed": "Marke konnte nicht archiviert werden.",
         "restoreFailed": "Marke konnte nicht wiederhergestellt werden."
+      },
+      "logo": {
+        "upload": "Logo hochladen",
+        "replace": "Logo ersetzen",
+        "remove": "Entfernen",
+        "hint": "JPEG, PNG oder WebP, bis zu 2 MB. Quadratische Logos funktionieren am besten.",
+        "alt": "Marken-Logo",
+        "errors": {
+          "uploadFailed": "Das Logo konnte nicht hochgeladen werden. Versuchen Sie ein anderes Bild.",
+          "removeFailed": "Das Logo konnte nicht entfernt werden. Bitte erneut versuchen.",
+          "uploadFailedAfterCreate": "Die Marke wurde erstellt, aber das Logo wurde nicht hochgeladen. Fügen Sie vor der nächsten Bearbeitung ein Logo hinzu — ohne Logo lässt sich die Marke nicht speichern."
+        }
+      },
+      "floor": {
+        "hint": "Noch erforderlich: {fields}.",
+        "fields": {
+          "name": "Markenname",
+          "slug": "Slug",
+          "description": "monatliche Leistungen",
+          "industry": "Branche",
+          "website_url": "Website-URL",
+          "logo_path": "Logo"
+        }
       }
     },
     "campaigns": {

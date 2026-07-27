@@ -96,8 +96,8 @@
       "campaigns": "Kampanje",
       "agencyUsers": "Ekipa",
       "settings": "Nastanjeitve",
-      "menu": "Meni",
-      "messages": "Sporočila"
+      "messages": "Sporočila",
+      "menu": "Meni"
     },
     "discover": {
       "title": "Odkrivanje ustvarjalca",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Název znamke",
         "slug": "Slug",
-        "description": "Popis",
+        "description": "Mesečni rezultati",
         "industry": "Odvětví",
         "websiteUrl": "URL webu",
         "defaultCurrency": "Výchozí měna",
         "defaultLanguage": "Výchozí jazyk",
-        "status": "Stanje"
+        "status": "Stanje",
+        "descriptionHint": "Kaj ustvarjalec pripravi vsak mesec (npr. 2 Reels in 3 Stories) ter pogoji uporabe.",
+        "slugHint": "Samodejno predlagano iz imena. Uporablja se v naslovih URL.",
+        "logo": "Logotip"
       },
       "status": {
         "active": "Aktiven",
@@ -413,6 +416,29 @@
         "saveFailed": "Ni uspelo shraniti značku.",
         "archiveFailed": "Ni uspelo archivovat značku.",
         "restoreFailed": "Ni uspelo obnovit značku."
+      },
+      "logo": {
+        "upload": "Naloži logotip",
+        "replace": "Zamenjaj logotip",
+        "remove": "Odstrani",
+        "hint": "JPEG, PNG ali WebP, do 2 MB. Najbolje delujejo kvadratni logotipi.",
+        "alt": "Logotip znamke",
+        "errors": {
+          "uploadFailed": "Logotipa ni bilo mogoče naložiti. Poskusite z drugo sliko.",
+          "removeFailed": "Logotipa ni bilo mogoče odstraniti. Poskusite znova.",
+          "uploadFailedAfterCreate": "Znamka je bila ustvarjena, vendar se logotip ni naložil. Dodajte logotip pred naslednjim urejanjem — brez njega znamke ni mogoče shraniti."
+        }
+      },
+      "floor": {
+        "hint": "Še je potrebno: {fields}.",
+        "fields": {
+          "name": "ime znamke",
+          "slug": "identifikator",
+          "description": "mesečni rezultati",
+          "industry": "panoga",
+          "website_url": "URL spletnega mesta",
+          "logo_path": "logotip"
+        }
       }
     },
     "campaigns": {

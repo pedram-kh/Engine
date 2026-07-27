@@ -44,6 +44,26 @@ function makeStaff(): array
     return compact('agency', 'user');
 }
 
+/**
+ * A create payload that satisfies the AH-053 D6 floor. The logo is NOT part of
+ * it — it is uploaded after the row exists (D7) — so a brand created through
+ * this helper is deliberately one field short of complete, exactly like the
+ * real create flow.
+ *
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function validBrandPayload(array $overrides = []): array
+{
+    return array_merge([
+        'name' => 'Acme Corp',
+        'slug' => 'acme-corp',
+        'description' => 'Monthly deliverables: 2 Reels and 3 Stories.',
+        'industry' => 'fashion',
+        'website_url' => 'https://acme.example.com',
+    ], $overrides);
+}
+
 // ---------------------------------------------------------------------------
 // Index
 // ---------------------------------------------------------------------------
@@ -137,14 +157,8 @@ it('cross-tenant list returns 404', function (): void {
 it('agency_admin can create a brand', function (): void {
     ['agency' => $agency, 'user' => $user] = makeAdmin();
 
-    $payload = [
-        'name' => 'Acme Corp',
-        'slug' => 'acme-corp',
-        'description' => 'A fine brand.',
-    ];
-
     $this->actingAs($user)
-        ->postJson("/api/v1/agencies/{$agency->ulid}/brands", $payload)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands", validBrandPayload())
         ->assertCreated()
         ->assertJsonPath('data.attributes.name', 'Acme Corp')
         ->assertJsonPath('data.attributes.slug', 'acme-corp');
@@ -156,10 +170,10 @@ it('agency_manager can create a brand', function (): void {
     ['agency' => $agency, 'user' => $user] = makeManager();
 
     $this->actingAs($user)
-        ->postJson("/api/v1/agencies/{$agency->ulid}/brands", [
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands", validBrandPayload([
             'name' => 'Beta Brand',
             'slug' => 'beta-brand',
-        ])
+        ]))
         ->assertCreated();
 });
 
@@ -167,10 +181,10 @@ it('agency_staff cannot create a brand', function (): void {
     ['agency' => $agency, 'user' => $user] = makeStaff();
 
     $this->actingAs($user)
-        ->postJson("/api/v1/agencies/{$agency->ulid}/brands", [
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands", validBrandPayload([
             'name' => 'Gamma Brand',
             'slug' => 'gamma-brand',
-        ])
+        ]))
         ->assertForbidden();
 });
 
@@ -178,10 +192,10 @@ it('brand creation emits brand.created audit log', function (): void {
     ['agency' => $agency, 'user' => $user] = makeAdmin();
 
     $this->actingAs($user)
-        ->postJson("/api/v1/agencies/{$agency->ulid}/brands", [
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands", validBrandPayload([
             'name' => 'Audit Brand',
             'slug' => 'audit-brand',
-        ])
+        ]))
         ->assertCreated();
 
     $this->assertDatabaseHas('audit_logs', [
@@ -194,7 +208,7 @@ it('brand creation validates required fields', function (): void {
 
     $this->actingAs($user)
         ->postJson("/api/v1/agencies/{$agency->ulid}/brands", [])
-        ->assertEnvelopeValidationErrors(['name', 'slug']);
+        ->assertEnvelopeValidationErrors(['name', 'slug', 'description', 'industry', 'website_url']);
 });
 
 it('brand slug must be unique within agency', function (): void {
@@ -202,10 +216,10 @@ it('brand slug must be unique within agency', function (): void {
     Brand::factory()->forAgency($agency->id)->create(['slug' => 'taken-slug']);
 
     $this->actingAs($user)
-        ->postJson("/api/v1/agencies/{$agency->ulid}/brands", [
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands", validBrandPayload([
             'name' => 'Dupe Brand',
             'slug' => 'taken-slug',
-        ])
+        ]))
         ->assertUnprocessable();
 });
 
@@ -215,10 +229,10 @@ it('same slug is allowed across different agencies', function (): void {
     Brand::factory()->forAgency($otherAgency->id)->create(['slug' => 'shared-slug']);
 
     $this->actingAs($user)
-        ->postJson("/api/v1/agencies/{$agency->ulid}/brands", [
+        ->postJson("/api/v1/agencies/{$agency->ulid}/brands", validBrandPayload([
             'name' => 'OK Brand',
             'slug' => 'shared-slug',
-        ])
+        ]))
         ->assertCreated();
 });
 

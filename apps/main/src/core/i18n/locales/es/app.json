@@ -96,8 +96,8 @@
       "campaigns": "Campañas",
       "agencyUsers": "Equipo",
       "settings": "Configuración",
-      "menu": "Menú",
-      "messages": "Mensajes"
+      "messages": "Mensajes",
+      "menu": "Menú"
     },
     "discover": {
       "title": "Descubrir creadores",
@@ -361,12 +361,15 @@
       "fields": {
         "name": "Nombre de la marca",
         "slug": "Slug",
-        "description": "Descripción",
+        "description": "Entregables mensuales",
         "industry": "Sector",
         "websiteUrl": "URL del sitio web",
         "defaultCurrency": "Moneda predeterminada",
         "defaultLanguage": "Idioma predeterminado",
-        "status": "Estado"
+        "status": "Estado",
+        "descriptionHint": "Lo que el creador produce cada mes (p. ej. 2 Reels y 3 Stories), además de las condiciones de uso.",
+        "slugHint": "Se sugiere automáticamente a partir del nombre. Se usa en las URL.",
+        "logo": "Logotipo"
       },
       "status": {
         "active": "Activa",
@@ -413,6 +416,29 @@
         "saveFailed": "No se ha podido guardar la marca.",
         "archiveFailed": "No se ha podido archivar la marca.",
         "restoreFailed": "No se ha podido restaurar la marca."
+      },
+      "logo": {
+        "upload": "Subir logotipo",
+        "replace": "Reemplazar logotipo",
+        "remove": "Quitar",
+        "hint": "JPEG, PNG o WebP, hasta 2 MB. Los logotipos cuadrados funcionan mejor.",
+        "alt": "Logotipo de la marca",
+        "errors": {
+          "uploadFailed": "No se pudo subir el logotipo. Prueba con otra imagen.",
+          "removeFailed": "No se pudo quitar el logotipo. Inténtalo de nuevo.",
+          "uploadFailedAfterCreate": "La marca se creó, pero el logotipo no se subió. Añade un logotipo antes de la próxima edición: la marca no puede guardarse sin él."
+        }
+      },
+      "floor": {
+        "hint": "Todavía falta: {fields}.",
+        "fields": {
+          "name": "nombre de la marca",
+          "slug": "identificador",
+          "description": "entregables mensuales",
+          "industry": "sector",
+          "website_url": "URL del sitio web",
+          "logo_path": "logotipo"
+        }
       }
     },
     "campaigns": {
