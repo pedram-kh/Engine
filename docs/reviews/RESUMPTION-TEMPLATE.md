@@ -113,10 +113,11 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-27 · **Through:** AH-054 · **Baseline:** the AH-053/AH-054 docs commit —
-the current `origin/main` tip. **Nothing is held.** (A commit cannot record its own hash, so the tip
-is named descriptively; the two feat SHAs below are the stable anchors, and
-`git rev-parse --short origin/main` gives the tip.)
+**Last updated:** 2026-07-27 · **Through:** AH-055 · **Baseline:** the AH-055 docs commit — the
+current local tip, sitting on `aa8d410` (the pushed AH-053/AH-054 close-out). **AH-055 is held**
+pending Pedram's push call; everything through AH-054 is pushed. (A commit cannot record its own
+hash, so the tip is named descriptively; `git rev-parse --short HEAD` gives it, and
+`git rev-parse --short origin/main` gives the pushed tip.)
 
 > **⚠ UNDEPLOYED CODE EXISTS — and it carries a migration and a pre-deploy read.** The push on
 > 2026-07-27 moved `origin/main` `2cb6c11..` with **AH-053 + AH-054** (Jobs Board chunks 1+2
@@ -409,6 +410,15 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     contract change** (see deploy notes). Surfaced by AH-051 eyes-on; commit `dd65868` is
     shared with the AH-051 addendum items.
 
+  - **AH-055** — Brand detail page stops showing `default_currency` / `default_language`, the two
+    fields AH-053's D8 made unsettable. Found by Pedram in eyes-on minutes after the push: D8 was
+    form-scoped, so the detail page still rendered both rows. Pure-UI (AH-007 pattern) — two
+    `v-list-item`s removed plus the orphaned `app.brands.fields.*` keys ×24; `app.settings.fields.*`
+    untouched, since the agency-level pair IS settable. **The contract does not narrow** — columns,
+    defaults, validation, resource emission and the FE type all stay as D8 left them. The AH-032
+    precedent (removed from form, Overview row kept) was deliberately NOT followed: `objective` is
+    consumed, whereas the brand defaults are inert — nothing in `apps/api/app` reads either one.
+    Deprecating the columns outright is left open as a full-loop question.
   - **AH-053** — Jobs Board chunk 1: brand completeness floor + logo pipeline + form relabel
     (`2568a96`, **pushed, NOT deployed**). Six-field floor (`name`, `slug`, `description`, `industry`,
     `website_url`, `logo_path`) required at create — logo excepted, it needs a row to attach to —

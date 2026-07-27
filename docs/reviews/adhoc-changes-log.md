@@ -70,6 +70,44 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-055 · Brand detail page stops showing the two fields AH-053 made unsettable
+
+- **Status:** Landed
+- **Commits:** `fix(brands): drop the unsettable default currency/language rows from brand detail (AH-055)`;
+  docs commit (this entry). Pure-UI, so it takes the **AH-007 pattern** — build it, log it, done — not
+  the full loop.
+- **Date:** 2026-07-27
+- **Why:** Found by Pedram in eyes-on, minutes after the AH-053/AH-054 push. AH-053's **D8** removed the
+  `default_currency` / `default_language` selects from the brand **form** but left the brand **detail
+  page** rendering both rows, so a freshly-created brand displayed "Default currency: EUR" and "Default
+  language: en" — values the user could no longer set and had never chosen.
+- **What:** Removed the two `v-list-item`s from `BrandDetailPage.vue`, and with them the now-orphaned
+  `app.brands.fields.defaultCurrency` / `defaultLanguage` keys across all 24 locales (2 leaves per
+  locale, 48 total). **`app.settings.fields.*` is untouched** — the agency-level pair is a different
+  thing and is genuinely settable on the Settings page.
+- **What is deliberately NOT touched:** the columns, their defaults, their validation, the
+  `BrandResource` emission and the `BrandAttributes` type all stay exactly as D8 left them. An API
+  client can still send both fields and still reads them back; this narrows the **UI**, not the
+  contract. The two D8 contract-preservation tests in `BrandFloorGateTest` continue to pin that.
+- **Decision — why the AH-032 precedent was NOT followed:** AH-032 removed `objective` from the
+  campaign form and deliberately **kept** its Overview-tab row, which is the obvious precedent for
+  "removed from the form, still shown on the read surface". It does not transfer. `objective`
+  describes the campaign and is consumed; the brand-level defaults are **inert** — a grep across
+  `apps/api/app` finds `default_currency` / `default_language` on the brand only in `Brand.php`
+  (attribute defaults + fillable), `BrandFactory`, the two form requests and `BrandResource`. No
+  pricing, campaign, mail or export path reads either one. So the row displayed a value that was
+  unsettable, unchosen, identical (`EUR` / `en`) on every new brand, and acted on by nothing.
+- **Known cost, accepted:** a brand created before AH-053 may carry a currency its owner genuinely
+  picked, and that value is now hidden. Since nothing reads it and it was already unsettable from the
+  UI, the cost is display-only. The data is still there and still on the wire.
+- **Follow-up left open:** whether the brand-level columns should be **deprecated outright** (dropped
+  from the resource, the requests, and eventually the schema) is a real question and a bigger one — it
+  is an API-contract plus schema change and would need the full loop. Not attempted here.
+- **Gates:** `apps/main` 135 files / 1243 tests, typecheck clean, lint 0 errors (the 2 pre-existing
+  `v-html` warnings), i18n locale parity green — the removal is symmetric across all 24 bundles, so the
+  keyset stays in lockstep. No Playwright re-run: no spec references `brand-detail-currency` or
+  `brand-detail-language`, and no backend surface moved.
+
 ### AH-054 · Jobs Board chunk 2 — campaign listing fields, the two gates, and the read-time scope
 
 - **Status:** Landed
