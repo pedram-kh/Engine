@@ -30,6 +30,7 @@
       "message_relationship_received_by_agency": "{sender_name} vam je poslao izravnu poruku.",
       "agency_creator_relation_admin_connected": "Administrator Catalysta povezao vas je s {agency_name}.",
       "agency_creator_relation_disconnected": "Vaša veza s {counterparty_name} je završila.",
+      "campaign_job_posted": "{agency_name} je objavila novi posao: {campaign_name}.",
       "fallback": "Máte nové oznámení."
     },
     "preferences": {
@@ -62,7 +63,8 @@
         "message_received_by_creator": "Nová zpráva od agencije",
         "message_received_by_agency": "Nová zpráva od ustvarjalca",
         "message_relationship_received_by_creator": "Nova izravna poruka od agencije",
-        "message_relationship_received_by_agency": "Nova izravna poruka od kreatora"
+        "message_relationship_received_by_agency": "Nova izravna poruka od kreatora",
+        "campaign_job_posted": "Objavljen je novi posao"
       }
     }
   }

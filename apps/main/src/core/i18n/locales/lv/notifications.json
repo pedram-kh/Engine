@@ -30,6 +30,7 @@
       "message_relationship_received_by_agency": "{sender_name} nosūtīja jums tiešo ziņojumu.",
       "agency_creator_relation_admin_connected": "Catalyst administrators saistīja jūs ar {agency_name}.",
       "agency_creator_relation_disconnected": "Jūsu saikne ar {counterparty_name} ir beigusies.",
+      "campaign_job_posted": "{agency_name} publicēja jaunu darba piedāvājumu: {campaign_name}.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -62,7 +63,8 @@
         "message_received_by_creator": "A new message from the agency",
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Jauns tiešais ziņojums no aģentūras",
-        "message_relationship_received_by_agency": "Jauns tiešais ziņojums no satura veidotāja"
+        "message_relationship_received_by_agency": "Jauns tiešais ziņojums no satura veidotāja",
+        "campaign_job_posted": "Tiek publicēts jauns darba piedāvājums"
       }
     }
   }

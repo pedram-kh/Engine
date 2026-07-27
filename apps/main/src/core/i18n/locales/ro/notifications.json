@@ -30,6 +30,7 @@
       "message_relationship_received_by_agency": "{sender_name} ți-a trimis un mesaj direct.",
       "agency_creator_relation_admin_connected": "Un administrator Catalyst te-a conectat cu {agency_name}.",
       "agency_creator_relation_disconnected": "Conexiunea ta cu {counterparty_name} s-a încheiat.",
+      "campaign_job_posted": "{agency_name} a publicat un job nou: {campaign_name}.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -62,7 +63,8 @@
         "message_received_by_creator": "A new message from the agency",
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Un nou mesaj direct de la agenție",
-        "message_relationship_received_by_agency": "Un nou mesaj direct de la creator"
+        "message_relationship_received_by_agency": "Un nou mesaj direct de la creator",
+        "campaign_job_posted": "Este publicat un job nou"
       }
     }
   }

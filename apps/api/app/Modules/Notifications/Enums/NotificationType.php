@@ -93,6 +93,25 @@ enum NotificationType: string
     case RelationAdminConnected = 'agency_creator_relation.admin_connected';
     case RelationDisconnected = 'agency_creator_relation.disconnected';
 
+    // AH-056 (Jobs Board chunk 3, D8) — a rostered agency listed a new job.
+    // SINGLE-DIRECTION (creator), so one verb rather than the dual pair the
+    // messaging types need: the agency performed the listing, so it is not news
+    // to them, and a type nobody receives is a toggle nobody should be offered.
+    //
+    // Grouped under `assignment` in the prefs UI rather than a fourth group. A
+    // new group has to earn its keep, and one type does not: `assignment` is
+    // already where the creator's campaign-work notifications live, which is
+    // exactly what a job posting is. The label tension ("Assignments" heading
+    // over a job-posted toggle) is real and accepted; the group splits when a
+    // SECOND jobs-board type exists to split with.
+    //
+    // Toggleable in_app (NOT always-on): a job alert is promotional in
+    // character, so a creator who does not want it must be able to stop it.
+    // ⚠ The MAIL half is not covered by that toggle — the email channel has
+    // never been wired through preference reads platform-wide. See the review's
+    // production posture and the tech-debt entry.
+    case CampaignJobPosted = 'campaign.job_posted';
+
     /**
      * The AuditAction this notification type mirrors. Proves the one-vocabulary
      * tie — every NotificationType value MUST be a live AuditAction value.

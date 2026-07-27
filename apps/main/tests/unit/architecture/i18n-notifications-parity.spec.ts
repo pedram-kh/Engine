@@ -70,6 +70,9 @@ const LIVE_TYPES = [
   'message.relationship_received_by_agency',
   'agency_creator_relation.admin_connected',
   'agency_creator_relation.disconnected',
+  // AH-056 (Jobs Board chunk 3, D8) — the job-posted creator alert. Grew the
+  // live-set 14 → 15.
+  'campaign.job_posted',
 ] as const
 
 /** Emit-less / forward-declared types that MUST route to the fallback. */
@@ -126,7 +129,7 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
     }
   })
 
-  it('notifications.types holds EXACTLY the 14 live templates + fallback', async () => {
+  it('notifications.types holds EXACTLY the 15 live templates + fallback', async () => {
     const en = await loadBundle('en')
     const typeKeys = Object.keys(en.notifications.types).sort()
 
@@ -139,6 +142,7 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
       'assignment_draft_submitted',
       'assignment_manually_verified',
       'assignment_revision_requested',
+      'campaign_job_posted',
       'creator_approved',
       'creator_rejected',
       'fallback',
@@ -223,13 +227,16 @@ describe('notifications prefs role-partition — single live-set source of truth
     }
   })
 
-  it('the known role split is honest (creator = 8 review/lifecycle/messaging, agency = 4 fan-out/messaging)', () => {
+  it('the known role split is honest (creator = 9 review/lifecycle/messaging/jobs, agency = 4 fan-out/messaging)', () => {
     expect([...creatorTypes].sort()).toEqual(
       [
         'assignment.draft_approved',
         'assignment.draft_rejected',
         'assignment.manually_verified',
         'assignment.revision_requested',
+        // AH-056 — creator-only by construction: the agency listed the job, so
+        // there is no agency-side counterpart to offer a toggle for.
+        'campaign.job_posted',
         'creator.approved',
         'creator.rejected',
         'message.received_by_creator',

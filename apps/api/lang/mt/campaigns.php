@@ -71,4 +71,16 @@ return [
             ],
         ],
     ],
+    // AH-056 (Jobs Board chunk 3, D6) — the job-posted fan-out mail. Queued and
+    // localized at queue time to the recipient's preferred_language, rendered
+    // through the shared `catalyst` markdown theme. Carries the agency + campaign
+    // names and a deep link only: the brand's identity is board content, behind
+    // the visibility predicate, and an inbox is not.
+    'job_posted' => [
+        'subject' => ':agency ippubblika xogħol ġdid',
+        'greeting' => 'Bonġu :name,',
+        'body' => ':agency ippubblika xogħol ġdid fuq il-bord tiegħek: “:campaign”. Iftħu biex tara d-dettalji u tapplika.',
+        'cta' => 'Ara x-xogħol',
+        'ignore' => 'Qed tirċievi dan il-messaġġ għax tinsab fil-lista ta’ kreaturi ta’ :agency.',
+    ],
 ];

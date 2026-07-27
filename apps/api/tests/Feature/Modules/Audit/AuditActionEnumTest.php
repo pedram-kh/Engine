@@ -165,6 +165,10 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         // Audit-only this chunk: the agency-facing NotificationType is chunk 4's
         // (the arc deploys as one release, so nothing is missed in between).
         'campaign_application.submitted',
+        // AH-056 — the job-posted fan-out verb. Unlike the apply verb, this one
+        // IS a NotificationType (creator-facing), so it joins the
+        // one-vocabulary tie and both notification tripwires.
+        'campaign.job_posted',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());

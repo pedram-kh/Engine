@@ -186,6 +186,26 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
     recipient: 'both',
     preference: null,
   },
+  // Jobs board (AH-056, D8) — a rostered agency listed a new job. Single
+  // direction: the agency did the listing, so only the creator is notified and
+  // only creators get the toggle.
+  //
+  // Grouped under `assignment` rather than a fourth group. One type does not
+  // earn a group of its own, and `assignment` is already the creator's
+  // campaign-work category — which is what a job posting is. The label tension
+  // is accepted, not overlooked; the split happens when a second jobs-board
+  // type exists to split with.
+  //
+  // `in_app` only. The fan-out ALSO sends mail, but the email channel has never
+  // been wired through preference reads on this platform, so a `mail` entry
+  // here would be a dead control — worse than no control, because it would read
+  // as a promise. The v1 containment is the global Pennant flag + the per-run
+  // cap + rostered-only recipients; see docs/tech-debt.md.
+  'campaign.job_posted': {
+    templateKey: 'notifications.types.campaign_job_posted',
+    recipient: 'creator',
+    preference: { group: 'assignment', channels: IN_APP_ONLY },
+  },
 }
 
 /**

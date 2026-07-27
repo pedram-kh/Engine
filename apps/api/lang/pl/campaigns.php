@@ -71,4 +71,16 @@ return [
             ],
         ],
     ],
+    // AH-056 (Jobs Board chunk 3, D6) — the job-posted fan-out mail. Queued and
+    // localized at queue time to the recipient's preferred_language, rendered
+    // through the shared `catalyst` markdown theme. Carries the agency + campaign
+    // names and a deep link only: the brand's identity is board content, behind
+    // the visibility predicate, and an inbox is not.
+    'job_posted' => [
+        'subject' => ':agency opublikowała nowe zlecenie',
+        'greeting' => 'Cześć :name,',
+        'body' => ':agency opublikowała nowe zlecenie na Twojej tablicy: „:campaign”. Otwórz je, aby zobaczyć szczegóły i zgłosić się.',
+        'cta' => 'Zobacz zlecenie',
+        'ignore' => 'Otrzymujesz tę wiadomość, ponieważ znajdujesz się na liście twórców agencji :agency.',
+    ],
 ];

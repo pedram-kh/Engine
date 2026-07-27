@@ -30,6 +30,7 @@
       "message_relationship_received_by_agency": "Sheol {sender_name} teachtaireacht dhíreach chugat.",
       "agency_creator_relation_admin_connected": "Cheangail riarthóir Catalyst thú le {agency_name}.",
       "agency_creator_relation_disconnected": "Tá deireadh tagtha le do nasc le {counterparty_name}.",
+      "campaign_job_posted": "D'fhoilsigh {agency_name} post nua: {campaign_name}.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -62,7 +63,8 @@
         "message_received_by_creator": "A new message from the agency",
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Teachtaireacht dhíreach nua ón ngníomhaireacht",
-        "message_relationship_received_by_agency": "Teachtaireacht dhíreach nua ón gcruthaitheoir"
+        "message_relationship_received_by_agency": "Teachtaireacht dhíreach nua ón gcruthaitheoir",
+        "campaign_job_posted": "Foilsítear post nua"
       }
     }
   }

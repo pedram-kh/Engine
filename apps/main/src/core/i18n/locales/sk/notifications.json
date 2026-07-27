@@ -30,6 +30,7 @@
       "message_relationship_received_by_agency": "{sender_name} vám poslal priamu správu.",
       "agency_creator_relation_admin_connected": "Administrátor Catalyst vás prepojil s {agency_name}.",
       "agency_creator_relation_disconnected": "Vaše prepojenie s {counterparty_name} sa skončilo.",
+      "campaign_job_posted": "{agency_name} zverejnila novú ponuku: {campaign_name}.",
       "fallback": "Máte nové oznámenia."
     },
     "preferences": {
@@ -62,7 +63,8 @@
         "message_received_by_creator": "Nová správa od agentúry",
         "message_received_by_agency": "Nová správa od tvorcu",
         "message_relationship_received_by_creator": "Nová priama správa od agentúry",
-        "message_relationship_received_by_agency": "Nová priama správa od tvorcu"
+        "message_relationship_received_by_agency": "Nová priama správa od tvorcu",
+        "campaign_job_posted": "Je zverejnená nová ponuka"
       }
     }
   }

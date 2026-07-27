@@ -44,6 +44,10 @@ it('NotificationType catalogue lists exactly the curated membership', function (
         // notifies the creator; disconnect notifies both parties (one type).
         'agency_creator_relation.admin_connected',
         'agency_creator_relation.disconnected',
+        // AH-056 (Jobs Board chunk 3, D8) — a rostered agency listed a new job.
+        // Single-direction (creator): the agency did the listing, so there is
+        // no agency-facing counterpart to pair it with.
+        'campaign.job_posted',
     ];
 
     $actual = array_map(fn (NotificationType $case): string => $case->value, NotificationType::cases());

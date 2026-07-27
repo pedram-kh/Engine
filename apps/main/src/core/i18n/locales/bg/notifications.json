@@ -30,6 +30,7 @@
       "message_relationship_received_by_agency": "{sender_name} ви изпрати директно съобщение.",
       "agency_creator_relation_admin_connected": "Администратор на Catalyst ви свърза с {agency_name}.",
       "agency_creator_relation_disconnected": "Връзката ви с {counterparty_name} приключи.",
+      "campaign_job_posted": "{agency_name} публикува нова обява: {campaign_name}.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -62,7 +63,8 @@
         "message_received_by_creator": "A new message from the agency",
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Ново директно съобщение от агенцията",
-        "message_relationship_received_by_agency": "Ново директно съобщение от създателя"
+        "message_relationship_received_by_agency": "Ново директно съобщение от създателя",
+        "campaign_job_posted": "Публикувана е нова обява"
       }
     }
   }

@@ -30,6 +30,7 @@
       "message_relationship_received_by_agency": "{sender_name} skickade ett direktmeddelande till dig.",
       "agency_creator_relation_admin_connected": "En Catalyst-administratör kopplade dig till {agency_name}.",
       "agency_creator_relation_disconnected": "Din koppling till {counterparty_name} har upphört.",
+      "campaign_job_posted": "{agency_name} har publicerat ett nytt jobb: {campaign_name}.",
       "fallback": "Du har en ny avisering."
     },
     "preferences": {
@@ -62,7 +63,8 @@
         "message_received_by_creator": "Ett nytt meddelande från byrån",
         "message_received_by_agency": "Ett nytt meddelande från creatorn",
         "message_relationship_received_by_creator": "Ett nytt direktmeddelande från byrån",
-        "message_relationship_received_by_agency": "Ett nytt direktmeddelande från skaparen"
+        "message_relationship_received_by_agency": "Ett nytt direktmeddelande från skaparen",
+        "campaign_job_posted": "Ett nytt jobb publiceras"
       }
     }
   }

@@ -51,6 +51,7 @@ export type NotificationType =
   | 'message.relationship_received_by_agency'
   | 'agency_creator_relation.admin_connected'
   | 'agency_creator_relation.disconnected'
+  | 'campaign.job_posted'
 
 /** The acting user who drove the event, when one exists (null for system-driven). */
 export interface NotificationActor {

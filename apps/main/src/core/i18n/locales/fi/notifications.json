@@ -30,6 +30,7 @@
       "message_relationship_received_by_agency": "{sender_name} lähetti sinulle suoraviestin.",
       "agency_creator_relation_admin_connected": "Catalystin ylläpitäjä yhdisti sinut kontaktiin {agency_name}.",
       "agency_creator_relation_disconnected": "Yhteytesi käyttäjään {counterparty_name} on päättynyt.",
+      "campaign_job_posted": "{agency_name} julkaisi uuden työn: {campaign_name}.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -62,7 +63,8 @@
         "message_received_by_creator": "A new message from the agency",
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Uusi suoraviesti toimistolta",
-        "message_relationship_received_by_agency": "Uusi suoraviesti tekijältä"
+        "message_relationship_received_by_agency": "Uusi suoraviesti tekijältä",
+        "campaign_job_posted": "Uusi työ julkaistaan"
       }
     }
   }

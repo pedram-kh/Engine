@@ -30,6 +30,7 @@
       "message_relationship_received_by_agency": "{sender_name} sent you a direct message.",
       "agency_creator_relation_admin_connected": "A Catalyst administrator connected you with {agency_name}.",
       "agency_creator_relation_disconnected": "Your connection with {counterparty_name} has ended.",
+      "campaign_job_posted": "{agency_name} posted a new job: {campaign_name}.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -62,7 +63,8 @@
         "message_received_by_creator": "A new message from the agency",
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "A new direct message from the agency",
-        "message_relationship_received_by_agency": "A new direct message from the creator"
+        "message_relationship_received_by_agency": "A new direct message from the creator",
+        "campaign_job_posted": "A new job is posted"
       }
     }
   }

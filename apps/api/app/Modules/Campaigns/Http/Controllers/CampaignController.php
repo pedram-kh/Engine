@@ -12,6 +12,7 @@ use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Http\Requests\CreateCampaignRequest;
 use App\Modules\Campaigns\Http\Requests\UpdateCampaignRequest;
 use App\Modules\Campaigns\Http\Resources\CampaignResource;
+use App\Modules\Campaigns\Jobs\SendJobPostedNotificationsJob;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -150,6 +151,33 @@ final class CampaignController
         if (isset($updates['budget_currency'])) {
             $updates['budget_currency'] = strtoupper((string) $updates['budget_currency']);
         }
+
+        // AH-056 (D4/D6) — the LISTING FLIP detector. `listed_on_jobs_board`
+        // has exactly one write path on the platform (this method: `store()`
+        // strips it, and nothing else assigns the column), so comparing the
+        // stored value against the incoming one here catches every transition
+        // there is. No domain event, no listener, no scheduler.
+        //
+        // §5.32 reinterpretation, recorded: the plan reached for a new campaign
+        // event to hang this on. It does not need one — AH-054's F3 already put
+        // `listed_on_jobs_board` in the audit snapshot pair three lines below,
+        // which means the before/after comparison is not a new mechanism but a
+        // read of one that already ships and is already tested. The INTENT was
+        // "fire exactly once, on the false→true edge, without depending on the
+        // scheduler"; a new event would have added machinery to reach the same
+        // place from further away.
+        $wasListed = $campaign->listed_on_jobs_board;
+        $willList = ! $wasListed
+            && $request->has('listed_on_jobs_board')
+            && $request->boolean('listed_on_jobs_board');
+
+        if ($willList) {
+            // Display metadata for the recency chip, written on the flip and
+            // only on the flip. The read scope remains the sole visibility
+            // authority — it never consults this column.
+            $updates['listed_at'] = now();
+        }
+
         $campaign->fill($updates)->save();
 
         Audit::log(
@@ -158,6 +186,16 @@ final class CampaignController
             before: $before,
             after: $this->auditableSnapshot($campaign->fresh() ?? $campaign),
         );
+
+        // Dispatched off the POST-SAVE state, not off the request: a payload
+        // that claimed `true` but was refused by a validator, or that arrived
+        // on an already-listed campaign, must not enqueue a fan-out. Plain
+        // dispatch AFTER the save, so the worker can never read a campaign that
+        // is not yet listed — and not `dispatchAfterResponse()`, which would
+        // run a mail loop inside the web process (Q3).
+        if (! $wasListed && $campaign->listed_on_jobs_board) {
+            SendJobPostedNotificationsJob::dispatch($campaign->id);
+        }
 
         return new CampaignResource(
             ($campaign->fresh() ?? $campaign)->loadCount('assignments')->load(['brand:id,ulid,name', 'agency:id,ulid']),

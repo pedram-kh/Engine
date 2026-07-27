@@ -311,6 +311,19 @@ enum AuditAction: string
     // The row records the FACT plus the campaign/creator ids.
     case CampaignApplicationSubmitted = 'campaign_application.submitted';
 
+    // AH-056 (Jobs Board chunk 3, D6/D8) — a campaign was listed on the jobs
+    // board and its rostered creators were told. Single-direction: it reaches
+    // CREATORS only (the agency performed the action, so it is not news to
+    // them), which is why it is one verb and not a directional pair.
+    //
+    // Subject is the CAMPAIGN, so the noun is `campaign.*` rather than
+    // `campaign_application.*` — the application does not exist yet when this
+    // fires, and cannot: the stamp precedes any application row (D7).
+    //
+    // This one IS a NotificationType (unlike the apply verb above), so it joins
+    // the one-vocabulary tie and rides both tripwires.
+    case CampaignJobPosted = 'campaign.job_posted';
+
     // Sprint 11 (D-7) — the two dual-recipient message-notification verbs. They
     // exist ONLY to satisfy NotificationType's one-vocabulary tie (a notification
     // type's value must be a live AuditAction value); NO audit row is ever

@@ -30,6 +30,7 @@
       "message_relationship_received_by_agency": "{sender_name} te envió un mensaje directo.",
       "agency_creator_relation_admin_connected": "Un administrador de Catalyst te ha conectado con {agency_name}.",
       "agency_creator_relation_disconnected": "Tu conexión con {counterparty_name} ha terminado.",
+      "campaign_job_posted": "{agency_name} ha publicado un nuevo trabajo: {campaign_name}.",
       "fallback": "Tienes una nueva notificación."
     },
     "preferences": {
@@ -62,7 +63,8 @@
         "message_received_by_creator": "Un nuevo mensaje de la agencia",
         "message_received_by_agency": "Un nuevo mensaje del creador",
         "message_relationship_received_by_creator": "Un nuevo mensaje directo de la agencia",
-        "message_relationship_received_by_agency": "Un nuevo mensaje directo del creador"
+        "message_relationship_received_by_agency": "Un nuevo mensaje directo del creador",
+        "campaign_job_posted": "Se publica un nuevo trabajo"
       }
     }
   }

@@ -30,6 +30,7 @@
       "message_relationship_received_by_agency": "{sender_name} bagħatlek messaġġ dirett.",
       "agency_creator_relation_admin_connected": "Amministratur ta' Catalyst qabbdek ma' {agency_name}.",
       "agency_creator_relation_disconnected": "Il-konnessjoni tiegħek ma' {counterparty_name} intemmet.",
+      "campaign_job_posted": "{agency_name} ippubblika xogħol ġdid: {campaign_name}.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -62,7 +63,8 @@
         "message_received_by_creator": "A new message from the agency",
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Messaġġ dirett ġdid mill-aġenzija",
-        "message_relationship_received_by_agency": "Messaġġ dirett ġdid mill-kreatur"
+        "message_relationship_received_by_agency": "Messaġġ dirett ġdid mill-kreatur",
+        "campaign_job_posted": "Jiġi ppubblikat xogħol ġdid"
       }
     }
   }

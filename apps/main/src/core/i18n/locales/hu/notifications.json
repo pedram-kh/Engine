@@ -30,6 +30,7 @@
       "message_relationship_received_by_agency": "{sender_name} közvetlen üzenetet küldött Önnek.",
       "agency_creator_relation_admin_connected": "A Catalyst adminisztrátora összekapcsolta Önt a(z) {agency_name} partnerrel.",
       "agency_creator_relation_disconnected": "A(z) {counterparty_name} partnerrel fennálló kapcsolata véget ért.",
+      "campaign_job_posted": "A(z) {agency_name} új munkát hirdetett meg: {campaign_name}.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -62,7 +63,8 @@
         "message_received_by_creator": "A new message from the agency",
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Új közvetlen üzenet az ügynökségtől",
-        "message_relationship_received_by_agency": "Új közvetlen üzenet az alkotótól"
+        "message_relationship_received_by_agency": "Új közvetlen üzenet az alkotótól",
+        "campaign_job_posted": "Új munkát hirdetnek meg"
       }
     }
   }
