@@ -1,13 +1,26 @@
 # Jobs Board arc, chunk 3 — creator job board + apply (AH-056)
 
-**Final code HEAD:** `ddf875c` — the last commit carrying code, with this docs commit on top of it.
-Six commits on `main`, all unpushed. (A commit cannot record its own hash;
-`git rev-parse --short HEAD` gives the tip.)
-**Ratified plan:** [`docs/reviews/jobs-board-c3-plan.md`](jobs-board-c3-plan.md).
-**Inventory:** [`docs/reviews/jobs-board-c3-inventory.md`](jobs-board-c3-inventory.md).
-**Binds to:** [`docs/reviews/jobs-board-brand-amends-review.md`](jobs-board-brand-amends-review.md)
-(the closed chunk-1+2 review — the listing floor, `scopeListedOnJobsBoard`, and the brand `logo_url`
-emission this chunk crosses to a new audience).
+- **Status:** **Closed — approved.** Six commits: `81df0b5`, `928ccce`, `0cf6275`, `4e527e7`,
+  `d37d43c`, `ddf875c` (the last commit carrying code), plus this docs commit.
+- **Verdict:** independent review complete: D1–D10 verified and the C2–C5 dispositions accepted; all
+  six break-reverts **re-executed at final HEAD and confirmed**, including the **leg-6 load-bearing
+  collateral** — removing the brand-hard-blacklist leg also reds the hard-versus-soft discrimination
+  test, which is what distinguishes an enforced leg from one that merely happens to agree with its
+  neighbours; the seven-case §5.34 set green on all four surfaces (list, detail, apply, recipient
+  query); both exact-keyset pins green, so the D3 brand subset cannot grow by accretion; the
+  **flag-registry gap accepted as found-and-fixed**, covered by the HTTP arm/disarm test — the flag's
+  default, service check, break-revert and enable ritual were all green while the operator control
+  did not exist, and writing the runbook row is what caught it; production posture verified
+  **LOW-MEDIUM** with the three containments (default-OFF flag, the 50-per-run cap, rostered-only
+  recipients) and the accepted queue-then-stamp silent miss named; full Playwright 24/24 including
+  the new browse-detail-apply leg.
+- **Date:** 2026-07-27
+- **Provenance:** drafted by Cursor, reviewed and closed by Claude.
+- **Ratified plan:** [`docs/reviews/jobs-board-c3-plan.md`](jobs-board-c3-plan.md).
+  **Inventory:** [`docs/reviews/jobs-board-c3-inventory.md`](jobs-board-c3-inventory.md).
+  **Binds to:** [`docs/reviews/jobs-board-brand-amends-review.md`](jobs-board-brand-amends-review.md)
+  (the closed chunk-1+2 review — the listing floor, `scopeListedOnJobsBoard`, and the brand
+  `logo_url` emission this chunk crosses to a new audience).
 
 ---
 

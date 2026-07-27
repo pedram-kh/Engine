@@ -144,7 +144,7 @@ reviews, and conversations.
   the new browse-detail-apply leg, with the dev stack down for the run and health-checked after.
   Six break-reverts run and restored (approved leg, roster leg, brand-hard-blacklist leg, flag-OFF
   no-op, `listed_at` non-consultation, and both halves of the architecture spec).
-- **Ref:** [`docs/reviews/jobs-board-c3-review.md`](jobs-board-c3-review.md) — the completion package;
+- **Ref:** [`docs/reviews/jobs-board-c3-review.md`](jobs-board-c3-review.md) — **Closed — approved**;
   [`jobs-board-c3-plan.md`](jobs-board-c3-plan.md) and
   [`jobs-board-c3-inventory.md`](jobs-board-c3-inventory.md) for the loop that produced it.
 

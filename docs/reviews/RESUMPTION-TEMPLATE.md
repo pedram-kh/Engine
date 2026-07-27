@@ -113,13 +113,13 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-27 · **Through:** AH-056 · **Baseline:** the AH-056 docs commit — the
-current local tip, atop the five AH-056 feature/test commits (`81df0b5`, `928ccce`, `0cf6275`,
-`4e527e7`, `d37d43c`) and the AH-055 docs commit, all sitting on `aa8d410` (the pushed
-AH-053/AH-054 close-out). **AH-055 and AH-056 are both held** pending Pedram's push call;
-everything through AH-054 is pushed. (A commit cannot record its own hash, so the tip is named
-descriptively; `git rev-parse --short HEAD` gives it, and `git rev-parse --short origin/main` gives
-the pushed tip.)
+**Last updated:** 2026-07-27 · **Through:** AH-056 · **Baseline:** the AH-056 close commit — the
+current tip and, as of this push, also the `origin/main` tip. It sits atop the six AH-056 commits
+(`81df0b5`, `928ccce`, `0cf6275`, `4e527e7`, `d37d43c`, `ddf875c`) and the AH-055 docs commit, all on
+`aa8d410` (the AH-053/AH-054 close-out). **Nothing is held — AH-055 and AH-056 were pushed on
+2026-07-27** with the review closed and approved. (A commit cannot record its own hash, so the tip is
+named descriptively; `git rev-parse --short HEAD` gives it, and `git rev-parse --short origin/main`
+gives the pushed tip. Those two are the authority, not this sentence.)
 
 > **⚠ The Jobs Board arc deploys as ONE unit — chunk 3 of 5 is done, and the deploy stays held.**
 > AH-056 ships the creator board, apply, and the job-posted fan-out, but the agency side (chunk 4)
@@ -151,11 +151,12 @@ eyes-on fix** commits — `4af63b2` (admin dialog: 422 copy, picker name, `appro
 `d381a77` (an `ended` relation could be re-pooled) — plus the addendum/AH-052 docs commit `d1dc3d2`.
 
 **Deployed through:** **`f5be920` (AH-052), deployed 2026-07-26.** Push and deploy were in sync as of
-that date; **they are no longer** — the AH-053/AH-054 push on 2026-07-27 is **code, and undeployed**.
-That is the first undeployed code since AH-052. Deploy state as last read from the server, not
-inferred: `php artisan migrate:status` reported **Ran through batch 5**, and the 2026-07-26 deploy
-correctly reported `Nothing to migrate` (AH-051/052 add none). **AH-054 adds one migration**, so the
-next deploy will not say that — see the deploy notes below.
+that date; **they are no longer** — the AH-053/AH-054 push and the AH-055/AH-056 push, both on
+2026-07-27, are **code, and undeployed**. That is the first undeployed code since AH-052, and it is
+now the whole first three chunks of the Jobs Board arc plus one UI fix. Deploy state as last read
+from the server, not inferred: `php artisan migrate:status` reported **Ran through batch 5**, and the
+2026-07-26 deploy correctly reported `Nothing to migrate` (AH-051/052 add none). **AH-054 adds one
+migration and AH-056 adds three**, so the next deploy will not say that — see the deploy notes below.
 
 > **Tracking lesson (2026-07-26).** Deploy state must be **read from the server**
 > (`migrate:status`, and see the scheduler blocker below), never inferred from push history —
@@ -163,7 +164,8 @@ next deploy will not say that — see the deploy notes below.
 > (`content_companions`) turned out to be already live before today, while this file still listed
 > its migrations as pending. Verify at each session close; do not carry forward an assumption.
 
-**Deploy notes — AH-056 (local, NOT pushed, NOT deployed).** Three obligations:
+**Deploy notes — AH-055/AH-056 (pushed 2026-07-27, NOT deployed).** AH-055 is pure UI and carries
+nothing. AH-056 carries three obligations:
 
 1. **Three more migrations**, all additive: `2026_07_27_110000_create_campaign_applications_table`,
    `2026_07_27_110001_create_campaign_job_notifications_table`, and
@@ -495,7 +497,7 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     `CampaignController::update()`, and the audit noun is `campaign_application.*`, not
     `application.*` (which would collide with the creator's onboarding application). Six
     break-reverts, all restored. Three additive migrations. `application_submitted` is deliberately
-    **left to chunk 4**. Review: `docs/reviews/jobs-board-c3-review.md`.
+    **left to chunk 4**. Review: `docs/reviews/jobs-board-c3-review.md` (**Closed — approved**).
 
   > **Ruling (AH-046/047, flaky-10 MT baseline):** new creator-facing copy gets a real
   > machine-translation baseline in **all 24 locales at merge time**, including the flaky 10
