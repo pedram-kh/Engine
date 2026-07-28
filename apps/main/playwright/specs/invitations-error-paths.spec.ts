@@ -82,7 +82,9 @@ test.describe('AcceptInvitationPage — error paths', () => {
     await page.locator(dt(testIds.signInEmail)).locator('input').fill(bobEmail)
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(bobPassword)
     await page.locator(dt(testIds.signInSubmit)).click()
-    await page.waitForTimeout(1000)
+    // Settle on the authenticated state rather than sleeping for a second — the
+    // fixed sleep raced the sign-in round trip under suite load (AH-058).
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
 
     // Navigate to the accept URL and try to accept while signed in as Bob.
     await page.goto(acceptUrl)
@@ -121,7 +123,7 @@ test.describe('AcceptInvitationPage — error paths', () => {
     await page.locator(dt(testIds.signInEmail)).locator('input').fill(userEmail)
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(userPassword)
     await page.locator(dt(testIds.signInSubmit)).click()
-    await page.waitForTimeout(1000)
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
 
     await page.goto(firstAcceptUrl)
     await expect(page.locator(dt(testIds.acceptInvitationPending))).toBeVisible({ timeout: 8000 })

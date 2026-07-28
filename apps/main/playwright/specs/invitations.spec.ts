@@ -159,8 +159,11 @@ test.describe('Invitation happy path', () => {
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(inviteePassword)
     await page.locator(dt(testIds.signInSubmit)).click()
 
-    // Wait for auth to settle (lands on dashboard or brands list).
-    await page.waitForTimeout(1000)
+    // Wait for auth to SETTLE, not for a second to pass: a fixed sleep here
+    // raced the sign-in round trip under suite load and navigated to the accept
+    // URL still unauthenticated, where the page correctly renders its
+    // "sign in to accept" branch and the pending card never appears (AH-058).
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
 
     // Navigate to accept URL while authenticated.
     await page.goto(acceptUrl)

@@ -743,6 +743,85 @@ export async function seedRosterCreators(
 }
 
 // ---------------------------------------------------------------------------
+// AH-058 — agency-side pending-application provisioning
+// ---------------------------------------------------------------------------
+
+export interface SeedPendingApplicantInput {
+  displayName: string
+  note?: string
+}
+
+export interface SeedPendingApplicationsResult {
+  agencyUlid: string
+  campaignUlid: string
+  campaignName: string
+  brandName: string
+  applications: { applicationUlid: string; creatorUlid: string; displayName: string }[]
+}
+
+/**
+ * Seed a listed campaign on the GIVEN agency plus N rostered creators who have
+ * applied to it and are still pending, so the applications-tab spec can open the
+ * tab and answer real rows.
+ *
+ * Agency-keyed, like `seedRosterCreators` — deliberately NOT the creator-keyed
+ * `creators/listed-job` helper the c3 board spec uses, which provisions its own
+ * fresh agency that no agency user can sign into. Driving the applications
+ * through the production apply endpoint instead would mean N creator sign-ins
+ * (each with its own TOTP round trip) before the first assertion; the apply path
+ * has its own feature tests.
+ */
+export async function seedPendingApplications(
+  request: APIRequestContext,
+  agencyUlid: string,
+  applicants: SeedPendingApplicantInput[],
+  options: { campaignName?: string; brandName?: string } = {},
+): Promise<SeedPendingApplicationsResult> {
+  const response = await request.post(
+    `http://127.0.0.1:8000/api/v1/_test/agencies/${agencyUlid}/pending-applications`,
+    {
+      headers: defaultHeaders,
+      data: {
+        applicants: applicants.map((a) => ({
+          display_name: a.displayName,
+          note: a.note ?? null,
+        })),
+        campaign_name: options.campaignName ?? null,
+        brand_name: options.brandName ?? null,
+      },
+    },
+  )
+
+  if (response.status() !== 201) {
+    throw new Error(
+      `seedPendingApplications failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  const body = (await response.json()) as {
+    data: {
+      agency_ulid: string
+      campaign_ulid: string
+      campaign_name: string
+      brand_name: string
+      applications: { application_ulid: string; creator_ulid: string; display_name: string }[]
+    }
+  }
+
+  return {
+    agencyUlid: body.data.agency_ulid,
+    campaignUlid: body.data.campaign_ulid,
+    campaignName: body.data.campaign_name,
+    brandName: body.data.brand_name,
+    applications: body.data.applications.map((a) => ({
+      applicationUlid: a.application_ulid,
+      creatorUlid: a.creator_ulid,
+      displayName: a.display_name,
+    })),
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Sprint 6.6c — creator connection-request inbox provisioning
 // ---------------------------------------------------------------------------
 

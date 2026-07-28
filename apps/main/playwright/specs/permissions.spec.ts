@@ -73,8 +73,9 @@ test.describe('Permission gating', () => {
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(staffPassword)
     await page.locator(dt(testIds.signInSubmit)).click()
 
-    // Wait for auth to settle.
-    await page.waitForTimeout(1000)
+    // Wait for auth to settle — the authenticated state, not a fixed second
+    // (the same race the invitations specs carried; AH-058).
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
 
     // Accept the invitation (staff user must do this first to join the agency).
     await page.goto(acceptUrl)

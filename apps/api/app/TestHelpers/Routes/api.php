@@ -6,6 +6,7 @@ use App\TestHelpers\Http\Controllers\CreateAdminUserController;
 use App\TestHelpers\Http\Controllers\CreateAgencyInvitationController;
 use App\TestHelpers\Http\Controllers\CreateAgencyWithAdminController;
 use App\TestHelpers\Http\Controllers\CreateListedJobController;
+use App\TestHelpers\Http\Controllers\CreatePendingApplicationsController;
 use App\TestHelpers\Http\Controllers\CreatePendingConnectionRequestController;
 use App\TestHelpers\Http\Controllers\CreateRosterCreatorsController;
 use App\TestHelpers\Http\Controllers\IssueTotpController;
@@ -100,6 +101,16 @@ Route::prefix('_test')
         // actual rows. No production path provisions a roster in one call.
         Route::post('agencies/{agency}/roster-creators', CreateRosterCreatorsController::class)
             ->name('agencies.roster_creators.create');
+
+        // AH-058 — seed a listed campaign on the GIVEN agency plus N rostered
+        // creators who have applied to it and are still pending, so the
+        // agency-side applications leg can open the tab and answer real rows.
+        // Agency-keyed (the roster-creators shape), deliberately a sibling of
+        // creators/listed-job rather than a second mode on it: that helper is
+        // creator-keyed and provisions its own agency, which no agency user can
+        // sign into.
+        Route::post('agencies/{agency}/pending-applications', CreatePendingApplicationsController::class)
+            ->name('agencies.pending_applications.create');
 
         // Sprint 6.6c — approve the signed-in creator + seed a pending_request
         // relation (on a fresh agency) so the creator-inbox Playwright round-
