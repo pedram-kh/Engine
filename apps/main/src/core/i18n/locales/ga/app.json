@@ -495,6 +495,7 @@
         "creators": "Cruthaitheoirs",
         "board": "Board",
         "drafts": "Dréachts",
+        "applications": "Iarratais",
         "payments": "Íocaíochts",
         "messages": "Teachtaireachtaí",
         "settings": "Socruithe"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "We couldn't load drafts. Please try again.",
         "submittedAt": "Cuir isteachted {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Gach iarratas"
+        },
+        "status": {
+          "pending": "Ar feitheamh",
+          "accepted": "Glactha",
+          "rejected": "Níor roghnaíodh thú"
+        },
+        "empty": {
+          "heading": "Níl aon iarratas fós",
+          "body": "Nuair a chuirfidh cruthaitheoirí isteach ar an bpost seo, taispeánfar iad anseo."
+        },
+        "loadFailed": "Níorbh fhéidir na hiarratais a lódáil. Bain triail eile as.",
+        "appliedAt": "Iarratas déanta {date}",
+        "acceptedToast": "Tairiscint seolta chuig {name}.",
+        "rejectedToast": "Dúnadh iarratas {name}.",
+        "accept": {
+          "action": "Glac leis",
+          "title": "Glac le {name}",
+          "body": "Seolann glacadh cuireadh caighdeánach le do thairiscint. Is féidir leis an gcruthaitheoir glacadh leis, é a dhiúltú nó frithairiscint a dhéanamh fós.",
+          "submit": "Seol an tairiscint",
+          "cancel": "Cealaigh",
+          "conflictBody": "Níl {name} ar fáil le linn tréimhse an fheachtais. An bhfuil fonn ort an tairiscint a sheoladh mar sin féin?"
+        },
+        "reject": {
+          "action": "Diúltaigh",
+          "title": "An bhfuil fonn ort an iarratas seo a dhiúltú?",
+          "body": "Cuirfear in iúl do {name} nár roghnaíodh é. Ní féidir é a chur ar ceal, agus ní féidir leis iarratas nua a dhéanamh.",
+          "confirm": "Diúltaigh an iarratas",
+          "cancel": "Cealaigh"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Freagraíodh an iarratas seo cheana.",
+            "already_engaged": "Tá an cruthaitheoir seo páirteach san fheachtas seo cheana.",
+            "creator_not_approved": "Níl cuntas an chruthaitheora seo faofa a thuilleadh."
+          },
+          "assignment": {
+            "blacklisted": "Tá an cruthaitheoir seo ar an liosta dubh agus ní féidir cuireadh a thabhairt dó chuig an bhfeachtas seo."
+          },
+          "generic": "Chuaigh rud éigin mícheart. Bain triail eile as."
+        }
       },
       "fees": {
         "offered": "Offered",

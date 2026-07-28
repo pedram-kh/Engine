@@ -495,6 +495,7 @@
         "creators": "Creators",
         "board": "Board",
         "drafts": "Ciornăs",
+        "applications": "Candidaturi",
         "payments": "Platăs",
         "messages": "Mesaje",
         "settings": "Setări"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "We couldn't load drafts. Please try again.",
         "submittedAt": "Trimitețited {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Toate candidaturile"
+        },
+        "status": {
+          "pending": "În așteptare",
+          "accepted": "Acceptată",
+          "rejected": "Neselectat"
+        },
+        "empty": {
+          "heading": "Încă nu există candidaturi",
+          "body": "Când creatorii aplică la acest job, vor apărea aici."
+        },
+        "loadFailed": "Nu am putut încărca candidaturile. Încearcă din nou.",
+        "appliedAt": "A aplicat la {date}",
+        "acceptedToast": "Oferta a fost trimisă către {name}.",
+        "rejectedToast": "Candidatura lui {name} a fost închisă.",
+        "accept": {
+          "action": "Acceptă",
+          "title": "Acceptă {name}",
+          "body": "Acceptarea trimite o invitație standard cu oferta ta. Creatorul o poate în continuare accepta, refuza sau contraoferta.",
+          "submit": "Trimite oferta",
+          "cancel": "Anulați",
+          "conflictBody": "{name} nu este disponibil în perioada campaniei. Trimiți oferta oricum?"
+        },
+        "reject": {
+          "action": "Respinge",
+          "title": "Respingi această candidatură?",
+          "body": "{name} va afla că nu a fost selectat. Acțiunea nu poate fi anulată și nu va putea aplica din nou.",
+          "confirm": "Respinge candidatura",
+          "cancel": "Anulați"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "La această candidatură s-a răspuns deja.",
+            "already_engaged": "Acest creator este deja implicat în această campanie.",
+            "creator_not_approved": "Contul acestui creator nu mai este aprobat."
+          },
+          "assignment": {
+            "blacklisted": "Acest creator este pe lista neagră și nu poate fi invitat în această campanie."
+          },
+          "generic": "Ceva nu a mers bine. Încearcă din nou."
+        }
       },
       "fees": {
         "offered": "Offered",

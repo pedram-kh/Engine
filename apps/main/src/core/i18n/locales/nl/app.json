@@ -495,6 +495,7 @@
         "creators": "Creators",
         "board": "Board",
         "drafts": "Concepten",
+        "applications": "Aanmeldingen",
         "payments": "Betalingen",
         "messages": "Berichten",
         "settings": "Instellingen"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "Concepten konden niet worden geladen. Probeer het opnieuw.",
         "submittedAt": "Ingediend {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Alle aanmeldingen"
+        },
+        "status": {
+          "pending": "In afwachting",
+          "accepted": "Geaccepteerd",
+          "rejected": "Niet gekozen"
+        },
+        "empty": {
+          "heading": "Nog geen aanmeldingen",
+          "body": "Wanneer creators zich aanmelden voor deze klus, verschijnen ze hier."
+        },
+        "loadFailed": "Aanmeldingen konden niet worden geladen. Probeer het opnieuw.",
+        "appliedAt": "Aangemeld op {date}",
+        "acceptedToast": "Aanbod verstuurd naar {name}.",
+        "rejectedToast": "De aanmelding van {name} is gesloten.",
+        "accept": {
+          "action": "Accepteren",
+          "title": "{name} accepteren",
+          "body": "Bij accepteren wordt een gewone uitnodiging met jouw aanbod verstuurd. De creator kan die nog steeds accepteren, afwijzen of een tegenbod doen.",
+          "submit": "Aanbod versturen",
+          "cancel": "Annuleren",
+          "conflictBody": "{name} is niet beschikbaar tijdens de campagneperiode. Aanbod toch versturen?"
+        },
+        "reject": {
+          "action": "Afwijzen",
+          "title": "Deze aanmelding afwijzen?",
+          "body": "{name} krijgt te horen dat hij niet is gekozen. Dit kan niet worden teruggedraaid en hij kan zich niet opnieuw aanmelden.",
+          "confirm": "Aanmelding afwijzen",
+          "cancel": "Annuleren"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Deze aanmelding is al beantwoord.",
+            "already_engaged": "Deze creator werkt al aan deze campagne.",
+            "creator_not_approved": "Het account van deze creator is niet langer goedgekeurd."
+          },
+          "assignment": {
+            "blacklisted": "Deze creator staat op de zwarte lijst en kan niet voor deze campagne worden uitgenodigd."
+          },
+          "generic": "Er is iets misgegaan. Probeer het opnieuw."
+        }
       },
       "fees": {
         "offered": "Aangeboden",

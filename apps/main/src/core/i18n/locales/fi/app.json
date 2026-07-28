@@ -495,6 +495,7 @@
         "creators": "Luojas",
         "board": "Board",
         "drafts": "Luonnoss",
+        "applications": "Hakemukset",
         "payments": "Maksus",
         "messages": "Viestit",
         "settings": "Asetukset"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "We couldn't load drafts. Please try again.",
         "submittedAt": "Lähetäted {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Kaikki hakemukset"
+        },
+        "status": {
+          "pending": "Odottaa",
+          "accepted": "Hyväksytty",
+          "rejected": "Ei valittu"
+        },
+        "empty": {
+          "heading": "Ei vielä hakemuksia",
+          "body": "Kun tekijät hakevat tätä työtä, he näkyvät tässä."
+        },
+        "loadFailed": "Hakemuksia ei voitu ladata. Yritä uudelleen.",
+        "appliedAt": "Haki {date}",
+        "acceptedToast": "Tarjous lähetettiin tekijälle {name}.",
+        "rejectedToast": "Hakemus tekijältä {name} on suljettu.",
+        "accept": {
+          "action": "Hyväksy",
+          "title": "Hyväksy {name}",
+          "body": "Hyväksyminen lähettää tavallisen kutsun tarjouksesi kanssa. Tekijä voi edelleen hyväksyä sen, hylätä sen tai tehdä vastatarjouksen.",
+          "submit": "Lähetä tarjous",
+          "cancel": "Peruuta",
+          "conflictBody": "{name} ei ole käytettävissä kampanjan aikana. Lähetetäänkö tarjous silti?"
+        },
+        "reject": {
+          "action": "Hylkää",
+          "title": "Hylätäänkö tämä hakemus?",
+          "body": "{name} saa tiedon, ettei häntä valittu. Tätä ei voi peruuttaa, eikä hän voi hakea uudelleen.",
+          "confirm": "Hylkää hakemus",
+          "cancel": "Peruuta"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Tähän hakemukseen on jo vastattu.",
+            "already_engaged": "Tämä tekijä on jo mukana tässä kampanjassa.",
+            "creator_not_approved": "Tämän tekijän tiliä ei ole enää hyväksytty."
+          },
+          "assignment": {
+            "blacklisted": "Tämä tekijä on estolistalla, eikä häntä voi kutsua tähän kampanjaan."
+          },
+          "generic": "Jokin meni pieleen. Yritä uudelleen."
+        }
       },
       "fees": {
         "offered": "Offered",

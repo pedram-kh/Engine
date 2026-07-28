@@ -7,7 +7,8 @@
  *   - Creators  — the assignment list (live, read-only; empty until Chunk 2
  *                 wires inviting).
  *   - Settings  — config edit (live; admin/manager only — `canEdit`).
- *   - Board / Drafts / Messages — live tabs (lazy-mounted where noted).
+ *   - Board / Drafts / Applications / Messages — live tabs (lazy-mounted where
+ *                 noted).
  *   - Payments — empty-state "coming soon".
  */
 
@@ -42,6 +43,7 @@ import ViewPostedContentDrawer from '../components/ViewPostedContentDrawer.vue'
 import CampaignMessagesPanel from '@/modules/messaging/components/CampaignMessagesPanel.vue'
 import BoardView from '@/modules/boards/components/BoardView.vue'
 import DraftsTab from '../components/DraftsTab.vue'
+import ApplicationsTab from '../components/ApplicationsTab.vue'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -157,6 +159,20 @@ function onReviewed(message: string): void {
 }
 
 const draftsTabRef = ref<InstanceType<typeof DraftsTab> | null>(null)
+
+// The Applications tab (Jobs Board chunk 4, D1). The badge counts PENDING rows
+// only, hoisted from the list's own scoped count — never the creator-facing
+// `applicant_count`, which is interest semantics and would never clear.
+const applicationsTabRef = ref<InstanceType<typeof ApplicationsTab> | null>(null)
+const pendingApplications = ref(0)
+const applicationsSnackbar = ref<string | null>(null)
+
+function onApplicationAnswered(message: string): void {
+  applicationsSnackbar.value = message
+  // An accepted application creates an `invited` assignment, so the Creators tab
+  // and the board both have new truth to show.
+  void loadAssignments()
+}
 
 // The verification-failure resolution surface (verification-resolution chunk,
 // D-7). Same `review` ability as the draft review. The row action shows only
@@ -332,8 +348,27 @@ async function loadAssignments(): Promise<void> {
   }
 }
 
+/**
+ * The badge's count, fetched on mount rather than only when the tab opens: a
+ * badge that appears after you have already looked is not a badge. One cheap
+ * page-of-one read — `meta.pending_total` is campaign-wide and unaffected by
+ * pagination or the row filter.
+ */
+async function loadPendingApplications(): Promise<void> {
+  const agencyId = agencyStore.currentAgencyId
+  if (agencyId === null) return
+  try {
+    const res = await campaignsApi.listApplications(agencyId, ulid.value, { per_page: 1 })
+    pendingApplications.value = res.meta.pending_total
+  } catch {
+    // A failed count is not worth an error surface — the tab reports its own.
+    pendingApplications.value = 0
+  }
+}
+
 onMounted(() => {
   void loadCampaign()
+  void loadPendingApplications()
 })
 
 watch(tab, (value) => {
@@ -431,6 +466,16 @@ function formatDay(iso: string | null): string {
         }}</v-tab>
         <v-tab value="board" data-test="tab-board">{{ t('app.campaigns.tabs.board') }}</v-tab>
         <v-tab value="drafts" data-test="tab-drafts">{{ t('app.campaigns.tabs.drafts') }}</v-tab>
+        <v-tab value="applications" data-test="tab-applications">
+          {{ t('app.campaigns.tabs.applications') }}
+          <v-badge
+            v-if="pendingApplications > 0"
+            inline
+            color="primary"
+            :content="pendingApplications"
+            data-test="tab-applications-badge"
+          />
+        </v-tab>
         <v-tab value="payments" data-test="tab-payments">{{
           t('app.campaigns.tabs.payments')
         }}</v-tab>
@@ -809,6 +854,35 @@ function formatDay(iso: string | null): string {
             @open-review="openReview"
             @open-resolve="openResolve"
           />
+        </v-window-item>
+
+        <!-- Applications (Jobs Board chunk 4) — the agency half of the jobs
+             board; fetch-on-open, like Board and Drafts. -->
+        <v-window-item value="applications" data-test="panel-applications">
+          <ApplicationsTab
+            v-if="tab === 'applications' && agencyStore.currentAgencyId"
+            ref="applicationsTabRef"
+            :agency-id="agencyStore.currentAgencyId"
+            :campaign-id="ulid"
+            :can-act="canInvite"
+            :campaign-currency="campaign.attributes.budget_currency"
+            @pending-total="(n) => (pendingApplications = n)"
+            @answered="onApplicationAnswered"
+          />
+
+          <v-snackbar
+            :model-value="applicationsSnackbar !== null"
+            :timeout="4000"
+            color="success"
+            data-test="applications-snackbar"
+            @update:model-value="
+              (v) => {
+                if (!v) applicationsSnackbar = null
+              }
+            "
+          >
+            {{ applicationsSnackbar }}
+          </v-snackbar>
         </v-window-item>
 
         <!-- Messages (Sprint 11) — the agency roll-up of the campaign's threads -->

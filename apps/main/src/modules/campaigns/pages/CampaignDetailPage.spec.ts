@@ -30,6 +30,9 @@ vi.mock('../api/campaigns.api', () => ({
     show: vi.fn(),
     assignments: vi.fn(),
     listDrafts: vi.fn(),
+    listApplications: vi.fn(),
+    acceptApplication: vi.fn(),
+    rejectApplication: vi.fn(),
     update: vi.fn(),
     reinvite: vi.fn(),
     showAssignment: vi.fn(),
@@ -254,6 +257,10 @@ describe('CampaignDetailPage (Sprint 8 Chunk 1)', () => {
       data: [],
       meta: { total: 0, page: 1, per_page: 25, last_page: 1 },
     })
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 25, last_page: 1, pending_total: 0 },
+    })
   })
 
   afterEach(() => {
@@ -268,7 +275,41 @@ describe('CampaignDetailPage (Sprint 8 Chunk 1)', () => {
     expect(harness.wrapper.find('[data-test="tab-creators"]').exists()).toBe(true)
     expect(harness.wrapper.find('[data-test="tab-board"]').exists()).toBe(true)
     expect(harness.wrapper.find('[data-test="tab-drafts"]').exists()).toBe(true)
+    expect(harness.wrapper.find('[data-test="tab-applications"]').exists()).toBe(true)
     expect(harness.wrapper.find('[data-test="tab-payments"]').exists()).toBe(true)
+  })
+
+  it('mounts the live ApplicationsTab when the Applications tab opens (AH-058)', async () => {
+    const harness = await mountDetail()
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'applications'
+    await flushPromises()
+
+    expect(harness.wrapper.find('[data-test="applications-tab"]').exists()).toBe(true)
+  })
+
+  it('renders the pending badge from the campaign-wide count, fetched on mount', async () => {
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 1, last_page: 1, pending_total: 4 },
+    })
+    const harness = await mountDetail()
+    cleanup = harness.cleanup
+
+    // The badge is readable BEFORE the tab is opened — that is the whole point
+    // of counting on mount — and the count is `pending_total`, never the
+    // creator-facing `applicant_count`.
+    expect(campaignsApi.listApplications).toHaveBeenCalledWith('agency-ulid', CAMPAIGN_ULID, {
+      per_page: 1,
+    })
+    expect(harness.wrapper.find('[data-test="tab-applications-badge"]').text()).toContain('4')
+  })
+
+  it('hides the badge when nothing is pending', async () => {
+    const harness = await mountDetail()
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="tab-applications-badge"]').exists()).toBe(false)
   })
 
   it('shows the Settings tab for admin/manager', async () => {

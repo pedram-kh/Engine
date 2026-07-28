@@ -495,6 +495,7 @@
         "creators": "Kreaturs",
         "board": "Board",
         "drafts": "Abbozzs",
+        "applications": "Applikazzjonijiet",
         "payments": "Ħlass",
         "messages": "Messaġġi",
         "settings": "Settings"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "We couldn't load drafts. Please try again.",
         "submittedAt": "Ibgħatted {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "L-applikazzjonijiet kollha"
+        },
+        "status": {
+          "pending": "Pendenti",
+          "accepted": "Aċċettata",
+          "rejected": "Ma ġejtx magħżul"
+        },
+        "empty": {
+          "heading": "Għad m'hemmx applikazzjonijiet",
+          "body": "Meta l-kreaturi japplikaw għal dan ix-xogħol, jidhru hawn."
+        },
+        "loadFailed": "Ma stajniex intellgħu l-applikazzjonijiet. Erġa' pprova.",
+        "appliedAt": "Applika {date}",
+        "acceptedToast": "L-offerta ntbagħtet lil {name}.",
+        "rejectedToast": "L-applikazzjoni ta' {name} ingħalqet.",
+        "accept": {
+          "action": "Aċċetta",
+          "title": "Aċċetta {name}",
+          "body": "L-aċċettazzjoni tibgħat stedina standard bl-offerta tiegħek. Il-kreatur xorta jista' jaċċettaha, jirrifjutaha jew jagħmel kontro-offerta.",
+          "submit": "Ibgħat l-offerta",
+          "cancel": "Ikkanċella",
+          "conflictBody": "{name} mhux disponibbli matul il-perjodu tal-kampanja. Tibgħat l-offerta xorta?"
+        },
+        "reject": {
+          "action": "Irrifjuta",
+          "title": "Tirrifjuta din l-applikazzjoni?",
+          "body": "{name} jiġi infurmat li ma ntgħażelx. Dan ma jistax jitreġġa' lura, u ma jistax japplika mill-ġdid.",
+          "confirm": "Irrifjuta l-applikazzjoni",
+          "cancel": "Ikkanċella"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Din l-applikazzjoni diġà ġiet imwieġba.",
+            "already_engaged": "Dan il-kreatur diġà qed jaħdem fuq din il-kampanja.",
+            "creator_not_approved": "Il-kont ta' dan il-kreatur ma għadux approvat."
+          },
+          "assignment": {
+            "blacklisted": "Dan il-kreatur qiegħed fil-lista sewda u ma jistax jiġi mistieden f'din il-kampanja."
+          },
+          "generic": "Xi ħaġa marret ħażin. Erġa' pprova."
+        }
       },
       "fees": {
         "offered": "Offered",

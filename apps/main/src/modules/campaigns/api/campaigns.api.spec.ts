@@ -161,3 +161,57 @@ describe('campaignsApi create / update / assignments', () => {
     )
   })
 })
+
+describe('campaignsApi applications (Jobs Board chunk 4)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockHttp.get.mockResolvedValue({
+      data: [],
+      meta: { total: 0, pending_total: 0, page: 1, per_page: 25, last_page: 1 },
+    })
+    mockHttp.post.mockResolvedValue({ data: {} })
+  })
+
+  it('GETs the applications collection with no query string by default', () => {
+    void campaignsApi.listApplications('agency-ulid', 'campaign-ulid')
+    expect(mockHttp.get).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/applications',
+    )
+  })
+
+  it('threads the status filter and pagination', () => {
+    void campaignsApi.listApplications('agency-ulid', 'campaign-ulid', {
+      status: 'pending',
+      page: 2,
+      per_page: 50,
+    })
+    const query = lastGetUrl()
+    expect(query.get('status')).toBe('pending')
+    expect(query.get('page')).toBe('2')
+    expect(query.get('per_page')).toBe('50')
+  })
+
+  it('POSTs the accept offer to the verb-on-application path (D2)', () => {
+    void campaignsApi.acceptApplication('agency-ulid', 'campaign-ulid', 'application-ulid', {
+      agreed_fee_minor_units: 500000,
+      agreed_fee_currency: 'EUR',
+      acknowledged: true,
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/applications/application-ulid/accept',
+      {
+        agreed_fee_minor_units: 500000,
+        agreed_fee_currency: 'EUR',
+        acknowledged: true,
+      },
+    )
+  })
+
+  it('POSTs an empty body to reject — no reason is sent or stored (D4)', () => {
+    void campaignsApi.rejectApplication('agency-ulid', 'campaign-ulid', 'application-ulid')
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/applications/application-ulid/reject',
+      {},
+    )
+  })
+})

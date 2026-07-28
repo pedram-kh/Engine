@@ -495,6 +495,7 @@
         "creators": "Creators",
         "board": "Board",
         "drafts": "Drafts",
+        "applications": "Applications",
         "payments": "Payments",
         "messages": "Messages",
         "settings": "Settings"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "We couldn't load drafts. Please try again.",
         "submittedAt": "Submitted {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "All applications"
+        },
+        "status": {
+          "pending": "Pending",
+          "accepted": "Accepted",
+          "rejected": "Not selected"
+        },
+        "empty": {
+          "heading": "No applications yet",
+          "body": "When creators apply to this job, they'll appear here."
+        },
+        "loadFailed": "We couldn't load applications. Please try again.",
+        "appliedAt": "Applied {date}",
+        "acceptedToast": "Offer sent to {name}.",
+        "rejectedToast": "{name}'s application was closed.",
+        "accept": {
+          "action": "Accept",
+          "title": "Accept {name}",
+          "body": "Accepting sends a standard invitation with your offer. The creator still accepts, declines or counters it.",
+          "submit": "Send offer",
+          "cancel": "Cancel",
+          "conflictBody": "{name} is unavailable during the campaign window. Send the offer anyway?"
+        },
+        "reject": {
+          "action": "Reject",
+          "title": "Reject this application?",
+          "body": "{name} will be told they weren't selected. This can't be undone, and they can't apply again.",
+          "confirm": "Reject application",
+          "cancel": "Cancel"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "This application has already been answered.",
+            "already_engaged": "This creator is already engaged on this campaign.",
+            "creator_not_approved": "This creator's account is no longer approved."
+          },
+          "assignment": {
+            "blacklisted": "This creator is blacklisted and can't be invited to this campaign."
+          },
+          "generic": "Something went wrong. Please try again."
+        }
       },
       "fees": {
         "offered": "Offered",

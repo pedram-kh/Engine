@@ -16,21 +16,23 @@
  * minor units; the currency is the campaign's, shown read-only). Per-creator
  * fee override is out of scope this chunk.
  *
- * Offer context (invite-offer-details batch): the free-text "Per" unit (half
- * width beside the fee), the offer description, and ONE optional attachment —
- * all batch-wide, mirroring the single fee. The file is uploaded ONCE via the
- * campaign-keyed presigned init/complete pair before the invite loop; every
+ * Offer context (invite-offer-details batch): the fee, the free-text "Per" unit,
+ * the offer description and ONE optional attachment are all batch-wide,
+ * mirroring the single fee — and all of them now live in the shared
+ * {@link OfferFieldsForm} child (AH-058, Q2), which this dialog drives through
+ * `buildOffer()`. The file is uploaded ONCE there before the invite loop; every
  * invite then carries the same attachment block.
  */
 
-import { ApiError, uploadToPresignedUrl } from '@catalyst/api-client'
-import type { InviteAssignmentPayload, RosterCreatorListItem } from '@catalyst/api-client'
+import { ApiError } from '@catalyst/api-client'
+import type { RosterCreatorListItem } from '@catalyst/api-client'
 import { BlacklistBadge } from '@catalyst/ui'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { rosterApi } from '@/modules/roster/api/roster.api'
 import { campaignsApi } from '../api/campaigns.api'
+import OfferFieldsForm from './OfferFieldsForm.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -55,17 +57,17 @@ const submitting = ref(false)
 const search = ref('')
 const selected = ref<Set<string>>(new Set())
 
-// Fee form — major units in the input, converted to minor on the wire.
-const feeAmount = ref<number | null>(null)
 const currency = computed(() => props.campaignCurrency ?? 'EUR')
 
-// Offer context (invite-offer-details batch) — batch-wide, like the fee.
-const feePer = ref('')
-const offerDescription = ref('')
-const attachmentFile = ref<File | null>(null)
-// The completed presigned upload, shared by every invite in the loop (and by
-// the TIER-2 acknowledge pass — uploaded exactly once per dialog submission).
-const uploadedAttachment = ref<InviteAssignmentPayload['attachment']>(null)
+// The shared offer form owns the fee, the "per" unit, the description and the
+// one attachment — including its single upload. This dialog only asks it for a
+// payload and for whether the fee is usable yet.
+const offerFields = ref<InstanceType<typeof OfferFieldsForm> | null>(null)
+const offerValid = ref(false)
+// The batch-wide offer, built once per submission and reused by the TIER-2
+// acknowledge pass so the attachment is never uploaded twice.
+type BuiltOffer = Awaited<ReturnType<InstanceType<typeof OfferFieldsForm>['buildOffer']>>
+const offer = ref<BuiltOffer>(null)
 
 // The availability-warning modal state (TIER 2).
 const conflictPrompt = ref(false)
@@ -86,19 +88,15 @@ function isHardBlacklisted(row: RosterCreatorListItem): boolean {
 }
 
 const rosterEmpty = computed(() => roster.value.length === 0)
-const feeValid = computed(() => feeAmount.value !== null && feeAmount.value > 0)
-const canInvite = computed(() => selected.value.size > 0 && feeValid.value && !submitting.value)
+const canInvite = computed(() => selected.value.size > 0 && offerValid.value && !submitting.value)
 
 async function load(): Promise<void> {
   loading.value = true
   error.value = null
   selected.value = new Set()
   search.value = ''
-  feeAmount.value = null
-  feePer.value = ''
-  offerDescription.value = ''
-  attachmentFile.value = null
-  uploadedAttachment.value = null
+  offerFields.value?.reset()
+  offer.value = null
   conflictedIds.value = []
   try {
     const res = await rosterApi.list(props.agencyId, { per_page: ROSTER_PER_PAGE })
@@ -130,45 +128,6 @@ function toggleSelect(creatorId: string, row: RosterCreatorListItem): void {
   selected.value = next
 }
 
-/** Minor units (D-8) from the major-unit input. */
-function feeMinorUnits(): number {
-  return Math.round((feeAmount.value ?? 0) * 100)
-}
-
-/**
- * Upload the selected file once via the campaign-keyed presigned pair
- * (init → PUT with the exact signed Content-Type → complete). Resolves false
- * on failure so the invite loop never starts with a broken attachment.
- */
-async function uploadAttachment(): Promise<boolean> {
-  const file = attachmentFile.value
-  if (file === null) {
-    uploadedAttachment.value = null
-    return true
-  }
-  if (uploadedAttachment.value !== null) return true
-  try {
-    const init = await campaignsApi.offerAttachmentInit(props.agencyId, props.campaignId, {
-      mime_type: file.type,
-      size_bytes: file.size,
-    })
-    await uploadToPresignedUrl(init.data.upload_url, file, { contentType: file.type })
-    const complete = await campaignsApi.offerAttachmentComplete(props.agencyId, props.campaignId, {
-      upload_id: init.data.upload_id,
-    })
-    uploadedAttachment.value = {
-      upload_id: complete.data.storage_path,
-      name: file.name,
-      mime_type: file.type,
-      size_bytes: file.size,
-    }
-    return true
-  } catch {
-    error.value = t('app.campaigns.invite.attachmentFailed')
-    return false
-  }
-}
-
 /**
  * Invite one creator. Resolves to a discriminated outcome the loop aggregates:
  *   - 'ok'         created / idempotent no-op
@@ -180,15 +139,13 @@ async function inviteOne(
   creatorId: string,
   acknowledged: boolean,
 ): Promise<'ok' | 'blacklist' | 'conflict' | 'error'> {
+  const built = offer.value
+  if (built === null) return 'error'
+
   try {
     await campaignsApi.invite(props.agencyId, props.campaignId, {
+      ...built,
       creator_id: creatorId,
-      agreed_fee_minor_units: feeMinorUnits(),
-      agreed_fee_currency: currency.value,
-      fee_per: feePer.value.trim() === '' ? null : feePer.value.trim(),
-      offer_description:
-        offerDescription.value.trim() === '' ? null : offerDescription.value.trim(),
-      attachment: uploadedAttachment.value,
       acknowledged,
     })
     return 'ok'
@@ -208,8 +165,10 @@ async function invite(): Promise<void> {
   error.value = null
 
   // The one attachment upload precedes the loop; a failed upload aborts the
-  // whole submission (never a half-attached batch).
-  if (!(await uploadAttachment())) {
+  // whole submission (never a half-attached batch). The built payload is then
+  // reused for every creator, and for the acknowledge pass.
+  offer.value = (await offerFields.value?.buildOffer()) ?? null
+  if (offer.value === null) {
     submitting.value = false
     return
   }
@@ -303,60 +262,16 @@ function finish(ok: number, blacklisted: number, skippedConflicts: number): void
           {{ error }}
         </v-alert>
 
-        <!-- The single agreed fee applied to every selected creator (D-8),
-             with the free-text "Per" unit beside it at half width. -->
-        <div class="d-flex ga-2 mb-3">
-          <v-text-field
-            v-model.number="feeAmount"
-            type="number"
-            min="0"
-            step="0.01"
-            density="compact"
-            variant="outlined"
-            hide-details
-            class="flex-1-1-0"
-            :label="t('app.campaigns.invite.feeLabel', { currency })"
-            :suffix="currency"
-            data-test="invite-creators-fee"
-          />
-          <v-text-field
-            v-model="feePer"
-            density="compact"
-            variant="outlined"
-            hide-details
-            class="flex-1-1-0"
-            :label="t('app.campaigns.invite.perLabel')"
-            :placeholder="t('app.campaigns.invite.perPlaceholder')"
-            maxlength="120"
-            data-test="invite-creators-fee-per"
-          />
-        </div>
-
-        <!-- Free-text expectations, shown to the creator with the invitation. -->
-        <v-textarea
-          v-model="offerDescription"
-          density="compact"
-          variant="outlined"
-          rows="2"
-          auto-grow
-          class="mb-3"
-          hide-details
-          :label="t('app.campaigns.invite.descriptionLabel')"
-          maxlength="2000"
-          data-test="invite-creators-description"
-        />
-
-        <!-- ONE optional offer attachment (brief / reference file). -->
-        <v-file-input
-          v-model="attachmentFile"
-          density="compact"
-          variant="outlined"
-          class="mb-3"
-          hide-details
-          prepend-icon=""
-          prepend-inner-icon="mdi-paperclip"
-          :label="t('app.campaigns.invite.attachmentLabel')"
-          data-test="invite-creators-attachment"
+        <!-- The shared offer form (Q2): fee + per + description + attachment,
+             batch-wide. The `invite-creators` prefix keeps this dialog's
+             existing selectors after the extraction. -->
+        <OfferFieldsForm
+          ref="offerFields"
+          :agency-id="agencyId"
+          :campaign-id="campaignId"
+          :currency="currency"
+          test-prefix="invite-creators"
+          @update:valid="(v) => (offerValid = v)"
         />
 
         <v-text-field

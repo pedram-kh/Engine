@@ -495,6 +495,7 @@
         "creators": "Alkotós",
         "board": "Board",
         "drafts": "Vázlats",
+        "applications": "Jelentkezések",
         "payments": "Fizetéss",
         "messages": "Üzenetek",
         "settings": "Beállítások"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "We couldn't load drafts. Please try again.",
         "submittedAt": "Küldésted {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Minden jelentkezés"
+        },
+        "status": {
+          "pending": "Válaszra vár",
+          "accepted": "Elfogadva",
+          "rejected": "Nem választottak ki"
+        },
+        "empty": {
+          "heading": "Még nincs jelentkezés",
+          "body": "Amikor alkotók jelentkeznek erre a munkára, itt fognak megjelenni."
+        },
+        "loadFailed": "Nem sikerült betölteni a jelentkezéseket. Próbáld újra.",
+        "appliedAt": "Jelentkezett: {date}",
+        "acceptedToast": "Ajánlat elküldve {name} részére.",
+        "rejectedToast": "{name} jelentkezését lezártuk.",
+        "accept": {
+          "action": "Elfogadás",
+          "title": "{name} elfogadása",
+          "body": "Az elfogadás egy szokásos meghívót küld az ajánlatoddal. Az alkotó továbbra is elfogadhatja, elutasíthatja vagy ellenajánlatot tehet.",
+          "submit": "Ajánlat küldése",
+          "cancel": "Mégse",
+          "conflictBody": "{name} nem elérhető a kampány időszakában. Elküldjük mégis az ajánlatot?"
+        },
+        "reject": {
+          "action": "Elutasítás",
+          "title": "Elutasítod ezt a jelentkezést?",
+          "body": "{name} értesítést kap arról, hogy nem választották ki. Ez nem vonható vissza, és nem jelentkezhet újra.",
+          "confirm": "Jelentkezés elutasítása",
+          "cancel": "Mégse"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Erre a jelentkezésre már válaszoltak.",
+            "already_engaged": "Ez az alkotó már részt vesz ebben a kampányban.",
+            "creator_not_approved": "Ennek az alkotónak a fiókja már nincs jóváhagyva."
+          },
+          "assignment": {
+            "blacklisted": "Ez az alkotó tiltólistán van, és nem hívható meg ebbe a kampányba."
+          },
+          "generic": "Valami hiba történt. Próbáld újra."
+        }
       },
       "fees": {
         "offered": "Offered",

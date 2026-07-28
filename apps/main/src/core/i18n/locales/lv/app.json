@@ -495,6 +495,7 @@
         "creators": "Radītājss",
         "board": "Board",
         "drafts": "Melnrakstss",
+        "applications": "Pieteikumi",
         "payments": "Maksājumss",
         "messages": "Ziņojumi",
         "settings": "Iestatījumi"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "We couldn't load drafts. Please try again.",
         "submittedAt": "Iesniegtted {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Visi pieteikumi"
+        },
+        "status": {
+          "pending": "Gaida atbildi",
+          "accepted": "Apstiprināts",
+          "rejected": "Nav izvēlēts"
+        },
+        "empty": {
+          "heading": "Pagaidām nav pieteikumu",
+          "body": "Kad autori pieteiksies šim darbam, tie parādīsies šeit."
+        },
+        "loadFailed": "Neizdevās ielādēt pieteikumus. Lūdzu, mēģini vēlreiz.",
+        "appliedAt": "Pieteicās {date}",
+        "acceptedToast": "Piedāvājums nosūtīts {name}.",
+        "rejectedToast": "{name} pieteikums ir slēgts.",
+        "accept": {
+          "action": "Apstiprināt",
+          "title": "Apstiprināt {name}",
+          "body": "Apstiprinot tiek nosūtīts parasts uzaicinājums ar tavu piedāvājumu. Autors to joprojām var pieņemt, atteikt vai piedāvāt savu cenu.",
+          "submit": "Nosūtīt piedāvājumu",
+          "cancel": "Atcelt",
+          "conflictBody": "{name} kampaņas laikā nav pieejams. Vai tomēr nosūtīt piedāvājumu?"
+        },
+        "reject": {
+          "action": "Atteikt",
+          "title": "Atteikt šo pieteikumu?",
+          "body": "{name} tiks informēts, ka nav izvēlēts. To nevar atsaukt, un atkārtoti pieteikties nebūs iespējams.",
+          "confirm": "Atteikt pieteikumu",
+          "cancel": "Atcelt"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Uz šo pieteikumu jau ir atbildēts.",
+            "already_engaged": "Šis autors jau ir iesaistīts šajā kampaņā.",
+            "creator_not_approved": "Šī autora konts vairs nav apstiprināts."
+          },
+          "assignment": {
+            "blacklisted": "Šis autors ir melnajā sarakstā, un viņu nevar uzaicināt uz šo kampaņu."
+          },
+          "generic": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz."
+        }
       },
       "fees": {
         "offered": "Offered",

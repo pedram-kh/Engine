@@ -495,6 +495,7 @@
         "creators": "Creator",
         "board": "Bacheca",
         "drafts": "Bozze",
+        "applications": "Candidature",
         "payments": "Pagamenti",
         "messages": "Messaggi",
         "settings": "Impostazioni"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "Impossibile caricare le bozze. Riprova.",
         "submittedAt": "Inviato il {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Tutte le candidature"
+        },
+        "status": {
+          "pending": "In attesa",
+          "accepted": "Accettata",
+          "rejected": "Non selezionato"
+        },
+        "empty": {
+          "heading": "Ancora nessuna candidatura",
+          "body": "Quando i creator si candideranno a questo lavoro, appariranno qui."
+        },
+        "loadFailed": "Impossibile caricare le candidature. Riprova.",
+        "appliedAt": "Candidatura del {date}",
+        "acceptedToast": "Offerta inviata a {name}.",
+        "rejectedToast": "La candidatura di {name} è stata chiusa.",
+        "accept": {
+          "action": "Accetta",
+          "title": "Accetta {name}",
+          "body": "Accettando invii un invito standard con la tua offerta. Il creator può ancora accettarla, rifiutarla o fare una controproposta.",
+          "submit": "Invia offerta",
+          "cancel": "Annulla",
+          "conflictBody": "{name} non è disponibile durante il periodo della campagna. Inviare l'offerta comunque?"
+        },
+        "reject": {
+          "action": "Rifiuta",
+          "title": "Rifiutare questa candidatura?",
+          "body": "{name} saprà di non essere stato selezionato. L'azione non è reversibile e non potrà candidarsi di nuovo.",
+          "confirm": "Rifiuta candidatura",
+          "cancel": "Annulla"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "A questa candidatura è già stata data una risposta.",
+            "already_engaged": "Questo creator è già impegnato in questa campagna.",
+            "creator_not_approved": "L'account di questo creator non è più approvato."
+          },
+          "assignment": {
+            "blacklisted": "Questo creator è in blacklist e non può essere invitato a questa campagna."
+          },
+          "generic": "Qualcosa è andato storto. Riprova."
+        }
       },
       "fees": {
         "offered": "Offerto",

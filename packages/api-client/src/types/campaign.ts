@@ -909,3 +909,108 @@ export interface CreatorJobApplyResponse {
  * rejection — Apply never re-opens).
  */
 export type JobApplyBlockCode = 'job.already_applied' | 'job.application_rejected'
+
+// ---------------------------------------------------------------------------
+// Agency applications (Jobs Board chunk 4, AH-058) — the campaign-detail
+// Applications TAB, and the two answers an agency can give.
+// ---------------------------------------------------------------------------
+
+/**
+ * One row in the Applications tab.
+ *
+ * The creator block is ROSTER-LEVEL identity and nothing more — an applicant is
+ * rostered by definition (applying requires the relation), so this exposes no
+ * contact detail the agency could not already see on the roster, and adding a
+ * field here is a decision rather than a patch.
+ */
+export interface CampaignApplicationListItemResource {
+  id: string
+  type: 'campaign_application_list_item'
+  attributes: {
+    status: CampaignApplicationStatus
+    /** The creator's own note, max 1000 chars. Null when they applied silently. */
+    note: string | null
+    applied_at: string
+    /** Null while pending; stamped when the application was answered. */
+    responded_at: string | null
+    creator: {
+      id: string
+      display_name: string | null
+      /** Short-lived signed GET, minted per-emission. */
+      avatar_url: string | null
+    } | null
+  }
+}
+
+export interface CampaignApplicationListParams {
+  status?: CampaignApplicationStatus
+  page?: number
+  per_page?: number
+}
+
+export interface CampaignApplicationListResponse {
+  data: CampaignApplicationListItemResource[]
+  meta: {
+    total: number
+    page: number
+    per_page: number
+    last_page: number
+    /**
+     * The TAB BADGE's number: PENDING only, campaign-wide, and unaffected by the
+     * `status` filter. Deliberately NOT `applicant_count` (the creator-facing
+     * interest metric) — a badge asking the agency to act must count only rows
+     * that can be acted on.
+     */
+    pending_total: number
+  }
+}
+
+/**
+ * POST `…/applications/{application}/accept` — the offer that turns an
+ * application into a standard invitation (D2).
+ *
+ * Structurally the invite payload MINUS `creator_id`: the applicant is the
+ * application's own creator, so a body creator_id is ignored server-side. Typed
+ * off `InviteAssignmentPayload` so the two cannot drift — the same fee, currency
+ * and attachment rules are validated by one shared server-side rule set.
+ */
+export type AcceptApplicationPayload = Omit<InviteAssignmentPayload, 'creator_id'>
+
+/** POST `…/applications/{application}/reject` — no body, no reason (D4). */
+export type RejectApplicationPayload = Record<string, never>
+
+/**
+ * The accept response is the created (or re-offered) assignment itself — 201 for
+ * a fresh invitation, 200 when the AH-035 re-offer edge reused a declined row.
+ */
+export interface AcceptApplicationResponse {
+  data: CampaignAssignmentResource
+}
+
+export interface RejectApplicationResponse {
+  data: {
+    id: string
+    type: 'campaign_application'
+    attributes: {
+      status: CampaignApplicationStatus
+      responded_at: string | null
+    }
+  }
+  meta: { code: 'application.rejected' }
+}
+
+/**
+ * The refusals the tab must surface as messages rather than swallow.
+ *
+ * `application.not_pending` — someone else already answered it (§5.6).
+ * `application.already_engaged` — the creator holds a live assignment on this
+ *   campaign; `meta.assignment_status` names it.
+ * `application.creator_not_approved` — the applicant's account is no longer
+ *   approved.
+ * `assignment.blacklisted` — a hard blacklist added AFTER the application.
+ */
+export type ApplicationActionBlockCode =
+  | 'application.not_pending'
+  | 'application.already_engaged'
+  | 'application.creator_not_approved'
+  | 'assignment.blacklisted'

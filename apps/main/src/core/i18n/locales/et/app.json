@@ -495,6 +495,7 @@
         "creators": "Loojas",
         "board": "Board",
         "drafts": "Mustands",
+        "applications": "Kandideerimised",
         "payments": "Makses",
         "messages": "Sõnumid",
         "settings": "Seaded"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "We couldn't load drafts. Please try again.",
         "submittedAt": "Esitated {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Kõik kandideerimised"
+        },
+        "status": {
+          "pending": "Ootel",
+          "accepted": "Vastu võetud",
+          "rejected": "Ei osutunud valituks"
+        },
+        "empty": {
+          "heading": "Kandideerimisi veel ei ole",
+          "body": "Kui loojad sellele tööle kandideerivad, ilmuvad nad siia."
+        },
+        "loadFailed": "Kandideerimisi ei õnnestunud laadida. Palun proovi uuesti.",
+        "appliedAt": "Kandideeris {date}",
+        "acceptedToast": "Pakkumine saadeti loojale {name}.",
+        "rejectedToast": "{name} kandideerimine on suletud.",
+        "accept": {
+          "action": "Võta vastu",
+          "title": "Võta {name} vastu",
+          "body": "Vastuvõtmine saadab tavapärase kutse koos sinu pakkumisega. Looja saab selle ikka vastu võtta, tagasi lükata või teha vastupakkumise.",
+          "submit": "Saada pakkumine",
+          "cancel": "Tühista",
+          "conflictBody": "{name} ei ole kampaania perioodil saadaval. Kas saadame pakkumise siiski?"
+        },
+        "reject": {
+          "action": "Lükka tagasi",
+          "title": "Kas lükkame selle kandideerimise tagasi?",
+          "body": "{name} saab teada, et teda ei valitud. Seda ei saa tagasi võtta ja uuesti kandideerida ta ei saa.",
+          "confirm": "Lükka kandideerimine tagasi",
+          "cancel": "Tühista"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Sellele kandideerimisele on juba vastatud.",
+            "already_engaged": "See looja osaleb selles kampaanias juba.",
+            "creator_not_approved": "Selle looja konto ei ole enam kinnitatud."
+          },
+          "assignment": {
+            "blacklisted": "See looja on mustas nimekirjas ja teda ei saa sellesse kampaaniasse kutsuda."
+          },
+          "generic": "Midagi läks valesti. Palun proovi uuesti."
+        }
       },
       "fees": {
         "offered": "Offered",

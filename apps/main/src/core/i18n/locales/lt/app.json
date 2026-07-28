@@ -495,6 +495,7 @@
         "creators": "Kūrėjass",
         "board": "Board",
         "drafts": "Juodraštiss",
+        "applications": "Paraiškos",
         "payments": "Mokėjimass",
         "messages": "Žinutės",
         "settings": "Nustatymai"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "We couldn't load drafts. Please try again.",
         "submittedAt": "Pateiktited {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Visos paraiškos"
+        },
+        "status": {
+          "pending": "Laukia",
+          "accepted": "Priimta",
+          "rejected": "Nepasirinkta"
+        },
+        "empty": {
+          "heading": "Kol kas paraiškų nėra",
+          "body": "Kai kūrėjai pateiks paraiškas šiam darbui, jie atsiras čia."
+        },
+        "loadFailed": "Nepavyko įkelti paraiškų. Bandyk dar kartą.",
+        "appliedAt": "Pateikta {date}",
+        "acceptedToast": "Pasiūlymas išsiųstas {name}.",
+        "rejectedToast": "{name} paraiška uždaryta.",
+        "accept": {
+          "action": "Priimti",
+          "title": "Priimti {name}",
+          "body": "Priėmus išsiunčiamas standartinis pakvietimas su tavo pasiūlymu. Kūrėjas vis dar gali jį priimti, atmesti arba pateikti kitą pasiūlymą.",
+          "submit": "Siųsti pasiūlymą",
+          "cancel": "Atšaukti",
+          "conflictBody": "{name} kampanijos laikotarpiu nepasiekiamas. Vis tiek siųsti pasiūlymą?"
+        },
+        "reject": {
+          "action": "Atmesti",
+          "title": "Atmesti šią paraišką?",
+          "body": "{name} bus informuotas, kad nebuvo pasirinktas. Šio veiksmo negalima atšaukti, o pateikti paraišką iš naujo nebus galima.",
+          "confirm": "Atmesti paraišką",
+          "cancel": "Atšaukti"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Į šią paraišką jau atsakyta.",
+            "already_engaged": "Šis kūrėjas jau dalyvauja šioje kampanijoje.",
+            "creator_not_approved": "Šio kūrėjo paskyra nebėra patvirtinta."
+          },
+          "assignment": {
+            "blacklisted": "Šis kūrėjas yra juodajame sąraše ir negali būti pakviestas į šią kampaniją."
+          },
+          "generic": "Kažkas nepavyko. Bandyk dar kartą."
+        }
       },
       "fees": {
         "offered": "Offered",

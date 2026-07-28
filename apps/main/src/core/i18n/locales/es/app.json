@@ -495,6 +495,7 @@
         "creators": "Creadores",
         "board": "Tablero",
         "drafts": "Borradores",
+        "applications": "Candidaturas",
         "payments": "Pagos",
         "messages": "Mensajes",
         "settings": "Configuración"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "No hemos podido cargar los borradores. Inténtalo de nuevo.",
         "submittedAt": "Enviado el {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Todas las candidaturas"
+        },
+        "status": {
+          "pending": "Pendiente",
+          "accepted": "Aceptada",
+          "rejected": "No seleccionado"
+        },
+        "empty": {
+          "heading": "Todavía no hay candidaturas",
+          "body": "Cuando los creadores se postulen a este trabajo, aparecerán aquí."
+        },
+        "loadFailed": "No hemos podido cargar las candidaturas. Inténtalo de nuevo.",
+        "appliedAt": "Se postuló el {date}",
+        "acceptedToast": "Oferta enviada a {name}.",
+        "rejectedToast": "La candidatura de {name} se ha cerrado.",
+        "accept": {
+          "action": "Aceptar",
+          "title": "Aceptar a {name}",
+          "body": "Al aceptar se envía una invitación estándar con tu oferta. El creador todavía puede aceptarla, rechazarla o contraofertar.",
+          "submit": "Enviar oferta",
+          "cancel": "Cancelar",
+          "conflictBody": "{name} no está disponible durante la ventana de la campaña. ¿Enviar la oferta de todos modos?"
+        },
+        "reject": {
+          "action": "Rechazar",
+          "title": "¿Rechazar esta candidatura?",
+          "body": "Se informará a {name} de que no ha sido seleccionado. No se puede deshacer y no podrá volver a postularse.",
+          "confirm": "Rechazar candidatura",
+          "cancel": "Cancelar"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Esta candidatura ya ha sido respondida.",
+            "already_engaged": "Este creador ya participa en esta campaña.",
+            "creator_not_approved": "La cuenta de este creador ya no está aprobada."
+          },
+          "assignment": {
+            "blacklisted": "Este creador está en la lista negra y no se le puede invitar a esta campaña."
+          },
+          "generic": "Algo ha salido mal. Inténtalo de nuevo."
+        }
       },
       "fees": {
         "offered": "Ofrecida",

@@ -495,6 +495,7 @@
         "creators": "Creator",
         "board": "Board",
         "drafts": "Entwürfe",
+        "applications": "Bewerbungen",
         "payments": "Zahlungen",
         "messages": "Nachrichten",
         "settings": "Einstellungen"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "Entwürfe konnten nicht geladen werden. Bitte versuche es erneut.",
         "submittedAt": "Eingereicht {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Alle Bewerbungen"
+        },
+        "status": {
+          "pending": "Offen",
+          "accepted": "Angenommen",
+          "rejected": "Nicht ausgewählt"
+        },
+        "empty": {
+          "heading": "Noch keine Bewerbungen",
+          "body": "Sobald sich Creator auf diesen Job bewerben, erscheinen sie hier."
+        },
+        "loadFailed": "Bewerbungen konnten nicht geladen werden. Bitte versuche es erneut.",
+        "appliedAt": "Beworben am {date}",
+        "acceptedToast": "Angebot an {name} gesendet.",
+        "rejectedToast": "Die Bewerbung von {name} wurde geschlossen.",
+        "accept": {
+          "action": "Annehmen",
+          "title": "{name} annehmen",
+          "body": "Beim Annehmen wird eine normale Einladung mit deinem Angebot gesendet. Der Creator kann sie weiterhin annehmen, ablehnen oder ein Gegenangebot machen.",
+          "submit": "Angebot senden",
+          "cancel": "Abbrechen",
+          "conflictBody": "{name} ist während des Kampagnenzeitraums nicht verfügbar. Angebot trotzdem senden?"
+        },
+        "reject": {
+          "action": "Ablehnen",
+          "title": "Diese Bewerbung ablehnen?",
+          "body": "{name} wird erfahren, nicht ausgewählt worden zu sein. Das lässt sich nicht rückgängig machen, und eine erneute Bewerbung ist nicht möglich.",
+          "confirm": "Bewerbung ablehnen",
+          "cancel": "Abbrechen"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Diese Bewerbung wurde bereits beantwortet.",
+            "already_engaged": "Dieser Creator ist in dieser Kampagne bereits engagiert.",
+            "creator_not_approved": "Das Konto dieses Creators ist nicht mehr freigegeben."
+          },
+          "assignment": {
+            "blacklisted": "Dieser Creator ist gesperrt und kann nicht zu dieser Kampagne eingeladen werden."
+          },
+          "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+        }
       },
       "fees": {
         "offered": "Angeboten",

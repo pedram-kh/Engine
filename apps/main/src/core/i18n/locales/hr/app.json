@@ -495,6 +495,7 @@
         "creators": "Kreatori",
         "board": "Plošča",
         "drafts": "Nacrti",
+        "applications": "Prijave",
         "payments": "Plaćanja",
         "messages": "Poruke",
         "settings": "Nastanjeitve"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "Ni nam uspelo načíst nacrty. Zkuste to znova.",
         "submittedAt": "Poslano {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Sve prijave"
+        },
+        "status": {
+          "pending": "U obradi",
+          "accepted": "Prihvaćeno",
+          "rejected": "Nisi odabran"
+        },
+        "empty": {
+          "heading": "Još nema prijava",
+          "body": "Kada se kreatori prijave na ovaj posao, pojavit će se ovdje."
+        },
+        "loadFailed": "Nismo mogli učitati prijave. Pokušaj ponovno.",
+        "appliedAt": "Prijavljeno {date}",
+        "acceptedToast": "Ponuda poslana kreatoru {name}.",
+        "rejectedToast": "Prijava kreatora {name} je zatvorena.",
+        "accept": {
+          "action": "Prihvati",
+          "title": "Prihvati {name}",
+          "body": "Prihvaćanjem se šalje standardni poziv s tvojom ponudom. Kreator je još može prihvatiti, odbiti ili poslati protuponudu.",
+          "submit": "Pošalji ponudu",
+          "cancel": "Otkažite",
+          "conflictBody": "{name} nije dostupan tijekom trajanja kampanje. Želiš li ipak poslati ponudu?"
+        },
+        "reject": {
+          "action": "Odbij",
+          "title": "Odbiti ovu prijavu?",
+          "body": "{name} će biti obaviješten da nije odabran. To se ne može poništiti i ne može se ponovno prijaviti.",
+          "confirm": "Odbij prijavu",
+          "cancel": "Otkažite"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Na ovu prijavu već je odgovoreno.",
+            "already_engaged": "Ovaj kreator već sudjeluje u ovoj kampanji.",
+            "creator_not_approved": "Račun ovog kreatora više nije odobren."
+          },
+          "assignment": {
+            "blacklisted": "Ovaj kreator je na crnoj listi i ne može se pozvati u ovu kampanju."
+          },
+          "generic": "Nešto je pošlo po zlu. Pokušaj ponovno."
+        }
       },
       "fees": {
         "offered": "Nabídnuto",

@@ -495,6 +495,7 @@
         "creators": "Créateurs",
         "board": "Tableau",
         "drafts": "Brouillons",
+        "applications": "Candidatures",
         "payments": "Paiements",
         "messages": "Messages",
         "settings": "Paramètres"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "Nous n'avons pas pu charger les brouillons. Veuillez réessayer.",
         "submittedAt": "Soumis le {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Toutes les candidatures"
+        },
+        "status": {
+          "pending": "En attente",
+          "accepted": "Acceptée",
+          "rejected": "Non retenue"
+        },
+        "empty": {
+          "heading": "Aucune candidature pour le moment",
+          "body": "Lorsque des créateurs postuleront à cette offre, ils apparaîtront ici."
+        },
+        "loadFailed": "Nous n'avons pas pu charger les candidatures. Veuillez réessayer.",
+        "appliedAt": "Candidature envoyée le {date}",
+        "acceptedToast": "Offre envoyée à {name}.",
+        "rejectedToast": "La candidature de {name} a été clôturée.",
+        "accept": {
+          "action": "Accepter",
+          "title": "Accepter {name}",
+          "body": "L'acceptation envoie une invitation standard avec votre offre. Le créateur peut toujours l'accepter, la refuser ou faire une contre-proposition.",
+          "submit": "Envoyer l'offre",
+          "cancel": "Annuler",
+          "conflictBody": "{name} n'est pas disponible pendant la période de la campagne. Envoyer l'offre quand même ?"
+        },
+        "reject": {
+          "action": "Refuser",
+          "title": "Refuser cette candidature ?",
+          "body": "{name} sera informé qu'il n'a pas été retenu. C'est irréversible et il ne pourra pas postuler à nouveau.",
+          "confirm": "Refuser la candidature",
+          "cancel": "Annuler"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Cette candidature a déjà reçu une réponse.",
+            "already_engaged": "Ce créateur participe déjà à cette campagne.",
+            "creator_not_approved": "Le compte de ce créateur n'est plus approuvé."
+          },
+          "assignment": {
+            "blacklisted": "Ce créateur est sur liste noire et ne peut pas être invité à cette campagne."
+          },
+          "generic": "Une erreur s'est produite. Veuillez réessayer."
+        }
       },
       "fees": {
         "offered": "Proposés",

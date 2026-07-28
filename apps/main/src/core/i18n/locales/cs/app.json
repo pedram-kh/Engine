@@ -495,6 +495,7 @@
         "creators": "Tvůrci",
         "board": "Nástěnka",
         "drafts": "Návrhy",
+        "applications": "Přihlášky",
         "payments": "Platby",
         "messages": "Zprávy",
         "settings": "Nastavení"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "Nepodařilo se nám načíst návrhy. Zkuste to znovu.",
         "submittedAt": "Odesláno {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Všechny přihlášky"
+        },
+        "status": {
+          "pending": "Čeká na odpověď",
+          "accepted": "Přijato",
+          "rejected": "Nevybráno"
+        },
+        "empty": {
+          "heading": "Zatím žádné přihlášky",
+          "body": "Až se na tuto nabídku přihlásí tvůrci, objeví se tady."
+        },
+        "loadFailed": "Nepodařilo se nám načíst přihlášky. Zkuste to znovu.",
+        "appliedAt": "Přihlášeno {date}",
+        "acceptedToast": "Nabídka byla odeslána tvůrci {name}.",
+        "rejectedToast": "Přihláška od {name} byla uzavřena.",
+        "accept": {
+          "action": "Přijmout",
+          "title": "Přijmout {name}",
+          "body": "Přijetím odešleš standardní pozvánku se svou nabídkou. Tvůrce ji stále může přijmout, odmítnout nebo poslat protinávrh.",
+          "submit": "Odeslat nabídku",
+          "cancel": "Zrušit",
+          "conflictBody": "{name} není v období kampaně dostupný. Odeslat nabídku i tak?"
+        },
+        "reject": {
+          "action": "Odmítnout",
+          "title": "Odmítnout tuto přihlášku?",
+          "body": "{name} se dozví, že nebyl vybrán. Tuto akci nelze vzít zpět a znovu se přihlásit už nemůže.",
+          "confirm": "Odmítnout přihlášku",
+          "cancel": "Zrušit"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Na tuto přihlášku už bylo odpovězeno.",
+            "already_engaged": "Tento tvůrce už na této kampani spolupracuje.",
+            "creator_not_approved": "Účet tohoto tvůrce už není schválený."
+          },
+          "assignment": {
+            "blacklisted": "Tento tvůrce je na černé listině a nelze ho do této kampaně pozvat."
+          },
+          "generic": "Něco se pokazilo. Zkuste to prosím znovu."
+        }
       },
       "fees": {
         "offered": "Nabídnuto",

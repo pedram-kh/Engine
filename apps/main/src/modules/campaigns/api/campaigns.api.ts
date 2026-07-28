@@ -9,9 +9,13 @@
  */
 
 import type {
+  AcceptApplicationPayload,
+  AcceptApplicationResponse,
   AgencyAssignmentDetailResponse,
   AttachContractPayload,
   AttachContractResponse,
+  CampaignApplicationListParams,
+  CampaignApplicationListResponse,
   CampaignAssignmentListResponse,
   CampaignAssignmentResource,
   CampaignDraftListParams,
@@ -33,6 +37,7 @@ import type {
   ProceedWithoutContractResponse,
   RejectDraftPayload,
   ReinviteAssignmentPayload,
+  RejectApplicationResponse,
   RequestResubmitFreshPayload,
   RequestResubmitInPlacePayload,
   RequestRevisionPayload,
@@ -101,6 +106,59 @@ export const campaignsApi = {
     const qs = query.toString()
     return http.get<CampaignDraftListResponse>(
       `${campaignsBase(agencyId)}/${campaignId}/drafts${qs === '' ? '' : `?${qs}`}`,
+    )
+  },
+
+  /**
+   * The campaign-detail Applications tab list (Jobs Board chunk 4, D1).
+   * `view`-gated — any member reads. Pending rows sort first, and
+   * `meta.pending_total` is the tab badge's number.
+   */
+  listApplications(
+    agencyId: string,
+    campaignId: string,
+    params: CampaignApplicationListParams = {},
+  ): Promise<CampaignApplicationListResponse> {
+    const query = new URLSearchParams()
+    if (params.status !== undefined) query.set('status', params.status)
+    if (params.page !== undefined) query.set('page', String(params.page))
+    if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
+    const qs = query.toString()
+    return http.get<CampaignApplicationListResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/applications${qs === '' ? '' : `?${qs}`}`,
+    )
+  },
+
+  /**
+   * Accept an application with a real offer (D2) — creates a STANDARD
+   * invitation, so the applicant can still decline the terms. Same execute
+   * ability as `invite`, and the same two gate tiers throw the same way: a 422
+   * `assignment.blacklisted` (hard block, possibly added after the application)
+   * or a 409 `assignment.availability_conflict` (soft warn — re-call with
+   * `acknowledged: true`). A 422 `application.already_engaged` means the pair
+   * already holds a live assignment.
+   */
+  acceptApplication(
+    agencyId: string,
+    campaignId: string,
+    applicationId: string,
+    payload: AcceptApplicationPayload,
+  ): Promise<AcceptApplicationResponse> {
+    return http.post<AcceptApplicationResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/applications/${applicationId}/accept`,
+      payload,
+    )
+  },
+
+  /** Reject an application (D4) — no body, no reason, and no re-apply after. */
+  rejectApplication(
+    agencyId: string,
+    campaignId: string,
+    applicationId: string,
+  ): Promise<RejectApplicationResponse> {
+    return http.post<RejectApplicationResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/applications/${applicationId}/reject`,
+      {},
     )
   },
 

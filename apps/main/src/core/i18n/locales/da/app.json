@@ -495,6 +495,7 @@
         "creators": "Creatorer",
         "board": "Board",
         "drafts": "Udkast",
+        "applications": "Ansøgninger",
         "payments": "Betalinger",
         "messages": "Beskeder",
         "settings": "Indstillinger"
@@ -524,6 +525,50 @@
         },
         "loadFailed": "Udkast kunne ikke indlæses. Prøv igen.",
         "submittedAt": "Indsendt {date}"
+      },
+      "applications": {
+        "filters": {
+          "all": "Alle ansøgninger"
+        },
+        "status": {
+          "pending": "Afventer",
+          "accepted": "Accepteret",
+          "rejected": "Ikke valgt"
+        },
+        "empty": {
+          "heading": "Ingen ansøgninger endnu",
+          "body": "Når creators søger dette job, vises de her."
+        },
+        "loadFailed": "Ansøgningerne kunne ikke indlæses. Prøv igen.",
+        "appliedAt": "Ansøgt {date}",
+        "acceptedToast": "Tilbud sendt til {name}.",
+        "rejectedToast": "Ansøgningen fra {name} er lukket.",
+        "accept": {
+          "action": "Accepter",
+          "title": "Accepter {name}",
+          "body": "Når du accepterer, sendes en almindelig invitation med dit tilbud. Creatoren kan stadig acceptere, afvise eller give et modbud.",
+          "submit": "Send tilbud",
+          "cancel": "Annuller",
+          "conflictBody": "{name} er ikke tilgængelig i kampagneperioden. Send tilbuddet alligevel?"
+        },
+        "reject": {
+          "action": "Afvis",
+          "title": "Afvis denne ansøgning?",
+          "body": "{name} får at vide, at de ikke blev valgt. Det kan ikke fortrydes, og de kan ikke søge igen.",
+          "confirm": "Afvis ansøgning",
+          "cancel": "Annuller"
+        },
+        "refusal": {
+          "application": {
+            "not_pending": "Denne ansøgning er allerede besvaret.",
+            "already_engaged": "Denne creator er allerede engageret på denne kampagne.",
+            "creator_not_approved": "Denne creators konto er ikke længere godkendt."
+          },
+          "assignment": {
+            "blacklisted": "Denne creator er sortlistet og kan ikke inviteres til denne kampagne."
+          },
+          "generic": "Noget gik galt. Prøv igen."
+        }
       },
       "fees": {
         "offered": "Tilbudt",
