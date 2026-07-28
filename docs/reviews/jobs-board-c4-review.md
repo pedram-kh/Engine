@@ -1,11 +1,26 @@
 # Jobs Board arc, chunk 4 — agency applications: the Applications tab, accept, reject, terminal auto-reject (AH-058)
 
-- **Status:** Complete — pending independent review. Nine commits carrying code: `0abba72`,
-  `78c2dd8`, `86a44a4`, `5f6486c`, `af0f343`, `d33df9e`, `ef195f8`, `8ff9985`, `a1c66ab`, plus this
-  docs commit. **Push held** — the two chunk-4 docs commits (`895f28a` inventory, `685991c` plan)
-  ride with it.
+- **Status:** **Closed — approved.** Nine commits carrying code: `0abba72`, `78c2dd8`, `86a44a4`,
+  `5f6486c`, `af0f343`, `d33df9e`, `ef195f8`, `8ff9985`, `a1c66ab`, plus `9a330d6` (this review and
+  the AH-058 log entry) and the close commit that flipped this line. Pushed 2026-07-28 with the two
+  held chunk-4 docs commits (`895f28a` inventory, `685991c` plan) riding along — thirteen in total.
+- **Verdict:** independent review complete: **D1–D8 and C1–C7 verified as built**; **all ten
+  mutations confirmed load-bearing**, including the **C1 ordering enforcement** (moving the accept
+  emission inside the transaction reds the rollback test's `Mail::assertNothingQueued()`, so the
+  after-commit ordering is enforced by a test rather than by a code-reading claim) and the **D3b
+  non-vacuity pair** (the hook dropped from each `store()` branch reds its own case, which is what
+  keeps the byte-identity pin from passing on a hook that does nothing); the **C5 reinterpretation
+  accepted as a correct improvement on the ruling** — a mail flag must not gate database truth, so
+  re-reading the flag at emission time inside the notifier rather than as an early return from
+  `handle()` is the right seam, and an early return would have left a campaign closed under a
+  flag-OFF window with its applications pending forever; the **§5.34 byte-identity pin**, the **D3
+  collision matrix** and the **no-exposure keysets** all green; **production posture MEDIUM
+  confirmed**, with the T+0-provably-zero population as its primary containment (no migration, no
+  listed campaign, no application to answer at deploy); full **Playwright 26/26** including the
+  agency-side leg.
 - **Date:** 2026-07-28
-- **Provenance:** built by Cursor against the ratified plan and its rulings.
+- **Provenance:** built by Cursor against the ratified plan and its rulings; reviewed and closed by
+  Claude.
 - **Ratified plan:** [`docs/reviews/jobs-board-c4-plan.md`](jobs-board-c4-plan.md).
   **Inventory:** [`docs/reviews/jobs-board-c4-inventory.md`](jobs-board-c4-inventory.md).
   **Binds to:** [`docs/reviews/jobs-board-c3-review.md`](jobs-board-c3-review.md) (the closed chunk-3

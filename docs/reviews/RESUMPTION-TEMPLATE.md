@@ -113,15 +113,19 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-28 · **Through:** AH-058 · **⚠ Push HELD.** `origin/main` is `d4b2de5`
-(the AH-057 docs commit); the local tip is **eleven commits ahead** and unpushed: the two held
-**chunk-4 docs** commits (`895f28a` inventory, `685991c` plan), the nine **AH-058** build commits
-(`0abba72`, `78c2dd8`, `86a44a4`, `5f6486c`, `af0f343`, `d33df9e`, `ef195f8`, `8ff9985`, `a1c66ab`),
-and the docs commit carrying this refresh plus
-[`jobs-board-c4-review.md`](jobs-board-c4-review.md) and the AH-058 log entry. `git rev-parse --short HEAD`
-and `git rev-parse --short origin/main` are the authority for those two numbers, not this sentence.
+**Last updated:** 2026-07-28 · **Through:** AH-058 · **Nothing is held.** The push on 2026-07-28
+moved `origin/main` from `d4b2de5` (the AH-057 docs commit) by **thirteen commits**: the two chunk-4
+**docs** commits held since plan-pause (`895f28a` inventory, `685991c` plan), the nine **AH-058**
+build commits (`0abba72`, `78c2dd8`, `86a44a4`, `5f6486c`, `af0f343`, `d33df9e`, `ef195f8`, `8ff9985`,
+`a1c66ab`), the S11 docs commit `9a330d6` carrying
+[`jobs-board-c4-review.md`](jobs-board-c4-review.md) and the AH-058 log entry, and the **close commit
+at the tip** flipping that review to **Closed — approved** and writing this refresh (a commit cannot
+record its own hash).
+**All of it is code, and undeployed** — see the deploy notes below.
+`git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for those two
+numbers, not this sentence; re-derive them rather than carrying this session's forward.
 
-**Baseline (the pushed tip):** the AH-057 docs commit. It sits atop the three AH-057 commits
+**Baseline (the previous pushed tip):** the AH-057 docs commit. It sits atop the three AH-057 commits
 (`fc88347`, `bbafc9c`, `d147baf`), which sit on the AH-056 close commit (`978bce5`), itself atop the
 six AH-056 commits (`81df0b5`, `928ccce`, `0cf6275`, `4e527e7`, `d37d43c`, `ddf875c`) and the AH-055
 docs commit, all on `aa8d410` (the AH-053/AH-054 close-out). **Nothing is held — AH-055, AH-056 and
@@ -180,11 +184,13 @@ eyes-on fix** commits — `4af63b2` (admin dialog: 422 copy, picker name, `appro
 
 **Deployed through:** **`f5be920` (AH-052), deployed 2026-07-26.** Push and deploy were in sync as of
 that date; **they are no longer** — the AH-053/AH-054 push and the AH-055/AH-056 push, both on
-2026-07-27, are **code, and undeployed**. That is the first undeployed code since AH-052, and it is
-now the whole first three chunks of the Jobs Board arc plus one UI fix. Deploy state as last read
+2026-07-27, plus the **AH-058** push on 2026-07-28, are **code, and undeployed**. That is the first
+undeployed code since AH-052, and it is now the whole first **four** chunks of the Jobs Board arc plus
+one UI fix. Deploy state as last read
 from the server, not inferred: `php artisan migrate:status` reported **Ran through batch 5**, and the
 2026-07-26 deploy correctly reported `Nothing to migrate` (AH-051/052 add none). **AH-054 adds one
-migration and AH-056 adds three**, so the next deploy will not say that — see the deploy notes below.
+migration and AH-056 adds three** (**AH-058 adds none**), so the next deploy will not say that — see
+the deploy notes below.
 
 > **Tracking lesson (2026-07-26).** Deploy state must be **read from the server**
 > (`migrate:status`, and see the scheduler blocker below), never inferred from push history —
@@ -192,7 +198,7 @@ migration and AH-056 adds three**, so the next deploy will not say that — see 
 > (`content_companions`) turned out to be already live before today, while this file still listed
 > its migrations as pending. Verify at each session close; do not carry forward an assumption.
 
-**Deploy notes — AH-058 (built 2026-07-28, push HELD, NOT deployed).** Three obligations, and
+**Deploy notes — AH-058 (pushed 2026-07-28, NOT deployed).** Three obligations, and
 **no migration** — the arc's pending-migration count stays **four**.
 
 1. **🔴 `application_notifications_enabled` ships OFF, and the arc's first-enable ritual now arms
@@ -553,7 +559,8 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     break-reverts, all restored. Three additive migrations. `application_submitted` is deliberately
     **left to chunk 4**. Review: `docs/reviews/jobs-board-c3-review.md` (**Closed — approved**).
   - **AH-058** — Jobs Board chunk 4: the agency half of applications — the Applications tab, accept,
-    reject, and terminal auto-reject (nine commits, `0abba72`…`a1c66ab` — **local, push HELD**).
+    reject, and terminal auto-reject (nine commits, `0abba72`…`a1c66ab` — pushed 2026-07-28,
+    undeployed).
     Applications render as a **campaign-detail tab, not a board column** (recorded §5.32
     reinterpretation of the c3 migration docblock): `board_cards.assignment_id` is `NOT NULL` +
     `UNIQUE` + `CASCADE`, so a card **is** an assignment at three layers, and §4.4's
