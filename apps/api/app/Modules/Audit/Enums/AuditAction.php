@@ -311,6 +311,27 @@ enum AuditAction: string
     // The row records the FACT plus the campaign/creator ids.
     case CampaignApplicationSubmitted = 'campaign_application.submitted';
 
+    // AH-058 (Jobs Board chunk 4, D2/D4) — the agency's two answers to an
+    // application. Both are hand-written by their controller (the application
+    // status enum has no state machine — its docblock puts the source guard at
+    // the call site) and both are also NotificationTypes, so the creator hears
+    // the answer they were waiting for.
+    //
+    // `accepted` is the audit row for the APPLICATION's flip only. The
+    // assignment the accept also creates writes its OWN `assignment.invited`
+    // row through the shared invitation service, so the two facts stay
+    // separately auditable: one campaign_application row moved to accepted, and
+    // one campaign_assignment row was born.
+    //
+    // `rejected` covers BOTH causes — an agency rejecting a pending application
+    // and a campaign going terminal with pending applications on it (D5). The
+    // cause travels in the metadata (`cause`), not in a second verb: the fact
+    // recorded is identical and a `campaign_application.auto_rejected` sibling
+    // would double the vocabulary, both tripwires and 24 locales of copy to
+    // record who pressed the button — which the actor column already says.
+    case CampaignApplicationAccepted = 'campaign_application.accepted';
+    case CampaignApplicationRejected = 'campaign_application.rejected';
+
     // AH-056 (Jobs Board chunk 3, D6/D8) — a campaign was listed on the jobs
     // board and its rostered creators were told. Single-direction: it reaches
     // CREATORS only (the agency performed the action, so it is not news to

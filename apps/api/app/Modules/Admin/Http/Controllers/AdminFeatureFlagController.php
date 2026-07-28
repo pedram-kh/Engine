@@ -7,6 +7,7 @@ namespace App\Modules\Admin\Http\Controllers;
 use App\Modules\Admin\Http\Requests\ToggleFeatureFlagRequest;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
+use App\Modules\Creators\Features\ApplicationNotificationsEnabled;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
@@ -79,6 +80,10 @@ final class AdminFeatureFlagController
         JobPostedNotificationsEnabled::NAME => [
             'label' => 'Job-posted notifications',
             'description' => 'Tells an agency’s roster when a campaign is listed on the jobs board.',
+        ],
+        ApplicationNotificationsEnabled::NAME => [
+            'label' => 'Application notifications',
+            'description' => 'Emails the jobs-board application notices (applied, accepted, declined). In-app rows are unaffected.',
         ],
     ];
 

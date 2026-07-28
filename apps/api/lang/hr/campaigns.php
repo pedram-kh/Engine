@@ -83,4 +83,40 @@ return [
         'cta' => 'Pogledaj posao',
         'ignore' => 'Ovu poruku primate jer se nalazite na popisu kreatora agencije :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Nova prijava za :campaign',
+            'greeting' => 'Pozdrav, :name,',
+            'body' => ':creator se prijavio na „:campaign“. Otvorite kampanju kako biste pregledali prijavu i poslali ponudu.',
+            'cta' => 'Pregledaj prijavu',
+        ],
+        'accepted' => [
+            'subject' => 'Vaša prijava za :campaign je prihvaćena',
+            'greeting' => 'Pozdrav, :name,',
+            'body' => ':agency je prihvatila vašu prijavu za „:campaign“ i poslala vam ponudu. Otvorite zadatak, pregledajte uvjete te prihvatite ili odbijte ponudu.',
+            'cta' => 'Pregledaj ponudu',
+        ],
+        'rejected' => [
+            'subject' => 'Novosti o vašoj prijavi za :campaign',
+            'greeting' => 'Pozdrav, :name,',
+            'body_agency_rejected' => 'Hvala vam na prijavi za „:campaign“. Za ovaj posao niste odabrani. Novi poslovi redovno se objavljuju na vašoj ploči.',
+            'body_campaign_closed' => 'Hvala vam na prijavi za „:campaign“. Kampanja je zatvorena, pa vaša prijava neće ići dalje. Novi poslovi redovno se objavljuju na vašoj ploči.',
+            'cta' => 'Pregledaj ponude poslova',
+        ],
+    ],
 ];

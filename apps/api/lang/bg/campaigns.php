@@ -83,4 +83,40 @@ return [
         'cta' => 'Вижте обявата',
         'ignore' => 'Получавате това съобщение, защото сте в списъка с творци на :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Нова кандидатура за :campaign',
+            'greeting' => 'Здравейте, :name,',
+            'body' => ':creator кандидатства за „:campaign“. Отворете кампанията, за да прегледате кандидатурата и да изпратите оферта.',
+            'cta' => 'Преглед на кандидатурата',
+        ],
+        'accepted' => [
+            'subject' => 'Вашата кандидатура за :campaign беше приета',
+            'greeting' => 'Здравейте, :name,',
+            'body' => ':agency прие вашата кандидатура за „:campaign“ и ви изпрати оферта. Отворете задачата, за да прегледате условията и да приемете или откажете.',
+            'cta' => 'Преглед на офертата',
+        ],
+        'rejected' => [
+            'subject' => 'Новини за вашата кандидатура за :campaign',
+            'greeting' => 'Здравейте, :name,',
+            'body_agency_rejected' => 'Благодарим ви, че кандидатствахте за „:campaign“. Не бяхте избрани за тази работа. Нови обяви се публикуват редовно на вашия борд.',
+            'body_campaign_closed' => 'Благодарим ви, че кандидатствахте за „:campaign“. Кампанията беше затворена, така че вашата кандидатура няма да продължи напред. Нови обяви се публикуват редовно на вашия борд.',
+            'cta' => 'Към борда с обяви',
+        ],
+    ],
 ];

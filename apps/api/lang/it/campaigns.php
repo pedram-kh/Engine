@@ -83,4 +83,40 @@ return [
         'cta' => 'Vedi il lavoro',
         'ignore' => 'Ricevi questo messaggio perché fai parte dell’elenco di creator di :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Nuova candidatura per :campaign',
+            'greeting' => 'Ciao :name,',
+            'body' => ':creator si è candidato a «:campaign». Apri la campagna per esaminare la candidatura e inviare un\'offerta.',
+            'cta' => 'Esamina la candidatura',
+        ],
+        'accepted' => [
+            'subject' => 'La tua candidatura per :campaign è stata accettata',
+            'greeting' => 'Ciao :name,',
+            'body' => ':agency ha accettato la tua candidatura per «:campaign» e ti ha inviato un\'offerta. Apri l\'incarico per leggere le condizioni e accettarla o rifiutarla.',
+            'cta' => 'Vedi l\'offerta',
+        ],
+        'rejected' => [
+            'subject' => 'Aggiornamento sulla tua candidatura per :campaign',
+            'greeting' => 'Ciao :name,',
+            'body_agency_rejected' => 'Grazie per aver inviato la tua candidatura per «:campaign». Non sei stato selezionato per questo lavoro. Nuovi lavori vengono pubblicati regolarmente sulla tua bacheca.',
+            'body_campaign_closed' => 'Grazie per aver inviato la tua candidatura per «:campaign». La campagna è stata chiusa, quindi la tua candidatura non proseguirà. Nuovi lavori vengono pubblicati regolarmente sulla tua bacheca.',
+            'cta' => 'Vedi la bacheca lavori',
+        ],
+    ],
 ];

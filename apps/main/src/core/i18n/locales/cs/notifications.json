@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Administrátor Catalyst vás propojil s {agency_name}.",
       "agency_creator_relation_disconnected": "Vaše spojení s {counterparty_name} skončilo.",
       "campaign_job_posted": "{agency_name} zveřejnila novou nabídku: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} se přihlásil na {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} přijala vaši přihlášku na {campaign_name}.",
+      "campaign_application_rejected": "Vaše přihláška na {campaign_name} nebyla úspěšná.",
       "fallback": "Máte nové oznámení."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Nepodařilo se uložit nastavení oznámení. Zkuste to znovu.",
       "groups": {
         "assignment": "Úkoly",
+        "jobs_board": "Nabídky práce",
         "creator": "Účet tvůrce",
         "messaging": "Zprávy"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "Nová zpráva od tvůrce",
         "message_relationship_received_by_creator": "Nová přímá zpráva od agentury",
         "message_relationship_received_by_agency": "Nová přímá zpráva od tvůrce",
-        "campaign_job_posted": "Je zveřejněna nová nabídka"
+        "campaign_job_posted": "Je zveřejněna nová nabídka",
+        "campaign_application_submitted": "Tvůrce se přihlásí na kampaň",
+        "campaign_application_accepted": "Přihláška je přijata",
+        "campaign_application_rejected": "Přihláška je odmítnuta"
       }
     }
   }

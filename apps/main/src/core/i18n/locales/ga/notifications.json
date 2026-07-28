@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Cheangail riarthóir Catalyst thú le {agency_name}.",
       "agency_creator_relation_disconnected": "Tá deireadh tagtha le do nasc le {counterparty_name}.",
       "campaign_job_posted": "D'fhoilsigh {agency_name} post nua: {campaign_name}.",
+      "campaign_application_submitted": "Chuir {creator_name} iarratas isteach ar {campaign_name}.",
+      "campaign_application_accepted": "Ghlac {agency_name} le d'iarratas ar {campaign_name}.",
+      "campaign_application_rejected": "Níor éirigh le d'iarratas ar {campaign_name}.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Couldn't save your notification settings. Please try again.",
       "groups": {
         "assignment": "Cúrams",
+        "jobs_board": "Clár post",
         "creator": "Cruthaitheoir account",
         "messaging": "Teachtaireachtaí"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Teachtaireacht dhíreach nua ón ngníomhaireacht",
         "message_relationship_received_by_agency": "Teachtaireacht dhíreach nua ón gcruthaitheoir",
-        "campaign_job_posted": "Foilsítear post nua"
+        "campaign_job_posted": "Foilsítear post nua",
+        "campaign_application_submitted": "Cuireann cruthaitheoir iarratas isteach ar fheachtas",
+        "campaign_application_accepted": "Glacadh le hiarratas",
+        "campaign_application_rejected": "Diúltaítear iarratas"
       }
     }
   }

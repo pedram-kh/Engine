@@ -83,4 +83,40 @@ return [
         'cta' => 'Ver el trabajo',
         'ignore' => 'Recibes este mensaje porque formas parte de la lista de creadores de :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Nueva solicitud para :campaign',
+            'greeting' => 'Hola :name,',
+            'body' => ':creator se ha postulado a «:campaign». Abre la campaña para revisar la solicitud y enviar una oferta.',
+            'cta' => 'Revisar la solicitud',
+        ],
+        'accepted' => [
+            'subject' => 'Tu solicitud para :campaign ha sido aceptada',
+            'greeting' => 'Hola :name,',
+            'body' => ':agency ha aceptado tu solicitud para «:campaign» y te ha enviado una oferta. Abre la asignación para revisar las condiciones y aceptarla o rechazarla.',
+            'cta' => 'Ver la oferta',
+        ],
+        'rejected' => [
+            'subject' => 'Novedades sobre tu solicitud para :campaign',
+            'greeting' => 'Hola :name,',
+            'body_agency_rejected' => 'Gracias por postularte a «:campaign». No has sido seleccionado para este trabajo. En tu tablón se publican nuevos trabajos con regularidad.',
+            'body_campaign_closed' => 'Gracias por postularte a «:campaign». La campaña se ha cerrado, por lo que tu solicitud no seguirá adelante. En tu tablón se publican nuevos trabajos con regularidad.',
+            'cta' => 'Ver el tablón de trabajos',
+        ],
+    ],
 ];

@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "En Catalyst-administrator har forbundet dig med {agency_name}.",
       "agency_creator_relation_disconnected": "Din forbindelse med {counterparty_name} er ophørt.",
       "campaign_job_posted": "{agency_name} har slået et nyt job op: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} har søgt {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} har accepteret din ansøgning til {campaign_name}.",
+      "campaign_application_rejected": "Din ansøgning til {campaign_name} blev ikke imødekommet.",
       "fallback": "Du har en ny notifikation."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Dine notifikationsindstillinger kunne ikke gemmes. Prøv igen.",
       "groups": {
         "assignment": "Opgaver",
+        "jobs_board": "Jobopslag",
         "creator": "Creator-konto",
         "messaging": "Beskeder"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "En ny besked fra creatoren",
         "message_relationship_received_by_creator": "En ny direkte besked fra bureauet",
         "message_relationship_received_by_agency": "En ny direkte besked fra skaberen",
-        "campaign_job_posted": "Et nyt job slås op"
+        "campaign_job_posted": "Et nyt job slås op",
+        "campaign_application_submitted": "En creator søger en kampagne",
+        "campaign_application_accepted": "En ansøgning accepteres",
+        "campaign_application_rejected": "En ansøgning afvises"
       }
     }
   }

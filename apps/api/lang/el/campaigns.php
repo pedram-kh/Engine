@@ -83,4 +83,40 @@ return [
         'cta' => 'Δες την αγγελία',
         'ignore' => 'Λαμβάνεις αυτό το μήνυμα επειδή βρίσκεσαι στη λίστα δημιουργών της :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Νέα αίτηση για :campaign',
+            'greeting' => 'Γεια σου :name,',
+            'body' => 'Ο/Η :creator υπέβαλε αίτηση για «:campaign». Ανοίξτε την καμπάνια για να δείτε την αίτηση και να στείλετε προσφορά.',
+            'cta' => 'Προβολή αίτησης',
+        ],
+        'accepted' => [
+            'subject' => 'Η αίτησή σας για :campaign εγκρίθηκε',
+            'greeting' => 'Γεια σου :name,',
+            'body' => 'Η :agency αποδέχτηκε την αίτησή σας για «:campaign» και σας έστειλε προσφορά. Ανοίξτε την ανάθεση για να δείτε τους όρους και να την αποδεχτείτε ή να την απορρίψετε.',
+            'cta' => 'Προβολή προσφοράς',
+        ],
+        'rejected' => [
+            'subject' => 'Ενημέρωση για την αίτησή σας για :campaign',
+            'greeting' => 'Γεια σου :name,',
+            'body_agency_rejected' => 'Σας ευχαριστούμε για την αίτησή σας για «:campaign». Δεν επιλεχθήκατε για αυτήν την εργασία. Νέες αγγελίες δημοσιεύονται τακτικά στον πίνακά σας.',
+            'body_campaign_closed' => 'Σας ευχαριστούμε για την αίτησή σας για «:campaign». Η καμπάνια έκλεισε, οπότε η αίτησή σας δεν θα προχωρήσει. Νέες αγγελίες δημοσιεύονται τακτικά στον πίνακά σας.',
+            'cta' => 'Προβολή αγγελιών',
+        ],
+    ],
 ];

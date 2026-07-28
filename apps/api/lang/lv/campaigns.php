@@ -83,4 +83,40 @@ return [
         'cta' => 'Skatīt piedāvājumu',
         'ignore' => 'Jūs saņemat šo ziņu, jo esat :agency autoru sarakstā.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Jauns pieteikums darbam :campaign',
+            'greeting' => 'Sveiki, :name,',
+            'body' => ':creator pieteicās darbam „:campaign“. Atveriet kampaņu, izskatiet pieteikumu un nosūtiet piedāvājumu.',
+            'cta' => 'Skatīt pieteikumu',
+        ],
+        'accepted' => [
+            'subject' => 'Jūsu pieteikums darbam :campaign ir pieņemts',
+            'greeting' => 'Sveiki, :name,',
+            'body' => ':agency pieņēma jūsu pieteikumu darbam „:campaign“ un nosūtīja jums piedāvājumu. Atveriet uzdevumu, izskatiet nosacījumus un pieņemiet vai atsakiet piedāvājumu.',
+            'cta' => 'Skatīt piedāvājumu',
+        ],
+        'rejected' => [
+            'subject' => 'Jaunumi par jūsu pieteikumu darbam :campaign',
+            'greeting' => 'Sveiki, :name,',
+            'body_agency_rejected' => 'Paldies, ka pieteicāties darbam „:campaign“. Šim darbam jūs netikāt izraudzīts. Jauni darba piedāvājumi jūsu panelī tiek publicēti regulāri.',
+            'body_campaign_closed' => 'Paldies, ka pieteicāties darbam „:campaign“. Kampaņa ir noslēgta, tāpēc jūsu pieteikums netiks izskatīts tālāk. Jauni darba piedāvājumi jūsu panelī tiek publicēti regulāri.',
+            'cta' => 'Skatīt darba piedāvājumus',
+        ],
+    ],
 ];

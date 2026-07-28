@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Een Catalyst-beheerder heeft je verbonden met {agency_name}.",
       "agency_creator_relation_disconnected": "Je verbinding met {counterparty_name} is beëindigd.",
       "campaign_job_posted": "{agency_name} heeft een nieuwe opdracht geplaatst: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} heeft gereageerd op {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} heeft je aanmelding voor {campaign_name} geaccepteerd.",
+      "campaign_application_rejected": "Je aanmelding voor {campaign_name} is niet geselecteerd.",
       "fallback": "Je hebt een nieuwe melding."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Je meldingsinstellingen konden niet worden opgeslagen. Probeer het opnieuw.",
       "groups": {
         "assignment": "Opdrachten",
+        "jobs_board": "Vacatures",
         "creator": "Creator-account",
         "messaging": "Berichten"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "Een nieuw bericht van de creator",
         "message_relationship_received_by_creator": "Een nieuw direct bericht van het bureau",
         "message_relationship_received_by_agency": "Een nieuw direct bericht van de maker",
-        "campaign_job_posted": "Er wordt een nieuwe opdracht geplaatst"
+        "campaign_job_posted": "Er wordt een nieuwe opdracht geplaatst",
+        "campaign_application_submitted": "Een creator meldt zich aan voor een campagne",
+        "campaign_application_accepted": "Een aanmelding wordt geaccepteerd",
+        "campaign_application_rejected": "Een aanmelding wordt afgewezen"
       }
     }
   }

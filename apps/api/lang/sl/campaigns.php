@@ -83,4 +83,40 @@ return [
         'cta' => 'Ogled dela',
         'ignore' => 'To sporočilo prejemate, ker ste na seznamu ustvarjalcev agencije :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Nova prijava za :campaign',
+            'greeting' => 'Pozdravljeni, :name,',
+            'body' => ':creator se je prijavil na „:campaign“. Odprite kampanjo, preglejte prijavo in pošljite ponudbo.',
+            'cta' => 'Preglej prijavo',
+        ],
+        'accepted' => [
+            'subject' => 'Vaša prijava za :campaign je bila sprejeta',
+            'greeting' => 'Pozdravljeni, :name,',
+            'body' => ':agency je sprejela vašo prijavo za „:campaign“ in vam poslala ponudbo. Odprite nalogo, preglejte pogoje ter ponudbo sprejmite ali zavrnite.',
+            'cta' => 'Poglej ponudbo',
+        ],
+        'rejected' => [
+            'subject' => 'Novice o vaši prijavi za :campaign',
+            'greeting' => 'Pozdravljeni, :name,',
+            'body_agency_rejected' => 'Hvala za vašo prijavo na „:campaign“. Za to delo niste bili izbrani. Nova dela se na vaši plošči objavljajo redno.',
+            'body_campaign_closed' => 'Hvala za vašo prijavo na „:campaign“. Kampanja je zaključena, zato vaša prijava ne bo obravnavana naprej. Nova dela se na vaši plošči objavljajo redno.',
+            'cta' => 'Poglej ponudbe dela',
+        ],
+    ],
 ];

@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "A Catalyst adminisztrátora összekapcsolta Önt a(z) {agency_name} partnerrel.",
       "agency_creator_relation_disconnected": "A(z) {counterparty_name} partnerrel fennálló kapcsolata véget ért.",
       "campaign_job_posted": "A(z) {agency_name} új munkát hirdetett meg: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} jelentkezett a következőre: {campaign_name}.",
+      "campaign_application_accepted": "A(z) {agency_name} elfogadta a jelentkezésedet a következőre: {campaign_name}.",
+      "campaign_application_rejected": "A jelentkezésed nem járt sikerrel a következőnél: {campaign_name}.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Couldn't save your notification settings. Please try again.",
       "groups": {
         "assignment": "Feladats",
+        "jobs_board": "Álláshirdetések",
         "creator": "Alkotó account",
         "messaging": "Üzenetek"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Új közvetlen üzenet az ügynökségtől",
         "message_relationship_received_by_agency": "Új közvetlen üzenet az alkotótól",
-        "campaign_job_posted": "Új munkát hirdetnek meg"
+        "campaign_job_posted": "Új munkát hirdetnek meg",
+        "campaign_application_submitted": "Egy alkotó jelentkezik egy kampányra",
+        "campaign_application_accepted": "Egy jelentkezést elfogadnak",
+        "campaign_application_rejected": "Egy jelentkezést elutasítanak"
       }
     }
   }

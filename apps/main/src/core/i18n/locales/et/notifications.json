@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Catalysti administraator ühendas teid kontaktiga {agency_name}.",
       "agency_creator_relation_disconnected": "Teie side kasutajaga {counterparty_name} on lõppenud.",
       "campaign_job_posted": "{agency_name} avaldas uue tööpakkumise: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} kandideeris tööle {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} võttis teie kandideerimise tööle {campaign_name} vastu.",
+      "campaign_application_rejected": "Teie kandideerimine tööle {campaign_name} ei osutunud edukaks.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Couldn't save your notification settings. Please try again.",
       "groups": {
         "assignment": "Ülesannes",
+        "jobs_board": "Tööpakkumised",
         "creator": "Looja account",
         "messaging": "Sõnumid"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Uus otsesõnum agentuurilt",
         "message_relationship_received_by_agency": "Uus otsesõnum loojalt",
-        "campaign_job_posted": "Avaldatakse uus tööpakkumine"
+        "campaign_job_posted": "Avaldatakse uus tööpakkumine",
+        "campaign_application_submitted": "Looja kandideerib kampaaniale",
+        "campaign_application_accepted": "Kandideerimine võetakse vastu",
+        "campaign_application_rejected": "Kandideerimine lükatakse tagasi"
       }
     }
   }

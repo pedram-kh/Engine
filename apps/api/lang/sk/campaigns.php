@@ -83,4 +83,40 @@ return [
         'cta' => 'Zobraziť ponuku',
         'ignore' => 'Túto správu dostávate, pretože ste na zozname tvorcov agentúry :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Nová prihláška na :campaign',
+            'greeting' => 'Dobrý deň, :name,',
+            'body' => ':creator sa prihlásil na „:campaign“. Otvorte kampaň, pozrite si prihlášku a pošlite ponuku.',
+            'cta' => 'Zobraziť prihlášku',
+        ],
+        'accepted' => [
+            'subject' => 'Vaša prihláška na :campaign bola prijatá',
+            'greeting' => 'Dobrý deň, :name,',
+            'body' => ':agency prijala vašu prihlášku na „:campaign“ a poslala vám ponuku. Otvorte zadanie, pozrite si podmienky a ponuku prijmite alebo odmietnite.',
+            'cta' => 'Zobraziť ponuku',
+        ],
+        'rejected' => [
+            'subject' => 'Novinky k vašej prihláške na :campaign',
+            'greeting' => 'Dobrý deň, :name,',
+            'body_agency_rejected' => 'Ďakujeme za vašu prihlášku na „:campaign“. Na túto prácu ste neboli vybraní. Nové ponuky sa na vašej tabuli objavujú pravidelne.',
+            'body_campaign_closed' => 'Ďakujeme za vašu prihlášku na „:campaign“. Kampaň bola ukončená, takže vaša prihláška nebude posudzovaná ďalej. Nové ponuky sa na vašej tabuli objavujú pravidelne.',
+            'cta' => 'Zobraziť pracovné ponuky',
+        ],
+    ],
 ];

@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Ein Catalyst-Administrator hat Sie mit {agency_name} verbunden.",
       "agency_creator_relation_disconnected": "Ihre Verbindung mit {counterparty_name} wurde beendet.",
       "campaign_job_posted": "{agency_name} hat einen neuen Job veröffentlicht: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} hat sich auf {campaign_name} beworben.",
+      "campaign_application_accepted": "{agency_name} hat deine Bewerbung für {campaign_name} angenommen.",
+      "campaign_application_rejected": "Deine Bewerbung für {campaign_name} war nicht erfolgreich.",
       "fallback": "Du hast eine neue Benachrichtigung."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Deine Benachrichtigungseinstellungen konnten nicht gespeichert werden. Bitte versuche es erneut.",
       "groups": {
         "assignment": "Aufträge",
+        "jobs_board": "Jobbörse",
         "creator": "Creator-Konto",
         "messaging": "Nachrichten"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "Eine neue Nachricht vom Creator",
         "message_relationship_received_by_creator": "Eine neue Direktnachricht von der Agentur",
         "message_relationship_received_by_agency": "Eine neue Direktnachricht vom Creator",
-        "campaign_job_posted": "Ein neuer Job wird veröffentlicht"
+        "campaign_job_posted": "Ein neuer Job wird veröffentlicht",
+        "campaign_application_submitted": "Ein Creator bewirbt sich auf eine Kampagne",
+        "campaign_application_accepted": "Eine Bewerbung wird angenommen",
+        "campaign_application_rejected": "Eine Bewerbung wird abgelehnt"
       }
     }
   }

@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Catalyst administrators saistīja jūs ar {agency_name}.",
       "agency_creator_relation_disconnected": "Jūsu saikne ar {counterparty_name} ir beigusies.",
       "campaign_job_posted": "{agency_name} publicēja jaunu darba piedāvājumu: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} pieteicās darbam {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} pieņēma jūsu pieteikumu darbam {campaign_name}.",
+      "campaign_application_rejected": "Jūsu pieteikums darbam {campaign_name} netika izraudzīts.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Couldn't save your notification settings. Please try again.",
       "groups": {
         "assignment": "Uzdevumss",
+        "jobs_board": "Darba piedāvājumi",
         "creator": "Radītājs account",
         "messaging": "Ziņojumi"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Jauns tiešais ziņojums no aģentūras",
         "message_relationship_received_by_agency": "Jauns tiešais ziņojums no satura veidotāja",
-        "campaign_job_posted": "Tiek publicēts jauns darba piedāvājums"
+        "campaign_job_posted": "Tiek publicēts jauns darba piedāvājums",
+        "campaign_application_submitted": "Radītājs piesakās kampaņai",
+        "campaign_application_accepted": "Pieteikums tiek pieņemts",
+        "campaign_application_rejected": "Pieteikums tiek atteikts"
       }
     }
   }

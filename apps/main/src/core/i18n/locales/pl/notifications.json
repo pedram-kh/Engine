@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Administrator Catalyst połączył Cię z {agency_name}.",
       "agency_creator_relation_disconnected": "Twoje połączenie z {counterparty_name} zakończyło się.",
       "campaign_job_posted": "{agency_name} opublikowała nowe zlecenie: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} zgłosił się do {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} zaakceptowała Twoje zgłoszenie do {campaign_name}.",
+      "campaign_application_rejected": "Twoje zgłoszenie do {campaign_name} nie zostało wybrane.",
       "fallback": "Masz nowe powiadomienie."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Nie można zapisać ustawień powiadomień. Spróbuj ponownie.",
       "groups": {
         "assignment": "Zadania",
+        "jobs_board": "Oferty pracy",
         "creator": "Konto twórcy",
         "messaging": "Wiadomości"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "Nowa wiadomość od twórcy",
         "message_relationship_received_by_creator": "Nowa wiadomość bezpośrednia od agencji",
         "message_relationship_received_by_agency": "Nowa wiadomość bezpośrednia od twórcy",
-        "campaign_job_posted": "Zostaje opublikowane nowe zlecenie"
+        "campaign_job_posted": "Zostaje opublikowane nowe zlecenie",
+        "campaign_application_submitted": "Twórca zgłasza się do kampanii",
+        "campaign_application_accepted": "Zgłoszenie zostaje zaakceptowane",
+        "campaign_application_rejected": "Zgłoszenie zostaje odrzucone"
       }
     }
   }

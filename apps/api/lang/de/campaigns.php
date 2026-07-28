@@ -83,4 +83,40 @@ return [
         'cta' => 'Job ansehen',
         'ignore' => 'Du erhältst diese Nachricht, weil du auf der Creator-Liste von :agency stehst.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Neue Bewerbung für :campaign',
+            'greeting' => 'Hallo :name,',
+            'body' => ':creator hat sich auf „:campaign“ beworben. Öffne die Kampagne, um die Bewerbung zu prüfen und ein Angebot zu senden.',
+            'cta' => 'Bewerbung ansehen',
+        ],
+        'accepted' => [
+            'subject' => 'Deine Bewerbung für :campaign wurde angenommen',
+            'greeting' => 'Hallo :name,',
+            'body' => ':agency hat deine Bewerbung für „:campaign“ angenommen und dir ein Angebot gesendet. Öffne den Auftrag, prüfe die Konditionen und nimm sie an oder lehne sie ab.',
+            'cta' => 'Angebot ansehen',
+        ],
+        'rejected' => [
+            'subject' => 'Neues zu deiner Bewerbung für :campaign',
+            'greeting' => 'Hallo :name,',
+            'body_agency_rejected' => 'Danke für deine Bewerbung auf „:campaign“. Du wurdest für diesen Job nicht ausgewählt. Neue Jobs erscheinen regelmäßig auf deinem Board.',
+            'body_campaign_closed' => 'Danke für deine Bewerbung auf „:campaign“. Die Kampagne wurde geschlossen, deine Bewerbung wird daher nicht weiter berücksichtigt. Neue Jobs erscheinen regelmäßig auf deinem Board.',
+            'cta' => 'Jobbörse ansehen',
+        ],
+    ],
 ];

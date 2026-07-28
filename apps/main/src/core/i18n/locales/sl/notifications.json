@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Skrbnik Catalysta vas je povezal z {agency_name}.",
       "agency_creator_relation_disconnected": "Vaša povezava z {counterparty_name} se je končala.",
       "campaign_job_posted": "{agency_name} je objavila novo delo: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} se je prijavil na {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} je sprejela vašo prijavo za {campaign_name}.",
+      "campaign_application_rejected": "Vaša prijava za {campaign_name} ni bila uspešna.",
       "fallback": "Máte nové oznámení."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Ni uspelo shraniti nastanjeení oznámení. Zkuste to znova.",
       "groups": {
         "assignment": "Úkoly",
+        "jobs_board": "Ponudbe dela",
         "creator": "Účet ustvarjalca",
         "messaging": "Sporočila"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "Nová zpráva od ustvarjalca",
         "message_relationship_received_by_creator": "Novo neposredno sporočilo od agencije",
         "message_relationship_received_by_agency": "Novo neposredno sporočilo od ustvarjalca",
-        "campaign_job_posted": "Objavljeno je novo delo"
+        "campaign_job_posted": "Objavljeno je novo delo",
+        "campaign_application_submitted": "Ustvarjalec se prijavi na kampanjo",
+        "campaign_application_accepted": "Prijava je sprejeta",
+        "campaign_application_rejected": "Prijava je zavrnjena"
       }
     }
   }

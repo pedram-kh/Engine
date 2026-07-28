@@ -83,4 +83,40 @@ return [
         'cta' => 'Vaata tööpakkumist',
         'ignore' => 'Saad selle kirja, sest kuulud agentuuri :agency loojate nimekirja.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Uus kandideerimine tööle :campaign',
+            'greeting' => 'Tere, :name,',
+            'body' => ':creator kandideeris tööle „:campaign“. Avage kampaania, vaadake kandideerimine üle ja saatke pakkumine.',
+            'cta' => 'Vaata kandideerimist',
+        ],
+        'accepted' => [
+            'subject' => 'Teie kandideerimine tööle :campaign võeti vastu',
+            'greeting' => 'Tere, :name,',
+            'body' => ':agency võttis teie kandideerimise tööle „:campaign“ vastu ja saatis teile pakkumise. Avage ülesanne, vaadake tingimused üle ning võtke pakkumine vastu või lükake tagasi.',
+            'cta' => 'Vaata pakkumist',
+        ],
+        'rejected' => [
+            'subject' => 'Uudised teie kandideerimise kohta tööle :campaign',
+            'greeting' => 'Tere, :name,',
+            'body_agency_rejected' => 'Täname, et kandideerisite tööle „:campaign“. Teid ei valitud selle töö jaoks. Uued tööpakkumised ilmuvad teie tahvlile regulaarselt.',
+            'body_campaign_closed' => 'Täname, et kandideerisite tööle „:campaign“. Kampaania on lõppenud, seega teie kandideerimist edasi ei menetleta. Uued tööpakkumised ilmuvad teie tahvlile regulaarselt.',
+            'cta' => 'Vaata tööpakkumisi',
+        ],
+    ],
 ];

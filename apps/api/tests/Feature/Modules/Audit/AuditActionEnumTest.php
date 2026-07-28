@@ -162,9 +162,16 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'admin.impersonation_ended',
         'feature_flag.toggled',
         // AH-056 (Jobs Board chunk 3) — a creator applied to a listed campaign.
-        // Audit-only this chunk: the agency-facing NotificationType is chunk 4's
-        // (the arc deploys as one release, so nothing is missed in between).
+        // Audit-only in chunk 3; AH-058 added its agency-facing NotificationType
+        // against the same live verb (the arc deploys as one release, so nothing
+        // was missed in between).
         'campaign_application.submitted',
+        // AH-058 (Jobs Board chunk 4, D2/D4) — the agency's two answers. Both
+        // are also NotificationTypes. `rejected` covers the agency's reject AND
+        // the campaign-terminal auto-reject, with the cause in the metadata
+        // rather than in a second verb.
+        'campaign_application.accepted',
+        'campaign_application.rejected',
         // AH-056 — the job-posted fan-out verb. Unlike the apply verb, this one
         // IS a NotificationType (creator-facing), so it joins the
         // one-vocabulary tie and both notification tripwires.

@@ -83,4 +83,40 @@ return [
         'cta' => 'Vezi jobul',
         'ignore' => 'Primești acest mesaj pentru că te afli pe lista de creatori a agenției :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Candidatură nouă pentru :campaign',
+            'greeting' => 'Bună, :name,',
+            'body' => ':creator a aplicat la „:campaign”. Deschide campania pentru a analiza candidatura și a trimite o ofertă.',
+            'cta' => 'Vezi candidatura',
+        ],
+        'accepted' => [
+            'subject' => 'Candidatura ta pentru :campaign a fost acceptată',
+            'greeting' => 'Bună, :name,',
+            'body' => ':agency a acceptat candidatura ta pentru „:campaign” și ți-a trimis o ofertă. Deschide sarcina pentru a citi condițiile și a accepta sau refuza oferta.',
+            'cta' => 'Vezi oferta',
+        ],
+        'rejected' => [
+            'subject' => 'Noutăți despre candidatura ta pentru :campaign',
+            'greeting' => 'Bună, :name,',
+            'body_agency_rejected' => 'Îți mulțumim pentru candidatura la „:campaign”. Nu ai fost selectat pentru acest job. Joburi noi apar regulat pe panoul tău.',
+            'body_campaign_closed' => 'Îți mulțumim pentru candidatura la „:campaign”. Campania s-a încheiat, așa că candidatura ta nu va merge mai departe. Joburi noi apar regulat pe panoul tău.',
+            'cta' => 'Vezi anunțurile de job',
+        ],
+    ],
 ];

@@ -83,4 +83,40 @@ return [
         'cta' => 'Se jobbet',
         'ignore' => 'Du modtager denne besked, fordi du står på kreatørlisten hos :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Ny ansøgning til :campaign',
+            'greeting' => 'Hej :name,',
+            'body' => ':creator har søgt »:campaign«. Åbn kampagnen for at se ansøgningen og sende et tilbud.',
+            'cta' => 'Se ansøgningen',
+        ],
+        'accepted' => [
+            'subject' => 'Din ansøgning til :campaign er accepteret',
+            'greeting' => 'Hej :name,',
+            'body' => ':agency har accepteret din ansøgning til »:campaign« og sendt dig et tilbud. Åbn opgaven for at se vilkårene og acceptere eller afvise.',
+            'cta' => 'Se tilbuddet',
+        ],
+        'rejected' => [
+            'subject' => 'Nyt om din ansøgning til :campaign',
+            'greeting' => 'Hej :name,',
+            'body_agency_rejected' => 'Tak for din ansøgning til »:campaign«. Du blev ikke valgt til dette job. Der kommer løbende nye jobopslag på dit board.',
+            'body_campaign_closed' => 'Tak for din ansøgning til »:campaign«. Kampagnen er lukket, så din ansøgning går ikke videre. Der kommer løbende nye jobopslag på dit board.',
+            'cta' => 'Se jobopslag',
+        ],
+    ],
 ];

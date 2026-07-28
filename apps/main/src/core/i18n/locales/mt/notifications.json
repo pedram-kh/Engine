@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Amministratur ta' Catalyst qabbdek ma' {agency_name}.",
       "agency_creator_relation_disconnected": "Il-konnessjoni tiegħek ma' {counterparty_name} intemmet.",
       "campaign_job_posted": "{agency_name} ippubblika xogħol ġdid: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} applika għal {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} aċċettat l-applikazzjoni tiegħek għal {campaign_name}.",
+      "campaign_application_rejected": "L-applikazzjoni tiegħek għal {campaign_name} ma ntgħażlitx.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Couldn't save your notification settings. Please try again.",
       "groups": {
         "assignment": "Assenjaments",
+        "jobs_board": "Bord tax-xogħol",
         "creator": "Kreatur account",
         "messaging": "Messaġġi"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Messaġġ dirett ġdid mill-aġenzija",
         "message_relationship_received_by_agency": "Messaġġ dirett ġdid mill-kreatur",
-        "campaign_job_posted": "Jiġi ppubblikat xogħol ġdid"
+        "campaign_job_posted": "Jiġi ppubblikat xogħol ġdid",
+        "campaign_application_submitted": "Kreatur japplika għal kampanja",
+        "campaign_application_accepted": "Applikazzjoni tiġi aċċettata",
+        "campaign_application_rejected": "Applikazzjoni tiġi rifjutata"
       }
     }
   }

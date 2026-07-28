@@ -83,4 +83,40 @@ return [
         'cta' => 'Bekijk de opdracht',
         'ignore' => 'Je ontvangt dit bericht omdat je op de creatorlijst van :agency staat.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Nieuwe aanmelding voor :campaign',
+            'greeting' => 'Hallo :name,',
+            'body' => ':creator heeft gereageerd op ":campaign". Open de campagne om de aanmelding te bekijken en een aanbod te sturen.',
+            'cta' => 'Aanmelding bekijken',
+        ],
+        'accepted' => [
+            'subject' => 'Je aanmelding voor :campaign is geaccepteerd',
+            'greeting' => 'Hallo :name,',
+            'body' => ':agency heeft je aanmelding voor ":campaign" geaccepteerd en je een aanbod gestuurd. Open de opdracht om de voorwaarden te bekijken en het aanbod te accepteren of af te wijzen.',
+            'cta' => 'Aanbod bekijken',
+        ],
+        'rejected' => [
+            'subject' => 'Nieuws over je aanmelding voor :campaign',
+            'greeting' => 'Hallo :name,',
+            'body_agency_rejected' => 'Bedankt voor je aanmelding voor ":campaign". Je bent niet geselecteerd voor deze opdracht. Er komen regelmatig nieuwe vacatures op je bord.',
+            'body_campaign_closed' => 'Bedankt voor je aanmelding voor ":campaign". De campagne is gesloten, dus je aanmelding gaat niet verder. Er komen regelmatig nieuwe vacatures op je bord.',
+            'cta' => 'Vacatures bekijken',
+        ],
+    ],
 ];

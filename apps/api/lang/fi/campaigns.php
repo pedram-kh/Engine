@@ -83,4 +83,40 @@ return [
         'cta' => 'Katso työ',
         'ignore' => 'Saat tämän viestin, koska olet toimiston :agency tekijälistalla.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Uusi hakemus työhön :campaign',
+            'greeting' => 'Hei :name,',
+            'body' => ':creator haki työhön ”:campaign”. Avaa kampanja, käy hakemus läpi ja lähetä tarjous.',
+            'cta' => 'Katso hakemus',
+        ],
+        'accepted' => [
+            'subject' => 'Hakemuksesi työhön :campaign hyväksyttiin',
+            'greeting' => 'Hei :name,',
+            'body' => ':agency hyväksyi hakemuksesi työhön ”:campaign” ja lähetti sinulle tarjouksen. Avaa toimeksianto, tarkista ehdot ja hyväksy tai hylkää tarjous.',
+            'cta' => 'Katso tarjous',
+        ],
+        'rejected' => [
+            'subject' => 'Tietoa hakemuksestasi työhön :campaign',
+            'greeting' => 'Hei :name,',
+            'body_agency_rejected' => 'Kiitos hakemuksestasi työhön ”:campaign”. Sinua ei valittu tähän työhön. Taulullesi julkaistaan uusia töitä säännöllisesti.',
+            'body_campaign_closed' => 'Kiitos hakemuksestasi työhön ”:campaign”. Kampanja on päättynyt, joten hakemustasi ei käsitellä eteenpäin. Taulullesi julkaistaan uusia töitä säännöllisesti.',
+            'cta' => 'Katso työpaikat',
+        ],
+    ],
 ];

@@ -48,6 +48,15 @@ it('NotificationType catalogue lists exactly the curated membership', function (
         // Single-direction (creator): the agency did the listing, so there is
         // no agency-facing counterpart to pair it with.
         'campaign.job_posted',
+        // AH-058 (Jobs Board chunk 4, D6) — the three application verbs.
+        // `submitted` reaches the AGENCY (its AuditAction shipped in chunk 3;
+        // only the type is new here); `accepted` / `rejected` reach the CREATOR.
+        // `rejected` has two emit sites — the agency's answer and the
+        // campaign-terminal auto-reject — separated by `data.cause`, not by a
+        // fourth verb.
+        'campaign_application.submitted',
+        'campaign_application.accepted',
+        'campaign_application.rejected',
     ];
 
     $actual = array_map(fn (NotificationType $case): string => $case->value, NotificationType::cases());

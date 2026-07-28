@@ -83,4 +83,40 @@ return [
         'cta' => 'Féach ar an bpost',
         'ignore' => 'Tá an teachtaireacht seo á fáil agat toisc go bhfuil tú ar liosta cruthaitheoirí :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Iarratas nua ar :campaign',
+            'greeting' => 'Dia duit, :name,',
+            'body' => 'Chuir :creator iarratas isteach ar ":campaign". Oscail an feachtas chun an iarratas a mheas agus tairiscint a sheoladh.',
+            'cta' => 'Féach ar an iarratas',
+        ],
+        'accepted' => [
+            'subject' => 'Glacadh le d\'iarratas ar :campaign',
+            'greeting' => 'Dia duit, :name,',
+            'body' => 'Ghlac :agency le d\'iarratas ar ":campaign" agus sheol tairiscint chugat. Oscail an tasc chun na téarmaí a léamh agus glacadh leis nó é a dhiúltú.',
+            'cta' => 'Féach ar an tairiscint',
+        ],
+        'rejected' => [
+            'subject' => 'Nuacht faoi d\'iarratas ar :campaign',
+            'greeting' => 'Dia duit, :name,',
+            'body_agency_rejected' => 'Go raibh maith agat as iarratas a chur isteach ar ":campaign". Níor roghnaíodh tú don phost seo. Foilsítear poist nua ar do chlár go rialta.',
+            'body_campaign_closed' => 'Go raibh maith agat as iarratas a chur isteach ar ":campaign". Tá an feachtas dúnta, mar sin ní rachaidh d\'iarratas ar aghaidh. Foilsítear poist nua ar do chlár go rialta.',
+            'cta' => 'Féach ar an gclár post',
+        ],
+    ],
 ];

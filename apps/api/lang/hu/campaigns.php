@@ -83,4 +83,40 @@ return [
         'cta' => 'Munka megtekintése',
         'ignore' => 'Azért kapod ezt az üzenetet, mert szerepelsz a(z) :agency alkotói listáján.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Új jelentkezés a következőre: :campaign',
+            'greeting' => 'Szia :name,',
+            'body' => ':creator jelentkezett a következőre: „:campaign“. Nyisd meg a kampányt, tekintsd át a jelentkezést, és küldj ajánlatot.',
+            'cta' => 'Jelentkezés megtekintése',
+        ],
+        'accepted' => [
+            'subject' => 'A jelentkezésedet elfogadták a következőre: :campaign',
+            'greeting' => 'Szia :name,',
+            'body' => 'A(z) :agency elfogadta a jelentkezésedet a következőre: „:campaign“, és ajánlatot küldött neked. Nyisd meg a feladatot, tekintsd át a feltételeket, majd fogadd el vagy utasítsd el.',
+            'cta' => 'Ajánlat megtekintése',
+        ],
+        'rejected' => [
+            'subject' => 'Hír a jelentkezésedről: :campaign',
+            'greeting' => 'Szia :name,',
+            'body_agency_rejected' => 'Köszönjük a jelentkezésedet a következőre: „:campaign“. Erre a munkára nem téged választottak. Új munkák rendszeresen megjelennek a tábládon.',
+            'body_campaign_closed' => 'Köszönjük a jelentkezésedet a következőre: „:campaign“. A kampány lezárult, ezért a jelentkezésed nem kerül tovább. Új munkák rendszeresen megjelennek a tábládon.',
+            'cta' => 'Álláshirdetések megtekintése',
+        ],
+    ],
 ];

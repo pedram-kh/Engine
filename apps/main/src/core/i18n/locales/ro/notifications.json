@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Un administrator Catalyst te-a conectat cu {agency_name}.",
       "agency_creator_relation_disconnected": "Conexiunea ta cu {counterparty_name} s-a încheiat.",
       "campaign_job_posted": "{agency_name} a publicat un job nou: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} a aplicat la {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} a acceptat candidatura ta pentru {campaign_name}.",
+      "campaign_application_rejected": "Candidatura ta pentru {campaign_name} nu a fost selectată.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Couldn't save your notification settings. Please try again.",
       "groups": {
         "assignment": "Sarcinăs",
+        "jobs_board": "Anunțuri de job",
         "creator": "Creator account",
         "messaging": "Mesaje"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Un nou mesaj direct de la agenție",
         "message_relationship_received_by_agency": "Un nou mesaj direct de la creator",
-        "campaign_job_posted": "Este publicat un job nou"
+        "campaign_job_posted": "Este publicat un job nou",
+        "campaign_application_submitted": "Un creator aplică la o campanie",
+        "campaign_application_accepted": "O candidatură este acceptată",
+        "campaign_application_rejected": "O candidatură este respinsă"
       }
     }
   }

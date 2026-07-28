@@ -83,4 +83,40 @@ return [
         'cta' => 'Zobacz zlecenie',
         'ignore' => 'Otrzymujesz tę wiadomość, ponieważ znajdujesz się na liście twórców agencji :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Nowe zgłoszenie do :campaign',
+            'greeting' => 'Cześć :name,',
+            'body' => ':creator zgłosił się do „:campaign”. Otwórz kampanię, aby przejrzeć zgłoszenie i wysłać ofertę.',
+            'cta' => 'Przejrzyj zgłoszenie',
+        ],
+        'accepted' => [
+            'subject' => 'Twoje zgłoszenie do :campaign zostało zaakceptowane',
+            'greeting' => 'Cześć :name,',
+            'body' => ':agency zaakceptowała Twoje zgłoszenie do „:campaign” i wysłała Ci ofertę. Otwórz zlecenie, sprawdź warunki i zaakceptuj je lub odrzuć.',
+            'cta' => 'Zobacz ofertę',
+        ],
+        'rejected' => [
+            'subject' => 'Nowości w sprawie Twojego zgłoszenia do :campaign',
+            'greeting' => 'Cześć :name,',
+            'body_agency_rejected' => 'Dziękujemy za zgłoszenie do „:campaign”. Nie zostałeś wybrany do tego zlecenia. Nowe oferty pojawiają się na Twojej tablicy regularnie.',
+            'body_campaign_closed' => 'Dziękujemy za zgłoszenie do „:campaign”. Kampania została zamknięta, więc Twoje zgłoszenie nie będzie rozpatrywane dalej. Nowe oferty pojawiają się na Twojej tablicy regularnie.',
+            'cta' => 'Zobacz oferty pracy',
+        ],
+    ],
 ];

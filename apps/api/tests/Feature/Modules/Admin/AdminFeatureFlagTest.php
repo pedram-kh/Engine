@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Models\AuditLog;
+use App\Modules\Creators\Features\ApplicationNotificationsEnabled;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
 use App\Modules\Creators\Features\JobPostedNotificationsEnabled;
@@ -61,7 +62,8 @@ it('lists every registered flag with its current state', function (): void {
     expect($names)->toContain(KycVerificationEnabled::NAME)
         ->and($names)->toContain(ContractSigningEnabled::NAME)
         ->and($names)->toContain(IncompleteCreatorNudgeEnabled::NAME)
-        ->and($names)->toContain(JobPostedNotificationsEnabled::NAME);
+        ->and($names)->toContain(JobPostedNotificationsEnabled::NAME)
+        ->and($names)->toContain(ApplicationNotificationsEnabled::NAME);
     expect($response->json('data.0.attributes'))->toHaveKeys([
         'name', 'label', 'description', 'enabled',
     ]);
@@ -88,6 +90,30 @@ it('lets an admin arm the jobs-board fan-out from the same registry (AH-056, D6)
 
     expect($off->status())->toBe(200);
     expect(Feature::active(JobPostedNotificationsEnabled::NAME))->toBeFalse();
+});
+
+it('lets an admin arm + disarm the application mails from the same registry (AH-058, D6)', function (): void {
+    $admin = makeFlagAdmin();
+    expect(Feature::active(ApplicationNotificationsEnabled::NAME))->toBeFalse();
+
+    $on = $this->actingAs($admin, 'web_admin')->postJson(
+        '/api/v1/admin/feature-flags/'.ApplicationNotificationsEnabled::NAME,
+        ['enabled' => true, 'reason' => 'Arming the jobs-board application mails with the arc.'],
+    );
+
+    expect($on->status())->toBe(200);
+    expect(Feature::active(ApplicationNotificationsEnabled::NAME))->toBeTrue();
+
+    // The AH-056 lesson, re-pinned: a flag reachable only from `tinker` is not
+    // an operator control. Both directions must work from the SPA, because the
+    // whole value of this flag is how fast an unintended send stops.
+    $off = $this->actingAs($admin, 'web_admin')->postJson(
+        '/api/v1/admin/feature-flags/'.ApplicationNotificationsEnabled::NAME,
+        ['enabled' => false, 'reason' => 'Pausing the application mails.'],
+    );
+
+    expect($off->status())->toBe(200);
+    expect(Feature::active(ApplicationNotificationsEnabled::NAME))->toBeFalse();
 });
 
 it('activates a flag, flips Feature::active live, and writes an audit row', function (): void {

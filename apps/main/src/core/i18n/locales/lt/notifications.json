@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Catalyst administratorius susiejo jus su {agency_name}.",
       "agency_creator_relation_disconnected": "Jūsų ryšys su {counterparty_name} baigėsi.",
       "campaign_job_posted": "{agency_name} paskelbė naują darbo pasiūlymą: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} pateikė paraišką dėl {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} priėmė jūsų paraišką dėl {campaign_name}.",
+      "campaign_application_rejected": "Jūsų paraiška dėl {campaign_name} nebuvo atrinkta.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Couldn't save your notification settings. Please try again.",
       "groups": {
         "assignment": "Užduotiss",
+        "jobs_board": "Darbo pasiūlymai",
         "creator": "Kūrėjas account",
         "messaging": "Žinutės"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Nauja tiesioginė žinutė iš agentūros",
         "message_relationship_received_by_agency": "Nauja tiesioginė žinutė iš kūrėjo",
-        "campaign_job_posted": "Paskelbiamas naujas darbo pasiūlymas"
+        "campaign_job_posted": "Paskelbiamas naujas darbo pasiūlymas",
+        "campaign_application_submitted": "Kūrėjas pateikia paraišką dėl kampanijos",
+        "campaign_application_accepted": "Paraiška priimama",
+        "campaign_application_rejected": "Paraiška atmetama"
       }
     }
   }

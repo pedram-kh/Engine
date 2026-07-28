@@ -39,8 +39,9 @@ const LOCALE_ROOT = path.resolve(__dirname, '../../../src/core/i18n/locales')
 const LOCALES = UI_LOCALES
 
 /**
- * The 14 notification types with a live emit site (Ch1/Ch2 + Sprint 11 campaign
- * messaging + AH-010 relationship messaging + AH-051 relation lifecycle).
+ * The 18 notification types with a live emit site (Ch1/Ch2 + Sprint 11 campaign
+ * messaging + AH-010 relationship messaging + AH-051 relation lifecycle +
+ * AH-056/AH-058 jobs board).
  * AH-010 (D5) grew the live-set 10 → 12: the two dual-recipient
  * relationship-message types each gained a live emit site
  * (RelationshipMessageNotifications). AH-051 (D7) grew it 12 → 14 with the
@@ -73,6 +74,15 @@ const LIVE_TYPES = [
   // AH-056 (Jobs Board chunk 3, D8) — the job-posted creator alert. Grew the
   // live-set 14 → 15.
   'campaign.job_posted',
+  // AH-058 (Jobs Board chunk 4, D6) — the three application verbs, 15 → 18.
+  // `submitted` is the type chunk 3 deferred (its audit verb was already live);
+  // `accepted` / `rejected` are net-new. Hand-added here, deliberately: this
+  // list is what catches a type whose 24 TRANSLATIONS are missing, and the
+  // AH-051 staleness it recorded above is the reason all three go in the same
+  // edit as their emit sites.
+  'campaign_application.submitted',
+  'campaign_application.accepted',
+  'campaign_application.rejected',
 ] as const
 
 /** Emit-less / forward-declared types that MUST route to the fallback. */
@@ -129,7 +139,7 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
     }
   })
 
-  it('notifications.types holds EXACTLY the 15 live templates + fallback', async () => {
+  it('notifications.types holds EXACTLY the 18 live templates + fallback', async () => {
     const en = await loadBundle('en')
     const typeKeys = Object.keys(en.notifications.types).sort()
 
@@ -142,6 +152,9 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
       'assignment_draft_submitted',
       'assignment_manually_verified',
       'assignment_revision_requested',
+      'campaign_application_accepted',
+      'campaign_application_rejected',
+      'campaign_application_submitted',
       'campaign_job_posted',
       'creator_approved',
       'creator_rejected',
@@ -227,7 +240,7 @@ describe('notifications prefs role-partition — single live-set source of truth
     }
   })
 
-  it('the known role split is honest (creator = 9 review/lifecycle/messaging/jobs, agency = 4 fan-out/messaging)', () => {
+  it('the known role split is honest (creator = 11 review/lifecycle/messaging/jobs, agency = 5 fan-out/messaging/jobs)', () => {
     expect([...creatorTypes].sort()).toEqual(
       [
         'assignment.draft_approved',
@@ -237,6 +250,12 @@ describe('notifications prefs role-partition — single live-set source of truth
         // AH-056 — creator-only by construction: the agency listed the job, so
         // there is no agency-side counterpart to offer a toggle for.
         'campaign.job_posted',
+        // AH-058 — the agency's two answers reach the CREATOR. The applicant's
+        // own `submitted` verb is the agency-side one, below: the split is per
+        // verb, not per feature, which is what keeps every toggle honest for
+        // whoever is looking at it.
+        'campaign_application.accepted',
+        'campaign_application.rejected',
         'creator.approved',
         'creator.rejected',
         'message.received_by_creator',
@@ -247,6 +266,8 @@ describe('notifications prefs role-partition — single live-set source of truth
       [
         'assignment.contracted',
         'assignment.draft_submitted',
+        // AH-058 — a creator applied. Agency-side: it is not news to the creator.
+        'campaign_application.submitted',
         'message.received_by_agency',
         'message.relationship_received_by_agency',
       ].sort(),

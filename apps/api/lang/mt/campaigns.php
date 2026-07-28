@@ -83,4 +83,40 @@ return [
         'cta' => 'Ara x-xogħol',
         'ignore' => 'Qed tirċievi dan il-messaġġ għax tinsab fil-lista ta’ kreaturi ta’ :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Applikazzjoni ġdida għal :campaign',
+            'greeting' => 'Bonġu :name,',
+            'body' => ':creator applika għal ":campaign". Iftaħ il-kampanja biex tirrevedi l-applikazzjoni u tibgħat offerta.',
+            'cta' => 'Irrevedi l-applikazzjoni',
+        ],
+        'accepted' => [
+            'subject' => 'L-applikazzjoni tiegħek għal :campaign ġiet aċċettata',
+            'greeting' => 'Bonġu :name,',
+            'body' => ':agency aċċettat l-applikazzjoni tiegħek għal ":campaign" u bagħtitlek offerta. Iftaħ l-inkarigu biex taqra l-kundizzjonijiet u taċċetta jew tirrifjuta.',
+            'cta' => 'Ara l-offerta',
+        ],
+        'rejected' => [
+            'subject' => 'Aġġornament dwar l-applikazzjoni tiegħek għal :campaign',
+            'greeting' => 'Bonġu :name,',
+            'body_agency_rejected' => 'Grazzi talli applikajt għal ":campaign". Ma ntgħażiltx għal dan ix-xogħol. Xogħlijiet ġodda jiġu ppubblikati regolarment fuq il-bord tiegħek.',
+            'body_campaign_closed' => 'Grazzi talli applikajt għal ":campaign". Il-kampanja ngħalqet, għalhekk l-applikazzjoni tiegħek mhux se timxi quddiem. Xogħlijiet ġodda jiġu ppubblikati regolarment fuq il-bord tiegħek.',
+            'cta' => 'Ara l-bord tax-xogħol',
+        ],
+    ],
 ];

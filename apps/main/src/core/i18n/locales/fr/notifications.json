@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Un administrateur Catalyst vous a connecté avec {agency_name}.",
       "agency_creator_relation_disconnected": "Votre connexion avec {counterparty_name} a pris fin.",
       "campaign_job_posted": "{agency_name} a publié une nouvelle offre : {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} a postulé à {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} a accepté votre candidature pour {campaign_name}.",
+      "campaign_application_rejected": "Votre candidature pour {campaign_name} n'a pas été retenue.",
       "fallback": "Vous avez une nouvelle notification."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Impossible d'enregistrer vos paramètres de notification. Veuillez réessayer.",
       "groups": {
         "assignment": "Missions",
+        "jobs_board": "Offres d'emploi",
         "creator": "Compte de créateur",
         "messaging": "Messages"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "Un nouveau message du créateur",
         "message_relationship_received_by_creator": "Un nouveau message direct de l'agence",
         "message_relationship_received_by_agency": "Un nouveau message direct du créateur",
-        "campaign_job_posted": "Une nouvelle offre est publiée"
+        "campaign_job_posted": "Une nouvelle offre est publiée",
+        "campaign_application_submitted": "Un créateur postule à une campagne",
+        "campaign_application_accepted": "Une candidature est acceptée",
+        "campaign_application_rejected": "Une candidature est refusée"
       }
     }
   }

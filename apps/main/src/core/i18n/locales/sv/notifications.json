@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "En Catalyst-administratör kopplade dig till {agency_name}.",
       "agency_creator_relation_disconnected": "Din koppling till {counterparty_name} har upphört.",
       "campaign_job_posted": "{agency_name} har publicerat ett nytt jobb: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} har sökt {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} har accepterat din ansökan till {campaign_name}.",
+      "campaign_application_rejected": "Din ansökan till {campaign_name} gick inte vidare.",
       "fallback": "Du har en ny avisering."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Kunde inte spara dina aviseringsinställningar. Försök igen.",
       "groups": {
         "assignment": "Uppdrag",
+        "jobs_board": "Jobbannonser",
         "creator": "Creator-konto",
         "messaging": "Meddelanden"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "Ett nytt meddelande från creatorn",
         "message_relationship_received_by_creator": "Ett nytt direktmeddelande från byrån",
         "message_relationship_received_by_agency": "Ett nytt direktmeddelande från skaparen",
-        "campaign_job_posted": "Ett nytt jobb publiceras"
+        "campaign_job_posted": "Ett nytt jobb publiceras",
+        "campaign_application_submitted": "En creator söker en kampanj",
+        "campaign_application_accepted": "En ansökan accepteras",
+        "campaign_application_rejected": "En ansökan avslås"
       }
     }
   }

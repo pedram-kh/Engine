@@ -87,4 +87,40 @@ return [
         'cta' => 'View the job',
         'ignore' => 'You are receiving this because you are on the :agency roster.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'New application for :campaign',
+            'greeting' => 'Hi :name,',
+            'body' => ':creator applied to ":campaign". Open the campaign to review the application and send an offer.',
+            'cta' => 'Review the application',
+        ],
+        'accepted' => [
+            'subject' => 'Your application for :campaign was accepted',
+            'greeting' => 'Hi :name,',
+            'body' => ':agency accepted your application for ":campaign" and sent you an offer. Open the assignment to review the terms, then accept or decline.',
+            'cta' => 'View the offer',
+        ],
+        'rejected' => [
+            'subject' => 'An update on your application for :campaign',
+            'greeting' => 'Hi :name,',
+            'body_agency_rejected' => 'Thank you for applying to ":campaign". You were not selected for this job. New jobs are posted to your board regularly.',
+            'body_campaign_closed' => 'Thank you for applying to ":campaign". The campaign has closed, so your application will not be taken forward. New jobs are posted to your board regularly.',
+            'cta' => 'View your jobs board',
+        ],
+    ],
 ];

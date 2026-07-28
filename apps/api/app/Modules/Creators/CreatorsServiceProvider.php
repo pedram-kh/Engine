@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Creators;
 
+use App\Modules\Creators\Features\ApplicationNotificationsEnabled;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
@@ -258,6 +259,7 @@ final class CreatorsServiceProvider extends ServiceProvider
         Feature::define(PerCampaignContractEnabled::NAME, PerCampaignContractEnabled::default());
         Feature::define(IncompleteCreatorNudgeEnabled::NAME, IncompleteCreatorNudgeEnabled::default());
         Feature::define(JobPostedNotificationsEnabled::NAME, JobPostedNotificationsEnabled::default());
+        Feature::define(ApplicationNotificationsEnabled::NAME, ApplicationNotificationsEnabled::default());
     }
 
     private function registerRoutes(): void

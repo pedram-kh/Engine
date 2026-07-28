@@ -83,4 +83,40 @@ return [
         'cta' => 'Visa jobbet',
         'ignore' => 'Du får det här meddelandet eftersom du finns på kreatörslistan hos :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Ny ansökan till :campaign',
+            'greeting' => 'Hej :name,',
+            'body' => ':creator har sökt ”:campaign”. Öppna kampanjen för att granska ansökan och skicka ett erbjudande.',
+            'cta' => 'Granska ansökan',
+        ],
+        'accepted' => [
+            'subject' => 'Din ansökan till :campaign har accepterats',
+            'greeting' => 'Hej :name,',
+            'body' => ':agency har accepterat din ansökan till ”:campaign” och skickat dig ett erbjudande. Öppna uppdraget för att läsa villkoren och tacka ja eller nej.',
+            'cta' => 'Visa erbjudandet',
+        ],
+        'rejected' => [
+            'subject' => 'Nytt om din ansökan till :campaign',
+            'greeting' => 'Hej :name,',
+            'body_agency_rejected' => 'Tack för din ansökan till ”:campaign”. Du blev inte vald till det här jobbet. Nya jobb publiceras löpande på din tavla.',
+            'body_campaign_closed' => 'Tack för din ansökan till ”:campaign”. Kampanjen är avslutad, så din ansökan går inte vidare. Nya jobb publiceras löpande på din tavla.',
+            'cta' => 'Visa jobbannonser',
+        ],
+    ],
 ];

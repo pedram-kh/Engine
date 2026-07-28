@@ -31,6 +31,9 @@
       "agency_creator_relation_admin_connected": "Catalystin ylläpitäjä yhdisti sinut kontaktiin {agency_name}.",
       "agency_creator_relation_disconnected": "Yhteytesi käyttäjään {counterparty_name} on päättynyt.",
       "campaign_job_posted": "{agency_name} julkaisi uuden työn: {campaign_name}.",
+      "campaign_application_submitted": "{creator_name} haki työhön {campaign_name}.",
+      "campaign_application_accepted": "{agency_name} hyväksyi hakemuksesi työhön {campaign_name}.",
+      "campaign_application_rejected": "Hakemuksesi työhön {campaign_name} ei tullut valituksi.",
       "fallback": "You have a new notification."
     },
     "preferences": {
@@ -44,6 +47,7 @@
       "saveError": "Couldn't save your notification settings. Please try again.",
       "groups": {
         "assignment": "Tehtäväs",
+        "jobs_board": "Työpaikat",
         "creator": "Luoja account",
         "messaging": "Viestit"
       },
@@ -64,7 +68,10 @@
         "message_received_by_agency": "A new message from the creator",
         "message_relationship_received_by_creator": "Uusi suoraviesti toimistolta",
         "message_relationship_received_by_agency": "Uusi suoraviesti tekijältä",
-        "campaign_job_posted": "Uusi työ julkaistaan"
+        "campaign_job_posted": "Uusi työ julkaistaan",
+        "campaign_application_submitted": "Sisällöntuottaja hakee kampanjaan",
+        "campaign_application_accepted": "Hakemus hyväksytään",
+        "campaign_application_rejected": "Hakemus hylätään"
       }
     }
   }

@@ -52,6 +52,13 @@ export type NotificationType =
   | 'agency_creator_relation.admin_connected'
   | 'agency_creator_relation.disconnected'
   | 'campaign.job_posted'
+  // AH-058 (Jobs Board chunk 4, D6) — the three application verbs. `submitted`
+  // reaches the agency; `accepted` and `rejected` reach the creator. `rejected`
+  // has two emit sites (the agency's answer and the campaign-terminal
+  // auto-reject) distinguished by `data.cause` — see the FE registry.
+  | 'campaign_application.submitted'
+  | 'campaign_application.accepted'
+  | 'campaign_application.rejected'
 
 /** The acting user who drove the event, when one exists (null for system-driven). */
 export interface NotificationActor {

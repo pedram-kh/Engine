@@ -83,4 +83,40 @@ return [
         'cta' => 'Voir l’offre',
         'ignore' => 'Vous recevez ce message parce que vous faites partie du portefeuille de créateurs de :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Nouvelle candidature pour :campaign',
+            'greeting' => 'Bonjour :name,',
+            'body' => ':creator a postulé à « :campaign ». Ouvrez la campagne pour examiner la candidature et envoyer une offre.',
+            'cta' => 'Examiner la candidature',
+        ],
+        'accepted' => [
+            'subject' => 'Votre candidature pour :campaign a été acceptée',
+            'greeting' => 'Bonjour :name,',
+            'body' => ':agency a accepté votre candidature pour « :campaign » et vous a envoyé une offre. Ouvrez la mission pour consulter les conditions, puis acceptez ou refusez.',
+            'cta' => 'Voir l\'offre',
+        ],
+        'rejected' => [
+            'subject' => 'Des nouvelles de votre candidature pour :campaign',
+            'greeting' => 'Bonjour :name,',
+            'body_agency_rejected' => 'Merci d\'avoir postulé à « :campaign ». Votre candidature n\'a pas été retenue pour cette offre. De nouvelles offres sont publiées régulièrement sur votre tableau.',
+            'body_campaign_closed' => 'Merci d\'avoir postulé à « :campaign ». La campagne est clôturée, votre candidature ne sera donc pas poursuivie. De nouvelles offres sont publiées régulièrement sur votre tableau.',
+            'cta' => 'Voir les offres d\'emploi',
+        ],
+    ],
 ];

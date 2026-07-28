@@ -83,4 +83,40 @@ return [
         'cta' => 'Ver o trabalho',
         'ignore' => 'Está a receber esta mensagem porque faz parte da lista de criadores da :agency.',
     ],
+    // AH-058 (Jobs Board chunk 4, D6) — the three application mails. All three
+    // are queued and localized at queue time to the recipient's
+    // preferred_language (a worker has no request locale), and all three are
+    // gated by the `application_notifications_enabled` Pennant flag on the MAIL
+    // leg only — the in-app rows write regardless.
+    //
+    // `rejected` carries TWO body variants selected by
+    // ApplicationRejectionCause (`body_agency_rejected` / `body_campaign_closed`)
+    // under ONE subject, the draft-reviewed `body_ . $outcome` precedent: the
+    // recipient's question is the same either way, and two mailables would double
+    // 24 locales of copy to express one sentence of difference.
+    //
+    // ⚠ No agency-supplied reason exists anywhere in the reject copy, by design
+    // (D4): none is collected or stored, and the audit row plus its actor is the
+    // internal record.
+    'campaign_application' => [
+        'submitted' => [
+            'subject' => 'Nova candidatura para :campaign',
+            'greeting' => 'Olá :name,',
+            'body' => ':creator candidatou-se a «:campaign». Abra a campanha para analisar a candidatura e enviar uma proposta.',
+            'cta' => 'Analisar a candidatura',
+        ],
+        'accepted' => [
+            'subject' => 'A sua candidatura a :campaign foi aceite',
+            'greeting' => 'Olá :name,',
+            'body' => 'A :agency aceitou a sua candidatura a «:campaign» e enviou-lhe uma proposta. Abra a tarefa para consultar as condições e aceitar ou recusar.',
+            'cta' => 'Ver a proposta',
+        ],
+        'rejected' => [
+            'subject' => 'Novidades sobre a sua candidatura a :campaign',
+            'greeting' => 'Olá :name,',
+            'body_agency_rejected' => 'Obrigado pela sua candidatura a «:campaign». Não foi selecionado para este trabalho. São publicados novos trabalhos no seu painel com regularidade.',
+            'body_campaign_closed' => 'Obrigado pela sua candidatura a «:campaign». A campanha foi encerrada, pelo que a sua candidatura não seguirá em frente. São publicados novos trabalhos no seu painel com regularidade.',
+            'cta' => 'Ver as ofertas de trabalho',
+        ],
+    ],
 ];

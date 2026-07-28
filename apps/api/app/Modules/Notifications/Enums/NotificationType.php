@@ -98,12 +98,13 @@ enum NotificationType: string
     // messaging types need: the agency performed the listing, so it is not news
     // to them, and a type nobody receives is a toggle nobody should be offered.
     //
-    // Grouped under `assignment` in the prefs UI rather than a fourth group. A
-    // new group has to earn its keep, and one type does not: `assignment` is
-    // already where the creator's campaign-work notifications live, which is
-    // exactly what a job posting is. The label tension ("Assignments" heading
-    // over a job-posted toggle) is real and accepted; the group splits when a
-    // SECOND jobs-board type exists to split with.
+    // ⚠ MOVED, AH-058 (chunk 4, Q5): grouped under `jobs_board`, not
+    // `assignment`. Chunk 3 grouped it under `assignment` because one type does
+    // not earn a group, and wrote the condition for revisiting down — "the group
+    // splits when a SECOND jobs-board type exists to split with". Chunk 4 adds
+    // three, so the condition is met and the accepted label tension
+    // ("Assignments" heading over a job-posted toggle) is resolved rather than
+    // multiplied by four.
     //
     // Toggleable in_app (NOT always-on): a job alert is promotional in
     // character, so a creator who does not want it must be able to stop it.
@@ -111,6 +112,42 @@ enum NotificationType: string
     // never been wired through preference reads platform-wide. See the review's
     // production posture and the tech-debt entry.
     case CampaignJobPosted = 'campaign.job_posted';
+
+    // AH-058 (Jobs Board chunk 4, D6) — the three application verbs, the loop's
+    // other half. `submitted` is the one chunk 3 deliberately deferred: its
+    // AuditAction has been live since chunk 3 and only now gains a type, because
+    // the agency surface that acts on it (the Applications tab) ships here.
+    //
+    // Directions are NOT symmetric, and that is why there are three types and
+    // not one:
+    //   - `submitted` reaches the AGENCY (`Agency::notifiableMembers()` —
+    //     admins + managers). A creator applying is not news to the creator.
+    //     ⚠ Staff are excluded, per that method's load-bearing exclusion, so an
+    //     agency staff member who may invite is not told when someone applies.
+    //     Pre-existing asymmetry, recorded rather than fixed here.
+    //   - `accepted` / `rejected` reach the CREATOR. The agency performed the
+    //     action, so it is not news to them.
+    // Each verb therefore has exactly one recipient role and one honest toggle;
+    // a single `campaign_application.answered` type would force one static
+    // recipient and leave the other side with a row it cannot silence.
+    //
+    // `rejected` is emitted by TWO sites (the agency's reject, and the
+    // campaign-terminal auto-reject) with a `cause` in the data bag choosing the
+    // mail body variant. One type, two causes — see AuditAction.
+    //
+    // Grouped under `jobs_board` in the prefs UI, which is the group this
+    // chunk creates: `campaign.job_posted`'s docblock above wrote the trigger
+    // ("the group splits when a SECOND jobs-board type exists to split with")
+    // and three of them is that second. It moves with them.
+    //
+    // ⚠ All three ALSO send mail, and the mail half is gated by the
+    // `application_notifications_enabled` Pennant flag while the in-app half is
+    // not: the flag gates mail; in-app honours the recipient's own preference
+    // (a disabled `in_app` toggle still writes nothing). The mail channel is
+    // still not preference-gated platform-wide — see docs/tech-debt.md.
+    case CampaignApplicationSubmitted = 'campaign_application.submitted';
+    case CampaignApplicationAccepted = 'campaign_application.accepted';
+    case CampaignApplicationRejected = 'campaign_application.rejected';
 
     /**
      * The AuditAction this notification type mirrors. Proves the one-vocabulary

@@ -10,6 +10,7 @@ use App\Modules\Audit\Facades\Audit;
 use App\Modules\Campaigns\Enums\CampaignApplicationStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignApplication;
+use App\Modules\Campaigns\Services\CampaignApplicationNotifier;
 use App\Modules\Campaigns\Services\JobsBoardVisibility;
 use App\Modules\Creators\Http\Requests\ApplyToJobRequest;
 use App\Modules\Creators\Http\Resources\CreatorJobCardResource;
@@ -205,8 +206,11 @@ final class CreatorJobBoardController
      *    translated into the SAME 409 rather than a 500 (§5.6). The check is
      *    the friendly path; the constraint is the correctness.
      */
-    public function apply(ApplyToJobRequest $request, string $campaign): JsonResponse
-    {
+    public function apply(
+        ApplyToJobRequest $request,
+        string $campaign,
+        CampaignApplicationNotifier $notifier,
+    ): JsonResponse {
         $creator = $this->requireCreator($request);
 
         $job = $this->visibility->findVisible($creator, $campaign);
@@ -257,6 +261,21 @@ final class CreatorJobBoardController
             ],
             agencyId: $job->agency_id,
         );
+
+        // AH-058 (chunk 4, D6) — the agency hears about it. Chunk 3 wrote this
+        // audit verb and deliberately deferred its notification until the agency
+        // surface that acts on it existed; it does now (the Applications tab).
+        //
+        // AFTER the write, never inside a transaction: `after_commit => false`
+        // means a queued mail is visible to a worker before any commit. This path
+        // has no transaction of its own (one insert, guarded by the unique index),
+        // so "after the write" is the same statement here — the ordering is
+        // spelled out for the same reason the accept/reject paths spell it out.
+        //
+        // The campaign is handed over pre-loaded because the notifier's own
+        // fallback read is unscoped-by-agency for the queued auto-reject case;
+        // this path already holds the visibility-verified row.
+        $notifier->submitted($application->setRelation('campaign', $job));
 
         return response()->json([
             'data' => [

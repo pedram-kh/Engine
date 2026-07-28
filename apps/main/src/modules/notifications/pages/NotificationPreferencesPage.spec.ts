@@ -90,20 +90,34 @@ describe('NotificationPreferencesPage', () => {
     wrapper.unmount()
   })
 
-  it('role filter — a CREATOR sees 9 types / 10 toggles across 3 groups (messaging has the digest)', async () => {
+  it('role filter — a CREATOR sees 11 types / 12 toggles across 4 groups (messaging has the digest)', async () => {
     vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
     const wrapper = mountPage('creator')
     await flushPromises()
 
-    // 9 types, 10 toggles: 8 in_app-only types (incl. the AH-010 relationship
-    // DM and AH-056's campaign.job_posted) + the campaign messaging type's
-    // in_app + digest pair (D-10).
-    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(9)
-    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(10)
-    // All three groups present (assignment + creator + messaging).
+    // 11 types, 12 toggles: 10 in_app-only types (incl. the AH-010 relationship
+    // DM and the three creator-facing jobs-board types — AH-056's
+    // campaign.job_posted plus AH-058's accepted/rejected) + the campaign
+    // messaging type's in_app + digest pair (D-10).
+    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(11)
+    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(12)
+    // All four groups present — AH-058 (Q5) split `jobs_board` out of
+    // `assignment`, honouring the trigger AH-056 recorded in the enum.
     expect(wrapper.find('[data-test="prefs-group-assignment"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="prefs-group-jobs_board"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="prefs-group-creator"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="prefs-group-messaging"]').exists()).toBe(true)
+    // The two AH-058 creator answers are offered here, under jobs_board.
+    expect(
+      wrapper.find('[data-test="prefs-toggle-campaign_application.accepted-in_app"]').exists(),
+    ).toBe(true)
+    expect(
+      wrapper.find('[data-test="prefs-toggle-campaign_application.rejected-in_app"]').exists(),
+    ).toBe(true)
+    // …and the agency-facing application verb is not (no dead control).
+    expect(
+      wrapper.find('[data-test="prefs-toggle-campaign_application.submitted-in_app"]').exists(),
+    ).toBe(false)
     // The messaging type exposes BOTH channels (digest co-delivered, D-10).
     expect(
       wrapper.find('[data-test="prefs-toggle-message.received_by_creator-in_app"]').exists(),
@@ -121,16 +135,26 @@ describe('NotificationPreferencesPage', () => {
     wrapper.unmount()
   })
 
-  it('role filter — an AGENCY user sees 4 types / 5 toggles (assignment + messaging w/ digest)', async () => {
+  it('role filter — an AGENCY user sees 5 types / 6 toggles (assignment + jobs board + messaging w/ digest)', async () => {
     vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
     const wrapper = mountPage('agency_user')
     await flushPromises()
 
-    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(4)
-    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(5)
+    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(5)
+    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(6)
     expect(
       wrapper.find('[data-test="prefs-toggle-assignment.draft_submitted-in_app"]').exists(),
     ).toBe(true)
+    // AH-058 — the agency's own jobs-board toggle: a creator applied. This is
+    // the first agency-facing type in the jobs_board group, which is why the
+    // group heading could not stay "Assignments".
+    expect(wrapper.find('[data-test="prefs-group-jobs_board"]').exists()).toBe(true)
+    expect(
+      wrapper.find('[data-test="prefs-toggle-campaign_application.submitted-in_app"]').exists(),
+    ).toBe(true)
+    expect(
+      wrapper.find('[data-test="prefs-toggle-campaign_application.accepted-in_app"]').exists(),
+    ).toBe(false)
     expect(
       wrapper.find('[data-test="prefs-toggle-message.received_by_agency-digest"]').exists(),
     ).toBe(true)
@@ -187,8 +211,8 @@ describe('NotificationPreferencesPage', () => {
 
     expect(notificationsApi.updatePreferences).toHaveBeenCalledTimes(1)
     const payload = vi.mocked(notificationsApi.updatePreferences).mock.calls[0]?.[0]
-    // A creator submits all 10 (type, channel) toggles — 9 in_app + 1 digest.
-    expect(payload?.preferences).toHaveLength(10)
+    // A creator submits all 12 (type, channel) toggles — 11 in_app + 1 digest.
+    expect(payload?.preferences).toHaveLength(12)
     expect(payload?.preferences.filter((p) => p.channel === 'digest')).toHaveLength(1)
     // The flipped in_app rides false; the opted-in digest rides true.
     expect(

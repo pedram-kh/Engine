@@ -54,7 +54,7 @@ export type NotificationRecipientRole = 'creator' | 'agency'
 export type NotificationReach = NotificationRecipientRole | 'both'
 
 /** The Ch3b prefs-UI category a live type is grouped under. */
-export type NotificationPreferenceGroup = 'assignment' | 'creator' | 'messaging'
+export type NotificationPreferenceGroup = 'assignment' | 'jobs_board' | 'creator' | 'messaging'
 
 /**
  * A live type's preferences row: the group it appears under and the channels it
@@ -186,25 +186,52 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
     recipient: 'both',
     preference: null,
   },
-  // Jobs board (AH-056, D8) — a rostered agency listed a new job. Single
-  // direction: the agency did the listing, so only the creator is notified and
-  // only creators get the toggle.
+  // Jobs board (AH-056 D8 + AH-058 D6) — the four jobs-board types, now their
+  // own group.
   //
-  // Grouped under `assignment` rather than a fourth group. One type does not
-  // earn a group of its own, and `assignment` is already the creator's
-  // campaign-work category — which is what a job posting is. The label tension
-  // is accepted, not overlooked; the split happens when a second jobs-board
-  // type exists to split with.
+  // ⚠ `campaign.job_posted` MOVED here from `assignment` (AH-058, Q5). AH-056
+  // grouped it under `assignment` because one type does not earn a group, and
+  // wrote the trigger for revisiting down: the split happens when a second
+  // jobs-board type exists to split with. Chunk 4 adds three, so the accepted
+  // label tension ("Assignments" over a job-posted toggle) is resolved rather
+  // than multiplied by four.
   //
-  // `in_app` only. The fan-out ALSO sends mail, but the email channel has never
-  // been wired through preference reads on this platform, so a `mail` entry
-  // here would be a dead control — worse than no control, because it would read
-  // as a promise. The v1 containment is the global Pennant flag + the per-run
-  // cap + rostered-only recipients; see docs/tech-debt.md.
+  // Directions are asymmetric and each type has exactly ONE recipient role, so
+  // each toggle is honest for whoever sees it: `submitted` reaches the AGENCY (a
+  // creator applying is not news to the creator), `job_posted` / `accepted` /
+  // `rejected` reach the CREATOR (the agency performed those acts).
+  //
+  // `in_app` only, all four. All four ALSO send mail, but the email channel has
+  // never been wired through preference reads on this platform, so a `mail`
+  // entry here would be a dead control — worse than none, because it would read
+  // as a promise. Mail containment is the Pennant flags
+  // (`job_posted_notifications_enabled`, `application_notifications_enabled`);
+  // see docs/tech-debt.md.
   'campaign.job_posted': {
     templateKey: 'notifications.types.campaign_job_posted',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_ONLY },
+    preference: { group: 'jobs_board', channels: IN_APP_ONLY },
+  },
+  'campaign_application.submitted': {
+    templateKey: 'notifications.types.campaign_application_submitted',
+    recipient: 'agency',
+    preference: { group: 'jobs_board', channels: IN_APP_ONLY },
+  },
+  'campaign_application.accepted': {
+    templateKey: 'notifications.types.campaign_application_accepted',
+    recipient: 'creator',
+    preference: { group: 'jobs_board', channels: IN_APP_ONLY },
+  },
+  // Two emit sites, one type: the agency's reject and the campaign-terminal
+  // auto-reject. The template reads `campaign_name` only — `data.cause`
+  // (`agency_rejected` | `campaign_closed`) is part of the contract and selects
+  // the MAIL body variant; the in-app line is identical either way, because the
+  // answer a creator needs is the same and a per-cause in-app sentence would
+  // explain a distinction they cannot act on.
+  'campaign_application.rejected': {
+    templateKey: 'notifications.types.campaign_application_rejected',
+    recipient: 'creator',
+    preference: { group: 'jobs_board', channels: IN_APP_ONLY },
   },
 }
 
@@ -244,6 +271,11 @@ export interface NotificationPreferenceGroupView {
 /** Stable display order of the prefs groups. */
 const PREFERENCE_GROUP_ORDER: readonly NotificationPreferenceGroup[] = [
   'assignment',
+  // Jobs board sits next to assignments because it IS campaign work — the two
+  // read as one story (a job is posted, applied to, answered; then the
+  // assignment lifecycle takes over) — and ahead of the account/messaging
+  // groups, which are about the user rather than the work.
+  'jobs_board',
   'creator',
   'messaging',
 ]
