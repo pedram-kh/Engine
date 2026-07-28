@@ -486,7 +486,9 @@
           "website": "Brändin verkkosivusto",
           "apply": "Hae",
           "appliedNotice": "Olet hakenut tätä työtä. Toimisto on sinuun yhteydessä.",
-          "rejectedNotice": "Sinua ei valittu tähän työhön."
+          "rejectedNotice": "Sinua ei valittu tähän työhön.",
+          "acceptedNotice": "Sinut on valittu tähän työhön — tarjouksesi on valmis tarkasteltavaksi.",
+          "viewOffer": "Näytä tarjous"
         },
         "applyDialog": {
           "title": "Hae tätä työtä",

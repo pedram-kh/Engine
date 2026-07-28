@@ -486,7 +486,9 @@
           "website": "Web-stranica brenda",
           "apply": "Prijavi se",
           "appliedNotice": "Prijavio si se na ovaj posao. Agencija će ti se javiti.",
-          "rejectedNotice": "Nisi odabran za ovaj posao."
+          "rejectedNotice": "Nisi odabran za ovaj posao.",
+          "acceptedNotice": "Odabrani ste za ovaj posao — vaša je ponuda spremna za pregled.",
+          "viewOffer": "Pogledaj ponudu"
         },
         "applyDialog": {
           "title": "Prijavi se na ovaj posao",

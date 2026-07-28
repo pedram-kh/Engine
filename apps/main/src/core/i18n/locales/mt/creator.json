@@ -486,7 +486,9 @@
           "website": "Websajt tal-brand",
           "apply": "Applika",
           "appliedNotice": "Applikajt għal dan ix-xogħol. L-aġenzija tikkuntattjak.",
-          "rejectedNotice": "Ma ġejtx magħżul għal dan ix-xogħol."
+          "rejectedNotice": "Ma ġejtx magħżul għal dan ix-xogħol.",
+          "acceptedNotice": "Ġejt magħżul għal dan ix-xogħol — l-offerta tiegħek hija lesta biex tarahha.",
+          "viewOffer": "Ara l-offerta"
         },
         "applyDialog": {
           "title": "Applika għal dan ix-xogħol",

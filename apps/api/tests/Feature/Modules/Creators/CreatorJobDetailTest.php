@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\BrandCreatorBlacklist;
+use App\Modules\Campaigns\Enums\AssignmentStatus;
+use App\Modules\Campaigns\Enums\CampaignApplicationStatus;
 use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Campaigns\Models\CampaignApplication;
+use App\Modules\Campaigns\Models\CampaignAssignment;
+use App\Modules\Creators\Database\Factories\CreatorFactory;
 use App\Modules\Creators\Enums\ApplicationStatus;
 use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Identity\Models\User;
@@ -53,6 +58,10 @@ const DETAIL_KEYS = [
     'listing_languages',
     'listing_regions',
     'listing_examples_url',
+    // The D7 bridge (chunk 4, AH-058). Present on EVERY detail render, null
+    // unless the caller's pair has an assignment — a conditional key would make
+    // this keyset data-dependent and blunt the accretion guard.
+    'assignment_ulid',
 ];
 
 // ── The happy path ──────────────────────────────────────────────────────────
@@ -252,6 +261,97 @@ it('NEVER lets listed_at decide visibility — the scope is the sole authority',
     $f->campaign->forceFill(['listed_at' => now(), 'listed_on_jobs_board' => false])->save();
     $this->actingAs($f->user)->getJson(CreatorJobFixture::URL)->assertOk()->assertJsonCount(0, 'data');
     $this->actingAs($f->user)->getJson($f->jobUrl())->assertNotFound();
+});
+
+// ── D7 — the assignment bridge (chunk 4, AH-058) ────────────────────────────
+
+it('emits a null assignment_ulid until the pair actually has an assignment', function (): void {
+    $f = CreatorJobFixture::make();
+
+    // Never applied.
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()
+        ->assertJsonPath('data.attributes.assignment_ulid', null);
+
+    // Applied, still pending — an application is not an engagement.
+    CampaignApplication::factory()->status(CampaignApplicationStatus::Pending)->createOne([
+        'campaign_id' => $f->campaign->id,
+        'creator_id' => $f->creator->id,
+    ]);
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()
+        ->assertJsonPath('data.attributes.application_status', 'pending')
+        ->assertJsonPath('data.attributes.assignment_ulid', null);
+});
+
+it('emits the caller OWN assignment ULID once the agency has accepted them', function (): void {
+    $f = CreatorJobFixture::make();
+
+    CampaignApplication::factory()->status(CampaignApplicationStatus::Accepted)->createOne([
+        'campaign_id' => $f->campaign->id,
+        'creator_id' => $f->creator->id,
+    ]);
+
+    $assignment = CampaignAssignment::factory()->status(AssignmentStatus::Invited)->createOne([
+        'agency_id' => $f->agency->id,
+        'campaign_id' => $f->campaign->id,
+        'brand_id' => $f->brand->id,
+        'creator_id' => $f->creator->id,
+    ]);
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()
+        ->assertJsonPath('data.attributes.application_status', 'accepted')
+        ->assertJsonPath('data.attributes.assignment_ulid', $assignment->ulid);
+});
+
+it('derives the bridge from the ASSIGNMENT, never from the accepted status', function (): void {
+    $f = CreatorJobFixture::make();
+
+    // An accepted application whose assignment is gone (the campaign's
+    // engagement was unwound) still renders — with no link to offer. The page
+    // degrades to the plain notice rather than sending the creator to a 404.
+    CampaignApplication::factory()->status(CampaignApplicationStatus::Accepted)->createOne([
+        'campaign_id' => $f->campaign->id,
+        'creator_id' => $f->creator->id,
+    ]);
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()
+        ->assertJsonPath('data.attributes.application_status', 'accepted')
+        ->assertJsonPath('data.attributes.assignment_ulid', null);
+});
+
+it('never bridges to ANOTHER creator assignment on the same campaign', function (): void {
+    $f = CreatorJobFixture::make();
+
+    $otherCreator = CreatorFactory::new()->approved()->createOne();
+
+    $theirs = CampaignAssignment::factory()->status(AssignmentStatus::Invited)->createOne([
+        'agency_id' => $f->agency->id,
+        'campaign_id' => $f->campaign->id,
+        'brand_id' => $f->brand->id,
+        'creator_id' => $otherCreator->id,
+    ]);
+
+    // BREAK-REVERT: drop the subquery's `creator_id` filter and this reads
+    // `$theirs->ulid` — one creator handed another's assignment identifier.
+    $attributes = $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()->json('data.attributes');
+
+    expect($attributes['assignment_ulid'])->toBeNull()
+        ->and(json_encode($attributes, JSON_THROW_ON_ERROR))->not->toContain($theirs->ulid);
+});
+
+it('keeps the bridge OFF the card — the detail owns the link', function (): void {
+    $f = CreatorJobFixture::make();
+
+    CampaignAssignment::factory()->status(AssignmentStatus::Invited)->createOne([
+        'agency_id' => $f->agency->id,
+        'campaign_id' => $f->campaign->id,
+        'brand_id' => $f->brand->id,
+        'creator_id' => $f->creator->id,
+    ]);
+
+    $card = $this->actingAs($f->user)->getJson(CreatorJobFixture::URL)->assertOk()->json('data.0.attributes');
+
+    expect(array_keys($card))->toBe(CARD_KEYS);
 });
 
 it('requires authentication on the detail too', function (): void {

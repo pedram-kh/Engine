@@ -486,7 +486,9 @@
           "website": "Web de la marca",
           "apply": "Aplicar",
           "appliedNotice": "Has aplicado a esta oferta. La agencia se pondrá en contacto contigo.",
-          "rejectedNotice": "No has sido seleccionado para esta oferta."
+          "rejectedNotice": "No has sido seleccionado para esta oferta.",
+          "acceptedNotice": "Te han seleccionado para este trabajo: tu oferta está lista para revisar.",
+          "viewOffer": "Ver oferta"
         },
         "applyDialog": {
           "title": "Aplicar a esta oferta",

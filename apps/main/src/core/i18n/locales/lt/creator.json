@@ -486,7 +486,9 @@
           "website": "Prekės ženklo svetainė",
           "apply": "Kandidatuoti",
           "appliedNotice": "Kandidatavai į šį darbą. Agentūra su tavimi susisieks.",
-          "rejectedNotice": "Į šį darbą nebuvai pasirinktas."
+          "rejectedNotice": "Į šį darbą nebuvai pasirinktas.",
+          "acceptedNotice": "Jūs buvote atrinkti šiam darbui — jūsų pasiūlymas parengtas peržiūrėti.",
+          "viewOffer": "Peržiūrėti pasiūlymą"
         },
         "applyDialog": {
           "title": "Kandidatuoti į šį darbą",

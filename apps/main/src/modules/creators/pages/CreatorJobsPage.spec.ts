@@ -152,6 +152,17 @@ describe('CreatorJobsPage', () => {
     expect(wrapper.find('[data-testid="creator-job-applied-01JOB1"]').text()).toBe('Not selected')
   })
 
+  it('renders an accepted application as "Accepted" (AH-058 D7 — a c3 chip, pinned)', async () => {
+    // The accepted chip is a side effect of the c3 chip being status-keyed, and
+    // chunk 4 is the release that can actually produce the state. Asserted here
+    // rather than rebuilt: the card's job is to get the creator to the detail
+    // page, which owns the link to the offer.
+    mockApi.list.mockResolvedValue(envelope([card({ application_status: 'accepted' })]) as never)
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-applied-01JOB1"]').text()).toBe('Accepted')
+  })
+
   it('shows the empty state — an empty board is a state, not an error', async () => {
     mockApi.list.mockResolvedValue(envelope([]) as never)
     const wrapper = await mountPage()

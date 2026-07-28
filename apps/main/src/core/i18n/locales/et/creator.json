@@ -486,7 +486,9 @@
           "website": "Brändi veebisait",
           "apply": "Kandideeri",
           "appliedNotice": "Kandideerisid sellele tööle. Agentuur võtab sinuga ühendust.",
-          "rejectedNotice": "Sa ei osutunud sellele tööle valituks."
+          "rejectedNotice": "Sa ei osutunud sellele tööle valituks.",
+          "acceptedNotice": "Teid valiti sellele tööle — teie pakkumine on ülevaatamiseks valmis.",
+          "viewOffer": "Vaata pakkumist"
         },
         "applyDialog": {
           "title": "Kandideeri sellele tööle",

@@ -486,7 +486,9 @@
           "website": "Spletna stran znamke",
           "apply": "Prijavi se",
           "appliedNotice": "Prijavil si se na to delo. Agencija se ti bo oglasila.",
-          "rejectedNotice": "Za to delo nisi bil izbran."
+          "rejectedNotice": "Za to delo nisi bil izbran.",
+          "acceptedNotice": "Izbrani ste bili za to delo — vaša ponudba je pripravljena za ogled.",
+          "viewOffer": "Ogled ponudbe"
         },
         "applyDialog": {
           "title": "Prijavi se na to delo",

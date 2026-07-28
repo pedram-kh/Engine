@@ -486,7 +486,9 @@
           "website": "Strona marki",
           "apply": "Aplikuj",
           "appliedNotice": "Zgłosiłeś się na to zlecenie. Agencja się z tobą skontaktuje.",
-          "rejectedNotice": "Nie zostałeś wybrany na to zlecenie."
+          "rejectedNotice": "Nie zostałeś wybrany na to zlecenie.",
+          "acceptedNotice": "Zostałeś wybrany do tego zlecenia — Twoja oferta jest gotowa do przejrzenia.",
+          "viewOffer": "Zobacz ofertę"
         },
         "applyDialog": {
           "title": "Aplikuj na to zlecenie",

@@ -486,7 +486,9 @@
           "website": "Site da marca",
           "apply": "Candidatar-me",
           "appliedNotice": "Candidataste-te a esta oferta. A agência entrará em contacto.",
-          "rejectedNotice": "Não foste selecionado para esta oferta."
+          "rejectedNotice": "Não foste selecionado para esta oferta.",
+          "acceptedNotice": "Foi selecionado para este trabalho — a sua proposta está pronta para consulta.",
+          "viewOffer": "Ver proposta"
         },
         "applyDialog": {
           "title": "Candidatar-me a esta oferta",

@@ -486,7 +486,9 @@
           "website": "Website van het merk",
           "apply": "Solliciteren",
           "appliedNotice": "Je hebt op deze opdracht gesolliciteerd. Het bureau neemt contact met je op.",
-          "rejectedNotice": "Je bent niet gekozen voor deze opdracht."
+          "rejectedNotice": "Je bent niet gekozen voor deze opdracht.",
+          "acceptedNotice": "Je bent geselecteerd voor deze opdracht — je aanbod staat klaar.",
+          "viewOffer": "Aanbod bekijken"
         },
         "applyDialog": {
           "title": "Solliciteren op deze opdracht",

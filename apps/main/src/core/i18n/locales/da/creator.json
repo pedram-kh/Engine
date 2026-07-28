@@ -486,7 +486,9 @@
           "website": "Brandets hjemmeside",
           "apply": "Søg",
           "appliedNotice": "Du har søgt dette job. Bureauet kontakter dig.",
-          "rejectedNotice": "Du blev ikke valgt til dette job."
+          "rejectedNotice": "Du blev ikke valgt til dette job.",
+          "acceptedNotice": "Du er blevet valgt til dette job — dit tilbud er klar til gennemsyn.",
+          "viewOffer": "Se tilbud"
         },
         "applyDialog": {
           "title": "Søg dette job",

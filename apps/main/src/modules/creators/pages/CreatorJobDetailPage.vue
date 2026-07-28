@@ -15,6 +15,11 @@
  * The Apply button is disabled once `application_status` is non-null, but that
  * is a courtesy: the server refuses regardless, which is why a stale tab that
  * missed a rejection still cannot slip a second application through.
+ *
+ * The footer renders the caller's own outcome, and chunk 4 (AH-058, D7) added
+ * the third state that was missing: `accepted` links into the assignment the
+ * agency created, so a creator is never left on a page saying "applied" while a
+ * real offer waits on another surface.
  */
 
 import { ApiError, type CreatorJobDetailResource } from '@catalyst/api-client'
@@ -40,6 +45,7 @@ const snackbar = ref<{ color: string; text: string } | null>(null)
 
 const ulid = computed(() => String(route.params.ulid ?? ''))
 const status = computed(() => job.value?.attributes.application_status ?? null)
+const assignmentUlid = computed(() => job.value?.attributes.assignment_ulid ?? null)
 const canApply = computed(() => job.value !== null && status.value === null)
 
 async function load(): Promise<void> {
@@ -265,6 +271,31 @@ onMounted(() => {
           data-testid="creator-job-rejected-notice"
         >
           {{ t('creator.ui.jobs.detail.rejectedNotice') }}
+        </v-alert>
+
+        <!-- The D7 bridge (AH-058) — an accepted applicant has a real offer
+             waiting elsewhere, so this notice is the way there rather than a
+             dead end saying "applied". The link appears only when the server
+             gave a ULID: an accepted application whose assignment is gone
+             degrades to the notice alone instead of a link into a 404. -->
+        <v-alert
+          v-else-if="status === 'accepted'"
+          type="success"
+          variant="tonal"
+          density="compact"
+          data-testid="creator-job-accepted-notice"
+        >
+          {{ t('creator.ui.jobs.detail.acceptedNotice') }}
+          <template v-if="assignmentUlid" #append>
+            <v-btn
+              variant="text"
+              size="small"
+              :to="{ name: 'creator.assignment.detail', params: { ulid: assignmentUlid } }"
+              data-testid="creator-job-accepted-link"
+            >
+              {{ t('creator.ui.jobs.detail.viewOffer') }}
+            </v-btn>
+          </template>
         </v-alert>
 
         <v-alert

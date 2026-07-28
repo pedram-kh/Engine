@@ -50,6 +50,7 @@ function detail(overrides: Record<string, unknown> = {}) {
         listing_languages: ['en', 'pt'],
         listing_regions: ['PT', 'ES'],
         listing_examples_url: 'https://examples.test/work',
+        assignment_ulid: null,
         brand: {
           name: 'Northwind Coffee',
           logo_url: 'https://cdn.test/logo.png',
@@ -95,6 +96,11 @@ async function mountPage() {
       {
         path: '/creator/jobs/:ulid',
         name: 'creator.job.detail',
+        component: { template: '<div />' },
+      },
+      {
+        path: '/creator/assignments/:ulid',
+        name: 'creator.assignment.detail',
         component: { template: '<div />' },
       },
     ],
@@ -277,6 +283,51 @@ describe('CreatorJobDetailPage', () => {
     )
     expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="creator-job-applied-notice"]').exists()).toBe(false)
+  })
+
+  // ── The D7 bridge (AH-058) — the third state ──────────────────────────────
+
+  it('links an accepted applicant to the offer waiting for them', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({ application_status: 'accepted', assignment_ulid: '01ASSIGN' }) as never,
+    )
+    const wrapper = await mountPage()
+
+    const notice = wrapper.find('[data-testid="creator-job-accepted-notice"]')
+    expect(notice.text()).toContain("You've been accepted")
+
+    const link = wrapper.find('[data-testid="creator-job-accepted-link"]')
+    expect(link.attributes('href')).toBe('/creator/assignments/01ASSIGN')
+
+    // The three states are mutually exclusive: an accepted applicant sees
+    // neither the "applied" holding notice nor a live Apply button.
+    expect(wrapper.find('[data-testid="creator-job-applied-notice"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="creator-job-rejected-notice"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(false)
+  })
+
+  it('degrades to the notice alone when there is no assignment to link (C6)', async () => {
+    // Accepted, but the assignment is gone. The page must not offer a link into
+    // a 404 — the notice still tells the creator the truth about the decision.
+    mockApi.show.mockResolvedValue(
+      detail({ application_status: 'accepted', assignment_ulid: null }) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-accepted-notice"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="creator-job-accepted-link"]').exists()).toBe(false)
+  })
+
+  it('never shows the accepted notice for a pending application', async () => {
+    mockApi.show.mockResolvedValue(
+      // A stale ULID next to a pending status must not promote the state: the
+      // notice branches on the STATUS, and only its link branches on the ULID.
+      detail({ application_status: 'pending', assignment_ulid: '01ASSIGN' }) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-applied-notice"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="creator-job-accepted-notice"]').exists()).toBe(false)
   })
 
   it('surfaces the two 409 codes with distinct copy', async () => {

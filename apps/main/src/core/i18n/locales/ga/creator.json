@@ -486,7 +486,9 @@
           "website": "Suíomh gréasáin an bhranda",
           "apply": "Cuir isteach",
           "appliedNotice": "Chuir tú isteach ar an bpost seo. Beidh an ghníomhaireacht i dteagmháil leat.",
-          "rejectedNotice": "Níor roghnaíodh thú don phost seo."
+          "rejectedNotice": "Níor roghnaíodh thú don phost seo.",
+          "acceptedNotice": "Roghnaíodh tú don phost seo — tá do thairiscint réidh le breathnú air.",
+          "viewOffer": "Féach ar an tairiscint"
         },
         "applyDialog": {
           "title": "Cuir isteach ar an bpost seo",

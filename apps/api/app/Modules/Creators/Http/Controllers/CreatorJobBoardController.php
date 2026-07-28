@@ -10,6 +10,7 @@ use App\Modules\Audit\Facades\Audit;
 use App\Modules\Campaigns\Enums\CampaignApplicationStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignApplication;
+use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\CampaignApplicationNotifier;
 use App\Modules\Campaigns\Services\JobsBoardVisibility;
 use App\Modules\Creators\Http\Requests\ApplyToJobRequest;
@@ -163,6 +164,10 @@ final class CreatorJobBoardController
             ->select([...self::CARD_COLUMNS, ...self::DETAIL_COLUMNS])
             ->withCount('applications')
             ->addSelect(['caller_application_status' => $this->callerApplicationSubquery($creator)])
+            // The D7 bridge — the caller's own assignment on this campaign, so
+            // an accepted applicant can reach the offer waiting for them.
+            // Detail only (the card has no link to give).
+            ->addSelect(['caller_assignment_ulid' => $this->callerAssignmentUlidSubquery($creator)])
             // One extra brand column vs the card — `website_url`, the third and
             // last brand field to cross to a creator audience (D3).
             ->with(['brand:id,name,logo_path,website_url'])
@@ -327,6 +332,36 @@ final class CreatorJobBoardController
             ->select('status')
             ->whereColumn('campaign_applications.campaign_id', 'campaigns.id')
             ->where('campaign_applications.creator_id', $creator->id)
+            ->limit(1);
+    }
+
+    /**
+     * The D7 bridge (Jobs Board chunk 4, AH-058) — the ULID of the caller's own
+     * assignment on this campaign, so an accepted applicant can walk from the
+     * job they applied to into the offer that is waiting for them. Detail only:
+     * the board card already says "Accepted", and the card's job is to get the
+     * creator to the detail page.
+     *
+     * It is derived from the ASSIGNMENT's existence, never from
+     * `application_status === 'accepted'` — the two can disagree. Emitted
+     * unconditionally (null when the pair has no assignment) so the detail
+     * keyset stays data-independent, and the page renders its accepted notice
+     * with or without the link rather than offering a link into nothing.
+     *
+     * Scoped by `creator_id` exactly as the application subquery above is.
+     * BREAK-REVERT: drop that filter and a creator reads another creator's
+     * assignment identifier. `limit(1)` is belt on top of the
+     * `unique_assignment_campaign_creator` index.
+     *
+     * @return Builder<CampaignAssignment>
+     */
+    private function callerAssignmentUlidSubquery(Creator $creator): Builder
+    {
+        return CampaignAssignment::query()
+            ->withoutGlobalScope(BelongsToAgencyScope::class)
+            ->select('ulid')
+            ->whereColumn('campaign_assignments.campaign_id', 'campaigns.id')
+            ->where('campaign_assignments.creator_id', $creator->id)
             ->limit(1);
     }
 

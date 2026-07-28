@@ -486,7 +486,9 @@
           "website": "Brand website",
           "apply": "Apply",
           "appliedNotice": "You've applied to this job. The agency will be in touch.",
-          "rejectedNotice": "You weren't selected for this job."
+          "rejectedNotice": "You weren't selected for this job.",
+          "acceptedNotice": "You've been accepted for this job — your offer is ready to review.",
+          "viewOffer": "View offer"
         },
         "applyDialog": {
           "title": "Apply to this job",

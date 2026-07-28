@@ -486,7 +486,9 @@
           "website": "Web značky",
           "apply": "Přihlásit se",
           "appliedNotice": "Na tuto nabídku ses přihlásil. Agentura se ti ozve.",
-          "rejectedNotice": "Pro tuto nabídku jsi nebyl vybrán."
+          "rejectedNotice": "Pro tuto nabídku jsi nebyl vybrán.",
+          "acceptedNotice": "Byli jste na tuto zakázku vybráni — vaše nabídka je připravena k prohlédnutí.",
+          "viewOffer": "Zobrazit nabídku"
         },
         "applyDialog": {
           "title": "Přihlásit se na tuto nabídku",

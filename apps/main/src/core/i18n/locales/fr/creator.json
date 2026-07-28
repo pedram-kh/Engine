@@ -486,7 +486,9 @@
           "website": "Site de la marque",
           "apply": "Postuler",
           "appliedNotice": "Vous avez postulé à cette offre. L'agence vous recontactera.",
-          "rejectedNotice": "Vous n'avez pas été retenu pour cette offre."
+          "rejectedNotice": "Vous n'avez pas été retenu pour cette offre.",
+          "acceptedNotice": "Vous avez été retenu·e pour cette mission — votre offre est prête à être consultée.",
+          "viewOffer": "Voir l'offre"
         },
         "applyDialog": {
           "title": "Postuler à cette offre",

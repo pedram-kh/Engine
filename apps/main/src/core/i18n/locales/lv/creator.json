@@ -486,7 +486,9 @@
           "website": "Zīmola tīmekļa vietne",
           "apply": "Pieteikties",
           "appliedNotice": "Tu pieteicies šim darbam. Aģentūra ar tevi sazināsies.",
-          "rejectedNotice": "Šim darbam tu netiki izvēlēts."
+          "rejectedNotice": "Šim darbam tu netiki izvēlēts.",
+          "acceptedNotice": "Jūs esat izvēlēts šim darbam — jūsu piedāvājums ir gatavs apskatei.",
+          "viewOffer": "Skatīt piedāvājumu"
         },
         "applyDialog": {
           "title": "Pieteikties šim darbam",

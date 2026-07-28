@@ -486,7 +486,9 @@
           "website": "A márka weboldala",
           "apply": "Jelentkezés",
           "appliedNotice": "Jelentkeztél erre a munkára. Az ügynökség hamarosan jelentkezik.",
-          "rejectedNotice": "Nem téged választottak erre a munkára."
+          "rejectedNotice": "Nem téged választottak erre a munkára.",
+          "acceptedNotice": "Kiválasztották erre a munkára – az ajánlata készen áll az áttekintésre.",
+          "viewOffer": "Ajánlat megtekintése"
         },
         "applyDialog": {
           "title": "Jelentkezés erre a munkára",

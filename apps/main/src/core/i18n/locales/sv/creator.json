@@ -486,7 +486,9 @@
           "website": "Varumärkets webbplats",
           "apply": "Sök",
           "appliedNotice": "Du har sökt det här jobbet. Byrån hör av sig.",
-          "rejectedNotice": "Du blev inte vald till det här jobbet."
+          "rejectedNotice": "Du blev inte vald till det här jobbet.",
+          "acceptedNotice": "Du har valts för det här jobbet – ditt erbjudande är klart att granskas.",
+          "viewOffer": "Visa erbjudande"
         },
         "applyDialog": {
           "title": "Sök det här jobbet",

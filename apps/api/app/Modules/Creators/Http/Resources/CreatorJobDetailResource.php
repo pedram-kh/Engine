@@ -27,6 +27,18 @@ use Illuminate\Http\Request;
  *                               creator audience (D3: the client's "link to the
  *                               brand's website" ask, detail page only). Adding
  *                               a fourth is a decision, not a patch.
+ *   - `assignment_ulid`       — the D7 bridge (chunk 4, AH-058): the caller's
+ *                               OWN assignment on this campaign, annotated by
+ *                               the controller in one correlated subquery.
+ *                               ALWAYS present, null when the pair has no
+ *                               assignment — a key that appeared only for
+ *                               accepted applicants would make the exact-keyset
+ *                               assertion data-dependent, and the page's
+ *                               accepted notice renders with or without the
+ *                               link. Never inferred from
+ *                               `application_status === 'accepted'`: the
+ *                               application and the assignment are separate
+ *                               rows and can disagree.
  *
  * Everything the card withholds, the detail withholds too. The exact-keyset
  * assertion in the feature test covers BOTH shapes.
@@ -58,8 +70,16 @@ final class CreatorJobDetailResource extends CreatorJobCardResource
                 'listing_languages' => $campaign->listing_languages,
                 'listing_regions' => $campaign->listing_regions,
                 'listing_examples_url' => $campaign->listing_examples_url,
+                'assignment_ulid' => $this->callerAssignmentUlid($campaign),
                 'brand' => $brand,
             ],
         ];
+    }
+
+    private function callerAssignmentUlid(Campaign $campaign): ?string
+    {
+        $ulid = $campaign->getAttribute('caller_assignment_ulid');
+
+        return is_string($ulid) ? $ulid : null;
     }
 }

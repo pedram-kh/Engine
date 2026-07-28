@@ -486,7 +486,9 @@
           "website": "Website der Marke",
           "apply": "Bewerben",
           "appliedNotice": "Du hast dich auf diesen Job beworben. Die Agentur meldet sich bei dir.",
-          "rejectedNotice": "Du wurdest für diesen Job nicht ausgewählt."
+          "rejectedNotice": "Du wurdest für diesen Job nicht ausgewählt.",
+          "acceptedNotice": "Du wurdest für diesen Job ausgewählt – dein Angebot liegt zur Prüfung bereit.",
+          "viewOffer": "Angebot ansehen"
         },
         "applyDialog": {
           "title": "Auf diesen Job bewerben",

@@ -857,7 +857,7 @@ export interface CreatorJobCardResource {
   }
 }
 
-/** The job detail payload — the card plus the four fields the page adds. */
+/** The job detail payload — the card plus the five fields the page adds. */
 export interface CreatorJobDetailResource {
   id: string
   type: 'creator_job'
@@ -868,6 +868,13 @@ export interface CreatorJobDetailResource {
     listing_regions: string[] | null
     /** External link; rendered with rel="noopener". */
     listing_examples_url: string | null
+    /**
+     * The caller's OWN assignment on this job (AH-058, D7) — the bridge from an
+     * accepted application to the offer waiting on `/creator/assignments/:ulid`.
+     * Always present; null when the pair has no assignment, which is why the
+     * accepted notice renders with or without the link.
+     */
+    assignment_ulid: string | null
   }
 }
 

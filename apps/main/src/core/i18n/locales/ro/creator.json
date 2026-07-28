@@ -486,7 +486,9 @@
           "website": "Site-ul brandului",
           "apply": "Aplică",
           "appliedNotice": "Ai aplicat la acest job. Agenția te va contacta.",
-          "rejectedNotice": "Nu ai fost selectat pentru acest job."
+          "rejectedNotice": "Nu ai fost selectat pentru acest job.",
+          "acceptedNotice": "Ați fost selectat pentru acest job — oferta dumneavoastră este gata de consultat.",
+          "viewOffer": "Vezi oferta"
         },
         "applyDialog": {
           "title": "Aplică la acest job",
