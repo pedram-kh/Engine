@@ -12,9 +12,12 @@ use App\Modules\Campaigns\Http\Requests\InviteAssignmentRequest;
 use App\Modules\Campaigns\Http\Requests\ReinviteAssignmentRequest;
 use App\Modules\Campaigns\Http\Resources\CampaignAssignmentResource;
 use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Campaigns\Models\CampaignApplication;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\AssignmentInviteGate;
 use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
+use App\Modules\Campaigns\Services\CampaignApplicationDecisionService;
+use App\Modules\Campaigns\Services\CampaignApplicationNotifier;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Campaigns\Services\CampaignInvitationService;
 use App\Modules\Campaigns\ValueObjects\AssignmentOffer;
@@ -25,6 +28,7 @@ use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Pennant\Feature;
 use RuntimeException;
@@ -83,6 +87,28 @@ final class CampaignAssignmentController
      * Single invite (the bulk D-5 case loops this client-side). The two-tier
      * gate fires BEFORE the create; the create is idempotent on the unique
      * (campaign_id, creator_id).
+     *
+     * ── D3b — the applications convergence hook (AH-058) ────────────────────
+     *
+     * This path gained exactly one new behaviour: when the invited pair has a
+     * PENDING job application, that application is marked `accepted` in the same
+     * transaction as the offer, and the creator gets the accepted notification
+     * after it commits. A direct invite and an accept-from-application now reach
+     * the same truthful outcome, so no application can sit pending forever for a
+     * creator the agency has already engaged.
+     *
+     * Two consequences worth naming rather than discovering later:
+     *
+     *   1. §5.34 — for a pair with NO application (the overwhelming majority,
+     *      and every pair that exists today) this endpoint is byte-identical to
+     *      before: same row, same audit row, same event, same 201. The invite
+     *      spec asserts that field-by-field.
+     *   2. `store()` now runs its writes inside a `DB::transaction()`, which it
+     *      did not before. That is a behavioural delta and a strict improvement:
+     *      the pre-existing shape could already leave a created assignment whose
+     *      audit row failed. The bulk-invite loop is N separate calls, so each
+     *      gets its own transaction — one creator's failure never rolls back the
+     *      other N−1.
      */
     public function store(
         InviteAssignmentRequest $request,
@@ -92,6 +118,8 @@ final class CampaignAssignmentController
         AssignmentOfferAttachmentUploadService $offerUploads,
         CampaignAssignmentStateMachine $machine,
         CampaignInvitationService $invitations,
+        CampaignApplicationDecisionService $decisions,
+        CampaignApplicationNotifier $notifier,
     ): JsonResponse {
         $this->assertBelongsToAgency($campaign, $agency);
         Gate::authorize('invite', $campaign);
@@ -158,17 +186,31 @@ final class CampaignAssignmentController
 
         if ($existing !== null) {
             if ($existing->status === AssignmentStatus::Declined) {
-                $machine->reofferAfterDecline(
-                    $existing,
-                    $offer->agreedFeeMinorUnits,
-                    $offer->agreedFeeCurrency,
-                    $offer->feePer,
-                    $offer->offerDescription,
-                    $offer->attachmentForReoffer(),
-                    $actor,
-                );
+                // The AH-035 re-offer branch settles the application too (D3b):
+                // a creator who declined, applied later, and is now being
+                // re-offered is exactly the pair a create-only hook would miss.
+                $settled = DB::transaction(function () use ($existing, $offer, $actor, $machine, $decisions, $campaign): ?CampaignApplication {
+                    $machine->reofferAfterDecline(
+                        $existing,
+                        $offer->agreedFeeMinorUnits,
+                        $offer->agreedFeeCurrency,
+                        $offer->feePer,
+                        $offer->offerDescription,
+                        $offer->attachmentForReoffer(),
+                        $actor,
+                    );
+
+                    /** @var Creator $creator */
+                    $creator = $existing->creator;
+
+                    return $decisions->settlePendingApplication($campaign, $creator);
+                });
+
+                $this->emitSettledApplication($notifier, $campaign, $settled, $existing->ulid);
             }
 
+            // Every other status is the pre-existing idempotent no-op: no offer
+            // is made, so nothing has answered any application either.
             return (new CampaignAssignmentResource($existing->load('creator:id,ulid,display_name')))
                 ->response()
                 ->setStatusCode(Response::HTTP_OK);
@@ -202,7 +244,15 @@ final class CampaignAssignmentController
         // that audit row and that event is an assignment with no board card and
         // no message thread. Correction #1's reasoning moved into the service's
         // docblock with the code.
-        $assignment = $invitations->invite($agency, $campaign, $creator, $offer, $actor);
+        // One transaction around the create, its audit row, its event and the
+        // D3b application settle — see the method docblock for why this is new.
+        [$assignment, $settled] = DB::transaction(function () use ($agency, $campaign, $creator, $offer, $actor, $invitations, $decisions): array {
+            $assignment = $invitations->invite($agency, $campaign, $creator, $offer, $actor);
+
+            return [$assignment, $decisions->settlePendingApplication($campaign, $creator)];
+        });
+
+        $this->emitSettledApplication($notifier, $campaign, $settled, $assignment->ulid);
 
         return (new CampaignAssignmentResource($assignment->load('creator:id,ulid,display_name')))
             ->response()
@@ -314,6 +364,27 @@ final class CampaignAssignmentController
         }
 
         return new CampaignAssignmentResource($assignment->load('creator:id,ulid,display_name'));
+    }
+
+    /**
+     * The D3b emission, AFTER the caller's commit and never inside it: a mail
+     * queued in an open transaction is visible to a worker immediately
+     * (`after_commit => false`), so a rolled-back invite would have told the
+     * creator their application was accepted.
+     *
+     * A no-op when nothing settled, which is the byte-identity case.
+     */
+    private function emitSettledApplication(
+        CampaignApplicationNotifier $notifier,
+        Campaign $campaign,
+        ?CampaignApplication $settled,
+        string $assignmentUlid,
+    ): void {
+        if (! $settled instanceof CampaignApplication) {
+            return;
+        }
+
+        $notifier->accepted($settled->setRelation('campaign', $campaign), $assignmentUlid);
     }
 
     private function assertBelongsToAgency(Campaign $campaign, Agency $agency): void

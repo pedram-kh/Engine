@@ -6,20 +6,18 @@ namespace App\Modules\Campaigns\Http\Controllers;
 
 use App\Core\Errors\ErrorResponse;
 use App\Modules\Agencies\Models\Agency;
-use App\Modules\Audit\Enums\AuditAction;
-use App\Modules\Audit\Facades\Audit;
 use App\Modules\Campaigns\Enums\ApplicationRejectionCause;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Enums\CampaignApplicationStatus;
 use App\Modules\Campaigns\Http\Requests\AcceptApplicationRequest;
 use App\Modules\Campaigns\Http\Resources\CampaignApplicationListItemResource;
 use App\Modules\Campaigns\Http\Resources\CampaignAssignmentResource;
-use App\Modules\Campaigns\Jobs\AutoRejectPendingApplicationsJob;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignApplication;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\AssignmentInviteGate;
 use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
+use App\Modules\Campaigns\Services\CampaignApplicationDecisionService;
 use App\Modules\Campaigns\Services\CampaignApplicationNotifier;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Campaigns\Services\CampaignInvitationService;
@@ -166,6 +164,7 @@ final class CampaignApplicationController
         AssignmentOfferAttachmentUploadService $offerUploads,
         CampaignAssignmentStateMachine $machine,
         CampaignInvitationService $invitations,
+        CampaignApplicationDecisionService $decisions,
         CampaignApplicationNotifier $notifier,
     ): JsonResponse {
         $this->assertBelongsToAgency($campaign, $agency);
@@ -286,8 +285,9 @@ final class CampaignApplicationController
             $actor,
             $machine,
             $invitations,
+            $decisions,
         ): CampaignAssignment {
-            $this->markAccepted($application);
+            $decisions->accept($application);
 
             if ($existing instanceof CampaignAssignment) {
                 // AH-035's edge, re-used rather than re-implemented: the SAME row
@@ -335,6 +335,7 @@ final class CampaignApplicationController
         Agency $agency,
         Campaign $campaign,
         CampaignApplication $application,
+        CampaignApplicationDecisionService $decisions,
         CampaignApplicationNotifier $notifier,
     ): JsonResponse {
         $this->assertBelongsToAgency($campaign, $agency);
@@ -350,8 +351,8 @@ final class CampaignApplicationController
             return $this->refuseNotPending($application);
         }
 
-        DB::transaction(function () use ($application): void {
-            $this->markRejected($application, ApplicationRejectionCause::AgencyRejected);
+        DB::transaction(function () use ($application, $decisions): void {
+            $decisions->reject($application, ApplicationRejectionCause::AgencyRejected);
         });
 
         // AFTER the commit (C1).
@@ -371,58 +372,6 @@ final class CampaignApplicationController
             ],
             'meta' => ['code' => 'application.rejected'],
         ]);
-    }
-
-    /**
-     * The application flip every accept path shares — the HTTP accept, and (via
-     * the invitation service's caller) the direct-invite convergence hook.
-     *
-     * MUST run inside the caller's transaction: the flip and the assignment write
-     * are one fact, and an accepted application with no assignment is the torn
-     * state review priority 1 exists to prove impossible.
-     */
-    private function markAccepted(CampaignApplication $application): void
-    {
-        $application->status = CampaignApplicationStatus::Accepted;
-        $application->responded_at = now();
-        $application->save();
-
-        Audit::log(
-            action: AuditAction::CampaignApplicationAccepted,
-            subject: $application,
-            metadata: [
-                'campaign_id' => $application->campaign_id,
-                'creator_id' => $application->creator_id,
-            ],
-            // Explicit, never inferred from ambient tenancy — the same call runs
-            // from a queued context in the auto-reject sibling below.
-            agencyId: $application->agency_id,
-        );
-    }
-
-    /**
-     * The rejection flip, shared by the agency's reject and (through
-     * {@see AutoRejectPendingApplicationsJob}) the
-     * campaign-terminal auto-reject. The cause is recorded in the audit metadata
-     * because the row is otherwise identical and "who/what closed this" is the
-     * only question a reader of the log will have.
-     */
-    private function markRejected(CampaignApplication $application, ApplicationRejectionCause $cause): void
-    {
-        $application->status = CampaignApplicationStatus::Rejected;
-        $application->responded_at = now();
-        $application->save();
-
-        Audit::log(
-            action: AuditAction::CampaignApplicationRejected,
-            subject: $application,
-            metadata: [
-                'campaign_id' => $application->campaign_id,
-                'creator_id' => $application->creator_id,
-                'cause' => $cause->value,
-            ],
-            agencyId: $application->agency_id,
-        );
     }
 
     /**
