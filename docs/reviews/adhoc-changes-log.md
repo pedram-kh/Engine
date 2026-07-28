@@ -70,6 +70,101 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-058 · Jobs Board chunk 4 — agency applications: the Applications tab, accept, reject, and terminal auto-reject
+
+- **Status:** Landed
+- **Commits:** `0abba72` — `refactor(campaigns): extract CampaignInvitationService + AssignmentOffer from store()`;
+  `78c2dd8` — `feat(notifications): jobs-board application vocabulary, flag, notifier + mails`;
+  `86a44a4` — `feat(campaigns): applications tab endpoints — list, accept, reject`;
+  `5f6486c` — `feat(campaigns): D3b invite-path convergence — settle pending applications in store()`;
+  `af0f343` — `feat(campaigns): terminal auto-reject for pending applications`;
+  `d33df9e` — `feat(campaigns): applications tab — list, accept dialog, reject confirm`;
+  `ef195f8` — `test(campaigns): satisfy PHPStan on the new application test files`;
+  `8ff9985` — `feat(creators): bridge an accepted application to its offer`;
+  `a1c66ab` — `test(campaigns): agency applications e2e leg + seed helper`;
+  plus the docs commit carrying this entry and the review. Split by **surface and risk**, not by
+  sub-step. The one deliberate feature of the split is that **`5f6486c` stands alone**: D3b is the only
+  change here that alters behaviour on a path the agency already uses every day, and a reviewer who
+  wants to read exactly that and nothing else should be able to `git show` one commit. The pure
+  refactor is first and separate for the same reason inverted — if a later commit broke an invite, the
+  refactor is provably not why, because it changed no test.
+- **Date:** 2026-07-28
+- **Why:** Chunk 4 of the five-chunk Jobs Board arc, and the chunk that makes chunk 3 mean something.
+  AH-056 let a rostered creator browse an agency's listed campaigns and apply; nothing read those
+  applications. Chunk 4 is the agency's half: read them, and answer them.
+- **What:** An **Applications tab** on the campaign detail (pending-first, badge counting pending
+  only, applicant shown at roster level with their note); **accept**, which opens a real offer form
+  and creates a **standard invitation** the applicant can still decline; **reject**, terminal and
+  pending-only behind a confirm dialog; **terminal auto-reject**, so a cancelled or completed campaign
+  answers whatever was still pending; the three-type application notification vocabulary chunk 3
+  deferred, dual-emitting in-app plus queued localized mail behind one new default-OFF flag; and the
+  **bridge** that carries an accepted creator from the job page to the offer waiting for them.
+- **Touched:** `apps/api` — one new controller, one job, three services (`CampaignInvitationService`,
+  `CampaignApplicationDecisionService`, `CampaignApplicationNotifier`), one value object
+  (`AssignmentOffer`), three mailables + their Blade views, one new enum
+  (`ApplicationRejectionCause`), two new `AuditAction` cases, three new `NotificationType` cases, one
+  Pennant flag, a shared offer-validation trait, three routes, one `_test` helper; `apps/main` — the
+  tab, two dialogs, the extracted `OfferFieldsForm`, the creator job-detail third state; `packages/api-client`
+  — the agency-side application types. i18n **1176 leaves** across four files × 24 locales. **The
+  backend migration diff is zero** — chunk 3's table, its `responded_at` column and its
+  `(agency_id, status)` index are the whole storage.
+- **Decisions:** **Applications are a TAB, not a board column** — a recorded §5.32 reinterpretation of
+  chunk 3's migration docblock, and the evidence is structural: `board_cards.assignment_id` is
+  `NOT NULL` + `UNIQUE` + `CASCADE`, so a card **is** an assignment at three layers and an applicant
+  has none; and §4.4's drag-is-consequence-free invariant cannot express accept or reject. Nothing
+  chunk 3 shipped is wasted — the index and the denormalized `agency_id` serve the tab identically,
+  and the `agency_id` turned out to be **load-bearing for a use the docblock did not anticipate** (it
+  is what lets the auto-reject job re-impose tenancy in a worker that has none). **Accept creates a
+  standard invitation**, so an accepted applicant is byte-indistinguishable downstream from a cold
+  invitee and can still decline: applying is not a contract. **The `is_discoverable` gate leg is
+  dropped** on the AH-051 ruling — browsing preference is not eligibility, and an applicant who has
+  since hidden from discovery must not 404 on their own application — while the agency-wide hard
+  blacklist re-check and the availability 409 are kept, because a blacklist may postdate an
+  application. **No reject reason, anywhere**: not collected, not stored, not rendered; the audit row
+  and its actor is the record, and the creator-facing copy is the same kind generic sentence either
+  way. The three-way argument was heard; this is the only version that keeps the chunk migration-free.
+  **One ability, not a fifth clone**: `invite` for both accept and reject, `view` for the list.
+  **The preference group splits** — `jobs_board` is new, and `campaign.job_posted` moved into it,
+  honouring the trigger chunk 3 wrote into the enum rather than re-arguing it.
+- **The finding the plan-pause existed for, and the real content of this entry:** `config/queue.php`
+  sets **`after_commit => false`** on all four connections, so a `Mail::queue()` issued inside an open
+  transaction is visible to a worker **immediately** — and if that transaction rolls back, the creator
+  has already been told they were accepted for an invitation that does not exist. So **every DB write
+  in this chunk is one transaction and every emission happens after it returns**, at all four emission
+  sites. The residual failure mode inverts to the strictly better one: a committed accept whose in-app
+  row failed to write, rather than a rolled-back accept that already mailed. Proven by mutation, not
+  by reading: moving the accept emission inside the transaction reds three tests.
+- **And it named a pre-existing defect of the same class.** `SendAssignmentNotifications` queues mail
+  from **inside** `CampaignAssignmentStateMachine::commit()`'s transaction — the same shape, on the
+  platform's single status authority, reached by every assignment transition in the app. It is now a
+  `tech-debt.md` entry with the trigger "the next chunk touching the state-machine emission path", and
+  deliberately **not** fixed here: moving that dispatch is a change with its own review, not a rider
+  on an applications chunk.
+- **The one touch on the live invite path, named as a delta.** `store()` gained a `DB::transaction()`
+  it did not have, plus one guarded hook that settles a pending application for the pair it is
+  inviting — called from **both** branches, the create and the AH-035 declined re-offer, because a
+  create-only hook passes every other test in the suite while leaving an application pending forever
+  on exactly the pair AH-035 exists to serve. The transaction is a behavioural delta (a mid-flight
+  failure that previously left an orphaned assignment row now leaves none) and a strict improvement.
+  A pair with **no** application is pinned byte-identical to before, field by field, with the
+  notification flag deliberately **armed** so a silent flag-OFF cannot be why nothing was sent.
+- **Ten mutations, each reverted.** The claims that could otherwise be read rather than proven: the
+  emission ordering, the accept transaction, the D3b hook on both branches, the dropped-discoverable
+  leg and the kept-blacklist leg in opposite directions, the auto-reject job's in-worker `pending`
+  re-filter, the mail flag (one mutation, four reds — one per emission site, which is what a
+  single-checkpoint flag buys), the D7 subquery's creator correlation, and the badge's pending-only
+  count.
+- **Gates:** backend **2338 passed / 1 skipped** (8587 assertions, up from 2234), PHPStan level max
+  **0 errors**, Pint clean; `apps/main` **1319 / 141 files**, `apps/admin` **449**, api-client **204**;
+  three typechecks clean, ESLint 0 errors (the same 2 pre-existing `v-html` warnings); locale parity
+  green across all four touched i18n files; both notification tripwires green (`LIVE_TYPES` 15 → 18 by
+  hand); **full Playwright 26/26 in 4.7m** including the new agency-side leg, with the dev stack down
+  and an isolated E2E database.
+- **Ref:** [`jobs-board-c4-review.md`](jobs-board-c4-review.md) — the completion package, with the
+  Production-posture section, the ten mutations verbatim, and the D1 annotation against chunk 3's
+  docblock. Plan: [`jobs-board-c4-plan.md`](jobs-board-c4-plan.md). Inventory:
+  [`jobs-board-c4-inventory.md`](jobs-board-c4-inventory.md).
+
 ### AH-057 · Jobs Board chunk 3, eyes-on fixes — the mobile bottom bar, the job detail frame, and the campaigns listing column
 
 - **Status:** Landed

@@ -113,8 +113,15 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-27 · **Through:** AH-057 · **Baseline:** the AH-057 docs commit — the
-current tip and, as of this push, also the `origin/main` tip. It sits atop the three AH-057 commits
+**Last updated:** 2026-07-28 · **Through:** AH-058 · **⚠ Push HELD.** `origin/main` is `d4b2de5`
+(the AH-057 docs commit); the local tip is **eleven commits ahead** and unpushed: the two held
+**chunk-4 docs** commits (`895f28a` inventory, `685991c` plan), the nine **AH-058** build commits
+(`0abba72`, `78c2dd8`, `86a44a4`, `5f6486c`, `af0f343`, `d33df9e`, `ef195f8`, `8ff9985`, `a1c66ab`),
+and the docs commit carrying this refresh plus
+[`jobs-board-c4-review.md`](jobs-board-c4-review.md) and the AH-058 log entry. `git rev-parse --short HEAD`
+and `git rev-parse --short origin/main` are the authority for those two numbers, not this sentence.
+
+**Baseline (the pushed tip):** the AH-057 docs commit. It sits atop the three AH-057 commits
 (`fc88347`, `bbafc9c`, `d147baf`), which sit on the AH-056 close commit (`978bce5`), itself atop the
 six AH-056 commits (`81df0b5`, `928ccce`, `0cf6275`, `4e527e7`, `d37d43c`, `ddf875c`) and the AH-055
 docs commit, all on `aa8d410` (the AH-053/AH-054 close-out). **Nothing is held — AH-055, AH-056 and
@@ -123,17 +130,23 @@ its own hash, so the tip is named descriptively; `git rev-parse --short HEAD` gi
 `git rev-parse --short origin/main` gives the pushed tip. Those two are the authority, not this
 sentence.)
 
-> **⚠ The Jobs Board arc deploys as ONE unit — chunk 3 of 5 is done, and the deploy stays held.**
-> AH-056 ships the creator board, apply, and the job-posted fan-out, but the agency side (chunk 4)
-> does not exist yet: an application a creator submits today has nowhere to be read. Holding the
-> deploy to end-of-arc is what prevents that gap, and it is why the arc's chunks are safe to build
-> incrementally. Do not deploy AH-053/054/056 piecemeal. **AH-057 carries nothing of its own** — it is
+> **⚠ The Jobs Board arc deploys as ONE unit — chunk 4 of 5 is done, and the deploy stays held.**
+> **AH-058 closes the gap chunk 3 left open**: the agency now reads applications on a
+> campaign-detail Applications tab and answers them (accept creates a standard invitation the
+> applicant can still decline; reject is terminal and no-re-apply), a cancelled or completed campaign
+> auto-rejects whatever was still pending, and an accepted creator is carried from the job page to
+> the offer waiting for them. **It adds no migration** — chunk 3's `campaign_applications` table is
+> the whole storage — and one new flag (below). Chunk 5 is the arc's last.
+> AH-056 shipped the creator board, apply, and the job-posted fan-out. Holding the
+> deploy to end-of-arc is what let the arc be built incrementally; do not deploy
+> AH-053/054/056/058 piecemeal. **AH-057 carries nothing of its own** — it is
 > the eyes-on fix pass over AH-056's UI (mobile bottom bar, job detail framing, a campaigns-table
 > listing column) with a **zero backend diff**: no migration, no endpoint, no enum, no lang file. It
 > inherits AH-056's deploy obligations and adds none.
 
-> **A new Playwright project exists (AH-057).** The suite is now **25 specs across two projects** —
-> 24 desktop `chromium` plus one `mobile` leg on the iPhone 13 profile, scoped to
+> **A new Playwright project exists (AH-057).** The suite is now **26 specs across two projects**
+> (AH-058 added the agency-side `campaign-applications.spec.ts` to the desktop project) —
+> 25 desktop `chromium` plus one `mobile` leg on the iPhone 13 profile, scoped to
 > `creator-shell-mobile.spec.ts` alone. It runs on the **Chromium engine**, not WebKit: the device
 > descriptor's `defaultBrowserType` is `webkit`, and Playwright's WebKit build for macOS 14 is frozen
 > and bus-errors on launch on this host. `pnpm test:e2e:install` therefore still fetches chromium
@@ -178,6 +191,32 @@ migration and AH-056 adds three**, so the next deploy will not say that — see 
 > deploys are colleague-managed and advance without notice. Everything through AH-050
 > (`content_companions`) turned out to be already live before today, while this file still listed
 > its migrations as pending. Verify at each session close; do not carry forward an assumption.
+
+**Deploy notes — AH-058 (built 2026-07-28, push HELD, NOT deployed).** Three obligations, and
+**no migration** — the arc's pending-migration count stays **four**.
+
+1. **🔴 `application_notifications_enabled` ships OFF, and the arc's first-enable ritual now arms
+   TWO flags together.** It gates the **mail legs only** of the three new
+   `campaign_application.*` notification types; the in-app rows write regardless, honouring the
+   recipient's own preference. Flip it from the admin Feature-flags page **alongside
+   `job_posted_notifications_enabled`** — a board that pushes listings but never acknowledges an
+   application is the confusing half-state, and both are the same fan-out risk class. Full row and
+   rationale in `docs/feature-flags.md`. At T+0 the population is provably zero: no campaign is
+   listed, so no application can exist.
+2. **⚠ The queue-worker restart rule binds.** This deploy carries new `lang/**` mail copy (three
+   mailables × 24 locales, `campaigns.php`) and three brand-new mailable classes. The long-running
+   worker caches translations in memory — **restart it**, or the first accepted creator gets a
+   missing-key body. The terminal auto-reject is a **queued job** (`AutoRejectPendingApplicationsJob`,
+   dispatched from `CampaignController::update()` on a non-terminal → `cancelled`/`completed` flip),
+   so a down worker means pending applications sit pending until the worker comes back; it is
+   idempotent by design (it re-filters `status = pending` inside its own transaction), so a
+   re-cancel or a late-started worker never double-rejects and never double-mails.
+3. **⚠ The live invite path changed behaviour, deliberately and narrowly.** `POST …/assignments`
+   now runs inside a transaction and, for a pair that has a **pending application**, marks that
+   application `accepted` in the same transaction (D3b). A pair with **no** application is
+   byte-identical to before — pinned field-by-field. Nothing to do at deploy; noted because an
+   operator reading assignment audit trails will now sometimes see a
+   `campaign_application.accepted` row beside an invite nobody accepted from the tab.
 
 **Deploy notes — AH-055/AH-056 (pushed 2026-07-27, NOT deployed).** AH-055 is pure UI and carries
 nothing. AH-056 carries three obligations:
@@ -494,7 +533,7 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     joins the `campaign.updated` audit snapshot; the four free-text/jsonb fields stay out. Regions
     are shape-capped, not registry-validated (tech-debt). One additive migration.
   - **AH-056** — Jobs Board chunk 3: the creator job board, apply, and the job-posted fan-out
-    (`81df0b5`, `928ccce`, `0cf6275`, `4e527e7`, `d37d43c` — **local, not pushed**). Applications
+    (`81df0b5`, `928ccce`, `0cf6275`, `4e527e7`, `d37d43c` — pushed 2026-07-27, undeployed). Applications
     are a **table**, not an assignment state: a pre-invited state would let `store()`'s idempotency
     branch silently swallow an agency invite, on the platform's most load-bearing machine.
     Visibility is **one predicate object, six legs** — tenancy-scope bypass, approved caller,
@@ -513,6 +552,28 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     `application.*` (which would collide with the creator's onboarding application). Six
     break-reverts, all restored. Three additive migrations. `application_submitted` is deliberately
     **left to chunk 4**. Review: `docs/reviews/jobs-board-c3-review.md` (**Closed — approved**).
+  - **AH-058** — Jobs Board chunk 4: the agency half of applications — the Applications tab, accept,
+    reject, and terminal auto-reject (nine commits, `0abba72`…`a1c66ab` — **local, push HELD**).
+    Applications render as a **campaign-detail tab, not a board column** (recorded §5.32
+    reinterpretation of the c3 migration docblock): `board_cards.assignment_id` is `NOT NULL` +
+    `UNIQUE` + `CASCADE`, so a card **is** an assignment at three layers, and §4.4's
+    drag-is-consequence-free invariant cannot express accept/reject. Nothing c3 shipped is wasted —
+    the index and the denormalized `agency_id` serve the tab's status-scoped list identically, and
+    the board handles post-accept for free (asserted, not rebuilt). **Accept = a real offer form
+    creating a standard invitation** through a service extracted from `store()`, so an accepted
+    applicant is byte-indistinguishable downstream from a cold invitee **and can still decline**;
+    the `is_discoverable` gate leg is **dropped** on the AH-051 ruling (browsing preference ≠
+    eligibility), the agency-wide hard-blacklist re-check and the availability 409 are **kept**.
+    **Every DB write is one transaction and every emission happens after it returns** — the
+    plan-pause's C1 finding, since `after_commit => false` means a mail queued inside an open
+    transaction is already visible to a worker; the rollback test asserts no assignment, a still-pending
+    application, `Mail::assertNothingQueued()` and zero notification rows. `store()` gains that same
+    transaction plus one guarded hook (**D3b**) settling a pending application for the pair it is
+    inviting — a named behavioural delta, with a §5.34 field-by-field byte-identity pin for pairs with
+    no application. Three notification types (`campaign_application.submitted/accepted/rejected`), a
+    new `jobs_board` preference group, and one flag (`application_notifications_enabled`, default OFF)
+    gating **mail only**. Terminal auto-reject is the flip-detector precedent plus an idempotent queued
+    job. **No migration.** Review: `docs/reviews/jobs-board-c4-review.md`.
 
   > **Ruling (AH-046/047, flaky-10 MT baseline):** new creator-facing copy gets a real
   > machine-translation baseline in **all 24 locales at merge time**, including the flaky 10

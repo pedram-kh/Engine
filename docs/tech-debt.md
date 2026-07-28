@@ -2096,6 +2096,45 @@ ukazuje na váš zveřejněný příspěvek, a poté ho níže znova odešlete."
   transactional-mail exemption list.
 - **Owner:** notifications.
 - **Status:** open; accepted for the jobs-board arc, named in that review's Production posture.
+- **Widened (AH-058, 2026-07-28):** chunk 4 inherits the same gap in three more places rather than
+  opening a second entry for it. `CampaignApplicationNotifier` dual-emits `submitted`, `accepted` and
+  `rejected`; the in-app leg reads the recipient's preference through `NotificationService` and the
+  **mail leg does not**. The v1 containment is the same shape — a Pennant kill switch
+  (`application_notifications_enabled`), plus recipient sets that are structurally narrow (an agency's
+  own admins + managers; a creator who applied to this exact campaign). The resolution below is
+  unchanged and now covers six types instead of one; the trigger is unchanged too, and chunk 4 does
+  not meet it (these are answers to actions the recipient took, not recurring outreach).
+
+## Mail is queued INSIDE the state machine's transaction (`SendAssignmentNotifications`, AH-058)
+
+- **Where:** [`SendAssignmentNotifications`](../apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php)
+  (a **synchronous** listener — four `Mail::…->queue(...)` sites at `:97`, `:133`, `:189`, `:260`),
+  reached from [`CampaignAssignmentStateMachine::commit()`](../apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php),
+  which dispatches `AssignmentTransitioned` **inside** its own `DB::transaction()` (`:612-637`).
+- **What we accepted (AH-058, 2026-07-28):** `config/queue.php` sets `'after_commit' => false` on all
+  four connections, so a mail queued inside an open transaction is visible to a worker
+  **immediately** — before the commit. Every assignment transition therefore queues its mail from
+  inside the transaction that has not yet committed. If that transaction rolls back, the creator (or
+  the inviting agency user) has already been told about a transition the database never recorded.
+- **Why it is named here and not fixed here:** this is precisely the defect class chunk 4's C1 ruling
+  prevents on its own paths (every AH-058 emission runs **after** the transaction returns, and the
+  accept rollback test asserts `Mail::assertNothingQueued()` plus zero notification rows). Fixing the
+  pre-existing site means moving the event dispatch out of `commit()` — the platform's single status
+  authority, on the critical path of every assignment transition in the app — which is a change with
+  its own review, not a rider on an applications chunk. It is now **known and named** rather than
+  latent, which is the difference this entry buys.
+- **The gap:** a rolled-back transition can still have mailed. Nobody has reported it, because
+  transition transactions rarely fail — the writes are small and the validation happens before them.
+  That is luck holding, not a design.
+- **Trigger:** **the next chunk touching the state-machine emission path.** Whoever opens
+  `commit()` or `SendAssignmentNotifications` next owns this.
+- **Resolution:** either dispatch `AssignmentTransitioned` after `commit()` returns (the C1 shape,
+  and the shape `CampaignController::update()` already uses for its fan-out), or make the listener
+  `ShouldQueue` with `afterCommit`. The first is preferable: it keeps the emission ordering visible at
+  the call site instead of hiding it in queue config. Estimated effort: half a day plus a careful
+  read of every transition test that asserts inside-transaction behaviour.
+- **Owner:** campaigns.
+- **Status:** open; named at AH-058, deliberately not fixed there.
 
 ## Jobs-board `ends_at` filter is non-sargable, and `ends_at` cannot lead an index (AH-056)
 
