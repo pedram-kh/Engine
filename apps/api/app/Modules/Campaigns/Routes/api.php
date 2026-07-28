@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Campaigns\Http\Controllers\CampaignApplicationController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentContractController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentResolutionController;
@@ -46,6 +47,20 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // Campaign-wide draft listing for the Drafts tab (view-gated, all versions).
         Route::get('campaigns/{campaign}/drafts', [CampaignDraftController::class, 'index'])
             ->name('campaigns.drafts.index');
+
+        // Jobs-board APPLICATIONS — the campaign-detail Applications tab
+        // (Jobs Board chunk 4, AH-058). Ordinary tenanted agency routes: no
+        // tenancy.md §4 allowlist entry, because assertBelongsToAgency + the
+        // campaign ability are the boundary, exactly as for drafts above.
+        Route::get('campaigns/{campaign}/applications', [CampaignApplicationController::class, 'index'])
+            ->name('campaigns.applications.index');
+
+        // Accept (the offer form → a standard invitation) + reject. Both under
+        // the `invite` execute ability (Q4); the list above is view-gated.
+        Route::post('campaigns/{campaign}/applications/{application}/accept', [CampaignApplicationController::class, 'accept'])
+            ->name('campaigns.applications.accept');
+        Route::post('campaigns/{campaign}/applications/{application}/reject', [CampaignApplicationController::class, 'reject'])
+            ->name('campaigns.applications.reject');
 
         // Invite a creator (Chunk 2, D-3) — the two-tier gate + execute ability.
         Route::post('campaigns/{campaign}/assignments', [CampaignAssignmentController::class, 'store'])
