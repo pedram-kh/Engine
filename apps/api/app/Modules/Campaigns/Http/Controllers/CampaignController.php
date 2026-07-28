@@ -12,6 +12,7 @@ use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Http\Requests\CreateCampaignRequest;
 use App\Modules\Campaigns\Http\Requests\UpdateCampaignRequest;
 use App\Modules\Campaigns\Http\Resources\CampaignResource;
+use App\Modules\Campaigns\Jobs\AutoRejectPendingApplicationsJob;
 use App\Modules\Campaigns\Jobs\SendJobPostedNotificationsJob;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
@@ -166,6 +167,13 @@ final class CampaignController
         // "fire exactly once, on the false→true edge, without depending on the
         // scheduler"; a new event would have added machinery to reach the same
         // place from further away.
+        // AH-058 (D5) — the TERMINAL flip detector, deliberately the same three
+        // lines in the same shape as the listing flip above rather than a new
+        // `CampaignStatusChanged` event: AH-056's ruling that a campaign event
+        // adds machinery to reach the same place from further away has not been
+        // given new evidence to overturn, and status has one write path (here).
+        $wasTerminal = $campaign->status->isTerminal();
+
         $wasListed = $campaign->listed_on_jobs_board;
         $willList = ! $wasListed
             && $request->has('listed_on_jobs_board')
@@ -195,6 +203,14 @@ final class CampaignController
         // run a mail loop inside the web process (Q3).
         if (! $wasListed && $campaign->listed_on_jobs_board) {
             SendJobPostedNotificationsJob::dispatch($campaign->id);
+        }
+
+        // The same post-save reasoning for the terminal edge: a campaign that
+        // just became `completed` or `cancelled` answers the applications still
+        // waiting on it. The job re-reads and re-filters, so a re-cancel is a
+        // no-op rather than a second round of notices.
+        if (! $wasTerminal && $campaign->status->isTerminal()) {
+            AutoRejectPendingApplicationsJob::dispatch($campaign->id);
         }
 
         return new CampaignResource(

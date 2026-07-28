@@ -25,4 +25,22 @@ enum CampaignStatus: string
     case Paused = 'paused';
     case Completed = 'completed';
     case Cancelled = 'cancelled';
+
+    /**
+     * A campaign nobody can be engaged on any more (AH-058, D5).
+     *
+     * `paused` is deliberately NOT terminal: a paused campaign resumes, and
+     * auto-rejecting its pending applications would throw away interest the
+     * agency is about to want back.
+     */
+    public function isTerminal(): bool
+    {
+        return match ($this) {
+            self::Completed,
+            self::Cancelled => true,
+            self::Draft,
+            self::Active,
+            self::Paused => false,
+        };
+    }
 }
