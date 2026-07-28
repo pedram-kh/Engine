@@ -143,11 +143,11 @@ it('rejects: notifies the creator in-app with cause=agency_rejected and queues t
         // No actor: the reject is an AGENCY act, and naming the employee who
         // pressed it puts their name in front of a rejected creator.
         ->and($row->actor_user_id)->toBeNull()
-        ->and($row->data['campaign_name'])->toBe('Autumn UGC push')
+        ->and($row->data['campaign_name'] ?? null)->toBe('Autumn UGC push')
         // Q8: `data.cause` is part of the notification CONTRACT — the SPA
         // template may read it and the mailable's blade appends it to `body_` to
         // pick the variant. Renaming the key or its values is a breaking change.
-        ->and($row->data['cause'])->toBe('agency_rejected');
+        ->and($row->data['cause'] ?? null)->toBe('agency_rejected');
 
     Mail::assertQueued(ApplicationRejectedMail::class, fn (ApplicationRejectedMail $mail): bool => $mail->hasTo($s['creatorUser']->email));
 });

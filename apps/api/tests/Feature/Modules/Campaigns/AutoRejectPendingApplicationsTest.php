@@ -185,7 +185,7 @@ it('rejects every pending application with cause=campaign_closed and notifies ea
     expect($rows)->toHaveCount(2)
         ->and($rows->pluck('recipient_user_id')->sort()->values()->all())
         ->toBe(collect([$firstUser->id, $secondUser->id])->sort()->values()->all())
-        ->and($rows->every(fn (Notification $row): bool => $row->data['cause'] === 'campaign_closed'))->toBeTrue();
+        ->and($rows->every(fn (Notification $row): bool => ($row->data['cause'] ?? null) === 'campaign_closed'))->toBeTrue();
 
     // The audit rows carry the same cause and are honestly attributed: no human
     // pressed reject, so the actor is the system.

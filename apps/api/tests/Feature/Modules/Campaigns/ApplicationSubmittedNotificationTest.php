@@ -86,8 +86,8 @@ it('carries the render params the SPA template interpolates, and no free-text no
         ->where('type', NotificationType::CampaignApplicationSubmitted->value)
         ->firstOrFail();
 
-    expect(array_keys($row->data))->toBe(['creator_name', 'campaign_name'])
-        ->and($row->data['campaign_name'])->toBe(CreatorJobFixture::CAMPAIGN_NAME)
+    expect(array_keys($row->data ?? []))->toBe(['creator_name', 'campaign_name'])
+        ->and($row->data['campaign_name'] ?? null)->toBe(CreatorJobFixture::CAMPAIGN_NAME)
         // The applicant is a CREATOR, and actor_user_id is a users-table key, so
         // the name travels in the data bag and the actor stays null.
         ->and($row->actor_user_id)->toBeNull()

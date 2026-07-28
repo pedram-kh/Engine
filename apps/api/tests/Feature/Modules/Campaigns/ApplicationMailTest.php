@@ -49,6 +49,7 @@ uses(TestCase::class);
  * `Mailable::locale()` defers the real switch to send time, so a direct render
  * needs an explicit App locale — the job-posted / incomplete-nudge precedent.
  *
+ * @param  ApplicationSubmittedMail|ApplicationAcceptedMail|ApplicationRejectedMail  $mail
  * @return array{subject: string, body: string}
  */
 function renderApplicationMail(Mailable $mail, string $locale): array

@@ -102,7 +102,7 @@ it('emits NO contact details — the tab creates no new exposure beyond the rost
     $s = applicationListSetup();
     $application = makeApplication($s['campaign'], CampaignApplicationStatus::Pending);
     $user = User::factory()->creator()->createOne(['email' => 'maria@example.test']);
-    $application->creator->forceFill(['user_id' => $user->id])->save();
+    $application->creator?->forceFill(['user_id' => $user->id])->save();
 
     $body = $this->actingAs($s['admin'])
         ->getJson(applicationsUrl($s['agency'], $s['campaign']))

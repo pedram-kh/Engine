@@ -205,7 +205,7 @@ it('D3b · CREATE branch: a pending application for the invited pair settles as 
     // The notice points at the invitation the invite created, so the creator
     // lands on the offer that needs an answer.
     expect($notification->recipient_user_id)->toBe($s['creatorUser']->id)
-        ->and($notification->data['assignment_ulid'])->toBe($assignment->ulid);
+        ->and($notification->data['assignment_ulid'] ?? null)->toBe($assignment->ulid);
 
     Mail::assertQueued(ApplicationAcceptedMail::class);
 });
@@ -243,7 +243,7 @@ it('D3b · DECLINED RE-OFFER branch: the AH-035 edge settles the application too
         ->where('type', NotificationType::CampaignApplicationAccepted->value)
         ->sole();
 
-    expect($notification->data['assignment_ulid'])->toBe($declined->ulid);
+    expect($notification->data['assignment_ulid'] ?? null)->toBe($declined->ulid);
 
     Mail::assertQueued(ApplicationAcceptedMail::class);
 });
