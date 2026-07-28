@@ -6,10 +6,7 @@ namespace App\Modules\Campaigns\Http\Controllers;
 
 use App\Core\Errors\ErrorResponse;
 use App\Modules\Agencies\Models\Agency;
-use App\Modules\Audit\Enums\AuditAction;
-use App\Modules\Audit\Facades\Audit;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
-use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Exceptions\AssignmentTransitionException;
 use App\Modules\Campaigns\Http\Requests\InviteAssignmentRequest;
 use App\Modules\Campaigns\Http\Requests\ReinviteAssignmentRequest;
@@ -19,6 +16,8 @@ use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\AssignmentInviteGate;
 use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
+use App\Modules\Campaigns\Services\CampaignInvitationService;
+use App\Modules\Campaigns\ValueObjects\AssignmentOffer;
 use App\Modules\Creators\Enums\ApplicationStatus;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Models\Creator;
@@ -92,6 +91,7 @@ final class CampaignAssignmentController
         AssignmentInviteGate $gate,
         AssignmentOfferAttachmentUploadService $offerUploads,
         CampaignAssignmentStateMachine $machine,
+        CampaignInvitationService $invitations,
     ): JsonResponse {
         $this->assertBelongsToAgency($campaign, $agency);
         Gate::authorize('invite', $campaign);
@@ -106,6 +106,7 @@ final class CampaignAssignmentController
         // same upload_id on every call (one shared object, stamped per row).
         /** @var array{upload_id: string, name: string, mime_type: string, size_bytes: int}|null $attachment */
         $attachment = $validated['attachment'] ?? null;
+        $offer = AssignmentOffer::fromValidated($validated);
         if ($attachment !== null) {
             try {
                 $offerUploads->assertUploadBelongs($agency, $campaign, (string) $attachment['upload_id']);
@@ -159,16 +160,11 @@ final class CampaignAssignmentController
             if ($existing->status === AssignmentStatus::Declined) {
                 $machine->reofferAfterDecline(
                     $existing,
-                    (int) $validated['agreed_fee_minor_units'],
-                    strtoupper((string) $validated['agreed_fee_currency']),
-                    $validated['fee_per'] ?? null,
-                    $validated['offer_description'] ?? null,
-                    $attachment === null ? null : [
-                        'path' => (string) $attachment['upload_id'],
-                        'name' => (string) $attachment['name'],
-                        'mime' => (string) $attachment['mime_type'],
-                        'size' => (int) $attachment['size_bytes'],
-                    ],
+                    $offer->agreedFeeMinorUnits,
+                    $offer->agreedFeeCurrency,
+                    $offer->feePer,
+                    $offer->offerDescription,
+                    $offer->attachmentForReoffer(),
                     $actor,
                 );
             }
@@ -200,53 +196,13 @@ final class CampaignAssignmentController
             }
         }
 
-        $assignment = CampaignAssignment::query()->create([
-            'agency_id' => $agency->id,
-            'campaign_id' => $campaign->id,
-            'brand_id' => $campaign->brand_id,
-            'creator_id' => $creator->id,
-            'status' => AssignmentStatus::Invited,
-            'invited_at' => now(),
-            'invited_by_user_id' => $actor->id,
-            'agreed_fee_minor_units' => $validated['agreed_fee_minor_units'],
-            'agreed_fee_currency' => strtoupper((string) $validated['agreed_fee_currency']),
-            // Invite-offer-details batch — free-text offer context + the one
-            // optional attachment (verified against the campaign prefix above).
-            'fee_per' => $validated['fee_per'] ?? null,
-            'offer_description' => $validated['offer_description'] ?? null,
-            'offer_attachment_path' => $attachment['upload_id'] ?? null,
-            'offer_attachment_name' => $attachment['name'] ?? null,
-            'offer_attachment_mime' => $attachment['mime_type'] ?? null,
-            'offer_attachment_size_bytes' => $attachment['size_bytes'] ?? null,
-            'deliverables' => $validated['deliverables'] ?? null,
-            'posting_due_at' => $validated['posting_due_at'] ?? null,
-            // Sprint 12 Chunk 3 (D-2) — mirror of posting_due_at; nullable.
-            'draft_due_at' => $validated['draft_due_at'] ?? null,
-        ]);
-
-        // Correction #1 — invite is a CREATE, not a machine transition, so the
-        // ENDPOINT hand-writes the `assignment.invited` audit row + dispatches
-        // the event (the machine never sees the create). The event carries
-        // from=to=invited (no prior state) so the future board listener can
-        // create the card off `eventKey()`.
-        Audit::log(
-            action: AuditAction::AssignmentInvited,
-            subject: $assignment,
-            metadata: [
-                'from' => null,
-                'to' => AssignmentStatus::Invited->value,
-                'agreed_fee_minor_units' => $assignment->agreed_fee_minor_units,
-                'agreed_fee_currency' => $assignment->agreed_fee_currency,
-            ],
-        );
-
-        AssignmentTransitioned::dispatch(
-            $assignment,
-            AssignmentStatus::Invited,
-            AssignmentStatus::Invited,
-            AuditAction::AssignmentInvited,
-            $actor->id,
-        );
+        // The create + its hand-written audit row + its hand-dispatched event
+        // live in ONE service (AH-058 S1) because accept-an-application is now a
+        // second way an invitation is born, and an invitation created without
+        // that audit row and that event is an assignment with no board card and
+        // no message thread. Correction #1's reasoning moved into the service's
+        // docblock with the code.
+        $assignment = $invitations->invite($agency, $campaign, $creator, $offer, $actor);
 
         return (new CampaignAssignmentResource($assignment->load('creator:id,ulid,display_name')))
             ->response()
