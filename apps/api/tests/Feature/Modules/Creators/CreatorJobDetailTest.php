@@ -48,6 +48,10 @@ const CARD_KEYS = [
     'applicant_count',
     'listed_at',
     'application_status',
+    // The coarse lifecycle reflection (AH-059, D5). On the CARD as well as the
+    // detail — unlike `assignment_ulid`, which stays detail-only. The card
+    // renders the state; the detail additionally offers the link.
+    'assignment_state',
     'brand',
 ];
 
@@ -352,6 +356,217 @@ it('keeps the bridge OFF the card — the detail owns the link', function (): vo
     $card = $this->actingAs($f->user)->getJson(CreatorJobFixture::URL)->assertOk()->json('data.0.attributes');
 
     expect(array_keys($card))->toBe(CARD_KEYS);
+});
+
+// ── D5: the coarse lifecycle reflection, on BOTH surfaces (AH-059) ──────────
+
+/**
+ * Both shapes' `assignment_state`, from one request pair, so a divergence
+ * between card and detail is a red rather than something a reader has to notice.
+ *
+ * @return array{card: mixed, detail: mixed}
+ */
+function assignmentStates(CreatorJobFixture $f): array
+{
+    return [
+        'card' => test()->actingAs($f->user)->getJson(CreatorJobFixture::URL)
+            ->assertOk()->json('data.0.attributes.assignment_state'),
+        'detail' => test()->actingAs($f->user)->getJson($f->jobUrl())
+            ->assertOk()->json('data.attributes.assignment_state'),
+    ];
+}
+
+/** Give the caller's pair an assignment in `$status`. */
+function assignPair(CreatorJobFixture $f, AssignmentStatus $status): CampaignAssignment
+{
+    return CampaignAssignment::factory()->status($status)->createOne([
+        'agency_id' => $f->agency->id,
+        'campaign_id' => $f->campaign->id,
+        'brand_id' => $f->brand->id,
+        'creator_id' => $f->creator->id,
+    ]);
+}
+
+it('emits a null assignment_state on both surfaces until the pair has an assignment', function (): void {
+    $f = CreatorJobFixture::make();
+
+    expect(assignmentStates($f))->toBe(['card' => null, 'detail' => null]);
+
+    // An application is not an engagement — a pending applicant has no stage to
+    // reflect, and the surfaces keep rendering the application's own answer.
+    CampaignApplication::factory()->status(CampaignApplicationStatus::Pending)->createOne([
+        'campaign_id' => $f->campaign->id,
+        'creator_id' => $f->creator->id,
+    ]);
+
+    expect(assignmentStates($f))->toBe(['card' => null, 'detail' => null]);
+});
+
+it('reflects every assignment status as its coarse family, identically on card and detail', function (
+    AssignmentStatus $status,
+    string $expected,
+): void {
+    $f = CreatorJobFixture::make();
+
+    assignPair($f, $status);
+
+    expect(assignmentStates($f))->toBe(['card' => $expected, 'detail' => $expected]);
+})->with([
+    // The full 16-case catalogue over HTTP. JobLifecycleStateTest pins the
+    // mapping in isolation; this pins that the mapping actually reaches both
+    // payloads — the two subqueries and two resources in between are where a
+    // correct mapping still fails to arrive.
+    'invited → in progress' => [AssignmentStatus::Invited, 'in_progress'],
+    'countered → in progress' => [AssignmentStatus::Countered, 'in_progress'],
+    'accepted → in progress' => [AssignmentStatus::Accepted, 'in_progress'],
+    'contracted → in progress' => [AssignmentStatus::Contracted, 'in_progress'],
+    'producing → in progress' => [AssignmentStatus::Producing, 'in_progress'],
+    'draft_submitted → in progress' => [AssignmentStatus::DraftSubmitted, 'in_progress'],
+    'revision_requested → in progress' => [AssignmentStatus::RevisionRequested, 'in_progress'],
+    // Approved but not yet posted: nothing is live, so "Completed" would
+    // over-promise.
+    'approved → in progress' => [AssignmentStatus::Approved, 'in_progress'],
+    'posted → completed' => [AssignmentStatus::Posted, 'completed'],
+    'live_verified → completed' => [AssignmentStatus::LiveVerified, 'completed'],
+    'manually_verified → completed' => [AssignmentStatus::ManuallyVerified, 'completed'],
+    'payment_held → completed' => [AssignmentStatus::PaymentHeld, 'completed'],
+    // …and the isTerminal() trap: terminal, but a SUCCESS.
+    'payment_released → completed' => [AssignmentStatus::PaymentReleased, 'completed'],
+    'declined → ended' => [AssignmentStatus::Declined, 'ended'],
+    'rejected → ended' => [AssignmentStatus::Rejected, 'ended'],
+    'cancelled → ended' => [AssignmentStatus::Cancelled, 'ended'],
+]);
+
+it('never reflects ANOTHER creator engagement — the new subquery repeats the scoping negative', function (): void {
+    $f = CreatorJobFixture::make();
+
+    $otherCreator = CreatorFactory::new()->approved()->createOne();
+
+    // Their engagement is well under way on the same campaign.
+    CampaignAssignment::factory()->status(AssignmentStatus::Producing)->createOne([
+        'agency_id' => $f->agency->id,
+        'campaign_id' => $f->campaign->id,
+        'brand_id' => $f->brand->id,
+        'creator_id' => $otherCreator->id,
+    ]);
+
+    // BREAK-REVERT: drop `callerAssignmentStatusSubquery()`'s `creator_id` filter
+    // and both surfaces start reporting `in_progress` — one creator reading
+    // another's engagement. The same negative the ULID subquery carries, repeated
+    // for the new one rather than assumed to transfer.
+    expect(assignmentStates($f))->toBe(['card' => null, 'detail' => null]);
+});
+
+// ── D1: the rejected-chip contradiction, four cases × two surfaces ──────────
+
+/**
+ * @return array{card: array{application_status: mixed, assignment_state: mixed}, detail: array{application_status: mixed, assignment_state: mixed}}
+ */
+function contradictionPayloads(CreatorJobFixture $f): array
+{
+    $card = test()->actingAs($f->user)->getJson(CreatorJobFixture::URL)
+        ->assertOk()->json('data.0.attributes');
+    $detail = test()->actingAs($f->user)->getJson($f->jobUrl())
+        ->assertOk()->json('data.attributes');
+
+    return [
+        'card' => [
+            'application_status' => $card['application_status'],
+            'assignment_state' => $card['assignment_state'],
+        ],
+        'detail' => [
+            'application_status' => $detail['application_status'],
+            'assignment_state' => $detail['assignment_state'],
+        ],
+    ];
+}
+
+/**
+ * The §5.34 set for D1, at the payload layer: the four combinations of
+ * (application rejected or not) × (assignment present or not), on both surfaces.
+ *
+ * The display rule itself is the SPA's — the branch ordering lives there, and
+ * CreatorJobsPage/CreatorJobDetailPage's specs assert the rendered outcome. What
+ * these cases pin is that the API hands the SPA BOTH facts in every combination,
+ * because a branch cannot order over a field it was not given. Case 2 is the
+ * eyes-on bug's exact shape.
+ */
+it('D1 case 1 — rejected application, NO assignment: the rejection is the whole story', function (): void {
+    $f = CreatorJobFixture::make();
+
+    CampaignApplication::factory()->status(CampaignApplicationStatus::Rejected)->createOne([
+        'campaign_id' => $f->campaign->id,
+        'creator_id' => $f->creator->id,
+    ]);
+
+    // §5.34's retained branch: this is the case that still renders
+    // "Not selected", and it must keep doing so.
+    expect(contradictionPayloads($f))->toBe([
+        'card' => ['application_status' => 'rejected', 'assignment_state' => null],
+        'detail' => ['application_status' => 'rejected', 'assignment_state' => null],
+    ]);
+});
+
+it('D1 case 2 — rejected application + LIVE invitation: both facts travel (the eyes-on bug)', function (): void {
+    $f = CreatorJobFixture::make();
+
+    // The exact shape Pedram found: the agency rejected the application, then
+    // invited the creator anyway. The application row stays rejected — the
+    // agency's answer to THAT application was truthful, and the later invitation
+    // is a separate event.
+    CampaignApplication::factory()->status(CampaignApplicationStatus::Rejected)->createOne([
+        'campaign_id' => $f->campaign->id,
+        'creator_id' => $f->creator->id,
+    ]);
+
+    assignPair($f, AssignmentStatus::Invited);
+
+    expect(contradictionPayloads($f))->toBe([
+        'card' => ['application_status' => 'rejected', 'assignment_state' => 'in_progress'],
+        'detail' => ['application_status' => 'rejected', 'assignment_state' => 'in_progress'],
+    ]);
+});
+
+it('D1 case 3 — rejected application + ENDED assignment: the assignment still wins (Q2)', function (): void {
+    $f = CreatorJobFixture::make();
+
+    CampaignApplication::factory()->status(CampaignApplicationStatus::Rejected)->createOne([
+        'campaign_id' => $f->campaign->id,
+        'creator_id' => $f->creator->id,
+    ]);
+
+    // The invitation was declined. Ruled at plan-pause (Q2a): the assignment
+    // wins whenever one exists, including an ended one, so this reads "Ended"
+    // rather than reverting to "Not selected". A pair that was ever invited never
+    // reads "Not selected" again, and that is the honest story — the agency's
+    // last act on the pair was an invitation, not a refusal.
+    assignPair($f, AssignmentStatus::Declined);
+
+    expect(contradictionPayloads($f))->toBe([
+        'card' => ['application_status' => 'rejected', 'assignment_state' => 'ended'],
+        'detail' => ['application_status' => 'rejected', 'assignment_state' => 'ended'],
+    ]);
+});
+
+it('D1 case 4 — accepted application + assignment: unchanged from chunk 4, now with a stage', function (): void {
+    $f = CreatorJobFixture::make();
+
+    CampaignApplication::factory()->status(CampaignApplicationStatus::Accepted)->createOne([
+        'campaign_id' => $f->campaign->id,
+        'creator_id' => $f->creator->id,
+    ]);
+
+    $assignment = assignPair($f, AssignmentStatus::Contracted);
+
+    expect(contradictionPayloads($f))->toBe([
+        'card' => ['application_status' => 'accepted', 'assignment_state' => 'in_progress'],
+        'detail' => ['application_status' => 'accepted', 'assignment_state' => 'in_progress'],
+    ]);
+
+    // And the detail still carries the bridge to that assignment — the reflection
+    // replaces the accepted NOTICE, not the link out of it.
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()
+        ->assertJsonPath('data.attributes.assignment_ulid', $assignment->ulid);
 });
 
 it('requires authentication on the detail too', function (): void {

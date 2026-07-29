@@ -40,6 +40,12 @@ use Illuminate\Http\Request;
  *                               application and the assignment are separate
  *                               rows and can disagree.
  *
+ * `assignment_state` (AH-059, D5) is NOT in that list, because it is not a detail
+ * addition: it lives on the shared card block, so both shapes carry it. The
+ * asymmetry with `assignment_ulid` is deliberate and documented on
+ * {@see CreatorJobCardResource::callerAssignmentState()} — the card renders the
+ * STATE, the detail additionally offers the LINK.
+ *
  * Everything the card withholds, the detail withholds too. The exact-keyset
  * assertion in the feature test covers BOTH shapes.
  *

@@ -7,6 +7,7 @@ namespace App\Modules\Creators\Http\Resources;
 use App\Modules\Brands\Http\Resources\BrandResource;
 use App\Modules\Brands\Services\BrandLogoUploadService;
 use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Creators\Enums\JobLifecycleState;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -47,6 +48,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * it counts every application status (pending + accepted + rejected — "how much
  * interest does this job have", D4), and it is deliberate rather than
  * incidental.
+ *
+ * `assignment_state` is the coarse lifecycle reflection (AH-059, D5) and the
+ * field that settles D1's contradiction — see {@see callerAssignmentState()} for
+ * both, including why it lives on the CARD while `assignment_ulid` does not.
  *
  * `listed_at` powers the recency chip and is the honest answer to it: it is
  * stamped only on the listing flip, so it cannot drift the way `updated_at`
@@ -94,6 +99,8 @@ class CreatorJobCardResource extends JsonResource
             // the controller in one correlated subquery. null ⟹ never applied.
             // It is the caller's own datum — never any other creator's.
             'application_status' => $this->callerApplicationStatus($campaign),
+            // The coarse lifecycle reflection (AH-059, D5) — see below.
+            'assignment_state' => $this->callerAssignmentState($campaign),
             'brand' => $this->brandSubset($campaign),
         ];
     }
@@ -127,5 +134,40 @@ class CreatorJobCardResource extends JsonResource
         $status = $campaign->getAttribute('caller_application_status');
 
         return is_string($status) ? $status : null;
+    }
+
+    /**
+     * The COARSE lifecycle reflection (AH-059, D5) — `in_progress` / `completed`
+     * / `ended`, or null when the caller's pair has no assignment.
+     *
+     * Three of the sixteen assignment statuses reach a creator here, by
+     * {@see JobLifecycleState}'s single exhaustive mapping. The 16-state machine
+     * is an agency-side instrument and stays one: a creator does not need to be
+     * told the difference between `producing` and `revision_requested` on a job
+     * card, and the fine states are readable on the assignment itself, which the
+     * detail links to.
+     *
+     * ⚠ **This field is also what settles D1.** The SPA renders it BEFORE the
+     * application's own status, so a rejected application can never put
+     * "Not selected" beside a live invitation for the same campaign. The
+     * consequence is deliberate (Q2): whenever an assignment exists it wins —
+     * including an `ended` one — so a pair that was ever invited never reads
+     * "Not selected" again. The agency's last act on that pair was an invitation,
+     * not a refusal.
+     *
+     * ⚠ **Emitted on the card as well as the detail**, unlike `assignment_ulid`.
+     * That is not a reversal of chunk 4's D7 (which put the BRIDGE on the detail
+     * because the card has no link to give) — it is the same reasoning applied to
+     * a different field: without the state on the card, the card keeps telling the
+     * contradiction the detail has stopped telling.
+     *
+     * Read-only and derived at read time. No column, no event, no sync: nothing
+     * persists this, so it cannot go stale against the assignment it reflects.
+     */
+    private function callerAssignmentState(Campaign $campaign): ?string
+    {
+        return JobLifecycleState::tryFromAssignmentStatusValue(
+            $campaign->getAttribute('caller_assignment_status'),
+        )?->value;
     }
 }

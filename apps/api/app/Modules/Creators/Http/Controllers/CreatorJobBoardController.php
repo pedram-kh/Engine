@@ -115,6 +115,10 @@ final class CreatorJobBoardController
             // The CALLER's own application status, so the card can render
             // "Applied" / "Not selected" without a second round trip.
             ->addSelect(['caller_application_status' => $this->callerApplicationSubquery($creator)])
+            // The caller's own assignment status (D5), collapsed to a coarse
+            // lifecycle state by the resource. On the CARD as well as the detail:
+            // D1's fix is branch ordering over this field.
+            ->addSelect(['caller_assignment_status' => $this->callerAssignmentStatusSubquery($creator)])
             // Two brand columns only. The card resource cannot emit
             // `website_url` because it is not even loaded here — belt on top of
             // the resource's narrow keyset (D3).
@@ -164,9 +168,11 @@ final class CreatorJobBoardController
             ->select([...self::CARD_COLUMNS, ...self::DETAIL_COLUMNS])
             ->withCount('applications')
             ->addSelect(['caller_application_status' => $this->callerApplicationSubquery($creator)])
+            ->addSelect(['caller_assignment_status' => $this->callerAssignmentStatusSubquery($creator)])
             // The D7 bridge — the caller's own assignment on this campaign, so
             // an accepted applicant can reach the offer waiting for them.
-            // Detail only (the card has no link to give).
+            // Detail only (the card has no link to give) — unlike the STATE
+            // above, which both surfaces render.
             ->addSelect(['caller_assignment_ulid' => $this->callerAssignmentUlidSubquery($creator)])
             // One extra brand column vs the card — `website_url`, the third and
             // last brand field to cross to a creator audience (D3).
@@ -360,6 +366,41 @@ final class CreatorJobBoardController
         return CampaignAssignment::query()
             ->withoutGlobalScope(BelongsToAgencyScope::class)
             ->select('ulid')
+            ->whereColumn('campaign_assignments.campaign_id', 'campaigns.id')
+            ->where('campaign_assignments.creator_id', $creator->id)
+            ->limit(1);
+    }
+
+    /**
+     * The lifecycle reflection's input (AH-059, D5) — the RAW status of the
+     * caller's own assignment on this campaign, mapped to the coarse
+     * {@see JobLifecycleState} by the resource.
+     *
+     * Unlike the bridge above, this one is annotated on BOTH the list and the
+     * detail. Both surfaces reflect the engagement's stage, and both need it for
+     * a second reason: D1's fix is BRANCH ORDERING over this field, so a card
+     * without it would keep rendering "Not selected" beside a live invitation —
+     * which is the contradiction the whole decision exists to kill. That is why
+     * `assignment_state` is on the card while `assignment_ulid` stays detail-only
+     * (chunk 4's D7 reasoning is preserved, not reversed): the STATE is what the
+     * card renders, the LINK is what the detail offers.
+     *
+     * The raw status crosses the boundary and is collapsed in the resource rather
+     * than mapped in SQL — a CASE expression here would put a second copy of the
+     * family mapping in a place PHPStan cannot check for exhaustiveness, which is
+     * precisely the failure D5 is built to make impossible.
+     *
+     * Scoped by `creator_id` exactly as the two subqueries above are.
+     * BREAK-REVERT: drop that filter and a creator's job card starts reflecting
+     * another creator's engagement.
+     *
+     * @return Builder<CampaignAssignment>
+     */
+    private function callerAssignmentStatusSubquery(Creator $creator): Builder
+    {
+        return CampaignAssignment::query()
+            ->withoutGlobalScope(BelongsToAgencyScope::class)
+            ->select('status')
             ->whereColumn('campaign_assignments.campaign_id', 'campaigns.id')
             ->where('campaign_assignments.creator_id', $creator->id)
             ->limit(1);

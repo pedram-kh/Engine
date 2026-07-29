@@ -825,6 +825,23 @@ export interface ProceedWithoutContractResponse {
 export type CampaignApplicationStatus = 'pending' | 'accepted' | 'rejected'
 
 /**
+ * Mirror of the API's `JobLifecycleState` (AH-059, D5) — the COARSE, read-only
+ * stage of the caller's own engagement on a job, derived server-side from the
+ * 16-state assignment machine by one exhaustive mapping. `null` means the pair
+ * has no assignment.
+ *
+ * Three states reach a creator on purpose. The fine assignment statuses are an
+ * agency-side instrument and are readable on the assignment itself, which the
+ * job detail links to via `assignment_ulid`.
+ *
+ * ⚠ This union is the SPA's whole vocabulary for the field, and adding a member
+ * here is not how a fourth state ships: the source of truth is
+ * `App\Modules\Creators\Enums\JobLifecycleState`, whose `match` is exhaustive
+ * against the assignment enum and whose catalogue test pins these three values.
+ */
+export type JobLifecycleState = 'in_progress' | 'completed' | 'ended'
+
+/**
  * The brand subset a creator may see (D3) — three fields, and adding a fourth
  * is a decision rather than a patch. `website_url` is detail-only; the card's
  * brand object carries `name` + `logo_url` and nothing else.
@@ -853,6 +870,16 @@ export interface CreatorJobCardResource {
     listed_at: string | null
     /** The CALLER's own application status. Null ⟹ never applied. */
     application_status: CampaignApplicationStatus | null
+    /**
+     * The caller's own engagement stage (AH-059, D5). Null ⟹ no assignment.
+     *
+     * ⚠ Present on the CARD as well as the detail, unlike `assignment_ulid`.
+     * That asymmetry is deliberate: this field is what the surfaces render, and
+     * D1's fix is to branch on it BEFORE `application_status` — so a rejected
+     * application never puts "Not selected" beside a live invitation. A card
+     * without it would keep telling that contradiction.
+     */
+    assignment_state: JobLifecycleState | null
     brand: CreatorJobBrand | null
   }
 }
