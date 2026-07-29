@@ -170,7 +170,7 @@ it('a member who silenced the type in-app gets no row — the flag does not over
 
 it('FLAG OFF: the log line counts BOTH recipients as suppressed (AH-059, D2)', function (): void {
     Mail::fake();
-    Log::spy();
+    $log = Log::spy();
     expect(Feature::active(ApplicationNotificationsEnabled::NAME))->toBeFalse();
 
     $s = submittedFixture();
@@ -180,7 +180,7 @@ it('FLAG OFF: the log line counts BOTH recipients as suppressed (AH-059, D2)', f
     // The fan-out verb is the one where the counts have to be counts rather than
     // booleans: two notifiable members, both suppressed, one line. A boolean here
     // would hide a partial send — the failure mode where SOME recipients got mail.
-    Log::shouldHaveReceived('info')
+    $log->shouldHaveReceived('info')
         ->withArgs(fn (string $message, array $context): bool => $message === 'jobs-board: application notification emitted'
             && $context['type'] === NotificationType::CampaignApplicationSubmitted->value
             && $context['recipients'] === 2

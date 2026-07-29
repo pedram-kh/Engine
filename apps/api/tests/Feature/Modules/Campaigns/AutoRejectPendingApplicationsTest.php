@@ -300,7 +300,7 @@ it('FLAG OFF: no mail, and the in-app rows are STILL written', function (): void
  */
 it('FLAG OFF: says so in the log — the silence is legible, not mysterious', function (): void {
     Mail::fake();
-    Log::spy();
+    $log = Log::spy();
     Feature::deactivate(ApplicationNotificationsEnabled::NAME);
     $s = terminalSetup(CampaignStatus::Cancelled);
 
@@ -313,7 +313,7 @@ it('FLAG OFF: says so in the log — the silence is legible, not mysterious', fu
 
     // BREAK-REVERT ANCHOR (§5.35): delete the logEmission() call from
     // CampaignApplicationNotifier::rejected() and this is the test that reddens.
-    Log::shouldHaveReceived('info')
+    $log->shouldHaveReceived('info')
         ->withArgs(function (string $message, array $context) use ($application, $s): bool {
             return $message === 'jobs-board: application notification emitted'
                 && $context['type'] === NotificationType::CampaignApplicationRejected->value
@@ -331,7 +331,7 @@ it('FLAG OFF: says so in the log — the silence is legible, not mysterious', fu
 
 it('FLAG ON: the same line reports the mail as queued, not suppressed', function (): void {
     Mail::fake();
-    Log::spy();
+    $log = Log::spy();
     Feature::activate(ApplicationNotificationsEnabled::NAME);
     $s = terminalSetup(CampaignStatus::Cancelled);
 
@@ -345,7 +345,7 @@ it('FLAG ON: the same line reports the mail as queued, not suppressed', function
     // The counterpart assertion: the line is only useful if it DISTINGUISHES the
     // two states. `mail_suppressed_by_flag: 0` with `mail_queued: 1` is the
     // reading that sends an operator to the worker and the transport instead.
-    Log::shouldHaveReceived('info')
+    $log->shouldHaveReceived('info')
         ->withArgs(fn (string $message, array $context): bool => $message === 'jobs-board: application notification emitted'
             && $context['mail_queued'] === 1
             && $context['mail_suppressed_by_flag'] === 0)
