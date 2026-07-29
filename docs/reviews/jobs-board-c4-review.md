@@ -814,3 +814,17 @@ dashboard applications teaser (not in the arc plan).
 not notified when a creator applies. It lives in `Agency::notifiableMembers()`, one shared primitive
 across every agency notification on the platform, and it is recorded as pre-existing rather than
 patched for one chunk's three types.
+
+---
+
+## Correction — 2026-07-29 (appended at AH-059, so this file is not read as the last word)
+
+Pedram's eyes-on of this chunk reported that the campaign-closed auto-reject produced an in-app
+notification but **no email, while the manual reject mailed** — recorded at the time as eyes-on item
+#2 and carried into the AH-059 kickoff as a suspected defect in the `campaign_closed` variant's mail
+leg. **The observed symptom was real; the attributed asymmetry was not.** AH-059's investigation found
+`application_notifications_enabled` was **never armed** during that session, so **neither** path
+mailed and both behaved exactly as this review describes. Nothing in chunk 4's mail path is defective,
+and nothing here needed changing: the four files were re-verified byte-identical at the AH-059 close.
+Full evidence in [`jobs-board-c5-plan.md`](jobs-board-c5-plan.md) §2 and
+[`jobs-board-c5-review.md`](jobs-board-c5-review.md) (D2).

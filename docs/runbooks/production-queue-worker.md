@@ -307,6 +307,59 @@ Already-stamped creators are never re-nudged regardless.
 > backfill) are _manual_ post-deploy steps and are **not** on the scheduler —
 > don't conflate them with this cron.
 
+### 7.4 First-enable ritual for the two jobs-board mail flags (AH-059)
+
+The Jobs Board arc ships **both** of its mail flags OFF and arms them **together, once**,
+as a single deliberate act that is **separable from the deploy** and later than it. The
+rationale, the off-state contracts and the disarm semantics live in
+[`docs/feature-flags.md`](../feature-flags.md) ("The jobs-board arc's combined first-enable
+ritual"). This is the operator's short form.
+
+**Preconditions.** The worker is running **and has been restarted since the deploy** (§4) —
+the arc carries new mailable classes and new `lang/**` copy, and a worker caches
+translations in memory. **No scheduler dependency**: every trigger is a user action or the
+terminal-flip job, so §7's cron is irrelevant here.
+
+1. **Preview the one flag that can be previewed** (pure read, ignores the flag):
+
+   ```bash
+   php artisan campaigns:preview-job-notifications {campaign-ulid} --dry-run
+   # → would notify N, would remain M   (cap 50 per run, oldest-roster-first)
+   ```
+
+   `N` is how many of the live creator base (~279) the next listing flip mails. Read it
+   before flipping, not after.
+
+2. **`application_notifications_enabled` has no preview** — its volume is human-driven.
+   The one shape worth knowing: `campaign_application.submitted` fans to **every admin and
+   manager of the agency**, once per application.
+
+3. **Arm both from the admin Feature-flags page**, `job_posted_notifications_enabled`
+   first. A reason is mandatory on each; both are written to the audit log as
+   `feature_flag.toggled`.
+
+4. **⚠ Read both flags back — do not assume the click landed.** This step exists because of
+   a real incident (AH-059 §2): an hour was spent chasing a "broken" mail path when the flag
+   had simply never been armed.
+
+   ```bash
+   php artisan tinker --execute="\
+     dump(Laravel\Pennant\Feature::active('job_posted_notifications_enabled'), \
+          Laravel\Pennant\Feature::active('application_notifications_enabled'));"
+   ```
+
+   Both must be `true`.
+
+5. **Watch, in this order:** the log (the fan-out reports `enabled/notified/remaining`; the
+   applications notifier now logs one line per emission decision naming type, recipient
+   count and flag state), the queue depth (§5 — it should drain, not grow), `failed_jobs`
+   for `JobPostedMail` / `Application*Mail`, and then one real delivered mail rendering in
+   the recipient's locale.
+
+**To pause.** Flip either flag OFF, with a reason. Both go fully inert; in-app notifications
+keep writing (by design). Nothing already sent is recalled, and the fan-out's once-per
+`(campaign, creator)` stamps are not cleared — a re-arm never re-notifies the same person.
+
 ---
 
 ## 8. Deploy order (the checklist)
@@ -346,8 +399,14 @@ Run these steps **in order**. Do not skip step 1.
 
 ### 8.1 First concrete instance — the current pending-deploy list
 
+> **⚠ Superseded, kept as the worked example (2026-07-29).** This list shipped: prod
+> `migrate:status` reports the AH-033–041 range and AH-048's column **Ran**, and both
+> one-shot commands are closed. **The next real deploy is [§8.3](#83-the-jobs-board-arc--the-single-deploy-ah-053--ah-059)** — the Jobs Board arc as one
+> unit. This section stays because it is the checklist worked through end to end on a
+> real deploy, which is worth more than a deleted section.
+
 The pending-deploy obligations carried in `RESUMPTION-TEMPLATE.md` Part 2, mapped
-onto the checklist above (this is the next real deploy):
+onto the checklist above:
 
 1. **Snapshot** — take it, wait for `available`, record the ID.
 2. **`php artisan migrate`** — this range carries the \*\*AH-033–AH-041 migrations
@@ -387,3 +446,68 @@ scratch instance → verify data integrity), the §5.40 production-data-safety
 standard is **incomplete** and every deploy should lean even more conservatively.
 This is a standing open item owned by Pedram, mirrored in
 `RESUMPTION-TEMPLATE.md` Part 2 → Open threads.
+
+### 8.3 The Jobs Board arc — the single deploy (AH-053 → AH-059)
+
+**The arc deploys as ONE unit.** Five chunks were built and pushed incrementally with the
+deploy held throughout, precisely so this could be one operation: chunk 1/2 (AH-053/AH-054 —
+brand floor, brand logo pipeline, campaign listing fields + the Settings toggle), chunk 3
+(AH-056 — the creator board, apply, the job-posted fan-out), the eyes-on fix pass (AH-057 —
+zero backend diff), chunk 4 (AH-058 — the agency Applications tab, accept, reject, terminal
+auto-reject), and chunk 5 (AH-059 — the eyes-on fixes, the board Applications column,
+lifecycle reflection, the full-loop E2E, this close-out). **Do not ship a subset.** A partial
+deploy produces half-states nobody designed: a listable campaign with no board to list it on,
+or a board whose applications no agency can answer.
+
+Run §8's checklist. The arc-specific content of each step:
+
+1. **Snapshot** — take it, wait for `available`, record the ID. Non-negotiable: step 2 carries
+   two `CREATE TABLE`s whose `down()` is **lossy** (see below).
+
+2. **`php artisan migrate`** — **four migrations**, all additive, all from chunks 1–3;
+   **chunks 4 and 5 add none**:
+
+   | Migration                                                   | Chunk       | What it does                                                        |
+   | ----------------------------------------------------------- | ----------- | ------------------------------------------------------------------- |
+   | `2026_07_27_100000_add_jobs_board_listing_to_campaigns`     | AH-054 (c2) | Six nullable columns + one boolean defaulting `false`. No backfill. |
+   | `2026_07_27_110000_create_campaign_applications_table`      | AH-056 (c3) | New table. **`down()` is lossy.**                                   |
+   | `2026_07_27_110001_create_campaign_job_notifications_table` | AH-056 (c3) | New table (the once-per-pair fan-out stamp). **`down()` is lossy.** |
+   | `2026_07_27_110002_add_listed_at_to_campaigns`              | AH-056 (c3) | One nullable timestamp. No backfill.                                |
+
+   No existing row is read or rewritten by any of the four. **Rollback honesty:** dropping the
+   two new tables destroys every application and every notification stamp — after creators have
+   applied, a rollback is a data-loss event, not a revert. Restore from step 1's snapshot
+   instead.
+
+3. **Infra — the queue-worker restart is MANDATORY on this deploy**, not optional and not
+   "if convenient" (§4). The arc carries four new mailable classes and new `lang/**` copy
+   across 24 locales; a long-running worker caches translations in memory and will keep
+   sending the old (here: missing-key) bodies until it is bounced. No cron/scheduler change:
+   nothing in the arc is scheduled.
+
+4. **One-shot commands — the arc has none.** One **pre-deploy read** applies if it was never
+   run: `php artisan brands:audit-floor` (AH-053) — a pure read reporting how many brands each
+   completeness floor field blocks, run **before** shipping, because AH-053 makes an incomplete
+   brand's next edit 422. Nothing is backfilled either way.
+
+5. **Smoke-verify** — `/up` 200, one authenticated request, plus two arc-specific reads that
+   cost nothing and prove the deploy landed intact:
+   - A creator's **Jobs** page loads and is **empty** (no campaign is listed yet — see the T+0
+     note below). An empty board is the correct result here, not a failure.
+   - A campaign's **Settings** tab renders the "List on jobs board" toggle, and the campaigns
+     **list** page renders its listing switch (AH-059 D3). Do not flip either during smoke —
+     the first real listing is a product decision, and with the flags OFF it would be a silent
+     one.
+
+6. **Record** — date, the four-migration range, the snapshot ID, and the fact that the worker
+   was restarted.
+
+**The flag ritual is NOT part of this deploy.** Both jobs-board mail flags ship and stay OFF.
+Arming them is §7.4, done when Pedram chooses, and the deploy is complete and correct without
+it.
+
+**Why T+0 is quiet.** At deploy, **zero campaigns are listed** — `listed_on_jobs_board` is a
+new column defaulting `false` and no operator has ever flipped it, because the surfaces that
+flip it are in this same deploy. So the board is empty, no fan-out has a recipient, no
+application exists to answer, and every path the arc adds is inert until an operator lists a
+campaign. That is the arc's primary containment, and it is a fact about the data, not a hope.

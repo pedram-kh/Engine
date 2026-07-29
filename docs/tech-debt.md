@@ -2172,3 +2172,56 @@ ukazuje na váš zveřejněný příspěvek, a poté ho níže znova odešlete."
   `--queue=default,bulk` priority order. Estimated effort: half a day including deployment config.
 - **Owner:** platform.
 - **Status:** open; accepted with the cap as the interim bound.
+
+## The dev and E2E environments share one Redis queue, and `failed_jobs` is unusable as a signal (AH-059)
+
+- **Where:** [`apps/main/playwright.config.ts`](../apps/main/playwright.config.ts) — the API
+  `webServer.env` block overrides `DB_DATABASE=catalyst_e2e` and `MEDIA_DISK_DRIVER=local` but leaves
+  `QUEUE_CONNECTION` alone, so an E2E run enqueues into the same Redis list
+  (`REDIS_PORT=6380`, `queues:default`) that the developer's `pnpm dev` worker consumes.
+- **What we found (AH-059, 2026-07-29, while investigating D2):** 158 rows in `failed_jobs` on the
+  dev host, **every one of them** a stale `VerifyEmailMail` or `InviteAgencyUserMail` failing with
+  `ModelNotFoundException` on `User` / `Agency` — models that existed in `catalyst_e2e` until
+  `global-setup.ts`'s unconditional `migrate:fresh` deleted them, in jobs that outlived the database
+  they belonged to. The newest batch failed six seconds after a dev worker started, draining a
+  backlog left by an earlier Playwright run.
+- **The gap:** two of them. (1) `failed_jobs` is **not a usable diagnostic signal** on a dev host — a
+  real failure would be one row among 158 look-alikes, which is how a genuine mail bug could hide in
+  plain sight during exactly the kind of eyes-on session that produced this finding. (2) A dev worker
+  and an E2E run can process each other's jobs, so an E2E-enqueued mailable can execute against the
+  developer's real database and vice versa. The DB isolation that exists (post-incident, 2026-07-08)
+  does not extend to the queue.
+- **Why it was recorded rather than fixed:** it surfaced inside an arc close-out chunk, and the fix
+  changes the very environment that chunk's full Playwright board runs in. Ruled record-don't-fix by
+  Pedram at the AH-059 plan-pause (Q10).
+- **Trigger:** the next time `failed_jobs` is consulted as a diagnostic, or any work that touches the
+  Playwright `webServer` env block.
+- **Resolution:** add `QUEUE_CONNECTION=sync` (or a dedicated Redis database index) to the API
+  `webServer.env` in `playwright.config.ts`, beside the `DB_DATABASE` override and under the same
+  "NEVER remove this" comment, then flush the accumulated backlog once
+  (`php artisan queue:flush`). Estimated effort: under an hour including a verification run.
+- **Owner:** platform.
+- **Status:** open; recorded at AH-059.
+
+## No creator-facing `is_discoverable` control exists, and the flag never varies in production (AH-059)
+
+- **Where:** `creators.is_discoverable` — read by the discover surfaces, and **not** read by the jobs
+  board (AH-058 dropped that leg on the AH-051 ruling that a browsing preference is not an
+  eligibility gate).
+- **What we found (AH-059, 2026-07-29):** the column exists and is honoured where it is read, but
+  **no surface anywhere lets a creator set it** — not the wizard, not the profile-edit page, not the
+  creator settings. It is therefore at its default for every creator on the platform, which means
+  every gate that consults it is, in production, a constant. A gate that never varies is a gate whose
+  behaviour has never actually been exercised by a real user's choice.
+- **The gap:** this is a **product** gap before it is an engineering one, and the product call is
+  unmade: is discoverability a **creator-controlled** privacy setting (the creator decides whether
+  agencies can find them cold), or an **admin-only** moderation lever (the platform decides who is
+  surfaced)? The two answers imply different surfaces, different audit posture and different copy;
+  building either without the decision would be guessing.
+- **Trigger:** Pedram's product call, or the first support request from a creator asking not to be
+  discoverable.
+- **Resolution:** take the product decision first, then one chunk to build the surface it implies —
+  a wizard/profile toggle with its own i18n and audit row, or an admin control on the creator-detail
+  page. Either way the reading gates need no change.
+- **Owner:** product (Pedram), then creators.
+- **Status:** open; recorded at AH-059 (D7d) as a deliberately unmade product decision.

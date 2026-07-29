@@ -113,7 +113,27 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-28 · **Through:** AH-058 · **Nothing is held.** The push on 2026-07-28
+**Last updated:** 2026-07-29 · **Through:** AH-059 · **⚠ TWELVE COMMITS ARE HELD.** The Jobs Board
+arc's **chunk 5 is built and unpushed**: eleven code commits (`a70c548`, `c27926a`, `b2ca89b`,
+`bb825a8`, `75076ef`, `ce841e2`, `e2501b3`, `a4897b5`, `df99cac`, `0c7ea82`, `26a127a`) plus the docs
+commit carrying [`jobs-board-c5-review.md`](jobs-board-c5-review.md), the AH-059 log entry and the D7
+close-out documents. Nothing pushes until Pedram clears it. `git rev-parse --short HEAD` and
+`git rev-parse --short origin/main` are the authority for where the two tips actually sit — re-derive
+them, do not carry this session's numbers forward.
+
+> **🏁 THE JOBS BOARD ARC IS COMPLETE (AH-053 → AH-059).** Five chunks, one feature, **one deploy**,
+> still held. **AH-059 closes it**: the five eyes-on fixes (the rejected-chip contradiction, the
+> mail-flag investigation, the list-page listing toggle, the board's Applications column, the coarse
+> lifecycle reflection), the cross-role full-lifecycle Playwright spec owed since chunk 3, and the
+> close-out documents. **It adds no migration, no production route, no flag and no notification type**,
+> and it has **zero diff** in the Boards module, the migrations, the automation seeds and the whole
+> application-mail path. **The arc's deploy procedure is now written down in one place:**
+> [`docs/runbooks/production-queue-worker.md` §8.3](../runbooks/production-queue-worker.md) — snapshot,
+> the four additive migrations enumerated, the **mandatory** queue-worker restart, no one-shots, smoke.
+> **The two mail flags stay OFF at deploy**; arming them is a separate later act with its own ritual
+> (§7.4 there, and `feature-flags.md`).
+
+**Prior state, for the record.** The push on 2026-07-28
 moved `origin/main` from `d4b2de5` (the AH-057 docs commit) by **thirteen commits**: the two chunk-4
 **docs** commits held since plan-pause (`895f28a` inventory, `685991c` plan), the nine **AH-058**
 build commits (`0abba72`, `78c2dd8`, `86a44a4`, `5f6486c`, `af0f343`, `d33df9e`, `ef195f8`, `8ff9985`,
@@ -148,9 +168,10 @@ sentence.)
 > listing column) with a **zero backend diff**: no migration, no endpoint, no enum, no lang file. It
 > inherits AH-056's deploy obligations and adds none.
 
-> **A new Playwright project exists (AH-057).** The suite is now **26 specs across two projects**
-> (AH-058 added the agency-side `campaign-applications.spec.ts` to the desktop project) —
-> 25 desktop `chromium` plus one `mobile` leg on the iPhone 13 profile, scoped to
+> **A new Playwright project exists (AH-057).** The suite is now **27 specs across 18 files and two
+> projects** (AH-058 added the agency-side `campaign-applications.spec.ts`; **AH-059 added
+> `jobs-board-full-lifecycle.spec.ts`, the cross-role spec that walks the whole board loop and, at
+> ~30s, the suite's longest**) — 26 desktop `chromium` plus one `mobile` leg on the iPhone 13 profile, scoped to
 > `creator-shell-mobile.spec.ts` alone. It runs on the **Chromium engine**, not WebKit: the device
 > descriptor's `defaultBrowserType` is `webkit`, and Playwright's WebKit build for macOS 14 is frozen
 > and bus-errors on launch on this host. `pnpm test:e2e:install` therefore still fetches chromium
@@ -197,6 +218,25 @@ the deploy notes below.
 > deploys are colleague-managed and advance without notice. Everything through AH-050
 > (`content_companions`) turned out to be already live before today, while this file still listed
 > its migrations as pending. Verify at each session close; do not carry forward an assumption.
+
+**Deploy notes — AH-059 (built 2026-07-29, HELD, NOT deployed).** **No obligations of its own, and no
+migration** — the arc's pending-migration count stays **four**, and this chunk is the one that writes
+that list down. Three things to know:
+
+1. **The whole arc's deploy is now one runbook section**, `production-queue-worker.md` §8.3: the four
+   migrations named with their chunk and their `down()` honesty (**the two `CREATE TABLE`s are lossy on
+   rollback** — after creators have applied, a rollback is a data-loss event, restore from the snapshot
+   instead), the **mandatory** worker restart, the absence of one-shots, and two arc-specific smoke
+   reads. §8.1 is marked superseded and points at it.
+2. **The combined first-enable ritual is written and is NOT part of the deploy** — `feature-flags.md`
+   ("The jobs-board arc's combined first-enable ritual") and runbook §7.4. Both jobs-board mail flags
+   are armed **together**, later, deliberately, and **step 4 is to read both flags back**. That step
+   exists because AH-059's own investigation spent an hour on a "broken" mail path that was simply an
+   unarmed flag.
+3. **D3 changed reachability, not code.** The campaigns-list toggle drives the same PATCH the Settings
+   tab drives, so a mis-click on a table row is now one round-trip from an outbound fan-out to real
+   creators once the flags are armed. The ON direction is behind a confirmation dialog for exactly that
+   reason; OFF stays immediate. At T+0 this is inert — no campaign is listed.
 
 **Deploy notes — AH-058 (pushed 2026-07-28, NOT deployed).** Three obligations, and
 **no migration** — the arc's pending-migration count stays **four**.
@@ -633,10 +673,23 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
 - **📋 `brands:audit-floor` before the AH-053 deploy — the one open obligation from this arc.** A
   pure read, but the number it returns should be looked at before agencies meet the new 422, not
   after. Pairs with `php artisan migrate` for AH-054's additive migration. See the deploy notes above.
-- **Chunk 3 — the Jobs Board itself — is the next piece.** It binds to
-  `Campaign::scopeListedOnJobsBoard()`, which AH-054 shipped already tested with a disjoint negative
-  set, so the contract is fixed rather than open. Reading `listing_regions` as anything other than
-  display text is also the trigger on the region-registry tech-debt entry.
+- ✅ **The Jobs Board arc is CLOSED (AH-059, 2026-07-29).** All five chunks are built; the deploy is
+  the one remaining step and it is Pedram's call (runbook §8.3). Nothing about the board is open as
+  engineering work — what is open is listed below, and both items are **decisions**, not code.
+- **❓ Product call owed — is `is_discoverable` creator-controlled or admin-only?** (AH-059 D7d.) The
+  column exists and is honoured where it is read, but **no surface anywhere lets a creator set it**, so
+  in production it is a constant and every gate consulting it has never been exercised by a real
+  choice. The two answers imply different surfaces, audit posture and copy; building either without the
+  decision would be guessing. Recorded in `tech-debt.md`; owner is product.
+- **The `?tab=` deep link, recorded as a candidate** (AH-059 Q6). The list-page toggle's refusal dialog
+  offers "Open campaign", which lands on the campaign, not on its Settings tab where the missing fields
+  are fixed. A `?tab=settings` deep link is the obvious improvement and was deliberately not built in
+  this chunk.
+- **⚠ `failed_jobs` is not a diagnostic signal on a developer host** (AH-059 C5/Q10). Dev and E2E share
+  one Redis queue, so the table holds 158 stale E2E jobs failing with `ModelNotFoundException` against a
+  database `migrate:fresh` deleted. A real failure would be one row among look-alikes. Production is
+  unaffected. Resolution sketched in `tech-debt.md` (`QUEUE_CONNECTION` override in the Playwright
+  `webServer.env`, plus a one-time flush).
 
 - **🚫 BLOCKER — scheduler existence UNVERIFIED.** Until `supervisorctl status` / `crontab -l` from
   prod confirms a scheduler, **assume NO scheduled command runs in production.** Consequences, all

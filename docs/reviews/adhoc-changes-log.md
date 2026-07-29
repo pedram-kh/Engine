@@ -70,6 +70,88 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-059 · Jobs Board chunk 5 — the eyes-on fixes, the board Applications column, lifecycle reflection, the full-loop E2E, and the arc's close-out
+
+- **Status:** Landed
+- **Commits:** `a70c548` — `feat(creators): coarse job lifecycle state, derived from the assignment enum`;
+  `c27926a` — `fix(campaigns): make the application-mail flag's silence legible`;
+  `b2ca89b` — `feat(creators): emit assignment_state on the job card and detail`;
+  `bb825a8` — `fix(creators): order the engagement above the application on job surfaces`;
+  `75076ef` — `feat(campaigns): make the list page's Job board column an interactive toggle`;
+  `ce841e2` — `test(campaigns): pin the single-key listing PATCH the list page sends`;
+  `e2501b3` — `refactor(campaigns): extract RejectApplicationDialog + useCampaignApplications`;
+  `a4897b5` — `feat(boards): render pending applications as the board's first column`;
+  `df99cac` — `test(helpers): seed a listABLE campaign for the full-lifecycle E2E`;
+  `0c7ea82` — `test(playwright): the jobs board end to end, both roles, one spec`;
+  `26a127a` — `test(campaigns): satisfy PHPStan on the AH-059 test files`; plus the docs commit
+  carrying the review, this entry and the D7 close-out documents. Split by **surface and decision**.
+  Two deliberate features: `e2501b3` is a **pure refactor** standing alone (the 11-spec
+  `ApplicationsTab` guard held byte-for-byte across it, so a later break is provably not the
+  refactor), and `ce841e2` is **test-only** — "the single-key PATCH is judged against the stored row"
+  is a claim about existing backend code, not a change to it.
+- **Date:** 2026-07-29
+- **Why:** The last chunk of the five-chunk Jobs Board arc. Pedram's eyes-on of chunks 3 and 4
+  produced five items; this chunk answers all five, adds the cross-role regression net owed since
+  chunk 3, and writes the arc's close-out documents.
+- **What:** **D1** — the rejected-chip contradiction is dead: a creator who was rejected and then
+  invited anyway no longer reads "Not selected" beside a live invitation (branch ordering; the
+  application row stays `rejected`, because the agency's answer to _that_ application was truthful).
+  **D2** — investigated, explained, **not fixed** (below). **D3** — the campaigns-list "Job board"
+  chip is now an interactive switch driving the same endpoint and gates as the Settings tab, with a
+  confirm on the ON direction and refusals that **name** the missing fields. **D4** — the board's
+  **Applications column**: first column, real-column visual language, pending-only, **no drag in or
+  out**, the same Accept and Reject dialogs the tab uses. **D5** — the creator's job surfaces reflect
+  the engagement's stage (In progress / Completed / Ended) through one exhaustive mapping over the
+  16-case assignment enum. **D6** — one Playwright spec walks the whole loop across both roles.
+  **D7** — the combined first-enable ritual, the arc's single-deploy runbook entry, the resumption
+  template, two recorded gaps.
+- **Touched:** `apps/api` — one new enum (`JobLifecycleState`), one new correlated subquery, two
+  resources, the applications notifier's logging, one flag docblock, one `_test` helper. `apps/main` —
+  the two creator job surfaces, the campaigns-list toggle, `BoardApplicationsColumn` +
+  `RejectApplicationDialog` + `useCampaignApplications`, the board's prop chain. `packages/api-client`
+  — the `JobLifecycleState` union. i18n **528 leaves** (22 × 24). Docs — `feature-flags.md`,
+  `runbooks/production-queue-worker.md`, `tech-debt.md`, `RESUMPTION-TEMPLATE.md`.
+  **No migration, no new production route, no new flag, no new notification type, and zero diff in the
+  Boards module, the migrations, the automation seeds and the whole D2 mail path** — all four proven by
+  `git diff --stat` returning empty, not by prose.
+- **The item that turned out not to be a bug, and is the real content of this entry:** the "auto-reject
+  mail missing" report. **There was no mail-path defect.** `application_notifications_enabled` was
+  **never armed** — the `features` row's `updated_at` never moved, `audit_logs` holds zero
+  `feature_flag.toggled` rows for it against two for the other flags, Mailhog's 153 retained messages
+  contain **zero** hits for `application` or `selected` with the gaps landing exactly where the six
+  emissions were, the DB rows and `laravel.log` show the job ran to completion and wrote its in-app
+  rows, and nothing application-shaped was ever queued or failed. The kickoff's premise — manual reject
+  mails, auto-reject does not — **is not in the evidence**: neither mailed. Confirmed by Pedram at
+  plan-pause (in-app notification only, for the manual reject too). **The c3/c4 eyes-on item #2 is
+  corrected here: the observed symptom was real; the attributed asymmetry was not.**
+- **What that investigation legitimately found, and what shipped because of it:** the notifier was
+  **silent about its own silence** while its sibling fan-out logs every run, so an operator could not
+  distinguish "no mail because an operator chose that" from "no mail because something is broken" —
+  which is exactly what cost an hour of eyes-on. S2 ships one structured log line at every emission
+  decision naming the type, the recipients, the queued count and the flag state; the flag is still read
+  in **one** place. It also corrects a docblock that described a flag re-check the job deliberately does
+  not do (c4's C5 ruling: a mail flag must not gate database truth). And the missing arm-verification
+  became **step 4 of D7's ritual — read both flags back** — with this incident named as its reason.
+- **Decisions:** **One derived field serves two decisions.** D1's stated mechanism (consult
+  `assignment_ulid`) could not work on the card, which does not carry it — and a c4 test asserts it must
+  not, because Q7 ruled detail-only. So `assignment_state` ships on **both** shapes, D1 becomes branch
+  ordering over D5's field, and Q7 is **preserved, not reversed**. **The assignment always wins whenever
+  one exists, including an ended one** — "Not selected" is unreachable for a pair that was ever invited,
+  and that is the honest story. **`approved` is In progress, not Completed** (nothing is live yet), and
+  **the payment pair is Completed** — the `isTerminal()` trap, since `payment_released` is terminal _and
+  a success_. **The no-drag rule is enforced by ABSENCE** — no `<draggable>`, absent from `localColumns`
+  — because a `:disabled` flag is one prop away from being flipped by someone who does not know what it
+  protects. **The Applications tab stays** (full history, including rejected; the column is a
+  pending-only working surface), with the revisit note recorded. **The E2E stops** at the creator
+  accepting the offer, stating two product facts plainly rather than working around them: the assignment
+  auto-advances to `contracted` (the campaign is `requires_per_campaign_contract = false`), and the card
+  **does not move columns** — same ULID, changed chip.
+- **Ref:** [`jobs-board-c5-review.md`](jobs-board-c5-review.md) (plan:
+  [`jobs-board-c5-plan.md`](jobs-board-c5-plan.md)). Five mutations executed and reverted; full gate
+  board including **Playwright 27/27** with the dev stack down and a restart plus health-check after.
+  Two new `tech-debt.md` entries: the shared dev/E2E Redis queue (recorded, not fixed) and the
+  **product** gap that no creator-facing `is_discoverable` control exists.
+
 ### AH-058 · Jobs Board chunk 4 — agency applications: the Applications tab, accept, reject, and terminal auto-reject
 
 - **Status:** Landed

@@ -53,6 +53,91 @@ This document is the registry. **No flags are defined in code yet** — Pennant 
 
 | `application_notifications_enabled` | The jobs-board **applications** vocabulary's MAIL legs: `campaign_application.submitted` (→ the agency's admins + managers when a creator applies), `campaign_application.accepted` and `campaign_application.rejected` (→ the creator when the agency answers, the rejected copy varying on `data.cause` ∈ `agency_rejected` / `campaign_closed`). Toggleable from the admin Feature-flags page. | off | flag OFF → `CampaignApplicationNotifier` queues **no mail** at any of its four emission sites (apply, accept, reject, terminal auto-reject) — and the **in-app rows are still written** at all four. That asymmetry is the design, not a gap: the flag gates mail; in-app honours the recipient's own notification preference. The applications tab, accept and reject all work with the flag OFF; only the outbound push is gated (the break-revert anchor). flag ON → each of the four sites dual-emits (in-app + a queued localized mailable, one per recipient). **This flag gates NO vendor** — the mail is internal transactional notification to an agency's own members and to rostered creators. | **None — gates no vendor.** Enable procedure: flip it from the admin Feature-flags page (a reason is recorded in the audit log), **alongside `job_posted_notifications_enabled`** — the arc's first-enable ritual arms both jobs-board mail flags together, since a board that pushes listings but never acknowledges an application is the confusing half-state. Requires the queue worker running (and a worker **restart**, so the new mailable classes and lang keys are loaded); **no scheduler dependency** — every trigger is a user action or the terminal-flip job. ⚠ Volume note, recorded at AH-058: `submitted` is the one type whose volume is driven by creators rather than by an agency action (N applications to one listing = N mails to every admin + manager). Fine at the current base; a per-campaign digest is the named future move if a popular listing makes it an inbox pattern. |
 
+### The jobs-board arc's combined first-enable ritual (AH-059, D7a)
+
+The two jobs-board mail flags — `job_posted_notifications_enabled` and
+`application_notifications_enabled` — are **armed together, as one procedure**, and this is the
+procedure. Their rows above describe what each one gates; this section is the operator's script for
+the day they are turned on.
+
+**Why together.** A board that pushes listings to creators but never acknowledges their applications
+is the confusing half-state: the creator is invited to apply by email and then hears nothing back
+through the same channel. The two flags are also the same risk class — outbound mail to the live
+base — so they get one read, one decision and one audit moment rather than two.
+
+**When.** Explicitly **separable from the deploy** and later than it. The arc deploys with both flags
+OFF, and at T+0 the population is provably zero: no campaign is listed, so no job-posted mail has a
+recipient and no application exists to acknowledge. Arming is a decision Pedram makes when he wants
+the board to start talking, not a step in shipping it.
+
+**Preconditions.**
+
+- The queue worker is **running and has been restarted since the deploy** (§4 of the runbook). The
+  arc ships new mailable classes and new `lang/**` copy, and a long-running worker caches
+  translations in memory — an un-restarted worker sends a missing-key body.
+- **No scheduler dependency.** Every trigger here is a user action or the terminal-flip job; nothing
+  in the jobs board waits on `schedule:run` (which is still unverified in production — see the
+  standing blocker).
+
+**The steps.**
+
+1. **Dry-run the one flag that has a preview.** Pick a campaign that is (or is about to be) listed:
+
+   ```bash
+   php artisan campaigns:preview-job-notifications {campaign-ulid} --dry-run
+   # → would notify N, would remain M
+   ```
+
+   Read both numbers. This is the arc's first outbound fan-out to the live creator base (~279 at the
+   last count), and `N` is how many people the next listing flip mails. The command mutates nothing
+   and ignores the flag.
+
+2. **`application_notifications_enabled` has no preview, and that is a known asymmetry.** Its volume
+   is driven by human action rather than by a roster query, so there is nothing to count in advance —
+   except for one case worth holding in mind: `campaign_application.submitted` goes to **every admin
+   and manager of the agency**, once per application, so a popular listing is N × (admins+managers)
+   mails. A per-campaign digest is the named future move if that becomes an inbox pattern.
+
+3. **Arm both, from the admin Feature-flags page**, in this order: `job_posted_notifications_enabled`
+   first, then `application_notifications_enabled`. A reason is **mandatory** on each and is written
+   to the audit log as `feature_flag.toggled`. The order matters only in the sense that listings
+   precede applications in time; either order is safe.
+
+4. **⚠ Read both flags BACK.** This step exists because of a real, expensive incident (AH-059 §2): an
+   eyes-on session spent an hour attributing missing application mail to a broken mail path, when the
+   flag had simply never been armed. Nothing in the product distinguishes "no mail because an
+   operator chose that" from "no mail because something is broken" at a glance, so confirm the arm
+   landed rather than assuming the click worked:
+
+   ```bash
+   php artisan tinker --execute="\
+     dump(Laravel\Pennant\Feature::active('job_posted_notifications_enabled'), \
+          Laravel\Pennant\Feature::active('application_notifications_enabled'));"
+   ```
+
+   Both must read `true`. The admin page's own toggle state is a second read of the same truth; the
+   audit log is the third (`feature_flag.toggled` rows, one per flag, with the reasons).
+
+5. **What to watch, in this order.**
+   - **The log.** Both mail paths now announce their own decisions. The fan-out logs
+     `{"enabled":true,"notified":N,"remaining":M}` per run; the applications notifier logs one line
+     per emission decision naming the type, the recipient count and the flag state (AH-059 S2 —
+     added precisely so the §2 incident cannot repeat silently).
+   - **The queue.** `redis-cli -p 6380 llen queues:default` (or the runbook's §5 equivalent) should
+     drain rather than grow. A listing flip enqueues at most 50 mailables plus the job itself.
+   - **`failed_jobs`.** Any `SendQueuedMailable` carrying `JobPostedMail` or one of the three
+     `Application*Mail` classes is a real signal. ⚠ On a **developer** host this table is currently
+     polluted by stale E2E jobs (tech-debt, AH-059); in production it is clean and trustworthy.
+   - **The first real recipient.** Confirm one delivered mail renders in the recipient's locale with
+     the interpolated campaign and brand names present — the arc's mail is localized per recipient.
+
+**To disarm.** Flip either flag OFF from the same page, with a reason. Both are complete no-ops when
+OFF: nothing queued, nothing stamped by the fan-out, and — the deliberate asymmetry — **in-app
+notifications keep writing** for the applications vocabulary regardless, honouring each recipient's
+own preference. Disarming stops future mail; it does not recall what was sent, and the fan-out's
+once-per-`(campaign, creator)` stamps are **not** cleared, so a re-arm does not re-notify anyone who
+was already notified.
+
 ## Conventions
 
 - **Naming.** Flags use snake*case, prefixed by the domain (`social_oauth*\_`, `kyc\_\_`, `payment\_\*`). The suffix is always `\_enabled`so the active state reads naturally:`if (Feature::active('payment_processing_enabled')) { ... }`.
