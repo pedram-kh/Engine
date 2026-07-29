@@ -822,6 +822,81 @@ export async function seedPendingApplications(
 }
 
 // ---------------------------------------------------------------------------
+// AH-059 (D6) — full-lifecycle provisioning: listABLE, not listed
+// ---------------------------------------------------------------------------
+
+export interface SeedListableCampaignResult {
+  agencyUlid: string
+  campaignUlid: string
+  campaignName: string
+  brandName: string
+  creatorUlid: string
+  creatorDisplayName: string
+}
+
+/**
+ * Seed a floor-COMPLETE but UNLISTED campaign on the given agency, plus the
+ * creator with the given email approved and rostered against that agency.
+ *
+ * The one helper in this file that deliberately stops SHORT of the jobs board.
+ * Every other jobs-board fixture hands the spec a campaign that is already
+ * listed, because those specs start downstream of the listing; the
+ * full-lifecycle spec starts AT it — flipping the D3 toggle is its first step —
+ * so a helper that pre-listed would quietly delete the step under test. The
+ * floor is filled so the toggle is accepted rather than 422'd, and
+ * `requires_per_campaign_contract` is forced off so the creator's offer-accept
+ * at the end of the loop does not land on the contract gate (a different branch
+ * with its own coverage).
+ *
+ * Agency-keyed, like {@link seedPendingApplications}: a cross-role spec signs in
+ * as the agency it seeded, so the campaign must live on an agency it controls.
+ */
+export async function seedListableCampaign(
+  request: APIRequestContext,
+  agencyUlid: string,
+  creatorEmail: string,
+  options: { campaignName?: string; brandName?: string } = {},
+): Promise<SeedListableCampaignResult> {
+  const response = await request.post(
+    `http://127.0.0.1:8000/api/v1/_test/agencies/${agencyUlid}/listable-campaign`,
+    {
+      headers: defaultHeaders,
+      data: {
+        email: creatorEmail,
+        campaign_name: options.campaignName ?? null,
+        brand_name: options.brandName ?? null,
+      },
+    },
+  )
+
+  if (response.status() !== 201) {
+    throw new Error(
+      `seedListableCampaign failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  const body = (await response.json()) as {
+    data: {
+      agency_ulid: string
+      campaign_ulid: string
+      campaign_name: string
+      brand_name: string
+      creator_ulid: string
+      creator_display_name: string
+    }
+  }
+
+  return {
+    agencyUlid: body.data.agency_ulid,
+    campaignUlid: body.data.campaign_ulid,
+    campaignName: body.data.campaign_name,
+    brandName: body.data.brand_name,
+    creatorUlid: body.data.creator_ulid,
+    creatorDisplayName: body.data.creator_display_name,
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Sprint 6.6c — creator connection-request inbox provisioning
 // ---------------------------------------------------------------------------
 

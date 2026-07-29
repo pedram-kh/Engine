@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\TestHelpers\Http\Controllers\CreateAdminUserController;
 use App\TestHelpers\Http\Controllers\CreateAgencyInvitationController;
 use App\TestHelpers\Http\Controllers\CreateAgencyWithAdminController;
+use App\TestHelpers\Http\Controllers\CreateListableCampaignController;
 use App\TestHelpers\Http\Controllers\CreateListedJobController;
 use App\TestHelpers\Http\Controllers\CreatePendingApplicationsController;
 use App\TestHelpers\Http\Controllers\CreatePendingConnectionRequestController;
@@ -111,6 +112,17 @@ Route::prefix('_test')
         // sign into.
         Route::post('agencies/{agency}/pending-applications', CreatePendingApplicationsController::class)
             ->name('agencies.pending_applications.create');
+
+        // AH-059 (D6) — a floor-complete but UNLISTED campaign on the given
+        // agency, plus the signed-in creator approved and rostered against it.
+        // The full-lifecycle spec starts one step earlier than every other
+        // jobs-board leg: it performs the listing itself, so the helper must
+        // NOT pre-list (that would delete the first step under test). Sibling
+        // of pending-applications for the same reason that one is a sibling of
+        // creators/listed-job — a cross-role spec signs in as the agency it
+        // seeded, so the campaign has to live on an agency it controls.
+        Route::post('agencies/{agency}/listable-campaign', CreateListableCampaignController::class)
+            ->name('agencies.listable_campaign.create');
 
         // Sprint 6.6c — approve the signed-in creator + seed a pending_request
         // relation (on a fresh agency) so the creator-inbox Playwright round-
