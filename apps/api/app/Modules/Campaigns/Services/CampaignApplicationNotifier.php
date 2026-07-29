@@ -18,6 +18,7 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Notifications\Enums\NotificationType;
 use App\Modules\Notifications\Services\NotificationService;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Pennant\Feature;
 
@@ -57,6 +58,13 @@ use Laravel\Pennant\Feature;
  * at the call sites is what keeps the three HTTP paths and the queued auto-reject
  * job in agreement.
  *
+ * ⚠ Every emission logs whether the flag suppressed its mail — see
+ * {@see logEmission()}. A flag that silences mail without saying so is
+ * indistinguishable from a broken mail path, which is exactly the confusion
+ * AH-059's D2 investigation had to resolve from the database and Mailhog after
+ * the fact. The flag is still read in exactly ONE place; `queue()` returns its
+ * decision rather than being asked twice.
+ *
  * ── Tenancy ─────────────────────────────────────────────────────────────────
  *
  * Reads here drop {@see BelongsToAgencyScope} explicitly and take their agency
@@ -92,7 +100,13 @@ final class CampaignApplicationNotifier
         $creatorName = $this->creatorName($creator);
         $actionUrl = $this->campaignUrl($campaign);
 
+        $recipients = 0;
+        $mailQueued = 0;
+        $mailSuppressed = 0;
+
         foreach ($agency->notifiableMembers() as $member) {
+            $recipients++;
+
             $this->notifications->notify(
                 recipient: $member,
                 type: NotificationType::CampaignApplicationSubmitted,
@@ -114,8 +128,17 @@ final class CampaignApplicationNotifier
                 creatorName: $creatorName,
                 campaignName: $campaign->name,
                 actionUrl: $actionUrl,
-            ));
+            )) ? $mailQueued++ : $mailSuppressed++;
         }
+
+        $this->logEmission(
+            NotificationType::CampaignApplicationSubmitted,
+            $application,
+            $campaign,
+            $recipients,
+            $mailQueued,
+            $mailSuppressed,
+        );
     }
 
     /**
@@ -157,15 +180,26 @@ final class CampaignApplicationNotifier
         );
 
         if ($recipient->email === '') {
+            $this->logEmission(NotificationType::CampaignApplicationAccepted, $application, $campaign, 1, 0, 0);
+
             return;
         }
 
-        $this->queue($recipient, new ApplicationAcceptedMail(
+        $queued = $this->queue($recipient, new ApplicationAcceptedMail(
             creatorName: $this->creatorName($creator, $recipient),
             agencyName: $agency->name,
             campaignName: $campaign->name,
             actionUrl: $this->assignmentUrl($assignmentUlid),
         ));
+
+        $this->logEmission(
+            NotificationType::CampaignApplicationAccepted,
+            $application,
+            $campaign,
+            1,
+            $queued ? 1 : 0,
+            $queued ? 0 : 1,
+        );
     }
 
     /**
@@ -201,10 +235,12 @@ final class CampaignApplicationNotifier
         );
 
         if ($recipient->email === '') {
+            $this->logEmission(NotificationType::CampaignApplicationRejected, $application, $campaign, 1, 0, 0);
+
             return;
         }
 
-        $this->queue($recipient, new ApplicationRejectedMail(
+        $queued = $this->queue($recipient, new ApplicationRejectedMail(
             creatorName: $this->creatorName($creator, $recipient),
             campaignName: $campaign->name,
             cause: $cause,
@@ -212,16 +248,32 @@ final class CampaignApplicationNotifier
             // way, so the useful next step is the next job.
             actionUrl: $this->jobsBoardUrl(),
         ));
+
+        $this->logEmission(
+            NotificationType::CampaignApplicationRejected,
+            $application,
+            $campaign,
+            1,
+            $queued ? 1 : 0,
+            $queued ? 0 : 1,
+        );
     }
 
     /**
      * The ONE flag check and the ONE queue-time locale application. Every mail
      * leg goes through here so neither can be forgotten at a call site.
+     *
+     * Returns whether the mail was queued, so the caller can log the outcome
+     * WITHOUT reading the flag a second time. That matters: "the flag is checked
+     * in exactly one place" is a load-bearing property — AH-058's mutation 8
+     * forced the check open once and got four reds, one per emission site — and a
+     * second `Feature::active()` call anywhere in this file would quietly halve
+     * that guarantee.
      */
-    private function queue(User $recipient, ApplicationSubmittedMail|ApplicationAcceptedMail|ApplicationRejectedMail $mailable): void
+    private function queue(User $recipient, ApplicationSubmittedMail|ApplicationAcceptedMail|ApplicationRejectedMail $mailable): bool
     {
         if (! Feature::active(ApplicationNotificationsEnabled::NAME)) {
-            return;
+            return false;
         }
 
         Mail::to($recipient->email)
@@ -229,6 +281,49 @@ final class CampaignApplicationNotifier
             // locale, so a mailable resolving its own would send everyone English.
             ->locale($recipient->preferred_language ?: 'en')
             ->queue($mailable);
+
+        return true;
+    }
+
+    /**
+     * One structured line per emission, so the flag's silence is LEGIBLE.
+     *
+     * ── Why this exists (AH-059, D2) ────────────────────────────────────────
+     *
+     * A whole eyes-on session was spent chasing a mail bug that did not exist:
+     * `application_notifications_enabled` was never armed, every mail leg was
+     * correctly silent, and NOTHING anywhere said so. The sibling fan-out logs
+     * `{"enabled": …}` on every run, which is exactly why its half of the same
+     * session was verifiable at a glance. This is that line, for this half.
+     *
+     * The three outcomes an operator needs to tell apart, and how they read here:
+     *
+     *   - `mail_queued > 0`                → mail is on its way; a missing message
+     *                                        is a worker or transport problem.
+     *   - `mail_suppressed_by_flag > 0`    → **an operator chose this.** Not a bug.
+     *   - both `0` with `recipients > 0`   → the recipients have no email address.
+     *
+     * Logged rather than audited, on the `SendJobPostedNotificationsJob`
+     * precedent: these emissions write no audit row of their own (the caller's
+     * `campaign_application.*` row is the record of the ACT), and what an operator
+     * needs after a first enable is worker-log evidence of what went out.
+     */
+    private function logEmission(
+        NotificationType $type,
+        CampaignApplication $application,
+        Campaign $campaign,
+        int $recipients,
+        int $mailQueued,
+        int $mailSuppressed,
+    ): void {
+        Log::info('jobs-board: application notification emitted', [
+            'type' => $type->value,
+            'application_id' => $application->id,
+            'campaign_id' => $campaign->id,
+            'recipients' => $recipients,
+            'mail_queued' => $mailQueued,
+            'mail_suppressed_by_flag' => $mailSuppressed,
+        ]);
     }
 
     /**

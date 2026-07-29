@@ -22,6 +22,7 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Notifications\Enums\NotificationType;
 use App\Modules\Notifications\Models\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Pennant\Feature;
@@ -281,6 +282,76 @@ it('FLAG OFF: no mail, and the in-app rows are STILL written', function (): void
         ->and(Notification::query()->where('type', NotificationType::CampaignApplicationRejected->value)->count())->toBe(1);
 
     Mail::assertNothingQueued();
+});
+
+/**
+ * AH-059 (D2) — the observability gap that cost an eyes-on session.
+ *
+ * The reported symptom was "the campaign-cancelled auto-reject produced the
+ * in-app notification but no email". The symptom was real. The attributed cause
+ * — a mail-path defect on the `campaign_closed` variant — was not: the flag had
+ * never been armed, so the mail leg was correctly silent, and NOTHING in any log
+ * said so. Confirmed by Pedram at plan-pause: no application email was observed
+ * at any point in the eyes-on session, manual reject included.
+ *
+ * No behaviour changed as a result. This is the test for the line that now makes
+ * the silence self-explaining, so the next operator reads the answer instead of
+ * reconstructing it from Pennant rows and Mailhog.
+ */
+it('FLAG OFF: says so in the log — the silence is legible, not mysterious', function (): void {
+    Mail::fake();
+    Log::spy();
+    Feature::deactivate(ApplicationNotificationsEnabled::NAME);
+    $s = terminalSetup(CampaignStatus::Cancelled);
+
+    [, , $application] = pendingApplicant($s);
+
+    (new AutoRejectPendingApplicationsJob($s['campaign']->id))->handle(
+        app(CampaignApplicationDecisionService::class),
+        app(CampaignApplicationNotifier::class),
+    );
+
+    // BREAK-REVERT ANCHOR (§5.35): delete the logEmission() call from
+    // CampaignApplicationNotifier::rejected() and this is the test that reddens.
+    Log::shouldHaveReceived('info')
+        ->withArgs(function (string $message, array $context) use ($application, $s): bool {
+            return $message === 'jobs-board: application notification emitted'
+                && $context['type'] === NotificationType::CampaignApplicationRejected->value
+                && $context['application_id'] === $application->id
+                && $context['campaign_id'] === $s['campaign']->id
+                // The in-app row WAS written — one recipient was reached…
+                && $context['recipients'] === 1
+                // …and the reason there is no email is stated, in a key whose
+                // name is the answer: an operator chose this.
+                && $context['mail_queued'] === 0
+                && $context['mail_suppressed_by_flag'] === 1;
+        })
+        ->once();
+});
+
+it('FLAG ON: the same line reports the mail as queued, not suppressed', function (): void {
+    Mail::fake();
+    Log::spy();
+    Feature::activate(ApplicationNotificationsEnabled::NAME);
+    $s = terminalSetup(CampaignStatus::Cancelled);
+
+    pendingApplicant($s);
+
+    (new AutoRejectPendingApplicationsJob($s['campaign']->id))->handle(
+        app(CampaignApplicationDecisionService::class),
+        app(CampaignApplicationNotifier::class),
+    );
+
+    // The counterpart assertion: the line is only useful if it DISTINGUISHES the
+    // two states. `mail_suppressed_by_flag: 0` with `mail_queued: 1` is the
+    // reading that sends an operator to the worker and the transport instead.
+    Log::shouldHaveReceived('info')
+        ->withArgs(fn (string $message, array $context): bool => $message === 'jobs-board: application notification emitted'
+            && $context['mail_queued'] === 1
+            && $context['mail_suppressed_by_flag'] === 0)
+        ->once();
+
+    Mail::assertQueued(ApplicationRejectedMail::class, 1);
 });
 
 it('is a no-op when the campaign was RE-OPENED before the worker ran', function (): void {

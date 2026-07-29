@@ -12,6 +12,7 @@ use App\Modules\Notifications\Enums\NotificationType;
 use App\Modules\Notifications\Models\Notification;
 use App\Modules\Notifications\Models\NotificationPreference;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Pennant\Feature;
 use Tests\Fixtures\JobsBoard\CreatorJobFixture;
@@ -165,6 +166,27 @@ it('a member who silenced the type in-app gets no row — the flag does not over
         ApplicationSubmittedMail::class,
         fn (ApplicationSubmittedMail $mail): bool => $mail->hasTo($s['manager']->email),
     );
+});
+
+it('FLAG OFF: the log line counts BOTH recipients as suppressed (AH-059, D2)', function (): void {
+    Mail::fake();
+    Log::spy();
+    expect(Feature::active(ApplicationNotificationsEnabled::NAME))->toBeFalse();
+
+    $s = submittedFixture();
+
+    $this->actingAs($s['fixture']->user)->postJson($s['fixture']->applyUrl())->assertCreated();
+
+    // The fan-out verb is the one where the counts have to be counts rather than
+    // booleans: two notifiable members, both suppressed, one line. A boolean here
+    // would hide a partial send — the failure mode where SOME recipients got mail.
+    Log::shouldHaveReceived('info')
+        ->withArgs(fn (string $message, array $context): bool => $message === 'jobs-board: application notification emitted'
+            && $context['type'] === NotificationType::CampaignApplicationSubmitted->value
+            && $context['recipients'] === 2
+            && $context['mail_queued'] === 0
+            && $context['mail_suppressed_by_flag'] === 2)
+        ->once();
 });
 
 it('an agency with no notifiable members is a silent no-op, not an error', function (): void {
