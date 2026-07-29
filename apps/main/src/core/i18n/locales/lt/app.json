@@ -853,7 +853,22 @@
           "listing_languages": "turinio kalbos",
           "listing_regions": "regionai"
         },
-        "listed": "Paskelbta"
+        "listed": "Paskelbta",
+        "toggle": {
+          "ariaLabel": "Darbo skelbimas kampanijai {name}",
+          "confirmTitle": "Įtraukti į darbų sąrašą?",
+          "confirmBody": "{name} bus matoma visiems jūsų sąrašo kūrėjams.",
+          "confirmNotice": "Sąrašo kūrėjai gali gauti pranešimą. Tai nutinka vieną kartą ir negali būti atšaukta.",
+          "confirm": "Įtraukti į sąrašą",
+          "cancel": "Atšaukti",
+          "blockedTitle": "Dar negalima paskelbti",
+          "blockedFloor": "Kampanijai {name} trūksta: {fields}. Užpildykite juos kampanijoje ir bandykite dar kartą.",
+          "blockedStatus": "{name} yra užbaigta arba atšaukta, todėl jos negalima įtraukti į darbų sąrašą.",
+          "close": "Uždaryti",
+          "fix": "Atidaryti kampaniją",
+          "listed": "{name} dabar yra darbų sąraše.",
+          "delisted": "{name} pašalinta iš darbų sąrašo."
+        }
       }
     },
     "pools": {

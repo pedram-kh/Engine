@@ -853,7 +853,22 @@
           "listing_languages": "a tartalom nyelvei",
           "listing_regions": "régiók"
         },
-        "listed": "Közzétéve"
+        "listed": "Közzétéve",
+        "toggle": {
+          "ariaLabel": "Álláshirdetés a következőhöz: {name}",
+          "confirmTitle": "Felkerüljön az álláslistára?",
+          "confirmBody": "A(z) {name} látható lesz a listád összes alkotója számára.",
+          "confirmNotice": "A lista alkotói értesítést kaphatnak. Ez egyszer történik meg, és nem vonható vissza.",
+          "confirm": "Felvétel az álláslistára",
+          "cancel": "Mégse",
+          "blockedTitle": "Még nem tehető közzé",
+          "blockedFloor": "A(z) {name} kampányból hiányzik: {fields}. Töltsd ki ezeket a kampányban, majd próbáld újra.",
+          "blockedStatus": "A(z) {name} befejeződött vagy le lett mondva, ezért nem tehető fel az álláslistára.",
+          "close": "Bezárás",
+          "fix": "Kampány megnyitása",
+          "listed": "A(z) {name} már szerepel az álláslistán.",
+          "delisted": "A(z) {name} le lett véve az álláslistáról."
+        }
       }
     },
     "pools": {

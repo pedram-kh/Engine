@@ -853,7 +853,22 @@
           "listing_languages": "idiomas del contenido",
           "listing_regions": "regiones"
         },
-        "listed": "Publicada"
+        "listed": "Publicada",
+        "toggle": {
+          "ariaLabel": "Publicación de empleo para {name}",
+          "confirmTitle": "¿Añadir al tablón de empleo?",
+          "confirmBody": "{name} será visible para todos los creadores de tu lista.",
+          "confirmNotice": "Los creadores de la lista pueden recibir una notificación. Ocurre una sola vez y no se puede deshacer.",
+          "confirm": "Añadir al tablón",
+          "cancel": "Cancelar",
+          "blockedTitle": "Todavía no se puede publicar",
+          "blockedFloor": "A {name} le falta: {fields}. Complétalos en la campaña e inténtalo de nuevo.",
+          "blockedStatus": "{name} está completada o cancelada, por lo que no se puede añadir al tablón de empleo.",
+          "close": "Cerrar",
+          "fix": "Abrir campaña",
+          "listed": "{name} ya está en el tablón de empleo.",
+          "delisted": "{name} se ha quitado del tablón de empleo."
+        }
       }
     },
     "pools": {

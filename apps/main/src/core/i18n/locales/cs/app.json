@@ -853,7 +853,22 @@
           "listing_languages": "jazyky obsahu",
           "listing_regions": "regiony"
         },
-        "listed": "Zveřejněno"
+        "listed": "Zveřejněno",
+        "toggle": {
+          "ariaLabel": "Nabídka práce pro {name}",
+          "confirmTitle": "Přidat na pracovní nabídky?",
+          "confirmBody": "{name} se zobrazí všem tvůrcům ve vašem seznamu.",
+          "confirmNotice": "Tvůrci ze seznamu mohou obdržet oznámení. Stane se to jednou a nelze to vzít zpět.",
+          "confirm": "Přidat na nabídky",
+          "cancel": "Zrušit",
+          "blockedTitle": "Nelze zveřejnit",
+          "blockedFloor": "U {name} chybí: {fields}. Doplňte je v kampani a zkuste to znovu.",
+          "blockedStatus": "{name} je dokončená nebo zrušená, takže ji nelze přidat na pracovní nabídky.",
+          "close": "Zavřít",
+          "fix": "Otevřít kampaň",
+          "listed": "{name} je nyní na pracovních nabídkách.",
+          "delisted": "{name} byla odebrána z pracovních nabídek."
+        }
       }
     },
     "pools": {

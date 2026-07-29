@@ -853,7 +853,22 @@
           "listing_languages": "teangacha an ábhair",
           "listing_regions": "réigiúin"
         },
-        "listed": "Liostaithe"
+        "listed": "Liostaithe",
+        "toggle": {
+          "ariaLabel": "Fógra poist do {name}",
+          "confirmTitle": "Cuir leis an gclár post?",
+          "confirmBody": "Beidh {name} le feiceáil ag gach cruthaitheoir ar do liosta.",
+          "confirmNotice": "Seans go gcuirfear cruthaitheoirí an liosta ar an eolas. Tarlaíonn sé uair amháin agus ní féidir é a chur ar ceal.",
+          "confirm": "Cuir leis an gclár",
+          "cancel": "Cealaigh",
+          "blockedTitle": "Níl sé réidh le foilsiú",
+          "blockedFloor": "Tá {fields} in easnamh ar {name}. Líon isteach sa bhfeachtas iad agus bain triail eile as.",
+          "blockedStatus": "Tá {name} críochnaithe nó curtha ar ceal, mar sin ní féidir é a chur leis an gclár post.",
+          "close": "Dún",
+          "fix": "Oscail an feachtas",
+          "listed": "Tá {name} ar an gclár post anois.",
+          "delisted": "Baineadh {name} den chlár post."
+        }
       }
     },
     "pools": {

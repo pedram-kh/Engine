@@ -853,7 +853,22 @@
           "listing_languages": "langues du contenu",
           "listing_regions": "régions"
         },
-        "listed": "Publiée"
+        "listed": "Publiée",
+        "toggle": {
+          "ariaLabel": "Annonce pour {name}",
+          "confirmTitle": "Ajouter au tableau des missions ?",
+          "confirmBody": "{name} deviendra visible pour tous les créateurs de votre liste.",
+          "confirmNotice": "Les créateurs de la liste peuvent être notifiés. Cela ne se produit qu'une fois et ne peut pas être annulé.",
+          "confirm": "Ajouter au tableau",
+          "cancel": "Annuler",
+          "blockedTitle": "Publication impossible pour l'instant",
+          "blockedFloor": "Il manque à {name} : {fields}. Complétez ces éléments dans la campagne, puis réessayez.",
+          "blockedStatus": "{name} est terminée ou annulée : elle ne peut pas être ajoutée au tableau des missions.",
+          "close": "Fermer",
+          "fix": "Ouvrir la campagne",
+          "listed": "{name} est désormais sur le tableau des missions.",
+          "delisted": "{name} a été retirée du tableau des missions."
+        }
       }
     },
     "pools": {

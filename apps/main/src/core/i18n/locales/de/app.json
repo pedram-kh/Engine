@@ -853,7 +853,22 @@
           "listing_languages": "Content-Sprachen",
           "listing_regions": "Regionen"
         },
-        "listed": "Veröffentlicht"
+        "listed": "Veröffentlicht",
+        "toggle": {
+          "ariaLabel": "Jobbörsen-Eintrag für {name}",
+          "confirmTitle": "Zur Jobbörse hinzufügen?",
+          "confirmBody": "{name} wird für alle Creator in Ihrer Liste sichtbar.",
+          "confirmNotice": "Creator aus Ihrer Liste können benachrichtigt werden. Das geschieht einmalig und lässt sich nicht widerrufen.",
+          "confirm": "Zur Jobbörse hinzufügen",
+          "cancel": "Abbrechen",
+          "blockedTitle": "Noch nicht bereit",
+          "blockedFloor": "Bei {name} fehlt: {fields}. Ergänzen Sie diese in der Kampagne und versuchen Sie es erneut.",
+          "blockedStatus": "{name} ist abgeschlossen oder abgebrochen und kann daher nicht zur Jobbörse hinzugefügt werden.",
+          "close": "Schließen",
+          "fix": "Kampagne öffnen",
+          "listed": "{name} ist jetzt in der Jobbörse.",
+          "delisted": "{name} wurde aus der Jobbörse entfernt."
+        }
       }
     },
     "pools": {

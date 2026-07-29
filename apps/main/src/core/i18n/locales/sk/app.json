@@ -853,7 +853,22 @@
           "listing_languages": "jazyky obsahu",
           "listing_regions": "regióny"
         },
-        "listed": "Zverejnené"
+        "listed": "Zverejnené",
+        "toggle": {
+          "ariaLabel": "Pracovná ponuka pre {name}",
+          "confirmTitle": "Pridať na tabuľu prác?",
+          "confirmBody": "{name} sa zobrazí všetkým tvorcom vo vašom zozname.",
+          "confirmNotice": "Tvorcovia zo zoznamu môžu dostať oznámenie. Stane sa to raz a nedá sa to vrátiť.",
+          "confirm": "Pridať na tabuľu",
+          "cancel": "Zrušiť",
+          "blockedTitle": "Nedá sa zverejniť",
+          "blockedFloor": "Kampani {name} chýba: {fields}. Doplňte ich v kampani a skúste to znova.",
+          "blockedStatus": "{name} je dokončená alebo zrušená, takže ju nemožno pridať na tabuľu prác.",
+          "close": "Zavrieť",
+          "fix": "Otvoriť kampaň",
+          "listed": "{name} je teraz na tabuli prác.",
+          "delisted": "{name} bola odstránená z tabule prác."
+        }
       }
     },
     "pools": {

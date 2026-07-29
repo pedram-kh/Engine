@@ -853,7 +853,22 @@
           "listing_languages": "jeziki vsebine",
           "listing_regions": "regije"
         },
-        "listed": "Objavljeno"
+        "listed": "Objavljeno",
+        "toggle": {
+          "ariaLabel": "Objava dela za {name}",
+          "confirmTitle": "Dodati na seznam del?",
+          "confirmBody": "{name} bo vidna vsem ustvarjalcem na vašem seznamu.",
+          "confirmNotice": "Ustvarjalci s seznama lahko prejmejo obvestilo. To se zgodi enkrat in tega ni mogoče razveljaviti.",
+          "confirm": "Dodaj na seznam",
+          "cancel": "Prekliči",
+          "blockedTitle": "Še ni pripravljeno za objavo",
+          "blockedFloor": "Kampanji {name} manjka: {fields}. Dopolnite jih v kampanji in poskusite znova.",
+          "blockedStatus": "{name} je zaključena ali preklicana, zato je ni mogoče dodati na seznam del.",
+          "close": "Zapri",
+          "fix": "Odpri kampanjo",
+          "listed": "{name} je zdaj na seznamu del.",
+          "delisted": "{name} je bila odstranjena s seznama del."
+        }
       }
     },
     "pools": {

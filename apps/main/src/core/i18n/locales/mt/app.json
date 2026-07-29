@@ -853,7 +853,22 @@
           "listing_languages": "lingwi tal-kontenut",
           "listing_regions": "reġjuni"
         },
-        "listed": "Ippubblikata"
+        "listed": "Ippubblikata",
+        "toggle": {
+          "ariaLabel": "Reklam ta' xogħol għal {name}",
+          "confirmTitle": "Tridha tiżdied fil-bord tax-xogħlijiet?",
+          "confirmBody": "{name} se ssir viżibbli għall-kreaturi kollha fil-lista tiegħek.",
+          "confirmNotice": "Il-kreaturi fil-lista jista' jkun li jiġu avżati. Dan jiġri darba u ma jistax jitreġġa' lura.",
+          "confirm": "Żid fil-bord",
+          "cancel": "Ikkanċella",
+          "blockedTitle": "Għadha mhix lesta biex tiġi ppubblikata",
+          "blockedFloor": "{name} nieqsa: {fields}. Imliehom fil-kampanja u erġa' pprova.",
+          "blockedStatus": "{name} tlestiet jew ġiet ikkanċellata, għalhekk ma tistax tiżdied fil-bord tax-xogħlijiet.",
+          "close": "Agħlaq",
+          "fix": "Iftaħ il-kampanja",
+          "listed": "{name} issa tinsab fil-bord tax-xogħlijiet.",
+          "delisted": "{name} tneħħiet mill-bord tax-xogħlijiet."
+        }
       }
     },
     "pools": {

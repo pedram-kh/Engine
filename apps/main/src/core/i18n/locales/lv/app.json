@@ -853,7 +853,22 @@
           "listing_languages": "satura valodas",
           "listing_regions": "reģioni"
         },
-        "listed": "Publicēts"
+        "listed": "Publicēts",
+        "toggle": {
+          "ariaLabel": "Darba piedāvājums kampaņai {name}",
+          "confirmTitle": "Pievienot darbu sarakstam?",
+          "confirmBody": "{name} kļūs redzama visiem jūsu saraksta satura veidotājiem.",
+          "confirmNotice": "Saraksta satura veidotāji var saņemt paziņojumu. Tas notiek vienu reizi un nav atsaucams.",
+          "confirm": "Pievienot sarakstam",
+          "cancel": "Atcelt",
+          "blockedTitle": "Vēl nav gatava publicēšanai",
+          "blockedFloor": "Kampaņai {name} nav norādīts: {fields}. Aizpildiet tos kampaņā un mēģiniet vēlreiz.",
+          "blockedStatus": "{name} ir pabeigta vai atcelta, tāpēc to nevar pievienot darbu sarakstam.",
+          "close": "Aizvērt",
+          "fix": "Atvērt kampaņu",
+          "listed": "{name} tagad ir darbu sarakstā.",
+          "delisted": "{name} ir noņemta no darbu saraksta."
+        }
       }
     },
     "pools": {

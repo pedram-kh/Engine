@@ -13,8 +13,6 @@
  * source-scans the PHP trait. Adding a field on one side alone reds that spec.
  */
 
-import type { CreateCampaignPayload } from '@catalyst/api-client'
-
 /** Must match `ValidatesJobsBoardListing::LISTING_FLOOR_FIELDS`, in order. */
 export const LISTING_FLOOR_FIELDS = [
   'description',
@@ -37,14 +35,21 @@ function isFilled(value: unknown): boolean {
 }
 
 /**
- * Which floor fields the given form state would still be missing. Evaluated
- * against the live form — the same merged state the PATCH will produce, since
- * the Settings form is seeded from the stored campaign.
+ * Which floor fields the given state would still be missing.
+ *
+ * Two callers, two containers, ONE predicate (AH-059, D3):
+ *
+ *   - the Settings tab passes its live edit form — the merged state the PATCH
+ *     will produce, since the form is seeded from the stored campaign;
+ *   - the campaigns list passes a row's stored `attributes` directly, because the
+ *     list payload carries every floor field.
+ *
+ * The parameter is typed as the five fields it actually reads rather than as
+ * either container, so both fit without a cast and neither surface can drift into
+ * evaluating a looser predicate than the other.
  */
 export function missingListingFloorFields(
-  payload: Partial<CreateCampaignPayload>,
+  source: Readonly<Partial<Record<ListingFloorField, unknown>>>,
 ): ListingFloorField[] {
-  return LISTING_FLOOR_FIELDS.filter(
-    (field) => !isFilled((payload as Record<string, unknown>)[field]),
-  )
+  return LISTING_FLOOR_FIELDS.filter((field) => !isFilled(source[field]))
 }

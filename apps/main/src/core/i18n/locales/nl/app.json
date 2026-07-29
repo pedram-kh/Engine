@@ -853,7 +853,22 @@
           "listing_languages": "talen van de content",
           "listing_regions": "regio's"
         },
-        "listed": "Geplaatst"
+        "listed": "Geplaatst",
+        "toggle": {
+          "ariaLabel": "Vacature voor {name}",
+          "confirmTitle": "Toevoegen aan het vacatureoverzicht?",
+          "confirmBody": "{name} wordt zichtbaar voor alle creators op je lijst.",
+          "confirmNotice": "Creators op de lijst kunnen een melding krijgen. Dit gebeurt eenmalig en kan niet ongedaan worden gemaakt.",
+          "confirm": "Toevoegen aan overzicht",
+          "cancel": "Annuleren",
+          "blockedTitle": "Nog niet klaar om te plaatsen",
+          "blockedFloor": "Bij {name} ontbreekt: {fields}. Vul deze aan in de campagne en probeer het opnieuw.",
+          "blockedStatus": "{name} is afgerond of geannuleerd en kan daarom niet aan het vacatureoverzicht worden toegevoegd.",
+          "close": "Sluiten",
+          "fix": "Campagne openen",
+          "listed": "{name} staat nu in het vacatureoverzicht.",
+          "delisted": "{name} is uit het vacatureoverzicht verwijderd."
+        }
       }
     },
     "pools": {

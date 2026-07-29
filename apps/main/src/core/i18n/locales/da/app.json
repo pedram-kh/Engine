@@ -853,7 +853,22 @@
           "listing_languages": "indholdssprog",
           "listing_regions": "regioner"
         },
-        "listed": "Opslået"
+        "listed": "Opslået",
+        "toggle": {
+          "ariaLabel": "Jobopslag for {name}",
+          "confirmTitle": "Tilføj til jobtavlen?",
+          "confirmBody": "{name} bliver synlig for alle creators på din liste.",
+          "confirmNotice": "Creators på listen kan blive underrettet. Det sker én gang og kan ikke fortrydes.",
+          "confirm": "Tilføj til jobtavlen",
+          "cancel": "Annuller",
+          "blockedTitle": "Ikke klar til opslag",
+          "blockedFloor": "{name} mangler: {fields}. Udfyld dem i kampagnen, og prøv igen.",
+          "blockedStatus": "{name} er afsluttet eller annulleret og kan derfor ikke tilføjes til jobtavlen.",
+          "close": "Luk",
+          "fix": "Åbn kampagne",
+          "listed": "{name} er nu på jobtavlen.",
+          "delisted": "{name} er fjernet fra jobtavlen."
+        }
       }
     },
     "pools": {

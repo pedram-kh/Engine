@@ -853,7 +853,22 @@
           "listing_languages": "limbile conținutului",
           "listing_regions": "regiuni"
         },
-        "listed": "Publicată"
+        "listed": "Publicată",
+        "toggle": {
+          "ariaLabel": "Anunț de lucru pentru {name}",
+          "confirmTitle": "Adaugi la panoul de lucrări?",
+          "confirmBody": "{name} va deveni vizibilă pentru toți creatorii din lista ta.",
+          "confirmNotice": "Creatorii din listă pot fi notificați. Acest lucru se întâmplă o singură dată și nu poate fi anulat.",
+          "confirm": "Adaugă la panou",
+          "cancel": "Anulează",
+          "blockedTitle": "Încă nu poate fi publicată",
+          "blockedFloor": "Din {name} lipsesc: {fields}. Completează-le în campanie și încearcă din nou.",
+          "blockedStatus": "{name} este finalizată sau anulată, așa că nu poate fi adăugată la panoul de lucrări.",
+          "close": "Închide",
+          "fix": "Deschide campania",
+          "listed": "{name} se află acum pe panoul de lucrări.",
+          "delisted": "{name} a fost eliminată din panoul de lucrări."
+        }
       }
     },
     "pools": {

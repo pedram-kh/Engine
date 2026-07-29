@@ -739,6 +739,14 @@ describe('CampaignDetailPage — jobs board toggle (AH-054)', () => {
     expect(hint).toContain('description')
     expect(hint).toContain('listing duration')
     expect(hint).toContain('regions')
+
+    // AH-059 (D3): the floor list completed, so ONE mutation of the shared mirror
+    // reddens BOTH surfaces. Before this, the campaigns-list spec named every
+    // field and this one named three — which meant "both surfaces read one gate"
+    // was a claim about the import graph rather than something a break-revert
+    // could demonstrate.
+    expect(hint).toContain('listed fee')
+    expect(hint).toContain('content languages')
   })
 
   it('enables the toggle once every floor field is present', async () => {

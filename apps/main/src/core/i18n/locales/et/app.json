@@ -853,7 +853,22 @@
           "listing_languages": "sisu keeled",
           "listing_regions": "piirkonnad"
         },
-        "listed": "Avaldatud"
+        "listed": "Avaldatud",
+        "toggle": {
+          "ariaLabel": "Tööpakkumine kampaaniale {name}",
+          "confirmTitle": "Kas lisada töölauale?",
+          "confirmBody": "{name} muutub nähtavaks kõigile sinu nimekirja loojatele.",
+          "confirmNotice": "Nimekirja loojad võivad saada teate. See juhtub ühe korra ja seda ei saa tagasi võtta.",
+          "confirm": "Lisa töölauale",
+          "cancel": "Loobu",
+          "blockedTitle": "Ei ole veel avaldamiseks valmis",
+          "blockedFloor": "Kampaanial {name} on puudu: {fields}. Täida need kampaanias ja proovi uuesti.",
+          "blockedStatus": "{name} on lõpetatud või tühistatud, seega ei saa seda töölauale lisada.",
+          "close": "Sulge",
+          "fix": "Ava kampaania",
+          "listed": "{name} on nüüd töölaual.",
+          "delisted": "{name} eemaldati töölaualt."
+        }
       }
     },
     "pools": {

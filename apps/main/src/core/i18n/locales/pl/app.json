@@ -853,7 +853,22 @@
           "listing_languages": "języki treści",
           "listing_regions": "regiony"
         },
-        "listed": "Opublikowano"
+        "listed": "Opublikowano",
+        "toggle": {
+          "ariaLabel": "Ogłoszenie o pracę dla {name}",
+          "confirmTitle": "Dodać do tablicy ogłoszeń?",
+          "confirmBody": "{name} stanie się widoczna dla wszystkich twórców z Twojej listy.",
+          "confirmNotice": "Twórcy z listy mogą otrzymać powiadomienie. Dzieje się to raz i nie można tego cofnąć.",
+          "confirm": "Dodaj do tablicy",
+          "cancel": "Anuluj",
+          "blockedTitle": "Jeszcze nie można opublikować",
+          "blockedFloor": "W kampanii {name} brakuje: {fields}. Uzupełnij je w kampanii i spróbuj ponownie.",
+          "blockedStatus": "{name} jest ukończona lub anulowana, więc nie można jej dodać do tablicy ogłoszeń.",
+          "close": "Zamknij",
+          "fix": "Otwórz kampanię",
+          "listed": "{name} jest teraz na tablicy ogłoszeń.",
+          "delisted": "{name} została usunięta z tablicy ogłoszeń."
+        }
       }
     },
     "pools": {

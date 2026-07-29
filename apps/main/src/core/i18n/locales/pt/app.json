@@ -853,7 +853,22 @@
           "listing_languages": "idiomas do conteúdo",
           "listing_regions": "regiões"
         },
-        "listed": "Publicada"
+        "listed": "Publicada",
+        "toggle": {
+          "ariaLabel": "Anúncio de trabalho para {name}",
+          "confirmTitle": "Adicionar ao quadro de trabalhos?",
+          "confirmBody": "{name} ficará visível para todos os criadores da sua lista.",
+          "confirmNotice": "Os criadores da lista podem ser notificados. Acontece uma única vez e não pode ser revertido.",
+          "confirm": "Adicionar ao quadro",
+          "cancel": "Cancelar",
+          "blockedTitle": "Ainda não pode ser publicada",
+          "blockedFloor": "Falta em {name}: {fields}. Preencha-os na campanha e tente novamente.",
+          "blockedStatus": "{name} está concluída ou cancelada, pelo que não pode ser adicionada ao quadro de trabalhos.",
+          "close": "Fechar",
+          "fix": "Abrir campanha",
+          "listed": "{name} está agora no quadro de trabalhos.",
+          "delisted": "{name} foi removida do quadro de trabalhos."
+        }
       }
     },
     "pools": {

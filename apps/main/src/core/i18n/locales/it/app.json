@@ -853,7 +853,22 @@
           "listing_languages": "lingue del contenuto",
           "listing_regions": "regioni"
         },
-        "listed": "Pubblicata"
+        "listed": "Pubblicata",
+        "toggle": {
+          "ariaLabel": "Annuncio di lavoro per {name}",
+          "confirmTitle": "Aggiungere alla bacheca lavori?",
+          "confirmBody": "{name} diventerà visibile a tutti i creator del tuo elenco.",
+          "confirmNotice": "I creator dell'elenco potrebbero ricevere una notifica. Avviene una sola volta e non è annullabile.",
+          "confirm": "Aggiungi alla bacheca",
+          "cancel": "Annulla",
+          "blockedTitle": "Non ancora pubblicabile",
+          "blockedFloor": "A {name} manca: {fields}. Completa questi campi nella campagna e riprova.",
+          "blockedStatus": "{name} è completata o annullata, quindi non può essere aggiunta alla bacheca lavori.",
+          "close": "Chiudi",
+          "fix": "Apri campagna",
+          "listed": "{name} è ora nella bacheca lavori.",
+          "delisted": "{name} è stata rimossa dalla bacheca lavori."
+        }
       }
     },
     "pools": {

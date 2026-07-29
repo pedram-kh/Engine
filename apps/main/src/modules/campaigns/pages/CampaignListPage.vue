@@ -4,11 +4,37 @@
  * brand / status / date filters. Mirrors BrandListPage. Any agency member may
  * view; the Create button is shown to all but the backend gates create to
  * admin/manager (a staff member's POST 403s).
+ *
+ * ── The Job board column is INTERACTIVE (AH-059, D3) ────────────────────────
+ *
+ * AH-057 gave this column a read-only chip. It is now a switch driving the same
+ * `PATCH /agencies/{agency}/campaigns/{campaign}` endpoint the Settings tab
+ * drives, with the same two gates in front of it, because listing a campaign
+ * from the row you are already looking at is the natural gesture and walking
+ * into Settings to flip one boolean is not.
+ *
+ * The two surfaces do NOT re-derive the gates. Both consult
+ * {@link missingListingFloorFields}, the single SPA mirror of the backend trait
+ * (itself pinned against the PHP source by `listing-floor-parity.spec.ts`), and
+ * both send the same key to the same endpoint, whose 422 is the authority. What
+ * differs is only the AFFORDANCE, and the difference is deliberate:
+ *
+ *   - Settings holds the whole listing form, so it can DISABLE the toggle and
+ *     name the missing fields inline before anything is attempted.
+ *   - A table row has no room for that, so the switch stays live and the refusal
+ *     is EXPLICIT — a dialog naming exactly which fields are missing, with the
+ *     way to go fill them. Never a silently-reverted switch, which reads as a
+ *     broken control.
+ *
+ * The ON direction additionally confirms, because it is the direction with a
+ * side effect a user cannot take back: `false → true` fans out a job-posted
+ * notification to every rostered creator. OFF stays immediate — delisting is
+ * reversible and urgent (it is what you reach for when something is wrong).
  */
 
-import { formatCurrency } from '@catalyst/api-client'
+import { ApiError, extractFieldErrors, formatCurrency } from '@catalyst/api-client'
 import type { BrandResource, CampaignListParams, CampaignResource } from '@catalyst/api-client'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { CEmptyState } from '@catalyst/ui'
@@ -16,6 +42,7 @@ import { CEmptyState } from '@catalyst/ui'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { brandsApi } from '@/modules/brands/api/brands.api'
 import { campaignsApi } from '../api/campaigns.api'
+import { type ListingFloorField, missingListingFloorFields } from '../listingFloor'
 
 const { t, locale } = useI18n()
 const agencyStore = useAgencyStore()
@@ -150,6 +177,166 @@ function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
 function formatMoney(minor: number | null, currency: string | null): string {
   return formatCurrency(minor, currency, locale.value)
 }
+
+// ── The Job board switch (AH-059, D3) ───────────────────────────────────────
+
+/** The row whose switch is mid-flight, so only that row's control spins. */
+const listingBusyId = ref<string | null>(null)
+
+/** The pending ON confirmation: the campaign awaiting an answer. */
+const confirmTarget = ref<CampaignResource | null>(null)
+
+/** The refusal being explained — either the floor or the terminal status. */
+const refusal = ref<{
+  campaignId: string
+  campaignName: string
+  reason: 'floor' | 'status'
+  fields: string[]
+} | null>(null)
+
+const listingSnackbar = ref<{ color: string; text: string } | null>(null)
+
+const confirmName = computed(() => confirmTarget.value?.attributes.name ?? '')
+
+/**
+ * The floor, evaluated against the row's OWN stored attributes.
+ *
+ * The list payload carries every floor field, so this is the same predicate over
+ * the same data the Settings tab evaluates — not a looser approximation. It runs
+ * before the request purely so the common refusal costs no round trip; the
+ * server's 422 is still the authority and is handled below.
+ */
+function rowFloorMissing(item: CampaignResource): ListingFloorField[] {
+  return missingListingFloorFields(item.attributes)
+}
+
+function isTerminal(item: CampaignResource): boolean {
+  return item.attributes.status === 'completed' || item.attributes.status === 'cancelled'
+}
+
+/** Floor field keys → the localized names the refusal dialog lists. */
+function floorFieldNames(fields: string[]): string {
+  return fields.map((f) => t(`app.campaigns.listing.floorFields.${f}`)).join(', ')
+}
+
+/**
+ * The switch's handler. Vuetify has already flipped the model optimistically, so
+ * every path either commits the flip or is responsible for putting the row back.
+ */
+async function onListingToggle(item: CampaignResource, next: boolean | null): Promise<void> {
+  const value = next === true
+
+  if (value === item.attributes.listed_on_jobs_board) return
+
+  // ── OFF: immediate, ungated. Delisting is reversible and it is what someone
+  // reaches for when a listing is wrong, so it must not ask twice.
+  if (!value) {
+    await commitListing(item, false)
+    return
+  }
+
+  // ── ON, gate 1: the listing floor. Same predicate as Settings.
+  const missing = rowFloorMissing(item)
+  if (missing.length > 0) {
+    refuse(item, 'floor', missing)
+    return
+  }
+
+  // ── ON, gate 2: terminal status. A completed or cancelled campaign cannot be
+  // listed — there is nothing for a creator to apply to.
+  if (isTerminal(item)) {
+    refuse(item, 'status', [])
+    return
+  }
+
+  // Both gates clear: ask, because this is the direction that notifies people.
+  confirmTarget.value = item
+}
+
+function refuse(item: CampaignResource, reason: 'floor' | 'status', fields: string[]): void {
+  refusal.value = {
+    campaignId: item.id,
+    campaignName: item.attributes.name,
+    reason,
+    fields,
+  }
+}
+
+async function confirmListing(): Promise<void> {
+  const item = confirmTarget.value
+  confirmTarget.value = null
+  if (item !== null) await commitListing(item, true)
+}
+
+/**
+ * Declining the confirmation, or dismissing either dialog.
+ *
+ * Re-reads rather than assigning the boolean back. Vuetify flipped the switch on
+ * click and this is the only branch where NOTHING was written, so the row on
+ * screen is now the one thing in the app that is wrong — and the server is the
+ * only place that knows what it should say.
+ */
+async function abandonListingFlip(): Promise<void> {
+  confirmTarget.value = null
+  refusal.value = null
+  await loadCampaigns()
+}
+
+/**
+ * The one write. A SINGLE-KEY PATCH — `{ listed_on_jobs_board }` and nothing
+ * else — which is why this surface cannot overwrite anything the row does not
+ * own: every other field is governed by the endpoint's `sometimes` rules and is
+ * preserved by its own absence. Settings sends the whole form because Settings
+ * IS the whole form.
+ */
+async function commitListing(item: CampaignResource, value: boolean): Promise<void> {
+  const agencyId = agencyStore.currentAgencyId
+  if (agencyId === null) return
+
+  listingBusyId.value = item.id
+
+  try {
+    const res = await campaignsApi.update(agencyId, item.id, { listed_on_jobs_board: value })
+
+    // Replace the row from the server's answer rather than patching the boolean
+    // locally: the flip also stamps `listed_at`, and the response is the truth
+    // about what happened.
+    const index = items.value.findIndex((c) => c.id === item.id)
+    if (index !== -1) items.value[index] = res.data
+
+    listingSnackbar.value = {
+      color: 'success',
+      text: value
+        ? t('app.campaigns.listing.toggle.listed', { name: item.attributes.name })
+        : t('app.campaigns.listing.toggle.delisted', { name: item.attributes.name }),
+    }
+  } catch (err) {
+    // The BACKSTOP, and the reason the local gates are a courtesy rather than the
+    // rule: a row rendered before someone else emptied a floor field, or before
+    // the campaign was cancelled, reaches a 422 here. The same dialog explains
+    // it, populated from the server's own field errors.
+    if (err instanceof ApiError && err.status === 422) {
+      const grouped = extractFieldErrors<string>(err)
+      const missing = rowFloorMissing(item)
+
+      refuse(
+        item,
+        missing.length > 0 ? 'floor' : 'status',
+        missing.length > 0
+          ? missing
+          : Object.keys(grouped).filter((k) => k !== 'listed_on_jobs_board'),
+      )
+    } else {
+      listingSnackbar.value = { color: 'error', text: t('app.campaigns.errors.saveFailed') }
+    }
+
+    // Re-read the row either way: the switch has been flipped optimistically and
+    // the only honest way to put it back is to ask what the server actually holds.
+    await loadCampaigns()
+  } finally {
+    listingBusyId.value = null
+  }
+}
 </script>
 
 <template>
@@ -269,22 +456,23 @@ function formatMoney(minor: number | null, currency: string | null): string {
         </v-chip>
       </template>
 
-      <!-- Listed campaigns get the chip; unlisted ones get a muted dash, so the
-           eye scans for the exception instead of reading two chips per row. -->
+      <!-- AH-059 (D3) — a SWITCH, not a clickable chip. A chip that silently
+           toggles is a control disguised as a label; a switch says "this is
+           settable, and here is its state" in one glyph, which is also what the
+           Settings tab uses for the same boolean. -->
       <template #item.attributes.listed_on_jobs_board="{ item }">
-        <v-chip
-          v-if="item.attributes.listed_on_jobs_board"
+        <v-switch
+          :model-value="item.attributes.listed_on_jobs_board"
           color="primary"
-          size="small"
-          variant="tonal"
-          prepend-icon="mdi-briefcase-outline"
-          :data-test="`campaign-job-board-${item.id}`"
-        >
-          {{ t('app.campaigns.listing.listed') }}
-        </v-chip>
-        <span v-else class="text-medium-emphasis" :data-test="`campaign-job-board-none-${item.id}`"
-          >—</span
-        >
+          density="compact"
+          hide-details
+          inset
+          :loading="listingBusyId === item.id"
+          :disabled="listingBusyId !== null"
+          :aria-label="t('app.campaigns.listing.toggle.ariaLabel', { name: item.attributes.name })"
+          :data-test="`campaign-job-board-toggle-${item.id}`"
+          @update:model-value="(v) => onListingToggle(item, v as boolean | null)"
+        />
       </template>
 
       <template #item.attributes.budget_minor_units="{ item }">
@@ -302,5 +490,121 @@ function formatMoney(minor: number | null, currency: string | null): string {
         />
       </template>
     </v-data-table-server>
+
+    <!-- The ON confirmation (AH-059, D3). Names the campaign, because the row is
+         about to leave the user's focus, and states the consequence: this is the
+         flip that notifies every rostered creator, once, and there is no unsend. -->
+    <v-dialog
+      :model-value="confirmTarget !== null"
+      max-width="480"
+      data-test="campaign-listing-confirm"
+      @update:model-value="
+        (v) => {
+          if (!v) void abandonListingFlip()
+        }
+      "
+    >
+      <v-card>
+        <v-card-title>{{ t('app.campaigns.listing.toggle.confirmTitle') }}</v-card-title>
+        <v-card-text>
+          <p class="mb-2" data-test="campaign-listing-confirm-body">
+            {{ t('app.campaigns.listing.toggle.confirmBody', { name: confirmName }) }}
+          </p>
+          <p class="text-medium-emphasis mb-0">
+            {{ t('app.campaigns.listing.toggle.confirmNotice') }}
+          </p>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            variant="text"
+            data-test="campaign-listing-confirm-cancel"
+            @click="abandonListingFlip()"
+          >
+            {{ t('app.campaigns.listing.toggle.cancel') }}
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="flat"
+            data-test="campaign-listing-confirm-submit"
+            @click="confirmListing()"
+          >
+            {{ t('app.campaigns.listing.toggle.confirm') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- The explicit refusal. The whole point of D3's failure UX: a switch that
+         springs back with no explanation is indistinguishable from a bug, so the
+         missing fields are NAMED and the way to go fill them is offered. -->
+    <v-dialog
+      :model-value="refusal !== null"
+      max-width="480"
+      data-test="campaign-listing-refusal"
+      @update:model-value="
+        (v) => {
+          if (!v) void abandonListingFlip()
+        }
+      "
+    >
+      <v-card v-if="refusal">
+        <v-card-title>{{ t('app.campaigns.listing.toggle.blockedTitle') }}</v-card-title>
+        <v-card-text>
+          <p
+            v-if="refusal.reason === 'floor'"
+            class="mb-0"
+            data-test="campaign-listing-refusal-body"
+          >
+            {{
+              t('app.campaigns.listing.toggle.blockedFloor', {
+                name: refusal.campaignName,
+                fields: floorFieldNames(refusal.fields),
+              })
+            }}
+          </p>
+          <p v-else class="mb-0" data-test="campaign-listing-refusal-body">
+            {{ t('app.campaigns.listing.toggle.blockedStatus', { name: refusal.campaignName }) }}
+          </p>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            variant="text"
+            data-test="campaign-listing-refusal-close"
+            @click="abandonListingFlip()"
+          >
+            {{ t('app.campaigns.listing.toggle.close') }}
+          </v-btn>
+          <!-- To the campaign, NOT to `?tab=settings`: the detail page's tab is
+               local component state rather than a route parameter, so a tab link
+               would be a promise the SPA does not keep. Making the tab
+               addressable is recorded as a candidate, not smuggled in here. -->
+          <v-btn
+            v-if="refusal.reason === 'floor'"
+            color="primary"
+            variant="flat"
+            :to="{ name: 'campaigns.detail', params: { ulid: refusal.campaignId } }"
+            data-test="campaign-listing-refusal-fix"
+          >
+            {{ t('app.campaigns.listing.toggle.fix') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-snackbar
+      :model-value="listingSnackbar !== null"
+      :timeout="4000"
+      :color="listingSnackbar?.color"
+      data-test="campaign-listing-snackbar"
+      @update:model-value="
+        (v) => {
+          if (!v) listingSnackbar = null
+        }
+      "
+    >
+      {{ listingSnackbar?.text }}
+    </v-snackbar>
   </div>
 </template>

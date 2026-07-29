@@ -853,7 +853,22 @@
           "listing_languages": "jezici sadržaja",
           "listing_regions": "regije"
         },
-        "listed": "Objavljeno"
+        "listed": "Objavljeno",
+        "toggle": {
+          "ariaLabel": "Objava posla za {name}",
+          "confirmTitle": "Dodati na ploču poslova?",
+          "confirmBody": "{name} će postati vidljiva svim kreatorima na vašem popisu.",
+          "confirmNotice": "Kreatori s popisa mogu biti obaviješteni. To se događa jednom i ne može se poništiti.",
+          "confirm": "Dodaj na ploču",
+          "cancel": "Odustani",
+          "blockedTitle": "Još nije spremno za objavu",
+          "blockedFloor": "Kampanji {name} nedostaje: {fields}. Dopunite ih u kampanji i pokušajte ponovno.",
+          "blockedStatus": "{name} je završena ili prekinuta, pa se ne može dodati na ploču poslova.",
+          "close": "Zatvori",
+          "fix": "Otvori kampanju",
+          "listed": "{name} je sada na ploči poslova.",
+          "delisted": "{name} je uklonjena s ploče poslova."
+        }
       }
     },
     "pools": {

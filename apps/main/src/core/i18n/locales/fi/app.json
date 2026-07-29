@@ -853,7 +853,22 @@
           "listing_languages": "sisällön kielet",
           "listing_regions": "alueet"
         },
-        "listed": "Julkaistu"
+        "listed": "Julkaistu",
+        "toggle": {
+          "ariaLabel": "Työpaikkailmoitus kampanjalle {name}",
+          "confirmTitle": "Lisätäänkö työpaikkatauluun?",
+          "confirmBody": "{name} tulee näkyviin kaikille listasi tekijöille.",
+          "confirmNotice": "Listan tekijät voivat saada ilmoituksen. Tämä tapahtuu kerran, eikä sitä voi peruuttaa.",
+          "confirm": "Lisää työpaikkatauluun",
+          "cancel": "Peruuta",
+          "blockedTitle": "Ei vielä julkaisukelpoinen",
+          "blockedFloor": "Kampanjasta {name} puuttuu: {fields}. Täydennä ne kampanjassa ja yritä uudelleen.",
+          "blockedStatus": "{name} on valmis tai peruutettu, joten sitä ei voi lisätä työpaikkatauluun.",
+          "close": "Sulje",
+          "fix": "Avaa kampanja",
+          "listed": "{name} on nyt työpaikkataulussa.",
+          "delisted": "{name} poistettiin työpaikkataulusta."
+        }
       }
     },
     "pools": {

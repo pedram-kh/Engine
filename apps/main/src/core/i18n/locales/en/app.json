@@ -853,7 +853,22 @@
           "listing_languages": "content languages",
           "listing_regions": "regions"
         },
-        "listed": "Listed"
+        "listed": "Listed",
+        "toggle": {
+          "ariaLabel": "Jobs board listing for {name}",
+          "confirmTitle": "Add to the jobs board?",
+          "confirmBody": "{name} will become visible to every creator on your roster.",
+          "confirmNotice": "Rostered creators may be notified. That happens once, and it cannot be undone.",
+          "confirm": "Add to jobs board",
+          "cancel": "Cancel",
+          "blockedTitle": "Not ready to list",
+          "blockedFloor": "{name} is missing: {fields}. Complete these in the campaign, then try again.",
+          "blockedStatus": "{name} is completed or cancelled, so it cannot be added to the jobs board.",
+          "close": "Close",
+          "fix": "Open campaign",
+          "listed": "{name} is now on the jobs board.",
+          "delisted": "{name} has been removed from the jobs board."
+        }
       }
     },
     "pools": {

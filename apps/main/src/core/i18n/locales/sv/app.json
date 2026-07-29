@@ -853,7 +853,22 @@
           "listing_languages": "innehållets språk",
           "listing_regions": "regioner"
         },
-        "listed": "Publicerad"
+        "listed": "Publicerad",
+        "toggle": {
+          "ariaLabel": "Jobbannons för {name}",
+          "confirmTitle": "Lägg till på jobbtavlan?",
+          "confirmBody": "{name} blir synlig för alla kreatörer i din lista.",
+          "confirmNotice": "Kreatörer i listan kan få ett meddelande. Det sker en gång och kan inte ångras.",
+          "confirm": "Lägg till på jobbtavlan",
+          "cancel": "Avbryt",
+          "blockedTitle": "Inte klar att publiceras",
+          "blockedFloor": "{name} saknar: {fields}. Fyll i dem i kampanjen och försök igen.",
+          "blockedStatus": "{name} är slutförd eller avbruten och kan därför inte läggas till på jobbtavlan.",
+          "close": "Stäng",
+          "fix": "Öppna kampanj",
+          "listed": "{name} finns nu på jobbtavlan.",
+          "delisted": "{name} har tagits bort från jobbtavlan."
+        }
       }
     },
     "pools": {
