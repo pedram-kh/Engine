@@ -113,13 +113,16 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-29 · **Through:** AH-059 · **⚠ TWELVE COMMITS ARE HELD.** The Jobs Board
-arc's **chunk 5 is built and unpushed**: eleven code commits (`a70c548`, `c27926a`, `b2ca89b`,
-`bb825a8`, `75076ef`, `ce841e2`, `e2501b3`, `a4897b5`, `df99cac`, `0c7ea82`, `26a127a`) plus the docs
-commit carrying [`jobs-board-c5-review.md`](jobs-board-c5-review.md), the AH-059 log entry and the D7
-close-out documents. Nothing pushes until Pedram clears it. `git rev-parse --short HEAD` and
-`git rev-parse --short origin/main` are the authority for where the two tips actually sit — re-derive
-them, do not carry this session's numbers forward.
+**Last updated:** 2026-07-29 · **Through:** AH-059 · **Nothing is held.** The push on 2026-07-29 moved
+`origin/main` from `5cc382c` (the AH-058 close) by **thirteen commits**: the eleven **AH-059** code
+commits (`a70c548`, `c27926a`, `b2ca89b`, `bb825a8`, `75076ef`, `ce841e2`, `e2501b3`, `a4897b5`,
+`df99cac`, `0c7ea82`, `26a127a`), the docs commit `b1ed331` carrying
+[`jobs-board-c5-review.md`](jobs-board-c5-review.md), the AH-059 log entry and the D7 close-out
+documents, and the **close commit at the tip** flipping that review to **Closed — approved** and
+writing this refresh (a commit cannot record its own hash).
+**All of it is code, and undeployed** — see the deploy notes below.
+`git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for where the
+two tips actually sit — re-derive them, do not carry this session's numbers forward.
 
 > **🏁 THE JOBS BOARD ARC IS COMPLETE (AH-053 → AH-059).** Five chunks, one feature, **one deploy**,
 > still held. **AH-059 closes it**: the five eyes-on fixes (the rejected-chip contradiction, the
@@ -219,7 +222,7 @@ the deploy notes below.
 > (`content_companions`) turned out to be already live before today, while this file still listed
 > its migrations as pending. Verify at each session close; do not carry forward an assumption.
 
-**Deploy notes — AH-059 (built 2026-07-29, HELD, NOT deployed).** **No obligations of its own, and no
+**Deploy notes — AH-059 (pushed 2026-07-29, NOT deployed).** **No obligations of its own, and no
 migration** — the arc's pending-migration count stays **four**, and this chunk is the one that writes
 that list down. Three things to know:
 

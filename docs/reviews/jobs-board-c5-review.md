@@ -1,11 +1,28 @@
 # Jobs Board arc, chunk 5 — eyes-on fixes, the board Applications column, lifecycle reflection, the full-loop E2E, and the arc's close-out (AH-059)
 
-- **Status:** **Complete — pending independent review.** Eleven commits carrying code: `a70c548`,
-  `c27926a`, `b2ca89b`, `bb825a8`, `75076ef`, `ce841e2`, `e2501b3`, `a4897b5`, `df99cac`, `0c7ea82`,
-  `26a127a`, plus the docs commit carrying this review, the AH-059 log entry and the D7 close-out
-  documents. **Nothing is pushed.** The push is held pending Pedram's read.
+- **Status:** **Closed — approved.** Eleven commits carrying code: `a70c548`, `c27926a`, `b2ca89b`,
+  `bb825a8`, `75076ef`, `ce841e2`, `e2501b3`, `a4897b5`, `df99cac`, `0c7ea82`, `26a127a`, plus
+  `b1ed331` (this review, the AH-059 log entry and the D7 close-out documents) and the close commit
+  that flipped this line. Pushed 2026-07-29 — **thirteen in total**, and **the Jobs Board arc ends
+  here**.
+- **Verdict:** independent review complete: **D1–D7 and C1–C6 verified as built**; **all five
+  mutations confirmed load-bearing** — the **branch-reorder** proving the D1 fix is ordering and not
+  deletion (the three engagement cases red while case 1, the retained "Not selected" branch, stays
+  green), the **17th enum case breaking the build at static analysis** rather than in a creator's
+  browser (`match.unhandled` at PHPStan level max, ahead of the catalogue test's
+  `UnhandledMatchError`), and the **one-predicate-two-surfaces red** (a single edit to `isFilled()`
+  reddening the list page and the Settings tab together, which is what makes "one shared gate" a fact
+  rather than a claim); **D2 accepted as explained-not-fixed**, with Pedram's confirmation on record
+  and the **zero mail-path diff proven by command output**; the **four zero-diffs** (Boards module,
+  migrations, automation seeds, the D2 mail path) likewise by command output rather than prose;
+  **production posture LOW-MEDIUM confirmed**, with the **D3 reachability-escalation framing** carried
+  into this file as the record — the toggle adds no backend code and changes only how many clicks
+  stand between an operator and an irreversible fan-out; **Playwright 27/27** including the
+  full-lifecycle spec; and the **`a4897b5` plan-doc sweep accepted as named-not-rewritten** — the
+  right call, since rewriting history to hide a bookkeeping slip is the worse habit.
 - **Date:** 2026-07-29
-- **Provenance:** built by Cursor against the ratified plan and its rulings.
+- **Provenance:** built by Cursor against the ratified plan and its rulings; reviewed and closed by
+  Claude.
 - **Ratified plan:** [`jobs-board-c5-plan.md`](jobs-board-c5-plan.md).
   **Binds to:** [`jobs-board-c4-review.md`](jobs-board-c4-review.md) (closed — the applications
   vocabulary, the accept/reject endpoints, the `after_commit` ordering discipline and the Q7
