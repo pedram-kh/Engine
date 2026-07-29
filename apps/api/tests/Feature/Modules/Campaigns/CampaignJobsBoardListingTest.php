@@ -340,6 +340,126 @@ it('records the visibility flip in the campaign.updated audit snapshot, without 
         ->and($log->after)->not->toHaveKey('listing_duration');
 });
 
+// ── D3 (AH-059) — the campaigns-list surface's single-key PATCH ─────────────
+//
+// The list page's Job board switch sends `{listed_on_jobs_board}` and NOTHING
+// else. Every rule it depends on already existed and was proven for the Settings
+// tab; what these cases add is the proof that the endpoint behaves the same way
+// when it is the ONLY key in the body, because that is the shape a table row can
+// safely write with — and because "the two surfaces share one gate" is otherwise
+// a claim about the import graph.
+
+it('a SINGLE-KEY listing PATCH blanks nothing — every other column survives by omission', function (): void {
+    ['agency' => $agency, 'admin' => $admin, 'campaign' => $campaign] = jobsBoardFixture();
+
+    // A campaign carrying a value in every column the Settings form governs, so
+    // an accidental blanking has something to blank.
+    $campaign->forceFill([
+        'brief' => 'The internal brief, which Settings deliberately never re-sends.',
+        'target_creator_count' => 7,
+        'listing_examples_url' => 'https://examples.test/reel',
+        'requires_per_campaign_contract' => true,
+    ])->save();
+
+    $before = $campaign->fresh()?->only([
+        'name', 'description', 'objective', 'status', 'brief', 'target_creator_count',
+        'budget_minor_units', 'budget_currency', 'starts_at', 'ends_at',
+        'requires_per_campaign_contract', 'is_marketplace_visible',
+        'listing_duration', 'listing_fee', 'listing_languages', 'listing_regions',
+        'listing_examples_url',
+    ]);
+
+    $this->actingAs($admin)
+        ->patchJson(campaignUrl($agency, $campaign), ['listed_on_jobs_board' => true])
+        ->assertOk();
+
+    $after = $campaign->fresh();
+
+    // The one intended change…
+    expect($after?->listed_on_jobs_board)->toBeTrue()
+        // …and nothing else moved. This is what the endpoint's `sometimes` rules
+        // buy, and it is the whole safety argument for writing from a table row:
+        // the switch cannot reach a field it does not render.
+        ->and($after?->only(array_keys($before ?? [])))->toBe($before);
+});
+
+it('judges a single-key flip against the STORED row, so an incomplete floor still refuses', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    // Floor complete except for one field. The list page's local mirror would
+    // catch this first, but the mirror is a courtesy — the authority is here, and
+    // it must reach the same verdict from a body that names only the switch.
+    $campaign = Campaign::factory()->forAgency($agency->id)->jobReady()->createOne([
+        'listing_fee' => null,
+    ]);
+
+    $this->actingAs($admin)
+        ->patchJson(campaignUrl($agency, $campaign), ['listed_on_jobs_board' => true])
+        ->assertUnprocessable()
+        ->assertEnvelopeValidationErrors(['listing_fee']);
+
+    expect($campaign->fresh()?->listed_on_jobs_board)->toBeFalse();
+});
+
+it('§5.34 STAFF NEGATIVE: a staff member cannot flip the listing from anywhere', function (): void {
+    ['agency' => $agency, 'campaign' => $campaign] = jobsBoardFixture();
+
+    $staff = User::factory()->agencyStaff($agency)->createOne();
+
+    // Staff may EXECUTE campaigns (they can invite creators — CampaignPolicy's
+    // deliberately broader `invite` ability), but listing a job to the whole
+    // roster is a management act. The new surface inherits that gate rather than
+    // introducing its own: same policy, same 403, no listing-specific carve-out.
+    $this->actingAs($staff)
+        ->patchJson(campaignUrl($agency, $campaign), ['listed_on_jobs_board' => true])
+        ->assertForbidden();
+
+    expect($campaign->fresh()?->listed_on_jobs_board)->toBeFalse();
+});
+
+it('repeated flips are SAFE — the once-only stamps make the fan-out idempotent', function (): void {
+    ['agency' => $agency, 'admin' => $admin, 'campaign' => $campaign] = jobsBoardFixture();
+
+    $url = campaignUrl($agency, $campaign);
+
+    $this->actingAs($admin)->patchJson($url, ['listed_on_jobs_board' => true])->assertOk();
+
+    $firstListedAt = $campaign->fresh()?->listed_at;
+    expect($firstListedAt)->not->toBeNull();
+
+    // Off, then on again. An interactive switch on a table row invites exactly
+    // this, so it is asserted rather than assumed: `listed_at` is stamped on the
+    // FIRST flip only, which is what keeps the job-posted fan-out once-only —
+    // the property AH-058 built, verified here from the new surface's shape
+    // rather than rebuilt.
+    $this->actingAs($admin)->patchJson($url, ['listed_on_jobs_board' => false])->assertOk();
+    $this->actingAs($admin)->patchJson($url, ['listed_on_jobs_board' => true])->assertOk();
+
+    expect($campaign->fresh()?->listed_at?->toIso8601String())
+        ->toBe($firstListedAt?->toIso8601String());
+});
+
+it('audits a single-key flip exactly as it audits the Settings save', function (): void {
+    ['agency' => $agency, 'admin' => $admin, 'campaign' => $campaign] = jobsBoardFixture();
+
+    $this->actingAs($admin)
+        ->patchJson(campaignUrl($agency, $campaign), ['listed_on_jobs_board' => true])
+        ->assertOk();
+
+    $log = AuditLog::query()
+        ->where('action', 'campaign.updated')
+        ->where('subject_id', $campaign->id)
+        ->latest('id')
+        ->firstOrFail();
+
+    // Same snapshot, same shape, from a body with one key in it — the audit trail
+    // cannot tell which surface pressed the switch, and it does not need to.
+    expect($log->before['listed_on_jobs_board'] ?? null)->toBeFalse()
+        ->and($log->after['listed_on_jobs_board'] ?? null)->toBeTrue()
+        ->and($log->after)->not->toHaveKey('listing_fee');
+});
+
 // ── D1/D5 — the read-time visibility predicate (S2) ─────────────────────────
 
 it('scopeListedOnJobsBoard returns a listed, non-terminal campaign', function (): void {
