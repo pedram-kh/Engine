@@ -33,8 +33,12 @@ vi.mock('../api/board.api', () => ({
   },
 }))
 vi.mock('@/modules/campaigns/api/campaigns.api', () => ({
-  campaignsApi: { showAssignment: vi.fn() },
+  // `listApplications`: the Applications pseudo-column (AH-059, D4) fetches on
+  // mount. This spec is about the board's assembly, so it always answers empty.
+  campaignsApi: { showAssignment: vi.fn(), listApplications: vi.fn() },
 }))
+
+import { campaignsApi } from '@/modules/campaigns/api/campaigns.api'
 
 import { boardApi } from '../api/board.api'
 import { useBoardStore } from '../stores/useBoardStore'
@@ -110,14 +114,28 @@ function boardPayload(cards: BoardCardResource[]) {
   }
 }
 
-async function mountView(canConfigure = true) {
+function stubEmptyApplications(): void {
+  vi.mocked(campaignsApi.listApplications).mockResolvedValue({
+    data: [],
+    meta: { current_page: 1, last_page: 1, per_page: 50, total: 0, pending_total: 0 },
+  } as never)
+}
+
+async function mountView(canConfigure = true, canAct = true) {
   setActivePinia(createPinia())
   mockApi.show.mockResolvedValue(boardPayload([card('k1', 'c1')]) as never)
+  stubEmptyApplications()
 
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: enApp } as never })
   const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
   const wrapper = mount(BoardView, {
-    props: { agencyId: 'agency-ulid', campaignId: 'campaign-ulid', canConfigure },
+    props: {
+      agencyId: 'agency-ulid',
+      campaignId: 'campaign-ulid',
+      canConfigure,
+      canAct,
+      campaignCurrency: 'EUR',
+    },
     global: {
       plugins: [i18n, vuetify],
       stubs: { draggable: DraggableStub, VSnackbar: VSnackbarStub, VDialog: true },
@@ -165,6 +183,25 @@ describe('BoardView', () => {
     wrapper.unmount()
   })
 
+  it('hosts the Applications pseudo-column and hands it the invite ability (AH-059, D4)', async () => {
+    const wrapper = await mountView(true, true)
+    expect(wrapper.find('[data-test="board-applications-column"]').exists()).toBe(true)
+    expect(campaignsApi.listApplications).toHaveBeenCalledWith('agency-ulid', 'campaign-ulid', {
+      page: 1,
+      per_page: 50,
+      status: 'pending',
+    })
+    expect(wrapper.findComponent(BoardColumns).props('canAct')).toBe(true)
+    wrapper.unmount()
+
+    // A staff member without the invite ability still SEES the column; the
+    // answers are what the ability gates, exactly as on the Applications tab.
+    const readOnly = await mountView(false, false)
+    expect(readOnly.find('[data-test="board-applications-column"]').exists()).toBe(true)
+    expect(readOnly.findComponent(BoardColumns).props('canAct')).toBe(false)
+    readOnly.unmount()
+  })
+
   it('hides the automations button + column config for a non-configurer (staff)', async () => {
     const wrapper = await mountView(false)
     expect(wrapper.find('[data-test="board-automations-open"]').exists()).toBe(false)
@@ -176,6 +213,7 @@ describe('BoardView', () => {
     vi.useFakeTimers()
     setActivePinia(createPinia())
     mockApi.show.mockResolvedValue(boardPayload([card('k1', 'c1')]) as never)
+    stubEmptyApplications()
 
     const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: enApp } as never })
     const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })

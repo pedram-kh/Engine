@@ -37,6 +37,13 @@ const props = defineProps<{
   canConfigure: boolean
   /** May open the verification-failure resolution drawer (the `review` ability). */
   canResolve?: boolean
+  /**
+   * The execute tier (invite). Gates accept/reject on the Applications
+   * pseudo-column (AH-059, D4) — the same ability the Applications tab uses, so
+   * the two surfaces cannot disagree about who may answer an application.
+   */
+  canAct?: boolean
+  campaignCurrency?: string | null
 }>()
 
 const emit = defineEmits<{
@@ -142,6 +149,10 @@ onBeforeUnmount(() => {
       :columns="store.sortedColumns"
       :cards-by-column="store.cardsByColumn"
       :can-edit-columns="canConfigure"
+      :agency-id="agencyId"
+      :campaign-id="campaignId"
+      :can-act="props.canAct ?? false"
+      :campaign-currency="props.campaignCurrency ?? null"
       @move="onMove"
       @reorder="onReorder"
       @open-card="onOpenCard"

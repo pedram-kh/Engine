@@ -638,6 +638,10 @@
         "moveFailed": "No se ha podido mover la tarjeta: ha vuelto a su sitio.",
         "reorderFailed": "No se han podido reordenar las columnas: se ha restaurado el orden.",
         "automationsButton": "Automatizaciones",
+        "applications": {
+          "title": "Candidaturas",
+          "empty": "No hay candidaturas pendientes"
+        },
         "card": {
           "unnamed": "Creador sin nombre",
           "removed": "Asignación eliminada",

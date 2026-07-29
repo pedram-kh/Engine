@@ -638,6 +638,10 @@
         "moveFailed": "Kartu sa nepodařilo přesunout — vrátila sa na místo.",
         "reorderFailed": "Nepodařilo sa změnit pořadí sloupců — pořadí bolo obnoveno.",
         "automationsButton": "Automatizace",
+        "applications": {
+          "title": "Prihlášky",
+          "empty": "Žiadne čakajúce prihlášky"
+        },
         "card": {
           "unnamed": "Nepojmenovaný tvorcu",
           "removed": "Odstraněný úkol",

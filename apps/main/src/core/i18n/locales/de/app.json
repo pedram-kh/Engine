@@ -638,6 +638,10 @@
         "moveFailed": "Karte konnte nicht verschoben werden — sie ist wieder dort, wo sie war.",
         "reorderFailed": "Spalten konnten nicht neu angeordnet werden — die Reihenfolge wurde wiederhergestellt.",
         "automationsButton": "Automatisierungen",
+        "applications": {
+          "title": "Bewerbungen",
+          "empty": "Keine offenen Bewerbungen"
+        },
         "card": {
           "unnamed": "Unbenannter Creator",
           "removed": "Entfernter Auftrag",

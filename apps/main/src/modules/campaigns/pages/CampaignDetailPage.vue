@@ -839,6 +839,8 @@ function formatDay(iso: string | null): string {
             :campaign-id="ulid"
             :can-configure="canEdit"
             :can-resolve="canReview"
+            :can-act="canInvite"
+            :campaign-currency="campaign?.attributes.budget_currency ?? null"
             @resolve="openResolve"
           />
         </v-window-item>

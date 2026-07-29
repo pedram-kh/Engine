@@ -638,6 +638,10 @@
         "moveFailed": "Kortet kunne ikke flyttes — det er tilbage, hvor det var.",
         "reorderFailed": "Kolonnerne kunne ikke omarrangeres — rækkefølgen er gendannet.",
         "automationsButton": "Automatiseringer",
+        "applications": {
+          "title": "Ansøgninger",
+          "empty": "Ingen ventende ansøgninger"
+        },
         "card": {
           "unnamed": "Unavngivet creator",
           "removed": "Fjernet opgave",

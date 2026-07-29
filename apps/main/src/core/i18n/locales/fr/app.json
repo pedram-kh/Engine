@@ -638,6 +638,10 @@
         "moveFailed": "Impossible de déplacer la carte — elle est revenue à sa place.",
         "reorderFailed": "Impossible de réorganiser les colonnes — l'ordre a été restauré.",
         "automationsButton": "Automatisations",
+        "applications": {
+          "title": "Candidatures",
+          "empty": "Aucune candidature en attente"
+        },
         "card": {
           "unnamed": "Créateur sans nom",
           "removed": "Mission supprimée",

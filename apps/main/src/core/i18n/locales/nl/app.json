@@ -638,6 +638,10 @@
         "moveFailed": "Kaart kon niet worden verplaatst — hij staat weer op de oorspronkelijke plek.",
         "reorderFailed": "Kolommen konden niet worden herschikt — de volgorde is hersteld.",
         "automationsButton": "Automatiseringen",
+        "applications": {
+          "title": "Aanmeldingen",
+          "empty": "Geen openstaande aanmeldingen"
+        },
         "card": {
           "unnamed": "Naamloze creator",
           "removed": "Verwijderde opdracht",

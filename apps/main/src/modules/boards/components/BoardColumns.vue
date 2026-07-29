@@ -9,6 +9,12 @@
  * Column dragging + the "Add column" button are gated on `canEditColumns` (board
  * CONFIG = admin + manager). Card dragging inside each column is independent
  * (the `invite` execute ability) and handled by BoardColumn.
+ *
+ * AH-059 (D4): the Applications pseudo-column is mounted here as the FIRST CHILD
+ * of `.board-columns-root` — inside the horizontal scroller, so it travels with
+ * the board and reads as the leftmost column — and pointedly OUTSIDE `draggable`,
+ * so it is absent from `localColumns` and from the `board-columns` group.
+ * {@link BoardApplicationsColumn} carries the full reasoning.
  */
 
 import type { BoardCardResource, BoardColumnResource } from '@catalyst/api-client'
@@ -16,12 +22,19 @@ import draggable from 'vuedraggable'
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import BoardApplicationsColumn from './BoardApplicationsColumn.vue'
 import BoardColumn from './BoardColumn.vue'
 
 const props = defineProps<{
   columns: BoardColumnResource[]
   cardsByColumn: Record<string, BoardCardResource[]>
   canEditColumns: boolean
+  /** For the Applications pseudo-column (AH-059, D4) — see its own docblock. */
+  agencyId: string
+  campaignId: string
+  /** The execute tier (invite) — gates accept/reject on the application cards. */
+  canAct: boolean
+  campaignCurrency: string | null
 }>()
 
 const emit = defineEmits<{
@@ -58,6 +71,19 @@ defineExpose({ onColumnChange, localColumns })
 
 <template>
   <div class="board-columns-root">
+    <!-- The Applications pseudo-column (AH-059, D4), FIRST CHILD of the scroll
+         container rather than a member of `localColumns`. Two consequences, both
+         wanted: it scrolls with the board instead of pinning while the real
+         columns slide under it, and it cannot be dragged, reordered or dropped
+         into — because it is not in the list vuedraggable owns. That absence IS
+         the enforcement (§5.34 negatives assert it). -->
+    <BoardApplicationsColumn
+      :agency-id="agencyId"
+      :campaign-id="campaignId"
+      :can-act="canAct"
+      :campaign-currency="campaignCurrency"
+    />
+
     <draggable
       v-model="localColumns"
       item-key="id"

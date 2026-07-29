@@ -638,6 +638,10 @@
         "moveFailed": "Kunde inte flytta kortet — det är tillbaka där det var.",
         "reorderFailed": "Kunde inte ordna om kolumnerna — ordningen återställdes.",
         "automationsButton": "Automatiseringar",
+        "applications": {
+          "title": "Ansökningar",
+          "empty": "Inga väntande ansökningar"
+        },
         "card": {
           "unnamed": "Ej namngiven creator",
           "removed": "Borttaget uppdrag",

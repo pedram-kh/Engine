@@ -638,6 +638,10 @@
         "moveFailed": "Nie udało się przenieść karty — wróciła na swoje miejsce.",
         "reorderFailed": "Nie udało się zmienić kolejności kolumn — kolejność została przywrócona.",
         "automationsButton": "Automatyzacje",
+        "applications": {
+          "title": "Zgłoszenia",
+          "empty": "Brak oczekujących zgłoszeń"
+        },
         "card": {
           "unnamed": "Nienazwany twórca",
           "removed": "Usunięte zadanie",

@@ -638,6 +638,10 @@
         "moveFailed": "Impossibile spostare la scheda — è tornata al punto di partenza.",
         "reorderFailed": "Impossibile riordinare le colonne — l'ordine è stato ripristinato.",
         "automationsButton": "Automazioni",
+        "applications": {
+          "title": "Candidature",
+          "empty": "Nessuna candidatura in attesa"
+        },
         "card": {
           "unnamed": "Creator senza nome",
           "removed": "Assegnazione rimossa",

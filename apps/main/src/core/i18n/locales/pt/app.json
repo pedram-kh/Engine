@@ -638,6 +638,10 @@
         "moveFailed": "Não foi possível mover o cartão — ele voltou ao lugar de origem.",
         "reorderFailed": "Não foi possível reordenar as colunas — a ordem foi restaurada.",
         "automationsButton": "Automações",
+        "applications": {
+          "title": "Candidaturas",
+          "empty": "Não há candidaturas pendentes"
+        },
         "card": {
           "unnamed": "Criador sem nome",
           "removed": "Atribuição removida",

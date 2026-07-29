@@ -638,6 +638,10 @@
         "moveFailed": "Couldn't move the card — it's back where it was.",
         "reorderFailed": "Couldn't reorder the columns — the order was restored.",
         "automationsButton": "Automations",
+        "applications": {
+          "title": "Jelentkezések",
+          "empty": "Nincs függőben lévő jelentkezés"
+        },
         "card": {
           "unnamed": "Unnamed creator",
           "removed": "Removed assignment",
