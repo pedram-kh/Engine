@@ -24,23 +24,34 @@
  * Rows show roster-level creator identity only (name, avatar). An applicant is
  * rostered by definition — applying requires the relation — so this creates NO
  * new exposure of a creator's details to the agency.
+ *
+ * ── AH-059 (D4): this tab STAYS, and its list logic moved out ───────────────
+ *
+ * The board gained a pending-only Applications column, which is a working surface
+ * — "what still needs an answer today". This tab is the HISTORY: every status,
+ * filterable, including the rejected rows a column has no business showing. Both
+ * were kept deliberately rather than one replacing the other; the revisit note is
+ * in the chunk's review.
+ *
+ * What that produced is a second consumer, so the list state moved into
+ * {@link useCampaignApplications} and the reject confirmation into
+ * {@link RejectApplicationDialog}. No behaviour changed here: the extraction was
+ * required to move a component without moving a single assertion.
  */
 
-import { ApiError, formatDateTime } from '@catalyst/api-client'
-import type {
-  CampaignApplicationListItemResource,
-  CampaignApplicationListParams,
-  CampaignApplicationStatus,
-} from '@catalyst/api-client'
+import { formatDateTime } from '@catalyst/api-client'
+import type { CampaignApplicationListItemResource } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { CEmptyState } from '@catalyst/ui'
 
-import { campaignsApi } from '../api/campaigns.api'
+import {
+  type ApplicationsFilter,
+  useCampaignApplications,
+} from '../composables/useCampaignApplications'
 import AcceptApplicationDialog from './AcceptApplicationDialog.vue'
-
-type FilterValue = 'all' | CampaignApplicationStatus
+import RejectApplicationDialog from './RejectApplicationDialog.vue'
 
 const props = defineProps<{
   agencyId: string
@@ -59,55 +70,34 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n()
 
-const rows = ref<CampaignApplicationListItemResource[]>([])
-const loading = ref(false)
-const loadError = ref(false)
-const page = ref(1)
-const lastPage = ref(1)
-const perPage = 25
-const filter = ref<FilterValue>('all')
+/**
+ * The list, from the composable the board's Applications column also uses
+ * (AH-059, S7a). This tab keeps the filter settable: it is the full history.
+ */
+const applications = useCampaignApplications(
+  () => props.agencyId,
+  () => props.campaignId,
+  // The badge number is hoisted per FETCH, not per value change: a campaign with
+  // genuinely zero pending applications still has to say so, and a watcher would
+  // stay silent because 0 is the initial value.
+  { onLoaded: (total) => emit('pending-total', total) },
+)
+
+const { rows, loading, loadError, page, lastPage, filter, actionError, hasRows, load, isPending } =
+  applications
 
 const acceptDialog = ref(false)
 const acceptTarget = ref<CampaignApplicationListItemResource | null>(null)
 
 const rejectPrompt = ref(false)
 const rejectTarget = ref<CampaignApplicationListItemResource | null>(null)
-const rejecting = ref(false)
-const actionError = ref<string | null>(null)
 
-const filterOptions = computed((): { title: string; value: FilterValue }[] => [
+const filterOptions = computed((): { title: string; value: ApplicationsFilter }[] => [
   { title: t('app.campaigns.applications.filters.all'), value: 'all' },
   { title: t('app.campaigns.applications.status.pending'), value: 'pending' },
   { title: t('app.campaigns.applications.status.accepted'), value: 'accepted' },
   { title: t('app.campaigns.applications.status.rejected'), value: 'rejected' },
 ])
-
-const hasRows = computed(() => rows.value.length > 0)
-
-function isPending(row: CampaignApplicationListItemResource): boolean {
-  return row.attributes.status === 'pending'
-}
-
-async function load(initial = false): Promise<void> {
-  loading.value = initial && rows.value.length === 0
-  try {
-    const params: CampaignApplicationListParams = { page: page.value, per_page: perPage }
-    if (filter.value !== 'all') {
-      params.status = filter.value
-    }
-    const res = await campaignsApi.listApplications(props.agencyId, props.campaignId, params)
-    rows.value = res.data
-    lastPage.value = res.meta.last_page
-    loadError.value = false
-    emit('pending-total', res.meta.pending_total)
-  } catch {
-    if (rows.value.length === 0) {
-      loadError.value = true
-    }
-  } finally {
-    loading.value = false
-  }
-}
 
 function openAccept(row: CampaignApplicationListItemResource): void {
   acceptTarget.value = row
@@ -119,45 +109,11 @@ function openReject(row: CampaignApplicationListItemResource): void {
   rejectPrompt.value = true
 }
 
-function onAccepted(message: string): void {
+/** Both answers land here: toast upward, then refetch. */
+function onAnswered(message: string): void {
+  actionError.value = null
   emit('answered', message)
   void load()
-}
-
-/**
- * The confirmed reject (D4). No reason is collected — the creator-facing copy is
- * a kind generic "not selected" whatever an agency might type, and the audit row
- * plus its actor is the internal record.
- */
-async function confirmReject(): Promise<void> {
-  const target = rejectTarget.value
-  if (target === null) return
-
-  rejecting.value = true
-  actionError.value = null
-  try {
-    await campaignsApi.rejectApplication(props.agencyId, props.campaignId, target.id)
-    rejectPrompt.value = false
-    emit(
-      'answered',
-      t('app.campaigns.applications.rejectedToast', {
-        name: target.attributes.creator?.display_name ?? t('app.campaigns.invite.unnamed'),
-      }),
-    )
-    void load()
-  } catch (err) {
-    // Surfaced, never swallowed: the common refusal is someone else having
-    // answered this application already (§5.6), and the operator needs to know
-    // that rather than watch a button do nothing.
-    const code =
-      err instanceof ApiError ? (err.raw as { meta?: { code?: string } } | null)?.meta?.code : null
-    actionError.value =
-      code === 'application.not_pending'
-        ? t('app.campaigns.applications.refusal.application.not_pending')
-        : t('app.campaigns.applications.refusal.generic')
-  } finally {
-    rejecting.value = false
-  }
 }
 
 function formatStamp(iso: string | null): string {
@@ -322,45 +278,17 @@ defineExpose({
       :campaign-id="campaignId"
       :application="acceptTarget"
       :campaign-currency="campaignCurrency"
-      @accepted="onAccepted"
+      @accepted="onAnswered"
     />
 
-    <!-- The terminal-action confirmation (ReviewDraftDrawer's pattern): mounted
-         with v-if so it carries no state between rows. -->
-    <v-dialog
+    <RejectApplicationDialog
       v-if="rejectPrompt"
       v-model="rejectPrompt"
-      max-width="420"
-      data-test="reject-application-dialog"
-    >
-      <v-card>
-        <v-card-title class="text-h6">
-          {{ t('app.campaigns.applications.reject.title') }}
-        </v-card-title>
-        <v-card-text data-test="reject-application-body">
-          {{
-            t('app.campaigns.applications.reject.body', {
-              name:
-                rejectTarget?.attributes.creator?.display_name ?? t('app.campaigns.invite.unnamed'),
-            })
-          }}
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn variant="text" data-test="reject-application-cancel" @click="rejectPrompt = false">
-            {{ t('app.campaigns.applications.reject.cancel') }}
-          </v-btn>
-          <v-btn
-            color="error"
-            variant="flat"
-            :loading="rejecting"
-            data-test="reject-application-confirm"
-            @click="confirmReject"
-          >
-            {{ t('app.campaigns.applications.reject.confirm') }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+      :agency-id="agencyId"
+      :campaign-id="campaignId"
+      :application="rejectTarget"
+      @rejected="onAnswered"
+      @refused="(message) => (actionError = message)"
+    />
   </div>
 </template>
