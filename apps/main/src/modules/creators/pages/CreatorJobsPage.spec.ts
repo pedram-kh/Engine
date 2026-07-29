@@ -43,6 +43,7 @@ function card(overrides: Record<string, unknown> = {}) {
       applicant_count: 3,
       listed_at: new Date().toISOString(),
       application_status: null,
+      assignment_state: null,
       brand: { name: 'Northwind Coffee', logo_url: 'https://cdn.test/logo.png' },
       ...overrides,
     },
@@ -161,6 +162,79 @@ describe('CreatorJobsPage', () => {
     const wrapper = await mountPage()
 
     expect(wrapper.find('[data-testid="creator-job-applied-01JOB1"]').text()).toBe('Accepted')
+  })
+
+  // ── D1 + D5: the branch ordering, four cases (AH-059) ────────────────────
+  //
+  // The §5.34 set for the CARD. The API-side set (CreatorJobDetailTest) proves
+  // both facts reach the payload; these four prove the card renders the right one
+  // of them. Case 2 is the eyes-on bug.
+
+  it('D1 case 1 — rejected + NO engagement: still "Not selected" (§5.34 retained branch)', async () => {
+    mockApi.list.mockResolvedValue(
+      envelope([card({ application_status: 'rejected', assignment_state: null })]) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-applied-01JOB1"]').text()).toBe('Not selected')
+    expect(wrapper.find('[data-testid="creator-job-lifecycle-01JOB1"]').exists()).toBe(false)
+  })
+
+  it('D1 case 2 — rejected + LIVE invitation: "In progress", and "Not selected" is GONE', async () => {
+    // The bug, as found: the agency rejected the application and then invited the
+    // creator anyway. The card was reading the older fact.
+    mockApi.list.mockResolvedValue(
+      envelope([
+        card({ application_status: 'rejected', assignment_state: 'in_progress' }),
+      ]) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-lifecycle-01JOB1"]').text()).toBe('In progress')
+
+    // The contradiction, asserted dead two ways: the rejected chip is absent as
+    // an element, and the string appears nowhere on the card at all.
+    expect(wrapper.find('[data-testid="creator-job-applied-01JOB1"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="creator-job-01JOB1"]').text()).not.toContain('Not selected')
+  })
+
+  it('D1 case 3 — rejected + ENDED engagement: "Ended" wins, not "Not selected" (Q2a)', async () => {
+    mockApi.list.mockResolvedValue(
+      envelope([card({ application_status: 'rejected', assignment_state: 'ended' })]) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-lifecycle-01JOB1"]').text()).toBe('Ended')
+    expect(wrapper.find('[data-testid="creator-job-applied-01JOB1"]').exists()).toBe(false)
+  })
+
+  it('D1 case 4 — accepted + engagement: the stage replaces "Accepted"', async () => {
+    mockApi.list.mockResolvedValue(
+      envelope([card({ application_status: 'accepted', assignment_state: 'completed' })]) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-lifecycle-01JOB1"]').text()).toBe('Completed')
+    expect(wrapper.find('[data-testid="creator-job-applied-01JOB1"]').exists()).toBe(false)
+  })
+
+  it('renders each lifecycle state with its own label and colour', async () => {
+    // BREAK-REVERT ANCHOR (§5.35): swap the two chips' v-if order in the template
+    // and cases 2–4 above redden — "Not selected" returns beside a live invite.
+    for (const [state, label, color] of [
+      ['in_progress', 'In progress', 'primary'],
+      ['completed', 'Completed', 'success'],
+      ['ended', 'Ended', 'default'],
+    ] as const) {
+      mockApi.list.mockResolvedValue(envelope([card({ assignment_state: state })]) as never)
+      const wrapper = await mountPage()
+      const chip = wrapper.find('[data-testid="creator-job-lifecycle-01JOB1"]')
+
+      expect(chip.text()).toBe(label)
+      // `ended` is neutral rather than red: an engagement can end by the
+      // creator's own decline, and their own choice must not read as a reprimand.
+      expect(chip.attributes('color') ?? color).toBe(color)
+    }
   })
 
   it('shows the empty state — an empty board is a state, not an error', async () => {

@@ -470,6 +470,11 @@
           "accepted": "Geaccepteerd",
           "rejected": "Niet gekozen"
         },
+        "lifecycle": {
+          "in_progress": "Loopt",
+          "completed": "Afgerond",
+          "ended": "Beëindigd"
+        },
         "empty": {
           "title": "Nog geen vacatures",
           "body": "Zodra een bureau waarmee je werkt een opdracht plaatst, verschijnt die hier."
@@ -488,7 +493,13 @@
           "appliedNotice": "Je hebt op deze opdracht gesolliciteerd. Het bureau neemt contact met je op.",
           "rejectedNotice": "Je bent niet gekozen voor deze opdracht.",
           "acceptedNotice": "Je bent geselecteerd voor deze opdracht — je aanbod staat klaar.",
-          "viewOffer": "Aanbod bekijken"
+          "lifecycleNotice": {
+            "in_progress": "Deze opdracht loopt.",
+            "completed": "Deze opdracht is afgerond.",
+            "ended": "Deze opdracht is beëindigd."
+          },
+          "viewOffer": "Aanbod bekijken",
+          "viewAssignment": "Opdracht bekijken"
         },
         "applyDialog": {
           "title": "Solliciteren op deze opdracht",

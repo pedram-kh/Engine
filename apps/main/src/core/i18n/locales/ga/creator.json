@@ -470,6 +470,11 @@
           "accepted": "Glactha",
           "rejected": "Níor roghnaíodh thú"
         },
+        "lifecycle": {
+          "in_progress": "Ar siúl",
+          "completed": "Críochnaithe",
+          "ended": "Thart"
+        },
         "empty": {
           "title": "Níl aon phost ann fós",
           "body": "Nuair a chuirfidh gníomhaireacht a n-oibríonn tú léi post suas, taispeánfar anseo é."
@@ -488,7 +493,13 @@
           "appliedNotice": "Chuir tú isteach ar an bpost seo. Beidh an ghníomhaireacht i dteagmháil leat.",
           "rejectedNotice": "Níor roghnaíodh thú don phost seo.",
           "acceptedNotice": "Roghnaíodh tú don phost seo — tá do thairiscint réidh le breathnú air.",
-          "viewOffer": "Féach ar an tairiscint"
+          "lifecycleNotice": {
+            "in_progress": "Tá an post seo ar siúl.",
+            "completed": "Tá an post seo críochnaithe.",
+            "ended": "Tá an post seo thart."
+          },
+          "viewOffer": "Féach ar an tairiscint",
+          "viewAssignment": "Féach ar an sannadh"
         },
         "applyDialog": {
           "title": "Cuir isteach ar an bpost seo",

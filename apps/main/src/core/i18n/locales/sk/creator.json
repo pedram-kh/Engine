@@ -470,6 +470,11 @@
           "accepted": "Prijaté",
           "rejected": "Nevybraté"
         },
+        "lifecycle": {
+          "in_progress": "Prebieha",
+          "completed": "Dokončené",
+          "ended": "Ukončené"
+        },
         "empty": {
           "title": "Zatiaľ žiadne ponuky",
           "body": "Keď agentúra, s ktorou spolupracuješ, zverejní ponuku, objaví sa tu."
@@ -488,7 +493,13 @@
           "appliedNotice": "Na túto ponuku si sa prihlásil. Agentúra sa ti ozve.",
           "rejectedNotice": "Na túto ponuku ťa nevybrali.",
           "acceptedNotice": "Boli ste vybraní na túto prácu — vaša ponuka je pripravená na prezretie.",
-          "viewOffer": "Zobraziť ponuku"
+          "lifecycleNotice": {
+            "in_progress": "Táto práca prebieha.",
+            "completed": "Táto práca je dokončená.",
+            "ended": "Táto práca bola ukončená."
+          },
+          "viewOffer": "Zobraziť ponuku",
+          "viewAssignment": "Zobraziť zadanie"
         },
         "applyDialog": {
           "title": "Prihlásiť sa na túto ponuku",

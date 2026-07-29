@@ -46,6 +46,7 @@ function detail(overrides: Record<string, unknown> = {}) {
         applicant_count: 3,
         listed_at: new Date().toISOString(),
         application_status: null,
+        assignment_state: null,
         description: 'Three short-form videos per month.',
         listing_languages: ['en', 'pt'],
         listing_regions: ['PT', 'ES'],
@@ -288,8 +289,16 @@ describe('CreatorJobDetailPage', () => {
   // ── The D7 bridge (AH-058) — the third state ──────────────────────────────
 
   it('links an accepted applicant to the offer waiting for them', async () => {
+    // `assignment_state: null` is what routes this to branch 3 and is now spelled
+    // out rather than inherited from the fixture: with D5 shipped, a real accepted
+    // applicant carries a state and takes branch 1 instead. This case pins the
+    // RETAINED fallback (Q4: no branch removed, no key deleted).
     mockApi.show.mockResolvedValue(
-      detail({ application_status: 'accepted', assignment_ulid: '01ASSIGN' }) as never,
+      detail({
+        application_status: 'accepted',
+        assignment_state: null,
+        assignment_ulid: '01ASSIGN',
+      }) as never,
     )
     const wrapper = await mountPage()
 
@@ -328,6 +337,103 @@ describe('CreatorJobDetailPage', () => {
 
     expect(wrapper.find('[data-testid="creator-job-applied-notice"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="creator-job-accepted-notice"]').exists()).toBe(false)
+  })
+
+  // ── D1 + D5: the footer's branch table (AH-059) ────────────────────────────
+  //
+  // Branch 1 was inserted above the retained branches, so these cases assert both
+  // halves of every claim: what now renders, AND what stopped.
+
+  it('D1 case 1 — rejected + NO engagement: "Not selected" is RETAINED (§5.34)', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({ application_status: 'rejected', assignment_state: null }) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-rejected-notice"]').text()).toContain(
+      "You weren't selected",
+    )
+    expect(wrapper.find('[data-testid="creator-job-lifecycle-notice"]').exists()).toBe(false)
+  })
+
+  it('D1 case 2 — rejected + LIVE invitation: the stage replaces it (the eyes-on bug)', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({
+        application_status: 'rejected',
+        assignment_state: 'in_progress',
+        assignment_ulid: '01ASSIGN',
+      }) as never,
+    )
+    const wrapper = await mountPage()
+
+    const notice = wrapper.find('[data-testid="creator-job-lifecycle-notice"]')
+    expect(notice.text()).toContain('This job is under way')
+
+    // Dead, both as an element and as a string anywhere on the page.
+    expect(wrapper.find('[data-testid="creator-job-rejected-notice"]').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain("You weren't selected")
+
+    // And the creator can reach the engagement the notice is about.
+    expect(wrapper.find('[data-testid="creator-job-lifecycle-link"]').attributes('href')).toBe(
+      '/creator/assignments/01ASSIGN',
+    )
+  })
+
+  it('D1 case 3 — rejected + ENDED engagement: "Ended", still not "Not selected" (Q2a)', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({ application_status: 'rejected', assignment_state: 'ended' }) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-lifecycle-notice"]').text()).toContain(
+      'This job has ended',
+    )
+    expect(wrapper.find('[data-testid="creator-job-rejected-notice"]').exists()).toBe(false)
+  })
+
+  it('D1 case 4 — accepted + engagement: the stage replaces the accepted notice', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({
+        application_status: 'accepted',
+        assignment_state: 'completed',
+        assignment_ulid: '01ASSIGN',
+      }) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-lifecycle-notice"]').text()).toContain(
+      'This job is complete',
+    )
+    expect(wrapper.find('[data-testid="creator-job-accepted-notice"]').exists()).toBe(false)
+  })
+
+  it('renders each stage, and Apply is dead in all three', async () => {
+    // BREAK-REVERT ANCHOR (§5.35): move branch 1 below the rejected branch and
+    // cases 2–3 above redden.
+    for (const [state, copy] of [
+      ['in_progress', 'This job is under way'],
+      ['completed', 'This job is complete'],
+      ['ended', 'This job has ended'],
+    ] as const) {
+      mockApi.show.mockResolvedValue(detail({ assignment_state: state }) as never)
+      const wrapper = await mountPage()
+
+      expect(wrapper.find('[data-testid="creator-job-lifecycle-notice"]').text()).toContain(copy)
+      // An engagement of any stage means the job is answered: Apply is gone even
+      // for the `ended` case, where the row that would block a re-apply is the
+      // application's, not the assignment's.
+      expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(false)
+    }
+  })
+
+  it('renders the stage with NO link when the bridge is absent', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({ assignment_state: 'in_progress', assignment_ulid: null }) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-lifecycle-notice"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="creator-job-lifecycle-link"]').exists()).toBe(false)
   })
 
   it('surfaces the two 409 codes with distinct copy', async () => {

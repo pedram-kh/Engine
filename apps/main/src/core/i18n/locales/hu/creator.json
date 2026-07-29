@@ -470,6 +470,11 @@
           "accepted": "Elfogadva",
           "rejected": "Nem választottak ki"
         },
+        "lifecycle": {
+          "in_progress": "Folyamatban",
+          "completed": "Befejezve",
+          "ended": "Lezárva"
+        },
         "empty": {
           "title": "Még nincs álláshirdetés",
           "body": "Amikor egy ügynökség, amellyel dolgozol, munkát hirdet, itt fog megjelenni."
@@ -488,7 +493,13 @@
           "appliedNotice": "Jelentkeztél erre a munkára. Az ügynökség hamarosan jelentkezik.",
           "rejectedNotice": "Nem téged választottak erre a munkára.",
           "acceptedNotice": "Kiválasztották erre a munkára – az ajánlata készen áll az áttekintésre.",
-          "viewOffer": "Ajánlat megtekintése"
+          "lifecycleNotice": {
+            "in_progress": "Ez a munka folyamatban van.",
+            "completed": "Ez a munka befejeződött.",
+            "ended": "Ez a munka lezárult."
+          },
+          "viewOffer": "Ajánlat megtekintése",
+          "viewAssignment": "Megbízás megtekintése"
         },
         "applyDialog": {
           "title": "Jelentkezés erre a munkára",

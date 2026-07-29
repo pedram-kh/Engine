@@ -470,6 +470,11 @@
           "accepted": "Acceptée",
           "rejected": "Non retenue"
         },
+        "lifecycle": {
+          "in_progress": "En cours",
+          "completed": "Terminé",
+          "ended": "Clôturé"
+        },
         "empty": {
           "title": "Aucune offre pour le moment",
           "body": "Lorsqu'une agence avec laquelle vous travaillez publiera une mission, elle apparaîtra ici."
@@ -488,7 +493,13 @@
           "appliedNotice": "Vous avez postulé à cette offre. L'agence vous recontactera.",
           "rejectedNotice": "Vous n'avez pas été retenu pour cette offre.",
           "acceptedNotice": "Vous avez été retenu·e pour cette mission — votre offre est prête à être consultée.",
-          "viewOffer": "Voir l'offre"
+          "lifecycleNotice": {
+            "in_progress": "Cette mission est en cours.",
+            "completed": "Cette mission est terminée.",
+            "ended": "Cette mission est clôturée."
+          },
+          "viewOffer": "Voir l'offre",
+          "viewAssignment": "Voir la mission"
         },
         "applyDialog": {
           "title": "Postuler à cette offre",

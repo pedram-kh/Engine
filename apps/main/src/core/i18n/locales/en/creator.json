@@ -470,6 +470,11 @@
           "accepted": "Accepted",
           "rejected": "Not selected"
         },
+        "lifecycle": {
+          "in_progress": "In progress",
+          "completed": "Completed",
+          "ended": "Ended"
+        },
         "empty": {
           "title": "No job posts yet",
           "body": "When an agency you work with posts a job, it'll appear here."
@@ -488,7 +493,13 @@
           "appliedNotice": "You've applied to this job. The agency will be in touch.",
           "rejectedNotice": "You weren't selected for this job.",
           "acceptedNotice": "You've been accepted for this job — your offer is ready to review.",
-          "viewOffer": "View offer"
+          "lifecycleNotice": {
+            "in_progress": "This job is under way.",
+            "completed": "This job is complete.",
+            "ended": "This job has ended."
+          },
+          "viewOffer": "View offer",
+          "viewAssignment": "View assignment"
         },
         "applyDialog": {
           "title": "Apply to this job",

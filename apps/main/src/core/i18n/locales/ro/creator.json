@@ -470,6 +470,11 @@
           "accepted": "Acceptată",
           "rejected": "Neselectat"
         },
+        "lifecycle": {
+          "in_progress": "În desfășurare",
+          "completed": "Finalizat",
+          "ended": "Încheiat"
+        },
         "empty": {
           "title": "Încă nu există anunțuri",
           "body": "Când o agenție cu care colaborezi publică un job, va apărea aici."
@@ -488,7 +493,13 @@
           "appliedNotice": "Ai aplicat la acest job. Agenția te va contacta.",
           "rejectedNotice": "Nu ai fost selectat pentru acest job.",
           "acceptedNotice": "Ați fost selectat pentru acest job — oferta dumneavoastră este gata de consultat.",
-          "viewOffer": "Vezi oferta"
+          "lifecycleNotice": {
+            "in_progress": "Această lucrare este în desfășurare.",
+            "completed": "Această lucrare este finalizată.",
+            "ended": "Această lucrare s-a încheiat."
+          },
+          "viewOffer": "Vezi oferta",
+          "viewAssignment": "Vezi misiunea"
         },
         "applyDialog": {
           "title": "Aplică la acest job",

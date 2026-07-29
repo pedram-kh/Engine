@@ -20,9 +20,29 @@
  * the third state that was missing: `accepted` links into the assignment the
  * agency created, so a creator is never left on a page saying "applied" while a
  * real offer waits on another surface.
+ *
+ * ── The footer's branch table (AH-059, D1+D5) ───────────────────────────────
+ *
+ * Five branches, in this order, and THE ORDER IS LOAD-BEARING:
+ *
+ *   1. an engagement exists   → its coarse stage, replacing 2 and 3
+ *   2. application rejected   → "Not selected"      (retained)
+ *   3. application accepted   → the D7 offer notice (retained)
+ *   4. application pending    → "Applied"           (retained)
+ *   5. never applied          → Apply
+ *
+ * Branch 1 was inserted ABOVE the others rather than merged into them, because
+ * the bug it fixes was two truths rendered as one contradiction: the agency
+ * rejected an application and later invited the same creator anyway, and the page
+ * kept reading the older fact. Nothing below branch 1 changed; no key was
+ * deleted. See the comments on the branches themselves.
  */
 
-import { ApiError, type CreatorJobDetailResource } from '@catalyst/api-client'
+import {
+  ApiError,
+  type CreatorJobDetailResource,
+  type JobLifecycleState,
+} from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
@@ -33,6 +53,18 @@ const { t } = useI18n()
 const route = useRoute()
 
 const NOTE_MAX_LENGTH = 1000
+
+/**
+ * The notice's severity per stage (AH-059, D5). Total over the union, so a fourth
+ * state is a `tsc` failure rather than an alert with no type.
+ *
+ * `ended` is `info`, not `error`: the creator may have declined it themselves.
+ */
+const LIFECYCLE_ALERT_TYPE: Record<JobLifecycleState, 'info' | 'success'> = {
+  in_progress: 'info',
+  completed: 'success',
+  ended: 'info',
+}
 
 const job = ref<CreatorJobDetailResource | null>(null)
 const loading = ref(true)
@@ -46,6 +78,10 @@ const snackbar = ref<{ color: string; text: string } | null>(null)
 const ulid = computed(() => String(route.params.ulid ?? ''))
 const status = computed(() => job.value?.attributes.application_status ?? null)
 const assignmentUlid = computed(() => job.value?.attributes.assignment_ulid ?? null)
+/** The engagement's coarse stage, or null when the pair has no assignment (D5). */
+const lifecycleState = computed<JobLifecycleState | null>(
+  () => job.value?.attributes.assignment_state ?? null,
+)
 const canApply = computed(() => job.value !== null && status.value === null)
 
 async function load(): Promise<void> {
@@ -263,8 +299,46 @@ onMounted(() => {
       <!-- The outcome of the caller's own application, or the way to make one.
            In the footer because it is the card's ACTION, not its content. -->
       <v-card-actions class="job-detail__actions">
+        <!-- ⚠ BRANCH 1, AND ITS POSITION IS THE FIX (AH-059, D1+D5).
+             ═══════════════════════════════════════════════════════════════
+             When an engagement exists it REPLACES the accepted and rejected
+             notices, because the engagement is the newer and truer fact. Move
+             this below the rejected branch and "Not selected" comes back on a
+             job the creator is currently working on — the contradiction Pedram
+             found on the board.
+
+             Whenever an assignment exists it wins, INCLUDING an ended one
+             (ruled at plan-pause, Q2a). The consequence is deliberate: a pair
+             that was ever invited never reads "Not selected" again. The agency's
+             last act on that pair was an invitation, not a refusal, and the
+             application row stays `rejected` in the database either way — the
+             agency's answer to that application was truthful, and the later
+             invitation is a separate event. -->
         <v-alert
-          v-if="status === 'rejected'"
+          v-if="lifecycleState !== null"
+          :type="LIFECYCLE_ALERT_TYPE[lifecycleState]"
+          variant="tonal"
+          density="compact"
+          data-testid="creator-job-lifecycle-notice"
+        >
+          {{ t(`creator.ui.jobs.detail.lifecycleNotice.${lifecycleState}`) }}
+          <template v-if="assignmentUlid" #append>
+            <v-btn
+              variant="text"
+              size="small"
+              :to="{ name: 'creator.assignment.detail', params: { ulid: assignmentUlid } }"
+              data-testid="creator-job-lifecycle-link"
+            >
+              {{ t('creator.ui.jobs.detail.viewAssignment') }}
+            </v-btn>
+          </template>
+        </v-alert>
+
+        <!-- BRANCH 2 — retained, and now reached only when there is no
+             engagement: a rejected application the agency never followed up on.
+             This is §5.34's other branch and it must keep rendering. -->
+        <v-alert
+          v-else-if="status === 'rejected'"
           type="info"
           variant="tonal"
           density="compact"
@@ -273,11 +347,13 @@ onMounted(() => {
           {{ t('creator.ui.jobs.detail.rejectedNotice') }}
         </v-alert>
 
-        <!-- The D7 bridge (AH-058) — an accepted applicant has a real offer
-             waiting elsewhere, so this notice is the way there rather than a
-             dead end saying "applied". The link appears only when the server
-             gave a ULID: an accepted application whose assignment is gone
-             degrades to the notice alone instead of a link into a 404. -->
+        <!-- BRANCH 3 — retained (AH-058's D7 notice), and now reached only in
+             the case chunk 4's own test already pinned: an accepted application
+             whose assignment is GONE (the engagement was unwound). Both facts
+             come from the same pair, so in practice `assignmentUlid` is null
+             here too and the append is inert — it is kept rather than deleted
+             because the ULID and the state are separately sourced, and the
+             graceful degradation is the point of the guard. -->
         <v-alert
           v-else-if="status === 'accepted'"
           type="success"
@@ -298,6 +374,7 @@ onMounted(() => {
           </template>
         </v-alert>
 
+        <!-- BRANCH 4 — pending. Retained unchanged. -->
         <v-alert
           v-else-if="status !== null"
           type="success"
@@ -308,6 +385,7 @@ onMounted(() => {
           {{ t('creator.ui.jobs.detail.appliedNotice') }}
         </v-alert>
 
+        <!-- BRANCH 5 — never applied. Retained unchanged. -->
         <v-btn
           v-else
           color="primary"

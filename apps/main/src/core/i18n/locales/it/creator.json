@@ -470,6 +470,11 @@
           "accepted": "Accettata",
           "rejected": "Non selezionato"
         },
+        "lifecycle": {
+          "in_progress": "In corso",
+          "completed": "Completato",
+          "ended": "Terminato"
+        },
         "empty": {
           "title": "Ancora nessuna offerta",
           "body": "Quando un'agenzia con cui collabori pubblicherà un lavoro, comparirà qui."
@@ -488,7 +493,13 @@
           "appliedNotice": "Ti sei candidato a questa offerta. L'agenzia ti contatterà.",
           "rejectedNotice": "Non sei stato selezionato per questa offerta.",
           "acceptedNotice": "Sei stato selezionato per questo lavoro: la tua offerta è pronta da esaminare.",
-          "viewOffer": "Vedi offerta"
+          "lifecycleNotice": {
+            "in_progress": "Questo lavoro è in corso.",
+            "completed": "Questo lavoro è completato.",
+            "ended": "Questo lavoro è terminato."
+          },
+          "viewOffer": "Vedi offerta",
+          "viewAssignment": "Visualizza incarico"
         },
         "applyDialog": {
           "title": "Candidati a questa offerta",

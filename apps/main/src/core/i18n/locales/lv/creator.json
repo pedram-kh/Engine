@@ -470,6 +470,11 @@
           "accepted": "Apstiprināts",
           "rejected": "Nav izvēlēts"
         },
+        "lifecycle": {
+          "in_progress": "Norisinās",
+          "completed": "Pabeigts",
+          "ended": "Beidzies"
+        },
         "empty": {
           "title": "Sludinājumu vēl nav",
           "body": "Kad aģentūra, ar kuru sadarbojies, publicēs darbu, tas parādīsies šeit."
@@ -488,7 +493,13 @@
           "appliedNotice": "Tu pieteicies šim darbam. Aģentūra ar tevi sazināsies.",
           "rejectedNotice": "Šim darbam tu netiki izvēlēts.",
           "acceptedNotice": "Jūs esat izvēlēts šim darbam — jūsu piedāvājums ir gatavs apskatei.",
-          "viewOffer": "Skatīt piedāvājumu"
+          "lifecycleNotice": {
+            "in_progress": "Šis darbs norisinās.",
+            "completed": "Šis darbs ir pabeigts.",
+            "ended": "Šis darbs ir beidzies."
+          },
+          "viewOffer": "Skatīt piedāvājumu",
+          "viewAssignment": "Skatīt uzdevumu"
         },
         "applyDialog": {
           "title": "Pieteikties šim darbam",

@@ -470,6 +470,11 @@
           "accepted": "Prihvaćeno",
           "rejected": "Nisi odabran"
         },
+        "lifecycle": {
+          "in_progress": "U tijeku",
+          "completed": "Završeno",
+          "ended": "Prekinuto"
+        },
         "empty": {
           "title": "Još nema oglasa",
           "body": "Kad agencija s kojom surađuješ objavi posao, pojavit će se ovdje."
@@ -488,7 +493,13 @@
           "appliedNotice": "Prijavio si se na ovaj posao. Agencija će ti se javiti.",
           "rejectedNotice": "Nisi odabran za ovaj posao.",
           "acceptedNotice": "Odabrani ste za ovaj posao — vaša je ponuda spremna za pregled.",
-          "viewOffer": "Pogledaj ponudu"
+          "lifecycleNotice": {
+            "in_progress": "Ovaj posao je u tijeku.",
+            "completed": "Ovaj posao je završen.",
+            "ended": "Ovaj posao je prekinut."
+          },
+          "viewOffer": "Pogledaj ponudu",
+          "viewAssignment": "Prikaži zadatak"
         },
         "applyDialog": {
           "title": "Prijavi se na ovaj posao",

@@ -470,6 +470,11 @@
           "accepted": "Aċċettata",
           "rejected": "Ma ġejtx magħżul"
         },
+        "lifecycle": {
+          "in_progress": "Għaddej",
+          "completed": "Lest",
+          "ended": "Intemm"
+        },
         "empty": {
           "title": "Għad m'hemm ebda post",
           "body": "Meta aġenzija li taħdem magħha ttella' xogħol, jidher hawn."
@@ -488,7 +493,13 @@
           "appliedNotice": "Applikajt għal dan ix-xogħol. L-aġenzija tikkuntattjak.",
           "rejectedNotice": "Ma ġejtx magħżul għal dan ix-xogħol.",
           "acceptedNotice": "Ġejt magħżul għal dan ix-xogħol — l-offerta tiegħek hija lesta biex tarahha.",
-          "viewOffer": "Ara l-offerta"
+          "lifecycleNotice": {
+            "in_progress": "Dan ix-xogħol għaddej.",
+            "completed": "Dan ix-xogħol lest.",
+            "ended": "Dan ix-xogħol intemm."
+          },
+          "viewOffer": "Ara l-offerta",
+          "viewAssignment": "Ara l-inkarigu"
         },
         "applyDialog": {
           "title": "Applika għal dan ix-xogħol",

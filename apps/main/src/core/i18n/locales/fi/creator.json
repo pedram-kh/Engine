@@ -470,6 +470,11 @@
           "accepted": "Hyväksytty",
           "rejected": "Ei valittu"
         },
+        "lifecycle": {
+          "in_progress": "Käynnissä",
+          "completed": "Valmis",
+          "ended": "Päättynyt"
+        },
         "empty": {
           "title": "Ei vielä työpaikkoja",
           "body": "Kun toimisto, jonka kanssa työskentelet, julkaisee työn, se näkyy täällä."
@@ -488,7 +493,13 @@
           "appliedNotice": "Olet hakenut tätä työtä. Toimisto on sinuun yhteydessä.",
           "rejectedNotice": "Sinua ei valittu tähän työhön.",
           "acceptedNotice": "Sinut on valittu tähän työhön — tarjouksesi on valmis tarkasteltavaksi.",
-          "viewOffer": "Näytä tarjous"
+          "lifecycleNotice": {
+            "in_progress": "Tämä työ on käynnissä.",
+            "completed": "Tämä työ on valmis.",
+            "ended": "Tämä työ on päättynyt."
+          },
+          "viewOffer": "Näytä tarjous",
+          "viewAssignment": "Näytä toimeksianto"
         },
         "applyDialog": {
           "title": "Hae tätä työtä",

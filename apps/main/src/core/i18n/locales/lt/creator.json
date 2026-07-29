@@ -470,6 +470,11 @@
           "accepted": "Priimta",
           "rejected": "Nepasirinkta"
         },
+        "lifecycle": {
+          "in_progress": "Vykdoma",
+          "completed": "Užbaigta",
+          "ended": "Baigėsi"
+        },
         "empty": {
           "title": "Skelbimų kol kas nėra",
           "body": "Kai agentūra, su kuria dirbi, paskelbs darbą, jis atsiras čia."
@@ -488,7 +493,13 @@
           "appliedNotice": "Kandidatavai į šį darbą. Agentūra su tavimi susisieks.",
           "rejectedNotice": "Į šį darbą nebuvai pasirinktas.",
           "acceptedNotice": "Jūs buvote atrinkti šiam darbui — jūsų pasiūlymas parengtas peržiūrėti.",
-          "viewOffer": "Peržiūrėti pasiūlymą"
+          "lifecycleNotice": {
+            "in_progress": "Šis darbas vykdomas.",
+            "completed": "Šis darbas užbaigtas.",
+            "ended": "Šis darbas baigėsi."
+          },
+          "viewOffer": "Peržiūrėti pasiūlymą",
+          "viewAssignment": "Peržiūrėti užduotį"
         },
         "applyDialog": {
           "title": "Kandidatuoti į šį darbą",

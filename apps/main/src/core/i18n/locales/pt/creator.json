@@ -470,6 +470,11 @@
           "accepted": "Aceite",
           "rejected": "Não selecionado"
         },
+        "lifecycle": {
+          "in_progress": "Em curso",
+          "completed": "Concluído",
+          "ended": "Encerrado"
+        },
         "empty": {
           "title": "Ainda não há ofertas",
           "body": "Quando uma agência com que colaboras publicar um trabalho, aparecerá aqui."
@@ -488,7 +493,13 @@
           "appliedNotice": "Candidataste-te a esta oferta. A agência entrará em contacto.",
           "rejectedNotice": "Não foste selecionado para esta oferta.",
           "acceptedNotice": "Foi selecionado para este trabalho — a sua proposta está pronta para consulta.",
-          "viewOffer": "Ver proposta"
+          "lifecycleNotice": {
+            "in_progress": "Este trabalho está em curso.",
+            "completed": "Este trabalho está concluído.",
+            "ended": "Este trabalho foi encerrado."
+          },
+          "viewOffer": "Ver proposta",
+          "viewAssignment": "Ver atribuição"
         },
         "applyDialog": {
           "title": "Candidatar-me a esta oferta",

@@ -470,6 +470,11 @@
           "accepted": "Zaakceptowano",
           "rejected": "Nie wybrano"
         },
+        "lifecycle": {
+          "in_progress": "W toku",
+          "completed": "Ukończone",
+          "ended": "Zakończone"
+        },
         "empty": {
           "title": "Nie ma jeszcze ogłoszeń",
           "body": "Gdy agencja, z którą współpracujesz, opublikuje zlecenie, pojawi się ono tutaj."
@@ -488,7 +493,13 @@
           "appliedNotice": "Zgłosiłeś się na to zlecenie. Agencja się z tobą skontaktuje.",
           "rejectedNotice": "Nie zostałeś wybrany na to zlecenie.",
           "acceptedNotice": "Zostałeś wybrany do tego zlecenia — Twoja oferta jest gotowa do przejrzenia.",
-          "viewOffer": "Zobacz ofertę"
+          "lifecycleNotice": {
+            "in_progress": "To zlecenie jest w toku.",
+            "completed": "To zlecenie zostało ukończone.",
+            "ended": "To zlecenie zostało zakończone."
+          },
+          "viewOffer": "Zobacz ofertę",
+          "viewAssignment": "Zobacz zlecenie"
         },
         "applyDialog": {
           "title": "Aplikuj na to zlecenie",

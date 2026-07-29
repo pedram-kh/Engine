@@ -470,6 +470,11 @@
           "accepted": "Angenommen",
           "rejected": "Nicht ausgewählt"
         },
+        "lifecycle": {
+          "in_progress": "In Arbeit",
+          "completed": "Abgeschlossen",
+          "ended": "Beendet"
+        },
         "empty": {
           "title": "Noch keine Jobangebote",
           "body": "Sobald eine Agentur, mit der du arbeitest, einen Job einstellt, erscheint er hier."
@@ -488,7 +493,13 @@
           "appliedNotice": "Du hast dich auf diesen Job beworben. Die Agentur meldet sich bei dir.",
           "rejectedNotice": "Du wurdest für diesen Job nicht ausgewählt.",
           "acceptedNotice": "Du wurdest für diesen Job ausgewählt – dein Angebot liegt zur Prüfung bereit.",
-          "viewOffer": "Angebot ansehen"
+          "lifecycleNotice": {
+            "in_progress": "Dieser Auftrag läuft.",
+            "completed": "Dieser Auftrag ist abgeschlossen.",
+            "ended": "Dieser Auftrag wurde beendet."
+          },
+          "viewOffer": "Angebot ansehen",
+          "viewAssignment": "Auftrag ansehen"
         },
         "applyDialog": {
           "title": "Auf diesen Job bewerben",

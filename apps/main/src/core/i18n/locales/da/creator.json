@@ -470,6 +470,11 @@
           "accepted": "Accepteret",
           "rejected": "Ikke valgt"
         },
+        "lifecycle": {
+          "in_progress": "I gang",
+          "completed": "Afsluttet",
+          "ended": "Ophørt"
+        },
         "empty": {
           "title": "Ingen jobopslag endnu",
           "body": "Når et bureau, du samarbejder med, slår et job op, vises det her."
@@ -488,7 +493,13 @@
           "appliedNotice": "Du har søgt dette job. Bureauet kontakter dig.",
           "rejectedNotice": "Du blev ikke valgt til dette job.",
           "acceptedNotice": "Du er blevet valgt til dette job — dit tilbud er klar til gennemsyn.",
-          "viewOffer": "Se tilbud"
+          "lifecycleNotice": {
+            "in_progress": "Dette job er i gang.",
+            "completed": "Dette job er afsluttet.",
+            "ended": "Dette job er ophørt."
+          },
+          "viewOffer": "Se tilbud",
+          "viewAssignment": "Se opgaven"
         },
         "applyDialog": {
           "title": "Søg dette job",

@@ -470,6 +470,11 @@
           "accepted": "Vastu võetud",
           "rejected": "Ei osutunud valituks"
         },
+        "lifecycle": {
+          "in_progress": "Pooleli",
+          "completed": "Lõpetatud",
+          "ended": "Lõppenud"
+        },
         "empty": {
           "title": "Tööpakkumisi veel pole",
           "body": "Kui agentuur, kellega koostööd teed, lisab töö, ilmub see siia."
@@ -488,7 +493,13 @@
           "appliedNotice": "Kandideerisid sellele tööle. Agentuur võtab sinuga ühendust.",
           "rejectedNotice": "Sa ei osutunud sellele tööle valituks.",
           "acceptedNotice": "Teid valiti sellele tööle — teie pakkumine on ülevaatamiseks valmis.",
-          "viewOffer": "Vaata pakkumist"
+          "lifecycleNotice": {
+            "in_progress": "See töö on pooleli.",
+            "completed": "See töö on lõpetatud.",
+            "ended": "See töö on lõppenud."
+          },
+          "viewOffer": "Vaata pakkumist",
+          "viewAssignment": "Vaata ülesannet"
         },
         "applyDialog": {
           "title": "Kandideeri sellele tööle",
