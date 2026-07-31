@@ -172,6 +172,14 @@ defineExpose({ onCardChange })
   margin: 0 -2px;
   border-radius: 8px;
 }
+/* Without this the scroll above never happens: these are flex items in a
+   column, so they shrink to fit instead of overflowing, and `.board-card`'s
+   own `overflow: hidden` then clips the squashed content silently. The
+   selector targets the list's children rather than `.board-card` because the
+   flex item is the click-wrapper around the card, not the card. */
+.board-column__list > * {
+  flex: 0 0 auto;
+}
 /* an empty column still reads as a column + droppable zone */
 .board-column__list--empty {
   border: 1px dashed rgba(var(--v-theme-on-surface), 0.12);

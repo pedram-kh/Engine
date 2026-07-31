@@ -299,6 +299,12 @@ onMounted(() => {
   padding: 2px;
   margin: 0 -2px;
 }
+/* Flex items in a column shrink to fit by default, which defeats the scroll
+   above — the stack compresses instead of overflowing. `BoardColumn` carries
+   the same declaration for the same reason. */
+.applications-column__list > * {
+  flex: 0 0 auto;
+}
 .applications-column__empty {
   margin: 0;
   padding: 8px 2px;
