@@ -183,6 +183,9 @@ php artisan queue:failed
 
 ## 6. Related
 
+- [`deploy-log.md`](deploy-log.md) — **the authoritative record of what production
+  runs and when.** This file is the _procedure_; that one is the _history_. Every
+  deploy run against §8's checklist gets an entry there.
 - `local-dev.md` §7 — the local counterpart (why `pnpm dev` spawns a worker,
   sync-queue behaviour in tests, stale-job cleanup after `db:reset`).
 - `docs/reviews/ah-004-portfolio-overhaul-plan.md` §6 — the 50 MP cap ↔ worker
@@ -392,10 +395,13 @@ Run these steps **in order**. Do not skip step 1.
 5. **Smoke-verify** — `GET /up` returns **200**, and **one authenticated request
    succeeds** (log in / hit an authed endpoint). If either fails, stop and
    assess before considering the deploy done.
-6. **Record the deploy** — date, migration range (from step 2), snapshot ID
-   (from step 1), and every command run (from step 4), appended to the deploy
-   log / this runbook's history or the resumption template, so the next deploy
-   and any incident review can reconstruct exactly what shipped.
+6. **Record the deploy in [`deploy-log.md`](deploy-log.md)** — date, migration
+   range (from step 2), snapshot ID (from step 1), every command run (from step
+   4), the verification results (step 5), and anything unexpected. **That file is
+   the single authoritative record of what production runs**; do not record deploy
+   state in the resumption template or anywhere else, because a fact kept in two
+   places goes stale in one of them. Open the entry **before** you start and fill
+   it as you go — the snapshot ID is wanted before the migration runs, not after.
 
 ### 8.1 First concrete instance — the current pending-deploy list
 
@@ -499,8 +505,12 @@ Run §8's checklist. The arc-specific content of each step:
      the first real listing is a product decision, and with the flags OFF it would be a silent
      one.
 
-6. **Record** — date, the four-migration range, the snapshot ID, and the fact that the worker
-   was restarted.
+6. **Record it in [`deploy-log.md`](deploy-log.md)** — the entry for this deploy is **already
+   open** at the top of that file, pre-filled with the range, the AH entries, the four migrations
+   and the obligations above, and marked `PENDING`. Fill the blanks as you go (snapshot ID before
+   step 2, the `brands:audit-floor` number, the verification results, the worker restart, and the
+   "anything unexpected" field), then flip its status to `DEPLOYED`. That file is the single
+   authoritative record of what production runs.
 
 **The flag ritual is NOT part of this deploy.** Both jobs-board mail flags ship and stay OFF.
 Arming them is §7.4, done when Pedram chooses, and the deploy is complete and correct without

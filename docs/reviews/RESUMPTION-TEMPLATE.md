@@ -77,6 +77,9 @@ discipline in §7.
   established through prior chunks** (source-inspection regressions, event-fake split, dual-recipient
   notifications, allowlist discipline, etc.) — consult it before reinventing a pattern.
 - **`docs/reviews/adhoc-changes-log.md`** — the **authoritative index of all ad-hoc (AH-NNN) work**.
+- **`docs/runbooks/deploy-log.md`** — the **authoritative record of what production runs and when.**
+  Part 2 of this file points there rather than restating it: pushed ≠ deployed, and a fact kept in
+  two places goes stale in one of them.
 - **`docs/tech-debt.md`** — deferred items with triggers/owners.
 - **`docs/reviews/sprint-{N}-chunk-{M}-review.md`** — per-chunk decisions; **review files are
   authoritative for counts** (test totals, etc.).
@@ -121,7 +124,8 @@ discipline in §7.
 the five AH entries, the two new `tech-debt.md` entries, the batch inventory and this refresh (a commit
 cannot record its own hash). `origin/main` and `HEAD` are now the same commit —
 `git rev-list --left-right --count origin/main...HEAD` reads `0 0` with a clean tree.
-**All of it is code, and undeployed** — see the deploy notes below.
+**Whether it is deployed is [`deploy-log.md`](../runbooks/deploy-log.md)'s fact, not this file's** —
+as of writing, its top entry is the 2026-07-31 deploy of this whole range, and it was `PENDING`.
 `git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for where the
 two tips actually sit — re-derive them, do not carry this session's numbers forward.
 
@@ -195,7 +199,6 @@ commits (`a70c548`, `c27926a`, `b2ca89b`, `bb825a8`, `75076ef`, `ce841e2`, `e250
 [`jobs-board-c5-review.md`](jobs-board-c5-review.md), the AH-059 log entry and the D7 close-out
 documents, and the **close commit at the tip** flipping that review to **Closed — approved** and
 writing this refresh (a commit cannot record its own hash).
-**All of it is code, and undeployed** — see the deploy notes below.
 `git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for where the
 two tips actually sit — re-derive them, do not carry this session's numbers forward.
 
@@ -219,7 +222,6 @@ build commits (`0abba72`, `78c2dd8`, `86a44a4`, `5f6486c`, `af0f343`, `d33df9e`,
 [`jobs-board-c4-review.md`](jobs-board-c4-review.md) and the AH-058 log entry, and the **close commit
 at the tip** flipping that review to **Closed — approved** and writing this refresh (a commit cannot
 record its own hash).
-**All of it is code, and undeployed** — see the deploy notes below.
 `git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for those two
 numbers, not this sentence; re-derive them rather than carrying this session's forward.
 
@@ -269,12 +271,14 @@ sentence.)
 > them `migrate:fresh` the same database concurrently. Also note `TEST_HELPERS_TOKEN` must be exported
 > or global-setup fails loudly by design.
 
-> **⚠ UNDEPLOYED CODE EXISTS — and it carries a migration and a pre-deploy read.** The push on
-> 2026-07-27 moved `origin/main` `2cb6c11..` with **AH-053 + AH-054** (Jobs Board chunks 1+2
-> — brand completeness floor, brand logo pipeline, campaign listing fields): `b7ea3e1` (AH-054 feat),
-> `2568a96` (AH-053 feat), then the shared docs commit at the tip. Review closed and approved:
+> **Prior state, for the record — the AH-053/AH-054 push.** On 2026-07-27 it moved `origin/main`
+> `2cb6c11..` with **AH-053 + AH-054** (Jobs Board chunks 1+2 — brand completeness floor, brand logo
+> pipeline, campaign listing fields): `b7ea3e1` (AH-054 feat), `2568a96` (AH-053 feat), then the
+> shared docs commit at the tip. Review closed and approved:
 > `docs/reviews/jobs-board-brand-amends-review.md`. **This is the arc's first migration since AH-041,
-> and AH-053 needs an operator read run BEFORE it deploys — see the deploy notes below.**
+> and AH-053 carries a pre-deploy operator read** — both are enumerated in
+> [`production-queue-worker.md` §8.3](../runbooks/production-queue-worker.md) and recorded in
+> [`deploy-log.md`](../runbooks/deploy-log.md).
 
 > **Correction (2026-07-27).** This block previously named `d1dc3d2` as the `origin/main` tip. It was
 > stale by four commits: `f5be920`, `d83c223`, `710292b` and `2cb6c11` had landed on top of it. All
@@ -292,160 +296,42 @@ eyes-on fix** commits — `4af63b2` (admin dialog: 422 copy, picker name, `appro
 `dd65868` (**AH-052** canonical 403 envelope, closed-thread composer, notification registry),
 `d381a77` (an `ended` relation could be re-pooled) — plus the addendum/AH-052 docs commit `d1dc3d2`.
 
-**Deployed through:** **`f5be920` (AH-052), deployed 2026-07-26.** Push and deploy were in sync as of
-that date; **they are no longer.** **One deploy still carries everything since `f5be920`** — the
-AH-053/AH-054 and AH-055/AH-056 pushes (both 2026-07-27), **AH-058** (2026-07-28), **AH-059**
-(2026-07-29), and now the **AH-060 → AH-064 batch** (pushed 2026-07-31), which is undeployed code
-sitting atop undeployed code. That is the complete five-chunk Jobs Board arc, one UI fix pass, and this UI batch,
-all in front of a single deploy. **The batch itself adds no deploy obligations** — the arc's
-pending-migration count stays **four** and the runbook section that governs them
-(`production-queue-worker.md` §8.3) is unchanged by it. Deploy state as last read
-from the server, not inferred: `php artisan migrate:status` reported **Ran through batch 5**, and the
-2026-07-26 deploy correctly reported `Nothing to migrate` (AH-051/052 add none). **AH-054 adds one
-migration and AH-056 adds three** (**AH-058 adds none**), so the next deploy will not say that — see
-the deploy notes below.
+### Deploy state — lives in one file, and it is not this one
 
-> **Tracking lesson (2026-07-26).** Deploy state must be **read from the server**
-> (`migrate:status`, and see the scheduler blocker below), never inferred from push history —
-> deploys are colleague-managed and advance without notice. Everything through AH-050
-> (`content_companions`) turned out to be already live before today, while this file still listed
-> its migrations as pending. Verify at each session close; do not carry forward an assumption.
+**➡ [`docs/runbooks/deploy-log.md`](../runbooks/deploy-log.md) is the authoritative record of what
+production runs and when.** Read it there; this file deliberately no longer restates it.
 
-**Deploy notes — AH-060 → AH-064 (pushed 2026-07-31, NOT deployed).** **No migration, no route, no
-resource shape, no gate, no flag, no notification type, and no `apps/api/**` diff at all** — so the
-batch adds **nothing\*\* to the deploy checklist and does not change the arc's four-migration count.
-Three things an operator should still know:
+> **The convention, which is why the split exists: pushed ≠ deployed.** Deploy state must be
+> **read from the server** (`php artisan migrate:status` for schema, `supervisorctl status` /
+> `crontab -l` for the worker and scheduler) and then **written down in the deploy log** — never
+> inferred from push history. Deploys are **colleague-managed and advance without notice**. This
+> was learned the expensive way: everything through AH-050 (`content_companions`) turned out to be
+> already live while this file still listed its migrations as pending. Deploy state was carried
+> inline here, in parallel with reality, and the copy here went stale — the same failure mode that
+> made push state drift until `origin/main` became its single authority.
+>
+> **So: do not add deploy status, migration state, or per-change deploy obligations to this file.**
+> Deploy obligations for a change belong in its AH entry; deploy **procedure** belongs in
+> `production-queue-worker.md` §8; what actually shipped belongs in the deploy log.
 
-1. **The queue-worker restart rule does NOT bind for this batch.** It ships new `lang/**`-equivalent
-   copy only in the SPA's own `locales/**` (12 keys × 24 locales in `apps/main`), not in
-   `apps/api/lang/**`, and the worker renders mail from the latter. Nothing this batch changes is
-   read by the worker. The rule still binds for the arc's own deploy, on the arc's grounds.
-2. **🔴 The Meta Pixel goes live the moment this deploys, un-gated.** From the first deploy carrying
-   AH-064, every visitor to `/sign-in` — the platform's front door — is tracked without consent, and
-   `_fbp` is set on their browser. That is Pedram's recorded decision and it is logged in
-   `tech-debt.md`, but it is a **live-on-deploy privacy posture change**, not a dormant flag waiting
-   to be flipped, and it is the only thing in this batch with any external-facing consequence. There
-   is no flag to turn it off: removing it means a code change.
-3. **A 5.6 MB PDF joins the deploy artefact** (`apps/main/public/creator-guide.pdf`). Harmless but
-   noticeable — every build and every deploy now carries it. Tech-debt entry logged with
-   `catalyst-engine-public-prod` as the CDN target.
-
-**Deploy notes — AH-059 (pushed 2026-07-29, NOT deployed).** **No obligations of its own, and no
-migration** — the arc's pending-migration count stays **four**, and this chunk is the one that writes
-that list down. Three things to know:
-
-1. **The whole arc's deploy is now one runbook section**, `production-queue-worker.md` §8.3: the four
-   migrations named with their chunk and their `down()` honesty (**the two `CREATE TABLE`s are lossy on
-   rollback** — after creators have applied, a rollback is a data-loss event, restore from the snapshot
-   instead), the **mandatory** worker restart, the absence of one-shots, and two arc-specific smoke
-   reads. §8.1 is marked superseded and points at it.
-2. **The combined first-enable ritual is written and is NOT part of the deploy** — `feature-flags.md`
-   ("The jobs-board arc's combined first-enable ritual") and runbook §7.4. Both jobs-board mail flags
-   are armed **together**, later, deliberately, and **step 4 is to read both flags back**. That step
-   exists because AH-059's own investigation spent an hour on a "broken" mail path that was simply an
-   unarmed flag.
-3. **D3 changed reachability, not code.** The campaigns-list toggle drives the same PATCH the Settings
-   tab drives, so a mis-click on a table row is now one round-trip from an outbound fan-out to real
-   creators once the flags are armed. The ON direction is behind a confirmation dialog for exactly that
-   reason; OFF stays immediate. At T+0 this is inert — no campaign is listed.
-
-**Deploy notes — AH-058 (pushed 2026-07-28, NOT deployed).** Three obligations, and
-**no migration** — the arc's pending-migration count stays **four**.
-
-1. **🔴 `application_notifications_enabled` ships OFF, and the arc's first-enable ritual now arms
-   TWO flags together.** It gates the **mail legs only** of the three new
-   `campaign_application.*` notification types; the in-app rows write regardless, honouring the
-   recipient's own preference. Flip it from the admin Feature-flags page **alongside
-   `job_posted_notifications_enabled`** — a board that pushes listings but never acknowledges an
-   application is the confusing half-state, and both are the same fan-out risk class. Full row and
-   rationale in `docs/feature-flags.md`. At T+0 the population is provably zero: no campaign is
-   listed, so no application can exist.
-2. **⚠ The queue-worker restart rule binds.** This deploy carries new `lang/**` mail copy (three
-   mailables × 24 locales, `campaigns.php`) and three brand-new mailable classes. The long-running
-   worker caches translations in memory — **restart it**, or the first accepted creator gets a
-   missing-key body. The terminal auto-reject is a **queued job** (`AutoRejectPendingApplicationsJob`,
-   dispatched from `CampaignController::update()` on a non-terminal → `cancelled`/`completed` flip),
-   so a down worker means pending applications sit pending until the worker comes back; it is
-   idempotent by design (it re-filters `status = pending` inside its own transaction), so a
-   re-cancel or a late-started worker never double-rejects and never double-mails.
-3. **⚠ The live invite path changed behaviour, deliberately and narrowly.** `POST …/assignments`
-   now runs inside a transaction and, for a pair that has a **pending application**, marks that
-   application `accepted` in the same transaction (D3b). A pair with **no** application is
-   byte-identical to before — pinned field-by-field. Nothing to do at deploy; noted because an
-   operator reading assignment audit trails will now sometimes see a
-   `campaign_application.accepted` row beside an invite nobody accepted from the tab.
-
-**Deploy notes — AH-055/AH-056 (pushed 2026-07-27, NOT deployed).** AH-055 is pure UI and carries
-nothing. AH-056 carries three obligations:
-
-1. **Three more migrations**, all additive: `2026_07_27_110000_create_campaign_applications_table`,
-   `2026_07_27_110001_create_campaign_job_notifications_table`, and
-   `2026_07_27_110002_add_listed_at_to_campaigns`. No existing row is read or rewritten. **The
-   `down()` on both new tables is lossy** — dropping them destroys every application and every
-   notification stamp. A rollback after creators have applied is a data-loss event, not a revert.
-   With AH-054's, the arc's pending-migration count is **four**.
-2. **🔴 `job_posted_notifications_enabled` ships OFF and must stay OFF until deliberately flipped.**
-   This is the platform's first outbound mail fan-out to the live creator base (~279). The
-   first-enable ritual is in `docs/feature-flags.md`: run
-   `php artisan campaigns:preview-job-notifications {campaign-ulid} --dry-run`, read the
-   would-notify / would-remain counts, then flip from the admin Feature-flags page. Zero campaigns
-   are listed at deploy, so the board is empty and the fan-out has nothing to send regardless.
-3. **The fan-out needs the queue worker, not the scheduler.** Its trigger is the listing flip
-   (`CampaignController::update()`), chosen precisely because the production scheduler is
-   unverified — see the standing blocker. If the worker is down, notifications queue and wait; the
-   `campaigns:preview-job-notifications` command drains any capped remainder by hand. Note also
-   that this deploy carries new `lang/**` mail copy, so the standing **queue-worker restart** rule
-   below binds.
-
-**Deploy notes — AH-053/AH-054 (pushed 2026-07-27, NOT deployed).** Two obligations, both new:
-
-1. **One migration** — `2026_07_27_100000_add_jobs_board_listing_to_campaigns`. Purely additive (six
-   nullable columns plus one boolean defaulting `false`), honest `down()`, no backfill, no existing
-   row read or rewritten. `php artisan migrate` becomes a required deploy step again for the first
-   time since AH-041.
-2. **📋 PRE-deploy read, not post-deploy** — run `php artisan brands:audit-floor` **before** shipping
-   AH-053. It is a pure read (no writes, pinned by a test) and reports, platform-wide, how many
-   brands each floor field blocks and the lifecycle split of the blocked population. AH-053 makes an
-   incomplete brand's **next edit** return 422 — a behaviour change for existing data, though not a
-   data change — and this command is how the size of that population becomes knowable in advance
-   rather than through support tickets. Nothing is backfilled; the brands themselves stay readable,
-   listable, campaign-carrying, archivable and restorable.
-
-**Deploy notes (prior).** **No migrations** anywhere in AH-051 or AH-052 (`ended` is a plain-varchar enum
-value, no CHECK). AH-051 notes, now **post**-deploy: (a) the live contact gate is TIGHTENED as of
-2026-07-26 — `php artisan relations:audit-contact-exposure` now reads what changed rather than
-what would (see outstanding items); and (b) admin disconnect DELETES pool-membership rows, so
-**snapshot-first** stays the standing rule for any deploy carrying it. **Two permanent notes**
-from the eyes-on fixes:
+### Standing production notes (not deploy state — these bind on every future deploy)
 
 1. **⚠ Restart the queue worker on every deploy that changes mail copy.** The long-running worker
    **caches translations in memory** — a `lang/**` copy change will keep sending the OLD body until
    the worker is restarted. Found the hard way while verifying the `530d7d8`/`bdc957b` mail trims:
-   the new text did not appear until the dev stack was bounced. This is **not** AH-051-specific; it
-   applies to every mail-copy change the platform ever ships.
+   the new text did not appear until the dev stack was bounced. This is **not** specific to any one
+   change; it applies to every mail-copy change the platform ever ships. Procedure: runbook §4.
 2. **⚠ The 403 body shape CHANGED in production on 2026-07-26 (client-visible contract).** AH-052
    makes every `authorize()` denial — all 82 call sites, plus every `abort(403)` — return the
    canonical JSON:API error envelope (`auth.forbidden`) instead of Laravel's default
    `{"message": …}`. Both SPAs consume the envelope via `ApiError.fromEnvelope` and were verified;
    the residual exposure is anything **outside this repo** that pattern-matched the old shape. This
-   is live now, so it is a thing to check **if 403 handling misbehaves**, not a pre-deploy gate.
-
-**Outstanding operational items.** **Both one-shot post-deploy commands are now CLOSED** (prod
-session, 2026-07-26/27). Nothing one-shot remains; AH-050, AH-051 and AH-052 added none.
-
-- ✅ **AH-026 D5 `creators:recompute-completeness` — CLOSED, run on prod 2026-07-26.** Dry-run
-  verified first, then executed: **279 creators checked, 1 score updated.** The near-zero delta is
-  the expected result, not a failure — it means the persisted scores were already consistent with
-  the AH-026 formula (region floor + D4 optional credit) for all but one row.
-- ✅ **AH-042 D4 `campaigns:advance-contractless-accepted` — CLOSED as moot.** **0 eligible rows on
-  prod**: nothing was ever stuck at `accepted` on a `requires=false` campaign, so the remediation
-  had nothing to remediate. The command stays in the codebase as a safety net; no action pending.
-- 📋 **D-1 contact-exposure audit — RECORDED, no action.** **2 `pending_request` relations across
-  1 agency, of which 1 had contact data populated** — audited **post**-deploy, gate already live.
-  This is the realized blast radius of the AH-051 tightening: one agency lost visibility of one
-  creator's contact details. Small enough that no remediation or notification is warranted.
-- ♻️ **Queue-worker restart on mail-copy changes — standing rule, not a one-shot.** See note 1
-  below. Never "closes"; it binds on every future deploy carrying a `lang/**` change.
+   is live, so it is a thing to check **if 403 handling misbehaves**, not a pre-deploy gate.
+3. **⚠ Admin disconnect DELETES pool-membership rows**, so **snapshot-first** stays the standing
+   rule for any deploy touching that path (§5.40 makes it the rule for every deploy carrying a
+   migration regardless).
+4. **No one-shot post-deploy commands are outstanding.** Both historical ones are closed with their
+   numbers recorded in the deploy log's 2026-07-26 entry.
 
 **Observed production scale (2026-07-26):** **~279 creators**, per the recompute command's own
 count. Useful as the blast-radius denominator when sizing any future data migration or backfill.
@@ -462,15 +348,11 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
 > Playwright, typecheck/lint/parity clean. Review: `docs/reviews/contract-toggle-off-flow-review.md`
 > (Closed, approved). Adds one post-deploy command (below).
 
-**Prior batch (AH-033→AH-041) — PUSHED AND DEPLOYED** (`ed2e0dc` close-out **docs** commit,
-sitting atop the **direct-iteration fix batch** `cc86bb8 … fdbec40` (33 code/spec commits + the
-Part-A closure commit `fdbec40`), atop the AH-032 baseline **`7051123`**). **✅ Migrations all Ran
-— nothing pending.** This paragraph previously carried a next-deploy warning for three schema
-migrations plus a data backfill; `migrate:status` on prod (2026-07-26) shows all of them **Ran**,
-with `2026_07_13_110000_backfill_cancelled_rejected_board_column` in **batch 3**. AH-042 through
-AH-052 add **no migrations at all**, so **the pending-migration list is empty** and
-`php artisan migrate` was not a required deploy step for anything on `origin/main` **as of AH-052**.
-(That statement expired with the AH-054 push, which adds one — see the deploy notes above.)
+**Prior batch (AH-033→AH-041)** — `ed2e0dc` close-out **docs** commit, sitting atop the
+**direct-iteration fix batch** `cc86bb8 … fdbec40` (33 code/spec commits + the Part-A closure commit
+`fdbec40`), atop the AH-032 baseline **`7051123`**. Its migration and deploy history — including the
+`migrate:status` batch reconstruction that established what was already live — is in
+[`deploy-log.md`](../runbooks/deploy-log.md) under "Pre-history".
 
 ### Delivered
 
@@ -649,7 +531,7 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     cause: a renderer existed for 422 and never for 403, and **no test asserted a 403 body**,
     only status codes. Pinned by `ForbiddenExceptionRendererTest`, including a case proving
     the output parses under the SPA's `ApiError.fromEnvelope` contract. **⚠ client-visible
-    contract change** (see deploy notes). Surfaced by AH-051 eyes-on; commit `dd65868` is
+    contract change** (see Standing production notes). Surfaced by AH-051 eyes-on; commit `dd65868` is
     shared with the AH-051 addendum items.
 
   - **AH-055** — Brand detail page stops showing `default_currency` / `default_language`, the two
@@ -662,7 +544,7 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     consumed, whereas the brand defaults are inert — nothing in `apps/api/app` reads either one.
     Deprecating the columns outright is left open as a full-loop question.
   - **AH-053** — Jobs Board chunk 1: brand completeness floor + logo pipeline + form relabel
-    (`2568a96`, **pushed, NOT deployed**). Six-field floor (`name`, `slug`, `description`, `industry`,
+    (`2568a96`, pushed 2026-07-27). Six-field floor (`name`, `slug`, `description`, `industry`,
     `website_url`, `logo_path`) required at create — logo excepted, it needs a row to attach to —
     and enforced on every later edit via a **merged-state** predicate (payload value where supplied,
     stored value otherwise), so PATCH stays PATCH; full-payload-required was rejected on the AH-032
@@ -678,7 +560,7 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     (pull restore inside the gate) reds 1. **⚠ Behaviour change for existing data** — see deploy
     notes. Review: `docs/reviews/jobs-board-brand-amends-review.md`.
   - **AH-054** — Jobs Board chunk 2: campaign listing fields + gates + Settings toggle
-    (`b7ea3e1`, **pushed, NOT deployed**). Six additive columns; create accepts the five content
+    (`b7ea3e1`, pushed 2026-07-27). Six additive columns; create accepts the five content
     fields and ignores
     `listed_on_jobs_board` entirely. **D3 (completeness) is a resulting-state rule** — if the
     campaign will be listed after this write, every floor field must be filled, which is what makes
@@ -690,7 +572,7 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     joins the `campaign.updated` audit snapshot; the four free-text/jsonb fields stay out. Regions
     are shape-capped, not registry-validated (tech-debt). One additive migration.
   - **AH-056** — Jobs Board chunk 3: the creator job board, apply, and the job-posted fan-out
-    (`81df0b5`, `928ccce`, `0cf6275`, `4e527e7`, `d37d43c` — pushed 2026-07-27, undeployed). Applications
+    (`81df0b5`, `928ccce`, `0cf6275`, `4e527e7`, `d37d43c` — pushed 2026-07-27). Applications
     are a **table**, not an assignment state: a pre-invited state would let `store()`'s idempotency
     branch silently swallow an agency invite, on the platform's most load-bearing machine.
     Visibility is **one predicate object, six legs** — tenancy-scope bypass, approved caller,
@@ -710,8 +592,7 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     break-reverts, all restored. Three additive migrations. `application_submitted` is deliberately
     **left to chunk 4**. Review: `docs/reviews/jobs-board-c3-review.md` (**Closed — approved**).
   - **AH-058** — Jobs Board chunk 4: the agency half of applications — the Applications tab, accept,
-    reject, and terminal auto-reject (nine commits, `0abba72`…`a1c66ab` — pushed 2026-07-28,
-    undeployed).
+    reject, and terminal auto-reject (nine commits, `0abba72`…`a1c66ab` — pushed 2026-07-28).
     Applications render as a **campaign-detail tab, not a board column** (recorded §5.32
     reinterpretation of the c3 migration docblock): `board_cards.assignment_id` is `NOT NULL` +
     `UNIQUE` + `CASCADE`, so a card **is** an assignment at three layers, and §4.4's
@@ -732,8 +613,7 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     new `jobs_board` preference group, and one flag (`application_notifications_enabled`, default OFF)
     gating **mail only**. Terminal auto-reject is the flip-detector precedent plus an idempotent queued
     job. **No migration.** Review: `docs/reviews/jobs-board-c4-review.md`.
-  - **AH-060** — Accept/decline on the creator's assignment **detail** page (`8081435` — pushed
-    2026-07-31, undeployed).
+  - **AH-060** — Accept/decline on the creator's assignment **detail** page (`8081435` — pushed 2026-07-31).
     The list had View + Accept + Decline; using View to read the invitation before deciding forced a
     trip back to the list to act. Same two endpoints, same six existing i18n keys, same toasts — reuse
     rather than re-implementation, so the surfaces cannot drift and the 24-locale surface is untouched.
@@ -741,8 +621,7 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     place** (spec-pinned) so an error is retryable. The gate is the status, not a new ability. **The one
     theme in the batch no Playwright spec traverses** — `jobs-board-full-lifecycle` accepts from the
     list — so Vitest is its only automated cover.
-  - **AH-061** — Review hand-off from the board card drawer (`877e81b` — pushed 2026-07-31,
-    undeployed). The
+  - **AH-061** — Review hand-off from the board card drawer (`877e81b` — pushed 2026-07-31). The
     `draft_submitted` timeline row said a draft existed and offered no way to act on it. A Review
     button beside Resolve, shown only with the `review` ability, emits a payload-free hand-off that
     `CampaignDetailPage` turns into a Drafts-tab switch. **A navigation hand-off, not a write** — it
@@ -750,8 +629,7 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     behind `canResolve`) and **existing key** (`app.campaigns.review.action`) reused: no fifth ability
     clone, nothing added to the 24-locale surface. A **tab switch, not a route**, so the AH-024
     route-table precedent does not apply.
-  - **AH-062** — Tall card stacks scroll instead of squashing (`ee8a917` — pushed 2026-07-31,
-    undeployed). `flex: 0 0 auto`
+  - **AH-062** — Tall card stacks scroll instead of squashing (`ee8a917` — pushed 2026-07-31). `flex: 0 0 auto`
     on the list children in `BoardColumn.vue` + `BoardApplicationsColumn.vue`; the scroll container was
     already correct and flex children were shrinking to defeat it. Pure CSS, two files, nothing else in
     the repo. It survived because `.board-card`'s `overflow: hidden` **clipped** the squashed content
@@ -760,7 +638,7 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     `BoardApplicationsColumn.vue` **is** AH-059's D4 pseudo-column — the batch's closest arc call —
     and touches none of the predicate, ability or drag-exclusion facts its pins protect; all green.
   - **AH-063** — The sign-in landing's marketing tail (`ceb15f0`, `6d970a8`, `f62529e`, `6ddad53`,
-    `63f1d8d` — pushed 2026-07-31, undeployed). Creator-guide CTA + marketing footer, hero-mode only;
+    `63f1d8d` — pushed 2026-07-31). Creator-guide CTA + marketing footer, hero-mode only;
     the monogram rebuilt
     from catalyst-growth.com's SVG with orbit/sheen animation and cursor-driven 3D tilt, its maths
     extracted to `monogramTilt.ts` **so the interactive behaviour is unit-testable** where the rendered
@@ -775,8 +653,7 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     spec does not scan. `AuthLayout`'s `MAX_LINES` raised **215 → 240** with the chunk-scoped note the
     spec demands (two imports, two `v-if="isHero"` tags, the spacing rules — **no `<script setup>`
     logic**, so the no-function guards hold). Tech-debt: the 5.6 MB PDF wants a CDN.
-  - **AH-064** — Meta Pixel on `/sign-in` only (`ebcc50a`, `2153e9e` — pushed 2026-07-31,
-    undeployed). See the ⚠ box above
+  - **AH-064** — Meta Pixel on `/sign-in` only (`ebcc50a`, `2153e9e` — pushed 2026-07-31). See the ⚠ box above
     for the mount-point boundary, the Advanced-Matching ordering, the recorded consent decision and the
     E2E block. The close-out's own miss is recorded in the entry: the consent shortcut was flagged, the
     **E2E blast radius was not** — every main spec starts at `/sign-in`, so every run was registering
@@ -841,7 +718,8 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
   pass. `tech-debt.md`.
 - **📋 `brands:audit-floor` before the AH-053 deploy — the one open obligation from this arc.** A
   pure read, but the number it returns should be looked at before agencies meet the new 422, not
-  after. Pairs with `php artisan migrate` for AH-054's additive migration. See the deploy notes above.
+  after. Pairs with `php artisan migrate` for AH-054's additive migration. Procedure in runbook §8.3;
+  the number it returned goes in [`deploy-log.md`](../runbooks/deploy-log.md)'s entry for the deploy.
 - ✅ **The Jobs Board arc is CLOSED (AH-059, 2026-07-29).** All five chunks are built; the deploy is
   the one remaining step and it is Pedram's call (runbook §8.3). Nothing about the board is open as
   engineering work — what is open is listed below, and both items are **decisions**, not code.
