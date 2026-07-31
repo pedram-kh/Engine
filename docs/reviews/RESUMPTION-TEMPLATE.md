@@ -113,7 +113,82 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-29 · **Through:** AH-059 · **Nothing is held.** The push on 2026-07-29 moved
+**Last updated:** 2026-07-31 · **Through:** AH-064 · **Nothing is held.** The push on 2026-07-31 moved
+`origin/main` from **`94088e3`** (the AH-059 arc-close commit) by **eleven** commits: the eight
+**AH-060…AH-064** build commits (`8081435`, `877e81b`, `ee8a917`, `ceb15f0`, `6d970a8`, `f62529e`,
+`6ddad53`, `ebcc50a`), the two **close-out fixes** (`2153e9e` — Meta blocked in every E2E run;
+`63f1d8d` — the `--auth-glow-gradient` contract pinned), and the **docs commit at the tip** carrying
+the five AH entries, the two new `tech-debt.md` entries, the batch inventory and this refresh (a commit
+cannot record its own hash). `origin/main` and `HEAD` are now the same commit —
+`git rev-list --left-right --count origin/main...HEAD` reads `0 0` with a clean tree.
+**All of it is code, and undeployed** — see the deploy notes below.
+`git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for where the
+two tips actually sit — re-derive them, do not carry this session's numbers forward.
+
+> **🎨 A DIRECT-ITERATION UI BATCH — AH-060 → AH-064 (the AH-007 pattern, five themes).** Built from
+> Pedram's eyes-on, each item confirmed before it was written. **AH-060** puts accept/decline on the
+> creator's assignment **detail** page (the one screen with all the information was the one screen
+> that could not answer). **AH-061** adds a Review hand-off from the board card drawer's
+> `draft_submitted` row — a navigation hand-off, not a write, on an ability and an i18n key that
+> already existed. **AH-062** is one CSS declaration per board column so tall stacks **scroll**
+> instead of squashing; it is **eyes-on-only by necessity** (see below). **AH-063** is the rebrand
+> landing's marketing tail — creator-guide CTA, marketing footer, the interactive monogram, 12 i18n
+> keys × 24 locales, three design tokens. **AH-064** loads the **Meta Pixel**, on `/sign-in` alone.
+> **Zero `apps/api/**` diff across the whole batch\*\* — no migration, no route, no resource shape, no
+> gate, no policy, no middleware. It consumes existing endpoints only.
+
+> **⚠ THE THREE THINGS TO KNOW BEFORE TOUCHING THIS BATCH.**
+>
+> 1. **The Meta Pixel's mount point is a security boundary, not a preference.** It lives in
+>    `SignInPage`'s `onMounted` and **must not** move to `index.html` or `AuthLayout`. The pixel
+>    reports the full document location, and `/auth/reset-password`, `/auth/verify-email` and
+>    `/auth/accept-invite` each carry a **single-use credential in the query string** — the normal
+>    installation would send reset and invite tokens to Meta. `SignInPage.spec.ts` pins it with the
+>    reason in the test. Advanced Matching is disabled **before** `init` (after `init` it is silently
+>    a no-op, and the harvested field would be the login form's email). **It fires with no consent
+>    gate and the pixel ID is hardcoded — both are Pedram's recorded decisions**, taken with the
+>    §2.1/§2.7 consent conflict and the UK PECR exposure on the table; `tech-debt.md` carries them,
+>    resolve-by Sprint 14 alongside the CMP. SRI is **unachievable** here (Meta serves a mutable
+>    `fbevents.js`), so CSP enforcement will need an explicit allowance plus a documented exemption.
+> 2. **`--auth-glow-gradient` changed MEANING, and it is now pinned.** It used to bake its strength
+>    into the stops; it is now **full-strength** and every consumer dims it with `opacity: 0.3`
+>    (the footer's radial bloom needs the undimmed gradient to mask). A consumer that forgets renders
+>    the aurora **~5× too bright** with every other gate green. `auth-glow-token-contract.spec.ts`
+>    pins both halves and **discovers consumers by scanning both SPAs**, so a fourth is covered when
+>    it is written. This fan-out was checked at close-out rather than flagged at build time — the
+>    process note is in AH-063: **a shared token whose meaning changes is a fan-out event and belongs
+>    in a flag.**
+> 3. **No E2E run may talk to Meta.** An auto-applied fixture (`playwright/fixtures/test.ts`, in
+>    **both** suites) aborts `connect.facebook.net` and `facebook.com/tr`, and asserts after each test
+>    body that nothing finished against them. **Specs must import `test` from that fixture, never from
+>    `@playwright/test`** — the package hands back an unblocked context and Meta calls resume silently
+>    with the suite green. `e2e-third-party-blocked.spec.ts` pins the import path for every spec in
+>    both suites. The app code is deliberately untouched by the block: it lives in the harness, so
+>    production ships exactly what a reviewer reads in `metaPixel.ts`.
+
+> **AH-062 is eyes-on-verified only, and that is a deliberate, recorded limit — not an oversight.**
+> The claim is a **layout** fact (do flex children shrink or scroll), and **jsdom has no layout
+> engine**: it computes no box sizes, so a Vitest assertion would pass identically before and after
+> the fix. The bug survived because `.board-card` sets `overflow: hidden`, so squashed cards were
+> **clipped silently** rather than overflowing visibly — there was no ragged layout to notice. If it
+> ever regresses, the fix is a **real-browser Playwright assertion on rendered geometry** (the AH-057
+> precedent, which is exactly how a viewport-dependent layout bug was caught while 24/24 stayed
+> green) — not a hunt for the unit test that was never possible.
+
+**Batch gate board (2026-07-31).** `apps/main` Vitest **1444 / 150 files**; `apps/admin` **449 / 53**;
+`packages/api-client` **204 / 9**; both typechecks clean; ESLint **0 errors** (2 warnings, the
+pre-existing onboarding `v-html` pair); locale parity green across all 24 locales with the 12 new keys
+**value-audited** in the flaky 10; **full Playwright, dev stack down, both suites** — `apps/main`
+**27/27 effective** (one red, `2fa-enrollment-and-sign-in`, the documented cold-start flake: green on
+isolated re-run, and local `retries: 0` where CI has 2) and `apps/admin` **2/2**, with **zero requests
+to Meta across the entire run**, verified in both directions (a throwaway spec confirmed
+`fbevents.js` is **attempted and aborted**, so the green is a working block and not an absent pixel).
+Dev stack restarted after, health-checked 200 on `:5173`, `:5174` and `:8000`/`up`. **The E2E DB
+isolation held** — dev `catalyst` intact (14 users, 2 agencies, 9 creators, 8 campaigns) while
+`catalyst_e2e` sits freshly migrated at 0 users. **No Pest / PHPStan / Pint: there is no PHP in the
+range.**
+
+**Prior state, for the record — the AH-059 close.** The push on 2026-07-29 moved
 `origin/main` from `5cc382c` (the AH-058 close) by **thirteen commits**: the eleven **AH-059** code
 commits (`a70c548`, `c27926a`, `b2ca89b`, `bb825a8`, `75076ef`, `ce841e2`, `e2501b3`, `a4897b5`,
 `df99cac`, `0c7ea82`, `26a127a`), the docs commit `b1ed331` carrying
@@ -181,7 +256,18 @@ sentence.)
 > alone — **do not "fix" it by adding webkit** without first verifying WebKit launches on the host in
 > question. Also note spec #20 (failed-login lockout) now carries `test.slow()`: it needs ~27s on a
 > quiet host and blows the default 30s budget when the machine is loaded, so a red there is a load
-> symptom to re-run in isolation before it is treated as a regression.
+> symptom to re-run in isolation before it is treated as a regression. **Two counts, both real, often
+> confused:** `apps/main` is **27 tests across 18 files**; with `apps/admin` the suite is **29 tests
+> across 20 files**. "27 specs" in this file has always meant the main test count.
+> **A new spec starts by importing `{ expect, test }` from `../fixtures/test`, not from
+> `@playwright/test`** (AH-064) — that fixture is what blocks Meta, and an architecture spec fails the
+> build if any spec reaches for the package instead. Two other standing traps live in the configs, both
+> post-incident and both pinned: the API `webServer` forces `reuseExistingServer: false` and
+> `DB_DATABASE` is hard-overridden to `catalyst_e2e`, because `global-setup.ts` runs `migrate:fresh`
+> unconditionally and has twice wiped a developer's dev database. **Run the two suites sequentially
+> locally** — they share `catalyst_e2e`, so the root `pnpm test:e2e` (which runs them `--parallel`) has
+> them `migrate:fresh` the same database concurrently. Also note `TEST_HELPERS_TOKEN` must be exported
+> or global-setup fails loudly by design.
 
 > **⚠ UNDEPLOYED CODE EXISTS — and it carries a migration and a pre-deploy read.** The push on
 > 2026-07-27 moved `origin/main` `2cb6c11..` with **AH-053 + AH-054** (Jobs Board chunks 1+2
@@ -207,10 +293,13 @@ eyes-on fix** commits — `4af63b2` (admin dialog: 422 copy, picker name, `appro
 `d381a77` (an `ended` relation could be re-pooled) — plus the addendum/AH-052 docs commit `d1dc3d2`.
 
 **Deployed through:** **`f5be920` (AH-052), deployed 2026-07-26.** Push and deploy were in sync as of
-that date; **they are no longer** — the AH-053/AH-054 push and the AH-055/AH-056 push, both on
-2026-07-27, plus the **AH-058** push on 2026-07-28, are **code, and undeployed**. That is the first
-undeployed code since AH-052, and it is now the whole first **four** chunks of the Jobs Board arc plus
-one UI fix. Deploy state as last read
+that date; **they are no longer.** **One deploy still carries everything since `f5be920`** — the
+AH-053/AH-054 and AH-055/AH-056 pushes (both 2026-07-27), **AH-058** (2026-07-28), **AH-059**
+(2026-07-29), and now the **AH-060 → AH-064 batch** (pushed 2026-07-31), which is undeployed code
+sitting atop undeployed code. That is the complete five-chunk Jobs Board arc, one UI fix pass, and this UI batch,
+all in front of a single deploy. **The batch itself adds no deploy obligations** — the arc's
+pending-migration count stays **four** and the runbook section that governs them
+(`production-queue-worker.md` §8.3) is unchanged by it. Deploy state as last read
 from the server, not inferred: `php artisan migrate:status` reported **Ran through batch 5**, and the
 2026-07-26 deploy correctly reported `Nothing to migrate` (AH-051/052 add none). **AH-054 adds one
 migration and AH-056 adds three** (**AH-058 adds none**), so the next deploy will not say that — see
@@ -221,6 +310,25 @@ the deploy notes below.
 > deploys are colleague-managed and advance without notice. Everything through AH-050
 > (`content_companions`) turned out to be already live before today, while this file still listed
 > its migrations as pending. Verify at each session close; do not carry forward an assumption.
+
+**Deploy notes — AH-060 → AH-064 (pushed 2026-07-31, NOT deployed).** **No migration, no route, no
+resource shape, no gate, no flag, no notification type, and no `apps/api/**` diff at all** — so the
+batch adds **nothing\*\* to the deploy checklist and does not change the arc's four-migration count.
+Three things an operator should still know:
+
+1. **The queue-worker restart rule does NOT bind for this batch.** It ships new `lang/**`-equivalent
+   copy only in the SPA's own `locales/**` (12 keys × 24 locales in `apps/main`), not in
+   `apps/api/lang/**`, and the worker renders mail from the latter. Nothing this batch changes is
+   read by the worker. The rule still binds for the arc's own deploy, on the arc's grounds.
+2. **🔴 The Meta Pixel goes live the moment this deploys, un-gated.** From the first deploy carrying
+   AH-064, every visitor to `/sign-in` — the platform's front door — is tracked without consent, and
+   `_fbp` is set on their browser. That is Pedram's recorded decision and it is logged in
+   `tech-debt.md`, but it is a **live-on-deploy privacy posture change**, not a dormant flag waiting
+   to be flipped, and it is the only thing in this batch with any external-facing consequence. There
+   is no flag to turn it off: removing it means a code change.
+3. **A 5.6 MB PDF joins the deploy artefact** (`apps/main/public/creator-guide.pdf`). Harmless but
+   noticeable — every build and every deploy now carries it. Tech-debt entry logged with
+   `catalyst-engine-public-prod` as the CDN target.
 
 **Deploy notes — AH-059 (pushed 2026-07-29, NOT deployed).** **No obligations of its own, and no
 migration** — the arc's pending-migration count stays **four**, and this chunk is the one that writes
@@ -624,6 +732,55 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
     new `jobs_board` preference group, and one flag (`application_notifications_enabled`, default OFF)
     gating **mail only**. Terminal auto-reject is the flip-detector precedent plus an idempotent queued
     job. **No migration.** Review: `docs/reviews/jobs-board-c4-review.md`.
+  - **AH-060** — Accept/decline on the creator's assignment **detail** page (`8081435` — pushed
+    2026-07-31, undeployed).
+    The list had View + Accept + Decline; using View to read the invitation before deciding forced a
+    trip back to the list to act. Same two endpoints, same six existing i18n keys, same toasts — reuse
+    rather than re-implementation, so the surfaces cannot drift and the 24-locale surface is untouched.
+    One `answering` flag makes a double-answer impossible in flight; a failed call **leaves the pair in
+    place** (spec-pinned) so an error is retryable. The gate is the status, not a new ability. **The one
+    theme in the batch no Playwright spec traverses** — `jobs-board-full-lifecycle` accepts from the
+    list — so Vitest is its only automated cover.
+  - **AH-061** — Review hand-off from the board card drawer (`877e81b` — pushed 2026-07-31,
+    undeployed). The
+    `draft_submitted` timeline row said a draft existed and offered no way to act on it. A Review
+    button beside Resolve, shown only with the `review` ability, emits a payload-free hand-off that
+    `CampaignDetailPage` turns into a Drafts-tab switch. **A navigation hand-off, not a write** — it
+    approves nothing, so no endpoint, no gate, no confirm. **Existing ability** (`review`, already
+    behind `canResolve`) and **existing key** (`app.campaigns.review.action`) reused: no fifth ability
+    clone, nothing added to the 24-locale surface. A **tab switch, not a route**, so the AH-024
+    route-table precedent does not apply.
+  - **AH-062** — Tall card stacks scroll instead of squashing (`ee8a917` — pushed 2026-07-31,
+    undeployed). `flex: 0 0 auto`
+    on the list children in `BoardColumn.vue` + `BoardApplicationsColumn.vue`; the scroll container was
+    already correct and flex children were shrinking to defeat it. Pure CSS, two files, nothing else in
+    the repo. It survived because `.board-card`'s `overflow: hidden` **clipped** the squashed content
+    silently instead of overflowing visibly. **Eyes-on-only by necessity — jsdom has no layout engine**
+    (see the box above); a regression wants a real-browser geometry assertion, not a unit test.
+    `BoardApplicationsColumn.vue` **is** AH-059's D4 pseudo-column — the batch's closest arc call —
+    and touches none of the predicate, ability or drag-exclusion facts its pins protect; all green.
+  - **AH-063** — The sign-in landing's marketing tail (`ceb15f0`, `6d970a8`, `f62529e`, `6ddad53`,
+    `63f1d8d` — pushed 2026-07-31, undeployed). Creator-guide CTA + marketing footer, hero-mode only;
+    the monogram rebuilt
+    from catalyst-growth.com's SVG with orbit/sheen animation and cursor-driven 3D tilt, its maths
+    extracted to `monogramTilt.ts` **so the interactive behaviour is unit-testable** where the rendered
+    transform is not; `prefers-reduced-motion` honoured throughout; one `footerLinks.ts` table owning
+    the inert-vs-anchor branch. 12 i18n keys × 24 locales, **value-audited** in the flaky 10. Three
+    design tokens — and **`--auth-glow-gradient` changed meaning**, now pinned by
+    `auth-glow-token-contract.spec.ts` (see the box above). **`v-html` introduced under an inline
+    suppression**, justified verbatim in the file: _"Build-time asset with no runtime input, so there is
+    nothing to sanitise. It must be inlined for the CSS to reach inside it."_ Safe — a `?raw` build-time
+    import — but it is a new XSS-rule suppression on the unauthenticated login page, **and it is why
+    `no-hard-coded-colors.spec.ts` stays green**: the colour literals moved into the `.svg`, which that
+    spec does not scan. `AuthLayout`'s `MAX_LINES` raised **215 → 240** with the chunk-scoped note the
+    spec demands (two imports, two `v-if="isHero"` tags, the spacing rules — **no `<script setup>`
+    logic**, so the no-function guards hold). Tech-debt: the 5.6 MB PDF wants a CDN.
+  - **AH-064** — Meta Pixel on `/sign-in` only (`ebcc50a`, `2153e9e` — pushed 2026-07-31,
+    undeployed). See the ⚠ box above
+    for the mount-point boundary, the Advanced-Matching ordering, the recorded consent decision and the
+    E2E block. The close-out's own miss is recorded in the entry: the consent shortcut was flagged, the
+    **E2E blast radius was not** — every main spec starts at `/sign-in`, so every run was registering
+    the production pixel once per spec until `2153e9e`.
 
   > **Ruling (AH-046/047, flaky-10 MT baseline):** new creator-facing copy gets a real
   > machine-translation baseline in **all 24 locales at merge time**, including the flaky 10
@@ -673,6 +830,15 @@ AH-052 add **no migrations at all**, so **the pending-migration list is empty** 
 
 ### Open threads
 
+- **🔴 The Meta Pixel's consent gate — the batch's one open commitment (AH-064).** The pixel ships
+  un-gated by Pedram's recorded decision, against the project's own §2.1/§2.7 commitments and with UK
+  PECR applying directly. **It goes live the moment this batch deploys**, and there is no flag to hold
+  it back. Owner: the Sprint 14 CMP work, which must gate it as its first consumer. Full posture,
+  mitigations and the CSP/SRI conflict in `tech-debt.md`.
+- **The creator-guide PDF wants a CDN (AH-063).** 5.6 MB served unauthenticated from the busiest page,
+  copied into `dist/` on every build. Nothing is broken; `catalyst-engine-public-prod` already exists
+  as the target. Trigger: a second marketing document, a measured bandwidth complaint, or the next CDN
+  pass. `tech-debt.md`.
 - **📋 `brands:audit-floor` before the AH-053 deploy — the one open obligation from this arc.** A
   pure read, but the number it returns should be looked at before agencies meet the new 422, not
   after. Pairs with `php artisan migrate` for AH-054's additive migration. See the deploy notes above.

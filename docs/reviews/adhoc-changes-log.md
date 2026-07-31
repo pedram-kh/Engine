@@ -70,6 +70,243 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-064 · Meta Pixel on the sign-in page — scoped to one route, Advanced Matching off, un-gated by decision
+
+- **Status:** Landed
+- **Commits:** `ebcc50a` — `feat(auth): load the Meta Pixel on the sign-in page only`; `2153e9e` —
+  `test(playwright): block Meta from every E2E run` (the close-out fix, below).
+- **Date:** 2026-07-31
+- **Why:** Pedram asked for the Meta Pixel on the login page, supplying the vendor snippet.
+- **What:** A queueing loader (`metaPixel.ts`) mounted from `SignInPage`'s `onMounted` — **not**
+  `index.html`, **not** `AuthLayout`, which is how the vendor snippet is normally installed. Advanced
+  Matching is disabled before `init`. It fires with no consent gate and the pixel ID is hardcoded;
+  both are Pedram's recorded decisions, not oversights.
+- **Touched:** `apps/main` — `modules/auth/internal/metaPixel.ts` + spec (new), `SignInPage.vue` +
+  spec. `apps/main` + `apps/admin` — `playwright/fixtures/test.ts` (new, both suites), all 20 spec
+  files' `test` import, `tests/unit/architecture/e2e-third-party-blocked.spec.ts` (new). Docs —
+  `tech-debt.md`. **No backend diff, no route, no i18n key, no migration.**
+- **The placement is the security content of this entry.** The pixel reports the full document
+  location with every event, and three sibling auth routes carry a **single-use credential in the
+  query string** — `/auth/reset-password?token=…`, `/auth/verify-email`, `/auth/accept-invite`.
+  Installed the normal way, in `index.html`, this would have sent password-reset and invite tokens to
+  Meta. So the mount point is not a stylistic preference, and `SignInPage.spec.ts` **pins it** with
+  the reason written into the test: a future refactor that "tidies" the loader up into the layout or
+  the entry point re-opens the leak, and there is no way to notice it from the outside.
+- **Automatic Advanced Matching is off**, via `fbq('set', 'autoConfig', false, id)` **before** `init`.
+  Left on, the pixel scrapes recognised form fields and ships hashed values — and the form on this
+  page is the login form, so the harvested field would be the user's email as they type it. The
+  **ordering** is asserted, not just the call: `set` after `init` is silently a no-op, so the wrong
+  order looks identical in review and does nothing.
+- **The consent gap is a recorded decision, taken with the conflict on the table.** The pixel sets
+  `_fbp`, a non-essential cookie; `docs/05-SECURITY-COMPLIANCE.md` §2.1 puts non-essential tracking
+  behind consent and §2.7 requires a CMP in Phase 1; that CMP is Sprint 14 work and **does not exist
+  in either SPA**. Catalyst is a UK entity, so PECR applies directly. This was raised as a hard
+  stop-gate **before any code was written**, with the three options spelled out; Pedram chose to ship
+  un-gated on `/sign-in` alone and log it. `tech-debt.md` carries it with the trigger "the Sprint 14
+  consent banner lands" and the CSP/SRI conflict recorded alongside (SRI is **unachievable** here —
+  Meta serves `fbevents.js` as a mutable file, so a pinned hash breaks on their next deploy).
+- **The hardcoded ID.** No `VITE_META_PIXEL_ID`, so local development and staging report into the
+  production pixel. Pedram's explicit choice when offered the env-var alternative; the fix is a
+  one-line swap whenever that traffic needs separating.
+- **What this entry got wrong, and the fix that closes it.** The consent shortcut was flagged and
+  logged. **The pixel's E2E blast radius was not**, and it should have been: every spec in the main
+  suite starts at `/sign-in`, so from `ebcc50a` onward **every E2E run fetched `fbevents.js` and
+  registered the production pixel once per spec** — CI traffic in real analytics, and a third-party
+  network dependency on the critical path of a suite that has nothing to do with analytics. Found at
+  close-out by asking which specs traverse the changed surface, which is the check that should have
+  run at build time. `2153e9e` fixes it: an **auto-applied** Playwright fixture aborts both Meta
+  endpoints on the browser context, so no spec opts in and no future spec has to remember. It also
+  makes each spec **prove** it — a `requestfinished` listener collects Meta URLs and the fixture
+  asserts the list is empty after the body, and since an aborted route raises `requestfailed`
+  instead, anything collected is a request that escaped. **The pixel code is untouched by the fix**,
+  deliberately: the block belongs to the harness, so production still ships exactly what a reviewer
+  reads in `metaPixel.ts`. Specs now take `test` from the fixture rather than `@playwright/test`, and
+  an architecture spec pins that for **both** suites — importing from the package yields an unblocked
+  context and silently resumes calling Meta with everything green. `apps/admin` has no pixel and
+  carries the fixture anyway, because "applied to e2e-main, not to e2e-admin" is precisely what
+  reproduced the DB-isolation incident on 2026-07-13.
+- **Verified both directions.** The suite being green proves nothing _finished_; it does not prove the
+  block ever fired. A throwaway spec (run, then deleted) confirmed the positive: on `/sign-in`,
+  `connect.facebook.net/en_US/fbevents.js` is **attempted and aborted**, zero Meta requests finished.
+  Blocking the loader stops the chain at the root, which is why one abort replaces the two requests
+  observed before the fix.
+- **Gates:** `apps/main` Vitest **1444 / 150 files**; `apps/admin` **449 / 53**; both typechecks
+  clean; ESLint 0 errors; **full Playwright green in both suites** with the dev stack down — main
+  27/27 effective (one documented cold-start flake, green on isolated re-run), admin 2/2 — and **zero
+  requests to Meta across the whole run**. No Pest / PHPStan / Pint: `apps/api/**` is untouched.
+
+### AH-063 · The sign-in landing's marketing tail — creator-guide CTA, marketing footer, and the interactive monogram
+
+- **Status:** Landed
+- **Commits:** `ceb15f0` — `feat(auth): creator-guide CTA and marketing footer on the sign-in landing`;
+  `6d970a8` — `chore(auth): add the creator guide PDF served by the sign-in landing`; `f62529e` —
+  `fix(auth): seat the footer monogram in flow and link out to the marketing site`; `6ddad53` —
+  `feat(auth): rebuild the footer monogram with the live site's glass card and motion`; `63f1d8d` —
+  `test(auth): pin the --auth-glow-gradient full-strength contract` (the close-out tripwire, below).
+  Split by **eyes-on round**: `ceb15f0` is the build, `f62529e` and `6ddad53` are two successive
+  passes answering what Pedram saw on screen, and the PDF stands alone because a 5.6 MB binary in a
+  code commit makes the diff unreadable.
+- **Date:** 2026-07-31
+- **Why:** The rebrand Figma gave the login page a creator-guide block and the marketing site's
+  footer. Neither existed, and the monogram in the footer is a signature brand moment on
+  catalyst-growth.com that the SPA rendered as a flat shape.
+- **What:** Two sibling components rendered **only in hero mode** (`CreatorGuideCta`,
+  `AuthMarketingFooter`), an interactive monogram (`AuthFooterMonogram`) rebuilt from the live site's
+  SVG with orbit and sheen animation plus cursor-driven 3D tilt and glare, a link table
+  (`footerLinks.ts`) owning the inert-vs-anchor branch, the guide PDF, 12 i18n keys across 24 locales,
+  and three design tokens.
+- **Touched:** `apps/main` — `modules/auth/layouts/AuthLayout.vue`; `modules/auth/components/` gains
+  `AuthMarketingFooter.vue`, `CreatorGuideCta.vue`, `AuthFooterMonogram.vue`, `footerLinks.ts`,
+  `monogramTilt.ts`, each with a spec; `modules/auth/assets/catalyst-monogram.svg` +
+  `assets/guide/guide-card-{1,2,3}.webp`; `public/creator-guide.pdf`; `core/i18n/locales/{24}/auth.json`;
+  `tests/unit/architecture/auth-layout-shape.spec.ts`. `apps/admin` —
+  `modules/auth/layouts/AuthLayout.vue` (the compensating dim, below). `packages/design-tokens/tokens.css`.
+  **No backend diff, no route change, no migration.**
+- **The token change is a semantics change, and it fans out across both SPAs.**
+  `--auth-glow-gradient` used to carry its strength **baked into the stops** (`rgba(…, 0.2)`); it is
+  now the aurora at **full strength**, and every consumer dims it itself with `opacity: 0.3`. That
+  had to happen because the footer's radial bloom masks the gradient and needs it undimmed. Both
+  references agree on 30% (the Figma overlay and the live site's own band), so the old `0.2` was also
+  wrong against the comment that claimed 30%. All three consumers — both SPAs' `AuthLayout.vue` and
+  the new footer — carry the compensating declaration.
+- **That fan-out check happened at close-out, not at build time, and that is the process note.**
+  Changing a token's meaning in `packages/design-tokens` is a cross-app contract change; it was
+  treated as part of the footer work and never flagged. The outcome was correct — all three consumers
+  were right — but correctness rested on someone remembering the admin SPA, and a fourth consumer
+  that forgot would render the aurora **~5× too bright** with every gate green. Nothing pinned it:
+  `aurora-surfacing.spec.ts` only asserts the variable is _referenced_, `no-hard-coded-colors.spec.ts`
+  only forbids hex literals, and the design-tokens spec covers no `--auth-*` token. `63f1d8d` closes
+  it with a tripwire pinning **both halves** of the contract — the token carries no alpha, and every
+  consumer declares `opacity` in the same rule — and it **discovers** consumers by scanning both
+  SPAs rather than listing them, so a fourth is covered when it is written rather than when someone
+  remembers the file. Break-revert: dropped `opacity: 0.3` from the admin `AuthLayout`, watched it go
+  red naming that file across the SPA boundary, restored it. **The generalisable lesson: a shared
+  token whose _meaning_ changes is a fan-out event and belongs in a flag, and "I checked all the
+  consumers" is a claim that should be a test.**
+- **`v-html` is introduced here under a suppression, and the justification is in the file verbatim:**
+  _"Build-time asset with no runtime input, so there is nothing to sanitise. It must be inlined for
+  the CSS to reach inside it."_ The markup is a `?raw` SVG import resolved at build time; nothing
+  user-supplied can reach it, and inlining is what lets the scoped CSS animate the artwork's internals
+  (`:deep` throughout, since v-html content carries no scope attribute). It is nonetheless a **new
+  suppression of an XSS rule on the unauthenticated login page**, which is why it is recorded here
+  rather than left as a code comment. It is also why `no-hard-coded-colors.spec.ts` stays green: the
+  colour literals moved into the `.svg` asset, which that spec does not scan — a real, if benign, hole
+  in that gate's reach.
+- **The `AuthLayout` ceiling was raised 215 → 240, with the note the spec demands.** The spec's own
+  docblock requires a chunk-scoped justification on any raise, and it names the Figma nodes: the two
+  blocks are sibling components with their own coverage, and the layout gained **only** two imports,
+  two `v-if="isHero"` tags and the spacing rules that place them — including the negative margin that
+  lets the footer bleed past the layout's 24 px gutter. **No `<script setup>` logic was added**;
+  `isHero` is still the only computed, so the no-function and no-multi-statement-arrow guards hold
+  unchanged. The ceiling exists to keep the layout a structural shell, and it still is one.
+- **Decisions:** **Hero mode only** — the marketing tail is for the landing, not for every auth
+  route. **The tilt maths live in `monogramTilt.ts`**, extracted as a pure function precisely so the
+  interactive behaviour is unit-testable; jsdom cannot verify the rendered transform, but it can
+  verify the numbers. **`prefers-reduced-motion` is honoured** for orbit, sheen and tilt alike.
+  **Footer links point at catalyst-growth.com** through one table, with the inert-vs-anchor branch
+  owned in one place so a not-yet-supplied URL renders as text rather than a dead link.
+- **Tech-debt logged:** the **5.6 MB PDF ships inside the SPA bundle** rather than from a CDN. It is
+  served unauthenticated from the busiest page the product has, it is copied into `dist/` on every
+  build, and at 5.6 MB (down from a 12 MB export via Ghostscript) it is the largest artefact in the
+  repo. Nothing is broken — `public/` assets are not bundled into JS, so first paint is unaffected —
+  but `catalyst-engine-public-prod` already exists as the CloudFront-fronted public bucket, and this
+  is exactly the asset class that belongs there.
+- **Gates:** `apps/main` Vitest **1444 / 150 files**; `apps/admin` **449 / 53**; typechecks clean;
+  ESLint 0 errors (the 2 `vue/no-v-html` warnings are the pre-existing onboarding pair, not this
+  one — the new suppression is inline); **locale parity green across all 24 locales**, with the 12 new
+  keys verified present in every locale and their **values** audited against English in the flaky 10
+  (the only three EN-identical values are `footer.nav.blog = "Blog"` in hu, mt and ro, which is the
+  correct word in all three — a loanword, not a fallback); full Playwright green.
+- **Spec changed to stay green:** `auth-layout-shape.spec.ts` only, `MAX_LINES` 215 → 240, justified
+  above. No spec was weakened, skipped or relaxed; every other touched spec **gained** tests.
+
+### AH-062 · Tall card stacks scroll instead of squashing
+
+- **Status:** Landed
+- **Commits:** `ee8a917` — `fix(boards): let tall card stacks scroll instead of squashing the cards`
+- **Date:** 2026-07-31
+- **Why:** Past a screenful, a board column compressed its cards to fit the viewport instead of
+  scrolling, so every card in a tall stack became unreadable rather than the last one being below the
+  fold.
+- **What:** `flex: 0 0 auto` on the list's children, in both column components. The scroll container
+  already existed and was correct — flex children were shrinking to fit and defeating it. Pure CSS:
+  no script, no template, no prop.
+- **Touched:** `apps/main` — `modules/boards/components/BoardColumn.vue`,
+  `modules/boards/components/BoardApplicationsColumn.vue`. Nothing else, anywhere.
+- **It reads as trivial and it is not, which is the whole reason it survived this long.** The cards
+  were not merely squashed — `.board-card` sets `overflow: hidden`, so the compressed content was
+  **clipped silently** instead of overflowing visibly. There was no ragged layout to notice; the cards
+  just quietly stopped saying anything. Both components carry a comment recording that, because the
+  next person to see `flex: 0 0 auto` will reasonably wonder why one declaration warranted a commit.
+- **Verifiability, stated plainly: this is eyes-on-only.** No test covers it and none is added,
+  because the claim is a **layout** fact and **jsdom has no layout engine** — it computes no box
+  sizes, so a Vitest assertion about whether children shrink would pass identically before and after
+  the fix. The honest options were a real-browser Playwright assertion on rendered geometry (the
+  AH-057 precedent, which bought a genuine viewport-dependent bug) or nothing; nothing was chosen
+  here because the surface is already E2E-traversed for behaviour and the failure mode is visible the
+  moment anyone looks at a tall column. **Recorded so a future reader does not mistake the absence of
+  a test for an oversight** — and so that if this regresses, the fix is to add the browser-level
+  assertion, not to hunt for the unit test that was never possible.
+- **Arc-adjacency, named:** `BoardApplicationsColumn.vue` **is** AH-059's D4 pseudo-column, the
+  closest call in the batch. The change adds one declaration to its list children and touches
+  neither the pending-only predicate, the ability plumbing, nor the drag exclusion the D4 pins
+  protect — and those pins (`BoardApplicationsColumn.spec.ts`, `BoardColumns.spec.ts`,
+  `BoardView.spec.ts`) are all green.
+- **Gates:** `apps/main` Vitest **1444 / 150 files**; typecheck + lint clean; full Playwright green
+  (the board layout is traversed by `jobs-board-full-lifecycle.spec.ts` and
+  `campaign-applications.spec.ts` for behaviour, not geometry).
+
+### AH-061 · Review hand-off from the board card drawer
+
+- **Status:** Landed
+- **Commits:** `877e81b` — `feat(boards): review hand-off from the card drawer's Draft-submitted row`
+- **Date:** 2026-07-31
+- **Why:** The drawer told an operator a draft had been submitted and then offered no way to act on
+  it — a dead end next to a row that is entirely about something needing a decision.
+- **What:** A Review button on the `draft_submitted` timeline row, styled as the Resolve action
+  beside it, shown only with the `review` ability, emitting a payload-free navigation hand-off that
+  `CampaignDetailPage` turns into a Drafts-tab switch.
+- **Touched:** `apps/main` — `modules/boards/components/BoardCardDrawer.vue` + spec,
+  `modules/boards/components/BoardView.vue` (new `canReview` prop, `review` emit),
+  `modules/campaigns/pages/CampaignDetailPage.vue` (`onBoardReview` → `tab = 'drafts'`) + spec.
+  **No backend diff, no new i18n key, no new ability, no route.**
+- **Decisions:** **A navigation hand-off, not a write.** The button moves the operator to the surface
+  that already owns draft review; it approves nothing and mutates nothing, so it needs no new
+  endpoint, no new gate and no confirm. **An existing ability, reused** — `review`, the same one
+  already behind `canResolve`, rather than a fifth clone. **An existing key, reused** —
+  `app.campaigns.review.action`, so this adds nothing to the 24-locale surface. **A tab switch, not a
+  route** (`tab.value = 'drafts'`), so the AH-024 route-table precedent does not apply and the board's
+  scroll position and drawer state are the caller's business, not the router's.
+- **Gates:** `apps/main` Vitest **1444 / 150 files** (drawer spec +2: Review offered on a submitted
+  draft, hidden without the ability; detail-page spec +1: the hand-off leaves Board for Drafts);
+  typecheck + lint clean; full Playwright green, including the two specs that traverse the drawer.
+
+### AH-060 · Answer a campaign invitation from its detail page
+
+- **Status:** Landed
+- **Commits:** `8081435` — `feat(creators): answer a campaign invitation from its detail page`
+- **Date:** 2026-07-31
+- **Why:** The invitation list offered View, Accept and Decline; a creator who used View to read the
+  invitation before deciding then had to navigate **back** to the list to act on it. The one place a
+  creator has all the information is the one place they could not answer.
+- **What:** The same accept/decline pair the list offers, in the same shape and copy, on the
+  assignment detail page — gated on `status === 'invited'`, hitting the same
+  `creatorAssignmentsApi.accept` / `.decline` endpoints, raising the same toasts. One `answering`
+  flag drives both buttons, so a double-answer is impossible in flight. Mobile splits the pair across
+  the width, as the list does.
+- **Touched:** `apps/main` — `modules/creators/pages/CreatorAssignmentDetailPage.vue` + spec.
+  **Nothing else: no backend diff, no new endpoint, no new i18n key, no route.**
+- **Decisions:** **Reuse, not re-implement** — the same two API functions and the same six existing
+  i18n keys, so the two surfaces cannot drift in copy or behaviour and the 24-locale surface is
+  untouched. **The gate is the status, not a new ability**: the endpoints already authorize the
+  creator, and the UI simply declines to offer an answer to an invitation that is no longer open.
+  **A failed call leaves the pair in place** — spec-pinned — so a network error is retryable rather
+  than a dead end, which is the failure mode the list already had right.
+- **Gates:** `apps/main` Vitest **1444 / 150 files** (spec +4: renders the pair, accept, decline, and
+  failure leaves the pair in place); typecheck + lint clean; full Playwright green — this surface is
+  the one theme in the batch **no** spec traverses (`jobs-board-full-lifecycle` accepts from the
+  list, not the detail page), so Vitest is its only automated cover.
+
 ### AH-059 · Jobs Board chunk 5 — the eyes-on fixes, the board Applications column, lifecycle reflection, the full-loop E2E, and the arc's close-out
 
 - **Status:** Landed

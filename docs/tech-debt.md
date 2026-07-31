@@ -9,6 +9,36 @@ anyone reviewing it later.
 
 ---
 
+## The 5.6 MB creator-guide PDF ships inside the SPA bundle instead of a CDN (OPEN)
+
+- **Where:** `apps/main/public/creator-guide.pdf`, linked from `CreatorGuideCta.vue` on the
+  sign-in landing.
+- **What we accepted (AH-063, 2026-07-31):** the guide is served as a static asset out of
+  `apps/main/public/`, so it is copied into `dist/` on every build and shipped by whatever
+  serves the SPA. At **5.6 MB** it is by a wide margin the largest artefact in the repo — the
+  original export was 12 MB and Ghostscript got it to 5.6 MB, which is where the easy wins
+  ended. It is reachable **unauthenticated**, from the busiest page the product has.
+- **Why it is debt rather than a bug:** nothing is broken. `public/` assets are not bundled
+  into JS, so it costs no parse or execution time and does not affect first paint — a visitor
+  pays only when they click. But it inflates every build artefact and every deploy, it is
+  served without the caching, compression or edge locality a CDN gives it, and the bandwidth is
+  billed against the app's own origin. A marketing PDF on an unauthenticated page is exactly
+  the asset class that belongs on a CDN.
+- **The fix when it comes:** move it to S3/CloudFront and point the CTA at the CDN URL. The
+  target already exists and needs no new infrastructure — `docs/00-MASTER-ARCHITECTURE.md`
+  names `catalyst-engine-public-prod` as the CloudFront-fronted **public** bucket. It also
+  needs no signing, which makes it the rare asset that can just be a URL: the guide is public
+  marketing collateral, unlike every other object the platform stores.
+  `docs/05-SECURITY-COMPLIANCE.md` §11.3's "no external CDN scripts" rule is about **scripts**
+  and does not bar a CDN-hosted document.
+- **Trigger to escalate:** whichever comes first — a second marketing document joining it (two
+  is a pattern and wants a home), a measured bandwidth or deploy-size complaint, or the next
+  piece of CDN work for any reason.
+- **Resolve by:** no hard date. Revisit at the next asset-pipeline or CDN pass.
+- **Status:** OPEN.
+
+---
+
 ## Meta Pixel fires on the sign-in page with no consent gate (OPEN)
 
 - **Where:** `apps/main/src/modules/auth/internal/metaPixel.ts`, mounted from
@@ -31,6 +61,12 @@ anyone reviewing it later.
     `init`. Left on, the pixel harvests recognised form fields and ships hashed emails; on a
     sign-in form that is the address being typed into the login box. Ordering is asserted in
     `metaPixel.spec.ts` because `set` after `init` is silently a no-op.
+  - **Blocked in E2E** (`2153e9e`, added at the AH-064 close-out). Every spec in the main suite
+    starts at `/sign-in`, so the pixel was firing once per spec on every run and registering CI
+    traffic against the production pixel. An auto-applied Playwright fixture aborts both Meta
+    endpoints and asserts nothing reached them, in both suites. The **app code is untouched** by
+    that block, deliberately — it lives in the harness, so this entry still describes exactly
+    what production does.
 - **Also outstanding:**
   - The pixel ID is hardcoded rather than read from a `VITE_META_PIXEL_ID` env var, so local
     development and staging report into the production pixel. Accepted deliberately; the fix is
