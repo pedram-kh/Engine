@@ -5,7 +5,10 @@
  * per-field 422 binding; the resubmit path shows the version history.
  */
 
-import type { CreatorAssignmentDetailResource } from '@catalyst/api-client'
+import type {
+  CreatorAssignmentActionResponse,
+  CreatorAssignmentDetailResource,
+} from '@catalyst/api-client'
 import { flushPromises } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -14,6 +17,8 @@ import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
 vi.mock('../assignments.api', () => ({
   creatorAssignmentsApi: {
     show: vi.fn(),
+    accept: vi.fn(),
+    decline: vi.fn(),
     submitDraft: vi.fn(),
     submitPostedContent: vi.fn(),
     updatePostedContent: vi.fn(),
@@ -66,6 +71,14 @@ function makeDetail(
       },
     },
     relationships: { drafts, posted_content: posted, contract },
+  }
+}
+
+/** The narrow `{data, meta:{code}}` envelope accept/decline actually return. */
+function makeAction(status: 'accepted' | 'declined'): CreatorAssignmentActionResponse {
+  return {
+    data: { type: 'campaign_assignment', id: ULID, attributes: { status } },
+    meta: { code: `assignment.${status}` },
   }
 }
 
@@ -326,6 +339,77 @@ describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', 
       false,
     )
     expect(wrapper.find('[data-testid="assignment-contract-form"]').exists()).toBe(false)
+  })
+})
+
+describe('CreatorAssignmentDetailPage — answering the invitation in place', () => {
+  it('renders the accept / decline pair for an invited assignment, and no other action', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('invited') })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-detail-accept"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="assignment-detail-decline"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="assignment-draft-form"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-posted-form"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-contract-form"]').exists()).toBe(false)
+  })
+
+  // The negative leg: the pair belongs to `invited` and to nothing else. Every
+  // status here is eligible in every respect except the one that matters.
+  it.each(['accepted', 'contracted', 'producing', 'declined', 'cancelled'] as const)(
+    'renders no accept / decline pair for a %s assignment',
+    async (status) => {
+      vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail(status) })
+      const { wrapper } = await mountDetail()
+
+      expect(wrapper.find('[data-testid="assignment-detail-actions"]').exists()).toBe(false)
+    },
+  )
+
+  it('accepts → calls the accept endpoint and reloads into the new state', async () => {
+    vi.mocked(creatorAssignmentsApi.show)
+      .mockResolvedValueOnce({ data: makeDetail('invited') })
+      .mockResolvedValueOnce({ data: makeDetail('accepted') })
+    vi.mocked(creatorAssignmentsApi.accept).mockResolvedValue(makeAction('accepted'))
+    const { wrapper } = await mountDetail()
+
+    await wrapper.find('[data-testid="assignment-detail-accept"]').trigger('click')
+    await flushPromises()
+
+    expect(creatorAssignmentsApi.accept).toHaveBeenCalledWith(ULID)
+    expect(creatorAssignmentsApi.decline).not.toHaveBeenCalled()
+    expect(creatorAssignmentsApi.show).toHaveBeenCalledTimes(2)
+    expect(wrapper.find('[data-testid="assignment-detail-actions"]').exists()).toBe(false)
+  })
+
+  it('declines → calls the decline endpoint and reloads into the new state', async () => {
+    vi.mocked(creatorAssignmentsApi.show)
+      .mockResolvedValueOnce({ data: makeDetail('invited') })
+      .mockResolvedValueOnce({ data: makeDetail('declined') })
+    vi.mocked(creatorAssignmentsApi.decline).mockResolvedValue(makeAction('declined'))
+    const { wrapper } = await mountDetail()
+
+    await wrapper.find('[data-testid="assignment-detail-decline"]').trigger('click')
+    await flushPromises()
+
+    expect(creatorAssignmentsApi.decline).toHaveBeenCalledWith(ULID)
+    expect(creatorAssignmentsApi.accept).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-testid="assignment-detail-actions"]').exists()).toBe(false)
+  })
+
+  it('surfaces a failed answer as an error and leaves the pair in place', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('invited') })
+    vi.mocked(creatorAssignmentsApi.accept).mockRejectedValue(
+      new ApiError({ status: 422, code: 'assignment.not_invited', message: 'Stale.' }),
+    )
+    const { wrapper } = await mountDetail()
+
+    await wrapper.find('[data-testid="assignment-detail-accept"]').trigger('click')
+    await flushPromises()
+
+    // No reload on failure, and the creator can try again.
+    expect(creatorAssignmentsApi.show).toHaveBeenCalledTimes(1)
+    expect(wrapper.find('[data-testid="assignment-detail-accept"]').exists()).toBe(true)
   })
 })
 

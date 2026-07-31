@@ -16,7 +16,11 @@
  *     Chunk 2; the arc STOPS here at verification_status=pending).
  *   - accepted                 → review + accept the per-campaign contract (when
  *     attached); otherwise read-only until the agency issues one.
- *   - anything else            → read-only (the list owns invited actions).
+ *   - invited                  → accept / decline, the same pair the flat list
+ *     offers, so a creator who opened the invitation to read it does not have to
+ *     go back to answer it. Same endpoints, same copy, no confirm — a second
+ *     door onto one action, not a second action.
+ *   - anything else            → read-only.
  *
  * Only the ONE legal action for the current status is shown (fail-closed UI; the
  * backend fail-closes too — a stale submit 422s).
@@ -109,6 +113,11 @@ const inPlaceUrl = ref('')
 const inPlaceFieldErrors = ref<Partial<Record<PostedField, readonly string[]>>>({})
 const submittingInPlace = ref(false)
 
+// The invitation answer (accept / decline) — mirrors the list's per-row pair.
+// One flag for both buttons: whichever is clicked spins and the other disables,
+// so a double-answer is impossible while a request is in flight.
+const answering = ref<'accept' | 'decline' | null>(null)
+
 const status = computed(() => assignment.value?.attributes.status ?? null)
 const drafts = computed(() => assignment.value?.relationships.drafts ?? [])
 const postedContent = computed(() => assignment.value?.relationships.posted_content ?? [])
@@ -137,6 +146,7 @@ const canSubmitDraft = computed(
     status.value === 'contracted' ||
     status.value === 'revision_requested',
 )
+const isInvited = computed(() => status.value === 'invited')
 const isResubmit = computed(() => status.value === 'revision_requested')
 const isAwaitingReview = computed(() => status.value === 'draft_submitted')
 const canSubmitPosted = computed(() => status.value === 'approved')
@@ -210,6 +220,31 @@ async function load(): Promise<void> {
   } finally {
     loading.value = false
     loadedOnce.value = true
+  }
+}
+
+/**
+ * Answer the invitation in place. The list's mechanics verbatim: the backend
+ * `meta.code` picks the toast, and a reload re-renders the page in whatever
+ * state the machine landed on — the buttons go with it.
+ */
+async function answer(action: 'accept' | 'decline'): Promise<void> {
+  if (answering.value !== null) return
+  answering.value = action
+  try {
+    const res =
+      action === 'accept'
+        ? await creatorAssignmentsApi.accept(ulid.value)
+        : await creatorAssignmentsApi.decline(ulid.value)
+    snackbar.value =
+      res.meta.code === 'assignment.accepted'
+        ? { color: 'success', text: t('creator.ui.assignments.toast.accepted') }
+        : { color: 'info', text: t('creator.ui.assignments.toast.declined') }
+    await load()
+  } catch {
+    snackbar.value = { color: 'error', text: t('creator.ui.assignments.toast.error') }
+  } finally {
+    answering.value = null
   }
 }
 
@@ -484,6 +519,33 @@ onMounted(() => {
         >
           {{ assignment.attributes.offer_attachment.name }}
         </v-chip>
+      </div>
+
+      <!-- Answer the invitation without going back to the list. Same endpoints,
+           same copy and the same button shapes as the list's per-row pair. -->
+      <div v-if="isInvited" class="invitation-actions" data-testid="assignment-detail-actions">
+        <v-btn
+          color="primary"
+          variant="flat"
+          size="small"
+          :loading="answering === 'accept'"
+          :disabled="answering === 'decline'"
+          data-testid="assignment-detail-accept"
+          @click="answer('accept')"
+        >
+          {{ t('creator.ui.assignments.accept') }}
+        </v-btn>
+        <v-btn
+          color="error"
+          variant="outlined"
+          size="small"
+          :loading="answering === 'decline'"
+          :disabled="answering === 'accept'"
+          data-testid="assignment-detail-decline"
+          @click="answer('decline')"
+        >
+          {{ t('creator.ui.assignments.decline') }}
+        </v-btn>
       </div>
 
       <!-- Inline chat thread with the agency (Sprint 11, D-11) -->
@@ -955,5 +1017,19 @@ onMounted(() => {
 .assignment-offer-description {
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.invitation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Mobile: the pair shares the width on one line, as it does in the list. */
+@media (max-width: 599px) {
+  .invitation-actions > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
 }
 </style>
