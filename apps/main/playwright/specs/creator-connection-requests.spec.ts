@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures/test'
 
 import { dt, testIds } from '../helpers/selectors'
 import {

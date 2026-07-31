@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url'
 
 import type { Page } from '@playwright/test'
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures/test'
 
 import { dt, testIds } from '../helpers/selectors'
 import {
