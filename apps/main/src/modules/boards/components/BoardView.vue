@@ -37,6 +37,8 @@ const props = defineProps<{
   canConfigure: boolean
   /** May open the verification-failure resolution drawer (the `review` ability). */
   canResolve?: boolean
+  /** May review a submitted draft — the same `review` ability as `canResolve`. */
+  canReview?: boolean
   /**
    * The execute tier (invite). Gates accept/reject on the Applications
    * pseudo-column (AH-059, D4) — the same ability the Applications tab uses, so
@@ -49,6 +51,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   /** Bubbled from the card drawer — the page owns the resolve drawer. */
   resolve: [assignment: CampaignAssignmentResource]
+  /** Bubbled from the card drawer — the page owns which tab is showing. */
+  review: []
 }>()
 
 const { t } = useI18n()
@@ -89,6 +93,13 @@ function onOpenCard(card: BoardCardResource): void {
 function onResolve(assignment: CampaignAssignmentResource): void {
   drawerOpen.value = false
   emit('resolve', assignment)
+}
+
+// Ask the page to show the Drafts tab, and close the card drawer on the way
+// out. Leaving the board tab unmounts this view, so no refresh is owed here.
+function onReview(): void {
+  drawerOpen.value = false
+  emit('review')
 }
 
 function onAddColumn(): void {
@@ -170,7 +181,9 @@ onBeforeUnmount(() => {
       :campaign-id="campaignId"
       :card="drawerCard"
       :can-resolve="props.canResolve ?? false"
+      :can-review="props.canReview ?? false"
       @resolve="onResolve"
+      @review="onReview"
     />
 
     <v-snackbar

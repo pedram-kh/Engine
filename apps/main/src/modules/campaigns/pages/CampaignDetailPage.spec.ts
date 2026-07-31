@@ -22,6 +22,7 @@ import { createI18n } from 'vue-i18n'
 
 import enApp from '@/core/i18n/locales/en/app.json'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import BoardView from '@/modules/boards/components/BoardView.vue'
 
 import CampaignDetailPage from './CampaignDetailPage.vue'
 
@@ -331,6 +332,29 @@ describe('CampaignDetailPage (Sprint 8 Chunk 1)', () => {
     await flushPromises()
     expect(harness.wrapper.find('[data-test="board-view"]').exists()).toBe(true)
     expect(harness.wrapper.find('[data-test="board-coming-soon"]').exists()).toBe(false)
+  })
+
+  it("the board's Review hand-off leaves the Board tab for the Drafts tab", async () => {
+    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+      data: [makeDraftRow()],
+      meta: { total: 1, page: 1, per_page: 25, last_page: 1 },
+    })
+    const harness = await mountDetail()
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'board'
+    await flushPromises()
+
+    const board = harness.wrapper.findComponent(BoardView)
+    // The ability reaches the board under its own name, not borrowed from resolve.
+    expect(board.props('canReview')).toBe(true)
+
+    board.vm.$emit('review')
+    await flushPromises()
+
+    expect((harness.wrapper.vm as unknown as { tab: string }).tab).toBe('drafts')
+    expect(harness.wrapper.find('[data-test="drafts-tab"]').exists()).toBe(true)
+    // Leaving the board unmounts it — which is why nothing has to refresh it.
+    expect(harness.wrapper.find('[data-test="board-view"]').exists()).toBe(false)
   })
 
   it('mounts the live DraftsTab when the Drafts tab opens (not coming-soon)', async () => {

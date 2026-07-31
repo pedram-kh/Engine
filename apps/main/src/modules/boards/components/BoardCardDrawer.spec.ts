@@ -162,7 +162,12 @@ function postedRow(verificationStatus: string, id = 'p1') {
 async function mountDrawer(
   c: BoardCardResource,
   movements: BoardCardMovementResource[],
-  opts: { canResolve?: boolean; postedContent?: ReturnType<typeof postedRow>[] } = {},
+  opts: {
+    canResolve?: boolean
+    canReview?: boolean
+    status?: string
+    postedContent?: ReturnType<typeof postedRow>[]
+  } = {},
 ) {
   setActivePinia(createPinia())
   await seedStore()
@@ -172,7 +177,7 @@ async function mountDrawer(
       id: 'a1',
       type: 'campaign_assignment',
       attributes: {
-        status: 'posted',
+        status: opts.status ?? 'posted',
         agreed_fee_minor_units: 20000,
         agreed_fee_currency: 'EUR',
         fee_per: 'script',
@@ -205,6 +210,7 @@ async function mountDrawer(
       campaignId: 'campaign-ulid',
       card: c,
       canResolve: opts.canResolve ?? false,
+      canReview: opts.canReview ?? false,
     },
     global: {
       plugins: [i18n, vuetify],
@@ -381,6 +387,51 @@ describe('BoardCardDrawer', () => {
       postedContent: [postedRow('mismatch')],
     })
     expect(wrapper.find('[data-test="board-card-drawer-resolve"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  // ── Draft-submitted row Review hand-off ───────────────────────────────────
+
+  it('offers Review on the Draft-submitted row for a draft_submitted assignment, and emits the navigation hand-off', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], {
+      canReview: true,
+      status: 'draft_submitted',
+    })
+
+    const btn = wrapper.find('[data-test="board-card-drawer-review"]')
+    expect(btn.exists()).toBe(true)
+    // It sits inside the Draft-submitted timeline row, not the Live-verified one.
+    expect(
+      wrapper
+        .find('[data-test="board-card-drawer-step-draft_submitted"]')
+        .find('[data-test="board-card-drawer-review"]')
+        .exists(),
+    ).toBe(true)
+
+    await btn.trigger('click')
+    // A navigation hand-off carries no payload — and writes nothing.
+    expect(wrapper.emitted('review')?.[0]).toEqual([])
+    expect(wrapper.emitted('resolve')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  // The negative leg: Review belongs to `draft_submitted` and to nothing else.
+  // Each status here is eligible in every respect except the one that matters.
+  it.each(['invited', 'accepted', 'producing', 'approved', 'posted', 'rejected'])(
+    'hides Review for a %s assignment even with the ability',
+    async (status) => {
+      const wrapper = await mountDrawer(card('a1'), [], { canReview: true, status })
+      expect(wrapper.find('[data-test="board-card-drawer-review"]').exists()).toBe(false)
+      wrapper.unmount()
+    },
+  )
+
+  it('hides Review without the canReview ability even on a submitted draft', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], {
+      canReview: false,
+      status: 'draft_submitted',
+    })
+    expect(wrapper.find('[data-test="board-card-drawer-review"]').exists()).toBe(false)
     wrapper.unmount()
   })
 

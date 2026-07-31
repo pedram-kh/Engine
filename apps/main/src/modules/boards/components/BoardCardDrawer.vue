@@ -22,7 +22,9 @@
  *     than a dangling id (§14.3, null-safe).
  *
  * This is a READ surface for Detail + History — no manual-move reason control
- * here (Q2 tech-debt note); Messages is the one interactive tab.
+ * here (Q2 tech-debt note); Messages is the one interactive tab. The two
+ * timeline buttons are hand-offs, not writes: Resolve opens the page's
+ * resolution drawer, Review sends the operator to the Drafts tab.
  */
 
 import { ApiError, formatCurrency, formatDate, formatDateTime } from '@catalyst/api-client'
@@ -49,12 +51,20 @@ const props = defineProps<{
   card: BoardCardResource | null
   /** May open the verification-failure resolution drawer (the `review` ability). */
   canResolve?: boolean
+  /** May review a submitted draft — the same `review` ability as `canResolve`. */
+  canReview?: boolean
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
   /** The one WRITE hand-off from this drawer: open the page-level resolve drawer. */
   resolve: [assignment: CampaignAssignmentResource]
+  /**
+   * A NAVIGATION hand-off, not a write: leave the board for the Drafts tab,
+   * where the draft is reviewed. Carries no payload — the destination is a
+   * campaign-wide list, not this one row.
+   */
+  review: []
 }>()
 
 const { t, locale } = useI18n()
@@ -104,6 +114,13 @@ const showResolveAction = computed(() => {
     (verification === 'not_found' || verification === 'mismatch')
   )
 })
+
+// The draft-review hand-off: offered while the assignment sits at
+// `draft_submitted` — the same condition the Creators tab's Review row action
+// uses, so the two surfaces cannot disagree about when a draft is reviewable.
+const showReviewAction = computed(
+  () => props.canReview === true && detail.value?.attributes.status === 'draft_submitted',
+)
 
 // Build the CampaignAssignmentResource stub the page-level resolve drawer
 // expects (the DraftsTab stub pattern) — it only reads `id`, the creator
@@ -449,6 +466,16 @@ function close(): void {
                     <span class="text-body-2" :class="step.at ? '' : 'text-medium-emphasis'">
                       {{ step.label }}
                     </span>
+                    <v-btn
+                      v-if="step.key === 'draft_submitted' && showReviewAction"
+                      color="warning"
+                      variant="flat"
+                      size="x-small"
+                      data-test="board-card-drawer-review"
+                      @click="emit('review')"
+                    >
+                      {{ t('app.campaigns.review.action') }}
+                    </v-btn>
                     <v-btn
                       v-if="step.key === 'live_verified' && showResolveAction"
                       color="warning"
