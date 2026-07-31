@@ -9,6 +9,48 @@ anyone reviewing it later.
 
 ---
 
+## Meta Pixel fires on the sign-in page with no consent gate (OPEN)
+
+- **Where:** `apps/main/src/modules/auth/internal/metaPixel.ts`, mounted from
+  `apps/main/src/modules/auth/pages/SignInPage.vue`.
+- **What we accepted (2026-07-31, Pedram's explicit call):** the pixel loads unconditionally on
+  `/sign-in`. It sets `_fbp`, a non-essential cookie, and
+  `docs/05-SECURITY-COMPLIANCE.md` §2.1 puts "optional analytics tracking, non-essential cookies"
+  behind **consent**, with the CMP required in Phase 1 (§2.7). That CMP is Sprint 14 work
+  (`docs/20-PHASE-1-SPEC.md:333`) and **does not exist yet** — there is no consent mechanism
+  anywhere in either SPA. So between now and Sprint 14 we track UK/EU visitors on the sign-in
+  page without a lawful basis under UK GDPR / PECR. Catalyst is a UK entity (company 13632394),
+  so PECR applies directly.
+- **What is already mitigated (do not undo):**
+  - **Mounted from `SignInPage` only.** The pixel reports the full document location with every
+    event, and `/auth/reset-password`, `/auth/verify-email` and `/auth/accept-invite` each carry a
+    single-use credential in the query string. Pasting the vendor snippet into `index.html` —
+    the normal installation — would send those tokens to Meta. `SignInPage.spec.ts` pins the
+    mount point for this reason.
+  - **Automatic Advanced Matching disabled** via `fbq('set', 'autoConfig', false, id)` _before_
+    `init`. Left on, the pixel harvests recognised form fields and ships hashed emails; on a
+    sign-in form that is the address being typed into the login box. Ordering is asserted in
+    `metaPixel.spec.ts` because `set` after `init` is silently a no-op.
+- **Also outstanding:**
+  - The pixel ID is hardcoded rather than read from a `VITE_META_PIXEL_ID` env var, so local
+    development and staging report into the production pixel. Accepted deliberately; the fix is
+    a one-line swap if that traffic needs separating.
+  - Conflicts with the documented CSP (`script-src 'self'`, `docs/05-SECURITY-COMPLIANCE.md`
+    §9.4) and with §11.3's "no external CDN scripts in production… if any third-party script is
+    loaded (analytics), it has SRI hash". SRI is not achievable here: Meta serves
+    `fbevents.js` as a mutable file, so a pinned hash breaks on their next deploy. **CSP is
+    spec-only today and enforced nowhere**, so nothing breaks yet — but this is the first thing
+    that will fail when CSP is turned on, and `connect.facebook.net` will need an explicit
+    `script-src` allowance plus a documented SRI exemption.
+- **Trigger to escalate:** whichever comes first — the Sprint 14 consent banner landing (gate the
+  pixel behind it), CSP enforcement (allowlist the domain and record the SRI exemption), a DPIA
+  or DPA review covering Meta as a processor, or any request to add a second pixel event or a
+  second call site.
+- **Resolve by:** Sprint 14, alongside the CMP.
+- **Status:** OPEN.
+
+---
+
 ## Backend `NotificationType` ↔ frontend `LIVE_TYPES` registry drift (eyes-on finding — CLOSED)
 
 - **Where:** `apps/api/app/Modules/Notifications/Enums/NotificationType.php` and

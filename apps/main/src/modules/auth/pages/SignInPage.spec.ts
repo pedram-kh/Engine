@@ -85,6 +85,21 @@ describe('SignInPage', () => {
     expect(h.wrapper.find('[data-test="sign-in-heading"]').text()).toBe('Sign in')
   })
 
+  it('loads the Meta Pixel on mount', async () => {
+    // This page is the pixel's ONLY mount point, deliberately: the
+    // sibling auth routes carry single-use tokens in their query strings
+    // and the pixel reports the document location. If this assertion is
+    // ever moved to the layout or index.html, that guarantee is gone.
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+
+    expect(typeof window.fbq).toBe('function')
+    const queued = (window.fbq?.queue ?? []) as unknown[][]
+    expect(queued).toContainEqual(['track', 'PageView'])
+    // Advanced matching off, or the pixel harvests the email field below.
+    expect(queued).toContainEqual(['set', 'autoConfig', false, '1372598514719791'])
+  })
+
   it('does NOT show the session-expired banner without ?reason', async () => {
     const h = await mountAuthPage(SignInPage)
     teardown = h.unmount

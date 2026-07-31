@@ -14,16 +14,22 @@
  *     loading prop (chunk-6.4 standard: per-action loading flags).
  *   - Form fields are properly labelled and the error region uses
  *     `aria-live="polite"`.
+ *
+ * Also the one mount point for the Meta Pixel. It belongs here rather
+ * than in `index.html` or the auth layout because the sibling auth routes
+ * carry single-use tokens in their query strings, which the pixel would
+ * report to Meta — see the header of `internal/metaPixel.ts`.
  */
 
 import { ApiError } from '@catalyst/api-client'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
+import { loadMetaPixel } from '@/modules/auth/internal/metaPixel'
 
 const { t, te } = useI18n()
 const route = useRoute()
@@ -47,6 +53,12 @@ const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
 
 const sessionExpired = computed(() => route.query.reason === 'session_expired')
+
+// On mount rather than at module scope so the pixel is tied to this page
+// being shown, not to the route chunk being downloaded.
+onMounted(() => {
+  loadMetaPixel(window, document)
+})
 
 const submitLabel = computed(() =>
   isLoggingIn.value ? t('auth.ui.loading.logging_in') : t('auth.ui.actions.sign_in'),
