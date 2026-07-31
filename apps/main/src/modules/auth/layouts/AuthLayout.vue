@@ -4,9 +4,11 @@
  * landing (node 359-1253): full-viewport dark surface with vertical
  * grid lines, an aurora glow band, and the Catalyst logo mark. Two
  * arrangements inside the same chrome: hero (sign-in only — copy left,
- * card right, brand wall below; AuthHeroPanel + BrandLogoWall siblings
- * own the substance) and the centred card for every other auth page.
- * This file stays a structural shell — see
+ * card right, then the brand wall, the creator-guide CTA and the
+ * marketing footer stacked below; AuthHeroPanel, BrandLogoWall,
+ * CreatorGuideCta and AuthMarketingFooter siblings own the substance)
+ * and the centred card for every other auth page. This file stays a
+ * structural shell — see
  * tests/unit/architecture/auth-layout-shape.spec.ts.
  */
 
@@ -16,7 +18,9 @@ import { useRoute } from 'vue-router'
 
 import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
 import AuthHeroPanel from '@/modules/auth/components/AuthHeroPanel.vue'
+import AuthMarketingFooter from '@/modules/auth/components/AuthMarketingFooter.vue'
 import BrandLogoWall from '@/modules/auth/components/BrandLogoWall.vue'
+import CreatorGuideCta from '@/modules/auth/components/CreatorGuideCta.vue'
 import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import { buildLocaleOptions } from './localeOptions'
@@ -65,6 +69,8 @@ const isHero = computed(() => route.name === 'auth.sign-in')
         </div>
 
         <BrandLogoWall v-if="isHero" class="auth-layout__wall" />
+        <CreatorGuideCta v-if="isHero" class="auth-layout__guide" />
+        <AuthMarketingFooter v-if="isHero" class="auth-layout__footer" />
       </div>
     </v-main>
   </v-app>
@@ -182,6 +188,16 @@ const isHero = computed(() => route.name === 'auth.sign-in')
 
 .auth-layout__wall {
   margin-top: var(--space-16);
+}
+
+.auth-layout__guide {
+  margin-top: var(--space-24);
+}
+
+/* The footer's aurora band and monogram bleed to the viewport edges,
+ * so it cancels the layout's 24px gutter on three sides. */
+.auth-layout__footer {
+  margin: var(--space-24) -24px -24px;
 }
 
 .auth-layout__locale {

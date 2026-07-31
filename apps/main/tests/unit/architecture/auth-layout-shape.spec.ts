@@ -62,9 +62,20 @@ const LAYOUT_PATH = path.resolve(__dirname, '../../../src/modules/auth/layouts/A
  * single-expression computed (`isHero`) — the no-function /
  * no-multi-statement-arrow guards below still hold.
  *
+ * The rebrand landing's marketing tail (Figma "Rebrand" nodes 490-2 /
+ * 490-44 — the creator-guide CTA and the site footer) raised the ceiling
+ * 215 -> 240. The two blocks are sibling components with their own
+ * coverage (CreatorGuideCta.vue, AuthMarketingFooter.vue, plus the
+ * footerLinks.ts helper that owns the inert-vs-anchor branch); the
+ * layout gained only two imports, two `v-if="isHero"` tags, and the
+ * spacing rules that place them — including the negative margin that
+ * lets the footer bleed past the layout's 24px gutter. No `<script
+ * setup>` logic was added; `isHero` is still the only computed, so the
+ * no-function / no-multi-statement-arrow guards below still hold.
+ *
  * Future raises require a new chunk-scoped code-review note here.
  */
-const MAX_LINES = 215
+const MAX_LINES = 240
 
 describe('AuthLayout.vue stays a pure structural shell', () => {
   it('is at most MAX_LINES lines (size guard)', async () => {

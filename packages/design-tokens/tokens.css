@@ -74,6 +74,12 @@
     rgba(0, 153, 146, 0) 100%
   );
   --auth-cell-hover-border: linear-gradient(90deg, #7b4099 0%, #5481a9 50%, #009992 100%);
+  /* Hairline rule on the dark landing: the footer's divider (Figma
+   * node 490-71) and the creator-guide cards' edge. The Figma cards
+   * carry a 0.1px solid-white stroke — unrenderable as a sub-pixel
+   * border, so the same weight is expressed as a 1px line at the
+   * divider's own alpha. */
+  --auth-hairline: rgba(255, 255, 255, 0.15);
   --auth-display-font:
     'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, var(--brand-font-primary);
 
