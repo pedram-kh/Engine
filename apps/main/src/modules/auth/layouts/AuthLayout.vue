@@ -95,6 +95,8 @@ const isHero = computed(() => route.name === 'auth.sign-in')
   left: 0;
   height: 450px;
   background: var(--auth-glow-gradient);
+  /* 30% strength — the Figma lays 70% black over the full gradient. */
+  opacity: 0.3;
   mask-image: linear-gradient(to bottom, black, transparent);
   -webkit-mask-image: linear-gradient(to bottom, black, transparent);
   pointer-events: none;

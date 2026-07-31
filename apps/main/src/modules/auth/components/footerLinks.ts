@@ -14,12 +14,20 @@
  *     hardcodes `'Perplexity'` / `'Huel'` as data rather than routing
  *     brand names through a translator.
  *
- * The `href` of every navigation and social entry is `null` until the
- * real destinations are supplied — see {@link FOOTER_NAV_LINKS}. A null
- * href renders as inert text rather than a dead `<a href="#">`, and
- * {@link footerLinkTag} is the single place that decision is made, so
- * the anchor path is unit-testable before any URL exists.
+ * Destinations were taken from the footer of catalyst-growth.com, which
+ * is the surface this one mirrors. They are absolute rather than
+ * root-relative: a bare `/about` would resolve against this SPA's own
+ * router and 404, so each entry points at the marketing host and opens
+ * in a new tab, as the BrandLogoWall tiles already do.
+ *
+ * Three entries have no destination and stay `null`: the marketing site
+ * publishes no Resources or Blog page and links no X account, so those
+ * render as inert text rather than a dead `<a href="#">`.
+ * {@link footerLinkTag} is the single place that decision is made.
  */
+
+/** Marketing site the footer links out to. */
+const SITE = 'https://www.catalyst-growth.com'
 
 /** Destination of a footer entry, `null` while the URL is outstanding. */
 type Href = string | null
@@ -39,34 +47,32 @@ export interface FooterSocialLink {
 
 /**
  * Site navigation, in the Figma column order (column one then column
- * two, top to bottom).
- *
- * ┌─────────────────────────────────────────────────────────────────┐
- * │ TODO(pedram): paste the real destinations here. Set each `href` │
- * │ to its absolute URL; the entry becomes a real link with no      │
- * │ other change anywhere (see `footerLinkTag`).                    │
- * └─────────────────────────────────────────────────────────────────┘
+ * two, top to bottom). "Case studies" maps to `/work`, which is what
+ * the marketing site calls that page.
  */
 export const FOOTER_NAV_LINKS: ReadonlyArray<FooterNavLink> = [
-  { labelKey: 'home', href: null },
-  { labelKey: 'about', href: null },
-  { labelKey: 'services', href: null },
-  { labelKey: 'case_studies', href: null },
-  { labelKey: 'contact', href: null },
+  { labelKey: 'home', href: `${SITE}/` },
+  { labelKey: 'about', href: `${SITE}/about` },
+  { labelKey: 'services', href: `${SITE}/services` },
+  { labelKey: 'case_studies', href: `${SITE}/work` },
+  { labelKey: 'contact', href: `${SITE}/contact` },
   { labelKey: 'resources', href: null },
   { labelKey: 'blog', href: null },
-  { labelKey: 'international', href: null },
+  { labelKey: 'international', href: `${SITE}/international` },
 ]
 
 /**
  * Social networks. Proper nouns, so they carry a literal label rather
- * than an i18n key. Same outstanding-URL treatment as the nav links.
+ * than an i18n key.
  */
 export const FOOTER_SOCIAL_LINKS: ReadonlyArray<FooterSocialLink> = [
-  { label: 'Instagram', href: null },
-  { label: 'LinkedIn', href: null },
+  { label: 'Instagram', href: 'https://www.instagram.com/catalystugc' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/catalystgrowthx' },
   { label: 'X', href: null },
 ]
+
+/** Privacy policy, hosted on the marketing site alongside the terms. */
+export const FOOTER_PRIVACY_HREF = `${SITE}/legal/privacy`
 
 /** Contact block. The email is a live `mailto:` — the URL is known. */
 export const FOOTER_CONTACT = {
@@ -93,4 +99,30 @@ export const FOOTER_LEGAL = {
  */
 export function footerLinkTag(href: Href): 'a' | 'span' {
   return href === null ? 'span' : 'a'
+}
+
+/** Attributes for a footer entry: empty for inert text, else a link. */
+export interface FooterLinkAttrs {
+  readonly href?: string
+  readonly target?: '_blank'
+  readonly rel?: string
+}
+
+/**
+ * The attribute set a footer entry renders with.
+ *
+ * Pairs with {@link footerLinkTag}: an inert entry is a `<span>` and
+ * must NOT carry `target` / `rel`, which are meaningless there. Keeping
+ * that in one tested function avoids a per-attribute ternary in the
+ * template, where the never-taken arm would be invisible to the auth
+ * module's 100% branch-coverage gate.
+ *
+ * Destinations are on the marketing site, so links open in a new tab
+ * and carry the anti-tabnabbing rel.
+ */
+export function footerLinkAttrs(href: Href): FooterLinkAttrs {
+  if (href === null) {
+    return {}
+  }
+  return { href, target: '_blank', rel: 'noopener noreferrer' }
 }

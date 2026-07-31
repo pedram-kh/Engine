@@ -25,7 +25,9 @@ import {
   FOOTER_CONTACT,
   FOOTER_LEGAL,
   FOOTER_NAV_LINKS,
+  FOOTER_PRIVACY_HREF,
   FOOTER_SOCIAL_LINKS,
+  footerLinkAttrs,
   footerLinkTag,
 } from './footerLinks'
 
@@ -34,9 +36,15 @@ const { t } = useI18n()
 
 <template>
   <footer class="auth-footer" data-test="auth-marketing-footer">
-    <img :src="catalystMonogram" alt="" aria-hidden="true" class="auth-footer__monogram" />
+    <div class="auth-footer__glow" aria-hidden="true">
+      <div class="auth-footer__glow-bloom" />
+    </div>
 
     <div class="auth-footer__content">
+      <div class="auth-footer__visual">
+        <img :src="catalystMonogram" alt="" aria-hidden="true" class="auth-footer__monogram" />
+      </div>
+
       <img :src="catalystLogo" alt="" class="auth-footer__logo" />
 
       <div class="auth-footer__columns">
@@ -45,7 +53,7 @@ const { t } = useI18n()
             :is="footerLinkTag(link.href)"
             v-for="link in FOOTER_NAV_LINKS"
             :key="link.labelKey"
-            :href="link.href"
+            v-bind="footerLinkAttrs(link.href)"
             class="auth-footer__link"
           >
             {{ t(`auth.ui.footer.nav.${link.labelKey}`) }}
@@ -57,7 +65,7 @@ const { t } = useI18n()
             :is="footerLinkTag(link.href)"
             v-for="link in FOOTER_SOCIAL_LINKS"
             :key="link.label"
-            :href="link.href"
+            v-bind="footerLinkAttrs(link.href)"
             class="auth-footer__link"
           >
             {{ link.label }}
@@ -79,7 +87,8 @@ const { t } = useI18n()
         <span>{{ FOOTER_LEGAL.companyNumber }}</span>
         <span>{{ FOOTER_LEGAL.vatNumber }}</span>
         <component
-          :is="footerLinkTag(null)"
+          :is="footerLinkTag(FOOTER_PRIVACY_HREF)"
+          v-bind="footerLinkAttrs(FOOTER_PRIVACY_HREF)"
           class="auth-footer__link auth-footer__privacy"
           data-test="auth-footer-privacy"
         >
@@ -92,57 +101,88 @@ const { t } = useI18n()
 
 <style scoped>
 /* Full-bleed band: the layout cancels its own gutter for this element,
- * so the 24px inset is re-applied here. Height tracks the Figma frame
- * (1304px on 1920px) to leave the watermark room; the content is pinned
- * to the bottom edge above it. */
+ * so the 24px inset is re-applied here. Height is intentionally natural
+ * — the monogram is a row of the content stack, not a backdrop, so
+ * nothing needs to reserve space for it.
+ *
+ * Deliberately NOT `overflow: hidden`. The glow window is taller than
+ * the footer, so clipping it here severs the bloom at the footer's top
+ * edge while it still carries ~8% alpha — a visible horizontal seam
+ * against the black section above. catalyst-growth.com leaves its own
+ * footer overflow visible for exactly this reason and lets the bloom
+ * bleed upward, where the mask fades it out on its own. */
 .auth-footer {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: clamp(560px, 67.9vw, 1304px);
   padding: var(--space-24) 24px var(--space-6);
-  overflow: hidden;
   isolation: isolate;
 }
 
-/* Aurora band rising from the bottom edge, mirroring the band the
- * layout paints along the top of the page. */
-.auth-footer::before {
-  content: '';
+/* Square viewport-wide window for the bloom. Its own `overflow` does the
+ * only clipping that is safe: the sides, at the viewport edges, which
+ * keeps the double-width bloom from opening a horizontal scrollbar. The
+ * top edge sits a full mask radius from the bloom's centre, so nothing
+ * visible is lost there. */
+.auth-footer__glow {
   position: absolute;
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: -2;
-  height: 450px;
-  background: var(--auth-glow-gradient);
-  mask-image: linear-gradient(to top, black, transparent);
-  -webkit-mask-image: linear-gradient(to top, black, transparent);
+  z-index: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
   pointer-events: none;
 }
 
-/* Oversized watermark, centred horizontally and bled off the bottom —
- * 603px on the 1920px Figma frame. */
-.auth-footer__monogram {
+/* Twice as wide as the window and pulled half its height below the
+ * bottom edge, so the circular mask reads as a bloom rising out of the
+ * page edge rather than a band across it. */
+.auth-footer__glow-bloom {
   position: absolute;
   bottom: 0;
   left: 50%;
-  z-index: -1;
-  width: clamp(320px, 31.4vw, 604px);
-  transform: translateX(-50%);
-  pointer-events: none;
+  width: 200%;
+  aspect-ratio: 1;
+  background-image: var(--auth-glow-gradient);
+  opacity: 0.3;
+  transform: translate(-50%, 50%);
+  mask-image: var(--auth-glow-mask);
+  -webkit-mask-image: var(--auth-glow-mask);
 }
 
 .auth-footer__content {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: var(--space-12);
 }
 
-.auth-footer__logo {
+/* The monogram is the first row of the stack, centred in clear space
+ * above the wordmark — in the Figma it occupies y 350-954 of the 1304px
+ * frame while the content sits below y 992, and catalyst-growth.com
+ * likewise gives it its own flow row. Layering it behind the columns
+ * (the pre-fix arrangement) is wrong in both references. */
+.auth-footer__visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-footer__monogram {
   display: block;
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 1;
+}
+
+/* `align-self` is load-bearing: as a column flex item the image would
+ * otherwise stretch to the full content width, and the SVG would centre
+ * its artwork inside that box — reading as a centred wordmark rather
+ * than the left-aligned one both references show. */
+.auth-footer__logo {
+  align-self: flex-start;
+  display: block;
+  width: auto;
   height: 28px;
 }
 
@@ -243,6 +283,16 @@ a.auth-footer__link:hover {
 
   .auth-footer__privacy {
     margin-left: 0;
+  }
+}
+
+/* Phones drop the monogram entirely: the Figma's mobile footer frame
+ * has no monogram at all, and catalyst-growth.com hides its own visual
+ * row at the same 480px cutoff. At this width it would otherwise crowd
+ * the contact block. */
+@media (max-width: 479px) {
+  .auth-footer__visual {
+    display: none;
   }
 }
 </style>

@@ -2,11 +2,12 @@
  * Component tests for the marketing footer on the rebrand sign-in
  * landing.
  *
- * The behaviour worth pinning is the outstanding-URL contract: until
- * Pedram supplies the real destinations, no navigation or social entry
- * may render as an anchor, because a dead `<a href="#">` is worse than
- * inert text. The one live link is the `mailto:` — that address is
- * known.
+ * The behaviour worth pinning is the split between real links and inert
+ * text. Destinations come from catalyst-growth.com's own footer, so the
+ * entries it has no page for (Resources, Blog, X) must stay inert — a
+ * dead `<a href="#">` is worse than plain text — and every real one must
+ * be absolute, since a root-relative href would hit this app's router
+ * instead of the marketing site.
  */
 
 import { afterEach, describe, expect, it } from 'vitest'
@@ -33,48 +34,71 @@ describe('AuthMarketingFooter', () => {
     expect(nav.text()).toContain('International')
   })
 
-  it('renders navigation entries as inert text while the URLs are outstanding', async () => {
+  it('links the published pages out to the marketing site in a new tab', async () => {
     const h = await mountAuthPage(AuthMarketingFooter)
     teardown = h.unmount
 
-    const entries = h.wrapper.find('[data-test="auth-footer-nav"]').findAll('.auth-footer__link')
-    for (const entry of entries) {
+    const about = h.wrapper
+      .find('[data-test="auth-footer-nav"]')
+      .findAll('a')
+      .find((a) => a.text() === 'About us')
+    expect(about?.attributes('href')).toBe('https://www.catalyst-growth.com/about')
+    expect(about?.attributes('target')).toBe('_blank')
+    expect(about?.attributes('rel')).toBe('noopener noreferrer')
+  })
+
+  it('renders entries with no published page as inert text carrying no link attributes', async () => {
+    const h = await mountAuthPage(AuthMarketingFooter)
+    teardown = h.unmount
+
+    const inert = h.wrapper
+      .findAll('.auth-footer__link')
+      .filter((entry) => ['Resources', 'Blog', 'X'].includes(entry.text()))
+    expect(inert).toHaveLength(3)
+    for (const entry of inert) {
       expect(entry.element.tagName).toBe('SPAN')
+      // A <span> must not inherit target/rel from the link branch.
       expect(entry.attributes('href')).toBeUndefined()
+      expect(entry.attributes('target')).toBeUndefined()
+      expect(entry.attributes('rel')).toBeUndefined()
     }
   })
 
-  it('renders the social entries as inert proper nouns', async () => {
+  it('links the social accounts the marketing site links, and only those', async () => {
     const h = await mountAuthPage(AuthMarketingFooter)
     teardown = h.unmount
 
     const social = h.wrapper.find('[data-test="auth-footer-social"]')
-    expect(social.text()).toContain('Instagram')
-    expect(social.text()).toContain('LinkedIn')
-    for (const entry of social.findAll('.auth-footer__link')) {
-      expect(entry.element.tagName).toBe('SPAN')
-    }
+    expect(social.findAll('a').map((a) => a.attributes('href'))).toEqual([
+      'https://www.instagram.com/catalystugc',
+      'https://www.linkedin.com/company/catalystgrowthx',
+    ])
+    expect(social.text()).toContain('X')
   })
 
-  it('renders "Privacy policy" as inert text too', async () => {
+  it('links "Privacy policy" to the published policy', async () => {
     const h = await mountAuthPage(AuthMarketingFooter)
     teardown = h.unmount
 
     const privacy = h.wrapper.find('[data-test="auth-footer-privacy"]')
     expect(privacy.text()).toBe('Privacy policy')
-    expect(privacy.element.tagName).toBe('SPAN')
+    expect(privacy.element.tagName).toBe('A')
+    expect(privacy.attributes('href')).toBe('https://www.catalyst-growth.com/legal/privacy')
   })
 
-  it('ships no dead anchors anywhere in the footer', async () => {
+  it('ships no dead or app-relative anchors anywhere in the footer', async () => {
     const h = await mountAuthPage(AuthMarketingFooter)
     teardown = h.unmount
 
-    // Disjoint-and-complete: the ONLY anchor the footer may render
-    // right now is the mailto. Anything else means a placeholder href
-    // leaked in.
-    const anchors = h.wrapper.findAll('a')
-    expect(anchors).toHaveLength(1)
-    expect(anchors[0]?.attributes('href')).toBe('mailto:info@catalyst-growth.com')
+    // Every anchor must leave this app: absolute https, or the mailto.
+    // A bare `/about` would resolve against our own router and 404.
+    // 6 nav + 2 social + privacy + mailto.
+    const hrefs = h.wrapper.findAll('a').map((a) => a.attributes('href'))
+    expect(hrefs).toHaveLength(10)
+    for (const href of hrefs) {
+      expect(href).toMatch(/^(https:\/\/|mailto:)/)
+    }
+    expect(hrefs).toContain('mailto:info@catalyst-growth.com')
   })
 
   it('renders the contact block and the registration details', async () => {
@@ -96,6 +120,23 @@ describe('AuthMarketingFooter', () => {
     const monogram = h.wrapper.find('.auth-footer__monogram')
     expect(monogram.attributes('alt')).toBe('')
     expect(monogram.attributes('aria-hidden')).toBe('true')
+  })
+
+  it('places the monogram in its own row above the content, not behind it', async () => {
+    const h = await mountAuthPage(AuthMarketingFooter)
+    teardown = h.unmount
+
+    // The reported bug: the monogram was an absolutely-positioned
+    // backdrop pinned to the bottom edge, so it sat behind the link
+    // columns. Both references (the Figma frame and the live site) give
+    // it a leading flow row instead. jsdom applies no scoped CSS, so the
+    // guard is the DOM contract that makes the layout possible: the
+    // monogram is the first child of the content stack, ahead of the
+    // wordmark, rather than a sibling of that stack.
+    const rows = Array.from(h.wrapper.find('.auth-footer__content').element.children)
+    expect(rows[0]?.classList.contains('auth-footer__visual')).toBe(true)
+    expect(rows[0]?.querySelector('.auth-footer__monogram')).not.toBeNull()
+    expect(rows[1]?.classList.contains('auth-footer__logo')).toBe(true)
   })
 
   it('renders translated navigation when the locale changes', async () => {

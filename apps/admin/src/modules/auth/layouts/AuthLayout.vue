@@ -88,6 +88,9 @@ const isHero = computed(() => route.name === 'auth.sign-in')
   left: 0;
   height: 450px;
   background: var(--auth-glow-gradient);
+  /* 30% strength — the token carries the aurora at full strength so the
+   * footer bloom can mask it; consumers dim it themselves. */
+  opacity: 0.3;
   mask-image: linear-gradient(to bottom, black, transparent);
   -webkit-mask-image: linear-gradient(to bottom, black, transparent);
   pointer-events: none;
