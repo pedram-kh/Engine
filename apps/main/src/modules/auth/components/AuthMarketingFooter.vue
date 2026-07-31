@@ -20,7 +20,7 @@
 import { useI18n } from 'vue-i18n'
 
 import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
-import catalystMonogram from '@/modules/auth/assets/catalyst-monogram.svg'
+import AuthFooterMonogram from './AuthFooterMonogram.vue'
 import {
   FOOTER_CONTACT,
   FOOTER_LEGAL,
@@ -42,7 +42,7 @@ const { t } = useI18n()
 
     <div class="auth-footer__content">
       <div class="auth-footer__visual">
-        <img :src="catalystMonogram" alt="" aria-hidden="true" class="auth-footer__monogram" />
+        <AuthFooterMonogram />
       </div>
 
       <img :src="catalystLogo" alt="" class="auth-footer__logo" />
@@ -166,13 +166,6 @@ const { t } = useI18n()
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.auth-footer__monogram {
-  display: block;
-  width: 100%;
-  max-width: 600px;
-  aspect-ratio: 1;
 }
 
 /* `align-self` is load-bearing: as a column flex item the image would

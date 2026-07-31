@@ -117,9 +117,9 @@ describe('AuthMarketingFooter', () => {
     const h = await mountAuthPage(AuthMarketingFooter)
     teardown = h.unmount
 
-    const monogram = h.wrapper.find('.auth-footer__monogram')
-    expect(monogram.attributes('alt')).toBe('')
-    expect(monogram.attributes('aria-hidden')).toBe('true')
+    const svg = h.wrapper.find('[data-test="auth-footer-monogram"] svg')
+    expect(svg.attributes('aria-hidden')).toBe('true')
+    expect(svg.attributes('role')).toBe('presentation')
   })
 
   it('places the monogram in its own row above the content, not behind it', async () => {
@@ -135,7 +135,7 @@ describe('AuthMarketingFooter', () => {
     // wordmark, rather than a sibling of that stack.
     const rows = Array.from(h.wrapper.find('.auth-footer__content').element.children)
     expect(rows[0]?.classList.contains('auth-footer__visual')).toBe(true)
-    expect(rows[0]?.querySelector('.auth-footer__monogram')).not.toBeNull()
+    expect(rows[0]?.querySelector('[data-test="auth-footer-monogram"]')).not.toBeNull()
     expect(rows[1]?.classList.contains('auth-footer__logo')).toBe(true)
   })
 
