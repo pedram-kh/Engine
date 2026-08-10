@@ -16,6 +16,10 @@
  * minor units; the currency is the campaign's, shown read-only). Per-creator
  * fee override is out of scope this chunk.
  *
+ * Search is SERVER-side (`?q=`, debounced) rather than a filter over one
+ * fetched page — see {@link fetchRoster} for why the local filter was a
+ * correctness bug, not just a slow path.
+ *
  * Offer context (invite-offer-details batch): the fee, the free-text "Per" unit,
  * the offer description and ONE optional attachment are all batch-wide,
  * mirroring the single fee — and all of them now live in the shared
@@ -25,7 +29,7 @@
  */
 
 import { ApiError } from '@catalyst/api-client'
-import type { RosterCreatorListItem } from '@catalyst/api-client'
+import type { RosterCreatorListItem, RosterListParams } from '@catalyst/api-client'
 import { BlacklistBadge } from '@catalyst/ui'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -49,13 +53,24 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const ROSTER_PER_PAGE = 100
+const SEARCH_DEBOUNCE_MS = 300
 
 const roster = ref<RosterCreatorListItem[]>([])
 const loading = ref(false)
+// A search re-query, as distinct from the initial open. It drives the field's
+// own spinner rather than the skeleton, so the input never unmounts mid-type.
+const searching = ref(false)
 const error = ref<string | null>(null)
 const submitting = ref(false)
-const search = ref('')
+// `clearable` hands back null on clear, so this is nullable and every read
+// goes through `searchTerm`.
+const search = ref<string | null>('')
 const selected = ref<Set<string>>(new Set())
+// Whether the agency has NO roster at all, captured on the unfiltered open
+// load. Kept separate from `roster.length === 0` so a search that matches
+// nothing can never masquerade as "you have no creators" — which would also
+// hide the search field and trap the user in the empty state.
+const rosterEmptyUnfiltered = ref(false)
 
 const currency = computed(() => props.campaignCurrency ?? 'EUR')
 
@@ -73,12 +88,7 @@ const offer = ref<BuiltOffer>(null)
 const conflictPrompt = ref(false)
 const conflictedIds = ref<string[]>([])
 
-const filtered = computed<RosterCreatorListItem[]>(() => {
-  const q = search.value.trim().toLowerCase()
-  const base = roster.value
-  if (q === '') return base
-  return base.filter((row) => (row.attributes.display_name ?? '').toLowerCase().includes(q))
-})
+const searchTerm = computed(() => (search.value ?? '').trim())
 
 /** Agency-wide HARD blacklist → the row is disabled (TIER 1, FE-visible half). */
 function isHardBlacklisted(row: RosterCreatorListItem): boolean {
@@ -87,8 +97,41 @@ function isHardBlacklisted(row: RosterCreatorListItem): boolean {
   )
 }
 
-const rosterEmpty = computed(() => roster.value.length === 0)
 const canInvite = computed(() => selected.value.size > 0 && offerValid.value && !submitting.value)
+
+/**
+ * The roster query. Search runs SERVER-side (`?q=`), mirroring
+ * `CreatorRosterPage` — it used to filter one fetched page in the browser,
+ * which silently capped the picker at the first `ROSTER_PER_PAGE` creators by
+ * display_name. On a roster larger than that page the tail of the alphabet was
+ * not merely unsearchable but unreachable: absent from the list, so no amount
+ * of scrolling reached them and they could never be invited.
+ *
+ * Responses are sequence-guarded: with a debounce in front of an async call,
+ * a slow early query can still land after a fast later one, so only the newest
+ * request is allowed to write.
+ */
+let requestSeq = 0
+let lastFetchedTerm: string | null = null
+
+async function fetchRoster(term: string): Promise<void> {
+  const seq = ++requestSeq
+  const params: RosterListParams = { per_page: ROSTER_PER_PAGE }
+  if (term !== '') params.q = term
+
+  try {
+    const res = await rosterApi.list(props.agencyId, params)
+    if (seq !== requestSeq) return
+    lastFetchedTerm = term
+    roster.value = res.data
+    // Only an UNFILTERED read can tell us the roster is genuinely empty.
+    if (term === '') rosterEmptyUnfiltered.value = res.data.length === 0
+  } catch {
+    if (seq !== requestSeq) return
+    error.value = t('app.campaigns.invite.loadFailed')
+    roster.value = []
+  }
+}
 
 async function load(): Promise<void> {
   loading.value = true
@@ -98,14 +141,8 @@ async function load(): Promise<void> {
   offerFields.value?.reset()
   offer.value = null
   conflictedIds.value = []
-  try {
-    const res = await rosterApi.list(props.agencyId, { per_page: ROSTER_PER_PAGE })
-    roster.value = res.data
-  } catch {
-    error.value = t('app.campaigns.invite.loadFailed')
-  } finally {
-    loading.value = false
-  }
+  await fetchRoster('')
+  loading.value = false
 }
 
 watch(
@@ -115,6 +152,23 @@ watch(
   },
   { immediate: true },
 )
+
+// Debounced server search — fires 300ms after the last keystroke, mirroring
+// CreatorRosterPage. Re-queries are skipped when the term is already the one
+// on screen, which also absorbs the reset-to-empty that `load()` performs on
+// open (and a type-then-backspace round trip).
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+
+watch(searchTerm, (term) => {
+  if (searchTimer !== null) clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    if (term === lastFetchedTerm) return
+    searching.value = true
+    void fetchRoster(term).finally(() => {
+      searching.value = false
+    })
+  }, SEARCH_DEBOUNCE_MS)
+})
 
 function close(): void {
   emit('update:modelValue', false)
@@ -274,13 +328,17 @@ function finish(ok: number, blacklisted: number, skippedConflicts: number): void
           @update:valid="(v) => (offerValid = v)"
         />
 
+        <!-- Stays mounted whenever a roster exists — including while a search
+             matches nothing, which is exactly when the user needs to edit or
+             clear the term. -->
         <v-text-field
-          v-if="!loading && !rosterEmpty"
+          v-if="!loading && !rosterEmptyUnfiltered"
           v-model="search"
           density="compact"
           variant="outlined"
           hide-details
           clearable
+          :loading="searching"
           prepend-inner-icon="mdi-magnify"
           class="mb-3"
           :label="t('app.campaigns.invite.search')"
@@ -294,7 +352,7 @@ function finish(ok: number, blacklisted: number, skippedConflicts: number): void
         />
 
         <div
-          v-else-if="rosterEmpty"
+          v-else-if="rosterEmptyUnfiltered"
           class="text-body-2 text-medium-emphasis py-4"
           data-test="invite-creators-empty"
         >
@@ -302,7 +360,7 @@ function finish(ok: number, blacklisted: number, skippedConflicts: number): void
         </div>
 
         <div
-          v-else-if="filtered.length === 0"
+          v-else-if="roster.length === 0"
           class="text-body-2 text-medium-emphasis py-4"
           data-test="invite-creators-no-match"
         >
@@ -311,7 +369,7 @@ function finish(ok: number, blacklisted: number, skippedConflicts: number): void
 
         <v-list v-else data-test="invite-creators-list">
           <v-list-item
-            v-for="row in filtered"
+            v-for="row in roster"
             :key="row.attributes.creator_id ?? row.id"
             :disabled="isHardBlacklisted(row)"
             :data-test="`invite-creators-row-${row.attributes.creator_id}`"

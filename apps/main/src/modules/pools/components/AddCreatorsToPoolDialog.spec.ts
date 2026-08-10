@@ -4,8 +4,10 @@
  *
  * The picker is sourced from the ROSTER (D-2) and excludes current members
  * client-side (D-3); selecting creators + Add loops the single-add `store`
- * (D-4); client-side search filters the fetched roster (D-5). Adding a creator
- * the partial exclusion still showed is a harmless idempotent no-op.
+ * (D-4); search goes to the SERVER, debounced (D-5 reversed — the old local
+ * filter capped the picker at one page, hiding the tail of the alphabet).
+ * Adding a creator the partial exclusion still showed is a harmless idempotent
+ * no-op.
  */
 
 import type { RosterCreatorListItem, TalentPoolMemberResource } from '@catalyst/api-client'
@@ -115,7 +117,19 @@ function mountDialog(roster: RosterCreatorListItem[], members: TalentPoolMemberR
 type DialogVm = {
   toggleSelect: (id: string) => void
   addSelected: () => Promise<void>
-  search: string
+  search: string | null
+}
+
+/** Drive the 300ms search debounce deterministically, then settle the fetch. */
+async function runDebounce(wrapper: ReturnType<typeof mount>, ms = 300): Promise<void> {
+  vi.useFakeTimers()
+  try {
+    await wrapper.vm.$nextTick()
+    await vi.advanceTimersByTimeAsync(ms)
+  } finally {
+    vi.useRealTimers()
+  }
+  await flushPromises()
 }
 
 describe('AddCreatorsToPoolDialog (pool-side add)', () => {
@@ -183,19 +197,118 @@ describe('AddCreatorsToPoolDialog (pool-side add)', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(false)
   })
 
-  it('client-side search filters the fetched roster list (D-5)', async () => {
-    const a = rosterRow({ id: 'rel-a', creator_id: '01A', display_name: 'Alice' })
-    const b = rosterRow({ id: 'rel-b', creator_id: '01B', display_name: 'Bob' })
-    wrapper = mountDialog([a, b], [])
+  // The dialog (and its search field) is teleported to body, so these drive the
+  // search via component state rather than a wrapper-scoped query.
+
+  it('sends the search to the SERVER after a 300ms debounce, trimmed (D-5 reversed)', async () => {
+    wrapper = mountDialog([rosterRow({ creator_id: '01A', display_name: 'Alice' })], [])
+    await flushPromises()
+    vi.mocked(rosterApi.list).mockClear()
+    ;(wrapper.vm as unknown as DialogVm).search = '  ali  '
+
+    vi.useFakeTimers()
+    try {
+      await wrapper.vm.$nextTick()
+
+      // Inside the debounce window — nothing issued yet.
+      await vi.advanceTimersByTimeAsync(299)
+      expect(rosterApi.list).not.toHaveBeenCalled()
+
+      await vi.advanceTimersByTimeAsync(1)
+    } finally {
+      vi.useRealTimers()
+    }
     await flushPromises()
 
-    // The dialog (and its search field) is teleported to body, so drive the
-    // search via the component state rather than a wrapper-scoped query.
+    expect(rosterApi.list).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1]).toEqual({ per_page: 100, q: 'ali' })
+  })
+
+  it('renders whatever the server returns WITHOUT re-filtering it locally', async () => {
+    // A row the server matched on bio shares no substring with the query; the
+    // old local `display_name.includes(q)` filter would have dropped it.
+    wrapper = mountDialog([rosterRow({ creator_id: '01A', display_name: 'Alice' })], [])
+    await flushPromises()
+
+    vi.mocked(rosterApi.list).mockResolvedValue({
+      data: [rosterRow({ id: 'rel-z', creator_id: '01Z', display_name: 'Zoe Quinn' })],
+      meta: { total: 1, page: 1, per_page: 100, last_page: 1 },
+    })
     ;(wrapper.vm as unknown as DialogVm).search = 'ali'
+    await runDebounce(wrapper)
+
+    expect(document.querySelector('[data-test="add-creators-row-01Z"]')).not.toBeNull()
+  })
+
+  it('shows the no-MATCH state and KEEPS the search field when a search returns nothing', async () => {
+    wrapper = mountDialog([rosterRow({ creator_id: '01A', display_name: 'Alice' })], [])
     await flushPromises()
 
-    expect(document.querySelector('[data-test="add-creators-row-01A"]')).not.toBeNull()
-    expect(document.querySelector('[data-test="add-creators-row-01B"]')).toBeNull()
+    vi.mocked(rosterApi.list).mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 100, last_page: 1 },
+    })
+    ;(wrapper.vm as unknown as DialogVm).search = 'nobody'
+    await runDebounce(wrapper)
+
+    expect(document.querySelector('[data-test="add-creators-empty-search"]')).not.toBeNull()
+    // An empty RESULT is not an empty ROSTER, and it is not an exhausted pool
+    // either — conflating them would also unmount the field below.
+    expect(document.querySelector('[data-test="add-creators-empty-no-roster"]')).toBeNull()
+    expect(document.querySelector('[data-test="add-creators-empty-all-in-pool"]')).toBeNull()
+    expect(document.querySelector('[data-test="add-creators-search"]')).not.toBeNull()
+  })
+
+  it('still fires the HARD-blacklist confirm for a creator selected under an EARLIER search term', async () => {
+    // Selection survives a re-query, so the creator is no longer among the rows
+    // on screen when Add is pressed. Resolving blacklist status against only the
+    // current result set would silently skip the confirm — the friction gate
+    // switching itself off for the one creator the user can no longer see.
+    const hard = rosterRow({
+      id: 'rel-h',
+      creator_id: '01HARD',
+      display_name: 'Hard Blocked',
+      is_blacklisted: true,
+      blacklist_type: 'hard',
+    })
+    wrapper = mountDialog([hard], [])
+    await flushPromises()
+    ;(wrapper.vm as unknown as DialogVm).toggleSelect('01HARD')
+
+    // Re-query to a result set that does NOT contain them.
+    vi.mocked(rosterApi.list).mockResolvedValue({
+      data: [rosterRow({ id: 'rel-o', creator_id: '01OTHER', display_name: 'Other' })],
+      meta: { total: 1, page: 1, per_page: 100, last_page: 1 },
+    })
+    ;(wrapper.vm as unknown as DialogVm).search = 'other'
+    await runDebounce(wrapper)
+    expect(document.querySelector('[data-test="add-creators-row-01HARD"]')).toBeNull()
+
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
+    try {
+      await (wrapper.vm as unknown as DialogVm).addSelected()
+      expect(confirmSpy).toHaveBeenCalledTimes(1)
+      expect(confirmSpy.mock.calls[0]?.[0]).toContain('Hard Blocked')
+      // Declined the confirm → nothing is added.
+      expect(talentPoolsApi.addCreator).not.toHaveBeenCalled()
+    } finally {
+      confirmSpy.mockRestore()
+    }
+  })
+
+  it('survives the clearable X (v-model null) and re-queries unfiltered', async () => {
+    wrapper = mountDialog([rosterRow({ creator_id: '01A', display_name: 'Alice' })], [])
+    await flushPromises()
+    ;(wrapper.vm as unknown as DialogVm).search = 'ali'
+    await runDebounce(wrapper)
+
+    // Vuetify's `clearable` writes null, which the old `.trim()` read threw on.
+    vi.mocked(rosterApi.list).mockClear()
+    ;(wrapper.vm as unknown as DialogVm).search = null
+    await runDebounce(wrapper)
+
+    expect(rosterApi.list).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1]).toEqual({ per_page: 100 })
   })
 
   it('shows a per-row blacklist flag for hard + soft, none for a clean creator (D-6)', async () => {

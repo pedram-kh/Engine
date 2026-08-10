@@ -15,14 +15,19 @@
  *     `firstOrCreate` makes a missed exclusion a harmless no-op, so a partial
  *     filter is only ever cosmetic, never a correctness bug.
  *   - D-4 multi-add loops the single `store` (no batch endpoint exists).
- *   - D-5 client-side search filters the fetched roster page locally.
+ *   - D-5 client-side search filtered the fetched roster page locally — NOW
+ *     REVERSED, and D-7's deferral of the server `?q=` FTS with it. The local
+ *     filter capped the picker at the first `ROSTER_PER_PAGE` creators by
+ *     display_name: past that, the tail of the alphabet was absent from the
+ *     list entirely, so those creators could not be added to a pool at all.
+ *     Search now goes to the server, debounced, as `CreatorRosterPage` does.
  *
  * Note: the slim roster row carries `display_name` + `country_code` + the
  * `creator_id` ULID, but NOT an avatar URL (only the member resource does),
  * so the avatar here is an initials placeholder.
  */
 
-import type { RosterCreatorListItem } from '@catalyst/api-client'
+import type { RosterCreatorListItem, RosterListParams } from '@catalyst/api-client'
 import { BlacklistBadge } from '@catalyst/ui'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -43,18 +48,25 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-// Fetch a wide single page so the client-side search + exclusion cover as
-// much of the roster as possible without a server round-trip (D-5). The
-// server `?q=` FTS stays deferred (D-7).
+// The result window per query. With search now server-side (D-5 reversed) this
+// bounds one page of results rather than the whole reachable roster.
 const ROSTER_PER_PAGE = 100
+const SEARCH_DEBOUNCE_MS = 300
 
 const roster = ref<RosterCreatorListItem[]>([])
 const memberIds = ref<Set<string>>(new Set())
 const loading = ref(false)
+// A search re-query, as distinct from the initial open — drives the field's
+// own spinner so the input never unmounts mid-type.
+const searching = ref(false)
 const error = ref<string | null>(null)
 const adding = ref(false)
-const search = ref('')
+// `clearable` hands back null on clear; every read goes through `searchTerm`.
+const search = ref<string | null>('')
 const selected = ref<Set<string>>(new Set())
+// Whether the agency has NO roster at all, captured on the unfiltered open
+// load — so a search matching nothing never renders as "you have no creators".
+const rosterEmptyUnfiltered = ref(false)
 
 /** Roster creators NOT already in the pool (client-side exclusion, D-3). */
 const available = computed<RosterCreatorListItem[]>(() =>
@@ -64,40 +76,78 @@ const available = computed<RosterCreatorListItem[]>(() =>
   }),
 )
 
-const filtered = computed<RosterCreatorListItem[]>(() => {
-  const q = search.value.trim().toLowerCase()
-  if (q === '') return available.value
-  return available.value.filter((row) =>
-    (row.attributes.display_name ?? '').toLowerCase().includes(q),
-  )
-})
+const searchTerm = computed(() => (search.value ?? '').trim())
+const hasSearch = computed(() => searchTerm.value !== '')
 
-/** Roster rows keyed by creator ULID — lets `addSelected` resolve a selected
- * id back to its blacklist status for the hard-only confirm (D-6/D-7). */
-const rosterById = computed<Map<string, RosterCreatorListItem>>(() => {
-  const map = new Map<string, RosterCreatorListItem>()
-  for (const row of roster.value) {
-    const id = row.attributes.creator_id
-    if (id !== null && id !== '') map.set(id, row)
-  }
-  return map
-})
+/**
+ * Every roster row seen since the dialog opened, keyed by creator ULID — lets
+ * `addSelected` resolve a selected id back to its blacklist status for the
+ * hard-only confirm (D-6/D-7).
+ *
+ * This ACCUMULATES rather than mirroring the current result set, because a
+ * selection survives a re-query: a creator picked under an earlier search term
+ * is no longer among the rows on screen, and resolving them against those rows
+ * alone would silently drop them from the confirm — turning the friction gate
+ * off for exactly the creator the user has lost sight of.
+ */
+const rosterById = ref<Map<string, RosterCreatorListItem>>(new Map())
 
-const rosterEmpty = computed(() => roster.value.length === 0)
-const allInPool = computed(() => roster.value.length > 0 && available.value.length === 0)
+// "Everyone is already in the pool" is only a truthful claim about the WHOLE
+// roster, so it is suppressed while a search narrows the set — a search that
+// happens to return only members is a no-match, not an exhausted roster.
+const allInPool = computed(
+  () => !hasSearch.value && roster.value.length > 0 && available.value.length === 0,
+)
 const canAdd = computed(() => selected.value.size > 0 && !adding.value)
+
+/**
+ * The roster query. Search runs SERVER-side (`?q=`) — see the D-5 note in the
+ * component docblock for why the previous local filter was a correctness bug.
+ *
+ * Sequence-guarded: a debounce in front of an async call still lets a slow
+ * early query land after a fast later one, so only the newest request writes.
+ */
+let requestSeq = 0
+let lastFetchedTerm: string | null = null
+
+async function fetchRoster(term: string): Promise<void> {
+  const seq = ++requestSeq
+  const params: RosterListParams = { per_page: ROSTER_PER_PAGE }
+  if (term !== '') params.q = term
+
+  try {
+    const res = await rosterApi.list(props.agencyId, params)
+    if (seq !== requestSeq) return
+    lastFetchedTerm = term
+    roster.value = res.data
+
+    const seen = new Map(rosterById.value)
+    for (const row of res.data) {
+      const id = row.attributes.creator_id
+      if (id !== null && id !== '') seen.set(id, row)
+    }
+    rosterById.value = seen
+
+    // Only an UNFILTERED read can tell us the roster is genuinely empty.
+    if (term === '') rosterEmptyUnfiltered.value = res.data.length === 0
+  } catch {
+    if (seq !== requestSeq) return
+    error.value = t('app.pools.addCreators.loadFailed')
+    roster.value = []
+  }
+}
 
 async function load(): Promise<void> {
   loading.value = true
   error.value = null
   selected.value = new Set()
   search.value = ''
+  rosterById.value = new Map()
   try {
-    const [rosterRes, membersRes] = await Promise.all([
-      rosterApi.list(props.agencyId, { per_page: ROSTER_PER_PAGE }),
+    const [, membersRes] = await Promise.all([
+      fetchRoster(''),
       talentPoolsApi.members(props.agencyId, props.poolId, { per_page: 25 }),
     ])
-    roster.value = rosterRes.data
     memberIds.value = new Set(membersRes.data.map((m) => m.id))
   } catch {
     error.value = t('app.pools.addCreators.loadFailed')
@@ -113,6 +163,22 @@ watch(
   },
   { immediate: true },
 )
+
+// Debounced server search — 300ms after the last keystroke, mirroring
+// CreatorRosterPage. Skipped when the term already matches what is on screen,
+// which absorbs both `load()`'s reset-to-empty and a type-then-backspace.
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+
+watch(searchTerm, (term) => {
+  if (searchTimer !== null) clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    if (term === lastFetchedTerm) return
+    searching.value = true
+    void fetchRoster(term).finally(() => {
+      searching.value = false
+    })
+  }, SEARCH_DEBOUNCE_MS)
+})
 
 function close(): void {
   emit('update:modelValue', false)
@@ -207,13 +273,16 @@ async function addSelected(): Promise<void> {
           {{ error }}
         </v-alert>
 
+        <!-- Stays mounted whenever a roster exists — including while a search
+             matches nothing, which is when the user needs to edit the term. -->
         <v-text-field
-          v-if="!loading && !rosterEmpty"
+          v-if="!loading && !rosterEmptyUnfiltered"
           v-model="search"
           density="compact"
           variant="outlined"
           hide-details
           clearable
+          :loading="searching"
           prepend-inner-icon="mdi-magnify"
           class="mb-3"
           :label="t('app.pools.addCreators.search')"
@@ -227,7 +296,7 @@ async function addSelected(): Promise<void> {
         />
 
         <div
-          v-else-if="rosterEmpty"
+          v-else-if="rosterEmptyUnfiltered"
           class="text-body-2 text-medium-emphasis py-4"
           data-test="add-creators-empty-no-roster"
         >
@@ -243,7 +312,7 @@ async function addSelected(): Promise<void> {
         </div>
 
         <div
-          v-else-if="filtered.length === 0"
+          v-else-if="available.length === 0"
           class="text-body-2 text-medium-emphasis py-4"
           data-test="add-creators-empty-search"
         >
@@ -252,7 +321,7 @@ async function addSelected(): Promise<void> {
 
         <v-list v-else data-test="add-creators-list">
           <v-list-item
-            v-for="row in filtered"
+            v-for="row in available"
             :key="row.attributes.creator_id ?? row.id"
             :data-test="`add-creators-row-${row.attributes.creator_id}`"
             @click="row.attributes.creator_id && toggleSelect(row.attributes.creator_id)"

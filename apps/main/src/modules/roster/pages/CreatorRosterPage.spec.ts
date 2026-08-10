@@ -374,6 +374,33 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     }
   })
 
+  it('survives the clearable X (v-model null) and re-queries without q', async () => {
+    // Vuetify's `clearable` writes null, not ''. Every read of the term used to
+    // call .trim() on it directly, so clearing the box threw and took the page
+    // down mid-render rather than simply dropping the filter.
+    const harness = await mountRoster({ rows: [makeRow()] })
+    cleanup = harness.cleanup
+    const vm = harness.wrapper.vm as unknown as { searchQuery: string | null }
+
+    vi.useFakeTimers()
+    try {
+      vm.searchQuery = 'ada'
+      await harness.wrapper.vm.$nextTick()
+      await vi.advanceTimersByTimeAsync(300)
+      expect(vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1]).toMatchObject({ q: 'ada' })
+
+      vi.mocked(rosterApi.list).mockClear()
+      vm.searchQuery = null
+      await harness.wrapper.vm.$nextTick()
+      await vi.advanceTimersByTimeAsync(300)
+
+      expect(rosterApi.list).toHaveBeenCalledTimes(1)
+      expect(vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1]).not.toHaveProperty('q')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('renders metrics as DISABLED affordances that issue no query (D-4)', async () => {
     const harness = await mountRoster({ rows: [makeRow()] })
     cleanup = harness.cleanup

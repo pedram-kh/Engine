@@ -53,7 +53,10 @@ const statusFilter = ref<StatusFilter>('all')
 const countryFilter = ref<string | null>(null)
 const languageFilter = ref<string | null>(null)
 const categoryFilter = ref<string | null>(null)
-const searchQuery = ref('')
+// `clearable` writes null on clear (the same reason the availability bounds
+// below are nullable), so every read goes through the trimmed `searchTerm`.
+const searchQuery = ref<string | null>('')
+const searchTerm = computed(() => (searchQuery.value ?? '').trim())
 
 // Availability range filter (Sprint 6.5, D-6). Two `'YYYY-MM-DD'` bounds;
 // the filter is sent only when BOTH are set (a one-sided range is ignored).
@@ -200,7 +203,7 @@ const hasActiveFilters = computed(
     countryFilter.value !== null ||
     languageFilter.value !== null ||
     categoryFilter.value !== null ||
-    searchQuery.value.trim() !== '' ||
+    searchTerm.value !== '' ||
     hasAvailabilityWindow.value,
 )
 
@@ -252,8 +255,7 @@ async function loadRoster(): Promise<void> {
     if (countryFilter.value !== null) params.country = countryFilter.value
     if (languageFilter.value !== null) params.language = languageFilter.value
     if (categoryFilter.value !== null) params.category = categoryFilter.value
-    const trimmedQuery = searchQuery.value.trim()
-    if (trimmedQuery !== '') params.q = trimmedQuery
+    if (searchTerm.value !== '') params.q = searchTerm.value
     // Availability window — both-or-neither (the backend ignores a one-sided
     // range, so we only thread it when complete).
     const from = availableFrom.value
@@ -305,7 +307,7 @@ watch(
 // (mirrors AgencyUsersPage). No existing list-search idiom to mirror beyond
 // the debounce shape itself, so this is the page's first search box.
 let searchTimer: ReturnType<typeof setTimeout> | null = null
-watch(searchQuery, () => {
+watch(searchTerm, () => {
   if (searchTimer !== null) clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
     tableOptions.value.page = 1
