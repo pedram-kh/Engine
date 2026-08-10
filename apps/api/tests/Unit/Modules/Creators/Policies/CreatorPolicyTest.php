@@ -9,6 +9,7 @@ use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Policies\CreatorPolicy;
+use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -497,4 +498,169 @@ it('canMessageRelationship returns false for an agency member who does not belon
     ]);
 
     expect(creatorPolicy()->canMessageRelationship($member, $creator, $qualifyingAgency))->toBeFalse();
+});
+
+// ---------------------------------------------------------------------------
+// Membership — NOT `users.type` — is the authority on the agency side.
+//
+// The public sign-up form is the only sign-up path and always stamps
+// `users.type = creator`; accepting an agency invitation adds the membership
+// row without flipping it. So a real agency admin normally carries
+// `type = creator` (26 of 30 live agency admins did when this was found), and
+// `view` / `canSeeContactDetails` / `canMessageRelationship` used to deny all
+// of them by checking the type instead of the membership.
+//
+// Every ALLOW case below is paired with its DENY case, because the entire
+// safety of dropping those type checks rests on a membership-LESS user still
+// being refused. What refuses them is that activeAgencyIds() is scoped to the
+// CALLER — so each deny case deliberately seeds a DIFFERENT user holding a real
+// accepted membership in the same agency. Without that row the deny specs pass
+// merely because no membership exists anywhere, which proves nothing; the first
+// draft of these specs had exactly that hole and the break-revert below caught
+// it.
+//
+// Break-revert (verified): drop the `where('user_id', …)` filter in
+// activeAgencyIds() → the three creator-typed-NON-member deny specs go red →
+// restore. Note that deleting the `$agencyIds === []` early-return in
+// hasNonBlacklistedRelation() does NOT redden anything, because an empty
+// `whereIn` already compiles to `0 = 1` — that early-return saves a query, it
+// is not the gate.
+// ---------------------------------------------------------------------------
+
+it('view returns true for a creator-TYPED agency member (the production shape) with a non-blacklisted relation', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->creatorTypedAgencyMember($agency)->createOne();
+    $creator = Creator::factory()->createOne();
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'is_blacklisted' => false,
+    ]);
+
+    // Guard the premise: the factory really does reproduce the live shape.
+    expect($member->type)->toBe(UserType::Creator)
+        ->and(creatorPolicy()->view($member, $creator))->toBeTrue();
+});
+
+it('view returns false for a creator-typed user with NO membership, even when a clean relation exists', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $outsider = User::factory()->creator()->createOne();
+    $creator = Creator::factory()->createOne();
+
+    // Somebody ELSE is a legitimate accepted member of this agency. Without
+    // this row the spec would pass merely because the agency has no members at
+    // all, which would not prove the membership lookup is scoped to the CALLER.
+    User::factory()->creatorTypedAgencyMember($agency)->createOne();
+
+    // The relation is real, but it belongs to an agency this user has no
+    // membership in — the empty-membership path must refuse.
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->view($outsider, $creator))->toBeFalse();
+});
+
+it('canSeeContactDetails returns true for a creator-TYPED agency member on a non-blacklisted ROSTER relation', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->creatorTypedAgencyMember($agency)->createOne();
+    $creator = Creator::factory()->createOne();
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::Roster,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canSeeContactDetails($member, $creator, $agency))->toBeTrue();
+});
+
+it('canSeeContactDetails returns false for a creator-typed user with NO membership in the target agency', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $outsider = User::factory()->creator()->createOne();
+    $creator = Creator::factory()->createOne();
+
+    // A legitimate member of the same agency exists — so a pass here could only
+    // come from the membership lookup leaking across users.
+    User::factory()->creatorTypedAgencyMember($agency)->createOne();
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::Roster,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canSeeContactDetails($outsider, $creator, $agency))->toBeFalse();
+});
+
+it('canMessageRelationship returns true for a creator-TYPED agency member on a qualifying relation', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $member = User::factory()->creatorTypedAgencyMember($agency)->createOne();
+    $creator = Creator::factory()->approved()->createOne();
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::Roster,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canMessageRelationship($member, $creator, $agency))->toBeTrue();
+});
+
+it('canMessageRelationship returns false for a creator-typed NON-member, even on a qualifying relation', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $outsider = User::factory()->creator()->createOne();
+    $creator = Creator::factory()->approved()->createOne();
+
+    // A legitimate member of the same agency exists, so the refusal must come
+    // from the caller-scoped membership lookup rather than from an empty table.
+    User::factory()->creatorTypedAgencyMember($agency)->createOne();
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::Roster,
+        'is_blacklisted' => false,
+    ]);
+
+    // Not the owning creator either — an unrelated creator account.
+    expect(creatorPolicy()->canMessageRelationship($outsider, $creator, $agency))->toBeFalse();
+});
+
+it('canMessageRelationship still refuses a platform admin who DOES hold an agency membership', function (): void {
+    $agency = AgencyFactory::new()->createOne();
+    $admin = User::factory()->platformAdmin()->createOne();
+    $creator = Creator::factory()->approved()->createOne();
+
+    // The membership makes the admin pass the membership check, so the refusal
+    // has to come from the explicit platform-admin branch — admins are never
+    // party to a 1:1 thread, and that must not rely on them happening to hold
+    // no membership row.
+    AgencyMembershipFactory::new()->state([
+        'agency_id' => $agency->id,
+        'user_id' => $admin->id,
+        'role' => AgencyRole::AgencyAdmin,
+        'accepted_at' => now(),
+    ])->create();
+
+    AgencyCreatorRelation::factory()->createOne([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+        'relationship_status' => RelationshipStatus::Roster,
+        'is_blacklisted' => false,
+    ]);
+
+    expect(creatorPolicy()->canMessageRelationship($admin, $creator, $agency))->toBeFalse();
+});
+
+it('viewAny stays platform-admin-only for a creator-typed agency member (membership is not admin rights)', function (): void {
+    $member = User::factory()->creatorTypedAgencyMember()->createOne();
+
+    expect(creatorPolicy()->viewAny($member))->toBeFalse();
 });

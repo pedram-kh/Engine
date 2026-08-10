@@ -26,6 +26,29 @@ use Illuminate\Auth\Access\HandlesAuthorization;
  *                     `adminUpdate` method on the admin-route table.
  *   - approve/reject: deferred to Sprint 4 explicitly (admin actions).
  *
+ * ── `users.type` is NOT how you identify an agency teammate ─────────────────
+ *
+ * The agency-facing methods here key off ACCEPTED MEMBERSHIP
+ * ({@see self::activeAgencyIds()}), never off `users.type === AgencyUser`. That
+ * is not a style preference — a `users.type` check is WRONG for this question.
+ * The only sign-up path the platform exposes (Identity's SignUpService)
+ * hard-codes `UserType::Creator`, and accepting an agency invitation
+ * (Agencies' AgencyInvitationService::accept()) adds the membership row WITHOUT
+ * flipping the type. So a real agency admin normally carries `type = creator`;
+ * on production 26 of 30 agency admins did when this was found.
+ * `UserType::AgencyUser` is only ever set out-of-band — the CreateAdminUser
+ * console command and the test-helper endpoints.
+ *
+ * Three methods here previously gated on the type and therefore denied the
+ * majority of live agency admins their contact details, relationship messaging
+ * and creator profiles. The SPA already had this right: its `requireAgencyUser`
+ * guard bounces only a creator-typed user holding NO membership.
+ *
+ * `UserType` remains the correct authority for the PLATFORM-ADMIN questions
+ * below (viewAny / adminUpdate / approve / reject and the two explicit admin
+ * branches), which are about the kind of principal rather than about
+ * belonging to a tenant.
+ *
  * Defense-in-depth (#40): every method ships with independent unit-test
  * coverage. Break-revert: temporarily flip a method to true/false,
  * confirm a test fails, revert.
@@ -124,11 +147,9 @@ final class CreatorPolicy
             return true;
         }
 
-        if ($user->type !== UserType::AgencyUser) {
-            return false;
-        }
-
         // Caller must actively belong to THIS agency (not merely any agency).
+        // Membership, NOT `users.type`, is the authority — see the class
+        // docblock's note on creator-typed agency teammates.
         if (! in_array($agency->id, $this->activeAgencyIds($user), true)) {
             return false;
         }
@@ -190,12 +211,18 @@ final class CreatorPolicy
             return true;
         }
 
+        // Platform admins are never party to a 1:1 thread, and this stays an
+        // EXPLICIT exclusion rather than a side effect of them holding no
+        // membership row — the guarantee should not depend on that accident.
+        if ($user->type === UserType::PlatformAdmin) {
+            return false;
+        }
+
         // Agency side — an ACTIVE member of THIS agency (org-level: any active
         // member of the connected agency may participate, AH-010 Q4). A
         // multi-agency user only passes for the agency that actually holds the
-        // qualifying relation.
-        return $user->type === UserType::AgencyUser
-            && in_array($agency->id, $this->activeAgencyIds($user), true);
+        // qualifying relation. Membership, NOT `users.type`, is the authority.
+        return in_array($agency->id, $this->activeAgencyIds($user), true);
     }
 
     /**
@@ -246,10 +273,14 @@ final class CreatorPolicy
      */
     private function hasAgencyAccess(User $user, Creator $creator): bool
     {
-        if ($user->type !== UserType::AgencyUser) {
-            return false;
-        }
-
+        // Membership, NOT `users.type`, is the authority. What keeps this from
+        // widening to every signed-in user is that {@see self::activeAgencyIds()}
+        // is scoped to THIS caller: a non-member yields an empty list, and an
+        // empty list matches no relation. (Verified by break-revert — dropping
+        // the `user_id` filter there turns all three agency-side abilities
+        // permissive and reddens the deny specs. The `$agencyIds === []`
+        // early-return in hasNonBlacklistedRelation() is a round-trip saver, not
+        // the safety net: an empty `whereIn` already compiles to `0 = 1`.)
         return $this->hasNonBlacklistedRelation($creator, $this->activeAgencyIds($user));
     }
 

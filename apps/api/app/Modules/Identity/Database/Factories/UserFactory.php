@@ -148,11 +148,32 @@ final class UserFactory extends Factory
             });
     }
 
-    private function agencyMember(?Agency $agency, AgencyRole $role): static
-    {
+    /**
+     * The PRODUCTION shape of an agency teammate: an accepted membership with a
+     * real role, while `users.type` is still `creator`.
+     *
+     * This is what the live data looks like for the majority of agency admins,
+     * and it is not an anomaly: the public sign-up form is the only sign-up path
+     * and always stamps `UserType::Creator`, while accepting an agency
+     * invitation adds the membership without flipping the type. Use this state
+     * (rather than {@see self::agencyAdmin()}) whenever a test needs to prove
+     * that an agency-side check keys off MEMBERSHIP and not off `users.type`.
+     */
+    public function creatorTypedAgencyMember(
+        ?Agency $agency = null,
+        AgencyRole $role = AgencyRole::AgencyAdmin,
+    ): static {
+        return $this->agencyMember($agency, $role, UserType::Creator);
+    }
+
+    private function agencyMember(
+        ?Agency $agency,
+        AgencyRole $role,
+        UserType $type = UserType::AgencyUser,
+    ): static {
         return $this
             ->state(fn (array $attributes): array => [
-                'type' => UserType::AgencyUser,
+                'type' => $type,
             ])
             ->afterCreating(function (User $user) use ($agency, $role): void {
                 $agency ??= AgencyFactory::new()->createOne();
