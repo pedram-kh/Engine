@@ -383,9 +383,15 @@ Run these steps **in order**. Do not skip step 1.
    its identifier — it goes in the deploy record (step 6) and is what you restore
    from if step 2 or 4 goes wrong. **Never** proceed to a migration on the word
    of a snapshot you have not seen finish.
-2. **`php artisan migrate`.** Migrations are additive-first (§5.40); a deploy
-   should not carry a destructive migration without a separately-reviewed plan.
-   Read the output — confirm the exact migration range that ran.
+2. **Deploy the code, then `php artisan migrate`.** The code deploy includes
+   `composer install --no-dev` — **install hooks verified inert, see the
+   2026-08-11 incident** (`post-install-cmd`/`post-update-cmd`/`post-autoload-dump`
+   pinned by `tests/Feature/Core/ComposerInstallHooksTest.php` to never call
+   `key:generate` or touch `.env`; that install hook rotating the live `APP_KEY`
+   on every deploy is exactly what happened before the pin existed). Migrations
+   are additive-first (§5.40); a deploy should not carry a destructive migration
+   without a separately-reviewed plan. Read the output — confirm the exact
+   migration range that ran.
 3. **Infra changes** — cron/scheduler lines (the §7 `schedule:run` entry), env
    var changes, worker (re)starts (§4 deploy hook). Apply these before running
    any command that depends on them.

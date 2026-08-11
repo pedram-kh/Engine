@@ -716,6 +716,12 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
   `campaign_job_notifications`) now both return `true`. Full incident detail, and what's honestly
   still unreconstructed about its timeline, is in
   [`deploy-log.md`](../runbooks/deploy-log.md)'s 2026-07-31 entry, "Anything unexpected."
+- **🔴 `APP_KEY` exists only in one `.env` file on one volume — OPEN (AH-067).** The 2026-08-11
+  incident's near-miss: recovery depended on the old key still sitting in a running queue worker's
+  process memory, retrievable only via a host-side `ptrace` dump. No durable second copy exists
+  anywhere. Belongs in AWS Secrets Manager (or at minimum a securely stored second copy). Trigger:
+  before the next infra change touching the API container or its volume. Full posture in
+  `tech-debt.md`; the rotation-cause fix (not the storage gap) is AH-067 in `adhoc-changes-log.md`.
 - **🔴 `APP_ENV=local` on production, with `TEST_HELPERS_TOKEN` non-empty — OPEN.** Found alongside
   the GRANTs incident: production logs and the middleware stack indicate `APP_ENV=local`, which
   leaves the test-helpers surface (`/api/v1/_test/*`) reachable — including a route that mints a

@@ -54,15 +54,49 @@ happened.
 
 ---
 
-## 2026-08-11 · Two production bug fixes (creator-typed agency admins, roster-picker search) — PENDING
+## 2026-08-11 · Composer install-hook fix (AH-067) — PENDING
+
+- **Status:** **PENDING.** Pushed to `origin/main` in this pass. Not yet deployed — this sits
+  atop the entry below, which is already `DEPLOYED`.
+- **Range:** `6cdf0a5` → `b13ee71` — **1 code commit** (plus the docs commit that follows it in
+  the same push):
+  - `b13ee71` — `fix(api): stop composer install from rotating the production APP_KEY (AH-067)`.
+- **AH entries carried:** **AH-067.**
+- **Migrations run:** **none.**
+- **Pre-deploy reads:** **none.**
+- **Snapshot ID:** _not applicable_ — no schema or data change; the fix edits install-time
+  tooling (`composer.json` script hooks) plus a test file. Nothing this deploy touches can be
+  destructive, so the standing "never skip step 1" rule is noted as satisfied-by-shape rather than
+  literally applied — flagging that judgment explicitly rather than silently skipping the field.
+- **Infra:** **none required to take effect immediately.** The fix only changes what
+  `composer install` does the _next_ time it runs — it has no effect on the code or process
+  currently running in production, so there is no urgency comparable to the AH-065/AH-066 PHP-FPM
+  reload. It should still ship on the next normal deploy so the landmine is gone before the next
+  `composer install --no-dev` fires, whenever that is.
+- **One-shot commands:** **none.**
+- **Post-deploy verification:** once deployed, confirm `composer.json` on the box no longer
+  contains `post-install-cmd`, and that a subsequent `composer install` does not log a
+  `key:generate` line.
+- **Flags armed:** **none — this range touches no flag.**
+- **Operator:** _TBD._
+- **Anything unexpected:** none — this is the planned follow-up fix for the incident recorded in
+  the entry directly below.
+
+---
+
+## 2026-08-11 · Two production bug fixes (creator-typed agency admins, roster-picker search) — DEPLOYED
 
 > **Update:** the 2026-07-31 entry below has now been closed out retroactively (see its own
 > `DEPLOYED` status and evidence) in the same pass that wrote this note, so this entry no longer
 > sits stacked above an open predecessor.
 
-- **Status:** **PENDING** — reviewed and approved by Pedram; the verbatim check against the
-  AH-065/AH-066 report found no divergences. Pushed to `origin/main` in this pass — **Pedram
-  deploys from here.**
+- **Status:** **DEPLOYED.** Reviewed and approved by Pedram; the verbatim check against the
+  AH-065/AH-066 report found no divergences; pushed to `origin/main`. The deploy itself completed
+  successfully — after an incident and recovery during the `composer install` step (see "Anything
+  unexpected" below), which is why this entry's status moved straight to `DEPLOYED` rather than
+  sitting in `PENDING` waiting on a clean run. **On-box HEAD: not yet supplied** — record it here
+  once Pedram has it; the pushed range below is what was _shipped_, not independently confirmed
+  as what the box is _running_.
 - **Range:** `6601ba0` → `6cdf0a5` — **3 commits** (`ec8cd00` docs-only, then the two fixes):
   - `ec8cd00` — `docs(runbooks): deploy log — record of production deploys, today's entry pending`
     (this file's own creation; no runtime change).
@@ -95,14 +129,35 @@ happened.
   admins this deploy exists to fix. `apps/main`'s SPA bundle needs its normal rebuild + redeploy for
   the picker fix to reach browsers — standard for any frontend change, not new here.
 - **One-shot commands:** **none.**
-- **Post-deploy verification:** _TBD_ — the standard `/up` 200 + one authenticated request, plus
+- **Post-deploy verification:** _TBD — smoke results not yet supplied; update from TBD to actual
+  as Pedram provides them._ The standard checks remain `/up` 200 + one authenticated request, plus
   two fix-specific reads that cost nothing: (1) a `creator`-typed agency admin (or the SQL query
   Pedram already ran) can see a connected creator's contact details and send a relationship
   message; (2) the campaign-invite or add-to-pool search finds a creator known to sit past the old
-  100-row alphabetical cutoff.
+  100-row alphabetical cutoff. **Additionally required after this incident, before calling smoke
+  clean:** confirm a TOTP-enrolled user can still complete 2FA sign-in against the _recovered_ key
+  — MFA was down platform-wide mid-deploy, and "recovered" is only proven by a real decrypt/verify
+  round-trip on live traffic, not by the recovery procedure's own internal check alone.
 - **Flags armed:** **none — this range touches no flag.**
 - **Operator:** _TBD._
-- **Anything unexpected:** _TBD._
+- **Anything unexpected: yes — an `APP_KEY` rotation mid-deploy, MFA down platform-wide, fully
+  recovered.** During this deploy, `composer install --no-dev` fired the repo's install-time
+  script chain, which included `@php artisan key:generate` in `post-install-cmd` — a hook Composer
+  runs on **every** install, not just first scaffold (see AH-067, above). This **rotated the live
+  production `APP_KEY`**. **Immediate effect:** every TOTP/MFA secret and every session became
+  undecryptable under the new key — MFA down platform-wide. **Not affected:** business data,
+  passwords (bcrypt/argon2 hashes are key-independent), and files. **Timeline mattered:**
+  containers had already been restarted _before_ the `composer install` step, so the running
+  queue/schedule workers still held the **old** key in memory even after `.env` on disk had the
+  new one. **Recovery:** the old key was extracted from the still-running queue worker's process
+  memory via a **host-side** memory dump (`ptrace` from the host — in-container `gcore` was
+  permission-denied), verified by successfully decrypting a stored TOTP secret with it, then
+  restored to `.env`, `php artisan config:cache` re-run, and PHP-FPM reloaded. **Outcome: full
+  recovery, zero data loss, no user action required.** The deploy then completed successfully.
+  **Root cause fixed, not worked around:** `composer.json`'s `post-install-cmd` duplicated
+  `key:generate` and the `.env` bootstrap copy — both already correctly scoped to
+  `post-create-project-cmd`/`post-root-package-install` (Composer hooks that fire once, at
+  scaffolding, never on a redeploy). Fixed and pinned same-day — see **AH-067**.
 
 ---
 

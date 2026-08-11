@@ -70,6 +70,61 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-067 · `composer install` was silently rotating the production `APP_KEY` — the hook is gone, and it's pinned
+
+- **Status:** Landed
+- **Commit:** `b13ee71` — `fix(api): stop composer install from rotating the production APP_KEY (AH-067)`
+  (the fix + the pinning test). Docs (this entry, the deploy-log incident record, the runbook and
+  process-doc notes, the tech-debt entry) land in a separate, docs-only commit — see this file's
+  header commit list at push time.
+- **Date:** 2026-08-11
+- **Why:** during the AH-065/AH-066 deploy, `composer install --no-dev` triggered an `APP_KEY`
+  rotation in production, taking MFA down platform-wide. The full incident — symptom, timeline,
+  recovery, outcome — is recorded verbatim in
+  [`deploy-log.md`](../runbooks/deploy-log.md)'s 2026-08-11 entry, "Anything unexpected"; this
+  entry covers the **fix and the pin**, not a second copy of the incident narrative.
+- **What:** `apps/api/composer.json`'s `post-install-cmd` carried both
+  `"@php -r \"file_exists('.env') || copy('.env.example', '.env');\""` and
+  `"@php artisan key:generate --ansi"`. Stock Laravel doesn't have a `post-install-cmd` at all —
+  those two commands belong to `post-root-package-install` and `post-create-project-cmd`
+  respectively, hooks Composer fires **once**, at `composer create-project` scaffolding, never
+  again. This project's `post-install-cmd` fired on **every** `composer install`/`update`,
+  including a production deploy's `composer install --no-dev`. Both commands were already present,
+  correctly scoped, in the once-only hooks — so the fix is a straight **removal** of the duplicate
+  four lines from `post-install-cmd`, not a move; nothing a fresh `composer create-project` needs
+  is lost.
+- **Provenance — this had been visible for a long time and never read as a production risk.**
+  `docs/reviews/sprint-1-chunk-7-1-review.md` (Sprint 1) already notes in passing that "the
+  composer post-install hook runs `php artisan key:generate` before migrations" — as a _CI_
+  observation, where a fresh throwaway `APP_KEY` every run is invisible and harmless. The same
+  hook, on the same trigger, is catastrophic the moment it runs against a live database instead of
+  a disposable CI one. Nobody connected the two contexts until this deploy did it for real.
+- **Touched:** `apps/api/composer.json` (4-line removal), new
+  `tests/Feature/Core/ComposerInstallHooksTest.php`. **No migration, no route, no Resource/Controller
+  change, no i18n key** — this is install-time tooling, not application code.
+- **The pin, source-scan style.** `ComposerInstallHooksTest` parses `composer.json` and asserts,
+  for every command under `post-install-cmd`, `post-update-cmd`, and `post-autoload-dump` (the
+  three hooks Composer fires on **every** install/update): no occurrence of `key:generate`, no
+  occurrence of `.env`. A counter-test asserts the **opposite** for the once-only hooks —
+  `post-create-project-cmd` still calls `key:generate`, `post-root-package-install` still
+  bootstraps `.env` — so the fix can't be read as "delete these commands everywhere," which would
+  quietly break a fresh scaffold. Break-revert: re-added the two lines to `post-install-cmd`,
+  watched the first test go red naming the exact violation, reverted, confirmed green.
+- **Risk line:** touches install-time **tooling** — not a migration, not an API/resource shape,
+  not a validation rule, not a gate/policy, not a notification/mail path, not an i18n keyset, and
+  none of the platform's named pinned surfaces. The **production impact of the underlying bug**
+  was severe (MFA down platform-wide); the **fix itself** is a same-day, zero-runtime-code, 4-line
+  removal with a pinning test — the risk asymmetry between the incident and the fix is the point.
+- **Docs:** `production-queue-worker.md` §8 step 2 now names the composer install step explicitly
+  and notes the hooks are verified inert (pointing at this incident);
+  `WORKING-PROCESS.md` §5 and `PROJECT-WORKFLOW.md` §5.40 both gain the standing rule — install-time
+  tooling must never mutate secrets or `.env`. Tech-debt gains a **separate, still-open** entry:
+  `APP_KEY` living in exactly one `.env` file on one volume is a distinct structural gap this fix
+  does not close (it stops the key from rotating unexpectedly; it doesn't give the key a second,
+  durable copy). `RESUMPTION-TEMPLATE.md`'s Open threads references both.
+- **Gates:** `apps/api` — the two new tests pass (16 assertions), break-revert confirmed red on the
+  violation and green on the fix; full `composer stan`/`pint`/`test` run below.
+
 ### AH-066 · The campaign-invite and talent-pool pickers search the roster server-side — the 100-row page was also the alphabet's ceiling
 
 - **Status:** Landed

@@ -162,6 +162,8 @@ Mirrors the `PROJECT-WORKFLOW.md` §5 standard:
   → record deploy + snapshot ID.
 - New emails/notifications to real users ship flag-gated (default OFF), with
   dry-run previews and per-run caps where volume is possible.
+- **Install-time tooling must never mutate secrets or `.env`** — pinned by
+  architecture test since the 2026-08-11 `APP_KEY` incident (AH-067).
 
 ---
 

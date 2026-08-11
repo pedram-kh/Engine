@@ -9,6 +9,37 @@ anyone reviewing it later.
 
 ---
 
+## `APP_KEY` exists only in one `.env` file on one volume (OPEN)
+
+- **Where:** production, `apps/api/.env`'s `APP_KEY` — the key that decrypts every TOTP/MFA
+  secret, every session, and every `encrypted` cast column.
+- **What we accepted (2026-08-11, discovered during the AH-067 incident):** the key's **only**
+  durable copy is a plaintext line in one file on one container's volume. Its only other existence
+  is transient — in the memory of whatever process currently has it loaded (queue worker, FPM).
+  The incident's near-miss made this concrete: recovery depended on the old key still sitting in a
+  running queue worker's process memory, retrievable only via a host-side `ptrace` dump, because
+  the container's own `gcore` was permission-denied. If that worker had also restarted before
+  recovery — or if the deploy's timing had been five minutes different — the key would have been
+  gone with **no second copy anywhere**, and every TOTP secret and session would have been
+  permanently, not temporarily, unrecoverable.
+- **Why it is debt rather than a one-off:** a single-file, single-volume secret with no backup
+  channel is a structural gap, not an incident-specific one — it is exactly as exposed the day
+  after this incident as the day before it, the recovery just happened to work this time. Nothing
+  about the fix in AH-067 (which stops the key from _rotating_ unexpectedly) changes where the key
+  _lives_, which is the separate problem this entry tracks.
+- **The fix when it comes:** move `APP_KEY` into AWS Secrets Manager (or, as a floor, a securely
+  stored second copy outside the container/volume that holds the live one) — read at boot, never
+  written back to a mutable file the way `.env` is. `docs/00-MASTER-ARCHITECTURE.md`'s AWS
+  footprint is the natural home; no new infrastructure family needed, only a new secret and the
+  boot-time wiring to read it.
+- **Trigger to escalate:** before the next infra change that touches the API container or its
+  volume — a rebuild, a migration to a new host, or a container-runtime change is exactly the kind
+  of event that could lose the one copy this entry describes.
+- **Resolve by:** no hard date. Revisit at the next infra/secrets pass.
+- **Status:** OPEN.
+
+---
+
 ## PHPStan and Pest can exhaust PHP's memory limit and still exit 0 (OPEN)
 
 - **Where:** `apps/api`'s CLI gates — `./vendor/bin/phpstan analyse` and `./vendor/bin/pest`, run
