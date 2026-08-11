@@ -9,6 +9,35 @@ anyone reviewing it later.
 
 ---
 
+## PHPStan and Pest can exhaust PHP's memory limit and still exit 0 (OPEN)
+
+- **Where:** `apps/api`'s CLI gates — `./vendor/bin/phpstan analyse` and `./vendor/bin/pest`, run
+  from a plain shell with PHP's stock 128 MB CLI `memory_limit` (no repo-level CLI `php.ini`
+  override).
+- **What we found (2026-08-10/11, gating the AH-065/AH-066 fixes):** both tools are long-running
+  PHP processes that analyse or boot the entire application; on a cold run each can exceed 128 MB
+  before finishing. When the memory limit kills the process mid-run, PHP prints a fatal "Allowed
+  memory size exhausted" error to stderr — **but the process's own exit code is still 0.** Any
+  script or CI step that checks only the exit code (`command && next-step`, `if command; then`)
+  reads a crashed, partial analysis or test run as **PASS**. Both full runs in this session needed
+  `php -d memory_limit=2G` to complete without truncation; run at the default limit, either would
+  have silently reported success on a fraction of the suite.
+- **Why it is debt rather than a one-off:** it is a gap in how the gate is **invoked**, not in the
+  code being analysed, so it recurs on every fresh shell or CI runner that keeps PHP's default CLI
+  limit. It is also asymmetric with every other gate in this project: Vitest, Playwright, and
+  ESLint all fail loudly on a crash; these two currently do not.
+- **The fix when it comes:** pin the CLI `memory_limit` for these two commands specifically —
+  a checked-in CLI `php.ini`/`.user.ini` override, a wrapper script, or the CI image's PHP config —
+  **and** have whatever invokes them assert on output content (PHPStan's summary line, Pest's
+  `Tests:` line) rather than exit code alone, so a memory-exhaustion crash fails the gate instead
+  of passing it.
+- **Trigger to escalate:** the next time this actually truncates a **CI** run (not just an ad hoc
+  local shell) and a gate reports green on a partial analysis.
+- **Resolve by:** no hard date. Revisit at the next CI/tooling pass.
+- **Status:** OPEN.
+
+---
+
 ## The 5.6 MB creator-guide PDF ships inside the SPA bundle instead of a CDN (OPEN)
 
 - **Where:** `apps/main/public/creator-guide.pdf`, linked from `CreatorGuideCta.vue` on the

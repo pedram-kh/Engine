@@ -707,6 +707,23 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
 
 ### Open threads
 
+- **✅ The `campaign_applications`/`campaign_job_notifications` GRANTs — verified resolved
+  (2026-08-11).** A colleague's deploy of the 2026-07-31 range surfaced
+  `SQLSTATE[42501]: permission denied for table campaign_applications` in production: the
+  migrating role created chunk 3's two new tables but the app's own DB role (`engine_c_user`) was
+  never separately granted access to them. Pedram's `has_table_privilege('engine_c_user',
+'campaign_applications', 'SELECT,INSERT,UPDATE')` (and the same for
+  `campaign_job_notifications`) now both return `true`. Full incident detail, and what's honestly
+  still unreconstructed about its timeline, is in
+  [`deploy-log.md`](../runbooks/deploy-log.md)'s 2026-07-31 entry, "Anything unexpected."
+- **🔴 `APP_ENV=local` on production, with `TEST_HELPERS_TOKEN` non-empty — OPEN.** Found alongside
+  the GRANTs incident: production logs and the middleware stack indicate `APP_ENV=local`, which
+  leaves the test-helpers surface (`/api/v1/_test/*`) reachable — including a route that mints a
+  `super_admin` user — if `TEST_HELPERS_TOKEN` matches the value published in
+  `apps/api/.env.example`. **Not verified or closed by anything in this session or in the
+  AH-065/AH-066 pass.** Immediate mitigation without a redeploy: blank `TEST_HELPERS_TOKEN` in the
+  deployed `.env` and `php artisan config:cache`; the proper fix is `APP_ENV=production` +
+  `APP_DEBUG=false` + cache/restart. Owner: Pedram.
 - **🔴 The Meta Pixel's consent gate — the batch's one open commitment (AH-064).** The pixel ships
   un-gated by Pedram's recorded decision, against the project's own §2.1/§2.7 commitments and with UK
   PECR applying directly. **It goes live the moment this batch deploys**, and there is no flag to hold

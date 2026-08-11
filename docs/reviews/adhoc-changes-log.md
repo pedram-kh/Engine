@@ -70,6 +70,148 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-066 · The campaign-invite and talent-pool pickers search the roster server-side — the 100-row page was also the alphabet's ceiling
+
+- **Status:** Landed
+- **Commit:** `6cdf0a5` — `fix(pickers): search the roster server-side so every creator is reachable`.
+- **Date:** 2026-08-11
+- **Why:** Pedram could not find a connected creator ("Rita") in the campaign invite dialog's
+  search box, despite the creator being rostered with the agency.
+- **What:** `InviteCreatorsDialog` and `AddCreatorsToPoolDialog` fetched **one 100-row page** of
+  the roster on open and filtered it **client-side**. 100 is also the server's hard page cap and
+  neither dialog asked for page 2, so on a roster past that size the alphabet's tail was not
+  merely hard to search — it was **never fetched**, unreachable by scrolling and impossible to
+  invite. The agency that reported it has **176 creators**, leaving 76 uninvitable. Both dialogs
+  now send `?q=` debounced at 300ms, mirroring the pattern `CreatorRosterPage` already used, with
+  a sequence guard so a slow early response cannot overwrite a newer one.
+- **Touched:** `apps/main` — `modules/campaigns/components/InviteCreatorsDialog.vue` + new spec,
+  `modules/pools/components/AddCreatorsToPoolDialog.vue` + spec,
+  `modules/roster/pages/CreatorRosterPage.vue` + spec. **No backend diff, no route, no migration,
+  no i18n key** — `rosterApi.list`'s `q` param already existed and was simply never wired into
+  these two callers.
+- **Pre-existing, and old.** Neither dialog is arc work. `InviteCreatorsDialog` dates to `5b3d711`
+  (2026-06-05, Sprint 8 Chunk 2); `AddCreatorsToPoolDialog` to `2484357` (2026-06-04) — both two
+  months before the Jobs Board arc (AH-053, earliest 2026-07-24) and before every deploy on
+  record, including the 2026-07-26 AH-051/052 deploy. The 100-row ceiling shipped on day one of
+  each dialog and survived at least two production deploys before anyone hit an agency large
+  enough to expose it.
+- **Three fixes fall out of the one root cause.** The **empty states split**: a search matching
+  nothing now renders no-match rather than the generic no-roster state, which also stops the
+  search field itself being unmounted mid-edit — the old behaviour trapped the user by removing
+  the box they were typing in. **`clearable` writes `null`**, which the `.trim()` reads
+  downstream threw on; the search ref is nullable now in all three components, read through one
+  trimmed accessor. And moving to server-side search meant the **pool dialog's hard-blacklist
+  confirm** could no longer resolve a selected creator against rows that had scrolled out of the
+  current query — `rosterById` changed from a computed (current page only) to an
+  **accumulating map** across every query the dialog has run since opening, so a creator selected
+  under an earlier search term still trips the blacklist gate. Skipping that gate silently is a
+  safety regression, not a cosmetic one.
+- **Risk line, explicit per surface named:** no migration, no API/resource-shape change (both
+  dialogs call the pre-existing `rosterApi.list({ q })`, unchanged shape), no validation rule, no
+  gate/policy, no notification/mail path, no i18n keyset — the "Showing X of Y" hint Pedram was
+  offered was explicitly declined. None of the named pinned surfaces (jobs-board predicate,
+  listing gate, application endpoints, board column negatives, D5 mapping, the pixel mount, the
+  glow-token contract) are touched; grepped both architecture-spec directories for either
+  component and for `CreatorPolicy` and found no reference. It **does** sit under two
+  E2E-traversed surfaces: `AddCreatorsToPoolDialog` (`talent-pools.spec.ts`, asserts
+  `add-creators-row-*`) and `CreatorRosterPage` (`roster-search-and-affordances.spec.ts`) — both
+  green on the full run below.
+- **Adjacent to, but not caused by or a workaround for, the missing `campaign_applications`
+  GRANTs.** The invite this dialog completes ends in `CampaignAssignmentController::store`, which
+  unconditionally calls `settlePendingApplication()` against `campaign_applications` in the same
+  transaction. If those GRANTs are still missing on production, an invite sent through this
+  now-fixed picker hits the same `SQLSTATE[42501]` already reported — that exposure sits on the
+  invite endpoint itself and predates this fix entirely. This change widens **who is reachable to
+  invite**; it does not change **what happens** once an invite is sent, so it neither depends on
+  nor repairs the GRANTs gap. Unrelated to `APP_ENV=local` on the same grounds — nothing here
+  reads environment or debug configuration.
+- **Test-gap closure.** `InviteCreatorsDialog` had **zero spec coverage at any layer** —
+  no unit test, no E2E traversal — before this fix. That absence is precisely how a
+  76-creator-invisible bug shipped and stayed invisible through two deploys; it gets nine tests
+  now (`InviteCreatorsDialog.spec.ts`, new), covering the debounced query, reaching creators past
+  page one (the original bug, reproduced and then fixed), both empty states, `clearable`, and
+  stale-response ordering. The pool dialog's existing D-5 test — which had pinned the client-side
+  filter that **was** the bug — is rewritten against the server-side behaviour, plus new tests for
+  the accumulating blacklist map. `CreatorRosterPage.spec.ts` gains one test for the `clearable`
+  crash. Break-revert on each: restoring the client-side filter reddens five invite specs;
+  reverting the accumulating map reddens the blacklist-confirm test; restoring the bare `.trim()`
+  reddens the roster page's clear spec.
+- **Gates:** `apps/main` Vitest **1457 / 151 files** (incl. `i18n-locale-parity.spec.ts`, green —
+  no locale file was touched); typecheck clean; ESLint 0 errors (2 pre-existing warnings, both in
+  files this change does not touch). Full Playwright, dev stack cold-started for the run: **27/27
+  effective** — 26 green on the first pass, one unrelated cold-start flake
+  (`2fa-enrollment-and-sign-in.spec.ts`, spec #19 — a locator timeout in 2FA enrollment, which
+  shares no code with either dialog) green on isolated re-run, matching the flake class AH-064
+  already documented. No spec's assertions were altered to reach green. `apps/admin` carries no
+  diff from this change and was not re-run. No Pest / Pint / PHPStan: `apps/api/**` untouched.
+
+### AH-065 · Agency-side `CreatorPolicy` checks stop gating on `users.type` — membership is the only authority on the agency side
+
+- **Status:** Landed
+- **Commit:** `df1c56c` — `fix(creators): authorise agency teammates by membership, not users.type`.
+- **Date:** 2026-08-10
+- **Why:** Pedram found a production agency admin whose account read `type = creator` and asked
+  whether that was correct, having assumed agency admins were always `agency_user`-typed.
+- **What:** It is correct, and it is the **common** case, not an edge one: the public sign-up form
+  is the platform's only sign-up path and always stamps `UserType::Creator`
+  (`SignUpService`); accepting an agency invitation later
+  (`AgencyInvitationService::accept()`) adds the membership row but never flips `users.type`. A
+  production query Pedram ran found **26 of 30** agency admins carrying `type = creator` this way.
+  Three `CreatorPolicy` methods — `canSeeContactDetails`, `canMessageRelationship`, and the
+  private `hasAgencyAccess` (backing `view`/`update`/`delete`) — nonetheless gated on
+  `$user->type === UserType::AgencyUser` before ever consulting membership, so those 26 admins
+  were denied contact details, relationship messaging, and creator profiles outright. The SPA's
+  own `requireAgencyUser` router guard already treats membership as authoritative
+  (`apps/main/src/core/router/guards.ts`); these three backend checks did not.
+- **Touched:** `apps/api` — `Modules/Creators/Policies/CreatorPolicy.php` (the three methods),
+  `Modules/Identity/Database/Factories/UserFactory.php` (new `creatorTypedAgencyMember` state, to
+  reproduce the production shape in tests), `tests/.../CreatorPolicyTest.php`. **No migration, no
+  route, no Resource/Controller shape change, no i18n key.**
+- **Pre-existing, and old — not the Jobs Board arc's work.** The offending checks date to
+  `5dc1e1f` (2026-06-28, "add contact details with connected-agency visibility") and `2656e5a`
+  (2026-06-29, AH-010a messaging). Both predate the Jobs Board arc (AH-053, earliest 2026-07-24)
+  by nearly four weeks and predate the 2026-07-26 AH-051/052 deploy as well — this bug shipped on,
+  and survived, at least that one prior production deploy before this fix.
+- **The fix:** accepted, active agency membership (`activeAgencyIds()`,
+  already the mechanism behind every other agency-side check in this policy) is now the **sole**
+  authority; the `users.type` guard is removed from all three methods rather than widened. The one
+  narrowing: `canMessageRelationship`'s platform-admin exclusion, previously an accident of admins
+  holding no membership row, is now an **explicit** `if ($user->type === UserType::PlatformAdmin)
+return false;` — a guarantee should not depend on the accident that produced it.
+- **Break-revert found a hollow test, not just a missing one.** The existing deny-path specs
+  passed even before this fix — but only because no test seeded **any** membership anywhere, so
+  "not a member of this agency" and "this agency has no members at all" were indistinguishable.
+  Each now seeds a genuine member alongside the outsider being tested, and dropping the `user_id`
+  filter in `activeAgencyIds()` reddens exactly the three abilities this fix touches — proving the
+  new deny-path is real rather than coincidental. Confirmed separately: an empty membership list
+  still firmly denies (`hasNonBlacklistedRelation()`'s `$agencyIds === []` early return is a
+  round-trip saver on top of a `whereIn` that already compiles to `0 = 1`, not the actual gate).
+- **Risk line, explicit per surface named:** touches a **gate/policy** (`CreatorPolicy`) —
+  squarely that category. No migration, no API/resource shape (no Resource or Controller changed),
+  no validation rule, no notification/mail path, no i18n keyset. None of the named pinned surfaces
+  (jobs-board predicate, listing gate, application endpoints, board column negatives, D5 mapping,
+  the pixel mount, the glow-token contract) are touched — grepped every consumer of
+  `CreatorPolicy` and every architecture spec; the one adjacent reference,
+  `CampaignApplicationListItemResource`'s docblock (`@see CreatorPolicy::canSeeContactDetails()`,
+  AH-051), is a comment justifying an omission and calls no method — the applications list is
+  unaffected. It does sit under one E2E-traversed surface: `creator-detail.spec.ts` exercises the
+  contact-email visibility this policy gates, unaffected in practice because that spec's fixture
+  is already `agency_user`-typed.
+- **Not related to the missing `campaign_applications`/`campaign_job_notifications` GRANTs or to
+  `APP_ENV=local`.** Different tables (`agency_memberships`, `creators`), different subsystem, no
+  dependency on environment or debug configuration either way. This is a genuine code fix to a
+  pre-existing authorization defect, not a workaround for either open ops item.
+- **Test-gap closure.** No test before this fix exercised a `creator`-typed user holding real
+  agency membership — every prior fixture was either `agency_user`-typed or held no membership at
+  all, so the widening this fix needed was invisible to the suite. `UserFactory::creatorTypedAgencyMember()`
+  reproduces the production shape directly; `CreatorPolicyTest.php` adds cases for `view`,
+  `canSeeContactDetails`, and `canMessageRelationship` for both a creator-typed member (must pass)
+  and a creator-typed non-member (must still fail), plus a platform-admin-with-membership case
+  proving the explicit exclusion holds. Break-revert as above.
+- **Gates:** `apps/api` Pest **2391 passed, 1 skipped, 8771 assertions**; Pint passed; PHPStan
+  (Larastan) — **no errors**. No Vitest/Playwright: `apps/main`/`apps/admin` carry no diff from
+  this change.
+
 ### AH-064 · Meta Pixel on the sign-in page — scoped to one route, Advanced Matching off, un-gated by decision
 
 - **Status:** Landed

@@ -54,11 +54,74 @@ happened.
 
 ---
 
-## 2026-07-31 · The Jobs Board arc + the post-arc UI batch — PENDING
+## 2026-08-11 · Two production bug fixes (creator-typed agency admins, roster-picker search) — PENDING
 
-- **Status:** **PENDING** — Pedram is deploying today. Fields marked _TBD_ are filled after the
-  run. Procedure: [`production-queue-worker.md` §8.3](production-queue-worker.md), which governs
-  this deploy.
+> **Update:** the 2026-07-31 entry below has now been closed out retroactively (see its own
+> `DEPLOYED` status and evidence) in the same pass that wrote this note, so this entry no longer
+> sits stacked above an open predecessor.
+
+- **Status:** **PENDING** — reviewed and approved by Pedram; the verbatim check against the
+  AH-065/AH-066 report found no divergences. Pushed to `origin/main` in this pass — **Pedram
+  deploys from here.**
+- **Range:** `6601ba0` → `6cdf0a5` — **3 commits** (`ec8cd00` docs-only, then the two fixes):
+  - `ec8cd00` — `docs(runbooks): deploy log — record of production deploys, today's entry pending`
+    (this file's own creation; no runtime change).
+  - `df1c56c` — `fix(creators): authorise agency teammates by membership, not users.type` (AH-065).
+  - `6cdf0a5` — `fix(pickers): search the roster server-side so every creator is reachable`
+    (AH-066).
+- **AH entries carried:** **AH-065, AH-066.** Two independent, pre-existing-defect fixes — not a
+  themed arc, no ordering dependency between them.
+- **Migrations run:** **none.** Neither fix touches `apps/api/database/migrations/**`.
+- **Pre-deploy reads:** **none required by this deploy's own changes.** One check was already run
+  ahead of it and is recorded here for completeness rather than as a blocking step: Pedram's
+  `has_table_privilege('engine_c_user', 'campaign_applications', 'SELECT,INSERT,UPDATE')` — and the
+  same for `campaign_job_notifications` — both returned `true` on 2026-08-11, confirming the
+  GRANTs the 2026-07-31 entry's "Anything unexpected" field describes are now in place. **No
+  further on-box SQL is needed for this deploy.** Left honestly open: whether that fix predates
+  today or was applied by a colleague somewhere in between, and whether the original incident was
+  exactly as broad as first diagnosed in chat or narrower — neither is reconstructable now; what's
+  confirmed is the _current_ state, not the fix's history.
+- **Snapshot ID:** _TBD — Pedram's call whether a snapshot is proportionate here._ Deploy shape is
+  code-only (below), so schema risk is genuinely zero, unlike the lossy-`down()` migrations the
+  prior entry carried — but the standing checklist (`production-queue-worker.md` §8 step 1, "do
+  not skip step 1") doesn't carve out an exception, so flagging rather than silently skipping.
+- **Infra:** **deploy shape is code-only** — an `apps/api` PHP change plus an `apps/main` SPA
+  rebuild; no schema, no flags, no scheduler/cron change. No queue-worker restart on mail/lang
+  grounds (neither fix adds a mailable or touches `apps/api/lang/**`, and `CreatorPolicy` is
+  resolved per-request, never inside a queued job — grepped every `ShouldQueue` class for it,
+  none). **The one mandatory step: a PHP-FPM reload**, so `CreatorPolicy.php`'s new bytecode is
+  actually served instead of opcache's stale copy — `CreatorPolicy` sits on the hot path of every
+  agency-side creator request, and a stale copy would silently keep denying the very 26 creator-typed
+  admins this deploy exists to fix. `apps/main`'s SPA bundle needs its normal rebuild + redeploy for
+  the picker fix to reach browsers — standard for any frontend change, not new here.
+- **One-shot commands:** **none.**
+- **Post-deploy verification:** _TBD_ — the standard `/up` 200 + one authenticated request, plus
+  two fix-specific reads that cost nothing: (1) a `creator`-typed agency admin (or the SQL query
+  Pedram already ran) can see a connected creator's contact details and send a relationship
+  message; (2) the campaign-invite or add-to-pool search finds a creator known to sit past the old
+  100-row alphabetical cutoff.
+- **Flags armed:** **none — this range touches no flag.**
+- **Operator:** _TBD._
+- **Anything unexpected:** _TBD._
+
+---
+
+## 2026-07-31 · The Jobs Board arc + the post-arc UI batch — DEPLOYED
+
+- **Status:** **DEPLOYED** — confirmed retroactively on 2026-08-11, not recorded live at deploy
+  time. **Evidence:** `6601ba0`'s **author date is `2026-07-31T19:40:30+02:00`**, an
+  exact-to-the-second match against the deployed tip's timestamp established in the deploy-state
+  verification pass — `git log --format='%h A=%ad C=%cd'` shows the author/committer dates
+  diverge on this one commit (`C=19:47:23`), consistent with it being picked up by a deploy
+  pipeline at the author timestamp and finishing its own commit metadata later. Independently,
+  Pedram's production GRANT check —
+  `has_table_privilege('engine_c_user', 'campaign_applications', 'SELECT,INSERT,UPDATE')` and the
+  same for `campaign_job_notifications` — both return `true`, meaning chunk 3's two new tables are
+  live, migrated, and (now) permissioned. Neither fact is possible unless this range shipped.
+  Fields below that nobody captured live are marked **"not recorded"** rather than `TBD` — this
+  deploy already happened without this file open to fill in as it went; there is no value left to
+  retrieve for them, only an honest gap. Procedure that should have governed it:
+  [`production-queue-worker.md` §8.3](production-queue-worker.md).
 - **Range:** `f5be920` → `6601ba0` — **60 commits.** This is the **entire undeployed backlog**: every
   commit since the 2026-07-26 deploy, in one operation. `6601ba0` is the last **code** commit in the
   range; the docs commit that adds this log sits on top of it and carries no runtime change, so the
@@ -82,32 +145,52 @@ happened.
   the two new tables destroys every application and every notification stamp. After creators have
   applied, restore from the snapshot instead.
 
-- **Pre-deploy reads:** `php artisan brands:audit-floor` (AH-053) — a pure read, **run before
-  shipping**, reporting how many brands each completeness-floor field blocks and the lifecycle
-  split of the blocked population. It matters because AH-053 makes an incomplete brand's **next
-  edit** return 422 — a behaviour change for existing data — and this is how the size of the
-  affected population becomes knowable in advance rather than through support tickets.
-  **Result: _TBD_.**
-- **Snapshot ID:** _TBD_ · confirmed `available` before migrating? _TBD_ — **non-negotiable here**,
-  because step 2 carries two lossy-`down()` `CREATE TABLE`s. Note the standing caveat: the
-  restore path has **never been rehearsed** (§8.2), so lean conservatively.
-- **Infra:** **the queue-worker restart is MANDATORY on this deploy**, not optional. The arc carries
-  four new mailable classes and new `lang/**` copy across 24 locales, and a long-running worker
-  caches translations in memory — it will keep sending missing-key bodies until bounced. No
-  cron/scheduler change: nothing in this range is scheduled. **Done: _TBD_.**
+- **Pre-deploy reads:** `php artisan brands:audit-floor` (AH-053) — **not recorded**. The
+  command's purpose (sizing the population AH-053's new 422 affects, before agencies met it) is
+  moot to run retroactively: agencies have been living with the behaviour since deploy, and a
+  support-ticket signal would already exist if the affected population were large. Not backfilled
+  with a guess; recorded as a genuine gap.
+- **Snapshot ID:** **not recorded** · confirmed `available` before migrating? **not recorded** —
+  this is the one field here where the gap is a real safety concern, not just paperwork, given
+  step 2 carried two lossy-`down()` `CREATE TABLE`s and the restore path has **never been
+  rehearsed** (§8.2) even when a snapshot ID **is** known. No retroactive fix possible; flagged for
+  the next deploy's discipline.
+- **Infra:** the queue-worker restart was **mandatory** on this deploy (four new mailables, 24
+  locales of new backend copy; a long-running worker caches translations and would otherwise keep
+  sending missing-key bodies until bounced). **Done: not recorded** — whether `queue:restart` ran
+  at deploy time can't be confirmed 11+ days later, though it's moot now regardless: a live worker
+  would have recycled naturally many times over in the interval either way.
 - **One-shot commands:** **none.** The arc has none, and the UI batch has none.
-- **Post-deploy verification:** _TBD_ — `/up` 200, one authenticated request, plus the two
-  arc-specific reads from §8.3 step 5: a creator's **Jobs** page loads and is **empty** (the
-  correct result at T+0, not a failure), and a campaign's **Settings** tab plus the campaigns
-  **list** page both render their listing toggle. **Do not flip either during smoke** — the first
-  real listing is a product decision.
+- **Post-deploy verification:** **not recorded.** `/up` 200 and an authenticated request were not
+  captured at deploy time, and this session has no production access to backfill them — an honest
+  gap, not a retroactively-fabricated result. The fact that stands in for it: the
+  `campaign_applications` permission error (below) proves the API was serving real traffic against
+  the new schema post-deploy — live and in use, just partially broken by the missing GRANTs.
 - **Flags armed:** **NONE — deliberately deferred.** Both jobs-board mail flags
   (`job_posted_notifications_enabled`, `application_notifications_enabled`) ship and stay **OFF**.
   Arming them is the combined ritual in §7.4, done when Pedram chooses, and **this deploy is
   complete and correct without it**. Also still OFF and unrelated:
   `incomplete_creator_nudge_enabled` (blocked on the scheduler, §7.3).
-- **Operator:** Pedram.
-- **Anything unexpected:** _TBD_.
+- **Operator:** **not reconciled.** This entry originally named Pedram, written when he expected
+  to run the deploy himself. The subsequent incident report (below) referenced "my colleague
+  deployed to production," which reads as the colleague having executed the actual run. Which is
+  accurate isn't established here; recorded as a discrepancy rather than silently left as Pedram.
+- **Anything unexpected: yes — the `campaign_applications` / `campaign_job_notifications`
+  GRANTs.** Shortly after this range went live, a colleague hit
+  `SQLSTATE[42501]: permission denied for table campaign_applications` in production. The
+  migrating role had created chunk 3's two new tables (and their `_id_seq` sequences), but the
+  application's own DB role, `engine_c_user`, was never separately granted table access — Postgres
+  does not extend `CREATE TABLE` access to other roles automatically. This blocked the creator
+  Jobs board, agency invites (`settlePendingApplication`), and `AutoRejectPendingApplicationsJob`
+  for however long it went unfixed. **Status as of 2026-08-11: verified resolved.** Pedram ran
+  `has_table_privilege('engine_c_user', 'campaign_applications', 'SELECT,INSERT,UPDATE')` → `true`,
+  and the same for `campaign_job_notifications` → `true`. **Left honestly unresolved:** exactly
+  when and how the GRANTs were applied, and whether the original error's scope matched the full
+  missing-GRANT diagnosis made in chat or was narrower — a colleague may have fixed it directly, or
+  the initial read may have overstated the blast radius. Neither is reconstructable from this
+  file; what's verified is the **current** state, not the incident's complete timeline. Tracked
+  going forward at [`RESUMPTION-TEMPLATE.md`](../reviews/RESUMPTION-TEMPLATE.md)'s Open threads,
+  marked resolved.
 - **Operator notes carried by this range** — nothing to do at deploy, but worth knowing if
   something looks odd afterwards:
   - **Assignment audit trails gain a row that has no tab behind it** (AH-058 D3b). `POST …/assignments`
