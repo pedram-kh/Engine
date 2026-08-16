@@ -1757,6 +1757,20 @@ anyone reviewing it later.
 - **Resolution:** S10 consumes `isPaymentEligible()` in the release-gate + widens `holdPayment()`'s source set to `{live_verified, manually_verified}`.
 - **Owner:** Sprint-10 payments workstream.
 - **Status:** open (deferred by design — predicate proven, consumer is S10). Surfaced + accepted by the verification-resolution chunk, 2026-06-05.
+- **AMENDED 2026-08-16 (AH-069) — the eligible set is now three, and one of them has no posted content.** `completed_on_approval` joined `isPaymentEligible()`, so the set is `{live_verified, manually_verified, completed_on_approval}`. The forward risk this entry already described is unchanged and now has a second head: see the entry directly below, which S10 must read alongside this one.
+
+---
+
+## A payment-eligible assignment may have **no `campaign_posted_content` row at all** (AH-069 → Sprint 10)
+
+- **Where:** [`AssignmentStatus::CompletedOnApproval`](../apps/api/app/Modules/Campaigns/Enums/AssignmentStatus.php) + `campaign_posted_content`. Reached only on campaigns with `campaigns.creator_posts_content = false`, where the approved draft **is** the delivery.
+- **What we accepted (AH-069, Q7 — ruled deliberately, not discovered):** on a hand-off campaign the creator never posts, so no `campaign_posted_content` row is ever created — and the assignment is nevertheless **payment-eligible**, because approval is that campaign type's completion. Every payment-eligible state before this one guaranteed a posted-content row existed; that guarantee is now false, and it is false by design rather than by omission.
+- **The concrete trap for S10:** any payment code that reaches for the posted-content record — to read a post URL, a verification result, a posted-at timestamp, or to join `campaign_posted_content` in an eligibility or reporting query — must treat its **absence as normal** for `completed_on_approval`, not as a data error, a null-deref, or a row silently dropped by an inner join. A `->firstOrFail()`, a `->sole()`, or an unqualified join in the release path will each fail in a different and confusing way on a campaign type that is otherwise working perfectly.
+- **Risk:** none today (no payment consumer exists); at S10, medium — the failure modes are a hard error on the release path, or worse, an eligible assignment vanishing from a joined payout query without anyone noticing.
+- **Triggered by:** Sprint 10 escrow wiring the release flow, the payout queries, or any payments reporting surface.
+- **Resolution:** S10 gates on `isPaymentEligible()` (per the entry above) and left-joins / null-guards `campaign_posted_content` throughout the payment path. Where a post URL is genuinely required for a receipt or a report, the hand-off case needs its own branch, not a fallback string.
+- **Owner:** Sprint-10 payments workstream.
+- **Status:** open (deferred by design). Recorded in full in [`draft-posting-toggle-review.md`](reviews/draft-posting-toggle-review.md) §9.
 
 ---
 

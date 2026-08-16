@@ -59,10 +59,9 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID  | Title                                    | Status  | Notes                                                                                       |
-| --- | ---------------------------------------- | ------- | ------------------------------------------------------------------------------------------- |
-| —   | Draft Workflow v2 **chunk B**            | Pending | Ask (B), the per-campaign posting toggle. Inventoried, not kicked off. See §0.2/§0.3 there. |
-| —   | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass."                        |
+| ID  | Title                                    | Status  | Notes                                                                |
+| --- | ---------------------------------------- | ------- | -------------------------------------------------------------------- |
+| —   | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass." |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -70,6 +69,80 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-069 · Not every campaign asks the creator to post — approval can be the finish line, per campaign
+
+- **Status:** Landed. Full chunk loop (inventory → kickoff → plan-pause → build), so the detail lives
+  in its own review file and this entry is the pointer.
+- **Commit:** `451388f1` — `feat(campaigns): let a campaign end at draft approval when creators do not post (AH-069)`,
+  plus the docs commit carrying this entry, the review file, the `deploy-log.md` PENDING entry, two
+  `tech-debt.md` entries, the Sprint-10 spec pointer and the resumption refresh.
+- **Date:** 2026-08-16
+- **Why:** the assignment lifecycle had exactly one ending — the creator posts the deliverable and
+  the post is verified. Real campaigns do not all work that way: for a hand-off deliverable (an asset
+  the brand publishes itself, a white-label edit, a stock shoot), the approved draft **is** the
+  delivery, and the platform was making creators stare at a "Mark as posted" form for a post that
+  will never exist. Client ask (B) of Draft Workflow v2.
+- **What:** a per-campaign toggle, **"Deliverables are posted by creators"**, on the create form and
+  the Settings tab. When it is off, approving a draft chains a second transition in the **same**
+  transaction and lands the assignment on a new terminal state, `completed_on_approval`; the board
+  stops rendering the Posted column; the creator gets a green completion banner instead of a post
+  form; the posting deadline is never stamped and the overdue scan never flags it. When it is on —
+  which is every campaign that exists today — nothing changes at all.
+- **Touched:** `apps/api` — new migration, new `AssignmentStatus` case + `AuditAction` verb +
+  `NotificationType` + mailable and Blade view, `CampaignAssignmentStateMachine`,
+  `CampaignAssignmentReviewController`, `CampaignController`, both campaign requests,
+  `CampaignResource`, `Campaign` + factory, `SendAssignmentNotifications`, `WriteSystemMessage`,
+  `BoardResource` / `BoardController` / `BoardCardService` / `BoardDefaults`, `OverdueScanService`,
+  `CampaignInvitationService`, `CreatorAssignmentDraftController`, `JobLifecycleState`,
+  `lang/*/campaigns.php` × 24, one new test-helper endpoint. `apps/main` — `CampaignForm.vue`,
+  `CampaignCreatePage.vue`, `CampaignDetailPage.vue`, `CreatorAssignmentDetailPage.vue`,
+  notification templates, `app.json` / `creator.json` / `notifications.json` × 24, a new Playwright
+  leg. `packages/api-client` — campaign and notification types.
+- **Decisions (D1–D9 locked at kickoff; Q1–Q8 ruled at plan-pause):** **Q1 killed the backfill
+  command** the kickoff had specified — the column defaults to `true` instead, which is exactly what
+  the command would have written, with no window in which live campaigns read OFF. That left a
+  deliberate **two-layer default**: the DB default is `true` (the safety floor for anything that
+  doesn't name the field — API, factories, seeders), the create form pre-sets `false` and always
+  sends it explicitly (the product decision). **D3's chain runs inside the review path's existing
+  transaction** — both audit rows or neither — and drops AH-042's `withoutGlobalScope` read, which
+  would have been cargo here: the campaign is route-bound and already authorised. **D6's Posted
+  column is a render filter, never a row deletion**, and flipping to OFF while cards sit in Posted is
+  refused with a 422 naming the creators. **D7's banner is a third branch**, not a widened
+  `isVerified` — the copy assertion exists because a banner that says "verified" about a post that
+  does not exist is the specific lie this chunk could most easily have told.
+- **The listener sweep found nothing to suppress.** All seven `AssignmentTransitioned` consumers were
+  put on paper before code (the AH-043 lesson). Five are untouched because their own verb gates
+  already exclude a verb they have never seen; two opt in deliberately. `DispatchPostedContentVerification`
+  needed no guard for the same reason, and that is pinned rather than assumed.
+- **Risk line: PROD-DATA RISK: LOW–MEDIUM**, re-derived down from the kickoff's MEDIUM. The plan's
+  MEDIUM rested on the backfill window; Q1 removed the window and the data mutation with it. One
+  additive column, catalogue-only, no existing row read or rewritten, no board row deleted, no
+  historical notification or audit row touched. The sharp edge that remains is the new terminal
+  state: nothing in the application can leave it. Mail copy moved in all 24 locales, so the
+  **queue-worker restart obligation applies**; deploy order is **migrate only**, no command.
+- **Q7, inherited in writing by Sprint 10:** `completed_on_approval` joins `isPaymentEligible()`,
+  which means a payable assignment on this campaign type may have **no `campaign_posted_content` row
+  at all**. Any payment code that reaches for the posted-content record must treat its absence as
+  normal. Recorded in the review file and pointed at from `tech-debt.md`.
+- **Break-reverts:** eight mutations, each reddening the test it was aimed at, each restored
+  byte-for-byte by SHA-256. Two of them are worth the ink: the enum case with no `JobLifecycleState`
+  family arm reddens **PHPStan before any test runs**, and in the two `posting_due_at` mutations the
+  toggle-ON sibling test correctly stayed green — the §5.34 pair proving the guard is narrow is a
+  different test from the one proving it works.
+- **Gates:** backend **2522 / 1 skipped** (9368 assertions), PHPStan level max **0 errors**, Pint
+  clean; `apps/main` **1500 / 154 files**, `apps/admin` **449 / 53**, api-client **204 / 9**;
+  typecheck clean, ESLint 0 errors; the new E2E leg green with **flaky-10 at 10/10**; **full
+  Playwright 28/28, first pass** — the suite is one spec larger (this chunk's leg), and the
+  `2fa-enrollment-and-sign-in` cold-start flake that AH-064/066/068 each had to re-run passed first
+  this time, recorded as an observation rather than a fix.
+- **The E2E limit, stated:** the new leg covers the toggle-**OFF** lifecycle end to end, through the
+  real Settings switch. The posting path — approve → post → verify — remains the named pre-existing
+  gap it was before this chunk.
+- **Ref:** [`draft-posting-toggle-review.md`](draft-posting-toggle-review.md) · plan
+  [`draft-posting-toggle-plan.md`](draft-posting-toggle-plan.md) · inventory
+  [`draft-workflow-v2-inventory.md`](draft-workflow-v2-inventory.md). With AH-068 (ask A), this
+  **closes Draft Workflow v2**.
 
 ### AH-068 · Draft rounds are numbered and visible — one "Draft {n}" vocabulary across five surfaces, the creator's own review trail, and the round in the cycle's notifications
 
@@ -133,8 +206,8 @@ reviews, and conversations.
 - **Ref:** [`draft-rounds-review.md`](draft-rounds-review.md) · plan
   [`draft-rounds-plan.md`](draft-rounds-plan.md) · inventory
   [`draft-workflow-v2-inventory.md`](draft-workflow-v2-inventory.md).
-  **Chunk B (the per-campaign posting toggle) is not built** — it is ask (B) of the same inventory
-  and a separate chunk.
+  **Chunk B (the per-campaign posting toggle) shipped separately as AH-069** — ask (B) of the same
+  inventory, one chunk later.
 
 ### AH-067 · `composer install` was silently rotating the production `APP_KEY` — the hook is gone, and it's pinned
 

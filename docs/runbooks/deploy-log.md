@@ -54,6 +54,57 @@ happened.
 
 ---
 
+## 2026-08-16 · Draft Workflow v2 — numbered rounds + the optional posting flow (AH-068, AH-069) — PENDING
+
+- **Status:** **PENDING.** AH-068 is pushed (`origin/main` = `45ee2e7f`); AH-069's three commits —
+  the plan-pause, the feature commit and the docs commit — are held. Stacks on top of the AH-067
+  entry below, which is itself still `PENDING`, so whoever deploys next carries **three** AH entries,
+  not one.
+- **Range:** `b13ee718` → the AH-069 docs commit at the tip. Code commits in the range:
+  - `36fa454f` — `feat(drafts): number the review rounds and say so on every surface (AH-068)`
+  - `451388f1` — `feat(campaigns): let a campaign end at draft approval when creators do not post (AH-069)`.
+    (The remainder of the range is docs-only: inventory, two plan-pauses, two review files, this entry.)
+- **AH entries carried:** **AH-068, AH-069** — and AH-067 is still un-deployed below.
+- **Migrations run:** **1** — `2026_08_16_100000_add_creator_posts_content_to_campaigns_table`.
+  Adds `campaigns.creator_posts_content boolean NOT NULL DEFAULT true`. On Postgres this is a
+  **catalogue-only** change: no table rewrite, no existing row read or written, and every existing
+  campaign reads `true`, which is exactly today's behaviour. **Deploy order is `migrate` and nothing
+  else** — the kickoff had specified a follow-up backfill command and the Q1 ruling deleted it,
+  because defaulting the column ON writes what the command would have written, without the window
+  in which live campaigns would have read OFF.
+- **Pre-deploy reads:** none required. Optional sanity read **after** migrating, to confirm the
+  default landed rather than assuming it:
+  `select count(*) from campaigns where creator_posts_content is not true;` — **expect 0.**
+- **Snapshot ID:** _TBD_ · **mandatory, confirmed `available` before migrating.** The schema change
+  is additive and reversible in shape, but `down()` **drops the column**, which discards every
+  campaign's posting posture — re-running `up()` resets them all to `true` rather than restoring
+  what was there. That is stated in the migration's own docblock; the snapshot is what makes it
+  recoverable.
+- **Infra:** **queue-worker restart REQUIRED.** Both ranges move mail copy: AH-068 changed both
+  draft-review mail templates in all 24 locales, and AH-069 adds a new mailable
+  (`AssignmentCompletedOnApprovalMail`) plus new `lang/*/campaigns.php` keys ×24. A worker running
+  pre-deploy code will render stale copy, and for AH-069 will not know the new class at all. No
+  cron/scheduler change, no env change.
+- **One-shot commands:** **none.** (This is the field the kickoff expected to fill; see "Migrations
+  run" for why it is empty.)
+- **Post-deploy verification:**
+  1. `/up` green, then one authenticated request.
+  2. The count read above returns **0**.
+  3. Open a campaign's Settings tab and confirm the **"Deliverables are posted by creators"** switch
+     renders **on** for an existing campaign — the safety floor, visible.
+  4. Open that campaign's board and confirm the **Posted column still renders** — the render filter
+     is off for ON campaigns, which is every campaign that exists at deploy time.
+  5. Create a campaign through the form and confirm the switch pre-sets **off** — the two-layer
+     default, both layers observed on the box.
+- **Flags armed:** **none — this range touches no feature flag.** The toggle is per-campaign
+  configuration, not a flag, and it arrives defaulted to today's behaviour.
+- **Operator:** _TBD._
+- **Anything unexpected:** noted rather than hidden — **AH-068 was pushed without a deploy-log
+  entry.** This entry is written to cover both chunks retroactively, so the worker-restart
+  obligation AH-068 created is not sitting only in a review file. Nothing else.
+
+---
+
 ## 2026-08-11 · Composer install-hook fix (AH-067) — PENDING
 
 - **Status:** **PENDING.** Pushed to `origin/main` in this pass. Not yet deployed — this sits

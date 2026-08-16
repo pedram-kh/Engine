@@ -1,8 +1,12 @@
 # Draft Workflow v2 — Chunk B (optional posting flow): Plan
 
-- **Status:** **PLAN-PAUSE. No code written.** Nothing in this file has been implemented; it is the
-  §2-step-3 artefact and it waits for Claude's clearance.
-- **Entry:** AH-069 (to be written at build time, not now).
+- **Status:** **CLEARED AND BUILT** (2026-08-16). This file is left as the plan-pause artefact it was,
+  committed at `59455604` **before** any code, and it is deliberately **not** back-edited to match
+  what shipped — a plan rewritten after the fact stops being evidence of what was proposed. Where the
+  build diverged (Q1 killing S3 and the backfill command, D3 dropping the `withoutGlobalScope` read),
+  the divergence is recorded in the review file, not patched into this one.
+- **Outcome:** [`draft-posting-toggle-review.md`](draft-posting-toggle-review.md).
+- **Entry:** AH-069.
 - **Chunk base:** `45ee2e7f` — `docs: close AH-068 — Draft Workflow v2 chunk A reviewed and approved`.
   Every citation below was re-derived at this SHA, **after** chunk A shipped. See §1.
 - **Reads from:** [`draft-workflow-v2-inventory.md`](draft-workflow-v2-inventory.md) §§0.2–0.3, 5–8 —

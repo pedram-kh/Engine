@@ -116,17 +116,76 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-08-16 · **Through:** AH-068 · **Nothing is held.** The push on 2026-08-16 moved
+**Last updated:** 2026-08-16 · **Through:** AH-069 · **THREE commits are HELD.** `HEAD` sits at
+AH-069's docs commit; `origin/main` sits at `45ee2e7f` (the AH-068 close). Unpushed, oldest first:
+
+1. `59455604` — `docs(reviews): plan-pause for Draft Workflow v2 chunk B (optional posting flow, AH-069)`,
+   held since the plan-pause itself;
+2. `451388f1` — the AH-069 feature commit;
+3. the docs commit at the tip carrying [`draft-posting-toggle-review.md`](draft-posting-toggle-review.md),
+   the AH-069 log entry, the `deploy-log.md` PENDING entry, two `tech-debt.md` entries, the Sprint-10
+   pointer in `20-PHASE-1-SPEC.md` and this block (a commit cannot record its own hash). **Push is held pending
+   Pedram's explicit call**, per the chunk loop. Re-derive both tips with `git rev-parse --short HEAD`
+   and `git rev-parse --short origin/main` rather than trusting these words.
+   **Deployment is [`deploy-log.md`](../runbooks/deploy-log.md)'s fact, not this file's** — AH-067,
+   AH-068 and AH-069 are **all three un-deployed**, and AH-069's entry is the one that now covers the
+   whole stack, including the worker-restart obligation AH-068 created and never logged.
+
+> **📝 AH-069 — DRAFT WORKFLOW v2, CHUNK B: the optional posting flow.** Ask (B), and with it
+> **Draft Workflow v2 is complete**. A per-campaign toggle, `campaigns.creator_posts_content`,
+> surfaced as **"Deliverables are posted by creators"** on the create form and the Settings tab. When
+> it is OFF, approving a draft chains `completeOnApproval()` in the **same transaction** and lands the
+> assignment on a new **17th** terminal state, `completed_on_approval`; the board stops rendering the
+> Posted column; the creator gets a completion banner instead of a post form; `posting_due_at` is
+> never stamped and the overdue scan never flags it. When it is ON — every campaign that exists
+> today — **nothing changes**.
+>
+> **Four things to know before touching it.**
+>
+> 1. **The two-layer default is deliberate, and looks like a bug if you find only one half.** The DB
+>    column defaults **`true`** (the safety floor: any path that does not name the field — a direct
+>    API POST, a factory, a seeder — gets today's lifecycle). The create form pre-sets **`false`** and
+>    always sends it explicitly (the product decision). They never conflict, because the form always
+>    names it. Both halves are pinned in `CampaignPostingToggleTest.php`; do not "fix" either to match
+>    the other.
+> 2. **`completed_on_approval` is terminal and nothing in the application can leave it.** `cancel()`
+>    refuses a terminal state and `markPosted()` only accepts `approved`. That is why the backfill
+>    command the kickoff specified was **deleted** rather than written: with a `false` default plus a
+>    command, every campaign reads OFF for the length of the window, and one approval landing in it
+>    drives a live assignment somewhere it can never come back from.
+> 3. **The Posted column is hidden by a RENDER filter and no row is ever deleted.** `BoardResource`
+>    omits posting-only columns for OFF campaigns; the column row, its automations and every card
+>    survive in the database, and row counts are asserted before and after. The filter identifies the
+>    column by the **audit verbs its automations target**, not by its name, so renaming the column
+>    does not break it. Flipping a campaign to OFF while cards sit in Posted is **refused with a 422**
+>    naming the creators — the alternative would have been stranding a card on a column the board no
+>    longer draws.
+> 4. **The completion banner is a third branch and must never claim verification.** There is no post
+>    and no verification, so widening `isVerified` would have made the UI lie. A copy assertion exists
+>    for exactly this, and a break-revert confirms it bites.
+>
+> **Sprint 10 inherits one thing in writing:** `completed_on_approval` is payment-eligible, so a
+> payable assignment on this campaign type may have **no `campaign_posted_content` row at all**. Both
+> `tech-debt.md` and the Sprint-10 block in `20-PHASE-1-SPEC.md` carry the pointer.
+>
+> **Deploy obligation:** **migrate only, no command**, snapshot mandatory (`down()` drops the column
+> and discards every campaign's posture), and the **queue-worker restart** applies — a new mailable
+> plus mail copy in all 24 locales.
+>
+> **The E2E limit:** the toggle-OFF lifecycle now has a full Playwright leg through the real Settings
+> switch. The **posting path** — approve → post → verify — remains the named pre-existing gap it was
+> before this chunk.
+
+**Prior state, for the record — AH-068.** The push on 2026-08-16 moved
 `origin/main` from **`ea9d686`** (the AH-067 docs commit) by **five** commits: `ba89907` (the Draft
 Workflow v2 read-only inventory) and `f9cc280` (the chunk-A plan), both held since the read pass and
 the plan-pause; the **AH-068 pair** `36fa454` (the code) and `0af4f1f` (the docs — the review file, the
 AH-068 log entry, two new `tech-debt.md` entries and this block); and the **close commit at the tip**
 flipping [`draft-rounds-review.md`](draft-rounds-review.md) to **Closed — approved** and writing this
-refresh (a commit cannot record its own hash).
-**Whether it is deployed is [`deploy-log.md`](../runbooks/deploy-log.md)'s fact, not this file's** — as
-of writing, AH-068 has no deploy-log entry, so it is **pushed and not deployed**.
-`git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for where the
-two tips actually sit — re-derive them, do not carry this session's numbers forward.
+refresh (a commit cannot record its own hash). At that close nothing was held and the two tips were
+equal at `45ee2e7f`, which is where `origin/main` still sits.
+AH-068 shipped **without a deploy-log entry** — the gap is closed retroactively by AH-069's entry,
+which carries both chunks' obligations.
 
 > **📝 AH-068 — DRAFT WORKFLOW v2, CHUNK A: numbered visible draft rounds.** Ask (A) of a two-ask
 > client request, inventoried in
@@ -162,10 +221,9 @@ two tips actually sit — re-derive them, do not carry this session's numbers fo
 > **Deploy obligation:** mail copy changed in all 24 `lang/*/campaigns.php`, so the **queue-worker
 > restart** applies. Nothing else — no one-shot, no backfill, no flag to arm.
 >
-> **Chunk B is inventoried and NOT built.** The per-campaign "deliverables are posted by creators"
-> toggle is a genuinely harder chunk: per inventory §0.2 there is **no `Completed` assignment
-> state**, so "auto-advance to completion" has no target today and the kickoff must choose a
-> mechanism. Do not treat it as a follow-on tweak.
+> **Chunk B shipped as AH-069**, the block above. The inventory's §0.2 finding — that there was no
+> `Completed` assignment state, so "auto-advance to completion" had no target — was answered by
+> adding one: `completed_on_approval`, the 17th case.
 
 **Prior state, for the record — the AH-060 → AH-064 batch.** The push on 2026-07-31 moved
 `origin/main` from **`94088e3`** (the AH-059 arc-close commit) by **eleven** commits: the eight

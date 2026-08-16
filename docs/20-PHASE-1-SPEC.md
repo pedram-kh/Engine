@@ -264,6 +264,13 @@ The heart of the platform.
 
 > **Build order:** deferred — built after Sprint 11 (Messaging). Gating item to resume: Stripe
 > account + test-mode keys. See `tech-debt.md` ("Sprint 10 deferred").
+>
+> **Inherited from AH-069, read before wiring the release flow:** the escrow-release trigger below
+> says `live_verified`, but the payment-eligible set is now **three** states, and one of them —
+> `completed_on_approval`, reached on campaigns where creators do not post — has **no
+> `campaign_posted_content` row at all**. Gate on `isPaymentEligible()`, never on a literal status,
+> and treat a missing posted-content record as normal rather than as an error. Both tech-debt
+> entries under "S10 payment-release gate" carry the detail.
 
 - `payments`, `payment_events` tables
 - Stripe Connect integration (real, not mock — but in test mode for staging)
