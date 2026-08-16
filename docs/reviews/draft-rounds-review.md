@@ -1,11 +1,29 @@
 # Draft Workflow v2, chunk A — numbered visible draft rounds (AH-068)
 
-- **Status:** Built, gated, **awaiting independent review**. Two commits: `36fa454` —
-  `feat(drafts): number the review rounds and say so on every surface (AH-068)` — and the docs
-  commit carrying this file, the AH-068 log entry, two `tech-debt.md` entries and the
-  `RESUMPTION-TEMPLATE.md` refresh. **Push held** — Pedram's call.
+- **Status:** **Closed — approved.** Two commits carrying the work: `36fa454` —
+  `feat(drafts): number the review rounds and say so on every surface (AH-068)` — and `0af4f1f2`, the
+  docs commit carrying this file, the AH-068 log entry, two `tech-debt.md` entries and the
+  `RESUMPTION-TEMPLATE.md` refresh, plus the close commit that flipped this line. **Pushed
+  2026-08-16**, together with the two docs commits held since the read pass and the plan-pause —
+  **five in total**.
+- **Verdict:** independent review complete: **D1–D6 and Q1–Q8 verified as built and as ruled**; **both
+  mutations confirmed load-bearing**, each with a **SHA-256 restore** rather than an assurance — the
+  payload-key removal reddening the in-app assertion while the omit-when-absent negative correctly
+  stays green (which is the argument for keeping both), and the state-machine revision target reddening
+  the cycle parity test from a file this chunk does not touch; **the Q1(a) historical-row proof and the
+  `templates.spec.ts` counter-pin accepted as the live-data record** — a pre-AH-068-shape fixture
+  asserted byte-identical, plus the invariant that no round-bearing body template interpolates
+  `{version}`, which is what stops the defect being reintroduced later rather than merely avoided now;
+  **D6 evidenced twice as offered** — thirteen zero-diffs by command output plus the executable cycle
+  parity test; **the self-corrected filter-label defect accepted as recorded** — finding and naming
+  your own vocabulary split mid-build, and re-deriving each locale's label from that locale's own
+  clause, is the behaviour §5.32 wants; **the Playwright flake disposition accepted as recorded** —
+  27/27 effective, the honest number, with the clean first-pass run named as the earlier tree rather
+  than promoted to the headline; and the **§5.3 gap closed for both touched mailables with the emitted
+  deep link pinned for the first time**, the class left open as tech-debt rather than swept.
 - **Date:** 2026-08-16
-- **Provenance:** built by Cursor against the ratified plan and Claude's Q1–Q8 rulings.
+- **Provenance:** built by Cursor against the ratified plan and Claude's Q1–Q8 rulings; reviewed and
+  closed by Claude.
 - **Ratified plan:** [`draft-rounds-plan.md`](draft-rounds-plan.md) (committed at plan-pause,
   `f9cc280`). **Reads from:** [`draft-workflow-v2-inventory.md`](draft-workflow-v2-inventory.md)
   §§0.1, 2, 3, 4 — cited, not re-derived.
@@ -673,5 +691,7 @@ muddied this diff); chunk B, the per-campaign posting toggle, in any part; and a
 
 ---
 
-_Provenance: built by Cursor against the ratified plan and Claude's Q1–Q8 rulings. Awaiting
-independent review; push held._
+_Provenance: built by Cursor against the ratified plan and Claude's Q1–Q8 rulings; reviewed and closed
+by Claude on 2026-08-16. **Chunk A is closed and pushed. Chunk B — the per-campaign posting toggle —
+is ask (B) of the same inventory and is not built.** A B read pass must read the post-A reality on the
+notification and mail surfaces this chunk just renamed, not the inventory's pre-A citations._

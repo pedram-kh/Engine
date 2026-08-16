@@ -116,13 +116,15 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-08-16 · **Through:** AH-068 · **FOUR COMMITS ARE HELD.** `origin/main` sits at
-**`ea9d686`** (the AH-067 docs commit). Held locally, in order: `ba89907` (the Draft Workflow v2
-read-only inventory), `f9cc280` (the chunk-A plan, committed at plan-pause), and the **AH-068
-two-commit pair** — `36fa454` (the code) and the docs commit at the tip carrying
-[`draft-rounds-review.md`](draft-rounds-review.md), the AH-068 log entry, two new `tech-debt.md`
-entries and this refresh (a commit cannot record its own hash). **The push is Pedram's call and the
-review file reads "awaiting independent review".**
+**Last updated:** 2026-08-16 · **Through:** AH-068 · **Nothing is held.** The push on 2026-08-16 moved
+`origin/main` from **`ea9d686`** (the AH-067 docs commit) by **five** commits: `ba89907` (the Draft
+Workflow v2 read-only inventory) and `f9cc280` (the chunk-A plan), both held since the read pass and
+the plan-pause; the **AH-068 pair** `36fa454` (the code) and `0af4f1f` (the docs — the review file, the
+AH-068 log entry, two new `tech-debt.md` entries and this block); and the **close commit at the tip**
+flipping [`draft-rounds-review.md`](draft-rounds-review.md) to **Closed — approved** and writing this
+refresh (a commit cannot record its own hash).
+**Whether it is deployed is [`deploy-log.md`](../runbooks/deploy-log.md)'s fact, not this file's** — as
+of writing, AH-068 has no deploy-log entry, so it is **pushed and not deployed**.
 `git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for where the
 two tips actually sit — re-derive them, do not carry this session's numbers forward.
 
@@ -764,8 +766,18 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
 
 ### Open threads
 
-- **📋 AH-068 awaits independent review, and the push is held** (four commits, listed at the top of
-  this block). [`draft-rounds-review.md`](draft-rounds-review.md) is the read.
+- **✅ AH-068 is CLOSED and PUSHED (2026-08-16).** Reviewed and approved;
+  [`draft-rounds-review.md`](draft-rounds-review.md) carries the verdict. **Not deployed** — and the
+  one deploy obligation it carries is the **queue-worker restart**, because mail copy changed in all 24
+  `lang/*/campaigns.php`. No migration, no one-shot, no flag to arm.
+- **⚠ A chunk-B read pass must read the POST-AH-068 reality, not the inventory's citations.** The
+  inventory ([`draft-workflow-v2-inventory.md`](draft-workflow-v2-inventory.md)) was written at
+  `ea9d686`, before chunk A shipped, and chunk B touches the **same notification and mail surfaces**
+  chunk A just renamed — `SendAssignmentNotifications.php`, both draft mailables, their Blade views,
+  and `lang/*/campaigns.php` all moved. Treat every line-number citation in that file as **stale until
+  re-verified**, and flag the drift rather than quoting it. The i18n keys moved too:
+  `app.campaigns.review.draftVersion` and `creator.ui.assignments.detail.reviewStatus.*` no longer
+  exist.
 - **❓ Draft Workflow v2 chunk B is inventoried and not kicked off.** The per-campaign "deliverables
   are posted by creators" toggle. It is **blocked on a mechanism decision, not on effort**: per
   [`draft-workflow-v2-inventory.md`](draft-workflow-v2-inventory.md) §0.2 there is no `Completed`

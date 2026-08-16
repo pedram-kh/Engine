@@ -59,11 +59,10 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID     | Title                                    | Status  | Notes                                                                                       |
-| ------ | ---------------------------------------- | ------- | ------------------------------------------------------------------------------------------- |
-| AH-068 | Draft Workflow v2 chunk A — review       | Pending | Built and gated; review file reads "awaiting independent review". Push held.                |
-| —      | Draft Workflow v2 **chunk B**            | Pending | Ask (B), the per-campaign posting toggle. Inventoried, not kicked off. See §0.2/§0.3 there. |
-| —      | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass."                        |
+| ID  | Title                                    | Status  | Notes                                                                                       |
+| --- | ---------------------------------------- | ------- | ------------------------------------------------------------------------------------------- |
+| —   | Draft Workflow v2 **chunk B**            | Pending | Ask (B), the per-campaign posting toggle. Inventoried, not kicked off. See §0.2/§0.3 there. |
+| —   | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass."                        |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
