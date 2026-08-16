@@ -39,6 +39,14 @@ return [
                 'cta' => 'Pārskatīt uzdevumu',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'Jūsu darbs kampaņai :campaign ir pabeigts',
+                'greeting' => 'Sveiki, :name,',
+                'body' => 'Jūsu uzmetums kampaņai “:campaign” ir apstiprināts. Šajā kampaņā saturu publicē aģentūra, tāpēc jūsu uzdevums tagad ir pabeigts — nekas vairāk nav jādara.',
+                'cta' => 'Skatīt uzdevumu',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Jūsu ieraksts priekš :campaign ir pieņemts',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Paldies, ka pieteicāties darbam „:campaign“. Kampaņa ir noslēgta, tāpēc jūsu pieteikums netiks izskatīts tālāk. Jauni darba piedāvājumi jūsu panelī tiek publicēti regulāri.',
             'cta' => 'Skatīt darba piedāvājumus',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} :creators kartīte joprojām ir publicēšanas kolonnā. Pārvietojiet kartīti ārpus kolonnas, pirms izslēdzat autoru publicēšanu.|[2,*] :count kartītes joprojām ir publicēšanas kolonnā (:creators). Pārvietojiet tās ārpus kolonnas, pirms izslēdzat autoru publicēšanu.',
     ],
 ];

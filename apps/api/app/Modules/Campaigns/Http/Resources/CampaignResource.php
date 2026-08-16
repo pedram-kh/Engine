@@ -47,6 +47,11 @@ final class CampaignResource extends JsonResource
                 'brief' => $campaign->brief,
                 'target_creator_count' => $campaign->target_creator_count,
                 'requires_per_campaign_contract' => $campaign->requires_per_campaign_contract,
+                // AH-069 D1 — the posting posture, read in the POSITIVE
+                // direction the label uses: `true` means the creator posts the
+                // deliverable and the assignment continues through
+                // posted → verified. `false` means approval IS completion.
+                'creator_posts_content' => $campaign->creator_posts_content,
                 'is_marketplace_visible' => $campaign->is_marketplace_visible,
 
                 // Jobs board (AH-054). `listed_on_jobs_board` is the agency's

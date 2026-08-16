@@ -26,6 +26,11 @@ it('NotificationType catalogue lists exactly the curated membership', function (
         'assignment.revision_requested',
         'assignment.draft_approved',
         'assignment.draft_rejected',
+        // AH-069 (D5) — creator-facing, single-direction. Rides ALONGSIDE the
+        // draft-approved row rather than replacing it; the email asymmetry
+        // (Q3 — this type mails, the approval does not, on this campaign type)
+        // lives in the listener, not in the catalogue.
+        'assignment.completed_on_approval',
         'assignment.manually_verified',
         'assignment.cancelled',
         // Forward payment verbs — deferred-S10 escrow alerts drop-in.

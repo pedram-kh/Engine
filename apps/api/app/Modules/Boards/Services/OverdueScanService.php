@@ -7,6 +7,7 @@ namespace App\Modules\Boards\Services;
 use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Campaigns\Models\CampaignAssignment;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 /**
@@ -64,6 +65,26 @@ final class OverdueScanService
                 'posting_overdue_flagged_at',
                 AuditAction::AssignmentPostingOverdue,
                 $now,
+                // AH-069 (D8) — never flag an assignment as overdue-to-post on a
+                // campaign that does not ask its creators to post. The writer
+                // side (CampaignInvitationService) stops stamping the deadline
+                // at all for those campaigns, so this catches exactly one case:
+                // an assignment invited while the toggle was ON, on a campaign
+                // that has since been turned OFF. Its stale deadline would
+                // otherwise pass, flag, and dispatch an overdue for a step that
+                // no longer exists — permanently, since the marker never resets.
+                //
+                // Reading through to the campaign rather than excluding the
+                // `completed_on_approval` status is deliberate: the status
+                // exclusion would only cover assignments that had already been
+                // approved, and would leave an OFF campaign's `contracted`
+                // assignment flagged for a post it will never be asked to make.
+                constrain: static fn (Builder $query): Builder => $query->whereHas(
+                    'campaign',
+                    static fn (Builder $campaign): Builder => $campaign
+                        ->withoutGlobalScope(BelongsToAgencyScope::class)
+                        ->where('creator_posts_content', true),
+                ),
             ),
             'draft' => $this->fireOverdue(
                 'draft_due_at',
@@ -78,15 +99,27 @@ final class OverdueScanService
      * The single overdue-type sweep. Deadline passed (`$dueColumn < now()`) AND
      * not yet flagged (`$flagColumn IS NULL`) AND a deadline IS set (`$dueColumn
      * IS NOT NULL` — skip nulls). Stamps the marker, then fires the event.
+     *
+     * `$constrain` narrows the population for one overdue type only; the posting
+     * sweep uses it (AH-069, D8). An excluded assignment is not merely skipped —
+     * its marker is NOT stamped either, so if the campaign's posting toggle is
+     * turned back on, the deadline is live again and the sweep can still flag it.
+     *
+     * @param  (callable(Builder<CampaignAssignment>): Builder<CampaignAssignment>)|null  $constrain
      */
-    private function fireOverdue(string $dueColumn, string $flagColumn, AuditAction $action, Carbon $now): int
+    private function fireOverdue(string $dueColumn, string $flagColumn, AuditAction $action, Carbon $now, ?callable $constrain = null): int
     {
-        $assignments = CampaignAssignment::query()
+        $query = CampaignAssignment::query()
             ->withoutGlobalScope(BelongsToAgencyScope::class)
             ->whereNotNull($dueColumn)
             ->whereNull($flagColumn)
-            ->where($dueColumn, '<', $now)
-            ->get();
+            ->where($dueColumn, '<', $now);
+
+        if ($constrain !== null) {
+            $query = $constrain($query);
+        }
+
+        $assignments = $query->get();
 
         $fired = 0;
 

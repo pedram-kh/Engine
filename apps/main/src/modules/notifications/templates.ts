@@ -123,6 +123,16 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
     recipient: 'creator',
     preference: { group: 'assignment', channels: IN_APP_ONLY },
   },
+  // AH-069 (D5) — sits BESIDE the draft-approved row, not instead of it: on a
+  // campaign that hands off at approval the creator gets both, and together they
+  // read "approved" then "and that's it". The body interpolates
+  // {campaign_name} only — no round, because this row is about the assignment
+  // ending rather than about a round of review.
+  'assignment.completed_on_approval': {
+    templateKey: 'notifications.types.assignment_completed_on_approval',
+    recipient: 'creator',
+    preference: { group: 'assignment', channels: IN_APP_ONLY },
+  },
   'assignment.manually_verified': {
     templateKey: 'notifications.types.assignment_manually_verified',
     recipient: 'creator',

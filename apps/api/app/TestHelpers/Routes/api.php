@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\TestHelpers\Http\Controllers\CreateAdminUserController;
 use App\TestHelpers\Http\Controllers\CreateAgencyInvitationController;
 use App\TestHelpers\Http\Controllers\CreateAgencyWithAdminController;
+use App\TestHelpers\Http\Controllers\CreateContractedAssignmentController;
 use App\TestHelpers\Http\Controllers\CreateListableCampaignController;
 use App\TestHelpers\Http\Controllers\CreateListedJobController;
 use App\TestHelpers\Http\Controllers\CreatePendingApplicationsController;
@@ -123,6 +124,15 @@ Route::prefix('_test')
         // seeded, so the campaign has to live on an agency it controls.
         Route::post('agencies/{agency}/listable-campaign', CreateListableCampaignController::class)
             ->name('agencies.listable_campaign.create');
+
+        // AH-069 (D9) — a CONTRACTED assignment on the given agency, with the
+        // board already provisioned and the posting toggle left ON. The
+        // hand-off-lifecycle leg starts here because everything before it
+        // (list → apply → offer → accept) is already end-to-end elsewhere, and
+        // it leaves the toggle alone because flipping it through the real
+        // Settings switch is the first step under test.
+        Route::post('agencies/{agency}/contracted-assignment', CreateContractedAssignmentController::class)
+            ->name('agencies.contracted_assignment.create');
 
         // Sprint 6.6c — approve the signed-in creator + seed a pending_request
         // relation (on a fresh agency) so the creator-inbox Playwright round-

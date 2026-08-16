@@ -39,6 +39,14 @@ return [
                 'cta' => 'Granska uppdraget',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'Ditt arbete för :campaign är klart',
+                'greeting' => 'Hej :name,',
+                'body' => 'Ditt utkast för ":campaign" har godkänts. I den här kampanjen publicerar byrån innehållet, så ditt uppdrag är nu klart — du behöver inte göra något mer.',
+                'cta' => 'Visa uppdraget',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Ditt inlägg för :campaign accepterades',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Tack för din ansökan till ”:campaign”. Kampanjen är avslutad, så din ansökan går inte vidare. Nya jobb publiceras löpande på din tavla.',
             'cta' => 'Visa jobbannonser',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} :creators har fortfarande ett kort i publiceringskolumnen. Flytta kortet ur kolumnen innan du stänger av publicering av kreatörer.|[2,*] :count kort finns fortfarande i publiceringskolumnen (:creators). Flytta dem ur kolumnen innan du stänger av publicering av kreatörer.',
     ],
 ];

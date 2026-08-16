@@ -80,6 +80,14 @@ enum JobLifecycleState: string
             AssignmentStatus::RevisionRequested,
             AssignmentStatus::Approved => self::InProgress,
 
+            // `CompletedOnApproval` (AH-069 D4) is `Completed` and not
+            // `InProgress`, which is where its source state `Approved` sits one
+            // line above. The distinction is the whole point of the chunk: on a
+            // campaign that hands off at approval there is no posting step left,
+            // so "Completed" is the truth rather than the over-promise the
+            // `Approved` docblock warns about. It is likewise not `Ended` —
+            // `Ended` means "ended WITHOUT delivery", and this delivered.
+            AssignmentStatus::CompletedOnApproval,
             AssignmentStatus::Posted,
             AssignmentStatus::LiveVerified,
             AssignmentStatus::ManuallyVerified,

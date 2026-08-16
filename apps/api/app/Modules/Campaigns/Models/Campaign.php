@@ -53,6 +53,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $marketplace_open_at
  * @property Carbon|null $marketplace_close_at
  * @property bool $requires_per_campaign_contract
+ * @property bool $creator_posts_content
  * @property bool $listed_on_jobs_board
  * @property string|null $listing_duration
  * @property string|null $listing_fee
@@ -88,6 +89,11 @@ final class Campaign extends Model
         'status' => 'draft',
         'is_marketplace_visible' => false,
         'requires_per_campaign_contract' => false,
+        // AH-069 D1 (Q1, the safety floor) — mirrors the column's DB default.
+        // A campaign built without naming the field expects creator posting,
+        // i.e. the lifecycle that has always shipped. The create FORM sends
+        // `false` explicitly; the default only governs the paths that don't.
+        'creator_posts_content' => true,
         'listed_on_jobs_board' => false,
     ];
 
@@ -116,6 +122,7 @@ final class Campaign extends Model
         'marketplace_open_at',
         'marketplace_close_at',
         'requires_per_campaign_contract',
+        'creator_posts_content',
         'listed_on_jobs_board',
         'listing_duration',
         'listing_fee',
@@ -260,6 +267,7 @@ final class Campaign extends Model
             'marketplace_open_at' => 'datetime',
             'marketplace_close_at' => 'datetime',
             'requires_per_campaign_contract' => 'boolean',
+            'creator_posts_content' => 'boolean',
             'listed_on_jobs_board' => 'boolean',
             'listing_languages' => 'array',
             'listing_regions' => 'array',

@@ -43,6 +43,14 @@ return [
             ],
         ],
         // Verification-resolution chunk (D-8) — the creator-facing resolution mails.
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'Your work for :campaign is complete',
+                'greeting' => 'Hi :name,',
+                'body' => 'Your draft for ":campaign" has been approved. On this campaign the agency publishes the content, so your assignment is now complete — there is nothing further for you to do.',
+                'cta' => 'View the assignment',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Your post for :campaign was accepted',
@@ -125,5 +133,14 @@ return [
             'body_campaign_closed' => 'Thank you for applying to ":campaign". The campaign has closed, so your application will not be taken forward. New jobs are posted to your board regularly.',
             'cta' => 'View your jobs board',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} :creators still has a card in the posting column. Move that card out of the column before turning off creator posting.|[2,*] :count cards are still in the posting column (:creators). Move them out of the column before turning off creator posting.',
     ],
 ];

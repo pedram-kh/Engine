@@ -1024,3 +1024,76 @@ export async function seedListedJob(
     creatorUlid: body.data.creator_ulid,
   }
 }
+
+// ---------------------------------------------------------------------------
+// AH-069 (D9) — hand-off lifecycle provisioning
+// ---------------------------------------------------------------------------
+
+export interface SeedContractedAssignmentResult {
+  agencyUlid: string
+  campaignUlid: string
+  campaignName: string
+  brandName: string
+  creatorUlid: string
+  creatorDisplayName: string
+  assignmentUlid: string
+}
+
+/**
+ * Seed a CONTRACTED assignment on the given agency, board provisioned, with the
+ * posting toggle left ON.
+ *
+ * The hand-off-lifecycle leg starts here rather than at a listed campaign
+ * because list → apply → offer → accept is already walked end to end by
+ * `jobs-board-full-lifecycle`; repeating it would add four minutes and four
+ * unrelated failure modes to a spec about what happens AFTER an approval.
+ *
+ * The toggle is deliberately not pre-set: flipping it through the real Settings
+ * switch is the leg's first step, and covers the D1 write path in the same run.
+ */
+export async function seedContractedAssignment(
+  request: APIRequestContext,
+  agencyUlid: string,
+  creatorEmail: string,
+  options: { campaignName?: string; brandName?: string } = {},
+): Promise<SeedContractedAssignmentResult> {
+  const response = await request.post(
+    `http://127.0.0.1:8000/api/v1/_test/agencies/${agencyUlid}/contracted-assignment`,
+    {
+      headers: defaultHeaders,
+      data: {
+        email: creatorEmail,
+        campaign_name: options.campaignName ?? null,
+        brand_name: options.brandName ?? null,
+      },
+    },
+  )
+
+  if (response.status() !== 201) {
+    throw new Error(
+      `seedContractedAssignment failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+
+  const body = (await response.json()) as {
+    data: {
+      agency_ulid: string
+      campaign_ulid: string
+      campaign_name: string
+      brand_name: string
+      creator_ulid: string
+      creator_display_name: string
+      assignment_ulid: string
+    }
+  }
+
+  return {
+    agencyUlid: body.data.agency_ulid,
+    campaignUlid: body.data.campaign_ulid,
+    campaignName: body.data.campaign_name,
+    brandName: body.data.brand_name,
+    creatorUlid: body.data.creator_ulid,
+    creatorDisplayName: body.data.creator_display_name,
+    assignmentUlid: body.data.assignment_ulid,
+  }
+}

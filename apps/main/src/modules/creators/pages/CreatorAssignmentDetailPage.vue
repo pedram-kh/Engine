@@ -84,6 +84,10 @@ const perCampaignContractEnabled = ref(false)
 // coming. With the D2 auto-advance an OFF assignment shouldn't sit at
 // `accepted` at all; this is belt-and-suspenders for any residual row.
 const requiresPerCampaignContract = ref(false)
+// Whether THIS campaign asks its creators to post the deliverable (AH-069, D7).
+// Seeded `true` — today's lifecycle — so a stale or partial payload never hides
+// the post step from a creator who genuinely owes a post.
+const creatorPostsContent = ref(true)
 const snackbar = ref<{ color: string; text: string } | null>(null)
 
 // Draft form state.
@@ -151,7 +155,12 @@ const canSubmitDraft = computed(
 const isInvited = computed(() => status.value === 'invited')
 const isResubmit = computed(() => status.value === 'revision_requested')
 const isAwaitingReview = computed(() => status.value === 'draft_submitted')
-const canSubmitPosted = computed(() => status.value === 'approved')
+// AH-069 (D7) — the toggle is read here as well as the status. On a hand-off
+// campaign an approval completes the assignment, so `approved` is normally
+// unreachable; the pairing covers the one gap that isn't — a campaign switched
+// off while an assignment was already sitting at `approved`. Without it the
+// creator is shown a post form whose submit the server refuses (the Q2 guard).
+const canSubmitPosted = computed(() => status.value === 'approved' && creatorPostsContent.value)
 
 /** The active (latest) posted-content row carries the live verification state. */
 const latestPosted = computed(() => postedContent.value[postedContent.value.length - 1] ?? null)
@@ -178,6 +187,17 @@ const isAwaitingVerification = computed(
 const isVerified = computed(
   () => status.value === 'live_verified' || status.value === 'manually_verified',
 )
+/**
+ * The assignment ended at approval, because this campaign does not ask its
+ * creators to post the deliverable (AH-069, D7).
+ *
+ * A THIRD branch alongside `isVerified`, deliberately not a widening of it. The
+ * verified banner says the post was found and confirmed live; nothing was posted
+ * here and nothing was verified, so borrowing that sentence would tell the
+ * creator something untrue about their own work. Same shape, same colour,
+ * different claim — and the claim is the part that has to be right.
+ */
+const isCompleteOnApproval = computed(() => status.value === 'completed_on_approval')
 
 /** The most recent agency feedback (Chunk 2 populates `review_feedback`). */
 const revisionFeedback = computed<string | null>(() => {
@@ -216,6 +236,7 @@ async function load(): Promise<void> {
     assignment.value = res.data
     perCampaignContractEnabled.value = res.meta?.per_campaign_contract_enabled ?? false
     requiresPerCampaignContract.value = res.meta?.requires_per_campaign_contract ?? false
+    creatorPostsContent.value = res.meta?.creator_posts_content ?? true
     // Prefill the in-place edit with the failed URL so the creator edits, not retypes.
     inPlaceUrl.value = verificationFailed.value
       ? (latestPosted.value?.attributes.post_url ?? '')
@@ -918,6 +939,21 @@ onMounted(() => {
         data-testid="assignment-verified-notice"
       >
         {{ t('creator.ui.assignments.detail.verifiedNotice') }}
+      </v-alert>
+
+      <!--
+        Complete at approval (AH-069, D7) — this campaign's creators do not post
+        the deliverable, so the approval WAS the finish line. Its own branch and
+        its own sentence: it must never claim the post was verified, because
+        there is no post.
+      -->
+      <v-alert
+        v-else-if="isCompleteOnApproval"
+        type="success"
+        variant="tonal"
+        data-testid="assignment-completed-on-approval-notice"
+      >
+        {{ t('creator.ui.assignments.detail.completedOnApprovalNotice') }}
       </v-alert>
 
       <!-- Draft version history (always shown when versions exist, D-6) -->

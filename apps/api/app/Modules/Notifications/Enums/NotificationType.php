@@ -50,6 +50,13 @@ enum NotificationType: string
     case AssignmentRevisionRequested = 'assignment.revision_requested';
     case AssignmentDraftApproved = 'assignment.draft_approved';
     case AssignmentDraftRejected = 'assignment.draft_rejected';
+    // AH-069 (D5) — the approval ENDED the assignment, on a campaign whose
+    // creators do not post the deliverable. Creator-facing and single-direction:
+    // the agency performed the approval, so the completion is not news to them.
+    // It arrives ALONGSIDE the draft-approved in-app row rather than instead of
+    // it — two rows tell a coherent story ("approved", then "and that's it") —
+    // but only ONE of the two sends an email (Q3): this one.
+    case AssignmentCompletedOnApproval = 'assignment.completed_on_approval';
     case AssignmentManuallyVerified = 'assignment.manually_verified';
     case AssignmentCancelled = 'assignment.cancelled';
 

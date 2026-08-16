@@ -90,17 +90,18 @@ describe('NotificationPreferencesPage', () => {
     wrapper.unmount()
   })
 
-  it('role filter — a CREATOR sees 11 types / 12 toggles across 4 groups (messaging has the digest)', async () => {
+  it('role filter — a CREATOR sees 12 types / 13 toggles across 4 groups (messaging has the digest)', async () => {
     vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
     const wrapper = mountPage('creator')
     await flushPromises()
 
-    // 11 types, 12 toggles: 10 in_app-only types (incl. the AH-010 relationship
-    // DM and the three creator-facing jobs-board types — AH-056's
-    // campaign.job_posted plus AH-058's accepted/rejected) + the campaign
-    // messaging type's in_app + digest pair (D-10).
-    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(11)
-    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(12)
+    // 12 types, 13 toggles: 11 in_app-only types (incl. the AH-010 relationship
+    // DM, the three creator-facing jobs-board types — AH-056's
+    // campaign.job_posted plus AH-058's accepted/rejected — and AH-069's
+    // completed-on-approval) + the campaign messaging type's in_app + digest
+    // pair (D-10).
+    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(12)
+    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(13)
     // All four groups present — AH-058 (Q5) split `jobs_board` out of
     // `assignment`, honouring the trigger AH-056 recorded in the enum.
     expect(wrapper.find('[data-test="prefs-group-assignment"]').exists()).toBe(true)
@@ -211,8 +212,8 @@ describe('NotificationPreferencesPage', () => {
 
     expect(notificationsApi.updatePreferences).toHaveBeenCalledTimes(1)
     const payload = vi.mocked(notificationsApi.updatePreferences).mock.calls[0]?.[0]
-    // A creator submits all 12 (type, channel) toggles — 11 in_app + 1 digest.
-    expect(payload?.preferences).toHaveLength(12)
+    // A creator submits all 13 (type, channel) toggles — 12 in_app + 1 digest.
+    expect(payload?.preferences).toHaveLength(13)
     expect(payload?.preferences.filter((p) => p.channel === 'digest')).toHaveLength(1)
     // The flipped in_app rides false; the opted-in digest rides true.
     expect(

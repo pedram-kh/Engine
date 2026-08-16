@@ -192,8 +192,15 @@ final class CampaignAssignmentReviewController
             );
         }
 
+        // AH-069 D3 — read the POLICY here, from the route-bound campaign already
+        // in hand, and hand the machine a decision rather than a lookup. The
+        // machine's `completeOnApproval()` deliberately has no campaign read of
+        // its own: one place decides, so there is no second reader to disagree.
+        $completesOnApproval = $reviewStatus === DraftReviewStatus::Approved
+            && ! $campaign->creator_posts_content;
+
         try {
-            DB::transaction(function () use ($draft, $assignment, $machine, $actor, $reviewStatus, $feedback): void {
+            DB::transaction(function () use ($draft, $assignment, $machine, $actor, $reviewStatus, $feedback, $completesOnApproval): void {
                 // Write the review trail FIRST (column-only fields shipped in
                 // Chunk 1) so the transition event's notification listener reads
                 // the persisted feedback.
@@ -206,7 +213,7 @@ final class CampaignAssignmentReviewController
                 $context = ['draft_id' => $draft->ulid, 'version' => $draft->version];
 
                 match ($reviewStatus) {
-                    DraftReviewStatus::Approved => $machine->approve($assignment, $actor, $context),
+                    DraftReviewStatus::Approved => $this->approveDraft($machine, $assignment, $actor, $context, $completesOnApproval),
                     DraftReviewStatus::RevisionRequested => $machine->requestRevision($assignment, $actor, $context),
                     DraftReviewStatus::Rejected => $machine->rejectDraft($assignment, (string) $feedback, $actor, $context),
                     DraftReviewStatus::Pending => null,
@@ -225,6 +232,44 @@ final class CampaignAssignmentReviewController
             'data' => (new CampaignDraftResource($draft->fresh() ?? $draft))->resolve($request),
             'meta' => ['code' => $this->metaCode($reviewStatus)],
         ]);
+    }
+
+    /**
+     * The approval, plus the AH-069 completion chain when the campaign hands off
+     * at approval (D3).
+     *
+     * Both transitions run inside the caller's transaction — this method opens
+     * none of its own. That is the whole safety argument: if the second commit
+     * throws, the first is rolled back with it and the assignment is still
+     * `draft_submitted` with an unreviewed draft. There is no state in which an
+     * assignment is approved-but-half-completed, and none in which the draft
+     * carries a review the assignment never got.
+     *
+     * The `completes_on_approval` context flag (Q3) rides the APPROVAL, not the
+     * completion, because it exists for the approval's own listener: it tells
+     * SendAssignmentNotifications to suppress the draft-approved EMAIL, since the
+     * completion mail arriving a moment later carries the news. The flag lands in
+     * the approval's audit metadata too, which is how the trail explains why one
+     * mail is missing. Its ABSENCE is the normal case and changes nothing.
+     *
+     * @param  array<string, mixed>  $context
+     */
+    private function approveDraft(
+        CampaignAssignmentStateMachine $machine,
+        CampaignAssignment $assignment,
+        User $actor,
+        array $context,
+        bool $completesOnApproval,
+    ): void {
+        $machine->approve(
+            $assignment,
+            $actor,
+            $completesOnApproval ? [...$context, 'completes_on_approval' => true] : $context,
+        );
+
+        if ($completesOnApproval) {
+            $machine->completeOnApproval($assignment, $actor, $context);
+        }
     }
 
     private function metaCode(DraftReviewStatus $status): string

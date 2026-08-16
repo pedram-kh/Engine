@@ -237,6 +237,82 @@ describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', 
     expect(wrapper.find('[data-testid="assignment-verified-notice"]').exists()).toBe(true)
   })
 
+  // ── The hand-off closure banner (AH-069, D7) ──────────────────────────────
+  //
+  // A THIRD branch beside the verified notice, not a widening of it. These four
+  // tests exist to keep it that way.
+
+  it('renders the completion notice for a completed_on_approval assignment', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('completed_on_approval'),
+      meta: { per_campaign_contract_enabled: false, creator_posts_content: false },
+    })
+    const { wrapper } = await mountDetail()
+
+    const notice = wrapper.find('[data-testid="assignment-completed-on-approval-notice"]')
+    expect(notice.exists()).toBe(true)
+    expect(notice.text()).toContain('Your draft has been approved')
+    expect(notice.text()).toContain('no further action is needed')
+  })
+
+  it('NEVER claims the post was verified on the completion notice (the copy assertion)', async () => {
+    // The one thing this banner must not do. A creator on a hand-off campaign
+    // posted nothing, so any word about verification — or about a post at all —
+    // would be the page telling them something untrue about their own work.
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('completed_on_approval'),
+      meta: { per_campaign_contract_enabled: false, creator_posts_content: false },
+    })
+    const { wrapper } = await mountDetail()
+
+    const text = wrapper.find('[data-testid="assignment-completed-on-approval-notice"]').text()
+    expect(text).not.toContain('verified')
+    expect(text).not.toContain('verify')
+    expect(text).not.toContain('post')
+
+    // And it is genuinely a separate element — the verified banner is absent,
+    // so this cannot be the AH-047 notice wearing a new label.
+    expect(wrapper.find('[data-testid="assignment-verified-notice"]').exists()).toBe(false)
+  })
+
+  it('shows no post or verify affordance once the assignment completed at approval', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('completed_on_approval'),
+      meta: { per_campaign_contract_enabled: false, creator_posts_content: false },
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-posted-form"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-awaiting-verification"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-resubmit-in-place-form"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-draft-form"]').exists()).toBe(false)
+  })
+
+  it('hides the post form on an approved assignment whose campaign hands off (Q2 mirror)', async () => {
+    // The sliver the status alone cannot catch: the toggle was switched off
+    // while this assignment already sat at `approved`. The server refuses the
+    // post (422); the surface must not offer it in the first place.
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('approved'),
+      meta: { per_campaign_contract_enabled: false, creator_posts_content: false },
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-posted-form"]').exists()).toBe(false)
+  })
+
+  it('still shows the post form on an approved assignment when the meta flag is absent', async () => {
+    // Back-compat, and the safe direction: an older or partial payload must not
+    // hide a step a posting campaign genuinely needs.
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('approved'),
+      meta: { per_campaign_contract_enabled: false },
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-posted-form"]').exists()).toBe(true)
+  })
+
   // Verification-resolution chunk (ACT3) — the in-place fix form on a failed post.
   it('renders the in-place resubmit form for a posted assignment whose verification FAILED', async () => {
     vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({

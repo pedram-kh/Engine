@@ -133,6 +133,10 @@ it('covers every allowlisted verb (catalogue tripwire)', function (): void {
         'assignment.draft_approved',
         'assignment.revision_requested',
         'assignment.draft_rejected',
+        // AH-069 (D5) — the closing line for a campaign that hands off at
+        // approval. Without it the thread's last word is "The draft was
+        // approved.", which reads as a waypoint rather than an ending.
+        'assignment.completed_on_approval',
         'assignment.posted_by_creator',
         'assignment.live_verified',
         'assignment.manually_verified',

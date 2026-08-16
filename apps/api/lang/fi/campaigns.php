@@ -39,6 +39,14 @@ return [
                 'cta' => 'Tarkista tehtävä',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'Työsi kampanjaan :campaign on valmis',
+                'greeting' => 'Hei, :name,',
+                'body' => 'Luonnoksesi kampanjaan ":campaign" on hyväksytty. Tässä kampanjassa sisällön julkaisee toimisto, joten toimeksiantosi on nyt valmis — sinun ei tarvitse tehdä muuta.',
+                'cta' => 'Katso tehtävä',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Julkaisusi kampanjaan :campaign on hyväksytty',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Kiitos hakemuksestasi työhön ”:campaign”. Kampanja on päättynyt, joten hakemustasi ei käsitellä eteenpäin. Taulullesi julkaistaan uusia töitä säännöllisesti.',
             'cta' => 'Katso työpaikat',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} :creators on yhä kortti julkaisusarakkeessa. Siirrä kortti pois sarakkeesta ennen kuin poistat tekijöiden julkaisun käytöstä.|[2,*] :count korttia on yhä julkaisusarakkeessa (:creators). Siirrä ne pois sarakkeesta ennen kuin poistat tekijöiden julkaisun käytöstä.',
     ],
 ];

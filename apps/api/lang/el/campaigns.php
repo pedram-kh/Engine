@@ -39,6 +39,14 @@ return [
                 'cta' => 'Επανεξέταση εργασίας',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'Η εργασία σας για την :campaign ολοκληρώθηκε',
+                'greeting' => 'Γεια σας, :name,',
+                'body' => 'Το προσχέδιό σας για την «:campaign» εγκρίθηκε. Σε αυτήν την καμπάνια το περιεχόμενο το δημοσιεύει το γραφείο, οπότε η ανάθεσή σας ολοκληρώθηκε — δεν χρειάζεται να κάνετε κάτι άλλο.',
+                'cta' => 'Προβολή εργασίας',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Η δημοσίευσή σας για την καμπάνια :campaign έγινε δεκτή',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Σας ευχαριστούμε για την αίτησή σας για «:campaign». Η καμπάνια έκλεισε, οπότε η αίτησή σας δεν θα προχωρήσει. Νέες αγγελίες δημοσιεύονται τακτικά στον πίνακά σας.',
             'cta' => 'Προβολή αγγελιών',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} Ο/Η :creators έχει ακόμη κάρτα στη στήλη δημοσίευσης. Μετακινήστε την κάρτα εκτός στήλης πριν απενεργοποιήσετε τη δημοσίευση από δημιουργούς.|[2,*] :count κάρτες βρίσκονται ακόμη στη στήλη δημοσίευσης (:creators). Μετακινήστε τις εκτός στήλης πριν απενεργοποιήσετε τη δημοσίευση από δημιουργούς.',
     ],
 ];

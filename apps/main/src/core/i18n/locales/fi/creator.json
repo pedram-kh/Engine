@@ -367,6 +367,7 @@
           "awaitingReview": "Your draft has been submitted and is awaiting agency review.",
           "awaitingVerification": "Your post has been recorded and is awaiting verification.",
           "verifiedNotice": "Agentuuri on vahvistanut julkaisusi. Tämä toimeksianto on valmis — lisätoimenpiteitä ei tarvita.",
+          "completedOnApprovalNotice": "Luonnoksesi on hyväksytty. Tämä toimeksianto on valmis — mitään muuta ei tarvita.",
           "resubmitInPlace": {
             "title": "We couldn't verify your post",
             "intro": "Julkaisusi automaattinen vahvistus epäonnistui. Jos linkki on väärä, korjaa se ja lähetä uudelleen alla. Jos linkki on jo oikein, mitään toimenpiteitä ei tarvita — agentuuri tarkistaa sen ja voi vahvistaa julkaisusi manuaalisesti.",

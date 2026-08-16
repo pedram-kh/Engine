@@ -24,6 +24,11 @@ export type CampaignObjective = 'awareness' | 'engagement' | 'conversion' | 'ugc
  * verification-resolution chunk adds the non-terminal `manually_verified` —
  * the agency's manual override of a FAILED auto-verification (`posted →
  * manually_verified`), payment-eligible alongside `live_verified`.
+ *
+ * AH-069 (D3/D4) adds the TERMINAL `completed_on_approval` — reached only from
+ * `approved`, and only on a campaign whose `creator_posts_content` is false. It
+ * means the work is delivered and the assignment is over; it does NOT mean
+ * anything was posted or verified, and no creator-facing copy may imply either.
  */
 export type AssignmentStatus =
   | 'invited'
@@ -36,6 +41,7 @@ export type AssignmentStatus =
   | 'revision_requested'
   | 'approved'
   | 'rejected'
+  | 'completed_on_approval'
   | 'posted'
   | 'live_verified'
   | 'manually_verified'
@@ -77,6 +83,21 @@ export interface CampaignAttributes {
   brief: CampaignBrief | null
   target_creator_count: number | null
   requires_per_campaign_contract: boolean
+  /**
+   * The posting posture (AH-069, D1). `true` — the shipped lifecycle — means the
+   * creator posts the deliverable, so an approved draft is followed by
+   * posted → verified. `false` means the campaign hands off at approval:
+   * approving a draft completes the assignment
+   * (`approved → completed_on_approval`), the creator never sees a post form,
+   * and the board does not render its Posted column.
+   *
+   * Reads in the POSITIVE direction of its label ("Deliverables are posted by
+   * creators") — no reader has to invert it. The DB default is `true` (the
+   * safety floor: anything created without naming the field keeps today's
+   * behaviour); the create FORM pre-sets it to `false` (the product default) and
+   * always sends it explicitly.
+   */
+  creator_posts_content: boolean
   is_marketplace_visible: boolean
   /**
    * Jobs board (AH-054). The agency's stored INTENT, not "currently visible":
@@ -172,6 +193,13 @@ export interface CreateCampaignPayload {
   posting_window_ends_at?: string | null
   target_creator_count?: number | null
   requires_per_campaign_contract?: boolean
+  /**
+   * Accepted on create (AH-069, D1) — unlike `listed_on_jobs_board`, this
+   * describes how the campaign RUNS, not whether it is advertised. Optional at
+   * the edge: omit it and the server applies the `true` safety floor. The create
+   * form always sends it.
+   */
+  creator_posts_content?: boolean
   brief?: CampaignBrief | null
 
   /**
@@ -515,6 +543,16 @@ export interface CreatorAssignmentDetailResponse {
      * "the agency will send a contract". Optional for back-compat.
      */
     requires_per_campaign_contract?: boolean
+    /**
+     * Whether THIS campaign asks its creators to post the deliverable
+     * (AH-069, D7). `false` means the campaign hands off at approval — no post
+     * form, no verification, and an approved draft is the end of the work.
+     *
+     * Optional for back-compat, and the fallback when absent is `true`: showing
+     * the post step and letting the server refuse is safer than hiding a step a
+     * posting campaign genuinely needs.
+     */
+    creator_posts_content?: boolean
   }
 }
 

@@ -260,6 +260,16 @@ enum AuditAction: string
     // (docs/10-BOARD-AUTOMATION.md). The board sprint consumes this verb (the
     // deferral discipline). Logged by CampaignAssignmentStateMachine::rejectDraft().
     case AssignmentDraftRejected = 'assignment.draft_rejected';
+    // AH-069 (D3) — the approval COMPLETED the assignment, because the campaign
+    // hands off at approval (`creator_posts_content = false`). A distinct verb
+    // rather than a re-used `assignment.draft_approved`, for two reasons that
+    // both bite: the trail has to distinguish "approved, now waiting on a post"
+    // from "approved, and that was the end", and every listener in the fan-out
+    // gates on the VERB — so a shared verb would have made the completion
+    // invisible to the ones that need it and indistinguishable to the rest.
+    // Logged by CampaignAssignmentStateMachine::completeOnApproval(), chained
+    // from the approve path inside the SAME transaction.
+    case AssignmentCompletedOnApproval = 'assignment.completed_on_approval';
     case AssignmentPostedByCreator = 'assignment.posted_by_creator';
     case AssignmentLiveVerified = 'assignment.live_verified';
     // Verification-resolution chunk — the agency's resolution of a FAILED

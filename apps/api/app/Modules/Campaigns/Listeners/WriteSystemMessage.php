@@ -39,6 +39,11 @@ final class WriteSystemMessage
         AuditAction::AssignmentDraftApproved,
         AuditAction::AssignmentRevisionRequested,
         AuditAction::AssignmentDraftRejected,
+        // AH-069 (D5) — the assignment ended at approval. It joins the allowlist
+        // for the same reason `payment_released` is here: a system message IS the
+        // closing event, and a thread whose last line is "The draft was approved."
+        // would leave both parties waiting for a post that is never coming.
+        AuditAction::AssignmentCompletedOnApproval,
         AuditAction::AssignmentPostedByCreator,
         AuditAction::AssignmentLiveVerified,
         AuditAction::AssignmentManuallyVerified,

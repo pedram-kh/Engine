@@ -9,6 +9,7 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Jobs\VerifyPostedContentJob;
+use App\Modules\Campaigns\Mail\AssignmentCompletedOnApprovalMail;
 use App\Modules\Campaigns\Mail\ContractAcceptedMail;
 use App\Modules\Campaigns\Mail\DraftReviewedMail;
 use App\Modules\Campaigns\Mail\DraftSubmittedForReviewMail;
@@ -28,6 +29,7 @@ use Illuminate\Support\Facades\Mail;
  *   - `assignment.draft_approved`      → notify the CREATOR (approved)
  *   - `assignment.revision_requested`  → notify the CREATOR (changes requested)
  *   - `assignment.draft_rejected`      → notify the CREATOR (rejected)
+ *   - `assignment.completed_on_approval` → notify the CREATOR (finished, AH-069)
  *   - `assignment.manually_verified`   → notify the CREATOR (post accepted, D-8)
  *
  * Queued mailables, localized at queue time to the recipient's preferred
@@ -52,6 +54,14 @@ use Illuminate\Support\Facades\Mail;
  * admins+managers via {@see self::notifyAgencyMembers()} (staff excluded),
  * while their emails stay single-inviter (the intentional D-6 asymmetry). Every
  * emit rides ALONGSIDE its untouched Mail::queue, never instead of it.
+ *
+ * AH-069 (D5/Q3) adds the ONE exception to that last sentence, and confines it to
+ * a single flag: when an approval also COMPLETES the assignment (a campaign whose
+ * creators do not post the deliverable), the controller threads
+ * `completes_on_approval` into the approval's context and the draft-approved
+ * EMAIL is skipped — its in-app row still rides. The completion transition that
+ * follows sends the one email. Two in-app rows, one email, for one click. On
+ * every other campaign the flag is absent and nothing here behaves differently.
  */
 final class SendAssignmentNotifications
 {
@@ -73,13 +83,67 @@ final class SendAssignmentNotifications
 
         match ($event->action) {
             AuditAction::AssignmentDraftSubmitted => $this->notifyAgencyOfSubmission($assignment, $actor, $round),
-            AuditAction::AssignmentDraftApproved => $this->notifyCreatorOfReview($assignment, 'approved', $round),
+            AuditAction::AssignmentDraftApproved => $this->notifyCreatorOfReview(
+                $assignment,
+                'approved',
+                $round,
+                suppressEmail: $event->context['completes_on_approval'] ?? false,
+            ),
             AuditAction::AssignmentRevisionRequested => $this->notifyCreatorOfReview($assignment, 'revision_requested', $round),
             AuditAction::AssignmentDraftRejected => $this->notifyCreatorOfReview($assignment, 'rejected', $round),
+            AuditAction::AssignmentCompletedOnApproval => $this->notifyCreatorOfCompletionOnApproval($assignment, $actor, $round),
             AuditAction::AssignmentContracted => $this->notifyAgencyOfContractAcceptance($assignment, $actor),
             AuditAction::AssignmentManuallyVerified => $this->notifyCreatorOfManualVerification($assignment, $actor),
             default => null,
         };
+    }
+
+    /**
+     * AH-069 (D5) — the creator learns their assignment is finished.
+     *
+     * Emitted on the CHAINED completion transition, a moment after the approval's
+     * own notification. Two in-app rows is the deliberate choice (Q3): they read
+     * as one story, and collapsing them would mean either losing the approval
+     * from the creator's history or writing a row whose type lies about which
+     * transition produced it. The EMAIL is the other half of that ruling —
+     * exactly one is sent, and it is this one, because it carries the news.
+     *
+     * Fail-quiet on a missing creator/campaign/user, matching every sibling here:
+     * a notification is not worth an exception inside a transition listener.
+     */
+    private function notifyCreatorOfCompletionOnApproval(CampaignAssignment $assignment, ?User $actor, ?int $round): void
+    {
+        $creator = $assignment->creator;
+        $campaign = $assignment->campaign;
+
+        if ($creator === null || $campaign === null) {
+            return;
+        }
+
+        $recipient = $creator->user;
+        if (! $recipient instanceof User || $recipient->email === '') {
+            return;
+        }
+
+        Mail::to($recipient->email)
+            ->locale($recipient->preferred_language ?: 'en')
+            ->queue(new AssignmentCompletedOnApprovalMail(
+                creatorName: $creator->display_name ?? $recipient->name,
+                campaignName: $campaign->name,
+                assignmentUlid: $assignment->ulid,
+            ));
+
+        $this->notifications->notify(
+            recipient: $recipient,
+            type: NotificationType::AssignmentCompletedOnApproval,
+            subject: $assignment,
+            actor: $actor,
+            data: $this->withRound([
+                'campaign_name' => $campaign->name,
+                'creator_name' => $creator->display_name ?? $recipient->name,
+                'assignment_ulid' => $assignment->ulid,
+            ], $round),
+        );
     }
 
     /**
@@ -200,8 +264,17 @@ final class SendAssignmentNotifications
 
     /**
      * @param  'approved'|'revision_requested'|'rejected'  $outcome
+     * @param  bool  $suppressEmail  AH-069 Q3 — set only on an approval that
+     *                               COMPLETES the assignment. The in-app row is
+     *                               still written; the email is not, because the
+     *                               completion mail arriving a moment later
+     *                               carries the same news and two mails seconds
+     *                               apart for one click is noise. The flag comes
+     *                               from the transition context the controller
+     *                               threaded, so this listener still makes no
+     *                               query of its own to decide.
      */
-    private function notifyCreatorOfReview(CampaignAssignment $assignment, string $outcome, ?int $round = null): void
+    private function notifyCreatorOfReview(CampaignAssignment $assignment, string $outcome, ?int $round = null, bool $suppressEmail = false): void
     {
         $creator = $assignment->creator;
         $campaign = $assignment->campaign;
@@ -228,16 +301,18 @@ final class SendAssignmentNotifications
         $rawFeedback = $outcome === 'approved' ? null : $latestDraft?->review_feedback;
         $feedback = is_string($rawFeedback) && $rawFeedback !== '' ? $rawFeedback : null;
 
-        Mail::to($recipient->email)
-            ->locale($recipient->preferred_language ?: 'en')
-            ->queue(new DraftReviewedMail(
-                creatorName: $creator->display_name ?? $recipient->name,
-                campaignName: $campaign->name,
-                outcome: $outcome,
-                feedback: $feedback,
-                assignmentUlid: $assignment->ulid,
-                round: $round,
-            ));
+        if (! $suppressEmail) {
+            Mail::to($recipient->email)
+                ->locale($recipient->preferred_language ?: 'en')
+                ->queue(new DraftReviewedMail(
+                    creatorName: $creator->display_name ?? $recipient->name,
+                    campaignName: $campaign->name,
+                    outcome: $outcome,
+                    feedback: $feedback,
+                    assignmentUlid: $assignment->ulid,
+                    round: $round,
+                ));
+        }
 
         // S11.0 Chunk 1 (D-10) — the proof consumer. In-app emission rides
         // alongside the email above; NotificationService reads the recipient's

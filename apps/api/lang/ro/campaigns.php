@@ -39,6 +39,14 @@ return [
                 'cta' => 'Revizuiți sarcina',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'Munca dumneavoastră pentru :campaign este finalizată',
+                'greeting' => 'Bună ziua, :name,',
+                'body' => 'Ciorna dumneavoastră pentru „:campaign” a fost aprobată. În această campanie conținutul este publicat de agenție, așa că sarcina dumneavoastră este acum finalizată — nu mai aveți nimic de făcut.',
+                'cta' => 'Vizualizați sarcina',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Postarea dvs. pentru :campaign a fost acceptată',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Îți mulțumim pentru candidatura la „:campaign”. Campania s-a încheiat, așa că candidatura ta nu va merge mai departe. Joburi noi apar regulat pe panoul tău.',
             'cta' => 'Vezi anunțurile de job',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} :creators are încă un card în coloana de publicare. Mutați cardul în afara coloanei înainte de a dezactiva publicarea de către creatori.|[2,*] :count carduri sunt încă în coloana de publicare (:creators). Mutați-le în afara coloanei înainte de a dezactiva publicarea de către creatori.',
     ],
 ];

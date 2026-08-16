@@ -39,6 +39,14 @@ return [
                 'cta' => 'Feladat megtekintése',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'A :campaign kampányhoz végzett munkája elkészült',
+                'greeting' => 'Kedves :name,',
+                'body' => 'A „:campaign” kampányhoz beadott vázlatát jóváhagyták. Ebben a kampányban a tartalmat az ügynökség teszi közzé, így a feladata befejeződött — nincs további tennivalója.',
+                'cta' => 'Feladat megtekintése',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'A(z) :campaign kampányhoz tartozó bejegyzése elfogadva',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Köszönjük a jelentkezésedet a következőre: „:campaign“. A kampány lezárult, ezért a jelentkezésed nem kerül tovább. Új munkák rendszeresen megjelennek a tábládon.',
             'cta' => 'Álláshirdetések megtekintése',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} :creators kártyája még a közzétételi oszlopban van. Helyezze át a kártyát az oszlopból, mielőtt kikapcsolja az alkotói közzétételt.|[2,*] :count kártya még a közzétételi oszlopban van (:creators). Helyezze át őket az oszlopból, mielőtt kikapcsolja az alkotói közzétételt.',
     ],
 ];

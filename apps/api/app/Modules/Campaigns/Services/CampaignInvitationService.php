@@ -98,7 +98,13 @@ final class CampaignInvitationService
             'offer_attachment_mime' => $offer->attachmentMime,
             'offer_attachment_size_bytes' => $offer->attachmentSizeBytes,
             'deliverables' => $offer->deliverables,
-            'posting_due_at' => $offer->postingDueAt,
+            // AH-069 (D8/Q5b) — a campaign that hands off at approval has no
+            // posting step, so it gets no posting deadline. Dropping it at the
+            // WRITER is the durable half of the fix: the overdue sweep's own
+            // exclusion (OverdueScanService) covers assignments invited before
+            // the toggle was turned off, but a deadline that was never stamped
+            // cannot be missed by any future reader either.
+            'posting_due_at' => $campaign->creator_posts_content ? $offer->postingDueAt : null,
             // Sprint 12 Chunk 3 (D-2) — mirror of posting_due_at; nullable.
             'draft_due_at' => $offer->draftDueAt,
         ]);

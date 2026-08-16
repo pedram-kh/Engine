@@ -63,6 +63,7 @@ function makeCampaign(overrides: Partial<CampaignResource['attributes']> = {}): 
       brief: null,
       target_creator_count: null,
       requires_per_campaign_contract: false,
+      creator_posts_content: true,
       is_marketplace_visible: false,
       listed_on_jobs_board: false,
       listing_duration: null,

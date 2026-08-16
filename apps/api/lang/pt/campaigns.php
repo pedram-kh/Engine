@@ -39,6 +39,14 @@ return [
                 'cta' => 'Rever a tarefa',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'O seu trabalho para :campaign está concluído',
+                'greeting' => 'Olá :name,',
+                'body' => 'O seu rascunho para ":campaign" foi aprovado. Nesta campanha o conteúdo é publicado pela agência, por isso a sua tarefa está agora concluída — não há mais nada a fazer.',
+                'cta' => 'Ver a tarefa',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'A sua publicação para :campaign foi aceite',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Obrigado pela sua candidatura a «:campaign». A campanha foi encerrada, pelo que a sua candidatura não seguirá em frente. São publicados novos trabalhos no seu painel com regularidade.',
             'cta' => 'Ver as ofertas de trabalho',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} :creators ainda tem um cartão na coluna de publicação. Retire o cartão da coluna antes de desativar a publicação pelos criadores.|[2,*] :count cartões ainda estão na coluna de publicação (:creators). Retire-os da coluna antes de desativar a publicação pelos criadores.',
     ],
 ];

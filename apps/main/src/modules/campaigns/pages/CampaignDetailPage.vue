@@ -315,6 +315,9 @@ function seedEditForm(c: CampaignResource): void {
     starts_at: toDateInput(c.attributes.starts_at),
     ends_at: toDateInput(c.attributes.ends_at),
     requires_per_campaign_contract: c.attributes.requires_per_campaign_contract,
+    // AH-069 D1 — seeded from the stored value, NOT from the create page's
+    // product default: the Settings tab shows what this campaign actually does.
+    creator_posts_content: c.attributes.creator_posts_content,
     listing_duration: c.attributes.listing_duration ?? undefined,
     listing_fee: c.attributes.listing_fee ?? undefined,
     listing_languages: c.attributes.listing_languages ?? [],
@@ -410,7 +413,24 @@ async function onSaveSettings(): Promise<void> {
     seedEditForm(res.data)
     saveSuccess.value = true
   } catch (err) {
-    if (err instanceof ApiError) {
+    if (err instanceof ApiError && err.code === 'campaign.posting_cards_present') {
+      // AH-069 (D6) — the server refused to turn posting off because cards are
+      // still sitting in the posting column, and its message names the creators
+      // in the caller's own language. Shown verbatim, without the `[code]`
+      // prefix the generic branch adds: this one is written to be read.
+      saveError.value = err.message
+      // Put the switch back where the server still has it. Leaving it OFF would
+      // show a posture the campaign does not have.
+      if (campaign.value !== null) {
+        // A NEW object, not a property write: CampaignForm watches the prop by
+        // reference, so mutating in place would leave the switch showing the
+        // value the server just refused.
+        editForm.value = {
+          ...editForm.value,
+          creator_posts_content: campaign.value.attributes.creator_posts_content,
+        }
+      }
+    } else if (err instanceof ApiError) {
       const grouped = extractFieldErrors<string>(err)
       fieldErrors.value = grouped
       if (Object.keys(grouped).length === 0) {
@@ -563,6 +583,22 @@ function formatDay(iso: string | null): string {
                     "
                     size="small"
                     data-test="overview-requires-contract"
+                  />
+                </template>
+              </v-list-item>
+              <v-list-item :title="t('app.campaigns.fields.creatorPostsContent')">
+                <template #subtitle>
+                  <v-icon
+                    :icon="
+                      campaign.attributes.creator_posts_content
+                        ? 'mdi-check-circle'
+                        : 'mdi-minus-circle-outline'
+                    "
+                    :color="
+                      campaign.attributes.creator_posts_content ? 'success' : 'medium-emphasis'
+                    "
+                    size="small"
+                    data-test="overview-creator-posts-content"
                   />
                 </template>
               </v-list-item>

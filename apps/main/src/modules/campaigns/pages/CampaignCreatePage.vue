@@ -25,6 +25,13 @@ function emptyForm(): CreateCampaignPayload {
     name: '',
     budget_minor_units: 0,
     budget_currency: 'EUR',
+    // AH-069 D1 — the PRODUCT default, and the reason it is stated here rather
+    // than left to the server: a campaign created through this form hands off
+    // at approval. The column's own default is the opposite (`true`, posting
+    // expected) because it is the SAFETY FLOOR for every path that does not
+    // name the field — a direct API POST, a factory, an import. Naming it here
+    // means the two never have to agree.
+    creator_posts_content: false,
   }
 }
 

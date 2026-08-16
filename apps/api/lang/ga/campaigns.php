@@ -39,6 +39,14 @@ return [
                 'cta' => 'Athbhreithnigh cúram',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'Tá do chuid oibre le haghaidh :campaign críochnaithe',
+                'greeting' => 'Dia duit, :name,',
+                'body' => 'Ceadaíodh do dhréacht le haghaidh ":campaign". Ar an bhfeachtas seo, foilsíonn an ghníomhaireacht an t-ábhar, mar sin tá do thasc críochnaithe anois — níl aon rud eile le déanamh agat.',
+                'cta' => 'Féach ar chúram',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Glacadh le do phostáil do :campaign',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Go raibh maith agat as iarratas a chur isteach ar ":campaign". Tá an feachtas dúnta, mar sin ní rachaidh d\'iarratas ar aghaidh. Foilsítear poist nua ar do chlár go rialta.',
             'cta' => 'Féach ar an gclár post',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} Tá cárta ag :creators fós sa cholún foilsithe. Bog an cárta as an gcolún sula gcuirtear foilsiú ag cruthaitheoirí as.|[2,*] Tá :count cárta fós sa cholún foilsithe (:creators). Bog amach as an gcolún iad sula gcuirtear foilsiú ag cruthaitheoirí as.',
     ],
 ];

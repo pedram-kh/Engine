@@ -60,6 +60,10 @@ const LIVE_TYPES = [
   'assignment.draft_approved',
   'assignment.revision_requested',
   'assignment.draft_rejected',
+  // AH-069 (D5) — the approval that ended the assignment. Live from the same
+  // release as the enum case: the listener emits it on every toggle-OFF
+  // approval, so a missing translation would be visible immediately.
+  'assignment.completed_on_approval',
   'assignment.manually_verified',
   'assignment.draft_submitted',
   'assignment.contracted',
@@ -139,13 +143,14 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
     }
   })
 
-  it('notifications.types holds EXACTLY the 18 live templates + fallback', async () => {
+  it('notifications.types holds EXACTLY the 19 live templates + fallback', async () => {
     const en = await loadBundle('en')
     const typeKeys = Object.keys(en.notifications.types).sort()
 
     const expected = [
       'agency_creator_relation_admin_connected',
       'agency_creator_relation_disconnected',
+      'assignment_completed_on_approval',
       'assignment_contracted',
       'assignment_draft_approved',
       'assignment_draft_rejected',
@@ -240,9 +245,13 @@ describe('notifications prefs role-partition — single live-set source of truth
     }
   })
 
-  it('the known role split is honest (creator = 11 review/lifecycle/messaging/jobs, agency = 5 fan-out/messaging/jobs)', () => {
+  it('the known role split is honest (creator = 12 review/lifecycle/messaging/jobs, agency = 5 fan-out/messaging/jobs)', () => {
     expect([...creatorTypes].sort()).toEqual(
       [
+        // AH-069 — creator-only by construction, like `campaign.job_posted`
+        // below: the AGENCY performed the approval, so the completion is not
+        // news to them and a toggle they would never receive is a dead control.
+        'assignment.completed_on_approval',
         'assignment.draft_approved',
         'assignment.draft_rejected',
         'assignment.manually_verified',

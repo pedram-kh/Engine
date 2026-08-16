@@ -68,6 +68,28 @@ final class BoardDefaults
     }
 
     /**
+     * The POSTING FAMILY of automation verbs (AH-069, D6) — the transitions that
+     * can only ever fire on a campaign whose creators post the deliverable.
+     *
+     * Used to decide, at RENDER time, which column an OFF campaign's board should
+     * not show. Deriving the hidden column from the automations that target it —
+     * rather than from the name "Posted" — is what makes the filter survive a
+     * rename, and what keeps it from ever hiding a column that something else
+     * also routes to. Nothing is deleted: the column row, its automations and any
+     * card on it all stay exactly where they are.
+     *
+     * @return list<string>
+     */
+    public static function postingFamilyEventKeys(): array
+    {
+        return [
+            AuditAction::AssignmentPostedByCreator->value,
+            AuditAction::AssignmentLiveVerified->value,
+            AuditAction::AssignmentManuallyVerified->value,
+        ];
+    }
+
+    /**
      * The design-system status palette (§1.2 — "column colors chosen from the
      * design system status palette"). The allow-set the column requests
      * validate against; each maps 1:1 to a `boardStatus` token in

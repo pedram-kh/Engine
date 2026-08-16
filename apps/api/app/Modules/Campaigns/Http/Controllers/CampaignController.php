@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace App\Modules\Campaigns\Http\Controllers;
 
+use App\Core\Errors\ErrorResponse;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
+use App\Modules\Boards\Http\Resources\BoardResource;
+use App\Modules\Boards\Models\Board;
+use App\Modules\Boards\Models\BoardCard;
+use App\Modules\Boards\Support\BoardDefaults;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Http\Requests\CreateCampaignRequest;
@@ -19,6 +24,8 @@ use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -102,6 +109,14 @@ final class CampaignController
             'target_creator_count' => $validated['target_creator_count'] ?? null,
             'requires_per_campaign_contract' => $validated['requires_per_campaign_contract'] ?? false,
 
+            // AH-069 D1 — this array is a WHITELIST, not `$fillable`, so a field
+            // missing from here validates, returns 201 and never persists (the
+            // AH-054 catch). The `?? true` fallback IS the Q1 safety floor: a
+            // caller that does not name the field gets today's behaviour
+            // (posting expected), matching the column default. The create form
+            // always names it.
+            'creator_posts_content' => $validated['creator_posts_content'] ?? true,
+
             // Jobs-board listing copy (AH-054, D2). `listed_on_jobs_board` is
             // absent by design — create never lists (D4); the column default
             // (false) carries it.
@@ -140,8 +155,12 @@ final class CampaignController
      * PATCH /api/v1/agencies/{agency}/campaigns/{campaign}
      *
      * The Settings edit (D-8/D-10) — admin/manager only.
+     *
+     * Returns the resource on success; the one refusal path (AH-069 D6 — the
+     * posting toggle cannot be turned off while cards sit in the posting column)
+     * returns a 422 envelope directly, hence the union.
      */
-    public function update(UpdateCampaignRequest $request, Agency $agency, Campaign $campaign): CampaignResource
+    public function update(UpdateCampaignRequest $request, Agency $agency, Campaign $campaign): CampaignResource|JsonResponse
     {
         $this->assertBelongsToAgency($campaign, $agency);
         Gate::authorize('update', $campaign);
@@ -173,6 +192,41 @@ final class CampaignController
         // adds machinery to reach the same place from further away has not been
         // given new evidence to overturn, and status has one write path (here).
         $wasTerminal = $campaign->status->isTerminal();
+
+        // AH-069 (D6/Q4) — refuse the flip to OFF while cards sit in the posting
+        // column. Turning posting off would stop that column being RENDERED, and
+        // those cards would silently vanish from the agency's board — present in
+        // the database, invisible on screen, with no way to move them. Refusing
+        // the flip is the only answer that neither deletes a row nor hides one.
+        if (
+            $request->has('creator_posts_content')
+            && ! $request->boolean('creator_posts_content')
+            && $campaign->creator_posts_content
+        ) {
+            $stranded = $this->cardsOnPostingColumns($campaign);
+
+            if ($stranded->isNotEmpty()) {
+                $names = $stranded->pluck('creator_name')->filter()->values();
+
+                return ErrorResponse::single(
+                    $request,
+                    Response::HTTP_UNPROCESSABLE_ENTITY,
+                    'campaign.posting_cards_present',
+                    trans_choice(
+                        'campaigns.posting_toggle.cards_present',
+                        $stranded->count(),
+                        ['count' => $stranded->count(), 'creators' => $names->join(', ')],
+                    ),
+                    meta: [
+                        'count' => $stranded->count(),
+                        // ULIDs, not database ids — the agency's client can act
+                        // on these, and they leak nothing.
+                        'assignment_ids' => $stranded->pluck('assignment_ulid')->values()->all(),
+                        'card_ids' => $stranded->pluck('card_ulid')->values()->all(),
+                    ],
+                );
+            }
+        }
 
         $wasListed = $campaign->listed_on_jobs_board;
         $willList = ! $wasListed
@@ -216,6 +270,65 @@ final class CampaignController
         return new CampaignResource(
             ($campaign->fresh() ?? $campaign)->loadCount('assignments')->load(['brand:id,ulid,name', 'agency:id,ulid']),
         );
+    }
+
+    /**
+     * The cards currently sitting on a posting-only column of this campaign's
+     * board (AH-069, D6/Q4).
+     *
+     * "Posting-only" is derived exactly as the render filter derives it — the
+     * posting family targets the column and nothing else does
+     * ({@see BoardResource::hiddenColumnIds()}) — so the set this refuses to
+     * strand is precisely the set the render filter would hide. Two different
+     * rules here would be a bug generator.
+     *
+     * Returns an empty collection when the campaign has no board yet, which is
+     * the common case for a campaign being configured before anyone is invited.
+     *
+     * @return Collection<int, array{assignment_ulid: string, card_ulid: string, creator_name: string|null}>
+     */
+    private function cardsOnPostingColumns(Campaign $campaign): Collection
+    {
+        // No `withoutGlobalScope` here: we are inside the agency-scoped route and
+        // the board belongs to the campaign we just authorised, so the tenant
+        // scope is defence, not an obstacle.
+        $board = Board::query()
+            ->where('campaign_id', $campaign->id)
+            ->with(['automations:id,board_id,event_key,target_column_id'])
+            ->first();
+
+        if ($board === null) {
+            return collect();
+        }
+
+        $postingKeys = BoardDefaults::postingFamilyEventKeys();
+
+        $postingOnlyColumnIds = $board->automations
+            ->whereNotNull('target_column_id')
+            ->groupBy('target_column_id')
+            ->filter(fn (Collection $automations): bool => $automations
+                ->pluck('event_key')
+                ->unique()
+                ->every(static fn (string $key): bool => in_array($key, $postingKeys, true)))
+            ->keys()
+            ->map(static fn (int|string $id): int => (int) $id)
+            ->all();
+
+        if ($postingOnlyColumnIds === []) {
+            return collect();
+        }
+
+        return BoardCard::query()
+            ->where('board_id', $board->id)
+            ->whereIn('column_id', $postingOnlyColumnIds)
+            ->with(['assignment:id,ulid,creator_id', 'assignment.creator:id,display_name'])
+            ->get()
+            ->map(fn (BoardCard $card): array => [
+                'assignment_ulid' => (string) $card->assignment?->ulid,
+                'card_ulid' => $card->ulid,
+                'creator_name' => $card->assignment?->creator?->display_name,
+            ])
+            ->values();
     }
 
     /**
@@ -298,6 +411,11 @@ final class CampaignController
             'agency_id' => $campaign->agency_id,
             'target_creator_count' => $campaign->target_creator_count,
             'requires_per_campaign_contract' => $campaign->requires_per_campaign_contract,
+            // AH-069 D1 — included on the same reasoning as the two toggles
+            // above, and with more force: this one decides whether an approval
+            // ends the assignment, so "who turned it off, and when" is a
+            // question the trail must be able to answer.
+            'creator_posts_content' => $campaign->creator_posts_content,
             'listed_on_jobs_board' => $campaign->listed_on_jobs_board,
         ];
     }

@@ -45,7 +45,7 @@ final class BoardController
         $board = $this->boards->forCampaign($campaign);
 
         $board->load([
-            'campaign:id,ulid',
+            'campaign:id,ulid,creator_posts_content',
             'columns' => fn ($q) => $q->withCount('cards'),
             'automations.targetColumn:id,ulid',
             'cards.column:id,ulid',
@@ -70,7 +70,7 @@ final class BoardController
         $reset->reset($board, $actor);
 
         $board->load([
-            'campaign:id,ulid',
+            'campaign:id,ulid,creator_posts_content',
             'columns' => fn ($q) => $q->withCount('cards'),
             'automations.targetColumn:id,ulid',
             'cards.column:id,ulid',

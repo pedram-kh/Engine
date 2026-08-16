@@ -21,6 +21,12 @@
  * satisfy the listing floor anyway, so offering the switch on create would
  * only ever produce a 422.
  *
+ * The posting toggle (AH-069, D1) is the opposite case and so lives HERE, on
+ * both surfaces: it describes how the campaign runs, which is a question the
+ * agency answers while writing the brief, not an edit-time act. The create
+ * page seeds it to `false` (hand off at approval — the product default); the
+ * column's own default is `true` (the safety floor for callers that omit it).
+ *
  * Per-field 422 errors arrive via `fieldErrors` (the canonical
  * extractFieldErrors pattern); the parent owns the network layer.
  */
@@ -298,6 +304,24 @@ const brandSelectItems = computed(() => props.brands.map((b) => ({ title: b.name
       density="compact"
       data-test="campaign-requires-contract"
       @update:model-value="update('requires_per_campaign_contract', $event ?? false)"
+    />
+
+    <!--
+      AH-069 D1 — the posting toggle. Read in the POSITIVE direction ("posted by
+      creators" = ON), so nobody has to invert it. The `?? true` fallback is the
+      safety floor showing through: a payload without the key describes a
+      campaign that expects posting.
+    -->
+    <v-switch
+      :model-value="local.creator_posts_content ?? true"
+      :label="t('app.campaigns.fields.creatorPostsContent')"
+      :hint="t('app.campaigns.fields.creatorPostsContentHint')"
+      persistent-hint
+      color="primary"
+      density="compact"
+      class="mb-3"
+      data-test="campaign-creator-posts-content"
+      @update:model-value="update('creator_posts_content', $event ?? true)"
     />
 
     <div

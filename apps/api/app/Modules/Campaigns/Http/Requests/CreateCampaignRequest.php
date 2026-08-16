@@ -67,6 +67,14 @@ final class CreateCampaignRequest extends FormRequest
             'target_creator_count' => ['nullable', 'integer', 'min:0'],
             'requires_per_campaign_contract' => ['sometimes', 'boolean'],
 
+            // AH-069 D1 — the posting toggle IS accepted on create (unlike
+            // `listed_on_jobs_board`): it describes how the campaign runs, not
+            // whether it is advertised, so the agency answers it while writing
+            // the brief. `sometimes` is deliberate — an omitted value falls
+            // back to the column default (`true`, posting expected), which is
+            // the Q1 safety floor.
+            'creator_posts_content' => ['sometimes', 'boolean'],
+
             // Structured brief blob → jsonb. Sub-fields are validated loosely.
             'brief' => ['nullable', 'array'],
             'brief.deliverables' => ['sometimes', 'array'],

@@ -43,8 +43,30 @@ use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
  * `campaign_assignments.status` varchar(32) — no migration (a sub-status marker
  * on `campaign_posted_content.verification_status` varchar(16) WOULD overflow).
  *
- * Terminal states: declined, rejected, payment_released, cancelled.
- * Payment-eligible states: live_verified, manually_verified ({@see isPaymentEligible()}).
+ * Draft Workflow v2 chunk B (AH-069, D3): `completed_on_approval` is a NEW
+ * TERMINAL state for campaigns whose `creator_posts_content` is false — the
+ * agency takes the approved files and publishes them itself, so there is no
+ * posting step to wait for and approval IS the finish line. It is reached ONLY
+ * from `approved`, and only by the approve path chaining into it inside the same
+ * transaction; nothing else transitions into it, and a campaign that expects
+ * creator posting can never reach it at all.
+ *
+ * The name says what happened and nothing more. It deliberately does NOT say
+ * "verified" or "posted": no content was published through the platform, no
+ * verification ran, and the creator-facing banner must never imply otherwise.
+ *
+ * It is PAYMENT-ELIGIBLE ({@see isPaymentEligible()}) because on this campaign
+ * type approval is completion — the work is done and there is nothing further
+ * to check. The consequence Sprint 10 inherits, in writing: a payable
+ * assignment in this state has NO `campaign_posted_content` row at all, so any
+ * release path that joins posted content to find the "verified" record will
+ * find nothing. Consume the predicate, never the row. 21 chars, fits the
+ * `campaign_assignments.status` varchar(32) — no migration.
+ *
+ * Terminal states: declined, rejected, completed_on_approval, payment_released,
+ * cancelled.
+ * Payment-eligible states: live_verified, manually_verified,
+ * completed_on_approval ({@see isPaymentEligible()}).
  */
 enum AssignmentStatus: string
 {
@@ -58,6 +80,7 @@ enum AssignmentStatus: string
     case RevisionRequested = 'revision_requested';
     case Approved = 'approved';
     case Rejected = 'rejected';
+    case CompletedOnApproval = 'completed_on_approval';
     case Posted = 'posted';
     case LiveVerified = 'live_verified';
     case ManuallyVerified = 'manually_verified';
@@ -74,6 +97,7 @@ enum AssignmentStatus: string
         return match ($this) {
             self::Declined,
             self::Rejected,
+            self::CompletedOnApproval,
             self::PaymentReleased,
             self::Cancelled => true,
             default => false,
@@ -89,12 +113,19 @@ enum AssignmentStatus: string
      * alongside a real auto-verification (`live_verified`) WITHOUT collapsing the
      * two (the audit distinction survives). Proven now (a test asserts both
      * states satisfy it) even though no payment is built this chunk.
+     *
+     * AH-069 (D4) adds `completed_on_approval` on the same reasoning taken one
+     * step further: on a campaign that hands off at approval, approval is the
+     * completion event, so refusing to pay it would leave finished work unpaid.
+     * The Sprint-10 consequence is recorded on the enum's class docblock — such
+     * an assignment has no posted-content row to join.
      */
     public function isPaymentEligible(): bool
     {
         return match ($this) {
             self::LiveVerified,
-            self::ManuallyVerified => true,
+            self::ManuallyVerified,
+            self::CompletedOnApproval => true,
             default => false,
         };
     }

@@ -52,7 +52,8 @@ it('partitions the 16 cases into three DISJOINT and COMPLETE families', function
     expect($mapped)->toHaveCount(count(AssignmentStatus::cases()))
         ->and(array_unique($mapped))->toHaveCount(count(AssignmentStatus::cases()));
 
-    // DISJOINT + the exact membership, ratified at plan-pause (Q3). 8 / 5 / 3.
+    // DISJOINT + the exact membership, ratified at plan-pause (Q3). 8 / 6 / 3
+    // since AH-069 D4 landed the 17th case in Completed.
     expect($families[JobLifecycleState::InProgress->value])->toEqualCanonicalizing([
         'invited',
         'countered',
@@ -64,6 +65,13 @@ it('partitions the 16 cases into three DISJOINT and COMPLETE families', function
         'approved',
     ])
         ->and($families[JobLifecycleState::Completed->value])->toEqualCanonicalizing([
+            // AH-069 D4 — the deliberate assignment the exhaustiveness pin
+            // forced. `completed_on_approval` is Completed even though its
+            // SOURCE state `approved` is In progress: on a campaign that hands
+            // off at approval there is no posting step left to wait for, so this
+            // is the one place "Completed" after an approval is not the
+            // over-promise the `Approved` docblock warns about.
+            'completed_on_approval',
             'posted',
             'live_verified',
             'manually_verified',
@@ -106,8 +114,18 @@ it('does NOT reuse isTerminal() — a fully-paid engagement is Completed, never 
         ),
     );
 
+    // Two terminal states are deliberately NOT Ended, and for the same reason:
+    // both are successful ends. `payment_released` is the paid finish; AH-069's
+    // `completed_on_approval` is the delivered-and-handed-off finish. Rendering
+    // either as "Ended" would tell a creator their finished work fell through.
     expect(array_diff($ended, $terminal))->toBe([], 'every Ended state must also be terminal')
-        ->and(array_diff($terminal, $ended))->toEqualCanonicalizing(['payment_released']);
+        ->and(array_diff($terminal, $ended))->toEqualCanonicalizing([
+            'payment_released',
+            'completed_on_approval',
+        ]);
+
+    expect(JobLifecycleState::fromAssignmentStatus(AssignmentStatus::CompletedOnApproval))
+        ->toBe(JobLifecycleState::Completed);
 });
 
 it('reflects the invitation itself as In progress — the D1 branch depends on it', function (): void {

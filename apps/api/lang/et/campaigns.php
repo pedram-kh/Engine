@@ -39,6 +39,14 @@ return [
                 'cta' => 'Vaata ülesannet',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'Teie töö kampaania :campaign jaoks on valmis',
+                'greeting' => 'Tere, :name,',
+                'body' => 'Teie kavand kampaania „:campaign“ jaoks on kinnitatud. Selles kampaanias avaldab sisu agentuur, seega on teie ülesanne nüüd lõpetatud — midagi enamat teha ei ole vaja.',
+                'cta' => 'Vaata ülesannet',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Teie postitus kampaaniale :campaign on vastu võetud',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Täname, et kandideerisite tööle „:campaign“. Kampaania on lõppenud, seega teie kandideerimist edasi ei menetleta. Uued tööpakkumised ilmuvad teie tahvlile regulaarselt.',
             'cta' => 'Vaata tööpakkumisi',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} :creators kaart on endiselt avaldamise veerus. Teisaldage kaart veerust välja, enne kui lülitate loojate avaldamise välja.|[2,*] :count kaarti on endiselt avaldamise veerus (:creators). Teisaldage need veerust välja, enne kui lülitate loojate avaldamise välja.',
     ],
 ];

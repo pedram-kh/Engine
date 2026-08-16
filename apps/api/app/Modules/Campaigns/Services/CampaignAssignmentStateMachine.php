@@ -40,6 +40,7 @@ use Laravel\Pennant\Feature;
  *   accepted → contracted (flag-gated) → producing → draft_submitted
  *   draft_submitted → {revision_requested → producing(loop), approved, rejected}
  *   approved → posted → live_verified → payment_held → payment_released
+ *   approved → completed_on_approval  [campaigns that hand off at approval, AH-069]
  *   any non-terminal → cancelled
  *
  * Sprint 9 Chunk 2: `rejectDraft` (`draft_submitted → rejected`, the new
@@ -394,6 +395,46 @@ final class CampaignAssignmentStateMachine
             AuditAction::AssignmentDraftRejected,
             $actor,
             reason: $trimmed,
+            context: $context,
+        );
+    }
+
+    /**
+     * approved → completed_on_approval (terminal, AH-069 D3). The campaign hands
+     * off at approval (`creator_posts_content = false`): the agency takes the
+     * approved files and publishes them itself, so there is no posting step to
+     * wait for and the approval IS the finish line.
+     *
+     * FAIL-CLOSED on both sides, deliberately:
+     *
+     *   - `approved` is the ONLY legal source. Not `draft_submitted` — the edge
+     *     is a CHAIN off {@see self::approve()}, not a shortcut past it, so the
+     *     trail always shows the approval before the completion.
+     *   - the CAMPAIGN check does NOT live here. This method transitions an
+     *     assignment; it does not decide policy, and giving it a campaign read
+     *     would let two callers disagree about which campaign to read. The
+     *     single caller — the agency review endpoint — checks
+     *     `creator_posts_content` on the route-bound campaign it already holds
+     *     and only then chains, inside the transaction it already opened. That
+     *     is why a toggle-ON campaign can never reach this state: nothing calls
+     *     it. {@see CampaignAssignmentReviewController::review()}
+     *
+     * Fires the net-new board verb `assignment.completed_on_approval`. No
+     * `mutate` closure: there is no `completed_on_approval_at` column, and there
+     * should not be — `approved_at` already carries the moment (the two are the
+     * same instant, one transaction) and the audit row carries the rest.
+     *
+     * @param  array<string, mixed>  $context
+     */
+    public function completeOnApproval(CampaignAssignment $assignment, ?User $actor = null, array $context = []): CampaignAssignment
+    {
+        $this->assertSource($assignment, [AssignmentStatus::Approved], AssignmentStatus::CompletedOnApproval);
+
+        return $this->commit(
+            $assignment,
+            AssignmentStatus::CompletedOnApproval,
+            AuditAction::AssignmentCompletedOnApproval,
+            $actor,
             context: $context,
         );
     }

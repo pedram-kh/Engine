@@ -39,6 +39,14 @@ return [
                 'cta' => 'Прегледай задачата',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'Работата ви по :campaign е завършена',
+                'greeting' => 'Здравей, :name,',
+                'body' => 'Черновата ви за „:campaign“ беше одобрена. При тази кампания агенцията публикува съдържанието, така че заданието ви вече е завършено — не е необходимо да правите нищо повече.',
+                'cta' => 'Виж задачата',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Вашата публикация за :campaign е приета',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Благодарим ви, че кандидатствахте за „:campaign“. Кампанията беше затворена, така че вашата кандидатура няма да продължи напред. Нови обяви се публикуват редовно на вашия борд.',
             'cta' => 'Към борда с обяви',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} :creators все още има карта в колоната за публикуване. Преместете картата извън колоната, преди да изключите публикуването от създатели.|[2,*] :count карти са все още в колоната за публикуване (:creators). Преместете ги извън колоната, преди да изключите публикуването от създатели.',
     ],
 ];

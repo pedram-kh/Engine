@@ -65,6 +65,12 @@ final class UpdateCampaignRequest extends FormRequest
             'target_creator_count' => ['sometimes', 'nullable', 'integer', 'min:0'],
             'requires_per_campaign_contract' => ['sometimes', 'boolean'],
 
+            // AH-069 D1 — editable on the Settings tab. The flip-to-OFF refusal
+            // while cards sit in Posted is enforced in the controller (D6), not
+            // here: it needs the board, and a FormRequest is the wrong place to
+            // reach for one.
+            'creator_posts_content' => ['sometimes', 'boolean'],
+
             'listed_on_jobs_board' => ['sometimes', 'boolean'],
 
             'brief' => ['sometimes', 'nullable', 'array'],

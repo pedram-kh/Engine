@@ -39,6 +39,14 @@ return [
                 'cta' => 'Opdracht controleren',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'Je werk voor :campaign is afgerond',
+                'greeting' => 'Hallo :name,',
+                'body' => 'Je concept voor ":campaign" is goedgekeurd. Bij deze campagne plaatst het bureau de content, dus je opdracht is nu afgerond — je hoeft niets meer te doen.',
+                'cta' => 'Opdracht bekijken',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Je post voor :campaign is geaccepteerd',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Bedankt voor je aanmelding voor ":campaign". De campagne is gesloten, dus je aanmelding gaat niet verder. Er komen regelmatig nieuwe vacatures op je bord.',
             'cta' => 'Vacatures bekijken',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} :creators heeft nog een kaart in de plaatsingskolom. Verplaats die kaart uit de kolom voordat u plaatsen door creators uitschakelt.|[2,*] :count kaarten staan nog in de plaatsingskolom (:creators). Verplaats ze uit de kolom voordat u plaatsen door creators uitschakelt.',
     ],
 ];

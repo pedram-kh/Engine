@@ -11,6 +11,7 @@ import type {
   CampaignDraftListItemResource,
   CampaignResource,
 } from '@catalyst/api-client'
+import { ApiError } from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -130,6 +131,7 @@ function makeCampaign(
       brief: null,
       target_creator_count: null,
       requires_per_campaign_contract: requiresContract,
+      creator_posts_content: true,
       is_marketplace_visible: false,
       listed_on_jobs_board: false,
       listing_duration: null,
@@ -814,6 +816,56 @@ describe('CampaignDetailPage — jobs board toggle (AH-054)', () => {
       CAMPAIGN_ULID,
       expect.objectContaining({ listed_on_jobs_board: true }),
     )
+  })
+
+  it('seeds the stored posting posture into Settings and sends it back (AH-069 D1)', async () => {
+    // Settings shows what THIS campaign does — never the create page's product
+    // default. A campaign already handing off at approval must not silently
+    // revert to expecting posting the next time someone saves the tab.
+    const wrapper = await openSettings({ creator_posts_content: false })
+
+    const toggle = wrapper.find('[data-test="campaign-creator-posts-content"] input')
+    expect((toggle.element as HTMLInputElement).checked).toBe(false)
+
+    vi.mocked(campaignsApi.update).mockResolvedValue({
+      data: makeCampaign(false, { creator_posts_content: false }),
+    })
+
+    await wrapper.find('[data-test="campaign-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(campaignsApi.update).toHaveBeenCalledWith(
+      'agency-ulid',
+      CAMPAIGN_ULID,
+      expect.objectContaining({ creator_posts_content: false }),
+    )
+  })
+
+  it('shows the refusal verbatim and puts the toggle back when the server rejects the flip (AH-069 D6)', async () => {
+    const wrapper = await openSettings({ creator_posts_content: true })
+
+    vi.mocked(campaignsApi.update).mockRejectedValue(
+      new ApiError({
+        message: 'Nadia Rossi still has a card in the posting column.',
+        status: 422,
+        code: 'campaign.posting_cards_present',
+      }),
+    )
+
+    await wrapper.find('[data-test="campaign-creator-posts-content"] input').setValue(false)
+    await wrapper.find('[data-test="campaign-form"]').trigger('submit')
+    await flushPromises()
+
+    // The server's sentence, in the caller's own language, with no `[code]`
+    // prefix in front of it — this message is written to be read.
+    const text = wrapper.text()
+    expect(text).toContain('Nadia Rossi still has a card in the posting column.')
+    expect(text).not.toContain('campaign.posting_cards_present')
+
+    // And the switch is back where the server still has it: leaving it OFF
+    // would show a posture the campaign does not have.
+    const toggle = wrapper.find('[data-test="campaign-creator-posts-content"] input')
+    expect((toggle.element as HTMLInputElement).checked).toBe(true)
   })
 
   it('seeds the listing fields into the edit form so an omitted field is never blanked', async () => {

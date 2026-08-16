@@ -39,6 +39,14 @@ return [
                 'cta' => 'Peržiūrėti užduotį',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'Jūsų darbas kampanijai :campaign baigtas',
+                'greeting' => 'Sveiki, :name,',
+                'body' => 'Jūsų juodraštis kampanijai „:campaign“ patvirtintas. Šioje kampanijoje turinį paskelbia agentūra, todėl jūsų užduotis baigta — daugiau nieko daryti nereikia.',
+                'cta' => 'Žiūrėti užduotį',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Jūsų įrašas kampanijai :campaign priimtas',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Dėkojame, kad pateikėte paraišką dėl „:campaign“. Kampanija baigta, todėl jūsų paraiška toliau nebus svarstoma. Nauji darbo pasiūlymai jūsų lentoje skelbiami reguliariai.',
             'cta' => 'Peržiūrėti darbo pasiūlymus',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} :creators vis dar turi kortelę paskelbimo stulpelyje. Perkelkite kortelę iš stulpelio, prieš išjungdami kūrėjų skelbimą.|[2,*] :count kortelės vis dar yra paskelbimo stulpelyje (:creators). Perkelkite jas iš stulpelio, prieš išjungdami kūrėjų skelbimą.',
     ],
 ];

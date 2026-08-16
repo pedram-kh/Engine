@@ -155,6 +155,15 @@ final class CreatorAssignmentDraftController
                 // Belt-and-suspenders: with the D2 auto-advance an OFF assignment
                 // should never sit at `accepted`, but a residual row is covered.
                 'requires_per_campaign_contract' => $campaign !== null && $campaign->requires_per_campaign_contract,
+                // AH-069 (D7) — whether THIS campaign asks its creators to post
+                // the deliverable. The creator page uses it to keep the post
+                // form off an `approved` assignment on a hand-off campaign: the
+                // same sliver the Q2 server guard covers, closed on the surface
+                // too so the creator is never offered an action that 422s.
+                // Defaults to `true` when the campaign is somehow missing —
+                // showing the form and letting the server refuse is safer than
+                // hiding a step a posting campaign genuinely needs.
+                'creator_posts_content' => $campaign === null || $campaign->creator_posts_content,
             ],
         ]);
     }
@@ -393,6 +402,24 @@ final class CreatorAssignmentDraftController
             );
         }
 
+        // AH-069 (Q2) — the campaign hands off at approval, so there is no post
+        // to report. In practice the approval already completed the assignment
+        // and the status check above caught it; this guard exists for the sliver
+        // where the toggle was flipped OFF between an approval and this call,
+        // leaving a genuinely `approved` assignment on a hand-off campaign. Let
+        // that through and it lands on `posted` — a status whose board column
+        // the campaign no longer renders, i.e. an invisible card. Refusing here
+        // is the mirror of the machine refusing a hand-off campaign's
+        // `completed_on_approval` from any source but `approved`.
+        if ($model->campaign !== null && ! $model->campaign->creator_posts_content) {
+            return ErrorResponse::single(
+                $request,
+                422,
+                'assignment.posting_not_required',
+                'This campaign does not ask creators to post the deliverable. Your approved draft is all that was needed.',
+            );
+        }
+
         $posted = DB::transaction(function () use ($model, $validated, $user, $machine): CampaignPostedContent {
             $posted = CampaignPostedContent::create([
                 'assignment_id' => $model->id,
@@ -511,7 +538,7 @@ final class CreatorAssignmentDraftController
             ->withoutGlobalScope(BelongsToAgencyScope::class)
             ->where('creator_id', $creator->id)
             ->where('ulid', $assignmentUlid)
-            ->with(['campaign:id,ulid,name,posting_window_starts_at,posting_window_ends_at,starts_at,ends_at,brand_id,requires_per_campaign_contract', 'campaign.brand:id,ulid,name'])
+            ->with(['campaign:id,ulid,name,posting_window_starts_at,posting_window_ends_at,starts_at,ends_at,brand_id,requires_per_campaign_contract,creator_posts_content', 'campaign.brand:id,ulid,name'])
             ->first();
 
         if ($assignment === null) {

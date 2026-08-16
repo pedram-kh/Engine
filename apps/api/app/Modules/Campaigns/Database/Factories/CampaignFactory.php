@@ -47,6 +47,9 @@ final class CampaignFactory extends Factory
             'marketplace_open_at' => null,
             'marketplace_close_at' => null,
             'requires_per_campaign_contract' => false,
+            // AH-069 D1 — the safety floor, mirrored into the factory so every
+            // pre-existing test keeps the lifecycle it was written against.
+            'creator_posts_content' => true,
             'listed_on_jobs_board' => false,
             'listing_duration' => null,
             'listing_fee' => null,
@@ -96,6 +99,18 @@ final class CampaignFactory extends Factory
         return $this->jobReady()->state(fn (array $attributes): array => [
             'listed_on_jobs_board' => true,
             'listed_at' => now(),
+        ]);
+    }
+
+    /**
+     * The AH-069 toggle-OFF campaign: the creator does NOT post the deliverable,
+     * so approving a draft completes the assignment
+     * (`approved → completed_on_approval`, D3).
+     */
+    public function handsOffAtApproval(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'creator_posts_content' => false,
         ]);
     }
 

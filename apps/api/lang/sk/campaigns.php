@@ -39,6 +39,14 @@ return [
                 'cta' => 'Skontrolovať úlohu',
             ],
         ],
+        'completed_on_approval' => [
+            'email' => [
+                'subject' => 'Vaša práca pre :campaign je hotová',
+                'greeting' => 'Dobrý deň, :name,',
+                'body' => 'Váš koncept pre „:campaign“ bol schválený. Pri tejto kampani obsah zverejňuje agentúra, takže vaše zadanie je teraz dokončené — nič ďalšie robiť nemusíte.',
+                'cta' => 'Zobraziť úlohu',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Váš príspevok pre :campaign bol prijatý',
@@ -121,5 +129,14 @@ return [
             'body_campaign_closed' => 'Ďakujeme za vašu prihlášku na „:campaign“. Kampaň bola ukončená, takže vaša prihláška nebude posudzovaná ďalej. Nové ponuky sa na vašej tabuli objavujú pravidelne.',
             'cta' => 'Zobraziť pracovné ponuky',
         ],
+    ],
+    // AH-069 (D6/Q4) — the refuse-flip message. Turning posting OFF stops the
+    // board RENDERING its posting column, so a card sitting there would be
+    // present in the database and invisible on screen. The update endpoint
+    // refuses the flip and says which cards are in the way, by creator name; the
+    // machine-readable count and the assignment/card ULIDs travel in the error's
+    // `meta` so a client can link straight to them.
+    'posting_toggle' => [
+        'cards_present' => '{1} :creators má stále kartu v stĺpci publikovania. Presuňte kartu zo stĺpca, kým vypnete publikovanie tvorcami.|[2,*] :count kariet je stále v stĺpci publikovania (:creators). Presuňte ich zo stĺpca, kým vypnete publikovanie tvorcami.',
     ],
 ];

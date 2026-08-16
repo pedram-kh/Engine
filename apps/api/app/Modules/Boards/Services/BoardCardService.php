@@ -139,7 +139,15 @@ final class BoardCardService
             AssignmentStatus::Contracted,
             AssignmentStatus::Producing => AuditAction::AssignmentInvited->value,
             AssignmentStatus::DraftSubmitted => AuditAction::AssignmentDraftSubmitted->value,
+            // `CompletedOnApproval` (AH-069) shares `Approved`'s column on
+            // purpose — Q6 ruled that no automation moves the card when an
+            // approval completes the assignment, so it stays where approval left
+            // it, and a card provisioned or healed AFTER that completion must
+            // land in the same place a live one already sits. Routing it to the
+            // posted key instead would aim a card at the one column an OFF
+            // campaign's board deliberately does not render (D6).
             AssignmentStatus::Approved,
+            AssignmentStatus::CompletedOnApproval,
             AssignmentStatus::RevisionRequested => AuditAction::AssignmentDraftApproved->value,
             AssignmentStatus::Posted,
             AssignmentStatus::LiveVerified,

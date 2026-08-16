@@ -123,6 +123,12 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'assignment.draft_approved',
         // Sprint 9 Chunk 2 — the agency's dedicated draft-rejection terminal.
         'assignment.draft_rejected',
+        // AH-069 (D3) — the approval that ENDED the assignment, on a campaign
+        // whose creators do not post the deliverable. A distinct verb from
+        // `assignment.draft_approved` because every listener in the fan-out gates
+        // on the verb: sharing one would have made the completion invisible to
+        // the listeners that must react and indistinguishable to the rest.
+        'assignment.completed_on_approval',
         'assignment.posted_by_creator',
         'assignment.live_verified',
         'assignment.payment_funded',

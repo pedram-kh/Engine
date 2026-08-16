@@ -225,6 +225,81 @@ it('approve: draft_submitted → approved fires the board verb assignment.draft_
     expect(lastAuditFor($assignment, AuditAction::AssignmentDraftApproved))->not->toBeNull();
 });
 
+it('completeOnApproval: approved → completed_on_approval fires assignment.completed_on_approval (AH-069 D3)', function (): void {
+    $assignment = assignmentInStatus(AssignmentStatus::Approved);
+
+    sm()->completeOnApproval($assignment, context: ['draft_id' => 'd_123', 'version' => 2]);
+
+    $fresh = reload($assignment);
+    expect($fresh->status)->toBe(AssignmentStatus::CompletedOnApproval);
+
+    $audit = lastAuditFor($assignment, AuditAction::AssignmentCompletedOnApproval);
+    expect($audit)->not->toBeNull()
+        ->and($audit?->metadata['from'] ?? null)->toBe('approved')
+        ->and($audit?->metadata['to'] ?? null)->toBe('completed_on_approval')
+        ->and($audit?->metadata['version'] ?? null)->toBe(2);
+});
+
+it('completeOnApproval stamps NO new timestamp — approved_at already carries the moment', function (): void {
+    // Deliberate absence, pinned so nobody "fixes" it by adding a column: the
+    // approval and the completion are the same instant in the same transaction.
+    $assignment = assignmentInStatus(AssignmentStatus::Approved);
+    $assignment->approved_at = now()->subMinute();
+    $assignment->save();
+    $approvedAt = $assignment->approved_at;
+
+    sm()->completeOnApproval($assignment);
+
+    $fresh = reload($assignment);
+    expect($fresh->approved_at?->toIso8601String())->toBe($approvedAt->toIso8601String())
+        ->and($fresh->posted_at)->toBeNull()
+        ->and($fresh->verified_live_at)->toBeNull();
+});
+
+it('completed_on_approval has NO edge out — it is terminal (AH-069 D3)', function (): void {
+    Feature::define(ContractSigningEnabled::NAME, true);
+
+    // Every outward-looking method the state could plausibly be dragged into.
+    expect(fn () => sm()->markPosted(assignmentInStatus(AssignmentStatus::CompletedOnApproval)))
+        ->toThrow(AssignmentTransitionException::class);
+    expect(fn () => sm()->approve(assignmentInStatus(AssignmentStatus::CompletedOnApproval)))
+        ->toThrow(AssignmentTransitionException::class);
+    expect(fn () => sm()->completeOnApproval(assignmentInStatus(AssignmentStatus::CompletedOnApproval)))
+        ->toThrow(AssignmentTransitionException::class);
+
+    // And cancel refuses it as terminal, with the terminal code rather than the
+    // illegal-transition one.
+    try {
+        sm()->cancel(assignmentInStatus(AssignmentStatus::CompletedOnApproval), 'too late');
+        $this->fail('Expected a terminal-cancel rejection.');
+    } catch (AssignmentTransitionException $e) {
+        expect($e->errorCode)->toBe('assignment.terminal');
+    }
+});
+
+it('completeOnApproval fails closed from every source but approved (AH-069 D3)', function (string $from): void {
+    $assignment = assignmentInStatus(AssignmentStatus::from($from));
+
+    try {
+        sm()->completeOnApproval($assignment);
+        $this->fail("Expected completeOnApproval to refuse a {$from} source.");
+    } catch (AssignmentTransitionException $e) {
+        expect($e->errorCode)->toBe('assignment.invalid_transition');
+    }
+
+    expect(reload($assignment)->status->value)->toBe($from);
+})->with([
+    // `draft_submitted` is the one that matters most: the completion is a CHAIN
+    // off the approval, never a shortcut past it, so the trail always shows the
+    // approval first.
+    'draft_submitted' => ['draft_submitted'],
+    'producing' => ['producing'],
+    'revision_requested' => ['revision_requested'],
+    'posted' => ['posted'],
+    'invited' => ['invited'],
+    'contracted' => ['contracted'],
+]);
+
 it('markPosted: approved → posted fires the board verb assignment.posted_by_creator + stamps posted_at', function (): void {
     $assignment = assignmentInStatus(AssignmentStatus::Approved);
 
@@ -304,6 +379,8 @@ it('rejects any transition out of a terminal state (declined / rejected / paymen
     'declined' => ['declined'],
     // Sprint 9 Chunk 2 (D-1) — the new dedicated terminal has no edge out.
     'rejected' => ['rejected'],
+    // AH-069 (D3) — likewise for the hand-off-at-approval terminal.
+    'completed_on_approval' => ['completed_on_approval'],
     'payment_released' => ['payment_released'],
 ]);
 
@@ -352,6 +429,7 @@ it('rejects cancelling a terminal assignment', function (string $from): void {
 })->with([
     'declined' => ['declined'],
     'rejected' => ['rejected'],
+    'completed_on_approval' => ['completed_on_approval'],
     'payment_released' => ['payment_released'],
     'cancelled' => ['cancelled'],
 ]);
