@@ -38,6 +38,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { campaignsApi } from '@/modules/campaigns/api/campaigns.api'
+import { roundStateKey } from '@/modules/campaigns/draftRounds'
 import { agencyChatTransport, type ChatTransport } from '@/modules/messaging/api/messaging.api'
 import ChatPanel from '@/modules/messaging/components/ChatPanel.vue'
 
@@ -101,6 +102,9 @@ const chatTitle = computed(
 )
 const latestDraft = computed(() => detail.value?.relationships.drafts[0] ?? null)
 const postedContent = computed(() => detail.value?.relationships.posted_content[0] ?? null)
+// Read off `detail` rather than the card's embedded assignment so the round-state
+// copy and the draft it describes can never come from two different loads.
+const assignmentStatus = computed(() => detail.value?.attributes.status ?? null)
 
 // The verification-failure resolution hand-off (same gate as the Creators
 // tab): offered when the assignment is `posted` and its LATEST post's
@@ -511,15 +515,9 @@ function close(): void {
                   >
                     <v-chip size="x-small" variant="tonal">
                       {{
-                        t('app.campaigns.review.draftVersion', {
+                        t(roundStateKey(latestDraft.attributes.review_status, assignmentStatus), {
                           n: latestDraft.attributes.version,
                         })
-                      }}
-                      ·
-                      {{
-                        t(
-                          `app.campaigns.review.draftStatus.${latestDraft.attributes.review_status}`,
-                        )
                       }}
                     </v-chip>
                     <span class="text-truncate">

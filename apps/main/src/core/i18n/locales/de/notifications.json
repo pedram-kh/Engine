@@ -9,7 +9,8 @@
       "error": "Benachrichtigungen konnten nicht geladen werden.",
       "unreadBadgeLabel": "{count} ungelesene Benachrichtigungen",
       "feedbackLabel": "Feedback",
-      "reasonLabel": "Grund"
+      "reasonLabel": "Grund",
+      "round": "Entwurf {n}"
     },
     "page": {
       "title": "Benachrichtigungen",

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Campaigns\Mail;
 
 use App\Modules\Campaigns\Listeners\SendAssignmentNotifications;
+use App\Modules\Campaigns\Mail\Concerns\CarriesDraftRound;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -22,10 +23,12 @@ use Illuminate\Mail\Mailables\Envelope;
  */
 final class DraftReviewedMail extends Mailable implements ShouldQueue
 {
+    use CarriesDraftRound;
     use Queueable;
 
     /**
      * @param  'approved'|'revision_requested'|'rejected'  $outcome
+     * @param  int|null  $round  The reviewed draft's `version` (AH-068, D4).
      */
     public function __construct(
         public readonly string $creatorName,
@@ -33,12 +36,16 @@ final class DraftReviewedMail extends Mailable implements ShouldQueue
         public readonly string $outcome,
         public readonly ?string $feedback,
         public readonly string $assignmentUlid,
+        public readonly ?int $round = null,
     ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: __('campaigns.assignment_notifications.reviewed.email.subject_'.$this->outcome, ['campaign' => $this->campaignName]),
+            subject: $this->withRoundInSubject(
+                (string) __('campaigns.assignment_notifications.reviewed.email.subject_'.$this->outcome, ['campaign' => $this->campaignName]),
+                $this->round,
+            ),
         );
     }
 
@@ -51,6 +58,7 @@ final class DraftReviewedMail extends Mailable implements ShouldQueue
                 'campaignName' => $this->campaignName,
                 'outcome' => $this->outcome,
                 'feedback' => $this->feedback,
+                'roundLabel' => $this->roundLabel($this->round),
                 'assignmentUrl' => $this->buildAssignmentUrl(),
             ],
         );

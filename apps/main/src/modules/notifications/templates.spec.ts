@@ -124,6 +124,76 @@ describe('notification registry parity', () => {
   })
 })
 
+describe('AH-068 draft round on the review-cycle rows', () => {
+  /** The five verbs whose payloads gain the round (D4 + Q4's draft_rejected). */
+  const ROUND_BEARING = [
+    'assignment.draft_submitted',
+    'assignment.draft_approved',
+    'assignment.revision_requested',
+    'assignment.draft_rejected',
+  ] as const
+
+  function listenerSource(): string {
+    return readFileSync(
+      resolve(
+        __dirname,
+        '../../../../../apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php',
+      ),
+      'utf8',
+    )
+  }
+
+  /**
+   * The payload key, pinned by name across the two languages that have to agree
+   * on it (the AH-058 Q8 precedent). The backend writes `data['version']`; the
+   * NotificationCenter reads `data.version`. Renaming either side alone reds here
+   * instead of silently dropping the round from every row.
+   */
+  it('the backend writes the round under the key `version`', () => {
+    expect(listenerSource()).toContain("$data['version'] = $round;")
+  })
+
+  /** Q2 — a direct machine call cannot invent a round number. */
+  it('the backend omits the key entirely when the transition carried no version', () => {
+    const source = listenerSource()
+
+    // The guard returns the payload untouched rather than writing a null.
+    expect(source).toContain('if ($round === null) {')
+    expect(source).not.toContain("$data['version'] = null")
+  })
+
+  /**
+   * Q1(a), enforced structurally rather than by memory. Every notification row
+   * written before AH-068 was stored with no `version` in its `data` bag, and
+   * `bodyText` spreads that bag as the template's named params. The moment one of
+   * these templates references `{version}`, every one of those rows renders with
+   * a hole — so the round belongs in its own element, and this reds if anyone
+   * "simplifies" it back into the copy.
+   */
+  it('no round-bearing body template interpolates {version}', () => {
+    const offenders = ROUND_BEARING.filter((type) => {
+      const template = translationFor(notificationTemplateKey(type))
+      return template !== undefined && template.includes('{version}')
+    })
+
+    expect(offenders).toEqual([])
+  })
+
+  it('the round label is its own key, present and interpolating the number', () => {
+    const label = translationFor('notifications.center.round')
+
+    expect(label).toBeTypeOf('string')
+    expect(label).toContain('{n}')
+  })
+
+  it('every round-bearing verb is live — the round rides real templates, not fallbacks', () => {
+    for (const type of ROUND_BEARING) {
+      expect(hasLiveTemplate(type), `${type} is not live`).toBe(true)
+      expect(notificationTemplateKey(type)).not.toBe(NOTIFICATION_FALLBACK_KEY)
+    }
+  })
+})
+
 describe('AH-051 relation notifications', () => {
   it('renders a bespoke template for admin-connected, naming the agency', () => {
     const key = notificationTemplateKey('agency_creator_relation.admin_connected')

@@ -747,7 +747,7 @@
         "action": "Revisar",
         "title": "Revisar borrador",
         "loadFailed": "No hemos podido cargar este borrador. Inténtalo de nuevo.",
-        "draftVersion": "Borrador v{n}",
+        "draftRound": "Borrador {n}",
         "noCaption": "No se ha proporcionado texto.",
         "hashtags": "Hashtags",
         "mentions": "Menciones",
@@ -758,13 +758,20 @@
         "requestRevision": "Solicitar cambios",
         "reject": "Rechazar",
         "close": "Cerrar",
-        "history": "Historial de versiones",
+        "history": "Historial de borradores",
         "postedContent": "Contenido publicado",
         "draftStatus": {
           "pending": "Pendiente de revisión",
           "approved": "Aprobado",
-          "rejected": "Rechazado",
-          "revision_requested": "Revisión solicitada"
+          "rejected": "No aceptado",
+          "revision_requested": "Cambios solicitados"
+        },
+        "roundState": {
+          "awaitingReview": "Borrador {n} — pendiente de revisión",
+          "changesRequested": "Borrador {n} — cambios solicitados",
+          "approved": "Borrador {n} — aprobado",
+          "notAccepted": "Borrador {n} — no aceptado",
+          "submitted": "Borrador {n} — enviado"
         },
         "verification": {
           "pending": "A la espera de verificación",

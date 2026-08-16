@@ -747,7 +747,7 @@
         "action": "Gennemse",
         "title": "Gennemse udkast",
         "loadFailed": "Dette udkast kunne ikke indlæses. Prøv igen.",
-        "draftVersion": "Udkast v{n}",
+        "draftRound": "Udkast {n}",
         "noCaption": "Ingen billedtekst angivet.",
         "hashtags": "Hashtags",
         "mentions": "Omtaler",
@@ -758,13 +758,20 @@
         "requestRevision": "Anmod om ændringer",
         "reject": "Afvis",
         "close": "Luk",
-        "history": "Versionshistorik",
+        "history": "Udkastshistorik",
         "postedContent": "Opslået indhold",
         "draftStatus": {
           "pending": "Afventer gennemgang",
           "approved": "Godkendt",
-          "rejected": "Afvist",
-          "revision_requested": "Revision anmodet"
+          "rejected": "Ikke accepteret",
+          "revision_requested": "Ændringer anmodet"
+        },
+        "roundState": {
+          "awaitingReview": "Udkast {n} — afventer gennemgang",
+          "changesRequested": "Udkast {n} — ændringer anmodet",
+          "approved": "Udkast {n} — godkendt",
+          "notAccepted": "Udkast {n} — ikke accepteret",
+          "submitted": "Udkast {n} — indsendt"
         },
         "verification": {
           "pending": "Afventer verifikation",

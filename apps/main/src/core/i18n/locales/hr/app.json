@@ -747,7 +747,7 @@
         "action": "Pregled",
         "title": "Pregled nacrtu",
         "loadFailed": "Ni nam uspelo načíst tento nacrt. Zkuste to znova.",
-        "draftVersion": "Nacrt v{n}",
+        "draftRound": "Nacrt {n}",
         "noCaption": "Žádný popisek.",
         "hashtags": "Hashtagy",
         "mentions": "Zmínky",
@@ -758,13 +758,20 @@
         "requestRevision": "Požádat o změny",
         "reject": "Odbij",
         "close": "Zapri",
-        "history": "Historie verzí",
+        "history": "Povijest nacrta",
         "postedContent": "Zveřejněný obsah",
         "draftStatus": {
-          "pending": "Čaka na pregled",
+          "pending": "Čeka pregled",
           "approved": "Odobreno",
-          "rejected": "Odbijeno",
-          "revision_requested": "Požadovány revize"
+          "rejected": "Nije prihvaćen",
+          "revision_requested": "Zatražene promjene"
+        },
+        "roundState": {
+          "awaitingReview": "Nacrt {n} — čeka pregled",
+          "changesRequested": "Nacrt {n} — zatražene promjene",
+          "approved": "Nacrt {n} — odobreno",
+          "notAccepted": "Nacrt {n} — nije prihvaćen",
+          "submitted": "Nacrt {n} — poslan"
         },
         "verification": {
           "pending": "Čaka na preverjanje",

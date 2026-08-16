@@ -747,7 +747,7 @@
         "action": "Review",
         "title": "Review draft",
         "loadFailed": "We couldn't load this draft. Please try again.",
-        "draftVersion": "Vázlat v{n}",
+        "draftRound": "{n}. vázlat",
         "noCaption": "Nem caption provided.",
         "hashtags": "Hashtags",
         "mentions": "Mentions",
@@ -758,13 +758,20 @@
         "requestRevision": "Request changes",
         "reject": "Elutasítás",
         "close": "Bezárás",
-        "history": "Version history",
+        "history": "Vázlatok előzményei",
         "postedContent": "Posted content",
         "draftStatus": {
-          "pending": "Függőben review",
-          "approved": "Jóváhagyásd",
-          "rejected": "Elutasításed",
-          "revision_requested": "Revision requested"
+          "pending": "Ellenőrzésre vár",
+          "approved": "Jóváhagyva",
+          "rejected": "Nem elfogadva",
+          "revision_requested": "Módosítás kérve"
+        },
+        "roundState": {
+          "awaitingReview": "{n}. vázlat — ellenőrzésre vár",
+          "changesRequested": "{n}. vázlat — módosítás kérve",
+          "approved": "{n}. vázlat — jóváhagyva",
+          "notAccepted": "{n}. vázlat — nem elfogadva",
+          "submitted": "{n}. vázlat — beküldve"
         },
         "verification": {
           "pending": "Awaiting verification",

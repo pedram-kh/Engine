@@ -747,7 +747,7 @@
         "action": "Review",
         "title": "Review draft",
         "loadFailed": "We couldn't load this draft. Моля try again.",
-        "draftVersion": "Чернова v{n}",
+        "draftRound": "Чернова {n}",
         "noCaption": "Не caption provided.",
         "hashtags": "Hashtags",
         "mentions": "Mentions",
@@ -758,13 +758,20 @@
         "requestRevision": "Request changes",
         "reject": "Отхвърлете",
         "close": "Затворете",
-        "history": "Version history",
+        "history": "История на черновите",
         "postedContent": "Posted content",
         "draftStatus": {
-          "pending": "В изчакване review",
-          "approved": "Одобретеd",
-          "rejected": "Отхвърлетеed",
-          "revision_requested": "Revision requested"
+          "pending": "Очаква преглед",
+          "approved": "Одобрена",
+          "rejected": "Не е приета",
+          "revision_requested": "Заявени промени"
+        },
+        "roundState": {
+          "awaitingReview": "Чернова {n} — очаква преглед",
+          "changesRequested": "Чернова {n} — заявени промени",
+          "approved": "Чернова {n} — одобрена",
+          "notAccepted": "Чернова {n} — не е приета",
+          "submitted": "Чернова {n} — подадена"
         },
         "verification": {
           "pending": "Awaiting verification",

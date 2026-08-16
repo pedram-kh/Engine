@@ -9,7 +9,8 @@
       "error": "Notifikationer kunne ikke indlæses.",
       "unreadBadgeLabel": "{count} ulæste notifikationer",
       "feedbackLabel": "Feedback",
-      "reasonLabel": "Årsag"
+      "reasonLabel": "Årsag",
+      "round": "Udkast {n}"
     },
     "page": {
       "title": "Notifikationer",

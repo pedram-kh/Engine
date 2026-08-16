@@ -747,7 +747,7 @@
         "action": "Rever",
         "title": "Rever rascunho",
         "loadFailed": "Não foi possível carregar este rascunho. Tente novamente.",
-        "draftVersion": "Rascunho v{n}",
+        "draftRound": "Rascunho {n}",
         "noCaption": "Nenhuma legenda fornecida.",
         "hashtags": "Hashtags",
         "mentions": "Menções",
@@ -758,13 +758,20 @@
         "requestRevision": "Solicitar alterações",
         "reject": "Rejeitar",
         "close": "Fechar",
-        "history": "Histórico de versões",
+        "history": "Histórico de rascunhos",
         "postedContent": "Conteúdo publicado",
         "draftStatus": {
           "pending": "Aguardando revisão",
           "approved": "Aprovado",
-          "rejected": "Rejeitado",
-          "revision_requested": "Revisão solicitada"
+          "rejected": "Não aceito",
+          "revision_requested": "Alterações solicitadas"
+        },
+        "roundState": {
+          "awaitingReview": "Rascunho {n} — aguardando revisão",
+          "changesRequested": "Rascunho {n} — alterações solicitadas",
+          "approved": "Rascunho {n} — aprovado",
+          "notAccepted": "Rascunho {n} — não aceito",
+          "submitted": "Rascunho {n} — enviado"
         },
         "verification": {
           "pending": "Aguardando verificação",

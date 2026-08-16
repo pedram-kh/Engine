@@ -747,7 +747,7 @@
         "action": "Review",
         "title": "Review draft",
         "loadFailed": "We couldn't load this draft. Please try again.",
-        "draftVersion": "Draft v{n}",
+        "draftRound": "Draft {n}",
         "noCaption": "No caption provided.",
         "hashtags": "Hashtags",
         "mentions": "Mentions",
@@ -758,13 +758,20 @@
         "requestRevision": "Request changes",
         "reject": "Reject",
         "close": "Close",
-        "history": "Version history",
+        "history": "Draft history",
         "postedContent": "Posted content",
         "draftStatus": {
-          "pending": "Pending review",
+          "pending": "Awaiting review",
           "approved": "Approved",
-          "rejected": "Rejected",
-          "revision_requested": "Revision requested"
+          "rejected": "Not accepted",
+          "revision_requested": "Changes requested"
+        },
+        "roundState": {
+          "awaitingReview": "Draft {n} — awaiting review",
+          "changesRequested": "Draft {n} — changes requested",
+          "approved": "Draft {n} — approved",
+          "notAccepted": "Draft {n} — not accepted",
+          "submitted": "Draft {n} — submitted"
         },
         "verification": {
           "pending": "Awaiting verification",

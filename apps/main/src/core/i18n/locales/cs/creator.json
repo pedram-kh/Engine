@@ -415,13 +415,7 @@
           },
           "history": {
             "title": "Historie návrhů",
-            "version": "Verze {n}"
-          },
-          "reviewStatus": {
-            "pending": "Čeká na posouzení",
-            "approved": "Schváleno",
-            "rejected": "Odmítnuto",
-            "revision_requested": "Požadovány revize"
+            "reviewedAt": "Posouzeno {date}"
           },
           "verificationStatus": {
             "pending": "Ověření čeká",

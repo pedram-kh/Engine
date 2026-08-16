@@ -415,13 +415,7 @@
           },
           "history": {
             "title": "Entwurfshistorie",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "Ausstehende Prüfung",
-            "approved": "Genehmigt",
-            "rejected": "Abgelehnt",
-            "revision_requested": "Überarbeitung angefordert"
+            "reviewedAt": "Geprüft am {date}"
           },
           "verificationStatus": {
             "pending": "Verifizierung ausstehend",

@@ -3,6 +3,10 @@
 
 {{ trans('campaigns.assignment_notifications.draft_submitted.email.body', ['creator' => $creatorName, 'campaign' => $campaignName]) }}
 
+@if ($roundLabel !== null)
+**{{ $roundLabel }}**
+@endif
+
 @component('mail::button', ['url' => $reviewUrl])
 {{ trans('campaigns.assignment_notifications.draft_submitted.email.cta') }}
 @endcomponent

@@ -414,14 +414,8 @@
             "summaryTitle": "Posted content"
           },
           "history": {
-            "title": "Dréacht history",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "Ar feitheamh review",
-            "approved": "Faomhaighd",
-            "rejected": "Diúltaighed",
-            "revision_requested": "Revision requested"
+            "title": "Stair na ndréachtaí",
+            "reviewedAt": "Athbhreithnithe {date}"
           },
           "verificationStatus": {
             "pending": "Fíorú pending",

@@ -9,7 +9,8 @@
       "error": "Nie można załadować powiadomień.",
       "unreadBadgeLabel": "{count} nieprzeczytanych powiadomień",
       "feedbackLabel": "Uwagi",
-      "reasonLabel": "Powód"
+      "reasonLabel": "Powód",
+      "round": "Szkic {n}"
     },
     "page": {
       "title": "Powiadomienia",

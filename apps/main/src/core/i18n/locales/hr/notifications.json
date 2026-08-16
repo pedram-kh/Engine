@@ -9,7 +9,8 @@
       "error": "Ni uspelo učitajti oznámení.",
       "unreadBadgeLabel": "{count} nepřečtených oznámení",
       "feedbackLabel": "Zpětná vazba",
-      "reasonLabel": "Razlog"
+      "reasonLabel": "Razlog",
+      "round": "Nacrt {n}"
     },
     "page": {
       "title": "Obavijesti",

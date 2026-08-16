@@ -9,7 +9,8 @@
       "error": "Meldingen konden niet worden geladen.",
       "unreadBadgeLabel": "{count} ongelezen meldingen",
       "feedbackLabel": "Feedback",
-      "reasonLabel": "Reden"
+      "reasonLabel": "Reden",
+      "round": "Concept {n}"
     },
     "page": {
       "title": "Meldingen",

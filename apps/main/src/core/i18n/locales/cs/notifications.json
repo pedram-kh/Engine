@@ -9,7 +9,8 @@
       "error": "Nepodařilo se načíst oznámení.",
       "unreadBadgeLabel": "{count} nepřečtených oznámení",
       "feedbackLabel": "Zpětná vazba",
-      "reasonLabel": "Důvod"
+      "reasonLabel": "Důvod",
+      "round": "Návrh {n}"
     },
     "page": {
       "title": "Oznámení",

@@ -414,14 +414,8 @@
             "summaryTitle": "Posted content"
           },
           "history": {
-            "title": "Juodraštis history",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "Laukiama review",
-            "approved": "Patvirtintid",
-            "rejected": "Atmestied",
-            "revision_requested": "Revision requested"
+            "title": "Juodraščių istorija",
+            "reviewedAt": "Peržiūrėta {date}"
           },
           "verificationStatus": {
             "pending": "Tikrinimas pending",

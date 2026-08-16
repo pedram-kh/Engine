@@ -7,6 +7,9 @@ return [
     // set. Queued mailables, localized at queue time, rendered through the
     // shared `catalyst` markdown theme (mirrors creators.connection_request).
     'assignment_notifications' => [
+        // The draft-round clause shared by both review-cycle mails (AH-068).
+        'round' => 'Draft :n',
+        'round_subject' => ':subject (:round)',
         'draft_submitted' => [
             'email' => [
                 'subject' => ':creator submitted a draft for review',

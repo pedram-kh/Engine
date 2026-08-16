@@ -82,8 +82,22 @@ function makeAction(status: 'accepted' | 'declined'): CreatorAssignmentActionRes
   }
 }
 
+type DraftAttributes =
+  CreatorAssignmentDetailResource['relationships']['drafts'][number]['attributes']
+
+/**
+ * One round. `review` closes it — a round with a `review_status` other than
+ * `pending` is a round the agency has answered (AH-068, D1), so the fixture takes
+ * the closing columns together rather than letting a spec build a
+ * revision-requested round with no feedback and no timestamp.
+ */
 function makeDraft(
   version: number,
+  review: Pick<DraftAttributes, 'review_status' | 'reviewed_at' | 'review_feedback'> = {
+    review_status: 'pending',
+    reviewed_at: null,
+    review_feedback: null,
+  },
 ): CreatorAssignmentDetailResource['relationships']['drafts'][number] {
   return {
     id: `01DRAFT${version}`,
@@ -91,15 +105,34 @@ function makeDraft(
     attributes: {
       version,
       submitted_at: '2026-06-01T10:00:00+00:00',
-      caption: `Draft v${version}`,
+      caption: `Caption for round ${version}`,
       hashtags: ['#ad'],
       mentions: null,
       media: [],
-      review_status: 'pending',
-      reviewed_at: null,
-      review_feedback: null,
+      ...review,
     },
   }
+}
+
+/**
+ * Three rounds, newest first (the endpoint orders `version` desc): two closed
+ * with their own distinct feedback, the third still open. The fixture review
+ * priority 3 asks for.
+ */
+function threeRounds(): CreatorAssignmentDetailResource['relationships']['drafts'] {
+  return [
+    makeDraft(3),
+    makeDraft(2, {
+      review_status: 'revision_requested',
+      reviewed_at: '2026-06-02T09:30:00+00:00',
+      review_feedback: 'Brighten the lighting and re-shoot the closing frame.',
+    }),
+    makeDraft(1, {
+      review_status: 'revision_requested',
+      reviewed_at: '2026-06-01T15:00:00+00:00',
+      review_feedback: 'Please add the campaign hashtag.',
+    }),
+  ]
 }
 
 function makePost(
@@ -240,7 +273,7 @@ describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', 
     })
   })
 
-  it('shows the revision feedback + resubmit form + version history for revision_requested', async () => {
+  it('shows the revision feedback + resubmit form + round history for revision_requested', async () => {
     vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
       data: makeDetail('revision_requested', [makeDraft(2), makeDraft(1)]),
     })
@@ -248,7 +281,7 @@ describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', 
 
     expect(wrapper.find('[data-testid="assignment-revision-feedback"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="assignment-draft-form"]').exists()).toBe(true)
-    // Version history preserved — both versions render.
+    // Round history preserved — both rounds render.
     expect(wrapper.find('[data-testid="assignment-draft-version-1"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="assignment-draft-version-2"]').exists()).toBe(true)
   })
@@ -630,5 +663,111 @@ describe('CreatorAssignmentDetailPage — draft submit form', () => {
         links: [{ url: 'https://example.com/final-cut' }],
       }),
     )
+  })
+})
+
+// ── Numbered visible rounds (AH-068, D2/D3) ──────────────────────────────────
+describe('CreatorAssignmentDetailPage — draft rounds', () => {
+  function historyText(wrapper: { find: (s: string) => { text: () => string } }): string {
+    return wrapper.find('[data-testid="assignment-draft-history"]').text()
+  }
+
+  it('names every round "Draft {n} — <state>", the same vocabulary the agency reads', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('draft_submitted', threeRounds()),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-draft-version-3"]').text()).toContain(
+      'Draft 3 — awaiting review',
+    )
+    expect(wrapper.find('[data-testid="assignment-draft-version-2"]').text()).toContain(
+      'Draft 2 — changes requested',
+    )
+    expect(wrapper.find('[data-testid="assignment-draft-version-1"]').text()).toContain(
+      'Draft 1 — changes requested',
+    )
+  })
+
+  it('has retired the "Version {n}" vocabulary entirely', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('draft_submitted', threeRounds()),
+    })
+    const { wrapper } = await mountDetail()
+
+    const text = historyText(wrapper)
+    expect(text).not.toContain('Version 1')
+    expect(text).not.toContain('Version 2')
+    expect(text).not.toContain('Version 3')
+    // …and the block title is the shared one, not a second phrasing.
+    expect(text).toContain('Draft history')
+  })
+
+  // D3 — the creator can reconstruct the conversation without asking.
+  it('renders each round with ITS OWN feedback and review timestamp', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('draft_submitted', threeRounds()),
+    })
+    const { wrapper } = await mountDetail()
+
+    const round2 = wrapper.find('[data-testid="assignment-draft-feedback-2"]')
+    const round1 = wrapper.find('[data-testid="assignment-draft-feedback-1"]')
+    expect(round2.text()).toContain('Brighten the lighting and re-shoot the closing frame.')
+    expect(round1.text()).toContain('Please add the campaign hashtag.')
+    // Each round's note stays on its own round — no leak from the newer one.
+    expect(round1.text()).not.toContain('Brighten the lighting')
+
+    expect(wrapper.find('[data-testid="assignment-draft-reviewed-at-2"]').text()).toContain(
+      'Reviewed',
+    )
+    expect(wrapper.find('[data-testid="assignment-draft-reviewed-at-1"]').text()).toMatch(/2026/)
+  })
+
+  // ── negative cases (§5.34) ─────────────────────────────────────────────────
+  it('the open round shows no feedback and no review timestamp', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('draft_submitted', threeRounds()),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-draft-feedback-3"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="assignment-draft-reviewed-at-3"]').exists()).toBe(false)
+  })
+
+  it('an approved round reads approved, and a pending round on a moved-on assignment does not claim a review is under way', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('approved', [
+        makeDraft(2, {
+          review_status: 'approved',
+          reviewed_at: '2026-06-04T11:00:00+00:00',
+          review_feedback: null,
+        }),
+        makeDraft(1, {
+          review_status: 'revision_requested',
+          reviewed_at: '2026-06-01T15:00:00+00:00',
+          review_feedback: 'Please add the campaign hashtag.',
+        }),
+      ]),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-draft-version-2"]').text()).toContain(
+      'Draft 2 — approved',
+    )
+    // The approved round closed with no note: the timestamp renders, and no
+    // sentence is invented on the agency's behalf (AH-043).
+    expect(wrapper.find('[data-testid="assignment-draft-reviewed-at-2"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="assignment-draft-feedback-2"]').exists()).toBe(false)
+  })
+
+  it('a pending round on a cancelled assignment reads submitted, not awaiting review', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('cancelled', [makeDraft(1)]),
+    })
+    const { wrapper } = await mountDetail()
+
+    const round = wrapper.find('[data-testid="assignment-draft-version-1"]').text()
+    expect(round).toContain('Draft 1 — submitted')
+    expect(round).not.toContain('awaiting review')
   })
 })

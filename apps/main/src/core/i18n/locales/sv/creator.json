@@ -415,13 +415,7 @@
           },
           "history": {
             "title": "Utkastshistorik",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "Väntar på granskning",
-            "approved": "Godkänd",
-            "rejected": "Avvisad",
-            "revision_requested": "Revision begärd"
+            "reviewedAt": "Granskad {date}"
           },
           "verificationStatus": {
             "pending": "Verifiering pågår",

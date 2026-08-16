@@ -18,6 +18,7 @@ import { useI18n } from 'vue-i18n'
 import { CEmptyState } from '@catalyst/ui'
 
 import { campaignsApi } from '../api/campaigns.api'
+import { roundStateKey } from '../draftRounds'
 
 type FilterValue = 'all' | DraftReviewStatus
 
@@ -190,11 +191,16 @@ defineExpose({
         <v-list-item v-for="row in rows" :key="row.id" :data-test="`drafts-row-${row.id}`">
           <v-list-item-title class="d-flex align-center ga-2 flex-wrap">
             {{ row.attributes.assignment?.creator?.display_name ?? '—' }}
-            <v-chip size="x-small" variant="tonal">
-              {{ t('app.campaigns.review.draftVersion', { n: row.attributes.version }) }}
-            </v-chip>
             <v-chip size="x-small" variant="tonal" color="primary">
-              {{ t(`app.campaigns.review.draftStatus.${row.attributes.review_status}`) }}
+              {{
+                t(
+                  roundStateKey(
+                    row.attributes.review_status,
+                    row.attributes.assignment?.status ?? null,
+                  ),
+                  { n: row.attributes.version },
+                )
+              }}
             </v-chip>
             <v-chip v-if="row.attributes.assignment" size="x-small" variant="outlined">
               {{ t(`app.campaigns.assignmentStatus.${row.attributes.assignment.status}`) }}

@@ -747,7 +747,7 @@
         "action": "Review",
         "title": "Review draft",
         "loadFailed": "We couldn't load this draft. Please try again.",
-        "draftVersion": "Dréacht v{n}",
+        "draftRound": "Dréacht {n}",
         "noCaption": "Níl caption provided.",
         "hashtags": "Hashtags",
         "mentions": "Mentions",
@@ -758,13 +758,20 @@
         "requestRevision": "Request changes",
         "reject": "Diúltaigh",
         "close": "Dún",
-        "history": "Version history",
+        "history": "Stair na ndréachtaí",
         "postedContent": "Posted content",
         "draftStatus": {
-          "pending": "Ar feitheamh review",
-          "approved": "Faomhaighd",
-          "rejected": "Diúltaighed",
-          "revision_requested": "Revision requested"
+          "pending": "Ag fanacht ar athbhreithniú",
+          "approved": "Faofa",
+          "rejected": "Níor glacadh leis",
+          "revision_requested": "Athruithe iarrtha"
+        },
+        "roundState": {
+          "awaitingReview": "Dréacht {n} — ag fanacht ar athbhreithniú",
+          "changesRequested": "Dréacht {n} — athruithe iarrtha",
+          "approved": "Dréacht {n} — faofa",
+          "notAccepted": "Dréacht {n} — níor glacadh leis",
+          "submitted": "Dréacht {n} — curtha isteach"
         },
         "verification": {
           "pending": "Awaiting verification",

@@ -415,13 +415,7 @@
           },
           "history": {
             "title": "Udkastshistorik",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "Afventer gennemgang",
-            "approved": "Godkendt",
-            "rejected": "Afvist",
-            "revision_requested": "Revision anmodet"
+            "reviewedAt": "Gennemgået {date}"
           },
           "verificationStatus": {
             "pending": "Verifikation afventer",

@@ -747,7 +747,7 @@
         "action": "Recenzja",
         "title": "Recenzja szkicu",
         "loadFailed": "Nie mogliśmy załadować tego szkicu. Spróbuj ponownie.",
-        "draftVersion": "Szkic v{n}",
+        "draftRound": "Szkic {n}",
         "noCaption": "Brak podpisu.",
         "hashtags": "Hashtagi",
         "mentions": "Wzmianki",
@@ -758,13 +758,20 @@
         "requestRevision": "Zażądaj zmian",
         "reject": "Odrzuć",
         "close": "Zamknij",
-        "history": "Historia wersji",
+        "history": "Historia szkiców",
         "postedContent": "Opublikowana treść",
         "draftStatus": {
           "pending": "Oczekuje na recenzję",
-          "approved": "Zatwierdzona",
-          "rejected": "Odrzucona",
-          "revision_requested": "Zażądano poprawek"
+          "approved": "Zatwierdzony",
+          "rejected": "Nieprzyjęty",
+          "revision_requested": "Zażądano zmian"
+        },
+        "roundState": {
+          "awaitingReview": "Szkic {n} — oczekuje na recenzję",
+          "changesRequested": "Szkic {n} — zażądano zmian",
+          "approved": "Szkic {n} — zatwierdzony",
+          "notAccepted": "Szkic {n} — nieprzyjęty",
+          "submitted": "Szkic {n} — przesłany"
         },
         "verification": {
           "pending": "Oczekuje na weryfikację",

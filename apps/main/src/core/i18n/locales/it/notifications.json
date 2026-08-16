@@ -9,7 +9,8 @@
       "error": "Impossibile caricare le notifiche.",
       "unreadBadgeLabel": "{count} notifiche non lette",
       "feedbackLabel": "Feedback",
-      "reasonLabel": "Motivo"
+      "reasonLabel": "Motivo",
+      "round": "Bozza {n}"
     },
     "page": {
       "title": "Notifiche",

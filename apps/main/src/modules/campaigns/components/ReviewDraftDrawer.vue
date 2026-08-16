@@ -26,6 +26,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { campaignsApi } from '../api/campaigns.api'
+import { roundStateKey } from '../draftRounds'
 
 type ReviewField = 'review_feedback'
 type ActionKind = 'approve' | 'revision' | 'reject'
@@ -67,6 +68,9 @@ const latestDraft = computed(() => detail.value?.relationships.drafts[0] ?? null
 const history = computed(() => detail.value?.relationships.drafts ?? [])
 const postedContent = computed(() => detail.value?.relationships.posted_content ?? [])
 const canAct = computed(() => detail.value?.attributes.status === 'draft_submitted')
+// The round-state copy needs the assignment to tell "awaiting review" from a
+// pending round nobody is looking at any more (AH-068).
+const assignmentStatus = computed(() => detail.value?.attributes.status ?? null)
 
 const galleryItems = computed<GalleryItem[]>(() => {
   const draft = latestDraft.value
@@ -212,7 +216,7 @@ async function runAction(kind: ActionKind): Promise<void> {
           <!-- Latest draft preview -->
           <div class="mb-4" data-test="review-draft-preview">
             <div class="text-subtitle-2 mb-1">
-              {{ t('app.campaigns.review.draftVersion', { n: latestDraft.attributes.version }) }}
+              {{ t('app.campaigns.review.draftRound', { n: latestDraft.attributes.version }) }}
             </div>
             <p class="text-body-2" data-test="review-caption">
               {{ latestDraft.attributes.caption || t('app.campaigns.review.noCaption') }}
@@ -274,7 +278,7 @@ async function runAction(kind: ActionKind): Promise<void> {
             />
           </template>
 
-          <!-- Version history -->
+          <!-- Draft history -->
           <v-card
             v-if="history.length > 0"
             variant="outlined"
@@ -291,10 +295,11 @@ async function runAction(kind: ActionKind): Promise<void> {
                 :data-test="`review-history-${draft.attributes.version}`"
               >
                 <v-list-item-title>
-                  {{ t('app.campaigns.review.draftVersion', { n: draft.attributes.version }) }}
-                  <v-chip size="x-small" variant="tonal" class="ml-2">
-                    {{ t(`app.campaigns.review.draftStatus.${draft.attributes.review_status}`) }}
-                  </v-chip>
+                  {{
+                    t(roundStateKey(draft.attributes.review_status, assignmentStatus), {
+                      n: draft.attributes.version,
+                    })
+                  }}
                 </v-list-item-title>
                 <v-list-item-subtitle v-if="draft.attributes.review_feedback">
                   {{ draft.attributes.review_feedback }}

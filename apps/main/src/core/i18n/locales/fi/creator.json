@@ -414,14 +414,8 @@
             "summaryTitle": "Posted content"
           },
           "history": {
-            "title": "Luonnos history",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "Odottaa review",
-            "approved": "Hyväksyd",
-            "rejected": "Hylkääed",
-            "revision_requested": "Revision requested"
+            "title": "Luonnosten historia",
+            "reviewedAt": "Arvioitu {date}"
           },
           "verificationStatus": {
             "pending": "Vahvistus pending",

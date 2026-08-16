@@ -747,7 +747,7 @@
         "action": "Review",
         "title": "Review draft",
         "loadFailed": "We couldn't load this draft. Please try again.",
-        "draftVersion": "Πρόχειρο v{n}",
+        "draftRound": "Πρόχειρο {n}",
         "noCaption": "Όχι caption provided.",
         "hashtags": "Hashtags",
         "mentions": "Mentions",
@@ -758,13 +758,20 @@
         "requestRevision": "Request changes",
         "reject": "Απόρριψη",
         "close": "Κλείσιμο",
-        "history": "Version history",
+        "history": "Ιστορικό προχείρων",
         "postedContent": "Posted content",
         "draftStatus": {
-          "pending": "Εκκρεμές review",
-          "approved": "Έγκρισηd",
-          "rejected": "Απόρριψηed",
-          "revision_requested": "Revision requested"
+          "pending": "Αναμένει έλεγχο",
+          "approved": "Εγκρίθηκε",
+          "rejected": "Δεν εγκρίθηκε",
+          "revision_requested": "Ζητήθηκαν αλλαγές"
+        },
+        "roundState": {
+          "awaitingReview": "Πρόχειρο {n} — αναμένει έλεγχο",
+          "changesRequested": "Πρόχειρο {n} — ζητήθηκαν αλλαγές",
+          "approved": "Πρόχειρο {n} — εγκρίθηκε",
+          "notAccepted": "Πρόχειρο {n} — δεν εγκρίθηκε",
+          "submitted": "Πρόχειρο {n} — υποβλήθηκε"
         },
         "verification": {
           "pending": "Awaiting verification",

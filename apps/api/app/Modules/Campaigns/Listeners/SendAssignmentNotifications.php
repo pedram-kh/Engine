@@ -69,15 +69,56 @@ final class SendAssignmentNotifications
             ? User::find($event->triggeredByUserId)
             : null;
 
+        $round = $this->roundFromContext($event);
+
         match ($event->action) {
-            AuditAction::AssignmentDraftSubmitted => $this->notifyAgencyOfSubmission($assignment, $actor),
-            AuditAction::AssignmentDraftApproved => $this->notifyCreatorOfReview($assignment, 'approved'),
-            AuditAction::AssignmentRevisionRequested => $this->notifyCreatorOfReview($assignment, 'revision_requested'),
-            AuditAction::AssignmentDraftRejected => $this->notifyCreatorOfReview($assignment, 'rejected'),
+            AuditAction::AssignmentDraftSubmitted => $this->notifyAgencyOfSubmission($assignment, $actor, $round),
+            AuditAction::AssignmentDraftApproved => $this->notifyCreatorOfReview($assignment, 'approved', $round),
+            AuditAction::AssignmentRevisionRequested => $this->notifyCreatorOfReview($assignment, 'revision_requested', $round),
+            AuditAction::AssignmentDraftRejected => $this->notifyCreatorOfReview($assignment, 'rejected', $round),
             AuditAction::AssignmentContracted => $this->notifyAgencyOfContractAcceptance($assignment, $actor),
             AuditAction::AssignmentManuallyVerified => $this->notifyCreatorOfManualVerification($assignment, $actor),
             default => null,
         };
+    }
+
+    /**
+     * The round number this transition is about (AH-068, D4), read off the
+     * context the domain already emits: the submit path sends `version` with the
+     * row it just wrote, and all three review verbs send the reviewed draft's.
+     * So no query is added here for either leg.
+     *
+     * Null when the machine was driven without a context — its own tests do
+     * exactly that. A direct call cannot invent a round number, so the
+     * notification carries none and every surface reads as it did before this
+     * chunk.
+     */
+    private function roundFromContext(AssignmentTransitioned $event): ?int
+    {
+        $version = $event->context['version'] ?? null;
+
+        return is_int($version) && $version > 0 ? $version : null;
+    }
+
+    /**
+     * Add the round to a notification payload, or leave the payload untouched
+     * when the round is unknown. The key is ABSENT rather than null so a
+     * consumer can test presence — the in-app renderer shows the round line only
+     * for rows that carry one, which is what keeps every notification row
+     * written before this chunk rendering exactly as it always did.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function withRound(array $data, ?int $round): array
+    {
+        if ($round === null) {
+            return $data;
+        }
+
+        $data['version'] = $round;
+
+        return $data;
     }
 
     private function notifyCreatorOfManualVerification(CampaignAssignment $assignment, ?User $actor): void
@@ -117,7 +158,7 @@ final class SendAssignmentNotifications
         );
     }
 
-    private function notifyAgencyOfSubmission(CampaignAssignment $assignment, ?User $actor): void
+    private function notifyAgencyOfSubmission(CampaignAssignment $assignment, ?User $actor, ?int $round = null): void
     {
         $campaign = $assignment->campaign;
         $creator = $assignment->creator;
@@ -137,6 +178,7 @@ final class SendAssignmentNotifications
                     creatorName: $creator->display_name ?? '',
                     campaignName: $campaign->name,
                     campaignUlid: $campaign->ulid,
+                    round: $round,
                 ));
         }
 
@@ -148,18 +190,18 @@ final class SendAssignmentNotifications
             $assignment,
             NotificationType::AssignmentDraftSubmitted,
             $actor,
-            [
+            $this->withRound([
                 'creator_name' => $creator->display_name ?? '',
                 'campaign_name' => $campaign->name,
                 'campaign_ulid' => $campaign->ulid,
-            ],
+            ], $round),
         );
     }
 
     /**
      * @param  'approved'|'revision_requested'|'rejected'  $outcome
      */
-    private function notifyCreatorOfReview(CampaignAssignment $assignment, string $outcome): void
+    private function notifyCreatorOfReview(CampaignAssignment $assignment, string $outcome, ?int $round = null): void
     {
         $creator = $assignment->creator;
         $campaign = $assignment->campaign;
@@ -194,6 +236,7 @@ final class SendAssignmentNotifications
                 outcome: $outcome,
                 feedback: $feedback,
                 assignmentUlid: $assignment->ulid,
+                round: $round,
             ));
 
         // S11.0 Chunk 1 (D-10) — the proof consumer. In-app emission rides
@@ -209,13 +252,13 @@ final class SendAssignmentNotifications
             type: $this->reviewNotificationType($outcome),
             subject: $assignment,
             actor: $reviewer,
-            data: [
+            data: $this->withRound([
                 'campaign_name' => $campaign->name,
                 'creator_name' => $creator->display_name ?? $recipient->name,
                 'outcome' => $outcome,
                 'feedback' => $feedback,
                 'assignment_ulid' => $assignment->ulid,
-            ],
+            ], $round),
         );
     }
 

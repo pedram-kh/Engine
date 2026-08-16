@@ -414,14 +414,8 @@
             "summaryTitle": "Posted content"
           },
           "history": {
-            "title": "Πρόχειρο history",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "Εκκρεμές review",
-            "approved": "Έγκρισηd",
-            "rejected": "Απόρριψηed",
-            "revision_requested": "Revision requested"
+            "title": "Ιστορικό προχείρων",
+            "reviewedAt": "Ελέγχθηκε {date}"
           },
           "verificationStatus": {
             "pending": "Επαλήθευση pending",

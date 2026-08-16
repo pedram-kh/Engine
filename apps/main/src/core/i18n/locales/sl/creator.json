@@ -414,14 +414,8 @@
             "summaryTitle": "Zveřejněný obsah"
           },
           "history": {
-            "title": "Historie osnuteků",
-            "version": "Verze {n}"
-          },
-          "reviewStatus": {
-            "pending": "Čaka na pregled",
-            "approved": "Odobreno",
-            "rejected": "Zavrnjeno",
-            "revision_requested": "Požadovány revize"
+            "title": "Zgodovina osnutkov",
+            "reviewedAt": "Pregledano {date}"
           },
           "verificationStatus": {
             "pending": "Preverjanje čaka",

@@ -415,13 +415,7 @@
           },
           "history": {
             "title": "Cronologia bozze",
-            "version": "Versione {n}"
-          },
-          "reviewStatus": {
-            "pending": "In attesa di revisione",
-            "approved": "Approvata",
-            "rejected": "Rifiutata",
-            "revision_requested": "Revisione richiesta"
+            "reviewedAt": "Revisionata {date}"
           },
           "verificationStatus": {
             "pending": "Verifica in attesa",

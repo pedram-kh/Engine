@@ -747,7 +747,7 @@
         "action": "Review",
         "title": "Review draft",
         "loadFailed": "We couldn't load this draft. Please try again.",
-        "draftVersion": "Juodraštis v{n}",
+        "draftRound": "Juodraštis {n}",
         "noCaption": "Ne caption provided.",
         "hashtags": "Hashtags",
         "mentions": "Mentions",
@@ -758,13 +758,20 @@
         "requestRevision": "Request changes",
         "reject": "Atmesti",
         "close": "Uždaryti",
-        "history": "Version history",
+        "history": "Juodraščių istorija",
         "postedContent": "Posted content",
         "draftStatus": {
-          "pending": "Laukiama review",
-          "approved": "Patvirtintid",
-          "rejected": "Atmestied",
-          "revision_requested": "Revision requested"
+          "pending": "Laukiama peržiūros",
+          "approved": "Patvirtintas",
+          "rejected": "Nepriimtas",
+          "revision_requested": "Paprašyta pakeitimų"
+        },
+        "roundState": {
+          "awaitingReview": "Juodraštis {n} — laukiama peržiūros",
+          "changesRequested": "Juodraštis {n} — paprašyta pakeitimų",
+          "approved": "Juodraštis {n} — patvirtintas",
+          "notAccepted": "Juodraštis {n} — nepriimtas",
+          "submitted": "Juodraštis {n} — pateiktas"
         },
         "verification": {
           "pending": "Awaiting verification",

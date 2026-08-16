@@ -64,6 +64,29 @@ function bodyText(row: NotificationResource): string {
   return t(key, { ...row.attributes.data })
 }
 
+/**
+ * The draft round this notification is about (AH-068, D4), or null for a row that
+ * carries none.
+ *
+ * The round is rendered as its OWN element rather than interpolated into the body
+ * template, and that is deliberate: `bodyText` above spreads a row's stored `data`
+ * bag as named params, and every notification row written before AH-068 was stored
+ * without a `version`. A `{version}` placeholder in the four review templates
+ * would leave a hole in the body of every one of those rows. Rendered
+ * conditionally, it leaves them byte-identical and the invariant in `bodyText`'s
+ * comment true.
+ *
+ * The label is duplicated in this namespace rather than read from
+ * `app.campaigns.review.draftRound`: this component's spec mounts with the
+ * notifications namespace alone, so reading an `app.*` key here is the
+ * cross-namespace key-miss the Sprint-9-c2 split exists to prevent.
+ */
+function roundLabel(row: NotificationResource): string | null {
+  const version = row.attributes.data.version
+
+  return typeof version === 'number' ? t('notifications.center.round', { n: version }) : null
+}
+
 /** Free-text detail line, rendered only when its key is present. */
 function detailText(row: NotificationResource): { label: string; text: string } | null {
   const data = row.attributes.data
@@ -216,6 +239,13 @@ defineExpose({ reload, load })
             data-test="notification-unread-dot"
           />
           <div class="flex-grow-1">
+            <div
+              v-if="roundLabel(row)"
+              class="text-caption text-medium-emphasis"
+              data-test="notification-round"
+            >
+              {{ roundLabel(row) }}
+            </div>
             <div class="text-body-2" data-test="notification-body">{{ bodyText(row) }}</div>
             <div
               v-if="detailText(row)"

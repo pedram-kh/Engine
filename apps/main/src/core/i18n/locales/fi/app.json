@@ -747,7 +747,7 @@
         "action": "Review",
         "title": "Review draft",
         "loadFailed": "We couldn't load this draft. Please try again.",
-        "draftVersion": "Luonnos v{n}",
+        "draftRound": "Luonnos {n}",
         "noCaption": "Ei caption provided.",
         "hashtags": "Hashtags",
         "mentions": "Mentions",
@@ -758,13 +758,20 @@
         "requestRevision": "Request changes",
         "reject": "Hylkää",
         "close": "Sulje",
-        "history": "Version history",
+        "history": "Luonnosten historia",
         "postedContent": "Posted content",
         "draftStatus": {
-          "pending": "Odottaa review",
-          "approved": "Hyväksyd",
-          "rejected": "Hylkääed",
-          "revision_requested": "Revision requested"
+          "pending": "Odottaa arviointia",
+          "approved": "Hyväksytty",
+          "rejected": "Ei hyväksytty",
+          "revision_requested": "Muutoksia pyydetty"
+        },
+        "roundState": {
+          "awaitingReview": "Luonnos {n} — odottaa arviointia",
+          "changesRequested": "Luonnos {n} — muutoksia pyydetty",
+          "approved": "Luonnos {n} — hyväksytty",
+          "notAccepted": "Luonnos {n} — ei hyväksytty",
+          "submitted": "Luonnos {n} — lähetetty"
         },
         "verification": {
           "pending": "Awaiting verification",

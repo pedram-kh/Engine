@@ -414,14 +414,8 @@
             "summaryTitle": "Posted content"
           },
           "history": {
-            "title": "Mustand history",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "Ootel review",
-            "approved": "Kinnitad",
-            "rejected": "Lükka tagasied",
-            "revision_requested": "Revision requested"
+            "title": "Mustandite ajalugu",
+            "reviewedAt": "Üle vaadatud {date}"
           },
           "verificationStatus": {
             "pending": "Kinnitamine pending",

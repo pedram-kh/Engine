@@ -747,7 +747,7 @@
         "action": "Prüfen",
         "title": "Entwurf prüfen",
         "loadFailed": "Dieser Entwurf konnte nicht geladen werden. Bitte versuche es erneut.",
-        "draftVersion": "Entwurf v{n}",
+        "draftRound": "Entwurf {n}",
         "noCaption": "Kein Text angegeben.",
         "hashtags": "Hashtags",
         "mentions": "Erwähnungen",
@@ -758,13 +758,20 @@
         "requestRevision": "Änderungen anfordern",
         "reject": "Ablehnen",
         "close": "Schließen",
-        "history": "Versionshistorie",
+        "history": "Entwurfshistorie",
         "postedContent": "Veröffentlichter Inhalt",
         "draftStatus": {
-          "pending": "Ausstehende Prüfung",
+          "pending": "Prüfung ausstehend",
           "approved": "Genehmigt",
-          "rejected": "Abgelehnt",
-          "revision_requested": "Überarbeitung angefordert"
+          "rejected": "Nicht angenommen",
+          "revision_requested": "Änderungen angefordert"
+        },
+        "roundState": {
+          "awaitingReview": "Entwurf {n} — Prüfung ausstehend",
+          "changesRequested": "Entwurf {n} — Änderungen angefordert",
+          "approved": "Entwurf {n} — genehmigt",
+          "notAccepted": "Entwurf {n} — nicht angenommen",
+          "submitted": "Entwurf {n} — eingereicht"
         },
         "verification": {
           "pending": "Ausstehende Verifizierung",

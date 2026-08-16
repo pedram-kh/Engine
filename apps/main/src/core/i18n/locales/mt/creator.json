@@ -414,14 +414,8 @@
             "summaryTitle": "Posted content"
           },
           "history": {
-            "title": "Abbozz history",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "Pendenti review",
-            "approved": "Approvad",
-            "rejected": "Irrifjutaed",
-            "revision_requested": "Revision requested"
+            "title": "Storja tal-abbozzi",
+            "reviewedAt": "Rivedut {date}"
           },
           "verificationStatus": {
             "pending": "Verifikazzjoni pending",

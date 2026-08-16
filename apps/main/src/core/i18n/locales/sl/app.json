@@ -747,7 +747,7 @@
         "action": "Pregled",
         "title": "Pregled osnuteku",
         "loadFailed": "Ni nam uspelo načíst tento osnutek. Zkuste to znova.",
-        "draftVersion": "Osnutek v{n}",
+        "draftRound": "Osnutek {n}",
         "noCaption": "Žádný popisek.",
         "hashtags": "Hashtagy",
         "mentions": "Zmínky",
@@ -758,13 +758,20 @@
         "requestRevision": "Požádat o změny",
         "reject": "Zavrni",
         "close": "Zapri",
-        "history": "Historie verzí",
+        "history": "Zgodovina osnutkov",
         "postedContent": "Zveřejněný obsah",
         "draftStatus": {
           "pending": "Čaka na pregled",
           "approved": "Odobreno",
-          "rejected": "Zavrnjeno",
-          "revision_requested": "Požadovány revize"
+          "rejected": "Ni sprejeto",
+          "revision_requested": "Zahtevane spremembe"
+        },
+        "roundState": {
+          "awaitingReview": "Osnutek {n} — čaka na pregled",
+          "changesRequested": "Osnutek {n} — zahtevane spremembe",
+          "approved": "Osnutek {n} — odobreno",
+          "notAccepted": "Osnutek {n} — ni sprejeto",
+          "submitted": "Osnutek {n} — oddano"
         },
         "verification": {
           "pending": "Čaka na preverjanje",

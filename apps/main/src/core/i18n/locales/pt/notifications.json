@@ -9,7 +9,8 @@
       "error": "Não foi possível carregar as notificações.",
       "unreadBadgeLabel": "{count} notificações não lidas",
       "feedbackLabel": "Comentário",
-      "reasonLabel": "Motivo"
+      "reasonLabel": "Motivo",
+      "round": "Rascunho {n}"
     },
     "page": {
       "title": "Notificações",

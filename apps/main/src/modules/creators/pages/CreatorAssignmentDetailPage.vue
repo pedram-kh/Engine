@@ -28,6 +28,7 @@
 
 import {
   formatCurrency,
+  formatDateTime,
   ApiError,
   extractFieldErrors,
   uploadToPresignedUrl,
@@ -40,6 +41,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import { creatorAssignmentsApi } from '../assignments.api'
+import { roundStateKey } from '@/modules/campaigns/draftRounds'
 import { creatorChatTransport } from '@/modules/messaging/api/messaging.api'
 import ChatPanel from '@/modules/messaging/components/ChatPanel.vue'
 
@@ -200,6 +202,10 @@ function newId(): string {
 
 function formatMoney(minor: number | null, currency: string | null): string {
   return formatCurrency(minor, currency, locale.value)
+}
+
+function formatReviewedAt(iso: string | null): string {
+  return formatDateTime(iso, locale.value)
 }
 
 async function load(): Promise<void> {
@@ -927,17 +933,39 @@ onMounted(() => {
           >
             <v-list-item-title>
               {{
-                t('creator.ui.assignments.detail.history.version', { n: draft.attributes.version })
+                t(roundStateKey(draft.attributes.review_status, assignment.attributes.status), {
+                  n: draft.attributes.version,
+                })
               }}
-              <v-chip size="x-small" variant="tonal" class="ml-2">
-                {{
-                  t(`creator.ui.assignments.detail.reviewStatus.${draft.attributes.review_status}`)
-                }}
-              </v-chip>
             </v-list-item-title>
             <v-list-item-subtitle v-if="draft.attributes.caption">
               {{ draft.attributes.caption }}
             </v-list-item-subtitle>
+            <!--
+              What came back on this round, and when (AH-068, D3). The agency has
+              always been able to read its own feedback per round; without this the
+              creator could only ever see the LATEST round's note, in the revision
+              banner. A round closed without a note renders only the timestamp —
+              there is no honest sentence to put in the agency's mouth (AH-043).
+            -->
+            <div
+              v-if="draft.attributes.review_feedback"
+              class="text-body-2 mt-1"
+              :data-testid="`assignment-draft-feedback-${draft.attributes.version}`"
+            >
+              {{ draft.attributes.review_feedback }}
+            </div>
+            <div
+              v-if="draft.attributes.reviewed_at"
+              class="text-caption text-medium-emphasis"
+              :data-testid="`assignment-draft-reviewed-at-${draft.attributes.version}`"
+            >
+              {{
+                t('creator.ui.assignments.detail.history.reviewedAt', {
+                  date: formatReviewedAt(draft.attributes.reviewed_at),
+                })
+              }}
+            </div>
           </v-list-item>
         </v-list>
       </v-card>

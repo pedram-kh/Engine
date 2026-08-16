@@ -388,6 +388,88 @@ describe('NotificationCenter — localized render per live type', () => {
   })
 })
 
+// ── The draft round on review-cycle rows (AH-068, D4 / Q1a) ──────────────────
+describe('NotificationCenter — draft round', () => {
+  /** The review-row data bag as it was stored BEFORE AH-068: no `version`. */
+  const HISTORICAL_ROW = {
+    campaign_name: 'Spring Launch',
+    creator_name: 'Alex',
+    outcome: 'revision_requested',
+    feedback: 'Brighten the lighting.',
+    assignment_ulid: '01ASSIGN',
+  }
+
+  async function mountRow(data: Record<string, unknown>) {
+    vi.mocked(notificationsApi.list).mockResolvedValue(
+      feed([makeRow('assignment.revision_requested', data)]) as never,
+    )
+    const wrapper = mountCenter({ variant: 'page' })
+    await flushPromises()
+    return wrapper
+  }
+
+  it('renders the round on a row that carries a version', async () => {
+    const wrapper = await mountRow({ ...HISTORICAL_ROW, version: 2 })
+
+    expect(wrapper.find('[data-test="notification-round"]').text()).toBe('Draft 2')
+    wrapper.unmount()
+  })
+
+  /**
+   * The proof that Q1(a) was the right mechanism. Every notification row already
+   * in production was written without a `version`; a `{version}` placeholder in
+   * the body template would have left a hole in all of them. Here the historical
+   * row renders its body BYTE-IDENTICALLY to the round-carrying row — the round
+   * is additive, never a hole.
+   */
+  it('a pre-AH-068 row renders byte-identically, with no round element at all', async () => {
+    const historical = await mountRow(HISTORICAL_ROW)
+    const historicalBody = historical.find('[data-test="notification-body"]').text()
+
+    expect(historical.find('[data-test="notification-round"]').exists()).toBe(false)
+    // No hole, no literal placeholder, no stray punctuation.
+    expect(historicalBody).toBe('Revisions were requested on your draft for Spring Launch.')
+    expect(historicalBody).not.toContain('{')
+    // The feedback detail line is untouched too.
+    expect(historical.find('[data-test="notification-detail"]').text()).toContain(
+      'Brighten the lighting.',
+    )
+    historical.unmount()
+
+    const withRound = await mountRow({ ...HISTORICAL_ROW, version: 2 })
+    expect(withRound.find('[data-test="notification-body"]').text()).toBe(historicalBody)
+    withRound.unmount()
+  })
+
+  it('ignores a version that is not a number rather than rendering a broken label', async () => {
+    const wrapper = await mountRow({ ...HISTORICAL_ROW, version: 'two' })
+
+    expect(wrapper.find('[data-test="notification-round"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('renders the round on the agency fan-out row too — the leg that shares one verb', async () => {
+    vi.mocked(notificationsApi.list).mockResolvedValue(
+      feed([
+        makeRow('assignment.draft_submitted', {
+          creator_name: 'Alex',
+          campaign_name: 'Spring Launch',
+          campaign_ulid: '01CAMPAIGN',
+          version: 3,
+        }),
+      ]) as never,
+    )
+    const wrapper = mountCenter({ variant: 'page' })
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="notification-round"]').text()).toBe('Draft 3')
+    expect(wrapper.find('[data-test="notification-body"]').text()).toBe(
+      'Alex submitted a draft for Spring Launch.',
+    )
+    wrapper.unmount()
+  })
+})
+
 describe('NotificationCenter — generic fallback (forward-compat)', () => {
   it('an emit-less but KNOWN type (assignment.payment_funded) renders the safe fallback', async () => {
     vi.mocked(notificationsApi.list).mockResolvedValue(

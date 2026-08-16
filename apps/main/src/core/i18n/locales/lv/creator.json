@@ -414,14 +414,8 @@
             "summaryTitle": "Posted content"
           },
           "history": {
-            "title": "Melnraksts history",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "Gaida review",
-            "approved": "Apstiprinātd",
-            "rejected": "Nēraidīted",
-            "revision_requested": "Revision requested"
+            "title": "Melnrakstu vēsture",
+            "reviewedAt": "Pārskatīts {date}"
           },
           "verificationStatus": {
             "pending": "Verifikācija pending",

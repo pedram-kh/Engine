@@ -6,6 +6,7 @@ namespace App\Modules\Campaigns\Mail;
 
 use App\Modules\Agencies\Mail\ConnectionRequestMail;
 use App\Modules\Campaigns\Listeners\SendAssignmentNotifications;
+use App\Modules\Campaigns\Mail\Concerns\CarriesDraftRound;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -24,19 +25,29 @@ use Illuminate\Mail\Mailables\Envelope;
  */
 final class DraftSubmittedForReviewMail extends Mailable implements ShouldQueue
 {
+    use CarriesDraftRound;
     use Queueable;
 
+    /**
+     * @param  int|null  $round  The submitted draft's `version` (AH-068, D4) —
+     *                           what distinguishes a resubmission from a first
+     *                           submission, since both fire the same verb.
+     */
     public function __construct(
         public readonly string $recipientName,
         public readonly string $creatorName,
         public readonly string $campaignName,
         public readonly string $campaignUlid,
+        public readonly ?int $round = null,
     ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: __('campaigns.assignment_notifications.draft_submitted.email.subject', ['creator' => $this->creatorName]),
+            subject: $this->withRoundInSubject(
+                (string) __('campaigns.assignment_notifications.draft_submitted.email.subject', ['creator' => $this->creatorName]),
+                $this->round,
+            ),
         );
     }
 
@@ -48,6 +59,7 @@ final class DraftSubmittedForReviewMail extends Mailable implements ShouldQueue
                 'recipientName' => $this->recipientName,
                 'creatorName' => $this->creatorName,
                 'campaignName' => $this->campaignName,
+                'roundLabel' => $this->roundLabel($this->round),
                 'reviewUrl' => $this->buildCampaignUrl(),
             ],
         );

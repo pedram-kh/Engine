@@ -415,13 +415,7 @@
           },
           "history": {
             "title": "Draft history",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "Pending review",
-            "approved": "Approved",
-            "rejected": "Rejected",
-            "revision_requested": "Revision requested"
+            "reviewedAt": "Reviewed {date}"
           },
           "verificationStatus": {
             "pending": "Verification pending",

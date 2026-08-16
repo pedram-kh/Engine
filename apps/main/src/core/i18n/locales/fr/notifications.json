@@ -9,7 +9,8 @@
       "error": "Impossible de charger les notifications.",
       "unreadBadgeLabel": "{count} notifications non lues",
       "feedbackLabel": "Commentaires",
-      "reasonLabel": "Motif"
+      "reasonLabel": "Motif",
+      "round": "Brouillon {n}"
     },
     "page": {
       "title": "Notifications",

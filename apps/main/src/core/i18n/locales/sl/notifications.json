@@ -9,7 +9,8 @@
       "error": "Ni uspelo naložiti oznámení.",
       "unreadBadgeLabel": "{count} nepřečtených oznámení",
       "feedbackLabel": "Zpětná vazba",
-      "reasonLabel": "Razlog"
+      "reasonLabel": "Razlog",
+      "round": "Osnutek {n}"
     },
     "page": {
       "title": "Obvestila",

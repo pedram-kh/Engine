@@ -747,7 +747,7 @@
         "action": "Review",
         "title": "Review draft",
         "loadFailed": "We couldn't load this draft. Please try again.",
-        "draftVersion": "Abbozz v{n}",
+        "draftRound": "Abbozz {n}",
         "noCaption": "Le caption provided.",
         "hashtags": "Hashtags",
         "mentions": "Mentions",
@@ -758,13 +758,20 @@
         "requestRevision": "Request changes",
         "reject": "Irrifjuta",
         "close": "Agħlaq",
-        "history": "Version history",
+        "history": "Storja tal-abbozzi",
         "postedContent": "Posted content",
         "draftStatus": {
-          "pending": "Pendenti review",
-          "approved": "Approvad",
-          "rejected": "Irrifjutaed",
-          "revision_requested": "Revision requested"
+          "pending": "Qed jistenna reviżjoni",
+          "approved": "Approvat",
+          "rejected": "Mhux aċċettat",
+          "revision_requested": "Intalbu tibdiliet"
+        },
+        "roundState": {
+          "awaitingReview": "Abbozz {n} — qed jistenna reviżjoni",
+          "changesRequested": "Abbozz {n} — intalbu tibdiliet",
+          "approved": "Abbozz {n} — approvat",
+          "notAccepted": "Abbozz {n} — mhux aċċettat",
+          "submitted": "Abbozz {n} — sottomess"
         },
         "verification": {
           "pending": "Awaiting verification",

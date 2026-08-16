@@ -747,7 +747,7 @@
         "action": "Rivedi",
         "title": "Rivedi bozza",
         "loadFailed": "Impossibile caricare questa bozza. Riprova.",
-        "draftVersion": "Bozza v{n}",
+        "draftRound": "Bozza {n}",
         "noCaption": "Nessuna didascalia fornita.",
         "hashtags": "Hashtag",
         "mentions": "Menzioni",
@@ -758,13 +758,20 @@
         "requestRevision": "Richiedi modifiche",
         "reject": "Rifiuta",
         "close": "Chiudi",
-        "history": "Cronologia versioni",
+        "history": "Cronologia bozze",
         "postedContent": "Contenuto pubblicato",
         "draftStatus": {
           "pending": "In attesa di revisione",
-          "approved": "Approvato",
-          "rejected": "Rifiutato",
-          "revision_requested": "Revisione richiesta"
+          "approved": "Approvata",
+          "rejected": "Non accettata",
+          "revision_requested": "Modifiche richieste"
+        },
+        "roundState": {
+          "awaitingReview": "Bozza {n} — in attesa di revisione",
+          "changesRequested": "Bozza {n} — modifiche richieste",
+          "approved": "Bozza {n} — approvata",
+          "notAccepted": "Bozza {n} — non accettata",
+          "submitted": "Bozza {n} — inviata"
         },
         "verification": {
           "pending": "In attesa di verifica",

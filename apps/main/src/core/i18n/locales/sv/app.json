@@ -747,7 +747,7 @@
         "action": "Granska",
         "title": "Granska utkast",
         "loadFailed": "Vi kunde inte ladda det här utkastet. Försök igen.",
-        "draftVersion": "Utkast v{n}",
+        "draftRound": "Utkast {n}",
         "noCaption": "Ingen bildtext angiven.",
         "hashtags": "Hashtags",
         "mentions": "Omnämnanden",
@@ -758,13 +758,20 @@
         "requestRevision": "Begär ändringar",
         "reject": "Avvisa",
         "close": "Stäng",
-        "history": "Versionshistorik",
+        "history": "Utkastshistorik",
         "postedContent": "Publicerat innehåll",
         "draftStatus": {
           "pending": "Väntar på granskning",
           "approved": "Godkänd",
-          "rejected": "Avvisad",
-          "revision_requested": "Revision begärd"
+          "rejected": "Inte godkänt",
+          "revision_requested": "Ändringar begärda"
+        },
+        "roundState": {
+          "awaitingReview": "Utkast {n} — väntar på granskning",
+          "changesRequested": "Utkast {n} — ändringar begärda",
+          "approved": "Utkast {n} — godkänt",
+          "notAccepted": "Utkast {n} — inte godkänt",
+          "submitted": "Utkast {n} — inskickat"
         },
         "verification": {
           "pending": "Väntar på verifiering",

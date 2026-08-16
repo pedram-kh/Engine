@@ -98,6 +98,29 @@ describe('DraftsTab', () => {
     wrapper.unmount()
   })
 
+  // ── Numbered visible rounds (AH-068, D2) ─────────────────────────────────
+  it("names a row's round in the one shared form, replacing the version+status chip pair", async () => {
+    const wrapper = await mountTab()
+
+    const row = wrapper.find('[data-test="drafts-row-01DRAFTULIDXXXXXXXXXXXXXXX"]').text()
+    expect(row).toContain('Draft 1 — awaiting review')
+    expect(row).not.toContain('Draft v1')
+    wrapper.unmount()
+  })
+
+  it('a pending round whose assignment has moved on reads submitted, not awaiting review', async () => {
+    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+      data: [makeRow('pending', { status: 'cancelled' })],
+      meta: { total: 1, page: 1, per_page: 25, last_page: 1 },
+    })
+    const wrapper = await mountTab()
+
+    const row = wrapper.find('[data-test="drafts-row-01DRAFTULIDXXXXXXXXXXXXXXX"]').text()
+    expect(row).toContain('Draft 1 — submitted')
+    expect(row).not.toContain('awaiting review')
+    wrapper.unmount()
+  })
+
   it('re-fetches when the review_status filter changes', async () => {
     const wrapper = await mountTab()
     vi.mocked(campaignsApi.listDrafts).mockClear()

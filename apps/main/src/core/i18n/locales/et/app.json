@@ -747,7 +747,7 @@
         "action": "Review",
         "title": "Review draft",
         "loadFailed": "We couldn't load this draft. Please try again.",
-        "draftVersion": "Mustand v{n}",
+        "draftRound": "Mustand {n}",
         "noCaption": "Ei caption provided.",
         "hashtags": "Hashtags",
         "mentions": "Mentions",
@@ -758,13 +758,20 @@
         "requestRevision": "Request changes",
         "reject": "Lükka tagasi",
         "close": "Sulge",
-        "history": "Version history",
+        "history": "Mustandite ajalugu",
         "postedContent": "Posted content",
         "draftStatus": {
-          "pending": "Ootel review",
-          "approved": "Kinnitad",
-          "rejected": "Lükka tagasied",
-          "revision_requested": "Revision requested"
+          "pending": "Ootab ülevaatamist",
+          "approved": "Kinnitatud",
+          "rejected": "Ei võetud vastu",
+          "revision_requested": "Muudatused taotletud"
+        },
+        "roundState": {
+          "awaitingReview": "Mustand {n} — ootab ülevaatamist",
+          "changesRequested": "Mustand {n} — muudatused taotletud",
+          "approved": "Mustand {n} — kinnitatud",
+          "notAccepted": "Mustand {n} — ei võetud vastu",
+          "submitted": "Mustand {n} — esitatud"
         },
         "verification": {
           "pending": "Awaiting verification",

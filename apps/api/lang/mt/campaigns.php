@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 return [
     'assignment_notifications' => [
+        // The draft-round clause shared by both review-cycle mails (AH-068).
+        'round' => 'Abbozz :n',
+        'round_subject' => ':subject (:round)',
         'draft_submitted' => [
             'email' => [
                 'subject' => ':creator bagħat abbozz għar-reviżjoni',

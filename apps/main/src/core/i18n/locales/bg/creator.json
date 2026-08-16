@@ -414,14 +414,8 @@
             "summaryTitle": "Posted content"
           },
           "history": {
-            "title": "Чернова history",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "В изчакване review",
-            "approved": "Одобретеd",
-            "rejected": "Отхвърлетеed",
-            "revision_requested": "Revision requested"
+            "title": "История на черновите",
+            "reviewedAt": "Прегледана {date}"
           },
           "verificationStatus": {
             "pending": "Верификация pending",

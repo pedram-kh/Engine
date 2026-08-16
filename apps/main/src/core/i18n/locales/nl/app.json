@@ -747,7 +747,7 @@
         "action": "Beoordelen",
         "title": "Concept beoordelen",
         "loadFailed": "Dit concept kon niet worden geladen. Probeer het opnieuw.",
-        "draftVersion": "Concept v{n}",
+        "draftRound": "Concept {n}",
         "noCaption": "Geen bijschrift opgegeven.",
         "hashtags": "Hashtags",
         "mentions": "Vermeldingen",
@@ -758,13 +758,20 @@
         "requestRevision": "Wijzigingen aanvragen",
         "reject": "Afwijzen",
         "close": "Sluiten",
-        "history": "Versiehistorie",
+        "history": "Concepthistorie",
         "postedContent": "Geplaatste content",
         "draftStatus": {
-          "pending": "In afwachting van beoordeling",
+          "pending": "Wacht op beoordeling",
           "approved": "Goedgekeurd",
-          "rejected": "Afgewezen",
-          "revision_requested": "Wijziging gevraagd"
+          "rejected": "Niet geaccepteerd",
+          "revision_requested": "Wijzigingen gevraagd"
+        },
+        "roundState": {
+          "awaitingReview": "Concept {n} — wacht op beoordeling",
+          "changesRequested": "Concept {n} — wijzigingen gevraagd",
+          "approved": "Concept {n} — goedgekeurd",
+          "notAccepted": "Concept {n} — niet geaccepteerd",
+          "submitted": "Concept {n} — ingediend"
         },
         "verification": {
           "pending": "In afwachting van verificatie",

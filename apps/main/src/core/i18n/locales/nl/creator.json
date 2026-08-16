@@ -415,13 +415,7 @@
           },
           "history": {
             "title": "Concepthistorie",
-            "version": "Versie {n}"
-          },
-          "reviewStatus": {
-            "pending": "In afwachting van beoordeling",
-            "approved": "Goedgekeurd",
-            "rejected": "Afgewezen",
-            "revision_requested": "Wijziging gevraagd"
+            "reviewedAt": "Beoordeeld op {date}"
           },
           "verificationStatus": {
             "pending": "Verificatie in behandeling",

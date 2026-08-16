@@ -415,13 +415,7 @@
           },
           "history": {
             "title": "Historia szkiców",
-            "version": "Wersja {n}"
-          },
-          "reviewStatus": {
-            "pending": "Oczekuje na recenzję",
-            "approved": "Zatwierdzony",
-            "rejected": "Odrzucony",
-            "revision_requested": "Zażądano poprawek"
+            "reviewedAt": "Sprawdzono {date}"
           },
           "verificationStatus": {
             "pending": "Weryfikacja oczekuje",

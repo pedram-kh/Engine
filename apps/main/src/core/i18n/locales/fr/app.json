@@ -747,7 +747,7 @@
         "action": "Examiner",
         "title": "Examiner le brouillon",
         "loadFailed": "Nous n'avons pas pu charger ce brouillon. Veuillez réessayer.",
-        "draftVersion": "Brouillon v{n}",
+        "draftRound": "Brouillon {n}",
         "noCaption": "Aucune légende fournie.",
         "hashtags": "Hashtags",
         "mentions": "Mentions",
@@ -758,13 +758,20 @@
         "requestRevision": "Demander des modifications",
         "reject": "Rejeter",
         "close": "Fermer",
-        "history": "Historique des versions",
+        "history": "Historique des brouillons",
         "postedContent": "Contenu publié",
         "draftStatus": {
           "pending": "En attente d'examen",
           "approved": "Approuvé",
-          "rejected": "Rejeté",
-          "revision_requested": "Révision demandée"
+          "rejected": "Non accepté",
+          "revision_requested": "Modifications demandées"
+        },
+        "roundState": {
+          "awaitingReview": "Brouillon {n} — en attente d'examen",
+          "changesRequested": "Brouillon {n} — modifications demandées",
+          "approved": "Brouillon {n} — approuvé",
+          "notAccepted": "Brouillon {n} — non accepté",
+          "submitted": "Brouillon {n} — soumis"
         },
         "verification": {
           "pending": "En attente de vérification",

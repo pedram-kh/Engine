@@ -9,7 +9,8 @@
       "error": "Couldn't load notifications.",
       "unreadBadgeLabel": "{count} unread notifications",
       "feedbackLabel": "Feedback",
-      "reasonLabel": "Reason"
+      "reasonLabel": "Reason",
+      "round": "Melnraksts {n}"
     },
     "page": {
       "title": "Paziņojumi",

@@ -167,6 +167,8 @@ async function mountDrawer(
     canReview?: boolean
     status?: string
     postedContent?: ReturnType<typeof postedRow>[]
+    /** Newest-first, as the endpoint returns them. Drives the latest-draft row. */
+    drafts?: Array<{ version: number; review_status: string; caption: string | null }>
   } = {},
 ) {
   setActivePinia(createPinia())
@@ -197,7 +199,25 @@ async function mountDrawer(
         creator: { id: 'cr1', display_name: 'Jane Q' },
         campaign: { id: 'cmp1', name: 'Summer Push', brand_name: 'Acme' },
       },
-      relationships: { drafts: [], posted_content: opts.postedContent ?? [] },
+      relationships: {
+        drafts: (opts.drafts ?? []).map((d) => ({
+          id: `draft-${d.version}`,
+          type: 'campaign_draft',
+          attributes: {
+            version: d.version,
+            submitted_at: '2026-06-03T00:00:00+00:00',
+            caption: d.caption,
+            hashtags: null,
+            mentions: null,
+            media: [],
+            links: null,
+            review_status: d.review_status,
+            reviewed_at: null,
+            review_feedback: null,
+          },
+        })),
+        posted_content: opts.postedContent ?? [],
+      },
     },
   } as never)
 
@@ -425,6 +445,35 @@ describe('BoardCardDrawer', () => {
       wrapper.unmount()
     },
   )
+
+  // ── The latest-draft row's round chip (AH-068, D2/D5) ────────────────────
+  it('names the latest draft as one round string, not a version chip joined to a status chip', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], {
+      status: 'draft_submitted',
+      drafts: [{ version: 3, review_status: 'pending', caption: 'The third cut' }],
+    })
+
+    const row = wrapper.find('[data-test="board-card-drawer-draft"]')
+    expect(row.text()).toContain('Draft 3 — awaiting review')
+    // The retired form and the "·" join that concatenated it are both gone.
+    expect(row.text()).not.toContain('Draft v3')
+    expect(row.text()).not.toContain('·')
+    // The caption still rides alongside the chip.
+    expect(row.text()).toContain('The third cut')
+    wrapper.unmount()
+  })
+
+  it('the latest-draft round follows the assignment, not the review status alone', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], {
+      status: 'posted',
+      drafts: [{ version: 2, review_status: 'approved', caption: null }],
+    })
+
+    expect(wrapper.find('[data-test="board-card-drawer-draft"]').text()).toContain(
+      'Draft 2 — approved',
+    )
+    wrapper.unmount()
+  })
 
   it('hides Review without the canReview ability even on a submitted draft', async () => {
     const wrapper = await mountDrawer(card('a1'), [], {

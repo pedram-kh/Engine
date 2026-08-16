@@ -9,7 +9,8 @@
       "error": "Kunde inte ladda aviseringar.",
       "unreadBadgeLabel": "{count} olästa aviseringar",
       "feedbackLabel": "Feedback",
-      "reasonLabel": "Anledning"
+      "reasonLabel": "Anledning",
+      "round": "Utkast {n}"
     },
     "page": {
       "title": "Aviseringar",

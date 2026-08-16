@@ -414,14 +414,8 @@
             "summaryTitle": "Zveřejněný obsah"
           },
           "history": {
-            "title": "Historie návrhů",
-            "version": "Verze {n}"
-          },
-          "reviewStatus": {
-            "pending": "Čaká na posúdenie",
-            "approved": "Schválené",
-            "rejected": "Odmietnuté",
-            "revision_requested": "Požadovány revize"
+            "title": "História návrhov",
+            "reviewedAt": "Posúdené {date}"
           },
           "verificationStatus": {
             "pending": "Overenie čeká",

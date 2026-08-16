@@ -414,14 +414,8 @@
             "summaryTitle": "Posted content"
           },
           "history": {
-            "title": "Vázlat history",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "Függőben review",
-            "approved": "Jóváhagyásd",
-            "rejected": "Elutasításed",
-            "revision_requested": "Revision requested"
+            "title": "Vázlatok előzményei",
+            "reviewedAt": "Ellenőrizve: {date}"
           },
           "verificationStatus": {
             "pending": "Ellenőrzés pending",

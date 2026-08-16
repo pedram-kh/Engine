@@ -414,14 +414,8 @@
             "summaryTitle": "Posted content"
           },
           "history": {
-            "title": "Ciornă history",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "În așteptare review",
-            "approved": "Aprobațid",
-            "rejected": "Respingețied",
-            "revision_requested": "Revision requested"
+            "title": "Istoricul ciornelor",
+            "reviewedAt": "Revizuit {date}"
           },
           "verificationStatus": {
             "pending": "Verificare pending",

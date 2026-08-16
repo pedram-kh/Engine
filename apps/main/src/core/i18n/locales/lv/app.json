@@ -747,7 +747,7 @@
         "action": "Review",
         "title": "Review draft",
         "loadFailed": "We couldn't load this draft. Please try again.",
-        "draftVersion": "Melnraksts v{n}",
+        "draftRound": "Melnraksts {n}",
         "noCaption": "Nē caption provided.",
         "hashtags": "Hashtags",
         "mentions": "Mentions",
@@ -758,13 +758,20 @@
         "requestRevision": "Request changes",
         "reject": "Nēraidīt",
         "close": "Aizvērt",
-        "history": "Version history",
+        "history": "Melnrakstu vēsture",
         "postedContent": "Posted content",
         "draftStatus": {
-          "pending": "Gaida review",
-          "approved": "Apstiprinātd",
-          "rejected": "Nēraidīted",
-          "revision_requested": "Revision requested"
+          "pending": "Gaida pārskatīšanu",
+          "approved": "Apstiprināts",
+          "rejected": "Nav pieņemts",
+          "revision_requested": "Pieprasītas izmaiņas"
+        },
+        "roundState": {
+          "awaitingReview": "Melnraksts {n} — gaida pārskatīšanu",
+          "changesRequested": "Melnraksts {n} — pieprasītas izmaiņas",
+          "approved": "Melnraksts {n} — apstiprināts",
+          "notAccepted": "Melnraksts {n} — nav pieņemts",
+          "submitted": "Melnraksts {n} — iesniegts"
         },
         "verification": {
           "pending": "Awaiting verification",

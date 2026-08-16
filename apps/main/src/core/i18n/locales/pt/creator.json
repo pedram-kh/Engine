@@ -415,13 +415,7 @@
           },
           "history": {
             "title": "Histórico de rascunhos",
-            "version": "Versão {n}"
-          },
-          "reviewStatus": {
-            "pending": "Revisão pendente",
-            "approved": "Aprovado",
-            "rejected": "Rejeitado",
-            "revision_requested": "Revisão solicitada"
+            "reviewedAt": "Revisado {date}"
           },
           "verificationStatus": {
             "pending": "Verificação pendente",

@@ -415,13 +415,7 @@
           },
           "history": {
             "title": "Historique des brouillons",
-            "version": "Version {n}"
-          },
-          "reviewStatus": {
-            "pending": "En attente d'examen",
-            "approved": "Approuvé",
-            "rejected": "Rejeté",
-            "revision_requested": "Révision demandée"
+            "reviewedAt": "Examiné le {date}"
           },
           "verificationStatus": {
             "pending": "Vérification en attente",

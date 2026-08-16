@@ -747,7 +747,7 @@
         "action": "Review",
         "title": "Review draft",
         "loadFailed": "We couldn't load this draft. Please try again.",
-        "draftVersion": "Ciornă v{n}",
+        "draftRound": "Ciorna {n}",
         "noCaption": "Nu caption provided.",
         "hashtags": "Hashtags",
         "mentions": "Mentions",
@@ -758,13 +758,20 @@
         "requestRevision": "Request changes",
         "reject": "Respingeți",
         "close": "Închideți",
-        "history": "Version history",
+        "history": "Istoricul ciornelor",
         "postedContent": "Posted content",
         "draftStatus": {
-          "pending": "În așteptare review",
-          "approved": "Aprobațid",
-          "rejected": "Respingețied",
-          "revision_requested": "Revision requested"
+          "pending": "În așteptarea revizuirii",
+          "approved": "Aprobată",
+          "rejected": "Neacceptată",
+          "revision_requested": "Modificări solicitate"
+        },
+        "roundState": {
+          "awaitingReview": "Ciorna {n} — în așteptarea revizuirii",
+          "changesRequested": "Ciorna {n} — modificări solicitate",
+          "approved": "Ciorna {n} — aprobată",
+          "notAccepted": "Ciorna {n} — neacceptată",
+          "submitted": "Ciorna {n} — trimisă"
         },
         "verification": {
           "pending": "Awaiting verification",

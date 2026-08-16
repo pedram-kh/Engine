@@ -415,13 +415,7 @@
           },
           "history": {
             "title": "Historial de borradores",
-            "version": "Versión {n}"
-          },
-          "reviewStatus": {
-            "pending": "Pendiente de revisión",
-            "approved": "Aprobado",
-            "rejected": "Rechazado",
-            "revision_requested": "Revisión solicitada"
+            "reviewedAt": "Revisado {date}"
           },
           "verificationStatus": {
             "pending": "Verificación pendiente",

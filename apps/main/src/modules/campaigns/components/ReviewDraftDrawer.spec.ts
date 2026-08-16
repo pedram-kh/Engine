@@ -54,12 +54,18 @@ function makeAssignment(): CampaignAssignmentResource {
   }
 }
 
-function makeDraft(): CampaignDraftResource {
+function makeDraft(
+  version = 1,
+  review: Pick<
+    CampaignDraftResource['attributes'],
+    'review_status' | 'reviewed_at' | 'review_feedback'
+  > = { review_status: 'pending', reviewed_at: null, review_feedback: null },
+): CampaignDraftResource {
   return {
-    id: 'draft-1',
+    id: `draft-${version}`,
     type: 'campaign_draft',
     attributes: {
-      version: 1,
+      version,
       submitted_at: '2026-06-01T10:00:00.000000Z',
       caption: 'A shiny new caption',
       hashtags: ['#ad'],
@@ -69,9 +75,7 @@ function makeDraft(): CampaignDraftResource {
         { url: 'https://example.com/raw-cut', name: 'Raw cut' },
         { url: 'https://example.com/moodboard' },
       ],
-      review_status: 'pending',
-      reviewed_at: null,
-      review_feedback: null,
+      ...review,
     },
   }
 }
@@ -97,6 +101,25 @@ function makeDetail(): AgencyAssignmentDetailResource {
       posted_content: [],
     },
   }
+}
+
+/** Three rounds, newest first — the shape the endpoint returns (version desc). */
+function makeDetailWithRounds(): AgencyAssignmentDetailResource {
+  const detail = makeDetail()
+  detail.relationships.drafts = [
+    makeDraft(3),
+    makeDraft(2, {
+      review_status: 'revision_requested',
+      reviewed_at: '2026-06-02T09:30:00.000000Z',
+      review_feedback: 'Brighten the lighting.',
+    }),
+    makeDraft(1, {
+      review_status: 'revision_requested',
+      reviewed_at: '2026-06-01T15:00:00.000000Z',
+      review_feedback: 'Add the campaign hashtag.',
+    }),
+  ]
+  return detail
 }
 
 const VDialogStub = {
@@ -171,6 +194,38 @@ describe('ReviewDraftDrawer (Sprint 9 Chunk 2)', () => {
     // A name-less link falls back to its URL.
     expect(wrapper.find('[data-test="review-link-1"]').text()).toContain(
       'https://example.com/moodboard',
+    )
+    wrapper.unmount()
+  })
+
+  // ── Numbered visible rounds (AH-068, D2) ─────────────────────────────────
+  it('heads the preview with the round number in the shared "Draft {n}" form', async () => {
+    const wrapper = await mountOpen()
+
+    const preview = wrapper.find('[data-test="review-draft-preview"]').text()
+    expect(preview).toContain('Draft 1')
+    // The agency's old "Draft v{n}" is retired on both sides.
+    expect(preview).not.toContain('Draft v1')
+    wrapper.unmount()
+  })
+
+  it('names each history round "Draft {n} — <state>" and titles the block "Draft history"', async () => {
+    vi.mocked(campaignsApi.showAssignment).mockResolvedValue({ data: makeDetailWithRounds() })
+    const wrapper = await mountOpen()
+
+    const history = wrapper.find('[data-test="review-history"]')
+    expect(history.text()).toContain('Draft history')
+    expect(history.text()).not.toContain('Version history')
+
+    expect(wrapper.find('[data-test="review-history-3"]').text()).toContain(
+      'Draft 3 — awaiting review',
+    )
+    expect(wrapper.find('[data-test="review-history-2"]').text()).toContain(
+      'Draft 2 — changes requested',
+    )
+    // Each round still carries its own feedback beneath its own name.
+    expect(wrapper.find('[data-test="review-history-1"]').text()).toContain(
+      'Add the campaign hashtag.',
     )
     wrapper.unmount()
   })

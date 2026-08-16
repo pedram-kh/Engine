@@ -747,7 +747,7 @@
         "action": "Posúdenie",
         "title": "Posúdenie návrhu",
         "loadFailed": "Nepodařilo sa nám načíst tento návrh. Zkuste to znova.",
-        "draftVersion": "Návrh v{n}",
+        "draftRound": "Návrh {n}",
         "noCaption": "Žádný popisek.",
         "hashtags": "Hashtagy",
         "mentions": "Zmínky",
@@ -758,13 +758,20 @@
         "requestRevision": "Požádat o změny",
         "reject": "Odmietnuť",
         "close": "Zavrieť",
-        "history": "Historie verzí",
+        "history": "História návrhov",
         "postedContent": "Zveřejněný obsah",
         "draftStatus": {
           "pending": "Čaká na posúdenie",
           "approved": "Schválené",
-          "rejected": "Odmietnuté",
-          "revision_requested": "Požadovány revize"
+          "rejected": "Neprijaté",
+          "revision_requested": "Vyžiadané zmeny"
+        },
+        "roundState": {
+          "awaitingReview": "Návrh {n} — čaká na posúdenie",
+          "changesRequested": "Návrh {n} — vyžiadané zmeny",
+          "approved": "Návrh {n} — schválené",
+          "notAccepted": "Návrh {n} — neprijaté",
+          "submitted": "Návrh {n} — odoslané"
         },
         "verification": {
           "pending": "Čaká na overenie",

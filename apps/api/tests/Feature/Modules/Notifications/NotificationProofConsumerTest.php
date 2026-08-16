@@ -10,6 +10,7 @@ use App\Modules\Campaigns\Mail\DraftReviewedMail;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
+use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use App\Modules\Notifications\Enums\NotificationChannel;
@@ -118,4 +119,73 @@ it('respects the creator\'s in_app opt-out — no row, email still sent', functi
 
     expect(Notification::query()->where('recipient_user_id', $creator->user_id)->count())->toBe(0);
     Mail::assertQueued(DraftReviewedMail::class);
+});
+
+// ── The draft round on the payload (AH-068, D4) ──────────────────────────────
+
+it('the review payload carries the round, read off the context the controller already sends', function (): void {
+    Mail::fake();
+    [$agency, $campaign, $assignment, $creator, $inviter] = proofReviewSetup();
+
+    // A second round, so a passing test cannot be explained by a hardcoded 1.
+    CampaignDraft::factory()->createOne([
+        'assignment_id' => $assignment->id,
+        'submitted_by_creator_id' => $creator->id,
+        'version' => 2,
+    ]);
+
+    $this->actingAs($inviter)
+        ->postJson(proofApproveUrl($agency, $campaign, $assignment))
+        ->assertOk();
+
+    $notification = Notification::query()
+        ->where('recipient_user_id', $creator->user_id)
+        ->where('type', NotificationType::AssignmentDraftApproved->value)
+        ->first();
+
+    expect($notification?->data['version'] ?? null)->toBe(2);
+
+    // …and the same round reaches the inbox.
+    Mail::assertQueued(DraftReviewedMail::class, fn (DraftReviewedMail $m): bool => $m->round === 2);
+});
+
+it('omits the round entirely when the machine is driven with no context (Q2)', function (): void {
+    Mail::fake();
+    [, , $assignment, $creator, $inviter] = proofReviewSetup();
+
+    // A direct machine call cannot invent a round number. The invariant is that
+    // the key is ABSENT — not null — so the client can test presence and every
+    // row written before this chunk keeps rendering as it always did.
+    app(CampaignAssignmentStateMachine::class)->approve($assignment, $inviter);
+
+    $notification = Notification::query()
+        ->where('recipient_user_id', $creator->user_id)
+        ->where('type', NotificationType::AssignmentDraftApproved->value)
+        ->first();
+
+    expect($notification)->not->toBeNull();
+
+    // `data` is nullable on the model; the row's existence is asserted above.
+    $data = $notification->data ?? [];
+
+    expect(array_key_exists('version', $data))->toBeFalse()
+        // The rest of the payload is untouched by the round's absence.
+        ->and($data['assignment_ulid'] ?? null)->toBe($assignment->ulid);
+
+    Mail::assertQueued(DraftReviewedMail::class, fn (DraftReviewedMail $m): bool => $m->round === null);
+});
+
+it('queues the review mail in the recipient creator\'s own language', function (): void {
+    Mail::fake();
+    [$agency, $campaign, $assignment, $creator, $inviter] = proofReviewSetup();
+
+    User::query()->findOrFail($creator->user_id)->update(['preferred_language' => 'pt']);
+
+    $this->actingAs($inviter)
+        ->postJson(proofApproveUrl($agency, $campaign, $assignment))
+        ->assertOk();
+
+    // The round clause is localized at queue time with the rest of the mail —
+    // it must not pin the sender's locale onto the recipient.
+    Mail::assertQueued(DraftReviewedMail::class, fn (DraftReviewedMail $m): bool => $m->locale === 'pt');
 });
