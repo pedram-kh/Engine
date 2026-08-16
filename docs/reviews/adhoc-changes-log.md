@@ -59,9 +59,11 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID  | Title                                    | Status  | Notes                                                                |
-| --- | ---------------------------------------- | ------- | -------------------------------------------------------------------- |
-| —   | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass." |
+| ID     | Title                                    | Status  | Notes                                                                                       |
+| ------ | ---------------------------------------- | ------- | ------------------------------------------------------------------------------------------- |
+| AH-068 | Draft Workflow v2 chunk A — review       | Pending | Built and gated; review file reads "awaiting independent review". Push held.                |
+| —      | Draft Workflow v2 **chunk B**            | Pending | Ask (B), the per-campaign posting toggle. Inventoried, not kicked off. See §0.2/§0.3 there. |
+| —      | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass."                        |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -69,6 +71,71 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-068 · Draft rounds are numbered and visible — one "Draft {n}" vocabulary across five surfaces, the creator's own review trail, and the round in the cycle's notifications
+
+- **Status:** Landed. Full chunk loop (inventory → kickoff → plan-pause → build), so the detail lives
+  in its own review file and this entry is the pointer.
+- **Commit:** `36fa454` — `feat(drafts): number the review rounds and say so on every surface (AH-068)`,
+  plus the docs commit carrying this entry, the review file, two `tech-debt.md` entries and the
+  resumption refresh.
+- **Date:** 2026-08-16
+- **Why:** the review cycle has always kept every round — one `campaign_drafts` row per submission at
+  `version = max + 1`, closed in place by its own `review_feedback` + `reviewed_at`. It just never
+  **said so**. One surface called a round "Version 3", the next "Draft v3", a third "Pending review";
+  the creator could not read the feedback their own browser had already been sent; and no
+  notification or email named the round it was about. Client ask (A) of Draft Workflow v2.
+- **What:** **"Draft {n}" everywhere**, in five status-bearing forms
+  (`Draft 2 — awaiting review / changes requested / approved / not accepted / submitted`), resolved
+  through one shared helper so five surfaces cannot drift. The creator's history rows gain the
+  agency's feedback and `Reviewed {date}`. The two review-cycle mails and the four in-app
+  notification types carry the round, read off the event context the domain already emits.
+- **Touched:** `apps/main` — `CreatorAssignmentDetailPage.vue`, `ReviewDraftDrawer.vue`,
+  `DraftsTab.vue`, `BoardCardDrawer.vue`, `NotificationCenter.vue`, new
+  `modules/campaigns/draftRounds.ts`; `app.json` / `creator.json` / `notifications.json` × 24.
+  `apps/api` — `SendAssignmentNotifications.php`, both draft mailables, their two Blade views, new
+  `Mail/Concerns/CarriesDraftRound.php`, `lang/*/campaigns.php` × 24. **No migration, no route, no
+  resource shape, no gate, no enum case, no flag, no api-client type.**
+- **Decisions (D1–D6 locked at kickoff; Q1–Q8 ruled at plan-pause):** the round **is**
+  `campaign_drafts.version` — no counter column, pinned structurally. **Q1 → the conditional round
+  detail**, not a `{version}` body placeholder: every notification row already in production was
+  written without a `version`, and a body placeholder would have left a hole in all of them. **Q2 →
+  omit-when-absent**, so a direct state-machine call cannot invent a round number. **Q3 → five
+  composite keys with an `{n}` param**, never template-side concatenation — Hungarian ships
+  `{n}. vázlat — ellenőrzésre vár`, which is the argument. **Q6 → unify the copy, keep both key
+  paths**: D2's "one vocabulary" was reinterpreted per §5.32 as what users read, not key topology, so
+  the Sprint-9-c2 namespace split that fixed a real harness key-miss survives. **Q8 → the two new
+  §5.3 mail render tests stay in this chunk**, because shipping changed mail copy with no render test
+  is the exact false-green §5.3 exists to prevent.
+- **The §5.3 gap this closed.** Both draft mailables shipped in Sprint 9 Chunk 2 with **queue
+  assertions only** — three specs, every one a `Mail::assertQueued(...)`, which renders nothing. Two
+  new files (40 tests) now render subject and body across six locales plus the flaky 10, assert the
+  three outcomes produce three genuinely different bodies, assert the no-round shape reads as a
+  complete message, and pin the emitted deep link, **which was pinned nowhere before**. The
+  still-uncovered mailables get a `tech-debt.md` entry rather than a drive-by fix.
+- **Risk line: PROD-DATA RISK: LOW.** No migration, no schema change, no column, no backfill, no
+  one-shot, no scheduled job, no new API field. The only new runtime write is **one additive key in
+  the `data` bag of newly-created notification rows**. The one live-data consequence — historical
+  notification rows rendering with a hole — was designed around rather than accepted, and is pinned
+  by a pre-AH-068-shape fixture asserted byte-identical. Mail copy changed in all 24 locales, so the
+  **queue-worker restart obligation applies** on deploy.
+- **D6 evidenced twice.** Thirteen paths zero-diff by command output (state machine, both
+  controllers, both draft resources, every `Campaigns` enum, the `Notifications` and `Audit` modules,
+  migrations, routes, Boards, api-client, admin), **plus** an executable parity test driving
+  submit → changes → resubmit → approve through the real endpoints and pinning every row, status and
+  audit verb. Two mutations confirmed both pins load-bearing, with byte-identical SHA-256 restores.
+- **Gates:** backend **2438 / 1 skipped** (9077 assertions), PHPStan level max **0 errors**, Pint
+  clean; `apps/main` **1485 / 152 files**, `apps/admin` **449**, api-client **204**; typecheck clean,
+  ESLint 0 errors; every parity spec green; **full Playwright 27/27 effective** (26 first-pass plus
+  the documented `2fa-enrollment-and-sign-in` cold-start flake, green on isolated re-run — the same
+  flake class AH-064 and AH-066 both recorded). The E2E suite is claimed as
+  the standing pre-push **gate, not as coverage** — no spec asserts a string this chunk renames and
+  none traverses the draft cycle.
+- **Ref:** [`draft-rounds-review.md`](draft-rounds-review.md) · plan
+  [`draft-rounds-plan.md`](draft-rounds-plan.md) · inventory
+  [`draft-workflow-v2-inventory.md`](draft-workflow-v2-inventory.md).
+  **Chunk B (the per-campaign posting toggle) is not built** — it is ask (B) of the same inventory
+  and a separate chunk.
 
 ### AH-067 · `composer install` was silently rotating the production `APP_KEY` — the hook is gone, and it's pinned
 

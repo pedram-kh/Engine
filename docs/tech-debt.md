@@ -40,6 +40,60 @@ anyone reviewing it later.
 
 ---
 
+## Most mailables still have no §5.3 real-rendering test — only queue assertions (OPEN)
+
+- **Where:** `apps/api/app/Modules/**/Mail/**`. Ten mailables now have real-render coverage
+  (`ApplicationMailTest`, `JobPostedMailTest`, `InvitationMailTest`, `AdminRelationMailTest`,
+  `CreatorLifecycleMailTest`, `IncompleteCreatorNudgeMailTest`, `MailLocalizationTest`,
+  `MailThemeBrandingTest`, and the two AH-068 added). The rest do not.
+- **What we found (2026-08-16, at the AH-068 read pass):** `DraftReviewedMail` and
+  `DraftSubmittedForReviewMail` shipped in Sprint 9 Chunk 2 and were referenced in exactly three test
+  files, **every reference a `Mail::assertQueued(...)`** — which asserts a job was queued and renders
+  nothing at all. A broken Blade conditional, a missing locale value or a malformed deep link in
+  either mail would have passed all three and reached a creator as a stack trace in their inbox.
+  AH-068 changed those two mails' copy, so it closed the gap **for those two** with two new
+  `§5.3` files (`DraftReviewedMailTest`, `DraftSubmittedForReviewMailTest`) — 40 tests, subject and
+  body per locale, the flaky-10 real-translation assertion, the queued-locale assertion, and the
+  emitted URL, which had been pinned nowhere.
+- **Why it is debt rather than a one-off:** the gap is a **default**, not an oversight in one place.
+  A queue assertion is the easy thing to write when adding a mail, and nothing in the gate board
+  distinguishes "this mailable is queued" from "this mailable renders". Every mailable added without
+  a render test carries the same false-green, and AH-068 only proves the class exists — it does not
+  fix the class.
+- **The fix when it comes:** enumerate the mailables with no render coverage and add one `§5.3` file
+  each on the shape the two AH-068 files establish. A source-scan architecture test — every class
+  under `Mail/` appears in at least one test that calls `->render()` — would stop the list growing,
+  and is the cheaper half to do first.
+- **Trigger to escalate:** the next mail-copy change to an uncovered mailable, or the first
+  production report of a broken/blank email.
+- **Resolve by:** no hard date. Natural home is the next notifications or mail pass.
+- **Status:** OPEN.
+
+---
+
+## Garbled English-mixed strings in `impersonation.json` for nine locales (OPEN)
+
+- **Where:** `apps/main/src/core/i18n/locales/{et,ga,el,lv,fi,lt,hu,ro,mt}/impersonation.json`.
+- **What we found (2026-08-16, incidental to the AH-068 read pass):** several values are
+  half-translated — the sentence frame is in the target language but an English noun phrase survives
+  untranslated inside it. Examples as shipped: `"Ei hand-off token was provided"` (`et`),
+  `"Níl hand-off token was provided"` (`ga`). This is the same class AH-046 found and fixed in the
+  `hr`/`sk`/`sl` draft keys, in a namespace AH-046 did not sweep.
+- **Why it is debt rather than a one-off:** the locale-parity gate checks **key-sets and placeholder
+  tokens**, not translation quality, so a value that is structurally valid and semantically garbled
+  is invisible to every gate in the project. Nine locales in one namespace suggests a batch, not nine
+  independent slips.
+- **The fix when it comes:** re-translate the affected `impersonation.json` values, then sweep the
+  remaining namespaces for the same signature (a target-language function word immediately followed
+  by an English noun phrase) rather than fixing only the nine found by accident.
+- **Trigger to escalate:** any operator-facing use of impersonation in a non-English locale, or the
+  next locale-quality pass.
+- **Resolve by:** no hard date.
+- **Status:** OPEN. Reported by AH-068; **out of scope for it and deliberately not fixed there** —
+  the chunk touched no impersonation copy and a drive-by locale edit would have muddied its diff.
+
+---
+
 ## PHPStan and Pest can exhaust PHP's memory limit and still exit 0 (OPEN)
 
 - **Where:** `apps/api`'s CLI gates — `./vendor/bin/phpstan analyse` and `./vendor/bin/pest`, run

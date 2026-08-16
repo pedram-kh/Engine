@@ -116,18 +116,75 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-07-31 · **Through:** AH-064 · **Nothing is held.** The push on 2026-07-31 moved
+**Last updated:** 2026-08-16 · **Through:** AH-068 · **FOUR COMMITS ARE HELD.** `origin/main` sits at
+**`ea9d686`** (the AH-067 docs commit). Held locally, in order: `ba89907` (the Draft Workflow v2
+read-only inventory), `f9cc280` (the chunk-A plan, committed at plan-pause), and the **AH-068
+two-commit pair** — `36fa454` (the code) and the docs commit at the tip carrying
+[`draft-rounds-review.md`](draft-rounds-review.md), the AH-068 log entry, two new `tech-debt.md`
+entries and this refresh (a commit cannot record its own hash). **The push is Pedram's call and the
+review file reads "awaiting independent review".**
+`git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for where the
+two tips actually sit — re-derive them, do not carry this session's numbers forward.
+
+> **📝 AH-068 — DRAFT WORKFLOW v2, CHUNK A: numbered visible draft rounds.** Ask (A) of a two-ask
+> client request, inventoried in
+> [`draft-workflow-v2-inventory.md`](draft-workflow-v2-inventory.md). The domain already kept every
+> round — one `campaign_drafts` row per submission at `version = max + 1`, closed in place by its own
+> feedback — so this is a **presentation and vocabulary chunk**, not a storage one. What shipped:
+> **"Draft {n}" in five status-bearing forms** on five surfaces through one shared helper
+> (`apps/main/src/modules/campaigns/draftRounds.ts`); the **creator's history rows** finally
+> rendering the feedback and `reviewed_at` that were already on the wire; and the **round in the
+> cycle's four in-app notifications and two mails**, read off the event context the domain already
+> emits. **No migration, no route, no resource shape, no gate, no enum case, no flag, no api-client
+> type**, and thirteen behaviour-bearing paths proven zero-diff by command output.
+>
+> **Three things to know before touching it.**
+>
+> 1. **The round must never become a `{version}` placeholder in a notification body template.** Every
+>    `notifications` row already in production was written without a `version`, and `bodyText()`
+>    spreads a row's stored `data` bag as named params — a body placeholder puts a hole in every
+>    historical row. The round renders as its **own** element, only when present.
+>    `NotificationCenter.spec.ts` pins a pre-AH-068-shape fixture rendering **byte-identically**, and
+>    `templates.spec.ts` pins that no round-bearing template interpolates `{version}`. Both are the
+>    guard; do not "tidy" either away.
+> 2. **The five round-state keys are five composites with an `{n}` param — not a label concatenated
+>    with a status.** Hungarian ships `{n}. vázlat — ellenőrzésre vár`: the number precedes the noun
+>    and takes an ordinal period. Concatenating in the template would hard-code English constituent
+>    order into 24 locales and would make the placeholder-parity gate's `{n}` check meaningless.
+> 3. **The creator/agency i18n namespace split stays split.** D2 asked for "one vocabulary" and it was
+>    reinterpreted per §5.32 as _what users read_, not _key topology_ — Sprint 9 Chunk 2 moved the
+>    agency drawer off the creator namespace to fix a real test-harness key-miss. Same reason
+>    `notifications.center.round` is its own leaf rather than a read of
+>    `app.campaigns.review.draftRound`.
+>
+> **Deploy obligation:** mail copy changed in all 24 `lang/*/campaigns.php`, so the **queue-worker
+> restart** applies. Nothing else — no one-shot, no backfill, no flag to arm.
+>
+> **Chunk B is inventoried and NOT built.** The per-campaign "deliverables are posted by creators"
+> toggle is a genuinely harder chunk: per inventory §0.2 there is **no `Completed` assignment
+> state**, so "auto-advance to completion" has no target today and the kickoff must choose a
+> mechanism. Do not treat it as a follow-on tweak.
+
+**Prior state, for the record — the AH-060 → AH-064 batch.** The push on 2026-07-31 moved
 `origin/main` from **`94088e3`** (the AH-059 arc-close commit) by **eleven** commits: the eight
 **AH-060…AH-064** build commits (`8081435`, `877e81b`, `ee8a917`, `ceb15f0`, `6d970a8`, `f62529e`,
 `6ddad53`, `ebcc50a`), the two **close-out fixes** (`2153e9e` — Meta blocked in every E2E run;
 `63f1d8d` — the `--auth-glow-gradient` contract pinned), and the **docs commit at the tip** carrying
 the five AH entries, the two new `tech-debt.md` entries, the batch inventory and this refresh (a commit
-cannot record its own hash). `origin/main` and `HEAD` are now the same commit —
-`git rev-list --left-right --count origin/main...HEAD` reads `0 0` with a clean tree.
+cannot record its own hash). At that close, `origin/main` and `HEAD` were the same commit and nothing
+was held.
 **Whether it is deployed is [`deploy-log.md`](../runbooks/deploy-log.md)'s fact, not this file's** —
-as of writing, its top entry is the 2026-07-31 deploy of this whole range, and it was `PENDING`.
-`git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for where the
-two tips actually sit — re-derive them, do not carry this session's numbers forward.
+at the time of that entry, its top line was the 2026-07-31 deploy of this whole range, `PENDING`.
+
+**Bridging the gap this block never covered — AH-065 → AH-067 (2026-08-11), all pushed.** Three
+entries landed between the batch above and AH-068 without their own refresh here, and they are in
+[`adhoc-changes-log.md`](adhoc-changes-log.md) rather than this file: **AH-065** (agency-side
+`CreatorPolicy` stops gating on `users.type` — membership is the only authority), **AH-066** (the
+campaign-invite and talent-pool pickers search the roster server-side; a 176-creator agency had 76
+creators unreachable), and **AH-067** (`composer install`'s `post-install-cmd` was rotating the
+production `APP_KEY` on every deploy — the incident is in
+[`deploy-log.md`](../runbooks/deploy-log.md)'s 2026-08-11 entry, the fix and its pin in AH-067).
+`origin/main` sits at AH-067's docs commit `ea9d686`.
 
 > **🎨 A DIRECT-ITERATION UI BATCH — AH-060 → AH-064 (the AH-007 pattern, five themes).** Built from
 > Pedram's eyes-on, each item confirmed before it was written. **AH-060** puts accept/decline on the
@@ -707,6 +764,26 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
 
 ### Open threads
 
+- **📋 AH-068 awaits independent review, and the push is held** (four commits, listed at the top of
+  this block). [`draft-rounds-review.md`](draft-rounds-review.md) is the read.
+- **❓ Draft Workflow v2 chunk B is inventoried and not kicked off.** The per-campaign "deliverables
+  are posted by creators" toggle. It is **blocked on a mechanism decision, not on effort**: per
+  [`draft-workflow-v2-inventory.md`](draft-workflow-v2-inventory.md) §0.2 there is no `Completed`
+  case in `AssignmentStatus`'s 16, so the ask's "auto-advance to completion" has no target today, and
+  §0.3 records that per-campaign column omission is not expressible without new board work. Three
+  candidate shapes are laid out in that file's §6.2; the kickoff has to pick one.
+- **🟠 Most mailables still have no `§5.3` render test — OPEN (AH-068).** Ten are covered; the rest
+  carry `Mail::assertQueued(...)` only, which renders nothing and would pass a broken Blade
+  conditional or a missing locale value straight into a user's inbox. AH-068 closed it for the two
+  mails it changed and recorded the class rather than sweeping it. The cheap half of the fix is a
+  source-scan architecture test — every class under `Mail/` appears in at least one test that calls
+  `->render()`. `tech-debt.md`.
+- **🟠 Nine locales carry garbled English-mixed `impersonation.json` strings — OPEN (AH-068,
+  incidental).** `"Ei hand-off token was provided"` (`et`), `"Níl hand-off token was provided"`
+  (`ga`), and the same signature in `el lv fi lt hu ro mt`. Same class as the `hr`/`sk`/`sl` text
+  AH-046 fixed, in a namespace AH-046 did not sweep. **Invisible to every gate** — locale parity
+  checks key-sets and placeholder tokens, not translation quality. Deliberately not fixed in AH-068,
+  whose diff it would have muddied. `tech-debt.md`.
 - **✅ The `campaign_applications`/`campaign_job_notifications` GRANTs — verified resolved
   (2026-08-11).** A colleague's deploy of the 2026-07-31 range surfaced
   `SQLSTATE[42501]: permission denied for table campaign_applications` in production: the
