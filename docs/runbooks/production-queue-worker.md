@@ -392,6 +392,10 @@ Run these steps **in order**. Do not skip step 1.
    are additive-first (§5.40); a deploy should not carry a destructive migration
    without a separately-reviewed plan. Read the output — confirm the exact
    migration range that ran.
+   **Migrations are schema-only by standing rule; any data step is a named
+   command in the deploy-log entry** — so if a deploy's stated data change does
+   not appear as a command in step 4, something is wrong and this is where to
+   stop and find out.
 3. **Infra changes** — cron/scheduler lines (the §7 `schedule:run` entry), env
    var changes, worker (re)starts (§4 deploy hook). Apply these before running
    any command that depends on them.

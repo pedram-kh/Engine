@@ -139,6 +139,15 @@ reviews, and conversations.
 - **The E2E limit, stated:** the new leg covers the toggle-**OFF** lifecycle end to end, through the
   real Settings switch. The posting path — approve → post → verify — remains the named pre-existing
   gap it was before this chunk.
+- **A standing rule came out of this chunk, and rides its close commit.** Q1's reasoning — that the
+  danger in a backfill is the unattended window, not the write — was generalised: **migrations modify
+  SCHEMA ONLY, no data writes in a migration file, ever, with no exception clause.** Every data change
+  is a separate guarded, idempotent, `--dry-run`-able command run deliberately post-migrate and named
+  in the deploy-log entry. Amended in `PROJECT-WORKFLOW.md` §5.40, `WORKING-PROCESS.md` §5, the deploy
+  runbook's migrate step, and `08-DATABASE-EVOLUTION.md` (whose "Deploy 2 — backfill" examples now
+  read explicitly as commands). This **removes the previous narrowly-scoped-backfill allowance**;
+  AH-041's in-migration board backfill was its last use and is **grandfathered, not precedent**.
+- **Status of the review:** **Closed — approved** by independent review, 2026-08-16.
 - **Ref:** [`draft-posting-toggle-review.md`](draft-posting-toggle-review.md) · plan
   [`draft-posting-toggle-plan.md`](draft-posting-toggle-plan.md) · inventory
   [`draft-workflow-v2-inventory.md`](draft-workflow-v2-inventory.md). With AH-068 (ask A), this

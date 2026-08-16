@@ -1,15 +1,26 @@
 # Draft Workflow v2, chunk B — the optional posting flow (AH-069)
 
-- **Status:** **Built, gates green, push held.** Two commits here, on top of the plan-pause commit
-  `59455604`, which is itself still unpushed — so the push, when it comes, moves `origin/main` by
-  **three**. The pair: `451388f1` —
+- **Status: Closed — approved.** Independent review complete; pushed. Three commits reached
+  `origin/main`: the plan-pause `59455604`, the feature commit `451388f1` —
   `feat(campaigns): let a campaign end at draft approval when creators do not post (AH-069)` — and the
   docs commit carrying this file, the AH-069 log entry, the `deploy-log.md` PENDING entry, the two
-  tech-debt entries, the Sprint-10 spec pointer and the resumption refresh.
+  tech-debt entries, the Sprint-10 spec pointer and the resumption refresh, plus this close.
+- **Verdict (Claude, 2026-08-16).** Independent review complete. **Q1's two-layer design verified**
+  with its **eight-case §5.34 set**, including the safety-floor cases — the absent-key POST and the
+  raw DB insert, which prove the floor lives in the schema and not only in the controller. **The D5
+  table verified listener-by-listener**: nothing suppressed, five untouched with their reasons on
+  record, two deliberate opt-ins. **The Q3 one-mail proof accepted in both directions**, the ON row
+  being the one that protects production. **The zero-deletion board proof and the refuse-flip
+  verified.** **D8/Q5 accepted as labelled prophylaxis**, not sold as a bug fix. **All eight
+  mutations load-bearing with SHA-256 restores**, and mutations 5 and 6's **green siblings noted as
+  the narrow-guard proof** — the test that proves a guard is narrow is correctly a different test
+  from the one that proves it works. **The E2E limit stated, not hidden.** **Risk LOW–MEDIUM accepted
+  as re-derived**, the backfill window being the thing that actually went away.
 - **Date:** 2026-08-16
 - **Provenance:** built by Cursor against the ratified plan
   ([`draft-posting-toggle-plan.md`](draft-posting-toggle-plan.md), committed at plan-pause as
-  `59455604`) and Claude's Q1–Q8 rulings.
+  `59455604`) and Claude's Q1–Q8 rulings; independently reviewed and approved by Claude on
+  2026-08-16. **This closes Draft Workflow v2** — ask (A) shipped as AH-068, ask (B) as AH-069.
 - **Chunk base:** `59455604` —
   `docs(reviews): plan-pause for Draft Workflow v2 chunk B (optional posting flow, AH-069)`.
 - **Binds to:** [`contract-toggle-off-flow-review.md`](contract-toggle-off-flow-review.md) (AH-042 —
@@ -396,7 +407,11 @@ flake should be treated as still present until a run that was trying to provoke 
 ## 14. What this chunk deliberately did not do
 
 - **No backfill command.** Q1(a) removed the need; the column default is the write the command would
-  have performed.
+  have performed. **This chunk's reasoning was then generalised into a standing rule** at close:
+  `PROJECT-WORKFLOW.md` §5.40 and `WORKING-PROCESS.md` §5 now hold that **migrations modify schema
+  only, with no exception clause** — every data change is a separate guarded, idempotent,
+  `--dry-run`-able command run deliberately post-migrate. The old narrow-backfill allowance is gone,
+  and AH-041's in-migration backfill is grandfathered rather than precedent.
 - **No `withoutGlobalScope` in the chain.** The route-bound campaign is in hand; the bypass would
   have been cargo.
 - **No widened `isVerified`.** A third branch, because the banner must never claim verification.

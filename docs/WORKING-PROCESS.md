@@ -146,10 +146,18 @@ Mirrors the `PROJECT-WORKFLOW.md` §5 standard:
 - **Migrations are additive-first.** Nullable/defaulted new columns; no
   destructive DDL on populated tables without a separately-reviewed plan;
   renames go expand→migrate→contract.
-- **Data mutations ship as guarded, idempotent, dry-runnable commands**, never
-  migration side effects — except narrow backfills that are idempotent,
-  predicate-guarded, and test-pinned including the leaves-everything-else-
-  alone case (AH-041 and AH-048 are the reference shapes).
+- **Migrations modify SCHEMA ONLY — no data writes in a migration file, ever.**
+  No backfills, no default-flips on existing rows, no seeding of business data,
+  no matter how narrow or how well guarded. **No exception clause.** A migration
+  runs unattended in the same breath as the code deploy: no dry-run, no counts
+  read, no decision point between "deploy" and "every row rewritten."
+- **Every data change is a separate artisan command** — guarded, idempotent,
+  `--dry-run`-able — run deliberately **after** `migrate`, with its dry-run
+  counts read first and both runs recorded in the `deploy-log.md` entry.
+  AH-048 is the reference shape.
+  - This **replaces** the old narrow-backfill allowance. **AH-041**'s
+    in-migration board backfill was its last use and is **grandfathered, not
+    precedent** — left in the repo, no longer citable as a pattern.
 - **`down()` must be honest** — true inverse or an explicit can't-restore
   comment.
 - **No casual deletion** of user-generated data; soft-delete/archive; any

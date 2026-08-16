@@ -116,20 +116,33 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-08-16 · **Through:** AH-069 · **THREE commits are HELD.** `HEAD` sits at
-AH-069's docs commit; `origin/main` sits at `45ee2e7f` (the AH-068 close). Unpushed, oldest first:
+**Last updated:** 2026-08-16 · **Through:** AH-069 · **Nothing is held.** The push on 2026-08-16 moved
+`origin/main` from **`45ee2e7f`** (the AH-068 close) by **four** commits: `59455604` (the chunk-B
+plan-pause, held since the plan-pause itself), `451388f1` (the AH-069 feature commit), the AH-069 docs
+commit (this review file, the log entry, the `deploy-log.md` PENDING entry, two `tech-debt.md` entries
+and the Sprint-10 pointer in `20-PHASE-1-SPEC.md`), and the **close commit at the tip** flipping
+[`draft-posting-toggle-review.md`](draft-posting-toggle-review.md) to **Closed — approved**, carrying
+the new schema-only migration rule and writing this refresh (a commit cannot record its own hash).
+`git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for where the
+two tips sit — re-derive them, do not carry this session's numbers forward.
+**Deployment is [`deploy-log.md`](../runbooks/deploy-log.md)'s fact, not this file's** — AH-067,
+AH-068 and AH-069 are **all three un-deployed**, and AH-069's entry is the one that covers the whole
+stack, including the worker-restart obligation AH-068 created and never logged.
 
-1. `59455604` — `docs(reviews): plan-pause for Draft Workflow v2 chunk B (optional posting flow, AH-069)`,
-   held since the plan-pause itself;
-2. `451388f1` — the AH-069 feature commit;
-3. the docs commit at the tip carrying [`draft-posting-toggle-review.md`](draft-posting-toggle-review.md),
-   the AH-069 log entry, the `deploy-log.md` PENDING entry, two `tech-debt.md` entries, the Sprint-10
-   pointer in `20-PHASE-1-SPEC.md` and this block (a commit cannot record its own hash). **Push is held pending
-   Pedram's explicit call**, per the chunk loop. Re-derive both tips with `git rev-parse --short HEAD`
-   and `git rev-parse --short origin/main` rather than trusting these words.
-   **Deployment is [`deploy-log.md`](../runbooks/deploy-log.md)'s fact, not this file's** — AH-067,
-   AH-068 and AH-069 are **all three un-deployed**, and AH-069's entry is the one that now covers the
-   whole stack, including the worker-restart obligation AH-068 created and never logged.
+> **⛔ NEW STANDING RULE, established at AH-069's close — MIGRATIONS MODIFY SCHEMA ONLY.** No data
+> writes in a migration file, **ever**: no backfills, no default-flips on existing rows, no seeding of
+> business data, however narrow or well-guarded. **There is no exception clause** — the previous
+> "narrowly-scoped backfill" allowance is **removed**. Every data change ships as a separate guarded,
+> idempotent, `--dry-run`-able artisan command, run deliberately after `migrate` per the deploy
+> runbook's step 4, with its dry-run counts read first and both runs named in the `deploy-log.md`
+> entry. The reasoning is AH-069's, generalised: the danger was never the boolean write, it was the
+> **unattended window** — a migration fires automatically alongside the code deploy with no dry-run and
+> no operator reading counts. **AH-041**'s in-migration board backfill was the allowance's last use and
+> is **grandfathered, not precedent** — it stays in the repo, it is not citable as a pattern, do not
+> copy it. Amended in `PROJECT-WORKFLOW.md` §5.40, `WORKING-PROCESS.md` §5, the deploy runbook's
+> migrate step, and `08-DATABASE-EVOLUTION.md` — whose Expand→Migrate→Contract examples are unchanged
+> in sequencing but now read explicitly as **commands**, since that doc's "Deploy 2 (queued
+> migration): backfill" would otherwise have contradicted the rule outright.
 
 > **📝 AH-069 — DRAFT WORKFLOW v2, CHUNK B: the optional posting flow.** Ask (B), and with it
 > **Draft Workflow v2 is complete**. A per-campaign toggle, `campaigns.creator_posts_content`,
@@ -814,8 +827,10 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
   score** — the submit gate is `incompleteSteps.length === 0`.
 - **Production-data safety (`PROJECT-WORKFLOW.md` §5.40) — we are live.** Migrations additive-first
   (nullable/defaulted; renames expand→migrate→contract; no destructive `ALTER`/`DROP` on populated
-  tables without a separately-reviewed plan); data mutations ship as guarded, idempotent,
-  dry-runnable commands, never as migration side effects; honest `down()`; no casual hard deletes.
+  tables without a separately-reviewed plan); **migrations modify schema only — no data write in a
+  migration file, ever, no exception clause** (AH-069's close; see the standing-rule box in Part 2),
+  so every data mutation is a separate guarded, idempotent, dry-runnable command run post-migrate;
+  honest `down()`; no casual hard deletes.
   **The alarm rule (both agents):** before any code, state a `PROD-DATA RISK:` line — `NONE`
   (affirmatively) or `⚠️` naming every op that modifies/deletes/migrates/backfills existing rows; an
   undeclared risky op mid-build is a stop-the-build event. Every review file gains a "Production

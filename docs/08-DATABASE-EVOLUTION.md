@@ -4,6 +4,8 @@
 
 After Phase 1 launches, every schema change carries risk. Live data must not be lost. Live users must not see downtime. Code from before and after the change must coexist briefly. This document defines exactly how to do that.
 
+> **⚠ AMENDED 2026-08-16 — where this document says "backfill", the backfill is a COMMAND, never a migration.** `PROJECT-WORKFLOW.md` §5.40 now holds that **migrations modify schema only, with no exception clause**: no data writes in a migration file, ever. The Expand → Migrate → Contract shape below is unchanged and still mandatory — but its **Migrate** step is a separate guarded, idempotent, `--dry-run`-able artisan command (or a queued job dispatched by one), run deliberately after `migrate` per the deploy runbook's step 4 and recorded in the `deploy-log.md` entry. Read every "Deploy 2 — backfill" below as "deploy the code, migrate the structure, **then run the named command**." The three-deploy sequencing is what protects the data; putting the row-writing half inside a migration file only removes the operator's chance to read a dry-run before it fires.
+
 ---
 
 ## 1. The core principle
@@ -83,7 +85,7 @@ For large tables (>100k rows), the default-value backfill can lock the table for
 $table->string('priority', 16)->nullable()->after('status');
 ```
 
-**Deploy 2 (queued migration):** Backfill in batches.
+**Deploy 2 (a command, not a migration — see the amendment at the top):** Backfill in batches.
 
 ```php
 Campaign::whereNull('priority')->chunkById(1000, function ($campaigns) {
