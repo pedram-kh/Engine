@@ -20,7 +20,12 @@ vi.mock('../api/board.api', () => ({
   boardApi: { show: vi.fn(), movements: vi.fn() },
 }))
 vi.mock('@/modules/campaigns/api/campaigns.api', () => ({
-  campaignsApi: { showAssignment: vi.fn() },
+  campaignsApi: {
+    showAssignment: vi.fn(),
+    approveDraft: vi.fn(),
+    requestRevision: vi.fn(),
+    rejectDraft: vi.fn(),
+  },
 }))
 // The Messages tab (campaign-messages chunk) builds an agency chat transport;
 // stub the factory so the ChatPanel stub receives a truthy transport without
@@ -49,6 +54,15 @@ const VDialogStub = {
   name: 'VDialog',
   props: ['modelValue'],
   template: '<div class="vdialog-stub"><slot /></div>',
+}
+
+// The Drafts tab now mounts the shared DraftReviewPanel, which renders the
+// real PortfolioGallery — stub it out (the ReviewDraftDrawer.spec.ts
+// convention), since the gallery's own lightbox behavior is out of scope here.
+const PortfolioGalleryStub = {
+  name: 'PortfolioGallery',
+  props: ['items'],
+  template: '<div class="portfolio-stub" />',
 }
 
 function card(
@@ -240,7 +254,11 @@ async function mountDrawer(
     },
     global: {
       plugins: [i18n, vuetify],
-      stubs: { VDialog: VDialogStub, ChatPanel: ChatPanelStub },
+      stubs: {
+        VDialog: VDialogStub,
+        ChatPanel: ChatPanelStub,
+        PortfolioGallery: PortfolioGalleryStub,
+      },
     },
     attachTo: document.createElement('div'),
   })
@@ -418,10 +436,11 @@ describe('BoardCardDrawer', () => {
 
   // ── Draft-submitted row Review hand-off ───────────────────────────────────
 
-  it('offers Review on the Draft-submitted row for a draft_submitted assignment, and emits the navigation hand-off', async () => {
+  it('offers Review on the Draft-submitted row, switching to the Drafts tab in THIS drawer (no more leaving for the campaign page)', async () => {
     const wrapper = await mountDrawer(card('a1'), [], {
       canReview: true,
       status: 'draft_submitted',
+      drafts: [{ version: 1, review_status: 'pending', caption: null }],
     })
 
     const btn = wrapper.find('[data-test="board-card-drawer-review"]')
@@ -435,9 +454,13 @@ describe('BoardCardDrawer', () => {
     ).toBe(true)
 
     await btn.trigger('click')
-    // A navigation hand-off carries no payload — and writes nothing.
-    expect(wrapper.emitted('review')?.[0]).toEqual([])
+    await flushPromises()
+
+    // Switches this drawer's OWN tab — no navigation hand-off, no write.
+    expect((wrapper.vm as unknown as { tab: string }).tab).toBe('drafts')
     expect(wrapper.emitted('resolve')).toBeUndefined()
+    // The full review surface (Approve, in this case) is right there.
+    expect(wrapper.find('[data-test="review-approve"]').exists()).toBe(true)
     wrapper.unmount()
   })
 
@@ -490,43 +513,21 @@ describe('BoardCardDrawer', () => {
     wrapper.unmount()
   })
 
-  // ── Drafts tab (board-drawer Drafts tab) ─────────────────────────────────
+  // ── Drafts tab (full review surface, eyes-on fix batch, 2026-08-17) ──────
+  //
+  // The Drafts tab now mounts the SAME `DraftReviewPanel` `ReviewDraftDrawer`
+  // hosts, so its history rendering (bold round titles, contrast-safe
+  // feedback text, the empty state) is that component's own responsibility —
+  // pinned once, in `DraftReviewPanel.spec.ts`. What's pinned HERE is what's
+  // specific to mounting it inside the board drawer: it gets the ability +
+  // the already-fetched detail, and a successful action reloads the drawer
+  // without closing it.
 
-  it('shows every round as a colored card with its bold round title and submitted-at timestamp', async () => {
+  it('shows the Draft history round cards inside the board drawer (rendered by the shared panel)', async () => {
     const wrapper = await mountDrawer(card('a1'), [], {
+      status: 'draft_submitted',
       drafts: [
-        {
-          version: 2,
-          review_status: 'pending',
-          caption: null,
-          submitted_at: '2026-06-05T09:07:00+00:00',
-        },
-        {
-          version: 1,
-          review_status: 'revision_requested',
-          caption: null,
-          review_feedback: 'Fix the hook.',
-          submitted_at: '2026-06-01T09:07:00+00:00',
-        },
-      ],
-    })
-
-    const round2 = wrapper.find('[data-test="board-card-drawer-draft-2"]')
-    expect(round2.text()).toContain('Draft 2')
-    expect(round2.find('[data-test="board-card-drawer-draft-submitted-at"]').text()).toContain(
-      'Submitted',
-    )
-    expect(round2.text()).toContain('2026')
-
-    const round1 = wrapper.find('[data-test="board-card-drawer-draft-1"]')
-    expect(round1.text()).toContain('changes requested')
-    expect(round1.text()).toContain('Fix the hook.')
-    wrapper.unmount()
-  })
-
-  it("a changes-requested round's feedback uses the warning card's own contrasting text color, not the pale medium-emphasis tone", async () => {
-    const wrapper = await mountDrawer(card('a1'), [], {
-      drafts: [
+        { version: 2, review_status: 'pending', caption: null },
         {
           version: 1,
           review_status: 'revision_requested',
@@ -535,19 +536,52 @@ describe('BoardCardDrawer', () => {
         },
       ],
     })
-    const feedback = wrapper.find(
-      '[data-test="board-card-drawer-draft-1"] .board-card-drawer__draft-feedback',
-    )
-    expect(feedback.exists()).toBe(true)
-    expect((feedback.attributes('style') ?? '').replace(/\s/g, '')).toContain(
-      'color:rgb(var(--v-theme-on-warning))',
-    )
+
+    expect(wrapper.find('[data-test="review-history-1"]').text()).toContain('Fix the hook.')
     wrapper.unmount()
   })
 
   it('shows the empty note on the Drafts tab when the assignment has no drafts yet', async () => {
     const wrapper = await mountDrawer(card('a1'), [], { drafts: [] })
-    expect(wrapper.find('[data-test="board-card-drawer-drafts-empty"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="review-empty"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('approving from the board drawer calls approveDraft and reloads without closing the drawer', async () => {
+    mockCampaigns.approveDraft.mockResolvedValue({
+      data: { id: 'draft-1', type: 'campaign_draft' },
+      meta: { code: 'assignment.draft_approved' },
+    } as never)
+    const wrapper = await mountDrawer(card('a1'), [], {
+      canReview: true,
+      status: 'draft_submitted',
+      drafts: [{ version: 1, review_status: 'pending', caption: null }],
+    })
+    ;(wrapper.vm as unknown as { tab: string }).tab = 'drafts'
+    await flushPromises()
+
+    await wrapper.find('[data-test="review-approve"]').trigger('click')
+    await flushPromises()
+
+    expect(mockCampaigns.approveDraft).toHaveBeenCalledWith('agency-ulid', 'campaign-ulid', 'a1')
+    // Reloads the shared detail (showAssignment called again) instead of closing.
+    expect(mockCampaigns.showAssignment).toHaveBeenCalledTimes(2)
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('without the canReview ability, the Drafts tab shows history but no action buttons', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], {
+      canReview: false,
+      status: 'draft_submitted',
+      drafts: [{ version: 1, review_status: 'pending', caption: null }],
+    })
+    ;(wrapper.vm as unknown as { tab: string }).tab = 'drafts'
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="review-draft-preview"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="review-approve"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="review-feedback"]').exists()).toBe(false)
     wrapper.unmount()
   })
 

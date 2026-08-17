@@ -74,8 +74,12 @@ const CANONICAL_422_FILES: readonly string[] = [
   // amount field (counter-dialog shape, not the invite dialog's unbound field).
   'modules/campaigns/components/ReinviteDialog.vue',
   // Sprint 9 Chunk 2 (D-8): the agency review drawer binds the feedback-required
-  // 422 onto the review_feedback textarea (request-revision / reject).
-  'modules/campaigns/components/ReviewDraftDrawer.vue',
+  // 422 onto the review_feedback textarea (request-revision / reject). Eyes-on
+  // fix batch, 2026-08-17: the binding moved WITH the reviewable content when it
+  // was extracted into the shared `DraftReviewPanel` (now also hosted by the
+  // board card drawer's Drafts tab) — `ReviewDraftDrawer.vue` itself is dialog
+  // chrome only now, so it comes off this list and the panel goes on.
+  'modules/campaigns/components/DraftReviewPanel.vue',
   // Sprint 11 (D-11): the shared chat compose form binds the send 422 (body /
   // attachments) onto its fields. Consumed by both the agency Messages tab and
   // the creator's inline thread.

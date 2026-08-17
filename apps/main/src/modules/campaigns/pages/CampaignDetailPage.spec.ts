@@ -336,27 +336,19 @@ describe('CampaignDetailPage (Sprint 8 Chunk 1)', () => {
     expect(harness.wrapper.find('[data-test="board-coming-soon"]').exists()).toBe(false)
   })
 
-  it("the board's Review hand-off leaves the Board tab for the Drafts tab", async () => {
-    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
-      data: [makeDraftRow()],
-      meta: { total: 1, page: 1, per_page: 25, last_page: 1 },
-    })
+  // The board's card drawer can now fully review a draft itself (its own
+  // Drafts tab hosts the shared DraftReviewPanel, eyes-on fix batch,
+  // 2026-08-17) — it no longer hands off to the campaign's own Drafts tab,
+  // so this page no longer owns any "leave the board" behavior for it. The
+  // one thing this page still owns is passing the ability through.
+  it('passes the review ability to the board under its own name, not borrowed from resolve', async () => {
     const harness = await mountDetail()
     cleanup = harness.cleanup
     ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'board'
     await flushPromises()
 
     const board = harness.wrapper.findComponent(BoardView)
-    // The ability reaches the board under its own name, not borrowed from resolve.
     expect(board.props('canReview')).toBe(true)
-
-    board.vm.$emit('review')
-    await flushPromises()
-
-    expect((harness.wrapper.vm as unknown as { tab: string }).tab).toBe('drafts')
-    expect(harness.wrapper.find('[data-test="drafts-tab"]').exists()).toBe(true)
-    // Leaving the board unmounts it — which is why nothing has to refresh it.
-    expect(harness.wrapper.find('[data-test="board-view"]').exists()).toBe(false)
   })
 
   it('mounts the live DraftsTab when the Drafts tab opens (not coming-soon)', async () => {

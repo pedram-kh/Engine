@@ -158,15 +158,6 @@ function onReviewed(message: string): void {
   }
 }
 
-/**
- * The board card drawer's Review button. Navigation only — it hands the
- * operator to the Drafts tab, where the review actually happens. Leaving the
- * board tab unmounts `BoardView`, so the board re-fetches on the way back.
- */
-function onBoardReview(): void {
-  tab.value = 'drafts'
-}
-
 const draftsTabRef = ref<InstanceType<typeof DraftsTab> | null>(null)
 
 // The Applications tab (Jobs Board chunk 4, D1). The badge counts PENDING rows
@@ -888,7 +879,6 @@ function formatDay(iso: string | null): string {
             :can-act="canInvite"
             :campaign-currency="campaign?.attributes.budget_currency ?? null"
             @resolve="openResolve"
-            @review="onBoardReview"
           />
         </v-window-item>
 
