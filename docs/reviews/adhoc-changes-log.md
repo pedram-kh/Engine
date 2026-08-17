@@ -143,12 +143,36 @@ same day, rather than sitting in `tech-debt.md` waiting for a trigger:
 - **Item 3 (branch protection requiring the check) stays open** — a GitHub repo-settings change, not a
   code or docs change, so it is Pedram's to make. `tech-debt.md`'s entry is marked partially resolved
   rather than closed, so that item does not silently disappear.
+- **The new rule caught something on its own first push — a real one, not a rehearsal.** The
+  docs-citation commit (`a7900152`) got its own CI run per the "push triggers on every commit to
+  `main`" behaviour, and it was **red**: `Tests\Feature\Modules\Campaigns\CampaignJobsBoardListingTest`
+  failed asserting two real timestamps were identical, one second apart. Per the standard just
+  written, this reopened the follow-through rather than being waved off as "unrelated to the diff" —
+  which it looked like, and which is exactly the case the rule exists for.
+  - **Root cause, verified before touching anything:** the test asserted `listed_at` stays pinned to
+    its FIRST value across an off→on→off→on cycle, calling that "the once-only stamp that keeps the
+    fan-out idempotent." `CampaignController::update()` and the AH-058 `jobs-board-c3-review.md` (D4)
+    both document the opposite on purpose — `listed_at` is display-only recency metadata, re-stamped
+    on **every** false→true flip — and the fan-out's real once-only guarantee is an entirely separate
+    mechanism, the `campaign_job_notifications` stamp table, which `JobPostedFanOutService` consults
+    and `listed_at` never touches (independently covered by `JobPostedFanOutTest`'s "sends nothing
+    when a campaign is delisted and RE-LISTED"). The test's assertion was simply wrong, and had only
+    ever passed because three fast HTTP requests almost always land inside the same wall-clock
+    second — until a slower CI runner finally crossed one, five days after AH-070's own fix, on a
+    push that touched neither this test nor this code.
+  - **Fix:** corrected the test to assert the actual, documented behaviour (`listed_at` refreshes on
+    relist) using `Carbon::setTestNow()` across the flip sequence instead of real time, so it is both
+    correct and no longer clock-dependent. No production code changed — the implementation matched
+    its own docs the whole time. Verified: the one test in isolation, the full file (36/36), then the
+    full backend suite (**2522 passed, 1 skipped, 9369 assertions**) locally before pushing again.
+  - **Touched:** `apps/api/tests/Feature/Modules/Campaigns/CampaignJobsBoardListingTest.php` only.
 - **Gate: this follow-through's own CI run, cited per the rule it just wrote — the first close-out
-  under the new standard.** Run
-  [`31995541154`](https://github.com/pedram-kh/Engine/actions/runs/31995541154) on `a7900152`: **all
-  four jobs green**, including the new `Prove hermeticity — Pest with NO apps/api/.env present`
-  step inside `Backend (Pint + Larastan + Pest)`, passing on the real runner and not only in the
-  local reproduction above.
+  under the new standard, and the first time the rule paid for itself the same day it was written.**
+  Run [`31995541154`](https://github.com/pedram-kh/Engine/actions/runs/31995541154) on `a7900152`:
+  all four jobs green, including the new hermetic step, but the pushed tip's **own** run
+  ([`31996047330`](https://github.com/pedram-kh/Engine/actions/runs/31996047330) on `e9a41917`) was
+  red on the unrelated flake above. The fix landed as its own commit; its run is cited once pushed —
+  see the citation immediately following in this same entry.
 - **Touched:** `docs/PROJECT-WORKFLOW.md`, `docs/WORKING-PROCESS.md`, `docs/tech-debt.md`,
   `.github/workflows/ci.yml`. Docs-only plus one CI step; no application code, no migration, no
   production impact.
