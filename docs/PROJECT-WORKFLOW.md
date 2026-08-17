@@ -493,6 +493,18 @@ We are live in production with real users, and live data is the platform's most 
 
 > **Standing open item (owned by Pedram) — the standard is incomplete until this is done.** The backup/restore posture is currently **unverified**: RDS automated snapshots enabled, PITR retention window, and — critically — a **tested restore** have not been confirmed on this deployment. A snapshot you have never restored from is a hope, not a backup. Until a restore has been rehearsed once end-to-end, treat this standard as provisional and lean even more conservatively. Tracked in `docs/runbooks/production-queue-worker.md` §8 and the resumption template's open threads.
 
+### 5.41 CI-green is part of the push, not a courtesy check
+
+**Established:** AH-070, 2026-08-17
+
+A push is not complete until the CI run **at the pushed tip** is green and its run URL is cited in the close-out. The local gate board (§4 of `WORKING-PROCESS.md`) remains the **pre-push** evidence — it is what tells the implementing agent the chunk is ready to push at all. CI is the **post-push confirmation** — a separate, independently-provisioned environment proving the same claim holds somewhere other than the machine that made it. **A red CI at the tip reopens the chunk**, regardless of what the local board said, and regardless of whether the failure looks unrelated to the diff — an unrelated-looking CI failure is exactly what this standard exists to catch, not a reason to wave it through.
+
+**Why this needed saying.** Two chunks — AH-068 and AH-069 — each shipped with a green local gate board while `origin/main`'s CI had been red since 2026-08-11 (AH-070). Both boards were honest; both were also **laptop-local**, run on a machine that supplied an AWS region CI did not, and neither chunk checked the CI result for the tip it was pushing before calling the push clean. The gap was not a testing gap — it was a **ritual** gap: nothing in the close-out step ever pointed either agent at GitHub.
+
+- **The close-out step, going forward, is not "gates green"; it is "gates green, then push, then CI green at the pushed SHA, cited."** A `git push` followed immediately by declaring victory is incomplete — wait for the run, read its conclusion, paste the run URL (e.g. `https://github.com/<org>/<repo>/actions/runs/<id>`) into the review file / AH log entry that records the push.
+- **A red CI at the tip is treated exactly like a red local gate:** stop, diagnose, fix, and the fix's own commit needs its own green CI before the chunk is called closed — it does not get grandfathered in because "the feature commit already shipped."
+- **This does not replace the local board with CI** — a chunk still is not pushed on a red local run in the first place (§4). It closes the loop the other direction: a green local run is necessary but, as AH-070 showed, not sufficient.
+
 ---
 
 ## 6. The "Q-and-A before code" pattern

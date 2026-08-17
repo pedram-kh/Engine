@@ -48,7 +48,18 @@ anyone reviewing it later.
 - **The fix when it comes, cheapest first:** (1) add "confirm the CI run for the pushed tip is green, and paste the run URL" to the close step of the loop, so the deploy-log/review claim cites CI rather than a laptop; (2) consider `--fail-on-warning` or an explicit assertion that the suite runs with **no** `apps/api/.env`, so the hermetic contract in `phpunit.xml` is enforced instead of merely documented; (3) optionally a branch-protection rule requiring the check, which turns "we forgot to look" into "it cannot merge".
 - **Trigger to escalate:** the next time a chunk's review claims a green gate board — i.e. immediately, at the next chunk close.
 - **Resolve by:** no hard date, but item (1) is a one-line process change and should not wait.
-- **Status:** OPEN. Surfaced by AH-070 (see `reviews/adhoc-changes-log.md`).
+- ~~**Status:** OPEN.~~ **AMENDED 2026-08-17 — items (1) and (2) resolved same-day, adopted rather than deferred.**
+  - **Item (1)** is now `PROJECT-WORKFLOW.md` §5.41 and the matching line in `WORKING-PROCESS.md` §8: a
+    push is not complete until CI is green at the pushed tip, cited by run URL, in the same close-out
+    this entry's own citation (below) follows.
+  - **Item (2)** shipped as a dedicated CI step, `Prove hermeticity — Pest with NO apps/api/.env
+present (AH-070)`, placed in the one window where `.env` genuinely does not exist yet (checkout
+    never includes it; nothing upstream of the step writes one) — a guard fails the step loudly if
+    that assumption is ever violated. It runs the real suite, not a stand-in.
+  - **Item (3)** (branch-protection requiring the check) stays **OPEN** — a GitHub repo-settings
+    change, Pedram's to make, not a code or docs change.
+  - **Status:** PARTIALLY RESOLVED — items (1)/(2) closed, item (3) open. Surfaced by AH-070 (see
+    `reviews/adhoc-changes-log.md`).
 
 ---
 

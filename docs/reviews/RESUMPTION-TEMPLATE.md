@@ -116,18 +116,27 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-08-16 · **Through:** AH-069 · **Nothing is held.** The push on 2026-08-16 moved
-`origin/main` from **`45ee2e7f`** (the AH-068 close) by **four** commits: `59455604` (the chunk-B
-plan-pause, held since the plan-pause itself), `451388f1` (the AH-069 feature commit), the AH-069 docs
-commit (this review file, the log entry, the `deploy-log.md` PENDING entry, two `tech-debt.md` entries
-and the Sprint-10 pointer in `20-PHASE-1-SPEC.md`), and the **close commit at the tip** flipping
-[`draft-posting-toggle-review.md`](draft-posting-toggle-review.md) to **Closed — approved**, carrying
-the new schema-only migration rule and writing this refresh (a commit cannot record its own hash).
-`git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for where the
-two tips sit — re-derive them, do not carry this session's numbers forward.
+**Last updated:** 2026-08-17 · **Through:** AH-070 (and its same-day follow-through) · **Nothing is
+held.** Since the AH-069 close (`1ff678ec`), `origin/main` moved by four commits: the AH-070 pair
+(`f771a7cf` — the `phpunit.xml` + CI fix for the missing AWS region; the docs commit logging it),
+`a9050e44` citing AH-070's CI run, and now this follow-through — the hermetic-suite CI step plus the
+new CI-green-at-push standing rule (§5.41), landed the same day as AH-070 rather than left as
+tech-debt. `git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for
+where the two tips sit — re-derive them, do not carry this session's numbers forward.
 **Deployment is [`deploy-log.md`](../runbooks/deploy-log.md)'s fact, not this file's** — AH-067,
-AH-068 and AH-069 are **all three un-deployed**, and AH-069's entry is the one that covers the whole
-stack, including the worker-restart obligation AH-068 created and never logged.
+AH-068, AH-069 and AH-070 are **all un-deployed** (AH-070 and its follow-through are CI/process only
+and carry no deploy obligation of their own); AH-069's entry is the one that covers the migration +
+worker-restart stack.
+
+> **⛔ NEW STANDING RULE, established at AH-070's follow-through — A PUSH IS NOT COMPLETE UNTIL CI IS
+> GREEN AT THE PUSHED TIP, CITED BY RUN URL.** `PROJECT-WORKFLOW.md` §5.41 and the matching line in
+> `WORKING-PROCESS.md` §8. The local gate board is pre-push evidence; CI is the post-push
+> confirmation on a separate environment — **not redundant**, because AH-068 and AH-069 both shipped
+> with a green local board while CI had been red for days (AH-070's own finding). A red CI at the
+> pushed tip reopens the chunk, full stop, even when the failure looks unrelated to the diff. Also
+> landed: the hermetic-suite CI step (`Prove hermeticity — Pest with NO apps/api/.env present`) that
+> tech-debt had marked as item 2 — it runs the real Pest suite in the one window before checkout's
+> gitignored `.env` could exist, with a defensive guard that fails loud if that ever stops holding.
 
 > **⛔ NEW STANDING RULE, established at AH-069's close — MIGRATIONS MODIFY SCHEMA ONLY.** No data
 > writes in a migration file, **ever**: no backfills, no default-flips on existing rows, no seeding of
@@ -831,6 +840,10 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
   migration file, ever, no exception clause** (AH-069's close; see the standing-rule box in Part 2),
   so every data mutation is a separate guarded, idempotent, dry-runnable command run post-migrate;
   honest `down()`; no casual hard deletes.
+- **CI-green is part of the push (`PROJECT-WORKFLOW.md` §5.41) — AH-070.** A push is not complete
+  until the CI run at the pushed tip is green and cited by run URL; the local gate board is pre-push
+  evidence, CI is the post-push confirmation, and a red CI at the tip reopens the chunk regardless of
+  whether the failure looks related to the diff.
   **The alarm rule (both agents):** before any code, state a `PROD-DATA RISK:` line — `NONE`
   (affirmatively) or `⚠️` naming every op that modifies/deletes/migrates/backfills existing rows; an
   undeclared risky op mid-build is a stop-the-build event. Every review file gains a "Production

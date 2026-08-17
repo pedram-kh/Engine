@@ -118,6 +118,37 @@ reviews, and conversations.
   `E2E — admin SPA (Playwright)`. This is the first fully green pipeline since 2026-08-11, and the
   first time either E2E job has run in that window.
 
+#### Follow-through (2026-08-17, same day) — the ritual gap gets closed, and item 2 is adopted rather than deferred
+
+The finding above was a **process** gap, not just a missing env var — three chunks called a push clean
+on a local board while CI disagreed, because nothing in the loop ever looked. Both fixes land docs-only,
+same day, rather than sitting in `tech-debt.md` waiting for a trigger:
+
+- **CI-green is now part of the push, codified as `PROJECT-WORKFLOW.md` §5.41** and the matching line
+  in `WORKING-PROCESS.md` §8: a push is not complete until the CI run **at the pushed tip** is green
+  and its run URL is cited in the close-out. The local gate board stays the pre-push evidence; CI is
+  the post-push confirmation — a separate environment proving the same claim holds somewhere other
+  than the machine that made it. A red CI at the tip **reopens the chunk**, full stop, including when
+  the failure looks unrelated to the diff.
+- **Tech-debt item 2 — the hermetic-suite assertion — shipped rather than waiting.** A new CI step,
+  `Prove hermeticity — Pest with NO apps/api/.env present`, runs the real Pest suite in the one window
+  where `.env` genuinely does not exist yet: right after `composer install`, before the "empty `.env`"
+  step that follows it. Checkout never includes `.env` (gitignored) and nothing upstream writes one, so
+  a defensive `test ! -f .env` guard in the same step fails loudly if that ever stops being true — the
+  exact shape of regression that let AH-070's cause hide for five days. Verified locally first: parked
+  the real `.env`, neutralised the machine's ambient AWS config, and ran the identical command CI now
+  runs — exit `0`, `2522 (warnings) / 1 passed`, zero assertion failures, matching the pinned suite's
+  real outcome with literally no `.env` file present, not even an empty one. `.env` restored
+  byte-for-byte by SHA-256 afterward.
+- **Item 3 (branch protection requiring the check) stays open** — a GitHub repo-settings change, not a
+  code or docs change, so it is Pedram's to make. `tech-debt.md`'s entry is marked partially resolved
+  rather than closed, so that item does not silently disappear.
+- **Gate: this follow-through's own CI run**, per the rule it just wrote — see the note directly below
+  once the tip is pushed and its run confirmed green.
+- **Touched:** `docs/PROJECT-WORKFLOW.md`, `docs/WORKING-PROCESS.md`, `docs/tech-debt.md`,
+  `.github/workflows/ci.yml`. Docs-only plus one CI step; no application code, no migration, no
+  production impact.
+
 ### AH-069 · Not every campaign asks the creator to post — approval can be the finish line, per campaign
 
 - **Status:** Landed. Full chunk loop (inventory → kickoff → plan-pause → build), so the detail lives

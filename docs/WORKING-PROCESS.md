@@ -240,6 +240,15 @@ violation Pedram can call out.
 - **Push discipline:** nothing pushes until Claude clears it and Pedram says
   go. After push: confirm `origin/main = HEAD`
   (`git rev-list --left-right --count origin/main...HEAD` → `0 0`).
+- **A push is not complete until CI is green at the pushed tip, cited
+  (`PROJECT-WORKFLOW.md` §5.41).** The local gate board is pre-push evidence;
+  CI is the post-push confirmation that the same claim holds off the
+  developer's own machine — and it is not redundant with the local run: two
+  chunks (AH-068, AH-069) shipped with a green local board while CI had been
+  red for days, because the boards were laptop-local and nothing in the
+  close-out looked at GitHub (AH-070). Cite the run URL in the close-out. A
+  red CI at the tip reopens the chunk — it does not ship because the feature
+  commit already did.
 
 ---
 
