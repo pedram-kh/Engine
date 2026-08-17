@@ -70,6 +70,48 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-070 · CI had been red for five days — the AWS region the suite needed was coming from a `.env` nobody wrote on purpose
+
+- **Status:** Landed. A small fix with an uncomfortable finding attached, so the entry carries the
+  finding rather than a review file.
+- **Date:** 2026-08-17
+- **Why:** the `Backend (Pint + Larastan + Pest)` job had failed on **every push since 2026-08-11** —
+  AH-067's docs commit, the AH-068 close, and the AH-069 pair — with hundreds of 500s reading
+  `InvalidArgumentException: Missing required client configuration options: region`. Every `s3`-family
+  disk in `config/filesystems.php` reads `env('AWS_DEFAULT_REGION')`, and the AWS SDK refuses to
+  construct a client without one, so any request rendering a presigned URL (brand logos, media,
+  contracts, exports) threw.
+- **The cause, and why it looked like nothing changed.** **AH-067** removed composer's
+  `post-install-cmd`, which ran two things: `key:generate` (the hook that rotated the live `APP_KEY`
+  and took MFA down — the reason it had to go) **and** `copy('.env.example', '.env')`. That second
+  line was silently the only reason CI had an `AWS_DEFAULT_REGION`: every `composer install` wrote a
+  `.env` nobody had asked for. Removing the hook was correct and stays; it simply exposed a
+  dependency the test suite should never have had.
+- **What:** `phpunit.xml` now pins the S3/MinIO placeholders it was always missing
+  (`AWS_DEFAULT_REGION`, credentials, the four buckets, path-style), which is what that file already
+  claims to do — its `APP_KEY` docblock states the suite must run "identically on a fresh clone, on
+  CI, and on every developer's machine **without depending on `apps/api/.env`**". The AWS values were
+  the one hole in that promise. CI additionally does `touch .env` — **an empty file, deliberately not
+  a copy of `.env.example`**, because dotenv warns once per test when the file is absent, and an
+  empty file cannot mask a missing key the way a populated one just did for three months.
+  Both E2E jobs get the same placeholders in their `env:` blocks, since they run a real
+  `php artisan serve` and never see `phpunit.xml`.
+- **The E2E jobs had not run since 2026-08-11** — they `need: [frontend, backend]`, so a red backend
+  skipped them silently. They would have failed on the same missing region the moment they were
+  unblocked (the brands specs render a logo), so the fix had to cover all three jobs, not just the
+  one that was visibly red.
+- **Verified, not asserted.** The failure was reproduced locally by parking `.env` and neutralising
+  the machine's ambient AWS config: 25 failures with the same SDK error, then **2522 passed / 1
+  skipped / 9368 assertions** with the pins in place — the same numbers as the normal local run, now
+  with no `.env` at all. `.env` was restored byte-for-byte by SHA-256.
+- **The honest part.** AH-068's and AH-069's gate boards both report a green backend suite. Those
+  numbers were real, but they were **local** runs on a machine that had an `.env` and an ambient AWS
+  region, and neither chunk checked the CI result before pushing. Two chunks shipped onto an
+  already-red pipeline. The process gap — not the missing env var — is the finding, and it has a
+  `tech-debt.md` entry.
+- **Touched:** `apps/api/phpunit.xml`, `.github/workflows/ci.yml`. **No application code**, no
+  migration, no dependency change, no production impact — nothing in this entry reaches a deploy.
+
 ### AH-069 · Not every campaign asks the creator to post — approval can be the finish line, per campaign
 
 - **Status:** Landed. Full chunk loop (inventory → kickoff → plan-pause → build), so the detail lives

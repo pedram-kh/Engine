@@ -40,6 +40,18 @@ anyone reviewing it later.
 
 ---
 
+## "Gates green" is claimed from local runs, and nothing checks CI before a push (OPEN)
+
+- **Where:** the chunk loop's pre-push gate board (`PROJECT-WORKFLOW.md` §3/§7, and every review file's "Gate board" section).
+- **What we accepted (discovered 2026-08-17, AH-070):** the gate board is produced by running the suites **locally** and pasting the numbers. Nothing in the loop reads the **CI** result for the commit being pushed. Between 2026-08-11 and 2026-08-17 the backend CI job failed on every push while three consecutive chunks (AH-067's docs commit, AH-068, AH-069) each recorded a green gate board — all three numbers honest, all three local. The red pipeline was found only because Pedram happened to look at GitHub.
+- **Why it is debt and not a one-off:** the two environments differ in ways a local run cannot see. AH-070's specific cause was an env var the developer machine supplied ambiently and the runner did not, which is a whole **class** of divergence (ambient AWS config, a populated `.env`, installed system libraries, locale data, timezone). A local green will keep failing to predict CI until something in the loop actually reads CI. Worse, a red backend job **skips** the two E2E jobs via `needs:`, so a single failure silently removes E2E coverage from the pipeline without ever reporting a failure for it.
+- **The fix when it comes, cheapest first:** (1) add "confirm the CI run for the pushed tip is green, and paste the run URL" to the close step of the loop, so the deploy-log/review claim cites CI rather than a laptop; (2) consider `--fail-on-warning` or an explicit assertion that the suite runs with **no** `apps/api/.env`, so the hermetic contract in `phpunit.xml` is enforced instead of merely documented; (3) optionally a branch-protection rule requiring the check, which turns "we forgot to look" into "it cannot merge".
+- **Trigger to escalate:** the next time a chunk's review claims a green gate board — i.e. immediately, at the next chunk close.
+- **Resolve by:** no hard date, but item (1) is a one-line process change and should not wait.
+- **Status:** OPEN. Surfaced by AH-070 (see `reviews/adhoc-changes-log.md`).
+
+---
+
 ## Most mailables still have no §5.3 real-rendering test — only queue assertions (OPEN)
 
 - **Where:** `apps/api/app/Modules/**/Mail/**`. Ten mailables now have real-render coverage
