@@ -230,6 +230,21 @@ describe('ReviewDraftDrawer (Sprint 9 Chunk 2)', () => {
     wrapper.unmount()
   })
 
+  // Eyes-on fix, 2026-08-17: `text-medium-emphasis` rendered pale white text
+  // on the warning-tonal card, unreadable. The feedback text must instead use
+  // the SAME contrasting foreground Vuetify's own warning surfaces use.
+  it("a changes-requested round's feedback uses the warning card's own contrasting text color, not a generic light tone", async () => {
+    vi.mocked(campaignsApi.showAssignment).mockResolvedValue({ data: makeDetailWithRounds() })
+    const wrapper = await mountOpen()
+
+    const feedback = wrapper.find('[data-test="review-history-1"] .review-history-feedback')
+    expect(feedback.exists()).toBe(true)
+    expect((feedback.attributes('style') ?? '').replace(/\s/g, '')).toContain(
+      'color:rgb(var(--v-theme-on-warning))',
+    )
+    wrapper.unmount()
+  })
+
   it('approve calls approveDraft + emits reviewed + closes', async () => {
     vi.mocked(campaignsApi.approveDraft).mockResolvedValue({
       data: makeDraft(),
