@@ -227,7 +227,7 @@ async function confirmReject(): Promise<void> {
          top-to-bottom as "act, then the field for the act you just picked"
          rather than the field then the acts underneath it. -->
     <template v-if="canAct">
-      <div class="d-flex ga-2 flex-wrap mb-3">
+      <div class="d-flex ga-2 flex-wrap justify-end mb-3">
         <v-btn
           color="error"
           variant="text"
