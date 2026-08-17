@@ -352,7 +352,7 @@
       },
       "assignments": {
         "title": "Invitaciones a campañas",
-        "subtitle": "Acepta, rechaza o contraoferta la tarifa en las campañas a las que te han invitado.",
+        "subtitle": "Acepta o rechaza las campañas a las que te han invitado.",
         "fee": "Tarifa",
         "youCountered": "has contraofertado",
         "accept": "Aceptar",

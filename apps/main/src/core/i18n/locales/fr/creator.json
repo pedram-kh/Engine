@@ -352,7 +352,7 @@
       },
       "assignments": {
         "title": "Invitations à des campagnes",
-        "subtitle": "Acceptez, refusez ou contre-proposez les honoraires des campagnes auxquelles vous avez été invité.",
+        "subtitle": "Acceptez ou refusez les campagnes auxquelles vous avez été invité.",
         "fee": "Honoraires",
         "youCountered": "vous avez contre-proposé",
         "accept": "Accepter",

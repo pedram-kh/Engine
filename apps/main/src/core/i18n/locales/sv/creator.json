@@ -352,7 +352,7 @@
       },
       "assignments": {
         "title": "Kampanjinbjudningar",
-        "subtitle": "Acceptera, avböj eller lägg motbud på ersättningen för kampanjer du bjudits in till.",
+        "subtitle": "Acceptera eller avböj de kampanjer du bjudits in till.",
         "fee": "Ersättning",
         "youCountered": "du lade motbud",
         "accept": "Acceptera",

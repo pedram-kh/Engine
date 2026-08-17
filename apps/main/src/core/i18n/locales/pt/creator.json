@@ -352,7 +352,7 @@
       },
       "assignments": {
         "title": "Convites de campanha",
-        "subtitle": "Aceite, recuse ou contraproponha o cachê das campanhas para as quais foi convidado.",
+        "subtitle": "Aceite ou recuse as campanhas para as quais foi convidado.",
         "fee": "Cachê",
         "youCountered": "contraproposta",
         "accept": "Aceitar",

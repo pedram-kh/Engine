@@ -352,7 +352,7 @@
       },
       "assignments": {
         "title": "Campanie invitations",
-        "subtitle": "Acceptați, decline, or counter the fee on campaigns you've been invited to.",
+        "subtitle": "Acceptați sau refuzați campaniile la care ați fost invitat.",
         "fee": "Fee",
         "youCountered": "you countered",
         "accept": "Acceptați",

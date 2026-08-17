@@ -352,7 +352,7 @@
       },
       "assignments": {
         "title": "Pozvánky do kampaní",
-        "subtitle": "Přijměte, odmítněte nebo nabídněte protinabídku za kampaně, do nichž jste byli pozváni.",
+        "subtitle": "Přijměte nebo odmítněte kampaně, do kterých jste byli pozváni.",
         "fee": "Odměna",
         "youCountered": "protinabídka odeslána",
         "accept": "Přijmout",

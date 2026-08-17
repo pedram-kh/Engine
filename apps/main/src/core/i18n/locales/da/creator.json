@@ -352,7 +352,7 @@
       },
       "assignments": {
         "title": "Kampagneinvitationer",
-        "subtitle": "Acceptér, afvis eller kom med et modbud på kampagner, du er inviteret til.",
+        "subtitle": "Acceptér eller afvis de kampagner, du er inviteret til.",
         "fee": "Honorar",
         "youCountered": "du kom med et modbud",
         "accept": "Acceptér",

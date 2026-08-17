@@ -352,7 +352,7 @@
       },
       "assignments": {
         "title": "Zaproszenia do kampanii",
-        "subtitle": "Zaakceptuj, odrzuć lub zaproponuj kontr wynagrodzenie za kampanie, do których zostałeś/aś zaproszony/a.",
+        "subtitle": "Zaakceptuj lub odrzuć kampanie, do których zostałeś/aś zaproszony/a.",
         "fee": "Wynagrodzenie",
         "youCountered": "złożyłeś/aś kontrpropozycję",
         "accept": "Zaakceptuj",
