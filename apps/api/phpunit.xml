@@ -69,5 +69,49 @@
              stays open for the rest of the suite. See
              app/TestHelpers/README.md for the operator runbook. -->
         <env name="TEST_HELPERS_TOKEN" value="phpunit-test-helpers-token"/>
+        <!-- ============================================================
+             S3/MinIO placeholders — the hermetic contract, completed.
+             ============================================================
+             Every `s3`-family disk in config/filesystems.php reads
+             env('AWS_DEFAULT_REGION'), and the AWS SDK refuses to build a
+             client without a region — so any request that touches a
+             presigned URL (brand logos, media, contracts, exports) throws
+             `Missing required client configuration options: region` when
+             nothing supplies one.
+
+             These are NOT secrets and NOT credentials: they are the same
+             local-MinIO placeholders as .env.example, present only so the
+             SDK can construct a client and sign a URL. No test reaches a
+             real bucket.
+
+             Why they live here rather than in CI's env: this file's whole
+             premise (see the APP_KEY note above) is that the suite runs
+             identically on a fresh clone, on CI, and on every developer's
+             machine WITHOUT depending on apps/api/.env. The AWS values were
+             the one hole in that promise, and it stayed invisible while
+             composer's `post-install-cmd` copied .env.example to .env on
+             every install — CI was reading a .env nobody had written on
+             purpose. AH-067 removed that hook (it also rotated the live
+             APP_KEY, hence the incident), which turned the latent hole into
+             a red CI. Do not "fix" a future recurrence by copying an env
+             file into CI; add the missing key here instead, so a fresh
+             clone behaves the same way. -->
+        <env name="AWS_ACCESS_KEY_ID" value="minioadmin"/>
+        <env name="AWS_SECRET_ACCESS_KEY" value="minioadmin"/>
+        <env name="AWS_DEFAULT_REGION" value="eu-central-1"/>
+        <env name="AWS_ENDPOINT_URL" value="http://localhost:9100"/>
+        <env name="AWS_BUCKET" value="catalyst-engine-media"/>
+        <env name="AWS_BUCKET_MEDIA" value="catalyst-engine-media"/>
+        <env name="AWS_BUCKET_CONTRACTS" value="catalyst-engine-contracts"/>
+        <env name="AWS_BUCKET_EXPORTS" value="catalyst-engine-exports"/>
+        <env name="AWS_BUCKET_PUBLIC" value="catalyst-engine-public"/>
+        <!-- Path-style matches .env.example and the local MinIO setup, so a
+             presigned URL has the same shape here as on a dev machine.
+             `(true)` and not `true`: PHPUnit casts a "true" attribute to a
+             real boolean and putenv() stringifies it to "1", which Laravel's
+             env() passes through as the STRING "1" and the AWS SDK rejects
+             with "Expected bool, but got string(1)". `(true)` is the literal
+             Laravel's Env::get maps to boolean true. -->
+        <env name="AWS_USE_PATH_STYLE_ENDPOINT" value="(true)"/>
     </php>
 </phpunit>

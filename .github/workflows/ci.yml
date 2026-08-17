@@ -69,6 +69,19 @@ jobs:
       - name: Install composer deps
         run: composer install --no-interaction --no-progress --prefer-dist
 
+      # An EMPTY .env, deliberately — not a copy of .env.example.
+      #
+      # Dotenv warns once per test when the file is absent, so the file has to
+      # exist; but it must stay empty, because everything the suite needs is
+      # pinned in phpunit.xml. Copying .env.example would let CI pass on values
+      # a fresh clone does not have, which is exactly the failure mode that hid
+      # the missing AWS_DEFAULT_REGION until AH-067: composer's post-install-cmd
+      # was silently writing this file on every install, and removing that hook
+      # (it also rotated the live APP_KEY) turned a latent hole into a red CI.
+      # An empty file cannot mask anything.
+      - name: Create an empty .env (values come from phpunit.xml)
+        run: touch .env
+
       - name: Pint (lint)
         run: composer pint:test
 
@@ -190,6 +203,21 @@ jobs:
       # fires inline. Local dev keeps the Mailpit path because `.env`
       # there sets `MAIL_MAILER=smtp` and Mailpit is running.
       MAIL_MAILER: array
+      # S3/MinIO placeholders. These jobs run a REAL `php artisan serve`, so
+      # they never see phpunit.xml's copies — and the AWS SDK refuses to build
+      # a client without a region, so any page rendering a presigned URL (the
+      # brands specs render a brand logo) 500s without them. Not secrets: the
+      # same local-MinIO placeholders as .env.example, and no bucket exists in
+      # the runner. Nothing here needs to succeed at signing against a real
+      # endpoint; it only needs to construct a client.
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+      AWS_DEFAULT_REGION: eu-central-1
+      AWS_BUCKET: catalyst-engine-media
+      AWS_BUCKET_MEDIA: catalyst-engine-media
+      AWS_BUCKET_CONTRACTS: catalyst-engine-contracts
+      AWS_BUCKET_EXPORTS: catalyst-engine-exports
+      AWS_BUCKET_PUBLIC: catalyst-engine-public
     steps:
       - uses: actions/checkout@v4
 
@@ -356,6 +384,15 @@ jobs:
       VITE_API_BASE_URL: '/api/v1'
       # See the e2e-main env block above for the rationale.
       MAIL_MAILER: array
+      # S3/MinIO placeholders — see the e2e-main env block above.
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+      AWS_DEFAULT_REGION: eu-central-1
+      AWS_BUCKET: catalyst-engine-media
+      AWS_BUCKET_MEDIA: catalyst-engine-media
+      AWS_BUCKET_CONTRACTS: catalyst-engine-contracts
+      AWS_BUCKET_EXPORTS: catalyst-engine-exports
+      AWS_BUCKET_PUBLIC: catalyst-engine-public
     steps:
       - uses: actions/checkout@v4
 
