@@ -8,6 +8,7 @@ use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -418,26 +419,42 @@ it('§5.34 STAFF NEGATIVE: a staff member cannot flip the listing from anywhere'
     expect($campaign->fresh()?->listed_on_jobs_board)->toBeFalse();
 });
 
-it('repeated flips are SAFE — the once-only stamps make the fan-out idempotent', function (): void {
+it('repeated flips are SAFE — relisting refreshes the recency chip, and the fan-out stays idempotent for an unrelated reason', function (): void {
     ['agency' => $agency, 'admin' => $admin, 'campaign' => $campaign] = jobsBoardFixture();
 
     $url = campaignUrl($agency, $campaign);
 
+    // AH-070 correction: this test previously asserted `listed_at` stays
+    // pinned to the FIRST flip. That contradicts the documented design
+    // (`jobs-board-c3-review.md` D4: "written only on the false → true
+    // flip" — i.e. every such flip, since it is recency display metadata,
+    // not an idempotency stamp — {@see CampaignController::update()}). The
+    // job-posted fan-out's real once-only guarantee is a completely separate
+    // mechanism, the `campaign_job_notifications` stamp table, asserted in
+    // {@see JobPostedFanOutTest} ("sends nothing when a campaign is delisted
+    // and RE-LISTED") — it never reads `listed_at` at all. The old assertion
+    // only ever passed because three fast requests usually land within the
+    // same wall-clock second; a slower CI runner finally crossed a second
+    // boundary and it failed for the first time on 2026-08-17. Fixed here to
+    // assert the actual, intended behaviour with a frozen clock rather than
+    // real time, so it is correct AND deterministic.
+    Carbon::setTestNow(Carbon::parse('2026-01-01T00:00:00Z'));
+
     $this->actingAs($admin)->patchJson($url, ['listed_on_jobs_board' => true])->assertOk();
 
     $firstListedAt = $campaign->fresh()?->listed_at;
-    expect($firstListedAt)->not->toBeNull();
+    expect($firstListedAt?->toIso8601String())->toBe('2026-01-01T00:00:00+00:00');
 
-    // Off, then on again. An interactive switch on a table row invites exactly
-    // this, so it is asserted rather than assumed: `listed_at` is stamped on the
-    // FIRST flip only, which is what keeps the job-posted fan-out once-only —
-    // the property AH-058 built, verified here from the new surface's shape
-    // rather than rebuilt.
     $this->actingAs($admin)->patchJson($url, ['listed_on_jobs_board' => false])->assertOk();
+
+    Carbon::setTestNow(Carbon::parse('2026-01-02T00:00:00Z'));
     $this->actingAs($admin)->patchJson($url, ['listed_on_jobs_board' => true])->assertOk();
 
-    expect($campaign->fresh()?->listed_at?->toIso8601String())
-        ->toBe($firstListedAt?->toIso8601String());
+    $relistedAt = $campaign->fresh()?->listed_at?->toIso8601String();
+    expect($relistedAt)->toBe('2026-01-02T00:00:00+00:00');
+    expect($relistedAt)->not->toBe($firstListedAt?->toIso8601String());
+
+    Carbon::setTestNow();
 });
 
 it('audits a single-key flip exactly as it audits the Settings save', function (): void {
