@@ -549,7 +549,7 @@
         "accept": {
           "action": "Annehmen",
           "title": "{name} annehmen",
-          "body": "Beim Annehmen wird eine normale Einladung mit deinem Angebot gesendet. Der Creator kann sie weiterhin annehmen, ablehnen oder ein Gegenangebot machen.",
+          "body": "Beim Annehmen wird eine normale Einladung mit deinem Angebot gesendet. Der Creator kann sie weiterhin annehmen oder ablehnen.",
           "submit": "Angebot senden",
           "cancel": "Abbrechen",
           "conflictBody": "{name} ist während des Kampagnenzeitraums nicht verfügbar. Angebot trotzdem senden?"

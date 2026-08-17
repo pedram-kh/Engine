@@ -549,7 +549,7 @@
         "accept": {
           "action": "Võta vastu",
           "title": "Võta {name} vastu",
-          "body": "Vastuvõtmine saadab tavapärase kutse koos sinu pakkumisega. Looja saab selle ikka vastu võtta, tagasi lükata või teha vastupakkumise.",
+          "body": "Vastuvõtmine saadab tavapärase kutse koos sinu pakkumisega. Looja saab selle ikka vastu võtta või tagasi lükata.",
           "submit": "Saada pakkumine",
           "cancel": "Tühista",
           "conflictBody": "{name} ei ole kampaania perioodil saadaval. Kas saadame pakkumise siiski?"

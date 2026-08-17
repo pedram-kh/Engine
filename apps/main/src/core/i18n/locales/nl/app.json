@@ -549,7 +549,7 @@
         "accept": {
           "action": "Accepteren",
           "title": "{name} accepteren",
-          "body": "Bij accepteren wordt een gewone uitnodiging met jouw aanbod verstuurd. De creator kan die nog steeds accepteren, afwijzen of een tegenbod doen.",
+          "body": "Bij accepteren wordt een gewone uitnodiging met jouw aanbod verstuurd. De creator kan die nog steeds accepteren of afwijzen.",
           "submit": "Aanbod versturen",
           "cancel": "Annuleren",
           "conflictBody": "{name} is niet beschikbaar tijdens de campagneperiode. Aanbod toch versturen?"

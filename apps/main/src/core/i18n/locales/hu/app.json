@@ -549,7 +549,7 @@
         "accept": {
           "action": "Elfogadás",
           "title": "{name} elfogadása",
-          "body": "Az elfogadás egy szokásos meghívót küld az ajánlatoddal. Az alkotó továbbra is elfogadhatja, elutasíthatja vagy ellenajánlatot tehet.",
+          "body": "Az elfogadás egy szokásos meghívót küld az ajánlatoddal. Az alkotó továbbra is elfogadhatja vagy elutasíthatja.",
           "submit": "Ajánlat küldése",
           "cancel": "Mégse",
           "conflictBody": "{name} nem elérhető a kampány időszakában. Elküldjük mégis az ajánlatot?"

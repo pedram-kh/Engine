@@ -549,7 +549,7 @@
         "accept": {
           "action": "Acceptă",
           "title": "Acceptă {name}",
-          "body": "Acceptarea trimite o invitație standard cu oferta ta. Creatorul o poate în continuare accepta, refuza sau contraoferta.",
+          "body": "Acceptarea trimite o invitație standard cu oferta ta. Creatorul o poate în continuare accepta sau refuza.",
           "submit": "Trimite oferta",
           "cancel": "Anulați",
           "conflictBody": "{name} nu este disponibil în perioada campaniei. Trimiți oferta oricum?"

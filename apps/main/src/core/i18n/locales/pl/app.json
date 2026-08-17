@@ -549,7 +549,7 @@
         "accept": {
           "action": "Zaakceptuj",
           "title": "Zaakceptuj {name}",
-          "body": "Akceptacja wysyła standardowe zaproszenie z Twoją ofertą. Twórca nadal może ją przyjąć, odrzucić lub złożyć kontrofertę.",
+          "body": "Akceptacja wysyła standardowe zaproszenie z Twoją ofertą. Twórca nadal może ją przyjąć lub odrzucić.",
           "submit": "Wyślij ofertę",
           "cancel": "Anuluj",
           "conflictBody": "{name} jest niedostępny w okresie kampanii. Wysłać ofertę mimo to?"

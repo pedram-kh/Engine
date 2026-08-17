@@ -549,7 +549,7 @@
         "accept": {
           "action": "Priimti",
           "title": "Priimti {name}",
-          "body": "Priėmus išsiunčiamas standartinis pakvietimas su tavo pasiūlymu. Kūrėjas vis dar gali jį priimti, atmesti arba pateikti kitą pasiūlymą.",
+          "body": "Priėmus išsiunčiamas standartinis pakvietimas su tavo pasiūlymu. Kūrėjas vis dar gali jį priimti arba atmesti.",
           "submit": "Siųsti pasiūlymą",
           "cancel": "Atšaukti",
           "conflictBody": "{name} kampanijos laikotarpiu nepasiekiamas. Vis tiek siųsti pasiūlymą?"

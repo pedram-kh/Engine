@@ -549,7 +549,7 @@
         "accept": {
           "action": "Aceitar",
           "title": "Aceitar {name}",
-          "body": "Ao aceitar, é enviado um convite normal com a tua proposta. O criador pode ainda aceitá-la, recusá-la ou fazer uma contraproposta.",
+          "body": "Ao aceitar, é enviado um convite normal com a tua proposta. O criador pode ainda aceitá-la ou recusá-la.",
           "submit": "Enviar proposta",
           "cancel": "Cancelar",
           "conflictBody": "{name} não está disponível durante o período da campanha. Enviar a proposta mesmo assim?"

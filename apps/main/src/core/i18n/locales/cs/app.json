@@ -549,7 +549,7 @@
         "accept": {
           "action": "Přijmout",
           "title": "Přijmout {name}",
-          "body": "Přijetím odešleš standardní pozvánku se svou nabídkou. Tvůrce ji stále může přijmout, odmítnout nebo poslat protinávrh.",
+          "body": "Přijetím odešleš standardní pozvánku se svou nabídkou. Tvůrce ji stále může přijmout nebo odmítnout.",
           "submit": "Odeslat nabídku",
           "cancel": "Zrušit",
           "conflictBody": "{name} není v období kampaně dostupný. Odeslat nabídku i tak?"

@@ -549,7 +549,7 @@
         "accept": {
           "action": "Accetta",
           "title": "Accetta {name}",
-          "body": "Accettando invii un invito standard con la tua offerta. Il creator può ancora accettarla, rifiutarla o fare una controproposta.",
+          "body": "Accettando invii un invito standard con la tua offerta. Il creator può ancora accettarla o rifiutarla.",
           "submit": "Invia offerta",
           "cancel": "Annulla",
           "conflictBody": "{name} non è disponibile durante il periodo della campagna. Inviare l'offerta comunque?"

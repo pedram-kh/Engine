@@ -549,7 +549,7 @@
         "accept": {
           "action": "Sprejmi",
           "title": "Sprejmi {name}",
-          "body": "S sprejemom se pošlje običajno vabilo s tvojo ponudbo. Ustvarjalec jo lahko še vedno sprejme, zavrne ali poda protiponudbo.",
+          "body": "S sprejemom se pošlje običajno vabilo s tvojo ponudbo. Ustvarjalec jo lahko še vedno sprejme ali zavrne.",
           "submit": "Pošlji ponudbo",
           "cancel": "Prekliči",
           "conflictBody": "{name} v času kampanje ni na voljo. Želiš ponudbo vseeno poslati?"

@@ -549,7 +549,7 @@
         "accept": {
           "action": "Hyväksy",
           "title": "Hyväksy {name}",
-          "body": "Hyväksyminen lähettää tavallisen kutsun tarjouksesi kanssa. Tekijä voi edelleen hyväksyä sen, hylätä sen tai tehdä vastatarjouksen.",
+          "body": "Hyväksyminen lähettää tavallisen kutsun tarjouksesi kanssa. Tekijä voi edelleen hyväksyä sen tai hylätä sen.",
           "submit": "Lähetä tarjous",
           "cancel": "Peruuta",
           "conflictBody": "{name} ei ole käytettävissä kampanjan aikana. Lähetetäänkö tarjous silti?"

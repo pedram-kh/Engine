@@ -549,7 +549,7 @@
         "accept": {
           "action": "Accepter",
           "title": "Accepter {name}",
-          "body": "Når du accepterer, sendes en almindelig invitation med dit tilbud. Creatoren kan stadig acceptere, afvise eller give et modbud.",
+          "body": "Når du accepterer, sendes en almindelig invitation med dit tilbud. Creatoren kan stadig acceptere eller afvise.",
           "submit": "Send tilbud",
           "cancel": "Annuller",
           "conflictBody": "{name} er ikke tilgængelig i kampagneperioden. Send tilbuddet alligevel?"

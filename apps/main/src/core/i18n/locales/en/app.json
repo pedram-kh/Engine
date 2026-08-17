@@ -549,7 +549,7 @@
         "accept": {
           "action": "Accept",
           "title": "Accept {name}",
-          "body": "Accepting sends a standard invitation with your offer. The creator still accepts, declines or counters it.",
+          "body": "Accepting sends a standard invitation with your offer. The creator still accepts or declines it.",
           "submit": "Send offer",
           "cancel": "Cancel",
           "conflictBody": "{name} is unavailable during the campaign window. Send the offer anyway?"

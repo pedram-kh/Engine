@@ -549,7 +549,7 @@
         "accept": {
           "action": "Aceptar",
           "title": "Aceptar a {name}",
-          "body": "Al aceptar se envía una invitación estándar con tu oferta. El creador todavía puede aceptarla, rechazarla o contraofertar.",
+          "body": "Al aceptar se envía una invitación estándar con tu oferta. El creador todavía puede aceptarla o rechazarla.",
           "submit": "Enviar oferta",
           "cancel": "Cancelar",
           "conflictBody": "{name} no está disponible durante la ventana de la campaña. ¿Enviar la oferta de todos modos?"

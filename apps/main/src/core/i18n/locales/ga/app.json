@@ -549,7 +549,7 @@
         "accept": {
           "action": "Glac leis",
           "title": "Glac le {name}",
-          "body": "Seolann glacadh cuireadh caighdeánach le do thairiscint. Is féidir leis an gcruthaitheoir glacadh leis, é a dhiúltú nó frithairiscint a dhéanamh fós.",
+          "body": "Seolann glacadh cuireadh caighdeánach le do thairiscint. Is féidir leis an gcruthaitheoir glacadh leis nó é a dhiúltú fós.",
           "submit": "Seol an tairiscint",
           "cancel": "Cealaigh",
           "conflictBody": "Níl {name} ar fáil le linn tréimhse an fheachtais. An bhfuil fonn ort an tairiscint a sheoladh mar sin féin?"

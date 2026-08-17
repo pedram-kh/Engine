@@ -549,7 +549,7 @@
         "accept": {
           "action": "Accepter",
           "title": "Accepter {name}",
-          "body": "L'acceptation envoie une invitation standard avec votre offre. Le créateur peut toujours l'accepter, la refuser ou faire une contre-proposition.",
+          "body": "L'acceptation envoie une invitation standard avec votre offre. Le créateur peut toujours l'accepter ou la refuser.",
           "submit": "Envoyer l'offre",
           "cancel": "Annuler",
           "conflictBody": "{name} n'est pas disponible pendant la période de la campagne. Envoyer l'offre quand même ?"

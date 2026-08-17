@@ -549,7 +549,7 @@
         "accept": {
           "action": "Aċċetta",
           "title": "Aċċetta {name}",
-          "body": "L-aċċettazzjoni tibgħat stedina standard bl-offerta tiegħek. Il-kreatur xorta jista' jaċċettaha, jirrifjutaha jew jagħmel kontro-offerta.",
+          "body": "L-aċċettazzjoni tibgħat stedina standard bl-offerta tiegħek. Il-kreatur xorta jista' jaċċettaha jew jirrifjutaha.",
           "submit": "Ibgħat l-offerta",
           "cancel": "Ikkanċella",
           "conflictBody": "{name} mhux disponibbli matul il-perjodu tal-kampanja. Tibgħat l-offerta xorta?"

@@ -549,7 +549,7 @@
         "accept": {
           "action": "Apstiprināt",
           "title": "Apstiprināt {name}",
-          "body": "Apstiprinot tiek nosūtīts parasts uzaicinājums ar tavu piedāvājumu. Autors to joprojām var pieņemt, atteikt vai piedāvāt savu cenu.",
+          "body": "Apstiprinot tiek nosūtīts parasts uzaicinājums ar tavu piedāvājumu. Autors to joprojām var pieņemt vai atteikt.",
           "submit": "Nosūtīt piedāvājumu",
           "cancel": "Atcelt",
           "conflictBody": "{name} kampaņas laikā nav pieejams. Vai tomēr nosūtīt piedāvājumu?"

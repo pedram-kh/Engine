@@ -549,7 +549,7 @@
         "accept": {
           "action": "Prihvati",
           "title": "Prihvati {name}",
-          "body": "Prihvaćanjem se šalje standardni poziv s tvojom ponudom. Kreator je još može prihvatiti, odbiti ili poslati protuponudu.",
+          "body": "Prihvaćanjem se šalje standardni poziv s tvojom ponudom. Kreator je još može prihvatiti ili odbiti.",
           "submit": "Pošalji ponudu",
           "cancel": "Otkažite",
           "conflictBody": "{name} nije dostupan tijekom trajanja kampanje. Želiš li ipak poslati ponudu?"

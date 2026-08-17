@@ -549,7 +549,7 @@
         "accept": {
           "action": "Acceptera",
           "title": "Acceptera {name}",
-          "body": "När du accepterar skickas en vanlig inbjudan med ditt erbjudande. Creatorn kan fortfarande acceptera, avslå eller lämna ett motbud.",
+          "body": "När du accepterar skickas en vanlig inbjudan med ditt erbjudande. Creatorn kan fortfarande acceptera eller avslå.",
           "submit": "Skicka erbjudande",
           "cancel": "Avbryt",
           "conflictBody": "{name} är otillgänglig under kampanjperioden. Skicka erbjudandet ändå?"
