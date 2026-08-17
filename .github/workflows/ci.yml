@@ -69,6 +69,21 @@ jobs:
       - name: Install composer deps
         run: composer install --no-interaction --no-progress --prefer-dist
 
+      # AH-070 tech-debt item 2, adopted rather than deferred. This step runs
+      # BEFORE any .env is created — checkout never includes it (gitignored)
+      # and nothing before this line writes one — so it is the one place in
+      # CI where the hermetic claim in phpunit.xml's docblocks ("the suite
+      # runs identically on a fresh clone, on CI, and on every developer's
+      # machine without depending on apps/api/.env") is actually EXERCISED
+      # rather than merely asserted in a comment. If a future hook, script,
+      # or dependency ever re-populates .env before this point — the exact
+      # shape of the bug this entry exists to prevent — the guard fails loud
+      # before the real test run even starts.
+      - name: Prove hermeticity — Pest with NO apps/api/.env present (AH-070)
+        run: |
+          test ! -f .env || { echo "::error::.env exists before it should — something upstream created it, defeating this check"; exit 1; }
+          php -d memory_limit=512M vendor/bin/pest --colors=always
+
       # An EMPTY .env, deliberately — not a copy of .env.example.
       #
       # Dotenv warns once per test when the file is absent, so the file has to
