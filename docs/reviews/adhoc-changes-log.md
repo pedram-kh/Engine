@@ -111,6 +111,12 @@ reviews, and conversations.
   `tech-debt.md` entry.
 - **Touched:** `apps/api/phpunit.xml`, `.github/workflows/ci.yml`. **No application code**, no
   migration, no dependency change, no production impact — nothing in this entry reaches a deploy.
+- **Gate: the CI run itself, cited rather than a local paste** — the first thing the new tech-debt
+  entry asks for. Run [`31994101871`](https://github.com/pedram-kh/Engine/actions/runs/31994101871)
+  on `c9becb3c`: **all four jobs green** — `Backend (Pint + Larastan + Pest)`,
+  `Frontend (lint + typecheck + unit)`, `E2E — main SPA (Playwright)` and
+  `E2E — admin SPA (Playwright)`. This is the first fully green pipeline since 2026-08-11, and the
+  first time either E2E job has run in that window.
 
 ### AH-069 · Not every campaign asks the creator to post — approval can be the finish line, per campaign
 
