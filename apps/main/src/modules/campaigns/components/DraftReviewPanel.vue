@@ -221,29 +221,13 @@ async function confirmReject(): Promise<void> {
       </div>
     </div>
 
-    <!-- Review actions (only when a draft awaits review) -->
+    <!-- Review actions (only when a draft awaits review) — the button row
+         sits ABOVE the feedback field (eyes-on fix, 2026-08-17): Reject and
+         Request changes both consume the field below, so the actions read
+         top-to-bottom as "act, then the field for the act you just picked"
+         rather than the field then the acts underneath it. -->
     <template v-if="canAct">
-      <v-alert
-        v-if="actionError"
-        type="error"
-        variant="tonal"
-        class="mb-3"
-        data-test="review-action-error"
-      >
-        {{ actionError }}
-      </v-alert>
-      <v-textarea
-        v-model="feedback"
-        :label="t('app.campaigns.review.feedbackLabel')"
-        :hint="t('app.campaigns.review.feedbackHint')"
-        persistent-hint
-        variant="outlined"
-        rows="3"
-        auto-grow
-        :error-messages="fieldErrors.review_feedback as string[]"
-        data-test="review-feedback"
-      />
-      <div class="d-flex ga-2 flex-wrap mt-3">
+      <div class="d-flex ga-2 flex-wrap mb-3">
         <v-btn
           color="error"
           variant="text"
@@ -275,6 +259,26 @@ async function confirmReject(): Promise<void> {
           {{ t('app.campaigns.review.approve') }}
         </v-btn>
       </div>
+      <v-alert
+        v-if="actionError"
+        type="error"
+        variant="tonal"
+        class="mb-3"
+        data-test="review-action-error"
+      >
+        {{ actionError }}
+      </v-alert>
+      <v-textarea
+        v-model="feedback"
+        :label="t('app.campaigns.review.feedbackLabel')"
+        :hint="t('app.campaigns.review.feedbackHint')"
+        persistent-hint
+        variant="outlined"
+        rows="3"
+        auto-grow
+        :error-messages="fieldErrors.review_feedback as string[]"
+        data-test="review-feedback"
+      />
     </template>
 
     <!-- Draft history -->
