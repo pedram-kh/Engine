@@ -73,3 +73,29 @@ export function roundStateKey(
 ): string {
   return `${ROUND_STATE_PREFIX}.${roundState(reviewStatus, assignmentStatus)}`
 }
+
+/**
+ * The Vuetify semantic color for a round's state — reuses the app's existing
+ * success/warning/error/info vocabulary rather than inventing a new palette
+ * (the creator's "Revision requested" banner is already `warning`, the
+ * "Verified" / "Completed on approval" notices are already `success`). One
+ * mapping, shared by every surface that colors a round, so a chip's color and
+ * its words can never say two different things about the same round.
+ */
+export function roundStateColor(
+  reviewStatus: DraftReviewStatus,
+  assignmentStatus?: AssignmentStatus | null,
+): 'success' | 'warning' | 'error' | 'info' | undefined {
+  switch (roundState(reviewStatus, assignmentStatus)) {
+    case 'approved':
+      return 'success'
+    case 'changesRequested':
+      return 'warning'
+    case 'notAccepted':
+      return 'error'
+    case 'awaitingReview':
+      return 'info'
+    case 'submitted':
+      return undefined
+  }
+}

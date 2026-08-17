@@ -26,7 +26,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { campaignsApi } from '../api/campaigns.api'
-import { roundStateKey } from '../draftRounds'
+import { roundStateColor, roundStateKey } from '../draftRounds'
 
 type ReviewField = 'review_feedback'
 type ActionKind = 'approve' | 'revision' | 'reject'
@@ -288,24 +288,31 @@ async function runAction(kind: ActionKind): Promise<void> {
             <v-card-title class="text-subtitle-2">{{
               t('app.campaigns.review.history')
             }}</v-card-title>
-            <v-list density="compact">
-              <v-list-item
+            <div class="d-flex flex-column ga-2 pa-3">
+              <v-sheet
                 v-for="draft in history"
                 :key="draft.id"
+                :color="roundStateColor(draft.attributes.review_status, assignmentStatus)"
+                variant="tonal"
+                rounded="lg"
+                class="pa-2 px-3"
                 :data-test="`review-history-${draft.attributes.version}`"
               >
-                <v-list-item-title>
+                <div class="text-body-2 font-weight-medium">
                   {{
                     t(roundStateKey(draft.attributes.review_status, assignmentStatus), {
                       n: draft.attributes.version,
                     })
                   }}
-                </v-list-item-title>
-                <v-list-item-subtitle v-if="draft.attributes.review_feedback">
+                </div>
+                <div
+                  v-if="draft.attributes.review_feedback"
+                  class="text-body-2 text-medium-emphasis mt-1 review-history-feedback"
+                >
                   {{ draft.attributes.review_feedback }}
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
+                </div>
+              </v-sheet>
+            </div>
           </v-card>
 
           <!-- Posted content (verification — labelled simulated, D-12) -->
@@ -420,3 +427,10 @@ async function runAction(kind: ActionKind): Promise<void> {
     </v-card>
   </v-dialog>
 </template>
+
+<style scoped>
+.review-history-feedback {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+</style>

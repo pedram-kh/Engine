@@ -18,7 +18,7 @@ import { useI18n } from 'vue-i18n'
 import { CEmptyState } from '@catalyst/ui'
 
 import { campaignsApi } from '../api/campaigns.api'
-import { roundStateKey } from '../draftRounds'
+import { roundStateColor, roundStateKey } from '../draftRounds'
 
 type FilterValue = 'all' | DraftReviewStatus
 
@@ -187,11 +187,29 @@ defineExpose({
     </CEmptyState>
 
     <template v-else>
-      <v-list lines="two" data-test="drafts-list">
-        <v-list-item v-for="row in rows" :key="row.id" :data-test="`drafts-row-${row.id}`">
+      <v-list lines="two" data-test="drafts-list" class="d-flex flex-column ga-2">
+        <v-list-item
+          v-for="row in rows"
+          :key="row.id"
+          :data-test="`drafts-row-${row.id}`"
+          :color="
+            roundStateColor(row.attributes.review_status, row.attributes.assignment?.status ?? null)
+          "
+          variant="tonal"
+          rounded="lg"
+        >
           <v-list-item-title class="d-flex align-center ga-2 flex-wrap">
             {{ row.attributes.assignment?.creator?.display_name ?? '—' }}
-            <v-chip size="x-small" variant="tonal" color="primary">
+            <v-chip
+              size="x-small"
+              variant="flat"
+              :color="
+                roundStateColor(
+                  row.attributes.review_status,
+                  row.attributes.assignment?.status ?? null,
+                )
+              "
+            >
               {{
                 t(
                   roundStateKey(
@@ -209,7 +227,7 @@ defineExpose({
                 date: formatSubmittedAt(row.attributes.submitted_at),
               })
             }}
-            <span v-if="row.attributes.review_feedback" class="d-block mt-1">
+            <span v-if="row.attributes.review_feedback" class="d-block mt-1 drafts-row-feedback">
               {{ row.attributes.review_feedback }}
             </span>
           </v-list-item-subtitle>
@@ -251,3 +269,10 @@ defineExpose({
     </template>
   </div>
 </template>
+
+<style scoped>
+.drafts-row-feedback {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+</style>

@@ -41,7 +41,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import { creatorAssignmentsApi } from '../assignments.api'
-import { roundStateKey } from '@/modules/campaigns/draftRounds'
+import { roundStateColor, roundStateKey } from '@/modules/campaigns/draftRounds'
 import { creatorChatTransport } from '@/modules/messaging/api/messaging.api'
 import ChatPanel from '@/modules/messaging/components/ChatPanel.vue'
 
@@ -595,7 +595,9 @@ onMounted(() => {
         <div class="font-weight-medium">
           {{ t('creator.ui.assignments.detail.revision.title') }}
         </div>
-        <div v-if="revisionFeedback">{{ revisionFeedback }}</div>
+        <div v-if="revisionFeedback" class="assignment-revision-feedback">
+          {{ revisionFeedback }}
+        </div>
         <div v-else class="text-medium-emphasis">
           {{ t('creator.ui.assignments.detail.revision.noFeedback') }}
         </div>
@@ -961,22 +963,26 @@ onMounted(() => {
         <v-card-title class="text-subtitle-1">
           {{ t('creator.ui.assignments.detail.history.title') }}
         </v-card-title>
-        <v-list density="compact">
-          <v-list-item
+        <v-card-text class="d-flex flex-column ga-2">
+          <v-sheet
             v-for="draft in drafts"
             :key="draft.id"
+            :color="roundStateColor(draft.attributes.review_status, assignment.attributes.status)"
+            variant="tonal"
+            rounded="lg"
+            class="pa-3 draft-round-card"
             :data-testid="`assignment-draft-version-${draft.attributes.version}`"
           >
-            <v-list-item-title>
+            <div class="text-body-1 font-weight-medium">
               {{
                 t(roundStateKey(draft.attributes.review_status, assignment.attributes.status), {
                   n: draft.attributes.version,
                 })
               }}
-            </v-list-item-title>
-            <v-list-item-subtitle v-if="draft.attributes.caption">
+            </div>
+            <div v-if="draft.attributes.caption" class="text-body-2 mt-1">
               {{ draft.attributes.caption }}
-            </v-list-item-subtitle>
+            </div>
             <!--
               What came back on this round, and when (AH-068, D3). The agency has
               always been able to read its own feedback per round; without this the
@@ -986,14 +992,14 @@ onMounted(() => {
             -->
             <div
               v-if="draft.attributes.review_feedback"
-              class="text-body-2 mt-1"
+              class="text-body-2 mt-1 draft-round-feedback"
               :data-testid="`assignment-draft-feedback-${draft.attributes.version}`"
             >
               {{ draft.attributes.review_feedback }}
             </div>
             <div
               v-if="draft.attributes.reviewed_at"
-              class="text-caption text-medium-emphasis"
+              class="text-caption text-medium-emphasis mt-1"
               :data-testid="`assignment-draft-reviewed-at-${draft.attributes.version}`"
             >
               {{
@@ -1002,8 +1008,8 @@ onMounted(() => {
                 })
               }}
             </div>
-          </v-list-item>
-        </v-list>
+          </v-sheet>
+        </v-card-text>
       </v-card>
 
       <!-- Posted content summary -->
@@ -1078,7 +1084,9 @@ onMounted(() => {
   gap: 20px;
 }
 
-.assignment-offer-description {
+.assignment-offer-description,
+.assignment-revision-feedback,
+.draft-round-feedback {
   white-space: pre-wrap;
   word-break: break-word;
 }
