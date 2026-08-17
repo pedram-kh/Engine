@@ -202,9 +202,6 @@ defineExpose({
                 )
               }}
             </v-chip>
-            <v-chip v-if="row.attributes.assignment" size="x-small" variant="outlined">
-              {{ t(`app.campaigns.assignmentStatus.${row.attributes.assignment.status}`) }}
-            </v-chip>
           </v-list-item-title>
           <v-list-item-subtitle>
             {{

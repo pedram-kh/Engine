@@ -121,6 +121,23 @@ describe('DraftsTab', () => {
     wrapper.unmount()
   })
 
+  // A historical round must never echo the assignment's CURRENT status — that
+  // duplication is what made an already-approved assignment's earlier
+  // "changes requested" rounds look approved too. The round chip alone is the
+  // single sentence for the row (AH-068 D1/D2); nothing else may contradict it.
+  it("a changes-requested round does not also show the assignment's current status", async () => {
+    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+      data: [makeRow('revision_requested', { status: 'approved' })],
+      meta: { total: 1, page: 1, per_page: 25, last_page: 1 },
+    })
+    const wrapper = await mountTab()
+
+    const row = wrapper.find('[data-test="drafts-row-01DRAFTULIDXXXXXXXXXXXXXXX"]').text()
+    expect(row).toContain('Draft 1 — changes requested')
+    expect(row).not.toContain('Approved')
+    wrapper.unmount()
+  })
+
   it('re-fetches when the review_status filter changes', async () => {
     const wrapper = await mountTab()
     vi.mocked(campaignsApi.listDrafts).mockClear()
