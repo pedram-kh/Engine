@@ -84,6 +84,8 @@ async function mountRoster(
     agencyId?: string | null
     reject?: boolean
     realTable?: boolean
+    /** The URL the page mounts on — the browse context lives in its query. */
+    url?: string
   } = {},
 ): Promise<{
   wrapper: ReturnType<typeof mount>
@@ -122,7 +124,7 @@ async function mountRoster(
       { path: '/roster/:ulid', name: 'roster.detail', component: { template: '<div />' } },
     ],
   })
-  await router.push('/roster')
+  await router.push(options.url ?? '/roster')
   await router.isReady()
 
   const i18n = createI18n({
@@ -271,6 +273,57 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     cleanup = harness.cleanup
 
     expect(rosterApi.list).not.toHaveBeenCalled()
+  })
+
+  it('resumes the browse context held in the URL instead of restarting at page 1', async () => {
+    const harness = await mountRoster({
+      rows: [makeRow()],
+      url: '/roster?page=4&per_page=50&status=prospect&q=ada&country=PT&available_from=2026-08-01&available_to=2026-08-31',
+    })
+    cleanup = harness.cleanup
+
+    expect(vi.mocked(rosterApi.list).mock.calls[0]?.[1]).toMatchObject({
+      page: 4,
+      per_page: 50,
+      status: 'prospect',
+      q: 'ada',
+      country: 'PT',
+      available_from: '2026-08-01',
+      available_to: '2026-08-31',
+    })
+  })
+
+  it('ignores a hand-edited URL that names values the filters do not offer', async () => {
+    const harness = await mountRoster({
+      rows: [makeRow()],
+      url: '/roster?page=0&per_page=99999&status=bogus&country=ZZ&available_from=31-08-2026',
+    })
+    cleanup = harness.cleanup
+
+    const params = vi.mocked(rosterApi.list).mock.calls[0]?.[1]
+    expect(params).toMatchObject({ page: 1, per_page: 25 })
+    expect(params).not.toHaveProperty('status')
+    expect(params).not.toHaveProperty('country')
+    expect(params).not.toHaveProperty('available_from')
+  })
+
+  it('writes page changes into the URL, and ignores the table echoing back the page it was given', async () => {
+    const harness = await mountRoster({ rows: [makeRow()], url: '/roster?page=2' })
+    cleanup = harness.cleanup
+    const vm = harness.wrapper.vm as unknown as {
+      onTableUpdate: (opts: { page: number; itemsPerPage: number }) => void
+    }
+
+    vi.mocked(rosterApi.list).mockClear()
+    vm.onTableUpdate({ page: 2, itemsPerPage: 25 })
+    await flushPromises()
+    expect(rosterApi.list).not.toHaveBeenCalled()
+    expect(harness.router.currentRoute.value.query.page).toBe('2')
+
+    vm.onTableUpdate({ page: 3, itemsPerPage: 25 })
+    await flushPromises()
+    expect(vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1]).toMatchObject({ page: 3 })
+    expect(harness.router.currentRoute.value.query.page).toBe('3')
   })
 
   it('re-queries with each filter and ANDs them together', async () => {

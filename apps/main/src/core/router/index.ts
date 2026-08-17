@@ -22,6 +22,7 @@ import {
   type Router,
   type RouteLocationNormalized,
   type RouteLocationRaw,
+  type RouterScrollBehavior,
 } from 'vue-router'
 
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
@@ -58,6 +59,49 @@ export async function runGuards(
 }
 
 /**
+ * How long scroll restoration will wait for an async list to render tall
+ * enough to hold the saved offset before giving up and scrolling as far as it
+ * can. Longer than a warm list request, short enough that a genuinely slow
+ * page does not feel stuck mid-navigation.
+ */
+const SCROLL_RESTORE_TIMEOUT_MS = 1200
+
+const SCROLL_RESTORE_POLL_MS = 50
+
+/** Is the document already tall enough to scroll to `top`? */
+function canScrollTo(top: number): boolean {
+  const el = document.documentElement
+  return el.scrollHeight - el.clientHeight >= top
+}
+
+/**
+ * Restoring a scroll offset only works once the content that made the page
+ * that tall is back on screen — and our lists paint a short skeleton first,
+ * then fetch. Scrolling at `nextTick` would therefore land at the bottom of
+ * the skeleton. Poll instead, and cap the wait so a failed request cannot hang
+ * the navigation.
+ */
+async function waitForScrollHeight(top: number): Promise<void> {
+  const deadline = Date.now() + SCROLL_RESTORE_TIMEOUT_MS
+  while (!canScrollTo(top) && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, SCROLL_RESTORE_POLL_MS))
+  }
+}
+
+/**
+ * Back/forward returns the operator where they were; every other navigation
+ * starts at the top. Exported for direct unit testing — the router only ever
+ * calls it in a real browser.
+ */
+export const scrollBehavior: RouterScrollBehavior = async (_to, _from, savedPosition) => {
+  if (savedPosition === null) {
+    return { top: 0 }
+  }
+  await waitForScrollHeight(savedPosition.top)
+  return savedPosition
+}
+
+/**
  * Build a fresh `Router` instance. Production wiring uses the module-level
  * singleton `router`; tests that need a clean router (e.g. to avoid leaked
  * navigation history between cases) call this directly.
@@ -72,6 +116,7 @@ export function createRouter(
   const r = createVueRouter({
     history: historyFactory(),
     routes,
+    scrollBehavior,
   })
 
   r.beforeEach(async (to, from) => {

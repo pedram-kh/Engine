@@ -42,6 +42,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
+import { useBackToList } from '@/composables/useBackToList'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 
@@ -171,9 +172,9 @@ async function load(): Promise<void> {
   }
 }
 
-function goBack(): void {
-  void router.push({ name: 'discover.list' })
-}
+// Unwinds to the discovery list we came from, filters and page intact — see
+// `useBackToList`.
+const goBack = useBackToList('discover.list')
 
 function viewInRoster(): void {
   void router.push({ name: 'roster.detail', params: { ulid: creatorUlid.value } })

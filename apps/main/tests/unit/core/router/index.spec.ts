@@ -10,7 +10,7 @@
 import type { RouteLocationNormalized } from 'vue-router'
 import { describe, expect, it, vi } from 'vitest'
 
-import { createRouter, runGuards } from '@/core/router'
+import { createRouter, runGuards, scrollBehavior } from '@/core/router'
 
 import type { AuthStore } from '@/core/router/guards'
 
@@ -129,6 +129,72 @@ describe('runGuards', () => {
       query: { redirect: '/app.dashboard' },
     })
     expect(bootstrap).toHaveBeenCalledTimes(1)
+  })
+})
+
+/**
+ * Scroll restoration. The list pages this exists for paint a short skeleton
+ * and then fetch, so restoring at nextTick would land at the bottom of the
+ * skeleton — the wait for the real content is the behaviour under test.
+ */
+describe('scrollBehavior', () => {
+  function setDocumentHeight(scrollHeight: number, clientHeight = 800): void {
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      configurable: true,
+      value: scrollHeight,
+    })
+    Object.defineProperty(document.documentElement, 'clientHeight', {
+      configurable: true,
+      value: clientHeight,
+    })
+  }
+
+  function callScrollBehavior(savedPosition: { top: number; left: number } | null) {
+    return scrollBehavior.call(
+      undefined as never,
+      makeRoute('discover.list'),
+      makeRoute('discover.detail'),
+      savedPosition,
+    )
+  }
+
+  it('starts a fresh navigation at the top', async () => {
+    await expect(callScrollBehavior(null)).resolves.toEqual({ top: 0 })
+  })
+
+  it('returns the saved position immediately when the page is already tall enough', async () => {
+    setDocumentHeight(4000)
+    await expect(callScrollBehavior({ top: 1200, left: 0 })).resolves.toEqual({
+      top: 1200,
+      left: 0,
+    })
+  })
+
+  it('waits for the async list to render before restoring the offset', async () => {
+    setDocumentHeight(0)
+    const pending = Promise.resolve(callScrollBehavior({ top: 1200, left: 0 }))
+
+    let settled = false
+    void pending.then(() => {
+      settled = true
+    })
+    await new Promise((resolve) => setTimeout(resolve, 60))
+    expect(settled).toBe(false)
+
+    setDocumentHeight(4000)
+    await expect(pending).resolves.toEqual({ top: 1200, left: 0 })
+  })
+
+  it('gives up rather than hanging the navigation when the content never arrives', async () => {
+    setDocumentHeight(0)
+    vi.useFakeTimers()
+    try {
+      const pending = callScrollBehavior({ top: 5000, left: 0 })
+      await vi.advanceTimersByTimeAsync(1500)
+      await expect(pending).resolves.toEqual({ top: 5000, left: 0 })
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
 

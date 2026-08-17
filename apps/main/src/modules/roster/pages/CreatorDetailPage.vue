@@ -37,8 +37,9 @@ import {
 } from '@catalyst/ui'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
+import { useBackToList } from '@/composables/useBackToList'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 
@@ -51,7 +52,6 @@ import StarRatingInput from '../components/StarRatingInput.vue'
 
 const { t } = useI18n()
 const route = useRoute()
-const router = useRouter()
 const agencyStore = useAgencyStore()
 
 const detail = ref<AgencyCreatorDetailResource | null>(null)
@@ -297,9 +297,9 @@ async function save(): Promise<void> {
   }
 }
 
-function goBack(): void {
-  void router.push({ name: 'roster.list' })
-}
+// Unwinds to the roster we came from, filters and page intact — see
+// `useBackToList`.
+const goBack = useBackToList('roster.list')
 
 onMounted(() => {
   void load()

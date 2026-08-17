@@ -16,6 +16,11 @@
  * overlapping HARD availability block in the window (soft never excludes).
  * Both bounds are required — a one-sided range issues no availability param.
  *
+ * Browse context (page, page size, search, and every filter) lives in the URL
+ * via `useListQueryState`, NOT in local refs: clicking a row unmounts this page,
+ * so local state would drop the operator back on page 1 with cleared filters
+ * the moment they came back from a creator. See that composable for the rest.
+ *
  * The METRICS affordance (follower range + engagement) stays a DISABLED,
  * present-but-inert control (D-4): faded, span-wrapped so its tooltip still
  * fires on hover (a disabled control emits no hover events), issuing NO query
@@ -38,6 +43,15 @@ import { useRouter } from 'vue-router'
 
 import { BlacklistBadge, CEmptyState } from '@catalyst/ui'
 
+import {
+  isoDateParam,
+  oneOfParam,
+  oneOfParamWithFallback,
+  pageParam,
+  perPageParam,
+  textParam,
+  useListQueryState,
+} from '@/composables/useListQueryState'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 import { rosterApi } from '../api/roster.api'
@@ -48,22 +62,6 @@ const router = useRouter()
 const agencyStore = useAgencyStore()
 
 type StatusFilter = RosterRelationshipStatus | 'all'
-
-const statusFilter = ref<StatusFilter>('all')
-const countryFilter = ref<string | null>(null)
-const languageFilter = ref<string | null>(null)
-const categoryFilter = ref<string | null>(null)
-// `clearable` writes null on clear (the same reason the availability bounds
-// below are nullable), so every read goes through the trimmed `searchTerm`.
-const searchQuery = ref<string | null>('')
-const searchTerm = computed(() => (searchQuery.value ?? '').trim())
-
-// Availability range filter (Sprint 6.5, D-6). Two `'YYYY-MM-DD'` bounds;
-// the filter is sent only when BOTH are set (a one-sided range is ignored).
-// `clearable` sets the model to null on clear, so the refs are string | null
-// and all reads use truthiness (empty string OR null = "unset").
-const availableFrom = ref<string | null>('')
-const availableTo = ref<string | null>('')
 
 // Affordance driver (D-4). A static FE constant — there is no backend signal
 // to drive it yet (no `kyc_vendor_available` equivalent). The METRICS filters
@@ -78,7 +76,12 @@ const totalItems = ref(0)
 const loading = ref(false)
 const error = ref<string | null>(null)
 
-const tableOptions = ref({ page: 1, itemsPerPage: 25 })
+// The page sizes the footer offers ARE the page sizes the URL accepts — one
+// list, so a size chosen in the UI always survives the round trip (and the
+// default "All" option, which would mean `per_page=-1`, is never offered).
+const PER_PAGE_OPTIONS = [10, 25, 50, 100] as const
+const DEFAULT_PER_PAGE = 25
+const perPageOptions = PER_PAGE_OPTIONS.map((value) => ({ value, title: String(value) }))
 
 // Bounded filter option sets. Country reuses the shared launch-market
 // picker; language draws from the shared 24-language EU registry (endonym
@@ -114,6 +117,48 @@ const CATEGORY_FILTER_KEYS = [
   'science',
   'other',
 ] as const
+
+const STATUS_FILTER_VALUES: readonly StatusFilter[] = [
+  'all',
+  'roster',
+  'prospect',
+  'external',
+  'pending_request',
+  'declined',
+  'ended',
+]
+
+// URL-backed browse context (page, page size, search, filters). Each filter is
+// validated against the SAME bounded vocabulary its control offers, so a
+// hand-typed `?status=bogus` reads as unset instead of reaching the API.
+//
+// `clearable` writes null on clear (the same reason the availability bounds are
+// nullable), so every read of the search box goes through `searchTerm`.
+const {
+  page,
+  per_page: itemsPerPage,
+  status: statusFilter,
+  country: countryFilter,
+  language: languageFilter,
+  category: categoryFilter,
+  q: searchQuery,
+  // Availability range filter (Sprint 6.5, D-6). Two `'YYYY-MM-DD'` bounds; the
+  // filter is sent only when BOTH are set (a one-sided range is ignored).
+  available_from: availableFrom,
+  available_to: availableTo,
+} = useListQueryState({
+  page: pageParam,
+  per_page: perPageParam(PER_PAGE_OPTIONS, DEFAULT_PER_PAGE),
+  status: oneOfParamWithFallback(STATUS_FILTER_VALUES, 'all'),
+  country: oneOfParam(COUNTRY_OPTIONS.map((c) => c.code)),
+  language: oneOfParam(worldLanguageOptions().map((o) => o.value)),
+  category: oneOfParam(CATEGORY_FILTER_KEYS),
+  q: textParam,
+  available_from: isoDateParam,
+  available_to: isoDateParam,
+})
+
+const searchTerm = computed(() => (searchQuery.value ?? '').trim())
 
 // The lifecycle-in-flight / severed statuses (Sprint 6.6b D-6, plus AH-051 D-3
 // for `ended`) are EXCLUDED from the default index but get their own chips
@@ -248,8 +293,8 @@ async function loadRoster(): Promise<void> {
 
   try {
     const params: RosterListParams = {
-      page: tableOptions.value.page,
-      per_page: tableOptions.value.itemsPerPage,
+      page: page.value,
+      per_page: itemsPerPage.value,
     }
     if (statusFilter.value !== 'all') params.status = statusFilter.value
     if (countryFilter.value !== null) params.country = countryFilter.value
@@ -298,7 +343,7 @@ watch(
 watch(
   [statusFilter, countryFilter, languageFilter, categoryFilter, availableFrom, availableTo],
   () => {
-    tableOptions.value.page = 1
+    page.value = 1
     void loadRoster()
   },
 )
@@ -310,13 +355,19 @@ let searchTimer: ReturnType<typeof setTimeout> | null = null
 watch(searchTerm, () => {
   if (searchTimer !== null) clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
-    tableOptions.value.page = 1
+    page.value = 1
     void loadRoster()
   }, 300)
 })
 
+// The table echoes its options back on mount as well as on a real page change.
+// Ignoring the echo matters now that the page number comes from the URL: an
+// unconditional write would reload — and could reset a deep-linked page — on
+// every mount.
 function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
-  tableOptions.value = opts
+  if (opts.page === page.value && opts.itemsPerPage === itemsPerPage.value) return
+  page.value = opts.page
+  itemsPerPage.value = opts.itemsPerPage
   void loadRoster()
 }
 
@@ -528,8 +579,9 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
       :items="items"
       :items-length="totalItems"
       :loading="loading"
-      :items-per-page="tableOptions.itemsPerPage"
-      :page="tableOptions.page"
+      :items-per-page="itemsPerPage"
+      :items-per-page-options="perPageOptions"
+      :page="page"
       item-value="id"
       hover
       data-test="roster-table"

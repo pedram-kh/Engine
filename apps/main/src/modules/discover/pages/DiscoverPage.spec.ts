@@ -73,6 +73,8 @@ async function mountDiscover(
     agencyId?: string | null
     reject?: boolean
     lastPage?: number
+    /** The URL the page mounts on — the browse context lives in its query. */
+    url?: string
   } = {},
 ): Promise<{
   wrapper: ReturnType<typeof mount>
@@ -111,7 +113,7 @@ async function mountDiscover(
       { path: '/discover/:ulid', name: 'discover.detail', component: { template: '<div />' } },
     ],
   })
-  await router.push('/discover')
+  await router.push(options.url ?? '/discover')
   await router.isReady()
 
   const i18n = createI18n({
@@ -281,6 +283,64 @@ describe('DiscoverPage (Sprint 6.6a)', () => {
     const harness = await mountDiscover({ reject: true })
     cleanup = harness.cleanup
     expect(harness.wrapper.find('[data-test="discover-error"]').text()).toContain("Couldn't load")
+  })
+
+  it('resumes the browse context held in the URL instead of restarting at page 1', async () => {
+    const harness = await mountDiscover({
+      cards: [makeCard()],
+      url: '/discover?page=3&q=ada&country=PT&category=tech',
+    })
+    cleanup = harness.cleanup
+
+    expect(vi.mocked(discoveryApi.list).mock.calls[0]?.[1]).toMatchObject({
+      page: 3,
+      q: 'ada',
+      country: 'PT',
+      category: 'tech',
+    })
+  })
+
+  it('ignores a hand-edited URL that names values the filters do not offer', async () => {
+    const harness = await mountDiscover({
+      cards: [makeCard()],
+      url: '/discover?page=zero&country=ZZ&category=nonsense',
+    })
+    cleanup = harness.cleanup
+
+    const params = vi.mocked(discoveryApi.list).mock.calls[0]?.[1]
+    expect(params).toMatchObject({ page: 1 })
+    expect(params).not.toHaveProperty('country')
+    expect(params).not.toHaveProperty('category')
+  })
+
+  it('writes the page into the URL so the profile can be left and re-entered here', async () => {
+    const harness = await mountDiscover({ cards: [makeCard()], lastPage: 5 })
+    cleanup = harness.cleanup
+    const replaceSpy = vi.spyOn(harness.router, 'replace')
+    ;(harness.wrapper.vm as unknown as { page: number }).page = 3
+    await flushPromises()
+
+    expect(harness.router.currentRoute.value.query.page).toBe('3')
+    // Replace, not push: paging must not stack history entries.
+    expect(replaceSpy).toHaveBeenCalled()
+  })
+
+  it('re-queries without q when the search box is cleared (Vuetify writes null, not "")', async () => {
+    const harness = await mountDiscover({ cards: [makeCard()], url: '/discover?q=ada' })
+    cleanup = harness.cleanup
+
+    vi.useFakeTimers()
+    try {
+      vi.mocked(discoveryApi.list).mockClear()
+      ;(harness.wrapper.vm as unknown as { searchQuery: string | null }).searchQuery = null
+      await harness.wrapper.vm.$nextTick()
+      await vi.advanceTimersByTimeAsync(300)
+
+      expect(vi.mocked(discoveryApi.list).mock.calls.at(-1)?.[1]).not.toHaveProperty('q')
+    } finally {
+      vi.useRealTimers()
+    }
+    expect(harness.wrapper.find('[data-test="discover-error"]').exists()).toBe(false)
   })
 
   it('navigates to the public profile on a card click', async () => {

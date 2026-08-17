@@ -12,6 +12,11 @@
  * (avatar + name + country/language/categories + the calling-agency-only
  * "already-connected" status); clicking a card opens the public profile.
  *
+ * Browse context (page + search + the three filters) lives in the URL via
+ * `useListQueryState`, NOT in local refs: opening a card unmounts this page, so
+ * local state would drop the operator back on page 1 with cleared filters the
+ * moment they came back from a profile. See that composable for the rest.
+ *
  * Read-only this chunk (D-9): NO send-request action — that's Sprint 6.6b.
  */
 
@@ -27,6 +32,12 @@ import { useRouter } from 'vue-router'
 
 import { CEmptyState } from '@catalyst/ui'
 
+import {
+  oneOfParam,
+  pageParam,
+  textParam,
+  useListQueryState,
+} from '@/composables/useListQueryState'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 import { discoveryApi } from '../api/discovery.api'
@@ -69,15 +80,30 @@ const CATEGORY_FILTER_KEYS = [
   'other',
 ] as const
 
-const searchQuery = ref('')
-const countryFilter = ref<string | null>(null)
-const languageFilter = ref<string | null>(null)
-const categoryFilter = ref<string | null>(null)
+// URL-backed browse context. The filters are validated against the SAME
+// bounded vocabularies the selects offer, so a hand-typed `?country=ZZ` reads
+// as unset instead of reaching the API.
+const {
+  page,
+  q: searchQuery,
+  country: countryFilter,
+  language: languageFilter,
+  category: categoryFilter,
+} = useListQueryState({
+  page: pageParam,
+  q: textParam,
+  country: oneOfParam(COUNTRY_OPTIONS.map((c) => c.code)),
+  language: oneOfParam(worldLanguageOptions().map((o) => o.value)),
+  category: oneOfParam(CATEGORY_FILTER_KEYS),
+})
+
+// `clearable` writes null on clear, so every read of the search box goes
+// through the trimmed term (the roster's idiom).
+const searchTerm = computed(() => (searchQuery.value ?? '').trim())
 
 const items = ref<DiscoveryCreatorListItem[]>([])
 const totalItems = ref(0)
 const lastPage = ref(1)
-const page = ref(1)
 const perPage = 24
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -97,7 +123,7 @@ const categoryFilterItems = computed(() =>
 
 const hasActiveFilters = computed(
   () =>
-    searchQuery.value.trim() !== '' ||
+    searchTerm.value !== '' ||
     countryFilter.value !== null ||
     languageFilter.value !== null ||
     categoryFilter.value !== null,
@@ -169,8 +195,7 @@ async function loadDiscovery(): Promise<void> {
 
   try {
     const params: DiscoveryListParams = { page: page.value, per_page: perPage }
-    const trimmed = searchQuery.value.trim()
-    if (trimmed !== '') params.q = trimmed
+    if (searchTerm.value !== '') params.q = searchTerm.value
     if (countryFilter.value !== null) params.country = countryFilter.value
     if (languageFilter.value !== null) params.language = languageFilter.value
     if (categoryFilter.value !== null) params.category = categoryFilter.value
@@ -206,7 +231,7 @@ watch([countryFilter, languageFilter, categoryFilter], () => {
 // Free-text search is debounced — fires 300ms after the user stops typing
 // (mirrors the roster search box).
 let searchTimer: ReturnType<typeof setTimeout> | null = null
-watch(searchQuery, () => {
+watch(searchTerm, () => {
   if (searchTimer !== null) clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
     page.value = 1
