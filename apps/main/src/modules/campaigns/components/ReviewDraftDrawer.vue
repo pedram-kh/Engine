@@ -20,14 +20,13 @@ import {
   extractFieldErrors,
   type AgencyAssignmentDetailResource,
   type CampaignAssignmentResource,
-  type CampaignDraftResource,
 } from '@catalyst/api-client'
 import { PortfolioGallery } from '@catalyst/ui'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { campaignsApi } from '../api/campaigns.api'
-import { roundStateColor, roundStateKey } from '../draftRounds'
+import { roundCardTextStyle, roundStateColor, roundStateKey } from '../draftRounds'
 
 type ReviewField = 'review_feedback'
 type ActionKind = 'approve' | 'revision' | 'reject'
@@ -72,21 +71,6 @@ const canAct = computed(() => detail.value?.attributes.status === 'draft_submitt
 // The round-state copy needs the assignment to tell "awaiting review" from a
 // pending round nobody is looking at any more (AH-068).
 const assignmentStatus = computed(() => detail.value?.attributes.status ?? null)
-
-/**
- * The round card's tonal background is a light tint regardless of the app's
- * dark theme, so the feedback text needs the SAME contrasting foreground
- * Vuetify's own solid success/warning/error/info surfaces use — the
- * `on-<color>` tokens, already contrast-audited in `@catalyst/design-tokens`
- * (`on-warning` is deliberately near-black; `on-success`/`on-info`/`on-error`
- * stay white). Vuetify's `text-medium-emphasis` utility ignores this local
- * tonal context and forces a pale white-on-amber tone — unreadable, and the
- * reason this exists rather than a hard-coded color.
- */
-function feedbackTextStyle(draft: CampaignDraftResource): Record<string, string> | undefined {
-  const color = roundStateColor(draft.attributes.review_status, assignmentStatus.value)
-  return color ? { color: `rgb(var(--v-theme-on-${color}))` } : undefined
-}
 
 const galleryItems = computed<GalleryItem[]>(() => {
   const draft = latestDraft.value
@@ -324,7 +308,7 @@ async function runAction(kind: ActionKind): Promise<void> {
                 <div
                   v-if="draft.attributes.review_feedback"
                   class="text-body-2 mt-1 review-history-feedback"
-                  :style="feedbackTextStyle(draft)"
+                  :style="roundCardTextStyle(draft.attributes.review_status, assignmentStatus)"
                 >
                   {{ draft.attributes.review_feedback }}
                 </div>

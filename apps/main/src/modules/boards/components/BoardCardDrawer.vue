@@ -2,7 +2,7 @@
 /**
  * Card drawer (Sprint 12 Chunk 2, D-9). A WIDE v-dialog (the ReviewDraftDrawer
  * pattern — no v-navigation-drawer in this app) opened by clicking a card.
- * Three tabs:
+ * Four tabs:
  *
  *   - Messages (DEFAULT, first): the per-assignment chat with this creator,
  *     mounted from the shared `ChatPanel` on the agency `agencyChatTransport`
@@ -17,14 +17,22 @@
  *     link. Fetched via `campaignsApi.showAssignment` (the same agency-side
  *     detail the review drawer consumes); identity/offer basics fall back to
  *     the card-face data. Null-safe.
+ *   - Drafts: every round of this assignment's draft history — the SAME
+ *     round cards `ReviewDraftDrawer`'s history renders (bold round title on
+ *     a tonal success/warning/error/info card, per `draftRounds.ts`), plus
+ *     the one field that history omits: each round's submitted-at timestamp,
+ *     so an agency can see this without leaving the board for the campaign's
+ *     own Drafts tab. Reads the SAME `detail.relationships.drafts` the
+ *     Detail tab's "latest draft" row already fetches — no extra request.
  *   - Movement history: `boardApi.movements` (newest-first). Column ids resolve
  *     to names via the store; a since-deleted column renders "(removed)" rather
  *     than a dangling id (§14.3, null-safe).
  *
- * This is a READ surface for Detail + History — no manual-move reason control
- * here (Q2 tech-debt note); Messages is the one interactive tab. The two
- * timeline buttons are hand-offs, not writes: Resolve opens the page's
- * resolution drawer, Review sends the operator to the Drafts tab.
+ * This is a READ surface for Detail + Drafts + History — no manual-move
+ * reason control here (Q2 tech-debt note); Messages is the one interactive
+ * tab. The two timeline buttons are hand-offs, not writes: Resolve opens the
+ * page's resolution drawer, Review sends the operator to the campaign's own
+ * Drafts tab (where the actual approve/request-changes/reject actions live).
  */
 
 import { ApiError, formatCurrency, formatDate, formatDateTime } from '@catalyst/api-client'
@@ -38,7 +46,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { campaignsApi } from '@/modules/campaigns/api/campaigns.api'
-import { roundStateKey } from '@/modules/campaigns/draftRounds'
+import { roundCardTextStyle, roundStateColor, roundStateKey } from '@/modules/campaigns/draftRounds'
 import { agencyChatTransport, type ChatTransport } from '@/modules/messaging/api/messaging.api'
 import ChatPanel from '@/modules/messaging/components/ChatPanel.vue'
 
@@ -71,7 +79,7 @@ const emit = defineEmits<{
 const { t, locale } = useI18n()
 const store = useBoardStore()
 
-const tab = ref<'messages' | 'detail' | 'history'>('messages')
+const tab = ref<'messages' | 'detail' | 'drafts' | 'history'>('messages')
 const detail = ref<AgencyAssignmentDetailResource | null>(null)
 const movements = ref<BoardCardMovementResource[]>([])
 const loading = ref(false)
@@ -101,10 +109,17 @@ const chatTitle = computed(
   () => assignmentData.value?.creator?.display_name ?? t('app.campaigns.board.card.unnamed'),
 )
 const latestDraft = computed(() => detail.value?.relationships.drafts[0] ?? null)
+// Every round, newest-first as the endpoint returns them — the Drafts tab's
+// history list (the same relationship the "latest draft" row above reads).
+const draftHistory = computed(() => detail.value?.relationships.drafts ?? [])
 const postedContent = computed(() => detail.value?.relationships.posted_content[0] ?? null)
 // Read off `detail` rather than the card's embedded assignment so the round-state
 // copy and the draft it describes can never come from two different loads.
 const assignmentStatus = computed(() => detail.value?.attributes.status ?? null)
+
+function draftSubmittedAtLabel(submittedAt: string | null): string {
+  return t('app.campaigns.drafts.submittedAt', { date: formatDateTime(submittedAt, locale.value) })
+}
 
 // The verification-failure resolution hand-off (same gate as the Creators
 // tab): offered when the assignment is `posted` and its LATEST post's
@@ -318,6 +333,9 @@ function close(): void {
         </v-tab>
         <v-tab value="detail" data-test="board-card-drawer-tab-detail">
           {{ t('app.campaigns.board.drawer.tabs.detail') }}
+        </v-tab>
+        <v-tab value="drafts" data-test="board-card-drawer-tab-drafts">
+          {{ t('app.campaigns.tabs.drafts') }}
         </v-tab>
         <v-tab value="history" data-test="board-card-drawer-tab-history">
           {{ t('app.campaigns.board.drawer.tabs.history') }}
@@ -547,6 +565,66 @@ function close(): void {
             </div>
           </v-window-item>
 
+          <!-- Drafts: the same round cards ReviewDraftDrawer's history shows
+               (bold title on a tonal success/warning/error/info card, per
+               round), plus each round's submitted-at timestamp. -->
+          <v-window-item value="drafts" eager>
+            <v-skeleton-loader v-if="loading" type="paragraph" />
+            <v-alert
+              v-else-if="loadError"
+              type="error"
+              variant="tonal"
+              density="compact"
+              data-test="board-card-drawer-drafts-error"
+            >
+              {{ t('app.campaigns.board.drawer.loadError') }}
+            </v-alert>
+            <div v-else data-test="board-card-drawer-drafts">
+              <p
+                v-if="draftHistory.length === 0"
+                class="text-medium-emphasis text-body-2"
+                data-test="board-card-drawer-drafts-empty"
+              >
+                {{ t('app.campaigns.drafts.empty.heading') }}
+              </p>
+              <div v-else class="d-flex flex-column ga-2">
+                <v-sheet
+                  v-for="draft in draftHistory"
+                  :key="draft.id"
+                  :color="roundStateColor(draft.attributes.review_status, assignmentStatus)"
+                  variant="tonal"
+                  rounded="lg"
+                  class="pa-3"
+                  :data-test="`board-card-drawer-draft-${draft.attributes.version}`"
+                >
+                  <div class="d-flex align-start justify-space-between ga-2 flex-wrap">
+                    <div class="text-body-2 font-weight-bold">
+                      {{
+                        t(roundStateKey(draft.attributes.review_status, assignmentStatus), {
+                          n: draft.attributes.version,
+                        })
+                      }}
+                    </div>
+                    <div
+                      class="text-caption"
+                      :style="roundCardTextStyle(draft.attributes.review_status, assignmentStatus)"
+                      data-test="board-card-drawer-draft-submitted-at"
+                    >
+                      {{ draftSubmittedAtLabel(draft.attributes.submitted_at) }}
+                    </div>
+                  </div>
+                  <div
+                    v-if="draft.attributes.review_feedback"
+                    class="text-body-2 mt-1 board-card-drawer__draft-feedback"
+                    :style="roundCardTextStyle(draft.attributes.review_status, assignmentStatus)"
+                  >
+                    {{ draft.attributes.review_feedback }}
+                  </div>
+                </v-sheet>
+              </div>
+            </div>
+          </v-window-item>
+
           <v-window-item value="history" eager>
             <v-skeleton-loader v-if="loading" type="paragraph" />
             <v-alert
@@ -595,7 +673,8 @@ function close(): void {
 .drawer-detail__avatar {
   background: rgba(var(--v-theme-on-surface), 0.08);
 }
-.drawer-detail__description {
+.drawer-detail__description,
+.board-card-drawer__draft-feedback {
   white-space: pre-wrap;
   word-break: break-word;
 }

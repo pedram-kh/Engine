@@ -99,3 +99,22 @@ export function roundStateColor(
       return undefined
   }
 }
+
+/**
+ * The inline style for text sitting ON a round's tonal card — the SAME
+ * contrasting foreground Vuetify's own solid success/warning/error/info
+ * surfaces use, already contrast-audited in `@catalyst/design-tokens`
+ * (`on-warning` is deliberately near-black; `on-success`/`on-info`/`on-error`
+ * stay white). Vuetify's `text-medium-emphasis` utility ignores this local
+ * tonal context and forces a pale white-on-amber tone — unreadable, and the
+ * reason this exists rather than a hard-coded color. Shared so a second round
+ * card (the board card drawer's Drafts tab) can't reintroduce that bug by
+ * copying `text-medium-emphasis` instead of this.
+ */
+export function roundCardTextStyle(
+  reviewStatus: DraftReviewStatus,
+  assignmentStatus?: AssignmentStatus | null,
+): Record<string, string> | undefined {
+  const color = roundStateColor(reviewStatus, assignmentStatus)
+  return color ? { color: `rgb(var(--v-theme-on-${color}))` } : undefined
+}

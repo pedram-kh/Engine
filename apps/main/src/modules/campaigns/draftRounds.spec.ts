@@ -9,7 +9,13 @@
 import enApp from '@/core/i18n/locales/en/app.json'
 import { describe, expect, it } from 'vitest'
 
-import { ROUND_STATES, roundState, roundStateColor, roundStateKey } from './draftRounds'
+import {
+  ROUND_STATES,
+  roundCardTextStyle,
+  roundState,
+  roundStateColor,
+  roundStateKey,
+} from './draftRounds'
 
 describe('roundState (AH-068, D2)', () => {
   it('names the three closed states from the review status alone', () => {
@@ -110,5 +116,32 @@ describe('roundStateColor', () => {
       const state = roundState(reviewStatus, assignmentStatus)
       expect(roundStateColor(reviewStatus, assignmentStatus)).toBe(wordToColor[state])
     }
+  })
+})
+
+// Eyes-on fix batch, 2026-08-17 — `text-medium-emphasis` ignores a tonal
+// card's own color and forces a pale white-on-amber tone for text sitting on
+// a `changesRequested` (warning) round; every surface that draws a round card
+// (the review drawer's history, the board card drawer's Drafts tab) routes
+// its on-card text through this helper instead so none of them can
+// reintroduce that bug independently.
+describe('roundCardTextStyle', () => {
+  it("a changes-requested round's text uses the warning card's own on-color, not white", () => {
+    expect(roundCardTextStyle('revision_requested')).toEqual({
+      color: 'rgb(var(--v-theme-on-warning))',
+    })
+  })
+
+  it('every colored state gets its matching on-color token', () => {
+    expect(roundCardTextStyle('approved')).toEqual({ color: 'rgb(var(--v-theme-on-success))' })
+    expect(roundCardTextStyle('rejected')).toEqual({ color: 'rgb(var(--v-theme-on-error))' })
+    expect(roundCardTextStyle('pending', 'draft_submitted')).toEqual({
+      color: 'rgb(var(--v-theme-on-info))',
+    })
+  })
+
+  it('the neutral (colorless) submitted state gets no style override', () => {
+    expect(roundCardTextStyle('pending', 'cancelled')).toBeUndefined()
+    expect(roundCardTextStyle('pending')).toBeUndefined()
   })
 })

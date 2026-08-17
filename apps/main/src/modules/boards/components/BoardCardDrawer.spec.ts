@@ -168,7 +168,13 @@ async function mountDrawer(
     status?: string
     postedContent?: ReturnType<typeof postedRow>[]
     /** Newest-first, as the endpoint returns them. Drives the latest-draft row. */
-    drafts?: Array<{ version: number; review_status: string; caption: string | null }>
+    drafts?: Array<{
+      version: number
+      review_status: string
+      caption: string | null
+      review_feedback?: string | null
+      submitted_at?: string | null
+    }>
   } = {},
 ) {
   setActivePinia(createPinia())
@@ -205,7 +211,7 @@ async function mountDrawer(
           type: 'campaign_draft',
           attributes: {
             version: d.version,
-            submitted_at: '2026-06-03T00:00:00+00:00',
+            submitted_at: d.submitted_at ?? '2026-06-03T00:00:00+00:00',
             caption: d.caption,
             hashtags: null,
             mentions: null,
@@ -213,7 +219,7 @@ async function mountDrawer(
             links: null,
             review_status: d.review_status,
             reviewed_at: null,
-            review_feedback: null,
+            review_feedback: d.review_feedback ?? null,
           },
         })),
         posted_content: opts.postedContent ?? [],
@@ -481,6 +487,67 @@ describe('BoardCardDrawer', () => {
       status: 'draft_submitted',
     })
     expect(wrapper.find('[data-test="board-card-drawer-review"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  // ── Drafts tab (board-drawer Drafts tab) ─────────────────────────────────
+
+  it('shows every round as a colored card with its bold round title and submitted-at timestamp', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], {
+      drafts: [
+        {
+          version: 2,
+          review_status: 'pending',
+          caption: null,
+          submitted_at: '2026-06-05T09:07:00+00:00',
+        },
+        {
+          version: 1,
+          review_status: 'revision_requested',
+          caption: null,
+          review_feedback: 'Fix the hook.',
+          submitted_at: '2026-06-01T09:07:00+00:00',
+        },
+      ],
+    })
+
+    const round2 = wrapper.find('[data-test="board-card-drawer-draft-2"]')
+    expect(round2.text()).toContain('Draft 2')
+    expect(round2.find('[data-test="board-card-drawer-draft-submitted-at"]').text()).toContain(
+      'Submitted',
+    )
+    expect(round2.text()).toContain('2026')
+
+    const round1 = wrapper.find('[data-test="board-card-drawer-draft-1"]')
+    expect(round1.text()).toContain('changes requested')
+    expect(round1.text()).toContain('Fix the hook.')
+    wrapper.unmount()
+  })
+
+  it("a changes-requested round's feedback uses the warning card's own contrasting text color, not the pale medium-emphasis tone", async () => {
+    const wrapper = await mountDrawer(card('a1'), [], {
+      drafts: [
+        {
+          version: 1,
+          review_status: 'revision_requested',
+          caption: null,
+          review_feedback: 'Fix the hook.',
+        },
+      ],
+    })
+    const feedback = wrapper.find(
+      '[data-test="board-card-drawer-draft-1"] .board-card-drawer__draft-feedback',
+    )
+    expect(feedback.exists()).toBe(true)
+    expect((feedback.attributes('style') ?? '').replace(/\s/g, '')).toContain(
+      'color:rgb(var(--v-theme-on-warning))',
+    )
+    wrapper.unmount()
+  })
+
+  it('shows the empty note on the Drafts tab when the assignment has no drafts yet', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], { drafts: [] })
+    expect(wrapper.find('[data-test="board-card-drawer-drafts-empty"]').exists()).toBe(true)
     wrapper.unmount()
   })
 
