@@ -973,7 +973,7 @@ onMounted(() => {
             class="pa-3 draft-round-card"
             :data-testid="`assignment-draft-version-${draft.attributes.version}`"
           >
-            <div class="text-body-1 font-weight-medium">
+            <div class="text-body-1 font-weight-bold">
               {{
                 t(roundStateKey(draft.attributes.review_status, assignment.attributes.status), {
                   n: draft.attributes.version,
