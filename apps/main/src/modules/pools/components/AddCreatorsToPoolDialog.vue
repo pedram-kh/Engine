@@ -23,8 +23,10 @@
  *     Search now goes to the server, debounced, as `CreatorRosterPage` does.
  *
  * Note: the slim roster row carries `display_name` + `country_code` + the
- * `creator_id` ULID, but NOT an avatar URL (only the member resource does),
- * so the avatar here is an initials placeholder.
+ * `creator_id` ULID, and — since the invite-offer-details batch put
+ * `avatar_url` on it for the campaign invite picker — a signed avatar too.
+ * The initials placeholder is now only the fallback for a creator with no
+ * avatar (or a non-S3 disk, where the URL is null).
  */
 
 import type { RosterCreatorListItem, RosterListParams } from '@catalyst/api-client'
@@ -327,8 +329,18 @@ async function addSelected(): Promise<void> {
             @click="row.attributes.creator_id && toggleSelect(row.attributes.creator_id)"
           >
             <template #prepend>
+              <!-- Real profile photo when the roster row carries a signed
+                   avatar_url; the initial-letter avatar stays as fallback
+                   (the InviteCreatorsDialog pattern, same roster shape). -->
               <v-avatar size="40" color="surface-variant">
-                <span class="text-caption">
+                <v-img
+                  v-if="row.attributes.avatar_url"
+                  :src="row.attributes.avatar_url"
+                  :alt="row.attributes.display_name ?? ''"
+                  cover
+                  :data-test="`add-creators-avatar-${row.attributes.creator_id}`"
+                />
+                <span v-else class="text-caption">
                   {{ (row.attributes.display_name ?? '?')[0]?.toUpperCase() }}
                 </span>
               </v-avatar>

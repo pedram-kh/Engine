@@ -311,6 +311,40 @@ describe('AddCreatorsToPoolDialog (pool-side add)', () => {
     expect(vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1]).toEqual({ per_page: 100 })
   })
 
+  // The roster row has carried a signed `avatar_url` since the
+  // invite-offer-details batch put it there for the campaign invite picker;
+  // this picker rendered initials regardless. Photo when there is one,
+  // initials only as the fallback.
+  it("renders the creator's profile photo, falling back to initials only when there is none", async () => {
+    const withPhoto = rosterRow({
+      id: 'rel-photo',
+      creator_id: '01PHOTO',
+      display_name: 'Ada Lovelace',
+      avatar_url: 'https://signed.example/ada.jpg',
+    })
+    const withoutPhoto = rosterRow({
+      id: 'rel-nophoto',
+      creator_id: '01NOPHOTO',
+      display_name: 'Bob Nomugshot',
+      avatar_url: null,
+    })
+    wrapper = mountDialog([withPhoto, withoutPhoto], [])
+    await flushPromises()
+
+    // jsdom never fires the image load, so v-img renders no inner <img> —
+    // the signed URL it was handed is the honest thing to assert.
+    const avatar = wrapper
+      .findAllComponents({ name: 'VImg' })
+      .find((c) => c.attributes('data-test') === 'add-creators-avatar-01PHOTO')
+    expect(avatar?.props('src')).toBe('https://signed.example/ada.jpg')
+
+    // No avatar → no <v-img> at all, and the initial stands in.
+    expect(document.querySelector('[data-test="add-creators-avatar-01NOPHOTO"]')).toBeNull()
+    expect(
+      document.querySelector('[data-test="add-creators-row-01NOPHOTO"]')?.textContent,
+    ).toContain('B')
+  })
+
   it('shows a per-row blacklist flag for hard + soft, none for a clean creator (D-6)', async () => {
     const hard = rosterRow({
       id: 'rel-hard',
