@@ -143,8 +143,12 @@ same day, rather than sitting in `tech-debt.md` waiting for a trigger:
 - **Item 3 (branch protection requiring the check) stays open** — a GitHub repo-settings change, not a
   code or docs change, so it is Pedram's to make. `tech-debt.md`'s entry is marked partially resolved
   rather than closed, so that item does not silently disappear.
-- **Gate: this follow-through's own CI run**, per the rule it just wrote — see the note directly below
-  once the tip is pushed and its run confirmed green.
+- **Gate: this follow-through's own CI run, cited per the rule it just wrote — the first close-out
+  under the new standard.** Run
+  [`31995541154`](https://github.com/pedram-kh/Engine/actions/runs/31995541154) on `a7900152`: **all
+  four jobs green**, including the new `Prove hermeticity — Pest with NO apps/api/.env present`
+  step inside `Backend (Pint + Larastan + Pest)`, passing on the real runner and not only in the
+  local reproduction above.
 - **Touched:** `docs/PROJECT-WORKFLOW.md`, `docs/WORKING-PROCESS.md`, `docs/tech-debt.md`,
   `.github/workflows/ci.yml`. Docs-only plus one CI step; no application code, no migration, no
   production impact.
