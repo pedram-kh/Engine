@@ -117,11 +117,16 @@ discipline in §7.
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
 **Last updated:** 2026-08-17 · **Through:** AH-070 (and its same-day follow-through) · **Nothing is
-held.** Since the AH-069 close (`1ff678ec`), `origin/main` moved by four commits: the AH-070 pair
+held.** Since the AH-069 close (`1ff678ec`), `origin/main` moved by nine commits: the AH-070 pair
 (`f771a7cf` — the `phpunit.xml` + CI fix for the missing AWS region; the docs commit logging it),
-`a9050e44` citing AH-070's CI run, and now this follow-through — the hermetic-suite CI step plus the
-new CI-green-at-push standing rule (§5.41), landed the same day as AH-070 rather than left as
-tech-debt. `git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for
+`a9050e44` citing AH-070's CI run, then the follow-through — the hermetic-suite CI step (`66d1fa18`),
+the §5.41 CI-green-at-push standing rule (`a7900152`), a citation commit (`e9a41917`) whose own CI run
+turned up **red** on an unrelated pre-existing flake, the fix for that flake (`e08ab2b7` — a wrong
+"once-only" assertion on `listed_at` corrected to match documented behavior; no production code
+touched), and two closing docs commits recording the catch and citing the actual final green tip. This
+is itself the first worked example of §5.41: the rule caught a real red run at a pushed tip on the
+same day it was written, and the chunk was not called closed until the fix's own run was verified
+green. `git rev-parse --short HEAD` and `git rev-parse --short origin/main` are the authority for
 where the two tips sit — re-derive them, do not carry this session's numbers forward.
 **Deployment is [`deploy-log.md`](../runbooks/deploy-log.md)'s fact, not this file's** — AH-067,
 AH-068, AH-069 and AH-070 are **all un-deployed** (AH-070 and its follow-through are CI/process only

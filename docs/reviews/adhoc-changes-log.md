@@ -171,8 +171,11 @@ same day, rather than sitting in `tech-debt.md` waiting for a trigger:
   Run [`31995541154`](https://github.com/pedram-kh/Engine/actions/runs/31995541154) on `a7900152`:
   all four jobs green, including the new hermetic step, but the pushed tip's **own** run
   ([`31996047330`](https://github.com/pedram-kh/Engine/actions/runs/31996047330) on `e9a41917`) was
-  red on the unrelated flake above. The fix landed as its own commit; its run is cited once pushed —
-  see the citation immediately following in this same entry.
+  red on the unrelated flake above. The fix landed as its own commit, and the run for **the actual
+  final pushed tip** is [`31996823818`](https://github.com/pedram-kh/Engine/actions/runs/31996823818)
+  on `7d826dea`: **all four jobs green** — `Backend (Pint + Larastan + Pest)`,
+  `Frontend (lint + typecheck + unit)`, `E2E — main SPA (Playwright)`, `E2E — admin SPA (Playwright)`.
+  This is the tip this entry's close-out cites, per the rule it is closing out under.
 - **Touched:** `docs/PROJECT-WORKFLOW.md`, `docs/WORKING-PROCESS.md`, `docs/tech-debt.md`,
   `.github/workflows/ci.yml`. Docs-only plus one CI step; no application code, no migration, no
   production impact.
