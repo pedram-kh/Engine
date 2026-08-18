@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Dies ist ein eingeschränktes Profil — Ihre Agentur hat noch keine Roster-Beziehung zu diesem Creator, daher sind Kontaktdaten, Bewertung und Notizen hier nicht verfügbar."
+    },
     "userMenu": {
       "signOut": "Abmelden",
       "signingOut": "Wird abgemeldet…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Nachrichten",
             "detail": "Details",
-            "history": "Bewegungshistorie"
+            "history": "Bewegungshistorie",
+            "profile": "Profil"
           },
           "messages": {
             "none": "Noch keine Konversation für diese Karte."

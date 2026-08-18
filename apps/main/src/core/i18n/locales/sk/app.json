@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Toto je obmedzený profil — vaša agentúra zatiaľ nemá s týmto tvorcom žiadny vzťah v zozname, takže kontaktné údaje, hodnotenie a poznámky tu nie sú k dispozícii."
+    },
     "userMenu": {
       "signOut": "Odhlásiť sa",
       "signingOut": "Odhlasovanie…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Správy",
             "detail": "Podrobnosti",
-            "history": "Historie přesunů"
+            "history": "Historie přesunů",
+            "profile": "Profil"
           },
           "messages": {
             "none": "Pre túto kartu zatiaľ neexistuje konverzácia."

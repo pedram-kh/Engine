@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Dette er en begrænset profil — dit bureau har endnu ikke en rosterrelation til denne kreatør, så kontaktoplysninger, vurdering og noter er ikke tilgængelige her."
+    },
     "userMenu": {
       "signOut": "Log ud",
       "signingOut": "Logger ud…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Beskeder",
             "detail": "Detalje",
-            "history": "Bevægelseshistorik"
+            "history": "Bevægelseshistorik",
+            "profile": "Profil"
           },
           "messages": {
             "none": "Ingen samtale for dette kort endnu."

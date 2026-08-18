@@ -192,3 +192,18 @@ it('the Creators-tab listing exposes the latest verification_status (drives the 
         ->assertJsonPath('data.0.attributes.status', 'posted')
         ->assertJsonPath('data.0.attributes.verification_status', 'mismatch');
 });
+
+// AH-080 — the Creators-tab listing gains `creator.avatar_url` (mirrors
+// BoardCardResource / CreatorDiscoveryResource: a signed GET, null under the
+// test env's non-S3 media disk — see BoardApiTest.php:78 for the same
+// null-under-test convention). Feeds the row avatar + the CreatorProfileDialog
+// header; NOT a new endpoint, an accretion on the existing one (named ripple).
+it('the Creators-tab listing exposes creator.avatar_url (AH-080, null under the non-S3 test disk)', function (): void {
+    [$agency, $campaign] = resolutionSetup();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $this->actingAs($admin)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/campaigns/{$campaign->ulid}/assignments")
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.creator.avatar_url', null);
+});

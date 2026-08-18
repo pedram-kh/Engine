@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Ez egy korlátozott profil — az ügynökségednek még nincs roster-kapcsolata ezzel az alkotóval, ezért az elérhetőségi adatok, az értékelés és a jegyzetek itt nem érhetők el."
+    },
     "userMenu": {
       "signOut": "Kijelentkezés",
       "signingOut": "Signing out…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Üzenetek",
             "detail": "Detail",
-            "history": "Movement history"
+            "history": "Movement history",
+            "profile": "Profil"
           },
           "messages": {
             "none": "Ehhez a kártyához még nincs beszélgetés."

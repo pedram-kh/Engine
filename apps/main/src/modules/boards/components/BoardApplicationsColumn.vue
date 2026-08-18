@@ -48,6 +48,7 @@ import { formatDateTime } from '@catalyst/api-client'
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import CreatorProfileDialog from '@/components/CreatorProfileDialog.vue'
 import AcceptApplicationDialog from '@/modules/campaigns/components/AcceptApplicationDialog.vue'
 import RejectApplicationDialog from '@/modules/campaigns/components/RejectApplicationDialog.vue'
 import { useCampaignApplications } from '@/modules/campaigns/composables/useCampaignApplications'
@@ -93,6 +94,21 @@ function openAccept(row: CampaignApplicationListItemResource): void {
 function openReject(row: CampaignApplicationListItemResource): void {
   target.value = row
   rejectDialog.value = true
+}
+
+// AH-080 (D2c) — the identity block (avatar + name) opens the profile
+// dialog. An applicant is rostered by definition (§0.1 of the inventory —
+// applying requires the relation), so `assumeFull: true`: one fetch, no
+// wasted 404-then-fallback. Deliberately NOT wrapping the whole card —
+// Accept/Reject stay their own click targets, nothing new sits between them
+// and their handlers (D5).
+const profileDialog = ref(false)
+const profileTarget = ref<CampaignApplicationListItemResource | null>(null)
+
+function openProfile(row: CampaignApplicationListItemResource): void {
+  if (row.attributes.creator === null) return
+  profileTarget.value = row
+  profileDialog.value = true
 }
 
 /**
@@ -183,7 +199,18 @@ onMounted(() => {
           class="application-card"
           :data-test="`board-application-${row.id}`"
         >
-          <div class="d-flex align-center ga-2">
+          <!-- AH-080 (D2c) — the identity block ALONE is the profile trigger;
+               nothing wraps the card, and Accept/Reject below are untouched. -->
+          <div
+            class="d-flex align-center ga-2 application-card__identity"
+            role="button"
+            tabindex="0"
+            :aria-label="t('app.roster.detail.sections.profile')"
+            :data-test="`board-application-profile-${row.id}`"
+            @click="openProfile(row)"
+            @keydown.enter.prevent="openProfile(row)"
+            @keydown.space.prevent="openProfile(row)"
+          >
             <v-avatar size="28" color="surface-variant">
               <v-img
                 v-if="row.attributes.creator?.avatar_url"
@@ -267,6 +294,16 @@ onMounted(() => {
       @rejected="onAnswered"
       @refused="(message) => (actionError = message)"
     />
+
+    <!-- AH-080 (D2c) — an applicant is rostered by definition, assumeFull:
+         true skips the 404-fallback dance (one fetch, not two). -->
+    <CreatorProfileDialog
+      v-if="profileTarget?.attributes.creator"
+      v-model="profileDialog"
+      :agency-id="agencyId"
+      :creator-ulid="profileTarget.attributes.creator.id"
+      :assume-full="true"
+    />
   </div>
 </template>
 
@@ -316,5 +353,19 @@ onMounted(() => {
   white-space: pre-wrap;
   word-break: break-word;
   opacity: 0.85;
+}
+.application-card__identity {
+  cursor: pointer;
+  border-radius: 6px;
+  width: fit-content;
+  max-width: 100%;
+}
+.application-card__identity:hover,
+.application-card__identity:focus-visible {
+  background: rgba(var(--v-theme-on-surface), 0.06);
+}
+.application-card__identity:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 2px;
 }
 </style>

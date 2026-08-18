@@ -46,6 +46,8 @@ import { useI18n } from 'vue-i18n'
 
 import { CEmptyState } from '@catalyst/ui'
 
+import CreatorProfileDialog from '@/components/CreatorProfileDialog.vue'
+
 import {
   type ApplicationsFilter,
   useCampaignApplications,
@@ -107,6 +109,19 @@ function openAccept(row: CampaignApplicationListItemResource): void {
 function openReject(row: CampaignApplicationListItemResource): void {
   rejectTarget.value = row
   rejectPrompt.value = true
+}
+
+// AH-080 (D2c) — the identity block (avatar + name) opens the profile
+// dialog, same as the board's Applications pseudo-column. An applicant is
+// rostered by definition, so `assumeFull: true` — one fetch, no 404
+// fallback dance. Accept/Reject stay their own click targets (D5).
+const profileDialog = ref(false)
+const profileTarget = ref<CampaignApplicationListItemResource | null>(null)
+
+function openProfile(row: CampaignApplicationListItemResource): void {
+  if (row.attributes.creator === null) return
+  profileTarget.value = row
+  profileDialog.value = true
 }
 
 /** Both answers land here: toast upward, then refetch. */
@@ -196,21 +211,43 @@ defineExpose({
       <v-list lines="two" data-test="applications-list">
         <v-list-item v-for="row in rows" :key="row.id" :data-test="`applications-row-${row.id}`">
           <template #prepend>
-            <v-avatar size="40" color="surface-variant">
-              <v-img
-                v-if="row.attributes.creator?.avatar_url"
-                :src="row.attributes.creator.avatar_url"
-                :alt="row.attributes.creator.display_name ?? ''"
-                cover
-              />
-              <span v-else class="text-caption">
-                {{ (row.attributes.creator?.display_name ?? '?')[0]?.toUpperCase() }}
-              </span>
-            </v-avatar>
+            <!-- AH-080 (D2c) — half of the identity block; the other half is
+                 the name below. Nothing wraps the whole row (D5). -->
+            <div
+              role="button"
+              tabindex="0"
+              :aria-label="t('app.roster.detail.sections.profile')"
+              :data-test="`applications-profile-${row.id}`"
+              @click="openProfile(row)"
+              @keydown.enter.prevent="openProfile(row)"
+              @keydown.space.prevent="openProfile(row)"
+            >
+              <v-avatar size="40" color="surface-variant" class="applications-identity">
+                <v-img
+                  v-if="row.attributes.creator?.avatar_url"
+                  :src="row.attributes.creator.avatar_url"
+                  :alt="row.attributes.creator.display_name ?? ''"
+                  cover
+                />
+                <span v-else class="text-caption">
+                  {{ (row.attributes.creator?.display_name ?? '?')[0]?.toUpperCase() }}
+                </span>
+              </v-avatar>
+            </div>
           </template>
 
           <v-list-item-title class="d-flex align-center ga-2 flex-wrap">
-            {{ row.attributes.creator?.display_name ?? t('app.campaigns.invite.unnamed') }}
+            <span
+              class="applications-identity"
+              role="button"
+              tabindex="0"
+              :aria-label="t('app.roster.detail.sections.profile')"
+              @click="openProfile(row)"
+              @keydown.enter.prevent="openProfile(row)"
+              @keydown.space.prevent="openProfile(row)"
+            >
+              {{ row.attributes.creator?.display_name ?? t('app.campaigns.invite.unnamed') }}
+            </span>
             <v-chip
               size="x-small"
               variant="tonal"
@@ -290,5 +327,26 @@ defineExpose({
       @rejected="onAnswered"
       @refused="(message) => (actionError = message)"
     />
+
+    <!-- AH-080 (D2c) — an applicant is rostered by definition, assumeFull
+         skips the 404-fallback dance. -->
+    <CreatorProfileDialog
+      v-if="profileTarget?.attributes.creator"
+      v-model="profileDialog"
+      :agency-id="agencyId"
+      :creator-ulid="profileTarget.attributes.creator.id"
+      :assume-full="true"
+    />
   </div>
 </template>
+
+<style scoped>
+.applications-identity {
+  cursor: pointer;
+  border-radius: 6px;
+}
+.applications-identity:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 2px;
+}
+</style>

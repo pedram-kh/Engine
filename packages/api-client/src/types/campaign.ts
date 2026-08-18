@@ -285,6 +285,10 @@ export interface CampaignAssignmentResource {
     creator: {
       id: string
       display_name: string | null
+      /** Short-lived signed GET, minted per-emission (AH-080). Optional for
+       *  back-compat with call sites whose eager-load doesn't select it
+       *  (single-object mutation responses — see `CampaignAssignmentResource.php`). */
+      avatar_url?: string | null
     } | null
   }
 }

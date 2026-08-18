@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Este é um perfil limitado — a sua agência ainda não tem uma relação de roster com este criador, pelo que os dados de contacto, a avaliação e as notas não estão disponíveis aqui."
+    },
     "userMenu": {
       "signOut": "Sair",
       "signingOut": "Saindo…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Mensagens",
             "detail": "Detalhe",
-            "history": "Histórico de movimentações"
+            "history": "Histórico de movimentações",
+            "profile": "Perfil"
           },
           "messages": {
             "none": "Ainda não há conversa para este cartão."

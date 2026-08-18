@@ -42,6 +42,16 @@ const ChatPanelStub = {
   template: '<div data-test="chat-panel-stub" />',
 }
 
+// AH-080 (D2b) — CreatorProfileContent's own full/thin/§5.34 rendering is
+// CreatorProfileContent.spec.ts's job. Here we only pin the drawer's OWN
+// contract: lazy mount timing + prop wiring, so it never fires an unmocked
+// network call in this suite.
+const CreatorProfileContentStub = {
+  name: 'CreatorProfileContent',
+  props: ['agencyId', 'creatorUlid', 'assumeFull'],
+  template: '<div data-test="creator-profile-content-stub" />',
+}
+
 import { campaignsApi } from '@/modules/campaigns/api/campaigns.api'
 import { boardApi } from '../api/board.api'
 import { useBoardStore } from '../stores/useBoardStore'
@@ -258,6 +268,7 @@ async function mountDrawer(
         VDialog: VDialogStub,
         ChatPanel: ChatPanelStub,
         PortfolioGallery: PortfolioGalleryStub,
+        CreatorProfileContent: CreatorProfileContentStub,
       },
     },
     attachTo: document.createElement('div'),
@@ -592,6 +603,59 @@ describe('BoardCardDrawer', () => {
     const row = wrapper.find('[data-test="board-card-movement-1"]')
     expect(row.text()).not.toContain('2026-06-01T12:30:00')
     expect(row.text()).toContain('2026')
+    wrapper.unmount()
+  })
+
+  // ── Profile tab (AH-080, D2b) — the lazy, deliberately-non-eager fifth tab ──
+
+  it('does NOT mount CreatorProfileContent on open — the drawer opens on Messages, Profile is untouched', async () => {
+    const wrapper = await mountDrawer(card('a1'), [])
+    expect(wrapper.find('[data-test="board-card-drawer-tab-profile"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="creator-profile-content-stub"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('mounts CreatorProfileContent only once the Profile tab is first activated, wired to the card creator + assumeFull:false', async () => {
+    const wrapper = await mountDrawer(card('a1'), [])
+    expect(wrapper.find('[data-test="creator-profile-content-stub"]').exists()).toBe(false)
+    ;(wrapper.vm as unknown as { tab: string }).tab = 'profile'
+    await flushPromises()
+
+    const content = wrapper.findComponent(CreatorProfileContentStub)
+    expect(content.exists()).toBe(true)
+    expect(content.props()).toMatchObject({
+      agencyId: 'agency-ulid',
+      creatorUlid: 'cr1',
+      assumeFull: false,
+    })
+    wrapper.unmount()
+  })
+
+  it('stays mounted after switching away — a re-visit never re-triggers the lazy activation (no second fetch)', async () => {
+    const wrapper = await mountDrawer(card('a1'), [])
+    const vm = wrapper.vm as unknown as { tab: string }
+
+    vm.tab = 'profile'
+    await flushPromises()
+    expect(wrapper.find('[data-test="creator-profile-content-stub"]').exists()).toBe(true)
+
+    vm.tab = 'messages'
+    await flushPromises()
+    vm.tab = 'profile'
+    await flushPromises()
+
+    // Still exactly one CreatorProfileContent instance — never unmounted, so
+    // useCreatorProfile inside it never re-runs its load().
+    expect(wrapper.findAllComponents(CreatorProfileContentStub)).toHaveLength(1)
+    wrapper.unmount()
+  })
+
+  it('does not mount CreatorProfileContent for a removed (null-assignment) card even if Profile is selected', async () => {
+    const wrapper = await mountDrawer(card(null), [])
+    ;(wrapper.vm as unknown as { tab: string }).tab = 'profile'
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="creator-profile-content-stub"]').exists()).toBe(false)
     wrapper.unmount()
   })
 })

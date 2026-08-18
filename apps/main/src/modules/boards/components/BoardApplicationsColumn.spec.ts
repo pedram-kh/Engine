@@ -106,7 +106,13 @@ async function mountColumn(canAct = true) {
       canAct,
       campaignCurrency: 'EUR',
     },
-    global: { plugins: [i18n, vuetify], stubs: { VDialog: true } },
+    global: {
+      plugins: [i18n, vuetify],
+      // CreatorProfileDialog's own full/thin/§5.34 rendering is
+      // CreatorProfileContent.spec.ts's job; here we only pin the click
+      // wiring (D2c), so a real mount never fires an unmocked network call.
+      stubs: { VDialog: true, CreatorProfileDialog: true },
+    },
     attachTo: document.createElement('div'),
   })
   await flushPromises()
@@ -274,6 +280,45 @@ describe('BoardApplicationsColumn — the pending working surface', () => {
     vi.mocked(campaignsApi.listApplications).mockRejectedValue(new Error('nope'))
     const wrapper = await mountColumn()
     expect(wrapper.find('[data-test="board-applications-error"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  // ── Profile access (AH-080, D2c) — the identity block, and only it ────────
+
+  it("opens the profile dialog on the identity block, wired to that row's creator with assumeFull:true", async () => {
+    const wrapper = await mountColumn()
+    await wrapper.find('[data-test="board-application-profile-app-1"]').trigger('click')
+    await flushPromises()
+
+    const dialog = wrapper.findComponent({ name: 'CreatorProfileDialog' })
+    expect(dialog.exists()).toBe(true)
+    expect(dialog.props()).toMatchObject({
+      agencyId: 'agency-ulid',
+      creatorUlid: 'cr-app-1',
+      assumeFull: true,
+    })
+    wrapper.unmount()
+  })
+
+  it('D5 — clicking Accept or Reject does NOT also open the profile dialog', async () => {
+    const wrapper = await mountColumn()
+    await wrapper.find('[data-test="board-application-accept-app-1"]').trigger('click')
+    await flushPromises()
+    expect(wrapper.findComponent({ name: 'CreatorProfileDialog' }).exists()).toBe(false)
+
+    await wrapper.find('[data-test="board-application-reject-app-2"]').trigger('click')
+    await flushPromises()
+    expect(wrapper.findComponent({ name: 'CreatorProfileDialog' }).exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('D5 — clicking the identity block does NOT open Accept/Reject (nothing wraps the card)', async () => {
+    const wrapper = await mountColumn()
+    await wrapper.find('[data-test="board-application-profile-app-1"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.findComponent({ name: 'AcceptApplicationDialog' }).exists()).toBe(false)
+    expect(wrapper.findComponent({ name: 'RejectApplicationDialog' }).exists()).toBe(false)
     wrapper.unmount()
   })
 })

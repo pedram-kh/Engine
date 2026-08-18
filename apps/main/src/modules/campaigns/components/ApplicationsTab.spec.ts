@@ -87,7 +87,13 @@ async function mountTab(canAct = true) {
       canAct,
       campaignCurrency: 'EUR',
     },
-    global: { plugins: [i18n, vuetify] },
+    global: {
+      plugins: [i18n, vuetify],
+      // CreatorProfileDialog's own rendering is CreatorProfileContent.spec.ts's
+      // job; here we only pin the click wiring (D2c), so a real mount never
+      // fires an unmocked roster/discover network call.
+      stubs: { CreatorProfileDialog: true },
+    },
     attachTo: document.createElement('div'),
   })
   await flushPromises()
@@ -257,6 +263,45 @@ describe('ApplicationsTab', () => {
     await flushPromises()
 
     expect(campaignsApi.listApplications).toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  // ── Profile access (AH-080, D2c) — the identity block, and only it ────────
+
+  it("opens the profile dialog from the avatar, wired to that row's creator with assumeFull:true", async () => {
+    const wrapper = await mountTab()
+
+    await wrapper.find(`[data-test="applications-profile-${PENDING_ID}"]`).trigger('click')
+    await flushPromises()
+
+    const dialog = wrapper.findComponent({ name: 'CreatorProfileDialog' })
+    expect(dialog.exists()).toBe(true)
+    expect(dialog.props()).toMatchObject({
+      agencyId: 'agency-ulid',
+      creatorUlid: '01CREATORULIDXXXXXXXXXXXXX',
+      assumeFull: true,
+    })
+    wrapper.unmount()
+  })
+
+  it('opens the profile dialog from the name text too — both halves of the identity block', async () => {
+    const wrapper = await mountTab()
+
+    await wrapper
+      .find(`[data-test="applications-row-${PENDING_ID}"] .applications-identity`)
+      .trigger('click')
+    await flushPromises()
+
+    expect(wrapper.findComponent({ name: 'CreatorProfileDialog' }).exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('D5 — clicking Accept or Reject does NOT also open the profile dialog', async () => {
+    const wrapper = await mountTab()
+
+    await wrapper.find(`[data-test="applications-reject-${PENDING_ID}"]`).trigger('click')
+    await flushPromises()
+    expect(wrapper.findComponent({ name: 'CreatorProfileDialog' }).exists()).toBe(false)
     wrapper.unmount()
   })
 })

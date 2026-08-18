@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Det här är en begränsad profil — din byrå har ännu ingen rosterrelation med den här kreatören, så kontaktuppgifter, betyg och anteckningar är inte tillgängliga här."
+    },
     "userMenu": {
       "signOut": "Logga ut",
       "signingOut": "Loggar ut…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Meddelanden",
             "detail": "Detalj",
-            "history": "Rörelsehistorik"
+            "history": "Rörelsehistorik",
+            "profile": "Profil"
           },
           "messages": {
             "none": "Ingen konversation för det här kortet ännu."

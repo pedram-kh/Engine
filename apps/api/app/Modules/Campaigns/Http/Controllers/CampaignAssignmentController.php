@@ -60,7 +60,11 @@ final class CampaignAssignmentController
 
         $paginator = $campaign->assignments()
             ->where('campaign_assignments.agency_id', $agency->id)
-            ->with(['creator:id,ulid,display_name', 'latestPostedContent', 'sentContract'])
+            // AH-080 — `avatar_path` added so CampaignAssignmentResource can mint
+            // the signed avatar_url the Creators-tab row + CreatorProfileDialog
+            // header want (AH-075 precedent). Signing itself happens in the
+            // resource, not here.
+            ->with(['creator:id,ulid,display_name,avatar_path', 'latestPostedContent', 'sentContract'])
             ->orderByDesc('campaign_assignments.id')
             ->paginate($perPage)
             ->withQueryString();

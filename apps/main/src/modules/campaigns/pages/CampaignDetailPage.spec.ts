@@ -500,6 +500,83 @@ describe('CampaignDetailPage — Creators tab re-invite (re-invite UI chunk)', (
   })
 })
 
+// AH-080 (D2a) — the Creators-tab row grows an avatar and a row click opens
+// the creator profile dialog. D5: no behavior change to the row's own
+// actions — the append buttons stop propagation so clicking them fires ONLY
+// their own handler, not also the row's click.
+describe('CampaignDetailPage — Creators-tab row profile access (AH-080, D2a)', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+  })
+
+  async function openCreatorsTab(assignments: CampaignAssignmentResource[]) {
+    const harness = await mountDetail('agency_admin', assignments)
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'creators'
+    await flushPromises()
+    return harness.wrapper
+  }
+
+  it('renders a signed avatar when the assignment carries one, falling back to the initial', async () => {
+    const withPhoto = makeAssignment('A', 'invited')
+    withPhoto.attributes.creator = {
+      id: 'creator-A',
+      display_name: 'Ada Lovelace',
+      avatar_url: 'https://signed.example/ada.jpg',
+    }
+    const wrapper = await openCreatorsTab([withPhoto, makeAssignment('B', 'invited')])
+
+    const withImg = wrapper.find('[data-test="creators-avatar-A"]')
+    expect(withImg.findComponent({ name: 'VImg' }).props('src')).toBe(
+      'https://signed.example/ada.jpg',
+    )
+
+    const withoutImg = wrapper.find('[data-test="creators-avatar-B"]')
+    expect(withoutImg.findComponent({ name: 'VImg' }).exists()).toBe(false)
+    expect(withoutImg.text()).toBe('C')
+  })
+
+  it("opens the profile dialog on a row click, scoped to that row's creator", async () => {
+    const wrapper = await openCreatorsTab([makeAssignment('A', 'invited')])
+
+    expect(wrapper.findComponent({ name: 'CreatorProfileDialog' }).exists()).toBe(false)
+
+    await wrapper.find('[data-test="creators-row-A"]').trigger('click')
+    await flushPromises()
+
+    const dialog = wrapper.findComponent({ name: 'CreatorProfileDialog' })
+    expect(dialog.exists()).toBe(true)
+    expect(dialog.props()).toMatchObject({
+      modelValue: true,
+      creatorUlid: 'creator-A',
+      assumeFull: false,
+    })
+  })
+
+  it('D5 — clicking an append action does NOT also open the profile dialog', async () => {
+    const wrapper = await openCreatorsTab([makeAssignment('C', 'countered')])
+
+    await wrapper.find('[data-test="creators-reinvite-C"]').trigger('click')
+    await flushPromises()
+
+    // The reinvite dialog's own target is set (its own click fired)…
+    expect(
+      (wrapper.vm as unknown as { reinviteTarget: CampaignAssignmentResource | null })
+        .reinviteTarget?.id,
+    ).toBe('C')
+    // …but the row click did NOT also fire — no profile dialog popped open
+    // underneath it (D5: additive UI, no behavior change to the row actions).
+    expect(wrapper.findComponent({ name: 'CreatorProfileDialog' }).exists()).toBe(false)
+  })
+})
+
 // contract-gate-decouple chunk (D-7) — the agency "proceed without a contract"
 // action on an accepted row, visible only when requires=false AND the flag is ON.
 describe('CampaignDetailPage — proceed without per-campaign contract (D-7)', () => {

@@ -28,6 +28,18 @@
  *   - Movement history: `boardApi.movements` (newest-first). Column ids resolve
  *     to names via the store; a since-deleted column renders "(removed)" rather
  *     than a dangling id (§14.3, null-safe).
+ *   - Profile (AH-080, D2b): the creator's full profile — `CreatorProfileContent`
+ *     rendered INLINE (not a nested `CreatorProfileDialog`, since this drawer
+ *     is itself a `v-dialog` — a second one on top would not read as "a tab").
+ *     Deliberately NOT `eager` like Detail/Drafts/History: those three ride
+ *     the ONE `loadDrawer` fetch this drawer already makes on open, so eager
+ *     costs nothing extra. Profile is a SEPARATE resource (roster-detail, or
+ *     its discover fallback) — eager-mounting it on every open would be a
+ *     second network round-trip nobody asked for. Instead it mounts (and
+ *     `useCreatorProfile` fires) only once the tab is FIRST activated, via a
+ *     sticky flag that stays true across further tab switches — so revisiting
+ *     Profile after leaving it never re-fetches. This is a deliberate
+ *     divergence from the drawer's eager idiom, not an oversight.
  *
  * Detail + History stay READ-only (no manual-move reason control here, Q2
  * tech-debt note); Messages and Drafts are the two interactive tabs now. The
@@ -47,6 +59,7 @@ import type {
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import CreatorProfileContent from '@/components/CreatorProfileContent.vue'
 import { campaignsApi } from '@/modules/campaigns/api/campaigns.api'
 import DraftReviewPanel from '@/modules/campaigns/components/DraftReviewPanel.vue'
 import { roundStateKey } from '@/modules/campaigns/draftRounds'
@@ -76,7 +89,7 @@ const emit = defineEmits<{
 const { t, locale } = useI18n()
 const store = useBoardStore()
 
-const tab = ref<'messages' | 'detail' | 'drafts' | 'history'>('messages')
+const tab = ref<'messages' | 'detail' | 'drafts' | 'history' | 'profile'>('messages')
 const detail = ref<AgencyAssignmentDetailResource | null>(null)
 const movements = ref<BoardCardMovementResource[]>([])
 const loading = ref(false)
@@ -105,6 +118,18 @@ const chatTransport = computed<ChatTransport | null>(() => {
 const chatTitle = computed(
   () => assignmentData.value?.creator?.display_name ?? t('app.campaigns.board.card.unnamed'),
 )
+
+// Profile tab (AH-080, D2b) — the creator ulid off the card-face data (always
+// present once an assignment resolved; never re-fetched for it). `activated`
+// is sticky: once the tab has been opened once, `CreatorProfileContent` stays
+// mounted across further tab switches, so `useCreatorProfile` fires exactly
+// once per drawer-open, not once per re-visit (the "fetches on first
+// activation" contract named in the file docblock).
+const profileCreatorUlid = computed(() => assignmentData.value?.creator?.id ?? null)
+const profileActivated = ref(false)
+watch(tab, (value) => {
+  if (value === 'profile') profileActivated.value = true
+})
 const latestDraft = computed(() => detail.value?.relationships.drafts[0] ?? null)
 const postedContent = computed(() => detail.value?.relationships.posted_content[0] ?? null)
 // Read off `detail` rather than the card's embedded assignment so the round-state
@@ -265,7 +290,12 @@ async function loadDrawer(resetTab = true): Promise<void> {
   loadError.value = false
   detail.value = null
   movements.value = []
-  if (resetTab) tab.value = 'messages'
+  if (resetTab) {
+    tab.value = 'messages'
+    // A fresh open of a (possibly different) card — the Profile tab, if it
+    // was activated for a PREVIOUS card, must not carry that mount forward.
+    profileActivated.value = false
+  }
 
   const assignmentId = card.relationships.assignment.data?.id ?? null
   try {
@@ -342,6 +372,9 @@ function onDraftReviewed(): void {
         </v-tab>
         <v-tab value="history" data-test="board-card-drawer-tab-history">
           {{ t('app.campaigns.board.drawer.tabs.history') }}
+        </v-tab>
+        <v-tab value="profile" data-test="board-card-drawer-tab-profile">
+          {{ t('app.campaigns.board.drawer.tabs.profile') }}
         </v-tab>
       </v-tabs>
       <v-divider />
@@ -621,6 +654,21 @@ function onDraftReviewed(): void {
                 </v-list-item>
               </v-list>
             </div>
+          </v-window-item>
+
+          <!-- Profile (AH-080, D2b) — inline content, NOT the dialog wrapper
+               (this drawer IS a v-dialog already). Lazy: mounts + fetches
+               only once this tab has been activated at least once; stays
+               mounted afterward (no re-fetch on a later re-visit). No creator
+               (an assignment that failed to load) renders nothing — the same
+               edge case the Messages tab handles by omission, not new copy. -->
+          <v-window-item value="profile" data-test="board-card-drawer-profile">
+            <CreatorProfileContent
+              v-if="profileActivated && profileCreatorUlid !== null"
+              :agency-id="agencyId"
+              :creator-ulid="profileCreatorUlid"
+              :assume-full="false"
+            />
           </v-window-item>
         </v-window>
       </v-card-text>

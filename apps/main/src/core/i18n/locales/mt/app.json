@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Dan huwa profil limitat — l-aġenzija tiegħek għad m'għandhiex relazzjoni ta' roster ma' dan il-kreatur, għalhekk id-dettalji ta' kuntatt, il-klassifikazzjoni u n-noti mhumiex disponibbli hawn."
+    },
     "userMenu": {
       "signOut": "Oħroġ",
       "signingOut": "Signing out…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Messaġġi",
             "detail": "Detail",
-            "history": "Movement history"
+            "history": "Movement history",
+            "profile": "Profil"
           },
           "messages": {
             "none": "Għad m'hemm l-ebda konversazzjoni għal din il-karta."

@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "To jest ograniczony profil — Twoja agencja nie ma jeszcze relacji na liście z tym twórcą, dlatego dane kontaktowe, ocena i notatki nie są tutaj dostępne."
+    },
     "userMenu": {
       "signOut": "Wyloguj się",
       "signingOut": "Wylogowywanie…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Wiadomości",
             "detail": "Szczegóły",
-            "history": "Historia ruchów"
+            "history": "Historia ruchów",
+            "profile": "Profil"
           },
           "messages": {
             "none": "Brak konwersacji dla tej karty."

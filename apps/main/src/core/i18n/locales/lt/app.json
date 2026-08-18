@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Tai ribotas profilis — jūsų agentūra dar neturi sąrašo ryšio su šiuo kūrėju, todėl kontaktiniai duomenys, įvertinimas ir pastabos čia nepasiekiami."
+    },
     "userMenu": {
       "signOut": "Atsijungti",
       "signingOut": "Signing out…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Žinutės",
             "detail": "Detail",
-            "history": "Movement history"
+            "history": "Movement history",
+            "profile": "Profilis"
           },
           "messages": {
             "none": "Šiai kortelei dar nėra pokalbio."

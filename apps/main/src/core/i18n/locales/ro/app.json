@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Acesta este un profil limitat — agenția dvs. nu are încă o relație de roster cu acest creator, așa că datele de contact, evaluarea și notele nu sunt disponibile aici."
+    },
     "userMenu": {
       "signOut": "Deconectați-vă",
       "signingOut": "Signing out…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Mesaje",
             "detail": "Detail",
-            "history": "Movement history"
+            "history": "Movement history",
+            "profile": "Profil"
           },
           "messages": {
             "none": "Încă nu există o conversație pentru acest card."

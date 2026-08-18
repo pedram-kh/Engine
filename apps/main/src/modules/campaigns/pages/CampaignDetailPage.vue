@@ -30,6 +30,7 @@ import { storeToRefs } from 'pinia'
 
 import { CEmptyState } from '@catalyst/ui'
 
+import CreatorProfileDialog from '@/components/CreatorProfileDialog.vue'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
@@ -71,6 +72,19 @@ const inviteSnackbar = ref<string | null>(null)
 function onInvited(message: string): void {
   inviteSnackbar.value = message
   void loadAssignments()
+}
+
+// AH-080 (D2a) — the Creators-tab row opens the creator profile dialog.
+// Always assumeFull: false — an assignment implies a relation TODAY, but the
+// dialog's own fallback is the honest guard against an edge case (e.g. a
+// disconnect between invite and view), not a claim this context is thin-only.
+const profileDialog = ref(false)
+const profileTarget = ref<CampaignAssignmentResource | null>(null)
+
+function openProfile(assignment: CampaignAssignmentResource): void {
+  if (assignment.attributes.creator === null) return
+  profileTarget.value = assignment
+  profileDialog.value = true
 }
 
 const reinviteDialog = ref(false)
@@ -625,7 +639,29 @@ function formatDay(iso: string | null): string {
             </template>
           </CEmptyState>
           <v-list v-else data-test="creators-list">
-            <v-list-item v-for="a in assignments" :key="a.id" :data-test="`creators-row-${a.id}`">
+            <!-- AH-080 (D2a) — row click opens the creator profile dialog;
+                 avatar added to the identity (AH-075 precedent). The append
+                 actions stop propagation so they keep firing on their own,
+                 without also popping the profile open underneath (D5). -->
+            <v-list-item
+              v-for="a in assignments"
+              :key="a.id"
+              :data-test="`creators-row-${a.id}`"
+              link
+              @click="openProfile(a)"
+            >
+              <template #prepend>
+                <v-avatar size="40" class="mr-3" :data-test="`creators-avatar-${a.id}`">
+                  <v-img
+                    v-if="a.attributes.creator?.avatar_url"
+                    :src="a.attributes.creator.avatar_url"
+                    :alt="a.attributes.creator?.display_name ?? ''"
+                  />
+                  <span v-else class="text-body-2">
+                    {{ (a.attributes.creator?.display_name ?? '?').charAt(0).toUpperCase() }}
+                  </span>
+                </v-avatar>
+              </template>
               <v-list-item-title class="d-flex align-center ga-2">
                 {{ a.attributes.creator?.display_name ?? '—' }}
                 <!-- History tag: this row was declined, then re-offered
@@ -678,7 +714,7 @@ function formatDay(iso: string | null): string {
                   variant="flat"
                   size="small"
                   :data-test="`creators-reinvite-${a.id}`"
-                  @click="openReinvite(a)"
+                  @click.stop="openReinvite(a)"
                 >
                   {{ t('app.campaigns.reinvite.action') }}
                 </v-btn>
@@ -692,7 +728,7 @@ function formatDay(iso: string | null): string {
                   variant="flat"
                   size="small"
                   :data-test="`creators-attach-contract-${a.id}`"
-                  @click="openAttachContract(a)"
+                  @click.stop="openAttachContract(a)"
                 >
                   {{ t('app.campaigns.contract.attach.action') }}
                 </v-btn>
@@ -713,7 +749,7 @@ function formatDay(iso: string | null): string {
                   variant="outlined"
                   size="small"
                   :data-test="`creators-proceed-without-contract-${a.id}`"
-                  @click="proceedWithoutContract(a)"
+                  @click.stop="proceedWithoutContract(a)"
                 >
                   {{ t('app.campaigns.contract.proceedWithout.action') }}
                 </v-btn>
@@ -723,7 +759,7 @@ function formatDay(iso: string | null): string {
                   variant="flat"
                   size="small"
                   :data-test="`creators-review-${a.id}`"
-                  @click="openReview(a)"
+                  @click.stop="openReview(a)"
                 >
                   {{ t('app.campaigns.review.action') }}
                 </v-btn>
@@ -733,7 +769,7 @@ function formatDay(iso: string | null): string {
                   variant="flat"
                   size="small"
                   :data-test="`creators-resolve-${a.id}`"
-                  @click="openResolve(a)"
+                  @click.stop="openResolve(a)"
                 >
                   {{ t('app.campaigns.resolution.action') }}
                 </v-btn>
@@ -743,13 +779,21 @@ function formatDay(iso: string | null): string {
                   variant="outlined"
                   size="small"
                   :data-test="`creators-view-post-${a.id}`"
-                  @click="openViewPost(a)"
+                  @click.stop="openViewPost(a)"
                 >
                   {{ t('app.campaigns.viewPost.action') }}
                 </v-btn>
               </template>
             </v-list-item>
           </v-list>
+
+          <CreatorProfileDialog
+            v-if="agencyStore.currentAgencyId && profileTarget?.attributes.creator"
+            v-model="profileDialog"
+            :agency-id="agencyStore.currentAgencyId"
+            :creator-ulid="profileTarget.attributes.creator.id"
+            :assume-full="false"
+          />
 
           <InviteCreatorsDialog
             v-if="canInvite && agencyStore.currentAgencyId"

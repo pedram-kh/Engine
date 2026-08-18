@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Tämä on rajoitettu profiili — toimistollasi ei vielä ole roster-suhdetta tähän luojaan, joten yhteystiedot, arvosana ja muistiinpanot eivät ole täällä saatavilla."
+    },
     "userMenu": {
       "signOut": "Kirjaudu ulos",
       "signingOut": "Signing out…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Viestit",
             "detail": "Detail",
-            "history": "Movement history"
+            "history": "Movement history",
+            "profile": "Profiili"
           },
           "messages": {
             "none": "Tälle kortille ei ole vielä keskustelua."

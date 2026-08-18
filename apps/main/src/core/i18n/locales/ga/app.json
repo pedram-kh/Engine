@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Is próifíl theoranta í seo — níl caidreamh rosta ag do ghníomhaireacht leis an gcruthaitheoir seo fós, mar sin níl sonraí teagmhála, rátáil ná nótaí ar fáil anseo."
+    },
     "userMenu": {
       "signOut": "Sínigh amach",
       "signingOut": "Signing out…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Teachtaireachtaí",
             "detail": "Detail",
-            "history": "Movement history"
+            "history": "Movement history",
+            "profile": "Próifíl"
           },
           "messages": {
             "none": "Níl aon chomhrá don chárta seo go fóill."

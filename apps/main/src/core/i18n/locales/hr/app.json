@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Ovo je ograničeni profil — vaša agencija još nema odnos s ovim kreatorom na popisu, pa podaci za kontakt, ocjena i bilješke ovdje nisu dostupni."
+    },
     "userMenu": {
       "signOut": "Odjava",
       "signingOut": "Odjavljanje…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Poruke",
             "detail": "Podrobnosti",
-            "history": "Historie přesunů"
+            "history": "Historie přesunů",
+            "profile": "Profil"
           },
           "messages": {
             "none": "Za ovu karticu još nema razgovora."

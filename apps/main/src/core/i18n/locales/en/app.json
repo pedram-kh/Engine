@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "This is a limited profile — your agency has no roster relationship with this creator yet, so contact details, rating, and notes aren't available here."
+    },
     "userMenu": {
       "signOut": "Sign out",
       "signingOut": "Signing out…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Messages",
             "detail": "Detail",
-            "history": "Movement history"
+            "history": "Movement history",
+            "profile": "Profile"
           },
           "messages": {
             "none": "No conversation for this card yet."

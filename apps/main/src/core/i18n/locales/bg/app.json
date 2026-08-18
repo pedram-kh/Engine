@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Това е ограничен профил — вашата агенция все още няма връзка с този създател в списъка, затова данните за контакт, оценката и бележките не са налични тук."
+    },
     "userMenu": {
       "signOut": "Излезте",
       "signingOut": "Signing out…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Съобщения",
             "detail": "Detail",
-            "history": "Movement history"
+            "history": "Movement history",
+            "profile": "Профил"
           },
           "messages": {
             "none": "Все още няма разговор за тази карта."

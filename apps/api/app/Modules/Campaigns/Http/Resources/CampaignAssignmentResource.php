@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Modules\Campaigns\Http\Resources;
 
+use App\Modules\Agencies\Http\Resources\CreatorDiscoveryResource;
+use App\Modules\Boards\Http\Resources\BoardCardResource;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
 use App\Modules\Creators\Models\Creator;
+use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * JSON representation of a CampaignAssignment for the agency-side Creators tab
@@ -28,10 +32,18 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * until the creator accepts). Emitted only when `sentContract` is eager-loaded
  * (null otherwise); the FE treats null/absent as "unknown".
  *
+ * `creator.avatar_url` (AH-080) is a signed GET, minted here the same way
+ * {@see BoardCardResource} and {@see CreatorDiscoveryResource} already do —
+ * bounded page, no N+1 concern beyond what those two already accept. Feeds
+ * the Creators-tab row avatar + the CreatorProfileDialog header (AH-075
+ * precedent for putting a photo on a list that already has the ULID).
+ *
  * @mixin CampaignAssignment
  */
 final class CampaignAssignmentResource extends JsonResource
 {
+    private const int SIGNED_URL_TTL_MINUTES = 60;
+
     /**
      * @return array<string, mixed>
      */
@@ -85,8 +97,28 @@ final class CampaignAssignmentResource extends JsonResource
                 'creator' => $creator instanceof Creator ? [
                     'id' => $creator->ulid,
                     'display_name' => $creator->display_name,
+                    'avatar_url' => $this->signedViewUrl($creator->avatar_path),
                 ] : null,
             ],
         ];
+    }
+
+    /**
+     * Mint a presigned GET URL against the private `media` disk, or null when
+     * the path is null OR the disk is non-S3 (test fakes use the local driver,
+     * which throws on temporaryUrl). Mirrors {@see BoardCardResource::signedViewUrl}.
+     */
+    private function signedViewUrl(?string $path): ?string
+    {
+        if ($path === null) {
+            return null;
+        }
+
+        $disk = Storage::disk('media');
+        if (! $disk instanceof AwsS3V3Adapter) {
+            return null;
+        }
+
+        return $disk->temporaryUrl($path, now()->addMinutes(self::SIGNED_URL_TTL_MINUTES));
     }
 }

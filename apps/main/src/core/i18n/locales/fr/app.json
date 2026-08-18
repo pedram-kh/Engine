@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Il s'agit d'un profil limité — votre agence n'a pas encore de relation de roster avec ce créateur, les coordonnées, la note et les notes ne sont donc pas disponibles ici."
+    },
     "userMenu": {
       "signOut": "Se déconnecter",
       "signingOut": "Déconnexion…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Messages",
             "detail": "Détail",
-            "history": "Historique des déplacements"
+            "history": "Historique des déplacements",
+            "profile": "Profil"
           },
           "messages": {
             "none": "Aucune conversation pour cette carte pour le moment."

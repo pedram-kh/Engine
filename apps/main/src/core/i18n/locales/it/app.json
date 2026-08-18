@@ -339,6 +339,9 @@
         }
       }
     },
+    "creatorProfile": {
+      "thinNotice": "Questo è un profilo limitato — la tua agenzia non ha ancora una relazione di roster con questo creator, quindi qui non sono disponibili i dati di contatto, la valutazione e le note."
+    },
     "userMenu": {
       "signOut": "Esci",
       "signingOut": "Disconnessione…"
@@ -692,7 +695,8 @@
           "tabs": {
             "messages": "Messaggi",
             "detail": "Dettaglio",
-            "history": "Cronologia spostamenti"
+            "history": "Cronologia spostamenti",
+            "profile": "Profilo"
           },
           "messages": {
             "none": "Nessuna conversazione per questa scheda al momento."
