@@ -3,12 +3,16 @@
  * AH-010b — the CREATOR full-screen relationship thread. Keyed by the agency
  * ULID (route param). The counterparty header is resolved from the `?name=`
  * navigation hint first (instant, no flash) then refined from the inbox lookup
- * on mount (authoritative on a hard refresh/deep-link). The transport is bound
- * to the agency; the thread view drives the rest.
+ * (authoritative on a hard refresh/deep-link). The transport is bound to the
+ * agency; the thread view drives the rest.
+ *
+ * The AH-013 two-pane shell keeps this component MOUNTED across conversation
+ * switches — only the route param changes — so the header must re-resolve on
+ * every param change, not once on mount.
  */
 
 import type { CreatorRelationshipThreadRow } from '@catalyst/api-client'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { type RouteLocationRaw, useRoute } from 'vue-router'
 import { useDisplay } from 'vuetify'
@@ -47,15 +51,30 @@ const title = computed(
 // AH-013 — the resolved agency logo for the thread header (null → initials).
 const avatarUrl = computed(() => resolvedRow.value?.attributes.agency.logo_url ?? null)
 
-onMounted(async () => {
-  try {
-    const res = await relationshipMessagingApi.creatorInbox()
-    resolvedRow.value =
-      res.data.find((row) => row.attributes.agency.id === agencyUlid.value) ?? null
-  } catch {
-    // The name hint / fallback covers the header; not load-bearing.
-  }
-})
+// Clearing FIRST matters: until the new row lands, the header falls back to the
+// `?name=` hint (correct name, initials) instead of showing the previous
+// agency's name and logo over someone else's conversation.
+watch(
+  agencyUlid,
+  async (ulid) => {
+    resolvedRow.value = null
+    if (ulid === '') {
+      return
+    }
+    try {
+      const res = await relationshipMessagingApi.creatorInbox()
+      // Clicking through conversations quickly can land these out of order —
+      // only the response for the conversation still on screen may write it.
+      if (agencyUlid.value !== ulid) {
+        return
+      }
+      resolvedRow.value = res.data.find((row) => row.attributes.agency.id === ulid) ?? null
+    } catch {
+      // The name hint / fallback covers the header; not load-bearing.
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>

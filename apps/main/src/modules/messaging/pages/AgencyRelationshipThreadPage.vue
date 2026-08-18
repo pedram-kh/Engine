@@ -6,10 +6,14 @@
  * provisioned thread — provisioning is lazy on first send). The counterparty
  * header uses the `?name=` hint, refined from the inbox lookup when the thread
  * already exists.
+ *
+ * The AH-013 two-pane shell keeps this component MOUNTED across conversation
+ * switches — only the route param changes — so the header must re-resolve on
+ * every param change, not once on mount.
  */
 
 import type { AgencyRelationshipThreadRow } from '@catalyst/api-client'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { type RouteLocationRaw, useRoute } from 'vue-router'
 import { useDisplay } from 'vuetify'
@@ -55,19 +59,30 @@ const title = computed(
 // AH-013 — the signed creator avatar for the thread header (null → initials).
 const avatarUrl = computed(() => resolvedRow.value?.attributes.creator.avatar_url ?? null)
 
-onMounted(async () => {
-  const agencyId = agencyStore.currentAgencyId
-  if (agencyId === null) {
-    return
-  }
-  try {
-    const res = await relationshipMessagingApi.agencyInbox(agencyId)
-    resolvedRow.value =
-      res.data.find((row) => row.attributes.creator.id === creatorUlid.value) ?? null
-  } catch {
-    // The name hint / fallback covers the header; not load-bearing.
-  }
-})
+// Clearing FIRST matters: until the new row lands, the header falls back to the
+// `?name=` hint (correct name, initials) instead of showing the previous
+// creator's name and photo over someone else's conversation.
+watch(
+  [creatorUlid, () => agencyStore.currentAgencyId],
+  async ([ulid, agencyId]) => {
+    resolvedRow.value = null
+    if (agencyId === null || ulid === '') {
+      return
+    }
+    try {
+      const res = await relationshipMessagingApi.agencyInbox(agencyId)
+      // Clicking through conversations quickly can land these out of order —
+      // only the response for the conversation still on screen may write it.
+      if (creatorUlid.value !== ulid || agencyStore.currentAgencyId !== agencyId) {
+        return
+      }
+      resolvedRow.value = res.data.find((row) => row.attributes.creator.id === ulid) ?? null
+    } catch {
+      // The name hint / fallback covers the header; not load-bearing.
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
