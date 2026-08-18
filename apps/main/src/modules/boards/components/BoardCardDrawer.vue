@@ -60,6 +60,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import CreatorProfileContent from '@/components/CreatorProfileContent.vue'
+import RichBrief from '@/components/RichBrief.vue'
 import { campaignsApi } from '@/modules/campaigns/api/campaigns.api'
 import DraftReviewPanel from '@/modules/campaigns/components/DraftReviewPanel.vue'
 import { roundStateKey } from '@/modules/campaigns/draftRounds'
@@ -467,13 +468,13 @@ function onDraftReviewed(): void {
                 <div v-if="feeLabel" class="text-body-2" data-test="board-card-drawer-fee">
                   {{ feeLabel }}
                 </div>
-                <p
+                <!-- Minimal rich text (AH-081) via RichBrief. -->
+                <RichBrief
                   v-if="offerDescription"
+                  :text="offerDescription"
                   class="text-body-2 text-medium-emphasis mt-1 mb-0 drawer-detail__description"
                   data-test="board-card-drawer-offer-description"
-                >
-                  {{ offerDescription }}
-                </p>
+                />
                 <div v-if="offerAttachment" class="mt-1">
                   <a
                     v-if="offerAttachment.url"

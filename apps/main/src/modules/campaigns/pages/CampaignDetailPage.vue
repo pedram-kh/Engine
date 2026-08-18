@@ -31,6 +31,7 @@ import { storeToRefs } from 'pinia'
 import { CEmptyState } from '@catalyst/ui'
 
 import CreatorProfileDialog from '@/components/CreatorProfileDialog.vue'
+import RichBrief from '@/components/RichBrief.vue'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
@@ -568,9 +569,11 @@ function formatDay(iso: string | null): string {
                 data-test="overview-description"
               >
                 <template #subtitle>
-                  <div class="overview-description__text">
-                    {{ campaign.attributes.description }}
-                  </div>
+                  <!-- Minimal rich text (AH-081) via RichBrief. -->
+                  <RichBrief
+                    :text="campaign.attributes.description"
+                    class="overview-description__text"
+                  />
                 </template>
               </v-list-item>
               <v-list-item :title="t('app.campaigns.fields.requiresContract')">

@@ -173,7 +173,9 @@ defineExpose({ buildOffer, reset, valid })
       />
     </div>
 
-    <!-- Free-text expectations, shown to the creator with the invitation. -->
+    <!-- Free-text expectations, shown to the creator with the invitation.
+         Minimal rich text (AH-081): rendered through RichBrief at every
+         creator-facing site, hence the formatting hint below. -->
     <v-textarea
       v-model="offerDescription"
       density="compact"
@@ -181,9 +183,10 @@ defineExpose({ buildOffer, reset, valid })
       rows="2"
       auto-grow
       class="mb-3"
-      hide-details
       :label="t('app.campaigns.invite.descriptionLabel')"
-      maxlength="2000"
+      :hint="t('app.campaigns.invite.formattingHint')"
+      persistent-hint
+      maxlength="3000"
       :data-test="`${testPrefix}-description`"
     />
 

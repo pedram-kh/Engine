@@ -41,6 +41,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import { creatorAssignmentsApi } from '../assignments.api'
+import RichBrief from '@/components/RichBrief.vue'
 import { roundStateColor, roundStateKey } from '@/modules/campaigns/draftRounds'
 import { creatorChatTransport } from '@/modules/messaging/api/messaging.api'
 import ChatPanel from '@/modules/messaging/components/ChatPanel.vue'
@@ -526,14 +527,14 @@ onMounted(() => {
         >
       </p>
 
-      <!-- The agency's offer expectations + attachment (invite-offer-details batch). -->
-      <p
+      <!-- The agency's offer expectations + attachment (invite-offer-details
+           batch). Minimal rich text (AH-081) via RichBrief. -->
+      <RichBrief
         v-if="assignment.attributes.offer_description"
+        :text="assignment.attributes.offer_description"
         class="text-body-2 assignment-offer-description"
         data-testid="assignment-detail-offer-description"
-      >
-        {{ assignment.attributes.offer_description }}
-      </p>
+      />
       <div v-if="assignment.attributes.offer_attachment?.url">
         <v-chip
           size="small"

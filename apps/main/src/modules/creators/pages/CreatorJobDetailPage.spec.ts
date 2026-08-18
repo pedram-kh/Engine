@@ -162,6 +162,60 @@ describe('CreatorJobDetailPage', () => {
     )
   })
 
+  // ── AH-081 — the trust boundary: agency-authored markdown rendered in a
+  // creator's browser. Sanitizer correctness itself is pinned by
+  // useRichBriefRenderer.spec.ts; this is the site-level proof that the
+  // description actually flows through RichBrief here, on the one page
+  // where the content crosses from agency-authored to creator-rendered.
+
+  it('renders bold/italic/links in the description as real HTML, not literal markdown', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({
+        description:
+          'Please shoot **outdoors**, in *natural* light. See [our brief](https://example.com/brief).',
+      }) as never,
+    )
+    const wrapper = await mountPage()
+
+    const description = wrapper.find('[data-testid="creator-job-detail-description"]')
+    expect(description.find('strong').text()).toBe('outdoors')
+    expect(description.find('em').text()).toBe('natural')
+    const link = description.find('a')
+    expect(link.attributes('href')).toBe('https://example.com/brief')
+    expect(link.attributes('target')).toBe('_blank')
+    expect(link.attributes('rel')).toBe('noopener noreferrer')
+  })
+
+  it('strips a <script> tag in the description — never executes agency-authored HTML', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({ description: 'Read this: <script>window.__pwned = true</script>' }) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.html()).not.toContain('<script')
+    expect((window as unknown as { __pwned?: boolean }).__pwned).toBeUndefined()
+  })
+
+  it('never renders a javascript: href from the description', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({ description: '[click me](javascript:alert(document.cookie))' }) as never,
+    )
+    const wrapper = await mountPage()
+
+    const description = wrapper.find('[data-testid="creator-job-detail-description"]')
+    expect(description.findAll('a').length).toBe(0)
+    expect(wrapper.html()).not.toMatch(/href="javascript:/i)
+  })
+
+  it('breaks a single newline in the description into a line break (D1 — the line-breaks ask)', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({ description: 'Bring your own props.\nWe provide lighting.' }) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-detail-description"]').html()).toContain('<br>')
+  })
+
   it('frames the job in a card, and leaves the failure states unframed (AH-057)', async () => {
     const wrapper = await mountPage()
 

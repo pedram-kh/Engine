@@ -190,6 +190,7 @@ async function mountDrawer(
     canResolve?: boolean
     canReview?: boolean
     status?: string
+    offerDescription?: string | null
     postedContent?: ReturnType<typeof postedRow>[]
     /** Newest-first, as the endpoint returns them. Drives the latest-draft row. */
     drafts?: Array<{
@@ -213,7 +214,7 @@ async function mountDrawer(
         agreed_fee_minor_units: 20000,
         agreed_fee_currency: 'EUR',
         fee_per: 'script',
-        offer_description: 'Two hooks, one CTA.',
+        offer_description: opts.offerDescription ?? 'Two hooks, one CTA.',
         offer_attachment: {
           name: 'brief.pdf',
           mime_type: 'application/pdf',
@@ -371,6 +372,16 @@ describe('BoardCardDrawer', () => {
     const attachment = wrapper.find('[data-test="board-card-drawer-attachment"]')
     expect(attachment.text()).toContain('brief.pdf')
     expect(attachment.attributes('href')).toBe('https://cdn/brief.pdf')
+    wrapper.unmount()
+  })
+
+  it('renders the offer description through RichBrief — markdown becomes real HTML (AH-081)', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], {
+      offerDescription: 'Please shoot **outdoors**, in *natural* light.',
+    })
+    const description = wrapper.find('[data-test="board-card-drawer-offer-description"]')
+    expect(description.find('strong').text()).toBe('outdoors')
+    expect(description.find('em').text()).toBe('natural')
     wrapper.unmount()
   })
 

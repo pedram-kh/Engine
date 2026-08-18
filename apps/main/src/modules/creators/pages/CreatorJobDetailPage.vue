@@ -48,6 +48,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import { creatorJobsApi } from '../jobs.api'
+import RichBrief from '@/components/RichBrief.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -233,9 +234,14 @@ onMounted(() => {
 
         <section v-if="job.attributes.description" class="job-detail__section">
           <h2 class="text-subtitle-1">{{ t('creator.ui.jobs.detail.about') }}</h2>
-          <p class="job-detail__description" data-testid="creator-job-detail-description">
-            {{ job.attributes.description }}
-          </p>
+          <!-- The trust boundary for AH-081: agency-authored markdown,
+               sanitized by RichBrief, rendered in a CREATOR's browser. See
+               useRichBriefRenderer.spec.ts for the XSS set this depends on. -->
+          <RichBrief
+            :text="job.attributes.description"
+            class="job-detail__description"
+            data-testid="creator-job-detail-description"
+          />
         </section>
 
         <section v-if="job.attributes.listing_languages?.length" class="job-detail__section">

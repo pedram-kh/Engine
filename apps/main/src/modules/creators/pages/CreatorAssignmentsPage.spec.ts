@@ -157,6 +157,24 @@ describe('CreatorAssignmentsPage', () => {
     expect(wrapper.find('[data-test="creator-assignment-attachment-B"]').exists()).toBe(false)
   })
 
+  it('renders the offer description through RichBrief — markdown becomes real HTML, not literal asterisks (AH-081)', async () => {
+    vi.mocked(creatorAssignmentsApi.list).mockResolvedValue({
+      data: [
+        makeAssignment('A', 'invited', {
+          offer_description: 'Please shoot **outdoors**, in *natural* light.',
+        }),
+      ],
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(CreatorAssignmentsPage)
+    teardown = unmount
+    await flushPromises()
+
+    const description = wrapper.find('[data-test="creator-assignment-description-A"]')
+    expect(description.find('strong').text()).toBe('outdoors')
+    expect(description.find('em').text()).toBe('natural')
+  })
+
   it('renders the empty state when there are no assignments', async () => {
     vi.mocked(creatorAssignmentsApi.list).mockResolvedValue({ data: [] })
 

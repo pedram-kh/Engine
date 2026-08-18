@@ -167,14 +167,18 @@ const brandSelectItems = computed(() => props.brands.map((b) => ({ title: b.name
       @update:model-value="update('name', $event)"
     />
 
+    <!-- Minimal rich text (AH-081): rendered through RichBrief at every
+         render site, hence the formatting hint appended below — same
+         concatenation shape ProfileBasicsForm.vue uses for its bio hint. -->
     <v-textarea
       :model-value="local.description ?? ''"
       :label="t('app.campaigns.fields.description')"
-      :hint="t('app.campaigns.fields.descriptionHint')"
+      :hint="`${t('app.campaigns.fields.descriptionHint')} ${t('app.campaigns.fields.formattingHint')}`"
       persistent-hint
       rows="3"
       auto-grow
       class="mb-3"
+      maxlength="5000"
       data-test="campaign-description"
       @update:model-value="update('description', $event || undefined)"
     />

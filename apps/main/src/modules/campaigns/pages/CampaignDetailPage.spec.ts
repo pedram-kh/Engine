@@ -282,6 +282,17 @@ describe('CampaignDetailPage (Sprint 8 Chunk 1)', () => {
     expect(harness.wrapper.find('[data-test="tab-payments"]').exists()).toBe(true)
   })
 
+  it('renders the campaign description through RichBrief — markdown becomes real HTML (AH-081)', async () => {
+    const harness = await mountDetail('agency_admin', [], {
+      campaign: { description: 'Please shoot **outdoors**, in *natural* light.' },
+    })
+    cleanup = harness.cleanup
+
+    const description = harness.wrapper.find('[data-test="overview-description"]')
+    expect(description.find('strong').text()).toBe('outdoors')
+    expect(description.find('em').text()).toBe('natural')
+  })
+
   it('mounts the live ApplicationsTab when the Applications tab opens (AH-058)', async () => {
     const harness = await mountDetail()
     cleanup = harness.cleanup

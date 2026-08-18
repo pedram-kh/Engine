@@ -46,6 +46,7 @@ function makeDetail(
   drafts: CreatorAssignmentDetailResource['relationships']['drafts'] = [],
   posted: CreatorAssignmentDetailResource['relationships']['posted_content'] = [],
   contract: CreatorAssignmentDetailResource['relationships']['contract'] = null,
+  attributeOverrides: Partial<CreatorAssignmentDetailResource['attributes']> = {},
 ): CreatorAssignmentDetailResource {
   return {
     id: ULID,
@@ -69,6 +70,7 @@ function makeDetail(
         posting_window_ends_at: null,
         brand_name: 'Acme',
       },
+      ...attributeOverrides,
     },
     relationships: { drafts, posted_content: posted, contract },
   }
@@ -519,6 +521,31 @@ describe('CreatorAssignmentDetailPage — answering the invitation in place', ()
     // No reload on failure, and the creator can try again.
     expect(creatorAssignmentsApi.show).toHaveBeenCalledTimes(1)
     expect(wrapper.find('[data-testid="assignment-detail-accept"]').exists()).toBe(true)
+  })
+})
+
+describe('CreatorAssignmentDetailPage — offer description (AH-081, minimal rich text)', () => {
+  it('renders the offer description through RichBrief — markdown becomes real HTML', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('invited', [], [], null, {
+        offer_description: 'Please shoot **outdoors**, in *natural* light.',
+      }),
+    })
+    const { wrapper } = await mountDetail()
+
+    const description = wrapper.find('[data-testid="assignment-detail-offer-description"]')
+    expect(description.exists()).toBe(true)
+    expect(description.find('strong').text()).toBe('outdoors')
+    expect(description.find('em').text()).toBe('natural')
+  })
+
+  it('omits the offer description block entirely when there is none', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('invited', [], [], null, { offer_description: null }),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-detail-offer-description"]').exists()).toBe(false)
   })
 })
 

@@ -515,8 +515,10 @@ it('validates the offer exactly as the invite path does — fee, currency, cap',
         ->postJson(acceptUrl($s), acceptPayload(['agreed_fee_currency' => 'USD']))
         ->assertUnprocessable();
 
+    // AH-081: cap raised 2000 -> 3000 to accommodate the minimal-rich-text
+    // markdown syntax overhead ("**", "[]()") on top of visible prose.
     $this->actingAs($s['admin'])
-        ->postJson(acceptUrl($s), acceptPayload(['offer_description' => str_repeat('x', 2001)]))
+        ->postJson(acceptUrl($s), acceptPayload(['offer_description' => str_repeat('x', 3001)]))
         ->assertUnprocessable();
 
     expect(CampaignAssignment::query()->count())->toBe(0);

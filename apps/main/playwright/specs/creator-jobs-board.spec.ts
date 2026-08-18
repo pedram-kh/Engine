@@ -56,7 +56,11 @@ test.describe('AH-056 — creator jobs board', () => {
       brandName: 'Northwind Coffee',
       listingFee: '€300 per video',
       listingDuration: '4 weeks',
-      description: 'Three short-form videos per month, shot in your own kitchen.',
+      // The trailing bold fragment exercises AH-081's real trust-boundary
+      // conversion end to end: this is agency-authored markdown, sanitized
+      // by RichBrief, rendered in the CREATOR's browser below.
+      description:
+        'Three short-form videos per month, shot in your own kitchen. **Bring your own props.**',
     })
 
     // Sign in through the SPA so Sanctum's stateful pipeline engages (the
@@ -98,6 +102,12 @@ test.describe('AH-056 — creator jobs board', () => {
     )
     await expect(page.locator('[data-testid="creator-job-detail-description"]')).toContainText(
       'Three short-form videos per month',
+    )
+    // AH-081 — the markdown became real HTML, not literal asterisks. This is
+    // the c3 leg's proof that the job-detail trust-boundary conversion holds
+    // end to end, not just in the unit-level sanitizer specs.
+    await expect(page.locator('[data-testid="creator-job-detail-description"] strong')).toHaveText(
+      'Bring your own props.',
     )
     // The third and last brand field allowed to cross to a creator (D3).
     await expect(page.locator('[data-testid="creator-job-website"]')).toHaveAttribute(

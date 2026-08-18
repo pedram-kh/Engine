@@ -23,6 +23,8 @@ import { CEmptyState } from '@catalyst/ui'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import RichBrief from '@/components/RichBrief.vue'
+
 import { creatorAssignmentsApi } from '../assignments.api'
 
 const { t, locale } = useI18n()
@@ -170,14 +172,15 @@ onMounted(() => {
               </span>
             </p>
             <p class="assignment__meta">{{ windowLabel(item) }}</p>
-            <!-- The agency's offer expectations (invite-offer-details batch). -->
-            <p
+            <!-- The agency's offer expectations (invite-offer-details batch).
+                 Minimal rich text (AH-081): bold/italic/links/breaks only,
+                 sanitized by RichBrief — see useRichBriefRenderer.ts. -->
+            <RichBrief
               v-if="item.attributes.offer_description"
+              :text="item.attributes.offer_description"
               class="assignment__description"
               :data-test="`creator-assignment-description-${item.id}`"
-            >
-              {{ item.attributes.offer_description }}
-            </p>
+            />
             <!-- The one optional offer attachment — the chip label is the
                  agency-given file name, opened via the short-lived signed URL. -->
             <v-chip

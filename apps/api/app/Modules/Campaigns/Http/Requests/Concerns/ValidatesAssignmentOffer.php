@@ -45,7 +45,11 @@ trait ValidatesAssignmentOffer
             // `fee_per` is the unit the fee applies to ("per script");
             // agency-authored content, deliberately not an enum.
             'fee_per' => ['nullable', 'string', 'max:120'],
-            'offer_description' => ['nullable', 'string', 'max:2000'],
+            // AH-081: raised from 2000 to 3000. The column is `text` (no
+            // storage constraint either way); the raise accounts for the
+            // markdown syntax ("**", "[]()") the minimal-rich-text renderer
+            // now supports, on top of the visible prose.
+            'offer_description' => ['nullable', 'string', 'max:3000'],
 
             // ONE optional offer attachment, uploaded via the presigned
             // init/complete pair BEFORE the invite; the upload_id is re-verified
