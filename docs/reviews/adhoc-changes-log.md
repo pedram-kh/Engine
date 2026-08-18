@@ -70,6 +70,55 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-080 · Creator Profile everywhere: one dialog, four mount contexts
+
+- **Status:** Landed (push HELD). Full loop — kickoff with locked decisions (D1–D5) → plan-pause
+  (five proposals ratified: i18n-reuse overturn, D2c, D3's lazy-tab deviation, no new Playwright
+  leg, the flake disposition) → build → two-commit pair, push held. Review file is the record.
+- **Commits:** feature + docs commits carrying this entry (see `git log` at the tip for the exact
+  hashes); flake fix `368970d4` ships separately, outside this chunk's diff.
+- **Date:** 2026-08-18
+- **Why:** a creator's full profile (photo, bio, contact, account-creation, socials, rating/notes,
+  blacklist) only ever rendered on the dedicated Roster/Discover detail pages. Three other surfaces
+  that already show a creator's name and photo — the campaign Creators-tab rows, the board's
+  assignment-card drawer, and the applications (pseudo-card + tab row) — had no way to see more
+  than that without navigating away.
+- **What:** one `CreatorProfileDialog` (split into a reusable `CreatorProfileContent` body + a
+  `v-dialog` shell) fed by the two resources that already existed — `rosterApi.show` (full mode,
+  when a relation exists) and `discoveryApi.show` (thin mode, the truthful fallback for a creator
+  this agency has never related to: profile + socials only, no contact/rating/notes/blacklist,
+  ever). Mode resolution lives in a new `useCreatorProfile` composable: try roster, fall back to
+  discover only on a 404, `assumeFull` skips the fallback entirely for contexts where the relation
+  is guaranteed (an applicant, by definition). Mounted in four places: Creators-tab rows (click
+  opens the dialog, `assumeFull: false`, new avatar on the row), the board card drawer (a new,
+  deliberately lazy fifth "Profile" tab — fetches only on first activation, unlike its four eager
+  siblings), and both application surfaces (a clickable identity block, `assumeFull: true`,
+  Accept/Reject untouched as their own click targets). Rating/notes and blacklist management reuse
+  the exact same wired components (`StarRatingInput`, `BlacklistCreatorDialog`,
+  `rosterApi.updateRelation`/`.unblacklist`) the roster detail page uses — not copies — and render
+  in full mode only.
+- **Decisions:** i18n reuse overturn — the dialog reads `app.roster.*` verbatim rather than
+  cloning a parallel namespace; net-new copy is exactly 2 leaves × 24 locales (the drawer's tab
+  label + the thin-mode notice). No new endpoint anywhere. No new Playwright leg — a conscious,
+  recorded deferral; D5 makes every mount point additive-only, so Vitest carries the correctness
+  weight (§5.34 thin-mode contact absence, the fallback sequence, the reuse imports).
+- **Touched:** `CampaignAssignmentController.php` + `CampaignAssignmentResource.php` (+test, the
+  one named ripple — `creator.avatar_url`, a signed URL), `useCreatorProfile.ts` (new, +spec),
+  `CreatorProfileContent.vue` (new, +spec), `CreatorProfileDialog.vue` (new, +spec),
+  `CampaignDetailPage.vue` (+spec — D2a), `BoardCardDrawer.vue` (+spec — D2b),
+  `BoardApplicationsColumn.vue` (+spec — D2c), `ApplicationsTab.vue` (+spec — D2c),
+  `campaign.ts` (api-client, `avatar_url?`), `en/app.json` + 23 locales (`creatorProfile.thinNotice`,
+  `campaigns.board.drawer.tabs.profile`, real MT incl. the flaky-10).
+- **Rider:** the `creator-detail.spec.ts` navigation-timing flake (two consecutive first-attempt
+  failures, local + CI run `32110681822`) disposed as environmental — cold-compile of lazy routes
+  under dev-mode Vite on constrained runners — timeout bumped 5s→15s in its own commit, outside
+  this chunk's diff.
+- **Playwright:** none new (see Decisions above); existing legs through the touched pages (roster
+  row → detail, board, applications) continue to pass through unchanged.
+- **Ref:** [`admin-filter-profile-modal-richtext-inventory.md`](admin-filter-profile-modal-richtext-inventory.md)
+  §0.1, I4.1–I4.3 (AH-080 candidate); full detail in
+  [`creator-profile-everywhere-review.md`](creator-profile-everywhere-review.md).
+
 ### AH-079 · Admin All-Creators filters: application status, KYC state, and Connected
 
 - **Status:** Landed. Compact full loop (kickoff with locked decisions → brief plan-pause → build →
