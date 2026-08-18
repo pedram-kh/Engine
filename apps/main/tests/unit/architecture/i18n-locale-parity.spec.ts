@@ -184,4 +184,27 @@ describe('i18n locale parity — en SOT across every namespace (S7)', () => {
     }
     expect(violations, `plural form-count drift:\n${violations.join('\n')}`).toEqual([])
   })
+
+  /**
+   * AH-074 pin: the creator counter-offer flow was removed (AH-035's re-offer-after-decline
+   * covers the negotiation need from the agency side instead), but two strings kept
+   * promising it — fixed by AH-074. Parity above proves keys/placeholders/plural-shape
+   * match en; it would not catch "counter" creeping back into the en SOURCE on a future
+   * edit. This targets that exact regression class, on exactly the two keys AH-074 fixed —
+   * NOT a blanket ban on the word, since `reinvite.body` ("They countered with {fee}...")
+   * legitimately describes the agency-side counter-offer that still exists.
+   */
+  it('AH-074: the retired counter-offer copy does not creep back into the two fixed keys', () => {
+    const guarded: Array<{ file: string; key: string }> = [
+      { file: 'creator.json', key: 'creator.ui.assignments.subtitle' },
+      { file: 'app.json', key: 'app.campaigns.applications.accept.body' },
+    ]
+    for (const { file, key } of guarded) {
+      const value = loadLeaves(SOT_LOCALE, file).get(key)
+      expect(value, `${file}: ${key} not found`).toBeDefined()
+      expect(value, `${file}: ${key} re-introduced counter-offer language: "${value}"`).not.toMatch(
+        /counter/i,
+      )
+    }
+  })
 })
