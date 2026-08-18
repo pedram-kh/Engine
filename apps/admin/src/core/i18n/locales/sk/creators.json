@@ -43,7 +43,14 @@
       "all": {
         "title": "Všetci tvorcovia",
         "empty": "Žádní tvorcovia.",
-        "load_failed": "Nepodařilo sa načíst tvorcu. Obnovte stránku."
+        "load_failed": "Nepodařilo sa načíst tvorcu. Obnovte stránku.",
+        "filters": {
+          "connected": {
+            "all": "Všetky",
+            "yes": "Prepojené",
+            "no": "Neprepojené"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Tvorcu",

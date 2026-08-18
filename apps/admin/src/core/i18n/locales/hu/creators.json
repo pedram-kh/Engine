@@ -43,7 +43,14 @@
       "all": {
         "title": "Összes creators",
         "empty": "Nem creators yet.",
-        "load_failed": "We couldn't load creators. Please refresh."
+        "load_failed": "We couldn't load creators. Please refresh.",
+        "filters": {
+          "connected": {
+            "all": "Összes",
+            "yes": "Kapcsolódik",
+            "no": "Nem kapcsolódik"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Alkotó",

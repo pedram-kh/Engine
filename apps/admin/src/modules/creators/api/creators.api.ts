@@ -54,6 +54,12 @@ export interface AdminCreatorListResponse {
 export interface AdminCreatorListParams {
   status?: CreatorApplicationStatus
   kyc_status?: CreatorKycStatus
+  /**
+   * AH-079 — at least one relation with any agency satisfying
+   * permitsMessaging() (roster + non-blacklisted). `false` is the exact
+   * complement, not merely "no relations at all".
+   */
+  connected?: boolean
   page?: number
   per_page?: number
 }
@@ -204,6 +210,7 @@ export const adminCreatorsApi = {
     const query = new URLSearchParams()
     if (params.status !== undefined) query.set('status', params.status)
     if (params.kyc_status !== undefined) query.set('kyc_status', params.kyc_status)
+    if (params.connected !== undefined) query.set('connected', params.connected ? 'true' : 'false')
     if (params.page !== undefined) query.set('page', String(params.page))
     if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
     const qs = query.toString()

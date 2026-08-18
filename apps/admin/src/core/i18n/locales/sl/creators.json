@@ -43,7 +43,14 @@
       "all": {
         "title": "Vsi ustvarjalci",
         "empty": "Žádní ustvarjalci.",
-        "load_failed": "Ni uspelo naložiti ustvarjalca. Obnovte stránku."
+        "load_failed": "Ni uspelo naložiti ustvarjalca. Obnovte stránku.",
+        "filters": {
+          "connected": {
+            "all": "Vse",
+            "yes": "Povezano",
+            "no": "Nepovezano"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Ustvarjalec",

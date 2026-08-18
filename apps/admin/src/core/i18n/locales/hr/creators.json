@@ -43,7 +43,14 @@
       "all": {
         "title": "Vsi kreatori",
         "empty": "Žádní kreatori.",
-        "load_failed": "Ni uspelo učitajti ustvarjalca. Obnovte stránku."
+        "load_failed": "Ni uspelo učitajti ustvarjalca. Obnovte stránku.",
+        "filters": {
+          "connected": {
+            "all": "Sve",
+            "yes": "Povezan",
+            "no": "Nije povezan"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Kreator",

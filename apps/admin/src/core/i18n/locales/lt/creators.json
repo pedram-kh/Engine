@@ -43,7 +43,14 @@
       "all": {
         "title": "Visi creators",
         "empty": "Ne creators yet.",
-        "load_failed": "We couldn't load creators. Please refresh."
+        "load_failed": "We couldn't load creators. Please refresh.",
+        "filters": {
+          "connected": {
+            "all": "Visi",
+            "yes": "Prijungtas",
+            "no": "Neprijungtas"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Kūrėjas",

@@ -43,7 +43,14 @@
       "all": {
         "title": "Kõik creators",
         "empty": "Ei creators yet.",
-        "load_failed": "We couldn't load creators. Please refresh."
+        "load_failed": "We couldn't load creators. Please refresh.",
+        "filters": {
+          "connected": {
+            "all": "Kõik",
+            "yes": "Ühendatud",
+            "no": "Ühendamata"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Looja",

@@ -43,7 +43,14 @@
       "all": {
         "title": "Всички creators",
         "empty": "Не creators yet.",
-        "load_failed": "We couldn't load creators. Моля refresh."
+        "load_failed": "We couldn't load creators. Моля refresh.",
+        "filters": {
+          "connected": {
+            "all": "Всички",
+            "yes": "Свързан",
+            "no": "Не е свързан"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Творец",

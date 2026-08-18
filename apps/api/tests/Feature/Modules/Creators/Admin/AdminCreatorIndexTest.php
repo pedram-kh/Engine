@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Agencies\Database\Factories\AgencyCreatorRelationFactory;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
 use App\Modules\Creators\Enums\ApplicationStatus;
 use App\Modules\Identity\Enums\UserType;
@@ -102,4 +103,119 @@ it('returns 401 when no admin is authenticated', function (): void {
     $response = $this->getJson('/api/v1/admin/creators');
 
     expect($response->status())->toBe(401);
+});
+
+/**
+ * AH-079 — the ?connected= filter. "Connected" = the AH-051 messaging gate
+ * (permitsMessaging: roster + non-blacklisted) applied to ANY agency, not
+ * "has a roster row" — a rostered-but-blacklisted creator is NOT connected.
+ * §5.34's disjoint set below is the fixture every case below draws from.
+ */
+function seedConnectedDisjointSet(): array
+{
+    $pendingRequestOnly = CreatorFactory::new()->approved()->createOne();
+    AgencyCreatorRelationFactory::new()->pendingRequest()->create(['creator_id' => $pendingRequestOnly->id]);
+
+    $rosteredBlacklisted = CreatorFactory::new()->approved()->createOne();
+    AgencyCreatorRelationFactory::new()->blacklisted()->create(['creator_id' => $rosteredBlacklisted->id]);
+
+    $rosteredClean = CreatorFactory::new()->approved()->createOne();
+    AgencyCreatorRelationFactory::new()->create(['creator_id' => $rosteredClean->id]);
+
+    $noRelations = CreatorFactory::new()->approved()->createOne();
+
+    return compact('pendingRequestOnly', 'rosteredBlacklisted', 'rosteredClean', 'noRelations');
+}
+
+it('connected=true matches only a rostered, non-blacklisted relation (§5.34 disjoint set)', function (): void {
+    $admin = makeIndexAdmin();
+    $set = seedConnectedDisjointSet();
+
+    $response = $this->actingAs($admin, 'web_admin')
+        ->getJson('/api/v1/admin/creators?connected=true');
+
+    expect($response->status())->toBe(200);
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.id'))->toBe($set['rosteredClean']->ulid);
+});
+
+it('a pending_request-only relation does NOT count as connected', function (): void {
+    $admin = makeIndexAdmin();
+    $set = seedConnectedDisjointSet();
+
+    $response = $this->actingAs($admin, 'web_admin')
+        ->getJson('/api/v1/admin/creators?connected=true');
+
+    $ids = array_column($response->json('data'), 'id');
+    expect($ids)->not->toContain($set['pendingRequestOnly']->ulid);
+});
+
+it('a rostered-but-blacklisted relation does NOT count as connected', function (): void {
+    $admin = makeIndexAdmin();
+    $set = seedConnectedDisjointSet();
+
+    $response = $this->actingAs($admin, 'web_admin')
+        ->getJson('/api/v1/admin/creators?connected=true');
+
+    $ids = array_column($response->json('data'), 'id');
+    expect($ids)->not->toContain($set['rosteredBlacklisted']->ulid);
+});
+
+it('connected=false returns exactly the complement of connected=true, not merely "no roster row"', function (): void {
+    $admin = makeIndexAdmin();
+    $set = seedConnectedDisjointSet();
+
+    $all = $this->actingAs($admin, 'web_admin')->getJson('/api/v1/admin/creators');
+    $connected = $this->actingAs($admin, 'web_admin')->getJson('/api/v1/admin/creators?connected=true');
+    $notConnected = $this->actingAs($admin, 'web_admin')->getJson('/api/v1/admin/creators?connected=false');
+
+    expect($all->json('meta.total'))->toBe(4);
+    expect($connected->json('meta.total'))->toBe(1);
+    expect($notConnected->json('meta.total'))->toBe(3);
+
+    $notConnectedIds = array_column($notConnected->json('data'), 'id');
+    // The complement includes the pending-request-only and blacklisted-rostered
+    // creators specifically BECAUSE they fail permitsMessaging(), not because
+    // they lack a relation row entirely (that's $noRelations, a fourth reason).
+    expect($notConnectedIds)->toEqualCanonicalizing([
+        $set['pendingRequestOnly']->ulid,
+        $set['rosteredBlacklisted']->ulid,
+        $set['noRelations']->ulid,
+    ]);
+});
+
+it('returns an empty page for an unknown connected value', function (): void {
+    $admin = makeIndexAdmin();
+    seedConnectedDisjointSet();
+
+    $response = $this->actingAs($admin, 'web_admin')
+        ->getJson('/api/v1/admin/creators?connected=maybe');
+
+    expect($response->status())->toBe(200);
+    expect($response->json('meta.total'))->toBe(0);
+});
+
+it('AND-composes status, kyc_status, and connected (chips are combinable, not exclusive)', function (): void {
+    $admin = makeIndexAdmin();
+
+    $match = CreatorFactory::new()->approved()->kycVerified()->createOne();
+    AgencyCreatorRelationFactory::new()->create(['creator_id' => $match->id]);
+
+    // Same status + kyc, but not connected — the connected leg must exclude it.
+    $notConnected = CreatorFactory::new()->approved()->kycVerified()->createOne();
+
+    // Connected + approved, but wrong kyc_status — the kyc leg must exclude it.
+    $wrongKyc = CreatorFactory::new()->approved()->createOne();
+    AgencyCreatorRelationFactory::new()->create(['creator_id' => $wrongKyc->id]);
+
+    $response = $this->actingAs($admin, 'web_admin')
+        ->getJson('/api/v1/admin/creators?status=approved&kyc_status=verified&connected=true');
+
+    expect($response->status())->toBe(200);
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.id'))->toBe($match->ulid);
+
+    $ids = array_column($response->json('data'), 'id');
+    expect($ids)->not->toContain($notConnected->ulid);
+    expect($ids)->not->toContain($wrongKyc->ulid);
 });

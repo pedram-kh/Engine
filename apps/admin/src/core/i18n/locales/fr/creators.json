@@ -43,7 +43,14 @@
       "all": {
         "title": "Tous les créateurs",
         "empty": "Aucun créateur pour le moment.",
-        "load_failed": "Nous n'avons pas pu charger les créateurs. Veuillez actualiser."
+        "load_failed": "Nous n'avons pas pu charger les créateurs. Veuillez actualiser.",
+        "filters": {
+          "connected": {
+            "all": "Tous",
+            "yes": "Connecté",
+            "no": "Non connecté"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Créateur",

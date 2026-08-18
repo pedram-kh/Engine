@@ -43,7 +43,14 @@
       "all": {
         "title": "Alle Creator",
         "empty": "Noch keine Creator.",
-        "load_failed": "Creator konnten nicht geladen werden. Bitte aktualisiere die Seite."
+        "load_failed": "Creator konnten nicht geladen werden. Bitte aktualisiere die Seite.",
+        "filters": {
+          "connected": {
+            "all": "Alle",
+            "yes": "Verbunden",
+            "no": "Nicht verbunden"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Creator",

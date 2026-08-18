@@ -43,7 +43,14 @@
       "all": {
         "title": "Todos os criadores",
         "empty": "Ainda não há criadores.",
-        "load_failed": "Não foi possível carregar os criadores. Atualize a página."
+        "load_failed": "Não foi possível carregar os criadores. Atualize a página.",
+        "filters": {
+          "connected": {
+            "all": "Todos",
+            "yes": "Conectado",
+            "no": "Não conectado"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Criador",

@@ -43,7 +43,14 @@
       "all": {
         "title": "Kaikki creators",
         "empty": "Ei creators yet.",
-        "load_failed": "We couldn't load creators. Please refresh."
+        "load_failed": "We couldn't load creators. Please refresh.",
+        "filters": {
+          "connected": {
+            "all": "Kaikki",
+            "yes": "Yhdistetty",
+            "no": "Ei yhdistetty"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Luoja",

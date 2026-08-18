@@ -43,7 +43,14 @@
       "all": {
         "title": "Gach creators",
         "empty": "Níl creators yet.",
-        "load_failed": "We couldn't load creators. Please refresh."
+        "load_failed": "We couldn't load creators. Please refresh.",
+        "filters": {
+          "connected": {
+            "all": "Uile",
+            "yes": "Ceangailte",
+            "no": "Neamhcheangailte"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Cruthaitheoir",

@@ -43,7 +43,14 @@
       "all": {
         "title": "Alle creators",
         "empty": "Nog geen creators.",
-        "load_failed": "Creators konden niet worden geladen. Ververs de pagina."
+        "load_failed": "Creators konden niet worden geladen. Ververs de pagina.",
+        "filters": {
+          "connected": {
+            "all": "Alle",
+            "yes": "Verbonden",
+            "no": "Niet verbonden"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Creator",

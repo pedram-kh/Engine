@@ -43,7 +43,14 @@
       "all": {
         "title": "All creators",
         "empty": "No creators yet.",
-        "load_failed": "We couldn't load creators. Please refresh."
+        "load_failed": "We couldn't load creators. Please refresh.",
+        "filters": {
+          "connected": {
+            "all": "All",
+            "yes": "Connected",
+            "no": "Not connected"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Creator",

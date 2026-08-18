@@ -43,7 +43,14 @@
       "all": {
         "title": "Tutti i creator",
         "empty": "Ancora nessun creator.",
-        "load_failed": "Impossibile caricare i creator. Aggiorna la pagina."
+        "load_failed": "Impossibile caricare i creator. Aggiorna la pagina.",
+        "filters": {
+          "connected": {
+            "all": "Tutti",
+            "yes": "Connesso",
+            "no": "Non connesso"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Creator",

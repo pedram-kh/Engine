@@ -43,7 +43,14 @@
       "all": {
         "title": "Visi creators",
         "empty": "Nē creators yet.",
-        "load_failed": "We couldn't load creators. Please refresh."
+        "load_failed": "We couldn't load creators. Please refresh.",
+        "filters": {
+          "connected": {
+            "all": "Visi",
+            "yes": "Savienots",
+            "no": "Nav savienots"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Radītājs",

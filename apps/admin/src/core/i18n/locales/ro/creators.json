@@ -43,7 +43,14 @@
       "all": {
         "title": "Toate creators",
         "empty": "Nu creators yet.",
-        "load_failed": "We couldn't load creators. Please refresh."
+        "load_failed": "We couldn't load creators. Please refresh.",
+        "filters": {
+          "connected": {
+            "all": "Toate",
+            "yes": "Conectat",
+            "no": "Neconectat"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Creator",

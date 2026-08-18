@@ -43,7 +43,14 @@
       "all": {
         "title": "Kollox creators",
         "empty": "Le creators yet.",
-        "load_failed": "We couldn't load creators. Please refresh."
+        "load_failed": "We couldn't load creators. Please refresh.",
+        "filters": {
+          "connected": {
+            "all": "Kollha",
+            "yes": "Konness",
+            "no": "Mhux konness"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Kreatur",

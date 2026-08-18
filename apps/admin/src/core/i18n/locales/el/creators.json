@@ -43,7 +43,14 @@
       "all": {
         "title": "Όλα creators",
         "empty": "Όχι creators yet.",
-        "load_failed": "We couldn't load creators. Please refresh."
+        "load_failed": "We couldn't load creators. Please refresh.",
+        "filters": {
+          "connected": {
+            "all": "Όλα",
+            "yes": "Συνδεδεμένος",
+            "no": "Μη συνδεδεμένος"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Δημιουργός",

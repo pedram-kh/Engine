@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Creators\Http\Controllers\Admin;
 
+use App\Core\Tenancy\BelongsToAgencyScope;
+use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
 use App\Modules\Creators\Enums\ApplicationStatus;
@@ -64,6 +66,8 @@ final class AdminCreatorController
      * list — the admin sees all). Optional ?status= filter validated
      * against ApplicationStatus; an unknown value yields an empty page
      * rather than 422 (the SPA only ever sends known filter chips).
+     * Also optional and orthogonal: ?kyc_status= and ?connected=true|false
+     * (AH-079 — see the connected-filter block below); all three AND-compose.
      * Paginated; returns the list-card fields only (display_name,
      * application_status, kyc_status, submitted_at, completeness) — the
      * full drill-in lives at the show route.
@@ -102,6 +106,37 @@ final class AdminCreatorController
                 $query->whereRaw('1 = 0');
             } else {
                 $query->where('kyc_status', $kyc->value);
+            }
+        }
+
+        // AH-079 — "Connected" is the AH-051 messaging gate applied as a list
+        // filter: at least one relation with ANY agency satisfying
+        // permitsMessaging() (roster + non-blacklisted). connected=false is
+        // the exact complement, not "no roster row" — a rostered-but-
+        // blacklisted creator is neither. Creator is a global entity (no
+        // tenancy on this list), so the correlated subquery drops
+        // BelongsToAgencyScope deliberately — this is a genuine cross-agency
+        // fact, not a scoping bug. Reuses AgencyCreatorRelation::
+        // scopePermitsMessaging() byte-for-byte (the same reuse
+        // JobsBoardVisibility::visibleTo() uses) rather than re-spelling the
+        // roster + blacklist predicate here, so the two call sites cannot
+        // drift. Unknown value → empty page, mirroring status/kyc_status.
+        //
+        // No creator_id-leading index on agency_creator_relations backs this
+        // EXISTS/NOT EXISTS; accepted at current scale (see docs/tech-debt.md).
+        $connectedInput = $request->query('connected');
+        if (is_string($connectedInput) && $connectedInput !== '') {
+            $permitsMessagingSubquery = fn () => AgencyCreatorRelation::query()
+                ->withoutGlobalScope(BelongsToAgencyScope::class)
+                ->permitsMessaging()
+                ->whereColumn('agency_creator_relations.creator_id', 'creators.id');
+
+            if ($connectedInput === 'true') {
+                $query->whereExists($permitsMessagingSubquery());
+            } elseif ($connectedInput === 'false') {
+                $query->whereNotExists($permitsMessagingSubquery());
+            } else {
+                $query->whereRaw('1 = 0');
             }
         }
 

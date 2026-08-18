@@ -43,7 +43,14 @@
       "all": {
         "title": "Wszyscy twórcy",
         "empty": "Brak twórców.",
-        "load_failed": "Nie udało się załadować twórców. Odśwież stronę."
+        "load_failed": "Nie udało się załadować twórców. Odśwież stronę.",
+        "filters": {
+          "connected": {
+            "all": "Wszystkie",
+            "yes": "Połączony",
+            "no": "Niepołączony"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Twórca",

@@ -43,7 +43,14 @@
       "all": {
         "title": "Alle creators",
         "empty": "Ingen creators endnu.",
-        "load_failed": "Creators kunne ikke indlæses. Opdater venligst siden."
+        "load_failed": "Creators kunne ikke indlæses. Opdater venligst siden.",
+        "filters": {
+          "connected": {
+            "all": "Alle",
+            "yes": "Forbundet",
+            "no": "Ikke forbundet"
+          }
+        }
       },
       "detail": {
         "fallback_title": "Creator",
