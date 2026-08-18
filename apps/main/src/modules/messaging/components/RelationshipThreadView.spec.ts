@@ -143,6 +143,22 @@ describe('RelationshipThreadView', () => {
     read.unmount()
   })
 
+  it('stamps every bubble with the DATE as well as the time', async () => {
+    const iso = '2026-01-01T09:30:00+00:00'
+    const wrapper = await mountView(
+      makeTransport({ list: vi.fn().mockResolvedValue(feed([msg('m1', { created_at: iso })])) }),
+    )
+
+    // Timezone-agnostic: the expected day is derived from the same instant, so
+    // the assertion holds wherever CI runs.
+    const expectedDate = new Intl.DateTimeFormat('en', { dateStyle: 'short' }).format(new Date(iso))
+    const stamp = wrapper.find('[data-test="relationship-message-time"]').text()
+    expect(stamp).toContain(expectedDate)
+    expect(stamp).toMatch(/\d:\d{2}/)
+
+    wrapper.unmount()
+  })
+
   it('shows no read tick on incoming messages (tick is own-only)', async () => {
     const wrapper = await mountView(makeTransport())
     expect(wrapper.find('[data-test="relationship-tick-sent"]').exists()).toBe(false)

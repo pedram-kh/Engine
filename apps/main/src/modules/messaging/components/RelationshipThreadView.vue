@@ -167,8 +167,10 @@ const fieldErrors = ref<Partial<Record<ComposeField, readonly string[]>>>({})
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
+// Date AND time: a thread spans days, and an hour alone leaves "11:45 PM"
+// ambiguous about which night it was. Locale-formatted, both parts short.
 const timeFormatter = computed(
-  () => new Intl.DateTimeFormat(locale.value, { hour: '2-digit', minute: '2-digit' }),
+  () => new Intl.DateTimeFormat(locale.value, { dateStyle: 'short', timeStyle: 'short' }),
 )
 
 const canSend = computed(
@@ -426,7 +428,7 @@ async function submit(): Promise<void> {
               </ul>
 
               <div class="rel-bubble__meta">
-                <span class="rel-bubble__time">{{
+                <span class="rel-bubble__time" data-test="relationship-message-time">{{
                   formatTime(message.attributes.created_at)
                 }}</span>
                 <v-icon
@@ -710,6 +712,8 @@ async function submit(): Promise<void> {
 .rel-bubble__time {
   font-size: 0.68rem;
   opacity: 0.6;
+  /* Keep the date and time on one line — a wrapped stamp reads as two stamps. */
+  white-space: nowrap;
 }
 
 .rel-bubble__tick {

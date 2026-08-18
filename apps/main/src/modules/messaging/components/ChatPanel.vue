@@ -37,8 +37,10 @@ const {
   sendMessage,
 } = useMessageThread(transportRef)
 
+// Date AND time — matches the relationship thread: a campaign conversation runs
+// for days, so an hour alone doesn't say which one.
 const timeFormatter = computed(
-  () => new Intl.DateTimeFormat(locale.value, { hour: '2-digit', minute: '2-digit' }),
+  () => new Intl.DateTimeFormat(locale.value, { dateStyle: 'short', timeStyle: 'short' }),
 )
 
 function formatTime(iso: string): string {
@@ -466,6 +468,8 @@ async function submit(): Promise<void> {
   opacity: 0.6;
   text-align: right;
   margin-top: 2px;
+  /* Keep the date and time on one line — a wrapped stamp reads as two stamps. */
+  white-space: nowrap;
 }
 
 .chat-panel__empty {
