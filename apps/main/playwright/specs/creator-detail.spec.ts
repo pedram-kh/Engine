@@ -66,9 +66,11 @@ test.describe('Creator detail view', () => {
     const table = page.locator(dt(testIds.rosterTable))
     await expect(table).toBeVisible({ timeout: 10000 })
 
-    // Row-click → detail route (D-2a-6).
+    // Row-click → detail route (D-2a-6). Timeout bumped 5s→15s: cold-compile
+    // of lazy routes under dev-mode Vite on constrained runners; retries
+    // remain the net (AH-080 rider).
     await table.getByText('Ada Lovelace').click()
-    await expect(page).toHaveURL(new RegExp(`/roster/${creatorUlid}$`))
+    await expect(page).toHaveURL(new RegExp(`/roster/${creatorUlid}$`), { timeout: 15000 })
 
     await expect(page.locator('[data-test="creator-detail-name"]')).toHaveText('Ada Lovelace')
 
