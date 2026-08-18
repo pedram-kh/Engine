@@ -39,6 +39,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
+import CreatorAvatar from '@/components/CreatorAvatar.vue'
 import { useBackToList } from '@/composables/useBackToList'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
@@ -72,9 +73,8 @@ const displayName = computed(() => creator.value?.display_name ?? t('app.roster.
 const email = computed(() => creator.value?.email ?? null)
 
 // Signed avatar for the header (60-min TTL, re-minted per page load). Null when
-// the creator never uploaded one — the initial stands in.
+// the creator never uploaded one — CreatorAvatar falls back to the initial.
 const avatarUrl = computed(() => creator.value?.avatar_url ?? null)
-const avatarInitial = computed(() => (displayName.value || '?')[0]?.toUpperCase() ?? '?')
 
 // Account-creation identity (sign-up first/last name). Same relation-exists
 // privacy basis as the contact email; never surfaced on discover.
@@ -345,10 +345,13 @@ onMounted(() => {
       <v-card variant="outlined" class="creator-detail__header-card">
         <v-card-text class="creator-detail__header d-flex align-start justify-space-between ga-3">
           <div class="d-flex align-start ga-4">
-            <v-avatar size="72" color="primary" data-test="creator-detail-avatar">
-              <v-img v-if="avatarUrl" :src="avatarUrl" :alt="displayName" cover />
-              <span v-else class="text-h6 font-weight-bold text-white">{{ avatarInitial }}</span>
-            </v-avatar>
+            <CreatorAvatar
+              :src="avatarUrl"
+              :name="displayName"
+              :preview-label="t('creator.ui.wizard.steps.portfolio.preview_label')"
+              :close-label="t('creator.ui.wizard.steps.portfolio.preview_close')"
+              data-test="creator-detail-avatar"
+            />
 
             <div class="creator-detail__header-text">
               <h1 class="text-h5 ma-0" data-test="creator-detail-name">{{ displayName }}</h1>

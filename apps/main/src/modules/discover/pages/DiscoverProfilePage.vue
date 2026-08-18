@@ -42,6 +42,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
+import CreatorAvatar from '@/components/CreatorAvatar.vue'
 import { useBackToList } from '@/composables/useBackToList'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
@@ -77,9 +78,8 @@ const connectionState = computed<DiscoveryConnectionState>(() =>
 const displayName = computed(() => attrs.value?.display_name ?? t('app.discover.unnamed'))
 
 // Signed avatar for the header (short-lived, re-minted per page load). Null when
-// the creator never uploaded one — the initial stands in.
+// the creator never uploaded one — CreatorAvatar falls back to the initial.
 const avatarUrl = computed(() => attrs.value?.avatar_url ?? null)
-const avatarInitial = computed(() => (displayName.value || '?')[0]?.toUpperCase() ?? '?')
 
 // Profile completeness (the same profile_completeness_score the creator sees on
 // their dashboard) surfaced read-only to the agency. The score→colour rule
@@ -262,10 +262,13 @@ onMounted(() => {
            status-driven send-request affordance (D-10/D-11). -->
       <v-card variant="outlined" class="discover-profile__header-card">
         <v-card-text class="discover-profile__header d-flex align-start ga-4">
-          <v-avatar size="72" color="primary" data-test="discover-profile-avatar">
-            <v-img v-if="avatarUrl" :src="avatarUrl" :alt="displayName" cover />
-            <span v-else class="text-h6 font-weight-bold text-white">{{ avatarInitial }}</span>
-          </v-avatar>
+          <CreatorAvatar
+            :src="avatarUrl"
+            :name="displayName"
+            :preview-label="t('creator.ui.wizard.steps.portfolio.preview_label')"
+            :close-label="t('creator.ui.wizard.steps.portfolio.preview_close')"
+            data-test="discover-profile-avatar"
+          />
 
           <div class="discover-profile__header-text">
             <h1 class="text-h5 ma-0" data-test="discover-profile-name">{{ displayName }}</h1>
