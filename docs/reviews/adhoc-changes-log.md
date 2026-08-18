@@ -70,6 +70,41 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-079 · Admin All-Creators filters: application status, KYC state, and Connected
+
+- **Status:** Landed. Compact full loop (kickoff with locked decisions → brief plan-pause → build →
+  two-commit pair, push held). Review file is the record.
+- **Commits:** `b2bc310e` (feature) + this docs commit.
+- **Date:** 2026-08-18
+- **Why:** the admin "All Creators" page (`AllCreatorsPage.vue`) sent no filter params at all — the
+  review-queue and KYC-queue pages already had chip filters on their own axes (`?status=`,
+  `?kyc_status=`), but nothing let an admin narrow the unfiltered list, and no query axis existed for
+  "is this creator connected to any agency" at all.
+- **What:** three independent, AND-composing `v-chip-group` filters on All Creators, cloned from the
+  review-queue/KYC-queue pattern: application status and KYC state reuse those pages' existing i18n
+  keys verbatim; the new third axis, `?connected=true|false`, is the AH-051 messaging gate
+  (`permitsMessaging()`: roster + non-blacklisted, with ANY agency) applied as a list filter via a
+  correlated `EXISTS`/`NOT EXISTS` against `agency_creator_relations`, deliberately reusing the same
+  Eloquent scope `JobsBoardVisibility::visibleTo()` already shares, rather than re-spelling the
+  roster+blacklist predicate a second time. `connected=false` is the exact complement — a
+  `pending_request`-only or rostered-but-blacklisted creator is neither connected nor swept into
+  "not connected" for the wrong reason; both land in the `false` bucket because they fail
+  `permitsMessaging()`, verified by a §5.34 disjoint-set test and a scope-reuse break-revert (bare
+  `EXISTS` without the scope lets both leak in as "connected" — proven red, then reverted).
+- **Decisions:** no URL-state persistence — AH-076 never reached admin, and All Creators (like its two
+  chip-filter siblings) has no URL-state precedent to begin with, so this doesn't start one. No new
+  index for the `EXISTS` correlation (tech-debt entry below, AH-054/AH-056-precedent shape).
+- **Touched:** `AdminCreatorController.php` (+`AdminCreatorIndexTest.php`, 6 new cases),
+  `AllCreatorsPage.vue` (three chip groups, new), `AllCreatorsPage.spec.ts` (new file, 9 tests),
+  `creators.api.ts` (`AdminCreatorListParams.connected`), `en/creators.json` + 23 locales
+  (`admin.creators.all.filters.connected.{all,yes,no}`, real MT baseline including the flaky-10),
+  `tech-debt.md` (the missing-index entry).
+- **Playwright:** none — `apps/admin/playwright/specs/` has exactly two specs (sign-in, MFA
+  enrollment); All Creators has no E2E surface before or after this chunk.
+- **Ref:** [`admin-filter-profile-modal-richtext-inventory.md`](admin-filter-profile-modal-richtext-inventory.md)
+  §0.3/I3.1 (the evidence base); [`admin-all-creators-filters-review.md`](admin-all-creators-filters-review.md)
+  (the full build record).
+
 ### AH-078 · Creator profile photo on both detail pages, squared and previewable
 
 - **Status:** Landed. Mode B (direct-iteration, eyes-on) — no kickoff, no review file; this entry is

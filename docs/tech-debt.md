@@ -2454,3 +2454,43 @@ ukazuje na váš zveřejněný příspěvek, a poté ho níže znova odešlete."
   page. Either way the reading gates need no change.
 - **Owner:** product (Pedram), then creators.
 - **Status:** open; recorded at AH-059 (D7d) as a deliberately unmade product decision.
+
+---
+
+## Admin's `?connected=` creator filter has no supporting index (AH-079)
+
+- **Where:** [`AdminCreatorController::index`](../apps/api/app/Modules/Creators/Http/Controllers/Admin/AdminCreatorController.php)
+  — the `?connected=true|false` leg runs a correlated `EXISTS`/`NOT EXISTS` against
+  `agency_creator_relations` for every row the outer `creators` query considers, filtered to
+  `permitsMessaging()` (roster + non-blacklisted).
+- **What we accepted (AH-079, 2026-08-18):** `agency_creator_relations` carries exactly two indexes
+  ([`2026_05_14_100007_create_agency_creator_relations_table.php:113-119`](../apps/api/database/migrations/2026_05_14_100007_create_agency_creator_relations_table.php)):
+  `unique_agency_creator (agency_id, creator_id)` and `idx_agency_creator_blacklisted (agency_id,
+is_blacklisted)` — both lead with `agency_id`. Neither serves `WHERE creator_id = ?`, so the
+  `whereColumn('agency_creator_relations.creator_id', 'creators.id')` correlation in the subquery
+  scans without an index assist. No new index ships with this chunk — the same posture as the
+  incomplete-creator-nudge query above and the AH-054/AH-056 precedents: a query nobody has measured
+  against real volume, run from an admin-only, low-QPS surface (a platform_admin browsing a paginated
+  list), where speculative tuning would be guessing.
+- **Why the three cheaper predicates were rejected instead of just eating this cost anyway (the
+  inventory's table, condensed):** (1) "any relation row exists regardless of status" is cheaper (no
+  `is_blacklisted`/`relationship_status` filtering) but wrong — a `pending_request` or `declined`
+  creator would show as connected, which is a materially different (and false) admin-facing fact,
+  not a shortcut; (2) "roster status only, skip the blacklist leg" is cheaper still but reintroduces
+  exactly the gap AH-051 exists to close — a blacklisted-rostered creator with an active row would
+  read as connected when contact/messaging with it is closed; (3) a denormalised `creators.is_connected`
+  boolean would be O(1) to filter but requires a write-path hook on every relation mutation (connect,
+  disconnect, blacklist, un-blacklist, decline, re-request) across `AdminCreatorConnectionController`
+  and every agency-side transition — real ongoing maintenance for a low-traffic admin list, and a second
+  source of truth `permitsMessaging()` could silently drift from. The honest EXISTS was chosen because
+  it can never drift from the single scope every other messaging-gate consumer shares.
+- **Trigger:** volume — `agency_creator_relations` or `creators` growing to a size where this admin
+  page's load time becomes noticeable (rule-of-thumb: tens of thousands of creators), OR the filter
+  gaining traffic beyond occasional admin triage (e.g. an automated report running it on a schedule).
+- **Resolution:** add a `creator_id`-leading index — likely `(creator_id, relationship_status,
+is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check the `EXPLAIN` for both
+  the `EXISTS` and `NOT EXISTS` forms (the latter is typically the more expensive one to plan).
+- **Owner:** creators/agencies, or whoever ships the next `agency_creator_relations`-scaling pass
+  (shares a trigger class with the AH-054/AH-056 entries above).
+- **Status:** open (deferred by design). Recorded in
+  [admin-all-creators-filters-review.md](reviews/admin-all-creators-filters-review.md), 2026-08-18.
