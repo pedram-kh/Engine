@@ -76,6 +76,11 @@ const connectionState = computed<DiscoveryConnectionState>(() =>
 
 const displayName = computed(() => attrs.value?.display_name ?? t('app.discover.unnamed'))
 
+// Signed avatar for the header (short-lived, re-minted per page load). Null when
+// the creator never uploaded one — the initial stands in.
+const avatarUrl = computed(() => attrs.value?.avatar_url ?? null)
+const avatarInitial = computed(() => (displayName.value || '?')[0]?.toUpperCase() ?? '?')
+
 // Profile completeness (the same profile_completeness_score the creator sees on
 // their dashboard) surfaced read-only to the agency. The score→colour rule
 // mirrors CreatorDashboardPage verbatim so "complete" reads identically on both
@@ -253,10 +258,15 @@ onMounted(() => {
     />
 
     <template v-else-if="profile !== null && attrs !== null">
-      <!-- Header: name + the three connection annotation states + the
+      <!-- Header: avatar + name + the three connection annotation states + the
            status-driven send-request affordance (D-10/D-11). -->
       <v-card variant="outlined" class="discover-profile__header-card">
-        <v-card-text class="discover-profile__header d-flex align-start justify-space-between ga-3">
+        <v-card-text class="discover-profile__header d-flex align-start ga-4">
+          <v-avatar size="72" color="primary" data-test="discover-profile-avatar">
+            <v-img v-if="avatarUrl" :src="avatarUrl" :alt="displayName" cover />
+            <span v-else class="text-h6 font-weight-bold text-white">{{ avatarInitial }}</span>
+          </v-avatar>
+
           <div class="discover-profile__header-text">
             <h1 class="text-h5 ma-0" data-test="discover-profile-name">{{ displayName }}</h1>
             <div class="d-flex flex-wrap align-center ga-2 mt-1">
@@ -321,8 +331,9 @@ onMounted(() => {
             />
           </div>
 
-          <!-- Status-driven action (D-10). Admin/manager only (canSend). -->
-          <div class="d-flex align-center ga-2">
+          <!-- Status-driven action (D-10). Admin/manager only (canSend).
+               `ms-auto` keeps it hard right now that the avatar leads the row. -->
+          <div class="d-flex align-center ga-2 ms-auto">
             <!-- connected → the existing READ link to the relation-gated roster
                detail (keys on `roster` specifically, D-5). -->
             <v-btn

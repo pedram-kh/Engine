@@ -214,6 +214,27 @@ describe('CreatorDetailPage (Sprint 6 Chunk 2a)', () => {
     expect(emailLink.attributes('href')).toBe('mailto:ada@example.com')
   })
 
+  it('shows the creator photo in the header, falling back to the initial', async () => {
+    const withPhoto = await mountDetail({
+      detail: makeDetail({}, { avatar_url: 'https://signed.example/ada.jpg' }),
+    })
+    cleanup = withPhoto.cleanup
+
+    const avatar = withPhoto.wrapper.find('[data-test="creator-detail-avatar"]')
+    expect(avatar.findComponent({ name: 'VImg' }).props('src')).toBe(
+      'https://signed.example/ada.jpg',
+    )
+
+    withPhoto.cleanup()
+
+    const noPhoto = await mountDetail({ detail: makeDetail({}, { avatar_url: null }) })
+    cleanup = noPhoto.cleanup
+
+    const fallback = noPhoto.wrapper.find('[data-test="creator-detail-avatar"]')
+    expect(fallback.findComponent({ name: 'VImg' }).exists()).toBe(false)
+    expect(fallback.text()).toBe('A')
+  })
+
   // AH-050 — the "Who appears in their content" row (display-only, D5).
   it('renders the companions row with localized chip labels when disclosed', async () => {
     const harness = await mountDetail({

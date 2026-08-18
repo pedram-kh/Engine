@@ -71,6 +71,11 @@ const creator = computed(() => detail.value?.attributes.creator ?? null)
 const displayName = computed(() => creator.value?.display_name ?? t('app.roster.detail.unnamed'))
 const email = computed(() => creator.value?.email ?? null)
 
+// Signed avatar for the header (60-min TTL, re-minted per page load). Null when
+// the creator never uploaded one — the initial stands in.
+const avatarUrl = computed(() => creator.value?.avatar_url ?? null)
+const avatarInitial = computed(() => (displayName.value || '?')[0]?.toUpperCase() ?? '?')
+
 // Account-creation identity (sign-up first/last name). Same relation-exists
 // privacy basis as the contact email; never surfaced on discover.
 const accountFirstName = computed(() => creator.value?.account_name ?? null)
@@ -336,33 +341,40 @@ onMounted(() => {
     />
 
     <template v-else-if="detail !== null && attrs !== null && creator !== null">
-      <!-- Header: name + contact email + status chips (D-2a-8) -->
+      <!-- Header: avatar + name + contact email + status chips (D-2a-8) -->
       <v-card variant="outlined" class="creator-detail__header-card">
         <v-card-text class="creator-detail__header d-flex align-start justify-space-between ga-3">
-          <div class="creator-detail__header-text">
-            <h1 class="text-h5 ma-0" data-test="creator-detail-name">{{ displayName }}</h1>
-            <a
-              v-if="email"
-              :href="`mailto:${email}`"
-              class="creator-detail__email"
-              data-test="creator-detail-email"
-            >
-              {{ email }}
-            </a>
-            <div class="d-flex flex-wrap ga-2 mt-1">
-              <v-chip size="small" variant="tonal" data-test="creator-detail-relationship-status">
-                {{ t(`app.roster.status.${attrs.relationship_status}`) }}
-              </v-chip>
-              <v-chip size="small" variant="flat" data-test="creator-detail-application-status">
-                {{ t(`app.roster.applicationStatus.${creator.application_status}`) }}
-              </v-chip>
-              <BlacklistBadge
-                v-if="attrs.is_blacklisted"
-                :type="blacklistType"
-                :label="t(`app.roster.blacklist.badge.${blacklistType}`)"
-                size="small"
-                data-test="creator-detail-blacklist"
-              />
+          <div class="d-flex align-start ga-4">
+            <v-avatar size="72" color="primary" data-test="creator-detail-avatar">
+              <v-img v-if="avatarUrl" :src="avatarUrl" :alt="displayName" cover />
+              <span v-else class="text-h6 font-weight-bold text-white">{{ avatarInitial }}</span>
+            </v-avatar>
+
+            <div class="creator-detail__header-text">
+              <h1 class="text-h5 ma-0" data-test="creator-detail-name">{{ displayName }}</h1>
+              <a
+                v-if="email"
+                :href="`mailto:${email}`"
+                class="creator-detail__email"
+                data-test="creator-detail-email"
+              >
+                {{ email }}
+              </a>
+              <div class="d-flex flex-wrap ga-2 mt-1">
+                <v-chip size="small" variant="tonal" data-test="creator-detail-relationship-status">
+                  {{ t(`app.roster.status.${attrs.relationship_status}`) }}
+                </v-chip>
+                <v-chip size="small" variant="flat" data-test="creator-detail-application-status">
+                  {{ t(`app.roster.applicationStatus.${creator.application_status}`) }}
+                </v-chip>
+                <BlacklistBadge
+                  v-if="attrs.is_blacklisted"
+                  :type="blacklistType"
+                  :label="t(`app.roster.blacklist.badge.${blacklistType}`)"
+                  size="small"
+                  data-test="creator-detail-blacklist"
+                />
+              </div>
             </div>
           </div>
 

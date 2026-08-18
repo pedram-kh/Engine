@@ -195,6 +195,27 @@ describe('DiscoverProfilePage', () => {
     expect(harness.wrapper.find('[data-test="creator-detail-rating"]').exists()).toBe(false)
   })
 
+  it('shows the creator photo in the header, falling back to the initial', async () => {
+    const withPhoto = await mountProfile({
+      profile: makeProfile({ avatar_url: 'https://signed.example/ada.jpg' }),
+    })
+    cleanup = withPhoto.cleanup
+
+    const avatar = withPhoto.wrapper.find('[data-test="discover-profile-avatar"]')
+    expect(avatar.findComponent({ name: 'VImg' }).props('src')).toBe(
+      'https://signed.example/ada.jpg',
+    )
+
+    withPhoto.cleanup()
+
+    const noPhoto = await mountProfile({ profile: makeProfile({ avatar_url: null }) })
+    cleanup = noPhoto.cleanup
+
+    const fallback = noPhoto.wrapper.find('[data-test="discover-profile-avatar"]')
+    expect(fallback.findComponent({ name: 'VImg' }).exists()).toBe(false)
+    expect(fallback.text()).toBe('A')
+  })
+
   it('surfaces the read-only profile completeness score to the agency', async () => {
     const harness = await mountProfile({
       profile: makeProfile({ profile_completeness_score: 90 }),
