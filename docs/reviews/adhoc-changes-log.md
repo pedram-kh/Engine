@@ -70,6 +70,56 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-081 · Minimal rich text: links + bold/italic + breaks in briefs and descriptions
+
+- **Status:** Landed (push HELD). Full loop — kickoff with locked decisions (D1–D6) → plan-pause
+  (six proposals ratified verbatim) → build → two-commit pair, push held. Review file is the
+  record.
+- **Commits:** feature + docs commits carrying this entry (see `git log` at the tip for the exact
+  hashes).
+- **Date:** 2026-08-19
+- **Why:** `offer_description` (the invite "what we expect" field) and `campaigns.description`
+  rendered as raw text everywhere, including the creator job-board detail page — an agency
+  couldn't emphasize a word, link a style guide, or break a brief into paragraphs without it
+  showing up as literal asterisks and run-on text in a creator's browser.
+- **What:** one shared sanitized renderer, `useBioRenderer.ts`'s tighter sibling —
+  `useRichBriefRenderer.ts` (`markdown-it` + `DOMPurify`, allowlist of exactly `p, br, strong, em,
+a`, `breaks: true`, a custom http(s)-only `validateLink` PLUS a pinned `ALLOWED_URI_REGEXP` as
+  two independent link defences, forced `rel="noopener noreferrer" target="_blank"`) and one
+  display component, `RichBrief.vue` — the single `v-html` call site in the codebase for this
+  content, following the AH-063 inline-disable precedent. Converted all 5 render sites across the
+  two fields' pipelines (creator assignment list + detail, the agency board drawer, the agency
+  campaign overview, and the creator job-board detail — the XSS-critical one), confirmed the
+  AH-054 listing "description" field is the same `campaigns.description` column (no separate site
+  needed), raised `offer_description`'s cap 2000→3000 (FE+BE) and closed `campaigns.description`'s
+  FE `maxlength` gap to match its existing BE cap of 5000, and added a "links and bold supported"
+  hint (2 new i18n keys ×24 locales) to both editors.
+- **Decisions:** D6 — legacy content renders through the same pipeline as new content; any
+  pre-feature brief containing literal asterisks now renders as emphasis instead (the same posture
+  `useBioRenderer.ts` already ships for bios), stated plainly rather than escaped around. No
+  toolbar editor this chunk (D5) — textarea + hint, upgrade path named. No mail-safe variant —
+  neither field flows into any mail template, re-verified.
+- **Touched:** `useRichBriefRenderer.ts` (new, +spec), `RichBrief.vue` (new, +spec),
+  `CreatorAssignmentsPage.vue` (+spec), `CreatorAssignmentDetailPage.vue` (+spec),
+  `BoardCardDrawer.vue` (+spec), `CampaignDetailPage.vue` (+spec), `CreatorJobDetailPage.vue`
+  (+spec — the XSS-critical site), `OfferFieldsForm.vue`, `CampaignForm.vue`,
+  `ValidatesAssignmentOffer.php` (+the boundary-test diff in `CampaignApplicationAcceptTest.php`),
+  `en/app.json` + 23 locales (`campaigns.invite.formattingHint`,
+  `campaigns.fields.formattingHint`, real MT incl. the flaky-10), `creator-jobs-board.spec.ts`
+  (the c3 Playwright leg's markdown-fragment seed + `<strong>` assertion).
+- **Security note:** the break-revert case for the sanitizer's `ALLOWED_TAGS` allowlist was
+  verified in both directions during build — temporarily widening it to include `script` turned
+  the dedicated spec assertion red, then reverting turned it green again, so the claim that the
+  allowlist array is load-bearing (not merely decorative behind `markdown-it`'s `html: false`) is
+  demonstrated, not assumed.
+- **Playwright:** `creator-jobs-board.spec.ts`'s c3 leg gained a markdown fragment in its seeded
+  description and a `<strong>` assertion on the rendered job-detail page — the trust-boundary
+  conversion proven end to end, not just at the unit level. One pre-existing, unrelated failure
+  observed in the full local suite run (`2fa-enrollment-and-sign-in.spec.ts`) — reproduced
+  identically on the clean pre-AH-081 tip via `git stash`, not a regression from this chunk.
+- **Ref:** [`admin-filter-profile-modal-richtext-inventory.md`](admin-filter-profile-modal-richtext-inventory.md)
+  §0.2, I2.1–I2.3; full detail in [`minimal-rich-text-review.md`](minimal-rich-text-review.md).
+
 ### AH-080 · Creator Profile everywhere: one dialog, four mount contexts
 
 - **Status:** Landed (push HELD). Full loop — kickoff with locked decisions (D1–D5) → plan-pause
