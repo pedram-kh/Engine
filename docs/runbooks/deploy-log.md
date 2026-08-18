@@ -56,15 +56,33 @@ happened.
 
 ## 2026-08-16 · Draft Workflow v2 — numbered rounds + the optional posting flow (AH-068, AH-069) — PENDING
 
+> **Update (2026-08-18):** the eyes-on fix batch (AH-071 → AH-078) landed and is pushed on top of this
+> range without opening a new entry — it adds **no new deploy obligation of its own**. Zero `apps/api`
+> files touched across all eight items (confirmed by diff in
+> [`draft-v2-eyeson-batch-inventory.md`](../reviews/draft-v2-eyeson-batch-inventory.md) §5): no
+> migration, no route, no resource shape, no gate, no flag, no mail-copy change beyond the two locale
+> value-only string fixes AH-074 made (`creator.ui.assignments.subtitle`,
+> `app.campaigns.applications.accept.body` — SPA-rendered strings, not `lang/*.php` mail templates, so
+> they carry **no queue-worker restart obligation of their own**). This entry's posture stays exactly
+> **migrate-only + queue-worker restart + mandatory snapshot**, unchanged from AH-068/AH-069's own
+> requirements below; whoever deploys this range now carries AH-067 through AH-078, not just AH-068/069.
+> `docs/reviews/adhoc-changes-log.md` and `RESUMPTION-TEMPLATE.md` Part 2 carry the eight entries'
+> detail; this file states only what changes about the deploy, which is nothing.
+
 - **Status:** **PENDING.** AH-068 is pushed (`origin/main` = `45ee2e7f`); AH-069's three commits —
-  the plan-pause, the feature commit and the docs commit — are held. Stacks on top of the AH-067
-  entry below, which is itself still `PENDING`, so whoever deploys next carries **three** AH entries,
-  not one.
-- **Range:** `b13ee718` → the AH-069 docs commit at the tip. Code commits in the range:
+  the plan-pause, the feature commit and the docs commit — are held, and AH-071 → AH-078 (eighteen
+  further commits: sixteen build/spec commits, one post-review pin, one docs commit) are held on top
+  of them, per the update note above. Stacks on top of the AH-067 entry below, which is itself still
+  `PENDING`, so whoever deploys next carries the **full AH-067 → AH-078 range**, not three entries.
+- **Range:** `b13ee718` → the AH-078 docs commit at the tip. Code commits in the range:
   - `36fa454f` — `feat(drafts): number the review rounds and say so on every surface (AH-068)`
-  - `451388f1` — `feat(campaigns): let a campaign end at draft approval when creators do not post (AH-069)`.
-    (The remainder of the range is docs-only: inventory, two plan-pauses, two review files, this entry.)
-- **AH entries carried:** **AH-068, AH-069** — and AH-067 is still un-deployed below.
+  - `451388f1` — `feat(campaigns): let a campaign end at draft approval when creators do not post (AH-069)`
+  - the AH-071 → AH-078 batch, `5e61795a` → `3ef5d8ec` (sixteen commits, all `apps/main`-only — see
+    `adhoc-changes-log.md` for the per-commit-per-entry mapping) plus the AH-074 regression pin
+    (`c1f0add6`, `apps/main` test-only).
+    (The remainder of the range is docs-only: inventories, plan-pauses, review files, this entry.)
+- **AH entries carried:** **AH-068, AH-069, AH-071, AH-072, AH-073, AH-074, AH-075, AH-076, AH-077,
+  AH-078** — and AH-067 is still un-deployed below.
 - **Migrations run:** **1** — `2026_08_16_100000_add_creator_posts_content_to_campaigns_table`.
   Adds `campaigns.creator_posts_content boolean NOT NULL DEFAULT true`. On Postgres this is a
   **catalogue-only** change: no table rewrite, no existing row read or written, and every existing

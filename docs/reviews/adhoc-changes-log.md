@@ -70,6 +70,241 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-078 · Creator profile photo on both detail pages, squared and previewable
+
+- **Status:** Landed. Mode B (direct-iteration, eyes-on) — no kickoff, no review file; this entry is
+  the record.
+- **Commits:** `676cc802`, `3ef5d8ec`.
+- **Date:** 2026-08-18
+- **Why:** neither the Roster creator-detail header nor the Discover profile header rendered a photo
+  at all — name only — despite both resources already carrying a signed `avatar_url` nobody consumed.
+  Follow-up ask: square it off (a hand-drawn reference showed a rounded rectangle, not the initial
+  circle mask, which was cropping too much of a portrait) and make it click-to-enlarge.
+- **What:** first pass rendered a plain `v-avatar` + `v-img`/initial-fallback on both headers. Second
+  pass replaced that with one shared `CreatorAvatar` component: `rounded="lg"` thumbnail, click (or
+  Enter/Space) opens a `v-dialog` lightbox with a blurred scrim and a floating close button — the same
+  pattern the portfolio gallery lower on both pages already uses, so a profile has one preview
+  behaviour, not two. Inert (no click affordance at all) when there is no photo.
+- **Touched:** `CreatorDetailPage.vue` (+spec), `DiscoverProfilePage.vue` (+spec), `CreatorAvatar.vue`
+  (new, +spec).
+- **Playwright:** `creator-detail.spec.ts`'s roster-row-to-detail test renders `CreatorDetailPage` and
+  would fail if the avatar addition broke the page, but does not assert on the avatar itself —
+  pass-through exposure, not a dedicated assertion.
+- **Ref:** [`draft-v2-eyeson-batch-inventory.md`](draft-v2-eyeson-batch-inventory.md) §2 (AH-078
+  candidate).
+
+### AH-077 · Two-pane messaging: header follows the conversation, bubbles carry the date
+
+- **Status:** Landed. Mode B (direct-iteration, eyes-on) — no kickoff, no review file; this entry is
+  the record. **Bug fix, not polish** — see the verified-pin note below.
+- **Commits:** `e30bb4c9`, `381b8d97`.
+- **Date:** 2026-08-18
+- **Why:** two independent findings on the relationship-messaging surface (AH-013's two-pane shell,
+  not part of this batch's own Draft Workflow v2 scope, surfaced because Pedram was eyes-on across the
+  whole app in the same session): (a) the two-pane shell keeps the thread page mounted when the
+  operator clicks a different conversation — only the route param changes — but the header resolved
+  the counterparty's name/photo once in `onMounted`, so a fast switch left the _feed_ correct and the
+  _header_ showing the previous person; (b) message bubbles stamped only the hour, so a thread
+  spanning days never said which one.
+- **What:** (a) both thread pages (`AgencyRelationshipThreadPage.vue`,
+  `CreatorRelationshipThreadPage.vue`) now re-resolve on every param change via `watch`, clearing the
+  resolved row first so the header falls back to the `?name=` hint instead of holding a stale face, and
+  discard any inbox response that lands after the operator has moved on again; (b) both bubble
+  surfaces (`RelationshipThreadView.vue`, `ChatPanel.vue`) switched their `Intl.DateTimeFormat` from
+  `{hour, minute}` to `{dateStyle: 'short', timeStyle: 'short'}`, kept on one line via
+  `white-space: nowrap` so a wrapped stamp can't read as two.
+- **Root cause (a):** **eyes-on-only class**, not a gap in any closed review. AH-013 (2026-06-29)
+  shipped the two-pane shell and changed the thread page's lifecycle; the header's `onMounted`-only
+  resolution was correct for the single-pane predecessor and became stale the moment AH-013 landed,
+  but no test ever simulated a _switch_ — only a fresh open. AH-013 has an ad-hoc-log entry but no
+  independent `-review.md` file with a decision/section structure the way `draft-rounds-review.md`
+  does, so there is no formal addendum target; this entry is the equivalent record.
+- **Verified as a real pin, not a decorative one.** New file `AgencyRelationshipThreadPage.spec.ts`, 4
+  tests, including one holding the inbox response mid-flight to prove no stale face renders and one
+  proving an out-of-order late response is discarded. Reverted to the pre-fix `onMounted` code: **2 of
+  the 4 tests fail** (`AssertionError: expected 'Nessa' to be 'Dan Richards'`); reapplied, all 4 pass.
+- **Touched:** `AgencyRelationshipThreadPage.vue` (+spec, new file), `CreatorRelationshipThreadPage.vue`,
+  `RelationshipThreadView.vue` (+spec), `ChatPanel.vue`.
+- **Playwright:** none of the 21 specs open the relationship-messaging two-pane surface at all —
+  genuinely E2E-uncovered, named rather than assumed covered.
+- **Ref:** [`draft-v2-eyeson-batch-inventory.md`](draft-v2-eyeson-batch-inventory.md) §2 (AH-077
+  candidate), §3 (root-cause table).
+
+### AH-076 · Browse-state persistence for Roster and Discover
+
+- **Status:** Landed. Mode B (direct-iteration, eyes-on) — no kickoff, no review file; this entry is
+  the record.
+- **Commit:** `8a1f3ae4`.
+- **Date:** 2026-08-18
+- **Why:** opening a creator from Roster or Discover and coming back reset to page 1 with search and
+  filters cleared, because all of it lived in local component refs that unmounted with the list. The
+  detail pages' own "Back" made it worse — it pushed a bare `/roster` or `/discover` rather than
+  unwinding to wherever the operator actually came from.
+- **What:** new `useListQueryState` composable puts page/search/filters in the URL (validated codecs,
+  `router.replace` so paging doesn't spam history); new `useBackToList` composable unwinds
+  `router.back()` when the previous history entry is the originating list (preserving its full URL +
+  scroll), else falls back to a bare push; router gained a `scrollBehavior` that waits for the async
+  list's content to actually render before restoring scroll offset (otherwise it lands at the bottom of
+  a skeleton).
+- **Drive-by bug, root cause eyes-on-only class:** Discover's `clearable` search box writes `null` on
+  clear, which threw inside `.trim()` in the load path — nobody had exercised "type, then clear"
+  against it since the box was added. Fixed in the same commit by reading through the same guarded
+  computed Roster already used.
+- **Touched:** `useListQueryState.ts` (new, +spec), `useBackToList.ts` (new, +spec),
+  `core/router/index.ts` (+spec), `DiscoverPage.vue` (+spec), `DiscoverProfilePage.vue`,
+  `CreatorRosterPage.vue` (+spec), `CreatorDetailPage.vue`.
+- **Playwright:** `roster-search-and-affordances.spec.ts` and `creator-detail.spec.ts` navigate
+  `/roster` → detail → back but assert neither URL query params nor scroll restoration — new,
+  E2E-uncovered surface, named rather than assumed covered.
+- **Ref:** [`draft-v2-eyeson-batch-inventory.md`](draft-v2-eyeson-batch-inventory.md) §2 (AH-076
+  candidate).
+
+### AH-075 · Real creator photo in the add-to-pool picker
+
+- **Status:** Landed. Mode B (direct-iteration, eyes-on) — no kickoff, no review file; this entry is
+  the record. Bug fix.
+- **Commit:** `1e062896`.
+- **Date:** 2026-08-18
+- **Why:** the picker rendered initials for every row on the premise that the slim roster row carries
+  no avatar — true when it was written, false since a July batch (`eb901dbb`) added `avatar_url` to
+  that same row type for a different picker (campaign invites). This dialog just never caught up.
+- **What:** render the photo when present, initials as fallback — the identical shape
+  `InviteCreatorsDialog` already uses on the same roster row.
+- **Root cause:** **stale catch-up**, not a gap in AH-068/069. `eb901dbb` (2026-07-12, sprint-numbered,
+  no independent review file) added the field for a different consumer; nobody circled back to this
+  one. No closed AH review exists for that batch to addend — named here instead, per the standing
+  instruction to say which decision missed it when no formal doc exists.
+- **Touched:** `AddCreatorsToPoolDialog.vue` (+spec).
+- **Playwright:** `talent-pools.spec.ts` adds a creator to a pool but doesn't assert on the picker
+  row's avatar rendering.
+- **Ref:** [`draft-v2-eyeson-batch-inventory.md`](draft-v2-eyeson-batch-inventory.md) §2 (AH-075
+  candidate), §3 (root-cause table).
+
+### AH-074 · Retire two stale counter-offer copy strings
+
+- **Status:** Landed. Mode B (direct-iteration, eyes-on) — no kickoff, no review file; this entry is
+  the record. Bug fix, now with its own regression pin (see below).
+- **Commits:** `f36ac4b9`, `27512a6a`; pin commit `c1f0add6` (2026-08-18, post-review).
+- **Date:** 2026-08-18
+- **Why:** the creator counter-offer flow was dropped by an earlier (July, sprint-numbered, not
+  AH-numbered) chunk, but two strings kept promising it: the creator's invitations-list subtitle and
+  the agency's accept-application dialog body.
+- **What:** rewrote both keys across all 24 locales. Several locales also carried a stale
+  half-translation or another language's text entirely and got a proper translation while touched.
+- **Root cause:** **stale catch-up**, same class as AH-075. `5626ddf7` (2026-07-12, sprint-numbered,
+  "re-offer after decline — drop creator counter") removed the counter-offer flow but the copy audit
+  didn't reach these two strings. No closed AH review exists for that batch — named here as the
+  equivalent of an addendum.
+- **The gap this closes.** Neither original commit added a spec asserting the _literal new sentence_ —
+  `i18n-locale-parity.spec.ts` proves keyset/placeholder/plural-shape parity across locales but would
+  not catch "counter" creeping back into the English source on a future edit. Closed post-review
+  (Pedram's ruling: a literal-sentence assertion is rejected as brittle; a targeted regex guard on
+  exactly these two keys is not) — `i18n-locale-parity.spec.ts` gained a fifth test asserting the en
+  values of `creator.ui.assignments.subtitle` and `app.campaigns.applications.accept.body` do not match
+  `/counter/i`. **Verified as a real pin**: reverted `creator.ui.assignments.subtitle` to its pre-fix
+  wording, the new test fails; restored, it passes. Deliberately not a blanket word ban —
+  `app.campaigns.reinvite.body` ("They countered with {fee}…") legitimately still describes the
+  agency-side counter-offer that remains.
+- **Touched:** `en/...json` ×2 keys, mirrored in all 24 locale files for `creator.json` (subtitle) and
+  `app.json` (accept body) — 48 file edits, one line each. Pin:
+  `apps/main/tests/unit/architecture/i18n-locale-parity.spec.ts`.
+- **Playwright:** none of the 21 specs assert on either changed sentence.
+- **Ref:** [`draft-v2-eyeson-batch-inventory.md`](draft-v2-eyeson-batch-inventory.md) §2 (AH-074
+  candidate), §3 (root-cause table), §9 (the gap, as originally flagged).
+
+### AH-073 · Review-action row: position + alignment
+
+- **Status:** Landed. Mode B (direct-iteration, eyes-on) — no kickoff, no review file; this entry is
+  the record. Pure polish — no bug, no root cause, no pin needed.
+- **Commits:** `6134604c`, `0099cbe5`.
+- **Date:** 2026-08-17
+- **Why/What:** two direct layout requests on the extracted `DraftReviewPanel.vue` (AH-072) — the
+  Reject / Request changes / Approve row moved above the feedback field (act, then the field for the
+  act you picked), then right-aligned within its row.
+- **Touched:** `DraftReviewPanel.vue`.
+- **Playwright:** the same `hand-off-at-approval-lifecycle.spec.ts` click path traverses this row; its
+  selectors are order-independent and unaffected.
+- **Ref:** [`draft-v2-eyeson-batch-inventory.md`](draft-v2-eyeson-batch-inventory.md) §2 (AH-073
+  candidate).
+
+### AH-072 · Board card drawer gets a full-review Drafts tab
+
+- **Status:** Landed. Mode B (direct-iteration, eyes-on) — no kickoff, no review file; this entry is
+  the record.
+- **Commits:** `7a9a01f1`, `49da7aa9`.
+- **Date:** 2026-08-17
+- **Why:** the board card drawer could preview a card's draft history but not act on it — approving,
+  requesting changes, or rejecting still meant leaving the board for the campaign's own Drafts tab.
+- **What:** extracted `ReviewDraftDrawer`'s preview + feedback field + three review actions + reject
+  confirmation into a shared `DraftReviewPanel`, hosted both by `ReviewDraftDrawer` (now dialog chrome
+  only) and by the board drawer's own Drafts tab (embedded). The Detail tab's "Review" button now
+  switches to the drawer's own Drafts tab instead of closing the drawer and handing off to the campaign
+  page; the resulting dead `review`-emit chain (`BoardCardDrawer` → `BoardView` → `CampaignDetailPage`)
+  was removed. The panel gates its actions on an explicit `canReview` prop since the board drawer's
+  Drafts tab has no upstream ability check the way the drawer's own mount condition did.
+- **Touched:** `BoardCardDrawer.vue` (+spec), `BoardView.vue`, `DraftReviewPanel.vue` (new, +spec),
+  `ReviewDraftDrawer.vue` (+spec), `CampaignDetailPage.vue` (+spec),
+  `tests/unit/architecture/form-error-pattern.spec.ts` (allowlist rename-track: the 422-binding code
+  moved to `DraftReviewPanel.vue`, so `ReviewDraftDrawer.vue` came off `CANONICAL_422_FILES` and the
+  panel went on — the assertion itself is unweakened, still exactly-one-canonical-file).
+- **Playwright — real, verified exposure.** `hand-off-at-approval-lifecycle.spec.ts` (the OFF-lifecycle
+  leg) directly traverses this: opens a draft via `[data-test^="drafts-review-"]`, asserts
+  `[data-test="review-draft-drawer"]` visible, clicks `[data-test="review-approve"]`. All three
+  selectors verified present and unchanged post-refactor by grep before the run, then **confirmed live**
+  in this session's full Playwright pass (§ below) — the leg's surface moved (the review UI now lives
+  in a different component) but its E2E contract did not.
+- **Ref:** [`draft-v2-eyeson-batch-inventory.md`](draft-v2-eyeson-batch-inventory.md) §2 (AH-072
+  candidate), §4 (pinned-surface audit, the D5/422-allowlist notes).
+
+### AH-071 · Draft-round history: readable feedback, colored by outcome, bold title, honest per-row status
+
+- **Status:** Landed. Mode B (direct-iteration, eyes-on) — no kickoff, no review file; this entry is
+  the record. Contains the batch's headline bug fix, a real gap in a **pre-AH-068** row, not in
+  AH-068's own closed review — see the root-cause note below.
+- **Commits:** `5e61795a`, `088a6540`, `b132c65e`, `174b4ca3`.
+- **Date:** 2026-08-17
+- **Why:** three separate eyes-on findings, all on the same three draft-review surfaces (agency Drafts
+  tab, agency Review-draft drawer, creator's own draft history): (a) an already-approved assignment's
+  earlier "changes requested" rounds displayed "Approved" too, because a second chip echoed the
+  assignment's _current_ status onto every row; (b) multi-line feedback text collapsed to one line — no
+  surface applied `white-space: pre-wrap`; (c) every round chip was the same `primary` blue and the
+  changes-requested round's feedback was unreadable pale-on-amber.
+- **What:** removed the contradicting status chip; added `roundStateColor()` (round outcome → Vuetify's
+  existing success/warning/error/info vocabulary, not a new palette) and rendered rounds as colored
+  tonal cards; applied `pre-wrap`/`break-word` to every feedback-rendering spot; bolded round titles;
+  computed the on-card foreground from the same `on-<color>` design tokens Vuetify's own solid surfaces
+  use, shared via a new `roundCardTextStyle()` helper.
+- **Root cause of (a), the double-chip bug — the finding worth naming plainly.** **Pre-existing**,
+  traced to `a8c48233`, the Drafts tab's _original_ commit — older than AH-068. Class: **spec gap**,
+  reproducible in Vitest the whole time; nobody wrote the negative ("a historical round does not also
+  show the assignment's live status"). **AH-068 did not cause this bug — it made it visible**, by
+  giving the round chip readable, distinguishable text for the first time where before every chip read
+  alike. AH-068's own closed review (`draft-rounds-review.md`) is not addended: the bug predates that
+  chunk's decision set, so there is nothing in it to have missed. Pin: new test in `DraftsTab.spec.ts`,
+  _"a changes-requested round does not also show the assignment's current status."_
+- **(b) and (c) are eyes-on-only class**, not regressions — no surface had ever applied `pre-wrap` or
+  color-coded the chip; this is a gap that existed since `review_feedback` first shipped as free text.
+  Self-reported pin gap: jsdom does not compute CSS `white-space` collapsing, so a test can prove the
+  style rule is _applied_ (a class/style assertion) but not that the browser _renders_ it correctly —
+  accepted as a known limit of the unit-test layer rather than escalated. `roundStateColor()`'s outcome
+  mapping itself is fully covered in `draftRounds.spec.ts`.
+- **Near-miss, self-caught, no stop needed.** The first attempt at the warning-card contrast fix used a
+  raw `rgba(0, 0, 0, 0.75)` literal; `no-hard-coded-colors.spec.ts` caught it immediately, same commit —
+  swapped for the audited `on-warning` token pattern rather than touching the architecture test.
+- **Touched:** `DraftsTab.vue` (+spec), `ReviewDraftDrawer.vue` (+spec),
+  `CreatorAssignmentDetailPage.vue`, `draftRounds.ts` (+spec) — two new pure functions appended,
+  nothing existing changed.
+- **Pinned-surface check.** D5's containing files (this entry's own `DraftsTab.vue`,
+  `ReviewDraftDrawer.vue`, `CreatorAssignmentDetailPage.vue`) were touched; D5's _mechanism_
+  (`roundState()`/`roundStateKey()` in `draftRounds.ts`) and its pinned tests
+  (`NotificationCenter.spec.ts`, `templates.spec.ts`) were **not** — confirmed byte-identical by diff,
+  not assumed.
+- **Playwright:** none of the 21 specs assert on round-chip color, bold weight, or feedback whitespace.
+  `hand-off-at-approval-lifecycle.spec.ts` traverses the surface structurally but asserts nothing about
+  these specifics.
+- **Ref:** [`draft-v2-eyeson-batch-inventory.md`](draft-v2-eyeson-batch-inventory.md) §2 (AH-071
+  candidate), §3 (root-cause table), §4 (D5 audit), §6 (the near-miss).
+
 ### AH-070 · CI had been red for five days — the AWS region the suite needed was coming from a `.env` nobody wrote on purpose
 
 - **Status:** Landed. A small fix with an uncomfortable finding attached, so the entry carries the

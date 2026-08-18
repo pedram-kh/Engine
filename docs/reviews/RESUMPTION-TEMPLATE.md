@@ -116,8 +116,76 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-08-17 · **Through:** AH-070 (and its same-day follow-through) · **Nothing is
-held.** Since the AH-069 close (`1ff678ec`), `origin/main` moved by nine commits: the AH-070 pair
+**Last updated:** 2026-08-18 · **Through:** AH-078, an eight-item eyes-on fix batch built directly on
+Pedram's live walkthrough of Draft Workflow v2 (Mode B — no kickoff, no per-item review file; each
+item confirmed before it was built). **Nothing is held.** Since the AH-070 follow-through's close
+(`7d826dea`), `origin/main` moved by eighteen commits: the sixteen AH-071 → AH-078 build/spec commits
+(`5e61795a` … `3ef5d8ec`, all `apps/main`-only — see `adhoc-changes-log.md` for the eight per-entry
+commit mappings), the post-review AH-074 regression pin (`c1f0add6`), and the docs commit at the tip
+carrying the inventory, all eight AH entries, this refresh, and the `deploy-log.md` update (a commit
+cannot record its own hash).
+
+> **📝 AH-071 → AH-078 — EYES-ON FIX BATCH ON DRAFT WORKFLOW V2 (plus drive-by messaging/pool/copy
+> fixes Pedram caught in the same walkthrough).** Full detail, themes, and evidence in
+> [`draft-v2-eyeson-batch-inventory.md`](draft-v2-eyeson-batch-inventory.md); each of the eight themes
+> also has its own `### AH-NNN` entry in `adhoc-changes-log.md`. Headline facts, not a restatement:
+>
+> 1. **Zero `apps/api` diff across all eight items** — no migration, no route, no resource shape, no
+>    gate, no flag. This alone clears five of the eight closed-chunk pinned surfaces (Q1, Q3, the
+>    refuse-flip, the render filter, the round-numbering templates), since all five live exclusively in
+>    backend code. **D5's containing files** (`DraftsTab.vue`, `ReviewDraftDrawer.vue`,
+>    `CreatorAssignmentDetailPage.vue`) were touched by AH-071/072 — styling and a dead-chip removal
+>    only — but D5's own mechanism (`roundState()`/`roundStateKey()` in `draftRounds.ts`) and its
+>    pinned tests (`NotificationCenter.spec.ts`, `templates.spec.ts`) are byte-identical, verified by
+>    diff. Zero stop-gates were hit; one near-miss (a raw `rgba()` literal) was self-caught by the
+>    existing `no-hard-coded-colors.spec.ts` in the same commit it appeared in.
+> 2. **Six of the eight items surfaced a real bug, and every one traces cleanly.** Three
+>    (`5e61795a`'s double status chip, the AH-013 messaging-header staleness, the two stale
+>    counter-offer copy strings) are **older than AH-068/069** — either made newly _visible_ by
+>    AH-068's own readable round text, or left behind by an unrelated July sprint chunk with no
+>    independent review file to addend. **None is a gap in AH-068's or AH-069's own closed review.**
+>    The messaging-header fix (AH-077, `e30bb4c9`) is verified as a real pin, not a decorative one:
+>    reverted to the pre-fix code, 2 of its 4 new tests fail.
+> 3. **One post-review addition: a regression guard for the resurrected-copy class.** AH-074's two
+>    stale-copy fixes shipped without a test asserting the literal new sentence — closed with a
+>    targeted `i18n-locale-parity.spec.ts` test asserting the en values of the two fixed keys don't
+>    match `/counter/i` (not a blanket word ban — `app.campaigns.reinvite.body` legitimately still
+>    describes a real counter-offer). Verified as a real pin the same way: reverted, fails; restored,
+>    passes.
+> 4. **The batch's real boundary was "whatever Pedram looked at," not "Draft Workflow v2."** AH-077
+>    (messaging header + bubble dates, AH-013's surface) and AH-074/AH-075 (stale copy, pool avatars,
+>    both from an unrelated July sprint chunk) are logged as independent single-item entries rather
+>    than pretended sub-chunks of the Draft Workflow v2 epic, per the inventory's own naming of this.
+> 5. **The kickoff's "28 specs" figure, resolved rather than carried forward wrong.** It was `apps/main`'s
+>    own test count all along, matching the AH-059-era convention ("27 tests… `apps/main` is X tests
+>    across Y files") — confirmed by this close-out's own full run: **`apps/main` is 28 tests across 19
+>    files; with `apps/admin`'s 2 tests across 2 files, the combined suite is 30 tests across 21
+>    files.** Use the combined figure ("30 tests / 21 files") going forward; "28 specs" alone means
+>    main only.
+>
+> **Batch gate board (2026-08-18).** `apps/main` Vitest — full suite green (per the prior AH-070-era
+> board; unchanged file/test totals beyond this batch's own new specs, re-verified green at this tip);
+> `npx vue-tsc --noEmit` clean; ESLint 0 errors (2 pre-existing unrelated `v-html` warnings); Prettier
+> clean on `src`/`tests`. **Full Playwright, dev stack brought down first, both projects, dev stack
+> restarted and health-checked after:** `apps/main` **28/28** (all green, first pass, no flake this
+> run); `apps/admin` **2/2 effective** (one red, `admin-mandatory-mfa-enrollment.spec.ts`'s D7
+> deep-link case — the same documented cold-start-flake class as the historical
+> `2fa-enrollment-and-sign-in` flake: green on an isolated re-run, local `retries: 0` where CI has 2).
+> AH-072's claimed E2E exposure (the `hand-off-at-approval-lifecycle.spec.ts` OFF-lifecycle leg
+> traversing the refactored review UI) is now **confirmed live**, not just by selector grep. Dev stack
+> restarted after, health-checked 200 on `:5173`, `:5174` and `:8000/up`. **E2E DB isolation held**: dev
+> `catalyst` unchanged at 44 users / 2 agencies / 39 creators / 11 campaigns before and after, while
+> `catalyst_e2e` ran its own fresh `migrate:fresh`. Backend gates not re-run — zero `apps/api` diff this
+> session (§5 of the inventory).
+>
+> **Deploy obligation: none of its own.** Stacks on top of the AH-068/069 `PENDING` deploy-log entry
+> without changing its posture — still migrate-only + mandatory snapshot + queue-worker restart; see
+> the 2026-08-18 update note at the top of that entry. AH-074's two changed strings are SPA-rendered
+> i18n values (`apps/main/src/core/i18n/locales`), not `lang/*.php` mail templates, so they carry no
+> _additional_ queue-worker-restart trigger of their own.
+
+**Prior state, for the record — AH-070 (and its same-day follow-through).** Since the AH-069 close
+(`1ff678ec`), `origin/main` moved by nine commits: the AH-070 pair
 (`f771a7cf` — the `phpunit.xml` + CI fix for the missing AWS region; the docs commit logging it),
 `a9050e44` citing AH-070's CI run, then the follow-through — the hermetic-suite CI step (`66d1fa18`),
 the §5.41 CI-green-at-push standing rule (`a7900152`), a citation commit (`e9a41917`) whose own CI run
