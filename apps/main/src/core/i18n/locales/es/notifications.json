@@ -17,6 +17,7 @@
       "empty": "Aún no tienes notificaciones."
     },
     "types": {
+      "assignment_invited": "Has recibido una nueva oferta para {campaign_name}.",
       "assignment_draft_approved": "Tu borrador para {campaign_name} se ha aprobado.",
       "assignment_revision_requested": "Se han solicitado cambios en tu borrador para {campaign_name}.",
       "assignment_draft_rejected": "Tu borrador para {campaign_name} se ha rechazado.",
@@ -58,6 +59,7 @@
         "digest": "Resumen diario por correo"
       },
       "typeLabels": {
+        "assignment_invited": "Se recibe una invitación a una campaña",
         "assignment_draft_submitted": "Se envía un borrador para revisión",
         "assignment_contracted": "Se acepta un contrato",
         "assignment_revision_requested": "Se solicitan cambios en un borrador",

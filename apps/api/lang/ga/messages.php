@@ -27,4 +27,13 @@ return [
         'unknown_campaign' => 'feachtas',
         'unknown_counterparty' => 'duine éigin',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Teachtaireacht nua faoi :counterparty',
+        'subject_relationship' => 'Teachtaireacht nua ó :counterparty',
+        'greeting' => 'Dia duit, :name,',
+        'body_campaign' => 'Sheol :sender teachtaireacht nua chugat faoi ":counterparty".',
+        'body_relationship' => 'Sheol :sender ó :counterparty teachtaireacht nua chugat.',
+        'cta' => 'Oscail an comhrá',
+    ],
 ];

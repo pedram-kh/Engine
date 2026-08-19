@@ -10,6 +10,7 @@ use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
 use App\Modules\Creators\Features\JobPostedNotificationsEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
+use App\Modules\Creators\Features\MissingCreatorMailsEnabled;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Creators\Integrations\Contracts\EsignProvider;
@@ -260,6 +261,7 @@ final class CreatorsServiceProvider extends ServiceProvider
         Feature::define(IncompleteCreatorNudgeEnabled::NAME, IncompleteCreatorNudgeEnabled::default());
         Feature::define(JobPostedNotificationsEnabled::NAME, JobPostedNotificationsEnabled::default());
         Feature::define(ApplicationNotificationsEnabled::NAME, ApplicationNotificationsEnabled::default());
+        Feature::define(MissingCreatorMailsEnabled::NAME, MissingCreatorMailsEnabled::default());
     }
 
     private function registerRoutes(): void

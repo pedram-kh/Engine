@@ -28,4 +28,13 @@ return [
         'unknown_campaign' => 'кампания',
         'unknown_counterparty' => 'някой',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Ново съобщение относно :counterparty',
+        'subject_relationship' => 'Ново съобщение от :counterparty',
+        'greeting' => 'Здравей, :name,',
+        'body_campaign' => ':sender ви изпрати ново съобщение относно ":counterparty".',
+        'body_relationship' => ':sender от :counterparty ви изпрати ново съобщение.',
+        'cta' => 'Отвори разговора',
+    ],
 ];

@@ -81,6 +81,16 @@ return [
                 'cta' => 'Poglej kampanjo',
             ],
         ],
+        'invite_received' => [
+            'email' => [
+                'subject_fresh' => 'Imate novo ponudbo za :campaign',
+                'subject_re_offer' => 'Posodobljena ponudba za :campaign',
+                'greeting' => 'Pozdravljeni, :name,',
+                'body_fresh' => 'Povabljeni ste, da sodelujete pri ":campaign". Odprite nalogo, da si ogledate ponudbo in odgovorite.',
+                'body_re_offer' => 'Na ":campaign" vas čaka posodobljena ponudba. Odprite nalogo, da si jo ogledate in odgovorite.',
+                'cta' => 'Ogled ponudbe',
+            ],
+        ],
     ],
     // AH-056 (Jobs Board chunk 3, D6) — the job-posted fan-out mail. Queued and
     // localized at queue time to the recipient's preferred_language, rendered

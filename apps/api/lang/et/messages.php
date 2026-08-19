@@ -27,4 +27,13 @@ return [
         'unknown_campaign' => 'kampaania',
         'unknown_counterparty' => 'keegi',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Uus sõnum teemal :counterparty',
+        'subject_relationship' => 'Uus sõnum saatjalt :counterparty',
+        'greeting' => 'Tere, :name,',
+        'body_campaign' => ':sender saatis teile uue sõnumi teemal ":counterparty".',
+        'body_relationship' => ':sender ettevõttest :counterparty saatis teile uue sõnumi.',
+        'cta' => 'Ava vestlus',
+    ],
 ];

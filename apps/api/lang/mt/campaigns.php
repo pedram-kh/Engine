@@ -81,6 +81,16 @@ return [
                 'cta' => 'Ara l-kampanja',
             ],
         ],
+        'invite_received' => [
+            'email' => [
+                'subject_fresh' => 'Għandek offerta ġdida għal :campaign',
+                'subject_re_offer' => 'Offerta aġġornata għal :campaign',
+                'greeting' => 'Bonġu, :name,',
+                'body_fresh' => 'Ġejt mistieden taħdem fuq ":campaign". Iftaħ il-kompitu biex tirrevedi l-offerta u twieġeb.',
+                'body_re_offer' => 'Hemm offerta aġġornata tistenniek fuq ":campaign". Iftaħ il-kompitu biex tirrevediha u twieġeb.',
+                'cta' => 'Ara l-offerta',
+            ],
+        ],
     ],
     // AH-056 (Jobs Board chunk 3, D6) — the job-posted fan-out mail. Queued and
     // localized at queue time to the recipient's preferred_language, rendered

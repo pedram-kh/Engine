@@ -81,6 +81,16 @@ return [
                 'cta' => 'Féach ar fheachtas',
             ],
         ],
+        'invite_received' => [
+            'email' => [
+                'subject_fresh' => 'Tá tairiscint nua agat do :campaign',
+                'subject_re_offer' => 'Tairiscint nuashonraithe do :campaign',
+                'greeting' => 'Dia duit, :name,',
+                'body_fresh' => 'Tugadh cuireadh duit obair a dhéanamh ar ":campaign". Oscail an cúram chun an tairiscint a athbhreithniú agus freagra a thabhairt.',
+                'body_re_offer' => 'Tá tairiscint nuashonraithe ag fanacht leat ar ":campaign". Oscail an cúram chun í a athbhreithniú agus freagra a thabhairt.',
+                'cta' => 'Féach ar an tairiscint',
+            ],
+        ],
     ],
     // AH-056 (Jobs Board chunk 3, D6) — the job-posted fan-out mail. Queued and
     // localized at queue time to the recipient's preferred_language, rendered

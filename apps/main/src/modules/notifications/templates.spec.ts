@@ -33,7 +33,8 @@ import enNotifications from '@/core/i18n/locales/en/notifications.json'
  * real template — otherwise the notification reaches users as a shrug.
  */
 const DEFERRED_WITHOUT_EMITTER = [
-  'assignment.invited',
+  // AH-083 (①) — `assignment.invited` went live (dual-emit invite mail +
+  // in-app), so it left this allowlist and gained a real registration below.
   'assignment.declined',
   'assignment.countered',
   'assignment.accepted',

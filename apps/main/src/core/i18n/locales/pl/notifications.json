@@ -17,6 +17,7 @@
       "empty": "Nie masz jeszcze żadnych powiadomień."
     },
     "types": {
+      "assignment_invited": "Otrzymałeś nową ofertę dla {campaign_name}.",
       "assignment_draft_approved": "Twój szkic dla {campaign_name} został zatwierdzony.",
       "assignment_revision_requested": "Zażądano poprawek Twojego szkicu dla {campaign_name}.",
       "assignment_draft_rejected": "Twój szkic dla {campaign_name} został odrzucony.",
@@ -58,6 +59,7 @@
         "digest": "Dzienny digest e-mail"
       },
       "typeLabels": {
+        "assignment_invited": "Zaproszenie do kampanii zostaje odebrane",
         "assignment_draft_submitted": "Szkic zostaje przesłany do recenzji",
         "assignment_contracted": "Umowa zostaje zaakceptowana",
         "assignment_revision_requested": "Zażądano poprawek szkicu",

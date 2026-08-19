@@ -17,6 +17,7 @@
       "empty": "Non hai ancora notifiche."
     },
     "types": {
+      "assignment_invited": "Hai ricevuto una nuova offerta per {campaign_name}.",
       "assignment_draft_approved": "La tua bozza per {campaign_name} è stata approvata.",
       "assignment_revision_requested": "Sono state richieste modifiche alla tua bozza per {campaign_name}.",
       "assignment_draft_rejected": "La tua bozza per {campaign_name} è stata rifiutata.",
@@ -58,6 +59,7 @@
         "digest": "Riepilogo giornaliero via email"
       },
       "typeLabels": {
+        "assignment_invited": "Viene ricevuto un invito a una campagna",
         "assignment_draft_submitted": "Viene inviata una bozza per la revisione",
         "assignment_contracted": "Un contratto viene accettato",
         "assignment_revision_requested": "Vengono richieste modifiche a una bozza",

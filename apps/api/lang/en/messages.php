@@ -34,4 +34,16 @@ return [
         'unknown_campaign' => 'a campaign',
         'unknown_counterparty' => 'someone',
     ],
+
+    // AH-083 (⑧) — the debounced immediate-message email, one class shared by
+    // BOTH thread models via a `context`-keyed sub-structure (`campaign` /
+    // `relationship`), mirroring `campaigns.php`'s `reviewed.email` shape.
+    'new_message' => [
+        'subject_campaign' => 'New message about :counterparty',
+        'subject_relationship' => 'New message from :counterparty',
+        'greeting' => 'Hi :name,',
+        'body_campaign' => ':sender sent you a new message about ":counterparty".',
+        'body_relationship' => ':sender at :counterparty sent you a new message.',
+        'cta' => 'Open the conversation',
+    ],
 ];

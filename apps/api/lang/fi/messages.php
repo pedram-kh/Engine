@@ -27,4 +27,13 @@ return [
         'unknown_campaign' => 'kampanja',
         'unknown_counterparty' => 'joku',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Uusi viesti koskien kampanjaa :counterparty',
+        'subject_relationship' => 'Uusi viesti lähettäjältä :counterparty',
+        'greeting' => 'Hei, :name,',
+        'body_campaign' => ':sender lähetti sinulle uuden viestin koskien kampanjaa ":counterparty".',
+        'body_relationship' => ':sender yritykseltä :counterparty lähetti sinulle uuden viestin.',
+        'cta' => 'Avaa keskustelu',
+    ],
 ];

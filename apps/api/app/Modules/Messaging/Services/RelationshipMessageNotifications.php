@@ -7,6 +7,7 @@ namespace App\Modules\Messaging\Services;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Identity\Models\User;
 use App\Modules\Messaging\Enums\MessageSenderRole;
+use App\Modules\Messaging\Mail\NewMessageMail;
 use App\Modules\Messaging\Models\RelationshipMessage;
 use App\Modules\Messaging\Models\RelationshipThread;
 use App\Modules\Notifications\Enums\NotificationType;
@@ -31,10 +32,19 @@ use App\Modules\Notifications\Services\NotificationService;
  * NotificationService honours each recipient's per-type `in_app` preference
  * (default ON). Digest is deferred (D5 — in-app unread covers it). The thread is
  * the notification subject.
+ *
+ * AH-083 (⑧) — the agency→creator tail ALSO offers the message to
+ * {@see DebouncedMessageMailer} (C6: the SAME shared service
+ * {@see SendMessageNotifications} calls, never the creator→agency fan-out
+ * branch above), with the AGENCY's ulid for the deep link (C5) — never the
+ * thread's own ulid, which the creator-side route does not accept.
  */
 final class RelationshipMessageNotifications
 {
-    public function __construct(private readonly NotificationService $notifications) {}
+    public function __construct(
+        private readonly NotificationService $notifications,
+        private readonly DebouncedMessageMailer $debouncedMailer,
+    ) {}
 
     public function dispatch(RelationshipThread $thread, RelationshipMessage $message, User $sender): void
     {
@@ -82,5 +92,13 @@ final class RelationshipMessageNotifications
             actor: $sender,
             data: $data,
         );
+
+        $this->debouncedMailer->maybeSend($thread, $creatorUser, new NewMessageMail(
+            recipientName: $creatorUser->name,
+            senderName: $sender->name,
+            context: 'relationship',
+            counterpartyName: $agency->name,
+            agencyUlid: $agency->ulid,
+        ));
     }
 }

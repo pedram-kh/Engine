@@ -27,4 +27,13 @@ return [
         'unknown_campaign' => 'kampány',
         'unknown_counterparty' => 'valaki',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Új üzenet erről: :counterparty',
+        'subject_relationship' => 'Új üzenet tőle: :counterparty',
+        'greeting' => 'Kedves :name,',
+        'body_campaign' => ':sender új üzenetet küldött erről: ":counterparty".',
+        'body_relationship' => ':sender (:counterparty) új üzenetet küldött.',
+        'cta' => 'Beszélgetés megnyitása',
+    ],
 ];

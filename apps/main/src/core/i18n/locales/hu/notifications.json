@@ -17,6 +17,7 @@
       "empty": "You have no notifications yet."
     },
     "types": {
+      "assignment_invited": "Új ajánlatot kapott a(z) {campaign_name} kampányhoz.",
       "assignment_draft_approved": "Your draft for {campaign_name} was approved.",
       "assignment_revision_requested": "Revisions were requested on your draft for {campaign_name}.",
       "assignment_draft_rejected": "Your draft for {campaign_name} was rejected.",
@@ -58,6 +59,7 @@
         "digest": "Daily email digest"
       },
       "typeLabels": {
+        "assignment_invited": "Kampányra szóló meghívás érkezik",
         "assignment_draft_submitted": "A draft is submitted for review",
         "assignment_contracted": "A contract is accepted",
         "assignment_revision_requested": "Revisions are requested on a draft",

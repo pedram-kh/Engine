@@ -81,6 +81,16 @@ return [
                 'cta' => 'Katso kampanja',
             ],
         ],
+        'invite_received' => [
+            'email' => [
+                'subject_fresh' => 'Sinulle on uusi tarjous kampanjaan :campaign',
+                'subject_re_offer' => 'Päivitetty tarjous kampanjaan :campaign',
+                'greeting' => 'Hei, :name,',
+                'body_fresh' => 'Sinut on kutsuttu työskentelemään kampanjassa ":campaign". Avaa tehtävä tarkistaaksesi tarjouksen ja vastataksesi.',
+                'body_re_offer' => 'Sinua odottaa päivitetty tarjous kampanjassa ":campaign". Avaa tehtävä tarkistaaksesi sen ja vastataksesi.',
+                'cta' => 'Näytä tarjous',
+            ],
+        ],
     ],
     // AH-056 (Jobs Board chunk 3, D6) — the job-posted fan-out mail. Queued and
     // localized at queue time to the recipient's preferred_language, rendered

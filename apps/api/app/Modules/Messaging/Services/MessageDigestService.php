@@ -6,6 +6,7 @@ namespace App\Modules\Messaging\Services;
 
 use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Creators\Features\MissingCreatorMailsEnabled;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use App\Modules\Messaging\Models\Message;
@@ -18,9 +19,21 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 
 /**
- * Builds the per-user daily unread-messages digest (Sprint 11, D-9). The digest
- * is the messaging email channel (D-8 spec-divergence: there is NO immediate
- * per-message email; the digest IS the email path, opt-in / default OFF).
+ * Builds the per-user daily unread-messages digest (Sprint 11, D-9).
+ *
+ * Sprint 11's D-8 read: "there is NO immediate per-message email; the digest
+ * IS the email path." AH-083 (2026-08-19) reverses that by product decision —
+ * a flag-gated ({@see MissingCreatorMailsEnabled})
+ * immediate, 30-minute-debounced message email now ships alongside this
+ * digest (see {@see DebouncedMessageMailer}).
+ * The two do not suppress each other (AH-083 kickoff Q6, considered and
+ * declined — the digest is opt-in/default-OFF and the overlap is rare), so a
+ * creator opted into both can see the same unread thread twice in quick
+ * succession; a documented, accepted duplication, not a bug. This digest
+ * itself is unchanged by that reversal — it still gates on
+ * {@see NotificationService::isChannelEnabled()} for the `digest` channel,
+ * below — the reversal is scope information for a future reader of this
+ * class, not a behavior change to it.
  *
  * It does NOT ride {@see NotificationService::notify()}
  * (in-app only by design) — it gates each candidate on

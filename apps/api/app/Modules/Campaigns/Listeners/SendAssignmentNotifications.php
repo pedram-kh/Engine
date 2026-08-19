@@ -13,13 +13,19 @@ use App\Modules\Campaigns\Mail\AssignmentCompletedOnApprovalMail;
 use App\Modules\Campaigns\Mail\ContractAcceptedMail;
 use App\Modules\Campaigns\Mail\DraftReviewedMail;
 use App\Modules\Campaigns\Mail\DraftSubmittedForReviewMail;
+use App\Modules\Campaigns\Mail\InviteReceivedMail;
 use App\Modules\Campaigns\Mail\PostManuallyVerifiedMail;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
+use App\Modules\Campaigns\Services\CampaignApplicationNotifier;
+use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
+use App\Modules\Campaigns\Services\CampaignInvitationService;
+use App\Modules\Creators\Features\MissingCreatorMailsEnabled;
 use App\Modules\Identity\Models\User;
 use App\Modules\Notifications\Enums\NotificationType;
 use App\Modules\Notifications\Services\NotificationService;
 use Illuminate\Support\Facades\Mail;
+use Laravel\Pennant\Feature;
 
 /**
  * The 3rd consumer of {@see AssignmentTransitioned} (Sprint 9 Chunk 2, D-14) —
@@ -62,6 +68,21 @@ use Illuminate\Support\Facades\Mail;
  * EMAIL is skipped — its in-app row still rides. The completion transition that
  * follows sends the one email. Two in-app rows, one email, for one click. On
  * every other campaign the flag is absent and nothing here behaves differently.
+ *
+ * §5.32 (AH-083, kickoff Q1) — the missing invite email (①). Rather than
+ * touching {@see CampaignInvitationService} or
+ * {@see CampaignAssignmentStateMachine} (both
+ * already dispatch {@see AssignmentTransitioned} on every path that lands an
+ * assignment on `invited`), this is the FOURTH consumer verb pair added here:
+ * `assignment.invited` (the fresh invite) and `assignment.re_invited` (BOTH the
+ * AH-035 re-offer after a decline AND the agency's re-offer answering the
+ * creator's own counter — kickoff Q4, all three invite-shaped paths emit
+ * identically). One match arm, one private method
+ * ({@see self::notifyCreatorOfInvite()}), discriminating only on copy
+ * (kickoff Q5). The MAIL leg is gated by
+ * {@see MissingCreatorMailsEnabled} (default OFF); the in-app row is NOT — it
+ * is the dual-emit ruling (kickoff Q2), so `assignment.invited` moved to the
+ * frontend's LIVE_TYPES registry alongside this chunk.
  */
 final class SendAssignmentNotifications
 {
@@ -94,6 +115,7 @@ final class SendAssignmentNotifications
             AuditAction::AssignmentCompletedOnApproval => $this->notifyCreatorOfCompletionOnApproval($assignment, $actor, $round),
             AuditAction::AssignmentContracted => $this->notifyAgencyOfContractAcceptance($assignment, $actor),
             AuditAction::AssignmentManuallyVerified => $this->notifyCreatorOfManualVerification($assignment, $actor),
+            AuditAction::AssignmentInvited, AuditAction::AssignmentReInvited => $this->notifyCreatorOfInvite($assignment, $event->action, $actor),
             default => null,
         };
     }
@@ -220,6 +242,86 @@ final class SendAssignmentNotifications
                 'assignment_ulid' => $assignment->ulid,
             ],
         );
+    }
+
+    /**
+     * AH-083 (①) — a campaign offer is waiting for the creator. Fires on
+     * BOTH verbs that land an assignment on `invited` (kickoff Q4: all three
+     * call sites behind them emit identically — the fresh invite from
+     * `CampaignInvitationService::invite()`, the AH-035 re-offer after a
+     * decline, and the agency's re-offer answering the creator's own counter).
+     *
+     * `$action` is the ONLY discriminator (kickoff Q5): `AssignmentInvited` →
+     * `fresh`; `AssignmentReInvited` → `re_offer` (shared copy for both
+     * re-invite paths — the creator's experience is identical either way). No
+     * NotificationType exists for `re_invited` (deliberately excluded, since
+     * un-curating it would need a net-new in-app vocabulary entry the product
+     * has not asked for) — the in-app row always writes as
+     * {@see NotificationType::AssignmentInvited} regardless of outcome, which
+     * is honest: from the creator's feed, "you have an offer" is the same fact
+     * whether it is the first one or an update.
+     *
+     * The email leg routes through {@see self::queueInviteMail()}, the ONE
+     * flag checkpoint (the {@see CampaignApplicationNotifier::queue()}
+     * precedent) — so a future call site can never bypass the flag by mistake.
+     * Fail-quiet on a missing creator/campaign/user, matching every sibling here.
+     */
+    private function notifyCreatorOfInvite(CampaignAssignment $assignment, AuditAction $action, ?User $actor): void
+    {
+        $creator = $assignment->creator;
+        $campaign = $assignment->campaign;
+
+        if ($creator === null || $campaign === null) {
+            return;
+        }
+
+        $recipient = $creator->user;
+        if (! $recipient instanceof User || $recipient->email === '') {
+            return;
+        }
+
+        $outcome = $action === AuditAction::AssignmentInvited ? 'fresh' : 're_offer';
+        $creatorName = $creator->display_name ?? $recipient->name;
+
+        $this->queueInviteMail($recipient, new InviteReceivedMail(
+            creatorName: $creatorName,
+            campaignName: $campaign->name,
+            outcome: $outcome,
+            assignmentUlid: $assignment->ulid,
+        ));
+
+        // Dual-emit (kickoff Q2) — the in-app row is UNGATED by the mail flag;
+        // NotificationService still honours the recipient's own in_app
+        // preference. Actor is whoever drove the transition (the inviting
+        // agency member, or the system on an auto-path).
+        $this->notifications->notify(
+            recipient: $recipient,
+            type: NotificationType::AssignmentInvited,
+            subject: $assignment,
+            actor: $actor,
+            data: [
+                'campaign_name' => $campaign->name,
+                'creator_name' => $creatorName,
+                'assignment_ulid' => $assignment->ulid,
+            ],
+        );
+    }
+
+    /**
+     * The ONE flag checkpoint for the invite mail (AH-083 D1) — mirrors
+     * {@see CampaignApplicationNotifier::queue()}.
+     * A second `Feature::active()` call anywhere in this class would quietly
+     * halve that guarantee, so every invite-shaped path funnels through here.
+     */
+    private function queueInviteMail(User $recipient, InviteReceivedMail $mailable): void
+    {
+        if (! Feature::active(MissingCreatorMailsEnabled::NAME)) {
+            return;
+        }
+
+        Mail::to($recipient->email)
+            ->locale($recipient->preferred_language ?: 'en')
+            ->queue($mailable);
     }
 
     private function notifyAgencyOfSubmission(CampaignAssignment $assignment, ?User $actor, ?int $round = null): void

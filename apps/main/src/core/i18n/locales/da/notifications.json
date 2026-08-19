@@ -17,6 +17,7 @@
       "empty": "Du har ingen notifikationer endnu."
     },
     "types": {
+      "assignment_invited": "Du har modtaget et nyt tilbud til {campaign_name}.",
       "assignment_draft_approved": "Dit udkast til {campaign_name} er godkendt.",
       "assignment_revision_requested": "Der er anmodet om ændringer til dit udkast til {campaign_name}.",
       "assignment_draft_rejected": "Dit udkast til {campaign_name} er afvist.",
@@ -58,6 +59,7 @@
         "digest": "Dagligt e-mail-sammendrag"
       },
       "typeLabels": {
+        "assignment_invited": "En kampagneinvitation modtages",
         "assignment_draft_submitted": "Et udkast indsendes til gennemgang",
         "assignment_contracted": "En kontrakt accepteres",
         "assignment_revision_requested": "Ændringer anmodes til et udkast",

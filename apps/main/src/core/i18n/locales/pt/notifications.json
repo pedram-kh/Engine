@@ -17,6 +17,7 @@
       "empty": "Ainda não tem notificações."
     },
     "types": {
+      "assignment_invited": "Recebeu uma nova oferta para {campaign_name}.",
       "assignment_draft_approved": "O seu rascunho para {campaign_name} foi aprovado.",
       "assignment_revision_requested": "Foram pedidas alterações ao seu rascunho para {campaign_name}.",
       "assignment_draft_rejected": "O seu rascunho para {campaign_name} foi rejeitado.",
@@ -58,6 +59,7 @@
         "digest": "Resumo diário por email"
       },
       "typeLabels": {
+        "assignment_invited": "Um convite de campanha é recebido",
         "assignment_draft_submitted": "Um rascunho é enviado para revisão",
         "assignment_contracted": "Um contrato é aceite",
         "assignment_revision_requested": "São pedidas alterações a um rascunho",

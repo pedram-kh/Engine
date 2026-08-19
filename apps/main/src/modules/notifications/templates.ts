@@ -96,6 +96,17 @@ const IN_APP_ONLY: NotificationChannel[] = ['in_app']
  * would treat the dot as nesting), so the flat-underscore `templateKey` applies.
  */
 const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
+  // AH-083 (①, kickoff Q2) — dual-emit: the creator's invite in-app row rides
+  // alongside the new invite EMAIL (SendAssignmentNotifications, backend).
+  // ONE type covers both `assignment.invited` (fresh) AND the `re_invited`
+  // audit verb (no separate NotificationType exists for re-invite — the
+  // in-app row reads identically either way; the mail side is what carries the
+  // fresh/re-offer copy split).
+  'assignment.invited': {
+    templateKey: 'notifications.types.assignment_invited',
+    recipient: 'creator',
+    preference: { group: 'assignment', channels: IN_APP_ONLY },
+  },
   // Agency fan-out rows (admins + managers) — only agency users receive these.
   'assignment.draft_submitted': {
     templateKey: 'notifications.types.assignment_draft_submitted',

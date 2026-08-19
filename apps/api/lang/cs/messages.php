@@ -28,4 +28,13 @@ return [
         'unknown_campaign' => 'kampaň',
         'unknown_counterparty' => 'někdo',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Nová zpráva ohledně :counterparty',
+        'subject_relationship' => 'Nová zpráva od :counterparty',
+        'greeting' => 'Dobrý den, :name,',
+        'body_campaign' => ':sender vám poslal(a) novou zprávu ohledně ":counterparty".',
+        'body_relationship' => ':sender z :counterparty vám poslal(a) novou zprávu.',
+        'cta' => 'Otevřít konverzaci',
+    ],
 ];

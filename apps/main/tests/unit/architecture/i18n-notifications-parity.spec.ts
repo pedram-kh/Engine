@@ -18,6 +18,10 @@
  *
  * Sprint 11 (D-7): the two dual-recipient messaging types each gained a live
  * emit site (SendMessageNotifications), so the live-set grew 8 → 10.
+ *
+ * AH-083 (①, kickoff Q2): `assignment.invited` gained a live emit site
+ * (SendAssignmentNotifications' dual-emit invite path), growing the live-set
+ * 18 → 19.
  */
 
 import { promises as fs } from 'node:fs'
@@ -57,6 +61,10 @@ const LOCALES = UI_LOCALES
  * missing TRANSLATION, that one catches a missing REGISTRATION.
  */
 const LIVE_TYPES = [
+  // AH-083 (①, kickoff Q2) — the invite dual-emit. Live from the same release
+  // as the backend listener's new match arm, so a missing translation would be
+  // visible immediately.
+  'assignment.invited',
   'assignment.draft_approved',
   'assignment.revision_requested',
   'assignment.draft_rejected',
@@ -91,7 +99,7 @@ const LIVE_TYPES = [
 
 /** Emit-less / forward-declared types that MUST route to the fallback. */
 const EMIT_LESS_TYPES = [
-  'assignment.invited',
+  // AH-083 — `assignment.invited` moved to LIVE_TYPES above.
   'assignment.declined',
   'assignment.countered',
   'assignment.accepted',
@@ -143,7 +151,7 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
     }
   })
 
-  it('notifications.types holds EXACTLY the 19 live templates + fallback', async () => {
+  it('notifications.types holds EXACTLY the 20 live templates + fallback', async () => {
     const en = await loadBundle('en')
     const typeKeys = Object.keys(en.notifications.types).sort()
 
@@ -155,6 +163,7 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
       'assignment_draft_approved',
       'assignment_draft_rejected',
       'assignment_draft_submitted',
+      'assignment_invited',
       'assignment_manually_verified',
       'assignment_revision_requested',
       'campaign_application_accepted',
@@ -245,9 +254,12 @@ describe('notifications prefs role-partition — single live-set source of truth
     }
   })
 
-  it('the known role split is honest (creator = 12 review/lifecycle/messaging/jobs, agency = 5 fan-out/messaging/jobs)', () => {
+  it('the known role split is honest (creator = 13 invite/review/lifecycle/messaging/jobs, agency = 5 fan-out/messaging/jobs)', () => {
     expect([...creatorTypes].sort()).toEqual(
       [
+        // AH-083 — the invite dual-emit. Creator-only by construction: the
+        // agency performed the invite, so it is not news to them.
+        'assignment.invited',
         // AH-069 — creator-only by construction, like `campaign.job_posted`
         // below: the AGENCY performed the approval, so the completion is not
         // news to them and a toggle they would never receive is a dead control.

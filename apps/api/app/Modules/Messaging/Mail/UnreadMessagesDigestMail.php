@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Messaging\Mail;
 
+use App\Modules\Creators\Features\MissingCreatorMailsEnabled;
+use App\Modules\Messaging\Services\DebouncedMessageMailer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -12,8 +14,21 @@ use Illuminate\Mail\Mailables\Envelope;
 
 /**
  * The daily aggregated unread-messages digest (Sprint 11, D-8/D-9) — ONE email
- * per opted-in user with unread messages. This is messaging's email channel:
- * there is deliberately no immediate per-message email (D-8 spec-divergence).
+ * per opted-in user with unread messages.
+ *
+ * Sprint 11's D-8 read ("there is deliberately no immediate per-message
+ * email") was **reversed by product decision, AH-083, 2026-08-19**: an
+ * immediate, 30-minute-debounced message email now ships alongside this
+ * digest, flag-gated behind
+ * {@see MissingCreatorMailsEnabled} — see
+ * {@see NewMessageMail} and
+ * {@see DebouncedMessageMailer}. The two are
+ * deliberately NOT cross-suppressed (AH-083 kickoff Q6) — this digest is
+ * unaware of the debounced email's send history and vice versa — so a
+ * creator opted into both channels may see the same unread thread reported
+ * twice in short order. Accepted as a rare, cosmetic duplication rather than
+ * a coupling worth buying; named here so a future reader does not mistake it
+ * for a bug.
  *
  * Queued + rendered through the shared `catalyst` markdown theme. Renders in
  * the application default locale (`en`) for all recipients — no per-recipient

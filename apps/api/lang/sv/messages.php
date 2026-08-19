@@ -28,4 +28,13 @@ return [
         'unknown_campaign' => 'en kampanj',
         'unknown_counterparty' => 'någon',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Nytt meddelande om :counterparty',
+        'subject_relationship' => 'Nytt meddelande från :counterparty',
+        'greeting' => 'Hej :name,',
+        'body_campaign' => ':sender har skickat dig ett nytt meddelande om ":counterparty".',
+        'body_relationship' => ':sender hos :counterparty har skickat dig ett nytt meddelande.',
+        'cta' => 'Öppna konversationen',
+    ],
 ];

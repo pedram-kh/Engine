@@ -81,6 +81,16 @@ return [
                 'cta' => 'Kampány megtekintése',
             ],
         ],
+        'invite_received' => [
+            'email' => [
+                'subject_fresh' => 'Új ajánlata érkezett a(z) :campaign kampányhoz',
+                'subject_re_offer' => 'Frissített ajánlat a(z) :campaign kampányhoz',
+                'greeting' => 'Kedves :name,',
+                'body_fresh' => 'Meghívást kapott, hogy dolgozzon a(z) ":campaign" kampányon. Nyissa meg a feladatot az ajánlat áttekintéséhez és a válaszadáshoz.',
+                'body_re_offer' => 'Frissített ajánlat várja a(z) ":campaign" kampányon. Nyissa meg a feladatot az ajánlat áttekintéséhez és a válaszadáshoz.',
+                'cta' => 'Ajánlat megtekintése',
+            ],
+        ],
     ],
     // AH-056 (Jobs Board chunk 3, D6) — the job-posted fan-out mail. Queued and
     // localized at queue time to the recipient's preferred_language, rendered

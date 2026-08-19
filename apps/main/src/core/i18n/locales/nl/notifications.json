@@ -17,6 +17,7 @@
       "empty": "Je hebt nog geen meldingen."
     },
     "types": {
+      "assignment_invited": "Je hebt een nieuw aanbod ontvangen voor {campaign_name}.",
       "assignment_draft_approved": "Je concept voor {campaign_name} is goedgekeurd.",
       "assignment_revision_requested": "Wijzigingen zijn gevraagd voor je concept van {campaign_name}.",
       "assignment_draft_rejected": "Je concept voor {campaign_name} is afgewezen.",
@@ -58,6 +59,7 @@
         "digest": "Dagelijkse e-mailsamenvatting"
       },
       "typeLabels": {
+        "assignment_invited": "Een campagne-uitnodiging wordt ontvangen",
         "assignment_draft_submitted": "Een concept wordt ingediend ter beoordeling",
         "assignment_contracted": "Een contract wordt geaccepteerd",
         "assignment_revision_requested": "Wijzigingen worden gevraagd voor een concept",

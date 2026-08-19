@@ -27,4 +27,13 @@ return [
         'unknown_campaign' => 'campanie',
         'unknown_counterparty' => 'cineva',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Mesaj nou despre :counterparty',
+        'subject_relationship' => 'Mesaj nou de la :counterparty',
+        'greeting' => 'Bună ziua, :name,',
+        'body_campaign' => ':sender v-a trimis un mesaj nou despre ":counterparty".',
+        'body_relationship' => ':sender de la :counterparty v-a trimis un mesaj nou.',
+        'cta' => 'Deschideți conversația',
+    ],
 ];

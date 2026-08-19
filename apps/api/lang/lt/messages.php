@@ -27,4 +27,13 @@ return [
         'unknown_campaign' => 'kampanija',
         'unknown_counterparty' => 'kažkas',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Naujas pranešimas apie :counterparty',
+        'subject_relationship' => 'Naujas pranešimas nuo :counterparty',
+        'greeting' => 'Sveiki, :name,',
+        'body_campaign' => ':sender atsiuntė jums naują pranešimą apie ":counterparty".',
+        'body_relationship' => ':sender iš :counterparty atsiuntė jums naują pranešimą.',
+        'cta' => 'Atidaryti pokalbį',
+    ],
 ];

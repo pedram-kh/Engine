@@ -27,4 +27,13 @@ return [
         'unknown_campaign' => 'kampaņa',
         'unknown_counterparty' => 'kāds',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Jauns ziņojums par :counterparty',
+        'subject_relationship' => 'Jauns ziņojums no :counterparty',
+        'greeting' => 'Sveiki, :name,',
+        'body_campaign' => ':sender jums nosūtīja jaunu ziņojumu par ":counterparty".',
+        'body_relationship' => ':sender no :counterparty jums nosūtīja jaunu ziņojumu.',
+        'cta' => 'Atvērt sarunu',
+    ],
 ];

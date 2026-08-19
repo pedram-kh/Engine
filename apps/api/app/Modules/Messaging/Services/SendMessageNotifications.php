@@ -8,6 +8,7 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Identity\Models\User;
 use App\Modules\Messaging\Enums\MessageSenderRole;
+use App\Modules\Messaging\Mail\NewMessageMail;
 use App\Modules\Messaging\Models\Message;
 use App\Modules\Messaging\Models\MessageThread;
 use App\Modules\Notifications\Enums\NotificationType;
@@ -26,10 +27,20 @@ use App\Modules\Notifications\Services\NotificationService;
  * NotificationService honours each recipient's per-type `in_app` preference
  * (default ON) and writes nothing for opted-out recipients. NO audit row is
  * written on send (D-17). System messages (no human sender) never notify.
+ *
+ * AH-083 (⑧) — the agency→creator tail ALSO offers the message to
+ * {@see DebouncedMessageMailer}, which decides (behind its own flag + the
+ * 30-minute debounce) whether to queue the immediate-message email. This is
+ * placed ONLY in this un-branched tail, never inside
+ * {@see self::fanOutToAgency()} — D4 restricts ⑧ to creators, by placement
+ * rather than a role check inside the mailer.
  */
 final class SendMessageNotifications
 {
-    public function __construct(private readonly NotificationService $notifications) {}
+    public function __construct(
+        private readonly NotificationService $notifications,
+        private readonly DebouncedMessageMailer $debouncedMailer,
+    ) {}
 
     public function dispatch(MessageThread $thread, Message $message, User $sender): void
     {
@@ -73,6 +84,14 @@ final class SendMessageNotifications
             actor: $sender,
             data: $data,
         );
+
+        $this->debouncedMailer->maybeSend($thread, $recipient, new NewMessageMail(
+            recipientName: $recipient->name,
+            senderName: $sender->name,
+            context: 'campaign',
+            counterpartyName: $campaign->name,
+            assignmentUlid: $assignment->ulid,
+        ));
     }
 
     /**

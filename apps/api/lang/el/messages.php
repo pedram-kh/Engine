@@ -27,4 +27,13 @@ return [
         'unknown_campaign' => 'καμπάνια',
         'unknown_counterparty' => 'κάποιος',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Νέο μήνυμα σχετικά με :counterparty',
+        'subject_relationship' => 'Νέο μήνυμα από :counterparty',
+        'greeting' => 'Γεια σας, :name,',
+        'body_campaign' => 'Ο/Η :sender σας έστειλε νέο μήνυμα σχετικά με ":counterparty".',
+        'body_relationship' => 'Ο/Η :sender από :counterparty σας έστειλε νέο μήνυμα.',
+        'cta' => 'Άνοιγμα συνομιλίας',
+    ],
 ];

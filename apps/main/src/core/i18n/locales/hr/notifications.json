@@ -17,6 +17,7 @@
       "empty": "Zatím nemáte žádná oznámení."
     },
     "types": {
+      "assignment_invited": "Primili ste novu ponudu za {campaign_name}.",
       "assignment_draft_approved": "Váš nacrt pro {campaign_name} byl schválen.",
       "assignment_revision_requested": "Byly požadovány revize vašeho nacrtu pro {campaign_name}.",
       "assignment_draft_rejected": "Váš nacrt pro {campaign_name} byl zamítnut.",
@@ -58,6 +59,7 @@
         "digest": "Denní e-mailový souhrn"
       },
       "typeLabels": {
+        "assignment_invited": "Primljena je pozivnica za kampanju",
         "assignment_draft_submitted": "Nacrt je odeslán k pregled",
         "assignment_contracted": "Ugovor je přijata",
         "assignment_revision_requested": "Jsou požadovány revize nacrtu",

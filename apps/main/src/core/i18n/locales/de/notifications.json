@@ -17,6 +17,7 @@
       "empty": "Du hast noch keine Benachrichtigungen."
     },
     "types": {
+      "assignment_invited": "Du hast ein neues Angebot für {campaign_name} erhalten.",
       "assignment_draft_approved": "Dein Entwurf für {campaign_name} wurde genehmigt.",
       "assignment_revision_requested": "Überarbeitungen deines Entwurfs für {campaign_name} wurden angefordert.",
       "assignment_draft_rejected": "Dein Entwurf für {campaign_name} wurde abgelehnt.",
@@ -58,6 +59,7 @@
         "digest": "Tägliche E-Mail-Zusammenfassung"
       },
       "typeLabels": {
+        "assignment_invited": "Eine Kampagnen-Einladung wird empfangen",
         "assignment_draft_submitted": "Ein Entwurf wird zur Überprüfung eingereicht",
         "assignment_contracted": "Ein Vertrag wird akzeptiert",
         "assignment_revision_requested": "Überarbeitungen eines Entwurfs werden angefordert",

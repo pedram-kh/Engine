@@ -17,6 +17,7 @@
       "empty": "Vous n'avez pas encore de notifications."
     },
     "types": {
+      "assignment_invited": "Vous avez reçu une nouvelle offre pour {campaign_name}.",
       "assignment_draft_approved": "Votre brouillon pour {campaign_name} a été approuvé.",
       "assignment_revision_requested": "Des modifications ont été demandées sur votre brouillon pour {campaign_name}.",
       "assignment_draft_rejected": "Votre brouillon pour {campaign_name} a été rejeté.",
@@ -58,6 +59,7 @@
         "digest": "Résumé quotidien par e-mail"
       },
       "typeLabels": {
+        "assignment_invited": "Une invitation à une campagne est reçue",
         "assignment_draft_submitted": "Un brouillon est soumis pour révision",
         "assignment_contracted": "Un contrat est accepté",
         "assignment_revision_requested": "Des modifications sont demandées sur un brouillon",

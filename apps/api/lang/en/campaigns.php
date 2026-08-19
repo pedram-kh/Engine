@@ -85,6 +85,22 @@ return [
                 'cta' => 'View the campaign',
             ],
         ],
+        // AH-083 (①) — a campaign offer is waiting. Fires on all three paths
+        // that land an assignment on `invited`: the fresh invite, the AH-035
+        // re-offer after a decline, and the agency's re-offer answering the
+        // creator's own counter (kickoff Q4) — the latter two share the
+        // `re_offer` copy, since the creator's experience is identical either
+        // way.
+        'invite_received' => [
+            'email' => [
+                'subject_fresh' => 'You have a new offer for :campaign',
+                'subject_re_offer' => 'An updated offer for :campaign',
+                'greeting' => 'Hi :name,',
+                'body_fresh' => 'You\'ve been invited to work on ":campaign". Open the assignment to review the offer and respond.',
+                'body_re_offer' => 'An updated offer is waiting for you on ":campaign". Open the assignment to review it and respond.',
+                'cta' => 'View the offer',
+            ],
+        ],
     ],
     // AH-056 (Jobs Board chunk 3, D6) — the job-posted fan-out mail. Queued and
     // localized at queue time to the recipient's preferred_language, rendered

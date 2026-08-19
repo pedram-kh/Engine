@@ -17,6 +17,7 @@
       "empty": "Du har inga aviseringar ännu."
     },
     "types": {
+      "assignment_invited": "Du har fått ett nytt erbjudande för {campaign_name}.",
       "assignment_draft_approved": "Ditt utkast för {campaign_name} godkändes.",
       "assignment_revision_requested": "Revisioner begärdes för ditt utkast till {campaign_name}.",
       "assignment_draft_rejected": "Ditt utkast för {campaign_name} avvisades.",
@@ -58,6 +59,7 @@
         "digest": "Daglig e-postdigest"
       },
       "typeLabels": {
+        "assignment_invited": "En kampanjinbjudan tas emot",
         "assignment_draft_submitted": "Ett utkast skickas in för granskning",
         "assignment_contracted": "Ett kontrakt accepteras",
         "assignment_revision_requested": "Revisioner begärs för ett utkast",

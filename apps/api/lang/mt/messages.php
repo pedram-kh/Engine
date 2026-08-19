@@ -27,4 +27,13 @@ return [
         'unknown_campaign' => 'kampanja',
         'unknown_counterparty' => 'xi ħadd',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Messaġġ ġdid dwar :counterparty',
+        'subject_relationship' => 'Messaġġ ġdid mingħand :counterparty',
+        'greeting' => 'Bonġu, :name,',
+        'body_campaign' => ':sender bagħtlek messaġġ ġdid dwar ":counterparty".',
+        'body_relationship' => ':sender minn :counterparty bagħtlek messaġġ ġdid.',
+        'cta' => 'Iftaħ il-konversazzjoni',
+    ],
 ];

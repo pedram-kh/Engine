@@ -13,6 +13,7 @@ use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
 use App\Modules\Creators\Features\JobPostedNotificationsEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
+use App\Modules\Creators\Features\MissingCreatorMailsEnabled;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Identity\Enums\UserType;
@@ -84,6 +85,10 @@ final class AdminFeatureFlagController
         ApplicationNotificationsEnabled::NAME => [
             'label' => 'Application notifications',
             'description' => 'Emails the jobs-board application notices (applied, accepted, declined). In-app rows are unaffected.',
+        ],
+        MissingCreatorMailsEnabled::NAME => [
+            'label' => 'Missing creator mails (invite + debounced message)',
+            'description' => 'Emails a campaign invite (fresh, re-offer, or counter-response) and a debounced new-message notice. Gates mail only — the invite in-app row and both immediate message in-app rows are unaffected.',
         ],
     ];
 

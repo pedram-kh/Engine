@@ -28,4 +28,13 @@ return [
         'unknown_campaign' => 'kampanię',
         'unknown_counterparty' => 'ktoś',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Nowa wiadomość dotycząca :counterparty',
+        'subject_relationship' => 'Nowa wiadomość od :counterparty',
+        'greeting' => 'Cześć, :name,',
+        'body_campaign' => ':sender wysłał(a) Ci nową wiadomość dotyczącą ":counterparty".',
+        'body_relationship' => ':sender z :counterparty wysłał(a) Ci nową wiadomość.',
+        'cta' => 'Otwórz rozmowę',
+    ],
 ];

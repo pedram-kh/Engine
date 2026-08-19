@@ -28,4 +28,13 @@ return [
         'unknown_campaign' => 'kampanja',
         'unknown_counterparty' => 'nekdo',
     ],
+
+    'new_message' => [
+        'subject_campaign' => 'Novo sporočilo o :counterparty',
+        'subject_relationship' => 'Novo sporočilo od :counterparty',
+        'greeting' => 'Pozdravljeni, :name,',
+        'body_campaign' => ':sender vam je poslal(a) novo sporočilo o ":counterparty".',
+        'body_relationship' => ':sender iz :counterparty vam je poslal(a) novo sporočilo.',
+        'cta' => 'Odpri pogovor',
+    ],
 ];
