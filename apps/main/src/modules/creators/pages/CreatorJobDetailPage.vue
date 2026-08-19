@@ -509,7 +509,9 @@ onMounted(() => {
 
 .job-detail__description {
   margin: 0;
-  white-space: pre-wrap;
+  /* RichBrief's own <p>/<br> markup owns line breaks now (AH-081) — pre-wrap
+     would additionally render the sanitized HTML's literal whitespace
+     between tags, doubling every break into a blank line. */
   word-break: break-word;
 }
 

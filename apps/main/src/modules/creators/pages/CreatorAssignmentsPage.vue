@@ -312,7 +312,9 @@ onMounted(() => {
   margin: 4px 0 0;
   font-size: 0.875rem;
   opacity: 0.75;
-  white-space: pre-wrap;
+  /* RichBrief's own <p>/<br> markup owns line breaks now (AH-081) — pre-wrap
+     would additionally render the sanitized HTML's literal whitespace
+     between tags, doubling every break into a blank line. */
   word-break: break-word;
 }
 

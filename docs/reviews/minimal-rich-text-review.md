@@ -1,11 +1,24 @@
 # Minimal rich text: links + bold/italic + breaks in briefs and descriptions (AH-081)
 
-- **Status: Landed (push HELD).** Full loop — kickoff with locked decisions (D1–D6) → plan-pause
-  (six proposals ratified verbatim) → build → two-commit pair, push held. Review file is the
-  record, pending the close instruction.
+- **Status: Closed — approved.** Full loop — kickoff with locked decisions (D1–D6) → plan-pause
+  (six proposals ratified verbatim) → build → two-commit pair → eyes-on finding + fix (see
+  [§9](#9-eyes-on-finding--the-stale-pre-wrap-regression)) → close. **Verdict:** D1–D6 verified as
+  built — the tighter five-tag allowlist and the two-independent-defences link posture confirmed;
+  the seven-row completeness table verified with before/after, Field C's one-column finding
+  recorded, `brands.description` correctly out of scope; the XSS set held incl. the
+  verified-both-directions break-revert case and the end-to-end Playwright `<strong>` proof; caps
+  mirrored FE/BE with the boundary-test diff; the 2-key ×24-locale hint with real flaky-10 MT; D6's
+  legacy-asterisks-now-bold posture stated plainly, precedent-backed, no escaping strategy. The
+  eyes-on pre-wrap finding is folded into this closing verdict, not a reopen — caught and fixed
+  before push, same loop.
 - **Date:** 2026-08-18/19
 - **Provenance:** built by Cursor directly against Pedram's kickoff (D1–D6 below, locked at
-  kickoff time); no separate independent-review round in this loop.
+  kickoff time). **Correction:** an earlier draft of this line read "no separate independent-review
+  round in this loop" — that denies a review that in fact happened. Pedram's own eyes-on test of
+  the live app, after build and before push, is exactly that independent-review round, and it
+  caught a real defect (§9) the full green gate could not see. This loop closes with the
+  human-in-the-loop verification the house model calls for on an eyes-on-only class of bug — not a
+  solo build with no outside check.
 - **Evidence base:**
   [`admin-filter-profile-modal-richtext-inventory.md`](admin-filter-profile-modal-richtext-inventory.md)
   §0.2, I2.1–I2.3 — the three-field render-site survey, the sanitizer-reality finding (no markdown
@@ -215,7 +228,57 @@ as the honest trade-off of adding markdown support to a field that previously ha
 
 ---
 
-## 9. What this chunk deliberately did not do
+## 9. Eyes-on finding — the stale pre-wrap regression
+
+**What broke, and how it was found.** After the two-commit pair landed (push still held), Pedram
+tested the shipped feature against a live campaign: an invite offer description containing
+`*12*\n*12*\nestefade` rendered with a visible blank line between every line instead of the tight,
+single-line-per-break output `breaks: true` is supposed to produce — reported as "I added bold and
+italic but I can't see the result."
+
+**Root cause: CSS whitespace semantics, not the renderer.** All 5 converted render sites still
+carried a `white-space: pre-wrap` rule left over from before this chunk, when these fields were
+raw `{{ }}` text interpolation and needed `pre-wrap` to preserve an author's line breaks.
+`RichBrief`'s sanitized output now carries its own structural line breaks — real `<br>` and `<p>`
+tags — but markdown-it's serializer leaves a literal `\n` immediately after each `<br>`
+(`<br>\n`), insignificant whitespace that a normal `white-space` value collapses away. Under the
+stale `pre-wrap`, that literal `\n` is preserved as an ADDITIONAL rendered break, doubling every
+line into a blank-line gap. Confirmed headlessly against a real Chromium instance (Playwright, not
+jsdom): the exact seeded content serialized to `"12\n\n12\n\nestefade"` (`innerText`) under the
+stale CSS, and the correct `"12\n12\nestefade"` once it was removed.
+
+**This is the concrete case of a class already on record, not a new discovery.** AH-071's own
+closed entry (`adhoc-changes-log.md`) named this exact limit while fixing the opposite-polarity
+bug (a MISSING `pre-wrap` collapsing real multi-line feedback to one line): "jsdom does not compute
+CSS `white-space` collapsing, so a test can prove the style rule is applied but not that the
+browser renders it correctly — accepted as a known limit of the unit-test layer rather than
+escalated." AH-081 hits the same recorded gap from the other direction — a STALE `pre-wrap`
+fighting a renderer that now owns its own line-break markup — and this is that gap's second real
+incident, not a hypothetical.
+
+**The fix.** Stripped `white-space: pre-wrap` from all 5 converted sites
+(`CreatorAssignmentsPage.vue`, `CreatorAssignmentDetailPage.vue`, `BoardCardDrawer.vue`,
+`CampaignDetailPage.vue`, `CreatorJobDetailPage.vue`), keeping `word-break: break-word` at each
+site (unrelated to the bug — still needed so a long unbroken token, e.g. a link, wraps instead of
+overflowing). `CreatorAssignmentDetailPage.vue`'s selector was the one that needed a scalpel, not
+a blanket edit: it was shared with `.assignment-revision-feedback` and `.draft-round-feedback`,
+two fields that are still plain-text interpolation this chunk and correctly keep `pre-wrap` — so
+`.assignment-offer-description` was split into its own rule rather than dropping `pre-wrap` for
+all three.
+
+**Stated plainly: 151 green tests across the 5 converted specs did not catch this — eyes did.**
+That is the exact sum of the five converted specs' passing counts in [§8](#8-gate-board) (6 + 42 +
+35 + 42 + 26 = 151), all still green both before and after this fix — because jsdom performs no
+layout and applies no real CSS whitespace-collapsing, so no Vitest assertion in this chunk could
+have distinguished the buggy double-spaced render from the correct one; both serialize to the
+identical sanitized HTML string. This was only visible by loading the actual page in a real
+browser, which is exactly what caught it. No test is added to pin this specific regression, for the
+same reason AH-071 didn't: the class itself is a recorded, accepted limit of the unit-test layer,
+not something to route around with a fragile jsdom workaround.
+
+---
+
+## 10. What this chunk deliberately did not do
 
 - **No toolbar editor.** Textarea + hint only, per D5 — the cheap choice, upgrade path named.
 - **No escaping strategy for legacy asterisks.** Per D6 — the honest, precedent-backed trade-off.

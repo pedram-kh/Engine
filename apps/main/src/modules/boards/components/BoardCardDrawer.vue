@@ -682,7 +682,9 @@ function onDraftReviewed(): void {
   background: rgba(var(--v-theme-on-surface), 0.08);
 }
 .drawer-detail__description {
-  white-space: pre-wrap;
+  /* RichBrief's own <p>/<br> markup owns line breaks now (AH-081) — pre-wrap
+     would additionally render the sanitized HTML's literal whitespace
+     between tags, doubling every break into a blank line. */
   word-break: break-word;
 }
 .min-width-0 {
