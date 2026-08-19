@@ -54,11 +54,22 @@ happened.
 
 ---
 
-## 2026-08-19 · AH-085 — brand select pagination fix — PENDING
+## 2026-08-19 · AH-085 — brand select pagination fix — DEPLOYED
 
-- **Status:** **PENDING.**
-- **Range:** `39788759` → `e6488eb1` (from-SHA exclusive — the previous deployed tip). **4
-  commits, all today, one themed fix:**
+> **Box HEAD (`6f5351de`) ≠ origin tip — expected, not drift.** Two commits landed on
+> `origin/main` after this deploy ran: `e6488eb1` (records the CI-fix commit + the green run —
+> `docs/reviews/adhoc-changes-log.md` only) and `f2d8851a` (opens this very entry —
+> `docs/runbooks/deploy-log.md` only). Both are **docs-only, zero-diff outside `docs/`, inert**
+> — confirmed by `git show --stat` on each: one file changed, in `docs/`, nothing under
+> `apps/` or `packages/`. The deployed code is byte-identical to what those two commits sit on
+> top of; production running `6f5351de` while origin reads `f2d8851a` is exactly the
+> pushed-≠-deployed distinction this file exists to track, not an undeployed-code gap.
+
+- **Status:** **DEPLOYED.** Confirmed by Pedram, 2026-08-19 — smoke passed: the brand select now
+  lists all brands across the five pickers named below.
+- **Range:** `39788759` → `6f5351de` (from-SHA exclusive — the previous deployed tip; to-SHA is
+  the deployed box's HEAD, not origin's current tip — see the note above). **3 commits, all
+  today, one themed fix:**
   - `edb30dd7` — `fix(brands): every brand reachable in select pickers, not just page 1` (AH-085).
   - `41b7b95b` — `docs(reviews): AH-085 brand select pagination bug — diagnosis, consumer table,
 fix` (docs-only).
@@ -67,8 +78,6 @@ global function` (AH-085) — a same-day CI-fix: the first push's CI run failed 
     `Cannot redeclare function`, a test-helper naming collision with an unrelated existing test
     file, caught and fixed before this entry was opened. No production runtime file in this
     commit — test-only.
-  - `e6488eb1` — `docs(reviews): AH-085 — record the CI-fix commit and the green run at tip`
-    (docs-only).
 - **AH entries carried:** **AH-085** only.
 - **Migrations run:** **none.** No file under `apps/api/database/migrations/**` in this range —
   `BrandController::index` and the new `BrandOptionResource` are read-path only, no schema touch.
@@ -82,19 +91,24 @@ global function` (AH-085) — a same-day CI-fix: the first push's CI run failed 
     `apps/api/lang/**` file, and `BrandController`/`BrandOptionResource` are resolved per-request
     only (grepped every `ShouldQueue` class in `app/Modules/Brands/` — none exist; nothing in this
     diff runs inside a queued job).
-  * **PHP-FPM reload REQUIRED** — `BrandController::index`'s new `?for=select` branch is opcached
-    bytecode like any other controller change; without a reload, FPM workers keep serving the
-    pre-fix compiled code and the fix does not take effect for any request until workers cycle or
-    a reload forces fresh bytecode. Same posture as the 2026-08-11 `CreatorPolicy` deploy above.
-  * `apps/main`'s SPA bundle needs its normal rebuild + redeploy for the five fixed pickers to
-    reach browsers — standard for any frontend change, not new here.
+  * **PHP-FPM reload — not explicitly recorded, but implied.** `BrandController::index`'s new
+    `?for=select` branch is opcached bytecode like any other controller change; without fresh
+    bytecode being served, the fix cannot take effect for any request. Pedram's smoke result
+    (brand select correctly lists all brands, past the old 25-row page, across all five pickers)
+    is only possible if the new controller code is actually running — which means either a
+    reload happened or FPM workers had already cycled past it by the time smoke ran. **Restart
+    performed: not recorded** as an explicit step; the live, verified-working fix is the evidence
+    it happened one way or another. Same posture as the 2026-08-11 `CreatorPolicy` deploy above,
+    minus the explicit confirmation that one got.
+  * `apps/main`'s SPA bundle rebuild + redeploy is confirmed to have reached browsers — smoke was
+    run against the actual pickers, not the API directly.
 - **One-shot commands:** **none.**
-- **Post-deploy verification:** the standard `/up` 200 + one authenticated request, plus two
-  fix-specific reads: (1) an agency with more than 25 active brands shows every brand — not just
-  the first alphabetical page — in the campaign-create Brand select; (2) the same agency's pool
-  create/edit Brand select reaches the same full set. **Results: not yet supplied.**
+- **Post-deploy verification:** ✅ **smoke confirmed by Pedram** — the brand select lists all
+  brands across the five pickers (campaign create, campaign-list filter, pool create, pool edit,
+  blacklist dialog), not just the first alphabetical page. `/up` + authenticated-request status:
+  **not separately recorded**, folded into the same confirmation.
 - **Flags armed:** **none — this range touches no flag.**
-- **Operator:** _TBD._
+- **Operator:** **Pedram.**
 - **Anything unexpected:** none during the build/push itself, beyond the CI-fix commit named
   above under Range (a test-only naming collision, caught by CI before anything reached this
   entry — no production-facing surprise).
