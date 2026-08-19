@@ -54,6 +54,53 @@ happened.
 
 ---
 
+## 2026-08-19 · AH-085 — brand select pagination fix — PENDING
+
+- **Status:** **PENDING.**
+- **Range:** `39788759` → `e6488eb1` (from-SHA exclusive — the previous deployed tip). **4
+  commits, all today, one themed fix:**
+  - `edb30dd7` — `fix(brands): every brand reachable in select pickers, not just page 1` (AH-085).
+  - `41b7b95b` — `docs(reviews): AH-085 brand select pagination bug — diagnosis, consumer table,
+fix` (docs-only).
+  - `6f5351de` — `fix(api): rename BrandSelectOptionsTest helper — collided with an existing
+global function` (AH-085) — a same-day CI-fix: the first push's CI run failed on a PHP fatal
+    `Cannot redeclare function`, a test-helper naming collision with an unrelated existing test
+    file, caught and fixed before this entry was opened. No production runtime file in this
+    commit — test-only.
+  - `e6488eb1` — `docs(reviews): AH-085 — record the CI-fix commit and the green run at tip`
+    (docs-only).
+- **AH entries carried:** **AH-085** only.
+- **Migrations run:** **none.** No file under `apps/api/database/migrations/**` in this range —
+  `BrandController::index` and the new `BrandOptionResource` are read-path only, no schema touch.
+- **Pre-deploy reads:** **none required.** Read-path fix, no data mutation, no backfill.
+- **Snapshot ID:** not applicable — no migration, so no schema-rollback surface exists for this
+  deploy. (Standard code-rollback via git/deploy tooling covers this range like any other.)
+- **Infra:** **deploy shape is code-only** — an `apps/api` PHP change (`BrandController`, new
+  `BrandOptionResource`) plus an `apps/main` SPA change (five picker components + `brands.api.ts`
+  - a new api-client type); no schema, no flags, no scheduler/cron change.
+  * **No queue-worker restart required** — confirmed: this range adds no mailable, touches no
+    `apps/api/lang/**` file, and `BrandController`/`BrandOptionResource` are resolved per-request
+    only (grepped every `ShouldQueue` class in `app/Modules/Brands/` — none exist; nothing in this
+    diff runs inside a queued job).
+  * **PHP-FPM reload REQUIRED** — `BrandController::index`'s new `?for=select` branch is opcached
+    bytecode like any other controller change; without a reload, FPM workers keep serving the
+    pre-fix compiled code and the fix does not take effect for any request until workers cycle or
+    a reload forces fresh bytecode. Same posture as the 2026-08-11 `CreatorPolicy` deploy above.
+  * `apps/main`'s SPA bundle needs its normal rebuild + redeploy for the five fixed pickers to
+    reach browsers — standard for any frontend change, not new here.
+- **One-shot commands:** **none.**
+- **Post-deploy verification:** the standard `/up` 200 + one authenticated request, plus two
+  fix-specific reads: (1) an agency with more than 25 active brands shows every brand — not just
+  the first alphabetical page — in the campaign-create Brand select; (2) the same agency's pool
+  create/edit Brand select reaches the same full set. **Results: not yet supplied.**
+- **Flags armed:** **none — this range touches no flag.**
+- **Operator:** _TBD._
+- **Anything unexpected:** none during the build/push itself, beyond the CI-fix commit named
+  above under Range (a test-only naming collision, caught by CI before anything reached this
+  entry — no production-facing surprise).
+
+---
+
 ## 2026-08-19 · AH-067 → AH-083 — composer fix, Draft Workflow v2, the eyes-on batch, four admin/creator items, and the missing creator emails — DEPLOYED
 
 > This entry **merges** what were, until today, two stacked `PENDING` entries — the AH-067 composer
