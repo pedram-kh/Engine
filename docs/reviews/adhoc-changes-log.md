@@ -70,6 +70,72 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-083 · Missing creator emails: invite (①) + debounced message (⑧)
+
+- **Status:** Closed — approved, pushed. Full loop — read-only inventory
+  (`creator-mail-set-inventory.md`) → kickoff with locked decisions (D1–D6) → plan-pause (ten
+  findings C1–C10, two proposals, ten questions) → all ten rulings (Q1–Q10) → build, S1 through S8
+  in order, each green → docs pass → close-and-push approval, Pedram, directly (no independent
+  review pass — the compact-loop shape, per `missing-creator-mails-review.md`'s own Status line).
+  This entry + the review file are the record.
+- **Commits:** four, pushed together — the inventory docs commit (`db6ec03d`), the plan-pause docs
+  commit (`691dabce`), the feature commit (`7b86bf90`), and this entry's docs commit at the tip (see
+  `git log origin/main` for its hash — a commit cannot record its own).
+- **Date:** 2026-08-19
+- **Why:** the creator-mail-set inventory found two of the platform's nine intended creator email
+  notifications simply did not exist: a creator invited to a campaign got no email at all (only an
+  in-app row on the assignments list, if they thought to check it), and an agency message to a
+  creator had no email path of any kind — Sprint 11's D-8 had explicitly ruled out an immediate
+  per-message email in favor of an opt-in daily digest only.
+- **What:** two new flag-gated (default OFF) mail legs behind one new Pennant flag,
+  `missing_creator_mails_enabled`. **① Invite email** — `InviteReceivedMail`, one new match arm +
+  private method (`notifyCreatorOfInvite()`) on `SendAssignmentNotifications`, no touch to
+  `CampaignInvitationService` or the state machine (both already dispatch the consumed event). Fires
+  on all three paths that land an assignment on `invited` — the fresh invite, the AH-035 re-offer
+  after a decline, and the agency's re-offer answering the creator's own counter — with a light
+  `outcome` discriminator (`fresh` vs `re_offer`, sharing copy for both re-invite paths). Dual-emits:
+  the mail leg is flag-gated, the in-app leg is not — `assignment.invited` moves to the frontend's
+  `LIVE_TYPES` registry, both parity specs updated. **⑧ Debounced message email** —
+  `NewMessageMail`, one context-discriminated mailable (`campaign` | `relationship`) serving both
+  thread models, queued through one shared checkpoint service,
+  `App\Modules\Messaging\Services\DebouncedMessageMailer`: email on first unread, re-armed once 30
+  minutes pass since the thread's last emailed notification to that recipient, never more than one
+  email per `(thread, recipient)` per 30 minutes, via an atomic `firstOrCreate` + conditional `UPDATE`
+  pair (no explicit transaction needed). Called from exactly the two "agency→creator" tails of
+  `SendMessageNotifications`/`RelationshipMessageNotifications` — never their creator→agency fan-out
+  branches — so creators-only (D4) is a property of placement, not a role check. New additive table
+  `message_email_debounces` (a real `morphTo('thread')`, composite-unique on
+  `(thread_type, thread_id, recipient_user_id)`).
+- **Decisions:** **Q4** — all three invite-shaped paths emit identically (same audit verb, same
+  landing state; excluding the counter-response path would need a context flag with no product
+  ask behind it). **Q5** — a light outcome discriminator on invite copy, not a full second
+  mailable. **Q6** — the daily digest is NOT suppressed when the debounced email already fired
+  (considered and declined — opt-in digest, rare overlap, not worth cross-service coupling).
+  **Q9** — a residual, narrower version of the jobs-board-c3 queue-then-stamp risk in
+  `CampaignAssignmentController::store()`'s shared transaction is named, not fixed, in the review
+  file (§Q9) — `settlePendingApplication()` has no business-rule throw path, so the exposure is
+  database-failure-order-of-magnitude. **C8** — Sprint 11's D-8 ("no immediate per-message email")
+  is explicitly reversed by this chunk; both `MessageDigestService` and `UnreadMessagesDigestMail`'s
+  docblocks are corrected in the same commit rather than left stating something now false.
+- **Break-reverts executed (all restored):** the 30-minute comparison inverted (the within-window
+  case reds); the flag check bypassed at both the service level (S6) and the real HTTP dispatch-path
+  level (S8) (every debounce test reds both times); the shared mailer call removed from ONE dispatch
+  path only (exactly that path's four §5.34 cases red, the other path's cases stay green — proving
+  neither path can silently stop calling the shared service without a test catching it).
+- **Touched:** `MissingCreatorMailsEnabled.php` (new flag), `InviteReceivedMail.php` +
+  `invite-received.blade.php` (new), `NewMessageMail.php` + `new-message.blade.php` (new),
+  `DebouncedMessageMailer.php` (new service), `MessageEmailDebounce.php` + factory + migration (new),
+  `SendAssignmentNotifications.php`, `SendMessageNotifications.php`,
+  `RelationshipMessageNotifications.php`, `MessageDigestService.php` +
+  `UnreadMessagesDigestMail.php` (C8 docblocks), `lang/*/campaigns.php` + `lang/*/messages.php` (×24
+  each, real MT incl. flaky-10), `templates.ts` + both parity specs +
+  `NotificationPreferencesPage.spec.ts` (frontend `LIVE_TYPES` ripple), `notifications.json` ×24
+  (new `assignment_invited` in-app copy), `AdminFeatureFlagController.php`, `feature-flags.md`,
+  `tech-debt.md` (AH-056 widened again).
+- **Ref:** [`creator-mail-set-inventory.md`](creator-mail-set-inventory.md) for the read-only
+  inventory this chunk was kicked off from; full detail in
+  [`missing-creator-mails-review.md`](missing-creator-mails-review.md).
+
 ### AH-082 · Insert-link button + cap raise
 
 - **Status:** Landed (push HELD). Compact full loop — kickoff with locked decisions (D1–D4) →

@@ -116,14 +116,98 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-08-18 · **Through:** AH-078, an eight-item eyes-on fix batch built directly on
-Pedram's live walkthrough of Draft Workflow v2 (Mode B — no kickoff, no per-item review file; each
-item confirmed before it was built). **Nothing is held.** Since the AH-070 follow-through's close
-(`7d826dea`), `origin/main` moved by eighteen commits: the sixteen AH-071 → AH-078 build/spec commits
-(`5e61795a` … `3ef5d8ec`, all `apps/main`-only — see `adhoc-changes-log.md` for the eight per-entry
-commit mappings), the post-review AH-074 regression pin (`c1f0add6`), and the docs commit at the tip
-carrying the inventory, all eight AH entries, this refresh, and the `deploy-log.md` update (a commit
-cannot record its own hash).
+**Last updated:** 2026-08-19 · **Through:** AH-083, the missing creator emails chunk (invite ① +
+debounced message ⑧). **Nothing is held.** Since the AH-082 docs commit's close, `origin/main` moved
+by four commits, pushed together: the read-only inventory (`db6ec03d`), the kickoff + plan-pause
+(`691dabce`), the feature build (`7b86bf90`), and this refresh's own docs commit at the tip (a commit
+cannot record its own hash — `git rev-parse --short origin/main` is the authority, re-derive it, do
+not carry this session's numbers forward). CI green at the pushed tip, cited by run URL per §5.41,
+closes the chunk.
+
+> **Honest gap, named rather than silently caught up on:** **AH-079 → AH-082 landed in a prior
+> session without their own Part 2 refresh** — the same class of miss as "AH-068 shipped without a
+> deploy-log entry" recorded further down this file. `adhoc-changes-log.md` is and was the whole
+> time the authoritative record for all four; this refresh is the first to reflect them here.
+> One line each: **AH-079** (Admin All-Creators filters — application status, KYC state, Connected;
+> no migration). **AH-080** (Creator Profile everywhere — one dialog, four mount contexts). **AH-081**
+> (minimal rich text: links + bold/italic + breaks in briefs and descriptions — the
+> `useRichBriefRenderer.ts`/`RichBrief.vue` sanitizer pipeline; no migration). **AH-082** (insert-link
+> button + cap raise on top of AH-081; `campaigns.description` 5000→10000; no migration). **Zero
+> deploy obligation across all four** — no migration, no flag, no mail-copy change in any of them; the
+> `deploy-log.md` PENDING entry's posture was unaffected until AH-083 (below).
+
+> **📝 AH-083 — THE MISSING CREATOR EMAILS: INVITE (①) + DEBOUNCED MESSAGE (⑧).** Full loop —
+> read-only inventory → kickoff (D1–D6) → plan-pause (`missing-creator-mails-plan.md`, C1–C10, two
+> proposals, Q1–Q10) → all ten rulings, Pedram, direct → build S1–S8, each green → this docs pass.
+> Two flag-gated (default OFF, one new Pennant flag `missing_creator_mails_enabled`) mail legs closing
+> two of the nine creator-email gaps the inventory found. **① Invite email** — one new match arm +
+> private method on `SendAssignmentNotifications`, **zero touch** to `CampaignInvitationService` or
+> the state machine (both already dispatch the consumed event — the chunk's biggest simplification,
+> C2). Fires on **all three** paths landing an assignment on `invited` (fresh invite, the AH-035
+> re-offer after decline, and the agency's re-offer answering the creator's own counter — Q4),
+> dual-emits (in-app unconditional, mail flag-gated), moves `assignment.invited` into the frontend's
+> `LIVE_TYPES`. **⑧ Debounced message email** — one context-discriminated mailable (`NewMessageMail`,
+> `campaign`|`relationship`) queued through one shared checkpoint,
+> `DebouncedMessageMailer` — email on first unread, re-armed 30 minutes after the thread's last
+> emailed notification to that recipient, at most one email per `(thread, recipient)` per 30 minutes,
+> via an atomic `firstOrCreate` + conditional `UPDATE` pair. Called from exactly the two
+> "agency→creator" tails of `SendMessageNotifications`/`RelationshipMessageNotifications` — never
+> their fan-out branches — making "creators only" (D4) a property of placement, not a role check.
+>
+> **Three things to know before touching it.**
+>
+> 1. **The relationship-thread email link uses the AGENCY's ulid, never the thread's own ulid (C5).**
+>    The creator-side route is keyed by `:agencyUlid`; a naive "reuse the thread's own ulid for both
+>    branches" helper (the pattern every other mailable uses) would silently 404 every
+>    relationship-thread email. Pinned by two DEDICATED assertions, not a shared "contains a ulid"
+>    check — `NewMessageMailTest.php`.
+> 2. **The debounce flag gates the WHOLE `DebouncedMessageMailer::maybeSend()` method, including the
+>    debounce table read/write — not just the mail queue call.** While the flag is off, the table is
+>    NEVER touched, so the first message after a later flag-flip reads correctly as "first unread" and
+>    emails immediately rather than the table having silently ticked in the background the whole time.
+>    Break-reverted TWICE, at both the service level (S6) and the real HTTP dispatch-path level (S8) —
+>    both times bypassing the check reds every debounce test.
+> 3. **Sprint 11's D-8 ("no immediate per-message email; the digest IS the email path") is explicitly
+>    reversed here, by product decision, and both docblocks that carried the old claim
+>    (`MessageDigestService`, `UnreadMessagesDigestMail`) are corrected in the same commit (C8)** rather
+>    than left stating something now false. The digest and the debounced email are deliberately NOT
+>    cross-suppressed (Q6, considered and declined) — a creator opted into both may see the same
+>    unread thread reported twice in quick succession; a named, accepted cosmetic duplication.
+>
+> **Gate board (2026-08-19).** Backend Pest **2605 passed, 1 skipped** (9733 assertions), including
+> six new test files (`InviteReceivedMailTest` 19, `InviteEmailNotificationTest` 9,
+> `DebouncedMessageMailerTest` 7, `MessageEmailDebounceModelTest` 5, `MessageEmailDebounceDispatchTest`
+> 11, `NewMessageMailTest` 23 — 74 tests / 342 assertions net-new); PHPStan **0 errors** (932 files);
+> Pint **passed**; `apps/main` Vitest **1625 passed / 166 files**; `vue-tsc` clean; ESLint **0 errors**
+> (2 pre-existing unrelated `v-html` warnings). **Five break-reverts, all restored**: the 30-minute
+> comparison inverted (S6); the flag bypassed at the service level (S6) and again at the dispatch
+> level (S8, the "×2" the kickoff asked for); the shared mailer call removed from ONE dispatch path
+> only, reding exactly that path's four §5.34 cases while the other path's stayed green (S8). No new
+> Playwright leg — no existing spec reaches the invite-accept flow's email content or the messaging
+> debounce window (the inventory's own I6 finding), so the existing E2E board is the bar. Full detail:
+> [`missing-creator-mails-review.md`](missing-creator-mails-review.md).
+>
+> **Deploy obligation: layered onto the still-held AH-068/069 range, not a fresh one.** A SECOND
+> additive migration (`create_message_email_debounces_table`); the already-owed queue-worker restart
+> is reaffirmed (now also covering two new mailables + `lang/*/campaigns.php` and `lang/*/messages.php`
+> keys ×24 each); one new flag registered but **not armed** by this deploy. See the
+> `deploy-log.md` 2026-08-19 update note on the AH-068/069 entry.
+>
+> **Deliberately not built:** per-type email preference reads (D5, deferred to AH-084 — the
+> `tech-debt.md` AH-056 entry now carries this chunk's own pointer); the agency-side direction of ⑧
+> (D4); any cap/`--dry-run` command (D6 — neither emission is fan-out-shaped); a fix for
+> `CampaignAssignmentController::store()`'s transaction-ordering residual (Q9, named not fixed,
+> ratified — the jobs-board-c3 queue-then-stamp precedent cited).
+
+**Prior state, for the record — AH-078.** **Last updated:** 2026-08-18 · **Through:** AH-078, an
+eight-item eyes-on fix batch built directly on Pedram's live walkthrough of Draft Workflow v2
+(Mode B — no kickoff, no per-item review file; each item confirmed before it was built). **Nothing
+was held at that close.** Since the AH-070 follow-through's close (`7d826dea`), `origin/main` moved
+by eighteen commits: the sixteen AH-071 → AH-078 build/spec commits (`5e61795a` … `3ef5d8ec`, all
+`apps/main`-only — see `adhoc-changes-log.md` for the eight per-entry commit mappings), the
+post-review AH-074 regression pin (`c1f0add6`), and the docs commit at the tip carrying the
+inventory, all eight AH entries, this refresh, and the `deploy-log.md` update (a commit cannot
+record its own hash).
 
 > **📝 AH-071 → AH-078 — EYES-ON FIX BATCH ON DRAFT WORKFLOW V2 (plus drive-by messaging/pool/copy
 > fixes Pedram caught in the same walkthrough).** Full detail, themes, and evidence in
@@ -925,6 +1009,12 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
 
 ### Open threads
 
+- **❓ AH-084 is named, not started — wire the email channel through notification preferences.**
+  AH-083's D5 explicitly deferred this: the two new mail legs (① invite, ⑧ debounced message), like
+  every existing transactional mail, are not yet individually opt-out-able — the new
+  `missing_creator_mails_enabled` flag is a global kill switch, not per-recipient consent. `tech-debt.md`'s
+  AH-056 entry (widened three times now — AH-058, then AH-083) is the authoritative gap description
+  and its own "Resolution" is written generally enough to close on AH-084 landing.
 - **✅ AH-068 is CLOSED and PUSHED (2026-08-16).** Reviewed and approved;
   [`draft-rounds-review.md`](draft-rounds-review.md) carries the verdict. **Not deployed** — and the
   one deploy obligation it carries is the **queue-worker restart**, because mail copy changed in all 24

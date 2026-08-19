@@ -56,6 +56,26 @@ happened.
 
 ## 2026-08-16 · Draft Workflow v2 — numbered rounds + the optional posting flow (AH-068, AH-069) — PENDING
 
+> **Update (2026-08-19):** AH-079 → AH-083 landed and are pushed on top of this range. **AH-079 →
+> AH-082 add no new deploy obligation** — no migration, no route, no resource shape, no gate, no flag,
+> no mail-copy change across all four (per their own entries in `adhoc-changes-log.md`). **AH-083 is
+> different: it adds a genuinely new obligation, layered onto this entry's existing posture rather
+> than replacing it.** A **SECOND migration** —
+> `2026_08_19_100000_create_message_email_debounces_table` (additive-only `CREATE TABLE`, no existing
+> row touched; `down()` is lossy — see its own docblock) — runs alongside AH-069's original
+> `add_creator_posts_content_to_campaigns_table`, in either order (they touch unrelated tables). The
+> **queue-worker restart** requirement is reaffirmed, not newly introduced (AH-068/069 already require
+> it): AH-083 adds two more mail-copy surfaces to the same restart — a new mailable
+> (`InviteReceivedMail`) plus new `lang/*/campaigns.php` keys ×24, and another new mailable
+> (`NewMessageMail`) plus new `lang/*/messages.php` keys ×24. **One new flag** ships alongside,
+> `missing_creator_mails_enabled` — registered but **not armed by this deploy**: both new mail legs
+> stay silent (in-app rows still write) until an operator arms it separately, per its
+> `feature-flags.md` row and enable ritual. This entry's posture is now **migrate (two migrations,
+> either order) + queue-worker restart + mandatory snapshot + no flag armed** — whoever deploys this
+> range carries **AH-067 through AH-083**. `docs/reviews/adhoc-changes-log.md`'s AH-083 entry and
+> [`missing-creator-mails-review.md`](../reviews/missing-creator-mails-review.md) carry the full
+> detail; this file states only what changes about the deploy itself.
+
 > **Update (2026-08-18):** the eyes-on fix batch (AH-071 → AH-078) landed and is pushed on top of this
 > range without opening a new entry — it adds **no new deploy obligation of its own**. Zero `apps/api`
 > files touched across all eight items (confirmed by diff in

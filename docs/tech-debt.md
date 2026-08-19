@@ -2333,6 +2333,15 @@ ukazuje na váš zveřejněný příspěvek, a poté ho níže znova odešlete."
   own admins + managers; a creator who applied to this exact campaign). The resolution below is
   unchanged and now covers six types instead of one; the trigger is unchanged too, and chunk 4 does
   not meet it (these are answers to actions the recipient took, not recurring outreach).
+- **Widened again (AH-083, 2026-08-19):** the two missing creator emails — the campaign-invite
+  email and the debounced new-message email — inherit the same gap, deliberately, rather than
+  opening a fourth entry. Both ship behind their own new kill switch
+  (`missing_creator_mails_enabled`, default OFF), and **neither reads a per-type email preference**;
+  a creator who wants the in-app row for one of these but not the email has no way to say so, same
+  as every mail this entry already covers. This split is intentional, not an oversight: **AH-084 is
+  the chunk that wires the channel** — reading `notification_preferences` for the `email` column
+  inside the emission path — and this entry's own "Resolution" below is written generally enough to
+  cover it once it lands; AH-083 does not attempt a narrower fix for just these two types.
 
 ## Mail is queued INSIDE the state machine's transaction (`SendAssignmentNotifications`, AH-058)
 
