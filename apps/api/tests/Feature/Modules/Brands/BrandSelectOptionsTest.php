@@ -20,7 +20,7 @@ uses(RefreshDatabase::class);
  * thin `{id, name}` projection — and proves the general paginated index is
  * byte-identical for callers that do not opt in (the Brands admin table).
  */
-function makeAgencyAdmin(): array
+function makeBrandSelectAdmin(): array
 {
     $agency = Agency::factory()->createOne();
     $user = User::factory()->agencyAdmin($agency)->createOne();
@@ -29,7 +29,7 @@ function makeAgencyAdmin(): array
 }
 
 it('§5.34 — every brand is reachable via ?for=select, past the old 25-row page boundary', function (): void {
-    [$agency, $user] = makeAgencyAdmin();
+    [$agency, $user] = makeBrandSelectAdmin();
 
     // page_size (25) + 5 — the exact shape that silently dropped brands
     // sorting after the 25th name under the old hardcoded paginate(25).
@@ -46,7 +46,7 @@ it('§5.34 — every brand is reachable via ?for=select, past the old 25-row pag
 });
 
 it('the thin projection carries only {id, type, attributes: {name}} — nothing heavier', function (): void {
-    [$agency, $user] = makeAgencyAdmin();
+    [$agency, $user] = makeBrandSelectAdmin();
     Brand::factory()->forAgency($agency->id)->create(['name' => 'Acme Corp']);
 
     $response = $this->actingAs($user)
@@ -62,7 +62,7 @@ it('the thin projection carries only {id, type, attributes: {name}} — nothing 
 });
 
 it('is ordered by name, matching the general index', function (): void {
-    [$agency, $user] = makeAgencyAdmin();
+    [$agency, $user] = makeBrandSelectAdmin();
     Brand::factory()->forAgency($agency->id)->create(['name' => 'Zebra Co']);
     Brand::factory()->forAgency($agency->id)->create(['name' => 'Acme Corp']);
     Brand::factory()->forAgency($agency->id)->create(['name' => 'Midway Ltd']);
@@ -79,7 +79,7 @@ it('is ordered by name, matching the general index', function (): void {
 });
 
 it('respects ?status — active (default), archived, and all — exactly like the general index', function (): void {
-    [$agency, $user] = makeAgencyAdmin();
+    [$agency, $user] = makeBrandSelectAdmin();
     Brand::factory()->forAgency($agency->id)->create(['name' => 'Active Brand']);
     Brand::factory()->archived()->forAgency($agency->id)->create(['name' => 'Archived Brand']);
 
@@ -102,7 +102,7 @@ it('respects ?status — active (default), archived, and all — exactly like th
 });
 
 it('never leaks another agency\'s brands through ?for=select', function (): void {
-    [$agency, $user] = makeAgencyAdmin();
+    [$agency, $user] = makeBrandSelectAdmin();
     $otherAgency = Agency::factory()->createOne();
     Brand::factory()->forAgency($agency->id)->create(['name' => 'Mine']);
     Brand::factory()->forAgency($otherAgency->id)->create(['name' => 'Not Mine']);
@@ -132,7 +132,7 @@ it('unauthenticated ?for=select returns 401, same as the general index', functio
 });
 
 it('BACKWARD COMPAT — omitting ?for=select still paginates at 25, unchanged (the Brands admin table)', function (): void {
-    [$agency, $user] = makeAgencyAdmin();
+    [$agency, $user] = makeBrandSelectAdmin();
     Brand::factory()->count(30)->forAgency($agency->id)->create();
 
     $response = $this->actingAs($user)
