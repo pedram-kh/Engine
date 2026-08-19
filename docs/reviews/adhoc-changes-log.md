@@ -70,6 +70,107 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-085 · Brand select pickers reachable past page 1 — the AH-066 bug class recurring in a second module
+
+- **Status: Closed — approved.** Verdict: the mechanism is empirically confirmed (30-brand
+  seed + `?per_page=100` returned 25 pre-fix, reproduced then fixed); the eight-caller consumer
+  sweep is accepted (5 page-1-only pickers fixed, `BrandListPage`/campaign-edit/`apps/admin` named
+  correctly out of scope); the thin-projection choice is ratified over AH-066's search shape, on
+  its own stated reasoning — brands are agency-bounded (realistically dozens) where creators are
+  not (realistically hundreds), so the two fixes being shaped differently is correct, not
+  inconsistent; the backward-compat pin (general paginated index byte-identical for non-opted-in
+  callers) and both break-reverts (backend `for=select` disable, frontend `listOptions` revert)
+  are accepted as the discriminating proof; the E2E gap is named, not silently expanded into this
+  chunk's scope. Posture **LOW** confirmed.
+- **Feat commit:** `edb30dd` — `fix(brands): every brand reachable in select pickers, not just
+page 1 (AH-085)`.
+- **Docs commit:** `14a66e2c` — `docs(reviews): AH-085 brand select pagination bug — diagnosis,
+consumer table, fix` (this entry).
+- **Provenance:** recurring-class tech-debt entry added — see
+  [tech-debt.md](../tech-debt.md) "A paginated index consumed as a `<select>` has now bitten
+  twice" — naming AH-066 + AH-085 as the two data points and a third instance as the trigger for a
+  conventions rule or lint guard, so the next per-site fix is a deliberate choice, not a repeat.
+- **Date:** 2026-08-19
+- **Why:** Pedram hit it on production — the New-campaign Brand select lists brands
+  alphabetically but stops partway through; he has more brands than the dropdown ever shows.
+- **Mechanism confirmed.** `BrandController::index` (`apps/api/app/Modules/Brands/Http/Controllers/BrandController.php`)
+  hardcoded `paginate(25)` and **ignored the `per_page` query param entirely** — every picker in
+  the SPA sent `per_page: 100` expecting up to 100 rows on page 1 and silently got 25 back, with
+  `meta` never inspected and no page-2 request ever made. Empirically verified pre-fix: seeding 30
+  brands and requesting `?per_page=100` still returned 25 rows. Unlike AH-066 (the roster
+  pickers), this was not "give up after one 100-row page" — the backend never honoured the
+  frontend's request at all, so the effective ceiling was 25, not 100.
+- **Consumer table — every caller of the brands index, and which were page-1-only:**
+
+  | Consumer                                  | File                                                   | Page-1-only?                                                                          | Fixed by                                    |
+  | ----------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------- | ------------------------------------------- |
+  | Campaign **create** — Brand select        | `modules/campaigns/pages/CampaignCreatePage.vue`       | Yes (Pedram's report)                                                                 | `listOptions`                               |
+  | Campaign **list** — Brand filter dropdown | `modules/campaigns/pages/CampaignListPage.vue`         | Yes                                                                                   | `listOptions`                               |
+  | Pool **create** — Brand select            | `modules/pools/pages/PoolCreatePage.vue`               | Yes                                                                                   | `listOptions`                               |
+  | Pool **edit** — Brand select              | `modules/pools/pages/PoolEditPage.vue`                 | Yes                                                                                   | `listOptions`                               |
+  | Blacklist dialog — brand-scope picker     | `modules/roster/components/BlacklistCreatorDialog.vue` | Yes                                                                                   | `listOptions`                               |
+  | Brands **admin table** (`BrandListPage`)  | `modules/brands/pages/BrandListPage.vue`               | **No** — real pagination controls, page 2+ is a click away                            | unchanged (paginates by design, not by bug) |
+  | Campaign **edit** (Settings tab)          | `modules/campaigns/pages/CampaignDetailPage.vue`       | N/A — has **no** brand select at all; brand is immutable after creation (`hideBrand`) | out of scope, nothing to fix                |
+  | `apps/admin`                              | —                                                      | N/A                                                                                   | zero `brandsApi` usage in the admin SPA     |
+
+  Five pickers shared the identical broken `per_page: 100` call; none has a shared component
+  (`BlacklistCreatorDialog`'s own doc comment already named this — "no shared brand-picker
+  component exists").
+
+- **Fix, argued.** AH-066's shape — server-side `?q=` search — is right for a creator roster that
+  runs to the hundreds, where a user could never browse the whole list anyway. A brand list is
+  **agency-bounded**: brands are created one at a time through a form, not imported in bulk, so a
+  real agency's active set is realistically dozens, never the hundreds a roster reaches. Search
+  machinery here (debounce, sequence-guarding stale responses, a "type to see more" affordance for
+  a list a user should just be able to open and browse) buys complexity to solve a problem this
+  list doesn't have. The honest cheap fix is a **full, unpaginated fetch of a thin projection** —
+  `?for=select` on the same route, returning **every** matching brand, ordered by name, in
+  `{id, name}` (nothing heavier — no `logo_url`, no `status`, no timestamps, no `agency`
+  relationship). The general paginated index (`paginate(25)`, full `BrandResource`) is untouched
+  for callers that did not opt in — namely `BrandListPage`'s own admin data table, which paginates
+  **by design** (real page-2 controls) and stays on `brandsApi.list()`.
+- **Touched:** `apps/api` — `BrandController::index` (additive `?for=select` branch), new
+  `BrandOptionResource` (the thin projection), new `BrandSelectOptionsTest.php` (8 tests).
+  `packages/api-client` — new `BrandOptionResource` wire type. `apps/main` —
+  `modules/brands/api/brands.api.ts` (new `listOptions()`), the five consumers named above, plus
+  spec-mock updates in `CampaignCreatePage.spec.ts`, `CampaignListPage.spec.ts`,
+  `CreatorDetailPage.spec.ts`, `CreatorProfileContent.spec.ts` (all stub `brandsApi` and needed the
+  new method added to their mock). New `PoolEditPage.spec.ts` — this page had **zero** spec
+  coverage before this fix.
+- **The §5.34 case, both create and edit.** Backend: a seeded agency with `page_size + N` (25 + 5
+  = 30) brands — `?for=select` returns all 30, not 25; the thin shape is exact
+  (`{id, type, attributes: {name}}`, nothing more); ordering, `?status` (active/archived/all), and
+  cross-tenant isolation all match the general index; the general index itself is pinned unchanged
+  (still 25/page, still full `BrandResource`) so the fix is proven additive. Frontend: 30 mocked
+  brands past the old page-1 boundary render into `CampaignForm`'s (create) and `PoolForm`'s
+  (edit) `brands`/`brandOptions` prop in full, including the 30th (alphabetically last) brand by
+  name — the exact one the old code would have dropped.
+- **Break-reverts, both layers.** Backend: disabling the `?for=select` branch (falling through to
+  the always-`paginate(25)` path) reddens exactly the two tests asserting count-30 and thin-shape,
+  green on every other case — pinning the fix precisely to the bug it closes. Frontend: reverting
+  `CampaignCreatePage`'s call back to `brandsApi.list(...)` reddens the new AH-085 spec with the
+  exact real-world symptom (`listOptions` never called), green again once restored.
+- **Campaign edit has no brand select — named, not assumed.** `CampaignDetailPage` renders
+  `CampaignForm` with `:brands="[]"` and `hideBrand` (brand is immutable post-create by design), so
+  it was never a page-1-only consumer and needed no fix. The genuine "create AND edit" pair proven
+  end-to-end here is the **talent pool** form, which shares one `PoolForm` component across
+  `PoolCreatePage` and `PoolEditPage` — both wired and both tested.
+- **Risk line:** read-path only — no migration, no write path, no validation rule, no gate/policy,
+  no notification/mail path, no i18n keyset. The general paginated index's behaviour for existing
+  callers (`BrandListPage`, and anything hitting the route without `?for=select`) is byte-identical
+  before and after, pinned by a dedicated backward-compat test. `POSTURE: LOW`.
+- **Known gap, named rather than silently left.** No E2E (Playwright) coverage exists for any
+  brand-select consumer — not before this fix, not added by it. The backend Pest suite (shape +
+  reachability + tenant isolation) and the two new frontend component tests (create + edit,
+  proving the mapped prop reflects all 30 brands) are the reachability proof this chunk delivers;
+  a real-browser traversal of the campaign-create or pool-edit brand picker remains an open
+  test-surface gap, same class as the one AH-066 closed for the roster pickers' own E2E coverage.
+- **Gates:** `apps/api` — `tests/Feature/Modules/Brands` 79/79, plus `tests/Feature/Modules/Campaigns`
+  and `tests/Feature/Modules/TalentPools` re-run clean (681 total across the three), PHPStan 0
+  errors, Pint clean. `apps/main` — the five touched modules' Vitest suites 281/281 (`campaigns`,
+  `pools`, `roster`, `brands`), `vue-tsc --noEmit` clean, ESLint 0 errors on every touched file.
+  `packages/api-client` — `tsc --noEmit` clean. Two-commit pair, push HELD.
+
 ### AH-083 · Missing creator emails: invite (①) + debounced message (⑧)
 
 - **Status:** Closed — approved, pushed. Full loop — read-only inventory

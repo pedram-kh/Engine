@@ -2503,3 +2503,52 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
   (shares a trigger class with the AH-054/AH-056 entries above).
 - **Status:** open (deferred by design). Recorded in
   [admin-all-creators-filters-review.md](reviews/admin-all-creators-filters-review.md), 2026-08-18.
+
+---
+
+## A paginated index consumed as a `<select>` has now bitten twice — a recurring class, not yet a rule (OPEN)
+
+- **Where:** any backend list endpoint built for a full-page data table, then reused by a
+  `<select>`/filter picker that expects "give me everything" — the picker either doesn't ask for a
+  second page, or asks and gets ignored.
+- **What we accepted (AH-066, 2026-08-11; AH-085, 2026-08-19):** the same bug class has now landed
+  twice, independently, in two different modules. **AH-066** — `InviteCreatorsDialog` and
+  `AddCreatorsToPoolDialog` fetched one 100-row page of the creator roster and filtered
+  client-side; the roster's own 100-row server cap meant any agency past that size had an
+  unreachable alphabetical tail (76 of 176 creators, in the reported case). Fixed with
+  server-side `?q=` search — right for a roster, which can run into the hundreds. **AH-085** —
+  `BrandController::index` hardcoded `paginate(25)` and silently ignored every picker's
+  `per_page: 100` entirely; five brand pickers (campaign create, campaign-list filter, pool
+  create/edit, the blacklist dialog) lost every brand past the 25th alphabetically. Fixed with an
+  unpaginated thin-projection endpoint (`?for=select`) — right for a brand list, which is
+  agency-bounded and realistically dozens, not hundreds. Both fixes were correct for their own
+  list's shape, and that is exactly the problem: **two different resolutions to the same root
+  cause**, chosen per-site because no shared convention exists yet for "this index also feeds a
+  picker."
+- **Why no shared fix ships now:** two data points don't yet justify a platform-wide rule. AH-066
+  and AH-085 needed opposite shapes (search vs. full-fetch) because roster and brand lists sit at
+  genuinely different scales — a rule mandating one shape for both would have been wrong for one
+  of them. What IS missing is not a single fix but a **decision procedure**: when a new list
+  endpoint is about to back a `<select>`, someone has to consciously ask "search or full-fetch?"
+  and currently nothing prompts that question — the default is silently copy-pasting whatever the
+  page-1 `per_page: 100` pattern the last picker used, which is exactly how both bugs shipped.
+- **Risk:** every list endpoint in the codebase that could plausibly back a future picker
+  (campaigns, talent pools, agency members, contracts) is a candidate for the same silent
+  truncation the moment someone wires a `<select>` to it without checking whether the endpoint
+  actually returns everything requested.
+- **Trigger:** **a third instance** of this exact class (a picker/filter silently missing rows
+  past page one because the backing index paginates and the picker didn't handle it) — at either
+  layer, any module. On the third hit, the fix graduates from "another per-site patch" to an
+  actual **house rule**: either (a) a `docs/02-CONVENTIONS.md` entry naming the two allowed
+  shapes for a picker-backing endpoint (bounded-scope → full thin-projection fetch;
+  unbounded-scope → server-side search) and the scale threshold that picks between them, or (b) a
+  lint/architecture-test guard that flags a `<select>`/`v-autocomplete` bound to a `brandsApi`-style
+  `.list()` call without either an explicit unpaginated variant or a `q`/`search` param wired in.
+- **Resolution:** deferred until the trigger fires — writing the rule off two data points risks
+  guessing the wrong threshold or shape. Whoever lands the third instance should mine AH-066 and
+  AH-085 for the actual decision factors (rows-per-agency-or-tenant order of magnitude; whether
+  the list is user-generated/unbounded or operator-created/bounded) rather than re-deriving them.
+- **Owner:** whoever ships the third instance, or a deliberate audit pass if none has surfaced by
+  the time a related sprint (e.g. any picker/filter chunk) has headroom.
+- **Status:** open. Recorded from [adhoc-changes-log.md](reviews/adhoc-changes-log.md) AH-085,
+  2026-08-19.
