@@ -457,7 +457,7 @@
         "objective": "Ziel",
         "description": "Beschreibung",
         "descriptionHint": "Nennen Sie die Liefergegenstände (z. B. 1 Reel, 3 Stories) sowie Nutzungsrechte oder Lizenzbedingungen.",
-        "formattingHint": "Du kannst **Fettschrift**, *Kursivschrift*, Links und Zeilenumbrüche verwenden.",
+        "formattingHint": "Du kannst **Fettschrift**, *Kursivschrift*, Links und Zeilenumbrüche verwenden, oder nutze die Schaltfläche 🔗.",
         "budget": "Budget",
         "currency": "Währung",
         "startsAt": "Startdatum",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Optionaler Link zu Referenzarbeiten.",
         "listedOnJobsBoard": "Zum Jobboard hinzufügen",
         "jobBoard": "Jobbörse"
+      },
+      "insertLink": {
+        "buttonLabel": "Link einfügen",
+        "dialogTitle": "Link einfügen",
+        "urlLabel": "URL",
+        "textLabel": "Linktext",
+        "invalidUrl": "Gib einen gültigen http- oder https-Link ein.",
+        "textRequired": "Gib den Text ein, der für diesen Link angezeigt werden soll.",
+        "tooLong": "Dieser Link ist zu lang, um hier zu passen — kürze die URL oder den Linktext.",
+        "insertButton": "Einfügen"
       },
       "objective": {
         "awareness": "Bekanntheit",
@@ -622,7 +632,7 @@
         "perLabel": "Pro",
         "perPlaceholder": "z. B. pro Skript",
         "descriptionLabel": "Beschreibung (was du erwartest)",
-        "formattingHint": "Du kannst **Fettschrift**, *Kursivschrift*, Links und Zeilenumbrüche verwenden.",
+        "formattingHint": "Du kannst **Fettschrift**, *Kursivschrift*, Links und Zeilenumbrüche verwenden, oder nutze die Schaltfläche 🔗.",
         "attachmentLabel": "Anhang (optional)",
         "attachmentFailed": "Der Anhang konnte nicht hochgeladen werden. Bitte versuche es erneut.",
         "search": "Creator suchen",

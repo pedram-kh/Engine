@@ -457,7 +457,7 @@
         "objective": "Mål",
         "description": "Beskrivning",
         "descriptionHint": "Ange leveranser (t.ex. 1 Reel, 3 Stories) och användningsrättigheter eller licensvillkor.",
-        "formattingHint": "Du kan använda **fetstil**, *kursiv*, länkar och radbrytningar.",
+        "formattingHint": "Du kan använda **fetstil**, *kursiv*, länkar och radbrytningar, eller använd knappen 🔗.",
         "budget": "Budget",
         "currency": "Valuta",
         "startsAt": "Startdatum",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Valfri länk till referensarbeten.",
         "listedOnJobsBoard": "Lägg till på uppdragstavlan",
         "jobBoard": "Jobbanslag"
+      },
+      "insertLink": {
+        "buttonLabel": "Infoga länk",
+        "dialogTitle": "Infoga länk",
+        "urlLabel": "URL",
+        "textLabel": "Länktext",
+        "invalidUrl": "Ange en giltig http- eller https-länk.",
+        "textRequired": "Ange texten som länken ska visa.",
+        "tooLong": "Länken är för lång för att få plats här — korta ner URL:en eller länktexten.",
+        "insertButton": "Infoga"
       },
       "objective": {
         "awareness": "Medvetenhet",
@@ -622,7 +632,7 @@
         "perLabel": "Per",
         "perPlaceholder": "t.ex. per manus",
         "descriptionLabel": "Beskrivning (vad du förväntar dig)",
-        "formattingHint": "Du kan använda **fetstil**, *kursiv*, länkar och radbrytningar.",
+        "formattingHint": "Du kan använda **fetstil**, *kursiv*, länkar och radbrytningar, eller använd knappen 🔗.",
         "attachmentLabel": "Bilaga (valfritt)",
         "attachmentFailed": "Bilagan kunde inte laddas upp. Försök igen.",
         "search": "Sök creators",

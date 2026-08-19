@@ -457,7 +457,7 @@
         "objective": "Objective",
         "description": "Description",
         "descriptionHint": "Inkludi l-prodotti mistennija (eż. 1 Reel, 3 Stories) u d-drittijiet tal-użu jew it-termini tal-liċenzjar.",
-        "formattingHint": "Tista' tuża **grassett**, *korsiv*, links u linji ġodda.",
+        "formattingHint": "Tista' tuża **grassett**, *korsiv*, links u linji ġodda, jew uża l-buttuna 🔗.",
         "budget": "Budget",
         "currency": "Munita",
         "startsAt": "Start date",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Link mhux obbligatorju għal xogħol ta' referenza.",
         "listedOnJobsBoard": "Żid mal-bord tax-xogħlijiet",
         "jobBoard": "Bord tax-xogħol"
+      },
+      "insertLink": {
+        "buttonLabel": "Daħħal link",
+        "dialogTitle": "Daħħal link",
+        "urlLabel": "URL",
+        "textLabel": "Test tal-link",
+        "invalidUrl": "Daħħal link http jew https validu.",
+        "textRequired": "Daħħal it-test li dan il-link għandu juri.",
+        "tooLong": "Dan il-link twil wisq biex jidħol hawn — qassar l-URL jew it-test tal-link.",
+        "insertButton": "Daħħal"
       },
       "objective": {
         "awareness": "Awareness",
@@ -622,7 +632,7 @@
         "perLabel": "Għal kull",
         "perPlaceholder": "eż. għal kull skript",
         "descriptionLabel": "Deskrizzjoni (x'tistenna)",
-        "formattingHint": "Tista' tuża **grassett**, *korsiv*, links u linji ġodda.",
+        "formattingHint": "Tista' tuża **grassett**, *korsiv*, links u linji ġodda, jew uża l-buttuna 🔗.",
         "attachmentLabel": "Anness (mhux obbligatorju)",
         "attachmentFailed": "L-anness ma setax jittella'. Jekk jogħġbok erġa' pprova.",
         "search": "Fittex creators",

@@ -457,7 +457,7 @@
         "objective": "Cel",
         "description": "Opis",
         "descriptionHint": "Podaj materiały do dostarczenia (np. 1 Reel, 3 Stories) oraz prawa do wykorzystania lub warunki licencji.",
-        "formattingHint": "Możesz używać **pogrubienia**, *kursywy*, linków i podziałów wierszy.",
+        "formattingHint": "Możesz używać **pogrubienia**, *kursywy*, linków i podziałów wierszy, lub użyj przycisku 🔗.",
         "budget": "Budżet",
         "currency": "Waluta",
         "startsAt": "Data rozpoczęcia",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Opcjonalny link do prac referencyjnych.",
         "listedOnJobsBoard": "Dodaj do tablicy zleceń",
         "jobBoard": "Oferty pracy"
+      },
+      "insertLink": {
+        "buttonLabel": "Wstaw link",
+        "dialogTitle": "Wstaw link",
+        "urlLabel": "URL",
+        "textLabel": "Tekst linku",
+        "invalidUrl": "Wprowadź prawidłowy link http lub https.",
+        "textRequired": "Wprowadź tekst, który ma się wyświetlać dla tego linku.",
+        "tooLong": "Ten link jest zbyt długi, aby się tu zmieścić — skróć adres URL lub tekst linku.",
+        "insertButton": "Wstaw"
       },
       "objective": {
         "awareness": "Świadomość",
@@ -622,7 +632,7 @@
         "perLabel": "Za",
         "perPlaceholder": "np. za scenariusz",
         "descriptionLabel": "Opis (czego oczekujesz)",
-        "formattingHint": "Możesz używać **pogrubienia**, *kursywy*, linków i podziałów wierszy.",
+        "formattingHint": "Możesz używać **pogrubienia**, *kursywy*, linków i podziałów wierszy, lub użyj przycisku 🔗.",
         "attachmentLabel": "Załącznik (opcjonalnie)",
         "attachmentFailed": "Nie udało się przesłać załącznika. Spróbuj ponownie.",
         "search": "Szukaj twórców",

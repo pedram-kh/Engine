@@ -457,7 +457,7 @@
         "objective": "Cíl",
         "description": "Popis",
         "descriptionHint": "Uveďte výstupy (napr. 1 Reel, 3 Stories) a práva na použitie alebo licenčné podmienky.",
-        "formattingHint": "Môžete použiť **tučné písmo**, *kurzívu*, odkazy a zalomenie riadkov.",
+        "formattingHint": "Môžete použiť **tučné písmo**, *kurzívu*, odkazy a zalomenie riadkov, alebo použite tlačidlo 🔗.",
         "budget": "Rozpočet",
         "currency": "Měna",
         "startsAt": "Dátum začátku",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Nepovinný odkaz na referenčné práce.",
         "listedOnJobsBoard": "Pridať na nástenku zákaziek",
         "jobBoard": "Pracovné nabídky"
+      },
+      "insertLink": {
+        "buttonLabel": "Vložiť odkaz",
+        "dialogTitle": "Vložiť odkaz",
+        "urlLabel": "URL",
+        "textLabel": "Text odkazu",
+        "invalidUrl": "Zadajte platný odkaz http alebo https.",
+        "textRequired": "Zadajte text, ktorý sa má pri tomto odkaze zobraziť.",
+        "tooLong": "Tento odkaz je príliš dlhý — skráťte adresu URL alebo text odkazu.",
+        "insertButton": "Vložiť"
       },
       "objective": {
         "awareness": "Povědomí",
@@ -622,7 +632,7 @@
         "perLabel": "Za",
         "perPlaceholder": "napr. za scenár",
         "descriptionLabel": "Popis (čo očakávate)",
-        "formattingHint": "Môžete použiť **tučné písmo**, *kurzívu*, odkazy a zalomenie riadkov.",
+        "formattingHint": "Môžete použiť **tučné písmo**, *kurzívu*, odkazy a zalomenie riadkov, alebo použite tlačidlo 🔗.",
         "attachmentLabel": "Príloha (voliteľné)",
         "attachmentFailed": "Prílohu sa nepodarilo nahrať. Skúste to znova.",
         "search": "Hľadať tvorcu",

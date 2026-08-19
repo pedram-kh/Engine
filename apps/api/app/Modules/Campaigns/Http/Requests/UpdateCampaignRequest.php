@@ -50,7 +50,9 @@ final class UpdateCampaignRequest extends FormRequest
             ...$this->listingFieldRules(),
 
             'name' => ['sometimes', 'string', 'max:255'],
-            'description' => ['sometimes', 'nullable', 'string', 'max:5000'],
+            // AH-082 D3 — raised 5000 -> 10000, mirrored from CreateCampaignRequest
+            // (the two validate independently — both must move together).
+            'description' => ['sometimes', 'nullable', 'string', 'max:10000'],
             'objective' => ['sometimes', new Enum(CampaignObjective::class)],
             'status' => ['sometimes', new Enum(CampaignStatus::class)],
 

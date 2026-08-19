@@ -457,7 +457,7 @@
         "objective": "Objetivo",
         "description": "Descripción",
         "descriptionHint": "Incluye los entregables (p. ej., 1 Reel, 3 Stories) y los derechos de uso o las condiciones de licencia.",
-        "formattingHint": "Puedes usar **negrita**, *cursiva*, enlaces y saltos de línea.",
+        "formattingHint": "Puedes usar **negrita**, *cursiva*, enlaces y saltos de línea, o usa el botón 🔗.",
         "budget": "Presupuesto",
         "currency": "Moneda",
         "startsAt": "Fecha de inicio",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Enlace opcional a trabajos de referencia.",
         "listedOnJobsBoard": "Añadir al tablón de trabajos",
         "jobBoard": "Bolsa de trabajo"
+      },
+      "insertLink": {
+        "buttonLabel": "Insertar enlace",
+        "dialogTitle": "Insertar enlace",
+        "urlLabel": "URL",
+        "textLabel": "Texto del enlace",
+        "invalidUrl": "Introduce un enlace http o https válido.",
+        "textRequired": "Introduce el texto que debe mostrar este enlace.",
+        "tooLong": "Este enlace es demasiado largo para caber aquí — acorta la URL o el texto del enlace.",
+        "insertButton": "Insertar"
       },
       "objective": {
         "awareness": "Notoriedad",
@@ -622,7 +632,7 @@
         "perLabel": "Por",
         "perPlaceholder": "p. ej., por guion",
         "descriptionLabel": "Descripción (lo que esperas)",
-        "formattingHint": "Puedes usar **negrita**, *cursiva*, enlaces y saltos de línea.",
+        "formattingHint": "Puedes usar **negrita**, *cursiva*, enlaces y saltos de línea, o usa el botón 🔗.",
         "attachmentLabel": "Adjunto (opcional)",
         "attachmentFailed": "No se pudo subir el adjunto. Inténtalo de nuevo.",
         "search": "Buscar creadores",

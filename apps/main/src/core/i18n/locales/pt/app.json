@@ -457,7 +457,7 @@
         "objective": "Objetivo",
         "description": "Descrição",
         "descriptionHint": "Inclua as entregas (por ex., 1 Reel, 3 Stories) e os direitos de utilização ou os termos de licenciamento.",
-        "formattingHint": "Pode usar **negrito**, *itálico*, links e quebras de linha.",
+        "formattingHint": "Pode usar **negrito**, *itálico*, links e quebras de linha, ou use o botão 🔗.",
         "budget": "Orçamento",
         "currency": "Moeda",
         "startsAt": "Data de início",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Ligação opcional para trabalhos de referência.",
         "listedOnJobsBoard": "Adicionar ao quadro de trabalhos",
         "jobBoard": "Ofertas de trabalho"
+      },
+      "insertLink": {
+        "buttonLabel": "Inserir link",
+        "dialogTitle": "Inserir link",
+        "urlLabel": "URL",
+        "textLabel": "Texto do link",
+        "invalidUrl": "Introduza um link http ou https válido.",
+        "textRequired": "Introduza o texto que este link deve mostrar.",
+        "tooLong": "Este link é demasiado longo para caber aqui — encurte o URL ou o texto do link.",
+        "insertButton": "Inserir"
       },
       "objective": {
         "awareness": "Reconhecimento",
@@ -622,7 +632,7 @@
         "perLabel": "Por",
         "perPlaceholder": "ex.: por guião",
         "descriptionLabel": "Descrição (o que espera)",
-        "formattingHint": "Pode usar **negrito**, *itálico*, links e quebras de linha.",
+        "formattingHint": "Pode usar **negrito**, *itálico*, links e quebras de linha, ou use o botão 🔗.",
         "attachmentLabel": "Anexo (opcional)",
         "attachmentFailed": "Não foi possível carregar o anexo. Tente novamente.",
         "search": "Buscar criadores",

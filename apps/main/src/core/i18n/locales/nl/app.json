@@ -457,7 +457,7 @@
         "objective": "Doel",
         "description": "Beschrijving",
         "descriptionHint": "Vermeld de deliverables (bijv. 1 Reel, 3 Stories) en gebruiksrechten of licentievoorwaarden.",
-        "formattingHint": "Je kunt **vet**, *cursief*, links en regeleinden gebruiken.",
+        "formattingHint": "Je kunt **vet**, *cursief*, links en regeleinden gebruiken, of gebruik de knop 🔗.",
         "budget": "Budget",
         "currency": "Valuta",
         "startsAt": "Startdatum",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Optionele link naar referentiewerk.",
         "listedOnJobsBoard": "Toevoegen aan het opdrachtenbord",
         "jobBoard": "Vacaturebord"
+      },
+      "insertLink": {
+        "buttonLabel": "Link invoegen",
+        "dialogTitle": "Link invoegen",
+        "urlLabel": "URL",
+        "textLabel": "Linktekst",
+        "invalidUrl": "Voer een geldige http- of https-link in.",
+        "textRequired": "Voer de tekst in die deze link moet tonen.",
+        "tooLong": "Deze link is te lang om hier te passen — verkort de URL of de linktekst.",
+        "insertButton": "Invoegen"
       },
       "objective": {
         "awareness": "Bewustwording",
@@ -622,7 +632,7 @@
         "perLabel": "Per",
         "perPlaceholder": "bijv. per script",
         "descriptionLabel": "Beschrijving (wat je verwacht)",
-        "formattingHint": "Je kunt **vet**, *cursief*, links en regeleinden gebruiken.",
+        "formattingHint": "Je kunt **vet**, *cursief*, links en regeleinden gebruiken, of gebruik de knop 🔗.",
         "attachmentLabel": "Bijlage (optioneel)",
         "attachmentFailed": "De bijlage kon niet worden geüpload. Probeer het opnieuw.",
         "search": "Creators zoeken",

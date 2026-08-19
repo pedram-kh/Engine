@@ -457,7 +457,7 @@
         "objective": "Objective",
         "description": "Description",
         "descriptionHint": "Norādiet nododamos rezultātus (piem., 1 Reel, 3 Stories) un lietošanas tiesības vai licencēšanas noteikumus.",
-        "formattingHint": "Varat izmantot **treknrakstu**, *slīprakstu*, saites un rindiņu pārtraukumus.",
+        "formattingHint": "Varat izmantot **treknrakstu**, *slīprakstu*, saites un rindiņu pārtraukumus, vai izmantojiet pogu 🔗.",
         "budget": "Budget",
         "currency": "Valūta",
         "startsAt": "Start date",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Neobligāta saite uz atsauces darbiem.",
         "listedOnJobsBoard": "Pievienot darbu tāfelei",
         "jobBoard": "Darba piedāvājumi"
+      },
+      "insertLink": {
+        "buttonLabel": "Ievietot saiti",
+        "dialogTitle": "Ievietot saiti",
+        "urlLabel": "URL",
+        "textLabel": "Saites teksts",
+        "invalidUrl": "Ievadiet derīgu http vai https saiti.",
+        "textRequired": "Ievadiet tekstu, kas šai saitei būtu jāparāda.",
+        "tooLong": "Šī saite ir pārāk gara, lai šeit ietilptu — saīsiniet URL vai saites tekstu.",
+        "insertButton": "Ievietot"
       },
       "objective": {
         "awareness": "Awareness",
@@ -622,7 +632,7 @@
         "perLabel": "Par",
         "perPlaceholder": "piem., par scenāriju",
         "descriptionLabel": "Apraksts (ko jūs sagaidāt)",
-        "formattingHint": "Varat izmantot **treknrakstu**, *slīprakstu*, saites un rindiņu pārtraukumus.",
+        "formattingHint": "Varat izmantot **treknrakstu**, *slīprakstu*, saites un rindiņu pārtraukumus, vai izmantojiet pogu 🔗.",
         "attachmentLabel": "Pielikums (neobligāti)",
         "attachmentFailed": "Pielikumu neizdevās augšupielādēt. Lūdzu, mēģiniet vēlreiz.",
         "search": "Meklēt creators",

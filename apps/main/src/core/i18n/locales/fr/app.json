@@ -457,7 +457,7 @@
         "objective": "Objectif",
         "description": "Description",
         "descriptionHint": "Indiquez les livrables (par ex. 1 Reel, 3 Stories) et les droits d’utilisation ou les conditions de licence.",
-        "formattingHint": "Vous pouvez utiliser le **gras**, l'*italique*, des liens et des retours à la ligne.",
+        "formattingHint": "Vous pouvez utiliser le **gras**, l'*italique*, des liens et des retours à la ligne, ou utilisez le bouton 🔗.",
         "budget": "Budget",
         "currency": "Devise",
         "startsAt": "Date de début",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Lien facultatif vers des travaux de référence.",
         "listedOnJobsBoard": "Ajouter au tableau des missions",
         "jobBoard": "Offres d'emploi"
+      },
+      "insertLink": {
+        "buttonLabel": "Insérer un lien",
+        "dialogTitle": "Insérer un lien",
+        "urlLabel": "URL",
+        "textLabel": "Texte du lien",
+        "invalidUrl": "Saisissez un lien http ou https valide.",
+        "textRequired": "Saisissez le texte que ce lien doit afficher.",
+        "tooLong": "Ce lien est trop long pour tenir ici — raccourcissez l'URL ou le texte du lien.",
+        "insertButton": "Insérer"
       },
       "objective": {
         "awareness": "Notoriété",
@@ -622,7 +632,7 @@
         "perLabel": "Par",
         "perPlaceholder": "p. ex. par script",
         "descriptionLabel": "Description (ce que vous attendez)",
-        "formattingHint": "Vous pouvez utiliser le **gras**, l'*italique*, des liens et des retours à la ligne.",
+        "formattingHint": "Vous pouvez utiliser le **gras**, l'*italique*, des liens et des retours à la ligne, ou utilisez le bouton 🔗.",
         "attachmentLabel": "Pièce jointe (facultatif)",
         "attachmentFailed": "La pièce jointe n'a pas pu être téléversée. Veuillez réessayer.",
         "search": "Rechercher des créateurs",

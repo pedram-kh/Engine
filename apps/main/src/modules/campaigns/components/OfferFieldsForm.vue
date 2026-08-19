@@ -30,8 +30,10 @@ import { uploadToPresignedUrl } from '@catalyst/api-client'
 import type { InviteAssignmentPayload } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import type { VTextarea } from 'vuetify/components'
 
 import { campaignsApi } from '../api/campaigns.api'
+import InsertLinkButton, { type TextareaHandle } from './InsertLinkButton.vue'
 
 /** The offer subset both callers send — the invite payload without the target. */
 type OfferFields = Omit<InviteAssignmentPayload, 'creator_id' | 'acknowledged'>
@@ -60,6 +62,17 @@ const feePer = ref('')
 const offerDescription = ref('')
 const attachmentFile = ref<File | null>(null)
 const uploadError = ref<string | null>(null)
+
+// Handed to InsertLinkButton for selection reads + cursor restore — see that
+// component's doc comment for why the cast is safe (VTextarea forwards the
+// native textarea's selection API dynamically, outside its public TS type).
+// The cast is hoisted into a computed (rather than inline in the template)
+// because eslint-plugin-vue's `no-deprecated-filter` rule misreads a `|`
+// union type inside a template expression as a Vue 2 filter pipe.
+const offerDescriptionTextarea = ref<InstanceType<typeof VTextarea> | null>(null)
+const offerDescriptionTextareaHandle = computed<TextareaHandle | null>(
+  () => offerDescriptionTextarea.value as unknown as TextareaHandle | null,
+)
 
 // The completed presigned upload, shared by every send of this form's payload
 // (the invite loop, and the TIER-2 acknowledge pass) — uploaded exactly once.
@@ -177,6 +190,7 @@ defineExpose({ buildOffer, reset, valid })
          Minimal rich text (AH-081): rendered through RichBrief at every
          creator-facing site, hence the formatting hint below. -->
     <v-textarea
+      ref="offerDescriptionTextarea"
       v-model="offerDescription"
       density="compact"
       variant="outlined"
@@ -188,7 +202,16 @@ defineExpose({ buildOffer, reset, valid })
       persistent-hint
       maxlength="3000"
       :data-test="`${testPrefix}-description`"
-    />
+    >
+      <template #append-inner>
+        <InsertLinkButton
+          v-model="offerDescription"
+          :textarea-ref="offerDescriptionTextareaHandle"
+          :maxlength="3000"
+          :test-prefix="`${testPrefix}-insert-link`"
+        />
+      </template>
+    </v-textarea>
 
     <!-- ONE optional offer attachment (brief / reference file). -->
     <v-file-input

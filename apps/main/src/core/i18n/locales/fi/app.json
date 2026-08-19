@@ -457,7 +457,7 @@
         "objective": "Objective",
         "description": "Description",
         "descriptionHint": "Kerro toimitettavat sisällöt (esim. 1 Reel, 3 Stories) sekä käyttöoikeudet tai lisenssiehdot.",
-        "formattingHint": "Voit käyttää **lihavointia**, *kursiivia*, linkkejä ja rivinvaihtoja.",
+        "formattingHint": "Voit käyttää **lihavointia**, *kursiivia*, linkkejä ja rivinvaihtoja, tai käytä 🔗-painiketta.",
         "budget": "Budget",
         "currency": "Valuutta",
         "startsAt": "Start date",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Valinnainen linkki referenssitöihin.",
         "listedOnJobsBoard": "Lisää työtauluun",
         "jobBoard": "Työpaikat"
+      },
+      "insertLink": {
+        "buttonLabel": "Lisää linkki",
+        "dialogTitle": "Lisää linkki",
+        "urlLabel": "URL-osoite",
+        "textLabel": "Linkin teksti",
+        "invalidUrl": "Anna kelvollinen http- tai https-linkki.",
+        "textRequired": "Anna teksti, jonka tämän linkin tulee näyttää.",
+        "tooLong": "Tämä linkki on liian pitkä mahtuakseen tähän — lyhennä URL-osoitetta tai linkin tekstiä.",
+        "insertButton": "Lisää"
       },
       "objective": {
         "awareness": "Awareness",
@@ -622,7 +632,7 @@
         "perLabel": "Per",
         "perPlaceholder": "esim. per käsikirjoitus",
         "descriptionLabel": "Kuvaus (mitä odotat)",
-        "formattingHint": "Voit käyttää **lihavointia**, *kursiivia*, linkkejä ja rivinvaihtoja.",
+        "formattingHint": "Voit käyttää **lihavointia**, *kursiivia*, linkkejä ja rivinvaihtoja, tai käytä 🔗-painiketta.",
         "attachmentLabel": "Liite (valinnainen)",
         "attachmentFailed": "Liitettä ei voitu ladata. Yritä uudelleen.",
         "search": "Etsi creators",

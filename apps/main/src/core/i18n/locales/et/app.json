@@ -457,7 +457,7 @@
         "objective": "Objective",
         "description": "Description",
         "descriptionHint": "Lisage tulemused (nt 1 Reel, 3 Stories) ja kasutusõigused või litsentsitingimused.",
-        "formattingHint": "Võite kasutada **paksu kirja**, *kaldkirja*, linke ja reamurdmisi.",
+        "formattingHint": "Võite kasutada **paksu kirja**, *kaldkirja*, linke ja reamurdmisi, või kasuta nuppu 🔗.",
         "budget": "Budget",
         "currency": "Valuuta",
         "startsAt": "Start date",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Valikuline link näidistöödele.",
         "listedOnJobsBoard": "Lisa tööde tahvlile",
         "jobBoard": "Tööpakkumised"
+      },
+      "insertLink": {
+        "buttonLabel": "Lisa link",
+        "dialogTitle": "Lisa link",
+        "urlLabel": "URL",
+        "textLabel": "Lingi tekst",
+        "invalidUrl": "Sisesta kehtiv http- või https-link.",
+        "textRequired": "Sisesta tekst, mida see link peaks näitama.",
+        "tooLong": "See link on siia liiga pikk — lühenda URL-i või lingi teksti.",
+        "insertButton": "Lisa"
       },
       "objective": {
         "awareness": "Awareness",
@@ -622,7 +632,7 @@
         "perLabel": "Ühik",
         "perPlaceholder": "nt skripti kohta",
         "descriptionLabel": "Kirjeldus (mida ootate)",
-        "formattingHint": "Võite kasutada **paksu kirja**, *kaldkirja*, linke ja reamurdmisi.",
+        "formattingHint": "Võite kasutada **paksu kirja**, *kaldkirja*, linke ja reamurdmisi, või kasuta nuppu 🔗.",
         "attachmentLabel": "Manus (valikuline)",
         "attachmentFailed": "Manust ei õnnestunud üles laadida. Palun proovige uuesti.",
         "search": "Otsi creators",

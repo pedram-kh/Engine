@@ -457,7 +457,7 @@
         "objective": "Cíl",
         "description": "Popis",
         "descriptionHint": "Uveďte výstupy (např. 1 Reel, 3 Stories) a práva k užití nebo licenční podmínky.",
-        "formattingHint": "Můžete použít **tučné písmo**, *kurzívu*, odkazy a zalomení řádků.",
+        "formattingHint": "Můžete použít **tučné písmo**, *kurzívu*, odkazy a zalomení řádků, nebo použijte tlačítko 🔗.",
         "budget": "Rozpočet",
         "currency": "Měna",
         "startsAt": "Datum začátku",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Volitelný odkaz na referenční práce.",
         "listedOnJobsBoard": "Přidat na nástěnku zakázek",
         "jobBoard": "Nabídky práce"
+      },
+      "insertLink": {
+        "buttonLabel": "Vložit odkaz",
+        "dialogTitle": "Vložit odkaz",
+        "urlLabel": "URL",
+        "textLabel": "Text odkazu",
+        "invalidUrl": "Zadejte platný odkaz http nebo https.",
+        "textRequired": "Zadejte text, který se má u tohoto odkazu zobrazit.",
+        "tooLong": "Tento odkaz je příliš dlouhý — zkraťte adresu URL nebo text odkazu.",
+        "insertButton": "Vložit"
       },
       "objective": {
         "awareness": "Povědomí",
@@ -622,7 +632,7 @@
         "perLabel": "Za",
         "perPlaceholder": "např. za scénář",
         "descriptionLabel": "Popis (co očekáváte)",
-        "formattingHint": "Můžete použít **tučné písmo**, *kurzívu*, odkazy a zalomení řádků.",
+        "formattingHint": "Můžete použít **tučné písmo**, *kurzívu*, odkazy a zalomení řádků, nebo použijte tlačítko 🔗.",
         "attachmentLabel": "Příloha (volitelné)",
         "attachmentFailed": "Přílohu se nepodařilo nahrát. Zkuste to prosím znovu.",
         "search": "Hledat tvůrce",

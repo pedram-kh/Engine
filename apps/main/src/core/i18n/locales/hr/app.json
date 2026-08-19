@@ -457,7 +457,7 @@
         "objective": "Cíl",
         "description": "Popis",
         "descriptionHint": "Navedite isporuke (npr. 1 Reel, 3 Stories) te prava korištenja ili uvjete licenciranja.",
-        "formattingHint": "Možete koristiti **podebljano**, *kurziv*, poveznice i prijelome redaka.",
+        "formattingHint": "Možete koristiti **podebljano**, *kurziv*, poveznice i prijelome redaka, ili upotrijebite gumb 🔗.",
         "budget": "Rozpočet",
         "currency": "Měna",
         "startsAt": "Datum začátku",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Neobavezna poveznica na referentne radove.",
         "listedOnJobsBoard": "Dodaj na ploču poslova",
         "jobBoard": "Oglasi za rad"
+      },
+      "insertLink": {
+        "buttonLabel": "Umetni poveznicu",
+        "dialogTitle": "Umetni poveznicu",
+        "urlLabel": "URL",
+        "textLabel": "Tekst poveznice",
+        "invalidUrl": "Unesite valjanu http ili https poveznicu.",
+        "textRequired": "Unesite tekst koji ova poveznica treba prikazati.",
+        "tooLong": "Ova je poveznica predugačka da bi stala ovdje — skratite URL ili tekst poveznice.",
+        "insertButton": "Umetni"
       },
       "objective": {
         "awareness": "Ozaveščenost",
@@ -622,7 +632,7 @@
         "perLabel": "Po",
         "perPlaceholder": "npr. po scenariju",
         "descriptionLabel": "Opis (što očekujete)",
-        "formattingHint": "Možete koristiti **podebljano**, *kurziv*, poveznice i prijelome redaka.",
+        "formattingHint": "Možete koristiti **podebljano**, *kurziv*, poveznice i prijelome redaka, ili upotrijebite gumb 🔗.",
         "attachmentLabel": "Privitak (neobavezno)",
         "attachmentFailed": "Privitak nije moguće prenijeti. Pokušajte ponovno.",
         "search": "Pretraživanje ustvarjalca",

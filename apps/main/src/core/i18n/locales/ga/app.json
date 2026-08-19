@@ -457,7 +457,7 @@
         "objective": "Objective",
         "description": "Description",
         "descriptionHint": "Cuir na hearraí insoláthartha san áireamh (m.sh. 1 Reel, 3 Stories) agus na cearta úsáide nó na téarmaí ceadúnaithe.",
-        "formattingHint": "Is féidir leat **cló trom**, *cló iodálach*, naisc agus línte nua a úsáid.",
+        "formattingHint": "Is féidir leat **cló trom**, *cló iodálach*, naisc agus línte nua a úsáid, nó úsáid an cnaipe 🔗.",
         "budget": "Budget",
         "currency": "Airgeadra",
         "startsAt": "Start date",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Nasc roghnach chuig obair thagartha.",
         "listedOnJobsBoard": "Cuir leis an gclár post",
         "jobBoard": "Clár post"
+      },
+      "insertLink": {
+        "buttonLabel": "Ionsáigh nasc",
+        "dialogTitle": "Ionsáigh nasc",
+        "urlLabel": "URL",
+        "textLabel": "Téacs an naisc",
+        "invalidUrl": "Cuir isteach nasc http nó https bailí.",
+        "textRequired": "Cuir isteach an téacs ba cheart don nasc seo a thaispeáint.",
+        "tooLong": "Tá an nasc seo rófhada le luí anseo — giorraigh an URL nó téacs an naisc.",
+        "insertButton": "Ionsáigh"
       },
       "objective": {
         "awareness": "Awareness",
@@ -622,7 +632,7 @@
         "perLabel": "In aghaidh",
         "perPlaceholder": "m.sh. in aghaidh na scripte",
         "descriptionLabel": "Cur síos (a bhfuil tú ag súil leis)",
-        "formattingHint": "Is féidir leat **cló trom**, *cló iodálach*, naisc agus línte nua a úsáid.",
+        "formattingHint": "Is féidir leat **cló trom**, *cló iodálach*, naisc agus línte nua a úsáid, nó úsáid an cnaipe 🔗.",
         "attachmentLabel": "Ceangaltán (roghnach)",
         "attachmentFailed": "Níorbh fhéidir an ceangaltán a uaslódáil. Bain triail eile as.",
         "search": "Cuardaigh creators",

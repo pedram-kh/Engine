@@ -457,7 +457,7 @@
         "objective": "Cíl",
         "description": "Popis",
         "descriptionHint": "Navedite izdelke (npr. 1 Reel, 3 Stories) ter pravice do uporabe ali licenčne pogoje.",
-        "formattingHint": "Uporabite lahko **krepko pisavo**, *ležečo pisavo*, povezave in prelome vrstic.",
+        "formattingHint": "Uporabite lahko **krepko pisavo**, *ležečo pisavo*, povezave in prelome vrstic, ali uporabite gumb 🔗.",
         "budget": "Rozpočet",
         "currency": "Měna",
         "startsAt": "Datum začátku",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Neobvezna povezava do referenčnih del.",
         "listedOnJobsBoard": "Dodaj na oglasno desko del",
         "jobBoard": "Oglasi za delo"
+      },
+      "insertLink": {
+        "buttonLabel": "Vstavi povezavo",
+        "dialogTitle": "Vstavi povezavo",
+        "urlLabel": "URL",
+        "textLabel": "Besedilo povezave",
+        "invalidUrl": "Vnesite veljavno povezavo http ali https.",
+        "textRequired": "Vnesite besedilo, ki naj ga ta povezava prikaže.",
+        "tooLong": "Ta povezava je predolga, da bi se prilegala sem — skrajšajte URL ali besedilo povezave.",
+        "insertButton": "Vstavi"
       },
       "objective": {
         "awareness": "Ozaveščenost",
@@ -622,7 +632,7 @@
         "perLabel": "Na",
         "perPlaceholder": "npr. na scenarij",
         "descriptionLabel": "Opis (kaj pričakujete)",
-        "formattingHint": "Uporabite lahko **krepko pisavo**, *ležečo pisavo*, povezave in prelome vrstic.",
+        "formattingHint": "Uporabite lahko **krepko pisavo**, *ležečo pisavo*, povezave in prelome vrstic, ali uporabite gumb 🔗.",
         "attachmentLabel": "Priloga (neobvezno)",
         "attachmentFailed": "Priloge ni bilo mogoče naložiti. Poskusite znova.",
         "search": "Iskanje ustvarjalca",

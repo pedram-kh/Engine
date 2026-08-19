@@ -457,7 +457,7 @@
         "objective": "Objective",
         "description": "Description",
         "descriptionHint": "Nurodykite rezultatus (pvz., 1 Reel, 3 Stories) ir naudojimo teises arba licencijos sąlygas.",
-        "formattingHint": "Galite naudoti **pusjuodį**, *kursyvą*, nuorodas ir eilučių lūžius.",
+        "formattingHint": "Galite naudoti **pusjuodį**, *kursyvą*, nuorodas ir eilučių lūžius, arba naudokite mygtuką 🔗.",
         "budget": "Budget",
         "currency": "Valiuta",
         "startsAt": "Start date",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Neprivaloma nuoroda į pavyzdinius darbus.",
         "listedOnJobsBoard": "Įtraukti į darbų lentą",
         "jobBoard": "Darbo skelbimai"
+      },
+      "insertLink": {
+        "buttonLabel": "Įterpti nuorodą",
+        "dialogTitle": "Įterpti nuorodą",
+        "urlLabel": "URL",
+        "textLabel": "Nuorodos tekstas",
+        "invalidUrl": "Įveskite tinkamą http arba https nuorodą.",
+        "textRequired": "Įveskite tekstą, kurį turėtų rodyti ši nuoroda.",
+        "tooLong": "Ši nuoroda per ilga, kad tilptų čia — sutrumpinkite URL arba nuorodos tekstą.",
+        "insertButton": "Įterpti"
       },
       "objective": {
         "awareness": "Awareness",
@@ -622,7 +632,7 @@
         "perLabel": "Už",
         "perPlaceholder": "pvz., už scenarijų",
         "descriptionLabel": "Aprašymas (ko tikitės)",
-        "formattingHint": "Galite naudoti **pusjuodį**, *kursyvą*, nuorodas ir eilučių lūžius.",
+        "formattingHint": "Galite naudoti **pusjuodį**, *kursyvą*, nuorodas ir eilučių lūžius, arba naudokite mygtuką 🔗.",
         "attachmentLabel": "Priedas (neprivaloma)",
         "attachmentFailed": "Priedo įkelti nepavyko. Bandykite dar kartą.",
         "search": "Ieškoti creators",

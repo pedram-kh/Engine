@@ -12,7 +12,7 @@
  */
 
 import type { CreateCampaignPayload } from '@catalyst/api-client'
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { createI18n } from 'vue-i18n'
 import { createVuetify } from 'vuetify'
@@ -99,5 +99,42 @@ describe('CampaignForm — the posting toggle (AH-069 D1)', () => {
     expect(emitted).toBeTruthy()
     const last = emitted?.at(-1)?.[0] as CreateCampaignPayload
     expect(last.creator_posts_content).toBe(true)
+  })
+})
+
+describe('CampaignForm — insert-link integration (AH-082)', () => {
+  it('inserts a markdown link into the description via the shared InsertLinkButton', async () => {
+    const wrapper = mountForm(basePayload({ description: 'shoot a video please' }))
+    // Let VTextarea's post-mount auto-grow pass settle before touching
+    // selection — otherwise its deferred resize effect can land after ours
+    // and reset the cursor to 0, same as the composer precedent's spec.
+    await flushPromises()
+
+    const textareaEl = wrapper.find('[data-test="campaign-description"] textarea')
+      .element as HTMLTextAreaElement
+    textareaEl.setSelectionRange(6, 13) // "a video"
+
+    await wrapper.find('[data-test="campaign-insert-link-button"]').trigger('click')
+    await flushPromises()
+
+    const urlInput = document.body.querySelector(
+      '[data-test="campaign-insert-link-url"] input',
+    ) as HTMLInputElement
+    urlInput.value = 'https://example.com/brief'
+    urlInput.dispatchEvent(new Event('input'))
+    await flushPromises()
+    ;(
+      document.body.querySelector('[data-test="campaign-insert-link-insert"]') as HTMLElement
+    ).click()
+    await flushPromises()
+
+    expect(
+      (wrapper.find('[data-test="campaign-description"] textarea').element as HTMLTextAreaElement)
+        .value,
+    ).toBe('shoot [a video](https://example.com/brief) please')
+
+    const emitted = wrapper.emitted('update:modelValue')
+    const last = emitted?.at(-1)?.[0] as CreateCampaignPayload
+    expect(last.description).toBe('shoot [a video](https://example.com/brief) please')
   })
 })

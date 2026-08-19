@@ -457,7 +457,7 @@
         "objective": "Objective",
         "description": "Description",
         "descriptionHint": "Include deliverables (e.g. 1 Reel, 3 Stories) and usage rights or licensing terms.",
-        "formattingHint": "You can use **bold**, *italics*, links, and line breaks.",
+        "formattingHint": "You can use **bold**, *italics*, links, and line breaks, or use the 🔗 button.",
         "budget": "Budget",
         "currency": "Currency",
         "startsAt": "Start date",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Optional link to reference work.",
         "listedOnJobsBoard": "Add to jobs board",
         "jobBoard": "Job board"
+      },
+      "insertLink": {
+        "buttonLabel": "Insert link",
+        "dialogTitle": "Insert link",
+        "urlLabel": "URL",
+        "textLabel": "Link text",
+        "invalidUrl": "Enter a valid http or https link.",
+        "textRequired": "Enter the text this link should show.",
+        "tooLong": "This link is too long to fit here — shorten the URL or the link text.",
+        "insertButton": "Insert"
       },
       "objective": {
         "awareness": "Awareness",
@@ -622,7 +632,7 @@
         "perLabel": "Per",
         "perPlaceholder": "e.g. per script",
         "descriptionLabel": "Description (what you expect)",
-        "formattingHint": "You can use **bold**, *italics*, links, and line breaks.",
+        "formattingHint": "You can use **bold**, *italics*, links, and line breaks, or use the 🔗 button.",
         "attachmentLabel": "Attachment (optional)",
         "attachmentFailed": "The attachment couldn't be uploaded. Please try again.",
         "search": "Search creators",

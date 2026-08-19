@@ -52,7 +52,9 @@ final class CreateCampaignRequest extends FormRequest
                 Rule::exists('brands', 'ulid')->where('agency_id', $agencyId),
             ],
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:5000'],
+            // AH-082 D3 — raised 5000 -> 10000 alongside the insert-link
+            // affordance; the FE textarea's `maxlength` mirrors this.
+            'description' => ['nullable', 'string', 'max:10000'],
             'objective' => ['sometimes', new Enum(CampaignObjective::class)],
 
             // Money — integer minor units (D-3) + ISO-4217 currency.

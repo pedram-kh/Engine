@@ -115,6 +115,28 @@ it('rejects an invalid objective + missing budget (422)', function (): void {
         ->assertStatus(422);
 });
 
+// AH-082 D3 — the description cap was raised 5000 -> 10000 alongside the
+// insert-link affordance. No boundary test existed for this field before this
+// chunk (a found pre-existing gap, not new behaviour this test is folded
+// into) — this pins the NEW ceiling at create time.
+it('rejects a campaign description over 10000 characters (422)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $brand = Brand::factory()->forAgency($agency->id)->createOne();
+
+    $this->actingAs($admin)
+        ->postJson(campaignsUrl($agency), validCampaignPayload($brand, [
+            'description' => str_repeat('x', 10_001),
+        ]))
+        ->assertStatus(422);
+
+    $this->actingAs($admin)
+        ->postJson(campaignsUrl($agency), validCampaignPayload($brand, [
+            'description' => str_repeat('x', 10_000),
+        ]))
+        ->assertCreated();
+});
+
 // ── Objective default (D-1 — the form no longer sends it) ────────────────────
 
 it('defaults a missing objective to ugc on create (D-1)', function (): void {
@@ -299,6 +321,23 @@ it('preserves the stored brief byte-identical when the edit omits it (D-3 — th
         ->and(reloadCampaign($campaign)->brief['mentions'] ?? null)->toBe(['@brandhandle'])
         ->and(reloadCampaign($campaign)->brief['links'] ?? null)->toBe(['https://brand.example/landing'])
         ->and(reloadCampaign($campaign)->brief['attachments'] ?? null)->toBe(['brief.pdf']);
+});
+
+// AH-082 D3 — UpdateCampaignRequest validates `description` independently
+// from CreateCampaignRequest; both moved to 10000 together, so both get the
+// boundary pin (create's above, this one on the Settings edit).
+it('rejects a Settings-edit description over 10000 characters (422)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $campaign = Campaign::factory()->forAgency($agency->id)->createOne();
+
+    $this->actingAs($admin)->patchJson(campaignsUrl($agency)."/{$campaign->ulid}", [
+        'description' => str_repeat('x', 10_001),
+    ])->assertStatus(422);
+
+    $this->actingAs($admin)->patchJson(campaignsUrl($agency)."/{$campaign->ulid}", [
+        'description' => str_repeat('x', 10_000),
+    ])->assertOk();
 });
 
 // ── Creators tab assignment list (read-only, Chunk 1) ─────────────────────────

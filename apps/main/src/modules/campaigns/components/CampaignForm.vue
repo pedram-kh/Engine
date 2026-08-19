@@ -35,6 +35,9 @@ import type { CreateCampaignPayload } from '@catalyst/api-client'
 import { COUNTRY_OPTIONS, euLanguageOptions } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import type { VTextarea } from 'vuetify/components'
+
+import InsertLinkButton, { type TextareaHandle } from './InsertLinkButton.vue'
 
 interface BrandOption {
   id: string
@@ -139,6 +142,17 @@ const currencyOptions = [
 ]
 
 const brandSelectItems = computed(() => props.brands.map((b) => ({ title: b.name, value: b.id })))
+
+// Handed to InsertLinkButton — see that component's doc comment for why the
+// cast is safe (VTextarea forwards the native textarea's selection API
+// dynamically, outside its public TS type). Hoisted into a computed (rather
+// than inline in the template) because eslint-plugin-vue's
+// `no-deprecated-filter` rule misreads a `|` union type inside a template
+// expression as a Vue 2 filter pipe.
+const descriptionTextarea = ref<InstanceType<typeof VTextarea> | null>(null)
+const descriptionTextareaHandle = computed<TextareaHandle | null>(
+  () => descriptionTextarea.value as unknown as TextareaHandle | null,
+)
 </script>
 
 <template>
@@ -171,6 +185,7 @@ const brandSelectItems = computed(() => props.brands.map((b) => ({ title: b.name
          render site, hence the formatting hint appended below — same
          concatenation shape ProfileBasicsForm.vue uses for its bio hint. -->
     <v-textarea
+      ref="descriptionTextarea"
       :model-value="local.description ?? ''"
       :label="t('app.campaigns.fields.description')"
       :hint="`${t('app.campaigns.fields.descriptionHint')} ${t('app.campaigns.fields.formattingHint')}`"
@@ -178,10 +193,20 @@ const brandSelectItems = computed(() => props.brands.map((b) => ({ title: b.name
       rows="3"
       auto-grow
       class="mb-3"
-      maxlength="5000"
+      maxlength="10000"
       data-test="campaign-description"
       @update:model-value="update('description', $event || undefined)"
-    />
+    >
+      <template #append-inner>
+        <InsertLinkButton
+          :model-value="local.description ?? ''"
+          :textarea-ref="descriptionTextareaHandle"
+          :maxlength="10000"
+          test-prefix="campaign-insert-link"
+          @update:model-value="update('description', $event || undefined)"
+        />
+      </template>
+    </v-textarea>
 
     <div class="d-flex ga-3">
       <v-text-field

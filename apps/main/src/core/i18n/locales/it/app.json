@@ -457,7 +457,7 @@
         "objective": "Obiettivo",
         "description": "Descrizione",
         "descriptionHint": "Indica i deliverable (es. 1 Reel, 3 Stories) e i diritti di utilizzo o i termini di licenza.",
-        "formattingHint": "Puoi usare il **grassetto**, il *corsivo*, i link e le interruzioni di riga.",
+        "formattingHint": "Puoi usare il **grassetto**, il *corsivo*, i link e le interruzioni di riga, oppure usa il pulsante 🔗.",
         "budget": "Budget",
         "currency": "Valuta",
         "startsAt": "Data di inizio",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Link facoltativo a lavori di riferimento.",
         "listedOnJobsBoard": "Aggiungi alla bacheca lavori",
         "jobBoard": "Offerte di lavoro"
+      },
+      "insertLink": {
+        "buttonLabel": "Inserisci link",
+        "dialogTitle": "Inserisci link",
+        "urlLabel": "URL",
+        "textLabel": "Testo del link",
+        "invalidUrl": "Inserisci un link http o https valido.",
+        "textRequired": "Inserisci il testo che questo link deve mostrare.",
+        "tooLong": "Questo link è troppo lungo per stare qui — abbrevia l'URL o il testo del link.",
+        "insertButton": "Inserisci"
       },
       "objective": {
         "awareness": "Notorietà",
@@ -622,7 +632,7 @@
         "perLabel": "Per",
         "perPlaceholder": "es. per script",
         "descriptionLabel": "Descrizione (cosa ti aspetti)",
-        "formattingHint": "Puoi usare il **grassetto**, il *corsivo*, i link e le interruzioni di riga.",
+        "formattingHint": "Puoi usare il **grassetto**, il *corsivo*, i link e le interruzioni di riga, oppure usa il pulsante 🔗.",
         "attachmentLabel": "Allegato (facoltativo)",
         "attachmentFailed": "Impossibile caricare l'allegato. Riprova.",
         "search": "Cerca creator",

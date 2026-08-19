@@ -457,7 +457,7 @@
         "objective": "Objective",
         "description": "Description",
         "descriptionHint": "Includeți livrabilele (de ex. 1 Reel, 3 Stories) și drepturile de utilizare sau termenii de licențiere.",
-        "formattingHint": "Poți folosi **text îngroșat**, *cursiv*, linkuri și întreruperi de rând.",
+        "formattingHint": "Poți folosi **text îngroșat**, *cursiv*, linkuri și întreruperi de rând, sau folosește butonul 🔗.",
         "budget": "Budget",
         "currency": "Monedă",
         "startsAt": "Start date",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Link opțional către lucrări de referință.",
         "listedOnJobsBoard": "Adaugă în panoul de joburi",
         "jobBoard": "Anunțuri de lucru"
+      },
+      "insertLink": {
+        "buttonLabel": "Inserează link",
+        "dialogTitle": "Inserează link",
+        "urlLabel": "URL",
+        "textLabel": "Text link",
+        "invalidUrl": "Introdu un link http sau https valid.",
+        "textRequired": "Introdu textul pe care ar trebui să îl afișeze acest link.",
+        "tooLong": "Acest link este prea lung pentru a încăpea aici — scurtează URL-ul sau textul linkului.",
+        "insertButton": "Inserează"
       },
       "objective": {
         "awareness": "Awareness",
@@ -622,7 +632,7 @@
         "perLabel": "Per",
         "perPlaceholder": "de ex. per scenariu",
         "descriptionLabel": "Descriere (ce așteptați)",
-        "formattingHint": "Poți folosi **text îngroșat**, *cursiv*, linkuri și întreruperi de rând.",
+        "formattingHint": "Poți folosi **text îngroșat**, *cursiv*, linkuri și întreruperi de rând, sau folosește butonul 🔗.",
         "attachmentLabel": "Atașament (opțional)",
         "attachmentFailed": "Atașamentul nu a putut fi încărcat. Vă rugăm să încercați din nou.",
         "search": "Căutați creators",

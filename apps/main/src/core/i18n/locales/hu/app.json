@@ -457,7 +457,7 @@
         "objective": "Objective",
         "description": "Description",
         "descriptionHint": "Adja meg a leadandókat (pl. 1 Reel, 3 Stories), valamint a felhasználási jogokat vagy licencfeltételeket.",
-        "formattingHint": "Használhatsz **félkövér**, *dőlt* szöveget, linkeket és sortöréseket.",
+        "formattingHint": "Használhatsz **félkövér**, *dőlt* szöveget, linkeket és sortöréseket, vagy használd a 🔗 gombot.",
         "budget": "Budget",
         "currency": "Valuta",
         "startsAt": "Start date",
@@ -476,6 +476,16 @@
         "listingExamplesUrlHint": "Opcionális link referenciamunkákhoz.",
         "listedOnJobsBoard": "Hozzáadás a munkatáblához",
         "jobBoard": "Álláshirdetések"
+      },
+      "insertLink": {
+        "buttonLabel": "Link beszúrása",
+        "dialogTitle": "Link beszúrása",
+        "urlLabel": "URL",
+        "textLabel": "Hivatkozás szövege",
+        "invalidUrl": "Adj meg egy érvényes http vagy https hivatkozást.",
+        "textRequired": "Add meg a szöveget, amit ennek a linknek meg kell jelenítenie.",
+        "tooLong": "Ez a link túl hosszú ide — rövidítsd le az URL-t vagy a link szövegét.",
+        "insertButton": "Beszúrás"
       },
       "objective": {
         "awareness": "Awareness",
@@ -622,7 +632,7 @@
         "perLabel": "Egység",
         "perPlaceholder": "pl. forgatókönyvenként",
         "descriptionLabel": "Leírás (mit vársz el)",
-        "formattingHint": "Használhatsz **félkövér**, *dőlt* szöveget, linkeket és sortöréseket.",
+        "formattingHint": "Használhatsz **félkövér**, *dőlt* szöveget, linkeket és sortöréseket, vagy használd a 🔗 gombot.",
         "attachmentLabel": "Melléklet (nem kötelező)",
         "attachmentFailed": "A mellékletet nem sikerült feltölteni. Kérjük, próbáld újra.",
         "search": "Keresés creators",
