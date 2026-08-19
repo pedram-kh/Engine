@@ -70,6 +70,47 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-082 · Insert-link button + cap raise
+
+- **Status:** Landed (push HELD). Compact full loop — kickoff with locked decisions (D1–D4) →
+  brief plan-pause (all five proposals ratified verbatim) → build → two-commit pair, push held.
+  Review file is the record.
+- **Commits:** feature + docs commits carrying this entry (see `git log` at the tip for the exact
+  hashes).
+- **Date:** 2026-08-19
+- **Why:** AH-081 gave agencies markdown links/bold/italic, but the only way to write a link was
+  hand-typing `[text](url)` syntax — no affordance existed, and neither editor's length cap
+  accounted for the extra prose a real brief needs.
+- **What:** one shared `InsertLinkButton.vue` (🔗, `append-inner` placement, the composer
+  precedent) on both `OfferFieldsForm.vue`'s and `CampaignForm.vue`'s description textareas.
+  Selecting text and clicking it wraps the selection as `[selection](url)`; with no selection it
+  asks for a label too and inserts `[label](url)` at the cursor, restoring focus + cursor position
+  immediately after the insert. A compute-before-insert maxlength guard refuses an insert that
+  would exceed the field's cap with an inline error, never a silent truncation or a server-side
+  surprise. `campaigns.description` raised 5000 → 10000 in both `CreateCampaignRequest` and
+  `UpdateCampaignRequest` (they validate independently); `offer_description` stays at AH-081's 3000. Closed a found pre-existing gap: `campaigns.description` had no length-boundary test
+  before this chunk — added on both the create and update endpoints.
+- **Decisions:** the dialog's http/https check is UX-only — `useRichBriefRenderer.ts`'s
+  `validateHttpOnlyLink` remains the actual enforcement, and its regex is deliberately duplicated
+  (not imported) so the renderer file's `git diff` is literally empty, not merely
+  zero-functional-diff. One shared component for both editors, not two copies. One
+  `app.campaigns.insertLink.*` i18n namespace (8 keys) mirroring `RelationshipThreadView`'s
+  existing link-dialog phrasing, plus the two AH-081 hint keys amended (not duplicated) to
+  mention the new button.
+- **Touched:** `InsertLinkButton.vue` (new, +spec), `OfferFieldsForm.vue` (+new spec file),
+  `CampaignForm.vue` (+spec), `CreateCampaignRequest.php`, `UpdateCampaignRequest.php`,
+  `CampaignCrudTest.php` (+2 new boundary tests), `en/app.json` + 23 locales
+  (`campaigns.invite.formattingHint`, `campaigns.fields.formattingHint` amended;
+  `campaigns.insertLink.*` net-new, 8 keys, real per-locale MT incl. the flaky-10).
+- **Security note:** zero-diff on `useRichBriefRenderer.ts` and `RichBrief.vue` confirmed by an
+  empty `git diff --stat` / `git status --porcelain` on both files — not a claim, a literal byte
+  count of zero.
+- **Playwright:** not run this chunk — editor micro-interaction, Vitest territory, as stated at
+  kickoff. No E2E leg touches this surface.
+- **Ref:** [`minimal-rich-text-review.md`](minimal-rich-text-review.md) for the AH-081 renderer
+  this chunk builds on and deliberately does not touch; full detail in
+  [`insert-link-button-cap-raise-review.md`](insert-link-button-cap-raise-review.md).
+
 ### AH-081 · Minimal rich text: links + bold/italic + breaks in briefs and descriptions
 
 - **Status:** Landed (push HELD). Full loop — kickoff with locked decisions (D1–D6) → plan-pause
