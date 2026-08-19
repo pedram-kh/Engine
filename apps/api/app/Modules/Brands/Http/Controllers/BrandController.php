@@ -10,6 +10,7 @@ use App\Modules\Audit\Facades\Audit;
 use App\Modules\Brands\Enums\BrandStatus;
 use App\Modules\Brands\Http\Requests\CreateBrandRequest;
 use App\Modules\Brands\Http\Requests\UpdateBrandRequest;
+use App\Modules\Brands\Http\Resources\BrandOptionResource;
 use App\Modules\Brands\Http\Resources\BrandResource;
 use App\Modules\Brands\Models\Brand;
 use Illuminate\Http\JsonResponse;
@@ -28,6 +29,22 @@ final class BrandController
      *   - 'archived'           — only archived (soft-deleted) brands
      *   - 'all'                — both active and archived brands
      * Only one role — any membership — can view.
+     *
+     * `?for=select` (AH-085) switches this same route to an UNPAGINATED,
+     * thin-projection mode for `<select>` pickers — see
+     * {@see BrandOptionResource}'s docblock for why a full fetch, not a
+     * paginated one and not AH-066's `?q=` search shape, is the honest fix
+     * here: brands are agency-owned and created one at a time through a
+     * form, so a whole agency's active set is realistically dozens, never
+     * the hundreds a creator roster runs to. Without this, every picker that
+     * requests `per_page=100` silently got the hardcoded-25 default below
+     * instead — any agency with more than 25 active brands had the
+     * alphabetical tail of its list permanently unreachable from every
+     * `<select>` (the campaign create form, the campaigns-list brand
+     * filter, the pool create/edit form, the blacklist dialog) while the
+     * dedicated Brands admin table — which paginates by DESIGN, not by
+     * bug — kept working, because it reads page 2 through real pagination
+     * controls rather than expecting one response to hold everything.
      */
     public function index(Request $request, Agency $agency): AnonymousResourceCollection
     {
@@ -47,9 +64,13 @@ final class BrandController
             $query->where('status', BrandStatus::Active->value);
         }
 
-        $brands = $query->orderBy('name')->paginate(25);
+        $query->orderBy('name');
 
-        return BrandResource::collection($brands);
+        if ($request->query('for') === 'select') {
+            return BrandOptionResource::collection($query->get());
+        }
+
+        return BrandResource::collection($query->paginate(25));
     }
 
     /**

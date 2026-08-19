@@ -28,7 +28,9 @@ async function loadBrands(): Promise<void> {
   const agencyId = agencyStore.currentAgencyId
   if (agencyId === null) return
   try {
-    const res = await brandsApi.list(agencyId, { per_page: 100, status: 'active' })
+    // AH-085 — unpaginated, so every brand is reachable, not just the first
+    // alphabetical page.
+    const res = await brandsApi.listOptions(agencyId, 'active')
     brandOptions.value = res.data.map((b) => ({ value: b.id, title: b.attributes.name }))
   } catch {
     brandOptions.value = []

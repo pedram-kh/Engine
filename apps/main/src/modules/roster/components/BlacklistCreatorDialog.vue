@@ -7,8 +7,8 @@
  * D-2 — the brand picker appears only for brand scope), and the hard/soft type
  * (D-1). Submits to the dedicated blacklist endpoint (NOT the rating/notes
  * PATCH — D-2 no dual-write). The dialog shell mirrors AddToPoolDialog; the
- * brand options reuse the PoolCreatePage `brandsApi.list` pattern (no shared
- * brand-picker component exists).
+ * brand options reuse the PoolCreatePage `brandsApi.listOptions` pattern (no
+ * shared brand-picker component exists — see AH-085).
  */
 
 import type { BlacklistScope, BlacklistType } from '@catalyst/api-client'
@@ -62,7 +62,9 @@ function reset(): void {
 async function loadBrands(): Promise<void> {
   brandsLoading.value = true
   try {
-    const res = await brandsApi.list(props.agencyId, { per_page: 100, status: 'active' })
+    // AH-085 — unpaginated, so every brand is reachable, not just the first
+    // alphabetical page.
+    const res = await brandsApi.listOptions(props.agencyId, 'active')
     brandOptions.value = res.data.map((b) => ({ value: b.id, title: b.attributes.name }))
   } catch {
     brandOptions.value = []

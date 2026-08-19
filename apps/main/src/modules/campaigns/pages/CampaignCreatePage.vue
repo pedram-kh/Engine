@@ -2,7 +2,7 @@
 import {
   ApiError,
   extractFieldErrors,
-  type BrandResource,
+  type BrandOptionResource,
   type CreateCampaignPayload,
 } from '@catalyst/api-client'
 import { onMounted, ref } from 'vue'
@@ -45,8 +45,11 @@ async function loadBrands(): Promise<void> {
   const agencyId = agencyStore.currentAgencyId
   if (agencyId === null) return
   try {
-    const res = await brandsApi.list(agencyId, { per_page: 100, status: 'active' })
-    brands.value = res.data.map((b: BrandResource) => ({ id: b.id, name: b.attributes.name }))
+    // AH-085 — every active brand, unpaginated (not `list()`'s 25-row page),
+    // so agencies with more than a page of brands don't lose the alphabetical
+    // tail from the select.
+    const res = await brandsApi.listOptions(agencyId, 'active')
+    brands.value = res.data.map((b: BrandOptionResource) => ({ id: b.id, name: b.attributes.name }))
   } catch {
     brands.value = []
   }

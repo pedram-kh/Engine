@@ -97,6 +97,21 @@ export interface BrandResource {
 }
 
 /**
+ * The thin `{id, name}` projection returned by `GET /brands?for=select`
+ * (AH-085) — every `<select>`/filter picker's shape. Not paginated: see
+ * `BrandOptionResource`'s backend docblock for why a full fetch of this
+ * narrow projection, not AH-066's `?q=` search, is the right fix for a list
+ * that is bounded by agency (realistically dozens, never hundreds).
+ */
+export interface BrandOptionResource {
+  id: string
+  type: 'brands'
+  attributes: {
+    name: string
+  }
+}
+
+/**
  * POST /brands. The brand FLOOR (AH-053, D6) is required by the API, so it is
  * required here: a payload missing any of these is a guaranteed 422.
  *

@@ -42,6 +42,7 @@ vi.mock('../api/roster.api', () => ({
 vi.mock('@/modules/brands/api/brands.api', () => ({
   brandsApi: {
     list: vi.fn().mockResolvedValue({ data: [] }),
+    listOptions: vi.fn().mockResolvedValue({ data: [] }),
   },
 }))
 

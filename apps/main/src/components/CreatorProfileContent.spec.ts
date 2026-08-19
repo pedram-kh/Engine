@@ -40,7 +40,10 @@ vi.mock('@/modules/discover/api/discovery.api', () => ({
   discoveryApi: { show: vi.fn() },
 }))
 vi.mock('@/modules/brands/api/brands.api', () => ({
-  brandsApi: { list: vi.fn().mockResolvedValue({ data: [] }) },
+  brandsApi: {
+    list: vi.fn().mockResolvedValue({ data: [] }),
+    listOptions: vi.fn().mockResolvedValue({ data: [] }),
+  },
 }))
 
 import { discoveryApi } from '@/modules/discover/api/discovery.api'

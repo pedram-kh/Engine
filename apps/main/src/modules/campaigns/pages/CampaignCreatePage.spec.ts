@@ -24,7 +24,7 @@ vi.mock('../api/campaigns.api', () => ({
 }))
 
 vi.mock('@/modules/brands/api/brands.api', () => ({
-  brandsApi: { list: vi.fn() },
+  brandsApi: { list: vi.fn(), listOptions: vi.fn() },
 }))
 
 vi.mock('@/core/stores/useAgencyStore', () => ({
@@ -38,6 +38,7 @@ vi.mock('vue-router', () => ({
 
 import { brandsApi } from '@/modules/brands/api/brands.api'
 import { campaignsApi } from '../api/campaigns.api'
+import CampaignForm from '../components/CampaignForm.vue'
 import CampaignCreatePage from './CampaignCreatePage.vue'
 
 async function mountPage() {
@@ -64,7 +65,7 @@ async function mountPage() {
 describe('CampaignCreatePage — the AH-069 posting default (D1, Q1)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(brandsApi.list).mockResolvedValue({ data: [] } as never)
+    vi.mocked(brandsApi.listOptions).mockResolvedValue({ data: [] })
   })
 
   it('pre-sets the toggle to OFF — a form-created campaign hands off at approval', async () => {
@@ -106,5 +107,31 @@ describe('CampaignCreatePage — the AH-069 posting default (D1, Q1)', () => {
       'agency-ulid',
       expect.objectContaining({ creator_posts_content: true }),
     )
+  })
+})
+
+describe('CampaignCreatePage — the brand select (AH-085)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('§5.34 — fetches via listOptions (unpaginated), not the paginated list(), and every brand past the old 25-row page is reachable in the select', async () => {
+    // page_size (25) + 5 — the exact shape the old `per_page: 100` /
+    // hardcoded-`paginate(25)` mismatch silently truncated.
+    const brands = Array.from({ length: 30 }, (_, i) => ({
+      id: `brand-${i}`,
+      type: 'brands' as const,
+      attributes: { name: `Brand ${String(i).padStart(2, '0')}` },
+    }))
+    vi.mocked(brandsApi.listOptions).mockResolvedValue({ data: brands })
+
+    const wrapper = await mountPage()
+
+    expect(brandsApi.listOptions).toHaveBeenCalledWith('agency-ulid', 'active')
+    expect(brandsApi.list).not.toHaveBeenCalled()
+
+    const form = wrapper.findComponent(CampaignForm)
+    expect(form.props('brands')).toHaveLength(30)
+    expect(form.props('brands')).toContainEqual({ id: 'brand-29', name: 'Brand 29' })
   })
 })

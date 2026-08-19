@@ -9,6 +9,7 @@
  */
 
 import type {
+  BrandOptionResource,
   BrandResource,
   CreateBrandPayload,
   PaginatedCollection,
@@ -25,6 +26,10 @@ export interface BrandListParams {
 
 export interface SingleBrandEnvelope {
   data: BrandResource
+}
+
+export interface BrandOptionsEnvelope {
+  data: BrandOptionResource[]
 }
 
 function brandsBase(agencyId: string): string {
@@ -44,6 +49,20 @@ export const brandsApi = {
     return http.get<PaginatedCollection<BrandResource>>(
       `${brandsBase(agencyId)}${qs ? `?${qs}` : ''}`,
     )
+  },
+
+  /**
+   * Every brand for the agency, unpaginated, in the thin `{id, name}`
+   * projection — for `<select>` pickers and filter dropdowns (AH-085).
+   * NOT for the Brands admin table, which paginates on purpose and should
+   * keep using `list()`.
+   */
+  listOptions(
+    agencyId: string,
+    status: BrandListParams['status'] = 'active',
+  ): Promise<BrandOptionsEnvelope> {
+    const query = new URLSearchParams({ for: 'select', status })
+    return http.get<BrandOptionsEnvelope>(`${brandsBase(agencyId)}?${query.toString()}`)
   },
 
   show(agencyId: string, brandId: string): Promise<SingleBrandEnvelope> {

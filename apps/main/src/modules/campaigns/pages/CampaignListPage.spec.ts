@@ -25,7 +25,7 @@ vi.mock('../api/campaigns.api', () => ({
   campaignsApi: { list: vi.fn(), update: vi.fn() },
 }))
 vi.mock('@/modules/brands/api/brands.api', () => ({
-  brandsApi: { list: vi.fn() },
+  brandsApi: { list: vi.fn(), listOptions: vi.fn() },
 }))
 
 import { campaignsApi } from '../api/campaigns.api'
@@ -95,11 +95,7 @@ async function mountList(
     data: campaigns,
     meta: { total: campaigns.length, page: 1, per_page: 25, last_page: 1 },
   })
-  vi.mocked(brandsApi.list).mockResolvedValue({
-    data: [],
-    meta: { current_page: 1, from: null, last_page: 1, per_page: 100, to: null, total: 0 },
-    links: { first: null, last: null, prev: null, next: null },
-  })
+  vi.mocked(brandsApi.listOptions).mockResolvedValue({ data: [] })
 
   const agency = useAgencyStore()
   agency.initFromUser([
