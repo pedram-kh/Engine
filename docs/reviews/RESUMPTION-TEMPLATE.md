@@ -124,6 +124,18 @@ cannot record its own hash — `git rev-parse --short origin/main` is the author
 not carry this session's numbers forward). CI green at the pushed tip, cited by run URL per §5.41,
 closes the chunk.
 
+**Deploy state: production is now current through this tip — nothing is undeployed.** Pedram
+confirmed on 2026-08-19 that the deploy carrying `6cdf0a5` → `54f59948` ran successfully, closing
+out the two stacked `PENDING` entries in `deploy-log.md` into one merged `DEPLOYED` entry
+(**AH-067 → AH-083**) — see [`deploy-log.md`](../runbooks/deploy-log.md)'s `2026-08-19` entry for
+the full range, the two migrations, and every field's actual value (several genuinely **not
+recorded**, per Pedram's own instruction, rather than guessed). **Three feature flags now sit
+registered, OFF, and not armed** in production: `job_posted_notifications_enabled` and
+`application_notifications_enabled` (live since the 2026-07-31 Jobs Board arc; arming both is
+Pedram's own separate, deliberate ritual) and `missing_creator_mails_enabled` (new in this range,
+AH-083). Arming any of the three is a later, distinct act from this deploy — this file does not
+restate deploy state beyond this pointer, per the standing convention below.
+
 > **Honest gap, named rather than silently caught up on:** **AH-079 → AH-082 landed in a prior
 > session without their own Part 2 refresh** — the same class of miss as "AH-068 shipped without a
 > deploy-log entry" recorded further down this file. `adhoc-changes-log.md` is and was the whole
@@ -1015,10 +1027,11 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
   `missing_creator_mails_enabled` flag is a global kill switch, not per-recipient consent. `tech-debt.md`'s
   AH-056 entry (widened three times now — AH-058, then AH-083) is the authoritative gap description
   and its own "Resolution" is written generally enough to close on AH-084 landing.
-- **✅ AH-068 is CLOSED and PUSHED (2026-08-16).** Reviewed and approved;
-  [`draft-rounds-review.md`](draft-rounds-review.md) carries the verdict. **Not deployed** — and the
-  one deploy obligation it carries is the **queue-worker restart**, because mail copy changed in all 24
-  `lang/*/campaigns.php`. No migration, no one-shot, no flag to arm.
+- **✅ AH-068 is CLOSED, PUSHED, and DEPLOYED (2026-08-19).** Reviewed and approved;
+  [`draft-rounds-review.md`](draft-rounds-review.md) carries the verdict.
+  [`deploy-log.md`](../runbooks/deploy-log.md)'s `2026-08-19` entry (AH-067 → AH-083, merged) is the
+  deploy record — the queue-worker restart its mail-copy change required is folded into that same
+  entry's `Infra` field. No migration, no one-shot, no flag to arm of its own.
 - **⚠ A chunk-B read pass must read the POST-AH-068 reality, not the inventory's citations.** The
   inventory ([`draft-workflow-v2-inventory.md`](draft-workflow-v2-inventory.md)) was written at
   `ea9d686`, before chunk A shipped, and chunk B touches the **same notification and mail surfaces**

@@ -54,122 +54,94 @@ happened.
 
 ---
 
-## 2026-08-16 · Draft Workflow v2 — numbered rounds + the optional posting flow (AH-068, AH-069) — PENDING
+## 2026-08-19 · AH-067 → AH-083 — composer fix, Draft Workflow v2, the eyes-on batch, four admin/creator items, and the missing creator emails — DEPLOYED
 
-> **Update (2026-08-19):** AH-079 → AH-083 landed and are pushed on top of this range. **AH-079 →
-> AH-082 add no new deploy obligation** — no migration, no route, no resource shape, no gate, no flag,
-> no mail-copy change across all four (per their own entries in `adhoc-changes-log.md`). **AH-083 is
-> different: it adds a genuinely new obligation, layered onto this entry's existing posture rather
-> than replacing it.** A **SECOND migration** —
-> `2026_08_19_100000_create_message_email_debounces_table` (additive-only `CREATE TABLE`, no existing
-> row touched; `down()` is lossy — see its own docblock) — runs alongside AH-069's original
-> `add_creator_posts_content_to_campaigns_table`, in either order (they touch unrelated tables). The
-> **queue-worker restart** requirement is reaffirmed, not newly introduced (AH-068/069 already require
-> it): AH-083 adds two more mail-copy surfaces to the same restart — a new mailable
-> (`InviteReceivedMail`) plus new `lang/*/campaigns.php` keys ×24, and another new mailable
-> (`NewMessageMail`) plus new `lang/*/messages.php` keys ×24. **One new flag** ships alongside,
-> `missing_creator_mails_enabled` — registered but **not armed by this deploy**: both new mail legs
-> stay silent (in-app rows still write) until an operator arms it separately, per its
-> `feature-flags.md` row and enable ritual. This entry's posture is now **migrate (two migrations,
-> either order) + queue-worker restart + mandatory snapshot + no flag armed** — whoever deploys this
-> range carries **AH-067 through AH-083**. `docs/reviews/adhoc-changes-log.md`'s AH-083 entry and
-> [`missing-creator-mails-review.md`](../reviews/missing-creator-mails-review.md) carry the full
-> detail; this file states only what changes about the deploy itself.
+> This entry **merges** what were, until today, two stacked `PENDING` entries — the AH-067 composer
+> fix (opened 2026-08-11) and the AH-068/069 Draft Workflow v2 entry (opened 2026-08-16, which had
+> accumulated AH-071 → AH-083 on top via update notes without ever opening a new entry, per its own
+> "whoever deploys next carries the full range" convention). Pedram confirmed on 2026-08-19 that the
+> deploy carrying this **entire backlog** ran successfully, in one operation, per the arc-deploy
+> convention (`production-queue-worker.md` §8.3 — a themed backlog does not ship as a subset). Per
+> his instruction: **fields he did not supply are written "not recorded," not `TBD`** — an honest gap,
+> not a placeholder awaiting a later fill.
 
-> **Update (2026-08-18):** the eyes-on fix batch (AH-071 → AH-078) landed and is pushed on top of this
-> range without opening a new entry — it adds **no new deploy obligation of its own**. Zero `apps/api`
-> files touched across all eight items (confirmed by diff in
-> [`draft-v2-eyeson-batch-inventory.md`](../reviews/draft-v2-eyeson-batch-inventory.md) §5): no
-> migration, no route, no resource shape, no gate, no flag, no mail-copy change beyond the two locale
-> value-only string fixes AH-074 made (`creator.ui.assignments.subtitle`,
-> `app.campaigns.applications.accept.body` — SPA-rendered strings, not `lang/*.php` mail templates, so
-> they carry **no queue-worker restart obligation of their own**). This entry's posture stays exactly
-> **migrate-only + queue-worker restart + mandatory snapshot**, unchanged from AH-068/AH-069's own
-> requirements below; whoever deploys this range now carries AH-067 through AH-078, not just AH-068/069.
-> `docs/reviews/adhoc-changes-log.md` and `RESUMPTION-TEMPLATE.md` Part 2 carry the eight entries'
-> detail; this file states only what changes about the deploy, which is nothing.
-
-- **Status:** **PENDING.** AH-068 is pushed (`origin/main` = `45ee2e7f`); AH-069's three commits —
-  the plan-pause, the feature commit and the docs commit — are held, and AH-071 → AH-078 (eighteen
-  further commits: sixteen build/spec commits, one post-review pin, one docs commit) are held on top
-  of them, per the update note above. Stacks on top of the AH-067 entry below, which is itself still
-  `PENDING`, so whoever deploys next carries the **full AH-067 → AH-078 range**, not three entries.
-- **Range:** `b13ee718` → the AH-078 docs commit at the tip. Code commits in the range:
-  - `36fa454f` — `feat(drafts): number the review rounds and say so on every surface (AH-068)`
-  - `451388f1` — `feat(campaigns): let a campaign end at draft approval when creators do not post (AH-069)`
+- **Status:** **DEPLOYED.** Confirmed by Pedram, 2026-08-19.
+- **Range:** `6cdf0a5` → `54f59948` — the entire held backlog since the 2026-08-11 deploy, in one
+  operation. Code commits in the range:
+  - `b13ee71` — `fix(api): stop composer install from rotating the production APP_KEY` (AH-067).
+  - `36fa454f` — `feat(drafts): number the review rounds and say so on every surface` (AH-068).
+  - `451388f1` — `feat(campaigns): let a campaign end at draft approval when creators do not post`
+    (AH-069).
+  - the AH-070 CI/process pair + follow-through (`f771a7cf`, `66d1fa18`, `a7900152`, `e08ab2b7`) —
+    `.github/workflows` + `phpunit.xml` + one pre-existing-flake test fix; **no production runtime
+    file touched**, carried here only for range completeness.
   - the AH-071 → AH-078 batch, `5e61795a` → `3ef5d8ec` (sixteen commits, all `apps/main`-only — see
-    `adhoc-changes-log.md` for the per-commit-per-entry mapping) plus the AH-074 regression pin
-    (`c1f0add6`, `apps/main` test-only).
-    (The remainder of the range is docs-only: inventories, plan-pauses, review files, this entry.)
-- **AH entries carried:** **AH-068, AH-069, AH-071, AH-072, AH-073, AH-074, AH-075, AH-076, AH-077,
-  AH-078** — and AH-067 is still un-deployed below.
-- **Migrations run:** **1** — `2026_08_16_100000_add_creator_posts_content_to_campaigns_table`.
-  Adds `campaigns.creator_posts_content boolean NOT NULL DEFAULT true`. On Postgres this is a
-  **catalogue-only** change: no table rewrite, no existing row read or written, and every existing
-  campaign reads `true`, which is exactly today's behaviour. **Deploy order is `migrate` and nothing
-  else** — the kickoff had specified a follow-up backfill command and the Q1 ruling deleted it,
-  because defaulting the column ON writes what the command would have written, without the window
-  in which live campaigns would have read OFF.
-- **Pre-deploy reads:** none required. Optional sanity read **after** migrating, to confirm the
-  default landed rather than assuming it:
-  `select count(*) from campaigns where creator_posts_content is not true;` — **expect 0.**
-- **Snapshot ID:** _TBD_ · **mandatory, confirmed `available` before migrating.** The schema change
-  is additive and reversible in shape, but `down()` **drops the column**, which discards every
-  campaign's posting posture — re-running `up()` resets them all to `true` rather than restoring
-  what was there. That is stated in the migration's own docblock; the snapshot is what makes it
-  recoverable.
-- **Infra:** **queue-worker restart REQUIRED.** Both ranges move mail copy: AH-068 changed both
-  draft-review mail templates in all 24 locales, and AH-069 adds a new mailable
-  (`AssignmentCompletedOnApprovalMail`) plus new `lang/*/campaigns.php` keys ×24. A worker running
-  pre-deploy code will render stale copy, and for AH-069 will not know the new class at all. No
-  cron/scheduler change, no env change.
-- **One-shot commands:** **none.** (This is the field the kickoff expected to fill; see "Migrations
-  run" for why it is empty.)
-- **Post-deploy verification:**
+    `adhoc-changes-log.md` for the per-commit-per-entry mapping), the AH-074 regression pin
+    (`c1f0add6`, `apps/main` test-only), and `368970d4` (a Playwright timeout bump, test-only).
+  - `b2bc310e` — `feat(admin): add application-status, KYC, and Connected filters to All Creators`
+    (AH-079).
+  - `1754560e` — `feat(campaigns,boards,roster): creator profile everywhere` (AH-080).
+  - `b2b3ee43` — `feat(campaigns,creators): minimal rich text for briefs and descriptions` (AH-081),
+    plus `5f7c96d4` (a same-day follow-up CSS fix).
+  - `f59c29c5` — `feat(campaigns): insert-link button + campaign description cap raise` (AH-082).
+  - `7b86bf90` — `feat(campaigns,messaging): missing creator emails — invite received + debounced
+message` (AH-083).
+  - (The remainder of the range is docs-only: inventories, plan-pauses, review files, this entry's
+    own predecessor entries.)
+- **AH entries carried:** **AH-067, AH-068, AH-069, AH-070** (CI/process only — no deploy obligation
+  of its own, carried for range completeness), **AH-071, AH-072, AH-073, AH-074, AH-075, AH-076,
+  AH-077, AH-078, AH-079, AH-080, AH-081, AH-082** (zero `apps/api` diff across the last four — no new
+  obligation), **AH-083.**
+- **Migrations run:** **2**, either order (unrelated tables):
+  1. `2026_08_16_100000_add_creator_posts_content_to_campaigns_table` (AH-069) — adds
+     `campaigns.creator_posts_content boolean NOT NULL DEFAULT true`. On Postgres a
+     **catalogue-only** change: no table rewrite, no existing row read or written; every existing
+     campaign reads `true`, exactly today's behaviour. No follow-up backfill command — the Q1 ruling
+     deleted it, since defaulting the column ON already writes what the command would have, without
+     the window in which live campaigns would have read OFF.
+  2. `2026_08_19_100000_create_message_email_debounces_table` (AH-083) — additive-only `CREATE
+TABLE`, no existing row touched. `down()` is **lossy** — see the migration's own docblock.
+- **Pre-deploy reads:** none required by either migration. Optional sanity read available
+  **after** migrating, not required before: `select count(*) from campaigns where
+creator_posts_content is not true;` — expect **0**. **Run: not recorded.**
+- **Snapshot ID:** **not recorded** · confirmed `available` before migrating? **not recorded.** This
+  is a real safety-relevant gap, not paperwork: migration 1's `down()` drops the column
+  (discarding every campaign's posting posture on rollback) and migration 2's `down()` is lossy by
+  its own docblock — the snapshot is what makes either rollback recoverable, and its presence at
+  migrate time is unconfirmed after the fact.
+- **Infra:** **queue-worker restart REQUIRED** (unchanged from both source entries' own posture) —
+  AH-068 changed both draft-review mail templates in all 24 locales; AH-069 added a new mailable
+  (`AssignmentCompletedOnApprovalMail`) plus new `lang/*/campaigns.php` keys ×24; AH-083 added two
+  more mailables (`InviteReceivedMail`, `NewMessageMail`) plus new `lang/*/campaigns.php` and
+  `lang/*/messages.php` keys ×24 each. A worker running pre-deploy code renders stale copy, and for
+  the three new mailables would not know the classes at all. No cron/scheduler change, no env
+  change. **Restart performed: not recorded.**
+- **One-shot commands:** **none** across the whole range.
+- **Post-deploy verification:** the checklist the range's own review files specify — **results not
+  recorded** for any of them:
   1. `/up` green, then one authenticated request.
-  2. The count read above returns **0**.
-  3. Open a campaign's Settings tab and confirm the **"Deliverables are posted by creators"** switch
-     renders **on** for an existing campaign — the safety floor, visible.
-  4. Open that campaign's board and confirm the **Posted column still renders** — the render filter
-     is off for ON campaigns, which is every campaign that exists at deploy time.
-  5. Create a campaign through the form and confirm the switch pre-sets **off** — the two-layer
-     default, both layers observed on the box.
-- **Flags armed:** **none — this range touches no feature flag.** The toggle is per-campaign
-  configuration, not a flag, and it arrives defaulted to today's behaviour.
-- **Operator:** _TBD._
-- **Anything unexpected:** noted rather than hidden — **AH-068 was pushed without a deploy-log
-  entry.** This entry is written to cover both chunks retroactively, so the worker-restart
-  obligation AH-068 created is not sitting only in a review file. Nothing else.
-
----
-
-## 2026-08-11 · Composer install-hook fix (AH-067) — PENDING
-
-- **Status:** **PENDING.** Pushed to `origin/main` in this pass. Not yet deployed — this sits
-  atop the entry below, which is already `DEPLOYED`.
-- **Range:** `6cdf0a5` → `b13ee71` — **1 code commit** (plus the docs commit that follows it in
-  the same push):
-  - `b13ee71` — `fix(api): stop composer install from rotating the production APP_KEY (AH-067)`.
-- **AH entries carried:** **AH-067.**
-- **Migrations run:** **none.**
-- **Pre-deploy reads:** **none.**
-- **Snapshot ID:** _not applicable_ — no schema or data change; the fix edits install-time
-  tooling (`composer.json` script hooks) plus a test file. Nothing this deploy touches can be
-  destructive, so the standing "never skip step 1" rule is noted as satisfied-by-shape rather than
-  literally applied — flagging that judgment explicitly rather than silently skipping the field.
-- **Infra:** **none required to take effect immediately.** The fix only changes what
-  `composer install` does the _next_ time it runs — it has no effect on the code or process
-  currently running in production, so there is no urgency comparable to the AH-065/AH-066 PHP-FPM
-  reload. It should still ship on the next normal deploy so the landmine is gone before the next
-  `composer install --no-dev` fires, whenever that is.
-- **One-shot commands:** **none.**
-- **Post-deploy verification:** once deployed, confirm `composer.json` on the box no longer
-  contains `post-install-cmd`, and that a subsequent `composer install` does not log a
-  `key:generate` line.
-- **Flags armed:** **none — this range touches no flag.**
-- **Operator:** _TBD._
-- **Anything unexpected:** none — this is the planned follow-up fix for the incident recorded in
-  the entry directly below.
+  2. The posting-toggle sanity count above returns **0**.
+  3. A campaign's Settings tab shows the **"Deliverables are posted by creators"** switch **on** for
+     an existing campaign (the safety floor).
+  4. That campaign's board still renders its **Posted column** (the render filter is off for ON
+     campaigns, which is every campaign that exists at deploy time).
+  5. A campaign created through the form pre-sets the switch **off** (the two-layer default).
+- **Flags armed:** **none.** As of this deploy, **three** feature flags exist in a registered,
+  **OFF, not-armed** state — none newly OFF because of this deploy, but worth stating together since
+  this is the first entry where all three coexist:
+  - `job_posted_notifications_enabled` and `application_notifications_enabled` — live since the
+    2026-07-31 Jobs Board arc deploy; arming both is a combined ritual Pedram runs deliberately, per
+    `feature-flags.md`, independent of any code deploy.
+  - `missing_creator_mails_enabled` — **new in this range** (AH-083), registered but not armed by
+    this deploy; both mail legs it gates stay silent (their in-app rows still write) until armed
+    separately.
+  - Also still OFF and unrelated to this range: `incomplete_creator_nudge_enabled` (blocked on the
+    scheduler — see the standing blocker in `RESUMPTION-TEMPLATE.md`).
+- **Operator:** **not recorded.**
+- **Anything unexpected:** **not recorded**, beyond the one thing already on record from when these
+  entries were still open — **AH-068 was originally pushed without a deploy-log entry**; the
+  now-merged entry above was written to cover it retroactively, so the worker-restart obligation it
+  created was never sitting only in a review file.
 
 ---
 
