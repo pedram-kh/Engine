@@ -84,8 +84,17 @@ reviews, and conversations.
   chunk's scope. Posture **LOW** confirmed.
 - **Feat commit:** `edb30dd` — `fix(brands): every brand reachable in select pickers, not just
 page 1 (AH-085)`.
-- **Docs commit:** `14a66e2c` — `docs(reviews): AH-085 brand select pagination bug — diagnosis,
-consumer table, fix` (this entry).
+- **Docs commit:** `41b7b95b` — `docs(reviews): AH-085 brand select pagination bug — diagnosis,
+consumer table, fix` (this entry, amended pre-push to fold in the tech-debt entry + verdict).
+- **CI-fix commit:** `6f5351de` — `fix(api): rename BrandSelectOptionsTest helper — collided with
+an existing global function (AH-085)`. The first push's CI run (`32295827531`) failed with a PHP
+  fatal `Cannot redeclare function makeAgencyAdmin()` — the new test file's top-level helper
+  collided with an identically-named one already declared in
+  `tests/Feature/Modules/Creators/BulkInviteEndpointTest.php` (Pest test-file functions are true
+  globals, not namespaced). Invisible running the Brands suite alone, as this chunk's own gate run
+  did; only surfaced once CI loaded the whole `tests/` tree in one process. Renamed to
+  `makeBrandSelectAdmin()`, confirmed unique repo-wide, full 2613-test Pest suite re-run green, and
+  it is the reason this chunk shipped as three commits, not two.
 - **Provenance:** recurring-class tech-debt entry added — see
   [tech-debt.md](../tech-debt.md) "A paginated index consumed as a `<select>` has now bitten
   twice" — naming AH-066 + AH-085 as the two data points and a third instance as the trigger for a
@@ -169,7 +178,10 @@ consumer table, fix` (this entry).
   and `tests/Feature/Modules/TalentPools` re-run clean (681 total across the three), PHPStan 0
   errors, Pint clean. `apps/main` — the five touched modules' Vitest suites 281/281 (`campaigns`,
   `pools`, `roster`, `brands`), `vue-tsc --noEmit` clean, ESLint 0 errors on every touched file.
-  `packages/api-client` — `tsc --noEmit` clean. Two-commit pair, push HELD.
+  `packages/api-client` — `tsc --noEmit` clean. Pushed as three commits (feat, docs, the CI-fix
+  above) — full CI green at tip `6f5351de`:
+  [run 32296895428](https://github.com/pedram-kh/Engine/actions/runs/32296895428) (Frontend,
+  Backend, both Playwright E2E suites all green).
 
 ### AH-083 · Missing creator emails: invite (①) + debounced message (⑧)
 
