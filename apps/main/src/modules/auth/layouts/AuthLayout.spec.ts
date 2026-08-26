@@ -57,4 +57,29 @@ describe('AuthLayout', () => {
     const items = select.props('items') as Array<{ value: string; title: string }>
     expect(new Set(items.map((i) => i.value))).toEqual(new Set(UI_LOCALES))
   })
+
+  it('applies the hero treatment on /sign-in', async () => {
+    const harness = await mountAuthPage(AuthLayout, { initialRoute: { name: 'auth.sign-in' } })
+    teardown = harness.unmount
+    expect(harness.wrapper.find('.auth-layout').classes()).toContain('auth-layout--hero')
+  })
+
+  // AH-086: the agency-facing sign-in variant is the SAME page component
+  // at a second route name, and gets the identical hero/card/aurora
+  // chrome — D1's "same layout, same auth card, same aurora treatment."
+  it('applies the SAME hero treatment on /agency/sign-in (AH-086 — no fork)', async () => {
+    const harness = await mountAuthPage(AuthLayout, {
+      initialRoute: { name: 'auth.agency-sign-in' },
+    })
+    teardown = harness.unmount
+    expect(harness.wrapper.find('.auth-layout').classes()).toContain('auth-layout--hero')
+  })
+
+  it('does NOT apply the hero treatment on other auth pages (e.g. forgot-password)', async () => {
+    const harness = await mountAuthPage(AuthLayout, {
+      initialRoute: { name: 'auth.forgot-password' },
+    })
+    teardown = harness.unmount
+    expect(harness.wrapper.find('.auth-layout').classes()).not.toContain('auth-layout--hero')
+  })
 })

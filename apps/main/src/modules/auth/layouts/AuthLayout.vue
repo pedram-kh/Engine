@@ -30,7 +30,10 @@ const { selectLocale } = useLocaleSwitch()
 const route = useRoute()
 
 const localeOptions = buildLocaleOptions()
-const isHero = computed(() => route.name === 'auth.sign-in')
+// AH-086: the agency-facing sign-in variant is the SAME page component at
+// a second route name — it gets the identical hero/card/aurora treatment,
+// never a stripped-down layout.
+const isHero = computed(() => route.name === 'auth.sign-in' || route.name === 'auth.agency-sign-in')
 </script>
 
 <template>

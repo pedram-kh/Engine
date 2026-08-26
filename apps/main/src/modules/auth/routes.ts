@@ -75,6 +75,23 @@ export const authRoutes: RouteRecordRaw[] = [
     component: () => import('./pages/SignInPage.vue'),
     meta: { layout: 'auth', guards: ['requireGuest'] },
   },
+  // Agency-facing variant of the SAME sign-in page (AH-086) — one
+  // component, parameterized by route name, never a fork. SignInPage.vue
+  // reads `route.name` (the same mechanism AuthLayout already uses for
+  // `isHero`) to swap the heading copy and drop the creator-signup CTA;
+  // everything else — the form, the `POST /auth/login` call, the
+  // role-based postLoginTarget() dispatch, the layout/card/aurora chrome —
+  // is byte-identical. Agencies are Catalyst-created (no signup flow
+  // exists or is added here), so this route carries the same
+  // `requireGuest` guard and nothing more. A creator who lands here still
+  // signs in successfully and is routed home by role — this is a door,
+  // not a wall.
+  {
+    path: '/agency/sign-in',
+    name: 'auth.agency-sign-in',
+    component: () => import('./pages/SignInPage.vue'),
+    meta: { layout: 'auth', guards: ['requireGuest'] },
+  },
   {
     path: '/sign-up',
     name: 'auth.sign-up',

@@ -368,6 +368,61 @@ describe('SignInPage', () => {
     expect(h.wrapper.html()).toContain('Password')
   })
 
+  // ---------------------------------------------------------------------
+  // AH-086 — agency-facing variant (`auth.agency-sign-in`, `/agency/sign-in`).
+  // Same component, parameterized by route name (mirrors AuthLayout's
+  // `isHero` mechanism). These cases pin the CTA-absence + the
+  // shared-component reality: no new Playwright leg, per the kickoff's D4 —
+  // this is Vitest territory, same as the other route-driven variants.
+  // ---------------------------------------------------------------------
+
+  it('agency variant: shows the agency heading and hides the creator-signup CTA', async () => {
+    const h = await mountAuthPage(SignInPage, {
+      initialRoute: { name: 'auth.agency-sign-in' },
+    })
+    teardown = h.unmount
+    expect(h.wrapper.find('[data-test="sign-in-heading"]').text()).toBe('Agency sign in')
+    expect(h.wrapper.find('[data-test="sign-in-signup-link"]').exists()).toBe(false)
+    // The forgot-password link is untouched — only the signup CTA is scoped out.
+    expect(h.wrapper.find('[data-test="sign-in-forgot-link"]').exists()).toBe(true)
+  })
+
+  it('default /sign-in still shows the creator-signup CTA (zero diff for the existing page)', async () => {
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    expect(h.wrapper.find('[data-test="sign-in-signup-link"]').exists()).toBe(true)
+    expect(h.wrapper.find('[data-test="sign-in-heading"]').text()).toBe('Sign in')
+  })
+
+  it('agency variant: a door, not a wall — same endpoint, login still calls authApi.login() and role-routes home', async () => {
+    vi.mocked(authApi.login).mockResolvedValue(USER)
+    const h = await mountAuthPage(SignInPage, {
+      initialRoute: { name: 'auth.agency-sign-in' },
+    })
+    teardown = h.unmount
+    const pushSpy = vi.spyOn(h.router, 'push')
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(authApi.login).toHaveBeenCalledWith({ email: 'a@b.c', password: 'Pa$$w0rd!12' })
+    expect(pushSpy).toHaveBeenCalledWith('/')
+  })
+
+  it('agency variant: a creator who signs in here still routes to onboarding.welcome-back — the page is a door, not a wall', async () => {
+    vi.mocked(authApi.login).mockResolvedValue(CREATOR_USER)
+    const h = await mountAuthPage(SignInPage, {
+      initialRoute: { name: 'auth.agency-sign-in' },
+    })
+    teardown = h.unmount
+    const pushSpy = vi.spyOn(h.router, 'push')
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'onboarding.welcome-back' })
+  })
+
   it('submit button switches to the loading label while isLoggingIn is true', async () => {
     let resolveLogin: (u: typeof USER) => void = () => undefined
     vi.mocked(authApi.login).mockImplementation(

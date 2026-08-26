@@ -19,6 +19,11 @@
  * than in `index.html` or the auth layout because the sibling auth routes
  * carry single-use tokens in their query strings, which the pixel would
  * report to Meta — see the header of `internal/metaPixel.ts`.
+ *
+ * AH-086: this same component also renders at `auth.agency-sign-in`
+ * (`/agency/sign-in`) — see `isAgencyVariant` below. No fork: the form,
+ * the login call, and postLoginTarget()'s role-based dispatch are
+ * identical on both routes.
  */
 
 import { ApiError } from '@catalyst/api-client'
@@ -53,6 +58,22 @@ const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
 
 const sessionExpired = computed(() => route.query.reason === 'session_expired')
+
+/**
+ * AH-086 — the agency-facing sign-in variant. Same component, same
+ * endpoint, same postLoginTarget() dispatch; the ONLY differences are the
+ * heading copy and the absence of the creator-signup CTA below. Reading
+ * `route.name` mirrors the mechanism `AuthLayout.vue`'s `isHero` already
+ * uses to distinguish `auth.sign-in` — one source of truth, no second
+ * page to drift out of sync with future auth changes. If a creator signs
+ * in through this route, `onSubmit()` and `postLoginTarget()` below run
+ * completely unchanged — this is a door, not a wall.
+ */
+const isAgencyVariant = computed(() => route.name === 'auth.agency-sign-in')
+
+const headingKey = computed(() =>
+  isAgencyVariant.value ? 'auth.ui.headings.agency_sign_in' : 'auth.ui.headings.sign_in',
+)
 
 // On mount rather than at module scope so the pixel is tied to this page
 // being shown, not to the route chunk being downloaded.
@@ -151,7 +172,7 @@ async function onSubmit(): Promise<void> {
 <template>
   <section data-test="sign-in-page">
     <h2 class="text-h5 mb-4" data-test="sign-in-heading">
-      {{ t('auth.ui.headings.sign_in') }}
+      {{ t(headingKey) }}
     </h2>
 
     <v-alert
@@ -220,7 +241,14 @@ async function onSubmit(): Promise<void> {
     </form>
 
     <div class="mt-4 d-flex justify-space-between text-body-2">
-      <router-link :to="{ name: 'auth.sign-up' }" data-test="sign-in-signup-link">
+      <!-- AH-086 D2: the agency variant has no signup flow of any kind —
+           agencies are Catalyst-created. This link is the creator-signup
+           funnel and does not appear here. -->
+      <router-link
+        v-if="!isAgencyVariant"
+        :to="{ name: 'auth.sign-up' }"
+        data-test="sign-in-signup-link"
+      >
         {{ t('auth.ui.actions.sign_up') }}
       </router-link>
       <router-link :to="{ name: 'auth.forgot-password' }" data-test="sign-in-forgot-link">
