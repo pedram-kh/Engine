@@ -70,6 +70,33 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-086 · Agency sign-in — one component, parameterized
+
+- **Status:** Landed (push HELD)
+- **Date:** 2026-08-27
+- **Why:** an agency-facing sign-in surface is needed for outreach/onboarding links, but a second
+  copy of the sign-in page would drift from the real one the moment auth logic next changes.
+- **What:** a second route, `/agency/sign-in` (`auth.agency-sign-in`), rendering the SAME
+  `SignInPage.vue` component — `route.name` (the identical mechanism `AuthLayout.vue` already uses
+  for `isHero`) swaps the heading copy to `auth.ui.headings.agency_sign_in` and hides the
+  creator-signup link. Layout, auth card, and aurora chrome are identical on both routes. The form,
+  the `POST /auth/login` call, and the role-based `postLoginTarget()` dispatch are completely
+  untouched — a creator who signs in through the agency page still lands correctly by role (a
+  door, not a wall). No signup flow was added; agencies remain Catalyst-created. Team-invite email
+  links keep pointing at `auth.sign-in` — named as a one-line follow-up option, not built.
+- **Touched:** `apps/main/src/modules/auth/routes.ts` (new route record), `SignInPage.vue` +
+  `SignInPage.spec.ts`, `AuthLayout.vue` + `AuthLayout.spec.ts`, one new i18n key
+  (`auth.ui.headings.agency_sign_in`) across all 24 `locales/*/auth.json` files.
+- **Decisions:** route-name-driven variant over a prop or a query param (kept guard-scoping and
+  matched the existing `isHero` precedent exactly); no new Playwright leg — Vitest covers the
+  CTA-absence + shared-component-reality assertions the kickoff asked for, per the AH-082
+  no-new-trust-boundary precedent; existing `/sign-in`-traversing Playwright specs were not re-run
+  this chunk, named as a gap rather than silently presumed green.
+- **Ref:** [`agency-sign-in-review.md`](agency-sign-in-review.md) (full kickoff-decision table,
+  mechanism argument, i18n table, gate board).
+
+---
+
 ### AH-085 · Brand select pickers reachable past page 1 — the AH-066 bug class recurring in a second module
 
 - **Status: Closed — approved.** Verdict: the mechanism is empirically confirmed (30-brand
