@@ -1,12 +1,13 @@
 # Platform Automations: rules table + on-approval auto-connect — REVIEW
 
-- **Status:** Landed — awaiting Pedram's close.
+- **Status: Closed — approved, pushed.**
 - **Date:** 2026-08-27
 - **Entry:** AH-090.
 - **Built from:** [`admin-automations-plan.md`](admin-automations-plan.md) (S1–S11, D1–D7, C1–C14,
   Q1–Q7) and [`admin-automations-inventory.md`](admin-automations-inventory.md).
 - **Commits:** `f31d7c7b` (the service extraction + the D3 guard) · `1c996c77` (table, flag, job,
-  hook) · `1a4e0a1f` (CRUD, `?for=select`, SPA) · this docs commit.
+  hook) · `1a4e0a1f` (CRUD, `?for=select`, SPA) · `f4ac735c` (the Q4 provenance stamp) · `4a3f2c6c` +
+  `55663b26` (the docs pass) · this close.
 - **Reviewed against:** `WORKING-PROCESS.md`, `PROJECT-WORKFLOW.md` §5 (references cited inline),
   `02-CONVENTIONS.md` §2.3/§2.8/§2.13/§2.16/§3.5, `security/tenancy.md` §4, `feature-flags.md`,
   `tech-debt.md`.
@@ -95,8 +96,10 @@ code deploys, unlike everything else in the chunk. It has its own §5.34 case in
 | **C4** — `name` column      | ratified into D1's schema                                                                 | `name` (string 120, required, min 3). The audit reason interpolates it; the rules table's first column reads it.                                         |
 | **C3** — the outcome VO     | replaces "verbatim" extraction                                                            | `DirectConnectOutcome` + `DirectConnectResult`. One enum backs both the HTTP codes and the skip reasons, so the two lists cannot drift.                  |
 | **C7** — after-commit       | dispatch after `approve()`'s existing emissions                                           | The dispatch sits after the transaction closes and after the mail/in-app emissions, pinned by a break-revert.                                            |
-| **Q4** — fire provenance    | lean taken: yes                                                                           | `fired_by: 'automation'` + `automation_rule_id: <ulid>` in the audit metadata, present ONLY on an automated fire.                                        |
-| **Q6** — duplicate rules    | lean taken: no constraint, dialog warns                                                   | The create/edit dialog lists how many other rules already watch the selected event.                                                                      |
+| **Q4** — fire provenance    | ratified: yes                                                                             | `fired_by: 'automation'` + `automation_rule_id: <ulid>` in the audit metadata, present ONLY on an automated fire, pinned from both sides.                |
+| **Q5** — the creator's mail | ratified: reuse `AdminConnectedMail` unchanged                                            | The automation's fire calls the same `notify()` the human path calls; no new mailable, no copy change.                                                   |
+| **Q6** — duplicate rules    | ratified: no constraint, dialog warns                                                     | The create/edit dialog lists how many other rules already watch the selected event.                                                                      |
+| **Q7** — per-rule drill-in  | ratified: no for v1                                                                       | Not built. The rules table's counts + the audit viewer's own action filter cover it.                                                                     |
 
 ### Q3 in the words it was ratified in
 
@@ -119,6 +122,60 @@ rather than dispatch time, so flipping it off stops work already sitting on the 
 
 Recorded verbatim in §1 above, as ratified: they are the reason the risk line does not climb, and
 naming them is what makes that claim checkable rather than reassuring.
+
+### Q4 — the half of the pin that matters is the absence, not the presence
+
+Asserting that an automated fire carries `fired_by: 'automation'` + `automation_rule_id` proves the
+happy path wired the keys through. It does **not** prove a human connect couldn't accidentally carry
+them too — a caller passing a stray default would pass that assertion while quietly mislabeling every
+manual connection as automated. The pin that actually catches that is the negative, in
+`CreatorAgencyDirectConnectServiceTest`: a human-actor connect asserts `metadata` has **neither** key.
+Ratified as built, both sides.
+
+### Q5 — reuse `AdminConnectedMail` unchanged, recorded as a live-mail wording decision
+
+The mail's copy frames the connection as admin-performed, and it stays that way: from the creator's
+side, an operator's rule **is** the platform acting, the agency name is what matters, and the existing
+"contact support if this is unexpected" line already covers the surprise case a creator might feel on
+an automated connect they didn't ask for. This was flagged at plan time as a wording question, not a
+code question, and it is recorded here as reviewed rather than defaulted into — a future rename of that
+mailable's copy should re-read this line before assuming the "admin-performed" framing was an oversight.
+
+### Q6 — prevention over absorption
+
+No uniqueness constraint: idempotency already absorbs two rules overlapping on the same event and
+agency, so a constraint would be enforcing something the system doesn't need enforced. What the dialog
+adds is cheaper and catches the actual mistake — an operator about to create a rule nobody asked for a
+second time sees the count **before** they click, rather than the platform silently absorbing a
+duplicate they didn't know existed.
+
+### Q7 — no drill-in v1
+
+The rules table's per-rule `fire_count` + `last_fired_at` plus the audit log's own action filter (`?
+action=agency_creator_relation.admin_connected`) already answer "did this rule do anything" and "what
+did it do." A dedicated drill-in view would be additional UI surface for a question the existing
+surfaces already answer, absent an operator asking for it.
+
+### The build-report ratifications
+
+Two more decisions surfaced by the build itself, not by the plan, are ratified here rather than left as
+loose asides in a chat transcript:
+
+- **The `ApiError`-code divergence.** `FeatureFlagsPage.vue` (the clone template) and at least four
+  other admin pages feed `error.code` into `t()` on a load failure; no locale defines keys like
+  `auth.forbidden`, so that path renders the raw API token at the operator. `AutomationsPage.vue` does
+  not copy this — it uses one i18n key it owns for every load failure. **Ratified as the correct choice
+  for this chunk, and explicitly NOT retroactive**: fixing the five sibling pages is a named follow-up
+  with its own scope and its own test surface, not something this chunk's mandate covers.
+- **Both honest limits, restated so they don't get read as gaps that were missed.** (1) The conventions
+  rule closing the tech-debt entry governs **new** pickers from here forward; no audit of the
+  codebase's existing list endpoints for the same silent-truncation shape was performed or is claimed,
+  and a pre-existing instance would still surface only when a user reports missing rows. (2) The SPA
+  Vitest specs prove the automations page's wiring against a **mocked** API contract; a wiring break
+  between the real form payload and the real CRUD endpoint's expected shape would pass those specs and
+  only be caught by the Pest integration test's real HTTP round-trip (or by a future E2E leg, not built
+  this chunk per Q/D7). Both limits were named at plan or build time, not discovered at close — this is
+  the record making that true after the fact as well.
 
 ---
 
@@ -297,3 +354,46 @@ each re-check, the log line, and the after-commit seam — all commented in-test
 - **No audit of pre-existing pickers.** The new conventions rule governs new pickers; a pre-existing
   silent truncation elsewhere would still be found only by a user reporting missing rows. Recorded on
   the closed tech-debt entry rather than claimed as done.
+
+---
+
+## §9. Close
+
+**Verdict: approved.** D1–D7 and C1–C14 verified as ruled; Q1–Q7 verified as ratified, all seven now
+recorded in §2 with the reasoning each was ratified in, not just the outcome. Specifically:
+
+- The **outcome-enum, one-vocabulary design** (C3) is accepted as the model for any future service that
+  needs to serve two callers with two different presentation needs (HTTP envelope vs. structured log)
+  off one decision — the alternative, a second hand-maintained list, is exactly the drift this pattern
+  forecloses.
+- The **after-commit dispatch seam** (C7) and its break-revert are confirmed: the anchor reddened when
+  the dispatch was deliberately moved inside the transaction, proving the seam is load-bearing rather
+  than a comment describing intent.
+- The **D3 both-caller guard**, keyed on `suspended_at`, with its own behaviour-change case in
+  `AdminCreatorConnectionTest` — the one change in this chunk that is live without a flag.
+- The **C13 terminal-skip asymmetry** — an automation never reverses a deliberate human disconnect or
+  refusal, the human path keeps elevating them — recorded with the reasoning it was ratified in: a human
+  choosing is the consent the elevation encodes, so the asymmetry is not an inconsistency to later
+  "fix."
+- The **C12 audit-posture divergence from `board_automations`** — this chunk's fires DO write an audit
+  row, because the subject is a cross-tenant relationship with commercial consequence, not a card
+  position inside one agency's board — recorded so a future reader doesn't "fix" the difference into a
+  false consistency.
+- The **Q4 provenance stamp**, pinned from both sides: the automated fire carries `fired_by` +
+  `automation_rule_id`, and the human connect is asserted to carry neither. The absence-implies-human
+  half is the one that actually catches a caller forgetting to pass the ULID.
+- The **third-instance conventions rule** (D6) plus the `?for=select` endpoint pair landed, and the
+  `tech-debt.md` picker-class entry closes pointing at both — with the declined architecture-test
+  option recorded in writing, not merely dropped.
+- The **rider's flake entry**, extended per the inventory's own §0 disposition: `admin-sign-in.spec.ts`
+  joins the tracked list as a third occurrence, evidenced rather than asserted, with no spec edit
+  because that entry's standing ruling against timeout-bumping this family still holds.
+- The **build-report ratifications** — the owned-key divergence from the `ApiError.code` pattern
+  (correctly scoped as this chunk's choice, not a retroactive fix to the five sibling pages), and both
+  honest limits (no pre-existing-picker audit claimed; the Vitest mocked-contract gap with the
+  fixture-less admin suite as its recorded reason) — are ratified as accurate self-assessment, not
+  understated risk.
+
+**Provenance:** reviewed and closed by Pedram, 2026-08-27. Built by Cursor against the ratified plan
+(`admin-automations-plan.md`) across commits `f31d7c7b`, `1c996c77`, `1a4e0a1f`, `f4ac735c`, `4a3f2c6c`,
+`55663b26`.

@@ -77,6 +77,11 @@ guard (AH-090)` — the service + outcome enum + result VO, and the one delibera
     `fired_by` + `automation_rule_id` in the fire's audit metadata. Metadata-only; no schema.
   - `4a3f2c6c` — the docs commit (this entry, the review, the AH-090 log entry, the conventions picker
     rule, the tenancy rows, the tech-debt close + the flake-entry rider).
+  - `55663b26` — `docs(runbooks): complete the AH-090 deploy entry's commit range` — this entry's own
+    range was written before the two commits above had SHAs; this one filled them in.
+  - _this commit_ — Q4–Q7 ratified into `admin-automations-review.md` §2 (with Q4's absence-implies-
+    human half named explicitly), the build-report ratifications (the owned-key divergence, both
+    honest limits), and the review's close: **Status: Closed — approved, pushed.**
 - **AH entries carried:** **AH-090.**
 - **Migrations run:** **1** — `2026_08_27_120000_create_admin_automation_rules_table.php`. A
   `CREATE TABLE`, nothing else: **no existing table is touched, no column added anywhere, no
