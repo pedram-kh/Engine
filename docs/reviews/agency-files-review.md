@@ -12,9 +12,12 @@
   ad-hoc log + deploy-log + resumption-template entries) · the close commit carrying this verdict
   (cannot record its own hash — `git rev-parse --short HEAD` is the authority, re-derive it, do
   not carry this session's number forward).
-- **CI at the pushed tip (§5.41):** see the close-out note at the bottom of this file — filled in
-  once the push's run is confirmed green, per Pedram's explicit instruction not to wave through a
-  red run.
+- **CI at the pushed tip (§5.41):** green — all four jobs (Backend Pint+Larastan+Pest, Frontend
+  lint+typecheck+unit, E2E main SPA Playwright, E2E admin SPA Playwright) —
+  [run `33105739460`](https://github.com/pedram-kh/Engine/actions/runs/33105739460) at `b48357b9`,
+  confirmed by `git rev-parse HEAD` / `git rev-parse origin/main` both resolving to that SHA. The
+  full board including both Playwright legs is what actually closes this chunk, per Pedram's
+  explicit instruction — cited here rather than waved through.
 - **Reviewed against:** `docs/00-MASTER-ARCHITECTURE.md` §4 (tenancy), `docs/03-DATA-MODEL.md`
   §16/§20, `docs/02-CONVENTIONS.md`, `docs/05-SECURITY-COMPLIANCE.md`, `docs/tech-debt.md`.
 
@@ -176,16 +179,17 @@ clean on all touched files.
 
 **`packages/api-client`.** `tsc` typecheck: clean.
 
-**Playwright — honest gap, not silently skipped.** The full existing board could not be executed
-in this session: it requires a live Postgres instance (`php artisan serve` + `migrate:fresh`
-against `catalyst_e2e`), and this sandbox has neither a reachable Postgres server nor a working
-Docker daemon (`docker ps` fails with "Cannot connect to the Docker daemon"). This is an
-environment limitation, not a decision to skip the suite — see `tech-debt.md`'s AH-091 entry,
-item 3, for the resulting gap this leaves (no NEW E2E spec drives the presigned upload
-round-trip, and there is no missing-receiver mechanism if a future nav item ships without one).
-**CI runs the full Playwright board on every push** (per the repo's existing workflow) and will
-be the actual verification that the new "Files" nav entry doesn't regress any spec enumerating
-the agency sidebar — cite the CI run once Pedram triggers the push, per §5.41.
+**Playwright — a local gap, closed by CI, not silently waved through.** The full existing board
+could not be executed in this session locally: it requires a live Postgres instance
+(`php artisan serve` + `migrate:fresh` against `catalyst_e2e`), and this sandbox had neither a
+reachable Postgres server nor a working Docker daemon (`docker ps` failed with "Cannot connect to
+the Docker daemon"). That was an environment limitation, not a decision to skip the suite. **CI's
+own run confirms both Playwright legs green at the pushed tip** — `e2e-main` and `e2e-admin`,
+[run `33105739460`](https://github.com/pedram-kh/Engine/actions/runs/33105739460) at `b48357b9` —
+so the new "Files" nav entry does not regress any existing spec enumerating the agency sidebar.
+What is NOT closed by this: no NEW E2E spec drives the presigned upload round-trip itself, and
+there is still no missing-receiver mechanism if a future nav item ships without one — both remain
+named in `tech-debt.md`'s AH-091 entry, item 3, as the actual residual gap.
 
 ---
 
@@ -273,9 +277,13 @@ range, since neither has deployed yet).
   quota — the count-cap rejection reasoning (bounds nothing that matters, ignores orphans, needs
   atomicity and an undefined tier rule) is on record as debt with an explicit trigger, not a
   silent omission.
-- **The local Playwright gap is accepted as environmental, not a build shortfall.** This session's
-  sandbox had neither a reachable Postgres nor a working Docker daemon — verified directly
-  (`docker ps` fails to connect), not assumed. CI is the actual verification, run on the pushed
-  tip below.
+- **The local Playwright gap is accepted as environmental, not a build shortfall — and CI is the
+  verification, confirmed green.** This session's sandbox had neither a reachable Postgres nor a
+  working Docker daemon — verified directly (`docker ps` fails to connect), not assumed.
+  [Run `33105739460`](https://github.com/pedram-kh/Engine/actions/runs/33105739460) at `b48357b9`
+  ran the full board — Backend, Frontend, `e2e-main`, and `e2e-admin` — all four green, closing
+  the gap this chunk's local run could not.
 
-**Status: Closed — approved, pushed.**
+**Status: Closed — approved, pushed. CI green at `b48357b9`
+([run `33105739460`](https://github.com/pedram-kh/Engine/actions/runs/33105739460)) — this chunk
+is closed.**
