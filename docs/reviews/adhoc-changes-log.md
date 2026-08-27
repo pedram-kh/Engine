@@ -70,6 +70,66 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-090 · Platform automations — rules table + on-approval auto-connect
+
+- **Status:** Landed — awaiting Pedram's close.
+- **Date:** 2026-08-27
+- **Why:** every creator approval that should end in a roster relation required a human to perform the
+  connect by hand, immediately after performing the approval by hand. For an operator running the same
+  pairing every time — one agency with a platform-wide arrangement — that second click carries no
+  decision, only the chance of forgetting it.
+- **What:** a rules table an operator writes — _when a creator is approved, connect them to this
+  agency_ — and a queued job that performs the connect as `system`, through the **same service** the
+  human direct-connect path calls, producing the same guard chain, the same notification, the same mail
+  and the same audit verb. Two deliberate acts gate every fire: a rule must exist (the table ships
+  empty) **and** `platform_automations_enabled` must be on (default OFF). The job takes IDs only and
+  re-derives every condition at fire time — flag, rule existence and enablement, creator existence and
+  still-approved, config well-formed, agency present and unsuspended, pair not hard-blacklisted, not
+  already roster, not terminal — with **one structured log line per invocation**, fired or skipped, for
+  each of eleven outcomes. The dispatch sits **after** `approve()`'s transaction commits, beside its
+  existing emissions, because every queue connection sets `after_commit => false` and a worker reading
+  a still-pending creator would make the feature fail closed and silently.
+- **Touched:** **Backend** — `CreatorAgencyDirectConnectService` extracted from
+  `AdminCreatorConnectionController` (Door 2 only) with `DirectConnectOutcome` + `DirectConnectResult`;
+  `admin_automation_rules` (one `CREATE TABLE`, no existing table touched); `AdminAutomationRule` +
+  factory + `AutomationEvent` / `AutomationAction`; `PlatformAutomationsEnabled` + its `FLAGS` entry;
+  `RunAutomationRuleJob`; the hook in `AdminCreatorController::approve()`;
+  `AdminAutomationRuleController` + four FormRequests + resource + routes; four new `AuditAction`
+  cases, all reason-mandatory; `AdminAgencyController::index()`'s `?for=select` branch +
+  `AgencyOptionResource`. **Frontend** — `apps/admin/src/modules/automations/` (api, page, routes), nav
+  entry, `automations.json` ×24 + the `app.json` nav label ×24. **Tests** — six Pest files (one new
+  service suite, one job suite, one approval-hook suite, one CRUD suite, one picker suite, plus the
+  untouched-but-green refactor pin) and one Vitest spec of 14 cases.
+- **Decisions:** (Q3) an automation **never** reverses a deliberate human decision — `ended` and
+  `declined` pairs are skipped as `skipped:relation_terminal`, while the manual path keeps elevating
+  them, because a human choosing IS the consent the elevation encodes. The asymmetry is the point, and
+  the test that carries it connects the same terminal pair through the human path in the next
+  assertion. (C8) one kill switch, checked at **fire** time so a mid-flight flip is honoured: per-rule
+  `enabled` is configuration, and five rules must die with one flip. (D3) the suspended-agency guard
+  fixes **both** callers, keyed on `suspended_at` as the SOT rather than the `is_active` mirror — this
+  is the chunk's one manual-path behaviour change, live without a flag, and it removes a capability
+  (connecting into an agency whose users cannot log in) rather than adding one. (D6) the picker-class
+  tech debt graduates via the **conventions rule + the >25-row endpoint test + a review-checklist
+  line**; the architecture-test option was priced and declined as green-by-construction, bypassed by
+  the named-constant idiom, and false-positive on the two legitimate AH-066 pickers. (D7) hard delete,
+  reason-gated, whole row in the audit before-snapshot; no Playwright leg — the Pest integration test
+  through the real endpoint and real job carries it, and the fixture-less admin suite makes a first
+  business-logic leg a deliberate future investment rather than this chunk's rider. (C4) a `name`
+  column joins the schema — the audit reason string needs it, and so does any human reading the table.
+  (C3) an outcome **value object** replaces the plan's "verbatim" extraction: one enum backing both the
+  HTTP codes and the skip reasons kills two hand-maintained lists. (Q4) the fire's audit row carries
+  `fired_by` + `automation_rule_id`, because `actor_type: system` says no human did this but not which
+  rule did.
+- **Ref:** [`admin-automations-review.md`](admin-automations-review.md) (the production posture and its
+  four already-nullable seams, the full re-check table, the break-revert pins, the named E2E gap, and
+  the one deliberate divergence from the clone template) · plan:
+  [`admin-automations-plan.md`](admin-automations-plan.md) · inventory:
+  [`admin-automations-inventory.md`](admin-automations-inventory.md) · closes the picker-class
+  `tech-debt.md` entry and extends the Playwright-flake entry with `admin-sign-in.spec.ts` as its third
+  occurrence.
+
+---
+
 ### AH-089 · Graduated floor scoring
 
 - **Status:** Landed — awaiting Pedram's close.

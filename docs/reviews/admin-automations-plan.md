@@ -1,6 +1,10 @@
 # Platform Automations: rules table + on-approval auto-connect — PLAN (plan-pause)
 
-- **Status:** Plan-pause. **No code written.** Awaiting clearance before sub-step 1.
+- **Status:** SUPERSEDED — cleared and built. This file is kept as the plan-of-record (it is what the
+  ratifications answered); what actually shipped, including where the build diverged, is in
+  [`admin-automations-review.md`](admin-automations-review.md). The "no code written" line below was
+  true when this was written and is preserved rather than retro-edited.
+- **Status at writing:** Plan-pause. **No code written.** Awaiting clearance before sub-step 1.
 - **Date:** 2026-08-27
 - **Entry:** AH-090 (confirmed free — AH-089 is the latest landed entry, `adhoc-changes-log.md:73`).
 - **Author:** Cursor, against the kickoff's locked decisions (D1–D7).

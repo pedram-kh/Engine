@@ -54,6 +54,67 @@ happened.
 
 ---
 
+## 2026-08-27 · AH-090 — platform automations: rules table + on-approval auto-connect — PENDING
+
+> **⚠ This entry STACKS on the two PENDING entries below** (AH-088 + AH-089, and AH-086 + b + AH-087).
+> Whoever deploys next runs **all three** checklists in one pass. Combined across the three:
+> **3 migrations**, **`migrate` required**, **queue-worker restart required**, **PHP-FPM reload
+> required**, and **one post-deploy artisan command** (the AH-088/089 entry's
+> `creators:recompute-completeness` — AH-090 adds no command of its own).
+
+- **Status:** PENDING
+- **Range:** the tip carrying the AH-088 + AH-089 entry → the tip carrying this entry. Commits, in
+  order:
+  - `f31d7c7b` — `refactor(creators): extract CreatorAgencyDirectConnectService + suspended-agency
+guard (AH-090)` — the service + outcome enum + result VO, and the one deliberate manual-path
+    behaviour change (see below).
+  - `1c996c77` — `feat(admin): platform automation rules — table, kill switch, job, on-approval hook
+(AH-090)` — the migration, model, enums, factory, the Pennant flag, the job, the hook.
+  - `1a4e0a1f` — `feat(admin): automation-rules CRUD, agency picker projection, admin SPA surface
+(AH-090)` — the CRUD controller + four audit verbs, the `?for=select` projection, the SPA module,
+    i18n ×24.
+  - _this commit_ — the docs commit (this entry, the review, the AH-090 log entry, the conventions
+    picker rule, the tenancy rows, the tech-debt close + the flake-entry rider).
+- **AH entries carried:** **AH-090.**
+- **Migrations run:** **1** — `2026_08_27_120000_create_admin_automation_rules_table.php`. A
+  `CREATE TABLE`, nothing else: **no existing table is touched, no column added anywhere, no
+  backfill, no `UPDATE`.** The table ships **EMPTY** and stays empty until an operator creates a rule
+  through the admin UI. The system-actor connect path needed zero schema work because
+  `agency_creator_relations.invited_by_user_id` was already nullable — had it not been, this deploy
+  would have carried an `ALTER` on a live relation table.
+  - **`down()` honesty:** `dropIfExists` is a true structural inverse with a **lossy content
+    inverse** — a rollback discards every configured rule and its fire trace, and a redeploy comes
+    back with an empty table. Relations already created by fires **survive** the rollback, correctly:
+    they are real relationships, not automation state.
+- **Pre-deploy reads:** none. There is nothing to count — the reachable population at deploy is
+  **zero creators**, and nothing in this chunk reads a creator who was approved before it.
+- **Infra:** **queue-worker restart REQUIRED** — `RunAutomationRuleJob` is a new job class, and a
+  worker running the old code cannot resolve it. **PHP-FPM reload required** (new controller, routes,
+  enums, feature class). **No cron/scheduler change** — the trigger is an admin approving a creator,
+  not a schedule. No env changes, no new secrets (this feature gates no vendor).
+- **One-shot commands:** none.
+- **Post-deploy verification:** `/up` 200; then, authenticated as a platform admin, `GET
+/api/v1/admin/automation-rules` returns `{"data": []}` (the empty table, reachable and authorized)
+  and the admin SPA's **Automations** nav item loads the empty-state. Confirm the Feature-flags page
+  lists `platform_automations_enabled` as **OFF**. A creator approval performed right after deploy
+  must behave exactly as before — with no rules and the flag off, the hook queries an empty table and
+  dispatches nothing.
+- **Flags armed:** **none — `platform_automations_enabled` ships OFF and is NOT armed by this
+  deploy.** Arming is a separate, deliberate operator act, and the order matters: create the rules
+  first, read the table back, confirm no rule shows a broken-target chip, THEN flip the flag. The
+  enable ritual is in [`feature-flags.md`](../feature-flags.md).
+- **⚠ One deliberate behaviour change to an EXISTING path, live the moment this deploys — no flag
+  gates it:** an admin direct-connecting a creator to a **suspended** agency now gets `422
+connection.agency_suspended`. Before AH-090 nothing in the connect chain checked suspension, so
+  that connection succeeded and produced a roster relation into an agency whose users cannot log in.
+  This **removes** a capability rather than adding one, and the removed capability has no legitimate
+  use — but it is the one thing in this deploy that changes what a human admin can do, and it does
+  not wait for the flag.
+- **Operator:** _to be filled at deploy._
+- **Anything unexpected:** _to be filled at deploy._
+
+---
+
 ## 2026-08-27 · AH-088 + AH-089 — creator date of birth → age everywhere + graduated floor scoring — PENDING
 
 > **⚠ This entry STACKS on the AH-086 + b + AH-087 entry below, which has not deployed.** Whoever

@@ -555,6 +555,31 @@ const isOverdue = computed(() => {
 - Types are auto-generated from the backend's OpenAPI spec where possible (Phase 2; manual in Phase 1).
 - **Components and composables never call `axios` directly.** They go through `api-client`.
 
+**A picker never reads a paginated index.** Any `<select>`, autocomplete, or other
+control that offers a CHOICE from a set must be fed by an endpoint that returns the
+whole set — a thin `?for=select` projection (`{id, name}`, unpaginated), not the
+paginated list endpoint and not the paginated endpoint with a large `per_page`.
+
+The failure this rule exists to prevent is silent: the picker renders, the operator
+scrolls, and the option they need is simply absent because it sat past the first
+page boundary. Nothing errors, so nothing surfaces the truncation. `per_page=1000`
+is not a fix — it is the same bug with a later boundary, and it degrades as the
+table grows.
+
+Two obligations come with adding one:
+
+1. The endpoint gets a test proving the set is **complete past the default page
+   boundary** — create more rows than one page holds and assert every one comes
+   back. A test with five rows proves nothing about pagination.
+2. The projection states its exclusions. Filtering out choices the backend would
+   then refuse (a suspended agency, an archived campaign) is correct — offering
+   one is offering a choice that fails — but the omission belongs in the
+   endpoint's doc row, not only in the query.
+
+Reviewers: see the `docs/security/tenancy.md` §6 checklist line. Two legitimate
+pre-existing pickers (AH-066) read paginated endpoints with named per-page
+constants; they are the exception this rule was written after, not a licence.
+
 ### 3.6 Routing
 
 - Each module exports its own routes from `module/routes.ts`.
