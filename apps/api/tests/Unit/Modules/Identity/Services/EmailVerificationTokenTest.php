@@ -38,7 +38,13 @@ it('refuses a token whose payload has been tampered with', function (): void {
     $token = $tokens->mint($user);
     [$payload, $signature] = explode('.', $token);
 
-    $tamperedPayload = $payload === 'a' ? 'b' : 'a'.substr($payload, 1);
+    // Flip the FIRST CHARACTER only, and guarantee it actually changes: the
+    // prior `$payload === 'a'` guard compared the whole segment (never true —
+    // a real payload is many characters) rather than its first character, so
+    // on the ~1-in-64 run where that character already was 'a' the "tampered"
+    // segment was byte-for-byte identical to the original and this assertion
+    // was flaky. `$payload[0] === 'a' ? 'b' : 'a'` covers both cases.
+    $tamperedPayload = ($payload[0] === 'a' ? 'b' : 'a').substr($payload, 1);
 
     $result = $tokens->decode($tamperedPayload.'.'.$signature);
 
@@ -52,7 +58,10 @@ it('refuses a token whose signature has been tampered with', function (): void {
     $token = $tokens->mint($user);
     [$payload, $signature] = explode('.', $token);
 
-    $tamperedSig = $signature === 'a' ? 'b' : 'a'.substr($signature, 1);
+    // Same fix as the payload-tamper test above: compare the first CHARACTER,
+    // not the whole segment, or a signature that happens to start with 'a'
+    // makes the "tampered" value identical to the original (CI hit this).
+    $tamperedSig = ($signature[0] === 'a' ? 'b' : 'a').substr($signature, 1);
 
     expect($tokens->decode($payload.'.'.$tamperedSig)->valid)->toBeFalse();
 });
