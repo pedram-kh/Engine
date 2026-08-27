@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Settings",
       "messages": "Messaġġi",
-      "menu": "Menu"
+      "menu": "Menu",
+      "files": "Fajls"
     },
     "discover": {
       "title": "Discover creators",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Failed to load settings.",
         "saveFailed": "Failed to save settings."
+      }
+    },
+    "files": {
+      "title": "Fajls",
+      "unknownUploader": "Mhux magħruf",
+      "actions": {
+        "upload": "Uploadja fajl",
+        "download": "Niżżel",
+        "delete": "Ħassar"
+      },
+      "fields": {
+        "name": "Fajl",
+        "size": "Daqs",
+        "uploadedBy": "Uploadjat minn",
+        "uploadedAt": "Uploadjat"
+      },
+      "upload": {
+        "title": "Uploadja fajl",
+        "body": "Fajls PDF, Word, Excel, test, CSV jew immaġini sa 25 MB.",
+        "label": "Agħżel fajl",
+        "cancel": "Ikkanċella"
+      },
+      "delete": {
+        "confirmTitle": "Ħassar fajl",
+        "confirmMessage": "Ħassar {name}? Din l-azzjoni ma tistax titħassar.",
+        "confirm": "Ħassar",
+        "cancel": "Ikkanċella"
+      },
+      "empty": {
+        "heading": "Għad m'hemm l-ebda fajl",
+        "body": "Uploadja dokument biex tibda.",
+        "cta": "Uploadja fajl"
+      },
+      "errors": {
+        "loadFailed": "Il-fajls ma setgħux jiġu kkargati.",
+        "unsupportedOrTooLarge": "Dan it-tip ta' fajl mhux sostnut, jew il-fajl huwa akbar minn 25 MB.",
+        "uploadFailed": "Il-fajl ma setax jiġi uploadjat. Erġa' pprova.",
+        "deleteFailed": "Il-fajl ma setax jitħassar. Erġa' pprova."
       }
     }
   },

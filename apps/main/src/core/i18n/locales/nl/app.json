@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Instellingen",
       "messages": "Berichten",
-      "menu": "Menu"
+      "menu": "Menu",
+      "files": "Bestanden"
     },
     "discover": {
       "title": "Creators ontdekken",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Instellingen konden niet worden geladen.",
         "saveFailed": "Instellingen konden niet worden opgeslagen."
+      }
+    },
+    "files": {
+      "title": "Bestanden",
+      "unknownUploader": "Onbekend",
+      "actions": {
+        "upload": "Bestand uploaden",
+        "download": "Downloaden",
+        "delete": "Verwijderen"
+      },
+      "fields": {
+        "name": "Bestand",
+        "size": "Grootte",
+        "uploadedBy": "Geüpload door",
+        "uploadedAt": "Geüpload"
+      },
+      "upload": {
+        "title": "Bestand uploaden",
+        "body": "PDF-, Word-, Excel-, tekst-, CSV- of afbeeldingsbestanden tot 25 MB.",
+        "label": "Bestand kiezen",
+        "cancel": "Annuleren"
+      },
+      "delete": {
+        "confirmTitle": "Bestand verwijderen",
+        "confirmMessage": "{name} verwijderen? Dit kan niet ongedaan worden gemaakt.",
+        "confirm": "Verwijderen",
+        "cancel": "Annuleren"
+      },
+      "empty": {
+        "heading": "Nog geen bestanden",
+        "body": "Upload een document om te beginnen.",
+        "cta": "Bestand uploaden"
+      },
+      "errors": {
+        "loadFailed": "Bestanden konden niet worden geladen.",
+        "unsupportedOrTooLarge": "Dit bestandstype wordt niet ondersteund, of het bestand is groter dan 25 MB.",
+        "uploadFailed": "Het bestand kon niet worden geüpload. Probeer het opnieuw.",
+        "deleteFailed": "Het bestand kon niet worden verwijderd. Probeer het opnieuw."
       }
     }
   },

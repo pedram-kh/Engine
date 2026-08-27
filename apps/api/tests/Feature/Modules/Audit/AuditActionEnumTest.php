@@ -199,6 +199,10 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'automation_rule.updated',
         'automation_rule.deleted',
         'automation_rule.toggled',
+        // AH-091, chunk A — the agency Files library's upload/delete verbs.
+        // Audit-only (nobody is notified); no NotificationType tie.
+        'agency_file.uploaded',
+        'agency_file.deleted',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());

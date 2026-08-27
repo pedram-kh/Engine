@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Ρυθμίσεις",
       "messages": "Μηνύματα",
-      "menu": "Μενού"
+      "menu": "Μενού",
+      "files": "Αρχεία"
     },
     "discover": {
       "title": "Discover creators",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Failed to load settings.",
         "saveFailed": "Failed to save settings."
+      }
+    },
+    "files": {
+      "title": "Αρχεία",
+      "unknownUploader": "Άγνωστο",
+      "actions": {
+        "upload": "Μεταφόρτωση αρχείου",
+        "download": "Λήψη",
+        "delete": "Διαγραφή"
+      },
+      "fields": {
+        "name": "Αρχείο",
+        "size": "Μέγεθος",
+        "uploadedBy": "Μεταφορτώθηκε από",
+        "uploadedAt": "Μεταφορτώθηκε"
+      },
+      "upload": {
+        "title": "Μεταφόρτωση αρχείου",
+        "body": "Αρχεία PDF, Word, Excel, κειμένου, CSV ή εικόνας έως 25 MB.",
+        "label": "Επιλέξτε αρχείο",
+        "cancel": "Άκυρο"
+      },
+      "delete": {
+        "confirmTitle": "Διαγραφή αρχείου",
+        "confirmMessage": "Διαγραφή {name}; Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
+        "confirm": "Διαγραφή",
+        "cancel": "Άκυρο"
+      },
+      "empty": {
+        "heading": "Δεν υπάρχουν ακόμη αρχεία",
+        "body": "Μεταφορτώστε ένα έγγραφο για να ξεκινήσετε.",
+        "cta": "Μεταφόρτωση αρχείου"
+      },
+      "errors": {
+        "loadFailed": "Δεν ήταν δυνατή η φόρτωση των αρχείων.",
+        "unsupportedOrTooLarge": "Αυτός ο τύπος αρχείου δεν υποστηρίζεται ή το αρχείο είναι μεγαλύτερο από 25 MB.",
+        "uploadFailed": "Δεν ήταν δυνατή η μεταφόρτωση του αρχείου. Δοκιμάστε ξανά.",
+        "deleteFailed": "Δεν ήταν δυνατή η διαγραφή του αρχείου. Δοκιμάστε ξανά."
       }
     }
   },

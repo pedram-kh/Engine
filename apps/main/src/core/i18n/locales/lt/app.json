@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Nustatymai",
       "messages": "Žinutės",
-      "menu": "Meniu"
+      "menu": "Meniu",
+      "files": "Failai"
     },
     "discover": {
       "title": "Discover creators",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Failed to load settings.",
         "saveFailed": "Failed to save settings."
+      }
+    },
+    "files": {
+      "title": "Failai",
+      "unknownUploader": "Nežinoma",
+      "actions": {
+        "upload": "Įkelti failą",
+        "download": "Atsisiųsti",
+        "delete": "Ištrinti"
+      },
+      "fields": {
+        "name": "Failas",
+        "size": "Dydis",
+        "uploadedBy": "Įkėlė",
+        "uploadedAt": "Įkelta"
+      },
+      "upload": {
+        "title": "Įkelti failą",
+        "body": "PDF, Word, Excel, teksto, CSV arba paveikslėlių failai iki 25 MB.",
+        "label": "Pasirinkti failą",
+        "cancel": "Atšaukti"
+      },
+      "delete": {
+        "confirmTitle": "Ištrinti failą",
+        "confirmMessage": "Ištrinti {name}? Šio veiksmo nebūtų galima anuliuoti.",
+        "confirm": "Ištrinti",
+        "cancel": "Atšaukti"
+      },
+      "empty": {
+        "heading": "Kol kas failų nėra",
+        "body": "Įkelkite dokumentą, kad pradėtumėte.",
+        "cta": "Įkelti failą"
+      },
+      "errors": {
+        "loadFailed": "Nepavyko įkelti failų.",
+        "unsupportedOrTooLarge": "Šis failo tipas nepalaikomas, arba failas didesnis nei 25 MB.",
+        "uploadFailed": "Nepavyko įkelti failo. Bandykite dar kartą.",
+        "deleteFailed": "Nepavyko ištrinti failo. Bandykite dar kartą."
       }
     }
   },

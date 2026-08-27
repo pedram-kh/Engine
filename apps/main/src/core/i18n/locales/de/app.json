@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Einstellungen",
       "messages": "Nachrichten",
-      "menu": "Menü"
+      "menu": "Menü",
+      "files": "Dateien"
     },
     "discover": {
       "title": "Creator entdecken",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Einstellungen konnten nicht geladen werden.",
         "saveFailed": "Einstellungen konnten nicht gespeichert werden."
+      }
+    },
+    "files": {
+      "title": "Dateien",
+      "unknownUploader": "Unbekannt",
+      "actions": {
+        "upload": "Datei hochladen",
+        "download": "Herunterladen",
+        "delete": "Löschen"
+      },
+      "fields": {
+        "name": "Datei",
+        "size": "Größe",
+        "uploadedBy": "Hochgeladen von",
+        "uploadedAt": "Hochgeladen"
+      },
+      "upload": {
+        "title": "Datei hochladen",
+        "body": "PDF-, Word-, Excel-, Text-, CSV- oder Bilddateien bis zu 25 MB.",
+        "label": "Datei auswählen",
+        "cancel": "Abbrechen"
+      },
+      "delete": {
+        "confirmTitle": "Datei löschen",
+        "confirmMessage": "{name} löschen? Dies kann nicht rückgängig gemacht werden.",
+        "confirm": "Löschen",
+        "cancel": "Abbrechen"
+      },
+      "empty": {
+        "heading": "Noch keine Dateien",
+        "body": "Laden Sie ein Dokument hoch, um zu beginnen.",
+        "cta": "Datei hochladen"
+      },
+      "errors": {
+        "loadFailed": "Dateien konnten nicht geladen werden.",
+        "unsupportedOrTooLarge": "Dieser Dateityp wird nicht unterstützt oder die Datei ist größer als 25 MB.",
+        "uploadFailed": "Die Datei konnte nicht hochgeladen werden. Bitte versuchen Sie es erneut.",
+        "deleteFailed": "Die Datei konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
       }
     }
   },

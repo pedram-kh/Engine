@@ -98,7 +98,8 @@
       "agencyUsers": "Equipe",
       "settings": "Configurações",
       "messages": "Mensagens",
-      "menu": "Menu"
+      "menu": "Menu",
+      "files": "Ficheiros"
     },
     "discover": {
       "title": "Descobrir criadores",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Falha ao carregar configurações.",
         "saveFailed": "Falha ao salvar configurações."
+      }
+    },
+    "files": {
+      "title": "Ficheiros",
+      "unknownUploader": "Desconhecido",
+      "actions": {
+        "upload": "Carregar ficheiro",
+        "download": "Descarregar",
+        "delete": "Eliminar"
+      },
+      "fields": {
+        "name": "Ficheiro",
+        "size": "Tamanho",
+        "uploadedBy": "Carregado por",
+        "uploadedAt": "Carregado"
+      },
+      "upload": {
+        "title": "Carregar ficheiro",
+        "body": "Ficheiros PDF, Word, Excel, texto, CSV ou imagem até 25 MB.",
+        "label": "Escolher um ficheiro",
+        "cancel": "Cancelar"
+      },
+      "delete": {
+        "confirmTitle": "Eliminar ficheiro",
+        "confirmMessage": "Eliminar {name}? Esta ação não pode ser anulada.",
+        "confirm": "Eliminar",
+        "cancel": "Cancelar"
+      },
+      "empty": {
+        "heading": "Ainda não há ficheiros",
+        "body": "Carregue um documento para começar.",
+        "cta": "Carregar ficheiro"
+      },
+      "errors": {
+        "loadFailed": "Não foi possível carregar os ficheiros.",
+        "unsupportedOrTooLarge": "Esse tipo de ficheiro não é suportado, ou é maior do que 25 MB.",
+        "uploadFailed": "Não foi possível carregar o ficheiro. Tente novamente.",
+        "deleteFailed": "Não foi possível eliminar o ficheiro. Tente novamente."
       }
     }
   },

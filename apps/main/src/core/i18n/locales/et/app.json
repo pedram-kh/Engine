@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Seaded",
       "messages": "Sõnumid",
-      "menu": "Menüü"
+      "menu": "Menüü",
+      "files": "Failid"
     },
     "discover": {
       "title": "Discover creators",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Failed to load settings.",
         "saveFailed": "Failed to save settings."
+      }
+    },
+    "files": {
+      "title": "Failid",
+      "unknownUploader": "Teadmata",
+      "actions": {
+        "upload": "Laadi fail üles",
+        "download": "Laadi alla",
+        "delete": "Kustuta"
+      },
+      "fields": {
+        "name": "Fail",
+        "size": "Suurus",
+        "uploadedBy": "Üles laadis",
+        "uploadedAt": "Üles laaditud"
+      },
+      "upload": {
+        "title": "Laadi fail üles",
+        "body": "PDF-, Word-, Excel-, tekst-, CSV- või pildifailid kuni 25 MB.",
+        "label": "Vali fail",
+        "cancel": "Loobu"
+      },
+      "delete": {
+        "confirmTitle": "Kustuta fail",
+        "confirmMessage": "Kustutada {name}? Seda toimingut ei saa tagasi võtta.",
+        "confirm": "Kustuta",
+        "cancel": "Loobu"
+      },
+      "empty": {
+        "heading": "Faile veel ei ole",
+        "body": "Laadi dokument üles, et alustada.",
+        "cta": "Laadi fail üles"
+      },
+      "errors": {
+        "loadFailed": "Failide laadimine ebaõnnestus.",
+        "unsupportedOrTooLarge": "See failitüüp ei ole toetatud või fail on suurem kui 25 MB.",
+        "uploadFailed": "Faili üleslaadimine ebaõnnestus. Proovi uuesti.",
+        "deleteFailed": "Faili kustutamine ebaõnnestus. Proovi uuesti."
       }
     }
   },

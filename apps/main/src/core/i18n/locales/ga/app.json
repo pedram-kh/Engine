@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Socruithe",
       "messages": "Teachtaireachtaí",
-      "menu": "Roghchlár"
+      "menu": "Roghchlár",
+      "files": "Comhaid"
     },
     "discover": {
       "title": "Discover creators",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Failed to load settings.",
         "saveFailed": "Failed to save settings."
+      }
+    },
+    "files": {
+      "title": "Comhaid",
+      "unknownUploader": "Anaithnid",
+      "actions": {
+        "upload": "Uaslódáil comhad",
+        "download": "Íoslódáil",
+        "delete": "Scrios"
+      },
+      "fields": {
+        "name": "Comhad",
+        "size": "Méid",
+        "uploadedBy": "Uaslódáilte ag",
+        "uploadedAt": "Uaslódáilte"
+      },
+      "upload": {
+        "title": "Uaslódáil comhad",
+        "body": "Comhaid PDF, Word, Excel, téacs, CSV nó íomhá suas le 25 MB.",
+        "label": "Roghnaigh comhad",
+        "cancel": "Cealaigh"
+      },
+      "delete": {
+        "confirmTitle": "Scrios comhad",
+        "confirmMessage": "Scrios {name}? Ní féidir an gníomh seo a chealú.",
+        "confirm": "Scrios",
+        "cancel": "Cealaigh"
+      },
+      "empty": {
+        "heading": "Níl comhaid ann fós",
+        "body": "Uaslódáil doiciméad chun tosú.",
+        "cta": "Uaslódáil comhad"
+      },
+      "errors": {
+        "loadFailed": "Níorbh fhéidir na comhaid a lódáil.",
+        "unsupportedOrTooLarge": "Ní thacaítear leis an gcineál comhaid sin, nó tá an comhad níos mó ná 25 MB.",
+        "uploadFailed": "Níorbh fhéidir an comhad a uaslódáil. Bain triail eile as.",
+        "deleteFailed": "Níorbh fhéidir an comhad a scriosadh. Bain triail eile as."
       }
     }
   },

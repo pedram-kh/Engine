@@ -98,7 +98,8 @@
       "agencyUsers": "Tým",
       "settings": "Nastavení",
       "messages": "Zprávy",
-      "menu": "Nabídka"
+      "menu": "Nabídka",
+      "files": "Soubory"
     },
     "discover": {
       "title": "Objevit tvůrce",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Nepodařilo se načíst nastavení.",
         "saveFailed": "Nepodařilo se uložit nastavení."
+      }
+    },
+    "files": {
+      "title": "Soubory",
+      "unknownUploader": "Neznámý",
+      "actions": {
+        "upload": "Nahrát soubor",
+        "download": "Stáhnout",
+        "delete": "Odstranit"
+      },
+      "fields": {
+        "name": "Soubor",
+        "size": "Velikost",
+        "uploadedBy": "Nahráno uživatelem",
+        "uploadedAt": "Nahráno"
+      },
+      "upload": {
+        "title": "Nahrát soubor",
+        "body": "Soubory PDF, Word, Excel, text, CSV nebo obrázky do 25 MB.",
+        "label": "Vybrat soubor",
+        "cancel": "Zrušit"
+      },
+      "delete": {
+        "confirmTitle": "Odstranit soubor",
+        "confirmMessage": "Odstranit {name}? Tuto akci nelze vrátit zpět.",
+        "confirm": "Odstranit",
+        "cancel": "Zrušit"
+      },
+      "empty": {
+        "heading": "Zatím žádné soubory",
+        "body": "Nahrajte dokument a začněte.",
+        "cta": "Nahrát soubor"
+      },
+      "errors": {
+        "loadFailed": "Soubory se nepodařilo načíst.",
+        "unsupportedOrTooLarge": "Tento typ souboru není podporován, nebo je soubor větší než 25 MB.",
+        "uploadFailed": "Soubor se nepodařilo nahrát. Zkuste to znovu.",
+        "deleteFailed": "Soubor se nepodařilo odstranit. Zkuste to znovu."
       }
     }
   },

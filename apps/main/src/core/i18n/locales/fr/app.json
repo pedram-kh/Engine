@@ -98,7 +98,8 @@
       "agencyUsers": "Équipe",
       "settings": "Paramètres",
       "messages": "Messages",
-      "menu": "Menu"
+      "menu": "Menu",
+      "files": "Fichiers"
     },
     "discover": {
       "title": "Découvrir des créateurs",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Échec du chargement des paramètres.",
         "saveFailed": "Échec de l'enregistrement des paramètres."
+      }
+    },
+    "files": {
+      "title": "Fichiers",
+      "unknownUploader": "Inconnu",
+      "actions": {
+        "upload": "Charger un fichier",
+        "download": "Télécharger",
+        "delete": "Supprimer"
+      },
+      "fields": {
+        "name": "Fichier",
+        "size": "Taille",
+        "uploadedBy": "Chargé par",
+        "uploadedAt": "Chargé le"
+      },
+      "upload": {
+        "title": "Charger un fichier",
+        "body": "Fichiers PDF, Word, Excel, texte, CSV ou image jusqu'à 25 Mo.",
+        "label": "Choisir un fichier",
+        "cancel": "Annuler"
+      },
+      "delete": {
+        "confirmTitle": "Supprimer le fichier",
+        "confirmMessage": "Supprimer {name} ? Cette action est irréversible.",
+        "confirm": "Supprimer",
+        "cancel": "Annuler"
+      },
+      "empty": {
+        "heading": "Aucun fichier pour le moment",
+        "body": "Chargez un document pour commencer.",
+        "cta": "Charger un fichier"
+      },
+      "errors": {
+        "loadFailed": "Impossible de charger les fichiers.",
+        "unsupportedOrTooLarge": "Ce type de fichier n'est pas pris en charge, ou il dépasse 25 Mo.",
+        "uploadFailed": "Impossible de charger le fichier. Veuillez réessayer.",
+        "deleteFailed": "Impossible de supprimer le fichier. Veuillez réessayer."
       }
     }
   },

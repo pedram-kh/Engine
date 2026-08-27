@@ -89,6 +89,8 @@ describe('agency-shell routes — requireAgencyUser guard registration (Sprint 6
       // public profile). New agency-shell routes; both carry requireAgencyUser.
       'discover.detail',
       'discover.list',
+      // AH-091, chunk A — the agency Files library (upload/list/delete).
+      'files.list',
       // AH-010b — the agency-shell relationship-messaging inbox + thread.
       'messages.inbox',
       'messages.thread',

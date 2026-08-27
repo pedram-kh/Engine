@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Messaging\Services;
 
+use App\Core\Storage\AttachmentMimeTypes;
 use App\Modules\Creators\Services\PortfolioUploadService;
 use App\Modules\Messaging\Models\MessageThread;
 use Aws\S3\S3Client;
@@ -33,29 +34,14 @@ final class MessageAttachmentUploadService
     public const int MAX_ATTACHMENTS_PER_MESSAGE = 10;
 
     /**
-     * Accepted MIME → extension. Images + video + PDF + common office/text docs.
+     * Accepted MIME → extension. Images + video + PDF + common office/text
+     * docs — the shared catalogue (AH-091 extraction); see
+     * {@see AttachmentMimeTypes} for the single source of truth this and two
+     * sibling services import.
      *
      * @var array<string, string>
      */
-    public const array ACCEPTED_MIME_TYPES = [
-        // Images.
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'image/webp' => 'webp',
-        'image/gif' => 'gif',
-        // Video.
-        'video/mp4' => 'mp4',
-        'video/quicktime' => 'mov',
-        'video/webm' => 'webm',
-        // PDF + common documents.
-        'application/pdf' => 'pdf',
-        'application/msword' => 'doc',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
-        'application/vnd.ms-excel' => 'xls',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
-        'text/plain' => 'txt',
-        'text/csv' => 'csv',
-    ];
+    public const array ACCEPTED_MIME_TYPES = AttachmentMimeTypes::ALL;
 
     /**
      * Initiate a presigned S3 PUT scoped to the thread's own prefix. The client

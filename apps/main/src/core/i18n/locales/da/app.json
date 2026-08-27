@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Indstillinger",
       "messages": "Beskeder",
-      "menu": "Menu"
+      "menu": "Menu",
+      "files": "Filer"
     },
     "discover": {
       "title": "Opdage creatorer",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Indstillinger kunne ikke indlæses.",
         "saveFailed": "Indstillinger kunne ikke gemmes."
+      }
+    },
+    "files": {
+      "title": "Filer",
+      "unknownUploader": "Ukendt",
+      "actions": {
+        "upload": "Upload fil",
+        "download": "Download",
+        "delete": "Slet"
+      },
+      "fields": {
+        "name": "Fil",
+        "size": "Størrelse",
+        "uploadedBy": "Uploadet af",
+        "uploadedAt": "Uploadet"
+      },
+      "upload": {
+        "title": "Upload fil",
+        "body": "PDF-, Word-, Excel-, tekst-, CSV- eller billedfiler op til 25 MB.",
+        "label": "Vælg en fil",
+        "cancel": "Annuller"
+      },
+      "delete": {
+        "confirmTitle": "Slet fil",
+        "confirmMessage": "Slet {name}? Dette kan ikke fortrydes.",
+        "confirm": "Slet",
+        "cancel": "Annuller"
+      },
+      "empty": {
+        "heading": "Ingen filer endnu",
+        "body": "Upload et dokument for at komme i gang.",
+        "cta": "Upload fil"
+      },
+      "errors": {
+        "loadFailed": "Filerne kunne ikke indlæses.",
+        "unsupportedOrTooLarge": "Denne filtype understøttes ikke, eller filen er større end 25 MB.",
+        "uploadFailed": "Filen kunne ikke uploades. Prøv igen.",
+        "deleteFailed": "Filen kunne ikke slettes. Prøv igen."
       }
     }
   },

@@ -464,6 +464,14 @@ enum AuditAction: string
     case AutomationRuleDeleted = 'automation_rule.deleted';
     case AutomationRuleToggled = 'automation_rule.toggled';
 
+    // AH-091 — Agency Files library chunk A. Mirrors the brand.* verbs (no
+    // reason required — an ordinary content-management action, not an
+    // accountability-critical override). `agency_file.deleted` is written
+    // AFTER the object-first delete has already succeeded (D5) — never on a
+    // failed delete, since a failed delete throws before the row soft-deletes.
+    case AgencyFileUploaded = 'agency_file.uploaded';
+    case AgencyFileDeleted = 'agency_file.deleted';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *

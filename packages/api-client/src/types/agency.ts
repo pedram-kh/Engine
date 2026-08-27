@@ -952,3 +952,90 @@ export interface AgencyMemberListItem {
   accepted_at: string | null
   is_pending: boolean
 }
+
+// ---------------------------------------------------------------------------
+// Agency Files library (AH-091, chunk A)
+// ---------------------------------------------------------------------------
+
+/**
+ * v1 ships exactly one category. Kept as a union (not a bare string) so a
+ * future chunk B category addition is a one-line type change the compiler
+ * catches everywhere it's matched on.
+ */
+export type AgencyFileCategory = 'campaign_attachment'
+
+export interface AgencyFileAttributes {
+  original_filename: string
+  mime_type: string
+  size_bytes: number
+  category: AgencyFileCategory
+  /**
+   * A FRESH short-lived signed GET (60 min, `Content-Disposition: attachment`
+   * — D4), minted per response. Null when the disk isn't S3-backed (local
+   * dev without MinIO). Treat every response's URL as one-shot — re-fetch
+   * (via `filesApi.show()`) rather than caching for a later download click.
+   */
+  download_url: string | null
+  created_at: string
+}
+
+export interface AgencyFileUploadedByRelationship {
+  data: {
+    id: string
+    type: 'users'
+    attributes: { name: string }
+  }
+}
+
+export interface AgencyFileResource {
+  id: string
+  type: 'agency_files'
+  attributes: AgencyFileAttributes
+  relationships: {
+    /** Null when the uploader account was later deleted (nullOnDelete, D1). */
+    uploaded_by: AgencyFileUploadedByRelationship | null
+  }
+}
+
+/**
+ * Hand-rolled `{data, meta}` envelope — mirrors {@link RosterListResponse},
+ * NOT the standard {@link PaginatedCollection} (no `links` block).
+ */
+export interface AgencyFileListResponse {
+  data: AgencyFileResource[]
+  meta: {
+    total: number
+    page: number
+    per_page: number
+    last_page: number
+  }
+}
+
+export interface AgencyFileListParams {
+  page?: number
+  per_page?: number
+}
+
+export interface AgencyFileEnvelope {
+  data: AgencyFileResource
+}
+
+export interface AgencyFileUploadInitPayload {
+  mime_type: string
+  declared_bytes: number
+}
+
+export interface AgencyFileUploadInitResponse {
+  data: {
+    upload_url: string
+    upload_id: string
+    storage_path: string
+    expires_at: string
+    max_bytes: number
+  }
+}
+
+export interface AgencyFileUploadCompletePayload {
+  upload_id: string
+  original_filename: string
+}

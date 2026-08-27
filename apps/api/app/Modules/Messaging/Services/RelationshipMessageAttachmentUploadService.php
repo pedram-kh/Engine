@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Messaging\Services;
 
+use App\Core\Storage\AttachmentMimeTypes;
 use App\Modules\Creators\Services\PortfolioImageProcessor;
 use App\Modules\Messaging\Models\RelationshipThread;
 use Aws\S3\S3Client;
@@ -42,29 +43,14 @@ final class RelationshipMessageAttachmentUploadService
     public const int MAX_ATTACHMENTS_PER_MESSAGE = 10;
 
     /**
-     * Accepted MIME → extension. Identical to campaign messaging's allowlist.
+     * Accepted MIME → extension. Identical to campaign messaging's allowlist
+     * — the shared catalogue (AH-091 extraction); see
+     * {@see AttachmentMimeTypes} for the single source of truth this and two
+     * sibling services import.
      *
      * @var array<string, string>
      */
-    public const array ACCEPTED_MIME_TYPES = [
-        // Images.
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'image/webp' => 'webp',
-        'image/gif' => 'gif',
-        // Video.
-        'video/mp4' => 'mp4',
-        'video/quicktime' => 'mov',
-        'video/webm' => 'webm',
-        // PDF + common documents.
-        'application/pdf' => 'pdf',
-        'application/msword' => 'doc',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
-        'application/vnd.ms-excel' => 'xls',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
-        'text/plain' => 'txt',
-        'text/csv' => 'csv',
-    ];
+    public const array ACCEPTED_MIME_TYPES = AttachmentMimeTypes::ALL;
 
     public function __construct(private readonly PortfolioImageProcessor $imageProcessor) {}
 

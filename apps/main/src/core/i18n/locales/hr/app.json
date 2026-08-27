@@ -98,7 +98,8 @@
       "agencyUsers": "Ekipa",
       "settings": "Nastanjeitve",
       "messages": "Poruke",
-      "menu": "Izbornik"
+      "menu": "Izbornik",
+      "files": "Datoteke"
     },
     "discover": {
       "title": "Odkrivanje ustvarjalca",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Ni uspelo učitajti nastanjeení.",
         "saveFailed": "Ni uspelo spremiti nastanjeení."
+      }
+    },
+    "files": {
+      "title": "Datoteke",
+      "unknownUploader": "Nepoznato",
+      "actions": {
+        "upload": "Učitaj datoteku",
+        "download": "Preuzmi",
+        "delete": "Izbriši"
+      },
+      "fields": {
+        "name": "Datoteka",
+        "size": "Veličina",
+        "uploadedBy": "Učitao",
+        "uploadedAt": "Učitano"
+      },
+      "upload": {
+        "title": "Učitaj datoteku",
+        "body": "Datoteke PDF, Word, Excel, tekst, CSV ili slike do 25 MB.",
+        "label": "Odaberi datoteku",
+        "cancel": "Odustani"
+      },
+      "delete": {
+        "confirmTitle": "Izbriši datoteku",
+        "confirmMessage": "Izbrisati {name}? Ova radnja se ne može poništiti.",
+        "confirm": "Izbriši",
+        "cancel": "Odustani"
+      },
+      "empty": {
+        "heading": "Još nema datoteka",
+        "body": "Učitajte dokument da biste počeli.",
+        "cta": "Učitaj datoteku"
+      },
+      "errors": {
+        "loadFailed": "Datoteke nije moguće učitati.",
+        "unsupportedOrTooLarge": "Ta vrsta datoteke nije podržana ili je datoteka veća od 25 MB.",
+        "uploadFailed": "Datoteku nije moguće učitati. Pokušajte ponovno.",
+        "deleteFailed": "Datoteku nije moguće izbrisati. Pokušajte ponovno."
       }
     }
   },

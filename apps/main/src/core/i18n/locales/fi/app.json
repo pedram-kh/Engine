@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Asetukset",
       "messages": "Viestit",
-      "menu": "Valikko"
+      "menu": "Valikko",
+      "files": "Tiedostot"
     },
     "discover": {
       "title": "Discover creators",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Failed to load settings.",
         "saveFailed": "Failed to save settings."
+      }
+    },
+    "files": {
+      "title": "Tiedostot",
+      "unknownUploader": "Tuntematon",
+      "actions": {
+        "upload": "Lataa tiedosto",
+        "download": "Lataa",
+        "delete": "Poista"
+      },
+      "fields": {
+        "name": "Tiedosto",
+        "size": "Koko",
+        "uploadedBy": "Latasi",
+        "uploadedAt": "Latausaika"
+      },
+      "upload": {
+        "title": "Lataa tiedosto",
+        "body": "PDF-, Word-, Excel-, teksti-, CSV- tai kuvatiedostot enintään 25 Mt.",
+        "label": "Valitse tiedosto",
+        "cancel": "Peruuta"
+      },
+      "delete": {
+        "confirmTitle": "Poista tiedosto",
+        "confirmMessage": "Poistetaanko {name}? Toimintoa ei voi kumota.",
+        "confirm": "Poista",
+        "cancel": "Peruuta"
+      },
+      "empty": {
+        "heading": "Ei tiedostoja vielä",
+        "body": "Lataa asiakirja aloittaaksesi.",
+        "cta": "Lataa tiedosto"
+      },
+      "errors": {
+        "loadFailed": "Tiedostojen lataaminen epäonnistui.",
+        "unsupportedOrTooLarge": "Tätä tiedostotyyppiä ei tueta, tai tiedosto on suurempi kuin 25 Mt.",
+        "uploadFailed": "Tiedoston lataaminen epäonnistui. Yritä uudelleen.",
+        "deleteFailed": "Tiedoston poistaminen epäonnistui. Yritä uudelleen."
       }
     }
   },

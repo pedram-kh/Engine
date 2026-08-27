@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Impostazioni",
       "messages": "Messaggi",
-      "menu": "Menu"
+      "menu": "Menu",
+      "files": "File"
     },
     "discover": {
       "title": "Scopri creator",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Caricamento impostazioni fallito.",
         "saveFailed": "Salvataggio impostazioni fallito."
+      }
+    },
+    "files": {
+      "title": "File",
+      "unknownUploader": "Sconosciuto",
+      "actions": {
+        "upload": "Carica file",
+        "download": "Scarica",
+        "delete": "Elimina"
+      },
+      "fields": {
+        "name": "File",
+        "size": "Dimensione",
+        "uploadedBy": "Caricato da",
+        "uploadedAt": "Caricato il"
+      },
+      "upload": {
+        "title": "Carica file",
+        "body": "File PDF, Word, Excel, testo, CSV o immagine fino a 25 MB.",
+        "label": "Scegli un file",
+        "cancel": "Annulla"
+      },
+      "delete": {
+        "confirmTitle": "Elimina file",
+        "confirmMessage": "Eliminare {name}? Questa azione non può essere annullata.",
+        "confirm": "Elimina",
+        "cancel": "Annulla"
+      },
+      "empty": {
+        "heading": "Nessun file",
+        "body": "Carica un documento per iniziare.",
+        "cta": "Carica file"
+      },
+      "errors": {
+        "loadFailed": "Impossibile caricare i file.",
+        "unsupportedOrTooLarge": "Questo tipo di file non è supportato oppure supera i 25 MB.",
+        "uploadFailed": "Impossibile caricare il file. Riprova.",
+        "deleteFailed": "Impossibile eliminare il file. Riprova."
       }
     }
   },

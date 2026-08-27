@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Iestatījumi",
       "messages": "Ziņojumi",
-      "menu": "Izvēlne"
+      "menu": "Izvēlne",
+      "files": "Faili"
     },
     "discover": {
       "title": "Discover creators",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Failed to load settings.",
         "saveFailed": "Failed to save settings."
+      }
+    },
+    "files": {
+      "title": "Faili",
+      "unknownUploader": "Nezināms",
+      "actions": {
+        "upload": "Augšupielādēt failu",
+        "download": "Lejupielādēt",
+        "delete": "Dzēst"
+      },
+      "fields": {
+        "name": "Fails",
+        "size": "Izmērs",
+        "uploadedBy": "Augšupielādēja",
+        "uploadedAt": "Augšupielādēts"
+      },
+      "upload": {
+        "title": "Augšupielādēt failu",
+        "body": "PDF, Word, Excel, teksta, CSV vai attēlu faili līdz 25 MB.",
+        "label": "Izvēlēties failu",
+        "cancel": "Atcelt"
+      },
+      "delete": {
+        "confirmTitle": "Dzēst failu",
+        "confirmMessage": "Dzēst {name}? Šo darbību nevar atsaukt.",
+        "confirm": "Dzēst",
+        "cancel": "Atcelt"
+      },
+      "empty": {
+        "heading": "Failu pagaidām nav",
+        "body": "Augšupielādējiet dokumentu, lai sāktu.",
+        "cta": "Augšupielādēt failu"
+      },
+      "errors": {
+        "loadFailed": "Failus nevarēja ielādēt.",
+        "unsupportedOrTooLarge": "Šis faila tips netiek atbalstīts, vai fails ir lielāks par 25 MB.",
+        "uploadFailed": "Failu nevarēja augšupielādēt. Lūdzu, mēģiniet vēlreiz.",
+        "deleteFailed": "Failu nevarēja dzēst. Lūdzu, mēģiniet vēlreiz."
       }
     }
   },

@@ -6,7 +6,9 @@ namespace App\Modules\Agencies;
 
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
+use App\Modules\Agencies\Models\AgencyFile;
 use App\Modules\Agencies\Policies\AgencyCreatorRelationPolicy;
+use App\Modules\Agencies\Policies\AgencyFilePolicy;
 use App\Modules\Agencies\Policies\AgencyPolicy;
 use App\Modules\Agencies\Services\AgencyInvitationService;
 use Illuminate\Contracts\Foundation\CachesRoutes;
@@ -31,6 +33,7 @@ final class AgenciesServiceProvider extends ServiceProvider
     {
         Gate::policy(AgencyCreatorRelation::class, AgencyCreatorRelationPolicy::class);
         Gate::policy(Agency::class, AgencyPolicy::class);
+        Gate::policy(AgencyFile::class, AgencyFilePolicy::class);
     }
 
     private function registerRoutes(): void

@@ -7,6 +7,7 @@ use App\Modules\Agencies\Http\Controllers\AgencyCreatorAvailabilityController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorDetailController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorDiscoveryController;
+use App\Modules\Agencies\Http\Controllers\AgencyFileController;
 use App\Modules\Agencies\Http\Controllers\AgencySettingsController;
 use App\Modules\Agencies\Http\Controllers\CreatorBlacklistController;
 use App\Modules\Agencies\Http\Controllers\DashboardActivityController;
@@ -146,6 +147,26 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // allowlist entry needed (it is inside the tenancy stack).
         Route::get('creators/{creator}/availability', [AgencyCreatorAvailabilityController::class, 'show'])
             ->name('agencies.creators.availability.show');
+
+        // ─── Agency Files library (AH-091, chunk A) ───────────────────────────
+        // A standalone, tenant-scoped document library — upload, list, delete.
+        // No campaign linkage or creator visibility this chunk (D7). Every
+        // member may list/view/upload; admin + manager only may delete
+        // (AgencyFilePolicy). Per docs/reviews/agency-files-plan.md §2.4.
+        //
+        // ⚠ Registration order: the literal `files/uploads/*` routes MUST
+        // precede `files/{file}` below, or `uploads` would be captured as a
+        // {file} ULID (the `creators/discover` precedent above).
+        Route::get('files', [AgencyFileController::class, 'index'])
+            ->name('agencies.files.index');
+        Route::post('files/uploads/init', [AgencyFileController::class, 'initUpload'])
+            ->name('agencies.files.uploads.init');
+        Route::post('files/uploads/complete', [AgencyFileController::class, 'completeUpload'])
+            ->name('agencies.files.uploads.complete');
+        Route::get('files/{file}', [AgencyFileController::class, 'show'])
+            ->name('agencies.files.show');
+        Route::delete('files/{file}', [AgencyFileController::class, 'destroy'])
+            ->name('agencies.files.destroy');
     });
 
 // ─── Accept invitation ────────────────────────────────────────────────────────

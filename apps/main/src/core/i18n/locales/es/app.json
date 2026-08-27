@@ -98,7 +98,8 @@
       "agencyUsers": "Equipo",
       "settings": "Configuración",
       "messages": "Mensajes",
-      "menu": "Menú"
+      "menu": "Menú",
+      "files": "Archivos"
     },
     "discover": {
       "title": "Descubrir creadores",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "No se ha podido cargar la configuración.",
         "saveFailed": "No se ha podido guardar la configuración."
+      }
+    },
+    "files": {
+      "title": "Archivos",
+      "unknownUploader": "Desconocido",
+      "actions": {
+        "upload": "Subir archivo",
+        "download": "Descargar",
+        "delete": "Eliminar"
+      },
+      "fields": {
+        "name": "Archivo",
+        "size": "Tamaño",
+        "uploadedBy": "Subido por",
+        "uploadedAt": "Subido"
+      },
+      "upload": {
+        "title": "Subir archivo",
+        "body": "Archivos PDF, Word, Excel, texto, CSV o imagen de hasta 25 MB.",
+        "label": "Elegir un archivo",
+        "cancel": "Cancelar"
+      },
+      "delete": {
+        "confirmTitle": "Eliminar archivo",
+        "confirmMessage": "¿Eliminar {name}? Esta acción no se puede deshacer.",
+        "confirm": "Eliminar",
+        "cancel": "Cancelar"
+      },
+      "empty": {
+        "heading": "Todavía no hay archivos",
+        "body": "Sube un documento para empezar.",
+        "cta": "Subir archivo"
+      },
+      "errors": {
+        "loadFailed": "No se pudieron cargar los archivos.",
+        "unsupportedOrTooLarge": "Ese tipo de archivo no es compatible, o supera los 25 MB.",
+        "uploadFailed": "No se pudo subir el archivo. Inténtalo de nuevo.",
+        "deleteFailed": "No se pudo eliminar el archivo. Inténtalo de nuevo."
       }
     }
   },

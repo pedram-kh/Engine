@@ -98,7 +98,8 @@
       "agencyUsers": "Zespół",
       "settings": "Ustawienia",
       "messages": "Wiadomości",
-      "menu": "Menu"
+      "menu": "Menu",
+      "files": "Pliki"
     },
     "discover": {
       "title": "Odkryj twórców",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Nie udało się załadować ustawień.",
         "saveFailed": "Nie udało się zapisać ustawień."
+      }
+    },
+    "files": {
+      "title": "Pliki",
+      "unknownUploader": "Nieznany",
+      "actions": {
+        "upload": "Wgraj plik",
+        "download": "Pobierz",
+        "delete": "Usuń"
+      },
+      "fields": {
+        "name": "Plik",
+        "size": "Rozmiar",
+        "uploadedBy": "Wgrał",
+        "uploadedAt": "Wgrano"
+      },
+      "upload": {
+        "title": "Wgraj plik",
+        "body": "Pliki PDF, Word, Excel, tekstowe, CSV lub obrazy do 25 MB.",
+        "label": "Wybierz plik",
+        "cancel": "Anuluj"
+      },
+      "delete": {
+        "confirmTitle": "Usuń plik",
+        "confirmMessage": "Usunąć {name}? Tej operacji nie można odwrócić.",
+        "confirm": "Usuń",
+        "cancel": "Anuluj"
+      },
+      "empty": {
+        "heading": "Brak plików",
+        "body": "Wgraj dokument, aby zacząć.",
+        "cta": "Wgraj plik"
+      },
+      "errors": {
+        "loadFailed": "Nie udało się wczytać plików.",
+        "unsupportedOrTooLarge": "Ten typ pliku nie jest wspierany lub plik jest większy niż 25 MB.",
+        "uploadFailed": "Nie udało się wgrać pliku. Spróbuj ponownie.",
+        "deleteFailed": "Nie udało się usunąć pliku. Spróbuj ponownie."
       }
     }
   },

@@ -98,7 +98,8 @@
       "agencyUsers": "Tím",
       "settings": "Nastavenia",
       "messages": "Správy",
-      "menu": "Ponuka"
+      "menu": "Ponuka",
+      "files": "Súbory"
     },
     "discover": {
       "title": "Objevit tvorcu",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Nepodařilo sa načíst nastavenia.",
         "saveFailed": "Nepodařilo sa uložiť nastavenia."
+      }
+    },
+    "files": {
+      "title": "Súbory",
+      "unknownUploader": "Neznámy",
+      "actions": {
+        "upload": "Nahrať súbor",
+        "download": "Stiahnuť",
+        "delete": "Odstrániť"
+      },
+      "fields": {
+        "name": "Súbor",
+        "size": "Veľkosť",
+        "uploadedBy": "Nahral",
+        "uploadedAt": "Nahrané"
+      },
+      "upload": {
+        "title": "Nahrať súbor",
+        "body": "Súbory PDF, Word, Excel, text, CSV alebo obrázky do 25 MB.",
+        "label": "Vybrať súbor",
+        "cancel": "Zrušiť"
+      },
+      "delete": {
+        "confirmTitle": "Odstrániť súbor",
+        "confirmMessage": "Odstrániť {name}? Túto akciu nie je možné vrátiť späť.",
+        "confirm": "Odstrániť",
+        "cancel": "Zrušiť"
+      },
+      "empty": {
+        "heading": "Zatiaľ žiadne súbory",
+        "body": "Nahrajte dokument a začnite.",
+        "cta": "Nahrať súbor"
+      },
+      "errors": {
+        "loadFailed": "Súbory sa nepodarilo načítať.",
+        "unsupportedOrTooLarge": "Tento typ súboru nie je podporovaný, alebo je súbor väčší ako 25 MB.",
+        "uploadFailed": "Súbor sa nepodarilo nahrať. Skúste to znova.",
+        "deleteFailed": "Súbor sa nepodarilo odstrániť. Skúste to znova."
       }
     }
   },

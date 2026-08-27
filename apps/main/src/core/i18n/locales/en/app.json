@@ -95,6 +95,7 @@
       "pools": "Talent pools",
       "brands": "Brands",
       "campaigns": "Campaigns",
+      "files": "Files",
       "agencyUsers": "Team",
       "settings": "Settings",
       "messages": "Messages",
@@ -1003,6 +1004,44 @@
         "archiveFailed": "Failed to archive pool.",
         "restoreFailed": "Failed to restore pool.",
         "removeFailed": "Failed to remove creator from the pool."
+      }
+    },
+    "files": {
+      "title": "Files",
+      "unknownUploader": "Unknown",
+      "actions": {
+        "upload": "Upload file",
+        "download": "Download",
+        "delete": "Delete"
+      },
+      "fields": {
+        "name": "File",
+        "size": "Size",
+        "uploadedBy": "Uploaded by",
+        "uploadedAt": "Uploaded"
+      },
+      "upload": {
+        "title": "Upload file",
+        "body": "PDF, Word, Excel, text, CSV, or image files up to 25 MB.",
+        "label": "Choose a file",
+        "cancel": "Cancel"
+      },
+      "delete": {
+        "confirmTitle": "Delete file",
+        "confirmMessage": "Delete {name}? This cannot be undone.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      },
+      "empty": {
+        "heading": "No files yet",
+        "body": "Upload a document to get started.",
+        "cta": "Upload file"
+      },
+      "errors": {
+        "loadFailed": "Failed to load files.",
+        "unsupportedOrTooLarge": "That file type isn't supported, or it's larger than 25 MB.",
+        "uploadFailed": "Failed to upload the file. Please try again.",
+        "deleteFailed": "Failed to delete the file. Please try again."
       }
     },
     "agencyUsers": {

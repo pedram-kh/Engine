@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Beállítások",
       "messages": "Üzenetek",
-      "menu": "Menü"
+      "menu": "Menü",
+      "files": "Fájlok"
     },
     "discover": {
       "title": "Discover creators",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Failed to load settings.",
         "saveFailed": "Failed to save settings."
+      }
+    },
+    "files": {
+      "title": "Fájlok",
+      "unknownUploader": "Ismeretlen",
+      "actions": {
+        "upload": "Fájl feltöltése",
+        "download": "Letöltés",
+        "delete": "Törlés"
+      },
+      "fields": {
+        "name": "Fájl",
+        "size": "Méret",
+        "uploadedBy": "Feltöltötte",
+        "uploadedAt": "Feltöltve"
+      },
+      "upload": {
+        "title": "Fájl feltöltése",
+        "body": "PDF, Word, Excel, szöveg, CSV vagy kép fájlok legfeljebb 25 MB méretig.",
+        "label": "Fájl kiválasztása",
+        "cancel": "Mégse"
+      },
+      "delete": {
+        "confirmTitle": "Fájl törlése",
+        "confirmMessage": "Törli a {name} fájlt? Ez a művelet nem vonható vissza.",
+        "confirm": "Törlés",
+        "cancel": "Mégse"
+      },
+      "empty": {
+        "heading": "Még nincsenek fájlok",
+        "body": "Töltsön fel egy dokumentumot a kezdéshez.",
+        "cta": "Fájl feltöltése"
+      },
+      "errors": {
+        "loadFailed": "A fájlok betöltése sikertelen.",
+        "unsupportedOrTooLarge": "Ez a fájltípus nem támogatott, vagy a fájl mérete meghaladja a 25 MB-ot.",
+        "uploadFailed": "A fájl feltöltése sikertelen. Kérjük, próbálja újra.",
+        "deleteFailed": "A fájl törlése sikertelen. Kérjük, próbálja újra."
       }
     }
   },

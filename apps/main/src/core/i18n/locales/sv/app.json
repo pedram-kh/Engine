@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Inställningar",
       "messages": "Meddelanden",
-      "menu": "Meny"
+      "menu": "Meny",
+      "files": "Filer"
     },
     "discover": {
       "title": "Utforska creators",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Kunde inte ladda inställningar.",
         "saveFailed": "Kunde inte spara inställningar."
+      }
+    },
+    "files": {
+      "title": "Filer",
+      "unknownUploader": "Okänd",
+      "actions": {
+        "upload": "Ladda upp fil",
+        "download": "Ladda ned",
+        "delete": "Ta bort"
+      },
+      "fields": {
+        "name": "Fil",
+        "size": "Storlek",
+        "uploadedBy": "Uppladdad av",
+        "uploadedAt": "Uppladdad"
+      },
+      "upload": {
+        "title": "Ladda upp fil",
+        "body": "PDF-, Word-, Excel-, text-, CSV- eller bildfiler upp till 25 MB.",
+        "label": "Välj en fil",
+        "cancel": "Avbryt"
+      },
+      "delete": {
+        "confirmTitle": "Ta bort fil",
+        "confirmMessage": "Ta bort {name}? Detta kan inte ångras.",
+        "confirm": "Ta bort",
+        "cancel": "Avbryt"
+      },
+      "empty": {
+        "heading": "Inga filer ännu",
+        "body": "Ladda upp ett dokument för att komma igång.",
+        "cta": "Ladda upp fil"
+      },
+      "errors": {
+        "loadFailed": "Det gick inte att läsa in filerna.",
+        "unsupportedOrTooLarge": "Den filtypen stöds inte, eller filen är större än 25 MB.",
+        "uploadFailed": "Det gick inte att ladda upp filen. Försök igen.",
+        "deleteFailed": "Det gick inte att ta bort filen. Försök igen."
       }
     }
   },

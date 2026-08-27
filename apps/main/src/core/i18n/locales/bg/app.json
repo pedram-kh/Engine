@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Настройки",
       "messages": "Съобщения",
-      "menu": "Меню"
+      "menu": "Меню",
+      "files": "Файлове"
     },
     "discover": {
       "title": "Discover creators",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Failed to load settings.",
         "saveFailed": "Failed to save settings."
+      }
+    },
+    "files": {
+      "title": "Файлове",
+      "unknownUploader": "Неизвестен",
+      "actions": {
+        "upload": "Качване на файл",
+        "download": "Изтегляне",
+        "delete": "Изтриване"
+      },
+      "fields": {
+        "name": "Файл",
+        "size": "Размер",
+        "uploadedBy": "Качено от",
+        "uploadedAt": "Качено на"
+      },
+      "upload": {
+        "title": "Качване на файл",
+        "body": "Файлове PDF, Word, Excel, текст, CSV или изображения до 25 MB.",
+        "label": "Изберете файл",
+        "cancel": "Отказ"
+      },
+      "delete": {
+        "confirmTitle": "Изтриване на файл",
+        "confirmMessage": "Да се изтрие ли {name}? Това действие не може да бъде отменено.",
+        "confirm": "Изтриване",
+        "cancel": "Отказ"
+      },
+      "empty": {
+        "heading": "Все още няма файлове",
+        "body": "Качете документ, за да започнете.",
+        "cta": "Качване на файл"
+      },
+      "errors": {
+        "loadFailed": "Файловете не можаха да бъдат заредени.",
+        "unsupportedOrTooLarge": "Този тип файл не се поддържа или файлът е по-голям от 25 MB.",
+        "uploadFailed": "Файлът не можа да бъде качен. Моля, опитайте отново.",
+        "deleteFailed": "Файлът не можа да бъде изтрит. Моля, опитайте отново."
       }
     }
   },

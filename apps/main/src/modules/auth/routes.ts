@@ -354,6 +354,19 @@ export const appRoutes: RouteRecordRaw[] = [
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
 
+  // ── Agency Files library (AH-091, chunk A) ─────────────────────────────────
+  // A standalone, tenant-scoped document library — upload, list, delete.
+  // Any agency member may view/upload; delete is admin + manager only (backend
+  // `AgencyFilePolicy` enforces; the page hides the affordance for staff). No
+  // detail page, no preview, no folders — the "not-Drive" fence (D6/D7). Same
+  // agency-shell guard chain; not MFA-gated.
+  {
+    path: '/files',
+    name: 'files.list',
+    component: () => import('@/modules/files/pages/AgencyFilesPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+
   // ── Agency users / invitations ────────────────────────────────────────────
   // Visible only to agency_admin (route guard + UI gating).
   //

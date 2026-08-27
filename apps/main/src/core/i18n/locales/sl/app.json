@@ -98,7 +98,8 @@
       "agencyUsers": "Ekipa",
       "settings": "Nastanjeitve",
       "messages": "Sporočila",
-      "menu": "Meni"
+      "menu": "Meni",
+      "files": "Datoteke"
     },
     "discover": {
       "title": "Odkrivanje ustvarjalca",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Ni uspelo naložiti nastanjeení.",
         "saveFailed": "Ni uspelo shraniti nastanjeení."
+      }
+    },
+    "files": {
+      "title": "Datoteke",
+      "unknownUploader": "Neznano",
+      "actions": {
+        "upload": "Naloži datoteko",
+        "download": "Prenesi",
+        "delete": "Izbriši"
+      },
+      "fields": {
+        "name": "Datoteka",
+        "size": "Velikost",
+        "uploadedBy": "Naložil",
+        "uploadedAt": "Naloženo"
+      },
+      "upload": {
+        "title": "Naloži datoteko",
+        "body": "Datoteke PDF, Word, Excel, besedilo, CSV ali slike do 25 MB.",
+        "label": "Izberi datoteko",
+        "cancel": "Prekliči"
+      },
+      "delete": {
+        "confirmTitle": "Izbriši datoteko",
+        "confirmMessage": "Izbrišem {name}? Tega dejanja ni mogoče razveljaviti.",
+        "confirm": "Izbriši",
+        "cancel": "Prekliči"
+      },
+      "empty": {
+        "heading": "Še ni datotek",
+        "body": "Naložite dokument za začetek.",
+        "cta": "Naloži datoteko"
+      },
+      "errors": {
+        "loadFailed": "Datotek ni bilo mogoče naložiti.",
+        "unsupportedOrTooLarge": "Ta vrsta datoteke ni podprta ali je datoteka večja od 25 MB.",
+        "uploadFailed": "Datoteke ni bilo mogoče naložiti. Poskusite znova.",
+        "deleteFailed": "Datoteke ni bilo mogoče izbrisati. Poskusite znova."
       }
     }
   },

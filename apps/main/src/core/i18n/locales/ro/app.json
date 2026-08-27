@@ -98,7 +98,8 @@
       "agencyUsers": "Team",
       "settings": "Setări",
       "messages": "Mesaje",
-      "menu": "Meniu"
+      "menu": "Meniu",
+      "files": "Fișiere"
     },
     "discover": {
       "title": "Discover creators",
@@ -1178,6 +1179,44 @@
       "errors": {
         "loadFailed": "Failed to load settings.",
         "saveFailed": "Failed to save settings."
+      }
+    },
+    "files": {
+      "title": "Fișiere",
+      "unknownUploader": "Necunoscut",
+      "actions": {
+        "upload": "Încarcă fișier",
+        "download": "Descarcă",
+        "delete": "Șterge"
+      },
+      "fields": {
+        "name": "Fișier",
+        "size": "Dimensiune",
+        "uploadedBy": "Încărcat de",
+        "uploadedAt": "Încărcat"
+      },
+      "upload": {
+        "title": "Încarcă fișier",
+        "body": "Fișiere PDF, Word, Excel, text, CSV sau imagine de până la 25 MB.",
+        "label": "Alege un fișier",
+        "cancel": "Anulează"
+      },
+      "delete": {
+        "confirmTitle": "Șterge fișierul",
+        "confirmMessage": "Ștergeți {name}? Această acțiune nu poate fi anulată.",
+        "confirm": "Șterge",
+        "cancel": "Anulează"
+      },
+      "empty": {
+        "heading": "Niciun fișier momentan",
+        "body": "Încărcați un document pentru a începe.",
+        "cta": "Încarcă fișier"
+      },
+      "errors": {
+        "loadFailed": "Fișierele nu au putut fi încărcate.",
+        "unsupportedOrTooLarge": "Acest tip de fișier nu este acceptat sau fișierul este mai mare de 25 MB.",
+        "uploadFailed": "Fișierul nu a putut fi încărcat. Încercați din nou.",
+        "deleteFailed": "Fișierul nu a putut fi șters. Încercați din nou."
       }
     }
   },
