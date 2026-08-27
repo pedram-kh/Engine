@@ -69,10 +69,12 @@ happened.
     `AttachmentMimeTypes` extraction (+ the three existing consumers switched to import it), the
     SPA surface (nav, page, upload dialog, api-client DTOs), i18n ×24, and the full Pest + Vitest
     coverage.
-  - _(docs commit SHA to be filled once assigned — cannot record its own hash)_ — this entry, the
-    review file, the AH-091 ad-hoc log entry, the `03-DATA-MODEL.md` §16 distinction, the
-    `00-MASTER-ARCHITECTURE.md` §4 tenancy row, and the `tech-debt.md` AV-count correction + four
-    new debt entries.
+  - `4447c4c4` — `docs(reviews): Agency Files library, chunk A — review, corrections, debt
+(AH-091)` — this entry, the review file, the AH-091 ad-hoc log entry, the `03-DATA-MODEL.md` §16
+    distinction, the `00-MASTER-ARCHITECTURE.md` §4 tenancy row, and the `tech-debt.md` AV-count
+    correction + four new debt entries.
+  - _(close-commit SHA to be filled once assigned — cannot record its own hash)_ — the review
+    file's §9 close-out verdict, ratified by Pedram.
 - **AH entries carried:** **AH-091.**
 - **Migrations run:** **1** — `2026_08_27_130000_create_agency_files_table.php`. A `CREATE TABLE`,
   nothing else: **no existing table is touched, no column added anywhere, no backfill.** The
