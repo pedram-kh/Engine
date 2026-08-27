@@ -61,6 +61,77 @@
         "cancel": "Peruuta",
         "success": "Toimisto reactivated.",
         "failed": "We couldn't reactivate this agency. Please try again."
+      },
+      "members": {
+        "heading": "Jäsenet",
+        "boundary_note": "Kaksivaiheisen vahvistuksen tila näytetään vain kyllä/ei-tietona. Ylläpitäjät eivät voi koskaan nähdä jäsenen salaista avainta tai palautuskoodeja, luoda koodeja hänen puolestaan eivätkä viimeistellä käyttöönottoa hänen nimissään.",
+        "search_label": "Hae jäseniä",
+        "load_failed": "Tämän toimiston jäseniä ei voitu ladata. Päivitä sivu.",
+        "empty": "Yksikään jäsen ei vastaa tätä suodatinta.",
+        "filters": {
+          "all": "Kaikki roolit"
+        },
+        "fields": {
+          "name": "Nimi",
+          "email": "Sähköposti",
+          "role": "Rooli",
+          "status": "Tila",
+          "joined": "Liittyi",
+          "mfa": "Kaksivaiheinen"
+        },
+        "roles": {
+          "agency_admin": "Ylläpitäjä",
+          "agency_manager": "Päällikkö",
+          "agency_staff": "Työntekijä"
+        },
+        "status_labels": {
+          "active": "Aktiivinen",
+          "pending": "Odottaa"
+        },
+        "mfa_labels": {
+          "enrolled": "Otettu käyttöön",
+          "not_enrolled": "Ei käytössä",
+          "exempt": "Vapautettu"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Vapautettu {date} lähtien.",
+          "also_enrolled": "Edelleen käytössä — kirjautumisessa pyydetään yhä koodi.",
+          "reason": "Syy: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Tällä jäsenellä ei ole kaksivaiheista vahvistusta, jonka voisi nollata.",
+          "already_exempt": "Tämä jäsen on jo vapautettu.",
+          "not_exempt": "Tätä jäsentä ei ole vapautettu.",
+          "platform_admin_not_exemptable": "Alustan ylläpitäjiä ei voi koskaan vapauttaa kaksivaiheisesta vahvistuksesta."
+        },
+        "actions": {
+          "menu_label": "Jäsentoiminnot",
+          "reason_label": "Syy",
+          "reason_hint": "Pakollinen, vähintään {count} merkkiä. Kirjataan tarkastuslokiin.",
+          "cancel": "Peruuta",
+          "failed": "Toimintoa ei voitu suorittaa. Yritä uudelleen.",
+          "reset": {
+            "menu": "Nollaa kaksivaiheinen",
+            "title": "Nollaa käyttäjän {name} kaksivaiheinen vahvistus",
+            "description": "Tämä poistaa todennussovelluksen ja palautuskoodit. Jäsen joutuu ottamaan kaksivaiheisen vahvistuksen uudelleen käyttöön seuraavalla suojatulla sivulla, ja hän saa turvallisuusilmoituksen sähköpostilla. Tili vaatii edelleen kaksivaiheisen vahvistuksen.",
+            "confirm": "Nollaa",
+            "success": "Kaksivaiheinen vahvistus nollattu. Jäsenelle lähetettiin sähköposti."
+          },
+          "exempt": {
+            "menu": "Vapauta kaksivaiheisesta",
+            "title": "Vapauta {name} kaksivaiheisesta vahvistuksesta",
+            "description": "Tämä poistaa velvollisuuden ottaa kaksivaiheinen vahvistus käyttöön — turvallisuuden heikennys tälle henkilölle. Jos se on jo käytössä, se pysyy aktiivisena ja koodia pyydetään yhä kirjautumisessa. Jäsen saa sähköpostin, ja syysi kirjataan tarkastuslokiin.",
+            "confirm": "Vapauta jäsen",
+            "success": "Jäsen vapautettu kaksivaiheisesta vahvistuksesta. Hänelle lähetettiin sähköposti."
+          },
+          "remove_exemption": {
+            "menu": "Poista vapautus",
+            "title": "Palauta kaksivaiheinen käyttäjälle {name}",
+            "description": "Tämä palauttaa kaksivaiheisen vahvistuksen vaatimuksen. Jäsentä pyydetään ottamaan se käyttöön seuraavalla suojatulla sivulla, jos hän ei ole jo tehnyt sitä. Jäsen saa sähköpostin, ja syysi kirjataan tarkastuslokiin.",
+            "confirm": "Palauta vaatimus",
+            "success": "Kaksivaiheisen vahvistuksen vaatimus palautettu. Jäsenelle lähetettiin sähköposti."
+          }
+        }
       }
     }
   }

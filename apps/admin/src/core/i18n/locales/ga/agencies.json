@@ -61,6 +61,77 @@
         "cancel": "Cealaigh",
         "success": "Gníomhaireacht reactivated.",
         "failed": "We couldn't reactivate this agency. Please try again."
+      },
+      "members": {
+        "heading": "Baill",
+        "boundary_note": "Ní thaispeántar staid an fhíordheimhnithe dhá fhachtóir ach mar tá/níl. Ní féidir le riarthóirí rún ná cóid athshlánaithe baill a fheiceáil choíche, cóid a ghiniúint dó, ná an socrú a chur i gcrích thar a cheann.",
+        "search_label": "Cuardaigh baill",
+        "load_failed": "Níorbh fhéidir baill na gníomhaireachta seo a lódáil. Athnuaigh an leathanach.",
+        "empty": "Níl aon bhall a mheaitseálann an scagaire seo.",
+        "filters": {
+          "all": "Gach ról"
+        },
+        "fields": {
+          "name": "Ainm",
+          "email": "Ríomhphost",
+          "role": "Ról",
+          "status": "Staid",
+          "joined": "Ceangailte",
+          "mfa": "Dhá fhachtóir"
+        },
+        "roles": {
+          "agency_admin": "Riarthóir",
+          "agency_manager": "Bainisteoir",
+          "agency_staff": "Foireann"
+        },
+        "status_labels": {
+          "active": "Gníomhach",
+          "pending": "Ar feitheamh"
+        },
+        "mfa_labels": {
+          "enrolled": "Socraithe",
+          "not_enrolled": "Gan socrú",
+          "exempt": "Díolmhaithe"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Díolmhaithe ó {date}.",
+          "also_enrolled": "Socraithe fós — iarrtar cód air agus é ag síniú isteach.",
+          "reason": "Cúis: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Níl aon socrú dhá fhachtóir ag an mball seo is féidir a athshocrú.",
+          "already_exempt": "Tá an ball seo díolmhaithe cheana féin.",
+          "not_exempt": "Níl an ball seo díolmhaithe.",
+          "platform_admin_not_exemptable": "Ní féidir riarthóirí an ardáin a dhíolmhú ón bhfíordheimhniú dhá fhachtóir choíche."
+        },
+        "actions": {
+          "menu_label": "Gníomhartha baill",
+          "reason_label": "Cúis",
+          "reason_hint": "Riachtanach, {count} carachtar ar a laghad. Taifeadta sa loga iniúchta.",
+          "cancel": "Cealaigh",
+          "failed": "Níorbh fhéidir an gníomh seo a chur i gcrích. Bain triail eile as.",
+          "reset": {
+            "menu": "Athshocraigh dhá fhachtóir",
+            "title": "Athshocraigh dhá fhachtóir do {name}",
+            "description": "Glanann sé seo an aip fhíordheimhnithe agus na cóid athshlánaithe. Iarrfar an socrú arís an chéad uair a bhainfidh sé leathanach cosanta amach, agus seolfar fógra slándála chuige le ríomhphost. Teastaíonn dhá fhachtóir ón gcuntas fós.",
+            "confirm": "Athshocraigh",
+            "success": "Athshocraíodh an dhá fhachtóir. Seoladh ríomhphost chuig an mball."
+          },
+          "exempt": {
+            "menu": "Díolmhaigh ón dhá fhachtóir",
+            "title": "Díolmhaigh {name} ón dhá fhachtóir",
+            "description": "Baineann sé seo an dualgas dhá fhachtóir a shocrú — laghdú slándála don duine seo. Má tá sé socraithe cheana, fanann sé gníomhach agus iarrtar cód air agus é ag síniú isteach. Seoltar ríomhphost chuig an mball agus taifeadtar do chúis sa loga iniúchta.",
+            "confirm": "Díolmhaigh an ball",
+            "success": "Díolmhaíodh an ball ón dhá fhachtóir. Seoladh ríomhphost chuige."
+          },
+          "remove_exemption": {
+            "menu": "Bain an díolúine",
+            "title": "Cuir dhá fhachtóir ar ais do {name}",
+            "description": "Cuireann sé seo an dualgas dhá fhachtóir ar ais. Iarrfar an socrú an chéad uair a bhainfidh sé leathanach cosanta amach, mura bhfuil sé déanta cheana. Seoltar ríomhphost chuig an mball agus taifeadtar do chúis sa loga iniúchta.",
+            "confirm": "Cuir an dualgas ar ais",
+            "success": "Cuireadh dualgas an dhá fhachtóir ar ais. Seoladh ríomhphost chuig an mball."
+          }
+        }
       }
     }
   }

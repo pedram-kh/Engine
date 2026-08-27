@@ -61,6 +61,77 @@
         "cancel": "Annuleren",
         "success": "Bureau gereactiveerd.",
         "failed": "Dit bureau kon niet worden gereactiveerd. Probeer het opnieuw."
+      },
+      "members": {
+        "heading": "Leden",
+        "boundary_note": "De tweefactorstatus wordt alleen als ja/nee weergegeven. Beheerders kunnen het tweefactorgeheim en de herstelcodes van een lid nooit zien, geen codes voor het lid genereren en de instelling niet namens het lid voltooien.",
+        "search_label": "Leden zoeken",
+        "load_failed": "We konden de leden van dit bureau niet laden. Vernieuw de pagina.",
+        "empty": "Geen leden voldoen aan dit filter.",
+        "filters": {
+          "all": "Alle rollen"
+        },
+        "fields": {
+          "name": "Naam",
+          "email": "E-mail",
+          "role": "Rol",
+          "status": "Status",
+          "joined": "Lid sinds",
+          "mfa": "Tweefactor"
+        },
+        "roles": {
+          "agency_admin": "Beheerder",
+          "agency_manager": "Manager",
+          "agency_staff": "Medewerker"
+        },
+        "status_labels": {
+          "active": "Actief",
+          "pending": "In afwachting"
+        },
+        "mfa_labels": {
+          "enrolled": "Ingesteld",
+          "not_enrolled": "Niet ingesteld",
+          "exempt": "Vrijgesteld"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Vrijgesteld sinds {date}.",
+          "also_enrolled": "Nog steeds ingesteld — bij het inloggen wordt nog om een code gevraagd.",
+          "reason": "Reden: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Dit lid heeft geen tweefactorinstelling om te resetten.",
+          "already_exempt": "Dit lid is al vrijgesteld.",
+          "not_exempt": "Dit lid is niet vrijgesteld.",
+          "platform_admin_not_exemptable": "Platformbeheerders kunnen nooit worden vrijgesteld van tweefactorauthenticatie."
+        },
+        "actions": {
+          "menu_label": "Ledenacties",
+          "reason_label": "Reden",
+          "reason_hint": "Verplicht, minimaal {count} tekens. Wordt vastgelegd in het auditlogboek.",
+          "cancel": "Annuleren",
+          "failed": "We konden deze actie niet voltooien. Probeer het opnieuw.",
+          "reset": {
+            "menu": "Tweefactor resetten",
+            "title": "Tweefactor resetten voor {name}",
+            "description": "Dit wist de authenticator-app en de herstelcodes. Bij het volgende bezoek aan een beveiligde pagina moet tweefactor opnieuw worden ingesteld en het lid krijgt een beveiligingsmelding per e-mail. Het account vereist nog steeds tweefactor.",
+            "confirm": "Resetten",
+            "success": "Tweefactor gereset. Het lid heeft een e-mail ontvangen."
+          },
+          "exempt": {
+            "menu": "Vrijstellen van tweefactor",
+            "title": "{name} vrijstellen van tweefactor",
+            "description": "Dit verwijdert de verplichting om tweefactor in te stellen — een verlaging van de beveiliging voor deze persoon. Is het al ingesteld, dan blijft het actief en wordt bij het inloggen nog om een code gevraagd. Het lid krijgt een e-mail en je reden wordt vastgelegd in het auditlogboek.",
+            "confirm": "Lid vrijstellen",
+            "success": "Lid vrijgesteld van tweefactor. Het lid heeft een e-mail ontvangen."
+          },
+          "remove_exemption": {
+            "menu": "Vrijstelling verwijderen",
+            "title": "Tweefactor herstellen voor {name}",
+            "description": "Dit herstelt de tweefactorverplichting. Bij het volgende bezoek aan een beveiligde pagina moet het worden ingesteld, als dat nog niet is gebeurd. Het lid krijgt een e-mail en je reden wordt vastgelegd in het auditlogboek.",
+            "confirm": "Verplichting herstellen",
+            "success": "Tweefactorverplichting herstelt. Het lid heeft een e-mail ontvangen."
+          }
+        }
       }
     }
   }

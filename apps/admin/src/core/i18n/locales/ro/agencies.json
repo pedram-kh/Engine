@@ -61,6 +61,77 @@
         "cancel": "Anulați",
         "success": "Agenție reactivated.",
         "failed": "We couldn't reactivate this agency. Please try again."
+      },
+      "members": {
+        "heading": "Membri",
+        "boundary_note": "Starea autentificării în doi pași este afișată doar ca da/nu. Administratorii nu pot vedea niciodată secretul sau codurile de recuperare ale unui membru, nu pot genera coduri în locul lui și nu pot finaliza configurarea în numele lui.",
+        "search_label": "Caută membri",
+        "load_failed": "Nu am putut încărca membrii acestei agenții. Reîmprospătează pagina.",
+        "empty": "Niciun membru nu corespunde acestui filtru.",
+        "filters": {
+          "all": "Toate rolurile"
+        },
+        "fields": {
+          "name": "Nume",
+          "email": "E-mail",
+          "role": "Rol",
+          "status": "Stare",
+          "joined": "S-a alăturat",
+          "mfa": "Doi pași"
+        },
+        "roles": {
+          "agency_admin": "Administrator",
+          "agency_manager": "Manager",
+          "agency_staff": "Personal"
+        },
+        "status_labels": {
+          "active": "Activ",
+          "pending": "În așteptare"
+        },
+        "mfa_labels": {
+          "enrolled": "Configurată",
+          "not_enrolled": "Neconfigurată",
+          "exempt": "Exceptat"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Exceptat din {date}.",
+          "also_enrolled": "Încă este configurată — la conectare i se cere în continuare un cod.",
+          "reason": "Motiv: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Acest membru nu are nicio configurare în doi pași de resetat.",
+          "already_exempt": "Acest membru este deja exceptat.",
+          "not_exempt": "Acest membru nu este exceptat.",
+          "platform_admin_not_exemptable": "Administratorii platformei nu pot fi niciodată exceptați de la autentificarea în doi pași."
+        },
+        "actions": {
+          "menu_label": "Acțiuni pentru membru",
+          "reason_label": "Motiv",
+          "reason_hint": "Obligatoriu, cel puțin {count} caractere. Se înregistrează în jurnalul de audit.",
+          "cancel": "Anulează",
+          "failed": "Nu am putut finaliza această acțiune. Încearcă din nou.",
+          "reset": {
+            "menu": "Resetează autentificarea în doi pași",
+            "title": "Resetează autentificarea în doi pași pentru {name}",
+            "description": "Aceasta șterge aplicația de autentificare și codurile de recuperare. La următoarea accesare a unei pagini protejate configurarea va fi cerută din nou, iar membrul primește o notificare de securitate prin e-mail. Contul cere în continuare doi pași.",
+            "confirm": "Resetează",
+            "success": "Autentificarea în doi pași a fost resetată. Membrul a fost notificat prin e-mail."
+          },
+          "exempt": {
+            "menu": "Exceptează de la doi pași",
+            "title": "Exceptează {name} de la autentificarea în doi pași",
+            "description": "Aceasta elimină obligația de a configura autentificarea în doi pași — o reducere a securității pentru această persoană. Dacă o are deja configurată, rămâne activă și codul este cerut în continuare la conectare. Membrul primește un e-mail, iar motivul tău se înregistrează în jurnalul de audit.",
+            "confirm": "Exceptează membrul",
+            "success": "Membru exceptat de la autentificarea în doi pași. A fost notificat prin e-mail."
+          },
+          "remove_exemption": {
+            "menu": "Elimină excepția",
+            "title": "Restabilește autentificarea în doi pași pentru {name}",
+            "description": "Aceasta restabilește obligația autentificării în doi pași. Configurarea va fi cerută la următoarea accesare a unei pagini protejate, dacă nu există deja. Membrul primește un e-mail, iar motivul tău se înregistrează în jurnalul de audit.",
+            "confirm": "Restabilește obligația",
+            "success": "Obligația autentificării în doi pași a fost restabilită. Membrul a fost notificat prin e-mail."
+          }
+        }
       }
     }
   }

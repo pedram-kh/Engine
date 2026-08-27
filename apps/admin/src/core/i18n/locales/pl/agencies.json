@@ -61,6 +61,77 @@
         "cancel": "Anuluj",
         "success": "Agencja reaktywowana.",
         "failed": "Nie udało się reaktywować tej agencji. Spróbuj ponownie."
+      },
+      "members": {
+        "heading": "Członkowie",
+        "boundary_note": "Stan uwierzytelniania dwuskładnikowego jest pokazywany wyłącznie jako tak/nie. Administratorzy nigdy nie mogą zobaczyć sekretu ani kodów odzyskiwania członka, wygenerować dla niego kodów ani dokończyć konfiguracji w jego imieniu.",
+        "search_label": "Szukaj członków",
+        "load_failed": "Nie udało się wczytać członków tej agencji. Odśwież stronę.",
+        "empty": "Żaden członek nie odpowiada temu filtrowi.",
+        "filters": {
+          "all": "Wszystkie role"
+        },
+        "fields": {
+          "name": "Imię i nazwisko",
+          "email": "E-mail",
+          "role": "Rola",
+          "status": "Status",
+          "joined": "Dołączył",
+          "mfa": "Dwuskładnikowe"
+        },
+        "roles": {
+          "agency_admin": "Administrator",
+          "agency_manager": "Menedżer",
+          "agency_staff": "Pracownik"
+        },
+        "status_labels": {
+          "active": "Aktywny",
+          "pending": "Oczekujący"
+        },
+        "mfa_labels": {
+          "enrolled": "Skonfigurowane",
+          "not_enrolled": "Nieskonfigurowane",
+          "exempt": "Zwolniony"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Zwolniony od {date}.",
+          "also_enrolled": "Nadal skonfigurowane — przy logowaniu wciąż wymagany jest kod.",
+          "reason": "Powód: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Ten członek nie ma konfiguracji dwuskładnikowej do zresetowania.",
+          "already_exempt": "Ten członek jest już zwolniony.",
+          "not_exempt": "Ten członek nie jest zwolniony.",
+          "platform_admin_not_exemptable": "Administratorzy platformy nigdy nie mogą zostać zwolnieni z uwierzytelniania dwuskładnikowego."
+        },
+        "actions": {
+          "menu_label": "Działania na członku",
+          "reason_label": "Powód",
+          "reason_hint": "Wymagane, co najmniej {count} znaków. Zapisywane w dzienniku audytu.",
+          "cancel": "Anuluj",
+          "failed": "Nie udało się wykonać tej operacji. Spróbuj ponownie.",
+          "reset": {
+            "menu": "Zresetuj dwuskładnikowe",
+            "title": "Zresetuj uwierzytelnianie dwuskładnikowe dla {name}",
+            "description": "To usuwa aplikację uwierzytelniającą i kody odzyskiwania. Przy następnym wejściu na chronioną stronę konfiguracja będzie wymagana ponownie, a członek otrzyma powiadomienie bezpieczeństwa e-mailem. Konto nadal wymaga dwuskładnikowego.",
+            "confirm": "Zresetuj",
+            "success": "Uwierzytelnianie dwuskładnikowe zresetowane. Członek został powiadomiony e-mailem."
+          },
+          "exempt": {
+            "menu": "Zwolnij z dwuskładnikowego",
+            "title": "Zwolnij {name} z uwierzytelniania dwuskładnikowego",
+            "description": "To usuwa obowiązek konfiguracji dwuskładnikowego — obniżenie bezpieczeństwa tej osoby. Jeśli ma je już skonfigurowane, pozostają aktywne i kod nadal będzie wymagany przy logowaniu. Członek otrzyma e-mail, a Twój powód zostanie zapisany w dzienniku audytu.",
+            "confirm": "Zwolnij członka",
+            "success": "Członek zwolniony z dwuskładnikowego. Otrzymał e-mail."
+          },
+          "remove_exemption": {
+            "menu": "Usuń zwolnienie",
+            "title": "Przywróć dwuskładnikowe dla {name}",
+            "description": "To przywraca obowiązek dwuskładnikowego. Konfiguracja będzie wymagana przy następnym wejściu na chronioną stronę, jeśli jeszcze jej nie ma. Członek otrzyma e-mail, a Twój powód zostanie zapisany w dzienniku audytu.",
+            "confirm": "Przywróć obowiązek",
+            "success": "Obowiązek dwuskładnikowego przywrócony. Członek został powiadomiony e-mailem."
+          }
+        }
       }
     }
   }

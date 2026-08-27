@@ -61,6 +61,77 @@
         "cancel": "Mégse",
         "success": "Ügynökség reactivated.",
         "failed": "We couldn't reactivate this agency. Please try again."
+      },
+      "members": {
+        "heading": "Tagok",
+        "boundary_note": "A kétfaktoros hitelesítés állapota csak igen/nem formában látszik. Az adminisztrátorok soha nem láthatják a tag titkos kulcsát vagy helyreállítási kódjait, nem generálhatnak neki kódot, és nem végezhetik el helyette a beállítást.",
+        "search_label": "Tagok keresése",
+        "load_failed": "Nem sikerült betölteni az ügynökség tagjait. Frissítsd az oldalt.",
+        "empty": "Egyetlen tag sem felel meg ennek a szűrőnek.",
+        "filters": {
+          "all": "Minden szerepkör"
+        },
+        "fields": {
+          "name": "Név",
+          "email": "E-mail",
+          "role": "Szerepkör",
+          "status": "Állapot",
+          "joined": "Csatlakozott",
+          "mfa": "Kétfaktoros"
+        },
+        "roles": {
+          "agency_admin": "Adminisztrátor",
+          "agency_manager": "Menedzser",
+          "agency_staff": "Munkatárs"
+        },
+        "status_labels": {
+          "active": "Aktív",
+          "pending": "Folyamatban"
+        },
+        "mfa_labels": {
+          "enrolled": "Beállítva",
+          "not_enrolled": "Nincs beállítva",
+          "exempt": "Felmentve"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Felmentve {date} óta.",
+          "also_enrolled": "Továbbra is be van állítva — bejelentkezéskor a rendszer továbbra is kódot kér.",
+          "reason": "Indok: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Ennek a tagnak nincs visszaállítható kétfaktoros beállítása.",
+          "already_exempt": "Ez a tag már fel van mentve.",
+          "not_exempt": "Ez a tag nincs felmentve.",
+          "platform_admin_not_exemptable": "A platform adminisztrátorai soha nem menthetők fel a kétfaktoros hitelesítés alól."
+        },
+        "actions": {
+          "menu_label": "Tagműveletek",
+          "reason_label": "Indok",
+          "reason_hint": "Kötelező, legalább {count} karakter. Bekerül az auditnaplóba.",
+          "cancel": "Mégse",
+          "failed": "A műveletet nem sikerült végrehajtani. Próbáld újra.",
+          "reset": {
+            "menu": "Kétfaktoros visszaállítása",
+            "title": "{name} kétfaktoros hitelesítésének visszaállítása",
+            "description": "Ez törli a hitelesítő alkalmazást és a helyreállítási kódokat. A tagnak a következő védett oldal megnyitásakor újra be kell állítania, és biztonsági értesítést kap e-mailben. A fiók továbbra is megkívánja a kétfaktoros hitelesítést.",
+            "confirm": "Visszaállítás",
+            "success": "A kétfaktoros hitelesítés visszaállítva. A tag e-mailt kapott."
+          },
+          "exempt": {
+            "menu": "Felmentés a kétfaktoros alól",
+            "title": "{name} felmentése a kétfaktoros alól",
+            "description": "Ez megszünteti a kétfaktoros beállítás kötelezettségét — biztonsági szintcsökkentés ennél a személynél. Ha már be van állítva, aktív marad, és bejelentkezéskor továbbra is kódot kér. A tag e-mailt kap, az indok pedig bekerül az auditnaplóba.",
+            "confirm": "Tag felmentése",
+            "success": "A tag felmentve a kétfaktoros alól. E-mailt kapott."
+          },
+          "remove_exemption": {
+            "menu": "Felmentés visszavonása",
+            "title": "{name} kétfaktoros kötelezettségének helyreállítása",
+            "description": "Ez helyreállítja a kétfaktoros kötelezettséget. A tagnak a következő védett oldal megnyitásakor be kell állítania, ha még nem tette meg. A tag e-mailt kap, az indok pedig bekerül az auditnaplóba.",
+            "confirm": "Kötelezettség helyreállítása",
+            "success": "A kétfaktoros kötelezettség helyreállítva. A tag e-mailt kapott."
+          }
+        }
       }
     }
   }

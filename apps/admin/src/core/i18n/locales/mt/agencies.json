@@ -61,6 +61,77 @@
         "cancel": "Ikkanċella",
         "success": "Aġenzija reactivated.",
         "failed": "We couldn't reactivate this agency. Please try again."
+      },
+      "members": {
+        "heading": "Membri",
+        "boundary_note": "L-istat tal-awtentikazzjoni b'żewġ fatturi jintwera biss bħala iva/le. L-amministraturi qatt ma jistgħu jaraw is-sigriet jew il-kodiċijiet ta' rkupru ta' membru, jiġġeneraw kodiċijiet għalih, jew jilestu l-konfigurazzjoni f'ismu.",
+        "search_label": "Fittex membri",
+        "load_failed": "Ma stajniex intellgħu l-membri ta' din l-aġenzija. Aġġorna l-paġna.",
+        "empty": "L-ebda membru ma jaqbel ma' dan il-filtru.",
+        "filters": {
+          "all": "Ir-rwoli kollha"
+        },
+        "fields": {
+          "name": "Isem",
+          "email": "Email",
+          "role": "Rwol",
+          "status": "Stat",
+          "joined": "Ingħaqad",
+          "mfa": "Żewġ fatturi"
+        },
+        "roles": {
+          "agency_admin": "Amministratur",
+          "agency_manager": "Manager",
+          "agency_staff": "Staff"
+        },
+        "status_labels": {
+          "active": "Attiv",
+          "pending": "Pendenti"
+        },
+        "mfa_labels": {
+          "enrolled": "Ikkonfigurat",
+          "not_enrolled": "Mhux ikkonfigurat",
+          "exempt": "Eżentat"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Eżentat minn {date}.",
+          "also_enrolled": "Għadu kkonfigurat — xorta jintalab kodiċi meta jidħol.",
+          "reason": "Raġuni: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Dan il-membru ma għandu ebda konfigurazzjoni b'żewġ fatturi biex tiġi rrisettjata.",
+          "already_exempt": "Dan il-membru huwa diġà eżentat.",
+          "not_exempt": "Dan il-membru mhuwiex eżentat.",
+          "platform_admin_not_exemptable": "L-amministraturi tal-pjattaforma qatt ma jistgħu jiġu eżentati mill-awtentikazzjoni b'żewġ fatturi."
+        },
+        "actions": {
+          "menu_label": "Azzjonijiet tal-membru",
+          "reason_label": "Raġuni",
+          "reason_hint": "Meħtieġ, mill-inqas {count} karattri. Jiġi rreġistrat fil-log tal-verifika.",
+          "cancel": "Ikkanċella",
+          "failed": "Ma stajniex nlestu din l-azzjoni. Erġa' pprova.",
+          "reset": {
+            "menu": "Irrisettja ż-żewġ fatturi",
+            "title": "Irrisettja ż-żewġ fatturi għal {name}",
+            "description": "Dan iħassar l-app tal-awtentikazzjoni u l-kodiċijiet ta' rkupru. Il-konfigurazzjoni terġa' tintalab id-darba li jmiss li jasal fuq paġna protetta, u jirċievi avviż ta' sigurtà bl-email. Il-kont xorta jeħtieġ iż-żewġ fatturi.",
+            "confirm": "Irrisettja",
+            "success": "Iż-żewġ fatturi ġew irrisettjati. Intbagħat email lill-membru."
+          },
+          "exempt": {
+            "menu": "Eżenta miż-żewġ fatturi",
+            "title": "Eżenta {name} miż-żewġ fatturi",
+            "description": "Dan ineħħi l-obbligu li tikkonfigura ż-żewġ fatturi — tnaqqis fis-sigurtà għal din il-persuna. Jekk diġà kkonfigurahom, jibqgħu attivi u xorta jintalab kodiċi meta jidħol. Il-membru jirċievi email u r-raġuni tiegħek tiġi rreġistrata fil-log tal-verifika.",
+            "confirm": "Eżenta l-membru",
+            "success": "Il-membru ġie eżentat miż-żewġ fatturi. Intbagħatlu email."
+          },
+          "remove_exemption": {
+            "menu": "Neħħi l-eżenzjoni",
+            "title": "Erġa' daħħal iż-żewġ fatturi għal {name}",
+            "description": "Dan jerġa' jdaħħal l-obbligu taż-żewġ fatturi. Il-konfigurazzjoni tintalab id-darba li jmiss li jasal fuq paġna protetta, jekk għadu ma għamilhiex. Il-membru jirċievi email u r-raġuni tiegħek tiġi rreġistrata fil-log tal-verifika.",
+            "confirm": "Erġa' daħħal l-obbligu",
+            "success": "L-obbligu taż-żewġ fatturi reġa' daħal. Intbagħat email lill-membru."
+          }
+        }
       }
     }
   }

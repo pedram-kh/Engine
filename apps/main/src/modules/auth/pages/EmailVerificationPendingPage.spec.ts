@@ -41,6 +41,7 @@ const UNVERIFIED_USER = {
     timezone: 'Europe/Lisbon',
     theme_preference: 'system' as const,
     mfa_required: false,
+    mfa_exempt: false,
     two_factor_enabled: false,
     last_login_at: null,
     created_at: '2026-01-01T00:00:00Z',

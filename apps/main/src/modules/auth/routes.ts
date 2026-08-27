@@ -39,6 +39,7 @@ export type GuardName =
   | 'requireAuth'
   | 'requireGuest'
   | 'requireMfaEnrolled'
+  | 'requireMfaUnlessExempt'
   | 'requireAgencyAdmin'
   | 'requireOnboardingAccess'
   | 'requireAgencyUser'
@@ -356,21 +357,28 @@ export const appRoutes: RouteRecordRaw[] = [
   // ── Agency users / invitations ────────────────────────────────────────────
   // Visible only to agency_admin (route guard + UI gating).
   //
-  // Sprint 3 Chunk 4 sub-step 5 — `requireMfaEnrolled` lands on
+  // Sprint 3 Chunk 4 sub-step 5 — the MFA policy gate lands on
   // admin-gated agency routes per Sprint 2 § e carry-forward. Order
-  // mirrors the chunk-7.1 admin SPA chain: requireAuth → requireMfaEnrolled
+  // mirrors the chunk-7.1 admin SPA chain: requireAuth → MFA gate
   // → requireAgencyAdmin. An admin user who hasn't enrolled 2FA is
   // bounced to /auth/2fa/enable before the route renders. Non-admin
   // routes (app.dashboard, brands.*, settings) are NOT MFA-gated in
   // Phase 1 — Sprint 4+ may broaden this if any of them grows a
   // state-flipping admin surface.
+  //
+  // AH-087 swapped `requireMfaEnrolled` → `requireMfaUnlessExempt` here and
+  // on creator-invitations.bulk: same behaviour for everyone who is not
+  // explicitly exempted (the column is NULL for the whole existing
+  // population), plus the per-user exemption branch. `requireMfaEnrolled`
+  // remains the PRECONDITION gate on auth.2fa.disable, which must not
+  // honour exemptions — you cannot disable 2FA you never set up.
   {
     path: '/agency-users',
     name: 'agency-users.list',
     component: () => import('@/modules/agency-users/pages/AgencyUsersPage.vue'),
     meta: {
       layout: 'agency',
-      guards: ['requireAuth', 'requireAgencyUser', 'requireMfaEnrolled', 'requireAgencyAdmin'],
+      guards: ['requireAuth', 'requireAgencyUser', 'requireMfaUnlessExempt', 'requireAgencyAdmin'],
     },
   },
 
@@ -378,15 +386,15 @@ export const appRoutes: RouteRecordRaw[] = [
   // Sprint 3 Chunk 4 sub-step 11 — CSV-driven prospect creator bulk-invite.
   // Admin-only (matches the backend's BulkInviteController::authorizeAdmin
   // role check). The guard chain mirrors agency-users.list — requireAuth →
-  // requireMfaEnrolled → requireAgencyAdmin — so 2FA is enforced before
-  // an admin can ship invitations.
+  // requireMfaUnlessExempt → requireAgencyAdmin — so 2FA is enforced before
+  // an admin can ship invitations, unless that admin is exempt (AH-087).
   {
     path: '/creator-invitations/bulk',
     name: 'creator-invitations.bulk',
     component: () => import('@/modules/creator-invitations/pages/BulkInvitePage.vue'),
     meta: {
       layout: 'agency',
-      guards: ['requireAuth', 'requireAgencyUser', 'requireMfaEnrolled', 'requireAgencyAdmin'],
+      guards: ['requireAuth', 'requireAgencyUser', 'requireMfaUnlessExempt', 'requireAgencyAdmin'],
     },
   },
 

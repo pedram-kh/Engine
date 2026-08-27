@@ -61,6 +61,77 @@
         "cancel": "Zrušit",
         "success": "Agentura reaktivována.",
         "failed": "Nepodařilo se reaktivovat tuto agenturu. Zkuste to znovu."
+      },
+      "members": {
+        "heading": "Členové",
+        "boundary_note": "Stav dvoufázového ověření se zobrazuje pouze jako ano/ne. Administrátoři nikdy nemohou vidět tajný klíč ani záložní kódy člena, vygenerovat mu kódy ani dokončit nastavení za něj.",
+        "search_label": "Hledat členy",
+        "load_failed": "Členy této agentury se nepodařilo načíst. Obnovte stránku.",
+        "empty": "Tomuto filtru neodpovídá žádný člen.",
+        "filters": {
+          "all": "Všechny role"
+        },
+        "fields": {
+          "name": "Jméno",
+          "email": "E-mail",
+          "role": "Role",
+          "status": "Stav",
+          "joined": "Připojen",
+          "mfa": "Dvoufázové ověření"
+        },
+        "roles": {
+          "agency_admin": "Administrátor",
+          "agency_manager": "Manažer",
+          "agency_staff": "Zaměstnanec"
+        },
+        "status_labels": {
+          "active": "Aktivní",
+          "pending": "Čeká"
+        },
+        "mfa_labels": {
+          "enrolled": "Nastaveno",
+          "not_enrolled": "Nenastaveno",
+          "exempt": "Výjimka"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Výjimka od {date}.",
+          "also_enrolled": "Stále nastaveno — při přihlášení je kód nadále vyžadován.",
+          "reason": "Důvod: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Tento člen nemá žádné nastavení dvoufázového ověření k resetu.",
+          "already_exempt": "Tento člen už má výjimku.",
+          "not_exempt": "Tento člen výjimku nemá.",
+          "platform_admin_not_exemptable": "Administrátoři platformy nikdy nemohou získat výjimku z dvoufázového ověření."
+        },
+        "actions": {
+          "menu_label": "Akce se členem",
+          "reason_label": "Důvod",
+          "reason_hint": "Povinné, alespoň {count} znaků. Zaznamenává se do auditního logu.",
+          "cancel": "Zrušit",
+          "failed": "Tuto akci se nepodařilo dokončit. Zkuste to znovu.",
+          "reset": {
+            "menu": "Resetovat dvoufázové ověření",
+            "title": "Resetovat dvoufázové ověření pro {name}",
+            "description": "Tím se smaže autentizační aplikace i záložní kódy. Při dalším otevření chráněné stránky bude nastavení vyžadováno znovu a člen dostane e-mailem bezpečnostní upozornění. Účet dvoufázové ověření nadále vyžaduje.",
+            "confirm": "Resetovat",
+            "success": "Dvoufázové ověření resetováno. Členovi byl odeslán e-mail."
+          },
+          "exempt": {
+            "menu": "Udělit výjimku",
+            "title": "Udělit {name} výjimku z dvoufázového ověření",
+            "description": "Tím se ruší povinnost nastavit dvoufázové ověření — snížení bezpečnosti této osoby. Pokud ho již nastaveno má, zůstává aktivní a kód bude při přihlášení nadále vyžadován. Člen dostane e-mail a váš důvod se zaznamená do auditního logu.",
+            "confirm": "Udělit výjimku",
+            "success": "Členovi byla udělena výjimka z dvoufázového ověření. Byl mu odeslán e-mail."
+          },
+          "remove_exemption": {
+            "menu": "Odebrat výjimku",
+            "title": "Obnovit dvoufázové ověření pro {name}",
+            "description": "Tím se obnoví povinnost dvoufázového ověření. Při dalším otevření chráněné stránky bude vyžadováno nastavení, pokud ještě neexistuje. Člen dostane e-mail a váš důvod se zaznamená do auditního logu.",
+            "confirm": "Obnovit povinnost",
+            "success": "Povinnost dvoufázového ověření obnovena. Členovi byl odeslán e-mail."
+          }
+        }
       }
     }
   }

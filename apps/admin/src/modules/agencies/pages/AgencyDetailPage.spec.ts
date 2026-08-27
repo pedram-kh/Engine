@@ -23,6 +23,13 @@ vi.mock('@/modules/agencies/api/agencies.api', async () => {
       show: vi.fn(),
       suspend: vi.fn(),
       reactivate: vi.fn(),
+      // AH-087: the page now stacks AgencyMembersCard, which loads on mount.
+      // Stubbed to an empty page here so these specs stay about suspend /
+      // reactivate; the members card has its own spec.
+      members: vi.fn(),
+      resetMemberTwoFactor: vi.fn(),
+      exemptMemberFromTwoFactor: vi.fn(),
+      removeMemberTwoFactorExemption: vi.fn(),
     },
   }
 })
@@ -62,6 +69,10 @@ describe('AgencyDetailPage (Sprint 13, D-3)', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(adminAgenciesApi.members).mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 15, last_page: 1 },
+    })
   })
 
   afterEach(() => {

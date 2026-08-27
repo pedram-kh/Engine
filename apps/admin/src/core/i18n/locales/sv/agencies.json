@@ -61,6 +61,77 @@
         "cancel": "Avbryt",
         "success": "Byrå återaktiverad.",
         "failed": "Den här byrån kunde inte återaktiveras. Försök igen."
+      },
+      "members": {
+        "heading": "Medlemmar",
+        "boundary_note": "Tvåfaktorstatus visas endast som ja/nej. Administratörer kan aldrig se en medlems tvåfaktorhemlighet eller återställningskoder, generera koder för medlemmen eller slutföra inställningen i medlemmens namn.",
+        "search_label": "Sök medlemmar",
+        "load_failed": "Vi kunde inte läsa in den här byråns medlemmar. Uppdatera sidan.",
+        "empty": "Inga medlemmar matchar det här filtret.",
+        "filters": {
+          "all": "Alla roller"
+        },
+        "fields": {
+          "name": "Namn",
+          "email": "E-post",
+          "role": "Roll",
+          "status": "Status",
+          "joined": "Medlem sedan",
+          "mfa": "Tvåfaktor"
+        },
+        "roles": {
+          "agency_admin": "Administratör",
+          "agency_manager": "Manager",
+          "agency_staff": "Personal"
+        },
+        "status_labels": {
+          "active": "Aktiv",
+          "pending": "Väntande"
+        },
+        "mfa_labels": {
+          "enrolled": "Inställd",
+          "not_enrolled": "Inte inställd",
+          "exempt": "Undantagen"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Undantagen sedan {date}.",
+          "also_enrolled": "Fortfarande inställd — en kod efterfrågas ändå vid inloggning.",
+          "reason": "Skäl: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Den här medlemmen har ingen tvåfaktorinställning att återställa.",
+          "already_exempt": "Den här medlemmen är redan undantagen.",
+          "not_exempt": "Den här medlemmen är inte undantagen.",
+          "platform_admin_not_exemptable": "Plattformsadministratörer kan aldrig undantas från tvåfaktorsautentisering."
+        },
+        "actions": {
+          "menu_label": "Medlemsåtgärder",
+          "reason_label": "Skäl",
+          "reason_hint": "Obligatoriskt, minst {count} tecken. Registreras i granskningsloggen.",
+          "cancel": "Avbryt",
+          "failed": "Vi kunde inte slutföra åtgärden. Försök igen.",
+          "reset": {
+            "menu": "Återställ tvåfaktor",
+            "title": "Återställ tvåfaktor för {name}",
+            "description": "Detta rensar autentiseringsappen och återställningskoderna. Medlemmen måste ställa in tvåfaktor igen nästa gång en skyddad sida öppnas och får ett säkerhetsmeddelande via e-post. Kontot kräver fortfarande tvåfaktor.",
+            "confirm": "Återställ",
+            "success": "Tvåfaktor återställd. Medlemmen har fått ett e-postmeddelande."
+          },
+          "exempt": {
+            "menu": "Undanta från tvåfaktor",
+            "title": "Undanta {name} från tvåfaktor",
+            "description": "Detta tar bort kravet på att ställa in tvåfaktor — en säkerhetssänkning för den här personen. Om det redan är inställt förblir det aktivt och en kod efterfrågas ändå vid inloggning. Medlemmen får ett e-postmeddelande och ditt skäl registreras i granskningsloggen.",
+            "confirm": "Undanta medlem",
+            "success": "Medlem undantagen från tvåfaktor. Medlemmen har fått ett e-postmeddelande."
+          },
+          "remove_exemption": {
+            "menu": "Ta bort undantaget",
+            "title": "Återinför tvåfaktor för {name}",
+            "description": "Detta återinför kravet på tvåfaktor. Medlemmen ombeds ställa in det nästa gång en skyddad sida öppnas, om det inte redan är gjort. Medlemmen får ett e-postmeddelande och ditt skäl registreras i granskningsloggen.",
+            "confirm": "Återinför kravet",
+            "success": "Kravet på tvåfaktor har återinförts. Medlemmen har fått ett e-postmeddelande."
+          }
+        }
       }
     }
   }

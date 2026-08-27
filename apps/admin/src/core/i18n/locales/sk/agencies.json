@@ -61,6 +61,77 @@
         "cancel": "Zrušiť",
         "success": "Agentúra reaktivována.",
         "failed": "Nepodařilo sa reaktivovať tuto agenturu. Zkuste to znova."
+      },
+      "members": {
+        "heading": "Členovia",
+        "boundary_note": "Stav dvojfaktorového overenia sa zobrazuje len ako áno/nie. Administrátori nikdy nemôžu vidieť tajný kľúč ani záložné kódy člena, vygenerovať mu kódy ani dokončiť nastavenie za neho.",
+        "search_label": "Hľadať členov",
+        "load_failed": "Členov tejto agentúry sa nepodarilo načítať. Obnovte stránku.",
+        "empty": "Tomuto filtru nezodpovedá žiadny člen.",
+        "filters": {
+          "all": "Všetky role"
+        },
+        "fields": {
+          "name": "Meno",
+          "email": "E-mail",
+          "role": "Rola",
+          "status": "Stav",
+          "joined": "Pripojený",
+          "mfa": "Dvojfaktorové overenie"
+        },
+        "roles": {
+          "agency_admin": "Administrátor",
+          "agency_manager": "Manažér",
+          "agency_staff": "Zamestnanec"
+        },
+        "status_labels": {
+          "active": "Aktívny",
+          "pending": "Čaká"
+        },
+        "mfa_labels": {
+          "enrolled": "Nastavené",
+          "not_enrolled": "Nenastavené",
+          "exempt": "Výnimka"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Výnimka od {date}.",
+          "also_enrolled": "Stále nastavené — pri prihlásení sa kód naďalej vyžaduje.",
+          "reason": "Dôvod: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Tento člen nemá žiadne nastavenie dvojfaktorového overenia na resetovanie.",
+          "already_exempt": "Tento člen už má výnimku.",
+          "not_exempt": "Tento člen výnimku nemá.",
+          "platform_admin_not_exemptable": "Administrátori platformy nikdy nemôžu získať výnimku z dvojfaktorového overenia."
+        },
+        "actions": {
+          "menu_label": "Akcie so členom",
+          "reason_label": "Dôvod",
+          "reason_hint": "Povinné, aspoň {count} znakov. Zaznamenáva sa do auditného logu.",
+          "cancel": "Zrušiť",
+          "failed": "Túto akciu sa nepodarilo dokončiť. Skúste to znova.",
+          "reset": {
+            "menu": "Resetovať dvojfaktorové overenie",
+            "title": "Resetovať dvojfaktorové overenie pre {name}",
+            "description": "Tým sa vymaže autentifikačná aplikácia aj záložné kódy. Pri ďalšom otvorení chránenej stránky bude nastavenie vyžadované znova a člen dostane e-mailom bezpečnostné upozornenie. Konto dvojfaktorové overenie naďalej vyžaduje.",
+            "confirm": "Resetovať",
+            "success": "Dvojfaktorové overenie resetované. Členovi bol odoslaný e-mail."
+          },
+          "exempt": {
+            "menu": "Udeliť výnimku",
+            "title": "Udeliť {name} výnimku z dvojfaktorového overenia",
+            "description": "Tým sa ruší povinnosť nastaviť dvojfaktorové overenie — zníženie bezpečnosti tejto osoby. Ak ho už nastavené má, zostáva aktívne a kód sa pri prihlásení naďalej vyžaduje. Člen dostane e-mail a váš dôvod sa zaznamená do auditného logu.",
+            "confirm": "Udeliť výnimku",
+            "success": "Členovi bola udelená výnimka z dvojfaktorového overenia. Bol mu odoslaný e-mail."
+          },
+          "remove_exemption": {
+            "menu": "Odobrať výnimku",
+            "title": "Obnoviť dvojfaktorové overenie pre {name}",
+            "description": "Tým sa obnoví povinnosť dvojfaktorového overenia. Pri ďalšom otvorení chránenej stránky bude nastavenie vyžadované, ak ešte neexistuje. Člen dostane e-mail a váš dôvod sa zaznamená do auditného logu.",
+            "confirm": "Obnoviť povinnosť",
+            "success": "Povinnosť dvojfaktorového overenia obnovená. Členovi bol odoslaný e-mail."
+          }
+        }
       }
     }
   }

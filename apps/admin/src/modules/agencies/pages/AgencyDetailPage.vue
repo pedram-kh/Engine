@@ -7,6 +7,11 @@
  * enforces min length + the agency.suspended audit verb) and blocks every
  * agency user's login; reactivate restores it. Both refresh the page from
  * the server response so the rendered state always matches the SOT.
+ *
+ * AH-087 added the members card as a third stacked card (this page's own
+ * idiom — no tabs exist anywhere in this SPA). It owns its own paging and
+ * error state; the only thing it hands back is the action toast, which this
+ * page already has a snackbar for.
  */
 
 import { computed, onMounted, ref } from 'vue'
@@ -16,6 +21,7 @@ import { useRoute } from 'vue-router'
 import { formatDateTime, ApiError } from '@catalyst/api-client'
 
 import { adminAgenciesApi, type AdminAgency } from '../api/agencies.api'
+import AgencyMembersCard from '../components/AgencyMembersCard.vue'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -91,6 +97,10 @@ async function confirmReactivate(): Promise<void> {
 
 function formatTimestamp(iso: string | null): string {
   return formatDateTime(iso, locale.value)
+}
+
+function onMemberAction(payload: { messageKey: string; color: string }): void {
+  notify(payload.messageKey, payload.color)
 }
 </script>
 
@@ -216,6 +226,8 @@ function formatTimestamp(iso: string | null): string {
           </template>
         </v-card-text>
       </v-card>
+
+      <AgencyMembersCard :agency-ulid="ulid" @acted="onMemberAction" />
     </template>
 
     <!-- Suspend dialog -->

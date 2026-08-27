@@ -61,6 +61,77 @@
         "cancel": "Cancel",
         "success": "Agency reactivated.",
         "failed": "We couldn't reactivate this agency. Please try again."
+      },
+      "members": {
+        "heading": "Members",
+        "boundary_note": "Two-factor state is shown as a yes/no only. Administrators can never see a member's two-factor secret or recovery codes, generate codes for them, or set two-factor up on their behalf.",
+        "search_label": "Search members",
+        "load_failed": "We couldn't load this agency's members. Please refresh.",
+        "empty": "No members match this filter.",
+        "filters": {
+          "all": "All roles"
+        },
+        "fields": {
+          "name": "Name",
+          "email": "Email",
+          "role": "Role",
+          "status": "Status",
+          "joined": "Joined",
+          "mfa": "Two-factor"
+        },
+        "roles": {
+          "agency_admin": "Admin",
+          "agency_manager": "Manager",
+          "agency_staff": "Staff"
+        },
+        "status_labels": {
+          "active": "Active",
+          "pending": "Pending"
+        },
+        "mfa_labels": {
+          "enrolled": "Enrolled",
+          "not_enrolled": "Not enrolled",
+          "exempt": "Exempt"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Exempt since {date}.",
+          "also_enrolled": "Still enrolled — they are asked for a code when they sign in.",
+          "reason": "Reason: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "This member has no two-factor enrollment to reset.",
+          "already_exempt": "This member is already exempt.",
+          "not_exempt": "This member is not exempt.",
+          "platform_admin_not_exemptable": "Platform administrators can never be exempted from two-factor authentication."
+        },
+        "actions": {
+          "menu_label": "Member actions",
+          "reason_label": "Reason",
+          "reason_hint": "Required, at least {count} characters. Recorded in the audit log.",
+          "cancel": "Cancel",
+          "failed": "We couldn't complete this action. Please try again.",
+          "reset": {
+            "menu": "Reset two-factor",
+            "title": "Reset two-factor for {name}",
+            "description": "This clears their authenticator app and recovery codes. They set two-factor up again the next time they reach a protected page, and they are emailed a security notice. The account still requires two-factor.",
+            "confirm": "Reset two-factor",
+            "success": "Two-factor reset. The member has been emailed."
+          },
+          "exempt": {
+            "menu": "Exempt from two-factor",
+            "title": "Exempt {name} from two-factor",
+            "description": "This removes the requirement to set two-factor up — a security downgrade for this person. If they already have it set up it stays active and they are still asked for a code at sign-in. They are emailed, and your reason is recorded in the audit log.",
+            "confirm": "Exempt member",
+            "success": "Member exempted from two-factor. They have been emailed."
+          },
+          "remove_exemption": {
+            "menu": "Remove two-factor exemption",
+            "title": "Restore two-factor for {name}",
+            "description": "This restores the two-factor requirement. They are asked to set it up the next time they reach a protected page, if they haven't already. They are emailed, and your reason is recorded in the audit log.",
+            "confirm": "Restore requirement",
+            "success": "Two-factor requirement restored. The member has been emailed."
+          }
+        }
       }
     }
   }

@@ -61,6 +61,77 @@
         "cancel": "Cancelar",
         "success": "Agência reativada.",
         "failed": "Não foi possível reativar esta agência. Tente novamente."
+      },
+      "members": {
+        "heading": "Membros",
+        "boundary_note": "O estado da autenticação de dois fatores é mostrado apenas como sim/não. Os administradores nunca podem ver o segredo nem os códigos de recuperação de um membro, gerar códigos por ele ou concluir a configuração em seu nome.",
+        "search_label": "Pesquisar membros",
+        "load_failed": "Não foi possível carregar os membros desta agência. Atualize a página.",
+        "empty": "Nenhum membro corresponde a este filtro.",
+        "filters": {
+          "all": "Todas as funções"
+        },
+        "fields": {
+          "name": "Nome",
+          "email": "E-mail",
+          "role": "Função",
+          "status": "Estado",
+          "joined": "Entrou em",
+          "mfa": "Dois fatores"
+        },
+        "roles": {
+          "agency_admin": "Administrador",
+          "agency_manager": "Gestor",
+          "agency_staff": "Equipa"
+        },
+        "status_labels": {
+          "active": "Ativo",
+          "pending": "Pendente"
+        },
+        "mfa_labels": {
+          "enrolled": "Configurada",
+          "not_enrolled": "Não configurada",
+          "exempt": "Isento"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Isento desde {date}.",
+          "also_enrolled": "Continua configurada — é pedido um código ao iniciar sessão.",
+          "reason": "Motivo: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Este membro não tem nenhuma configuração de dois fatores para reiniciar.",
+          "already_exempt": "Este membro já está isento.",
+          "not_exempt": "Este membro não está isento.",
+          "platform_admin_not_exemptable": "Os administradores da plataforma nunca podem ser isentos da autenticação de dois fatores."
+        },
+        "actions": {
+          "menu_label": "Ações do membro",
+          "reason_label": "Motivo",
+          "reason_hint": "Obrigatório, pelo menos {count} caracteres. Registado no registo de auditoria.",
+          "cancel": "Cancelar",
+          "failed": "Não foi possível concluir esta ação. Tente novamente.",
+          "reset": {
+            "menu": "Reiniciar dois fatores",
+            "title": "Reiniciar os dois fatores de {name}",
+            "description": "Isto apaga a aplicação de autenticação e os códigos de recuperação. Será pedida nova configuração no próximo acesso a uma página protegida e o membro recebe um aviso de segurança por e-mail. A conta continua a exigir dois fatores.",
+            "confirm": "Reiniciar",
+            "success": "Dois fatores reiniciada. O membro foi avisado por e-mail."
+          },
+          "exempt": {
+            "menu": "Isentar de dois fatores",
+            "title": "Isentar {name} de dois fatores",
+            "description": "Isto remove a obrigação de configurar os dois fatores — uma redução de segurança para esta pessoa. Se já os tiver configurados, continuam ativos e o código continua a ser pedido ao iniciar sessão. O membro é avisado por e-mail e o seu motivo fica no registo de auditoria.",
+            "confirm": "Isentar membro",
+            "success": "Membro isento de dois fatores. Foi avisado por e-mail."
+          },
+          "remove_exemption": {
+            "menu": "Remover a isenção",
+            "title": "Restaurar dois fatores para {name}",
+            "description": "Isto restaura a obrigação de dois fatores. Será pedida a configuração no próximo acesso a uma página protegida, caso ainda não exista. O membro é avisado por e-mail e o seu motivo fica no registo de auditoria.",
+            "confirm": "Restaurar a obrigação",
+            "success": "Obrigação de dois fatores restaurada. O membro foi avisado por e-mail."
+          }
+        }
       }
     }
   }

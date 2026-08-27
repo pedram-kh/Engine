@@ -12,7 +12,13 @@
  * This test inspects `apps/main/src/modules/auth/routes.ts` and asserts
  * that the `agency-users.list` route declares its guards in the order:
  *
- *   requireAuth → requireAgencyUser → requireMfaEnrolled → requireAgencyAdmin
+ *   requireAuth → requireAgencyUser → requireMfaUnlessExempt → requireAgencyAdmin
+ *
+ * AH-087 changed the third link from `requireMfaEnrolled` to
+ * `requireMfaUnlessExempt` — the policy half of a guard that used to do two
+ * jobs. This file's pinned sets moved WITH that change, deliberately: the
+ * PMC-1 negative case exists precisely so the set of MFA-gated routes cannot
+ * shift without someone editing this expectation and saying why.
  *
  * The order matters: auth check must come first (we need a user), then the
  * agency-shell check (Sprint 6 Chunk 1, D-7 — bounce a creator before any
@@ -86,29 +92,31 @@ describe('agency routes — MFA guard registration (Sprint 3 Chunk 4 sub-step 5)
     expect(target, 'agency-users.list route record not found in routes.ts').toBeDefined()
   })
 
-  it('chains requireAuth → requireAgencyUser → requireMfaEnrolled → requireAgencyAdmin in that exact order', async () => {
+  it('chains requireAuth → requireAgencyUser → requireMfaUnlessExempt → requireAgencyAdmin in that exact order', async () => {
     const routes = await parseRoutes()
     const target = routes.find((r) => r.name === 'agency-users.list')
     // Sprint 6 Chunk 1 (D-7) inserted `requireAgencyUser` second — after auth
     // resolves a user, a creator is bounced before the MFA/admin checks can
-    // leak anything about the page. The MFA → admin tail order is unchanged.
+    // leak anything about the page. The MFA → admin tail order is unchanged;
+    // AH-087 only swapped which MFA guard occupies that slot.
     expect(target?.guards).toEqual([
       'requireAuth',
       'requireAgencyUser',
-      'requireMfaEnrolled',
+      'requireMfaUnlessExempt',
       'requireAgencyAdmin',
     ])
   })
 })
 
-describe('no route declares requireMfaEnrolled without requireAuth (cross-route invariant)', () => {
-  it('every route that opts into requireMfaEnrolled also opts into requireAuth first', async () => {
+describe('no route declares an MFA gate without requireAuth (cross-route invariant)', () => {
+  it('every route that opts into an MFA gate also opts into requireAuth first', async () => {
     const routes = await parseRoutes()
-    const mfaRoutes = routes.filter((r) => r.guards.includes('requireMfaEnrolled'))
+    const mfaGuards = ['requireMfaEnrolled', 'requireMfaUnlessExempt']
+    const mfaRoutes = routes.filter((r) => r.guards.some((g) => mfaGuards.includes(g)))
     expect(mfaRoutes.length).toBeGreaterThan(0)
     for (const r of mfaRoutes) {
       const authIdx = r.guards.indexOf('requireAuth')
-      const mfaIdx = r.guards.indexOf('requireMfaEnrolled')
+      const mfaIdx = r.guards.findIndex((g) => mfaGuards.includes(g))
       expect(authIdx, `route ${r.name} is MFA-gated but does not require auth`).toBeGreaterThan(-1)
       expect(authIdx, `route ${r.name} declares MFA gate before auth gate`).toBeLessThan(mfaIdx)
     }
@@ -130,19 +138,45 @@ describe('no route declares requireMfaEnrolled without requireAuth (cross-route 
  * MFA-gated routes verbatim. Adding a fourth gate, or removing one
  * of the named three, fails CI before merge.
  */
-describe('selective gating — only the named routes carry requireMfaEnrolled', () => {
+describe('selective gating — only the named routes carry an MFA gate', () => {
   it('the full set of MFA-gated routes is exactly the admin-sensitive routes + the self-service 2FA-disable page', async () => {
     const routes = await parseRoutes()
+    const mfaGuards = ['requireMfaEnrolled', 'requireMfaUnlessExempt']
     const mfaGated = routes
-      .filter((r) => r.guards.includes('requireMfaEnrolled'))
+      .filter((r) => r.guards.some((g) => mfaGuards.includes(g)))
       .map((r) => r.name)
       .sort()
-    // Three routes legitimately carry the gate:
+    // Three routes legitimately carry a gate:
     //   - `agency-users.list`         — admin-sensitive surface (Chunk 4 sub-step 5).
     //   - `creator-invitations.bulk`  — admin-sensitive surface (Chunk 4 sub-step 11).
     //   - `auth.2fa.disable`          — self-service: disable requires you be enrolled.
     // Adding a fourth (e.g., `/brands`, `/dashboard`, `/settings`)
     // would be a silent broadening of the gate — block it here.
     expect(mfaGated).toEqual(['agency-users.list', 'auth.2fa.disable', 'creator-invitations.bulk'])
+  })
+
+  /**
+   * AH-087 — which gate sits on which route is itself the invariant.
+   *
+   * The two guards are not interchangeable: only `requireMfaUnlessExempt`
+   * honours a per-user exemption, and it must never reach the disable page
+   * (an exempt, un-enrolled user would land on a page with nothing to
+   * disable). Swapping either way passes every assertion above, so the
+   * split is pinned per route here.
+   */
+  it('the exemption-aware gate covers exactly the admin-sensitive routes, and never the disable page', async () => {
+    const routes = await parseRoutes()
+
+    const policyGated = routes
+      .filter((r) => r.guards.includes('requireMfaUnlessExempt'))
+      .map((r) => r.name)
+      .sort()
+    expect(policyGated).toEqual(['agency-users.list', 'creator-invitations.bulk'])
+
+    const preconditionGated = routes
+      .filter((r) => r.guards.includes('requireMfaEnrolled'))
+      .map((r) => r.name)
+      .sort()
+    expect(preconditionGated).toEqual(['auth.2fa.disable'])
   })
 })

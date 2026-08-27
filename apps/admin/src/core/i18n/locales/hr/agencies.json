@@ -61,6 +61,77 @@
         "cancel": "Otkažite",
         "success": "Agencija reaktivována.",
         "failed": "Ni uspelo reaktivovat tuto agenturu. Zkuste to znova."
+      },
+      "members": {
+        "heading": "Članovi",
+        "boundary_note": "Stanje dvofaktorske provjere prikazuje se samo kao da/ne. Administratori nikada ne mogu vidjeti tajni ključ ni kodove za oporavak člana, generirati mu kodove niti dovršiti postavljanje umjesto njega.",
+        "search_label": "Traži članove",
+        "load_failed": "Nije bilo moguće učitati članove ove agencije. Osvježite stranicu.",
+        "empty": "Nijedan član ne odgovara ovom filtru.",
+        "filters": {
+          "all": "Sve role"
+        },
+        "fields": {
+          "name": "Ime",
+          "email": "E-pošta",
+          "role": "Rola",
+          "status": "Stanje",
+          "joined": "Pridružio se",
+          "mfa": "Dvofaktorska provjera"
+        },
+        "roles": {
+          "agency_admin": "Administrator",
+          "agency_manager": "Menadžer",
+          "agency_staff": "Osoblje"
+        },
+        "status_labels": {
+          "active": "Aktivan",
+          "pending": "U čekanju"
+        },
+        "mfa_labels": {
+          "enrolled": "Postavljeno",
+          "not_enrolled": "Nije postavljeno",
+          "exempt": "Izuzet"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Izuzet od {date}.",
+          "also_enrolled": "Još je postavljeno — pri prijavi se kod i dalje traži.",
+          "reason": "Razlog: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Ovaj član nema postavljenu dvofaktorsku provjeru za poništavanje.",
+          "already_exempt": "Ovaj član već je izuzet.",
+          "not_exempt": "Ovaj član nije izuzet.",
+          "platform_admin_not_exemptable": "Administratori platforme nikada ne mogu biti izuzeti od dvofaktorske provjere."
+        },
+        "actions": {
+          "menu_label": "Radnje nad članom",
+          "reason_label": "Razlog",
+          "reason_hint": "Obavezno, najmanje {count} znakova. Bilježi se u zapisnik nadzora.",
+          "cancel": "Odustani",
+          "failed": "Ovu radnju nije bilo moguće dovršiti. Pokušajte ponovno.",
+          "reset": {
+            "menu": "Poništi dvofaktorsku provjeru",
+            "title": "Poništi dvofaktorsku provjeru za {name}",
+            "description": "Time se brišu aplikacija za provjeru i kodovi za oporavak. Pri sljedećem otvaranju zaštićene stranice postavljanje će se ponovno tražiti, a član e-poštom dobiva sigurnosnu obavijest. Račun i dalje zahtijeva dvofaktorsku provjeru.",
+            "confirm": "Poništi",
+            "success": "Dvofaktorska provjera poništena. Članu je poslana e-pošta."
+          },
+          "exempt": {
+            "menu": "Izuzmi od dvofaktorske provjere",
+            "title": "Izuzmi {name} od dvofaktorske provjere",
+            "description": "Time se ukida obveza postavljanja dvofaktorske provjere — sniženje sigurnosti ove osobe. Ako je već postavljena, ostaje aktivna i kod se pri prijavi i dalje traži. Član dobiva e-poštu, a vaš se razlog bilježi u zapisnik nadzora.",
+            "confirm": "Izuzmi člana",
+            "success": "Član je izuzet od dvofaktorske provjere. Poslana mu je e-pošta."
+          },
+          "remove_exemption": {
+            "menu": "Ukloni izuzeće",
+            "title": "Vrati dvofaktorsku provjeru za {name}",
+            "description": "Time se vraća obveza dvofaktorske provjere. Postavljanje će se tražiti pri sljedećem otvaranju zaštićene stranice, ako već nije postavljeno. Član dobiva e-poštu, a vaš se razlog bilježi u zapisnik nadzora.",
+            "confirm": "Vrati obvezu",
+            "success": "Obveza dvofaktorske provjere vraćena. Članu je poslana e-pošta."
+          }
+        }
       }
     }
   }

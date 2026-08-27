@@ -61,6 +61,77 @@
         "cancel": "Atcelt",
         "success": "Aģentūra reactivated.",
         "failed": "We couldn't reactivate this agency. Please try again."
+      },
+      "members": {
+        "heading": "Dalībnieki",
+        "boundary_note": "Divpakāpju autentifikācijas stāvoklis tiek rādīts tikai kā jā/nē. Administratori nekad nevar redzēt dalībnieka slepeno atslēgu vai atkopšanas kodus, ģenerēt kodus viņa vietā vai pabeigt iestatīšanu viņa vārdā.",
+        "search_label": "Meklēt dalībniekus",
+        "load_failed": "Neizdevās ielādēt šīs aģentūras dalībniekus. Atsvaidziniet lapu.",
+        "empty": "Neviens dalībnieks neatbilst šim filtram.",
+        "filters": {
+          "all": "Visas lomas"
+        },
+        "fields": {
+          "name": "Vārds",
+          "email": "E-pasts",
+          "role": "Loma",
+          "status": "Statuss",
+          "joined": "Pievienojās",
+          "mfa": "Divpakāpju"
+        },
+        "roles": {
+          "agency_admin": "Administrators",
+          "agency_manager": "Vadītājs",
+          "agency_staff": "Darbinieks"
+        },
+        "status_labels": {
+          "active": "Aktīvs",
+          "pending": "Gaida"
+        },
+        "mfa_labels": {
+          "enrolled": "Iestatīta",
+          "not_enrolled": "Nav iestatīta",
+          "exempt": "Atbrīvots"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Atbrīvots no {date}.",
+          "also_enrolled": "Joprojām iestatīta — pierakstoties kods tiek prasīts arī turpmāk.",
+          "reason": "Iemesls: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Šim dalībniekam nav divpakāpju autentifikācijas, ko atiestatīt.",
+          "already_exempt": "Šis dalībnieks jau ir atbrīvots.",
+          "not_exempt": "Šis dalībnieks nav atbrīvots.",
+          "platform_admin_not_exemptable": "Platformas administratorus nekad nevar atbrīvot no divpakāpju autentifikācijas."
+        },
+        "actions": {
+          "menu_label": "Dalībnieka darbības",
+          "reason_label": "Iemesls",
+          "reason_hint": "Obligāts, vismaz {count} rakstzīmes. Tiek reģistrēts audita žurnālā.",
+          "cancel": "Atcelt",
+          "failed": "Šo darbību nevarēja pabeigt. Mēģiniet vēlreiz.",
+          "reset": {
+            "menu": "Atiestatīt divpakāpju",
+            "title": "Atiestatīt {name} divpakāpju autentifikāciju",
+            "description": "Tas izdzēš autentifikācijas lietotni un atkopšanas kodus. Nākamreiz atverot aizsargātu lapu, iestatīšana būs jāveic no jauna, un dalībnieks e-pastā saņem drošības paziņojumu. Kontam joprojām nepieciešama divpakāpju autentifikācija.",
+            "confirm": "Atiestatīt",
+            "success": "Divpakāpju autentifikācija atiestatīta. Dalībniekam nosūtīts e-pasts."
+          },
+          "exempt": {
+            "menu": "Atbrīvot no divpakāpju",
+            "title": "Atbrīvot {name} no divpakāpju autentifikācijas",
+            "description": "Tas atceļ pienākumu iestatīt divpakāpju autentifikāciju — drošības pazemināšana šai personai. Ja tā jau ir iestatīta, tā paliek aktīva un kods pierakstoties tiek prasīts arī turpmāk. Dalībnieks saņem e-pastu, un jūsu iemesls tiek reģistrēts audita žurnālā.",
+            "confirm": "Atbrīvot dalībnieku",
+            "success": "Dalībnieks atbrīvots no divpakāpju autentifikācijas. Viņam nosūtīts e-pasts."
+          },
+          "remove_exemption": {
+            "menu": "Noņemt atbrīvojumu",
+            "title": "Atjaunot {name} divpakāpju autentifikāciju",
+            "description": "Tas atjauno divpakāpju autentifikācijas pienākumu. Iestatīšana tiks prasīta, nākamreiz atverot aizsargātu lapu, ja tā vēl nav veikta. Dalībnieks saņem e-pastu, un jūsu iemesls tiek reģistrēts audita žurnālā.",
+            "confirm": "Atjaunot pienākumu",
+            "success": "Divpakāpju autentifikācijas pienākums atjaunots. Dalībniekam nosūtīts e-pasts."
+          }
+        }
       }
     }
   }

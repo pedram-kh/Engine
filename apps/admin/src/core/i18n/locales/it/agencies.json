@@ -61,6 +61,77 @@
         "cancel": "Annulla",
         "success": "Agenzia riattivata.",
         "failed": "Impossibile riattivare questa agenzia. Riprova."
+      },
+      "members": {
+        "heading": "Membri",
+        "boundary_note": "Lo stato dell'autenticazione a due fattori è mostrato solo come sì/no. Gli amministratori non possono mai vedere il segreto o i codici di recupero di un membro, generare codici per lui né completare la configurazione a suo nome.",
+        "search_label": "Cerca membri",
+        "load_failed": "Non è stato possibile caricare i membri di questa agenzia. Aggiorna la pagina.",
+        "empty": "Nessun membro corrisponde a questo filtro.",
+        "filters": {
+          "all": "Tutti i ruoli"
+        },
+        "fields": {
+          "name": "Nome",
+          "email": "E-mail",
+          "role": "Ruolo",
+          "status": "Stato",
+          "joined": "Iscritto il",
+          "mfa": "Due fattori"
+        },
+        "roles": {
+          "agency_admin": "Amministratore",
+          "agency_manager": "Manager",
+          "agency_staff": "Staff"
+        },
+        "status_labels": {
+          "active": "Attivo",
+          "pending": "In attesa"
+        },
+        "mfa_labels": {
+          "enrolled": "Configurata",
+          "not_enrolled": "Non configurata",
+          "exempt": "Esentato"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Esentato dal {date}.",
+          "also_enrolled": "Ancora configurata: al momento dell'accesso viene comunque richiesto un codice.",
+          "reason": "Motivo: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Questo membro non ha alcuna configurazione a due fattori da reimpostare.",
+          "already_exempt": "Questo membro è già esentato.",
+          "not_exempt": "Questo membro non è esentato.",
+          "platform_admin_not_exemptable": "Gli amministratori della piattaforma non possono mai essere esentati dall'autenticazione a due fattori."
+        },
+        "actions": {
+          "menu_label": "Azioni sul membro",
+          "reason_label": "Motivo",
+          "reason_hint": "Obbligatorio, almeno {count} caratteri. Registrato nel log di audit.",
+          "cancel": "Annulla",
+          "failed": "Non è stato possibile completare questa azione. Riprova.",
+          "reset": {
+            "menu": "Reimposta due fattori",
+            "title": "Reimposta i due fattori di {name}",
+            "description": "Questo cancella la sua app di autenticazione e i codici di recupero. Gli verrà chiesto di configurarla di nuovo al prossimo accesso a una pagina protetta e riceverà un avviso di sicurezza via e-mail. L'account richiede ancora i due fattori.",
+            "confirm": "Reimposta",
+            "success": "Due fattori reimpostata. Al membro è stata inviata un'e-mail."
+          },
+          "exempt": {
+            "menu": "Esenta dai due fattori",
+            "title": "Esenta {name} dai due fattori",
+            "description": "Questo rimuove l'obbligo di configurare i due fattori: un abbassamento della sicurezza per questa persona. Se li ha già configurati restano attivi e il codice viene comunque richiesto all'accesso. Il membro riceve un'e-mail e il tuo motivo viene registrato nel log di audit.",
+            "confirm": "Esenta il membro",
+            "success": "Membro esentato dai due fattori. Gli è stata inviata un'e-mail."
+          },
+          "remove_exemption": {
+            "menu": "Rimuovi l'esenzione",
+            "title": "Ripristina i due fattori per {name}",
+            "description": "Questo ripristina l'obbligo dei due fattori. Gli verrà chiesto di configurarli al prossimo accesso a una pagina protetta, se non lo ha già fatto. Il membro riceve un'e-mail e il tuo motivo viene registrato nel log di audit.",
+            "confirm": "Ripristina l'obbligo",
+            "success": "Obbligo dei due fattori ripristinato. Al membro è stata inviata un'e-mail."
+          }
+        }
       }
     }
   }

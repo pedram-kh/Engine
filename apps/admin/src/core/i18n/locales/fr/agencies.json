@@ -61,6 +61,77 @@
         "cancel": "Annuler",
         "success": "Agence réactivée.",
         "failed": "Nous n'avons pas pu réactiver cette agence. Veuillez réessayer."
+      },
+      "members": {
+        "heading": "Membres",
+        "boundary_note": "L'état de la double authentification est affiché uniquement par oui/non. Les administrateurs ne peuvent jamais voir le secret ni les codes de secours d'un membre, générer des codes à sa place, ni effectuer la configuration en son nom.",
+        "search_label": "Rechercher des membres",
+        "load_failed": "Nous n'avons pas pu charger les membres de cette agence. Veuillez actualiser.",
+        "empty": "Aucun membre ne correspond à ce filtre.",
+        "filters": {
+          "all": "Tous les rôles"
+        },
+        "fields": {
+          "name": "Nom",
+          "email": "E-mail",
+          "role": "Rôle",
+          "status": "Statut",
+          "joined": "Membre depuis",
+          "mfa": "Double authentification"
+        },
+        "roles": {
+          "agency_admin": "Admin",
+          "agency_manager": "Manager",
+          "agency_staff": "Personnel"
+        },
+        "status_labels": {
+          "active": "Actif",
+          "pending": "En attente"
+        },
+        "mfa_labels": {
+          "enrolled": "Configurée",
+          "not_enrolled": "Non configurée",
+          "exempt": "Exempté"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Exempté depuis le {date}.",
+          "also_enrolled": "Toujours configurée — un code est encore demandé à la connexion.",
+          "reason": "Motif : {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Ce membre n'a aucune configuration de double authentification à réinitialiser.",
+          "already_exempt": "Ce membre est déjà exempté.",
+          "not_exempt": "Ce membre n'est pas exempté.",
+          "platform_admin_not_exemptable": "Les administrateurs de la plateforme ne peuvent jamais être exemptés de la double authentification."
+        },
+        "actions": {
+          "menu_label": "Actions sur le membre",
+          "reason_label": "Motif",
+          "reason_hint": "Obligatoire, au moins {count} caractères. Enregistré dans le journal d'audit.",
+          "cancel": "Annuler",
+          "failed": "Nous n'avons pas pu effectuer cette action. Veuillez réessayer.",
+          "reset": {
+            "menu": "Réinitialiser la double authentification",
+            "title": "Réinitialiser la double authentification de {name}",
+            "description": "Cela efface l'application d'authentification et les codes de secours. La configuration sera redemandée au prochain accès à une page protégée, et le membre reçoit un avis de sécurité par e-mail. Le compte reste soumis à la double authentification.",
+            "confirm": "Réinitialiser",
+            "success": "Double authentification réinitialisée. Le membre a été prévenu par e-mail."
+          },
+          "exempt": {
+            "menu": "Exempter de la double authentification",
+            "title": "Exempter {name} de la double authentification",
+            "description": "Cela supprime l'obligation de configurer la double authentification — un abaissement de sécurité pour cette personne. Si elle est déjà configurée, elle reste active et un code est encore demandé à la connexion. Le membre est prévenu par e-mail et votre motif est enregistré dans le journal d'audit.",
+            "confirm": "Exempter le membre",
+            "success": "Membre exempté de la double authentification. Il a été prévenu par e-mail."
+          },
+          "remove_exemption": {
+            "menu": "Retirer l'exemption",
+            "title": "Rétablir la double authentification pour {name}",
+            "description": "Cela rétablit l'obligation de double authentification. La configuration sera demandée au prochain accès à une page protégée, si elle n'est pas déjà faite. Le membre est prévenu par e-mail et votre motif est enregistré dans le journal d'audit.",
+            "confirm": "Rétablir l'obligation",
+            "success": "Obligation de double authentification rétablie. Le membre a été prévenu par e-mail."
+          }
+        }
       }
     }
   }

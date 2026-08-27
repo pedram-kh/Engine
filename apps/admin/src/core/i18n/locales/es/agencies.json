@@ -61,6 +61,77 @@
         "cancel": "Cancelar",
         "success": "Agencia reactivada.",
         "failed": "No hemos podido reactivar esta agencia. Inténtalo de nuevo."
+      },
+      "members": {
+        "heading": "Miembros",
+        "boundary_note": "El estado de la verificación en dos pasos se muestra solo como sí/no. Los administradores nunca pueden ver el secreto ni los códigos de recuperación de un miembro, generar códigos en su lugar ni completar la configuración en su nombre.",
+        "search_label": "Buscar miembros",
+        "load_failed": "No pudimos cargar los miembros de esta agencia. Actualiza la página.",
+        "empty": "Ningún miembro coincide con este filtro.",
+        "filters": {
+          "all": "Todos los roles"
+        },
+        "fields": {
+          "name": "Nombre",
+          "email": "Correo electrónico",
+          "role": "Rol",
+          "status": "Estado",
+          "joined": "Se unió",
+          "mfa": "Dos factores"
+        },
+        "roles": {
+          "agency_admin": "Administrador",
+          "agency_manager": "Gestor",
+          "agency_staff": "Personal"
+        },
+        "status_labels": {
+          "active": "Activo",
+          "pending": "Pendiente"
+        },
+        "mfa_labels": {
+          "enrolled": "Configurada",
+          "not_enrolled": "Sin configurar",
+          "exempt": "Exento"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Exento desde el {date}.",
+          "also_enrolled": "Sigue configurada: se le pedirá un código al iniciar sesión.",
+          "reason": "Motivo: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Este miembro no tiene ninguna configuración de dos factores que restablecer.",
+          "already_exempt": "Este miembro ya está exento.",
+          "not_exempt": "Este miembro no está exento.",
+          "platform_admin_not_exemptable": "Los administradores de la plataforma nunca pueden quedar exentos de la verificación en dos pasos."
+        },
+        "actions": {
+          "menu_label": "Acciones del miembro",
+          "reason_label": "Motivo",
+          "reason_hint": "Obligatorio, al menos {count} caracteres. Se registra en el registro de auditoría.",
+          "cancel": "Cancelar",
+          "failed": "No pudimos completar esta acción. Inténtalo de nuevo.",
+          "reset": {
+            "menu": "Restablecer dos factores",
+            "title": "Restablecer dos factores de {name}",
+            "description": "Esto borra su aplicación de autenticación y sus códigos de recuperación. Se le pedirá configurarla de nuevo la próxima vez que acceda a una página protegida y recibirá un aviso de seguridad por correo. La cuenta sigue requiriendo dos factores.",
+            "confirm": "Restablecer",
+            "success": "Dos factores restablecida. Se ha enviado un correo al miembro."
+          },
+          "exempt": {
+            "menu": "Exentar de dos factores",
+            "title": "Exentar a {name} de dos factores",
+            "description": "Esto elimina la obligación de configurar la verificación en dos pasos: una rebaja de seguridad para esta persona. Si ya la tiene configurada, sigue activa y se le pedirá un código al iniciar sesión. Se le envía un correo y tu motivo queda en el registro de auditoría.",
+            "confirm": "Exentar al miembro",
+            "success": "Miembro exento de dos factores. Se le ha enviado un correo."
+          },
+          "remove_exemption": {
+            "menu": "Quitar la exención",
+            "title": "Restaurar dos factores para {name}",
+            "description": "Esto restaura la obligación de dos factores. Se le pedirá configurarla la próxima vez que acceda a una página protegida, si aún no lo ha hecho. Se le envía un correo y tu motivo queda en el registro de auditoría.",
+            "confirm": "Restaurar la obligación",
+            "success": "Obligación de dos factores restaurada. Se ha enviado un correo al miembro."
+          }
+        }
       }
     }
   }

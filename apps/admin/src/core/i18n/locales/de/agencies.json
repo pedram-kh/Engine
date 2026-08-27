@@ -61,6 +61,77 @@
         "cancel": "Abbrechen",
         "success": "Agentur reaktiviert.",
         "failed": "Die Agentur konnte nicht reaktiviert werden. Bitte versuche es erneut."
+      },
+      "members": {
+        "heading": "Mitglieder",
+        "boundary_note": "Der Zwei-Faktor-Status wird nur als Ja/Nein angezeigt. Administratoren können das Zwei-Faktor-Geheimnis und die Wiederherstellungscodes eines Mitglieds niemals sehen, keine Codes für es erzeugen und die Zwei-Faktor-Einrichtung nicht in seinem Namen abschließen.",
+        "search_label": "Mitglieder suchen",
+        "load_failed": "Die Mitglieder dieser Agentur konnten nicht geladen werden. Bitte aktualisiere die Seite.",
+        "empty": "Keine Mitglieder entsprechen diesem Filter.",
+        "filters": {
+          "all": "Alle Rollen"
+        },
+        "fields": {
+          "name": "Name",
+          "email": "E-Mail",
+          "role": "Rolle",
+          "status": "Status",
+          "joined": "Beigetreten",
+          "mfa": "Zwei-Faktor"
+        },
+        "roles": {
+          "agency_admin": "Admin",
+          "agency_manager": "Manager",
+          "agency_staff": "Mitarbeiter"
+        },
+        "status_labels": {
+          "active": "Aktiv",
+          "pending": "Ausstehend"
+        },
+        "mfa_labels": {
+          "enrolled": "Eingerichtet",
+          "not_enrolled": "Nicht eingerichtet",
+          "exempt": "Ausgenommen"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Ausgenommen seit {date}.",
+          "also_enrolled": "Weiterhin eingerichtet — bei der Anmeldung wird weiterhin ein Code verlangt.",
+          "reason": "Grund: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Für dieses Mitglied gibt es keine Zwei-Faktor-Einrichtung zum Zurücksetzen.",
+          "already_exempt": "Dieses Mitglied ist bereits ausgenommen.",
+          "not_exempt": "Dieses Mitglied ist nicht ausgenommen.",
+          "platform_admin_not_exemptable": "Plattform-Administratoren können niemals von der Zwei-Faktor-Authentifizierung ausgenommen werden."
+        },
+        "actions": {
+          "menu_label": "Mitgliedsaktionen",
+          "reason_label": "Grund",
+          "reason_hint": "Erforderlich, mindestens {count} Zeichen. Wird im Auditprotokoll erfasst.",
+          "cancel": "Abbrechen",
+          "failed": "Diese Aktion konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
+          "reset": {
+            "menu": "Zwei-Faktor zurücksetzen",
+            "title": "Zwei-Faktor für {name} zurücksetzen",
+            "description": "Dies löscht die Authenticator-App und die Wiederherstellungscodes. Beim nächsten Zugriff auf eine geschützte Seite wird die Zwei-Faktor-Einrichtung erneut verlangt; das Mitglied erhält einen Sicherheitshinweis per E-Mail. Das Konto benötigt weiterhin Zwei-Faktor.",
+            "confirm": "Zurücksetzen",
+            "success": "Zwei-Faktor zurückgesetzt. Das Mitglied wurde per E-Mail informiert."
+          },
+          "exempt": {
+            "menu": "Von Zwei-Faktor ausnehmen",
+            "title": "{name} von Zwei-Faktor ausnehmen",
+            "description": "Dies entfernt die Pflicht zur Zwei-Faktor-Einrichtung — eine Sicherheitsherabsetzung für diese Person. Eine bereits vorhandene Einrichtung bleibt aktiv und bei der Anmeldung wird weiterhin ein Code verlangt. Das Mitglied wird per E-Mail informiert und dein Grund wird im Auditprotokoll erfasst.",
+            "confirm": "Mitglied ausnehmen",
+            "success": "Mitglied von Zwei-Faktor ausgenommen. Es wurde per E-Mail informiert."
+          },
+          "remove_exemption": {
+            "menu": "Zwei-Faktor-Ausnahme entfernen",
+            "title": "Zwei-Faktor für {name} wiederherstellen",
+            "description": "Dies stellt die Zwei-Faktor-Pflicht wieder her. Beim nächsten Zugriff auf eine geschützte Seite wird die Einrichtung verlangt, falls sie noch nicht erfolgt ist. Das Mitglied wird per E-Mail informiert und dein Grund wird im Auditprotokoll erfasst.",
+            "confirm": "Pflicht wiederherstellen",
+            "success": "Zwei-Faktor-Pflicht wiederhergestellt. Das Mitglied wurde per E-Mail informiert."
+          }
+        }
       }
     }
   }

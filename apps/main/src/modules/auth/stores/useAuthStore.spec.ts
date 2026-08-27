@@ -59,6 +59,7 @@ function makeUser(overrides: Partial<User['attributes']> = {}): User {
       timezone: 'Europe/Lisbon',
       theme_preference: 'system',
       mfa_required: false,
+      mfa_exempt: false,
       two_factor_enabled: false,
       last_login_at: '2026-05-01T08:14:21+00:00',
       created_at: '2026-04-15T09:00:00+00:00',

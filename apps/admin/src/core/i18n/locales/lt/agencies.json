@@ -61,6 +61,77 @@
         "cancel": "Atšaukti",
         "success": "Agentūra reactivated.",
         "failed": "We couldn't reactivate this agency. Please try again."
+      },
+      "members": {
+        "heading": "Nariai",
+        "boundary_note": "Dviejų veiksnių tikrinimo būsena rodoma tik kaip taip/ne. Administratoriai niekada negali matyti nario slaptojo rakto ar atkūrimo kodų, generuoti jam kodų ar užbaigti nustatymo jo vardu.",
+        "search_label": "Ieškoti narių",
+        "load_failed": "Nepavyko įkelti šios agentūros narių. Atnaujinkite puslapį.",
+        "empty": "Šio filtro neatitinka nė vienas narys.",
+        "filters": {
+          "all": "Visi vaidmenys"
+        },
+        "fields": {
+          "name": "Vardas",
+          "email": "El. paštas",
+          "role": "Vaidmuo",
+          "status": "Būsena",
+          "joined": "Prisijungė",
+          "mfa": "Dviejų veiksnių"
+        },
+        "roles": {
+          "agency_admin": "Administratorius",
+          "agency_manager": "Vadovas",
+          "agency_staff": "Darbuotojas"
+        },
+        "status_labels": {
+          "active": "Aktyvus",
+          "pending": "Laukiama"
+        },
+        "mfa_labels": {
+          "enrolled": "Nustatyta",
+          "not_enrolled": "Nenustatyta",
+          "exempt": "Netaikoma"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Išimtis nuo {date}.",
+          "also_enrolled": "Vis dar nustatyta — prisijungiant kodas ir toliau prašomas.",
+          "reason": "Priežastis: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Šis narys neturi dviejų veiksnių tikrinimo, kurį būtų galima atkurti.",
+          "already_exempt": "Šiam nariui išimtis jau pritaikyta.",
+          "not_exempt": "Šiam nariui išimtis nepritaikyta.",
+          "platform_admin_not_exemptable": "Platformos administratoriams niekada negali būti taikoma dviejų veiksnių tikrinimo išimtis."
+        },
+        "actions": {
+          "menu_label": "Nario veiksmai",
+          "reason_label": "Priežastis",
+          "reason_hint": "Būtina, bent {count} simbolių. Įrašoma į audito žurnalą.",
+          "cancel": "Atšaukti",
+          "failed": "Nepavyko atlikti šio veiksmo. Bandykite dar kartą.",
+          "reset": {
+            "menu": "Atkurti dviejų veiksnių",
+            "title": "Atkurti {name} dviejų veiksnių tikrinimą",
+            "description": "Tai ištrina tapatybės nustatymo programą ir atkūrimo kodus. Kitą kartą atidarius apsaugotą puslapį nustatymą reikės atlikti iš naujo, o narys el. paštu gaus saugumo pranešimą. Paskyra vis dar reikalauja dviejų veiksnių tikrinimo.",
+            "confirm": "Atkurti",
+            "success": "Dviejų veiksnių tikrinimas atkurtas. Nariui išsiųstas el. laiškas."
+          },
+          "exempt": {
+            "menu": "Taikyti išimtį",
+            "title": "Taikyti {name} dviejų veiksnių išimtį",
+            "description": "Tai pašalina pareigą nustatyti dviejų veiksnių tikrinimą — šio žmogaus saugumo sumažinimas. Jei jis jau nustatytas, jis lieka aktyvus ir kodas prisijungiant vis dar prašomas. Narys gauna el. laišką, o jūsų priežastis įrašoma į audito žurnalą.",
+            "confirm": "Taikyti nariui išimtį",
+            "success": "Nariui pritaikyta dviejų veiksnių išimtis. Jam išsiųstas el. laiškas."
+          },
+          "remove_exemption": {
+            "menu": "Pašalinti išimtį",
+            "title": "Grąžinti {name} dviejų veiksnių reikalavimą",
+            "description": "Tai grąžina dviejų veiksnių tikrinimo pareigą. Nustatymo bus paprašyta kitą kartą atidarius apsaugotą puslapį, jei jis dar neatliktas. Narys gauna el. laišką, o jūsų priežastis įrašoma į audito žurnalą.",
+            "confirm": "Grąžinti reikalavimą",
+            "success": "Dviejų veiksnių reikalavimas grąžintas. Nariui išsiųstas el. laiškas."
+          }
+        }
       }
     }
   }

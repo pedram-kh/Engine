@@ -61,6 +61,77 @@
         "cancel": "Prekliči",
         "success": "Agencija reaktivována.",
         "failed": "Ni uspelo reaktivovat tuto agenturu. Zkuste to znova."
+      },
+      "members": {
+        "heading": "Člani",
+        "boundary_note": "Stanje dvostopenjskega preverjanja je prikazano samo kot da/ne. Skrbniki nikoli ne morejo videti skrivnega ključa ali obnovitvenih kod člana, zanj ustvariti kod ali namesto njega zaključiti nastavitve.",
+        "search_label": "Iskanje članov",
+        "load_failed": "Članov te agencije ni bilo mogoče naložiti. Osvežite stran.",
+        "empty": "Temu filtru ne ustreza noben član.",
+        "filters": {
+          "all": "Vse vloge"
+        },
+        "fields": {
+          "name": "Ime",
+          "email": "E-pošta",
+          "role": "Vloga",
+          "status": "Stanje",
+          "joined": "Pridružil se",
+          "mfa": "Dvostopenjsko preverjanje"
+        },
+        "roles": {
+          "agency_admin": "Skrbnik",
+          "agency_manager": "Vodja",
+          "agency_staff": "Sodelavec"
+        },
+        "status_labels": {
+          "active": "Aktiven",
+          "pending": "V čakanju"
+        },
+        "mfa_labels": {
+          "enrolled": "Nastavljeno",
+          "not_enrolled": "Ni nastavljeno",
+          "exempt": "Izvzet"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Izvzet od {date}.",
+          "also_enrolled": "Še vedno nastavljeno — pri prijavi je koda še vedno zahtevana.",
+          "reason": "Razlog: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Ta član nima nastavljenega dvostopenjskega preverjanja za ponastavitev.",
+          "already_exempt": "Ta član je že izvzet.",
+          "not_exempt": "Ta član ni izvzet.",
+          "platform_admin_not_exemptable": "Skrbniki platforme nikoli ne morejo biti izvzeti iz dvostopenjskega preverjanja."
+        },
+        "actions": {
+          "menu_label": "Dejanja za člana",
+          "reason_label": "Razlog",
+          "reason_hint": "Obvezno, najmanj {count} znakov. Zabeleži se v revizijski dnevnik.",
+          "cancel": "Prekliči",
+          "failed": "Tega dejanja ni bilo mogoče zaključiti. Poskusite znova.",
+          "reset": {
+            "menu": "Ponastavi dvostopenjsko preverjanje",
+            "title": "Ponastavi dvostopenjsko preverjanje za {name}",
+            "description": "S tem se izbrišeta aplikacija za preverjanje in obnovitvene kode. Ob naslednjem obisku zaščitene strani bo nastavitev znova zahtevana, član pa po e-pošti prejme varnostno obvestilo. Račun dvostopenjsko preverjanje še vedno zahteva.",
+            "confirm": "Ponastavi",
+            "success": "Dvostopenjsko preverjanje ponastavljeno. Član je prejel e-pošto."
+          },
+          "exempt": {
+            "menu": "Izvzemi iz dvostopenjskega preverjanja",
+            "title": "Izvzemi {name} iz dvostopenjskega preverjanja",
+            "description": "S tem se odpravi obveznost nastavitve dvostopenjskega preverjanja — poslabšanje varnosti te osebe. Če ga že ima nastavljeno, ostane aktivno in koda je pri prijavi še vedno zahtevana. Član prejme e-pošto, vaš razlog pa se zabeleži v revizijski dnevnik.",
+            "confirm": "Izvzemi člana",
+            "success": "Član je izvzet iz dvostopenjskega preverjanja. Prejel je e-pošto."
+          },
+          "remove_exemption": {
+            "menu": "Odstrani izvzetje",
+            "title": "Obnovi dvostopenjsko preverjanje za {name}",
+            "description": "S tem se obnovi obveznost dvostopenjskega preverjanja. Nastavitev bo zahtevana ob naslednjem obisku zaščitene strani, če je še ni. Član prejme e-pošto, vaš razlog pa se zabeleži v revizijski dnevnik.",
+            "confirm": "Obnovi obveznost",
+            "success": "Obveznost dvostopenjskega preverjanja obnovljena. Član je prejel e-pošto."
+          }
+        }
       }
     }
   }

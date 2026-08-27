@@ -106,9 +106,13 @@ export async function requireGuest(ctx: GuardContext): Promise<GuardResult> {
 }
 
 /**
- * Routes that require the user to have MFA enrolled. Distinct from
- * `requireAuth`: a user with no MFA enrolment passes `requireAuth` but
- * fails this guard and is bounced to the enable-2fa page.
+ * PRECONDITION gate: this page only makes sense for an enrolled user.
+ *
+ * Its one caller is `auth.2fa.disable` — you cannot disable 2FA you never
+ * set up. This is NOT the policy gate, and it deliberately does not know
+ * about exemptions (AH-087): an exempt, un-enrolled user has nothing to
+ * disable, so sending them to the disable page would be incoherent. The
+ * policy gate is `requireMfaUnlessExempt` below.
  *
  * Composes safely with `requireAuth` declared earlier in the chain — by
  * the time this runs, `bootstrap()` has already resolved and `user`
@@ -122,6 +126,53 @@ export async function requireMfaEnrolled(ctx: GuardContext): Promise<GuardResult
     // requireMfaEnrolled was composed without requireAuth ahead of it,
     // fall through to the sign-in redirect rather than crashing.
     return { name: 'auth.sign-in' }
+  }
+
+  if (!store.isMfaEnrolled) {
+    return { name: 'auth.2fa.enable' }
+  }
+
+  return null
+}
+
+/**
+ * POLICY gate (AH-087): the admin-sensitive agency routes require 2FA
+ * enrollment UNLESS a platform admin has exempted this user.
+ *
+ * Split out of `requireMfaEnrolled` because that guard was doing two
+ * different jobs — a policy gate on the admin-sensitive routes and a
+ * precondition gate on the self-service disable page — and only the policy
+ * half can honour an exemption. Branching on the route name inside one
+ * guard was rejected: a per-user data field is available, and route-name
+ * branching inside a security gate hides the distinction it is making.
+ *
+ * INERTNESS (the AH-087 review's first priority): `mfa_exempt` is the
+ * `users.mfa_exempted_at !== null` projection, and that column is NULL for
+ * every user who has not been explicitly exempted — no backfill, no
+ * default flip. So for the entire existing population this guard evaluates
+ * `!isMfaEnrolled && !isMfaExempt`, which is exactly what
+ * `requireMfaEnrolled` evaluated before: same redirect, same target, same
+ * order. The exemption branch can only fire for a user an admin acted on.
+ *
+ * This gate is CLIENT-SIDE ONLY, and so is the requirement it enforces:
+ * no server-side middleware has ever required 2FA enrollment on an agency
+ * route (only the admin guard's `EnsureMfaForAdmins` does, for platform
+ * admins, unconditionally and without consulting exemptions). Recorded in
+ * docs/tech-debt.md — before MFA is presented to agencies or compliance as
+ * a security control, the server-side gate must ship and this branch moves
+ * into it.
+ */
+export async function requireMfaUnlessExempt(ctx: GuardContext): Promise<GuardResult> {
+  const { store } = ctx
+
+  if (store.user === null) {
+    // Defensive: same posture as requireMfaEnrolled — fall through to
+    // sign-in rather than crashing if composed without requireAuth.
+    return { name: 'auth.sign-in' }
+  }
+
+  if (store.isMfaExempt) {
+    return null
   }
 
   if (!store.isMfaEnrolled) {
@@ -279,6 +330,7 @@ export const guards: Record<
   | 'requireAuth'
   | 'requireGuest'
   | 'requireMfaEnrolled'
+  | 'requireMfaUnlessExempt'
   | 'requireAgencyAdmin'
   | 'requireOnboardingAccess'
   | 'requireAgencyUser',
@@ -287,6 +339,7 @@ export const guards: Record<
   requireAuth,
   requireGuest,
   requireMfaEnrolled,
+  requireMfaUnlessExempt,
   requireAgencyAdmin,
   requireOnboardingAccess,
   requireAgencyUser,

@@ -61,6 +61,77 @@
         "cancel": "Tühista",
         "success": "Agentuur reactivated.",
         "failed": "We couldn't reactivate this agency. Please try again."
+      },
+      "members": {
+        "heading": "Liikmed",
+        "boundary_note": "Kaheastmelise kinnitamise olek kuvatakse ainult jah/ei kujul. Administraatorid ei saa kunagi näha liikme salajast võtit ega taastekoode, luua talle koode ega viia seadistust tema eest lõpuni.",
+        "search_label": "Otsi liikmeid",
+        "load_failed": "Selle agentuuri liikmeid ei õnnestunud laadida. Värskendage lehte.",
+        "empty": "Ükski liige ei vasta sellele filtrile.",
+        "filters": {
+          "all": "Kõik rollid"
+        },
+        "fields": {
+          "name": "Nimi",
+          "email": "E-post",
+          "role": "Roll",
+          "status": "Olek",
+          "joined": "Liitus",
+          "mfa": "Kaheastmeline"
+        },
+        "roles": {
+          "agency_admin": "Administraator",
+          "agency_manager": "Juht",
+          "agency_staff": "Töötaja"
+        },
+        "status_labels": {
+          "active": "Aktiivne",
+          "pending": "Ootel"
+        },
+        "mfa_labels": {
+          "enrolled": "Seadistatud",
+          "not_enrolled": "Pole seadistatud",
+          "exempt": "Vabastatud"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Vabastatud alates {date}.",
+          "also_enrolled": "Endiselt seadistatud — sisselogimisel küsitakse jätkuvalt koodi.",
+          "reason": "Põhjus: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Sellel liikmel pole kaheastmelist kinnitamist, mida lähtestada.",
+          "already_exempt": "See liige on juba vabastatud.",
+          "not_exempt": "See liige ei ole vabastatud.",
+          "platform_admin_not_exemptable": "Platvormi administraatoreid ei saa kunagi kaheastmelisest kinnitamisest vabastada."
+        },
+        "actions": {
+          "menu_label": "Liikme toimingud",
+          "reason_label": "Põhjus",
+          "reason_hint": "Kohustuslik, vähemalt {count} tähemärki. Salvestatakse auditilogisse.",
+          "cancel": "Loobu",
+          "failed": "Seda toimingut ei õnnestunud lõpetada. Proovige uuesti.",
+          "reset": {
+            "menu": "Lähtesta kaheastmeline",
+            "title": "Lähtesta {name} kaheastmeline kinnitamine",
+            "description": "See kustutab autentimisrakenduse ja taastekoodid. Järgmisel kaitstud lehe avamisel tuleb seadistus uuesti teha ja liige saab e-kirjaga turvateate. Konto nõuab endiselt kaheastmelist kinnitamist.",
+            "confirm": "Lähtesta",
+            "success": "Kaheastmeline kinnitamine lähtestatud. Liikmele saadeti e-kiri."
+          },
+          "exempt": {
+            "menu": "Vabasta kaheastmelisest",
+            "title": "Vabasta {name} kaheastmelisest kinnitamisest",
+            "description": "See eemaldab kohustuse kaheastmeline kinnitamine seadistada — turvalisuse alandamine selle inimese jaoks. Kui see on juba seadistatud, jääb see aktiivseks ja koodi küsitakse sisselogimisel edasi. Liige saab e-kirja ja teie põhjus salvestatakse auditilogisse.",
+            "confirm": "Vabasta liige",
+            "success": "Liige vabastati kaheastmelisest kinnitamisest. Talle saadeti e-kiri."
+          },
+          "remove_exemption": {
+            "menu": "Eemalda vabastus",
+            "title": "Taasta {name} kaheastmeline kinnitamine",
+            "description": "See taastab kaheastmelise kinnitamise kohustuse. Seadistust küsitakse järgmisel kaitstud lehe avamisel, kui seda veel pole. Liige saab e-kirja ja teie põhjus salvestatakse auditilogisse.",
+            "confirm": "Taasta kohustus",
+            "success": "Kaheastmelise kinnitamise kohustus taastatud. Liikmele saadeti e-kiri."
+          }
+        }
       }
     }
   }

@@ -41,6 +41,7 @@ import {
   requireAuth,
   requireGuest,
   requireMfaEnrolled,
+  requireMfaUnlessExempt,
   requireAgencyAdmin,
   requireOnboardingAccess,
   requireAgencyUser,
@@ -54,6 +55,7 @@ interface StoreOverrides {
   bootstrapStatus?: AuthStore['bootstrapStatus']
   mfaEnrollmentRequired?: AuthStore['mfaEnrollmentRequired']
   isMfaEnrolled?: AuthStore['isMfaEnrolled']
+  isMfaExempt?: AuthStore['isMfaExempt']
   bootstrap?: AuthStore['bootstrap']
 }
 
@@ -63,6 +65,10 @@ function makeStore(overrides: StoreOverrides = {}): AuthStore {
     bootstrapStatus: overrides.bootstrapStatus ?? 'ready',
     mfaEnrollmentRequired: overrides.mfaEnrollmentRequired ?? false,
     isMfaEnrolled: overrides.isMfaEnrolled ?? false,
+    // AH-087: the store getter defaults to false when the payload has no
+    // `mfa_exempt` (unknown answer keeps the gate closed), so the stub
+    // default mirrors the production default rather than being permissive.
+    isMfaExempt: overrides.isMfaExempt ?? false,
     bootstrap: overrides.bootstrap ?? vi.fn(async () => undefined),
   } as unknown as AuthStore
 }
@@ -84,6 +90,7 @@ function makeRoute(name: string, fullPath: string = `/${name}`): RouteLocationNo
 function makeUser(
   overrides: Partial<{
     two_factor_enabled: boolean
+    mfa_exempt: boolean
     user_type: 'creator' | 'agency_user' | 'platform_admin' | 'brand_user'
   }> = {},
 ) {
@@ -94,6 +101,7 @@ function makeUser(
       email: 'a@b.c',
       user_type: overrides.user_type ?? 'creator',
       two_factor_enabled: overrides.two_factor_enabled ?? false,
+      mfa_exempt: overrides.mfa_exempt ?? false,
     },
   } as unknown as NonNullable<AuthStore['user']>
 }
@@ -205,6 +213,104 @@ describe('requireMfaEnrolled', () => {
   it('redirects to auth.sign-in when no user is signed in (defensive fall-through)', async () => {
     const store = makeStore({ user: null, isMfaEnrolled: false })
     const result = await requireMfaEnrolled(makeCtx(store, makeRoute('app.dashboard', '/')))
+    expect(result).toEqual({ name: 'auth.sign-in' })
+  })
+
+  /**
+   * AH-087 — the precondition gate must NOT honour an exemption. Its only
+   * caller is the 2FA-disable page: an exempt, un-enrolled user sent there
+   * would land on a page with nothing to disable.
+   */
+  it('still redirects an EXEMPT un-enrolled user (the precondition gate ignores exemptions)', async () => {
+    const store = makeStore({
+      user: makeUser({ two_factor_enabled: false, mfa_exempt: true }),
+      isMfaEnrolled: false,
+      isMfaExempt: true,
+    })
+    const result = await requireMfaEnrolled(
+      makeCtx(store, makeRoute('auth.2fa.disable', '/auth/2fa/disable')),
+    )
+    expect(result).toEqual({ name: 'auth.2fa.enable' })
+  })
+})
+
+/**
+ * AH-087 — the MFA POLICY gate, and the chunk's central inertness proof.
+ *
+ * The first two cases below are the whole risk of this chunk: for every user
+ * who has NOT been explicitly exempted (which, at deploy, is every user —
+ * `users.mfa_exempted_at` is NULL for the entire population and nothing
+ * backfills it), this guard must behave exactly as `requireMfaEnrolled` did.
+ * Same allow, same redirect, same target.
+ */
+describe('requireMfaUnlessExempt', () => {
+  it('INERTNESS: a non-exempt enrolled user is allowed, exactly as before', async () => {
+    const store = makeStore({
+      user: makeUser({ two_factor_enabled: true }),
+      isMfaEnrolled: true,
+      isMfaExempt: false,
+    })
+    const result = await requireMfaUnlessExempt(
+      makeCtx(store, makeRoute('agency-users.list', '/agency-users')),
+    )
+    expect(result).toBeNull()
+  })
+
+  it('INERTNESS: a non-exempt un-enrolled user is redirected to auth.2fa.enable, exactly as before', async () => {
+    const store = makeStore({
+      user: makeUser({ two_factor_enabled: false }),
+      isMfaEnrolled: false,
+      isMfaExempt: false,
+    })
+    const result = await requireMfaUnlessExempt(
+      makeCtx(store, makeRoute('agency-users.list', '/agency-users')),
+    )
+    expect(result).toEqual({ name: 'auth.2fa.enable' })
+  })
+
+  it('matches requireMfaEnrolled for every non-exempt combination (byte-identical default population)', async () => {
+    for (const enrolled of [true, false]) {
+      const overrides = {
+        user: makeUser({ two_factor_enabled: enrolled }),
+        isMfaEnrolled: enrolled,
+        isMfaExempt: false,
+      }
+      const route = makeRoute('agency-users.list', '/agency-users')
+      const legacy = await requireMfaEnrolled(makeCtx(makeStore(overrides), route))
+      const policy = await requireMfaUnlessExempt(makeCtx(makeStore(overrides), route))
+      expect(policy).toEqual(legacy)
+    }
+  })
+
+  it('allows an EXEMPT un-enrolled user through (the only behavioural change)', async () => {
+    const store = makeStore({
+      user: makeUser({ two_factor_enabled: false, mfa_exempt: true }),
+      isMfaEnrolled: false,
+      isMfaExempt: true,
+    })
+    const result = await requireMfaUnlessExempt(
+      makeCtx(store, makeRoute('agency-users.list', '/agency-users')),
+    )
+    expect(result).toBeNull()
+  })
+
+  it('allows an EXEMPT enrolled user through (exemption removes the requirement, not the enrollment)', async () => {
+    const store = makeStore({
+      user: makeUser({ two_factor_enabled: true, mfa_exempt: true }),
+      isMfaEnrolled: true,
+      isMfaExempt: true,
+    })
+    const result = await requireMfaUnlessExempt(
+      makeCtx(store, makeRoute('agency-users.list', '/agency-users')),
+    )
+    expect(result).toBeNull()
+  })
+
+  it('redirects to auth.sign-in when no user is signed in (defensive fall-through)', async () => {
+    const store = makeStore({ user: null, isMfaEnrolled: false, isMfaExempt: true })
+    const result = await requireMfaUnlessExempt(
+      makeCtx(store, makeRoute('agency-users.list', '/agency-users')),
+    )
     expect(result).toEqual({ name: 'auth.sign-in' })
   })
 })
@@ -373,6 +479,7 @@ describe('guards registry', () => {
     expect(guards.requireAuth).toBe(requireAuth)
     expect(guards.requireGuest).toBe(requireGuest)
     expect(guards.requireMfaEnrolled).toBe(requireMfaEnrolled)
+    expect(guards.requireMfaUnlessExempt).toBe(requireMfaUnlessExempt)
     expect(guards.requireAgencyAdmin).toBe(requireAgencyAdmin)
     expect(guards.requireOnboardingAccess).toBe(requireOnboardingAccess)
     expect(guards.requireAgencyUser).toBe(requireAgencyUser)

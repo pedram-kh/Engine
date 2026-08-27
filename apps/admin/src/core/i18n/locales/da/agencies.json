@@ -61,6 +61,77 @@
         "cancel": "Annuller",
         "success": "Bureau genaktiveret.",
         "failed": "Dette bureau kunne ikke genaktiveres. Prøv igen."
+      },
+      "members": {
+        "heading": "Medlemmer",
+        "boundary_note": "Tofaktorstatus vises kun som ja/nej. Administratorer kan aldrig se et medlems tofaktorhemmelighed eller gendannelseskoder, generere koder for medlemmet eller fuldføre opsætningen på medlemmets vegne.",
+        "search_label": "Søg medlemmer",
+        "load_failed": "Vi kunne ikke indlæse dette bureaus medlemmer. Opdater siden.",
+        "empty": "Ingen medlemmer matcher dette filter.",
+        "filters": {
+          "all": "Alle roller"
+        },
+        "fields": {
+          "name": "Navn",
+          "email": "E-mail",
+          "role": "Rolle",
+          "status": "Status",
+          "joined": "Tilmeldt",
+          "mfa": "Tofaktor"
+        },
+        "roles": {
+          "agency_admin": "Administrator",
+          "agency_manager": "Manager",
+          "agency_staff": "Medarbejder"
+        },
+        "status_labels": {
+          "active": "Aktiv",
+          "pending": "Afventer"
+        },
+        "mfa_labels": {
+          "enrolled": "Opsat",
+          "not_enrolled": "Ikke opsat",
+          "exempt": "Undtaget"
+        },
+        "mfa_tooltip": {
+          "exempt_since": "Undtaget siden {date}.",
+          "also_enrolled": "Stadig opsat — der bliver stadig bedt om en kode ved login.",
+          "reason": "Årsag: {reason}"
+        },
+        "errors": {
+          "nothing_to_reset": "Dette medlem har ingen tofaktoropsætning at nulstille.",
+          "already_exempt": "Dette medlem er allerede undtaget.",
+          "not_exempt": "Dette medlem er ikke undtaget.",
+          "platform_admin_not_exemptable": "Platformsadministratorer kan aldrig undtages fra tofaktorgodkendelse."
+        },
+        "actions": {
+          "menu_label": "Medlemshandlinger",
+          "reason_label": "Årsag",
+          "reason_hint": "Påkrævet, mindst {count} tegn. Registreres i revisionsloggen.",
+          "cancel": "Annuller",
+          "failed": "Vi kunne ikke gennemføre denne handling. Prøv igen.",
+          "reset": {
+            "menu": "Nulstil tofaktor",
+            "title": "Nulstil tofaktor for {name}",
+            "description": "Dette sletter godkendelsesappen og gendannelseskoderne. Medlemmet skal opsætte tofaktor igen næste gang det åbner en beskyttet side og får en sikkerhedsbesked på e-mail. Kontoen kræver stadig tofaktor.",
+            "confirm": "Nulstil",
+            "success": "Tofaktor nulstillet. Medlemmet har fået en e-mail."
+          },
+          "exempt": {
+            "menu": "Undtag fra tofaktor",
+            "title": "Undtag {name} fra tofaktor",
+            "description": "Dette fjerner kravet om at opsætte tofaktor — en sikkerhedsforringelse for denne person. Er det allerede opsat, forbliver det aktivt, og der bliver stadig bedt om en kode ved login. Medlemmet får en e-mail, og din årsag registreres i revisionsloggen.",
+            "confirm": "Undtag medlem",
+            "success": "Medlem undtaget fra tofaktor. Medlemmet har fået en e-mail."
+          },
+          "remove_exemption": {
+            "menu": "Fjern undtagelsen",
+            "title": "Gendan tofaktor for {name}",
+            "description": "Dette gendanner kravet om tofaktor. Medlemmet bliver bedt om at opsætte det næste gang det åbner en beskyttet side, hvis det ikke allerede er sket. Medlemmet får en e-mail, og din årsag registreres i revisionsloggen.",
+            "confirm": "Gendan kravet",
+            "success": "Kravet om tofaktor er gendannet. Medlemmet har fået en e-mail."
+          }
+        }
       }
     }
   }

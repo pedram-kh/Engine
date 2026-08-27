@@ -97,6 +97,15 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isMfaEnrolled = computed(() => user.value?.attributes.two_factor_enabled ?? false)
 
+  /**
+   * AH-087 — whether a platform admin has exempted this user from the
+   * 2FA-enrollment requirement. Read by `requireMfaUnlessExempt`.
+   *
+   * Defaults to `false` when absent (no user, or a payload predating the
+   * field), so an unknown answer keeps the gate closed.
+   */
+  const isMfaExempt = computed(() => user.value?.attributes.mfa_exempt ?? false)
+
   // ---------------------------------------------------------------
   // Actions — identity primitives
   // ---------------------------------------------------------------
@@ -421,6 +430,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     userType,
     isMfaEnrolled,
+    isMfaExempt,
     // actions
     setUser,
     clearUser,
