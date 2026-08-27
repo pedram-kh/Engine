@@ -62,8 +62,8 @@ it('renders the invitation mail in English', function (): void {
         ->toContain('Acme Agency')
         ->toContain('Alice Admin')
         ->toContain('agency/sign-in?token=abc123&amp;agency=01ABCDEF')
-        ->not->toContain('accept-invitation')
-        ->toContain('7'); // expiry days
+        ->toContain('7') // expiry days
+        ->and($result['body'])->not->toContain('accept-invitation');
 });
 
 it('renders the invitation mail in Portuguese', function (): void {

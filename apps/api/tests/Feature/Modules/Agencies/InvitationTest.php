@@ -58,8 +58,8 @@ it('AH-086b: the queued invite mail\'s magic link points at /agency/sign-in, car
     Mail::assertQueued(InviteAgencyUserMail::class, function (InviteAgencyUserMail $mail) use ($agency): bool {
         expect($mail->acceptUrl)
             ->toContain('/agency/sign-in?token=')
-            ->toContain('&agency='.$agency->ulid)
-            ->not->toContain('/accept-invitation');
+            ->and($mail->acceptUrl)->toContain('&agency='.$agency->ulid)
+            ->and($mail->acceptUrl)->not->toContain('/accept-invitation');
 
         return true;
     });
