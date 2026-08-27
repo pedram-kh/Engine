@@ -104,7 +104,11 @@ it('connects the creator, audits as SYSTEM naming the rule, and bumps the fire t
     expect($audit->actor_type)->toBe('system')
         ->and($audit->actor_id)->toBeNull()
         ->and($audit->reason)->toContain("rule #{$rule->id}")
-        ->and($audit->reason)->toContain('Approved → Northwind Talent');
+        ->and($audit->reason)->toContain('Approved → Northwind Talent')
+        // Q4 — provenance beyond "not a human". The reason string names the rule
+        // in prose; this is what makes "what did rule X ever do" a QUERY.
+        ->and($audit->metadata['fired_by'] ?? null)->toBe('automation')
+        ->and($audit->metadata['automation_rule_id'] ?? null)->toBe($rule->ulid);
 
     // The cheap trace an operator reads instead of the audit log (D5).
     $rule->refresh();

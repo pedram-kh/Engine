@@ -80,6 +80,18 @@ final class CreatorAgencyDirectConnectService
      *                                       instead of elevated. The automation
      *                                       passes true; the human path never
      *                                       does.
+     * @param  string|null  $firedByRuleUlid  AH-090 Q4 — the automation rule's
+     *                                        ULID, stamped into the audit
+     *                                        metadata as provenance.
+     *                                        `actor_type: system` says "no human
+     *                                        did this"; it does not say WHICH
+     *                                        rule, and without the id the audit
+     *                                        log cannot answer "what did this
+     *                                        rule ever do" — the reason string
+     *                                        names the rule in prose, which is
+     *                                        not a filter. A ULID, not the model:
+     *                                        rules live in the Admin module and
+     *                                        Creators does not depend on it.
      */
     public function connect(
         Creator $creator,
@@ -87,6 +99,7 @@ final class CreatorAgencyDirectConnectService
         ?User $actor,
         string $reason,
         bool $skipTerminalRelations = false,
+        ?string $firedByRuleUlid = null,
     ): DirectConnectResult {
         if ($creator->application_status !== ApplicationStatus::Approved) {
             return DirectConnectResult::refused(DirectConnectOutcome::CreatorNotApproved);
@@ -104,7 +117,7 @@ final class CreatorAgencyDirectConnectService
             return DirectConnectResult::refused(DirectConnectOutcome::AgencySuspended);
         }
 
-        return $this->tenancy->runAs($agency->id, function () use ($creator, $agency, $actor, $reason, $skipTerminalRelations): DirectConnectResult {
+        return $this->tenancy->runAs($agency->id, function () use ($creator, $agency, $actor, $reason, $skipTerminalRelations, $firedByRuleUlid): DirectConnectResult {
             $relation = AgencyCreatorRelation::query()
                 ->where('agency_id', $agency->id)
                 ->where('creator_id', $creator->id)
@@ -131,7 +144,7 @@ final class CreatorAgencyDirectConnectService
 
             $wasNetNew = $relation === null;
 
-            $relation = DB::transaction(function () use ($relation, $agency, $creator, $actor, $reason): AgencyCreatorRelation {
+            $relation = DB::transaction(function () use ($relation, $agency, $creator, $actor, $reason, $firedByRuleUlid): AgencyCreatorRelation {
                 if ($relation === null) {
                     $relation = AgencyCreatorRelation::query()->create([
                         'agency_id' => $agency->id,
@@ -155,7 +168,16 @@ final class CreatorAgencyDirectConnectService
                     actor: $actor,
                     subject: $relation,
                     reason: $reason,
-                    metadata: ['agency_id' => $agency->ulid, 'mode' => 'direct'],
+                    metadata: [
+                        'agency_id' => $agency->ulid,
+                        'mode' => 'direct',
+                        // Present ONLY on an automated fire, so the absence of
+                        // these keys is itself the signal that a human chose it.
+                        ...($firedByRuleUlid === null ? [] : [
+                            'fired_by' => 'automation',
+                            'automation_rule_id' => $firedByRuleUlid,
+                        ]),
+                    ],
                     agencyId: $agency->id,
                     actorType: $actor === null ? 'system' : null,
                 );

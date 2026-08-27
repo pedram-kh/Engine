@@ -102,7 +102,12 @@ it('connects a net-new pair: roster, admin provenance, reason-bearing audit, dua
     expect($audit->actor_id)->toBe($admin->id)
         ->and($audit->actor_type)->toBe('user')
         ->and($audit->agency_id)->toBe($agency->id)
-        ->and($audit->reason)->toBe('An offline representation agreement, signed.');
+        ->and($audit->reason)->toBe('An offline representation agreement, signed.')
+        // The negative half of AH-090 Q4: the automation keys are ABSENT on a
+        // human connect, so their presence is itself the provenance signal. A
+        // fire that forgot to pass the rule ULID would look human here.
+        ->and($audit->metadata)->not->toHaveKey('fired_by')
+        ->and($audit->metadata)->not->toHaveKey('automation_rule_id');
 
     Mail::assertQueued(AdminConnectedMail::class, 1);
     expect(Notification::query()

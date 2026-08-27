@@ -159,6 +159,10 @@ final class RunAutomationRuleJob implements ShouldQueue
             // elevates those, because a human choosing IS the consent the
             // elevation encodes; the asymmetry is the point.
             skipTerminalRelations: true,
+            // Q4 — provenance. `actor_type: system` says no human did this; the
+            // rule ULID is what makes "what did THIS rule ever do" a query
+            // rather than a prose search through reason strings.
+            firedByRuleUlid: $rule->ulid,
         );
 
         if ($result->outcome === DirectConnectOutcome::Connected) {
