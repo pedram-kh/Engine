@@ -301,10 +301,18 @@ blank it from the UI.
 entry, data model, tech debt, deploy` (this file, the AH-088 log entry, the data-model row, two
   tech-debt entries, the deploy-log PENDING entry, and the inventory's forward-pointer) — both on
   top of `04a2ecec` (the AH-088 read-only inventory).
-- **Push:** done. **CI green at the pushed tip (§5.41):** cited by run URL in a small follow-up
-  commit per the house convention (`e9a41917`'s precedent) — a pushed commit's own hash is not
-  self-referenced inside it, so the tip hash and the run URL are recorded together, once, in that
-  follow-up rather than here.
+- **Push:** done. **CI at the pushed tip (§5.41):** the first run,
+  [`33044099156`](https://github.com/pedram-kh/Engine/actions/runs/33044099156) at `b6e03aea`,
+  **failed** — not on anything this chunk touched, but §5.41 draws no exception for that: a red CI
+  reopens the chunk regardless of how unrelated the failure looks. The cause was
+  `EmailVerificationTokenTest`'s tamper helper comparing a whole multi-character base64url segment
+  to the single-character string `'a'` (a comparison that is never true) instead of that segment's
+  first character — so on the roughly-1-in-64 run where the real first character actually was `'a'`,
+  the "tampered" segment was byte-for-byte identical to the original and `->toBeFalse()` failed on a
+  true assertion. Fixed at both sites, verified with 60 consecutive local runs (0 failures) before
+  repushing, in `ad696308` — its own run,
+  [`33045135681`](https://github.com/pedram-kh/Engine/actions/runs/33045135681), is **green: all
+  four jobs (Backend, Frontend, and both Playwright E2E suites)**. **Tip:** `ad696308`.
 - **Deploy obligations:** one migration **plus a required post-deploy
   `php artisan creators:recompute-completeness`** that writes to ~279 rows. Full checklist, including
   the pre/post reads that make the score drop verifiable, is the AH-088 entry in
