@@ -7,7 +7,13 @@
   Q1–Q7) and [`admin-automations-inventory.md`](admin-automations-inventory.md).
 - **Commits:** `f31d7c7b` (the service extraction + the D3 guard) · `1c996c77` (table, flag, job,
   hook) · `1a4e0a1f` (CRUD, `?for=select`, SPA) · `f4ac735c` (the Q4 provenance stamp) · `4a3f2c6c` +
-  `55663b26` (the docs pass) · this close.
+  `55663b26` (the docs pass) · `281f88fb` (this close) · `8241be30` (a carried CI fix, unrelated to
+  this chunk's diff — see §9).
+- **CI at the pushed tip (§5.41):** green —
+  [run `33070701330`](https://github.com/pedram-kh/Engine/actions/runs/33070701330) at `8241be30`. The
+  close's own push (`281f88fb`, [run `33069766972`](https://github.com/pedram-kh/Engine/actions/runs/33069766972))
+  redded on an unrelated file; per §5.41 that reopened the chunk rather than being waved through, and
+  the fix that closed it again is `8241be30` — see §9.
 - **Reviewed against:** `WORKING-PROCESS.md`, `PROJECT-WORKFLOW.md` §5 (references cited inline),
   `02-CONVENTIONS.md` §2.3/§2.8/§2.13/§2.16/§3.5, `security/tenancy.md` §4, `feature-flags.md`,
   `tech-debt.md`.
@@ -394,6 +400,20 @@ recorded in §2 with the reasoning each was ratified in, not just the outcome. S
   fixture-less admin suite as its recorded reason) — are ratified as accurate self-assessment, not
   understated risk.
 
+**§5.41, discharged.** The close's own push redded CI at the tip
+([run `33069766972`](https://github.com/pedram-kh/Engine/actions/runs/33069766972)) — Larastan, in
+`CampaignAssignmentContractTest.php`, a file no commit in this chunk touches. Per the standard, an
+unrelated-looking failure is exactly the case it exists to catch, not a reason to wave it through: the
+chunk was treated as reopened. Diagnosis: the file called `Event::fake()` / `Event::assertDispatched()`
+bare, with no `use` import, resolving `\Event` only via Laravel's runtime global facade alias — a
+resolution path that held locally (reproduced directly against the file alone, cache cleared) but not
+in CI's fresh container. Every other `Event::fake`/`assertDispatched`/`assertNotDispatched` call site in
+the codebase was grepped; this was the only one missing the import. Fixed at the one site (`8241be30`),
+which removes the dependency on runtime aliasing in either environment. The next push's CI is green —
+[run `33070701330`](https://github.com/pedram-kh/Engine/actions/runs/33070701330) at `8241be30` — with
+the tracked `admin-sign-in.spec.ts` flake (§6) reproducing on attempt #1 and clearing on Playwright's own
+retry, exactly the pattern §6 names; not a second incident.
+
 **Provenance:** reviewed and closed by Pedram, 2026-08-27. Built by Cursor against the ratified plan
 (`admin-automations-plan.md`) across commits `f31d7c7b`, `1c996c77`, `1a4e0a1f`, `f4ac735c`, `4a3f2c6c`,
-`55663b26`.
+`55663b26`, `281f88fb`, `8241be30`.

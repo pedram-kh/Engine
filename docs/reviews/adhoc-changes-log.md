@@ -120,6 +120,21 @@ reviews, and conversations.
   HTTP codes and the skip reasons kills two hand-maintained lists. (Q4) the fire's audit row carries
   `fired_by` + `automation_rule_id`, because `actor_type: system` says no human did this but not which
   rule did.
+- **Carried record (not this chunk's own work, but discovered by its push):** the close-out push's CI
+  run ([`33069766972`](https://github.com/pedram-kh/Engine/actions/runs/33069766972)) redded on
+  Larastan, in a file this chunk never touched —
+  `tests/Feature/Modules/Campaigns/CampaignAssignmentContractTest.php` called `Event::fake()` /
+  `Event::assertDispatched()` bare, with no `use` import, relying on Laravel's runtime global facade
+  alias to resolve `\Event` — passing at runtime everywhere (the alias is registered on every boot) and
+  passing locally under Larastan too (reproduced directly against the file alone, cache cleared), but
+  failing in CI's fresh container, where whatever makes Larastan's own bootstrap register that alias
+  evidently didn't complete before the `Event` calls were analysed. Grepped every other
+  `Event::fake`/`assertDispatched`/`assertNotDispatched` site in the codebase: this file was the only
+  one missing the import. Fixed at the one site (`8241be30`), verified against a full local Pint +
+  Larastan + Pest pass, and confirmed by CI going green on the very next push
+  ([`33070701330`](https://github.com/pedram-kh/Engine/actions/runs/33070701330)) — including the
+  tracked `admin-sign-in.spec.ts` flake reproducing on attempt #1 and clearing on Playwright's own
+  retry, exactly the pattern this session's tech-debt addendum named.
 - **Ref:** [`admin-automations-review.md`](admin-automations-review.md) (the production posture and its
   four already-nullable seams, the full re-check table, the break-revert pins, the named E2E gap, and
   the one deliberate divergence from the clone template) · plan:

@@ -79,9 +79,17 @@ guard (AH-090)` — the service + outcome enum + result VO, and the one delibera
     rule, the tenancy rows, the tech-debt close + the flake-entry rider).
   - `55663b26` — `docs(runbooks): complete the AH-090 deploy entry's commit range` — this entry's own
     range was written before the two commits above had SHAs; this one filled them in.
-  - _this commit_ — Q4–Q7 ratified into `admin-automations-review.md` §2 (with Q4's absence-implies-
-    human half named explicitly), the build-report ratifications (the owned-key divergence, both
-    honest limits), and the review's close: **Status: Closed — approved, pushed.**
+  - `281f88fb` — `docs(reviews): AH-090 close-out — Q4-Q7 ratified, approved, pushed` — Q4–Q7 ratified
+    into `admin-automations-review.md` §2 (with Q4's absence-implies-human half named explicitly), the
+    build-report ratifications (the owned-key divergence, both honest limits), and the review's close:
+    **Status: Closed — approved, pushed.**
+  - `8241be30` — `fix(tests): explicit Event facade import — CI-only Larastan resolution gap` — a
+    **carried, unrelated fix**: `281f88fb`'s own push redded CI (§5.41) on a pre-existing test file this
+    chunk never touches (`CampaignAssignmentContractTest.php`, bare `Event::fake()` with no `use`
+    import). No schema, no app code — one test file's import line. CI is green at `8241be30`
+    ([run `33070701330`](https://github.com/pedram-kh/Engine/actions/runs/33070701330)). Listed here
+    because it is now part of this range's deployed diff, not because it needs its own deploy checklist
+    line — it changes nothing this entry's infra/migration/flag claims describe.
 - **AH entries carried:** **AH-090.**
 - **Migrations run:** **1** — `2026_08_27_120000_create_admin_automation_rules_table.php`. A
   `CREATE TABLE`, nothing else: **no existing table is touched, no column added anywhere, no
