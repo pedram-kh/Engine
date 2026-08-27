@@ -53,4 +53,31 @@ return [
         'not_enabled' => "L'autenticazione a due fattori non è abilitata per questo account.",
         'provisional_expired' => 'La sessione di registrazione a due fattori è scaduta. Riprova.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'La tua autenticazione a due fattori è stata reimpostata',
+            'greeting' => 'Ciao :name,',
+            'body' => "Un amministratore della piattaforma ha reimpostato l'autenticazione a due fattori del tuo account :app. La tua precedente app di autenticazione e i codici di recupero non funzionano più.",
+            'next' => "Ti verrà chiesto di configurare di nuovo l'autenticazione a due fattori al prossimo accesso a una parte protetta dell'applicazione.",
+            'unexpected' => "Se non hai richiesto questa operazione, contatta subito l'assistenza.",
+            'cta' => 'Vai su :app',
+        ],
+        'exempted' => [
+            'subject' => "L'autenticazione a due fattori non è più obbligatoria sul tuo account",
+            'greeting' => 'Ciao :name,',
+            'body' => "Un amministratore della piattaforma ha rimosso l'obbligo di autenticazione a due fattori dal tuo account :app. Ora puoi usare senza configurarla le aree che prima te la richiedevano.",
+            'still_enrolled' => "Se hai già configurato l'autenticazione a due fattori, resta attiva e al momento dell'accesso ti verrà comunque chiesto un codice: puoi mantenerla o disattivarla nelle impostazioni.",
+            'unexpected' => "Se non ti aspettavi questa modifica, contatta l'assistenza.",
+        ],
+        'exemption_removed' => [
+            'subject' => "L'autenticazione a due fattori è di nuovo obbligatoria sul tuo account",
+            'greeting' => 'Ciao :name,',
+            'body' => "Un amministratore della piattaforma ha ripristinato l'obbligo di autenticazione a due fattori sul tuo account :app.",
+            'next' => "Al prossimo accesso a un'area protetta ti verrà chiesto di configurare l'autenticazione a due fattori, se non lo hai già fatto.",
+            'unexpected' => "Se non ti aspettavi questa modifica, contatta l'assistenza.",
+        ],
+    ],
 ];

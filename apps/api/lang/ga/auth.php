@@ -48,4 +48,31 @@ return [
         'not_enabled' => 'Níl fíordheimhniú dhá fhachtóir cumasaithe don chuntas seo.',
         'provisional_expired' => 'D\'éag an seisiún clárúcháin fíordheimhnithe dhá fhachtóir. Tosaigh arís.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Athshocraíodh do fhíordheimhniú dhá fhachtóir',
+            'greeting' => 'Dia dhuit :name,',
+            'body' => "D'athshocraigh riarthóir ardáin an fíordheimhniú dhá fhachtóir ar do chuntas :app. Ní oibríonn do sheanaip fhíordheimhnithe ná do chóid athshlánaithe a thuilleadh.",
+            'next' => 'Iarrfar ort an fíordheimhniú dhá fhachtóir a shocrú arís an chéad uair eile a bhainfidh tú cuid chosanta den aip amach.',
+            'unexpected' => 'Mura raibh sé seo iarrtha agat, déan teagmháil leis an tacaíocht láithreach.',
+            'cta' => 'Téigh chuig :app',
+        ],
+        'exempted' => [
+            'subject' => 'Níl fíordheimhniú dhá fhachtóir riachtanach ar do chuntas a thuilleadh',
+            'greeting' => 'Dia dhuit :name,',
+            'body' => "Bhain riarthóir ardáin an dualgas fíordheimhnithe dhá fhachtóir de do chuntas :app. Is féidir leat na codanna a d'iarr an socrú ort roimhe seo a úsáid gan é anois.",
+            'still_enrolled' => 'Má tá an fíordheimhniú dhá fhachtóir socraithe agat cheana, fanann sé gníomhach agus iarrfar cód ort fós agus tú ag síniú isteach — is féidir leat é a choinneáil nó é a mhúchadh i do shocruithe.',
+            'unexpected' => 'Mura raibh tú ag súil leis an athrú seo, déan teagmháil leis an tacaíocht.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Tá fíordheimhniú dhá fhachtóir riachtanach ar do chuntas arís',
+            'greeting' => 'Dia dhuit :name,',
+            'body' => 'Chuir riarthóir ardáin an dualgas fíordheimhnithe dhá fhachtóir ar do chuntas :app ar ais.',
+            'next' => 'An chéad uair eile a bhainfidh tú cuid chosanta amach, iarrfar ort an fíordheimhniú dhá fhachtóir a shocrú, mura bhfuil sé déanta agat cheana.',
+            'unexpected' => 'Mura raibh tú ag súil leis an athrú seo, déan teagmháil leis an tacaíocht.',
+        ],
+    ],
 ];

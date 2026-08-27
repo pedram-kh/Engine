@@ -53,4 +53,31 @@ return [
         'not_enabled' => 'Dvojfaktorové overenie nie je povolené pre tento účet.',
         'provisional_expired' => 'Relácia registrácie dvojfaktorového overenia vypršala. Začnite znova.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Vaše dvojfaktorové overenie bolo resetované',
+            'greeting' => 'Dobrý deň :name,',
+            'body' => 'Administrátor platformy resetoval dvojfaktorové overenie na vašom konte :app. Vaša doterajšia autentifikačná aplikácia a záložné kódy už nefungujú.',
+            'next' => 'Pri ďalšom vstupe do chránenej časti aplikácie budete požiadaní o nové nastavenie dvojfaktorového overenia.',
+            'unexpected' => 'Ak ste o to nežiadali, okamžite kontaktujte podporu.',
+            'cta' => 'Prejsť na :app',
+        ],
+        'exempted' => [
+            'subject' => 'Dvojfaktorové overenie už na vašom konte nie je povinné',
+            'greeting' => 'Dobrý deň :name,',
+            'body' => 'Administrátor platformy odstránil povinnosť dvojfaktorového overenia z vášho konta :app. Časti, ktoré vás predtým vyzývali na jeho nastavenie, teraz môžete používať bez neho.',
+            'still_enrolled' => 'Ak už dvojfaktorové overenie nastavené máte, zostáva aktívne a pri prihlásení budete stále vyzvaní na zadanie kódu — môžete si ho ponechať alebo ho vypnúť v nastaveniach.',
+            'unexpected' => 'Ak ste túto zmenu neočakávali, kontaktujte podporu.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Dvojfaktorové overenie je na vašom konte opäť povinné',
+            'greeting' => 'Dobrý deň :name,',
+            'body' => 'Administrátor platformy obnovil povinnosť dvojfaktorového overenia na vašom konte :app.',
+            'next' => 'Pri ďalšom vstupe do chránenej časti budete požiadaní o nastavenie dvojfaktorového overenia, ak ho ešte nemáte.',
+            'unexpected' => 'Ak ste túto zmenu neočakávali, kontaktujte podporu.',
+        ],
+    ],
 ];

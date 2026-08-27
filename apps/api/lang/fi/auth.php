@@ -48,4 +48,31 @@ return [
         'not_enabled' => 'Kaksivaiheinen todennus ei ole käytössä tälle tilille.',
         'provisional_expired' => 'Kaksivaiheisen todennuksen rekisteröinti-istunto on vanhentunut. Aloita alusta.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Kaksivaiheinen vahvistuksesi on nollattu',
+            'greeting' => 'Hei :name,',
+            'body' => 'Alustan ylläpitäjä nollasi kaksivaiheisen vahvistuksen :app-tililtäsi. Aiempi todennussovelluksesi ja palautuskoodisi eivät enää toimi.',
+            'next' => 'Sinua pyydetään ottamaan kaksivaiheinen vahvistus uudelleen käyttöön, kun seuraavan kerran siirryt sovelluksen suojattuun osaan.',
+            'unexpected' => 'Jos et pyytänyt tätä, ota välittömästi yhteyttä tukeen.',
+            'cta' => 'Siirry :app-palveluun',
+        ],
+        'exempted' => [
+            'subject' => 'Kaksivaiheista vahvistusta ei enää vaadita tililläsi',
+            'greeting' => 'Hei :name,',
+            'body' => 'Alustan ylläpitäjä poisti kaksivaiheisen vahvistuksen vaatimuksen :app-tililtäsi. Voit nyt käyttää ilman käyttöönottoa niitä osia, jotka aiemmin pyysivät sitä.',
+            'still_enrolled' => 'Jos olet jo ottanut kaksivaiheisen vahvistuksen käyttöön, se pysyy aktiivisena ja koodia pyydetään edelleen kirjautumisen yhteydessä — voit pitää sen tai poistaa sen käytöstä asetuksissa.',
+            'unexpected' => 'Jos et odottanut tätä muutosta, ota yhteyttä tukeen.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Kaksivaiheinen vahvistus vaaditaan tililläsi jälleen',
+            'greeting' => 'Hei :name,',
+            'body' => 'Alustan ylläpitäjä palautti kaksivaiheisen vahvistuksen vaatimuksen :app-tilillesi.',
+            'next' => 'Kun seuraavan kerran siirryt suojattuun osaan, sinua pyydetään ottamaan kaksivaiheinen vahvistus käyttöön, jos et ole vielä tehnyt sitä.',
+            'unexpected' => 'Jos et odottanut tätä muutosta, ota yhteyttä tukeen.',
+        ],
+    ],
 ];

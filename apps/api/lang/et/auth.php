@@ -48,4 +48,31 @@ return [
         'not_enabled' => 'Kahefaktoriline autentimine ei ole selle konto jaoks lubatud.',
         'provisional_expired' => 'Kahefaktorilise autentimise registreerimise seanss on aegunud. Alustage uuesti.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Teie kaheastmeline kinnitamine on lähtestatud',
+            'greeting' => 'Tere :name,',
+            'body' => 'Platvormi administraator lähtestas teie :app konto kaheastmelise kinnitamise. Teie senine autentimisrakendus ja taastekoodid enam ei tööta.',
+            'next' => 'Järgmisel korral, kui avate rakenduse kaitstud osa, palutakse teil kaheastmeline kinnitamine uuesti seadistada.',
+            'unexpected' => 'Kui te seda ei taotlenud, võtke kohe ühendust toega.',
+            'cta' => 'Ava :app',
+        ],
+        'exempted' => [
+            'subject' => 'Kaheastmeline kinnitamine ei ole teie kontol enam nõutav',
+            'greeting' => 'Tere :name,',
+            'body' => 'Platvormi administraator eemaldas teie :app kontolt kaheastmelise kinnitamise nõude. Osi, mis varem palusid selle seadistamist, saate nüüd kasutada ilma selleta.',
+            'still_enrolled' => 'Kui teil on kaheastmeline kinnitamine juba seadistatud, jääb see aktiivseks ja sisselogimisel küsitakse endiselt koodi — võite selle alles jätta või seadetes välja lülitada.',
+            'unexpected' => 'Kui te seda muudatust ei oodanud, võtke ühendust toega.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Kaheastmeline kinnitamine on teie kontol taas nõutav',
+            'greeting' => 'Tere :name,',
+            'body' => 'Platvormi administraator taastas teie :app kontol kaheastmelise kinnitamise nõude.',
+            'next' => 'Järgmisel korral, kui avate kaitstud osa, palutakse teil kaheastmeline kinnitamine seadistada, kui te pole seda veel teinud.',
+            'unexpected' => 'Kui te seda muudatust ei oodanud, võtke ühendust toega.',
+        ],
+    ],
 ];

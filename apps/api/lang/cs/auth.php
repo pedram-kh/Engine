@@ -53,4 +53,31 @@ return [
         'not_enabled' => 'Dvoufaktorové ověření není povoleno pro tento účet.',
         'provisional_expired' => 'Relace registrace dvoufaktorového ověření vypršela. Začněte znovu.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Vaše dvoufázové ověření bylo resetováno',
+            'greeting' => 'Dobrý den :name,',
+            'body' => 'Administrátor platformy resetoval dvoufázové ověření u vašeho účtu :app. Vaše dosavadní autentizační aplikace a záložní kódy již nefungují.',
+            'next' => 'Při dalším vstupu do chráněné části aplikace budete požádáni o nové nastavení dvoufázového ověření.',
+            'unexpected' => 'Pokud jste o to nežádali, obraťte se okamžitě na podporu.',
+            'cta' => 'Přejít na :app',
+        ],
+        'exempted' => [
+            'subject' => 'Dvoufázové ověření již není u vašeho účtu vyžadováno',
+            'greeting' => 'Dobrý den :name,',
+            'body' => 'Administrátor platformy odstranil povinnost dvoufázového ověření u vašeho účtu :app. Části, které vás dříve vyzývaly k jeho nastavení, nyní můžete používat bez něj.',
+            'still_enrolled' => 'Pokud již dvoufázové ověření nastavené máte, zůstává aktivní a při přihlášení budete stále vyzváni k zadání kódu — můžete si je ponechat, nebo je vypnout v nastavení.',
+            'unexpected' => 'Pokud jste tuto změnu neočekávali, obraťte se na podporu.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Dvoufázové ověření je u vašeho účtu opět vyžadováno',
+            'greeting' => 'Dobrý den :name,',
+            'body' => 'Administrátor platformy obnovil povinnost dvoufázového ověření u vašeho účtu :app.',
+            'next' => 'Při dalším vstupu do chráněné části budete požádáni o nastavení dvoufázového ověření, pokud je ještě nemáte.',
+            'unexpected' => 'Pokud jste tuto změnu neočekávali, obraťte se na podporu.',
+        ],
+    ],
 ];

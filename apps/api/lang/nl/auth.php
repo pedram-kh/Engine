@@ -53,4 +53,31 @@ return [
         'not_enabled' => 'Twee-factor authenticatie is niet ingeschakeld voor dit account.',
         'provisional_expired' => 'De twee-factor instelsessie is verlopen. Begin opnieuw.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Je tweefactorauthenticatie is gereset',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Een platformbeheerder heeft de tweefactorauthenticatie van je :app-account gereset. Je vorige authenticator-app en herstelcodes werken niet meer.',
+            'next' => 'Bij je volgende bezoek aan een beveiligd deel van de app wordt gevraagd tweefactorauthenticatie opnieuw in te stellen.',
+            'unexpected' => 'Als je hier niet om hebt gevraagd, neem dan onmiddellijk contact op met support.',
+            'cta' => 'Ga naar :app',
+        ],
+        'exempted' => [
+            'subject' => 'Tweefactorauthenticatie is niet langer verplicht op je account',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Een platformbeheerder heeft de verplichting tot tweefactorauthenticatie van je :app-account verwijderd. Onderdelen die er eerder om vroegen, kun je nu zonder instelling gebruiken.',
+            'still_enrolled' => 'Heb je tweefactorauthenticatie al ingesteld, dan blijft die actief en wordt bij het inloggen nog om een code gevraagd — je kunt die houden of uitschakelen in je instellingen.',
+            'unexpected' => 'Als je deze wijziging niet verwachtte, neem dan contact op met support.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Tweefactorauthenticatie is weer verplicht op je account',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Een platformbeheerder heeft de verplichting tot tweefactorauthenticatie op je :app-account hersteld.',
+            'next' => 'Bij je volgende bezoek aan een beveiligd onderdeel wordt gevraagd tweefactorauthenticatie in te stellen, als dat nog niet is gebeurd.',
+            'unexpected' => 'Als je deze wijziging niet verwachtte, neem dan contact op met support.',
+        ],
+    ],
 ];

@@ -53,4 +53,31 @@ return [
         'not_enabled' => 'To-faktor-godkendelse er ikke aktiveret for denne konto.',
         'provisional_expired' => 'To-faktor-opsætningssessionen er udløbet. Start forfra.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Din tofaktorgodkendelse er blevet nulstillet',
+            'greeting' => 'Hej :name,',
+            'body' => 'En platformsadministrator har nulstillet tofaktorgodkendelsen på din :app-konto. Din tidligere godkendelsesapp og dine gendannelseskoder virker ikke længere.',
+            'next' => 'Du bliver bedt om at opsætte tofaktorgodkendelse igen, næste gang du åbner en beskyttet del af appen.',
+            'unexpected' => 'Hvis du ikke har bedt om dette, skal du kontakte support med det samme.',
+            'cta' => 'Gå til :app',
+        ],
+        'exempted' => [
+            'subject' => 'Tofaktorgodkendelse er ikke længere påkrævet på din konto',
+            'greeting' => 'Hej :name,',
+            'body' => 'En platformsadministrator har fjernet kravet om tofaktorgodkendelse på din :app-konto. Du kan nu bruge de områder, der tidligere bad dig om at opsætte det, uden opsætning.',
+            'still_enrolled' => 'Hvis du allerede har opsat tofaktorgodkendelse, forbliver den aktiv, og du bliver stadig bedt om en kode ved login — du kan beholde den eller slå den fra i dine indstillinger.',
+            'unexpected' => 'Hvis du ikke forventede denne ændring, skal du kontakte support.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Tofaktorgodkendelse er påkrævet på din konto igen',
+            'greeting' => 'Hej :name,',
+            'body' => 'En platformsadministrator har gendannet kravet om tofaktorgodkendelse på din :app-konto.',
+            'next' => 'Næste gang du åbner et beskyttet område, bliver du bedt om at opsætte tofaktorgodkendelse, hvis du ikke allerede har gjort det.',
+            'unexpected' => 'Hvis du ikke forventede denne ændring, skal du kontakte support.',
+        ],
+    ],
 ];

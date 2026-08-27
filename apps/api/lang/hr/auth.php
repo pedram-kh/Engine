@@ -53,4 +53,31 @@ return [
         'not_enabled' => 'Dvofaktorska provjera autentičnosti nije omogućena za ovaj račun.',
         'provisional_expired' => 'Sesija registracije dvofaktorske provjere autentičnosti je istekla. Počnite iznova.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Vaša dvofaktorska provjera je poništena',
+            'greeting' => 'Zdravo :name,',
+            'body' => 'Administrator platforme poništio je dvofaktorsku provjeru na vašem računu :app. Vaša dosadašnja aplikacija za provjeru i kodovi za oporavak više ne rade.',
+            'next' => 'Pri sljedećem ulazu u zaštićeni dio aplikacije bit ćete zamoljeni da dvofaktorsku provjeru ponovno postavite.',
+            'unexpected' => 'Ako to niste zatražili, odmah se obratite podršci.',
+            'cta' => 'Idi na :app',
+        ],
+        'exempted' => [
+            'subject' => 'Dvofaktorska provjera više nije obavezna na vašem računu',
+            'greeting' => 'Zdravo :name,',
+            'body' => 'Administrator platforme ukinuo je obvezu dvofaktorske provjere na vašem računu :app. Dijelove koji su prije tražili njezino postavljanje sada možete koristiti bez nje.',
+            'still_enrolled' => 'Ako dvofaktorsku provjeru već imate postavljenu, ostaje aktivna i pri prijavi ćete i dalje biti upitani za kod — možete je zadržati ili isključiti u postavkama.',
+            'unexpected' => 'Ako ovu promjenu nisu očekivali, obratite se podršci.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Dvofaktorska provjera ponovno je obavezna na vašem računu',
+            'greeting' => 'Zdravo :name,',
+            'body' => 'Administrator platforme vratio je obvezu dvofaktorske provjere na vašem računu :app.',
+            'next' => 'Pri sljedećem ulazu u zaštićeni dio bit ćete zamoljeni da dvofaktorsku provjeru postavite, ako je još nemate.',
+            'unexpected' => 'Ako ovu promjenu nisu očekivali, obratite se podršci.',
+        ],
+    ],
 ];

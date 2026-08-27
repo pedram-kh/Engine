@@ -54,4 +54,27 @@ final class AgencyPolicy
     {
         return $user->type === UserType::PlatformAdmin;
     }
+
+    /**
+     * List this agency's members from the admin console (AH-087). Same flat
+     * gate as the rest of this policy: an agency's own agency_admin reads
+     * their roster through the tenant-scoped agency-self endpoint
+     * (GET /agencies/{agency}/members), not through the admin console.
+     */
+    public function viewMembers(User $user, Agency $agency): bool
+    {
+        return $user->type === UserType::PlatformAdmin;
+    }
+
+    /**
+     * Act on a member's 2FA state — reset enrollment, grant or remove an
+     * exemption (AH-087). The gate is the same flat platform-admin check;
+     * the operation-specific limits live in the controller, which is where
+     * the target matters rather than the actor: a platform-admin TARGET is
+     * never exemptable, and every operation carries a mandatory reason.
+     */
+    public function manageMemberMfa(User $user, Agency $agency): bool
+    {
+        return $user->type === UserType::PlatformAdmin;
+    }
 }

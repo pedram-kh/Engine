@@ -48,4 +48,31 @@ return [
         'not_enabled' => 'A kétfaktoros hitelesítés nincs engedélyezve ennél a fióknál.',
         'provisional_expired' => 'A kétfaktoros hitelesítési regisztrációs munkamenet lejárt. Kezdje újra.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'A kétfaktoros hitelesítésed visszaállításra került',
+            'greeting' => 'Szia :name,',
+            'body' => 'A platform egyik adminisztrátora visszaállította a kétfaktoros hitelesítést a :app-fiókodon. A korábbi hitelesítő alkalmazásod és helyreállítási kódjaid már nem működnek.',
+            'next' => 'Amikor legközelebb az alkalmazás védett részére lépsz, meg kell adnod a kétfaktoros hitelesítés beállítását.',
+            'unexpected' => 'Ha nem te kérted ezt, azonnal fordulj a támogatáshoz.',
+            'cta' => 'Tovább a :app oldalra',
+        ],
+        'exempted' => [
+            'subject' => 'A kétfaktoros hitelesítés már nem kötelező a fiókodon',
+            'greeting' => 'Szia :name,',
+            'body' => 'A platform egyik adminisztrátora megszüntette a kétfaktoros hitelesítés kötelezettségét a :app-fiókodon. Azokat a részeket, amelyek korábban a beállítását kérték, most beállítás nélkül is használhatod.',
+            'still_enrolled' => 'Ha már beállítottad a kétfaktoros hitelesítést, az aktív marad, és bejelentkezéskor továbbra is kódot fog kérni — megtarthatod, vagy kikapcsolhatod a beállításokban.',
+            'unexpected' => 'Ha nem számítottál erre a változásra, fordulj a támogatáshoz.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'A kétfaktoros hitelesítés ismét kötelező a fiókodon',
+            'greeting' => 'Szia :name,',
+            'body' => 'A platform egyik adminisztrátora helyreállította a kétfaktoros hitelesítés kötelezettségét a :app-fiókodon.',
+            'next' => 'Amikor legközelebb védett részre lépsz, meg kell adnod a kétfaktoros hitelesítés beállítását, ha még nem tetted meg.',
+            'unexpected' => 'Ha nem számítottál erre a változásra, fordulj a támogatáshoz.',
+        ],
+    ],
 ];

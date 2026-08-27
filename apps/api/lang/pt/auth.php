@@ -53,4 +53,31 @@ return [
         'not_enabled' => 'A autenticação de dois fatores não está ativada nesta conta.',
         'provisional_expired' => 'A sessão de inscrição em dois fatores expirou. Comece novamente.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'A sua autenticação de dois fatores foi reiniciada',
+            'greeting' => 'Olá :name,',
+            'body' => 'Um administrador da plataforma reiniciou a autenticação de dois fatores da sua conta :app. A sua aplicação de autenticação anterior e os códigos de recuperação já não funcionam.',
+            'next' => 'Será pedido que configure novamente a autenticação de dois fatores no próximo acesso a uma parte protegida da aplicação.',
+            'unexpected' => 'Se não pediu isto, contacte imediatamente o suporte.',
+            'cta' => 'Ir para :app',
+        ],
+        'exempted' => [
+            'subject' => 'A autenticação de dois fatores já não é obrigatória na sua conta',
+            'greeting' => 'Olá :name,',
+            'body' => 'Um administrador da plataforma removeu a obrigação de autenticação de dois fatores da sua conta :app. Já pode usar sem a configurar as áreas que antes lha pediam.',
+            'still_enrolled' => 'Se já tem a autenticação de dois fatores configurada, continua ativa e continuará a ser-lhe pedido um código ao iniciar sessão — pode mantê-la ou desativá-la nas suas definições.',
+            'unexpected' => 'Se não esperava esta alteração, contacte o suporte.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'A autenticação de dois fatores é novamente obrigatória na sua conta',
+            'greeting' => 'Olá :name,',
+            'body' => 'Um administrador da plataforma restaurou a obrigação de autenticação de dois fatores na sua conta :app.',
+            'next' => 'No próximo acesso a uma área protegida será pedido que configure a autenticação de dois fatores, caso ainda não o tenha feito.',
+            'unexpected' => 'Se não esperava esta alteração, contacte o suporte.',
+        ],
+    ],
 ];

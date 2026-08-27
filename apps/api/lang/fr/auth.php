@@ -53,4 +53,31 @@ return [
         'not_enabled' => "L'authentification à deux facteurs n'est pas activée pour ce compte.",
         'provisional_expired' => "La session d'activation de l'authentification à deux facteurs a expiré. Veuillez recommencer.",
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Votre double authentification a été réinitialisée',
+            'greeting' => 'Bonjour :name,',
+            'body' => "Un administrateur de la plateforme a réinitialisé la double authentification de votre compte :app. Votre ancienne application d'authentification et vos codes de secours ne fonctionnent plus.",
+            'next' => "Il vous sera demandé de reconfigurer la double authentification lors de votre prochain accès à une partie protégée de l'application.",
+            'unexpected' => "Si vous n'êtes pas à l'origine de cette demande, contactez immédiatement le support.",
+            'cta' => 'Aller sur :app',
+        ],
+        'exempted' => [
+            'subject' => "La double authentification n'est plus obligatoire sur votre compte",
+            'greeting' => 'Bonjour :name,',
+            'body' => "Un administrateur de la plateforme a supprimé l'obligation de double authentification sur votre compte :app. Vous pouvez désormais utiliser sans configuration les espaces qui vous la demandaient auparavant.",
+            'still_enrolled' => 'Si vous avez déjà configuré la double authentification, elle reste active et un code vous sera encore demandé à la connexion — vous pouvez la conserver ou la désactiver dans vos paramètres.',
+            'unexpected' => 'Si vous ne vous attendiez pas à ce changement, contactez le support.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'La double authentification est de nouveau obligatoire sur votre compte',
+            'greeting' => 'Bonjour :name,',
+            'body' => "Un administrateur de la plateforme a rétabli l'obligation de double authentification sur votre compte :app.",
+            'next' => "Lors de votre prochain accès à un espace protégé, il vous sera demandé de configurer la double authentification, si ce n'est pas déjà fait.",
+            'unexpected' => 'Si vous ne vous attendiez pas à ce changement, contactez le support.',
+        ],
+    ],
 ];

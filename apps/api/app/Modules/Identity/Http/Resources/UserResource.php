@@ -44,6 +44,11 @@ final class UserResource extends JsonResource
                 'theme_preference' => $user->theme_preference->value,
                 'mfa_required' => $user->mfa_required,
                 'two_factor_enabled' => $user->hasTwoFactorEnabled(),
+                // AH-087 — a BOOLEAN projection only: the SPA's MFA-policy
+                // guard needs to know whether this user is exempt, never when
+                // or why. The timestamp and the admin's reason stay on the
+                // admin members surface.
+                'mfa_exempt' => $user->isMfaExempt(),
                 'last_login_at' => $user->last_login_at?->toIso8601String(),
                 'created_at' => $user->created_at->toIso8601String(),
             ],

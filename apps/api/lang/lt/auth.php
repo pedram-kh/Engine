@@ -48,4 +48,31 @@ return [
         'not_enabled' => 'Dviejų veiksnių autentifikavimas šiai paskyrai neįjungtas.',
         'provisional_expired' => 'Dviejų veiksnių autentifikavimo registracijos sesija baigėsi. Pradėkite iš naujo.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Jūsų dviejų veiksnių tikrinimas atkurtas',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Platformos administratorius atkūrė dviejų veiksnių tikrinimą jūsų :app paskyroje. Ankstesnė tapatybės nustatymo programa ir atkūrimo kodai nebeveikia.',
+            'next' => 'Kitą kartą atidarę apsaugotą programos dalį būsite paprašyti dviejų veiksnių tikrinimą nustatyti iš naujo.',
+            'unexpected' => 'Jei to neprašėte, nedelsdami susisiekite su palaikymo komanda.',
+            'cta' => 'Atidaryti :app',
+        ],
+        'exempted' => [
+            'subject' => 'Dviejų veiksnių tikrinimas jūsų paskyroje nebėra būtinas',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Platformos administratorius pašalino dviejų veiksnių tikrinimo reikalavimą iš jūsų :app paskyros. Dalis, kurios anksčiau prašė jį nustatyti, dabar galite naudoti be jo.',
+            'still_enrolled' => 'Jei dviejų veiksnių tikrinimą jau esate nustatę, jis lieka aktyvus ir prisijungiant kodo vis tiek bus paprašyta — galite jį pasilikti arba išjungti nustatymuose.',
+            'unexpected' => 'Jei šio pakeitimo nesitikėjote, susisiekite su palaikymo komanda.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Dviejų veiksnių tikrinimas jūsų paskyroje vėl būtinas',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Platformos administratorius grąžino dviejų veiksnių tikrinimo reikalavimą jūsų :app paskyrai.',
+            'next' => 'Kitą kartą atidarę apsaugotą dalį būsite paprašyti nustatyti dviejų veiksnių tikrinimą, jei dar to nepadarėte.',
+            'unexpected' => 'Jei šio pakeitimo nesitikėjote, susisiekite su palaikymo komanda.',
+        ],
+    ],
 ];

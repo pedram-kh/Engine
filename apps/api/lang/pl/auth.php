@@ -53,4 +53,31 @@ return [
         'not_enabled' => 'Uwierzytelnianie dwuskładnikowe nie jest włączone dla tego konta.',
         'provisional_expired' => 'Sesja rejestracji dwuskładnikowej wygasła. Zacznij od nowa.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Twoje uwierzytelnianie dwuskładnikowe zostało zresetowane',
+            'greeting' => 'Cześć :name,',
+            'body' => 'Administrator platformy zresetował uwierzytelnianie dwuskładnikowe na Twoim koncie :app. Twoja dotychczasowa aplikacja uwierzytelniająca i kody odzyskiwania już nie działają.',
+            'next' => 'Przy następnym wejściu do chronionej części aplikacji zostaniesz poproszony o ponowną konfigurację uwierzytelniania dwuskładnikowego.',
+            'unexpected' => 'Jeśli o to nie prosiłeś, natychmiast skontaktuj się z pomocą techniczną.',
+            'cta' => 'Przejdź do :app',
+        ],
+        'exempted' => [
+            'subject' => 'Uwierzytelnianie dwuskładnikowe nie jest już wymagane na Twoim koncie',
+            'greeting' => 'Cześć :name,',
+            'body' => 'Administrator platformy usunął wymóg uwierzytelniania dwuskładnikowego z Twojego konta :app. Miejsca, które wcześniej prosiły o jego konfigurację, możesz teraz używać bez niej.',
+            'still_enrolled' => 'Jeśli masz już skonfigurowane uwierzytelnianie dwuskładnikowe, pozostaje aktywne i przy logowaniu nadal będziesz proszony o kod — możesz je zachować lub wyłączyć w ustawieniach.',
+            'unexpected' => 'Jeśli nie spodziewałeś się tej zmiany, skontaktuj się z pomocą techniczną.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Uwierzytelnianie dwuskładnikowe jest znów wymagane na Twoim koncie',
+            'greeting' => 'Cześć :name,',
+            'body' => 'Administrator platformy przywrócił wymóg uwierzytelniania dwuskładnikowego na Twoim koncie :app.',
+            'next' => 'Przy następnym wejściu do chronionej części zostaniesz poproszony o konfigurację uwierzytelniania dwuskładnikowego, jeśli jeszcze go nie masz.',
+            'unexpected' => 'Jeśli nie spodziewałeś się tej zmiany, skontaktuj się z pomocą techniczną.',
+        ],
+    ],
 ];

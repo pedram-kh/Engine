@@ -48,4 +48,31 @@ return [
         'not_enabled' => 'Divfaktoru autentifikācija nav iespējota šim kontam.',
         'provisional_expired' => 'Divfaktoru autentifikācijas reģistrācijas sesija ir beigusies. Sāciet no jauna.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Jūsu divpakāpju autentifikācija ir atiestatīta',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Platformas administrators atiestatīja divpakāpju autentifikāciju jūsu :app kontā. Jūsu iepriekšējā autentifikācijas lietotne un atkopšanas kodi vairs nedarbojas.',
+            'next' => 'Nākamreiz, kad atvērsiet aizsargātu lietotnes daļu, jums lūgs divpakāpju autentifikāciju iestatīt no jauna.',
+            'unexpected' => 'Ja jūs to nepieprasījāt, nekavējoties sazinieties ar atbalsta dienestu.',
+            'cta' => 'Atvērt :app',
+        ],
+        'exempted' => [
+            'subject' => 'Divpakāpju autentifikācija jūsu kontā vairs nav obligāta',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Platformas administrators noņēma divpakāpju autentifikācijas prasību jūsu :app kontam. Daļas, kas iepriekš prasīja tās iestatīšanu, tagad varat lietot bez tās.',
+            'still_enrolled' => 'Ja divpakāpju autentifikācija jums jau ir iestatīta, tā paliek aktīva un, pierakstoties, kods joprojām tiks prasīts — varat to saglabāt vai izslēgt iestatījumos.',
+            'unexpected' => 'Ja negaidījāt šo izmaiņu, sazinieties ar atbalsta dienestu.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Divpakāpju autentifikācija jūsu kontā ir atkal obligāta',
+            'greeting' => 'Sveiki, :name,',
+            'body' => 'Platformas administrators atjaunoja divpakāpju autentifikācijas prasību jūsu :app kontam.',
+            'next' => 'Nākamreiz, kad atvērsiet aizsargātu daļu, jums lūgs iestatīt divpakāpju autentifikāciju, ja tā vēl nav iestatīta.',
+            'unexpected' => 'Ja negaidījāt šo izmaiņu, sazinieties ar atbalsta dienestu.',
+        ],
+    ],
 ];

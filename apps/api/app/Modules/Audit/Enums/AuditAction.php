@@ -419,6 +419,25 @@ enum AuditAction: string
     case AdminImpersonationEnded = 'admin.impersonation_ended';
     case FeatureFlagToggled = 'feature_flag.toggled';
 
+    // AH-087 — admin acting on another user's 2FA, from the agency-members
+    // drill-in. `user.*`-rooted rather than `mfa.*` DELIBERATELY: every
+    // existing mfa.* verb means "the user did this to themself" (the
+    // self-service enable/confirm/disable/regenerate path), and the closest
+    // existing precedent for "an admin changed a named user's account state"
+    // is the user.suspended / user.unsuspended pair — which is already
+    // reason-gated below, the exact treatment these need. Keeping the admin
+    // verbs out of mfa.* leaves that namespace's meaning intact and makes an
+    // admin-driven reset FOREVER distinguishable from a self-service disable
+    // (the AH-051 admin_connected-vs-created distinction, same reasoning).
+    //
+    // NOT NotificationType cases: the affected user is reached by EMAIL only
+    // (three mailables — reset / exempted / exemption-removed), the
+    // deliberately email-only posture the blacklist notice established. There
+    // is no in-app half to toggle and no preference row to own.
+    case UserMfaReset = 'user.mfa_reset';
+    case UserMfaExempted = 'user.mfa_exempted';
+    case UserMfaExemptionRemoved = 'user.mfa_exemption_removed';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *
@@ -462,6 +481,18 @@ enum AuditAction: string
             // — it is an ordinary connection request the creator can decline.
             self::AgencyCreatorRelationAdminConnected,
             self::AgencyCreatorRelationDisconnected => true,
+            // AH-087 — all three admin 2FA operations answer "why", including
+            // the un-exempt direction. This DIVERGES from the
+            // agency.reactivated precedent above (where restoring the default
+            // state needs no reason) and the divergence is deliberate:
+            // un-exempting restores a requirement on a PERSON, not a default
+            // state of an org, so both directions of a per-person
+            // security-posture change carry a reason. Reset is reason-gated
+            // even though it is usually user-requested — a support action that
+            // wipes credential material still gets a paper trail.
+            self::UserMfaReset,
+            self::UserMfaExempted,
+            self::UserMfaExemptionRemoved => true,
             default => false,
         };
     }
@@ -482,6 +513,12 @@ enum AuditAction: string
             self::MfaRecoveryCodeConsumed,
             self::AuthPasswordChanged,
             self::AuthPasswordResetCompleted => true,
+            // AH-087 — an admin reset nulls the secret + recovery codes, so it
+            // mutates credential material and inherits the no-plaintext
+            // discipline. The exemption pair does NOT: it touches only
+            // mfa_exempted_at / mfa_exemption_reason and never reads, writes,
+            // or reveals any secret material.
+            self::UserMfaReset => true,
             default => false,
         };
     }

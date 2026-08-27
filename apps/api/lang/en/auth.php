@@ -70,4 +70,32 @@ return [
         'not_enabled' => 'Two-factor authentication is not enabled for this account.',
         'provisional_expired' => 'The two-factor enrollment session has expired. Please start again.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named (the AH-051 eyes-on
+    // lesson): the reason is the internal paper trail, not user-facing copy.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Your two-factor authentication was reset',
+            'greeting' => 'Hi :name,',
+            'body' => 'A platform administrator reset two-factor authentication on your :app account. Your previous authenticator app and recovery codes no longer work.',
+            'next' => 'You will be asked to set two-factor authentication up again the next time you reach a protected part of the app.',
+            'unexpected' => 'If you did not request this, contact support immediately.',
+            'cta' => 'Go to :app',
+        ],
+        'exempted' => [
+            'subject' => 'Two-factor authentication is no longer required on your account',
+            'greeting' => 'Hi :name,',
+            'body' => 'A platform administrator removed the two-factor authentication requirement from your :app account. You can now use the areas that previously asked you to set it up without enrolling.',
+            'still_enrolled' => 'If you already have two-factor authentication set up, it stays active and you will still be asked for a code when you sign in — you can keep it or turn it off in your settings.',
+            'unexpected' => 'If you did not expect this change, contact support.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Two-factor authentication is required on your account again',
+            'greeting' => 'Hi :name,',
+            'body' => 'A platform administrator restored the two-factor authentication requirement on your :app account.',
+            'next' => 'The next time you reach a protected area you will be asked to set two-factor authentication up, if you have not already.',
+            'unexpected' => 'If you did not expect this change, contact support.',
+        ],
+    ],
 ];

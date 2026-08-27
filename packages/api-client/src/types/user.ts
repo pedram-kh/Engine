@@ -92,9 +92,14 @@ export interface UserAttributes {
   timezone: TimezoneIdentifier | null
   theme_preference: ThemePreference
   /**
-   * `true` for users whose `users.mfa_required` flag is set (today
-   * always platform admins, by chunk-5 priority #7). The SPA uses this
-   * to drive the 2FA-enrollment-required flow on the admin surface.
+   * `true` for users whose `users.mfa_required` flag is set (today always
+   * platform admins, by chunk-5 priority #7).
+   *
+   * Read-only reporting only — NO guard branches on it. The admin MFA gate
+   * is the unconditional server-side `EnsureMfaForAdmins` middleware plus
+   * the SPA's `requireMfaEnrolled`, both of which read
+   * `two_factor_enabled`. AH-087 confirmed the column drives nothing and
+   * deliberately left it dormant.
    */
   mfa_required: boolean
   /**
@@ -103,6 +108,17 @@ export interface UserAttributes {
    * the backend.
    */
   two_factor_enabled: boolean
+  /**
+   * `true` when a platform admin has exempted this user from the
+   * 2FA-enrollment requirement (AH-087). Read by the main SPA's
+   * `requireMfaUnlessExempt` guard, which lets an exempt user reach the
+   * admin-sensitive agency routes without enrolling.
+   *
+   * Exemption removes the REQUIREMENT, not the enrollment: an exempt user
+   * who is also enrolled keeps their authenticator and is still challenged
+   * at sign-in. Platform admins are never exemptable.
+   */
+  mfa_exempt: boolean
   last_login_at: string | null
   created_at: string
 }

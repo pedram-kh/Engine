@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Admin\Http\Controllers\AdminAgencyController;
+use App\Modules\Admin\Http\Controllers\AdminAgencyMemberController;
 use App\Modules\Admin\Http\Controllers\AdminAlertsController;
 use App\Modules\Admin\Http\Controllers\AdminAuditLogController;
 use App\Modules\Admin\Http\Controllers\AdminComplianceController;
@@ -58,6 +59,26 @@ Route::prefix('admin')
             Route::get('{agency}', [AdminAgencyController::class, 'show'])->name('show');
             Route::post('{agency}/suspend', [AdminAgencyController::class, 'suspend'])->name('suspend');
             Route::post('{agency}/reactivate', [AdminAgencyController::class, 'reactivate'])->name('reactivate');
+
+            // ─── Members drill-in + per-member 2FA controls (AH-087) ──
+            // The list is a read of the agency's roster with an MFA-state
+            // projection (booleans only — never any secret material; the
+            // payload keyset is pinned by test). The three writes act on
+            // ONE user's 2FA state each, all reason-mandatory and audited:
+            // reset clears the enrollment artifacts (support), the
+            // exemption pair flips the requirement (policy). A
+            // platform-admin target is refused (422) on the grant
+            // direction. Both bindings are checked as a PAIR in the
+            // controller — the member must belong to {agency}, else 404.
+            // Allowlisted in docs/security/tenancy.md § 4.
+            Route::get('{agency}/members', [AdminAgencyMemberController::class, 'index'])
+                ->name('members.index');
+            Route::post('{agency}/members/{user}/reset-2fa', [AdminAgencyMemberController::class, 'resetTwoFactor'])
+                ->name('members.reset-2fa');
+            Route::post('{agency}/members/{user}/exempt-2fa', [AdminAgencyMemberController::class, 'exempt'])
+                ->name('members.exempt-2fa');
+            Route::post('{agency}/members/{user}/remove-2fa-exemption', [AdminAgencyMemberController::class, 'removeExemption'])
+                ->name('members.remove-2fa-exemption');
         });
 
         // ─── Audit-log viewer (D-5) ──────────────────────────────────

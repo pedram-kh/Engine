@@ -53,4 +53,31 @@ return [
         'not_enabled' => 'Die Zwei-Faktor-Authentifizierung ist für dieses Konto nicht aktiviert.',
         'provisional_expired' => 'Die Einrichtungssitzung für die Zwei-Faktor-Authentifizierung ist abgelaufen. Bitte beginne erneut.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Deine Zwei-Faktor-Authentifizierung wurde zurückgesetzt',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Ein Plattform-Administrator hat die Zwei-Faktor-Authentifizierung für dein :app-Konto zurückgesetzt. Deine bisherige Authenticator-App und deine Wiederherstellungscodes funktionieren nicht mehr.',
+            'next' => 'Beim nächsten Zugriff auf einen geschützten Bereich wirst du gebeten, die Zwei-Faktor-Authentifizierung erneut einzurichten.',
+            'unexpected' => 'Falls du das nicht angefordert hast, wende dich sofort an den Support.',
+            'cta' => 'Zu :app',
+        ],
+        'exempted' => [
+            'subject' => 'Zwei-Faktor-Authentifizierung ist für dein Konto nicht mehr erforderlich',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Ein Plattform-Administrator hat die Pflicht zur Zwei-Faktor-Authentifizierung für dein :app-Konto aufgehoben. Bereiche, die dich zuvor zur Einrichtung aufgefordert haben, kannst du jetzt ohne Einrichtung nutzen.',
+            'still_enrolled' => 'Wenn du die Zwei-Faktor-Authentifizierung bereits eingerichtet hast, bleibt sie aktiv und du wirst bei der Anmeldung weiterhin nach einem Code gefragt — du kannst sie behalten oder in deinen Einstellungen deaktivieren.',
+            'unexpected' => 'Falls du diese Änderung nicht erwartet hast, wende dich an den Support.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Zwei-Faktor-Authentifizierung ist für dein Konto wieder erforderlich',
+            'greeting' => 'Hallo :name,',
+            'body' => 'Ein Plattform-Administrator hat die Pflicht zur Zwei-Faktor-Authentifizierung für dein :app-Konto wieder aktiviert.',
+            'next' => 'Beim nächsten Zugriff auf einen geschützten Bereich wirst du gebeten, die Zwei-Faktor-Authentifizierung einzurichten, falls das noch nicht geschehen ist.',
+            'unexpected' => 'Falls du diese Änderung nicht erwartet hast, wende dich an den Support.',
+        ],
+    ],
 ];

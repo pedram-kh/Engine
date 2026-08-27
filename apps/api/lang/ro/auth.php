@@ -48,4 +48,31 @@ return [
         'not_enabled' => 'Autentificarea cu doi factori nu este activată pentru acest cont.',
         'provisional_expired' => 'Sesiunea de înregistrare a autentificării cu doi factori a expirat. Începeți din nou.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Autentificarea în doi pași a fost resetată',
+            'greeting' => 'Bună :name,',
+            'body' => 'Un administrator al platformei a resetat autentificarea în doi pași pentru contul tău :app. Aplicația de autentificare anterioară și codurile de recuperare nu mai funcționează.',
+            'next' => 'La următoarea accesare a unei zone protejate a aplicației ți se va cere să configurezi din nou autentificarea în doi pași.',
+            'unexpected' => 'Dacă nu ai cerut acest lucru, contactează imediat asistența.',
+            'cta' => 'Mergi la :app',
+        ],
+        'exempted' => [
+            'subject' => 'Autentificarea în doi pași nu mai este obligatorie pentru contul tău',
+            'greeting' => 'Bună :name,',
+            'body' => 'Un administrator al platformei a eliminat obligația autentificării în doi pași pentru contul tău :app. Zonele care înainte îți cereau configurarea pot fi folosite acum fără ea.',
+            'still_enrolled' => 'Dacă ai deja autentificarea în doi pași configurată, rămâne activă și ți se va cere în continuare un cod la conectare — o poți păstra sau o poți dezactiva din setări.',
+            'unexpected' => 'Dacă nu te așteptai la această schimbare, contactează asistența.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Autentificarea în doi pași este din nou obligatorie pentru contul tău',
+            'greeting' => 'Bună :name,',
+            'body' => 'Un administrator al platformei a restabilit obligația autentificării în doi pași pentru contul tău :app.',
+            'next' => 'La următoarea accesare a unei zone protejate ți se va cere să configurezi autentificarea în doi pași, dacă nu ai făcut-o deja.',
+            'unexpected' => 'Dacă nu te așteptai la această schimbare, contactează asistența.',
+        ],
+    ],
 ];

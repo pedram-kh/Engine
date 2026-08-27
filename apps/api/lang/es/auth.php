@@ -53,4 +53,31 @@ return [
         'not_enabled' => 'La autenticación de doble factor no está activada en esta cuenta.',
         'provisional_expired' => 'La sesión de configuración del doble factor ha caducado. Vuelve a empezar.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Se ha restablecido tu verificación en dos pasos',
+            'greeting' => 'Hola :name:',
+            'body' => 'Un administrador de la plataforma ha restablecido la verificación en dos pasos de tu cuenta de :app. Tu aplicación de autenticación anterior y tus códigos de recuperación ya no funcionan.',
+            'next' => 'Se te pedirá que vuelvas a configurar la verificación en dos pasos la próxima vez que accedas a una parte protegida de la aplicación.',
+            'unexpected' => 'Si no has solicitado esto, contacta con el soporte de inmediato.',
+            'cta' => 'Ir a :app',
+        ],
+        'exempted' => [
+            'subject' => 'La verificación en dos pasos ya no es obligatoria en tu cuenta',
+            'greeting' => 'Hola :name:',
+            'body' => 'Un administrador de la plataforma ha eliminado la obligación de verificación en dos pasos de tu cuenta de :app. Ahora puedes usar sin configurarla las áreas que antes te la pedían.',
+            'still_enrolled' => 'Si ya tienes la verificación en dos pasos configurada, sigue activa y se te pedirá un código al iniciar sesión: puedes mantenerla o desactivarla en tus ajustes.',
+            'unexpected' => 'Si no esperabas este cambio, contacta con el soporte.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'La verificación en dos pasos vuelve a ser obligatoria en tu cuenta',
+            'greeting' => 'Hola :name:',
+            'body' => 'Un administrador de la plataforma ha restaurado la obligación de verificación en dos pasos en tu cuenta de :app.',
+            'next' => 'La próxima vez que accedas a un área protegida se te pedirá configurar la verificación en dos pasos, si aún no lo has hecho.',
+            'unexpected' => 'Si no esperabas este cambio, contacta con el soporte.',
+        ],
+    ],
 ];

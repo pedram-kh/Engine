@@ -42,6 +42,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $two_factor_confirmed_at
  * @property Carbon|null $two_factor_enrollment_suspended_at
  * @property bool $mfa_required
+ * @property Carbon|null $mfa_exempted_at
+ * @property string|null $mfa_exemption_reason
  * @property bool $is_suspended
  * @property string|null $suspended_reason
  * @property Carbon|null $suspended_at
@@ -87,6 +89,8 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
         'two_factor_confirmed_at',
         'two_factor_enrollment_suspended_at',
         'mfa_required',
+        'mfa_exempted_at',
+        'mfa_exemption_reason',
         'is_suspended',
         'suspended_reason',
         'suspended_at',
@@ -114,6 +118,17 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
      *   - two_factor_confirmed_at               (never in audits)
      *   - two_factor_enrollment_suspended_at    (never in audits)
      *   - remember_token                        (never in audits)
+     *   - mfa_exemption_reason                  (never in audits — AH-087)
+     *
+     * `mfa_exemption_reason` is free-text an admin typed about a named
+     * person. It is excluded under the same redaction discipline as the
+     * other operator-authored reasons: the reason reaches the trail
+     * through the audit row's own `reason` field (the verbs
+     * user.mfa_exempted / user.mfa_exemption_removed both
+     * requiresReason()), so allowlisting the column would duplicate it
+     * into every unrelated `user.updated` snapshot for the rest of that
+     * user's life. `mfa_exempted_at` IS allowlisted — the state is not
+     * sensitive, and seeing it move in a snapshot is the point.
      *
      * Asserted by tests/Feature/Modules/Audit/AuditedTraitTest.php and
      * tests/Feature/Modules/Identity/TwoFactorAuditTest.php.
@@ -135,6 +150,7 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
             'last_login_at',
             'last_login_ip',
             'mfa_required',
+            'mfa_exempted_at',
             'is_suspended',
             'suspended_reason',
             'suspended_at',
@@ -210,6 +226,23 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
     }
 
     /**
+     * True when a platform admin has exempted this user from the 2FA
+     * enrollment requirement (AH-087).
+     *
+     * The exemption removes the REQUIREMENT to enroll, never the
+     * enrollment itself: an exempt user who is also enrolled keeps their
+     * authenticator and is still challenged at sign-in, because the login
+     * gate reads {@see hasTwoFactorEnabled()} and knows nothing about
+     * this column. Platform admins are never exemptable — the admin
+     * guard's server-side gate (EnsureMfaForAdmins) does not consult
+     * this method, and the exemption endpoint refuses admin targets.
+     */
+    public function isMfaExempt(): bool
+    {
+        return $this->mfa_exempted_at !== null;
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
@@ -229,6 +262,7 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
             'two_factor_confirmed_at' => 'datetime',
             'two_factor_enrollment_suspended_at' => 'datetime',
             'mfa_required' => 'boolean',
+            'mfa_exempted_at' => 'datetime',
             'is_suspended' => 'boolean',
             'suspended_at' => 'datetime',
         ];

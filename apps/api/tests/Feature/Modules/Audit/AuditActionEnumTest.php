@@ -182,6 +182,12 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         // IS a NotificationType (creator-facing), so it joins the
         // one-vocabulary tie and both notification tripwires.
         'campaign.job_posted',
+        // AH-087 — admin acting on another user's 2FA. `user.*`-rooted (the
+        // user.suspended precedent), NOT mfa.* (which means self-service).
+        // Email-only, so none of the three is a NotificationType.
+        'user.mfa_reset',
+        'user.mfa_exempted',
+        'user.mfa_exemption_removed',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());
@@ -220,6 +226,13 @@ it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', functi
         // paper-trail; Door 1 (admin_requested) does NOT require a reason.
         'agency_creator_relation.admin_connected',
         'agency_creator_relation.disconnected',
+        // AH-087 — all three admin 2FA operations answer "why", including the
+        // un-exempt direction. Deliberately divergent from agency.reactivated:
+        // restoring a requirement on a PERSON is not restoring an org's default
+        // state, so both directions carry a reason.
+        'user.mfa_reset',
+        'user.mfa_exempted',
+        'user.mfa_exemption_removed',
     ]);
 });
 
@@ -250,6 +263,10 @@ it('flags mfa state-mutating verbs as sensitive credential actions', function ()
         'mfa.recovery_code_consumed',
         'auth.password.changed',
         'auth.password.reset_completed',
+        // AH-087 — the admin reset nulls the secret + recovery codes, so it
+        // inherits the no-plaintext discipline. The exemption pair does not
+        // appear here: it never touches credential material.
+        'user.mfa_reset',
     ]);
 });
 
@@ -257,5 +274,7 @@ it('non-credential actions are not flagged sensitive', function (): void {
     expect(AuditAction::AuthLoginSucceeded->isSensitiveCredentialAction())->toBeFalse()
         ->and(AuditAction::AuthLogout->isSensitiveCredentialAction())->toBeFalse()
         ->and(AuditAction::UserCreated->isSensitiveCredentialAction())->toBeFalse()
-        ->and(AuditAction::MfaEnrollmentSuspended->isSensitiveCredentialAction())->toBeFalse();
+        ->and(AuditAction::MfaEnrollmentSuspended->isSensitiveCredentialAction())->toBeFalse()
+        ->and(AuditAction::UserMfaExempted->isSensitiveCredentialAction())->toBeFalse()
+        ->and(AuditAction::UserMfaExemptionRemoved->isSensitiveCredentialAction())->toBeFalse();
 });

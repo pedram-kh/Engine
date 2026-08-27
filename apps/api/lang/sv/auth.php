@@ -53,4 +53,31 @@ return [
         'not_enabled' => 'Tvåfaktorsautentisering är inte aktiverat för det här kontot.',
         'provisional_expired' => 'Tvåfaktorregistreringssessionen har gått ut. Börja om.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => 'Din tvåfaktorsautentisering har återställts',
+            'greeting' => 'Hej :name,',
+            'body' => 'En plattformsadministratör har återställt tvåfaktorsautentiseringen på ditt :app-konto. Din tidigare autentiseringsapp och dina återställningskoder fungerar inte längre.',
+            'next' => 'Du kommer att bli ombedd att ställa in tvåfaktorsautentisering igen nästa gång du öppnar en skyddad del av appen.',
+            'unexpected' => 'Om du inte har begärt detta ska du kontakta supporten omedelbart.',
+            'cta' => 'Gå till :app',
+        ],
+        'exempted' => [
+            'subject' => 'Tvåfaktorsautentisering krävs inte längre på ditt konto',
+            'greeting' => 'Hej :name,',
+            'body' => 'En plattformsadministratör har tagit bort kravet på tvåfaktorsautentisering från ditt :app-konto. Du kan nu använda de delar som tidigare bad dig ställa in det utan att göra det.',
+            'still_enrolled' => 'Om du redan har ställt in tvåfaktorsautentisering förblir den aktiv och du blir ändå ombedd att ange en kod vid inloggning — du kan behålla den eller stänga av den i dina inställningar.',
+            'unexpected' => 'Om du inte förväntade dig den här ändringen, kontakta supporten.',
+        ],
+        'exemption_removed' => [
+            'subject' => 'Tvåfaktorsautentisering krävs på ditt konto igen',
+            'greeting' => 'Hej :name,',
+            'body' => 'En plattformsadministratör har återinfört kravet på tvåfaktorsautentisering på ditt :app-konto.',
+            'next' => 'Nästa gång du öppnar ett skyddat område blir du ombedd att ställa in tvåfaktorsautentisering, om du inte redan har gjort det.',
+            'unexpected' => 'Om du inte förväntade dig den här ändringen, kontakta supporten.',
+        ],
+    ],
 ];

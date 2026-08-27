@@ -48,4 +48,31 @@ return [
         'not_enabled' => 'L-awtentikazzjoni b\'żewġ fatturi mhijiex attivata għal dan il-kont.',
         'provisional_expired' => 'Il-sessjoni ta\' reġistrazzjoni tal-awtentikazzjoni b\'żewġ fatturi skadiet. Ibda mill-ġdid.',
     ],
+
+    // AH-087 — the three admin-initiated 2FA notices. The admin's reason is
+    // never quoted and the acting admin is never named.
+    'mfa_admin' => [
+        'reset' => [
+            'subject' => "L-awtentikazzjoni b'żewġ fatturi tiegħek ġiet irrisettjata",
+            'greeting' => 'Ċaw :name,',
+            'body' => "Amministratur tal-pjattaforma rrisettja l-awtentikazzjoni b'żewġ fatturi fuq il-kont tiegħek ta' :app. L-app tal-awtentikazzjoni preċedenti u l-kodiċijiet ta' rkupru tiegħek ma jaħdmux aktar.",
+            'next' => "Id-darba li jmiss li tidħol f'parti protetta tal-app, jintalab li tikkonfigura l-awtentikazzjoni b'żewġ fatturi mill-ġdid.",
+            'unexpected' => 'Jekk ma tlabtx dan, ikkuntattja lis-sapport immedjatament.',
+            'cta' => 'Mur fuq :app',
+        ],
+        'exempted' => [
+            'subject' => "L-awtentikazzjoni b'żewġ fatturi ma għadhiex meħtieġa fuq il-kont tiegħek",
+            'greeting' => 'Ċaw :name,',
+            'body' => "Amministratur tal-pjattaforma neħħa l-obbligu tal-awtentikazzjoni b'żewġ fatturi mill-kont tiegħek ta' :app. Il-partijiet li qabel talbuk tikkonfigurah tista' tużahom mingħajru.",
+            'still_enrolled' => "Jekk diġà kkonfigurajt l-awtentikazzjoni b'żewġ fatturi, tibqa' attiva u xorta jintalab kodiċi meta tidħol — tista' żżommha jew titfiha mis-settings tiegħek.",
+            'unexpected' => 'Jekk ma kontx qed tistenna din il-bidla, ikkuntattja lis-sapport.',
+        ],
+        'exemption_removed' => [
+            'subject' => "L-awtentikazzjoni b'żewġ fatturi hija meħtieġa mill-ġdid fuq il-kont tiegħek",
+            'greeting' => 'Ċaw :name,',
+            'body' => "Amministratur tal-pjattaforma reġa' daħħal l-obbligu tal-awtentikazzjoni b'żewġ fatturi fuq il-kont tiegħek ta' :app.",
+            'next' => "Id-darba li jmiss li tidħol f'parti protetta, jintalab li tikkonfigura l-awtentikazzjoni b'żewġ fatturi, jekk għadek ma għamiltx dan.",
+            'unexpected' => 'Jekk ma kontx qed tistenna din il-bidla, ikkuntattja lis-sapport.',
+        ],
+    ],
 ];
