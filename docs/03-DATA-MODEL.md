@@ -1097,6 +1097,26 @@ Centralized table for tracking S3-stored files. Other tables reference this when
 | `created_at`, `updated_at` | timestamptz           |                                                                                                                                                     | P1                  |
 | `deleted_at`               | timestamptz null      |                                                                                                                                                     | P1                  |
 
+> **`files` is spec, not shipped.** No migration has ever created this centralized registry — every upload path in the codebase (creator avatar, portfolio media, brand/agency logo, draft media, contract attachments, and `agency_files` below) writes its own narrow table instead. `agency_files` (AH-091) is one such narrow table, not an implementation of this section: it has no `kind` polymorphism, no `s3_bucket`/`checksum`/`is_public`/`metadata` columns, and is agency-scoped only (`agency_id NOT NULL`, no admin/global rows). Don't read `agency_files` as this table's Phase-1 slice — if `files` is ever built for real, `agency_files` is a migration source, not a subset already in place.
+
+### `agency_files` (AH-091 — chunk A: upload, list, delete; no campaign linkage yet)
+
+A standalone, agency-scoped document library — deliberately not the generic `files` registry above (see the note). `category`'s only value today is `campaign_attachment`; chunk B is expected to attach these rows to campaigns and render them to agencies and (per creator opt-in) creators, at which point a `hasAttachments()` guard already shipped in chunk A blocks deletion of an attached file.
+
+| Column                     | Type                | Notes                                                                                                                                | Phase |
+| -------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----- |
+| `id`                       | bigint PK           |                                                                                                                                      | P1    |
+| `ulid`                     | char(26) unique     |                                                                                                                                      | P1    |
+| `agency_id`                | bigint FK           | `agencies.id`, RESTRICT — `BelongsToAgency`                                                                                          | P1    |
+| `original_filename`        | varchar(255)        |                                                                                                                                      | P1    |
+| `storage_key`              | varchar(512) unique | `agencies/{agency_ulid}/files/{file_ulid}.{ext}` — the house `s3_path` convention, named `storage_key` here                          | P1    |
+| `mime_type`                | varchar(128)        | Wider than `files.mime_type`'s `varchar(64)` above — Office MIME strings (e.g. the 71-char `...wordprocessingml.document`) exceed 64 | P1    |
+| `size_bytes`               | bigint              | Derived server-side from the landed S3 object on complete, never trusted from the client                                             | P1    |
+| `category`                 | varchar(32)         | Enum-backed (`AgencyFileCategory`); v1 single value `campaign_attachment`                                                            | P1    |
+| `uploaded_by_user_id`      | bigint FK null      | `users.id`, SET NULL — the uploader's account may later be deleted; the file outlives it                                             | P1    |
+| `created_at`, `updated_at` | timestamptz         |                                                                                                                                      | P1    |
+| `deleted_at`               | timestamptz null    | Soft-delete; object-first hard delete of the S3 object happens synchronously alongside it (`CreatorPortfolioItem` precedent)         | P1    |
+
 ---
 
 ## 17. Integration tracking
@@ -1201,7 +1221,7 @@ Tenant-scoped models use the `BelongsToAgency` trait. The trait:
 - Defines the `agency()` relationship
 - Validates `agency_id` is set on model events
 
-Models with `BelongsToAgency`: Brand, Campaign, CampaignAssignment, Board, BoardColumn, BoardCard, MessageThread, AgencyCreatorRelation (composite), Payment.
+Models with `BelongsToAgency`: Brand, Campaign, CampaignAssignment, Board, BoardColumn, BoardCard, MessageThread, AgencyCreatorRelation (composite), Payment, AgencyFile.
 
 ### `HasUlids` trait
 

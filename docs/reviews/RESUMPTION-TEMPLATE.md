@@ -116,8 +116,77 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-08-19 · **Through:** AH-083, the missing creator emails chunk (invite ① +
-debounced message ⑧). **Nothing is held.** Since the AH-082 docs commit's close, `origin/main` moved
+**Last updated:** 2026-08-27 · **Through:** AH-091, the Agency Files library (chunk A — upload,
+list, delete). **Push is HELD** on the two-commit pair (`706a0b6e` feat + the docs commit landing
+alongside this refresh) per Pedram's explicit instruction; no push, no CI run, and therefore no
+tip to cite yet. `git rev-parse --short HEAD` is the authority for the actual local tip — re-derive
+it, do not carry this session's SHA forward once a push happens.
+
+> **Honest gap, named rather than silently caught up on:** **AH-085 → AH-090 landed without their
+> own Part 2 refresh** — the same class of miss this file already recorded once for AH-079 → AH-082
+> below. `adhoc-changes-log.md` was and is the whole-time authoritative record for all six
+> (AH-085 brand-picker completeness fix, AH-086 agency sign-in component unification, AH-087 agency
+> member 2FA drill-in controls, AH-088/089 creator DOB→age + graduated floor scoring, AH-090
+> platform automations). This refresh is the first to reflect AH-091 here; it does not attempt to
+> retroactively backfill the five sessions before it — re-derive their detail from the log itself,
+> not from a guess written into this file after the fact.
+
+> **📝 AH-091 — AGENCY FILES LIBRARY, CHUNK A: UPLOAD, LIST, DELETE.** Full loop — read-only
+> inventory (`agency-files-inventory.md`) → kickoff (D1–D7) → plan-pause (`agency-files-plan.md`)
+> → all rulings, Pedram, direct → build (seven sub-steps, each green) → six break-revert proofs →
+> this docs pass. A standalone, per-agency S3-backed document library reachable from a new
+> left-menu **"Files"** entry — deliberately not "Drive": no folders, no sharing, no preview. Any
+> agency member can upload (images + PDF/Office/text/CSV, ≤25 MB, no video) and list
+> (server-paginated); admin + manager can delete (object-first hard delete of the S3 object,
+> synchronous, before the row soft-deletes). No campaign linkage, no creator visibility — that is
+> chunk B, and this chunk ships a `hasAttachments()` guard seam (vacuously false today) so chunk B
+> adds a query rather than a redesign.
+>
+> **Three things to know before touching it.**
+>
+> 1. **This is the sixth presigned-upload surface, and the MIME allowlist finally has ONE source
+>    of truth.** `AttachmentMimeTypes` extracts the previously-triplicated 14-entry array
+>    (`MessageAttachmentUploadService`, `RelationshipMessageAttachmentUploadService`,
+>    `AssignmentOfferAttachmentUploadService` all imported it byte-identically, their own test
+>    suites unchanged and green) and adds `NON_VIDEO` for this chunk's own "documents, not media"
+>    subset. The three-call presign/complete FLOW itself is still hand-duplicated per surface —
+>    that base-class consolidation is named debt, not this chunk's job (`tech-debt.md`'s AH-091
+>    entry, item 4).
+> 2. **Signed downloads here force `Content-Disposition: attachment` — the SECOND such precedent
+>    in the codebase, not the first.** The inventory originally claimed no disposition override
+>    existed anywhere; `PortfolioItemPresenter` already had one, and the inventory file itself now
+>    carries a correction rather than a silent edit. The other five upload-adjacent signed-read
+>    call sites (six, counting the corrected AV-debt tally) still don't — named debt, not fixed
+>    here.
+> 3. **A cross-tenant `{file}` 404s, never 403** — `AgencyFileController` checks
+>    `$file->agency_id === $agency->id` explicitly before the policy even runs, so existence is
+>    never leaked. Pinned by a dedicated test and a break-revert proof.
+>
+> **Gate board (2026-08-27).** Backend Pest **2852 tests, 0 failures** (10903 assertions); PHPStan
+> **0 errors**; Pint **passed**. `apps/main` Vitest **170 files / 1673 tests, all passing**;
+> `vue-tsc` clean; ESLint 0 new errors; Prettier clean. **Six break-reverts, all restored, clean
+> diff verified:** the tenancy 404 guard, the D4 disposition header, the object-first delete
+> ordering (both the service-level throw and the HTTP-level row-visibility), the allowlist's
+> byte-identity pin, the video-subtraction rejection, and one locale's i18n parity key. **No
+> Playwright run this session** — this sandbox has neither a reachable Postgres nor a working
+> Docker daemon, so the full board (which the build intended to re-run, to confirm the new nav item
+> doesn't regress anything) could not be executed locally. Named as a gap, not silently skipped:
+> `tech-debt.md`'s AH-091 entry (item 3) records it, and CI runs the full board on push — that run
+> is this chunk's actual verification, cited once Pedram triggers the push.
+>
+> **Deploy obligation: layered onto the still-held AH-090 range, not a fresh one.** A SECOND
+> additive migration stacked on AH-090's (`CREATE TABLE agency_files`, ships empty); no new flag,
+> no new disk/bucket (reuses `media` under a new prefix); PHP-FPM reload required, queue-worker
+> restart NOT required (this chunk dispatches no queued job). See the `deploy-log.md` 2026-08-27
+> AH-091 entry, stacked above the AH-090 one.
+>
+> **Deliberately not built:** any per-agency quota (byte or count — priced and rejected at plan
+> time, `tech-debt.md` item 2); a Playwright spec for the surface itself (item 3); the shared
+> three-call presigned-flow base class (item 4); AV/magic-byte scanning (inherited platform-wide
+> gap, now named as the sixth affected surface rather than a fresh one).
+
+**Prior state, for the record — AH-083.** **Last updated:** 2026-08-19 · **Through:** AH-083, the
+missing creator emails chunk (invite ① + debounced message ⑧). **Nothing is held.** Since the AH-082 docs commit's close, `origin/main` moved
 by four commits, pushed together: the read-only inventory (`db6ec03d`), the kickoff + plan-pause
 (`691dabce`), the feature build (`7b86bf90`), and this refresh's own docs commit at the tip (a commit
 cannot record its own hash — `git rev-parse --short origin/main` is the authority, re-derive it, do

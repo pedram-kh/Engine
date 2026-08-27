@@ -70,6 +70,62 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-091 · Agency Files library, chunk A — upload, list, delete
+
+- **Status:** Landed — push HELD (per Pedram's explicit instruction).
+- **Date:** 2026-08-27
+- **Why:** agencies had no place to store a document (a brand brief, an internal reference PDF)
+  that wasn't attached to a specific message thread, offer, or contract. Every existing upload
+  path is parent-shaped — a creator, a brand, an assignment — and a standalone library row has no
+  parent to hang off.
+- **What:** a new `agency_files` table (ulid, agency-scoped via `BelongsToAgency`, original
+  filename, unique storage key, mime type, size, a `category` enum with v1's single value
+  `campaign_attachment`, nullable uploader, soft-deletes) plus `AgencyFileUploadService` — the
+  sixth presigned-upload surface, built on the `AssignmentContractUploadService` template. Along
+  the way, extracts the previously-triplicated 14-entry MIME allowlist into a shared
+  `AttachmentMimeTypes` class (byte-identical for its three existing consumers) and adds a fourth
+  constant, `NON_VIDEO`, for this chunk's own "documents, not media" subset. Delete is
+  object-first (hard-delete the S3 object synchronously, then soft-delete the row); a failed
+  object delete throws a new `StorageDeleteFailedException` and leaves the row fully visible
+  rather than orphaning bytes behind an invisible row. Signed downloads force
+  `Content-Disposition: attachment` — the second such precedent in the codebase, after
+  `PortfolioItemPresenter` (the inventory's "none anywhere" claim was wrong; corrected in the
+  inventory file itself). A new "Files" left-menu entry, list page (`BrandListPage`'s
+  server-paginated table shape), and upload dialog (`AttachContractDialog`'s `v-file-input`
+  precedent, no drag-drop) round out the SPA surface. `app.files.*` + `app.nav.files` landed
+  across all 24 locales in the same pass.
+- **Touched:** **Backend** — `AgencyFile` + factory + `AgencyFileCategory` enum;
+  `AgencyFileUploadService` + `StorageDeleteFailedException`; `AttachmentMimeTypes` (new) +
+  the three existing consumers (`MessageAttachmentUploadService`,
+  `RelationshipMessageAttachmentUploadService`, `AssignmentOfferAttachmentUploadService`) switched
+  to import it; `AgencyFileController` + `AgencyFilePolicy` + `AgencyFileResource` + routes; two
+  new `AuditAction` cases (`agency_file.uploaded`, `agency_file.deleted`); one migration
+  (`CREATE TABLE`, additive only). **Frontend** — `apps/main/src/modules/files/` (api, page,
+  upload dialog), the `files.list` route + nav entry, `packages/api-client`'s Agency Files DTOs,
+  i18n ×24. **Tests** — four new Pest files (schema/model, service, disposition, full API/security
+  — 37 tests net-new) plus the `AttachmentMimeTypes` pin, and three new Vitest files (19 tests
+  net-new).
+- **Decisions:** all-members list/download/upload, admin + manager delete. No Playwright spec for
+  the surface itself — the full existing board was intended to be re-run to confirm the new nav
+  item doesn't regress anything, but this session's sandbox had no reachable Postgres/Docker to
+  run it locally; CI carries this verification on push (named as a debt item, not silently
+  skipped — see `tech-debt.md`). No quota (a count cap was priced and rejected — bounds nothing
+  that matters, ignores orphans, needs atomicity and a tier rule that doesn't exist). Three
+  inventory corrections ratified: the AV-debt surface count (four → six, the contract-PDF uploader
+  omission fixed in passing), the disposition precedent (`PortfolioItemPresenter` already existed,
+  contradicting "none anywhere"), and the `03-DATA-MODEL.md` §16 distinction (a shipped narrow
+  library vs. the spec's unbuilt generic `files` registry, plus the `mime_type` width fix,
+  `varchar(64)` → `varchar(128)`, that the wider Office MIME strings would otherwise have hit at
+  runtime).
+- **Ref:** [`agency-files-review.md`](agency-files-review.md) (production posture, the six
+  break-revert proofs, the full gate board, and the Playwright gap named honestly) · plan:
+  [`agency-files-plan.md`](agency-files-plan.md) · inventory:
+  [`agency-files-inventory.md`](agency-files-inventory.md) (now carrying its own "Corrections"
+  section) · extends the AH-010a AV-scanning debt entry to six surfaces · opens four new
+  `tech-debt.md` entries under its own AH-091 heading.
+
+---
+
 ### AH-090 · Platform automations — rules table + on-approval auto-connect
 
 - **Status:** Landed — awaiting Pedram's close.

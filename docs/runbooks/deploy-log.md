@@ -54,6 +54,54 @@ happened.
 
 ---
 
+## 2026-08-27 · AH-091 — agency files library, chunk A: upload, list, delete — PENDING
+
+> **⚠ This entry STACKS on the AH-090 PENDING entry below** (which itself stacks on AH-088 + AH-089,
+> and AH-086 + b + AH-087). Whoever deploys next runs **all four** checklists in one pass. Combined
+> across all four: **4 migrations**, **`migrate` required**, **queue-worker restart required**,
+> **PHP-FPM reload required**, and **one post-deploy artisan command** (the AH-088/089 entry's
+> `creators:recompute-completeness` — neither AH-090 nor AH-091 adds a command of its own).
+
+- **Status:** PENDING
+- **Range:** the tip carrying the AH-090 entry → the tip carrying this entry.
+  - `706a0b6e` — `feat(agencies): Agency Files library, chunk A — upload, list, delete (AH-091)` —
+    the migration, model, service, controller/policy/resource, routes, the shared
+    `AttachmentMimeTypes` extraction (+ the three existing consumers switched to import it), the
+    SPA surface (nav, page, upload dialog, api-client DTOs), i18n ×24, and the full Pest + Vitest
+    coverage.
+  - _(docs commit SHA to be filled once assigned — cannot record its own hash)_ — this entry, the
+    review file, the AH-091 ad-hoc log entry, the `03-DATA-MODEL.md` §16 distinction, the
+    `00-MASTER-ARCHITECTURE.md` §4 tenancy row, and the `tech-debt.md` AV-count correction + four
+    new debt entries.
+- **AH entries carried:** **AH-091.**
+- **Migrations run:** **1** — `2026_08_27_130000_create_agency_files_table.php`. A `CREATE TABLE`,
+  nothing else: **no existing table is touched, no column added anywhere, no backfill.** The
+  table ships **EMPTY** and stays empty until an agency member uploads a file.
+  - **`down()` honesty:** `dropIfExists` is a true structural inverse with a **lossy content
+    inverse** — a rollback discards every row (and every reference to the S3 objects those rows
+    named), but never touches the S3 objects themselves; those sit outside a migration's reach
+    either way. A redeploy comes back with an empty table.
+- **Pre-deploy reads:** none. There is nothing to count — the table doesn't exist before this
+  migration runs, so there is no pre-existing population.
+- **Infra:** **queue-worker restart NOT required** — this chunk dispatches no queued job; every
+  operation (`initUpload`, `completeUpload`, `delete`) runs synchronously in the request. **PHP-FPM
+  reload required** (new controller, policy, routes, model, enum). No cron/scheduler change. No
+  env changes, no new secrets — the existing `media` disk/bucket is reused under a new prefix
+  (`agencies/{agency}/files/`), not a new one.
+- **One-shot commands:** none.
+- **Post-deploy verification:** `/up` 200; then, authenticated as an agency member, `GET
+/api/v1/agencies/{agency}/files` returns `{"data": [], "meta": {"total": 0, ...}}` (the empty
+  table, reachable and authorized) and the agency SPA's new **Files** nav item loads the empty
+  state. Upload one small test file end-to-end (init → PUT → complete) and confirm it lists,
+  downloads with `Content-Disposition: attachment`, and deletes (as admin) with the S3 object
+  actually gone (`aws s3 ls` on the exact key, or the disk's own `exists()` check).
+- **Flags armed:** none — this chunk ships no feature flag; the surface is live for every agency
+  member the moment the deploy completes (no staged rollout was requested).
+- **Operator:** _to be filled at deploy._
+- **Anything unexpected:** _to be filled at deploy._
+
+---
+
 ## 2026-08-27 · AH-090 — platform automations: rules table + on-approval auto-connect — PENDING
 
 > **⚠ This entry STACKS on the two PENDING entries below** (AH-088 + AH-089, and AH-086 + b + AH-087).

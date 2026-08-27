@@ -24,6 +24,37 @@ section.
 
 ---
 
+## Corrections (post-plan-pause, ratified, AH-091, 2026-08-27)
+
+Appended, not rewritten — the findings below stand as originally written; these three corrections
+were surfaced and ratified during the plan-pause and are recorded here rather than silently folded
+into the prose above.
+
+1. **AV-debt surface count was undercounted at "confirmed none... a fifth" (I4, `:254-259` below).**
+   The count omitted `AssignmentContractUploadService` (contract-PDF attachments), which carries
+   the identical no-AV-scan posture and should have been counted among the existing surfaces
+   independent of this feature. With `AgencyFileUploadService` added, the count is **six**, not
+   five: portfolio, campaign messaging, relationship messaging, offer attachments, contract-PDF
+   attachments, and agency files. Corrected in `docs/tech-debt.md`'s AH-010a entry.
+2. **The disposition claim "no `Content-Disposition: attachment` override anywhere in the
+   codebase" (I4, `:277-278` below) is wrong.** `PortfolioItemPresenter::signedUrl()`
+   (`apps/api/app/Modules/Creators/Support/PortfolioItemPresenter.php:111,130`) already passes
+   `ResponseContentDisposition => 'attachment; filename="..."'` on its signed GET — one existing
+   precedent, not zero. The inventory's broader point stands (none of the ~14 OTHER `temporaryUrl()`
+   call sites do this — see the corrected count in `docs/tech-debt.md`'s AH-091 entry, item 1), but
+   "anywhere" overstated it; `AgencyFileUploadService::signedDownloadUrl()` is the second precedent,
+   not the first, and copies this pattern rather than inventing it.
+3. **`docs/03-DATA-MODEL.md` §16 ("Files & uploads") describes a generic, never-built `files`
+   registry** — no migration has ever created it; every real upload path (this one included) writes
+   its own narrow table. `agency_files` is NOT that table's Phase-1 slice: no `kind` polymorphism, no
+   `s3_bucket`/`checksum`/`is_public`/`metadata`, agency-scoped only, and `mime_type` at
+   `varchar(128)` rather than §16's `varchar(64)` (several Office MIME strings, e.g. the 71-character
+   `application/vnd.openxmlformats-officedocument.wordprocessingml.document`, exceed 64 — a detail
+   that would have bitten at runtime had the spec's width been copied verbatim). §16 now carries a
+   note making this distinction explicit, plus the shipped `agency_files` table shape.
+
+---
+
 ## I1 — The upload machinery that exists
 
 ### Every current upload path, enumerated

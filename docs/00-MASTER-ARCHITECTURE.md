@@ -91,6 +91,7 @@ This is critical. Get it wrong in Phase 1 and you spend Phase 3 rebuilding it.
 
 - **Tenant = Agency.** Every tenant-scoped row carries an `agency_id`.
 - **Brand, Campaign, CampaignAssignment, Board, Card, Message** are tenant-scoped via their parent.
+- **AgencyFile** (AH-091 — the agency Files library) is tenant-scoped directly, not via a parent: it has no campaign/creator linkage in chunk A.
 - **Creator, AdminUser, Contract templates** are global (not tenant-scoped).
 - **CreatorAgencyRelation** (creator's blacklist status, ratings, history per agency) is tenant-scoped.
 
