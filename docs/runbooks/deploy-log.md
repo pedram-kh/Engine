@@ -54,25 +54,36 @@ happened.
 
 ---
 
-## 2026-08-27 · AH-088 — creator date of birth → age everywhere — PENDING
+## 2026-08-27 · AH-088 + AH-089 — creator date of birth → age everywhere + graduated floor scoring — PENDING
 
 > **⚠ This entry STACKS on the AH-086 + b + AH-087 entry below, which has not deployed.** Whoever
 > deploys next runs **both** checklists in one pass: this range starts at the tip that carries that
 > entry, so there is no way to ship this without shipping that. Combined obligations across the two
 > entries: **2 migrations**, **`migrate` required**, **queue-worker restart required** (from the
-> entry below — AH-088 adds no mailable and touches no `apps/api/lang/**` file), **PHP-FPM reload
-> required** (both), and **one post-deploy artisan command** (this entry only).
+> entry below — neither AH-088 nor AH-089 adds a mailable or touches `apps/api/lang/**`), **PHP-FPM
+> reload required** (both), and **one post-deploy artisan command** (this entry only).
+>
+> **AH-089 rides this same range and this same one-shot command — it adds no migration and no new
+> infra obligation of its own.** It changes what `creators:recompute-completeness` computes (the
+> floor's own arithmetic), not how it writes or when it must run. See the rewritten blast-radius
+> paragraph below — it supersedes the AH-088-alone figure that was here before AH-089 landed on top
+> of it, per the AH-046 addendum pattern (nothing above is deleted; the correction is additive).
 
 - **Status:** PENDING
 - **Range:** `04a2ecec` (the AH-088 read-only inventory, already on `main`) → the tip carrying this
   entry. Commits, in order:
   - `04a2ecec` — `docs(reviews): creator date-of-birth → age inventory (I1-I6)` (docs-only; the
     read-only inventory AH-088 was built from, already pushed before the build began).
-  - _the feat commit_ — `feat(creators): date of birth with derived age everywhere (AH-088)` — the
-    migration, model, resources, floor, filter, both SPAs, api-client types, 72 locale files.
-  - _this commit_ — `docs(reviews): AH-088 creator date of birth → age — review, AH entry, data
-model, tech debt, deploy` (docs-only; this entry).
-- **AH entries carried:** **AH-088** only.
+  - _the AH-088 feat commit_ — `feat(creators): date of birth with derived age everywhere (AH-088)`
+    — the migration, model, resources, floor, filter, both SPAs, api-client types, 72 locale files.
+  - _the AH-088 docs commit_ — `docs(reviews): AH-088 creator date of birth → age — review, AH entry,
+data model, tech debt, deploy` (docs-only).
+  - _the AH-089 feat commit_ — `feat(creators): graduated per-field floor scoring (AH-089)` —
+    `CompletenessScoreCalculator::profileEarned()` + the new `floorFieldPresence()` one-source
+    enumeration; `isProfileComplete()` untouched. No migration, no schema.
+  - _this commit_ — `docs(reviews): AH-089 graduated floor scoring — review, AH entry, AH-088
+addendum, deploy-log blast-radius rewrite` (docs-only; this entry).
+- **AH entries carried:** **AH-088, AH-089.**
 - **Migrations run:** **1** — `2026_08_27_110000_add_date_of_birth_to_creators_table.php`. Adds
   `creators.date_of_birth` (date, nullable). **Additive-nullable, schema-only: NO BACKFILL, no
   `UPDATE`, no data write of any kind.** Every pre-existing row reads NULL the instant it finishes.
@@ -82,17 +93,27 @@ model, tech debt, deploy` (docs-only; this entry).
   recompute after any rollback is required).
 - **⚠ POST-DEPLOY COMMAND — REQUIRED, and it WRITES:**
   `php artisan creators:recompute-completeness`. Run it **after** `migrate`, from the app root.
-  - **Why it is required:** `date_of_birth` joined the profile-completeness FLOOR (AH-088 D6). The
-    floor is a single all-or-nothing block (`PROFILE_FLOOR_WEIGHT = 13` of the profile unit's 25), so
-    every creator who met the old six-field floor no longer meets the seven-field one. Their
-    persisted `profile_completeness_score` is stale-HIGH until this runs. The score is denormalised
-    on the row and surfaced to agencies on discovery, so a stale value is user-visible.
-  - **Expected blast radius — say the number out loud:** ~279 creators, **all of them**, because
-    NOBODY has a birthday on the day this ships. Each loses the floor block: renormalized against
-    the flags-OFF denominator (65), that is **13/65 ≈ 20 points off every creator's public
-    completeness score.** This is the intended consequence of adding a floor field, not a defect —
-    but it is the single most visible thing this deploy does, and it self-heals per creator the
-    moment they enter a birthday.
+  - **Why it is required:** `date_of_birth` joined the profile-completeness FLOOR (AH-088 D6),
+    taking it from six fields to seven. As of AH-089 (riding this same range, same command), the
+    floor's own `PROFILE_FLOOR_WEIGHT` (13 of the profile unit's 25) is earned **per-field-
+    proportionally** — `13 × (present floor fields ÷ 7)` — not all-or-nothing. Either way, every
+    creator who met the old six-field floor now scores differently against the new seven-field one
+    until this runs; their persisted `profile_completeness_score` is stale until it does. The score
+    is denormalised on the row and surfaced to agencies on discovery, so a stale value is
+    user-visible.
+  - **Expected blast radius — say the number out loud (AH-089 REWRITE — supersedes the figure that
+    stood here before AH-089 landed on top of AH-088; see
+    [`graduated-floor-scoring-review.md`](../reviews/graduated-floor-scoring-review.md)):** ~279
+    creators, because NOBODY has a birthday on the day this ships — but, thanks to AH-089, none of
+    them loses the **whole** floor block anymore. Missing exactly one floor field (DOB, the only gap
+    for this cohort) costs `13 × 1/7 ≈ 1.86` raw points instead of the full 13. Renormalized against
+    the build-time-hidden-steps denominator (65, `WizardStep::WIZARD_HIDDEN_STEPS` — kyc/tax/payout
+    are excluded regardless of any flag), that is **≈2.9 visible points, not ≈20.** A creator
+    previously at 100 lands at **≈97**, not ≈80. The general rule for any creator missing more than
+    one floor field: **delta = their missing-floor-field count × ~2.9 visible points.** This is the
+    intended consequence — considerably gentler than AH-088 alone would have produced, which is the
+    entire reason AH-089 exists — and it remains the single most visible thing this deploy does. It
+    self-heals per creator, per missing field, the moment they fill it.
   - **What it does NOT do:** it does not email anyone, does not change any
     `application_status`, and does not push any creator back into the wizard. Verified before
     shipping: the incomplete-creator nudge keys off `application_status`, not the completeness score,
@@ -110,8 +131,9 @@ model, tech debt, deploy` (docs-only; this entry).
   - `SELECT COUNT(*) FROM creators WHERE date_of_birth IS NOT NULL;` — must be an **error** before
     the migration (column absent) and **0** immediately after.
   - `SELECT ROUND(AVG(profile_completeness_score)) FROM creators;` — record this number BEFORE the
-    recompute. After it, the average should be visibly lower (roughly 20 points for any creator who
-    had met the floor). If it does not move at all, the recompute did not run.
+    recompute. After it, the average should be visibly lower — **roughly 2.9 points for the ~279
+    creators missing only DOB (the AH-089 graduated figure, not the ≈20-point all-or-nothing figure
+    this line quoted before AH-089 landed)**. If it does not move at all, the recompute did not run.
 - **Snapshot ID:** _TBD at deploy time._ **Required** — this range contains a migration AND a
   command that writes to every `creators` row.
 - **Infra:**

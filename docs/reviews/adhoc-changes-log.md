@@ -70,6 +70,54 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-089 · Graduated floor scoring
+
+- **Status:** Landed — awaiting Pedram's close.
+- **Date:** 2026-08-27
+- **Why:** AH-088 made every live creator floor-incomplete overnight (no birthday yet), which exposed
+  that the floor's all-or-nothing score block is disproportionate: one missing field costs the full
+  ~20 visible points regardless of which field, or how many. Pedram's ruling: the score becomes
+  proportional; the gate does not change.
+- **What:** `CompletenessScoreCalculator::profileEarned()`'s floor credit — `PROFILE_FLOOR_WEIGHT`
+  (13, of the profile unit's 25) — is now earned as `13 × (present floor fields ÷ 7)` instead of
+  13-or-0. Both endpoints are fixed points, unchanged: 7/7 present still earns exactly 13, 0/7 still
+  earns exactly 0; only the six intermediate counts are new. The GATE (`isProfileComplete()`, the FE
+  `floorMet` mirror, save-blocking, the wizard step gate, the parity spec) is byte-identical — this
+  chunk changes arithmetic, never gating. No migration, no schema; rides the pending AH-088 deploy's
+  one required `creators:recompute-completeness` run.
+- **Touched:** `CompletenessScoreCalculator` (a new `floorFieldPresence()` one-source enumeration,
+  `profileEarned(): float`, widened from `int`); `CompletenessScoreCalculatorTest` (a one-source pin,
+  a per-field dataset test, a monotonicity dataset test, a production-parity regression pin, four
+  reshaped float-aware pins); `CreatorWizardFlagOffTest` (one test's expectation updated — a
+  same-shape ripple to AH-088's own `CreatorReopenTest` catch, found by running the full suite, not
+  the targeted file).
+- **Decisions:** (D1) the gate stays untouched, said and pinned first. (D2) equal shares, not a
+  per-field weights registry — proportionality is the point, curation is a named follow-up. (D3) a
+  **parallel enumeration**, not a shared call — `isProfileComplete()`'s literal source text is
+  load-bearing for two existing specs (`floor-mirror-parity.spec.ts`, the AH-050 source pin) this
+  chunk does not edit, so a structurally-impossible-to-diverge single function does not exist while
+  that holds; the agreement between the two enumerations is instead pinned mechanically, in the same
+  regex-extraction idiom the AH-050 pin already uses, and proven to bite by break-revert. (D4) the
+  deploy-log's blast-radius paragraph is **rewritten**, not appended — creators previously at 100
+  land at ≈97, not ≈80; the AH-088 review gains a dated addendum pointing here. (D5) FE surfaces
+  audited for hardcoded all-or-nothing assumptions — none found, zero diff. Sub-decision:
+  `profileEarned(): float`, not `int` — mathematically sound widening, `strict_types`-safe, rounding
+  stays single-point inside `score()`.
+- **Carried record (not this chunk's own work, but previously undocumented outside chat):** AH-088's
+  push required one CI-fix commit, `ad696308`. Its own run,
+  [`33045135681`](https://github.com/pedram-kh/Engine/actions/runs/33045135681), was green — all four
+  jobs. The fix: `EmailVerificationTokenTest`'s tamper helper compared a whole multi-character
+  base64url segment to the single-character string `'a'` (a comparison that is never true) instead
+  of that segment's first character, so on the roughly-1-in-64 run where the real first character
+  actually was `'a'`, the "tampered" segment was byte-for-byte identical to the original and
+  `->toBeFalse()` failed on a true assertion. Fixed at both sites, verified with 60 consecutive local
+  runs (0 failures) before repushing.
+- **Ref:** [`graduated-floor-scoring-review.md`](graduated-floor-scoring-review.md) (full decision
+  table, the D3 mechanism + the honest "structurally-impossible-to-diverge" sentence, the
+  break-revert, the gate board, and the full-suite ripple).
+
+---
+
 ### AH-088 · Creator date of birth → age everywhere
 
 - **Status:** Landed — awaiting Pedram's close.

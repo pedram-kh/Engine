@@ -158,6 +158,20 @@ after any rollback.
 
 ---
 
+> **Addendum — 2026-08-27, AH-089 (post-close, AH-046 pattern: nothing above is edited, this stands
+> beside it).** The **≈20-point** figure above assumed the floor's score block stays all-or-nothing
+> once it reaches seven fields — true when this section was written, no longer true. AH-089 makes
+> `PROFILE_FLOOR_WEIGHT` (13) graduated: earned as `13 × (present floor fields ÷ 7)`, not 13-or-0.
+> Riding the **same** pending deploy and the **same** one required
+> `creators:recompute-completeness` run, the realized outcome for this cohort is **≈2.9 visible
+> points per missing floor field, not ≈20** — a creator previously at 100 lands at **≈97** (missing
+> DOB only), not ≈80. The gate this section also describes (`isProfileComplete()`, the hard-block /
+> soft-warn save behaviour, the self-heal-on-next-edit posture) is **unchanged** by AH-089 — only the
+> score's arithmetic softened. Full mechanism, decisions, and evidence:
+> [`graduated-floor-scoring-review.md`](graduated-floor-scoring-review.md).
+
+---
+
 ## 6. The projection trap (O3) — the one that would have shipped silently
 
 The roster list and the discover list both `SELECT` a **slim column set**, not `creators.*`. `age`
