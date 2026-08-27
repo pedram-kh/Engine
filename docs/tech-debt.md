@@ -9,6 +9,57 @@ anyone reviewing it later.
 
 ---
 
+## The agency-side 2FA requirement has never been server-enforced — the exemption is therefore a presentational gate (OPEN)
+
+- **Where:** `apps/main/src/core/router/guards.ts` (`requireMfaEnrolled`, and AH-087's new
+  `requireMfaUnlessExempt`), the two routes that opt into them
+  (`agency-users.list`, `creator-invitations.bulk`), and the API endpoints those pages call —
+  `apps/api/app/Modules/Agencies/Http/Controllers/**`, which carry `auth:web` + tenancy +
+  policy checks but **no MFA middleware**.
+- **The honest sentence:** _the agency-side MFA requirement has never been server-enforced; the
+  exemption is therefore a presentational gate._ For platform admins MFA **is** a real
+  server-side control (`EnsureMfaForAdmins`, on the whole `admin` route group, unconditional and
+  deliberately blind to the exemption columns). For agency users it has only ever been a
+  client-side router guard: an un-enrolled agency admin who calls the underlying endpoint
+  directly — curl, a stale tab, a rebuilt request — is served by the backend today exactly as
+  they were before AH-087.
+- **What we accepted (2026-08-27, AH-087, decision R2):** AH-087's exemption branches the
+  **client guards only**. It does not add a server-side agency MFA gate, because adding one in
+  the same chunk would **tighten** behaviour for the entire default (non-exempt) population —
+  the exact inverse of the inertness requirement that chunk was built to satisfy. Shipping the
+  gate and the exemption together would also mean the gate's first-ever production exercise
+  happened simultaneously with a new bypass branch, with no way to attribute a regression to
+  one or the other.
+- **Why it is debt and not a defect:** nothing regressed — this is the pre-AH-087 state,
+  written down. The debt is the **gap between what the surface implies and what the server
+  enforces**: a member row now renders an "Exempt" chip and an audit trail records
+  `user.mfa_exempted`, which together read as though a security control was relaxed for that
+  person. In truth no server-side control was ever applied to anyone in that population. That
+  discrepancy is harmless while MFA is an internal convention and misleading the moment it is
+  described as a control to someone outside the team.
+- **The fix when it comes:** a server-side MFA gate for the admin-sensitive agency endpoints
+  (the `EnsureMfaForAdmins` shape, applied to the specific agency routes rather than a whole
+  group), with the exemption branch **moved into it** — the guard then becomes a UX
+  affordance in front of a real gate rather than the gate itself. Note the sequencing cost this
+  entry is really tracking: switching it on is a behaviour **tightening** for every un-enrolled
+  agency admin in production, so it needs its own chunk, its own population read
+  (how many agency admins are un-enrolled today), and a communication step — not a quiet
+  middleware addition.
+- **Trigger to escalate:** **before MFA is presented to agencies, customers, auditors, or
+  compliance as a security control** — in a security questionnaire, a SOC-style
+  control narrative, a contract, a trust page, or a sales answer. At that moment the
+  server-side gate ships first and the exemption branch moves into it. A second, softer
+  trigger: any new agency-side surface that handles credentials, payouts, or bulk
+  member/creator operations, since the guard list would otherwise keep growing on a
+  foundation that does not hold.
+- **Resolve by:** no hard date. Blocked on nothing technical — it is a deliberate sequencing
+  choice, re-read at the trigger above.
+- **Status:** OPEN. Surfaced by AH-087 (see
+  [`reviews/admin-agency-members-2fa-review.md`](reviews/admin-agency-members-2fa-review.md),
+  the Production posture section).
+
+---
+
 ## `APP_KEY` exists only in one `.env` file on one volume (OPEN)
 
 - **Where:** production, `apps/api/.env`'s `APP_KEY` — the key that decrypts every TOTP/MFA

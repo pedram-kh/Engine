@@ -1,5 +1,12 @@
 # Platform-admin Agencies section + per-member 2FA controls — Inventory (I1–I4)
 
+> **Outcome: this inventory was built on as AH-087.** See
+> [`admin-agency-members-2fa-review.md`](admin-agency-members-2fa-review.md). One I2 finding
+> changed the shape of the build: `users.mfa_required` turned out to be unusable as the exemption
+> flip (it reads `false` for every agency user today), so the chunk added
+> `users.mfa_exempted_at` + `users.mfa_exemption_reason` instead. This file is kept as the
+> pre-build snapshot and is deliberately **not** retro-edited.
+
 - **Scope:** read-only inventory only. NO edits, NO plan, NO code. Answers I1–I4 for the
   locked feature: a platform-admin "Agencies" left-menu section (browse agencies → members)
   plus two per-member MFA operations — **Reset 2FA** (clears enrollment, re-enroll required,

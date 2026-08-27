@@ -70,6 +70,54 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-087 · Agency members drill-in + per-member 2FA controls (reset / exempt)
+
+- **Status:** Landed — awaiting Pedram's close.
+- **Date:** 2026-08-27
+- **Why:** support had no way to help an agency member who lost their authenticator device, and no
+  way to grant a documented exception to someone who genuinely cannot run one (a shared terminal,
+  no personal phone). Both were manual database work, unaudited, with no record of who did it or
+  why.
+- **What:** a Members card on the existing admin agency detail page — server-paginated roster with
+  name / email / role / status / joined plus an **MFA column rendering exactly three states**
+  (Enrolled / Not enrolled / Exempt) — and two per-member operations behind a
+  reason-mandatory dialog. **Reset 2FA** clears all four enrollment artifacts
+  (`two_factor_secret`, `two_factor_recovery_codes`, `two_factor_confirmed_at`,
+  `two_factor_enrollment_suspended_at`) in one transaction and leaves the account's MFA posture
+  untouched — the person simply re-enrolls. **Exempt / un-exempt** flips a new additive-nullable
+  column pair (`users.mfa_exempted_at` + `users.mfa_exemption_reason`) and is honoured by the main
+  SPA's router guards. Three audit verbs (`user.mfa_reset`, `user.mfa_exempted`,
+  `user.mfa_exemption_removed`), all reason-mandatory; three new mailables ×24 locales, email-only
+  (no `NotificationType`). Platform admins are **never** exemptable — 422, unconditionally.
+- **Touched:** one migration; new `AdminAgencyMemberController` + `MemberMfaActionRequest` + three
+  mailables/views; `User`, `AuditAction`, `AgencyPolicy`, `Admin/Routes/api.php`, `UserResource`,
+  `lang/*/auth.php` ×24; `apps/main` `guards.ts` / `useAuthStore` / `auth/routes.ts`;
+  `apps/admin` `AgencyMembersCard.vue` + `MemberMfaActionDialog.vue` + `agencies.api.ts` +
+  `AgencyDetailPage.vue` + `locales/*/agencies.json` ×24; `packages/api-client` user types;
+  five new test files.
+- **Decisions:** (R1) a **new column pair** rather than the existing `users.mfa_required` — that
+  column reads `false` for every agency user today, so branching enforcement on it would have
+  exempted the entire live population on deploy; the new pair makes inertness structural (every
+  pre-existing row NULL, no backfill, nothing written at deploy). (R2) the exemption branches the
+  **client guards only** — no server-side agency MFA gate ships, because adding one would tighten
+  behaviour for the whole default population; the honest consequence ("the agency-side MFA
+  requirement has never been server-enforced; the exemption is therefore a presentational gate")
+  is a `tech-debt.md` entry with an explicit trigger. (R3) `requireMfaEnrolled` **split** into a
+  precondition gate (2FA-disable page) and `requireMfaUnlessExempt` (the two admin-sensitive
+  routes); route-name branching inside a security gate rejected. (R5) a reason is required in
+  **both** directions of the exemption flip — a deliberate divergence from the
+  `agency.reactivated` precedent, which takes none. (R6) Exempt wins the chip over Enrolled, with
+  "also enrolled" in the tooltip. Plus: `TwoFactorDisabled` deliberately **not** dispatched on an
+  admin reset (it would forge a self-service `mfa.disabled` row attributed to the user);
+  `user.mfa_reset` joins `isSensitiveCredentialAction()` while the exemption pair does not; the
+  free-text reason stays out of `auditableAllowlist()`; a third stacked card, not a tab.
+- **Ref:** [`admin-agency-members-2fa-review.md`](admin-agency-members-2fa-review.md) (full
+  decision table, the production-posture paragraphs, the six break-reverts, gate board);
+  [`admin-agencies-2fa-inventory.md`](admin-agencies-2fa-inventory.md) (the read-only inventory
+  this was built from).
+
+---
+
 ### AH-086 · Agency sign-in — one component, parameterized
 
 - **Status: Closed — approved, pushed.** Verdict: D1–D4 verified as built; the route-name mechanism
