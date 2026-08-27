@@ -423,6 +423,60 @@ describe('SignInPage', () => {
     expect(pushSpy).toHaveBeenCalledWith({ name: 'onboarding.welcome-back' })
   })
 
+  // ---------------------------------------------------------------------
+  // AH-086b — the team-invite email's magic link now carries
+  // ?token=&agency= on the agency variant, forwarding to the SAME
+  // accept-invitation page/flow (byte-identical), never rendering the
+  // sign-in form for that hop.
+  // ---------------------------------------------------------------------
+
+  it('agency variant: a token+agency query forwards to accept-invitation, preserving both params unchanged', async () => {
+    const h = await mountAuthPage(SignInPage, {
+      initialRoute: { name: 'auth.agency-sign-in', query: { token: 'abc123', agency: '01ABCDEF' } },
+    })
+    teardown = h.unmount
+    // Synchronously — before the async router.replace() below even
+    // resolves — the sign-in form never renders for this hop: the
+    // template's v-if gates on the SAME computed the forward reads.
+    expect(h.wrapper.find('[data-test="sign-in-page"]').exists()).toBe(false)
+
+    // The forward itself is an async router.replace() fired from
+    // onMounted, landing on accept-invitation (a lazy-imported route),
+    // so a single flushPromises() pass isn't always enough — poll.
+    await vi.waitFor(() => {
+      expect(h.router.currentRoute.value.name).toBe('accept-invitation')
+    })
+    expect(h.router.currentRoute.value.query).toEqual({ token: 'abc123', agency: '01ABCDEF' })
+  })
+
+  it('agency variant: without a token+agency query, renders the normal sign-in form (no forward)', async () => {
+    const h = await mountAuthPage(SignInPage, { initialRoute: { name: 'auth.agency-sign-in' } })
+    teardown = h.unmount
+    await flushPromises()
+    expect(h.router.currentRoute.value.name).toBe('auth.agency-sign-in')
+    expect(h.wrapper.find('[data-test="sign-in-page"]').exists()).toBe(true)
+  })
+
+  it('agency variant: a token WITHOUT agency (or vice versa) does not forward — renders the form instead', async () => {
+    const h = await mountAuthPage(SignInPage, {
+      initialRoute: { name: 'auth.agency-sign-in', query: { token: 'abc123' } },
+    })
+    teardown = h.unmount
+    await flushPromises()
+    expect(h.router.currentRoute.value.name).toBe('auth.agency-sign-in')
+    expect(h.wrapper.find('[data-test="sign-in-page"]').exists()).toBe(true)
+  })
+
+  it('default /sign-in ignores a token+agency query — the forward is agency-variant-only (D2 zero-diff holds)', async () => {
+    const h = await mountAuthPage(SignInPage, {
+      initialRoute: { path: '/sign-in', query: { token: 'abc123', agency: '01ABCDEF' } },
+    })
+    teardown = h.unmount
+    await flushPromises()
+    expect(h.router.currentRoute.value.name).toBe('auth.sign-in')
+    expect(h.wrapper.find('[data-test="sign-in-page"]').exists()).toBe(true)
+  })
+
   it('submit button switches to the loading label while isLoggingIn is true', async () => {
     let resolveLogin: (u: typeof USER) => void = () => undefined
     vi.mocked(authApi.login).mockImplementation(

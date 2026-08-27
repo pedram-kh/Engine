@@ -17,11 +17,16 @@ use Illuminate\Queue\SerializesModels;
 /**
  * Invitation email sent to a prospective agency member.
  *
- * The magic-link URL is the SPA's accept-invitation route
- * (`/accept-invitation?token={unhashed_token}`). The unhashed
- * token is ONLY present here (in the email) and in the
- * test-helper create response; it is never stored in the database
- * (only its SHA-256 hash is stored — see Q1 answer in review).
+ * AH-086b: the magic-link URL is now the SPA's agency-branded sign-in
+ * door (`/agency/sign-in?token={unhashed_token}&agency={agency_ulid}`),
+ * not the bare accept page directly. `SignInPage.vue` forwards
+ * `token`+`agency` unchanged to the SAME `/accept-invitation` page/flow
+ * — this mailable and its `acceptUrl` construction (in
+ * `AgencyInvitationService::invite()`) are the ONLY thing that changed;
+ * the accept flow itself is untouched. The unhashed token is ONLY
+ * present here (in the email) and in the test-helper create response;
+ * it is never stored in the database (only its SHA-256 hash is stored
+ * — see Q1 answer in review).
  *
  * Q2 answer: Option B — the magic-link goes to a dedicated accept
  * page that shows the invitation details before the user confirms.

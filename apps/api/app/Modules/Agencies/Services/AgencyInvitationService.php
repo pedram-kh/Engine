@@ -59,12 +59,19 @@ final class AgencyInvitationService
             return $invitation;
         });
 
-        // Build the magic-link URL for the SPA accept page. The `agency`
-        // parameter carries the agency ULID so the accept page can call
-        // POST /api/v1/agencies/{agency}/invitations/accept — the endpoint
-        // requires the agency identifier in the path.
+        // Build the magic-link URL for the SPA. AH-086b: the door is now
+        // `/agency/sign-in` (the agency-branded sign-in variant) rather
+        // than the bare `/accept-invitation` page directly — SignInPage.vue
+        // detects `token`+`agency` on that route and forwards to the SAME
+        // `/accept-invitation` page/flow, unchanged, carrying both params.
+        // The `agency` parameter carries the agency ULID so the accept
+        // flow can call POST /api/v1/agencies/{agency}/invitations/accept —
+        // the endpoint requires the agency identifier in the path. Already
+        // -sent invitations keep the old `/accept-invitation?...` URL baked
+        // into their email body; that route is untouched and still
+        // resolves directly, so those links keep working unchanged.
         $acceptUrl = rtrim((string) config('app.frontend_main_url', config('app.url')), '/')
-            .'/accept-invitation?token='.$token.'&agency='.$agency->ulid;
+            .'/agency/sign-in?token='.$token.'&agency='.$agency->ulid;
 
         // The invitee's name: if they already have an account, use it;
         // otherwise fall back to the email local part.

@@ -75,9 +75,40 @@ const headingKey = computed(() =>
   isAgencyVariant.value ? 'auth.ui.headings.agency_sign_in' : 'auth.ui.headings.sign_in',
 )
 
+/**
+ * AH-086b — the agency team-invite email's magic link now points at
+ * this route carrying `?token=&agency=` instead of `/accept-invitation`
+ * directly (see `AgencyInvitationService::invite()`). This component
+ * never inspects, hashes, or validates the token itself — it forwards
+ * both params UNCHANGED to the SAME `/accept-invitation` page/flow,
+ * which is byte-identical and does all the real work. Gated on
+ * `isAgencyVariant` so `/sign-in` itself never forwards on a stray
+ * `token`/`agency` query — the D2 zero-diff pin from AH-086 holds.
+ * Already-sent invite emails carry the OLD `/accept-invitation?...`
+ * URL, which this chunk does not touch — those links keep resolving
+ * directly, unaffected by this forward existing or not.
+ */
+const inviteForwardTarget = computed(() => {
+  if (!isAgencyVariant.value) {
+    return null
+  }
+  const token = typeof route.query.token === 'string' ? route.query.token : null
+  const agency = typeof route.query.agency === 'string' ? route.query.agency : null
+  if (token === null || agency === null) {
+    return null
+  }
+  return { name: 'accept-invitation', query: { token, agency } }
+})
+
 // On mount rather than at module scope so the pixel is tied to this page
-// being shown, not to the route chunk being downloaded.
+// being shown, not to the route chunk being downloaded. An invite-link
+// forward takes priority — the pixel should not fire for a hop nobody
+// actually saw rendered.
 onMounted(() => {
+  if (inviteForwardTarget.value !== null) {
+    void router.replace(inviteForwardTarget.value)
+    return
+  }
   loadMetaPixel(window, document)
 })
 
@@ -170,7 +201,7 @@ async function onSubmit(): Promise<void> {
 </script>
 
 <template>
-  <section data-test="sign-in-page">
+  <section v-if="inviteForwardTarget === null" data-test="sign-in-page">
     <h2 class="text-h5 mb-4" data-test="sign-in-heading">
       {{ t(headingKey) }}
     </h2>

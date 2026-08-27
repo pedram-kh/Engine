@@ -43,6 +43,28 @@ it('agency_admin can create an invitation', function (): void {
     Mail::assertQueued(InviteAgencyUserMail::class, fn ($mail) => $mail->hasTo('new@example.com'));
 });
 
+it('AH-086b: the queued invite mail\'s magic link points at /agency/sign-in, carrying token + agency', function (): void {
+    Mail::fake();
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $this->actingAs($admin)
+        ->postJson("/api/v1/agencies/{$agency->ulid}/invitations", [
+            'email' => 'new@example.com',
+            'role' => AgencyRole::AgencyManager->value,
+        ])
+        ->assertCreated();
+
+    Mail::assertQueued(InviteAgencyUserMail::class, function (InviteAgencyUserMail $mail) use ($agency): bool {
+        expect($mail->acceptUrl)
+            ->toContain('/agency/sign-in?token=')
+            ->toContain('&agency='.$agency->ulid)
+            ->not->toContain('/accept-invitation');
+
+        return true;
+    });
+});
+
 it('agency_manager cannot create an invitation', function (): void {
     Mail::fake();
     $agency = Agency::factory()->createOne();

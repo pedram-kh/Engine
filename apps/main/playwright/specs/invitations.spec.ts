@@ -182,6 +182,51 @@ test.describe('Invitation happy path', () => {
     await expect(page.locator(dt(testIds.acceptInvitationSuccess))).toBeVisible({ timeout: 8000 })
   })
 
+  test('AH-086b: the /agency/sign-in door forwards to the SAME accept flow, preserving token+agency', async ({
+    page,
+  }) => {
+    const request = page.context().request
+
+    const inviteeEmail = `invitee-door-${Date.now()}@catalyst-test.dev`
+    const inviteePassword = 'Cata1yst-E2E-Invitee!'
+    await signUpUser(request, inviteeEmail, inviteePassword, 'Door Invitee')
+
+    const { token, agencyUlid: invitedAgencyUlid } = await seedAgencyInvitation(
+      request,
+      agencyUlid,
+      {
+        email: inviteeEmail,
+        role: 'agency_staff',
+      },
+    )
+
+    // This is the exact shape `AgencyInvitationService::invite()` now
+    // mints for the team-invite email's CTA — the door this chunk adds.
+    const doorUrl = `/agency/sign-in?token=${token}&agency=${invitedAgencyUlid}`
+
+    // Sign in first, then follow the door while authenticated — proves
+    // the forward preserves both params through to the SAME accept
+    // page/flow, and that acceptance itself still completes exactly as
+    // it did before this chunk (byte-identical downstream of the door).
+    await page.goto('/sign-in')
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(inviteeEmail)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(inviteePassword)
+    await page.locator(dt(testIds.signInSubmit)).click()
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
+
+    await page.goto(doorUrl)
+
+    // The forward lands on the SAME accept-invitation page, carrying the
+    // SAME token + agency — never rendering the sign-in form for this hop.
+    await expect(page).toHaveURL(/\/accept-invitation\?/, { timeout: 8000 })
+    expect(page.url()).toContain(`token=${token}`)
+    expect(page.url()).toContain(`agency=${invitedAgencyUlid}`)
+    await expect(page.locator(dt(testIds.acceptInvitationPending))).toBeVisible({ timeout: 8000 })
+
+    await page.locator(dt(testIds.acceptInvitationBtn)).click()
+    await expect(page.locator(dt(testIds.acceptInvitationSuccess))).toBeVisible({ timeout: 8000 })
+  })
+
   test('expired invitation shows distinct expired state', async ({ page }) => {
     const request = page.context().request
 

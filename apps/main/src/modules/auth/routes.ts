@@ -86,6 +86,15 @@ export const authRoutes: RouteRecordRaw[] = [
   // `requireGuest` guard and nothing more. A creator who lands here still
   // signs in successfully and is routed home by role — this is a door,
   // not a wall.
+  //
+  // AH-086b: also the team-invite email's magic-link door. When `?token=`
+  // + `?agency=` are present, SignInPage.vue forwards them unchanged to
+  // `accept-invitation` (the real, untouched accept flow) instead of
+  // rendering the sign-in form — see `inviteForwardTarget` there. Safe
+  // under `requireGuest`: an invite-email click is always a fresh page
+  // load, so `store.user` reads null pre-bootstrap regardless of an
+  // existing session, and the forward always fires; `accept-invitation`
+  // itself bootstraps and resolves the true auth state either way.
   {
     path: '/agency/sign-in',
     name: 'auth.agency-sign-in',

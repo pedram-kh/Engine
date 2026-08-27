@@ -46,7 +46,7 @@ it('renders the invitation mail in English', function (): void {
         inviter: $inviter,
         inviteeName: 'Bob Invitee',
         role: AgencyRole::AgencyManager,
-        acceptUrl: 'https://app.example.com/accept-invitation?token=abc123',
+        acceptUrl: 'https://app.example.com/agency/sign-in?token=abc123&agency=01ABCDEF',
         expiresInDays: 7,
     );
 
@@ -56,10 +56,13 @@ it('renders the invitation mail in English', function (): void {
         ->toContain('Acme Agency')
         ->toContain(config('app.name'));
 
+    // AH-086b: the mail's magic-link CTA now points at /agency/sign-in
+    // (the token+agency-carrying door), not /accept-invitation directly.
     expect($result['body'])
         ->toContain('Acme Agency')
         ->toContain('Alice Admin')
-        ->toContain('accept-invitation')
+        ->toContain('agency/sign-in?token=abc123&amp;agency=01ABCDEF')
+        ->not->toContain('accept-invitation')
         ->toContain('7'); // expiry days
 });
 
@@ -72,7 +75,7 @@ it('renders the invitation mail in Portuguese', function (): void {
         inviter: $inviter,
         inviteeName: 'Bob Convidado',
         role: AgencyRole::AgencyStaff,
-        acceptUrl: 'https://app.example.com/accept-invitation?token=abc123',
+        acceptUrl: 'https://app.example.com/agency/sign-in?token=abc123&agency=01ABCDEF',
         expiresInDays: 7,
     );
 
@@ -91,7 +94,7 @@ it('renders the invitation mail in Italian', function (): void {
         inviter: $inviter,
         inviteeName: 'Bob Invitato',
         role: AgencyRole::AgencyAdmin,
-        acceptUrl: 'https://app.example.com/accept-invitation?token=abc123',
+        acceptUrl: 'https://app.example.com/agency/sign-in?token=abc123&agency=01ABCDEF',
         expiresInDays: 7,
     );
 
