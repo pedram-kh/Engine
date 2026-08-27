@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Modules\Creators\Http\Controllers\Admin;
 
 use App\Core\Tenancy\BelongsToAgencyScope;
+use App\Modules\Admin\Enums\AutomationEvent;
+use App\Modules\Admin\Jobs\RunAutomationRuleJob;
+use App\Modules\Admin\Models\AdminAutomationRule;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
@@ -298,6 +301,8 @@ final class AdminCreatorController
             array_filter(['welcome_message' => $welcomeString], static fn ($v): bool => $v !== null),
         );
 
+        $this->dispatchApprovalAutomations($creator);
+
         return (new CreatorResource($creator, $this->calculator))
             ->withAdmin(true)
             ->response($request);
@@ -431,6 +436,41 @@ final class AdminCreatorController
         return (new CreatorResource($creator, $this->calculator))
             ->withAdmin(true)
             ->response($request);
+    }
+
+    /**
+     * The `creator.approved` automation hook (AH-090, D4).
+     *
+     * Inline here rather than behind a new domain event, following the AH-056
+     * flip-detector precedent: this method is the ONLY production write of
+     * `ApplicationStatus::Approved`, so one hook site is complete coverage, and
+     * a new event system for a single-writer transition would be machinery
+     * without a second subscriber.
+     *
+     * ⚠ Called AFTER the approval transaction has committed, deliberately. Every
+     * queue connection is configured `after_commit => false`, so a dispatch from
+     * inside that transaction is visible to a worker BEFORE the commit — the job
+     * would then re-read a creator who is still `pending` and skip for a reason
+     * that is not true, i.e. the feature would silently never fire. Same trap,
+     * same resolution as `CampaignController::update()`'s post-save dispatch.
+     * Moving this call inside the transaction is a break-revert seam.
+     *
+     * Nothing about whether a rule SHOULD fire is decided here. This reads
+     * "which rules are watching" and hands each one to a job that re-checks
+     * everything live (D5), because minutes can pass before a worker picks it
+     * up. Re-approval after a reopen dispatches again; the connect operation's
+     * idempotency absorbs the repeat.
+     */
+    private function dispatchApprovalAutomations(Creator $creator): void
+    {
+        $rules = AdminAutomationRule::query()
+            ->where('event', AutomationEvent::CreatorApproved->value)
+            ->where('enabled', true)
+            ->get();
+
+        foreach ($rules as $rule) {
+            RunAutomationRuleJob::dispatch($creator->id, $rule->id);
+        }
     }
 
     /**

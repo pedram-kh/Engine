@@ -15,6 +15,7 @@ use App\Modules\Creators\Features\JobPostedNotificationsEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Creators\Features\MissingCreatorMailsEnabled;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
+use App\Modules\Creators\Features\PlatformAutomationsEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Identity\Enums\UserType;
 use Illuminate\Http\JsonResponse;
@@ -89,6 +90,10 @@ final class AdminFeatureFlagController
         MissingCreatorMailsEnabled::NAME => [
             'label' => 'Missing creator mails (invite + debounced message)',
             'description' => 'Emails a campaign invite (fresh, re-offer, or counter-response) and a debounced new-message notice. Gates mail only — the invite in-app row and both immediate message in-app rows are unaffected.',
+        ],
+        PlatformAutomationsEnabled::NAME => [
+            'label' => 'Platform automations',
+            'description' => 'Lets configured automation rules act. With this off, rules can still be created and enabled but never fire — the kill switch for every rule at once.',
         ],
     ];
 

@@ -9,6 +9,7 @@ use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
 use App\Modules\Creators\Features\JobPostedNotificationsEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
+use App\Modules\Creators\Features\PlatformAutomationsEnabled;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -63,7 +64,8 @@ it('lists every registered flag with its current state', function (): void {
         ->and($names)->toContain(ContractSigningEnabled::NAME)
         ->and($names)->toContain(IncompleteCreatorNudgeEnabled::NAME)
         ->and($names)->toContain(JobPostedNotificationsEnabled::NAME)
-        ->and($names)->toContain(ApplicationNotificationsEnabled::NAME);
+        ->and($names)->toContain(ApplicationNotificationsEnabled::NAME)
+        ->and($names)->toContain(PlatformAutomationsEnabled::NAME);
     expect($response->json('data.0.attributes'))->toHaveKeys([
         'name', 'label', 'description', 'enabled',
     ]);
@@ -114,6 +116,33 @@ it('lets an admin arm + disarm the application mails from the same registry (AH-
 
     expect($off->status())->toBe(200);
     expect(Feature::active(ApplicationNotificationsEnabled::NAME))->toBeFalse();
+});
+
+it('lets an admin arm + disarm platform automations from the same registry (AH-090, C8)', function (): void {
+    $admin = makeFlagAdmin();
+
+    // Ships dark: the platform's first automated WRITE path into live
+    // relationship data does not fire on deploy day.
+    expect(Feature::active(PlatformAutomationsEnabled::NAME))->toBeFalse();
+
+    $on = $this->actingAs($admin, 'web_admin')->postJson(
+        '/api/v1/admin/feature-flags/'.PlatformAutomationsEnabled::NAME,
+        ['enabled' => true, 'reason' => 'Arming the on-approval auto-connect rule.'],
+    );
+
+    expect($on->status())->toBe(200);
+    expect(Feature::active(PlatformAutomationsEnabled::NAME))->toBeTrue();
+
+    // The point of the flag over per-rule `enabled`: ONE flip stops every rule,
+    // including the ones nobody has thought about yet. A switch reachable only
+    // from `tinker` (the AH-056 lesson) would not be that.
+    $off = $this->actingAs($admin, 'web_admin')->postJson(
+        '/api/v1/admin/feature-flags/'.PlatformAutomationsEnabled::NAME,
+        ['enabled' => false, 'reason' => 'Stopping every rule at once.'],
+    );
+
+    expect($off->status())->toBe(200);
+    expect(Feature::active(PlatformAutomationsEnabled::NAME))->toBeFalse();
 });
 
 it('activates a flag, flips Feature::active live, and writes an audit row', function (): void {
