@@ -1,12 +1,22 @@
 # Agency members drill-in + per-member 2FA controls (AH-087)
 
-- **Status: Built — awaiting Pedram's close.** Full loop: read-only inventory
+- **Status: Closed — approved, pushed.** Full loop: read-only inventory
   ([`admin-agencies-2fa-inventory.md`](admin-agencies-2fa-inventory.md), commit `cfd776a2`) →
   kickoff with locked decisions (D1–D6) → plan-pause (R1–R7 ratified) → build (S1–S11) →
-  gate board → **push held**.
+  gate board → **pushed**.
 - **Date:** 2026-08-27.
 - **Provenance:** kickoff decisions D1–D6 locked by Pedram; the plan-pause questions R1–R7
-  answered by Pedram before any code was written; built by Cursor.
+  answered by Pedram before any code was written; built by Cursor. **Closed by Pedram**,
+  verdict: R1–R7 verified as ruled; the structural-inertness proof accepted with both polarity
+  break-reverts ([§8](#8-gate-board)); the [§2](#2-production-posture--read-this-before-approving)
+  Production posture accepted as the record — the presentational-gate limitation stated plainly,
+  the tech-debt trigger named; the six break-reverts confirmed, including the #6 EN-fallback
+  finding written up as a standing lesson (a missing locale string silently renders the English
+  string rather than erroring — the `LangParityTest` en-SOT keyset gate is the actual tripwire,
+  not the mailable render test); the D2 `TwoFactorDisabled`-not-dispatched shape verified
+  ([§4](#4-d2--reset-2fa-the-support-operation)); the `ah087` helper-prefix fix accepted as the
+  AH-085 bug class caught locally rather than in CI; three mailables' §5.3 real-render coverage
+  ×24 confirmed green, flaky-10.
 - **Evidence base:** the inventory file above (every claim about the pre-existing MFA graph
   in this document traces to it); the **suspend pattern** (`AdminAgencyController::suspend` /
   `reactivate` — mandatory reason, audit verb, row marker) as the shape both write operations

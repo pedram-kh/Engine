@@ -54,33 +54,52 @@ happened.
 
 ---
 
-## 2026-08-27 · AH-087 — agency members drill-in + per-member 2FA controls — PENDING
+## 2026-08-27 · AH-086 + b + AH-087 — agency sign-in variant, team-invite email door, agency members drill-in + per-member 2FA controls — PENDING
 
-> **Stacks on the AH-086 + b entry below, which is itself still PENDING.** Deploying this range
-> necessarily deploys AH-086 + b as well — read both entries' Infra sections together, and treat
-> the union of their obligations as this deploy's checklist. AH-086 + b's obligations (worker
-> restart + FPM reload + the `apps/main` bundle) are a **subset** of this entry's, except for its
-> post-deploy invite-URL check, which still has to be run.
+> This entry **merges** what were, until this update, two stacked `PENDING` entries — the AH-086 +
+> b entry (opened first) and the AH-087 entry (opened on top of it, itself noting it stacked on
+> the entry below). Neither has deployed, so per the arc-deploy convention
+> (`production-queue-worker.md` §8.3 — a themed backlog does not ship as a subset) they are
+> combined into the one checklist whoever deploys next actually runs, rather than left as two
+> entries a deployer has to remember to read together.
 
 - **Status:** PENDING
-- **Range:** `2de36602` (the current `origin/main` tip, exclusive) → the tip carrying this entry.
-  Commits, in order:
+- **Range:** `6f5351de` (the AH-085 deployed tip, exclusive) → `5aa6564f` (the tip carrying this
+  entry). Commits, in order:
+  - `e6488eb1`, `f2d8851a`, `245f346d` — AH-085's own CI-fix-record + deploy-log open/close
+    (docs-only; AH-085 itself already **DEPLOYED**, see below — carried here only for range
+    completeness, no obligation of its own).
+  - `82a9ce98` — `docs(reviews): production email inventory — every mailable, trigger, gate, and
+verbatim copy` (docs-only).
+  - `2e7c02ad` — `feat(auth): agency-facing sign-in variant, one component (AH-086)`.
+  - `39c9e5af` — `docs(reviews): AH-086 agency sign-in — decision table, mechanism, gate board`
+    (docs-only).
+  - `0edcffa1` — `feat(agencies): team-invite email's CTA doors through /agency/sign-in (AH-086b)`
+    — the magic-link door (`AgencyInvitationService` + `InviteAgencyUserMail` + `SignInPage.vue` +
+    the new tests).
+  - `a1b5507c` — `docs(reviews): AH-086 close-out + AH-086b addendum, deploy-log PENDING entry`
+    (docs-only).
+  - `2de36602` — `fix(tests): Larastan-safe assertion chaining in AH-086b invite tests` (test-only).
   - `cfd776a2` — `docs(reviews): admin agencies + 2FA controls inventory` (docs-only; the
-    read-only inventory this chunk was built from — already committed, push held).
-  - the feature commits carrying AH-087 (backend + frontend) and the docs commit carrying this
-    entry — see `git log` at the tip for their exact SHAs.
-- **AH entries carried:** **AH-087** — plus **AH-086 + AH-086b** inherited from the still-pending
-  entry below (see the note above).
-- **Migrations run:** **1** —
-  `2026_08_27_100000_add_mfa_exemption_to_users_table.php`. Adds `users.mfa_exempted_at`
-  (timestamp, nullable) and `users.mfa_exemption_reason` (text, nullable).
+    read-only inventory AH-087 was built from).
+  - `48a984a8` — `feat(admin): agency members drill-in + per-member 2FA reset/exempt (AH-087)`.
+  - `c140b001` — `feat(spa): members card with 2FA controls + exemption-aware guard (AH-087)`.
+  - `5aa6564f` — `docs(reviews): AH-087 agency members 2FA — review, tenancy rows, tech debt,
+deploy` (docs-only; this entry).
+- **AH entries carried:** **AH-086** (base) + the **AH-086b addendum** (same thread, not a
+  separate AH number) + **AH-087.**
+- **Migrations run:** **1 total across the whole range** —
+  `2026_08_27_100000_add_mfa_exemption_to_users_table.php` (AH-087). Adds
+  `users.mfa_exempted_at` (timestamp, nullable) and `users.mfa_exemption_reason` (text, nullable).
   **Additive-nullable, schema-only: NO BACKFILL, no `UPDATE`, no data write of any kind.** Every
   pre-existing row reads NULL the instant it finishes, which is what makes the exemption branch
-  inert on arrival — nothing about anyone's MFA behaviour changes at deploy time. The `down()` is
-  an honest inverse (both columns are net-new and hold no pre-existing data); note that rolling
-  back discards any exemption granted after the migration ran, which **re-imposes** the MFA gate
-  on those people — fail-closed, not fail-open — while the audit trail survives in `audit_logs`
-  regardless.
+  inert on arrival — nothing about anyone's MFA behaviour changes at deploy time. AH-086 + b add no
+  migration (AH-086 is SPA-only; AH-086b changes one URL-building line in
+  `AgencyInvitationService::invite()` and a docblock, no schema touch). The `down()` on the one
+  migration is an honest inverse (both columns are net-new and hold no pre-existing data); note
+  that rolling back discards any exemption granted after the migration ran, which **re-imposes**
+  the MFA gate on those people — fail-closed, not fail-open — while the audit trail survives in
+  `audit_logs` regardless.
 - **Pre-deploy reads:** **none required** (nothing is read or transformed). Optional and cheap, as
   a sanity anchor for the honest-inverse note above:
   `SELECT COUNT(*) FROM users WHERE mfa_exempted_at IS NOT NULL;` — must be an error before the
@@ -88,113 +107,72 @@ happened.
 - **Snapshot ID:** _TBD at deploy time._ **Required** — this range contains a migration.
   Confirm the snapshot reads `available` before running `migrate`.
 - **Infra:**
-  - **`php artisan migrate`: REQUIRED** — the one migration above.
-  - **Queue-worker restart: REQUIRED.** Three net-new mailables
-    (`MfaResetByAdminMail`, `MfaExemptionGrantedMail`, `MfaExemptionRemovedMail`) plus 24 touched
-    `apps/api/lang/*/auth.php` files. A stale worker would fail to resolve the new classes and
-    would render the new keys from stale bytecode.
-  - **PHP-FPM reload: REQUIRED.** Auth-path PHP moved: `User` (the new cast, fillable entries,
-    `isMfaExempt()`, the audit allowlist), `UserResource` (the new `mfa_exempt` attribute that the
-    main SPA's guard reads), `AgencyPolicy` (two new abilities), `AuditAction` (three new cases),
-    and the new controller + form request. Without fresh bytecode the four new routes 404 and
-    `/me` keeps omitting `mfa_exempt` — which would leave the new `requireMfaUnlessExempt` guard
-    reading `undefined` and defaulting every user to non-exempt (fail-closed, but the exemption
-    feature would silently not work).
+  - **`php artisan migrate`: REQUIRED** — the one migration above (AH-087 only).
+  - **Queue-worker restart: REQUIRED — one restart covers four mailable-touching files across the
+    whole range.** AH-086b touched an existing mailable (`InviteAgencyUserMail.php`, docblock
+    only, but the standing house rule treats any mailable-file touch as worker-restart territory
+    rather than a case-by-case bytecode read). AH-087 adds **three net-new** mailables
+    (`MfaResetByAdminMail`, `MfaExemptionGrantedMail`, `MfaExemptionRemovedMail`) plus touches 24
+    `apps/api/lang/*/auth.php` files (both AH-086b's own subject-mirror keys and AH-087's new
+    `mfa_admin.*` keys live there). A stale worker would keep rendering old copy and would fail to
+    resolve the three new mailable classes at all.
+  - **PHP-FPM reload: REQUIRED — auth-path PHP moved in both AH-086b and AH-087.** AH-086b's
+    `AgencyInvitationService::invite()` URL-building line runs synchronously in the web/FPM
+    process at invite-creation time — the `Mailable`'s `acceptUrl` is baked into its constructor
+    arguments before queueing, so the worker never re-derives it; a stale opcache keeps minting the
+    OLD `/accept-invitation?...` URL. AH-087 moved `User` (new cast, fillable entries,
+    `isMfaExempt()`, the audit allowlist), `UserResource` (the new `mfa_exempt` attribute the main
+    SPA's guard reads), `AgencyPolicy` (two new abilities), `AuditAction` (three new cases), and the
+    new controller + form request — without fresh bytecode the four new member-2FA routes 404 and
+    `/me` keeps omitting `mfa_exempt`, defaulting every user to non-exempt (fail-closed, but the
+    exemption feature would silently not work). One reload discharges both.
   - No cron/scheduler change, no env change, **no flag** (this range touches no flag).
-  - **Both SPA bundles need their normal rebuild + redeploy:** `apps/admin` (the members card and
-    its dialog are invisible without it) and `apps/main` (the guard split — without it the old
-    single guard keeps running and an exempt member is still redirected to enroll).
+  - **Both `apps/main` and `apps/admin` need their normal rebuild + redeploy.** `apps/main` carries
+    AH-086's `/agency/sign-in` route/component, AH-086b's invite-forward branch, and AH-087's guard
+    split; `apps/admin` carries AH-087's Members card and its dialog. None of the three reaches a
+    browser without both bundles going out.
 - **One-shot commands:** **none.**
 - **Post-deploy verification:** `/up` 200 + one authenticated request, then:
-  1. `SELECT COUNT(*) FROM users WHERE mfa_exempted_at IS NOT NULL;` → **0**. The direct proof
-     the migration wrote no data (the inertness claim).
-  2. Admin panel → any agency → the **Members** card loads, and the MFA column renders
+  1. `/agency/sign-in` renders the agency heading, no creator-signup CTA (AH-086).
+  2. A fresh invite created post-deploy (agency_admin → Invite user modal) contains a
+     `/agency/sign-in?token=...&agency=...` link, not `/accept-invitation?...` — the direct proof
+     the FPM reload actually took for AH-086b (a stale opcache would silently fail this exact
+     check).
+  3. That link, followed unauthenticated, lands on the same accept-invitation preview/sign-in
+     surface as before (AH-086b's forward), and an OLD-shape link sent before this deploy still
+     resolves directly — nothing 404s.
+  4. `SELECT COUNT(*) FROM users WHERE mfa_exempted_at IS NOT NULL;` → **0**. The direct proof the
+     AH-087 migration wrote no data (the inertness claim).
+  5. Admin panel → any agency → the **Members** card loads, and the MFA column renders
      Enrolled / Not enrolled for the existing population — **no row shows "Exempt"** (same
      inertness claim, from the UI side).
-  3. Reset 2FA on a **test** member who is enrolled: the row flips to Not enrolled, an
+  6. Reset 2FA on a **test** member who is enrolled: the row flips to Not enrolled, an
      `user.mfa_reset` row appears in the admin audit log with the typed reason, and the member
      receives the reset email. Re-running it 409s.
-  4. Exempt that same test member, then confirm (a) the chip reads Exempt with the reason in its
+  7. Exempt that same test member, then confirm (a) the chip reads Exempt with the reason in its
      tooltip, (b) an `user.mfa_exempted` row exists, (c) the member receives the exemption email,
      and (d) **attempting the same on a platform-admin target is refused** with
      `mfa.platform_admin_not_exemptable`. Then remove the exemption and confirm the reverse row +
      email. Leave no test exemption in place.
-  5. An un-enrolled, **non-exempt** agency admin still hits the enroll redirect on
-     `/agency/users` — the default population's behaviour is unchanged (the guard-side inertness
-     claim).
-  6. AH-086 + b's own post-deploy check, inherited: a fresh invite created post-deploy mints a
-     `/agency/sign-in?token=…` link (see the entry below).
+  8. An un-enrolled, **non-exempt** agency admin still hits the enroll redirect on
+     `/agency/users` — the default population's behaviour is unchanged (AH-087's guard-side
+     inertness claim).
 - **Flags armed:** **none — this range touches no flag.**
 - **Operator:** _TBD — Pedram's call when this deploys._
-- **Anything unexpected:** none during build, with one honest note: the full-suite run caught a
-  Pest global-helper name collision (a new test declared `resetUrl()`, already declared in
-  `Modules/Boards/BoardResetTest.php` — the AH-085 bug class) that the targeted runs could not
-  see. Fixed by prefixing every new helper in this chunk. Full gate detail lives in
-  [`admin-agency-members-2fa-review.md`](../reviews/admin-agency-members-2fa-review.md).
-  **Read that review's "Production posture" section before approving the deploy** — it states
-  plainly that the agency-side MFA requirement has never been server-enforced and that this
-  exemption is therefore a presentational gate.
-
----
-
-## 2026-08-27 · AH-086 + b — agency sign-in variant + team-invite email door — PENDING
-
-- **Status:** PENDING
-- **Range:** `6f5351de` (the AH-085 deployed tip below, exclusive) → the tip carrying this entry.
-  Commits, in order:
-  - `2e7c02ad` — `feat(auth): agency-facing sign-in variant, one component (AH-086)`.
-  - `39c9e5af` — `docs(reviews): AH-086 agency sign-in — decision table, mechanism, gate board`
-    (docs-only).
-  - `0edcffa1` — `feat(agencies): team-invite email's CTA doors through /agency/sign-in (AH-086b)`
-    — the magic-link door (`AgencyInvitationService` + `InviteAgencyUserMail` + `SignInPage.vue` +
-    the new tests).
-  - the close-out docs commit carrying this entry, the AH-086 review's Closed status, its §8
-    addendum, and the AH-086 log entry's b-paragraph — docs-only; see `git log` at the tip for its
-    exact SHA.
-- **AH entries carried:** **AH-086** (base) + the **AH-086b addendum** (same thread, same push —
-  not a separate AH number; see `../reviews/adhoc-changes-log.md`'s AH-086 entry, b-paragraph).
-- **Migrations run:** **none.** No file under `apps/api/database/migrations/**` in this range —
-  AH-086 is SPA-only; AH-086b changes one URL-building line in
-  `AgencyInvitationService::invite()` and a docblock in `InviteAgencyUserMail.php`, no schema
-  touch.
-- **Pre-deploy reads:** none required.
-- **Snapshot ID:** not applicable — no migration in this range.
-- **Infra:**
-  - **Queue-worker restart: REQUIRED**, on AH-086b's mail-file-touching grounds —
-    `InviteAgencyUserMail.php` changed (docblock only, but the file changed; the standing house
-    rule treats any mailable-file touch as worker-restart territory rather than a case-by-case
-    bytecode read — same posture as the AH-068/069/083 mail-touch entries below).
-  - **PHP-FPM reload: REQUIRED — PHP moved, this is not an "SPA + mail only" deploy.**
-    `AgencyInvitationService::invite()`'s URL-building line changed, and that code runs
-    synchronously in the web/FPM process at invite-creation time — the `Mailable`'s `acceptUrl` is
-    baked into its constructor arguments before the object is queued, so the WORKER never
-    re-derives it. Without an FPM reload, opcache keeps serving the OLD bytecode and every invite
-    created post-deploy would still mint the OLD `/accept-invitation?...` URL until FPM's workers
-    naturally cycle past it — silently defeating the point of this addendum. Same posture as the
-    2026-08-11 `CreatorPolicy` deploy and the AH-085 `BrandController` deploy below.
-  - No cron/scheduler change, no env change, no flag.
-  - `apps/main`'s SPA bundle needs its normal rebuild + redeploy — AH-086 adds the
-    `/agency/sign-in` route/component, AH-086b adds `SignInPage.vue`'s invite-forward branch;
-    neither reaches browsers without it.
-- **One-shot commands:** **none.**
-- **Post-deploy verification:** `/up` 200 + one authenticated request, plus AH-086/AH-086b-specific
-  reads:
-  1. `/agency/sign-in` renders the agency heading, no creator-signup CTA (AH-086).
-  2. A fresh invite created post-deploy (agency_admin → Invite user modal) contains a
-     `/agency/sign-in?token=...&agency=...` link, not `/accept-invitation?...` — the direct proof
-     the FPM reload actually took (see the PHP-FPM note above; a stale opcache would silently fail
-     this exact check).
-  3. That link, followed unauthenticated, lands on the same accept-invitation preview/sign-in
-     surface as before (AH-086b's forward).
-  4. An OLD-shape link (`/accept-invitation?token=...&agency=...`, e.g. one already sent before
-     this deploy) still resolves directly — nothing 404s.
-- **Flags armed:** **none — this range touches no flag.**
-- **Operator:** _TBD — Pedram's call when this deploys._
-- **Anything unexpected:** none during build. Full gate detail lives in
-  [`agency-sign-in-review.md`](../reviews/agency-sign-in-review.md) (base chunk, §1–§7) and its
-  [§8 addendum](../reviews/agency-sign-in-review.md#8-addendum-ah-086b--team-invite-email-door)
-  (AH-086b) — backend Pest 2615/1 skipped, `apps/main` Vitest 1638/167 files, full Playwright
-  29/29 first pass.
+- **Anything unexpected:** none during either chunk's build, with one honest note from AH-087: the
+  full-suite Pest run caught a global-helper name collision (a new test declared `resetUrl()`,
+  already declared in `Modules/Boards/BoardResetTest.php` — the AH-085 bug class recurring) that
+  the targeted runs could not see. Fixed by prefixing every new helper in that chunk with `ah087`
+  before push. Full gate detail lives in
+  [`agency-sign-in-review.md`](../reviews/agency-sign-in-review.md) (AH-086, base chunk + §8
+  addendum — backend Pest 2615/1 skipped, `apps/main` Vitest 1638/167 files, full Playwright
+  29/29 first pass) and
+  [`admin-agency-members-2fa-review.md`](../reviews/admin-agency-members-2fa-review.md) (AH-087 —
+  backend Pest 2688/10285 assertions, `apps/main` Vitest 1646/167 files, `apps/admin` Vitest
+  469/55 files, six break-reverts, **closed by Pedram** 2026-08-27). **Read the AH-087 review's
+  "Production posture" section before approving the deploy** — it states plainly that the
+  agency-side MFA requirement has never been server-enforced and that the new exemption is
+  therefore a presentational gate, tracked as its own tech-debt entry with a named trigger.
 
 ---
 
