@@ -1,15 +1,21 @@
 # AH-089 — Graduated floor scoring
 
-- **Status: Landed — awaiting Pedram's close.** Full loop: kickoff with locked decisions (D1–D5) →
+- **Status: Closed — approved, pushed.** Full loop: kickoff with locked decisions (D1–D5) →
   plan-pause (the D3 extraction proposal + the return-type sub-decision, both ratified) → build
-  (S1–S10) → gate board → **push HELD**.
-- **Date:** 2026-08-27. **Risk:** PROD-DATA LOW, as re-derived at plan-pause. No migration, no
-  schema — a pure scoring-calculation change; the write surface is the existing recompute command,
-  re-run at deploy (already written into the pending AH-088 entry — this chunk changes what the
-  recompute computes, not how it writes).
+  (S1–S10) → gate board → **pushed**.
+- **Date:** 2026-08-27. **Risk:** PROD-DATA LOW, as re-derived at plan-pause and confirmed in §4.
 - **Provenance:** kickoff decisions D1–D5 locked by Pedram; the plan-pause's D3 extraction proposal
   (parallel enumeration) and the `profileEarned(): float` return-type sub-decision both ratified by
-  Pedram before any code was written; built by Cursor.
+  Pedram before any code was written; built by Cursor. **Closed by Pedram**, verdict: D1–D5 verified
+  as ruled; the parallel-enumeration resolution accepted with its honest
+  structurally-impossible-to-diverge sentence (§3.2) as the permanent record; both fixed points
+  (7/7 → exactly 13, 0/7 → exactly 0) pinned at today's exact values; the one-source pin proven
+  biting by break-revert (§5.1); the monotonicity + per-field dataset tests credited with catching
+  the factory fixture-contamination bug pre-ship, before it could have shipped as a silently-wrong
+  test; the `CreatorWizardFlagOffTest` ripple (§5.3) correctly classified as genuine graduated
+  credit, not a regression; the FE zero-diff (D5) proven by a full, unmodified suite run rather than
+  by inspection; the three-document sync — this review, the AH-088 addendum, and the deploy-log
+  blast-radius rewrite — confirmed complete.
 - **Evidence base:** the AH-026 reweight review + [`creator-dob-age-review.md`](creator-dob-age-review.md)
   §5's numbers (the ~20-point cliff this chunk exists to soften); the gate board in
   [§5](#5-evidence) (full local suite, both SPAs, Larastan, Pint, lint, typecheck); the break-revert
@@ -229,13 +235,12 @@ by re-running the full `apps/main` suite unmodified (§5.4) rather than by inspe
 
 ## 8. Close-out
 
-- **Two commits, push HELD:** `feat(creators): graduated per-field floor scoring (AH-089)` (code —
-  `CompletenessScoreCalculator`, the calculator test reshape, the `CreatorWizardFlagOffTest` ripple
-  fix) → this docs commit — `docs(reviews): AH-089 graduated floor scoring — review, AH entry,
-AH-088 addendum, deploy-log rewrite` (this file, the AH-089 log entry, the AH-088 addendum, the
-  deploy-log rewrite).
-- **Push:** held, per instruction. **CI:** not yet run remotely — the full local board above is run
-  at tip and green.
+- **Two commits, pushed:** `4d56d312` — `feat(creators): graduated per-field floor scoring (AH-089)`
+  (code — `CompletenessScoreCalculator`, the calculator test reshape, the `CreatorWizardFlagOffTest`
+  ripple fix) → `ca9019e8` — `docs(reviews): AH-089 graduated floor scoring — review, AH entry,
+deploy-log rewrite` (this file, the AH-089 log entry, the AH-088 addendum, the deploy-log
+  rewrite) — both on top of `860957d7` (AH-088's own close-out tip).
+- **Push:** done. **CI at the pushed tip:** see the run cited below.
 - **Deploy obligations:** none new. Rides the pending AH-088 + AH-089 entry in
   [`../runbooks/deploy-log.md`](../runbooks/deploy-log.md) — no new migration, the same one required
   `creators:recompute-completeness` run, with its expected outcome rewritten there per D4.
