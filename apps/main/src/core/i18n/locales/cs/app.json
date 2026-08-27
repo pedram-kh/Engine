@@ -521,7 +521,8 @@
         "applications": "Přihlášky",
         "payments": "Platby",
         "messages": "Zprávy",
-        "settings": "Nastavení"
+        "settings": "Nastavení",
+        "attachments": "Přílohy"
       },
       "create": {
         "title": "Nová kampaň"
@@ -905,6 +906,46 @@
           "fix": "Otevřít kampaň",
           "listed": "{name} je nyní na pracovních nabídkách.",
           "delisted": "{name} byla odebrána z pracovních nabídek."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Přiložit soubory"
+        },
+        "fields": {
+          "name": "Soubor",
+          "size": "Velikost",
+          "visibleToCreators": "Viditelné pro tvůrce",
+          "attachedBy": "Přiložil",
+          "attachedAt": "Přiloženo"
+        },
+        "empty": {
+          "heading": "Zatím žádné přílohy",
+          "body": "Přiložte soubory z knihovny souborů, abyste je mohli sdílet s tvůrci."
+        },
+        "detach": {
+          "action": "Odebrat",
+          "confirmTitle": "Odebrat soubor",
+          "confirmMessage": "Odebrat {name} z této kampaně? Tvůrci ho již neuvidí.",
+          "confirm": "Odebrat",
+          "cancel": "Zrušit"
+        },
+        "errors": {
+          "loadFailed": "Přílohy se nepodařilo načíst. Zkuste to znovu.",
+          "attachFailed": "Soubor se nepodařilo přiložit. Zkuste to znovu.",
+          "toggleFailed": "Viditelnost se nepodařilo aktualizovat. Zkuste to znovu.",
+          "detachFailed": "Soubor se nepodařilo odebrat. Zkuste to znovu."
+        },
+        "picker": {
+          "title": "Přiložit soubory",
+          "search": "Hledat soubory",
+          "noFiles": "V knihovně ještě nejsou žádné soubory. Nejprve nahrajte soubor na stránce Soubory.",
+          "noMatch": "Žádné soubory neodpovídají vašemu vyhledávání.",
+          "alreadyAttached": "Již přiloženo",
+          "submit": "Přiložit ({count})",
+          "cancel": "Zrušit",
+          "loadFailed": "Vaše soubory se nepodařilo načíst. Zkuste to znovu.",
+          "attachedSummary": "Přiloženo {count} soubor(ů)."
         }
       }
     },

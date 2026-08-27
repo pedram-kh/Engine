@@ -521,7 +521,8 @@
         "applications": "Prijave",
         "payments": "Plačila",
         "messages": "Sporočila",
-        "settings": "Nastanjeitve"
+        "settings": "Nastanjeitve",
+        "attachments": "Priloge"
       },
       "create": {
         "title": "Nová kampanja"
@@ -905,6 +906,46 @@
           "fix": "Odpri kampanjo",
           "listed": "{name} je zdaj na seznamu del.",
           "delisted": "{name} je bila odstranjena s seznama del."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Priloži datoteke"
+        },
+        "fields": {
+          "name": "Datoteka",
+          "size": "Velikost",
+          "visibleToCreators": "Vidno ustvarjalcem",
+          "attachedBy": "Priložil",
+          "attachedAt": "Priloženo"
+        },
+        "empty": {
+          "heading": "Še ni prilog",
+          "body": "Priložite datoteke iz knjižnice datotek, da jih delite z ustvarjalci."
+        },
+        "detach": {
+          "action": "Odstrani",
+          "confirmTitle": "Odstrani datoteko",
+          "confirmMessage": "Odstranite {name} iz te kampanje? Ustvarjalci je ne bodo več videli.",
+          "confirm": "Odstrani",
+          "cancel": "Prekliči"
+        },
+        "errors": {
+          "loadFailed": "Prilog ni bilo mogoče naložiti. Poskusite znova.",
+          "attachFailed": "Datoteke ni bilo mogoče priložiti. Poskusite znova.",
+          "toggleFailed": "Vidljivosti ni bilo mogoče posodobiti. Poskusite znova.",
+          "detachFailed": "Datoteke ni bilo mogoče odstraniti. Poskusite znova."
+        },
+        "picker": {
+          "title": "Priloži datoteke",
+          "search": "Iskanje datotek",
+          "noFiles": "V knjižnici še ni datotek. Najprej naložite datoteko na strani Datoteke.",
+          "noMatch": "Nobena datoteka ne ustreza vašemu iskanju.",
+          "alreadyAttached": "Že priloženo",
+          "submit": "Priloži ({count})",
+          "cancel": "Prekliči",
+          "loadFailed": "Vaših datotek ni bilo mogoče naložiti. Poskusite znova.",
+          "attachedSummary": "Priloženih datotek: {count}."
         }
       }
     },

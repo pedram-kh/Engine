@@ -521,7 +521,8 @@
         "applications": "Candidaturi",
         "payments": "Platăs",
         "messages": "Mesaje",
-        "settings": "Setări"
+        "settings": "Setări",
+        "attachments": "Fișiere atașate"
       },
       "create": {
         "title": "New campaign"
@@ -905,6 +906,46 @@
           "fix": "Deschide campania",
           "listed": "{name} se află acum pe panoul de lucrări.",
           "delisted": "{name} a fost eliminată din panoul de lucrări."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Atașează fișiere"
+        },
+        "fields": {
+          "name": "Fișier",
+          "size": "Dimensiune",
+          "visibleToCreators": "Vizibil pentru creatori",
+          "attachedBy": "Atașat de",
+          "attachedAt": "Atașat"
+        },
+        "empty": {
+          "heading": "Niciun fișier atașat încă",
+          "body": "Atașați fișiere din biblioteca dvs. de fișiere pentru a le partaja cu creatorii."
+        },
+        "detach": {
+          "action": "Elimină",
+          "confirmTitle": "Elimină fișierul",
+          "confirmMessage": "Eliminați {name} din această campanie? Creatorii nu îl vor mai vedea.",
+          "confirm": "Elimină",
+          "cancel": "Anulează"
+        },
+        "errors": {
+          "loadFailed": "Fișierele atașate nu au putut fi încărcate. Încercați din nou.",
+          "attachFailed": "Fișierul nu a putut fi atașat. Încercați din nou.",
+          "toggleFailed": "Vizibilitatea nu a putut fi actualizată. Încercați din nou.",
+          "detachFailed": "Fișierul nu a putut fi eliminat. Încercați din nou."
+        },
+        "picker": {
+          "title": "Atașează fișiere",
+          "search": "Căutare fișiere",
+          "noFiles": "Nu există încă fișiere în biblioteca dvs. Încărcați mai întâi un fișier din pagina Fișiere.",
+          "noMatch": "Niciun fișier nu corespunde căutării dvs.",
+          "alreadyAttached": "Deja atașat",
+          "submit": "Atașează ({count})",
+          "cancel": "Anulează",
+          "loadFailed": "Fișierele dvs. nu au putut fi încărcate. Încercați din nou.",
+          "attachedSummary": "{count} fișier(e) atașat(e)."
         }
       }
     },

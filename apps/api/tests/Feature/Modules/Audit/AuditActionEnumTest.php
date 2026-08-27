@@ -203,6 +203,11 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         // Audit-only (nobody is notified); no NotificationType tie.
         'agency_file.uploaded',
         'agency_file.deleted',
+        // AH-092, chunk B — campaign attachments (linking a Files-library
+        // file to a campaign). Audit-only; no NotificationType tie.
+        'campaign_attachment.added',
+        'campaign_attachment.visibility_changed',
+        'campaign_attachment.removed',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());

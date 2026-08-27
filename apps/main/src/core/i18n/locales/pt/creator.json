@@ -20,6 +20,9 @@
       "invalid_state": "Apenas uma candidatura rejeitada pode ser reaberta."
     },
     "ui": {
+      "attachments": {
+        "title": "Anexos"
+      },
       "wizard": {
         "title": "Configurar o seu perfil de criador",
         "subtitle": "Algumas etapas para se apresentar às marcas.",

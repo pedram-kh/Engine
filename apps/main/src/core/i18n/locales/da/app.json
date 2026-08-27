@@ -521,7 +521,8 @@
         "applications": "Ansøgninger",
         "payments": "Betalinger",
         "messages": "Beskeder",
-        "settings": "Indstillinger"
+        "settings": "Indstillinger",
+        "attachments": "Vedhæftninger"
       },
       "create": {
         "title": "Ny kampagne"
@@ -905,6 +906,46 @@
           "fix": "Åbn kampagne",
           "listed": "{name} er nu på jobtavlen.",
           "delisted": "{name} er fjernet fra jobtavlen."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Vedhæft filer"
+        },
+        "fields": {
+          "name": "Fil",
+          "size": "Størrelse",
+          "visibleToCreators": "Synlig for creators",
+          "attachedBy": "Vedhæftet af",
+          "attachedAt": "Vedhæftet"
+        },
+        "empty": {
+          "heading": "Ingen vedhæftninger endnu",
+          "body": "Vedhæft filer fra dit filbibliotek for at dele dem med creators."
+        },
+        "detach": {
+          "action": "Fjern",
+          "confirmTitle": "Fjern fil",
+          "confirmMessage": "Fjern {name} fra denne kampagne? Creators kan ikke længere se den.",
+          "confirm": "Fjern",
+          "cancel": "Annuller"
+        },
+        "errors": {
+          "loadFailed": "Vedhæftninger kunne ikke indlæses. Prøv igen.",
+          "attachFailed": "Filen kunne ikke vedhæftes. Prøv igen.",
+          "toggleFailed": "Synligheden kunne ikke opdateres. Prøv igen.",
+          "detachFailed": "Filen kunne ikke fjernes. Prøv igen."
+        },
+        "picker": {
+          "title": "Vedhæft filer",
+          "search": "Søg i filer",
+          "noFiles": "Ingen filer i dit bibliotek endnu. Upload en fra siden Filer først.",
+          "noMatch": "Ingen filer matcher din søgning.",
+          "alreadyAttached": "Allerede vedhæftet",
+          "submit": "Vedhæft ({count})",
+          "cancel": "Annuller",
+          "loadFailed": "Dine filer kunne ikke indlæses. Prøv igen.",
+          "attachedSummary": "{count} fil(er) vedhæftet."
         }
       }
     },

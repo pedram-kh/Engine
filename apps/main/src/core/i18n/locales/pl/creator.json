@@ -20,6 +20,9 @@
       "invalid_state": "Tylko odrzucona aplikacja może być ponownie otwarta."
     },
     "ui": {
+      "attachments": {
+        "title": "Załączniki"
+      },
       "wizard": {
         "title": "Skonfiguruj swój profil twórcy",
         "subtitle": "Kilka kroków, aby przedstawić się markom.",

@@ -20,6 +20,9 @@
       "invalid_state": "Znovu otevřít lze pouze odmítnutou přihlášku."
     },
     "ui": {
+      "attachments": {
+        "title": "Přílohy"
+      },
       "wizard": {
         "title": "Nastavte svůj profil tvůrce",
         "subtitle": "Několik kroků pro představení se značkám.",

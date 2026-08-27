@@ -962,6 +962,11 @@ export interface SeedListedJobResult {
   creatorUlid: string
 }
 
+export interface SeedListedJobAttachmentInput {
+  filename: string
+  visible?: boolean
+}
+
 export interface SeedListedJobInput {
   campaignName?: string
   brandName?: string
@@ -969,6 +974,12 @@ export interface SeedListedJobInput {
   listingFee?: string
   listingDuration?: string
   description?: string
+  /**
+   * Campaign attachments from the Files library, chunk B (AH-092, S7 c3
+   * leg) — seeded directly via the `AgencyFile` + `CampaignAttachment`
+   * factories, not the presigned-upload flow.
+   */
+  attachments?: SeedListedJobAttachmentInput[]
 }
 
 /**
@@ -998,6 +1009,7 @@ export async function seedListedJob(
       listing_fee: input.listingFee,
       listing_duration: input.listingDuration,
       description: input.description,
+      attachments: input.attachments,
     },
   })
 

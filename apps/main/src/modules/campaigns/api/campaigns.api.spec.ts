@@ -162,6 +162,53 @@ describe('campaignsApi create / update / assignments', () => {
   })
 })
 
+describe('campaignsApi attachments (Campaign attachments from the Files library, chunk B, AH-092)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockHttp.get.mockResolvedValue({ data: [] })
+    mockHttp.post.mockResolvedValue({ data: {} })
+    mockHttp.patch.mockResolvedValue({ data: {} })
+    mockHttp.delete.mockResolvedValue(undefined)
+  })
+
+  it('GETs the attachments collection', () => {
+    void campaignsApi.listAttachments('agency-ulid', 'campaign-ulid')
+    expect(mockHttp.get).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/attachments',
+    )
+  })
+
+  it('POSTs the agency_file_id (+ optional visible_to_creators) to attach', () => {
+    void campaignsApi.attachFile('agency-ulid', 'campaign-ulid', {
+      agency_file_id: 'file-ulid',
+      visible_to_creators: true,
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/attachments',
+      { agency_file_id: 'file-ulid', visible_to_creators: true },
+    )
+  })
+
+  it('PATCHes the visibility toggle by file id', () => {
+    void campaignsApi.updateAttachment('agency-ulid', 'campaign-ulid', 'file-ulid', {
+      visible_to_creators: false,
+    })
+    expect(mockHttp.patch).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/attachments/file-ulid',
+      { visible_to_creators: false },
+    )
+  })
+
+  it('DELETEs the join row by file id and resolves on 204 (no body)', async () => {
+    await expect(
+      campaignsApi.detachFile('agency-ulid', 'campaign-ulid', 'file-ulid'),
+    ).resolves.toBeUndefined()
+    expect(mockHttp.delete).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/attachments/file-ulid',
+    )
+  })
+})
+
 describe('campaignsApi applications (Jobs Board chunk 4)', () => {
   beforeEach(() => {
     vi.clearAllMocks()

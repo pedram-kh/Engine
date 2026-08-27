@@ -20,6 +20,9 @@
       "invalid_state": "Endast en avvisad ansökan kan återöppnas."
     },
     "ui": {
+      "attachments": {
+        "title": "Bilagor"
+      },
       "wizard": {
         "title": "Konfigurera din creator-profil",
         "subtitle": "Några steg för att presentera dig för varumärken.",

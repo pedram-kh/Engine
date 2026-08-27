@@ -521,7 +521,8 @@
         "applications": "Prijave",
         "payments": "Plaćanja",
         "messages": "Poruke",
-        "settings": "Nastanjeitve"
+        "settings": "Nastanjeitve",
+        "attachments": "Privitci"
       },
       "create": {
         "title": "Nová kampanja"
@@ -905,6 +906,46 @@
           "fix": "Otvori kampanju",
           "listed": "{name} je sada na ploči poslova.",
           "delisted": "{name} je uklonjena s ploče poslova."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Priloži datoteke"
+        },
+        "fields": {
+          "name": "Datoteka",
+          "size": "Veličina",
+          "visibleToCreators": "Vidljivo kreatorima",
+          "attachedBy": "Priložio",
+          "attachedAt": "Priloženo"
+        },
+        "empty": {
+          "heading": "Još nema privitaka",
+          "body": "Priložite datoteke iz svoje knjižnice datoteka da biste ih podijelili s kreatorima."
+        },
+        "detach": {
+          "action": "Ukloni",
+          "confirmTitle": "Ukloni datoteku",
+          "confirmMessage": "Ukloniti {name} iz ove kampanje? Kreatori je više neće vidjeti.",
+          "confirm": "Ukloni",
+          "cancel": "Odustani"
+        },
+        "errors": {
+          "loadFailed": "Privitke nije moguće učitati. Pokušajte ponovno.",
+          "attachFailed": "Datoteku nije moguće priložiti. Pokušajte ponovno.",
+          "toggleFailed": "Vidljivost nije moguće ažurirati. Pokušajte ponovno.",
+          "detachFailed": "Datoteku nije moguće ukloniti. Pokušajte ponovno."
+        },
+        "picker": {
+          "title": "Priloži datoteke",
+          "search": "Pretraži datoteke",
+          "noFiles": "U knjižnici još nema datoteka. Prvo učitajte datoteku na stranici Datoteke.",
+          "noMatch": "Nijedna datoteka ne odgovara vašoj pretrazi.",
+          "alreadyAttached": "Već priloženo",
+          "submit": "Priloži ({count})",
+          "cancel": "Odustani",
+          "loadFailed": "Vaše datoteke nije moguće učitati. Pokušajte ponovno.",
+          "attachedSummary": "Priloženo {count} datoteka."
         }
       }
     },

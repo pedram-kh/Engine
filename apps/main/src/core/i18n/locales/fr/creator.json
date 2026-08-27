@@ -20,6 +20,9 @@
       "invalid_state": "Seule une candidature rejetée peut être rouverte."
     },
     "ui": {
+      "attachments": {
+        "title": "Pièces jointes"
+      },
       "wizard": {
         "title": "Configurez votre profil de créateur",
         "subtitle": "Quelques étapes pour vous présenter aux marques.",

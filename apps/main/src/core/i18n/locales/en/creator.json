@@ -20,6 +20,9 @@
       "invalid_state": "Only a rejected application can be reopened."
     },
     "ui": {
+      "attachments": {
+        "title": "Attachments"
+      },
       "wizard": {
         "title": "Set up your creator profile",
         "subtitle": "A few steps to introduce yourself to brands.",

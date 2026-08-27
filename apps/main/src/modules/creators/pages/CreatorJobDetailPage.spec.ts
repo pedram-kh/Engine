@@ -52,6 +52,7 @@ function detail(overrides: Record<string, unknown> = {}) {
         listing_regions: ['PT', 'ES'],
         listing_examples_url: 'https://examples.test/work',
         assignment_ulid: null,
+        attachments: [],
         brand: {
           name: 'Northwind Coffee',
           logo_url: 'https://cdn.test/logo.png',
@@ -255,6 +256,39 @@ describe('CreatorJobDetailPage', () => {
 
     expect(wrapper.find('[data-testid="creator-job-website"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="creator-job-detail-brand"]').text()).toBe('Northwind Coffee')
+  })
+
+  // ── Campaign attachments from the Files library, chunk B (AH-092, S6) ─────
+  // Same shared block + response shape as the assignment-detail page; this
+  // page's own job is only to hand the array to it.
+
+  it('renders the visible attachment with its filename and a download link', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({
+        attachments: [
+          {
+            filename: 'brief.pdf',
+            mime_type: 'application/pdf',
+            size_bytes: 204800,
+            url: 'https://example.com/signed/brief.pdf',
+          },
+        ],
+      }) as never,
+    )
+    const wrapper = await mountPage()
+
+    const block = wrapper.find('[data-testid="creator-attachments-block"]')
+    expect(block.exists()).toBe(true)
+    expect(block.text()).toContain('brief.pdf')
+    expect(wrapper.find('[data-testid="creator-attachment-0"]').attributes('href')).toBe(
+      'https://example.com/signed/brief.pdf',
+    )
+  })
+
+  it('renders no attachments block when the array is empty (not-visible or never attached)', async () => {
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-attachments-block"]').exists()).toBe(false)
   })
 
   // ── Fail-closed loads ─────────────────────────────────────────────────────

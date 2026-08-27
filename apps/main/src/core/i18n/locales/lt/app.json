@@ -521,7 +521,8 @@
         "applications": "Paraiškos",
         "payments": "Mokėjimass",
         "messages": "Žinutės",
-        "settings": "Nustatymai"
+        "settings": "Nustatymai",
+        "attachments": "Priedai"
       },
       "create": {
         "title": "New campaign"
@@ -905,6 +906,46 @@
           "fix": "Atidaryti kampaniją",
           "listed": "{name} dabar yra darbų sąraše.",
           "delisted": "{name} pašalinta iš darbų sąrašo."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Prisegti failus"
+        },
+        "fields": {
+          "name": "Failas",
+          "size": "Dydis",
+          "visibleToCreators": "Matoma kūrėjams",
+          "attachedBy": "Prisegė",
+          "attachedAt": "Prisegta"
+        },
+        "empty": {
+          "heading": "Kol kas nėra priedų",
+          "body": "Prisekite failus iš savo failų bibliotekos, kad galėtumėte juos bendrinti su kūrėjais."
+        },
+        "detach": {
+          "action": "Pašalinti",
+          "confirmTitle": "Pašalinti failą",
+          "confirmMessage": "Pašalinti {name} iš šios kampanijos? Kūrėjai jo daugiau nematys.",
+          "confirm": "Pašalinti",
+          "cancel": "Atšaukti"
+        },
+        "errors": {
+          "loadFailed": "Nepavyko įkelti priedų. Bandykite dar kartą.",
+          "attachFailed": "Nepavyko prisegti failo. Bandykite dar kartą.",
+          "toggleFailed": "Nepavyko atnaujinti matomumo. Bandykite dar kartą.",
+          "detachFailed": "Nepavyko pašalinti failo. Bandykite dar kartą."
+        },
+        "picker": {
+          "title": "Prisegti failus",
+          "search": "Ieškoti failų",
+          "noFiles": "Jūsų bibliotekoje kol kas nėra failų. Pirmiausia įkelkite failą Failų puslapyje.",
+          "noMatch": "Nėra failų, atitinkančių jūsų paiešką.",
+          "alreadyAttached": "Jau prisegta",
+          "submit": "Prisegti ({count})",
+          "cancel": "Atšaukti",
+          "loadFailed": "Nepavyko įkelti jūsų failų. Bandykite dar kartą.",
+          "attachedSummary": "Prisegta {count} failas(-ai)."
         }
       }
     },

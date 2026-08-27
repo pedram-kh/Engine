@@ -521,7 +521,8 @@
         "applications": "Iarratais",
         "payments": "Íocaíochts",
         "messages": "Teachtaireachtaí",
-        "settings": "Socruithe"
+        "settings": "Socruithe",
+        "attachments": "Iatáin"
       },
       "create": {
         "title": "New campaign"
@@ -905,6 +906,46 @@
           "fix": "Oscail an feachtas",
           "listed": "Tá {name} ar an gclár post anois.",
           "delisted": "Baineadh {name} den chlár post."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Ceangail comhaid"
+        },
+        "fields": {
+          "name": "Comhad",
+          "size": "Méid",
+          "visibleToCreators": "Le feiceáil ag cruthaitheoirí",
+          "attachedBy": "Ceangailte ag",
+          "attachedAt": "Ceangailte"
+        },
+        "empty": {
+          "heading": "Níl iatáin ann fós",
+          "body": "Ceangail comhaid ó do leabharlann comhad chun iad a roinnt le cruthaitheoirí."
+        },
+        "detach": {
+          "action": "Bain",
+          "confirmTitle": "Bain an comhad",
+          "confirmMessage": "An bain {name} den fheachtas seo? Ní fheicfidh cruthaitheoirí é a thuilleadh.",
+          "confirm": "Bain",
+          "cancel": "Cealaigh"
+        },
+        "errors": {
+          "loadFailed": "Níorbh fhéidir na hiatáin a lódáil. Bain triail eile as.",
+          "attachFailed": "Níorbh fhéidir an comhad a cheangal. Bain triail eile as.",
+          "toggleFailed": "Níorbh fhéidir an infheictheacht a nuashonrú. Bain triail eile as.",
+          "detachFailed": "Níorbh fhéidir an comhad a bhaint. Bain triail eile as."
+        },
+        "picker": {
+          "title": "Ceangail comhaid",
+          "search": "Cuardaigh comhaid",
+          "noFiles": "Níl comhaid i do leabharlann fós. Uaslódáil ceann ó leathanach na gComhad ar dtús.",
+          "noMatch": "Níl comhaid ar bith ag teacht leis an gcuardach agat.",
+          "alreadyAttached": "Ceangailte cheana",
+          "submit": "Ceangail ({count})",
+          "cancel": "Cealaigh",
+          "loadFailed": "Níorbh fhéidir do chomhaid a lódáil. Bain triail eile as.",
+          "attachedSummary": "Ceangailte {count} comhad."
         }
       }
     },

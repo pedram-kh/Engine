@@ -20,6 +20,9 @@
       "invalid_state": "Alleen een afgewezen aanmelding kan opnieuw worden geopend."
     },
     "ui": {
+      "attachments": {
+        "title": "Bijlagen"
+      },
       "wizard": {
         "title": "Creatorprofiel instellen",
         "subtitle": "Een paar stappen om jezelf voor te stellen aan merken.",

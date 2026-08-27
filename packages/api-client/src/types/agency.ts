@@ -1039,3 +1039,26 @@ export interface AgencyFileUploadCompletePayload {
   upload_id: string
   original_filename: string
 }
+
+/**
+ * The thin `{id, original_filename, mime_type, size_bytes}` projection
+ * returned by `GET .../files?for=select` (Campaign attachments chunk B,
+ * AH-092 — the `BrandOptionResource` shape, the fourth invocation of this
+ * decision procedure). No `download_url` (a choice list, not a download
+ * gesture — minting a signed URL per row here is the exact per-row-mint cost
+ * the Jobs-Board-card decision already ruled out) and no `category`.
+ */
+export interface AgencyFileOptionResource {
+  id: string
+  type: 'agency_files'
+  attributes: {
+    original_filename: string
+    mime_type: string
+    size_bytes: number
+  }
+}
+
+/** Unpaginated — every matching file, past the general index's page boundary. */
+export interface AgencyFileOptionListResponse {
+  data: AgencyFileOptionResource[]
+}

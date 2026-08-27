@@ -7,6 +7,7 @@ namespace App\Modules\Agencies\Http\Controllers;
 use App\Core\Errors\ErrorResponse;
 use App\Core\Storage\StorageDeleteFailedException;
 use App\Modules\Agencies\Enums\AgencyFileCategory;
+use App\Modules\Agencies\Http\Resources\AgencyFileOptionResource;
 use App\Modules\Agencies\Http\Resources\AgencyFileResource;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyFile;
@@ -30,6 +31,17 @@ use RuntimeException;
  *   GET    …/files/{file}         show — a FRESH signed download URL
  *   DELETE …/files/{file}         object-first delete (204)
  *
+ * `?for=select` (Campaign attachments chunk B, AH-092) switches `index` to
+ * an UNPAGINATED, thin-projection mode for the Attachments tab's attach
+ * picker — the BrandController/BrandOptionResource precedent (AH-085): an
+ * agency's file library is realistically dozens of rows, uploaded one at a
+ * time through a form, never the hundreds a creator roster runs to, so a
+ * whole-set fetch is the honest fix rather than the paginated default or a
+ * `?q=` search shape. No "already attached to this campaign" filter here —
+ * the picker dialog cross-references against the tab's own already-fetched
+ * attachment list client-side, so this endpoint stays one shared, cacheable
+ * shape regardless of which campaign is asking.
+ *
  * Every `{file}` route explicitly checks `$file->agency_id === $agency->id`
  * BEFORE `Gate::authorize(...)` — route-model binding resolves `{file}`
  * before tenancy context exists (the BrandLogoController precedent), so a
@@ -45,6 +57,17 @@ final class AgencyFileController
     public function index(Request $request, Agency $agency): JsonResponse
     {
         Gate::authorize('viewAny', AgencyFile::class);
+
+        if ($request->query('for') === 'select') {
+            $files = AgencyFile::query()
+                ->where('agency_id', $agency->id)
+                ->orderBy('original_filename')
+                ->get();
+
+            return response()->json([
+                'data' => AgencyFileOptionResource::collection($files),
+            ]);
+        }
 
         $perPage = (int) $request->integer('per_page', 25);
         $perPage = max(1, min($perPage, 100));

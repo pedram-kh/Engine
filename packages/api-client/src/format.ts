@@ -96,3 +96,31 @@ export function formatDateTime(
   const d = typeof date === 'string' ? new Date(date) : date
   return new Intl.DateTimeFormat(locale, opts).format(d)
 }
+
+/**
+ * Format a byte count as a human-readable size (`B`/`KB`/`MB`/`GB`).
+ *
+ * Originally a private helper on `AgencyFilesPage` (AH-091, chunk A) —
+ * hoisted here once the campaign Attachments tab (chunk B, AH-092) became a
+ * second consumer, per this codebase's "no abstraction before a second
+ * consumer" convention. Locale-INDEPENDENT by design: unlike the other three
+ * functions in this file, unit abbreviations (`KB`, `MB`, …) are not
+ * `Intl`-formattable and are rendered identically in every locale today —
+ * revisit if a locale ever needs its own unit words.
+ *
+ * @example
+ * formatFileSize(512)        // '512 B'
+ * formatFileSize(2048)       // '2.0 KB'
+ * formatFileSize(5_242_880)  // '5 MB'
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  const units = ['KB', 'MB', 'GB']
+  let value = bytes / 1024
+  let unitIndex = 0
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024
+    unitIndex += 1
+  }
+  return `${value.toFixed(value < 10 ? 1 : 0)} ${units[unitIndex]}`
+}

@@ -41,6 +41,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import { creatorAssignmentsApi } from '../assignments.api'
+import CreatorAttachmentsBlock from '../components/CreatorAttachmentsBlock.vue'
 import RichBrief from '@/components/RichBrief.vue'
 import { roundStateColor, roundStateKey } from '@/modules/campaigns/draftRounds'
 import { creatorChatTransport } from '@/modules/messaging/api/messaging.api'
@@ -126,6 +127,10 @@ const submittingInPlace = ref(false)
 const answering = ref<'accept' | 'decline' | null>(null)
 
 const status = computed(() => assignment.value?.attributes.status ?? null)
+// Campaign attachments from the Files library, chunk B (AH-092, S6). The
+// resource always sends an array (empty when nothing is creator-visible),
+// so the `?? []` here is belt-and-suspenders, not a real fallback path.
+const attachments = computed(() => assignment.value?.attributes.attachments ?? [])
 const drafts = computed(() => assignment.value?.relationships.drafts ?? [])
 const postedContent = computed(() => assignment.value?.relationships.posted_content ?? [])
 const pendingContract = computed(() => assignment.value?.relationships.contract ?? null)
@@ -548,6 +553,10 @@ onMounted(() => {
           {{ assignment.attributes.offer_attachment.name }}
         </v-chip>
       </div>
+
+      <!-- Campaign attachments from the Files library, chunk B (AH-092, S6) —
+           the shared block also used on the Jobs Board job-detail page. -->
+      <CreatorAttachmentsBlock :attachments="attachments" />
 
       <!-- Answer the invitation without going back to the list. Same endpoints,
            same copy and the same button shapes as the list's per-row pair. -->

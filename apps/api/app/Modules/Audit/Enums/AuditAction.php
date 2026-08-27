@@ -472,6 +472,15 @@ enum AuditAction: string
     case AgencyFileUploaded = 'agency_file.uploaded';
     case AgencyFileDeleted = 'agency_file.deleted';
 
+    // Campaign attachments from the Files library, chunk B (AH-092). A
+    // linkage action on the campaign, not a library action on the file — the
+    // file's own audit trail (above) is unaffected by any of these. No
+    // reason required, mirroring agency_file.* (ordinary content management,
+    // not an accountability-critical override).
+    case CampaignAttachmentAdded = 'campaign_attachment.added';
+    case CampaignAttachmentVisibilityChanged = 'campaign_attachment.visibility_changed';
+    case CampaignAttachmentRemoved = 'campaign_attachment.removed';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *

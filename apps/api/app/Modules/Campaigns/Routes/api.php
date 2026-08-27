@@ -7,6 +7,7 @@ use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentContractController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentResolutionController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentReviewController;
+use App\Modules\Campaigns\Http\Controllers\CampaignAttachmentController;
 use App\Modules\Campaigns\Http\Controllers\CampaignController;
 use App\Modules\Campaigns\Http\Controllers\CampaignDraftController;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +40,19 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
             ->name('campaigns.show');
         Route::patch('campaigns/{campaign}', [CampaignController::class, 'update'])
             ->name('campaigns.update');
+
+        // Campaign attachments from the Files library, chunk B (AH-092) — the
+        // Attachments tab. `{file}` binds an AgencyFile by its own ulid (no
+        // ulid on campaign_attachments itself, the talent_pool_creators
+        // shape); read = `view`, attach/toggle/detach = `update` (D-3).
+        Route::get('campaigns/{campaign}/attachments', [CampaignAttachmentController::class, 'index'])
+            ->name('campaigns.attachments.index');
+        Route::post('campaigns/{campaign}/attachments', [CampaignAttachmentController::class, 'store'])
+            ->name('campaigns.attachments.store');
+        Route::patch('campaigns/{campaign}/attachments/{file}', [CampaignAttachmentController::class, 'update'])
+            ->name('campaigns.attachments.update');
+        Route::delete('campaigns/{campaign}/attachments/{file}', [CampaignAttachmentController::class, 'destroy'])
+            ->name('campaigns.attachments.destroy');
 
         // Read-only assignment listing for the Creators tab (Chunk 1).
         Route::get('campaigns/{campaign}/assignments', [CampaignAssignmentController::class, 'index'])

@@ -521,7 +521,8 @@
         "applications": "Candidaturas",
         "payments": "Pagos",
         "messages": "Mensajes",
-        "settings": "Configuración"
+        "settings": "Configuración",
+        "attachments": "Adjuntos"
       },
       "create": {
         "title": "Nueva campaña"
@@ -905,6 +906,46 @@
           "fix": "Abrir campaña",
           "listed": "{name} ya está en el tablón de empleo.",
           "delisted": "{name} se ha quitado del tablón de empleo."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Adjuntar archivos"
+        },
+        "fields": {
+          "name": "Archivo",
+          "size": "Tamaño",
+          "visibleToCreators": "Visible para los creadores",
+          "attachedBy": "Adjuntado por",
+          "attachedAt": "Adjuntado"
+        },
+        "empty": {
+          "heading": "Aún no hay adjuntos",
+          "body": "Adjunta archivos de tu biblioteca de archivos para compartirlos con los creadores."
+        },
+        "detach": {
+          "action": "Quitar",
+          "confirmTitle": "Quitar archivo",
+          "confirmMessage": "¿Quitar {name} de esta campaña? Los creadores ya no lo verán.",
+          "confirm": "Quitar",
+          "cancel": "Cancelar"
+        },
+        "errors": {
+          "loadFailed": "No se pudieron cargar los adjuntos. Inténtalo de nuevo.",
+          "attachFailed": "No se pudo adjuntar el archivo. Inténtalo de nuevo.",
+          "toggleFailed": "No se pudo actualizar la visibilidad. Inténtalo de nuevo.",
+          "detachFailed": "No se pudo quitar el archivo. Inténtalo de nuevo."
+        },
+        "picker": {
+          "title": "Adjuntar archivos",
+          "search": "Buscar archivos",
+          "noFiles": "Aún no hay archivos en tu biblioteca. Sube uno desde la página de Archivos primero.",
+          "noMatch": "Ningún archivo coincide con tu búsqueda.",
+          "alreadyAttached": "Ya adjuntado",
+          "submit": "Adjuntar ({count})",
+          "cancel": "Cancelar",
+          "loadFailed": "No se pudieron cargar tus archivos. Inténtalo de nuevo.",
+          "attachedSummary": "{count} archivo(s) adjuntado(s)."
         }
       }
     },

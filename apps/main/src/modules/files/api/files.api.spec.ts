@@ -51,6 +51,18 @@ describe('filesApi.list', () => {
   })
 })
 
+describe('filesApi.listOptions (Campaign attachments chunk B, AH-092, S3)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockHttp.get.mockResolvedValue({ data: [] })
+  })
+
+  it('GETs the collection with the ?for=select query string', () => {
+    void filesApi.listOptions('agency-ulid')
+    expect(mockHttp.get).toHaveBeenCalledWith('/agencies/agency-ulid/files?for=select')
+  })
+})
+
 describe('filesApi upload dance', () => {
   beforeEach(() => {
     vi.clearAllMocks()

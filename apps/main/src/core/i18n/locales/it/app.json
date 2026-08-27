@@ -521,7 +521,8 @@
         "applications": "Candidature",
         "payments": "Pagamenti",
         "messages": "Messaggi",
-        "settings": "Impostazioni"
+        "settings": "Impostazioni",
+        "attachments": "Allegati"
       },
       "create": {
         "title": "Nuova campagna"
@@ -905,6 +906,46 @@
           "fix": "Apri campagna",
           "listed": "{name} è ora nella bacheca lavori.",
           "delisted": "{name} è stata rimossa dalla bacheca lavori."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Allega file"
+        },
+        "fields": {
+          "name": "File",
+          "size": "Dimensione",
+          "visibleToCreators": "Visibile ai creator",
+          "attachedBy": "Allegato da",
+          "attachedAt": "Allegato"
+        },
+        "empty": {
+          "heading": "Nessun allegato",
+          "body": "Allega file dalla tua libreria di file per condividerli con i creator."
+        },
+        "detach": {
+          "action": "Rimuovi",
+          "confirmTitle": "Rimuovi file",
+          "confirmMessage": "Rimuovere {name} da questa campagna? I creator non lo vedranno più.",
+          "confirm": "Rimuovi",
+          "cancel": "Annulla"
+        },
+        "errors": {
+          "loadFailed": "Impossibile caricare gli allegati. Riprova.",
+          "attachFailed": "Impossibile allegare il file. Riprova.",
+          "toggleFailed": "Impossibile aggiornare la visibilità. Riprova.",
+          "detachFailed": "Impossibile rimuovere il file. Riprova."
+        },
+        "picker": {
+          "title": "Allega file",
+          "search": "Cerca file",
+          "noFiles": "Nessun file nella tua libreria. Caricane uno dalla pagina File.",
+          "noMatch": "Nessun file corrisponde alla ricerca.",
+          "alreadyAttached": "Già allegato",
+          "submit": "Allega ({count})",
+          "cancel": "Annulla",
+          "loadFailed": "Impossibile caricare i tuoi file. Riprova.",
+          "attachedSummary": "Allegati {count} file."
         }
       }
     },

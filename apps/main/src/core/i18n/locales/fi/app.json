@@ -521,7 +521,8 @@
         "applications": "Hakemukset",
         "payments": "Maksus",
         "messages": "Viestit",
-        "settings": "Asetukset"
+        "settings": "Asetukset",
+        "attachments": "Liitteet"
       },
       "create": {
         "title": "New campaign"
@@ -905,6 +906,46 @@
           "fix": "Avaa kampanja",
           "listed": "{name} on nyt työpaikkataulussa.",
           "delisted": "{name} poistettiin työpaikkataulusta."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Liitä tiedostoja"
+        },
+        "fields": {
+          "name": "Tiedosto",
+          "size": "Koko",
+          "visibleToCreators": "Näkyvä creatoreille",
+          "attachedBy": "Liittänyt",
+          "attachedAt": "Liitetty"
+        },
+        "empty": {
+          "heading": "Ei liitteitä vielä",
+          "body": "Liitä tiedostoja tiedostokirjastostasi jaettavaksi creatoreille."
+        },
+        "detach": {
+          "action": "Poista",
+          "confirmTitle": "Poista tiedosto",
+          "confirmMessage": "Poistetaanko {name} tästä kampanjasta? Creatorit eivät enää näe sitä.",
+          "confirm": "Poista",
+          "cancel": "Peruuta"
+        },
+        "errors": {
+          "loadFailed": "Liitteiden lataaminen epäonnistui. Yritä uudelleen.",
+          "attachFailed": "Tiedoston liittäminen epäonnistui. Yritä uudelleen.",
+          "toggleFailed": "Näkyvyyden päivittäminen epäonnistui. Yritä uudelleen.",
+          "detachFailed": "Tiedoston poistaminen epäonnistui. Yritä uudelleen."
+        },
+        "picker": {
+          "title": "Liitä tiedostoja",
+          "search": "Etsi tiedostoja",
+          "noFiles": "Kirjastossasi ei ole vielä tiedostoja. Lataa ensin yksi Tiedostot-sivulta.",
+          "noMatch": "Hakuasi vastaavia tiedostoja ei löytynyt.",
+          "alreadyAttached": "Jo liitetty",
+          "submit": "Liitä ({count})",
+          "cancel": "Peruuta",
+          "loadFailed": "Tiedostojesi lataaminen epäonnistui. Yritä uudelleen.",
+          "attachedSummary": "{count} tiedosto(a) liitetty."
         }
       }
     },

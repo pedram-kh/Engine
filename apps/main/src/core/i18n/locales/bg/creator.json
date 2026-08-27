@@ -20,6 +20,9 @@
       "invalid_state": "Only a rejected application can be reopened."
     },
     "ui": {
+      "attachments": {
+        "title": "Прикачени файлове"
+      },
       "wizard": {
         "title": "Set up your creator prотile",
         "subtitle": "A few steps to introduce yourself to brands.",

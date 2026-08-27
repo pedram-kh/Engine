@@ -521,7 +521,8 @@
         "applications": "Candidatures",
         "payments": "Paiements",
         "messages": "Messages",
-        "settings": "Paramètres"
+        "settings": "Paramètres",
+        "attachments": "Pièces jointes"
       },
       "create": {
         "title": "Nouvelle campagne"
@@ -905,6 +906,46 @@
           "fix": "Ouvrir la campagne",
           "listed": "{name} est désormais sur le tableau des missions.",
           "delisted": "{name} a été retirée du tableau des missions."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Joindre des fichiers"
+        },
+        "fields": {
+          "name": "Fichier",
+          "size": "Taille",
+          "visibleToCreators": "Visible par les créateurs",
+          "attachedBy": "Joint par",
+          "attachedAt": "Joint le"
+        },
+        "empty": {
+          "heading": "Aucune pièce jointe pour le moment",
+          "body": "Joignez des fichiers de votre bibliothèque de fichiers pour les partager avec les créateurs."
+        },
+        "detach": {
+          "action": "Détacher",
+          "confirmTitle": "Détacher le fichier",
+          "confirmMessage": "Détacher {name} de cette campagne ? Les créateurs ne le verront plus.",
+          "confirm": "Détacher",
+          "cancel": "Annuler"
+        },
+        "errors": {
+          "loadFailed": "Impossible de charger les pièces jointes. Veuillez réessayer.",
+          "attachFailed": "Impossible de joindre le fichier. Veuillez réessayer.",
+          "toggleFailed": "Impossible de mettre à jour la visibilité. Veuillez réessayer.",
+          "detachFailed": "Impossible de détacher le fichier. Veuillez réessayer."
+        },
+        "picker": {
+          "title": "Joindre des fichiers",
+          "search": "Rechercher des fichiers",
+          "noFiles": "Aucun fichier dans votre bibliothèque pour le moment. Téléchargez-en un depuis la page Fichiers.",
+          "noMatch": "Aucun fichier ne correspond à votre recherche.",
+          "alreadyAttached": "Déjà joint",
+          "submit": "Joindre ({count})",
+          "cancel": "Annuler",
+          "loadFailed": "Impossible de charger vos fichiers. Veuillez réessayer.",
+          "attachedSummary": "{count} fichier(s) joint(s)."
         }
       }
     },

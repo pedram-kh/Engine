@@ -48,6 +48,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import { creatorJobsApi } from '../jobs.api'
+import CreatorAttachmentsBlock from '../components/CreatorAttachmentsBlock.vue'
 import RichBrief from '@/components/RichBrief.vue'
 
 const { t } = useI18n()
@@ -84,6 +85,9 @@ const lifecycleState = computed<JobLifecycleState | null>(
   () => job.value?.attributes.assignment_state ?? null,
 )
 const canApply = computed(() => job.value !== null && status.value === null)
+// Campaign attachments from the Files library, chunk B (AH-092, S6). Same
+// shared block as the assignment-detail page — see CreatorAttachmentsBlock.
+const attachments = computed(() => job.value?.attributes.attachments ?? [])
 
 async function load(): Promise<void> {
   loading.value = true
@@ -300,6 +304,10 @@ onMounted(() => {
             {{ t('creator.ui.jobs.detail.website') }}
           </v-btn>
         </div>
+
+        <!-- Campaign attachments from the Files library, chunk B (AH-092,
+             S6) — the shared block also used on the assignment-detail page. -->
+        <CreatorAttachmentsBlock :attachments="attachments" />
       </v-card-text>
 
       <!-- The outcome of the caller's own application, or the way to make one.

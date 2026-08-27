@@ -20,6 +20,9 @@
       "invalid_state": "Solo se puede reabrir una solicitud rechazada."
     },
     "ui": {
+      "attachments": {
+        "title": "Adjuntos"
+      },
       "wizard": {
         "title": "Configura tu perfil de creador",
         "subtitle": "Unos pocos pasos para presentarte ante las marcas.",

@@ -21,7 +21,7 @@ export {
   type HttpClient,
   type HttpRequestOptions,
 } from './http'
-export { formatCurrency, formatDate, formatDateTime } from './format'
+export { formatCurrency, formatDate, formatDateTime, formatFileSize } from './format'
 export { uploadToPresignedUrl } from './presigned'
 export {
   EU_LANGUAGES,

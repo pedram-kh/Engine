@@ -521,7 +521,8 @@
         "applications": "Jelentkezések",
         "payments": "Fizetéss",
         "messages": "Üzenetek",
-        "settings": "Beállítások"
+        "settings": "Beállítások",
+        "attachments": "Csatolmányok"
       },
       "create": {
         "title": "New campaign"
@@ -905,6 +906,46 @@
           "fix": "Kampány megnyitása",
           "listed": "A(z) {name} már szerepel az álláslistán.",
           "delisted": "A(z) {name} le lett véve az álláslistáról."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Fájlok csatolása"
+        },
+        "fields": {
+          "name": "Fájl",
+          "size": "Méret",
+          "visibleToCreators": "Látható a creatoroknak",
+          "attachedBy": "Csatolta",
+          "attachedAt": "Csatolva"
+        },
+        "empty": {
+          "heading": "Még nincsenek csatolmányok",
+          "body": "Csatoljon fájlokat a fájlkönyvtárából, hogy megoszthassa őket a creatorokkal."
+        },
+        "detach": {
+          "action": "Eltávolítás",
+          "confirmTitle": "Fájl eltávolítása",
+          "confirmMessage": "Eltávolítja a {name} fájlt ebből a kampányból? A creatorok többé nem fogják látni.",
+          "confirm": "Eltávolítás",
+          "cancel": "Mégse"
+        },
+        "errors": {
+          "loadFailed": "A csatolmányok betöltése sikertelen. Kérjük, próbálja újra.",
+          "attachFailed": "A fájl csatolása sikertelen. Kérjük, próbálja újra.",
+          "toggleFailed": "A láthatóság frissítése sikertelen. Kérjük, próbálja újra.",
+          "detachFailed": "A fájl eltávolítása sikertelen. Kérjük, próbálja újra."
+        },
+        "picker": {
+          "title": "Fájlok csatolása",
+          "search": "Fájlok keresése",
+          "noFiles": "Még nincs fájl a könyvtárában. Először töltsön fel egyet a Fájlok oldalon.",
+          "noMatch": "Nincs a keresésnek megfelelő fájl.",
+          "alreadyAttached": "Már csatolva",
+          "submit": "Csatolás ({count})",
+          "cancel": "Mégse",
+          "loadFailed": "A fájljai betöltése sikertelen. Kérjük, próbálja újra.",
+          "attachedSummary": "{count} fájl csatolva."
         }
       }
     },

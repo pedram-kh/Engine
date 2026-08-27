@@ -20,6 +20,9 @@
       "invalid_state": "Solo una candidatura rifiutata può essere riaperta."
     },
     "ui": {
+      "attachments": {
+        "title": "Allegati"
+      },
       "wizard": {
         "title": "Configura il tuo profilo creator",
         "subtitle": "Alcuni passaggi per presentarti ai brand.",

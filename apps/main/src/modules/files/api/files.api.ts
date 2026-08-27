@@ -16,6 +16,7 @@ import type {
   AgencyFileEnvelope,
   AgencyFileListParams,
   AgencyFileListResponse,
+  AgencyFileOptionListResponse,
   AgencyFileUploadCompletePayload,
   AgencyFileUploadInitPayload,
   AgencyFileUploadInitResponse,
@@ -47,6 +48,15 @@ export const filesApi = {
     payload: AgencyFileUploadCompletePayload,
   ): Promise<AgencyFileEnvelope> {
     return http.post<AgencyFileEnvelope>(`${filesBase(agencyId)}/uploads/complete`, payload)
+  },
+
+  /**
+   * The unpaginated `?for=select` thin projection (Campaign attachments chunk
+   * B, AH-092, S3) — the attach picker's source list. Sorted by
+   * `original_filename`, unlike `list()`'s newest-first order.
+   */
+  listOptions(agencyId: string): Promise<AgencyFileOptionListResponse> {
+    return http.get<AgencyFileOptionListResponse>(`${filesBase(agencyId)}?for=select`)
   },
 
   /** A fresh signed `download_url` (60 min, forced attachment — D4). */

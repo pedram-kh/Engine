@@ -521,7 +521,8 @@
         "applications": "Aanmeldingen",
         "payments": "Betalingen",
         "messages": "Berichten",
-        "settings": "Instellingen"
+        "settings": "Instellingen",
+        "attachments": "Bijlagen"
       },
       "create": {
         "title": "Nieuwe campagne"
@@ -905,6 +906,46 @@
           "fix": "Campagne openen",
           "listed": "{name} staat nu in het vacatureoverzicht.",
           "delisted": "{name} is uit het vacatureoverzicht verwijderd."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Bestanden bijvoegen"
+        },
+        "fields": {
+          "name": "Bestand",
+          "size": "Grootte",
+          "visibleToCreators": "Zichtbaar voor creators",
+          "attachedBy": "Bijgevoegd door",
+          "attachedAt": "Bijgevoegd"
+        },
+        "empty": {
+          "heading": "Nog geen bijlagen",
+          "body": "Voeg bestanden uit je bestandenbibliotheek toe om ze met creators te delen."
+        },
+        "detach": {
+          "action": "Verwijderen",
+          "confirmTitle": "Bestand verwijderen",
+          "confirmMessage": "{name} van deze campagne verwijderen? Creators zien het bestand dan niet meer.",
+          "confirm": "Verwijderen",
+          "cancel": "Annuleren"
+        },
+        "errors": {
+          "loadFailed": "Bijlagen konden niet worden geladen. Probeer het opnieuw.",
+          "attachFailed": "Het bestand kon niet worden bijgevoegd. Probeer het opnieuw.",
+          "toggleFailed": "De zichtbaarheid kon niet worden bijgewerkt. Probeer het opnieuw.",
+          "detachFailed": "Het bestand kon niet worden verwijderd. Probeer het opnieuw."
+        },
+        "picker": {
+          "title": "Bestanden bijvoegen",
+          "search": "Bestanden zoeken",
+          "noFiles": "Nog geen bestanden in je bibliotheek. Upload er eerst een via de pagina Bestanden.",
+          "noMatch": "Geen bestanden komen overeen met je zoekopdracht.",
+          "alreadyAttached": "Al bijgevoegd",
+          "submit": "Bijvoegen ({count})",
+          "cancel": "Annuleren",
+          "loadFailed": "Je bestanden konden niet worden geladen. Probeer het opnieuw.",
+          "attachedSummary": "{count} bestand(en) bijgevoegd."
         }
       }
     },

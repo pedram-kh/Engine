@@ -58,6 +58,7 @@ function makeDetail(
       countered_fee_minor_units: null,
       countered_fee_currency: null,
       deliverables: null,
+      attachments: [],
       posting_due_at: null,
       invited_at: null,
       submitted_draft_at: null,
@@ -546,6 +547,44 @@ describe('CreatorAssignmentDetailPage — offer description (AH-081, minimal ric
     const { wrapper } = await mountDetail()
 
     expect(wrapper.find('[data-testid="assignment-detail-offer-description"]').exists()).toBe(false)
+  })
+})
+
+// Campaign attachments from the Files library, chunk B (AH-092, S6). The
+// resource's `attributes.attachments` is already scoped server-side
+// (creator-visible + live file) — this page's only job is to render whatever
+// array it is handed, empty or not.
+describe('CreatorAssignmentDetailPage — attachments (AH-092)', () => {
+  it('renders the visible attachment with its filename and a download link', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('producing', [], [], null, {
+        attachments: [
+          {
+            filename: 'brief.pdf',
+            mime_type: 'application/pdf',
+            size_bytes: 204800,
+            url: 'https://example.com/signed/brief.pdf',
+          },
+        ],
+      }),
+    })
+    const { wrapper } = await mountDetail()
+
+    const block = wrapper.find('[data-testid="creator-attachments-block"]')
+    expect(block.exists()).toBe(true)
+    expect(block.text()).toContain('brief.pdf')
+    expect(wrapper.find('[data-testid="creator-attachment-0"]').attributes('href')).toBe(
+      'https://example.com/signed/brief.pdf',
+    )
+  })
+
+  it('renders no attachments block when the array is empty (not-visible or never attached)', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('producing', [], [], null, { attachments: [] }),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="creator-attachments-block"]').exists()).toBe(false)
   })
 })
 

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\TestHelpers\Http\Controllers;
 
 use App\Modules\Agencies\Database\Factories\AgencyFactory;
+use App\Modules\Agencies\Database\Factories\AgencyFileFactory;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Brands\Models\Brand;
+use App\Modules\Campaigns\Database\Factories\CampaignAttachmentFactory;
 use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Creators\Enums\ApplicationStatus;
@@ -53,6 +55,14 @@ use Illuminate\Validation\ValidationException;
  *   - `listing_fee`       — string|null, optional (display-only copy).
  *   - `listing_duration`  — string|null, optional.
  *   - `description`       — string|null, optional (the job copy).
+ *   - `attachments`       — array|null, optional. Campaign attachments from the
+ *                           Files library, chunk B (AH-092, S7 c3 leg). Each
+ *                           entry: `{ filename: string, visible?: bool }`.
+ *                           Seeded directly via the `AgencyFile` +
+ *                           `CampaignAttachment` factories — NOT the
+ *                           presigned-upload flow, which this helper does not
+ *                           exercise (that round-trip is AH-091 debt #3's own
+ *                           gap, not this leg's).
  *
  * Response (201):
  *   { "data": { "campaign_ulid", "campaign_name", "brand_name", "agency_ulid", "creator_ulid" } }
@@ -70,6 +80,9 @@ final class CreateListedJobController
                 'listing_fee' => ['nullable', 'string', 'max:255'],
                 'listing_duration' => ['nullable', 'string', 'max:255'],
                 'description' => ['nullable', 'string', 'max:5000'],
+                'attachments' => ['nullable', 'array', 'max:5'],
+                'attachments.*.filename' => ['required', 'string', 'max:255'],
+                'attachments.*.visible' => ['sometimes', 'boolean'],
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([
@@ -141,6 +154,19 @@ final class CreateListedJobController
             // spec on a date rollover.
             'ends_at' => null,
         ]);
+
+        /** @var array<int, array{filename: string, visible?: bool}> $attachments */
+        $attachments = $validated['attachments'] ?? [];
+        foreach ($attachments as $attachment) {
+            $file = AgencyFileFactory::new()
+                ->forAgency($agency->id)
+                ->createOne(['original_filename' => $attachment['filename']]);
+            CampaignAttachmentFactory::new()->createOne([
+                'campaign_id' => $campaign->id,
+                'agency_file_id' => $file->id,
+                'visible_to_creators' => $attachment['visible'] ?? false,
+            ]);
+        }
 
         return new JsonResponse([
             'data' => [

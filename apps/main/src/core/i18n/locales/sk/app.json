@@ -521,7 +521,8 @@
         "applications": "Prihlášky",
         "payments": "Platby",
         "messages": "Správy",
-        "settings": "Nastavenia"
+        "settings": "Nastavenia",
+        "attachments": "Prílohy"
       },
       "create": {
         "title": "Nová kampaň"
@@ -905,6 +906,46 @@
           "fix": "Otvoriť kampaň",
           "listed": "{name} je teraz na tabuli prác.",
           "delisted": "{name} bola odstránená z tabule prác."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Priložiť súbory"
+        },
+        "fields": {
+          "name": "Súbor",
+          "size": "Veľkosť",
+          "visibleToCreators": "Viditeľné pre tvorcov",
+          "attachedBy": "Priložil",
+          "attachedAt": "Priložené"
+        },
+        "empty": {
+          "heading": "Zatiaľ žiadne prílohy",
+          "body": "Priložte súbory z knižnice súborov, aby ste ich mohli zdieľať s tvorcami."
+        },
+        "detach": {
+          "action": "Odobrať",
+          "confirmTitle": "Odobrať súbor",
+          "confirmMessage": "Odobrať {name} z tejto kampane? Tvorcovia ho už neuvidia.",
+          "confirm": "Odobrať",
+          "cancel": "Zrušiť"
+        },
+        "errors": {
+          "loadFailed": "Prílohy sa nepodarilo načítať. Skúste to znova.",
+          "attachFailed": "Súbor sa nepodarilo priložiť. Skúste to znova.",
+          "toggleFailed": "Viditeľnosť sa nepodarilo aktualizovať. Skúste to znova.",
+          "detachFailed": "Súbor sa nepodarilo odobrať. Skúste to znova."
+        },
+        "picker": {
+          "title": "Priložiť súbory",
+          "search": "Hľadať súbory",
+          "noFiles": "V knižnici ešte nie sú žiadne súbory. Najprv nahrajte súbor na stránke Súbory.",
+          "noMatch": "Žiadne súbory nezodpovedajú vášmu vyhľadávaniu.",
+          "alreadyAttached": "Už priložené",
+          "submit": "Priložiť ({count})",
+          "cancel": "Zrušiť",
+          "loadFailed": "Vaše súbory sa nepodarilo načítať. Skúste to znova.",
+          "attachedSummary": "Priložených súborov: {count}."
         }
       }
     },

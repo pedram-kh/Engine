@@ -521,7 +521,8 @@
         "applications": "Applikazzjonijiet",
         "payments": "Ħlass",
         "messages": "Messaġġi",
-        "settings": "Settings"
+        "settings": "Settings",
+        "attachments": "Mehmuzin"
       },
       "create": {
         "title": "New campaign"
@@ -905,6 +906,46 @@
           "fix": "Iftaħ il-kampanja",
           "listed": "{name} issa tinsab fil-bord tax-xogħlijiet.",
           "delisted": "{name} tneħħiet mill-bord tax-xogħlijiet."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Ehmeż fajls"
+        },
+        "fields": {
+          "name": "Fajl",
+          "size": "Daqs",
+          "visibleToCreators": "Viżibbli għall-creators",
+          "attachedBy": "Mehmuż minn",
+          "attachedAt": "Mehmuż"
+        },
+        "empty": {
+          "heading": "Għad m'hemm ebda mehmuż",
+          "body": "Ehmeż fajls mil-librerija tal-fajls tiegħek biex taqsamhom mal-creators."
+        },
+        "detach": {
+          "action": "Neħħi",
+          "confirmTitle": "Neħħi l-fajl",
+          "confirmMessage": "Neħħi {name} minn din il-kampanja? Il-creators mhux se jibqgħu jarawh.",
+          "confirm": "Neħħi",
+          "cancel": "Ikkanċella"
+        },
+        "errors": {
+          "loadFailed": "Il-mehmuzin ma setgħux jiġu kkargati. Erġa' pprova.",
+          "attachFailed": "Il-fajl ma setax jiġi mehmuż. Erġa' pprova.",
+          "toggleFailed": "Il-viżibbiltà ma setgħetx tiġi aġġornata. Erġa' pprova.",
+          "detachFailed": "Il-fajl ma setax jitneħħa. Erġa' pprova."
+        },
+        "picker": {
+          "title": "Ehmeż fajls",
+          "search": "Fittex fajls",
+          "noFiles": "Għad m'hemm ebda fajl fil-librerija tiegħek. L-ewwel uploadja wieħed mill-paġna Fajls.",
+          "noMatch": "L-ebda fajl ma jaqbel mat-tfixxija tiegħek.",
+          "alreadyAttached": "Diġà mehmuż",
+          "submit": "Ehmeż ({count})",
+          "cancel": "Ikkanċella",
+          "loadFailed": "Il-fajls tiegħek ma setgħux jiġu kkargati. Erġa' pprova.",
+          "attachedSummary": "Mehmuż {count} fajl(s)."
         }
       }
     },

@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modules\Creators\Http\Resources;
 
+use App\Modules\Campaigns\Http\Resources\CreatorCampaignAttachmentResource;
 use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Campaigns\Models\CampaignAttachment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 /**
  * The creator's JOB DETAIL page (Jobs Board chunk 3, AH-056, D3/D4).
@@ -39,6 +42,16 @@ use Illuminate\Http\Request;
  *                               `application_status === 'accepted'`: the
  *                               application and the assignment are separate
  *                               rows and can disagree.
+ *   - `attachments`           — Campaign attachments from the Files library,
+ *                               chunk B (AH-092, D4). The controller loads the
+ *                               relation pre-filtered through
+ *                               `CampaignAttachment::scopeCreatorVisible()`
+ *                               (flag ON + live file), AFTER its own
+ *                               `JobsBoardVisibility` gate has already run —
+ *                               this key only ever renders what already
+ *                               cleared both doors. Always an array, `[]`
+ *                               when nothing is attached or nothing is
+ *                               flagged visible.
  *
  * `assignment_state` (AH-059, D5) is NOT in that list, because it is not a detail
  * addition: it lives on the shared card block, so both shapes carry it. The
@@ -77,6 +90,7 @@ final class CreatorJobDetailResource extends CreatorJobCardResource
                 'listing_regions' => $campaign->listing_regions,
                 'listing_examples_url' => $campaign->listing_examples_url,
                 'assignment_ulid' => $this->callerAssignmentUlid($campaign),
+                'attachments' => CreatorCampaignAttachmentResource::collection($this->creatorVisibleAttachments($campaign))->resolve($request),
                 'brand' => $brand,
             ],
         ];
@@ -87,5 +101,21 @@ final class CreatorJobDetailResource extends CreatorJobCardResource
         $ulid = $campaign->getAttribute('caller_assignment_ulid');
 
         return is_string($ulid) ? $ulid : null;
+    }
+
+    /**
+     * Deliberately reads ONLY the eager-loaded, pre-filtered relation — never
+     * `$campaign->attachments` directly, which would trigger a fresh,
+     * UNFILTERED lazy-load bypassing `creatorVisible()` if this resource is
+     * ever reached without the controller's own filtered `->load()` call.
+     * Failing to `[]` when unloaded is the fail-closed posture (D4 review
+     * priority #1): a missing eager-load must never silently leak every
+     * attachment instead of none.
+     *
+     * @return Collection<int, CampaignAttachment>
+     */
+    private function creatorVisibleAttachments(Campaign $campaign): Collection
+    {
+        return $campaign->relationLoaded('attachments') ? $campaign->attachments : collect();
     }
 }

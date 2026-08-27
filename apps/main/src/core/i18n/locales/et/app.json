@@ -521,7 +521,8 @@
         "applications": "Kandideerimised",
         "payments": "Makses",
         "messages": "Sõnumid",
-        "settings": "Seaded"
+        "settings": "Seaded",
+        "attachments": "Manused"
       },
       "create": {
         "title": "New campaign"
@@ -905,6 +906,46 @@
           "fix": "Ava kampaania",
           "listed": "{name} on nüüd töölaual.",
           "delisted": "{name} eemaldati töölaualt."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Lisa faile"
+        },
+        "fields": {
+          "name": "Fail",
+          "size": "Suurus",
+          "visibleToCreators": "Nähtav creatoritele",
+          "attachedBy": "Lisas",
+          "attachedAt": "Lisatud"
+        },
+        "empty": {
+          "heading": "Manuseid veel ei ole",
+          "body": "Lisa faile oma failikogust, et neid creatoritega jagada."
+        },
+        "detach": {
+          "action": "Eemalda",
+          "confirmTitle": "Eemalda fail",
+          "confirmMessage": "Eemaldada {name} sellelt kampaanialt? Creatorid ei näe seda enam.",
+          "confirm": "Eemalda",
+          "cancel": "Loobu"
+        },
+        "errors": {
+          "loadFailed": "Manuste laadimine ebaõnnestus. Proovi uuesti.",
+          "attachFailed": "Faili lisamine ebaõnnestus. Proovi uuesti.",
+          "toggleFailed": "Nähtavuse värskendamine ebaõnnestus. Proovi uuesti.",
+          "detachFailed": "Faili eemaldamine ebaõnnestus. Proovi uuesti."
+        },
+        "picker": {
+          "title": "Lisa faile",
+          "search": "Otsi faile",
+          "noFiles": "Sinu kogus pole veel faile. Laadi esmalt üks fail üles Failide lehel.",
+          "noMatch": "Otsingule vastavaid faile ei leitud.",
+          "alreadyAttached": "Juba lisatud",
+          "submit": "Lisa ({count})",
+          "cancel": "Loobu",
+          "loadFailed": "Sinu failide laadimine ebaõnnestus. Proovi uuesti.",
+          "attachedSummary": "Lisatud {count} fail(i)."
         }
       }
     },

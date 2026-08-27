@@ -20,6 +20,9 @@
       "invalid_state": "Kun en afvist ansøgning kan genåbnes."
     },
     "ui": {
+      "attachments": {
+        "title": "Vedhæftninger"
+      },
       "wizard": {
         "title": "Opsæt din creator-profil",
         "subtitle": "Et par trin til at introducere dig for brands.",

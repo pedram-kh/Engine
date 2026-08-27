@@ -197,6 +197,19 @@ final class Campaign extends Model
     }
 
     /**
+     * This campaign's links to its agency's Files-library documents
+     * (Campaign attachments chunk B, AH-092). Deliberately replaces, not
+     * migrates, the untyped `brief.attachments` JSON slot — that field is
+     * left exactly as shipped; nothing here reads or writes it.
+     *
+     * @return HasMany<CampaignAttachment, $this>
+     */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(CampaignAttachment::class);
+    }
+
+    /**
      * The per-creator once-only job-posted notification stamps (AH-056, D7).
      * Read by the fan-out service to skip already-notified creators; never
      * emitted in any resource.

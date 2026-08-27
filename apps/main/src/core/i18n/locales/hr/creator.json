@@ -20,6 +20,9 @@
       "invalid_state": "Znova otevřít lze pouze odmítnutou prijavo."
     },
     "ui": {
+      "attachments": {
+        "title": "Privitci"
+      },
       "wizard": {
         "title": "Nastanjete svůj profil ustvarjalca",
         "subtitle": "Několik kroků pro předstanjeení se značkám.",

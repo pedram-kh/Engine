@@ -521,7 +521,8 @@
         "applications": "Pieteikumi",
         "payments": "Maksājumss",
         "messages": "Ziņojumi",
-        "settings": "Iestatījumi"
+        "settings": "Iestatījumi",
+        "attachments": "Pielikumi"
       },
       "create": {
         "title": "New campaign"
@@ -905,6 +906,46 @@
           "fix": "Atvērt kampaņu",
           "listed": "{name} tagad ir darbu sarakstā.",
           "delisted": "{name} ir noņemta no darbu saraksta."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Pievienot failus"
+        },
+        "fields": {
+          "name": "Fails",
+          "size": "Izmērs",
+          "visibleToCreators": "Redzams satura veidotājiem",
+          "attachedBy": "Pievienoja",
+          "attachedAt": "Pievienots"
+        },
+        "empty": {
+          "heading": "Vēl nav pielikumu",
+          "body": "Pievienojiet failus no savas failu bibliotēkas, lai kopīgotu tos ar satura veidotājiem."
+        },
+        "detach": {
+          "action": "Noņemt",
+          "confirmTitle": "Noņemt failu",
+          "confirmMessage": "Noņemt {name} no šīs kampaņas? Satura veidotāji to vairs neredzēs.",
+          "confirm": "Noņemt",
+          "cancel": "Atcelt"
+        },
+        "errors": {
+          "loadFailed": "Pielikumus nevarēja ielādēt. Lūdzu, mēģiniet vēlreiz.",
+          "attachFailed": "Failu nevarēja pievienot. Lūdzu, mēģiniet vēlreiz.",
+          "toggleFailed": "Redzamību nevarēja atjaunināt. Lūdzu, mēģiniet vēlreiz.",
+          "detachFailed": "Failu nevarēja noņemt. Lūdzu, mēģiniet vēlreiz."
+        },
+        "picker": {
+          "title": "Pievienot failus",
+          "search": "Meklēt failus",
+          "noFiles": "Jūsu bibliotēkā vēl nav failu. Vispirms augšupielādējiet failu lapā Faili.",
+          "noMatch": "Nav failu, kas atbilstu jūsu meklējumam.",
+          "alreadyAttached": "Jau pievienots",
+          "submit": "Pievienot ({count})",
+          "cancel": "Atcelt",
+          "loadFailed": "Jūsu failus nevarēja ielādēt. Lūdzu, mēģiniet vēlreiz.",
+          "attachedSummary": "Pievienoti {count} faili."
         }
       }
     },

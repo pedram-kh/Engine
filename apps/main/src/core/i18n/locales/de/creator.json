@@ -20,6 +20,9 @@
       "invalid_state": "Nur eine abgelehnte Bewerbung kann erneut geöffnet werden."
     },
     "ui": {
+      "attachments": {
+        "title": "Anhänge"
+      },
       "wizard": {
         "title": "Creator-Profil einrichten",
         "subtitle": "Ein paar Schritte, um dich Marken vorzustellen.",

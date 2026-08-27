@@ -521,7 +521,8 @@
         "applications": "Zgłoszenia",
         "payments": "Płatności",
         "messages": "Wiadomości",
-        "settings": "Ustawienia"
+        "settings": "Ustawienia",
+        "attachments": "Załączniki"
       },
       "create": {
         "title": "Nowa kampania"
@@ -905,6 +906,46 @@
           "fix": "Otwórz kampanię",
           "listed": "{name} jest teraz na tablicy ogłoszeń.",
           "delisted": "{name} została usunięta z tablicy ogłoszeń."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Dołącz pliki"
+        },
+        "fields": {
+          "name": "Plik",
+          "size": "Rozmiar",
+          "visibleToCreators": "Widoczne dla twórców",
+          "attachedBy": "Dołączone przez",
+          "attachedAt": "Dołączono"
+        },
+        "empty": {
+          "heading": "Brak załączników",
+          "body": "Dołącz pliki z biblioteki plików, aby udostępnić je twórcom."
+        },
+        "detach": {
+          "action": "Odłącz",
+          "confirmTitle": "Odłącz plik",
+          "confirmMessage": "Odłączyć {name} od tej kampanii? Twórcy nie będą już go widzieć.",
+          "confirm": "Odłącz",
+          "cancel": "Anuluj"
+        },
+        "errors": {
+          "loadFailed": "Nie udało się wczytać załączników. Spróbuj ponownie.",
+          "attachFailed": "Nie udało się dołączyć pliku. Spróbuj ponownie.",
+          "toggleFailed": "Nie udało się zaktualizować widoczności. Spróbuj ponownie.",
+          "detachFailed": "Nie udało się odłączyć pliku. Spróbuj ponownie."
+        },
+        "picker": {
+          "title": "Dołącz pliki",
+          "search": "Szukaj plików",
+          "noFiles": "W Twojej bibliotece nie ma jeszcze plików. Najpierw wgraj plik na stronie Pliki.",
+          "noMatch": "Żaden plik nie odpowiada Twojemu wyszukiwaniu.",
+          "alreadyAttached": "Już dołączony",
+          "submit": "Dołącz ({count})",
+          "cancel": "Anuluj",
+          "loadFailed": "Nie udało się wczytać Twoich plików. Spróbuj ponownie.",
+          "attachedSummary": "Dołączono {count} plik(ów)."
         }
       }
     },

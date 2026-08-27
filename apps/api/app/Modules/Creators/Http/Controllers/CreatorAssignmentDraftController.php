@@ -13,8 +13,10 @@ use App\Modules\Campaigns\Enums\DraftReviewStatus;
 use App\Modules\Campaigns\Enums\PostedContentVerificationStatus;
 use App\Modules\Campaigns\Http\Resources\CampaignDraftResource;
 use App\Modules\Campaigns\Http\Resources\CampaignPostedContentResource;
+use App\Modules\Campaigns\Http\Resources\CreatorCampaignAttachmentResource;
 use App\Modules\Campaigns\Jobs\VerifyPostedContentJob;
 use App\Modules\Campaigns\Models\CampaignAssignment;
+use App\Modules\Campaigns\Models\CampaignAttachment;
 use App\Modules\Campaigns\Models\CampaignDraft;
 use App\Modules\Campaigns\Models\CampaignPostedContent;
 use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
@@ -102,6 +104,15 @@ final class CreatorAssignmentDraftController
         $campaign = $model->campaign;
         $brand = $campaign?->brand;
 
+        // Campaign attachments from the Files library, chunk B (AH-092, D4).
+        // The ownership door above is untouched — this is the shared
+        // creator-visible filter layered on TOP of it, never a substitute
+        // for it. Empty (not omitted) when the campaign relation is somehow
+        // missing.
+        $attachments = $campaign !== null
+            ? CampaignAttachment::query()->where('campaign_id', $campaign->id)->creatorVisible()->with('agencyFile')->get()
+            : collect();
+
         return response()->json([
             'data' => [
                 'id' => $model->ulid,
@@ -123,6 +134,10 @@ final class CreatorAssignmentDraftController
                     'countered_fee_minor_units' => $model->countered_fee_minor_units,
                     'countered_fee_currency' => $model->countered_fee_currency,
                     'deliverables' => $model->deliverables,
+                    // Campaign attachments chunk B (AH-092, D4) — the campaign's
+                    // creator-visible Files-library documents. Never on the flat
+                    // `GET creators/me/assignments` list (D4's fence).
+                    'attachments' => CreatorCampaignAttachmentResource::collection($attachments)->resolve($request),
                     'posting_due_at' => $model->posting_due_at?->toIso8601String(),
                     'invited_at' => $model->invited_at?->toIso8601String(),
                     'submitted_draft_at' => $model->submitted_draft_at?->toIso8601String(),

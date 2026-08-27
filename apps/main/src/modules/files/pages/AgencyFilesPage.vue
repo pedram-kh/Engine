@@ -11,7 +11,7 @@
  * affordance.
  */
 
-import { formatDateTime, type AgencyFileResource } from '@catalyst/api-client'
+import { formatDateTime, formatFileSize, type AgencyFileResource } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -60,22 +60,6 @@ const headers = [
   },
   { title: '', key: 'actions', sortable: false, width: 100, align: 'end' as const },
 ]
-
-/** No shared byte-formatter exists yet (AH-091 is the first UI surface to
- * render `size_bytes`) — a local pure function, not a new package export,
- * mirrors the rest of this codebase's "no abstraction before a second
- * consumer" convention. */
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  const units = ['KB', 'MB', 'GB']
-  let value = bytes / 1024
-  let unitIndex = 0
-  while (value >= 1024 && unitIndex < units.length - 1) {
-    value /= 1024
-    unitIndex += 1
-  }
-  return `${value.toFixed(value < 10 ? 1 : 0)} ${units[unitIndex]}`
-}
 
 async function loadFiles(): Promise<void> {
   const agencyId = agencyStore.currentAgencyId

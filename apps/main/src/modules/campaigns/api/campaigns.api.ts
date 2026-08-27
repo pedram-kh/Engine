@@ -12,12 +12,15 @@ import type {
   AcceptApplicationPayload,
   AcceptApplicationResponse,
   AgencyAssignmentDetailResponse,
+  AttachCampaignFilePayload,
   AttachContractPayload,
   AttachContractResponse,
   CampaignApplicationListParams,
   CampaignApplicationListResponse,
   CampaignAssignmentListResponse,
   CampaignAssignmentResource,
+  CampaignAttachmentListResponse,
+  CampaignAttachmentResource,
   CampaignDraftListParams,
   CampaignDraftListResponse,
   CampaignEnvelope,
@@ -43,6 +46,7 @@ import type {
   RequestRevisionPayload,
   ResolutionActionResponse,
   ReviewActionResponse,
+  UpdateCampaignAttachmentPayload,
   UpdateCampaignPayload,
 } from '@catalyst/api-client'
 
@@ -127,6 +131,55 @@ export const campaignsApi = {
     return http.get<CampaignApplicationListResponse>(
       `${campaignsBase(agencyId)}/${campaignId}/applications${qs === '' ? '' : `?${qs}`}`,
     )
+  },
+
+  /**
+   * The campaign-detail Attachments tab list (Campaign attachments from the
+   * Files library, chunk B, AH-092). `view`-gated — any member reads.
+   * Unpaginated; a campaign's own attachment list is small and bounded.
+   */
+  listAttachments(agencyId: string, campaignId: string): Promise<CampaignAttachmentListResponse> {
+    return http.get<CampaignAttachmentListResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/attachments`,
+    )
+  },
+
+  /**
+   * Attach a Files-library file (D2). `update`-gated (admin/manager only —
+   * mirrors Settings, not the broader Creators-tab execute ability).
+   * Idempotent: attaching an already-attached file 200s without re-applying
+   * `visible_to_creators` to the existing row.
+   */
+  attachFile(
+    agencyId: string,
+    campaignId: string,
+    payload: AttachCampaignFilePayload,
+  ): Promise<{ data: CampaignAttachmentResource }> {
+    return http.post<{ data: CampaignAttachmentResource }>(
+      `${campaignsBase(agencyId)}/${campaignId}/attachments`,
+      payload,
+    )
+  },
+
+  /** Toggle `visible_to_creators` on an existing attachment (D2). */
+  updateAttachment(
+    agencyId: string,
+    campaignId: string,
+    fileId: string,
+    payload: UpdateCampaignAttachmentPayload,
+  ): Promise<{ data: CampaignAttachmentResource }> {
+    return http.patch<{ data: CampaignAttachmentResource }>(
+      `${campaignsBase(agencyId)}/${campaignId}/attachments/${fileId}`,
+      payload,
+    )
+  },
+
+  /**
+   * Detach a file from the campaign (D2) — a hard delete of the join row
+   * only; the underlying Files-library file is untouched. Resolves on 204.
+   */
+  detachFile(agencyId: string, campaignId: string, fileId: string): Promise<void> {
+    return http.delete<void>(`${campaignsBase(agencyId)}/${campaignId}/attachments/${fileId}`)
   },
 
   /**

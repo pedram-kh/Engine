@@ -521,7 +521,8 @@
         "applications": "Candidaturas",
         "payments": "Pagamentos",
         "messages": "Mensagens",
-        "settings": "Configurações"
+        "settings": "Configurações",
+        "attachments": "Anexos"
       },
       "create": {
         "title": "Nova campanha"
@@ -905,6 +906,46 @@
           "fix": "Abrir campanha",
           "listed": "{name} está agora no quadro de trabalhos.",
           "delisted": "{name} foi removida do quadro de trabalhos."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Anexar ficheiros"
+        },
+        "fields": {
+          "name": "Ficheiro",
+          "size": "Tamanho",
+          "visibleToCreators": "Visível para os criadores",
+          "attachedBy": "Anexado por",
+          "attachedAt": "Anexado"
+        },
+        "empty": {
+          "heading": "Ainda sem anexos",
+          "body": "Anexe ficheiros da sua biblioteca de ficheiros para os partilhar com os criadores."
+        },
+        "detach": {
+          "action": "Remover",
+          "confirmTitle": "Remover ficheiro",
+          "confirmMessage": "Remover {name} desta campanha? Os criadores deixarão de o ver.",
+          "confirm": "Remover",
+          "cancel": "Cancelar"
+        },
+        "errors": {
+          "loadFailed": "Não foi possível carregar os anexos. Tente novamente.",
+          "attachFailed": "Não foi possível anexar o ficheiro. Tente novamente.",
+          "toggleFailed": "Não foi possível atualizar a visibilidade. Tente novamente.",
+          "detachFailed": "Não foi possível remover o ficheiro. Tente novamente."
+        },
+        "picker": {
+          "title": "Anexar ficheiros",
+          "search": "Pesquisar ficheiros",
+          "noFiles": "Ainda sem ficheiros na sua biblioteca. Carregue um a partir da página Ficheiros primeiro.",
+          "noMatch": "Nenhum ficheiro corresponde à sua pesquisa.",
+          "alreadyAttached": "Já anexado",
+          "submit": "Anexar ({count})",
+          "cancel": "Cancelar",
+          "loadFailed": "Não foi possível carregar os seus ficheiros. Tente novamente.",
+          "attachedSummary": "{count} ficheiro(s) anexado(s)."
         }
       }
     },

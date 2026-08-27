@@ -521,7 +521,8 @@
         "applications": "Bewerbungen",
         "payments": "Zahlungen",
         "messages": "Nachrichten",
-        "settings": "Einstellungen"
+        "settings": "Einstellungen",
+        "attachments": "Anhänge"
       },
       "create": {
         "title": "Neue Kampagne"
@@ -905,6 +906,46 @@
           "fix": "Kampagne öffnen",
           "listed": "{name} ist jetzt in der Jobbörse.",
           "delisted": "{name} wurde aus der Jobbörse entfernt."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Dateien anhängen"
+        },
+        "fields": {
+          "name": "Datei",
+          "size": "Größe",
+          "visibleToCreators": "Für Creator sichtbar",
+          "attachedBy": "Angehängt von",
+          "attachedAt": "Angehängt"
+        },
+        "empty": {
+          "heading": "Noch keine Anhänge",
+          "body": "Hängen Sie Dateien aus Ihrer Dateibibliothek an, um sie mit Creators zu teilen."
+        },
+        "detach": {
+          "action": "Entfernen",
+          "confirmTitle": "Datei entfernen",
+          "confirmMessage": "{name} von dieser Kampagne entfernen? Creator sehen die Datei danach nicht mehr.",
+          "confirm": "Entfernen",
+          "cancel": "Abbrechen"
+        },
+        "errors": {
+          "loadFailed": "Anhänge konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+          "attachFailed": "Die Datei konnte nicht angehängt werden. Bitte versuchen Sie es erneut.",
+          "toggleFailed": "Die Sichtbarkeit konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
+          "detachFailed": "Die Datei konnte nicht entfernt werden. Bitte versuchen Sie es erneut."
+        },
+        "picker": {
+          "title": "Dateien anhängen",
+          "search": "Dateien suchen",
+          "noFiles": "Noch keine Dateien in Ihrer Bibliothek. Laden Sie zuerst eine Datei über die Seite „Dateien\" hoch.",
+          "noMatch": "Keine Dateien entsprechen Ihrer Suche.",
+          "alreadyAttached": "Bereits angehängt",
+          "submit": "Anhängen ({count})",
+          "cancel": "Abbrechen",
+          "loadFailed": "Ihre Dateien konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+          "attachedSummary": "{count} Datei(en) angehängt."
         }
       }
     },

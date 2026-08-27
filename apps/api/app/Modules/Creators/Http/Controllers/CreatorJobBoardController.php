@@ -184,6 +184,12 @@ final class CreatorJobBoardController
             abort(404);
         }
 
+        // Campaign attachments from the Files library, chunk B (AH-092, D4).
+        // Loaded ONLY after the visibility predicate above has already run —
+        // never a substitute for it, only the shared creator-visible filter
+        // layered on top.
+        $job->load(['attachments' => fn ($q) => $q->creatorVisible()->with('agencyFile')]);
+
         return response()->json([
             'data' => (new CreatorJobDetailResource($job))->resolve($request),
         ]);

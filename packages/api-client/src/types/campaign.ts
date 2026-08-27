@@ -229,6 +229,72 @@ export type UpdateCampaignPayload = Partial<Omit<CreateCampaignPayload, 'brand_i
 }
 
 // ---------------------------------------------------------------------------
+// Campaign attachments from the Files library, chunk B (AH-092)
+// ---------------------------------------------------------------------------
+
+/**
+ * The agency-side Attachments tab row. `id` is the underlying `AgencyFile`'s
+ * OWN ulid (there is no ulid on the join row itself — see the backend
+ * `CampaignAttachment` model's docblock) — it is also the exact path segment
+ * the toggle/detach endpoints address, so a row can act on itself with no
+ * second lookup.
+ *
+ * `download_url` reuses the AH-091 signer verbatim (Q2, the plan's resolved
+ * disagreement): unlike the Jobs Board card, a campaign's own attachment list
+ * is small and bounded, so minting per row here costs nothing the agency
+ * member couldn't already get from the library's own `show()`.
+ */
+export interface CampaignAttachmentAttributes {
+  original_filename: string
+  mime_type: string
+  size_bytes: number
+  visible_to_creators: boolean
+  /** A FRESH short-lived signed GET, minted per response. Null on a non-S3 disk. */
+  download_url: string | null
+  attached_at: string
+}
+
+export interface CampaignAttachmentAttachedByRelationship {
+  data: {
+    id: string
+    type: 'users'
+    attributes: { name: string }
+  }
+}
+
+export interface CampaignAttachmentResource {
+  id: string
+  type: 'campaign_attachments'
+  attributes: CampaignAttachmentAttributes
+  relationships: {
+    /** Null when the attaching user account was later deleted (nullOnDelete). */
+    attached_by: CampaignAttachmentAttachedByRelationship | null
+  }
+}
+
+/** GET …/campaigns/{campaign}/attachments — unpaginated; the list is small and bounded. */
+export interface CampaignAttachmentListResponse {
+  data: CampaignAttachmentResource[]
+}
+
+/**
+ * POST …/campaigns/{campaign}/attachments. Idempotent: attaching an
+ * already-attached file 200s without re-applying `visible_to_creators` to
+ * the existing row (attach and toggle are different write intents) —
+ * omitting it defaults to the column's own `false`.
+ */
+export interface AttachCampaignFilePayload {
+  /** The AgencyFile's own ulid. */
+  agency_file_id: string
+  visible_to_creators?: boolean
+}
+
+/** PATCH …/campaigns/{campaign}/attachments/{file} — the only writable field. */
+export interface UpdateCampaignAttachmentPayload {
+  visible_to_creators: boolean
+}
+
+// ---------------------------------------------------------------------------
 // Campaign assignment (read-only Creators tab — Chunk 1)
 // ---------------------------------------------------------------------------
 
@@ -449,6 +515,22 @@ export interface DraftLink {
   name?: string | null
 }
 
+/**
+ * The narrow CREATOR-facing shape of a campaign attachment (chunk B, AH-092,
+ * D4) — `{filename, mime_type, size_bytes, url}` only, never
+ * `visible_to_creators` (a creator only ever receives rows that already
+ * passed the flag) and never an `attached_by` actor. Shared verbatim by BOTH
+ * consuming surfaces (assignment detail + Jobs Board detail) — one type, so
+ * the two cannot render the field differently. `url` is a fresh signed GET;
+ * null on a non-S3 disk (tests / local dev).
+ */
+export interface CreatorCampaignAttachment {
+  filename: string
+  mime_type: string
+  size_bytes: number
+  url: string | null
+}
+
 /** One `campaign_drafts` row (a single submission version). */
 export interface CampaignDraftResource {
   id: string
@@ -497,6 +579,13 @@ export interface CreatorAssignmentDetailResource {
     countered_fee_minor_units: number | null
     countered_fee_currency: string | null
     deliverables: string[] | null
+    /**
+     * Campaign attachments from the Files library, chunk B (AH-092, D4). The
+     * campaign's creator-visible Files-library documents. Always an array
+     * (`[]` when nothing qualifies) — never omitted, never on the flat
+     * `GET creators/me/assignments` list.
+     */
+    attachments: CreatorCampaignAttachment[]
     posting_due_at: string | null
     invited_at: string | null
     submitted_draft_at: string | null
@@ -944,6 +1033,12 @@ export interface CreatorJobDetailResource {
      * accepted notice renders with or without the link.
      */
     assignment_ulid: string | null
+    /**
+     * Campaign attachments from the Files library, chunk B (AH-092, D4).
+     * Detail-only, like the five fields above it — the card stays
+     * byte-identical. Always an array (`[]` when nothing qualifies).
+     */
+    attachments: CreatorCampaignAttachment[]
   }
 }
 

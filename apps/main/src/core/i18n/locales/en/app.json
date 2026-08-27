@@ -521,7 +521,8 @@
         "applications": "Applications",
         "payments": "Payments",
         "messages": "Messages",
-        "settings": "Settings"
+        "settings": "Settings",
+        "attachments": "Attachments"
       },
       "create": {
         "title": "New campaign"
@@ -905,6 +906,46 @@
           "fix": "Open campaign",
           "listed": "{name} is now on the jobs board.",
           "delisted": "{name} has been removed from the jobs board."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Attach files"
+        },
+        "fields": {
+          "name": "File",
+          "size": "Size",
+          "visibleToCreators": "Visible to creators",
+          "attachedBy": "Attached by",
+          "attachedAt": "Attached"
+        },
+        "empty": {
+          "heading": "No attachments yet",
+          "body": "Attach files from your Files library to share with creators."
+        },
+        "detach": {
+          "action": "Detach",
+          "confirmTitle": "Detach file",
+          "confirmMessage": "Detach {name} from this campaign? Creators will no longer see it.",
+          "confirm": "Detach",
+          "cancel": "Cancel"
+        },
+        "errors": {
+          "loadFailed": "We couldn't load attachments. Please try again.",
+          "attachFailed": "Failed to attach the file. Please try again.",
+          "toggleFailed": "Failed to update visibility. Please try again.",
+          "detachFailed": "Failed to detach the file. Please try again."
+        },
+        "picker": {
+          "title": "Attach files",
+          "search": "Search files",
+          "noFiles": "No files in your library yet. Upload one from the Files page first.",
+          "noMatch": "No files match your search.",
+          "alreadyAttached": "Already attached",
+          "submit": "Attach ({count})",
+          "cancel": "Cancel",
+          "loadFailed": "We couldn't load your files. Please try again.",
+          "attachedSummary": "Attached {count} file(s)."
         }
       }
     },

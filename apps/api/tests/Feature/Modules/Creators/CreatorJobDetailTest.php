@@ -68,6 +68,10 @@ const DETAIL_KEYS = [
     // unless the caller's pair has an assignment — a conditional key would make
     // this keyset data-dependent and blunt the accretion guard.
     'assignment_ulid',
+    // Campaign attachments from the Files library, chunk B (AH-092, D4).
+    // Always an array (`[]` when nothing is attached/visible) — never a
+    // conditional key, for the same accretion-guard reason as above.
+    'attachments',
 ];
 
 // ── The happy path ──────────────────────────────────────────────────────────

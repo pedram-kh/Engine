@@ -165,4 +165,50 @@ test.describe('AH-056 — creator jobs board', () => {
     expect(duplicate.status()).toBe(409)
     expect(await duplicate.text()).toContain('job.already_applied')
   })
+
+  // ── Campaign attachments from the Files library, chunk B (AH-092, S8) ─────
+  //
+  // Render-only leg (the build-time feasibility gate, Q3): the two rows are
+  // seeded directly via factories (seedListedJob's `attachments` option), NOT
+  // the presigned-upload flow. The download-click itself is NOT joined here —
+  // the E2E `media` disk is `local` (see `playwright.config.ts`'s
+  // `MEDIA_DISK_DRIVER` note), so `AgencyFileUploadService::signedDownloadUrl`
+  // returns null in this environment (it only mints against a real S3
+  // adapter) and there is no missing receiver to click through. That gap is
+  // AH-091 debt #3, extended rather than duplicated — see docs/tech-debt.md.
+  test('the visible attachment renders on the job detail page; the not-visible one is absent', async ({
+    page,
+  }) => {
+    const request = page.context().request
+    const email = uniqueEmail()
+
+    await signUpUser(request, email, PASSWORD, 'Jobs Board Attachments E2E')
+    await verifyEmailViaApi(request, email)
+
+    const job = await seedListedJob(request, email, {
+      campaignName: 'Winter Lookbook',
+      attachments: [
+        { filename: 'brief-visible.pdf', visible: true },
+        { filename: 'internal-notes.pdf', visible: false },
+      ],
+    })
+
+    await page.goto('/sign-in')
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(PASSWORD)
+    await page.locator(dt(testIds.signInSubmit)).click()
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
+
+    await page.goto(`/creator/jobs/${job.campaignUlid}`)
+    await expect(page.locator('[data-testid="creator-job-detail-name"]')).toHaveText(
+      'Winter Lookbook',
+    )
+
+    const block = page.locator('[data-testid="creator-attachments-block"]')
+    await expect(block).toBeVisible({ timeout: 10_000 })
+    await expect(block).toContainText('brief-visible.pdf')
+    // The not-visible row is absent — not present-but-hidden, not blank —
+    // from the exact-keyset the server sends (review priority #1).
+    await expect(block).not.toContainText('internal-notes.pdf')
+  })
 })

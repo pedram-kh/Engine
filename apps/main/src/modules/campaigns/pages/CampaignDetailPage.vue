@@ -46,6 +46,7 @@ import CampaignMessagesPanel from '@/modules/messaging/components/CampaignMessag
 import BoardView from '@/modules/boards/components/BoardView.vue'
 import DraftsTab from '../components/DraftsTab.vue'
 import ApplicationsTab from '../components/ApplicationsTab.vue'
+import AttachmentsTab from '../components/AttachmentsTab.vue'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -496,6 +497,9 @@ function formatDay(iso: string | null): string {
         <v-tab value="overview" data-test="tab-overview">{{
           t('app.campaigns.tabs.overview')
         }}</v-tab>
+        <v-tab value="attachments" data-test="tab-attachments">{{
+          t('app.campaigns.tabs.attachments')
+        }}</v-tab>
         <v-tab value="creators" data-test="tab-creators">{{
           t('app.campaigns.tabs.creators')
         }}</v-tab>
@@ -612,6 +616,17 @@ function formatDay(iso: string | null): string {
               </v-list-item>
             </v-list>
           </v-card>
+        </v-window-item>
+
+        <!-- Attachments (Campaign attachments from the Files library, chunk B,
+             AH-092) — fetch-on-open, the Drafts/Applications precedent. -->
+        <v-window-item value="attachments" data-test="panel-attachments">
+          <AttachmentsTab
+            v-if="tab === 'attachments' && agencyStore.currentAgencyId"
+            :agency-id="agencyStore.currentAgencyId"
+            :campaign-id="ulid"
+            :can-edit="canEdit"
+          />
         </v-window-item>
 
         <!-- Creators (assignment list + invite picker) -->

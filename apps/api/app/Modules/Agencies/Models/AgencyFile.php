@@ -8,10 +8,12 @@ use App\Core\Concerns\HasUlid;
 use App\Core\Tenancy\BelongsToAgency;
 use App\Modules\Agencies\Database\Factories\AgencyFileFactory;
 use App\Modules\Agencies\Enums\AgencyFileCategory;
+use App\Modules\Campaigns\Models\CampaignAttachment;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -21,9 +23,9 @@ use Illuminate\Support\Carbon;
  * (creator, brand, assignment); it belongs only to its agency. Per
  * docs/reviews/agency-files-plan.md §2.1.
  *
- * Deletion (D5): `hasAttachments()` is chunk A's seam for chunk B, which will
- * attach these rows to campaigns — it returns `false` unconditionally today
- * because no attachment relation exists yet. The delete flow
+ * Deletion (D5): `hasAttachments()` was chunk A's inert seam (`return false`
+ * unconditionally, no attachment relation yet) and is now chunk B's real
+ * guard (AH-092) against {@see CampaignAttachment}. The delete flow
  * (AgencyFileUploadService::delete()) hard-deletes the S3 object BEFORE
  * soft-deleting this row (object-first, the CreatorPortfolioItem precedent),
  * so a failed object delete never orphans bytes behind an invisible row.
@@ -74,16 +76,33 @@ final class AgencyFile extends Model
     }
 
     /**
-     * Whether this file is currently attached to any campaign. Vacuously
-     * `false` in chunk A — no attachment relation exists yet. Chunk B is the
-     * intended source of truth: it replaces this method's body with a real
-     * query against its attachment table, turning this from an inert seam
-     * into a live delete guard (409 `agency_file.attached`) without changing
-     * any caller.
+     * Every campaign attachment row pointing at this file (chunk B, AH-092).
+     * Unconditional — no visibility, campaign-status, or campaign-soft-delete
+     * filter — because {@see hasAttachments()} must answer "is this file
+     * linked anywhere at all", not "is it linked somewhere currently
+     * creator-visible". No SoftDeletes clause is needed either: detach is a
+     * hard delete of the linkage (CampaignAttachment carries no `deleted_at`),
+     * so every row this relation returns is live by construction.
+     *
+     * @return HasMany<CampaignAttachment, $this>
+     */
+    public function campaignAttachments(): HasMany
+    {
+        return $this->hasMany(CampaignAttachment::class);
+    }
+
+    /**
+     * Whether this file is currently attached to any campaign (chunk B,
+     * AH-092 — this is the real query chunk A's docblock deferred to here).
+     * The delete flow (AgencyFileController::destroy()) calls this BEFORE
+     * ever touching S3 or this row, and answers 409 `agency_file.attached`
+     * on `true` — the FK's `restrictOnDelete()` on `agency_file_id` is only
+     * the hard-delete backstop; this guard is what a normal soft-delete
+     * actually hits.
      */
     public function hasAttachments(): bool
     {
-        return false;
+        return $this->campaignAttachments()->exists();
     }
 
     /**

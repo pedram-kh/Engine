@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { formatCurrency, formatDate, formatDateTime } from './format'
+import { formatCurrency, formatDate, formatDateTime, formatFileSize } from './format'
 
 // ---------------------------------------------------------------------------
 // formatCurrency
@@ -163,5 +163,34 @@ describe('formatDateTime', () => {
     const result = formatDateTime(iso, 'en', { dateStyle: 'short' })
     const expected = new Intl.DateTimeFormat('en', { dateStyle: 'short' }).format(new Date(iso))
     expect(result).toBe(expected)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// formatFileSize (hoisted from AgencyFilesPage — AH-092 second consumer)
+// ---------------------------------------------------------------------------
+
+describe('formatFileSize', () => {
+  it('renders sub-1024 byte counts as plain bytes', () => {
+    expect(formatFileSize(0)).toBe('0 B')
+    expect(formatFileSize(512)).toBe('512 B')
+    expect(formatFileSize(1023)).toBe('1023 B')
+  })
+
+  it('renders KB with one decimal below 10, no decimal at/above 10', () => {
+    expect(formatFileSize(1024)).toBe('1.0 KB')
+    expect(formatFileSize(2048)).toBe('2.0 KB')
+    expect(formatFileSize(10 * 1024)).toBe('10 KB')
+  })
+
+  it('renders MB once the value crosses 1024 KB', () => {
+    expect(formatFileSize(5 * 1024 * 1024)).toBe('5.0 MB')
+    expect(formatFileSize(1.5 * 1024 * 1024)).toBe('1.5 MB')
+  })
+
+  it('renders GB and stays capped there (no TB unit)', () => {
+    expect(formatFileSize(2 * 1024 * 1024 * 1024)).toBe('2.0 GB')
+    // A value large enough to overflow GB still renders in GB, not a fourth unit.
+    expect(formatFileSize(2048 * 1024 * 1024 * 1024)).toBe('2048 GB')
   })
 })

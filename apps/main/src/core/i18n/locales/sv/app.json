@@ -521,7 +521,8 @@
         "applications": "Ansökningar",
         "payments": "Betalningar",
         "messages": "Meddelanden",
-        "settings": "Inställningar"
+        "settings": "Inställningar",
+        "attachments": "Bilagor"
       },
       "create": {
         "title": "Ny kampanj"
@@ -905,6 +906,46 @@
           "fix": "Öppna kampanj",
           "listed": "{name} finns nu på jobbtavlan.",
           "delisted": "{name} har tagits bort från jobbtavlan."
+        }
+      },
+      "attachments": {
+        "actions": {
+          "attach": "Bifoga filer"
+        },
+        "fields": {
+          "name": "Fil",
+          "size": "Storlek",
+          "visibleToCreators": "Synlig för creators",
+          "attachedBy": "Bifogad av",
+          "attachedAt": "Bifogad"
+        },
+        "empty": {
+          "heading": "Inga bilagor än",
+          "body": "Bifoga filer från ditt filbibliotek för att dela dem med creators."
+        },
+        "detach": {
+          "action": "Ta bort",
+          "confirmTitle": "Ta bort fil",
+          "confirmMessage": "Ta bort {name} från den här kampanjen? Creators kommer inte längre att se den.",
+          "confirm": "Ta bort",
+          "cancel": "Avbryt"
+        },
+        "errors": {
+          "loadFailed": "Det gick inte att läsa in bilagor. Försök igen.",
+          "attachFailed": "Det gick inte att bifoga filen. Försök igen.",
+          "toggleFailed": "Det gick inte att uppdatera synligheten. Försök igen.",
+          "detachFailed": "Det gick inte att ta bort filen. Försök igen."
+        },
+        "picker": {
+          "title": "Bifoga filer",
+          "search": "Sök filer",
+          "noFiles": "Inga filer i ditt bibliotek än. Ladda upp en från sidan Filer först.",
+          "noMatch": "Inga filer matchar din sökning.",
+          "alreadyAttached": "Redan bifogad",
+          "submit": "Bifoga ({count})",
+          "cancel": "Avbryt",
+          "loadFailed": "Det gick inte att läsa in dina filer. Försök igen.",
+          "attachedSummary": "{count} fil(er) bifogad(e)."
         }
       }
     },
