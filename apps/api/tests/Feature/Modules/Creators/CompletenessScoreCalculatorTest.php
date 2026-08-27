@@ -270,9 +270,12 @@ it('filling date_of_birth flips the profile step complete (AH-088 floor)', funct
 |--------------------------------------------------------------------------
 | D4 — profile partial credit (gate boolean vs score numerator)
 |--------------------------------------------------------------------------
-| booleans gate, points motivate. The floor block earns 13; each filled
-| optional adds its own points, independent of the floor. §5.34 negative
-| case: an empty optional must NOT flip stepCompletion['profile'] false.
+| booleans gate, points motivate. The floor block earns UP TO 13 — graduated
+| by present-field count since AH-089 D2 (see the section below); these
+| fixtures stay AT the full floor (7/7) so the optional-credit behaviour is
+| isolated from the floor's own fraction. Each filled optional adds its own
+| points, independent of the floor. §5.34 negative case: an empty optional
+| must NOT flip stepCompletion['profile'] false.
 */
 
 it('profileEarned awards the floor block only when the seven-field floor is met', function (): void {
@@ -294,7 +297,10 @@ it('profileEarned awards the floor block only when the seven-field floor is met'
         'address_postal_code' => null,
     ]);
 
-    expect($calc->profileEarned($atFloor))->toBe(CompletenessScoreCalculator::PROFILE_FLOOR_WEIGHT);
+    // AH-089: profileEarned() now returns float (the floor is graduated), but
+    // the full-floor endpoint is a fixed point — 7/7 present still earns
+    // exactly PROFILE_FLOOR_WEIGHT (13), today's number unchanged.
+    expect($calc->profileEarned($atFloor))->toBe((float) CompletenessScoreCalculator::PROFILE_FLOOR_WEIGHT);
 });
 
 it('profileEarned awards optional credit independently of the floor (Q2)', function (): void {
@@ -302,13 +308,14 @@ it('profileEarned awards optional credit independently of the floor (Q2)', funct
 
     // Below the floor (no display_name/region/etc.) but with a bio + accent:
     // the meter still moves — 4 (bio) + 2 (accent) = 6 — even though the
-    // floor block earns nothing and the gate boolean stays false.
+    // floor block earns nothing (0/7 present, the other fixed point) and
+    // the gate boolean stays false.
     $belowFloor = CreatorFactory::new()->bootstrap()->createOne([
         'bio' => 'Just a bio.',
         'accent' => 'Roman',
     ]);
 
-    expect($calc->profileEarned($belowFloor))->toBe(6);
+    expect($calc->profileEarned($belowFloor))->toBe(6.0);
     expect($calc->stepCompletion($belowFloor)[WizardStep::Profile->value])->toBeFalse();
 });
 
@@ -328,14 +335,14 @@ it('an empty optional drops the score but does NOT flip the profile gate (§5.34
 
     // Floor met (gate true) + bio filled → profile earns 13 + 4 = 17.
     expect($calc->stepCompletion($creator)[WizardStep::Profile->value])->toBeTrue();
-    expect($calc->profileEarned($creator))->toBe(17);
+    expect($calc->profileEarned($creator))->toBe(17.0);
 
     // Clear the optional: the score drops by the bio weight, the GATE holds.
     $creator->update(['bio' => null]);
     $creator->refresh();
 
     expect($calc->stepCompletion($creator)[WizardStep::Profile->value])->toBeTrue();
-    expect($calc->profileEarned($creator))->toBe(CompletenessScoreCalculator::PROFILE_FLOOR_WEIGHT);
+    expect($calc->profileEarned($creator))->toBe((float) CompletenessScoreCalculator::PROFILE_FLOOR_WEIGHT);
 });
 
 it('whitespace-only optionals are not "filled" (trimmed-non-empty parity)', function (): void {
@@ -354,5 +361,169 @@ it('whitespace-only optionals are not "filled" (trimmed-non-empty parity)', func
     ]);
 
     // Neither optional counts — profile earns the floor block only.
-    expect($calc->profileEarned($creator))->toBe(CompletenessScoreCalculator::PROFILE_FLOOR_WEIGHT);
+    expect($calc->profileEarned($creator))->toBe((float) CompletenessScoreCalculator::PROFILE_FLOOR_WEIGHT);
+});
+
+/*
+|--------------------------------------------------------------------------
+| AH-089 — the floor becomes graduated (D2), pinned against the gate (D3)
+|--------------------------------------------------------------------------
+|
+| The gate (isProfileComplete(), pinned above) stays all-or-nothing and
+| completely untouched (D1). Its own weight (PROFILE_FLOOR_WEIGHT) is now
+| earned in proportion to how many of the seven floor fields are present,
+| via floorFieldPresence() — a SEPARATE enumeration, not a shared call,
+| because isProfileComplete()'s literal source text is load-bearing for two
+| specs this chunk does not edit: floor-mirror-parity.spec.ts and this
+| file's own D6 source-pin (below). A structurally-impossible-to-diverge
+| version — one function backing both the boolean and the fraction — does
+| NOT exist while D1 holds those two specs' literal shape fixed. The
+| one-source pin test right below is the documented substitute, in the
+| house's own idiom rather than a new mechanism.
+*/
+
+it('AH-089 D3 — floorFieldPresence() checks EXACTLY the same fields as isProfileComplete() (one-source pin)', function (): void {
+    // Same idiom the D6 pin below (and ContentCompanionsTest.php) already use
+    // against isProfileComplete() alone — regex-extract the function body,
+    // collect $creator->field tokens — applied here to BOTH enumerations and
+    // compared. Break either one (add/drop a field from just one side) and
+    // this test reds; that is the whole point of the pin.
+    $source = (string) file_get_contents(
+        (new ReflectionClass(CompletenessScoreCalculator::class))->getFileName() ?: '',
+    );
+
+    preg_match(
+        '/private function isProfileComplete\(Creator \$creator\): bool\s*\{([\s\S]*?)\n {4}\}/',
+        $source,
+        $gate,
+    );
+    preg_match(
+        '/private function floorFieldPresence\(Creator \$creator\): array\s*\{([\s\S]*?)\n {4}\}/',
+        $source,
+        $fraction,
+    );
+
+    preg_match_all('/\$creator->(\w+)/', $gate[1] ?? '', $gateTokens);
+    preg_match_all('/\$creator->(\w+)/', $fraction[1] ?? '', $fractionTokens);
+
+    $gateFields = collect($gateTokens[1])->unique()->sort()->values()->all();
+    $fractionFields = collect($fractionTokens[1])->unique()->sort()->values()->all();
+
+    expect($gateFields)->not->toBeEmpty();
+    expect($fractionFields)->toBe($gateFields);
+});
+
+it('AH-089 D2 — missing exactly one floor field earns 13 × 6/7 of the floor block (dataset)', function (string $field, mixed $missingValue): void {
+    $attrs = [
+        'display_name' => 'Six Of Seven',
+        'country_code' => 'IT',
+        'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
+        'primary_language' => 'en',
+        'categories' => ['music'],
+        'avatar_path' => 'x',
+        // Every optional pinned null — the factory's own `bio` default is
+        // randomised (fake()->optional()), which would otherwise sometimes
+        // add uncontrolled optional credit and break this pin's isolation.
+        'bio' => null,
+        'accent' => null,
+        'phone' => null,
+        'whatsapp' => null,
+        'address_street' => null,
+        'address_postal_code' => null,
+    ];
+    $attrs[$field] = $missingValue;
+
+    $creator = CreatorFactory::new()->createOne($attrs);
+    $calc = new CompletenessScoreCalculator;
+
+    // The gate still reads this creator as incomplete (D1, untouched) —
+    // pinned alongside the fraction so the two never silently drift apart.
+    expect($calc->stepCompletion($creator)[WizardStep::Profile->value])->toBeFalse();
+    expect($calc->profileEarned($creator))->toBe(CompletenessScoreCalculator::PROFILE_FLOOR_WEIGHT * (6 / 7));
+})->with([
+    'display_name' => ['display_name', null],
+    'country_code' => ['country_code', null],
+    'region' => ['region', null],
+    'date_of_birth' => ['date_of_birth', null],
+    'primary_language' => ['primary_language', null],
+    'categories' => ['categories', []],
+    'avatar_path' => ['avatar_path', null],
+]);
+
+it('AH-089 — adding any floor field never lowers profileEarned() (monotonicity, review priority #4)', function (string $field, mixed $filledValue): void {
+    $empty = [
+        'display_name' => null,
+        'country_code' => null,
+        'region' => null,
+        'date_of_birth' => null,
+        'primary_language' => null,
+        'categories' => null,
+        'avatar_path' => null,
+        // Pinned null for the same reason as the dataset test above — the
+        // factory's random `bio` default would otherwise add noise that
+        // could make the "before" and "after" draws disagree on something
+        // other than the one field under test.
+        'bio' => null,
+        'accent' => null,
+        'phone' => null,
+        'whatsapp' => null,
+        'address_street' => null,
+        'address_postal_code' => null,
+    ];
+
+    $calc = new CompletenessScoreCalculator;
+    $before = CreatorFactory::new()->createOne($empty);
+    $baseline = $calc->profileEarned($before);
+
+    $filled = $empty;
+    $filled[$field] = $filledValue;
+    $after = CreatorFactory::new()->createOne($filled);
+
+    expect($calc->profileEarned($after))->toBeGreaterThan($baseline);
+})->with([
+    'display_name' => ['display_name', 'Someone'],
+    'country_code' => ['country_code', 'IT'],
+    'region' => ['region', 'Lazio'],
+    'date_of_birth' => ['date_of_birth', '1994-03-17'],
+    'primary_language' => ['primary_language', 'en'],
+    'categories' => ['categories', ['music']],
+    'avatar_path' => ['avatar_path', 'x'],
+]);
+
+it('AH-089 — production-parity regression pin: missing only DOB, otherwise fully complete, scores 97', function (): void {
+    // Re-derives the exact number the AH-089 deploy-log rewrite quotes, so a
+    // future weight edit that silently moves it is caught here rather than
+    // discovered in production. kyc/tax/payout are build-time hidden
+    // (WizardStep::WIZARD_HIDDEN_STEPS) regardless of this file's beforeEach
+    // flag activations, so the applicable denominator is profile(25) +
+    // social(15) + portfolio(10) + contract(15) = 65 — not 100.
+    $creator = CreatorFactory::new()->createOne([
+        'display_name' => 'Missing Birthday Only',
+        'country_code' => 'IT',
+        'region' => 'Lazio',
+        'date_of_birth' => null,
+        'primary_language' => 'en',
+        'categories' => ['music'],
+        'avatar_path' => 'x',
+        'bio' => 'A short bio.',
+        'accent' => 'Roman',
+        'phone' => '+39 06 1234 5678',
+        'whatsapp' => '+39 06 1234 5679',
+        'address_street' => 'Via del Corso 1',
+        'address_postal_code' => '00186',
+        'kyc_status' => KycStatus::Verified,
+        'tax_profile_complete' => true,
+        'payout_method_set' => true,
+        'signed_master_contract_id' => 1,
+    ]);
+    CreatorSocialAccountFactory::new()->for($creator)->create();
+    CreatorPortfolioItemFactory::new()->for($creator)->create();
+
+    $calc = new CompletenessScoreCalculator;
+
+    // profile: 13×6/7 (≈11.14) + 12 optionals = 23.142857…
+    // + social 15 + portfolio 10 + contract 15 = 63.142857… earned / 65
+    // applicable × 100 = 97.14… → 97.
+    expect($calc->score($creator))->toBe(97);
 });

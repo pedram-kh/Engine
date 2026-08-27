@@ -314,16 +314,27 @@ it('completeness score = 100 for a creator with profile/social/portfolio filled 
 // "Ticking the agreement scores like signing." The applicable
 // denominator with kyc/tax/payout hidden (AH-003) is therefore
 // profile(25) + social(15) + portfolio(10) + contract(15) = 65.
-it('completeness score = 0 for a fresh creator with all three vendor flags OFF (no phantom credit)', function (): void {
+// AH-089 ripple (found by running the full suite, not just the targeted
+// calculator file — the D1 house rule): makeFlagOffCreator() seeds
+// avatar_path for every test in this file, including this one. Before
+// AH-089 that lone floor field earned nothing (the floor was
+// all-or-nothing), so this fixture scored exactly 0. Now the floor is
+// graduated (D2) — one of seven floor fields present is genuine, non-
+// phantom credit: 13 × 1/7 ≈ 1.86 profile points → round(1.86/65*100) = 3.
+// This is the intended consequence of AH-089, not a regression; the title
+// and expectation are updated rather than re-seeding the shared helper
+// (which every other test in this file also depends on for unrelated
+// reasons and must not be perturbed).
+it('completeness score = 3 for a fresh creator with all three vendor flags OFF (avatar-only graduated floor credit, AH-089)', function (): void {
     [, $creator] = makeFlagOffCreator();
 
-    // Bootstrap state: avatar seeded by the helper, but no profile
-    // fields, no social/portfolio, tax incomplete, agreement not yet
-    // accepted. Nothing earned => 0 / 65 = 0.
+    // Bootstrap state: avatar seeded by the helper (the lone present floor
+    // field), no other profile fields, no social/portfolio, tax
+    // incomplete, agreement not yet accepted.
     $score = app(CompletenessScoreCalculator::class)
         ->score($creator->fresh());
 
-    expect($score)->toBe(0);
+    expect($score)->toBe(3);
 });
 
 it('completeness score renormalises to 38 when only profile is complete and the vendor flags are OFF', function (): void {

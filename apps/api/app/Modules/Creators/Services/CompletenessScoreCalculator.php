@@ -25,11 +25,14 @@ use Laravel\Pennant\Feature;
  *
  *   profile      25  seven-field floor (display_name + country + region +
  *                    date_of_birth + primary_language + categories + avatar)
- *                    worth 13, plus per-optional-field credit (bio/accent/
- *                    phone/whatsapp/street/postal) totalling 12 (AH-026 D1 + D4,
- *                    date_of_birth added by AH-088 D6). The unit
- *                    weight is still 25; only the numerator is now partial —
- *                    see {@see self::PROFILE_OPTIONAL_WEIGHTS} + {@see self::profileEarned()}.
+ *                    worth 13, earned in EQUAL PROPORTION to how many of the
+ *                    seven are present (AH-089 D2 — graduated, not
+ *                    all-or-nothing), plus per-optional-field credit
+ *                    (bio/accent/phone/whatsapp/street/postal) totalling 12
+ *                    (AH-026 D1 + D4, date_of_birth added by AH-088 D6). The
+ *                    unit weight is still 25; only the numerator is partial —
+ *                    see {@see self::PROFILE_OPTIONAL_WEIGHTS},
+ *                    {@see self::floorFieldPresence()} + {@see self::profileEarned()}.
  *   social       15  at least one connected account
  *   portfolio    10  at least one portfolio item
  *   kyc          15  kyc_status = verified
@@ -50,15 +53,27 @@ final class CompletenessScoreCalculator
 {
     /**
      * D4 — the profile unit's 25 points split into the always-required
-     * seven-field floor + per-optional-field credit. The floor is a single
-     * all-or-nothing block; each optional adds its points INDEPENDENTLY of
-     * the floor (Q2 = award-regardless), so the completeness meter never
-     * "lies" by refusing to move when a creator fills an optional field.
+     * seven-field floor + per-optional-field credit. Each optional adds its
+     * points INDEPENDENTLY of the floor (Q2 = award-regardless), so the
+     * completeness meter never "lies" by refusing to move when a creator
+     * fills an optional field.
+     *
+     * AH-089 D2 — the floor's own 13 points are GRADUATED, not
+     * all-or-nothing: earned as 13 × (present floor fields ÷ seven), via
+     * {@see self::floorFieldPresence()}. The GATE stays all-or-nothing —
+     * {@see self::isProfileComplete()} is untouched by this chunk and still
+     * requires all seven to advance the wizard step / clear the save floor.
+     * Gate and score are deliberately different questions answered from the
+     * same seven facts: "may this creator proceed" vs "how much of the floor
+     * have they earned."
      *
      * INVARIANT (pinned by CompletenessScoreCalculatorTest): the floor
      * weight + the sum of the optional weights equals weights()[profile]
      * (25), so the profile unit's contribution to the denominator, the
-     * sum-to-100 total, and every other unit's ratio are all unchanged.
+     * sum-to-100 total, and every other unit's ratio are all unchanged. Both
+     * endpoints are fixed points of the AH-089 formula — 7/7 present earns
+     * exactly 13 (today's number), 0/7 earns exactly 0 (today's number) —
+     * only the six intermediate counts are new.
      */
     public const int PROFILE_FLOOR_WEIGHT = 13;
 
@@ -132,12 +147,14 @@ final class CompletenessScoreCalculator
 
             $total += $weights[$step];
 
-            // The profile unit earns PARTIAL credit (D4): the seven-field floor
-            // is worth PROFILE_FLOOR_WEIGHT and each filled optional field adds
-            // its own points, independent of whether the floor is met. Every
-            // other unit stays all-or-nothing on its boolean. The profile
-            // unit's total weight (25) is unchanged, so the denominator, the
-            // sum-to-100 total, and external unit ratios are untouched.
+            // The profile unit earns PARTIAL credit (D4, graduated further by
+            // AH-089 D2): the seven-field floor is worth PROFILE_FLOOR_WEIGHT,
+            // earned in proportion to how many of the seven are present, and
+            // each filled optional field adds its own points independent of
+            // the floor. Every other unit stays all-or-nothing on its
+            // boolean. The profile unit's total weight (25) is unchanged, so
+            // the denominator, the sum-to-100 total, and external unit
+            // ratios are untouched.
             if ($step === WizardStep::Profile->value) {
                 $earned += $this->profileEarned($creator);
             } elseif ($isComplete) {
@@ -248,17 +265,31 @@ final class CompletenessScoreCalculator
     }
 
     /**
-     * The profile unit's earned score (0–25): the floor block plus each
-     * filled optional field's credit. Optional credit is awarded
+     * The profile unit's earned score (0–25): the floor's graduated credit
+     * plus each filled optional field's credit. Optional credit is awarded
      * INDEPENDENTLY of the floor (Q2) — a creator below the floor still
-     * sees the meter move as they fill optionals; a creator at the floor
-     * with no optionals earns exactly PROFILE_FLOOR_WEIGHT (13). This is the
-     * numerator half of D4's gate/score separation: the boolean in
-     * {@see self::stepCompletion()} still gates on the floor alone.
+     * sees the meter move as they fill optionals.
+     *
+     * AH-089 D2 — the floor itself is no longer all-or-nothing: it earns
+     * PROFILE_FLOOR_WEIGHT × (present floor fields ÷ total floor fields),
+     * via {@see self::floorFieldPresence()}. A creator missing one of seven
+     * earns 13 × 6/7 ≈ 11.14 instead of 0; a creator at the full floor with
+     * no optionals still earns exactly PROFILE_FLOOR_WEIGHT (13) — the
+     * endpoints are unchanged, only the six intermediate counts are new.
+     * This is the numerator half of D1/D4's gate/score separation: the
+     * boolean in {@see self::stepCompletion()} still gates on the full
+     * seven-field floor alone, via {@see self::isProfileComplete()}, which
+     * this chunk leaves completely untouched.
+     *
+     * Returns `float` (widened from AH-026's `int`) because the floor
+     * fraction is not always a whole number; {@see self::score()} keeps its
+     * single round-at-the-end behaviour unchanged, so no double-rounding is
+     * introduced by the wider intermediate type.
      */
-    public function profileEarned(Creator $creator): int
+    public function profileEarned(Creator $creator): float
     {
-        $earned = $this->isProfileComplete($creator) ? self::PROFILE_FLOOR_WEIGHT : 0;
+        $presence = $this->floorFieldPresence($creator);
+        $earned = self::PROFILE_FLOOR_WEIGHT * (count(array_filter($presence)) / count($presence));
 
         foreach (self::PROFILE_OPTIONAL_WEIGHTS as $field => $weight) {
             if ($this->isFilled($creator->{$field})) {
@@ -267,6 +298,45 @@ final class CompletenessScoreCalculator
         }
 
         return $earned;
+    }
+
+    /**
+     * AH-089 D3 — the per-field presence map behind {@see self::profileEarned()}'s
+     * floor fraction. Deliberately a SEPARATE enumeration from
+     * {@see self::isProfileComplete()}, not a shared call: the FE↔BE
+     * floor-mirror parity spec (`floor-mirror-parity.spec.ts`) and the AH-050
+     * content-companions source pin (`ContentCompanionsTest.php`) both
+     * regex-extract `isProfileComplete()`'s LITERAL body for its
+     * `$creator->field` tokens, so that function's source text is
+     * load-bearing for two specs this chunk does not edit (D1). A
+     * structurally-impossible-to-diverge version — one function backing
+     * both the boolean and the fraction — does not exist while that holds.
+     *
+     * So instead this method restates `isProfileComplete()`'s seven checks
+     * verbatim — the floor predicate's OWN per-field expressions, not
+     * {@see self::isFilled()} — because the count here must agree with the
+     * gate EXACTLY, and `isFilled()`'s trimmed-non-empty rule could diverge
+     * from a raw `!== null` check on a hypothetical whitespace-only value.
+     * The agreement between the two enumerations is pinned mechanically:
+     * see the "one-source pin" test in `CompletenessScoreCalculatorTest`,
+     * which regex-extracts BOTH bodies (the same idiom
+     * `ContentCompanionsTest.php` already uses against `isProfileComplete()`
+     * alone) and asserts the two field-token sets are identical. Break
+     * either enumeration and that test reds.
+     *
+     * @return array<string, bool>
+     */
+    private function floorFieldPresence(Creator $creator): array
+    {
+        return [
+            'display_name' => $creator->display_name !== null,
+            'country_code' => $creator->country_code !== null,
+            'region' => $creator->region !== null,
+            'date_of_birth' => $creator->date_of_birth !== null,
+            'primary_language' => $creator->primary_language !== null,
+            'categories' => is_array($creator->categories) && count($creator->categories) > 0,
+            'avatar_path' => $creator->avatar_path !== null,
+        ];
     }
 
     /**
