@@ -7,7 +7,6 @@ namespace App\Modules\Creators\Http\Controllers\Admin;
 use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Core\Tenancy\TenancyContext;
 use App\Modules\Agencies\Enums\BlacklistType;
-use App\Modules\Agencies\Mail\AdminConnectedMail;
 use App\Modules\Agencies\Mail\ConnectionRequestMail;
 use App\Modules\Agencies\Mail\RelationDisconnectedMail;
 use App\Modules\Agencies\Models\Agency;
@@ -16,10 +15,13 @@ use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
 use App\Modules\Creators\Enums\ApplicationStatus;
+use App\Modules\Creators\Enums\DirectConnectOutcome;
 use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Http\Requests\Admin\AdminCreateConnectionRequest;
 use App\Modules\Creators\Http\Requests\Admin\AdminDisconnectRequest;
 use App\Modules\Creators\Models\Creator;
+use App\Modules\Creators\Services\CreatorAgencyDirectConnectService;
+use App\Modules\Creators\ValueObjects\DirectConnectResult;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
 use App\Modules\Notifications\Enums\NotificationType;
@@ -47,7 +49,11 @@ use Illuminate\Support\Facades\DB;
  *     the unchanged creators/me endpoints (which now carry the D-2 re-gates).
  *   mode=direct → Door 2: records an OFFLINE agreement — targets `roster`
  *     immediately, MANDATORY reason (consent paper-trail), notifies the creator
- *     immediately (dual-emit in-app + mail).
+ *     immediately (dual-emit in-app + mail). Since AH-090 (D2) the logic itself
+ *     lives in {@see CreatorAgencyDirectConnectService}, because an approval rule
+ *     fires the same operation and a queued job cannot call a method that returns
+ *     a JsonResponse. This controller supplies the FormRequest, the admin, and
+ *     the envelope; the service owns the decision.
  *
  * Both doors: `approved` binds (a non-approved creator is not eligible), but
  * `is_discoverable` is BYPASSED — an admin-mediated arrangement is not cold
@@ -71,6 +77,7 @@ final class AdminCreatorConnectionController
         private readonly MailFactory $mail,
         private readonly NotificationService $notifications,
         private readonly TenancyContext $tenancy,
+        private readonly CreatorAgencyDirectConnectService $directConnect,
     ) {}
 
     /**
@@ -113,17 +120,29 @@ final class AdminCreatorConnectionController
             return $this->error(404, 'connection.agency_not_found', 'No agency found for that identifier.');
         }
 
+        /** @var User $admin */
+        $admin = $request->user();
+
+        // Door 2 lives in a service since AH-090 (D2) because a rule fires it
+        // too. Its guard chain — creator-approved, hard-blacklist, already-roster
+        // — went with it, so this branch is the envelope and nothing else. Door 1
+        // keeps its own copy of the two shared guards below: they are shared
+        // between the doors, so they could not move out wholesale, and each door
+        // now checks once instead of the pair being checked here and re-checked
+        // there.
+        if ($request->mode() === 'direct') {
+            return $this->directConnectResponse(
+                $this->directConnect->connect($creator, $agency, $admin, (string) $request->reason()),
+                $agency,
+            );
+        }
+
         // `approved` binds BOTH doors; is_discoverable is bypassed for admin.
         if ($creator->application_status !== ApplicationStatus::Approved) {
             return $this->error(422, 'connection.creator_not_approved', 'This creator is not approved and cannot be connected.');
         }
 
-        /** @var User $admin */
-        $admin = $request->user();
-        $mode = $request->mode();
-        $reason = $request->reason();
-
-        return $this->tenancy->runAs($agency->id, function () use ($agency, $creator, $admin, $mode, $reason): JsonResponse {
+        return $this->tenancy->runAs($agency->id, function () use ($agency, $creator, $admin): JsonResponse {
             $relation = AgencyCreatorRelation::query()
                 ->where('agency_id', $agency->id)
                 ->where('creator_id', $creator->id)
@@ -134,16 +153,10 @@ final class AdminCreatorConnectionController
             if ($relation !== null
                 && $relation->is_blacklisted
                 && $relation->blacklist_type === BlacklistType::Hard) {
-                return $this->error(
-                    422,
-                    $mode === 'direct' ? 'connection.direct_blacklisted' : 'connection.request_blacklisted',
-                    'This creator is hard-blacklisted for the selected agency.',
-                );
+                return $this->error(422, 'connection.request_blacklisted', 'This creator is hard-blacklisted for the selected agency.');
             }
 
-            return $mode === 'direct'
-                ? $this->directConnect($relation, $agency, $creator, $admin, (string) $reason)
-                : $this->sendRequest($relation, $agency, $creator, $admin);
+            return $this->sendRequest($relation, $agency, $creator, $admin);
         });
     }
 
@@ -208,6 +221,39 @@ final class AdminCreatorConnectionController
 
             return $this->relationResponse($relation, $agency, Response::HTTP_OK, 'connection.disconnected', 'disconnect');
         });
+    }
+
+    /**
+     * Door 2's outcome → the AH-051 envelope (AH-090 D2).
+     *
+     * The status/code strings themselves live on {@see DirectConnectOutcome} so
+     * the job's skip reasons and these wire codes are one list. The 201 is
+     * decided here rather than there: "created" is a property of the write, not
+     * of the outcome — an elevated relation connected without being created.
+     */
+    private function directConnectResponse(DirectConnectResult $result, Agency $agency): JsonResponse
+    {
+        $relation = $result->relation;
+
+        if ($relation === null || ! in_array(
+            $result->outcome,
+            [DirectConnectOutcome::Connected, DirectConnectOutcome::AlreadyConnected],
+            true,
+        )) {
+            return $this->error(
+                $result->outcome->httpStatus(),
+                $result->outcome->apiCode(),
+                $result->outcome->detail(),
+            );
+        }
+
+        return $this->relationResponse(
+            $relation,
+            $agency,
+            $result->wasNetNew ? Response::HTTP_CREATED : Response::HTTP_OK,
+            $result->outcome->apiCode(),
+            'direct',
+        );
     }
 
     /**
@@ -331,94 +377,6 @@ final class AdminCreatorConnectionController
             $isNetNew ? 'connection.requested' : 'connection.re_requested',
             'request',
         );
-    }
-
-    /**
-     * Door 2 — admin direct-connect (records an offline agreement). Idempotent
-     * no-op if already rostered; otherwise elevates/creates a `roster` relation.
-     * MANDATORY reason (the admin_connected verb requiresReason). Dual-emit:
-     * in-app RelationAdminConnected + AdminConnectedMail to the creator.
-     */
-    private function directConnect(?AgencyCreatorRelation $relation, Agency $agency, Creator $creator, User $admin, string $reason): JsonResponse
-    {
-        if ($relation !== null && $relation->relationship_status === RelationshipStatus::Roster) {
-            return $this->relationResponse($relation, $agency, Response::HTTP_OK, 'connection.already_connected', 'direct');
-        }
-
-        $isNetNew = $relation === null;
-
-        $relation = DB::transaction(function () use ($relation, $agency, $creator, $admin, $reason): AgencyCreatorRelation {
-            if ($relation === null) {
-                $relation = AgencyCreatorRelation::query()->create([
-                    'agency_id' => $agency->id,
-                    'creator_id' => $creator->id,
-                    'relationship_status' => RelationshipStatus::Roster,
-                    'invited_by_user_id' => $admin->id,
-                    'invitation_sent_at' => now(),
-                    'notification_sent_at' => now(),
-                ]);
-            } else {
-                // pending_request / declined / ended / prospect / external →
-                // roster. Direct-connect supersedes a pending ask.
-                $relation->relationship_status = RelationshipStatus::Roster;
-                $relation->invited_by_user_id = $admin->id;
-                $relation->notification_sent_at = now();
-                $relation->save();
-            }
-
-            Audit::log(
-                action: AuditAction::AgencyCreatorRelationAdminConnected,
-                actor: $admin,
-                subject: $relation,
-                reason: $reason,
-                metadata: ['agency_id' => $agency->ulid, 'mode' => 'direct'],
-                agencyId: $agency->id,
-            );
-
-            return $relation;
-        });
-
-        $this->notifyDirectConnect($creator, $agency, $admin, $relation);
-
-        return $this->relationResponse(
-            $relation,
-            $agency,
-            $isNetNew ? Response::HTTP_CREATED : Response::HTTP_OK,
-            'connection.direct_connected',
-            'direct',
-        );
-    }
-
-    /**
-     * Door 2 dual-emit — the creator is notified IMMEDIATELY (in-app + mail),
-     * naming the agency, with a "contact support if unexpected" line. Guarded so
-     * a missing creator user/email never 500s the write that already committed.
-     */
-    private function notifyDirectConnect(Creator $creator, Agency $agency, User $admin, AgencyCreatorRelation $relation): void
-    {
-        $user = $creator->user;
-        if ($user === null) {
-            return;
-        }
-
-        $this->notifications->notify(
-            recipient: $user,
-            type: NotificationType::RelationAdminConnected,
-            subject: $relation,
-            actor: $admin,
-            data: ['agency_name' => $agency->name],
-        );
-
-        if ($user->email !== '') {
-            $this->mail
-                ->mailer()
-                ->to($user->email)
-                ->locale($user->preferred_language ?: 'en')
-                ->queue(new AdminConnectedMail(
-                    creatorDisplayName: $creator->display_name ?? '',
-                    agencyName: $agency->name,
-                ));
-        }
     }
 
     /**

@@ -278,6 +278,33 @@ it('Door 2 refuses a hard-blacklisted relation with a mode-distinct 422', functi
         ->assertJsonPath('errors.0.code', 'connection.direct_blacklisted');
 });
 
+/*
+ * AH-090 (D3) — the one behaviour change this chunk makes to the MANUAL path.
+ *
+ * Before AH-090 nothing in the connect chain checked suspension, so this request
+ * succeeded: an admin could put a creator on the roster of an agency whose users
+ * cannot log in. It is now refused for both callers (the human here, the rule in
+ * RunAutomationRuleJob), because the capability had no legitimate use.
+ */
+it('Door 2 refuses a SUSPENDED agency (AH-090 D3 — the manual path changed here)', function (): void {
+    Mail::fake();
+    $admin = connAdmin();
+    $creator = connCreator();
+    $agency = Agency::factory()->suspended()->createOne();
+
+    $this->actingAs($admin, 'web_admin')
+        ->postJson(connUrl($creator), [
+            'agency_id' => $agency->ulid,
+            'mode' => 'direct',
+            'reason' => 'Trying to connect into an agency that is suspended.',
+        ])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'connection.agency_suspended');
+
+    expect(connRelation($agency, $creator))->toBeNull();
+    Mail::assertNothingQueued();
+});
+
 it('Door 2 requires a reason (min:10)', function (): void {
     $admin = connAdmin();
     $creator = connCreator();
