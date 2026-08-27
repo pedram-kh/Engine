@@ -73,8 +73,10 @@ guard (AH-090)` — the service + outcome enum + result VO, and the one delibera
   - `1a4e0a1f` — `feat(admin): automation-rules CRUD, agency picker projection, admin SPA surface
 (AH-090)` — the CRUD controller + four audit verbs, the `?for=select` projection, the SPA module,
     i18n ×24.
-  - _this commit_ — the docs commit (this entry, the review, the AH-090 log entry, the conventions
-    picker rule, the tenancy rows, the tech-debt close + the flake-entry rider).
+  - `f4ac735c` — `feat(creators): stamp the firing rule onto the connect's audit row (AH-090 Q4)` —
+    `fired_by` + `automation_rule_id` in the fire's audit metadata. Metadata-only; no schema.
+  - `4a3f2c6c` — the docs commit (this entry, the review, the AH-090 log entry, the conventions picker
+    rule, the tenancy rows, the tech-debt close + the flake-entry rider).
 - **AH entries carried:** **AH-090.**
 - **Migrations run:** **1** — `2026_08_27_120000_create_admin_automation_rules_table.php`. A
   `CREATE TABLE`, nothing else: **no existing table is touched, no column added anywhere, no
