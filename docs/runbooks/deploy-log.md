@@ -54,6 +54,100 @@ happened.
 
 ---
 
+## 2026-08-27 · AH-088 — creator date of birth → age everywhere — PENDING
+
+> **⚠ This entry STACKS on the AH-086 + b + AH-087 entry below, which has not deployed.** Whoever
+> deploys next runs **both** checklists in one pass: this range starts at the tip that carries that
+> entry, so there is no way to ship this without shipping that. Combined obligations across the two
+> entries: **2 migrations**, **`migrate` required**, **queue-worker restart required** (from the
+> entry below — AH-088 adds no mailable and touches no `apps/api/lang/**` file), **PHP-FPM reload
+> required** (both), and **one post-deploy artisan command** (this entry only).
+
+- **Status:** PENDING
+- **Range:** `04a2ecec` (the AH-088 read-only inventory, already on `main`) → the tip carrying this
+  entry. Commits, in order:
+  - `04a2ecec` — `docs(reviews): creator date-of-birth → age inventory (I1-I6)` (docs-only; the
+    read-only inventory AH-088 was built from, already pushed before the build began).
+  - _the feat commit_ — `feat(creators): date of birth with derived age everywhere (AH-088)` — the
+    migration, model, resources, floor, filter, both SPAs, api-client types, 72 locale files.
+  - _this commit_ — `docs(reviews): AH-088 creator date of birth → age — review, AH entry, data
+model, tech debt, deploy` (docs-only; this entry).
+- **AH entries carried:** **AH-088** only.
+- **Migrations run:** **1** — `2026_08_27_110000_add_date_of_birth_to_creators_table.php`. Adds
+  `creators.date_of_birth` (date, nullable). **Additive-nullable, schema-only: NO BACKFILL, no
+  `UPDATE`, no data write of any kind.** Every pre-existing row reads NULL the instant it finishes.
+  The `down()` is an honest inverse — the column is net-new and holds no pre-existing data — but note
+  that rolling back after creators have entered birthdays **destroys those birthdays**, and the
+  completeness scores recomputed below would then be stale in the opposite direction (a second
+  recompute after any rollback is required).
+- **⚠ POST-DEPLOY COMMAND — REQUIRED, and it WRITES:**
+  `php artisan creators:recompute-completeness`. Run it **after** `migrate`, from the app root.
+  - **Why it is required:** `date_of_birth` joined the profile-completeness FLOOR (AH-088 D6). The
+    floor is a single all-or-nothing block (`PROFILE_FLOOR_WEIGHT = 13` of the profile unit's 25), so
+    every creator who met the old six-field floor no longer meets the seven-field one. Their
+    persisted `profile_completeness_score` is stale-HIGH until this runs. The score is denormalised
+    on the row and surfaced to agencies on discovery, so a stale value is user-visible.
+  - **Expected blast radius — say the number out loud:** ~279 creators, **all of them**, because
+    NOBODY has a birthday on the day this ships. Each loses the floor block: renormalized against
+    the flags-OFF denominator (65), that is **13/65 ≈ 20 points off every creator's public
+    completeness score.** This is the intended consequence of adding a floor field, not a defect —
+    but it is the single most visible thing this deploy does, and it self-heals per creator the
+    moment they enter a birthday.
+  - **What it does NOT do:** it does not email anyone, does not change any
+    `application_status`, and does not push any creator back into the wizard. Verified before
+    shipping: the incomplete-creator nudge keys off `application_status`, not the completeness score,
+    so no nudge cohort is created by this; and the onboarding route guard keys off
+    `application_status` too, so an approved creator stays on their dashboard. What DOES change for
+    an existing creator is that their next profile SAVE is blocked until they enter a birthday
+    (pending/rejected hard-block, approved soft-warn) — the AH-026 D3 backfill-on-next-edit posture,
+    at cohort scale.
+  - **Run it dry first** — the command supports `--dry-run` and reports how many scores would change
+    without writing. Expect "would change" ≈ the number of creators who previously met the floor. It
+    is idempotent (writes only rows whose recomputed score differs), so a second run must report
+    **0 changed**; that is the cheapest possible confirmation it completed.
+- **Pre-deploy reads:** cheap and worth having, because they make the score drop above verifiable
+  rather than assumed:
+  - `SELECT COUNT(*) FROM creators WHERE date_of_birth IS NOT NULL;` — must be an **error** before
+    the migration (column absent) and **0** immediately after.
+  - `SELECT ROUND(AVG(profile_completeness_score)) FROM creators;` — record this number BEFORE the
+    recompute. After it, the average should be visibly lower (roughly 20 points for any creator who
+    had met the floor). If it does not move at all, the recompute did not run.
+- **Snapshot ID:** _TBD at deploy time._ **Required** — this range contains a migration AND a
+  command that writes to every `creators` row.
+- **Infra:**
+  - **`php artisan migrate`: REQUIRED** — the one migration above (plus the one in the entry below).
+  - **`php artisan creators:recompute-completeness`: REQUIRED** — see above. This is the only
+    obligation in this entry that is not covered by a normal deploy.
+  - **Queue-worker restart: not required BY AH-088** — no new or touched mailable, and no
+    `apps/api/lang/**` change (AH-088's 72 locale files are all SPA-side JSON, which ships with the
+    frontend build, not the worker). **But the entry below requires one**, so a restart happens in
+    this deploy regardless.
+  - **PHP-FPM reload: REQUIRED** — synchronous request-path PHP moved: `Creator` (fillable, cast, the
+    new `age()`), `CreatorResource` (the D1 conditional), three agency resources, two list
+    controllers' projections, `CompletenessScoreCalculator::isProfileComplete()`,
+    `UpdateProfileRequest`, and the shared `FiltersCreatorColumns` trait.
+  - **Frontend build/deploy: REQUIRED** — both SPAs changed (`apps/main`: the wizard field, five
+    render surfaces, the roster column + age filter; `apps/admin`: the read-only age row) plus 72
+    locale JSON files and the `@catalyst/api-client` types they compile against.
+  - **Flags to arm:** none. AH-088 ships behind no flag.
+- **Verification after deploy (in order):**
+  1. `migrate:status` shows `2026_08_27_110000_add_date_of_birth_to_creators_table` as `Ran`.
+  2. The pre-deploy `COUNT(*)` read above returns **0**.
+  3. `creators:recompute-completeness --dry-run`, then the real run, then `--dry-run` again — the
+     third must report **0 would change**.
+  4. As a creator: the wizard's step-2 (or the profile page) shows a **Date of birth** field with an
+     asterisk, and entering a date shows "You'll appear as N" beneath it. Saving succeeds.
+  5. As that creator's connected agency: the roster row shows the age in its own column, and the
+     roster detail's profile card shows it. **Search the roster and detail responses for
+     `date_of_birth` — it must appear NOWHERE.** (Pinned by tests, but this is the one-second
+     manual confirmation of the chunk's whole point.)
+  6. As a platform admin: the creator drill-in shows an **Age** row with no pencil, and the admin
+     payload carries **no** `date_of_birth` key.
+- **Operator:** _TBD._
+- **Anything unexpected:** _TBD at deploy time._
+
+---
+
 ## 2026-08-27 · AH-086 + b + AH-087 — agency sign-in variant, team-invite email door, agency members drill-in + per-member 2FA controls — PENDING
 
 > This entry **merges** what were, until this update, two stacked `PENDING` entries — the AH-086 +

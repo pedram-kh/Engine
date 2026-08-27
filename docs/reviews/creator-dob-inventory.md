@@ -1,5 +1,16 @@
 # Creator date of birth → age everywhere — Inventory (I1–I6)
 
+> **Outcome: this inventory was built on as AH-088.** See
+> [`creator-dob-age-review.md`](creator-dob-age-review.md). The [§I5](#i5--privacy-boundary)
+> finding is the one that shaped the build: `CreatorResource` serves the creator-self and
+> admin-drill-in audiences from one shape, so the obvious placement for a raw `date_of_birth`
+> would have handed the birthday to the one audience the locked decision withholds it from.
+> Raised as a kickoff decision rather than discovered at build, and resolved as D1 — one class,
+> one conditional key, and an amendment recorded in that resource's own docblock. Two things the
+> inventory did **not** predict are written up in §8 of the review (the cross-driver date-storage
+> divergence, and that clearing a birthday is unreachable through either UI). This file is kept
+> as the pre-build snapshot and is deliberately **not** retro-edited.
+
 - **Scope:** read-only inventory only. **NO edits, NO plan, NO code.** Answers I1–I6 for the
   locked feature: creators enter a **date of birth** (wizard step + own profile edit, real date
   picker with sane year navigation); **everyone else sees a computed AGE only, never the raw

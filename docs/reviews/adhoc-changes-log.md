@@ -70,6 +70,54 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-088 · Creator date of birth → age everywhere
+
+- **Status:** Landed — awaiting Pedram's close.
+- **Date:** 2026-08-27
+- **Why:** brands cast on age and the platform could not answer the question. Creators had no field
+  for a birthday, so every casting conversation about age happened off-platform, and agencies
+  filtering a roster had no way to narrow to a bracket.
+- **What:** one additive-nullable `creators.date_of_birth` (date), written by the creator and **by
+  nobody else** — it is absent from `AdminUpdateCreatorRequest::EDITABLE_FIELDS`. Every other
+  audience, admins included, reads a **derived `age`** instead, emitted on eight surfaces (the
+  owner/admin `CreatorResource`, the three agency-facing resources, the roster list row, and the
+  three SPA profile renderers). The raw date crosses the wire **only** to its owner. `date_of_birth`
+  joined the profile-completeness **floor**, which took it from six fields to seven, and an inclusive
+  `age_min`/`age_max` filter joined the shared creator-column trait, with the roster gaining the UI
+  and a matching new column.
+- **Touched:** one migration; `Creator` (fillable, `date` cast, a plain `age(): ?int`, an
+  audit-allowlist exclusion note), `CreatorResource`, `AgencyCreatorDetailResource`,
+  `CreatorPublicProfileResource`, `CreatorDiscoveryResource`, `AgencyCreatorController` (projection +
+  row), `AgencyCreatorDiscoveryController` (projection), `CompletenessScoreCalculator`,
+  `UpdateProfileRequest`, `FiltersCreatorColumns`; `apps/main` `ProfileBasicsForm.vue` (field + live
+  age preview), `CreatorProfileContent.vue`, roster `CreatorDetailPage.vue` +
+  `CreatorRosterPage.vue` (column + filter), both discover pages, `useListQueryState.ts` (a new
+  `boundedIntParam` codec); `apps/admin` `CreatorDetailPage.vue` (a read-only row, no pencil);
+  `packages/api-client` creator + agency types; **72 locale files** (24 × `creator.json`, 24 ×
+  `app.json`, 24 × admin `creators.json`); one new test file plus the wizard happy-path E2E.
+- **Decisions:** (D1) **one resource, two audiences, one conditional key** — `date_of_birth` is
+  emitted only when `! isAdminView`, an explicit and recorded exception to `CreatorResource`'s
+  no-per-audience-fields docblock, taken instead of splitting the class in two. (D2/Q2) `age` is a
+  **plain method**, not an Eloquent accessor — the house has zero accessors, and `$appends` would
+  push age into every implicit `toArray()`, which is the opposite of what a controlled-emission chunk
+  wants. (D6) DOB joins the **floor**, so ~279 live creators become floor-incomplete at rest and are
+  gated on their next profile SAVE — verified first that this creates no nudge cohort (the nudge keys
+  off `application_status`) and pushes nobody back into the wizard (so does the route guard). (Q1) the
+  age filter lives in the **shared trait**, on the trait's own criterion, so discover's API accepts
+  `age_min`/`age_max` with no discover UI — the D7 fence is UI-only, and the symmetry is pinned by a
+  discover-side test rather than left accidental. (Q3) the roster **list** shows age, because a filter
+  over an invisible value is a support ticket. (Q5) permissive-read/clamped bounds on both endpoints,
+  matching every other shared filter; no new FormRequest. Plus: an age bound **excludes** unknown-DOB
+  creators (stated, tested, and a named follow-up rather than a silent surprise); no minimum-age rule
+  anywhere in the stack (offered and declined, D8); no index on the new column (volume-trigger).
+- **Ref:** [`creator-dob-age-review.md`](creator-dob-age-review.md) (full decision table, the
+  production-posture paragraphs, the break-revert, the gate board, and the two things this build
+  found that the plan did not predict);
+  [`creator-dob-inventory.md`](creator-dob-inventory.md) (the read-only inventory this was built
+  from).
+
+---
+
 ### AH-087 · Agency members drill-in + per-member 2FA controls (reset / exempt)
 
 - **Status:** Landed — awaiting Pedram's close.

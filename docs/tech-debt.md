@@ -2557,6 +2557,63 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
 
 ---
 
+## The `age_min`/`age_max` creator filter has no supporting index (AH-088)
+
+- **Where:** [`FiltersCreatorColumns::applyAgeFilters`](../apps/api/app/Modules/Agencies/Concerns/FiltersCreatorColumns.php)
+  — compiles an inclusive age range into two `whereDate` bounds on `creators.date_of_birth`, applied by
+  BOTH the agency roster list and the discovery list (the trait is shared, so the predicate is one
+  implementation on two surfaces).
+- **What we accepted (AH-088, 2026-08-27):** the additive-nullable `date_of_birth` column ships with no
+  index at all
+  ([`2026_08_27_110000_add_date_of_birth_to_creators_table.php`](../apps/api/database/migrations/2026_08_27_110000_add_date_of_birth_to_creators_table.php)),
+  so an age-bounded query scans without an index assist. Same volume-trigger posture as the AH-054 /
+  AH-056 / AH-079 entries: nobody has measured this against real volume, and at ship time the column is
+  null for every one of the ~279 live creators, which makes any index guess worse than usually — the
+  data distribution the index would be sized for does not exist yet.
+- **One wrinkle worth flagging before the index is added:** `whereDate` wraps the column
+  (`date_of_birth::date` on Postgres). On a real `date` column that cast is a no-op and a plain B-tree
+  index remains usable, but if the column type is ever widened to `timestamp`, the same expression
+  silently stops using a plain index and needs an expression index instead. The `date` type is load-
+  bearing for more than age arithmetic.
+- **Trigger:** volume — `creators` reaching a size where either list's load time becomes noticeable
+  (same rule of thumb as AH-079: tens of thousands), OR the filter becoming a default rather than an
+  occasional narrowing (e.g. a saved-search feature that always sends bounds).
+- **Resolution:** a plain B-tree index on `creators.date_of_birth`, added once real birthdays exist so
+  the planner has a distribution to work with; re-check `EXPLAIN` for the one-sided (`age_min` only)
+  and two-sided forms, since a single-column index behaves differently for a half-open range.
+- **Owner:** creators/agencies, or whoever ships the next `creators`-scaling pass (shares a trigger
+  class with the AH-054/AH-056/AH-079 entries above).
+- **Status:** open (deferred by design). Recorded in
+  [creator-dob-age-review.md](reviews/creator-dob-age-review.md), 2026-08-27.
+
+---
+
+## The age filter excludes creators with an unknown age, with no way to opt out (AH-088)
+
+- **Where:** the same [`applyAgeFilters`](../apps/api/app/Modules/Agencies/Concerns/FiltersCreatorColumns.php)
+  predicate. SQL comparisons against `NULL` are never true, so ANY age bound silently drops every
+  creator who has not entered a birthday.
+- **What we accepted (AH-088, 2026-08-27):** the semantics are correct — an unknown age cannot honestly
+  satisfy "21–35" — and they are pinned by a test rather than left implicit. But on the day this ships
+  NO creator has a birthday, so an agency who touches either age input sees an empty roster and has no
+  affordance explaining why. The mitigation is time: the field is a profile-floor member (D6), so
+  creators backfill it on their next profile save.
+- **Why no toggle now:** an "include creators with unknown age" checkbox is a third filter state
+  (bounded / bounded-plus-unknown / unbounded) on a surface that already carries seven filters, and its
+  value decays to zero as the backfill completes. Building it for a transient window — and keeping it
+  forever afterwards — is the worse trade. It is named here so the decision is retrievable if the
+  backfill stalls.
+- **Trigger:** the backfill visibly stalling (a large share of active creators still without a birthday
+  after a few months), or agency support traffic about empty age-filtered rosters.
+- **Resolution:** either an explicit "include unknown age" bound modifier (`orWhereNull`), or an
+  empty-state message on the roster that names the cause when an age bound is active and the result is
+  empty — the cheaper of the two, and probably sufficient.
+- **Owner:** agencies/roster.
+- **Status:** open (accepted trade). Recorded in
+  [creator-dob-age-review.md](reviews/creator-dob-age-review.md), 2026-08-27.
+
+---
+
 ## A paginated index consumed as a `<select>` has now bitten twice — a recurring class, not yet a rule (OPEN)
 
 - **Where:** any backend list endpoint built for a full-page data table, then reused by a

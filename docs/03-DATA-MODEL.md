@@ -180,36 +180,37 @@ Phase 1 does **not** create this table.
 
 A creator is a global entity, not tenant-scoped.
 
-| Column                       | Type                  | Notes                                                           | Phase                        |
-| ---------------------------- | --------------------- | --------------------------------------------------------------- | ---------------------------- |
-| `id`                         | bigint PK             |                                                                 | P1                           |
-| `ulid`                       | char(26) unique       |                                                                 | P1                           |
-| `user_id`                    | bigint FK unique      | `users.id`, RESTRICT                                            | P1                           |
-| `display_name`               | varchar(160)          |                                                                 | P1                           |
-| `bio`                        | text null             |                                                                 | P1                           |
-| `country_code`               | char(2)               |                                                                 | P1                           |
-| `region`                     | varchar(160) null     | City/region, free text                                          | P1                           |
-| `primary_language`           | char(2)               |                                                                 | P1                           |
-| `secondary_languages`        | jsonb null            | Array of language codes                                         | P1                           |
-| `avatar_path`                | varchar(512) null     |                                                                 | P1                           |
-| `cover_path`                 | varchar(512) null     |                                                                 | P1                           |
-| `categories`                 | jsonb                 | Array of category slugs (lifestyle, sports, etc.)               | P1                           |
-| `verification_level`         | varchar(16)           | `unverified`, `email_verified`, `kyc_verified`, `tier_verified` | P1 (only first 3 used in P1) |
-| `tier`                       | varchar(16)           | `standard`, `premium`, `top`                                    | P3 (column nullable from P1) |
-| `application_status`         | varchar(16)           | `pending`, `approved`, `rejected`, `incomplete`                 | P1                           |
-| `approved_at`                | timestamptz null      |                                                                 | P1                           |
-| `approved_by_user_id`        | bigint FK null        | `users.id`, SET NULL — admin/agency staff who approved          | P1                           |
-| `rejected_at`                | timestamptz null      |                                                                 | P1                           |
-| `rejection_reason`           | text null             | Free text                                                       | P1                           |
-| `profile_completeness_score` | smallint default 0    | 0-100 score, computed                                           | P1                           |
-| `last_active_at`             | timestamptz null      |                                                                 | P1                           |
-| `signed_master_contract_id`  | bigint FK null        | `contracts.id`                                                  | P1                           |
-| `kyc_status`                 | varchar(16)           | `none`, `pending`, `verified`, `rejected`                       | P1                           |
-| `kyc_verified_at`            | timestamptz null      |                                                                 | P1                           |
-| `tax_profile_complete`       | boolean default false |                                                                 | P1                           |
-| `payout_method_set`          | boolean default false |                                                                 | P1                           |
-| `created_at`, `updated_at`   | timestamptz           |                                                                 | P1                           |
-| `deleted_at`                 | timestamptz null      |                                                                 | P1                           |
+| Column                       | Type                  | Notes                                                                                                 | Phase                        |
+| ---------------------------- | --------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `id`                         | bigint PK             |                                                                                                       | P1                           |
+| `ulid`                       | char(26) unique       |                                                                                                       | P1                           |
+| `user_id`                    | bigint FK unique      | `users.id`, RESTRICT                                                                                  | P1                           |
+| `display_name`               | varchar(160)          |                                                                                                       | P1                           |
+| `bio`                        | text null             |                                                                                                       | P1                           |
+| `country_code`               | char(2)               |                                                                                                       | P1                           |
+| `region`                     | varchar(160) null     | City/region, free text                                                                                | P1                           |
+| `date_of_birth`              | date null             | AH-088. Creator-written only; every other audience reads the derived `age`. No index (volume-trigger) | P1                           |
+| `primary_language`           | char(2)               |                                                                                                       | P1                           |
+| `secondary_languages`        | jsonb null            | Array of language codes                                                                               | P1                           |
+| `avatar_path`                | varchar(512) null     |                                                                                                       | P1                           |
+| `cover_path`                 | varchar(512) null     |                                                                                                       | P1                           |
+| `categories`                 | jsonb                 | Array of category slugs (lifestyle, sports, etc.)                                                     | P1                           |
+| `verification_level`         | varchar(16)           | `unverified`, `email_verified`, `kyc_verified`, `tier_verified`                                       | P1 (only first 3 used in P1) |
+| `tier`                       | varchar(16)           | `standard`, `premium`, `top`                                                                          | P3 (column nullable from P1) |
+| `application_status`         | varchar(16)           | `pending`, `approved`, `rejected`, `incomplete`                                                       | P1                           |
+| `approved_at`                | timestamptz null      |                                                                                                       | P1                           |
+| `approved_by_user_id`        | bigint FK null        | `users.id`, SET NULL — admin/agency staff who approved                                                | P1                           |
+| `rejected_at`                | timestamptz null      |                                                                                                       | P1                           |
+| `rejection_reason`           | text null             | Free text                                                                                             | P1                           |
+| `profile_completeness_score` | smallint default 0    | 0-100 score, computed                                                                                 | P1                           |
+| `last_active_at`             | timestamptz null      |                                                                                                       | P1                           |
+| `signed_master_contract_id`  | bigint FK null        | `contracts.id`                                                                                        | P1                           |
+| `kyc_status`                 | varchar(16)           | `none`, `pending`, `verified`, `rejected`                                                             | P1                           |
+| `kyc_verified_at`            | timestamptz null      |                                                                                                       | P1                           |
+| `tax_profile_complete`       | boolean default false |                                                                                                       | P1                           |
+| `payout_method_set`          | boolean default false |                                                                                                       | P1                           |
+| `created_at`, `updated_at`   | timestamptz           |                                                                                                       | P1                           |
+| `deleted_at`                 | timestamptz null      |                                                                                                       | P1                           |
 
 **Indexes:**
 
