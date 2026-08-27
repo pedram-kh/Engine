@@ -31,7 +31,8 @@
       "compliance": "Conformidade",
       "exportRequests": "Pedidos de exportação",
       "erasureQueue": "Fila de apagamento",
-      "featureFlags": "Feature flags"
+      "featureFlags": "Feature flags",
+      "automations": "Automações"
     },
     "userMenu": {
       "signOut": "Terminar sessão",

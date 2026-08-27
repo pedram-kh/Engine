@@ -31,7 +31,8 @@
       "compliance": "Atbilstība",
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
-      "featureFlags": "Funkciju karodziņi"
+      "featureFlags": "Funkciju karodziņi",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Izrakstīties",

@@ -31,7 +31,8 @@
       "compliance": "Efterlevnad",
       "exportRequests": "Exportförfrågningar",
       "erasureQueue": "Raderingskö",
-      "featureFlags": "Funktionsflaggor"
+      "featureFlags": "Funktionsflaggor",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Logga ut",

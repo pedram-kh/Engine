@@ -31,7 +31,8 @@
       "compliance": "Cumplimiento",
       "exportRequests": "Solicitudes de exportación",
       "erasureQueue": "Cola de borrado",
-      "featureFlags": "Indicadores de funciones"
+      "featureFlags": "Indicadores de funciones",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Cerrar sesión",

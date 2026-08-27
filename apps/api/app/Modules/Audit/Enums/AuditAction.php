@@ -438,6 +438,32 @@ enum AuditAction: string
     case UserMfaExempted = 'user.mfa_exempted';
     case UserMfaExemptionRemoved = 'user.mfa_exemption_removed';
 
+    // AH-090 — the platform automation-rule CRUD (D6). Configuring a rule that
+    // auto-connects creators to an agency is a platform-BEHAVIOUR change, the
+    // same class feature_flag.toggled covers, so all four are reason-gated
+    // below — including delete and the disable direction of toggle, because the
+    // reason is the only record of intent once the row is gone.
+    //
+    // These are the CONFIGURATION verbs. A rule FIRING writes
+    // agency_creator_relation.admin_connected (unchanged, already reason-gated)
+    // with actor_type=system — deliberately the same verb a human Door 2 write
+    // uses, so "how did this relation come to exist" has one answer to look up
+    // and the actor tells you who decided.
+    //
+    // Audit-only: NOT NotificationType cases (nobody is notified that an
+    // operator edited a rule), so no NotificationTypeEnumTest ripple — the
+    // board.* automation verbs already establish that shape.
+    //
+    // ⚠ Divergence from board_automations, deliberately: board automation MOVES
+    // write no audit row at all (the Ch1 movement-only dual-trail invariant),
+    // while these fires do. The board precedent governs the table shape, not the
+    // audit posture: the subject here is a cross-tenant commercial relationship,
+    // not a card's position inside one agency's board.
+    case AutomationRuleCreated = 'automation_rule.created';
+    case AutomationRuleUpdated = 'automation_rule.updated';
+    case AutomationRuleDeleted = 'automation_rule.deleted';
+    case AutomationRuleToggled = 'automation_rule.toggled';
+
     /**
      * True when the action requires a non-empty reason at the service layer.
      *
@@ -493,6 +519,17 @@ enum AuditAction: string
             self::UserMfaReset,
             self::UserMfaExempted,
             self::UserMfaExemptionRemoved => true,
+            // AH-090 — all four automation-rule config verbs, both toggle
+            // directions included. Same reasoning as feature_flag.toggled, which
+            // is reason-gated in both directions: an operator arming a rule that
+            // will write relationship rows, and an operator silently stopping one
+            // the business depends on, both have to answer "why". Delete most of
+            // all — the row is gone, so the audit `before` snapshot plus the
+            // reason is the entire remaining record of what that rule was.
+            self::AutomationRuleCreated,
+            self::AutomationRuleUpdated,
+            self::AutomationRuleDeleted,
+            self::AutomationRuleToggled => true,
             default => false,
         };
     }

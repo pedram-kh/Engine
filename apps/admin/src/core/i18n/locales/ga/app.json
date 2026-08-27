@@ -31,7 +31,8 @@
       "compliance": "Comhlíonadh",
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
-      "featureFlags": "Bratacha gnéithe"
+      "featureFlags": "Bratacha gnéithe",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Sínigh amach",

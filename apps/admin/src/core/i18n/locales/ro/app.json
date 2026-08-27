@@ -31,7 +31,8 @@
       "compliance": "Conformitate",
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
-      "featureFlags": "Indicatori de funcții"
+      "featureFlags": "Indicatori de funcții",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Deconectați-vă",

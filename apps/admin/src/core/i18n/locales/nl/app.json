@@ -31,7 +31,8 @@
       "compliance": "Compliance",
       "exportRequests": "Exportverzoeken",
       "erasureQueue": "Verwijderingswachtrij",
-      "featureFlags": "Functievlaggen"
+      "featureFlags": "Functievlaggen",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Uitloggen",

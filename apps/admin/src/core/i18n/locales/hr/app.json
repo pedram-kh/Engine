@@ -31,7 +31,8 @@
       "compliance": "Skladnost",
       "exportRequests": "Žádosti o export",
       "erasureQueue": "Čakalna vrsta smazání",
-      "featureFlags": "Stikaloe funkcí"
+      "featureFlags": "Stikaloe funkcí",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Odjava",

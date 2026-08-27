@@ -6,6 +6,7 @@ use App\Modules\Admin\Http\Controllers\AdminAgencyController;
 use App\Modules\Admin\Http\Controllers\AdminAgencyMemberController;
 use App\Modules\Admin\Http\Controllers\AdminAlertsController;
 use App\Modules\Admin\Http\Controllers\AdminAuditLogController;
+use App\Modules\Admin\Http\Controllers\AdminAutomationRuleController;
 use App\Modules\Admin\Http\Controllers\AdminComplianceController;
 use App\Modules\Admin\Http\Controllers\AdminDashboardController;
 use App\Modules\Admin\Http\Controllers\AdminFeatureFlagController;
@@ -93,6 +94,24 @@ Route::prefix('admin')
         Route::prefix('feature-flags')->name('feature-flags.')->group(function (): void {
             Route::get('/', [AdminFeatureFlagController::class, 'index'])->name('index');
             Route::post('{flag}', [AdminFeatureFlagController::class, 'toggle'])->name('toggle');
+        });
+
+        // ─── Platform automation rules (AH-090, D6) ──────────────────
+        // Operator CRUD over `admin_automation_rules` — "when X happens, do Y"
+        // at platform level. Every write carries a MANDATORY reason and writes
+        // one of the four automation_rule.* audit verbs: these rules write
+        // relationship rows into live data with no human present at the moment
+        // of writing, so who configured them and why must always be answerable.
+        // Unpaginated (operator-created, tens of rows). `{rule}` binds by ULID.
+        // Nothing here can fire anything — the platform_automations_enabled
+        // flag is the arming switch, and it lives in the feature-flags surface
+        // above. Allowlisted in docs/security/tenancy.md § 4.
+        Route::prefix('automation-rules')->name('automation-rules.')->group(function (): void {
+            Route::get('/', [AdminAutomationRuleController::class, 'index'])->name('index');
+            Route::post('/', [AdminAutomationRuleController::class, 'store'])->name('store');
+            Route::patch('{rule}', [AdminAutomationRuleController::class, 'update'])->name('update');
+            Route::delete('{rule}', [AdminAutomationRuleController::class, 'destroy'])->name('destroy');
+            Route::post('{rule}/toggle', [AdminAutomationRuleController::class, 'toggle'])->name('toggle');
         });
 
         // ─── Dashboard (D-7) ─────────────────────────────────────────

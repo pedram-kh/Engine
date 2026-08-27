@@ -137,4 +137,8 @@ export const NAV_ENTRIES: ReadonlyArray<NavEntry> = [
     ],
   },
   { key: 'featureFlags', icon: 'mdi-flag-outline', routeName: 'app.feature-flags.list' },
+  // AH-090 — platform automation rules. Sits beside feature flags rather than
+  // under a group: it is the same class of surface (platform behaviour an
+  // operator configures at runtime), and its own kill switch lives on that page.
+  { key: 'automations', icon: 'mdi-robot-outline', routeName: 'app.automations.list' },
 ]

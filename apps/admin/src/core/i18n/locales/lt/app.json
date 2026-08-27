@@ -31,7 +31,8 @@
       "compliance": "Atitiktis",
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
-      "featureFlags": "Funkcijų vėliavėlės"
+      "featureFlags": "Funkcijų vėliavėlės",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Atsijungti",

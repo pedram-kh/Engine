@@ -31,7 +31,8 @@
       "compliance": "Soulad",
       "exportRequests": "Žádosti o export",
       "erasureQueue": "Fronta smazání",
-      "featureFlags": "Přepínače funkcí"
+      "featureFlags": "Přepínače funkcí",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Odhlásit se",

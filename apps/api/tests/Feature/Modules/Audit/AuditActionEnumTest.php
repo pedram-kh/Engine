@@ -188,6 +188,17 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'user.mfa_reset',
         'user.mfa_exempted',
         'user.mfa_exemption_removed',
+        // AH-090 — platform automation-rule CONFIG verbs. Audit-only (nobody is
+        // notified that an operator edited a rule), so none is a
+        // NotificationType. A rule FIRING reuses
+        // agency_creator_relation.admin_connected with actor_type=system rather
+        // than minting an automation-specific verb: "how did this relation come
+        // to exist" should have one verb to look up, with the actor saying who
+        // decided.
+        'automation_rule.created',
+        'automation_rule.updated',
+        'automation_rule.deleted',
+        'automation_rule.toggled',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());
@@ -233,6 +244,15 @@ it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', functi
         'user.mfa_reset',
         'user.mfa_exempted',
         'user.mfa_exemption_removed',
+        // AH-090 — all four automation-rule config verbs, both toggle directions.
+        // The feature_flag.toggled shape, for the same reason: arming a rule that
+        // writes relationship rows and silently stopping one the business depends
+        // on both have to answer "why". Delete most of all — once the row is gone
+        // the audit `before` snapshot plus this reason is the only record left.
+        'automation_rule.created',
+        'automation_rule.updated',
+        'automation_rule.deleted',
+        'automation_rule.toggled',
     ]);
 });
 

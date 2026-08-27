@@ -1,0 +1,69 @@
+{
+  "admin": {
+    "automations": {
+      "title": "Automações",
+      "subtitle": "Regras da plataforma que agem quando algo acontece. Todas as alterações são auditadas.",
+      "flag_notice": "As regras só agem enquanto a flag \"Automações da plataforma\" estiver ativa. Desative-a na página de Feature flags para parar todas as regras de uma vez.",
+      "load_failed": "Não foi possível carregar as regras de automação. Atualize a página.",
+      "empty": "Ainda não existem regras de automação. Crie uma para a plataforma agir sobre um evento.",
+      "create": "Nova regra",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "save": "Guardar",
+      "never": "Nunca",
+      "columns": {
+        "name": "Nome",
+        "event": "Quando",
+        "action": "Então",
+        "target": "Destino",
+        "lastFired": "Última execução",
+        "fireCount": "Execuções",
+        "enabled": "Ativa"
+      },
+      "events": {
+        "creatorApproved": "Um criador é aprovado"
+      },
+      "actions": {
+        "connectToAgency": "Ligá-lo a uma agência"
+      },
+      "target": {
+        "unknown": "—"
+      },
+      "broken": {
+        "misconfigured": "Sem agência definida",
+        "agency_missing": "Agência eliminada",
+        "agency_suspended": "Agência suspensa"
+      },
+      "form": {
+        "createTitle": "Nova regra de automação",
+        "editTitle": "Editar regra de automação",
+        "name": "Nome",
+        "name_hint": "Como esta regra é identificada no registo de auditoria.",
+        "event": "Quando isto acontecer",
+        "action": "Fazer isto",
+        "agency": "Agência de destino",
+        "agency_hint": "Agências suspensas não são listadas — uma regra não pode ligar um criador a uma delas.",
+        "existing": "{count} outra regra já observa este evento. | {count} outras regras já observam este evento.",
+        "reason": "Motivo",
+        "reason_hint": "Pelo menos {count} caracteres — registado no registo de auditoria.",
+        "created": "Regra de automação criada.",
+        "updated": "Regra de automação atualizada.",
+        "failed": "Não foi possível guardar a regra. Verifique os campos e tente novamente."
+      },
+      "toggle": {
+        "enableTitle": "Ativar {name}?",
+        "disableTitle": "Desativar {name}?",
+        "description": "Uma regra desativada nunca age. As ligações que já criou não são revertidas.",
+        "success": "Regra de automação atualizada.",
+        "failed": "Não foi possível atualizar a regra. Tente novamente."
+      },
+      "delete": {
+        "title": "Eliminar {name}?",
+        "description": "Isto remove a regra permanentemente. As ligações que já criou são mantidas — eliminar uma regra impede ações futuras, não reverte as passadas.",
+        "confirm": "Eliminar regra",
+        "success": "Regra de automação eliminada.",
+        "failed": "Não foi possível eliminar a regra. Tente novamente."
+      }
+    }
+  }
+}

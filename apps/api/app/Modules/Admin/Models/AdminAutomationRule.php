@@ -40,6 +40,17 @@ final class AdminAutomationRule extends Model
     use HasUlid;
 
     /**
+     * The fire trace's zero state, in memory as well as in the schema — a rule
+     * that has just been created reads `fire_count = 0`, not null, so the
+     * response the create endpoint returns matches the one the list returns.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'fire_count' => 0,
+    ];
+
+    /**
      * @var list<string>
      */
     protected $fillable = [

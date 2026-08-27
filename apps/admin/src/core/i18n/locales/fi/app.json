@@ -31,7 +31,8 @@
       "compliance": "Vaatimustenmukaisuus",
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
-      "featureFlags": "Ominaisuusliput"
+      "featureFlags": "Ominaisuusliput",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Kirjaudu ulos",

@@ -31,7 +31,8 @@
       "compliance": "Compliance",
       "exportRequests": "Exportanfragen",
       "erasureQueue": "Lösch-Warteschlange",
-      "featureFlags": "Feature-Flags"
+      "featureFlags": "Feature-Flags",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Abmelden",

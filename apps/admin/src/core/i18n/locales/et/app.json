@@ -31,7 +31,8 @@
       "compliance": "Vastavus",
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
-      "featureFlags": "Funktsioonilipud"
+      "featureFlags": "Funktsioonilipud",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Logi välja",

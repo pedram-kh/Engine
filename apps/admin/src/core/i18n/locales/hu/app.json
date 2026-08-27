@@ -31,7 +31,8 @@
       "compliance": "Megfelelőség",
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
-      "featureFlags": "Funkciójelzők"
+      "featureFlags": "Funkciójelzők",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Kijelentkezés",

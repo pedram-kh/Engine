@@ -148,6 +148,7 @@ export const errorRoutes: RouteRecordRaw[] = [
 import { agenciesRoutes } from '@/modules/agencies/routes'
 import { alertsRoutes } from '@/modules/alerts/routes'
 import { auditRoutes } from '@/modules/audit/routes'
+import { automationsRoutes } from '@/modules/automations/routes'
 import { complianceRoutes } from '@/modules/compliance/routes'
 import { creatorsRoutes } from '@/modules/creators/routes'
 import { dashboardRoutes } from '@/modules/dashboard/routes'
@@ -182,5 +183,6 @@ export const routes: RouteRecordRaw[] = [
   ...operationsRoutes,
   ...complianceRoutes,
   ...featureFlagsRoutes,
+  ...automationsRoutes,
   ...errorRoutes,
 ]

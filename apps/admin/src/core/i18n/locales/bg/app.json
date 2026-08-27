@@ -31,7 +31,8 @@
       "compliance": "Съответствие",
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
-      "featureFlags": "Флагове за функции"
+      "featureFlags": "Флагове за функции",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Излезте",

@@ -31,7 +31,8 @@
       "compliance": "Conformità",
       "exportRequests": "Richieste di esportazione",
       "erasureQueue": "Coda di cancellazione",
-      "featureFlags": "Feature flag"
+      "featureFlags": "Feature flag",
+      "automations": "Automazioni"
     },
     "userMenu": {
       "signOut": "Esci",

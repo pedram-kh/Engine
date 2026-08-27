@@ -31,7 +31,8 @@
       "compliance": "Conformité",
       "exportRequests": "Demandes d'exportation",
       "erasureQueue": "File d'effacement",
-      "featureFlags": "Indicateurs de fonctionnalités"
+      "featureFlags": "Indicateurs de fonctionnalités",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Se déconnecter",

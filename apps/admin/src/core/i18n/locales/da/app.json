@@ -31,7 +31,8 @@
       "compliance": "Overholdelse",
       "exportRequests": "Eksportanmodninger",
       "erasureQueue": "Sletningskø",
-      "featureFlags": "Funktionsflag"
+      "featureFlags": "Funktionsflag",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Log ud",

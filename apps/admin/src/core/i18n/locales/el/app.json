@@ -31,7 +31,8 @@
       "compliance": "Συμμόρφωση",
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
-      "featureFlags": "Σημαίες λειτουργιών"
+      "featureFlags": "Σημαίες λειτουργιών",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Αποσύνδεση",

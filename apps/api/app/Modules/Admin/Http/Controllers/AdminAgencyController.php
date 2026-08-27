@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Http\Controllers;
 
 use App\Modules\Admin\Http\Requests\SuspendAgencyRequest;
+use App\Modules\Admin\Http\Resources\AgencyOptionResource;
 use App\Modules\Agencies\Enums\AgencyRole;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyMembership;
@@ -40,9 +41,32 @@ use Illuminate\Support\Facades\DB;
  */
 final class AdminAgencyController
 {
+    /**
+     * GET /api/v1/admin/agencies.
+     *
+     * `?for=select` (AH-090, D6) switches this same route to an UNPAGINATED thin
+     * projection for `<select>` pickers — the AH-085 `BrandController::index()`
+     * shape. The automation-rule dialog reads it, and it exists because a picker
+     * pointed at the paginated branch below would silently stop offering the
+     * alphabetical tail once the platform passes 25 agencies: an option that
+     * cannot be chosen, with no error to notice. Non-suspended only — a rule
+     * cannot target a suspended agency (the connect guard refuses it), so
+     * offering one would be offering a choice that is rejected on save.
+     *
+     * See docs/02-CONVENTIONS.md §3.5 for which of the two picker shapes a new
+     * list endpoint should take.
+     */
     public function index(Request $request): JsonResponse
     {
         $this->authorizeAny($request, 'viewAny');
+
+        if ($request->query('for') === 'select') {
+            return response()->json([
+                'data' => AgencyOptionResource::collection(
+                    Agency::query()->whereNull('suspended_at')->orderBy('name')->get(),
+                )->resolve($request),
+            ]);
+        }
 
         $perPage = max(1, min((int) $request->integer('per_page', 25), 100));
 

@@ -6,6 +6,7 @@ import enAgencies from './locales/en/agencies.json'
 import enAlerts from './locales/en/alerts.json'
 import enApp from './locales/en/app.json'
 import enAudit from './locales/en/audit.json'
+import enAutomations from './locales/en/automations.json'
 import enAuth from './locales/en/auth.json'
 import enCompliance from './locales/en/compliance.json'
 import enCreators from './locales/en/creators.json'
@@ -40,6 +41,7 @@ type MessageSchema = typeof enApp &
   typeof enCreators &
   typeof enAgencies &
   typeof enAudit &
+  typeof enAutomations &
   typeof enFeatureFlags &
   typeof enDashboard &
   typeof enOperations &
@@ -48,8 +50,9 @@ type MessageSchema = typeof enApp &
   typeof enAlerts
 
 // Deep-merge (NOT shallow spread): every admin module locale file
-// (`creators.json`, `agencies.json`, `audit.json`, `feature-flags.json`,
-// `dashboard.json`, `operations.json`) contributes an `admin.*` subtree,
+// (`creators.json`, `agencies.json`, `audit.json`, `automations.json`,
+// `feature-flags.json`, `dashboard.json`, `operations.json`) contributes an
+// `admin.*` subtree,
 // which a spread would clobber.
 //
 // `en` is statically bundled (always-needed fallback, present at boot, no
@@ -60,6 +63,7 @@ const enMessages = deepMergeLocale(
   enCreators,
   enAgencies,
   enAudit,
+  enAutomations,
   enFeatureFlags,
   enDashboard,
   enOperations,

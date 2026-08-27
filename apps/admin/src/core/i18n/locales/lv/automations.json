@@ -1,0 +1,69 @@
+{
+  "admin": {
+    "automations": {
+      "title": "Automations",
+      "subtitle": "Platform rules that act when something happens. Every change is audited.",
+      "flag_notice": "Rules only act while the \"Platform automations\" feature flag is on. Turn it off on the Feature flags page to stop every rule at once.",
+      "load_failed": "We couldn't load the automation rules. Please refresh.",
+      "empty": "No automation rules yet. Create one to have the platform act on an event.",
+      "create": "New rule",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "save": "Save",
+      "never": "Never",
+      "columns": {
+        "name": "Name",
+        "event": "When",
+        "action": "Then",
+        "target": "Target",
+        "lastFired": "Last fired",
+        "fireCount": "Fires",
+        "enabled": "Enabled"
+      },
+      "events": {
+        "creatorApproved": "A creator is approved"
+      },
+      "actions": {
+        "connectToAgency": "Connect them to an agency"
+      },
+      "target": {
+        "unknown": "—"
+      },
+      "broken": {
+        "misconfigured": "No agency set",
+        "agency_missing": "Agency deleted",
+        "agency_suspended": "Agency suspended"
+      },
+      "form": {
+        "createTitle": "New automation rule",
+        "editTitle": "Edit automation rule",
+        "name": "Name",
+        "name_hint": "How this rule is identified in the audit log.",
+        "event": "When this happens",
+        "action": "Do this",
+        "agency": "Target agency",
+        "agency_hint": "Suspended agencies are not listed — a rule cannot connect a creator to one.",
+        "existing": "{count} other rule already watches this event. | {count} other rules already watch this event.",
+        "reason": "Reason",
+        "reason_hint": "At least {count} characters — recorded in the audit log.",
+        "created": "Automation rule created.",
+        "updated": "Automation rule updated.",
+        "failed": "We couldn't save the rule. Please check the fields and try again."
+      },
+      "toggle": {
+        "enableTitle": "Enable {name}?",
+        "disableTitle": "Disable {name}?",
+        "description": "A disabled rule never acts. Existing connections it already made are not undone.",
+        "success": "Automation rule updated.",
+        "failed": "We couldn't update the rule. Please try again."
+      },
+      "delete": {
+        "title": "Delete {name}?",
+        "description": "This removes the rule permanently. Connections it already made are kept — deleting a rule stops future actions, it does not undo past ones.",
+        "confirm": "Delete rule",
+        "success": "Automation rule deleted.",
+        "failed": "We couldn't delete the rule. Please try again."
+      }
+    }
+  }
+}

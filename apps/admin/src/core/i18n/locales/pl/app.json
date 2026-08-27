@@ -31,7 +31,8 @@
       "compliance": "Zgodność",
       "exportRequests": "Prośby o eksport",
       "erasureQueue": "Kolejka usunięcia",
-      "featureFlags": "Flagi funkcji"
+      "featureFlags": "Flagi funkcji",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Wyloguj się",

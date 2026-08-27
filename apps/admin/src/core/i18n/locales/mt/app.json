@@ -31,7 +31,8 @@
       "compliance": "Konformità",
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
-      "featureFlags": "Bnadar tal-karatteristiċi"
+      "featureFlags": "Bnadar tal-karatteristiċi",
+      "automations": "Automations"
     },
     "userMenu": {
       "signOut": "Oħroġ",
