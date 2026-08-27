@@ -2,10 +2,16 @@
 
 - **Status: Closed — approved.** Compact full loop — kickoff with locked decisions (D1–D4) →
   brief plan-pause (mechanism ratified: route-name-driven variant on the existing page, mirroring
-  `AuthLayout.vue`'s own `isHero` pattern) → build → two-commit pair, **push HELD**.
-- **Date:** 2026-08-27
+  `AuthLayout.vue`'s own `isHero` pattern) → build → two-commit pair → **pushed**, together with
+  the [AH-086b addendum](#8-addendum-ah-086b--team-invite-email-door) that rides the same push.
+- **Date:** 2026-08-27 (base chunk and addendum, same day).
 - **Provenance:** kickoff (D1–D4) locked by Pedram; mechanism resolved at plan-pause per the
-  kickoff's explicit delegation ("mechanism yours at plan-pause"); built by Cursor.
+  kickoff's explicit delegation ("mechanism yours at plan-pause"); built by Cursor. **Closed by
+  Pedram**, verdict: D1–D4 verified as built; the route-name mechanism ratified, with its
+  query-param-rejection reasoning ([§2](#2-d1--the-mechanism)) standing as the record; the
+  door-not-a-wall dispatch pin ([§4](#4-d3--a-door-not-a-wall)) accepted; the named E2E gap
+  ([§5](#5-d4--i18n-and-e2ce-scope), [§6](#6-gate-board)) resolved by the AH-086b addendum's full
+  Playwright run ([§8](#8-addendum-ah-086b--team-invite-email-door)).
 - **Evidence base:** `AuthLayout.vue`'s existing `isHero = route.name === 'auth.sign-in'`
   computed — the direct precedent for driving a shared component's presentation off `route.name`
   without a prop or a second file; `NotificationsPage.vue`'s two-route-one-component pattern
@@ -271,3 +277,148 @@ the full E2E run is still the more rigorous proof and has not been produced).
   (flex default: left-aligned). Not adjusted — the kickoff asked for "the exact existing sign-in
   UI" minus the named CTA, not a re-balanced row; a live-browser eyes-on pass would catch it if it
   reads wrong, same honesty posture AH-082 took on its own unverified placement.
+
+---
+
+## 8. Addendum (AH-086b) — team-invite email door
+
+**Scope, one line:** the agency team-invite email's magic-link CTA now points at
+`/agency/sign-in?token=…&agency=…` instead of `/accept-invitation?token=…&agency=…` directly.
+`SignInPage.vue`'s agency variant detects both params and forwards them, unchanged, to the SAME
+`/accept-invitation` page/flow — nothing about token validation, expiry, or acceptance moved.
+
+### 8.1 The change
+
+```73:74:apps/api/app/Modules/Agencies/Services/AgencyInvitationService.php
+        $acceptUrl = rtrim((string) config('app.frontend_main_url', config('app.url')), '/')
+            .'/agency/sign-in?token='.$token.'&agency='.$agency->ulid;
+```
+
+```91:101:apps/main/src/modules/auth/pages/SignInPage.vue
+const inviteForwardTarget = computed(() => {
+  if (!isAgencyVariant.value) {
+    return null
+  }
+  const token = typeof route.query.token === 'string' ? route.query.token : null
+  const agency = typeof route.query.agency === 'string' ? route.query.agency : null
+  if (token === null || agency === null) {
+    return null
+  }
+  return { name: 'accept-invitation', query: { token, agency } }
+})
+```
+
+```107:113:apps/main/src/modules/auth/pages/SignInPage.vue
+onMounted(() => {
+  if (inviteForwardTarget.value !== null) {
+    void router.replace(inviteForwardTarget.value)
+    return
+  }
+  loadMetaPixel(window, document)
+})
+```
+
+The template gates on the same computed (`v-if="inviteForwardTarget === null"`), so the sign-in
+form itself never paints for this hop.
+
+### 8.2 Scope fences held
+
+- **ONLY the team-invite mailable.** `InviteAgencyUserMail.php` (docblock only — no logic change)
+  and `AgencyInvitationService::invite()` (the one URL line) are the only backend files touched.
+  **Checked negative:** `ProspectCreatorInviteMail` — the creator roster-invite mail — is a
+  different funnel (its own magic-link shape, `/auth/accept-invite?token=…`, its own SPA page,
+  `AcceptCreatorInvitePage.vue`) and has zero diff in this addendum.
+- **Invite-acceptance logic, expiry, and `AcceptInvitationPage.vue`'s own internal routing:
+  untouched.** `AgencyInvitationService::accept()`, `InvitationController::accept()`,
+  `InvitationPreviewController`, and every state/button inside `AcceptInvitationPage.vue`
+  (including its own two `auth.sign-in` CTAs for the `not-authenticated` and `already-accepted`
+  states) are byte-identical — `git diff` on that file is empty. The door this addendum builds
+  sits entirely upstream, in `SignInPage.vue` and the URL `AgencyInvitationService` mints; nothing
+  downstream of the door changed.
+- **`requireGuest` and the door coexist safely.** `auth.agency-sign-in` keeps its
+  `requireGuest` guard (routes.ts §D1 above); the guard does not call `bootstrap()`
+  (`guards.ts` docblock), so on the cold, full-page-reload a real email-link click always produces
+  (there is no client-side-SPA path to this URL), `store.user` reads `null` at guard-check time
+  regardless of whether the visitor secretly still holds a valid session cookie — the guard always
+  passes through, the forward always fires, and `accept-invitation` (which explicitly bootstraps
+  in `loadPreview()`) resolves the TRUE auth state either way. **Named, not fixed:** the guard
+  would still bounce an _already-authenticated, already-loaded_ SPA tab that client-side-navigates
+  to this URL without a full reload — no code path in this app does that today, so it is a
+  theoretical residual, not a reproduced one.
+
+### 8.3 §5.34 — old link still works, new link completes acceptance
+
+- **Old, already-sent links keep working.** `/accept-invitation` is untouched — the pre-existing
+  Playwright specs (`invitations.spec.ts`, `invitations-error-paths.spec.ts`, `permissions.spec.ts`)
+  navigate directly to that exact URL shape via `seedAgencyInvitation()`'s own
+  `acceptUrl` builder (independent of `AgencyInvitationService`) and all pass unchanged — nothing
+  404s.
+- **New link (the door) completes acceptance exactly as before.** A new Playwright case proves the
+  full round trip for real, not just the redirect in isolation:
+
+  ```185:224:apps/main/playwright/specs/invitations.spec.ts
+  test('AH-086b: the /agency/sign-in door forwards to the SAME accept flow, preserving token+agency', async ({
+    page,
+  }) => {
+    // ...seeds an invitation, signs in, then navigates to
+    // `/agency/sign-in?token=…&agency=…` (the exact shape
+    // AgencyInvitationService::invite() now mints) and asserts the
+    // browser lands on /accept-invitation? carrying the SAME token +
+    // agency, then completes acceptance to the success state.
+  })
+  ```
+
+  Plus four new Vitest cases in `SignInPage.spec.ts` pinning the forward/no-forward branches in
+  isolation (token+agency present → forwards; agency variant with no token/agency → renders the
+  form; one of the two params present → renders the form, doesn't half-forward; default `/sign-in`
+  with a stray token+agency query → ignored, D2 zero-diff holds).
+
+- **Honest UX caveat, named not fixed:** the forward is an unguarded `router.replace()` in
+  `onMounted` — no loading spinner. A real browser may paint the sign-in form for a single frame
+  before the replace commits. Not fixed this chunk; low-severity and cosmetic, no live-browser
+  frame-by-frame check was performed to confirm or deny it.
+
+### 8.4 Blade/lang touch discipline
+
+No `.blade.php` or `lang/*.php` text changed — the touched files are a PHP URL-building line and a
+docblock. Treated as a mail-rendering-affecting change regardless (the mailable's actual rendered
+output — its CTA URL — changes), per the standing discipline: `InvitationMailTest.php`'s three
+per-locale render tests (English, Portuguese, Italian) were re-run with fixtures updated to the new
+URL shape, and the English case now asserts the body contains `agency/sign-in?token=…` and does
+**not** contain `accept-invitation`. A fourth, new backend test
+(`InvitationTest.php`, "AH-086b: the queued invite mail's magic link points at /agency/sign-in…")
+asserts the real `AgencyInvitationService::invite()` code path (via the actual
+`POST .../invitations` endpoint, not a hand-built fixture) mints a queued `InviteAgencyUserMail`
+whose `acceptUrl` contains `/agency/sign-in?token=` and `&agency=<ulid>` and does not contain
+`/accept-invitation`.
+
+**Deploy obligation:** worker restart required (mail-touching file, per the standing rule), **and**
+a PHP-FPM reload — `AgencyInvitationService::invite()`'s URL-building logic runs in the web/FPM
+process at invite-creation time (the `Mailable`'s `acceptUrl` is baked in at construction, before
+it is queued), so without a reload FPM's opcache would keep minting the OLD `/accept-invitation`
+URL for new invites until it naturally cycled. See the deploy-log PENDING entry.
+
+### 8.5 Gate board (addendum)
+
+| Gate                                                    | Result                                                                                                                                                                                                                            |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend (Pest), full `apps/api` suite (`composer test`) | **2615 passed / 1 skipped, 9769 assertions** — incl. the updated `InvitationMailTest.php` (3) and the new `InvitationTest.php` case                                                                                               |
+| Pint (touched files)                                    | **passed**                                                                                                                                                                                                                        |
+| PHPStan (Larastan), touched files                       | **no errors**                                                                                                                                                                                                                     |
+| Frontend (Vitest), full `apps/main` suite               | **1638 passed / 167 files** — incl. 4 new `SignInPage.spec.ts` forward-branch cases                                                                                                                                               |
+| `vue-tsc --noEmit` (`apps/main`, project-wide)          | **clean**                                                                                                                                                                                                                         |
+| ESLint (`apps/main`, touched files)                     | **0 errors**                                                                                                                                                                                                                      |
+| Full Playwright, main SPA (dev stack cold-started)      | **29/29 — first pass, no flakes.** Discharges the AH-086 base chunk's named E2E gap ([§5](#5-d4--i18n-and-e2ce-scope)) honestly — every `/sign-in`-traversing spec that gap named is in this run, plus the new AH-086b door spec. |
+
+### 8.6 What this addendum deliberately did not build
+
+- **No change to `AcceptInvitationPage.vue`'s own sign-in buttons** (`not-authenticated` and
+  `already-accepted` states) — both still resolve `auth.sign-in`. Retargeting them to
+  `auth.agency-sign-in` would be a reasonable follow-up for visual consistency but is a second,
+  separate surface the "ONLY the team-invite mailable" fence does not cover — named here as a
+  found-but-not-built consideration, not silently left as an oversight.
+- **No fix for the theoretical already-authenticated-SPA-tab `requireGuest` bounce** ([§8.2](#82-scope-fences-held))
+  — no reproducible path to it exists in this app today.
+- **No loading state during the forward hop** ([§8.3](#83-5-34--old-link-still-works-new-link-completes-acceptance))
+  — a possible single-frame flash of the sign-in form, not fixed, not verified either way in a live
+  browser.

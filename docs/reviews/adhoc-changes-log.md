@@ -72,7 +72,10 @@ reviews, and conversations.
 
 ### AH-086 · Agency sign-in — one component, parameterized
 
-- **Status:** Landed (push HELD)
+- **Status: Closed — approved, pushed.** Verdict: D1–D4 verified as built; the route-name mechanism
+  ratified, with its query-param-rejection reasoning standing as the record; the door-not-a-wall
+  dispatch pin accepted; the named E2E gap resolved by the AH-086b addendum's full Playwright run
+  (below).
 - **Date:** 2026-08-27
 - **Why:** an agency-facing sign-in surface is needed for outreach/onboarding links, but a second
   copy of the sign-in page would drift from the real one the moment auth logic next changes.
@@ -94,6 +97,40 @@ reviews, and conversations.
   this chunk, named as a gap rather than silently presumed green.
 - **Ref:** [`agency-sign-in-review.md`](agency-sign-in-review.md) (full kickoff-decision table,
   mechanism argument, i18n table, gate board).
+
+**AH-086b addendum — team-invite email door (same thread, same push).** The agency team-invite
+email's magic-link CTA now points at `/agency/sign-in?token=…&agency=…` instead of
+`/accept-invitation?token=…&agency=…` directly; `SignInPage.vue`'s agency variant detects both
+params and forwards them, unchanged, to the SAME `/accept-invitation` page/flow — token validation,
+expiry, and acceptance are all untouched. **Scope:** ONLY the team-invite mailable
+(`AgencyInvitationService::invite()`'s URL-building line, `InviteAgencyUserMail.php`'s docblock) —
+the creator roster-invite mail (`ProspectCreatorInviteMail`, its own `/auth/accept-invite` shape) is
+a different funnel, checked and confirmed untouched. `AcceptInvitationPage.vue` itself — its
+10-state machine, its own two `auth.sign-in` CTAs, expiry, accept endpoint — has an empty `git
+diff`. **§5.34:** old already-sent invite links keep resolving directly (`/accept-invitation` is
+untouched; the pre-existing Playwright specs prove it, unchanged); a new link (the door) completes
+acceptance exactly as before, proven end-to-end by a new Playwright case
+(`invitations.spec.ts`, AH-086b) plus 4 new `SignInPage.spec.ts` cases pinning the forward/no-forward
+branches. **Blade/lang touch discipline:** no `.blade.php` or `lang/*.php` text changed, but treated
+as mail-rendering-affecting regardless — `InvitationMailTest.php`'s three per-locale render tests
+were re-run against the new URL shape, and a new `InvitationTest.php` case asserts the real
+`AgencyInvitationService::invite()` code path (via the actual endpoint) mints the new URL. **Gates:**
+backend Pest **2615 / 1 skipped, 9769 assertions**, Pint clean, PHPStan (Larastan) no errors;
+`apps/main` Vitest **1638 / 167 files**; typecheck clean; ESLint 0 errors; **full Playwright 29/29,
+first pass, no flakes** (dev stack cold-started) — this discharges the AH-086 base chunk's own named
+E2E gap honestly, not just AH-086b's own new spec. **Deploy obligation:** worker restart (mail-file
+touch, standing rule) **and** a PHP-FPM reload — the URL-building logic runs in the web/FPM process
+at invite-creation time, so without a reload new invites would keep minting the OLD URL until FPM's
+opcache cycled naturally; see `deploy-log.md`'s PENDING entry. **Touched:**
+`apps/api/app/Modules/Agencies/Services/AgencyInvitationService.php`,
+`apps/api/app/Modules/Agencies/Mail/InviteAgencyUserMail.php` (docblock only),
+`apps/api/tests/Feature/Modules/Agencies/InvitationMailTest.php`,
+`apps/api/tests/Feature/Modules/Agencies/InvitationTest.php`, `apps/main/src/modules/auth/pages/SignInPage.vue`
+
+- `SignInPage.spec.ts`, `apps/main/src/modules/auth/routes.ts` (comment only),
+  `apps/main/playwright/specs/invitations.spec.ts`. **Ref:**
+  [`agency-sign-in-review.md`](agency-sign-in-review.md#8-addendum-ah-086b--team-invite-email-door)
+  §8 (the addendum section, full detail).
 
 ---
 

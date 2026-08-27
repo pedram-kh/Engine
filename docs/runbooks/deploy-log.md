@@ -54,6 +54,67 @@ happened.
 
 ---
 
+## 2026-08-27 · AH-086 + b — agency sign-in variant + team-invite email door — PENDING
+
+- **Status:** PENDING
+- **Range:** `6f5351de` (the AH-085 deployed tip below, exclusive) → the tip carrying this entry.
+  Commits, in order:
+  - `2e7c02ad` — `feat(auth): agency-facing sign-in variant, one component (AH-086)`.
+  - `39c9e5af` — `docs(reviews): AH-086 agency sign-in — decision table, mechanism, gate board`
+    (docs-only).
+  - `0edcffa1` — `feat(agencies): team-invite email's CTA doors through /agency/sign-in (AH-086b)`
+    — the magic-link door (`AgencyInvitationService` + `InviteAgencyUserMail` + `SignInPage.vue` +
+    the new tests).
+  - the close-out docs commit carrying this entry, the AH-086 review's Closed status, its §8
+    addendum, and the AH-086 log entry's b-paragraph — docs-only; see `git log` at the tip for its
+    exact SHA.
+- **AH entries carried:** **AH-086** (base) + the **AH-086b addendum** (same thread, same push —
+  not a separate AH number; see `../reviews/adhoc-changes-log.md`'s AH-086 entry, b-paragraph).
+- **Migrations run:** **none.** No file under `apps/api/database/migrations/**` in this range —
+  AH-086 is SPA-only; AH-086b changes one URL-building line in
+  `AgencyInvitationService::invite()` and a docblock in `InviteAgencyUserMail.php`, no schema
+  touch.
+- **Pre-deploy reads:** none required.
+- **Snapshot ID:** not applicable — no migration in this range.
+- **Infra:**
+  - **Queue-worker restart: REQUIRED**, on AH-086b's mail-file-touching grounds —
+    `InviteAgencyUserMail.php` changed (docblock only, but the file changed; the standing house
+    rule treats any mailable-file touch as worker-restart territory rather than a case-by-case
+    bytecode read — same posture as the AH-068/069/083 mail-touch entries below).
+  - **PHP-FPM reload: REQUIRED — PHP moved, this is not an "SPA + mail only" deploy.**
+    `AgencyInvitationService::invite()`'s URL-building line changed, and that code runs
+    synchronously in the web/FPM process at invite-creation time — the `Mailable`'s `acceptUrl` is
+    baked into its constructor arguments before the object is queued, so the WORKER never
+    re-derives it. Without an FPM reload, opcache keeps serving the OLD bytecode and every invite
+    created post-deploy would still mint the OLD `/accept-invitation?...` URL until FPM's workers
+    naturally cycle past it — silently defeating the point of this addendum. Same posture as the
+    2026-08-11 `CreatorPolicy` deploy and the AH-085 `BrandController` deploy below.
+  - No cron/scheduler change, no env change, no flag.
+  - `apps/main`'s SPA bundle needs its normal rebuild + redeploy — AH-086 adds the
+    `/agency/sign-in` route/component, AH-086b adds `SignInPage.vue`'s invite-forward branch;
+    neither reaches browsers without it.
+- **One-shot commands:** **none.**
+- **Post-deploy verification:** `/up` 200 + one authenticated request, plus AH-086/AH-086b-specific
+  reads:
+  1. `/agency/sign-in` renders the agency heading, no creator-signup CTA (AH-086).
+  2. A fresh invite created post-deploy (agency_admin → Invite user modal) contains a
+     `/agency/sign-in?token=...&agency=...` link, not `/accept-invitation?...` — the direct proof
+     the FPM reload actually took (see the PHP-FPM note above; a stale opcache would silently fail
+     this exact check).
+  3. That link, followed unauthenticated, lands on the same accept-invitation preview/sign-in
+     surface as before (AH-086b's forward).
+  4. An OLD-shape link (`/accept-invitation?token=...&agency=...`, e.g. one already sent before
+     this deploy) still resolves directly — nothing 404s.
+- **Flags armed:** **none — this range touches no flag.**
+- **Operator:** _TBD — Pedram's call when this deploys._
+- **Anything unexpected:** none during build. Full gate detail lives in
+  [`agency-sign-in-review.md`](../reviews/agency-sign-in-review.md) (base chunk, §1–§7) and its
+  [§8 addendum](../reviews/agency-sign-in-review.md#8-addendum-ah-086b--team-invite-email-door)
+  (AH-086b) — backend Pest 2615/1 skipped, `apps/main` Vitest 1638/167 files, full Playwright
+  29/29 first pass.
+
+---
+
 ## 2026-08-19 · AH-085 — brand select pagination fix — DEPLOYED
 
 > **Box HEAD (`6f5351de`) ≠ origin tip — expected, not drift.** Two commits landed on
