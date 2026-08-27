@@ -59,6 +59,12 @@ final class CreatorDiscoveryResource extends JsonResource
             'attributes' => [
                 'display_name' => $creator->display_name,
                 'country_code' => $creator->country_code,
+                // AH-088 — the derived age, rendered in the card's icon meta row
+                // beside location and language. Requires `creators.date_of_birth`
+                // in the controller's slim projection: without it the model has
+                // no attribute to derive from and this reads null in production
+                // while every resource-direct test stays green.
+                'age' => $creator->age(),
                 'primary_language' => $creator->primary_language,
                 'accent' => $creator->accent,
                 // AH-050 — emitted on the card shape for payload symmetry with

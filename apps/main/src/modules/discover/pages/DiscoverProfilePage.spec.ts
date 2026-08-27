@@ -65,6 +65,7 @@ function makeProfile(
       bio: 'Pioneering mathematician',
       country_code: 'GB',
       region: 'London',
+      age: 36,
       primary_language: 'en',
       secondary_languages: [],
       accent: null,

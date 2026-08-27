@@ -81,6 +81,9 @@ function fullEnvelope(
           account_name: 'Ada',
           account_last_name: 'Lovelace',
           country_code: 'GB',
+          // AH-088 — the derived age; the raw date_of_birth is never on an
+          // agency-facing shape, so there is nothing else to seed here.
+          age: 36,
           region: null,
           primary_language: 'en',
           secondary_languages: null,
@@ -112,6 +115,7 @@ function thinEnvelope(
         bio: 'Pioneering mathematician',
         country_code: 'GB',
         region: null,
+        age: 36,
         primary_language: 'en',
         secondary_languages: null,
         accent: null,

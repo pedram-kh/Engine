@@ -184,6 +184,7 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes', fun
             'country_code' => 'GB',
             'primary_language' => 'en',
             'content_companions' => ['roommates'],
+            'date_of_birth' => now()->subYears(29)->subDays(3)->toDateString(),
         ],
     );
 
@@ -204,6 +205,9 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes', fun
         'email',
         'application_status',
         'country_code',
+        // AH-088 — the derived age joins the slim row (the age-range filter
+        // lives on this surface, so the value it filters on is visible).
+        'age',
         'primary_language',
         // AH-050 — companions join the slim row (display-only, D5).
         'content_companions',
@@ -217,6 +221,12 @@ it('exposes the slim row shape with internal_rating but NOT internal_notes', fun
     expect($attributes['internal_rating'])->toBe(4);
     expect($attributes['avatar_url'])->toBeNull();
     expect($attributes['content_companions'])->toBe(['roommates']);
+    // AH-088 (O3) — asserted through the ENDPOINT because `age` derives from a
+    // column carried by the eager-load projection above. Remove
+    // `date_of_birth` from that select and this reds; a row-shape unit test
+    // would not.
+    expect($attributes['age'])->toBe(29);
+    expect($response->getContent())->not->toContain('date_of_birth');
 
     // The GDPR-sensitive note must NEVER appear anywhere in the payload
     // (break-revert: adding it to the row shape fails this).
@@ -313,6 +323,146 @@ it('filters by primary_language', function (): void {
 
     expect($response->json('meta.total'))->toBe(1);
     expect($response->json('data.0.attributes.primary_language'))->toBe('it');
+});
+
+/*
+|--------------------------------------------------------------------------
+| AH-088 — the age-range filter (?age_min=&age_max=)
+|--------------------------------------------------------------------------
+|
+| Date-bound algebra over `creators.date_of_birth`, so the assertions that
+| matter are the BOUNDARIES: a creator shown as N must be returned by both
+| `age_min=N` and `age_max=N`, or the filter and the displayed age disagree and
+| an agency is told someone is 24 who does not appear under "24".
+|
+| Ages are seeded relative to `today()` for the same reason Creator::age()'s own
+| tests are: fixed birthdates would drift into false greens.
+|
+*/
+
+/** A rostered creator whose derived age is exactly `$age` today. */
+function makeRosterCreatorAged(Agency $agency, int $age, string $name): AgencyCreatorRelation
+{
+    return makeRosterRelation($agency, [], [
+        'display_name' => $name,
+        'date_of_birth' => now()->subYears($age)->toDateString(),
+    ]);
+}
+
+it('filters the roster by an inclusive age range', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterCreatorAged($agency, 19, 'Nineteen');
+    makeRosterCreatorAged($agency, 25, 'TwentyFive');
+    makeRosterCreatorAged($agency, 41, 'FortyOne');
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'age_min=20&age_max=30'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.attributes.display_name'))->toBe('TwentyFive');
+    expect($response->json('data.0.attributes.age'))->toBe(25);
+});
+
+it('includes a creator at the exact lower bound (age_min=N returns an N-year-old)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    // Birthday is TODAY: Creator::age() says 25, so the filter must agree.
+    makeRosterCreatorAged($agency, 25, 'ExactlyTwentyFive');
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'age_min=25'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.attributes.age'))->toBe(25);
+});
+
+it('includes a creator at the exact upper bound (age_max=N returns an N-year-old)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterCreatorAged($agency, 25, 'ExactlyTwentyFive');
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'age_max=25'));
+
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.attributes.age'))->toBe(25);
+});
+
+it('excludes the day-before-birthday creator from age_min (still one year younger)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    // Turns 25 tomorrow ⟹ age() is 24 ⟹ age_min=25 must NOT return them.
+    makeRosterRelation($agency, [], [
+        'display_name' => 'AlmostTwentyFive',
+        'date_of_birth' => now()->subYears(25)->addDay()->toDateString(),
+    ]);
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'age_min=25'));
+
+    expect($response->json('meta.total'))->toBe(0);
+});
+
+// AH-088 O5, stated as a test so nobody has to guess: an age bound EXCLUDES
+// creators with no birthday on file. At deploy that is every creator, which is
+// why this behaviour is called out in the review rather than left to be
+// discovered as a bug report. The "include unknown age" toggle is the follow-up.
+it('excludes creators with no date of birth from any age-bounded query', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterRelation($agency, [], ['display_name' => 'Unknown', 'date_of_birth' => null]);
+    makeRosterCreatorAged($agency, 30, 'Known');
+
+    expect($this->actingAs($admin)->getJson(rosterUrl($agency, 'age_min=18'))->json('meta.total'))->toBe(1);
+    expect($this->actingAs($admin)->getJson(rosterUrl($agency, 'age_max=99'))->json('meta.total'))->toBe(1);
+
+    // …and both are returned when NO age bound is present, proving the exclusion
+    // is the filter's doing and not the fixture's.
+    expect($this->actingAs($admin)->getJson(rosterUrl($agency))->json('meta.total'))->toBe(2);
+});
+
+it('ignores non-numeric and empty age bounds instead of erroring (permissive read)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterRelation($agency, [], ['date_of_birth' => null]);
+    makeRosterCreatorAged($agency, 30, 'Known');
+
+    foreach (['age_min=abc', 'age_min=', 'age_max=&age_min=', 'age_min=abc&age_max=xyz'] as $query) {
+        $response = $this->actingAs($admin)->getJson(rosterUrl($agency, $query));
+
+        $response->assertOk();
+        // No filter applied at all — the unknown-DOB creator is still present.
+        expect($response->json('meta.total'))->toBe(2);
+    }
+});
+
+it('clamps an out-of-range age bound rather than dropping it', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterCreatorAged($agency, 30, 'Known');
+
+    // age_min=999 clamps to 120 — narrowing to nobody. The failure mode for a
+    // dropped bound would be the opposite (everybody), which is the wrong way
+    // for a filter to break.
+    expect($this->actingAs($admin)->getJson(rosterUrl($agency, 'age_min=999'))->json('meta.total'))->toBe(0);
+    // age_max=999 clamps to 120 — which still includes everyone real.
+    expect($this->actingAs($admin)->getJson(rosterUrl($agency, 'age_max=999'))->json('meta.total'))->toBe(1);
+});
+
+it('returns nothing for a reversed range without special-casing it', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    makeRosterCreatorAged($agency, 30, 'Known');
+
+    $response = $this->actingAs($admin)->getJson(rosterUrl($agency, 'age_min=40&age_max=20'));
+
+    $response->assertOk();
+    expect($response->json('meta.total'))->toBe(0);
 });
 
 it('filters by category via jsonb containment', function (): void {

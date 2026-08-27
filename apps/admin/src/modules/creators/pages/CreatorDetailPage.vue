@@ -848,6 +848,23 @@ const decisionSnackbarColor = computed(() =>
           <CategoryChips :labels="categoryLabels" />
         </EditFieldRow>
 
+        <!-- AH-088 — the DERIVED age, admin read-only twice over: the admin
+             cannot edit a birthday (not in EDITABLE_FIELDS) and this is not even
+             the stored value. The raw date_of_birth is withheld from this
+             audience entirely (D1), so there is nothing here to edit and no
+             pencil — the AH-050 plain-row pattern. Hidden when the creator has
+             not entered a birthday. -->
+        <div
+          v-if="creator.attributes.age !== null"
+          class="admin-creator-detail__readonly-row"
+          data-testid="admin-creator-detail-row-age"
+        >
+          <span class="admin-creator-detail__readonly-label">
+            {{ t('admin.creators.detail.fields.age') }}
+          </span>
+          <span data-testid="admin-creator-detail-value-age">{{ creator.attributes.age }}</span>
+        </div>
+
         <!-- AH-050 — admin read-only (D7): plain row, deliberately NOT an
              EditFieldRow (no pencil). Self-declared personal data an admin
              never edits on a creator's behalf; the backend rejects it too

@@ -430,6 +430,14 @@ onMounted(() => {
                   <span class="creator-detail__label">{{ t('app.roster.fields.country') }}</span>
                   <CountryDisplay :code="creator.country_code" :label="countryLabel" />
                 </div>
+                <!-- AH-088 — the derived age. The raw birthday is withheld from
+                     this surface even in the contact-included full mode, which is
+                     the deliberate asymmetry with the AH-005 contact block below
+                     (pinned by DateOfBirthWithholdingTest). -->
+                <div v-if="creator.age !== null" data-testid="roster-detail-age">
+                  <span class="creator-detail__label">{{ t('app.roster.fields.age') }}</span>
+                  <span class="text-body-2">{{ creator.age }}</span>
+                </div>
                 <div>
                   <span class="creator-detail__label">{{ t('app.roster.fields.language') }}</span>
                   <LanguageList

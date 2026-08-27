@@ -182,6 +182,7 @@ it('POST /wizard/submit succeeds when all three vendor flags are OFF + stamps ky
         'display_name' => 'Catalyst',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
         // D1 + D4: region joins the floor, and the profile unit only reaches
@@ -224,6 +225,7 @@ it('submit DOES NOT downgrade an already-Verified creator to NotRequired even if
         'display_name' => 'Catalyst',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
         // D1 + D4: region joins the floor, and the profile unit only reaches
@@ -269,6 +271,7 @@ it('completeness score = 100 for a creator with profile/social/portfolio filled 
         'display_name' => 'Catalyst',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
         // D1 + D4: region joins the floor, and the profile unit only reaches
@@ -330,6 +333,7 @@ it('completeness score renormalises to 38 when only profile is complete and the 
         'display_name' => 'Catalyst',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
         // D1 + D4: region joins the floor, and the profile unit only reaches
@@ -359,6 +363,7 @@ it('completeness score renormalises to 62 when profile + social are complete and
         'display_name' => 'Catalyst',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
         // D1 + D4: region joins the floor, and the profile unit only reaches
@@ -392,6 +397,7 @@ it('click-through acceptance earns the contract weight in the score (flag OFF)',
         'display_name' => 'Catalyst',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
         // D1 + D4: region joins the floor, and the profile unit only reaches

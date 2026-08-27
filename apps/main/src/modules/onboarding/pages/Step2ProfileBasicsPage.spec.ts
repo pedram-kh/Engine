@@ -24,11 +24,16 @@ const baseAttributes = {
   display_name: 'Existing Name',
   bio: null,
   country_code: 'IT',
-  // D1: region is part of the six-field floor. The base fixture fills it so
+  // D1: region is part of the seven-field floor. The base fixture fills it so
   // the "happy" gate paths satisfy the full floor; the avatar-missing tests
   // still isolate on the single missing avatar, and the region-gates test
   // overrides it back to null with the avatar present.
   region: 'Lazio',
+  // AH-088 D6: date_of_birth joined the same floor, so the base fixture fills it
+  // for the same reason region does — otherwise every "gate opens" test would be
+  // asserting against two missing fields instead of the one it isolates.
+  date_of_birth: '1994-03-17',
+  age: 32,
   primary_language: 'en',
   secondary_languages: [] as string[],
   // AH-050 — null means "undisclosed" (hydrates to an empty chip group).
@@ -54,6 +59,33 @@ const baseAttributes = {
   approved_at: null,
   created_at: '2026-05-14T00:00:00+00:00',
   updated_at: '2026-05-14T00:00:00+00:00',
+}
+
+/**
+ * Resolve the profile PATCH with a well-formed bootstrap payload — the store
+ * re-hydrates from the response, so a bare `mockResolvedValue({})` would blow up
+ * inside the store rather than in the assertion. The `mockBootstrap` factory
+ * above is the same idea for the initial GET.
+ */
+function mockUpdateProfile(attrOverrides: Record<string, unknown> = {}): void {
+  vi.mocked(onboardingApi.updateProfile).mockResolvedValue({
+    data: {
+      id: '01',
+      type: 'creators',
+      attributes: { ...baseAttributes, ...attrOverrides },
+      wizard: {
+        next_step: 'profile',
+        is_submitted: false,
+        steps: [],
+        weights: {},
+        flags: {
+          kyc_verification_enabled: false,
+          creator_payout_method_enabled: false,
+          contract_signing_enabled: false,
+        },
+      },
+    } as never,
+  })
 }
 
 function mockBootstrap(attrOverrides: Record<string, unknown> = {}): void {
@@ -480,8 +512,8 @@ describe('Step2ProfileBasicsPage', () => {
   })
 
   it('enables Save and continue and hides the hint once the full floor is met', async () => {
-    // Base fixture fills display_name/country/region/language/category; adding
-    // the avatar completes the six-field floor → gate met.
+    // Base fixture fills display_name/country/region/dob/language/category;
+    // adding the avatar completes the seven-field floor → gate met.
     mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg', categories: ['lifestyle'] })
     const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
       initialRoute: { path: '/onboarding/profile' },
@@ -530,5 +562,118 @@ describe('Step2ProfileBasicsPage', () => {
     expect(wrapper.find('[data-testid="profile-submit"]').classes()).not.toContain(
       'v-btn--disabled',
     )
+  })
+
+  // AH-088 D6 — the DOB half of the same floor invariant, in both directions.
+  // The forward gate is the only thing standing between an existing creator and
+  // a profile the platform can render an age for, so it gets the region
+  // treatment: one test for the block, one for the release.
+  it('disables Save and continue when only the date of birth is missing (AH-088 floor)', async () => {
+    mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg', date_of_birth: null })
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="profile-submit"]').classes()).toContain('v-btn--disabled')
+    expect(wrapper.find('[data-testid="profile-requirements-hint"]').exists()).toBe(true)
+  })
+
+  it('enables Save and continue once the date of birth is filled (AH-088 floor)', async () => {
+    mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg', date_of_birth: '1990-01-31' })
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="profile-submit"]').classes()).not.toContain(
+      'v-btn--disabled',
+    )
+  })
+
+  it('hydrates the date input from the owner payload and previews the age it derives', async () => {
+    mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg', date_of_birth: '1990-01-31' })
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    const input = wrapper.find('[data-testid="profile-date-of-birth"] input')
+    expect((input.element as HTMLInputElement).value).toBe('1990-01-31')
+
+    // The preview is computed locally from the entered date, so it does not wait
+    // on a save round-trip. Asserted against the same whole-years rule the
+    // backend uses rather than a hard-coded number, so the test does not rot on
+    // a birthday.
+    const expectedAge = Math.floor(
+      (Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()) -
+        Date.UTC(1990, 0, 31)) /
+        (365.2425 * 24 * 60 * 60 * 1000),
+    )
+    expect(wrapper.find('[data-testid="profile-age-preview"]').text()).toContain(
+      String(expectedAge),
+    )
+  })
+
+  it('sends the edited date of birth on save', async () => {
+    mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg', date_of_birth: '1990-01-31' })
+    mockUpdateProfile()
+
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('[data-testid="profile-date-of-birth"] input').setValue('1988-07-04')
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(onboardingApi.updateProfile).toHaveBeenCalledWith(
+      expect.objectContaining({ date_of_birth: '1988-07-04' }),
+    )
+  })
+
+  // Clearing the date is where the floor and the `nullable` rule meet. The
+  // BACKEND accepts null (a creator must be able to correct a wrong birthday via
+  // any client), but on this surface the floor gate fires FIRST: an empty date
+  // means the step gate closes, so the save never leaves the page. Asserted
+  // because it is the honest behaviour — the empty→null mapping in the form's
+  // save() is shape-correctness for the payload, not a reachable UI path here.
+  it('blocks the save instead of clearing when the date of birth is emptied', async () => {
+    mockBootstrap({ avatar_path: 'creators/seed/avatar/x.jpg', date_of_birth: '1990-01-31' })
+    mockUpdateProfile()
+
+    const { wrapper, unmount } = await mountAuthPage(Step2ProfileBasicsPage, {
+      initialRoute: { path: '/onboarding/profile' },
+      beforeMount: async () => {
+        await useOnboardingStore().bootstrap()
+      },
+    })
+    teardown = unmount
+    await flushPromises()
+
+    await wrapper.find('[data-testid="profile-date-of-birth"] input').setValue('')
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(onboardingApi.updateProfile).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-testid="profile-submit"]').classes()).toContain('v-btn--disabled')
+    expect(wrapper.find('[data-testid="profile-requirements-hint"]').exists()).toBe(true)
   })
 })

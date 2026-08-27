@@ -107,14 +107,16 @@ it('a freshly-bootstrapped creator scores 0', function (): void {
 });
 
 it('a fully-completed creator scores 100', function (): void {
-    // D4: the profile unit only reaches its full 25 when the six-field floor
-    // (region included, D1) AND every optional field are filled — so a
+    // D4: the profile unit only reaches its full 25 when the seven-field floor
+    // (region per D1, date_of_birth per AH-088 D6) AND every optional field are
+    // filled — so a
     // "fully-completed" fixture must now set the optionals too, otherwise the
     // profile unit lands at PROFILE_FLOOR_WEIGHT (13) and the total is < 100.
     $creator = CreatorFactory::new()->createOne([
         'display_name' => 'Test Creator',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
         'avatar_path' => 'creators/test/avatar/abc.jpg',
@@ -148,6 +150,7 @@ it('next_step starts at profile and advances as steps complete', function (): vo
         'display_name' => 'Test',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['music'],
         'avatar_path' => 'x',
@@ -161,6 +164,7 @@ it('next_step lands on Review when every preceding step is complete', function (
         'display_name' => 'Done',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['music'],
         'avatar_path' => 'x',
@@ -188,6 +192,7 @@ it('a creator missing only region does NOT complete the profile step (D1 floor)'
         'display_name' => 'No Region',
         'country_code' => 'IT',
         'region' => null,
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['music'],
         'avatar_path' => 'x',
@@ -204,6 +209,53 @@ it('filling region flips the profile step complete (D1 floor)', function (): voi
         'display_name' => 'With Region',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
+        'primary_language' => 'en',
+        'categories' => ['music'],
+        'avatar_path' => 'x',
+    ]);
+
+    $calc = new CompletenessScoreCalculator;
+
+    expect($calc->stepCompletion($creator)[WizardStep::Profile->value])->toBeTrue();
+});
+
+/*
+|--------------------------------------------------------------------------
+| AH-088 D6 — date_of_birth joins the same floor
+|--------------------------------------------------------------------------
+|
+| The region pair above, repeated for the birthday. Worth having twice: the
+| floor is HAND-LISTED in isProfileComplete() (there is no field registry to
+| iterate), so each member needs its own pin or a future edit can drop one
+| silently. The frontend half of the mirror is enforced separately, by source
+| inspection, in floor-mirror-parity.spec.ts.
+|
+*/
+
+it('a creator missing only date_of_birth does NOT complete the profile step (AH-088 floor)', function (): void {
+    $creator = CreatorFactory::new()->createOne([
+        'display_name' => 'No Birthday',
+        'country_code' => 'IT',
+        'region' => 'Lazio',
+        'date_of_birth' => null,
+        'primary_language' => 'en',
+        'categories' => ['music'],
+        'avatar_path' => 'x',
+    ]);
+
+    $calc = new CompletenessScoreCalculator;
+
+    expect($calc->stepCompletion($creator)[WizardStep::Profile->value])->toBeFalse();
+    expect($calc->nextStep($creator))->toBe(WizardStep::Profile);
+});
+
+it('filling date_of_birth flips the profile step complete (AH-088 floor)', function (): void {
+    $creator = CreatorFactory::new()->createOne([
+        'display_name' => 'With Birthday',
+        'country_code' => 'IT',
+        'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['music'],
         'avatar_path' => 'x',
@@ -223,13 +275,14 @@ it('filling region flips the profile step complete (D1 floor)', function (): voi
 | case: an empty optional must NOT flip stepCompletion['profile'] false.
 */
 
-it('profileEarned awards the floor block only when the six-field floor is met', function (): void {
+it('profileEarned awards the floor block only when the seven-field floor is met', function (): void {
     $calc = new CompletenessScoreCalculator;
 
     $atFloor = CreatorFactory::new()->createOne([
         'display_name' => 'Floor Only',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['music'],
         'avatar_path' => 'x',
@@ -266,6 +319,7 @@ it('an empty optional drops the score but does NOT flip the profile gate (§5.34
         'display_name' => 'Gated',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['music'],
         'avatar_path' => 'x',
@@ -291,6 +345,7 @@ it('whitespace-only optionals are not "filled" (trimmed-non-empty parity)', func
         'display_name' => 'Whitespace',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['music'],
         'avatar_path' => 'x',

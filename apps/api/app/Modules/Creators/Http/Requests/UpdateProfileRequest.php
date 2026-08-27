@@ -63,6 +63,12 @@ final class UpdateProfileRequest extends FormRequest
             'bio' => ['sometimes', 'nullable', 'string', 'max:5000'],
             'country_code' => ['sometimes', 'string', 'size:2'],
             'region' => ['sometimes', 'nullable', 'string', 'max:120'],
+            // AH-088 — the creator's own date of birth. Bounds are SANITY ONLY:
+            // no minimum-age rule anywhere in the stack (offered and declined,
+            // D8), so a young date validates and saves. `before_or_equal:today`
+            // rejects the future; the 1900 floor catches a mistyped year rather
+            // than encoding a maximum age.
+            'date_of_birth' => ['sometimes', 'nullable', 'date', 'before_or_equal:today', 'after:1900-01-01'],
             // AH-005 — optional contact details (all nullable; partial entry
             // is fine). phone / whatsapp are validated as LENIENT phone-ish
             // strings: an E.164-friendly character set with a digit floor (so

@@ -211,6 +211,7 @@
         "status": "Status",
         "applicationStatus": "Bewerbung",
         "country": "Land",
+        "age": "Alter",
         "language": "Sprache",
         "categories": "Kategorien",
         "companions": "Wer in den Inhalten erscheint",
@@ -251,6 +252,10 @@
         "country": "Land",
         "language": "Sprache",
         "category": "Kategorie",
+        "age": {
+          "min": "Min. Alter",
+          "max": "Max. Alter"
+        },
         "availability": {
           "from": "Verfügbar ab",
           "to": "Verfügbar bis"

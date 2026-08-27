@@ -211,6 +211,7 @@
         "status": "Stádas",
         "applicationStatus": "Application",
         "country": "Country",
+        "age": "Aois",
         "language": "Teanga",
         "categories": "Categories",
         "companions": "Cé a fheictear ina gcuid ábhair",
@@ -251,6 +252,10 @@
         "country": "Country",
         "language": "Teanga",
         "category": "Category",
+        "age": {
+          "min": "Aois íos.",
+          "max": "Aois uas."
+        },
         "availability": {
           "from": "Available from",
           "to": "Available to"

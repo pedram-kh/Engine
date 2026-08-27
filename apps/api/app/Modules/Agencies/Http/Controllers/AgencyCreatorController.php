@@ -149,8 +149,13 @@ final class AgencyCreatorController
             // here (one extra query for the whole page, NOT per-row) so the
             // roster list can surface it without an N+1 — `user_id` is added to
             // the creator select so the belongsTo can hydrate.
+            // AH-088 — `date_of_birth` joins the projection so `toRow()` can
+            // derive `age`. Same trap as discover's slim select: drop it and the
+            // column simply isn't hydrated, so age reads null in production
+            // while row-shape unit tests stay green — hence the endpoint-level
+            // age assertion in AgencyCreatorRosterTest.
             ->with([
-                'creator:id,ulid,user_id,display_name,country_code,primary_language,accent,content_companions,categories,application_status,avatar_path',
+                'creator:id,ulid,user_id,display_name,country_code,date_of_birth,primary_language,accent,content_companions,categories,application_status,avatar_path',
                 'creator.user:id,email',
             ])
             // Default sort: creator display_name ASC via a correlated
@@ -359,6 +364,12 @@ final class AgencyCreatorController
                 // from relationship_status above.
                 'application_status' => $creator?->application_status->value,
                 'country_code' => $creator?->country_code,
+                // AH-088 — the derived age, on the LIST as well as the detail:
+                // the age-range filter lives on this surface, and a filter over
+                // a column the list doesn't show is a support ticket. Needs
+                // `date_of_birth` in the eager-load select above; the raw date
+                // itself never ships (withholding spec).
+                'age' => $creator?->age(),
                 'primary_language' => $creator?->primary_language,
                 'accent' => $creator?->accent,
                 // AH-050 — self-declared companions (in the eager-load select

@@ -120,6 +120,21 @@ export interface CreatorAttributes {
   country_code: string | null
   region: string | null
   /**
+   * The creator's own date of birth as `'YYYY-MM-DD'` (AH-088).
+   *
+   * Present ONLY on the owner's payload — `GET /creators/me`. The admin
+   * drill-in reads the SAME resource but the key is omitted for that audience
+   * (D1), which is why this is optional rather than nullable: admin consumers of
+   * `CreatorAttributes` will not find it at all. Everyone else reads `age`.
+   */
+  date_of_birth?: string | null
+  /**
+   * Derived age in whole years, or null when no birthday has been entered
+   * (AH-088). Present for BOTH audiences. Read-only — the writable field is
+   * `date_of_birth`, and only the owner can write it.
+   */
+  age: number | null
+  /**
    * Optional creator contact details (AH-005). Surfaced in the BASE
    * attributes (owner-self + admin view-only); the connected-agency
    * roster-detail surface carries them too, gated by a non-blacklisted
@@ -325,6 +340,13 @@ export interface CreatorProfileUpdatePayload {
   bio?: string | null
   country_code?: string
   region?: string | null
+  /**
+   * `'YYYY-MM-DD'` (AH-088). Owner-writable only — absent from
+   * `AdminUpdateCreatorRequest::EDITABLE_FIELDS`, so there is no admin
+   * counterpart to this field. Null clears it (at the cost of the profile
+   * floor); no minimum-age rule applies.
+   */
+  date_of_birth?: string | null
   /** Optional contact details (AH-005). All nullable; partial entry is fine. */
   phone?: string | null
   whatsapp?: string | null

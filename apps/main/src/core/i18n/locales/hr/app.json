@@ -211,6 +211,7 @@
         "status": "Stanje",
         "applicationStatus": "Prijava",
         "country": "Země",
+        "age": "Starost",
         "language": "Jazyk",
         "categories": "Kategorie",
         "companions": "Tko se pojavljuje u njihovom sadržaju",
@@ -251,6 +252,10 @@
         "country": "Země",
         "language": "Jazyk",
         "category": "Kategorie",
+        "age": {
+          "min": "Min. starost",
+          "max": "Maks. starost"
+        },
         "availability": {
           "from": "Dostupný od",
           "to": "Dostupný do"

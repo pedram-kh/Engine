@@ -29,6 +29,7 @@ function makeCreator(overrides: Partial<CreatorResource> = {}): CreatorResource 
     bio: null,
     country_code: null,
     region: null,
+    age: null,
     phone: null,
     whatsapp: null,
     address_street: null,

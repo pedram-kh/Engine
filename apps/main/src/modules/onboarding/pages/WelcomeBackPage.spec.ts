@@ -39,6 +39,7 @@ function makeCreator(
       bio: null,
       country_code: 'IT',
       region: null,
+      age: null,
       phone: null,
       whatsapp: null,
       address_street: null,

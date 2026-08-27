@@ -69,7 +69,7 @@ const store = useOnboardingStore()
 /**
  * D9 — append the required-field indicator (asterisk) to a translated label.
  * The marker is locale-neutral (no translation key), so it needs no locale
- * files; the asterisk flags every field in the six-field floor so a creator
+ * files; the asterisk flags every field in the seven-field floor so a creator
  * can tell blocking fields from score-only ones at a glance.
  */
 function requiredLabel(key: string): string {
@@ -89,6 +89,7 @@ type ProfileField =
   | 'bio'
   | 'country_code'
   | 'region'
+  | 'date_of_birth'
   | 'phone'
   | 'whatsapp'
   | 'address_street'
@@ -102,6 +103,9 @@ const displayName = ref('')
 const bio = ref('')
 const countryCode = ref<string | null>(null)
 const region = ref<string | null>(null)
+// AH-088 — a `'YYYY-MM-DD'` string, empty when unset: the value shape a native
+// date input binds to. Part of the seven-field floor (D6).
+const dateOfBirth = ref('')
 // AH-005 — optional contact details. All optional; partial entry is fine.
 // phone / whatsapp are split into a dial-code part and a local-number part;
 // they are joined back to a single string on save (e.g. "+34 612 345 678").
@@ -213,6 +217,45 @@ const renderedBio = computed(() => renderBio(bio.value))
 
 const countryLabel = computed(() => labelForCountryCode(countryCode.value))
 
+/**
+ * AH-088 — the upper bound on the date input: a birthday cannot be in the
+ * future. Mirrors the backend's `before_or_equal:today`, and like it carries NO
+ * lower bound beyond sanity: there is no minimum-age rule anywhere in the stack
+ * (offered and declined, D8).
+ *
+ * UTC, deliberately: the backend derives age against `Carbon::today()` under
+ * APP_TIMEZONE=UTC, so anchoring the preview below to the same day keeps the two
+ * from disagreeing for a browser in a distant timezone.
+ */
+const todayIso = new Date().toISOString().slice(0, 10)
+
+/**
+ * The age the rest of the platform will see, shown back to the creator beside
+ * their own input ("You'll appear as 24"). Computed locally so it updates as
+ * they type rather than after a save round-trip; the authoritative value is the
+ * backend's `Creator::age()`, and the whole-years rule here is the same one — a
+ * birthday TODAY has already counted.
+ *
+ * Null for an empty or future date, so the hint simply doesn't render rather
+ * than showing a negative age while someone is mid-typing.
+ */
+const previewAge = computed<number | null>(() => {
+  if (dateOfBirth.value === '') return null
+
+  const [year, month, day] = dateOfBirth.value.split('-').map(Number)
+  if (!year || !month || !day) return null
+
+  const now = new Date()
+  const todayYear = now.getUTCFullYear()
+  const todayMonth = now.getUTCMonth() + 1
+  const todayDay = now.getUTCDate()
+
+  let age = todayYear - year
+  if (todayMonth < month || (todayMonth === month && todayDay < day)) age -= 1
+
+  return age >= 0 ? age : null
+})
+
 const primaryLanguageLabel = computed(() => {
   if (primaryLanguage.value === null) return null
   const label = languageEndonym(primaryLanguage.value)
@@ -236,12 +279,13 @@ const hasAvatar = computed(() => store.creator?.attributes.avatar_path != null)
 const hasCategory = computed(() => categories.value.length > 0)
 
 /**
- * Full mirror of the backend `isProfileComplete` gate — the SIX-FIELD FLOOR
- * (display_name, country, region, primary_language, ≥1 category, avatar).
- * region joined the floor with D1; it uses trimmed-non-empty here while the BE
- * uses `!== null` — the field SET is the mirror invariant (pinned by the
- * floor-mirror parity spec), not the exact operator. Both wizard step 2's
- * forward gate (D2) and the profile page's hard floor key off this.
+ * Full mirror of the backend `isProfileComplete` gate — the SEVEN-FIELD FLOOR
+ * (display_name, country, region, date_of_birth, primary_language, ≥1 category,
+ * avatar). region joined the floor with D1 and date_of_birth with AH-088 D6;
+ * both use a trimmed/non-empty test here while the BE uses `!== null` — the
+ * field SET is the mirror invariant (pinned by the floor-mirror parity spec),
+ * not the exact operator. Both wizard step 2's forward gate (D2) and the
+ * profile page's hard floor key off this.
  *
  * NOTE: the "filled" test for region matches the optional-field `nullableTrim`
  * rule so BE-earned points and this floor never disagree on whitespace.
@@ -251,6 +295,7 @@ const floorMet = computed(
     displayName.value.trim() !== '' &&
     countryCode.value !== null &&
     (region.value?.trim() ?? '') !== '' &&
+    dateOfBirth.value !== '' &&
     primaryLanguage.value !== null &&
     categories.value.length > 0 &&
     hasAvatar.value,
@@ -286,6 +331,9 @@ function hydrate(): void {
   bio.value = attrs.bio ?? ''
   countryCode.value = attrs.country_code ?? null
   region.value = attrs.region ?? null
+  // AH-088 — the raw date, which only the owner's own payload carries (D1). It
+  // arrives as `'YYYY-MM-DD'`, already the shape the native date input binds to.
+  dateOfBirth.value = attrs.date_of_birth ?? ''
   // AH-005 — split any existing stored value (e.g. "+34 612 345 678") back
   // into dial code + local number. Falls back to the country-derived dial
   // code when no known prefix is found (covers legacy free-text entries).
@@ -320,6 +368,13 @@ async function save(): Promise<boolean> {
       bio: bio.value === '' ? null : bio.value,
       country_code: countryCode.value ?? undefined,
       region: region.value,
+      // AH-088 — an explicit null for an empty value, never an omitted key: the
+      // backend rule is `sometimes`, so omission would silently preserve the old
+      // birthday instead of clearing it. In practice neither host can reach this
+      // branch while the floor holds (an empty date closes the step gate and the
+      // profile page's hard floor), so it is payload correctness rather than a
+      // live path — pinned as such in the step-2 spec.
+      date_of_birth: dateOfBirth.value === '' ? null : dateOfBirth.value,
       // AH-005 — join dial code + local number back to a single string.
       // An empty local-number field clears the value (null).
       phone: nullableTrim(phoneLocal.value)
@@ -426,6 +481,34 @@ defineExpose({ save, hydrate, isPristine })
       :error-messages="fieldErrors.region"
       data-testid="profile-region"
     />
+
+    <!-- AH-088 — a native date input (`type="date"`), the six-site house
+         majority for dates. The VDatePicker precedent was availability-specific
+         (a calendar the creator scans for free days); a birthday is typed, and
+         the native control's keyboard year entry beats paging a calendar back
+         three decades. Required (D6 floor); no lower bound, `max` is today. -->
+    <v-text-field
+      v-model="dateOfBirth"
+      type="date"
+      :label="requiredLabel('creator.ui.wizard.fields.date_of_birth')"
+      :hint="t('creator.ui.wizard.fields.date_of_birth_help')"
+      persistent-hint
+      :max="todayIso"
+      :error-messages="fieldErrors.date_of_birth"
+      data-testid="profile-date-of-birth"
+      required
+    />
+
+    <!-- The value everyone else will read, shown back to the creator. Free once
+         the age rule exists, and it answers "what exactly do brands see?"
+         before it becomes a support ticket. -->
+    <p
+      v-if="previewAge !== null"
+      class="profile-basics-form__age-preview text-caption"
+      data-testid="profile-age-preview"
+    >
+      {{ t('creator.ui.wizard.fields.age_preview', { age: previewAge }) }}
+    </p>
 
     <v-text-field
       v-model="addressStreet"
@@ -777,5 +860,10 @@ defineExpose({ save, hydrate, isPristine })
 
 .profile-basics-form__avatar-note--missing {
   color: rgb(var(--v-theme-error));
+}
+
+.profile-basics-form__age-preview {
+  margin-top: -12px;
+  color: rgb(var(--v-theme-on-surface-variant));
 }
 </style>

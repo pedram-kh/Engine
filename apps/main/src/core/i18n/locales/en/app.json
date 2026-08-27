@@ -211,6 +211,7 @@
         "status": "Status",
         "applicationStatus": "Application",
         "country": "Country",
+        "age": "Age",
         "language": "Language",
         "categories": "Categories",
         "companions": "Who appears in their content",
@@ -251,6 +252,10 @@
         "country": "Country",
         "language": "Language",
         "category": "Category",
+        "age": {
+          "min": "Min age",
+          "max": "Max age"
+        },
         "availability": {
           "from": "Available from",
           "to": "Available to"

@@ -17,6 +17,7 @@ function floorCompleteCreator(): Creator
         'display_name' => 'Recompute Me',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['music'],
         'avatar_path' => 'creators/seed/avatar/x.jpg',

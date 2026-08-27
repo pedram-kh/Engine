@@ -147,6 +147,7 @@ it('PATCH /wizard/profile updates fields and recomputes completeness when all pr
             'display_name' => 'Catalyst',
             'country_code' => 'IT',
             'region' => 'Lazio',
+            'date_of_birth' => '1994-03-17',
             'primary_language' => 'en',
             'categories' => ['lifestyle', 'music'],
         ]);
@@ -245,6 +246,7 @@ it('PATCH /wizard/profile emits CreatorWizardProfileCompleted exactly once on fi
         'display_name' => 'Idem',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['lifestyle'],
     ];
@@ -640,6 +642,7 @@ it('POST /wizard/submit transitions to pending when every step is complete', fun
         'display_name' => 'Done',
         'country_code' => 'IT',
         'region' => 'Lazio',
+        'date_of_birth' => '1994-03-17',
         'primary_language' => 'en',
         'categories' => ['music'],
         'avatar_path' => 'x',

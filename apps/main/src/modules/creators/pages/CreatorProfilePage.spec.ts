@@ -37,9 +37,10 @@ interface SeedOptions {
 }
 
 /**
- * A complete, floor-MEETING creator by default — the six-field floor
- * (display_name + country + region + primary_language + ≥1 category + avatar,
- * D1). Individual tests drop fields via `attrs` or counts via
+ * A complete, floor-MEETING creator by default — the seven-field floor
+ * (display_name + country + region + date_of_birth + primary_language +
+ * ≥1 category + avatar; D1 + AH-088 D6). Individual tests drop fields via
+ * `attrs` or counts via
  * `socials`/`portfolio`.
  */
 function makeBootstrap(options: SeedOptions = {}): never {
@@ -53,6 +54,11 @@ function makeBootstrap(options: SeedOptions = {}): never {
         bio: null,
         country_code: 'IT',
         region: 'Lazio',
+        // AH-088 D6 — a floor field, so the default seed fills it: every test
+        // here starts from a floor-MEETING profile and then knocks out the one
+        // field it is about.
+        date_of_birth: '1994-03-17',
+        age: 32,
         phone: null,
         whatsapp: null,
         address_street: null,
@@ -180,6 +186,36 @@ describe('CreatorProfilePage — completeness floor', () => {
 
     // Filling region clears the block (self-healing, one field).
     await wrapper.find('[data-testid="profile-region"] input').setValue('Lazio')
+    await flushPromises()
+    expect(wrapper.find('[data-testid="creator-profile-save"]').classes()).not.toContain(
+      'v-btn--disabled',
+    )
+  })
+
+  // AH-088 D6 / §5.34 — THE production posture, asserted rather than described.
+  // Every creator alive when this ships has date_of_birth = null, so this is the
+  // exact state all ~279 of them are in: the profile still renders in full, and
+  // the block appears only when they next try to SAVE. One field fixes it, on
+  // the surface they are already standing on.
+  it('hard-blocks the save for a creator seeded with date_of_birth = null (AH-088 backfill)', async () => {
+    const { wrapper } = await mount({
+      status: 'pending',
+      attrs: { date_of_birth: null, age: null },
+    })
+
+    // Nothing is hidden or emptied — the profile is fully readable at rest.
+    expect(
+      (wrapper.find('[data-testid="profile-display-name"] input').element as HTMLInputElement)
+        .value,
+    ).toBe('Existing Name')
+
+    const saveBtn = wrapper.find('[data-testid="creator-profile-save"]')
+    expect(saveBtn.classes()).toContain('v-btn--disabled')
+    expect(wrapper.find('[data-testid="creator-profile-incomplete-hint"]').exists()).toBe(true)
+
+    // Entering a date clears the block (self-healing, one field — the region D3
+    // shape one-for-one).
+    await wrapper.find('[data-testid="profile-date-of-birth"] input').setValue('1990-01-31')
     await flushPromises()
     expect(wrapper.find('[data-testid="creator-profile-save"]').classes()).not.toContain(
       'v-btn--disabled',

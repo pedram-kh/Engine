@@ -211,6 +211,7 @@
         "status": "Status",
         "applicationStatus": "Ansökan",
         "country": "Land",
+        "age": "Ålder",
         "language": "Språk",
         "categories": "Kategorier",
         "companions": "Vem syns i deras innehåll",
@@ -251,6 +252,10 @@
         "country": "Land",
         "language": "Språk",
         "category": "Kategori",
+        "age": {
+          "min": "Min. ålder",
+          "max": "Max. ålder"
+        },
         "availability": {
           "from": "Tillgänglig från",
           "to": "Tillgänglig till"

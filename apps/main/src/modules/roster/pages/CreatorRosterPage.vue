@@ -44,6 +44,7 @@ import { useRouter } from 'vue-router'
 import { BlacklistBadge, CEmptyState } from '@catalyst/ui'
 
 import {
+  boundedIntParam,
   isoDateParam,
   oneOfParam,
   oneOfParamWithFallback,
@@ -81,6 +82,13 @@ const error = ref<string | null>(null)
 // default "All" option, which would mean `per_page=-1`, is never offered).
 const PER_PAGE_OPTIONS = [10, 25, 50, 100] as const
 const DEFAULT_PER_PAGE = 25
+
+// AH-088 — the age filter's clamp bounds. Kept identical to the backend's
+// FiltersCreatorColumns::AGE_FILTER_MIN/MAX so a URL survives the round trip
+// unchanged; sanity rails on an input, not a policy about who may be on the
+// platform (there is no minimum-age rule in the stack — D8).
+const AGE_FILTER_MIN = 0
+const AGE_FILTER_MAX = 120
 const perPageOptions = PER_PAGE_OPTIONS.map((value) => ({ value, title: String(value) }))
 
 // Bounded filter option sets. Country reuses the shared launch-market
@@ -146,6 +154,11 @@ const {
   // filter is sent only when BOTH are set (a one-sided range is ignored).
   available_from: availableFrom,
   available_to: availableTo,
+  // AH-088 — the age-range filter. Unlike availability, the two bounds are
+  // INDEPENDENT: `age_min` alone ("18+") and `age_max` alone are both useful
+  // queries, so neither waits for the other.
+  age_min: ageMin,
+  age_max: ageMax,
 } = useListQueryState({
   page: pageParam,
   per_page: perPageParam(PER_PAGE_OPTIONS, DEFAULT_PER_PAGE),
@@ -156,6 +169,8 @@ const {
   q: textParam,
   available_from: isoDateParam,
   available_to: isoDateParam,
+  age_min: boundedIntParam(AGE_FILTER_MIN, AGE_FILTER_MAX),
+  age_max: boundedIntParam(AGE_FILTER_MIN, AGE_FILTER_MAX),
 })
 
 const searchTerm = computed(() => (searchQuery.value ?? '').trim())
@@ -214,6 +229,16 @@ const headers = [
     sortable: false,
     width: 120,
   },
+  // AH-088 — the age column exists because the age FILTER does: filtering a
+  // list by a value the list doesn't show is a support ticket. Narrow and
+  // end-aligned like the campaigns count; the raw birthday is never on the wire.
+  {
+    title: t('app.roster.fields.age'),
+    key: 'attributes.age',
+    sortable: false,
+    width: 80,
+    align: 'end' as const,
+  },
   {
     title: t('app.roster.fields.language'),
     key: 'attributes.primary_language',
@@ -249,7 +274,9 @@ const hasActiveFilters = computed(
     languageFilter.value !== null ||
     categoryFilter.value !== null ||
     searchTerm.value !== '' ||
-    hasAvailabilityWindow.value,
+    hasAvailabilityWindow.value ||
+    ageMin.value !== null ||
+    ageMax.value !== null,
 )
 
 function countryLabel(code: string | null): string {
@@ -309,6 +336,10 @@ async function loadRoster(): Promise<void> {
       params.available_from = from
       params.available_to = to
     }
+    // AH-088 — each age bound threads independently ("18+" is a real query, and
+    // so is "under 30"), unlike the both-or-neither availability window above.
+    if (ageMin.value !== null) params.age_min = ageMin.value
+    if (ageMax.value !== null) params.age_max = ageMax.value
 
     const res = await rosterApi.list(agencyId, params)
     items.value = res.data
@@ -341,7 +372,18 @@ watch(
 // param (it's incomplete), completing the range reloads with it, clearing a
 // side drops it — all page-1 resets (mirrors the other filters).
 watch(
-  [statusFilter, countryFilter, languageFilter, categoryFilter, availableFrom, availableTo],
+  [
+    statusFilter,
+    countryFilter,
+    languageFilter,
+    categoryFilter,
+    availableFrom,
+    availableTo,
+    // AH-088 — the two age bounds join the structured set (not the debounced
+    // search set): they are numeric steppers, not free text being typed.
+    ageMin,
+    ageMax,
+  ],
   () => {
     page.value = 1
     void loadRoster()
@@ -451,6 +493,43 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
           hide-details
           clearable
           data-test="roster-category-filter"
+        />
+      </v-col>
+    </v-row>
+
+    <!-- AH-088 — the age-range filter. Two number inputs rather than a slider:
+         an agency filtering a roster has a specific bracket in mind ("21–35" for
+         a brief), and typing two numbers beats dragging two handles. Each bound
+         works ALONE, unlike the availability window below. Bounds are clamped
+         identically here, in the URL codec, and in the backend, so a shared link
+         resolves to the same rows everywhere. -->
+    <v-row dense class="mb-2">
+      <v-col cols="6" sm="3">
+        <v-text-field
+          v-model.number="ageMin"
+          type="number"
+          :label="t('app.roster.filters.age.min')"
+          :min="AGE_FILTER_MIN"
+          :max="AGE_FILTER_MAX"
+          density="compact"
+          variant="outlined"
+          hide-details
+          clearable
+          data-test="roster-age-min"
+        />
+      </v-col>
+      <v-col cols="6" sm="3">
+        <v-text-field
+          v-model.number="ageMax"
+          type="number"
+          :label="t('app.roster.filters.age.max')"
+          :min="AGE_FILTER_MIN"
+          :max="AGE_FILTER_MAX"
+          density="compact"
+          variant="outlined"
+          hide-details
+          clearable
+          data-test="roster-age-max"
         />
       </v-col>
     </v-row>
@@ -630,6 +709,16 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
 
       <template #item.attributes.country_code="{ item }">
         {{ countryLabel(item.attributes.country_code) }}
+      </template>
+
+      <!-- AH-088 — an em dash for an unknown age rather than a blank cell: in a
+           table a blank reads as a rendering bug, whereas the profile surfaces
+           (where the field sits in a labelled grid) hide the row entirely. Same
+           treatment the email column already gives a missing value. -->
+      <template #item.attributes.age="{ item }">
+        <span :data-test="`roster-age-${item.id}`">
+          {{ item.attributes.age ?? '—' }}
+        </span>
       </template>
 
       <template #item.attributes.primary_language="{ item }">

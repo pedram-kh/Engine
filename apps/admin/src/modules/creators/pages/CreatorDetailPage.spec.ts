@@ -74,6 +74,9 @@ function buildCreator(overrides: Partial<CreatorResource['attributes']> = {}): C
       bio: 'Old bio',
       country_code: 'IE',
       region: 'Dublin',
+      // AH-088 — the admin audience gets the DERIVED age and never the raw
+      // date_of_birth (D1), which is why only `age` appears in this fixture.
+      age: 31,
       phone: null,
       whatsapp: null,
       address_street: null,

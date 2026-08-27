@@ -103,6 +103,15 @@ const countryLabel = computed(() => {
   return COUNTRY_OPTIONS.find((c) => c.code === code)?.label ?? code
 })
 
+/**
+ * AH-088 — the derived age, from whichever payload this component was handed.
+ * Both carry it (the gated roster-detail profile and the thin discover profile),
+ * neither carries the raw birthday. Null when the creator has not entered one —
+ * the cell then hides rather than rendering an em dash, matching how the
+ * companions/categories cells treat "undisclosed".
+ */
+const age = computed(() => fullCreator.value?.age ?? thinProfile.value?.attributes.age ?? null)
+
 function languageLabel(code: string | null): string | null {
   if (code === null) return null
   return languageEndonym(code)
@@ -342,6 +351,10 @@ watch(() => [props.agencyId, props.creatorUlid], refresh, { immediate: true })
                 t('app.roster.fields.country')
               }}</span>
               <CountryDisplay :code="countryCode" :label="countryLabel" />
+            </div>
+            <div v-if="age !== null" data-test="creator-profile-content-age">
+              <span class="creator-profile-content__label">{{ t('app.roster.fields.age') }}</span>
+              <span class="text-body-2">{{ age }}</span>
             </div>
             <div>
               <span class="creator-profile-content__label">{{

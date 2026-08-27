@@ -132,6 +132,12 @@ final class AgencyCreatorDetailResource extends JsonResource
             'account_last_name' => $creator->user?->last_name,
             'country_code' => $creator->country_code,
             'region' => $creator->region,
+            // AH-088 — the DERIVED age only. The raw date_of_birth never
+            // appears here, and unlike the AH-005 contact block below it is not
+            // unlocked by the roster/non-blacklisted gate either: the birthday
+            // has no agency-facing mode at all. That asymmetry with contact is
+            // deliberate — see the withholding spec.
+            'age' => $creator->age(),
             'primary_language' => $creator->primary_language,
             'secondary_languages' => $creator->secondary_languages,
             'accent' => $creator->accent,

@@ -56,6 +56,7 @@ function makeCard(
     attributes: {
       display_name: 'Ada Lovelace',
       country_code: 'GB',
+      age: 36,
       primary_language: 'en',
       accent: null,
       content_companions: null,

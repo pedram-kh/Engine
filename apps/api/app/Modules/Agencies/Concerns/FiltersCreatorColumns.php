@@ -10,6 +10,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 /**
  * The creator-column filter + full-text search logic, shared between the
@@ -31,12 +32,31 @@ use Illuminate\Http\Request;
  * inside `whereHas('creator', ...)` (a sub-builder on `creators`); discovery
  * applies them directly on `Creator::query()`. Either way the predicates only
  * ever reference `creators` columns (display_name / bio / country_code /
- * primary_language / categories) — never a relation join — which is exactly
- * what makes them content-reusable. The relation-coupled filters (status,
- * availability) are NOT here: they stay private to the roster controller.
+ * primary_language / categories / date_of_birth) — never a relation join —
+ * which is exactly what makes them content-reusable. The relation-coupled
+ * filters (status, availability) are NOT here: they stay private to the roster
+ * controller.
+ *
+ * AH-088 adds `age_min`/`age_max` here rather than to the roster controller, on
+ * the trait's OWN criterion: an age predicate is a pure `creators`-column
+ * predicate, so anywhere else reopens exactly the drift this trait exists to
+ * prevent. The consequence is deliberate and tested: the discover endpoint
+ * ACCEPTS both parameters even though the discover UI ships no age filter
+ * (AH-088 D7 is a UI-only fence). The symmetry is a contract, not an accident —
+ * see the discover-side age-filter test.
  */
 trait FiltersCreatorColumns
 {
+    /**
+     * The clamp bounds for `?age_min=`/`?age_max=` (AH-088). Sanity rails on a
+     * query string, NOT a policy about who may use the platform: there is no
+     * minimum-age rule anywhere in the stack (offered and declined, D8), and the
+     * write path's own bounds are equally permissive.
+     */
+    private const int AGE_FILTER_MIN = 0;
+
+    private const int AGE_FILTER_MAX = 120;
+
     /**
      * Apply the creator-column filters. Each is optional and composable (they
      * AND together).
@@ -75,10 +95,92 @@ trait FiltersCreatorColumns
             $creatorQuery->whereJsonContains('categories', $category);
         }
 
+        $this->applyAgeFilters($creatorQuery, $request);
+
         $search = $request->query('q');
         if (is_string($search) && trim($search) !== '') {
             $this->applySearchFilter($creatorQuery, trim($search));
         }
+    }
+
+    /**
+     * `?age_min=` / `?age_max=` — an inclusive age-range filter (AH-088 D7),
+     * expressed as date bounds on `date_of_birth` so the database does the work
+     * and no per-row derivation is needed.
+     *
+     * The algebra, with `age` = whole years elapsed (the {@see
+     * \App\Modules\Creators\Models\Creator::age()} rule, where a birthday TODAY
+     * has already counted):
+     *
+     *   age >= min  ⟺  date_of_birth <= today - min years
+     *   age <= max  ⟺  age < max + 1  ⟺  date_of_birth > today - (max + 1) years
+     *
+     * Keep those two lines and Creator::age() in agreement — a creator shown as
+     * 24 must be returned by `age_min=24` and by `age_max=24`. Both directions
+     * are pinned at the exact boundary in the roster filter tests.
+     *
+     * `whereDate`, NOT a plain `where`, and this is load-bearing rather than
+     * stylistic: the two drivers store this column differently. Postgres holds a
+     * real `date` (`2001-08-27`), while SQLite receives the model's default
+     * datetime format (`2001-08-27 00:00:00`) — so a raw string comparison
+     * against `'2001-08-27'` is true on Postgres and FALSE on SQLite at exactly
+     * the boundary. That divergence would have shipped as a passing CI suite and
+     * an off-by-one-day filter in production, or the reverse. whereDate
+     * normalizes both sides to a date and costs nothing on a real `date` column.
+     *
+     * SEMANTICS WORTH SAYING OUT LOUD (AH-088 O5): because SQL comparisons
+     * against NULL are never true, ANY age bound excludes creators with no
+     * birthday on file — which on the day this ships is all ~279 of them. That
+     * is intended (an age filter cannot honestly claim an unknown age matches),
+     * but it means the filter looks "broken" until creators backfill. An
+     * "include unknown age" toggle is the named follow-up; it is not built.
+     *
+     * VALIDATION POSTURE (Q5): permissive read, clamped in code — the posture
+     * every other filter here uses. Junk is ignored rather than 422'd (there is
+     * no FormRequest on either read endpoint, and adding one to discover only
+     * would make the two behave differently for the same parameter), and an
+     * out-of-range number is clamped instead of rejected. A reversed range
+     * (min > max) needs no special case: the two bounds simply cannot both hold,
+     * so the result is empty, which is what the caller asked for.
+     *
+     * @template TModel of Model
+     *
+     * @param  Builder<TModel>  $creatorQuery
+     */
+    private function applyAgeFilters(Builder $creatorQuery, Request $request): void
+    {
+        $min = $this->clampedAge($request->query('age_min'));
+        if ($min !== null) {
+            $creatorQuery->whereDate('date_of_birth', '<=', Carbon::today()->subYears($min));
+        }
+
+        $max = $this->clampedAge($request->query('age_max'));
+        if ($max !== null) {
+            $creatorQuery->whereDate('date_of_birth', '>', Carbon::today()->subYears($max + 1));
+        }
+    }
+
+    /**
+     * A query-string age bound as an int within {@see self::AGE_FILTER_MIN}..
+     * {@see self::AGE_FILTER_MAX}, or null when the value is absent/not a number.
+     *
+     * `''` returns null (a cleared filter input is "no filter", not "age 0") and
+     * so does `'abc'`. A numeric value outside the range is clamped rather than
+     * dropped, so `age_min=999` narrows to nobody instead of silently widening to
+     * everybody — the safer failure for a filter.
+     */
+    private function clampedAge(mixed $value): ?int
+    {
+        if (! is_string($value) && ! is_int($value)) {
+            return null;
+        }
+
+        $raw = trim((string) $value);
+        if ($raw === '' || ! ctype_digit(ltrim($raw, '-'))) {
+            return null;
+        }
+
+        return max(self::AGE_FILTER_MIN, min(self::AGE_FILTER_MAX, (int) $raw));
     }
 
     /**

@@ -162,11 +162,19 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     await page.locator('[data-testid="profile-country"]').click()
     await page.getByRole('option', { name: 'Ireland' }).click()
 
-    // Region joined the six-field floor (AH-026 D1): the Step-2 forward gate
-    // now aligns to the full floor (D2), so without a region the "Save and
-    // continue" button stays disabled and this traversal would stall here.
-    // It's a plain text field.
+    // Region joined the floor (AH-026 D1): the Step-2 forward gate aligns to the
+    // full floor (D2), so without a region the "Save and continue" button stays
+    // disabled and this traversal would stall here. It's a plain text field.
     await page.locator('[data-testid="profile-region"]').locator('input').fill('Leinster')
+
+    // Date of birth joined the same floor (AH-088 D6) — likewise gating, so this
+    // fill is load-bearing for the traversal rather than incidental coverage. A
+    // native date input, so `.fill()` with an ISO string is enough (no menu).
+    await page.locator('[data-testid="profile-date-of-birth"]').locator('input').fill('1994-03-17')
+
+    // The age the platform will show, echoed back live from the entered date —
+    // the one place this E2E can prove the derivation reaches a real browser.
+    await expect(page.locator('[data-testid="profile-age-preview"]')).toBeVisible()
 
     await page.locator('[data-testid="profile-primary-language"]').click()
     await page.getByRole('option', { name: 'English' }).click()

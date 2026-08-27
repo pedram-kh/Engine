@@ -211,6 +211,7 @@
         "status": "Stare",
         "applicationStatus": "Application",
         "country": "Country",
+        "age": "Vârstă",
         "language": "Limbă",
         "categories": "Categories",
         "companions": "Cine apare în conținutul lor",
@@ -251,6 +252,10 @@
         "country": "Country",
         "language": "Limbă",
         "category": "Category",
+        "age": {
+          "min": "Vârstă min.",
+          "max": "Vârstă max."
+        },
         "availability": {
           "from": "Available from",
           "to": "Available to"

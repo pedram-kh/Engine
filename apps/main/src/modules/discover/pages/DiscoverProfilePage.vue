@@ -419,6 +419,12 @@ onMounted(() => {
               <span class="discover-profile__label">{{ t('app.roster.fields.country') }}</span>
               <CountryDisplay :code="attrs.country_code" :label="countryLabel" />
             </div>
+            <!-- AH-088 — the derived age. Hidden when unknown, matching how the
+                 grid's other cells treat undisclosed values. -->
+            <div v-if="attrs.age !== null" data-testid="discover-profile-age">
+              <span class="discover-profile__label">{{ t('app.roster.fields.age') }}</span>
+              <span class="text-body-2">{{ attrs.age }}</span>
+            </div>
             <div>
               <span class="discover-profile__label">{{ t('app.roster.fields.language') }}</span>
               <LanguageList

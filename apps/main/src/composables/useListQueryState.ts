@@ -154,6 +154,34 @@ export const isoDateParam: QueryParam<string | null> = {
   },
 }
 
+/**
+ * An integer bound within `[min, max]`, or null for unset (AH-088).
+ *
+ * Nullable because Vuetify's `clearable` writes `null`, like `textParam` and
+ * `isoDateParam`. The clamp mirrors the backend's, so the URL and the query the
+ * server actually ran agree — a shared `?age_min=999` link resolves to the same
+ * result set on both ends rather than looking like a different bug on each.
+ *
+ * A non-integer (including a decimal, and including a number outside the range
+ * on SERIALIZE) reads as unset rather than being coerced: a URL is user input,
+ * and quietly rounding it produces a filter nobody asked for.
+ */
+export function boundedIntParam(min: number, max: number): QueryParam<number | null> {
+  const clamp = (value: number): number => Math.min(max, Math.max(min, value))
+
+  return {
+    parse(raw) {
+      if (raw === null) return null
+      const parsed = Number(raw)
+      return Number.isInteger(parsed) ? clamp(parsed) : null
+    },
+    serialize(value) {
+      if (value === null || !Number.isInteger(value)) return null
+      return String(clamp(value))
+    },
+  }
+}
+
 /** Query equality over the raw shapes vue-router hands back (string | null | array). */
 function sameQuery(a: LocationQuery, b: LocationQueryRaw): boolean {
   const aKeys = Object.keys(a)

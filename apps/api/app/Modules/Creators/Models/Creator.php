@@ -38,6 +38,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $bio
  * @property string|null $country_code
  * @property string|null $region
+ * @property Carbon|null $date_of_birth
  * @property string|null $phone
  * @property string|null $whatsapp
  * @property string|null $address_street
@@ -109,6 +110,10 @@ final class Creator extends Model implements Auditable
         'bio',
         'country_code',
         'region',
+        // AH-088 — the creator's own date of birth. Written only by the owner
+        // (it is absent from AdminUpdateCreatorRequest::EDITABLE_FIELDS) and
+        // read out as a derived age by every other audience.
+        'date_of_birth',
         // AH-005 — optional, self-edited contact details. Plaintext (NOT
         // encrypted like the tax address): they are surfaced to non-blacklisted
         // connected agencies on the roster-detail surface.
@@ -243,6 +248,38 @@ final class Creator extends Model implements Auditable
     }
 
     /**
+     * The creator's age in whole years, or null when no date of birth has been
+     * entered (AH-088 D2).
+     *
+     * A plain method, deliberately NOT an Eloquent accessor: this codebase has
+     * no accessors at all (derived values are methods — the
+     * AgencyCreatorRelation::isProspect() family), and an accessor with
+     * `$appends` would push age into every implicit `toArray()`, including
+     * surfaces this chunk never audited. Emission stays explicit, per resource.
+     *
+     * Date-only arithmetic: the `date` cast normalizes the stored value to
+     * midnight and the comparison anchor is `today()`, so no time-of-day
+     * component can shift the result. The anchor is the application timezone
+     * (APP_TIMEZONE=UTC), which means a creator far east of UTC can see their
+     * age tick over up to a day late — accepted; a per-creator timezone is not
+     * data we hold.
+     *
+     * Keep the boundary rule here identical to the roster filter's
+     * (FiltersCreatorColumns::applyAgeFilters): a creator whose birthday is
+     * TODAY has already reached the new age.
+     */
+    public function age(): ?int
+    {
+        $dob = $this->date_of_birth;
+
+        if ($dob === null) {
+            return null;
+        }
+
+        return (int) $dob->startOfDay()->diffInYears(Carbon::today());
+    }
+
+    /**
      * Allowlist of attributes that may appear in audit before/after
      * snapshots. Excludes:
      *   - bio                  (free-text; GDPR-sensitive)
@@ -254,6 +291,12 @@ final class Creator extends Model implements Auditable
      *   - content_companions   (AH-050 — self-declared personal data about who
      *                           appears in the creator's content; deliberately
      *                           NOT audited, the accent precedent)
+     *   - date_of_birth        (AH-088 — the audit snapshot is admin-readable,
+     *                           so allowlisting the birthday would hand it to
+     *                           the one audience D1 withholds it from. Excluded
+     *                           by DECISION, not by omission: pinned by source
+     *                           inspection in DateOfBirthWithholdingTest, the
+     *                           content_companions precedent)
      *
      * Asserted by tests/Feature/Modules/Creators/CreatorAuditTest.php.
      *
@@ -291,6 +334,9 @@ final class Creator extends Model implements Auditable
     protected function casts(): array
     {
         return [
+            // AH-088 — `date`, not `datetime`: the cast normalizes to midnight
+            // so age arithmetic can never pick up a time-of-day component.
+            'date_of_birth' => 'date',
             'secondary_languages' => 'array',
             'content_companions' => 'array',
             'categories' => 'array',

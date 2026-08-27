@@ -108,6 +108,58 @@ it('Creator hasMany kyc_verifications', function (): void {
     expect($creator->kycVerifications)->toHaveCount(2);
 });
 
+/*
+|--------------------------------------------------------------------------
+| AH-088 — Creator::age() derivation
+|--------------------------------------------------------------------------
+|
+| The boundary rules the whole chunk rests on, pinned relative to `today()`
+| rather than against fixed dates, so they cannot rot into false greens as the
+| suite ages. The roster filter's SQL predicate must agree with these — that
+| agreement is asserted separately in the roster filter tests.
+|
+*/
+
+it('Creator::age() returns null when no date of birth is set', function (): void {
+    $creator = Creator::factory()->createOne(['date_of_birth' => null]);
+
+    expect($creator->age())->toBeNull();
+});
+
+it('Creator::age() counts whole years elapsed', function (): void {
+    $creator = Creator::factory()->createOne([
+        'date_of_birth' => now()->subYears(30)->subDays(10)->toDateString(),
+    ]);
+
+    expect($creator->age())->toBe(30);
+});
+
+it('Creator::age() treats a birthday TODAY as already reached', function (): void {
+    $creator = Creator::factory()->createOne([
+        'date_of_birth' => now()->subYears(25)->toDateString(),
+    ]);
+
+    expect($creator->age())->toBe(25);
+});
+
+it('Creator::age() has NOT yet counted a birthday one day away', function (): void {
+    $creator = Creator::factory()->createOne([
+        'date_of_birth' => now()->subYears(25)->addDay()->toDateString(),
+    ]);
+
+    expect($creator->age())->toBe(24);
+});
+
+it('Creator::age() is unaffected by a time component on the stored value', function (): void {
+    // The `date` cast normalizes to midnight; without it a late-evening
+    // timestamp could round the diff down by a year on the birthday itself.
+    $creator = Creator::factory()->createOne([
+        'date_of_birth' => now()->subYears(40)->setTime(23, 59, 59),
+    ]);
+
+    expect($creator->age())->toBe(40);
+});
+
 it('AgencyCreatorRelation supports prospect state with invitation columns', function (): void {
     $agency = AgencyFactory::new()->createOne();
     $creator = Creator::factory()->bootstrap()->createOne();

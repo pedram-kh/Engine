@@ -403,6 +403,18 @@ function openProfile(item: DiscoveryCreatorListItem): void {
                   <v-icon icon="mdi-map-marker-outline" size="14" />
                   {{ countryLabel(item.attributes.country_code) }}
                 </span>
+                <!-- AH-088 — age joins the icon meta row rather than the chip
+                     row: the chip row is single-line by design (categories +N),
+                     and a number reads better beside location than as a chip.
+                     Hidden when unknown — no "age unknown" placeholder. -->
+                <span
+                  v-if="item.attributes.age !== null"
+                  class="d-inline-flex align-center ga-1"
+                  :data-test="`discover-age-${item.id}`"
+                >
+                  <v-icon icon="mdi-cake-variant-outline" size="14" />
+                  {{ item.attributes.age }}
+                </span>
                 <span
                   v-if="languageLabel(item.attributes.primary_language)"
                   class="d-inline-flex align-center ga-1"

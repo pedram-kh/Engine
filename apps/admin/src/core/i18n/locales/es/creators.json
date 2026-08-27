@@ -104,6 +104,7 @@
           "primary_language": "Idioma principal",
           "secondary_languages": "Idiomas secundarios",
           "accent": "Acento",
+          "age": "Edad",
           "categories": "Categorías",
           "content_companions": "Quién aparece en su contenido"
         },

@@ -66,6 +66,10 @@ final class CreatorPublicProfileResource extends JsonResource
                 'bio' => $creator->bio,
                 'country_code' => $creator->country_code,
                 'region' => $creator->region,
+                // AH-088 — age is public-profile-grade (D4): a casting signal
+                // of the same class as accent and companions, so it ships on the
+                // thin/no-relation view too. The raw birthday never does.
+                'age' => $creator->age(),
                 'primary_language' => $creator->primary_language,
                 'secondary_languages' => $creator->secondary_languages,
                 'accent' => $creator->accent,

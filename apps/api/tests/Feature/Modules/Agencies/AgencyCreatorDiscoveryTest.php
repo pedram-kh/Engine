@@ -169,7 +169,11 @@ it('exposes the slim card shape and carries NONE of the relation block', functio
 
     $attrs = $response->json('data.0.attributes');
     expect(array_keys($attrs))->toEqualCanonicalizing([
-        'display_name', 'country_code', 'primary_language', 'accent',
+        // AH-088 — `age` (derived), never `date_of_birth` (raw). This exact
+        // keyset is the one pin in the suite that reds on any new card key, so
+        // it is also the guard that a raw birthday can never arrive here
+        // unnoticed.
+        'display_name', 'country_code', 'age', 'primary_language', 'accent',
         'content_companions', 'categories', 'avatar_url', 'relationship_status',
     ]);
 
@@ -181,6 +185,63 @@ it('exposes the slim card shape and carries NONE of the relation block', functio
         ->and($body)->not->toContain('internal_rating')
         ->and($body)->not->toContain('total_campaigns_completed')
         ->and($body)->not->toContain('is_blacklisted');
+});
+
+/**
+ * AH-088 (O3) — age asserted through the ENDPOINT, not the resource.
+ *
+ * The card's age is derived from `creators.date_of_birth`, which reaches the
+ * model only via the controller's slim projection. Constructing the resource
+ * directly hydrates a full model, so a resource-level test passes even with the
+ * column missing from the SELECT — and the card silently reads null in
+ * production. This test is the projection's only guard: drop
+ * `creators.date_of_birth` from the select and it reds.
+ */
+it('derives the card age through the slim projection (AH-088 O3)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    discoverableCreator([
+        'display_name' => 'Dated Dana',
+        'date_of_birth' => now()->subYears(31)->subDays(2)->toDateString(),
+    ]);
+
+    $response = $this->actingAs($admin)->getJson(discoverUrl($agency));
+
+    $response->assertOk()->assertJsonPath('data.0.attributes.age', 31);
+    expect($response->getContent())->not->toContain('date_of_birth');
+});
+
+/**
+ * AH-088 (O1 / D7) — discover ACCEPTS `age_min`/`age_max` with no discover UI.
+ *
+ * The age predicate lives in the shared FiltersCreatorColumns trait because it is
+ * a pure creators-column predicate, and the trait's whole purpose is that both
+ * surfaces read one implementation. The consequence is that discover gains the
+ * capability for free while its UI ships no age control (the D7 fence is
+ * UI-only). That is a deliberate outcome, so it is pinned: if someone later
+ * "tidies up" by moving the filter onto the roster controller, this reds and the
+ * decision gets re-made on purpose instead of by accident.
+ */
+it('discover accepts age_min/age_max from the shared trait, with no discover UI (AH-088 D7)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    discoverableCreator([
+        'display_name' => 'Young Yara',
+        'date_of_birth' => now()->subYears(22)->toDateString(),
+    ]);
+    discoverableCreator([
+        'display_name' => 'Older Otto',
+        'date_of_birth' => now()->subYears(48)->toDateString(),
+    ]);
+
+    $response = $this->actingAs($admin)->getJson(discoverUrl($agency, 'age_min=20&age_max=30'));
+
+    $response->assertOk();
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.attributes.display_name'))->toBe('Young Yara');
+    expect($response->json('data.0.attributes.age'))->toBe(22);
 });
 
 // ---------------------------------------------------------------------------

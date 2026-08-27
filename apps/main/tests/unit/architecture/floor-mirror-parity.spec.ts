@@ -1,7 +1,7 @@
 /**
  * Architecture test — creator profile FLOOR mirror parity (backend ↔ frontend).
  *
- * The six-field "profile floor" is duplicated by design:
+ * The seven-field "profile floor" is duplicated by design:
  *
  *   - Backend:  CompletenessScoreCalculator::isProfileComplete() — the gate
  *               boolean + the `profileEarned()` floor block.
@@ -14,10 +14,12 @@
  * adds a seventh floor field to the backend only. Then the wizard would let a
  * creator advance past step 2 (or save on the profile page) with a field the
  * backend still considers missing, stranding them at submit with no on-screen
- * cause. This is the field-edit-config-parity precedent doing its job.
+ * cause. This is the field-edit-config-parity precedent doing its job. AH-088
+ * is that same one-line edit done deliberately: date_of_birth was added to both
+ * sides and to FLOOR_FIELDS in one commit.
  *
  * Source-inspection only — it parses both source files as text (no eval, no
- * runtime DI). The six fields are pinned ONCE in FLOOR_FIELDS below, so a
+ * runtime DI). The fields are pinned ONCE in FLOOR_FIELDS below, so a
  * legitimate floor change is a one-line edit here with a self-explanatory
  * failure message rather than two magic assertions drifting apart.
  */
@@ -53,16 +55,19 @@ const FRONTEND_FORM_PATH = join(
 )
 
 /**
- * The six-field floor, pinned ONCE. Each entry names its backend attribute
+ * The seven-field floor, pinned ONCE. Each entry names its backend attribute
  * (as read via `$creator->…` in isProfileComplete) and its frontend reactive
  * token (as read via `….value` in floorMet). To legitimately change the floor,
  * edit this list AND both sources — the two assertions below force all three
  * to agree.
+ *
+ * date_of_birth joined with AH-088 D6, the same one-for-one shape region used.
  */
 const FLOOR_FIELDS = [
   { be: 'display_name', fe: 'displayName' },
   { be: 'country_code', fe: 'countryCode' },
   { be: 'region', fe: 'region' },
+  { be: 'date_of_birth', fe: 'dateOfBirth' },
   { be: 'primary_language', fe: 'primaryLanguage' },
   { be: 'categories', fe: 'categories' },
   { be: 'avatar_path', fe: 'hasAvatar' },
@@ -88,7 +93,7 @@ function uniqueTokens(body: string, re: RegExp): string[] {
 }
 
 describe('creator profile floor mirror parity (D1)', () => {
-  it('backend isProfileComplete() reads EXACTLY the six floor fields', () => {
+  it('backend isProfileComplete() reads EXACTLY the seven floor fields', () => {
     const php = readFileSync(BACKEND_CALCULATOR_PATH, 'utf-8')
     const body = extractBlock(
       php,
@@ -101,7 +106,7 @@ describe('creator profile floor mirror parity (D1)', () => {
     expect(referenced.sort()).toEqual([...expected].sort())
   })
 
-  it('frontend floorMet reads EXACTLY the six mirror fields', () => {
+  it('frontend floorMet reads EXACTLY the seven mirror fields', () => {
     const vue = readFileSync(FRONTEND_FORM_PATH, 'utf-8')
     const body = extractBlock(
       vue,

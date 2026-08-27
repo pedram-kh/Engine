@@ -211,6 +211,7 @@
         "status": "Būsena",
         "applicationStatus": "Application",
         "country": "Country",
+        "age": "Amžius",
         "language": "Kalba",
         "categories": "Categories",
         "companions": "Kas rodomas jų turinyje",
@@ -251,6 +252,10 @@
         "country": "Country",
         "language": "Kalba",
         "category": "Category",
+        "age": {
+          "min": "Min. amžius",
+          "max": "Maks. amžius"
+        },
         "availability": {
           "from": "Available from",
           "to": "Available to"

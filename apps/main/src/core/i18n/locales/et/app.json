@@ -211,6 +211,7 @@
         "status": "Olek",
         "applicationStatus": "Application",
         "country": "Country",
+        "age": "Vanus",
         "language": "Keel",
         "categories": "Categories",
         "companions": "Kes nende sisus esineb",
@@ -251,6 +252,10 @@
         "country": "Country",
         "language": "Keel",
         "category": "Category",
+        "age": {
+          "min": "Min. vanus",
+          "max": "Maks. vanus"
+        },
         "availability": {
           "from": "Available from",
           "to": "Available to"

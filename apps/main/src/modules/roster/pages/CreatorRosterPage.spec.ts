@@ -69,6 +69,7 @@ function makeRow(
       display_name: 'Ada Lovelace',
       email: 'ada@example.test',
       country_code: 'GB',
+      age: 36,
       primary_language: 'en',
       accent: null,
       content_companions: null,
@@ -215,6 +216,10 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     expect(harness.wrapper.find(`[data-test="roster-email-${row.id}"]`).text()).toBe(
       'ada@example.test',
     )
+
+    // AH-088 — the derived age has its own column, because the age-range filter
+    // acts on this list. The raw birthday is not on the row shape at all.
+    expect(harness.wrapper.find(`[data-test="roster-age-${row.id}"]`).text()).toBe('36')
 
     // Chunk 5b: the application-status chip is a SEPARATE axis from the
     // relationship chip — its own data-test + its own label ("Approved" vs
@@ -517,5 +522,53 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     const cleared = vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1] ?? {}
     expect(cleared).not.toHaveProperty('available_from')
     expect(cleared).not.toHaveProperty('available_to')
+  })
+
+  // AH-088 — the age bounds are INDEPENDENT, which is the one behavioural
+  // difference from the availability window above. Each alone must reach the API.
+  it('threads each age bound independently (AH-088)', async () => {
+    const harness = await mountRoster({ rows: [makeRow()] })
+    cleanup = harness.cleanup
+    const vm = harness.wrapper.vm as unknown as {
+      ageMin: number | null
+      ageMax: number | null
+    }
+
+    vi.mocked(rosterApi.list).mockClear()
+    vm.ageMin = 21
+    await flushPromises()
+    const minOnly = vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1] ?? {}
+    expect(minOnly).toMatchObject({ age_min: 21 })
+    expect(minOnly).not.toHaveProperty('age_max')
+
+    vi.mocked(rosterApi.list).mockClear()
+    vm.ageMax = 35
+    await flushPromises()
+    expect(vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1]).toMatchObject({
+      age_min: 21,
+      age_max: 35,
+    })
+
+    // Clearing (clearable → null) drops just that bound.
+    vi.mocked(rosterApi.list).mockClear()
+    vm.ageMin = null
+    await flushPromises()
+    const maxOnly = vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1] ?? {}
+    expect(maxOnly).not.toHaveProperty('age_min')
+    expect(maxOnly).toMatchObject({ age_max: 35 })
+  })
+
+  it('resumes age bounds from the URL and clamps hand-edited ones (AH-088)', async () => {
+    const harness = await mountRoster({
+      rows: [makeRow()],
+      // 999 clamps to the shared 120 ceiling rather than being dropped; `abc`
+      // is not a number at all and reads as unset.
+      url: '/roster?age_min=999&age_max=abc',
+    })
+    cleanup = harness.cleanup
+
+    const params = vi.mocked(rosterApi.list).mock.calls[0]?.[1]
+    expect(params).toMatchObject({ age_min: 120 })
+    expect(params).not.toHaveProperty('age_max')
   })
 })

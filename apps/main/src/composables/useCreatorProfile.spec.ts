@@ -55,6 +55,8 @@ function fullEnvelope(): AgencyCreatorDetailEnvelope {
           account_name: null,
           account_last_name: null,
           country_code: null,
+          // AH-088 — null is the real state for every creator alive at deploy.
+          age: null,
           region: null,
           primary_language: null,
           secondary_languages: null,
@@ -82,6 +84,7 @@ function thinEnvelope(): CreatorPublicProfileEnvelope {
         bio: null,
         country_code: null,
         region: null,
+        age: null,
         primary_language: null,
         secondary_languages: null,
         accent: null,

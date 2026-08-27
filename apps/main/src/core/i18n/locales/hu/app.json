@@ -211,6 +211,7 @@
         "status": "Állapot",
         "applicationStatus": "Application",
         "country": "Country",
+        "age": "Életkor",
         "language": "Nyelv",
         "categories": "Categories",
         "companions": "Ki jelenik meg a tartalmaikban",
@@ -251,6 +252,10 @@
         "country": "Country",
         "language": "Nyelv",
         "category": "Category",
+        "age": {
+          "min": "Min. életkor",
+          "max": "Max. életkor"
+        },
         "availability": {
           "from": "Available from",
           "to": "Available to"

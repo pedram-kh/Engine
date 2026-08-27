@@ -91,6 +91,7 @@ function makeDetail(
         account_last_name: 'Lovelace',
         country_code: 'GB',
         region: null,
+        age: 36,
         primary_language: 'en',
         secondary_languages: null,
         accent: null,

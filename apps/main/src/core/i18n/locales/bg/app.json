@@ -211,6 +211,7 @@
         "status": "Статус",
         "applicationStatus": "Application",
         "country": "Country",
+        "age": "Възраст",
         "language": "Език",
         "categories": "Categories",
         "companions": "Кой се появява в съдържанието им",
@@ -251,6 +252,10 @@
         "country": "Country",
         "language": "Език",
         "category": "Category",
+        "age": {
+          "min": "Мин. възраст",
+          "max": "Макс. възраст"
+        },
         "availability": {
           "from": "Available from",
           "to": "Available to"

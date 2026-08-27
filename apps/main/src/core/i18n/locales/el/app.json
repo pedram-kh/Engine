@@ -211,6 +211,7 @@
         "status": "Κατάσταση",
         "applicationStatus": "Application",
         "country": "Country",
+        "age": "Ηλικία",
         "language": "Γλώσσα",
         "categories": "Categories",
         "companions": "Ποιος εμφανίζεται στο περιεχόμενό τους",
@@ -251,6 +252,10 @@
         "country": "Country",
         "language": "Γλώσσα",
         "category": "Category",
+        "age": {
+          "min": "Ελάχ. ηλικία",
+          "max": "Μέγ. ηλικία"
+        },
         "availability": {
           "from": "Available from",
           "to": "Available to"

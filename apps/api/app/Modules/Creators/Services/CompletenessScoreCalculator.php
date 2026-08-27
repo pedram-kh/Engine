@@ -23,10 +23,11 @@ use Laravel\Pennant\Feature;
  *
  * Step weights (sum = 100):
  *
- *   profile      25  six-field floor (display_name + country + region +
- *                    primary_language + categories + avatar) worth 13, plus
- *                    per-optional-field credit (bio/accent/phone/whatsapp/
- *                    street/postal) totalling 12 (AH-026 D1 + D4). The unit
+ *   profile      25  seven-field floor (display_name + country + region +
+ *                    date_of_birth + primary_language + categories + avatar)
+ *                    worth 13, plus per-optional-field credit (bio/accent/
+ *                    phone/whatsapp/street/postal) totalling 12 (AH-026 D1 + D4,
+ *                    date_of_birth added by AH-088 D6). The unit
  *                    weight is still 25; only the numerator is now partial —
  *                    see {@see self::PROFILE_OPTIONAL_WEIGHTS} + {@see self::profileEarned()}.
  *   social       15  at least one connected account
@@ -49,7 +50,7 @@ final class CompletenessScoreCalculator
 {
     /**
      * D4 — the profile unit's 25 points split into the always-required
-     * six-field floor + per-optional-field credit. The floor is a single
+     * seven-field floor + per-optional-field credit. The floor is a single
      * all-or-nothing block; each optional adds its points INDEPENDENTLY of
      * the floor (Q2 = award-regardless), so the completeness meter never
      * "lies" by refusing to move when a creator fills an optional field.
@@ -131,7 +132,7 @@ final class CompletenessScoreCalculator
 
             $total += $weights[$step];
 
-            // The profile unit earns PARTIAL credit (D4): the six-field floor
+            // The profile unit earns PARTIAL credit (D4): the seven-field floor
             // is worth PROFILE_FLOOR_WEIGHT and each filled optional field adds
             // its own points, independent of whether the floor is met. Every
             // other unit stays all-or-nothing on its boolean. The profile
@@ -346,12 +347,20 @@ final class CompletenessScoreCalculator
         // Categories is the discriminating field — a creator can fill
         // every other text field but if they haven't picked at least one
         // category we can't surface them on agency search. Avatar is
-        // included to incentivise upload. Region joined the floor (AH-026 D1):
-        // the six-field floor is mirrored 1:1 by the FE `floorMet` in
+        // included to incentivise upload. Region joined the floor (AH-026 D1)
+        // and date_of_birth joined it the same way (AH-088 D6): the
+        // SEVEN-field floor is mirrored 1:1 by the FE `floorMet` in
         // ProfileBasicsForm.vue, pinned by the floor-mirror parity spec.
+        //
+        // AH-088 posture: no live creator has a birthday on the day this ships,
+        // so every one of them is floor-incomplete at rest — untouched, fully
+        // readable, and gated only on their NEXT profile edit. The persisted
+        // score moves once, when `creators:recompute-completeness` is re-run at
+        // deploy.
         return $creator->display_name !== null
             && $creator->country_code !== null
             && $creator->region !== null
+            && $creator->date_of_birth !== null
             && $creator->primary_language !== null
             && is_array($creator->categories) && count($creator->categories) > 0
             && $creator->avatar_path !== null;

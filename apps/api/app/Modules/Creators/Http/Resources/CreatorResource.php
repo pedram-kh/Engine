@@ -35,6 +35,15 @@ use Laravel\Pennant\Feature;
  * shape) — adding fields per-audience would split into separate
  * resources, which we explicitly chose not to do.
  *
+ * AH-088 amends that last sentence with exactly one exception, on the record:
+ * `date_of_birth` is emitted ONLY to the owner audience (`! $isAdminView`),
+ * because it is the first field on this resource whose exposure is
+ * differentiated by audience by decision rather than by convenience — the
+ * creator enters a birthday, everyone else (admin included) reads the derived
+ * `age`. The rule the docblock was defending — do not split one resource into
+ * two just to vary a field — is honored: one class, one shape, one conditional
+ * key. Any FUTURE per-audience field must clear the same bar or be refused.
+ *
  * `wizard.flags` (Sprint 3 Chunk 3 sub-step 1 — pause-condition-7
  * closure): exposes the three Phase-1 creator-side feature-flag
  * states on every bootstrap so the wizard renders the documented
@@ -116,6 +125,12 @@ final class CreatorResource extends JsonResource
                 'bio' => $creator->bio,
                 'country_code' => $creator->country_code,
                 'region' => $creator->region,
+                // AH-088 — the DERIVED age ships to both audiences: the admin
+                // drill-in legitimately needs to know a creator is 24, and the
+                // creator sees it beside their own input as a confirmation of
+                // what everyone else will read. The raw birthday does NOT ship
+                // to both — see the owner-only append below `$payload`.
+                'age' => $creator->age(),
                 // AH-005 — optional contact details. These live in the BASE
                 // (owner-self) attributes because the creator must read their
                 // own values to hydrate the wizard's Contact-details form. The
@@ -207,6 +222,18 @@ final class CreatorResource extends JsonResource
                 ],
             ],
         ];
+
+        // AH-088 D1 — the ONE per-audience field, and the deliberate exception
+        // to the one-shape doctrine above. The raw date is the creator's to read
+        // (they must hydrate their own date input) and nobody else's, admin
+        // included: the whole point of the chunk is that everyone downstream
+        // reads `age`. A single conditional emission keeps one resource class
+        // serving both audiences; the alternative was a second owner-only
+        // resource plus a second hydration path, which is more structure, not
+        // less. Pinned in both directions by DateOfBirthWithholdingTest.
+        if (! $this->isAdminView) {
+            $payload['attributes']['date_of_birth'] = $creator->date_of_birth?->toDateString();
+        }
 
         if ($this->isAdminView) {
             $payload['admin_attributes'] = [

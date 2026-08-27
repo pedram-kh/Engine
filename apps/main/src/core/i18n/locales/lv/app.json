@@ -211,6 +211,7 @@
         "status": "Statuss",
         "applicationStatus": "Application",
         "country": "Country",
+        "age": "Vecums",
         "language": "Valoda",
         "categories": "Categories",
         "companions": "Kas parādās viņu saturā",
@@ -251,6 +252,10 @@
         "country": "Country",
         "language": "Valoda",
         "category": "Category",
+        "age": {
+          "min": "Min. vecums",
+          "max": "Maks. vecums"
+        },
         "availability": {
           "from": "Available from",
           "to": "Available to"

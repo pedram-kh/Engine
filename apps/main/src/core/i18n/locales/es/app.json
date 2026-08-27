@@ -211,6 +211,7 @@
         "status": "Estado",
         "applicationStatus": "Solicitud",
         "country": "País",
+        "age": "Edad",
         "language": "Idioma",
         "categories": "Categorías",
         "companions": "Quién aparece en su contenido",
@@ -251,6 +252,10 @@
         "country": "País",
         "language": "Idioma",
         "category": "Categoría",
+        "age": {
+          "min": "Edad mín.",
+          "max": "Edad máx."
+        },
         "availability": {
           "from": "Disponible desde",
           "to": "Disponible hasta"

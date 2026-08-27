@@ -211,6 +211,7 @@
         "status": "Status",
         "applicationStatus": "Aanmelding",
         "country": "Land",
+        "age": "Leeftijd",
         "language": "Taal",
         "categories": "Categorieën",
         "companions": "Wie verschijnt er in hun content",
@@ -251,6 +252,10 @@
         "country": "Land",
         "language": "Taal",
         "category": "Categorie",
+        "age": {
+          "min": "Min. leeftijd",
+          "max": "Max. leeftijd"
+        },
         "availability": {
           "from": "Beschikbaar vanaf",
           "to": "Beschikbaar tot"

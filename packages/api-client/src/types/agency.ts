@@ -296,6 +296,12 @@ export interface RosterCreatorListItem {
      */
     application_status: CreatorApplicationStatus
     country_code: string | null
+    /**
+     * Derived age in whole years, null when the creator has entered no birthday
+     * (AH-088). On the LIST because the age-range filter is on this surface. The
+     * raw `date_of_birth` is never on any agency-facing shape.
+     */
+    age: number | null
     primary_language: string | null
     /** Free-text accent / dialect hint (e.g. "British"). Display-only. */
     accent: string | null
@@ -345,6 +351,22 @@ export interface RosterListParams {
    */
   available_from?: string
   available_to?: string
+  /**
+   * Inclusive age-range filter (AH-088). Each bound is INDEPENDENT — unlike the
+   * availability window above, `age_min` alone is a useful query. Compiled
+   * server-side into date bounds on `creators.date_of_birth`, so the raw birthday
+   * never travels in either direction.
+   *
+   * Both bounds are clamped to 0–120 by the backend; out-of-range values narrow
+   * rather than widen. NOTE: any age bound EXCLUDES creators who have entered no
+   * birthday, since an unknown age cannot honestly satisfy a range.
+   *
+   * The discovery endpoint accepts these too (the filter lives in the shared
+   * FiltersCreatorColumns trait); the discover UI simply ships no control for
+   * them yet.
+   */
+  age_min?: number
+  age_max?: number
   page?: number
   per_page?: number
 }
@@ -380,6 +402,12 @@ export interface AgencyCreatorDetailProfile {
   account_last_name: string | null
   country_code: string | null
   region: string | null
+  /**
+   * Derived age in whole years, null when unknown (AH-088). Unlike the contact
+   * block below this is NOT gated — and unlike the contact block, the underlying
+   * raw value never has an agency-facing mode at all.
+   */
+  age: number | null
   /**
    * Optional contact details (AH-005). Present ONLY when this agency's
    * relation to the creator is non-blacklisted (the server gates the whole
@@ -525,6 +553,8 @@ export interface DiscoveryCreatorListItem {
   attributes: {
     display_name: string | null
     country_code: string | null
+    /** Derived age in whole years, null when unknown (AH-088). */
+    age: number | null
     primary_language: string | null
     /** Free-text accent / dialect hint (e.g. "British"). Display-only. */
     accent: string | null
@@ -589,6 +619,8 @@ export interface CreatorPublicProfile {
     bio: string | null
     country_code: string | null
     region: string | null
+    /** Derived age in whole years, null when unknown (AH-088). */
+    age: number | null
     primary_language: string | null
     secondary_languages: string[] | null
     /** Free-text accent / dialect hint (e.g. "British"). Display-only. */

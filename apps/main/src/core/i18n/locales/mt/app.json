@@ -211,6 +211,7 @@
         "status": "Status",
         "applicationStatus": "Application",
         "country": "Country",
+        "age": "Età",
         "language": "Lingwa",
         "categories": "Categories",
         "companions": "Min jidher fil-kontenut tagħhom",
@@ -251,6 +252,10 @@
         "country": "Country",
         "language": "Lingwa",
         "category": "Category",
+        "age": {
+          "min": "Età min.",
+          "max": "Età mas."
+        },
         "availability": {
           "from": "Available from",
           "to": "Available to"

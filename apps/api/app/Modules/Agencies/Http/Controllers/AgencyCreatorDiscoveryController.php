@@ -79,6 +79,12 @@ final class AgencyCreatorDiscoveryController
                 'creators.ulid',
                 'creators.display_name',
                 'creators.country_code',
+                // AH-088 — the raw column is projected so the resource can
+                // derive `age`; it is NEVER emitted (the withholding spec pins
+                // that). Dropping it from this list does not fail a resource
+                // unit test — the card's age just goes null in production — so
+                // the discover index test asserts age through the ENDPOINT.
+                'creators.date_of_birth',
                 'creators.primary_language',
                 'creators.accent',
                 'creators.content_companions',

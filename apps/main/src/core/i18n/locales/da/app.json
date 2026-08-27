@@ -211,6 +211,7 @@
         "status": "Status",
         "applicationStatus": "Ansøgning",
         "country": "Land",
+        "age": "Alder",
         "language": "Sprog",
         "categories": "Kategorier",
         "companions": "Hvem optræder i deres indhold",
@@ -251,6 +252,10 @@
         "country": "Land",
         "language": "Sprog",
         "category": "Kategori",
+        "age": {
+          "min": "Min. alder",
+          "max": "Maks. alder"
+        },
         "availability": {
           "from": "Tilgængelig fra",
           "to": "Tilgængelig til"
