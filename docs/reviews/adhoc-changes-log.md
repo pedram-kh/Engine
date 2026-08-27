@@ -70,6 +70,73 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-092 · Campaign attachments from the Files library, chunk B — link, visibility, creator read
+
+- **Status:** Landed — push HELD (per Pedram's explicit instruction).
+- **Date:** 2026-08-27
+- **Why:** AH-091 gave agencies a document library but no way to put a file in front of a creator —
+  a brand brief or reference PDF sitting in the library was invisible to the very people producing
+  against it. Every existing per-campaign attachment path (offer attachments, assignment contracts)
+  is upload-shaped, one-off, and non-reusable; a library file needed a LINK, not a new upload.
+- **What:** a new `campaign_attachments` join table (`campaign_id` CASCADE, `agency_file_id`
+  RESTRICT, `visible_to_creators` boolean default `false`, `attached_by_user_id`, no ulid, no
+  soft-deletes — the `talent_pool_creators` shape, addressed by the FILE's own ulid nested under its
+  campaign). Agencies get an Attachments tab (placed after Overview) on the campaign detail page: a
+  multi-select attach picker reusing the library's new `?for=select` unpaginated thin projection (the
+  `BrandOptionResource` precedent), a per-row visibility toggle, and hard-delete detach. AH-091's
+  `hasAttachments()` stub (chunk A's vacuous `return false`) becomes a real query, turning the
+  library delete route's 409 `agency_file.attached` guard into a genuinely reachable outcome for the
+  first time. Creators read attachments through a single shared scope,
+  `CampaignAttachment::scopeCreatorVisible()` (flag ON AND a live file), composed independently at
+  TWO doors — assignment-detail (ownership-gated) and Jobs Board job-detail
+  (`JobsBoardVisibility`-gated) — through one narrow, byte-identical presenter,
+  `CreatorCampaignAttachmentResource` (`filename`, `mime_type`, `size_bytes`, a freshly-signed
+  `url` — never `storage_key`, never `visible_to_creators`, never `attached_by`). Deliberately absent
+  from the Jobs Board card list, the flat assignments list, and apply responses — enforced
+  structurally (the shared `cardAttributes()` block the card and detail resources both extend never
+  gained the key) rather than by convention alone.
+- **The one thing this session's own docs pass caught and fixed, not merely documented:** the
+  plan-pause's Q1 ruling assumed a race between a concurrent attach and a library-file soft-delete
+  would leave, at worst, a display inconsistency on the agency's own attachment list. A model-layer
+  probe against a real database (soft-delete a file behind a live attachment row, then read
+  `$attachment->agencyFile`) confirmed the CREATOR side is correctly invisible in that state, but
+  disproved the AGENCY side's claim — `CampaignAttachmentController::index()` would have
+  dereferenced a null file and 500'd the whole list. Fixed in the same session, before it shipped:
+  `index()` now filters out any attachment whose file resolved to `null`, with a dedicated regression
+  test reproducing the dangling row by bypassing the guard at the model layer (the same technique the
+  plan sanctioned for the creator-side scope test). `tech-debt.md`'s AH-092 entry carries the
+  corrected framing, not the original milder claim.
+- **Touched:** **Backend** — `CampaignAttachment` model + factory + migration; `AgencyFile::hasAttachments()`
+  wired to a real query + `campaignAttachments()` relation; `CampaignAttachmentController` (index,
+  store, update, destroy) + two form requests + `CampaignAttachmentResource` +
+  `CreatorCampaignAttachmentResource`; `AgencyFileController::index()`'s new `?for=select` branch +
+  `AgencyFileOptionResource`; `CreatorAssignmentDraftController` and `CreatorJobBoardController` both
+  eager-load the pre-filtered relation into their existing detail resources; three new `AuditAction`
+  cases (`campaign_attachment.added`/`visibility_changed`/`removed`). **Frontend** —
+  `apps/main/src/modules/campaigns/components/{AttachFilesDialog,AttachmentsTab}.vue` + the
+  `CampaignDetailPage` tab wiring; `apps/main/src/modules/creators/components/CreatorAttachmentsBlock.vue`
+  shared across `CreatorAssignmentDetailPage` and `CreatorJobDetailPage`; `formatFileSize` extracted
+  to `@catalyst/api-client`; new agency + creator DTOs and api-client wrapper methods; i18n ×24 for
+  both `app.campaigns.attachments.*` and `creator.ui.attachments.title`. **Tests** — four new Pest
+  files (38 tests net-new) plus the `AuditActionEnumTest` catalogue extension, and three new Vitest
+  files (19 tests net-new) plus extensions to four existing spec files. **E2E** — one new
+  `creator-jobs-board.spec.ts` case (render-only leg, per the plan's Q3 gate).
+- **Decisions:** the agency-side resource mints the download URL directly (Q2 — the Jobs-Board-card
+  volume argument for click-to-fetch doesn't apply to a campaign's own small, operator-verified
+  list). The E2E download-click joins only if feasible without a missing receiver (Q3) — found
+  infeasible this session (`MEDIA_DISK_DRIVER=local` forces every signed URL to `null` in Playwright),
+  extending the AH-091 debt line rather than opening a new one. No multi-file bulk-attach endpoint
+  (multi-select UI, one `POST` per file). No attachments on Jobs Board cards, the flat assignments
+  list, or apply responses (D6). No ordering/reorder UI. No new bucket or storage prefix — reuses
+  AH-091's `media` disk and the file's existing key.
+- **Ref:** [`campaign-attachments-review.md`](campaign-attachments-review.md) (production posture,
+  the Q1 correction, five break-revert proofs, the full gate board, and the three named pre-existing
+  Playwright TOTP flakes) · plan: [`campaign-attachments-plan.md`](campaign-attachments-plan.md) ·
+  inventory: [`campaign-attachments-inventory.md`](campaign-attachments-inventory.md) · opens one new
+  `tech-debt.md` entry under its own AH-092 heading and extends the AH-091 entry's item 3.
+
+---
+
 ### AH-091 · Agency Files library, chunk A — upload, list, delete
 
 - **Status:** Landed — push HELD (per Pedram's explicit instruction).

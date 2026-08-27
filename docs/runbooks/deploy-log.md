@@ -54,6 +54,58 @@ happened.
 
 ---
 
+## 2026-08-27 · AH-092 — campaign attachments from the Files library, chunk B — PENDING
+
+> **⚠ This entry STACKS on the AH-091 PENDING entry below** (which itself stacks on AH-090, and
+> AH-088 + AH-089, and AH-086 + b + AH-087). Whoever deploys next runs **all five** checklists in one
+> pass. Combined across all five: **5 migrations**, **`migrate` required**, **queue-worker restart
+> required** (still owed from the AH-088/089 range — this chunk adds no queued job of its own),
+> **PHP-FPM reload required**, and **one post-deploy artisan command** (the AH-088/089 entry's
+> `creators:recompute-completeness` — AH-090, AH-091, and AH-092 each add none of their own).
+
+- **Status:** PENDING
+- **Range:** the tip carrying the AH-091 entry → the tip carrying this entry.
+  - _(feature commit SHA to be filled once assigned)_ — `feat(campaigns): Campaign attachments from
+the Files library, chunk B (AH-092)` — the migration, model, controller/resources/requests, the
+    `hasAttachments()` real query, the creator read path on both doors, the picker's `?for=select`
+    branch, the SPA surface (Attachments tab, attach dialog, creator attachment block), i18n ×24,
+    and the full Pest + Vitest coverage.
+  - _(docs commit SHA to be filled once assigned)_ — `docs(reviews): Campaign attachments from the
+Files library, chunk B — review, tech-debt correction (AH-092)` — this entry, the review file,
+    the AH-092 ad-hoc log entry, the `tech-debt.md` AH-092 entry (with its mid-session Q1 correction)
+    and AH-091 item-3 extension, and the `docs/security/tenancy.md` two-row update.
+- **AH entries carried:** **AH-092.**
+- **Migrations run:** **1** — `2026_08_27_140000_create_campaign_attachments_table.php`. A
+  `CREATE TABLE`, nothing else: **no existing table is touched, no column added anywhere, no
+  backfill.** The table ships **EMPTY** and stays empty until an agency member attaches a file to a
+  campaign.
+  - **`down()` honesty:** `dropIfExists` is a true structural AND content inverse — this table is new
+    this chunk, so a rollback loses only this chunk's own attach/visibility history. No pre-existing
+    `campaigns`/`agency_files` row and no S3 object is touched either direction.
+- **Pre-deploy reads:** none. There is nothing to count — the table doesn't exist before this
+  migration runs, so there is no pre-existing population.
+- **Infra:** **queue-worker restart NOT required for this chunk specifically** — every operation
+  (attach, toggle, detach) runs synchronously in the request; the restart already owed by the
+  AH-088/089 range in the stack above is unaffected by this addition. **PHP-FPM reload required**
+  (new controller, model, resources, routes). No cron/scheduler change. No env changes, no new
+  secrets — reuses AH-091's `media` disk under the file's own existing key; attaching a file never
+  moves or duplicates its bytes.
+- **One-shot commands:** none.
+- **Post-deploy verification:** `/up` 200; then, authenticated as an agency member with a campaign
+  and a library file already in place, `POST
+/api/v1/agencies/{agency}/campaigns/{campaign}/attachments` with that file's ulid returns 201 and
+  the file's own delete route now returns 409 `agency_file.attached` while attached; `DELETE` the
+  attachment and confirm the file's delete route returns 204 again. As a creator with a visible
+  attachment on an assigned campaign, confirm `GET /api/v1/creators/me/assignments/{assignment}`'s
+  `attributes.attachments` array contains it with a live signed `url`.
+- **Flags armed:** none — this chunk ships no feature flag; the surface is live for every agency
+  member and every eligible creator the moment the deploy completes (no staged rollout was
+  requested).
+- **Operator:** _to be filled at deploy._
+- **Anything unexpected:** _to be filled at deploy._
+
+---
+
 ## 2026-08-27 · AH-091 — agency files library, chunk A: upload, list, delete — PENDING
 
 > **⚠ This entry STACKS on the AH-090 PENDING entry below** (which itself stacks on AH-088 + AH-089,

@@ -116,11 +116,81 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-08-27 · **Through:** AH-091, the Agency Files library (chunk A — upload,
-list, delete). **Push is HELD** on the two-commit pair (`706a0b6e` feat + the docs commit landing
-alongside this refresh) per Pedram's explicit instruction; no push, no CI run, and therefore no
-tip to cite yet. `git rev-parse --short HEAD` is the authority for the actual local tip — re-derive
-it, do not carry this session's SHA forward once a push happens.
+**Last updated:** 2026-08-27 · **Through:** AH-092, Campaign attachments from the Files library
+(chunk B — link, visibility, creator read). **Push is HELD** on the two-commit pair (the feature
+commit + the docs commit landing alongside this refresh) per Pedram's explicit instruction; no
+push, no CI run, and therefore no tip to cite yet. `git rev-parse --short HEAD` is the authority
+for the actual local tip — re-derive it, do not carry this session's SHA forward once a push
+happens.
+
+> **📝 AH-092 — CAMPAIGN ATTACHMENTS FROM THE FILES LIBRARY, CHUNK B: LINK, VISIBILITY, CREATOR
+> READ.** Full loop — read-only inventory (`campaign-attachments-inventory.md`) → kickoff (D1–D6) →
+> plan-pause (`campaign-attachments-plan.md`, Q1–Q3) → all rulings, Pedram, direct → build (S1–S9,
+> each green) → five break-revert proofs → this docs pass. Agencies can now link an AH-091
+> Files-library document to a campaign via a new `campaign_attachments` join table (`campaign_id`
+> CASCADE, `agency_file_id` RESTRICT, `visible_to_creators` boolean default `false`, no ulid, no
+> soft-deletes) and a new campaign-detail **Attachments** tab (attach picker, visibility toggle,
+> hard-delete detach). Creators read visible attachments through ONE shared scope
+> (`CampaignAttachment::scopeCreatorVisible()`: flag ON AND a live file) composed independently at
+> TWO doors — assignment-detail and Jobs Board job-detail — never on the board's card list or in an
+> apply response. AH-091's `hasAttachments()` stub becomes a real query, so the library delete
+> route's 409 guard is reachable for the first time.
+>
+> **Three things to know before touching it.**
+>
+> 1. **This session's own docs pass caught and fixed a real defect the plan-pause had UNDER-stated,
+>    not merely documented it.** The plan assumed the attach/soft-delete race's worst case was a
+>    harmless display inconsistency on the agency's OWN attachment list. A model-layer probe against
+>    a real database proved the CREATOR side correctly invisible in that state, but disproved the
+>    milder agency-side claim: `CampaignAttachmentController::index()` would have 500'd on a null
+>    file dereference. Fixed in this same session — `index()` now filters dangling rows — with a
+>    dedicated regression test, and `tech-debt.md`'s AH-092 entry carries the corrected framing.
+>    Read `campaign-attachments-review.md` §1 before assuming any of this chunk's own debt
+>    characterizations are the last word without re-checking them against the shipped code.
+> 2. **The card resource's byte-identity is structural, not conventional.** `attachments` is added
+>    only inside `CreatorJobDetailResource::toArray()`, never inside the shared
+>    `CreatorJobCardResource::cardAttributes()` block both the card and detail resources extend — a
+>    future edit that moves it into the shared block WILL leak attachments onto Jobs Board cards and
+>    the flat assignments list, and break-revert proof #3 (the review's §3) is the pin that would
+>    catch it.
+> 3. **The two creator read doors are independently gated, never one gate feeding two renders.**
+>    `CreatorCampaignAttachmentResource` itself enforces neither door — cases 3 (unlisted campaign)
+>    and 5 (severed roster relation) in `CreatorCampaignAttachmentReadPathTest.php` each prove one
+>    door dies while the OTHER survives, using the same attachment row.
+>
+> **Gate board (2026-08-27).** Backend Pest **2890 tests, 0 failures** (11048 assertions), including
+> 38 net-new AH-092 tests across four new files plus a three-verb `AuditActionEnumTest` catalogue
+> extension; PHPStan **0 errors**; Pint **passed**. `apps/main` Vitest **173 files / 1701 tests, all
+> passing**, including 19 net-new tests across three new spec files; `vue-tsc` clean; ESLint 0 new
+> errors; Prettier clean. **Five break-reverts, all restored, clean diff verified:** the not-visible
+> exact-keyset guard, the 409 seam, the card resource's structural byte-identity, the picker's
+> `?for=select` convention, and one locale's i18n parity key. **Playwright ran locally this session**
+> (Docker/Postgres reachable) — this chunk's own new E2E leg
+> (`creator-jobs-board.spec.ts`'s attachment render-only case) passed, both in the full board and
+> isolated. Three OTHER, pre-existing failures surfaced across both apps' full boards
+> (`2fa-enrollment-and-sign-in.spec.ts` main, `admin-mandatory-mfa-enrollment.spec.ts` +
+> `admin-sign-in.spec.ts` admin) — all TOTP-timing assertions, all confirmed unrelated (zero files
+> touched by this chunk anywhere near 2FA/MFA/auth in either app), two of the three main-app failures
+> (`creator-detail.spec.ts`, `talent-pools.spec.ts`) also confirmed as pure full-board flakiness
+> (pass alone). Named honestly in the review rather than silently waved through — see
+> [`campaign-attachments-review.md`](campaign-attachments-review.md) §4.
+>
+> **Deploy obligation: layered onto the still-held AH-091 range, not a fresh one.** A THIRD additive
+> migration stacked on AH-090/091's (`CREATE TABLE campaign_attachments`, ships empty); no new flag,
+> no new disk/bucket (reuses AH-091's `media` disk under the file's own existing key); PHP-FPM reload
+> required, queue-worker restart NOT required for this chunk specifically (the restart still owed
+> from the AH-088/089 range in the stack is unaffected). See the `deploy-log.md` 2026-08-27 AH-092
+> entry, stacked above the AH-091 one.
+>
+> **Deliberately not built:** a multi-file bulk-attach endpoint (D6 — multi-select UI, one `POST`
+> per file); attachments on Jobs Board cards, the flat assignments list, or apply responses (D6,
+> structurally enforced); ordering/reorder UI; a new bucket or storage prefix; the E2E
+> download-click leg (Q3 — found infeasible in this environment, `MEDIA_DISK_DRIVER=local` forces
+> every signed URL to `null`, extending rather than duplicating the AH-091 debt line).
+
+**Prior state, for the record — AH-091.** **Last updated:** 2026-08-27 · **Through:** AH-091, the
+Agency Files library (chunk A — upload, list, delete). Push was HELD on the two-commit pair
+(`706a0b6e` feat + its docs commit) at that close per Pedram's explicit instruction.
 
 > **Honest gap, named rather than silently caught up on:** **AH-085 → AH-090 landed without their
 > own Part 2 refresh** — the same class of miss this file already recorded once for AH-079 → AH-082
