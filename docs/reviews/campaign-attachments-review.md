@@ -1,17 +1,24 @@
 # Campaign attachments from the Files library, chunk B — REVIEW
 
-- **Status: Closed — approved, push HELD** (per Pedram's explicit instruction).
+- **Status: Closed — approved, pushed.**
 - **Date:** 2026-08-27
 - **Entry:** AH-092.
 - **Built from:** [`campaign-attachments-plan.md`](campaign-attachments-plan.md) (D1–D6, the
   plan-pause rulings Q1–Q3) and [`campaign-attachments-inventory.md`](campaign-attachments-inventory.md)
   (the read-only inventory that preceded the kickoff).
-- **Commits:** the feature + docs land as a two-commit pair per Pedram's instruction; both SHAs are
-  recorded once assigned (a commit cannot record its own hash — `git rev-parse --short HEAD` is the
-  authority, re-derive it, do not carry this session's numbers forward).
-- **CI at the pushed tip:** not yet applicable — push is held. This session's full local gate board
-  (§5) is the verification of record until a push triggers CI; that run, once it exists, is what
-  actually closes this chunk per the AH-091 precedent this file follows.
+- **Commits:** four, pushed together — `b9e0af4d` (inventory) · `1365de91` (kickoff + plan-pause) ·
+  `ec2401cd` (the feature — table, service seam, controller/policy/resources, SPA surface, i18n ×24,
+  Pest + Vitest coverage) · `3b8d8e0d` (the docs pass — this review, the tech-debt corrections, the
+  ad-hoc log entry, the tenancy.md rows, the deploy-log entry, the resumption refresh).
+- **CI at the pushed tip (§5.41):** green — all four jobs (Backend Pint+Larastan+Pest, Frontend
+  lint+typecheck+unit, E2E main SPA Playwright, E2E admin SPA Playwright) —
+  [run `33126867086`](https://github.com/pedram-kh/Engine/actions/runs/33126867086) at `3b8d8e0d`,
+  confirmed by `git rev-parse HEAD` / `git rev-parse origin/main` both resolving to that SHA. Both
+  Playwright jobs each carried exactly one CI-level flaky retry before passing —
+  `creator-wizard-happy-path.spec.ts` (main) and `admin-sign-in.spec.ts` (admin) — the same
+  TOTP/navigation-timing class as the three flakes this review's §4 already named from the local
+  run (none of the four specs across both runs touch this chunk's own files); CI's built-in retry
+  absorbed all of them, and the run is green.
 - **Reviewed against:** `docs/00-MASTER-ARCHITECTURE.md` §4 (tenancy), `docs/security/tenancy.md`,
   `docs/02-CONVENTIONS.md`, `docs/05-SECURITY-COMPLIANCE.md`, `docs/tech-debt.md`.
 
@@ -274,6 +281,13 @@ since neither has deployed yet).
   verified pre-existing and environment-tied (zero touched files across both apps' 2FA/MFA surfaces),
   not a regression from this work — named honestly rather than silently waved through, per the
   AH-091 review's own precedent for environmental gaps.
+- **CI at the pushed tip confirms the local board, rather than substituting for it.** All four jobs
+  green at `3b8d8e0d` — [run `33126867086`](https://github.com/pedram-kh/Engine/actions/runs/33126867086).
+  Both Playwright jobs' single flaky retries (`creator-wizard-happy-path.spec.ts`,
+  `admin-sign-in.spec.ts`) are the same TOTP/navigation-timing class already named from the local
+  run, on files this chunk did not touch — CI's own retry absorbed them, and this chunk's own new
+  E2E leg needed no retry at all in either environment.
 
-**Status: Closed — approved, push HELD. Awaiting Pedram's push instruction; CI's own run at the
-pushed tip is this chunk's actual closing verification, per the build request's own terms.**
+**Status: Closed — approved, pushed. CI green at `3b8d8e0d`
+([run `33126867086`](https://github.com/pedram-kh/Engine/actions/runs/33126867086)) — this chunk
+is closed.**
