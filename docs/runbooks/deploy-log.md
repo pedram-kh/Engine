@@ -62,6 +62,12 @@ happened.
 > required** (still owed from the AH-088/089 range — this chunk adds no queued job of its own),
 > **PHP-FPM reload required**, and **one post-deploy artisan command** (the AH-088/089 entry's
 > `creators:recompute-completeness` — AH-090, AH-091, and AH-092 each add none of their own).
+>
+> **Rider (2026-08-28): AH-093 joins this entry, not a new one.** A one-commit, template-only hide
+> (campaign duration removed from two creator Vue renders) with **zero deploy obligation of its
+> own** — no migration, no schema touch, no new route or controller, no queue/cron change, and
+> `apps/api` sees no diff at all. It rides the same stack purely for range completeness; the
+> combined totals above (5 migrations, PHP-FPM reload, etc.) are **unchanged by AH-093**.
 
 - **Status:** PENDING
 - **Range:** the tip carrying the AH-091 entry → the tip carrying this entry.
@@ -74,7 +80,12 @@ the Files library, chunk B (AH-092)` — the migration, model, controller/resour
 Files library, chunk B — review, tech-debt correction (AH-092)` — this entry, the review file,
     the AH-092 ad-hoc log entry, the `tech-debt.md` AH-092 entry (with its mid-session Q1 correction)
     and AH-091 item-3 extension, and the `docs/security/tenancy.md` two-row update.
-- **AH entries carried:** **AH-092.**
+  - `8547cc02` — `feat(creators): hide campaign duration on Jobs Board surfaces (AH-093)` — the
+    template-only render hide (`CreatorJobsPage.vue`, `CreatorJobDetailPage.vue`), the two flipped/
+    added Vitest specs, and this file's own AH-093 adhoc-log entry, all in one commit. **Rider only —
+    see the note above; no obligation added to this stack.**
+- **AH entries carried:** **AH-092, AH-093** (AH-093 is a zero-obligation rider — no migration, no
+  restart, no new route; `apps/api` untouched).
 - **Migrations run:** **1** — `2026_08_27_140000_create_campaign_attachments_table.php`. A
   `CREATE TABLE`, nothing else: **no existing table is touched, no column added anywhere, no
   backfill.** The table ships **EMPTY** and stays empty until an agency member attaches a file to a
@@ -87,9 +98,10 @@ Files library, chunk B — review, tech-debt correction (AH-092)` — this entry
 - **Infra:** **queue-worker restart NOT required for this chunk specifically** — every operation
   (attach, toggle, detach) runs synchronously in the request; the restart already owed by the
   AH-088/089 range in the stack above is unaffected by this addition. **PHP-FPM reload required**
-  (new controller, model, resources, routes). No cron/scheduler change. No env changes, no new
-  secrets — reuses AH-091's `media` disk under the file's own existing key; attaching a file never
-  moves or duplicates its bytes.
+  (new controller, model, resources, routes) — AH-092's own obligation; **AH-093's rider adds
+  nothing here** (a Vue template + Vitest spec change only — no PHP file, so no reload need of its
+  own). No cron/scheduler change. No env changes, no new secrets — reuses AH-091's `media` disk
+  under the file's own existing key; attaching a file never moves or duplicates its bytes.
 - **One-shot commands:** none.
 - **Post-deploy verification:** `/up` 200; then, authenticated as an agency member with a campaign
   and a library file already in place, `POST
@@ -97,7 +109,10 @@ Files library, chunk B — review, tech-debt correction (AH-092)` — this entry
   the file's own delete route now returns 409 `agency_file.attached` while attached; `DELETE` the
   attachment and confirm the file's delete route returns 204 again. As a creator with a visible
   attachment on an assigned campaign, confirm `GET /api/v1/creators/me/assignments/{assignment}`'s
-  `attributes.attachments` array contains it with a live signed `url`.
+  `attributes.attachments` array contains it with a live signed `url`. **AH-093's own check:** open
+  the Jobs Board card list and a job's detail page as a creator and confirm no "Duration: …" text
+  renders on either, while `GET /api/v1/creators/me/jobs` and its `/{campaign}` detail route still
+  return `listing_duration` in the JSON (byte-identical payload, hidden only in the SPA render).
 - **Flags armed:** none — this chunk ships no feature flag; the surface is live for every agency
   member and every eligible creator the moment the deploy completes (no staged rollout was
   requested).

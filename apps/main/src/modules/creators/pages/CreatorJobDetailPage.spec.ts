@@ -163,6 +163,13 @@ describe('CreatorJobDetailPage', () => {
     )
   })
 
+  it('does not render the campaign duration on the detail page (AH-093, render-only hide)', async () => {
+    const wrapper = await mountPage()
+
+    expect(wrapper.text()).not.toContain('4 weeks')
+    expect(wrapper.text()).not.toContain(enCreator.creator.ui.jobs.duration)
+  })
+
   // ── AH-081 — the trust boundary: agency-authored markdown rendered in a
   // creator's browser. Sanitizer correctness itself is pinned by
   // useRichBriefRenderer.spec.ts; this is the site-level proof that the

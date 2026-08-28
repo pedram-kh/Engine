@@ -70,6 +70,79 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-093 · Hide campaign duration on creator-facing surfaces (render-only)
+
+- **Status:** Landed. Fast batch (direct-iteration) — no kickoff, no review file; this entry is the
+  record. Single commit, push HELD per Pedram's explicit instruction.
+- **Date:** 2026-08-28
+- **Why:** Pedram wants the campaign duration invisible to creators on the Jobs Board (his
+  screenshots showed "Duration: 1 week" on both the card and the detail page) — a presentation
+  preference, not a data or policy change. Explicitly render-only: no schema, API/resource,
+  validation, or i18n-key change; the agency side (the listing form, which still requires the
+  field) is untouched everywhere.
+- **What:** removed the `<span v-if="job.attributes.listing_duration">` block from both creator
+  templates. The `job__meta` / `job-detail__meta` row reflows cleanly with fee + applicants intact
+  (no gap, no changed spacing — the removed span was a sibling, not a grid cell). The
+  `creator.ui.jobs.duration` i18n key stays defined in all 24 locales (still legitimate — the key
+  itself isn't the field, and Pedram's instruction was explicit that no i18n key gets deleted); the
+  `listing_duration` attribute keeps flowing byte-identical through `CreatorJobCardResource` /
+  `CreatorJobDetailResource` and the jobs-board listing form's floor-field requirement
+  (`listingFloor.ts` / `ValidatesJobsBoardListing`) is untouched.
+- **Production posture — a UI-layer hide, not a data suppression, by deliberate choice.**
+  `listing_duration` still sits in the `campaigns` table, still comes back byte-identical in both
+  creator JSON responses, still gates the agency's own listing form (the floor-field requirement),
+  and its i18n key is still in every locale bundle. Nothing about this change stops a creator who
+  opens the browser's network tab or Vue devtools from seeing the raw value on the wire — this hide
+  is scoped to the Vue template render only, exactly as Pedram's brief specified ("nothing is
+  deleted… a render-only hide"), and that residual dev-tools visibility is the accepted, named
+  trade-off of that scope, not an oversight.
+- **Surface sweep (path:line, pre-change):** exactly two creator-facing renders of the duration
+  field exist in the codebase — both now removed.
+  1. `apps/main/src/modules/creators/pages/CreatorJobsPage.vue:171-173` — the Jobs Board card.
+  2. `apps/main/src/modules/creators/pages/CreatorJobDetailPage.vue:231-233` — the Jobs Board detail
+     page.
+
+  No third surface exists: `CreatorAssignmentDetailPage.vue`'s only "duration" hit
+  (`duration_seconds`) is unrelated uploaded-media metadata, not the campaign's `listing_duration`;
+  neither `CreatorAssignmentsPage.vue` nor `CreatorDashboardPage.vue` renders the field at all;
+  there is no separate invitation/offer view in this codebase (the Jobs Board apply flow and the
+  assignment pages are the whole of the creator campaign-facing surface). The only other
+  `listing_duration` render site, `CampaignDetailPage.vue:328`, is agency-side and out of scope by
+  Pedram's explicit instruction.
+
+- **False-coverage note.** Before this batch, `CreatorJobsPage.spec.ts` carried a test literally
+  titled `'renders a card with the brand subset, fee, duration and applicant count'` whose body
+  never actually asserted the duration text — there was never a `data-testid` on the duration span
+  to select, so the fee/applicant/brand assertions ran and passed while "duration" sat in the title
+  unchecked. `CreatorJobDetailPage.spec.ts` had the same gap with no title even claiming it. In both
+  files, this batch's two new tests (below) are the **first real pins** on the duration's rendering
+  behavior — asserting its absence, since that's now the only true thing to assert.
+- **Flipped specs (assertion inverts, nothing deleted):**
+  1. `CreatorJobsPage.spec.ts` — the stale-titled test retitled to `'renders a card with the brand
+subset, fee and applicant count, but not the duration'` (fee/applicant/brand assertions unchanged).
+     New sibling test `'does not render the campaign duration on the card (AH-093, render-only
+hide)'` added, asserting the card's full text contains neither the fixture's `'4 weeks'` value nor
+     the `creator.ui.jobs.duration` i18n string.
+  2. `CreatorJobDetailPage.spec.ts` — no pre-existing test title even claimed the duration, so
+     nothing to retitle. New test `'does not render the campaign duration on the detail page
+(AH-093, render-only hide)'` added, same two-part assertion.
+  - **E2E:** `creator-jobs-board.spec.ts` (the c3 leg) seeds `listingDuration: '4 weeks'` via
+    `seedListedJob` but never asserted on the duration text either — checked line by line, no
+    `toContainText`/`toHaveText` touches it. Per Pedram's own "if yes, flip" framing, nothing
+    qualified to flip; the leg was re-run in full after the template change and both cases still
+    pass (fee + applicant-count assertions unaffected by the row's reflow).
+- **Touched:** `CreatorJobsPage.vue`, `CreatorJobDetailPage.vue` (both `-3` lines, template-only);
+  `CreatorJobsPage.spec.ts`, `CreatorJobDetailPage.spec.ts` (one retitle + one new test each).
+- **Gates:** `apps/main` Vitest full suite — **173 files / 1703 tests, all passing** (net +2 from
+  this batch). ESLint 0 new errors on the four touched files. `vue-tsc` clean. Playwright
+  `creator-jobs-board.spec.ts` — 2/2 passing, run in isolation against a real API.
+- **Decisions:** no `data-testid` added to a duration element that no longer exists — the two new
+  unit assertions check rendered text directly instead, since adding a testid purely to prove an
+  absence would be scope creep on a render-only hide.
+- **Ref:** this entry is the record (fast batch, no inventory/plan/review file).
+
+---
+
 ### AH-092 · Campaign attachments from the Files library, chunk B — link, visibility, creator read
 
 - **Status:** Landed — push HELD (per Pedram's explicit instruction).

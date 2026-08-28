@@ -168,9 +168,6 @@ onMounted(() => {
             <span v-if="job.attributes.listing_fee" :data-testid="`creator-job-fee-${job.id}`">
               {{ t('creator.ui.jobs.fee') }}: {{ job.attributes.listing_fee }}
             </span>
-            <span v-if="job.attributes.listing_duration">
-              {{ t('creator.ui.jobs.duration') }}: {{ job.attributes.listing_duration }}
-            </span>
             <span :data-testid="`creator-job-applicants-${job.id}`">
               {{ t('creator.ui.jobs.applicants', job.attributes.applicant_count) }}
             </span>

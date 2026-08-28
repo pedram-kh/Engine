@@ -95,7 +95,7 @@ describe('CreatorJobsPage', () => {
     mockApi.list.mockResolvedValue(envelope([card()]) as never)
   })
 
-  it('renders a card with the brand subset, fee, duration and applicant count', async () => {
+  it('renders a card with the brand subset, fee and applicant count, but not the duration', async () => {
     const wrapper = await mountPage()
 
     expect(wrapper.find('[data-testid="creator-job-brand-01JOB1"]').text()).toBe('Northwind Coffee')
@@ -106,6 +106,13 @@ describe('CreatorJobsPage', () => {
       '3 applicants',
     )
     expect(wrapper.find('[data-testid="creator-job-logo-01JOB1"]').exists()).toBe(true)
+  })
+
+  it('does not render the campaign duration on the card (AH-093, render-only hide)', async () => {
+    const wrapper = await mountPage()
+
+    expect(wrapper.text()).not.toContain('4 weeks')
+    expect(wrapper.text()).not.toContain(enCreator.creator.ui.jobs.duration)
   })
 
   it('pluralizes a single applicant', async () => {
