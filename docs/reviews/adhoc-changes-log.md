@@ -70,6 +70,62 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-094 · i18n used-key coverage tripwire (both SPAs)
+
+- **Status:** Landed. Fast batch (direct-iteration) — no kickoff, no review file; this entry is the
+  record.
+- **Date:** 2026-08-29
+- **Why:** Eyes-on report — the admin SPA's Agency Members card (AH-087 surface) was seen rendering
+  raw dotted i18n keys instead of copy (heading, boundary note, filters, role/status/MFA labels).
+  Investigation found the keys correctly present in all 24 `apps/admin` locale files and the loader
+  wiring intact, then reproduced the symptom against nothing: a scripted live-browser session (fresh
+  admin account, real sign-in + TOTP, the running dev server, current DB) rendered the Members card
+  perfectly in `en` — every string resolved, zero raw keys. The likely cause is a stale browser
+  tab / interrupted Vite HMR socket from one of that session's several dev-server restarts, not a
+  code defect; not independently reproducible, so nothing to fix there. But the investigation surfaced
+  a real, separate gap in what the test suite actually checks — see What.
+- **What — the gap `i18n-locale-parity.spec.ts` (both SPAs' "LangParityTest") cannot catch:** that
+  spec diffs each **non-`en`** locale against `en` (missing/extra keys, `{named}`-placeholder drift,
+  plural-form-count drift). It structurally cannot catch a key that is missing from **every** bundle,
+  including `en` itself — a typo'd path, a renamed namespace, a stale copy-pasted prefix — because
+  there is nothing to diff against; the spec stays green while the affected component renders a raw
+  key at runtime, exactly the reported symptom. `i18n-auth-codes.spec.ts` / `i18n-creator-codes.spec.ts`
+  are the closest existing relatives, but both harvest specific backend-code prefixes
+  (`auth.*`/`rate_limit.*`, `creator.*`) from `apps/api`, not `t()` call sites in the SPAs' own source.
+  Nothing previously verified "does a `t()` call in `apps/admin/src` or `apps/main/src` actually
+  resolve to something in `en`."
+  - **New tripwire, both SPAs:** `i18n-used-keys-resolve.spec.ts`, source-inspection tests that walk
+    every non-spec `.vue`/`.ts` file, harvest every `t(...)` call, and assert each resolves against
+    the SAME deep-merged `en` bundle the app boots with. Two harvested shapes: **static**
+    (`t('admin.foo.bar')`, whole path a literal, resolved exactly) and **template-prefix**
+    (``t(`admin.foo.${dynamic}`)``, only the literal portion before the first `${` is checked, and
+    only as an existing namespace — the enum-like dynamic suffix can't be enumerated statically). A
+    third shape, a fully-dynamic prefix (``t(`${variable}.title`)``), has no static portion to check
+    and is deliberately skipped — today that's exactly `MemberMfaActionDialog.vue`'s three `copyKey`
+    lookups in admin; none exist in main.
+  - **Admin:** 393 static + 21 prefix calls harvested, **0 missing**.
+  - **Main:** 1,348 static + 67 prefix calls harvested, **0 missing**.
+  - Confirms, by construction, that the reported symptom is not a current, live gap in either SPA's
+    `en` bundle — both harvests are already green.
+- **Sibling-gap disposition:** the kickoff for this batch flagged that `apps/main` had no equivalent
+  spec — same class of gap, larger surface (3.4× the call sites). Ported the admin harvester verbatim
+  (only the source root / locale root / merge strategy differ — main's `core/i18n/index.ts` merges its
+  seven namespace files with a shallow spread since none collide on a shared top-level key, unlike
+  admin's `admin.*`-sharing Sprint-13 modules; the new spec's own deep-merge is a strict superset-safe
+  choice either way). Came in well under the hour budget; landed in this same commit rather than as a
+  named follow-up.
+- **Touched:** `apps/admin/tests/unit/architecture/i18n-used-keys-resolve.spec.ts` (new),
+  `apps/main/tests/unit/architecture/i18n-used-keys-resolve.spec.ts` (new).
+- **Gates:** admin Vitest full suite — 57 files / 486 tests, all passing (net +3). Main Vitest full
+  suite — 174 files / 1,706 tests, all passing (net +3). ESLint clean on both new files.
+- **Decisions:** no attempt to statically resolve the fully-dynamic `${variable}.prefix` shape
+  (admin's `copyKey` lookups) — tracing the variable's possible values back to a finite set would
+  turn a source-inspection test into a partial type-checker; if that shape ever needs static coverage,
+  thread the specific mapping through the test rather than approximating it generally.
+- **Ref:** this entry is the record (fast batch, no inventory/plan/review file).
+
+---
+
 ### AH-093 · Hide campaign duration on creator-facing surfaces (render-only)
 
 - **Status:** Landed. Fast batch (direct-iteration) — no kickoff, no review file; this entry is the
