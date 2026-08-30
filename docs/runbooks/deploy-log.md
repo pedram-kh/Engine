@@ -78,6 +78,16 @@ happened.
 > branch + 48 touched locale files. `apps/admin` sees no diff. AH-094 (pure-test, both SPAs'
 > `i18n-used-keys-resolve.spec.ts`) is **not** added as a rider here — no runtime file changed,
 > nothing for a deploy to carry.
+>
+> **Rider (2026-08-30): AH-096 joins this entry, not a new one.** Fixes `roster.api.ts::list()`
+> silently dropping the `age_min`/`age_max` query params (an AH-088 wiring gap) — **zero deploy
+> obligation of its own**: no migration, no new route, and its one `apps/api` touch
+> (`CreateRosterCreatorsController` gaining a `date_of_birth` field) is a `/api/v1/_test/*`
+> test-helper route that `TestHelpersServiceProvider` never registers outside `local`/`testing` —
+> **not present in production at all**, so it needs no PHP-FPM reload, no config, nothing. The
+> stack's already-owed `apps/main` bundle rebuild is confirmed to carry this fix (`roster.api.ts`
+> only); `apps/admin` sees no diff. Combined totals above (5 migrations, PHP-FPM reload, etc.) are
+> **unchanged by AH-096**.
 
 - **Status:** PENDING
 - **Range:** the tip carrying the AH-091 entry → the tip carrying this entry.
@@ -103,9 +113,15 @@ the account for stranger invitees (AH-095)` — the new `create-account` route, 
 account — review, tech-debt, tenancy allowlist (AH-095)` — this entry, the review file, the
     AH-095 ad-hoc log entry, the new `tech-debt.md` invitation-revocation entry, and the
     `docs/security/tenancy.md` allowlist row.
-- **AH entries carried:** **AH-092, AH-093, AH-095** (AH-093 is a zero-obligation rider — no
-  migration, no restart, no new route, `apps/api` untouched; AH-095 adds a route + PHP-FPM-reload
-  need but no migration — see the rider note above).
+  - `0eb3a7da` — `fix(roster): thread age_min/age_max into the query string + class-sweep pin
+(AH-096)` — the `roster.api.ts` fix, the wrapper-level + structural (`api-wrapper-params-serialized
+    .spec.ts`, both SPAs) + Playwright pins, the test-helper-only `CreateRosterCreatorsController`
+    change, and the `creator-dob-age-review.md` addendum + this file's own AH-096 adhoc-log entry.
+    **Rider only — see the note above; no obligation added to this stack.**
+- **AH entries carried:** **AH-092, AH-093, AH-095, AH-096** (AH-093 and AH-096 are both
+  zero-obligation riders — no migration, no restart, no new production route; AH-096's one
+  `apps/api` touch is a test-helper route never registered outside `local`/`testing`. AH-095 adds a
+  route + PHP-FPM-reload need but no migration — see the rider notes above).
 - **Migrations run:** **1** — `2026_08_27_140000_create_campaign_attachments_table.php`. AH-095 adds
   **none** — the `users` table already had every column its `User::create()` call needs. A
   `CREATE TABLE`, nothing else: **no existing table is touched, no column added anywhere, no
@@ -143,7 +159,10 @@ account — review, tech-debt, tenancy allowlist (AH-095)` — this entry, the r
   `is_accepted: true` via the preview endpoint, the created `users` row has `email_verified_at` set,
   and re-submitting the same (now-stale) form returns 409 `invitation.already_accepted`. Separately
   confirm the byte-identical path: an invitee whose account already exists still sees the sign-in
-  prompt, never the new form.
+  prompt, never the new form. **AH-096's own check:** on the agency roster (`/roster`), set the
+  age-min/age-max filter to a narrow bracket around one known creator's age and confirm the table
+  narrows to just that creator (and any other creator without a `date_of_birth` on file drops out) —
+  the pre-fix symptom was exactly this filter doing nothing.
 - **Flags armed:** none — this chunk ships no feature flag; the surface is live for every agency
   member and every eligible creator the moment the deploy completes (no staged rollout was
   requested).
