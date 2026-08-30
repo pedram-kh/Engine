@@ -1175,8 +1175,13 @@
         "accepting": "Glacing…",
         "signInToContinue": "Sínigh isteach to accept this invitation",
         "signIn": "Sínigh isteach",
-        "noAccount": "Don't have an account?",
-        "signUp": "Cruthaigh one now",
+        "createAccount": {
+          "heading": "Cruthaigh do chuntas",
+          "subheading": "Tugadh cuireadh duit páirt a ghlacadh in {agencyName} mar {role}. Socraigh pasfhocal chun do chuntas a chruthú agus tosú.",
+          "submit": "Cruthaigh cuntas agus glac páirt",
+          "submitting": "Do chuntas á chruthú…",
+          "alreadyHaveAccount": "An bhfuil cuntas agat cheana féin?"
+        },
         "success": "Fáilte to {agencyName}! You're now a {role}.",
         "expired": {
           "heading": "This invitation has expired",

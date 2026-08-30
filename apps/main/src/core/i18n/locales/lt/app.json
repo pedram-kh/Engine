@@ -1175,8 +1175,13 @@
         "accepting": "Priimtiing…",
         "signInToContinue": "Prisijungti to accept this invitation",
         "signIn": "Prisijungti",
-        "noAccount": "Don't have an account?",
-        "signUp": "Sukurti one now",
+        "createAccount": {
+          "heading": "Susikurkite paskyrą",
+          "subheading": "Esate kviečiami prisijungti prie {agencyName} kaip {role}. Nustatykite slaptažodį, kad susikurtumėte paskyrą ir galėtumėte pradėti.",
+          "submit": "Sukurti paskyrą ir prisijungti",
+          "submitting": "Kuriama jūsų paskyra…",
+          "alreadyHaveAccount": "Jau turite paskyrą?"
+        },
         "success": "Sveiki atvykę to {agencyName}! You're now a {role}.",
         "expired": {
           "heading": "This invitation has expired",

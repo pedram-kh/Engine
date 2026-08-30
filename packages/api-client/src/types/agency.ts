@@ -904,10 +904,38 @@ export interface InvitationPreview {
   is_expired: boolean
   is_accepted: boolean
   expires_at: string
+  /**
+   * AH-095 — the invitation's target email, rendered read-only by the
+   * accept page. Disclosure is gated by token possession (the same
+   * unguessable 64-char secret this whole endpoint already requires),
+   * not a public lookup.
+   */
+  invited_email: string
+  /**
+   * AH-095 — true when a `users` row already exists for `invited_email`.
+   * Drives the accept page's D1 branch: `true` → today's
+   * sign-in-then-accept path; `false` → the inline set-password form.
+   */
+  account_exists: boolean
 }
 
 export interface InvitationPreviewEnvelope {
   data: InvitationPreview
+}
+
+/**
+ * `POST /api/v1/agencies/{agency}/invitations/create-account` request body
+ * (AH-095 — the stranger path). Deliberately has NO `email` field: the
+ * created account's email is always the invitation's own email, enforced
+ * server-side by the request schema's absence of the field, not by a
+ * value check.
+ */
+export interface CreateAccountAndAcceptInvitationPayload {
+  token: string
+  name: string
+  last_name: string
+  password: string
+  password_confirmation: string
 }
 
 // ---------------------------------------------------------------------------

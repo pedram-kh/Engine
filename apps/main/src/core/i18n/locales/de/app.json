@@ -1175,8 +1175,13 @@
         "accepting": "Wird angenommen…",
         "signInToContinue": "Melde dich an, um diese Einladung anzunehmen",
         "signIn": "Anmelden",
-        "noAccount": "Noch kein Konto?",
-        "signUp": "Jetzt erstellen",
+        "createAccount": {
+          "heading": "Erstelle dein Konto",
+          "subheading": "Du wirst eingeladen, {agencyName} als {role} beizutreten. Lege ein Passwort fest, um dein Konto zu erstellen und loszulegen.",
+          "submit": "Konto erstellen & beitreten",
+          "submitting": "Konto wird erstellt…",
+          "alreadyHaveAccount": "Hast du schon ein Konto?"
+        },
         "success": "Willkommen bei {agencyName}! Du bist jetzt {role}.",
         "expired": {
           "heading": "Diese Einladung ist abgelaufen",

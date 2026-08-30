@@ -66,6 +66,18 @@ enum AuditAction: string
     case InvitationAccepted = 'invitation.accepted';
     case InvitationExpiredOnAttempt = 'invitation.expired_on_attempt';
 
+    // AH-095 — invite acceptance that ALSO creates the account (the
+    // stranger path: no account existed for the invited email). A
+    // dedicated verb, not a payload flag on `invitation.accepted`,
+    // because review priority #6 wants this row independently
+    // queryable — a WHERE on the action beats a JSON-path filter on
+    // metadata. `UserSignedUp` is deliberately NOT dispatched for this
+    // path: its own docblock asserts a creator-typed, unverified
+    // account, both false here, so reusing it would either go stale or
+    // mislead the next reader. This verb is the sole record of "an
+    // account was born from an invitation, not self-serve sign-up."
+    case InvitationAcceptedWithNewAccount = 'invitation.accepted_with_new_account';
+
     // Agency settings verbs (Sprint 2 Chunk 1).
     case AgencySettingsUpdated = 'agency_settings.updated';
 

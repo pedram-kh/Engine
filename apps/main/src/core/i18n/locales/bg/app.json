@@ -1175,8 +1175,13 @@
         "accepting": "Приеметеing…",
         "signInToContinue": "Влезте to accept this invitation",
         "signIn": "Влезте",
-        "noAccount": "Don't have an account?",
-        "signUp": "Създайте one now",
+        "createAccount": {
+          "heading": "Създайте своя акаунт",
+          "subheading": "Поканени сте да се присъедините към {agencyName} като {role}. Задайте парола, за да създадете акаунта си и да започнете.",
+          "submit": "Създай акаунт и се присъедини",
+          "submitting": "Създаване на акаунта…",
+          "alreadyHaveAccount": "Вече имате акаунт?"
+        },
         "success": "Добре дошли to {agencyName}! You're now a {role}.",
         "expired": {
           "heading": "This invitation has expired",

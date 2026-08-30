@@ -1175,8 +1175,13 @@
         "accepting": "Elfogadásing…",
         "signInToContinue": "Bejelentkezés to accept this invitation",
         "signIn": "Bejelentkezés",
-        "noAccount": "Don't have an account?",
-        "signUp": "Létrehozás one now",
+        "createAccount": {
+          "heading": "Hozza létre a fiókját",
+          "subheading": "Meghívást kapott, hogy csatlakozzon a {agencyName} ügynökséghez mint {role}. Állítson be egy jelszót a fiók létrehozásához és a kezdéshez.",
+          "submit": "Fiók létrehozása és csatlakozás",
+          "submitting": "Fiók létrehozása…",
+          "alreadyHaveAccount": "Már van fiókja?"
+        },
         "success": "Üdvözöljük to {agencyName}! You're now a {role}.",
         "expired": {
           "heading": "This invitation has expired",

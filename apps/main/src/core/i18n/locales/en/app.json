@@ -1213,9 +1213,14 @@
         "accepting": "Accepting…",
         "signInToContinue": "Sign in to accept this invitation",
         "signIn": "Sign in",
-        "noAccount": "Don't have an account?",
-        "signUp": "Create one now",
         "success": "Welcome to {agencyName}! You're now a {role}.",
+        "createAccount": {
+          "heading": "Create your account",
+          "subheading": "You're being invited to join {agencyName} as {role}. Set a password to create your account and get started.",
+          "submit": "Create account & join",
+          "submitting": "Creating your account…",
+          "alreadyHaveAccount": "Already have an account?"
+        },
         "expired": {
           "heading": "This invitation has expired",
           "body": "Please contact your agency administrator to request a new invitation."

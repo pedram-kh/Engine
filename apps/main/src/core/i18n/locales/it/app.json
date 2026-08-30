@@ -1175,8 +1175,13 @@
         "accepting": "Accettazione…",
         "signInToContinue": "Accedi per accettare questo invito",
         "signIn": "Accedi",
-        "noAccount": "Non hai un account?",
-        "signUp": "Creane uno ora",
+        "createAccount": {
+          "heading": "Crea il tuo account",
+          "subheading": "Sei invitato ad unirti a {agencyName} come {role}. Imposta una password per creare il tuo account e iniziare.",
+          "submit": "Crea account e unisciti",
+          "submitting": "Creazione del tuo account…",
+          "alreadyHaveAccount": "Hai già un account?"
+        },
         "success": "Benvenuto/a in {agencyName}! Ora sei {role}.",
         "expired": {
           "heading": "Questo invito è scaduto",

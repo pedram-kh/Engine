@@ -8,30 +8,45 @@
  * if unauthenticated, show sign-in CTA with redirect preserved.
  *
  * State machine:
- *   loading    → previewing the invitation (unauthenticated preview endpoint)
- *   expired    → "This invitation has expired" + contact admin msg
- *   accepted   → "Already accepted" + sign-in CTA
- *   pending    →  authenticated: "Accept" button → POST accept
- *             → unauthenticated: "Sign in to accept" CTA
- *   success    → "Welcome!" message
- *   error      → generic error state
+ *   loading         → previewing the invitation (unauthenticated preview endpoint)
+ *   expired         → "This invitation has expired" + contact admin msg
+ *   accepted        → "Already accepted" + sign-in CTA
+ *   pending         →  authenticated: "Accept" button → POST accept
+ *   not-authenticated → unauthenticated + an account already exists for the
+ *                     invited email: "Sign in to accept" CTA
+ *   no-account      → AH-095: unauthenticated + NO account exists for the
+ *                     invited email: inline set-password form. Submitting
+ *                     creates the account, activates the membership, and
+ *                     signs the user in — no round-trip through sign-up.
+ *   success         → "Welcome!" message
+ *   error           → generic error state
  *
  * Note: invitation.expired_on_attempt (410 from accept endpoint) is
  * surfaced as distinct from the preview "is_expired: true" path —
  * both show the expired message but the 410 is logged in audit trail.
+ *
+ * AH-095 D1: the branch between `not-authenticated` and `no-account` is
+ * `preview.account_exists`, computed server-side by the SAME preview
+ * call this page already made — no extra round-trip. An authenticated
+ * user ALWAYS lands on `pending` regardless of `account_exists` (an
+ * existing-account holder who is already signed in has nothing new to
+ * create), so the existing-account path is byte-identical to before
+ * AH-095: this file changes nothing about how an authenticated
+ * acceptance behaves.
  */
 
-import { ApiError } from '@catalyst/api-client'
+import { ApiError, extractFieldErrors } from '@catalyst/api-client'
 import type { InvitationPreview } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
+import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { invitationsApi } from '../api/invitations.api'
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
@@ -44,6 +59,7 @@ type PageState =
   | 'already-accepted'
   | 'pending'
   | 'not-authenticated'
+  | 'no-account'
   | 'email-mismatch'
   | 'already-member'
   | 'not-found'
@@ -53,6 +69,17 @@ type PageState =
 const state = ref<PageState>('loading')
 const preview = ref<InvitationPreview | null>(null)
 const accepting = ref(false)
+
+// AH-095 — the no-account (create-account) form's local state.
+type CreateAccountField = 'name' | 'last_name' | 'password' | 'password_confirmation'
+const firstName = ref('')
+const lastName = ref('')
+const newPassword = ref('')
+const newPasswordConfirmation = ref('')
+const creatingAccount = ref(false)
+const createAccountFieldErrors = ref<Partial<Record<CreateAccountField, readonly string[]>>>({})
+const createAccountErrorKey = ref<string | null>(null)
+const createAccountErrorValues = ref<Record<string, string | number>>({})
 
 const token = computed(() => {
   const t = route.query.token
@@ -96,7 +123,9 @@ async function loadPreview(): Promise<void> {
     } else if (res.data.is_accepted) {
       state.value = 'already-accepted'
     } else if (!isAuthenticated.value) {
-      state.value = 'not-authenticated'
+      // AH-095 D1: branch on account existence. An authenticated user
+      // always takes the `pending` path below, unchanged.
+      state.value = res.data.account_exists ? 'not-authenticated' : 'no-account'
     } else {
       state.value = 'pending'
     }
@@ -145,6 +174,72 @@ async function acceptInvitation(): Promise<void> {
     }
   } finally {
     accepting.value = false
+  }
+}
+
+/**
+ * AH-095 — the stranger path: submits the set-password form, which
+ * atomically creates the account, activates the membership, consumes
+ * the token, and establishes the session server-side in one call.
+ *
+ * `authStore.setUser()` is called DIRECTLY with the response — the
+ * same "no bootstrap round-trip" shape `login()` uses — so the SPA
+ * lands signed-in without a second `/me` fetch.
+ */
+async function createAccountAndAccept(): Promise<void> {
+  const tok = token.value
+  const a = agencyId.value
+  if (!tok || !a) return
+
+  createAccountErrorKey.value = null
+  createAccountErrorValues.value = {}
+  createAccountFieldErrors.value = {}
+  creatingAccount.value = true
+  try {
+    const result = await invitationsApi.createAccount(a, {
+      token: tok,
+      name: firstName.value,
+      last_name: lastName.value,
+      password: newPassword.value,
+      password_confirmation: newPasswordConfirmation.value,
+    })
+    authStore.setUser(result.data)
+    state.value = 'success'
+    setTimeout(() => {
+      void router.push({ name: 'app.dashboard' })
+    }, 2000)
+  } catch (err) {
+    if (err instanceof ApiError) {
+      createAccountFieldErrors.value = extractFieldErrors<CreateAccountField>(err)
+
+      // D3 collision race: an account was created for this email between
+      // page-load and this submit. Re-branch to the sign-in path rather
+      // than a dead-end error — identical treatment to account_exists:
+      // true from the preview call.
+      if (err.code === 'invitation.account_exists') {
+        state.value = 'not-authenticated'
+        return
+      }
+      if (err.status === 410 || err.code === 'invitation.expired') {
+        state.value = 'expired'
+        return
+      }
+      if (err.code === 'invitation.already_accepted') {
+        state.value = 'already-accepted'
+        return
+      }
+      if (err.status === 404) {
+        state.value = 'not-found'
+        return
+      }
+    }
+    if (Object.keys(createAccountFieldErrors.value).length === 0) {
+      const resolved = resolveErrorMessage(err, (k) => te(k))
+      createAccountErrorKey.value = resolved.key
+      createAccountErrorValues.value = resolved.values
+    }
+  } finally {
+    creatingAccount.value = false
   }
 }
 
@@ -219,10 +314,112 @@ onMounted(loadPreview)
       >
         {{ t('app.invitation.accept.signIn') }}
       </v-btn>
-      <p class="text-body-2 text-medium-emphasis">
-        {{ t('app.invitation.accept.noAccount') }}
-        <router-link :to="{ name: 'auth.sign-up' }" data-test="accept-sign-up-link">
-          {{ t('app.invitation.accept.signUp') }}
+    </v-card>
+
+    <!-- No account — AH-095: the stranger path. Set-password form that
+         creates the account, activates the membership, and signs the
+         user in, all in one submit. -->
+    <v-card
+      v-else-if="state === 'no-account'"
+      class="pa-8"
+      max-width="480"
+      data-test="accept-invitation-create-account"
+    >
+      <div class="text-center mb-6">
+        <v-icon icon="mdi-account-plus-outline" size="64" color="primary" class="mb-4" />
+        <h2 class="text-h5 mb-2">{{ t('app.invitation.accept.createAccount.heading') }}</h2>
+        <p v-if="preview" class="text-body-2 text-medium-emphasis">
+          {{
+            t('app.invitation.accept.createAccount.subheading', {
+              agencyName: preview.agency_name,
+              role: t(`app.agencyUsers.roles.${preview.role}`),
+            })
+          }}
+        </p>
+      </div>
+
+      <form novalidate @submit.prevent="createAccountAndAccept">
+        <v-text-field
+          id="create-account-email"
+          :model-value="preview?.invited_email ?? ''"
+          :label="t('auth.ui.labels.email')"
+          readonly
+          data-test="create-account-email"
+        />
+        <v-text-field
+          id="create-account-first-name"
+          v-model="firstName"
+          :label="t('auth.ui.labels.first_name')"
+          :error-messages="createAccountFieldErrors.name"
+          autocomplete="given-name"
+          required
+          data-test="create-account-first-name"
+        />
+        <v-text-field
+          id="create-account-last-name"
+          v-model="lastName"
+          :label="t('auth.ui.labels.last_name')"
+          :error-messages="createAccountFieldErrors.last_name"
+          autocomplete="family-name"
+          required
+          data-test="create-account-last-name"
+        />
+        <v-text-field
+          id="create-account-password"
+          v-model="newPassword"
+          :label="t('auth.ui.labels.password')"
+          :error-messages="createAccountFieldErrors.password"
+          type="password"
+          autocomplete="new-password"
+          required
+          data-test="create-account-password"
+        />
+        <v-text-field
+          id="create-account-password-confirmation"
+          v-model="newPasswordConfirmation"
+          :label="t('auth.ui.labels.password_confirmation')"
+          :error-messages="createAccountFieldErrors.password_confirmation"
+          type="password"
+          autocomplete="new-password"
+          required
+          data-test="create-account-password-confirmation"
+        />
+
+        <div
+          role="alert"
+          aria-live="polite"
+          class="text-error text-body-2 mb-2"
+          data-test="create-account-error"
+        >
+          <template v-if="createAccountErrorKey !== null">
+            {{ t(createAccountErrorKey, createAccountErrorValues) }}
+          </template>
+        </div>
+
+        <v-btn
+          type="submit"
+          color="primary"
+          size="large"
+          block
+          :loading="creatingAccount"
+          :disabled="creatingAccount"
+          data-test="create-account-submit"
+        >
+          {{
+            creatingAccount
+              ? t('app.invitation.accept.createAccount.submitting')
+              : t('app.invitation.accept.createAccount.submit')
+          }}
+        </v-btn>
+      </form>
+
+      <p class="text-body-2 text-medium-emphasis text-center mt-4">
+        {{ t('app.invitation.accept.createAccount.alreadyHaveAccount') }}
+        <router-link
+          :to="{ name: 'auth.sign-in', query: { redirect: redirectParam } }"
+          data-test="create-account-sign-in-link"
+        >
+          {{ t('app.invitation.accept.signIn') }}
         </router-link>
       </p>
     </v-card>

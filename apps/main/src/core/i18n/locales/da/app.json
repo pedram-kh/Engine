@@ -1175,8 +1175,13 @@
         "accepting": "Accepterer…",
         "signInToContinue": "Log ind for at acceptere denne invitation",
         "signIn": "Log ind",
-        "noAccount": "Har du ikke en konto?",
-        "signUp": "Opret en nu",
+        "createAccount": {
+          "heading": "Opret din konto",
+          "subheading": "Du er inviteret til at tilslutte dig {agencyName} som {role}. Opret en adgangskode for at oprette din konto og komme i gang.",
+          "submit": "Opret konto og tilslut dig",
+          "submitting": "Opretter din konto…",
+          "alreadyHaveAccount": "Har du allerede en konto?"
+        },
         "success": "Velkommen til {agencyName}! Du er nu {role}.",
         "expired": {
           "heading": "Denne invitation er udløbet",

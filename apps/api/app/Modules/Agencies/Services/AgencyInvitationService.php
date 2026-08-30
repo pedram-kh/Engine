@@ -5,13 +5,22 @@ declare(strict_types=1);
 namespace App\Modules\Agencies\Services;
 
 use App\Modules\Agencies\Enums\AgencyRole;
+use App\Modules\Agencies\Exceptions\InvitationAccountExistsException;
+use App\Modules\Agencies\Http\Requests\CreateAccountAndAcceptInvitationRequest;
 use App\Modules\Agencies\Mail\InviteAgencyUserMail;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Agencies\Models\AgencyUserInvitation;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
+use App\Modules\Identity\Enums\ThemePreference;
+use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
+use App\Modules\Identity\Services\AuthService;
+use App\Modules\Identity\Services\ImpersonationService;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -19,6 +28,10 @@ use Illuminate\Support\Str;
 final class AgencyInvitationService
 {
     private const int EXPIRES_IN_DAYS = 7;
+
+    public function __construct(
+        private readonly AuthFactory $auth,
+    ) {}
 
     /**
      * Create a new invitation and dispatch the magic-link email.
@@ -135,5 +148,124 @@ final class AgencyInvitationService
 
             return $membership;
         });
+    }
+
+    /**
+     * Accept an invitation AND create the account in one atomic step
+     * (AH-095 — the stranger path: no account exists for the invited
+     * email at submit time).
+     *
+     * Email immutability (review priority #1): the created row's email
+     * is ALWAYS `$invitation->email`. `$attributes` carries no email key
+     * at all — {@see CreateAccountAndAcceptInvitationRequest}
+     * has no `email` field in its rules — so there is no client-supplied
+     * value here to prefer, ignore, or accidentally trust. Foreclosure
+     * by construction, not by a check.
+     *
+     * Email verification: the invitee clicked a link mailed to this
+     * exact address, so `email_verified_at` is stamped to now() — the
+     * single-use token already proved possession; a second verification
+     * mail would prove nothing the token hasn't already proven.
+     *
+     * Collision race (D3): the controller ran a pre-check
+     * (`account_exists`) before opening this transaction. This method
+     * re-checks INSIDE the transaction to close the page-load-to-submit
+     * window, and additionally catches the `users.email` unique-index
+     * violation as the last-resort backstop for a true concurrent
+     * double-submit that slips past both checks — never a bare 500.
+     * Both layers funnel into the same {@see InvitationAccountExistsException}
+     * so the controller (and the SPA) has exactly one code to branch on.
+     *
+     * Rollback-safe (review priority #5): the user create, membership
+     * create, invitation stamp, audit log, and session login all live
+     * inside ONE DB::transaction. Any failure — including the
+     * unique-violation catch re-throwing after the transaction unwinds —
+     * leaves zero rows: no half-account, no orphaned membership, no
+     * consumed token.
+     *
+     * Session establishment mirrors {@see ImpersonationService::claim()}
+     * — `$this->auth->guard('web')->login($user)` +
+     * `$request->session()->regenerate()` inside the same transaction —
+     * rather than {@see AuthService::login()},
+     * which does password/MFA/failed-login-tracking work that does not
+     * apply to a freshly-created, invite-authenticated account.
+     *
+     * @param  array{name: string, last_name: string, password: string}  $attributes
+     *
+     * @throws InvitationAccountExistsException
+     */
+    public function acceptWithNewAccount(
+        AgencyUserInvitation $invitation,
+        array $attributes,
+        Request $request,
+    ): User {
+        try {
+            return DB::transaction(function () use ($invitation, $attributes, $request): User {
+                if (User::query()->where('email', $invitation->email)->exists()) {
+                    throw new InvitationAccountExistsException;
+                }
+
+                /** @var User $user */
+                $user = User::query()->create([
+                    'type' => UserType::AgencyUser,
+                    'email' => $invitation->email,
+                    'name' => $attributes['name'],
+                    'last_name' => $attributes['last_name'],
+                    'password' => $attributes['password'],
+                    'email_verified_at' => now(),
+                    'preferred_language' => 'en',
+                    'preferred_currency' => config('app.default_currency', 'EUR'),
+                    'timezone' => 'UTC',
+                    // Set explicitly (not left to the column's DB default):
+                    // the in-memory $user is fed straight into UserResource
+                    // below without a refresh(), and the cast expects an
+                    // enum instance, not the raw DB-default string.
+                    'theme_preference' => ThemePreference::System,
+                    'mfa_required' => false,
+                    'is_suspended' => false,
+                ]);
+
+                AgencyMembership::query()->create([
+                    'agency_id' => $invitation->agency_id,
+                    'user_id' => $user->id,
+                    'role' => $invitation->role,
+                    'invited_by_user_id' => $invitation->invited_by_user_id,
+                    'invited_at' => $invitation->created_at,
+                    'accepted_at' => now(),
+                ]);
+
+                $invitation->update([
+                    'accepted_at' => now(),
+                    'accepted_by_user_id' => $user->id,
+                ]);
+
+                Audit::log(
+                    action: AuditAction::InvitationAcceptedWithNewAccount,
+                    actor: $user,
+                    subject: $invitation,
+                    after: [
+                        'role' => $invitation->role->value,
+                        'agency_id' => $invitation->agency_id,
+                        'user_id' => $user->id,
+                    ],
+                    agencyId: $invitation->agency_id,
+                );
+
+                $this->auth->guard('web')->login($user);
+                $request->session()->regenerate();
+
+                return $user;
+            });
+        } catch (QueryException $e) {
+            // Postgres unique_violation. The pre-check above (and the
+            // controller's own pre-check before it) closes the common
+            // window; this is the last-resort backstop for a true
+            // concurrent double-submit racing past both.
+            if ((string) $e->getCode() === '23505') {
+                throw new InvitationAccountExistsException;
+            }
+
+            throw $e;
+        }
     }
 }

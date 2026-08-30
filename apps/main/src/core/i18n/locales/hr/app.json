@@ -1175,8 +1175,13 @@
         "accepting": "Přijímání…",
         "signInToContinue": "Prijavite se pro přijetí této pozvánky",
         "signIn": "Prijava",
-        "noAccount": "Nemáte účet?",
-        "signUp": "Stvori nyní",
+        "createAccount": {
+          "heading": "Izradite svoj račun",
+          "subheading": "Pozvani ste da se pridružite {agencyName} kao {role}. Postavite lozinku za izradu računa i početak rada.",
+          "submit": "Izradi račun i pridruži se",
+          "submitting": "Izrada vašeg računa…",
+          "alreadyHaveAccount": "Već imate račun?"
+        },
         "success": "Vítejte v {agencyName}! Nyní jste {role}.",
         "expired": {
           "heading": "Tato pozvánka vypršela",

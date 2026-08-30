@@ -10,9 +10,11 @@
 import type {
   AgencyInvitationResource,
   AgencyInvitationStatus,
+  CreateAccountAndAcceptInvitationPayload,
   CreateInvitationPayload,
   InvitationPreviewEnvelope,
   PaginatedCollection,
+  UserEnvelope,
 } from '@catalyst/api-client'
 import { http } from '@/core/api'
 
@@ -60,6 +62,27 @@ export const invitationsApi = {
     return http.get<InvitationPreviewEnvelope>(
       `/agencies/${agencyId}/invitations/preview?token=${encodeURIComponent(token)}`,
     )
+  },
+
+  /**
+   * POST /api/v1/agencies/{agency}/invitations/create-account (AH-095)
+   *
+   * The stranger path: no account exists for the invited email yet.
+   * Unauthenticated — this call IS what establishes the session (the
+   * cookie is set as a side effect of the response, exactly like
+   * {@link AuthApi.login}). Returns the full user envelope so the
+   * store can `setUser()` directly, without a second `/me` round-trip.
+   *
+   * Throws `ApiError` with `invitation.account_exists` (409) on the
+   * collision race — the SPA re-branches to the sign-in state on that
+   * exact code, identically to how it treats `account_exists: true`
+   * from {@link preview}.
+   */
+  createAccount(
+    agencyId: string,
+    payload: CreateAccountAndAcceptInvitationPayload,
+  ): Promise<UserEnvelope> {
+    return http.post<UserEnvelope>(`/agencies/${agencyId}/invitations/create-account`, payload)
   },
 
   /**

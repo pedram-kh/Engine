@@ -1175,8 +1175,13 @@
         "accepting": "Accepterar…",
         "signInToContinue": "Logga in för att acceptera den här inbjudan",
         "signIn": "Logga in",
-        "noAccount": "Har du inget konto?",
-        "signUp": "Skapa ett nu",
+        "createAccount": {
+          "heading": "Skapa ditt konto",
+          "subheading": "Du bjuds in att gå med i {agencyName} som {role}. Ange ett lösenord för att skapa ditt konto och komma igång.",
+          "submit": "Skapa konto och gå med",
+          "submitting": "Skapar ditt konto…",
+          "alreadyHaveAccount": "Har du redan ett konto?"
+        },
         "success": "Välkommen till {agencyName}! Du är nu {role}.",
         "expired": {
           "heading": "Den här inbjudan har gått ut",

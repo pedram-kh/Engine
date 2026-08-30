@@ -1175,8 +1175,13 @@
         "accepting": "Acceptațiing…",
         "signInToContinue": "Conectați-vă to accept this invitation",
         "signIn": "Conectați-vă",
-        "noAccount": "Don't have an account?",
-        "signUp": "Creați one now",
+        "createAccount": {
+          "heading": "Creați-vă contul",
+          "subheading": "Ați fost invitat să vă alăturați {agencyName} ca {role}. Setați o parolă pentru a vă crea contul și a începe.",
+          "submit": "Creează cont și alătură-te",
+          "submitting": "Se creează contul…",
+          "alreadyHaveAccount": "Aveți deja un cont?"
+        },
         "success": "Bun venit to {agencyName}! You're now a {role}.",
         "expired": {
           "heading": "This invitation has expired",

@@ -1175,8 +1175,13 @@
         "accepting": "Accepteren…",
         "signInToContinue": "Log in om deze uitnodiging te accepteren",
         "signIn": "Inloggen",
-        "noAccount": "Nog geen account?",
-        "signUp": "Nu aanmaken",
+        "createAccount": {
+          "heading": "Maak je account aan",
+          "subheading": "Je wordt uitgenodigd om lid te worden van {agencyName} als {role}. Stel een wachtwoord in om je account aan te maken en aan de slag te gaan.",
+          "submit": "Account aanmaken en deelnemen",
+          "submitting": "Je account wordt aangemaakt…",
+          "alreadyHaveAccount": "Heb je al een account?"
+        },
         "success": "Welkom bij {agencyName}! Je bent nu {role}.",
         "expired": {
           "heading": "Deze uitnodiging is verlopen",

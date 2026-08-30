@@ -191,3 +191,20 @@ Route::prefix('agencies/{agency}')
         Route::get('invitations/preview', InvitationPreviewController::class)
             ->name('agencies.invitations.preview');
     });
+
+// ─── Create account + accept (no auth) — AH-095 ───────────────────────────────
+// The stranger path: no account exists for the invited email. This
+// endpoint IS what creates the session, so it cannot require auth:web —
+// same unauthenticated posture as sign-up, and the same `auth-ip` rate
+// limiter (10/min/IP). The token is unbrute-forceable and the operation
+// is single-use by nature (first success consumes it), so a second,
+// stricter limiter was considered and declined at plan-pause — its main
+// real-world effect would be locking out the legitimate recipient
+// fumbling their password confirmation, not stopping abuse.
+
+Route::prefix('agencies/{agency}')
+    ->middleware('throttle:auth-ip')
+    ->group(function (): void {
+        Route::post('invitations/create-account', [InvitationController::class, 'createAccount'])
+            ->name('agencies.invitations.create_account');
+    });

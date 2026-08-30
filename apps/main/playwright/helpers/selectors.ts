@@ -197,13 +197,26 @@ export const testIds = {
   acceptInvitationAlreadyAccepted: 'accept-invitation-already-accepted',
   acceptInvitationUnauthenticated: 'accept-invitation-unauthenticated',
   acceptSignInBtn: 'accept-sign-in-btn',
-  acceptSignUpLink: 'accept-sign-up-link',
   acceptInvitationSuccess: 'accept-invitation-success',
   acceptInvitationSuccessMsg: 'accept-invitation-success-msg',
   acceptInvitationEmailMismatch: 'accept-invitation-email-mismatch',
   acceptInvitationNotFound: 'accept-invitation-not-found',
   acceptInvitationAlreadyMember: 'accept-invitation-already-member',
   alreadyAcceptedSignIn: 'already-accepted-sign-in',
+
+  // AH-095 — the stranger (no-account) path's set-password form. Replaces
+  // the removed `acceptSignUpLink` (the old "Sign up" CTA on the
+  // not-authenticated card); the stranger branch is now its own card,
+  // not a link off the sign-in one.
+  acceptInvitationCreateAccount: 'accept-invitation-create-account',
+  createAccountEmail: 'create-account-email',
+  createAccountFirstName: 'create-account-first-name',
+  createAccountLastName: 'create-account-last-name',
+  createAccountPassword: 'create-account-password',
+  createAccountPasswordConfirmation: 'create-account-password-confirmation',
+  createAccountError: 'create-account-error',
+  createAccountSubmit: 'create-account-submit',
+  createAccountSignInLink: 'create-account-sign-in-link',
 
   // ---------------------------------------------------------------
   // Onboarding wizard — Welcome Back surface (Sprint 3 Chunk 3

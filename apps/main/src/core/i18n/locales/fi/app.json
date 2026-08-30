@@ -1175,8 +1175,13 @@
         "accepting": "Hyväksying…",
         "signInToContinue": "Kirjaudu sisään to accept this invitation",
         "signIn": "Kirjaudu sisään",
-        "noAccount": "Don't have an account?",
-        "signUp": "Luo one now",
+        "createAccount": {
+          "heading": "Luo tilisi",
+          "subheading": "Sinut on kutsuttu liittymään {agencyName}:iin roolissa {role}. Aseta salasana luodaksesi tilisi ja aloittaaksesi.",
+          "submit": "Luo tili ja liity",
+          "submitting": "Luodaan tiliäsi…",
+          "alreadyHaveAccount": "Onko sinulla jo tili?"
+        },
         "success": "Tervetuloa to {agencyName}! You're now a {role}.",
         "expired": {
           "heading": "This invitation has expired",

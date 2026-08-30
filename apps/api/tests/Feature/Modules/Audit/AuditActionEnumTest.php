@@ -43,6 +43,9 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'invitation.created',
         'invitation.accepted',
         'invitation.expired_on_attempt',
+        // AH-095 — invite acceptance that also creates the account (the
+        // stranger path). Independently queryable from a plain accept.
+        'invitation.accepted_with_new_account',
         // Sprint 2 — agency settings
         'agency_settings.updated',
         // Sprint 3 — creator domain

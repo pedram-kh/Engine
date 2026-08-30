@@ -1175,8 +1175,13 @@
         "accepting": "Αποδοχήing…",
         "signInToContinue": "Σύνδεση to accept this invitation",
         "signIn": "Σύνδεση",
-        "noAccount": "Don't have an account?",
-        "signUp": "Δημιουργία one now",
+        "createAccount": {
+          "heading": "Δημιουργήστε τον λογαριασμό σας",
+          "subheading": "Σας προσκαλούν να συμμετάσχετε στο {agencyName} ως {role}. Ορίστε έναν κωδικό πρόσβασης για να δημιουργήσετε τον λογαριασμό σας και να ξεκινήσετε.",
+          "submit": "Δημιουργία λογαριασμού & συμμετοχή",
+          "submitting": "Δημιουργία του λογαριασμού σας…",
+          "alreadyHaveAccount": "Έχετε ήδη λογαριασμό;"
+        },
         "success": "Καλώς ορίσατε to {agencyName}! You're now a {role}.",
         "expired": {
           "heading": "This invitation has expired",

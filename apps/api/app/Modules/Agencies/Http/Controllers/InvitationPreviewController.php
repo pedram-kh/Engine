@@ -7,6 +7,7 @@ namespace App\Modules\Agencies\Http\Controllers;
 use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyUserInvitation;
+use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -29,6 +30,19 @@ use Illuminate\Http\Request;
  *   - Already-accepted → 200 with is_accepted: true.
  *   - agency_name and role are included on all 200 responses so the SPA
  *     can render the expired/accepted states with full context.
+ *
+ * AH-095 — `invited_email` and `account_exists` join the response so the
+ * accept page can branch BEFORE the user does anything: an existing
+ * account gets today's sign-in-then-accept path (byte-identical); no
+ * account gets an inline set-password form with the email rendered
+ * read-only. This is a considered, incremental disclosure: reaching this
+ * endpoint at all already requires the 64-char unguessable token, and
+ * that token was mailed to the address it now discloses — the only party
+ * who learns anything new is someone holding a leaked token, who could
+ * already infer the same fact by simply attempting the accept flow with
+ * that email at sign-in/sign-up. `account_exists` is computed against
+ * the SAME trust boundary (a `users.email` existence check gated by
+ * token possession, not a public, ungated oracle).
  *
  * No auth required — consuming users may not have an account yet.
  */
@@ -72,6 +86,8 @@ final class InvitationPreviewController
                 'is_expired' => $invitation->isExpired(),
                 'is_accepted' => $invitation->isAccepted(),
                 'expires_at' => $invitation->expires_at->toIso8601String(),
+                'invited_email' => $invitation->email,
+                'account_exists' => User::query()->where('email', $invitation->email)->exists(),
             ],
         ]);
     }

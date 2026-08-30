@@ -1175,8 +1175,13 @@
         "accepting": "Pieņemting…",
         "signInToContinue": "Pierakstīties to accept this invitation",
         "signIn": "Pierakstīties",
-        "noAccount": "Don't have an account?",
-        "signUp": "Izveidot one now",
+        "createAccount": {
+          "heading": "Izveidojiet savu kontu",
+          "subheading": "Jūs esat uzaicināts pievienoties {agencyName} kā {role}. Iestatiet paroli, lai izveidotu savu kontu un sāktu darbu.",
+          "submit": "Izveidot kontu un pievienoties",
+          "submitting": "Konta izveide…",
+          "alreadyHaveAccount": "Jums jau ir konts?"
+        },
         "success": "Laipni lūgti to {agencyName}! You're now a {role}.",
         "expired": {
           "heading": "This invitation has expired",

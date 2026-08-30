@@ -1175,8 +1175,13 @@
         "accepting": "Nõustuing…",
         "signInToContinue": "Logi sisse to accept this invitation",
         "signIn": "Logi sisse",
-        "noAccount": "Don't have an account?",
-        "signUp": "Loo one now",
+        "createAccount": {
+          "heading": "Loo oma konto",
+          "subheading": "Teid kutsutakse liituma {agencyName}-ga rollis {role}. Määra parool, et konto luua ja alustada.",
+          "submit": "Loo konto ja liitu",
+          "submitting": "Konto loomine…",
+          "alreadyHaveAccount": "Kas teil on juba konto?"
+        },
         "success": "Tere tulemast to {agencyName}! You're now a {role}.",
         "expired": {
           "heading": "This invitation has expired",

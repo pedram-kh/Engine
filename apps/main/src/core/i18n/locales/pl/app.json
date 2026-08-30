@@ -1175,8 +1175,13 @@
         "accepting": "Akceptowanie…",
         "signInToContinue": "Zaloguj się, aby zaakceptować to zaproszenie",
         "signIn": "Zaloguj się",
-        "noAccount": "Nie masz konta?",
-        "signUp": "Utwórz je teraz",
+        "createAccount": {
+          "heading": "Utwórz swoje konto",
+          "subheading": "Zostałeś zaproszony do dołączenia do {agencyName} jako {role}. Ustaw hasło, aby utworzyć konto i zacząć.",
+          "submit": "Utwórz konto i dołącz",
+          "submitting": "Tworzenie konta…",
+          "alreadyHaveAccount": "Masz już konto?"
+        },
         "success": "Witaj w {agencyName}! Jesteś teraz {role}.",
         "expired": {
           "heading": "To zaproszenie wygasło",

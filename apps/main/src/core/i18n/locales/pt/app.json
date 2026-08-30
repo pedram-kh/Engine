@@ -1175,8 +1175,13 @@
         "accepting": "Aceitando…",
         "signInToContinue": "Entre para aceitar este convite",
         "signIn": "Entrar",
-        "noAccount": "Não tem uma conta?",
-        "signUp": "Crie uma agora",
+        "createAccount": {
+          "heading": "Crie sua conta",
+          "subheading": "Você está sendo convidado para entrar em {agencyName} como {role}. Defina uma senha para criar sua conta e começar.",
+          "submit": "Criar conta e entrar",
+          "submitting": "Criando sua conta…",
+          "alreadyHaveAccount": "Já tem uma conta?"
+        },
         "success": "Bem-vindo(a) a {agencyName}! Agora você é {role}.",
         "expired": {
           "heading": "Este convite expirou",

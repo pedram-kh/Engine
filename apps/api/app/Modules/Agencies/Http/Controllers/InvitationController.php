@@ -7,7 +7,9 @@ namespace App\Modules\Agencies\Http\Controllers;
 use App\Core\Errors\ErrorResponse;
 use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Agencies\Enums\AgencyRole;
+use App\Modules\Agencies\Exceptions\InvitationAccountExistsException;
 use App\Modules\Agencies\Http\Requests\AcceptInvitationRequest;
+use App\Modules\Agencies\Http\Requests\CreateAccountAndAcceptInvitationRequest;
 use App\Modules\Agencies\Http\Requests\CreateInvitationRequest;
 use App\Modules\Agencies\Http\Resources\AgencyInvitationResource;
 use App\Modules\Agencies\Models\Agency;
@@ -16,6 +18,7 @@ use App\Modules\Agencies\Models\AgencyUserInvitation;
 use App\Modules\Agencies\Services\AgencyInvitationService;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
+use App\Modules\Identity\Http\Resources\UserResource;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -209,6 +212,101 @@ final class InvitationController
         $this->invitationService->accept($invitation, $user);
 
         return (new AgencyInvitationResource($invitation->fresh() ?? $invitation))
+            ->response()
+            ->setStatusCode(200);
+    }
+
+    /**
+     * POST /api/v1/agencies/{agency}/invitations/create-account
+     *
+     * AH-095 — the stranger path: no account exists for the invited
+     * email. Unauthenticated by definition (this endpoint IS what
+     * creates the session) — mirrors sign-up's `throttle:auth-ip`
+     * posture, not `accept()`'s `auth:web`.
+     *
+     * Guard order mirrors `accept()`'s existing shape verbatim (not_found
+     * → expired → already_accepted), then adds the AH-095 account_exists
+     * pre-check before ever opening a transaction. The service re-checks
+     * the same condition inside the transaction plus a unique-index
+     * catch, so a request that slips past this pre-check (the collision
+     * race, D3) still cannot 500 — it surfaces as the SAME
+     * `invitation.account_exists` code either way, giving the SPA one
+     * branch to handle regardless of which layer caught it.
+     *
+     * NOT mounted under tenancy.agency or auth:web — same reasoning as
+     * the preview route: the caller has no account and no session yet.
+     */
+    public function createAccount(CreateAccountAndAcceptInvitationRequest $request, Agency $agency): JsonResponse
+    {
+        $tokenHash = hash('sha256', $request->string('token')->value());
+
+        $invitation = AgencyUserInvitation::withoutGlobalScope(BelongsToAgencyScope::class)
+            ->where('agency_id', $agency->id)
+            ->where('token_hash', $tokenHash)
+            ->first();
+
+        if ($invitation === null) {
+            return ErrorResponse::single(
+                $request,
+                404,
+                'invitation.not_found',
+                'Invitation not found.',
+            );
+        }
+
+        if ($invitation->isExpired()) {
+            Audit::log(
+                action: AuditAction::InvitationExpiredOnAttempt,
+                actor: null,
+                subject: $invitation,
+                agencyId: $agency->id,
+            );
+
+            return ErrorResponse::single(
+                $request,
+                410,
+                'invitation.expired',
+                'This invitation has expired.',
+            );
+        }
+
+        if ($invitation->isAccepted()) {
+            return ErrorResponse::single(
+                $request,
+                409,
+                'invitation.already_accepted',
+                'This invitation has already been accepted.',
+            );
+        }
+
+        // AH-095 D3 collision-race, layer 1: the cheap pre-check before
+        // opening a transaction. Layer 2 lives inside the service.
+        $accountExists = User::query()->where('email', $invitation->email)->exists();
+        if ($accountExists) {
+            return ErrorResponse::single(
+                $request,
+                409,
+                'invitation.account_exists',
+                'An account already exists for the invited email. Please sign in to accept.',
+            );
+        }
+
+        try {
+            $user = $this->invitationService->acceptWithNewAccount(
+                $invitation,
+                $request->accountAttributes(),
+                $request,
+            );
+        } catch (InvitationAccountExistsException) {
+            return ErrorResponse::single(
+                $request,
+                409,
+                'invitation.account_exists',
+                'An account already exists for the invited email. Please sign in to accept.',
+            );
+        }
+
+        return UserResource::make($user)
             ->response()
             ->setStatusCode(200);
     }

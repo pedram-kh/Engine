@@ -1175,8 +1175,13 @@
         "accepting": "Aċċettaing…",
         "signInToContinue": "Idħol to accept this invitation",
         "signIn": "Idħol",
-        "noAccount": "Don't have an account?",
-        "signUp": "Oħloq one now",
+        "createAccount": {
+          "heading": "Oħloq il-kont tiegħek",
+          "subheading": "Ġejt mistieden tissieħeb ma' {agencyName} bħala {role}. Ipprovdi password biex toħloq il-kont tiegħek u tibda.",
+          "submit": "Oħloq kont u ssieħeb",
+          "submitting": "Il-kont tiegħek qed jinħoloq…",
+          "alreadyHaveAccount": "Diġà għandek kont?"
+        },
         "success": "Merħba to {agencyName}! You're now a {role}.",
         "expired": {
           "heading": "This invitation has expired",
