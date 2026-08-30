@@ -70,6 +70,95 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-095 · Invite-acceptance creates the account
+
+- **Status:** Landed — push HELD (per Pedram's explicit instruction). Full loop: kickoff with
+  locked decisions D1–D6 → plan-pause (six ratified decisions) → build (S1–S9) → this entry +
+  review file.
+- **Date:** 2026-08-30.
+- **Why:** an agency-invite recipient with no existing account had to detour through the generic
+  creator sign-up funnel, verify by email, sign in, then re-click the original invite link to
+  finally accept it — the wrong funnel (agency-typed, not creator-typed) and a broken first
+  impression for a brand-new agency team member (found in Pedram's eyes-on).
+- **What:** the invitation-accept page now branches on whether an account already exists for the
+  invited email. Existing-account invitees see the byte-identical pre-AH-095 sign-in-then-accept
+  path — untouched bytes, proven by an unmodified E2E leg still green. Stranger invitees (no
+  account) see a new set-password form (first/last name, password + confirmation; email renders
+  read-only from the invitation, never editable) on a new unauthenticated endpoint,
+  `POST /agencies/{agency}/invitations/create-account`. One submit = one `DB::transaction()`:
+  create the user (agency-typed, `email_verified_at = now()` — the invite token is the proof of
+  address control), activate the membership at the invite's role, consume the token, establish
+  the session, and land on the agency dashboard — all four writes roll back together on any
+  failure (proved with a forced mid-transaction failure → zero rows anywhere, not just documented
+  as an intent).
+- **The structural safeguard the review leads with:** the new Form Request has no `email` field in
+  its validation rules at all — not a disabled input, not a server override of a submitted value,
+  an absence. The created account's email can only ever be `$invitation->email`; there is no code
+  path for a client-submitted address to reach the write. Pinned at both the backend (a test that
+  POSTs an `email` key anyway and asserts it has zero effect) and the frontend (the field's
+  `readonly` attribute + no second editable email input existing on the card at all).
+- **The collision race:** the window between page-load and submit, in which an account could be
+  created for the invited email by some other path. Two-layer guard: a cheap controller pre-check
+  before any transaction opens, plus a service-level re-check inside the transaction backed by a
+  catch on the `users.email` unique-index violation for the genuinely-concurrent case. Both funnel
+  into one `InvitationAccountExistsException` → a 409 `invitation.account_exists` the SPA treats
+  identically to the preview endpoint's `account_exists: true`: re-branch to the sign-in state with
+  a clear message, never a 500 or a dead end.
+- **Dropped from scope, named not absorbed:** the kickoff's D3 asked for an "invite-revoked" guard
+  to join the enumeration. The read pass at plan-pause found no revocation feature exists anywhere
+  in the codebase — no `revoked_at` column, no endpoint, no SPA affordance — so there was nothing
+  to guard against. Recorded as a new `tech-debt.md` entry ("No agency-invitation revocation path
+  exists") rather than silently dropped or quietly built as an unplanned addition.
+- **E2E — a fix, not just an extension (per the kickoff's D6):** `invitations.spec.ts`'s
+  `'unauthenticated invitee sees sign-in prompt on accept page'` seeded a brand-new,
+  never-signed-up email — exactly the precondition that now renders the NEW set-password form, not
+  a sign-in prompt. Its assertion became wrong the moment this feature shipped, not merely
+  incomplete; renamed and rewritten as the full stranger-path leg (seeded invite → unauthenticated
+  page-load → set-password form → submit → success → the page's own redirect lands the invitee
+  signed-in on the real agency dashboard). Two new legs added alongside it: the existing-account
+  case correctly isolated with the right precondition this time (signs up first, invites second),
+  and the collision race triggered for real (a second, independent sign-up call while the stale
+  form sits on screen, then submits into the 409).
+- **Touched:** **Backend** — `AuditAction` (new `InvitationAcceptedWithNewAccount` case);
+  `InvitationPreviewController` (+`invited_email`, +`account_exists`); `InvitationController` (new
+  `createAccount()` action); `AgencyInvitationService` (new `acceptWithNewAccount()`,
+  `AuthFactory` injected; the existing `accept()` untouched); new
+  `InvitationAccountExistsException`; new `CreateAccountAndAcceptInvitationRequest` (no `email`
+  field, by design); one new unauthenticated `throttle:auth-ip` route. **Shared** —
+  `packages/api-client`'s `InvitationPreview` (+2 fields) + new
+  `CreateAccountAndAcceptInvitationPayload`. **Frontend** — `invitations.api.ts` (`createAccount()`);
+  `AcceptInvitationPage.vue` (new `'no-account'` state + set-password form + handler; the existing
+  `pending`/`acceptInvitation()` path is byte-identical); 48 locale files (24 × `app.json` +
+  `auth.json`) — 5 new keys + 1 new key, and the now-unreachable `noAccount`/`signUp` sign-up-link
+  keys removed. **Tests** — two new Pest files (20 tests net-new: 11 + 9) plus the
+  `AuditActionEnumTest` catalogue extension; one new Vitest file (17 tests net-new). **E2E** —
+  `invitations.spec.ts` (one leg fixed/repurposed, two net-new — 5 → 7 tests); 9 new + 1 removed
+  Playwright selector.
+- **Gates:** backend Pest full suite — 2910 tests, 11138 assertions, 0 failures (the "2905
+  deprecated" label is a PHP 8.5 environmental `PDO::MYSQL_ATTR_SSL_CA` deprecation notice firing
+  suite-wide on this machine, not a regression — same class already named out-of-scope in the
+  AH-093/AH-094 sessions); PHPStan 0 errors (3 found + fixed during the pass, all in the new test
+  file). `apps/main` Vitest full suite — **175 files / 1723 tests, all passing** (net +1 file /
+  +17 tests, exactly the new spec file). ESLint 0 new errors; `vue-tsc` clean; both i18n
+  architecture tripwires green. Playwright full `apps/main` suite — **31/31 passing**
+  (`invitations.spec.ts` 7/7, `invitations-error-paths.spec.ts` 2/2 regression-checked).
+- **Decisions:** preview disclosure of `invited_email`/`account_exists` confirmed — the 64-char
+  token is already the capability, so a token holder learns nothing new that attempting the flow
+  wouldn't also reveal. Revoke guard dropped (a) — named as a tech-debt follow-up. Audit uses a
+  dedicated enum case (`InvitationAcceptedWithNewAccount`), not a payload flag, so the row is
+  independently queryable. Rate limiting is `auth-ip` only (a) — the token is unbruteforceable and
+  single-use by construction; a second, email-keyed limiter's main real-world effect would be
+  locking out the legitimate invitee. Risk re-derived to LOW on the strength of the email field's
+  structural absence from the request schema.
+- **Ref:** [`invite-acceptance-creates-account-review.md`](invite-acceptance-creates-account-review.md)
+  (the full D1–D6 mapping, the email-immutability + rollback + collision-race proofs, the complete
+  gate board, and the deploy obligations) · opens one new `tech-debt.md` entry (invitation
+  revocation) · adds one new `security/tenancy.md` allowlist row for the new route (and names, but
+  does not fix, a pre-existing allowlist gap on the sibling `accept`/`preview` routes it found
+  along the way).
+
+---
+
 ### AH-094 · i18n used-key coverage tripwire (both SPAs)
 
 - **Status:** Landed. Fast batch (direct-iteration) — no kickoff, no review file; this entry is the

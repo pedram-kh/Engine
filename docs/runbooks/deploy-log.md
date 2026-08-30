@@ -68,6 +68,16 @@ happened.
 > own** — no migration, no schema touch, no new route or controller, no queue/cron change, and
 > `apps/api` sees no diff at all. It rides the same stack purely for range completeness; the
 > combined totals above (5 migrations, PHP-FPM reload, etc.) are **unchanged by AH-093**.
+>
+> **Rider (2026-08-30): AH-095 joins this entry, not a new one.** One new unauthenticated route
+> (`POST /agencies/{agency}/invitations/create-account`) — **no migration** (the `users` table
+> already carries every column this write needs). Adds to the stack's existing PHP-FPM-reload
+> obligation (a new controller action, Form Request, and service method — already required by
+> AH-091/092 above, so no _new_ infra line, but the reload now also serves this route) and
+> confirms the stack's `apps/main` bundle rebuild carries `AcceptInvitationPage.vue`'s new
+> branch + 48 touched locale files. `apps/admin` sees no diff. AH-094 (pure-test, both SPAs'
+> `i18n-used-keys-resolve.spec.ts`) is **not** added as a rider here — no runtime file changed,
+> nothing for a deploy to carry.
 
 - **Status:** PENDING
 - **Range:** the tip carrying the AH-091 entry → the tip carrying this entry.
@@ -84,9 +94,20 @@ Files library, chunk B — review, tech-debt correction (AH-092)` — this entry
     template-only render hide (`CreatorJobsPage.vue`, `CreatorJobDetailPage.vue`), the two flipped/
     added Vitest specs, and this file's own AH-093 adhoc-log entry, all in one commit. **Rider only —
     see the note above; no obligation added to this stack.**
-- **AH entries carried:** **AH-092, AH-093** (AH-093 is a zero-obligation rider — no migration, no
-  restart, no new route; `apps/api` untouched).
-- **Migrations run:** **1** — `2026_08_27_140000_create_campaign_attachments_table.php`. A
+  - _(feature commit SHA to be filled once assigned)_ — `feat(agencies): invite-acceptance creates
+the account for stranger invitees (AH-095)` — the new `create-account` route, Form Request,
+    controller action, service method, the `InvitationAccountExistsException` collision-race guard,
+    the `AuditAction` case, the preview endpoint's two new fields, the SPA's new `'no-account'`
+    branch + set-password form, i18n ×24, and the full Pest + Vitest + Playwright coverage.
+  - _(docs commit SHA to be filled once assigned)_ — `docs(reviews): Invite-acceptance creates the
+account — review, tech-debt, tenancy allowlist (AH-095)` — this entry, the review file, the
+    AH-095 ad-hoc log entry, the new `tech-debt.md` invitation-revocation entry, and the
+    `docs/security/tenancy.md` allowlist row.
+- **AH entries carried:** **AH-092, AH-093, AH-095** (AH-093 is a zero-obligation rider — no
+  migration, no restart, no new route, `apps/api` untouched; AH-095 adds a route + PHP-FPM-reload
+  need but no migration — see the rider note above).
+- **Migrations run:** **1** — `2026_08_27_140000_create_campaign_attachments_table.php`. AH-095 adds
+  **none** — the `users` table already had every column its `User::create()` call needs. A
   `CREATE TABLE`, nothing else: **no existing table is touched, no column added anywhere, no
   backfill.** The table ships **EMPTY** and stays empty until an agency member attaches a file to a
   campaign.
@@ -100,8 +121,11 @@ Files library, chunk B — review, tech-debt correction (AH-092)` — this entry
   AH-088/089 range in the stack above is unaffected by this addition. **PHP-FPM reload required**
   (new controller, model, resources, routes) — AH-092's own obligation; **AH-093's rider adds
   nothing here** (a Vue template + Vitest spec change only — no PHP file, so no reload need of its
-  own). No cron/scheduler change. No env changes, no new secrets — reuses AH-091's `media` disk
-  under the file's own existing key; attaching a file never moves or duplicates its bytes.
+  own); **AH-095's rider rides the same reload** (its new controller action/Form Request/service
+  method need the same fresh opcode cache — no additional infra line, just confirmation this
+  reload also covers it). No cron/scheduler change. No env changes, no new secrets — reuses
+  AH-091's `media` disk under the file's own existing key; attaching a file never moves or
+  duplicates its bytes; AH-095 introduces no new secret or vendor either.
 - **One-shot commands:** none.
 - **Post-deploy verification:** `/up` 200; then, authenticated as an agency member with a campaign
   and a library file already in place, `POST
@@ -113,6 +137,13 @@ Files library, chunk B — review, tech-debt correction (AH-092)` — this entry
   the Jobs Board card list and a job's detail page as a creator and confirm no "Duration: …" text
   renders on either, while `GET /api/v1/creators/me/jobs` and its `/{campaign}` detail route still
   return `listing_duration` in the JSON (byte-identical payload, hidden only in the SPA render).
+  **AH-095's own check:** seed a fresh invitation for a never-signed-up email, load its accept URL
+  unauthenticated and confirm the set-password form renders (not the sign-in prompt); submit it and
+  confirm `GET /api/v1/agencies/{agency}/invitations/create-account`'s prior invitation now shows
+  `is_accepted: true` via the preview endpoint, the created `users` row has `email_verified_at` set,
+  and re-submitting the same (now-stale) form returns 409 `invitation.already_accepted`. Separately
+  confirm the byte-identical path: an invitee whose account already exists still sees the sign-in
+  prompt, never the new form.
 - **Flags armed:** none — this chunk ships no feature flag; the surface is live for every agency
   member and every eligible creator the moment the deploy completes (no staged rollout was
   requested).

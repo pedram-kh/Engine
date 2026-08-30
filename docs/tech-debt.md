@@ -9,6 +9,38 @@ anyone reviewing it later.
 
 ---
 
+## No agency-invitation revocation path exists (OPEN)
+
+- **Where:** `apps/api/app/Modules/Agencies/Models/AgencyUserInvitation.php`,
+  `AgencyInvitationService`, `InvitationController`. There is no `revoked_at` column, no
+  revoke endpoint, and no SPA affordance anywhere in the agency-users surface.
+- **What we found (AH-095 plan-pause):** the AH-095 kickoff asked for the invite-revoked case
+  to join the guard enumeration (D3). The read pass found there is nothing to guard against —
+  "invitation revocation" is not a feature that exists on this platform today. A pending
+  invitation is cancellable only by its natural expiry (`expires_at`, default 7 days) or by
+  simply never being accepted.
+- **Why it is debt and not a defect:** an agency admin who mis-types an invitee's email, or
+  invites the wrong person to the wrong role, has no way to kill that invite early. The window
+  is real: for up to 7 days a valid, unrevoked token sits in an inbox (or, worse, a mis-typed
+  inbox) capable of creating an account and joining the agency at whatever role was set — AH-095
+  makes this MORE consequential than before, since a stranger token can now provision a full
+  account rather than only accept as an existing user.
+- **The fix when it comes:** a `revoked_at` timestamp (mirrors the `suspended_at` /
+  `mfa_exempted_at` nullable-marker pattern already used twice in this codebase), a
+  `DELETE /agencies/{agency}/invitations/{invitation}` or `POST .../revoke` endpoint
+  (`authorizeAdmin()`, same shape as invitation creation), a row action in
+  `AgencyUsersPage.vue`'s invitation-history table, and both `accept` and `create-account` guard
+  chains gaining a revoked check identical in shape to their existing expired/already-accepted
+  checks.
+- **Trigger to escalate:** any support ticket about a mis-sent invitation, or before invitations
+  are opened to a role wider than `agency_admin`-only sending.
+- **Resolve by:** no hard date — named at AH-095 plan-pause as a deliberate scope drop (D2 of the
+  kickoff), not an oversight.
+- **Status:** OPEN. Surfaced by AH-095 (see
+  [`reviews/invite-acceptance-creates-account-review.md`](reviews/invite-acceptance-creates-account-review.md)).
+
+---
+
 ## The agency-side 2FA requirement has never been server-enforced — the exemption is therefore a presentational gate (OPEN)
 
 - **Where:** `apps/main/src/core/router/guards.ts` (`requireMfaEnrolled`, and AH-087's new
