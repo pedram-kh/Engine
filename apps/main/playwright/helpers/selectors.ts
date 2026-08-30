@@ -263,6 +263,11 @@ export const testIds = {
   // inputs) — replaces the old disabled availability affordance.
   rosterAvailableFrom: 'roster-available-from',
   rosterAvailableTo: 'roster-available-to',
+  // AH-088: the age-range filter (each bound independent). AH-096 gave it its
+  // first live-wire E2E exercise after finding the wrapper silently dropped
+  // both query params.
+  rosterAgeMin: 'roster-age-min',
+  rosterAgeMax: 'roster-age-max',
 
   // ---------------------------------------------------------------
   // Settings page — Sprint 2 Chunk 2

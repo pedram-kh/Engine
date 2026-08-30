@@ -686,6 +686,8 @@ export interface SeedRosterCreatorInput {
   countryCode?: string
   primaryLanguage?: string
   relationshipStatus?: 'roster' | 'prospect' | 'external'
+  /** `'YYYY-MM-DD'` — so the age-filter E2E leg (AH-096) can seed real ages. */
+  dateOfBirth?: string
 }
 
 export interface SeedRosterCreatorsResult {
@@ -715,6 +717,7 @@ export async function seedRosterCreators(
           country_code: c.countryCode ?? null,
           primary_language: c.primaryLanguage ?? null,
           relationship_status: c.relationshipStatus ?? null,
+          date_of_birth: c.dateOfBirth ?? null,
         })),
       },
     },

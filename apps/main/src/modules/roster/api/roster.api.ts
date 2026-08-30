@@ -28,10 +28,19 @@ export const rosterApi = {
   /**
    * List the agency's creators across all relationship statuses, with the
    * status / country / language / category filters, name/bio full-text
-   * search (`?q=`, Sprint 6 Chunk 1), and the availability range filter
-   * (`?available_from=&available_to=`, Sprint 6.5 D-6 — both bounds required).
-   * Follower/engagement filters and talent pools remain deferred (inert
-   * affordances on the page, D-4).
+   * search (`?q=`, Sprint 6 Chunk 1), the availability range filter
+   * (`?available_from=&available_to=`, Sprint 6.5 D-6 — both bounds required),
+   * and the age-range filter (`?age_min=&age_max=`, AH-088 — each bound
+   * INDEPENDENT, unlike the availability window). Follower/engagement
+   * filters and talent pools remain deferred (inert affordances on the
+   * page, D-4).
+   *
+   * AH-096 eyes-on: `age_min`/`age_max` were on `RosterListParams` and set by
+   * the page since AH-088, but never serialized here — a silent no-op filter
+   * (the page called this method correctly; this method dropped the two
+   * keys on the floor). See the AH-096 addendum on
+   * `creator-dob-age-review.md` for the fix + the class sweep across every
+   * other list wrapper in both SPAs (no other gap found).
    */
   list(agencyId: string, params: RosterListParams = {}): Promise<RosterListResponse> {
     const query = new URLSearchParams()
@@ -53,6 +62,10 @@ export const rosterApi = {
       query.set('available_from', params.available_from)
       query.set('available_to', params.available_to)
     }
+    // Age range: each bound threads INDEPENDENTLY — "18+" (age_min alone) is
+    // a real query, unlike the availability window above (AH-096 fix).
+    if (params.age_min !== undefined) query.set('age_min', String(params.age_min))
+    if (params.age_max !== undefined) query.set('age_max', String(params.age_max))
     if (params.page !== undefined) query.set('page', String(params.page))
     if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
     const qs = query.toString()

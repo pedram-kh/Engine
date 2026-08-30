@@ -117,4 +117,55 @@ test.describe('Creator roster — search + disabled affordances', () => {
     await expect(table).toContainText('Ada Lovelace')
     await expect(table).toContainText('Grace Hopper')
   })
+
+  // AH-096: the roster wrapper (`roster.api.ts`) silently dropped `age_min`/
+  // `age_max` from the query string — a filter set on the page never reached
+  // the backend. `CreatorRosterPage.spec.ts` couldn't catch it (it mocks the
+  // wrapper); this is the first REAL browser exercise of the age filter,
+  // birthday-to-table-row, closing that gap for good.
+  test('age-range filter narrows the table to creators whose age falls in the bound', async ({
+    page,
+  }) => {
+    const currentYear = new Date().getFullYear()
+    // January 1st births: by any day in the seed's own year, the birthday has
+    // already passed, so the whole-years-old math is stable regardless of
+    // what day this suite happens to run.
+    await seedRosterCreators(page.context().request, agencyUlid, [
+      { displayName: 'Young Yara', dateOfBirth: `${currentYear - 6}-01-01` },
+      { displayName: 'Grown Greg', dateOfBirth: `${currentYear - 10}-01-01` },
+    ])
+
+    await page.goto('/sign-in')
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(adminEmail)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(adminPassword)
+    await page.locator(dt(testIds.signInSubmit)).click()
+    await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible({ timeout: 10000 })
+
+    await page.goto('/roster')
+    const table = page.locator(dt(testIds.rosterTable))
+    await expect(table).toBeVisible({ timeout: 10000 })
+    await expect(table).toContainText('Young Yara')
+    await expect(table).toContainText('Grown Greg')
+
+    // 4–7 catches the 6-year-old, excludes the 10-year-old — and, per the
+    // backend's "unknown age can't honestly satisfy a range" rule
+    // (`FiltersCreatorColumns`, AH-088), also excludes the two no-DOB
+    // creators seeded in `beforeEach` (Ada Lovelace, Grace Hopper).
+    await page.locator(dt(testIds.rosterAgeMin)).locator('input').fill('4')
+    await page.locator(dt(testIds.rosterAgeMax)).locator('input').fill('7')
+
+    await expect(table).toContainText('Young Yara')
+    await expect(table).not.toContainText('Grown Greg')
+    await expect(table).not.toContainText('Ada Lovelace')
+    await expect(table).not.toContainText('Grace Hopper')
+
+    // Clearing both bounds restores the full roster — proves the narrowing
+    // above was the filter, not a coincidental page/search state.
+    await page.locator(dt(testIds.rosterAgeMin)).locator('input').fill('')
+    await page.locator(dt(testIds.rosterAgeMax)).locator('input').fill('')
+    await expect(table).toContainText('Young Yara')
+    await expect(table).toContainText('Grown Greg')
+    await expect(table).toContainText('Ada Lovelace')
+    await expect(table).toContainText('Grace Hopper')
+  })
 })

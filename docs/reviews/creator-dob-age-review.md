@@ -172,6 +172,50 @@ after any rollback.
 
 ---
 
+> **Addendum — 2026-08-30, AH-096 (post-close, AH-046 pattern: nothing above is edited, this
+> stands beside it).** Eyes-on on the agency roster page (`/roster`) found the D7 age-range
+> filter a **dead affordance**: setting `age_min=4`/`age_max=7` still showed an 8-year-old
+> creator. Kin to the [§6 projection trap](#6-the-projection-trap-o3--the-one-that-would-have-shipped-silently)
+> in shape (a real filter that silently never reached the query) but a different layer entirely —
+> not a missing column, a missing **wire**. `CreatorRosterPage.vue` set `params.age_min`/`params.age_max` on the object it passed to
+> `roster.api.ts::list()` (correctly, since the page was built against this section's own D7),
+> but the wrapper's `URLSearchParams` builder never read either key — the two filter values were
+> silently dropped between the page and the HTTP request, so `AgencyCreatorController` /
+> `FiltersCreatorColumns::applyAgeFilters()` (both exactly as designed at §Q1/§Q5 above) never
+> received them and the endpoint ran unfiltered. The backend this section documents was never
+> wrong; nothing reached it.
+>
+> **Why nothing here caught it:** `CreatorRosterPage.spec.ts` mocks `roster.api.ts` wholesale and
+> asserted the PAGE called `rosterApi.list()` with `age_min`/`age_max` in the params object — true,
+> and provided zero information about what actually left the browser. The backend suite
+> (`AgencyCreatorRosterTest`, cited at §2/§7 above) is airtight on the endpoint's own filtering
+> logic but is never exercised by the frontend's own request-building code, so a wrapper that
+> drops a param before the request is sent is invisible to it by construction. This is the
+> **mock-boundary lesson**: a page spec that asserts params into a mocked collaborator proves the
+> page's own logic, never the wire.
+>
+> **Fix + pin:** `roster.api.ts::list()` now threads both bounds into the query string
+> (independently — `age_min` alone is deliberately not fenced together with `age_max`, per this
+> section's own D7 semantics). Pinned three ways: a wrapper-level Vitest spec asserting the REAL
+> `URLSearchParams`-level query string (not a mocked call argument); a new source-inspection
+> architecture test in both SPAs (`api-wrapper-params-serialized.spec.ts`) that harvests every
+> `*Params` interface + its consuming wrapper method and fails if any declared field is never
+> referenced in the method body — the class-killer, verified to catch this exact bug by reverting
+> the fix and confirming it reds with the precise two missing fields; and a new Playwright leg on
+> `roster-search-and-affordances.spec.ts` seeding two real creators at different ages and asserting
+> the age-filtered table narrows for real — the roster age filter's first live-browser exercise; it
+> had none before. (This section's own [§9 follow-ups](#9-follow-ups-named-not-built) item 3, discover's still-missing
+> filter UI, is untouched by this fix — that gap is unchanged and remains intentional, not a bug.)
+>
+> **Class sweep:** every other `*Params`-typed list wrapper in both SPAs (roster, discover, files,
+> campaigns × 3, availability × 2, invitations, notifications, talent pools × 2, members, jobs,
+> brands, and every admin-SPA equivalent — audit, creators × 3, impersonation, agencies × 2) was
+> audited by hand and is now guarded by the same structural test; **no second instance of this
+> class was found**. Full table + fix + pins: [`adhoc-changes-log.md`](adhoc-changes-log.md)'s
+> AH-096 entry.
+
+---
+
 ## 6. The projection trap (O3) — the one that would have shipped silently
 
 The roster list and the discover list both `SELECT` a **slim column set**, not `creators.*`. `age`

@@ -35,6 +35,10 @@ use Illuminate\Validation\ValidationException;
  *   - `creators.*.primary_language`      — string|null, optional (2 chars).
  *   - `creators.*.relationship_status`   — string|null, optional; one of
  *                                          RelationshipStatus (default roster).
+ *   - `creators.*.date_of_birth`         — string|null, optional (`Y-m-d`) —
+ *                                          AH-096, so the E2E age-filter leg
+ *                                          can seed real ages instead of
+ *                                          asserting only "no error".
  *
  * Response (201):
  *   { "data": { "agency_ulid": "...", "relations": [ { "relation_ulid", "creator_ulid", "display_name" } ] } }
@@ -54,6 +58,7 @@ final class CreateRosterCreatorsController
                     static fn (RelationshipStatus $status): string => $status->value,
                     RelationshipStatus::cases(),
                 ))],
+                'creators.*.date_of_birth' => ['nullable', 'date_format:Y-m-d'],
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([
@@ -73,6 +78,7 @@ final class CreateRosterCreatorsController
                 'country_code' => $input['country_code'] ?? 'US',
                 'primary_language' => $input['primary_language'] ?? 'en',
                 'application_status' => ApplicationStatus::Approved,
+                'date_of_birth' => $input['date_of_birth'] ?? null,
             ]);
 
             $status = isset($input['relationship_status']) && is_string($input['relationship_status'])

@@ -4,8 +4,16 @@
  * Pins the `list()` query-builder — specifically the Sprint 6.5 (D-6)
  * availability window threading: BOTH `available_from` + `available_to` are
  * sent together, and a one-sided / empty range sends NEITHER (the backend
- * ignores a half range, so we don't waste it on the wire). The HTTP singleton
- * is mocked so no transport runs.
+ * ignores a half range, so we don't waste it on the wire) — and the AH-096
+ * age-range fix: `age_min`/`age_max` land in the REAL query string built by
+ * `URLSearchParams`, not merely in a mocked call argument. `CreatorRosterPage
+ * .spec.ts` already asserted the page passes `age_min`/`age_max` to this
+ * wrapper (it mocks `roster.api.ts` entirely) — that assertion proved
+ * nothing about the wire, which is exactly how the AH-096 bug shipped
+ * unnoticed: the wrapper silently dropped both keys after the mock boundary.
+ * This spec is the first to assert past that boundary, at the
+ * `URLSearchParams`/query-string level. The HTTP singleton is mocked so no
+ * transport runs.
  */
 
 import { describe, expect, it, vi, beforeEach } from 'vitest'
@@ -65,6 +73,45 @@ describe('rosterApi.list', () => {
   it('omits the query string entirely with no params', () => {
     void rosterApi.list('agency-ulid')
     expect(mockHttp.get).toHaveBeenCalledWith('/agencies/agency-ulid/creators')
+  })
+
+  it('AH-096: threads age_min + age_max into the real query string', () => {
+    void rosterApi.list('agency-ulid', { age_min: 4, age_max: 7 })
+    const url = mockHttp.get.mock.calls.at(-1)![0] as string
+    expect(url).toBe('/agencies/agency-ulid/creators?age_min=4&age_max=7')
+    const query = lastListUrl()
+    expect(query.get('age_min')).toBe('4')
+    expect(query.get('age_max')).toBe('7')
+  })
+
+  it('AH-096: each age bound is INDEPENDENT — age_min alone still sends', () => {
+    void rosterApi.list('agency-ulid', { age_min: 18 })
+    const query = lastListUrl()
+    expect(query.get('age_min')).toBe('18')
+    expect(query.has('age_max')).toBe(false)
+  })
+
+  it('AH-096: each age bound is INDEPENDENT — age_max alone still sends', () => {
+    void rosterApi.list('agency-ulid', { age_max: 12 })
+    const query = lastListUrl()
+    expect(query.has('age_min')).toBe(false)
+    expect(query.get('age_max')).toBe('12')
+  })
+
+  it('AH-096: age filter composes with the other filters on the wire', () => {
+    void rosterApi.list('agency-ulid', {
+      status: 'roster',
+      q: 'skater',
+      age_min: 4,
+      age_max: 7,
+      page: 2,
+    })
+    const query = lastListUrl()
+    expect(query.get('status')).toBe('roster')
+    expect(query.get('q')).toBe('skater')
+    expect(query.get('age_min')).toBe('4')
+    expect(query.get('age_max')).toBe('7')
+    expect(query.get('page')).toBe('2')
   })
 })
 

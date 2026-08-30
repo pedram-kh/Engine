@@ -70,6 +70,117 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-096 · Roster age filter wiring gap + class sweep (fold on AH-088)
+
+- **Status:** Landed. Fast batch (direct-iteration) — no kickoff, no standalone review file; this
+  entry + a dated addendum on [`creator-dob-age-review.md`](creator-dob-age-review.md) (the
+  AH-046 post-close pattern, inserted between its §5 and §6) are the record, since the sweep
+  found only the one gap.
+- **Date:** 2026-08-30.
+- **Why:** Eyes-on report — the age filter on the agency roster (`/roster`, seeded by AH-088) did
+  nothing: `age_min=4`/`age_max=7` still showed an 8-year-old creator in the table.
+- **Root cause:** `CreatorRosterPage.vue` correctly set `params.age_min`/`params.age_max` on the
+  object it passed to `roster.api.ts::list()` — but the wrapper's `URLSearchParams` builder never
+  read either key. The two filter values were dropped silently between the page and the HTTP
+  request; `AgencyCreatorController` / `FiltersCreatorColumns::applyAgeFilters()` (both exactly as
+  AH-088 designed them) never received them, so the endpoint ran unfiltered. Nothing wrong on the
+  wire OR in the backend — a page-passes-param, wrapper-drops-it-silently bug, entirely in
+  `roster.api.ts`.
+- **Why nothing caught it:** `CreatorRosterPage.spec.ts` mocks `roster.api.ts` wholesale and
+  asserts the PAGE called `rosterApi.list()` with the right params object — true, and it proves
+  nothing about what actually left the browser. **The mock-boundary lesson:** a page spec that
+  asserts params into a mocked wrapper only proves the page's own logic; it cannot see a wrapper
+  that drops a param before the request is built, because the wrapper never runs for real.
+- **Fix:** `roster.api.ts::list()` now threads `age_min`/`age_max` into the query string,
+  independently (matching AH-088's own D7 semantics — `age_min` alone is a real query, unlike the
+  availability window's both-or-neither pairing already in the same method).
+- **The class sweep (the important half):** audited every `*Params`-typed list wrapper in both
+  SPAs by hand for the same page-passes-wrapper-drops shape — every field on the type checked
+  against what the wrapper's query-string builder actually reads.
+
+  | Wrapper (`*.api.ts`)                           | Params type                     | Fields accepted                                                                            | Fields serialized                         | Gap                                                                                                                 |
+  | ---------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+  | `roster` `list()`                              | `RosterListParams`              | status, country, language, category, q, available_from/to, **age_min/max**, page, per_page | all _except_ age_min/age_max (before fix) | **YES — the reported bug**                                                                                          |
+  | `discover` `list()`                            | `DiscoveryListParams`           | country, language, category, q, page, per_page                                             | all                                       | No — type itself has no age_min/age_max field (AH-088 D7/Q1: API accepts them, deliberately no UI/type surface yet) |
+  | `files` `list()`                               | `AgencyFileListParams`          | page, per_page                                                                             | all                                       | No                                                                                                                  |
+  | `campaigns` `list()`                           | `CampaignListParams`            | brand, status, starts_from/to, page, per_page                                              | all                                       | No                                                                                                                  |
+  | `campaigns` `listDrafts()`                     | `CampaignDraftListParams`       | review_status, page, per_page                                                              | all                                       | No                                                                                                                  |
+  | `campaigns` `listApplications()`               | `CampaignApplicationListParams` | status, page, per_page                                                                     | all                                       | No                                                                                                                  |
+  | `availability` (creator-self) `list()`         | `AvailabilityListParams`        | from, to (both required)                                                                   | all                                       | No                                                                                                                  |
+  | `agencyAvailability` `list()`                  | `AgencyAvailabilityListParams`  | from, to (both required)                                                                   | all                                       | No                                                                                                                  |
+  | `invitations` `list()`                         | `InvitationHistoryParams`       | page, per_page, status, sort, order                                                        | all                                       | No                                                                                                                  |
+  | `notifications` `list()`                       | `NotificationListParams`        | page, perPage                                                                              | all                                       | No                                                                                                                  |
+  | `talentPools` `list()`                         | `TalentPoolListParams`          | page, per_page, status                                                                     | all                                       | No                                                                                                                  |
+  | `talentPools` `members()`                      | (inline `{ page, per_page }`)   | page, per_page                                                                             | all                                       | No                                                                                                                  |
+  | `members` (agency) `list()`                    | `MemberListParams`              | page, per_page, role, search, sort, order                                                  | all (via `buildQuery()` helper)           | No                                                                                                                  |
+  | `creators/jobs` `list()`                       | `CreatorJobListParams`          | page, perPage                                                                              | all                                       | No                                                                                                                  |
+  | `brands` `list()`                              | `BrandListParams`               | page, per_page, status                                                                     | all                                       | No                                                                                                                  |
+  | admin `audit` `list()`                         | `AdminAuditLogParams`           | action, actor_id, agency_id, subject_ulid, date_from/to, per_page, cursor                  | all                                       | No                                                                                                                  |
+  | admin `creators` `list()`                      | `AdminCreatorListParams`        | status, kyc_status, connected, page, per_page                                              | all                                       | No                                                                                                                  |
+  | admin `creators` `assignments()`/`auditLogs()` | `AdminCreatorHistoryParams`     | page, per_page                                                                             | all                                       | No                                                                                                                  |
+  | admin `impersonation` `sessions()`             | `ImpersonationLogParams`        | status, q, date_from/to, per_page, cursor                                                  | all                                       | No                                                                                                                  |
+  | admin `agencies` `list()`                      | `AdminAgencyListParams`         | status, search, page, per_page                                                             | all                                       | No                                                                                                                  |
+  | admin `agencies` `members()`                   | `AdminAgencyMemberListParams`   | role, search, sort, page, per_page                                                         | all                                       | No                                                                                                                  |
+
+  **Result: only the roster gap.** Discover's API-side age acceptance is confirmed intentional and
+  unchanged (AH-088's own D7/Q1 ruling — no frontend type/UI surface exists to drop a param from,
+  so there is nothing to fix there; if discover ever grows the UI, `DiscoveryListParams` gains the
+  fields and the new structural test below immediately holds it to the same bar). Per the standing
+  docs ruling, a single-gap sweep folds as a dated addendum rather than standing alone.
+
+- **The pin, both layers:**
+  1. **Wrapper-level regression** (`roster.api.spec.ts`, +4 tests): asserts the REAL query string
+     built by `URLSearchParams` — `age_min=4&age_max=7`, each bound independent, composing
+     correctly alongside the other filters — not merely a mocked call argument.
+  2. **Structural class-killer** (new `api-wrapper-params-serialized.spec.ts`, both SPAs):
+     source-inspection architecture test in the `i18n-used-keys-resolve.spec.ts` tradition. Harvests
+     every `export interface *Params { ... }` (shared `@catalyst/api-client` types + each
+     wrapper's local declarations), finds every `params: SomeParams` method signature in every
+     `*.api.ts` file, isolates that method's own body (following a same-file delegate call, e.g.
+     `members.api.ts`'s `buildQuery(params)`, to the helper that actually builds the query), and
+     fails if any declared field is never referenced as `params.<field>` inside it. **Verified as a
+     genuine class-killer**, not just a plausible one: reverting the roster fix and re-running reds
+     with the exact message `RosterListParams (roster.api.ts): missing age_min, age_max` — the
+     precise shape of the original bug, caught mechanically. Both SPA copies pass clean today,
+     confirming the sweep table above by construction rather than only by hand-audit.
+  3. **Playwright E2E** (`roster-search-and-affordances.spec.ts`, +1 test): seeds two real creators
+     at different ages via an extended test-helper (`CreateRosterCreatorsController` now accepts
+     `date_of_birth`), sets the age filter through the real inputs, and asserts the table narrows
+     to the in-range creator and excludes both the out-of-range creator and two no-DOB creators
+     (the backend's "unknown age can't satisfy a range" rule, already pinned server-side) — then
+     clears both bounds and asserts the full roster returns. This is the first real-browser exercise
+     of the age filter; previously it had none.
+- **E2E question answered:** the roster leg (`roster-search-and-affordances.spec.ts`) did NOT
+  exercise the age filter at all before this pass — it covered search + the disabled metrics
+  affordances + the availability range only. It does now (item 3 above), seeded with real
+  birthdays and asserting a real narrowed row set, not just "no error."
+- **Touched:** `apps/main/src/modules/roster/api/roster.api.ts` (the fix);
+  `apps/main/src/modules/roster/api/roster.api.spec.ts` (+4 tests);
+  `apps/main/tests/unit/architecture/api-wrapper-params-serialized.spec.ts` (new);
+  `apps/admin/tests/unit/architecture/api-wrapper-params-serialized.spec.ts` (new);
+  `apps/main/playwright/specs/roster-search-and-affordances.spec.ts` (+1 test);
+  `apps/main/playwright/fixtures/test-helpers.ts` (`SeedRosterCreatorInput.dateOfBirth`);
+  `apps/main/playwright/helpers/selectors.ts` (+2 selectors, `roster-age-min`/`roster-age-max`);
+  `apps/api/app/TestHelpers/Http/Controllers/CreateRosterCreatorsController.php`
+  (+`date_of_birth`, test-helper-gated, no production surface).
+- **Gates:** `apps/main` Vitest — **176 files / 1729 tests, all passing** (net +1 file / +6 tests:
+  +4 wrapper-level, +2 architecture sanity checks). `apps/admin` Vitest — **58 files / 488 tests,
+  all passing** (net +1 file / +2 tests). `vue-tsc` clean on both SPAs; ESLint 0 new errors on
+  every touched file. PHPStan 0 errors on the touched controller; Pint clean. Playwright
+  `roster-search-and-affordances.spec.ts` — **2/2 passing**, run live against the real Laravel
+  dev server + Postgres, including the new age-filter leg.
+- **Decisions:** single-gap sweep folds as an addendum, not a standalone review, per the standing
+  docs ruling — the class-killer test and the sweep table live in this entry either way, so the
+  audit trail is the same regardless of which file carries it. The structural test's one named
+  limitation (an inline, unnamed params type — e.g. `talentPools.members()`'s
+  `{ page, per_page }` — isn't harvested, since there's no interface to check it against) is
+  accepted rather than worked around: no filter-bearing wrapper uses that shape today, and if one
+  ever does, the gap is visible in a future sweep, not silently unguarded forever.
+- **Ref:** dated addendum on [`creator-dob-age-review.md`](creator-dob-age-review.md) (2026-08-30,
+  AH-096, AH-046 pattern, between its §5 and §6).
+
+---
+
 ### AH-095 · Invite-acceptance creates the account
 
 - **Status:** Landed — push HELD (per Pedram's explicit instruction). Full loop: kickoff with
