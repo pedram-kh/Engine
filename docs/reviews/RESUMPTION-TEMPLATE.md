@@ -116,40 +116,35 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-09-01 · **Through:** AH-096, the roster age-filter fix + class sweep.
-**Nothing is held.** `origin/main` tip is `6d4994e3`. CI green at both pushed tips per §5.41
-([run `33323794863`](https://github.com/pedram-kh/Engine/actions/runs/33323794863) for the AH-096
-fix commit `0eb3a7da`; [run `33324873425`](https://github.com/pedram-kh/Engine/actions/runs/33324873425)
-for the deploy-log-rider commit `6d4994e3`).
+**Last updated:** 2026-09-02 · **Through:** AH-097, campaign description on the creator assignment
+detail. **Nothing is held.** `origin/main` tip is `28547822`. CI green at both pushed tips per
+§5.41 ([run `33510200711`](https://github.com/pedram-kh/Engine/actions/runs/33510200711) for the
+AH-097 feature commit `7abd52c4`; [run `33511250955`](https://github.com/pedram-kh/Engine/actions/runs/33511250955)
+for the deploy-log-rider commit `28547822`).
 
-> **Honest gap, named rather than silently caught up on:** **AH-093 → AH-096 landed without their
-> own Part 2 refresh** — the same class of miss this file already recorded twice below (AH-085 →
-> AH-090, and AH-079 → AH-082). `adhoc-changes-log.md` is and was the whole time the authoritative
-> record for all four; this refresh is the first to reflect them here. One line each: **AH-093**
-> (campaign duration hidden on two creator-facing Jobs Board renders, render-only, zero `apps/api`
-> diff). **AH-094** (i18n used-keys-resolve coverage tripwire, both SPAs — pure-test, zero runtime
-> diff). **AH-095** (invite-acceptance creates the account for stranger invitees — full loop, D1–D6,
-> new `create-account` route + Form Request + service method + collision-race guard + dedicated
-> audit case; see `invite-acceptance-creates-account-review.md`). **AH-096** (`roster.api.ts` was
-> silently dropping `age_min`/`age_max` from the query string — fixed, plus a class sweep of every
-> list wrapper in both SPAs and a new structural architecture test pinning the class; see the
-> deploy-state paragraph below for the deploy side).
+**Deploy state: production is fully current, nothing undeployed, no open verification items —
+the deploy state is fully clean for the first time since AH-086 opened.**
 
-**Deploy state: production is now current through the deployed tip — nothing is undeployed.**
-Pedram confirmed the deploy carrying `6f5351de` → `0eb3a7da` ran on 2026-08-31/09-01, closing out
-the **five** stacked `PENDING` entries in `deploy-log.md` (AH-086 + b + AH-087, AH-088 + AH-089,
-AH-090, AH-091, AH-092) into one merged `DEPLOYED` entry (**AH-086 → AH-096**) — see
-[`deploy-log.md`](../runbooks/deploy-log.md)'s `2026-08-31` entry for the full range, the five
-migrations, the `creators:recompute-completeness` ritual output (1295 recomputed, idempotency
-proven — see the entry for why the platform-wide 44.51 average is not directly comparable to the
-"≈97" per-cohort figure), and every field's actual value (several genuinely **not recorded**, per
-Pedram's own instruction, rather than guessed). **One post-deploy check is still open:** the
-graduated-floor score distribution (count ≥99, count in 95–98.99, count in 78–82, approved-only
-average) — Pedram, please run the query in that entry's post-deploy verification item 10 on the
-box; until it's supplied, the graduated-floor outcome reads "recompute complete, distribution
-unverified."
+- **AH-097 is DEPLOYED** (2026-09-01) — smoke confirmed by Pedram on production: the "About this
+  campaign" block renders on a described campaign's assignment detail and is absent on an
+  undescribed one. Deployed runtime code is `7abd52c4` (the on-box `git rev-parse HEAD` was not
+  itself recorded, but the pull-target reasoning holds regardless — `origin/main`'s tip at deploy
+  time was `28547822`, and the two commits above `7abd52c4` in that range are docs-only). No
+  migration (verified — none pending at deploy), PHP-FPM reloaded, `apps/main` (the only SPA this
+  entry touches) rebuilt, no worker restart needed. See
+  [`deploy-log.md`](../runbooks/deploy-log.md)'s AH-097 entry.
+- **The AH-086 → AH-096 entry's last open item is now CLOSED, with evidence.** The graduated-floor
+  score-distribution check Pedram ran on the box (2026-09-01): `≥99: 1` · `95–98.99: 131` ·
+  `78–82: 30`, across 1,295 creator rows. **Verdict: AH-089's graduated floor confirmed in
+  production** — the 131-strong 95–99 bucket is the previously-complete cohort now sitting at
+  ≈97, missing only DOB (exactly the graduated outcome; under the superseded all-or-nothing floor
+  that bucket would be empty with those ~130 creators instead piled into 78–82, the cliff
+  signature). The 30 in 78–82 reads as ordinary mid-distribution creators genuinely missing
+  multiple fields, not the cliff. One creator has already self-healed into `≥99` by adding a
+  birthday. See [`deploy-log.md`](../runbooks/deploy-log.md)'s `2026-08-31 · AH-086 → AH-096` entry,
+  post-deploy verification item 10, for the full write-up.
 
-**Feature flags — four now registered, all OFF, none armed:**
+**Feature flags — four registered, all OFF, none armed:**
 
 - `platform_automations_enabled` (new in this range, AH-090) — **OFF, NOT armed by this deploy.**
   Arming is a separate, deliberate operator act (create the rules, read them back, THEN flip the
@@ -168,6 +163,30 @@ gates either:**
 2. **Suspended-agency direct-connect now refused (AH-090).** An admin direct-connecting a creator
    to a suspended agency gets `422 connection.agency_suspended` — a removed capability, not an
    added one.
+
+**Prior state, for the record — AH-096.** **Last updated:** 2026-09-01 · **Through:** AH-096, the
+roster age-filter fix + class sweep. `origin/main` tip at that close was `6d4994e3`.
+
+> **Honest gap, named rather than silently caught up on:** **AH-093 → AH-096 landed without their
+> own Part 2 refresh** — the same class of miss this file already recorded twice below (AH-085 →
+> AH-090, and AH-079 → AH-082). `adhoc-changes-log.md` is and was the whole time the authoritative
+> record for all four; that refresh was the first to reflect them here. One line each: **AH-093**
+> (campaign duration hidden on two creator-facing Jobs Board renders, render-only, zero `apps/api`
+> diff). **AH-094** (i18n used-keys-resolve coverage tripwire, both SPAs — pure-test, zero runtime
+> diff). **AH-095** (invite-acceptance creates the account for stranger invitees — full loop, D1–D6,
+> new `create-account` route + Form Request + service method + collision-race guard + dedicated
+> audit case; see `invite-acceptance-creates-account-review.md`). **AH-096** (`roster.api.ts` was
+> silently dropping `age_min`/`age_max` from the query string — fixed, plus a class sweep of every
+> list wrapper in both SPAs and a new structural architecture test pinning the class).
+
+> **Deploy state at that close:** Pedram confirmed the deploy carrying `6f5351de` → `0eb3a7da` ran
+> on 2026-08-31/09-01, closing out the **five** stacked `PENDING` entries in `deploy-log.md`
+> (AH-086 + b + AH-087, AH-088 + AH-089, AH-090, AH-091, AH-092) into one merged `DEPLOYED` entry
+> (**AH-086 → AH-096**) — the five migrations, the `creators:recompute-completeness` ritual output
+> (1295 recomputed, idempotency proven), and every field's actual value (several genuinely **not
+> recorded**, per Pedram's own instruction, rather than guessed) are in that entry. **One
+> post-deploy check was still open at that point:** the graduated-floor score distribution — now
+> CLOSED, with evidence, per the current top block above.
 
 **Prior state, for the record — AH-092.** **Last updated:** 2026-08-27 · **Through:** AH-092,
 Campaign attachments from the Files library (chunk B — link, visibility, creator read). Push was

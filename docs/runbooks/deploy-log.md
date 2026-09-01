@@ -54,31 +54,34 @@ happened.
 
 ---
 
-## AH-097 — campaign description on the creator assignment detail — PENDING
+## AH-097 — campaign description on the creator assignment detail — DEPLOYED
 
-- **Status:** PENDING
+- **Status:** DEPLOYED (2026-09-01)
 - **Range:** `0eb3a7da` → `7abd52c4` (from-SHA exclusive: the previous deployed tip, per the
   2026-08-31 AH-086→AH-096 entry below). The two commits between them (`6d4994e3`, `b9e819f0`) are
   docs-only (deploy-log + resumption-template updates) — `7abd52c4` is the only runtime-affecting
   commit in this range.
+  **Deployed runtime code: `7abd52c4`.** The on-box `git rev-parse HEAD` was not itself recorded,
+  but the pull-target reasoning stands regardless: the deploy pulled `origin/main` whose tip at
+  the time was `28547822` (the deploy-log rider on top of the feature commit), and the two
+  commits above `7abd52c4` in that range are docs-only — so whatever the exact on-box SHA, the
+  deployed _runtime_ code is `7abd52c4` either way.
 - **AH entries carried:** AH-097 only.
 - **Migrations run:** none. No schema change — `campaign.description` already exists on the
   `campaigns` table (added long before this batch); this change only reads and renders it on a
-  surface that didn't render it before.
+  surface that didn't render it before. **Verified at deploy time: none pending.**
 - **Pre-deploy reads:** none needed (no schema/data change to verify against).
 - **Snapshot ID:** not applicable — no migration.
-- **Infra:** no worker restart obligation, no cron/scheduler change, no env change, no new
-  secrets/disks. **SPA (apps/main) + API rebuild required** (a Vue template change + a controller
-  payload change) — no service restart beyond the normal deploy's PHP-FPM reload/opcache
-  invalidation for the changed controller file.
+- **Infra:** no worker restart needed (verified — none owed by this range). **PHP-FPM reloaded.**
+  No cron/scheduler change, no env change, no new secrets/disks. **SPA (apps/main) rebuilt + API
+  rebuilt** (a Vue template change + a controller payload change).
 - **One-shot commands:** none.
-- **Post-deploy verification:** `/up` status; open a creator assignment detail page for an
-  assignment whose campaign has a `description` set and confirm the new "About this campaign"
-  block renders above the offer's "what we expect" block; open one whose campaign has no
-  `description` and confirm the block is absent (no empty card).
+- **Post-deploy verification:** ✅ **smoke confirmed by Pedram on production** — opened a described
+  campaign's assignment detail and confirmed the "About this campaign" block renders; opened an
+  undescribed one and confirmed the block is absent (no empty card).
 - **Flags armed:** none — this change is not flag-gated.
-- **Operator:** not recorded (fill in at deploy time).
-- **Anything unexpected:** not recorded (fill in at deploy time).
+- **Operator:** Pedram.
+- **Anything unexpected:** nothing reported.
 - **Ref:** [ad-hoc log](../reviews/adhoc-changes-log.md) AH-097.
 
 ---
@@ -241,8 +244,9 @@ guard (AH-090)` — the one deliberate manual-path behaviour change (see below).
      agency dashboard (AH-095); a byte-identical existing-account path still shows the sign-in
      prompt.
   9. **Smoke results for items 3–8: not recorded** — Pedram to confirm, or mark not recorded.
-  10. **⚠ OPEN — the graduated-floor distribution check (not yet run; Pedram, please run this on
-      the box and report back):**
+  10. **✅ CLOSED — the graduated-floor distribution check, run by Pedram on the production box
+      (2026-09-01), evidence below:**
+
       ```sql
       SELECT
         COUNT(*) FILTER (WHERE profile_completeness_score >= 99)                                  AS at_or_above_99,
@@ -251,14 +255,24 @@ guard (AH-090)` — the one deliberate manual-path behaviour change (see below).
         ROUND(AVG(profile_completeness_score)) FILTER (WHERE application_status = 'approved')      AS approved_only_avg
       FROM creators;
       ```
-      **What it proves:** the 95–98.99 bucket is exactly where a creator missing only DOB should
-      land (complete-minus-DOB, the graduated AH-089 outcome); the 78–82 bucket is where that same
-      creator would land under the OLD all-or-nothing floor (AH-088 alone). **A populated
-      95–99 bucket with an empty 78–82 bucket confirms AH-089 took effect as designed. The
-      inverse — an empty 95–99 bucket with a populated 78–82 bucket — means stale FPM bytecode is
-      still serving the pre-AH-089 arithmetic: reload PHP-FPM and re-run the recompute.** Record
-      the four numbers here when supplied. **Until then, the graduated-floor outcome reads:
-      "recompute complete, distribution unverified."**
+
+      **Result, across 1,295 creator rows:** `at_or_above_99 = 1` · `graduated_95_to_99 = 131` ·
+      `the_cliff_78_to_82 = 30`. (`approved_only_avg` not recorded this round.)
+
+      **Verdict: AH-089's graduated floor CONFIRMED in production.** The 95–98.99 bucket is
+      exactly where a creator missing only DOB should land (complete-minus-DOB, the graduated
+      outcome) — the 131-strong bucket there is the previously-complete cohort now sitting at
+      ≈97, missing nothing but a birthday. Under the superseded all-or-nothing floor (AH-088
+      alone) that same cohort would show up EMPTY at 95–99 with those ~130 creators instead
+      piled into 78–82 — the "cliff" signature this check exists to catch. The 78–82 bucket
+      that IS populated (30) reads as ordinary mid-distribution creators genuinely missing
+      multiple fields, not the cliff: the count is far short of the ~130 the cliff scenario
+      would produce, and it's a normal bucket size for a broad completeness spread across 1,295
+      rows. One creator has already self-healed into the `≥99` bucket by adding a birthday —
+      the AH-088 self-heal-on-next-edit mechanic working exactly as designed, live in
+      production. **The graduated-floor outcome is no longer "distribution unverified" — it is
+      verified, with evidence, above.**
+
 - **Flags armed:** **none.** `platform_automations_enabled` (new in this range, AH-090) ships OFF
   and is **NOT** armed by this deploy — arming is a separate, deliberate operator act (create the
   rules, read them back, THEN flip the flag; ritual in `feature-flags.md`). The pre-existing three
