@@ -67,6 +67,7 @@ function makeDetail(
       campaign: {
         id: '01CAMP',
         name: 'Summer Launch',
+        description: null,
         posting_window_starts_at: null,
         posting_window_ends_at: null,
         brand_name: 'Acme',
@@ -547,6 +548,72 @@ describe('CreatorAssignmentDetailPage — offer description (AH-081, minimal ric
     const { wrapper } = await mountDetail()
 
     expect(wrapper.find('[data-testid="assignment-detail-offer-description"]').exists()).toBe(false)
+  })
+})
+
+// AH-097 — closes the AH-032 tech-debt gap: the campaign's OWN description
+// (distinct from the agency's per-assignment offer_description above),
+// already served to every rostered creator via the Jobs Board detail door.
+describe('CreatorAssignmentDetailPage — campaign description (AH-097)', () => {
+  it('renders the campaign description through RichBrief, above the offer description', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('invited', [], [], null, {
+        campaign: {
+          id: '01CAMP',
+          name: 'Summer Launch',
+          description: 'Two **Reels** and three *Stories* per month.',
+          posting_window_starts_at: null,
+          posting_window_ends_at: null,
+          brand_name: 'Acme',
+        },
+        offer_description: 'Please shoot outdoors.',
+      }),
+    })
+    const { wrapper } = await mountDetail()
+
+    const description = wrapper.find('[data-testid="assignment-detail-campaign-description"]')
+    expect(description.exists()).toBe(true)
+    expect(description.find('strong').text()).toBe('Reels')
+    expect(description.find('em').text()).toBe('Stories')
+
+    // Above the offer's "what we expect" — the campaign block precedes it in
+    // document order.
+    const html = wrapper.html()
+    expect(html.indexOf('assignment-detail-campaign-description')).toBeLessThan(
+      html.indexOf('assignment-detail-offer-description'),
+    )
+  })
+
+  it('omits the campaign description block entirely when there is none — absent, not an empty card', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('invited', [], [], null, {
+        campaign: {
+          id: '01CAMP',
+          name: 'Summer Launch',
+          description: null,
+          posting_window_starts_at: null,
+          posting_window_ends_at: null,
+          brand_name: 'Acme',
+        },
+      }),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-detail-campaign-description"]').exists()).toBe(
+      false,
+    )
+    expect(wrapper.find('section.assignment-detail__section').exists()).toBe(false)
+  })
+
+  it('omits the campaign description block when the campaign relation itself is null', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('invited', [], [], null, { campaign: null }),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-detail-campaign-description"]').exists()).toBe(
+      false,
+    )
   })
 })
 

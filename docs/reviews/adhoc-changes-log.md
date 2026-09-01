@@ -70,6 +70,83 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-097 · Campaign description on the creator assignment detail
+
+- **Status:** Landed. Fast batch (direct-iteration) — no kickoff, no standalone review file;
+  this entry is the record.
+- **Date:** 2026-09-01.
+- **Why:** Eyes-on report — an invited/assigned creator opening their assignment detail page
+  could read only the agency's per-assignment `offer_description` ("what we expect"), never the
+  campaign's own `description`. The gap was already named by the AH-032 tech-debt entry
+  ("Campaign brief/description is invisible to creators…"): agencies can write the campaign
+  description; creators had no surface to read it on the one page that matters most — the
+  assignment they're actually working.
+- **Fix:** `CreatorAssignmentDraftController::show()` (the inline payload that backs
+  `GET /api/v1/creators/me/assignments/{assignment}` — there is no dedicated
+  `CreatorAssignmentResource` PHP class for this endpoint; the payload is built directly in the
+  controller) now eager-loads `campaign.description` and adds it to the `campaign` sub-object.
+  Additive only — every existing key on that sub-object is untouched.
+  `CreatorAssignmentDetailPage.vue` renders it via `<RichBrief>` (the AH-081 component — sanitizer,
+  disposition, pre-wrap lesson already applied) under a new "About this campaign" heading, placed
+  above the agency's own `offer_description` block. Absent when the campaign has no description
+  set — the whole `<section>` is conditional on the value, never an empty card.
+- **Exposure check (the AH-088 fork question):** confirmed no other audience shares this payload.
+  `CreatorAssignmentDraftController::show()` is creator-only; the agency-facing rows come from a
+  wholly separate class (`CampaignAssignmentResource`) and a separate inline payload
+  (`CampaignAssignmentReviewController::show()`) — adding `description` here forks nothing. Separately,
+  the field is **not new exposure**: `CreatorJobDetailResource` already serves `campaign.description`
+  to every ROSTERED creator on the Jobs Board detail door (`CreatorJobDetailTest.php` pins it in the
+  happy-path keyset). An assignee reading it on the assignment detail is a strict subset of that
+  existing audience — an assignee is necessarily a rostered creator, and specifically this
+  campaign's own invitee.
+- **The exact-keyset pin (deliberately created, not just updated):** no exact-keyset test existed
+  on this endpoint's `campaign` sub-object before this batch — unlike the Jobs Board detail's
+  `DETAIL_KEYS` pin, the assignment show payload had never been keyset-pinned. This batch adds the
+  first one (`emits EXACTLY the campaign sub-keyset on show, including the new description`), so
+  the next field added to this sub-object is a deliberate, reviewed keyset change, not a silent
+  drift.
+- **List endpoint deliberately untouched:** the flat `GET /creators/me/assignments` list
+  (`CreatorAssignmentController::toRow()`, a separate inline payload) does NOT gain `description` —
+  out of scope, matching the existing `attachments`-field fence from AH-092 (some fields are
+  detail-only by design; the list stays a lightweight row).
+- **Specs:** backend — the new exact-keyset test, plus a value test (description renders) and a
+  null-safety test (key present, value `null`, never omitted, when the campaign has none set).
+  Frontend — three new Vitest cases: renders through `RichBrief` and sits above the offer
+  description in document order; block absent when `campaign.description` is `null`; block absent
+  when `campaign` itself is `null`. E2E: no existing Playwright spec asserts a full block/section
+  inventory on the assignment detail page (only specific testids for state-dependent forms), so
+  none needed flipping; the one E2E spec that renders this page
+  (`hand-off-at-approval-lifecycle.spec.ts`) still passes unchanged.
+- **i18n:** one new heading key, `creator.ui.assignments.detail.about` ("About this campaign"),
+  added to all 24 locales with real per-locale copy including the flaky-10
+  (`bg, el, et, fi, ga, hu, lt, lv, mt, ro`) — mirrored off the already-hand-translated
+  `creator.ui.jobs.detail.about` ("About this job") pattern per locale (swapping the noun, not a
+  fresh MT pass), since that key was itself real MT, not the mechanical/pluralised strings seen
+  elsewhere in some locale files. `LangParityTest` green across all three specs (file-set parity,
+  key-set parity, placeholder parity).
+- **Tech debt closed (partially):** the "creators can't read `description`" half of the AH-032
+  entry in `tech-debt.md` is now CLOSED (update note added, dated 2026-09-01). The entry's other
+  half — the brief-write forward-guard (merge-not-rebuild discipline for any future brief editor)
+  — remains open; no brief editor exists yet, so that half was never in this batch's scope.
+- **Touched:** `apps/api/app/Modules/Creators/Http/Controllers/CreatorAssignmentDraftController.php`
+  (eager-load + payload); `apps/api/tests/Feature/Modules/Creators/CreatorAssignmentDraftTest.php`
+  (+3 tests); `packages/api-client/src/types/campaign.ts`
+  (`CreatorAssignmentDetailResource.attributes.campaign.description`);
+  `apps/main/src/modules/creators/pages/CreatorAssignmentDetailPage.vue` (render block + style);
+  `apps/main/src/modules/creators/pages/CreatorAssignmentDetailPage.spec.ts` (+3 tests, +1 fixture
+  field); `apps/main/src/core/i18n/locales/*/creator.json` (×24, one key each);
+  `docs/tech-debt.md` (partial closure note).
+- **Gates:** `apps/main` Vitest — **176 files / 1732 tests**, 2 pre-existing unrelated flakes in
+  `Step2ProfileBasicsPage.spec.ts` (timeout under full-suite load; both green in isolation, 21/21)
+  — no failure traces to this change. `vue-tsc` clean; ESLint 0 new errors on every touched file.
+  `apps/api` Pest, `--filter=Creator` — **1111 tests / 3776 assertions, all passing**. PHPStan 0
+  errors on the touched controller; Pint clean on both touched PHP files. `LangParityTest` — 3/3
+  green. Playwright — `hand-off-at-approval-lifecycle.spec.ts` (the one spec that renders this
+  page) — **1/1 passing**, live against the real Laravel dev server + Postgres.
+- **Ref:** this entry; `docs/tech-debt.md` (AH-032 entry, partial-closure update note).
+
+---
+
 ### AH-096 · Roster age filter wiring gap + class sweep (fold on AH-088)
 
 - **Status:** Landed. Fast batch (direct-iteration) — no kickoff, no standalone review file; this

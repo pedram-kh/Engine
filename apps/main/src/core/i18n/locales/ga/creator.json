@@ -367,6 +367,7 @@
         "view": "Féach",
         "detail": {
           "back": "Ar ais to invitations",
+          "about": "Faoin bhfeachtas seo",
           "notFound": "This assignment could not be found.",
           "loadFailed": "We couldn't load this assignment. Please try again.",
           "retry": "Retry",

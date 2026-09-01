@@ -367,6 +367,7 @@
         "view": "Ver",
         "detail": {
           "back": "Volver a las invitaciones",
+          "about": "Sobre esta campaña",
           "notFound": "No se ha podido encontrar esta asignación.",
           "loadFailed": "No hemos podido cargar esta asignación. Inténtalo de nuevo.",
           "retry": "Reintentar",

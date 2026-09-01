@@ -127,6 +127,65 @@ it('404s on show for another creator\'s assignment', function (): void {
         ->assertNotFound();
 });
 
+// AH-097 — the campaign gains `description` on this detail payload (closes
+// the AH-032 tech-debt gap: an assignee previously had no way to read the
+// campaign's own description, only the agency's per-assignment
+// `offer_description`). The exact-keyset pin: no such pin existed on this
+// endpoint's `campaign` sub-object before this batch — this is the first one,
+// deliberately created so the next field addition here is deliberate too.
+it('emits EXACTLY the campaign sub-keyset on show, including the new description', function (): void {
+    [$user, $creator] = draftCreatorUser();
+    $assignment = assignmentForCreatorInStatus($creator, AssignmentStatus::Producing);
+
+    $campaign = $this->actingAs($user)
+        ->getJson("/api/v1/creators/me/assignments/{$assignment->ulid}")
+        ->assertOk()
+        ->json('data.attributes.campaign');
+
+    expect(array_keys($campaign))->toBe([
+        'id',
+        'name',
+        'description',
+        'posting_window_starts_at',
+        'posting_window_ends_at',
+        'brand_name',
+    ]);
+});
+
+it('renders the campaign description on show (AH-097)', function (): void {
+    [$user, $creator] = draftCreatorUser();
+    $campaign = Campaign::factory()->create([
+        'budget_currency' => 'EUR',
+        'description' => 'Two Reels and three Stories per month.',
+    ]);
+    $assignment = CampaignAssignment::factory()->status(AssignmentStatus::Producing)->create([
+        'campaign_id' => $campaign->id,
+        'creator_id' => $creator->id,
+    ]);
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/creators/me/assignments/{$assignment->ulid}")
+        ->assertOk()
+        ->assertJsonPath(
+            'data.attributes.campaign.description',
+            'Two Reels and three Stories per month.',
+        );
+});
+
+it('the campaign description key is present but null when the campaign has none set (AH-097)', function (): void {
+    [$user, $creator] = draftCreatorUser();
+    $campaign = Campaign::factory()->create(['budget_currency' => 'EUR', 'description' => null]);
+    $assignment = CampaignAssignment::factory()->status(AssignmentStatus::Producing)->create([
+        'campaign_id' => $campaign->id,
+        'creator_id' => $creator->id,
+    ]);
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/creators/me/assignments/{$assignment->ulid}")
+        ->assertOk()
+        ->assertJsonPath('data.attributes.campaign.description', null);
+});
+
 // ── Draft submit (producing → draft_submitted) ────────────────────────────────
 
 it('submits a v1 draft, transitions producing → draft_submitted, audits + emits the event', function (): void {

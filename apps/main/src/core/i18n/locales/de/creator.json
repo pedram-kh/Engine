@@ -367,6 +367,7 @@
         "view": "Ansehen",
         "detail": {
           "back": "Zurück zu Einladungen",
+          "about": "Über diese Kampagne",
           "notFound": "Dieser Auftrag konnte nicht gefunden werden.",
           "loadFailed": "Dieser Auftrag konnte nicht geladen werden. Bitte versuche es erneut.",
           "retry": "Erneut versuchen",

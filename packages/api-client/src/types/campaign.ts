@@ -594,6 +594,8 @@ export interface CreatorAssignmentDetailResource {
     campaign: {
       id: string
       name: string
+      /** The campaign's own description — closes the AH-032 gap (AH-097). */
+      description: string | null
       posting_window_starts_at: string | null
       posting_window_ends_at: string | null
       brand_name: string | null

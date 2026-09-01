@@ -367,6 +367,7 @@
         "view": "Voir",
         "detail": {
           "back": "Retour aux invitations",
+          "about": "À propos de cette campagne",
           "notFound": "Cette mission est introuvable.",
           "loadFailed": "Nous n'avons pas pu charger cette mission. Veuillez réessayer.",
           "retry": "Réessayer",

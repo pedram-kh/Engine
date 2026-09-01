@@ -367,6 +367,7 @@
         "view": "Zobraziť",
         "detail": {
           "back": "Späť na pozvánky",
+          "about": "O tejto kampani",
           "notFound": "Tento úkol nie je možné nalézt.",
           "loadFailed": "Nepodařilo sa nám načíst tento úkol. Zkuste to znova.",
           "retry": "Skúsiť znova",

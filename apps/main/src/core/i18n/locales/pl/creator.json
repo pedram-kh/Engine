@@ -367,6 +367,7 @@
         "view": "Wyświetl",
         "detail": {
           "back": "Wróć do zaproszeń",
+          "about": "O tej kampanii",
           "notFound": "Tego zadania nie można znaleźć.",
           "loadFailed": "Nie mogliśmy załadować tego zadania. Spróbuj ponownie.",
           "retry": "Spróbuj ponownie",

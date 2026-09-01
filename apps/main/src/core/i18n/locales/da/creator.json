@@ -367,6 +367,7 @@
         "view": "Se",
         "detail": {
           "back": "Tilbage til invitationer",
+          "about": "Om denne kampagne",
           "notFound": "Denne opgave kunne ikke findes.",
           "loadFailed": "Vi kunne ikke indlæse denne opgave. Prøv igen.",
           "retry": "Prøv igen",

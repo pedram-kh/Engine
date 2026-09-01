@@ -146,6 +146,15 @@ final class CreatorAssignmentDraftController
                     'campaign' => $campaign !== null ? [
                         'id' => $campaign->ulid,
                         'name' => $campaign->name,
+                        // AH-097 — closes the AH-032 tech-debt gap: the assignee
+                        // could read only offer_description, never the
+                        // campaign's own description. Already served to every
+                        // ROSTERED creator via CreatorJobDetailResource on the
+                        // Jobs Board detail door; an assignee reading it here is
+                        // a strict subset (an assignee is necessarily rostered
+                        // and, on top of that, this specific campaign's own
+                        // invitee) — no new exposure.
+                        'description' => $campaign->description,
                         'posting_window_starts_at' => ($campaign->posting_window_starts_at ?? $campaign->starts_at)?->toIso8601String(),
                         'posting_window_ends_at' => ($campaign->posting_window_ends_at ?? $campaign->ends_at)?->toIso8601String(),
                         'brand_name' => $brand?->name,
@@ -553,7 +562,7 @@ final class CreatorAssignmentDraftController
             ->withoutGlobalScope(BelongsToAgencyScope::class)
             ->where('creator_id', $creator->id)
             ->where('ulid', $assignmentUlid)
-            ->with(['campaign:id,ulid,name,posting_window_starts_at,posting_window_ends_at,starts_at,ends_at,brand_id,requires_per_campaign_contract,creator_posts_content', 'campaign.brand:id,ulid,name'])
+            ->with(['campaign:id,ulid,name,description,posting_window_starts_at,posting_window_ends_at,starts_at,ends_at,brand_id,requires_per_campaign_contract,creator_posts_content', 'campaign.brand:id,ulid,name'])
             ->first();
 
         if ($assignment === null) {

@@ -367,6 +367,7 @@
         "view": "Vedi",
         "detail": {
           "back": "Torna agli inviti",
+          "about": "Informazioni sulla campagna",
           "notFound": "Impossibile trovare questo incarico.",
           "loadFailed": "Impossibile caricare questo incarico. Riprova.",
           "retry": "Riprova",

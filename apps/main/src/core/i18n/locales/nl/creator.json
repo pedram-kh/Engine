@@ -367,6 +367,7 @@
         "view": "Bekijken",
         "detail": {
           "back": "Terug naar uitnodigingen",
+          "about": "Over deze campagne",
           "notFound": "Deze opdracht kon niet worden gevonden.",
           "loadFailed": "We konden deze opdracht niet laden. Probeer het opnieuw.",
           "retry": "Opnieuw proberen",

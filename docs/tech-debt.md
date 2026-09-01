@@ -459,6 +459,16 @@ present (AH-070)`, placed in the one window where `.env` genuinely does not exis
 
 ## Campaign brief/description is invisible to creators + brief-write forward-guard
 
+> **Update (2026-09-01, AH-097): the "creators can't read `description`" half of this entry is
+> CLOSED.** The creator assignment detail now renders `campaign.description` (the
+> `CreatorAssignmentDraftController::show()` payload gained the field, additive; the SPA renders it
+> via `<RichBrief>` under an "About this campaign" heading, above the agency's own
+> `offer_description` block — absent when empty, never an empty card). This closes only the
+> read-surface gap; the **brief-write forward-guard below is still open** — no brief editor has been
+> built, so the merge-not-rebuild rule has not yet been exercised for real. The
+> `preserves the stored brief byte-identical when the edit omits it` regression test still stands as
+> the current invariant's pin.
+
 - **Where:** the campaign `brief` jsonb blob + `description` column
   ([`Campaign`](../apps/api/app/Modules/Campaigns/Models/Campaign.php)), the creator-facing assignment
   detail surface ([`CreatorAssignmentDetailPage.vue`](../apps/main/src/modules/creators/pages/CreatorAssignmentDetailPage.vue)),
@@ -485,8 +495,9 @@ present (AH-070)`, placed in the one window where `.env` genuinely does not exis
   creator assignment detail, legibly (markdown or sanitised prose); (2) if a brief editor is built,
   load-merge-save the full blob (or explicitly, consciously replace named keys), never reconstruct it
   from whatever inputs happen to be on screen.
-- **Owner:** whoever next builds creator-visible campaign brief/description or a campaign brief editor.
-- **Status:** open (product gap + forward-guard). Surfaced by AH-032, July 12, 2026
+- **Owner:** whoever next builds a campaign brief editor (the forward-guard's remaining trigger).
+- **Status:** the product-gap half CLOSED by AH-097, September 1, 2026 (see the update note above);
+  the brief-write forward-guard half remains open. Surfaced by AH-032, July 12, 2026
   ([ad-hoc log](reviews/adhoc-changes-log.md)).
 
 ---

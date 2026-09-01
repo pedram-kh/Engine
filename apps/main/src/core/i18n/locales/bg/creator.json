@@ -367,6 +367,7 @@
         "view": "Вижте",
         "detail": {
           "back": "Назад to invitations",
+          "about": "За тази кампания",
           "notFound": "This assignment could not be found.",
           "loadFailed": "We couldn't load this assignment. Моля try again.",
           "retry": "Retry",

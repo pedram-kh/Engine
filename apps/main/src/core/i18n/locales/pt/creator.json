@@ -367,6 +367,7 @@
         "view": "Ver",
         "detail": {
           "back": "Voltar aos convites",
+          "about": "Sobre esta campanha",
           "notFound": "Não foi possível encontrar esta atribuição.",
           "loadFailed": "Não foi possível carregar esta atribuição. Tente novamente.",
           "retry": "Tentar novamente",

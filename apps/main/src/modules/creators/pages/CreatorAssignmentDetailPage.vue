@@ -532,6 +532,24 @@ onMounted(() => {
         >
       </p>
 
+      <!-- The campaign's own description (AH-097 — closes the AH-032 gap: an
+           invited/assigned creator could previously read only the agency's
+           offer_description below, never the campaign's own description,
+           even though the Jobs Board detail door already serves this same
+           field to every rostered creator). Absent → block absent, not an
+           empty card. -->
+      <section
+        v-if="assignment.attributes.campaign?.description"
+        class="assignment-detail__section"
+      >
+        <h2 class="text-subtitle-1">{{ t('creator.ui.assignments.detail.about') }}</h2>
+        <RichBrief
+          :text="assignment.attributes.campaign.description"
+          class="text-body-2 assignment-campaign-description"
+          data-testid="assignment-detail-campaign-description"
+        />
+      </section>
+
       <!-- The agency's offer expectations + attachment (invite-offer-details
            batch). Minimal rich text (AH-081) via RichBrief. -->
       <RichBrief
@@ -1098,8 +1116,15 @@ onMounted(() => {
    would additionally render the sanitized HTML's literal whitespace between
    tags, doubling every break into a blank line. The other two fields below
    are still plain-text interpolation and keep pre-wrap. */
-.assignment-offer-description {
+.assignment-offer-description,
+.assignment-campaign-description {
   word-break: break-word;
+}
+
+.assignment-detail__section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .assignment-revision-feedback,

@@ -367,6 +367,7 @@
         "view": "View",
         "detail": {
           "back": "Back to invitations",
+          "about": "About this campaign",
           "notFound": "This assignment could not be found.",
           "loadFailed": "We couldn't load this assignment. Please try again.",
           "retry": "Retry",
