@@ -116,12 +116,63 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-08-27 · **Through:** AH-092, Campaign attachments from the Files library
-(chunk B — link, visibility, creator read). **Push is HELD** on the two-commit pair (the feature
-commit + the docs commit landing alongside this refresh) per Pedram's explicit instruction; no
-push, no CI run, and therefore no tip to cite yet. `git rev-parse --short HEAD` is the authority
-for the actual local tip — re-derive it, do not carry this session's SHA forward once a push
-happens.
+**Last updated:** 2026-09-01 · **Through:** AH-096, the roster age-filter fix + class sweep.
+**Nothing is held.** `origin/main` tip is `6d4994e3`. CI green at both pushed tips per §5.41
+([run `33323794863`](https://github.com/pedram-kh/Engine/actions/runs/33323794863) for the AH-096
+fix commit `0eb3a7da`; [run `33324873425`](https://github.com/pedram-kh/Engine/actions/runs/33324873425)
+for the deploy-log-rider commit `6d4994e3`).
+
+> **Honest gap, named rather than silently caught up on:** **AH-093 → AH-096 landed without their
+> own Part 2 refresh** — the same class of miss this file already recorded twice below (AH-085 →
+> AH-090, and AH-079 → AH-082). `adhoc-changes-log.md` is and was the whole time the authoritative
+> record for all four; this refresh is the first to reflect them here. One line each: **AH-093**
+> (campaign duration hidden on two creator-facing Jobs Board renders, render-only, zero `apps/api`
+> diff). **AH-094** (i18n used-keys-resolve coverage tripwire, both SPAs — pure-test, zero runtime
+> diff). **AH-095** (invite-acceptance creates the account for stranger invitees — full loop, D1–D6,
+> new `create-account` route + Form Request + service method + collision-race guard + dedicated
+> audit case; see `invite-acceptance-creates-account-review.md`). **AH-096** (`roster.api.ts` was
+> silently dropping `age_min`/`age_max` from the query string — fixed, plus a class sweep of every
+> list wrapper in both SPAs and a new structural architecture test pinning the class; see the
+> deploy-state paragraph below for the deploy side).
+
+**Deploy state: production is now current through the deployed tip — nothing is undeployed.**
+Pedram confirmed the deploy carrying `6f5351de` → `0eb3a7da` ran on 2026-08-31/09-01, closing out
+the **five** stacked `PENDING` entries in `deploy-log.md` (AH-086 + b + AH-087, AH-088 + AH-089,
+AH-090, AH-091, AH-092) into one merged `DEPLOYED` entry (**AH-086 → AH-096**) — see
+[`deploy-log.md`](../runbooks/deploy-log.md)'s `2026-08-31` entry for the full range, the five
+migrations, the `creators:recompute-completeness` ritual output (1295 recomputed, idempotency
+proven — see the entry for why the platform-wide 44.51 average is not directly comparable to the
+"≈97" per-cohort figure), and every field's actual value (several genuinely **not recorded**, per
+Pedram's own instruction, rather than guessed). **One post-deploy check is still open:** the
+graduated-floor score distribution (count ≥99, count in 95–98.99, count in 78–82, approved-only
+average) — Pedram, please run the query in that entry's post-deploy verification item 10 on the
+box; until it's supplied, the graduated-floor outcome reads "recompute complete, distribution
+unverified."
+
+**Feature flags — four now registered, all OFF, none armed:**
+
+- `platform_automations_enabled` (new in this range, AH-090) — **OFF, NOT armed by this deploy.**
+  Arming is a separate, deliberate operator act (create the rules, read them back, THEN flip the
+  flag; ritual in `feature-flags.md`).
+- `job_posted_notifications_enabled`, `application_notifications_enabled`,
+  `missing_creator_mails_enabled` (the three pre-existing mail flags — live since the 2026-07-31
+  Jobs Board arc and the 2026-08-19 AH-083 close respectively) — **per their last known state: OFF,
+  not armed.** This range touches none of the three; not independently re-verified this session.
+
+**Two flag-independent behaviour changes to EXISTING paths are now live in production, no flag
+gates either:**
+
+1. **DOB is now required on profile save (AH-088).** An existing creator's next profile SAVE is
+   blocked until they enter a birthday (pending/rejected hard-block, approved soft-warn). Self-heals
+   per creator the moment they fill it in.
+2. **Suspended-agency direct-connect now refused (AH-090).** An admin direct-connecting a creator
+   to a suspended agency gets `422 connection.agency_suspended` — a removed capability, not an
+   added one.
+
+**Prior state, for the record — AH-092.** **Last updated:** 2026-08-27 · **Through:** AH-092,
+Campaign attachments from the Files library (chunk B — link, visibility, creator read). Push was
+HELD on the two-commit pair at that close per Pedram's explicit instruction; both since pushed and
+CI-confirmed (see the deploy-state note above).
 
 > **📝 AH-092 — CAMPAIGN ATTACHMENTS FROM THE FILES LIBRARY, CHUNK B: LINK, VISIBILITY, CREATOR
 > READ.** Full loop — read-only inventory (`campaign-attachments-inventory.md`) → kickoff (D1–D6) →

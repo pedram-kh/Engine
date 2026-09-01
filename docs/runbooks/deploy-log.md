@@ -54,484 +54,207 @@ happened.
 
 ---
 
-## 2026-08-27 · AH-092 — campaign attachments from the Files library, chunk B — PENDING
+## 2026-08-31 · AH-086 → AH-096 — agency sign-in + invite-door, members 2FA, DOB→age + graduated floor scoring, platform automations, agency files library (chunks A+B), campaign-duration hide, invite-acceptance account creation, roster age-filter fix — DEPLOYED
 
-> **⚠ This entry STACKS on the AH-091 PENDING entry below** (which itself stacks on AH-090, and
-> AH-088 + AH-089, and AH-086 + b + AH-087). Whoever deploys next runs **all five** checklists in one
-> pass. Combined across all five: **5 migrations**, **`migrate` required**, **queue-worker restart
-> required** (still owed from the AH-088/089 range — this chunk adds no queued job of its own),
-> **PHP-FPM reload required**, and **one post-deploy artisan command** (the AH-088/089 entry's
-> `creators:recompute-completeness` — AH-090, AH-091, and AH-092 each add none of their own).
->
-> **Rider (2026-08-28): AH-093 joins this entry, not a new one.** A one-commit, template-only hide
-> (campaign duration removed from two creator Vue renders) with **zero deploy obligation of its
-> own** — no migration, no schema touch, no new route or controller, no queue/cron change, and
-> `apps/api` sees no diff at all. It rides the same stack purely for range completeness; the
-> combined totals above (5 migrations, PHP-FPM reload, etc.) are **unchanged by AH-093**.
->
-> **Rider (2026-08-30): AH-095 joins this entry, not a new one.** One new unauthenticated route
-> (`POST /agencies/{agency}/invitations/create-account`) — **no migration** (the `users` table
-> already carries every column this write needs). Adds to the stack's existing PHP-FPM-reload
-> obligation (a new controller action, Form Request, and service method — already required by
-> AH-091/092 above, so no _new_ infra line, but the reload now also serves this route) and
-> confirms the stack's `apps/main` bundle rebuild carries `AcceptInvitationPage.vue`'s new
-> branch + 48 touched locale files. `apps/admin` sees no diff. AH-094 (pure-test, both SPAs'
-> `i18n-used-keys-resolve.spec.ts`) is **not** added as a rider here — no runtime file changed,
-> nothing for a deploy to carry.
->
-> **Rider (2026-08-30): AH-096 joins this entry, not a new one.** Fixes `roster.api.ts::list()`
-> silently dropping the `age_min`/`age_max` query params (an AH-088 wiring gap) — **zero deploy
-> obligation of its own**: no migration, no new route, and its one `apps/api` touch
-> (`CreateRosterCreatorsController` gaining a `date_of_birth` field) is a `/api/v1/_test/*`
-> test-helper route that `TestHelpersServiceProvider` never registers outside `local`/`testing` —
-> **not present in production at all**, so it needs no PHP-FPM reload, no config, nothing. The
-> stack's already-owed `apps/main` bundle rebuild is confirmed to carry this fix (`roster.api.ts`
-> only); `apps/admin` sees no diff. Combined totals above (5 migrations, PHP-FPM reload, etc.) are
-> **unchanged by AH-096**.
+> This entry **merges** what were, until this update, **five stacked `PENDING` entries** — AH-086 +
+> b + AH-087, AH-088 + AH-089, AH-090, AH-091, and AH-092 (itself carrying the AH-093, AH-095, and
+> AH-096 riders) — per the arc-deploy convention (`production-queue-worker.md` §8.3 — a themed
+> backlog does not ship as a subset) and the same precedent as the 2026-08-19 AH-067 → AH-083
+> merge below. Pedram confirmed the deploy carrying this **entire held backlog** ran on
+> **2026-08-31/09-01**. Per his instruction: **fields he did not supply are written "not
+> recorded," not `TBD`** — an honest gap, not a placeholder awaiting a later fill.
 
-- **Status:** PENDING
-- **Range:** the tip carrying the AH-091 entry → the tip carrying this entry.
-  - _(feature commit SHA to be filled once assigned)_ — `feat(campaigns): Campaign attachments from
-the Files library, chunk B (AH-092)` — the migration, model, controller/resources/requests, the
-    `hasAttachments()` real query, the creator read path on both doors, the picker's `?for=select`
-    branch, the SPA surface (Attachments tab, attach dialog, creator attachment block), i18n ×24,
-    and the full Pest + Vitest coverage.
-  - _(docs commit SHA to be filled once assigned)_ — `docs(reviews): Campaign attachments from the
-Files library, chunk B — review, tech-debt correction (AH-092)` — this entry, the review file,
-    the AH-092 ad-hoc log entry, the `tech-debt.md` AH-092 entry (with its mid-session Q1 correction)
-    and AH-091 item-3 extension, and the `docs/security/tenancy.md` two-row update.
-  - `8547cc02` — `feat(creators): hide campaign duration on Jobs Board surfaces (AH-093)` — the
-    template-only render hide (`CreatorJobsPage.vue`, `CreatorJobDetailPage.vue`), the two flipped/
-    added Vitest specs, and this file's own AH-093 adhoc-log entry, all in one commit. **Rider only —
-    see the note above; no obligation added to this stack.**
-  - _(feature commit SHA to be filled once assigned)_ — `feat(agencies): invite-acceptance creates
-the account for stranger invitees (AH-095)` — the new `create-account` route, Form Request,
-    controller action, service method, the `InvitationAccountExistsException` collision-race guard,
-    the `AuditAction` case, the preview endpoint's two new fields, the SPA's new `'no-account'`
-    branch + set-password form, i18n ×24, and the full Pest + Vitest + Playwright coverage.
-  - _(docs commit SHA to be filled once assigned)_ — `docs(reviews): Invite-acceptance creates the
-account — review, tech-debt, tenancy allowlist (AH-095)` — this entry, the review file, the
-    AH-095 ad-hoc log entry, the new `tech-debt.md` invitation-revocation entry, and the
-    `docs/security/tenancy.md` allowlist row.
-  - `0eb3a7da` — `fix(roster): thread age_min/age_max into the query string + class-sweep pin
-(AH-096)` — the `roster.api.ts` fix, the wrapper-level + structural (`api-wrapper-params-serialized
-    .spec.ts`, both SPAs) + Playwright pins, the test-helper-only `CreateRosterCreatorsController`
-    change, and the `creator-dob-age-review.md` addendum + this file's own AH-096 adhoc-log entry.
-    **Rider only — see the note above; no obligation added to this stack.**
-- **AH entries carried:** **AH-092, AH-093, AH-095, AH-096** (AH-093 and AH-096 are both
-  zero-obligation riders — no migration, no restart, no new production route; AH-096's one
-  `apps/api` touch is a test-helper route never registered outside `local`/`testing`. AH-095 adds a
-  route + PHP-FPM-reload need but no migration — see the rider notes above).
-- **Migrations run:** **1** — `2026_08_27_140000_create_campaign_attachments_table.php`. AH-095 adds
-  **none** — the `users` table already had every column its `User::create()` call needs. A
-  `CREATE TABLE`, nothing else: **no existing table is touched, no column added anywhere, no
-  backfill.** The table ships **EMPTY** and stays empty until an agency member attaches a file to a
-  campaign.
-  - **`down()` honesty:** `dropIfExists` is a true structural AND content inverse — this table is new
-    this chunk, so a rollback loses only this chunk's own attach/visibility history. No pre-existing
-    `campaigns`/`agency_files` row and no S3 object is touched either direction.
-- **Pre-deploy reads:** none. There is nothing to count — the table doesn't exist before this
-  migration runs, so there is no pre-existing population.
-- **Infra:** **queue-worker restart NOT required for this chunk specifically** — every operation
-  (attach, toggle, detach) runs synchronously in the request; the restart already owed by the
-  AH-088/089 range in the stack above is unaffected by this addition. **PHP-FPM reload required**
-  (new controller, model, resources, routes) — AH-092's own obligation; **AH-093's rider adds
-  nothing here** (a Vue template + Vitest spec change only — no PHP file, so no reload need of its
-  own); **AH-095's rider rides the same reload** (its new controller action/Form Request/service
-  method need the same fresh opcode cache — no additional infra line, just confirmation this
-  reload also covers it). No cron/scheduler change. No env changes, no new secrets — reuses
-  AH-091's `media` disk under the file's own existing key; attaching a file never moves or
-  duplicates its bytes; AH-095 introduces no new secret or vendor either.
-- **One-shot commands:** none.
-- **Post-deploy verification:** `/up` 200; then, authenticated as an agency member with a campaign
-  and a library file already in place, `POST
-/api/v1/agencies/{agency}/campaigns/{campaign}/attachments` with that file's ulid returns 201 and
-  the file's own delete route now returns 409 `agency_file.attached` while attached; `DELETE` the
-  attachment and confirm the file's delete route returns 204 again. As a creator with a visible
-  attachment on an assigned campaign, confirm `GET /api/v1/creators/me/assignments/{assignment}`'s
-  `attributes.attachments` array contains it with a live signed `url`. **AH-093's own check:** open
-  the Jobs Board card list and a job's detail page as a creator and confirm no "Duration: …" text
-  renders on either, while `GET /api/v1/creators/me/jobs` and its `/{campaign}` detail route still
-  return `listing_duration` in the JSON (byte-identical payload, hidden only in the SPA render).
-  **AH-095's own check:** seed a fresh invitation for a never-signed-up email, load its accept URL
-  unauthenticated and confirm the set-password form renders (not the sign-in prompt); submit it and
-  confirm `GET /api/v1/agencies/{agency}/invitations/create-account`'s prior invitation now shows
-  `is_accepted: true` via the preview endpoint, the created `users` row has `email_verified_at` set,
-  and re-submitting the same (now-stale) form returns 409 `invitation.already_accepted`. Separately
-  confirm the byte-identical path: an invitee whose account already exists still sees the sign-in
-  prompt, never the new form. **AH-096's own check:** on the agency roster (`/roster`), set the
-  age-min/age-max filter to a narrow bracket around one known creator's age and confirm the table
-  narrows to just that creator (and any other creator without a `date_of_birth` on file drops out) —
-  the pre-fix symptom was exactly this filter doing nothing.
-- **Flags armed:** none — this chunk ships no feature flag; the surface is live for every agency
-  member and every eligible creator the moment the deploy completes (no staged rollout was
-  requested).
-- **Operator:** _to be filled at deploy._
-- **Anything unexpected:** _to be filled at deploy._
-
----
-
-## 2026-08-27 · AH-091 — agency files library, chunk A: upload, list, delete — PENDING
-
-> **⚠ This entry STACKS on the AH-090 PENDING entry below** (which itself stacks on AH-088 + AH-089,
-> and AH-086 + b + AH-087). Whoever deploys next runs **all four** checklists in one pass. Combined
-> across all four: **4 migrations**, **`migrate` required**, **queue-worker restart required**,
-> **PHP-FPM reload required**, and **one post-deploy artisan command** (the AH-088/089 entry's
-> `creators:recompute-completeness` — neither AH-090 nor AH-091 adds a command of its own).
-
-- **Status:** PENDING
-- **Range:** the tip carrying the AH-090 entry → the tip carrying this entry.
-  - `706a0b6e` — `feat(agencies): Agency Files library, chunk A — upload, list, delete (AH-091)` —
-    the migration, model, service, controller/policy/resource, routes, the shared
-    `AttachmentMimeTypes` extraction (+ the three existing consumers switched to import it), the
-    SPA surface (nav, page, upload dialog, api-client DTOs), i18n ×24, and the full Pest + Vitest
-    coverage.
-  - `4447c4c4` — `docs(reviews): Agency Files library, chunk A — review, corrections, debt
-(AH-091)` — this entry, the review file, the AH-091 ad-hoc log entry, the `03-DATA-MODEL.md` §16
-    distinction, the `00-MASTER-ARCHITECTURE.md` §4 tenancy row, and the `tech-debt.md` AV-count
-    correction + four new debt entries.
-  - _(close-commit SHA to be filled once assigned — cannot record its own hash)_ — the review
-    file's §9 close-out verdict, ratified by Pedram.
-- **AH entries carried:** **AH-091.**
-- **Migrations run:** **1** — `2026_08_27_130000_create_agency_files_table.php`. A `CREATE TABLE`,
-  nothing else: **no existing table is touched, no column added anywhere, no backfill.** The
-  table ships **EMPTY** and stays empty until an agency member uploads a file.
-  - **`down()` honesty:** `dropIfExists` is a true structural inverse with a **lossy content
-    inverse** — a rollback discards every row (and every reference to the S3 objects those rows
-    named), but never touches the S3 objects themselves; those sit outside a migration's reach
-    either way. A redeploy comes back with an empty table.
-- **Pre-deploy reads:** none. There is nothing to count — the table doesn't exist before this
-  migration runs, so there is no pre-existing population.
-- **Infra:** **queue-worker restart NOT required** — this chunk dispatches no queued job; every
-  operation (`initUpload`, `completeUpload`, `delete`) runs synchronously in the request. **PHP-FPM
-  reload required** (new controller, policy, routes, model, enum). No cron/scheduler change. No
-  env changes, no new secrets — the existing `media` disk/bucket is reused under a new prefix
-  (`agencies/{agency}/files/`), not a new one.
-- **One-shot commands:** none.
-- **Post-deploy verification:** `/up` 200; then, authenticated as an agency member, `GET
-/api/v1/agencies/{agency}/files` returns `{"data": [], "meta": {"total": 0, ...}}` (the empty
-  table, reachable and authorized) and the agency SPA's new **Files** nav item loads the empty
-  state. Upload one small test file end-to-end (init → PUT → complete) and confirm it lists,
-  downloads with `Content-Disposition: attachment`, and deletes (as admin) with the S3 object
-  actually gone (`aws s3 ls` on the exact key, or the disk's own `exists()` check).
-- **Flags armed:** none — this chunk ships no feature flag; the surface is live for every agency
-  member the moment the deploy completes (no staged rollout was requested).
-- **Operator:** _to be filled at deploy._
-- **Anything unexpected:** _to be filled at deploy._
-
----
-
-## 2026-08-27 · AH-090 — platform automations: rules table + on-approval auto-connect — PENDING
-
-> **⚠ This entry STACKS on the two PENDING entries below** (AH-088 + AH-089, and AH-086 + b + AH-087).
-> Whoever deploys next runs **all three** checklists in one pass. Combined across the three:
-> **3 migrations**, **`migrate` required**, **queue-worker restart required**, **PHP-FPM reload
-> required**, and **one post-deploy artisan command** (the AH-088/089 entry's
-> `creators:recompute-completeness` — AH-090 adds no command of its own).
-
-- **Status:** PENDING
-- **Range:** the tip carrying the AH-088 + AH-089 entry → the tip carrying this entry. Commits, in
-  order:
+- **Status:** **DEPLOYED.** Confirmed by Pedram — deploy ran 2026-08-31/09-01.
+- **Range:** `6f5351de` (the AH-085 deployed tip, exclusive) → `0eb3a7da` (the AH-096 fix — **"the
+  deployed tip," per Pedram**). **Note, same class as the 2026-08-19 AH-085 entry's own "Box HEAD ≠
+  origin tip" note below:** `origin/main` now reads one commit further, `6d4994e3`
+  (`docs(runbooks): AH-096 rides the pending stack — deploy-log rider` — this entry's own
+  predecessor edit, docs-only, zero diff outside `docs/`). The deployed code is byte-identical to
+  what that commit sits on top of. **48 commits** in the range; the ones with an actual runtime
+  diff, in order:
+  - `2e7c02ad` — `feat(auth): agency-facing sign-in variant, one component (AH-086)`.
+  - `0edcffa1` — `feat(agencies): team-invite email's CTA doors through /agency/sign-in (AH-086b)`
+    — the magic-link door (`AgencyInvitationService` + `InviteAgencyUserMail` + `SignInPage.vue`).
+  - `2de36602` — `fix(tests): Larastan-safe assertion chaining in AH-086b invite tests` (test-only).
+  - `48a984a8` — `feat(admin): agency members drill-in + per-member 2FA reset/exempt (AH-087)`.
+  - `c140b001` — `feat(spa): members card with 2FA controls + exemption-aware guard (AH-087)`.
+  - `0fba5a4c` — `feat(creators): date of birth with derived age everywhere (AH-088)` — the
+    migration, model, resources, floor, filter, both SPAs, api-client types, 72 locale files.
+  - `ad696308` — `fix(tests): stop comparing a whole base64url segment to a single char (flaky)`
+    (test-only).
+  - `4d56d312` — `feat(creators): graduated per-field floor scoring (AH-089)` — no migration.
   - `f31d7c7b` — `refactor(creators): extract CreatorAgencyDirectConnectService + suspended-agency
-guard (AH-090)` — the service + outcome enum + result VO, and the one deliberate manual-path
-    behaviour change (see below).
+guard (AH-090)` — the one deliberate manual-path behaviour change (see below).
   - `1c996c77` — `feat(admin): platform automation rules — table, kill switch, job, on-approval hook
 (AH-090)` — the migration, model, enums, factory, the Pennant flag, the job, the hook.
   - `1a4e0a1f` — `feat(admin): automation-rules CRUD, agency picker projection, admin SPA surface
-(AH-090)` — the CRUD controller + four audit verbs, the `?for=select` projection, the SPA module,
-    i18n ×24.
+(AH-090)`.
   - `f4ac735c` — `feat(creators): stamp the firing rule onto the connect's audit row (AH-090 Q4)` —
-    `fired_by` + `automation_rule_id` in the fire's audit metadata. Metadata-only; no schema.
-  - `4a3f2c6c` — the docs commit (this entry, the review, the AH-090 log entry, the conventions picker
-    rule, the tenancy rows, the tech-debt close + the flake-entry rider).
-  - `55663b26` — `docs(runbooks): complete the AH-090 deploy entry's commit range` — this entry's own
-    range was written before the two commits above had SHAs; this one filled them in.
-  - `281f88fb` — `docs(reviews): AH-090 close-out — Q4-Q7 ratified, approved, pushed` — Q4–Q7 ratified
-    into `admin-automations-review.md` §2 (with Q4's absence-implies-human half named explicitly), the
-    build-report ratifications (the owned-key divergence, both honest limits), and the review's close:
-    **Status: Closed — approved, pushed.**
+    metadata-only; no schema.
   - `8241be30` — `fix(tests): explicit Event facade import — CI-only Larastan resolution gap` — a
-    **carried, unrelated fix**: `281f88fb`'s own push redded CI (§5.41) on a pre-existing test file this
-    chunk never touches (`CampaignAssignmentContractTest.php`, bare `Event::fake()` with no `use`
-    import). No schema, no app code — one test file's import line. CI is green at `8241be30`
-    ([run `33070701330`](https://github.com/pedram-kh/Engine/actions/runs/33070701330)). Listed here
-    because it is now part of this range's deployed diff, not because it needs its own deploy checklist
-    line — it changes nothing this entry's infra/migration/flag claims describe.
-- **AH entries carried:** **AH-090.**
-- **Migrations run:** **1** — `2026_08_27_120000_create_admin_automation_rules_table.php`. A
-  `CREATE TABLE`, nothing else: **no existing table is touched, no column added anywhere, no
-  backfill, no `UPDATE`.** The table ships **EMPTY** and stays empty until an operator creates a rule
-  through the admin UI. The system-actor connect path needed zero schema work because
-  `agency_creator_relations.invited_by_user_id` was already nullable — had it not been, this deploy
-  would have carried an `ALTER` on a live relation table.
-  - **`down()` honesty:** `dropIfExists` is a true structural inverse with a **lossy content
-    inverse** — a rollback discards every configured rule and its fire trace, and a redeploy comes
-    back with an empty table. Relations already created by fires **survive** the rollback, correctly:
-    they are real relationships, not automation state.
-- **Pre-deploy reads:** none. There is nothing to count — the reachable population at deploy is
-  **zero creators**, and nothing in this chunk reads a creator who was approved before it.
-- **Infra:** **queue-worker restart REQUIRED** — `RunAutomationRuleJob` is a new job class, and a
-  worker running the old code cannot resolve it. **PHP-FPM reload required** (new controller, routes,
-  enums, feature class). **No cron/scheduler change** — the trigger is an admin approving a creator,
-  not a schedule. No env changes, no new secrets (this feature gates no vendor).
-- **One-shot commands:** none.
-- **Post-deploy verification:** `/up` 200; then, authenticated as a platform admin, `GET
-/api/v1/admin/automation-rules` returns `{"data": []}` (the empty table, reachable and authorized)
-  and the admin SPA's **Automations** nav item loads the empty-state. Confirm the Feature-flags page
-  lists `platform_automations_enabled` as **OFF**. A creator approval performed right after deploy
-  must behave exactly as before — with no rules and the flag off, the hook queries an empty table and
-  dispatches nothing.
-- **Flags armed:** **none — `platform_automations_enabled` ships OFF and is NOT armed by this
-  deploy.** Arming is a separate, deliberate operator act, and the order matters: create the rules
-  first, read the table back, confirm no rule shows a broken-target chip, THEN flip the flag. The
-  enable ritual is in [`feature-flags.md`](../feature-flags.md).
-- **⚠ One deliberate behaviour change to an EXISTING path, live the moment this deploys — no flag
-  gates it:** an admin direct-connecting a creator to a **suspended** agency now gets `422
-connection.agency_suspended`. Before AH-090 nothing in the connect chain checked suspension, so
-  that connection succeeded and produced a roster relation into an agency whose users cannot log in.
-  This **removes** a capability rather than adding one, and the removed capability has no legitimate
-  use — but it is the one thing in this deploy that changes what a human admin can do, and it does
-  not wait for the flag.
-- **Operator:** _to be filled at deploy._
-- **Anything unexpected:** _to be filled at deploy._
+    carried, unrelated fix; no schema, no app code, one test file's import line.
+  - `706a0b6e` — `feat(agencies): Agency Files library, chunk A — upload, list, delete (AH-091)` —
+    the migration, model, service, controller/policy/resource, routes, the shared
+    `AttachmentMimeTypes` extraction, i18n ×24.
+  - `ec2401cd` — `feat(campaigns): Campaign attachments from the Files library, chunk B (AH-092)` —
+    the migration, model, controller/resources/requests, the creator read path on both doors,
+    i18n ×24.
+  - `abe4657d` — `feat(creators): hide campaign duration on Jobs Board surfaces (AH-093)` — the
+    template-only render hide. **Rider — no obligation of its own.**
+  - `7580e59c` — `test(architecture): used-key coverage tripwire for both SPAs (AH-094)` —
+    pure-test; zero runtime diff, no deploy obligation.
+  - `c9df1888` — `feat(agencies): invite-acceptance creates the account for stranger invitees
+(AH-095)` — the new `create-account` route, Form Request, controller action, service method, the
+    collision-race guard, the dedicated `AuditAction` case, the preview endpoint's two new fields,
+    the SPA's `'no-account'` branch + set-password form, i18n ×24.
+  - `0eb3a7da` — `fix(roster): thread age_min/age_max into the query string + class-sweep pin
+(AH-096)` — the `roster.api.ts` fix, wrapper-level + structural + Playwright pins, the
+    test-helper-only `CreateRosterCreatorsController` change. **Rider — no obligation of its own.**
+  - The remaining 30 commits are docs-only: read-only inventories, kickoffs/plan-pauses, review
+    files, close-outs, and this file's own five predecessor `PENDING` entries (now collapsed into
+    this one) — see `adhoc-changes-log.md` for the full per-commit-per-entry mapping.
+- **AH entries carried:** **AH-086** (base) + the **AH-086b addendum** + **AH-087, AH-088, AH-089,
+  AH-090, AH-091, AH-092, AH-093, AH-095, AH-096.** **AH-094** (pure-test, both SPAs'
+  `i18n-used-keys-resolve.spec.ts`) is carried for range completeness only — no runtime file
+  changed, nothing for a deploy to have carried. AH-093 and AH-096 are both zero-obligation riders
+  (no migration, no restart, no new production route; AH-096's one `apps/api` touch is a
+  `/api/v1/_test/*` test-helper route `TestHelpersServiceProvider` never registers outside
+  `local`/`testing` — **not present in production at all**).
+- **Migrations run:** **5, in this order:**
+  1. `2026_08_27_100000_add_mfa_exemption_to_users_table.php` (AH-087) — adds
+     `users.mfa_exempted_at` (timestamp, nullable) + `users.mfa_exemption_reason` (text, nullable).
+     Additive-nullable: no backfill, no `UPDATE`. Every pre-existing row reads NULL, which is what
+     makes the exemption branch inert on arrival.
+  2. `2026_08_27_110000_add_date_of_birth_to_creators_table.php` (AH-088) — adds
+     `creators.date_of_birth` (date, nullable). Additive-nullable: no backfill. Every pre-existing
+     row reads NULL until a creator or an admin backfills it on next edit.
+  3. `2026_08_27_120000_create_admin_automation_rules_table.php` (AH-090) — `CREATE TABLE`, ships
+     EMPTY, stays empty until an operator creates a rule.
+  4. `2026_08_27_130000_create_agency_files_table.php` (AH-091) — `CREATE TABLE`, ships EMPTY,
+     stays empty until an agency member uploads a file.
+  5. `2026_08_27_140000_create_campaign_attachments_table.php` (AH-092) — `CREATE TABLE`, ships
+     EMPTY, stays empty until an agency member attaches a file to a campaign.
 
----
+  AH-089, AH-093, AH-095, AH-096 add **none** — AH-089 changes only the floor's arithmetic (no
+  schema); AH-095's `User::create()` needed no column the `users` table didn't already have.
+  **`down()` honesty:** #1 and #2 are true structural-and-content inverses (net-new nullable
+  columns, no pre-existing data at risk beyond what accrues after deploy — see the rollback notes
+  on each in the collapsed entries' git history). #3, #4, #5 are structural inverses with a
+  **lossy content inverse** — each `dropIfExists` discards every row written after this deploy
+  (rules, files, attachments respectively); no pre-existing table content is at risk since all
+  three are net-new.
 
-## 2026-08-27 · AH-088 + AH-089 — creator date of birth → age everywhere + graduated floor scoring — PENDING
-
-> **⚠ This entry STACKS on the AH-086 + b + AH-087 entry below, which has not deployed.** Whoever
-> deploys next runs **both** checklists in one pass: this range starts at the tip that carries that
-> entry, so there is no way to ship this without shipping that. Combined obligations across the two
-> entries: **2 migrations**, **`migrate` required**, **queue-worker restart required** (from the
-> entry below — neither AH-088 nor AH-089 adds a mailable or touches `apps/api/lang/**`), **PHP-FPM
-> reload required** (both), and **one post-deploy artisan command** (this entry only).
->
-> **AH-089 rides this same range and this same one-shot command — it adds no migration and no new
-> infra obligation of its own.** It changes what `creators:recompute-completeness` computes (the
-> floor's own arithmetic), not how it writes or when it must run. See the rewritten blast-radius
-> paragraph below — it supersedes the AH-088-alone figure that was here before AH-089 landed on top
-> of it, per the AH-046 addendum pattern (nothing above is deleted; the correction is additive).
-
-- **Status:** PENDING
-- **Range:** `04a2ecec` (the AH-088 read-only inventory, already on `main`) → the tip carrying this
-  entry. Commits, in order:
-  - `04a2ecec` — `docs(reviews): creator date-of-birth → age inventory (I1-I6)` (docs-only; the
-    read-only inventory AH-088 was built from, already pushed before the build began).
-  - _the AH-088 feat commit_ — `feat(creators): date of birth with derived age everywhere (AH-088)`
-    — the migration, model, resources, floor, filter, both SPAs, api-client types, 72 locale files.
-  - _the AH-088 docs commit_ — `docs(reviews): AH-088 creator date of birth → age — review, AH entry,
-data model, tech debt, deploy` (docs-only).
-  - _the AH-089 feat commit_ — `feat(creators): graduated per-field floor scoring (AH-089)` —
-    `CompletenessScoreCalculator::profileEarned()` + the new `floorFieldPresence()` one-source
-    enumeration; `isProfileComplete()` untouched. No migration, no schema.
-  - _this commit_ — `docs(reviews): AH-089 graduated floor scoring — review, AH entry, AH-088
-addendum, deploy-log blast-radius rewrite` (docs-only; this entry).
-- **AH entries carried:** **AH-088, AH-089.**
-- **Migrations run:** **1** — `2026_08_27_110000_add_date_of_birth_to_creators_table.php`. Adds
-  `creators.date_of_birth` (date, nullable). **Additive-nullable, schema-only: NO BACKFILL, no
-  `UPDATE`, no data write of any kind.** Every pre-existing row reads NULL the instant it finishes.
-  The `down()` is an honest inverse — the column is net-new and holds no pre-existing data — but note
-  that rolling back after creators have entered birthdays **destroys those birthdays**, and the
-  completeness scores recomputed below would then be stale in the opposite direction (a second
-  recompute after any rollback is required).
-- **⚠ POST-DEPLOY COMMAND — REQUIRED, and it WRITES:**
-  `php artisan creators:recompute-completeness`. Run it **after** `migrate`, from the app root.
-  - **Why it is required:** `date_of_birth` joined the profile-completeness FLOOR (AH-088 D6),
-    taking it from six fields to seven. As of AH-089 (riding this same range, same command), the
-    floor's own `PROFILE_FLOOR_WEIGHT` (13 of the profile unit's 25) is earned **per-field-
-    proportionally** — `13 × (present floor fields ÷ 7)` — not all-or-nothing. Either way, every
-    creator who met the old six-field floor now scores differently against the new seven-field one
-    until this runs; their persisted `profile_completeness_score` is stale until it does. The score
-    is denormalised on the row and surfaced to agencies on discovery, so a stale value is
-    user-visible.
-  - **Expected blast radius — say the number out loud (AH-089 REWRITE — supersedes the figure that
-    stood here before AH-089 landed on top of AH-088; see
-    [`graduated-floor-scoring-review.md`](../reviews/graduated-floor-scoring-review.md)):** ~279
-    creators, because NOBODY has a birthday on the day this ships — but, thanks to AH-089, none of
-    them loses the **whole** floor block anymore. Missing exactly one floor field (DOB, the only gap
-    for this cohort) costs `13 × 1/7 ≈ 1.86` raw points instead of the full 13. Renormalized against
-    the build-time-hidden-steps denominator (65, `WizardStep::WIZARD_HIDDEN_STEPS` — kyc/tax/payout
-    are excluded regardless of any flag), that is **≈2.9 visible points, not ≈20.** A creator
-    previously at 100 lands at **≈97**, not ≈80. The general rule for any creator missing more than
-    one floor field: **delta = their missing-floor-field count × ~2.9 visible points.** This is the
-    intended consequence — considerably gentler than AH-088 alone would have produced, which is the
-    entire reason AH-089 exists — and it remains the single most visible thing this deploy does. It
-    self-heals per creator, per missing field, the moment they fill it.
-  - **What it does NOT do:** it does not email anyone, does not change any
-    `application_status`, and does not push any creator back into the wizard. Verified before
-    shipping: the incomplete-creator nudge keys off `application_status`, not the completeness score,
-    so no nudge cohort is created by this; and the onboarding route guard keys off
-    `application_status` too, so an approved creator stays on their dashboard. What DOES change for
-    an existing creator is that their next profile SAVE is blocked until they enter a birthday
-    (pending/rejected hard-block, approved soft-warn) — the AH-026 D3 backfill-on-next-edit posture,
-    at cohort scale.
-  - **Run it dry first** — the command supports `--dry-run` and reports how many scores would change
-    without writing. Expect "would change" ≈ the number of creators who previously met the floor. It
-    is idempotent (writes only rows whose recomputed score differs), so a second run must report
-    **0 changed**; that is the cheapest possible confirmation it completed.
-- **Pre-deploy reads:** cheap and worth having, because they make the score drop above verifiable
-  rather than assumed:
-  - `SELECT COUNT(*) FROM creators WHERE date_of_birth IS NOT NULL;` — must be an **error** before
-    the migration (column absent) and **0** immediately after.
-  - `SELECT ROUND(AVG(profile_completeness_score)) FROM creators;` — record this number BEFORE the
-    recompute. After it, the average should be visibly lower — **roughly 2.9 points for the ~279
-    creators missing only DOB (the AH-089 graduated figure, not the ≈20-point all-or-nothing figure
-    this line quoted before AH-089 landed)**. If it does not move at all, the recompute did not run.
-- **Snapshot ID:** _TBD at deploy time._ **Required** — this range contains a migration AND a
-  command that writes to every `creators` row.
+- **⚠ POST-DEPLOY COMMAND — REQUIRED, and it WRITES:** `php artisan creators:recompute-completeness`
+  (owed by the AH-088/089 range; AH-090, AH-091, AH-092 each add none of their own). **Ritual
+  output, as supplied by Pedram:**
+  ```
+  dry-run:  1295 checked / 1295 would change
+  run:      1295 recomputed / 1295 updated
+  dry-run:  1295 checked / 0 would change   ← idempotency proven
+  ```
+  The third line is the cheapest possible confirmation the command completed and is safe to
+  re-run. **Post-recompute platform-wide average: 44.51**, across all 1295 creator rows.
+  **⚠ Not directly comparable to the "≈97 for previously-complete creators" figure the AH-088/089
+  entry's blast-radius estimate used.** That figure described one cohort (creators who were
+  previously AT the old six-field floor, missing only DOB); **1295 is the full `creators` table —
+  every `application_status`, including pending/abandoned/rejected**, most of whom were never
+  near 100 to begin with and whose scores are dominated by fields this recompute doesn't touch.
+  A single platform-wide average across a population that heterogeneous cannot confirm or refute
+  the graduated-floor arithmetic on its own — **the distribution check below is what actually
+  confirms it.**
+- **Pre-deploy reads:**
+  - `SELECT COUNT(*) FROM creators WHERE date_of_birth IS NOT NULL;` — must be an error before the
+    migration, **0** immediately after. **Run: not recorded.**
+  - `SELECT ROUND(AVG(profile_completeness_score)) FROM creators;` (the PRE average, for
+    comparison against the 44.51 POST figure above) — **not recorded**, if captured at all.
+- **Snapshot ID:** **not recorded** · confirmed `available` before migrating? **not recorded.**
+  Required — this range contains two nullable-column migrations plus three lossy-`down()`
+  `CREATE TABLE`s.
 - **Infra:**
-  - **`php artisan migrate`: REQUIRED** — the one migration above (plus the one in the entry below).
-  - **`php artisan creators:recompute-completeness`: REQUIRED** — see above. This is the only
-    obligation in this entry that is not covered by a normal deploy.
-  - **Queue-worker restart: not required BY AH-088** — no new or touched mailable, and no
-    `apps/api/lang/**` change (AH-088's 72 locale files are all SPA-side JSON, which ships with the
-    frontend build, not the worker). **But the entry below requires one**, so a restart happens in
-    this deploy regardless.
-  - **PHP-FPM reload: REQUIRED** — synchronous request-path PHP moved: `Creator` (fillable, cast, the
-    new `age()`), `CreatorResource` (the D1 conditional), three agency resources, two list
-    controllers' projections, `CompletenessScoreCalculator::isProfileComplete()`,
-    `UpdateProfileRequest`, and the shared `FiltersCreatorColumns` trait.
-  - **Frontend build/deploy: REQUIRED** — both SPAs changed (`apps/main`: the wizard field, five
-    render surfaces, the roster column + age filter; `apps/admin`: the read-only age row) plus 72
-    locale JSON files and the `@catalyst/api-client` types they compile against.
-  - **Flags to arm:** none. AH-088 ships behind no flag.
-- **Verification after deploy (in order):**
-  1. `migrate:status` shows `2026_08_27_110000_add_date_of_birth_to_creators_table` as `Ran`.
-  2. The pre-deploy `COUNT(*)` read above returns **0**.
-  3. `creators:recompute-completeness --dry-run`, then the real run, then `--dry-run` again — the
-     third must report **0 would change**.
-  4. As a creator: the wizard's step-2 (or the profile page) shows a **Date of birth** field with an
-     asterisk, and entering a date shows "You'll appear as N" beneath it. Saving succeeds.
-  5. As that creator's connected agency: the roster row shows the age in its own column, and the
-     roster detail's profile card shows it. **Search the roster and detail responses for
-     `date_of_birth` — it must appear NOWHERE.** (Pinned by tests, but this is the one-second
-     manual confirmation of the chunk's whole point.)
-  6. As a platform admin: the creator drill-in shows an **Age** row with no pencil, and the admin
-     payload carries **no** `date_of_birth` key.
-- **Operator:** _TBD._
-- **Anything unexpected:** _TBD at deploy time._
-
----
-
-## 2026-08-27 · AH-086 + b + AH-087 — agency sign-in variant, team-invite email door, agency members drill-in + per-member 2FA controls — PENDING
-
-> This entry **merges** what were, until this update, two stacked `PENDING` entries — the AH-086 +
-> b entry (opened first) and the AH-087 entry (opened on top of it, itself noting it stacked on
-> the entry below). Neither has deployed, so per the arc-deploy convention
-> (`production-queue-worker.md` §8.3 — a themed backlog does not ship as a subset) they are
-> combined into the one checklist whoever deploys next actually runs, rather than left as two
-> entries a deployer has to remember to read together.
-
-- **Status:** PENDING
-- **Range:** `6f5351de` (the AH-085 deployed tip, exclusive) → `5aa6564f` (the tip carrying this
-  entry). Commits, in order:
-  - `e6488eb1`, `f2d8851a`, `245f346d` — AH-085's own CI-fix-record + deploy-log open/close
-    (docs-only; AH-085 itself already **DEPLOYED**, see below — carried here only for range
-    completeness, no obligation of its own).
-  - `82a9ce98` — `docs(reviews): production email inventory — every mailable, trigger, gate, and
-verbatim copy` (docs-only).
-  - `2e7c02ad` — `feat(auth): agency-facing sign-in variant, one component (AH-086)`.
-  - `39c9e5af` — `docs(reviews): AH-086 agency sign-in — decision table, mechanism, gate board`
-    (docs-only).
-  - `0edcffa1` — `feat(agencies): team-invite email's CTA doors through /agency/sign-in (AH-086b)`
-    — the magic-link door (`AgencyInvitationService` + `InviteAgencyUserMail` + `SignInPage.vue` +
-    the new tests).
-  - `a1b5507c` — `docs(reviews): AH-086 close-out + AH-086b addendum, deploy-log PENDING entry`
-    (docs-only).
-  - `2de36602` — `fix(tests): Larastan-safe assertion chaining in AH-086b invite tests` (test-only).
-  - `cfd776a2` — `docs(reviews): admin agencies + 2FA controls inventory` (docs-only; the
-    read-only inventory AH-087 was built from).
-  - `48a984a8` — `feat(admin): agency members drill-in + per-member 2FA reset/exempt (AH-087)`.
-  - `c140b001` — `feat(spa): members card with 2FA controls + exemption-aware guard (AH-087)`.
-  - `5aa6564f` — `docs(reviews): AH-087 agency members 2FA — review, tenancy rows, tech debt,
-deploy` (docs-only; this entry).
-- **AH entries carried:** **AH-086** (base) + the **AH-086b addendum** (same thread, not a
-  separate AH number) + **AH-087.**
-- **Migrations run:** **1 total across the whole range** —
-  `2026_08_27_100000_add_mfa_exemption_to_users_table.php` (AH-087). Adds
-  `users.mfa_exempted_at` (timestamp, nullable) and `users.mfa_exemption_reason` (text, nullable).
-  **Additive-nullable, schema-only: NO BACKFILL, no `UPDATE`, no data write of any kind.** Every
-  pre-existing row reads NULL the instant it finishes, which is what makes the exemption branch
-  inert on arrival — nothing about anyone's MFA behaviour changes at deploy time. AH-086 + b add no
-  migration (AH-086 is SPA-only; AH-086b changes one URL-building line in
-  `AgencyInvitationService::invite()` and a docblock, no schema touch). The `down()` on the one
-  migration is an honest inverse (both columns are net-new and hold no pre-existing data); note
-  that rolling back discards any exemption granted after the migration ran, which **re-imposes**
-  the MFA gate on those people — fail-closed, not fail-open — while the audit trail survives in
-  `audit_logs` regardless.
-- **Pre-deploy reads:** **none required** (nothing is read or transformed). Optional and cheap, as
-  a sanity anchor for the honest-inverse note above:
-  `SELECT COUNT(*) FROM users WHERE mfa_exempted_at IS NOT NULL;` — must be an error before the
-  migration (column absent) and **0** immediately after.
-- **Snapshot ID:** _TBD at deploy time._ **Required** — this range contains a migration.
-  Confirm the snapshot reads `available` before running `migrate`.
-- **Infra:**
-  - **`php artisan migrate`: REQUIRED** — the one migration above (AH-087 only).
-  - **Queue-worker restart: REQUIRED — one restart covers four mailable-touching files across the
-    whole range.** AH-086b touched an existing mailable (`InviteAgencyUserMail.php`, docblock
-    only, but the standing house rule treats any mailable-file touch as worker-restart territory
-    rather than a case-by-case bytecode read). AH-087 adds **three net-new** mailables
-    (`MfaResetByAdminMail`, `MfaExemptionGrantedMail`, `MfaExemptionRemovedMail`) plus touches 24
-    `apps/api/lang/*/auth.php` files (both AH-086b's own subject-mirror keys and AH-087's new
-    `mfa_admin.*` keys live there). A stale worker would keep rendering old copy and would fail to
-    resolve the three new mailable classes at all.
-  - **PHP-FPM reload: REQUIRED — auth-path PHP moved in both AH-086b and AH-087.** AH-086b's
-    `AgencyInvitationService::invite()` URL-building line runs synchronously in the web/FPM
-    process at invite-creation time — the `Mailable`'s `acceptUrl` is baked into its constructor
-    arguments before queueing, so the worker never re-derives it; a stale opcache keeps minting the
-    OLD `/accept-invitation?...` URL. AH-087 moved `User` (new cast, fillable entries,
-    `isMfaExempt()`, the audit allowlist), `UserResource` (the new `mfa_exempt` attribute the main
-    SPA's guard reads), `AgencyPolicy` (two new abilities), `AuditAction` (three new cases), and the
-    new controller + form request — without fresh bytecode the four new member-2FA routes 404 and
-    `/me` keeps omitting `mfa_exempt`, defaulting every user to non-exempt (fail-closed, but the
-    exemption feature would silently not work). One reload discharges both.
-  - No cron/scheduler change, no env change, **no flag** (this range touches no flag).
-  - **Both `apps/main` and `apps/admin` need their normal rebuild + redeploy.** `apps/main` carries
-    AH-086's `/agency/sign-in` route/component, AH-086b's invite-forward branch, and AH-087's guard
-    split; `apps/admin` carries AH-087's Members card and its dialog. None of the three reaches a
-    browser without both bundles going out.
-- **One-shot commands:** **none.**
-- **Post-deploy verification:** `/up` 200 + one authenticated request, then:
-  1. `/agency/sign-in` renders the agency heading, no creator-signup CTA (AH-086).
-  2. A fresh invite created post-deploy (agency_admin → Invite user modal) contains a
-     `/agency/sign-in?token=...&agency=...` link, not `/accept-invitation?...` — the direct proof
-     the FPM reload actually took for AH-086b (a stale opcache would silently fail this exact
-     check).
-  3. That link, followed unauthenticated, lands on the same accept-invitation preview/sign-in
-     surface as before (AH-086b's forward), and an OLD-shape link sent before this deploy still
-     resolves directly — nothing 404s.
-  4. `SELECT COUNT(*) FROM users WHERE mfa_exempted_at IS NOT NULL;` → **0**. The direct proof the
-     AH-087 migration wrote no data (the inertness claim).
-  5. Admin panel → any agency → the **Members** card loads, and the MFA column renders
-     Enrolled / Not enrolled for the existing population — **no row shows "Exempt"** (same
-     inertness claim, from the UI side).
-  6. Reset 2FA on a **test** member who is enrolled: the row flips to Not enrolled, an
-     `user.mfa_reset` row appears in the admin audit log with the typed reason, and the member
-     receives the reset email. Re-running it 409s.
-  7. Exempt that same test member, then confirm (a) the chip reads Exempt with the reason in its
-     tooltip, (b) an `user.mfa_exempted` row exists, (c) the member receives the exemption email,
-     and (d) **attempting the same on a platform-admin target is refused** with
-     `mfa.platform_admin_not_exemptable`. Then remove the exemption and confirm the reverse row +
-     email. Leave no test exemption in place.
-  8. An un-enrolled, **non-exempt** agency admin still hits the enroll redirect on
-     `/agency/users` — the default population's behaviour is unchanged (AH-087's guard-side
-     inertness claim).
-- **Flags armed:** **none — this range touches no flag.**
-- **Operator:** _TBD — Pedram's call when this deploys._
-- **Anything unexpected:** none during either chunk's build, with one honest note from AH-087: the
-  full-suite Pest run caught a global-helper name collision (a new test declared `resetUrl()`,
-  already declared in `Modules/Boards/BoardResetTest.php` — the AH-085 bug class recurring) that
-  the targeted runs could not see. Fixed by prefixing every new helper in that chunk with `ah087`
-  before push. Full gate detail lives in
-  [`agency-sign-in-review.md`](../reviews/agency-sign-in-review.md) (AH-086, base chunk + §8
-  addendum — backend Pest 2615/1 skipped, `apps/main` Vitest 1638/167 files, full Playwright
-  29/29 first pass) and
-  [`admin-agency-members-2fa-review.md`](../reviews/admin-agency-members-2fa-review.md) (AH-087 —
-  backend Pest 2688/10285 assertions, `apps/main` Vitest 1646/167 files, `apps/admin` Vitest
-  469/55 files, six break-reverts, **closed by Pedram** 2026-08-27). **Read the AH-087 review's
-  "Production posture" section before approving the deploy** — it states plainly that the
-  agency-side MFA requirement has never been server-enforced and that the new exemption is
-  therefore a presentational gate, tracked as its own tech-debt entry with a named trigger.
+  - **`php artisan migrate`: REQUIRED** — the five migrations above. Expected output: five
+    `Migrating: ...` / `Migrated: ... (Xms)` pairs, in the numbered order above. **Actual migrate
+    output: not recorded.**
+  - **`php artisan creators:recompute-completeness`: REQUIRED and RUN** — see the ritual output
+    above (this is the one field in this section that IS recorded).
+  - **Queue-worker restart: REQUIRED** — carried from the AH-086b/AH-087 range (one existing
+    mailable's docblock touched, three net-new mailables — `MfaResetByAdminMail`,
+    `MfaExemptionGrantedMail`, `MfaExemptionRemovedMail` — plus 24 `apps/api/lang/*/auth.php`
+    files). Nothing after AH-087 in this range adds a further mailable or touches
+    `apps/api/lang/**`. **Restart performed: not recorded.**
+  - **PHP-FPM reload: REQUIRED** — synchronous request-path PHP moved in nearly every chunk in this
+    range (auth, users, creators, agency files, campaign attachments, automation rules, the
+    invite-acceptance controller). **Reload performed: not recorded.**
+  - **Frontend build/deploy: REQUIRED, both SPAs.** `apps/main` carries AH-086's `/agency/sign-in`,
+    AH-086b's invite-forward branch, AH-087's guard split, AH-088's wizard field + five render
+    surfaces + roster column/filter, AH-091's Files nav + page, AH-092's Attachments tab, AH-093's
+    duration hide, AH-095's `'no-account'` branch, and AH-096's `roster.api.ts` fix. `apps/admin`
+    carries AH-087's Members card, AH-088's read-only age row, and AH-090's Automations module.
+    None of this reaches a browser without both bundles going out.
+  - No cron/scheduler change anywhere in the range. No env changes, no new secrets, no new
+    disk/bucket (AH-091/092 reuse the existing `media` disk under new prefixes/keys).
+- **One-shot commands:** the recompute ritual above — the only one in this range.
+- **Post-deploy verification:**
+  1. `/up` 200 + one authenticated request. **Result: not recorded.**
+  2. `migrate:status` shows all five migrations above as `Ran`. **Result: not recorded.**
+  3. `/agency/sign-in` renders the agency heading, no creator-signup CTA (AH-086); a fresh invite
+     contains a `/agency/sign-in?token=...&agency=...` link (AH-086b).
+  4. Admin panel → any agency → **Members** card loads with MFA column intact; Feature-flags page
+     lists `platform_automations_enabled` as **OFF**.
+  5. A creator's profile page shows the **Date of birth** field; that creator's agency roster shows
+     the age column, and the age-min/age-max filter narrows the table (AH-096's own check — the
+     pre-fix symptom was exactly this filter doing nothing).
+  6. Agency Files (`/files`) and a campaign's **Attachments** tab both load and round-trip one
+     test file each (AH-091, AH-092).
+  7. Jobs Board card list and job detail show no "Duration: …" text, while the JSON payload still
+     carries `listing_duration` (AH-093, byte-identical-payload proof).
+  8. Seed a fresh invitation for a never-signed-up email, load its accept URL unauthenticated, and
+     confirm the set-password form renders and successfully lands the new user signed in on the
+     agency dashboard (AH-095); a byte-identical existing-account path still shows the sign-in
+     prompt.
+  9. **Smoke results for items 3–8: not recorded** — Pedram to confirm, or mark not recorded.
+  10. **⚠ OPEN — the graduated-floor distribution check (not yet run; Pedram, please run this on
+      the box and report back):**
+      ```sql
+      SELECT
+        COUNT(*) FILTER (WHERE profile_completeness_score >= 99)                                  AS at_or_above_99,
+        COUNT(*) FILTER (WHERE profile_completeness_score >= 95 AND profile_completeness_score < 99) AS graduated_95_to_99,
+        COUNT(*) FILTER (WHERE profile_completeness_score >= 78 AND profile_completeness_score <= 82) AS the_cliff_78_to_82,
+        ROUND(AVG(profile_completeness_score)) FILTER (WHERE application_status = 'approved')      AS approved_only_avg
+      FROM creators;
+      ```
+      **What it proves:** the 95–98.99 bucket is exactly where a creator missing only DOB should
+      land (complete-minus-DOB, the graduated AH-089 outcome); the 78–82 bucket is where that same
+      creator would land under the OLD all-or-nothing floor (AH-088 alone). **A populated
+      95–99 bucket with an empty 78–82 bucket confirms AH-089 took effect as designed. The
+      inverse — an empty 95–99 bucket with a populated 78–82 bucket — means stale FPM bytecode is
+      still serving the pre-AH-089 arithmetic: reload PHP-FPM and re-run the recompute.** Record
+      the four numbers here when supplied. **Until then, the graduated-floor outcome reads:
+      "recompute complete, distribution unverified."**
+- **Flags armed:** **none.** `platform_automations_enabled` (new in this range, AH-090) ships OFF
+  and is **NOT** armed by this deploy — arming is a separate, deliberate operator act (create the
+  rules, read them back, THEN flip the flag; ritual in `feature-flags.md`). The pre-existing three
+  mail flags (`job_posted_notifications_enabled`, `application_notifications_enabled`,
+  `missing_creator_mails_enabled`) are untouched by this range and remain at their last recorded
+  state (OFF, not armed, per the 2026-08-19 AH-083 entry below) — not independently re-verified
+  this session.
+- **⚠ Two deliberate behaviour changes to EXISTING paths, live the moment this deployed — no flag
+  gates either:**
+  1. **DOB now required on profile save (AH-088).** An existing creator's next profile SAVE is
+     blocked until they enter a birthday (pending/rejected hard-block, approved soft-warn) — the
+     AH-026 D3 backfill-on-next-edit posture, at cohort scale. Self-heals per creator the moment
+     they fill it in; does not email anyone, does not change `application_status`, does not push
+     anyone back into the wizard.
+  2. **Suspended-agency direct-connect now refused (AH-090).** An admin direct-connecting a
+     creator to a **suspended** agency gets `422 connection.agency_suspended`. Before AH-090
+     nothing in the connect chain checked suspension, so that connection succeeded and produced a
+     roster relation into an agency whose users cannot log in. This removes a capability rather
+     than adding one; the removed capability had no legitimate use.
+- **Operator:** **not recorded.**
+- **Anything unexpected:** **not recorded**, beyond what is already on record from when these
+  entries were still open: the AH-090 close-out's own push redded CI on a pre-existing, unrelated
+  test file (`8241be30`, fixed same-day, CI green at that tip — see the collapsed entry's own note,
+  now folded into the commit list above), and one flaky-test fix during the AH-088 session
+  (`ad696308`, a base64url-segment comparison, unrelated to any deploy obligation).
 
 ---
 
