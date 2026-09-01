@@ -139,11 +139,18 @@ reviews, and conversations.
 - **Gates:** `apps/main` Vitest — **176 files / 1732 tests**, 2 pre-existing unrelated flakes in
   `Step2ProfileBasicsPage.spec.ts` (timeout under full-suite load; both green in isolation, 21/21)
   — no failure traces to this change. `vue-tsc` clean; ESLint 0 new errors on every touched file.
-  `apps/api` Pest, `--filter=Creator` — **1111 tests / 3776 assertions, all passing**. PHPStan 0
-  errors on the touched controller; Pint clean on both touched PHP files. `LangParityTest` — 3/3
-  green. Playwright — `hand-off-at-approval-lifecycle.spec.ts` (the one spec that renders this
-  page) — **1/1 passing**, live against the real Laravel dev server + Postgres.
-- **Ref:** this entry; `docs/tech-debt.md` (AH-032 entry, partial-closure update note).
+  `apps/api` Pest — the **local run was scoped to `--filter=Creator`** (1111 tests / 3776
+  assertions, all passing) for fast iteration; **CI ran the full backend board** (Pint +
+  Larastan + Pest, unscoped) on the pushed commit and is the actual gate per §5.41 — see the push
+  entry below for the run URL. PHPStan 0 errors on the touched controller; Pint clean on both
+  touched PHP files. `LangParityTest` — 3/3 green. Playwright — `hand-off-at-approval-lifecycle.spec.ts`
+  (the one spec that renders this page) — **1/1 passing**, live against the real Laravel dev
+  server + Postgres.
+- **Pushed:** commit `7abd52c4`, CI green at the tip (run
+  <https://github.com/pedram-kh/Engine/actions/runs/33510200711>) — full backend board (Pint +
+  Larastan + Pest, unscoped) + frontend board (lint + typecheck + unit), both green.
+- **Ref:** this entry; `docs/tech-debt.md` (AH-032 entry, partial-closure update note);
+  `docs/runbooks/deploy-log.md` (new PENDING entry, AH-097).
 
 ---
 

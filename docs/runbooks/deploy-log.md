@@ -54,6 +54,35 @@ happened.
 
 ---
 
+## AH-097 — campaign description on the creator assignment detail — PENDING
+
+- **Status:** PENDING
+- **Range:** `0eb3a7da` → `7abd52c4` (from-SHA exclusive: the previous deployed tip, per the
+  2026-08-31 AH-086→AH-096 entry below). The two commits between them (`6d4994e3`, `b9e819f0`) are
+  docs-only (deploy-log + resumption-template updates) — `7abd52c4` is the only runtime-affecting
+  commit in this range.
+- **AH entries carried:** AH-097 only.
+- **Migrations run:** none. No schema change — `campaign.description` already exists on the
+  `campaigns` table (added long before this batch); this change only reads and renders it on a
+  surface that didn't render it before.
+- **Pre-deploy reads:** none needed (no schema/data change to verify against).
+- **Snapshot ID:** not applicable — no migration.
+- **Infra:** no worker restart obligation, no cron/scheduler change, no env change, no new
+  secrets/disks. **SPA (apps/main) + API rebuild required** (a Vue template change + a controller
+  payload change) — no service restart beyond the normal deploy's PHP-FPM reload/opcache
+  invalidation for the changed controller file.
+- **One-shot commands:** none.
+- **Post-deploy verification:** `/up` status; open a creator assignment detail page for an
+  assignment whose campaign has a `description` set and confirm the new "About this campaign"
+  block renders above the offer's "what we expect" block; open one whose campaign has no
+  `description` and confirm the block is absent (no empty card).
+- **Flags armed:** none — this change is not flag-gated.
+- **Operator:** not recorded (fill in at deploy time).
+- **Anything unexpected:** not recorded (fill in at deploy time).
+- **Ref:** [ad-hoc log](../reviews/adhoc-changes-log.md) AH-097.
+
+---
+
 ## 2026-08-31 · AH-086 → AH-096 — agency sign-in + invite-door, members 2FA, DOB→age + graduated floor scoring, platform automations, agency files library (chunks A+B), campaign-duration hide, invite-acceptance account creation, roster age-filter fix — DEPLOYED
 
 > This entry **merges** what were, until this update, **five stacked `PENDING` entries** — AH-086 +
