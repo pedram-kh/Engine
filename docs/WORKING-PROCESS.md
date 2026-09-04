@@ -81,6 +81,10 @@ in a fresh thread; no per-item kickoff. Rules:
 - `packages/ui` changes: name the consumer surfaces in both SPAs before
   committing.
 - Playwright awareness: say when an item touches an E2E-traversed surface.
+- **Deploy-log disposition is part of the docs pass:** every batch's docs pass
+  updates `docs/runbooks/deploy-log.md` — stack onto the open `PENDING` entry
+  if one exists, else open one — before the push. A push with no deploy-log
+  disposition is incomplete, same standing as the CI-green rule (§5.41).
 - Close-out (always): Claude-written **inventory prompt** → evidence-based
   scope verification → **spot-checks** on anything that crossed the stop-gate
   → fixes → docs pass → verbatim read → push clearance.

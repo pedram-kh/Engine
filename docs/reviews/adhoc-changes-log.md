@@ -181,6 +181,13 @@ click_through_accepted_at !== null` — hidden entirely (not an empty state) oth
   tests (`CreatorMasterAgreementSection.spec.ts` and `CreatorProfilePage.spec.ts`'s
   "is absent when the creator has no acceptance on record") went red, exactly and only those two,
   with the expected `false`→`true` diff. Reverted; both specs re-green (16/16 across the two files).
+- **Process rule born here:** this batch landed on a clean deploy state (production current
+  through AH-097, no open `PENDING` entry) and was the first fast batch to notice that nothing in
+  `WORKING-PROCESS.md` actually required opening one before push — the deploy-log `PENDING` entry
+  only got written because it was asked for explicitly, not because the process demanded it. Gap
+  closed same-session: `WORKING-PROCESS.md` §2 (Mode B) now codifies "every batch's docs pass
+  updates `deploy-log.md` — stack onto the open `PENDING` entry if one exists, else open one —
+  before the push," standing alongside the CI-green rule (§5.41).
 - **Ref:** this entry; `docs/tech-debt.md` (new "No versioned retrieval…" entry).
 
 ---

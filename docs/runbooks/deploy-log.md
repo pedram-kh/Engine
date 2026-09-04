@@ -54,6 +54,53 @@ happened.
 
 ---
 
+## AH-098 — master agreement section on the creator profile — PENDING
+
+> **Standalone entry.** Production is current through AH-097 — nothing stacks on top of this one;
+> it is the entire undeployed backlog.
+
+- **Status:** PENDING.
+- **Range:** `7b8401fe` (the AH-097 close-out tip, exclusive — the previous deployed tip) →
+  `271294db` (the AH-098 feature commit) **+ any docs rider** (this entry's own commit, opening
+  this `PENDING` record — docs-only, zero diff outside `docs/`, carries no runtime obligation of
+  its own, same class as every other deploy-log-rider commit in this file's history).
+- **AH entries carried:** AH-098 only.
+- **Migrations run:** none. **Zero `apps/api` diff in this range** — both fields the profile
+  section needed (`has_signed_master_contract`, `click_through_accepted_at`) were already shipped
+  on `CreatorResource`'s creator-self attributes; verified in the AH-098 entry
+  ([`adhoc-changes-log.md`](../reviews/adhoc-changes-log.md)) rather than assumed. No
+  `apps/api/database/migrations/**` file in this range.
+- **Pre-deploy reads:** none required — no schema/data change to verify against.
+- **Snapshot ID:** not applicable — no migration.
+- **Infra:**
+  - **No worker restart required.** This range adds no mailable and touches no
+    `apps/api/lang/**` file — the three new i18n keys (`accepted_header`, `accepted_on`,
+    `toggle_label`) ×24 live entirely under `apps/main/src/core/i18n/locales/**`, the SPA's own
+    bundle, not backend copy a queue worker would cache.
+  - **No PHP-FPM reload required** — zero `apps/api` diff means no PHP bytecode changed.
+  - No cron/scheduler change, no env change, no new secrets/disk, no flag.
+  - **Frontend build/deploy: REQUIRED, `apps/main` only.** Carries the new
+    `CreatorMasterAgreementSection.vue` (the profile's new bottom section) + the extracted
+    `MasterAgreementTerms.vue` (now the one rendering path shared with the wizard's
+    `ClickThroughAccept.vue`, refactored in the same commit) + the 24 locale files' three new keys
+    each. `apps/admin` is untouched by this range — no rebuild owed there.
+- **One-shot commands:** none.
+- **Post-deploy verification:**
+  1. `/up` 200 + one authenticated request.
+  2. A click-through-accepted creator's profile page shows the collapsed "Master agreement"
+     section with the accepted date; expanding it scrolls the full agreement text inside the
+     height-bounded panel — the page itself must not grow by the document's length.
+  3. A never-accepted creator's profile shows **no section at all** — absent, not an empty state.
+- **Flags armed:** none — this change is not flag-gated.
+- **Operator:** _open — fill in at deploy time._
+- **Date:** _open — fill in at deploy time._
+- **Anything unexpected:** _open — fill in at deploy time._
+- **Ref:** [ad-hoc log](../reviews/adhoc-changes-log.md) AH-098; [tech-debt](../tech-debt.md)'s
+  "No versioned retrieval of the master agreement text…" entry (a read-on-re-read limitation, not
+  a deploy obligation — nothing for this deploy to carry or verify against it).
+
+---
+
 ## AH-097 — campaign description on the creator assignment detail — DEPLOYED
 
 - **Status:** DEPLOYED (2026-09-01)

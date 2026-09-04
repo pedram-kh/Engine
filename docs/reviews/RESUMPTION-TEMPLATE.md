@@ -126,16 +126,19 @@ kickoff message ("push held ... CI green at tip closes after the push clearance"
   carry this session's numbers forward. `origin/main` tip is UNCHANGED at `7b8401fe` until the push
   lands.
 
-**Deploy state (unaffected by this session — no deploy obligation, see the note below):
-production is fully current through AH-097, nothing undeployed, no open verification items — the
-deploy state has been fully clean since AH-097's close.**
+**Deploy state: production is fully current through AH-097; AH-098 now has an open `PENDING` entry
+in [`deploy-log.md`](../runbooks/deploy-log.md) (opened this session, docs-only, standalone — no
+prior entry to stack on) awaiting the actual deploy. No open verification items carried from any
+earlier range — the deploy state was fully clean through AH-097's close before this entry opened.**
 
 - **AH-098's deploy obligation: rides the next deploy, no separate one.** SPA-only rebuild
   (`apps/main`) — ± the API layer only if a future chunk adds the deferred `contracts.version`
   field (not this one). No migration, no new flag, no worker/queue restart, no PHP-FPM reload
   strictly required (zero `apps/api` diff) though a routine deploy would still reload it for
-  whatever else rides along. Nothing to smoke-verify beyond the two render states (section present
-  when accepted, absent when not) once it ships.
+  whatever else rides along. Post-deploy verification (per the `deploy-log.md` entry): the section
+  renders with the accepted date for a click-through-accepted creator and scrolls inside its
+  bounded panel on expand; a never-accepted creator sees no section at all. **Operator and date
+  fields in that entry are deliberately open — fill in at deploy time, not now.**
 
 **Prior state, for the record — AH-097.** **Last updated:** 2026-09-02 · **Through:** AH-097,
 campaign description on the creator assignment detail. `origin/main` tip at that close was
