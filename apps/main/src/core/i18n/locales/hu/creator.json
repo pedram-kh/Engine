@@ -297,6 +297,11 @@
         "account_last_name": "Vezetéknév",
         "account_email": "E-mail",
         "connections_heading": "Közösségi média és portfólió",
+        "master_agreement": {
+          "accepted_header": "Elfogadtad a keretszerződést.",
+          "accepted_on": "Elfogadva: {date}",
+          "toggle_label": "Szerződés szövegének megjelenítése"
+        },
         "save": "Módosítások mentése",
         "saved": "Profil elmentve"
       },

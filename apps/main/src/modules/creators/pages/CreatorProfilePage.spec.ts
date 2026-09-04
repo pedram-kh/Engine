@@ -15,6 +15,7 @@ vi.mock('../../onboarding/api/onboarding.api', () => ({
     uploadPortfolioImage: vi.fn(),
     initiatePortfolioVideoUpload: vi.fn(),
     completePortfolioVideoUpload: vi.fn(),
+    getContractTerms: vi.fn(),
   },
 }))
 
@@ -327,5 +328,25 @@ describe('CreatorProfilePage — completeness floor', () => {
 
     expect(onboardingApi.deletePortfolioItem).toHaveBeenCalledWith('01HQ0')
     expect(wrapper.find('[data-testid="creator-profile-portfolio-warning"]').exists()).toBe(true)
+  })
+})
+
+// AH-098 — the "Master agreement" section's wiring into this page. The
+// section's own render/hide/scroll cases live in
+// `CreatorMasterAgreementSection.spec.ts`; these two confirm the page passes
+// the right store attributes through, nothing more.
+describe('CreatorProfilePage — master agreement section', () => {
+  it('is absent when the creator has no acceptance on record (the default seed)', async () => {
+    const { wrapper } = await mount({ status: 'pending' })
+    expect(wrapper.find('[data-testid="creator-profile-master-agreement"]').exists()).toBe(false)
+  })
+
+  it('renders when click_through_accepted_at is set on the store', async () => {
+    const { wrapper } = await mount({
+      status: 'approved',
+      attrs: { click_through_accepted_at: '2026-06-01T10:00:00+00:00' },
+    })
+    expect(wrapper.find('[data-testid="creator-profile-master-agreement"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="master-agreement-accepted-date"]').exists()).toBe(true)
   })
 })

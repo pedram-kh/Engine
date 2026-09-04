@@ -879,6 +879,18 @@ present (AH-070)`, placed in the one window where `.env` genuinely does not exis
 
 ---
 
+## No versioned retrieval of the master agreement text a creator actually accepted
+
+- **Where:** [`ContractTermsRenderer::render()`](../apps/api/app/Modules/Creators/Services/ContractTermsRenderer.php) always renders `CURRENT_VERSION`'s markdown, regardless of caller. `GET /api/v1/creators/me/wizard/contract/terms` (the ONLY creator-facing terms endpoint) takes no version parameter and cannot return anything else. `CreatorResource` exposes `has_signed_master_contract` (boolean) and `click_through_accepted_at` (timestamp) — never `contracts.version` or `contracts.body_markdown` (the accept-time snapshot, which the row genuinely stores per `CreatorWizardService::acceptClickThroughContract()`).
+- **What we accepted in AH-098 (creator profile "Master agreement" section, 2026-09-04):** the new profile panel reuses the SAME endpoint + renderer the wizard's Step 8 click-through uses (`MasterAgreementTerms.vue`, extracted this batch — "one rendering path, two hosts, never a copy"). Both re-reads — the wizard step's own re-entry AND the new profile panel — show the CURRENT agreement text, never the version the creator actually clicked through on. Today this is invisible (only one version, `1.1`, has ever shipped — see `docs/reviews/master-agreement-v1-1-review.md`), but the moment a `1.2` ships, every creator who accepted `1.1` sees `1.2`'s text on both re-reads with no indication anything changed. Named honestly rather than silently: the profile panel does NOT claim "this is what you agreed to" anywhere in its copy — it shows the acceptance date and the current text as two separate facts, deliberately not implying they're the same document.
+- **Risk:** low today (single version in production), but grows the moment the agreement text is amended. No compliance exposure identified — the binding acceptance evidence (`contracts.signed_signature_data`: method + IP/UA + timestamp + the semver string `1.1`) is intact and unaffected; this gap is purely about what a creator SEES on re-read, not what was legally captured at accept time.
+- **Triggered by:** the first `CURRENT_VERSION` bump past `1.1`, OR a support/compliance ask for "show creators exactly what they agreed to."
+- **Resolution (not built, cost was reported rather than absorbed into AH-098):** a new creator-facing endpoint (or a resource-shape addition surfacing `contracts.version` + a way to render the accept-time `body_markdown` snapshot) — genuinely a new API surface, not a mechanism tweak, hence out of a fast-batch's scope. Cheapest version: expose `contracts.version` (the integer) on `CreatorResource` so at least the profile panel COULD say "you accepted v1.1" even while still rendering current text below it — still a resource-shape change, still deferred.
+- **Owner:** whichever chunk next bumps `ContractTermsRenderer::CURRENT_VERSION`.
+- **Status:** open. Surfaced by AH-098, 2026-09-04.
+
+---
+
 ## Full API test suite needs `memory_limit=2G` (unrelated big-CSV test OOMs at 128M)
 
 - **Where:** [`apps/api/tests/Feature/Modules/Creators/BulkInviteCsvParserTest.php`](../apps/api/tests/Feature/Modules/Creators/BulkInviteCsvParserTest.php) ("rejects a CSV exceeding the 5MB hard cap" builds a 300k-row CSV in memory).

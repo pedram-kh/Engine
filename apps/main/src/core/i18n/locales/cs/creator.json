@@ -297,6 +297,11 @@
         "account_last_name": "Příjmení",
         "account_email": "E-mail",
         "connections_heading": "Sociální sítě a portfolio",
+        "master_agreement": {
+          "accepted_header": "Přijali jste rámcovou smlouvu.",
+          "accepted_on": "Přijato dne {date}",
+          "toggle_label": "Zobrazit text smlouvy"
+        },
         "save": "Uložit změny",
         "saved": "Profil uložen"
       },

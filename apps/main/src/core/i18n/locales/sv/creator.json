@@ -297,6 +297,11 @@
         "account_last_name": "Efternamn",
         "account_email": "E-post",
         "connections_heading": "Sociala medier och portfölj",
+        "master_agreement": {
+          "accepted_header": "Du har accepterat masteravtalet.",
+          "accepted_on": "Accepterat den {date}",
+          "toggle_label": "Visa avtalstexten"
+        },
         "save": "Spara ändringar",
         "saved": "Profil sparad"
       },

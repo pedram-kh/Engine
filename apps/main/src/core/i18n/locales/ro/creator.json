@@ -297,6 +297,11 @@
         "account_last_name": "Nume de familie",
         "account_email": "Email",
         "connections_heading": "Rețele sociale și portofoliu",
+        "master_agreement": {
+          "accepted_header": "Ați acceptat contractul-cadru.",
+          "accepted_on": "Acceptat la {date}",
+          "toggle_label": "Afișează textul contractului"
+        },
         "save": "Salvează modificările",
         "saved": "Profil salvat"
       },

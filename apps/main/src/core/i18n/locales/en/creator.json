@@ -297,6 +297,11 @@
         "account_last_name": "Last name",
         "account_email": "Email",
         "connections_heading": "Socials & portfolio",
+        "master_agreement": {
+          "accepted_header": "You've accepted the master agreement.",
+          "accepted_on": "Accepted on {date}",
+          "toggle_label": "Show the master agreement text"
+        },
         "save": "Save changes",
         "saved": "Profile saved"
       },

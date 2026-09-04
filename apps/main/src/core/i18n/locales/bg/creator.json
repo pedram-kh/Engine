@@ -297,6 +297,11 @@
         "account_last_name": "Фамилия",
         "account_email": "Имейл",
         "connections_heading": "Социални мрежи и портфолио",
+        "master_agreement": {
+          "accepted_header": "Приели сте рамковия договор.",
+          "accepted_on": "Прието на {date}",
+          "toggle_label": "Показване на текста на договора"
+        },
         "save": "Запазване на промените",
         "saved": "Профилът е запазен"
       },

@@ -297,6 +297,11 @@
         "account_last_name": "Επώνυμο",
         "account_email": "Email",
         "connections_heading": "Κοινωνικά δίκτυα & χαρτοφυλάκιο",
+        "master_agreement": {
+          "accepted_header": "Έχετε αποδεχτεί τη συμφωνία-πλαίσιο.",
+          "accepted_on": "Έγινε αποδοχή στις {date}",
+          "toggle_label": "Εμφάνιση του κειμένου της συμφωνίας"
+        },
         "save": "Αποθήκευση αλλαγών",
         "saved": "Το προφίλ αποθηκεύτηκε"
       },

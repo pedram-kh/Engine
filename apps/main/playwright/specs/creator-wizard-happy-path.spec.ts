@@ -246,11 +246,15 @@ test.describe('Sprint 3 Chunk 3 — creator wizard happy path', () => {
     // retry block) — continue with the contract-specific assertions.
     // -----------------------------------------------------------------
     await expect(page.locator('[data-testid="contract-flag-off"]')).toBeVisible()
-    const termsRegion = page.locator('[data-testid="click-through-terms"]')
+    // AH-098 extracted the terms-rendering region into a shared
+    // `MasterAgreementTerms` component (reused by the creator profile's
+    // "Master agreement" panel) — testids renamed `click-through-*` →
+    // `master-agreement-*` accordingly.
+    const termsRegion = page.locator('[data-testid="master-agreement-terms"]')
     await expect(termsRegion).toBeVisible({
       timeout: 10_000,
     })
-    await expect(page.locator('[data-testid="click-through-version"]')).toBeVisible()
+    await expect(page.locator('[data-testid="master-agreement-version"]')).toBeVisible()
 
     // AH-028: the checkbox is disabled until the terms region is scrolled to
     // the end (a legal-attestation gate, not a rendering artifact) — the real

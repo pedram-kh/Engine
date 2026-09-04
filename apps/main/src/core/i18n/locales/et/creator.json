@@ -297,6 +297,11 @@
         "account_last_name": "Perekonnanimi",
         "account_email": "E-post",
         "connections_heading": "Sotsiaalmeedia ja portfoolio",
+        "master_agreement": {
+          "accepted_header": "Olete nõustunud raamlepinguga.",
+          "accepted_on": "Nõustutud {date}",
+          "toggle_label": "Kuva lepingu tekst"
+        },
         "save": "Salvesta muudatused",
         "saved": "Profiil salvestatud"
       },

@@ -297,6 +297,11 @@
         "account_last_name": "Efternavn",
         "account_email": "E-mail",
         "connections_heading": "Sociale medier og portfolio",
+        "master_agreement": {
+          "accepted_header": "Du har accepteret rammeaftalen.",
+          "accepted_on": "Accepteret den {date}",
+          "toggle_label": "Vis aftaleteksten"
+        },
         "save": "Gem ændringer",
         "saved": "Profil gemt"
       },

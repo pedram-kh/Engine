@@ -297,6 +297,11 @@
         "account_last_name": "Prezime",
         "account_email": "E-mail",
         "connections_heading": "Društvene mreže i portfelj",
+        "master_agreement": {
+          "accepted_header": "Prihvatili ste okvirni ugovor.",
+          "accepted_on": "Prihvaćeno {date}",
+          "toggle_label": "Prikaži tekst ugovora"
+        },
         "save": "Spremi promjene",
         "saved": "Profil spremljen"
       },

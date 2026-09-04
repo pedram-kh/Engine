@@ -297,6 +297,11 @@
         "account_last_name": "Priimek",
         "account_email": "E-mail",
         "connections_heading": "Družbena omrežja in portfelj",
+        "master_agreement": {
+          "accepted_header": "Sprejeli ste okvirno pogodbo.",
+          "accepted_on": "Sprejeto {date}",
+          "toggle_label": "Prikaži besedilo pogodbe"
+        },
         "save": "Shrani spremembe",
         "saved": "Profil shranjen"
       },

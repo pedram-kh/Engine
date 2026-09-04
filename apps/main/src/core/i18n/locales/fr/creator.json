@@ -297,6 +297,11 @@
         "account_last_name": "Nom",
         "account_email": "E-mail",
         "connections_heading": "Réseaux sociaux et portfolio",
+        "master_agreement": {
+          "accepted_header": "Vous avez accepté l'accord-cadre.",
+          "accepted_on": "Accepté le {date}",
+          "toggle_label": "Afficher le texte de l'accord"
+        },
         "save": "Enregistrer les modifications",
         "saved": "Profil enregistré"
       },

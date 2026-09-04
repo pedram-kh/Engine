@@ -297,6 +297,11 @@
         "account_last_name": "Sloinne",
         "account_email": "Ríomhphost",
         "connections_heading": "Líonraí sóisialta agus punann",
+        "master_agreement": {
+          "accepted_header": "Ghlac tú leis an gcomhaontú máistir.",
+          "accepted_on": "Glacadh leis an {date}",
+          "toggle_label": "Taispeáin téacs an chomhaontaithe"
+        },
         "save": "Sábháil na hathruithe",
         "saved": "Próifíl sábháilte"
       },

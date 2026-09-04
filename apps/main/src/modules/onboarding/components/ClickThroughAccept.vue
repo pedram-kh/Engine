@@ -3,29 +3,13 @@
  * Click-through acceptance fallback for the master agreement
  * (Sprint 3 Chunk 3 sub-step 4, Decision E2=a — inline scrollable).
  *
- * Renders the server-side-rendered HTML returned by
- * `GET /api/v1/creators/me/wizard/contract/terms` inside an
- * inline scrollable region. Below the region: a checkbox the
- * creator must tick + a Continue button that fires the
- * click-through endpoint.
- *
- * Trust boundary (Refinement 4): the HTML body comes from the
- * server-rendered terms endpoint, which:
- *   - Reads from a static markdown file under the platform's
- *     control (not user input).
- *   - Passes through league/commonmark with `allow_unsafe_links:
- *     false` + `html_input: 'escape'`.
- *
- * So even though `v-html` is rendering server-side HTML here,
- * the path is end-to-end trusted. The browser DOM never sees
- * markdown — only pre-sanitised HTML the renderer produced.
+ * The agreement text itself renders via {@link MasterAgreementTerms}
+ * (extracted AH-098 — "one rendering path, two hosts, never a copy"; the
+ * creator profile's "Master agreement" panel is the second host). This
+ * component keeps only what's specific to the WIZARD's acceptance flow:
+ * the subtitle, the scroll-gated checkbox, and the accept button.
  *
  * a11y (F2=b):
- *   - The scrollable region has `tabindex="0"` and is keyboard
- *     scrollable.
- *   - Pre-fetched content is rendered with an `aria-busy="false"`
- *     once `terms` resolves; before that, `aria-busy="true"` +
- *     `role="status"`.
  *   - The checkbox label includes the agreement version so a
  *     screen reader announces "I have read and accept these terms
  *     — Master Creator Agreement v1.1".
@@ -35,49 +19,26 @@
  */
 
 import { ApiError } from '@catalyst/api-client'
-import type { ContractTermsResource } from '@catalyst/api-client'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { onboardingApi } from '../api/onboarding.api'
+import MasterAgreementTerms from '@/components/MasterAgreementTerms.vue'
+
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 const emit = defineEmits<{
   (event: 'accepted'): void
 }>()
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const store = useOnboardingStore()
 
-const terms = ref<ContractTermsResource['data'] | null>(null)
-const isLoading = ref(false)
 const accepted = ref(false)
 const submitErrorKey = ref<string | null>(null)
-const loadErrorKey = ref<string | null>(null)
-
-const termsRef = ref<HTMLElement | null>(null)
 const reachedEnd = ref(false)
 
-// px tolerance so sub-pixel layout / browser-zoom rounding still registers as
-// "scrolled to the end" rather than leaving the gate one pixel short.
-const SCROLL_END_THRESHOLD = 4
-
-// The click-through is a legal attestation ("I have read and accept these
-// terms"), so the acceptance checkbox stays disabled until the creator has
-// actually scrolled the agreement to the end. If the content is short enough
-// not to overflow the region, there is nothing to scroll — satisfy the gate
-// immediately rather than stranding them behind a permanently-disabled box.
-function evaluateScrollState(): void {
-  const el = termsRef.value
-  if (el === null) {
-    return
-  }
-  const overflow = el.scrollHeight - el.clientHeight
-  if (overflow <= SCROLL_END_THRESHOLD) {
-    reachedEnd.value = true
-    return
-  }
-  reachedEnd.value = el.scrollTop + el.clientHeight >= el.scrollHeight - SCROLL_END_THRESHOLD
+function onReachedEnd(value: boolean): void {
+  reachedEnd.value = value
 }
 
 const helpTextKey = computed(() =>
@@ -85,45 +46,6 @@ const helpTextKey = computed(() =>
     ? 'creator.ui.wizard.steps.contract.click_through_help'
     : 'creator.ui.wizard.steps.contract.click_through_scroll_hint',
 )
-
-const isSubmitDisabled = computed(
-  () => !accepted.value || terms.value === null || store.isLoadingClickThrough,
-)
-
-const loadErrorMessage = computed(() =>
-  loadErrorKey.value === null ? null : t(loadErrorKey.value),
-)
-const submitErrorMessage = computed(() =>
-  submitErrorKey.value === null ? null : t(submitErrorKey.value),
-)
-
-const versionLabel = computed(() =>
-  terms.value === null
-    ? ''
-    : t('creator.ui.wizard.steps.contract.terms_version', {
-        version: terms.value.version,
-      }),
-)
-
-async function loadTerms(): Promise<void> {
-  isLoading.value = true
-  loadErrorKey.value = null
-  try {
-    const response = await onboardingApi.getContractTerms()
-    terms.value = response.data
-    void locale // referenced so a future locale-aware fetch sees the dep
-    reachedEnd.value = false
-    await nextTick()
-    evaluateScrollState()
-  } catch (error) {
-    loadErrorKey.value =
-      error instanceof ApiError
-        ? 'creator.ui.errors.upload_failed'
-        : 'creator.ui.errors.upload_failed'
-  } finally {
-    isLoading.value = false
-  }
-}
 
 async function onAccept(): Promise<void> {
   submitErrorKey.value = null
@@ -137,10 +59,6 @@ async function onAccept(): Promise<void> {
         : 'creator.ui.errors.upload_failed'
   }
 }
-
-onMounted(() => {
-  void loadTerms()
-})
 </script>
 
 <template>
@@ -149,38 +67,10 @@ onMounted(() => {
       {{ t('creator.ui.wizard.steps.contract.skipped_explanation') }}
     </p>
 
-    <div
-      v-if="loadErrorMessage !== null"
-      role="alert"
-      class="click-through-accept__error"
-      data-testid="click-through-load-error"
-    >
-      {{ loadErrorMessage }}
-      <v-btn variant="text" size="small" data-testid="click-through-retry-load" @click="loadTerms">
-        {{ t('creator.ui.wizard.vendor_bounce.retry') }}
-      </v-btn>
-    </div>
-
-    <div
-      v-else
-      ref="termsRef"
-      class="click-through-accept__terms"
-      tabindex="0"
-      role="region"
-      :aria-label="t('creator.ui.wizard.steps.contract.title')"
-      :aria-busy="isLoading"
-      data-testid="click-through-terms"
-      @scroll="evaluateScrollState"
-      v-html="terms?.html ?? ''"
-    ></div>
-
-    <p
-      v-if="terms !== null"
-      class="click-through-accept__version"
-      data-testid="click-through-version"
-    >
-      {{ versionLabel }}
-    </p>
+    <MasterAgreementTerms
+      :label="t('creator.ui.wizard.steps.contract.title')"
+      @reached-end="onReachedEnd"
+    />
 
     <v-checkbox
       v-model="accepted"
@@ -195,17 +85,17 @@ onMounted(() => {
     </p>
 
     <div
-      v-if="submitErrorMessage !== null"
+      v-if="submitErrorKey !== null"
       role="alert"
       class="click-through-accept__error"
       data-testid="click-through-submit-error"
     >
-      {{ submitErrorMessage }}
+      {{ t(submitErrorKey) }}
     </div>
 
     <v-btn
       color="primary"
-      :disabled="isSubmitDisabled"
+      :disabled="!accepted || store.isLoadingClickThrough"
       :loading="store.isLoadingClickThrough"
       aria-describedby="click-through-help"
       data-testid="click-through-submit"
@@ -225,26 +115,6 @@ onMounted(() => {
 }
 
 .click-through-accept__subtitle {
-  color: rgb(var(--v-theme-on-surface-variant));
-}
-
-.click-through-accept__terms {
-  max-height: 360px;
-  overflow-y: auto;
-  padding: 16px;
-  border: 1px solid rgb(var(--v-theme-outline));
-  border-radius: 6px;
-  background-color: rgb(var(--v-theme-surface));
-  line-height: 1.6;
-}
-
-.click-through-accept__terms:focus {
-  outline: 2px solid rgb(var(--v-theme-primary));
-  outline-offset: 2px;
-}
-
-.click-through-accept__version {
-  font-size: 0.75rem;
   color: rgb(var(--v-theme-on-surface-variant));
 }
 

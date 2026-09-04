@@ -116,53 +116,73 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-09-02 · **Through:** AH-097, campaign description on the creator assignment
-detail. **Nothing is held.** `origin/main` tip is `28547822`. CI green at both pushed tips per
-§5.41 ([run `33510200711`](https://github.com/pedram-kh/Engine/actions/runs/33510200711) for the
-AH-097 feature commit `7abd52c4`; [run `33511250955`](https://github.com/pedram-kh/Engine/actions/runs/33511250955)
+**Last updated:** 2026-09-04 · **Through:** AH-098, the master agreement section on the creator
+profile. **One commit prepared, PUSH HELD** — per Pedram's explicit instruction in this batch's own
+kickoff message ("push held ... CI green at tip closes after the push clearance"). Zero
+`apps/api` / `packages/api-client` diff, no migration — pure `apps/main` frontend + 24-locale i18n
+
+- docs. The commit's own hash is not cited here (a commit cannot record its own hash) — re-derive
+  via `git log -1` / `git rev-parse HEAD` before citing it in the push-clearance exchange; do not
+  carry this session's numbers forward. `origin/main` tip is UNCHANGED at `7b8401fe` until the push
+  lands.
+
+**Deploy state (unaffected by this session — no deploy obligation, see the note below):
+production is fully current through AH-097, nothing undeployed, no open verification items — the
+deploy state has been fully clean since AH-097's close.**
+
+- **AH-098's deploy obligation: rides the next deploy, no separate one.** SPA-only rebuild
+  (`apps/main`) — ± the API layer only if a future chunk adds the deferred `contracts.version`
+  field (not this one). No migration, no new flag, no worker/queue restart, no PHP-FPM reload
+  strictly required (zero `apps/api` diff) though a routine deploy would still reload it for
+  whatever else rides along. Nothing to smoke-verify beyond the two render states (section present
+  when accepted, absent when not) once it ships.
+
+**Prior state, for the record — AH-097.** **Last updated:** 2026-09-02 · **Through:** AH-097,
+campaign description on the creator assignment detail. `origin/main` tip at that close was
+`28547822`. CI green at both pushed tips per §5.41
+([run `33510200711`](https://github.com/pedram-kh/Engine/actions/runs/33510200711) for the AH-097
+feature commit `7abd52c4`; [run `33511250955`](https://github.com/pedram-kh/Engine/actions/runs/33511250955)
 for the deploy-log-rider commit `28547822`).
 
-**Deploy state: production is fully current, nothing undeployed, no open verification items —
-the deploy state is fully clean for the first time since AH-086 opened.**
-
-- **AH-097 is DEPLOYED** (2026-09-01) — smoke confirmed by Pedram on production: the "About this
-  campaign" block renders on a described campaign's assignment detail and is absent on an
-  undescribed one. Deployed runtime code is `7abd52c4` (the on-box `git rev-parse HEAD` was not
-  itself recorded, but the pull-target reasoning holds regardless — `origin/main`'s tip at deploy
-  time was `28547822`, and the two commits above `7abd52c4` in that range are docs-only). No
-  migration (verified — none pending at deploy), PHP-FPM reloaded, `apps/main` (the only SPA this
-  entry touches) rebuilt, no worker restart needed. See
-  [`deploy-log.md`](../runbooks/deploy-log.md)'s AH-097 entry.
-- **The AH-086 → AH-096 entry's last open item is now CLOSED, with evidence.** The graduated-floor
-  score-distribution check Pedram ran on the box (2026-09-01): `≥99: 1` · `95–98.99: 131` ·
-  `78–82: 30`, across 1,295 creator rows. **Verdict: AH-089's graduated floor confirmed in
-  production** — the 131-strong 95–99 bucket is the previously-complete cohort now sitting at
-  ≈97, missing only DOB (exactly the graduated outcome; under the superseded all-or-nothing floor
-  that bucket would be empty with those ~130 creators instead piled into 78–82, the cliff
-  signature). The 30 in 78–82 reads as ordinary mid-distribution creators genuinely missing
-  multiple fields, not the cliff. One creator has already self-healed into `≥99` by adding a
-  birthday. See [`deploy-log.md`](../runbooks/deploy-log.md)'s `2026-08-31 · AH-086 → AH-096` entry,
-  post-deploy verification item 10, for the full write-up.
-
-**Feature flags — four registered, all OFF, none armed:**
-
-- `platform_automations_enabled` (new in this range, AH-090) — **OFF, NOT armed by this deploy.**
-  Arming is a separate, deliberate operator act (create the rules, read them back, THEN flip the
-  flag; ritual in `feature-flags.md`).
-- `job_posted_notifications_enabled`, `application_notifications_enabled`,
-  `missing_creator_mails_enabled` (the three pre-existing mail flags — live since the 2026-07-31
-  Jobs Board arc and the 2026-08-19 AH-083 close respectively) — **per their last known state: OFF,
-  not armed.** This range touches none of the three; not independently re-verified this session.
-
-**Two flag-independent behaviour changes to EXISTING paths are now live in production, no flag
-gates either:**
-
-1. **DOB is now required on profile save (AH-088).** An existing creator's next profile SAVE is
-   blocked until they enter a birthday (pending/rejected hard-block, approved soft-warn). Self-heals
-   per creator the moment they fill it in.
-2. **Suspended-agency direct-connect now refused (AH-090).** An admin direct-connecting a creator
-   to a suspended agency gets `422 connection.agency_suspended` — a removed capability, not an
-   added one.
+> **AH-097 is DEPLOYED** (2026-09-01) — smoke confirmed by Pedram on production: the "About this
+> campaign" block renders on a described campaign's assignment detail and is absent on an
+> undescribed one. Deployed runtime code is `7abd52c4` (the on-box `git rev-parse HEAD` was not
+> itself recorded, but the pull-target reasoning holds regardless — `origin/main`'s tip at deploy
+> time was `28547822`, and the two commits above `7abd52c4` in that range are docs-only). No
+> migration (verified — none pending at deploy), PHP-FPM reloaded, `apps/main` (the only SPA this
+> entry touches) rebuilt, no worker restart needed. See
+> [`deploy-log.md`](../runbooks/deploy-log.md)'s AH-097 entry.
+>
+> **The AH-086 → AH-096 entry's last open item is now CLOSED, with evidence.** The graduated-floor
+> score-distribution check Pedram ran on the box (2026-09-01): `≥99: 1` · `95–98.99: 131` ·
+> `78–82: 30`, across 1,295 creator rows. **Verdict: AH-089's graduated floor confirmed in
+> production** — the 131-strong 95–99 bucket is the previously-complete cohort now sitting at
+> ≈97, missing only DOB (exactly the graduated outcome; under the superseded all-or-nothing floor
+> that bucket would be empty with those ~130 creators instead piled into 78–82, the cliff
+> signature). The 30 in 78–82 reads as ordinary mid-distribution creators genuinely missing
+> multiple fields, not the cliff. One creator has already self-healed into `≥99` by adding a
+> birthday. See [`deploy-log.md`](../runbooks/deploy-log.md)'s `2026-08-31 · AH-086 → AH-096` entry,
+> post-deploy verification item 10, for the full write-up.
+>
+> **Feature flags — four registered, all OFF, none armed:**
+>
+> - `platform_automations_enabled` (new in this range, AH-090) — **OFF, NOT armed by this deploy.**
+>   Arming is a separate, deliberate operator act (create the rules, read them back, THEN flip the
+>   flag; ritual in `feature-flags.md`).
+> - `job_posted_notifications_enabled`, `application_notifications_enabled`,
+>   `missing_creator_mails_enabled` (the three pre-existing mail flags — live since the 2026-07-31
+>   Jobs Board arc and the 2026-08-19 AH-083 close respectively) — **per their last known state: OFF,
+>   not armed.** This range touches none of the three; not independently re-verified this session.
+>
+> **Two flag-independent behaviour changes to EXISTING paths are now live in production, no flag
+> gates either:**
+>
+> 1. **DOB is now required on profile save (AH-088).** An existing creator's next profile SAVE is
+>    blocked until they enter a birthday (pending/rejected hard-block, approved soft-warn). Self-heals
+>    per creator the moment they fill it in.
+> 2. **Suspended-agency direct-connect now refused (AH-090).** An admin direct-connecting a creator
+>    to a suspended agency gets `422 connection.agency_suspended` — a removed capability, not an
+>    added one.
 
 **Prior state, for the record — AH-096.** **Last updated:** 2026-09-01 · **Through:** AH-096, the
 roster age-filter fix + class sweep. `origin/main` tip at that close was `6d4994e3`.
@@ -1230,6 +1250,17 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
 
 ### Open threads
 
+- **⏸ AH-098's single commit is PUSH HELD, awaiting Claude's clearance + Pedram's go.** Everything
+  is built, gated, and committed (`apps/main` + 24-locale i18n + docs, zero `apps/api` diff); the
+  next action on this thread is the push-clearance exchange, not more building. Cite the commit
+  hash by re-deriving it (`git log -1`) — this session's Part 2 refresh deliberately did not
+  self-cite it (see the top block above).
+- **❓ New tech-debt entry — no versioned retrieval of the master agreement text a creator
+  actually accepted (AH-098).** `docs/tech-debt.md`'s newest entry: the profile panel and the
+  wizard's own re-entry both show the CURRENT agreement text, never the version actually accepted
+  — invisible today (only `1.1` has ever shipped) but real the moment a `1.2` lands. No fix
+  attempted this batch (would require a new API resource-shape change); triggered by the next
+  `ContractTermsRenderer::CURRENT_VERSION` bump.
 - **❓ AH-084 is named, not started — wire the email channel through notification preferences.**
   AH-083's D5 explicitly deferred this: the two new mail legs (① invite, ⑧ debounced message), like
   every existing transactional mail, are not yet individually opt-out-able — the new

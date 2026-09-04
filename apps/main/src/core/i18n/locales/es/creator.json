@@ -297,6 +297,11 @@
         "account_last_name": "Apellido",
         "account_email": "Correo electrónico",
         "connections_heading": "Redes sociales y portafolio",
+        "master_agreement": {
+          "accepted_header": "Has aceptado el acuerdo marco.",
+          "accepted_on": "Aceptado el {date}",
+          "toggle_label": "Mostrar el texto del acuerdo"
+        },
         "save": "Guardar cambios",
         "saved": "Perfil guardado"
       },

@@ -50,10 +50,10 @@ describe('ClickThroughAccept', () => {
     teardown = unmount
     await flushPromises()
 
-    const terms = wrapper.find('[data-testid="click-through-terms"]')
+    const terms = wrapper.find('[data-testid="master-agreement-terms"]')
     expect(terms.exists()).toBe(true)
     expect(terms.html()).toContain('Master Agreement')
-    expect(wrapper.find('[data-testid="click-through-version"]').text()).toContain('1.0')
+    expect(wrapper.find('[data-testid="master-agreement-version"]').text()).toContain('1.0')
   })
 
   it('disables the submit button until the checkbox is checked', async () => {
@@ -104,7 +104,7 @@ describe('ClickThroughAccept', () => {
     teardown = unmount
     await flushPromises()
 
-    const region = wrapper.find('[data-testid="click-through-terms"]')
+    const region = wrapper.find('[data-testid="master-agreement-terms"]')
     const el = region.element as HTMLElement
     // Simulate content taller than the scroll region, not yet scrolled.
     Object.defineProperty(el, 'scrollHeight', { configurable: true, value: 1000 })
@@ -165,7 +165,7 @@ describe('ClickThroughAccept', () => {
     teardown = unmount
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="click-through-load-error"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="click-through-retry-load"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="master-agreement-load-error"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="master-agreement-retry-load"]').exists()).toBe(true)
   })
 })

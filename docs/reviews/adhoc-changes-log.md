@@ -70,6 +70,121 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-098 · Master agreement section on the creator profile
+
+- **Status:** Landed. Fast batch (direct-iteration) — no kickoff, no standalone review file;
+  this entry is the record. **Stop-gate exception flagged in the moment:** this batch adds new
+  i18n keys, nominally a Mode-A full-loop trigger per `WORKING-PROCESS.md` §2 — proceeding under
+  Pedram's own locked-decisions message (which specified the exact keys, i18n scope, and fast-batch
+  framing), consistent with the AH-093/AH-094/AH-097 precedent of i18n-touching fast batches.
+- **Date:** 2026-09-04.
+- **Why:** Pedram's locked decision — the creator profile page should show a creator whether they've
+  accepted the master agreement, and let them re-read the full text, without duplicating the
+  wizard's rendering.
+- **Read pass (reported before building, per the house pattern):**
+  - **Wizard's agreement source:** static markdown (`apps/api/resources/contracts/master-agreement.en.md`),
+    rendered server-side by `ContractTermsRenderer::render()` (league/commonmark,
+    `allow_unsafe_links: false`, `html_input: 'escape'`) and served by the stateless
+    `GET /api/v1/creators/me/wizard/contract/terms` (no wizard-step gate, no
+    `contract_signing_enabled` check — just `requireCreator()`). The wizard's `ClickThroughAccept.vue`
+    rendered it via `v-html` on the returned HTML.
+  - **Acceptance record (contract-gate work, Sprint 4 Chunk 4):** the `contracts` table row
+    (`version` int, `title`, `body_markdown` snapshot, `signed_at`, `signed_signature_data` encrypted
+    `{method, version, ip, user_agent, accepted_at}`) plus two denormalized `creators` columns:
+    `signed_master_contract_id` (FK-less, multi-meaning per the open tech-debt entry — click-through
+    writes a real `contracts.id`, the vendor e-sign webhook writes an `integration_events.id`
+    sentinel) and `click_through_accepted_at` (timestamp, click-through path ONLY —
+    `ProcessEsignWebhookJob` never sets it, so a vendor-signed creator can be `has_signed_master_contract
+= true` with no timestamp at all). `CreatorResource` already exposes both
+    (`has_signed_master_contract`, `click_through_accepted_at`) on the creator-self attributes —
+    unconditional, not admin-gated — which is what backs the profile page's store already.
+  - **Profile page's section idiom:** no Vuetify `v-expansion-panel` exists anywhere in the
+    codebase. The closest precedent is the roster/discover portfolio drawer's custom
+    clickable-header + chevron + `v-expand-transition` pattern (`CreatorDetailPage.vue`,
+    `DiscoverProfilePage.vue`) — mirrored here.
+  - **Version-reality:** NOT trivially retrievable. `CreatorResource` exposes only the acceptance
+    boolean + timestamp — never `contracts.version` or the accept-time `body_markdown` snapshot.
+    Surfacing either would be a new API resource-shape change, out of a fast batch's scope — so the
+    honest limitation is reported, not built: the panel shows the CURRENT text and the acceptance
+    date as two separate facts, never implying they're the same document. New tech-debt entry filed
+    (`docs/tech-debt.md`, "No versioned retrieval of the master agreement text…").
+  - **Resource additions:** NONE needed. Both fields the profile needs already ship on
+    `GET /creators/me`'s existing payload. Confirmed audience-sharing check (required before
+    touching a shared resource): `CreatorResource` IS also read by admin's
+    `GET /admin/creators/{creator}` via `withAdmin()` — moot here since nothing is added to the
+    resource; no keyset pin change, no touch.
+  - **i18n verbatim-reuse check:** the wizard's `accepted_body` ("You've accepted the master
+    agreement. Continue to the next step.") is NOT verbatim-reusable — the trailing
+    "Continue to the next step." is wizard-only instruction. Mirrored (new key,
+    `accepted_header`, dropping that clause) rather than reused. The section HEADING itself
+    (`contract.name` = "Master agreement") IS reused verbatim — already a live, user-facing string
+    (the wizard's progress-rail step label), so no new exposure of its existing flaky-10
+    English-fallback debt (bg/el/et/fi/ga/hu/lt/lv/mt/ro all show "Master agreement" untranslated
+    there already — pre-existing, not touched by this batch, named here rather than silently
+    inherited).
+- **Build:** extracted `MasterAgreementTerms.vue` (`apps/main/src/components/`) — the ONE rendering
+  path (fetch + `v-html` region + version label + scroll-to-end tracking), used by two hosts:
+  `ClickThroughAccept.vue` (refactored to a thin wrapper: subtitle + shared terms viewer + checkbox
+  - submit) and the new `CreatorMasterAgreementSection.vue`
+    (`apps/main/src/modules/creators/components/`), mounted as a fourth, bottom section on
+    `CreatorProfilePage.vue`. The section is `v-if`-gated on `has_signed_master_contract ||
+click_through_accepted_at !== null` — hidden entirely (not an empty state) otherwise. Collapsed
+    by default; expanding mounts (`v-if`, not `v-show` — a deliberate departure from the roster
+    precedent, since this panel's content is a real network fetch the common "never expanded" case
+    should never issue) the shared terms viewer, which is height-bounded with internal scroll
+    (`max-height: 360px; overflow-y: auto` on `.master-agreement-terms__scroll`) — the page cannot
+    grow by the document's length. The accepted-date line renders only when
+    `click_through_accepted_at !== null` (the vendor-signed-with-no-timestamp state renders the
+    header with no date line, never a placeholder).
+- **Testid rename (mechanical, both specs updated):** `click-through-terms` / `-version` /
+  `-load-error` / `-retry-load` → `master-agreement-terms` / `-version` / `-load-error` /
+  `-retry-load`, since the shared component is no longer click-through-specific. Playwright
+  awareness: `creator-wizard-happy-path.spec.ts` (an E2E-traversed surface) references these
+  testids and was updated in the same commit.
+- **Specs:** `MasterAgreementTerms.spec.ts` (new — render/version, bounded-scroll class, reached-end
+  emission, retry-on-error) + `CreatorMasterAgreementSection.spec.ts` (new — the three named cases:
+  renders-with-acceptance including the vendor-signed-no-timestamp variant, hidden-without-acceptance,
+  bounded-scroll presence) + `CreatorProfilePage.spec.ts` (+2 thin wiring checks) +
+  `ClickThroughAccept.spec.ts` (updated testids, unchanged behavior, still green).
+- **i18n:** three new keys × 24 locales, real per-locale copy including the flaky-10 (bg, el, et,
+  fi, ga, hu, lt, lv, mt, ro) — `creator.ui.profile.master_agreement.accepted_header`,
+  `.accepted_on` (`{date}` placeholder), `.toggle_label` (the expand/collapse button's aria-label).
+  Reused verbatim, no new key: `contract.name` (section heading), `contract.terms_version`
+  (inside the shared renderer), `vendor_bounce.retry` (retry button), `errors.upload_failed`
+  (load-failure message — pre-existing, slightly mislabeled for this context, not fixed here,
+  inherited via the byte-identical reuse). `LangParityTest` green across all three specs (file-set,
+  key-set, placeholder parity) — ran as part of the full Vitest board below.
+- **Touched:** `apps/main/src/components/MasterAgreementTerms.vue` (+spec, new);
+  `apps/main/src/modules/creators/components/CreatorMasterAgreementSection.vue` (+spec, new);
+  `apps/main/src/modules/onboarding/components/ClickThroughAccept.vue` (+spec, refactored);
+  `apps/main/src/modules/creators/pages/CreatorProfilePage.vue` (+spec, new section wired);
+  `apps/main/src/core/i18n/locales/*/creator.json` (×24, three keys each);
+  `apps/main/playwright/specs/creator-wizard-happy-path.spec.ts` (testid rename);
+  `docs/tech-debt.md` (new entry — version-reality limitation).
+- **Touched — deliberately NOT touched:** `apps/api` (zero diff — both fields already shipped on
+  `CreatorResource`); `packages/api-client` (zero diff — `ContractTermsResource`,
+  `has_signed_master_contract`, `click_through_accepted_at` were already typed); no migration.
+- **Gates:** `apps/main` Vitest — **178 files / 1742 tests, all passing** (full board, re-run after
+  the final prop/emit-name fixes below). `vue-tsc` clean. ESLint **0 errors** (1 pre-existing-class
+  warning, `vue/no-v-html`, on the relocated — not new — terms region; documented in the component's
+  own trust-boundary docblock). Prettier clean (2 files needed `--write`, applied, re-verified
+  clean + re-green). `LangParityTest` — 3/3 green, all 24 locales. **No Playwright run this
+  session** — this sandbox has neither Docker nor a reachable Postgres (the same gap AH-091 named);
+  CI runs the full board on push, which is the actual verification, cited once Pedram triggers the
+  push. Mid-build correction, named rather than silently fixed: the first `defineProps`/`defineEmits`
+  pass used `ariaLabel`/`'reached-end'`, which `vue-tsc` rejected on kebab-case template usage
+  across `.vue` file boundaries (a real cross-file typing gap, not a false positive) — resolved by
+  renaming to a single-word prop (`label`) and a camelCase emit (`reachedEnd`), which also cleared
+  the `vue/attribute-hyphenation` warnings that would otherwise have appeared.
+- **Break-revert (the one load-bearing condition this batch introduces):** mutated
+  `CreatorMasterAgreementSection.vue`'s `isAccepted` gate to `() => true` — the two hidden-state
+  tests (`CreatorMasterAgreementSection.spec.ts` and `CreatorProfilePage.spec.ts`'s
+  "is absent when the creator has no acceptance on record") went red, exactly and only those two,
+  with the expected `false`→`true` diff. Reverted; both specs re-green (16/16 across the two files).
+- **Ref:** this entry; `docs/tech-debt.md` (new "No versioned retrieval…" entry).
+
+---
+
 ### AH-097 · Campaign description on the creator assignment detail
 
 - **Status:** Landed. Fast batch (direct-iteration) — no kickoff, no standalone review file;

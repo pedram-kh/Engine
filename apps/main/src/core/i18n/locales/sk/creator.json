@@ -297,6 +297,11 @@
         "account_last_name": "Priezvisko",
         "account_email": "E-mail",
         "connections_heading": "Sociálne siete a portfólio",
+        "master_agreement": {
+          "accepted_header": "Prijali ste rámcovú zmluvu.",
+          "accepted_on": "Prijaté {date}",
+          "toggle_label": "Zobraziť text zmluvy"
+        },
         "save": "Uložiť zmeny",
         "saved": "Profil uložený"
       },

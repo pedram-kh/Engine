@@ -297,6 +297,11 @@
         "account_last_name": "Nachname",
         "account_email": "E-Mail",
         "connections_heading": "Soziale Netzwerke & Portfolio",
+        "master_agreement": {
+          "accepted_header": "Du hast die Rahmenvereinbarung akzeptiert.",
+          "accepted_on": "Akzeptiert am {date}",
+          "toggle_label": "Vereinbarungstext anzeigen"
+        },
         "save": "Änderungen speichern",
         "saved": "Profil gespeichert"
       },

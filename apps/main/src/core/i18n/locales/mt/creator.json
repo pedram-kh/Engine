@@ -297,6 +297,11 @@
         "account_last_name": "Kunjom",
         "account_email": "Email",
         "connections_heading": "Midja soċjali u portfolio",
+        "master_agreement": {
+          "accepted_header": "Aċċettajt il-ftehim prinċipali.",
+          "accepted_on": "Aċċettat fi {date}",
+          "toggle_label": "Uri t-test tal-ftehim"
+        },
         "save": "Issejvja l-bidliet",
         "saved": "Il-profil ġie ssejvjat"
       },

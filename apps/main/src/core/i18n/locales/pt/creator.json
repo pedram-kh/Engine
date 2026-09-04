@@ -297,6 +297,11 @@
         "account_last_name": "Apelido",
         "account_email": "E-mail",
         "connections_heading": "Redes sociais e portefólio",
+        "master_agreement": {
+          "accepted_header": "Aceitou o contrato principal.",
+          "accepted_on": "Aceite em {date}",
+          "toggle_label": "Mostrar o texto do contrato"
+        },
         "save": "Guardar alterações",
         "saved": "Perfil guardado"
       },

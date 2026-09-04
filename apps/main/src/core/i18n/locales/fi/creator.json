@@ -297,6 +297,11 @@
         "account_last_name": "Sukunimi",
         "account_email": "Sähköposti",
         "connections_heading": "Sosiaalinen media ja portfolio",
+        "master_agreement": {
+          "accepted_header": "Olet hyväksynyt puitesopimuksen.",
+          "accepted_on": "Hyväksytty {date}",
+          "toggle_label": "Näytä sopimuksen teksti"
+        },
         "save": "Tallenna muutokset",
         "saved": "Profiili tallennettu"
       },

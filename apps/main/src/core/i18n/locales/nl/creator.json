@@ -297,6 +297,11 @@
         "account_last_name": "Achternaam",
         "account_email": "E-mail",
         "connections_heading": "Social media & portfolio",
+        "master_agreement": {
+          "accepted_header": "Je hebt de raamovereenkomst geaccepteerd.",
+          "accepted_on": "Geaccepteerd op {date}",
+          "toggle_label": "Overeenkomsttekst weergeven"
+        },
         "save": "Wijzigingen opslaan",
         "saved": "Profiel opgeslagen"
       },

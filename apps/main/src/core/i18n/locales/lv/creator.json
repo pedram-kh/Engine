@@ -297,6 +297,11 @@
         "account_last_name": "Uzvārds",
         "account_email": "E-pasts",
         "connections_heading": "Sociālie tīkli un portfolio",
+        "master_agreement": {
+          "accepted_header": "Jūs esat piekritis pamatlīgumam.",
+          "accepted_on": "Piekrišana sniegta {date}",
+          "toggle_label": "Rādīt līguma tekstu"
+        },
         "save": "Saglabāt izmaiņas",
         "saved": "Profils saglabāts"
       },

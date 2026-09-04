@@ -16,6 +16,14 @@
  * contact + socials + portfolio); the sub-sections read the store reactively,
  * and we hydrate the basics form once the creator is present.
  *
+ * Master agreement (AH-098): a fourth, bottom section — collapsed by default,
+ * hidden entirely (not an empty state) when the creator has no acceptance on
+ * record. See {@link CreatorMasterAgreementSection} for the full narrative;
+ * the store's existing `has_signed_master_contract` /
+ * `click_through_accepted_at` attributes (already on `CreatorResource`,
+ * already hydrated by this same `bootstrap()`) are all it needs — no new
+ * fetch, no resource change.
+ *
  * Audience (D6): post-submission creators (pending / approved / rejected).
  * Incomplete creators are still in onboarding and edit via the wizard, so we
  * soft-redirect them to the Welcome Back surface here (Q2 — kept in the page,
@@ -62,6 +70,7 @@ import { useRouter } from 'vue-router'
 import ProfileBasicsForm from '../../onboarding/components/ProfileBasicsForm.vue'
 import ConnectionsSocialSection from '../../onboarding/components/ConnectionsSocialSection.vue'
 import ConnectionsPortfolioSection from '../../onboarding/components/ConnectionsPortfolioSection.vue'
+import CreatorMasterAgreementSection from '../components/CreatorMasterAgreementSection.vue'
 import { useOnboardingStore } from '../../onboarding/stores/useOnboardingStore'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 
@@ -276,6 +285,13 @@ onMounted(async () => {
         {{ t('creator.ui.profile.floor.portfolio_warning') }}
       </v-alert>
     </section>
+
+    <!-- Section 3: Master agreement (AH-098) — hidden entirely (not an
+         empty state) when the creator has no acceptance on record. -->
+    <CreatorMasterAgreementSection
+      :has-signed-master-contract="store.creator?.attributes.has_signed_master_contract ?? false"
+      :click-through-accepted-at="store.creator?.attributes.click_through_accepted_at ?? null"
+    />
 
     <v-snackbar
       v-model="snackbar"

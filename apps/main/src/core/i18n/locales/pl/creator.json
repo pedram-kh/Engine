@@ -297,6 +297,11 @@
         "account_last_name": "Nazwisko",
         "account_email": "E-mail",
         "connections_heading": "Media społecznościowe i portfolio",
+        "master_agreement": {
+          "accepted_header": "Zaakceptowałeś/aś umowę ramową.",
+          "accepted_on": "Zaakceptowano {date}",
+          "toggle_label": "Pokaż treść umowy"
+        },
         "save": "Zapisz zmiany",
         "saved": "Profil zapisany"
       },

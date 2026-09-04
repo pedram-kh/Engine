@@ -297,6 +297,11 @@
         "account_last_name": "Pavardė",
         "account_email": "El. paštas",
         "connections_heading": "Socialiniai tinklai ir portfelis",
+        "master_agreement": {
+          "accepted_header": "Sutikote su pagrindine sutartimi.",
+          "accepted_on": "Sutikta {date}",
+          "toggle_label": "Rodyti sutarties tekstą"
+        },
         "save": "Išsaugoti pakeitimus",
         "saved": "Profilis išsaugotas"
       },
