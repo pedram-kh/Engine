@@ -116,29 +116,26 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-09-04 · **Through:** AH-098, the master agreement section on the creator
-profile. **One commit prepared, PUSH HELD** — per Pedram's explicit instruction in this batch's own
-kickoff message ("push held ... CI green at tip closes after the push clearance"). Zero
+**Last updated:** 2026-09-06 · **Through:** AH-098, the master agreement section on the creator
+profile. **Nothing is held.** `origin/main` tip is `9b7d6deb`.
+
+**Deploy state: production is current through `9b7d6deb` — level with `origin/main`, nothing
+undeployed, no open items.**
+
+- **AH-098 is DEPLOYED** (2026-09-04) — deployed tip `9b7d6deb`, operator Pedram. Code-only per
+  this entry's own shape: zero `apps/api` diff, no migration, no PHP-FPM reload, no worker
+  restart, no snapshot — `apps/main` (SPA-only) rebuild. Smoke: `/up` 200; a click-through-accepted
+  creator's profile shows the collapsed "Master agreement" section with the accepted date, and
+  expanding it scrolls the full text inside the height-bounded panel — **confirmed by Pedram on
+  production.** The sibling check (a never-accepted creator sees no section at all) was **not run
+  this deploy** — recorded honestly in `deploy-log.md` rather than assumed from the first check's
+  pass. See [`deploy-log.md`](../runbooks/deploy-log.md)'s AH-098 entry.
+
+**Prior state, for the record — AH-098 (pre-deploy).** **Last updated:** 2026-09-04 · at that point
+AH-098's one commit was prepared with push held per Pedram's own kickoff instruction; zero
 `apps/api` / `packages/api-client` diff, no migration — pure `apps/main` frontend + 24-locale i18n
-
-- docs. The commit's own hash is not cited here (a commit cannot record its own hash) — re-derive
-  via `git log -1` / `git rev-parse HEAD` before citing it in the push-clearance exchange; do not
-  carry this session's numbers forward. `origin/main` tip is UNCHANGED at `7b8401fe` until the push
-  lands.
-
-**Deploy state: production is fully current through AH-097; AH-098 now has an open `PENDING` entry
-in [`deploy-log.md`](../runbooks/deploy-log.md) (opened this session, docs-only, standalone — no
-prior entry to stack on) awaiting the actual deploy. No open verification items carried from any
-earlier range — the deploy state was fully clean through AH-097's close before this entry opened.**
-
-- **AH-098's deploy obligation: rides the next deploy, no separate one.** SPA-only rebuild
-  (`apps/main`) — ± the API layer only if a future chunk adds the deferred `contracts.version`
-  field (not this one). No migration, no new flag, no worker/queue restart, no PHP-FPM reload
-  strictly required (zero `apps/api` diff) though a routine deploy would still reload it for
-  whatever else rides along. Post-deploy verification (per the `deploy-log.md` entry): the section
-  renders with the accepted date for a click-through-accepted creator and scrolls inside its
-  bounded panel on expand; a never-accepted creator sees no section at all. **Operator and date
-  fields in that entry are deliberately open — fill in at deploy time, not now.**
+docs. `origin/main` tip was `7b8401fe` until the push landed (it since has, at `9b7d6deb`, per the
+current top block above).
 
 **Prior state, for the record — AH-097.** **Last updated:** 2026-09-02 · **Through:** AH-097,
 campaign description on the creator assignment detail. `origin/main` tip at that close was
