@@ -79,6 +79,16 @@ final class AccountLockoutService
             'suspended_at' => Carbon::now(),
         ])->saveQuietly();
 
+        // AH-099 (D3): suspension revokes every bearer token the user holds
+        // — closes the "token outlives suspension" finding (M2.4). This is
+        // the ONLY place a user is suspended (admin suspend-user surface does
+        // not exist yet; agency suspension affects agency members, who cannot
+        // hold app tokens). CreatorTokenGuard also refuses suspended users at
+        // use time, so this is the primary control and that is the backstop.
+        // Sits after the idempotency early-return above: re-running on an
+        // already-suspended user is still a no-op.
+        $user->tokens()->delete();
+
         $this->audit->log(
             action: AuditAction::AuthAccountLockedSuspended,
             subject: $user,

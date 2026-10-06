@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Http\Controllers;
 
-use App\Core\Errors\ErrorResponse;
 use App\Modules\Identity\Http\Requests\LoginRequest;
 use App\Modules\Identity\Http\Resources\UserResource;
+use App\Modules\Identity\Http\Responders\LoginFailureResponder;
 use App\Modules\Identity\Services\AuthService;
-use App\Modules\Identity\Services\FailedLoginTracker;
 use App\Modules\Identity\Services\LoginResult;
 use App\Modules\Identity\Services\LoginResultStatus;
-use App\Modules\Identity\Services\TwoFactorVerificationThrottle;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -59,74 +57,10 @@ final class LoginController
         return match ($result->status) {
             LoginResultStatus::Success => UserResource::make($result->user)->response(),
 
-            LoginResultStatus::WrongSpa => ErrorResponse::single(
-                request: $request,
-                status: 403,
-                code: 'auth.wrong_spa',
-                title: trans('auth.login.wrong_spa'),
-                // The receiving SPA uses `meta.correct_spa_url` to render
-                // a "Go to the right login page" link. We always return
-                // the OTHER SPA's URL (relative to the guard that just
-                // rejected the user) so the wrong-side flow has a single,
-                // unambiguous next step.
-                meta: ['correct_spa_url' => self::correctSpaUrlForUser($request)],
-            ),
-
-            LoginResultStatus::InvalidCredentials => ErrorResponse::single(
-                request: $request,
-                status: 401,
-                code: 'auth.invalid_credentials',
-                title: trans('auth.login.invalid_credentials'),
-            ),
-
-            LoginResultStatus::MfaRequired => ErrorResponse::single(
-                request: $request,
-                status: 401,
-                code: 'auth.mfa_required',
-                title: trans('auth.login.mfa_required'),
-                meta: ['mfa_required' => true],
-            ),
-
-            LoginResultStatus::MfaInvalidCode => ErrorResponse::single(
-                request: $request,
-                status: 401,
-                code: 'auth.mfa.invalid_code',
-                title: trans('auth.mfa.invalid_code'),
-                meta: ['mfa_required' => true],
-            ),
-
-            LoginResultStatus::MfaRateLimited => ErrorResponse::single(
-                request: $request,
-                status: 423,
-                code: 'auth.mfa.rate_limited',
-                title: trans('auth.mfa.rate_limited', [
-                    'minutes' => TwoFactorVerificationThrottle::WINDOW_MINUTES,
-                ]),
-                headers: ['Retry-After' => (string) ($result->retryAfterSeconds ?? 0)],
-            ),
-
-            LoginResultStatus::MfaEnrollmentSuspended => ErrorResponse::single(
-                request: $request,
-                status: 423,
-                code: 'auth.mfa.enrollment_suspended',
-                title: trans('auth.mfa.enrollment_suspended'),
-            ),
-
-            LoginResultStatus::AccountSuspended => ErrorResponse::single(
-                request: $request,
-                status: 423,
-                code: 'auth.account_locked.suspended',
-                title: trans('auth.login.account_locked'),
-            ),
-
-            LoginResultStatus::TemporarilyLocked => ErrorResponse::single(
-                request: $request,
-                status: 423,
-                code: 'auth.account_locked.temporary',
-                title: trans('auth.login.account_locked_temporary', [
-                    'minutes' => FailedLoginTracker::SHORT_WINDOW_MINUTES,
-                ]),
-                headers: ['Retry-After' => (string) ($result->retryAfterSeconds ?? 0)],
+            default => LoginFailureResponder::respond(
+                $request,
+                $result,
+                self::correctSpaUrlForUser($request),
             ),
         };
     }

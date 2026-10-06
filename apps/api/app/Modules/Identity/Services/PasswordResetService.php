@@ -103,6 +103,15 @@ final class PasswordResetService
                     'remember_token' => Str::random(60),
                 ])->save();
 
+                // AH-099 (D3): the session-killing equivalent for the creator
+                // app. A password reset kills web sessions via the rotated
+                // credentials (Sanctum's AuthenticateSession); a bearer token
+                // has no such tie, so revoke EVERY token the user holds. Runs
+                // only inside the broker's success callback — an invalid or
+                // expired reset token never reaches here, so a failed reset
+                // leaves tokens intact.
+                $user->tokens()->delete();
+
                 $this->failedLogins->clear($user->email);
                 $this->lockout->clearTemporaryLock($user->email);
             },

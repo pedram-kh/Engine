@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Identity\Services;
 
 use App\Modules\Identity\Models\User;
+use Laravel\Sanctum\NewAccessToken;
 
 /**
  * Discriminated result of {@see AuthService::login()}.
@@ -53,11 +54,16 @@ final readonly class LoginResult
         public LoginResultStatus $status,
         public ?User $user = null,
         public ?int $retryAfterSeconds = null,
+        public ?NewAccessToken $token = null,
     ) {}
 
-    public static function success(User $user): self
+    /**
+     * `$token` is set only by the token door (AH-099); the session door
+     * leaves it null, exactly as before.
+     */
+    public static function success(User $user, ?NewAccessToken $token = null): self
     {
-        return new self(LoginResultStatus::Success, user: $user);
+        return new self(LoginResultStatus::Success, user: $user, token: $token);
     }
 
     public static function invalidCredentials(): self

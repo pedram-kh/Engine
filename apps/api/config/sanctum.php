@@ -57,12 +57,22 @@ return [
     | Expiration Minutes
     |--------------------------------------------------------------------------
     |
-    | Used only for personal access tokens (Phase 2 mobile / Phase 3 public
-    | API). SPA sessions are governed by config('session.lifetime').
+    | Applies to personal access tokens only (the creator app, AH-099). SPA
+    | sessions are governed by config('session.lifetime').
+    |
+    | A FIXED ceiling measured from token creation — Sanctum has no sliding
+    | expiry and no refresh. Default 129600 min = 90 days. Revocation
+    | (logout / password reset / suspension) is the real control; this caps
+    | the blast radius of a leaked token that none of those caught.
+    |
+    | Deliberately a GLOBAL setting rather than a per-token `expires_at`:
+    | Sanctum evaluates it at use time against `created_at`, so lowering the
+    | env value is an operator lever that retroactively expires older
+    | tokens. A per-token stamp could not do that.
     |
     */
 
-    'expiration' => null,
+    'expiration' => (int) env('SANCTUM_TOKEN_EXPIRATION_MINUTES', 129600),
 
     /*
     |--------------------------------------------------------------------------

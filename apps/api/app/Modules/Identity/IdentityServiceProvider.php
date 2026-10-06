@@ -18,12 +18,15 @@ use App\Modules\Identity\Events\TwoFactorRecoveryCodesRegenerated;
 use App\Modules\Identity\Events\UserLoggedIn;
 use App\Modules\Identity\Events\UserLoggedOut;
 use App\Modules\Identity\Events\UserSignedUp;
+use App\Modules\Identity\Guards\CreatorTokenGuard;
 use App\Modules\Identity\Listeners\WriteAuthAuditLog;
 use App\Modules\Identity\Services\PwnedPasswordsClient;
+use Illuminate\Auth\RequestGuard;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
@@ -38,9 +41,39 @@ final class IdentityServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->registerCreatorTokenGuard();
         $this->registerRateLimits();
         $this->registerEventListeners();
         $this->registerRoutes();
+    }
+
+    /**
+     * Registers the `creator_token` guard driver behind the `creator_app`
+     * guard (AH-099). Mirrors how Sanctum builds its own RequestGuard —
+     * same provider, same expiry, same `last_used_at` tracking — but with
+     * {@see CreatorTokenGuard} as the callback, which never consults a
+     * session guard.
+     */
+    private function registerCreatorTokenGuard(): void
+    {
+        Auth::resolved(function ($auth): void {
+            $auth->extend('creator_token', function ($app, string $name, array $config) use ($auth): RequestGuard {
+                $guard = new RequestGuard(
+                    new CreatorTokenGuard(
+                        $auth,
+                        config('sanctum.expiration'),
+                        $config['provider'] ?? null,
+                        (bool) config('sanctum.last_used_at', true),
+                    ),
+                    $app['request'],
+                    $auth->createUserProvider($config['provider'] ?? null),
+                );
+
+                $app->refresh('request', $guard, 'setRequest');
+
+                return $guard;
+            });
+        });
     }
 
     private function registerRateLimits(): void

@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Laravel\Sanctum\PersonalAccessToken;
 use RuntimeException;
 use SensitiveParameter;
 
@@ -74,6 +75,12 @@ use SensitiveParameter;
  */
 final class AuthService
 {
+    /** The guard / allow-list key the token door evaluates under (AH-099). */
+    public const TOKEN_GUARD = 'creator_app';
+
+    /** Per-device token name prefix: `creator-app:{ios|android}`. */
+    public const TOKEN_NAME_PREFIX = 'creator-app:';
+
     /**
      * Allow-list of user types per SPA guard. The agency SPA (`web`)
      * serves Creators (onboarding wizard + welcome-back flow) and
@@ -87,10 +94,9 @@ final class AuthService
      * — the schema knows about it, but no SPA serves it today, so a
      * brand-user attempting either side falls through to WrongSpa.
      *
-     * Guards outside the SPA axis (e.g. `api`, `sanctum` token auth)
-     * do not flow through this code path because the SPA login
-     * controller hard-codes `web` / `web_admin` based on the matched
-     * route name. If a future caller passes an unknown guard string,
+     * `creator_app` is the token door ({@see issueToken()}, AH-099) — it
+     * evaluates this same graph under its own key. Guards outside this
+     * set do not flow through here. If a future caller passes an unknown guard string,
      * we fail open (no gate) — that is the conservative posture for a
      * defensive check whose contract is "wrong SPA, not wrong auth".
      *
@@ -99,6 +105,9 @@ final class AuthService
     private const SPA_USER_TYPE_ALLOW_LIST = [
         'web' => [UserType::Creator, UserType::AgencyUser],
         'web_admin' => [UserType::PlatformAdmin],
+        // AH-099: the token door. Creator-only by design — agency members and
+        // admins get no app token (this arc is the creator app).
+        'creator_app' => [UserType::Creator],
     ];
 
     public function __construct(
@@ -151,6 +160,152 @@ final class AuthService
             );
         }
 
+        $gates = $this->evaluateGates($email, $password, $request, $guard, $mfaCode);
+
+        if ($gates instanceof LoginResult) {
+            return $gates;
+        }
+
+        $email = $gates->email;
+        $user = $gates->user;
+        $ip = $gates->ip;
+        $userAgent = $gates->userAgent;
+        $usedMfa = $gates->usedMfa;
+
+        $this->failedLogins->clear($email);
+        $this->lockout->clearTemporaryLock($email);
+
+        $this->auth->guard($guard)->login($user);
+        $request->session()->regenerate();
+
+        $user->forceFill([
+            'last_login_at' => Carbon::now(),
+            'last_login_ip' => $ip,
+        ])->saveQuietly();
+
+        $this->events->dispatch(new UserLoggedIn(
+            user: $user,
+            ip: $ip,
+            userAgent: $userAgent,
+            guard: $guard,
+            mfa: $usedMfa,
+        ));
+
+        return LoginResult::success($user);
+    }
+
+    /**
+     * Token door (AH-099, D1): the creator app's login. Runs the SAME gate
+     * graph as {@see login()} via {@see evaluateGates()} and differs only at
+     * the very end — a personal access token is minted and returned instead
+     * of `guard()->login()` + session regenerate. Consequently:
+     *
+     *   - 2FA holds: an enrolled creator gets `MfaRequired` exactly as on
+     *     web, and no token exists until a valid code is supplied;
+     *   - failed attempts feed the same lockout counters as the web door;
+     *   - no session is required or touched (the Capacitor origin is not a
+     *     stateful domain, so none is bound) — hence no `hasSession()` guard
+     *     here, unlike {@see login()}.
+     *
+     * Creator-only: the allow-list key `creator_app` admits `Creator` and
+     * nothing else, so an agency member or platform admin with valid
+     * credentials gets `WrongSpa` and no token. That is the deliberate
+     * boundary of this arc (the creator app), not an oversight.
+     *
+     * Impersonation cannot mint a token: minting requires the account's
+     * password, which an impersonating admin never has.
+     *
+     * @param  'ios'|'android'  $platform
+     */
+    public function issueToken(
+        string $email,
+        #[SensitiveParameter] string $password,
+        Request $request,
+        string $platform,
+        #[SensitiveParameter] ?string $mfaCode = null,
+    ): LoginResult {
+        $gates = $this->evaluateGates($email, $password, $request, self::TOKEN_GUARD, $mfaCode);
+
+        if ($gates instanceof LoginResult) {
+            return $gates;
+        }
+
+        $this->failedLogins->clear($gates->email);
+        $this->lockout->clearTemporaryLock($gates->email);
+
+        $token = $gates->user->createToken(self::TOKEN_NAME_PREFIX.$platform, ['*']);
+
+        $gates->user->forceFill([
+            'last_login_at' => Carbon::now(),
+            'last_login_ip' => $gates->ip,
+        ])->saveQuietly();
+
+        $this->events->dispatch(new UserLoggedIn(
+            user: $gates->user,
+            ip: $gates->ip,
+            userAgent: $gates->userAgent,
+            guard: self::TOKEN_GUARD,
+            mfa: $gates->usedMfa,
+        ));
+
+        return LoginResult::success($gates->user, $token);
+    }
+
+    public function logout(Request $request, string $guard): void
+    {
+        /** @var User|null $user */
+        $user = $this->auth->guard($guard)->user();
+
+        // AH-099 token door: a bearer request has no session user on the
+        // `web` guard, only a `creator_app` user. Revoke exactly the token
+        // presented — the creator's other devices stay signed in. The cookie
+        // branch below is unchanged and still taken for every session user.
+        if ($user === null && $guard === 'web') {
+            $tokenUser = $this->auth->guard(self::TOKEN_GUARD)->user();
+
+            if ($tokenUser instanceof User) {
+                $this->logoutToken($request, $tokenUser);
+
+                return;
+            }
+        }
+
+        $this->auth->guard($guard)->logout();
+
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        if ($user instanceof User) {
+            $this->events->dispatch(new UserLoggedOut(
+                user: $user,
+                ip: $request->ip(),
+                userAgent: $request->userAgent(),
+                guard: $guard,
+            ));
+        }
+    }
+
+    /**
+     * The credential + gate graph shared by BOTH login doors (AH-099, D1):
+     * lockout → lookup → password → suspension → agency suspension →
+     * SPA/door gate → rehash → 2FA. Extracted from {@see login()} with the
+     * body moved verbatim, so the session door and the token door
+     * ({@see issueToken()}) can never drift: there is one graph, and the two
+     * doors differ only in what they do once it has passed.
+     *
+     * Returns a failure {@see LoginResult} the moment any gate trips, or
+     * {@see GatesPassed} when every gate cleared (credentials verified, 2FA
+     * satisfied where enrolled). No session or token is touched in here.
+     */
+    private function evaluateGates(
+        string $email,
+        #[SensitiveParameter] string $password,
+        Request $request,
+        string $guard,
+        #[SensitiveParameter] ?string $mfaCode,
+    ): LoginResult|GatesPassed {
         $email = strtolower(trim($email));
         $ip = $request->ip();
         $userAgent = $request->userAgent();
@@ -295,48 +450,23 @@ final class AuthService
             $usedMfa = true;
         }
 
-        $this->failedLogins->clear($email);
-        $this->lockout->clearTemporaryLock($email);
-
-        $this->auth->guard($guard)->login($user);
-        $request->session()->regenerate();
-
-        $user->forceFill([
-            'last_login_at' => Carbon::now(),
-            'last_login_ip' => $ip,
-        ])->saveQuietly();
-
-        $this->events->dispatch(new UserLoggedIn(
-            user: $user,
-            ip: $ip,
-            userAgent: $userAgent,
-            guard: $guard,
-            mfa: $usedMfa,
-        ));
-
-        return LoginResult::success($user);
+        return new GatesPassed($email, $user, $ip, $userAgent, $usedMfa);
     }
 
-    public function logout(Request $request, string $guard): void
+    private function logoutToken(Request $request, User $user): void
     {
-        /** @var User|null $user */
-        $user = $this->auth->guard($guard)->user();
+        $token = $user->currentAccessToken();
 
-        $this->auth->guard($guard)->logout();
-
-        if ($request->hasSession()) {
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
+        if ($token instanceof PersonalAccessToken) {
+            $token->delete();
         }
 
-        if ($user instanceof User) {
-            $this->events->dispatch(new UserLoggedOut(
-                user: $user,
-                ip: $request->ip(),
-                userAgent: $request->userAgent(),
-                guard: $guard,
-            ));
-        }
+        $this->events->dispatch(new UserLoggedOut(
+            user: $user,
+            ip: $request->ip(),
+            userAgent: $request->userAgent(),
+            guard: self::TOKEN_GUARD,
+        ));
     }
 
     private function recordFailureAndMaybeLock(

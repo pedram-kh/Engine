@@ -57,6 +57,18 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Creator-app bearer guard (AH-099). Bearer-token ONLY — it never
+        // reads a session, so no session guard (`web_admin` in particular)
+        // can authenticate through it. Mounted AFTER `web` as
+        // `auth:web,creator_app` on the creator-reachable routes; see
+        // App\Modules\Identity\Guards\CreatorTokenGuard for why this is a
+        // dedicated guard rather than `auth:sanctum`. The driver is
+        // registered by IdentityServiceProvider.
+        'creator_app' => [
+            'driver' => 'creator_token',
+            'provider' => 'users',
+        ],
     ],
 
     /*

@@ -55,7 +55,7 @@ uses(TestCase::class);
 |      `auth:*` middleware on the route.
 |
 |   6. Wizard-completion endpoints SIT INSIDE the creators.me.*
-|      group (auth:web + tenancy.set + verified) — they read
+|      group (auth:web,creator_app + tenancy.set + verified) — they read
 |      authenticated state.
 |
 */
@@ -199,7 +199,10 @@ it('wizard-completion endpoints DO carry auth + verified middleware (creator-sco
         expect($route->getActionName())->toContain(WizardCompletionController::class);
 
         $middleware = $route->gatherMiddleware();
-        expect($middleware)->toContain('auth:web')
+        // AH-099: the creator-reachable mounts moved from `auth:web` to
+        // `auth:web,creator_app` (session first, then the bearer-only guard).
+        expect($middleware)->toContain('auth:web,creator_app')
+            ->and($middleware)->not->toContain('auth:web')
             ->and($middleware)->toContain('tenancy.set')
             ->and($middleware)->toContain('verified');
     }

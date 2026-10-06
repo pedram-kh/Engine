@@ -50,7 +50,7 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
 
 Route::prefix('creators/me/assignments/{assignment}')
     ->name('creators.me.assignments.messages.')
-    ->middleware(['auth:web', 'tenancy.set', 'verified'])
+    ->middleware(['auth:web,creator_app', 'tenancy.set', 'verified'])
     ->group(function (): void {
         Route::get('messages', [CreatorMessageController::class, 'index'])->name('index');
         Route::post('messages', [CreatorMessageController::class, 'store'])->name('store');
@@ -103,7 +103,7 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
 // unpaginated list of messageable agencies.
 Route::prefix('creators/me')
     ->name('creators.me.messaging.')
-    ->middleware(['auth:web', 'tenancy.set', 'verified'])
+    ->middleware(['auth:web,creator_app', 'tenancy.set', 'verified'])
     ->group(function (): void {
         Route::get('messageable-agencies', [MessageableContactsController::class, 'agencies'])
             ->name('messageable-agencies');
@@ -111,7 +111,7 @@ Route::prefix('creators/me')
 
 Route::prefix('creators/me/relationship-threads')
     ->name('creators.me.relationship-messaging.')
-    ->middleware(['auth:web', 'tenancy.set', 'verified'])
+    ->middleware(['auth:web,creator_app', 'tenancy.set', 'verified'])
     ->group(function (): void {
         Route::get('/', [CreatorRelationshipMessageController::class, 'inbox'])->name('inbox');
         Route::get('{agency}/messages', [CreatorRelationshipMessageController::class, 'index'])->name('messages.index');

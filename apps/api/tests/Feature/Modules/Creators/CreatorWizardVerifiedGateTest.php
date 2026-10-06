@@ -18,7 +18,7 @@ uses(TestCase::class, RefreshDatabase::class);
 | Defence-in-depth (#40) companion to the
 | PasswordResetService::request() email_verified_at gate. The wizard
 | route group at apps/api/app/Modules/Creators/Routes/api.php carries
-| ['auth:web', 'tenancy.set', 'verified']; without `verified`, an
+| ['auth:web,creator_app', 'tenancy.set', 'verified']; without `verified`, an
 | authenticated-but-unverified User created via the bulk-invite
 | throwaway-password path could reach the wizard and either advance
 | their own application or interfere with the legitimate magic-link

@@ -13,6 +13,7 @@ use App\Modules\Identity\Http\Controllers\PasswordResetController;
 use App\Modules\Identity\Http\Controllers\RegenerateRecoveryCodesController;
 use App\Modules\Identity\Http\Controllers\ResendVerificationController;
 use App\Modules\Identity\Http\Controllers\SignUpController;
+use App\Modules\Identity\Http\Controllers\TokenLoginController;
 use App\Modules\Identity\Http\Controllers\UpdateMeController;
 use App\Modules\Identity\Http\Controllers\VerifyEmailController;
 use App\Modules\Identity\Http\Middleware\EnsureMfaForAdmins;
@@ -57,7 +58,7 @@ use Illuminate\Support\Facades\Route;
 // tenant-scoped data AND is reachable only by agency users.
 
 Route::get('me', MeController::class)
-    ->middleware(['auth:web', 'tenancy.set'])
+    ->middleware(['auth:web,creator_app', 'tenancy.set'])
     ->name('me');
 
 // Locale-only self-update (persistence half of the locale chunk). Same
@@ -66,7 +67,7 @@ Route::get('me', MeController::class)
 // fail-closed `tenancy` alias is intentionally NOT applied). Allowlisted in
 // docs/security/tenancy.md §4.
 Route::patch('me', UpdateMeController::class)
-    ->middleware(['auth:web', 'tenancy.set'])
+    ->middleware(['auth:web,creator_app', 'tenancy.set'])
     ->name('me.update');
 
 // ---------------------------------------------------------------------------
@@ -81,8 +82,17 @@ Route::prefix('auth')
             ->middleware('throttle:auth-login-email')
             ->name('login');
 
+        // Creator-app token login (AH-099, D1). A separate door onto the
+        // SAME AuthService gate graph as `login` above — same throttles,
+        // same lockout counters, same 2FA challenge — that mints a bearer
+        // token instead of attaching a session. Creator-only; no callers
+        // until the app ships (AH-100).
+        Route::post('token', TokenLoginController::class)
+            ->middleware('throttle:auth-login-email')
+            ->name('token');
+
         Route::post('logout', LogoutController::class)
-            ->middleware('auth:web')
+            ->middleware('auth:web,creator_app')
             ->name('logout');
 
         Route::post('forgot-password', [PasswordResetController::class, 'forgot'])
@@ -110,19 +120,19 @@ Route::prefix('auth')
         // service rather than a route-level limiter (an honest user
         // who fat-fingers four codes still gets a fifth try).
         Route::post('2fa/enable', EnableTwoFactorController::class)
-            ->middleware('auth:web')
+            ->middleware('auth:web,creator_app')
             ->name('2fa.enable');
 
         Route::post('2fa/confirm', ConfirmTwoFactorController::class)
-            ->middleware('auth:web')
+            ->middleware('auth:web,creator_app')
             ->name('2fa.confirm');
 
         Route::post('2fa/disable', DisableTwoFactorController::class)
-            ->middleware('auth:web')
+            ->middleware('auth:web,creator_app')
             ->name('2fa.disable');
 
         Route::post('2fa/recovery-codes', RegenerateRecoveryCodesController::class)
-            ->middleware('auth:web')
+            ->middleware('auth:web,creator_app')
             ->name('2fa.recovery_codes');
 
         // Impersonation hand-off (Sprint 13, D-9). On the MAIN origin so the

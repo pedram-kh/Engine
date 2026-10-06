@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Carbon;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @property int $id
@@ -54,6 +55,12 @@ use Illuminate\Support\Carbon;
 final class User extends Authenticatable implements Auditable, MustVerifyEmail
 {
     use Audited;
+
+    // AH-099 — personal access tokens for the creator app (bearer auth).
+    // The trait is inert for every cookie/session request: it adds the
+    // `tokens()` relation + `createToken()` and nothing reads it unless a
+    // request authenticates through the `creator_app` guard.
+    use HasApiTokens;
 
     /** @use HasFactory<UserFactory> */
     use HasFactory;

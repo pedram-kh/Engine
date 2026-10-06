@@ -82,7 +82,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('creators/me')
     ->name('creators.me.')
-    ->middleware(['auth:web', 'tenancy.set', 'verified'])
+    ->middleware(['auth:web,creator_app', 'tenancy.set', 'verified'])
     ->group(function (): void {
         Route::get('/', [CreatorWizardController::class, 'show'])->name('show');
 

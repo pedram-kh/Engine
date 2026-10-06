@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('me/notifications')
-    ->middleware(['auth:web', 'tenancy.set'])
+    ->middleware(['auth:web,creator_app', 'tenancy.set'])
     ->name('me.notifications.')
     ->group(function (): void {
         Route::get('', [NotificationController::class, 'index'])->name('index');
@@ -43,7 +43,7 @@ Route::prefix('me/notifications')
 // resolved from $request->user() (no path id, no policy). On the cross-tenant
 // allowlist in docs/security/tenancy.md §4: prefs are user-global.
 Route::prefix('me/notification-preferences')
-    ->middleware(['auth:web', 'tenancy.set'])
+    ->middleware(['auth:web,creator_app', 'tenancy.set'])
     ->name('me.notification-preferences.')
     ->group(function (): void {
         Route::get('', [NotificationPreferenceController::class, 'index'])->name('index');
