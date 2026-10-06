@@ -54,6 +54,51 @@ happened.
 
 ---
 
+## AH-099 — Creator app token auth, backend — PENDING
+
+> **Standalone entry.** Production was current through AH-098 (`9b7d6deb`) before this. The
+> inventory/docs commits between are docs-only. **Deploys dark: nothing calls the new path until
+> AH-100.**
+
+- **Status:** PENDING
+- **Range:** `9b7d6deb` → `e665e9ce` (from-SHA exclusive: the previous deployed tip; to-SHA is the
+  feat commit — everything above it is docs-only)
+- **AH entries carried:** AH-099
+- **Migrations run:** **none.** Verified: no migration file in the diff; the stock
+  `2026_05_07_003823_create_personal_access_tokens_table` already shows `Ran` locally.
+  **Verify on the box before reload:** `php artisan migrate:status` lists it as `Ran` (and nothing
+  `Pending` that this deploy introduced).
+- **Pre-deploy reads:**
+  1. `php artisan migrate:status | grep personal_access_tokens` → `Ran`.
+  2. `SELECT count(*) FROM personal_access_tokens;` → expected `0` (zero callers exist).
+  3. **`SANCTUM_STATEFUL_DOMAINS` contains no bare `localhost`.** This is the **Android-only**
+     trap: Sanctum strips only `http(s)://` before matching, so a bare `localhost` entry would
+     make Android's `https://localhost` a stateful origin and every bearer POST would 419
+     (iOS's `capacitor://localhost` never matches). The repo `.env.example` default _does_
+     contain `localhost` — that is for local dev; production must not.
+  4. `AUTH_GUARD` is unset or `web`.
+- **Snapshot ID:** not required — no migration and no data change. (Operator may take one anyway.)
+- **Infra:** **PHP-FPM reload — required** (new guard class, config, provider registration). No
+  worker restart. No SPA rebuild (zero `apps/main` / `apps/admin` diff). No scheduler/cron change.
+  **Env:** set `FRONTEND_EXTRA_ORIGINS=capacitor://localhost,https://localhost` (adds the two
+  Capacitor origins to CORS — an env change, not code; **append** to any existing value).
+  `SANCTUM_TOKEN_EXPIRATION_MINUTES` is optional (defaults to `129600` = 90 days). Run
+  If config is cached on the box, re-cache it so the new `auth.php` / `sanctum.php` keys are read.
+- **One-shot commands:** none.
+- **Post-deploy verification (to be filled):**
+  1. `/up` → 200.
+  2. A creator **cookie** session still works on `GET /api/v1/me` (the web path did not move).
+  3. A platform-admin session on `GET /api/v1/me` of the **main** SPA host is refused as before.
+  4. `POST /api/v1/auth/token` with an **unknown email** → `401 auth.invalid_credentials`, and
+     `count(*)` on `personal_access_tokens` stays `0`. (Do **not** smoke it with a real creator's
+     email: a correct password would mint a live token with no client to hold it, and a wrong
+     one would bump that creator's failed-login lockout counter.)
+- **Flags armed:** none — the path has no callers; no flag exists or is needed.
+- **Operator:** _to be filled._
+- **Anything unexpected:** _to be filled._
+
+---
+
 ## AH-098 — master agreement section on the creator profile — DEPLOYED
 
 > **Standalone entry.** Production was current through AH-097 before this deploy — nothing stacked

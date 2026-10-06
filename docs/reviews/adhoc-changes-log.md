@@ -70,6 +70,53 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-099 · Creator app token auth, backend (Creator App arc, chunk 1 of 7)
+
+- **Status:** Landed. Full chunk loop (inventory → kickoff D1–D7 → plan-pause Q1–Q7 → build S1–S6
+  → review). Full review: [`creator-app-token-auth-review.md`](creator-app-token-auth-review.md).
+- **Date:** 2026-10-06.
+- **Why:** the Creator mobile app needs to authenticate to the API without a cookie session.
+  The inventory ([`creator-app-inventory.md`](creator-app-inventory.md) §M2) found the stock
+  Sanctum token table present and empty, but no token-issuing path, no revocation on password
+  reset or suspension, and a widening hazard in Sanctum's own guard list
+  (`['web', 'web_admin']`).
+- **What:** `POST /api/v1/auth/token` runs the same `AuthService` gate graph as the web login and
+  mints a per-device token (`creator-app:{ios|android}`) at the end instead of starting a session.
+  A dedicated bearer-only guard `creator_app` is mounted as `auth:web,creator_app` on the 13
+  creator-reachable mounts (73 routes); `sanctum.guard` is untouched and no route mounts
+  `auth:sanctum`. Tokens are revoked at logout (the presented token), on password reset (all) and
+  at the single suspend site (all), are refused at use time for non-Creator and suspended users,
+  and expire at a global 90-day ceiling. A shared `LoginFailureResponder` carries the error
+  envelopes for both login controllers.
+- **Touched:** `apps/api` only — Identity module (guard, provider, `AuthService`, `GatesPassed`,
+  `LoginResult`, `LoginFailureResponder`, `TokenLoginController`/`Request`, routes, `User`),
+  mount strings in the Creators / Messaging / Notifications route files, `config/auth.php`,
+  `config/sanctum.php`, `.env.example`, `PasswordResetService`, `AccountLockoutService`; five new
+  Pest files (61 tests) and one deliberate pin update (`Sprint3Chunk2InvariantsTest`). **Zero**
+  `apps/main` / `apps/admin` / `packages/api-client` change. **No migration.**
+- **Decisions:**
+  - **Q1** dedicated guard over narrowing `sanctum.guard` (cookie requests would run under the
+    `sanctum` guard — not byte-identical) or an assert middleware (leaves the hazard in place).
+  - **Q2** the guard refuses non-Creator and suspended users at use time — the token path is
+    deliberately **stricter than sessions** (sessions outliving suspension is the Q6 tech-debt entry).
+  - **Q3** global `sanctum.expiration` 90 days, env-overridable, retroactive operator lever.
+  - **Q4** separate `POST /auth/token`; **Q5** the four 2FA routes swap; **Q7** reuse
+    `403 auth.wrong_spa`, zero new i18n keys.
+  - Impersonation cannot mint tokens (the endpoint requires the password); `last_used_at` stays
+    (a write per bearer request, named).
+  - Pin correction: the kickoff's "8 pins" was **1** real pin (the rest were `auth:web_admin`, a
+    test-only route and comments).
+- **Evidence:** 15 break-reverts all red and restored byte-identical (incl. both polarities of the
+  widening hazard and the route-inspection trio); the existing web-auth suite untouched, and 24
+  of its tests go red when the shared responder drifts (so "byte-identical" is a live pin).
+  Full Pest 2,974 / PHPStan / Pint green. Local Playwright: 2 specs fail at the TOTP-confirm
+  recovery-codes step and **fail identically on a pristine `HEAD`** — see the review §5.
+- **Deploy obligation:** no migration, PHP-FPM reload, **deploys dark** (no callers until AH-100),
+  env `FRONTEND_EXTRA_ORIGINS` + read-backs (notably: production `SANCTUM_STATEFUL_DOMAINS` has no
+  bare `localhost`). See [`deploy-log.md`](../runbooks/deploy-log.md).
+- **Ref:** [`creator-app-token-auth-review.md`](creator-app-token-auth-review.md); feat commit
+  `e665e9ce`; `tech-debt.md` ("AH-099 …" ×2).
+
 ### AH-098 · Master agreement section on the creator profile
 
 - **Status:** Landed. Fast batch (direct-iteration) — no kickoff, no standalone review file;

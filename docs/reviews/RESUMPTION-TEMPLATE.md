@@ -116,8 +116,32 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-09-06 · **Through:** AH-098, the master agreement section on the creator
-profile. **Nothing is held.** `origin/main` tip is `9b7d6deb`.
+**Last updated:** 2026-10-06 · **Through:** AH-099, the Creator App arc's chunk 1 of 7 — bearer-token
+auth, backend (`apps/api` only; zero SPA / api-client diff; **no migration**). **Review closed —
+approved, and pushed on Pedram's clearance (2026-10-06):** the feat commit `e665e9ce` plus the
+docs commit on top of `07445c39` (the Creator App inventory). The exact tip and the CI run are
+recorded in the review's header. Live push state is `origin/main`, not this sentence — re-derive
+it with `git rev-list --left-right --count origin/main...HEAD`.
+
+- **What AH-099 is:** `POST /api/v1/auth/token` (the existing gate graph, token minted at the end),
+  the dedicated bearer-only `creator_app` guard mounted as `auth:web,creator_app` on 13 mounts
+  (73 routes), revocation at logout / password reset / the single suspend site, a global 90-day
+  expiry, and a use-time guard that refuses non-Creator and suspended users. Review:
+  [`creator-app-token-auth-review.md`](creator-app-token-auth-review.md).
+- **Deploy obligation (deploys DARK — nothing calls it until AH-100):** PHP-FPM reload; env
+  `FRONTEND_EXTRA_ORIGINS=capacitor://localhost,https://localhost`; read-back that production
+  `SANCTUM_STATEFUL_DOMAINS` has **no bare `localhost`** (the Android-only 419 trap). The PENDING
+  entry is in [`deploy-log.md`](../runbooks/deploy-log.md). **Pushed ≠ deployed — do not infer
+  either from the other.**
+- **Open from this chunk:** CI green at the pushed tip (§5.41) closes it. Two local Playwright
+  specs (`2fa-enrollment-and-sign-in` main, `admin-mandatory-mfa-enrollment` admin) fail at the
+  recovery-codes step on this machine **and on a pristine `HEAD`** — read the review's §5 before
+  treating a red there as regression or as noise.
+- **Next in the arc:** AH-100 (the app client — this chunk's first caller); device table, push and the rest follow per the inventory. Chunk 1 of 7 is this one.
+
+**Prior state, for the record — AH-098 (deployed).** **Last updated:** 2026-09-06 · **Through:**
+AH-098, the master agreement section on the creator profile. **Nothing was held.** `origin/main`
+tip was `9b7d6deb`.
 
 **Deploy state: production is current through `9b7d6deb` — level with `origin/main`, nothing
 undeployed, no open items.**
