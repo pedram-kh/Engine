@@ -15,14 +15,29 @@
 - **Built from:** [`creator-app-inventory.md`](creator-app-inventory.md) §M2 (the read-only
   inventory) and the kickoff's locked decisions D1–D7, with the plan-pause rulings Q1–Q7.
 - **Commits:** a **feat + docs pair** (the natural split — code/tests/`.env.example` in one, the
-  review/log/deploy-log/tech-debt/resumption in the other). Feat: `e665e9ce`. The docs commit
-  is the one that carries this file.
-- **CI at the pushed tip (§5.41):** _filled in by the post-push provenance commit, once the run
-  completes._
-- **Provenance:** closed and pushed 2026-10-06 on Pedram's clearance. The pushed SHAs, the CI run
-  URL and the `origin/main = HEAD` confirmation (`git rev-list --left-right --count
-origin/main...HEAD` → `0 0`) are recorded in this header by that follow-up commit; a file
-  cannot cite its own commit's SHA.
+  review/log/deploy-log/tech-debt/resumption in the other), pushed together as
+  `07445c39..78a1fe23`: `e665e9ce` (feat) · `78a1fe23` (docs — this review, the AH-099 log entry,
+  the deploy-log PENDING entry, the tech-debt entries, the Part 2 refresh). A third, docs-only
+  provenance commit (the one that wrote this paragraph) follows them.
+- **CI at the pushed tip (§5.41):** **green — all four jobs** (Backend Pint+Larastan+Pest,
+  Frontend lint+typecheck+unit, E2E main SPA Playwright, E2E admin SPA Playwright) —
+  [run `37402539475`](https://github.com/pedram-kh/Engine/actions/runs/37402539475) at `78a1fe23`,
+  after `git rev-list --left-right --count origin/main...HEAD` → `0 0` (`origin/main` and `HEAD`
+  both `78a1fe23c12da7abb2004adf698a08a93512d87b`).
+  - **Two CI-level flaky retries, both pre-existing and not introduced here.** Main:
+    `creator-wizard-happy-path.spec.ts`; admin: `admin-sign-in.spec.ts` (the TOTP sign-in spec —
+    the path this chunk refactored, so it was checked rather than assumed). Each failed its first
+    attempt and passed on retry. **The pre-AH-099 baseline run on `07445c39`
+    ([run `37393941985`](https://github.com/pedram-kh/Engine/actions/runs/37393941985)) shows the
+    identical pair, each with the identical one-retry pass**, and the AH-092 review already
+    recorded the same two specs as the known TOTP/navigation-timing flake class.
+  - **The 2FA-enrolment specs did not red on CI** (`2fa-enrollment-and-sign-in` and
+    `admin-mandatory-mfa-enrollment` both passed; neither flaked). The close verdict's condition —
+    "if CI reds on the 2FA-enrolment spec, fix it as a gate-fix commit" — therefore **did not
+    fire**, and no gate-fix commit was made. This is consistent with the local failure being a
+    local-hardware artefact (§5); it is not a proof of the `BCRYPT_ROUNDS` mechanism, which remains
+    an unconfirmed hypothesis that CI simply did not need.
+- **Provenance:** closed 2026-10-06 on Pedram's verdict; pushed the same day on his clearance.
 - **Reviewed against:** `docs/02-CONVENTIONS.md`, `docs/05-SECURITY-COMPLIANCE.md`,
   `docs/security/tenancy.md`, `docs/tech-debt.md`.
 
@@ -289,7 +304,7 @@ _Evidence notes, stated plainly:_
 | Migration files in the diff                  | **none**; `create_personal_access_tokens_table` shows **Ran**                         |
 | Playwright, main SPA (local)                 | **31 passed, 2 failed** — see below                                                   |
 | Playwright, admin SPA (local)                | **1 passed, 1 failed** — see below                                                    |
-| CI at the pushed tip                         | _pending the push_                                                                    |
+| CI at the pushed tip (`78a1fe23`)            | **green, all 4 jobs** — run `37402539475`; two pre-existing flaky retries (header)    |
 
 **Playwright, honestly.**
 

@@ -119,8 +119,10 @@ discipline in §7.
 **Last updated:** 2026-10-06 · **Through:** AH-099, the Creator App arc's chunk 1 of 7 — bearer-token
 auth, backend (`apps/api` only; zero SPA / api-client diff; **no migration**). **Review closed —
 approved, and pushed on Pedram's clearance (2026-10-06):** the feat commit `e665e9ce` plus the
-docs commit on top of `07445c39` (the Creator App inventory). The exact tip and the CI run are
-recorded in the review's header. Live push state is `origin/main`, not this sentence — re-derive
+docs commit `78a1fe23` on top of `07445c39` (the Creator App inventory). **CI green at that
+tip, all four jobs** — [run `37402539475`](https://github.com/pedram-kh/Engine/actions/runs/37402539475)
+(two pre-existing flaky retries, identical to the pre-change baseline; detail in the review's
+header). One docs-only provenance commit follows it. Live push state is `origin/main`, not this sentence — re-derive
 it with `git rev-list --left-right --count origin/main...HEAD`.
 
 - **What AH-099 is:** `POST /api/v1/auth/token` (the existing gate graph, token minted at the end),
@@ -133,10 +135,11 @@ it with `git rev-list --left-right --count origin/main...HEAD`.
   `SANCTUM_STATEFUL_DOMAINS` has **no bare `localhost`** (the Android-only 419 trap). The PENDING
   entry is in [`deploy-log.md`](../runbooks/deploy-log.md). **Pushed ≠ deployed — do not infer
   either from the other.**
-- **Open from this chunk:** CI green at the pushed tip (§5.41) closes it. Two local Playwright
-  specs (`2fa-enrollment-and-sign-in` main, `admin-mandatory-mfa-enrollment` admin) fail at the
-  recovery-codes step on this machine **and on a pristine `HEAD`** — read the review's §5 before
-  treating a red there as regression or as noise.
+- **Closed:** the chunk is closed (CI green at the pushed tip, §5.41). Two local Playwright specs
+  (`2fa-enrollment-and-sign-in` main, `admin-mandatory-mfa-enrollment` admin) fail at the
+  recovery-codes step on one developer machine **and on a pristine `HEAD`**, but **passed on CI**;
+  the review's §5 has the disposition. The `BCRYPT_ROUNDS` explanation stayed an unconfirmed
+  hypothesis.
 - **Next in the arc:** AH-100 (the app client — this chunk's first caller); device table, push and the rest follow per the inventory. Chunk 1 of 7 is this one.
 
 **Prior state, for the record — AH-098 (deployed).** **Last updated:** 2026-09-06 · **Through:**
