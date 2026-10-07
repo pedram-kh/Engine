@@ -47,6 +47,7 @@ const vuetifyComponents = [
   'VProgressLinear',
   'VProgressCircular',
   'VDialog',
+  'VBottomSheet',
   'VSnackbar',
   'VDataTable',
   'VTable',

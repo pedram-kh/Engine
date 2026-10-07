@@ -15,7 +15,13 @@
       "assignments": "Inviti",
       "availability": "Disponibilità",
       "messages": "Messaggi",
-      "more": "Altro"
+      "more": "Altro",
+      "settings": "Impostazioni",
+      "subtitles": {
+        "profile": "Foto, bio e social",
+        "availability": "Blocca le date",
+        "settings": "Preferenze di notifica"
+      }
     },
     "nav": {
       "prevMonth": "Mese precedente",
@@ -83,6 +89,9 @@
         "saveFailed": "Impossibile salvare il blocco. Riprova.",
         "deleteFailed": "Impossibile eliminare il blocco. Riprova."
       }
+    },
+    "legend": {
+      "today": "Oggi"
     }
   }
 }

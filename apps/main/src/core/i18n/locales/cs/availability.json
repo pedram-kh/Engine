@@ -15,7 +15,13 @@
       "assignments": "Pozvánky",
       "availability": "Dostupnost",
       "messages": "Zprávy",
-      "more": "Více"
+      "more": "Více",
+      "settings": "Nastavení",
+      "subtitles": {
+        "profile": "Fotka, bio a sociální sítě",
+        "availability": "Blokujte termíny",
+        "settings": "Předvolby oznámení"
+      }
     },
     "nav": {
       "prevMonth": "Předchozí měsíc",
@@ -83,6 +89,9 @@
         "saveFailed": "Nepodařilo se uložit blok. Zkuste to znovu.",
         "deleteFailed": "Nepodařilo se smazat blok. Zkuste to znovu."
       }
+    },
+    "legend": {
+      "today": "Dnes"
     }
   }
 }

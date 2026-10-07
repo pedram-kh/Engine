@@ -15,7 +15,13 @@
       "assignments": "Kvietimass",
       "availability": "Pasiekiamumas",
       "messages": "Žinutės",
-      "more": "Daugiau"
+      "more": "Daugiau",
+      "settings": "Nustatymai",
+      "subtitles": {
+        "profile": "Nuotrauka, aprašymas ir socialiniai tinklai",
+        "availability": "Užblokuokite datas",
+        "settings": "Pranešimų nuostatos"
+      }
     },
     "nav": {
       "prevMonth": "Ankstesnis month",
@@ -83,6 +89,9 @@
         "saveFailed": "We couldn't save the block. Please try again.",
         "deleteFailed": "We couldn't delete the block. Please try again."
       }
+    },
+    "legend": {
+      "today": "Šiandien"
     }
   }
 }

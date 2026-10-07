@@ -15,7 +15,13 @@
       "assignments": "Stedinas",
       "availability": "Disponibilità",
       "messages": "Messaġġi",
-      "more": "Aktar"
+      "more": "Aktar",
+      "settings": "Issettjar",
+      "subtitles": {
+        "profile": "Ritratt, bijografija u midja soċjali",
+        "availability": "Imblokka d-dati",
+        "settings": "Preferenzi tan-notifiki"
+      }
     },
     "nav": {
       "prevMonth": "Preċedenti month",
@@ -83,6 +89,9 @@
         "saveFailed": "We couldn't save the block. Please try again.",
         "deleteFailed": "We couldn't delete the block. Please try again."
       }
+    },
+    "legend": {
+      "today": "Illum"
     }
   }
 }

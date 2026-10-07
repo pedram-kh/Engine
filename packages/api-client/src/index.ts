@@ -18,6 +18,7 @@ export { ApiError, extractFieldErrors, type ApiErrorDetail, type ApiErrorOptions
 export {
   createHttpClient,
   type CreateHttpClientOptions,
+  type HttpAuthMode,
   type HttpClient,
   type HttpRequestOptions,
 } from './http'

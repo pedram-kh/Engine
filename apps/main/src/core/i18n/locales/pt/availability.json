@@ -15,7 +15,13 @@
       "assignments": "Convites",
       "availability": "Disponibilidade",
       "messages": "Mensagens",
-      "more": "Mais"
+      "more": "Mais",
+      "settings": "Definições",
+      "subtitles": {
+        "profile": "Fotografia, biografia e redes sociais",
+        "availability": "Bloqueie datas",
+        "settings": "Preferências de notificações"
+      }
     },
     "nav": {
       "prevMonth": "Mês anterior",
@@ -83,6 +89,9 @@
         "saveFailed": "Não foi possível guardar o bloco. Tente novamente.",
         "deleteFailed": "Não foi possível eliminar o bloco. Tente novamente."
       }
+    },
+    "legend": {
+      "today": "Hoje"
     }
   }
 }

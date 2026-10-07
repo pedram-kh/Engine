@@ -20,7 +20,7 @@
  *     test (PROJECT-WORKFLOW.md § 5.1).
  */
 
-import type { PreferredLanguage, TimezoneIdentifier } from './user'
+import type { PreferredLanguage, TimezoneIdentifier, UserResource } from './user'
 
 /**
  * `POST /api/v1/auth/login` request body.
@@ -36,6 +36,39 @@ export interface LoginRequest {
   email: string
   password: string
   mfa_code?: string
+}
+
+/** The native platform a creator-app token is minted for (`creator-app:{platform}`). */
+export type TokenPlatform = 'ios' | 'android'
+
+/**
+ * `POST /api/v1/auth/token` request body — the creator app's login
+ * (AH-099 `TokenLoginRequest`). The credential fields and the 2FA
+ * re-submit contract are identical to {@link LoginRequest}.
+ */
+export interface TokenLoginRequest extends LoginRequest {
+  platform: TokenPlatform
+}
+
+/**
+ * `POST /api/v1/auth/token` 2xx body (AH-099 `TokenLoginController`): the
+ * user resource plus the bearer token, shown exactly once.
+ */
+export interface TokenLoginEnvelope {
+  data: UserResource
+  meta: {
+    token: string
+    token_type: 'Bearer'
+    /** ISO-8601; `null` only when the server runs with no expiry configured. */
+    expires_at: string | null
+  }
+}
+
+/** The unwrapped {@link TokenLoginEnvelope} `AuthApi.tokenLogin` resolves to. */
+export interface TokenLoginResult {
+  user: UserResource
+  token: string
+  expiresAt: string | null
 }
 
 /**

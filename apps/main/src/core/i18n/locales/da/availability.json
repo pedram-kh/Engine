@@ -15,7 +15,13 @@
       "assignments": "Invitationer",
       "availability": "Tilgængelighed",
       "messages": "Beskeder",
-      "more": "Mere"
+      "more": "Mere",
+      "settings": "Indstillinger",
+      "subtitles": {
+        "profile": "Foto, bio og sociale medier",
+        "availability": "Bloker datoer",
+        "settings": "Notifikationsindstillinger"
+      }
     },
     "nav": {
       "prevMonth": "Forrige måned",
@@ -83,6 +89,9 @@
         "saveFailed": "Blokken kunne ikke gemmes. Prøv igen.",
         "deleteFailed": "Blokken kunne ikke slettes. Prøv igen."
       }
+    },
+    "legend": {
+      "today": "I dag"
     }
   }
 }

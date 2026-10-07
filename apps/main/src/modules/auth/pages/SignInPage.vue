@@ -24,6 +24,12 @@
  * (`/agency/sign-in`) — see `isAgencyVariant` below. No fork: the form,
  * the login call, and postLoginTarget()'s role-based dispatch are
  * identical on both routes.
+ *
+ * AH-100: inside the Capacitor creator app the same page is the app's
+ * sign-in screen. `store.login()` goes to `POST /auth/token` there; the
+ * page itself only differs in three ways — no Meta Pixel, no sign-up
+ * funnel (a pointer to the web instead), and a wrong-door message that
+ * names the web address the account belongs to.
  */
 
 import { ApiError } from '@catalyst/api-client'
@@ -32,6 +38,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
 import { loadMetaPixel } from '@/modules/auth/internal/metaPixel'
@@ -58,6 +65,11 @@ const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
 
 const sessionExpired = computed(() => route.query.reason === 'session_expired')
+
+const isNative = isNativePlatform()
+
+/** Where a creator without an account goes (AH-100 Q8: no in-app sign-up in v1). */
+const CREATOR_SIGNUP_SITE = 'platform.catalyst-growth.com'
 
 /**
  * AH-086 — the agency-facing sign-in variant. Same component, same
@@ -103,13 +115,16 @@ const inviteForwardTarget = computed(() => {
 // On mount rather than at module scope so the pixel is tied to this page
 // being shown, not to the route chunk being downloaded. An invite-link
 // forward takes priority — the pixel should not fire for a hop nobody
-// actually saw rendered.
+// actually saw rendered. Never in the creator app: no third-party
+// tracking inside the native shell (App Tracking Transparency).
 onMounted(() => {
   if (inviteForwardTarget.value !== null) {
     void router.replace(inviteForwardTarget.value)
     return
   }
-  loadMetaPixel(window, document)
+  if (!isNative) {
+    loadMetaPixel(window, document)
+  }
 })
 
 const submitLabel = computed(() =>
@@ -196,6 +211,13 @@ async function onSubmit(): Promise<void> {
     const resolved = resolveErrorMessage(err, (k) => te(k))
     errorKey.value = resolved.key
     errorValues.value = resolved.values
+    if (
+      isNative &&
+      resolved.key === 'auth.wrong_spa' &&
+      typeof resolved.values.correct_spa_url === 'string'
+    ) {
+      errorKey.value = 'auth.ui.native.wrong_door'
+    }
   }
 }
 </script>
@@ -276,7 +298,7 @@ async function onSubmit(): Promise<void> {
            agencies are Catalyst-created. This link is the creator-signup
            funnel and does not appear here. -->
       <router-link
-        v-if="!isAgencyVariant"
+        v-if="!isAgencyVariant && !isNative"
         :to="{ name: 'auth.sign-up' }"
         data-test="sign-in-signup-link"
       >
@@ -286,5 +308,13 @@ async function onSubmit(): Promise<void> {
         {{ t('auth.ui.headings.forgot_password') }}
       </router-link>
     </div>
+
+    <p
+      v-if="isNative"
+      class="mt-6 text-body-2 text-medium-emphasis"
+      data-test="sign-in-native-create-account"
+    >
+      {{ t('auth.ui.native.create_account', { site: CREATOR_SIGNUP_SITE }) }}
+    </p>
   </section>
 </template>

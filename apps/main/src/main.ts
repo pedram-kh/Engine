@@ -5,6 +5,7 @@ import App from './App.vue'
 import { resolveBootLocale } from './composables/useLocalePreference'
 import { router } from './core/router'
 import { i18n, setLocale } from './core/i18n'
+import { bootNativeShell } from './core/platform/bootNativeShell'
 import { vuetify } from './plugins/vuetify'
 
 // Self-hosted Inter typeface (Catalyst Engine v2). Imported before the design
@@ -25,6 +26,10 @@ app.use(vuetify)
 // pre-auth target comes from localStorage (the user's last choice); once
 // the authenticated user loads, the server `preferred_language` wins and
 // the auth store re-flips the locale. `en` is the default when unset.
-void setLocale(resolveBootLocale(i18n.global.locale.value)).then(() => {
+// Inside the creator app the native token layer loads alongside it.
+void Promise.all([
+  setLocale(resolveBootLocale(i18n.global.locale.value)),
+  bootNativeShell(document),
+]).then(() => {
   app.mount('#app')
 })

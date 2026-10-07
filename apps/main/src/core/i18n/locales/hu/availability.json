@@ -15,7 +15,13 @@
       "assignments": "Meghívós",
       "availability": "Elérhetőség",
       "messages": "Üzenetek",
-      "more": "Továbbiak"
+      "more": "Továbbiak",
+      "settings": "Beállítások",
+      "subtitles": {
+        "profile": "Fotó, bemutatkozás és közösségi média",
+        "availability": "Dátumok letiltása",
+        "settings": "Értesítési beállítások"
+      }
     },
     "nav": {
       "prevMonth": "Előző month",
@@ -83,6 +89,9 @@
         "saveFailed": "We couldn't save the block. Please try again.",
         "deleteFailed": "We couldn't delete the block. Please try again."
       }
+    },
+    "legend": {
+      "today": "Ma"
     }
   }
 }

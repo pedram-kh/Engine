@@ -121,6 +121,13 @@ export function weekdayLabels(locale: string, weekStartsOn: 0 | 1 = 1): string[]
   )
 }
 
+/** Localized short day heading for a `'YYYY-MM-DD'` key, e.g. `"Tue, Oct 6"` (en). */
+export function agendaDayLabel(dateKey: string, locale: string): string {
+  return DateTime.fromISO(dateKey)
+    .setLocale(locale)
+    .toLocaleString({ weekday: 'short', day: 'numeric', month: 'short' })
+}
+
 /** `'YYYY-MM-DD'` for "today" in the target zone (drives CMonthGrid's today marker). */
 export function todayKey(zone: string): string {
   return DateTime.now().setZone(zone).toISODate() ?? ''

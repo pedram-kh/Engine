@@ -34,6 +34,9 @@ import type {
   ResendVerificationRequest,
   ResetPasswordRequest,
   SignUpRequest,
+  TokenLoginEnvelope,
+  TokenLoginRequest,
+  TokenLoginResult,
   VerifyEmailRequest,
 } from './types/auth'
 import type { UpdateMeRequest, User, UserEnvelope } from './types/user'
@@ -84,8 +87,18 @@ export interface AuthApi {
   login(body: LoginRequest): Promise<User>
 
   /**
+   * `POST /api/v1/auth/token` — the creator app's login (AH-099). Same
+   * gate graph and failure envelopes as {@link AuthApi.login}; on success
+   * resolves the user plus the bearer token (`meta.token`, shown once)
+   * and its `meta.expires_at`. Main variant only — the door is
+   * creator-only and has no admin twin.
+   */
+  tokenLogin(body: TokenLoginRequest): Promise<TokenLoginResult>
+
+  /**
    * `POST /api/v1/auth/logout`. The 2xx path destroys the session
-   * cookie; the SPA must clear its in-memory user separately.
+   * cookie (or, under bearer auth, revokes exactly the presented token);
+   * the SPA must clear its in-memory user separately.
    */
   logout(): Promise<void>
 
@@ -157,6 +170,7 @@ export function createAuthApi(http: HttpClient, options: CreateAuthApiOptions = 
   const mePath = variant === 'admin' ? '/admin/me' : '/me'
   const loginPath = variant === 'admin' ? '/admin/auth/login' : '/auth/login'
   const logoutPath = variant === 'admin' ? '/admin/auth/logout' : '/auth/logout'
+  const tokenLoginPath = '/auth/token'
   // Sign-up + email-verification + password-reset live only on the main
   // SPA's surface — the admin SPA's onboarding goes through a separate
   // (eventual) admin-invite flow rather than self-service. We keep the
@@ -187,6 +201,15 @@ export function createAuthApi(http: HttpClient, options: CreateAuthApiOptions = 
     async login(body) {
       const envelope = await http.post<UserEnvelope>(loginPath, body)
       return envelope.data
+    },
+
+    async tokenLogin(body) {
+      const envelope = await http.post<TokenLoginEnvelope>(tokenLoginPath, body)
+      return {
+        user: envelope.data,
+        token: envelope.meta.token,
+        expiresAt: envelope.meta.expires_at,
+      }
     },
 
     async logout() {

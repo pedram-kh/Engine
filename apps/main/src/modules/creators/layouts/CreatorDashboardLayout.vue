@@ -13,13 +13,19 @@
  * router-linked buttons (Sprint 5 Chunk B, D-b13) — a sidebar would read
  * heavy/empty here, and extending the topbar is lower-risk than adding a
  * new structural region. No workspace switcher (creator is global).
+ *
+ * AH-100: inside the Capacitor creator app this is the app shell (Figma
+ * frames 07/08) — the bottom tab bar at every width, the Figma app-bar
+ * and tab styling, safe-area padding, a "Settings" entry and per-item
+ * subtitles in the More menu, and no theme toggle (the app is dark-only
+ * in v1). Every native difference is gated on `isNative`; the web shell
+ * renders exactly as before.
  */
 
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useDisplay } from 'vuetify'
 
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
@@ -28,16 +34,17 @@ import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { useOnboardingStore } from '@/modules/onboarding/stores/useOnboardingStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
+import { useMobileShell } from '@/composables/useMobileShell'
 import { useTheme } from '@/composables/useTheme'
 import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 
-const { t, locale } = useI18n()
+const { t, te, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
-const display = useDisplay()
+const { isNative, isMobile } = useMobileShell()
 const { currentTheme } = useTheme()
 const { user, isLoggingOut } = storeToRefs(authStore)
 const { applicationStatus } = storeToRefs(onboardingStore)
@@ -63,11 +70,17 @@ const logoNeedsDarkening = computed(() => currentTheme.value === 'light')
 const wideContent = computed(() => route.meta.wide === true)
 
 /**
- * Mobile chrome (smAndDown): the primary topbar nav overflows the cramped
- * mobile app-bar, so it moves to a thumb-reachable bottom navigation bar.
- * Utility actions stay in the topbar avatar menu. Desktop is untouched.
+ * Mobile chrome (smAndDown, or always inside the app — `useMobileShell`):
+ * the primary topbar nav overflows the cramped mobile app-bar, so it moves
+ * to a thumb-reachable bottom navigation bar. Utility actions stay in the
+ * topbar avatar menu. Desktop is untouched.
  */
-const isMobile = computed(() => display.smAndDown.value)
+
+/** AH-100 — the app's More-menu subtitle for an item, when one is authored. */
+function moreSubtitle(key: string): string | undefined {
+  const subtitleKey = `availability.creatorNav.subtitles.${key}`
+  return isNative && te(subtitleKey) ? t(subtitleKey) : undefined
+}
 
 /**
  * Creator topbar nav (D-b13). Router-linked items; active-state is driven by
@@ -168,10 +181,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-app data-test="creator-layout">
+  <v-app :class="{ 'creator-layout--native': isNative }" data-test="creator-layout">
     <ImpersonationBanner />
 
-    <v-app-bar elevation="1" data-test="creator-topbar">
+    <v-app-bar
+      elevation="1"
+      :class="{ 'creator-topbar--native': isNative }"
+      data-test="creator-topbar"
+    >
       <div class="d-flex align-center px-4" data-test="creator-brand">
         <img
           :src="catalystLogo"
@@ -214,8 +231,11 @@ onMounted(() => {
       >
         <template #activator="{ props: menuProps }">
           <v-btn v-bind="menuProps" variant="text" class="text-none" data-test="user-menu-btn">
-            <v-avatar size="32" color="primary" class="mr-2">
-              <span class="text-caption font-weight-bold text-white">
+            <v-avatar size="32" :color="isNative ? 'primary-container' : 'primary'" class="mr-2">
+              <span
+                class="text-caption font-weight-bold"
+                :class="isNative ? 'text-primary' : 'text-white'"
+              >
                 {{ (user?.attributes.name ?? '?')[0]?.toUpperCase() }}
               </span>
             </v-avatar>
@@ -232,7 +252,7 @@ onMounted(() => {
               {{ user?.attributes.email ?? '' }}
             </p>
 
-            <div class="d-flex align-center justify-space-between mb-3">
+            <div v-if="!isNative" class="d-flex align-center justify-space-between mb-3">
               <span class="text-body-2">{{ t('app.theme.toggle.label') }}</span>
               <ThemeToggle />
             </div>
@@ -274,9 +294,9 @@ onMounted(() => {
       </v-menu>
     </v-app-bar>
 
-    <v-main data-test="creator-main">
+    <v-main :class="{ 'creator-main--native': isNative }" data-test="creator-main">
       <v-container
-        :class="wideContent ? 'pa-2 pa-md-6' : 'pa-6'"
+        :class="wideContent ? 'pa-2 pa-md-6' : isNative ? 'px-4 py-6' : 'pa-6'"
         :fluid="wideContent"
         :style="wideContent ? undefined : 'max-width: 960px'"
       >
@@ -293,6 +313,7 @@ onMounted(() => {
       grow
       color="primary"
       class="creator-bottom-nav"
+      :class="{ 'creator-bottom-nav--native': isNative }"
       data-test="creator-bottom-nav"
     >
       <v-btn
@@ -311,10 +332,15 @@ onMounted(() => {
         v-if="mobileOverflowItems.length > 0"
         v-model="moreMenuOpen"
         location="top end"
+        :scrim="isNative"
         data-test="creator-bottom-nav-more-wrapper"
       >
         <template #activator="{ props: moreProps }">
-          <v-btn v-bind="moreProps" data-test="creator-bottom-nav-more">
+          <v-btn
+            v-bind="moreProps"
+            :class="{ 'creator-bottom-nav__more--open': isNative && moreMenuOpen }"
+            data-test="creator-bottom-nav-more"
+          >
             <v-icon icon="mdi-dots-horizontal" />
             <span class="creator-bottom-nav__label">
               {{ t('availability.creatorNav.more') }}
@@ -322,14 +348,30 @@ onMounted(() => {
           </v-btn>
         </template>
 
-        <v-list density="compact" data-test="creator-bottom-nav-more-list">
+        <v-list
+          density="compact"
+          :class="{ 'creator-more-menu--native': isNative }"
+          data-test="creator-bottom-nav-more-list"
+        >
           <v-list-item
             v-for="item in mobileOverflowItems"
             :key="item.key"
             :to="{ name: item.routeName }"
             :prepend-icon="item.icon"
             :title="t(`availability.creatorNav.${item.key}`)"
+            :subtitle="moreSubtitle(item.key)"
             :data-test="`creator-bottom-nav-more-${item.key}`"
+            @click="moreMenuOpen = false"
+          />
+          <!-- AH-100 Q7: the app's "Settings" is notification preferences in v1
+               (the web reaches them from the avatar menu). -->
+          <v-list-item
+            v-if="isNative"
+            :to="{ name: 'creator.notifications.preferences' }"
+            prepend-icon="mdi-cog-outline"
+            :title="t('availability.creatorNav.settings')"
+            :subtitle="moreSubtitle('settings')"
+            data-test="creator-bottom-nav-more-settings"
             @click="moreMenuOpen = false"
           />
         </v-list>
@@ -376,5 +418,88 @@ onMounted(() => {
  * comment for why that scoped-CSS pattern blacked out the whole app. */
 .creator-topbar__logo--on-light {
   filter: brightness(0);
+}
+
+/* AH-100 — the creator app shell (Figma frames 07/08). Every rule hangs off
+   a `--native` modifier that is only bound inside the Capacitor app, and
+   reads the `--native-*` tokens from @catalyst/design-tokens/native.css.
+   The fixed app bar and tab bar grow by the notch / home-indicator insets,
+   and <v-main> reserves the same extra room so content is never covered. */
+.creator-topbar--native {
+  background: var(--native-bg-topbar) !important;
+  border-bottom: 1px solid var(--native-border-default);
+  box-shadow: none !important;
+  padding-top: var(--native-safe-top);
+}
+
+.creator-main--native {
+  padding-top: calc(var(--v-layout-top) + var(--native-safe-top));
+  padding-bottom: calc(var(--v-layout-bottom) + var(--native-safe-bottom));
+}
+
+.creator-bottom-nav--native {
+  background: var(--native-bg-sidebar) !important;
+  border-top: 1px solid var(--native-border-default);
+  box-shadow: none !important;
+  height: calc(56px + var(--native-safe-bottom)) !important;
+  padding-bottom: var(--native-safe-bottom);
+}
+
+.creator-bottom-nav--native :deep(.v-bottom-navigation__content > .v-btn) {
+  position: relative;
+  color: var(--native-text-tertiary);
+}
+
+.creator-bottom-nav--native :deep(.v-bottom-navigation__content > .v-btn--active),
+.creator-bottom-nav--native :deep(.v-bottom-navigation__content > .creator-bottom-nav__more--open) {
+  color: var(--native-accent-primary);
+}
+
+.creator-bottom-nav--native :deep(.v-bottom-navigation__content > .v-btn--active)::after,
+.creator-bottom-nav--native
+  :deep(.v-bottom-navigation__content > .creator-bottom-nav__more--open)::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 28px;
+  height: 2px;
+  margin-left: -14px;
+  border-radius: var(--native-radius-full);
+  background: var(--native-accent-primary);
+}
+
+.creator-bottom-nav--native .creator-bottom-nav__label {
+  font: var(--native-type-caption);
+}
+
+.creator-bottom-nav--native :deep(.v-btn--active) .creator-bottom-nav__label,
+.creator-bottom-nav--native .creator-bottom-nav__more--open .creator-bottom-nav__label {
+  font: var(--native-type-caption-strong);
+}
+
+.creator-more-menu--native {
+  width: 220px;
+  padding: 6px 0;
+  background: var(--native-bg-surface-raised) !important;
+  border: 1px solid var(--native-border-strong);
+  border-radius: var(--native-radius-xl) !important;
+  box-shadow: var(--native-shadow-overlay) !important;
+}
+
+.creator-more-menu--native :deep(.v-list-item) {
+  min-height: 0;
+  padding: 10px 14px;
+}
+
+.creator-more-menu--native :deep(.v-list-item-title) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.creator-more-menu--native :deep(.v-list-item-subtitle) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+  opacity: 1;
 }
 </style>

@@ -15,7 +15,13 @@
       "assignments": "Einladungen",
       "availability": "Verfügbarkeit",
       "messages": "Nachrichten",
-      "more": "Mehr"
+      "more": "Mehr",
+      "settings": "Einstellungen",
+      "subtitles": {
+        "profile": "Foto, Bio und Social Media",
+        "availability": "Termine blockieren",
+        "settings": "Benachrichtigungseinstellungen"
+      }
     },
     "nav": {
       "prevMonth": "Vorheriger Monat",
@@ -83,6 +89,9 @@
         "saveFailed": "Der Block konnte nicht gespeichert werden. Bitte versuche es erneut.",
         "deleteFailed": "Der Block konnte nicht gelöscht werden. Bitte versuche es erneut."
       }
+    },
+    "legend": {
+      "today": "Heute"
     }
   }
 }

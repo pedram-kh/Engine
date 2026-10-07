@@ -15,7 +15,13 @@
       "assignments": "Pozivi",
       "availability": "Dostupnost",
       "messages": "Poruke",
-      "more": "Više"
+      "more": "Više",
+      "settings": "Postavke",
+      "subtitles": {
+        "profile": "Fotografija, biografija i društvene mreže",
+        "availability": "Blokirajte datume",
+        "settings": "Postavke obavijesti"
+      }
     },
     "nav": {
       "prevMonth": "Předchozí měsíc",
@@ -83,6 +89,9 @@
         "saveFailed": "Ni uspelo spremiti blok. Zkuste to znova.",
         "deleteFailed": "Ni uspelo smazat blok. Zkuste to znova."
       }
+    },
+    "legend": {
+      "today": "Danas"
     }
   }
 }

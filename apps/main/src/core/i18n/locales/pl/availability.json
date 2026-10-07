@@ -15,7 +15,13 @@
       "assignments": "Zaproszenia",
       "availability": "Dostępność",
       "messages": "Wiadomości",
-      "more": "Więcej"
+      "more": "Więcej",
+      "settings": "Ustawienia",
+      "subtitles": {
+        "profile": "Zdjęcie, bio i media społecznościowe",
+        "availability": "Zablokuj daty",
+        "settings": "Preferencje powiadomień"
+      }
     },
     "nav": {
       "prevMonth": "Poprzedni miesiąc",
@@ -83,6 +89,9 @@
         "saveFailed": "Nie mogliśmy zapisać bloku. Spróbuj ponownie.",
         "deleteFailed": "Nie mogliśmy usunąć bloku. Spróbuj ponownie."
       }
+    },
+    "legend": {
+      "today": "Dziś"
     }
   }
 }

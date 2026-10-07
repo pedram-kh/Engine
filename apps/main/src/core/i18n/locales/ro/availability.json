@@ -15,7 +15,13 @@
       "assignments": "Invitațies",
       "availability": "Disponibilitate",
       "messages": "Mesaje",
-      "more": "Mai multe"
+      "more": "Mai multe",
+      "settings": "Setări",
+      "subtitles": {
+        "profile": "Fotografie, biografie și rețele sociale",
+        "availability": "Blocați date",
+        "settings": "Preferințe de notificare"
+      }
     },
     "nav": {
       "prevMonth": "Anterior month",
@@ -83,6 +89,9 @@
         "saveFailed": "We couldn't save the block. Please try again.",
         "deleteFailed": "We couldn't delete the block. Please try again."
       }
+    },
+    "legend": {
+      "today": "Astăzi"
     }
   }
 }

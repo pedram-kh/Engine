@@ -15,7 +15,13 @@
       "assignments": "Invitations",
       "availability": "Availability",
       "messages": "Messages",
-      "more": "More"
+      "more": "More",
+      "settings": "Settings",
+      "subtitles": {
+        "profile": "Photo, bio and socials",
+        "availability": "Block out dates",
+        "settings": "Notification preferences"
+      }
     },
     "nav": {
       "prevMonth": "Previous month",
@@ -83,6 +89,9 @@
         "saveFailed": "We couldn't save the block. Please try again.",
         "deleteFailed": "We couldn't delete the block. Please try again."
       }
+    },
+    "legend": {
+      "today": "Today"
     }
   }
 }

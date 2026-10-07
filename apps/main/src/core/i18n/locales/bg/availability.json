@@ -15,7 +15,13 @@
       "assignments": "Поканаs",
       "availability": "Наличност",
       "messages": "Съобщения",
-      "more": "Още"
+      "more": "Още",
+      "settings": "Настройки",
+      "subtitles": {
+        "profile": "Снимка, био и социални мрежи",
+        "availability": "Блокирайте дати",
+        "settings": "Предпочитания за известия"
+      }
     },
     "nav": {
       "prevMonth": "Предишен month",
@@ -83,6 +89,9 @@
         "saveFailed": "We couldn't save the block. Моля try again.",
         "deleteFailed": "We couldn't delete the block. Моля try again."
       }
+    },
+    "legend": {
+      "today": "Днес"
     }
   }
 }

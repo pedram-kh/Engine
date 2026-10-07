@@ -15,7 +15,13 @@
       "assignments": "Uzaicinājumss",
       "availability": "Pieejamība",
       "messages": "Ziņojumi",
-      "more": "Vairāk"
+      "more": "Vairāk",
+      "settings": "Iestatījumi",
+      "subtitles": {
+        "profile": "Foto, biogrāfija un sociālie tīkli",
+        "availability": "Bloķējiet datumus",
+        "settings": "Paziņojumu preferences"
+      }
     },
     "nav": {
       "prevMonth": "Iepriekšējais month",
@@ -83,6 +89,9 @@
         "saveFailed": "We couldn't save the block. Please try again.",
         "deleteFailed": "We couldn't delete the block. Please try again."
       }
+    },
+    "legend": {
+      "today": "Šodien"
     }
   }
 }

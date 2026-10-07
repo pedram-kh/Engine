@@ -61,6 +61,13 @@ vi.mock('@/modules/onboarding/api/onboarding.api', () => ({
 
 import { onboardingApi } from '@/modules/onboarding/api/onboarding.api'
 
+// AH-100 — the Capacitor platform probe. Web unless a test opts in, so every
+// pre-AH-100 test below runs the web shell exactly as before.
+const platform = vi.hoisted(() => ({ native: false }))
+vi.mock('@/core/platform/isNativePlatform', () => ({
+  isNativePlatform: () => platform.native,
+}))
+
 import CreatorDashboardLayout from './CreatorDashboardLayout.vue'
 
 /**
@@ -94,9 +101,11 @@ async function mountLayout(
     dark?: boolean
     applicationStatus?: string
     mobile?: boolean
+    native?: boolean
   } = {},
 ) {
   setViewportWidth(options.mobile === true ? 390 : 1280)
+  platform.native = options.native === true
 
   // Always re-stated (not only when overridden): `vi.clearAllMocks()` clears
   // calls but keeps implementations, so a test that mounts as `approved` would
@@ -413,5 +422,87 @@ describe('CreatorDashboardLayout — mobile bottom bar (AH-057)', () => {
     cleanup = mounted.cleanup
     expect(mounted.wrapper.find('[data-test="creator-bottom-nav"]').exists()).toBe(false)
     expect(mounted.wrapper.find('[data-test="creator-nav"]').exists()).toBe(true)
+  })
+})
+
+/**
+ * AH-100 D4 — inside the Capacitor app the bottom tabs are there because the
+ * shell is native, not because the screen is narrow; each native difference
+ * is pinned next to its web polarity.
+ */
+describe('CreatorDashboardLayout — creator app shell (AH-100)', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => vi.clearAllMocks())
+  afterEach(() => {
+    if (cleanup !== null) {
+      cleanup()
+      cleanup = null
+    }
+    platform.native = false
+    setViewportWidth(1280)
+  })
+
+  it('native at a desktop width: bottom tabs, no topbar nav', async () => {
+    const mounted = await mountLayout({ native: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    expect(mounted.wrapper.find('[data-test="creator-bottom-nav"]').exists()).toBe(true)
+    expect(mounted.wrapper.find('[data-test="creator-nav"]').exists()).toBe(false)
+  })
+
+  it('native: the Figma modifiers are bound; web: none of them are', async () => {
+    const native = await mountLayout({ native: true, applicationStatus: 'approved' })
+    for (const modifier of [
+      'creator-layout--native',
+      'creator-topbar--native',
+      'creator-main--native',
+      'creator-bottom-nav--native',
+    ]) {
+      expect(native.wrapper.find(`.${modifier}`).exists(), modifier).toBe(true)
+    }
+    native.cleanup()
+
+    const web = await mountLayout({ mobile: true, applicationStatus: 'approved' })
+    cleanup = web.cleanup
+    expect(web.wrapper.html()).not.toContain('--native')
+  })
+
+  it('native: no theme toggle; web: the toggle stays', async () => {
+    const native = await mountLayout({ native: true })
+    expect(native.wrapper.findComponent({ name: 'ThemeToggle' }).exists()).toBe(false)
+    native.cleanup()
+
+    const web = await mountLayout()
+    cleanup = web.cleanup
+    expect(web.wrapper.findComponent({ name: 'ThemeToggle' }).exists()).toBe(true)
+  })
+
+  it('native: More carries subtitles and a Settings entry to notification preferences', async () => {
+    const mounted = await mountLayout({ native: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+    const w = mounted.wrapper
+
+    expect(w.find('[data-test="creator-bottom-nav-more-profile"]').text()).toContain(
+      'Photo, bio and socials',
+    )
+    expect(w.find('[data-test="creator-bottom-nav-more-availability"]').text()).toContain(
+      'Block out dates',
+    )
+    const settings = w.find('[data-test="creator-bottom-nav-more-settings"]')
+    expect(settings.text()).toContain('Settings')
+    expect(settings.text()).toContain('Notification preferences')
+    expect(settings.attributes('href')).toBe('/creator/notifications/preferences')
+  })
+
+  it('web mobile: More keeps its pre-AH-100 items — no Settings, no subtitles', async () => {
+    const mounted = await mountLayout({ mobile: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+    const w = mounted.wrapper
+
+    expect(w.find('[data-test="creator-bottom-nav-more-settings"]').exists()).toBe(false)
+    expect(
+      w.find('[data-test="creator-bottom-nav-more-list"] .v-list-item-subtitle').exists(),
+    ).toBe(false)
   })
 })

@@ -12,3 +12,7 @@ test-results
 *.lock
 pnpm-lock.yaml
 composer.lock
+
+# Capacitor native projects (AH-100)
+apps/main/ios
+apps/main/android

@@ -48,7 +48,9 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 import { writeStoredLocale } from '@/composables/useLocalePreference'
+import { nativeTokenStore } from '@/core/auth/tokenStore'
 import { setLocale } from '@/core/i18n'
+import { isNativePlatform, nativePlatform } from '@/core/platform/isNativePlatform'
 import { setAuthRebootstrap, useAgencyStore } from '@/core/stores/useAgencyStore'
 import { resetWelcomeBackFlag } from '@/modules/onboarding/internal/welcomeBackFlag'
 import { authApi } from '../api/auth.api'
@@ -175,6 +177,13 @@ export const useAuthStore = defineStore('auth', () => {
 
     inFlightBootstrap = (async (): Promise<void> => {
       try {
+        // AH-100 — the creator app with no stored token is anonymous;
+        // there is nothing to ask `/me` about.
+        if (isNativePlatform() && (await nativeTokenStore().read()) === null) {
+          user.value = null
+          bootstrapStatus.value = 'ready'
+          return
+        }
         const me = await authApi.me()
         // Use setUser() so the agency store is initialized from the membership
         // list embedded in the /me response. Direct user.value assignment would
@@ -183,7 +192,13 @@ export const useAuthStore = defineStore('auth', () => {
         bootstrapStatus.value = 'ready'
       } catch (error) {
         if (error instanceof ApiError && error.status === 401) {
-          // Cold-load anonymous session — normal, not an error.
+          // Cold-load anonymous session — normal, not an error. In the
+          // creator app it means the stored token is dead: drop it.
+          if (isNativePlatform()) {
+            await nativeTokenStore()
+              .clear()
+              .catch(() => undefined)
+          }
           user.value = null
           mfaEnrollmentRequired.value = false
           bootstrapStatus.value = 'ready'
@@ -216,7 +231,15 @@ export const useAuthStore = defineStore('auth', () => {
   // Actions — auth surface
   // ---------------------------------------------------------------
 
+  /**
+   * Every caller (sign-in page, TOTP page) goes through `login()`; inside
+   * the creator app it dispatches to {@link loginWithToken}, so no native
+   * path can reach the cookie endpoint.
+   */
   async function login(email: string, password: string, totpCode?: string): Promise<void> {
+    if (isNativePlatform()) {
+      return loginWithToken(email, password, totpCode)
+    }
     isLoggingIn.value = true
     try {
       const next = await authApi.login({
@@ -230,9 +253,58 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  /**
+   * AH-100 D5 — `POST /auth/token` for the creator app. The token is
+   * persisted before the user is set, so a signed-in app always has a
+   * token behind it. Failure envelopes (wrong door, 2FA, suspension)
+   * surface unchanged for the page to render.
+   */
+  async function loginWithToken(email: string, password: string, totpCode?: string): Promise<void> {
+    const platform = nativePlatform()
+    if (platform === null) {
+      throw new Error('loginWithToken() is native-only.')
+    }
+    isLoggingIn.value = true
+    try {
+      const result = await authApi.tokenLogin({
+        email,
+        password,
+        platform,
+        ...(totpCode !== undefined ? { mfa_code: totpCode } : {}),
+      })
+      await nativeTokenStore().write(result.token, result.expiresAt)
+      setUser(result.user)
+    } finally {
+      isLoggingIn.value = false
+    }
+  }
+
+  /**
+   * In the creator app, signing out on the device is authoritative: the
+   * revoke request carries the token, then the token and user are
+   * dropped whatever the server said. A revoke that never arrived leaves
+   * the server-side token to lapse at its `expires_at`.
+   */
+  async function nativeLogout(): Promise<void> {
+    try {
+      await authApi.logout()
+    } catch {
+      // Device-side sign-out proceeds regardless.
+    } finally {
+      await nativeTokenStore()
+        .clear()
+        .catch(() => undefined)
+      clearUser()
+    }
+  }
+
   async function logout(): Promise<void> {
     isLoggingOut.value = true
     try {
+      if (isNativePlatform()) {
+        await nativeLogout()
+        return
+      }
       try {
         await authApi.logout()
       } catch (error) {
@@ -436,6 +508,7 @@ export const useAuthStore = defineStore('auth', () => {
     clearUser,
     bootstrap,
     login,
+    loginWithToken,
     logout,
     signUp,
     setPreferredLanguage,

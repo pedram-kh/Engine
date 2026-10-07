@@ -15,7 +15,13 @@
       "assignments": "Povabila",
       "availability": "Razpoložljivost",
       "messages": "Sporočila",
-      "more": "Več"
+      "more": "Več",
+      "settings": "Nastavitve",
+      "subtitles": {
+        "profile": "Fotografija, opis in družbena omrežja",
+        "availability": "Blokirajte datume",
+        "settings": "Nastavitve obvestil"
+      }
     },
     "nav": {
       "prevMonth": "Předchozí měsíc",
@@ -83,6 +89,9 @@
         "saveFailed": "Ni uspelo shraniti blok. Zkuste to znova.",
         "deleteFailed": "Ni uspelo smazat blok. Zkuste to znova."
       }
+    },
+    "legend": {
+      "today": "Danes"
     }
   }
 }

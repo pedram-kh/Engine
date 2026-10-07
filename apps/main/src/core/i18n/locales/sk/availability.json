@@ -15,7 +15,13 @@
       "assignments": "Pozvánky",
       "availability": "Dostupnosť",
       "messages": "Správy",
-      "more": "Viac"
+      "more": "Viac",
+      "settings": "Nastavenia",
+      "subtitles": {
+        "profile": "Fotka, bio a sociálne siete",
+        "availability": "Blokujte termíny",
+        "settings": "Predvoľby upozornení"
+      }
     },
     "nav": {
       "prevMonth": "Předchozí měsíc",
@@ -83,6 +89,9 @@
         "saveFailed": "Nepodařilo sa uložiť blok. Zkuste to znova.",
         "deleteFailed": "Nepodařilo sa odstrániť blok. Zkuste to znova."
       }
+    },
+    "legend": {
+      "today": "Dnes"
     }
   }
 }

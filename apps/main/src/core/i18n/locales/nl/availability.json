@@ -15,7 +15,13 @@
       "assignments": "Uitnodigingen",
       "availability": "Beschikbaarheid",
       "messages": "Berichten",
-      "more": "Meer"
+      "more": "Meer",
+      "settings": "Instellingen",
+      "subtitles": {
+        "profile": "Foto, bio en socials",
+        "availability": "Blokkeer data",
+        "settings": "Meldingsvoorkeuren"
+      }
     },
     "nav": {
       "prevMonth": "Vorige maand",
@@ -83,6 +89,9 @@
         "saveFailed": "Het blok kon niet worden opgeslagen. Probeer het opnieuw.",
         "deleteFailed": "Het blok kon niet worden verwijderd. Probeer het opnieuw."
       }
+    },
+    "legend": {
+      "today": "Vandaag"
     }
   }
 }

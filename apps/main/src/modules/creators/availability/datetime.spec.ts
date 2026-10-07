@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   addDays,
+  agendaDayLabel,
   browserTimezone,
   eachDayKey,
   monthLabel,
@@ -125,5 +126,12 @@ describe('label + date helpers', () => {
 
   it('todayKey returns a YYYY-MM-DD key', () => {
     expect(todayKey('UTC')).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+  })
+
+  it('agendaDayLabel names the weekday, day and month of the key itself', () => {
+    expect(agendaDayLabel('2026-10-06', 'en')).toBe('Tue, Oct 6')
+    // A date key is a calendar day: no zone shift may move it to the 5th.
+    expect(agendaDayLabel('2026-10-06', 'pt')).toContain('6')
+    expect(agendaDayLabel('2026-10-06', 'pt')).not.toBe(agendaDayLabel('2026-10-06', 'en'))
   })
 })

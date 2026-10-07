@@ -15,7 +15,13 @@
       "assignments": "Πρόσκλησηs",
       "availability": "Διαθεσιμότητα",
       "messages": "Μηνύματα",
-      "more": "Περισσότερα"
+      "more": "Περισσότερα",
+      "settings": "Ρυθμίσεις",
+      "subtitles": {
+        "profile": "Φωτογραφία, βιογραφικό και κοινωνικά δίκτυα",
+        "availability": "Αποκλεισμός ημερομηνιών",
+        "settings": "Προτιμήσεις ειδοποιήσεων"
+      }
     },
     "nav": {
       "prevMonth": "Προηγούμενο month",
@@ -83,6 +89,9 @@
         "saveFailed": "We couldn't save the block. Please try again.",
         "deleteFailed": "We couldn't delete the block. Please try again."
       }
+    },
+    "legend": {
+      "today": "Σήμερα"
     }
   }
 }

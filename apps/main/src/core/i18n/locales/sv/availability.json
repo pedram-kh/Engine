@@ -15,7 +15,13 @@
       "assignments": "Inbjudningar",
       "availability": "Tillgänglighet",
       "messages": "Meddelanden",
-      "more": "Mer"
+      "more": "Mer",
+      "settings": "Inställningar",
+      "subtitles": {
+        "profile": "Foto, bio och sociala medier",
+        "availability": "Blockera datum",
+        "settings": "Aviseringsinställningar"
+      }
     },
     "nav": {
       "prevMonth": "Föregående månad",
@@ -83,6 +89,9 @@
         "saveFailed": "Vi kunde inte spara blocket. Försök igen.",
         "deleteFailed": "Vi kunde inte ta bort blocket. Försök igen."
       }
+    },
+    "legend": {
+      "today": "Idag"
     }
   }
 }

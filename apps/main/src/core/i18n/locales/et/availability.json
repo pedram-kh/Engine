@@ -15,7 +15,13 @@
       "assignments": "Kutses",
       "availability": "Kättesaadavus",
       "messages": "Sõnumid",
-      "more": "Rohkem"
+      "more": "Rohkem",
+      "settings": "Seaded",
+      "subtitles": {
+        "profile": "Foto, tutvustus ja sotsiaalmeedia",
+        "availability": "Blokeeri kuupäevi",
+        "settings": "Teavituste eelistused"
+      }
     },
     "nav": {
       "prevMonth": "Eelmine month",
@@ -83,6 +89,9 @@
         "saveFailed": "We couldn't save the block. Please try again.",
         "deleteFailed": "We couldn't delete the block. Please try again."
       }
+    },
+    "legend": {
+      "today": "Täna"
     }
   }
 }

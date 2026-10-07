@@ -229,4 +229,9 @@ const isHero = computed(() => route.name === 'auth.sign-in' || route.name === 'a
     order: 1;
   }
 }
+
+/* AH-100: the creator app runs edge to edge — clear the notch/home bar. */
+:global(.catalyst-native .auth-layout) {
+  padding: calc(24px + var(--native-safe-top)) 24px calc(24px + var(--native-safe-bottom));
+}
 </style>

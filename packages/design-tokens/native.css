@@ -1,0 +1,86 @@
+/*
+ * Catalyst creator app (Capacitor) — AH-100 D4 token layer.
+ * Source of truth: Figma 1Dd0NdZ55EXh58uNyvf9Bi; TS mirror: src/native.ts
+ * (`nativeCssVariables`, kept in lockstep by src/native.spec.ts).
+ *
+ * Loaded ONLY inside the native shell (dynamic import in the main SPA's
+ * boot, after `.catalyst-native` is set on <html>). Every selector in this
+ * file starts with `.catalyst-native`, pinned by
+ * apps/main/tests/unit/architecture/native-css-scoping.spec.ts, so even if
+ * the file were ever loaded on the web it could not restyle anything.
+ *
+ * Colours that have a Vuetify slot are NOT here — they reach components
+ * through the swapped `dark` theme (`nativeDarkTheme`). This file carries
+ * what Vuetify has no slot for.
+ */
+
+.catalyst-native {
+  --native-bg-canvas: #0b0b0c;
+  --native-bg-sidebar: #151516;
+  --native-bg-topbar: #18181a;
+  --native-bg-surface: #1b1b1d;
+  --native-bg-surface-raised: #232326;
+  --native-border-default: #2e2e33;
+  --native-border-strong: #3a3a40;
+  --native-text-primary: #ededed;
+  --native-text-secondary: #a0a0a8;
+  --native-text-tertiary: #6e6e76;
+  --native-text-on-accent: #0b0b0c;
+  --native-text-inverse: #ffffff;
+  --native-accent-primary: #3ecf9e;
+  --native-accent-primary-subtle: #163a30;
+  --native-status-success: #34c77b;
+  --native-status-danger: #f0506e;
+  --native-status-warning: #f5a524;
+  --native-status-info: #4c8dff;
+  --native-usp-5: #3ecf9e;
+  --native-usp-6: #f472b6;
+
+  /* Status pills render as tinted fills in the frames. */
+  --native-status-success-subtle: rgb(52 199 123 / 0.16);
+  --native-status-danger-subtle: rgb(240 80 110 / 0.16);
+  --native-status-warning-subtle: rgb(245 165 36 / 0.16);
+  --native-status-info-subtle: rgb(76 141 255 / 0.16);
+
+  /* Figma's radius scale; `xl` is 10px here, 12px on the web. */
+  --native-radius-sm: 4px;
+  --native-radius-md: 6px;
+  --native-radius-lg: 8px;
+  --native-radius-xl: 10px;
+  --native-radius-2xl: 12px;
+  --native-radius-full: 999px;
+
+  --native-shadow-overlay: 0 12px 32px #0000008c;
+
+  /* Type scale as `font` shorthands (Inter via --font-sans). */
+  --native-type-display: 500 28px/36px var(--font-sans);
+  --native-type-h3: 600 18px/24px var(--font-sans);
+  --native-type-h4: 600 15px/20px var(--font-sans);
+  --native-type-body: 400 14px/20px var(--font-sans);
+  --native-type-body-strong: 500 14px/20px var(--font-sans);
+  --native-type-body-small: 400 13px/19px var(--font-sans);
+  --native-type-caption: 400 12px/16px var(--font-sans);
+  --native-type-caption-strong: 500 12px/16px var(--font-sans);
+  --native-type-overline: 600 11px/14px var(--font-sans);
+  --native-type-overline-tracking: 0.6px;
+  --native-type-button-primary: 600 14px/20px var(--font-sans);
+  --native-type-button: 500 14px/20px var(--font-sans);
+
+  /* Notch / home-indicator insets (viewport-fit=cover). */
+  --native-safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --native-safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+  --native-safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --native-safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
+
+  color-scheme: dark;
+}
+
+.catalyst-native body {
+  background: var(--native-bg-canvas);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+.catalyst-native .v-application {
+  font: var(--native-type-body);
+}

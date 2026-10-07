@@ -9,7 +9,7 @@ import { ApiError } from './errors'
  * campaigns API, future creators API, etc.) can be unit-tested with a
  * `vi.fn()`-shaped fake without pulling axios into the test surface.
  *
- * Every method:
+ * Every method (default cookie mode — both SPAs):
  *   - Sends `withCredentials: true` (Sanctum SPA cookie auth).
  *   - Resolves to the parsed JSON response body, typed as `T`.
  *   - Throws an {@link ApiError} on any non-2xx response or transport
@@ -22,6 +22,11 @@ import { ApiError } from './errors'
  *     Sanctum SPA flow (`docs/04-API-DESIGN.md §4`).
  *   - Read the `XSRF-TOKEN` cookie set by that preflight and forward
  *     it on the actual request as `X-XSRF-TOKEN`.
+ *
+ * Bearer mode (`auth: { mode: 'bearer' }` — the creator app only)
+ * replaces all three: no cookies are sent (`withCredentials: false`), no
+ * CSRF preflight is issued, `document.cookie` is never read, and every
+ * request carries `Authorization: Bearer <token>` instead.
  */
 export interface HttpClient {
   get<T = unknown>(path: string, options?: HttpRequestOptions): Promise<T>
@@ -90,7 +95,22 @@ export interface CreateHttpClientOptions {
    * different exception type the caller would not be prepared for.
    */
   onUnauthorized?: (path: string) => void
+  /**
+   * Authentication mode. Omitted (or `{ mode: 'cookie' }`) means Sanctum
+   * SPA cookie auth — what both web SPAs use. `{ mode: 'bearer' }` is the
+   * creator app's token auth (AH-100): `getToken` is awaited before every
+   * request and its result sent as `Authorization: Bearer …`; a `null`
+   * token sends no header. Bearer mode never touches cookies — a stray
+   * API-domain session cookie riding along would let the `web` guard
+   * authenticate the request ahead of the token on
+   * `auth:web,creator_app` routes.
+   */
+  auth?: HttpAuthMode
 }
+
+export type HttpAuthMode =
+  | { mode: 'cookie' }
+  | { mode: 'bearer'; getToken: () => Promise<string | null> }
 
 const DEFAULT_CSRF_COOKIE_URL = '/sanctum/csrf-cookie'
 const DEFAULT_XSRF_COOKIE_NAME = 'XSRF-TOKEN'
@@ -101,11 +121,13 @@ export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
   const csrfCookieUrl = options.csrfCookieUrl ?? DEFAULT_CSRF_COOKIE_URL
   const xsrfCookieName = options.xsrfCookieName ?? DEFAULT_XSRF_COOKIE_NAME
   const xsrfHeaderName = options.xsrfHeaderName ?? DEFAULT_XSRF_HEADER_NAME
+  const bearerAuth = options.auth?.mode === 'bearer' ? options.auth : null
+  const usesCookieAuth = bearerAuth === null
 
   const instance: AxiosInstance =
     options.axiosInstance ??
     axios.create({
-      withCredentials: true,
+      withCredentials: usesCookieAuth,
       // Per-request `request<T>()` is the single source of truth for
       // headers (see Content-Type / FormData contract below). We
       // intentionally do NOT set instance-level header defaults so the
@@ -122,8 +144,9 @@ export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
     })
 
   // Belt-and-suspenders even when an axiosInstance is injected — guard
-  // against a test instance defaulting `withCredentials: false`.
-  instance.defaults.withCredentials = true
+  // against a test instance defaulting `withCredentials: false` (and, in
+  // bearer mode, one defaulting to `true`).
+  instance.defaults.withCredentials = usesCookieAuth
 
   const resolvedCsrfUrl = resolveCsrfUrl(csrfCookieUrl, options.baseUrl)
 
@@ -133,7 +156,7 @@ export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
     const path = config.url ?? ''
 
     try {
-      if (STATE_CHANGING_METHODS.has(method)) {
+      if (usesCookieAuth && STATE_CHANGING_METHODS.has(method)) {
         // CSRF preflight: GET /sanctum/csrf-cookie sets the XSRF-TOKEN
         // cookie. We don't keep the response — only the side-effect.
         await instance.request({
@@ -164,10 +187,17 @@ export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
         ...(config.headers as Record<string, string> | undefined),
       }
 
-      if (STATE_CHANGING_METHODS.has(method)) {
+      if (usesCookieAuth && STATE_CHANGING_METHODS.has(method)) {
         const token = readCookie(xsrfCookieName)
         if (token !== null) {
           headers[xsrfHeaderName] = token
+        }
+      }
+
+      if (bearerAuth !== null) {
+        const bearerToken = await bearerAuth.getToken()
+        if (bearerToken !== null) {
+          headers.Authorization = `Bearer ${bearerToken}`
         }
       }
 

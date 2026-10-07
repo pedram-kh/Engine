@@ -224,6 +224,77 @@ describe('createAuthApi', () => {
     })
   })
 
+  describe('tokenLogin()', () => {
+    function tokenEnvelope() {
+      return {
+        ...userEnvelope(),
+        meta: {
+          token: '7|plaintextTokenShownOnce',
+          token_type: 'Bearer',
+          expires_at: '2027-01-04T12:00:00+00:00',
+        },
+      }
+    }
+
+    it('POSTs to /auth/token with platform and unwraps user, token and expiry', async () => {
+      http.post.mockResolvedValueOnce(tokenEnvelope())
+
+      const result = await api.tokenLogin({
+        email: 'creator@example.test',
+        password: 'pw',
+        platform: 'ios',
+      })
+
+      expect(http.post).toHaveBeenCalledWith('/auth/token', {
+        email: 'creator@example.test',
+        password: 'pw',
+        platform: 'ios',
+      })
+      expect(result).toEqual({
+        user: userEnvelope().data,
+        token: '7|plaintextTokenShownOnce',
+        expiresAt: '2027-01-04T12:00:00+00:00',
+      })
+    })
+
+    it('forwards mfa_code on the 2FA re-submit', async () => {
+      http.post.mockResolvedValueOnce(tokenEnvelope())
+
+      await api.tokenLogin({
+        email: 'creator@example.test',
+        password: 'pw',
+        platform: 'android',
+        mfa_code: '123456',
+      })
+
+      expect(http.post).toHaveBeenCalledWith('/auth/token', {
+        email: 'creator@example.test',
+        password: 'pw',
+        platform: 'android',
+        mfa_code: '123456',
+      })
+    })
+
+    it('hits /auth/token even on the admin variant (the door has no admin twin)', async () => {
+      const adminApi = createAuthApi(http as unknown as HttpClient, { variant: 'admin' })
+      http.post.mockResolvedValueOnce(tokenEnvelope())
+
+      await adminApi.tokenLogin({ email: 'a@b.c', password: 'pw', platform: 'ios' })
+
+      expect(http.post).toHaveBeenCalledWith('/auth/token', expect.any(Object))
+    })
+
+    it('surfaces 403 auth.wrong_spa with meta.correct_spa_url verbatim', async () => {
+      http.post.mockRejectedValueOnce(
+        envelopeError(403, 'auth.wrong_spa', { correct_spa_url: 'https://web.test' }),
+      )
+
+      await expect(
+        api.tokenLogin({ email: 'a@b.c', password: 'pw', platform: 'ios' }),
+      ).rejects.toMatchObject({ status: 403, code: 'auth.wrong_spa' })
+    })
+  })
+
   describe('logout()', () => {
     it('POSTs to /auth/logout with no body', async () => {
       http.post.mockResolvedValueOnce(undefined)

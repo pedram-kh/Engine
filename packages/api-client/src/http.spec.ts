@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance } from 'axios'
 import MockAdapter from 'axios-mock-adapter'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ApiError } from './errors'
 import { createHttpClient, type HttpClient } from './http'
@@ -611,6 +611,174 @@ describe('createHttpClient', () => {
 
       const jsonHeaders = h.mock.history.post[1]?.headers as Record<string, string>
       expect(jsonHeaders?.['Content-Type']).toBe('application/json')
+    })
+  })
+})
+
+/**
+ * AH-100 D1 — the auth mode, both polarities. The cookie block pins that
+ * the web transport carries no bearer artefact and keeps every cookie
+ * artefact; the bearer block pins the inverse. Each block is the other's
+ * break-revert target.
+ */
+describe('createHttpClient — auth mode (AH-100)', () => {
+  function makeInstance(withCredentials: boolean): AxiosInstance {
+    return axios.create({ withCredentials, xsrfCookieName: undefined, xsrfHeaderName: undefined })
+  }
+
+  beforeEach(() => {
+    clearAllCookies()
+    setXsrfCookie('xsrf-value')
+  })
+
+  afterEach(() => {
+    clearAllCookies()
+    vi.restoreAllMocks()
+  })
+
+  describe.each([
+    ['omitted', undefined],
+    ["{ mode: 'cookie' }", { mode: 'cookie' as const }],
+  ])('cookie mode (auth %s) — the web transport', (_label, auth) => {
+    function makeCookieClient(): { http: HttpClient; mock: MockAdapter } {
+      const instance = makeInstance(false)
+      const mock = new MockAdapter(instance)
+      const http = createHttpClient({
+        baseUrl: BASE_URL,
+        axiosInstance: instance,
+        ...(auth !== undefined ? { auth } : {}),
+      })
+      return { http, mock }
+    }
+
+    it('keeps preflight + XSRF header + withCredentials and sends no Authorization', async () => {
+      const { http, mock } = makeCookieClient()
+      mock.onGet(CSRF_URL).reply(204)
+      mock.onPost(`${BASE_URL}/me`).reply(200, {})
+      mock.onGet(`${BASE_URL}/me`).reply(200, {})
+
+      await http.post('/me', {})
+      await http.get('/me')
+
+      expect(mock.history.get.filter((r) => r.url === CSRF_URL)).toHaveLength(1)
+      const post = mock.history.post[0]
+      const postHeaders = post?.headers as Record<string, string>
+      expect(postHeaders['X-XSRF-TOKEN']).toBe('xsrf-value')
+      expect(post?.withCredentials).toBe(true)
+      for (const request of [...mock.history.get, ...mock.history.post]) {
+        const headers = request.headers as Record<string, string>
+        expect(headers.Authorization).toBeUndefined()
+      }
+    })
+  })
+
+  describe('bearer mode — the creator app transport', () => {
+    function makeBearerClient(getToken: () => Promise<string | null>): {
+      http: HttpClient
+      mock: MockAdapter
+    } {
+      // Injected with `withCredentials: true` on purpose: bearer mode must
+      // force it off even when the instance defaults it on.
+      const instance = makeInstance(true)
+      const mock = new MockAdapter(instance)
+      const http = createHttpClient({
+        baseUrl: BASE_URL,
+        axiosInstance: instance,
+        auth: { mode: 'bearer', getToken },
+      })
+      return { http, mock }
+    }
+
+    it('sends Authorization: Bearer on reads and writes', async () => {
+      const { http, mock } = makeBearerClient(async () => 'tok-1')
+      mock.onGet(`${BASE_URL}/me`).reply(200, {})
+      mock.onPost(`${BASE_URL}/auth/logout`).reply(204)
+
+      await http.get('/me')
+      await http.post('/auth/logout')
+
+      expect((mock.history.get[0]?.headers as Record<string, string>).Authorization).toBe(
+        'Bearer tok-1',
+      )
+      expect((mock.history.post[0]?.headers as Record<string, string>).Authorization).toBe(
+        'Bearer tok-1',
+      )
+    })
+
+    it('issues no CSRF preflight on POST / PATCH / DELETE', async () => {
+      const { http, mock } = makeBearerClient(async () => 'tok-1')
+      mock.onPost(`${BASE_URL}/x`).reply(200, {})
+      mock.onPatch(`${BASE_URL}/x`).reply(200, {})
+      mock.onDelete(`${BASE_URL}/x`).reply(204)
+
+      await http.post('/x', {})
+      await http.patch('/x', {})
+      await http.delete('/x')
+
+      expect(mock.history.get).toHaveLength(0)
+    })
+
+    it('never reads document.cookie and sends no XSRF header', async () => {
+      const cookieGetter = vi.spyOn(document, 'cookie', 'get')
+      const { http, mock } = makeBearerClient(async () => 'tok-1')
+      mock.onPost(`${BASE_URL}/x`).reply(200, {})
+
+      await http.post('/x', {})
+
+      expect(cookieGetter).not.toHaveBeenCalled()
+      const headers = mock.history.post[0]?.headers as Record<string, string>
+      expect(headers['X-XSRF-TOKEN']).toBeUndefined()
+    })
+
+    it('sends withCredentials: false (no cookie can ride along)', async () => {
+      const { http, mock } = makeBearerClient(async () => 'tok-1')
+      mock.onGet(`${BASE_URL}/me`).reply(200, {})
+      mock.onPost(`${BASE_URL}/x`).reply(200, {})
+
+      await http.get('/me')
+      await http.post('/x', {})
+
+      expect(mock.history.get[0]?.withCredentials).toBe(false)
+      expect(mock.history.post[0]?.withCredentials).toBe(false)
+    })
+
+    it('reads the token per request and sends no Authorization when it is null', async () => {
+      const getToken = vi.fn<() => Promise<string | null>>().mockResolvedValue(null)
+      const { http, mock } = makeBearerClient(getToken)
+      mock.onPost(`${BASE_URL}/auth/token`).reply(200, {})
+
+      await http.post('/auth/token', { email: 'a@b.c' })
+
+      expect(getToken).toHaveBeenCalledTimes(1)
+      const headers = mock.history.post[0]?.headers as Record<string, string>
+      expect(headers.Authorization).toBeUndefined()
+    })
+
+    it('a caller-supplied Authorization header cannot replace the bearer token', async () => {
+      const { http, mock } = makeBearerClient(async () => 'tok-1')
+      mock.onGet(`${BASE_URL}/me`).reply(200, {})
+
+      await http.get('/me', { headers: { Authorization: 'Bearer forged' } })
+
+      expect((mock.history.get[0]?.headers as Record<string, string>).Authorization).toBe(
+        'Bearer tok-1',
+      )
+    })
+
+    it('still fires onUnauthorized on a 401', async () => {
+      const onUnauthorized = vi.fn()
+      const instance = makeInstance(false)
+      const mock = new MockAdapter(instance)
+      const http = createHttpClient({
+        baseUrl: BASE_URL,
+        axiosInstance: instance,
+        auth: { mode: 'bearer', getToken: async () => 'expired' },
+        onUnauthorized,
+      })
+      mock.onGet(`${BASE_URL}/creators/me`).reply(401, { errors: [] })
+
+      await expect(http.get('/creators/me')).rejects.toMatchObject({ status: 401 })
+      expect(onUnauthorized).toHaveBeenCalledWith('/creators/me')
     })
   })
 })

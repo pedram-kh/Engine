@@ -15,6 +15,9 @@ export default [
       '**/coverage/**',
       '**/playwright-report/**',
       '**/test-results/**',
+      // Capacitor's generated native projects (AH-100).
+      'ios/**',
+      'android/**',
     ],
   },
   ...pluginVue.configs['flat/recommended'],

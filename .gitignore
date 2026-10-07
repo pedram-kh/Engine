@@ -23,6 +23,10 @@ test-results/
 .env.local
 .env.*.local
 !.env.example
+# The creator app's production API target is supplied locally, never committed.
+# (Native build artefacts are ignored by Capacitor's own ios/ and android/
+# .gitignore files.)
+apps/main/.env.native-production
 
 # Editor / OS
 .idea/

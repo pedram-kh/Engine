@@ -23,14 +23,19 @@
  *   - Bootstrap belt-and-suspenders on mount.
  *   - `data-test` hooks: onboarding-layout / -topbar / -brand /
  *     -locale-switcher / save-and-exit-btn / -main / -progress / -body.
+ *
+ * AH-100: inside the Capacitor creator app the chrome is the Figma frame-01
+ * header (`NativeWizardHeader`) at every width, with "Save and exit" inline
+ * beside the menu and safe-area padding. Gated on `isNative`; the web
+ * branches above are unchanged.
  */
 
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useDisplay } from 'vuetify'
 
+import { useMobileShell } from '@/composables/useMobileShell'
 import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
@@ -40,6 +45,7 @@ import { useOnboardingStore } from '../stores/useOnboardingStore'
 import OnboardingProgress from '../components/OnboardingProgress.vue'
 import AnimatedWizardChrome, { type WizardChromeStep } from '../components/AnimatedWizardChrome.vue'
 import AnimatedWizardChromeMobile from '../components/AnimatedWizardChromeMobile.vue'
+import NativeWizardHeader from '../components/NativeWizardHeader.vue'
 import {
   VISIBLE_UX_STEPS,
   WIZARD_TOTAL_STEPS,
@@ -54,7 +60,7 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
-const display = useDisplay()
+const { isNative, isMobile } = useMobileShell()
 
 const {
   isBootstrapped,
@@ -73,11 +79,11 @@ const localeOptions = buildLocaleOptions()
 const userMenuOpen = ref(false)
 
 /**
- * Mobile chrome (smAndDown): the inline locale switcher + "Save and exit"
- * button are collapsed into a right-side hamburger drawer so the cramped
- * mobile app-bar stays just logo + menu. Desktop is untouched.
+ * Mobile chrome (smAndDown, or always inside the app — `useMobileShell`):
+ * the inline locale switcher + "Save and exit" button are collapsed into a
+ * right-side hamburger drawer so the cramped mobile app-bar stays just
+ * logo + menu. Desktop is untouched.
  */
-const isMobile = computed(() => display.smAndDown.value)
 const menuDrawerOpen = ref(false)
 
 /**
@@ -106,7 +112,7 @@ onMounted(() => {
  *  switch between two designs — it renders inside the same chrome with
  *  its `next_step` highlighted on the rail. */
 const useAnimatedChrome = computed(
-  () => !display.smAndDown.value && !prefersReducedMotion.value && creator.value !== null,
+  () => !isMobile.value && !prefersReducedMotion.value && creator.value !== null,
 )
 
 /** Mobile animated chrome: the horizontal top-rail variant. Motion-allowed
@@ -115,8 +121,11 @@ const useAnimatedChrome = computed(
  *  parity with the desktop chrome). Reduced-motion + the no-creator cold-load
  *  fall through to the fallback below. */
 const useMobileChrome = computed(
-  () => display.smAndDown.value && !prefersReducedMotion.value && creator.value !== null,
+  () => isMobile.value && !prefersReducedMotion.value && creator.value !== null,
 )
+
+/** AH-100 — the creator app's frame-01 header (no motion to reduce). */
+const useNativeHeader = computed(() => isNative && creator.value !== null)
 
 /** On a step route the active row is that step; on the Welcome Back
  *  resume screen we highlight the creator's `next_step` so the rail
@@ -200,7 +209,12 @@ async function saveAndExit(): Promise<void> {
   <v-app data-test="onboarding-layout">
     <ImpersonationBanner />
 
-    <v-app-bar elevation="1" class="onboarding-topbar" data-test="onboarding-topbar">
+    <v-app-bar
+      elevation="1"
+      class="onboarding-topbar"
+      :class="{ 'onboarding-topbar--native': isNative }"
+      data-test="onboarding-topbar"
+    >
       <div class="d-flex align-center px-4" data-test="onboarding-brand">
         <img :src="catalystLogo" alt="Catalyst" class="onboarding-topbar__logo" />
       </div>
@@ -236,13 +250,26 @@ async function saveAndExit(): Promise<void> {
         </v-btn>
       </template>
 
-      <!-- Mobile: collapse those controls behind a top-right hamburger. -->
-      <v-app-bar-nav-icon
-        v-else
-        :aria-label="t('app.nav.menu')"
-        data-test="onboarding-menu-btn"
-        @click="menuDrawerOpen = !menuDrawerOpen"
-      />
+      <!-- Mobile: collapse those controls behind a top-right hamburger.
+           In the app, "Save and exit" stays inline beside it (frame 01). -->
+      <template v-else>
+        <v-btn
+          v-if="isNative && showSaveAndExit"
+          variant="text"
+          size="small"
+          class="text-none onboarding-topbar__save-native"
+          :disabled="isLoggingOut"
+          data-test="save-and-exit-btn"
+          @click="saveAndExit"
+        >
+          {{ t('creator.ui.wizard.actions.save_and_exit') }}
+        </v-btn>
+        <v-app-bar-nav-icon
+          :aria-label="t('app.nav.menu')"
+          data-test="onboarding-menu-btn"
+          @click="menuDrawerOpen = !menuDrawerOpen"
+        />
+      </template>
     </v-app-bar>
 
     <!-- Mobile menu drawer (smAndDown only): the app-bar's overflow. -->
@@ -268,7 +295,7 @@ async function saveAndExit(): Promise<void> {
         />
 
         <v-btn
-          v-if="showSaveAndExit"
+          v-if="showSaveAndExit && !isNative"
           variant="tonal"
           class="text-none"
           block
@@ -282,9 +309,21 @@ async function saveAndExit(): Promise<void> {
       </div>
     </v-navigation-drawer>
 
-    <v-main data-test="onboarding-main">
+    <v-main :class="{ 'onboarding-main--native': isNative }" data-test="onboarding-main">
+      <!-- AH-100: the creator app's header + plain body (frame 01). -->
+      <div v-if="useNativeHeader" class="onboarding-native">
+        <NativeWizardHeader
+          :steps="chromeSteps"
+          :active-index="activeIndex"
+          :completeness-label="completenessLabel"
+        />
+        <section class="onboarding-native__body" data-test="onboarding-body">
+          <slot />
+        </section>
+      </div>
+
       <!-- Option A: animated chrome (desktop, motion allowed, step route) -->
-      <div v-if="useAnimatedChrome" class="onboarding-stage">
+      <div v-else-if="useAnimatedChrome" class="onboarding-stage">
         <AnimatedWizardChrome
           :steps="chromeSteps"
           :active-index="activeIndex"
@@ -388,6 +427,34 @@ async function saveAndExit(): Promise<void> {
   background-color: rgb(var(--v-theme-surface));
   border-radius: var(--radius-lg);
   padding: 2rem;
+}
+
+/* AH-100 — the creator app chrome (Figma frame 01). Only bound inside the
+   Capacitor app; reads the `--native-*` tokens. The header shares the top
+   bar's surface so the two read as one block, which is why the bar drops
+   its bottom border and aurora line here. */
+.onboarding-topbar--native {
+  background: var(--native-bg-topbar) !important;
+  box-shadow: none !important;
+  padding-top: var(--native-safe-top);
+}
+
+.onboarding-topbar--native::after {
+  display: none;
+}
+
+.onboarding-topbar__save-native {
+  font: var(--native-type-caption-strong);
+  color: var(--native-text-secondary);
+}
+
+.onboarding-main--native {
+  padding-top: calc(var(--v-layout-top) + var(--native-safe-top));
+  padding-bottom: var(--native-safe-bottom);
+}
+
+.onboarding-native__body {
+  padding: 24px 16px 32px;
 }
 
 @media (max-width: 960px) {

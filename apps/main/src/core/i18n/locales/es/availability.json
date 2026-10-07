@@ -15,7 +15,13 @@
       "assignments": "Invitaciones",
       "availability": "Disponibilidad",
       "messages": "Mensajes",
-      "more": "Más"
+      "more": "Más",
+      "settings": "Ajustes",
+      "subtitles": {
+        "profile": "Foto, biografía y redes sociales",
+        "availability": "Bloquea fechas",
+        "settings": "Preferencias de notificaciones"
+      }
     },
     "nav": {
       "prevMonth": "Mes anterior",
@@ -83,6 +89,9 @@
         "saveFailed": "No hemos podido guardar el bloqueo. Inténtalo de nuevo.",
         "deleteFailed": "No hemos podido eliminar el bloqueo. Inténtalo de nuevo."
       }
+    },
+    "legend": {
+      "today": "Hoy"
     }
   }
 }

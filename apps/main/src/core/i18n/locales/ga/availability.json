@@ -15,7 +15,13 @@
       "assignments": "Cuireadhs",
       "availability": "Infhaighteacht",
       "messages": "Teachtaireachtaí",
-      "more": "Tuilleadh"
+      "more": "Tuilleadh",
+      "settings": "Socruithe",
+      "subtitles": {
+        "profile": "Grianghraf, beathaisnéis agus meáin shóisialta",
+        "availability": "Cuir bac ar dhátaí",
+        "settings": "Roghanna fógraí"
+      }
     },
     "nav": {
       "prevMonth": "Roimhe month",
@@ -83,6 +89,9 @@
         "saveFailed": "We couldn't save the block. Please try again.",
         "deleteFailed": "We couldn't delete the block. Please try again."
       }
+    },
+    "legend": {
+      "today": "Inniu"
     }
   }
 }

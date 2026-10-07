@@ -11,7 +11,9 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import {
+  createNativeUnauthorizedPolicy,
   createUnauthorizedPolicy,
+  shouldHandleNativeUnauthorized,
   shouldHandleUnauthorized,
   SESSION_EXPIRED_QUERY_REASON,
   http,
@@ -126,6 +128,75 @@ describe('createUnauthorizedPolicy', () => {
 
     expect(storeResolved).toBe(true)
     expect(routerResolved).toBe(true)
+    expect(clearUser).toHaveBeenCalledTimes(1)
+    expect(push).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('shouldHandleNativeUnauthorized (AH-100)', () => {
+  it.each(['/me', '/auth/token', '/auth/impersonation/status'])('exempts %s', (path) => {
+    expect(shouldHandleNativeUnauthorized(path)).toBe(false)
+  })
+
+  it.each(['/auth/logout', '/creators/me', '/creators/me/availability', '/auth/login'])(
+    'handles %s as a dead token',
+    (path) => {
+      expect(shouldHandleNativeUnauthorized(path)).toBe(true)
+    },
+  )
+})
+
+describe('createNativeUnauthorizedPolicy (AH-100)', () => {
+  function makeNativeDeps(clearToken: () => Promise<void> = vi.fn(async () => undefined)) {
+    const clearUser = vi.fn()
+    const push = vi.fn(() => Promise.resolve())
+    return {
+      clearUser,
+      push,
+      clearToken,
+      deps: {
+        getStore: vi.fn(async () => ({ clearUser })),
+        getRouter: vi.fn(async () => ({ push })),
+        clearToken,
+      },
+    }
+  }
+
+  it('clears the token and the user, then routes to sign-in, on a non-exempt 401', async () => {
+    const { clearUser, push, clearToken, deps } = makeNativeDeps()
+
+    await createNativeUnauthorizedPolicy(deps)('/creators/me')
+
+    expect(clearToken).toHaveBeenCalledTimes(1)
+    expect(clearUser).toHaveBeenCalledTimes(1)
+    expect(push).toHaveBeenCalledWith({
+      name: 'auth.sign-in',
+      query: { reason: SESSION_EXPIRED_QUERY_REASON },
+    })
+  })
+
+  it.each(['/auth/token', '/me', '/auth/impersonation/status'])(
+    'touches nothing on the exempt path %s',
+    async (path) => {
+      const { clearUser, push, clearToken, deps } = makeNativeDeps()
+
+      await createNativeUnauthorizedPolicy(deps)(path)
+
+      expect(clearToken).not.toHaveBeenCalled()
+      expect(clearUser).not.toHaveBeenCalled()
+      expect(push).not.toHaveBeenCalled()
+    },
+  )
+
+  it('still signs the user out when clearing storage throws', async () => {
+    const { clearUser, push, deps } = makeNativeDeps(
+      vi.fn(async () => {
+        throw new Error('keychain unavailable')
+      }),
+    )
+
+    await createNativeUnauthorizedPolicy(deps)('/creators/me')
+
     expect(clearUser).toHaveBeenCalledTimes(1)
     expect(push).toHaveBeenCalledTimes(1)
   })

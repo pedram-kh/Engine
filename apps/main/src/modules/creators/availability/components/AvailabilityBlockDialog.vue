@@ -19,6 +19,9 @@
  *
  * All timezone conversion happens here (UTC ↔ resolved tz); the child
  * `DateTimeField` is tz-agnostic.
+ *
+ * Inside the creator app (AH-100) the same card opens in a `v-bottom-sheet`
+ * instead of the centred `v-dialog`; the form is identical.
  */
 
 import {
@@ -31,6 +34,10 @@ import {
 } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { VBottomSheet } from 'vuetify/components/VBottomSheet'
+import { VDialog } from 'vuetify/components/VDialog'
+
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import { availabilityApi } from '../availability.api'
 import { addDays, eachDayKey, todayKey, utcIsoToZoned, zonedToUtcIso } from '../datetime'
@@ -55,6 +62,9 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+/** AH-100 — the creator app opens this form as a bottom sheet. */
+const isNative = isNativePlatform()
 
 type AvailabilityField =
   | 'starts_at'
@@ -271,7 +281,8 @@ async function onDelete(): Promise<void> {
 </script>
 
 <template>
-  <v-dialog
+  <component
+    :is="isNative ? VBottomSheet : VDialog"
     :model-value="modelValue"
     max-width="560"
     scrollable
@@ -488,5 +499,5 @@ async function onDelete(): Promise<void> {
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </component>
 </template>

@@ -11,7 +11,7 @@ export default mergeConfig(
       // The Playwright suite lives under `playwright/**` (chunk 6.8);
       // its specs use the @playwright/test runner, not Vitest, so they
       // must be excluded from the Vitest scan.
-      exclude: ['tests/e2e/**', 'playwright/**', 'node_modules/**'],
+      exclude: ['tests/e2e/**', 'playwright/**', 'node_modules/**', 'ios/**', 'android/**'],
       globals: true,
       root: fileURLToPath(new URL('./', import.meta.url)),
       setupFiles: ['./tests/unit/setup.ts'],

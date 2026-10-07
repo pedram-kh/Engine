@@ -15,7 +15,13 @@
       "assignments": "Invitations",
       "availability": "Disponibilité",
       "messages": "Messages",
-      "more": "Plus"
+      "more": "Plus",
+      "settings": "Paramètres",
+      "subtitles": {
+        "profile": "Photo, bio et réseaux sociaux",
+        "availability": "Bloquez des dates",
+        "settings": "Préférences de notification"
+      }
     },
     "nav": {
       "prevMonth": "Mois précédent",
@@ -83,6 +89,9 @@
         "saveFailed": "Nous n'avons pas pu enregistrer le bloc. Veuillez réessayer.",
         "deleteFailed": "Nous n'avons pas pu supprimer le bloc. Veuillez réessayer."
       }
+    },
+    "legend": {
+      "today": "Aujourd'hui"
     }
   }
 }
