@@ -116,7 +116,29 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-10-06 · **Through:** AH-099, the Creator App arc's chunk 1 of 7 — bearer-token
+**Last updated:** 2026-10-06 · **Through:** AH-100, the Creator App arc's chunk 2 of 7 — the app
+client, the Capacitor wrap and the native theme (`apps/main`, `packages/api-client`,
+`packages/design-tokens`; zero `apps/api` / `apps/admin` diff; **no migration**). **Review closed —
+approved (2026-10-07), and pushed on Pedram's clearance** as a feat + docs pair on `d1ab5820`. The
+CI run at the tip is cited in the review header by the follow-up docs-only commit. Live push state
+is `origin/main`, not this sentence — re-derive it with
+`git rev-list --left-right --count origin/main...HEAD`.
+
+- **What AH-100 is:** the main SPA wrapped as the Catalyst creator app (`com.catalystgrowth.platform`,
+  Capacitor 8.5.2, iOS + Android inside `apps/main`). It signs in through AH-099's `POST /auth/token`
+  with a bearer token kept in the Keychain or Keystore, and renders a Figma-derived dark theme, bottom
+  tabs and an availability agenda. **The web renders byte-identically**, pinned four ways. Review:
+  [`creator-app-client-shell-review.md`](creator-app-client-shell-review.md); its §9 is the
+  simulator/device walkthrough.
+- **Deploy:** web is an `apps/main` rebuild only. The app does not deploy. A production app build
+  waits on AH-099's PENDING deploy. Both entries are in [`deploy-log.md`](../runbooks/deploy-log.md).
+- **Next:** Pedram's simulator/device walkthrough (review §9). Then **AH-100b** (the
+  designed-page Figma passes, split off at Q4), and the arc continues (AH-101+).
+- **Local dev for the app needs:** JDK 21 for Android Gradle, and in the local `apps/api/.env`
+  `FRONTEND_EXTRA_ORIGINS=capacitor://localhost,https://localhost` with the bare `localhost` dropped
+  from `SANCTUM_STATEFUL_DOMAINS` (review §9).
+
+**Prior state, for the record — AH-099.** **Through:** AH-099, the Creator App arc's chunk 1 of 7 — bearer-token
 auth, backend (`apps/api` only; zero SPA / api-client diff; **no migration**). **Review closed —
 approved, and pushed on Pedram's clearance (2026-10-06):** the feat commit `e665e9ce` plus the
 docs commit `78a1fe23` on top of `07445c39` (the Creator App inventory). **CI green at that
@@ -1277,11 +1299,10 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
 
 ### Open threads
 
-- **⏸ AH-098's single commit is PUSH HELD, awaiting Claude's clearance + Pedram's go.** Everything
-  is built, gated, and committed (`apps/main` + 24-locale i18n + docs, zero `apps/api` diff); the
-  next action on this thread is the push-clearance exchange, not more building. Cite the commit
-  hash by re-deriving it (`git log -1`) — this session's Part 2 refresh deliberately did not
-  self-cite it (see the top block above).
+- **✅ AH-100 is CLOSED and PUSHED (2026-10-07).** The open item is Pedram's simulator/device
+  walkthrough (review §9), the chunk's eyes-on instrument; Android has been verified as a build
+  only. Deploy state is in `deploy-log.md` (PENDING, stacked on AH-099). (The line that stood here, "AH-098's
+  single commit is PUSH HELD", was stale: AH-098 was pushed and is DEPLOYED, 2026-09-04.)
 - **❓ New tech-debt entry — no versioned retrieval of the master agreement text a creator
   actually accepted (AH-098).** `docs/tech-debt.md`'s newest entry: the profile panel and the
   wizard's own re-entry both show the CURRENT agreement text, never the version actually accepted

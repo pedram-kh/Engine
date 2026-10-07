@@ -54,6 +54,36 @@ happened.
 
 ---
 
+## AH-100 — Creator app client, Capacitor wrap and native theme — PENDING
+
+> **Stacks on AH-099, which is itself PENDING.** Deploy them in order (AH-099 first), or together as
+> one entry; either way AH-099's obligations apply unchanged.
+
+- **Status:** PENDING
+- **Range:** `d1ab5820` → _the AH-100 feat commit, filled at push._
+- **AH entries carried:** AH-100.
+- **Migrations run:** **none.** Zero `apps/api` diff.
+- **Pre-deploy reads:** none of its own. AH-099's reads still apply if they are deployed together.
+- **Snapshot ID:** not required — no migration, no data change.
+- **Infra:**
+  - **`apps/main` SPA rebuild only.** The web renders byte-identically: the bearer transport and
+    native shell are dead code for a browser.
+  - No PHP-FPM reload of its own, no worker restart, no env change, no scheduler change.
+  - **The creator app is not deployed by this entry.** It builds locally (review §9). A
+    production app build (`build:native` with the uncommitted `.env.native-production`) is
+    pointless until AH-099's token door exists on production.
+- **One-shot commands:** none.
+- **Post-deploy verification (to be filled):**
+  1. `/up` → 200.
+  2. Web creator sign-in, dashboard and availability page look and behave as before. A cookie
+     session is in use, and no `Authorization` header is sent.
+  3. `personal_access_tokens` `count(*)` is unchanged by web traffic.
+- **Flags armed:** none — the web has no new behaviour to arm.
+- **Operator:** _to be filled._
+- **Anything unexpected:** _to be filled._
+
+---
+
 ## AH-099 — Creator app token auth, backend — PENDING
 
 > **Standalone entry.** Production was current through AH-098 (`9b7d6deb`) before this. The

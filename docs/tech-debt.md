@@ -2794,3 +2794,58 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
   5. **`last_used_at` is a write per bearer request.** Sanctum's guard stamps it (kept on purpose — the future device list needs it). A polling client therefore causes one `UPDATE personal_access_tokens` per request. **Triggered by** DB write-load attributable to it, or the app polling faster than ~1/min per user. **Resolution:** add `'last_used_at' => false` to `config/sanctum.php` (the key is not published today; `IdentityServiceProvider` reads `config('sanctum.last_used_at', true)`, so adding it is a one-line switch), or throttle the stamp (e.g. only when older than 5 minutes).
 - **Owner:** identity (1, 3, 4, 5); the device/push chunk (2).
 - **Status:** open (by design). Surfaced + deliberately deferred at AH-099, 2026-10-06 ([ad-hoc log](reviews/adhoc-changes-log.md)).
+
+---
+
+## AH-100 (Creator app client) — pre-existing English / wrong-language values in `auth.json` and `availability.json`
+
+- **Where:** `apps/main/src/core/i18n/locales/*/auth.json` and `*/availability.json`.
+- **What we found (2026-10-06, while adding AH-100's keys):** several locales carry English values
+  under translated keys (for example fi `"Edellinen month"`). `hr` and `sl` contain Czech text, and
+  `bg` mixes languages. AH-100's own new keys are real MT ×24, checked non-English in every non-`en`
+  locale. The older values were **not** touched: fixing them is a separate translation pass, and
+  mixing it into this chunk's diff would hide the new keys.
+- **Triggered by:** the next i18n sweep, or any creator-facing change to these two files.
+- **Resolution:** run the AH-100 non-English check across every existing key in both files, then
+  re-translate the hits (the flaky 10 first). About half a day with review.
+- **Owner:** frontend / i18n.
+- **Status:** open. Surfaced at AH-100, 2026-10-06 ([review](reviews/creator-app-client-shell-review.md)).
+
+---
+
+## AH-100 (Creator app client) — native theme follow-ups: subtle-fill alphas, tertiary contrast, no light theme
+
+- **Where:** [`packages/design-tokens/src/native.ts`](../packages/design-tokens/src/native.ts) and `native.css`.
+- **What we accepted (2026-10-06):**
+  1. **The `status-*-subtle` fills use a uniform 16% alpha.** The Figma export drops opacity, so the
+     value is an approximation chosen at build time, not one taken per node. **Triggered by** AH-100b's per-frame
+     design-context passes. **Resolution:** take the exact alphas from the node data and update
+     the TS and CSS together (the lockstep spec pins them).
+  2. **`text/tertiary` `#6e6e76` meets AA-Large only:** 3.9:1 on the canvas, 3.4:1 on the surface
+     and 3.1:1 on the raised surface. Figma's value is kept as designed. **Triggered by** any
+     tertiary text used for body-size content. **Resolution:** keep it to large or non-essential
+     text, or raise it in Figma first.
+  3. **The app is dark-only (Q6).** The theme toggle is hidden on native, and no light native
+     palette exists. **Triggered by** a design for a light app theme. **Resolution:** a
+     `nativeLight` palette, plus deciding whether the toggle returns on native.
+- **Owner:** frontend / design.
+- **Status:** open (by design). Surfaced at AH-100, 2026-10-06 ([review](reviews/creator-app-client-shell-review.md)).
+
+---
+
+## AH-100 (Creator app client) — app build toolchain and placeholder assets
+
+- **Where:** `apps/main/ios/`, `apps/main/android/`.
+- **What we accepted (2026-10-06):**
+  1. **Android needs JDK 21.** The Capacitor 8 template's Gradle 8.14.3 fails on JDK 25 ("Unsupported
+     class file major version 69"), and both the system JDK and Android Studio's bundled JBR on the
+     dev Mac are 25. Workaround (review §9): set Android Studio's Gradle JDK to 21, or
+     `brew install openjdk@21`. **Triggered by** a Capacitor/Gradle release that supports JDK 25.
+     **Resolution:** bump Gradle in `android/gradle/wrapper` and drop the note.
+  2. **Icons and splash are Capacitor's placeholders,** and the Android splash is white (a flash on a
+     dark app). **Triggered by** AH-105 (store assets). **Resolution:** real icon set plus a dark
+     splash for both platforms.
+  3. **The Android shell is verified as a build only.** The x86_64 emulator did not finish booting on
+     the dev host, so the first Android visual check is Pedram's walkthrough.
+- **Owner:** mobile.
+- **Status:** open. Surfaced at AH-100, 2026-10-06 ([review](reviews/creator-app-client-shell-review.md)).

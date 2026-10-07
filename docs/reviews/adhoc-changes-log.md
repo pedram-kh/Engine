@@ -59,9 +59,10 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID  | Title                                    | Status  | Notes                                                                |
-| --- | ---------------------------------------- | ------- | -------------------------------------------------------------------- |
-| —   | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass." |
+| ID      | Title                                    | Status   | Notes                                                                              |
+| ------- | ---------------------------------------- | -------- | ---------------------------------------------------------------------------------- |
+| —       | Campaign Drafts tab — independent review | Pending  | Merged in code; review file reads "pending independent review pass."               |
+| AH-100b | Creator app — designed-page Figma passes | Proposed | Split from AH-100 (Q4): frames 02–06c and 09–14, plus the remaining bottom sheets. |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -69,6 +70,52 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-100 · Creator app client, Capacitor wrap and native theme (Creator App arc, chunk 2 of 7)
+
+- **Status:** Landed. Full chunk loop (kickoff D1–D7 + the Figma addendum → plan-pause Q1–Q12 →
+  build S1–S7 → review). S8 (the designed-page Figma passes and the remaining bottom sheets) is split
+  off as **AH-100b**. Full review: [`creator-app-client-shell-review.md`](creator-app-client-shell-review.md).
+- **Date:** 2026-10-06.
+- **Why:** AH-099 built the token door with no caller. This chunk is the caller: the main SPA wrapped
+  as the Catalyst creator app, signing in by bearer token, with the Figma design system as its theme.
+- **What:**
+  - `@catalyst/api-client` gains an opt-in bearer mode (no CSRF preflight, no cookie read,
+    `withCredentials: false`) and `AuthApi.tokenLogin()`.
+  - `apps/main` gets one platform probe (`isNativePlatform()`), a secure-storage token store, a native
+    401 policy, a native sign-in branch (2FA, wrong-door, suspension), and a native token layer
+    (Vuetify `dark` slot swapped plus `native.css`, loaded only on native).
+  - Both layouts switch on platform, not width: bottom tabs and More menu, and a native onboarding
+    header. Availability gets a compact grid plus an agenda list, and its dialog becomes a bottom sheet.
+  - A Capacitor 8.5.2 project (`com.catalystgrowth.platform`, iOS + Android) lives inside `apps/main`.
+- **Touched:** `packages/api-client`, `packages/design-tokens` (new `native` export), and `apps/main`
+  (core/api, core/auth, core/platform, auth, onboarding, creators layouts and availability, Vuetify
+  plugin, i18n ×24, Capacitor config, `ios/`, `android/`). Also root `.gitignore` / `.prettierignore`.
+  **Zero `apps/api` / `apps/admin` diff. No migration.**
+- **Decisions:**
+  - Q1 Capacitor 8 after the toolchain upgrade.
+  - Q2 `@aparajita/capacitor-secure-storage` 8.0.1, pinned exactly (single-maintainer supply-chain
+    note in the review).
+  - Q3 compact grid + agenda. Q4 S8 → AH-100b. Q5 swap the `dark` theme's values on native, hide
+    the toggle. Q6 dark-only. Q7 new keys (app wrong-door, More "Settings" → notification
+    preferences, subtitles), real MT ×24. Q8 no sign-up link in the app. Q9 `appId`
+    `com.catalystgrowth.platform`, name "Catalyst". Q10 `.env.native-production` supplied by Pedram,
+    gitignored. Q11 MDI icons. Q12 drop the bare `localhost` from the **local**
+    `SANCTUM_STATEFUL_DOMAINS` only.
+- **Evidence:**
+  - 40 break-reverts, all red and restored byte-identical.
+  - Web CSS diff against `d1ab5820`: 0 rules removed, 74 added, all native-gated or `VBottomSheet`'s
+    own. The web _renders_ byte-identically; its JS bundle does not, by design.
+  - Frontend board green (main 1848/1848).
+  - Playwright: main 33/33, admin 2/2. The local flakes are the known pre-existing pair, reproduced on
+    `d1ab5820`.
+  - iOS simulator smoke on the native path. Android verified as a build only (the emulator did not
+    boot on this host).
+- **Deploy obligation:** web is an `apps/main` SPA rebuild only (nothing renders differently). The
+  **app does not deploy** — it builds locally per the review's §9 walkthrough. A production app build
+  waits on AH-099's PENDING deploy. See [`deploy-log.md`](../runbooks/deploy-log.md).
+- **Ref:** [`creator-app-client-shell-review.md`](creator-app-client-shell-review.md);
+  `tech-debt.md` ("AH-100 …").
 
 ### AH-099 · Creator app token auth, backend (Creator App arc, chunk 1 of 7)
 
