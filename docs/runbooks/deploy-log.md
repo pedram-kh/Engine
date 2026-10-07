@@ -60,7 +60,7 @@ happened.
 > one entry; either way AH-099's obligations apply unchanged.
 
 - **Status:** PENDING
-- **Range:** `d1ab5820` → _the AH-100 feat commit, filled at push._
+- **Range:** `d1ab5820` → `75ce384d` (the AH-100 feat commit; everything above it is docs-only).
 - **AH entries carried:** AH-100.
 - **Migrations run:** **none.** Zero `apps/api` diff.
 - **Pre-deploy reads:** none of its own. AH-099's reads still apply if they are deployed together.

@@ -119,8 +119,11 @@ discipline in §7.
 **Last updated:** 2026-10-06 · **Through:** AH-100, the Creator App arc's chunk 2 of 7 — the app
 client, the Capacitor wrap and the native theme (`apps/main`, `packages/api-client`,
 `packages/design-tokens`; zero `apps/api` / `apps/admin` diff; **no migration**). **Review closed —
-approved (2026-10-07), and pushed on Pedram's clearance** as a feat + docs pair on `d1ab5820`. The
-CI run at the tip is cited in the review header by the follow-up docs-only commit. Live push state
+approved (2026-10-07), and pushed on Pedram's clearance:** the feat commit `75ce384d` plus the
+docs commit `cf69f97b` on top of `d1ab5820`. **CI green at that tip, all four jobs** —
+[run `37561535504`](https://github.com/pedram-kh/Engine/actions/runs/37561535504) (the known
+pre-existing flake pair, one retry each; detail in the review's header). One docs-only provenance
+commit follows it. Live push state
 is `origin/main`, not this sentence — re-derive it with
 `git rev-list --left-right --count origin/main...HEAD`.
 

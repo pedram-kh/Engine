@@ -12,6 +12,22 @@
 - **Scope:** built S1–S7 as cleared. S8 (the designed-page Figma passes and the remaining bottom
   sheets) is split off as **AH-100b** (Q4).
 - **Provenance:** closed 2026-10-07 on Pedram's verdict; pushed the same day on his clearance.
+- **Commits:** the feat + docs pair, pushed together as `d1ab5820..cf69f97b`: `75ce384d` (feat) ·
+  `cf69f97b` (docs — this review, the AH-100 log entry, the deploy-log PENDING entry, the
+  tech-debt entries, the Part 2 refresh). A third, docs-only provenance commit (the one that wrote
+  this paragraph) follows them.
+- **CI at the pushed tip (§5.41):** **green — all four jobs** (Backend Pint+Larastan+Pest,
+  Frontend lint+typecheck+unit, E2E main SPA Playwright, E2E admin SPA Playwright) —
+  [run `37561535504`](https://github.com/pedram-kh/Engine/actions/runs/37561535504) at `cf69f97b`,
+  after `git rev-list --left-right --count origin/main...HEAD` → `0 0` (`origin/main` and `HEAD`
+  both `cf69f97ba800b046d01b5654c45b318daefe3023`).
+  - **Two CI-level flaky retries, both the known pre-existing pair.** Main:
+    `creator-wizard-happy-path.spec.ts` (32 passed + 1 flaky); admin: `admin-sign-in.spec.ts`, the
+    TOTP sign-in spec (1 passed + 1 flaky). Each failed its first attempt and passed on its single
+    retry, the same shape as the pre-AH-099 baseline run
+    ([run `37393941985`](https://github.com/pedram-kh/Engine/actions/runs/37393941985)) cited in the
+    AH-099 review, and the same pair this chunk's local runs reproduced on `d1ab5820` (§8). No other
+    spec flaked or failed, so nothing needed diagnosing.
 - **Date:** 2026-10-06
 - **Entry:** AH-100.
 - **Built from:** the kickoff's D1–D7 and the D4 Figma addendum, the plan-pause rulings Q1–Q12,
@@ -241,7 +257,9 @@ single maintainer, pinned exactly. It hard-depends on `@capacitor/app` 8.1.2, `@
     already retries as a known flake.
   - An earlier 32-red main run was **my harness, not the product**: the agent's shell still exported
     the CSS-diff build's placeholder `VITE_API_BASE_URL`, which Playwright's dev server inherited.
-- **CI at the pushed tip (§5.41):** _to be filled after the push._
+- **CI at the pushed tip (§5.41):** green, all four jobs —
+  [run `37561535504`](https://github.com/pedram-kh/Engine/actions/runs/37561535504) at `cf69f97b`
+  (the known flake pair retried once each; see the header).
 
 ---
 

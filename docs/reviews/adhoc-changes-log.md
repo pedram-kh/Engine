@@ -114,8 +114,8 @@ reviews, and conversations.
 - **Deploy obligation:** web is an `apps/main` SPA rebuild only (nothing renders differently). The
   **app does not deploy** — it builds locally per the review's §9 walkthrough. A production app build
   waits on AH-099's PENDING deploy. See [`deploy-log.md`](../runbooks/deploy-log.md).
-- **Ref:** [`creator-app-client-shell-review.md`](creator-app-client-shell-review.md);
-  `tech-debt.md` ("AH-100 …").
+- **Ref:** [`creator-app-client-shell-review.md`](creator-app-client-shell-review.md); feat commit
+  `75ce384d`; `tech-debt.md` ("AH-100 …").
 
 ### AH-099 · Creator app token auth, backend (Creator App arc, chunk 1 of 7)
 
