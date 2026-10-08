@@ -503,3 +503,5 @@ onMounted(() => {
   opacity: 1;
 }
 </style>
+
+<style scoped src="./creatorNative.css"></style>

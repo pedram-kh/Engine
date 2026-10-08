@@ -16,6 +16,7 @@ const tokenStore = vi.hoisted(() => ({
   read: vi.fn<() => Promise<string | null>>(),
   write: vi.fn<(token: string, expiresAt: string | null) => Promise<void>>(),
   clear: vi.fn<() => Promise<void>>(),
+  hasLapsed: vi.fn<() => boolean>(),
 }))
 
 vi.mock('@/core/platform/isNativePlatform', () => ({
@@ -86,6 +87,7 @@ beforeEach(() => {
   tokenStore.read.mockReset().mockResolvedValue(null)
   tokenStore.write.mockReset().mockResolvedValue(undefined)
   tokenStore.clear.mockReset().mockResolvedValue(undefined)
+  tokenStore.hasLapsed.mockReset().mockReturnValue(false)
 })
 
 describe('native login', () => {
@@ -216,6 +218,137 @@ describe('native bootstrap', () => {
     expect(tokenStore.clear).toHaveBeenCalledTimes(1)
     expect(store.user).toBeNull()
     expect(store.bootstrapStatus).toBe('ready')
+  })
+})
+
+describe('sessionLapsed (AH-100b D3 — the one-shot lapse flag)', () => {
+  it('cold start whose token EXPIRED while the app was closed raises the flag', async () => {
+    tokenStore.read.mockResolvedValue(null)
+    tokenStore.hasLapsed.mockReturnValue(true)
+    const store = useAuthStore()
+
+    await store.bootstrap()
+
+    expect(store.sessionLapsed).toBe(true)
+    expect(store.user).toBeNull()
+    expect(mocked.me).not.toHaveBeenCalled()
+  })
+
+  it('cold start whose token was refused by /me (revoked or suspended) raises the flag', async () => {
+    tokenStore.read.mockResolvedValue('tok-dead')
+    mocked.me.mockRejectedValue(envelopeError(401, 'auth.unauthenticated'))
+    const store = useAuthStore()
+
+    await store.bootstrap()
+
+    expect(store.sessionLapsed).toBe(true)
+    expect(store.user).toBeNull()
+  })
+
+  it('cold start that never had a token (fresh install, or after a deliberate logout) stays quiet', async () => {
+    tokenStore.read.mockResolvedValue(null)
+    tokenStore.hasLapsed.mockReturnValue(false)
+    const store = useAuthStore()
+
+    await store.bootstrap()
+
+    expect(store.sessionLapsed).toBe(false)
+  })
+
+  it('a token store that cannot report a lapse (no hasLapsed) reads as "no lapse"', async () => {
+    tokenStore.read.mockResolvedValue(null)
+    const mutable = tokenStore as { hasLapsed?: unknown }
+    const original = mutable.hasLapsed
+    mutable.hasLapsed = undefined
+    try {
+      const store = useAuthStore()
+      await store.bootstrap()
+      expect(store.sessionLapsed).toBe(false)
+    } finally {
+      mutable.hasLapsed = original
+    }
+  })
+
+  it('a live token resolved from /me leaves the flag down', async () => {
+    tokenStore.read.mockResolvedValue('tok-1')
+    mocked.me.mockResolvedValue(makeUser())
+    const store = useAuthStore()
+
+    await store.bootstrap()
+
+    expect(store.sessionLapsed).toBe(false)
+  })
+
+  it('login() clears it', async () => {
+    tokenStore.read.mockResolvedValue(null)
+    tokenStore.hasLapsed.mockReturnValue(true)
+    mocked.tokenLogin.mockResolvedValue({ user: makeUser(), token: 't', expiresAt: null })
+    const store = useAuthStore()
+    await store.bootstrap()
+    expect(store.sessionLapsed).toBe(true)
+
+    await store.login('a@b.c', 'pw')
+
+    expect(store.sessionLapsed).toBe(false)
+  })
+
+  it('logout() clears it', async () => {
+    tokenStore.read.mockResolvedValue(null)
+    tokenStore.hasLapsed.mockReturnValue(true)
+    mocked.logout.mockResolvedValue(undefined)
+    const store = useAuthStore()
+    await store.bootstrap()
+    expect(store.sessionLapsed).toBe(true)
+
+    await store.logout()
+
+    expect(store.sessionLapsed).toBe(false)
+  })
+
+  it('fresh logout, then a cold start over the same real token store, leaves the flag down', async () => {
+    const { createTokenStore } =
+      await vi.importActual<typeof import('@/core/auth/tokenStore')>('@/core/auth/tokenStore')
+    let persisted: { token: string; expiresAt: string | null } | null = {
+      token: 'tok-1',
+      expiresAt: '2099-01-01T00:00:00Z',
+    }
+    const backend = {
+      get: async () => persisted,
+      set: async (v: { token: string; expiresAt: string | null }) => {
+        persisted = v
+      },
+      remove: async () => {
+        persisted = null
+      },
+    }
+    const useReal = (real: ReturnType<typeof createTokenStore>) => {
+      tokenStore.read.mockImplementation(() => real.read())
+      tokenStore.clear.mockImplementation(() => real.clear())
+      tokenStore.hasLapsed.mockImplementation(() => real.hasLapsed?.() === true)
+    }
+    mocked.logout.mockResolvedValue(undefined)
+
+    useReal(createTokenStore(backend))
+    const session = useAuthStore()
+    session.setUser(makeUser())
+    await session.logout()
+
+    setActivePinia(createPinia())
+    useReal(createTokenStore(backend))
+    const coldStart = useAuthStore()
+    await coldStart.bootstrap()
+
+    expect(coldStart.sessionLapsed).toBe(false)
+  })
+
+  it('on web the flag is never raised', async () => {
+    platform.native = false
+    mocked.me.mockRejectedValue(envelopeError(401, 'auth.unauthenticated'))
+    const store = useAuthStore()
+
+    await store.bootstrap()
+
+    expect(store.sessionLapsed).toBe(false)
   })
 })
 

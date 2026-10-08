@@ -24,6 +24,7 @@ import CreatorGuideCta from '@/modules/auth/components/CreatorGuideCta.vue'
 import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import { buildLocaleOptions } from './localeOptions'
+import { showsMarketingTail } from './marketingTail'
 
 const { t, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
@@ -34,6 +35,7 @@ const localeOptions = buildLocaleOptions()
 // a second route name — it gets the identical hero/card/aurora treatment,
 // never a stripped-down layout.
 const isHero = computed(() => route.name === 'auth.sign-in' || route.name === 'auth.agency-sign-in')
+const showTail = computed(() => showsMarketingTail(isHero.value))
 </script>
 
 <template>
@@ -71,9 +73,9 @@ const isHero = computed(() => route.name === 'auth.sign-in' || route.name === 'a
           </v-card>
         </div>
 
-        <BrandLogoWall v-if="isHero" class="auth-layout__wall" />
-        <CreatorGuideCta v-if="isHero" class="auth-layout__guide" />
-        <AuthMarketingFooter v-if="isHero" class="auth-layout__footer" />
+        <BrandLogoWall v-if="showTail" class="auth-layout__wall" />
+        <CreatorGuideCta v-if="showTail" class="auth-layout__guide" />
+        <AuthMarketingFooter v-if="showTail" class="auth-layout__footer" />
       </div>
     </v-main>
   </v-app>

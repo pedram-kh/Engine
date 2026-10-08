@@ -1,0 +1,249 @@
+/*
+ * AH-100b — the creator pages in the Capacitor app (Figma frames 09, 10, 11,
+ * 13, 14, and the token-derived set for pages Figma does not draw).
+ *
+ * Bound ONLY through `.creator-main--native`, a class the creator layout
+ * renders when it runs inside the app, so nothing here can reach the web
+ * creator shell. The pages' own markup is restyled from the outside (`:deep`);
+ * their structure, copy and test ids are untouched. Colours, radii and type
+ * are `--native-*` tokens only.
+ */
+
+/* Page title + sentence (Display + Body/Default), shared by every page. */
+.creator-main--native :deep(section > header > h1) {
+  margin: 0;
+  font: var(--native-type-display);
+  letter-spacing: 0;
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(section > header > p) {
+  margin: 4px 0 0;
+  font: var(--native-type-body);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+.creator-main--native :deep(.creator-profile__header) {
+  padding-bottom: 0;
+  border: 0;
+  border-image: none;
+}
+
+/* Section cards (Edit profile, frame 13). */
+.creator-main--native :deep(.creator-profile) {
+  gap: 20px;
+  max-width: none;
+}
+
+.creator-main--native :deep(.creator-profile__section) {
+  gap: 16px;
+  padding: 20px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+.creator-main--native :deep(.creator-profile__section-heading) {
+  margin: 0;
+  font: var(--native-type-h4);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.creator-profile__account-hint) {
+  margin: -8px 0 0;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+.creator-main--native :deep(.creator-profile__account-grid) {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.creator-main--native :deep(.creator-profile__account-label) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+/* The profile form already sits inside a section card; its own cards flatten. */
+.creator-main--native :deep(.creator-profile__section .native-card) {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.creator-main--native :deep(.creator-profile__actions .v-btn) {
+  width: 100%;
+  min-height: 44px;
+}
+
+/* Notifications (frame 09): the feed is one card of rounded rows. */
+.creator-main--native :deep([data-test='notifications-page']) {
+  max-width: none;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.creator-main--native :deep(.notification-center--page > .d-flex) {
+  padding: 0 0 16px;
+}
+
+.creator-main--native :deep(.notification-center--page > .d-flex > span) {
+  font: var(--native-type-display);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.notification-center--page > .v-divider) {
+  display: none;
+}
+
+.creator-main--native :deep([data-test='notification-mark-all']) {
+  color: var(--native-text-secondary);
+}
+
+.creator-main--native :deep([data-test='notification-list']) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+.creator-main--native :deep([data-test='notification-list'] .v-list-item) {
+  padding: 12px;
+  border-radius: var(--native-radius-lg);
+}
+
+.creator-main--native :deep([data-test='notification-list'] .notification-row--unread) {
+  background: var(--native-accent-primary-subtle);
+}
+
+.creator-main--native :deep([data-test='notification-body']) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep([data-test='notification-detail']),
+.creator-main--native :deep([data-test='notification-round']) {
+  font: var(--native-type-caption);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+/* Campaign invitations (frame 10): each invitation is a stacked card. */
+.creator-main--native :deep(.creator-assignments),
+.creator-main--native :deep(.creator-jobs) {
+  gap: 20px;
+}
+
+.creator-main--native :deep(.assignments),
+.creator-main--native :deep(.jobs) {
+  gap: 16px;
+}
+
+.creator-main--native :deep(.assignment),
+.creator-main--native :deep(.job) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+.creator-main--native :deep(.assignment__name),
+.creator-main--native :deep(.job__name) {
+  font: var(--native-type-h4);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.assignment__meta),
+.creator-main--native :deep(.job__brand),
+.creator-main--native :deep(.job__meta) {
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+/* Accept leads at full width; View and Decline share the row beneath it. */
+.creator-main--native :deep(.assignment__actions) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.creator-main--native :deep(.assignment__actions .v-btn) {
+  flex: 1 1 0;
+  min-height: 36px;
+}
+
+.creator-main--native :deep([data-testid^='creator-assignment-accept-']) {
+  flex: 1 0 100%;
+  order: -1;
+  min-height: 44px;
+  font: var(--native-type-button-primary);
+}
+
+/* Empty states (frames 11 and 14): a ringed icon, a title, a sentence. */
+.creator-main--native :deep(.c-empty-state) {
+  gap: 8px;
+  padding: 24px 0;
+}
+
+.creator-main--native :deep(.c-empty-state__icon) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 0 4px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep(.c-empty-state__icon .v-icon) {
+  --v-icon-size-multiplier: 1;
+
+  font-size: 24px;
+  color: var(--native-text-secondary);
+}
+
+.creator-main--native :deep(.c-empty-state__title) {
+  margin: 0;
+  font: var(--native-type-h4);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.c-empty-state__body),
+.creator-main--native :deep(.rel-inbox__empty-text) {
+  margin: 0;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+}
+
+.creator-main--native :deep(.c-empty-state__action) {
+  margin-top: 6px;
+}
+
+.creator-main--native :deep(.rel-inbox__empty) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.creator-main--native :deep(.rel-inbox__empty .v-btn) {
+  min-height: 36px;
+  color: var(--native-text-on-accent);
+  background: var(--native-accent-primary);
+}

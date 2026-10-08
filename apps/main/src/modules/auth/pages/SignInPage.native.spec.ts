@@ -45,6 +45,7 @@ vi.mock('@/modules/auth/api/auth.api', () => ({
 }))
 
 import { authApi } from '@/modules/auth/api/auth.api'
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 
 const CREATOR = {
   type: 'user' as const,
@@ -158,6 +159,50 @@ describe('SignInPage — creator app (native)', () => {
     })
   })
 
+  describe('session-expired banner (AH-100b D3)', () => {
+    it('shows it for the 401 policy (?reason=session_expired)', async () => {
+      const h = await mountAuthPage(SignInPage, {
+        initialRoute: { path: '/sign-in', query: { reason: 'session_expired' } },
+      })
+      teardown = h.unmount
+
+      expect(h.wrapper.find('[data-test="session-expired-banner"]').exists()).toBe(true)
+    })
+
+    it('shows it for a lapsed cold start (the bootstrap raised the lapse flag)', async () => {
+      const h = await mountAuthPage(SignInPage, {
+        beforeMount: ({ pinia }) => {
+          useAuthStore(pinia).sessionLapsed = true
+        },
+      })
+      teardown = h.unmount
+
+      expect(h.wrapper.find('[data-test="session-expired-banner"]').exists()).toBe(true)
+    })
+
+    it('does NOT show it on a plain landing — a deliberate logout, a fresh install, a cold start after logout', async () => {
+      const h = await mountAuthPage(SignInPage)
+      teardown = h.unmount
+
+      expect(h.wrapper.find('[data-test="session-expired-banner"]').exists()).toBe(false)
+    })
+
+    it('the banner goes once the lapse flag is cleared (login or logout clears it)', async () => {
+      const h = await mountAuthPage(SignInPage, {
+        beforeMount: ({ pinia }) => {
+          useAuthStore(pinia).sessionLapsed = true
+        },
+      })
+      teardown = h.unmount
+      expect(h.wrapper.find('[data-test="session-expired-banner"]').exists()).toBe(true)
+
+      useAuthStore().sessionLapsed = false
+      await flushPromises()
+
+      expect(h.wrapper.find('[data-test="session-expired-banner"]').exists()).toBe(false)
+    })
+  })
+
   it('on auth.wrong_spa renders the app wrong-door message with the web address', async () => {
     vi.mocked(authApi.tokenLogin).mockRejectedValue(wrongSpa())
     const h = await mountAuthPage(SignInPage)
@@ -216,6 +261,17 @@ describe('SignInPage — web polarity of the native branches', () => {
   afterEach(() => {
     teardown?.()
     teardown = null
+  })
+
+  it('a raised lapse flag paints no banner on web — only ?reason=session_expired does', async () => {
+    const h = await mountAuthPage(SignInPage, {
+      beforeMount: ({ pinia }) => {
+        useAuthStore(pinia).sessionLapsed = true
+      },
+    })
+    teardown = h.unmount
+
+    expect(h.wrapper.find('[data-test="session-expired-banner"]').exists()).toBe(false)
   })
 
   it('loads the Meta Pixel and keeps the sign-up link, with no native pointer', async () => {

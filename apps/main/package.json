@@ -10,6 +10,8 @@
     "build:native:dev": "vue-tsc --noEmit && vite build --mode native-development",
     "build:native": "vue-tsc --noEmit && vite build --mode native-production",
     "cap": "cap",
+    "assets:sources": "node scripts/app-icon-sources.mjs",
+    "assets:generate": "pnpm assets:sources && capacitor-assets generate --ios --android --assetPath assets --iconBackgroundColor '#0b0b0c' --iconBackgroundColorDark '#0b0b0c' --splashBackgroundColor '#0b0b0c' --splashBackgroundColorDark '#0b0b0c' && node scripts/app-icon-android-fixup.mjs",
     "preview": "vite preview --port 5173",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -40,6 +42,7 @@
     "vuetify": "^3.7.6"
   },
   "devDependencies": {
+    "@capacitor/assets": "3.0.5",
     "@capacitor/cli": "8.5.2",
     "@playwright/test": "^1.49.1",
     "@types/dompurify": "^3.2.0",
@@ -56,6 +59,7 @@
     "eslint-plugin-vue": "^9.32.0",
     "jsdom": "^25.0.1",
     "prettier": "^3.4.2",
+    "sharp": "0.32.6",
     "typescript": "~5.6.3",
     "vite": "^6.0.7",
     "vite-plugin-vuetify": "^2.0.4",

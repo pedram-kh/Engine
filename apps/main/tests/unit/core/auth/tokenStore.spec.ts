@@ -102,6 +102,67 @@ describe('createTokenStore', () => {
   })
 })
 
+describe('createTokenStore — hasLapsed (AH-100b D3)', () => {
+  it('is false before anything is read, and when no token was ever stored', async () => {
+    const { backend } = memoryBackend()
+    const store = createTokenStore(backend, now)
+
+    expect(store.hasLapsed?.()).toBe(false)
+    await store.read()
+    expect(store.hasLapsed?.()).toBe(false)
+  })
+
+  it('is true once an EXPIRED token has been discarded by read()', async () => {
+    const { backend } = memoryBackend({ token: 'tok-1', expiresAt: '2026-10-06T11:59:59Z' })
+    const store = createTokenStore(backend, now)
+
+    await expect(store.read()).resolves.toBeNull()
+
+    expect(store.hasLapsed?.()).toBe(true)
+  })
+
+  it('stays false while a live token is read', async () => {
+    const { backend } = memoryBackend({ token: 'tok-1', expiresAt: '2027-01-01T00:00:00Z' })
+    const store = createTokenStore(backend, now)
+
+    await store.read()
+
+    expect(store.hasLapsed?.()).toBe(false)
+  })
+
+  it('an explicit clear() (logout) resets it, so a deliberate sign-out is never a lapse', async () => {
+    const { backend } = memoryBackend({ token: 'tok-1', expiresAt: '2026-10-06T11:59:59Z' })
+    const store = createTokenStore(backend, now)
+    await store.read()
+
+    await store.clear()
+
+    expect(store.hasLapsed?.()).toBe(false)
+  })
+
+  it('a fresh write() resets it', async () => {
+    const { backend } = memoryBackend({ token: 'tok-1', expiresAt: '2026-10-06T11:59:59Z' })
+    const store = createTokenStore(backend, now)
+    await store.read()
+
+    await store.write('tok-2', null)
+
+    expect(store.hasLapsed?.()).toBe(false)
+  })
+
+  it('a deliberate logout then a COLD START (a new store over the same backend) is not a lapse', async () => {
+    const { backend } = memoryBackend({ token: 'tok-1', expiresAt: '2027-01-01T00:00:00Z' })
+    const session = createTokenStore(backend, now)
+    await session.read()
+    await session.clear()
+
+    const coldStart = createTokenStore(backend, now)
+    await expect(coldStart.read()).resolves.toBeNull()
+
+    expect(coldStart.hasLapsed?.()).toBe(false)
+  })
+})
+
 describe('isStoredToken', () => {
   it.each([
     [{ token: 't', expiresAt: null }, true],

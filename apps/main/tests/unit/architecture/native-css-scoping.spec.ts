@@ -18,7 +18,8 @@ function selectors(css: string): string[] {
   const out: string[] = []
   for (const match of withoutComments.matchAll(/([^{}]+)\{[^{}]*\}/g)) {
     for (const selector of (match[1] as string).split(',')) {
-      out.push(selector.trim())
+      // Collapse whitespace: Prettier wraps long selectors across lines.
+      out.push(selector.trim().replace(/\s+/g, ' '))
     }
   }
   return out

@@ -1,0 +1,379 @@
+/*
+ * AH-100b — the wizard body in the creator app (Figma frames 02–06c).
+ *
+ * Bound ONLY through `.onboarding-native__body`, a class the layout renders
+ * when it runs inside the Capacitor app, so nothing here can reach the web
+ * wizard. It restyles the steps' existing markup from the outside (`:deep`)
+ * rather than editing every step: each step is `section > header(h2 + p)`
+ * followed by its own groups, and the groups that Figma draws as cards are
+ * the fieldsets and the named step sections below. Colours, radii and type
+ * are `--native-*` tokens only.
+ */
+
+/* The page title and its sentence (Display + Body/Default). */
+.onboarding-native__body :deep(section > header > h2) {
+  margin: 0;
+  font: var(--native-type-display);
+  letter-spacing: 0;
+  color: var(--native-text-primary);
+}
+
+.onboarding-native__body :deep(section > header > p) {
+  margin: 4px 0 0;
+  font: var(--native-type-body);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+.onboarding-native__body :deep(section[data-testid^='step-']) {
+  max-width: none;
+  gap: 20px;
+}
+
+/* Cards: the grouped field sets and the Connections step's two panels. */
+.onboarding-native__body :deep(fieldset),
+.onboarding-native__body :deep(.profile-basics-form__preview),
+.onboarding-native__body :deep(.social-accounts),
+.onboarding-native__body :deep(.portfolio-step) {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 20px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+/* A card's children stack at 16px. */
+.onboarding-native__body :deep(fieldset > :not(legend) + *),
+.onboarding-native__body :deep(.social-accounts > * + *),
+.onboarding-native__body :deep(.portfolio-step > * + *) {
+  margin-top: 16px;
+}
+
+/* Fieldset legends become the card's Heading/H4 line, not a border notch. */
+.onboarding-native__body :deep(fieldset > legend) {
+  float: left;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  font: var(--native-type-h4);
+  color: var(--native-text-primary);
+}
+
+.onboarding-native__body :deep(fieldset > legend + *) {
+  clear: both;
+  margin-top: 4px;
+}
+
+/* …and the one-line explanation under a card heading is Body/Small. */
+.onboarding-native__body :deep(fieldset > legend + p),
+.onboarding-native__body :deep(.social-accounts__header p),
+.onboarding-native__body :deep(.portfolio-step__header p),
+.onboarding-native__body :deep(.social-accounts__hint) {
+  margin: 4px 0 0;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+.onboarding-native__body :deep(.social-accounts__header h3),
+.onboarding-native__body :deep(.portfolio-step__header h3),
+.onboarding-native__body :deep(.portfolio-step__gallery h4),
+.onboarding-native__body :deep(.profile-basics-form__preview h3) {
+  margin: 0;
+  font: var(--native-type-h4);
+  color: var(--native-text-primary);
+}
+
+/* The summary list under the form duplicates the tiles' own view mode. */
+.onboarding-native__body :deep(.social-accounts__connected) {
+  display: none;
+}
+
+/* Page actions: Figma's Button/Lg — 44px, the full width. */
+.onboarding-native__body :deep(.profile-basics__actions),
+.onboarding-native__body :deep(.connections-step__actions),
+.onboarding-native__body :deep(.kyc-step__actions),
+.onboarding-native__body :deep(.payout-step__actions),
+.onboarding-native__body :deep(.review-step__actions),
+.onboarding-native__body :deep(.contract-step__actions) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-top: 0;
+}
+
+.onboarding-native__body :deep(.profile-basics__actions .v-btn),
+.onboarding-native__body :deep(.connections-step__actions .v-btn),
+.onboarding-native__body :deep(.kyc-step__actions .v-btn),
+.onboarding-native__body :deep(.payout-step__actions .v-btn),
+.onboarding-native__body :deep(.review-step__actions .v-btn),
+.onboarding-native__body :deep(.contract-step__actions .v-btn),
+.onboarding-native__body :deep(.click-through-accept > .v-btn),
+.onboarding-native__body :deep(.contract-step__body > .v-btn) {
+  --v-btn-height: 44px;
+  width: 100%;
+}
+
+/* The disabled primary is the same button at 40% (Figma frame 05). */
+.onboarding-native__body :deep(.v-btn--disabled.bg-primary) {
+  opacity: 0.4;
+}
+
+/* The "complete the step" hint under the action is Caption/Default tertiary. */
+.onboarding-native__body :deep(.profile-basics__requirements) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+/* Platform tiles (frames 04/05): canvas tile, mint-tinted once connected. */
+.onboarding-native__body :deep(.social-card) {
+  gap: 12px;
+  padding: 16px;
+  background: var(--native-bg-canvas);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-xl);
+}
+
+.onboarding-native__body :deep(.social-card:has(.social-card__handle)) {
+  background: var(--native-accent-primary-subtle);
+  border-color: var(--native-accent-primary);
+}
+
+.onboarding-native__body :deep(.social-card__platform) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.onboarding-native__body :deep(.social-card__handle) {
+  font: var(--native-type-caption);
+  color: var(--native-text-secondary);
+}
+
+/* The portfolio's own sub-heading and the agreement's terms panel. */
+.onboarding-native__body :deep(.portfolio-step__gallery) {
+  padding-top: 16px;
+  border-top: 1px solid var(--native-border-default);
+}
+
+/* The dropzone (frames 04/05): canvas panel, 1.5px dashed outline, mint icon disc. */
+.onboarding-native__body :deep(.portfolio-upload-grid__dropzone) {
+  gap: 8px;
+  padding: 24px;
+  background: var(--native-bg-canvas);
+  border: 1.5px dashed var(--native-border-strong);
+  border-radius: var(--native-radius-xl);
+}
+
+.onboarding-native__body :deep(.portfolio-upload-grid__dropzone .v-icon) {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  border-radius: var(--native-radius-full);
+  background: var(--native-accent-primary-subtle);
+  color: var(--native-accent-primary);
+}
+
+.onboarding-native__body :deep(.portfolio-upload-grid__primary) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.onboarding-native__body :deep(.portfolio-upload-grid__hint) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.onboarding-native__body :deep(.portfolio-upload-grid__slots) {
+  font: var(--native-type-caption-strong);
+  color: var(--native-accent-primary);
+}
+
+.onboarding-native__body :deep(.portfolio-upload-grid__link-prompt) {
+  font: var(--native-type-caption-strong);
+  color: var(--native-text-secondary);
+}
+
+/* "Add link": the URL field full width, then title + button on one row. */
+.onboarding-native__body :deep(.portfolio-upload-grid__link-fields) {
+  flex-wrap: nowrap;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* The portfolio: two-up tiles, 152×190 thumbs with a 10px radius (frame 04). */
+.onboarding-native__body :deep(.portfolio-gallery) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 12px;
+}
+
+.onboarding-native__body :deep(.portfolio-gallery__thumb-wrap) {
+  aspect-ratio: 152 / 190;
+  border-radius: var(--native-radius-xl);
+  background: var(--native-bg-surface-raised);
+}
+
+.onboarding-native__body :deep(.portfolio-gallery__remove) {
+  width: 26px;
+  height: 26px;
+  background: var(--native-bg-canvas);
+  border-radius: var(--native-radius-full);
+  color: var(--native-text-primary);
+}
+
+.onboarding-native__body :deep(.portfolio-gallery__title) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+/* Master agreement (frame 06): the terms read in a canvas panel, 340px tall. */
+.onboarding-native__body :deep(.click-through-accept) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+.onboarding-native__body :deep(.click-through-accept__subtitle),
+.onboarding-native__body :deep(.click-through-accept__help) {
+  margin: 0;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+}
+
+.onboarding-native__body :deep(.master-agreement-terms__scroll) {
+  max-height: 340px;
+  padding: 16px;
+  background: var(--native-bg-canvas);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-lg);
+  font: var(--native-type-body-small);
+  line-height: 19px;
+  color: var(--native-text-secondary);
+}
+
+.onboarding-native__body :deep(.master-agreement-terms__scroll h1),
+.onboarding-native__body :deep(.master-agreement-terms__scroll h2),
+.onboarding-native__body :deep(.master-agreement-terms__scroll h3),
+.onboarding-native__body :deep(.master-agreement-terms__scroll h4) {
+  font: var(--native-type-h4);
+  color: var(--native-text-primary);
+}
+
+.onboarding-native__body :deep(.master-agreement-terms__scroll strong) {
+  font: var(--native-type-body-strong);
+}
+
+.onboarding-native__body :deep(.master-agreement-terms__version) {
+  margin: 0;
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+/* Review and submit (frame 06c): the ready banner, the steps card, ghost Edit. */
+.onboarding-native__body :deep(.review-step__two-signal) {
+  margin: 0;
+  padding: 16px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  background: var(--native-status-success-subtle);
+  border: 1px solid var(--native-status-success);
+  border-radius: var(--native-radius-xl);
+}
+
+.onboarding-native__body :deep(.review-step__rows) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  margin: 0;
+  list-style: none;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+.onboarding-native__body :deep(.review-step__row) {
+  gap: 12px;
+  padding: 12px;
+  border: 0;
+  border-radius: var(--native-radius-lg);
+}
+
+.onboarding-native__body :deep(.review-step__row + .review-step__row) {
+  border-top: 1px solid var(--native-border-default);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.onboarding-native__body :deep(.review-step__row-name) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.onboarding-native__body :deep(.review-step__row-number),
+.onboarding-native__body :deep(.review-step__row-status) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.onboarding-native__body :deep(.review-step__rows .v-btn--variant-text) {
+  color: var(--native-text-secondary);
+}
+
+.onboarding-native__body :deep(.review-step__blocker) {
+  padding: 16px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  background: var(--native-status-warning-subtle);
+  border: 1px solid var(--native-status-warning);
+  border-radius: var(--native-radius-xl);
+}
+
+.onboarding-native__body :deep(.review-step__error) {
+  font: var(--native-type-body-small);
+  color: var(--native-status-danger);
+}
+
+/* Master agreement (frame 06b): one card, a canvas well that scrolls. */
+.onboarding-native__body :deep(.click-through-accept) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+.onboarding-native__body :deep(.click-through-accept__subtitle) {
+  margin: 0;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+}
+
+.onboarding-native__body :deep(.master-agreement-terms__scroll) {
+  max-height: 320px;
+  padding: 16px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  background: var(--native-bg-canvas);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-lg);
+}
+
+.onboarding-native__body :deep(.master-agreement-terms__version),
+.onboarding-native__body :deep(.click-through-accept__help) {
+  margin: 0;
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.onboarding-native__body :deep(.click-through-accept > .v-btn) {
+  width: 100%;
+  min-height: 44px;
+}

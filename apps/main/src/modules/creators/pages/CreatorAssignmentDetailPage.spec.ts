@@ -14,6 +14,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
 
+const platform = vi.hoisted(() => ({ native: false }))
+vi.mock('@/core/platform/isNativePlatform', () => ({
+  isNativePlatform: () => platform.native,
+}))
+
 vi.mock('../assignments.api', () => ({
   creatorAssignmentsApi: {
     show: vi.fn(),
@@ -161,6 +166,7 @@ let teardown: (() => void) | null = null
 afterEach(() => {
   teardown?.()
   teardown = null
+  platform.native = false
 })
 
 beforeEach(() => {
@@ -978,5 +984,36 @@ describe('CreatorAssignmentDetailPage — draft rounds', () => {
     const round = wrapper.find('[data-testid="assignment-draft-version-1"]').text()
     expect(round).toContain('Draft 1 — submitted')
     expect(round).not.toContain('awaiting review')
+  })
+})
+
+describe('CreatorAssignmentDetailPage — link dialog container (AH-100b)', () => {
+  /** The link dialog teleports to <body>; the testid lands on the overlay root. */
+  async function openLinkDialog() {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('producing') })
+    const { wrapper } = await mountDetail()
+    await wrapper.find('[data-testid="assignment-draft-attach-link"]').trigger('click')
+    await flushPromises()
+    return document.body.querySelector('[data-testid="assignment-draft-link-dialog"]')
+  }
+
+  it('native: the link form opens in a bottom sheet, same fields', async () => {
+    platform.native = true
+    const dialog = await openLinkDialog()
+
+    expect(dialog).not.toBeNull()
+    expect(dialog?.classList.contains('v-bottom-sheet')).toBe(true)
+    expect(dialog?.querySelector('[data-testid="assignment-draft-link-url"]')).not.toBeNull()
+    expect(dialog?.querySelector('[data-testid="assignment-draft-link-name"]')).not.toBeNull()
+    expect(dialog?.querySelector('[data-testid="assignment-draft-link-add"]')).not.toBeNull()
+  })
+
+  it('web: the centred dialog, no bottom sheet', async () => {
+    const dialog = await openLinkDialog()
+
+    expect(dialog).not.toBeNull()
+    expect(dialog?.classList.contains('v-dialog')).toBe(true)
+    expect(dialog?.classList.contains('v-bottom-sheet')).toBe(false)
+    expect(dialog?.querySelector('[data-testid="assignment-draft-link-add"]')).not.toBeNull()
   })
 })

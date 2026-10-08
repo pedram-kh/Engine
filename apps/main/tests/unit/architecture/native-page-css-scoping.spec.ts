@@ -1,0 +1,53 @@
+/**
+ * AH-100b — the creator app's per-area stylesheets are bound to a class that
+ * only renders inside the Capacitor app, so they cannot restyle the web.
+ *
+ * Each entry names a stylesheet and the root class every one of its
+ * selectors must start with (the stylesheet is `scoped`, so the compiled
+ * selector is `.root[data-v-…] <descendant>`). Colours must come from the
+ * `--native-*` tokens, never a literal.
+ */
+
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+
+import { describe, expect, it } from 'vitest'
+
+const SRC = path.resolve(__dirname, '../../../src')
+
+const SHEETS: { file: string; root: string }[] = [
+  { file: 'modules/onboarding/layouts/onboardingNative.css', root: '.onboarding-native__body' },
+  { file: 'modules/creators/layouts/creatorNative.css', root: '.creator-main--native' },
+]
+
+function selectors(css: string): string[] {
+  const withoutComments = css.replace(/\/\*[\s\S]*?\*\//g, '')
+  const out: string[] = []
+  for (const match of withoutComments.matchAll(/([^{}]+)\{[^{}]*\}/g)) {
+    for (const selector of (match[1] as string).split(',')) {
+      out.push(selector.trim().replace(/\s+/g, ' '))
+    }
+  }
+  return out
+}
+
+describe.each(SHEETS)('$file', ({ file, root }) => {
+  const css = readFileSync(path.join(SRC, file), 'utf8')
+
+  it('has rules to check', () => {
+    expect(selectors(css).length).toBeGreaterThan(0)
+  })
+
+  it(`roots every selector at ${root}`, () => {
+    const stray = selectors(css).filter((selector) => !selector.startsWith(`${root} `))
+    expect(stray).toEqual([])
+  })
+
+  it('contains no at-rules (a bare @media would escape the root)', () => {
+    expect(css.replace(/\/\*[\s\S]*?\*\//g, '')).not.toMatch(/@[a-z-]+/)
+  })
+
+  it('uses no literal colours', () => {
+    expect(css.replace(/\/\*[\s\S]*?\*\//g, '')).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i)
+  })
+})

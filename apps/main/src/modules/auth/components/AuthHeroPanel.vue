@@ -8,14 +8,22 @@
 
 import { useI18n } from 'vue-i18n'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
+
 const { t } = useI18n()
+// AH-100b D2: in the creator app the hero is the headline alone — the body is
+// the web sign-up pitch (the app carries no sign-up funnel) and the footnote
+// points at the case-study grid, which the app does not render.
+const isNative = isNativePlatform()
 </script>
 
 <template>
   <div class="auth-hero" data-test="auth-hero">
     <p class="auth-hero__headline">{{ t('auth.ui.hero.headline') }}</p>
-    <p class="auth-hero__body">{{ t('auth.ui.hero.body') }}</p>
-    <p class="auth-hero__body auth-hero__body--last">{{ t('auth.ui.hero.footnote') }}</p>
+    <template v-if="!isNative">
+      <p class="auth-hero__body">{{ t('auth.ui.hero.body') }}</p>
+      <p class="auth-hero__body auth-hero__body--last">{{ t('auth.ui.hero.footnote') }}</p>
+    </template>
   </div>
 </template>
 

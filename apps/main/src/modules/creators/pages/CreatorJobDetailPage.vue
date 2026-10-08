@@ -46,6 +46,10 @@ import {
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
+import { VBottomSheet } from 'vuetify/components/VBottomSheet'
+import { VDialog } from 'vuetify/components/VDialog'
+
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import { creatorJobsApi } from '../jobs.api'
 import CreatorAttachmentsBlock from '../components/CreatorAttachmentsBlock.vue'
@@ -53,6 +57,7 @@ import RichBrief from '@/components/RichBrief.vue'
 
 const { t } = useI18n()
 const route = useRoute()
+const isNative = isNativePlatform()
 
 const NOTE_MAX_LENGTH = 1000
 
@@ -410,7 +415,12 @@ onMounted(() => {
       </v-card-actions>
     </v-card>
 
-    <v-dialog v-model="dialogOpen" max-width="520" data-testid="creator-job-apply-dialog">
+    <component
+      :is="isNative ? VBottomSheet : VDialog"
+      v-model="dialogOpen"
+      max-width="520"
+      data-testid="creator-job-apply-dialog"
+    >
       <v-card>
         <v-card-title>{{ t('creator.ui.jobs.applyDialog.title') }}</v-card-title>
         <v-card-text>
@@ -442,7 +452,7 @@ onMounted(() => {
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </component>
 
     <v-snackbar
       :model-value="snackbar !== null"

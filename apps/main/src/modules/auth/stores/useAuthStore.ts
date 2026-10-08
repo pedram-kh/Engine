@@ -72,6 +72,14 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const bootstrapStatus = ref<BootstrapStatus>('idle')
   const mfaEnrollmentRequired = ref(false)
+  /**
+   * AH-100b D3 — creator app only. Set by the cold-start bootstrap when the
+   * stored token turned out to be dead (past its expiry, or refused by
+   * `/me`), so the sign-in screen can say why the user is signed out. Never
+   * set on web, never set by a deliberate sign-out; `login()` and
+   * `logout()` both clear it.
+   */
+  const sessionLapsed = ref(false)
 
   const isLoggingIn = ref(false)
   const isLoggingOut = ref(false)
@@ -179,10 +187,14 @@ export const useAuthStore = defineStore('auth', () => {
       try {
         // AH-100 — the creator app with no stored token is anonymous;
         // there is nothing to ask `/me` about.
-        if (isNativePlatform() && (await nativeTokenStore().read()) === null) {
-          user.value = null
-          bootstrapStatus.value = 'ready'
-          return
+        if (isNativePlatform()) {
+          const tokens = nativeTokenStore()
+          if ((await tokens.read()) === null) {
+            user.value = null
+            sessionLapsed.value = tokens.hasLapsed?.() === true
+            bootstrapStatus.value = 'ready'
+            return
+          }
         }
         const me = await authApi.me()
         // Use setUser() so the agency store is initialized from the membership
@@ -195,6 +207,7 @@ export const useAuthStore = defineStore('auth', () => {
           // Cold-load anonymous session — normal, not an error. In the
           // creator app it means the stored token is dead: drop it.
           if (isNativePlatform()) {
+            sessionLapsed.value = true
             await nativeTokenStore()
               .clear()
               .catch(() => undefined)
@@ -237,6 +250,7 @@ export const useAuthStore = defineStore('auth', () => {
    * path can reach the cookie endpoint.
    */
   async function login(email: string, password: string, totpCode?: string): Promise<void> {
+    sessionLapsed.value = false
     if (isNativePlatform()) {
       return loginWithToken(email, password, totpCode)
     }
@@ -299,6 +313,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout(): Promise<void> {
+    sessionLapsed.value = false
     isLoggingOut.value = true
     try {
       if (isNativePlatform()) {
@@ -487,6 +502,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     bootstrapStatus,
     mfaEnrollmentRequired,
+    sessionLapsed,
     isLoggingIn,
     isLoggingOut,
     isSigningUp,

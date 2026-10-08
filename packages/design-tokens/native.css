@@ -84,3 +84,142 @@
 .catalyst-native .v-application {
   font: var(--native-type-body);
 }
+
+/*
+ * AH-100b — the Figma component language (frames 02–14). Vuetify widgets
+ * only: every rule here restyles a generic Vuetify class so the Figma look
+ * reaches every screen without a per-page edit. Page structure (cards around
+ * field groups, headings, action rows) lives with the page that owns it.
+ */
+
+/* Cards are flat, bordered surfaces — never elevated (frames 02–14). */
+.catalyst-native .v-card--variant-elevated,
+.catalyst-native .v-card--variant-flat {
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+  box-shadow: none;
+}
+
+.catalyst-native .v-card-title {
+  font: var(--native-type-h4);
+  letter-spacing: 0;
+}
+
+/* Inputs: canvas fill, strong 1px outline, 8px radius, 46px tall. The label
+   still floats inside the field (Vuetify) — Figma draws it above; see the
+   deviations list in the AH-100b review. */
+.catalyst-native .v-field {
+  --v-field-border-radius: var(--native-radius-lg);
+}
+
+.catalyst-native .v-field--variant-outlined {
+  background: var(--native-bg-canvas);
+}
+
+.catalyst-native .v-input--density-compact {
+  --v-input-control-height: 46px;
+}
+
+.catalyst-native
+  .v-field--variant-outlined:not(.v-field--focused):not(.v-field--error)
+  .v-field__outline {
+  --v-field-border-opacity: 1;
+  color: var(--native-border-strong);
+}
+
+.catalyst-native .v-field__input,
+.catalyst-native .v-field .v-field-label {
+  font: var(--native-type-body);
+}
+
+.catalyst-native .v-messages {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.catalyst-native .v-counter {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+/* Choice chips: surface pill, accent-subtle + accent border when selected. */
+.catalyst-native .v-chip--variant-outlined {
+  background: var(--native-bg-surface);
+  border-color: var(--native-border-default);
+  color: var(--native-text-secondary);
+  font: var(--native-type-body-small);
+}
+
+.catalyst-native .v-chip--variant-outlined.v-chip--selected {
+  background: var(--native-accent-primary-subtle);
+  border-color: var(--native-accent-primary);
+  color: var(--native-accent-primary);
+}
+
+.catalyst-native .v-chip--variant-outlined .v-chip__underlay,
+.catalyst-native .v-chip--variant-outlined .v-chip__overlay {
+  display: none;
+}
+
+/* Checkbox: 20px, 4px radius, mint fill when checked. */
+.catalyst-native .v-selection-control .v-icon {
+  font-size: 20px;
+}
+
+.catalyst-native .v-checkbox .v-label,
+.catalyst-native .v-selection-control .v-label {
+  font: var(--native-type-body);
+  opacity: 1;
+  color: var(--native-text-primary);
+}
+
+/* Buttons: Figma's Button/Default 500 and Button/Primary 600. */
+.catalyst-native .v-btn {
+  font: var(--native-type-button);
+  letter-spacing: 0;
+}
+
+.catalyst-native .v-btn.bg-primary {
+  font: var(--native-type-button-primary);
+  color: var(--native-text-on-accent);
+}
+
+/* Tonal buttons are Figma's "Soft": accent-subtle fill, mint label. */
+.catalyst-native .v-btn--variant-tonal {
+  background: var(--native-accent-primary-subtle);
+  color: var(--native-accent-primary);
+}
+
+.catalyst-native .v-btn--variant-tonal .v-btn__underlay {
+  background: transparent;
+}
+
+/* Outlined buttons are Figma's "Secondary": surface fill, strong border. */
+.catalyst-native .v-btn--variant-outlined:not([class*='text-']) {
+  background: var(--native-bg-surface);
+  border-color: var(--native-border-strong);
+  color: var(--native-text-primary);
+}
+
+/* Alerts read as Figma's tinted banners (info / success / warning / danger). */
+.catalyst-native .v-alert--variant-tonal {
+  border-radius: var(--native-radius-xl);
+}
+
+.catalyst-native .v-alert--variant-tonal.text-info,
+.catalyst-native .v-alert--variant-tonal.v-alert--color-info {
+  background: var(--native-status-info-subtle);
+  border: 1px solid var(--native-status-info);
+}
+
+/* A run of fields grouped by `NativeCard` (the web renders no wrapper). */
+.catalyst-native .native-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  padding: 20px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}

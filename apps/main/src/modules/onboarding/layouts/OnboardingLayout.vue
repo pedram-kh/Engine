@@ -467,3 +467,5 @@ async function saveAndExit(): Promise<void> {
   }
 }
 </style>
+
+<style scoped src="./onboardingNative.css"></style>

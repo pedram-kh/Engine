@@ -12,7 +12,7 @@
 
 import { ApiError } from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { createVuetify } from 'vuetify'
@@ -20,6 +20,11 @@ import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
 
 import enCreator from '@/core/i18n/locales/en/creator.json'
+
+const platform = vi.hoisted(() => ({ native: false }))
+vi.mock('@/core/platform/isNativePlatform', () => ({
+  isNativePlatform: () => platform.native,
+}))
 
 vi.mock('../jobs.api', () => ({
   creatorJobsApi: {
@@ -85,6 +90,13 @@ const VDialogStub = {
   template: '<div class="vdialog-stub"><slot /></div>',
 }
 
+/** The native container (AH-100b): same slot-through stub, its own name. */
+const VBottomSheetStub = {
+  name: 'VBottomSheet',
+  props: ['modelValue'],
+  template: '<div class="vbottomsheet-stub"><slot /></div>',
+}
+
 /** VSnackbar teleports to the body, so its copy is read from there. */
 function snackbarText(): string {
   return document.body.querySelector('[data-testid="creator-job-snackbar"]')?.textContent ?? ''
@@ -124,7 +136,7 @@ async function mountPage() {
         i18n,
         createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives }),
       ],
-      stubs: { VDialog: VDialogStub },
+      stubs: { VDialog: VDialogStub, VBottomSheet: VBottomSheetStub },
     },
     attachTo: document.createElement('div'),
   })
@@ -562,5 +574,40 @@ describe('CreatorJobDetailPage', () => {
     await flushPromises()
 
     expect(snackbarText()).toContain('no longer available')
+  })
+})
+
+describe('CreatorJobDetailPage — apply container (AH-100b)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    document.body.innerHTML = ''
+    mockApi.show.mockResolvedValue(detail() as never)
+  })
+
+  afterEach(() => {
+    platform.native = false
+  })
+
+  it('native: the apply form opens in a bottom sheet, same fields and buttons', async () => {
+    platform.native = true
+    const wrapper = await mountPage()
+    await wrapper.find('[data-testid="creator-job-apply"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.findComponent({ name: 'VBottomSheet' }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: 'VDialog' }).exists()).toBe(false)
+    expect(wrapper.find('[data-testid="creator-job-apply-note"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="creator-job-apply-cancel"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="creator-job-apply-submit"]').exists()).toBe(true)
+  })
+
+  it('web: the centred dialog, no bottom sheet', async () => {
+    const wrapper = await mountPage()
+    await wrapper.find('[data-testid="creator-job-apply"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.findComponent({ name: 'VDialog' }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: 'VBottomSheet' }).exists()).toBe(false)
+    expect(wrapper.find('[data-testid="creator-job-apply-submit"]').exists()).toBe(true)
   })
 })

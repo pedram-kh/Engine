@@ -113,19 +113,72 @@ export function createUnauthorizedPolicy(deps: UnauthorizedPolicyDeps) {
  * a rejected token itself); `/auth/impersonation/status` is the
  * every-route banner probe that 401s for anonymous visitors by design,
  * exactly as on the web.
+ *
+ * AH-100b D3 — `/auth/logout` joins them: a 401 there means the token is
+ * already gone, i.e. "already signed out", never "your session expired".
+ * (A double-tapped Sign out sends a second revoke that the server refuses.)
  */
 const NATIVE_UNAUTHORIZED_EXEMPT_PATHS: ReadonlyArray<string> = [
   '/me',
   '/auth/token',
   '/auth/impersonation/status',
+  '/auth/logout',
 ]
 
 export function shouldHandleNativeUnauthorized(path: string): boolean {
   return !NATIVE_UNAUTHORIZED_EXEMPT_PATHS.includes(path)
 }
 
+/** What the native policy needs to know about the device's session at the moment a 401 lands. */
+export interface NativeSessionState {
+  /** A deliberate sign-out is in flight. */
+  isLoggingOut: boolean
+  /** The auth store still holds a signed-in user. */
+  hasUser: boolean
+  /** The token store still holds a token. */
+  hasToken: boolean
+}
+
+/**
+ * AH-100b D3 — "your session expired" needs a session to expire. A 401
+ * that lands while the user chose to sign out, or after the device has
+ * already dropped both the user and the token (a late reply to a request
+ * that was in flight at logout, a poll that fires on the way out), is not
+ * an expiry and must not paint the banner. A genuine mid-session 401
+ * arrives while the user and/or token are still held, so it still acts.
+ */
+export function hasLiveNativeSession(state: NativeSessionState): boolean {
+  return !state.isLoggingOut && (state.hasUser || state.hasToken)
+}
+
+/**
+ * Builds the {@link NativeSessionState} reader from its two sources: the
+ * auth store (user + deliberate-logout flag) and the token store. An
+ * unreadable token store reads as "no token", the same rule the token
+ * store itself applies.
+ */
+export function createNativeSessionStateReader(deps: {
+  loadStore: () => Promise<{ isLoggingOut: boolean; user: unknown }>
+  readToken: () => Promise<string | null>
+}): () => Promise<NativeSessionState> {
+  return async () => {
+    const store = await deps.loadStore()
+    const token = await deps.readToken().catch(() => null)
+    return {
+      isLoggingOut: store.isLoggingOut,
+      hasUser: store.user !== null,
+      hasToken: token !== null,
+    }
+  }
+}
+
 export interface NativeUnauthorizedPolicyDeps extends UnauthorizedPolicyDeps {
   clearToken: () => Promise<void>
+  /**
+   * Reads {@link NativeSessionState}. Optional only so the AH-100 policy
+   * specs keep running unchanged; production always supplies it.
+   */
+  getSessionState?: () => Promise<NativeSessionState>
 }
 
 /**
@@ -138,6 +191,9 @@ export interface NativeUnauthorizedPolicyDeps extends UnauthorizedPolicyDeps {
 export function createNativeUnauthorizedPolicy(deps: NativeUnauthorizedPolicyDeps) {
   return async (path: string): Promise<void> => {
     if (!shouldHandleNativeUnauthorized(path)) {
+      return
+    }
+    if (deps.getSessionState !== undefined && !hasLiveNativeSession(await deps.getSessionState())) {
       return
     }
     const [storeMod, routerMod] = await Promise.all([
@@ -154,11 +210,13 @@ export function createNativeUnauthorizedPolicy(deps: NativeUnauthorizedPolicyDep
 }
 
 /* c8 ignore start -- @preserve: production wiring; tests exercise both policy factories with fakes. */
+const loadAuthStore = async () => {
+  const mod = await import('@/modules/auth/stores/useAuthStore')
+  return mod.useAuthStore()
+}
+
 const policyDeps: UnauthorizedPolicyDeps = {
-  getStore: async () => {
-    const mod = await import('@/modules/auth/stores/useAuthStore')
-    return mod.useAuthStore()
-  },
+  getStore: loadAuthStore,
   getRouter: async () => {
     const mod = await import('@/core/router')
     return mod.router
@@ -171,6 +229,10 @@ const productionPolicy = isNative
   ? createNativeUnauthorizedPolicy({
       ...policyDeps,
       clearToken: () => nativeTokenStore().clear(),
+      getSessionState: createNativeSessionStateReader({
+        loadStore: loadAuthStore,
+        readToken: () => nativeTokenStore().read(),
+      }),
     })
   : createUnauthorizedPolicy(policyDeps)
 /* c8 ignore stop */

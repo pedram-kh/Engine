@@ -10,7 +10,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 const createHttpClient = vi.fn()
 const read = vi.fn(async () => 'tok-native')
-const nativeTokenStore = vi.fn(() => ({ read, write: vi.fn(), clear: vi.fn() }))
+const clear = vi.fn(async () => undefined)
+const nativeTokenStore = vi.fn(() => ({ read, write: vi.fn(), clear }))
+const authStore = { isLoggingOut: false, user: null as unknown, clearUser: vi.fn() }
+const routerPush = vi.fn()
 
 async function loadCoreApi(native: boolean): Promise<void> {
   vi.resetModules()
@@ -29,6 +32,8 @@ async function loadCoreApi(native: boolean): Promise<void> {
     nativePlatform: () => (native ? 'ios' : null),
   }))
   vi.doMock('@/core/auth/tokenStore', () => ({ nativeTokenStore }))
+  vi.doMock('@/modules/auth/stores/useAuthStore', () => ({ useAuthStore: () => authStore }))
+  vi.doMock('@/core/router', () => ({ router: { push: routerPush } }))
   await import('@/core/api')
 }
 
@@ -36,6 +41,14 @@ afterEach(() => {
   vi.doUnmock('@catalyst/api-client')
   vi.doUnmock('@/core/platform/isNativePlatform')
   vi.doUnmock('@/core/auth/tokenStore')
+  vi.doUnmock('@/modules/auth/stores/useAuthStore')
+  vi.doUnmock('@/core/router')
+  authStore.isLoggingOut = false
+  authStore.user = null
+  authStore.clearUser.mockClear()
+  routerPush.mockClear()
+  clear.mockClear()
+  read.mockImplementation(async () => 'tok-native')
   createHttpClient.mockClear()
   nativeTokenStore.mockClear()
   read.mockClear()
@@ -60,5 +73,42 @@ describe('core/api transport selection', () => {
     expect(options.auth.mode).toBe('bearer')
     await expect(options.auth.getToken()).resolves.toBe('tok-native')
     expect(read).toHaveBeenCalledTimes(1)
+  })
+
+  // AH-100b D3 — the guard only protects the app if the PRODUCTION policy
+  // is built with it. The policy factories are unit-tested with fakes; this
+  // drives the `onUnauthorized` that `core/api` really hands the HTTP client.
+  describe('native production policy wiring (AH-100b D3)', () => {
+    async function fire(path: string): Promise<void> {
+      const options = createHttpClient.mock.calls[0]?.[0] as {
+        onUnauthorized: (path: string) => void
+      }
+      options.onUnauthorized(path)
+      await new Promise((resolve) => setTimeout(resolve, 20))
+    }
+
+    it('a 401 with no user and no token (a late reply after sign-out) does nothing', async () => {
+      read.mockImplementation(async () => null as never)
+      await loadCoreApi(true)
+
+      await fire('/creators/me/jobs')
+
+      expect(routerPush).not.toHaveBeenCalled()
+      expect(authStore.clearUser).not.toHaveBeenCalled()
+    })
+
+    it('a 401 while the user is held still clears the session and routes to sign-in', async () => {
+      authStore.user = { id: 'u1' }
+      await loadCoreApi(true)
+
+      await fire('/creators/me/jobs')
+
+      expect(clear).toHaveBeenCalledTimes(1)
+      expect(authStore.clearUser).toHaveBeenCalledTimes(1)
+      expect(routerPush).toHaveBeenCalledWith({
+        name: 'auth.sign-in',
+        query: { reason: 'session_expired' },
+      })
+    })
   })
 })

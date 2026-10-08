@@ -47,7 +47,7 @@ const { t, te } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const store = useAuthStore()
-const { isLoggingIn, userType } = storeToRefs(store)
+const { isLoggingIn, userType, sessionLapsed } = storeToRefs(store)
 
 const email = ref('')
 const password = ref('')
@@ -64,9 +64,17 @@ const showTotpField = ref(false)
 const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
 
-const sessionExpired = computed(() => route.query.reason === 'session_expired')
-
 const isNative = isNativePlatform()
+
+/**
+ * The banner is for involuntary termination only. `?reason=session_expired`
+ * comes from the 401 policy; inside the creator app the cold-start
+ * bootstrap adds the lapse flag for a token that died while the app was
+ * closed (AH-100b D3). A deliberate sign-out sets neither.
+ */
+const sessionExpired = computed(
+  () => route.query.reason === 'session_expired' || (isNative && sessionLapsed.value),
+)
 
 /** Where a creator without an account goes (AH-100 Q8: no in-app sign-up in v1). */
 const CREATOR_SIGNUP_SITE = 'platform.catalyst-growth.com'

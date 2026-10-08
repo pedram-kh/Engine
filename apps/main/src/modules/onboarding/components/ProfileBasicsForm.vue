@@ -43,6 +43,8 @@ import {
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import NativeCard from '@/components/NativeCard'
+
 import AvatarUploadDrop from './AvatarUploadDrop.vue'
 import { renderBio } from '../composables/useBioRenderer'
 import { COUNTRY_OPTIONS, labelForCountryCode } from '../data/countries'
@@ -423,108 +425,110 @@ defineExpose({ save, hydrate, isPristine })
 
 <template>
   <div class="profile-basics-form" data-testid="profile-basics-form">
-    <AvatarUploadDrop />
-    <p
-      class="profile-basics-form__avatar-note text-caption"
-      :class="{ 'profile-basics-form__avatar-note--missing': !hasAvatar }"
-      data-testid="profile-avatar-required"
-    >
-      {{ t('creator.ui.wizard.fields.avatar_required') }}
-    </p>
+    <NativeCard>
+      <AvatarUploadDrop />
+      <p
+        class="profile-basics-form__avatar-note text-caption"
+        :class="{ 'profile-basics-form__avatar-note--missing': !hasAvatar }"
+        data-testid="profile-avatar-required"
+      >
+        {{ t('creator.ui.wizard.fields.avatar_required') }}
+      </p>
 
-    <v-text-field
-      v-model="displayName"
-      :label="requiredLabel('creator.ui.wizard.fields.display_name')"
-      :hint="t('creator.ui.wizard.fields.display_name_help')"
-      persistent-hint
-      :counter="60"
-      :rules="[(v: string) => !!v || t('validation.field_required')]"
-      :error-messages="fieldErrors.display_name"
-      data-testid="profile-display-name"
-      required
-    />
+      <v-text-field
+        v-model="displayName"
+        :label="requiredLabel('creator.ui.wizard.fields.display_name')"
+        :hint="t('creator.ui.wizard.fields.display_name_help')"
+        persistent-hint
+        :counter="60"
+        :rules="[(v: string) => !!v || t('validation.field_required')]"
+        :error-messages="fieldErrors.display_name"
+        data-testid="profile-display-name"
+        required
+      />
 
-    <v-textarea
-      v-model="bio"
-      :label="t('creator.ui.wizard.fields.bio')"
-      :hint="`${t('creator.ui.wizard.fields.optional_prefix')} ${t('creator.ui.wizard.fields.bio_help')}`"
-      persistent-hint
-      rows="4"
-      auto-grow
-      :counter="500"
-      :error-messages="fieldErrors.bio"
-      data-testid="profile-bio"
-    />
+      <v-textarea
+        v-model="bio"
+        :label="t('creator.ui.wizard.fields.bio')"
+        :hint="`${t('creator.ui.wizard.fields.optional_prefix')} ${t('creator.ui.wizard.fields.bio_help')}`"
+        persistent-hint
+        rows="4"
+        auto-grow
+        :counter="500"
+        :error-messages="fieldErrors.bio"
+        data-testid="profile-bio"
+      />
 
-    <div
-      v-if="bio.length > 0"
-      class="profile-basics-form__bio-preview"
-      data-testid="profile-bio-preview"
-      v-html="renderedBio"
-    ></div>
+      <div
+        v-if="bio.length > 0"
+        class="profile-basics-form__bio-preview"
+        data-testid="profile-bio-preview"
+        v-html="renderedBio"
+      ></div>
 
-    <!-- Autocomplete (not plain select): the full ISO list is ~250 entries,
+      <!-- Autocomplete (not plain select): the full ISO list is ~250 entries,
          so type-to-filter is the only usable interaction. -->
-    <v-autocomplete
-      v-model="countryCode"
-      :items="COUNTRY_OPTIONS"
-      item-title="label"
-      item-value="code"
-      :label="requiredLabel('creator.ui.wizard.fields.country')"
-      :error-messages="fieldErrors.country_code"
-      data-testid="profile-country"
-    />
+      <v-autocomplete
+        v-model="countryCode"
+        :items="COUNTRY_OPTIONS"
+        item-title="label"
+        item-value="code"
+        :label="requiredLabel('creator.ui.wizard.fields.country')"
+        :error-messages="fieldErrors.country_code"
+        data-testid="profile-country"
+      />
 
-    <v-text-field
-      v-model="region"
-      :label="requiredLabel('creator.ui.wizard.fields.region')"
-      :error-messages="fieldErrors.region"
-      data-testid="profile-region"
-    />
+      <v-text-field
+        v-model="region"
+        :label="requiredLabel('creator.ui.wizard.fields.region')"
+        :error-messages="fieldErrors.region"
+        data-testid="profile-region"
+      />
 
-    <!-- AH-088 — a native date input (`type="date"`), the six-site house
+      <!-- AH-088 — a native date input (`type="date"`), the six-site house
          majority for dates. The VDatePicker precedent was availability-specific
          (a calendar the creator scans for free days); a birthday is typed, and
          the native control's keyboard year entry beats paging a calendar back
          three decades. Required (D6 floor); no lower bound, `max` is today. -->
-    <v-text-field
-      v-model="dateOfBirth"
-      type="date"
-      :label="requiredLabel('creator.ui.wizard.fields.date_of_birth')"
-      :hint="t('creator.ui.wizard.fields.date_of_birth_help')"
-      persistent-hint
-      :max="todayIso"
-      :error-messages="fieldErrors.date_of_birth"
-      data-testid="profile-date-of-birth"
-      required
-    />
+      <v-text-field
+        v-model="dateOfBirth"
+        type="date"
+        :label="requiredLabel('creator.ui.wizard.fields.date_of_birth')"
+        :hint="t('creator.ui.wizard.fields.date_of_birth_help')"
+        persistent-hint
+        :max="todayIso"
+        :error-messages="fieldErrors.date_of_birth"
+        data-testid="profile-date-of-birth"
+        required
+      />
 
-    <!-- The value everyone else will read, shown back to the creator. Free once
+      <!-- The value everyone else will read, shown back to the creator. Free once
          the age rule exists, and it answers "what exactly do brands see?"
          before it becomes a support ticket. -->
-    <p
-      v-if="previewAge !== null"
-      class="profile-basics-form__age-preview text-caption"
-      data-testid="profile-age-preview"
-    >
-      {{ t('creator.ui.wizard.fields.age_preview', { age: previewAge }) }}
-    </p>
+      <p
+        v-if="previewAge !== null"
+        class="profile-basics-form__age-preview text-caption"
+        data-testid="profile-age-preview"
+      >
+        {{ t('creator.ui.wizard.fields.age_preview', { age: previewAge }) }}
+      </p>
 
-    <v-text-field
-      v-model="addressStreet"
-      :label="t('creator.ui.wizard.fields.address_street')"
-      :counter="255"
-      :error-messages="fieldErrors.address_street"
-      data-testid="profile-address-street"
-    />
+      <v-text-field
+        v-model="addressStreet"
+        :label="t('creator.ui.wizard.fields.address_street')"
+        :counter="255"
+        :error-messages="fieldErrors.address_street"
+        data-testid="profile-address-street"
+      />
 
-    <v-text-field
-      v-model="addressPostalCode"
-      :label="t('creator.ui.wizard.fields.address_postal_code')"
-      :counter="20"
-      :error-messages="fieldErrors.address_postal_code"
-      data-testid="profile-address-postal-code"
-    />
+      <v-text-field
+        v-model="addressPostalCode"
+        :label="t('creator.ui.wizard.fields.address_postal_code')"
+        :counter="20"
+        :error-messages="fieldErrors.address_postal_code"
+        data-testid="profile-address-postal-code"
+      />
+    </NativeCard>
 
     <fieldset class="profile-basics-form__contact" data-testid="profile-contact-section">
       <legend class="text-subtitle-2">
@@ -590,25 +594,27 @@ defineExpose({ save, hydrate, isPristine })
     </fieldset>
 
     <!-- Autocomplete: the world language list is ~175 entries. -->
-    <v-autocomplete
-      v-model="primaryLanguage"
-      :items="languageOptions"
-      item-title="label"
-      item-value="value"
-      :label="requiredLabel('creator.ui.wizard.fields.primary_language')"
-      :error-messages="fieldErrors.primary_language"
-      data-testid="profile-primary-language"
-    />
+    <NativeCard>
+      <v-autocomplete
+        v-model="primaryLanguage"
+        :items="languageOptions"
+        item-title="label"
+        item-value="value"
+        :label="requiredLabel('creator.ui.wizard.fields.primary_language')"
+        :error-messages="fieldErrors.primary_language"
+        data-testid="profile-primary-language"
+      />
 
-    <v-text-field
-      v-model="accent"
-      :label="t('creator.ui.wizard.fields.accent')"
-      :hint="t('creator.ui.wizard.fields.accent_help')"
-      persistent-hint
-      :counter="80"
-      :error-messages="fieldErrors.accent"
-      data-testid="profile-accent"
-    />
+      <v-text-field
+        v-model="accent"
+        :label="t('creator.ui.wizard.fields.accent')"
+        :hint="t('creator.ui.wizard.fields.accent_help')"
+        persistent-hint
+        :counter="80"
+        :error-messages="fieldErrors.accent"
+        data-testid="profile-accent"
+      />
+    </NativeCard>
 
     <!-- AH-050 — "Who appears in your content?" Optional multi-select chip
          group (the categories pattern MINUS select-all, D3): empty means

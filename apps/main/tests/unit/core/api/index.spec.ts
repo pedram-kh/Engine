@@ -11,7 +11,9 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import {
+  createNativeSessionStateReader,
   createNativeUnauthorizedPolicy,
+  hasLiveNativeSession,
   createUnauthorizedPolicy,
   shouldHandleNativeUnauthorized,
   shouldHandleUnauthorized,
@@ -134,11 +136,16 @@ describe('createUnauthorizedPolicy', () => {
 })
 
 describe('shouldHandleNativeUnauthorized (AH-100)', () => {
-  it.each(['/me', '/auth/token', '/auth/impersonation/status'])('exempts %s', (path) => {
-    expect(shouldHandleNativeUnauthorized(path)).toBe(false)
-  })
+  // AH-100b D3: `/auth/logout` moved from the handled list to here — a 401 on the
+  // revoke means "already signed out", never "your session expired".
+  it.each(['/me', '/auth/token', '/auth/impersonation/status', '/auth/logout'])(
+    'exempts %s',
+    (path) => {
+      expect(shouldHandleNativeUnauthorized(path)).toBe(false)
+    },
+  )
 
-  it.each(['/auth/logout', '/creators/me', '/creators/me/availability', '/auth/login'])(
+  it.each(['/creators/me', '/creators/me/availability', '/auth/login'])(
     'handles %s as a dead token',
     (path) => {
       expect(shouldHandleNativeUnauthorized(path)).toBe(true)
@@ -175,7 +182,7 @@ describe('createNativeUnauthorizedPolicy (AH-100)', () => {
     })
   })
 
-  it.each(['/auth/token', '/me', '/auth/impersonation/status'])(
+  it.each(['/auth/token', '/me', '/auth/impersonation/status', '/auth/logout'])(
     'touches nothing on the exempt path %s',
     async (path) => {
       const { clearUser, push, clearToken, deps } = makeNativeDeps()
@@ -199,6 +206,81 @@ describe('createNativeUnauthorizedPolicy (AH-100)', () => {
 
     expect(clearUser).toHaveBeenCalledTimes(1)
     expect(push).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('hasLiveNativeSession (AH-100b D3)', () => {
+  it.each([
+    [{ isLoggingOut: false, hasUser: true, hasToken: true }, true],
+    [{ isLoggingOut: false, hasUser: true, hasToken: false }, true],
+    [{ isLoggingOut: false, hasUser: false, hasToken: true }, true],
+    [{ isLoggingOut: false, hasUser: false, hasToken: false }, false],
+    [{ isLoggingOut: true, hasUser: true, hasToken: true }, false],
+    [{ isLoggingOut: true, hasUser: false, hasToken: false }, false],
+  ])('%j → %s', (state, expected) => {
+    expect(hasLiveNativeSession(state)).toBe(expected)
+  })
+})
+
+describe('createNativeUnauthorizedPolicy session gate (AH-100b D3)', () => {
+  function gated(state: { isLoggingOut: boolean; hasUser: boolean; hasToken: boolean }) {
+    const clearUser = vi.fn()
+    const push = vi.fn(() => Promise.resolve())
+    const clearToken = vi.fn(async () => undefined)
+    const policy = createNativeUnauthorizedPolicy({
+      getStore: vi.fn(async () => ({ clearUser })),
+      getRouter: vi.fn(async () => ({ push })),
+      clearToken,
+      getSessionState: vi.fn(async () => state),
+    })
+    return { policy, clearUser, push, clearToken }
+  }
+
+  it('acts when a session is held', async () => {
+    const { policy, push, clearUser, clearToken } = gated({
+      isLoggingOut: false,
+      hasUser: true,
+      hasToken: true,
+    })
+
+    await policy('/creators/me')
+
+    expect(clearToken).toHaveBeenCalledTimes(1)
+    expect(clearUser).toHaveBeenCalledTimes(1)
+    expect(push).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([
+    ['no session at all', { isLoggingOut: false, hasUser: false, hasToken: false }],
+    ['a deliberate sign-out in flight', { isLoggingOut: true, hasUser: true, hasToken: true }],
+  ])('touches nothing with %s', async (_label, state) => {
+    const { policy, push, clearUser, clearToken } = gated(state)
+
+    await policy('/creators/me')
+
+    expect(clearToken).not.toHaveBeenCalled()
+    expect(clearUser).not.toHaveBeenCalled()
+    expect(push).not.toHaveBeenCalled()
+  })
+})
+
+describe('createNativeSessionStateReader (AH-100b D3)', () => {
+  it('reads the logout flag and user from the store and the token from the token store', async () => {
+    const read = createNativeSessionStateReader({
+      loadStore: async () => ({ isLoggingOut: true, user: { id: 'u' } }),
+      readToken: async () => 'tok',
+    })
+    await expect(read()).resolves.toEqual({ isLoggingOut: true, hasUser: true, hasToken: true })
+  })
+
+  it('reads "no user" and "no token" as false, and a throwing token store as no token', async () => {
+    const read = createNativeSessionStateReader({
+      loadStore: async () => ({ isLoggingOut: false, user: null }),
+      readToken: async () => {
+        throw new Error('keychain unavailable')
+      },
+    })
+    await expect(read()).resolves.toEqual({ isLoggingOut: false, hasUser: false, hasToken: false })
   })
 })
 

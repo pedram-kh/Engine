@@ -12,6 +12,14 @@ export interface TokenStore {
   read(): Promise<string | null>
   write(token: string, expiresAt: string | null): Promise<void>
   clear(): Promise<void>
+  /**
+   * AH-100b D3 — true once `read()` has discarded an EXPIRED token in this
+   * app-open, so the cold-start bootstrap can tell "your session lapsed"
+   * from "you never signed in" (both read as `null`). An explicit `clear()`
+   * (logout) or a fresh `write()` resets it. Optional so a decorator that
+   * cannot tell (AH-103's biometric gate delegates it) simply reports nothing.
+   */
+  hasLapsed?(): boolean
 }
 
 export interface StoredToken {
@@ -35,6 +43,7 @@ export interface TokenBackend {
  */
 export function createTokenStore(backend: TokenBackend, now: () => number = Date.now): TokenStore {
   let cached: Promise<StoredToken | null> | null = null
+  let lapsed = false
 
   function load(): Promise<StoredToken | null> {
     cached ??= backend.get().catch(() => null)
@@ -42,6 +51,7 @@ export function createTokenStore(backend: TokenBackend, now: () => number = Date
   }
 
   async function clear(): Promise<void> {
+    lapsed = false
     cached = Promise.resolve(null)
     await backend.remove()
   }
@@ -54,6 +64,7 @@ export function createTokenStore(backend: TokenBackend, now: () => number = Date
       }
       if (stored.expiresAt !== null && Date.parse(stored.expiresAt) <= now()) {
         await clear()
+        lapsed = true
         return null
       }
       return stored.token
@@ -62,8 +73,10 @@ export function createTokenStore(backend: TokenBackend, now: () => number = Date
       const value: StoredToken = { token, expiresAt }
       await backend.set(value)
       cached = Promise.resolve(value)
+      lapsed = false
     },
     clear,
+    hasLapsed: () => lapsed,
   }
 }
 

@@ -39,6 +39,10 @@ import {
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
+import { VBottomSheet } from 'vuetify/components/VBottomSheet'
+import { VDialog } from 'vuetify/components/VDialog'
+
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import { creatorAssignmentsApi } from '../assignments.api'
 import CreatorAttachmentsBlock from '../components/CreatorAttachmentsBlock.vue'
@@ -66,6 +70,7 @@ const PLATFORMS = ['instagram', 'tiktok', 'youtube'] as const
 
 const { t, locale } = useI18n()
 const route = useRoute()
+const isNative = isNativePlatform()
 
 const ulid = computed(() => String(route.params.ulid ?? ''))
 
@@ -801,7 +806,8 @@ onMounted(() => {
           </v-list>
 
           <!-- The chat composer's link dialog, verbatim mechanics. -->
-          <v-dialog
+          <component
+            :is="isNative ? VBottomSheet : VDialog"
             v-model="linkDialogOpen"
             max-width="420"
             data-testid="assignment-draft-link-dialog"
@@ -837,7 +843,7 @@ onMounted(() => {
                 </v-btn>
               </v-card-text>
             </v-card>
-          </v-dialog>
+          </component>
         </v-card-text>
         <v-card-actions>
           <p
