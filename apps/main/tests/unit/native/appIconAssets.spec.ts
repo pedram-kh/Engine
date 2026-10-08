@@ -13,7 +13,7 @@
  *   4. the canvas colour is the native palette's `bg-canvas`, not a copy.
  */
 import { existsSync, readFileSync } from 'node:fs'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdir, mkdtemp, rm } from 'node:fs/promises'
 import path from 'node:path'
 
 import { nativePalette } from '@catalyst/design-tokens/native'
@@ -72,6 +72,8 @@ describe('committed sources', () => {
 
   it('are reproduced pixel-for-pixel by the committed script', async () => {
     await rm(buildDir, { recursive: true, force: true })
+    // `test-results/` is gitignored, so a clean checkout (CI) has no such directory.
+    await mkdir(path.dirname(buildDir), { recursive: true })
     rebuilt = await mkdtemp(`${buildDir}-`)
     const { files } = await buildSources(rebuilt)
     expect(files).toHaveLength(5)
