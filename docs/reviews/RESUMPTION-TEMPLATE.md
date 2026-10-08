@@ -116,7 +116,29 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-10-06 · **Through:** AH-100, the Creator App arc's chunk 2 of 7 — the app
+**Last updated:** 2026-10-08 · **Through:** AH-100b, the Creator App arc's chunk 3 of 8 — the
+Figma-faithful page passes, the walkthrough findings and the real app icon (`apps/main`,
+`packages/design-tokens/native.css`; zero `apps/api` / `apps/admin` diff; **no migration**; **no new
+user-facing string**). **Review closed — approved (2026-10-08); feat commit `6c2b86ec`,
+pushed on Pedram's clearance** (the docs commit and CI run are in the review's header). Live state is `git status` and `origin/main`, not this sentence.
+
+- **What AH-100b is:** the remaining Figma frames as **native-only** CSS (`onboardingNative.css`,
+  `creatorNative.css`, `NativeCard`), two dialogs turned bottom sheets, a sign-in that shows the hero
+  headline, a card and the create-account pointer only, the session-lapse banner on involuntary
+  termination only (`/auth/logout` exempt), and a real icon and dark splash reproducible through
+  `pnpm --filter @catalyst/main assets:generate`. Review:
+  [`creator-app-figma-passes-review.md`](creator-app-figma-passes-review.md); its §3 is the deviation
+  list for Pedram's per-item ruling and its §9 the rebuild steps.
+- **Open:** Pedram's eyes-on (`build:native:dev` → `cap sync` → relaunch both platforms) and the §3
+  rulings. **The CSS has not been looked at in a simulator.** CI at the tip closes it (§5.41).
+- **Deploy:** web is an `apps/main` rebuild only; the app does not deploy. `deploy-log.md` has a
+  PENDING entry stacked on AH-100 and AH-099.
+- **Standing facts to carry:** in-app sign-up is AH-104b, gated on AH-104's deletion. `sharp` is on the
+  pnpm build-script allowlist. After `assets:generate`, `git checkout -- android/app/src/main/AndroidManifest.xml`.
+  Playwright needs `TEST_HELPERS_TOKEN` exported and `PLAYWRIGHT_BROWSERS_PATH=$HOME/Library/Caches/ms-playwright`
+  (the agent sandbox's own cache has no browsers); stop the dev API first.
+
+**Prior state, for the record — AH-100.** **Last updated:** 2026-10-06 · **Through:** AH-100, the Creator App arc's chunk 2 of 7 — the app
 client, the Capacitor wrap and the native theme (`apps/main`, `packages/api-client`,
 `packages/design-tokens`; zero `apps/api` / `apps/admin` diff; **no migration**). **Review closed —
 approved (2026-10-07), and pushed on Pedram's clearance:** the feat commit `75ce384d` plus the

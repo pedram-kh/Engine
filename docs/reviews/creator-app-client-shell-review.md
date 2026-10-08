@@ -141,7 +141,8 @@ handling was written against the controller and `LoginFailureResponder` as they 
 - **No Meta Pixel on native** (App Tracking Transparency; inventory §M3) — S3-BR1 red. Web unchanged.
 - **No sign-up link in the app (Q8).** It is replaced by `auth.ui.native.create_account`, pointing
   creators to `platform.catalyst-growth.com` (S3-BR2 red). In-app account creation stays coupled to
-  AH-104's in-app deletion.
+  AH-104's in-app deletion. **Exit:** in-app sign-up is scheduled as AH-104b, gated on AH-104's
+  deletion (recorded at AH-100b).
 - **i18n:** the two `auth.ui.native.*` keys, plus `availability.creatorNav.settings`,
   `availability.creatorNav.subtitles.*` and `availability.legend.today`, ×24 locales, real MT. A
   script asserted every non-`en` value differs from `en` (no English fallback, including the flaky

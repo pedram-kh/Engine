@@ -2842,10 +2842,41 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
      dev Mac are 25. Workaround (review §9): set Android Studio's Gradle JDK to 21, or
      `brew install openjdk@21`. **Triggered by** a Capacitor/Gradle release that supports JDK 25.
      **Resolution:** bump Gradle in `android/gradle/wrapper` and drop the note.
-  2. **Icons and splash are Capacitor's placeholders,** and the Android splash is white (a flash on a
-     dark app). **Triggered by** AH-105 (store assets). **Resolution:** real icon set plus a dark
-     splash for both platforms.
+  2. ~~**Icons and splash are Capacitor's placeholders,** and the Android splash is white.~~
+     **Closed at AH-100b (2026-10-08):** the real icon and a dark splash ship for both platforms,
+     reproducible through `assets:generate`. Store-listing assets remain AH-105's.
   3. **The Android shell is verified as a build only.** The x86_64 emulator did not finish booting on
      the dev host, so the first Android visual check is Pedram's walkthrough.
 - **Owner:** mobile.
 - **Status:** open. Surfaced at AH-100, 2026-10-06 ([review](reviews/creator-app-client-shell-review.md)).
+
+---
+
+## AH-100b (Creator app Figma passes) — what the passes left open
+
+- **Where:** [`creatorNative.css`](../apps/main/src/modules/creators/layouts/creatorNative.css),
+  [`onboardingNative.css`](../apps/main/src/modules/onboarding/layouts/onboardingNative.css),
+  `apps/main/scripts/app-icon-*.mjs`,
+  [`useIdleTimeout.ts`](../apps/main/src/modules/auth/composables/useIdleTimeout.ts).
+- **What we accepted (2026-10-08):**
+  1. **The frames' copy-bearing and behaviour-bearing parts are not built** (reading-progress bar,
+     All/Unread filter, search fields, "To reach 100%", invitation detail rows and the rest). The
+     complete list is the review's §3. **Triggered by** Pedram's per-item ruling. **Resolution:** each
+     ruled item becomes its own small chunk with its strings ×24 locales (real MT).
+  2. **The `status-*-subtle` alphas are still a uniform 16%** (AH-100's item 1). The frames' React
+     export carries no per-node opacity, so AH-100b could not take the numbers. **Triggered by**
+     reading the alphas from the Figma variables or node fills directly. **Resolution:** as AH-100
+     item 1.
+  3. **No Android 13 themed (monochrome) icon.** Out of scope at Q3. **Resolution:** add a
+     `<monochrome>` layer to the adaptive XML and extend `appIconAssets.spec.ts`.
+  4. **`useIdleTimeout` is dead code in `apps/main`:** only its own spec imports it. **Resolution:**
+     delete it with its spec, or wire it, in a cleanup chunk.
+  5. **Undesigned pages follow the token-derived set,** not a frame: KYC, tax, payout and any state
+     Figma does not draw. **Triggered by** a design for them.
+  6. **The icon tooling brings a second `@capacitor/cli` (5.x)** and `sharp` (on
+     `pnpm.onlyBuiltDependencies`) as dev dependencies. **Triggered by** `@capacitor/assets` moving
+     to the Capacitor 8 line. **Resolution:** drop the second CLI and re-pin.
+  7. **The new native CSS is unlooked-at** until Pedram's eyes-on (float legends, the `:has` tile
+     tint, the 46px field height). **Resolution:** his rebuild.
+- **Owner:** frontend / mobile.
+- **Status:** open. Surfaced at AH-100b, 2026-10-08 ([review](reviews/creator-app-figma-passes-review.md)).

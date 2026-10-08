@@ -59,10 +59,9 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID      | Title                                    | Status   | Notes                                                                              |
-| ------- | ---------------------------------------- | -------- | ---------------------------------------------------------------------------------- |
-| —       | Campaign Drafts tab — independent review | Pending  | Merged in code; review file reads "pending independent review pass."               |
-| AH-100b | Creator app — designed-page Figma passes | Proposed | Split from AH-100 (Q4): frames 02–06c and 09–14, plus the remaining bottom sheets. |
+| ID  | Title                                    | Status  | Notes                                                                |
+| --- | ---------------------------------------- | ------- | -------------------------------------------------------------------- |
+| —   | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass." |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -70,6 +69,38 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-100b · Creator app Figma-faithful page passes, walkthrough findings and the real app icon (Creator App arc, chunk 3 of 8)
+
+- **Status:** Closed — approved (2026-10-08); per-item §3 rulings follow Pedram's eyes-on. Full chunk loop (kickoff D1–D5 →
+  plan-pause Q1–Q5 → build S1–S10). Full review:
+  [`creator-app-figma-passes-review.md`](creator-app-figma-passes-review.md).
+- **Date:** 2026-10-08.
+- **Why:** AH-100 shipped the shell and the theme but only four of the Figma frames. Pedram's
+  walkthrough also found a sign-in that carried the whole marketing page, a session-lapse banner with
+  no rule behind it, and a placeholder icon.
+- **What:**
+  - D1: the remaining frames (02–05, 06, 06b, 06c, 09, 10, 11, 13, 14) as **native-only** CSS, bound by
+    `.onboarding-native__body` and `.creator-main--native`, plus `NativeCard` and two dialogs that
+    become bottom sheets (the job-apply form, the draft-link form).
+  - D2: native sign-in shows the hero headline, a card and the create-account pointer only.
+  - D3: the lapse banner appears only on involuntary termination; `/auth/logout` is exempt from the
+    native 401 policy.
+  - D4: a real icon (the mark, cropped from the lockup, on `#0b0b0c`) and a dark splash, reproducible
+    through `pnpm --filter @catalyst/main assets:generate`.
+- **Touched:** `apps/main` (core/api, core/auth, auth, onboarding, creators layouts and pages,
+  components, scripts, assets, `ios/`, `android/`), `packages/design-tokens/native.css`, root
+  `package.json` and `pnpm-lock.yaml`. **Zero `apps/api` / `apps/admin` diff. No migration. No new
+  user-facing string, so no locale change.**
+- **Decisions:** Q1 sign-in headline only. Q2 one-shot lapse flag. Q3 the cropped mark on `#0b0b0c`;
+  Android 13 themed icon out of scope. Q4 only the two named dialogs become sheets. Q5
+  `@capacitor/assets` pinned exactly, sources committed.
+- **Evidence:** see the review's §7. Web CSS: every added selector is native-gated (two scoping
+  specs); the AH-100 web pin set is green and unedited.
+- **Deploy obligation:** web is an `apps/main` SPA rebuild only, and nothing renders differently in a
+  browser. The **app does not deploy**. See [`deploy-log.md`](../runbooks/deploy-log.md).
+- **Ref:** [`creator-app-figma-passes-review.md`](creator-app-figma-passes-review.md); feat commit
+  `6c2b86ec`; `tech-debt.md` ("AH-100b …", "AH-100 …").
 
 ### AH-100 · Creator app client, Capacitor wrap and native theme (Creator App arc, chunk 2 of 7)
 
@@ -114,6 +145,10 @@ reviews, and conversations.
 - **Deploy obligation:** web is an `apps/main` SPA rebuild only (nothing renders differently). The
   **app does not deploy** — it builds locally per the review's §9 walkthrough. A production app build
   waits on AH-099's PENDING deploy. See [`deploy-log.md`](../runbooks/deploy-log.md).
+- **Walkthrough, discharged (2026-10-08):** Pedram's simulator and device walkthrough is done. iOS
+  7/7. Android: sign-in through the 419-guarded path, the tabs, availability and token persistence.
+  Its findings became AH-100b (sign-in content, the lapse banner, the icon). In-app sign-up is
+  scheduled as **AH-104b**, gated on AH-104's in-app account deletion (the Q8 boundary).
 - **Ref:** [`creator-app-client-shell-review.md`](creator-app-client-shell-review.md); feat commit
   `75ce384d`; `tech-debt.md` ("AH-100 …").
 

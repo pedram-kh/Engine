@@ -54,6 +54,33 @@ happened.
 
 ---
 
+## AH-100b — Creator app Figma-faithful page passes, walkthrough findings and the real app icon — PENDING
+
+> **Stacks on AH-100 and AH-099, both PENDING.** Deploy in order, or together as one entry. Their
+> obligations apply unchanged.
+
+- **Status:** PENDING
+- **Range:** `60de0811` → `6c2b86ec` (the AH-100b feat commit; everything above it is docs-only).
+- **AH entries carried:** AH-100b.
+- **Migrations run:** **none.** Zero `apps/api` diff.
+- **Pre-deploy reads:** none of its own.
+- **Snapshot ID:** not required. No migration, no data change.
+- **Infra:**
+  - **`apps/main` SPA rebuild only.** Every addition is native-gated, so a browser renders what it did
+    before. The JS bundle does change (the icon and bottom-sheet code paths ship, dead on the web).
+  - No PHP-FPM reload, no worker restart, no env change, no scheduler change.
+  - **The creator app is not deployed by this entry.** The icon and splash live in the `ios/` and
+    `android/` projects and reach a device through a local build (review §9).
+- **One-shot commands:** none.
+- **Post-deploy verification (to be filled):**
+  1. `/up` → 200.
+  2. Web creator and sign-in pages look and behave as before.
+- **Flags armed:** none.
+- **Operator:** _to be filled._
+- **Anything unexpected:** _to be filled._
+
+---
+
 ## AH-100 — Creator app client, Capacitor wrap and native theme — PENDING
 
 > **Stacks on AH-099, which is itself PENDING.** Deploy them in order (AH-099 first), or together as
