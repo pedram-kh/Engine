@@ -10,8 +10,26 @@
   zero-new-strings i18n reasoning is verified. The S1 re-run closed the one evidence gap (§7).
   Close condition: CI green at the pushed tip (§5.41), the wizard-spec flake judged against its cited
   baseline; any other red is diagnosed.
-- **Commits:** feat `6c2b86ec` · docs (this review, the log entry, the deploy-log PENDING entry, the
-  tech-debt entry, the Part 2 refresh). CI at the pushed tip is recorded below once it lands.
+- **Commits:** pushed together as `60de0811..bdf279c1`: `6c2b86ec` (feat) · `dff7d59c` (docs — this
+  review, the log entry, the deploy-log PENDING entry, the tech-debt entry, the Part 2 refresh) ·
+  `bdf279c1` (fix — one test, below). A docs-only provenance commit (the one that wrote this
+  paragraph) follows them.
+- **CI at the pushed tip (§5.41):** **green — all four jobs** (Backend Pint+Larastan+Pest, Frontend
+  lint+typecheck+unit, E2E main SPA Playwright, E2E admin SPA Playwright) —
+  [run `37716595878`](https://github.com/pedram-kh/Engine/actions/runs/37716595878) at `bdf279c1`,
+  after `git rev-list --left-right --count origin/main...HEAD` → `0 0`.
+  - **Two CI-level flaky retries, both the known pre-existing pair, same shape as AH-100's run
+    ([`37561535504`](https://github.com/pedram-kh/Engine/actions/runs/37561535504)):** main
+    `creator-wizard-happy-path.spec.ts` (32 passed + 1 flaky); admin `admin-sign-in.spec.ts`, the TOTP
+    sign-in spec (1 passed + 1 flaky). No other spec flaked or failed.
+  - **The first CI run at `dff7d59c` was red, and that one was mine, not a flake.**
+    [Run `37715503817`](https://github.com/pedram-kh/Engine/actions/runs/37715503817): the Frontend job
+    failed on exactly one test, `appIconAssets.spec.ts` "are reproduced pixel-for-pixel by the committed
+    script" (`ENOENT … mkdtemp '…/apps/main/test-results/app-icon-build-…'`). `test-results/` is
+    gitignored, so a clean checkout has no such directory; my local runs always had one. The E2E jobs
+    were skipped as a result, so that run proved nothing about them. Fixed in `bdf279c1` (the spec
+    creates the directory first) and **verified by running the spec with `test-results/` absent**
+    (17/17). Lesson recorded: a spec that writes under a gitignored directory must create it.
 - **Provenance:** kickoff and rulings by Claude, decision-owned by Pedram, built by Cursor,
   independent review closure by Claude.
 - **Chunk:** Creator App arc, chunk 3 of 8. Entry **AH-100b** (split from AH-100 at its Q4).

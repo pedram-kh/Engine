@@ -119,8 +119,11 @@ discipline in §7.
 **Last updated:** 2026-10-08 · **Through:** AH-100b, the Creator App arc's chunk 3 of 8 — the
 Figma-faithful page passes, the walkthrough findings and the real app icon (`apps/main`,
 `packages/design-tokens/native.css`; zero `apps/api` / `apps/admin` diff; **no migration**; **no new
-user-facing string**). **Review closed — approved (2026-10-08); feat commit `6c2b86ec`,
-pushed on Pedram's clearance** (the docs commit and CI run are in the review's header). Live state is `git status` and `origin/main`, not this sentence.
+user-facing string**). **Review closed — approved (2026-10-08); pushed on Pedram's clearance:** the feat commit `6c2b86ec`,
+the docs commit `dff7d59c` and a one-test fix `bdf279c1` on top of `60de0811`. **CI green at that tip, all
+four jobs** — [run `37716595878`](https://github.com/pedram-kh/Engine/actions/runs/37716595878) (the known
+flake pair, one retry each; the first run at `dff7d59c` was red on a clean-checkout bug of mine, detail in
+the review's header). One docs-only provenance commit follows. Live state is `git status` and `origin/main`, not this sentence.
 
 - **What AH-100b is:** the remaining Figma frames as **native-only** CSS (`onboardingNative.css`,
   `creatorNative.css`, `NativeCard`), two dialogs turned bottom sheets, a sign-in that shows the hero
@@ -129,7 +132,7 @@ pushed on Pedram's clearance** (the docs commit and CI run are in the review's h
   `pnpm --filter @catalyst/main assets:generate`. Review:
   [`creator-app-figma-passes-review.md`](creator-app-figma-passes-review.md); its §3 is the deviation
   list for Pedram's per-item ruling and its §9 the rebuild steps.
-- **Open:** Pedram's eyes-on (`build:native:dev` → `cap sync` → relaunch both platforms) and the §3
+- **Next:** Pedram's eyes-on (`build:native:dev` → `cap sync` → relaunch both platforms) and the §3
   rulings. **The CSS has not been looked at in a simulator.** CI at the tip closes it (§5.41).
 - **Deploy:** web is an `apps/main` rebuild only; the app does not deploy. `deploy-log.md` has a
   PENDING entry stacked on AH-100 and AH-099.

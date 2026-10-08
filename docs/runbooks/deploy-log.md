@@ -60,7 +60,7 @@ happened.
 > obligations apply unchanged.
 
 - **Status:** PENDING
-- **Range:** `60de0811` → `6c2b86ec` (the AH-100b feat commit; everything above it is docs-only).
+- **Range:** `60de0811` → `6c2b86ec` (the AH-100b feat commit; `bdf279c1` above it is a one-test fix, everything else docs-only).
 - **AH entries carried:** AH-100b.
 - **Migrations run:** **none.** Zero `apps/api` diff.
 - **Pre-deploy reads:** none of its own.
