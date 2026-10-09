@@ -29,7 +29,7 @@
     (Frontend had passed on attempt 1; both E2E jobs ran on attempt 2). The test is not fixed here
     (it is `apps/api`, outside this chunk's fence); tech-debt carries it with the one-line fix.
   - **The two local load-timeouts (§7) were judged here:** both files, `createRouter` (admin) and
-    `roster/pages/CreatorDetailPage.spec.ts`, passed in CI's Frontend job on both attempts.
+    `roster/pages/CreatorDetailPage.spec.ts`, passed in CI's Frontend job (attempt 1; that job was not re-run, having passed).
   - **Three Playwright flaky retries, all passing on retry:** main `creator-wizard-happy-path.spec.ts`
     (the known pre-existing flake; it traverses a surface this chunk touched, the native-gated
     dropzone copy, which does not render on web) and main `creator-detail.spec.ts:64` ("navigates from
