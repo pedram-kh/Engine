@@ -359,6 +359,20 @@
           "pending": "Du har {count} inbjudan/inbjudningar som väntar på ditt svar.",
           "none": "Inga inbjudningar väntar på ditt svar.",
           "cta": "Visa inbjudningar"
+        },
+        "native": {
+          "welcome": "Välkommen, {name}",
+          "subtitle": "Det här behöver din uppmärksamhet i dag.",
+          "approved_body": "Du kan nu ta emot varumärkessamarbeten. Mer av din creator-dashboard kommer snart.",
+          "strength": {
+            "title": "Profilstyrka",
+            "next": "För att nå 100 % behöver du slutföra det här steget: {step}"
+          },
+          "invitations": {
+            "title": "{count} kampanjinbjudan | {count} kampanjinbjudningar",
+            "waiting": "Väntar på ditt svar",
+            "new": "Ny"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Släpp ett foto här, eller klicka för att välja",
+        "avatar_prompt_native": "Tryck för att välja ett foto",
         "avatar_preview_alt": "Förhandsgranskning av profilfoto",
         "size_hint": "{types} · upp till {max_mb} MB",
         "portfolio_prompt": "Släpp filer här, eller klicka för att välja",
+        "portfolio_prompt_native": "Tryck för att välja filer",
         "portfolio_size_hint": "Bilder upp till {image_mb} MB · videor upp till {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} platser kvar",
         "portfolio_queue_status": "{in_flight} av {total} laddar upp (upp till {concurrency} åt gången).",

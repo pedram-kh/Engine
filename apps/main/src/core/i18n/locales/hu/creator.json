@@ -359,6 +359,20 @@
           "pending": "You have {count} invitation(s) awaiting your response.",
           "none": "Nem invitations awaiting your response.",
           "cta": "Megtekintés invitations"
+        },
+        "native": {
+          "welcome": "Üdvözöljük, {name}",
+          "subtitle": "Ez az, ami ma a figyelmét igényli.",
+          "approved_body": "Mostantól márkákkal való együttműködéseket fogadhat. Alkotói vezérlőpultjának további részei hamarosan érkeznek.",
+          "strength": {
+            "title": "Profil erőssége",
+            "next": "A 100% eléréséhez fejezze be ezt a lépést: {step}"
+          },
+          "invitations": {
+            "title": "{count} kampánymeghívó | {count} kampánymeghívó",
+            "waiting": "Válaszára vár",
+            "new": "Új"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
+        "avatar_prompt_native": "Koppintson egy fotó kiválasztásához",
         "avatar_preview_alt": "Profil photo preview",
         "size_hint": "{types} · up to {max_mb} MB",
         "portfolio_prompt": "Drop files here, or click to choose",
+        "portfolio_prompt_native": "Koppintson a fájlok kiválasztásához",
         "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slots remaining",
         "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",

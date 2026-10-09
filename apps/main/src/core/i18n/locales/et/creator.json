@@ -359,6 +359,20 @@
           "pending": "You have {count} invitation(s) awaiting your response.",
           "none": "Ei invitations awaiting your response.",
           "cta": "Vaata invitations"
+        },
+        "native": {
+          "welcome": "Tere tulemast, {name}",
+          "subtitle": "Siin on see, mis vajab täna sinu tähelepanu.",
+          "approved_body": "Nüüd saad vastu võtta koostöid brändidega. Rohkem sinu loojapaneelist tuleb varsti.",
+          "strength": {
+            "title": "Profiili tugevus",
+            "next": "100% saavutamiseks lõpeta see samm: {step}"
+          },
+          "invitations": {
+            "title": "{count} kampaaniakutse | {count} kampaaniakutset",
+            "waiting": "Ootab sinu vastust",
+            "new": "Uus"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
+        "avatar_prompt_native": "Foto valimiseks puuduta",
         "avatar_preview_alt": "Profiil photo preview",
         "size_hint": "{types} · up to {max_mb} MB",
         "portfolio_prompt": "Drop files here, or click to choose",
+        "portfolio_prompt_native": "Failide valimiseks puuduta",
         "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slots remaining",
         "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",

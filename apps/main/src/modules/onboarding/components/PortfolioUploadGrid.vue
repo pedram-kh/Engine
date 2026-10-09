@@ -21,6 +21,8 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
+
 import {
   PORTFOLIO_CONCURRENCY,
   PORTFOLIO_IMAGE_ALLOWED_MIME_TYPES,
@@ -31,6 +33,10 @@ import {
 } from '../composables/usePortfolioUpload'
 
 const { t } = useI18n()
+// AH-100c — "drop here, or click" is wrong on a touch device: the app says "tap".
+const promptKey = isNativePlatform()
+  ? 'creator.ui.upload.portfolio_prompt_native'
+  : 'creator.ui.upload.portfolio_prompt'
 const { items, enqueue, addLink, remove, inFlightCount, remainingSlots } = usePortfolioUpload()
 
 const isDragOver = ref(false)
@@ -164,7 +170,7 @@ function statusLabel(status: string): string {
       />
       <v-icon icon="mdi-cloud-upload-outline" size="32" />
       <span class="portfolio-upload-grid__primary">
-        {{ t('creator.ui.upload.portfolio_prompt') }}
+        {{ t(promptKey) }}
       </span>
       <span id="portfolio-upload-hint" class="portfolio-upload-grid__hint">{{ sizeHint }}</span>
       <span class="portfolio-upload-grid__slots">{{ slotsLabel }}</span>

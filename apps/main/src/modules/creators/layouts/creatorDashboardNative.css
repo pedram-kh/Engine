@@ -1,0 +1,272 @@
+/*
+ * AH-100c — the approved dashboard in the Capacitor app (Figma frame 07).
+ *
+ * Bound ONLY through `.creator-main--native`, a class the creator layout
+ * renders when it runs inside the app, so nothing here can reach the web
+ * creator shell. The banner, strength card and invitation card are
+ * native-only markup (they never mount on web); the header, the requests
+ * section and its empty state are the page's own markup, restyled from the
+ * outside. Colours, radii and type are `--native-*` tokens only.
+ */
+
+/* The aurora rule under the header is a web brand moment; frame 07 has none. */
+.creator-main--native :deep(.creator-dashboard) {
+  gap: 20px;
+}
+
+.creator-main--native :deep(.creator-dashboard__header) {
+  padding-bottom: 0;
+  border: 0;
+  border-image: none;
+}
+
+/* ── "You're approved" banner ──────────────────────────────────────────── */
+
+.creator-main--native :deep(.dash-banner) {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: var(--native-status-success-subtle);
+  border: 1px solid var(--native-status-success);
+  border-radius: var(--native-radius-xl);
+}
+
+.creator-main--native :deep(.dash-banner .v-icon) {
+  flex: none;
+  color: var(--native-status-success);
+}
+
+.creator-main--native :deep(.dash-banner__text) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.creator-main--native :deep(.dash-banner__title) {
+  margin: 0;
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.dash-banner__body) {
+  margin: 0;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+}
+
+/* ── Profile strength ──────────────────────────────────────────────────── */
+
+.creator-main--native :deep(.dash-strength),
+.creator-main--native :deep(.dash-invites) {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+.creator-main--native :deep(.dash-strength__head) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.creator-main--native :deep(.dash-strength__title) {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.dash-strength__value) {
+  font: var(--native-type-body-strong);
+  color: var(--native-accent-primary);
+}
+
+.creator-main--native :deep(.dash-strength__bar .v-progress-linear__background) {
+  background: var(--native-bg-surface-raised);
+  opacity: 1;
+}
+
+.creator-main--native :deep(.dash-strength__next) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin: 0;
+  font: var(--native-type-caption);
+  color: var(--native-text-secondary);
+  text-decoration: none;
+}
+
+.creator-main--native :deep(.dash-strength__next .v-icon) {
+  color: var(--native-text-tertiary);
+}
+
+/* ── Campaign invitation ───────────────────────────────────────────────── */
+
+.creator-main--native :deep(.dash-invites) {
+  gap: 16px;
+}
+
+.creator-main--native :deep(.dash-invites__row) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.creator-main--native :deep(.dash-invites__icon) {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--native-status-info);
+  background: var(--native-status-info-subtle);
+  border-radius: var(--native-radius-lg);
+}
+
+.creator-main--native :deep(.dash-invites__text) {
+  flex: 1;
+  min-width: 0;
+}
+
+.creator-main--native :deep(.dash-invites__title) {
+  margin: 0;
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.dash-invites__status) {
+  margin: 0;
+  font: var(--native-type-caption);
+  color: var(--native-text-secondary);
+}
+
+.creator-main--native :deep(.dash-invites__pill) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 8px;
+  font: var(--native-type-caption-strong);
+  color: var(--native-status-info);
+  background: var(--native-status-info-subtle);
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep(.dash-invites__dot) {
+  width: 6px;
+  height: 6px;
+  background: currentcolor;
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep(.dash-invites .v-btn) {
+  min-height: 44px;
+}
+
+/* ── Connection requests ───────────────────────────────────────────────── */
+
+.creator-main--native :deep(.creator-dashboard__requests) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.creator-main--native :deep(.creator-dashboard__requests > *) {
+  grid-column: 1 / -1;
+}
+
+.creator-main--native :deep(.creator-dashboard__requests > h2) {
+  grid-column: 1;
+  margin: 0;
+  font: var(--native-type-h4);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.creator-dashboard__requests > .creator-dashboard__requests-count) {
+  grid-column: 2;
+  font: var(--native-type-caption-strong);
+  color: var(--native-text-tertiary);
+}
+
+/* Pending requests: one card per agency, the two actions on a row of their own. */
+.creator-main--native :deep(.creator-dashboard__requests .v-list) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  background: transparent;
+}
+
+.creator-main--native :deep(.creator-dashboard__requests .v-list-item) {
+  grid-template-areas:
+    'prepend content'
+    'append append';
+  padding: 16px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-xl);
+}
+
+.creator-main--native :deep(.creator-dashboard__requests .v-list-item-title) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.creator-dashboard__requests .v-list-item-subtitle) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+  opacity: 1;
+}
+
+.creator-main--native :deep(.creator-dashboard__requests .v-list-item__append) {
+  margin-top: 12px;
+}
+
+.creator-main--native :deep(.creator-dashboard__requests .v-list-item__append > .d-flex) {
+  width: 100%;
+}
+
+.creator-main--native :deep(.creator-dashboard__requests .v-list-item__append .v-btn) {
+  flex: 1;
+  min-height: 44px;
+}
+
+/* The empty state is a dashed card with a 40px raised disc (frame 07). */
+.creator-main--native :deep(.c-empty-state[data-test='dashboard-requests-empty']) {
+  gap: 8px;
+  padding: 20px;
+  border: 1px dashed var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+.creator-main--native :deep([data-test='dashboard-requests-empty'] .c-empty-state__icon) {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  background: var(--native-bg-surface-raised);
+  border: 0;
+}
+
+.creator-main--native :deep([data-test='dashboard-requests-empty'] .c-empty-state__icon .v-icon) {
+  font-size: 20px;
+}
+
+.creator-main--native :deep([data-test='dashboard-requests-empty'] .c-empty-state__title) {
+  font: var(--native-type-body-strong);
+}
+
+.creator-main--native :deep([data-test='dashboard-requests-empty'] .c-empty-state__body) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+  text-align: center;
+}

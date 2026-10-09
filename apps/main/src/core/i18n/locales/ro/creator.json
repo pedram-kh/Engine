@@ -359,6 +359,20 @@
           "pending": "You have {count} invitation(s) awaiting your response.",
           "none": "Nu invitations awaiting your response.",
           "cta": "Vizualizați invitations"
+        },
+        "native": {
+          "welcome": "Bun venit, {name}",
+          "subtitle": "Iată ce are nevoie de atenția ta astăzi.",
+          "approved_body": "Acum poți primi colaborări cu branduri. În curând vor apărea mai multe funcții în tabloul tău de bord de creator.",
+          "strength": {
+            "title": "Puterea profilului",
+            "next": "Pentru a ajunge la 100%, finalizează acest pas: {step}"
+          },
+          "invitations": {
+            "title": "Invitații la campanii: {count} | Invitații la campanii: {count}",
+            "waiting": "Așteaptă răspunsul tău",
+            "new": "Nouă"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
+        "avatar_prompt_native": "Atinge pentru a alege o fotografie",
         "avatar_preview_alt": "Profil photo preview",
         "size_hint": "{types} · up to {max_mb} MB",
         "portfolio_prompt": "Drop files here, or click to choose",
+        "portfolio_prompt_native": "Atinge pentru a alege fișiere",
         "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slots remaining",
         "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",

@@ -359,6 +359,20 @@
           "pending": "Du har {count} invitation(er), der venter på dit svar.",
           "none": "Ingen invitationer venter på dit svar.",
           "cta": "Se invitationer"
+        },
+        "native": {
+          "welcome": "Velkommen, {name}",
+          "subtitle": "Det her kræver din opmærksomhed i dag.",
+          "approved_body": "Du kan nu modtage brandsamarbejder. Mere af dit creator-dashboard kommer snart.",
+          "strength": {
+            "title": "Profilstyrke",
+            "next": "For at nå 100 % skal du gennemføre dette trin: {step}"
+          },
+          "invitations": {
+            "title": "{count} kampagneinvitation | {count} kampagneinvitationer",
+            "waiting": "Venter på dit svar",
+            "new": "Ny"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Drop et billede her, eller klik for at vælge",
+        "avatar_prompt_native": "Tryk for at vælge et billede",
         "avatar_preview_alt": "Forhåndsvisning af profilbillede",
         "size_hint": "{types} · op til {max_mb} MB",
         "portfolio_prompt": "Drop filer her, eller klik for at vælge",
+        "portfolio_prompt_native": "Tryk for at vælge filer",
         "portfolio_size_hint": "Billeder op til {image_mb} MB · videoer op til {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} pladser tilbage",
         "portfolio_queue_status": "{in_flight} af {total} uploader (op til {concurrency} ad gangen).",

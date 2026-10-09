@@ -359,6 +359,20 @@
           "pending": "You have {count} invitation(s) awaiting your response.",
           "none": "Ei invitations awaiting your response.",
           "cta": "Näytä invitations"
+        },
+        "native": {
+          "welcome": "Tervetuloa, {name}",
+          "subtitle": "Tässä on, mikä kaipaa huomiotasi tänään.",
+          "approved_body": "Voit nyt vastaanottaa yhteistyöpyyntöjä brändeiltä. Lisää sisällöntuottajan kojelaudasta on tulossa pian.",
+          "strength": {
+            "title": "Profiilin vahvuus",
+            "next": "Yltääksesi 100 %:iin viimeistele tämä vaihe: {step}"
+          },
+          "invitations": {
+            "title": "{count} kampanjakutsu | {count} kampanjakutsua",
+            "waiting": "Odottaa vastaustasi",
+            "new": "Uusi"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
+        "avatar_prompt_native": "Valitse kuva napauttamalla",
         "avatar_preview_alt": "Profiili photo preview",
         "size_hint": "{types} · up to {max_mb} MB",
         "portfolio_prompt": "Drop files here, or click to choose",
+        "portfolio_prompt_native": "Valitse tiedostot napauttamalla",
         "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slots remaining",
         "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",

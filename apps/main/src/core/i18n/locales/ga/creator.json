@@ -359,6 +359,20 @@
           "pending": "You have {count} invitation(s) awaiting your response.",
           "none": "Níl invitations awaiting your response.",
           "cta": "Féach invitations"
+        },
+        "native": {
+          "welcome": "Fáilte, {name}",
+          "subtitle": "Seo an méid a bhfuil d'aird de dhíth air inniu.",
+          "approved_body": "Is féidir leat comhoibrithe branda a fháil anois. Beidh tuilleadh de do chlár deise cruthaitheora ag teacht go luath.",
+          "strength": {
+            "title": "Neart an phróifíle",
+            "next": "Chun 100% a bhaint amach, críochnaigh an chéim seo: {step}"
+          },
+          "invitations": {
+            "title": "Cuirí feachtais: {count} | Cuirí feachtais: {count}",
+            "waiting": "Ag fanacht le do fhreagra",
+            "new": "Nua"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
+        "avatar_prompt_native": "Tapáil chun grianghraf a roghnú",
         "avatar_preview_alt": "Próifíl photo preview",
         "size_hint": "{types} · up to {max_mb} MB",
         "portfolio_prompt": "Drop files here, or click to choose",
+        "portfolio_prompt_native": "Tapáil chun comhaid a roghnú",
         "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slots remaining",
         "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",

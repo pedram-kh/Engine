@@ -18,6 +18,11 @@ const SRC = path.resolve(__dirname, '../../../src')
 const SHEETS: { file: string; root: string }[] = [
   { file: 'modules/onboarding/layouts/onboardingNative.css', root: '.onboarding-native__body' },
   { file: 'modules/creators/layouts/creatorNative.css', root: '.creator-main--native' },
+  // AH-100c — the Edit profile form body: a parallel sheet under the same root,
+  // so the verified wizard sheet above stays untouched.
+  { file: 'modules/creators/layouts/creatorProfileFormNative.css', root: '.creator-main--native' },
+  // AH-100c — the approved dashboard (frame 07).
+  { file: 'modules/creators/layouts/creatorDashboardNative.css', root: '.creator-main--native' },
 ]
 
 function selectors(css: string): string[] {

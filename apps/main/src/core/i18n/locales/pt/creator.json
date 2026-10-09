@@ -359,6 +359,20 @@
           "pending": "Tem {count} convite(s) a aguardar a sua resposta.",
           "none": "Nenhum convite a aguardar a sua resposta.",
           "cta": "Ver convites"
+        },
+        "native": {
+          "welcome": "Olá, {name}",
+          "subtitle": "Eis o que precisa da sua atenção hoje.",
+          "approved_body": "Já pode receber colaborações com marcas. Em breve, haverá mais novidades no seu painel de criador.",
+          "strength": {
+            "title": "Força do perfil",
+            "next": "Para chegar aos 100%, conclua este passo: {step}"
+          },
+          "invitations": {
+            "title": "{count} convite de campanha | {count} convites de campanha",
+            "waiting": "A aguardar a sua resposta",
+            "new": "Novo"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Largue uma foto aqui ou clique para escolher",
+        "avatar_prompt_native": "Toque para escolher uma foto",
         "avatar_preview_alt": "Pré-visualização da foto de perfil",
         "size_hint": "{types} · até {max_mb} MB",
         "portfolio_prompt": "Largue ficheiros aqui ou clique para escolher",
+        "portfolio_prompt_native": "Toque para escolher ficheiros",
         "portfolio_size_hint": "Imagens até {image_mb} MB · vídeos até {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} lugares restantes",
         "portfolio_queue_status": "{in_flight} de {total} a carregar (até {concurrency} em simultâneo).",

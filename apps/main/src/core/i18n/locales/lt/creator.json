@@ -359,6 +359,20 @@
           "pending": "You have {count} invitation(s) awaiting your response.",
           "none": "Ne invitations awaiting your response.",
           "cta": "Peržiūrėti invitations"
+        },
+        "native": {
+          "welcome": "Sveiki atvykę, {name}",
+          "subtitle": "Štai kam šiandien reikia jūsų dėmesio.",
+          "approved_body": "Dabar galite gauti bendradarbiavimo pasiūlymų iš prekių ženklų. Daugiau jūsų kūrėjo skydelio funkcijų netrukus.",
+          "strength": {
+            "title": "Profilio stiprumas",
+            "next": "Norėdami pasiekti 100 %, užbaikite šį veiksmą: {step}"
+          },
+          "invitations": {
+            "title": "Kampanijų kvietimai: {count} | Kampanijų kvietimai: {count}",
+            "waiting": "Laukia jūsų atsakymo",
+            "new": "Naujas"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
+        "avatar_prompt_native": "Palieskite, kad pasirinktumėte nuotrauką",
         "avatar_preview_alt": "Profilis photo preview",
         "size_hint": "{types} · up to {max_mb} MB",
         "portfolio_prompt": "Drop files here, or click to choose",
+        "portfolio_prompt_native": "Palieskite, kad pasirinktumėte failus",
         "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slots remaining",
         "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",

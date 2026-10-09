@@ -359,6 +359,20 @@
           "pending": "You have {count} invitation(s) awaiting your response.",
           "none": "Le invitations awaiting your response.",
           "cta": "Ara invitations"
+        },
+        "native": {
+          "welcome": "Merħba, {name}",
+          "subtitle": "Dan hu dak li jeħtieġ l-attenzjoni tiegħek illum.",
+          "approved_body": "Issa tista' tirċievi kollaborazzjonijiet mal-marki. Aktar mid-dashboard tal-kreatur tiegħek se jasal dalwaqt.",
+          "strength": {
+            "title": "Saħħa tal-profil",
+            "next": "Biex tilħaq il-100%, lesti dan il-pass: {step}"
+          },
+          "invitations": {
+            "title": "Stediniet tal-kampanji: {count} | Stediniet tal-kampanji: {count}",
+            "waiting": "Qed jistenna t-tweġiba tiegħek",
+            "new": "Ġdid"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
+        "avatar_prompt_native": "Agħfas biex tagħżel ritratt",
         "avatar_preview_alt": "Profil photo preview",
         "size_hint": "{types} · up to {max_mb} MB",
         "portfolio_prompt": "Drop files here, or click to choose",
+        "portfolio_prompt_native": "Agħfas biex tagħżel fajls",
         "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slots remaining",
         "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",

@@ -109,6 +109,7 @@ export const nativeCssVariables: Readonly<Record<string, string>> = {
   'type-body': '400 14px/20px var(--font-sans)',
   'type-body-strong': '500 14px/20px var(--font-sans)',
   'type-body-small': '400 13px/19px var(--font-sans)',
+  'type-input': '400 16px/22px var(--font-sans)',
   'type-caption': '400 12px/16px var(--font-sans)',
   'type-caption-strong': '500 12px/16px var(--font-sans)',
   'type-overline': '600 11px/14px var(--font-sans)',

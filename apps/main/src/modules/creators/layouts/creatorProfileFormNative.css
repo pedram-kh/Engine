@@ -1,0 +1,500 @@
+/*
+ * AH-100c — the Edit profile form body in the Capacitor app (Figma frame 13).
+ *
+ * AH-100b styled the page's section cards (creatorNative.css) but not the
+ * form components inside them: the components are shared with the onboarding
+ * wizard, whose native rules hang off `.onboarding-native__body` and so never
+ * reach this page. Mechanism: a parallel sheet bound through the same
+ * `.creator-main--native` root as creatorNative.css — the verified wizard
+ * sheet stays byte-for-byte untouched (see the AH-100c review, deviation D5,
+ * and tech-debt for unifying the two under one shared root class).
+ *
+ * Bound ONLY through `.creator-main--native`, so nothing here can reach the
+ * web creator shell. Components are restyled from the outside (`:deep`); their
+ * structure and test ids are untouched. Colours, radii and type are
+ * `--native-*` tokens only. Pinned by creator-profile-native-coverage.spec.ts.
+ */
+
+/* ── Divider, hint, warning (the page's own leftovers) ─────────────────── */
+
+.creator-main--native :deep(.creator-profile__divider) {
+  margin: 4px 0;
+  border-color: var(--native-border-default);
+  opacity: 1;
+}
+
+.creator-main--native :deep(.creator-profile__hint) {
+  margin: 0 0 8px;
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.creator-main--native :deep(.creator-profile__warning) {
+  margin-top: 16px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  background: var(--native-status-warning-subtle);
+  border: 1px solid var(--native-status-warning);
+  border-radius: var(--native-radius-xl);
+}
+
+/* ── Profile basics ────────────────────────────────────────────────────── */
+
+.creator-main--native :deep(.profile-basics-form) {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.creator-main--native :deep(.profile-basics-form__avatar-note) {
+  margin: 0;
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.creator-main--native :deep(.profile-basics-form__avatar-note--missing) {
+  color: var(--native-status-warning);
+}
+
+.creator-main--native :deep(.profile-basics-form__age-preview) {
+  margin: -8px 0 0;
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.creator-main--native :deep(.profile-basics-form__bio-preview) {
+  padding: 12px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  background: var(--native-bg-canvas);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-lg);
+}
+
+/* The country / language / categories echo is not in frame 13 and only repeats
+   the fields above it — the same call the wizard sheet makes for the social
+   summary list. */
+.creator-main--native :deep(.profile-basics-form__preview) {
+  display: none;
+}
+
+/* The grouped sets (contact, companions, categories) are sub-sections of the
+   one Profile basics card: a divider, a Heading/H4 line, a Body/Small note. */
+.creator-main--native :deep(.profile-basics-form__contact),
+.creator-main--native :deep(.profile-basics-form__companions),
+.creator-main--native :deep(.profile-basics-form__categories) {
+  min-width: 0;
+  padding: 20px 0 0;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--native-border-default);
+}
+
+.creator-main--native :deep(.profile-basics-form__contact > legend),
+.creator-main--native :deep(.profile-basics-form__companions > legend),
+.creator-main--native :deep(.profile-basics-form__categories > legend) {
+  float: left;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  font: var(--native-type-h4);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.profile-basics-form__contact > legend + *),
+.creator-main--native :deep(.profile-basics-form__companions > legend + *),
+.creator-main--native :deep(.profile-basics-form__categories > legend + *) {
+  clear: both;
+}
+
+.creator-main--native :deep(.profile-basics-form__contact-note),
+.creator-main--native :deep(.profile-basics-form__companions-note),
+.creator-main--native :deep(.profile-basics-form__categories-note) {
+  margin: 4px 0 16px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+.creator-main--native :deep(.profile-basics-form__categories-select-all) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font: var(--native-type-body);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.profile-basics-form__category-chips .v-slide-group__content),
+.creator-main--native :deep(.profile-basics-form__companion-chips .v-slide-group__content) {
+  gap: 8px;
+}
+
+.creator-main--native :deep(.profile-basics-form__category-chips .v-chip),
+.creator-main--native :deep(.profile-basics-form__companion-chips .v-chip) {
+  margin: 0;
+}
+
+/* Dial code + number sit on one row (Figma draws "+34" beside the number). */
+.creator-main--native :deep(.profile-basics-form__tel-row) {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  margin-bottom: 4px;
+}
+
+.creator-main--native :deep(.profile-basics-form__dial-code) {
+  min-width: 0;
+}
+
+.creator-main--native :deep(.profile-basics-form__dial-selection) {
+  white-space: nowrap;
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.profile-basics-form__tel-number) {
+  min-width: 0;
+}
+
+.creator-main--native :deep(.profile-basics-form__error) {
+  margin-top: 8px;
+  font: var(--native-type-body-small);
+  color: var(--native-status-danger);
+}
+
+/* ── Profile photo (Figma: a 72px tile, then the controls) ─────────────── */
+
+.creator-main--native :deep(.avatar-upload-drop) {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+
+.creator-main--native :deep(.avatar-upload-drop__preview) {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  background: var(--native-bg-surface-raised);
+  border-radius: var(--native-radius-2xl);
+}
+
+.creator-main--native :deep(.avatar-upload-drop__image) {
+  border-radius: var(--native-radius-2xl);
+}
+
+.creator-main--native :deep(.avatar-upload-drop__zone) {
+  flex: 1 1 160px;
+  gap: 8px;
+  padding: 16px;
+  background: var(--native-bg-canvas);
+  border: 1.5px dashed var(--native-border-strong);
+  border-radius: var(--native-radius-xl);
+}
+
+.creator-main--native :deep(.avatar-upload-drop__zone--drag-over) {
+  background: var(--native-accent-primary-subtle);
+  border-color: var(--native-accent-primary);
+}
+
+.creator-main--native :deep(.avatar-upload-drop__zone--uploading) {
+  opacity: 0.6;
+}
+
+.creator-main--native :deep(.avatar-upload-drop__zone .v-icon) {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  color: var(--native-accent-primary);
+  background: var(--native-accent-primary-subtle);
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep(.avatar-upload-drop__primary) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.avatar-upload-drop__hint) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.creator-main--native :deep(.avatar-upload-drop__error) {
+  flex-basis: 100%;
+  font: var(--native-type-body-small);
+  color: var(--native-status-danger);
+}
+
+/* ── Social accounts (tiles, as in the wizard's frames 04/05) ──────────── */
+
+.creator-main--native :deep(.social-accounts),
+.creator-main--native :deep(.portfolio-step) {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: 0;
+}
+
+.creator-main--native :deep(.social-accounts > * + *),
+.creator-main--native :deep(.portfolio-step > * + *) {
+  margin-top: 16px;
+}
+
+.creator-main--native :deep(.social-accounts__header h3),
+.creator-main--native :deep(.portfolio-step__header h3),
+.creator-main--native :deep(.portfolio-step__gallery h4) {
+  margin: 0;
+  font: var(--native-type-h4);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.social-accounts__header p),
+.creator-main--native :deep(.portfolio-step__header p) {
+  margin: 4px 0 0;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+.creator-main--native :deep(.social-accounts__hint) {
+  margin: 0;
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+  opacity: 1;
+}
+
+/* The summary list duplicates the tiles' own view mode. */
+.creator-main--native :deep(.social-accounts__connected) {
+  display: none;
+}
+
+.creator-main--native :deep(.social-accounts__forms) {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.creator-main--native :deep(.social-accounts__form-row) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.creator-main--native :deep(.social-accounts__platform-label) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.social-card) {
+  gap: 12px;
+  padding: 16px;
+  background: var(--native-bg-canvas);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-xl);
+}
+
+.creator-main--native :deep(.social-card:has(.social-card__handle)) {
+  background: var(--native-accent-primary-subtle);
+  border-color: var(--native-accent-primary);
+}
+
+.creator-main--native :deep(.social-card__head) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.creator-main--native :deep(.social-card__platform) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.social-card__handle) {
+  font: var(--native-type-caption);
+  color: var(--native-text-secondary);
+}
+
+.creator-main--native :deep(.social-card__actions) {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Portfolio ─────────────────────────────────────────────────────────── */
+
+.creator-main--native :deep(.portfolio-step__gallery) {
+  padding-top: 16px;
+  border-top: 1px solid var(--native-border-default);
+}
+
+.creator-main--native :deep(.portfolio-step__remove-error) {
+  margin-top: 8px;
+  font: var(--native-type-body-small);
+  color: var(--native-status-danger);
+}
+
+.creator-main--native :deep(.portfolio-upload-grid) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__dropzone) {
+  gap: 8px;
+  padding: 24px;
+  background: var(--native-bg-canvas);
+  border: 1.5px dashed var(--native-border-strong);
+  border-radius: var(--native-radius-xl);
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__dropzone--drag-over) {
+  background: var(--native-accent-primary-subtle);
+  border-color: var(--native-accent-primary);
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__dropzone .v-icon) {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  color: var(--native-accent-primary);
+  background: var(--native-accent-primary-subtle);
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__primary) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__hint) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__slots) {
+  font: var(--native-type-caption-strong);
+  color: var(--native-accent-primary);
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__link) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__link-prompt) {
+  font: var(--native-type-caption-strong);
+  color: var(--native-text-secondary);
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__link-fields) {
+  flex-wrap: nowrap;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__items) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__item) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--native-bg-canvas);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-lg);
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__item-meta) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__item-name) {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font: var(--native-type-body);
+  color: var(--native-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__item-status) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.creator-main--native :deep(.portfolio-upload-grid__item-error) {
+  font: var(--native-type-caption);
+  color: var(--native-status-danger);
+}
+
+/* Two-up tiles, 152×190 thumbs with a 10px radius (frame 04's gallery). */
+.creator-main--native :deep(.portfolio-gallery) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 12px;
+}
+
+.creator-main--native :deep(.portfolio-gallery__thumb-wrap) {
+  aspect-ratio: 152 / 190;
+  background: var(--native-bg-surface-raised);
+  border-radius: var(--native-radius-xl);
+}
+
+.creator-main--native :deep(.portfolio-gallery__remove) {
+  width: 26px;
+  height: 26px;
+  color: var(--native-text-primary);
+  background: var(--native-bg-canvas);
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep(.portfolio-gallery__title) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+/* ── Master agreement (frame 13's last card) ───────────────────────────── */
+
+.creator-main--native :deep(.master-agreement-section__header) {
+  align-items: center;
+}
+
+.creator-main--native :deep(.master-agreement-section__summary p) {
+  margin: 0;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+.creator-main--native :deep(.master-agreement-terms__scroll) {
+  max-height: 320px;
+  padding: 16px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  background: var(--native-bg-canvas);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-lg);
+}
+
+.creator-main--native :deep(.master-agreement-terms__version) {
+  margin: 8px 0 0;
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.creator-main--native :deep(.master-agreement-terms__error) {
+  font: var(--native-type-body-small);
+  color: var(--native-status-danger);
+}

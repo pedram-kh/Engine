@@ -359,6 +359,20 @@
           "pending": "You have {count} invitation(s) awaiting your response.",
           "none": "Не invitations awaiting your response.",
           "cta": "Вижте invitations"
+        },
+        "native": {
+          "welcome": "Добре дошли, {name}",
+          "subtitle": "Ето какво изисква вашето внимание днес.",
+          "approved_body": "Вече можете да получавате сътрудничества с марки. Още от таблото ви за създатели скоро ще бъде налично.",
+          "strength": {
+            "title": "Сила на профила",
+            "next": "За да достигнете 100%, завършете тази стъпка: {step}"
+          },
+          "invitations": {
+            "title": "{count} покана за кампания | {count} покани за кампании",
+            "waiting": "Очаква вашия отговор",
+            "new": "Нова"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
+        "avatar_prompt_native": "Докоснете, за да изберете снимка",
         "avatar_preview_alt": "Профил photo preview",
         "size_hint": "{types} · up to {max_mb} MB",
         "portfolio_prompt": "Drop files here, or click to choose",
+        "portfolio_prompt_native": "Докоснете, за да изберете файлове",
         "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slots remaining",
         "portfolio_queue_status": "{in_flight} от {total} uploading (up to {concurrency} at a time).",

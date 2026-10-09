@@ -59,6 +59,10 @@
   --native-type-body: 400 14px/20px var(--font-sans);
   --native-type-body-strong: 500 14px/20px var(--font-sans);
   --native-type-body-small: 400 13px/19px var(--font-sans);
+  /* AH-100c — field text. 16px, NOT Figma's 14px: iOS WKWebView auto-zooms the
+     page when a control under 16px takes focus, and the zoom persists after
+     blur and across route changes. See the AH-100c review (deviation D1). */
+  --native-type-input: 400 16px/22px var(--font-sans);
   --native-type-caption: 400 12px/16px var(--font-sans);
   --native-type-caption-strong: 500 12px/16px var(--font-sans);
   --native-type-overline: 600 11px/14px var(--font-sans);
@@ -127,7 +131,21 @@
   color: var(--native-border-strong);
 }
 
+/* Field TEXT is 16px (AH-100c, deviation D1 from Figma's 14px): anything
+   smaller makes iOS zoom the page on focus, and the zoom sticks — it pushed the
+   fixed tab bar off-screen. Pinned by native-field-text-size.spec.ts. We do not
+   set `maximum-scale=1` instead: that blocks pinch-zoom, an accessibility
+   failure (WCAG 1.4.4). Labels are not focus targets and stay at body (14px). */
 .catalyst-native .v-field__input,
+.catalyst-native .v-field__input input,
+.catalyst-native .v-field__input select,
+.catalyst-native .v-field__input textarea,
+.catalyst-native input,
+.catalyst-native select,
+.catalyst-native textarea {
+  font: var(--native-type-input);
+}
+
 .catalyst-native .v-field .v-field-label {
   font: var(--native-type-body);
 }

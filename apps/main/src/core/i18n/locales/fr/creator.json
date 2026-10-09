@@ -359,6 +359,20 @@
           "pending": "Vous avez {count} invitation(s) en attente de votre réponse.",
           "none": "Aucune invitation en attente de votre réponse.",
           "cta": "Voir les invitations"
+        },
+        "native": {
+          "welcome": "Bienvenue, {name}",
+          "subtitle": "Voici ce qui demande votre attention aujourd'hui.",
+          "approved_body": "Vous pouvez désormais recevoir des collaborations avec des marques. Le reste de votre tableau de bord de créateur arrive bientôt.",
+          "strength": {
+            "title": "Solidité du profil",
+            "next": "Pour atteindre 100 %, terminez cette étape : {step}"
+          },
+          "invitations": {
+            "title": "{count} invitation à une campagne | {count} invitations à des campagnes",
+            "waiting": "En attente de votre réponse",
+            "new": "Nouvelle"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Déposez une photo ici, ou cliquez pour choisir",
+        "avatar_prompt_native": "Touchez pour choisir une photo",
         "avatar_preview_alt": "Aperçu de la photo de profil",
         "size_hint": "{types} · jusqu'à {max_mb} Mo",
         "portfolio_prompt": "Déposez des fichiers ici, ou cliquez pour choisir",
+        "portfolio_prompt_native": "Touchez pour choisir des fichiers",
         "portfolio_size_hint": "Images jusqu'à {image_mb} Mo · vidéos jusqu'à {video_mb} Mo",
         "portfolio_slots_remaining": "{remaining} emplacements restants",
         "portfolio_queue_status": "{in_flight} sur {total} en cours de téléversement (jusqu'à {concurrency} à la fois).",

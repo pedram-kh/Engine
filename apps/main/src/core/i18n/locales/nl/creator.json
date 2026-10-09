@@ -359,6 +359,20 @@
           "pending": "Je hebt {count} uitnodiging(en) die wacht(en) op je reactie.",
           "none": "Geen uitnodigingen wachten op je reactie.",
           "cta": "Uitnodigingen bekijken"
+        },
+        "native": {
+          "welcome": "Welkom, {name}",
+          "subtitle": "Dit vraagt vandaag je aandacht.",
+          "approved_body": "Je kunt nu samenwerkingen met merken ontvangen. Binnenkort komt er meer van je creator-dashboard.",
+          "strength": {
+            "title": "Profielsterkte",
+            "next": "Voltooi deze stap om 100% te bereiken: {step}"
+          },
+          "invitations": {
+            "title": "{count} campagne-uitnodiging | {count} campagne-uitnodigingen",
+            "waiting": "Wacht op je reactie",
+            "new": "Nieuw"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Foto hier neerzetten of klikken om te kiezen",
+        "avatar_prompt_native": "Tik om een foto te kiezen",
         "avatar_preview_alt": "Voorbeeld profielfoto",
         "size_hint": "{types} · tot {max_mb} MB",
         "portfolio_prompt": "Bestanden hier neerzetten of klikken om te kiezen",
+        "portfolio_prompt_native": "Tik om bestanden te kiezen",
         "portfolio_size_hint": "Afbeeldingen tot {image_mb} MB · video's tot {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} plaatsen beschikbaar",
         "portfolio_queue_status": "{in_flight} van {total} wordt geüpload (maximaal {concurrency} tegelijk).",

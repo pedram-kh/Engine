@@ -22,6 +22,8 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
+
 import {
   AVATAR_ALLOWED_DESCRIPTORS,
   AVATAR_ALLOWED_MIME_TYPES,
@@ -31,6 +33,10 @@ import {
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 const { t } = useI18n()
+// AH-100c — "drop here, or click" is wrong on a touch device: the app says "tap".
+const promptKey = isNativePlatform()
+  ? 'creator.ui.upload.avatar_prompt_native'
+  : 'creator.ui.upload.avatar_prompt'
 const store = useOnboardingStore()
 const { previewUrl, error, isUploading, upload, remove } = useAvatarUpload()
 
@@ -125,7 +131,7 @@ function onDragLeave(): void {
       />
       <v-icon icon="mdi-cloud-upload-outline" size="32" />
       <span class="avatar-upload-drop__primary">
-        {{ isUploading ? t('creator.ui.upload.uploading') : t('creator.ui.upload.avatar_prompt') }}
+        {{ isUploading ? t('creator.ui.upload.uploading') : t(promptKey) }}
       </span>
       <span id="avatar-upload-hint" class="avatar-upload-drop__hint">{{ sizeHint }}</span>
     </label>

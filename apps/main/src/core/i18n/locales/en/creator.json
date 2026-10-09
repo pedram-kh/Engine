@@ -359,6 +359,20 @@
           "pending": "You have {count} invitation(s) awaiting your response.",
           "none": "No invitations awaiting your response.",
           "cta": "View invitations"
+        },
+        "native": {
+          "welcome": "Welcome, {name}",
+          "subtitle": "Here's what needs your attention today.",
+          "approved_body": "You can now receive brand collaborations. More of your creator dashboard is coming soon.",
+          "strength": {
+            "title": "Profile strength",
+            "next": "To reach 100%, finish this step: {step}"
+          },
+          "invitations": {
+            "title": "{count} campaign invitation | {count} campaign invitations",
+            "waiting": "Waiting for your response",
+            "new": "New"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
+        "avatar_prompt_native": "Tap to choose a photo",
         "avatar_preview_alt": "Profile photo preview",
         "size_hint": "{types} · up to {max_mb} MB",
         "portfolio_prompt": "Drop files here, or click to choose",
+        "portfolio_prompt_native": "Tap to choose files",
         "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slots remaining",
         "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",

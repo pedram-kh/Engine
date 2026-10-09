@@ -359,6 +359,20 @@
           "pending": "You have {count} invitation(s) awaiting your response.",
           "none": "Nē invitations awaiting your response.",
           "cta": "Skatīt invitations"
+        },
+        "native": {
+          "welcome": "Laipni lūgti, {name}",
+          "subtitle": "Lūk, kam šodien nepieciešama jūsu uzmanība.",
+          "approved_body": "Tagad varat saņemt sadarbības piedāvājumus no zīmoliem. Drīz parādīsies vairāk jūsu satura veidotāja informācijas paneļa.",
+          "strength": {
+            "title": "Profila stiprums",
+            "next": "Lai sasniegtu 100 %, pabeidziet šo soli: {step}"
+          },
+          "invitations": {
+            "title": "Kampaņu uzaicinājumi: {count} | Kampaņu uzaicinājumi: {count}",
+            "waiting": "Gaida jūsu atbildi",
+            "new": "Jauns"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
+        "avatar_prompt_native": "Pieskarieties, lai izvēlētos fotoattēlu",
         "avatar_preview_alt": "Profils photo preview",
         "size_hint": "{types} · up to {max_mb} MB",
         "portfolio_prompt": "Drop files here, or click to choose",
+        "portfolio_prompt_native": "Pieskarieties, lai izvēlētos failus",
         "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slots remaining",
         "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",

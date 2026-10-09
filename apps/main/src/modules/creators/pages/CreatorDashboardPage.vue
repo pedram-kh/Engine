@@ -38,6 +38,10 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
+
+import DashboardInvitationCard from '../components/DashboardInvitationCard.vue'
+import DashboardStrengthCard from '../components/DashboardStrengthCard.vue'
 import { resolveSubmitErrorKey } from '../../onboarding/composables/useSubmitErrorKey'
 import { useOnboardingStore } from '../../onboarding/stores/useOnboardingStore'
 import { connectionRequestsApi } from '../connectionRequests.api'
@@ -54,6 +58,18 @@ const completenessLabel = computed(() =>
 )
 
 const displayName = computed(() => store.creator?.attributes.display_name ?? '')
+
+// AH-100c — inside the Capacitor app the APPROVED dashboard draws Figma frame 07
+// (welcome header, banner, strength card, invitation card). Every other state,
+// and the whole web dashboard, keeps the markup below it unchanged.
+const isNative = isNativePlatform()
+const nativeApproved = computed(() => isNative && status.value === 'approved')
+/** The first wizard step the creator has not completed — the strength card's row. */
+const nextIncompleteStep = computed(
+  () =>
+    store.creator?.wizard.steps.find((step) => !step.is_complete && step.id !== 'review')?.id ??
+    null,
+)
 const submittedAt = computed(() => store.creator?.attributes.submitted_at)
 // Sprint 4 Chunk 3 (Cluster 5 / D-c3-1): the reason is now surfaced on
 // the creator-facing attributes (it used to be admin-only and thus null
@@ -197,15 +213,37 @@ onMounted(async () => {
   <section class="creator-dashboard" data-testid="creator-dashboard">
     <header class="creator-dashboard__header">
       <h1 class="text-h4">
-        {{ t('creator.ui.dashboard.title') }}
+        {{
+          nativeApproved && displayName
+            ? t('creator.ui.dashboard.native.welcome', { name: displayName })
+            : t('creator.ui.dashboard.title')
+        }}
       </h1>
       <p v-if="displayName" class="text-body-1 text-medium-emphasis">
-        {{ t('creator.ui.dashboard.greeting', { name: displayName }) }}
+        {{
+          nativeApproved
+            ? t('creator.ui.dashboard.native.subtitle')
+            : t('creator.ui.dashboard.greeting', { name: displayName })
+        }}
       </p>
     </header>
 
+    <!-- AH-100c: frame 07's banner (native + approved only). -->
+    <div
+      v-if="nativeApproved"
+      class="dash-banner"
+      role="status"
+      data-testid="dashboard-banner-approved"
+    >
+      <v-icon icon="mdi-check-circle-outline" size="20" aria-hidden="true" />
+      <div class="dash-banner__text">
+        <p class="dash-banner__title">{{ t('creator.ui.dashboard.approved.heading') }}</p>
+        <p class="dash-banner__body">{{ t('creator.ui.dashboard.native.approved_body') }}</p>
+      </div>
+    </div>
+
     <v-alert
-      v-if="status === 'pending'"
+      v-else-if="status === 'pending'"
       type="info"
       variant="tonal"
       data-testid="dashboard-banner-pending"
@@ -265,7 +303,9 @@ onMounted(async () => {
       <p>{{ t('creator.ui.dashboard.incomplete.description') }}</p>
     </v-alert>
 
+    <DashboardStrengthCard v-if="nativeApproved" :score="score" :next-step="nextIncompleteStep" />
     <CompletenessBar
+      v-else
       :score="score"
       :label="completenessLabel"
       :color="score >= 100 ? 'success' : 'primary'"
@@ -274,8 +314,9 @@ onMounted(async () => {
     <!-- Campaign-invitation teaser (Sprint 8 Chunk 2, D-10). Approved-only;
          links to the dedicated assignments surface. Shows a count badge when
          invitations await a response. -->
+    <DashboardInvitationCard v-if="nativeApproved" :count="invitedCount" />
     <v-alert
-      v-if="status === 'approved'"
+      v-else-if="status === 'approved'"
       type="info"
       variant="tonal"
       border="start"
@@ -314,6 +355,13 @@ onMounted(async () => {
       data-testid="dashboard-requests"
     >
       <h2 class="text-h6">{{ t('creator.ui.dashboard.requests.title') }}</h2>
+      <span
+        v-if="isNative"
+        class="creator-dashboard__requests-count"
+        data-testid="dashboard-requests-count"
+      >
+        {{ requests.length }}
+      </span>
 
       <v-skeleton-loader
         v-if="requestsLoading && !requestsLoadedOnce"

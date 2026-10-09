@@ -359,6 +359,20 @@
           "pending": "Hai {count} invito/i in attesa di risposta.",
           "none": "Nessun invito in attesa di risposta.",
           "cta": "Vedi inviti"
+        },
+        "native": {
+          "welcome": "Ciao, {name}",
+          "subtitle": "Ecco cosa richiede la tua attenzione oggi.",
+          "approved_body": "Ora puoi ricevere collaborazioni con i brand. Presto arriveranno altre parti della tua dashboard da creator.",
+          "strength": {
+            "title": "Solidità del profilo",
+            "next": "Per arrivare al 100%, completa questo passaggio: {step}"
+          },
+          "invitations": {
+            "title": "{count} invito a una campagna | {count} inviti a campagne",
+            "waiting": "In attesa della tua risposta",
+            "new": "Nuovo"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Trascina una foto qui o clicca per selezionare",
+        "avatar_prompt_native": "Tocca per scegliere una foto",
         "avatar_preview_alt": "Anteprima della foto del profilo",
         "size_hint": "{types} · fino a {max_mb} MB",
         "portfolio_prompt": "Trascina i file qui o clicca per selezionare",
+        "portfolio_prompt_native": "Tocca per scegliere i file",
         "portfolio_size_hint": "Immagini fino a {image_mb} MB · video fino a {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slot rimanenti",
         "portfolio_queue_status": "{in_flight} di {total} in caricamento (fino a {concurrency} contemporaneamente).",

@@ -359,6 +359,20 @@
           "pending": "Máte {count} pozvánku/pozvánek čekající na vaši odpověď.",
           "none": "Žádné pozvánky čekající na vaši odpověď.",
           "cta": "Prikaži pozvánky"
+        },
+        "native": {
+          "welcome": "Dobrodošli, {name}",
+          "subtitle": "Evo što danas zahtijeva vašu pažnju.",
+          "approved_body": "Sada možete primati suradnje s brendovima. Još dijelova vaše nadzorne ploče za kreatore stiže uskoro.",
+          "strength": {
+            "title": "Snaga profila",
+            "next": "Da biste dosegnuli 100 %, dovršite ovaj korak: {step}"
+          },
+          "invitations": {
+            "title": "Pozivnice u kampanje: {count} | Pozivnice u kampanje: {count}",
+            "waiting": "Čeka vaš odgovor",
+            "new": "Nova"
+          }
         }
       },
       "assignments": {
@@ -526,9 +540,11 @@
       },
       "upload": {
         "avatar_prompt": "Přetáhněte foto sem nebo klikněte pro výběr",
+        "avatar_prompt_native": "Dodirnite za odabir fotografije",
         "avatar_preview_alt": "Náhled profilové fotografie",
         "size_hint": "{types} · do {max_mb} MB",
         "portfolio_prompt": "Přetáhněte soubory sem nebo klikněte pro výběr",
+        "portfolio_prompt_native": "Dodirnite za odabir datoteka",
         "portfolio_size_hint": "Obrázky do {image_mb} MB · videa do {video_mb} MB",
         "portfolio_slots_remaining": "Zbývá {remaining} míst",
         "portfolio_queue_status": "{in_flight} z {total} se nahrává (max. {concurrency} najednou).",

@@ -505,3 +505,5 @@ onMounted(() => {
 </style>
 
 <style scoped src="./creatorNative.css"></style>
+<style scoped src="./creatorProfileFormNative.css"></style>
+<style scoped src="./creatorDashboardNative.css"></style>
