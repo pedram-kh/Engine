@@ -1017,3 +1017,26 @@ describe('CreatorAssignmentDetailPage — link dialog container (AH-100b)', () =
     expect(dialog?.querySelector('[data-testid="assignment-draft-link-add"]')).not.toBeNull()
   })
 })
+
+describe('CreatorAssignmentDetailPage — status pill (AH-100d)', () => {
+  // The native stylesheet tints the pill for an invitation off `data-status`.
+  // The attribute exists only in the app: the web page's DOM is unchanged.
+  it('native: the pill carries the assignment status for the stylesheet', async () => {
+    platform.native = true
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('invited') })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-detail-status"]').attributes('data-status')).toBe(
+      'invited',
+    )
+  })
+
+  it('web: the pill has no data-status attribute', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('invited') })
+    const { wrapper } = await mountDetail()
+
+    expect(
+      wrapper.find('[data-testid="assignment-detail-status"]').attributes(),
+    ).not.toHaveProperty('data-status')
+  })
+})

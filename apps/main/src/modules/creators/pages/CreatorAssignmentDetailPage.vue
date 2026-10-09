@@ -518,7 +518,12 @@ onMounted(() => {
     <template v-else-if="assignment !== null">
       <header class="d-flex align-center ga-3 flex-wrap">
         <h1 class="text-h4">{{ assignment.attributes.campaign?.name ?? '—' }}</h1>
-        <v-chip size="small" variant="tonal" data-testid="assignment-detail-status">
+        <v-chip
+          size="small"
+          variant="tonal"
+          :data-status="isNative ? assignment.attributes.status : undefined"
+          data-testid="assignment-detail-status"
+        >
           {{ t(`app.campaigns.assignmentStatus.${assignment.attributes.status}`) }}
         </v-chip>
       </header>

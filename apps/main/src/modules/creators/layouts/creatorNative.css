@@ -444,3 +444,384 @@
 .creator-main--native :deep(.rel-inbox__empty .v-btn) {
   min-height: 36px;
 }
+
+/*
+ * AH-100d — the two detail pages Figma does not draw: Invitation / assignment
+ * detail ("Back to invitations") and the Job post detail. Token-derived, by
+ * Pedram's instruction, from the language frames 09-13 DO draw: bordered
+ * `bg-surface` cards at `radius-2xl`, Display for the page title, H4 for a
+ * section title, Body-small for prose, the invitation card's note rail, the
+ * status pill, the tinted banners, and the invitation card's button order
+ * (the primary alone on a full row, 44px). Nothing here is Figma-measured.
+ *
+ * Restyled from the outside by test id / structure, so the pages' markup and
+ * the web shell stay as they were. Vuetify's typography utilities
+ * (`.text-h4`, `.text-subtitle-1`, `.text-body-2`, `.text-medium-emphasis`)
+ * carry `!important` on size, letter-spacing and colour, so the type rules
+ * below do too: `font: … !important` plus `letter-spacing: 0 !important`.
+ * Pinned by native-detail-pages.spec.ts.
+ */
+
+/* Back links: Invitation detail renders a text link, Job detail a text button. */
+.creator-main--native :deep([data-testid='assignment-detail-back']),
+.creator-main--native :deep([data-testid='creator-job-back']) {
+  align-self: flex-start;
+  min-width: 0;
+  padding: 0;
+  font: var(--native-type-body-small) !important;
+  letter-spacing: 0 !important;
+  color: var(--native-text-secondary);
+  text-decoration: none;
+  text-transform: none;
+}
+
+.creator-main--native :deep([data-testid='creator-job-back'] .v-btn__overlay),
+.creator-main--native :deep([data-testid='creator-job-back'] .v-btn__underlay) {
+  display: none;
+}
+
+/* Page title: Display, with the brand / status under it. */
+.creator-main--native :deep([data-testid='creator-assignment-detail']),
+.creator-main--native :deep([data-testid='creator-job-detail']) {
+  gap: 16px;
+}
+
+.creator-main--native :deep([data-testid='creator-assignment-detail'] > header) {
+  flex-direction: column;
+  align-items: flex-start !important;
+  gap: 8px;
+}
+
+.creator-main--native :deep([data-testid='creator-assignment-detail'] > header h1),
+.creator-main--native :deep([data-testid='creator-job-detail-name']) {
+  margin: 0;
+  font: var(--native-type-display) !important;
+  letter-spacing: 0 !important;
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep([data-testid='creator-job-detail-brand']) {
+  font: var(--native-type-caption);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+/* The status pill and the chips: Figma's neutral pill (info-tinted when invited). */
+.creator-main--native :deep([data-testid='assignment-detail-status']),
+.creator-main--native :deep([data-testid='assignment-detail-attachment']),
+.creator-main--native :deep(.job-detail__chips .v-chip) {
+  height: 22px;
+  padding: 0 8px;
+  font: var(--native-type-caption-strong);
+  color: var(--native-text-secondary);
+  background: var(--native-bg-surface-raised);
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep([data-testid='assignment-detail-status'] .v-chip__underlay),
+.creator-main--native :deep([data-testid='assignment-detail-status'] .v-chip__overlay),
+.creator-main--native :deep([data-testid='assignment-detail-attachment'] .v-chip__underlay),
+.creator-main--native :deep([data-testid='assignment-detail-attachment'] .v-chip__overlay),
+.creator-main--native :deep(.job-detail__chips .v-chip .v-chip__underlay),
+.creator-main--native :deep(.job-detail__chips .v-chip .v-chip__overlay) {
+  display: none;
+}
+
+.creator-main--native :deep([data-testid='assignment-detail-status'][data-status='invited']) {
+  color: var(--native-status-info);
+  background: var(--native-status-info-subtle);
+}
+
+.creator-main--native
+  :deep([data-testid='assignment-detail-status'][data-status='invited'])::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  background: currentcolor;
+  border-radius: var(--native-radius-full);
+}
+
+/* Brand + fee line under the title. */
+.creator-main--native :deep([data-testid='creator-assignment-detail'] > header + p) {
+  margin: 0;
+  font: var(--native-type-body-small) !important;
+  letter-spacing: 0 !important;
+  color: var(--native-text-secondary) !important;
+}
+
+/* Job detail: one card, a canvas panel for the meta rows. */
+.creator-main--native :deep([data-testid='creator-job-detail-card']) {
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+.creator-main--native :deep(.job-detail__body) {
+  gap: 20px;
+  padding: 20px;
+}
+
+.creator-main--native :deep(.job-detail__head) {
+  gap: 12px;
+}
+
+.creator-main--native :deep(.job-detail__meta) {
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  background: var(--native-bg-canvas);
+  border-radius: var(--native-radius-lg);
+  opacity: 1;
+}
+
+.creator-main--native :deep([data-testid='creator-job-detail-fee']) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+/* Section blocks: a section title (H4) over Body-small prose. The invitation
+   detail's "About this campaign" is a card of its own; on Job detail it sits
+   in the card that is already there. */
+.creator-main--native :deep(.assignment-detail__section) {
+  gap: 8px;
+  padding: 20px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+.creator-main--native :deep(.assignment-detail__section h2),
+.creator-main--native :deep(.job-detail__section h2),
+.creator-main--native :deep(.creator-attachments-block h2) {
+  margin: 0;
+  font: var(--native-type-h4) !important;
+  letter-spacing: 0 !important;
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.assignment-campaign-description),
+.creator-main--native :deep(.job-detail__description) {
+  font: var(--native-type-body-small) !important;
+  letter-spacing: 0 !important;
+  color: var(--native-text-secondary);
+}
+
+.creator-main--native :deep(.assignment-campaign-description p),
+.creator-main--native :deep(.job-detail__description p) {
+  margin: 0 0 8px;
+}
+
+.creator-main--native :deep(.assignment-campaign-description p:last-child),
+.creator-main--native :deep(.job-detail__description p:last-child) {
+  margin-bottom: 0;
+}
+
+/* The agency's offer note: the invitation card's note rail. */
+.creator-main--native :deep(.assignment-offer-description) {
+  padding-left: 12px;
+  font: var(--native-type-body-small) !important;
+  letter-spacing: 0 !important;
+  color: var(--native-text-secondary);
+  border-left: 3px solid var(--native-border-strong);
+}
+
+.creator-main--native :deep(.job-detail__section) {
+  gap: 8px;
+}
+
+.creator-main--native :deep(.job-detail__chips) {
+  gap: 8px;
+}
+
+/* Job detail's external links: Secondary buttons, side by side. */
+.creator-main--native :deep(.job-detail__links) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.creator-main--native :deep(.job-detail__links .v-btn) {
+  min-width: 0;
+  min-height: 36px;
+}
+
+/* Attached files: rows in a canvas panel. */
+.creator-main--native :deep(.creator-attachments-block__list) {
+  padding: 4px;
+  background: var(--native-bg-canvas);
+  border-radius: var(--native-radius-lg);
+}
+
+.creator-main--native :deep(.creator-attachments-block .v-list-item) {
+  border-radius: var(--native-radius-md);
+}
+
+.creator-main--native :deep(.creator-attachments-block .v-list-item-title) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.creator-attachments-block .v-list-item-subtitle) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+  opacity: 1;
+}
+
+/* The Apply row: the primary on a full 44px row (frame 10's order). */
+.creator-main--native :deep(.job-detail__actions) {
+  padding: 0 20px 20px;
+}
+
+.creator-main--native :deep(.job-detail__actions > .v-btn) {
+  width: 100%;
+  min-height: 44px;
+}
+
+.creator-main--native :deep(.job-detail__actions > .v-alert) {
+  flex: 1 1 0;
+}
+
+/* Answering an invitation from its detail page: Accept alone on a full row,
+   Decline under it, both 44px (the card's button language). */
+.creator-main--native :deep(.invitation-actions) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.creator-main--native :deep(.invitation-actions .v-btn) {
+  min-width: 0;
+  min-height: 44px;
+}
+
+/* Cards on the invitation detail: Messages, the forms, the draft history. */
+.creator-main--native :deep([data-testid='creator-assignment-detail'] .v-card) {
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+  box-shadow: none;
+}
+
+.creator-main--native :deep([data-testid='creator-assignment-detail'] .v-card-title) {
+  padding: 20px 20px 8px;
+  font: var(--native-type-h4) !important;
+  letter-spacing: 0 !important;
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep([data-testid='creator-assignment-detail'] .v-card-text) {
+  padding: 8px 20px 20px;
+}
+
+.creator-main--native :deep([data-testid='creator-assignment-detail'] .v-card-actions) {
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0 20px 20px;
+}
+
+.creator-main--native :deep([data-testid='creator-assignment-detail'] .v-card-actions .v-spacer) {
+  display: none;
+}
+
+.creator-main--native :deep([data-testid='creator-assignment-detail'] .v-card-actions > p) {
+  flex: 1 1 100%;
+  order: -1;
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.creator-main--native :deep([data-testid='creator-assignment-detail'] .v-card-actions > .v-btn) {
+  flex: 1 1 100%;
+  min-height: 44px;
+}
+
+/* The Messages thread: bubbles on the raised surface, the creator's own in the
+   accent tint, system lines and times in Caption. */
+.creator-main--native :deep(.chat-panel__empty) {
+  padding: 12px 0;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+.creator-main--native :deep(.chat-message__bubble) {
+  max-width: 82%;
+  padding: 8px 12px;
+  background: var(--native-bg-surface-raised);
+  border-radius: var(--native-radius-xl);
+}
+
+.creator-main--native :deep(.chat-message--own .chat-message__bubble) {
+  background: var(--native-accent-primary-subtle);
+}
+
+.creator-main--native :deep(.chat-message__sender) {
+  font: var(--native-type-caption-strong);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+.creator-main--native :deep(.chat-message__body) {
+  font: var(--native-type-body);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.chat-message__time),
+.creator-main--native :deep(.chat-message__system) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+  opacity: 1;
+}
+
+/* A draft round (history): a tinted banner per state, not a solid colour block.
+   Vuetify's `.bg-<tone>` utilities are `!important`, so these are too. */
+.creator-main--native :deep(.draft-round-card) {
+  color: var(--native-text-primary) !important;
+  background: var(--native-bg-surface-raised) !important;
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-lg);
+}
+
+.creator-main--native :deep(.draft-round-card.bg-success) {
+  background: var(--native-status-success-subtle) !important;
+  border-color: var(--native-status-success);
+}
+
+.creator-main--native :deep(.draft-round-card.bg-warning) {
+  background: var(--native-status-warning-subtle) !important;
+  border-color: var(--native-status-warning);
+}
+
+.creator-main--native :deep(.draft-round-card.bg-error) {
+  background: var(--native-status-danger-subtle) !important;
+  border-color: var(--native-status-danger);
+}
+
+.creator-main--native :deep(.draft-round-card.bg-info) {
+  background: var(--native-status-info-subtle) !important;
+  border-color: var(--native-status-info);
+}
+
+/* Banners (the native banner style, all four tones) for the lifecycle and
+   state notices on both detail pages. `info` is already global. */
+.creator-main--native :deep(.v-alert--variant-tonal.text-success) {
+  background: var(--native-status-success-subtle);
+  border: 1px solid var(--native-status-success);
+}
+
+.creator-main--native :deep(.v-alert--variant-tonal.text-warning) {
+  background: var(--native-status-warning-subtle);
+  border: 1px solid var(--native-status-warning);
+}
+
+.creator-main--native :deep(.v-alert--variant-tonal.text-error) {
+  background: var(--native-status-danger-subtle);
+  border: 1px solid var(--native-status-danger);
+}
+
+.creator-main--native :deep(.v-alert--variant-tonal .v-alert__append) {
+  margin-inline-start: 12px;
+}
