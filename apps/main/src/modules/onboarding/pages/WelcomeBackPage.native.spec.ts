@@ -28,6 +28,10 @@ function creator(opts: {
   next: 'profile' | 'social' | 'contract' | 'review'
   done: string[]
   score?: number
+  /** `contract_signing_enabled` — false (the default) is the flag-OFF path. */
+  contractSigning?: boolean
+  /** `click_through_accepted_at` is stamped. */
+  accepted?: boolean
 }): { data: CreatorResource } {
   const ids = ['profile', 'social', 'portfolio', 'kyc', 'tax', 'payout', 'contract']
   return {
@@ -40,6 +44,7 @@ function creator(opts: {
         profile_completeness_score: opts.score ?? 21,
         submitted_at: null,
         updated_at: '2026-05-14T15:00:00+00:00',
+        click_through_accepted_at: opts.accepted ? '2026-05-14T15:00:00+00:00' : null,
         social_accounts: [],
         portfolio: [],
       },
@@ -51,7 +56,7 @@ function creator(opts: {
         flags: {
           kyc_verification_enabled: false,
           creator_payout_method_enabled: false,
-          contract_signing_enabled: false,
+          contract_signing_enabled: opts.contractSigning ?? false,
         },
       },
     },
@@ -159,6 +164,60 @@ describe('welcome back — native (frame 01)', () => {
     const w = await mountIt(true, creator({ next: 'profile', done: [], score: 0 }))
 
     expect(w.find('[data-test="welcome-back-heading"]').text()).toBe("Let's get started")
+  })
+})
+
+/**
+ * The real flag-OFF payload: the backend reports the contract step
+ * `is_complete: true` on EVERY account (a pseudo-completion, nothing was
+ * signed). Pedram's second re-walk saw "Master agreement" ticked on a brand-new
+ * 0% account, with Profile basics "Up next".
+ */
+describe('welcome back — the Master agreement tick is earned (AH-100d)', () => {
+  const contractRow = (w: Awaited<ReturnType<typeof mountIt>>) =>
+    w.find('[data-testid="welcome-back-step-contract"]').classes()
+
+  it('a fresh account is unchecked even though the flag-OFF backend reports it complete', async () => {
+    const w = await mountIt(
+      true,
+      creator({ next: 'profile', done: ['contract'], score: 5, accepted: false }),
+    )
+
+    expect(contractRow(w)).toContain('welcome-back__step--todo')
+    expect(contractRow(w)).not.toContain('welcome-back__step--done')
+    expect(states(w)[1]).toEqual(['welcome-back-step-profile', 'welcome-back__step--next'])
+  })
+
+  it('is checked once the creator has accepted the click-through', async () => {
+    const w = await mountIt(
+      true,
+      creator({
+        next: 'review',
+        done: ['profile', 'social', 'portfolio', 'contract'],
+        accepted: true,
+      }),
+    )
+
+    expect(contractRow(w)).toContain('welcome-back__step--done')
+  })
+
+  it('with signing ON, a signed contract is checked', async () => {
+    const w = await mountIt(
+      true,
+      creator({ next: 'review', done: ['profile', 'contract'], contractSigning: true }),
+    )
+
+    expect(contractRow(w)).toContain('welcome-back__step--done')
+  })
+
+  it('with signing ON, an unsigned contract is not', async () => {
+    const w = await mountIt(
+      true,
+      creator({ next: 'contract', done: ['profile'], contractSigning: true }),
+    )
+
+    expect(contractRow(w)).toContain('welcome-back__step--next')
+    expect(contractRow(w)).not.toContain('welcome-back__step--done')
   })
 })
 

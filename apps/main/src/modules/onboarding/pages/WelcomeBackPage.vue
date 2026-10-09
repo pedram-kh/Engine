@@ -98,7 +98,7 @@ import { useOnboardingStore } from '../stores/useOnboardingStore'
 import { hasMountedBefore, markMounted } from '../internal/welcomeBackFlag'
 import {
   VISIBLE_UX_STEPS,
-  resolveUxStepComplete,
+  resolveUxStepStatus,
   uxIndexForBackendStep,
   uxStepTitleKey,
 } from '../composables/useWizardSteps'
@@ -108,8 +108,16 @@ const { t } = useI18n()
 const router = useRouter()
 const onboardingStore = useOnboardingStore()
 
-const { creator, nextStep, isSubmitted, completenessScore, lastActivityAt, stepCompletion } =
-  storeToRefs(onboardingStore)
+const {
+  creator,
+  nextStep,
+  isSubmitted,
+  completenessScore,
+  lastActivityAt,
+  stepCompletion,
+  flags,
+  clickThroughAccepted,
+} = storeToRefs(onboardingStore)
 
 /**
  * AH-100d (Figma frame 01): the native app greets the creator by first name and
@@ -130,10 +138,21 @@ interface ChecklistRow {
   state: 'done' | 'next' | 'todo'
 }
 
+/**
+ * A row is ticked only for work the creator actually did. The wizard's own
+ * status resolver is used (not the raw `is_complete`) because a flag-OFF step
+ * reports `is_complete: true` as a pseudo-completion: with contract signing off
+ * the backend marks the Master agreement complete on a brand-new account, which
+ * read as a tick beside a 0% profile. That resolver returns `skipped` for it, and
+ * `completed` only once the click-through is accepted (or the flag is on and the
+ * contract genuinely signed). Display logic only: the store and the API are as they were.
+ */
 const checklist = computed<ChecklistRow[]>(() => {
   const nextIndex = nextStep.value === null ? -1 : uxIndexForBackendStep(nextStep.value)
   return VISIBLE_UX_STEPS.map((step, index) => {
-    const done = resolveUxStepComplete(step, stepCompletion.value)
+    const done =
+      resolveUxStepStatus(step, stepCompletion.value, flags.value, clickThroughAccepted.value) ===
+      'completed'
     return {
       id: step.id,
       titleKey: uxStepTitleKey(step),
