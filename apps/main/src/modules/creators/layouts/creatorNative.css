@@ -359,20 +359,32 @@
   opacity: 1;
 }
 
-/* Accept leads at full width; View and Decline share the row beneath it. */
+/* Frame 10's action row, for EVERY invitation card (direct-invited and
+   applied-then-accepted alike: one markup, no origin field in the payload):
+   "Accept invitation" alone on a full-width row, "View brief" and "Decline"
+   side by side beneath it. A two-column grid, because `flex` has no effect on a
+   grid item: the page's own mobile rule (`.assignment__actions > * { flex: 1 1 0 }`)
+   and the `.v-btn` rule can no longer squeeze Accept into half a row, which
+   clipped its label when all three actions rendered. With only View to show
+   (a read-only status), it takes the whole row. */
 .creator-main--native :deep(.assignment__actions) {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 8px;
 }
 
 .creator-main--native :deep(.assignment__actions .v-btn) {
-  flex: 1 1 0;
+  min-width: 0;
   min-height: 36px;
 }
 
-.creator-main--native :deep([data-testid^='creator-assignment-accept-']) {
-  flex: 1 0 100%;
+.creator-main--native :deep(.assignment__actions > .v-btn:only-child) {
+  grid-column: 1 / -1;
+}
+
+.creator-main--native
+  :deep(.assignment__actions > .v-btn[data-testid^='creator-assignment-accept-']) {
+  grid-column: 1 / -1;
   order: -1;
   min-height: 44px;
   font: var(--native-type-button-primary);

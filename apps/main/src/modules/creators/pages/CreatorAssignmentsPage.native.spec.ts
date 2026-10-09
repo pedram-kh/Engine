@@ -159,6 +159,43 @@ describe('invitations — native card (frame 10)', () => {
     expect(decline.classes()).toContain('text-error')
   })
 
+  /**
+   * Pedram's second re-walk: "Accept invitation" was clipped on cards where all
+   * three actions render. Frame 10: Accept full-width on its own row, View brief
+   * and Decline side by side beneath. The payload has no origin field, so a
+   * direct invitation and an applied-then-accepted one are the same markup; both
+   * shapes are mounted here (a full offer, and the sparse one an application
+   * produces: no note, no deliverables, no unit, no brand). The geometry itself
+   * is pinned in the CSS spec (native-invitation-actions.spec.ts); jsdom lays out
+   * nothing.
+   */
+  it('renders all three actions in one actions container on BOTH invitation kinds', async () => {
+    const wrapper = await mountIt(true, [
+      makeAssignment('DIRECT', 'invited'),
+      makeAssignment(
+        'APPLIED',
+        'invited',
+        { offer_description: null, deliverables: null, fee_per: null },
+        null,
+      ),
+    ])
+
+    for (const id of ['DIRECT', 'APPLIED']) {
+      const actions = wrapper.find(`[data-testid="creator-assignment-${id}"] .assignment__actions`)
+      expect(actions.exists()).toBe(true)
+      expect(actions.findAll('.v-btn')).toHaveLength(3)
+      expect(actions.find(`[data-testid="creator-assignment-accept-${id}"]`).text()).toBe(
+        'Accept invitation',
+      )
+      expect(actions.find(`[data-testid="creator-assignment-view-${id}"]`).text()).toBe(
+        'View brief',
+      )
+      expect(actions.find(`[data-testid="creator-assignment-decline-${id}"]`).text()).toBe(
+        'Decline',
+      )
+    }
+  })
+
   it('offers no Accept or Decline on an invitation that is no longer open', async () => {
     const wrapper = await mountIt(true, [makeAssignment('A', 'accepted')])
 
