@@ -194,6 +194,7 @@
           "avatar_required": "Zdjęcie profilowe jest wymagane do ukończenia tego kroku.",
           "step_requirements_hint": "Wypełnij wszystkie wymagane pola (oznaczone *), aby kontynuować.",
           "social_handle": "Nazwa użytkownika",
+          "social_handle_placeholder": "nazwa użytkownika",
           "social_handle_hint": "Podaj tylko swoją nazwę użytkownika — bez symbolu {'@'} ani pełnego adresu URL profilu.",
           "social_handle_invalid": "Podaj prawidłową nazwę użytkownika: 2–30 liter, cyfr, kropek, podkreśleń lub myślników (bez spacji, {'@'} lub adresów URL).",
           "social_profile_url": "Adres URL profilu",
@@ -280,6 +281,10 @@
           "all_complete_prompt": "Świetnie — ukończyłeś/aś każdy krok. Gotowy/a do przesłania?",
           "continue_button": "Kontynuuj do {step_name}",
           "review_button": "Przejrzyj i prześlij"
+        },
+        "social_status": {
+          "added": "Dodano",
+          "not_connected": "Niepołączono"
         }
       },
       "profile": {

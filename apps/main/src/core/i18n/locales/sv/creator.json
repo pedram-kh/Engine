@@ -194,6 +194,7 @@
           "avatar_required": "Ett profilfoto krävs för att slutföra det här steget.",
           "step_requirements_hint": "Fyll i alla obligatoriska fält (markerade med *) för att fortsätta.",
           "social_handle": "Användarnamn",
+          "social_handle_placeholder": "användarnamn",
           "social_handle_hint": "Ange bara ditt användarnamn — inget {'@'-tecken} eller fullständig profil-URL.",
           "social_handle_invalid": "Ange ett giltigt användarnamn: 2–30 bokstäver, siffror, punkter, understreck eller bindestreck (inga mellanslag, {'@'} eller URL:er).",
           "social_profile_url": "Profil-URL",
@@ -280,6 +281,10 @@
           "all_complete_prompt": "Ser bra ut — du har slutfört varje steg. Redo att skicka in?",
           "continue_button": "Fortsätt till {step_name}",
           "review_button": "Granska och skicka in"
+        },
+        "social_status": {
+          "added": "Tillagd",
+          "not_connected": "Inte ansluten"
         }
       },
       "profile": {

@@ -194,6 +194,7 @@
           "avatar_required": "Ein Profilfoto ist erforderlich, um diesen Schritt abzuschließen.",
           "step_requirements_hint": "Füllen Sie alle Pflichtfelder (mit * markiert) aus, um fortzufahren.",
           "social_handle": "Nutzername",
+          "social_handle_placeholder": "Nutzername",
           "social_handle_hint": "Gib nur deinen Nutzernamen ein — kein {'@'}-Symbol oder vollständige Profil-URL.",
           "social_handle_invalid": "Gib einen gültigen Nutzernamen ein: 2–30 Buchstaben, Zahlen, Punkte, Unterstriche oder Bindestriche (keine Leerzeichen, {'@'} oder URLs).",
           "social_profile_url": "Profil-URL",
@@ -280,6 +281,10 @@
           "all_complete_prompt": "Sehr gut — du hast jeden Schritt abgeschlossen. Bereit zum Einreichen?",
           "continue_button": "Weiter zu {step_name}",
           "review_button": "Prüfen und einreichen"
+        },
+        "social_status": {
+          "added": "Hinzugefügt",
+          "not_connected": "Nicht verbunden"
         }
       },
       "profile": {

@@ -194,6 +194,7 @@
           "avatar_required": "É necessária uma foto de perfil para concluir este passo.",
           "step_requirements_hint": "Preencha todos os campos obrigatórios (marcados com *) para continuar.",
           "social_handle": "Nome de utilizador",
+          "social_handle_placeholder": "nome de utilizador",
           "social_handle_hint": "Indique apenas o nome de utilizador — sem o símbolo {'@'} nem o URL completo do perfil.",
           "social_handle_invalid": "Indique um nome de utilizador válido: 2 a 30 letras, números, pontos, sublinhados ou hífenes (sem espaços, {'@'} ou URLs).",
           "social_profile_url": "URL do perfil",
@@ -280,6 +281,10 @@
           "all_complete_prompt": "Está pronto — completou todas as etapas. Pronto para submeter?",
           "continue_button": "Continuar para {step_name}",
           "review_button": "Rever e submeter"
+        },
+        "social_status": {
+          "added": "Adicionado",
+          "not_connected": "Não ligado"
         }
       },
       "profile": {

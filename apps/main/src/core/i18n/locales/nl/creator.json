@@ -194,6 +194,7 @@
           "avatar_required": "Een profielfoto is vereist om deze stap te voltooien.",
           "step_requirements_hint": "Vul alle verplichte velden (gemarkeerd met *) in om door te gaan.",
           "social_handle": "Gebruikersnaam",
+          "social_handle_placeholder": "gebruikersnaam",
           "social_handle_hint": "Voer alleen je gebruikersnaam in — geen {'@'}-symbool of volledige profiel-URL.",
           "social_handle_invalid": "Voer een geldige gebruikersnaam in: 2–30 letters, cijfers, punten, underscores of koppeltekens (geen spaties, {'@'} of URL's).",
           "social_profile_url": "Profiel-URL",
@@ -280,6 +281,10 @@
           "all_complete_prompt": "Goed gedaan — je hebt elke stap voltooid. Klaar om in te dienen?",
           "continue_button": "Doorgaan naar {step_name}",
           "review_button": "Beoordelen en indienen"
+        },
+        "social_status": {
+          "added": "Toegevoegd",
+          "not_connected": "Niet verbonden"
         }
       },
       "profile": {

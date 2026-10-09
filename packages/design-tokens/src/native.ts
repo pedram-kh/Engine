@@ -92,6 +92,7 @@ export const nativeDarkTheme: CatalystThemeDefinition = {
  */
 export const nativeCssVariables: Readonly<Record<string, string>> = {
   ...nativePalette,
+  'usp-6-subtle': 'rgb(244 114 182 / 0.16)',
   'status-success-subtle': 'rgb(52 199 123 / 0.16)',
   'status-danger-subtle': 'rgb(240 80 110 / 0.16)',
   'status-warning-subtle': 'rgb(245 165 36 / 0.16)',

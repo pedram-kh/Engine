@@ -194,6 +194,7 @@
           "avatar_required": "Pro dokončení tohoto kroku je vyžadována profilová fotografie.",
           "step_requirements_hint": "Izpolnite vsa obvezna polja (označena z *) za nadaljevanje.",
           "social_handle": "Uživatelské ime",
+          "social_handle_placeholder": "uporabniško ime",
           "social_handle_hint": "Zadejte pouze své uživatelské ime — bez symbolu {'@'} nebo plné URL profilu.",
           "social_handle_invalid": "Zadejte platné uživatelské ime: 2–30 písmen, číslic, teček, podtržítek nebo pomlček (bez mezer, {'@'} nebo URL).",
           "social_profile_url": "URL profilu",
@@ -280,6 +281,10 @@
           "all_complete_prompt": "Skvělé — dokončili jste každý krok. Připraveni k odeslání?",
           "continue_button": "Nadaljuj na {step_name}",
           "review_button": "Preveri a odeslat"
+        },
+        "social_status": {
+          "added": "Dodano",
+          "not_connected": "Ni povezano"
         }
       },
       "profile": {

@@ -194,6 +194,7 @@
           "avatar_required": "Et profilbillede er påkrævet for at afslutte dette trin.",
           "step_requirements_hint": "Udfyld alle påkrævede felter (markeret med *) for at fortsætte.",
           "social_handle": "Brugernavn",
+          "social_handle_placeholder": "brugernavn",
           "social_handle_hint": "Indtast kun dit brugernavn — intet {'@'}-symbol eller fuld profil-URL.",
           "social_handle_invalid": "Indtast et gyldigt brugernavn: 2–30 bogstaver, tal, punktummer, underscores eller bindestreger (ingen mellemrum, {'@'} eller URL'er).",
           "social_profile_url": "Profil-URL",
@@ -280,6 +281,10 @@
           "all_complete_prompt": "Ser godt ud — du har fuldført hvert trin. Klar til at indsende?",
           "continue_button": "Fortsæt til {step_name}",
           "review_button": "Gennemse og indsend"
+        },
+        "social_status": {
+          "added": "Tilføjet",
+          "not_connected": "Ikke forbundet"
         }
       },
       "profile": {

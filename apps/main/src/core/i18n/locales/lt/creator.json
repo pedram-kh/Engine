@@ -194,6 +194,7 @@
           "avatar_required": "A profile photo is required to finish this step.",
           "step_requirements_hint": "Norėdami tęsti, užpildykite visus privalomus laukus (pažymėtus *).",
           "social_handle": "Username",
+          "social_handle_placeholder": "naudotojo vardas",
           "social_handle_hint": "Enter your username only — no {'@'} symbol or full profile URL.",
           "social_handle_invalid": "Enter a valid username: 2–30 letters, numbers, dots, underscores or hyphens (no spaces, {'@'}, or URLs).",
           "social_profile_url": "Profilis URL",
@@ -280,6 +281,10 @@
           "all_complete_prompt": "Looking good — you've completed every step. Ready to submit?",
           "continue_button": "Tęsti to {step_name}",
           "review_button": "Review and submit"
+        },
+        "social_status": {
+          "added": "Pridėta",
+          "not_connected": "Neprijungta"
         }
       },
       "profile": {

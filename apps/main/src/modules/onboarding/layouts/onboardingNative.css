@@ -253,6 +253,99 @@
   color: var(--native-text-secondary);
 }
 
+/* The platform card (frames 04/05/13): brand tile, name + @handle / status,
+   "Added" pill; then Edit + Remove, or the "@ username" entry + Add. */
+.onboarding-native__body :deep(.social-card__top) {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.onboarding-native__body :deep(.social-card--native .social-card__head) {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 0;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.onboarding-native__body :deep(.social-card__tile) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--native-accent-primary);
+  background: var(--native-accent-primary-subtle);
+  border-radius: var(--native-radius-lg);
+}
+
+.onboarding-native__body :deep(.social-card__tile--instagram) {
+  color: var(--native-usp-6);
+  background: var(--native-usp-6-subtle);
+}
+
+.onboarding-native__body :deep(.social-card__tile--youtube) {
+  color: var(--native-status-danger);
+  background: var(--native-status-danger-subtle);
+}
+
+.onboarding-native__body :deep(.social-card--native .social-card__handle) {
+  text-align: left;
+}
+
+.onboarding-native__body :deep(.social-brand-icon) {
+  flex: none;
+  color: inherit;
+}
+
+.onboarding-native__body :deep(.social-brand-icon--svg) {
+  display: block;
+}
+
+.onboarding-native__body :deep(.social-card__status) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.onboarding-native__body :deep(.social-card__pill) {
+  display: inline-flex;
+  flex: none;
+  gap: 6px;
+  align-items: center;
+  padding: 3px 10px 3px 8px;
+  font: var(--native-type-caption-strong);
+  color: var(--native-status-success);
+  background: var(--native-status-success-subtle);
+  border-radius: var(--native-radius-full);
+}
+
+.onboarding-native__body :deep(.social-card__pill)::before {
+  width: 6px;
+  height: 6px;
+  content: '';
+  background: currentcolor;
+  border-radius: var(--native-radius-full);
+}
+
+.onboarding-native__body :deep(.social-card--native .social-card__actions) {
+  justify-content: flex-end;
+}
+
+.onboarding-native__body :deep(.social-card__entry) {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.onboarding-native__body :deep(.social-card__input) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 /* The portfolio's own sub-heading and the agreement's terms panel. */
 .onboarding-native__body :deep(.portfolio-step__gallery) {
   padding-top: 16px;

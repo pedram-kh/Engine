@@ -19,7 +19,10 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
+
 import { useOnboardingStore } from '../stores/useOnboardingStore'
+import SocialBrandIcon from './SocialBrandIcon.vue'
 
 const { t } = useI18n()
 const store = useOnboardingStore()
@@ -28,6 +31,12 @@ const display = useDisplay()
 // Mobile swaps the rigid 4-column desktop row for a stacked card with a
 // view/edit toggle (a connected account reads as a clean card until "Edit").
 const isMobile = computed(() => display.smAndDown.value)
+
+// AH-100d (Figma frames 04/05/13) — inside the Capacitor app each platform is a
+// card with a brand tile, the @handle, an "Added" pill and inline Edit / Remove
+// (or "@ username" + Add when not connected). The web keeps the two layouts
+// below; this is a third, native-only branch.
+const isNative = isNativePlatform()
 
 // Per-platform "currently editing the handle" flag. Only meaningful on the
 // mobile card path; the desktop row keeps its always-visible input.
@@ -213,9 +222,103 @@ async function saveEdit(platform: CreatorSocialPlatform): Promise<void> {
 
     <div class="social-accounts__forms">
       <template v-for="platform in PLATFORMS" :key="platform">
+        <!-- AH-100d: the creator app's platform card (frames 04/05/13). -->
+        <div
+          v-if="isNative"
+          class="social-card social-card--native"
+          :data-testid="`social-form-${platform}`"
+        >
+          <div class="social-card__top">
+            <span class="social-card__tile" :class="`social-card__tile--${platform}`">
+              <SocialBrandIcon :platform="platform" />
+            </span>
+            <div class="social-card__head">
+              <span class="social-card__platform">
+                {{ t(`creator.ui.wizard.social_platforms.${platform}`) }}
+              </span>
+              <span v-if="isConnected(platform)" class="social-card__handle">
+                @{{ connectedByPlatform[platform]?.handle }}
+              </span>
+              <span v-else class="social-card__status" data-testid="social-card-status">
+                {{ t('creator.ui.wizard.social_status.not_connected') }}
+              </span>
+            </div>
+            <span
+              v-if="isConnected(platform)"
+              class="social-card__pill"
+              :data-testid="`social-added-${platform}`"
+            >
+              {{ t('creator.ui.wizard.social_status.added') }}
+            </span>
+          </div>
+
+          <div v-if="isConnected(platform) && !editing[platform]" class="social-card__actions">
+            <v-btn
+              variant="outlined"
+              :data-testid="`social-edit-${platform}`"
+              @click="startEdit(platform)"
+            >
+              {{ t('creator.ui.wizard.actions.edit') }}
+            </v-btn>
+            <v-btn
+              variant="outlined"
+              color="error"
+              :loading="store.isLoadingSocial"
+              :data-testid="`social-remove-${platform}`"
+              @click="removePlatform(platform)"
+            >
+              {{ t('creator.ui.wizard.actions.remove') }}
+            </v-btn>
+          </div>
+
+          <div v-else class="social-card__entry">
+            <v-text-field
+              v-model="drafts[platform].handle"
+              class="social-card__input"
+              prefix="@"
+              :placeholder="t('creator.ui.wizard.fields.social_handle_placeholder')"
+              :aria-label="t('creator.ui.wizard.fields.social_handle')"
+              :data-testid="`social-handle-${platform}`"
+              density="compact"
+              hide-details="auto"
+              :rules="[
+                (v: string) =>
+                  normalizeHandle(v) === '' ||
+                  HANDLE_RE.test(normalizeHandle(v)) ||
+                  t('creator.ui.wizard.fields.social_handle_invalid'),
+              ]"
+              :error-messages="
+                drafts[platform].fieldErrors.handle ??
+                (drafts[platform].errorKey === null ? undefined : t(drafts[platform].errorKey!))
+              "
+            />
+            <v-btn
+              variant="tonal"
+              :loading="store.isLoadingSocial"
+              :disabled="drafts[platform].handle.trim() === '' || !isHandleValid(platform)"
+              :data-testid="`social-connect-${platform}`"
+              @click="editing[platform] ? saveEdit(platform) : connectPlatform(platform)"
+            >
+              {{
+                editing[platform]
+                  ? t('creator.ui.wizard.actions.save')
+                  : t('creator.ui.wizard.actions.connect')
+              }}
+            </v-btn>
+            <v-btn
+              v-if="editing[platform]"
+              variant="text"
+              :data-testid="`social-cancel-${platform}`"
+              @click="cancelEdit(platform)"
+            >
+              {{ t('creator.ui.wizard.actions.cancel') }}
+            </v-btn>
+          </div>
+        </div>
+
         <!-- Desktop: the original 4-column row (unchanged). -->
         <div
-          v-if="!isMobile"
+          v-else-if="!isMobile"
           class="social-accounts__form-row"
           :data-testid="`social-form-${platform}`"
         >

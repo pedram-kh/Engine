@@ -194,6 +194,7 @@
           "avatar_required": "A prотile photo is required to finish this step.",
           "step_requirements_hint": "Попълнете всички задължителни полета (отбелязани с *), за да продължите.",
           "social_handle": "Username",
+          "social_handle_placeholder": "потребителско име",
           "social_handle_hint": "Enter your username only — no {'@'} symbol or full prотile URL.",
           "social_handle_invalid": "Enter a valid username: 2–30 letters, numbers, dots, underscores or hyphens (no spaces, {'@'}, or URLs).",
           "social_profile_url": "Профил URL",
@@ -280,6 +281,10 @@
           "all_complete_prompt": "Looking good — you've completed every step. Ready to submit?",
           "continue_button": "Продължете to {step_name}",
           "review_button": "Review and submit"
+        },
+        "social_status": {
+          "added": "Добавен",
+          "not_connected": "Не е свързан"
         }
       },
       "profile": {

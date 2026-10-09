@@ -35,6 +35,8 @@
   --native-status-info: #4c8dff;
   --native-usp-5: #3ecf9e;
   --native-usp-6: #f472b6;
+  /* Brand tiles render as the colour at 16% (Figma frames 04/10/13). */
+  --native-usp-6-subtle: rgb(244 114 182 / 0.16);
 
   /* Status pills render as tinted fills in the frames. */
   --native-status-success-subtle: rgb(52 199 123 / 0.16);
@@ -233,6 +235,13 @@
   background: var(--native-bg-surface);
   border-color: var(--native-border-strong);
   color: var(--native-text-primary);
+}
+
+/* Danger outlined buttons (Remove, Decline) are Figma's tinted danger: danger
+   fill at 16%, danger border, danger label (frames 04, 10, 13). */
+.catalyst-native .v-btn--variant-outlined.text-error {
+  background: var(--native-status-danger-subtle);
+  border-color: var(--native-status-danger);
 }
 
 /* Alerts read as Figma's tinted banners (info / success / warning / danger). */

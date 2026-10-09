@@ -82,3 +82,18 @@ describe('nativeDarkTheme', () => {
     expect(ratio).toBeGreaterThanOrEqual(AA_NORMAL)
   })
 })
+
+describe('native.css button language (AH-100d)', () => {
+  it('danger outlined buttons (Remove, Decline) are the tinted-danger style: 16% fill, danger border', () => {
+    const rule = /\.catalyst-native \.v-btn--variant-outlined\.text-error\s*\{([^}]*)\}/.exec(
+      NATIVE_CSS,
+    )
+    expect(rule, 'the danger outlined rule exists').not.toBeNull()
+    expect(rule?.[1]).toMatch(/background:\s*var\(--native-status-danger-subtle\)/)
+    expect(rule?.[1]).toMatch(/border-color:\s*var\(--native-status-danger\)/)
+  })
+
+  it('brand tiles have a 16% pink token for Instagram (usp/6)', () => {
+    expect(declared().get('usp-6-subtle')).toBe('rgb(244 114 182 / 0.16)')
+  })
+})

@@ -363,6 +363,99 @@
   gap: 8px;
 }
 
+/* The platform card (frames 04/05/13): brand tile, name + @handle / status,
+   "Added" pill; then Edit + Remove, or the "@ username" entry + Add. */
+.creator-main--native :deep(.social-card__top) {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.creator-main--native :deep(.social-card--native .social-card__head) {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 0;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.creator-main--native :deep(.social-card__tile) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--native-accent-primary);
+  background: var(--native-accent-primary-subtle);
+  border-radius: var(--native-radius-lg);
+}
+
+.creator-main--native :deep(.social-card__tile--instagram) {
+  color: var(--native-usp-6);
+  background: var(--native-usp-6-subtle);
+}
+
+.creator-main--native :deep(.social-card__tile--youtube) {
+  color: var(--native-status-danger);
+  background: var(--native-status-danger-subtle);
+}
+
+.creator-main--native :deep(.social-card--native .social-card__handle) {
+  text-align: left;
+}
+
+.creator-main--native :deep(.social-brand-icon) {
+  flex: none;
+  color: inherit;
+}
+
+.creator-main--native :deep(.social-brand-icon--svg) {
+  display: block;
+}
+
+.creator-main--native :deep(.social-card__status) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.creator-main--native :deep(.social-card__pill) {
+  display: inline-flex;
+  flex: none;
+  gap: 6px;
+  align-items: center;
+  padding: 3px 10px 3px 8px;
+  font: var(--native-type-caption-strong);
+  color: var(--native-status-success);
+  background: var(--native-status-success-subtle);
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep(.social-card__pill)::before {
+  width: 6px;
+  height: 6px;
+  content: '';
+  background: currentcolor;
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep(.social-card--native .social-card__actions) {
+  justify-content: flex-end;
+}
+
+.creator-main--native :deep(.social-card__entry) {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.creator-main--native :deep(.social-card__input) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 /* ── Portfolio ─────────────────────────────────────────────────────────── */
 
 .creator-main--native :deep(.portfolio-step__gallery) {
