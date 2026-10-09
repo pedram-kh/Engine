@@ -659,6 +659,20 @@
   border-radius: var(--native-radius-xl);
 }
 
+/* The completeness bar reads as frame 06c's "Profile strength" card. */
+.onboarding-native__body :deep(.review-step > .completeness-bar) {
+  gap: 12px;
+  padding: 20px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+.onboarding-native__body :deep(.review-step .completeness-bar__label) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
 .onboarding-native__body :deep(.review-step__rows) {
   display: flex;
   flex-direction: column;
