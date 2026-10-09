@@ -202,6 +202,22 @@
   color: var(--native-text-on-accent);
 }
 
+/* AH-100d — the button radius is Figma's `radius/lg` (8px) on every size and
+   variant (Lg 44 and Md 36, frames 02–14). AH-100 set it through the Vuetify
+   `defaults.VBtn.style` token, and it never rendered: that same default sets
+   `rounded: 0`, which makes Vuetify add `.rounded-0 { border-radius: 0
+   !important }`, and an inline style without `!important` can never beat an
+   `!important` class (measured: 0px). So the rule has to be `!important` too,
+   and it out-ranks `.rounded-0` on specificity. Icon-only buttons take
+   Vuetify's own circle back. Pinned by native-button-radius.spec.ts. */
+.catalyst-native .v-btn:not(.v-btn--icon) {
+  border-radius: var(--native-radius-lg) !important;
+}
+
+.catalyst-native .v-btn.v-btn--icon {
+  border-radius: var(--native-radius-full) !important;
+}
+
 /* Tonal buttons are Figma's "Soft": accent-subtle fill, mint label. */
 .catalyst-native .v-btn--variant-tonal {
   background: var(--native-accent-primary-subtle);
