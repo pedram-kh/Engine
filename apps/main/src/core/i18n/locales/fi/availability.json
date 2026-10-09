@@ -12,7 +12,7 @@
       "profile": "Profiili",
       "dashboard": "Kojelauta",
       "jobs": "Työpaikat",
-      "assignments": "Kutsus",
+      "assignments": "Kutsut",
       "availability": "Saatavuus",
       "messages": "Viestit",
       "more": "Lisää",
@@ -21,6 +21,13 @@
         "profile": "Kuva, esittely ja some",
         "availability": "Estä päivämääriä",
         "settings": "Ilmoitusasetukset"
+      },
+      "tab": {
+        "dashboard": "Kojelauta",
+        "jobs": "Työpaikat",
+        "assignments": "Kutsut",
+        "messages": "Viestit",
+        "more": "Lisää"
       }
     },
     "nav": {

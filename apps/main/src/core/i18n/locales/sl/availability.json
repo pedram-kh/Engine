@@ -21,6 +21,13 @@
         "profile": "Fotografija, opis in družbena omrežja",
         "availability": "Blokirajte datume",
         "settings": "Nastavitve obvestil"
+      },
+      "tab": {
+        "dashboard": "Pregled",
+        "jobs": "Oglasi",
+        "assignments": "Povabila",
+        "messages": "Sporočila",
+        "more": "Več"
       }
     },
     "nav": {

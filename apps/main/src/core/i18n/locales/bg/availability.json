@@ -12,7 +12,7 @@
       "profile": "Профил",
       "dashboard": "Табло за управление",
       "jobs": "Обяви за работа",
-      "assignments": "Поканаs",
+      "assignments": "Покани",
       "availability": "Наличност",
       "messages": "Съобщения",
       "more": "Още",
@@ -21,6 +21,13 @@
         "profile": "Снимка, био и социални мрежи",
         "availability": "Блокирайте дати",
         "settings": "Предпочитания за известия"
+      },
+      "tab": {
+        "dashboard": "Табло",
+        "jobs": "Обяви",
+        "assignments": "Покани",
+        "messages": "Съобщения",
+        "more": "Още"
       }
     },
     "nav": {

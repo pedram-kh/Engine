@@ -22,6 +22,7 @@ import { lightTheme, darkTheme } from '@catalyst/design-tokens/vuetify'
 import enApp from '@/core/i18n/locales/en/app.json'
 import enAvailability from '@/core/i18n/locales/en/availability.json'
 import enNotifications from '@/core/i18n/locales/en/notifications.json'
+import frAvailability from '@/core/i18n/locales/fr/availability.json'
 import itAvailability from '@/core/i18n/locales/it/availability.json'
 import ptAvailability from '@/core/i18n/locales/pt/availability.json'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
@@ -96,7 +97,7 @@ function setViewportWidth(width: number): void {
 
 async function mountLayout(
   options: {
-    locale?: 'en' | 'pt' | 'it'
+    locale?: 'en' | 'pt' | 'it' | 'fr'
     route?: string
     dark?: boolean
     applicationStatus?: string
@@ -174,11 +175,12 @@ async function mountLayout(
     legacy: false,
     locale: options.locale ?? 'en',
     fallbackLocale: 'en',
-    availableLocales: ['en', 'pt', 'it'],
+    availableLocales: ['en', 'pt', 'it', 'fr'],
     messages: {
       en: { ...enApp, ...enAvailability, ...enNotifications },
       pt: { ...enApp, ...ptAvailability, ...enNotifications },
       it: { ...enApp, ...itAvailability, ...enNotifications },
+      fr: { ...enApp, ...frAvailability, ...enNotifications },
     } as never,
   }) as unknown as ReturnType<typeof createI18n>
 
@@ -504,5 +506,46 @@ describe('CreatorDashboardLayout — creator app shell (AH-100)', () => {
     expect(
       w.find('[data-test="creator-bottom-nav-more-list"] .v-list-item-subtitle').exists(),
     ).toBe(false)
+  })
+})
+
+/**
+ * AH-100d — the French tab bar collided: "Tableau de bord" and "Offres de
+ * mission" overlap or clip in a fifth of a 390px phone. The app's bar reads its
+ * own short labels (`availability.creatorNav.tab.*`); the web's bottom bar and
+ * topbar keep the full ones, so a browser's labels are unchanged.
+ */
+describe('CreatorDashboardLayout — tab bar labels (AH-100d)', () => {
+  let cleanup: (() => void) | null = null
+  afterEach(() => cleanup?.())
+
+  const labels = (w: Awaited<ReturnType<typeof mountLayout>>['wrapper']) =>
+    ['dashboard', 'jobs', 'assignments', 'messages', 'more'].map((k) =>
+      w.find(`[data-test="creator-bottom-nav-${k}"]`).text(),
+    )
+
+  it('the app bar uses the short French labels', async () => {
+    const m = await mountLayout({
+      native: true,
+      mobile: true,
+      locale: 'fr',
+      applicationStatus: 'approved',
+    })
+    cleanup = m.cleanup
+
+    expect(labels(m.wrapper)).toEqual(['Accueil', 'Offres', 'Invitations', 'Messages', 'Plus'])
+  })
+
+  it('the web bottom bar keeps the full French labels', async () => {
+    const m = await mountLayout({ mobile: true, locale: 'fr', applicationStatus: 'approved' })
+    cleanup = m.cleanup
+
+    expect(labels(m.wrapper)).toEqual([
+      'Tableau de bord',
+      'Offres de mission',
+      'Invitations',
+      'Messages',
+      'Plus',
+    ])
   })
 })

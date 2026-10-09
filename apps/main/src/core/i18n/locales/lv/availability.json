@@ -12,7 +12,7 @@
       "profile": "Profils",
       "dashboard": "Vadības panelis",
       "jobs": "Darba sludinājumi",
-      "assignments": "Uzaicinājumss",
+      "assignments": "Ielūgumi",
       "availability": "Pieejamība",
       "messages": "Ziņojumi",
       "more": "Vairāk",
@@ -21,6 +21,13 @@
         "profile": "Foto, biogrāfija un sociālie tīkli",
         "availability": "Bloķējiet datumus",
         "settings": "Paziņojumu preferences"
+      },
+      "tab": {
+        "dashboard": "Panelis",
+        "jobs": "Darbi",
+        "assignments": "Ielūgumi",
+        "messages": "Ziņojumi",
+        "more": "Vairāk"
       }
     },
     "nav": {

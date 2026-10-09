@@ -12,7 +12,7 @@
       "profile": "Profiil",
       "dashboard": "Juhtpaneel",
       "jobs": "Tööpakkumised",
-      "assignments": "Kutses",
+      "assignments": "Kutsed",
       "availability": "Kättesaadavus",
       "messages": "Sõnumid",
       "more": "Rohkem",
@@ -21,6 +21,13 @@
         "profile": "Foto, tutvustus ja sotsiaalmeedia",
         "availability": "Blokeeri kuupäevi",
         "settings": "Teavituste eelistused"
+      },
+      "tab": {
+        "dashboard": "Juhtpaneel",
+        "jobs": "Töökohad",
+        "assignments": "Kutsed",
+        "messages": "Sõnumid",
+        "more": "Rohkem"
       }
     },
     "nav": {

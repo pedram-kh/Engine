@@ -12,7 +12,7 @@
       "profile": "Profil",
       "dashboard": "Irányítópult",
       "jobs": "Álláshirdetések",
-      "assignments": "Meghívós",
+      "assignments": "Meghívók",
       "availability": "Elérhetőség",
       "messages": "Üzenetek",
       "more": "Továbbiak",
@@ -21,6 +21,13 @@
         "profile": "Fotó, bemutatkozás és közösségi média",
         "availability": "Dátumok letiltása",
         "settings": "Értesítési beállítások"
+      },
+      "tab": {
+        "dashboard": "Irányítópult",
+        "jobs": "Állások",
+        "assignments": "Meghívók",
+        "messages": "Üzenetek",
+        "more": "Továbbiak"
       }
     },
     "nav": {

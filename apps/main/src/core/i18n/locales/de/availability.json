@@ -21,6 +21,13 @@
         "profile": "Foto, Bio und Social Media",
         "availability": "Termine blockieren",
         "settings": "Benachrichtigungseinstellungen"
+      },
+      "tab": {
+        "dashboard": "Dashboard",
+        "jobs": "Jobs",
+        "assignments": "Einladungen",
+        "messages": "Nachrichten",
+        "more": "Mehr"
       }
     },
     "nav": {

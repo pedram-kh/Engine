@@ -21,6 +21,13 @@
         "profile": "Zdjęcie, bio i media społecznościowe",
         "availability": "Zablokuj daty",
         "settings": "Preferencje powiadomień"
+      },
+      "tab": {
+        "dashboard": "Pulpit",
+        "jobs": "Oferty",
+        "assignments": "Zaproszenia",
+        "messages": "Wiadomości",
+        "more": "Więcej"
       }
     },
     "nav": {

@@ -12,7 +12,7 @@
       "profile": "Profilis",
       "dashboard": "Valdymo skydelis",
       "jobs": "Darbo skelbimai",
-      "assignments": "Kvietimass",
+      "assignments": "Kvietimai",
       "availability": "Pasiekiamumas",
       "messages": "Žinutės",
       "more": "Daugiau",
@@ -21,6 +21,13 @@
         "profile": "Nuotrauka, aprašymas ir socialiniai tinklai",
         "availability": "Užblokuokite datas",
         "settings": "Pranešimų nuostatos"
+      },
+      "tab": {
+        "dashboard": "Skydelis",
+        "jobs": "Darbai",
+        "assignments": "Kvietimai",
+        "messages": "Žinutės",
+        "more": "Daugiau"
       }
     },
     "nav": {

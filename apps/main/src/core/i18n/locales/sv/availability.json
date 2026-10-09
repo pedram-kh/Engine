@@ -21,6 +21,13 @@
         "profile": "Foto, bio och sociala medier",
         "availability": "Blockera datum",
         "settings": "Aviseringsinställningar"
+      },
+      "tab": {
+        "dashboard": "Dashboard",
+        "jobs": "Jobb",
+        "assignments": "Inbjudningar",
+        "messages": "Chattar",
+        "more": "Mer"
       }
     },
     "nav": {

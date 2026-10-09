@@ -12,7 +12,7 @@
       "profile": "Próifíl",
       "dashboard": "Deais",
       "jobs": "Poist",
-      "assignments": "Cuireadhs",
+      "assignments": "Cuirí",
       "availability": "Infhaighteacht",
       "messages": "Teachtaireachtaí",
       "more": "Tuilleadh",
@@ -21,6 +21,13 @@
         "profile": "Grianghraf, beathaisnéis agus meáin shóisialta",
         "availability": "Cuir bac ar dhátaí",
         "settings": "Roghanna fógraí"
+      },
+      "tab": {
+        "dashboard": "Painéal",
+        "jobs": "Poist",
+        "assignments": "Cuirí",
+        "messages": "Comhráite",
+        "more": "Tuilleadh"
       }
     },
     "nav": {

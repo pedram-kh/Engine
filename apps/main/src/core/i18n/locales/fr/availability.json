@@ -21,6 +21,13 @@
         "profile": "Photo, bio et réseaux sociaux",
         "availability": "Bloquez des dates",
         "settings": "Préférences de notification"
+      },
+      "tab": {
+        "dashboard": "Accueil",
+        "jobs": "Offres",
+        "assignments": "Invitations",
+        "messages": "Messages",
+        "more": "Plus"
       }
     },
     "nav": {

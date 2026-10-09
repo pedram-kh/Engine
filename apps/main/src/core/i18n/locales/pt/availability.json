@@ -21,6 +21,13 @@
         "profile": "Fotografia, biografia e redes sociais",
         "availability": "Bloqueie datas",
         "settings": "Preferências de notificações"
+      },
+      "tab": {
+        "dashboard": "Painel",
+        "jobs": "Ofertas",
+        "assignments": "Convites",
+        "messages": "Mensagens",
+        "more": "Mais"
       }
     },
     "nav": {

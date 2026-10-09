@@ -21,6 +21,13 @@
         "profile": "Fotografija, biografija i društvene mreže",
         "availability": "Blokirajte datume",
         "settings": "Postavke obavijesti"
+      },
+      "tab": {
+        "dashboard": "Početna",
+        "jobs": "Poslovi",
+        "assignments": "Pozivi",
+        "messages": "Poruke",
+        "more": "Više"
       }
     },
     "nav": {

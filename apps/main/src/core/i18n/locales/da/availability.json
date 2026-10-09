@@ -21,6 +21,13 @@
         "profile": "Foto, bio og sociale medier",
         "availability": "Bloker datoer",
         "settings": "Notifikationsindstillinger"
+      },
+      "tab": {
+        "dashboard": "Dashboard",
+        "jobs": "Jobopslag",
+        "assignments": "Invitationer",
+        "messages": "Beskeder",
+        "more": "Mere"
       }
     },
     "nav": {

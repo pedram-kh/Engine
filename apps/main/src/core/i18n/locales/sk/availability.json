@@ -21,6 +21,13 @@
         "profile": "Fotka, bio a sociálne siete",
         "availability": "Blokujte termíny",
         "settings": "Predvoľby upozornení"
+      },
+      "tab": {
+        "dashboard": "Prehľad",
+        "jobs": "Ponuky",
+        "assignments": "Pozvánky",
+        "messages": "Správy",
+        "more": "Viac"
       }
     },
     "nav": {

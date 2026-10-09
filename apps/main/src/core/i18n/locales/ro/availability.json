@@ -12,7 +12,7 @@
       "profile": "Profil",
       "dashboard": "Panou de control",
       "jobs": "Anunțuri de job",
-      "assignments": "Invitațies",
+      "assignments": "Invitații",
       "availability": "Disponibilitate",
       "messages": "Mesaje",
       "more": "Mai multe",
@@ -21,6 +21,13 @@
         "profile": "Fotografie, biografie și rețele sociale",
         "availability": "Blocați date",
         "settings": "Preferințe de notificare"
+      },
+      "tab": {
+        "dashboard": "Panou",
+        "jobs": "Joburi",
+        "assignments": "Invitații",
+        "messages": "Mesaje",
+        "more": "Mai multe"
       }
     },
     "nav": {

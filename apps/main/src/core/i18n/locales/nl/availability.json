@@ -21,6 +21,13 @@
         "profile": "Foto, bio en socials",
         "availability": "Blokkeer data",
         "settings": "Meldingsvoorkeuren"
+      },
+      "tab": {
+        "dashboard": "Dashboard",
+        "jobs": "Vacatures",
+        "assignments": "Uitnodigingen",
+        "messages": "Berichten",
+        "more": "Meer"
       }
     },
     "nav": {

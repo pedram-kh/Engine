@@ -322,9 +322,10 @@ onMounted(() => {
         :to="{ name: item.routeName }"
         :data-test="`creator-bottom-nav-${item.key}`"
       >
+        <span v-if="isNative" class="creator-bottom-nav__line" aria-hidden="true" />
         <v-icon :icon="item.icon" />
         <span class="creator-bottom-nav__label">
-          {{ t(`availability.creatorNav.${item.key}`) }}
+          {{ t(`availability.creatorNav.${isNative ? 'tab.' : ''}${item.key}`) }}
         </span>
       </v-btn>
 
@@ -341,9 +342,12 @@ onMounted(() => {
             :class="{ 'creator-bottom-nav__more--open': isNative && moreMenuOpen }"
             data-test="creator-bottom-nav-more"
           >
+            <span v-if="isNative" class="creator-bottom-nav__line" aria-hidden="true" />
             <v-icon icon="mdi-dots-horizontal" />
             <span class="creator-bottom-nav__label">
-              {{ t('availability.creatorNav.more') }}
+              {{
+                t(isNative ? 'availability.creatorNav.tab.more' : 'availability.creatorNav.more')
+              }}
             </span>
           </v-btn>
         </template>
@@ -441,13 +445,55 @@ onMounted(() => {
   background: var(--native-bg-sidebar) !important;
   border-top: 1px solid var(--native-border-default);
   box-shadow: none !important;
-  height: calc(56px + var(--native-safe-bottom)) !important;
+  /* Frame 07's bar: 1px rule + 58px item row + the home-indicator inset. */
+  height: calc(59px + var(--native-safe-bottom)) !important;
   padding-bottom: var(--native-safe-bottom);
 }
 
+/* The selected treatment, from frames 07 / 09 / 10 (Bottom nav, node 20:296):
+   NO fill and NO block. A tab is an icon over a label. The selected one has its
+   icon and label in the accent colour, the label in Medium (Caption/Strong), and a
+   28 x 2 accent line (radius/full) at the very top of its cell. Unselected tabs are
+   text/tertiary, Regular. Items share the row equally; gap 4, icon 22, label 12/16.
+
+   Why it read as "a filled rounded block": `.catalyst-native .v-btn` gives every
+   button the 8px radius (!important, AH-100d), and Vuetify paints an overlay on
+   the active button, so the active tab became a rounded tinted block. The bar's
+   buttons take the square cell back, and the overlay and underlay are not drawn. */
 .creator-bottom-nav--native :deep(.v-bottom-navigation__content > .v-btn) {
   position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: none;
+  padding: 0 2px;
   color: var(--native-text-tertiary);
+  letter-spacing: 0;
+  text-transform: none;
+  background: transparent;
+  border-radius: 0 !important;
+}
+
+.creator-bottom-nav--native :deep(.v-bottom-navigation__content > .v-btn .v-btn__overlay),
+.creator-bottom-nav--native :deep(.v-bottom-navigation__content > .v-btn .v-btn__underlay) {
+  display: none;
+}
+
+.creator-bottom-nav--native :deep(.v-bottom-navigation__content > .v-btn .v-btn__content) {
+  gap: 4px;
+  max-width: 100%;
+}
+
+.creator-bottom-nav--native :deep(.v-bottom-navigation__content > .v-btn .v-icon) {
+  --v-icon-size-multiplier: 1;
+
+  width: 22px;
+  height: 22px;
+  font-size: 22px;
+}
+
+.creator-bottom-nav--native :deep(.v-bottom-navigation__content > .v-btn:focus-visible) {
+  outline: 2px solid var(--native-accent-primary);
+  outline-offset: -2px;
 }
 
 .creator-bottom-nav--native :deep(.v-bottom-navigation__content > .v-btn--active),
@@ -455,18 +501,24 @@ onMounted(() => {
   color: var(--native-accent-primary);
 }
 
-.creator-bottom-nav--native :deep(.v-bottom-navigation__content > .v-btn--active)::after,
-.creator-bottom-nav--native
-  :deep(.v-bottom-navigation__content > .creator-bottom-nav__more--open)::after {
-  content: '';
+/* The selected line is a real element, not a pseudo-element: Vuetify's own
+   `.v-btn::before` / `::after` carry the hover and focus layers, and its `::after`
+   is `opacity: 0`, so the line drawn there since AH-100 never showed. */
+.creator-bottom-nav__line {
   position: absolute;
   top: 0;
   left: 50%;
+  display: none;
   width: 28px;
   height: 2px;
   margin-left: -14px;
-  border-radius: var(--native-radius-full);
   background: var(--native-accent-primary);
+  border-radius: var(--native-radius-full);
+}
+
+.creator-bottom-nav--native :deep(.v-btn--active) .creator-bottom-nav__line,
+.creator-bottom-nav--native .creator-bottom-nav__more--open .creator-bottom-nav__line {
+  display: block;
 }
 
 .creator-bottom-nav--native .creator-bottom-nav__label {

@@ -12,7 +12,7 @@
       "profile": "Profil",
       "dashboard": "Dashboard",
       "jobs": "Postijiet tax-xogħol",
-      "assignments": "Stedinas",
+      "assignments": "Stediniet",
       "availability": "Disponibilità",
       "messages": "Messaġġi",
       "more": "Aktar",
@@ -21,6 +21,13 @@
         "profile": "Ritratt, bijografija u midja soċjali",
         "availability": "Imblokka d-dati",
         "settings": "Preferenzi tan-notifiki"
+      },
+      "tab": {
+        "dashboard": "Pannell",
+        "jobs": "Impjiegi",
+        "assignments": "Stediniet",
+        "messages": "Messaġġi",
+        "more": "Aktar"
       }
     },
     "nav": {

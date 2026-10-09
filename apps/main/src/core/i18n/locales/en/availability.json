@@ -21,6 +21,13 @@
         "profile": "Photo, bio and socials",
         "availability": "Block out dates",
         "settings": "Notification preferences"
+      },
+      "tab": {
+        "dashboard": "Dashboard",
+        "jobs": "Job Posts",
+        "assignments": "Invitations",
+        "messages": "Messages",
+        "more": "More"
       }
     },
     "nav": {
