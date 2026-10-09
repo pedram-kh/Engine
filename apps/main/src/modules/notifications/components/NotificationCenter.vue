@@ -24,8 +24,11 @@ import type { NotificationResource } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
+
 import { notificationsApi } from '../api/notifications.api'
 import type { NotificationPollHandle } from '../composables/useNotificationPoll'
+import { compactAge, notificationVisual } from '../notificationVisual'
 import { notificationTemplateKey } from '../templates'
 
 const props = withDefaults(
@@ -41,7 +44,14 @@ const props = withDefaults(
   },
 )
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+/**
+ * AH-100d (Figma frame 09): in the native app each row carries a type-icon disc,
+ * a compact age and the unread dot on the right, and the page ends "You're all
+ * caught up". Web keeps its own row.
+ */
+const isNative = isNativePlatform()
 
 const DROPDOWN_PER_PAGE = 8
 const PAGE_PER_PAGE = 25
@@ -229,7 +239,43 @@ defineExpose({ reload, load })
         :data-test="`notification-row${isUnread(row) ? ' notification-row--unread' : ''}`"
         @click="onRowClick(row)"
       >
-        <div class="d-flex align-start ga-2">
+        <div v-if="isNative" class="notification-row">
+          <span
+            class="notification-row__icon"
+            :class="`notification-row__icon--${notificationVisual(row.attributes.notification_type).tone}`"
+            data-test="notification-type-icon"
+          >
+            <v-icon :icon="notificationVisual(row.attributes.notification_type).icon" size="18" />
+          </span>
+          <div class="notification-row__text">
+            <div
+              v-if="roundLabel(row)"
+              class="text-caption text-medium-emphasis"
+              data-test="notification-round"
+            >
+              {{ roundLabel(row) }}
+            </div>
+            <div class="text-body-2" data-test="notification-body">{{ bodyText(row) }}</div>
+            <div
+              v-if="detailText(row)"
+              class="text-caption text-medium-emphasis mt-1"
+              data-test="notification-detail"
+            >
+              {{ detailText(row)?.label }}: {{ detailText(row)?.text }}
+            </div>
+          </div>
+          <div class="notification-row__aside">
+            <span class="notification-row__time" data-test="notification-age">{{
+              compactAge(row.attributes.created_at, locale)
+            }}</span>
+            <span
+              v-if="isUnread(row)"
+              class="notification-row__dot"
+              data-test="notification-unread-dot"
+            />
+          </div>
+        </div>
+        <div v-else class="d-flex align-start ga-2">
           <v-icon
             v-if="isUnread(row)"
             icon="mdi-circle"
@@ -258,6 +304,15 @@ defineExpose({ reload, load })
         </div>
       </v-list-item>
     </v-list>
+
+    <!-- Native page footer (frame 09): the end of the feed. -->
+    <div
+      v-if="isNative && variant === 'page' && hasRows && page >= lastPage"
+      class="notification-center__caught-up"
+      data-test="notification-caught-up"
+    >
+      {{ t('notifications.center.empty') }}
+    </div>
 
     <!-- Dropdown footer: view-all link -->
     <template v-if="variant === 'dropdown' && viewAllRoute">

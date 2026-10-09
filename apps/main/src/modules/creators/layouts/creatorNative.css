@@ -136,6 +136,78 @@
   opacity: 1;
 }
 
+/* A row: type-icon disc, the text, then the age over the unread dot (frame 09). */
+.creator-main--native :deep(.notification-row) {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.creator-main--native :deep(.notification-row__icon) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--native-text-secondary);
+  background: var(--native-bg-surface-raised);
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep(.notification-row__icon--accent) {
+  color: var(--native-accent-primary);
+  background: var(--native-accent-primary-subtle);
+}
+
+.creator-main--native :deep(.notification-row__icon--success) {
+  color: var(--native-status-success);
+  background: var(--native-status-success-subtle);
+}
+
+.creator-main--native :deep(.notification-row__icon--info) {
+  color: var(--native-status-info);
+  background: var(--native-status-info-subtle);
+}
+
+.creator-main--native :deep(.notification-row__icon--danger) {
+  color: var(--native-status-danger);
+  background: var(--native-status-danger-subtle);
+}
+
+.creator-main--native :deep(.notification-row__text) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.creator-main--native :deep(.notification-row__aside) {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  min-height: 32px;
+}
+
+.creator-main--native :deep(.notification-row__time) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.creator-main--native :deep(.notification-row__dot) {
+  width: 8px;
+  height: 8px;
+  background: var(--native-accent-primary);
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep(.notification-center__caught-up) {
+  padding: 16px 0 0;
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+  text-align: center;
+}
+
 /* Campaign invitations (frame 10): each invitation is a stacked card. */
 .creator-main--native :deep(.creator-assignments),
 .creator-main--native :deep(.creator-jobs) {
