@@ -431,6 +431,4 @@
 
 .creator-main--native :deep(.rel-inbox__empty .v-btn) {
   min-height: 36px;
-  color: var(--native-text-on-accent);
-  background: var(--native-accent-primary);
 }

@@ -13,6 +13,8 @@ import type { RouteLocationRaw } from 'vue-router'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
+
 export interface RelationshipInboxItem {
   /** Stable key (the thread or counterparty ULID). */
   id: string
@@ -49,6 +51,15 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n()
 
+/**
+ * AH-100d: inside the creator app the CTA is the filled primary button. The
+ * web's tonal variant puts Vuetify's `text-primary` (`color: ... !important`)
+ * on the label, and the native sheet's mint fill made it mint-on-mint: a blank
+ * pill. The label resolves fine; the paint did not. A filled button takes the
+ * app's own on-accent label colour.
+ */
+const isNative = isNativePlatform()
+
 const dateFormatter = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'short' }))
 
 function formatStamp(iso: string | null): string {
@@ -76,7 +87,7 @@ function formatStamp(iso: string | null): string {
       <p class="rel-inbox__empty-text">{{ t('app.messaging.relationship.inboxEmpty') }}</p>
       <v-btn
         color="primary"
-        variant="tonal"
+        :variant="isNative ? 'flat' : 'tonal'"
         prepend-icon="mdi-message-plus-outline"
         data-test="relationship-inbox-start"
         @click="emit('start')"
