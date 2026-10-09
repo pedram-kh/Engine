@@ -286,7 +286,11 @@
           "next_step_prompt": "Vous êtes à l'étape {step}. Continuez ici, ou revenez en arrière pour modifier une étape précédente.",
           "all_complete_prompt": "Tout est prêt — vous avez terminé toutes les étapes. Prêt à soumettre ?",
           "continue_button": "Continuer vers {step_name}",
-          "review_button": "Vérifier et soumettre"
+          "review_button": "Vérifier et soumettre",
+          "title_named": "Bon retour, {name}",
+          "subtitle_native": "Reprenez là où vous vous étiez arrêté. Tout ce que vous avez saisi a été enregistré.",
+          "up_next": "Prochaine étape",
+          "footer_hint": "Vous pouvez revenir en arrière et modifier n'importe quelle étape précédente à tout moment."
         },
         "social_status": {
           "added": "Ajouté",

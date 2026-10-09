@@ -286,7 +286,11 @@
           "next_step_prompt": "Du er ved trin {step}. Fortsæt her, eller hop tilbage for at redigere et tidligere trin.",
           "all_complete_prompt": "Ser godt ud — du har fuldført hvert trin. Klar til at indsende?",
           "continue_button": "Fortsæt til {step_name}",
-          "review_button": "Gennemse og indsend"
+          "review_button": "Gennemse og indsend",
+          "title_named": "Velkommen tilbage, {name}",
+          "subtitle_native": "Fortsæt, hvor du slap. Alt, hvad du har indtastet, er gemt.",
+          "up_next": "Næste",
+          "footer_hint": "Du kan til enhver tid gå tilbage og redigere et tidligere trin."
         },
         "social_status": {
           "added": "Tilføjet",

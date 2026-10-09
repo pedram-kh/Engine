@@ -278,15 +278,19 @@
           "contact_support": "Kontaktovat podporu"
         },
         "welcome_back": {
-          "title": "Vítejte zpět",
-          "subtitle": "Naposledy ste tu byli {time_ago}. Pokračujte tam, kde ste skončili.",
-          "first_time_title": "Začněme",
-          "first_time_subtitle": "Vítejte v Catalyst. Nastavme váš profil tvorcu — potrvá to jen několik minut.",
-          "first_time_prompt": "Začněte s {step} pro představení sa značkám.",
-          "next_step_prompt": "Ste na kroku {step}. Pokračujte zde nebo sa vraťte k úpravě dřívějšího kroku.",
-          "all_complete_prompt": "Skvělé — dokončili ste každý krok. Připraveni k odeslání?",
+          "title": "Vitajte späť",
+          "subtitle": "Naposledy ste tu boli {time_ago}. Pokračujte tam, kde ste skončili.",
+          "first_time_title": "Poďme na to",
+          "first_time_subtitle": "Vitajte v Catalyst. Nastavme váš profil tvorcu — zaberie to len pár minút.",
+          "first_time_prompt": "Začnite krokom „{step}“, aby ste sa predstavili značkám.",
+          "next_step_prompt": "Ste na kroku „{step}“. Pokračujte tu alebo sa vráťte upraviť skorší krok.",
+          "all_complete_prompt": "Vyzerá to dobre — dokončili ste všetky kroky. Ste pripravení odoslať?",
           "continue_button": "Pokračovať na {step_name}",
-          "review_button": "Skontrolovať a odoslať"
+          "review_button": "Skontrolovať a odoslať",
+          "title_named": "Vitajte späť, {name}",
+          "subtitle_native": "Pokračujte tam, kde ste skončili. Všetko, čo ste zadali, je uložené.",
+          "up_next": "Ďalej",
+          "footer_hint": "Kedykoľvek sa môžete vrátiť a upraviť ktorýkoľvek skorší krok."
         },
         "social_status": {
           "added": "Pridané",

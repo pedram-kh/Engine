@@ -286,7 +286,11 @@
           "next_step_prompt": "Du bist bei Schritt {step}. Fahre hier fort oder spring zurück, um einen früheren Schritt zu bearbeiten.",
           "all_complete_prompt": "Sehr gut — du hast jeden Schritt abgeschlossen. Bereit zum Einreichen?",
           "continue_button": "Weiter zu {step_name}",
-          "review_button": "Prüfen und einreichen"
+          "review_button": "Prüfen und einreichen",
+          "title_named": "Willkommen zurück, {name}",
+          "subtitle_native": "Mach dort weiter, wo du aufgehört hast. Alles, was du eingegeben hast, ist gespeichert.",
+          "up_next": "Als Nächstes",
+          "footer_hint": "Du kannst jederzeit zurückgehen und jeden früheren Schritt bearbeiten."
         },
         "social_status": {
           "added": "Hinzugefügt",

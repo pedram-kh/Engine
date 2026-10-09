@@ -286,7 +286,11 @@
           "next_step_prompt": "Sei al passaggio {step}. Continua qui oppure torna indietro per modificare un passaggio precedente.",
           "all_complete_prompt": "Sei a posto — hai completato tutti i passaggi. Pronto a inviare?",
           "continue_button": "Continua a {step_name}",
-          "review_button": "Rivedi e invia"
+          "review_button": "Rivedi e invia",
+          "title_named": "Bentornato, {name}",
+          "subtitle_native": "Riprendi da dove avevi lasciato. Tutto ciò che hai inserito è stato salvato.",
+          "up_next": "Prossimo",
+          "footer_hint": "Puoi tornare indietro e modificare qualsiasi passaggio precedente in qualsiasi momento."
         },
         "social_status": {
           "added": "Aggiunto",

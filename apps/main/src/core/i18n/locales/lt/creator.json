@@ -278,15 +278,19 @@
           "contact_support": "Contact support"
         },
         "welcome_back": {
-          "title": "Sveiki atvykę back",
-          "subtitle": "You were last here {time_ago}. Pick up where you left off.",
-          "first_time_title": "Let's get started",
-          "first_time_subtitle": "Sveiki atvykę to Catalyst. Let's set up your creator profile — it only takes a few minutes.",
-          "first_time_prompt": "Start with {step} to introduce yourself to brands.",
-          "next_step_prompt": "You're on Step {step}. Tęsti here, or jump back to edit an earlier step.",
-          "all_complete_prompt": "Looking good — you've completed every step. Ready to submit?",
-          "continue_button": "Tęsti to {step_name}",
-          "review_button": "Review and submit"
+          "title": "Sveiki sugrįžę",
+          "subtitle": "Paskutinį kartą čia buvote {time_ago}. Tęskite ten, kur sustojote.",
+          "first_time_title": "Pradėkime",
+          "first_time_subtitle": "Sveiki atvykę į „Catalyst“. Sukurkime jūsų kūrėjo profilį – tai užtruks vos kelias minutes.",
+          "first_time_prompt": "Pradėkite nuo „{step}“, kad prisistatytumėte prekių ženklams.",
+          "next_step_prompt": "Esate žingsnyje „{step}“. Tęskite čia arba grįžkite, kad redaguotumėte ankstesnį žingsnį.",
+          "all_complete_prompt": "Atrodo puikiai – atlikote visus žingsnius. Pasiruošę pateikti?",
+          "continue_button": "Tęsti į „{step_name}“",
+          "review_button": "Peržiūrėti ir pateikti",
+          "title_named": "Sveiki sugrįžę, {name}",
+          "subtitle_native": "Tęskite ten, kur sustojote. Viskas, ką įvedėte, išsaugota.",
+          "up_next": "Toliau",
+          "footer_hint": "Bet kada galite grįžti ir redaguoti bet kurį ankstesnį žingsnį."
         },
         "social_status": {
           "added": "Pridėta",

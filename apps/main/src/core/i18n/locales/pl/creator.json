@@ -286,7 +286,11 @@
           "next_step_prompt": "Jesteś na kroku {step}. Kontynuuj tutaj lub wróć, aby edytować wcześniejszy krok.",
           "all_complete_prompt": "Świetnie — ukończyłeś/aś każdy krok. Gotowy/a do przesłania?",
           "continue_button": "Kontynuuj do {step_name}",
-          "review_button": "Przejrzyj i prześlij"
+          "review_button": "Przejrzyj i prześlij",
+          "title_named": "Witaj ponownie, {name}",
+          "subtitle_native": "Kontynuuj tam, gdzie skończyłeś/aś. Wszystko, co wprowadziłeś/aś, zostało zapisane.",
+          "up_next": "Następny",
+          "footer_hint": "W każdej chwili możesz wrócić i edytować dowolny wcześniejszy krok."
         },
         "social_status": {
           "added": "Dodano",

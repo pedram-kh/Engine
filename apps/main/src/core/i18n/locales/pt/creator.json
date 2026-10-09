@@ -286,7 +286,11 @@
           "next_step_prompt": "Está na Etapa {step}. Continue aqui ou volte para editar uma etapa anterior.",
           "all_complete_prompt": "Está pronto — completou todas as etapas. Pronto para submeter?",
           "continue_button": "Continuar para {step_name}",
-          "review_button": "Rever e submeter"
+          "review_button": "Rever e submeter",
+          "title_named": "Bem-vindo de volta, {name}",
+          "subtitle_native": "Continue de onde parou. Tudo o que introduziu foi guardado.",
+          "up_next": "A seguir",
+          "footer_hint": "Pode voltar atrás e editar qualquer passo anterior a qualquer momento."
         },
         "social_status": {
           "added": "Adicionado",

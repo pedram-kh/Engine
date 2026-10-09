@@ -30,6 +30,131 @@
   gap: 20px;
 }
 
+/* Welcome back (frame 01): the greeting, one card with the completeness ring and
+   the step list, a full-width Continue, and a closing hint. */
+.onboarding-native__body :deep(.welcome-back) {
+  max-width: none;
+}
+
+.onboarding-native__body :deep(.welcome-back > h1) {
+  margin: 0;
+  font: var(--native-type-display);
+  letter-spacing: 0;
+  color: var(--native-text-primary);
+}
+
+.onboarding-native__body :deep([data-test='welcome-back-subtitle']) {
+  margin: 4px 0 24px;
+  font: var(--native-type-body);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+.onboarding-native__body :deep([data-test='welcome-back-status']) {
+  padding: 20px;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+  box-shadow: none;
+}
+
+.onboarding-native__body :deep([data-test='welcome-back-status'] .text-caption) {
+  font: var(--native-type-caption);
+  color: var(--native-text-secondary);
+}
+
+.onboarding-native__body :deep([data-test='welcome-back-completeness']) {
+  font: var(--native-type-display);
+  color: var(--native-text-primary);
+}
+
+.onboarding-native__body :deep([data-test='welcome-back-status'] .v-progress-circular) {
+  color: var(--native-accent-primary);
+}
+
+.onboarding-native__body :deep(.welcome-back__steps) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0 0;
+  margin: 0 0 16px;
+  list-style: none;
+  border-top: 1px solid var(--native-border-default);
+}
+
+.onboarding-native__body :deep(.welcome-back__step) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 36px;
+}
+
+.onboarding-native__body :deep(.welcome-back__marker) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font: var(--native-type-caption-strong);
+  color: var(--native-text-secondary);
+  border: 1px solid var(--native-border-strong);
+  border-radius: var(--native-radius-full);
+}
+
+.onboarding-native__body :deep(.welcome-back__step--done .welcome-back__marker) {
+  color: var(--native-text-on-accent);
+  background: var(--native-accent-primary);
+  border-color: var(--native-accent-primary);
+}
+
+.onboarding-native__body :deep(.welcome-back__step--next .welcome-back__marker) {
+  color: var(--native-accent-primary);
+  border-color: var(--native-accent-primary);
+}
+
+.onboarding-native__body :deep(.welcome-back__step-name) {
+  flex: 1 1 0;
+  font: var(--native-type-body);
+  color: var(--native-text-secondary);
+}
+
+.onboarding-native__body :deep(.welcome-back__step--next .welcome-back__step-name) {
+  color: var(--native-text-primary);
+}
+
+.onboarding-native__body :deep(.welcome-back__pill) {
+  display: inline-flex;
+  flex: none;
+  gap: 6px;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  font: var(--native-type-caption-strong);
+  color: var(--native-status-info);
+  background: var(--native-status-info-subtle);
+  border-radius: var(--native-radius-full);
+}
+
+.onboarding-native__body :deep(.welcome-back__pill)::before {
+  width: 6px;
+  height: 6px;
+  content: '';
+  background: currentcolor;
+  border-radius: var(--native-radius-full);
+}
+
+.onboarding-native__body :deep([data-test='welcome-back-continue-btn']) {
+  --v-btn-height: 44px;
+  width: 100%;
+}
+
+.onboarding-native__body :deep(.welcome-back__hint) {
+  margin: 0;
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
 /* Cards: the grouped field sets and the Connections step's two panels. */
 .onboarding-native__body :deep(fieldset),
 .onboarding-native__body :deep(.profile-basics-form__preview),

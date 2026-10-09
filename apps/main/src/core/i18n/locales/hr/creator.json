@@ -278,15 +278,19 @@
           "contact_support": "Kontaktovat podporu"
         },
         "welcome_back": {
-          "title": "Vítejte zpět",
-          "subtitle": "Naposledy jste tu byli {time_ago}. Pokračujte tam, kde jste skončili.",
-          "first_time_title": "Začněme",
-          "first_time_subtitle": "Vítejte v Catalyst. Nastanjeme váš profil ustvarjalca — potrvá to jen několik minut.",
-          "first_time_prompt": "Začněte s {step} pro předstanjeení se značkám.",
-          "next_step_prompt": "Jste na kroku {step}. Pokračujte zde nebo se vraťte k úpravě dřívějšího kroku.",
-          "all_complete_prompt": "Skvělé — dokončili jste každý krok. Připraveni k odeslání?",
-          "continue_button": "Nadaljuj na {step_name}",
-          "review_button": "Preveri a odeslat"
+          "title": "Dobrodošli natrag",
+          "subtitle": "Zadnji put ste ovdje bili {time_ago}. Nastavite gdje ste stali.",
+          "first_time_title": "Krenimo",
+          "first_time_subtitle": "Dobrodošli u Catalyst. Postavimo vaš profil kreatora — potrebno je samo nekoliko minuta.",
+          "first_time_prompt": "Počnite s „{step}” kako biste se predstavili brendovima.",
+          "next_step_prompt": "Nalazite se na koraku „{step}”. Nastavite ovdje ili se vratite i uredite raniji korak.",
+          "all_complete_prompt": "Izgleda dobro — dovršili ste sve korake. Spremni za slanje?",
+          "continue_button": "Nastavi na „{step_name}”",
+          "review_button": "Pregledaj i pošalji",
+          "title_named": "Dobrodošli natrag, {name}",
+          "subtitle_native": "Nastavite gdje ste stali. Sve što ste unijeli je spremljeno.",
+          "up_next": "Sljedeće",
+          "footer_hint": "U bilo kojem trenutku možete se vratiti i urediti bilo koji raniji korak."
         },
         "social_status": {
           "added": "Dodano",

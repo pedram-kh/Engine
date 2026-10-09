@@ -286,7 +286,11 @@
           "next_step_prompt": "Du är på steg {step}. Fortsätt här, eller gå tillbaka för att redigera ett tidigare steg.",
           "all_complete_prompt": "Ser bra ut — du har slutfört varje steg. Redo att skicka in?",
           "continue_button": "Fortsätt till {step_name}",
-          "review_button": "Granska och skicka in"
+          "review_button": "Granska och skicka in",
+          "title_named": "Välkommen tillbaka, {name}",
+          "subtitle_native": "Fortsätt där du slutade. Allt du har angett har sparats.",
+          "up_next": "Nästa",
+          "footer_hint": "Du kan gå tillbaka och redigera vilket tidigare steg som helst när som helst."
         },
         "social_status": {
           "added": "Tillagd",

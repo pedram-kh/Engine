@@ -286,7 +286,11 @@
           "next_step_prompt": "Jste na kroku {step}. Pokračujte zde nebo se vraťte k úpravě dřívějšího kroku.",
           "all_complete_prompt": "Skvělé — dokončili jste každý krok. Připraveni k odeslání?",
           "continue_button": "Pokračovat na {step_name}",
-          "review_button": "Zkontrolovat a odeslat"
+          "review_button": "Zkontrolovat a odeslat",
+          "title_named": "Vítejte zpět, {name}",
+          "subtitle_native": "Pokračujte tam, kde jste skončili. Vše, co jste zadali, je uloženo.",
+          "up_next": "Další",
+          "footer_hint": "Kdykoli se můžete vrátit a upravit jakýkoli dřívější krok."
         },
         "social_status": {
           "added": "Přidáno",

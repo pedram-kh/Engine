@@ -92,16 +92,56 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
+
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 import { hasMountedBefore, markMounted } from '../internal/welcomeBackFlag'
+import {
+  VISIBLE_UX_STEPS,
+  resolveUxStepComplete,
+  uxIndexForBackendStep,
+  uxStepTitleKey,
+} from '../composables/useWizardSteps'
 import { WIZARD_STEP_ROUTE_NAMES } from '../routes'
 
 const { t } = useI18n()
 const router = useRouter()
 const onboardingStore = useOnboardingStore()
 
-const { creator, nextStep, isSubmitted, completenessScore, lastActivityAt } =
+const { creator, nextStep, isSubmitted, completenessScore, lastActivityAt, stepCompletion } =
   storeToRefs(onboardingStore)
+
+/**
+ * AH-100d (Figma frame 01): the native app greets the creator by first name and
+ * lists the steps (done / up next / to do) inside the card, in place of the
+ * "You're on Step X" sentence. Web keeps its own copy and card.
+ */
+const isNative = isNativePlatform()
+
+const firstName = computed(() => {
+  const name = creator.value?.attributes.display_name?.trim() ?? ''
+  return name === '' ? null : (name.split(/\s+/)[0] ?? null)
+})
+
+interface ChecklistRow {
+  id: string
+  titleKey: string
+  position: number
+  state: 'done' | 'next' | 'todo'
+}
+
+const checklist = computed<ChecklistRow[]>(() => {
+  const nextIndex = nextStep.value === null ? -1 : uxIndexForBackendStep(nextStep.value)
+  return VISIBLE_UX_STEPS.map((step, index) => {
+    const done = resolveUxStepComplete(step, stepCompletion.value)
+    return {
+      id: step.id,
+      titleKey: uxStepTitleKey(step),
+      position: index + 1,
+      state: done ? 'done' : index === nextIndex ? 'next' : 'todo',
+    }
+  })
+})
 
 const shouldRender = ref(false)
 
@@ -184,17 +224,25 @@ function continueFromHere(): void {
 <template>
   <div v-if="shouldRender && creator" class="welcome-back" data-test="welcome-back-page">
     <h1 class="text-h4 mb-2" data-test="welcome-back-heading">
-      {{
-        t(
-          isFirstTime
-            ? 'creator.ui.wizard.welcome_back.first_time_title'
-            : 'creator.ui.wizard.welcome_back.title',
-        )
-      }}
+      <template v-if="isNative && !isFirstTime && firstName">
+        {{ t('creator.ui.wizard.welcome_back.title_named', { name: firstName }) }}
+      </template>
+      <template v-else>
+        {{
+          t(
+            isFirstTime
+              ? 'creator.ui.wizard.welcome_back.first_time_title'
+              : 'creator.ui.wizard.welcome_back.title',
+          )
+        }}
+      </template>
     </h1>
     <p class="text-body-1 text-medium-emphasis mb-6" data-test="welcome-back-subtitle">
       <template v-if="isFirstTime">
         {{ t('creator.ui.wizard.welcome_back.first_time_subtitle') }}
+      </template>
+      <template v-else-if="isNative">
+        {{ t('creator.ui.wizard.welcome_back.subtitle_native') }}
       </template>
       <template v-else>
         {{
@@ -205,7 +253,11 @@ function continueFromHere(): void {
       </template>
     </p>
 
-    <v-card class="mb-6 pa-6" elevation="1" data-test="welcome-back-status">
+    <v-card
+      :class="isNative ? 'mb-6 pa-5' : 'mb-6 pa-6'"
+      :elevation="isNative ? 0 : 1"
+      data-test="welcome-back-status"
+    >
       <div class="d-flex align-center justify-space-between mb-4">
         <div>
           <p class="text-caption text-medium-emphasis mb-1">
@@ -215,35 +267,56 @@ function continueFromHere(): void {
         </div>
         <v-progress-circular
           :model-value="completenessScore"
-          :size="48"
-          :width="6"
+          :size="isNative ? 64 : 48"
+          :width="isNative ? 7 : 6"
           color="primary"
         />
       </div>
 
-      <p
-        v-if="nextStep && nextStep !== 'review'"
-        class="text-body-2 mb-4"
-        data-test="welcome-back-next-step-prompt"
-      >
-        <template v-if="isFirstTime">
-          {{
-            t('creator.ui.wizard.welcome_back.first_time_prompt', {
-              step: t(`creator.ui.wizard.steps.${nextStep}.name`),
-            })
-          }}
-        </template>
-        <template v-else>
-          {{
-            t('creator.ui.wizard.welcome_back.next_step_prompt', {
-              step: t(`creator.ui.wizard.steps.${nextStep}.name`),
-            })
-          }}
-        </template>
-      </p>
-      <p v-else class="text-body-2 mb-4" data-test="welcome-back-all-complete-prompt">
-        {{ t('creator.ui.wizard.welcome_back.all_complete_prompt') }}
-      </p>
+      <ol v-if="isNative" class="welcome-back__steps" data-testid="welcome-back-steps">
+        <li
+          v-for="row in checklist"
+          :key="row.id"
+          class="welcome-back__step"
+          :class="`welcome-back__step--${row.state}`"
+          :data-testid="`welcome-back-step-${row.id}`"
+        >
+          <span class="welcome-back__marker" aria-hidden="true">
+            <v-icon v-if="row.state === 'done'" icon="mdi-check" size="14" />
+            <template v-else>{{ row.position }}</template>
+          </span>
+          <span class="welcome-back__step-name">{{ t(row.titleKey) }}</span>
+          <span v-if="row.state === 'next'" class="welcome-back__pill">{{
+            t('creator.ui.wizard.welcome_back.up_next')
+          }}</span>
+        </li>
+      </ol>
+
+      <template v-else>
+        <p
+          v-if="nextStep && nextStep !== 'review'"
+          class="text-body-2 mb-4"
+          data-test="welcome-back-next-step-prompt"
+        >
+          <template v-if="isFirstTime">
+            {{
+              t('creator.ui.wizard.welcome_back.first_time_prompt', {
+                step: t(`creator.ui.wizard.steps.${nextStep}.name`),
+              })
+            }}
+          </template>
+          <template v-else>
+            {{
+              t('creator.ui.wizard.welcome_back.next_step_prompt', {
+                step: t(`creator.ui.wizard.steps.${nextStep}.name`),
+              })
+            }}
+          </template>
+        </p>
+        <p v-else class="text-body-2 mb-4" data-test="welcome-back-all-complete-prompt">
+          {{ t('creator.ui.wizard.welcome_back.all_complete_prompt') }}
+        </p>
+      </template>
 
       <v-btn
         color="primary"
@@ -264,6 +337,10 @@ function continueFromHere(): void {
         </span>
       </v-btn>
     </v-card>
+
+    <p v-if="isNative" class="welcome-back__hint" data-testid="welcome-back-hint">
+      {{ t('creator.ui.wizard.welcome_back.footer_hint') }}
+    </p>
   </div>
 </template>
 

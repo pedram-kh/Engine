@@ -286,7 +286,11 @@
           "next_step_prompt": "Je bent bij stap {step}. Ga hier verder of spring terug om een eerdere stap te bewerken.",
           "all_complete_prompt": "Goed gedaan — je hebt elke stap voltooid. Klaar om in te dienen?",
           "continue_button": "Doorgaan naar {step_name}",
-          "review_button": "Beoordelen en indienen"
+          "review_button": "Beoordelen en indienen",
+          "title_named": "Welkom terug, {name}",
+          "subtitle_native": "Ga verder waar je gebleven was. Alles wat je hebt ingevoerd is opgeslagen.",
+          "up_next": "Volgende",
+          "footer_hint": "Je kunt op elk moment teruggaan en een eerdere stap bewerken."
         },
         "social_status": {
           "added": "Toegevoegd",
