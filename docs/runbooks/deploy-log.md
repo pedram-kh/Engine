@@ -54,6 +54,37 @@ happened.
 
 ---
 
+## AH-100d — Creator app Figma fidelity audit and app-resume state refresh — PENDING
+
+> **Stacks on AH-100c, AH-100b, AH-100 and AH-099, all PENDING.** Deploy in order, or together as one
+> entry. Their obligations apply unchanged. **Not pushed yet:** held for Pedram's re-walk.
+
+- **Status:** PENDING
+- **Range:** `b214c31f` → the AH-100d docs commit (feat commits `ceae669a`…`766c2d63`).
+- **AH entries carried:** AH-100d.
+- **Migrations run:** **none.** Zero `apps/api` diff.
+- **Pre-deploy reads:** none of its own.
+- **Snapshot ID:** not required. No migration, no data change.
+- **Infra:**
+  - **`apps/main` SPA rebuild only** (plus `packages/ui` and `packages/design-tokens`, built into it;
+    `apps/admin` consumes `packages/ui` and its `PortfolioGallery` is unchanged when the new prop is
+    absent). Every behavior is native-gated; the web bundle gains only unused i18n keys in every locale
+    file and the repaired `welcome_back` strings.
+  - New dependency `@capacitor/app` (lockfile changed): `pnpm install` on the build host.
+  - No PHP-FPM reload, no worker restart, no env change, no scheduler change.
+  - **The creator app is not deployed by this entry.** A device build needs `npx cap sync` for the new
+    plugin.
+- **One-shot commands:** none.
+- **Post-deploy verification (to be filled):**
+  1. `/up` → 200.
+  2. Web creator dashboard, wizard and Edit profile look and behave as before (square web buttons,
+     no polling on the under-review page).
+- **Flags armed:** none.
+- **Operator:** _to be filled._
+- **Anything unexpected:** _to be filled._
+
+---
+
 ## AH-100c — Creator app eyes-on fixes: iOS input zoom, edit-profile form body, frame-07 dashboard pass — PENDING
 
 > **Stacks on AH-100b, AH-100 and AH-099, all PENDING.** Deploy in order, or together as one entry.

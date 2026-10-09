@@ -70,6 +70,40 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-100d · Creator app Figma fidelity audit and app-resume state refresh (Creator App arc)
+
+- **Status:** Landed. Gates green at the feat tip; **push HELD** until Pedram's re-walk (submit wizard →
+  approve as admin → background and reopen the app → approved state appears with no logout). Full
+  review: [`creator-app-fidelity-audit-review.md`](creator-app-fidelity-audit-review.md).
+- **Date:** 2026-10-09.
+- **Why:** AH-100c's re-walk left two kinds of residue: pages that still differed from the Figma frames,
+  and a session that went stale while the app was backgrounded (an approved creator saw "under review"
+  until a logout).
+- **What:**
+  - **Half 1, audit:** every frame audited, per-frame table in the review §3. Styling-only gaps and gaps
+    that use data the app already has were fixed: **button radius** (the AH-100 token lost to Vuetify's
+    `.rounded-0 { border-radius: 0 !important }`; fixed with an `!important` rule, pinned), profile photo
+    row (03), social platform cards (04), portfolio tiles with Image/Video/Link pills and a count (04),
+    the invitation card with the Fee/Dates/Deliverables panel from the payload and the brand note (10),
+    notification rows with type icon, compact age and caught-up footer (09), Welcome back with the step
+    list (01), the review step's Profile-strength card (06c). Gaps needing new API shape or behavior are
+    **deferred, named per item** (review §3).
+  - **Half 2, item 8:** a Capacitor resume listener refetching `/me` and the onboarding bootstrap
+    (signed-out and overlap guarded), and a visible-only poll on the under-review page that flips to the
+    approved branch. **The proactive version is AH-102's push (approval joins the push-worthy set). The
+    web page-poll is a named follow-up, not this batch.**
+- **Touched:** `apps/main`, `packages/design-tokens`, `packages/ui` (`PortfolioGallery` optional
+  `kindLabels` prop). **Zero `apps/api` / `apps/admin` diff. No migration. No new API surface.** One new
+  dependency, `@capacitor/app`. Seventeen new strings ×24 (real MT; flaky-10 script-checked) plus a
+  repair of nine `welcome_back` strings in 12 locales.
+- **Evidence:** review §7: 36 logged break-reverts (plus the hand-run `packages/ui` one) with captured reds and sha-checked restores, both
+  polarities specced; web byte-identical pins green and unedited.
+- **PROD-DATA RISK: NONE.** SPA-only, native-gated.
+- **Deploy obligation:** web is an `apps/main` SPA rebuild (new locale keys ship in every locale file;
+  unused on the web). The app does not deploy; `cap sync` is needed locally for the new plugin. See
+  [`deploy-log.md`](../runbooks/deploy-log.md).
+- **Ref:** feat commits `ceae669a`…`766c2d63` on `b214c31f`; `tech-debt.md` ("AH-100d …").
+
 ### AH-100c · Creator app eyes-on fixes: iOS input zoom, edit-profile form body, frame-07 dashboard pass (Creator App arc)
 
 - **Status:** Closed — approved (2026-10-09), verified by Pedram's re-walk; pushed `e5beeddc..112e7eb6`; CI green at the

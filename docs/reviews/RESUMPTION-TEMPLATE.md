@@ -116,7 +116,31 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-10-09 · **Through:** AH-100c, the eyes-on fixes to the Creator App arc's
+**Last updated:** 2026-10-09 · **Through:** AH-100d, the Creator App arc's Figma fidelity audit and
+app-resume state refresh (`apps/main`, `packages/design-tokens`, `packages/ui` optional `kindLabels`
+prop; zero `apps/api` / `apps/admin` diff; **no migration**; **no new API surface**; **PROD-DATA RISK:
+NONE**; new dependency `@capacitor/app`; 17 new i18n keys ×24 real MT plus a `welcome_back` locale
+repair). **Built and gated; push HELD** until Pedram's re-walk. Feat commits `ceae669a`…`766c2d63` on
+`b214c31f` (AH-100c's pushed tip), then one docs commit. Live state is `git status` and
+`origin/main`, not this sentence.
+
+- **What AH-100d is:** Half 1, a per-frame audit against Figma (review §3): styling-only and
+  already-in-the-payload gaps fixed (button radius that `.rounded-0 !important` had been defeating,
+  photo row, social cards, portfolio tiles, invitation card, notification rows, Welcome back, review
+  Profile-strength card); API-shaped gaps **deferred, named per item**. Half 2, item 8: a Capacitor
+  resume listener refetching `/me` and the onboarding bootstrap, and a visible-only poll on the
+  under-review page, so approval appears with no logout. Review:
+  [`creator-app-fidelity-audit-review.md`](creator-app-fidelity-audit-review.md).
+- **Next:** Pedram's re-walk (review §9; rebuild needs `npx cap sync`): submit wizard → approve as
+  admin → background and reopen the app → approved state with no logout. Then push on his go. The
+  proactive version of item 8 is **AH-102's push**; the web page-poll is a named follow-up.
+- **Deploy:** web is an `apps/main` SPA rebuild; the app does not deploy. `deploy-log.md` has a PENDING
+  entry stacked on AH-100c, AH-100b, AH-100 and AH-099.
+- **Standing facts to carry:** the audit was string- and structure-level, not rendered pixels; the two
+  native form sheets are still parallel; locale debt beyond `welcome_back` is in tech-debt; under load
+  use `vitest --testTimeout=60000`.
+
+**Prior state, for the record — AH-100c.** **Last updated:** 2026-10-09 · **Through:** AH-100c, the eyes-on fixes to the Creator App arc's
 chunk 3 (`apps/main`, `packages/design-tokens/native.css`; zero `apps/api` / `apps/admin` diff; **no
 migration**; **no new API surface**; **ten new i18n keys ×24, real MT**). **Review closed — approved
 (2026-10-09), verified by Pedram's re-walk; pushed on his clearance:** the feat commit `9f4934e9` plus

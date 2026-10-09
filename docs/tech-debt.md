@@ -2928,3 +2928,45 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
       this chunk. **Triggered by** a second occurrence.
 - **Owner:** frontend / mobile.
 - **Status:** open. Surfaced at AH-100c, 2026-10-09 ([review](reviews/creator-app-eyes-on-fixes-review.md)).
+
+---
+
+## AH-100d (Creator app fidelity audit and resume refresh) — what the batch left open
+
+- **Where:** `packages/design-tokens/native.css`, the creator and onboarding native sheets,
+  `apps/main/src/core/i18n/locales/*/creator.json`, `CreatorDashboardPage.vue`,
+  `NotificationCenter.vue`, `ConnectionsPortfolioSection.vue`.
+- **What we accepted (2026-10-09):**
+  1. **Web buttons are square.** Vuetify's `rounded="0"` compiles to `.rounded-0 { border-radius: 0 !important }`,
+     which beat the AH-100 radius token on native (fixed there with an `!important` rule). On the web
+     the same utility is in force; any intended web radius is overridden. **Resolution:** a design
+     decision on web button radius, then drop `rounded="0"` or set it deliberately.
+  2. **Deferred Figma items, each needing an API shape or new behavior** (none is a styling gap):
+     - 06 / 06b: the "% read" line and the document banner copy (a completeness-by-document signal).
+     - 06c: the "Profile strength" title and "To reach 100%" list (field-level completeness), "Ready to
+       submit" title, "Done" pill, the "2 working days" footnote (review-time copy).
+     - 09: title/subtitle split on a notification, the All/Unread filter, "Mark all as read" wording
+       (payload carries no title/subtitle; a filter API). The age reads `2h` with no "ago" (bare `{time_ago}`).
+     - 10: the 7-day expiry footer (the invitation payload has no expiry).
+     - 11: "Search conversations" (new behavior). 12: subtitle wording with dates.
+     - 13: the Account details card (first/last name, email) and "Video · 0:24" tile meta (no duration).
+     - 02: the phone placeholder from the frame; date of birth stays the platform date input on purpose.
+  3. **The web page-poll for the under-review state** is a named follow-up (the web dashboard never
+     polls). The proactive native version is **AH-102's push** (approval joins the push-worthy set).
+  4. **Frame 02's dashed-tile row vs the dropzone:** the dropzone stays the empty state, as ruled.
+  5. **Figma tint pairs below 4.5:1** (4.12, 4.19, 4.30) and the text-tertiary captions and overline are
+     the design's colors, reproduced. **Resolution:** a design pass on contrast.
+  6. **Locale debt, measured at this batch's end:** about 107–127 English-identical `creator.json`
+     strings per flaky-10 locale (bg el et fi ga hu lt lv mt ro) and Czech-derived values in hr/sl/sk.
+     Only the `welcome_back` group was repaired. **Resolution:** the value audit and real MT pass
+     already named in AH-100c item 7.
+  7. **`social_handle` carries bad strings in 12 locales** (pre-existing, found while adding the
+     placeholder; the new `social_handle_placeholder` key is correct). **Resolution:** native-speaker review.
+  8. **Plural strings for Slavic, Baltic, Maltese, Irish and Romanian use a "Label: {count} | Label: {count}"
+     form** to dodge agreement errors. **Resolution:** native-speaker review.
+  9. **Two native sheets still duplicate the shared-component rules** (AH-100c item 1, unchanged; the
+     new gallery, social and photo rules were added to both).
+  10. **The audit was not a rendered-pixel comparison** (review §1). **Resolution:** Pedram's re-walk,
+      or a native screenshot harness.
+- **Owner:** frontend / mobile.
+- **Status:** open. Surfaced at AH-100d, 2026-10-09 ([review](reviews/creator-app-fidelity-audit-review.md)).
