@@ -120,8 +120,10 @@ discipline in §7.
 chunk 3 (`apps/main`, `packages/design-tokens/native.css`; zero `apps/api` / `apps/admin` diff; **no
 migration**; **no new API surface**; **ten new i18n keys ×24, real MT**). **Review closed — approved
 (2026-10-09), verified by Pedram's re-walk; pushed on his clearance:** the feat commit `9f4934e9` plus
-a docs commit on top of `e5beeddc` (AH-100b's closed tip). **CI at the pushed tip closes it (§5.41);
-the run and the pushed tip are cited in the review's docs-only provenance commit.** Live state is
+the docs commit `112e7eb6` on top of `e5beeddc` (AH-100b's closed tip). **CI green at that tip, all
+four jobs** — [run `37957556300`](https://github.com/pedram-kh/Engine/actions/runs/37957556300), attempt 2
+(attempt 1's Backend job failed on a faker-name flake in an untouched test; detail in the review's
+header). One docs-only provenance commit follows. Live state is
 `git status` and `origin/main`, not this sentence.
 
 - **What AH-100c is:** Pedram's AH-100b eyes-on found five things. **One cause for three of them:**
@@ -133,7 +135,7 @@ the run and the pushed tip are cited in the review's docs-only provenance commit
   Profile-strength card, invitation card with a "New" pill). Review:
   [`creator-app-eyes-on-fixes-review.md`](creator-app-eyes-on-fixes-review.md); its §3 is the deviation
   list (D1–D6) and its §9 the re-walk. AH-100b's review gained a dated post-close addendum.
-- **Next:** CI at the tip. Pedram's re-walk (including tapping a field and navigating on) passed: no
+- **Next:** the arc continues. Pedram's re-walk (including tapping a field and navigating on) passed: no
   zoom, no clipping, tab bar pinned, the dashboard and the Edit profile form body landing. Open
   observation: the 6px vertical scroll was not separately re-measured. Then the arc continues.
 - **Deploy:** web is an `apps/main` SPA rebuild only; the app does not deploy. `deploy-log.md` has a

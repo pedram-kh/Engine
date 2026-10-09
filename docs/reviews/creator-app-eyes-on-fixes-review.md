@@ -12,10 +12,30 @@
   delivered. **No divergence was found**; the only edits made at close are the status, provenance and
   disclosure lines that this build-time text could not have known.
   Close condition: CI green at the pushed tip (§5.41), the two local load-timeouts (§7) judged there.
-- **Commits:** the feat commit `9f4934e9` and the docs commit (this review, the log entry, the AH-100b
-  post-close addendum, the deploy-log PENDING entry, the tech-debt entry, the Part 2 refresh) on top of
-  `e5beeddc`. The docs commit was amended once before the push to carry this close; its pushed hash
-  is cited in the docs-only provenance commit that follows (AH-091 precedent), together with the CI run.
+- **Commits:** pushed together as `e5beeddc..112e7eb6`: `9f4934e9` (feat) · `112e7eb6` (docs: this
+  review, the log entry, the AH-100b post-close addendum, the deploy-log PENDING entry, the tech-debt
+  entry, the Part 2 refresh; amended once before the push to carry this close, so its pre-push hash
+  `94417362` never reached the remote). A docs-only provenance commit (the one that wrote this
+  paragraph) follows them (AH-091 precedent). `git rev-list --left-right --count origin/main...HEAD`
+  was `0 0` after the push.
+- **CI at the pushed tip (§5.41):** **green — all four jobs** (Backend Pint+Larastan+Pest, Frontend
+  lint+typecheck+unit, E2E main SPA, E2E admin SPA) —
+  [run `37957556300`](https://github.com/pedram-kh/Engine/actions/runs/37957556300) at `112e7eb6`, **attempt 2** (see the first bullet).
+  - **The first attempt was red on the Backend job, one test, in code this chunk did not touch** (zero
+    `apps/api` diff): `MembershipsIndexTest > searches members by email substring (case-insensitive)`
+    (`expected size 1, got 2`). The test searches `ALICE` and gives the second user a random
+    `fake()->name()`; the endpoint also matches the name column, so a random name containing "alice"
+    makes it fail. A non-deterministic test, not a regression. Only the failed job was re-run and passed
+    (Frontend had passed on attempt 1; both E2E jobs ran on attempt 2). The test is not fixed here
+    (it is `apps/api`, outside this chunk's fence); tech-debt carries it with the one-line fix.
+  - **The two local load-timeouts (§7) were judged here:** both files, `createRouter` (admin) and
+    `roster/pages/CreatorDetailPage.spec.ts`, passed in CI's Frontend job on both attempts.
+  - **Three Playwright flaky retries, all passing on retry:** main `creator-wizard-happy-path.spec.ts`
+    (the known pre-existing flake; it traverses a surface this chunk touched, the native-gated
+    dropzone copy, which does not render on web) and main `creator-detail.spec.ts:64` ("navigates from
+    a roster row…", a roster page this chunk does not touch; **first time recorded in these docs**); admin
+    `admin-sign-in.spec.ts` (the TOTP reveal, the known admin flake). Main 31 passed + 2 flaky; admin
+    1 passed + 1 flaky. No other spec flaked or failed.
 - **Provenance:** eyes-on findings by Pedram (AH-100b's walkthrough), diagnosis and fix proposal by
   Cursor, rulings by Pedram / Claude, built by Cursor, re-walk acceptance by Pedram, independent review
   closure by Claude.

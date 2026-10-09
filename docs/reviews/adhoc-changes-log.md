@@ -72,8 +72,8 @@ reviews, and conversations.
 
 ### AH-100c · Creator app eyes-on fixes: iOS input zoom, edit-profile form body, frame-07 dashboard pass (Creator App arc)
 
-- **Status:** Closed — approved (2026-10-09), verified by Pedram's re-walk; CI at the pushed tip closes
-  it (§5.41; the CI run is cited in the review's provenance commit). A new entry, **not a reopen of AH-100b** (closed chunks stay closed; AH-100b carries a
+- **Status:** Closed — approved (2026-10-09), verified by Pedram's re-walk; pushed `e5beeddc..112e7eb6`; CI green at the
+  tip, all four jobs, [run `37957556300`](https://github.com/pedram-kh/Engine/actions/runs/37957556300) (§5.41). A new entry, **not a reopen of AH-100b** (closed chunks stay closed; AH-100b carries a
   dated post-close addendum). Full review:
   [`creator-app-eyes-on-fixes-review.md`](creator-app-eyes-on-fixes-review.md).
 - **Date:** 2026-10-09.
@@ -103,7 +103,7 @@ reviews, and conversations.
 - **Deploy obligation:** web is an `apps/main` SPA rebuild only; every addition is native-gated. The
   **app does not deploy.** See [`deploy-log.md`](../runbooks/deploy-log.md).
 - **Ref:** [`creator-app-eyes-on-fixes-review.md`](creator-app-eyes-on-fixes-review.md); feat commit
-  `9f4934e9`; `tech-debt.md` ("AH-100c …").
+  `9f4934e9`, docs `112e7eb6`; `tech-debt.md` ("AH-100c …").
 
 ### AH-100b · Creator app Figma-faithful page passes, walkthrough findings and the real app icon (Creator App arc, chunk 3 of 8)
 

@@ -60,7 +60,7 @@ happened.
 > Their obligations apply unchanged. Pushed on Pedram's clearance after his re-walk (2026-10-09).
 
 - **Status:** PENDING
-- **Range:** `e5beeddc` → _the pushed tip (to be filled)_ (the AH-100c feat commit is `9f4934e9`; the rest is docs-only).
+- **Range:** `e5beeddc` → `112e7eb6` (the AH-100c feat commit is `9f4934e9`; the rest is docs-only).
 - **AH entries carried:** AH-100c.
 - **Migrations run:** **none.** Zero `apps/api` diff.
 - **Pre-deploy reads:** none of its own.

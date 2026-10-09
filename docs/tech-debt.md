@@ -2918,5 +2918,13 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
      review.
   9. **The 6px vertical scroll was not reproduced.** **Resolution:** re-measure in the re-walk; if it
      remains, it is a real layout defect to chase.
+  10. **A non-deterministic backend test:** `apps/api/tests/Feature/Modules/Agencies/MembershipsIndexTest.php`
+      "searches members by email substring" (line ~123) searches `ALICE` but leaves the second user's
+      `name` to `fake()->name()`, and the endpoint also matches names. It failed once in CI at the
+      AH-100c tip (attempt 1, then green on re-run). **Resolution:** give that user a fixed name that
+      cannot contain the needle. `apps/api` test change, one line.
+  11. **A new Playwright flake, recorded:** main `creator-detail.spec.ts:64` ("navigates from a roster
+      row and renders the composed detail") retried once and passed at the AH-100c tip. Not touched by
+      this chunk. **Triggered by** a second occurrence.
 - **Owner:** frontend / mobile.
 - **Status:** open. Surfaced at AH-100c, 2026-10-09 ([review](reviews/creator-app-eyes-on-fixes-review.md)).
