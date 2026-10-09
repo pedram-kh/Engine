@@ -24,6 +24,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import RichBrief from '@/components/RichBrief.vue'
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import { creatorAssignmentsApi } from '../assignments.api'
 
@@ -34,6 +35,9 @@ const loading = ref(false)
 const loadedOnce = ref(false)
 const actioningId = ref<string | null>(null)
 const snackbar = ref<{ color: string; text: string } | null>(null)
+
+/** Native (AH-100d, Figma frame 10): the card is built from the offer payload. */
+const isNative = isNativePlatform()
 
 const isEmpty = computed(() => loadedOnce.value && assignments.value.length === 0)
 
@@ -49,6 +53,29 @@ function windowLabel(a: CreatorAssignmentResource): string {
     start: formatDate(start, locale.value),
     end: formatDate(end, locale.value),
   })
+}
+
+/** Two-letter brand tile, e.g. "Glow Labs" -> "GL"; falls back to the campaign name. */
+function brandInitials(a: CreatorAssignmentResource): string {
+  const source = a.attributes.campaign?.brand_name ?? a.attributes.campaign?.name ?? ''
+  const words = source.split(/\s+/).filter((w) => w !== '')
+  if (words.length === 0) return '—'
+  const letters =
+    words.length > 1
+      ? [Array.from(words[0] as string)[0], Array.from(words[1] as string)[0]]
+      : Array.from(words[0] as string).slice(0, 2)
+  return letters.join('').toLocaleUpperCase(locale.value)
+}
+
+/** "€25.00 per video" — `fee_per` is the agency's own unit text ("per video"). */
+function feeLabel(a: CreatorAssignmentResource): string {
+  const money = formatMoney(a.attributes.agreed_fee_minor_units, a.attributes.agreed_fee_currency)
+  const per = a.attributes.fee_per?.trim()
+  return per ? `${money} ${per}` : money
+}
+
+function deliverablesLabel(a: CreatorAssignmentResource): string {
+  return (a.attributes.deliverables ?? []).filter((d) => d.trim() !== '').join(', ')
 }
 
 async function load(): Promise<void> {
@@ -128,67 +155,100 @@ onMounted(() => {
           class="assignment"
           :data-testid="`creator-assignment-${item.id}`"
         >
-          <div class="assignment__info">
-            <div class="assignment__title">
-              <span class="assignment__name">{{ item.attributes.campaign?.name ?? '—' }}</span>
+          <template v-if="isNative">
+            <div class="assignment-card__top">
+              <span class="assignment-card__tile" aria-hidden="true">{{
+                brandInitials(item)
+              }}</span>
+              <div class="assignment-card__head">
+                <span class="assignment__name">{{ item.attributes.campaign?.name ?? '—' }}</span>
+                <span v-if="item.attributes.campaign?.brand_name" class="assignment-card__brand">
+                  {{ item.attributes.campaign.brand_name }}
+                </span>
+              </div>
               <v-chip
                 size="x-small"
                 variant="tonal"
+                :data-status="item.attributes.status"
                 :data-testid="`creator-assignment-status-${item.id}`"
               >
                 {{ t(`app.campaigns.assignmentStatus.${item.attributes.status}`) }}
               </v-chip>
             </div>
-            <p class="assignment__meta">
-              <span v-if="item.attributes.campaign?.brand_name">
-                {{ item.attributes.campaign.brand_name }} ·
-              </span>
-              {{ t('creator.ui.assignments.fee') }}:
-              {{
-                formatMoney(
-                  item.attributes.agreed_fee_minor_units,
-                  item.attributes.agreed_fee_currency,
-                )
-              }}<span
-                v-if="item.attributes.fee_per"
-                :data-test="`creator-assignment-fee-per-${item.id}`"
-              >
-                / {{ item.attributes.fee_per }}</span
-              >
-              <span
+
+            <dl class="assignment-card__panel" :data-testid="`creator-assignment-panel-${item.id}`">
+              <div class="assignment-card__row" :data-testid="`creator-assignment-fee-${item.id}`">
+                <dt>
+                  <v-icon icon="mdi-currency-eur" size="15" />{{ t('creator.ui.assignments.fee') }}
+                </dt>
+                <dd>{{ feeLabel(item) }}</dd>
+              </div>
+              <div
                 v-if="
                   item.attributes.status === 'countered' &&
                   item.attributes.countered_fee_minor_units !== null
                 "
+                class="assignment-card__row"
                 :data-testid="`creator-assignment-countered-${item.id}`"
               >
-                · {{ t('creator.ui.assignments.youCountered') }}:
-                {{
-                  formatMoney(
-                    item.attributes.countered_fee_minor_units,
-                    item.attributes.countered_fee_currency,
-                  )
-                }}
-              </span>
-            </p>
-            <p class="assignment__meta">{{ windowLabel(item) }}</p>
-            <!-- The agency's offer expectations (invite-offer-details batch).
-                 Minimal rich text (AH-081): bold/italic/links/breaks only,
-                 sanitized by RichBrief — see useRichBriefRenderer.ts. -->
-            <RichBrief
+                <dt>
+                  <v-icon icon="mdi-swap-horizontal" size="15" />{{
+                    t('creator.ui.assignments.youCountered')
+                  }}
+                </dt>
+                <dd>
+                  {{
+                    formatMoney(
+                      item.attributes.countered_fee_minor_units,
+                      item.attributes.countered_fee_currency,
+                    )
+                  }}
+                </dd>
+              </div>
+              <div
+                class="assignment-card__row"
+                :data-testid="`creator-assignment-dates-${item.id}`"
+              >
+                <dt>
+                  <v-icon icon="mdi-calendar-blank-outline" size="15" />{{
+                    t('creator.ui.assignments.dates')
+                  }}
+                </dt>
+                <dd>{{ windowLabel(item) }}</dd>
+              </div>
+              <div
+                v-if="deliverablesLabel(item) !== ''"
+                class="assignment-card__row"
+                :data-testid="`creator-assignment-deliverables-${item.id}`"
+              >
+                <dt>
+                  <v-icon icon="mdi-briefcase-outline" size="15" />{{
+                    t('creator.ui.assignments.deliverables')
+                  }}
+                </dt>
+                <dd>{{ deliverablesLabel(item) }}</dd>
+              </div>
+            </dl>
+
+            <div
               v-if="item.attributes.offer_description"
-              :text="item.attributes.offer_description"
-              class="assignment__description"
-              :data-test="`creator-assignment-description-${item.id}`"
-            />
-            <!-- The one optional offer attachment — the chip label is the
-                 agency-given file name, opened via the short-lived signed URL. -->
+              class="assignment-card__note"
+              :data-testid="`creator-assignment-note-${item.id}`"
+            >
+              <span class="assignment-card__note-label">{{
+                t('creator.ui.assignments.note_from_brand')
+              }}</span>
+              <RichBrief
+                :text="item.attributes.offer_description"
+                class="assignment__description"
+                :data-test="`creator-assignment-description-${item.id}`"
+              />
+            </div>
             <v-chip
               v-if="item.attributes.offer_attachment?.url"
               size="small"
               variant="tonal"
               prepend-icon="mdi-paperclip"
-              class="mt-1"
               :href="item.attributes.offer_attachment.url"
               target="_blank"
               rel="noopener noreferrer"
@@ -196,7 +256,79 @@ onMounted(() => {
             >
               {{ item.attributes.offer_attachment.name }}
             </v-chip>
-          </div>
+          </template>
+
+          <template v-else>
+            <div class="assignment__info">
+              <div class="assignment__title">
+                <span class="assignment__name">{{ item.attributes.campaign?.name ?? '—' }}</span>
+                <v-chip
+                  size="x-small"
+                  variant="tonal"
+                  :data-testid="`creator-assignment-status-${item.id}`"
+                >
+                  {{ t(`app.campaigns.assignmentStatus.${item.attributes.status}`) }}
+                </v-chip>
+              </div>
+              <p class="assignment__meta">
+                <span v-if="item.attributes.campaign?.brand_name">
+                  {{ item.attributes.campaign.brand_name }} ·
+                </span>
+                {{ t('creator.ui.assignments.fee') }}:
+                {{
+                  formatMoney(
+                    item.attributes.agreed_fee_minor_units,
+                    item.attributes.agreed_fee_currency,
+                  )
+                }}<span
+                  v-if="item.attributes.fee_per"
+                  :data-test="`creator-assignment-fee-per-${item.id}`"
+                >
+                  / {{ item.attributes.fee_per }}</span
+                >
+                <span
+                  v-if="
+                    item.attributes.status === 'countered' &&
+                    item.attributes.countered_fee_minor_units !== null
+                  "
+                  :data-testid="`creator-assignment-countered-${item.id}`"
+                >
+                  · {{ t('creator.ui.assignments.youCountered') }}:
+                  {{
+                    formatMoney(
+                      item.attributes.countered_fee_minor_units,
+                      item.attributes.countered_fee_currency,
+                    )
+                  }}
+                </span>
+              </p>
+              <p class="assignment__meta">{{ windowLabel(item) }}</p>
+              <!-- The agency's offer expectations (invite-offer-details batch).
+                   Minimal rich text (AH-081): bold/italic/links/breaks only,
+                   sanitized by RichBrief — see useRichBriefRenderer.ts. -->
+              <RichBrief
+                v-if="item.attributes.offer_description"
+                :text="item.attributes.offer_description"
+                class="assignment__description"
+                :data-test="`creator-assignment-description-${item.id}`"
+              />
+              <!-- The one optional offer attachment — the chip label is the
+                   agency-given file name, opened via the short-lived signed URL. -->
+              <v-chip
+                v-if="item.attributes.offer_attachment?.url"
+                size="small"
+                variant="tonal"
+                prepend-icon="mdi-paperclip"
+                class="mt-1"
+                :href="item.attributes.offer_attachment.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                :data-test="`creator-assignment-attachment-${item.id}`"
+              >
+                {{ item.attributes.offer_attachment.name }}
+              </v-chip>
+            </div>
+          </template>
 
           <div class="assignment__actions">
             <v-btn
@@ -205,7 +337,9 @@ onMounted(() => {
               :to="{ name: 'creator.assignment.detail', params: { ulid: item.id } }"
               :data-testid="`creator-assignment-view-${item.id}`"
             >
-              {{ t('creator.ui.assignments.view') }}
+              {{
+                isNative ? t('creator.ui.assignments.view_brief') : t('creator.ui.assignments.view')
+              }}
             </v-btn>
             <template v-if="item.attributes.status === 'invited'">
               <v-btn
@@ -217,7 +351,11 @@ onMounted(() => {
                 :data-testid="`creator-assignment-accept-${item.id}`"
                 @click="accept(item)"
               >
-                {{ t('creator.ui.assignments.accept') }}
+                {{
+                  isNative
+                    ? t('creator.ui.assignments.accept_invitation')
+                    : t('creator.ui.assignments.accept')
+                }}
               </v-btn>
               <v-btn
                 color="error"

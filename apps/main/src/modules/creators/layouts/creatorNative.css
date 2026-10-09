@@ -172,6 +172,121 @@
   opacity: 1;
 }
 
+/* Invitation card (frame 10): brand tile + title + status pill, a canvas panel of
+   Fee / Dates / Deliverables, the brand's note on a rail, then the actions. */
+.creator-main--native :deep(.assignment-card__top) {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.creator-main--native :deep(.assignment-card__tile) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  font: var(--native-type-h4);
+  color: var(--native-usp-6);
+  background: var(--native-usp-6-subtle);
+  border-radius: var(--native-radius-lg);
+}
+
+.creator-main--native :deep(.assignment-card__head) {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.creator-main--native :deep(.assignment-card__brand) {
+  font: var(--native-type-caption);
+  color: var(--native-text-secondary);
+}
+
+/* The status pill: neutral by default, info-tinted with a dot for "Invited". */
+.creator-main--native :deep([data-testid^='creator-assignment-status-']) {
+  flex: none;
+  height: 22px;
+  padding: 0 8px;
+  font: var(--native-type-caption-strong);
+  color: var(--native-text-secondary);
+  background: var(--native-bg-surface-raised);
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep([data-testid^='creator-assignment-status-'][data-status='invited']) {
+  color: var(--native-status-info);
+  background: var(--native-status-info-subtle);
+}
+
+.creator-main--native
+  :deep([data-testid^='creator-assignment-status-'][data-status='invited'])::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  background: currentcolor;
+  border-radius: var(--native-radius-full);
+}
+
+.creator-main--native :deep(.assignment-card__panel) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  margin: 0;
+  background: var(--native-bg-canvas);
+  border-radius: var(--native-radius-lg);
+}
+
+.creator-main--native :deep(.assignment-card__row) {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.creator-main--native :deep(.assignment-card__row dt) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+}
+
+.creator-main--native :deep(.assignment-card__row dd) {
+  margin: 0;
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+  text-align: right;
+}
+
+.creator-main--native :deep(.assignment-card__note) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 12px;
+  border-left: 3px solid var(--native-border-strong);
+}
+
+.creator-main--native :deep(.assignment-card__note-label) {
+  font: var(--native-type-overline);
+  color: var(--native-text-tertiary);
+  letter-spacing: var(--native-type-overline-tracking);
+  text-transform: uppercase;
+}
+
+.creator-main--native :deep(.assignment-card__note .assignment__description) {
+  margin: 0;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
 /* Accept leads at full width; View and Decline share the row beneath it. */
 .creator-main--native :deep(.assignment__actions) {
   display: flex;
