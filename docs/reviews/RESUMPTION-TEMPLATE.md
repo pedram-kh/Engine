@@ -116,7 +116,35 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-10-08 · **Through:** AH-100b, the Creator App arc's chunk 3 of 8 — the
+**Last updated:** 2026-10-09 · **Through:** AH-100c, the eyes-on fixes to the Creator App arc's
+chunk 3 (`apps/main`, `packages/design-tokens/native.css`; zero `apps/api` / `apps/admin` diff; **no
+migration**; **no new API surface**; **ten new i18n keys ×24, real MT**). **Review closed — approved
+(2026-10-09), verified by Pedram's re-walk; pushed on his clearance:** the feat commit `9f4934e9` plus
+a docs commit on top of `e5beeddc` (AH-100b's closed tip). **CI at the pushed tip closes it (§5.41);
+the run and the pushed tip are cited in the review's docs-only provenance commit.** Live state is
+`git status` and `origin/main`, not this sentence.
+
+- **What AH-100c is:** Pedram's AH-100b eyes-on found five things. **One cause for three of them:**
+  native field text was Figma's 14px and iOS WKWebView auto-zooms any control under 16px on focus (the
+  zoom persists across blur and routes and pushes the fixed tab bar out of view). Fixed as **16px
+  field text** (a ratified deviation from Figma; labels stay 14px; `maximum-scale=1` rejected on
+  accessibility grounds) and pinned by a CSS-parsing spec. Plus the Edit profile **form body** (frame
+  13, a parallel native sheet and a coverage spec) and the approved **dashboard** (frame 07: banner,
+  Profile-strength card, invitation card with a "New" pill). Review:
+  [`creator-app-eyes-on-fixes-review.md`](creator-app-eyes-on-fixes-review.md); its §3 is the deviation
+  list (D1–D6) and its §9 the re-walk. AH-100b's review gained a dated post-close addendum.
+- **Next:** CI at the tip. Pedram's re-walk (including tapping a field and navigating on) passed: no
+  zoom, no clipping, tab bar pinned, the dashboard and the Edit profile form body landing. Open
+  observation: the 6px vertical scroll was not separately re-measured. Then the arc continues.
+- **Deploy:** web is an `apps/main` SPA rebuild only; the app does not deploy. `deploy-log.md` has a
+  PENDING entry stacked on AH-100b, AH-100 and AH-099.
+- **Standing facts to carry:** the two native form sheets are parallel (tech-debt: unify under one root
+  class); the dashboard's reach-100 row is step-level and the "New" pill is keyed on a pending
+  invitation, both because the API exposes nothing finer; pre-existing translation defects in the
+  flaky-10 and hr/sk/sl are logged in tech-debt, untouched. In zsh, quote `echo '=====X'` (an unquoted
+  `=====X` is parsed as command substitution).
+
+**Prior state, for the record — AH-100b.** **Last updated:** 2026-10-08 · **Through:** AH-100b, the Creator App arc's chunk 3 of 8 — the
 Figma-faithful page passes, the walkthrough findings and the real app icon (`apps/main`,
 `packages/design-tokens/native.css`; zero `apps/api` / `apps/admin` diff; **no migration**; **no new
 user-facing string**). **Review closed — approved (2026-10-08); pushed on Pedram's clearance:** the feat commit `6c2b86ec`,

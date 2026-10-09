@@ -54,6 +54,35 @@ happened.
 
 ---
 
+## AH-100c — Creator app eyes-on fixes: iOS input zoom, edit-profile form body, frame-07 dashboard pass — PENDING
+
+> **Stacks on AH-100b, AH-100 and AH-099, all PENDING.** Deploy in order, or together as one entry.
+> Their obligations apply unchanged. Pushed on Pedram's clearance after his re-walk (2026-10-09).
+
+- **Status:** PENDING
+- **Range:** `e5beeddc` → _the pushed tip (to be filled)_ (the AH-100c feat commit is `9f4934e9`; the rest is docs-only).
+- **AH entries carried:** AH-100c.
+- **Migrations run:** **none.** Zero `apps/api` diff.
+- **Pre-deploy reads:** none of its own.
+- **Snapshot ID:** not required. No migration, no data change.
+- **Infra:**
+  - **`apps/main` SPA rebuild only.** Every addition is native-gated, so a browser renders what it did
+    before, **with one exception on the web bundle: ten new i18n keys ship in every locale file** (they
+    are unused on the web). `packages/design-tokens` changes only the native layer.
+  - No PHP-FPM reload, no worker restart, no env change, no scheduler change.
+  - **The creator app is not deployed by this entry.** The fixes reach a device through a local build
+    (review §9).
+- **One-shot commands:** none.
+- **Post-deploy verification (to be filled):**
+  1. `/up` → 200.
+  2. Web creator dashboard and Edit profile look and behave as before (completeness bar and the
+     invitation alert are still the web ones).
+- **Flags armed:** none.
+- **Operator:** _to be filled._
+- **Anything unexpected:** _to be filled._
+
+---
+
 ## AH-100b — Creator app Figma-faithful page passes, walkthrough findings and the real app icon — PENDING
 
 > **Stacks on AH-100 and AH-099, both PENDING.** Deploy in order, or together as one entry. Their

@@ -70,6 +70,41 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-100c · Creator app eyes-on fixes: iOS input zoom, edit-profile form body, frame-07 dashboard pass (Creator App arc)
+
+- **Status:** Closed — approved (2026-10-09), verified by Pedram's re-walk; CI at the pushed tip closes
+  it (§5.41; the CI run is cited in the review's provenance commit). A new entry, **not a reopen of AH-100b** (closed chunks stay closed; AH-100b carries a
+  dated post-close addendum). Full review:
+  [`creator-app-eyes-on-fixes-review.md`](creator-app-eyes-on-fixes-review.md).
+- **Date:** 2026-10-09.
+- **Why:** Pedram's AH-100b eyes-on found five things. Three were one cause: native field text was
+  Figma's 14px, and iOS WKWebView auto-zooms any control under 16px on focus. The zoom (measured
+  `visualViewport.scale` 1.1418, which is 16/14) outlives blur and route changes, clipped the page's
+  left edge and left the fixed tab bar outside the visible viewport. The other two were scope AH-100b
+  did not reach: the dashboard (frame 07) and the Edit profile form body (frame 13).
+- **What:**
+  - B1: native field text is **16px** (new `--native-type-input` token; labels stay 14px), pinned by a
+    CSS-parsing spec over every native sheet. `maximum-scale=1` rejected (blocks pinch-zoom, WCAG 1.4.4).
+  - B2: the suspected safe-area double count was investigated from source: no defect, no change.
+  - B3: the Edit profile form body styled against frame 13 in a parallel native sheet, plus a coverage
+    spec and a native "Tap to choose" dropzone copy.
+  - B4: the approved dashboard drawn from frame 07 (welcome header, banner, Profile-strength card,
+    invitation card with a "New" pill, requests count and empty card), native-gated; the web DOM is
+    unchanged.
+- **Touched:** `apps/main` (creators layouts, pages and components; onboarding dropzones; i18n ×24),
+  `packages/design-tokens`. **Zero `apps/api` / `apps/admin` diff. No migration. No new API surface.**
+- **Decisions:** 16px inputs ratified as a recorded deviation from Figma (Pedram may update the Figma
+  inputs to 16 so the two re-converge). New strings allowed for this batch: **10 keys, real MT ×24,
+  flaky-10 script-checked, all listed in the review's §4.** The reach-100 row is step-level (the
+  payload exposes the next incomplete step, not field); the "New" pill is keyed on a pending invitation
+  (no unseen signal).
+- **Evidence:** review §7 — break-reverts BR1a–BR5 (captured reds, sha256 restore, re-green), the
+  scoping spec deliberately updated, the web pin set green and unedited.
+- **Deploy obligation:** web is an `apps/main` SPA rebuild only; every addition is native-gated. The
+  **app does not deploy.** See [`deploy-log.md`](../runbooks/deploy-log.md).
+- **Ref:** [`creator-app-eyes-on-fixes-review.md`](creator-app-eyes-on-fixes-review.md); feat commit
+  `9f4934e9`; `tech-debt.md` ("AH-100c …").
+
 ### AH-100b · Creator app Figma-faithful page passes, walkthrough findings and the real app icon (Creator App arc, chunk 3 of 8)
 
 - **Status:** Closed — approved (2026-10-08); per-item §3 rulings follow Pedram's eyes-on. Full chunk loop (kickoff D1–D5 →
@@ -101,6 +136,8 @@ reviews, and conversations.
   browser. The **app does not deploy**. See [`deploy-log.md`](../runbooks/deploy-log.md).
 - **Ref:** [`creator-app-figma-passes-review.md`](creator-app-figma-passes-review.md); feat commit
   `6c2b86ec`; `tech-debt.md` ("AH-100b …", "AH-100 …").
+- **Post-close addendum (2026-10-09):** Pedram's eyes-on found five things, three of them one cause
+  (a 14px field font making iOS auto-zoom); fixed in **AH-100c**. See the review's post-close addendum.
 
 ### AH-100 · Creator app client, Capacitor wrap and native theme (Creator App arc, chunk 2 of 7)
 

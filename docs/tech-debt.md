@@ -2880,3 +2880,43 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
      tint, the 46px field height). **Resolution:** his rebuild.
 - **Owner:** frontend / mobile.
 - **Status:** open. Surfaced at AH-100b, 2026-10-08 ([review](reviews/creator-app-figma-passes-review.md)).
+
+---
+
+## AH-100c (Creator app eyes-on fixes) — what the batch left open
+
+- **Where:** [`creatorProfileFormNative.css`](../apps/main/src/modules/creators/layouts/creatorProfileFormNative.css),
+  [`creatorDashboardNative.css`](../apps/main/src/modules/creators/layouts/creatorDashboardNative.css),
+  [`DashboardStrengthCard.vue`](../apps/main/src/modules/creators/components/DashboardStrengthCard.vue),
+  [`DashboardInvitationCard.vue`](../apps/main/src/modules/creators/components/DashboardInvitationCard.vue),
+  `packages/design-tokens/native.css`, `apps/main/src/core/i18n/locales/*/creator.json`.
+- **What we accepted (2026-10-09):**
+  1. **Two parallel native sheets style the same shared form components** (`onboardingNative.css` under
+     `.onboarding-native__body`, `creatorProfileFormNative.css` under `.creator-main--native`). A rule
+     fixed in one can still be missing from the other. **Resolution:** one shared root class on both
+     bodies and a single sheet; update `native-page-css-scoping.spec.ts` with it. **Triggered by**
+     the next change to a shared form component.
+  2. **The "to reach 100%" row is step-level, not field-level.** The completeness payload exposes the
+     next incomplete wizard step only. **Resolution:** expose the next missing field from the API, then
+     name it on the card. Needs an API chunk.
+  3. **The "New" pill is keyed on a pending invitation, not on "unseen".** There is no seen signal
+     on an assignment. **Resolution:** add one (API), then key the pill on it.
+  4. **Field text is 16px against Figma's 14px** (a ratified deviation). **Resolution:** update the
+     Figma inputs to 16px so design and build re-converge.
+  5. **Only the approved dashboard is redesigned.** Pending, rejected and suspended states keep the
+     web layout inside the native shell. **Triggered by** a design for them.
+  6. **The requests list-item layout on the dashboard was not checked against a reference render.**
+     **Resolution:** Pedram's re-walk.
+  7. **Pre-existing translation defects, found while auditing and not touched:** in `creator.json`,
+     the flaky-10 locales carry about 190–210 of 424 values identical to English (bg 188, el 206,
+     et 208, fi 207, ga 205, hu 206, lt 207, lv 207, mt 212, ro 210; strings over 3 characters),
+     and hr, sk and sl carry 131, 134 and 131 values identical to Czech and not to English. Identity
+     was measured, not judged: some of it may be legitimate. **Resolution:** a value audit and a real
+     MT pass of the genuine leftovers, ×24.
+  8. **Eleven locales carry the "campaign invitations" plural as the same string in both slots**
+     (cs, ga, hr, hu, lt, lv, mt, pl, ro, sk, sl), a count-neutral form. **Resolution:** a native-speaker
+     review.
+  9. **The 6px vertical scroll was not reproduced.** **Resolution:** re-measure in the re-walk; if it
+     remains, it is a real layout defect to chase.
+- **Owner:** frontend / mobile.
+- **Status:** open. Surfaced at AH-100c, 2026-10-09 ([review](reviews/creator-app-eyes-on-fixes-review.md)).

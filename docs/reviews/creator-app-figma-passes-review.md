@@ -328,3 +328,50 @@ Then relaunch on both platforms. Check, in order: the home-screen icon and the s
 card, create-account pointer), the wizard (every step, especially 06b and 06c), notifications,
 invitations, messages, job posts, edit profile, and the two bottom sheets (apply to a job, add a
 draft link). Rule on each item in §3.
+
+## Post-close addendum (AH-100b, 2026-10-09) — the eyes-on outcome, fix ref
+
+This review closed on its evidence (§7) with Pedram's simulator and device eyes-on as the acceptance
+instrument. That eyes-on has now run and found **five things this review did not and could not see**
+(its own header said no simulator ran in the session). The chunk stays closed; the fix is a new entry,
+**AH-100c** (`creator-app-eyes-on-fixes-review.md`).
+
+**The findings.**
+
+1. **Sign-in:** after a field took focus and the keyboard closed, the page stayed zoomed; the hero
+   headline's left edge was clipped and the page panned sideways.
+2. **Dashboard:** carried over the same zoom, "Your application" was clipped on the left, and "0%
+   complete" and "Connection requests" lost their first letters.
+3. **Tab bar:** the fixed bar was not unpinned but sat outside the visible area, so the tabs were only
+   reachable by scrolling.
+4. **Dashboard content (frame 07):** it was the plain web layout. §2 above says "01, 07, 08 and 12 were
+   AH-100's", and D1's frame list (02–05, 06, 06b, 06c, 09–11, 13, 14) leaves 07 out. 07 was used
+   only for the shell, so the dashboard content was never built.
+5. **Edit profile form body (frame 13):** the page shell and section cards were native, but the form
+   components are shared with the wizard, whose native rules hang off `.onboarding-native__body` and
+   never reach that page. **The S8 pass on this page was thin.** This review's §3 and §7 did not
+   catch it because the scoping specs prove native rules cannot reach the web, not that every
+   native-rendered class has a rule.
+
+(The wording of 1–5 was reconstructed from the diagnosis session, not copied from Pedram's message; Claude confirmed 4–5 accurate against the originals at AH-100c's close.)
+
+**Root cause of 1–3 (one cause).** Field text was **14px**, Figma's number, in
+`.catalyst-native .v-field__input …`. iOS WKWebView auto-zooms any control under 16px on focus. Measured
+on the iPhone 17 Pro simulator: after the keyboard closed, `visualViewport.scale` was **1.1418** (16/14 =
+1.1428) with `offsetLeft` 25; the zoom is page-level WebView state, so it survived blur and carried
+across the sign-in → dashboard route change. Fixed elements are laid out against the unzoomed box, so the
+tab bar (`position: fixed`, 784–874) sat outside the zoomed visual viewport, which was 765 high.
+Resetting the zoom (toggling the viewport meta in the live DOM, a control and not a code change) left the
+dashboard flush with the tab bar visible.
+
+**The "thin S8" finding (5), and why §3's list did not carry it:** §3 listed deviations from the frames
+that were built; it had no row for a frame region that was never reached. The fix adds a pin that
+**walks the page's rendered classes and fails on any with no native rule** (AH-100c, B3).
+
+**What this review's closure still stands for:** D2, D3 and D4 (sign-in content set, the lapse banner,
+the icon and splash) were not among the findings. The 14px was a faithful reading of the Figma token
+table, which is why AH-100c records 16px as a **deviation from the frame**, not a correction of a
+mistake here.
+
+**Fix (AH-100c):** see the AH-100c entry in `docs/reviews/adhoc-changes-log.md` and
+`docs/reviews/creator-app-eyes-on-fixes-review.md`.
