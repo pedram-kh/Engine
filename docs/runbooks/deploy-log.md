@@ -60,7 +60,12 @@ happened.
 > entry. Their obligations apply unchanged. **Not pushed yet:** held for Pedram's re-walk.
 
 - **Status:** PENDING
-- **Range:** `b214c31f` → the AH-100d docs commit (feat commits `ceae669a`…`766c2d63`).
+- **Range:** `b214c31f` → the AH-100d docs commits (feat commits `ceae669a`…`766c2d63`, then the
+  second re-walk batch `9ef51fd4`…`2b8294d5`).
+- **Second batch, deploy-relevant:** the web bundle gains five new locale keys
+  (`availability.creatorNav.tab.*`, unused on the web) and the **repaired base `assignments` label in ten
+  locales (bg el et fi ga hu lt lv mt ro), which the web top nav and More menu DO read**. Nothing else on
+  the web changes. Still an `apps/main` SPA rebuild only; no migration, no env, no dependency.
 - **AH entries carried:** AH-100d.
 - **Migrations run:** **none.** Zero `apps/api` diff.
 - **Pre-deploy reads:** none of its own.

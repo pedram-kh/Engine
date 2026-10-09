@@ -102,7 +102,18 @@ reviews, and conversations.
 - **Deploy obligation:** web is an `apps/main` SPA rebuild (new locale keys ship in every locale file;
   unused on the web). The app does not deploy; `cap sync` is needed locally for the new plugin. See
   [`deploy-log.md`](../runbooks/deploy-log.md).
-- **Ref:** feat commits `ceae669a`…`766c2d63` on `b214c31f`; `tech-debt.md` ("AH-100d …").
+- **Second re-walk batch (same entry, five more commits `9ef51fd4`, `f11ad8dc`, `a363bebf`, `88cb4fdd`,
+  `2b8294d5`):** eight UI-only items from Pedram's second re-walk. Accept no longer clipped (the
+  invitation actions row is a grid, both invitation kinds); the Messages empty-state button no longer
+  renders blank (mint-on-mint paint, not a missing key); Welcome back no longer ticks Master agreement
+  on a new account (display predicate only); the native tab bar matches frame 07 (a top line, no filled
+  block; the line had never rendered) and uses five new short keys `availability.creatorNav.tab.*` ×24,
+  plus a repair of ten locales' base `assignments` label (visible on the web); and token-derived native
+  treatments for the invitation detail, job post detail and assignment detail pages (no Figma frame
+  exists). New: 5 keys ×24 (120 strings). No `packages/ui`, `apps/api`, `apps/admin` change and no new
+  dependency. 22 more logged break-reverts (review §7). **PROD-DATA RISK: NONE.** Review §10.
+- **Ref:** feat commits `ceae669a`…`766c2d63` on `b214c31f`, then the second-batch commits above;
+  `tech-debt.md` ("AH-100d …").
 
 ### AH-100c · Creator app eyes-on fixes: iOS input zoom, edit-profile form body, frame-07 dashboard pass (Creator App arc)
 

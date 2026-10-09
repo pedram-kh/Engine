@@ -2968,5 +2968,19 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
      new gallery, social and photo rules were added to both).
   10. **The audit was not a rendered-pixel comparison** (review §1). **Resolution:** Pedram's re-walk,
       or a native screenshot harness.
+  11. **Second re-walk batch (review §10), open items:**
+      - The invitation, job and assignment detail pages are **token-derived, not designed**: no Figma
+        frame exists. **Resolution:** a design pass, then re-derive.
+      - The apply bottom sheet and the add-link sheet were not restyled.
+      - Native-locale review of the new `tab.*` labels, especially **ga, mt, lv, el**; `mt` Dashboard is
+        "Pannell" (a judgement call).
+      - The tinted banner style now covers the success, warning and error tones on every creator page
+        (not only the detail pages); only the detail pages were looked at.
+      - `!important` is now load-bearing in `creatorNative.css` on type and draft-round fills, because
+        Vuetify's typography and `.bg-*` utilities are `!important` (pinned by `native-detail-pages.spec`,
+        which asserts the cause is still live). **Resolution:** drop the utilities from the templates
+        in a markup pass, then the `!important`s can go.
+      - The offer note on the invitation detail has the rail but not the card's "Note from the brand"
+        label (template change deferred).
 - **Owner:** frontend / mobile.
 - **Status:** open. Surfaced at AH-100d, 2026-10-09 ([review](reviews/creator-app-fidelity-audit-review.md)).
