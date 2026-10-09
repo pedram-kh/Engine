@@ -550,6 +550,7 @@
         "portfolio_queue_status": "{in_flight} av {total} laddar upp (upp till {concurrency} åt gången).",
         "uploading": "Laddar upp…",
         "remove": "Ta bort",
+        "replace": "Byt ut",
         "remove_avatar": "Ta bort foto",
         "remove_portfolio_item_label": "Ta bort {name}",
         "status_pending": "Väntar…",

@@ -550,6 +550,7 @@
         "portfolio_queue_status": "{in_flight} z {total} se nahrává (max. {concurrency} najednou).",
         "uploading": "Nalaganje…",
         "remove": "Odstrani",
+        "replace": "Zamenjaj",
         "remove_avatar": "Odstrani foto",
         "remove_portfolio_item_label": "Odstrani {name}",
         "status_pending": "Čakaní…",

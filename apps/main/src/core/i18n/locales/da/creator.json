@@ -550,6 +550,7 @@
         "portfolio_queue_status": "{in_flight} af {total} uploader (op til {concurrency} ad gangen).",
         "uploading": "Uploader…",
         "remove": "Fjern",
+        "replace": "Erstat",
         "remove_avatar": "Fjern billede",
         "remove_portfolio_item_label": "Fjern {name}",
         "status_pending": "Venter…",

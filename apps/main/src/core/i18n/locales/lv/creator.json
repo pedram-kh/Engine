@@ -550,6 +550,7 @@
         "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",
         "uploading": "Augšupielādēting…",
         "remove": "Remove",
+        "replace": "Aizstāt",
         "remove_avatar": "Remove photo",
         "remove_portfolio_item_label": "Remove {name}",
         "status_pending": "Waiting…",

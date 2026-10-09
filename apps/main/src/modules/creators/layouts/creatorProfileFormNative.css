@@ -163,7 +163,7 @@
   color: var(--native-status-danger);
 }
 
-/* ── Profile photo (Figma: a 72px tile, then the controls) ─────────────── */
+/* ── Profile photo (Figma frames 02/03: an 88px tile, then the controls) ── */
 
 .creator-main--native :deep(.avatar-upload-drop) {
   flex-direction: row;
@@ -174,8 +174,8 @@
 
 .creator-main--native :deep(.avatar-upload-drop__preview) {
   flex: none;
-  width: 72px;
-  height: 72px;
+  width: 88px;
+  height: 88px;
   background: var(--native-bg-surface-raised);
   border-radius: var(--native-radius-2xl);
 }
@@ -225,6 +225,45 @@
   flex-basis: 100%;
   font: var(--native-type-body-small);
   color: var(--native-status-danger);
+}
+
+/* The filled state (frame 03): thumbnail, title, hint, Replace + Remove. */
+.creator-main--native :deep(.avatar-upload-drop__row) {
+  display: flex;
+  flex: 1 1 100%;
+  gap: 16px;
+  align-items: center;
+  min-width: 0;
+}
+
+.creator-main--native :deep(.avatar-upload-drop__row-body) {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.creator-main--native :deep(.avatar-upload-drop__row-title),
+.creator-main--native :deep(.avatar-upload-drop__row-hint) {
+  margin: 0;
+}
+
+.creator-main--native :deep(.avatar-upload-drop__row-title) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.creator-main--native :deep(.avatar-upload-drop__row-hint) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.creator-main--native :deep(.avatar-upload-drop__row-actions) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
 }
 
 /* ── Social accounts (tiles, as in the wizard's frames 04/05) ──────────── */

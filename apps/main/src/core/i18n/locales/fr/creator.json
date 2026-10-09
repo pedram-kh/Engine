@@ -550,6 +550,7 @@
         "portfolio_queue_status": "{in_flight} sur {total} en cours de téléversement (jusqu'à {concurrency} à la fois).",
         "uploading": "Téléversement…",
         "remove": "Supprimer",
+        "replace": "Remplacer",
         "remove_avatar": "Supprimer la photo",
         "remove_portfolio_item_label": "Supprimer {name}",
         "status_pending": "En attente…",

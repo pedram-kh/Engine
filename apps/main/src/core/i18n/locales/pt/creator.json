@@ -550,6 +550,7 @@
         "portfolio_queue_status": "{in_flight} de {total} a carregar (até {concurrency} em simultâneo).",
         "uploading": "A carregar…",
         "remove": "Remover",
+        "replace": "Substituir",
         "remove_avatar": "Remover foto",
         "remove_portfolio_item_label": "Remover {name}",
         "status_pending": "À espera…",

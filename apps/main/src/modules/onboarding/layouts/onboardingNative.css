@@ -127,6 +127,108 @@
   color: var(--native-text-tertiary);
 }
 
+/* Profile photo (frames 02/03): the empty dropzone, then the filled row. */
+.onboarding-native__body :deep(.avatar-upload-drop) {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__preview) {
+  flex: none;
+  width: 88px;
+  height: 88px;
+  background: var(--native-bg-surface-raised);
+  border-radius: var(--native-radius-2xl);
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__image) {
+  border-radius: var(--native-radius-2xl);
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__zone) {
+  flex: 1 1 160px;
+  gap: 8px;
+  padding: 16px;
+  background: var(--native-bg-canvas);
+  border: 1.5px dashed var(--native-border-strong);
+  border-radius: var(--native-radius-xl);
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__zone--drag-over) {
+  background: var(--native-accent-primary-subtle);
+  border-color: var(--native-accent-primary);
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__zone--uploading) {
+  opacity: 0.6;
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__zone .v-icon) {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  color: var(--native-accent-primary);
+  background: var(--native-accent-primary-subtle);
+  border-radius: var(--native-radius-full);
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__primary) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__hint) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__error) {
+  flex-basis: 100%;
+  font: var(--native-type-body-small);
+  color: var(--native-status-danger);
+}
+
+/* The filled state (frame 03): thumbnail, title, hint, Replace + Remove. */
+.onboarding-native__body :deep(.avatar-upload-drop__row) {
+  display: flex;
+  flex: 1 1 100%;
+  gap: 16px;
+  align-items: center;
+  min-width: 0;
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__row-body) {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__row-title),
+.onboarding-native__body :deep(.avatar-upload-drop__row-hint) {
+  margin: 0;
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__row-title) {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__row-hint) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.onboarding-native__body :deep(.avatar-upload-drop__row-actions) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
 /* Platform tiles (frames 04/05): canvas tile, mint-tinted once connected. */
 .onboarding-native__body :deep(.social-card) {
   gap: 12px;

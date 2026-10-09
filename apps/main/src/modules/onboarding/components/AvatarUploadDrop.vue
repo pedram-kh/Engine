@@ -58,6 +58,17 @@ const persistedAvatarUrl = computed(() => store.creator?.attributes.avatar_url ?
 const hasPersisted = computed(() => persistedAvatarPath.value !== null)
 const displayUrl = computed(() => previewUrl.value ?? persistedAvatarUrl.value)
 
+// AH-100d (Figma frame 03) — once there is a photo, the app shows it as a ROW
+// (88px thumbnail, "Profile photo *", the size hint, Replace + Remove). The
+// dashed dropzone stays the EMPTY state (frame 02). Web keeps its own markup.
+const isNative = isNativePlatform()
+const nativeFilled = computed(() => isNative && displayUrl.value !== null)
+const photoLabel = computed(() => `${t('creator.ui.wizard.fields.avatar')} *`)
+
+function onClickReplace(): void {
+  inputRef.value?.click()
+}
+
 const errorMessage = computed(() => {
   if (error.value === null) return null
   return t(error.value.key, error.value.values)
@@ -96,56 +107,102 @@ function onDragLeave(): void {
 
 <template>
   <div class="avatar-upload-drop">
-    <div
-      v-if="displayUrl !== null"
-      class="avatar-upload-drop__preview"
-      data-testid="avatar-preview"
-    >
-      <img
-        :src="displayUrl"
-        :alt="t('creator.ui.upload.avatar_preview_alt')"
-        class="avatar-upload-drop__image"
-      />
+    <!-- AH-100d: frame 03's filled state (native only). -->
+    <div v-if="nativeFilled" class="avatar-upload-drop__row" data-testid="avatar-row">
+      <div class="avatar-upload-drop__preview" data-testid="avatar-preview">
+        <img
+          :src="displayUrl ?? undefined"
+          :alt="t('creator.ui.upload.avatar_preview_alt')"
+          class="avatar-upload-drop__image"
+        />
+      </div>
+      <div class="avatar-upload-drop__row-body">
+        <p class="avatar-upload-drop__row-title">{{ photoLabel }}</p>
+        <p id="avatar-upload-hint" class="avatar-upload-drop__row-hint">{{ sizeHint }}</p>
+        <div class="avatar-upload-drop__row-actions">
+          <input
+            ref="inputRef"
+            type="file"
+            :accept="acceptAttr"
+            :disabled="isUploading"
+            :aria-describedby="errorMessage !== null ? 'avatar-upload-error' : 'avatar-upload-hint'"
+            class="avatar-upload-drop__input"
+            data-testid="avatar-file-input"
+            @change="onChange"
+          />
+          <v-btn
+            variant="outlined"
+            :loading="isUploading"
+            :disabled="isUploading"
+            data-testid="avatar-replace-button"
+            @click="onClickReplace"
+          >
+            {{ t('creator.ui.upload.replace') }}
+          </v-btn>
+          <v-btn
+            variant="text"
+            :disabled="isUploading"
+            data-testid="avatar-remove-button"
+            @click="onClickRemove"
+          >
+            {{ t('creator.ui.upload.remove') }}
+          </v-btn>
+        </div>
+      </div>
     </div>
 
-    <label
-      class="avatar-upload-drop__zone"
-      :class="{
-        'avatar-upload-drop__zone--drag-over': isDragOver,
-        'avatar-upload-drop__zone--uploading': isUploading,
-      }"
-      data-testid="avatar-drop-zone"
-      @drop.prevent="onDrop"
-      @dragover.prevent="onDragOver"
-      @dragleave.prevent="onDragLeave"
-    >
-      <input
-        ref="inputRef"
-        type="file"
-        :accept="acceptAttr"
-        :disabled="isUploading"
-        :aria-describedby="errorMessage !== null ? 'avatar-upload-error' : 'avatar-upload-hint'"
-        class="avatar-upload-drop__input"
-        data-testid="avatar-file-input"
-        @change="onChange"
-      />
-      <v-icon icon="mdi-cloud-upload-outline" size="32" />
-      <span class="avatar-upload-drop__primary">
-        {{ isUploading ? t('creator.ui.upload.uploading') : t(promptKey) }}
-      </span>
-      <span id="avatar-upload-hint" class="avatar-upload-drop__hint">{{ sizeHint }}</span>
-    </label>
+    <template v-else>
+      <div
+        v-if="displayUrl !== null"
+        class="avatar-upload-drop__preview"
+        data-testid="avatar-preview"
+      >
+        <img
+          :src="displayUrl"
+          :alt="t('creator.ui.upload.avatar_preview_alt')"
+          class="avatar-upload-drop__image"
+        />
+      </div>
 
-    <v-btn
-      v-if="hasPersisted && !isUploading"
-      variant="text"
-      size="small"
-      color="error"
-      data-testid="avatar-remove-button"
-      @click="onClickRemove"
-    >
-      {{ t('creator.ui.upload.remove_avatar') }}
-    </v-btn>
+      <label
+        class="avatar-upload-drop__zone"
+        :class="{
+          'avatar-upload-drop__zone--drag-over': isDragOver,
+          'avatar-upload-drop__zone--uploading': isUploading,
+        }"
+        data-testid="avatar-drop-zone"
+        @drop.prevent="onDrop"
+        @dragover.prevent="onDragOver"
+        @dragleave.prevent="onDragLeave"
+      >
+        <input
+          ref="inputRef"
+          type="file"
+          :accept="acceptAttr"
+          :disabled="isUploading"
+          :aria-describedby="errorMessage !== null ? 'avatar-upload-error' : 'avatar-upload-hint'"
+          class="avatar-upload-drop__input"
+          data-testid="avatar-file-input"
+          @change="onChange"
+        />
+        <v-icon icon="mdi-cloud-upload-outline" size="32" />
+        <span class="avatar-upload-drop__primary">
+          {{ isUploading ? t('creator.ui.upload.uploading') : t(promptKey) }}
+        </span>
+        <span id="avatar-upload-hint" class="avatar-upload-drop__hint">{{ sizeHint }}</span>
+      </label>
+
+      <v-btn
+        v-if="hasPersisted && !isUploading"
+        variant="text"
+        size="small"
+        color="error"
+        data-testid="avatar-remove-button"
+        @click="onClickRemove"
+      >
+        {{ t('creator.ui.upload.remove_avatar') }}
+      </v-btn>
+    </template>
 
     <div
       v-if="errorMessage !== null"

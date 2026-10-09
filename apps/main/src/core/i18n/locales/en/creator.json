@@ -556,6 +556,7 @@
         "add_link_failed": "We couldn't add that link. Please try again.",
         "uploading": "Uploading…",
         "remove": "Remove",
+        "replace": "Replace",
         "remove_avatar": "Remove photo",
         "remove_portfolio_item_label": "Remove {name}",
         "status_pending": "Waiting…",

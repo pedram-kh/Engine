@@ -550,6 +550,7 @@
         "portfolio_queue_status": "{in_flight} от {total} uploading (up to {concurrency} at a time).",
         "uploading": "Качетеing…",
         "remove": "Remove",
+        "replace": "Замени",
         "remove_avatar": "Remove photo",
         "remove_portfolio_item_label": "Remove {name}",
         "status_pending": "Waiting…",
