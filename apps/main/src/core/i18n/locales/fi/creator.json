@@ -83,6 +83,7 @@
             "gallery_empty": "Ei portfolio kohteet uploaded yet.",
             "gallery_remove": "Remove item",
             "gallery_status": "Portfolio gallery contains {count} item(s).",
+            "gallery_count": "{count} kohde | {count} kohdetta",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
@@ -92,7 +93,12 @@
             "failed_label": "Lataus epäonnistui",
             "download_label": "Lataa",
             "copy_link_label": "Kopioi linkki",
-            "view_all_label": "Näytä kaikki"
+            "view_all_label": "Näytä kaikki",
+            "kind_label": {
+              "image": "Kuva",
+              "video": "Video",
+              "link": "Linkki"
+            }
           },
           "kyc": {
             "name": "Identity verification",

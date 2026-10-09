@@ -83,6 +83,7 @@
             "gallery_empty": "Ingen portfolio-elementer uploadet endnu.",
             "gallery_remove": "Fjern element",
             "gallery_status": "Portfoliogalleri indeholder {count} element(er).",
+            "gallery_count": "{count} element | {count} elementer",
             "video_badge_label": "Video",
             "link_badge_label": "Eksternt link",
             "untitled_item": "Unavngivet portfolio-element",
@@ -92,7 +93,12 @@
             "failed_label": "Upload mislykkedes",
             "download_label": "Download",
             "copy_link_label": "Kopier link",
-            "view_all_label": "Se alle"
+            "view_all_label": "Se alle",
+            "kind_label": {
+              "image": "Billede",
+              "video": "Video",
+              "link": "Link"
+            }
           },
           "kyc": {
             "name": "Identitetsverifikation",

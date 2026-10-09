@@ -83,6 +83,7 @@
             "gallery_empty": "Brak przesłanych pozycji portfolio.",
             "gallery_remove": "Usuń pozycję",
             "gallery_status": "Galeria portfolio zawiera {count} pozycję/pozycji.",
+            "gallery_count": "Pozycje: {count} | Pozycje: {count}",
             "video_badge_label": "Wideo",
             "link_badge_label": "Zewnętrzny link",
             "untitled_item": "Nienazwana pozycja portfolio",
@@ -92,7 +93,12 @@
             "failed_label": "Przesyłanie nie powiodło się",
             "download_label": "Pobierz",
             "copy_link_label": "Kopiuj link",
-            "view_all_label": "Zobacz wszystkie"
+            "view_all_label": "Zobacz wszystkie",
+            "kind_label": {
+              "image": "Obraz",
+              "video": "Wideo",
+              "link": "Link"
+            }
           },
           "kyc": {
             "name": "Weryfikacja tożsamości",

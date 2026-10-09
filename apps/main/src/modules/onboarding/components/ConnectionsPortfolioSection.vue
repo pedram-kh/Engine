@@ -13,6 +13,8 @@ import { PortfolioGallery } from '@catalyst/ui'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
+
 import PortfolioUploadGrid from './PortfolioUploadGrid.vue'
 import { resolveSubmitErrorKey } from '../composables/useSubmitErrorKey'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
@@ -21,6 +23,22 @@ const { t } = useI18n()
 const store = useOnboardingStore()
 
 const removeErrorKey = ref<string | null>(null)
+
+/**
+ * AH-100d (Figma frame 04): the native app draws an Image / Video / Link pill on
+ * each tile and a "N items" count beside the heading. Web gets neither (the
+ * prop is `undefined`, so the shared gallery's markup is unchanged).
+ */
+const isNative = isNativePlatform()
+const kindLabels = computed(() =>
+  isNative
+    ? {
+        image: t('creator.ui.wizard.steps.portfolio.kind_label.image'),
+        video: t('creator.ui.wizard.steps.portfolio.kind_label.video'),
+        link: t('creator.ui.wizard.steps.portfolio.kind_label.link'),
+      }
+    : undefined,
+)
 
 const galleryItems = computed(() => {
   const items: ReadonlyArray<CreatorPortfolioItemSummary> =
@@ -69,11 +87,24 @@ async function onRemove(itemId: string): Promise<void> {
     </div>
 
     <div class="portfolio-step__gallery" data-testid="portfolio-step-gallery">
-      <h4 class="text-subtitle-2">
+      <div v-if="isNative" class="portfolio-step__gallery-head">
+        <h4 class="text-subtitle-2">
+          {{ t('creator.ui.wizard.steps.portfolio.gallery_heading') }}
+        </h4>
+        <span
+          v-if="galleryItems.length > 0"
+          class="portfolio-step__count"
+          data-testid="portfolio-step-count"
+        >
+          {{ t('creator.ui.wizard.steps.portfolio.gallery_count', { count: galleryItems.length }) }}
+        </span>
+      </div>
+      <h4 v-else class="text-subtitle-2">
         {{ t('creator.ui.wizard.steps.portfolio.gallery_heading') }}
       </h4>
       <PortfolioGallery
         :items="galleryItems"
+        :kind-labels="kindLabels"
         :editable="true"
         :empty-label="t('creator.ui.wizard.steps.portfolio.gallery_empty')"
         :remove-label="t('creator.ui.wizard.steps.portfolio.gallery_remove')"

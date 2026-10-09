@@ -35,6 +35,12 @@ const PACKAGE_CLASSES = [
   'portfolio-gallery__thumb-wrap',
   'portfolio-gallery__remove',
   'portfolio-gallery__title',
+  // AH-100d (frame 04): the kind pill, the hidden full-tile badge, the title row
+  // and the relocated download glyph.
+  'portfolio-gallery__kind',
+  'portfolio-gallery__badge',
+  'portfolio-gallery__footer',
+  'portfolio-gallery__download',
 ]
 
 /** Rendered, but with no visual of its own to style. Reason per entry. */

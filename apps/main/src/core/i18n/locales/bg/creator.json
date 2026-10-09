@@ -83,6 +83,7 @@
             "gallery_empty": "Не portfolio елементи uploaded yet.",
             "gallery_remove": "Remove item",
             "gallery_status": "Портфолио gallery contains {count} item(s).",
+            "gallery_count": "{count} елемент | {count} елемента",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
@@ -92,7 +93,12 @@
             "failed_label": "Качването е неуспешно",
             "download_label": "Изтегляне",
             "copy_link_label": "Копирай линк",
-            "view_all_label": "Виж всички"
+            "view_all_label": "Виж всички",
+            "kind_label": {
+              "image": "Изображение",
+              "video": "Видео",
+              "link": "Връзка"
+            }
           },
           "kyc": {
             "name": "Identity verification",

@@ -39,6 +39,16 @@ const promptKey = isNativePlatform()
   : 'creator.ui.upload.portfolio_prompt'
 const { items, enqueue, addLink, remove, inFlightCount, remainingSlots } = usePortfolioUpload()
 
+/**
+ * AH-100d (Figma frame 04): a finished upload is already a tile in the gallery
+ * below, so the native app does not list it a second time as a file row (the
+ * duplicate Remove button was the audit finding). Pending / uploading / error
+ * rows stay — they have no tile yet. Web keeps every row, unchanged.
+ */
+const visibleItems = computed(() =>
+  isNativePlatform() ? items.value.filter((item) => item.status !== 'done') : items.value,
+)
+
 const isDragOver = ref(false)
 
 // ── Add-link affordance (AH-004 D9/D11) ──────────────────────────────────
@@ -225,12 +235,12 @@ function statusLabel(status: string): string {
     </form>
 
     <div
-      v-if="items.length > 0"
+      v-if="visibleItems.length > 0"
       class="portfolio-upload-grid__items"
       data-testid="portfolio-upload-list"
     >
       <div
-        v-for="item in items"
+        v-for="item in visibleItems"
         :key="item.id"
         class="portfolio-upload-grid__item"
         :data-status="item.status"

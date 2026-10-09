@@ -83,6 +83,7 @@
             "gallery_empty": "Nog geen portfolio-items geüpload.",
             "gallery_remove": "Item verwijderen",
             "gallery_status": "Portfoliogalerij bevat {count} item(s).",
+            "gallery_count": "{count} item | {count} items",
             "video_badge_label": "Video",
             "link_badge_label": "Externe link",
             "untitled_item": "Naamloos portfolio-item",
@@ -92,7 +93,12 @@
             "failed_label": "Uploaden mislukt",
             "download_label": "Downloaden",
             "copy_link_label": "Link kopiëren",
-            "view_all_label": "Alles weergeven"
+            "view_all_label": "Alles weergeven",
+            "kind_label": {
+              "image": "Afbeelding",
+              "video": "Video",
+              "link": "Link"
+            }
           },
           "kyc": {
             "name": "Identiteitsverificatie",

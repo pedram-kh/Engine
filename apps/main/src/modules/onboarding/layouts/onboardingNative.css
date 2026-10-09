@@ -422,6 +422,60 @@
   color: var(--native-text-primary);
 }
 
+/* AH-100d (frame 04): the kind pill on the thumbnail, top-left; it replaces the
+   full-tile play/link overlay. */
+.onboarding-native__body :deep(.portfolio-gallery__kind) {
+  top: 8px;
+  left: 8px;
+  height: 22px;
+  padding: 0 8px;
+  background: var(--native-bg-canvas);
+  color: var(--native-text-primary);
+  font: var(--native-type-caption-strong);
+  border-radius: var(--native-radius-full);
+}
+
+.onboarding-native__body :deep(.portfolio-gallery__badge) {
+  display: none;
+}
+
+.onboarding-native__body :deep(.portfolio-gallery__remove) {
+  top: 8px;
+  right: 8px;
+}
+
+/* The download glyph moves from a top-left disc to the end of the title row. */
+.onboarding-native__body :deep(.portfolio-gallery__footer) {
+  min-height: 20px;
+  padding-right: 22px;
+}
+
+.onboarding-native__body :deep(.portfolio-gallery__download) {
+  top: auto;
+  left: auto;
+  right: 0;
+  bottom: 3px;
+  width: 14px;
+  height: 14px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--native-text-tertiary);
+}
+
+/* "Your portfolio" with the item count at the row's end. */
+.onboarding-native__body :deep(.portfolio-step__gallery-head) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.onboarding-native__body :deep(.portfolio-step__count) {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
 /* Master agreement (frame 06): the terms read in a canvas panel, 340px tall. */
 .onboarding-native__body :deep(.click-through-accept) {
   display: flex;

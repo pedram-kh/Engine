@@ -83,6 +83,7 @@
             "gallery_empty": "Aucun élément de portfolio téléversé pour le moment.",
             "gallery_remove": "Supprimer l'élément",
             "gallery_status": "La galerie du portfolio contient {count} élément(s).",
+            "gallery_count": "{count} élément | {count} éléments",
             "video_badge_label": "Vidéo",
             "link_badge_label": "Lien externe",
             "untitled_item": "Élément de portfolio sans titre",
@@ -92,7 +93,12 @@
             "failed_label": "Échec du téléversement",
             "download_label": "Télécharger",
             "copy_link_label": "Copier le lien",
-            "view_all_label": "Voir tout"
+            "view_all_label": "Voir tout",
+            "kind_label": {
+              "image": "Image",
+              "video": "Vidéo",
+              "link": "Lien"
+            }
           },
           "kyc": {
             "name": "Vérification d'identité",

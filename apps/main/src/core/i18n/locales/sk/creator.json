@@ -83,6 +83,7 @@
             "gallery_empty": "Zatím žádné nahrané položky portfolia.",
             "gallery_remove": "Odobrať položku",
             "gallery_status": "Galerie portfolia obsahuje {count} položku/položek.",
+            "gallery_count": "Položky: {count} | Položky: {count}",
             "video_badge_label": "Video",
             "link_badge_label": "Externí odkaz",
             "untitled_item": "Nepojmenovaná položka portfolia",
@@ -92,7 +93,12 @@
             "failed_label": "Nahrávanie zlyhalo",
             "download_label": "Stiahnuť",
             "copy_link_label": "Kopírovať odkaz",
-            "view_all_label": "Zobraziť všetko"
+            "view_all_label": "Zobraziť všetko",
+            "kind_label": {
+              "image": "Obrázok",
+              "video": "Video",
+              "link": "Odkaz"
+            }
           },
           "kyc": {
             "name": "Overenie totožnosti",

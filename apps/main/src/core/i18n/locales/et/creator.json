@@ -83,6 +83,7 @@
             "gallery_empty": "Ei portfolio üksused uploaded yet.",
             "gallery_remove": "Remove item",
             "gallery_status": "Portfolio gallery contains {count} item(s).",
+            "gallery_count": "{count} üksus | {count} üksust",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
@@ -92,7 +93,12 @@
             "failed_label": "Üleslaadimine ebaõnnestus",
             "download_label": "Laadi alla",
             "copy_link_label": "Kopeeri link",
-            "view_all_label": "Vaata kõiki"
+            "view_all_label": "Vaata kõiki",
+            "kind_label": {
+              "image": "Pilt",
+              "video": "Video",
+              "link": "Link"
+            }
           },
           "kyc": {
             "name": "Identity verification",

@@ -83,6 +83,7 @@
             "gallery_empty": "Inga portfolioposter uppladdade ännu.",
             "gallery_remove": "Ta bort post",
             "gallery_status": "Portfoliogalleriet innehåller {count} post(er).",
+            "gallery_count": "{count} objekt | {count} objekt",
             "video_badge_label": "Video",
             "link_badge_label": "Extern länk",
             "untitled_item": "Ej namngiven portfoliopost",
@@ -92,7 +93,12 @@
             "failed_label": "Uppladdningen misslyckades",
             "download_label": "Ladda ner",
             "copy_link_label": "Kopiera länk",
-            "view_all_label": "Visa alla"
+            "view_all_label": "Visa alla",
+            "kind_label": {
+              "image": "Bild",
+              "video": "Video",
+              "link": "Länk"
+            }
           },
           "kyc": {
             "name": "Identitetsverifiering",

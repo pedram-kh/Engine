@@ -83,6 +83,7 @@
             "gallery_empty": "Nessun elemento del portfolio caricato finora.",
             "gallery_remove": "Rimuovi elemento",
             "gallery_status": "La galleria del portfolio contiene {count} elemento(i).",
+            "gallery_count": "{count} elemento | {count} elementi",
             "video_badge_label": "Video",
             "link_badge_label": "Link esterno",
             "untitled_item": "Elemento del portfolio senza titolo",
@@ -92,7 +93,12 @@
             "failed_label": "Caricamento non riuscito",
             "download_label": "Scarica",
             "copy_link_label": "Copia link",
-            "view_all_label": "Vedi tutti"
+            "view_all_label": "Vedi tutti",
+            "kind_label": {
+              "image": "Immagine",
+              "video": "Video",
+              "link": "Link"
+            }
           },
           "kyc": {
             "name": "Verifica dell'identità",

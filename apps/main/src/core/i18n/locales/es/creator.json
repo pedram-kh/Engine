@@ -83,6 +83,7 @@
             "gallery_empty": "Aún no has subido elementos al portafolio.",
             "gallery_remove": "Eliminar elemento",
             "gallery_status": "La galería del portafolio contiene {count} elemento(s).",
+            "gallery_count": "{count} elemento | {count} elementos",
             "video_badge_label": "Vídeo",
             "link_badge_label": "Enlace externo",
             "untitled_item": "Elemento del portafolio sin título",
@@ -92,7 +93,12 @@
             "failed_label": "Error al subir",
             "download_label": "Descargar",
             "copy_link_label": "Copiar enlace",
-            "view_all_label": "Ver todo"
+            "view_all_label": "Ver todo",
+            "kind_label": {
+              "image": "Imagen",
+              "video": "Vídeo",
+              "link": "Enlace"
+            }
           },
           "kyc": {
             "name": "Verificación de identidad",

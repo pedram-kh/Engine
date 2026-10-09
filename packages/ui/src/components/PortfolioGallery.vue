@@ -120,6 +120,12 @@ interface Props {
   downloadLabel?: string
   /** Localized accessible label for the per-link copy-URL affordance. */
   copyLinkLabel?: string
+  /**
+   * Localized label per item kind. When provided (the creator app does, the web
+   * surfaces do not), each tile carries a small "Image / Video / Link" pill over
+   * its thumbnail (AH-100d, Figma frame 04). Omitted = no pill, markup unchanged.
+   */
+  kindLabels?: Partial<Record<'image' | 'video' | 'link', string>>
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -134,6 +140,7 @@ const props = withDefaults(defineProps<Props>(), {
   failedLabel: 'Upload failed',
   downloadLabel: 'Download',
   copyLinkLabel: 'Copy link',
+  kindLabels: undefined,
 })
 
 const emit = defineEmits<{
@@ -142,6 +149,12 @@ const emit = defineEmits<{
 
 /** The item currently shown in the lightbox, or null when closed. */
 const active = ref<PortfolioGalleryItem | null>(null)
+
+const KIND_ICONS = {
+  image: 'mdi-file-image-outline',
+  video: 'mdi-play-circle-outline',
+  link: 'mdi-link-variant',
+} as const
 
 function isProcessing(item: PortfolioGalleryItem): boolean {
   return item.processingStatus === 'processing'
@@ -218,6 +231,16 @@ function onRemove(itemId: string): void {
           :aria-label="props.linkLabel"
         >
           <v-icon icon="mdi-open-in-new" size="24" aria-hidden="true" />
+        </span>
+
+        <!-- AH-100d: the kind pill (frame 04) — only when the consumer supplies labels. -->
+        <span
+          v-if="props.kindLabels?.[item.kind]"
+          class="portfolio-gallery__kind"
+          :data-testid="`portfolio-gallery-kind-${item.id}`"
+        >
+          <v-icon :icon="KIND_ICONS[item.kind]" size="10" aria-hidden="true" />
+          {{ props.kindLabels[item.kind] }}
         </span>
 
         <!-- AH-004 processing / failed overlays. A processing image has no
@@ -419,6 +442,23 @@ function onRemove(itemId: string): void {
   pointer-events: none;
   color: rgb(var(--v-theme-on-surface));
   background: rgba(var(--v-theme-surface), 0.35);
+}
+
+.portfolio-gallery__kind {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(var(--v-theme-surface), 0.85);
+  color: rgb(var(--v-theme-on-surface));
+  font-size: var(--catalyst-typography-caption-size, 0.75rem);
+  font-weight: 500;
+  line-height: 1.3;
+  pointer-events: none;
 }
 
 .portfolio-gallery__open {

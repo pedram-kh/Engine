@@ -83,6 +83,7 @@
             "gallery_empty": "Ainda não foram carregados itens do portfólio.",
             "gallery_remove": "Remover item",
             "gallery_status": "A galeria do portfólio contém {count} item(s).",
+            "gallery_count": "{count} item | {count} itens",
             "video_badge_label": "Vídeo",
             "link_badge_label": "Link externo",
             "untitled_item": "Item do portfólio sem título",
@@ -92,7 +93,12 @@
             "failed_label": "Falha no carregamento",
             "download_label": "Transferir",
             "copy_link_label": "Copiar ligação",
-            "view_all_label": "Ver tudo"
+            "view_all_label": "Ver tudo",
+            "kind_label": {
+              "image": "Imagem",
+              "video": "Vídeo",
+              "link": "Ligação"
+            }
           },
           "kyc": {
             "name": "Verificação de identidade",

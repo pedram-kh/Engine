@@ -83,6 +83,7 @@
             "gallery_empty": "Níl portfolio míreanna uploaded yet.",
             "gallery_remove": "Remove item",
             "gallery_status": "Punann gallery contains {count} item(s).",
+            "gallery_count": "Míreanna: {count} | Míreanna: {count}",
             "video_badge_label": "Video",
             "link_badge_label": "External link",
             "untitled_item": "Untitled portfolio item",
@@ -92,7 +93,12 @@
             "failed_label": "Theip ar an uaslódáil",
             "download_label": "Íoslódáil",
             "copy_link_label": "Cóipeáil nasc",
-            "view_all_label": "Féach ar gach ceann"
+            "view_all_label": "Féach ar gach ceann",
+            "kind_label": {
+              "image": "Íomhá",
+              "video": "Físeán",
+              "link": "Nasc"
+            }
           },
           "kyc": {
             "name": "Identity verification",

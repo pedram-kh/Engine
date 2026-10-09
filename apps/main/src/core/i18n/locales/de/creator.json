@@ -83,6 +83,7 @@
             "gallery_empty": "Noch keine Portfolio-Einträge hochgeladen.",
             "gallery_remove": "Eintrag entfernen",
             "gallery_status": "Portfolio-Galerie enthält {count} Eintrag/Einträge.",
+            "gallery_count": "{count} Eintrag | {count} Einträge",
             "video_badge_label": "Video",
             "link_badge_label": "Externer Link",
             "untitled_item": "Unbenannter Portfolio-Eintrag",
@@ -92,7 +93,12 @@
             "failed_label": "Upload fehlgeschlagen",
             "download_label": "Herunterladen",
             "copy_link_label": "Link kopieren",
-            "view_all_label": "Alle anzeigen"
+            "view_all_label": "Alle anzeigen",
+            "kind_label": {
+              "image": "Bild",
+              "video": "Video",
+              "link": "Link"
+            }
           },
           "kyc": {
             "name": "Identitätsverifizierung",
