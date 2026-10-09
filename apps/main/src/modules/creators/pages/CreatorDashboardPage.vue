@@ -34,7 +34,7 @@
 import { formatDate } from '@catalyst/api-client'
 import type { ConnectionRequestListItem } from '@catalyst/api-client'
 import { CompletenessBar, CEmptyState } from '@catalyst/ui'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
@@ -42,6 +42,7 @@ import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import DashboardInvitationCard from '../components/DashboardInvitationCard.vue'
 import DashboardStrengthCard from '../components/DashboardStrengthCard.vue'
+import { useApplicationStatusPoll } from '../../onboarding/composables/useApplicationStatusPoll'
 import { resolveSubmitErrorKey } from '../../onboarding/composables/useSubmitErrorKey'
 import { useOnboardingStore } from '../../onboarding/stores/useOnboardingStore'
 import { connectionRequestsApi } from '../connectionRequests.api'
@@ -195,6 +196,30 @@ async function declineRequest(item: ConnectionRequestListItem): Promise<void> {
     actioningId.value = null
   }
 }
+
+// ── AH-100d (item 8) — the under-review page goes live ──────────────────────
+// A pending creator waits for an admin. Inside the app (which people never sign
+// out of) the page re-polls the status while it is on screen, and the app-resume
+// listener refreshes the same store, so approval lands without a logout/login.
+// The poll is native-only and stops itself when the status leaves `pending` or
+// the page unmounts. The web page does not poll (a named follow-up; AH-102's push
+// is the proactive version).
+useApplicationStatusPoll({
+  active: computed(() => isNative && status.value === 'pending'),
+  refresh: () => store.refresh(),
+})
+
+// pending → approved while the page is open (poll or resume): the first-load
+// path in onMounted never ran for the approved branch, so load what that branch
+// shows — the connection-request inbox and the invitation count. Keyed on
+// `prev === 'pending'` so the first bootstrap (incomplete → approved) does not
+// double-load beside onMounted.
+watch(status, async (next, prev) => {
+  if (prev === 'pending' && next === 'approved') {
+    await loadRequests()
+    await loadInvitedCount()
+  }
+})
 
 onMounted(async () => {
   if (!store.isBootstrapped) {

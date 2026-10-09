@@ -87,6 +87,10 @@ export const useOnboardingStore = defineStore('onboarding', () => {
   // Dedupe cache for concurrent bootstrap() calls.
   let inFlightBootstrap: Promise<void> | null = null
 
+  // AH-100d — silent refresh (app resume, the under-review page's poll).
+  let inFlightRefresh: Promise<void> | null = null
+  let resetEpoch = 0
+
   // ---------------------------------------------------------------
   // Getters
   // ---------------------------------------------------------------
@@ -189,6 +193,54 @@ export const useOnboardingStore = defineStore('onboarding', () => {
   function reset(): void {
     creator.value = null
     bootstrapStatus.value = 'idle'
+    // AH-100d: a `refresh()` still in flight belongs to the session that just
+    // ended; its answer must not repopulate the store.
+    resetEpoch += 1
+  }
+
+  /**
+   * Re-read the creator payload WITHOUT touching `bootstrapStatus`.
+   *
+   * `bootstrap()` flips the status to `loading`, which makes `isBootstrapped`
+   * false and would blank every page that gates on it: right for a first load,
+   * wrong for "the app came back to the foreground" or "the under-review page
+   * checks whether an admin approved it". This replaces `creator` in place, so
+   * a pending creator's page re-renders as approved the moment the answer
+   * lands, and nothing flickers while it is asking.
+   *
+   * Guards (each specced): nothing to refresh before the first bootstrap (the
+   * page's own bootstrap owns the first load); one request at a time; a
+   * bootstrap already in flight is the same request, so it is joined, not
+   * duplicated; `reset()` (sign-out) discards a late answer. A failed refresh
+   * is silent: the held payload stays, the next tick or resume retries (a 401
+   * still reaches the global policy, which signs the app out).
+   */
+  async function refresh(): Promise<void> {
+    if (inFlightBootstrap !== null) {
+      return inFlightBootstrap.catch(() => undefined)
+    }
+    if (inFlightRefresh !== null) {
+      return inFlightRefresh
+    }
+    if (creator.value === null) {
+      return
+    }
+    const epoch = resetEpoch
+
+    inFlightRefresh = (async (): Promise<void> => {
+      try {
+        const envelope = await onboardingApi.bootstrap()
+        if (epoch === resetEpoch && creator.value !== null) {
+          creator.value = envelope.data
+        }
+      } catch {
+        // Silent by design — see the docblock.
+      } finally {
+        inFlightRefresh = null
+      }
+    })()
+
+    return inFlightRefresh
   }
 
   async function updateProfile(payload: CreatorProfileUpdatePayload): Promise<void> {
@@ -431,6 +483,7 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     applicationStatus,
     // actions
     bootstrap,
+    refresh,
     reset,
     updateProfile,
     connectSocial,

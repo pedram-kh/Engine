@@ -400,6 +400,129 @@ describe('useOnboardingStore', () => {
     })
   })
 
+  // AH-100d (item 8) — the silent refresh the app-resume listener and the
+  // under-review page's poll share.
+  describe('refresh()', () => {
+    function approvedCreator(): CreatorResource {
+      const base = makeCreator()
+      return { ...base, attributes: { ...base.attributes, application_status: 'approved' } }
+    }
+
+    async function bootstrappedPending() {
+      vi.mocked(onboardingApi.bootstrap).mockResolvedValueOnce({
+        data: makeCreator({
+          attributes: { application_status: 'pending' } as CreatorResource['attributes'],
+        }),
+      })
+      const store = useOnboardingStore()
+      await store.bootstrap()
+      vi.mocked(onboardingApi.bootstrap).mockClear()
+      return store
+    }
+
+    it('flips a pending creator to approved in place, without leaving "ready"', async () => {
+      const store = await bootstrappedPending()
+      expect(store.applicationStatus).toBe('pending')
+      const seen: string[] = []
+      vi.mocked(onboardingApi.bootstrap).mockImplementation(async () => {
+        seen.push(store.bootstrapStatus)
+        return { data: approvedCreator() }
+      })
+
+      await store.refresh()
+
+      expect(store.applicationStatus).toBe('approved')
+      expect(store.bootstrapStatus).toBe('ready')
+      // Never `loading`: a page gating on isBootstrapped must not blank.
+      expect(seen).toEqual(['ready'])
+    })
+
+    it('does nothing before the first bootstrap (the page owns the first load)', async () => {
+      const store = useOnboardingStore()
+
+      await store.refresh()
+
+      expect(onboardingApi.bootstrap).not.toHaveBeenCalled()
+      expect(store.creator).toBeNull()
+    })
+
+    it('shares one request between overlapping refreshes', async () => {
+      const store = await bootstrappedPending()
+      let resolveFn: (() => void) | null = null
+      vi.mocked(onboardingApi.bootstrap).mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveFn = () => resolve({ data: approvedCreator() })
+          }),
+      )
+
+      const first = store.refresh()
+      const second = store.refresh()
+      resolveFn!()
+      await Promise.all([first, second])
+
+      expect(onboardingApi.bootstrap).toHaveBeenCalledTimes(1)
+    })
+
+    it('joins a bootstrap already in flight instead of duplicating it', async () => {
+      const store = useOnboardingStore()
+      let resolveFn: (() => void) | null = null
+      vi.mocked(onboardingApi.bootstrap).mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveFn = () => resolve({ data: makeCreator() })
+          }),
+      )
+
+      const booting = store.bootstrap()
+      const refreshing = store.refresh()
+      resolveFn!()
+      await Promise.all([booting, refreshing])
+
+      expect(onboardingApi.bootstrap).toHaveBeenCalledTimes(1)
+    })
+
+    it('drops a late answer when reset() (sign-out) happened while it was in flight', async () => {
+      const store = await bootstrappedPending()
+      let resolveFn: (() => void) | null = null
+      vi.mocked(onboardingApi.bootstrap).mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveFn = () => resolve({ data: approvedCreator() })
+          }),
+      )
+
+      const refreshing = store.refresh()
+      store.reset()
+      resolveFn!()
+      await refreshing
+
+      expect(store.creator).toBeNull()
+      expect(store.bootstrapStatus).toBe('idle')
+    })
+
+    it('is silent on failure and keeps the held payload', async () => {
+      const store = await bootstrappedPending()
+      vi.mocked(onboardingApi.bootstrap).mockRejectedValue(new TypeError('offline'))
+
+      await expect(store.refresh()).resolves.toBeUndefined()
+
+      expect(store.applicationStatus).toBe('pending')
+      expect(store.bootstrapStatus).toBe('ready')
+    })
+
+    it('a failed refresh does not wedge the next one', async () => {
+      const store = await bootstrappedPending()
+      vi.mocked(onboardingApi.bootstrap).mockRejectedValueOnce(new TypeError('offline'))
+      await store.refresh()
+      vi.mocked(onboardingApi.bootstrap).mockResolvedValue({ data: approvedCreator() })
+
+      await store.refresh()
+
+      expect(store.applicationStatus).toBe('approved')
+    })
+  })
+
   describe('reset()', () => {
     it('clears creator + bootstrapStatus but preserves wasBootstrappedThisSession (tab-scoped semantic)', async () => {
       vi.mocked(onboardingApi.bootstrap).mockResolvedValue({ data: makeCreator() })

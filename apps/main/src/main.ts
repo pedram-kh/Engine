@@ -3,8 +3,10 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import { resolveBootLocale } from './composables/useLocalePreference'
+import { SESSION_EXPIRED_QUERY_REASON } from './core/api'
 import { router } from './core/router'
 import { i18n, setLocale } from './core/i18n'
+import { startAppResumeRefresh } from './core/platform/appResume'
 import { bootNativeShell } from './core/platform/bootNativeShell'
 import { vuetify } from './plugins/vuetify'
 
@@ -32,4 +34,12 @@ void Promise.all([
   bootNativeShell(document),
 ]).then(() => {
   app.mount('#app')
+  // AH-100d: creator app only (a no-op on the web) — re-read the session when
+  // the app returns to the foreground. After mount so the stores exist and the
+  // first bootstrap (the router guard) owns the cold start.
+  startAppResumeRefresh({
+    onSessionLapsed: () => {
+      void router.push({ name: 'auth.sign-in', query: { reason: SESSION_EXPIRED_QUERY_REASON } })
+    },
+  })
 })

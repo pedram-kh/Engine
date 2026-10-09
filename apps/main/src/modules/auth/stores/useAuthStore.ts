@@ -241,6 +241,73 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // ---------------------------------------------------------------
+  // refreshSession() — AH-100d: re-read /me while signed in
+  // ---------------------------------------------------------------
+
+  // Dedup cache for concurrent refreshSession() calls (a second resume while
+  // the first is still in flight returns the same promise: one /me, not two).
+  let inFlightRefresh: Promise<void> | null = null
+
+  /**
+   * Re-fetch `/me` for a user who is already signed in, and replace the held
+   * user with the answer. The creator app calls this when it comes back to the
+   * foreground (`core/platform/appResume.ts`): an app is backgrounded for
+   * hours, and the server-owned parts of the session (the approved state, the
+   * admin's changes) move while it sleeps.
+   *
+   * Guards, each a specced polarity:
+   *   - Signed out (no user, or bootstrap not `ready`): returns without a
+   *     request. Resuming onto the sign-in screen must not call `/me`.
+   *   - Overlap: one request at a time (see `inFlightRefresh`).
+   *   - A sign-out or a different user arriving while the request was in
+   *     flight discards the answer, so a late reply can never resurrect a
+   *     session the user just ended.
+   *   - A 401 in the creator app means the token is dead (the same rule as the
+   *     cold-load bootstrap): drop it, mark the session lapsed, clear the user.
+   *     Any other failure is swallowed — a background refresh failing is not
+   *     an error state, the held user stays and the next resume retries.
+   *
+   * Deliberately NOT `setUser()`: no locale hydration, no agency-store reset.
+   * It replaces the identity fields in place and nothing else.
+   */
+  async function refreshSession(): Promise<void> {
+    if (inFlightRefresh !== null) {
+      return inFlightRefresh
+    }
+    if (user.value === null || bootstrapStatus.value !== 'ready') {
+      return
+    }
+    const requestedFor = user.value.id
+
+    inFlightRefresh = (async (): Promise<void> => {
+      try {
+        const me = await authApi.me()
+        if (user.value !== null && user.value.id === requestedFor && me.id === requestedFor) {
+          user.value = me
+        }
+      } catch (error) {
+        if (
+          error instanceof ApiError &&
+          error.status === 401 &&
+          isNativePlatform() &&
+          user.value !== null &&
+          user.value.id === requestedFor
+        ) {
+          sessionLapsed.value = true
+          await nativeTokenStore()
+            .clear()
+            .catch(() => undefined)
+          clearUser()
+        }
+      } finally {
+        inFlightRefresh = null
+      }
+    })()
+
+    return inFlightRefresh
+  }
+
+  // ---------------------------------------------------------------
   // Actions — auth surface
   // ---------------------------------------------------------------
 
@@ -523,6 +590,7 @@ export const useAuthStore = defineStore('auth', () => {
     setUser,
     clearUser,
     bootstrap,
+    refreshSession,
     login,
     loginWithToken,
     logout,
