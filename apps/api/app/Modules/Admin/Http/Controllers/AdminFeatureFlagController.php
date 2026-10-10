@@ -17,6 +17,7 @@ use App\Modules\Creators\Features\MissingCreatorMailsEnabled;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\PlatformAutomationsEnabled;
 use App\Modules\Creators\Features\PostVerifiedMailEnabled;
+use App\Modules\Creators\Features\PushNotificationsEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Identity\Enums\UserType;
 use Illuminate\Http\JsonResponse;
@@ -99,6 +100,10 @@ final class AdminFeatureFlagController
         PostVerifiedMailEnabled::NAME => [
             'label' => 'Post-verified mail',
             'description' => 'Emails the creator when their post passes automatic verification. Gates mail only — the in-app row is unaffected. Do not arm until production runs a real (non-mock) verification driver.',
+        ],
+        PushNotificationsEnabled::NAME => [
+            'label' => 'Push notifications',
+            'description' => 'Sends push notifications to creators\' devices. Gates sending only — device registration and in-app rows are unaffected. Do not arm until the FCM credential is set and `push:test --validate-only` has passed.',
         ],
     ];
 

@@ -9,6 +9,7 @@ use App\Modules\Notifications\Enums\NotificationChannel;
 use App\Modules\Notifications\Enums\NotificationType;
 use App\Modules\Notifications\Models\Notification;
 use App\Modules\Notifications\Models\NotificationPreference;
+use App\Modules\Notifications\Push\PushDispatcher;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -27,16 +28,30 @@ use Illuminate\Database\Eloquent\Model;
  */
 final class NotificationService
 {
+    public function __construct(private readonly PushDispatcher $push) {}
+
     /**
-     * Emit an in-app notification to a recipient if their `in_app` preference
-     * for this type is enabled. Returns the written row, or null when in-app
-     * is disabled for the (recipient, type) pair.
+     * Emit a notification to a recipient: write the in-app row when their `in_app`
+     * preference for this type is enabled, and (AH-102) hand the event to the push
+     * leg. Returns the written row, or null when in-app is disabled for the
+     * (recipient, type) pair.
+     *
+     * PUSH IS INDEPENDENT OF IN-APP. A recipient who muted in-app for a type still
+     * gets its push unless they muted push, so there is no early return before the
+     * push leg (AH-102 Q2/§5.4). The leg runs on BOTH paths and can never throw
+     * ({@see PushDispatcher::dispatch()}), so it cannot affect the in-app row or the
+     * caller's transaction. It is off by default behind `push_notifications_enabled`.
      *
      * @param  array<string, mixed>  $data  Render params only (e.g.
      *                                      {campaign_name, creator_name}) —
      *                                      NEVER localized text. The body
      *                                      renders client-side (Ch3) from
      *                                      `type` + this payload.
+     * @param  bool  $suppressPush  Skip ONLY the push leg (the in-app row is still
+     *                              written). Mirrors AH-069 `suppressEmail`: set on
+     *                              a draft approval that also completes the
+     *                              assignment, whose completion push carries the
+     *                              same news.
      */
     public function notify(
         User $recipient,
@@ -44,19 +59,22 @@ final class NotificationService
         ?Model $subject = null,
         ?User $actor = null,
         array $data = [],
+        bool $suppressPush = false,
     ): ?Notification {
-        if (! $this->isChannelEnabled($recipient, $type, NotificationChannel::InApp)) {
-            return null;
-        }
+        $notification = $this->isChannelEnabled($recipient, $type, NotificationChannel::InApp)
+            ? Notification::query()->create([
+                'recipient_user_id' => $recipient->getKey(),
+                'actor_user_id' => $actor?->getKey(),
+                'subject_type' => $subject?->getMorphClass(),
+                'subject_id' => $subject?->getKey(),
+                'type' => $type,
+                'data' => $data,
+            ])
+            : null;
 
-        return Notification::query()->create([
-            'recipient_user_id' => $recipient->getKey(),
-            'actor_user_id' => $actor?->getKey(),
-            'subject_type' => $subject?->getMorphClass(),
-            'subject_id' => $subject?->getKey(),
-            'type' => $type,
-            'data' => $data,
-        ]);
+        $this->push->dispatch($recipient, $type, $data, $notification?->ulid, $suppressPush);
+
+        return $notification;
     }
 
     /**

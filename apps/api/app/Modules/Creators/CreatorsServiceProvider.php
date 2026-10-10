@@ -14,6 +14,7 @@ use App\Modules\Creators\Features\MissingCreatorMailsEnabled;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Features\PlatformAutomationsEnabled;
 use App\Modules\Creators\Features\PostVerifiedMailEnabled;
+use App\Modules\Creators\Features\PushNotificationsEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Creators\Integrations\Contracts\EsignProvider;
 use App\Modules\Creators\Integrations\Contracts\KycProvider;
@@ -266,6 +267,7 @@ final class CreatorsServiceProvider extends ServiceProvider
         Feature::define(MissingCreatorMailsEnabled::NAME, MissingCreatorMailsEnabled::default());
         Feature::define(PlatformAutomationsEnabled::NAME, PlatformAutomationsEnabled::default());
         Feature::define(PostVerifiedMailEnabled::NAME, PostVerifiedMailEnabled::default());
+        Feature::define(PushNotificationsEnabled::NAME, PushNotificationsEnabled::default());
     }
 
     private function registerRoutes(): void

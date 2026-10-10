@@ -503,6 +503,9 @@ final class SendAssignmentNotifications
                 'feedback' => $feedback,
                 'assignment_ulid' => $assignment->ulid,
             ], $round),
+            // AH-102 Q5 — the AH-069 mirror: an approval that completes the assignment
+            // pushes ONCE (the completion notice), not twice seconds apart.
+            suppressPush: $suppressEmail,
         );
     }
 
