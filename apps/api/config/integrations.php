@@ -115,4 +115,35 @@ return [
         ],
     ],
 
+    'push' => [
+        /*
+         * Firebase Cloud Messaging (FCM HTTP v1) — AH-102 mobile push for the
+         * creator app. Zero composer dependencies: a thin client in
+         * `app/Modules/Notifications/Push/Fcm/`.
+         *
+         * `service_account_json_b64` is SECRET material (P-1): the Google
+         * service-account JSON, base64-encoded, supplied as ONE env var and
+         * decoded inside the FCM client at send time. In non-local
+         * environments it is hydrated from AWS Secrets Manager
+         * (`catalyst/${env}/api/fcm`) per docs/06-INTEGRATIONS.md § 1.2 —
+         * never committed. There is no file path and no file-permission step.
+         * A missing / non-base64 / non-JSON value is a ConfigError outcome at
+         * send time, never a boot-time crash.
+         *
+         * `project_id` is the non-secret Firebase project id; if empty the
+         * `project_id` inside the service-account JSON is used.
+         *
+         * `timeout` (seconds) bounds EACH HTTP call. Worst case per job
+         * attempt is the OAuth exchange + one send (+ one forced-refresh
+         * retry), which must stay under the job's own timeout.
+         */
+        'fcm' => [
+            'project_id' => env('FCM_PROJECT_ID'),
+            'service_account_json_b64' => env('FCM_SERVICE_ACCOUNT_JSON_B64'),
+            'timeout' => (int) env('FCM_HTTP_TIMEOUT', 5),
+            'token_url' => 'https://oauth2.googleapis.com/token',
+            'send_base_url' => 'https://fcm.googleapis.com',
+        ],
+    ],
+
 ];

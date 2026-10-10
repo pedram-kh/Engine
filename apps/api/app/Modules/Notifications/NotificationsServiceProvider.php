@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Notifications;
 
+use App\Modules\Notifications\Push\Fcm\FcmPushSender;
+use App\Modules\Notifications\Push\PushSender;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -22,6 +24,11 @@ final class NotificationsServiceProvider extends ServiceProvider
     {
         // NotificationService is a plain, dependency-free service — the
         // container autowires it. No explicit binding needed.
+
+        // AH-102: the ONE place the push provider is chosen. Everything else
+        // depends on the PushSender interface; swapping/adding a provider for a
+        // platform (fallback B) is a change here and under Push/Fcm/, nothing else.
+        $this->app->bind(PushSender::class, FcmPushSender::class);
     }
 
     public function boot(): void
