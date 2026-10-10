@@ -1,7 +1,9 @@
 # AH-101 — notification preference matrix, completion notice, third UI batch — review
 
-**Status:** Half A and Half B built and gated, **not pushed**; Pedram's device walk (§8.4) is acceptance.
-**Push is held; Pedram's device walk is acceptance.** Live push state is `origin/main`.
+**Status:** **Closed.** Half A and Half B built and gated; **Pedram's device walk passed 2026-10-10** (sign-in
+sheet, iOS splash, bell closes on navigation, composer above the tab bar, paperclip placements, no hamburger in
+native) — the batch is accepted. **Pushed:** the push commit and CI run are recorded below once pushed.
+Pushing is not deploying: deploy timing is Pedram's call, and no flag is armed. Live push state is `origin/main`.
 Inventory: [`notification-prefs-and-ui-batch-inventory.md`](notification-prefs-and-ui-batch-inventory.md) ·
 Plan-pause: [`notification-prefs-and-ui-batch-plan.md`](notification-prefs-and-ui-batch-plan.md).
 

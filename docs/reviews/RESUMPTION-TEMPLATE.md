@@ -117,9 +117,8 @@ discipline in §7.
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
 **Last updated:** 2026-10-10 · **Through:** AH-101, the notification preference matrix, the post-verified notice
-and the third creator-app UI batch. **Built and gated; NOT pushed.** Push is held; Pedram's device walk is
-acceptance. Half A (behavioural, API + SPA) is `34d90a4f` + docs `6c32df5d` on `a1a20ead` (the inventory);
-Half B (native, SPA-only) is `7d4f3e36` + its docs commit. **No migration.** **PROD-DATA RISK: LOW** (the new
+and the third creator-app UI batch. **Built, gated, device-walked and accepted.** Half A (behavioural, API + SPA) is `34d90a4f` + docs `6c32df5d` on `a1a20ead` (the inventory);
+Half B (native, SPA-only) is `7d4f3e36` + `811a0356`. **Closed 2026-10-10: Pedram's device walk passed; pushed (tip and CI in the review header); not deployed, no flag armed.** **No migration.** **PROD-DATA RISK: LOW** (the new
 email guard honours every stored `email=false` row on deploy). Live state is `git status` and `origin/main`,
 not this sentence. Review: [`notification-prefs-and-ui-batch-review.md`](notification-prefs-and-ui-batch-review.md).
 
@@ -127,10 +126,8 @@ not this sentence. Review: [`notification-prefs-and-ui-batch-review.md`](notific
   social verification driver). **If `SOCIAL_PROVIDER` is unset, posted content may be mock-"verified" in
   production today** — a standing-board item independent of this chunk. `post_verified_mail_enabled` ships OFF
   and does not arm until the driver is real.
-- **Pedram owes, on device:** the walk in review §8.4 (bell, thread composer height, attach controls,
-  onboarding without a hamburger, the sign-in sheet and its error state, the iOS splash).
-- **Not proven:** Playwright (stop the dev servers on :8000/:5173 to run it); anything device-only. The sign-in
-  sheet was checked in a browser with a faked Capacitor bridge, not on a device.
+- **Not proven:** Playwright (stop the dev servers on :8000/:5173 to run it). Device behaviour was walked by
+  Pedram and accepted.
 - **Caveats to carry:** locale switching is lost mid-wizard on native (Q10); no Android boot screen (Q8); no
   "Create an account" button on native (Q7).
 - **Named follow-ups:** an agency-side preferences surface (the inviter mails are guarded but have no UI);

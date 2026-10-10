@@ -72,8 +72,8 @@ reviews, and conversations.
 
 ### AH-101 · Notification preference matrix, post-verified notice and the third creator-app UI batch (Creator App arc)
 
-- **Status:** Built and gated — Half A (behavioral) and Half B (native, SPA-only); **not pushed**; Pedram's
-  device walk is acceptance (review §8.4). Full review:
+- **Status:** Closed 2026-10-10 — Pedram's device walk passed; pushed (the tip and CI run are in the review
+  header); **not deployed**, no flag armed. Half A (behavioral) and Half B (native, SPA-only). Full review:
   [`notification-prefs-and-ui-batch-review.md`](notification-prefs-and-ui-batch-review.md); plan:
   [`notification-prefs-and-ui-batch-plan.md`](notification-prefs-and-ui-batch-plan.md).
 - **Date:** 2026-10-10.

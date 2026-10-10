@@ -57,18 +57,40 @@ happened.
 ## AH-101 — notification preference matrix, post-verified notice, third creator-app UI batch — PENDING
 
 > **Stacks on AH-100d and everything under it (all PENDING).** Half A is backend + SPA; Half B is SPA /
-> native only. **Pushed:** not yet; push is held for Pedram's device walk.
+> native only. **Closed 2026-10-10:** Pedram's device walk passed (sign-in sheet, iOS splash, bell closes on
+> navigation, composer above the tab bar, paperclip placements, no hamburger in native). **Pushed** — the pushed
+> tip and CI run are recorded in the review header. **Pushing is not deploying: deploy timing is Pedram's call.**
 
-- **Status:** PENDING
-- **Range:** `a1a20ead` (inventory) → Half A feat `34d90a4f` and docs `6c32df5d`, then Half B feat `7d4f3e36`
-  (native, SPA-only: the app, plus a web SPA rebuild that carries no visible web change) and its docs commit.
+- **Status:** PENDING (pushed, not deployed)
+- **Range:** base `a1a20ead` (inventory), then four commits: Half A feat `34d90a4f` + docs `6c32df5d`; Half B feat
+  `7d4f3e36` + docs `811a0356`. (A docs-only close/provenance commit follows them.)
 - **AH entries carried:** AH-101
 - **Migrations run:** none. No backfill, no schema change.
+
+**What goes live on deploy**
+
+- **`NotificationService::isEmailEnabled` guard — subtract-only.** It can only _block_ an email for a user who has
+  turned that type off (a stored `email=false` row); it adds no sends and no recipients. It is called after each
+  site's Pennant flag, so it never replaces a kill switch. **Behaviour change on deploy:** every existing
+  `email=false` row is honoured immediately, however it got there (review §0, §6).
+- **The notification preferences matrix page** (grid on web, stacked cards on native).
+- **The in-app `assignment.live_verified` notice** — creator-only, ungated.
+- **All Half B UI changes** (bell, thread height, attach controls, onboarding menu, sign-in sheet, iOS splash). These
+  are native-scoped; the web render is unchanged, pinned by native-and-web polarity tests (the web assertions
+  that existed before were kept; the added web-polarity tests pass).
+
+**What is gated OFF**
+
+- **`post_verified_mail_enabled` ships OFF and must NOT be armed** until Pedram's production read-back is done and
+  confirms (a) the **preference-row counts** (so the email-opt-out blast radius is a known number) and (b) a **real,
+  non-mock verification driver** (`SOCIAL_PROVIDER` / `config('integrations.social.driver')`, and
+  `Feature::active('social_verification_enabled')`). If the driver is `mock` or unset, posted content may already be
+  mock-"verified" in production — a standing-board item independent of this chunk (tech-debt, review §0).
+
 - **Pre-deploy reads:** **required.** (1) `SELECT channel, is_enabled, COUNT(*) FROM user_notification_preferences
-GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY type;` — the guard honours every
-  stored `email=false` row on deploy, so the count of people who will stop receiving a mail must be a known
-  number. (2) `config('integrations.social.driver')` and `Feature::active('social_verification_enabled')` on
-  production — see the review §6. Neither blocks the deploy; the second blocks arming the new flag.
+GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY type;` — the count of people who will
+  stop receiving a mail must be a known number. (2) The driver and flag read above — see the review §6. Neither blocks
+  the deploy; (2) blocks arming the new flag.
 - **Snapshot ID:** n/a (no schema change)
 - **Infra:** **restart the queue worker** (new mailable class `PostVerifiedMail`). No cron / scheduler / env
   change.
@@ -78,8 +100,7 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
   `post_verified_mail_enabled` OFF.
 - **App build (Half B):** no deploy; a **clean iOS build** is needed for the new splash (the asset catalog and
   `assets/` changed; iOS caches launch screens, so delete and reinstall to see it). No new plugin, so no `cap sync`.
-- **Flags armed:** none — `post_verified_mail_enabled` ships OFF and must stay OFF until the driver read-back
-  confirms a real (non-mock) verification driver.
+- **Flags armed:** none — `post_verified_mail_enabled` ships OFF and stays OFF.
 - **Operator:** —
 - **Anything unexpected:** —
 
