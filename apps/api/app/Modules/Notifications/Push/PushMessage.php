@@ -15,6 +15,9 @@ namespace App\Modules\Notifications\Push;
  */
 final readonly class PushMessage
 {
+    /** The one Android notification channel the app creates (plan §5.5). */
+    public const string DEFAULT_CHANNEL = 'catalyst_default';
+
     /**
      * @param  array<string, string|int>  $data  small scalar payload for the app (type, ulid, version) — never user content; senders stringify
      * @param  string|null  $collapseKey  messages sharing a key REPLACE each other on the device
@@ -26,7 +29,7 @@ final readonly class PushMessage
         public ?string $body = null,
         public array $data = [],
         public ?string $collapseKey = null,
-        public string $channelId = 'default',
+        public string $channelId = self::DEFAULT_CHANNEL,
         public int $ttlSeconds = 86400,
         public PushPriority $priority = PushPriority::High,
     ) {}
