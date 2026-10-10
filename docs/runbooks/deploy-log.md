@@ -58,8 +58,8 @@ happened.
 
 > **Stacks on AH-100d and everything under it (all PENDING).** Half A is backend + SPA; Half B is SPA /
 > native only. **Closed 2026-10-10:** Pedram's device walk passed (sign-in sheet, iOS splash, bell closes on
-> navigation, composer above the tab bar, paperclip placements, no hamburger in native). **Pushed** — the pushed
-> tip and CI run are recorded in the review header. **Pushing is not deploying: deploy timing is Pedram's call.**
+> navigation, composer above the tab bar, paperclip placements, no hamburger in native). **Pushed** at `b7a3342f`,
+> CI green on all four jobs ([run `38024623651`](https://github.com/pedram-kh/Engine/actions/runs/38024623651)). **Pushing is not deploying: deploy timing is Pedram's call.**
 
 - **Status:** PENDING (pushed, not deployed)
 - **Range:** base `a1a20ead` (inventory), then four commits: Half A feat `34d90a4f` + docs `6c32df5d`; Half B feat

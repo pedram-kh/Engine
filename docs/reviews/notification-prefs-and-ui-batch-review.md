@@ -2,7 +2,10 @@
 
 **Status:** **Closed.** Half A and Half B built and gated; **Pedram's device walk passed 2026-10-10** (sign-in
 sheet, iOS splash, bell closes on navigation, composer above the tab bar, paperclip placements, no hamburger in
-native) — the batch is accepted. **Pushed:** the push commit and CI run are recorded below once pushed.
+native) — the batch is accepted. **Pushed 2026-10-10:** `origin/main` at `b7a3342f` (docs close commit on top of `34d90a4f`, `6c32df5d`, `7d4f3e36`,
+`811a0356`; base `a1a20ead`). **CI green at that tip, all four jobs** (Backend, Frontend, E2E main SPA, E2E admin SPA) —
+[run `38024623651`](https://github.com/pedram-kh/Engine/actions/runs/38024623651). That run also executed the Playwright
+matrix spec (§8.4's "unrun" caveat applied to my local machine only). One docs-only provenance commit follows it.
 Pushing is not deploying: deploy timing is Pedram's call, and no flag is armed. Live push state is `origin/main`.
 Inventory: [`notification-prefs-and-ui-batch-inventory.md`](notification-prefs-and-ui-batch-inventory.md) ·
 Plan-pause: [`notification-prefs-and-ui-batch-plan.md`](notification-prefs-and-ui-batch-plan.md).
@@ -202,8 +205,8 @@ gate forced the wrong way, the test failed, the gate restored).
 
 - `apps/main` vitest **217 files / 2207 tests pass**; `packages/design-tokens` 42 pass (1 todo); `vue-tsc`,
   eslint on the changed files and prettier clean; `vite build` succeeds. Backend suites unchanged by Half B.
-- **Playwright is still unrun** (the config refuses to reuse :8000/:5173, which are Pedram's dev servers). The
-  matrix spec exists and is unproven.
+- **Playwright did not run locally** (the config refuses to reuse :8000/:5173, which are Pedram's dev servers); it
+  **ran green in CI** at the pushed tip (run `38024623651`).
 - **Visual smoke, not a device:** I rendered the sign-in sheet in a 390×844 browser view with the Capacitor
   bridge faked. It matched frame 02 closely (pill, mark, hairline, labels, field radius, button, pointer line).
   That is **not** the WKWebView/WebView, the native theme colours (the mint was the web theme's), the safe
