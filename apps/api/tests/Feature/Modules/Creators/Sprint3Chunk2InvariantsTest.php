@@ -14,7 +14,6 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
-use RuntimeException;
 use Tests\TestCase;
 
 uses(TestCase::class);
