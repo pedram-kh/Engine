@@ -365,6 +365,33 @@ keep writing (by design). Nothing already sent is recalled, and the fan-out's on
 
 ---
 
+### 7.5 First-enable ritual for push notifications (AH-102)
+
+`push_notifications_enabled` ships **OFF** and is armed as a deliberate act, **separable from the deploy** and later than
+it. Registration of device tokens works the whole time; only _sending_ waits. The flag's arming conditions are in
+[`docs/feature-flags.md`](../feature-flags.md); this is the operator's short form.
+
+**Preconditions.** The worker is running **and was restarted after the AH-102 deploy** (§4 — the deploy adds
+`SendPushNotificationJob`, and the job runs on the **default** queue, the only one the production worker consumes).
+`CACHE_STORE` is an atomic store (the per-thread throttle uses `Cache::add`). No scheduler dependency.
+
+1. **Credential smoke, on the server:** `php artisan push:test --validate-only` → `Credential OK`. This decodes
+   `FCM_SERVICE_ACCOUNT_JSON_B64`, does the OAuth exchange and asks the provider to validate a request for a
+   placeholder token. Anything else is a `config_error` / `retryable` / `rejected` line — read the code, do not arm.
+2. **One real push to a named test account** that has a registered Android token:
+   `php artisan push:test --user=<id> --dry-run` (prints the token ids), then `php artisan push:test --user=<id>`.
+   Confirm it displays on the lock screen with neutral copy, in the account's language.
+3. **Arm:** admin → Feature flags → `push_notifications_enabled` ON, **before** the first push-capable store build
+   ships to users.
+4. **Watch:** the log lines `push.delivery` (info) and `push.config_error` / `push.delivery_rejected` /
+   `push.delivery_retryable` (error). A burst of `config_error` means the credential or project is wrong — flip the flag
+   OFF. Nothing logs a token or message text.
+
+**To pause.** Flip the flag OFF. The dispatcher returns immediately; jobs already queued still run (they re-check token
+liveness first). In-app notifications and token registration are unaffected. Nothing already sent is recalled.
+
+---
+
 ## 8. Deploy order (the checklist)
 
 > **Why this lives here.** We chose to extend this runbook with the deploy

@@ -54,6 +54,71 @@ happened.
 
 ---
 
+## AH-102 (Checkpoint A, backend) — push notifications: token table, FCM sender, dispatcher — PENDING
+
+> **Stacks on AH-101 and everything under it (AH-099 … AH-101, all PENDING).** Local commits only — **not pushed,
+> not deployed**; deploy timing is Pedram's call. This entry covers **backend only** (Stages 0–2). The matrix
+> column, the app's push module and the Android build (Stages 3–4), and iOS (**AH-102-ios**) come later and get
+> their own entries.
+
+- **Status:** PENDING (not pushed)
+- **Range:** base `4d468406` (`origin/main` at plan time, pushed, not deployed) → tip **TBD at push** (the commits are
+  `faf96d4d`, `1f7d2de0`, `93b7d767`, `ff0a4112`, `2f3d62eb`, `37d482d9`, `6ff737d9`, `238fa85b`, `cdfa13e6`,
+  `68ffb21c`, `72204f1d`, `a8423726`, plus the docs commits). The deploy range also carries the undeployed
+  AH-099 … AH-101 chain.
+- **AH entries carried:** AH-102 (backend half)
+- **Migrations run:** **1** — `2026_10_10_100000_create_user_push_tokens_table` (`CREATE TABLE` only; FKs _to_ `users`
+  and `personal_access_tokens`; no data writes, no change to an existing table). Tagged `@migration-risk low`; its
+  `down()` drops the table and says so (data loss of registered tokens — they re-register on next app launch).
+
+**What goes live on deploy**
+
+- `POST` / `DELETE /api/v1/me/push-tokens` (creator-app bearer only; **registration is not behind the flag**, by
+  design, so a build that registers before arming still works).
+- The `push` channel on `GET` / `PATCH /me/notification-preferences`, and a `type_defaults` block in the response.
+  **Existing clients are unaffected:** they ignore the new key, and the SPA does not render a push column until
+  Stage 3 ships (backend-first order: the API accepts `push` before any client sends it).
+- `notify()` restructure: the in-app early return is gone and the push leg runs on both paths. With the flag OFF the
+  leg returns before touching the database for ineligible types and after a single flag read for eligible ones.
+- `push:test` artisan command; the `push_notifications_enabled` flag (**OFF**).
+
+**What is gated OFF**
+
+- **`push_notifications_enabled` ships OFF.** Do **not** arm until: the FCM credential is present, `push:test
+--validate-only` passed on the server, the Android device proof passed, and the arming is timed **before** the first
+  push-capable store build reaches users (so their first sessions' registered tokens are not stranded).
+
+**Named deploy steps (in order)**
+
+1. **Pre-deploy reads (Pedram):**
+   - Worker + queue connection: `supervisorctl status` shows `queue:work` (not Horizon); effective `QUEUE_CONNECTION`.
+     **Result:** —
+   - `CACHE_STORE` effective value (the push throttle needs an atomic `Cache::add`; the OAuth token cache needs it too).
+     **Result:** —
+   - `SELECT count(*) FROM user_notification_preferences WHERE channel='push';` → **expected `0`.** **Result:** —
+   - **FCM credential:** `FCM_PROJECT_ID` is set, and `FCM_SERVICE_ACCOUNT_JSON_B64` **is set and decodes to valid JSON**
+     carrying `client_email`, `private_key` and `project_id` — read back **without printing the value**. (`push:test
+--validate-only` performs exactly this decode and then the OAuth exchange.) **Result:** —
+2. **Snapshot** taken and confirmed `available` (migration in this deploy). **Snapshot ID:** —
+3. `php artisan migrate` (one migration), then the code.
+4. **`php artisan queue:restart`** — **a named step**: this deploy adds a job class (`SendPushNotificationJob`), and a
+   worker holding the old class map would fail it.
+5. PHP-FPM reload (opcache), then `/up` and one authenticated request.
+6. **`engine_c_user` GRANT check** (post-migrate, pre-arm): `SELECT has_table_privilege('engine_c_user',
+'user_push_tokens', 'SELECT,INSERT,UPDATE,DELETE');` → must be `true`, and `USAGE` on the id sequence. Default
+   privileges may not cover new tables (the history is not reconstructable), so this is checked, not assumed.
+   **Result:** —
+7. **Smoke:** `php artisan push:test --validate-only` → "Credential OK". **Result:** —
+
+- **Infra:** `queue:restart` (required); new env vars `FCM_PROJECT_ID`, `FCM_SERVICE_ACCOUNT_JSON_B64` (from Secrets
+  Manager; the path `catalyst/<env>/api/fcm` is a **convention to confirm**); no cron / scheduler change.
+- **One-shot commands:** none that mutate (`push:test` is read-only against our data).
+- **Post-deploy verification:** `/up`; the admin Feature-flags page lists `push_notifications_enabled` OFF; a creator's
+  `PATCH /me/notification-preferences` with `channel: push` is accepted; `push:test --validate-only` passes.
+- **Flags armed:** none — `push_notifications_enabled` ships OFF.
+- **Operator:** —
+- **Anything unexpected:** —
+
 ## AH-101 — notification preference matrix, post-verified notice, third creator-app UI batch — PENDING
 
 > **Stacks on AH-100d and everything under it (all PENDING).** Half A is backend + SPA; Half B is SPA /

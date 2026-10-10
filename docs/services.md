@@ -114,6 +114,32 @@ signup is usually fast (instant→days) — the decision is the gating step.
 
 ---
 
+## 📲 Push notifications — Firebase Cloud Messaging (AH-102)
+
+- **Capability:** lock-screen push to the creator app (Capacitor 8, Android first; iOS is the Apple-account-gated final
+  stage). One provider for both platforms (FCM HTTP v1; on iOS FCM relays through APNs). The plugin is
+  `@capacitor-firebase/messaging`; the server is a thin custom client with **zero new composer dependencies**.
+- **What is needed (Pedram):**
+  1. **A Firebase project** — one, **production-only** (no dev/staging project; local runs use `push:test --dry-run`
+     or a fake sender). **Which Google account owns it: _to be supplied by Pedram_** — record it here when
+     decided; losing access to that account is losing push, so it should be a team-held account, not a personal one.
+  2. **An Android app registered in the project** → `google-services.json` (committed to the app, not secret).
+  3. **A service account** with the _Firebase Cloud Messaging API Admin_ role → its JSON key, **base64-encoded**, in
+     **AWS Secrets Manager** and surfaced to the app as `FCM_SERVICE_ACCOUNT_JSON_B64`; plus `FCM_PROJECT_ID`.
+     The service-account JSON is **never** in the repo (the `.gitignore` guards it). The Secrets Manager path
+     `catalyst/<env>/api/fcm` is a **convention guess — confirm against how the other secrets are named**.
+  4. **iOS (later, AH-102-ios):** the Apple Developer account is **not enrolled yet**. When it is: an APNs auth key
+     uploaded to the Firebase project, the iOS app registered → `GoogleService-Info.plist` (committed).
+- **Server config:** `config/integrations.php` → `push.fcm.{project_id, service_account_json_b64, timeout, token_url,
+send_base_url}`. A missing / non-base64 / non-JSON credential is a `config_error` _outcome_ (logged, never a boot
+  crash). The OAuth token URL is fixed in config, never read from the credential JSON.
+- **Smoke test:** `php artisan push:test --validate-only` (credential + OAuth + project id, no device).
+- **Privacy / compliance (not built here — AH-105, Pedram's):** App Store privacy labels, Play Data Safety, the
+  privacy policy and the Google DPA must cover device tokens before the first push-capable store build.
+- **Lands in:** AH-102 (Checkpoint A: backend; Stage 4: Android app; Stage 5: iOS).
+
+---
+
 ## 💤 Deferrable — later sprints, listed for completeness
 
 | Service                                        | Decision                                                    | When                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -145,20 +171,21 @@ Locked Sprint 4 = full scope, dependency-ordered. Service touchpoints per chunk:
 (Mirrors `06-INTEGRATIONS.md` §12 — keep this updated as decisions land; this table is the
 living `vendor-decisions.md` the spec asks for.)
 
-| Capability        | Status       | Vendor                             | Sandbox/keys           | Lead-time action                           |
-| ----------------- | ------------ | ---------------------------------- | ---------------------- | ------------------------------------------ |
-| Payments          | Decided      | Stripe Connect (Express)           | ❌ test keys pending   | Connect application — **start now**        |
-| KYC               | **Open**     | TBD (lean Veriff)                  | ❌                     | Select, then sandbox                       |
-| E-sign            | **Open**     | TBD (lean Dropbox Sign)            | ❌                     | Select, then sandbox                       |
-| Email             | **Open**     | TBD (lean SES + Postmark)          | ❌                     | Select + verify domain (Sprint 4 relevant) |
-| Social — Meta     | Platform set | Meta Graph / IG Graph              | ❌                     | **App review — start now**                 |
-| Social — TikTok   | Platform set | TikTok Login Kit                   | ❌                     | **App review — start now**                 |
-| Social — YouTube  | Platform set | Google OAuth                       | ❌                     | Consent-screen verification                |
-| Error monitoring  | Decided      | Sentry (EU)                        | Confirm projects exist | Sprint-0 item — confirm                    |
-| Product analytics | Open         | TBD (lean PostHog EU)              | ❌                     | Defer                                      |
-| Cookie consent    | Decided      | Self-built (Iubenda fallback)      | n/a                    | Pre-launch                                 |
-| Tax validation    | Built-in     | VIES + HMRC                        | n/a (free)             | Confirm live calls wired                   |
-| Secrets / cloud   | Foundation   | AWS Secrets Manager + eu-central-1 | Confirm                | Sprint-0 item — confirm                    |
+| Capability        | Status       | Vendor                             | Sandbox/keys           | Lead-time action                                      |
+| ----------------- | ------------ | ---------------------------------- | ---------------------- | ----------------------------------------------------- |
+| Payments          | Decided      | Stripe Connect (Express)           | ❌ test keys pending   | Connect application — **start now**                   |
+| KYC               | **Open**     | TBD (lean Veriff)                  | ❌                     | Select, then sandbox                                  |
+| E-sign            | **Open**     | TBD (lean Dropbox Sign)            | ❌                     | Select, then sandbox                                  |
+| Email             | **Open**     | TBD (lean SES + Postmark)          | ❌                     | Select + verify domain (Sprint 4 relevant)            |
+| Social — Meta     | Platform set | Meta Graph / IG Graph              | ❌                     | **App review — start now**                            |
+| Social — TikTok   | Platform set | TikTok Login Kit                   | ❌                     | **App review — start now**                            |
+| Social — YouTube  | Platform set | Google OAuth                       | ❌                     | Consent-screen verification                           |
+| Error monitoring  | Decided      | Sentry (EU)                        | Confirm projects exist | Sprint-0 item — confirm                               |
+| Product analytics | Open         | TBD (lean PostHog EU)              | ❌                     | Defer                                                 |
+| Cookie consent    | Decided      | Self-built (Iubenda fallback)      | n/a                    | Pre-launch                                            |
+| Tax validation    | Built-in     | VIES + HMRC                        | n/a (free)             | Confirm live calls wired                              |
+| Secrets / cloud   | Foundation   | AWS Secrets Manager + eu-central-1 | Confirm                | Sprint-0 item — confirm                               |
+| Push              | Decided      | Firebase Cloud Messaging (v1)      | ❌ project not created | Firebase project + owning Google account — **Pedram** |
 
 ---
 

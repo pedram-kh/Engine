@@ -221,3 +221,15 @@ opens the picker. A relationship thread: paperclip and link both inline; the lin
 Onboarding: no hamburger. (5) Sign in: the sheet, the language pill opens the 24-language menu, a wrong
 password shows the banner and shrinks the mark, the keyboard doesn't bury the button, a short phone doesn't put
 the mark over the pill. (6) Cold start on iOS: the splash; then an iPhone SE-class device if you have one.
+
+---
+
+## Addendum (post-close, 2026-10-10) — correction from AH-102
+
+AH-101 claimed that adding `push` would be **"one column constant plus one enum case"** with **"no page change"**
+(the AH-101 plan, and the comment above `PREFERENCE_CHANNEL_ORDER` in `templates.ts`). **That is not true.** Push is
+native-only, so the matrix must be able to hide the column on web: `preferenceGroupsForRole()` gains an
+`includeNativeOnly` option (default `false`, so the existing web render and the AH-101 specs are unchanged), the page
+passes a platform predicate, and a native-only state row ("Push is off on this device — Enable") is added. The page
+therefore **does** change, in AH-102 Stage 3. The AH-101 chunk itself is unaffected: it shipped no push column and no
+push enum case. See [`push-notifications-plan.md`](push-notifications-plan.md) §4.5.

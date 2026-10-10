@@ -2808,6 +2808,21 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
 
 ---
 
+## AH-102 (push notifications) — standing items opened by the build
+
+- **Where:** [`apps/api/app/Modules/Notifications/Push/`](../apps/api/app/Modules/Notifications/Push/), `user_push_tokens`, the `lang/*/push.php` files, `apps/main/capacitor.config.*`.
+- **What we accepted (2026-10-10):**
+  1. **R-7 — a full `cap sync` before Stage 5 hazards iOS.** Until AH-102-ios, native sync is **Android-only**; a contributor running a plain `npx cap sync` (all platforms) regenerates the iOS package manifest with the Firebase SDK but no `GoogleService-Info.plist`. **Triggered by** anyone running a full sync before the iOS stage. **Resolution:** Stage 5 adds the plist and the iOS build; until then run `cap sync android` only.
+  2. **Expired-PAT pruning interacts with `user_push_tokens`.** The AH-099 "no pruning" item (above) stays open. A token row is _not live_ once its PAT is expired (`liveQuery()` checks `expires_at` and the 90-day age), so an expired row never receives a push; but the row stays until `sanctum:prune-expired` deletes the PAT, whereupon the FK **cascade** removes it. So scheduling the prune is safe for push and is also what keeps `user_push_tokens` from accumulating dead rows. **Resolution:** the same scheduled prune as AH-099 item 1.
+  3. **Delivery is untracked until AH-102b.** `PushDeliveryRecorder` logs outcomes (never the token or the text) and invalidates dead tokens; there is no `push_deliveries` table, so "did this creator get it?" is not answerable from the database. **Resolution:** AH-102b.
+  4. **The FCM error taxonomy is from Google's documentation, not verified against the live API.** A token is killed only on an explicit vendor signal (`UNREGISTERED`, or `INVALID_ARGUMENT` naming the registration token); everything ambiguous is `rejected`/`config_error`, never a token kill. **Triggered by** the first real `push:test`. **Resolution:** record the observed codes in the review and adjust the map if they differ.
+  5. **`lang/*/push.php` ×24 are machine-quality translations, not native-reviewed.** Short, name-after-a-colon copy keeps inflection out of it, but a native speaker has not read them. **Resolution:** the same review pass as the other machine-translated catalogs.
+  6. **R2 rider (`creator-detail.spec.ts:64`) — not yet diagnosed.** The bounded (≤2 h) diagnosis needs the dev stack down; outcome to be recorded here when done.
+- **Owner:** notifications (1, 3, 4, 5); identity (2); platform (6).
+- **Status:** open (by design). Surfaced at AH-102 Checkpoint A, 2026-10-10 ([ad-hoc log](reviews/adhoc-changes-log.md)).
+
+---
+
 ## AH-100 (Creator app client) — pre-existing English / wrong-language values in `auth.json` and `availability.json`
 
 - **Where:** `apps/main/src/core/i18n/locales/*/auth.json` and `*/availability.json`.

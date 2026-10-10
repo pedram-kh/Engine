@@ -70,6 +70,61 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-102 · Push notifications for the creator app (Creator App arc)
+
+- **Status:** **In progress — Checkpoint A (Stages 0–2, backend) landed locally; pushes HELD, awaiting
+  clearance.** Stages 3–5 (matrix column, the app's push module and Android, then iOS as **AH-102-ios**) are not
+  started. Plan: [`push-notifications-plan.md`](push-notifications-plan.md); inventory:
+  [`push-notifications-inventory.md`](push-notifications-inventory.md); review (draft):
+  [`push-notifications-review.md`](push-notifications-review.md).
+- **Date:** 2026-10-10.
+- **Why:** the creator app is a Capacitor 8 wrap with no way to reach a creator who is not looking at it. The
+  in-app notification rows exist; push adds the lock-screen leg for the 14 types a creator must not miss.
+- **What (Checkpoint A, backend):**
+  - **Sender seam** `PushSender` (neutral message/target/result) with one implementation, a thin **FCM v1 client with
+    zero new composer dependencies** (RS256 JWT via `openssl_sign`, cached OAuth token), contained under
+    `Notifications/Push/Fcm/` (pinned by a scan test). iOS is last and swappable (fallback B) because the Apple
+    account is not enrolled.
+  - **`user_push_tokens`** (FKs to `users` and `personal_access_tokens`, both cascading; unique per PAT and per
+    token) plus `POST` / `DELETE /me/push-tokens` on the bearer-only `creator_app` guard.
+  - **Eligibility and defaults:** 14 eligible types (10 toggleable, 4 always-on); `push` is a channel on the
+    preference API; push defaults ON except `campaign.job_posted` (OFF, opt-in) via one type-aware resolver.
+  - **Copy:** fixed neutral localized titles, names from an allowlist only, `lang/*/push.php` ×24. No message text,
+    feedback or reasons ever leave the server.
+  - **Dispatch:** `PushDispatcher` inside `notify()` (the early return is gone, so push is independent of the
+    in-app preference); try/catch on both paths; after-commit job per live token; ~60 s per-(thread, recipient)
+    throttle for message types; one push when a draft approval also completes the assignment (the AH-069 mirror).
+  - **Flag** `push_notifications_enabled`, default OFF, gates **sending only**.
+  - **`push:test`** operator command (credential smoke test and device-proof trigger; one user, one fixed message).
+- **Commits (local, not pushed):**
+
+  | Commit | SHA        | What                                                                     |
+  | ------ | ---------- | ------------------------------------------------------------------------ |
+  | docs   | `faf96d4d` | plan P-rulings recorded                                                  |
+  | C0.1   | `1f7d2de0` | drop an inert `RuntimeException` import (PHP 8.5 compile warning)        |
+  | C0.2   | `93b7d767` | `.gitignore` guards for service-account and APNs key files               |
+  | C1.1   | `ff0a4112` | type-aware preference default, behaviour-identical                       |
+  | C1.2   | `2f3d62eb` | `push` channel, eligibility policy, `campaign.job_posted` opt-in default |
+  | C1.3   | `37d482d9` | `user_push_tokens` table, model, registry                                |
+  | C1.4   | `6ff737d9` | `POST` / `DELETE /me/push-tokens` (creator-app bearer only)              |
+  | C2.1   | `238fa85b` | `PushSender` contract and the FCM v1 client                              |
+  | C2.2   | `cdfa13e6` | push copy (`lang/*/push.php` ×24) and `PushMessageFactory`               |
+  | C2.3   | `68ffb21c` | `SendPushNotificationJob` and delivery recorder                          |
+  | C2.4   | `72204f1d` | push leg in `notify()` behind `push_notifications_enabled`               |
+  | C2.5   | `a8423726` | `push:test` operator command                                             |
+
+- **PROD-DATA RISK: LOW–MEDIUM.** One additive `CREATE TABLE` migration; `notify()` (the hot path) is restructured
+  behind a try/catch and an after-commit job, with the flag OFF. The Notifications / Campaigns / Messaging suites
+  pass unedited. Existing tests touched, all of them listed in the review §6: the flag-list assertion (+1 line), one
+  inert import removed (Q17), one test added to `CreatorAppGuardSwapTest`, and two fixture lines in the AH-101
+  preferences spec.
+- **Deploy obligations (named steps in the deploy log):** snapshot, `migrate` (one), **`queue:restart`**, the
+  **`engine_c_user` GRANT check** on `user_push_tokens`, the **pre-deploy read** `count(*) … WHERE channel='push'` = 0,
+  the **FCM credential read** ("set and decodes to valid JSON"), then `push:test --validate-only`. **No flag armed.**
+  See [`deploy-log.md`](../runbooks/deploy-log.md).
+- **Not proven yet:** anything on a device; the live FCM error vocabulary (taxonomy is from Google's docs);
+  Playwright (the dev stack on :8000/:5173 must be stopped).
+
 ### AH-101 · Notification preference matrix, post-verified notice and the third creator-app UI batch (Creator App arc)
 
 - **Status:** Closed 2026-10-10 — Pedram's device walk passed; pushed (the tip and CI run are in the review
