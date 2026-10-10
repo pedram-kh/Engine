@@ -55,6 +55,14 @@ return [
                 'cta' => 'Poglej nalogo',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Vaša objava za :campaign je preverjena',
+                'greeting' => 'Pozdravljeni, :name,',
+                'body' => 'Dobre novice — vaša objava za ":campaign" je bila najdena na poslani povezavi in je preverjena. Nadaljnji ukrepi niso potrebni.',
+                'cta' => 'Poglej nalogo',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Za vašo objavo za :campaign je potrebno ukrepanje',

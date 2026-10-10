@@ -264,6 +264,15 @@ final class JobPostedFanOutService
 
     private function queueMail(Campaign $campaign, User $user): void
     {
+        // AH-101 (A1) — the recipient's `email` preference, INSIDE the
+        // `job_posted_notifications_enabled` gate `send()` already passed (the
+        // kill switch still kills). Absence means ON. The caller stamps the
+        // recipient regardless: they were notified in-app, and a creator who
+        // opted out of the mail must not be re-selected on the next run.
+        if (! $this->notifications->isEmailEnabled($user, NotificationType::CampaignJobPosted)) {
+            return;
+        }
+
         Mail::to($user->email)
             ->locale($user->preferred_language ?: 'en')
             ->queue(new JobPostedMail(

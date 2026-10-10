@@ -23,6 +23,7 @@
       "assignment_draft_rejected": "Dein Entwurf für {campaign_name} wurde abgelehnt.",
       "assignment_completed_on_approval": "Ihr Entwurf für {campaign_name} wurde freigegeben — der Auftrag ist damit abgeschlossen.",
       "assignment_manually_verified": "Dein Post für {campaign_name} wurde verifiziert.",
+      "assignment_live_verified": "Dein Post für {campaign_name} wurde verifiziert.",
       "assignment_draft_submitted": "{creator_name} hat einen Entwurf für {campaign_name} eingereicht.",
       "assignment_contracted": "{creator_name} hat den Vertrag für {campaign_name} akzeptiert.",
       "creator_approved": "Dein Creator-Konto wurde genehmigt.",
@@ -41,7 +42,7 @@
     },
     "preferences": {
       "title": "Benachrichtigungseinstellungen",
-      "description": "Wähle, welche In-App-Benachrichtigungen du erhalten möchtest.",
+      "description": "Wähle, welche Benachrichtigungen du erhalten möchtest und auf welchem Weg.",
       "menuItem": "Benachrichtigungseinstellungen",
       "save": "Änderungen speichern",
       "saving": "Wird gespeichert…",
@@ -56,8 +57,10 @@
       },
       "channels": {
         "in_app": "In der App",
+        "email": "E-Mail",
         "digest": "Tägliche E-Mail-Zusammenfassung"
       },
+      "alwaysOn": "Immer aktiv",
       "typeLabels": {
         "assignment_invited": "Eine Kampagnen-Einladung wird empfangen",
         "assignment_draft_submitted": "Ein Entwurf wird zur Überprüfung eingereicht",
@@ -67,6 +70,7 @@
         "assignment_draft_rejected": "Ein Entwurf wird abgelehnt",
         "assignment_completed_on_approval": "Eine Freigabe schließt einen Auftrag ab",
         "assignment_manually_verified": "Ein Post wird verifiziert",
+        "assignment_live_verified": "Ein Post besteht die automatische Verifizierung",
         "creator_approved": "Ein Creator-Konto wird genehmigt",
         "creator_rejected": "Eine Creator-Bewerbung wird abgelehnt",
         "message_received_by_creator": "Eine neue Nachricht von der Agentur",

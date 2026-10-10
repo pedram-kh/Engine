@@ -55,6 +55,14 @@ return [
                 'cta' => 'Vaata ülesannet',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Teie postitus kampaaniale :campaign on kinnitatud',
+                'greeting' => 'Tere, :name,',
+                'body' => 'Head uudised — teie postitus kampaaniale ":campaign" leiti esitatud lingilt ja see on kinnitatud. Täiendavaid toiminguid pole vaja.',
+                'cta' => 'Vaata ülesannet',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Teie postituse kampaaniale :campaign puhul on vaja tegutseda',

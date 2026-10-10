@@ -66,6 +66,13 @@ export type NotificationPreferenceGroup = 'assignment' | 'jobs_board' | 'creator
 interface NotificationPreferenceDefinition {
   group: NotificationPreferenceGroup
   channels: NotificationChannel[]
+  /**
+   * Channels this type delivers that the user CANNOT turn off (AH-101, Q2).
+   * Shown in the matrix as an "Always on" caption instead of a switch — the
+   * honest rendering of a mail that is account-lifecycle transactional
+   * (`creator.approved` / `creator.rejected`). Never overlaps `channels`.
+   */
+  alwaysOnChannels?: NotificationChannel[]
 }
 
 interface LiveNotificationType {
@@ -92,6 +99,26 @@ interface LiveNotificationType {
 const IN_APP_ONLY: NotificationChannel[] = ['in_app']
 
 /**
+ * AH-101 — a type whose mail now honours the recipient's `email` preference
+ * (`NotificationService::isEmailEnabled`, the one backend guard). A channel is
+ * listed ONLY where that guard is wired at the type's send site; the backend's
+ * `EmailPreferenceGuardTest` is the other half of that promise.
+ */
+const IN_APP_AND_EMAIL: NotificationChannel[] = ['in_app', 'email']
+
+/**
+ * The matrix's column order — the ONE place a channel's position is decided.
+ * The preferences page derives its columns from the union of the registry's
+ * channels sorted by this list, so adding a channel (AH-102's `push`) is one
+ * entry here plus the enum case and the label — no page change.
+ */
+export const PREFERENCE_CHANNEL_ORDER: readonly NotificationChannel[] = [
+  'in_app',
+  'email',
+  'digest',
+]
+
+/**
  * The live-set. The dotted enum values can't be `t()`-pathed directly (vue-i18n
  * would treat the dot as nesting), so the flat-underscore `templateKey` applies.
  */
@@ -105,7 +132,7 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'assignment.invited': {
     templateKey: 'notifications.types.assignment_invited',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_ONLY },
+    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
   },
   // Agency fan-out rows (admins + managers) — only agency users receive these.
   'assignment.draft_submitted': {
@@ -122,17 +149,17 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'assignment.revision_requested': {
     templateKey: 'notifications.types.assignment_revision_requested',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_ONLY },
+    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
   },
   'assignment.draft_approved': {
     templateKey: 'notifications.types.assignment_draft_approved',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_ONLY },
+    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
   },
   'assignment.draft_rejected': {
     templateKey: 'notifications.types.assignment_draft_rejected',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_ONLY },
+    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
   },
   // AH-069 (D5) — sits BESIDE the draft-approved row, not instead of it: on a
   // campaign that hands off at approval the creator gets both, and together they
@@ -142,33 +169,45 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'assignment.completed_on_approval': {
     templateKey: 'notifications.types.assignment_completed_on_approval',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_ONLY },
+    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
   },
   'assignment.manually_verified': {
     templateKey: 'notifications.types.assignment_manually_verified',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_ONLY },
+    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
+  },
+  // AH-101 (⑦) — the creator's post passed AUTOMATIC verification: the silent
+  // success branch, now a notice. Creator-only. The mail leg is behind
+  // `post_verified_mail_enabled` (default OFF) on the backend, but the `email`
+  // cell is still honest here: the preference is read the moment the flag arms,
+  // so opting out early is real, not decorative.
+  'assignment.live_verified': {
+    templateKey: 'notifications.types.assignment_live_verified',
+    recipient: 'creator',
+    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
   },
   'creator.approved': {
     templateKey: 'notifications.types.creator_approved',
     recipient: 'creator',
-    preference: { group: 'creator', channels: IN_APP_ONLY },
+    preference: { group: 'creator', channels: IN_APP_ONLY, alwaysOnChannels: ['email'] },
   },
   'creator.rejected': {
     templateKey: 'notifications.types.creator_rejected',
     recipient: 'creator',
-    preference: { group: 'creator', channels: IN_APP_ONLY },
+    preference: { group: 'creator', channels: IN_APP_ONLY, alwaysOnChannels: ['email'] },
   },
   // Messaging (Sprint 11, D-7) — dual-recipient new-message notifications. Each
   // direction targets exactly one role, so each gets its own toggle (no dead
   // control). by_creator → the creator receives (agency sent); by_agency → the
   // agency receives (creator sent). Messaging is the first type to expose the
   // `digest` channel (D-10): the daily-digest job consumes it, so the toggle
-  // ships WITH its consumer (no dead control, no un-opt-out-able digest).
+  // ships WITH its consumer (no dead control, no un-opt-out-able digest). The
+  // creator direction also carries `email` (AH-101) — the debounced new-message
+  // mail; the agency direction has no message mail, so no email cell.
   'message.received_by_creator': {
     templateKey: 'notifications.types.message_received_by_creator',
     recipient: 'creator',
-    preference: { group: 'messaging', channels: ['in_app', 'digest'] },
+    preference: { group: 'messaging', channels: ['in_app', 'email', 'digest'] },
   },
   'message.received_by_agency': {
     templateKey: 'notifications.types.message_received_by_agency',
@@ -177,13 +216,15 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   },
   // Relationship messaging (AH-010, D5) — the 1:1 connected agency↔creator DM,
   // distinct from the campaign-assignment thread above. Dual-recipient, same as
-  // the campaign pair. UNLIKE campaign messaging these are `in_app` ONLY: the
-  // relationship-message digest is deferred (AH-010 D5), so no `digest` toggle
-  // ships until that job consumes them (no dead control).
+  // the campaign pair. UNLIKE campaign messaging there is no `digest` cell: the
+  // relationship-message digest is deferred (AH-010 D5), so no toggle ships until
+  // that job consumes them (no dead control). The creator side gained an `email`
+  // cell in AH-101 (the debounced mail now reads the preference); the AGENCY side
+  // has no message mail, so it stays `in_app` only.
   'message.relationship_received_by_creator': {
     templateKey: 'notifications.types.message_relationship_received_by_creator',
     recipient: 'creator',
-    preference: { group: 'messaging', channels: IN_APP_ONLY },
+    preference: { group: 'messaging', channels: IN_APP_AND_EMAIL },
   },
   'message.relationship_received_by_agency': {
     templateKey: 'notifications.types.message_relationship_received_by_agency',
@@ -222,26 +263,25 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   // creator applying is not news to the creator), `job_posted` / `accepted` /
   // `rejected` reach the CREATOR (the agency performed those acts).
   //
-  // `in_app` only, all four. All four ALSO send mail, but the email channel has
-  // never been wired through preference reads on this platform, so a `mail`
-  // entry here would be a dead control — worse than none, because it would read
-  // as a promise. Mail containment is the Pennant flags
-  // (`job_posted_notifications_enabled`, `application_notifications_enabled`);
-  // see docs/tech-debt.md.
+  // All four carry an `email` cell as of AH-101: their send sites now read the
+  // recipient's `email` preference (`NotificationService::isEmailEnabled`),
+  // INSIDE the Pennant flags that still contain the mail
+  // (`job_posted_notifications_enabled`, `application_notifications_enabled`) —
+  // the flag is the kill switch, the preference is the user's say.
   'campaign.job_posted': {
     templateKey: 'notifications.types.campaign_job_posted',
     recipient: 'creator',
-    preference: { group: 'jobs_board', channels: IN_APP_ONLY },
+    preference: { group: 'jobs_board', channels: IN_APP_AND_EMAIL },
   },
   'campaign_application.submitted': {
     templateKey: 'notifications.types.campaign_application_submitted',
     recipient: 'agency',
-    preference: { group: 'jobs_board', channels: IN_APP_ONLY },
+    preference: { group: 'jobs_board', channels: IN_APP_AND_EMAIL },
   },
   'campaign_application.accepted': {
     templateKey: 'notifications.types.campaign_application_accepted',
     recipient: 'creator',
-    preference: { group: 'jobs_board', channels: IN_APP_ONLY },
+    preference: { group: 'jobs_board', channels: IN_APP_AND_EMAIL },
   },
   // Two emit sites, one type: the agency's reject and the campaign-terminal
   // auto-reject. The template reads `campaign_name` only — `data.cause`
@@ -252,7 +292,7 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'campaign_application.rejected': {
     templateKey: 'notifications.types.campaign_application_rejected',
     recipient: 'creator',
-    preference: { group: 'jobs_board', channels: IN_APP_ONLY },
+    preference: { group: 'jobs_board', channels: IN_APP_AND_EMAIL },
   },
 }
 
@@ -277,10 +317,25 @@ export function recipientRoleForUserType(userType: UserType): NotificationRecipi
   return userType === 'creator' ? 'creator' : 'agency'
 }
 
-/** A single live type's prefs row: the type + the channels it can toggle. */
+/**
+ * A single live type's prefs row: the type + the channels it can toggle, plus the
+ * channels it delivers that are ALWAYS ON (rendered as a caption, never a switch).
+ * Both lists are sorted by {@link PREFERENCE_CHANNEL_ORDER}.
+ */
 export interface NotificationPreferenceTypeView {
   type: NotificationType
   channels: NotificationChannel[]
+  alwaysOn: NotificationChannel[]
+}
+
+/** Sort channels into the matrix's column order (unknown channels last, stable). */
+function inColumnOrder(channels: readonly NotificationChannel[]): NotificationChannel[] {
+  const rank = (channel: NotificationChannel): number => {
+    const index = PREFERENCE_CHANNEL_ORDER.indexOf(channel)
+    return index === -1 ? PREFERENCE_CHANNEL_ORDER.length : index
+  }
+
+  return [...channels].sort((a, b) => rank(a) - rank(b))
 }
 
 /** A prefs-UI group with the live types (for one recipient role) it contains. */
@@ -325,7 +380,11 @@ export function preferenceGroupsForRole(
       continue
     }
     const existing = byGroup.get(preference.group) ?? []
-    existing.push({ type, channels: preference.channels })
+    existing.push({
+      type,
+      channels: inColumnOrder(preference.channels),
+      alwaysOn: inColumnOrder(preference.alwaysOnChannels ?? []),
+    })
     byGroup.set(preference.group, existing)
   }
 
@@ -333,6 +392,27 @@ export function preferenceGroupsForRole(
     group,
     types: byGroup.get(group) ?? [],
   }))
+}
+
+/**
+ * The matrix columns for a set of groups: the union of every type's channels and
+ * always-on channels, in {@link PREFERENCE_CHANNEL_ORDER}. Derived — never listed
+ * by hand — so a column exists exactly when some row has a cell in it (no empty
+ * column), and a new channel appears the moment one type lists it.
+ */
+export function preferenceColumns(
+  groups: readonly NotificationPreferenceGroupView[],
+): NotificationChannel[] {
+  const present = new Set<NotificationChannel>()
+
+  for (const group of groups) {
+    for (const typeView of group.types) {
+      typeView.channels.forEach((channel) => present.add(channel))
+      typeView.alwaysOn.forEach((channel) => present.add(channel))
+    }
+  }
+
+  return inColumnOrder([...present])
 }
 
 /**

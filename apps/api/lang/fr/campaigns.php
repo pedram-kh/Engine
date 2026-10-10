@@ -55,6 +55,14 @@ return [
                 'cta' => 'Voir la mission',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Votre publication pour :campaign a été vérifiée',
+                'greeting' => 'Bonjour :name,',
+                'body' => "Bonne nouvelle — votre publication pour « :campaign » a été trouvée au lien que vous avez soumis et a été vérifiée. Aucune autre action n'est nécessaire.",
+                'cta' => 'Voir la mission',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Action requise sur votre publication :campaign',

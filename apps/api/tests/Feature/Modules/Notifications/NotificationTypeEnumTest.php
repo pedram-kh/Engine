@@ -32,6 +32,8 @@ it('NotificationType catalogue lists exactly the curated membership', function (
         // lives in the listener, not in the catalogue.
         'assignment.completed_on_approval',
         'assignment.manually_verified',
+        // AH-101 (⑦) — the silent success branch of verification, now creator-facing.
+        'assignment.live_verified',
         'assignment.cancelled',
         // Forward payment verbs — deferred-S10 escrow alerts drop-in.
         'assignment.payment_funded',

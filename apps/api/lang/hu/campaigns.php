@@ -55,6 +55,14 @@ return [
                 'cta' => 'Feladat megtekintése',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'A(z) :campaign kampányhoz tartozó bejegyzésed ellenőrizve lett',
+                'greeting' => 'Kedves :name,',
+                'body' => 'Jó hír — a(z) ":campaign" kampányhoz tartozó bejegyzésed megtalálható a beküldött linken, és ellenőrizve lett. További teendőd nincs.',
+                'cta' => 'Feladat megtekintése',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Intézkedés szükséges a(z) :campaign kampányhoz tartozó bejegyzéséhez',

@@ -55,6 +55,14 @@ return [
                 'cta' => 'Se opgave',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Dit opslag til :campaign er blevet verificeret',
+                'greeting' => 'Hej :name,',
+                'body' => 'Gode nyheder — dit opslag til ":campaign" blev fundet på det link, du indsendte, og er blevet verificeret. Der kræves ingen yderligere handling.',
+                'cta' => 'Se opgave',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Handling påkrævet for dit :campaign-opslag',

@@ -55,6 +55,14 @@ return [
                 'cta' => 'Katso tehtävä',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Julkaisusi kampanjaan :campaign on vahvistettu',
+                'greeting' => 'Hei, :name,',
+                'body' => 'Hyviä uutisia — julkaisusi kampanjaan ":campaign" löytyi lähettämästäsi linkistä ja se on vahvistettu. Lisätoimia ei tarvita.',
+                'cta' => 'Katso tehtävä',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Toimia tarvitaan julkaisullesi kampanjaan :campaign',

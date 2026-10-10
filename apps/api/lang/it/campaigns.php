@@ -55,6 +55,14 @@ return [
                 'cta' => 'Vedi l\'incarico',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Il tuo post per :campaign è stato verificato',
+                'greeting' => 'Ciao :name,',
+                'body' => 'Buone notizie — il tuo post per ":campaign" è stato trovato al link che hai inviato ed è stato verificato. Non è necessaria alcuna azione ulteriore.',
+                'cta' => 'Vedi l\'incarico',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Azione richiesta sul tuo post per :campaign',

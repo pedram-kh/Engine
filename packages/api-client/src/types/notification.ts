@@ -41,6 +41,7 @@ export type NotificationType =
   | 'assignment.draft_rejected'
   | 'assignment.completed_on_approval'
   | 'assignment.manually_verified'
+  | 'assignment.live_verified'
   | 'assignment.cancelled'
   | 'assignment.payment_funded'
   | 'assignment.payment_released'

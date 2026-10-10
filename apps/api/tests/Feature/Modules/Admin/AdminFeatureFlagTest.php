@@ -10,6 +10,7 @@ use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
 use App\Modules\Creators\Features\JobPostedNotificationsEnabled;
 use App\Modules\Creators\Features\KycVerificationEnabled;
 use App\Modules\Creators\Features\PlatformAutomationsEnabled;
+use App\Modules\Creators\Features\PostVerifiedMailEnabled;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -65,7 +66,8 @@ it('lists every registered flag with its current state', function (): void {
         ->and($names)->toContain(IncompleteCreatorNudgeEnabled::NAME)
         ->and($names)->toContain(JobPostedNotificationsEnabled::NAME)
         ->and($names)->toContain(ApplicationNotificationsEnabled::NAME)
-        ->and($names)->toContain(PlatformAutomationsEnabled::NAME);
+        ->and($names)->toContain(PlatformAutomationsEnabled::NAME)
+        ->and($names)->toContain(PostVerifiedMailEnabled::NAME);
     expect($response->json('data.0.attributes'))->toHaveKeys([
         'name', 'label', 'description', 'enabled',
     ]);

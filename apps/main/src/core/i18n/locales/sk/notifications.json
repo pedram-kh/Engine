@@ -23,6 +23,7 @@
       "assignment_draft_rejected": "Váš návrh pro {campaign_name} byl zamítnut.",
       "assignment_completed_on_approval": "Váš koncept pre {campaign_name} bol schválený — toto zadanie je teraz dokončené.",
       "assignment_manually_verified": "Váš příspěvek pro {campaign_name} byl ověřen.",
+      "assignment_live_verified": "Váš príspevok pre {campaign_name} bol overený.",
       "assignment_draft_submitted": "{creator_name} odeslal návrh pro {campaign_name}.",
       "assignment_contracted": "{creator_name} přijal zmlúvu pro {campaign_name}.",
       "creator_approved": "Váš účet tvorcu byl schválen.",
@@ -41,7 +42,7 @@
     },
     "preferences": {
       "title": "Nastavenia oznámenia",
-      "description": "Vyberte, která oznámenia v aplikaci chcete dostávat.",
+      "description": "Vyberte, ktoré oznámenia chcete dostávať a akým spôsobom.",
       "menuItem": "Nastavenia oznámenia",
       "save": "Uložiť změny",
       "saving": "Ukladanie…",
@@ -56,8 +57,10 @@
       },
       "channels": {
         "in_app": "V aplikaci",
+        "email": "E-mail",
         "digest": "Denní e-mailový souhrn"
       },
+      "alwaysOn": "Vždy zapnuté",
       "typeLabels": {
         "assignment_invited": "Je prijaté pozvanie do kampane",
         "assignment_draft_submitted": "Návrh je odeslán k posúdenie",
@@ -67,6 +70,7 @@
         "assignment_draft_rejected": "Návrh je zamítnut",
         "assignment_completed_on_approval": "Schválenie dokončí zadanie",
         "assignment_manually_verified": "Příspěvek je ověřen",
+        "assignment_live_verified": "Príspevok prejde automatickým overením",
         "creator_approved": "Účet tvorcu je schválen",
         "creator_rejected": "Prihláška tvorcu je odmietnutá",
         "message_received_by_creator": "Nová správa od agentúry",

@@ -341,6 +341,15 @@ describe('NotificationCenter — localized render per live type', () => {
     expect(body).toBe('Your post for Spring Launch was verified.')
   })
 
+  it('assignment.live_verified — creator row (AH-101: the automatic-verification notice)', async () => {
+    const body = await renderBodyFor('assignment.live_verified', {
+      campaign_name: 'Spring Launch',
+      creator_name: 'Alex',
+      assignment_ulid: '01ASSIGN',
+    })
+    expect(body).toBe('Your post for Spring Launch was verified.')
+  })
+
   it('assignment.draft_submitted — AGENCY fan-out row binds creator_name + campaign_name (NOT assignment_ulid)', async () => {
     const body = await renderBodyFor('assignment.draft_submitted', {
       creator_name: 'Alex',

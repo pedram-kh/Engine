@@ -73,6 +73,8 @@ const LIVE_TYPES = [
   // approval, so a missing translation would be visible immediately.
   'assignment.completed_on_approval',
   'assignment.manually_verified',
+  // AH-101 (⑦) — the creator's automatic-verification notice, 20 → 21.
+  'assignment.live_verified',
   'assignment.draft_submitted',
   'assignment.contracted',
   'creator.approved',
@@ -151,7 +153,7 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
     }
   })
 
-  it('notifications.types holds EXACTLY the 20 live templates + fallback', async () => {
+  it('notifications.types holds EXACTLY the 21 live templates + fallback', async () => {
     const en = await loadBundle('en')
     const typeKeys = Object.keys(en.notifications.types).sort()
 
@@ -164,6 +166,7 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
       'assignment_draft_rejected',
       'assignment_draft_submitted',
       'assignment_invited',
+      'assignment_live_verified',
       'assignment_manually_verified',
       'assignment_revision_requested',
       'campaign_application_accepted',
@@ -254,7 +257,7 @@ describe('notifications prefs role-partition — single live-set source of truth
     }
   })
 
-  it('the known role split is honest (creator = 13 invite/review/lifecycle/messaging/jobs, agency = 5 fan-out/messaging/jobs)', () => {
+  it('the known role split is honest (creator = 14 invite/review/lifecycle/messaging/jobs, agency = 5 fan-out/messaging/jobs)', () => {
     expect([...creatorTypes].sort()).toEqual(
       [
         // AH-083 — the invite dual-emit. Creator-only by construction: the
@@ -267,6 +270,8 @@ describe('notifications prefs role-partition — single live-set source of truth
         'assignment.draft_approved',
         'assignment.draft_rejected',
         'assignment.manually_verified',
+        // AH-101 (⑦) — creator-only: the platform's own check passed.
+        'assignment.live_verified',
         'assignment.revision_requested',
         // AH-056 — creator-only by construction: the agency listed the job, so
         // there is no agency-side counterpart to offer a toggle for.
@@ -314,5 +319,26 @@ describe('notifications prefs role-partition — single live-set source of truth
     )
     // Every live type still supports the in-app feed.
     expect(rows.every((r) => r.channels.includes('in_app'))).toBe(true)
+  })
+
+  it('the email channel is exposed only where the backend guard exists (AH-101)', () => {
+    const rows = [
+      ...preferenceGroupsForRole('creator'),
+      ...preferenceGroupsForRole('agency'),
+    ].flatMap((g) => g.types)
+
+    const withEmail = rows.filter((r) => r.channels.includes('email')).map((r) => r.type)
+    expect(withEmail).toHaveLength(13)
+    // The agency-inviter mails and the account-lifecycle mails never get a switch.
+    for (const type of [
+      'assignment.draft_submitted',
+      'assignment.contracted',
+      'creator.approved',
+      'creator.rejected',
+      'message.received_by_agency',
+      'message.relationship_received_by_agency',
+    ] as const) {
+      expect(withEmail).not.toContain(type)
+    }
   })
 })

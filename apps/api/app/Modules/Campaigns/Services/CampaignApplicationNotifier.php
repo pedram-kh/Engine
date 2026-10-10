@@ -276,6 +276,15 @@ final class CampaignApplicationNotifier
             return false;
         }
 
+        // AH-101 (A1) — the recipient's `email` preference, read beside the flag
+        // (after it: the kill switch still kills) so it is as impossible to
+        // forget at a call site as the flag is. Absence means ON. A preference
+        // suppression reports `false` exactly like the flag, so the emission log
+        // counts it as suppressed rather than queued.
+        if (! $this->notifications->isEmailEnabled($recipient, $this->typeFor($mailable))) {
+            return false;
+        }
+
         Mail::to($recipient->email)
             // Queue-time locale, not render-time: the worker has no request
             // locale, so a mailable resolving its own would send everyone English.
@@ -283,6 +292,15 @@ final class CampaignApplicationNotifier
             ->queue($mailable);
 
         return true;
+    }
+
+    private function typeFor(ApplicationSubmittedMail|ApplicationAcceptedMail|ApplicationRejectedMail $mailable): NotificationType
+    {
+        return match (true) {
+            $mailable instanceof ApplicationSubmittedMail => NotificationType::CampaignApplicationSubmitted,
+            $mailable instanceof ApplicationAcceptedMail => NotificationType::CampaignApplicationAccepted,
+            default => NotificationType::CampaignApplicationRejected,
+        };
     }
 
     /**

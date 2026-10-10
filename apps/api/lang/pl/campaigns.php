@@ -55,6 +55,14 @@ return [
                 'cta' => 'Wyświetl zadanie',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Twój post dla :campaign został zweryfikowany',
+                'greeting' => 'Cześć, :name,',
+                'body' => 'Dobre wieści — Twój post dla ":campaign" został znaleziony pod przesłanym linkiem i zweryfikowany. Nie są potrzebne żadne dalsze działania.',
+                'cta' => 'Wyświetl zadanie',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Wymagane działanie dotyczące Twojego posta dla :campaign',

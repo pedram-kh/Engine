@@ -55,6 +55,14 @@ return [
                 'cta' => 'Visa uppdraget',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Ditt inlägg för :campaign har verifierats',
+                'greeting' => 'Hej :name,',
+                'body' => 'Goda nyheter — ditt inlägg för ":campaign" hittades på länken du skickade in och har verifierats. Ingen ytterligare åtgärd krävs.',
+                'cta' => 'Visa uppdraget',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Åtgärd krävs för ditt :campaign-inlägg',

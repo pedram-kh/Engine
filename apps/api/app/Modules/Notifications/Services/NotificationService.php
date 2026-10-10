@@ -100,6 +100,27 @@ final class NotificationService
     }
 
     /**
+     * AH-101 (A1) — the ONE email-preference guard. May this recipient be mailed
+     * this notification type?
+     *
+     * Keyed on the RECIPIENT user and the {@see NotificationType} — never on the
+     * mailable — so the exemption is structural: a mail with no NotificationType
+     * (security / transactional / non-user, and the always-on account-lifecycle
+     * mails) has no key to read and therefore cannot call this. The call sites
+     * are pinned by `EmailPreferenceGuardArchitectureTest`.
+     *
+     * Absence means ON ({@see NotificationChannel::defaultEnabled()}), so with no
+     * `email` row every guarded site sends exactly what it sent before this
+     * existed. A stored `email=false` row is an expressed opt-out however it
+     * arrived (Q1: honoured, never cleared). The guard sits INSIDE each site's
+     * Pennant kill-switch, never instead of it.
+     */
+    public function isEmailEnabled(User $recipient, NotificationType $type): bool
+    {
+        return $this->isChannelEnabled($recipient, $type, NotificationChannel::Email);
+    }
+
+    /**
      * Resolve whether a channel is enabled for a (user, type) pair.
      *
      * Preserve-current default (D-7): when no preference row exists, fall back

@@ -55,6 +55,14 @@ return [
                 'cta' => 'Ver a tarefa',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'A sua publicação para :campaign foi verificada',
+                'greeting' => 'Olá :name,',
+                'body' => 'Boas notícias — a sua publicação para ":campaign" foi encontrada na ligação que enviou e foi verificada. Não é necessária nenhuma ação adicional.',
+                'cta' => 'Ver a tarefa',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Ação necessária na sua publicação de :campaign',

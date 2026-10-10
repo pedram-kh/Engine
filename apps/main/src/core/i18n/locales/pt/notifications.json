@@ -23,6 +23,7 @@
       "assignment_draft_rejected": "O seu rascunho para {campaign_name} foi rejeitado.",
       "assignment_completed_on_approval": "O seu rascunho para {campaign_name} foi aprovado — essa tarefa está agora concluída.",
       "assignment_manually_verified": "A sua publicação para {campaign_name} foi verificada.",
+      "assignment_live_verified": "A sua publicação para {campaign_name} foi verificada.",
       "assignment_draft_submitted": "{creator_name} enviou um rascunho para {campaign_name}.",
       "assignment_contracted": "{creator_name} aceitou o contrato para {campaign_name}.",
       "creator_approved": "A sua conta de criador foi aprovada.",
@@ -41,7 +42,7 @@
     },
     "preferences": {
       "title": "Definições de notificações",
-      "description": "Escolha que notificações na aplicação pretende receber.",
+      "description": "Escolha que notificações quer receber e como.",
       "menuItem": "Definições de notificações",
       "save": "Guardar alterações",
       "saving": "A guardar…",
@@ -56,8 +57,10 @@
       },
       "channels": {
         "in_app": "Na aplicação",
+        "email": "E-mail",
         "digest": "Resumo diário por email"
       },
+      "alwaysOn": "Sempre ativo",
       "typeLabels": {
         "assignment_invited": "Um convite de campanha é recebido",
         "assignment_draft_submitted": "Um rascunho é enviado para revisão",
@@ -67,6 +70,7 @@
         "assignment_draft_rejected": "Um rascunho é rejeitado",
         "assignment_completed_on_approval": "Uma aprovação conclui uma tarefa",
         "assignment_manually_verified": "Uma publicação é verificada",
+        "assignment_live_verified": "Uma publicação passa a verificação automática",
         "creator_approved": "Uma conta de criador é aprovada",
         "creator_rejected": "Uma candidatura de criador é recusada",
         "message_received_by_creator": "Uma nova mensagem da agência",

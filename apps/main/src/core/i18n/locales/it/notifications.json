@@ -23,6 +23,7 @@
       "assignment_draft_rejected": "La tua bozza per {campaign_name} è stata rifiutata.",
       "assignment_completed_on_approval": "La tua bozza per {campaign_name} è stata approvata: quell’incarico è ora completato.",
       "assignment_manually_verified": "Il tuo post per {campaign_name} è stato verificato.",
+      "assignment_live_verified": "Il tuo post per {campaign_name} è stato verificato.",
       "assignment_draft_submitted": "{creator_name} ha inviato una bozza per {campaign_name}.",
       "assignment_contracted": "{creator_name} ha accettato il contratto per {campaign_name}.",
       "creator_approved": "Il tuo account creator è stato approvato.",
@@ -41,7 +42,7 @@
     },
     "preferences": {
       "title": "Impostazioni notifiche",
-      "description": "Scegli quali notifiche nell'app vuoi ricevere.",
+      "description": "Scegli quali notifiche vuoi ricevere e come.",
       "menuItem": "Impostazioni notifiche",
       "save": "Salva modifiche",
       "saving": "Salvataggio…",
@@ -56,8 +57,10 @@
       },
       "channels": {
         "in_app": "Nell'app",
+        "email": "E-mail",
         "digest": "Riepilogo giornaliero via email"
       },
+      "alwaysOn": "Sempre attivo",
       "typeLabels": {
         "assignment_invited": "Viene ricevuto un invito a una campagna",
         "assignment_draft_submitted": "Viene inviata una bozza per la revisione",
@@ -67,6 +70,7 @@
         "assignment_draft_rejected": "Una bozza viene rifiutata",
         "assignment_completed_on_approval": "Un’approvazione completa un incarico",
         "assignment_manually_verified": "Un post viene verificato",
+        "assignment_live_verified": "Un post supera la verifica automatica",
         "creator_approved": "Un account creator viene approvato",
         "creator_rejected": "Una candidatura creator viene rifiutata",
         "message_received_by_creator": "Un nuovo messaggio dall'agenzia",

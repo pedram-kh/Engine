@@ -23,6 +23,7 @@
       "assignment_draft_rejected": "Váš nacrt pro {campaign_name} byl zamítnut.",
       "assignment_completed_on_approval": "Vaša skica za {campaign_name} je odobrena — taj zadatak je sada dovršen.",
       "assignment_manually_verified": "Váš příspěvek pro {campaign_name} byl ověřen.",
+      "assignment_live_verified": "Vaša objava za {campaign_name} je provjerena.",
       "assignment_draft_submitted": "{creator_name} odeslal nacrt pro {campaign_name}.",
       "assignment_contracted": "{creator_name} přijal smlouvu pro {campaign_name}.",
       "creator_approved": "Váš účet ustvarjalca byl schválen.",
@@ -41,7 +42,7 @@
     },
     "preferences": {
       "title": "Nastanjeitve oznámení",
-      "description": "Vyberte, která oznámení v aplikaci chcete dostávat.",
+      "description": "Odaberite koje obavijesti želite primati i na koji način.",
       "menuItem": "Nastanjeitve oznámení",
       "save": "Spremi změny",
       "saving": "Spremanje…",
@@ -56,8 +57,10 @@
       },
       "channels": {
         "in_app": "V aplikaci",
+        "email": "E-pošta",
         "digest": "Denní e-mailový souhrn"
       },
+      "alwaysOn": "Uvijek uključeno",
       "typeLabels": {
         "assignment_invited": "Primljena je pozivnica za kampanju",
         "assignment_draft_submitted": "Nacrt je odeslán k pregled",
@@ -67,6 +70,7 @@
         "assignment_draft_rejected": "Nacrt je zamítnut",
         "assignment_completed_on_approval": "Odobrenje dovršava zadatak",
         "assignment_manually_verified": "Příspěvek je ověřen",
+        "assignment_live_verified": "Objava prolazi automatsku provjeru",
         "creator_approved": "Účet ustvarjalca je schválen",
         "creator_rejected": "Prijava ustvarjalca je odmítnuta",
         "message_received_by_creator": "Nová zpráva od agencije",

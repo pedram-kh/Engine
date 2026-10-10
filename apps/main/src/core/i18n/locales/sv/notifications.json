@@ -23,6 +23,7 @@
       "assignment_draft_rejected": "Ditt utkast för {campaign_name} avvisades.",
       "assignment_completed_on_approval": "Ditt utkast för {campaign_name} godkändes — det uppdraget är nu klart.",
       "assignment_manually_verified": "Ditt inlägg för {campaign_name} verifierades.",
+      "assignment_live_verified": "Ditt inlägg för {campaign_name} har verifierats.",
       "assignment_draft_submitted": "{creator_name} skickade in ett utkast för {campaign_name}.",
       "assignment_contracted": "{creator_name} accepterade kontraktet för {campaign_name}.",
       "creator_approved": "Ditt creator-konto har godkänts.",
@@ -41,7 +42,7 @@
     },
     "preferences": {
       "title": "Aviseringsinställningar",
-      "description": "Välj vilka aviseringar i appen du vill ta emot.",
+      "description": "Välj vilka aviseringar du vill få och hur.",
       "menuItem": "Aviseringsinställningar",
       "save": "Spara ändringar",
       "saving": "Sparar…",
@@ -56,8 +57,10 @@
       },
       "channels": {
         "in_app": "I appen",
+        "email": "E-post",
         "digest": "Daglig e-postdigest"
       },
+      "alwaysOn": "Alltid på",
       "typeLabels": {
         "assignment_invited": "En kampanjinbjudan tas emot",
         "assignment_draft_submitted": "Ett utkast skickas in för granskning",
@@ -67,6 +70,7 @@
         "assignment_draft_rejected": "Ett utkast avvisas",
         "assignment_completed_on_approval": "Ett godkännande avslutar ett uppdrag",
         "assignment_manually_verified": "Ett inlägg verifieras",
+        "assignment_live_verified": "Ett inlägg klarar den automatiska verifieringen",
         "creator_approved": "Ett creator-konto godkänns",
         "creator_rejected": "En creator-ansökan avslås",
         "message_received_by_creator": "Ett nytt meddelande från byrån",

@@ -8,6 +8,8 @@ use App\Modules\Creators\Features\MissingCreatorMailsEnabled;
 use App\Modules\Identity\Models\User;
 use App\Modules\Messaging\Mail\NewMessageMail;
 use App\Modules\Messaging\Models\MessageEmailDebounce;
+use App\Modules\Notifications\Enums\NotificationType;
+use App\Modules\Notifications\Services\NotificationService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
@@ -56,6 +58,8 @@ final class DebouncedMessageMailer
 {
     private const int DEBOUNCE_MINUTES = 30;
 
+    public function __construct(private readonly NotificationService $preferences) {}
+
     /**
      * @return bool whether the mail was queued, so a caller wanting to log
      *              the outcome does not have to re-read the flag itself.
@@ -70,6 +74,17 @@ final class DebouncedMessageMailer
 
         if ($recipient->email === '') {
             $this->logEmission($thread, $recipient, $mailable->context, 'no_email');
+
+            return false;
+        }
+
+        // AH-101 (A1) — the recipient's `email` preference for the type this mail
+        // announces. AFTER the flag (the kill switch still kills) and BEFORE the
+        // debounce row: a suppressed send must never touch the debounce table,
+        // or a later opt-back-in would be silently debounced out of its first
+        // unread. Absence means ON, so with no row this is a pass-through.
+        if (! $this->preferences->isEmailEnabled($recipient, $this->typeFor($mailable))) {
+            $this->logEmission($thread, $recipient, $mailable->context, 'preference_suppressed');
 
             return false;
         }
@@ -89,6 +104,18 @@ final class DebouncedMessageMailer
         $this->logEmission($thread, $recipient, $mailable->context, 'sent');
 
         return true;
+    }
+
+    /**
+     * The creator-facing notification type this mail announces — the SAME type
+     * the caller's immediate in-app row was written under, derived from the
+     * mailable's own `context` so no caller can pass a mismatched pair.
+     */
+    private function typeFor(NewMessageMail $mailable): NotificationType
+    {
+        return $mailable->context === 'relationship'
+            ? NotificationType::MessageRelationshipReceivedByCreator
+            : NotificationType::MessageReceivedByCreator;
     }
 
     /**

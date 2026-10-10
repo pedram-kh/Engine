@@ -23,6 +23,7 @@
       "assignment_draft_rejected": "Votre brouillon pour {campaign_name} a été rejeté.",
       "assignment_completed_on_approval": "Votre brouillon pour {campaign_name} a été approuvé — cette mission est terminée.",
       "assignment_manually_verified": "Votre publication pour {campaign_name} a été vérifiée.",
+      "assignment_live_verified": "Votre publication pour {campaign_name} a été vérifiée.",
       "assignment_draft_submitted": "{creator_name} a soumis un brouillon pour {campaign_name}.",
       "assignment_contracted": "{creator_name} a accepté le contrat pour {campaign_name}.",
       "creator_approved": "Votre compte de créateur a été approuvé.",
@@ -41,7 +42,7 @@
     },
     "preferences": {
       "title": "Paramètres de notification",
-      "description": "Choisissez les notifications dans l'application que vous souhaitez recevoir.",
+      "description": "Choisissez les notifications que vous souhaitez recevoir, et comment.",
       "menuItem": "Paramètres de notification",
       "save": "Enregistrer les modifications",
       "saving": "Enregistrement…",
@@ -56,8 +57,10 @@
       },
       "channels": {
         "in_app": "Dans l'application",
+        "email": "E-mail",
         "digest": "Résumé quotidien par e-mail"
       },
+      "alwaysOn": "Toujours activé",
       "typeLabels": {
         "assignment_invited": "Une invitation à une campagne est reçue",
         "assignment_draft_submitted": "Un brouillon est soumis pour révision",
@@ -67,6 +70,7 @@
         "assignment_draft_rejected": "Un brouillon est rejeté",
         "assignment_completed_on_approval": "Une approbation termine une mission",
         "assignment_manually_verified": "Une publication est vérifiée",
+        "assignment_live_verified": "Une publication réussit la vérification automatique",
         "creator_approved": "Un compte de créateur est approuvé",
         "creator_rejected": "Une candidature de créateur est refusée",
         "message_received_by_creator": "Un nouveau message de l'agence",

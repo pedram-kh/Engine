@@ -23,7 +23,7 @@ use App\Modules\Audit\Enums\AuditAction;
  *
  * Deliberately EXCLUDED as internal / non-notification transitions:
  * `assignment.re_invited`, `assignment.producing`, `assignment.posted_by_creator`,
- * `assignment.live_verified`, `assignment.resubmit_requested(_in_place)`,
+ * `assignment.resubmit_requested(_in_place)`,
  * `assignment.posted_content_updated`.
  *
  * Ch2 (S11.0) un-curates the two creator-lifecycle verbs whose AuditAction
@@ -58,6 +58,14 @@ enum NotificationType: string
     // but only ONE of the two sends an email (Q3): this one.
     case AssignmentCompletedOnApproval = 'assignment.completed_on_approval';
     case AssignmentManuallyVerified = 'assignment.manually_verified';
+    // AH-101 (⑦) — the automated check passed: the creator's post was found at the
+    // submitted link (`posted → live_verified`). Creator-facing and single-direction,
+    // the `manually_verified` sibling for the success branch that used to be silent
+    // (the failure branch mails the agency, the human override mails the creator).
+    // In-app is ungated; the mail leg is behind `post_verified_mail_enabled`
+    // (default OFF) and does not arm until production runs a real, non-mock
+    // verification driver — see the AH-101 review.
+    case AssignmentLiveVerified = 'assignment.live_verified';
     case AssignmentCancelled = 'assignment.cancelled';
 
     // Forward payment verbs (deferred-S10 escrow alerts — drop-in, D-5).

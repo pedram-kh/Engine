@@ -59,6 +59,14 @@ return [
                 'cta' => 'View the assignment',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Your post for :campaign was verified',
+                'greeting' => 'Hi :name,',
+                'body' => 'Good news — your post for ":campaign" was found at the link you submitted and has been verified. No further action is needed.',
+                'cta' => 'View the assignment',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Action needed on your :campaign post',

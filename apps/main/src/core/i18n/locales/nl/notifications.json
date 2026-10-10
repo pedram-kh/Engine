@@ -23,6 +23,7 @@
       "assignment_draft_rejected": "Je concept voor {campaign_name} is afgewezen.",
       "assignment_completed_on_approval": "Je concept voor {campaign_name} is goedgekeurd — die opdracht is nu afgerond.",
       "assignment_manually_verified": "Je post voor {campaign_name} is geverifieerd.",
+      "assignment_live_verified": "Je bericht voor {campaign_name} is geverifieerd.",
       "assignment_draft_submitted": "{creator_name} heeft een concept ingediend voor {campaign_name}.",
       "assignment_contracted": "{creator_name} heeft het contract voor {campaign_name} geaccepteerd.",
       "creator_approved": "Je creator-account is goedgekeurd.",
@@ -41,7 +42,7 @@
     },
     "preferences": {
       "title": "Meldingsinstellingen",
-      "description": "Kies welke in-app meldingen je wilt ontvangen.",
+      "description": "Kies welke meldingen je wilt ontvangen en hoe.",
       "menuItem": "Meldingsinstellingen",
       "save": "Wijzigingen opslaan",
       "saving": "Opslaan…",
@@ -56,8 +57,10 @@
       },
       "channels": {
         "in_app": "In de app",
+        "email": "E-mail",
         "digest": "Dagelijkse e-mailsamenvatting"
       },
+      "alwaysOn": "Altijd aan",
       "typeLabels": {
         "assignment_invited": "Een campagne-uitnodiging wordt ontvangen",
         "assignment_draft_submitted": "Een concept wordt ingediend ter beoordeling",
@@ -67,6 +70,7 @@
         "assignment_draft_rejected": "Een concept wordt afgewezen",
         "assignment_completed_on_approval": "Een goedkeuring rondt een opdracht af",
         "assignment_manually_verified": "Een post wordt geverifieerd",
+        "assignment_live_verified": "Een post doorstaat de automatische verificatie",
         "creator_approved": "Een creator-account wordt goedgekeurd",
         "creator_rejected": "Een creator-aanmelding wordt afgewezen",
         "message_received_by_creator": "Een nieuw bericht van het bureau",

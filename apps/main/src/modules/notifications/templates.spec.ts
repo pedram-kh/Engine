@@ -8,6 +8,8 @@ import {
   hasLiveTemplate,
   liveNotificationTypes,
   notificationTemplateKey,
+  PREFERENCE_CHANNEL_ORDER,
+  preferenceColumns,
   preferenceGroupsForRole,
 } from './templates'
 
@@ -238,5 +240,120 @@ describe('AH-051 relation notifications', () => {
 
     // Role partition still holds — no creator-only toggle leaks to agencies.
     expect(agencyTypes).not.toContain('creator.approved')
+  })
+})
+
+describe('AH-101 preference matrix registry', () => {
+  /** Every (type, channel) pair the registry offers as a SWITCH, for a role. */
+  function switches(role: 'creator' | 'agency'): string[] {
+    return preferenceGroupsForRole(role).flatMap((group) =>
+      group.types.flatMap((view) => view.channels.map((channel) => `${view.type}::${channel}`)),
+    )
+  }
+
+  /**
+   * The backend send sites that read the recipient's `email` preference
+   * (`NotificationService::isEmailEnabled`) — pinned from the other side by the
+   * backend's `EmailPreferenceGuardTest`. An `email` cell may exist ONLY for a
+   * type listed here; adding a cell without wiring the guard is a dead control.
+   */
+  const EMAIL_GUARDED = [
+    'assignment.invited',
+    'assignment.completed_on_approval',
+    'assignment.manually_verified',
+    'assignment.live_verified',
+    'assignment.draft_approved',
+    'assignment.revision_requested',
+    'assignment.draft_rejected',
+    'message.received_by_creator',
+    'message.relationship_received_by_creator',
+    'campaign.job_posted',
+    'campaign_application.submitted',
+    'campaign_application.accepted',
+    'campaign_application.rejected',
+  ]
+
+  it('offers an email switch for exactly the guarded types', () => {
+    const emailTypes = [...switches('creator'), ...switches('agency')]
+      .filter((key) => key.endsWith('::email'))
+      .map((key) => key.split('::')[0])
+
+    expect([...emailTypes].sort()).toEqual([...EMAIL_GUARDED].sort())
+  })
+
+  it('never offers an email switch for the agency-inviter mails (Q3) or the account-lifecycle mails (Q2)', () => {
+    const all = [...switches('creator'), ...switches('agency')]
+
+    for (const type of [
+      'assignment.draft_submitted',
+      'assignment.contracted',
+      'creator.approved',
+      'creator.rejected',
+      'agency_creator_relation.admin_connected',
+      'agency_creator_relation.disconnected',
+    ]) {
+      expect(all).not.toContain(`${type}::email`)
+    }
+  })
+
+  it('shows creator.approved / creator.rejected email as always-on, never as a switch', () => {
+    const creatorGroup = preferenceGroupsForRole('creator').find((g) => g.group === 'creator')
+
+    expect(creatorGroup?.types.map((v) => v.type).sort()).toEqual([
+      'creator.approved',
+      'creator.rejected',
+    ])
+    for (const view of creatorGroup?.types ?? []) {
+      expect(view.channels).toEqual(['in_app'])
+      expect(view.alwaysOn).toEqual(['email'])
+    }
+  })
+
+  it('keeps digest on the campaign message type only', () => {
+    const digest = [...switches('creator'), ...switches('agency')].filter((key) =>
+      key.endsWith('::digest'),
+    )
+
+    expect(digest.sort()).toEqual([
+      'message.received_by_agency::digest',
+      'message.received_by_creator::digest',
+    ])
+  })
+
+  it("orders every row's channels by the single column constant", () => {
+    for (const role of ['creator', 'agency'] as const) {
+      for (const group of preferenceGroupsForRole(role)) {
+        for (const view of group.types) {
+          const ranks = view.channels.map((c) => PREFERENCE_CHANNEL_ORDER.indexOf(c))
+          expect(ranks).toEqual([...ranks].sort((a, b) => a - b))
+          expect(ranks.every((r) => r >= 0)).toBe(true)
+        }
+      }
+    }
+  })
+
+  it('derives columns from the union of channels — a column exists only when a row fills it', () => {
+    const groups = preferenceGroupsForRole('creator')
+    const byName = (name: string) => groups.filter((g) => g.group === name)
+
+    expect(preferenceColumns(byName('assignment'))).toEqual(['in_app', 'email'])
+    expect(preferenceColumns(byName('messaging'))).toEqual(['in_app', 'email', 'digest'])
+    expect(preferenceColumns([])).toEqual([])
+  })
+
+  it('adding a channel to one type adds its column with no other change (the push seam)', () => {
+    // The shape AH-102 relies on: `push` is a constant entry + an enum case.
+    // Simulated here with a synthetic group, since no live type lists it yet.
+    const columns = preferenceColumns([
+      {
+        group: 'assignment',
+        types: [
+          { type: 'assignment.invited', channels: ['push', 'in_app'] as never, alwaysOn: [] },
+        ],
+      },
+    ])
+
+    // An unknown channel sorts after the known ones rather than breaking the grid.
+    expect(columns).toEqual(['in_app', 'push'])
   })
 })

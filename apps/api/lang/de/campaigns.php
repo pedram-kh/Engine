@@ -55,6 +55,14 @@ return [
                 'cta' => 'Auftrag ansehen',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Dein Post für :campaign wurde verifiziert',
+                'greeting' => 'Hallo :name,',
+                'body' => 'Gute Neuigkeiten – dein Post für „:campaign" wurde unter dem eingereichten Link gefunden und verifiziert. Es sind keine weiteren Maßnahmen erforderlich.',
+                'cta' => 'Auftrag ansehen',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Handlungsbedarf bei deinem :campaign-Post',

@@ -55,6 +55,14 @@ return [
                 'cta' => 'Žiūrėti užduotį',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Jūsų įrašas kampanijai :campaign patvirtintas',
+                'greeting' => 'Sveiki, :name,',
+                'body' => 'Geros naujienos — jūsų įrašas kampanijai ":campaign" rastas pateiktoje nuorodoje ir patvirtintas. Papildomų veiksmų atlikti nereikia.',
+                'cta' => 'Žiūrėti užduotį',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Reikalingas veiksmas dėl jūsų įrašo kampanijai :campaign',

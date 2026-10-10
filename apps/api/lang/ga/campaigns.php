@@ -55,6 +55,14 @@ return [
                 'cta' => 'Féach ar chúram',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Fíoraíodh do phostáil do :campaign',
+                'greeting' => 'Dia duit, :name,',
+                'body' => 'Nuacht iontach — fuarthas do phostáil do ":campaign" ag an nasc a chuir tú isteach agus fíoraíodh í. Níl aon ghníomh breise ag teastáil.',
+                'cta' => 'Féach ar chúram',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Tá gníomh ag teastáil do do phostáil do :campaign',

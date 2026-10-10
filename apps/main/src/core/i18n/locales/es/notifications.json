@@ -23,6 +23,7 @@
       "assignment_draft_rejected": "Tu borrador para {campaign_name} se ha rechazado.",
       "assignment_completed_on_approval": "Tu borrador para {campaign_name} fue aprobado: esa asignación ya está completada.",
       "assignment_manually_verified": "Tu publicación para {campaign_name} se ha verificado.",
+      "assignment_live_verified": "Tu publicación para {campaign_name} ha sido verificada.",
       "assignment_draft_submitted": "{creator_name} ha enviado un borrador para {campaign_name}.",
       "assignment_contracted": "{creator_name} ha aceptado el contrato para {campaign_name}.",
       "creator_approved": "Tu cuenta de creador se ha aprobado.",
@@ -41,7 +42,7 @@
     },
     "preferences": {
       "title": "Configuración de notificaciones",
-      "description": "Elige qué notificaciones dentro de la aplicación quieres recibir.",
+      "description": "Elige qué notificaciones quieres recibir y cómo.",
       "menuItem": "Configuración de notificaciones",
       "save": "Guardar cambios",
       "saving": "Guardando…",
@@ -56,8 +57,10 @@
       },
       "channels": {
         "in_app": "En la aplicación",
+        "email": "Correo electrónico",
         "digest": "Resumen diario por correo"
       },
+      "alwaysOn": "Siempre activado",
       "typeLabels": {
         "assignment_invited": "Se recibe una invitación a una campaña",
         "assignment_draft_submitted": "Se envía un borrador para revisión",
@@ -67,6 +70,7 @@
         "assignment_draft_rejected": "Se rechaza un borrador",
         "assignment_completed_on_approval": "Una aprobación completa una asignación",
         "assignment_manually_verified": "Se verifica una publicación",
+        "assignment_live_verified": "Una publicación supera la verificación automática",
         "creator_approved": "Se aprueba una cuenta de creador",
         "creator_rejected": "Se rechaza una solicitud de creador",
         "message_received_by_creator": "Un nuevo mensaje de la agencia",

@@ -23,6 +23,7 @@
       "assignment_draft_rejected": "Twój szkic dla {campaign_name} został odrzucony.",
       "assignment_completed_on_approval": "Twoja wersja robocza dla {campaign_name} została zatwierdzona — to zlecenie jest ukończone.",
       "assignment_manually_verified": "Twój post dla {campaign_name} został zweryfikowany.",
+      "assignment_live_verified": "Twój post dla {campaign_name} został zweryfikowany.",
       "assignment_draft_submitted": "{creator_name} przesłał szkic dla {campaign_name}.",
       "assignment_contracted": "{creator_name} zaakceptował umowę dla {campaign_name}.",
       "creator_approved": "Twoje konto twórcy zostało zatwierdzone.",
@@ -41,7 +42,7 @@
     },
     "preferences": {
       "title": "Ustawienia powiadomień",
-      "description": "Wybierz, które powiadomienia w aplikacji chcesz otrzymywać.",
+      "description": "Wybierz, które powiadomienia chcesz otrzymywać i w jaki sposób.",
       "menuItem": "Ustawienia powiadomień",
       "save": "Zapisz zmiany",
       "saving": "Zapisywanie…",
@@ -56,8 +57,10 @@
       },
       "channels": {
         "in_app": "W aplikacji",
+        "email": "E-mail",
         "digest": "Dzienny digest e-mail"
       },
+      "alwaysOn": "Zawsze włączone",
       "typeLabels": {
         "assignment_invited": "Zaproszenie do kampanii zostaje odebrane",
         "assignment_draft_submitted": "Szkic zostaje przesłany do recenzji",
@@ -67,6 +70,7 @@
         "assignment_draft_rejected": "Szkic zostaje odrzucony",
         "assignment_completed_on_approval": "Zatwierdzenie kończy zlecenie",
         "assignment_manually_verified": "Post zostaje zweryfikowany",
+        "assignment_live_verified": "Post przechodzi automatyczną weryfikację",
         "creator_approved": "Konto twórcy zostaje zatwierdzone",
         "creator_rejected": "Aplikacja twórcy zostaje odrzucona",
         "message_received_by_creator": "Nowa wiadomość od agencji",

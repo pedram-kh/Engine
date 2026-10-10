@@ -55,6 +55,14 @@ return [
                 'cta' => 'Opdracht bekijken',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Je bericht voor :campaign is geverifieerd',
+                'greeting' => 'Hallo :name,',
+                'body' => 'Goed nieuws — je bericht voor ":campaign" is gevonden op de link die je hebt ingediend en is geverifieerd. Je hoeft verder niets te doen.',
+                'cta' => 'Opdracht bekijken',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Actie vereist voor je :campaign-post',

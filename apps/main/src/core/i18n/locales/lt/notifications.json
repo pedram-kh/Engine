@@ -23,6 +23,7 @@
       "assignment_draft_rejected": "Your draft for {campaign_name} was rejected.",
       "assignment_completed_on_approval": "Jūsų juodraštis kampanijai {campaign_name} patvirtintas — ta užduotis dabar baigta.",
       "assignment_manually_verified": "Your post for {campaign_name} was verified.",
+      "assignment_live_verified": "Jūsų įrašas kampanijai {campaign_name} patvirtintas.",
       "assignment_draft_submitted": "{creator_name} submitted a draft for {campaign_name}.",
       "assignment_contracted": "{creator_name} accepted the contract for {campaign_name}.",
       "creator_approved": "Your creator account has been approved.",
@@ -41,7 +42,7 @@
     },
     "preferences": {
       "title": "Netification settings",
-      "description": "Choose which in-app notifications you'd like to receive.",
+      "description": "Pasirinkite, kokius pranešimus norite gauti ir kokiu būdu.",
       "menuItem": "Netification settings",
       "save": "Išsaugoti pakeitimus",
       "saving": "Saving…",
@@ -56,8 +57,10 @@
       },
       "channels": {
         "in_app": "In-app",
+        "email": "El. paštas",
         "digest": "Daily email digest"
       },
+      "alwaysOn": "Visada įjungta",
       "typeLabels": {
         "assignment_invited": "Gaunamas kvietimas į kampaniją",
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -67,6 +70,7 @@
         "assignment_draft_rejected": "A draft is rejected",
         "assignment_completed_on_approval": "Patvirtinimas užbaigia užduotį",
         "assignment_manually_verified": "A post is verified",
+        "assignment_live_verified": "Įrašas praeina automatinį patikrinimą",
         "creator_approved": "A creator account is approved",
         "creator_rejected": "A creator application is declined",
         "message_received_by_creator": "A new message from the agency",

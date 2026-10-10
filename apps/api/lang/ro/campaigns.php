@@ -55,6 +55,14 @@ return [
                 'cta' => 'Vizualizați sarcina',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Postarea ta pentru :campaign a fost verificată',
+                'greeting' => 'Bună ziua, :name,',
+                'body' => 'Vești bune — postarea ta pentru ":campaign" a fost găsită la linkul trimis și a fost verificată. Nu este necesară nicio acțiune suplimentară.',
+                'cta' => 'Vizualizați sarcina',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Este necesară o acțiune pentru postarea dvs. pentru :campaign',

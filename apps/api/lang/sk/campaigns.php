@@ -55,6 +55,14 @@ return [
                 'cta' => 'Zobraziť úlohu',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Váš príspevok pre :campaign bol overený',
+                'greeting' => 'Dobrý deň, :name,',
+                'body' => 'Dobré správy — váš príspevok pre ":campaign" bol nájdený na odoslanom odkaze a bol overený. Nie sú potrebné žiadne ďalšie kroky.',
+                'cta' => 'Zobraziť úlohu',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Je požadovaná akcia ohľadom vášho príspevku pre :campaign',

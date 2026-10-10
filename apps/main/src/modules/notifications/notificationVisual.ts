@@ -37,6 +37,7 @@ const VISUALS: Partial<Record<NotificationType, NotificationVisual>> = {
   'assignment.draft_approved': { icon: 'mdi-check-circle-outline', tone: 'success' },
   'assignment.completed_on_approval': { icon: 'mdi-check-circle-outline', tone: 'success' },
   'assignment.manually_verified': { icon: 'mdi-check-circle-outline', tone: 'success' },
+  'assignment.live_verified': { icon: 'mdi-check-circle-outline', tone: 'success' },
   'assignment.declined': { icon: 'mdi-close-circle-outline', tone: 'danger' },
   'assignment.draft_rejected': { icon: 'mdi-close-circle-outline', tone: 'danger' },
   'assignment.cancelled': { icon: 'mdi-close-circle-outline', tone: 'danger' },

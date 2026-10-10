@@ -55,6 +55,14 @@ return [
                 'cta' => 'Zobrazit úkol',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Váš příspěvek pro :campaign byl ověřen',
+                'greeting' => 'Dobrý den, :name,',
+                'body' => 'Dobrá zpráva — váš příspěvek pro ":campaign" byl nalezen na odkazu, který jste odeslali, a byl ověřen. Nejsou potřeba žádné další kroky.',
+                'cta' => 'Zobrazit úkol',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Je vyžadována akce ohledně vašeho příspěvku pro :campaign',

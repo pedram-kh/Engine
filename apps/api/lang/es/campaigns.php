@@ -55,6 +55,14 @@ return [
                 'cta' => 'Ver la asignación',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Tu publicación para :campaign ha sido verificada',
+                'greeting' => 'Hola :name:',
+                'body' => 'Buenas noticias: tu publicación para ":campaign" se encontró en el enlace que enviaste y ha sido verificada. No se requiere ninguna acción adicional.',
+                'cta' => 'Ver la asignación',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Se requiere tu acción en tu publicación de :campaign',

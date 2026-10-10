@@ -3,21 +3,31 @@
  * NotificationPreferencesPage — the per-user notification settings surface
  * (S11.0 Ch3b). The product's first user self-WRITE page.
  *
+ * AH-101 turned the old single list of switches into a MATRIX: one row per type,
+ * one column per channel (in-app · email · daily digest). The columns are derived
+ * from the registry (`preferenceColumns`), cells are empty where a type does not
+ * deliver that channel, and `creator.approved` / `creator.rejected` show an
+ * "Always on" caption in the email column — account-lifecycle mail the user
+ * cannot mute (Q2). On the web at md+ it is a grid; in the native app (and at
+ * narrow web widths) each type is a stacked card so a switch is never squeezed
+ * into a 360px-wide column. SAVE SEMANTICS ARE UNCHANGED: the same `enabled`
+ * map, the same full-visible-set payload, the same single Save button.
+ *
  * Shell-agnostic, like the rest of this module: the `/me/notification-preferences`
  * API is owner-scoped to the auth user, so the page takes no agency/role input
  * and is mounted by BOTH shells via two route records (`/notifications/preferences`
  * agency, `/creator/notifications/preferences` creator) — reached from a
  * "Notification settings" item in the user menu.
  *
- * Honesty scope (D-2 / D-4 + the Ch3b review's role-filter): only the `in_app`
- * channel, only the live-emit types, AND only the types that actually target the
- * CURRENT user's recipient role are exposed — a toggle for a channel that gates
- * nothing, a notification that can't arrive yet, or one only the OTHER principal
- * receives would all be dead controls. The exposed list derives from the single
- * `LIVE_TYPES` registry in `../templates` (shared with the Ch3a renderer), so it
- * cannot drift. The backend stores SPARSELY (D-1: divergence → row,
+ * Honesty scope (D-2 / D-4 + the Ch3b review's role-filter, widened by AH-101): a
+ * channel appears for a type ONLY when a consumer actually delivers it AND reads
+ * the preference — a toggle that gates nothing, a notification that can't arrive
+ * yet, or one only the OTHER principal receives would all be dead controls. Only
+ * the live-emit types that target the CURRENT user's recipient role are exposed.
+ * The exposed list derives from the single `LIVE_TYPES` registry in `../templates`
+ * (shared with the Ch3a renderer), so it cannot drift. The backend stores SPARSELY (D-1: divergence → row,
  * return-to-default → delete) and ships the channel `defaults` over the wire, so
- * the display state is composed as `row?.is_enabled ?? defaults.in_app` and the
+ * the display state is composed as `row?.is_enabled ?? defaults[channel]` and the
  * contract is never hardcoded here.
  */
 
@@ -30,17 +40,21 @@ import { storeToRefs } from 'pinia'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { useMobileShell } from '@/composables/useMobileShell'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 
 import { notificationsApi } from '../api/notifications.api'
 import {
+  preferenceColumns,
   preferenceGroupsForRole,
   recipientRoleForUserType,
   type NotificationPreferenceGroup,
+  type NotificationPreferenceGroupView,
 } from '../templates'
 
 const { t } = useI18n()
 const { user } = storeToRefs(useAuthStore())
+const { isMobile } = useMobileShell()
 
 /**
  * The grouped, ROLE-FILTERED live types this user can set (D-4 + the review's
@@ -53,6 +67,22 @@ const { user } = storeToRefs(useAuthStore())
 const preferenceGroups = computed(() =>
   preferenceGroupsForRole(recipientRoleForUserType(user.value?.attributes.user_type ?? 'creator')),
 )
+
+/**
+ * A group's matrix columns — the union of ITS types' channels, in registry order.
+ * Per group rather than page-wide, so a group never shows a column no row in it
+ * fills (the digest column belongs to Messages alone).
+ */
+function columnsFor(group: NotificationPreferenceGroupView): NotificationChannel[] {
+  return preferenceColumns([group])
+}
+
+/** The grid template for a group's matrix: a label column, then one column per channel. */
+function gridStyleFor(group: NotificationPreferenceGroupView): Record<string, string> {
+  return {
+    gridTemplateColumns: `minmax(0, 1fr) repeat(${columnsFor(group).length}, minmax(88px, auto))`,
+  }
+}
 
 /** Every (type, channel) toggle this user can set — the flat save/compose set. */
 const allRows = computed(() =>
@@ -76,6 +106,11 @@ function typeLabelKey(type: string): string {
 /** The i18n label key for a channel toggle. */
 function channelLabelKey(channel: NotificationChannel): string {
   return `notifications.preferences.channels.${channel}`
+}
+
+/** The accessible name of one matrix cell's switch: "<type> — <channel>". */
+function cellLabel(type: string, channel: NotificationChannel): string {
+  return `${t(typeLabelKey(type))} — ${t(channelLabelKey(channel))}`
 }
 
 /** The composed display-state key for a (type, channel) pair. */
@@ -184,26 +219,96 @@ onMounted(loadPreferences)
             {{ t(groupLabelKey(group.group)) }}
           </h2>
 
+          <!-- Web (md+): one grid per group — a header row, then a row per type. -->
           <div
-            v-for="typeView in group.types"
-            :key="typeView.type"
-            class="mb-3"
-            :data-test="`prefs-type-${typeView.type}`"
+            v-if="!isMobile"
+            class="prefs-grid"
+            :style="gridStyleFor(group)"
+            role="table"
+            :data-test="`prefs-grid-${group.group}`"
           >
-            <div class="text-body-2 mb-1">{{ t(typeLabelKey(typeView.type)) }}</div>
+            <div class="prefs-grid__row prefs-grid__row--head" role="row">
+              <span role="columnheader" />
+              <span
+                v-for="column in columnsFor(group)"
+                :key="column"
+                role="columnheader"
+                class="prefs-grid__colhead text-caption text-medium-emphasis"
+                :data-test="`prefs-column-${column}`"
+              >
+                {{ t(channelLabelKey(column)) }}
+              </span>
+            </div>
 
-            <v-switch
-              v-for="channel in typeView.channels"
-              :key="channel"
-              v-model="enabled[stateKey(typeView.type, channel)]"
-              :label="t(channelLabelKey(channel))"
-              color="primary"
-              density="compact"
-              hide-details
-              class="ms-2"
-              :data-test="`prefs-toggle-${typeView.type}-${channel}`"
-            />
+            <div
+              v-for="typeView in group.types"
+              :key="typeView.type"
+              class="prefs-grid__row"
+              role="row"
+              :data-test="`prefs-type-${typeView.type}`"
+            >
+              <span role="rowheader" class="text-body-2">{{ t(typeLabelKey(typeView.type)) }}</span>
+
+              <span
+                v-for="column in columnsFor(group)"
+                :key="column"
+                role="cell"
+                class="prefs-grid__cell"
+              >
+                <v-switch
+                  v-if="typeView.channels.includes(column)"
+                  v-model="enabled[stateKey(typeView.type, column)]"
+                  :aria-label="cellLabel(typeView.type, column)"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  :data-test="`prefs-toggle-${typeView.type}-${column}`"
+                />
+                <span
+                  v-else-if="typeView.alwaysOn.includes(column)"
+                  class="text-caption text-medium-emphasis"
+                  :data-test="`prefs-always-on-${typeView.type}-${column}`"
+                >
+                  {{ t('notifications.preferences.alwaysOn') }}
+                </span>
+              </span>
+            </div>
           </div>
+
+          <!-- Native app / narrow web: one stacked card per type, only its own channels. -->
+          <template v-else>
+            <div
+              v-for="typeView in group.types"
+              :key="typeView.type"
+              class="prefs-card mb-3"
+              :data-test="`prefs-type-${typeView.type}`"
+            >
+              <div class="text-body-2 mb-1">{{ t(typeLabelKey(typeView.type)) }}</div>
+
+              <v-switch
+                v-for="channel in typeView.channels"
+                :key="channel"
+                v-model="enabled[stateKey(typeView.type, channel)]"
+                :label="t(channelLabelKey(channel))"
+                color="primary"
+                density="compact"
+                hide-details
+                :data-test="`prefs-toggle-${typeView.type}-${channel}`"
+              />
+
+              <div
+                v-for="channel in typeView.alwaysOn"
+                :key="`always-${channel}`"
+                class="prefs-card__always d-flex align-center justify-space-between text-body-2"
+                :data-test="`prefs-always-on-${typeView.type}-${channel}`"
+              >
+                <span>{{ t(channelLabelKey(channel)) }}</span>
+                <span class="text-caption text-medium-emphasis">
+                  {{ t('notifications.preferences.alwaysOn') }}
+                </span>
+              </div>
+            </div>
+          </template>
         </div>
 
         <div
@@ -233,3 +338,44 @@ onMounted(loadPreferences)
     </template>
   </v-card>
 </template>
+
+<style scoped>
+.prefs-grid {
+  display: grid;
+  row-gap: 2px;
+}
+
+/* A row is a subgrid-less pass-through so every row shares the parent's columns. */
+.prefs-grid__row {
+  display: contents;
+}
+
+.prefs-grid__row > * {
+  padding-block: 6px;
+  border-block-end: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.prefs-grid__row--head > * {
+  border-block-end-width: 1px;
+  padding-block: 0 6px;
+}
+
+.prefs-grid__colhead,
+.prefs-grid__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.prefs-card {
+  padding: 12px 14px;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 12px;
+}
+
+.prefs-card__always {
+  min-height: 40px;
+  padding-inline-start: 8px;
+}
+</style>

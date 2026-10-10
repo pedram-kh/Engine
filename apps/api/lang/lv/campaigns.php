@@ -55,6 +55,14 @@ return [
                 'cta' => 'Skatīt uzdevumu',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Jūsu ieraksts kampaņai :campaign ir apstiprināts',
+                'greeting' => 'Sveiki, :name,',
+                'body' => 'Labas ziņas — jūsu ieraksts kampaņai ":campaign" tika atrasts jūsu iesniegtajā saitē un ir apstiprināts. Papildu darbības nav nepieciešamas.',
+                'cta' => 'Skatīt uzdevumu',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Nepieciešama darbība jūsu ierakstam priekš :campaign',

@@ -15,15 +15,18 @@ use App\Modules\Campaigns\Mail\DraftReviewedMail;
 use App\Modules\Campaigns\Mail\DraftSubmittedForReviewMail;
 use App\Modules\Campaigns\Mail\InviteReceivedMail;
 use App\Modules\Campaigns\Mail\PostManuallyVerifiedMail;
+use App\Modules\Campaigns\Mail\PostVerifiedMail;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
 use App\Modules\Campaigns\Services\CampaignApplicationNotifier;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Campaigns\Services\CampaignInvitationService;
 use App\Modules\Creators\Features\MissingCreatorMailsEnabled;
+use App\Modules\Creators\Features\PostVerifiedMailEnabled;
 use App\Modules\Identity\Models\User;
 use App\Modules\Notifications\Enums\NotificationType;
 use App\Modules\Notifications\Services\NotificationService;
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Pennant\Feature;
 
@@ -37,6 +40,7 @@ use Laravel\Pennant\Feature;
  *   - `assignment.draft_rejected`      → notify the CREATOR (rejected)
  *   - `assignment.completed_on_approval` → notify the CREATOR (finished, AH-069)
  *   - `assignment.manually_verified`   → notify the CREATOR (post accepted, D-8)
+ *   - `assignment.live_verified`       → notify the CREATOR (post verified, AH-101)
  *
  * Queued mailables, localized at queue time to the recipient's preferred
  * language (the {@see ConnectionRequestMail} pattern).
@@ -115,6 +119,7 @@ final class SendAssignmentNotifications
             AuditAction::AssignmentCompletedOnApproval => $this->notifyCreatorOfCompletionOnApproval($assignment, $actor, $round),
             AuditAction::AssignmentContracted => $this->notifyAgencyOfContractAcceptance($assignment, $actor),
             AuditAction::AssignmentManuallyVerified => $this->notifyCreatorOfManualVerification($assignment, $actor),
+            AuditAction::AssignmentLiveVerified => $this->notifyCreatorOfLiveVerification($assignment, $actor),
             AuditAction::AssignmentInvited, AuditAction::AssignmentReInvited => $this->notifyCreatorOfInvite($assignment, $event->action, $actor),
             default => null,
         };
@@ -147,13 +152,11 @@ final class SendAssignmentNotifications
             return;
         }
 
-        Mail::to($recipient->email)
-            ->locale($recipient->preferred_language ?: 'en')
-            ->queue(new AssignmentCompletedOnApprovalMail(
-                creatorName: $creator->display_name ?? $recipient->name,
-                campaignName: $campaign->name,
-                assignmentUlid: $assignment->ulid,
-            ));
+        $this->queueMail($recipient, NotificationType::AssignmentCompletedOnApproval, new AssignmentCompletedOnApprovalMail(
+            creatorName: $creator->display_name ?? $recipient->name,
+            campaignName: $campaign->name,
+            assignmentUlid: $assignment->ulid,
+        ));
 
         $this->notifications->notify(
             recipient: $recipient,
@@ -221,19 +224,66 @@ final class SendAssignmentNotifications
             return;
         }
 
-        Mail::to($recipient->email)
-            ->locale($recipient->preferred_language ?: 'en')
-            ->queue(new PostManuallyVerifiedMail(
-                creatorName: $creator->display_name ?? $recipient->name,
-                campaignName: $campaign->name,
-                assignmentUlid: $assignment->ulid,
-            ));
+        $this->queueMail($recipient, NotificationType::AssignmentManuallyVerified, new PostManuallyVerifiedMail(
+            creatorName: $creator->display_name ?? $recipient->name,
+            campaignName: $campaign->name,
+            assignmentUlid: $assignment->ulid,
+        ));
 
         // S11.0 Chunk 2 (D-2 #2) — in-app rides alongside the untouched email.
         // Actor is the agency user who manually verified (D-3).
         $this->notifications->notify(
             recipient: $recipient,
             type: NotificationType::AssignmentManuallyVerified,
+            subject: $assignment,
+            actor: $actor,
+            data: [
+                'campaign_name' => $campaign->name,
+                'creator_name' => $creator->display_name ?? $recipient->name,
+                'assignment_ulid' => $assignment->ulid,
+            ],
+        );
+    }
+
+    /**
+     * AH-101 (⑦) — the creator's post passed automatic verification.
+     *
+     * The success branch of verification was the only silent one: the failure
+     * mails the agency (`VerifyPostedContentJob`) and the human override mails
+     * the creator (above). Creator-only (Q5) — the agency fan-out for success is
+     * a named follow-up. The actor is null when the job drove the transition.
+     *
+     * Dual-emit, the AH-083 shape: the in-app row is UNGATED (the recipient's own
+     * `in_app` preference still applies inside `notify()`); the MAIL leg is behind
+     * `post_verified_mail_enabled` (default OFF — it must not arm over the mock
+     * verification driver) and then the recipient's `email` preference. One email
+     * for the transition; no duplicate of the thread system message or board move.
+     */
+    private function notifyCreatorOfLiveVerification(CampaignAssignment $assignment, ?User $actor): void
+    {
+        $creator = $assignment->creator;
+        $campaign = $assignment->campaign;
+
+        if ($creator === null || $campaign === null) {
+            return;
+        }
+
+        $recipient = $creator->user;
+        if (! $recipient instanceof User || $recipient->email === '') {
+            return;
+        }
+
+        if (Feature::active(PostVerifiedMailEnabled::NAME)) {
+            $this->queueMail($recipient, NotificationType::AssignmentLiveVerified, new PostVerifiedMail(
+                creatorName: $creator->display_name ?? $recipient->name,
+                campaignName: $campaign->name,
+                assignmentUlid: $assignment->ulid,
+            ));
+        }
+
+        $this->notifications->notify(
+            recipient: $recipient,
+            type: NotificationType::AssignmentLiveVerified,
             subject: $assignment,
             actor: $actor,
             data: [
@@ -310,12 +360,33 @@ final class SendAssignmentNotifications
     /**
      * The ONE flag checkpoint for the invite mail (AH-083 D1) — mirrors
      * {@see CampaignApplicationNotifier::queue()}.
-     * A second `Feature::active()` call anywhere in this class would quietly
-     * halve that guarantee, so every invite-shaped path funnels through here.
+     * A second `Feature::active(MissingCreatorMailsEnabled::NAME)` call anywhere in
+     * this class would quietly halve that guarantee, so every invite-shaped path
+     * funnels through here. (The post-verified flag is a different flag with its
+     * own single consumer, {@see self::notifyCreatorOfLiveVerification()}.)
      */
     private function queueInviteMail(User $recipient, InviteReceivedMail $mailable): void
     {
         if (! Feature::active(MissingCreatorMailsEnabled::NAME)) {
+            return;
+        }
+
+        $this->queueMail($recipient, NotificationType::AssignmentInvited, $mailable);
+    }
+
+    /**
+     * AH-101 (A1) — the ONE preference checkpoint for every mail this listener
+     * sends. Every `Mail::to(...)` here funnels through this method, so the
+     * recipient's `email` preference for the notification type is read in
+     * exactly one place and the queue-time locale is applied in exactly one
+     * place. It sits AFTER any Pennant kill-switch (the flag still kills) and
+     * keys on the recipient user — agency inviters are covered mechanically.
+     *
+     * Absence means ON, so with no `email` row this is a plain queue.
+     */
+    private function queueMail(User $recipient, NotificationType $type, Mailable $mailable): void
+    {
+        if (! $this->notifications->isEmailEnabled($recipient, $type)) {
             return;
         }
 
@@ -337,15 +408,13 @@ final class SendAssignmentNotifications
         // missing/empty inviter never blocks the in-app fan-out below.
         $inviter = $assignment->invitedBy;
         if ($inviter instanceof User && $inviter->email !== '') {
-            Mail::to($inviter->email)
-                ->locale($inviter->preferred_language ?: 'en')
-                ->queue(new DraftSubmittedForReviewMail(
-                    recipientName: $inviter->name,
-                    creatorName: $creator->display_name ?? '',
-                    campaignName: $campaign->name,
-                    campaignUlid: $campaign->ulid,
-                    round: $round,
-                ));
+            $this->queueMail($inviter, NotificationType::AssignmentDraftSubmitted, new DraftSubmittedForReviewMail(
+                recipientName: $inviter->name,
+                creatorName: $creator->display_name ?? '',
+                campaignName: $campaign->name,
+                campaignUlid: $campaign->ulid,
+                round: $round,
+            ));
         }
 
         // S11.0 Chunk 2 (D-2 #3, D-5/D-6) — in-app FANS OUT to admins+managers
@@ -404,16 +473,14 @@ final class SendAssignmentNotifications
         $feedback = is_string($rawFeedback) && $rawFeedback !== '' ? $rawFeedback : null;
 
         if (! $suppressEmail) {
-            Mail::to($recipient->email)
-                ->locale($recipient->preferred_language ?: 'en')
-                ->queue(new DraftReviewedMail(
-                    creatorName: $creator->display_name ?? $recipient->name,
-                    campaignName: $campaign->name,
-                    outcome: $outcome,
-                    feedback: $feedback,
-                    assignmentUlid: $assignment->ulid,
-                    round: $round,
-                ));
+            $this->queueMail($recipient, $this->reviewNotificationType($outcome), new DraftReviewedMail(
+                creatorName: $creator->display_name ?? $recipient->name,
+                campaignName: $campaign->name,
+                outcome: $outcome,
+                feedback: $feedback,
+                assignmentUlid: $assignment->ulid,
+                round: $round,
+            ));
         }
 
         // S11.0 Chunk 1 (D-10) — the proof consumer. In-app emission rides
@@ -477,14 +544,12 @@ final class SendAssignmentNotifications
         // the fan-out so a missing inviter never blocks the in-app rows.
         $inviter = $assignment->invitedBy;
         if ($inviter instanceof User && $inviter->email !== '') {
-            Mail::to($inviter->email)
-                ->locale($inviter->preferred_language ?: 'en')
-                ->queue(new ContractAcceptedMail(
-                    recipientName: $inviter->name,
-                    creatorName: $creator->display_name ?? '',
-                    campaignName: $campaign->name,
-                    campaignUlid: $campaign->ulid,
-                ));
+            $this->queueMail($inviter, NotificationType::AssignmentContracted, new ContractAcceptedMail(
+                recipientName: $inviter->name,
+                creatorName: $creator->display_name ?? '',
+                campaignName: $campaign->name,
+                campaignUlid: $campaign->ulid,
+            ));
         }
 
         // S11.0 Chunk 2 (D-2 #4, D-5/D-6) — in-app fans out to admins+managers;

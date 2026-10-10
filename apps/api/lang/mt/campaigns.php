@@ -55,6 +55,14 @@ return [
                 'cta' => 'Ara l-kompitu',
             ],
         ],
+        'post_verified' => [
+            'email' => [
+                'subject' => 'Il-post tiegħek għal :campaign ġie vverifikat',
+                'greeting' => 'Bonġu, :name,',
+                'body' => 'Aħbar tajba — il-post tiegħek għal ":campaign" instab fil-link li bgħatt u ġie vverifikat. M\'hemm bżonn ta\' ebda azzjoni oħra.',
+                'cta' => 'Ara l-kompitu',
+            ],
+        ],
         'resubmit_requested' => [
             'email' => [
                 'subject' => 'Azzjoni meħtieġa għall-post tiegħek għal :campaign',
