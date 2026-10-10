@@ -81,3 +81,16 @@ docker-compose.override.yml
 
 # Husky
 .husky/_/
+
+# Push notifications (AH-102) — credentials that must never be committed.
+# The Firebase service-account key (downloaded from the console as
+# `<project>-firebase-adminsdk-*.json`) reaches the app only as the base64 env
+# var FCM_SERVICE_ACCOUNT_JSON_B64. The APNs auth key is a `.p8` file.
+# NOT ignored on purpose: google-services.json / GoogleService-Info.plist
+# (client config, committed per the AH-102 plan, Q14).
+*-firebase-adminsdk-*.json
+**/service-account*.json
+**/*serviceAccount*.json
+**/*service_account*.json
+AuthKey_*.p8
+*.p8
