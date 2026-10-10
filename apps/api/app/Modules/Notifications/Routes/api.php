@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Notifications\Http\Controllers\NotificationController;
 use App\Modules\Notifications\Http\Controllers\NotificationPreferenceController;
+use App\Modules\Notifications\Http\Controllers\PushTokenController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,4 +49,18 @@ Route::prefix('me/notification-preferences')
     ->group(function (): void {
         Route::get('', [NotificationPreferenceController::class, 'index'])->name('index');
         Route::patch('', [NotificationPreferenceController::class, 'update'])->name('update');
+    });
+
+// Device push tokens (AH-102). The ONLY bearer-only creator routes: `auth:creator_app`
+// ALONE — a push token binds to the personal access token it registered under, so
+// a cookie session has nothing to bind to and is refused (401). User-global like
+// the preferences: owner = the authenticated creator, never a request field. On the
+// cross-tenant allowlist in docs/security/tenancy.md §4. Registration is NOT gated
+// on the `push_notifications_enabled` flag (the flag gates sending only).
+Route::prefix('me/push-tokens')
+    ->middleware(['auth:creator_app', 'tenancy.set', 'throttle:30,1'])
+    ->name('me.push-tokens.')
+    ->group(function (): void {
+        Route::post('', [PushTokenController::class, 'store'])->name('store');
+        Route::delete('', [PushTokenController::class, 'destroy'])->name('destroy');
     });

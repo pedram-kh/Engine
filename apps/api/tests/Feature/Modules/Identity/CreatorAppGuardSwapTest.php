@@ -205,6 +205,25 @@ it('sanctum.guard is untouched — still [web, web_admin] (we foreclosed the haz
     expect(config('sanctum.guard'))->toBe(['web', 'web_admin']);
 });
 
+it('the bearer-only (bare auth:creator_app) routes are a closed allowlist, disjoint from the swapped set (AH-102)', function (): void {
+    $allowlist = ['DELETE api/v1/me/push-tokens', 'POST api/v1/me/push-tokens'];
+
+    $bare = [];
+    foreach (caRoutes() as $row) {
+        if (in_array('auth:creator_app', $row['middleware'], true)) {
+            $bare[] = $row['key'];
+
+            // Disjoint: a bare-bearer route is never ALSO on the session-or-bearer guard.
+            expect($row['middleware'])->not->toContain('auth:web,creator_app')
+                ->and($row['middleware'])->not->toContain('auth:web');
+        }
+    }
+
+    sort($bare);
+
+    expect($bare)->toBe($allowlist, 'a new bearer-only creator route must be added to this allowlist deliberately');
+});
+
 // =============================================================================
 // The hazard, pinned — behavioural, both polarities
 // =============================================================================
