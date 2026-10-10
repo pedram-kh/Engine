@@ -1,0 +1,118 @@
+/*
+ * AH-101 U2 — the sign-in landing as the creator app's bottom sheet (Figma
+ * frame 02, node 205:445): a language pill top-right, the brand mark, and a
+ * full-bleed sheet pinned to the bottom edge with 24px top corners and the
+ * aurora hairline across its top.
+ *
+ * Bound ONLY through `.auth-layout--native`, a class the layout renders when it
+ * is the hero arrangement inside the Capacitor app, so nothing here can reach
+ * the web landing or the app's other auth pages. The sheet's contents belong to
+ * the page: `pages/signInNative.css`. The aurora glow band and the grid-free
+ * dark canvas are the layout's own and unchanged. Colours, radii and type are
+ * `--native-*` tokens (or the shared aurora token) only.
+ */
+
+/* The logo lockup gives way to the mark above the sheet; the heading stays for
+   assistive tech. */
+.auth-layout--native .auth-layout__brand {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.auth-layout--native .auth-layout__header {
+  /* `justify-space-between` is a Vuetify utility (!important). */
+  justify-content: flex-end !important;
+}
+
+/* The language control is a pill: surface fill, default border, globe, the
+   current language (Caption/Strong). Its floating label is kept for assistive
+   tech and drawn off-screen. */
+.auth-layout--native .auth-layout__locale {
+  width: auto;
+  max-width: none;
+  --v-input-control-height: 34px;
+  --v-field-padding-top: 0px;
+  --v-field-padding-bottom: 0px;
+}
+
+/* The radius is set on the field itself: Vuetify 3.12 hard-codes 4px on
+   `.v-field` (its outline inherits it), and `--v-field-border-radius` — which
+   `native.css` sets to 8px — does not reach it. */
+.auth-layout--native .auth-layout__locale :deep(.v-field) {
+  border-radius: var(--native-radius-full);
+  background: var(--native-bg-surface);
+}
+
+.auth-layout--native
+  .auth-layout__locale
+  :deep(.v-field--variant-outlined:not(.v-field--focused) .v-field__outline) {
+  color: var(--native-border-default);
+}
+
+.auth-layout--native .auth-layout__locale :deep(.v-field-label) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.auth-layout--native .auth-layout__locale :deep(.v-select__selection-text) {
+  font: var(--native-type-caption-strong);
+  color: var(--native-text-primary);
+}
+
+.auth-layout--native .auth-layout__locale :deep(.v-field__prepend-inner > .v-icon),
+.auth-layout--native .auth-layout__locale :deep(.v-field__append-inner > .v-icon) {
+  font-size: 14px;
+  opacity: 1;
+  color: var(--native-text-secondary);
+}
+
+/* The aurora glow: the landing's own band hangs from the top edge; on the
+   sheet screen the frames keep the top near-black and light the area behind the
+   mark, fading both ways. Only the band's placement and strength change here;
+   its gradient is still the layout's. */
+.auth-layout--native::before {
+  top: 120px;
+  height: 400px;
+  opacity: 0.2;
+  mask-image: linear-gradient(to bottom, transparent, black 55%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 55%, transparent);
+}
+
+/* The sheet: the content wrapper cancels the layout's gutter on three sides so
+   the sheet runs edge to edge, and `margin-top: auto` pins it to the bottom
+   edge. The top padding is the room the mark needs above it, so a short screen
+   scrolls rather than laying the mark over the language pill. */
+.auth-layout--native .auth-layout__content {
+  display: block;
+  margin: auto -24px calc(-24px - var(--native-safe-bottom));
+  padding-top: 180px;
+}
+
+.auth-layout--native .auth-layout__card {
+  position: relative;
+  width: auto;
+  max-width: none;
+  overflow: visible;
+  padding: 28px 24px calc(36px + var(--native-safe-bottom)) !important;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-sheet) var(--native-radius-sheet) 0 0;
+  box-shadow: var(--native-shadow-overlay);
+}
+
+/* The brand hairline: the card's existing aurora accent, narrowed to a 2px line
+   across the sheet's top edge, inset 24px. */
+.auth-layout--native .auth-layout__card::before {
+  top: -1px;
+  right: 24px;
+  left: 24px;
+  height: 2px;
+  border-radius: 1px;
+}

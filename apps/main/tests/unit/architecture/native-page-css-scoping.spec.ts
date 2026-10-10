@@ -23,6 +23,9 @@ const SHEETS: { file: string; root: string }[] = [
   { file: 'modules/creators/layouts/creatorProfileFormNative.css', root: '.creator-main--native' },
   // AH-100c — the approved dashboard (frame 07).
   { file: 'modules/creators/layouts/creatorDashboardNative.css', root: '.creator-main--native' },
+  // AH-101 U2 — the sign-in sheet: the layout's frame and the page's contents.
+  { file: 'modules/auth/layouts/authNative.css', root: '.auth-layout--native' },
+  { file: 'modules/auth/pages/signInNative.css', root: '.sign-in-native' },
 ]
 
 function selectors(css: string): string[] {
@@ -44,7 +47,11 @@ describe.each(SHEETS)('$file', ({ file, root }) => {
   })
 
   it(`roots every selector at ${root}`, () => {
-    const stray = selectors(css).filter((selector) => !selector.startsWith(`${root} `))
+    // `${root}::before` / `::after` style the root's own pseudo-elements (AH-101: the
+    // sign-in landing's glow band) — still rooted at the class, so still inert on web.
+    const stray = selectors(css).filter(
+      (selector) => !selector.startsWith(`${root} `) && !selector.startsWith(`${root}::`),
+    )
     expect(stray).toEqual([])
   })
 

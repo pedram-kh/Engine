@@ -73,9 +73,18 @@ const LAYOUT_PATH = path.resolve(__dirname, '../../../src/modules/auth/layouts/A
  * setup>` logic was added; `isHero` is still the only computed, so the
  * no-function / no-multi-statement-arrow guards below still hold.
  *
+ * AH-101 U2 (the creator app's sign-in sheet, Figma frame 02) raised the
+ * ceiling 240 -> 250. The layout gained one import, one single-expression
+ * computed (`isNativeSheet`, delegating to `nativeSheet.ts`), a class
+ * modifier, the globe icon on the language pill, one `v-if` clause and the
+ * `<style scoped src>` line that binds `authNative.css`. The sheet's CSS lives
+ * in that sibling file (rooted at `.auth-layout--native`, pinned by
+ * native-page-css-scoping.spec.ts), not here. No function or multi-statement
+ * arrow was added, so the guards below still hold.
+ *
  * Future raises require a new chunk-scoped code-review note here.
  */
-const MAX_LINES = 240
+const MAX_LINES = 250
 
 describe('AuthLayout.vue stays a pure structural shell', () => {
   it('is at most MAX_LINES lines (size guard)', async () => {

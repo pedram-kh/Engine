@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
 import AuthLayout from './AuthLayout.vue'
 import { showsMarketingTail } from './marketingTail'
+import { usesNativeSheet } from './nativeSheet'
 
 const platform = vi.hoisted(() => ({ native: true }))
 
@@ -50,17 +51,27 @@ describe('AuthLayout — the creator app sign-in (native)', () => {
     teardown = null
   })
 
-  it('renders the hero heading, the card and the brand mark', async () => {
+  // AH-101 U2 — Figma frame 02: the landing is a bottom sheet under the brand
+  // mark. The hero headline belongs to the web landing and is not drawn.
+  it('arranges the landing as the sheet: native modifier, the card, and no hero headline', async () => {
     const h = await mountSignInLanding()
     teardown = h.unmount
 
-    expect(h.wrapper.find('.auth-layout').classes()).toContain('auth-layout--hero')
-    expect(h.wrapper.find('[data-test="auth-hero"]').exists()).toBe(true)
-    expect(h.wrapper.find('.auth-hero__headline').text()).toBe(
-      "Create UGC ads for the world's best brands.",
-    )
+    const layout = h.wrapper.find('.auth-layout')
+    expect(layout.classes()).toContain('auth-layout--hero')
+    expect(layout.classes()).toContain('auth-layout--native')
+    expect(h.wrapper.find('[data-test="auth-hero"]').exists()).toBe(false)
+    expect(h.wrapper.text()).not.toContain("Create UGC ads for the world's best brands.")
     expect(h.wrapper.find('[data-test="auth-card"] [data-test="slot-child"]').exists()).toBe(true)
+  })
+
+  it('keeps the brand heading and the language control (the pill) for assistive tech and use', async () => {
+    const h = await mountSignInLanding()
+    teardown = h.unmount
+
     expect(h.wrapper.find('[data-test="auth-brand"]').exists()).toBe(true)
+    expect(h.wrapper.find('[data-test="auth-locale-switcher"]').exists()).toBe(true)
+    expect(h.wrapper.find('[data-test="auth-locale-switcher"] .mdi-web').exists()).toBe(true)
   })
 
   it.each(TAIL)('does not render %s', async (selector) => {
@@ -78,7 +89,7 @@ describe('AuthLayout — the creator app sign-in (native)', () => {
     expect(h.wrapper.find('[data-test="auth-footer-privacy"]').exists()).toBe(false)
   })
 
-  it('the hero is the headline alone: no sign-up pitch body, no "case studies below" footnote', async () => {
+  it('the sheet carries no hero copy at all: no body, no "case studies below" footnote', async () => {
     const h = await mountSignInLanding()
     teardown = h.unmount
 
@@ -98,6 +109,7 @@ describe('AuthLayout — the creator app sign-in (native)', () => {
     teardown = h.unmount
 
     expect(h.wrapper.find('[data-test="auth-hero"]').exists()).toBe(false)
+    expect(h.wrapper.find('.auth-layout').classes()).not.toContain('auth-layout--native')
     expect(h.wrapper.find('[data-test="slot-child"]').exists()).toBe(true)
   })
 })
@@ -119,6 +131,17 @@ describe('AuthLayout — the web sign-in keeps the full landing (polarity)', () 
     teardown = h.unmount
 
     expect(h.wrapper.find(selector).exists()).toBe(true)
+  })
+
+  it('has no sheet modifier, keeps the hero headline, and no globe on the language control', async () => {
+    const h = await mountSignInLanding()
+    teardown = h.unmount
+
+    expect(h.wrapper.find('.auth-layout').classes()).not.toContain('auth-layout--native')
+    expect(h.wrapper.find('.auth-hero__headline').text()).toBe(
+      "Create UGC ads for the world's best brands.",
+    )
+    expect(h.wrapper.find('[data-test="auth-locale-switcher"] .mdi-web').exists()).toBe(false)
   })
 
   it('renders the hero body and the case-studies footnote', async () => {
@@ -152,6 +175,24 @@ describe('AuthLayout — the web sign-in keeps the full landing (polarity)', () 
     teardown = h.unmount
 
     expect(h.wrapper.find('[data-test="auth-marketing-footer"]').exists()).toBe(true)
+  })
+})
+
+describe('usesNativeSheet', () => {
+  it.each([
+    [true, true, true],
+    [true, false, false],
+    [false, true, false],
+    [false, false, false],
+  ])('hero=%s native=%s → %s', (isHero, isNative, expected) => {
+    expect(usesNativeSheet(isHero, isNative)).toBe(expected)
+  })
+
+  it('defaults the platform to the live probe', () => {
+    platform.native = true
+    expect(usesNativeSheet(true)).toBe(true)
+    platform.native = false
+    expect(usesNativeSheet(true)).toBe(false)
   })
 })
 

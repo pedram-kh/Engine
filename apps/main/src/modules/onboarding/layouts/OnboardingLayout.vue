@@ -264,7 +264,13 @@ async function saveAndExit(): Promise<void> {
         >
           {{ t('creator.ui.wizard.actions.save_and_exit') }}
         </v-btn>
+        <!-- AH-101 (U5): in the app the menu held ONE thing, the locale switcher,
+             behind a hamburger that every walk read as dead chrome. Native drops
+             the menu and its drawer; locale switching is still available at
+             sign-in's language control (a Settings locale row is the follow-up).
+             The web branches are unchanged. -->
         <v-app-bar-nav-icon
+          v-if="!isNative"
           :aria-label="t('app.nav.menu')"
           data-test="onboarding-menu-btn"
           @click="menuDrawerOpen = !menuDrawerOpen"
@@ -272,9 +278,10 @@ async function saveAndExit(): Promise<void> {
       </template>
     </v-app-bar>
 
-    <!-- Mobile menu drawer (smAndDown only): the app-bar's overflow. -->
+    <!-- Mobile menu drawer (web smAndDown only): the app-bar's overflow. Not
+         rendered in the app (AH-101 U5). -->
     <v-navigation-drawer
-      v-if="isMobile"
+      v-if="isMobile && !isNative"
       v-model="menuDrawerOpen"
       location="right"
       temporary

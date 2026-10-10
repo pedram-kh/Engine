@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { createVuetify } from 'vuetify'
+import { VMenu } from 'vuetify/components'
 import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
 
@@ -37,14 +38,20 @@ function mountBell() {
   const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: [{ path: '/notifications', name: 'notifications', component: { template: '<div />' } }],
+    routes: [
+      { path: '/', name: 'home', component: { template: '<div />' } },
+      { path: '/notifications', name: 'notifications', component: { template: '<div />' } },
+      { path: '/elsewhere', name: 'elsewhere', component: { template: '<div />' } },
+    ],
   })
 
-  return mount(NotificationBell, {
+  const wrapper = mount(NotificationBell, {
     props: { viewAllRoute: 'notifications' },
     global: { plugins: [i18n, vuetify, router] },
     attachTo: document.createElement('div'),
   })
+
+  return Object.assign(wrapper, { router })
 }
 
 beforeEach(() => {
@@ -109,5 +116,77 @@ describe('NotificationBell — the first v-badge', () => {
     wrapper.unmount()
     await vi.advanceTimersByTimeAsync(45000 * 3)
     expect(vi.mocked(notificationsApi.unreadCount).mock.calls.length).toBe(before)
+  })
+})
+
+describe('NotificationBell — closes on navigation (AH-101 U1)', () => {
+  // vue-router's navigation never settles under the file-level fake timers, so this
+  // block runs on real ones (the 45 s poll never fires inside a spec this short).
+  beforeEach(() => {
+    vi.useRealTimers()
+  })
+
+  async function openMenu(wrapper: ReturnType<typeof mountBell>): Promise<void> {
+    await wrapper.find('[data-test="notification-bell-btn"]').trigger('click')
+    await flushPromises()
+  }
+
+  it('opens on a bell tap (non-vacuity: the close assertions below start from open)', async () => {
+    vi.mocked(notificationsApi.unreadCount).mockResolvedValue(countEnvelope(0) as never)
+    vi.mocked(notificationsApi.list).mockResolvedValue({ data: [], meta: {}, links: {} } as never)
+    const wrapper = mountBell()
+    await flushPromises()
+
+    expect(wrapper.findComponent(VMenu).props('modelValue')).toBe(false)
+    await openMenu(wrapper)
+    expect(wrapper.findComponent(VMenu).props('modelValue')).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('closes when the route changes while open — the "View all" case', async () => {
+    vi.mocked(notificationsApi.unreadCount).mockResolvedValue(countEnvelope(0) as never)
+    vi.mocked(notificationsApi.list).mockResolvedValue({ data: [], meta: {}, links: {} } as never)
+    const wrapper = mountBell()
+    await wrapper.router.push('/')
+    await flushPromises()
+    await openMenu(wrapper)
+    expect(wrapper.findComponent(VMenu).props('modelValue')).toBe(true)
+
+    await wrapper.router.push('/notifications')
+    await flushPromises()
+
+    expect(wrapper.findComponent(VMenu).props('modelValue')).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('closes for ANY navigation, not just the view-all route', async () => {
+    vi.mocked(notificationsApi.unreadCount).mockResolvedValue(countEnvelope(0) as never)
+    vi.mocked(notificationsApi.list).mockResolvedValue({ data: [], meta: {}, links: {} } as never)
+    const wrapper = mountBell()
+    await wrapper.router.push('/')
+    await flushPromises()
+    await openMenu(wrapper)
+
+    await wrapper.router.push('/elsewhere')
+    await flushPromises()
+
+    expect(wrapper.findComponent(VMenu).props('modelValue')).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('stays open when the route does not change (a row tap that does not navigate)', async () => {
+    vi.mocked(notificationsApi.unreadCount).mockResolvedValue(countEnvelope(0) as never)
+    vi.mocked(notificationsApi.list).mockResolvedValue({ data: [], meta: {}, links: {} } as never)
+    const wrapper = mountBell()
+    await wrapper.router.push('/')
+    await flushPromises()
+    await openMenu(wrapper)
+
+    // Re-pushing the same location is a no-op navigation: nothing to close on.
+    await wrapper.router.push('/')
+    await flushPromises()
+
+    expect(wrapper.findComponent(VMenu).props('modelValue')).toBe(true)
+    wrapper.unmount()
   })
 })

@@ -28,6 +28,8 @@ import { useI18n } from 'vue-i18n'
 import type { RouteLocationRaw } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
+
 import type { RelationshipChatTransport } from '../api/relationshipMessaging.api'
 import { useMessageThread } from '../composables/useMessageThread'
 
@@ -161,6 +163,13 @@ const uploading = ref(false)
 
 // The "+" attach menu (file / link) below the composer, and the link dialog.
 const attachOpen = ref(false)
+
+// AH-101 (U4) — in the native app the "+" menu is replaced by the paperclip and
+// the link control side by side in the composer row: the same two capabilities,
+// one tap each instead of two. (The "+" menu exists so a thumb-sized composer is
+// not crowded; on a 390pt screen two 40pt icons fit, and the assignment page
+// already renders this exact pair.) The web keeps the "+" menu unchanged.
+const isNative = isNativePlatform()
 const linkDialogOpen = ref(false)
 const generalError = ref<string | null>(null)
 const fieldErrors = ref<Partial<Record<ComposeField, readonly string[]>>>({})
@@ -500,7 +509,28 @@ async function submit(): Promise<void> {
       </p>
 
       <div class="rel-thread__compose-row">
+        <template v-if="isNative">
+          <v-btn
+            icon="mdi-paperclip"
+            variant="text"
+            density="comfortable"
+            class="rel-thread__attach-btn"
+            :aria-label="t('app.messaging.attachment')"
+            data-test="relationship-attach-file"
+            @click="openFilePicker"
+          />
+          <v-btn
+            icon="mdi-link-variant"
+            variant="text"
+            density="comfortable"
+            class="rel-thread__attach-btn"
+            :aria-label="t('app.messaging.relationship.addLink')"
+            data-test="relationship-attach-link"
+            @click="openLinkDialog"
+          />
+        </template>
         <v-btn
+          v-else
           icon="mdi-plus"
           variant="text"
           density="comfortable"
@@ -541,7 +571,11 @@ async function submit(): Promise<void> {
         </v-textarea>
       </div>
 
-      <div v-if="attachOpen" class="rel-thread__attach-menu" data-test="relationship-attach-menu">
+      <div
+        v-if="!isNative && attachOpen"
+        class="rel-thread__attach-menu"
+        data-test="relationship-attach-menu"
+      >
         <v-btn
           icon="mdi-paperclip"
           variant="tonal"
@@ -625,6 +659,27 @@ async function submit(): Promise<void> {
     height: calc(100dvh - 140px);
     min-height: 0;
   }
+}
+
+/* AH-101 (U3) — inside the native app the chrome is taller than the web's, so
+   the web-mobile constant above (140px = a 56px bar + a 56px bottom nav + padding)
+   made the thread ~90pt too tall: the composer rendered, but under the fixed tab
+   bar, and the conversation read as having no reply field.
+
+   Native instead subtracts what <v-main> itself reserves — the SAME quantities
+   `.creator-main--native` pads by (CreatorDashboardLayout) — so the thread tracks
+   any future change to the bar or the safe-area insets instead of gaining another
+   magic number. 24px is the page's own vertical content padding. Scoped to
+   `.catalyst-native`, which the shell sets on <html> only inside the Capacitor
+   app: the web rules above are untouched. Declared AFTER the media block so it
+   wins at equal specificity. The `min-height` floor is released for the same
+   reason the mobile rule releases it. */
+:global(.catalyst-native .rel-thread) {
+  height: calc(
+    100dvh - var(--v-layout-top, 0px) - var(--native-safe-top, 0px) - var(--v-layout-bottom, 0px) -
+      var(--native-safe-bottom, 0px) - 24px
+  );
+  min-height: 0;
 }
 
 .rel-thread__header {

@@ -25,6 +25,7 @@ import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import { buildLocaleOptions } from './localeOptions'
 import { showsMarketingTail } from './marketingTail'
+import { usesNativeSheet } from './nativeSheet'
 
 const { t, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
@@ -36,6 +37,8 @@ const localeOptions = buildLocaleOptions()
 // never a stripped-down layout.
 const isHero = computed(() => route.name === 'auth.sign-in' || route.name === 'auth.agency-sign-in')
 const showTail = computed(() => showsMarketingTail(isHero.value))
+// AH-101 U2: the creator app's sign-in is a bottom sheet, not the hero + card.
+const isNativeSheet = computed(() => usesNativeSheet(isHero.value))
 </script>
 
 <template>
@@ -43,7 +46,10 @@ const showTail = computed(() => showsMarketingTail(isHero.value))
     <ImpersonationBanner />
 
     <v-main>
-      <div class="auth-layout" :class="{ 'auth-layout--hero': isHero }">
+      <div
+        class="auth-layout"
+        :class="{ 'auth-layout--hero': isHero, 'auth-layout--native': isNativeSheet }"
+      >
         <header class="auth-layout__header d-flex align-center justify-space-between mb-6 w-100">
           <h1 class="auth-layout__brand ma-0" data-test="auth-brand">
             <img :src="catalystLogo" alt="" class="auth-layout__logo" />
@@ -59,6 +65,7 @@ const showTail = computed(() => showsMarketingTail(isHero.value))
               density="compact"
               variant="outlined"
               hide-details
+              :prepend-inner-icon="isNativeSheet ? 'mdi-web' : undefined"
               class="auth-layout__locale"
               data-test="auth-locale-switcher"
               @update:model-value="selectLocale"
@@ -67,7 +74,7 @@ const showTail = computed(() => showsMarketingTail(isHero.value))
         </header>
 
         <div class="auth-layout__content">
-          <AuthHeroPanel v-if="isHero" />
+          <AuthHeroPanel v-if="isHero && !isNativeSheet" />
           <v-card class="auth-layout__card pa-6 w-100" elevation="2" data-test="auth-card">
             <slot />
           </v-card>
@@ -237,3 +244,4 @@ const showTail = computed(() => showsMarketingTail(isHero.value))
   padding: calc(24px + var(--native-safe-top)) 24px calc(24px + var(--native-safe-bottom));
 }
 </style>
+<style scoped src="./authNative.css"></style>

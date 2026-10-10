@@ -20,8 +20,22 @@
  *   icon-foreground.png  1024², transparent, mark = 60% of the 72dp launcher
  *                        window (same as iOS), inside the 66dp safe zone
  *   icon-background.png  1024², solid canvas
- *   splash.png           2732², canvas + centred mark
+ *   splash.png           2732², iOS: the Figma splash frame (AH-101 U2, below)
  *   splash-dark.png      identical — the app is dark-only (AH-100 Q6)
+ *   android-splash/      2732², Android: canvas + centred mark (the AH-100b
+ *                        splash, unchanged — AH-101 Q8: Android stays
+ *                        icon-on-colour; a boot screen is a named follow-up)
+ *
+ * AH-101 U2 — the iOS splash is Figma frame 01 (node 201:445 of file
+ * 1Dd0NdZ55EXh58uNyvf9Bi): the aurora glow and the ghosted 225px mark on the
+ * canvas. Unlike the icons it cannot be drawn from the logo, so the frame's
+ * export is committed as `assets/source/splash-frame.png` (390×844 at 4×) and
+ * this script only places it. LaunchScreen.storyboard fills the screen with the
+ * square image (scaleAspectFill), so on a phone only the central strip the
+ * width of the screen shows: the frame is scaled to the full 2732 height and
+ * centred, which is exactly that strip on a 19.5:9 phone, with the canvas
+ * colour either side of it (all four corners stay the canvas, pinned by the
+ * asset spec). Regenerate the frame from Figma, not from this repo.
  */
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
@@ -34,6 +48,10 @@ const here = path.dirname(fileURLToPath(import.meta.url))
 export const APP_ROOT = path.resolve(here, '..')
 export const LOGO_SVG = path.join(APP_ROOT, 'src/modules/auth/assets/catalyst-logo.svg')
 export const OUT_DIR = path.join(APP_ROOT, 'assets')
+/** The Figma splash frame, exported at 4× (AH-101 U2). Committed, not derived. */
+export const SPLASH_FRAME = path.join(OUT_DIR, 'source/splash-frame.png')
+/** Where the Android-only splash pair lives (a second `capacitor-assets` pass reads it). */
+export const ANDROID_SPLASH_DIR = 'android-splash'
 
 /** `bg/canvas` — pinned equal to `nativePalette['bg-canvas']` by the asset spec. */
 export const CANVAS = '#0b0b0c'
@@ -127,9 +145,34 @@ export function adaptiveMarkPx() {
   return Math.round(ICON_SIZE * IOS_MARK_SHARE * ADAPTIVE_WINDOW_SHARE)
 }
 
+/**
+ * The iOS splash: the Figma frame scaled to the full canvas height and centred
+ * on an opaque square canvas. Written WITHOUT an alpha channel.
+ */
+export async function iosSplash(frame = SPLASH_FRAME) {
+  const scaled = await sharp(await readFile(frame))
+    .resize({ height: SPLASH_SIZE })
+    .flatten({ background: { r: 11, g: 11, b: 12 } })
+    .png()
+    .toBuffer()
+  const { width } = await sharp(scaled).metadata()
+  return sharp({
+    create: {
+      width: SPLASH_SIZE,
+      height: SPLASH_SIZE,
+      channels: 3,
+      background: { r: 11, g: 11, b: 12 },
+    },
+  })
+    .composite([{ input: scaled, left: Math.round((SPLASH_SIZE - width) / 2), top: 0 }])
+    .removeAlpha()
+    .png()
+    .toBuffer()
+}
+
 export async function buildSources(outDir = OUT_DIR) {
   const svg = await readFile(LOGO_SVG, 'utf8')
-  await mkdir(outDir, { recursive: true })
+  await mkdir(path.join(outDir, ANDROID_SPLASH_DIR), { recursive: true })
 
   const iosPx = Math.round(ICON_SIZE * IOS_MARK_SHARE)
   const adaptivePx = adaptiveMarkPx()
@@ -149,9 +192,16 @@ export async function buildSources(outDir = OUT_DIR) {
     })
       .png()
       .toBuffer(),
-    'splash.png': await onCanvas(SPLASH_SIZE, splashPx, await renderMark(svg, splashPx), opaque),
+    'splash.png': await iosSplash(),
+    [`${ANDROID_SPLASH_DIR}/splash.png`]: await onCanvas(
+      SPLASH_SIZE,
+      splashPx,
+      await renderMark(svg, splashPx),
+      opaque,
+    ),
   }
   files['splash-dark.png'] = files['splash.png']
+  files[`${ANDROID_SPLASH_DIR}/splash-dark.png`] = files[`${ANDROID_SPLASH_DIR}/splash.png`]
 
   for (const [name, buffer] of Object.entries(files)) {
     await writeFile(path.join(outDir, name), buffer)

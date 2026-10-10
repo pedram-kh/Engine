@@ -1,6 +1,8 @@
 export const APP_ROOT: string
 export const LOGO_SVG: string
 export const OUT_DIR: string
+export const SPLASH_FRAME: string
+export const ANDROID_SPLASH_DIR: string
 export const CANVAS: string
 export const MARK_CROP: { x: number; y: number; size: number }
 export const ICON_SIZE: number
@@ -13,6 +15,7 @@ export function markSvg(svg: string, px: number): string
 export function renderMark(svg: string, px: number): Promise<Buffer>
 export function maxRadiusShare(png: Buffer, alphaThreshold?: number): Promise<number>
 export function adaptiveMarkPx(): number
+export function iosSplash(frame?: string): Promise<Buffer>
 export function buildSources(outDir?: string): Promise<{
   iosPx: number
   adaptivePx: number

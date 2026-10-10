@@ -29,12 +29,15 @@ import {
 } from '../../../scripts/app-icon-android-fixup.mjs'
 import {
   ADAPTIVE_SAFE_ZONE,
+  ANDROID_SPLASH_DIR,
   APP_ROOT,
   buildSources,
   CANVAS,
   ICON_SIZE,
+  iosSplash,
   maxRadiusShare,
   OUT_DIR,
+  SPLASH_FRAME,
   SPLASH_SIZE,
 } from '../../../scripts/app-icon-sources.mjs'
 
@@ -76,7 +79,7 @@ describe('committed sources', () => {
     await mkdir(path.dirname(buildDir), { recursive: true })
     rebuilt = await mkdtemp(`${buildDir}-`)
     const { files } = await buildSources(rebuilt)
-    expect(files).toHaveLength(5)
+    expect(files).toHaveLength(7)
     for (const name of files as string[]) {
       const committed = await raw(path.join(OUT_DIR, name))
       const fresh = await raw(path.join(rebuilt, name))
@@ -90,10 +93,50 @@ describe('committed sources', () => {
       const meta = await sharp(path.join(OUT_DIR, `${name}.png`)).metadata()
       expect([name, meta.width, meta.height]).toEqual([name, ICON_SIZE, ICON_SIZE])
     }
-    for (const name of ['splash', 'splash-dark']) {
+    for (const name of [
+      'splash',
+      'splash-dark',
+      `${ANDROID_SPLASH_DIR}/splash`,
+      `${ANDROID_SPLASH_DIR}/splash-dark`,
+    ]) {
       const meta = await sharp(path.join(OUT_DIR, `${name}.png`)).metadata()
       expect([name, meta.width, meta.height]).toEqual([name, SPLASH_SIZE, SPLASH_SIZE])
     }
+  })
+
+  // AH-101 U2 — the iOS splash is Figma frame 01 placed on the canvas, and
+  // Android's stays the icon-on-colour splash (Q8).
+  it('places the Figma splash frame at full height, centred, with no alpha (iOS)', async () => {
+    const meta = await sharp(path.join(OUT_DIR, 'splash.png')).metadata()
+    expect(meta.hasAlpha).toBe(false)
+    const frame = await sharp(SPLASH_FRAME).metadata()
+    // 390×844 at 4× — the frame the committed source must be.
+    expect([frame.width, frame.height]).toEqual([1560, 3376])
+    const placed = Math.round((SPLASH_SIZE * 1560) / 3376)
+    const left = Math.round((SPLASH_SIZE - placed) / 2)
+    const centre = await pixel(path.join(OUT_DIR, 'splash.png'), SPLASH_SIZE / 2, SPLASH_SIZE / 2)
+    // The ghosted mark's centre glow is lit — it is not the flat canvas.
+    expect(centre).not.toEqual(CANVAS_RGB)
+    // The strip's left and right edges sit symmetrically either side of the centre.
+    expect(left + placed + left).toBeLessThanOrEqual(SPLASH_SIZE + 1)
+    // And outside the strip is the flat canvas.
+    expect(await pixel(path.join(OUT_DIR, 'splash.png'), left - 2, SPLASH_SIZE - 1)).toEqual(
+      CANVAS_RGB,
+    )
+  })
+
+  it('is deterministic: the placement function reproduces the committed iOS splash', async () => {
+    const fresh = await raw(await iosSplash())
+    const committed = await raw(path.join(OUT_DIR, 'splash.png'))
+    expect(committed.data.equals(fresh.data)).toBe(true)
+  }, 60_000)
+
+  it('keeps the Android splash as the mark on the canvas — a lit mark, flat canvas around it', async () => {
+    const file = path.join(OUT_DIR, ANDROID_SPLASH_DIR, 'splash.png')
+    expect(await pixel(file, 40, SPLASH_SIZE / 2)).toEqual(CANVAS_RGB)
+    expect(await pixel(file, SPLASH_SIZE / 2, SPLASH_SIZE / 2)).not.toEqual(CANVAS_RGB)
+    // The mark is the AH-100b size (18% of the canvas, ±246px), not the Figma ghost mark.
+    expect(await pixel(file, SPLASH_SIZE / 2 + 300, SPLASH_SIZE / 2)).toEqual(CANVAS_RGB)
   })
 
   it('has no alpha channel on the iOS icon (the App Store rejects one)', async () => {
@@ -114,7 +157,14 @@ describe('committed sources', () => {
   })
 
   it('paints the canvas colour at every corner of the opaque sources', async () => {
-    for (const name of ['icon-only', 'icon-background', 'splash', 'splash-dark']) {
+    for (const name of [
+      'icon-only',
+      'icon-background',
+      'splash',
+      'splash-dark',
+      `${ANDROID_SPLASH_DIR}/splash`,
+      `${ANDROID_SPLASH_DIR}/splash-dark`,
+    ]) {
       const file = path.join(OUT_DIR, `${name}.png`)
       const { width, height } = await raw(file)
       const corners: [number, number][] = [

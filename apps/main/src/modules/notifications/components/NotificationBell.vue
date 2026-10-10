@@ -18,6 +18,7 @@
 
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 import { useNotificationPoll } from '../composables/useNotificationPoll'
 import NotificationCenter from './NotificationCenter.vue'
@@ -33,7 +34,22 @@ const poll = useNotificationPoll()
 void poll.start()
 
 const menuOpen = ref(false)
+const route = useRoute()
 const centerRef = ref<InstanceType<typeof NotificationCenter> | null>(null)
+
+// AH-101 (U1) — close on navigation. The menu is `:close-on-content-click="false"`
+// (a tap on a notification row must not dismiss it before the row's own handler
+// runs), so a route change made from INSIDE the card — "View all", or a row that
+// deep-links — left the dropdown open on top of the page it had just navigated
+// to. Watching the route closes it for every navigation, whatever caused it,
+// instead of patching each item that can navigate. Not native-gated: the same
+// defect existed on the web, it is simply easier to hit with a thumb.
+watch(
+  () => route.fullPath,
+  () => {
+    menuOpen.value = false
+  },
+)
 
 // Refetch the recent slice each time the dropdown opens (a reconcile point
 // alongside the steady poll).

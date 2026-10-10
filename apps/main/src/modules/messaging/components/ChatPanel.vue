@@ -9,6 +9,8 @@ import { computed, nextTick, ref, toRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
+
 import type { ChatTransport } from '../api/messaging.api'
 import { useMessageThread } from '../composables/useMessageThread'
 
@@ -101,6 +103,11 @@ const fieldErrors = ref<Partial<Record<ComposeField, readonly string[]>>>({})
 
 const fileInput = ref<HTMLInputElement | null>(null)
 const attachOpen = ref(false)
+
+// AH-101 (U4) — in the native app the "+" would open a menu with ONE item (the
+// paperclip), which is a tap spent revealing a tap. The native composer renders
+// the paperclip itself in the "+" slot. The web keeps the "+" menu unchanged.
+const isNative = isNativePlatform()
 
 function onComposerKeydown(event: KeyboardEvent): void {
   if (isMobile.value) {
@@ -322,6 +329,17 @@ async function submit(): Promise<void> {
 
       <div class="chat-panel__compose-row">
         <v-btn
+          v-if="isNative"
+          icon="mdi-paperclip"
+          variant="text"
+          density="comfortable"
+          class="chat-panel__attach-btn"
+          :aria-label="t('app.messaging.attachment')"
+          data-test="chat-attach-file"
+          @click="openFilePicker"
+        />
+        <v-btn
+          v-else
           icon="mdi-plus"
           variant="text"
           density="comfortable"
@@ -362,7 +380,11 @@ async function submit(): Promise<void> {
         </v-textarea>
       </div>
 
-      <div v-if="attachOpen" class="chat-panel__attach-menu" data-test="chat-attach-menu">
+      <div
+        v-if="!isNative && attachOpen"
+        class="chat-panel__attach-menu"
+        data-test="chat-attach-menu"
+      >
         <v-btn
           icon="mdi-paperclip"
           variant="tonal"

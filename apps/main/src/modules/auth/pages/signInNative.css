@@ -1,0 +1,138 @@
+/*
+ * AH-101 U2 — the sign-in sheet's contents in the creator app (Figma frame 02,
+ * node 205:445; the failed state is 205:515).
+ *
+ * Bound ONLY through `.sign-in-native`, a class the page renders when it runs
+ * inside the Capacitor app, so nothing here can reach the web page. The sheet
+ * itself (full-bleed, pinned to the bottom, 24px top corners, the aurora
+ * hairline) belongs to the layout: `layouts/authNative.css`. Colours, radii and
+ * type are `--native-*` tokens only. The fields keep 16px text (AH-100c).
+ */
+
+/* The brand mark sits above the sheet and rides its top edge: the frames pin
+   the sheet to the bottom and let the mark sit 29px above it (20px, and 84px
+   wide instead of 150, once the error banner has made the sheet taller). */
+.sign-in-native .sign-in-native__mark {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  margin-bottom: 29px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.sign-in-native .sign-in-native__mark--compact {
+  width: 84px;
+  height: 84px;
+  margin-bottom: 20px;
+}
+
+/* Heading/H1 and the one-sentence welcome. */
+.sign-in-native .sign-in-native__title {
+  margin: 0 0 4px;
+  font: var(--native-type-h1);
+  letter-spacing: 0;
+  color: var(--native-text-primary);
+}
+
+.sign-in-native .sign-in-native__subtitle {
+  margin: 0 0 20px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+}
+
+.sign-in-native form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Labels sit above their field (Caption/Strong, 8px gap), not inside it. */
+.sign-in-native .sign-in-native__label {
+  display: block;
+  margin-bottom: 8px;
+  font: var(--native-type-caption-strong);
+  color: var(--native-text-secondary);
+}
+
+.sign-in-native .sign-in-native__label-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.sign-in-native .sign-in-native__label-row .sign-in-native__label {
+  flex: 1 1 auto;
+  margin-bottom: 0;
+}
+
+.sign-in-native .sign-in-native__forgot {
+  flex: 0 0 auto;
+  font: var(--native-type-caption-strong);
+  color: var(--native-accent-primary);
+  text-decoration: none;
+}
+
+/* Each field group is followed by the 20px section gap. */
+.sign-in-native form > .v-input {
+  margin-bottom: 20px;
+}
+
+/* Figma's input radius is `radius/lg` (8px). Vuetify 3.12 hard-codes 4px on
+   `.v-field` and `native.css`'s `--v-field-border-radius` does not reach it, so
+   the sheet sets the radius on the field itself. (The same gap applies to the
+   app's other fields — a recorded finding, not changed here.) */
+.sign-in-native form :deep(.v-field) {
+  border-radius: var(--native-radius-lg);
+}
+
+.sign-in-native form :deep(.v-field__prepend-inner > .v-icon) {
+  font-size: 16px;
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+.sign-in-native form :deep(.v-field--focused:not(.v-field--error) .v-field__outline) {
+  color: var(--native-accent-primary);
+}
+
+/* The error banner (frame 02b) leads the form. The live region is always
+   rendered so a screen reader hears it appear, and is empty — zero height —
+   until there is something to say. */
+.sign-in-native .sign-in-native__error {
+  order: -1;
+}
+
+.sign-in-native .sign-in-native__error--on {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-primary);
+  background: var(--native-status-danger-subtle);
+  border: 1px solid var(--native-status-danger);
+  border-radius: var(--native-radius-lg);
+}
+
+.sign-in-native .sign-in-native__error--on .v-icon {
+  flex: 0 0 auto;
+  color: var(--native-status-danger);
+}
+
+/* Frame 02's "New to Catalyst?" divider and the account pointer. */
+.sign-in-native .sign-in-native__pointer {
+  margin: 20px 0 0;
+  padding-top: 20px;
+  text-align: center;
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+  border-top: 1px solid var(--native-border-default);
+}
+
+.sign-in-native .sign-in-native__site {
+  color: var(--native-accent-primary);
+}

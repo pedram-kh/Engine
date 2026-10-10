@@ -157,30 +157,52 @@ describe('OnboardingLayout — creator app chrome (AH-100)', () => {
     expect(filled.length).toBe(2)
   })
 
-  it('native: "Save and exit" is inline in the top bar, beside the menu', async () => {
+  it('native: "Save and exit" is inline in the top bar (the menu is gone, AH-101 U5)', async () => {
     wrapper = await mountLayout({ native: true })
 
     const topbar = wrapper.find('[data-test="onboarding-topbar"]')
     expect(topbar.classes()).toContain('onboarding-topbar--native')
     expect(topbar.find('[data-test="save-and-exit-btn"]').exists()).toBe(true)
-    expect(topbar.find('[data-test="onboarding-menu-btn"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="onboarding-main"]').classes()).toContain(
       'onboarding-main--native',
     )
   })
 
-  it('native: the open menu drawer does not repeat "Save and exit"; web: it carries it', async () => {
+  // AH-101 (U5) — the native menu held only the locale switcher. Vuetify renders a
+  // closed temporary drawer's content (inert), so the pin is that neither the
+  // hamburger nor the drawer is in the DOM at all, not that a drawer is shut.
+  it('native: no hamburger and no menu drawer (the locale switcher left with it)', async () => {
     wrapper = await mountLayout({ native: true })
+
+    expect(wrapper.find('[data-test="onboarding-menu-btn"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="onboarding-menu-drawer"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="onboarding-menu-locale-switcher"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="onboarding-menu-save-and-exit-btn"]').exists()).toBe(false)
+  })
+
+  it('native on a wide viewport: still no hamburger and no drawer', async () => {
+    wrapper = await mountLayout({ native: true, mobile: false })
+
+    expect(wrapper.find('[data-test="onboarding-menu-btn"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="onboarding-menu-drawer"]').exists()).toBe(false)
+  })
+
+  it('web mobile: the hamburger and drawer are unchanged, and the drawer carries both controls', async () => {
+    wrapper = await mountLayout({ mobile: true })
+
+    expect(wrapper.find('[data-test="onboarding-menu-btn"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="onboarding-menu-drawer"]').exists()).toBe(true)
     await wrapper.find('[data-test="onboarding-menu-btn"]').trigger('click')
     await flushPromises()
     expect(wrapper.find('[data-test="onboarding-menu-locale-switcher"]').exists()).toBe(true)
-    expect(wrapper.find('[data-test="onboarding-menu-save-and-exit-btn"]').exists()).toBe(false)
-    wrapper.unmount()
-
-    wrapper = await mountLayout({ mobile: true })
-    await wrapper.find('[data-test="onboarding-menu-btn"]').trigger('click')
-    await flushPromises()
     expect(wrapper.find('[data-test="onboarding-menu-save-and-exit-btn"]').exists()).toBe(true)
+  })
+
+  it('web desktop: the inline locale switcher stays, with no hamburger', async () => {
+    wrapper = await mountLayout()
+
+    expect(wrapper.find('[data-test="onboarding-locale-switcher"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="onboarding-menu-btn"]').exists()).toBe(false)
   })
 
   it('web desktop: the animated chrome, no native header or modifiers', async () => {

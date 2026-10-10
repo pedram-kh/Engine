@@ -30,6 +30,11 @@
  * page itself only differs in three ways — no Meta Pixel, no sign-up
  * funnel (a pointer to the web instead), and a wrong-door message that
  * names the web address the account belongs to.
+ *
+ * AH-101 U2: that same native screen takes the Figma sign-in sheet (frame 02):
+ * the brand mark above, labels above the fields, "forgot password" in the
+ * password label row, the error as a tinted banner. Every difference is gated
+ * on `isNative` and styled by `signInNative.css`; the web markup is unchanged.
  */
 
 import { ApiError } from '@catalyst/api-client'
@@ -42,6 +47,7 @@ import { isNativePlatform } from '@/core/platform/isNativePlatform'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
 import { loadMetaPixel } from '@/modules/auth/internal/metaPixel'
+import nativeMark from '@/modules/auth/assets/native-sign-in-mark.svg'
 
 const { t, te } = useI18n()
 const route = useRoute()
@@ -65,6 +71,11 @@ const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
 
 const isNative = isNativePlatform()
+
+/** The native sheet outlines the credential fields on a failed sign-in (frame 02b). */
+const credentialError = computed(
+  () => errorKey.value !== null && errorKey.value !== 'auth.mfa_required',
+)
 
 /**
  * The banner is for involuntary termination only. `?reason=session_expired`
@@ -231,10 +242,27 @@ async function onSubmit(): Promise<void> {
 </script>
 
 <template>
-  <section v-if="inviteForwardTarget === null" data-test="sign-in-page">
-    <h2 class="text-h5 mb-4" data-test="sign-in-heading">
+  <section
+    v-if="inviteForwardTarget === null"
+    :class="{ 'sign-in-native': isNative }"
+    data-test="sign-in-page"
+  >
+    <img
+      v-if="isNative"
+      :src="nativeMark"
+      alt=""
+      class="sign-in-native__mark"
+      :class="{ 'sign-in-native__mark--compact': errorKey !== null }"
+      data-test="sign-in-native-mark"
+    />
+
+    <h2 :class="isNative ? 'sign-in-native__title' : 'text-h5 mb-4'" data-test="sign-in-heading">
       {{ t(headingKey) }}
     </h2>
+
+    <p v-if="isNative" class="sign-in-native__subtitle" data-test="sign-in-native-subtitle">
+      {{ t('auth.ui.native.sign_in_subtitle') }}
+    </p>
 
     <v-alert
       v-if="sessionExpired"
@@ -247,31 +275,57 @@ async function onSubmit(): Promise<void> {
     </v-alert>
 
     <form novalidate @submit.prevent="onSubmit">
+      <label v-if="isNative" for="sign-in-email" class="sign-in-native__label">
+        {{ t('auth.ui.labels.email') }}
+      </label>
       <v-text-field
         id="sign-in-email"
         v-model="email"
-        :label="t('auth.ui.labels.email')"
+        :label="isNative ? undefined : t('auth.ui.labels.email')"
+        :prepend-inner-icon="isNative ? 'mdi-email-outline' : undefined"
+        :hide-details="isNative"
+        :error="isNative && credentialError"
         type="email"
         autocomplete="email"
         required
         data-test="sign-in-email"
       />
 
+      <div v-if="isNative" class="sign-in-native__label-row">
+        <label for="sign-in-password" class="sign-in-native__label">
+          {{ t('auth.ui.labels.password') }}
+        </label>
+        <!-- Frame 02: "forgot password" lives in the password label row. -->
+        <router-link
+          :to="{ name: 'auth.forgot-password' }"
+          class="sign-in-native__forgot"
+          data-test="sign-in-forgot-link"
+        >
+          {{ t('auth.ui.headings.forgot_password') }}
+        </router-link>
+      </div>
       <v-text-field
         id="sign-in-password"
         v-model="password"
-        :label="t('auth.ui.labels.password')"
+        :label="isNative ? undefined : t('auth.ui.labels.password')"
+        :prepend-inner-icon="isNative ? 'mdi-lock-outline' : undefined"
+        :hide-details="isNative"
+        :error="isNative && credentialError"
         type="password"
         autocomplete="current-password"
         required
         data-test="sign-in-password"
       />
 
+      <label v-if="isNative && showTotpField" for="sign-in-totp" class="sign-in-native__label">
+        {{ t('auth.ui.labels.totp_code') }}
+      </label>
       <v-text-field
         v-if="showTotpField"
         id="sign-in-totp"
         v-model="totpCode"
-        :label="t('auth.ui.labels.totp_code')"
+        :label="isNative ? undefined : t('auth.ui.labels.totp_code')"
+        :hide-details="isNative"
         type="text"
         inputmode="numeric"
         autocomplete="one-time-code"
@@ -283,16 +337,24 @@ async function onSubmit(): Promise<void> {
       <div
         role="alert"
         aria-live="polite"
-        class="text-error text-body-2 mb-2"
+        :class="
+          isNative
+            ? ['sign-in-native__error', { 'sign-in-native__error--on': errorKey !== null }]
+            : 'text-error text-body-2 mb-2'
+        "
         data-test="sign-in-error"
       >
-        <template v-if="errorKey !== null">{{ t(errorKey, errorValues) }}</template>
+        <template v-if="errorKey !== null">
+          <v-icon v-if="isNative" icon="mdi-alert-circle-outline" size="18" aria-hidden="true" />
+          {{ t(errorKey, errorValues) }}
+        </template>
       </div>
 
       <v-btn
         type="submit"
         color="primary"
         block
+        :size="isNative ? 'large' : undefined"
         :loading="isLoggingIn"
         :disabled="isLoggingIn"
         data-test="sign-in-submit"
@@ -301,12 +363,12 @@ async function onSubmit(): Promise<void> {
       </v-btn>
     </form>
 
-    <div class="mt-4 d-flex justify-space-between text-body-2">
+    <div v-if="!isNative" class="mt-4 d-flex justify-space-between text-body-2">
       <!-- AH-086 D2: the agency variant has no signup flow of any kind —
            agencies are Catalyst-created. This link is the creator-signup
            funnel and does not appear here. -->
       <router-link
-        v-if="!isAgencyVariant && !isNative"
+        v-if="!isAgencyVariant"
         :to="{ name: 'auth.sign-up' }"
         data-test="sign-in-signup-link"
       >
@@ -317,12 +379,21 @@ async function onSubmit(): Promise<void> {
       </router-link>
     </div>
 
-    <p
+    <!-- AH-101 Q7: frame 02's "Create an account" button is NOT drawn. A button
+         with nowhere in-app to go is dead, and an external account-creation link
+         is store-sensitive; the pointer line stays. The button returns with real
+         in-app sign-up (AH-104b). -->
+    <i18n-t
       v-if="isNative"
-      class="mt-6 text-body-2 text-medium-emphasis"
+      keypath="auth.ui.native.create_account"
+      tag="p"
+      class="sign-in-native__pointer"
       data-test="sign-in-native-create-account"
     >
-      {{ t('auth.ui.native.create_account', { site: CREATOR_SIGNUP_SITE }) }}
-    </p>
+      <template #site>
+        <span class="sign-in-native__site">{{ CREATOR_SIGNUP_SITE }}</span>
+      </template>
+    </i18n-t>
   </section>
 </template>
+<style scoped src="./signInNative.css"></style>

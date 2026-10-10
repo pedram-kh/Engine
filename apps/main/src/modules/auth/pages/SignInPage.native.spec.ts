@@ -248,6 +248,122 @@ describe('SignInPage — creator app (native)', () => {
 
     expect(h.wrapper.find('[data-test="sign-in-error"]').text()).toContain(expected)
   })
+
+  // AH-101 U2 — Figma frame 02 (sheet) and 02b (failed state).
+  describe('the sign-in sheet (AH-101 U2)', () => {
+    it('draws the brand mark above the sheet, and the title and one-sentence welcome', async () => {
+      const h = await mountAuthPage(SignInPage)
+      teardown = h.unmount
+
+      expect(h.wrapper.find('section').classes()).toContain('sign-in-native')
+      expect(h.wrapper.find('[data-test="sign-in-native-mark"]').exists()).toBe(true)
+      expect(h.wrapper.find('[data-test="sign-in-heading"]').text()).toBe('Sign in')
+      expect(h.wrapper.find('[data-test="sign-in-native-subtitle"]').text()).toBe(
+        'Welcome back. Sign in to see your campaigns, invitations and messages.',
+      )
+    })
+
+    it('puts the labels above the fields, not inside them', async () => {
+      const h = await mountAuthPage(SignInPage)
+      teardown = h.unmount
+
+      const email = h.wrapper.find('label[for="sign-in-email"]')
+      const password = h.wrapper.find('label[for="sign-in-password"]')
+      expect(email.text()).toBe('Email')
+      expect(password.text()).toBe('Password')
+      // The field itself carries no floating label of its own.
+      expect(h.wrapper.find('[data-test="sign-in-email"] .v-label').exists()).toBe(false)
+      expect(h.wrapper.find('[data-test="sign-in-password"] .v-label').exists()).toBe(false)
+      // …and the label really does name the input (for → id).
+      expect(h.wrapper.find('input#sign-in-email').exists()).toBe(true)
+      expect(h.wrapper.find('input#sign-in-password').exists()).toBe(true)
+    })
+
+    it('carries the field icons', async () => {
+      const h = await mountAuthPage(SignInPage)
+      teardown = h.unmount
+
+      expect(h.wrapper.find('[data-test="sign-in-email"] .mdi-email-outline').exists()).toBe(true)
+      expect(h.wrapper.find('[data-test="sign-in-password"] .mdi-lock-outline').exists()).toBe(true)
+    })
+
+    it('puts "forgot password" in the password label row, once', async () => {
+      const h = await mountAuthPage(SignInPage)
+      teardown = h.unmount
+
+      const links = h.wrapper.findAll('[data-test="sign-in-forgot-link"]')
+      expect(links).toHaveLength(1)
+      expect(links[0]!.element.closest('.sign-in-native__label-row')).not.toBeNull()
+    })
+
+    it('the pointer line names the site in its own span, with the full sentence unchanged', async () => {
+      const h = await mountAuthPage(SignInPage)
+      teardown = h.unmount
+
+      const pointer = h.wrapper.find('[data-test="sign-in-native-create-account"]')
+      expect(pointer.element.tagName).toBe('P')
+      expect(pointer.find('.sign-in-native__site').text()).toBe('platform.catalyst-growth.com')
+      expect(h.wrapper.text()).not.toContain('Create an account')
+    })
+
+    it('the sign-in button is the large (44px) primary button', async () => {
+      const h = await mountAuthPage(SignInPage)
+      teardown = h.unmount
+
+      const btn = h.wrapper.find('[data-test="sign-in-submit"]')
+      expect(btn.classes()).toContain('v-btn--size-large')
+      expect(btn.classes()).toContain('bg-primary')
+    })
+
+    it('before any failure: the live region is present but silent, the mark is full size', async () => {
+      const h = await mountAuthPage(SignInPage)
+      teardown = h.unmount
+
+      const region = h.wrapper.find('[data-test="sign-in-error"]')
+      expect(region.attributes('role')).toBe('alert')
+      expect(region.classes()).not.toContain('sign-in-native__error--on')
+      expect(region.text()).toBe('')
+      expect(h.wrapper.find('[data-test="sign-in-native-mark"]').classes()).not.toContain(
+        'sign-in-native__mark--compact',
+      )
+    })
+
+    it('a failed sign-in draws the banner, outlines the credentials and shrinks the mark (02b)', async () => {
+      vi.mocked(authApi.tokenLogin).mockRejectedValue(
+        new ApiError({ status: 401, code: 'auth.invalid_credentials', message: 'no.' }),
+      )
+      const h = await mountAuthPage(SignInPage)
+      teardown = h.unmount
+
+      await submit(h)
+
+      const region = h.wrapper.find('[data-test="sign-in-error"]')
+      expect(region.classes()).toContain('sign-in-native__error--on')
+      expect(region.find('.mdi-alert-circle-outline').exists()).toBe(true)
+      expect(region.text()).toBe('Invalid email or password.')
+      expect(h.wrapper.find('[data-test="sign-in-password"]').classes()).toContain('v-input--error')
+      expect(h.wrapper.find('[data-test="sign-in-email"]').classes()).toContain('v-input--error')
+      expect(h.wrapper.find('[data-test="sign-in-native-mark"]').classes()).toContain(
+        'sign-in-native__mark--compact',
+      )
+    })
+
+    it('the two-factor prompt is not a credential failure: no red outline, but the code field has a label', async () => {
+      vi.mocked(authApi.tokenLogin).mockRejectedValue(
+        new ApiError({ status: 401, code: 'auth.mfa_required', message: '' }),
+      )
+      const h = await mountAuthPage(SignInPage)
+      teardown = h.unmount
+
+      await submit(h)
+
+      expect(h.wrapper.find('[data-test="sign-in-password"]').classes()).not.toContain(
+        'v-input--error',
+      )
+      expect(h.wrapper.find('label[for="sign-in-totp"]').text()).toBe('Two-factor code')
+      expect(h.wrapper.find('[data-test="sign-in-totp"] .v-label').exists()).toBe(false)
+    })
+  })
 })
 
 describe('SignInPage — web polarity of the native branches', () => {
@@ -296,6 +412,50 @@ describe('SignInPage — web polarity of the native branches', () => {
     expect(authApi.tokenLogin).not.toHaveBeenCalled()
     expect(h.wrapper.find('[data-test="sign-in-error"]').text()).toContain(
       'This account is registered for the admin console',
+    )
+  })
+
+  // AH-101 U2 — the sheet is native only; the web page keeps its own markup.
+  it('has none of the sheet: no mark, subtitle, outside labels or native modifier', async () => {
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+
+    expect(h.wrapper.find('section').classes()).not.toContain('sign-in-native')
+    expect(h.wrapper.find('[data-test="sign-in-native-mark"]').exists()).toBe(false)
+    expect(h.wrapper.find('[data-test="sign-in-native-subtitle"]').exists()).toBe(false)
+    expect(h.wrapper.find('label[for="sign-in-email"]').exists()).toBe(true) // Vuetify's own
+    expect(h.wrapper.find('[data-test="sign-in-email"] .v-label').text()).toBe('Email')
+    expect(h.wrapper.find('[data-test="sign-in-password"] .v-label').text()).toBe('Password')
+    expect(h.wrapper.find('.sign-in-native__label').exists()).toBe(false)
+    expect(h.wrapper.find('.mdi-email-outline').exists()).toBe(false)
+    expect(h.wrapper.find('[data-test="sign-in-submit"]').classes()).not.toContain(
+      'v-btn--size-large',
+    )
+  })
+
+  it('keeps the sign-up and forgot links in the bottom row, and the plain red error text', async () => {
+    vi.mocked(authApi.login).mockRejectedValue(
+      new ApiError({ status: 401, code: 'auth.invalid_credentials', message: 'no.' }),
+    )
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+
+    const links = h.wrapper.findAll('[data-test="sign-in-forgot-link"]')
+    expect(links).toHaveLength(1)
+    expect(links[0]!.element.closest('.sign-in-native__label-row')).toBeNull()
+    expect(h.wrapper.find('[data-test="sign-in-signup-link"]').exists()).toBe(true)
+
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('x')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    const region = h.wrapper.find('[data-test="sign-in-error"]')
+    expect(region.classes()).toContain('text-error')
+    expect(region.classes()).not.toContain('sign-in-native__error--on')
+    expect(region.find('.mdi-alert-circle-outline').exists()).toBe(false)
+    expect(h.wrapper.find('[data-test="sign-in-password"]').classes()).not.toContain(
+      'v-input--error',
     )
   })
 })

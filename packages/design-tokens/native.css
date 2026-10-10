@@ -51,11 +51,15 @@
   --native-radius-xl: 10px;
   --native-radius-2xl: 12px;
   --native-radius-full: 999px;
+  /* AH-101 — the sign-in sheet's top corners (Figma frame 02, 24px). */
+  --native-radius-sheet: 24px;
 
   --native-shadow-overlay: 0 12px 32px #0000008c;
 
   /* Type scale as `font` shorthands (Inter via --font-sans). */
   --native-type-display: 500 28px/36px var(--font-sans);
+  /* AH-101 — Heading/H1, the sign-in sheet's title (Figma frame 02). */
+  --native-type-h1: 500 26px/32px var(--font-sans);
   --native-type-h3: 600 18px/24px var(--font-sans);
   --native-type-h4: 600 15px/20px var(--font-sans);
   --native-type-body: 400 14px/20px var(--font-sans);
