@@ -1,6 +1,6 @@
 # AH-102 — push notifications for the creator app — PLAN (plan-pause)
 
-- **Status:** Plan-pause. **No code, config or migration written.** Awaiting clearance before Stage 0.
+- **Status:** **Cleared** at `d4edffb4` with the P-rulings in §11 (2026-10-10). Build starts at Stage 0, C0.1. Both pushes held; Checkpoint A stops for clearance.
 - **Date:** 2026-10-10
 - **Entries:** **AH-102** (everything through Android) and **AH-102-ios** (the Apple-account-gated final stage; §6).
 - **Author:** Cursor, against the rulings Q1–Q19 given at kickoff.
@@ -339,9 +339,9 @@ PushSendResult(neutral enum+DTO)  Delivered | TokenInvalid | Retryable | ConfigE
   `SENDER_ID_MISMATCH`, `THIRD_PARTY_AUTH_ERROR`, 401/403 after refresh → `ConfigError` (alarm, never a token kill);
   `QUOTA_EXCEEDED`/`UNAVAILABLE`/`INTERNAL`/timeouts → `Retryable`.
 - **Config** in `config/integrations.php` beside `payment.stripe` (`:108-115`; "secrets in AWS Secrets Manager,
-  non-secret config here"), env `FCM_PROJECT_ID`, `FCM_SERVICE_ACCOUNT_PATH` (path to a root-readable file, mode 600,
-  readable by the **worker user** — `user=www-data` in the runbook, `production-queue-worker.md:60`), plus timeout.
-  How the Secrets Manager value becomes that file on the box is **not documented** in the repo — **P-1**.
+  non-secret config here"), env `FCM_PROJECT_ID`, `FCM_SERVICE_ACCOUNT_JSON_B64` (the service-account JSON, base64-encoded, **decoded inside the FCM
+  client**; **P-1 ruled** — no file, no path, no permission step), plus timeout. A missing, non-base64 or non-JSON value
+  is a `ConfigError` outcome, never a crash at boot.
 - **Containment proof (the fallback-B guarantee):** a scan test asserting nothing outside
   `Notifications/Push/Fcm/` imports an `Fcm*` class or references `fcm.googleapis.com`, and that the job, dispatcher,
   factory, recorder and registry never branch on `platform`. If the spike later fails, B = add `ApnsPushSender`, a
@@ -515,7 +515,7 @@ type, always-on types still arrive; (8) `job_posted` push default OFF, opt-in �
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | **5.0 prerequisites (Pedram)**  | enrol; App ID `com.catalystgrowth.platform` + Push capability; APNs auth key (`.p8`, Key ID, Team ID); upload the key to Firebase; register the iOS app in Firebase (needs only the bundle id — may be done earlier) and download `GoogleService-Info.plist`                                                                                                                                                                                                                                                                                 | `.p8` never enters the repo (C0.2)                |
 | **5.1 spike (time-boxed)**      | on a **real iPhone**: does `@capacitor-firebase/messaging` (SPM, Capacitor CLI 8.5.2 ≥ 8.4.0 as required by `experimental.ios.spm.packageOptions`) build, and does `getToken()` return an FCM token that FCM v1 accepts (`push:test`)? **Go / no-go recorded.**                                                                                                                                                                                                                                                                              | decides A vs B                                    |
-| **5.2 wiring (go)**             | `npx cap sync ios`; `packageOptions` `{"@capacitor-firebase/messaging":{"symlink":true}}` in `capacitor.config.ts`; Push Notifications capability → `App.entitlements` (`aps-environment`) + `CODE_SIGN_ENTITLEMENTS`; the three AppDelegate methods (the plugin README block); `GoogleService-Info.plist` committed (Q14); `FirebaseMessagingAutoInitEnabled=NO`; flip `IOS_PUSH_ENABLED = true`; foreground `presentationOptions` set explicitly (plugin default is `["alert","badge","sound"]`; plan = `[]` for Android parity — **P-5**) | iOS archive builds; no `UIBackgroundModes` needed |
+| **5.2 wiring (go)**             | `npx cap sync ios`; `packageOptions` `{"@capacitor-firebase/messaging":{"symlink":true}}` in `capacitor.config.ts`; Push Notifications capability → `App.entitlements` (`aps-environment`) + `CODE_SIGN_ENTITLEMENTS`; the three AppDelegate methods (the plugin README block); `GoogleService-Info.plist` committed (Q14); `FirebaseMessagingAutoInitEnabled=NO`; flip `IOS_PUSH_ENABLED = true`; foreground `presentationOptions` set explicitly (plugin default is `["alert","badge","sound"]`; `[]` for Android parity — **P-5, ruled**) | iOS archive builds; no `UIBackgroundModes` needed |
 | **5.3 device proof**            | the §5.6 list on iOS (TestFlight/production APNs environment _and_ a debug install, to catch the sandbox/production token split)                                                                                                                                                                                                                                                                                                                                                                                                             | evidence pasted                                   |
 | **5.4 fallback B (no-go only)** | `ApnsPushSender` (HTTP/2, ES256 JWT, `.p8` + Key ID + Team ID + topic), per-platform binding, additive `environment` column + the official `@capacitor/push-notifications` behind the same `PushClient`. **Untouched:** `PushEligibility`, `PushMessageFactory`, the job, the recorder, the registry's liveness query, the token endpoints, the matrix. The containment scan (§5.1) is the proof.                                                                                                                                            | —                                                 |
 
@@ -546,8 +546,9 @@ diff of tests touched.
    `QUEUE_CONNECTION` (`.env.example` says `redis`).
 2. **`CACHE_STORE`** effective value (the throttle needs atomic `Cache::add`; the FCM OAuth token cache needs it too).
 3. **`SELECT count(*) FROM user_notification_preferences WHERE channel='push'` → expected `0`.**
-4. **FCM credentials:** `FCM_PROJECT_ID` set; `FCM_SERVICE_ACCOUNT_PATH` file exists, mode 600, and readable **by the worker
-   user** (`sudo -u www-data test -r …`).
+4. **FCM credentials (P-1):** `FCM_PROJECT_ID` is set, and `FCM_SERVICE_ACCOUNT_JSON_B64` **is set and decodes to valid
+   JSON** carrying `client_email`, `private_key` and `project_id` — read-back without printing the value (the
+   `push:test --validate-only` smoke performs exactly this decode and then the OAuth exchange).
 5. **Snapshot** taken and confirmed `available` (migration in this deploy).
 
 **Deploy:** snapshot → `migrate` (one: `user_push_tokens`) → code → **`php artisan queue:restart`** (named step: a new job
@@ -640,8 +641,28 @@ Each has a recommendation; none blocks the stage work except where stated.
 - **P-9** No (type, channel) combination validation on PATCH (AH-101 precedent) — the dispatcher is authoritative.
 - **P-10** Two held pushes (A after Stage 2, B after Stage 4) as in §2, rather than one at the end?
 
-**Plan-pause stands.** No code, config or migration will be written until this plan is reviewed and cleared; Stage 0
-starts with C0.1.
+See §11 for the rulings.
+
+---
+
+## 11. Dispositions (plan review, 2026-10-10)
+
+Plan `d4edffb4` reviewed and **cleared**. P-rulings:
+
+| P    | Ruling                                                                                                                | Effect on the plan                                                                                                                                                                                                        |
+| ---- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P-1  | **Base64 env var** `FCM_SERVICE_ACCOUNT_JSON_B64`, decoded in the FCM client; drop the file-path and permission steps | §5.1 config rewritten; §7.2 read 4 is now "set and decodes to valid JSON"; the worker-user file-permission step and the `FCM_SERVICE_ACCOUNT_PATH` env name are gone from the plan body (§10 keeps the question as asked) |
+| P-2  | Yes                                                                                                                   | Soft-ask: pending **and** approved-never-asked creators; 30-day cool-down (§5.5)                                                                                                                                          |
+| P-3  | Stage 0                                                                                                               | C0.2 stays a Stage-0 commit                                                                                                                                                                                               |
+| P-4  | Derive the monochrome mark from the AH-100b icon sources, **shown at E1**                                             | C4.2 derives a white-on-transparent glyph from `apps/main/assets` (`icon-foreground.png`, `icon-only.png`, `source/`); the glyph is part of the E1 eyes-on, not a surprise at E3                                          |
+| P-5  | `[]` — decided now                                                                                                    | iOS foreground `presentationOptions: []` (in-app bell only; Android parity); no longer a question for Stage 5                                                                                                             |
+| P-6  | Yes                                                                                                                   | C2.5 `push:test` is in                                                                                                                                                                                                    |
+| P-7  | As planned                                                                                                            | `notify()` runs the push leg on both paths (§5.4)                                                                                                                                                                         |
+| P-8  | Accepted                                                                                                              | `pushChannelAvailable()` (§4.5)                                                                                                                                                                                           |
+| P-9  | Accepted                                                                                                              | No combination validation on PATCH (§4.2-6)                                                                                                                                                                               |
+| P-10 | Yes                                                                                                                   | Two held pushes, A after Stage 2, B after Stage 4 (§2)                                                                                                                                                                    |
+
+**Standing:** all disciplines as written; both pushes held; **Checkpoint A stops for clearance.**
 
 ---
 
