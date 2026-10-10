@@ -6,6 +6,7 @@ namespace App\Modules\Notifications\Push;
 
 use App\Modules\Identity\Models\User;
 use App\Modules\Notifications\Models\UserPushToken;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -64,25 +65,21 @@ final class PushTokenRegistry
      */
     public function liveTokensFor(User $user): Collection
     {
-        $query = UserPushToken::query()
-            ->select('user_push_tokens.*')
-            ->join('personal_access_tokens', 'personal_access_tokens.id', '=', 'user_push_tokens.personal_access_token_id')
-            ->join('users', 'users.id', '=', 'user_push_tokens.user_id')
+        return $this->liveQuery()
             ->where('user_push_tokens.user_id', $user->getKey())
-            ->whereNull('user_push_tokens.invalidated_at')
-            ->whereNull('users.deleted_at')
-            ->where(function ($q): void {
-                $q->whereNull('personal_access_tokens.expires_at')
-                    ->orWhere('personal_access_tokens.expires_at', '>', now());
-            });
+            ->orderBy('user_push_tokens.id')
+            ->get();
+    }
 
-        $expirationMinutes = (int) config('sanctum.expiration');
-
-        if ($expirationMinutes > 0) {
-            $query->where('personal_access_tokens.created_at', '>', now()->subMinutes($expirationMinutes));
-        }
-
-        return $query->orderBy('user_push_tokens.id')->get();
+    /**
+     * One token by id, ONLY if it is still live by the same rules as
+     * {@see self::liveTokensFor()} — the send job's re-check at run time (the
+     * token may have been invalidated, its bearer revoked or expired, or the
+     * user deleted between dispatch and execution).
+     */
+    public function findLive(int $tokenId): ?UserPushToken
+    {
+        return $this->liveQuery()->where('user_push_tokens.id', $tokenId)->first();
     }
 
     /**
@@ -107,6 +104,33 @@ final class PushTokenRegistry
     public function revokeAllForUser(User $user): int
     {
         return UserPushToken::query()->where('user_id', $user->getKey())->delete();
+    }
+
+    /**
+     * The liveness rules, in exactly one place.
+     *
+     * @return Builder<UserPushToken>
+     */
+    private function liveQuery(): Builder
+    {
+        $query = UserPushToken::query()
+            ->select('user_push_tokens.*')
+            ->join('personal_access_tokens', 'personal_access_tokens.id', '=', 'user_push_tokens.personal_access_token_id')
+            ->join('users', 'users.id', '=', 'user_push_tokens.user_id')
+            ->whereNull('user_push_tokens.invalidated_at')
+            ->whereNull('users.deleted_at')
+            ->where(function ($q): void {
+                $q->whereNull('personal_access_tokens.expires_at')
+                    ->orWhere('personal_access_tokens.expires_at', '>', now());
+            });
+
+        $expirationMinutes = (int) config('sanctum.expiration');
+
+        if ($expirationMinutes > 0) {
+            $query->where('personal_access_tokens.created_at', '>', now()->subMinutes($expirationMinutes));
+        }
+
+        return $query;
     }
 
     private function upsert(
