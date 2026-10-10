@@ -72,7 +72,8 @@ reviews, and conversations.
 
 ### AH-101 · Notification preference matrix, post-verified notice and the third creator-app UI batch (Creator App arc)
 
-- **Status:** In progress — Half A (behavioral) landed; Half B (native, SPA-only) follows. Full review:
+- **Status:** Built and gated — Half A (behavioral) and Half B (native, SPA-only); **not pushed**; Pedram's
+  device walk is acceptance (review §8.4). Full review:
   [`notification-prefs-and-ui-batch-review.md`](notification-prefs-and-ui-batch-review.md); plan:
   [`notification-prefs-and-ui-batch-plan.md`](notification-prefs-and-ui-batch-plan.md).
 - **Date:** 2026-10-10.
@@ -87,15 +88,23 @@ reviews, and conversations.
     `post_verified_mail_enabled`, 24 locales.
   - **Preferences page becomes a channel matrix** (grid on web, stacked cards native); `push` will be a
     column constant plus an enum case; `creator.approved` / `creator.rejected` email shows "Always on".
+- **What (Half B):** bell menu closes on navigation; relationship-thread height from native tokens; the "+"
+  attach menu replaced by a direct paperclip (chat) and paperclip + link (DM); the onboarding hamburger and
+  drawer removed on native (**locale switching is lost mid-wizard on native**, a Settings locale row is the
+  follow-up); the sign-in becomes the Figma sheet (new tokens `--native-type-h1`, `--native-radius-sheet`; one
+  new string ×24); the iOS splash becomes Figma frame 01 while Android stays icon-on-colour. The web is
+  unchanged and pinned both ways. No "Create an account" button (AH-104b).
 - **Standing-board line:** if production's `SOCIAL_PROVIDER` is unset, `social_verification_enabled` defaults ON
   over the mock driver, so posted content may be getting mock-"verified" in production today.
 - **Touched:** `apps/api` (Notifications, Campaigns, Messaging, Creators flag, 24 `lang/*/campaigns.php`),
-  `apps/main` (templates registry, preferences page, 24 `notifications.json`), `packages/api-client` (one union
-  member). **No migration, no backfill, no new endpoint.**
+  `apps/main` (templates registry, preferences page, 24 `notifications.json`, the native sign-in and layout,
+  messaging, onboarding, the bell, 24 `auth.json`, the splash assets and generator), `packages/api-client` (one
+  union member), `packages/design-tokens` (two native tokens). **No migration, no backfill, no new endpoint.**
 - **PROD-DATA RISK: LOW** — no schema change, but the guard changes mail behaviour for any existing
   `email=false` row; the read-back in the review §6 turns that into a number before deploy.
-- **Deploy obligation:** backend deploy + queue worker restart + SPA rebuild; flag stays OFF. See
-  [`deploy-log.md`](../runbooks/deploy-log.md).
+- **Deploy obligation:** backend deploy + queue worker restart + SPA rebuild; flag stays OFF. Half B is the
+  app only — no deploy, but a clean iOS build for the new splash. See [`deploy-log.md`](../runbooks/deploy-log.md).
+- **Not proven:** Playwright (dev servers on :8000/:5173 must be stopped) and anything that needs a device.
 
 ### AH-100d · Creator app Figma fidelity audit and app-resume state refresh (Creator App arc)
 

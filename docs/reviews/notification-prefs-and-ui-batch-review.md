@@ -1,6 +1,6 @@
 # AH-101 — notification preference matrix, completion notice, third UI batch — review
 
-**Status:** Half A built and gated; Half B in progress (this file gains a Half B section when it lands).
+**Status:** Half A and Half B built and gated, **not pushed**; Pedram's device walk (§8.4) is acceptance.
 **Push is held; Pedram's device walk is acceptance.** Live push state is `origin/main`.
 Inventory: [`notification-prefs-and-ui-batch-inventory.md`](notification-prefs-and-ui-batch-inventory.md) ·
 Plan-pause: [`notification-prefs-and-ui-batch-plan.md`](notification-prefs-and-ui-batch-plan.md).
@@ -106,7 +106,7 @@ creator only · Q6 stacked cards on native, no new save model.
 
 Mail-inside-transaction hazard · a real social adapter · AH-102's push worker · any change to who receives a
 mail · **agency-side preferences surface** (the inviter mails are guarded but have no UI) · **agency success
-fan-out** for the completion notice · **a locale row in Settings** (Q10, Half B).
+fan-out** for the completion notice · **a locale row in Settings** (Q10, Half B) · **an Android boot screen** (Q8) · **the "Create an account" button, wired to real in-app sign-up (AH-104b, Q7)** · **a show/hide-password eye on the sign-in sheet** · **the 4px field-radius gap** (§8.3) · **the unrun Playwright walk** (needs the dev servers on :8000/:5173 stopped).
 
 ## 6. Production read-back (Pedram) — **before** deploy and **before** arming the flag
 
@@ -138,6 +138,81 @@ Backend deploy (code + 24 `lang/*/campaigns.php`); **no migration, no backfill, 
 Frontend: an `apps/main` SPA rebuild. Queue worker restart (new mailable class). One new flag, default OFF,
 nothing to arm. See [`deploy-log.md`](../runbooks/deploy-log.md).
 
-## 8. Half B
+## 8. Half B — the third creator-app UI batch (native, SPA-only)
 
-_Added when Half B lands._
+Everything here is gated on `isNativePlatform()` (or lives under a class only the app renders). **The web renders
+as before, and each item pins both polarities** (a native test and a web test, and each was break-reverted: the
+gate forced the wrong way, the test failed, the gate restored).
+
+### 8.1 What changed
+
+| Item   | What                                                                                                                                                                                                                                                      | Where                                                                                        | Pin                                                                                                                                             |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **U1** | The bell's menu closes on any route change (it stayed open behind "View all").                                                                                                                                                                            | `NotificationBell.vue`                                                                       | `NotificationBell.spec.ts`, four tests, real timers (vue-router hangs under fake ones)                                                          |
+| **U3** | The relationship thread takes its height from the native layout tokens, not the web's fixed 140/180px offsets, so the composer sits above the tab bar.                                                                                                    | `RelationshipThreadView.vue` (rule placed after the `@media` block)                          | `rel-thread-native-height.spec.ts` — a source-inspection pin; **jsdom cannot lay this out, so it needs the device**                             |
+| **U4** | The "+" attach menu is gone in the app. `ChatPanel`: the paperclip is the control and opens the picker in one tap. `RelationshipThreadView`: paperclip **and** link inline (the DM menu held two actions, so a lone paperclip would have been a removal). | `ChatPanel.vue`, `RelationshipThreadView.vue`                                                | `ChatPanel.native.spec.ts`, `RelationshipThreadView.native.spec.ts`; forced-false fails 8, forced-true fails 5                                  |
+| **U5** | Onboarding drops the native hamburger **and** its drawer (it held only the locale switcher).                                                                                                                                                              | `OnboardingLayout.vue`                                                                       | `OnboardingLayout.native.spec.ts`. Vuetify renders a closed drawer's content (`inert`), so the pin is that the nodes are **absent**, not closed |
+| **U2** | The sign-in becomes the Figma sheet (frame 02 / 02b), and the iOS splash becomes frame 01 (§8.2).                                                                                                                                                         | `AuthLayout.vue` + `authNative.css`, `SignInPage.vue` + `signInNative.css`, `nativeSheet.ts` | `AuthLayout.native.spec.ts`, `SignInPage.native.spec.ts`, `native-page-css-scoping.spec.ts` (both new sheets), `appIconAssets.spec.ts`          |
+
+### 8.2 U2 in detail
+
+- **Sheet:** brand mark (150px, 84px once the error banner has made the sheet taller) above a full-bleed
+  sheet pinned to the bottom, 24px top corners, the 2px aurora hairline inset 24px, the language control as a
+  pill with a globe, the hero headline gone, labels above the fields, field icons, "forgot password" in the
+  password label row, the error as a tinted banner with the credentials outlined (not for the two-factor
+  prompt), a 44px primary button, and the pointer line under a hairline with the site in the accent colour.
+  The mark sits above the sheet by `bottom: 100%`, so it follows the sheet as it grows.
+- **New tokens:** `--native-type-h1` (500 26/32) and `--native-radius-sheet` (24px), in `native.css` and kept in
+  lockstep by `native.spec.ts`. **New string:** `auth.ui.native.sign_in_subtitle` ×24 (written, not
+  machine-checked by a native speaker — the `fr` and `it` lines are the ones worth a glance).
+- **`AuthLayout.vue` is at 247 lines**; the structural-shell cap rose 240 → 250 with a dated note in
+  `auth-layout-shape.spec.ts`. The CSS lives in sibling files, each rooted at a class only the app renders; the
+  scoping spec now also allows `${root}::before` (the glow band's placement on the layout root).
+- **iOS splash:** Figma frame 01 is committed as `assets/source/splash-frame.png` (390×844 at 4×) and
+  `app-icon-sources.mjs` places it at full height, centred, on the 2732 canvas. The storyboard fills the screen
+  with the square image, so a 19.5:9 phone shows exactly that strip. **Android is unchanged (Q8):** a second
+  `capacitor-assets` pass reads `assets/android-splash/` (the AH-100b icon-on-colour splash), and the generated
+  Android drawables came out **byte-identical** to before (git shows no Android diff). The asset spec pins the
+  placement, determinism and the Android splash.
+
+### 8.3 Deviations from the frames, and findings
+
+- **No "Create an account" button (Q7).** The pointer line carries it; a hairline stands where the divider is.
+  The "New to Catalyst?" divider label is not drawn separately because the existing sentence already begins
+  with it. The button returns with real in-app sign-up (AH-104b).
+- **"Forgot password?" is the existing "Reset your password" string**, to avoid a new string ×24.
+- **No placeholders and no show/hide-password eye** (the frames draw both). The placeholders need strings; the
+  eye needs an accessible name ×24. Named follow-up.
+- **The glow is the layout's aurora band, re-placed and dimmed**, not the frames' blurred mask. It reads close;
+  it is not identical.
+- **Error copy is the existing code-keyed text**, not the frame's sample sentence.
+- **Field text stays 16px** (the AH-100c deviation).
+- **Finding, not changed:** Vuetify 3.12 hard-codes `border-radius: 4px` on `.v-field`, so `native.css`'s
+  `--v-field-border-radius: 8px` never reaches it — **every field in the app is 4px, not Figma's 8px**. The
+  sign-in sheet sets the radius on the field itself; the rest of the app is untouched (changing it re-skins
+  every screen and wants its own look). It is the same shape as AH-100d's button radius.
+- **Locale switching is lost mid-wizard on native (Q10).** It remains at sign-in's language pill; a locale row in
+  Settings is the named follow-up.
+- **A hard edge on a splash wider than 19.5:9** (an iPhone SE, an iPad): the strip's sides meet the flat canvas.
+  Left as drawn; look at it on the walk.
+
+### 8.4 Gates, and what is not proven
+
+- `apps/main` vitest **217 files / 2207 tests pass**; `packages/design-tokens` 42 pass (1 todo); `vue-tsc`,
+  eslint on the changed files and prettier clean; `vite build` succeeds. Backend suites unchanged by Half B.
+- **Playwright is still unrun** (the config refuses to reuse :8000/:5173, which are Pedram's dev servers). The
+  matrix spec exists and is unproven.
+- **Visual smoke, not a device:** I rendered the sign-in sheet in a 390×844 browser view with the Capacitor
+  bridge faked. It matched frame 02 closely (pill, mark, hairline, labels, field radius, button, pointer line).
+  That is **not** the WKWebView/WebView, the native theme colours (the mint was the web theme's), the safe
+  areas or the keyboard.
+- **Not walked at all:** U3 (needs the tab bar and keyboard), the error state's banner, the iOS splash on a
+  device. **A new iOS splash needs a clean build and often an app delete/reinstall** — iOS caches launch
+  screens. No new plugin, so no `cap sync` is needed for this half.
+
+**Pedram's walk, in order:** (1) bell: open it, tap "View all" — the menu closes. (2) A relationship thread: the
+composer sits above the tab bar, with and without the keyboard. (3) A campaign chat: one tap on the paperclip
+opens the picker. A relationship thread: paperclip and link both inline; the link opens its dialog. (4)
+Onboarding: no hamburger. (5) Sign in: the sheet, the language pill opens the 24-language menu, a wrong
+password shows the banner and shrinks the mark, the keyboard doesn't bury the button, a short phone doesn't put
+the mark over the pill. (6) Cold start on iOS: the splash; then an iPhone SE-class device if you have one.

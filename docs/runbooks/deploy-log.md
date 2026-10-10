@@ -60,7 +60,8 @@ happened.
 > native only. **Pushed:** not yet; push is held for Pedram's device walk.
 
 - **Status:** PENDING
-- **Range:** `a1a20ead` (inventory) → the Half A feat commit (`34d90a4f`); Half B appends here when it lands.
+- **Range:** `a1a20ead` (inventory) → Half A feat `34d90a4f` and docs `6c32df5d`, then Half B feat `7d4f3e36`
+  (native, SPA-only: the app, plus a web SPA rebuild that carries no visible web change) and its docs commit.
 - **AH entries carried:** AH-101
 - **Migrations run:** none. No backfill, no schema change.
 - **Pre-deploy reads:** **required.** (1) `SELECT channel, is_enabled, COUNT(*) FROM user_notification_preferences
@@ -75,6 +76,8 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
 - **Post-deploy verification:** `/up`; the creator preferences page shows the grid with an Email column; a
   creator with one `email=false` row for a type still gets every other mail; flag list in the admin shows
   `post_verified_mail_enabled` OFF.
+- **App build (Half B):** no deploy; a **clean iOS build** is needed for the new splash (the asset catalog and
+  `assets/` changed; iOS caches launch screens, so delete and reinstall to see it). No new plugin, so no `cap sync`.
 - **Flags armed:** none — `post_verified_mail_enabled` ships OFF and must stay OFF until the driver read-back
   confirms a real (non-mock) verification driver.
 - **Operator:** —

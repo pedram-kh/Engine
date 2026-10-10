@@ -3010,3 +3010,15 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
 - **Resolution:** read the value; if it is `mock`/unset, set the intended driver explicitly (or turn the flag
   OFF), and decide how to treat posts already marked verified. A real social adapter is the durable fix.
 - **Owner:** platform. **Status:** open, standing-board item, awaiting the production read-back.
+
+## Creator app fields render at 4px, not Figma's 8px (AH-101)
+
+- **Where:** `packages/design-tokens/native.css` (`.catalyst-native .v-field { --v-field-border-radius: … }`) and
+  Vuetify 3.12's own `.v-field { border-radius: 4px }`.
+- **The gap:** Vuetify hard-codes the radius on `.v-field` (its outline inherits it), so the custom property the
+  native layer sets never reaches it. Every field in the app is 4px; the frames draw 8px (`radius/lg`). Found
+  while building the sign-in sheet, which sets the radius on the field itself in `signInNative.css`.
+- **Not changed:** a one-line fix in `native.css` would re-skin every form in the app at once, so it wants its own
+  look at the device, the way AH-100d's button radius (the same shape of bug) did.
+- **Owner:** frontend / mobile. **Status:** open. Surfaced at AH-101, 2026-10-10
+  ([review](reviews/notification-prefs-and-ui-batch-review.md) §8.3).
