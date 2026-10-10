@@ -54,6 +54,32 @@ happened.
 
 ---
 
+## AH-101 — notification preference matrix, post-verified notice, third creator-app UI batch — PENDING
+
+> **Stacks on AH-100d and everything under it (all PENDING).** Half A is backend + SPA; Half B is SPA /
+> native only. **Pushed:** not yet; push is held for Pedram's device walk.
+
+- **Status:** PENDING
+- **Range:** `a1a20ead` (inventory) → the Half A feat commit (`34d90a4f`); Half B appends here when it lands.
+- **AH entries carried:** AH-101
+- **Migrations run:** none. No backfill, no schema change.
+- **Pre-deploy reads:** **required.** (1) `SELECT channel, is_enabled, COUNT(*) FROM user_notification_preferences
+GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY type;` — the guard honours every
+  stored `email=false` row on deploy, so the count of people who will stop receiving a mail must be a known
+  number. (2) `config('integrations.social.driver')` and `Feature::active('social_verification_enabled')` on
+  production — see the review §6. Neither blocks the deploy; the second blocks arming the new flag.
+- **Snapshot ID:** n/a (no schema change)
+- **Infra:** **restart the queue worker** (new mailable class `PostVerifiedMail`). No cron / scheduler / env
+  change.
+- **One-shot commands:** none.
+- **Post-deploy verification:** `/up`; the creator preferences page shows the grid with an Email column; a
+  creator with one `email=false` row for a type still gets every other mail; flag list in the admin shows
+  `post_verified_mail_enabled` OFF.
+- **Flags armed:** none — `post_verified_mail_enabled` ships OFF and must stay OFF until the driver read-back
+  confirms a real (non-mock) verification driver.
+- **Operator:** —
+- **Anything unexpected:** —
+
 ## AH-100d — Creator app Figma fidelity audit and app-resume state refresh — PENDING
 
 > **Stacks on AH-100c, AH-100b, AH-100 and AH-099, all PENDING.** Deploy in order, or together as one

@@ -70,6 +70,33 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-101 · Notification preference matrix, post-verified notice and the third creator-app UI batch (Creator App arc)
+
+- **Status:** In progress — Half A (behavioral) landed; Half B (native, SPA-only) follows. Full review:
+  [`notification-prefs-and-ui-batch-review.md`](notification-prefs-and-ui-batch-review.md); plan:
+  [`notification-prefs-and-ui-batch-plan.md`](notification-prefs-and-ui-batch-plan.md).
+- **Date:** 2026-10-10.
+- **Why:** the email channel had never been read through notification preferences, so a creator could mute an
+  in-app row and still get its mail; the success branch of post verification was silent; and Pedram's third
+  device walk found five native UI defects plus the sign-in and splash design.
+- **What (Half A):**
+  - **One email guard** (`NotificationService::isEmailEnabled`) at every typed mail site, after each Pennant
+    flag; a stored `email=false` row is honoured and never cleared. **Behaviour change on deploy** (see the
+    review §0 and §6).
+  - **`assignment.live_verified`:** creator in-app (ungated) and a mail behind the new default-OFF
+    `post_verified_mail_enabled`, 24 locales.
+  - **Preferences page becomes a channel matrix** (grid on web, stacked cards native); `push` will be a
+    column constant plus an enum case; `creator.approved` / `creator.rejected` email shows "Always on".
+- **Standing-board line:** if production's `SOCIAL_PROVIDER` is unset, `social_verification_enabled` defaults ON
+  over the mock driver, so posted content may be getting mock-"verified" in production today.
+- **Touched:** `apps/api` (Notifications, Campaigns, Messaging, Creators flag, 24 `lang/*/campaigns.php`),
+  `apps/main` (templates registry, preferences page, 24 `notifications.json`), `packages/api-client` (one union
+  member). **No migration, no backfill, no new endpoint.**
+- **PROD-DATA RISK: LOW** — no schema change, but the guard changes mail behaviour for any existing
+  `email=false` row; the read-back in the review §6 turns that into a number before deploy.
+- **Deploy obligation:** backend deploy + queue worker restart + SPA rebuild; flag stays OFF. See
+  [`deploy-log.md`](../runbooks/deploy-log.md).
+
 ### AH-100d · Creator app Figma fidelity audit and app-resume state refresh (Creator App arc)
 
 - **Status:** Landed. Gates green; verified by Pedram's third re-walk on device; pushed (the tip and CI run

@@ -2450,6 +2450,17 @@ ukazuje na váš zveřejněný příspěvek, a poté ho níže znova odešlete."
   the chunk that wires the channel** — reading `notification_preferences` for the `email` column
   inside the emission path — and this entry's own "Resolution" below is written generally enough to
   cover it once it lands; AH-083 does not attempt a narrower fix for just these two types.
+- **Closed for every typed notification mail (AH-101, 2026-10-10):** one guard,
+  [`NotificationService::isEmailEnabled()`](../apps/api/app/Modules/Notifications/Services/NotificationService.php),
+  is now called at every typed mail site (assignment lifecycle, both message mails, the three
+  application mails, job-posted), **after** each site's Pennant flag. The preferences page exposes an
+  `email` cell for exactly those types. A scan-based architecture test fails on any new mail-sending file
+  that is neither guarded nor on a reasoned allowlist. **Residual, named:** (1) the untyped / always-on
+  mails stay unguarded by design (sign-up, password reset, invitations, the nudge, the digest, relation
+  and contract mails); (2) the **agency-side inviter mails** (`draft_submitted`, `contracted`) are
+  guarded but have **no UI**, and the verification-failed and resolution mails have no type at all;
+  (3) the nudge has its own flag and ledger but no preference. Trigger for (2): the first agency user to ask
+  to silence a creator-activity mail, or the AH-102 push chunk, whichever is first.
 
 ## Mail is queued INSIDE the state machine's transaction (`SendAssignmentNotifications`, AH-058)
 
@@ -2984,3 +2995,18 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
         label (template change deferred).
 - **Owner:** frontend / mobile.
 - **Status:** open. Surfaced at AH-100d, 2026-10-09 ([review](reviews/creator-app-fidelity-audit-review.md)).
+
+## Verification may run over the mock driver in production (AH-101)
+
+- **Where:** [`SocialVerificationEnabled::default()`](../apps/api/app/Modules/Creators/Features/SocialVerificationEnabled.php)
+  (ON while the driver is `mock`), `config/integrations.php` (`SOCIAL_PROVIDER` defaults to `mock`), and
+  [`VerifyPostedContentJob`](../apps/api/app/Modules/Campaigns/Jobs/VerifyPostedContentJob.php).
+- **The risk:** if production's `SOCIAL_PROVIDER` is **unset**, the flag is ON over the mock provider, so a posted
+  link can be moved to `live_verified` by the mock and treated as a real verification — including as the
+  payment-eligible state. This is **independent of AH-101**; AH-101 only declined to make it louder (its new
+  "post verified" mail ships behind `post_verified_mail_enabled`, default OFF).
+- **Not yet known:** whether production actually runs with `SOCIAL_PROVIDER` unset. The read-back is in
+  [`notification-prefs-and-ui-batch-review.md`](reviews/notification-prefs-and-ui-batch-review.md) §6.
+- **Resolution:** read the value; if it is `mock`/unset, set the intended driver explicitly (or turn the flag
+  OFF), and decide how to treat posts already marked verified. A real social adapter is the durable fix.
+- **Owner:** platform. **Status:** open, standing-board item, awaiting the production read-back.
