@@ -20,7 +20,7 @@ use Illuminate\Support\Carbon;
  *
  * Default resolution is COMPUTED, not stored: a MISSING row resolves to the
  * channel default (`in_app`/`email` ON, `digest` OFF) — see
- * {@see NotificationChannel::defaultEnabled()} and
+ * {@see NotificationChannel::defaultEnabledFor()} and
  * {@see NotificationService}. No per-user
  * row is seeded; a missing row never silently disables an existing email.
  *

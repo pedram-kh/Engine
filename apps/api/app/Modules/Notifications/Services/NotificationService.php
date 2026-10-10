@@ -62,7 +62,7 @@ final class NotificationService
     /**
      * Apply a single preference toggle, SPARSELY (S11.0 Chunk 3b, D-1).
      *
-     * The table holds ONLY divergences from {@see NotificationChannel::defaultEnabled()}
+     * The table holds ONLY divergences from {@see NotificationChannel::defaultEnabledFor()}
      * so the "missing row → default" read in {@see self::isChannelEnabled()} stays
      * the single source of truth:
      *   - toggle DIVERGES from the default → updateOrCreate the row;
@@ -83,7 +83,7 @@ final class NotificationService
             ->where('type', $type->value)
             ->where('channel', $channel->value);
 
-        if ($isEnabled === $channel->defaultEnabled()) {
+        if ($isEnabled === $channel->defaultEnabledFor($type)) {
             $query->delete();
 
             return;
@@ -109,7 +109,7 @@ final class NotificationService
      * mails) has no key to read and therefore cannot call this. The call sites
      * are pinned by `EmailPreferenceGuardArchitectureTest`.
      *
-     * Absence means ON ({@see NotificationChannel::defaultEnabled()}), so with no
+     * Absence means ON ({@see NotificationChannel::defaultEnabledFor()}), so with no
      * `email` row every guarded site sends exactly what it sent before this
      * existed. A stored `email=false` row is an expressed opt-out however it
      * arrived (Q1: honoured, never cleared). The guard sits INSIDE each site's
@@ -124,7 +124,8 @@ final class NotificationService
      * Resolve whether a channel is enabled for a (user, type) pair.
      *
      * Preserve-current default (D-7): when no preference row exists, fall back
-     * to the channel default — `in_app`/`email` ON, `digest` OFF.
+     * to the (type-aware, AH-102) default — `in_app`/`email` ON, `digest` OFF,
+     * unless the type carries an override.
      */
     public function isChannelEnabled(User $recipient, NotificationType $type, NotificationChannel $channel): bool
     {
@@ -135,7 +136,7 @@ final class NotificationService
             ->first();
 
         if ($preference === null) {
-            return $channel->defaultEnabled();
+            return $channel->defaultEnabledFor($type);
         }
 
         return $preference->is_enabled;

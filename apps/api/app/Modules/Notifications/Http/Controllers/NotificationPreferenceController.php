@@ -87,13 +87,7 @@ final class NotificationPreferenceController
      */
     private function defaults(): array
     {
-        $defaults = [];
-
-        foreach (NotificationChannel::cases() as $channel) {
-            $defaults[$channel->value] = $channel->defaultEnabled();
-        }
-
-        return $defaults;
+        return NotificationChannel::baselineDefaults();
     }
 
     private function user(Request $request): User
