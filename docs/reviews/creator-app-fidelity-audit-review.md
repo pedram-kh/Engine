@@ -25,6 +25,19 @@
   `9ef51fd4` · `f11ad8dc` · `a363bebf` · `88cb4fdd` · `2b8294d5`, with its docs commit `e950ea4e`. All
   sixteen are pushed together on `b214c31f`; the tip and the CI run are cited by the docs-only
   provenance commit that follows them (AH-091 precedent).
+- **Pushed:** `b214c31f..fbf84e33` (all sixteen feat/docs commits plus the close commit `fbf84e33`),
+  `git rev-list --left-right --count origin/main...HEAD` = `0 0` after the push. The provenance commit
+  that records this paragraph follows the tip (AH-091 precedent).
+- **CI at the pushed tip (§5.41):** **green, all four jobs** (Frontend lint+typecheck+unit, Backend
+  Pint+Larastan+Pest, E2E main SPA, E2E admin SPA), attempt 1, at `fbf84e33`:
+  [run `38013498051`](https://github.com/pedram-kh/Engine/actions/runs/38013498051).
+  - **Three Playwright flaky retries, all passing on retry, the same three recorded at AH-100c's close:**
+    main `creator-wizard-happy-path.spec.ts:91` (the known pre-existing flake; the wizard traverses
+    surfaces this batch touched, but the native-gated ones do not render on web), main
+    `creator-detail.spec.ts:64` ("navigates from a roster row…", a roster page this batch does not
+    touch; the URL stayed on `/roster` after the click), and admin `admin-sign-in.spec.ts:69` (the TOTP
+    reveal, the known admin flake). Main 31 passed + 2 flaky; admin 1 passed + 1 flaky. No spec failed.
+    No re-run was needed.
 - **Chunk:** Creator App arc, a new entry (AH-100d). Not a reopen of AH-100c.
 - **Provenance:** audit rule and rulings by Pedram (invitations "ruled BUILD"); the second batch's
   items from Pedram's second re-walk; built by Cursor; re-walk acceptance by Pedram (the third walk);
