@@ -1,21 +1,34 @@
 # Creator app Figma fidelity audit and app-resume state refresh (AH-100d) — REVIEW
 
-- **Status: Built, gates green (see §7 and §10), push HELD.** Extended by the second re-walk batch
-  (eight items, §10): `9ef51fd4`, `f11ad8dc`, `a363bebf`, `88cb4fdd`, `2b8294d5` on top of the first ten. Acceptance is Pedram's re-walk (§9), including
-  the new path: submit the wizard → approve as admin → background and reopen the app → the approved
-  state appears with no logout. Nothing is pushed before his go. Independent review not yet done.
+- **Status: Closed — approved.** Verdict (Claude, independent review, 2026-10-10; decision owned by
+  Pedram): **the full batch is verified by Pedram's third re-walk on device**, both the original set (the
+  audit fixes and item 8, including the approve-then-reopen path with no logout) and the eight-item
+  extension of §10 (screenshots on record with Claude). The **root-cause set is accepted**: the
+  `.rounded-0 { border-radius: 0 !important }` tie that kept the AH-100 radius token from ever rendering
+  (§2); the `tonal` Messages button that painted mint on mint, so its label vanished (§10 item 3); the
+  flag-off pseudo-completion that ticked Master agreement on a new account (§10 item 4); and the
+  `::after` selected-tab indicator that Vuetify's own `opacity: 0` had kept from ever rendering (§10
+  item 6). The **locale repairs are accepted** (the `welcome_back` strings in 12 locales, and the base
+  `assignments` nav label in ten). This was a **conditional clearance** (the AH-090 precedent): the
+  review had to match the build report as delivered. **No divergence was found**; the only edits made at
+  close are the status, commits, CI and provenance lines that this build-time text could not have known.
+  Close condition: CI green at the pushed tip (§5.41), cited below.
 - **PROD-DATA RISK: NONE.** SPA-only and native-gated. No `apps/api` or `apps/admin` diff, no migration,
   no new API surface, no secrets in code. No dev database was read or altered. The web byte-identical
   pins are green and unedited.
 - **Orientation:** at kickoff `HEAD` = `origin/main` = `b214c31f` (the AH-100c citation tip), working
   tree clean.
-- **Commits (fast-batch, conventional, gates green per commit):** `ceae669a` radius · `313ecd4c` item 8 ·
+- **Commits (fast-batch, conventional, gates green per commit):** the first ten: `ceae669a` radius · `313ecd4c` item 8 ·
   `eedccc44` photo row · `90cd920f` social cards · `be40c52b` portfolio tiles · `9b4ef8da` invitations ·
   `476f4a58` notifications · `c73589be` Welcome back + `welcome_back` locale repair · `766c2d63`
-  review-step Profile-strength card. The docs commit (this file, the log entry, tech-debt, deploy-log,
-  Part 2) is the second half of the pair.
+  review-step Profile-strength card, and the docs commit `3bff52ad`. The second re-walk batch (§10) is
+  `9ef51fd4` · `f11ad8dc` · `a363bebf` · `88cb4fdd` · `2b8294d5`, with its docs commit `e950ea4e`. All
+  sixteen are pushed together on `b214c31f`; the tip and the CI run are cited by the docs-only
+  provenance commit that follows them (AH-091 precedent).
 - **Chunk:** Creator App arc, a new entry (AH-100d). Not a reopen of AH-100c.
-- **Provenance:** audit rule and rulings by Pedram (invitations "ruled BUILD"), built by Cursor.
+- **Provenance:** audit rule and rulings by Pedram (invitations "ruled BUILD"); the second batch's
+  items from Pedram's second re-walk; built by Cursor; re-walk acceptance by Pedram (the third walk);
+  independent review closure by Claude.
 
 ## 1. The audit rule and how the audit was run
 

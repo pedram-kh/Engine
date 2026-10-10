@@ -120,8 +120,7 @@ discipline in §7.
 app-resume state refresh (`apps/main`, `packages/design-tokens`, `packages/ui` optional `kindLabels`
 prop; zero `apps/api` / `apps/admin` diff; **no migration**; **no new API surface**; **PROD-DATA RISK:
 NONE**; new dependency `@capacitor/app`; 22 new i18n keys ×24 real MT plus a `welcome_back` locale
-repair and a repair of ten locales' base `assignments` nav label). **Built and gated; push HELD** until
-Pedram's re-walk. Feat commits `ceae669a`…`766c2d63` on `b214c31f` (AH-100c's pushed tip), the docs
+repair and a repair of ten locales' base `assignments` nav label). **Built, gated, verified by Pedram's third re-walk, closed and pushed** (tip and CI run in the review header). Feat commits `ceae669a`…`766c2d63` on `b214c31f` (AH-100c's pushed tip), the docs
 commit, then the **second re-walk batch** (`9ef51fd4`, `f11ad8dc`, `a363bebf`, `88cb4fdd`, `2b8294d5`
 and a docs commit): Accept unclipped on both invitation kinds, the blank Messages CTA, Welcome back's
 false Master agreement tick, the tab bar matching frame 07 with short labels ×24, and token-derived
@@ -135,9 +134,9 @@ native detail pages (invitation, job, assignment; review §10). Live state is `g
   resume listener refetching `/me` and the onboarding bootstrap, and a visible-only poll on the
   under-review page, so approval appears with no logout. Review:
   [`creator-app-fidelity-audit-review.md`](creator-app-fidelity-audit-review.md).
-- **Next:** Pedram's re-walk (review §9; rebuild needs `npx cap sync`): submit wizard → approve as
-  admin → background and reopen the app → approved state with no logout. Then push on his go. The
-  proactive version of item 8 is **AH-102's push**; the web page-poll is a named follow-up.
+- **Next:** the Creator App arc continues; AH-100d is closed. A device build needs `npx cap sync` for
+  the new `@capacitor/app` plugin. The proactive version of item 8 is **AH-102's push**; the web
+  page-poll is a named follow-up.
 - **Deploy:** web is an `apps/main` SPA rebuild; the app does not deploy. `deploy-log.md` has a PENDING
   entry stacked on AH-100c, AH-100b, AH-100 and AH-099.
 - **Standing facts to carry:** the audit was string- and structure-level, not rendered pixels; the two

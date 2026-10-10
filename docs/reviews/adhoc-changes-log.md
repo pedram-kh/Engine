@@ -72,8 +72,8 @@ reviews, and conversations.
 
 ### AH-100d · Creator app Figma fidelity audit and app-resume state refresh (Creator App arc)
 
-- **Status:** Landed. Gates green at the feat tip; **push HELD** until Pedram's re-walk (submit wizard →
-  approve as admin → background and reopen the app → approved state appears with no logout). Full
+- **Status:** Landed. Gates green; verified by Pedram's third re-walk on device; pushed (the tip and CI run
+  are cited in the review's header, §5.41). Full
   review: [`creator-app-fidelity-audit-review.md`](creator-app-fidelity-audit-review.md).
 - **Date:** 2026-10-09.
 - **Why:** AH-100c's re-walk left two kinds of residue: pages that still differed from the Figma frames,

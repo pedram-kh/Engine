@@ -57,7 +57,7 @@ happened.
 ## AH-100d — Creator app Figma fidelity audit and app-resume state refresh — PENDING
 
 > **Stacks on AH-100c, AH-100b, AH-100 and AH-099, all PENDING.** Deploy in order, or together as one
-> entry. Their obligations apply unchanged. **Not pushed yet:** held for Pedram's re-walk.
+> entry. Their obligations apply unchanged. **Pushed** after Pedram's third re-walk; the tip and CI run are in the AH-100d review header.
 
 - **Status:** PENDING
 - **Range:** `b214c31f` → the AH-100d docs commits (feat commits `ceae669a`…`766c2d63`, then the
