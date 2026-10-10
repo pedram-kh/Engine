@@ -86,13 +86,19 @@ it('the scan itself would catch a direct call (the scanner is not vacuous)', fun
 });
 
 it('the per-type override map is exactly what has been ruled (no existing default can move silently)', function (): void {
-    // C1.1: behaviour-identical refactor — nothing is overridden yet. C1.2
-    // replaces this expectation with the single ruled pair.
-    expect(NotificationChannel::typeDefaultOverrides())->toBe([]);
+    // The ONE ruled exception (AH-102 Q3): promotional push is opt-in. Nothing
+    // else — in particular no in_app / email / digest default — may ever appear
+    // here without this test, and the stored-state reasoning in
+    // NotificationService::setPreference()'s docblock, being revisited.
+    expect(NotificationChannel::typeDefaultOverrides())->toBe([
+        'campaign.job_posted' => ['push' => false],
+    ]);
 
     foreach (NotificationType::cases() as $type) {
         foreach (NotificationChannel::cases() as $channel) {
-            expect($channel->defaultEnabledFor($type))->toBe($channel->defaultEnabled());
+            $overridden = $type === NotificationType::CampaignJobPosted && $channel === NotificationChannel::Push;
+
+            expect($channel->defaultEnabledFor($type))->toBe($overridden ? false : $channel->defaultEnabled());
         }
     }
 });

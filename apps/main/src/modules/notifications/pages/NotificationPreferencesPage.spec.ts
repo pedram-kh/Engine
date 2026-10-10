@@ -29,7 +29,7 @@ import { notificationsApi } from '../api/notifications.api'
 
 import NotificationPreferencesPage from './NotificationPreferencesPage.vue'
 
-const DEFAULTS = { in_app: true, email: true, digest: false }
+const DEFAULTS = { in_app: true, email: true, digest: false, push: true }
 
 function envelope(
   preferences: NotificationPreferencesEnvelope['data']['attributes']['preferences'] = [],
@@ -37,7 +37,7 @@ function envelope(
   return {
     data: {
       type: 'notification_preferences',
-      attributes: { preferences, defaults: DEFAULTS },
+      attributes: { preferences, defaults: DEFAULTS, type_defaults: {} },
     },
   }
 }

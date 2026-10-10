@@ -162,9 +162,10 @@ export interface NotificationReadAllEnvelope {
  * `App\Modules\Notifications\Enums\NotificationChannel`. The Ch3b UI surfaces
  * `in_app` only (`email` rides independently of prefs; `digest` has no consumer
  * until Messaging) — but the wire contract carries all three so the channels
- * light up with no type change when a consumer ships.
+ * light up with no type change when a consumer ships. `push` (AH-102) is the
+ * creator app's mobile push channel; the SPA shows it on native only.
  */
-export type NotificationChannel = 'in_app' | 'email' | 'digest'
+export type NotificationChannel = 'in_app' | 'email' | 'digest' | 'push'
 
 /**
  * A single SPARSE preference row — present ONLY when it diverges from the
@@ -188,8 +189,16 @@ export interface NotificationPreferencesEnvelope {
     type: 'notification_preferences'
     attributes: {
       preferences: NotificationPreferenceRow[]
-      /** Channel value → its preserve-current default (`in_app`/`email` on, `digest` off). */
+      /** Channel value → its preserve-current default (`in_app`/`email`/`push` on, `digest` off). */
       defaults: Record<NotificationChannel, boolean>
+      /**
+       * AH-102 — per-TYPE exceptions to `defaults`, only the exceptions (today:
+       * `campaign.job_posted` push is opt-in, default OFF). The display state is
+       * `row?.is_enabled ?? type_defaults[type]?.[channel] ?? defaults[channel]`.
+       */
+      type_defaults: Partial<
+        Record<NotificationType, Partial<Record<NotificationChannel, boolean>>>
+      >
     }
   }
 }

@@ -24,18 +24,29 @@ enum NotificationChannel: string
     case InApp = 'in_app';
     case Email = 'email';
     case Digest = 'digest';
+    // AH-102 — mobile push (FCM) to the creator app. Default ON: the consent
+    // gate is "installed the app, granted the OS permission, holds a live
+    // device token", so a second default-OFF gate would mean a user who tapped
+    // "Allow" still gets nothing. The one exception is per-TYPE (see
+    // TYPE_DEFAULT_OVERRIDES): `campaign.job_posted` is promotional and opt-in.
+    case Push = 'push';
 
     /**
      * The per-TYPE default exceptions (AH-102, Q3): `type value => channel value => default`.
      *
-     * Deliberately EMPTY of every `in_app` / `email` / `digest` entry — an existing
+     * Deliberately free of every `in_app` / `email` / `digest` entry — an existing
      * default moving would silently override stored state for every user who has
      * (or lacks) a row (see {@see NotificationService::setPreference()}).
      * The map is pinned by test to exactly what has been ruled.
      *
      * @var array<string, array<string, bool>>
      */
-    private const array TYPE_DEFAULT_OVERRIDES = [];
+    private const array TYPE_DEFAULT_OVERRIDES = [
+        // AH-102 (Q3): promotional push is OPT-IN — default OFF for this one pair
+        // (Apple App Store guideline 4.5.4). The user switches it on in the
+        // preference matrix; that stores a row (it diverges from this default).
+        NotificationType::CampaignJobPosted->value => [self::Push->value => false],
+    ];
 
     /**
      * The CHANNEL baseline default (D-7) — the answer when a type has no override.
@@ -48,7 +59,7 @@ enum NotificationChannel: string
     public function defaultEnabled(): bool
     {
         return match ($this) {
-            self::InApp, self::Email => true,
+            self::InApp, self::Email, self::Push => true,
             self::Digest => false,
         };
     }

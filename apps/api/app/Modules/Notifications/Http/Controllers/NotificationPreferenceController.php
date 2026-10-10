@@ -24,8 +24,8 @@ use Illuminate\Http\Request;
  *
  * Storage is SPARSE (D-1): the table holds only divergences from the channel
  * default. The read therefore ships BOTH the sparse rows AND a `defaults` block
- * so the SPA composes full toggle state (`row.is_enabled ?? defaults[channel]`)
- * without hardcoding the preserve-current contract.
+ * (plus, since AH-102, the per-type exceptions in `type_defaults`) so the SPA
+ * composes full toggle state without hardcoding the preserve-current contract.
  */
 final class NotificationPreferenceController
 {
@@ -74,6 +74,10 @@ final class NotificationPreferenceController
                 'attributes' => [
                     'preferences' => NotificationPreferenceResource::collection($rows)->resolve($request),
                     'defaults' => $this->defaults(),
+                    // AH-102 — per-type exceptions to the channel defaults, e.g.
+                    // `campaign.job_posted` push is opt-in. The SPA composes
+                    // `row ?? type_defaults[type][channel] ?? defaults[channel]`.
+                    'type_defaults' => NotificationChannel::typeDefaultOverrides(),
                 ],
             ],
         ]);
