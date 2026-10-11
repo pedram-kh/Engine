@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Notifications\Push;
 
 use App\Modules\Identity\Models\User;
+use App\Modules\Identity\Support\LiveAppSession;
 use App\Modules\Notifications\Models\UserPushToken;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -107,7 +108,9 @@ final class PushTokenRegistry
     }
 
     /**
-     * The liveness rules, in exactly one place.
+     * The liveness rules: the push-specific clause (not invalidated by the
+     * provider) here, the bearer/user clauses in the one shared predicate
+     * {@see LiveAppSession} (AH-102b — the admin usage views use the same one).
      *
      * @return Builder<UserPushToken>
      */
@@ -117,20 +120,9 @@ final class PushTokenRegistry
             ->select('user_push_tokens.*')
             ->join('personal_access_tokens', 'personal_access_tokens.id', '=', 'user_push_tokens.personal_access_token_id')
             ->join('users', 'users.id', '=', 'user_push_tokens.user_id')
-            ->whereNull('user_push_tokens.invalidated_at')
-            ->whereNull('users.deleted_at')
-            ->where(function ($q): void {
-                $q->whereNull('personal_access_tokens.expires_at')
-                    ->orWhere('personal_access_tokens.expires_at', '>', now());
-            });
+            ->whereNull('user_push_tokens.invalidated_at');
 
-        $expirationMinutes = (int) config('sanctum.expiration');
-
-        if ($expirationMinutes > 0) {
-            $query->where('personal_access_tokens.created_at', '>', now()->subMinutes($expirationMinutes));
-        }
-
-        return $query;
+        return LiveAppSession::constrain($query);
     }
 
     private function upsert(
