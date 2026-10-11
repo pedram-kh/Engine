@@ -77,6 +77,16 @@ describe('PushSoftAskSheet', () => {
     expect(registration.accept).not.toHaveBeenCalled()
   })
 
+  it('is persistent: a tap outside does not dismiss it, the only exits are the two buttons', async () => {
+    wrapper = mountSheet()
+    await flushPromises()
+
+    // jsdom does not run Vuetify's click-outside, so the contract is pinned on
+    // the prop that makes the sheet ignore it. An un-answered dismissal would
+    // leave no cool-down and re-ask on the next mount.
+    expect(wrapper.findComponent({ name: 'VBottomSheet' }).props('persistent')).toBe(true)
+  })
+
   it('accept → asks the registration once and closes', async () => {
     wrapper = mountSheet()
     await flushPromises()
