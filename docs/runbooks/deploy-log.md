@@ -119,6 +119,41 @@ happened.
 - **Operator:** —
 - **Anything unexpected:** —
 
+## AH-102 (Checkpoint B, app) — push column, push registration module, Android FCM wiring — PENDING
+
+> **Stacks on AH-102 Checkpoint A and everything under it (AH-099 … AH-101, all PENDING).** **Local, not pushed:** held
+> for Pedram's eyes-on (E1/E2/E3). This entry is opened **before** the push, per the plan. SPA + Android project only.
+
+- **Status:** PENDING (local; push held)
+- **Range:** from Checkpoint A's pushed tip `6e827e40` → tip **TBD at push**: `1b16a6f6` (docs), `f61c0ec1` (C3.1),
+  `20942da6` (C3.2), `a377cf97` (C4.1), `6d07b727` (C4.2), `55b4ef21` (a test), plus the Checkpoint B docs commit.
+- **AH entries carried:** AH-102 (app half)
+- **Migrations run:** **none.** No schema change, no backfill.
+- **Pre-deploy reads:** none beyond Checkpoint A's.
+
+**What goes live on deploy**
+
+- **Web:** the SPA ships with the Push column code, but it is **invisible on web** (`pushChannelAvailable()` is `false`
+  without a native shell); the page renders exactly as before (pinned by web-polarity specs and the unedited AH-101
+  page spec). Locale files gain push strings ×24. No route, API or env change.
+- **The Android build** is handed to Pedram's store process; it is not part of the web deploy. It needs
+  `apps/main/android/app/google-services.json` (**Pedram supplies**, not yet in the repo) and the Firebase project (Q9).
+  Until both exist, an Android build installs but cannot initialise Firebase.
+
+**What is gated OFF**
+
+- **`push_notifications_enabled` stays OFF.** Arm only after: the Android device proof (E3, including R-8), the
+  `push:test --validate-only` smoke, and Pedram's go — timed **before** the first push-capable store build reaches users.
+
+- **Infra:** none for the web deploy (the queue-restart and env steps are Checkpoint A's). **Never run a bare
+  `npx cap sync`** (R-7); Android builds need JDK 21.
+- **One-shot commands:** none.
+- **Post-deploy verification:** web: the notification preferences page has no Push column; the creator dashboard shows no
+  soft-ask. Android (E3): [`push-notifications-device-walk.md`](../reviews/push-notifications-device-walk.md).
+- **Flags armed:** none — `push_notifications_enabled` stays OFF.
+- **Operator:** —
+- **Anything unexpected:** —
+
 ## AH-101 — notification preference matrix, post-verified notice, third creator-app UI batch — PENDING
 
 > **Stacks on AH-100d and everything under it (all PENDING).** Half A is backend + SPA; Half B is SPA /

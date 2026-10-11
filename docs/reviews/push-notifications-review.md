@@ -1,9 +1,10 @@
 # AH-102 — push notifications for the creator app — Checkpoint A review (backend, Stages 0–2)
 
-- **Status:** **Checkpoint A gates complete (§5, §12).** Stages 0–2 are built and gated; the two gates that were open at
-  first review (the R2 rider C0.3 and the full Playwright run) are done and recorded in §12. Stages 3–5 (matrix column,
-  the app's push module and Android, iOS) are **not started**. The push and its CI run URL are recorded in §13.
-- **Date:** 2026-10-10
+- **Status:** **Checkpoint A (backend, Stages 0–2) is pushed and CI-green (§12, §13). Checkpoint B (Stages 3–4: the
+  matrix column, the app's push module, Android) is built and gated LOCALLY and is HELD for your eyes-on (E1, E2, E3) —
+  §14 onward.** Nothing in B has run on a device. Stage 5 (iOS, **AH-102-ios**) is not started and needs the Apple
+  account. Sections 1–13 are the Checkpoint A review as it stood; they are not rewritten.
+- **Date:** 2026-10-10 (Checkpoint A) · 2026-10-11 (Checkpoint B)
 - **Plan:** [`push-notifications-plan.md`](push-notifications-plan.md) (cleared at `d4edffb4`, dispositions at
   `faf96d4d`) · **Inventory:** [`push-notifications-inventory.md`](push-notifications-inventory.md)
 - **Local tip:** the docs commit that carries this file sits on top of `a8423726`. `origin/main` is `4d468406`.
@@ -331,3 +332,209 @@ the docs pair, C0.3, and the gates docs commit).
   passed on retry — the same spec that flaked locally (§12.3); it is on the known-flake list, undiagnosed, and unrelated
   to push. The main suite had no flakes in CI, including `2fa-enrollment-and-sign-in.spec.ts:93` (tech-debt item 7).
 - A docs-only provenance commit (this section) follows the tip; it changes no code.
+
+---
+
+# Checkpoint B — the matrix column, the app's push module, Android (Stages 3–4)
+
+> ⚠ **Nothing in Checkpoint B has run on a device, and no real FCM call has ever been made.** Every behaviour below is
+> proven by Vitest (fakes at the Capacitor and HTTP seams), a Gradle build, a merged-manifest read and an image
+> inspection. The first real answers come from your E3 walk ([`push-notifications-device-walk.md`](push-notifications-device-walk.md)).
+>
+> ⚠ **`google-services.json` does not exist yet.** The Android build succeeds without it; Firebase cannot initialise at
+> runtime until you supply it (Q9, Q14).
+>
+> ⚠ **R-8 (FCM auto-init off) is unverified.** The manifest keeps it off so no token exists before consent. If E3 item 12
+> fails, the fallback is default auto-init (§19).
+
+## 14. What Checkpoint B built (6 local commits + the docs commit)
+
+| Commit | SHA        | What                                                                                                              |
+| ------ | ---------- | ----------------------------------------------------------------------------------------------------------------- |
+| docs   | `1b16a6f6` | Checkpoint A provenance (§13). Stayed local, rides with this push (your ruling)                                   |
+| C3.1   | `f61c0ec1` | push column in the preference matrix, native only; `pushChannelAvailable()`; `type_defaults` composed in the page |
+| C3.2   | `20942da6` | push label and state strings ×24, with an architecture spec                                                       |
+| C4.1   | `a377cf97` | registration, soft-ask sheet, state row, tap and foreground handling, logout cleanup, boot wiring                 |
+| C4.2   | `6d07b727` | Android FCM wiring: plugin, manifest meta-data, derived notification icon, config spec                            |
+| test   | `55b4ef21` | pins the soft-ask sheet as `persistent` (a break-revert survived; §20.6)                                          |
+| docs   | (this)     | this review, the device-walk scaffold, the docs pair, tech-debt, resumption                                       |
+
+**Placement notes (where something is not in the commit the plan named):** the state-row **strings** are in C3.2 but the
+**component** that uses them is in C4.1 (the strings are inert until then, and the parity spec needs them in all 24
+locales at once); the `@capacitor-firebase/messaging` **dependency** is in C4.1, not C4.2, because C4.1 is the first code
+that imports it and `pnpm install` must precede its typecheck and build.
+
+## 15. Stage 3 — the matrix column (C3.1, C3.2)
+
+- **Registry:** the nine toggleable types and `message.received_by_creator` list `push`; `creator.approved` /
+  `creator.rejected` carry it as an always-on channel. `NATIVE_ONLY_CHANNELS = ['push']` is stripped by
+  `preferenceGroupsForRole()` by default, so **web and every pre-existing spec are unchanged**; the page passes
+  `includeNativeOnly: pushChannelAvailable()` (P-8: native AND (Android OR `IOS_PUSH_ENABLED`, a constant `false`)).
+- **Defaults on the wire:** the page resolves `row?.is_enabled ?? type_defaults[type]?.[channel] ?? defaults[channel]`,
+  so `campaign.job_posted` shows Push OFF until the creator opts in, and saving writes the composed value (a row is
+  stored, as in Checkpoint A's write-side pin).
+- **Parity with the server, from source:** `templates.spec.ts` reads `PushEligibility.php` and `NotificationType.php` and
+  fails if the client registry and the server policy drift (14 types, 10 toggleable, 4 always-on).
+- **Strings:** 24 locales. The ten that often leak English (bg, el, et, fi, ga, hu, lt, lv, mt, ro) are asserted not to
+  equal English (only the "Push" column header is exempt, and asserted to be "Push"). Same machine-quality caveat as
+  `push.php` (§7.5): not native-read.
+- **Break-reverts (per-mutation failing counts; each reverted, diff clean, suite re-green):**
+  BR-14a registry stops stripping native-only → **11** failed (4 new, 6 in the UNEDITED page spec, 1 web-polarity);
+  BR-14b page always passes `includeNativeOnly: true` → **7** (6 in the unedited page spec); BR-15 page ignores
+  `type_defaults` → **3**; BR-14c delete a type from `PushEligibility::TOGGLEABLE` → **2** (the parity spec and the
+  ruled-count pin); BR-18a ro `softAsk.title` set to English → **1**; BR-18b lv drops a key → **2**.
+  (BR-14b's first attempt matched nothing, because prettier had split the line, and showed 0 failing; it is recorded as
+  a non-run and re-done: 7.) BR numbers are per commit, so "BR-16" in C2.5 and in C4.1 are different mutations.
+
+## 16. Stage 4 — the app's push module and Android (C4.1, C4.2)
+
+### 16.1 C4.1 behaviour (all in `apps/main`)
+
+| Rule                                                                                                                                                 | Where it is pinned                                                            |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Consent first: no token and no OS prompt until the creator accepts OUR sheet                                                                         | `pushRegistration.spec.ts` (accept/decline/denied paths)                      |
+| A declined or answered soft-ask is not shown again for 30 days; an OS deny is never re-prompted                                                      | cool-down boundary tests (both sides of 30 d); BR-19, BR-27                   |
+| Never registers while signed out                                                                                                                     | BR-20                                                                         |
+| Upkeep re-POSTs at most daily; a repeat of the same token is not a rotation; rotation needs granted permission                                       | BR-22, BR-25, BR-26                                                           |
+| Logout: forget at the server first, then `deleteToken()` at FCM, local record wiped, bounded at 3 s, never throws, runs BEFORE the bearer is cleared | `useAuthStore.pushLogout.spec.ts` (order pinned); BR-17, BR-21, BR-28, BR-29  |
+| iOS builds do nothing while `IOS_PUSH_ENABLED` is `false`                                                                                            | `pushChannelAvailable.spec.ts`; BR-16                                         |
+| Foreground push refreshes the bell (a `document` event the poll already listens for); tap routes to `creator.notifications`                          | `startPush.spec.ts`, `useNotificationPoll.refreshEvent.spec.ts`; BR-23, BR-24 |
+| Unknown `data.type` values open the app (they are never inspected: tap always goes to the notifications page)                                        | `startPush.spec.ts`                                                           |
+| Soft-ask shows once per mount, only on the dashboard, only for pending/approved creators, never at launch or sign-in                                 | `PushSoftAskSheet.spec.ts`, `CreatorDashboardPage.push.spec.ts`               |
+| Settings row: "Turn on" only while the permission is `prompt`; no button when denied; re-reads the OS state on `visibilitychange`                    | `PushStateRow.spec.ts`                                                        |
+
+**C4.1 break-reverts (scope: push module + notifications + the auth and dashboard push specs, 204 tests, baseline all
+pass; each mutation restored and re-checked):** BR-16 remove the iOS gate → 1 failed · BR-17 cleanup after the token
+clear → 1 · BR-19 ignore the cool-down → 1 · BR-20 register while signed out → 1 · BR-21 no logout timeout → 2 ·
+BR-22 ignore the daily window → 1 · BR-23 drop the foreground handler → 1 · BR-24 drop the tap handler → 1 · BR-25 no
+rotation dedupe → 1 · BR-26 rotation without granted permission → 1 · BR-27 soft-ask ignores the OS state → 4 ·
+BR-28 skip `deleteToken()` at logout → 2 · BR-29 keep the local token record at logout → 1.
+
+**Bundle check:** the plugin's web half imports the optional peer `firebase/messaging`. A Vite alias points it at a
+stub (`firebaseMessagingStub.ts`); the production build passes and `dist` contains **no Firebase web SDK strings** (a
+2 KB stub chunk and a 637-byte plugin chunk).
+
+### 16.2 C4.2 evidence
+
+- **`npx cap sync android` only.** Diff: two generated Gradle files (+1, +3 lines). `ios/` is untouched; a spec fails if
+  `Package.swift` ever mentions Firebase (R-7).
+- **Builds:** `assembleDebug` and `assembleRelease` both **BUILD SUCCESSFUL** (JDK 21; the system JDK 25 is rejected by
+  Gradle 8.14.3 — `Unsupported class file major version 69`).
+- **Merged release manifest:** `POST_NOTIFICATIONS`, c2dm `RECEIVE`, `WAKE_LOCK`, `ACCESS_NETWORK_STATE` arrive from the
+  plugin and Firebase (no manual permission needed); our four meta-data are present (auto-init `false`, analytics
+  `false`, default channel `catalyst_default`, default icon `@drawable/ic_stat_catalyst`); `MessagingService` and
+  `FirebaseMessagingService` are registered; the release manifest has **no** cleartext or network-security-config (that
+  stays debug-only).
+- **The conditional Google-services apply** (`android/app/build.gradle:48-53`) was proven with a throwaway
+  `google-services.json` (fake project, deleted at once, never staged): `:app:processDebugGoogleServices` ran and debug
+  assembled. Without the file the plugin is not applied.
+- **The push icon (your E1 item).** Derived from `catalyst-logo.svg`, the same source as the launcher icon: pure white on
+  transparent, 24 dp box with a 22 dp mark, at the five notification densities (24/36/48/72/96 px). The first cut showed
+  a grey haze inside the C: the logo's soft inner glow is faint but non-zero alpha (≤ 43) and Android would tint it.
+  The script now keeps the shape and drops the glow (alpha ≤ 64 → 0, ≥ 160 → 255). Preview, tinted as Android draws it,
+  on a dark and a light shade, plus the real 24 dp size enlarged on the right of each:
+
+  ![push icon preview](push-notifications-assets/push-icon-preview.png)
+
+  Regenerate with `pnpm --filter @catalyst/main assets:push-icon`.
+
+- **Break-reverts (14-test config spec):** BR-30 auto-init `true` → 1 failed · BR-31 analytics on → 1 · BR-32 manifest
+  channel ≠ the server's → 1 · BR-33 icon colour/grey (caught by the reproducibility check; the white check guards a
+  regenerated icon) → 1 · BR-34 glow not dropped → 1 · BR-35 plugin missing from the Android build → 1 · BR-36 Firebase in
+  the iOS `Package.swift` → 1 · BR-37 icon meta-data points elsewhere → 1.
+- **`capacitor.config.ts` is unchanged:** `FirebaseMessaging.presentationOptions` is iOS-only (P-5 is for Stage 5);
+  Android foreground pushes are handled in JS and show no system banner.
+
+## 17. Existing tests and gates touched in Checkpoint B (the §4.4 list, as built)
+
+| File                                                                                                              | Change                                                                                                                | Why                               |
+| ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| `apps/main/tests/unit/architecture/use-theme-is-sot.spec.ts`                                                      | **+1 allowlist entry** (`composables/usePushPreference.ts`) with a comment. **A conscious edit of an existing gate.** | non-theme persistence (see below) |
+| `NotificationPreferencesPage.spec.ts`, `useAuthStore.native.spec.ts`, every pre-existing `templates.spec.ts` case | **unedited**, and passing — they are the proof that web and the existing native logout are unchanged                  | —                                 |
+| `templates.spec.ts`                                                                                               | one new `describe` (the push-column registry); no existing case edited                                                | C3.1                              |
+
+**The one gate edit, explained.** The push module keeps local state (the soft-ask cool-down and the upkeep clock) in
+WebView `localStorage`, and the theme-SoT architecture test forbids direct `localStorage` calls outside an allowlist. Its
+own message says "for non-theme persistence open a tech-debt note + extend this allowlist", which is what I did, the way
+`useLocalePreference.ts` is already allowlisted: the persistence moved into one file, `composables/usePushPreference.ts`
+(the push module imports it), and **only that file** is allowlisted. Its own spec uses `Storage.prototype` spies so it
+does not need a second entry. A `docs/tech-debt.md` note records it, including that the allowlist should be generalised
+if it grows again. Say if you would rather have `@capacitor/preferences` instead and no allowlist change.
+
+**Decisions I made that you may want to overrule (Checkpoint B):**
+
+- **No Android settings deep-link** from the denied state: the plugin offers none, so the row is explanatory text with no
+  button. A dead button seemed worse. (`tech-debt.md` item 9.)
+- **The `firebase/messaging` Vite alias** to a stub (`tech-debt.md` item 10), to keep the Firebase web SDK out of a
+  native-only feature's bundle.
+- **Soft-ask copy and trigger:** pending or approved creators, once per dashboard mount, then a 30-day cool-down (P-2).
+- **A decline and an OS answer both start the cool-down**, and an OS deny is never re-prompted. The state row is the only
+  way back.
+- **Logout waits at most 3 s** for the cleanup, then proceeds; offline logout leaves the server row to lapse with the
+  login (R-4, accepted).
+
+## 18. Flake accounting, updated (your ruling on the C0.3 outcome)
+
+- **R2 rider — closed.** The C0.3 outcome (a fix with a break-revert, `8c7d3318`) closes it.
+  **`creator-wizard-happy-path.spec.ts:91` is covered by the same root cause** (cold Vite dependency cache re-optimising
+  and force-reloading mid-test): it flaked once in the first full run and **0 times after the fix** (§12.4).
+- **`admin-sign-in.spec.ts:69` stays on the watch-list as the one remaining undiagnosed flake.** It failed once and
+  passed on retry locally (§12.3) and in CI at the Checkpoint A tip (§13). `tech-debt.md` item 13.
+- **Local Vitest, one load flake:** `CreatorDashboardLayout.spec.ts` "renders the Invitations nav item" timed out at 5 s
+  in one full run while Pest and Gradle shared the machine; it passes in the grouped run and in isolation, and the file
+  is untouched by this chunk.
+
+## 19. Checkpoint B gate board (at the test tip `55b4ef21` plus the docs)
+
+| Gate                                        | Result                                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend Pest, full, serial, 2G              | **0 failed.** 3 239 deprecated-but-passing + 5 passed, 16 390 assertions (identical to Checkpoint A: no backend code changed in B; the PHP 8.5 `PDO::MYSQL_ATTR_SSL_CA` noise is as in §5)                                                                                                                                                            |
+| Pint `--test`                               | pass                                                                                                                                                                                                                                                                                                                                                  |
+| PHPStan / Larastan (`--memory-limit=2G`)    | `[OK] No errors`                                                                                                                                                                                                                                                                                                                                      |
+| Vitest, all workspaces                      | design-tokens 42 (+1 todo) · api-client 221 · ui 47 · apps/admin 488 · apps/main **2 319** (2 318 at the C4.1 full run, +1 for the sheet's persistence test) — **all pass**                                                                                                                                                                           |
+| ESLint, all frontend                        | 0 errors; 2 warnings, both pre-existing (`v-html` in `apps/main`)                                                                                                                                                                                                                                                                                     |
+| vue-tsc / tsc, all frontend                 | pass                                                                                                                                                                                                                                                                                                                                                  |
+| 24-locale parity                            | `i18n-push-strings.spec.ts` (new), `i18n-notifications-parity` and backend `LangParityTest`, inside the runs above                                                                                                                                                                                                                                    |
+| Production build (`apps/main`)              | pass; no Firebase web SDK in `dist` (§16.1)                                                                                                                                                                                                                                                                                                           |
+| Android `assembleDebug` / `assembleRelease` | both **BUILD SUCCESSFUL** (JDK 21); merged manifest read (§16.2)                                                                                                                                                                                                                                                                                      |
+| Playwright (main, admin)                    | **NOT RUN at B.** It needs the dev stack down, and your `php artisan serve` is running on :8000 again. I did not stop it. Checkpoint B changes nothing the E2E suites traverse on web (the push column is invisible there, and the preferences page spec is unedited), but the plan calls for the run before the push, so it is outstanding — see §21 |
+
+**Two environment notes.**
+
+1. **Vitest with `--coverage` is flaky on this machine, and CI does not run it** (`pnpm test:frontend` is plain
+   `vitest run`; the auth module's 100% line gate lives only in `test:coverage`). Two full coverage runs each timed out
+   1–3 _different, unrelated_ specs at the 5 s default (`CreatorProfilePage`, `BrandListPage`, `CreatorDashboardLayout`);
+   every one passes in isolation and in the plain run. I did not raise a timeout. The `useAuthStore.ts` change in B is six
+   lines (the cleanup call), exercised by `useAuthStore.pushLogout.spec.ts`.
+2. **Gradle needs JDK 21.** The system default (25) is rejected (`Unsupported class file major version 69`).
+
+## 20. Not verified (Checkpoint B), and what is not tested
+
+1. **Everything on a device** (E3), including the lock-screen copy in a non-English locale, the channel as the OS shows it,
+   tap-from-killed, foreground arrival, and the throttle and collapse in practice.
+2. **R-8: FCM auto-init off.** That an explicit `getToken()` mints a token, and that rotation fires `tokenReceived`, with
+   `firebase_messaging_auto_init_enabled=false`. The fallback is in the device-walk doc.
+3. **`main.ts` wiring has no spec.** `startPush(...)` with `onTap → router.push({name:'creator.notifications'})`,
+   `onForeground → requestNotificationsRefresh`, and the `watch` on the auth user id are the boot file's glue; the pieces
+   they call are all specced (`startPush.spec.ts`, `useNotificationPoll.refreshEvent.spec.ts`), the glue is not. E3 items
+   4 and 5 are its test.
+4. **Real FCM**, as in §0 and §7. `google-services.json` and the service-account credential do not exist yet.
+5. **The `catalyst_default` channel's visible name** is the i18n string at the time of registration; it follows the
+   locale only the next time registration re-asserts it (at most daily).
+6. **Break-revert evidence for B is per-mutation failing counts**, in the same accepted form as A. Totals: C3 6
+   mutations, C4.1 13 + 7 (`startPush`, the sheet, the dashboard trigger, the state row), C4.2 8. The 7 added late are
+   BR-38 `startPush` ignores availability → 1 · BR-39 foreground sync while hidden → 1 · BR-40 `stop()` leaves the
+   listener → 1 · BR-41 sheet ignores eligibility → 1 · BR-42 sheet not `persistent` → **0 at first (the mutation
+   survived: nothing pinned it)**, then a spec pinning the prop was added and the mutation fails it → 1 · BR-43 the
+   dashboard asks every status → 2 · BR-44 "Turn on" shown when denied → 2.
+
+## 21. Clearance requested
+
+1. **Eyes-on E1, E2, E3** (the device-walk doc has the scaffold). For E1, the push icon preview is in §16.2.
+2. **May I stop your `php artisan serve` (:8000) again** to run the full Playwright suites on the isolated stack before
+   the push? (I will tell you when it is back to yours; it restarts as you started it.)
+3. **Supply** the Firebase project and its owning account (Q9), `google-services.json` (Q14), and the FCM credential in
+   `apps/api/.env`, when you are ready for E3.
+4. **The one gate edit** (§17) and the decisions listed there.
+5. **The push itself:** `1b16a6f6` + C3.1 + C3.2 + C4.1 + C4.2 + the test and docs commits, as one push, after the above.
+   Nothing is pushed.

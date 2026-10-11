@@ -233,3 +233,9 @@ native-only, so the matrix must be able to hide the column on web: `preferenceGr
 passes a platform predicate, and a native-only state row ("Push is off on this device — Enable") is added. The page
 therefore **does** change, in AH-102 Stage 3. The AH-101 chunk itself is unaffected: it shipped no push column and no
 push enum case. See [`push-notifications-plan.md`](push-notifications-plan.md) §4.5.
+
+**As built (AH-102, 2026-10-11):** the page change landed in `f61c0ec1` (the column, behind `pushChannelAvailable()`) and
+`a377cf97` (the state row, `PushStateRow.vue`). Two details differ from the plan's wording above: the row shows a "Turn
+on" action only while the OS permission is still `prompt`; once it is `denied` there is **no** button (the plugin offers
+no Android settings deep-link, so a dead control would be worse than text). The stale comment above
+`PREFERENCE_CHANNEL_ORDER` in `templates.ts` was rewritten in `f61c0ec1`.

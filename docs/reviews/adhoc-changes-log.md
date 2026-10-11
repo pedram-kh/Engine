@@ -72,11 +72,13 @@ reviews, and conversations.
 
 ### AH-102 · Push notifications for the creator app (Creator App arc)
 
-- **Status:** **In progress — Checkpoint A (Stages 0–2, backend) gated, with the R2 rider and the full Playwright run
-  done; pushed.** Stages 3–5 (matrix column, the app's push module and Android, then iOS as **AH-102-ios**) are not
-  started. Plan: [`push-notifications-plan.md`](push-notifications-plan.md); inventory:
+- **Status:** **In progress — Checkpoint A (Stages 0–2, backend) pushed (CI green); Checkpoint B (Stages 3–4: the matrix
+  column, the app's push module, Android) built and gated LOCALLY, held for Pedram's eyes-on (E1/E2/E3). Not pushed.**
+  Stage 5 (iOS, **AH-102-ios**) is not started and needs the Apple account. Plan:
+  [`push-notifications-plan.md`](push-notifications-plan.md); inventory:
   [`push-notifications-inventory.md`](push-notifications-inventory.md); review (draft):
-  [`push-notifications-review.md`](push-notifications-review.md).
+  [`push-notifications-review.md`](push-notifications-review.md); device walk:
+  [`push-notifications-device-walk.md`](push-notifications-device-walk.md).
 - **Date:** 2026-10-10.
 - **Why:** the creator app is a Capacitor 8 wrap with no way to reach a creator who is not looking at it. The
   in-app notification rows exist; push adds the lock-screen leg for the 14 types a creator must not miss.
@@ -113,6 +115,20 @@ reviews, and conversations.
   | C2.4   | `72204f1d` | push leg in `notify()` behind `push_notifications_enabled`               |
   | C2.5   | `a8423726` | `push:test` operator command                                             |
 
+- **What (Checkpoint B, app — local, held):**
+  - **The matrix gains a native-only Push column** (`pushChannelAvailable()`: native AND Android, or iOS once
+    `IOS_PUSH_ENABLED`), with `type_defaults` composed so `campaign.job_posted` shows OFF by default. The web page is
+    unchanged. Corrects AH-101's "no page change" claim (addendum on its review).
+  - **Consent-first registration:** own bottom-sheet soft-ask, then the OS prompt; a 30-day cool-down; a daily upkeep
+    re-POST; deduped token rotation; never while signed out; logout cleanup (server, then FCM) before the bearer is
+    cleared, bounded at 3 s, never throws. Foreground pushes refresh the bell; a tap opens the notifications page.
+  - **Android wiring:** `@capacitor-firebase/messaging` 8.5.2, `cap sync android` only; manifest auto-init OFF, analytics
+    OFF, default channel `catalyst_default`, default icon; a white-on-transparent glyph derived from the logo.
+    `google-services.json` is **not** committed (Pedram supplies it).
+  - 24 locales of push strings (the flaky ten checked for English), a `firebase/messaging` Vite alias (no Firebase web
+    SDK in the bundle), one allowlist entry in the theme-SoT architecture test (see the review §17).
+- **Checkpoint B commits (local):** `1b16a6f6` docs provenance for A; `f61c0ec1` C3.1; `20942da6` C3.2; `a377cf97` C4.1;
+  `6d07b727` C4.2; `55b4ef21` a test; plus the Checkpoint B docs commit.
 - **PROD-DATA RISK: LOW–MEDIUM.** One additive `CREATE TABLE` migration; `notify()` (the hot path) is restructured
   behind a try/catch and an after-commit job, with the flag OFF. The Notifications / Campaigns / Messaging suites
   pass unedited. Existing tests touched, all of them listed in the review §6: the flag-list assertion (+1 line), one
@@ -122,8 +138,8 @@ reviews, and conversations.
   **`engine_c_user` GRANT check** on `user_push_tokens`, the **pre-deploy read** `count(*) … WHERE channel='push'` = 0,
   the **FCM credential read** ("set and decodes to valid JSON"), then `push:test --validate-only`. **No flag armed.**
   See [`deploy-log.md`](../runbooks/deploy-log.md).
-- **Not proven yet:** anything on a device; the live FCM error vocabulary (taxonomy is from Google's docs);
-  device behaviour is Stage 4.
+- **Not proven yet:** anything on a device (the E3 walk, including **R-8**, FCM auto-init off); the live FCM error
+  vocabulary (taxonomy is from Google's docs).
 
 ### AH-101 · Notification preference matrix, post-verified notice and the third creator-app UI batch (Creator App arc)
 

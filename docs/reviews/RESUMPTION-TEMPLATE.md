@@ -116,7 +116,25 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-10-10 · **Through:** AH-101, the notification preference matrix, the post-verified notice
+**Last updated:** 2026-10-11 · **Through:** AH-102, push notifications for the creator app (Android first), **Checkpoint B
+built and gated locally, HELD for Pedram's eyes-on (E1 matrix column + push icon, E2 soft-ask, E3 Android device walk)**.
+Checkpoint A (backend, Stages 0–2) is pushed (`4d468406..6e827e40`, CI green, [run 38135748678](https://github.com/pedram-kh/Engine/actions/runs/38135748678)). Checkpoint B is **local, not
+pushed**: `1b16a6f6` (A's provenance docs), `f61c0ec1` (C3.1 push column in the matrix, native only), `20942da6` (C3.2 push
+strings ×24), `a377cf97` (C4.1 registration, soft-ask, tap, foreground), `6d07b727` (C4.2 Android FCM wiring and the push icon),
+`55b4ef21` (a test), plus the Checkpoint B docs commit. **No migration in B. Flag `push_notifications_enabled` is OFF everywhere and stays OFF.**
+Review: [`push-notifications-review.md`](push-notifications-review.md) (§14–§18); device walk scaffold:
+[`push-notifications-device-walk.md`](push-notifications-device-walk.md).
+
+- **Pedram owes:** the Firebase project and its owning Google account (Q9), `apps/main/android/app/google-services.json`
+  (committed, Q14), `FCM_PROJECT_ID` + `FCM_SERVICE_ACCOUNT_JSON_B64` for the API, then the E1/E2/E3 walk. Until the
+  json lands the Android build succeeds but Firebase cannot initialise at runtime.
+- **Not proven:** anything on a device; the live FCM error vocabulary; **R-8 (FCM auto-init off, rotation)**; Playwright on
+  the Checkpoint B tip (needs the dev stack down). **Never run a bare `npx cap sync`** (R-7), `cap sync android` only. Gradle
+  needs JDK 21 (the system default here is 25).
+- **Named follow-ups:** AH-102-ios (Apple account), AH-102b (`push_deliveries`), AH-103 (deep links), AH-105 (privacy
+  checklist), an Android settings deep-link for the denied state, native review of `lang/*/push.php`.
+
+**Prior state, for the record — AH-101.** **Last updated:** 2026-10-10 · **Through:** AH-101, the notification preference matrix, the post-verified notice
 and the third creator-app UI batch. **Built, gated, device-walked and accepted.** Half A (behavioural, API + SPA) is `34d90a4f` + docs `6c32df5d` on `a1a20ead` (the inventory);
 Half B (native, SPA-only) is `7d4f3e36` + `811a0356`. **Closed 2026-10-10: Pedram's device walk passed; pushed (tip and CI in the review header); not deployed, no flag armed.** **No migration.** **PROD-DATA RISK: LOW** (the new
 email guard honours every stored `email=false` row on deploy). Live state is `git status` and `origin/main`,
