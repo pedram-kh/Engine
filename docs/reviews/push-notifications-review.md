@@ -1,9 +1,12 @@
 # AH-102 — push notifications for the creator app — Checkpoint A review (backend, Stages 0–2)
 
-- **Status:** **Checkpoint A (backend, Stages 0–2) is pushed and CI-green (§12, §13). Checkpoint B (Stages 3–4: the
-  matrix column, the app's push module, Android) is built and gated LOCALLY and is HELD for your eyes-on (E1, E2, E3) —
-  §14 onward.** Nothing in B has run on a device. Stage 5 (iOS, **AH-102-ios**) is not started and needs the Apple
-  account. Sections 1–13 are the Checkpoint A review as it stood; they are not rewritten.
+- **Status:** **CLOSED 2026-10-11 (pushed, CI green at the tip, not deployed, no flag armed).** Checkpoint A (backend) and
+  Checkpoint B (the matrix column, the push module, Android, and iOS) are on `origin/main`; Pedram's Android walk (11 of 12
+  items) and the real-iPhone spike and walk passed; **`IOS_PUSH_ENABLED` is `true` in code, `push_notifications_enabled` is OFF
+  everywhere.** Named open items, none blocking the close: **(1)** the TestFlight production-APNs proof (pending the first
+  upload); **(2)** the token-rotation re-POST (R-8, never forced on a device; accepted, self-healing); **(3)** item 10 on iOS (no
+  `UNREGISTERED` observed). Close-out: §29. Sections 1-13 are the Checkpoint A review as it stood; later sections are
+  additive.
 - **Date:** 2026-10-10 (Checkpoint A) · 2026-10-11 (Checkpoint B)
 - **Plan:** [`push-notifications-plan.md`](push-notifications-plan.md) (cleared at `d4edffb4`, dispositions at
   `faf96d4d`) · **Inventory:** [`push-notifications-inventory.md`](push-notifications-inventory.md)
@@ -741,6 +744,8 @@ arrives through FCM. Plan §5.4 (`ApnsPushSender`, fallback B) is **not needed**
 - **The sign-in survives a delete and reinstall** (iOS Keychain). Tech-debt 17; decide before the first iOS store build.
 - **FCM never reported the deleted app as gone** within 6 test sends and 1 real send: the uninstall item is **not observed on iOS** (the
   logic is server-side and was proven on Android; the reinstall then reused the same token, as Firebase keeps its install identity in the Keychain).
+  **Likely cause, unverified:** sandbox-APNs feedback timing (Apple reports an uninstalled app late, a known vendor quirk). Not tested
+  further.
 - The locked-screen card reads "Catalyst / Notification" (the iPhone's Show Previews default); unlocked, the neutral copy shows.
 
 **Committed (local, not pushed):** `4b4dca71` (the `NSAllowsLocalNetworking` exception, §27), `9d28206c` (the iOS channel fix),
@@ -749,3 +754,27 @@ arrives through FCM. Plan §5.4 (`ApnsPushSender`, fallback B) is **not needed**
 **Not covered:** the TestFlight run (production APNs, the sandbox/production token split), iOS items 3, 6, 7, 8 (server-side), the other 22 locales
 on a device. **Spike closed:** API back on `127.0.0.1`, worker stopped, flag off, language `en`, the LAN env override deleted; user 14's three stale
 Android sign-in tokens were revoked.
+
+## 29. Close-out of AH-102 (2026-10-11)
+
+**Final status: closed.** Everything on `origin/main`; CI at the pushed tip `e2501352` is **green on all four jobs** ([run 38173240196](https://github.com/pedram-kh/Engine/actions/runs/38173240196): main SPA Playwright 34 passed, 0 flaky; admin SPA Playwright 1 flaky, passed on retry, the known `admin-sign-in.spec.ts:69`, tech-debt 16). **Pushed, not deployed.** No flag
+armed; `push_notifications_enabled` is OFF everywhere and `IOS_PUSH_ENABLED` is `true` in code only. Deploy obligations stay in the
+deploy log (Checkpoint A's entry carries the migration, the `queue:restart`, the grant check and the credential read).
+
+**Named open items (carried, not blocking the close)**
+
+| #   | Item                                                                                             | State                                                                                                                                                                                                                                                   | Where it lands                                                |
+| --- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| 1   | **TestFlight production-APNs proof** (the sandbox/production token split on a real signed build) | **Pending the first TestFlight upload.** The iPhone spike used the Xcode debug install (sandbox APNs) only.                                                                                                                                             | Before the first iOS store build; with the server flag arming |
+| 2   | **Token-rotation re-POST** (R-8: that a rotation fires `tokenReceived` and re-POSTs once)        | Never forced on a device, on Android or iOS. **Accepted by Pedram 2026-10-11** as self-healing: a rotated token that never re-POSTs goes `UNREGISTERED` on the next send and is invalidated; the daily upkeep registers the new one. Tech-debt item 11. | Tech-debt                                                     |
+| 3   | **Item 10 on iOS** (uninstall, then `UNREGISTERED`, then invalidated)                            | **Not observed on iOS** (6 test sends and 1 real send all `delivered`). Likely cause **unverified**: sandbox-APNs feedback timing, a known vendor quirk. The server logic is platform-independent and proven on Android. **Accepted by Pedram.**        | Re-observe on the TestFlight run                              |
+
+Also carried, not new: the other 22 locales unseen on a device, `lang/*/push.php` machine-quality, tech-debt 17 (the iOS Keychain
+sign-in survives a reinstall; **accepted as recorded**, decided before the first iOS store build, likely with AH-104's deletion work).
+
+**Token hygiene (recorded at Pedram's request).** During the Android walk the user's dev bearer token was printed to my terminal by an
+unfiltered logcat read; it was disclosed at the time and treated as exposed. Revoking it at that session's sign-out left **three older
+`creator-app:android` sign-in tokens for user 14** (17:49 to 18:01 UTC, from sessions cleared on the phone without signing out; the
+exposed token may have been one of them). **All three were revoked on 2026-10-11** (`personal_access_tokens` for user 14: 3 to 0), local
+dev database only. Since then logcat reads are filtered, and `.env` values are never printed. The FCM service-account value was never
+committed or echoed.

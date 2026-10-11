@@ -72,11 +72,12 @@ reviews, and conversations.
 
 ### AH-102 · Push notifications for the creator app (Creator App arc)
 
-- **Status:** **In progress — Checkpoint A (Stages 0–2, backend) pushed (CI green); Checkpoint B (Stages 3–4: the matrix
-  column, the app's push module, Android) built and gated LOCALLY, held for Pedram's eyes-on (E1/E2/E3). Not pushed.**
-  Stage 5 (iOS, **AH-102-ios**) is not started and needs the Apple account. Plan:
-  [`push-notifications-plan.md`](push-notifications-plan.md); inventory:
-  [`push-notifications-inventory.md`](push-notifications-inventory.md); review (draft):
+- **Status:** **Closed 2026-10-11. Pushed (`origin/main` `4d468406..e2501352`, CI **green on all four jobs** ([run 38173240196](https://github.com/pedram-kh/Engine/actions/runs/38173240196): main SPA Playwright 34 passed, 0 flaky; admin SPA Playwright 1 flaky, passed on retry, the known `admin-sign-in.spec.ts:69`, tech-debt 16)), NOT deployed, no flag armed.**
+  Checkpoint A (backend), Checkpoint B (the matrix column, the push module, Android) and Stage 5 (iOS, enabled after the
+  real-iPhone spike) are all on `main`. **Named open items:** the TestFlight production-APNs proof (pending the first upload), the
+  token-rotation re-POST (accepted, self-healing), and item 10's iOS observation (not observed; likely sandbox-APNs feedback timing,
+  unverified). Plan: [`push-notifications-plan.md`](push-notifications-plan.md); inventory:
+  [`push-notifications-inventory.md`](push-notifications-inventory.md); review (final, §29):
   [`push-notifications-review.md`](push-notifications-review.md); device walk:
   [`push-notifications-device-walk.md`](push-notifications-device-walk.md).
 - **Date:** 2026-10-10.
@@ -115,7 +116,7 @@ reviews, and conversations.
   | C2.4   | `72204f1d` | push leg in `notify()` behind `push_notifications_enabled`               |
   | C2.5   | `a8423726` | `push:test` operator command                                             |
 
-- **What (Checkpoint B, app — local, held):**
+- **What (Checkpoint B, app — pushed, walked on Android and iOS):**
   - **The matrix gains a native-only Push column** (`pushChannelAvailable()`: native AND Android, or iOS once
     `IOS_PUSH_ENABLED`), with `type_defaults` composed so `campaign.job_posted` shows OFF by default. The web page is
     unchanged. Corrects AH-101's "no page change" claim (addendum on its review).
@@ -127,8 +128,13 @@ reviews, and conversations.
     `google-services.json` is **not** committed (Pedram supplies it).
   - 24 locales of push strings (the flaky ten checked for English), a `firebase/messaging` Vite alias (no Firebase web
     SDK in the bundle), one allowlist entry in the theme-SoT architecture test (see the review §17).
-- **Checkpoint B commits (local):** `1b16a6f6` docs provenance for A; `f61c0ec1` C3.1; `20942da6` C3.2; `a377cf97` C4.1;
-  `6d07b727` C4.2; `55b4ef21` a test; `9119b9c4` google-services.json; `0d51aed9` iOS wiring (off until the iPhone spike); plus the docs commits.
+- **Checkpoint B commits (pushed):** `1b16a6f6` docs provenance for A; `f61c0ec1` C3.1; `20942da6` C3.2; `a377cf97` C4.1;
+  `6d07b727` C4.2; `55b4ef21` a test; `9119b9c4` google-services.json; `0d51aed9` iOS wiring; `72afb8ae` **fix: a cold-start tap waits for
+  the router (found by the Android walk)**; the Android-bridge logging spec (`9dd7f167`); `4b4dca71` the local-network ATS exception;
+  `9d28206c` **fix: no Android-only channel call on iOS (found by the iPhone spike)**; `9ab318dd` **`IOS_PUSH_ENABLED = true`**; plus the docs commits.
+- **Found on devices (both fixed):** the cold-start tap lost to the router's first navigation (Android); `createChannel` is Android-only and
+  its silent rejection ended iOS registration before the token (iPhone). Recorded, not fixed: the iOS Keychain sign-in survives a reinstall
+  (tech-debt 17).
 - **PROD-DATA RISK: LOW–MEDIUM.** One additive `CREATE TABLE` migration; `notify()` (the hot path) is restructured
   behind a try/catch and an after-commit job, with the flag OFF. The Notifications / Campaigns / Messaging suites
   pass unedited. Existing tests touched, all of them listed in the review §6: the flag-list assertion (+1 line), one
@@ -138,8 +144,9 @@ reviews, and conversations.
   **`engine_c_user` GRANT check** on `user_push_tokens`, the **pre-deploy read** `count(*) … WHERE channel='push'` = 0,
   the **FCM credential read** ("set and decodes to valid JSON"), then `push:test --validate-only`. **No flag armed.**
   See [`deploy-log.md`](../runbooks/deploy-log.md).
-- **Not proven yet:** anything on a device (the E3 walk, including **R-8**, FCM auto-init off); the live FCM error
-  vocabulary (taxonomy is from Google's docs).
+- **Proven:** the Android walk (11 of 12; Samsung SM-A515F, real FCM), the iPhone spike and walk (real iPhone, sandbox APNs), the live FCM
+  `UNREGISTERED`. **Not proven:** the TestFlight production-APNs run; the token-rotation re-POST (R-8); `UNREGISTERED` on iOS; the other
+  FCM codes (`INVALID_ARGUMENT`, `SENDER_ID_MISMATCH`, `QUOTA_EXCEEDED`, 5xx).
 
 ### AH-101 · Notification preference matrix, post-verified notice and the third creator-app UI batch (Creator App arc)
 

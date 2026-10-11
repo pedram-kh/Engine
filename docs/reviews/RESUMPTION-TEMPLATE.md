@@ -116,7 +116,40 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-10-11 · **Through:** AH-102, push notifications for the creator app (Android first), **Checkpoint B
+**Last updated:** 2026-10-11 · **Through:** **AH-102, push notifications for the creator app (Android and iOS) — CLOSED.**
+Checkpoint A (backend), Checkpoint B (the matrix column, the push module, Android) and Stage 5 (iOS) are all on `origin/main`:
+Checkpoint A `4d468406..6e827e40`, then B and the iOS stage `6e827e40..e2501352` (CI at that tip: **green on all four jobs** ([run 38173240196](https://github.com/pedram-kh/Engine/actions/runs/38173240196): main SPA Playwright 34 passed, 0 flaky; admin SPA Playwright 1 flaky, passed on retry, the known `admin-sign-in.spec.ts:69`, tech-debt 16)), plus a docs-only closing
+commit. **Pushed, NOT deployed, no flag armed:** `push_notifications_enabled` is OFF everywhere; `IOS_PUSH_ENABLED` is `true` in code only.
+**One additive migration (`user_push_tokens`, Checkpoint A).** **PROD-DATA RISK: LOW–MEDIUM** (the `notify()` hot path restructured behind
+try/catch, an after-commit job and the OFF flag). Live state is `git status` and `origin/main`, not this sentence. Review (final, §29):
+[`push-notifications-review.md`](push-notifications-review.md); walk record:
+[`push-notifications-device-walk.md`](push-notifications-device-walk.md); ad-hoc entry AH-102; deploy entries in `deploy-log.md`
+(Checkpoint A and B, both PENDING).
+
+- **Proven:** the Android walk (Samsung SM-A515F, real FCM, 11 of 12 items); the real-iPhone spike and iOS walk (iOS 27.0.1, Xcode debug
+  install, sandbox APNs, the one uploaded key): token, delivery, neutral localised copy (en, es), tap from background and killed,
+  foreground (no banner, bell +1), sign-out, deny path. Playwright is clean in CI at the pushed tip for the main SPA (34 passed, 0 flaky); the admin suite passed on retry after the known `admin-sign-in.spec.ts:69` flake (tech-debt 16, now three CI runs in a row, undiagnosed). Full `apps/main` suite green.
+- **Named open items (none blocking the close):** **(1)** the **TestFlight production-APNs proof**, pending the first TestFlight upload,
+  required before the first iOS store build; **(2)** the **token-rotation re-POST** (R-8), never forced on a device, accepted by Pedram
+  as self-healing (a rotated token that never re-POSTs goes `UNREGISTERED` on the next send and is invalidated); tech-debt 11;
+  **(3)** **item 10 on iOS**, no `UNREGISTERED` observed in 6 test sends and 1 real send (likely sandbox-APNs feedback timing, a known
+  vendor quirk, **unverified**; the server logic is proven on Android); re-observe on the TestFlight run.
+- **Pedram owes:** the first TestFlight upload (and the production-APNs run); the production FCM credential in Secrets Manager, then
+  `push:test --validate-only`, before arming `push_notifications_enabled` (timed before the first push-capable store build reaches
+  users); the deploy of the Checkpoint A/B stack on his schedule (**pushed is not deployed**; deploy obligations are in the deploy log:
+  snapshot, `migrate`, `queue:restart`, the `engine_c_user` GRANT check on `user_push_tokens`, the pre-deploy read, the credential read).
+- **Decided, to land later:** **tech-debt 17** (the iOS Keychain sign-in survives a delete and reinstall) is accepted as recorded; the
+  decision lands before the first iOS store build, likely with AH-104's deletion work.
+- **Standing traps from this chunk:** never run a bare `npx cap sync` (R-7; `cap sync android` / `cap sync ios` only); Gradle needs
+  JDK 21; a stale Xcode DerivedData can build an app without Firebase (a 260 KB binary); `SANCTUM_STATEFUL_DOMAINS` with a bare
+  `localhost` returns 419 to the Android origin; an exported shell env var overrides `.env`; a real iPhone cannot reach `localhost`
+  (use the Mac's LAN address, `NSAllowsLocalNetworking`, and the macOS firewall); `push:test` is read-only and English-only. Never
+  commit or print the FCM service-account value. Real behaviour (localisation, throttle, invalidation) needs a real `notify()`.
+- **Named follow-ups:** AH-102b (`push_deliveries`), AH-103 (per-type deep links), AH-105 (privacy checklist; the FCM install
+  identifier), an Android settings deep-link for the denied state, native review of `lang/*/push.php`, the matrix Push toggle caption
+  while the OS blocks push (tech-debt 14), and tech-debt 15 to 17.
+
+**Prior state, for the record — AH-102 Checkpoint B, held for the walk.** **Last updated:** 2026-10-11 · **Through:** AH-102, push notifications for the creator app (Android first), **Checkpoint B
 built and gated locally, HELD for Pedram's eyes-on (E1 matrix column + push icon, E2 soft-ask, E3 Android device walk)**.
 Checkpoint A (backend, Stages 0–2) is pushed (`4d468406..6e827e40`, CI green, [run 38135748678](https://github.com/pedram-kh/Engine/actions/runs/38135748678)). Checkpoint B is **local, not
 pushed**: `1b16a6f6` (A's provenance docs), `f61c0ec1` (C3.1 push column in the matrix, native only), `20942da6` (C3.2 push
@@ -1421,6 +1454,9 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
 
 ### Open threads
 
+- **✅ AH-102 is CLOSED and PUSHED (2026-10-11), not deployed.** Open items: the TestFlight production-APNs proof (pending the
+  first upload), the token-rotation re-POST (accepted), item 10's iOS observation (not observed; unverified likely cause). Part 2 above
+  and review §29 carry the detail; deploy state is in `deploy-log.md`.
 - **✅ AH-100 is CLOSED and PUSHED (2026-10-07).** The open item is Pedram's simulator/device
   walkthrough (review §9), the chunk's eyes-on instrument; Android has been verified as a build
   only. Deploy state is in `deploy-log.md` (PENDING, stacked on AH-099). (The line that stood here, "AH-098's

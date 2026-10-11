@@ -119,18 +119,19 @@ happened.
 - **Operator:** —
 - **Anything unexpected:** —
 
-## AH-102 (Checkpoint B, app) — push column, push registration module, Android FCM wiring — PENDING
+## AH-102 (Checkpoint B, app) — push column, push registration module, Android FCM wiring, iOS enabled — PENDING
 
 > **Stacks on AH-102 Checkpoint A and everything under it (AH-099 … AH-101, all PENDING).** **Cleared 2026-10-11:** Pedram's
 > Android walk (E1/E2/E3, real FCM, Samsung SM-A515F) passed 11 of 12 items; item 12 is partial (rotation re-POST not
 > verified, accepted as a known gap: self-healing in production, see `docs/tech-debt.md`). SPA + Android project only.
 
-- **Status:** PENDING (cleared by the Android walk; pushed to `origin/main` at `9dd7f167`, CI green; not deployed). **Pushing is not deploying.**
-- **Range:** from Checkpoint A's pushed tip `6e827e40` → tip **`9dd7f167`, pushed 2026-10-11, CI green (run 38163464156; see review §26)** (`1b16a6f6` … `96518a3e` plus `9dd7f167`): `1b16a6f6` (docs), `f61c0ec1` (C3.1),
-  `20942da6` (C3.2), `a377cf97` (C4.1), `6d07b727` (C4.2), `55b4ef21` (a test), `1eef233c` (docs), `9119b9c4`
-  (google-services.json), `0d51aed9` (iOS wiring), `8521aadc` / `899882d3` / `c803d7db` / `96518a3e` (docs), **`72afb8ae`
-  (fix: a cold-start push tap waits for the router; found by the walk)**, and the spec that pins the Android bridge logging as
-  debug-only.
+- **Status:** PENDING (**closed 2026-10-11**: pushed to `origin/main` at `e2501352`, CI **green on all four jobs** ([run 38173240196](https://github.com/pedram-kh/Engine/actions/runs/38173240196): main SPA Playwright 34 passed, 0 flaky; admin SPA Playwright 1 flaky, passed on retry, the known `admin-sign-in.spec.ts:69`, tech-debt 16); not deployed). **Pushing is not deploying.**
+- **Range:** from Checkpoint A's pushed tip `6e827e40` → **`e2501352`** (a docs-only closing commit follows it). The commits: `1b16a6f6`
+  (docs), `f61c0ec1` (C3.1), `20942da6` (C3.2), `a377cf97` (C4.1), `6d07b727` (C4.2), `55b4ef21` (a test), `1eef233c` (docs),
+  `9119b9c4` (google-services.json), `0d51aed9` (iOS wiring), `8521aadc` / `899882d3` / `c803d7db` / `96518a3e` / `d0a5fd18` (docs),
+  **`72afb8ae`** (fix: a cold-start push tap waits for the router; found by the Android walk), `9dd7f167` (the Android-bridge logging
+  spec), `4b4dca71` (the `NSAllowsLocalNetworking` ATS exception), **`9d28206c`** (fix: no Android-only channel call on iOS; found by
+  the iPhone spike), **`9ab318dd`** (`IOS_PUSH_ENABLED = true`), `e2501352` (docs).
 - **AH entries carried:** AH-102 (app half)
 - **Migrations run:** **none.** No schema change, no backfill.
 - **Pre-deploy reads:** none beyond Checkpoint A's.
@@ -143,8 +144,9 @@ happened.
 - **The Android build** is handed to Pedram's store process; it is not part of the web deploy. `google-services.json`
   (project "Catalyst Production") is committed (`9119b9c4`).
 - **The iOS project** gains the push wiring (`0d51aed9`: plugin, entitlement, plist, AppDelegate). The real-iPhone spike
-  passed (2026-10-11, review §28) and `IOS_PUSH_ENABLED` is now `true` in code (`9ab318dd`, **not yet pushed**); the server flag keeps push off. The production-APNs
-  (TestFlight) run is still to do before the first iOS store build.
+  passed (2026-10-11, review §28) and `IOS_PUSH_ENABLED` is now `true` in code (`9ab318dd`, pushed); the server flag keeps push off. The
+  **TestFlight production-APNs proof is pending the first upload** and is required before the first iOS store build. The iOS `Info.plist`
+  gains `NSAllowsLocalNetworking` (local-network traffic only; production talks HTTPS, so it changes nothing there).
 
 **What is gated OFF**
 
@@ -160,7 +162,9 @@ happened.
   2026-10-11 against the local API; the first PRODUCTION run is the first store build, after the flag is armed).
 - **Flags armed:** none — `push_notifications_enabled` stays OFF.
 - **Operator:** —
-- **Anything unexpected:** —
+- **Anything unexpected:** — (nothing at deploy: not deployed yet). Named open items, none blocking: the TestFlight production-APNs proof
+  (pending the first upload); the token-rotation re-POST (accepted, self-healing); item 10 on iOS not observed (likely sandbox-APNs
+  feedback timing, unverified). Tech-debt 17 (the iOS Keychain sign-in survives a reinstall) is decided before the first iOS store build.
 
 ## AH-101 — notification preference matrix, post-verified notice, third creator-app UI batch — PENDING
 
