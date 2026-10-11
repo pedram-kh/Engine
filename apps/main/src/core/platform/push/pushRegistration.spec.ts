@@ -233,6 +233,23 @@ describe('accept', () => {
     expect(registration.permission.value).toBe('granted')
   })
 
+  it('on iOS it never asks for a channel (the plugin has none there) and still registers', async () => {
+    const h = harness({ platform: () => 'ios' })
+    // The real plugin rejects `createChannel` on iOS ("Not implemented on iOS").
+    h.client.createChannel.mockRejectedValue(new Error('Not implemented on iOS.'))
+    h.client.requestPermission.mockImplementation(async () => {
+      h.state.permission = 'granted'
+      return 'granted'
+    })
+    const registration = createPushRegistration(h.deps)
+
+    expect(await registration.accept()).toBe('granted')
+
+    expect(h.client.createChannel).not.toHaveBeenCalled()
+    expect(h.client.getToken).toHaveBeenCalledTimes(1)
+    expect(h.tokens.register).toHaveBeenCalledWith('fcm-token-1', 'ios', '1.4.0')
+  })
+
   it('an OS "don\'t allow" mints no token, POSTs nothing, and starts the cool-down', async () => {
     const h = harness()
     h.client.requestPermission.mockResolvedValue('denied')

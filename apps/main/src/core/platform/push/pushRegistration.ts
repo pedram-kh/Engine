@@ -131,8 +131,13 @@ export function createPushRegistration(deps: PushRegistrationDeps): PushRegistra
     }
     try {
       // Re-asserting the channel each time keeps its OS-visible name in step with
-      // the current locale (the id, and the importance, never change).
-      await client.createChannel(channel())
+      // the current locale (the id, and the importance, never change). Android
+      // only: the plugin answers `createChannel` on iOS with "Not implemented",
+      // which would land in the catch below and silently end registration before
+      // the token is ever minted (found on the first iPhone run).
+      if (os === 'android') {
+        await client.createChannel(channel())
+      }
       const token = knownToken ?? (await client.getToken())
       if (token === '') {
         return false
