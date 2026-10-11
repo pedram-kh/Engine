@@ -121,13 +121,13 @@ built and gated locally, HELD for Pedram's eyes-on (E1 matrix column + push icon
 Checkpoint A (backend, Stages 0–2) is pushed (`4d468406..6e827e40`, CI green, [run 38135748678](https://github.com/pedram-kh/Engine/actions/runs/38135748678)). Checkpoint B is **local, not
 pushed**: `1b16a6f6` (A's provenance docs), `f61c0ec1` (C3.1 push column in the matrix, native only), `20942da6` (C3.2 push
 strings ×24), `a377cf97` (C4.1 registration, soft-ask, tap, foreground), `6d07b727` (C4.2 Android FCM wiring and the push icon),
-`55b4ef21` (a test), plus the Checkpoint B docs commit. **No migration in B. Flag `push_notifications_enabled` is OFF everywhere and stays OFF.**
+`55b4ef21` (a test), `9119b9c4` (google-services.json), `0d51aed9` (iOS wiring, off until the spike), plus the docs commits. **No migration in B. Flag `push_notifications_enabled` is OFF everywhere and stays OFF.**
 Review: [`push-notifications-review.md`](push-notifications-review.md) (§14–§18); device walk scaffold:
 [`push-notifications-device-walk.md`](push-notifications-device-walk.md).
 
-- **Pedram owes:** the Firebase project and its owning Google account (Q9), `apps/main/android/app/google-services.json`
-  (committed, Q14), `FCM_PROJECT_ID` + `FCM_SERVICE_ACCOUNT_JSON_B64` for the API, then the E1/E2/E3 walk. Until the
-  json lands the Android build succeeds but Firebase cannot initialise at runtime.
+- **Pedram owes:** the E1/E2/E3 walk and the iOS spike (device-walk doc §4 and §6), with `FCM_PROJECT_ID` and
+  `FCM_SERVICE_ACCOUNT_JSON_B64` in his local API `.env`. Firebase ("Catalyst Production"), `google-services.json`,
+  `GoogleService-Info.plist`, the APNs key and the Apple account are done.
 - **Not proven:** anything on a device; the live FCM error vocabulary; **R-8 (FCM auto-init off, rotation)**; Playwright on
   the Checkpoint B tip (needs the dev stack down). **Never run a bare `npx cap sync`** (R-7), `cap sync android` only. Gradle
   needs JDK 21 (the system default here is 25).

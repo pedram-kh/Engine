@@ -341,8 +341,8 @@ the docs pair, C0.3, and the gates docs commit).
 > proven by Vitest (fakes at the Capacitor and HTTP seams), a Gradle build, a merged-manifest read and an image
 > inspection. The first real answers come from your E3 walk ([`push-notifications-device-walk.md`](push-notifications-device-walk.md)).
 >
-> ⚠ **`google-services.json` does not exist yet.** The Android build succeeds without it; Firebase cannot initialise at
-> runtime until you supply it (Q9, Q14).
+> ✅ **`google-services.json` is in** (commit `9119b9c4`, Firebase project "Catalyst Production"); the release APK carries the
+> project's `google_app_id`. Still nothing has run against real FCM.
 >
 > ⚠ **R-8 (FCM auto-init off) is unverified.** The manifest keeps it off so no token exists before consent. If E3 item 12
 > fails, the fallback is default auto-init (§19).
@@ -533,8 +533,57 @@ if it grows again. Say if you would rather have `@capacitor/preferences` instead
 1. **Eyes-on E1, E2, E3** (the device-walk doc has the scaffold). For E1, the push icon preview is in §16.2.
 2. **May I stop your `php artisan serve` (:8000) again** to run the full Playwright suites on the isolated stack before
    the push? (I will tell you when it is back to yours; it restarts as you started it.)
-3. **Supply** the Firebase project and its owning account (Q9), `google-services.json` (Q14), and the FCM credential in
-   `apps/api/.env`, when you are ready for E3.
+3. **Put the FCM credential in your local `apps/api/.env`** (`FCM_PROJECT_ID=catalyst-production-c28e9`,
+   `FCM_SERVICE_ACCOUNT_JSON_B64`) for E3. The Firebase project, `google-services.json` and the iOS prerequisites are done
+   (§22); the service-account key stays with you until deploy.
 4. **The one gate edit** (§17) and the decisions listed there.
-5. **The push itself:** `1b16a6f6` + C3.1 + C3.2 + C4.1 + C4.2 + the test and docs commits, as one push, after the above.
+5. **The push itself:** `1b16a6f6` + C3.1 + C3.2 + C4.1 + C4.2 + the test, `google-services.json`, iOS wiring and docs commits, as one push, after the above.
    Nothing is pushed.
+
+## 22. Stage 5 (iOS) — wired, not enabled (added 2026-10-11)
+
+Q19 is now yes (Apple account active, Team `LTW9262ZXP`, APNs key uploaded to Firebase, Push on the App ID,
+`GoogleService-Info.plist` supplied). Two commits, both local:
+
+- **`9119b9c4`** `google-services.json` committed (Q14). Evidence: `processDebugGoogleServices` and
+  `processReleaseGoogleServices` run; the release APK holds `google_app_id` `1:908297825153:android:4dd8…`, `project_id`
+  `catalyst-production-c28e9`, `gcm_defaultSenderId` `908297825153` (read with `aapt2`). The config spec pins the package
+  name to the app id, the one production project, and that no service-account key can be pasted into it (BR-45..47: 1
+  failing each).
+- **`0d51aed9`** the plan's 5.2 wiring: `cap sync ios`; the SwiftPM symlink option; `App.entitlements`
+  (`aps-environment=development`; Xcode's automatic signing swaps in `production` for TestFlight and App Store archives);
+  `DEVELOPMENT_TEAM=LTW9262ZXP` on both configurations; the plugin's three AppDelegate forwards; FCM auto-init off;
+  foreground `presentationOptions: []` (P-5); `GoogleService-Info.plist` as a bundle resource.
+  **`IOS_PUSH_ENABLED` stays `false`**, so no iOS user sees a Push control before the iPhone spike (the plan flips it in
+  5.2; I held it back because the spike is what decides go or no-go, and Checkpoint B must not carry an unproven iOS push).
+
+**Evidence (the plan's R-6, partly):** the SwiftPM graph resolves and the app builds for a generic iOS device in Debug and
+Release, unsigned (`** BUILD SUCCEEDED **`), under Xcode 26.0. The release binary links Firebase Messaging (192 string
+hits, 2 MB) and **not** the GoogleAppMeasurement SDK (only the interop stubs inside Firebase Core and Messaging).
+`FirebaseMessagingAutoInitEnabled=false` and `GoogleService-Info.plist` are in the built bundle.
+
+**Two things that went wrong on the way, kept because the next person will meet them:**
+
+1. The first `xcodebuild` died resolving packages (`grpcpp.zip … does not contain a binary artifact`); an immediate retry
+   resolved. Transient.
+2. **A build that succeeded without Firebase in it.** After the second attempt, the Release binary was 260 KB and
+   contained no Firebase symbols, yet reported success; it was a stale build cache from before the package graph changed.
+   After deleting the project's DerivedData `Build` folder it rebuilt at 2 MB with Firebase linked. I only caught it by
+   inspecting the binary, so this is in the device-walk doc as the first thing to check if push is dead on the phone.
+
+**Spec:** `tests/unit/native/pushIosConfig.spec.ts` (15). Break-reverts, each 1 failing: BR-48 AppDelegate drops the
+APNs-token forward · BR-49 auto-init on · BR-50 entitlement dropped from one configuration · BR-51 team removed from one
+configuration · BR-52 plist removed from the Resources phase (**survived at first**: my regex also matched the build-file
+definition line; tightened to the Resources phase and re-run: 1) · BR-53 plist for another bundle id · BR-54 plist from
+another Firebase project · BR-55 foreground banner left at the plugin default · BR-56 SwiftPM symlink option dropped ·
+BR-57 plugin missing from the Swift package · BR-58 entitlement key removed. The earlier "iOS has NOT picked the plugin
+up" assertion (R-7) was **removed from `pushAndroidConfig.spec.ts`** because the wiring now intentionally exists (a
+conscious edit of my own C4.2 spec; `tech-debt.md` item 1 records R-7 as resolved).
+
+**Not done, and cannot be by me:** 5.1 on a real iPhone (go/no-go), the signed archive (needs your Xcode account), and 5.3.
+The spike needs a **local, uncommitted** `IOS_PUSH_ENABLED = true` or the phone never shows the soft-ask; the steps are in the
+device-walk doc §6. On go, that flip is its own commit; on no-go, plan §5.4 (fallback B) applies and the two Stage 5 commits
+are the part to reconsider.
+
+**Closing AH-102 with Stage 5:** possible if the spike goes well. What it adds to Checkpoint B: this section, the flip commit,
+and the §4 walk run on iOS twice (debug and TestFlight).

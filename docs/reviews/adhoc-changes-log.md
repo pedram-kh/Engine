@@ -128,7 +128,7 @@ reviews, and conversations.
   - 24 locales of push strings (the flaky ten checked for English), a `firebase/messaging` Vite alias (no Firebase web
     SDK in the bundle), one allowlist entry in the theme-SoT architecture test (see the review §17).
 - **Checkpoint B commits (local):** `1b16a6f6` docs provenance for A; `f61c0ec1` C3.1; `20942da6` C3.2; `a377cf97` C4.1;
-  `6d07b727` C4.2; `55b4ef21` a test; plus the Checkpoint B docs commit.
+  `6d07b727` C4.2; `55b4ef21` a test; `9119b9c4` google-services.json; `0d51aed9` iOS wiring (off until the iPhone spike); plus the docs commits.
 - **PROD-DATA RISK: LOW–MEDIUM.** One additive `CREATE TABLE` migration; `notify()` (the hot path) is restructured
   behind a try/catch and an after-commit job, with the flag OFF. The Notifications / Campaigns / Messaging suites
   pass unedited. Existing tests touched, all of them listed in the review §6: the flag-list assertion (+1 line), one

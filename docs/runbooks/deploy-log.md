@@ -126,7 +126,7 @@ happened.
 
 - **Status:** PENDING (local; push held)
 - **Range:** from Checkpoint A's pushed tip `6e827e40` → tip **TBD at push**: `1b16a6f6` (docs), `f61c0ec1` (C3.1),
-  `20942da6` (C3.2), `a377cf97` (C4.1), `6d07b727` (C4.2), `55b4ef21` (a test), plus the Checkpoint B docs commit.
+  `20942da6` (C3.2), `a377cf97` (C4.1), `6d07b727` (C4.2), `55b4ef21` (a test), `9119b9c4` (google-services.json), `0d51aed9` (iOS wiring), plus the docs commits.
 - **AH entries carried:** AH-102 (app half)
 - **Migrations run:** **none.** No schema change, no backfill.
 - **Pre-deploy reads:** none beyond Checkpoint A's.
@@ -136,9 +136,10 @@ happened.
 - **Web:** the SPA ships with the Push column code, but it is **invisible on web** (`pushChannelAvailable()` is `false`
   without a native shell); the page renders exactly as before (pinned by web-polarity specs and the unedited AH-101
   page spec). Locale files gain push strings ×24. No route, API or env change.
-- **The Android build** is handed to Pedram's store process; it is not part of the web deploy. It needs
-  `apps/main/android/app/google-services.json` (**Pedram supplies**, not yet in the repo) and the Firebase project (Q9).
-  Until both exist, an Android build installs but cannot initialise Firebase.
+- **The Android build** is handed to Pedram's store process; it is not part of the web deploy. `google-services.json`
+  (project "Catalyst Production") is committed (`9119b9c4`).
+- **The iOS project** gains the push wiring (`0d51aed9`: plugin, entitlement, plist, AppDelegate) but push stays **off**
+  on iOS (`IOS_PUSH_ENABLED=false`) until the real-iPhone spike passes. No iOS build ships push before that.
 
 **What is gated OFF**
 

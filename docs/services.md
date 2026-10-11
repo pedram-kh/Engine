@@ -140,9 +140,12 @@ send_base_url}`. A missing / non-base64 / non-JSON credential is a `config_error
   aliased to a stub, so no Firebase web SDK reaches the bundle). Manifest: FCM auto-init **off** (the token is minted only
   after the in-app soft-ask is accepted, **unverified on a device**: plan R-8), analytics collection **off**, default
   channel `catalyst_default` (the server's `PushMessage::DEFAULT_CHANNEL`), default icon `ic_stat_catalyst`.
-  `google-services.json` is **not in the repo yet** (Pedram supplies it; the existing conditional in
-  `android/app/build.gradle` applies the plugin once it exists). Sync with `npx cap sync android` only (R-7); Gradle
-  needs JDK 21.
+  `google-services.json` is committed (Q14; project "Catalyst Production", `catalyst-production-c28e9`); the existing
+  conditional in `android/app/build.gradle` applies the Google-services plugin. Gradle needs JDK 21.
+- **iOS app (Stage 5, wired, not enabled):** the same plugin through SwiftPM (`experimental.ios.spm.packageOptions`
+  symlink), the Push capability (`App.entitlements`, Team `LTW9262ZXP`), `GoogleService-Info.plist` committed, FCM
+  auto-init off, foreground presentation `[]`. The APNs auth key is uploaded to Firebase (never in the repo).
+  `IOS_PUSH_ENABLED` stays `false` until the real-iPhone spike passes (device-walk doc §6).
 - **Lands in:** AH-102 (Checkpoint A: backend; Checkpoint B: matrix column and Android app; Stage 5: iOS).
 
 ---

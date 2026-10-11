@@ -89,3 +89,35 @@ record that Firebase would then hold an installation identifier from first launc
 
 For each row: pass or fail, and for 1, 9 and 10 the SQL output; for 2 to 8 a screenshot of the lock screen or shade;
 for 12 the before and after of `user_push_tokens`. Anything that fails goes in the review as a finding, not a footnote.
+
+## 6. iOS spike and walk (Stage 5: 5.1, then 5.3)
+
+The wiring is committed (`0d51aed9`) and builds unsigned for a generic iOS device in Debug and Release, but it is **off**:
+`IOS_PUSH_ENABLED` is `false`, so on an iPhone the app shows no Push column and never asks. **That is why the spike needs
+one local, uncommitted edit.**
+
+```bash
+# 1. Local only, do NOT commit: let the iPhone build offer push
+#    apps/main/src/core/platform/push/pushChannelAvailable.ts  ->  export const IOS_PUSH_ENABLED = true
+
+cd apps/main && pnpm build:native:dev
+cd apps/main && npx cap sync ios                 # now fine on iOS: the wiring exists
+cd apps/main && npx cap open ios                 # Xcode: target App, Team LTW9262ZXP (already set), your iPhone, Run
+```
+
+If Xcode says it cannot find the Firebase package product after a sync, close Xcode, delete
+`~/Library/Developer/Xcode/DerivedData/App-*/Build`, and build again. (During the wiring a stale build cache silently
+produced an app **without** Firebase, a 260 KB binary instead of 2 MB, while still reporting success. If push is dead on
+the device, check this first.)
+
+| #    | 5.1 spike check (time-boxed; go / no-go is recorded here)                                                                         | Result | Evidence |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
+| S5.1 | The app builds and installs on the iPhone from Xcode with the Firebase package (R-6)                                              |        |          |
+| S5.2 | Dashboard soft-ask appears; Accept shows the iOS permission prompt; Allow                                                         |        |          |
+| S5.3 | A `user_push_tokens` row exists with `platform=ios` (an FCM token, not a raw APNs token: long, with a colon)                      |        |          |
+| S5.4 | `php artisan push:test --user=<id>` delivers to the phone (debug install = sandbox APNs, through the one uploaded key)            |        |          |
+| S5.5 | **Go / no-go:** go means FCM accepted the iOS token and the push arrived. No-go triggers plan §5.4 (fallback B, `ApnsPushSender`) |        |          |
+
+On **go**: revert the local edit, commit `IOS_PUSH_ENABLED = true` (the pinned spec for that constant is updated in the same
+commit), then run items 1 to 12 of §4 on iOS, once from the Xcode debug install and once from TestFlight (production APNs),
+to catch the sandbox/production token split. Item 12 on iOS is the `FirebaseMessagingAutoInitEnabled=NO` equivalent.
