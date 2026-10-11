@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import { createApp, watch } from 'vue'
 import { createPinia } from 'pinia'
 
 import App from './App.vue'
@@ -8,6 +8,9 @@ import { router } from './core/router'
 import { i18n, setLocale } from './core/i18n'
 import { startAppResumeRefresh } from './core/platform/appResume'
 import { bootNativeShell } from './core/platform/bootNativeShell'
+import { startPush } from './core/platform/push/startPush'
+import { useAuthStore } from './modules/auth/stores/useAuthStore'
+import { requestNotificationsRefresh } from './modules/notifications/composables/notificationsRefresh'
 import { vuetify } from './plugins/vuetify'
 
 // Self-hosted Inter typeface (Catalyst Engine v2). Imported before the design
@@ -42,4 +45,27 @@ void Promise.all([
       void router.push({ name: 'auth.sign-in', query: { reason: SESSION_EXPIRED_QUERY_REASON } })
     },
   })
+
+  // AH-102: creator app only (a no-op on the web, and on iOS until AH-102-ios) —
+  // push token upkeep and the tap / foreground handlers. It never asks for
+  // permission (that is the soft-ask sheet's job). A tap opens the notification
+  // list; per-type destinations are AH-103. A foreground push re-reads the bell
+  // and shows no banner. The router and the refresh are injected here because
+  // only this wiring layer may touch them.
+  const push = startPush({
+    onTap: () => {
+      void router.push({ name: 'creator.notifications' })
+    },
+    onForeground: () => requestNotificationsRefresh(),
+  })
+  // A session appearing (sign-in on a device that already granted permission)
+  // registers without an app restart.
+  watch(
+    () => useAuthStore().user?.id ?? null,
+    (userId) => {
+      if (userId !== null) {
+        push.sync()
+      }
+    },
+  )
 })

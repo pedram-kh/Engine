@@ -54,6 +54,7 @@ import { pushChannelAvailable } from '@/core/platform/push/pushChannelAvailable'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 
 import { notificationsApi } from '../api/notifications.api'
+import PushStateRow from '../components/PushStateRow.vue'
 import {
   preferenceColumns,
   preferenceGroupsForRole,
@@ -208,6 +209,10 @@ onMounted(loadPreferences)
     <p class="text-body-2 text-medium-emphasis mb-6">
       {{ t('notifications.preferences.description') }}
     </p>
+
+    <!-- AH-102: native only — says so when the OS has push off, so the push column
+         never feels dead. Renders nothing on the web. -->
+    <PushStateRow />
 
     <v-skeleton-loader v-if="loading" type="article" data-test="prefs-skeleton" />
 

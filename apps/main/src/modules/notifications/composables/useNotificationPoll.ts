@@ -29,6 +29,7 @@
 import { getCurrentInstance, onBeforeUnmount, ref, type Ref } from 'vue'
 
 import { notificationsApi } from '../api/notifications.api'
+import { NOTIFICATIONS_REFRESH_EVENT } from './notificationsRefresh'
 
 export const NOTIFICATION_POLL_INTERVAL_MS = 45000
 
@@ -56,6 +57,7 @@ export function useNotificationPoll(): NotificationPollHandle {
   let cancelled = false
   let timeoutHandle: ReturnType<typeof setTimeout> | null = null
   let visibilityListener: (() => void) | null = null
+  let refreshListener: (() => void) | null = null
 
   function isHidden(): boolean {
     return typeof document !== 'undefined' && document.visibilityState === 'hidden'
@@ -127,6 +129,16 @@ export function useNotificationPoll(): NotificationPollHandle {
       visibilityListener = onVisibilityChange
       document.addEventListener('visibilitychange', visibilityListener)
     }
+    // AH-102 — a foreground push asks every running poll to re-read now. The
+    // same lifetime as the visibility listener: added at start, removed at cancel.
+    if (refreshListener === null && typeof document !== 'undefined') {
+      refreshListener = () => {
+        if (!cancelled) {
+          void fetchCount()
+        }
+      }
+      document.addEventListener(NOTIFICATIONS_REFRESH_EVENT, refreshListener)
+    }
     await tick()
   }
 
@@ -137,6 +149,10 @@ export function useNotificationPoll(): NotificationPollHandle {
     if (visibilityListener !== null && typeof document !== 'undefined') {
       document.removeEventListener('visibilitychange', visibilityListener)
       visibilityListener = null
+    }
+    if (refreshListener !== null && typeof document !== 'undefined') {
+      document.removeEventListener(NOTIFICATIONS_REFRESH_EVENT, refreshListener)
+      refreshListener = null
     }
   }
 

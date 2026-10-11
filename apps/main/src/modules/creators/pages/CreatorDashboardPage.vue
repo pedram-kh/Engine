@@ -40,6 +40,8 @@ import { useRouter } from 'vue-router'
 
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
+import PushSoftAskSheet from '@/modules/notifications/components/PushSoftAskSheet.vue'
+
 import DashboardInvitationCard from '../components/DashboardInvitationCard.vue'
 import DashboardStrengthCard from '../components/DashboardStrengthCard.vue'
 import { useApplicationStatusPoll } from '../../onboarding/composables/useApplicationStatusPoll'
@@ -457,6 +459,11 @@ onMounted(async () => {
     >
       {{ snackbar?.text }}
     </v-snackbar>
+
+    <!-- AH-102: the push soft-ask. Native + push-capable builds only (it renders
+         nothing on the web); pending and approved creators, never rejected or
+         mid-wizard ones. -->
+    <PushSoftAskSheet :eligible="status === 'pending' || status === 'approved'" />
   </section>
 </template>
 

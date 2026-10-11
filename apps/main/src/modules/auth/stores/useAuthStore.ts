@@ -51,6 +51,7 @@ import { writeStoredLocale } from '@/composables/useLocalePreference'
 import { nativeTokenStore } from '@/core/auth/tokenStore'
 import { setLocale } from '@/core/i18n'
 import { isNativePlatform, nativePlatform } from '@/core/platform/isNativePlatform'
+import { pushLogoutCleanup } from '@/core/platform/push/pushLogoutCleanup'
 import { setAuthRebootstrap, useAgencyStore } from '@/core/stores/useAgencyStore'
 import { resetWelcomeBackFlag } from '@/modules/onboarding/internal/welcomeBackFlag'
 import { authApi } from '../api/auth.api'
@@ -367,6 +368,11 @@ export const useAuthStore = defineStore('auth', () => {
    * the server-side token to lapse at its `expires_at`.
    */
   async function nativeLogout(): Promise<void> {
+    // AH-102 (R-4) — forget this device's push token while the bearer still
+    // works (the DELETE needs it). Best-effort and bounded: it never throws and
+    // never holds sign-out past its own short timeout. It MUST run before the
+    // token is cleared below; the order is pinned by a spec.
+    await pushLogoutCleanup().catch(() => undefined)
     try {
       await authApi.logout()
     } catch {

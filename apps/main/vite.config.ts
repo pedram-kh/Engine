@@ -75,6 +75,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // AH-102: `@capacitor-firebase/messaging`'s web half imports the Firebase
+      // web SDK (an optional peer we do not install — push is native-only).
+      // Resolve it to a stub so the web build links; see the stub's header.
+      'firebase/messaging': fileURLToPath(
+        new URL('./src/core/platform/push/firebaseMessagingStub.ts', import.meta.url),
+      ),
     },
   },
   optimizeDeps: {

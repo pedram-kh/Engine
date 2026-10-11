@@ -25,6 +25,16 @@ vi.mock('@/core/platform/push/pushChannelAvailable', () => ({
   pushChannelAvailable: () => platform.pushAvailable,
 }))
 
+// The state row has its own spec; here it sees a registration that is already
+// granted, so it renders nothing and the page's matrix is what is under test.
+vi.mock('@/core/platform/push/usePushRegistration', () => ({
+  usePushRegistration: () => ({
+    permission: { value: 'granted' },
+    refreshPermission: async () => 'granted',
+    accept: async () => 'granted',
+  }),
+}))
+
 vi.mock('../api/notifications.api', () => ({
   notificationsApi: {
     getPreferences: vi.fn(),

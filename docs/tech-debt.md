@@ -3039,3 +3039,9 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
   look at the device, the way AH-100d's button radius (the same shape of bug) did.
 - **Owner:** frontend / mobile. **Status:** open. Surfaced at AH-101, 2026-10-10
   ([review](reviews/notification-prefs-and-ui-batch-review.md) §8.3).
+
+## Push registration keeps local state in WebView `localStorage` (AH-102)
+
+`apps/main/src/composables/usePushPreference.ts` persists the creator app's local push state (`catalyst.push.askedAt` — the 30-day soft-ask cool-down; `catalyst.push.registeredAt` / `catalyst.push.token` — the once-a-day upkeep and rotation dedupe). It is non-secret and cleared on uninstall, so WebView `localStorage` is adequate, and a lost value costs one repeated soft-ask or one extra registration.
+
+It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the test's own instruction for non-theme persistence), the same way `useLocalePreference.ts` is. Debt: the allowlist is a growing list of "composable is the persistence layer" files; if it grows again, generalise that test to "storage primitives only in `composables/use*Preference.ts`" instead of enumerating paths. Open to moving the cool-down to `@capacitor/preferences` if WebView storage eviction ever shows up on device.

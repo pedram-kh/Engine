@@ -87,6 +87,12 @@ const ALLOWLISTED_RELATIVE_PATHS: ReadonlySet<string> = new Set([
   // useThemePreference — it IS the persistence layer and legitimately
   // owns the localStorage primitives for the locale key.
   'composables/useLocalePreference.ts',
+  // AH-102: usePushPreference is the persistence layer for the creator app's
+  // LOCAL push state (the soft-ask cool-down and the once-a-day registration
+  // upkeep) — non-theme, non-secret, WebView localStorage, cleared on uninstall.
+  // Mirrors useLocalePreference: it IS the persistence layer and owns the
+  // primitives for its keys. Carries a matching note in docs/tech-debt.md.
+  'composables/usePushPreference.ts',
 ])
 
 const FORBIDDEN_PATTERNS: ReadonlyArray<{ pattern: RegExp; description: string }> = [
