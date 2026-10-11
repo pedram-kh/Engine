@@ -51,6 +51,23 @@ const vuetifyComponents = [
   'VSnackbar',
   'VDataTable',
   'VTable',
+  // Found by a cold-cache E2E run (AH-102 C0.3): each of these was first
+  // discovered mid-run, forcing a full-page reload that dropped an in-flight
+  // route change (creator-detail.spec.ts:64, creator-wizard-happy-path.spec.ts:91).
+  'VSystemBar',
+  'VBottomNavigation',
+  'VBadge',
+  'VPagination',
+  'VTooltip',
+  'VImg',
+  'VRadio',
+  'VRadioGroup',
+  'VSwitch',
+  'transitions',
+  'VTabs',
+  'VWindow',
+  'VSheet',
+  'VAutocomplete',
 ].map((name) => `vuetify/components/${name}`)
 
 export default defineConfig({
