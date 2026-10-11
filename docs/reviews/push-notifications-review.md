@@ -700,3 +700,19 @@ library source and against an edited copy (matches the original, not the edit), 
 
 **Still true:** in a debug build the token is in logcat. Debug builds are the developer's own; the rule in the walk doc
 (§7.5) is not to paste logcat. Signing out revokes the token.
+
+## 26. Pushed, and CI at the pushed tip (2026-10-11)
+
+**Pushed:** `origin/main` `6e827e40..9dd7f167` (15 commits: `1b16a6f6` … `9dd7f167`). Checkpoint A was already pushed
+(`6e827e40`); this is Checkpoint B (app). **Pushed, not deployed.** `push_notifications_enabled` is OFF and
+`IOS_PUSH_ENABLED=false`.
+
+**CI at `9dd7f167`:** [run 38163464156](https://github.com/pedram-kh/Engine/actions/runs/38163464156), conclusion **success**,
+all four jobs green (Frontend, Backend, E2E admin, E2E main).
+
+- **E2E main SPA (Playwright): 34 passed, 0 flaky, 0 failed.** This is the clean Playwright run that §23 deferred to CI,
+  including `2fa-enrollment-and-sign-in.spec.ts:93`, which fails on a loaded laptop (bcrypt cost against a 5 s wait) and
+  passes on the runner.
+- **E2E admin SPA (Playwright): 1 flaky, then passed on retry** (`admin-sign-in.spec.ts:106`: the URL stayed on `/sign-in`
+  on the first attempt). The admin app is untouched by AH-102 (no file under `apps/admin` changed in this range), and the run is
+  green on retry. Recorded as seen, not diagnosed; if it recurs it is a separate tech-debt row.

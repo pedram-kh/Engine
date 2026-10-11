@@ -125,9 +125,8 @@ happened.
 > Android walk (E1/E2/E3, real FCM, Samsung SM-A515F) passed 11 of 12 items; item 12 is partial (rotation re-POST not
 > verified, accepted as a known gap: self-healing in production, see `docs/tech-debt.md`). SPA + Android project only.
 
-- **Status:** PENDING (cleared by the Android walk; pushed, not deployed). **Pushing is not deploying.**
-- **Range:** from Checkpoint A's pushed tip `6e827e40` → tip **recorded in the review §26 after the push** (14 local commits
-  at the time of writing, `1b16a6f6` … `96518a3e`, plus this entry and the spec below): `1b16a6f6` (docs), `f61c0ec1` (C3.1),
+- **Status:** PENDING (cleared by the Android walk; pushed to `origin/main` at `9dd7f167`, CI green; not deployed). **Pushing is not deploying.**
+- **Range:** from Checkpoint A's pushed tip `6e827e40` → tip **`9dd7f167`, pushed 2026-10-11, CI green (run 38163464156; see review §26)** (`1b16a6f6` … `96518a3e` plus `9dd7f167`): `1b16a6f6` (docs), `f61c0ec1` (C3.1),
   `20942da6` (C3.2), `a377cf97` (C4.1), `6d07b727` (C4.2), `55b4ef21` (a test), `1eef233c` (docs), `9119b9c4`
   (google-services.json), `0d51aed9` (iOS wiring), `8521aadc` / `899882d3` / `c803d7db` / `96518a3e` (docs), **`72afb8ae`
   (fix: a cold-start push tap waits for the router; found by the walk)**, and the spec that pins the Android bridge logging as
